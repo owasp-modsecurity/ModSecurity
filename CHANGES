@@ -1,0 +1,144 @@
+
+05 Feb 2006 - 2.1.0-rc7
+------------------------
+
+* Fixed a problem with incorrectly setting requestBodyProcessor using
+  the ctl action.
+
+
+24 Jan 2007 - 2.1.0-rc6
+-----------------------
+
+* Bundled Core Rules 2.1-1.3.2b4.
+
+* Updates to the reference manual.
+
+* Reversed the return values of @validateDTD and @validateSchema, to
+  make them consistent with other operators.
+
+* Added a few helpful debug messages in the XML validation area.
+
+
+05 Jan 2007 - 2.1.0-rc5
+-----------------------
+
+* Updates to the reference manual.
+
+
+29 Dec 2006 - 2.1.0-rc4
+-----------------------
+
+* Fixed the validateByteRange operator.
+
+* Default value for the status action is now 403 (as it was supposed to
+  be but it was effectively 500).
+
+* Rule exceptions (removing using an ID range or an regular expression)
+  is now applied to the current context too. (Previously it only worked
+  on rules that are inherited from the parent context.)
+
+* Fix of a bug with expired variables.
+
+* Fixed regular expression variable selectors for many collections.
+
+* Performance improvements - up to two times for real-life work loads!
+
+* Memory consumption improvements (not measured but significant).
+
+* The allow action did not work in phases 3 and 4. Fixed.
+
+* Unlocked collections GLOBAL and RESOURCE.
+
+* Added support for variable expansion in the msg action.
+
+* New feature: It is now possible to make relative changes to the
+  audit log parts with the ctl action. For example: "ctl:auditLogParts=+E".
+
+* New feature: "tag" action. To be used for event categorisation.
+
+* XML parser was not reporting errors that occured at the end
+  of XML payload.
+
+* Files were not extracted from request if SecUploadKeepFiles was
+  Off. Fixed.
+
+* Regular expressions that are too long are truncated to 256
+  characters before used in error messages. (In order to keep
+  the error messages in the log at a reasonable size.)
+
+* Fixed the sha1 transformation function.
+
+* Fixed the skip action.
+
+* Fixed REQUEST_PROTOCOL, REMOTE_USER, and AUTH_TYPE.
+
+* SecRuleEngine did not work in child configuration contexts
+  (e.g. <Location>).
+
+* Fixed base64Decode and base64Encode.
+
+
+15 Nov 2006 - 2.0.4
+-------------------
+
+* Fixed the "deprecatevar" action.
+
+* Decreasing variable values did not work.
+
+* Made "nolog" do what it is supposed to do - cause a rule match to
+  not be logged. Also "nolog" now implies "noauditlog" but it's
+  possible to follow "nolog" with "auditlog" and have the match
+  not logged to the error log but logged to the auditlog. (Not
+  something that strikes me as useful but it's possible.)
+
+* Relative paths given to SecDataDir will now be treated as relative
+  to the Apache server root.
+
+* Added checks to make sure only correct actions are specified in
+  SecDefaultAction (some actions are required, some don't make any
+  sense) and in rules that are not chain starters (same). This should
+  make the unhelpful "Internal Error: Failed to add rule to the ruleset"
+  message go away.
+
+* Fixed the problem when "SecRuleInheritance Off" is used in a context
+  with no rules defined.
+
+* Fixed a problem of lost input (request body) data on some redirections,
+  for example when mod_rewrite is used.
+
+
+26 Oct 2006 - 2.0.3
+-------------------
+
+* Fixed a memory leak (all platforms) and a concurrency control
+  problem that could cause a crash (multithreaded platforms only).
+
+* Fixed a SecAuditLogRelevantStatus problem, which would not work
+  properly unless the regular expression contained a subexpression.
+
+
+19 Oct 2006 - 2.0.2
+-------------------
+
+* Fixed incorrect permissions on the global mutex, which prevented
+  the mutex from working properly.
+
+* Fixed incorrect actionset merging where the status was copied from
+  the child actionset even though it was not defined.
+
+* Fixed missing metadata information (in the logs) for warnings.
+
+
+16 Oct 2006 - 2.0.1
+-------------------
+
+* Rules that used operator negation did not work. Fixed.
+
+* Fixed bug that prevented invalid regular expressions from being reported.
+
+
+16 Oct 2006 - 2.0.0
+-------------------
+
+* First stable 2.x release.
+

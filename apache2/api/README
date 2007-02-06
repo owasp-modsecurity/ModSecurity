@@ -1,0 +1,26 @@
+
+This directory contains two examples how you can extend
+ModSecurity without having to touch it directly, simply
+by creating custom Apache modules.
+
+1)
+
+Module mod_tfn_reverse.c creates a custom transformation
+function "reverse" that reverses the content it receives
+on input.
+
+To compile simply do:
+
+  apxs -cia mod_tfn_reverse.c
+
+2)
+
+Module mod_op_strstr.c creates a custom operator "strstr"
+that implements fast matching using the Boyer-Moore-Horspool
+algorithm.
+
+Compiling this module is more involved because it requires
+access to ModSecurity structures. For example:
+
+  apxs -I<MODSECURITY_SOURCE_CODE> -I/usr/include/libxml2 -cia mod_op_strstr.c
+

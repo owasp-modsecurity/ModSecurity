@@ -1,0 +1,32 @@
+
+# Basic configuration options
+SecRuleEngine On
+SecRequestBodyAccess On
+SecResponseBodyAccess Off
+
+# Handling of file uploads
+# TODO Choose a folder private to Apache.
+# SecUploadDir /opt/apache-frontend/tmp/
+SecUploadKeepFiles Off
+
+# Debug log
+SecDebugLog logs/modsec_debug.log
+SecDebugLogLevel 0
+
+# Serial audit log
+SecAuditEngine RelevantOnly
+SecAuditLogRelevantStatus ^5
+SecAuditLogParts ABIFHZ
+SecAuditLogType Serial
+SecAuditLog logs/modsec_audit.log
+
+# Maximum request body size we will
+# accept for buffering
+SecRequestBodyLimit 131072
+
+# Store up to 128 KB in memory
+SecRequestBodyInMemoryLimit 131072
+
+# Buffer response bodies of up to
+# 512 KB in length
+SecResponseBodyLimit 524288

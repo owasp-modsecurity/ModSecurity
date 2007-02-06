@@ -1,0 +1,42 @@
+
+# Path to Apache installation
+BASE = "C:/Program Files/Apache Group/Apache2/"
+
+CC = cl
+
+# Add -DWITH_LIBXML2 below if you want to link against libxml2
+DEFS = /nologo /Od /LD /W3 -DWIN32 -DWINNT
+DLL = mod_security2.dll
+
+# Path to the headers - configure the libxml2 include path
+INCLUDES = -I. -I$(BASE)\include -IC:\libxml2\include
+
+CFLAGS= -O $(INCLUDES) $(DEFS)
+
+# Paths to the required libraries
+# Use the line below if you want to link against libxml2
+# LIBS = $(BASE)\lib\libhttpd.lib $(BASE)\lib\libapr.lib $(BASE)\lib\libaprutil.lib $(BASE)\lib\pcre.lib C:\libxml2\lib\libxml2.lib
+
+# Use the line belof if you don't want to link against libxml2
+LIBS = $(BASE)\lib\libhttpd.lib $(BASE)\lib\libapr.lib $(BASE)\lib\libaprutil.lib $(BASE)\lib\pcre.lib
+
+OBJS =  mod_security2.obj apache2_config.obj apache2_io.obj apache2_util.obj \
+    re.obj re_operators.obj re_actions.obj re_tfns.obj re_variables.obj \
+    msc_logging.obj msc_xml.obj msc_multipart.obj modsecurity.obj msc_parsers.obj \
+    msc_util.obj msc_pcre.obj persist_dbm.obj msc_reqbody.obj
+
+all: $(DLL)
+
+dll: $(DLL)
+
+.c.obj:
+    $(CC) $(CFLAGS) -c $< -Fo$@
+
+.cpp.obj:
+    $(CC) $(CFLAGS) -c $< -Fo$@
+
+$(DLL): $(OBJS)
+    $(CC) $(CFLAGS) -LD $(OBJS) -Fe$(DLL) $(LIBS) /link /NODEFAULTLIB:MSVCRT
+
+clean:
+    del $(OBJS) *.dll *.lib *.pdb *.idb *.ilk *.exp *.res *.rc *.bin

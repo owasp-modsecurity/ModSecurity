@@ -1,0 +1,4134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article>
+  <title>ModSecurity Reference Manual</title>
+
+  <articleinfo>
+    <releaseinfo>Version 2.1.0-rc7 / (February 5, 2007)</releaseinfo>
+
+    <copyright>
+      <year>2004-2007</year>
+
+      <holder>Breach Security, Inc. (<ulink
+      url="http://www.breach.com">http://www.breach.com</ulink>)</holder>
+    </copyright>
+  </articleinfo>
+
+  <section id="01-introduction">
+    <title>Introduction</title>
+
+    <para><trademark class="trade">ModSecurity</trademark>is a web application
+    firewall (WAF). With over 70% of all attacks now carried out over the web
+    application level, organisations need every help they can get in making
+    their systems secure. WAFs are deployed to establish an external security
+    layer that increases security, detects, and prevents attacks before they
+    reach web applications. It provides protection from a range of attacks
+    against web applications and allows for HTTP traffic monitoring and
+    real-time analysis with little or no changes to existing
+    infrastructure.</para>
+
+    <section>
+      <title>HTTP Traffic Logging</title>
+
+      <para>Web servers are typically well-equipped to log traffic in a form
+      useful for marketing analyses, but fall short when it comes to logging
+      of traffic to web applications. In particular, most are not capable of
+      logging the request bodies. Your adversaries know this, and that is why
+      most attacks are now carried out via POST requests, rendering your
+      systems blind. ModSecurity makes full HTTP transaction logging possible,
+      allowing complete requests and responses to be logged. Its logging
+      facilities also allow fine-grained decisions to be made about exactly
+      what is logged and when, ensure only the relevant data is
+      recorded.</para>
+    </section>
+
+    <section>
+      <title>Real-Time Monitoring and Attack Detection</title>
+
+      <para>In addition to providing logging facilities, ModSecurity can
+      monitor the HTTP traffic in real time in order to detect attacks. In
+      this case ModSecurity operates as a web intrusion detection tool,
+      allowing you to react to suspicious events that take place at your web
+      systems.</para>
+    </section>
+
+    <section>
+      <title>Attack Prevention and Just-in-time Patching</title>
+
+      <para>ModSecurity can also act immediately to prevent attacks from
+      reaching your web applications. There are three commonly used
+      approaches:</para>
+
+      <orderedlist continuation="restarts" inheritnum="ignore">
+        <listitem>
+          <para>Negative security model. Negative security model monitors
+          requests for anomalies, unusual behaviour, and common web
+          application attacks. It keeps anomaly scores for each request, IP
+          addresses, application sessions, and user accounts. Requests with
+          high anomaly scores are either logged or rejected altogether.</para>
+        </listitem>
+
+        <listitem>
+          <para>Positive security model. When positive security model is
+          deployed, only requests that are known to be valid are accepted,
+          with everything else rejected. This approach works best with
+          applications that are heavily used but rarely updated.</para>
+        </listitem>
+
+        <listitem>
+          <para>Known weaknesses and vulnerabilities. Its rule language makes
+          ModSecurity an ideal external patching tool. External patching is
+          all about reducing the window of opportunity. Time needed to patch
+          application vulnerabilities often runs to weeks in many
+          organisations. With ModSecurity, applications can be patched from
+          the outside, without touching the application source code (and even
+          without any access to it), making your systems secure until a proper
+          patch is produced.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+
+    <section>
+      <title>Flexible Rule Engine</title>
+
+      <para>A flexible rule engine sits in the heart of ModSecurity. It
+      implements the ModSecurity Rule Language, which is a specialised
+      programming language designed to work with HTTP transaction data. The
+      ModSecurity Rule Language was designed to be easy to use, yet flexible:
+      common operations are simple while complex operations are possible.
+      Certified ModSecurity Rules, included with subscription to ModSecurity,
+      contain a comprehensive set of rules that implement general-purpose
+      hardening, common web application security issues. Heavily commented,
+      these rules can be used as a learning tool.</para>
+    </section>
+
+    <section>
+      <title>Embedded-mode Deployment</title>
+
+      <para>ModSecurity is an embeddable web application firewall, which means
+      it can be deployed as part of your existing web server infrastructure
+      provided your web servers are Apache-based. This deployment method has
+      certain advantages:</para>
+
+      <orderedlist continuation="restarts" inheritnum="ignore">
+        <listitem>
+          <para>No changes to existing network. It only takes a few minutes to
+          add ModSecurity to your existing web servers. And because it was
+          designed to be completely passive by default, you are free to deploy
+          it incrementally and only use the features you need. It is equally
+          easy to remove or deactivate it should decide you don't want it any
+          more.</para>
+        </listitem>
+
+        <listitem>
+          <para>No single point of failure. Unlike with network-based
+          deployments, you will not be introducing a new point of failure to
+          your system.</para>
+        </listitem>
+
+        <listitem>
+          <para>Implicit load balancing and scaling. Because it works embedded
+          in web servers, ModSecurity will automatically take advantage of the
+          additional load balancing and scalability features. You will not
+          need to think of load balancing and scaling unless your existing
+          system needs them.</para>
+        </listitem>
+
+        <listitem>
+          <para>Minimal overhead. Because it works from inside the web server
+          process there is no overhead for network communication and minimal
+          overhead in parsing and data exchange.</para>
+        </listitem>
+
+        <listitem>
+          <para>No problem with encrypted or compressed content. Many IDS
+          systems have difficulties analysing SSL traffic. This is not a
+          problem for ModSecurity because it is positioned to work when the
+          traffic is decrypted and decompressed.</para>
+        </listitem>
+      </orderedlist>
+
+      <para>ModSecurity is known to work well on a wide range of operating
+      systems. Our customers are successfully running it on Linux, Windows,
+      Solaris, FreeBSD, OpenBSD, NetBSD, AIX, Mac OS X, and HP-UX.<emphasis
+      role="bold"></emphasis></para>
+    </section>
+
+    <section>
+      <title>Network-based Deployment</title>
+
+      <para>ModSecurity works equally well when deployed as part of an
+      Apache-based reverse proxy server, and many of our customers choose to
+      do so. In this scenario, one installation of ModSecurity can protect any
+      number of web servers (even the non-Apache ones).</para>
+    </section>
+
+    <section id="03-licensing">
+      <title>Licensing</title>
+
+      <para>ModSecurity is available under two licenses. Users can choose to
+      use the software under the terms of the GNU General Public License
+      (<ulink
+      url="http://www.gnu.org/licenses/gpl.html">http://www.gnu.org/licenses/gpl.html</ulink>),as
+      an Open Source / Free Software product. A range of commercial licenses
+      is also available, together with a range of commercial support
+      contracts. For more information on commercial licensing please contact
+      Breach Security.</para>
+
+      <note>
+        <para>ModSecurity, mod_security, and ModSecurity Pro are trademarks or
+        registered trademarks of Breach Security.</para>
+      </note>
+    </section>
+  </section>
+
+  <section>
+    <title>ModSecurity Core Rules</title>
+
+    <section>
+      <title>Overview</title>
+
+      <para>ModSecurity is a web application firewall engine that provides
+      very little protection on its own. In order to become useful ModSecurity
+      must be configured with rules. In order to enable users to take full
+      advantage of ModSecurity out of the box, Breach Security Inc. is
+      providing a free certified rule set for ModSecurity 2.0. Unlike
+      intrusion detection and prevention systems, which rely on signature
+      specific to known vulnerabilities, the Core Rules provide generic
+      protection from unknown vulnerabilities often found in web applications,
+      which are in most cases custom coded. The Core Rules are heavily
+      commented to allow it to be used as a step-by-step deployment guide for
+      ModSecurity. The latest Core Rules can be found at the ModSecurity
+      website -<link
+      linkend="???">http://www.modsecurity.org/projects/rules/index.html</link>.</para>
+    </section>
+
+    <section>
+      <title>Core Rules Structure</title>
+
+      <para>If you expect a single pack of Apache configuration files, you are
+      right, and wrong. A ModSecurity rule set includes information about
+      different areas:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>The logic required to detect attacks.</para>
+        </listitem>
+
+        <listitem>
+          <para>A policy setting the actions to perform if an attack is
+          detected.</para>
+        </listitem>
+
+        <listitem>
+          <para>Information regarding attacks.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>In order to allow separate management of the different parts, the
+      Core Rules are based on templates that are generated into a run-time
+      rule set by inserting policy, patterns and event information. The Core
+      Rules package includes these templates, the generation script (written
+      in Perl) and data files required to generate a useful rule set. It also
+      includes a bunch of pre-generated rule sets for different policies. The
+      generation script also allows two optimizations:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Optimal use of regular expressions. Since regular expressions
+          are much more efficient if assembled into a single expression and
+          optimized, the generation script takes the list of patterns that are
+          required for a rule and optimize them into a most efficient regular
+          expression.</para>
+        </listitem>
+
+        <listitem>
+          <para>Removal of rules that are not utilized by a specific
+          policy.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Core Rules Content</title>
+
+      <para>In order to provide generic web applications protection, the Core
+      Rules use the following techniques:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>HTTP protection - detecting violations of the HTTP protocol
+          and a locally defined usage policy.</para>
+        </listitem>
+
+        <listitem>
+          <para>Common Web Attacks Protection - detecting common web
+          application security attack.</para>
+        </listitem>
+
+        <listitem>
+          <para>Automation detection - Detecting bots, crawlers, scanners and
+          other surface malicious activity.</para>
+        </listitem>
+
+        <listitem>
+          <para>Trojan Protection - Detecting access to Trojans horses.</para>
+        </listitem>
+
+        <listitem>
+          <para>Error Hiding - Disguising error messages sent by the
+          server.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+  </section>
+
+  <section id="02-installation">
+    <title>Installation</title>
+
+    <para>ModSecurity installation consists of the following steps:</para>
+
+    <orderedlist continuation="restarts" inheritnum="ignore">
+      <listitem>
+        <para>ModSecurity 2.x works with Apache 2.0.x or better.</para>
+      </listitem>
+
+      <listitem>
+        <para>Make sure you have <literal
+        moreinfo="none">mod_unique_id</literal>installed.</para>
+      </listitem>
+
+      <listitem>
+        <para>(Optional) Install the latest version of libxml2, if it isn't
+        already installed on the server.</para>
+      </listitem>
+
+      <listitem>
+        <para>Unpack the ModSecurity archive</para>
+      </listitem>
+
+      <listitem>
+        <para>Edit Makefile to configure the path to the Apache ServerRoot
+        directory. You can check this by identifying the ServerRoot directive
+        setting in your httpd.conf file. This is the path that was specified
+        with the "--install-path=" configuration flag during compilation (for
+        example, in Fedora Core4:<filename moreinfo="none"> top_dir =
+        /etc/httpd</filename>).</para>
+      </listitem>
+
+      <listitem>
+        <para>(Optional) Edit Makefile to enable ModSecurity to use libxml2
+        (uncomment line<literal moreinfo="none">DEFS =
+        -DWITH_LIBXML2</literal>) and configure the include path (for example:
+        <filename
+        moreinfo="none">INCLUDES=-I/usr/include/libxml2</filename>)</para>
+      </listitem>
+
+      <listitem>
+        <para>Compile with <literal moreinfo="none">make</literal></para>
+      </listitem>
+
+      <listitem>
+        <para>Stop Apache</para>
+      </listitem>
+
+      <listitem>
+        <para>Install with<literal moreinfo="none"> make
+        install</literal></para>
+      </listitem>
+
+      <listitem>
+        <para>(Optional) Add one line to your configuration to load
+        libxml2:<filename moreinfo="none">LoadFile
+        /usr/lib/libxml2.so</filename></para>
+      </listitem>
+
+      <listitem>
+        <para>Add one line to your configuration to load ModSecurity:<literal
+        moreinfo="none">LoadModule security2_module
+        modules/mod_security2.so</literal></para>
+      </listitem>
+
+      <listitem>
+        <para>Configure ModSecurity</para>
+      </listitem>
+
+      <listitem>
+        <para>Start Apache</para>
+      </listitem>
+
+      <listitem>
+        <para>You now have ModSecurity 2.x up and running.</para>
+      </listitem>
+    </orderedlist>
+
+    <note>
+      <para>If you have compiled Apache yourself you might experience problems
+      compiling ModSecurity against PCRE. This is because Apache bundles PCRE
+      but this library is also typically provided by the operating system. I
+      would expect most (all) vendor-packaged Apache distributions to be
+      configured to use an external PCRE library (so this should not be a
+      problem).</para>
+
+      <para>You want to avoid Apache using the bundled PCRE library and
+      ModSecurity linking against the one provided by the operating system.
+      The easiest way to do this is to compile Apache against the PCRE library
+      provided by the operating system (or you can compile it against the
+      latest PCRE version you downloaded from the main PCRE distribution
+      site). You can do this at configure time using the<literal
+      moreinfo="none"> --with-pcre</literal> switch. If you are not in a
+      position to recompile Apache then, to compile ModSecurity successfully,
+      you'd still need to have access to the bundled PCRE headers (they are
+      available only in the Apache source code) and change the include path
+      for ModSecurity (as you did in step 7 above) to point to them.</para>
+
+      <para>Do note that if your Apache is using an external PCRE library you
+      can compile ModSecurity with <literal
+      moreinfo="none">WITH_PCRE_STUDY</literal> defined,which would possibly
+      give you a slight performance edge in regular expression
+      processing.</para>
+    </note>
+  </section>
+
+  <section id="03-configuration-directives">
+    <title>Configuration Directives</title>
+
+    <para>The following section outlines all of the ModSecurity directives.
+    Most of the ModSecurity directives can be used inside the various Apache
+    Scope Directives such as Virtual Hosts, Location, LocationMatch,
+    Directory, etc... There are others, however, that can only be used once in
+    the main configuration file. This information is specified in the Scope
+    sections below.</para>
+
+    <para>These rules, along with the Core rules files, should be contained is
+    files outside of the httpd.conf file and called up with Apache "Include"
+    directives. This allows for easier updating/migration of the rules. If you
+    create your own custom rules that you would like to use with the Core
+    rules, you should create a file called -
+    modsecurity_crs_15_customrules.conf and place it in the same directory as
+    the Core rules files. By using this file name, your custom rules will be
+    called up after the standard ModSecurity Core rules configuration file but
+    before the other Core rules. This allows your rules to be evaluate first
+    which can be useful if you need to implement specific "allow" rules or to
+    correct any false positives in the Core rules as they are applied to your
+    site.</para>
+
+    <para><emphasis role="bold">Note</emphasis></para>
+
+    <para>It is highly encouraged that you do not edit the Core rules files
+    themselves but rather place all changes (such as SecRuleRemoveByID,
+    etc...) in your custom rules file. This will allow for easier upgrading as
+    newer Core rules are released by Breach on the ModSecurity website.</para>
+
+    <section>
+      <title><literal>SecAction</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Unconditionally
+      processes the action list it receives as the first and only parameter.
+      It accepts one parameter, the syntax of which is identical to the third
+      parameter of<literal moreinfo="none"> SecRule</literal>.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecActionaction 1,action2,action2</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecAction
+      nolog,redirect:http://www.hostname.com</literal></para>
+
+      <para><emphasis role="bold"> <emphasis
+      role="bold">ProcessingPhase:</emphasis> </emphasis>Any</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
+
+      <para>SecAction is best used when you uncondiationally execute an
+      action. This is explicit triggering whereas the normal Actions are
+      conditional based on data inspection of the request/response. This is a
+      useful directive when you want to run certian actions such as initcol to
+      initialize collections.</para>
+    </section>
+
+    <section>
+      <title><literal>SecArgumentSeparator</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Specifies which
+      character to use as separator for<literal moreinfo="none">
+      application/x-www-form-urlencoded</literal> content. Defaults to<literal
+      moreinfo="none">&amp;</literal>. Applications are sometimes (very
+      rarely) written to use a semicolon (<literal
+      moreinfo="none">;</literal>).</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecArgumentSeparator character</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecArgumentSeparator ;</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Main</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
+
+      <para>This directive is needed if a backend web appliaction is using a
+      non-standard argument separator. If this directive is not set properly
+      for each web app, then ModSecurity will not be able to parse the
+      arguements appropriately and the effectiveness of the rule matching will
+      be significantly decreased.</para>
+    </section>
+
+    <section>
+      <title><literal>SecAuditEngine</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configures the audit
+      logging engine.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecAuditEngine On|Off|RelevantOnly</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecAuditEngine On</literal></para>
+
+      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> Can be
+      set/changed with the "ctl" action for the current transaction.</para>
+
+      <para>Example: The following example shows the various audit directives
+      used together.</para>
+
+      <programlisting format="linespecific"><emphasis role="bold">SecAuditEngine RelevantOnly
+</emphasis>SecAuditLog logs/audit/audit.log
+SecAuditLogParts ABCFHZ
+SecAuditLogType concurrent
+SecAuditLogStorageDir logs/audit
+<emphasis role="bold">SecAuditLogRelevantStatus "^(4|5)"</emphasis></programlisting>
+
+      <para>Possible values are:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><literal moreinfo="none">On </literal>- log all transactions
+          by default.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">Off</literal> - do not log
+          transactions by default.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">RelevantOnly </literal>- by default
+          only log transactions that have triggered a warning or an error, or
+          have a status code that is considered to be relevant (see<literal
+          moreinfo="none"> SecAuditLogRelevantStatus</literal>).</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>SecAuditLog</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Defines the path to
+      the main audit log file.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecAuditLog /path/to/auditlog</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecAuditLog
+      /usr/local/apache/logs/audit.log</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> This file is
+      open on startup when the server typically still runs as<emphasis>
+      root</emphasis>. You should not allow non-root users to have write
+      privileges for this file or for the directory it is stored in..</para>
+
+      <para>This file will be used to store the audit log entries if serial
+      audit logging format is used. If concurrent audit logging format is used
+      this file will be used as an index, and contain a record of all audit
+      log files created. If you are planning to use Concurrent audit logging
+      and sending your audit log data off to a remote Console host, then you
+      will need to use the modsec-auditlog-collector.pl script and use the
+      following format:</para>
+
+      <para><literal>SecAuditLog "|/path/to/modsec-auditlog-collector.pl
+      /path/to/SecAuditLogDataDir /path/to/SecAuditLog"</literal></para>
+    </section>
+
+    <section>
+      <title><literal>SecAuditLogParts</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Defines the path to
+      the main audit log file.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecAuditLogParts PARTS</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecAuditLogParts ABCFHZ</literal></para>
+
+      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes: </emphasis>At this time
+      ModSecurity does not log response bodies of stock Apache responses
+      (e.g.<literal moreinfo="none">404</literal>), or the<literal
+      moreinfo="none"> Server</literal> and<literal moreinfo="none"> Date
+      </literal>response headers.</para>
+
+      <para>Default<literal moreinfo="none">ABCFHZ</literal>.</para>
+
+      <para>Available audit log parts:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><literal moreinfo="none">A</literal>– audit log header
+          (mandatory)</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">B</literal>– request headers</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">C</literal>– request body (present
+          only if the request body exists and ModSecurity is configured to
+          intercept it)</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">D</literal>- RESERVED for
+          intermediary response headers, not implemented yet.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">E</literal>– intermediary response
+          body (present only if ModSecurity is configured to intercept
+          response bodies, and if the audit log engine is configured to record
+          it). Intermediary response body is the same as the actual response
+          body unless ModSecurity intercepts the intermediary response body,
+          in which case the actual response body will contain the error
+          message (either the Apache default error message, or the
+          ErrorDocument page).</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">F</literal>– final response headers
+          (excluding the Date and Server headers, which are always added by
+          Apache in the late stage of content delivery).</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">G</literal>– RESERVED for the actual
+          response body, not implemented yet.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">H</literal>- audit log trailer</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">I</literal>- This part is a
+          replacement for part C. It will log the same data as C in all cases
+          except when<literal
+          moreinfo="none">multipart/form-data</literal>encoding in used. In
+          this case it will log a fake<literal moreinfo="none">
+          application/x-www-form-urlencoded</literal> body that contains the
+          information about parameters but not about the files. This is handy
+          if you don't want to have (often large) files stored in your audit
+          logs.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">J</literal>- RESERVED. This part,
+          when implemented, will contain information about the files uploaded
+          using multipart/form-data encoding.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">Z</literal>– final boundary,
+          signifies the end of the entry (mandatory)</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>SecAuditLogRelevantStatus</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Configures which
+      response status code is to be considered relevant for the purpose of
+      audit logging.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecAuditLogRelevantStatus REGEX</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecAuditLogRelevantStatus ^(4|5)</literal></para>
+
+      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> Must have the
+      SecAuditEngine set to RelevantOnly. The parameter is a regular
+      expression.</para>
+
+      <para>The main purpose of this directive is to allow you to configure
+      audit logging for only transactions that generate the specified HTTP
+      Response Status Code. This directive is often used to the decrease the
+      total size of the audit log file. Keep in mind that if this parameter is
+      used, then successful attacks that result in a 200 OK status code will
+      not be logged.</para>
+    </section>
+
+    <section>
+      <title><literal>SecAuditLogStorageDir</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configures the
+      storage directory where concurrent audit log entries are to be
+      stored.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecAuditLogStorageDir
+      /path/to/storage/dir</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecAuditLogStorageDir
+      /usr/local/apache/logs/audit</literal></para>
+
+      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis>
+      SecAuditLogType must be set to Concurrent. The directory must already be
+      created before starting Apache and it must be writable by the web server
+      user as new files are generated at runtime.</para>
+
+      <para>As with all logging mechanisms, ensure that you specify a file
+      system location that as adequate disk space and is not on the root
+      partition.</para>
+    </section>
+
+    <section>
+      <title><literal>SecAuditLogType</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configures the type
+      of audit logging mechanism to be used.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecAuditLogType serial|concurrent</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecAuditLogType serial</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> Must specify
+      SecAuditLogStorageDir if you use concurrent logging.</para>
+
+      <para>Possible values are:</para>
+
+      <orderedlist continuation="restarts" inheritnum="ignore">
+        <listitem>
+          <para><literal moreinfo="none">Serial </literal>- all audit log
+          entries will be stored in the main audit logging file. This is more
+          convenient for casual use but it is slower as only one audit log
+          entry can be written to the file at any one file.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">Concurrent </literal>- audit log
+          entries will be stored in separate files, one for each transaction.
+          Concurrent logging is the mode to use if you are going to send the
+          audit log data off to a remote ModSecurity Console host.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+
+    <section>
+      <title><literal>SecChrootDir</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configures the
+      directory path that will be used to jail the web server process.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecChrootDir /path/to/chroot/dir</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecChrootDir /chroot</literal></para>
+
+      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Main</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> The internal
+      chroot functionality provided by ModSecurity works great for simple
+      setups. One example of a simple setup is Apache serving static files
+      only, or running scripts using modules. For more complex setups you
+      should consider building a jail the old-fashioned way. The internal
+      chroot feature should be treated as somewhat experimental. Due to the
+      large number of default and third-party modules available for the Apache
+      web server, it is not possible to verify the internal chroot works
+      reliably with all of them. You are advised to think about your option
+      and make your own decision. In particular, if you are using any of the
+      modules that fork in the module initialisation phase (e.g. mod_fastcgi,
+      mod_fcgid, mod_cgid), you are advised to examine each Apache process and
+      observe its current working directory, process root, and the list of
+      open files.</para>
+    </section>
+
+    <section>
+      <title><literal>SecCookieFormat</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Selects the cookie
+      format that will be used in the current configuration context.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecCookieFormat 0|1</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecCookieFormat 0</literal></para>
+
+      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
+
+      <para>Possible values are:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><literal moreinfo="none">0</literal> - use version 0
+          (Netscape) cookies. This is what most applications use. It is the
+          default value.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">1 </literal>- use version 1
+          cookies.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>SecDataDir</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Path where
+      persistent data (e.g. IP address data, session data, etc) is to be
+      stored.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecDataDir /path/to/dir</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecDataDir /usr/local/apache/logs/data</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Main</para>
+
+      <para><emphasis role="bold">Dependencies/Notes: </emphasis> This
+      directive is needed when initcol, setsid an setuid are used. Must be
+      writable by the web server user.</para>
+    </section>
+
+    <section>
+      <title><literal>SecDebugLog</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Path to the
+      ModSecurity debug log file.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecDebugLog /path/to/modsec-debug.log</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecDebugLog
+      /usr/local/apache/logs/modsec-debug.log</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
+    </section>
+
+    <section>
+      <title><literal>SecDebugLogLevel</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Configures the
+      verboseness of the debug log data.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecDebugLogLevel 0|1|2|3|4|5|6|7|8|9</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecDebugLogLevel 4</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> Levels
+      <literal moreinfo="none">1</literal>-<literal moreinfo="none">3
+      </literal>are always sent to the Apache error log. Therefore you can
+      always use level<literal moreinfo="none"> 0 </literal>as the default
+      logging level in production. Level<literal moreinfo="none"> 5
+      </literal>is useful when debugging. It is not advisable to use higher
+      logging levels in production as excessive logging can slow down server
+      significantly.</para>
+
+      <para>Possible values are:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><literal moreinfo="none">0 </literal>- no logging.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">1 </literal>- errors (intercepted
+          requests) only.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">2 </literal>- warnings.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">3 </literal>- notices.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">4 </literal>- details of how
+          transactions are handled.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">5 </literal>- as above, but including
+          information about each piece of information handled.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">9 </literal>- log everything,
+          including very detailed debugging information.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>SecDefaultAction</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Defines the default
+      action to take on a rule match.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecDefaultAction
+      action1,action2,action3</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecDefaultAction
+      log,auditlog,deny,status:403,phase:2,t:lowercase</literal></para>
+
+      <para><emphasis role="bold">Processing Phase: </emphasis>Any</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes: </emphasis>Rules
+      following a SecDefaultAction directive will inherit this setting unless
+      a specific action is specified for an indivdual rule or until another
+      SecDefaultAction is specified.</para>
+
+      <para>The default value is:</para>
+
+      <programlisting format="linespecific">SecDefaultAction log,auditlog,deny,status:403,phase:2,t:lowercase,t:replaceNulls,t:compressWhitespace</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>SecDefaultAction must specify a disruptive action and a processing
+      phase.</para>
+    </section>
+
+    <section>
+      <title><literal>SecGuardianLog</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configuration
+      directive to use the httpd-guardian script to monitor for Denial of
+      Service (DoS) attacks.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecGuardianLog |/path/to/httpd-guardian</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecGuardianLog
+      |/usr/local/apache/bin/httpd-guardian</literal></para>
+
+      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Main</para>
+
+      <para><emphasis role="bold">Dependencies/Notes: </emphasis>By default
+      httpd-guardian will defend against clients that send more 120 requests
+      in a minute, or more than 360 requests in five minutes.</para>
+
+      <para>Since 1.9 ModSecurity supports a new directive, SecGuardianLog,
+      that is designed to send all access data to another program using the
+      piped logging feature. Since Apache is typically deployed in a
+      multi-process fashion, making information sharing difficult, the idea is
+      to deploy a single external process to observe all requests in a
+      stateful manner, providing additional protection.</para>
+
+      <para>Development of a state of the art external protection tool will be
+      a focus of subsequent ModSecurity releases. However, a fully functional
+      tool is already available as part of the Apache httpd tools project
+      (<link linkend="???">http://www.apachesecurity.net/tools/</link>). The
+      tool is called httpd-guardian and can be used to defend against Denial
+      of Service attacks. It uses the blacklist tool (from the same project)
+      to interact with an iptables-based (Linux) or pf-based (*BSD) firewall,
+      dynamically blacklisting the offending IP addresses. It can also
+      interact with SnortSam (http://www.snortsam.net). Assuming
+      httpd-guardian is already configured (look into the source code for the
+      detailed instructions) you only need to add one line to your Apache
+      configuration to deploy it:</para>
+
+      <programlisting format="linespecific">SecGuardianLog |/path/to/httpd-guardian</programlisting>
+    </section>
+
+    <section>
+      <title><literal>SecRequestBodyAccess</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configures whether
+      request bodies will be buffered and processed by ModSecurity by
+      default.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecRequestBodyAccess On|Off</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecRequestBodyAccess On</literal></para>
+
+      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes: </emphasis>Thisdirective
+      is required if you plan to inspect POST_PAYLOADS of requests. This
+      directive must be used along with the "phase:2" processing phase action
+      and REQUEST_BODY variable/location. If any of these 3 parts are not
+      configured, you will not be able to inspect the request bodies.</para>
+
+      <para>Possible values are:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><literal moreinfo="none">On</literal> - access request
+          bodies.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">Off </literal>- do not attempt to
+          access request bodies.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>SecRequestBodyLimit</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configures the
+      maximum request body size ModSecurity will accept for buffering.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecRequestBodyLimit NUMBER_IN_BYTES</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecRequestBodyLimit 134217728</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes: </emphasis>131072 KB
+      (134217728 bytes) is the default setting. Anything over this limit will
+      be rejected with status code 413 Request Entity Too Large. There is a
+      hard limit of 1 GB.</para>
+    </section>
+
+    <section>
+      <title><literal>SecRequestBodyInMemoryLimit</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Configures the
+      maximum request body size ModSecurity will store in memory.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecRequestBodyInMemoryLimit
+      NUMBER_IN_BYTES</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecRequestBodyInMemoryLimit 131072</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
+
+      <para>By default the limit is 128 KB:</para>
+
+      <programlisting format="linespecific"># Store up to 128 KB in memory
+SecRequestBodyInMemoryLimit 131072</programlisting>
+    </section>
+
+    <section>
+      <title><literal>SecResponseBodyLimit</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Configures the
+      maximum response body size that will be accepted for buffering.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecResponseBodyLimit NUMBER_IN_BYTES</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecResponseBodyLimit 524228</literal></para>
+
+      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes: </emphasis>Anything over
+      this limit will be rejected with status code 500 Internal Server Error.
+      This setting will not affect the responses with MIME types that are not
+      marked for buffering. There is a hard limit of 1 GB.</para>
+
+      <para>By default this limit is configured to 512 KB:</para>
+
+      <programlisting format="linespecific"># Buffer response bodies of up to 512 KB in length 
+SecResponseBodyLimit 524288</programlisting>
+    </section>
+
+    <section>
+      <title><literal>SecResponseBodyMimeType</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Configures
+      which<literal moreinfo="none"> MIME</literal> types are to be considered
+      for response body buffering.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecResponseBodyMimeType mime/type</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecResponseBodyMimeType text/plain
+      text/html</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis>
+      Multiple<literal moreinfo="none"> SecResponseBodyMimeType</literal>
+      directives can be used to add<literal moreinfo="none"> MIME</literal>
+      types.</para>
+
+      <para>The default value is <literal
+      moreinfo="none">text/plaintext/html</literal>:</para>
+
+      <programlisting format="linespecific">SecResponseBodyMimeType text/plain text/html</programlisting>
+    </section>
+
+    <section>
+      <title><literal>SecResponseBodyMimeTypesClear</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Clears the list of
+      <literal moreinfo="none">MIME </literal>types considered for response
+      body buffering, allowing you to start populating the list from
+      scratch.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecResponseBodyMimeTypesClear</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecResponseBodyMimeTypesClear</literal></para>
+
+      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
+    </section>
+
+    <section>
+      <title><literal>SecResponseBodyAccess</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configures whether
+      response bodies are to be buffer and analysed or not.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecResponseBodyAccess On|Off</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecResponseBodyAccess On</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> This
+      directive is required if you plan to inspect html responses. This
+      directive must be used along with the "phase:4" processing phase action
+      and RESPONSE_BODY variable/location. If any of these 3 parts are not
+      configured, you will not be able to inspect the response bodies.</para>
+
+      <para>Possible values are:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><literal moreinfo="none">On </literal>- access response bodies
+          (but only if the MIME type matches, see above).</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">Off </literal>- do not attempt to
+          access response bodies.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>SecRule</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> <literal
+      moreinfo="none">SecRule</literal>is the main ModSecurity directive. It
+      is used to analyse data and perform actions based on the results.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecRuleVARIABLES OPERATOR [ACTIONS]</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecRuleREQUEST_URI "attack"</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
+
+      <para>In general, the format of this rule is as follows:</para>
+
+      <programlisting format="linespecific">SecRule VARIABLES OPERATOR [ACTIONS]</programlisting>
+
+      <para>The second part, <literal moreinfo="none">OPERATOR</literal>,
+      specifies how they are going to be checked. The third (optional) part,
+      <literal moreinfo="none">ACTIONS</literal>, specifies what to do
+      whenever the operator used performs a successful match against a
+      variable.</para>
+
+      <section>
+        <title>Variables in rules</title>
+
+        <para>The first part,<literal moreinfo="none"> VARIABLES</literal>,
+        specifies which variables are to be checked. For example, the
+        following rule will reject a transaction that has the word<emphasis>
+        dirty</emphasis> in the URI:</para>
+
+        <programlisting format="linespecific">SecRule REQUEST_URI dirty</programlisting>
+
+        <para>Each rule can specify one or more variables:</para>
+
+        <programlisting format="linespecific">SecRule REQUEST_URI|QUERY_STRING dirty</programlisting>
+
+        <para>There is a third format supported by the selection operator -
+        XPath expression. XPath expressions can only used against the special
+        variable XML, which is available only of the request body was
+        processed as XML.</para>
+
+        <programlisting format="linespecific">SecRule XML:/xPath/Expression dirty</programlisting>
+
+        <note>
+          <para>As you have just seen, not all collections support all
+          selection operator format types. You should refer to the
+          documentation of each collection to determine what is and isn't
+          supported.</para>
+        </note>
+      </section>
+
+      <section>
+        <title>Operators in rules</title>
+
+        <para>In the simplest possible case you will use a regular expression
+        pattern as the second rule parameter. This is what we've done in the
+        examples above. If you do this ModSecurity assumes you want to use
+        the<literal moreinfo="none"> rx </literal>operator. You can explicitly
+        specify the operator you want to use by using <literal
+        moreinfo="none">@ </literal>as the first character in the second rule
+        parameter:</para>
+
+        <programlisting format="linespecific">SecRule REQUEST_URI "@rx dirty"</programlisting>
+
+        <para>Note how we had to use double quotes to delimit the second rule
+        parameter. This is because the second parameter now has a whitespace
+        in it. Any number of whitespace characters can follow the name of the
+        operator. If there are any non-whitespace characters there, they will
+        all be treated as a special parameter to the operator. In the case of
+        the regular expression operator the special parameter is the pattern
+        that will be used for comparison.</para>
+
+        <para>The @ can be the second character if you are using negation to
+        negate the result returned by the operator:</para>
+
+        <programlisting format="linespecific">SecRule &amp;ARGS "!@rx ^0$"</programlisting>
+      </section>
+
+      <section>
+        <title>Actions in rules</title>
+
+        <para>The third parameter,<literal moreinfo="none"> ACTIONS</literal>,
+        can be omitted only because there is a helper feature that specifies
+        the default action list. If the parameter isn't omitted the actions
+        specified in the parameter will be merged with the default action list
+        to create the actual list of actions that will be processed on a rule
+        match.</para>
+      </section>
+    </section>
+
+    <section>
+      <title><literal>SecRuleInheritance</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configures whether
+      the current context will inherit rules from the parent context
+      (configuration options are inherited in most cases - you should look up
+      the documentation for every directive to determine if it is inherited or
+      not).</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecRuleInheritance On|Off</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecRuleInheritance Off</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis>
+      Resource-specific contexts (e.g.<literal moreinfo="none">
+      Location</literal>,<literal moreinfo="none"> Directory</literal>, etc)
+      cannot override<emphasis>phase1</emphasis>rules configured in the main
+      server or in the virtual server. This is because phase 1 is run early in
+      the request processing process, before Apache maps request to resource.
+      Virtual host context can override phase 1 rules configured in the main
+      server.</para>
+
+      <para>Example: The following example shows where ModSecurity may be
+      enabled in the main Apache configuration scope, however you might want
+      to configure your VirtualHosts differently. In the first example, the
+      first virtualhost is not inheriting the ModSecurity main config
+      directives and in the second one it is.</para>
+
+      <programlisting format="linespecific">SecRuleEnine On
+SecDefaultAction log,pass,phase:2
+...  
+
+&lt;VirtualHost *:80&gt;
+ServerName app1.com 
+ServerAlias www.app1.com<emphasis role="bold">
+SecRuleInheritance Off</emphasis>
+SecDefaultAction log,deny,phase:1,redirect:http://www.site2.com 
+... 
+&lt;/VirtualHost&gt;  
+
+&lt;VirtualHost *:80&gt; 
+ServerName app2.com 
+ServerAlias www.app2.com
+<emphasis role="bold">SecRuleInheritance On
+</emphasis>SecRule ARGS "attack" 
+... 
+&lt;/VirtualHost&gt;</programlisting>
+
+      <para>Possible values are:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><literal moreinfo="none">On </literal>- inherit rules from the
+          parent context.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">Off </literal>- do not inherit rules
+          from the parent context.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>SecRuleEngine</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configures the rules
+      engine.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecRuleEngineOn|Off|DetectionOnly</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecRuleEngine On</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> Thisdirective
+      can also be controled by the ctl action (ctl:ruleEngine=off) for per
+      rule processing.</para>
+
+      <para>Possible values are:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><literal moreinfo="none">On </literal>- process rules.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">Off </literal>- do not process
+          rules.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">DetectionOnly </literal>- process
+          rules but never intercept transactions, even when rules are
+          configured to do so.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>SecRuleRemoveById</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Removes matching
+      rules from the parent contexts.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecRuleRemoveById RULEID</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecRuleRemoveByID 1 2 "9000-9010"</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> This
+      directive supports multiple parameters, where each parameter can either
+      be a rule ID, or a range. Parameters that contain spaces must be
+      delimited using double quotes.</para>
+
+      <programlisting format="linespecific">SecRuleRemoveById 1 2 5 10-20 "400-556" 673</programlisting>
+    </section>
+
+    <section>
+      <title><literal>SecRuleRemoveByMsg</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Removes matching
+      rules from the parent contexts.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecRuleRemoveByMsg REGEX</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecRuleRemoveByMsg "FAIL"</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> This
+      directive supports multiple parameters. Each parameter is a regular
+      expression that will be applied to the message (specified using the
+      <literal moreinfo="none">msg </literal>action).</para>
+    </section>
+
+    <section>
+      <title><literal>SecServerSignature</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Instructs
+      ModSecurity to change the data presented in the "Server:" response
+      header token.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecServerSignature "WEB SERVER
+      SOFTWARE"</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecServerSignature
+      "Netscape-Enterprise/6.0"</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Main</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> In order for
+      this directive to work, you must set the Apache ServerTokens directive
+      to Full. ModSecurity will overwrite the server signature data held in
+      this memory space with the data set in this directive. If ServerTokens
+      is not set to Full, then the memory space is most likely not large
+      enough to hold the new data we are looking to insert.</para>
+    </section>
+
+    <section>
+      <title><literal>SecTmpDir</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configures the
+      directory where temporary files will be created.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecTmpDir /path/to/dir</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecTmpDir /tmp</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes: </emphasis>Needs to be
+      writable by the Apache user process. This is the directory location
+      where Apache will swap data to disk if it runs out of memory (more data
+      than what was specified in the SecRequestBodyInMemoryLimit directive)
+      during inspection.</para>
+    </section>
+
+    <section>
+      <title><literal>SecUploadDir</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configures the
+      directory where intercepted files will be stored.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecUploadDir /path/to/dir</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecUploadDir /tmp</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> This
+      directory must be on the same filesystem as the temporary directory
+      defined with <literal moreinfo="none">SecTmpDir</literal>. This
+      directive is used with <literal>SecUploadKeepFiles</literal>.</para>
+    </section>
+
+    <section>
+      <title><literal>SecUploadKeepFiles</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configures whether
+      or not the intercepted files will be kept after transaction is
+      processed.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecUploadKeepFiles On|Off|RelevantOnly</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecUploadKeepFiles On</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes: </emphasis>This
+      directive requires the storage directory to be defined (using <literal
+      moreinfo="none">SecUploadDir</literal>).</para>
+
+      <para>Possible values are:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><literal moreinfo="none">On </literal>- Keep uploaded
+          files.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">Off </literal>- Do not keep uploaded
+          files.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">RelevantOnly </literal>- This will
+          keep only those files that belong to requests that are deemed
+          relevant.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>SecWebAppId</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Creates a partition
+      on the server that belongs to one web application.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecWebAppId "NAME"</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecWebAppId "WebApp1"</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis>N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> Partitions
+      are used to avoid collisions between session IDs and user IDs. This
+      directive must be used if there are multiple applications deployed on
+      the same server. If it isn't a collision between session IDs might
+      occur. The default value is<literal moreinfo="none"> default</literal>.
+      Example:</para>
+
+      <programlisting format="linespecific">&lt;VirtualHost *:80&gt; 
+ServerName app1.com 
+ServerAlias www.app1.com
+<emphasis role="bold">SecWebAppId "App1"</emphasis>
+SecRule REQUEST_COOKIES:PHPSESSID !^$ chain,nolog,pass 
+SecAction setsid:%{REQUEST_COOKIES.PHPSESSID} 
+... 
+&lt;/VirtualHost&gt;  
+
+&lt;VirtualHost *:80&gt; 
+ServerName app2.com 
+ServerAlias www.app2.com<emphasis role="bold">
+SecWebAppId "App2"</emphasis>
+SecRule REQUEST_COOKIES:PHPSESSID !^$ chain,nolog,pass 
+SecAction setsid:%{REQUEST_COOKIES.PHPSESSID} 
+... 
+&lt;/VirtualHost&gt;</programlisting>
+
+      <para>In the two examples configurations shown, SecWebAppId is being
+      used in conjuction with the Apache VirtualHost directives. What this
+      achieves is to create more unique collection names when being hosted on
+      one server. Normally, when setsid is used, ModSecurity will create a
+      collection with the name "SESSION" and it will hold the value specified.
+      With using SecWebAppId as shown in the examples, however, the name of
+      the collection would become "App1_SESSION" and "App2_SESSION".</para>
+
+      <para>SecWebAppId is relevant in two cases:</para>
+
+      <orderedlist continuation="restarts" inheritnum="ignore">
+        <listitem>
+          <para>You are logging transactions/alerts to the ModSecurity Console
+          and you want to use the web application ID to search only the
+          transactions belonging to that application.</para>
+        </listitem>
+
+        <listitem>
+          <para>You are using the data persistence facility (collections
+          SESSION and USER) and you need to avoid collisions between sessions
+          and users belonging to different applications.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+  </section>
+
+  <section id="04-processing-phases">
+    <title>Processing Phases</title>
+
+    <para>ModSecurity 2.x allows rules to be placed in one of the following
+    five phases:</para>
+
+    <orderedlist continuation="restarts" inheritnum="ignore">
+      <listitem>
+        <para>Request headers</para>
+      </listitem>
+
+      <listitem>
+        <para>Request body</para>
+      </listitem>
+
+      <listitem>
+        <para>Response headers</para>
+      </listitem>
+
+      <listitem>
+        <para>Response body</para>
+      </listitem>
+
+      <listitem>
+        <para>Logging</para>
+      </listitem>
+    </orderedlist>
+
+    <para><emphasis role="bold">ModSecurity Processing Phases
+    Diagram</emphasis></para>
+
+    <para><emphasis> <emphasis>Below is a diagram of the standard Apache
+    Request Cycle. In the diagram, the 5 ModSecurity processing phases are
+    shown.</emphasis> </emphasis></para>
+
+    <para><graphic fileref="apache_request_cycle-modsecurity.jpg" scale="150"
+    scalefit="" /></para>
+
+    <para>In order to select the phase a rule executes during, use the phase
+    action either directly in the rule or in using the
+    <literal>SecDefaultAction</literal> directive:</para>
+
+    <programlisting format="linespecific">SecDefaultAction "log,pass,<emphasis
+        role="bold">phase:2</emphasis>"
+SecRule HTTP_Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis>"</programlisting>
+
+    <para><emphasis role="bold">Note on Rule and Phases</emphasis></para>
+
+    <para>Keep in mind that rules are executed according to phases, so even if
+    two rules are adjacent in a configuration file, but are set to execute in
+    different phases, they would not happen one after the other. The order of
+    rules in the configuration file is important only within the rules of each
+    phase. This is especially important when using the <literal>skip</literal>
+    action.</para>
+
+    <section>
+      <title>Phase Request Headers</title>
+
+      <para>Rules in this phase immediately after Apache completes reading the
+      request headers (post-read-request phase). At this point the request
+      body has not been read yet, meaning not all request arguments are
+      available. Rules should be placed in this phase if you need to have them
+      run early (before Apache does something with the request), to do
+      something before the request body has been read, determine whether or
+      not the request body should be buffered, or decide how you want the
+      request body to be processed (e.g. whether to parse it as XML or
+      not).</para>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Rules in this phase can not leverage Apache scope directives
+      (Directory, Location, LocationMatch, etc...) as the post-read-request
+      hook does not have this information yet. The exception here is the
+      VirtualHost directive. If you want to use ModSecurity rules inside
+      Apache locations, then they should run in Phase 2. Refer to the Apache
+      Request Cycle/ModSecurity Processing Phases diagram.</para>
+    </section>
+
+    <section>
+      <title>Phase Request Body</title>
+
+      <para>This is the general-purpose input analysis phase. Most of the
+      application-oriented rules should go here. In this phase you are
+      guaranteed to have received the request argument (provided the request
+      body has been read). ModSecurity supports three encoding types for the
+      request body phase:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>application/x-www-form-urlencoded - used to transfer form
+          data</para>
+        </listitem>
+
+        <listitem>
+          <para>multipart/form-data – used for file transfers</para>
+        </listitem>
+
+        <listitem>
+          <para>text/xml - used for passing XML data</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Other encodings are not used by most web applications.</para>
+    </section>
+
+    <section>
+      <title>Phase Response Headers</title>
+
+      <para>This phase takes place just before response headers are sent back
+      to the client. Run here if you want to observe the response before that
+      happens, and if you want to use the response headers to determine if you
+      want to buffer the response body. Note that some response status codes
+      (such as 404) are handled earlier in the request cycle by Apache and my
+      not be able to be triggered as expected. Additionally, there are some
+      response headers that are added by Apache at a later hook (such as Date,
+      Server and Connection) that we would not be able to trigger on or
+      sanitize. This should work appropirately in a proxy setup
+      however.</para>
+    </section>
+
+    <section>
+      <title>Phase Response Body</title>
+
+      <para>This is the general-purpose output analysis phase. At this point
+      you can run rules against the response body (provided it was buffered,
+      of course). This is the phase where you would want to inspect the
+      outbound html for information discloure, error messages or failed
+      authentication text.</para>
+    </section>
+
+    <section>
+      <title>Phase Logging</title>
+
+      <para>This phase is run just before logging takes place. The rules
+      placed into this phase can only affect how the logging is performed.
+      This phase can be used to inspect the error messages logged by Apache.
+      You can not deny/block connections in this phase as it is too
+      late.</para>
+    </section>
+  </section>
+
+  <section id="05-variables">
+    <title>Variables</title>
+
+    <para>The following variables are supported in ModSecurity 2.x:</para>
+
+    <section>
+      <title><literal moreinfo="none">ARGS</literal></title>
+
+      <para><literal>ARGS</literal> is a collection and can be used on its own
+      (means all arguments including the POST Payload), with a static
+      parameter (matches arguments with that name), or with a regular
+      expression (matches all arguments with name that matches the regular
+      expression). Note:<literal> ARGS:p</literal> will not result in any
+      invocations against the operator if argument p does not exist. Some
+      variables are actually collections, which are expanded into more
+      variables at runtime. The following example will examine all request
+      arguments:<programlisting format="linespecific">SecRule ARGS dirty</programlisting>Sometimes,
+      however, you will want to look only at parts of a collection. This can
+      be achieved with the help of the<emphasis>selection
+      operator</emphasis>(colon). The following example will only look at the
+      arguments named<literal moreinfo="none"> p</literal> (do note that, in
+      general, requests can contain multiple arguments with the same name):
+      <programlisting format="linespecific">SecRule ARGS:p dirty</programlisting>It
+      is also possible to specify exclusions. The following will examine all
+      request arguments for the word<emphasis> dirty</emphasis>, except the
+      ones named<literal moreinfo="none"> z </literal>(again, there can be
+      zero or more arguments named<literal moreinfo="none"> z</literal>):
+      <programlisting format="linespecific">SecRule ARGS|!ARGS:z dirty</programlisting>There
+      is a special operator that allows you to count how many variables there
+      are in a collection. The following rule will trigger if there is more
+      than zero arguments in the request (ignore the second parameter for the
+      time being): <programlisting format="linespecific">SecRule &amp;ARGS !^0$</programlisting>And
+      sometimes you need to look at an array of parameters, each with a
+      slightly different name. In this case you can specify a regular
+      expression in the selection operator itself. The following rule will
+      look into all arguments whose names begin with <literal
+      moreinfo="none">id_</literal>: <programlisting format="linespecific">SecRule ARGS:/^id_/ dirty</programlisting><para>
+          <emphasis role="bold">Note</emphasis>
+        </para> In ModSecurity 1.X, the <literal>ARGS</literal> variable stood
+      for <literal>QUERY_STRING</literal> + <literal>POST_PAYLOAD</literal>,
+      whereas now it expands to to individual variables.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">ARGS_COMBINED_SIZE</literal></title>
+
+      <para>This variable allows you to set more targeted evaluations on the
+      total size of the Arguments as compared with normal Apache LimitRequest
+      directives. For example, you could create a rule to ensure that the
+      total size of the argument data is below a certain threshold (to help
+      prevent buffer overflow issues). Example: Block request if the size of
+      the arguments is above 25 characters.</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_FILENAME "^/cgi-bin/login\.php$" "chain,log,deny,status:403,phase:2"
+SecRule<emphasis role="bold"> ARGS_COMBINED_SIZE </emphasis>"@gt 25"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">ARGS_NAMES</literal></title>
+
+      <para>Is a collection of the argument names. You can search for specific
+      argument names that you want to block. In a positive policy scenario,
+      you can also whitelist (using an inverted rule with the ! character)
+      only authorized argument names. Example: This example rule will only
+      allow 2 argument names - p and a. If any other argument names are
+      injected, it will be blocked.</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_FILENAME "/index.php" "chain,log,deny,status:403,phase:2"
+SecRule<emphasis role="bold"> ARGS_NAMES</emphasis> "!^(p|a)$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">AUTH_TYPE</literal></title>
+
+      <para>This variable holds the authentication method used to validate a
+      user. Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> AUTH_TYPE </emphasis>"basic" log,deny,status:403,phase:1,t:lowercase</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This data will not be available in a proxy-mode deployment as the
+      authentication is not local. In a proxy-mode deployment, you would need
+      to inpect the <literal>REQUEST_HEADERS:Authorization</literal>
+      header.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">ENV</literal></title>
+
+      <para>Collection, requires a single parameter (after a colon character).
+      The ENV variable is set with setenv and does not give access to the CGI
+      environment variables. Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_FILENAME "printenv" pass,<emphasis
+          role="bold">setenv:tag=suspicious</emphasis>
+SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">FILES</literal></title>
+
+      <para>Collection. Contains a collection of original file names (as they
+      were called on the remote user's file system). Note: only available if
+      files were extracted from the request body. Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> FILES</emphasis> "\.conf$" log,deny,status:403,phase:2</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">FILES_COMBINED_SIZE</literal></title>
+
+      <para>Single value. Total size of the uploaded files. Note: only
+      available if files were extracted from the request body. Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">FILES_COMBINED_SIZE</emphasis> "@gt 1000" log,deny,status:403,phase:2</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">FILES_NAMES</literal></title>
+
+      <para>Collection w/o parameter. Contains a list of form fields that were
+      used for file upload. Note: only available if files were extracted from
+      the request body. Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> FILES_NAMES</emphasis> "^upfile$" log,deny,status:403,phase:2</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">FILES_SIZES</literal></title>
+
+      <para>Collection. Contains a list of file sizes. Useful for implementing
+      a size limitation on individual uploaded files. Note: only available if
+      files were extracted from the request body. Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> FILES_SIZES </emphasis>"@gt 100" log,deny,status:403,phase:2</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">FILES_TMPNAMES</literal></title>
+
+      <para>Collection. Contains a collection of temporary files' names on the
+      disk. Useful when used together with <literal
+      moreinfo="none">@inspectFile. </literal>Note: only available if files
+      were extracted from the request body. Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">FILES_TMPNAMES</emphasis> "@inspectFile /usr/local/apache/tests/inspect_script.pl"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">HTTP_</literal></title>
+
+      <para>This variable is a special prefix that is followed by a header
+      name and can be used to access any request header. Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> HTTP_REFERER</emphasis> "www\.badsite\.com"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This variable is for backward-compatibilty with ModSecurity 1.X
+      rules. It has been superceded by the REQUEST_HEADERS variable
+      (REQUEST_HEADERS:<emphasis>Headername</emphasis>)</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">PATH_INFO</literal></title>
+
+      <para>Besides passing query information to a script/handler, you can
+      also pass additional data, known as extra path information, as part of
+      the URL. Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> PATH_INFO</emphasis> "^/(bin|etc|sbin|opt|usr)"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">QUERY_STRING</literal></title>
+
+      <para>This variable holds form data passed to the script/handler by
+      appending data after a question mark. Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold">Q UERY_STRIN G</emphasis>"attack"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REMOTE_ADDR</literal></title>
+
+      <para>This variable holds the IP address of the remote client.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REMOTE_ADDR </emphasis>"^192\.168\.1\.101$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REMOTE_HOST</literal></title>
+
+      <para>If HostnameLookUps are set to On, then this variable will hold the
+      DNS resolved remote host name. If it is set to Off, then it will hold
+      the remote IP address. Possible uses for this variable would be to deny
+      known bad client hosts or network blocks, or conversely, to allow in
+      authorized hosts. Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> REMOTE_HOST </emphasis>"\.evil\.network\org$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REMOTE_PORT</literal></title>
+
+      <para>This variable hold information on the source port that the client
+      used when initiating the connection to our web server. Example: in this
+      example, we are evaluating to see if the <literal>REMOTE_PORT</literal>
+      is less than 1024, which would indicate that the user is a privileged
+      user (root).</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REMOTE_PORT </emphasis>"@lt 1024" phase:1,log,pass,setenv:remote_port=privileged</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REMOTE_USER</literal></title>
+
+      <para>This variable holds the username of the authenticated user. If
+      there are no password (basic|digest) access controls in place, then this
+      variable will be empty. Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REMOTE_USER</emphasis> "admin"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This data will not be available in a proxy-mode deployment as the
+      authentication is not local.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REQBODY_PROCESSOR</literal></title>
+
+      <para>Built-in processors are <literal
+      moreinfo="none">URLENCODED</literal>,<literal moreinfo="none">
+      MULTIPART</literal>, and <literal moreinfo="none">XML</literal>.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQBODY_PROCESSOR</emphasis> "^XML$ chain
+SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
+    </section>
+
+    <section>
+      <title><literal
+      moreinfo="none">REQBODY_PROCESSOR_ERROR</literal></title>
+
+      <para>0 (no error) or 1 (error). If you want to stop processing on an
+      error you must have an explicit rule in phase 2 to do so.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQBODY_PROCESSOR_ERROR</emphasis> "@eq 1" deny,phase:2</programlisting>
+    </section>
+
+    <section>
+      <title><literal
+      moreinfo="none">REQBODY_PROCESSOR_ERROR_MSG</literal></title>
+
+      <para>Empty, or contains the error message from the processor.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQBODY_PROCESSOR_ERROR_MSG</emphasis> "failed to parse" t:lowercase</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REQUEST_BASENAME</literal></title>
+
+      <para>This variable holds just the filename part of
+      <literal>REQUEST_FILENAME</literal> (e.g. index.php). Warning: not
+      urlDecoded. Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_BASENAME </emphasis>"^login\.php$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REQUEST_BODY</literal></title>
+
+      <para>This variable holds the data in the request body (including
+      POST_PAYLOAD data). REQUEST_BODY should be used if the original order of
+      the arguements is important (ARGS should be used in all other cases).
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQUEST_BODY </emphasis>"^username=\w{25,}\&amp;password=\w{25,}\&amp;Submit\=login$"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This variable is only available if the content type is
+      application/x-www-form-urlencoded.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REQUEST_COOKIES</literal></title>
+
+      <para>This variable is a collection of all of the cookie data. Example:
+      the following example is using the Ampersand special operator to count
+      how many variables are in the collection. In this rule, it would trigger
+      if the request does not include any Cookie headers.</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> &amp;REQUEST_COOKIES</emphasis> "@eq 0"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REQUEST_COOKIES_NAMES</literal></title>
+
+      <para>This variable is a collection of the cookie names in the request
+      headers. Example: the following rule will trigger if the JSESSIONID
+      cookie is not present.</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> &amp;REQUEST_COOKIES_NAMES:JSESSIONID</emphasis> "@eq 0"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REQUEST_FILENAME</literal></title>
+
+      <para>This variable holds the relative REQUEST_URI minus the
+      QUERY_STRING part (e.g. /index.php). Warning: not urlDecoded.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_FILENAME</emphasis> "^/cgi-bin/login\.php$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REQUEST_HEADERS</literal></title>
+
+      <para>This variable can be used as either a collection of all of the
+      Request Headers or can be used to specify indivudual headers (by using
+      REQUEST_HEADERS<emphasis>:Header-Name</emphasis>). Example: the first
+      example uses REQUEST_HEADERS as a collection and is applying the
+      validateUrlEncoding operator against all headers.</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQUEST_HEADERS </emphasis>"@validateUrlEncoding"</programlisting>
+
+      <para>Example: the second example is targeting only the Host
+      header.</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_HEADERS:Host</emphasis> "^[\d\.]+$" "deny,log,status:400,msg:'Host header is a numeric IP address'"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REQUEST_HEADERS_NAMES</literal></title>
+
+      <para>This variable is a collection of the names of all of the Request
+      Headers. Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_HEADERS_NAMES</emphasis> "^x-forwarded-for" "log,deny,status:403,t:lowercase,msg:'Proxy Server Used'"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REQUEST_LINE</literal></title>
+
+      <para>This variable holds the complete request line sent to the server
+      (including the REQUEST_METHOD and HTTP version data). Example: this
+      example rule will trigger if the request method is something other than
+      GET, HEAD, POST or if the HTTP is something other than HTTP/0.9, 1.0 or
+      1.1.</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQUEST_LINE </emphasis>"!(^((?:(?:pos|ge)t|head))|http/(0\.9|1\.0|1\.1)$)"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Due to the default action transformation function lowercase, the
+      regex strings should be in lowercase as well unless the t:none
+      transformation function is specified for this particular rule.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REQUEST_METHOD</literal></title>
+
+      <para>This variable holds the Request Method used by the client.
+      Example: the following example will trigger if the Request Method is
+      either CONNECT or TRACE.</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_METHOD</emphasis> "^((?:connect|trace))$"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Due to the default action transformation function lowercase, the
+      regex strings should be in lowercase as well unless the t:none
+      transformation function is specified for this particular rule.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REQUEST_PROTOCOL</literal></title>
+
+      <para>This variable holds the Request Protocol Version information.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQUEST_PROTOCOL </emphasis>"!^http/(0\.9|1\.0|1\.1)$"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Due to the default action transformation function lowercase, the
+      regex strings should be in lowercase as well unless the t:none
+      transformation function is specified for this particular rule.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REQUEST_URI</literal></title>
+
+      <para>This variable holds the full URL including the QUERY_STRING data
+      (e.g. /index.php?p=X), however it will never contain a domain name, even
+      if it was provided on the request line. Warning: not urlDecoded. It also
+      does not include either the REQUEST_METHOD or the HTTP version info.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQUEST_URI </emphasis>"attack"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">REQUEST_URI_RAW</literal></title>
+
+      <para>Same as REQUEST_URI but will contain the domain name if it was
+      provided on the request line (e.g.
+      http://www.example.com/index.php?p=X). Warning: not urlDecoded.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQUEST_URI_RAW</emphasis> "http:/"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">RESPONSE_BODY</literal></title>
+
+      <para>This variable holds the data for the response payload.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> RESPONSE_BODY</emphasis> "ODBC Error Code"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">RESPONSE_HEADERS</literal></title>
+
+      <para>This variable is similar to the REQUEST_HEADERS variable and can
+      be used in the same manner. Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> RESPONSE_HEADERS</emphasis><emphasis
+          role="bold">:X-Cache</emphasis> "MISS"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This variable may not have access to some headers when running in
+      embedded-mode. Headers such as Server, Date and Connection are added
+      during a later Apache hook just prior to sending the data to the client.
+      This data should be available, however, when running in
+      proxy-mode.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">RESPONSE_HEADERS_NAMES</literal></title>
+
+      <para>This variable is a collection of the response header names.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> RESPONSE_HEADERS_NAMES </emphasis>"Set-Cookie"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Same limitations as RESPONSE_HEADERS with regards to access to
+      some headers in embedded-mode.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">RESPONSE_PROTOCOL</literal></title>
+
+      <para>This variable holds the HTTP Response Protocol information.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">RESPONSE_PROTOCOL </emphasis>"^HTTP\/0\.9"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">RESPONSE_STATUS</literal></title>
+
+      <para>This variable holds the HTTP Response Status Code generated by
+      Apache. Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> RESPONSE_STATUS </emphasis>"^[45]"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This directive may not work as expected in embedded-mode as Apache
+      handles many of the stock response codes (404, 401, etc...) earlier in
+      Phase 2. This variable should work as expected in a proxy-mode
+      deployment.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">RULE</literal></title>
+
+      <para>This variable provides access to the<literal
+      moreinfo="none">id</literal>,<literal
+      moreinfo="none">rev</literal>,<literal
+      moreinfo="none">severity</literal>, and<literal
+      moreinfo="none">msg</literal>fields of the rule that triggered the
+      action. Only available for expansion in action strings (e.g.<literal
+      moreinfo="none">setvar:tx.varname=%{rule.id}</literal>).Example:</para>
+
+      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS:Host "@eq 0" "phase:2,deny,id:1,setvar:tx.varname=<emphasis
+          role="bold">%{rule.id}</emphasis>"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">SCRIPT_BASENAME</literal></title>
+
+      <para>This variable holds just the local filename part of
+      SCRIPT_FILENAME. Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_BASENAME </emphasis>"^login\.php$"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This variable is not available in proxy mode.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">SCRIPT_FILENAME</literal></title>
+
+      <para>This variable holds the full path on the server to the requested
+      script. (e.g. SCRIPT_NAME plus the server path). Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_FILENAME</emphasis> "^/usr/local/apache/cgi-bin/login\.php$"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This variable is not available in proxy mode.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">SCRIPT_GID</literal></title>
+
+      <para>This variable holds the groupid (numerical value) of the group
+      owner of the script. Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> SCRIPT_GID </emphasis>"!^46$"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This variable is not available in proxy mode.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">SCRIPT_GROUPNAME</literal></title>
+
+      <para>This variable holds the group name of the group owner of the
+      script. Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> SCRIPT_GROUPNAME</emphasis> "!^apache$"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This variable is not available in proxy mode.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">SCRIPT_MODE</literal></title>
+
+      <para>This variable holds the script's permissions mode data (numerical
+      - 1=execute, 2=write, 4=read and 7=read/write/execute). Example: will
+      trigger if the script has the WRITE permissions set.</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_MODE </emphasis>"^(2|3|6|7)$"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This variable is not available in proxy mode.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">SCRIPT_UID</literal></title>
+
+      <para>This variable holds the userid (numerical value) of the owner of
+      the script. Example: the example rule below will trigger if the UID is
+      not 46 (the Apache user).</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> SCRIPT_UID</emphasis> "!^46$"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This variable is not available in proxy mode.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">SCRIPT_USERNAME</literal></title>
+
+      <para>This variable holds the username of the owner of the script.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_USERNAME </emphasis>"!^apache$"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This variable is not available in proxy mode.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">SERVER_ADDR</literal></title>
+
+      <para>This variable contains the IP address of the server.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> SERVER_ADDR</emphasis> "^192\.168\.1\.100$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">SERVER_NAME</literal></title>
+
+      <para>This variable contains the server's hostname or IP address.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> SERVER_NAME </emphasis>"hostname\.com$"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This data is taken from the Host header submitted in the client
+      request.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">SERVER_PORT</literal></title>
+
+      <para>This variable contains the local port that the web server is
+      listening on. Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold">S ERVER_PORT </emphasis>"^80$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">SESSION</literal></title>
+
+      <para>This variable is a collection, available only after<literal
+      moreinfo="none"> setsid </literal>is executed. Example: the following
+      example shows how to initialize a SESSION collection with setsid, how to
+      use setvar to increase the session.score values, how to set the
+      session.blocked variable and finally how to deny the connection based on
+      the session:blocked value.</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_COOKIES:PHPSESSID !^$ chain,nolog,pass
+SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}
+SecRule REQUEST_URI "^/cgi-bin/finger$" "pass,log,setvar:<emphasis role="bold">session.score</emphasis>=+10"
+SecRule<emphasis role="bold"> SESSION:SCORE</emphasis> "@gt 50" "pass,log,setvar:<emphasis
+          role="bold">session.blocked</emphasis>=1"
+SecRule<emphasis role="bold"> SESSION:BLOCKED</emphasis> "@eq 1" "log,deny,status:403"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">SESSIONID</literal></title>
+
+      <para>This variable is the value set with <literal
+      moreinfo="none">setsid</literal>. Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">SESSIONID</emphasis> !^$ chain,nolog,pass
+SecRule REQUEST_COOKIES:PHPSESSID !^$
+SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">TIME</literal></title>
+
+      <para>This variable holds a formatted string representing the time
+      (hour:minute:second). Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> TIME</emphasis> "^(([1](8|9))|([2](0|1|2|3))):\d{2}:\d{2}$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">TIME_DAY</literal></title>
+
+      <para>This variable holds the current date (1-31). Example: this rule
+      would trigger anytime between the 10th and 20th days of the
+      month.</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">TIME_DAY </emphasis>"^(([1](0|1|2|3|4|5|6|7|8|9))|20)$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">TIME_EPOCH</literal></title>
+
+      <para>This variable holds the time in seconds since 1970.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">TIME_EPOCH</emphasis> "@gt 1000"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">TIME_HOUR</literal></title>
+
+      <para>This variable holds the current hour (0-23). Example: this rule
+      would trigger during "off hours".</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> TIME_HOUR</emphasis> "^(0|1|2|3|4|5|6|[1](8|9)|[2](0|1|2|3))$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">TIME_MIN</literal></title>
+
+      <para>This variable holds the current minute (0-59). Example: this rule
+      would trigger during the last half hour of every hour.</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">TIME_MIN</emphasis> "^(3|4|5)"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">TIME_MON</literal></title>
+
+      <para>This variable holds the current month (0-11). Example: this rule
+      would match if the month was either November (10) or December
+      (11).</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> TIME_MON</emphasis> "^1"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">TIME_SEC</literal></title>
+
+      <para>This variable holds the current second count (0-59).
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">TIME_SEC</emphasis> "@gt 30"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">TIME_WDAY</literal></title>
+
+      <para>This variable holds the current weekday (0-6). Example: this rule
+      would trigger only on week-ends (Saturday and Sunday).</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> TIME_WDAY </emphasis>"^(0|6)$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">TIME_YEAR</literal></title>
+
+      <para>This variable holds the current four-digit year data.
+      Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">TIME_YEAR </emphasis>"^2006$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">TX</literal></title>
+
+      <para>Transaction Collection. This is used to store pieces of data,
+      create a transaction anomaly score, and so on. Transaction variables are
+      set for 1 request/response cycle. The scoring and evaluation will not
+      last past the current request/response process. Example: In this
+      example, we are using setvar to increase the tx.score value by 5 points.
+      We then have a follow-up run that will evaluate the transactional score
+      this this request and then it will decided whether or not to allow/deny
+      the request through.</para>
+
+      <programlisting format="linespecific">SecRule WEBSERVER_ERROR_LOG "File does not exist" "phase:5,pass,<emphasis
+          role="bold">setvar:tx.score=+5</emphasis>"
+SecRule<emphasis role="bold"> TX:SCORE</emphasis> "@gt 20" deny,log</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">USERID</literal></title>
+
+      <para>This variable is the value set with <literal
+      moreinfo="none">setuid</literal>. Example:</para>
+
+      <programlisting format="linespecific">SecAction setuid:%{REMOTE_USER},nolog
+SecRule<emphasis role="bold"> USERID</emphasis> "Admin"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">WEBAPPID</literal></title>
+
+      <para>This variable is the value set with <literal
+      moreinfo="none">SecWebAppId</literal>. Example:</para>
+
+      <programlisting format="linespecific">SecWebAppId "WebApp1"
+SecRule<emphasis role="bold"> WEBAPPID</emphasis> "WebApp1" "chain,log,deny,status:403"
+SecRule REQUEST_HEADERS:Transfer-Encoding "!^$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">WEBSERVER_ERROR_LOG</literal></title>
+
+      <para>Contains zero or more error messages produced by the web server.
+      Access to this variable is in phase:5 (logging). Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis role="bold"> WEBSERVER_ERROR_LOG</emphasis> "File does not exist" "phase:5,setvar:tx.score=+5"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">XML</literal></title>
+
+      <para>Can be used standalone (as a target for validateDTD and
+      validateSchema) or with an XPath expression parameter (which makes it a
+      valid target for any function that accepts plain text). Example using
+      XPath:</para>
+
+      <programlisting format="linespecific">SecDefaultAction log,deny,status:403,phase:2
+SecRule REQUEST_HEADERS:Content-Type ^text/xml$ phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=<emphasis
+          role="bold">XML</emphasis>
+SecRule REQBODY_PROCESSOR "<emphasis role="bold">!^XML$</emphasis>" skip:2
+SecRule <emphasis role="bold">XML:/employees/employee/name/text()</emphasis> Fred
+SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> Fred xmlns:xq=http://www.example.com/employees</programlisting>
+    </section>
+  </section>
+
+  <section id="06-transformation-functions">
+    <title>Transformation functions</title>
+
+    <para>When ModSecurity receives request or response information, it makes
+    a copy of this data and places it into memory. It is on this data in
+    memory that transformation functions are applied. The raw request/response
+    data is never altered. Transformation functions are used to transform a
+    variable before testing it in a rule.</para>
+
+    <para><emphasis role="bold">Note</emphasis></para>
+
+    <para>The default transformation function setting is - lowercase,
+    replaceNulls and compressWhitespace (in this order).</para>
+
+    <para>The following rule will ensure that an attacker does not use mixed
+    case in order to evade the ModSecurity rule:</para>
+
+    <para><programlisting format="linespecific">SecRule ARG:p "xp_cmdshell" <emphasis
+          role="bold">"t:lowercase"</emphasis></programlisting>multipetranformation
+    actions can be used in the same rule, for example the following rule also
+    ensures that an attacker does not use URL encodign (%xx encoding) for
+    evasion. Not the order of the transformation functions, which ensures that
+    a URL encoded letter is first decoded and than translated to lower
+    case.</para>
+
+    <para><programlisting format="linespecific">SecRule ARG:p "xp_cmdshell" <emphasis
+          role="bold">"t:urlDecode,t:lowercase"</emphasis></programlisting></para>
+
+    <para>One can use the SetDefaultAction command to ensure the translation
+    occurs for every rule until the next. Note that translation actions are
+    additive, so if a rule explicitly list actions, the translation actions
+    set by SetDefaultAction are still performed.</para>
+
+    <para><programlisting format="linespecific">SecDefaultAction <emphasis
+          role="bold">t:urlDecode,t:lowercase</emphasis></programlisting></para>
+
+    <para>The following transformation functions are supported:</para>
+
+    <section>
+      <title><literal>base64Decode</literal></title>
+
+      <para>This function decoes a base64-encoded string.</para>
+    </section>
+
+    <section>
+      <title><literal>base64Encode</literal></title>
+
+      <para>This function encodes input string using base64 encoding.</para>
+    </section>
+
+    <section>
+      <title><literal>compressWhitespace</literal></title>
+
+      <para>This function is enabled by default. It converts whitespace
+      characters (32, \f, \t, \n, \r, \v, 160) to spaces (ASCII 32) and then
+      compresses multiple space characters into only one.</para>
+    </section>
+
+    <section>
+      <title><literal>escapeSeqDecode</literal></title>
+
+      <para>This function decode ANSI C escape sequences:<literal
+      moreinfo="none">\a</literal>,<literal
+      moreinfo="none">\b</literal>,<literal
+      moreinfo="none">\f</literal>,<literal
+      moreinfo="none">\n</literal>,<literal
+      moreinfo="none">\r</literal>,<literal
+      moreinfo="none">\t</literal>,<literal
+      moreinfo="none">\v</literal>,<literal
+      moreinfo="none">\\</literal>,<literal
+      moreinfo="none">\?</literal>,<literal
+      moreinfo="none">\'</literal>,<literal
+      moreinfo="none">\"</literal>,<literal
+      moreinfo="none">\xHH</literal>(hexadecimal),<literal
+      moreinfo="none">\0OOO</literal>(octal). Invalid encodings are left in
+      the output.</para>
+    </section>
+
+    <section>
+      <title><literal>hexDecode</literal></title>
+
+      <para>This function decodes a hex-encoded string.</para>
+    </section>
+
+    <section>
+      <title><literal>hexEncode</literal></title>
+
+      <para>This function encodes input as hex-encoded string.</para>
+    </section>
+
+    <section>
+      <title><literal>htmlEntityDecode</literal></title>
+
+      <para>This function decodes HTML entities present in input. The
+      following variants are supported:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><literal moreinfo="none">&amp;#xHH</literal>and<literal
+          moreinfo="none">&amp;#xHH;</literal>(where H is any hexadecimal
+          number)</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">&amp;#DDD</literal>and<literal
+          moreinfo="none">&amp;#DDD;</literal>(where D is any decimal
+          number)</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">&amp;quot</literal>and<literal
+          moreinfo="none">&amp;quot;</literal></para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">&amp;nbs</literal>p and<literal
+          moreinfo="none">&amp;nbsp;</literal></para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">&amp;lt</literal>and<literal
+          moreinfo="none">&amp;lt;</literal></para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">&amp;gt</literal>and<literal
+          moreinfo="none">&amp;gt;</literal></para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>lowercase</literal></title>
+
+      <para>This function is enabled by default. It converts all charactes to
+      lowercase using the current C locale.</para>
+    </section>
+
+    <section>
+      <title><literal>md5</literal></title>
+
+      <para>This function calculates an MD5 hash from input.</para>
+    </section>
+
+    <section>
+      <title><literal><literal>none</literal></literal></title>
+
+      <para>This not an actual transformation function but an instruction to
+      ModSecurity to remove all transformation functions associated with the
+      current rule and start from scratch.</para>
+    </section>
+
+    <section>
+      <title><literal>normalisePath</literal></title>
+
+      <para>This function will remove multiple slashes, self-references and
+      directory back-references (except when they are at the beginning of the
+      path).</para>
+    </section>
+
+    <section>
+      <title><literal>normalisePathWin</literal></title>
+
+      <para>Same as normalisePath, but will first convert backslash characters
+      to forward slashes.</para>
+    </section>
+
+    <section>
+      <title><literal>removeNulls</literal></title>
+
+      <para>This function removes NULL bytes from input.</para>
+    </section>
+
+    <section>
+      <title><literal>removeWhitespace</literal></title>
+
+      <para>This function removes all whitespace characters.</para>
+    </section>
+
+    <section>
+      <title><literal>replaceComments</literal></title>
+
+      <para>This function replaces each occurence of a C-style comments
+      (<literal moreinfo="none">/* ... */</literal>) with a single space
+      (multiple consecutive occurences of a space will not be compressed).
+      Unterminated comments will too be replaced with a space (ASCII 32).
+      However, a standalone termination of a comment (<literal
+      moreinfo="none">*/</literal>) will not be acted upon.</para>
+    </section>
+
+    <section>
+      <title><literal>replaceNulls</literal></title>
+
+      <para>This function is enabled by default. It replaces NULL bytes in
+      input with spaces (ASCII 32).</para>
+    </section>
+
+    <section>
+      <title><literal>urlDecode</literal></title>
+
+      <para>This function decodes an URL-encoded input string. Invalid
+      encodings (i.e. the ones that use non-hexadecimal characters, or the
+      ones that are at the end of string and have one or two characters
+      missing) will not be converted. If you want to detect invalid encodings
+      use the <literal moreinfo="none">@validateUrlEncoding</literal>
+      operator. The transformational function should not be used against
+      variables that have already been URL-decoded unless it is your intention
+      to perform URL decoding twice!</para>
+    </section>
+
+    <section>
+      <title><literal>urlDecodeUni</literal></title>
+
+      <para>In addition to decoding %xx like <literal
+      moreinfo="none">urlDecode, urlDecodeUni also</literal> decodes<literal
+      moreinfo="none"> <literal>%uXXXX</literal> </literal>encoding (only the
+      lower byte will be used, the higher byte will be discarded).</para>
+    </section>
+
+    <section>
+      <title><literal>urlEncode</literal></title>
+
+      <para>This function encodes input using URL encoding.</para>
+    </section>
+
+    <section>
+      <title><literal>sha1</literal></title>
+
+      <para>This function calculates a SHA1 hash from input.</para>
+    </section>
+  </section>
+
+  <section id="07-actions">
+    <title>Actions</title>
+
+    <para>Each action belongs to one of five groups:</para>
+
+    <orderedlist continuation="restarts" inheritnum="ignore">
+      <listitem>
+        <para><emphasis>Disruptive actions</emphasis>- are those actions where
+        ModSecurity will intercept the data. They can only appear in the first
+        rule in a chain.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>Non-disruptive actions</emphasis>; can appear
+        anywhere.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>Flow actions</emphasis>; can appear only in the first
+        rule in a chain.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>Meta-data actions</emphasis>(<literal
+        moreinfo="none">id</literal>,<literal moreinfo="none">
+        rev</literal>,<literal moreinfo="none"> severity</literal>,<literal
+        moreinfo="none"> msg</literal>); can only appear in the first rule in
+        a chain.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>Data actions</emphasis>- can appear anywhere; these
+        actions are completely passive and only serve to carry data used by
+        other actions.</para>
+      </listitem>
+    </orderedlist>
+
+    <section>
+      <title><literal>allow</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Stops processing on
+      a successful match and allows transaction to proceed.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REMOTE_ADDR "^192\.168\.1\.100$" nolog,phase:1,<emphasis
+          role="bold">allow</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>The allow action only applies to the current processing phase. If
+      your intent is to explicitly allow a request, then you should use the
+      "ctl" action to turn the ruleEngine off -<literal moreinfo="none">
+      ctl:ruleEngine=Off</literal>.</para>
+    </section>
+
+    <section>
+      <title><literal>auditlog</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Marks the
+      transaction for logging in the audit log.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REMOTE_ADDR "^192\.168\.1\.100$" <emphasis
+          role="bold">auditlog</emphasis>,phase:1,allow</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>The auditlog action is now explicit if log is already
+      specified.</para>
+    </section>
+
+    <section>
+      <title><literal>capture</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> When used together
+      with the regular expression operator, capture action will create copies
+      of regular expression captures and place them into the transaction
+      variable collection. Up to ten captures will be copied on a successful
+      pattern match, each with a name consisting of a digit from 0 to
+      9.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_BODY "^username=(\w{25,})" phase:2,<emphasis
+          role="bold">capture</emphasis>,t:none,chain
+SecRule TX:1 "(?:(?:a(dmin|nonymous)))"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>The 0 data captures the entire REGEX match and 1 captures the data
+      in the first parantheses, etc...</para>
+    </section>
+
+    <section>
+      <title><literal>chain</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Chains the rule
+      where the action is placed with the rule that immediately follows it.
+      The result is called a<emphasis> rule chain</emphasis>. Chained rules
+      allow for more complex rule matches where you want to use a number of
+      different VARIABLES to create a better rule and to help prevent false
+      positives.</para>
+
+      <para><emphasis role="bold">Action Group: </emphasis>Flow</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific"># Refuse to accept POST requests that do
+# not specify request body length 
+SecRule REQUEST_METHOD ^POST$<emphasis role="bold"> chain</emphasis>
+SecRule REQUEST_HEADER:Content-Length ^$</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>In programming language concepts, think of chained rules somewhat
+      similar to AND conditional statements. The actions specified in the
+      first portion of the chained rule will only be triggered if all of the
+      variable checks return positive hits. If one aspect of the chained rule
+      is negative, then the entire rule chain is negative. Also note that
+      disruptive actions, execution phases, metadata actions (id, rev, msg)
+      and skip actions can only be specified on by the chain starter
+      rule.</para>
+    </section>
+
+    <section>
+      <title><literal>ctl</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> The ctl action
+      allows configuration options to be updated for the transaction.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific"># Parse requests with Content-Type "text/xml" as XML 
+SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis role="bold">ctl:requestBodyProcessor=XML</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>The following configuration options are supported:</para>
+
+      <orderedlist continuation="restarts" inheritnum="ignore">
+        <listitem>
+          <para><literal moreinfo="none">auditEngine</literal></para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">auditLogParts</literal></para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">debugLogLevel</literal></para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">requestBodyAccess</literal></para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">requestBodyLimit</literal></para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">requestBodyProcessor</literal></para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">responseBodyAccess</literal></para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">responseBodyLimit</literal></para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">ruleEngine</literal></para>
+        </listitem>
+      </orderedlist>
+
+      <para>With the exception of<literal moreinfo="none">
+      requestBodyProcessor</literal>, each configuration option corresponds to
+      one configuration directive and the usage is identical.</para>
+
+      <para>The requestBodyProcessor option allows you to configure the
+      request body processor. By default ModSecurity will use the <literal
+      moreinfo="none">URLENCODED</literal> and<literal moreinfo="none">
+      MULTIPART</literal> processors to process an <literal
+      moreinfo="none">application/x-www-form-urlencoded</literal> and a
+      <literal moreinfo="none">multipart/form-data </literal>body,
+      respectively. A third processor, XML, is also supported, but it is never
+      used implicitly. Instead you must tell ModSecurity to use it by placing
+      a few rules in the<literal moreinfo="none"> REQUEST_HEADERS</literal>
+      processing phase. After the request body was processed as XML you will
+      be able to use the XML-related features to inspect it.</para>
+
+      <para>Request body processors will not interrupt a transaction if an
+      error occurs during parsing. Instead they will set variables<literal
+      moreinfo="none"> REQBODY_PROCESSOR_ERROR</literal> and<literal
+      moreinfo="none"> REQBODY_PROCESSOR_ERROR_MSG</literal>. These variables
+      should be inspected in the <literal
+      moreinfo="none">REQUEST_BODY</literal> phase and an appropriate action
+      taken.</para>
+    </section>
+
+    <section>
+      <title><literal>deny</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Stops rule
+      processing and intercepts transaction.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "nikto" log,<emphasis
+          role="bold">deny</emphasis>,msg:'Nikto Scanners Identified"</programlisting>
+    </section>
+
+    <section>
+      <title><literal>deprecatevar</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Decrement counter
+      based on its age.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example: The following example will decrement the counter by 60
+      every 300 seconds.</para>
+
+      <programlisting format="linespecific">SecAction deprecatevar:session.score=60/300</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Counter values are always positive, meaning the value will never
+      go below zero.</para>
+    </section>
+
+    <section>
+      <title><literal>drop</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Immediately initiate
+      a "connection close" action to tear down the TCP connection by sending a
+      FIN packet.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Disruptive</para>
+
+      <para>Example: The following example initiates an IP collection for
+      tracking Basic Authentication attempts. If the client goes over the
+      threshold of more than 25 attempts in 2 minutes, it will DROP subsequent
+      connections.</para>
+
+      <programlisting format="linespecific">SecAction initcol:ip=%{REMOTE_ADDR},nolog
+SecRule ARGS:login "!^$" nolog,phase:1,setvar:ip.auth_attempt=+1,deprecatevar:ip.auth_attempt=20/120
+SecRule IP:AUTH_ATTEMPT "@gt 25" log,<emphasis role="bold">drop</emphasis>,phase:1,msg:'Possible Brute Force Attack"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This action is extremely useful when responding to both Brute
+      Force and Denial of Service attacks in that, in both cases, you want to
+      minimize both the network bandwidth and the data returned to the client.
+      This action causes error message to appear in the log "(9)Bad file
+      descriptor: core_output_filter: writing data to the network"</para>
+    </section>
+
+    <section>
+      <title><literal>exec</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Executes an external
+      script/binary supplied as parameter.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_URI "^/cgi-bin/script\.pl" "log,<emphasis
+          role="bold">exec:/usr/local/apache/bin/test.sh</emphasis>,phase:1"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This directive does not effect a primary action if it exists. This
+      action will always call script with no parameters, but providing all
+      information in the environment. All the usual CGI environment variables
+      will be there. You can have one binary executed per filter match.
+      Execution will add the header mod_security-executed to the list of
+      request headers. You should be aware that forking a threaded process
+      results in all threads being replicated in the new process. Forking can
+      therefore incur larger overhead in multithreaded operation. The script
+      you execute must write something (anything) to stdout. If it doesn't
+      ModSecurity will assume execution didn't work.</para>
+    </section>
+
+    <section>
+      <title><literal>expirevar</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configurescollection
+      variable to expire after the given time in seconds.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_COOKIES:JSESSIONID "!^$" nolog,phase:1,pass,chain
+SecAction setsid:%{REQUEST_COOKIES:JSESSIONID}
+SecRule REQUEST_URI "^/cgi-bin/script\.pl" "log,allow,setvar:session.suspicious=1,<emphasis
+          role="bold">expirevar:session.suspicious=3600</emphasis>,phase:1"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>You should use expirevar actions at the same time that you use
+      setvar actions in order to keep the indended expiration time. If they
+      are used on their own (perhaps in a SecAction directive) the expire time
+      could get re-set. When variables are removed from collections, and there
+      are no other changes, collections are not written to disk at the end of
+      request. This is because the variables can always be expired again when
+      the collection is read again on a subsequent request.</para>
+    </section>
+
+    <section>
+      <title><literal>id</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Assigns a unique ID
+      to the rule or chain.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Metadata</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS:Host "@eq 0" "log,<emphasis
+          role="bold">id:60008</emphasis>,severity:2,msg:'Request Missing a Host Header'"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>These are the reserved ranges:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>1 – 99999; reserved for your internal needs, use as you see
+          fit but don't publish them to others</para>
+        </listitem>
+
+        <listitem>
+          <para>100,000-199,999; reserved for internal use of the engine, to
+          assign to rules that do not have explicit IDs</para>
+        </listitem>
+
+        <listitem>
+          <para>200,000-299,999; reserved for rules published at
+          modsecurity.org</para>
+        </listitem>
+
+        <listitem>
+          <para>300,000-399,999; reserved for rules published at
+          gotroot.com</para>
+        </listitem>
+
+        <listitem>
+          <para>400,000 and above; unreserved range.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>initcol</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Initialises a named
+      persistent collection, either by loading data from storage or by
+      creating a new collection in memory.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example: The following example initiates IP address
+      tracking.</para>
+
+      <programlisting format="linespecific">SecAction<emphasis role="bold"> initcol:ip=%{REMOTE_ADDR}</emphasis>,nolog</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Every collection contains several built-in variables that are
+      read-only:</para>
+
+      <orderedlist continuation="restarts" inheritnum="ignore">
+        <listitem>
+          <para><literal moreinfo="none">CREATE_TIME</literal>- date/time of
+          the creation of the collection.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">KEY</literal>- the value of the
+          initcol variable (the client's IP address in the example).</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">LAST_UPDATE_TIME</literal>- date/time
+          of the last update to the collection.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">TIMEOUT</literal>- date/time in
+          seconds when the collection will be updated on disk from memory (if
+          no other updates occur).</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">UPDATE_COUNTER</literal>- how many
+          times the collection has been updated since creation.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">UPDATE_RATE</literal>- is the average
+          rate updates per minute since creation.</para>
+        </listitem>
+      </orderedlist>
+
+      <para>Collections are loaded into memory when the initcol action is
+      encountered. The collection in storage will be updated (and the
+      appropriate counters increased)<emphasis>only</emphasis>if it was
+      changed during transaction processing.</para>
+
+      <note>
+        <para>To create a collection to hold session variables (<literal
+        moreinfo="none">SESSION</literal>) use action <literal
+        moreinfo="none">setsid</literal>. To create a collection to hold user
+        variables (<literal moreinfo="none">USER</literal>)use action <literal
+        moreinfo="none">setuid</literal>.</para>
+      </note>
+
+      <note>
+        <para>At this time it is only possible to have three
+        collections:<literal moreinfo="none"> IP</literal>,<literal
+        moreinfo="none"> SESSION</literal>, and <literal
+        moreinfo="none">USER</literal>.</para>
+      </note>
+    </section>
+
+    <section>
+      <title><literal>log</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Indicates that a
+      successful match of the rule needs to be logged.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecAction initcol:ip=%{REMOTE_ADDR},<emphasis
+          role="bold">log</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This action will log matches to the Apache error log file and the
+      ModSecurity audit log.</para>
+    </section>
+
+    <section>
+      <title><literal>msg</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Assigns a custom
+      message to the rule or chain.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Metadata</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS:Host "@eq 0" "log,id:60008<emphasis
+          role="bold">,</emphasis>severity:2,<emphasis role="bold">msg:'Request Missing a Host Header'"</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>The msg information appears in the error and/or audit log files
+      and is not sent back to the client in response headers.</para>
+    </section>
+
+    <section>
+      <title><literal>multiMatch</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>If enabled
+      ModSecurity will perform multiple operator invocations for every target,
+      before and after every anti-evasion transformation is performed.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecDefaultAction log,deny,phase:1,t:lowercase,t:removeNulls,t:lowercase SecRule ARGS "attack"<emphasis
+          role="bold">multiMatch</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Normally, variables are evaluated once, only after all
+      transformation functions have completed. With multiMatch, variables are
+      checked against the operator before and after every transformation
+      function that changes the input.</para>
+    </section>
+
+    <section>
+      <title><literal>noauditlog</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Indicates that a
+      successful match of the rule should not be used as criteria whether the
+      transaction should be logged to the audit log.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "Test" allow,<emphasis
+          role="bold">noauditlog</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>If the SecAuditEngine is set to On, all of the transactions will
+      be logged. If it is set to RelevantOnly, then you can control it with
+      the noauditlog action. Even it the noauditlog action is applied to a
+      specific rule, if a rule either before or after triggered an audit
+      event, then the tranaction will be logged to the audit log. The correct
+      way to disable audit logging for the entire transaction is to use
+      "<literal moreinfo="none">ctl:auditEngine=Off</literal>"</para>
+    </section>
+
+    <section>
+      <title><literal>nolog</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Prevents rule
+      matches from appearing in both the error and audit logs.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "Test" allow,<emphasis
+          role="bold">nolog</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>The nolog action also implies noauditlog.</para>
+    </section>
+
+    <section>
+      <title><literal>pass</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Continues processing
+      with the next rule in spite of a successful match.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "Test" log,<emphasis
+          role="bold">pass</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Transaction will not be interrupted but it will be logged (unless
+      logging has been suppressed).</para>
+    </section>
+
+    <section>
+      <title><literal>pause</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Pauses transaction
+      processing for the specified number of milliseconds.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403,<emphasis
+          role="bold">pause:5000</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This feature can be of limited benefit for slowing down Brute
+      Force Scanners, however use with care. If you are under a Denial of
+      Service type of attack, the pause feature may make matters worse as this
+      feature will cause child processes to sit idle until the pause is
+      completed.</para>
+    </section>
+
+    <section>
+      <title><literal>phase</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Places the rule (or
+      the rule chain) into one of five available processing phases.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecDefaultAction log,deny,<emphasis
+          role="bold">phase:1</emphasis>,t:lowercase,t:removeNulls,t:lowercase
+SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Keep in mind that is you specify the incorrect phase, the target
+      variable that you specify may be empty. This could lead to a false
+      negative situation where your variable and operator (RegEx) may be
+      correct, but it misses malicious data because you specified the wrong
+      phase.</para>
+    </section>
+
+    <section>
+      <title><literal>proxy</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Intercepts
+      transaction by forwarding request to another web server using the proxy
+      backend.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "Test" log,<emphasis
+          role="bold">proxy:http://www.honeypothost.com/</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>For this action to work, mod_proxy must also be installed. This
+      action is useful if you would like to proxy matching requests onto a
+      honeypot webserver.</para>
+    </section>
+
+    <section>
+      <title><literal>redirect</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Intercepts
+      transaction by issuing a redirect to the given location.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "Test" log,<emphasis
+          role="bold">redirect:http://www.hostname.com/failed.html</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>If the<literal moreinfo="none">status</literal>action is present
+      and its value is acceptable (301, 302, 303, or 307) it will be used for
+      the redirection. Otherwise status code 302 will be used.</para>
+    </section>
+
+    <section>
+      <title><literal>rev</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Specifies rule
+      revision.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Metadata</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_METHOD "^PUT$" "id:340002,<emphasis
+          role="bold">rev:1</emphasis>,severity:2,msg:'Restricted HTTP function'"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This action is used in combination with the<literal
+      moreinfo="none">id</literal>action to allow the same rule ID to be used
+      after changes take place but to still provide some indication the rule
+      changed.</para>
+    </section>
+
+    <section>
+      <title><literal>sanitiseArg</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Sanitises (replaces
+      each byte with an asterisk) a named request argument prior to audit
+      logging.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecAction nolog,phase:2,<emphasis
+          role="bold">sanitiseArg:password</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>The sanitize actions do not sanitize any data within the actual
+      raw requests but only on the copy of data within memory that is set to
+      log to the audit log. It will not sanitize the data in the
+      modsec_debug.log file (if the log level is set high enough to capture
+      this data).</para>
+    </section>
+
+    <section>
+      <title><literal>sanitiseMatched</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Sanitises the
+      variable (request argument, request header, or response header) that
+      caused a rule match.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example: This action can be used to sanitise arbitrary transaction
+      elements when they match a condition. For example, the example below
+      will sanitise any argument that contains the word<emphasis>
+      password</emphasis> in the name.</para>
+
+      <programlisting format="linespecific">SecRule ARGS_NAMES password nolog,pass,<emphasis
+          role="bold">sanitiseMatched</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Same note as sanitiseArg.</para>
+    </section>
+
+    <section>
+      <title><literal>sanitiseRequestHeader</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Sanitises a named
+      request header.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example: For example, the example below will sanitise the data in
+      the Authorization header.</para>
+
+      <programlisting format="linespecific">SecAction log,phase:1,<emphasis
+          role="bold">sanitiseRequestHeader:Authorization</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Same note as sanitiseArg.</para>
+    </section>
+
+    <section>
+      <title><literal>sanitiseResponseHeader</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Sanitises a named
+      response header.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example: For example, the example below will sanitise the
+      Set-Cookie data sent to the client.</para>
+
+      <programlisting format="linespecific">SecAction log,phase:3,<emphasis
+          role="bold">sanitiseResponseHeader:Set-Cookie</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Same note as sanitiseArg.</para>
+    </section>
+
+    <section>
+      <title><literal>severity</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Assigns severity to
+      the rule it is placed with.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Metadata</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_METHOD "^PUT$" "id:340002,rev:1,<emphasis
+          role="bold">severity:2</emphasis>,msg:'Restricted HTTP function'"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>The severity numbers follow the Syslog convention -</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>0 = EMERGENCY</para>
+        </listitem>
+
+        <listitem>
+          <para>1 = ALERT</para>
+        </listitem>
+
+        <listitem>
+          <para>2 = CRITICAL</para>
+        </listitem>
+
+        <listitem>
+          <para>3 = ERROR</para>
+        </listitem>
+
+        <listitem>
+          <para>4 = WARNING</para>
+        </listitem>
+
+        <listitem>
+          <para>5 = NOTICE</para>
+        </listitem>
+
+        <listitem>
+          <para>6 = INFO</para>
+        </listitem>
+
+        <listitem>
+          <para>7 = DEBUG</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>setuid</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis>
+      Special-purposeaction that initialises the <literal
+      moreinfo="none">USER</literal> collection.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecAction <emphasis role="bold">setuid:%{REMOTE_USER}</emphasis>,nolog</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>After initialisation takes place the variable <literal
+      moreinfo="none">USERID</literal> will be available for use in the
+      subsequent rules.</para>
+    </section>
+
+    <section>
+      <title><literal>setsid</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis>
+      Special-purposeaction that initialises the <literal
+      moreinfo="none">SESSION</literal> collection.</para>
+
+      <para><emphasis role="bold">Action Group:
+      </emphasis>Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific"># Initialise session variables using the session cookie value 
+SecRule REQUEST_COOKIES:PHPSESSID !^$ chain,nolog,pass
+SecAction<emphasis role="bold">setsid:%{REQUEST_COOKIES.PHPSESSID}</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>On first invocation of this action the collection will be empty
+      (not taking the pre-defined variables into account - see<literal
+      moreinfo="none">initcol</literal>for more information). On subsequent
+      invocations the contents of the collection (session, in this case) will
+      be retrieved from storage. After initialisation takes place the
+      variable<literal moreinfo="none"> SESSIONID</literal> will be available
+      for use in the subsequent rules.This action understands each application
+      maintains its own set of sessions. It will utilise the current web
+      application ID to create a session namespace.</para>
+    </section>
+
+    <section>
+      <title><literal>setenv</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Creates, removes, or
+      updates an environment variable.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Examples:</para>
+
+      <para>To create a new variable (if you omit the value <literal
+      moreinfo="none">1</literal> will be used):</para>
+
+      <programlisting format="linespecific">setenv:name=value</programlisting>
+
+      <para>To remove a variable:</para>
+
+      <programlisting format="linespecific">setenv:!name</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>This action can be used to establish communication with other
+      Apache modules.</para>
+    </section>
+
+    <section>
+      <title><literal>setvar</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Creates, removes, or
+      updates a variable in the specified collection.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Examples:</para>
+
+      <para>To create a new variable:</para>
+
+      <programlisting format="linespecific">setvar:tx.score=10</programlisting>
+
+      <para>To remove a variable prefix the name with exclamation mark:</para>
+
+      <programlisting format="linespecific">setvar:!tx.score</programlisting>
+
+      <para>To increase or decrease variable value use<literal
+      moreinfo="none">+</literal>and<literal
+      moreinfo="none">-</literal>characters in front of a numerical
+      value:</para>
+
+      <programlisting format="linespecific">setvar:tx.score=+5</programlisting>
+    </section>
+
+    <section>
+      <title><literal>skip</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Skips one or more
+      rules (or chains) on successful match.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <para><programlisting format="linespecific">SecRule REQUEST_URI "^/$" "chain,<emphasis
+            role="bold">skip:2</emphasis>"
+SecRule REMOTE_ADDR "^127\.0\.0\.1$" "chain"
+SecRule REQUEST_HEADERS:User-Agent "^Apache \(internal dummy connection\)$" "t:none"  
+SecRule &amp;REQUEST_HEADERS:Host "@eq 0" "deny,log,status:400,id:960008,severity:4,msg:'Request Missing a Host Header'"
+SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" "log,deny,log,status:400,id:960015,msg:'Request Missing an Accept Header'"</programlisting></para>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Skip only applies to the current processing phase and not
+      necessarily the order in which the rules appear in the configuration
+      file. If you group rules by processing phases, then skip should work as
+      expected. This action can not be used to skip rules within one chain.
+      Accepts a single paramater denoting the number of rules (or chains) to
+      skip.</para>
+    </section>
+
+    <section>
+      <title><literal>status</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Specifies the
+      response status code to use with actions<literal moreinfo="none">
+      deny</literal> and<literal moreinfo="none"> redirect</literal>.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecDefaultAction log,deny,<emphasis
+          role="bold">status:403</emphasis>,phase:1</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Staus actions defined in Apache scope locations (such as
+      Directory, Location, etc...) may be superceded by phase:1 action
+      settings. The Apache ErrorDocument directive will be triggered if
+      present in the configuration. Therefore if you have previously defined a
+      custom error page for a given status then it will be executed and its
+      output presented to the user.</para>
+    </section>
+
+    <section>
+      <title><literal>t</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> This action can be
+      used which transformation function should be used against the specified
+      variables before they (or the results, rather) are run against the
+      operator specified in the rule.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecDefaultAction log,deny,phase:1,t:lowercase,t:removeNulls,t:lowercase 
+SecRule REQUEST_COOKIES:SESSIONID "47414e81cbbef3cf8366e84eeacba091" log,deny,status:403,<emphasis
+          role="bold">t:md5</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Any transformation functions that you specify in a SecRule will be
+      in addtion to previous ones specified in SecDefaultAction. Use of
+      "t:none" will remove all transformation functions for the specified
+      rule.</para>
+    </section>
+
+    <section>
+      <title><literal>xmlns</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> This action should
+      be used together with an XPath expression to register a
+      namespace.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis>
+      Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:Content-Type "text/xml" phase:1,pass,ctl:requestBodyProcessor=XML,ctl:requestBodyAccess=On,<emphasis
+          role="bold">xmlns:xsd="http://www.w3.org/2001/XMLSchema"</emphasis>
+SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny</programlisting>
+    </section>
+  </section>
+
+  <section id="08-operators">
+    <title>Operators</title>
+
+    <para>A number of operators can be used in rules, as documented below. The
+    operator syntax used the "@" symbol followed by the specific operator
+    name.</para>
+
+    <section>
+      <title><literal>eq</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      numerical comparison and stands for "equal to."</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis
+          role="bold">@eq </emphasis>15"</programlisting>
+    </section>
+
+    <section>
+      <title><literal>ge</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> This operator is a
+      numerical comparison and stands for "greater than or equal to."</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis
+          role="bold">@ge</emphasis> 15"</programlisting>
+    </section>
+
+    <section>
+      <title><literal>gt</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> This operator is a
+      numerical comparison and stands for "greater than."</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis
+          role="bold">@gt</emphasis> 15"</programlisting>
+    </section>
+
+    <section>
+      <title><literal>inspectFile</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Executes the
+      external script/binary given as parameter to the operator against every
+      file extracted from the request.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule FILES_TMPNAMES "<emphasis
+          role="bold">@inspectFile </emphasis>/opt/apache/bin/inspect_script.pl"</programlisting>
+    </section>
+
+    <section>
+      <title><literal>le</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      numerical comparison and stands for "less than or equal to."</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis
+          role="bold">@le </emphasis>15"</programlisting>
+    </section>
+
+    <section>
+      <title><literal>lt</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> This operator is a
+      numerical comparison and stands for "less than."</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis
+          role="bold">@lt </emphasis>15"</programlisting>
+    </section>
+
+    <section>
+      <title><literal>rbl</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Look up the
+      parameter in the RBL given as parameter. Parameter can be an IPv4
+      address, or a hostname.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REMOTE_ADDR "<emphasis
+          role="bold">@rbl</emphasis> sc.surbl.org"</programlisting>
+    </section>
+
+    <section>
+      <title><literal>rx</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Regular expression
+      operator. This is the default operator, so if the "@" operator is not
+      defined, it is assumed to be rx.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "<emphasis
+          role="bold">@rx </emphasis>nikto"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>Regular expressions are handled by the PCRE library (<ulink
+      url="http://www.pcre.org">http://www.pcre.org</ulink>). ModSecurity
+      compiles its regular expressions with the following settings:</para>
+
+      <orderedlist continuation="restarts" inheritnum="ignore">
+        <listitem>
+          <para>The entire input is treated as a single line, even when there
+          are newline characters present.</para>
+        </listitem>
+
+        <listitem>
+          <para>All matches are case-sensitive. If you do not care about case
+          sensitivity you either need to implement the <literal
+          moreinfo="none">lowercase</literal> transformational function, or
+          use the per-pattern<literal
+          moreinfo="none">(?i)</literal>modificator, as allowed by
+          PCRE.</para>
+        </listitem>
+
+        <listitem>
+          <para>The<literal moreinfo="none"> PCRE_DOTALL </literal>flag is set
+          during compilation, meaning a single dot will match any character,
+          including the newlines.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+
+    <section>
+      <title><literal>validateByteRange</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>Validates the byte
+      range used in the variable falls into the specified range.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule ARG:text "<emphasis
+          role="bold">@validateByteRange </emphasis>10, 13, 32-126"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>You can force requests to consist only of bytes from a certain
+      byte range. This can be useful to avoid stack overflow attacks (since
+      they usually contain "random" binary content). Default range values are
+      0 and 255, i.e. all byte values are allowed. This directive does not
+      check byte range in a POST payload when multipart/form-data encoding
+      (file upload) is used. Doing so would prevent binary files from being
+      uploaded. However, after the parameters are extracted from such request
+      they are checked for a valid range.</para>
+
+      <para>validateByteRange is similar to the ModSecurity 1.X
+      SecFilterForceByteRange Directive however since it works in a rule
+      context, it has the following differences:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>You can specify a different range for different
+          variables.</para>
+        </listitem>
+
+        <listitem>
+          <para>It has an "event" context (id, msg....)</para>
+        </listitem>
+
+        <listitem>
+          <para>It is executed in the flow or rules rather than being a build
+          in pre-check.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>validateDTD</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> This operator
+      requires request body to be processed as XML.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecDefaultAction log,deny,status:403,phase:2
+SecRule REQUEST_HEADERS:Content-Type ^text/xml$ phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML
+SecRule REQBODY_PROCESSOR "!^XML$" nolog,pass,skip:1
+SecRule XML "<emphasis role="bold">@validateDTD /path/to/apache2/conf/xml.dtd</emphasis>"</programlisting>
+    </section>
+
+    <section>
+      <title><literal>validateSchema</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> This operator
+      requires request body to be processed as XML.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecDefaultAction log,deny,status:403,phase:2
+SecRule REQUEST_HEADERS:Content-Type ^text/xml$ phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML
+SecRule REQBODY_PROCESSOR "!^XML$" nolog,pass,skip:1
+SecRule XML "<emphasis role="bold">@validateSchema /path/to/apache2/conf/xml.xsd</emphasis>"</programlisting>
+
+      <para>This operator requires request body to be processed as XML.</para>
+    </section>
+
+    <section>
+      <title><literal>validateUrlEncoding</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Verifies the
+      encodings used in the variable (if any) are valid.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule ARGS "<emphasis
+          role="bold">@validateUrlEncoding</emphasis>"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>URL encoding is an HTTP standard for encoding byte values within a
+      URL. The byte is escaped with a % followed by two hexadecimal values
+      (0-F). This directive does not check encoding in a POST payload when the
+      multipart/form-data encoding (file upload) is used. It is not necessary
+      to do so because URL encoding is not used for this encoding.</para>
+    </section>
+
+    <section>
+      <title><literal>validateUtf8Encoding</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Verifies the
+      variable is a valid UTF-8 encoded string.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule ARGS "<emphasis
+          role="bold">@validateUtf8Encoding</emphasis>"</programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>UTF-8 encoding is valid on most web servers. Integer values
+      between 0-65535 are encoded in a UTF-8 byte sequence that is escaped by
+      percents. The short form is two bytes in length.</para>
+
+      <para>check for three types of errors:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Not enough bytes. UTF-8 supports two, three, four, five, and
+          six byte encodings. ModSecurity will locate cases when a byte or
+          more is missing.</para>
+        </listitem>
+
+        <listitem>
+          <para>Invalid encoding. The two most significant bits in most
+          characters are supposed to be fixed to 0x80. Attackers can use this
+          to subvert Unicode decoders.</para>
+        </listitem>
+
+        <listitem>
+          <para>Overlong characters. ASCII characters are mapped directly into
+          the Unicode space and are thus represented with a single byte.
+          However, most ASCII characters can also be encoded with two, three,
+          four, five, and six characters thus tricking the decoder into
+          thinking that the character is something else (and, presumably,
+          avoiding the security check).</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+  </section>
+</article>

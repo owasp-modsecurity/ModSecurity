@@ -1,0 +1,102 @@
+
+body {
+    font: 13px/20px Arial, Helvetica;
+    background-color: white;
+    width: 800px;
+}
+
+/* TEXT */
+
+PRE {
+    font-size: 100%;
+    padding: 5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #CCCCCC;
+    background-color: #F5F8FA;
+}
+
+p, td, tr, li, ol, ul {
+    /*font-family: Trebuchet MS, Verdana, Tahoma, Arial, Helvetica, Geneva;*/
+    /*font-family: Arial, Helvetica;
+    font-size: 14px;
+    line-height: 24px;*/
+}
+
+.copyright {
+    font-size: 10px;
+}
+
+h1 {
+    padding-top: 40px;
+    font: 24px/30px Arial, Helvetica;
+    font-weight: bold;
+}
+
+h2 {
+    font: 20px/30px Arial, Helvetica;
+    font-weight: bold;
+}
+
+h3 {
+    padding-top: 15px;
+    font: 16px/10px Arial, Helvetica;
+    font-weight: bold;
+}
+
+h4 {
+    padding-top: 15px;
+    font: 14px/10px Arial, Helvetica;
+    font-weight: bold;
+}
+
+
+
+
+.header {
+    background-color: #00448B;
+    border-top: 6px solid #002B6E;
+    height: 84px;
+    vertical-align: top;
+    padding-left:  20px;
+    padding-top: 10px;
+}
+
+.topNavigation {
+    background-color: #EEEEEE;
+    background: url('g/topnav-background.gif');
+    height: 23px;
+    line-height: 12px;
+    vertical-align: top;
+    padding-left:  12px;
+    padding-top: 5px;
+}
+
+.topLink, A.topLink:link, A.topLink:active, A.topLink:visited {
+    font-weight: bold;
+    color: black;
+    text-decoration: none;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+A.topLink:hover {
+    color: #BB0000;
+}
+
+#navheader td {
+    font-size: 12px;
+}
+
+#navfooter td {
+    font-size: 12px;
+}
+
+h3.title {
+    margin-top: 0px;
+}
+
+.note {
+    border-top: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+}
