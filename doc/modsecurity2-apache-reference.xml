@@ -188,17 +188,17 @@
       <title>Overview</title>
 
       <para>ModSecurity is a web application firewall engine that provides
-      very little protection on its own. In order to become useful ModSecurity
-      must be configured with rules. In order to enable users to take full
-      advantage of ModSecurity out of the box, Breach Security Inc. is
-      providing a free certified rule set for ModSecurity 2.0. Unlike
+      very little protection on its own. In order to become useful,
+      ModSecurity must be configured with rules. In order to enable users to
+      take full advantage of ModSecurity out of the box, Breach Security Inc.
+      is providing a free certified rule set for ModSecurity 2.0. Unlike
       intrusion detection and prevention systems, which rely on signature
       specific to known vulnerabilities, the Core Rules provide generic
       protection from unknown vulnerabilities often found in web applications,
       which are in most cases custom coded. The Core Rules are heavily
       commented to allow it to be used as a step-by-step deployment guide for
       ModSecurity. The latest Core Rules can be found at the ModSecurity
-      website -<link
+      website - <link
       linkend="???">http://www.modsecurity.org/projects/rules/index.html</link>.</para>
     </section>
 
@@ -294,7 +294,7 @@
 
       <listitem>
         <para>Make sure you have <literal
-        moreinfo="none">mod_unique_id</literal>installed.</para>
+        moreinfo="none">mod_unique_id</literal> installed.</para>
       </listitem>
 
       <listitem>
@@ -317,7 +317,7 @@
 
       <listitem>
         <para>(Optional) Edit Makefile to enable ModSecurity to use libxml2
-        (uncomment line<literal moreinfo="none">DEFS =
+        (uncomment line<literal moreinfo="none"> DEFS =
         -DWITH_LIBXML2</literal>) and configure the include path (for example:
         <filename
         moreinfo="none">INCLUDES=-I/usr/include/libxml2</filename>)</para>
@@ -337,13 +337,13 @@
       </listitem>
 
       <listitem>
-        <para>(Optional) Add one line to your configuration to load
-        libxml2:<filename moreinfo="none">LoadFile
+        <para>(Optional) Add one line to your configuration to load libxml2:
+        <filename moreinfo="none">LoadFile
         /usr/lib/libxml2.so</filename></para>
       </listitem>
 
       <listitem>
-        <para>Add one line to your configuration to load ModSecurity:<literal
+        <para>Add one line to your configuration to load ModSecurity: <literal
         moreinfo="none">LoadModule security2_module
         modules/mod_security2.so</literal></para>
       </listitem>
@@ -454,9 +454,9 @@
 
       <para><emphasis role="bold">Description: </emphasis>Specifies which
       character to use as separator for<literal moreinfo="none">
-      application/x-www-form-urlencoded</literal> content. Defaults to<literal
-      moreinfo="none">&amp;</literal>. Applications are sometimes (very
-      rarely) written to use a semicolon (<literal
+      application/x-www-form-urlencoded</literal> content. Defaults to
+      <literal moreinfo="none">&amp;</literal>. Applications are sometimes
+      (very rarely) written to use a semicolon (<literal
       moreinfo="none">;</literal>).</para>
 
       <para><emphasis role="bold">Syntax:</emphasis> <literal
@@ -562,8 +562,8 @@ SecAuditLogStorageDir logs/audit
       will need to use the modsec-auditlog-collector.pl script and use the
       following format:</para>
 
-      <para><literal>SecAuditLog "|/path/to/modsec-auditlog-collector.pl
-      /path/to/SecAuditLogDataDir /path/to/SecAuditLog"</literal></para>
+      <para><programlisting format="linespecific">SecAuditLog \
+  "|/path/modsec-auditlog-collector.pl /path/SecAuditLogDataDir /path/SecAuditLog"</programlisting></para>
     </section>
 
     <section>
@@ -721,7 +721,7 @@ SecAuditLogStorageDir logs/audit
       user as new files are generated at runtime.</para>
 
       <para>As with all logging mechanisms, ensure that you specify a file
-      system location that as adequate disk space and is not on the root
+      system location that has adequate disk space and is not on the root
       partition.</para>
     </section>
 
@@ -749,14 +749,14 @@ SecAuditLogStorageDir logs/audit
 
       <orderedlist continuation="restarts" inheritnum="ignore">
         <listitem>
-          <para><literal moreinfo="none">Serial </literal>- all audit log
+          <para><literal moreinfo="none">Serial</literal> - all audit log
           entries will be stored in the main audit logging file. This is more
           convenient for casual use but it is slower as only one audit log
           entry can be written to the file at any one file.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">Concurrent </literal>- audit log
+          <para><literal moreinfo="none">Concurrent</literal> - audit log
           entries will be stored in separate files, one for each transaction.
           Concurrent logging is the mode to use if you are going to send the
           audit log data off to a remote ModSecurity Console host.</para>
@@ -965,7 +965,8 @@ SecAuditLogStorageDir logs/audit
 
       <para>The default value is:</para>
 
-      <programlisting format="linespecific">SecDefaultAction log,auditlog,deny,status:403,phase:2,t:lowercase,t:replaceNulls,t:compressWhitespace</programlisting>
+      <programlisting format="linespecific">SecDefaultAction \
+  log,auditlog,deny,status:403,phase:2,t:lowercase,t:replaceNulls,t:compressWhitespace</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -996,7 +997,7 @@ SecAuditLogStorageDir logs/audit
       httpd-guardian will defend against clients that send more 120 requests
       in a minute, or more than 360 requests in five minutes.</para>
 
-      <para>Since 1.9 ModSecurity supports a new directive, SecGuardianLog,
+      <para>Since 1.9, ModSecurity supports a new directive, SecGuardianLog,
       that is designed to send all access data to another program using the
       piped logging feature. Since Apache is typically deployed in a
       multi-process fashion, making information sharing difficult, the idea is
@@ -1037,11 +1038,12 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
       </emphasis>Any</para>
 
-      <para><emphasis role="bold">Dependencies/Notes: </emphasis>Thisdirective
-      is required if you plan to inspect POST_PAYLOADS of requests. This
-      directive must be used along with the "phase:2" processing phase action
-      and REQUEST_BODY variable/location. If any of these 3 parts are not
-      configured, you will not be able to inspect the request bodies.</para>
+      <para><emphasis role="bold">Dependencies/Notes: </emphasis>This
+      directive is required if you plan to inspect POST_PAYLOADS of requests.
+      This directive must be used along with the "phase:2" processing phase
+      action and REQUEST_BODY variable/location. If any of these 3 parts are
+      not configured, you will not be able to inspect the request
+      bodies.</para>
 
       <para>Possible values are:</para>
 
@@ -1233,10 +1235,10 @@ SecResponseBodyLimit 524288</programlisting>
       is used to analyse data and perform actions based on the results.</para>
 
       <para><emphasis role="bold">Syntax:</emphasis> <literal
-      moreinfo="none">SecRuleVARIABLES OPERATOR [ACTIONS]</literal></para>
+      moreinfo="none">SecRule VARIABLES OPERATOR [ACTIONS]</literal></para>
 
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
-      moreinfo="none">SecRuleREQUEST_URI "attack"</literal></para>
+      moreinfo="none">SecRule REQUEST_URI "attack"</literal></para>
 
       <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
 
@@ -1314,7 +1316,7 @@ SecResponseBodyLimit 524288</programlisting>
       <section>
         <title>Actions in rules</title>
 
-        <para>The third parameter,<literal moreinfo="none"> ACTIONS</literal>,
+        <para>The third parameter, <literal moreinfo="none">ACTIONS</literal>,
         can be omitted only because there is a helper feature that specifies
         the default action list. If the parameter isn't omitted the actions
         specified in the parameter will be merged with the default action list
@@ -1346,7 +1348,7 @@ SecResponseBodyLimit 524288</programlisting>
       <para><emphasis role="bold">Dependencies/Notes:</emphasis>
       Resource-specific contexts (e.g.<literal moreinfo="none">
       Location</literal>,<literal moreinfo="none"> Directory</literal>, etc)
-      cannot override<emphasis>phase1</emphasis>rules configured in the main
+      cannot override <emphasis>phase1</emphasis> rules configured in the main
       server or in the virtual server. This is because phase 1 is run early in
       the request processing process, before Apache maps request to resource.
       Virtual host context can override phase 1 rules configured in the main
@@ -1400,7 +1402,7 @@ ServerAlias www.app2.com
       engine.</para>
 
       <para><emphasis role="bold">Syntax:</emphasis> <literal
-      moreinfo="none">SecRuleEngineOn|Off|DetectionOnly</literal></para>
+      moreinfo="none">SecRuleEngine On|Off|DetectionOnly</literal></para>
 
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
       moreinfo="none">SecRuleEngine On</literal></para>
@@ -1418,16 +1420,16 @@ ServerAlias www.app2.com
 
       <itemizedlist>
         <listitem>
-          <para><literal moreinfo="none">On </literal>- process rules.</para>
+          <para><literal moreinfo="none">On</literal> - process rules.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">Off </literal>- do not process
+          <para><literal moreinfo="none">Off</literal> - do not process
           rules.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">DetectionOnly </literal>- process
+          <para><literal moreinfo="none">DetectionOnly</literal> - process
           rules but never intercept transactions, even when rules are
           configured to do so.</para>
         </listitem>
@@ -1583,17 +1585,17 @@ ServerAlias www.app2.com
 
       <itemizedlist>
         <listitem>
-          <para><literal moreinfo="none">On </literal>- Keep uploaded
+          <para><literal moreinfo="none">On</literal> - Keep uploaded
           files.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">Off </literal>- Do not keep uploaded
+          <para><literal moreinfo="none">Off</literal> - Do not keep uploaded
           files.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">RelevantOnly </literal>- This will
+          <para><literal moreinfo="none">RelevantOnly</literal> - This will
           keep only those files that belong to requests that are deemed
           relevant.</para>
         </listitem>
@@ -1620,7 +1622,7 @@ ServerAlias www.app2.com
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> Partitions
       are used to avoid collisions between session IDs and user IDs. This
       directive must be used if there are multiple applications deployed on
-      the same server. If it isn't a collision between session IDs might
+      the same server. If it isn't used, a collision between session IDs might
       occur. The default value is<literal moreinfo="none"> default</literal>.
       Example:</para>
 
@@ -1726,15 +1728,15 @@ SecRule HTTP_Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis>"</program
     <section>
       <title>Phase Request Headers</title>
 
-      <para>Rules in this phase immediately after Apache completes reading the
-      request headers (post-read-request phase). At this point the request
-      body has not been read yet, meaning not all request arguments are
-      available. Rules should be placed in this phase if you need to have them
-      run early (before Apache does something with the request), to do
-      something before the request body has been read, determine whether or
-      not the request body should be buffered, or decide how you want the
-      request body to be processed (e.g. whether to parse it as XML or
-      not).</para>
+      <para>Rules in this phase are processed immediately after Apache
+      completes reading the request headers (post-read-request phase). At this
+      point the request body has not been read yet, meaning not all request
+      arguments are available. Rules should be placed in this phase if you
+      need to have them run early (before Apache does something with the
+      request), to do something before the request body has been read,
+      determine whether or not the request body should be buffered, or decide
+      how you want the request body to be processed (e.g. whether to parse it
+      as XML or not).</para>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -1821,13 +1823,13 @@ SecRule HTTP_Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis>"</program
       (means all arguments including the POST Payload), with a static
       parameter (matches arguments with that name), or with a regular
       expression (matches all arguments with name that matches the regular
-      expression). Note:<literal> ARGS:p</literal> will not result in any
+      expression). Note: <literal>ARGS:p</literal> will not result in any
       invocations against the operator if argument p does not exist. Some
       variables are actually collections, which are expanded into more
       variables at runtime. The following example will examine all request
       arguments:<programlisting format="linespecific">SecRule ARGS dirty</programlisting>Sometimes,
       however, you will want to look only at parts of a collection. This can
-      be achieved with the help of the<emphasis>selection
+      be achieved with the help of the <emphasis>selection
       operator</emphasis>(colon). The following example will only look at the
       arguments named<literal moreinfo="none"> p</literal> (do note that, in
       general, requests can contain multiple arguments with the same name):
@@ -1989,7 +1991,7 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
       <para>This variable holds form data passed to the script/handler by
       appending data after a question mark. Example:</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold">Q UERY_STRIN G</emphasis>"attack"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">QUERY_STRING</emphasis> "attack"</programlisting>
     </section>
 
     <section>
@@ -2016,7 +2018,7 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
     <section>
       <title><literal moreinfo="none">REMOTE_PORT</literal></title>
 
-      <para>This variable hold information on the source port that the client
+      <para>This variable holds information on the source port that the client
       used when initiating the connection to our web server. Example: in this
       example, we are evaluating to see if the <literal>REMOTE_PORT</literal>
       is less than 1024, which would indicate that the user is a privileged
@@ -2144,7 +2146,8 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para>Example: the second example is targeting only the Host
       header.</para>
 
-      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_HEADERS:Host</emphasis> "^[\d\.]+$" "deny,log,status:400,msg:'Host header is a numeric IP address'"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_HEADERS:Host</emphasis> "^[\d\.]+$" \
+    "deny,log,status:400,msg:'Host header is a numeric IP address'"</programlisting>
     </section>
 
     <section>
@@ -2153,7 +2156,8 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para>This variable is a collection of the names of all of the Request
       Headers. Example:</para>
 
-      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_HEADERS_NAMES</emphasis> "^x-forwarded-for" "log,deny,status:403,t:lowercase,msg:'Proxy Server Used'"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_HEADERS_NAMES</emphasis> "^x-forwarded-for" \
+    "log,deny,status:403,t:lowercase,msg:'Proxy Server Used'"</programlisting>
     </section>
 
     <section>
@@ -2297,13 +2301,13 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     <section>
       <title><literal moreinfo="none">RULE</literal></title>
 
-      <para>This variable provides access to the<literal
+      <para>This variable provides access to the <literal
       moreinfo="none">id</literal>,<literal
       moreinfo="none">rev</literal>,<literal
-      moreinfo="none">severity</literal>, and<literal
-      moreinfo="none">msg</literal>fields of the rule that triggered the
+      moreinfo="none">severity</literal>, and <literal
+      moreinfo="none">msg</literal> fields of the rule that triggered the
       action. Only available for expansion in action strings (e.g.<literal
-      moreinfo="none">setvar:tx.varname=%{rule.id}</literal>).Example:</para>
+      moreinfo="none">setvar:tx.varname=%{rule.id}</literal>). Example:</para>
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS:Host "@eq 0" "phase:2,deny,id:1,setvar:tx.varname=<emphasis
           role="bold">%{rule.id}</emphasis>"</programlisting>
@@ -2431,14 +2435,14 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para>This variable contains the local port that the web server is
       listening on. Example:</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold">S ERVER_PORT </emphasis>"^80$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">SERVER_PORT </emphasis>"^80$"</programlisting>
     </section>
 
     <section>
       <title><literal moreinfo="none">SESSION</literal></title>
 
-      <para>This variable is a collection, available only after<literal
-      moreinfo="none"> setsid </literal>is executed. Example: the following
+      <para>This variable is a collection, available only after <literal
+      moreinfo="none">setsid</literal> is executed. Example: the following
       example shows how to initialize a SESSION collection with setsid, how to
       use setvar to increase the session.score values, how to set the
       session.blocked variable and finally how to deny the connection based on
@@ -2602,11 +2606,13 @@ SecRule REQUEST_HEADERS:Transfer-Encoding "!^$"</programlisting>
       XPath:</para>
 
       <programlisting format="linespecific">SecDefaultAction log,deny,status:403,phase:2
-SecRule REQUEST_HEADERS:Content-Type ^text/xml$ phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=<emphasis
+SecRule REQUEST_HEADERS:Content-Type ^text/xml$ \
+    phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=<emphasis
           role="bold">XML</emphasis>
 SecRule REQBODY_PROCESSOR "<emphasis role="bold">!^XML$</emphasis>" skip:2
 SecRule <emphasis role="bold">XML:/employees/employee/name/text()</emphasis> Fred
-SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> Fred xmlns:xq=http://www.example.com/employees</programlisting>
+SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> Fred \
+    xmlns:xq=http://www.example.com/employees</programlisting>
     </section>
   </section>
 
@@ -2628,12 +2634,12 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
     case in order to evade the ModSecurity rule:</para>
 
     <para><programlisting format="linespecific">SecRule ARG:p "xp_cmdshell" <emphasis
-          role="bold">"t:lowercase"</emphasis></programlisting>multipetranformation
-    actions can be used in the same rule, for example the following rule also
-    ensures that an attacker does not use URL encodign (%xx encoding) for
-    evasion. Not the order of the transformation functions, which ensures that
-    a URL encoded letter is first decoded and than translated to lower
-    case.</para>
+          role="bold">"t:lowercase"</emphasis></programlisting>multiple
+    tranformation actions can be used in the same rule, for example the
+    following rule also ensures that an attacker does not use URL encoding
+    (%xx encoding) for evasion. Note the order of the transformation
+    functions, which ensures that a URL encoded letter is first decoded and
+    than translated to lower case.</para>
 
     <para><programlisting format="linespecific">SecRule ARG:p "xp_cmdshell" <emphasis
           role="bold">"t:urlDecode,t:lowercase"</emphasis></programlisting></para>
@@ -2672,18 +2678,14 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
       <title><literal>escapeSeqDecode</literal></title>
 
       <para>This function decode ANSI C escape sequences:<literal
-      moreinfo="none">\a</literal>,<literal
-      moreinfo="none">\b</literal>,<literal
-      moreinfo="none">\f</literal>,<literal
-      moreinfo="none">\n</literal>,<literal
-      moreinfo="none">\r</literal>,<literal
-      moreinfo="none">\t</literal>,<literal
-      moreinfo="none">\v</literal>,<literal
-      moreinfo="none">\\</literal>,<literal
-      moreinfo="none">\?</literal>,<literal
-      moreinfo="none">\'</literal>,<literal
-      moreinfo="none">\"</literal>,<literal
-      moreinfo="none">\xHH</literal>(hexadecimal),<literal
+      moreinfo="none"> \a</literal>,<literal moreinfo="none"> \b</literal>,
+      <literal moreinfo="none">\f</literal>, <literal
+      moreinfo="none">\n</literal>, <literal moreinfo="none">\r</literal>,
+      <literal moreinfo="none">\t</literal>, <literal
+      moreinfo="none">\v</literal>, <literal moreinfo="none">\\</literal>,
+      <literal moreinfo="none">\?</literal>, <literal
+      moreinfo="none">\'</literal>, <literal moreinfo="none">\"</literal>,
+      <literal moreinfo="none">\xHH</literal>(hexadecimal), <literal
       moreinfo="none">\0OOO</literal>(octal). Invalid encodings are left in
       the output.</para>
     </section>
@@ -2708,34 +2710,34 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
 
       <itemizedlist>
         <listitem>
-          <para><literal moreinfo="none">&amp;#xHH</literal>and<literal
-          moreinfo="none">&amp;#xHH;</literal>(where H is any hexadecimal
+          <para><literal moreinfo="none">&amp;#xHH</literal> and <literal
+          moreinfo="none">&amp;#xHH;</literal> (where H is any hexadecimal
           number)</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">&amp;#DDD</literal>and<literal
-          moreinfo="none">&amp;#DDD;</literal>(where D is any decimal
+          <para><literal moreinfo="none">&amp;#DDD</literal> and <literal
+          moreinfo="none">&amp;#DDD;</literal> (where D is any decimal
           number)</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">&amp;quot</literal>and<literal
+          <para><literal moreinfo="none">&amp;quot</literal> and <literal
           moreinfo="none">&amp;quot;</literal></para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">&amp;nbs</literal>p and<literal
+          <para><literal moreinfo="none">&amp;nbs</literal>p and <literal
           moreinfo="none">&amp;nbsp;</literal></para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">&amp;lt</literal>and<literal
+          <para><literal moreinfo="none">&amp;lt</literal> and <literal
           moreinfo="none">&amp;lt;</literal></para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">&amp;gt</literal>and<literal
+          <para><literal moreinfo="none">&amp;gt</literal> and <literal
           moreinfo="none">&amp;gt;</literal></para>
         </listitem>
       </itemizedlist>
@@ -2824,7 +2826,7 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
       <title><literal>urlDecodeUni</literal></title>
 
       <para>In addition to decoding %xx like <literal
-      moreinfo="none">urlDecode, urlDecodeUni also</literal> decodes<literal
+      moreinfo="none">urlDecode, urlDecodeUni also </literal>decodes<literal
       moreinfo="none"> <literal>%uXXXX</literal> </literal>encoding (only the
       lower byte will be used, the higher byte will be discarded).</para>
     </section>
@@ -3106,8 +3108,10 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis role="bold">ctl:requ
       connections.</para>
 
       <programlisting format="linespecific">SecAction initcol:ip=%{REMOTE_ADDR},nolog
-SecRule ARGS:login "!^$" nolog,phase:1,setvar:ip.auth_attempt=+1,deprecatevar:ip.auth_attempt=20/120
-SecRule IP:AUTH_ATTEMPT "@gt 25" log,<emphasis role="bold">drop</emphasis>,phase:1,msg:'Possible Brute Force Attack"</programlisting>
+SecRule ARGS:login "!^$" \
+    nolog,phase:1,setvar:ip.auth_attempt=+1,deprecatevar:ip.auth_attempt=20/120
+SecRule IP:AUTH_ATTEMPT "@gt 25" \
+    log,<emphasis role="bold">drop</emphasis>,phase:1,msg:'Possible Brute Force Attack"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -3129,8 +3133,8 @@ SecRule IP:AUTH_ATTEMPT "@gt 25" log,<emphasis role="bold">drop</emphasis>,phase
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecRule REQUEST_URI "^/cgi-bin/script\.pl" "log,<emphasis
-          role="bold">exec:/usr/local/apache/bin/test.sh</emphasis>,phase:1"</programlisting>
+      <programlisting format="linespecific">SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
+    "log,<emphasis role="bold">exec:/usr/local/apache/bin/test.sh</emphasis>,phase:1"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -3159,8 +3163,8 @@ SecRule IP:AUTH_ATTEMPT "@gt 25" log,<emphasis role="bold">drop</emphasis>,phase
 
       <programlisting format="linespecific">SecRule REQUEST_COOKIES:JSESSIONID "!^$" nolog,phase:1,pass,chain
 SecAction setsid:%{REQUEST_COOKIES:JSESSIONID}
-SecRule REQUEST_URI "^/cgi-bin/script\.pl" "log,allow,setvar:session.suspicious=1,<emphasis
-          role="bold">expirevar:session.suspicious=3600</emphasis>,phase:1"</programlisting>
+SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
+    "log,allow,setvar:session.suspicious=1,<emphasis role="bold">expirevar:session.suspicious=3600</emphasis>,phase:1"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -3183,8 +3187,8 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" "log,allow,setvar:session.suspicious=
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS:Host "@eq 0" "log,<emphasis
-          role="bold">id:60008</emphasis>,severity:2,msg:'Request Missing a Host Header'"</programlisting>
+      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS:Host "@eq 0" \
+    "log,<emphasis role="bold">id:60008</emphasis>,severity:2,msg:'Request Missing a Host Header'"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -3239,18 +3243,18 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" "log,allow,setvar:session.suspicious=
 
       <orderedlist continuation="restarts" inheritnum="ignore">
         <listitem>
-          <para><literal moreinfo="none">CREATE_TIME</literal>- date/time of
+          <para><literal moreinfo="none">CREATE_TIME</literal> - date/time of
           the creation of the collection.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">KEY</literal>- the value of the
+          <para><literal moreinfo="none">KEY</literal> - the value of the
           initcol variable (the client's IP address in the example).</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">LAST_UPDATE_TIME</literal>- date/time
-          of the last update to the collection.</para>
+          <para><literal moreinfo="none">LAST_UPDATE_TIME</literal> -
+          date/time of the last update to the collection.</para>
         </listitem>
 
         <listitem>
@@ -3260,27 +3264,27 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" "log,allow,setvar:session.suspicious=
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">UPDATE_COUNTER</literal>- how many
+          <para><literal moreinfo="none">UPDATE_COUNTER</literal> - how many
           times the collection has been updated since creation.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">UPDATE_RATE</literal>- is the average
-          rate updates per minute since creation.</para>
+          <para><literal moreinfo="none">UPDATE_RATE</literal> - is the
+          average rate updates per minute since creation.</para>
         </listitem>
       </orderedlist>
 
       <para>Collections are loaded into memory when the initcol action is
       encountered. The collection in storage will be updated (and the
-      appropriate counters increased)<emphasis>only</emphasis>if it was
+      appropriate counters increased) <emphasis>only</emphasis> if it was
       changed during transaction processing.</para>
 
       <note>
         <para>To create a collection to hold session variables (<literal
         moreinfo="none">SESSION</literal>) use action <literal
         moreinfo="none">setsid</literal>. To create a collection to hold user
-        variables (<literal moreinfo="none">USER</literal>)use action <literal
-        moreinfo="none">setuid</literal>.</para>
+        variables (<literal moreinfo="none">USER</literal>) use action
+        <literal moreinfo="none">setuid</literal>.</para>
       </note>
 
       <note>
@@ -3321,8 +3325,9 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" "log,allow,setvar:session.suspicious=
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS:Host "@eq 0" "log,id:60008<emphasis
-          role="bold">,</emphasis>severity:2,<emphasis role="bold">msg:'Request Missing a Host Header'"</emphasis></programlisting>
+      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS:Host "@eq 0" \
+    "log,id:60008<emphasis role="bold">,</emphasis>severity:2,<emphasis
+          role="bold">msg:'Request Missing a Host Header'"</emphasis></programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -3342,8 +3347,8 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" "log,allow,setvar:session.suspicious=
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecDefaultAction log,deny,phase:1,t:lowercase,t:removeNulls,t:lowercase SecRule ARGS "attack"<emphasis
-          role="bold">multiMatch</emphasis></programlisting>
+      <programlisting format="linespecific">SecDefaultAction log,deny,phase:1,t:removeNulls,t:lowercase
+SecRule ARGS "attack" <emphasis role="bold">multiMatch</emphasis></programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -3372,8 +3377,8 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" "log,allow,setvar:session.suspicious=
 
       <para>If the SecAuditEngine is set to On, all of the transactions will
       be logged. If it is set to RelevantOnly, then you can control it with
-      the noauditlog action. Even it the noauditlog action is applied to a
-      specific rule, if a rule either before or after triggered an audit
+      the noauditlog action. Even if the noauditlog action is applied to a
+      specific rule and a rule either before or after triggered an audit
       event, then the tranaction will be logged to the audit log. The correct
       way to disable audit logging for the entire transaction is to use
       "<literal moreinfo="none">ctl:auditEngine=Off</literal>"</para>
@@ -3450,7 +3455,7 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" "log,allow,setvar:session.suspicious=
       <para>Example:</para>
 
       <programlisting format="linespecific">SecDefaultAction log,deny,<emphasis
-          role="bold">phase:1</emphasis>,t:lowercase,t:removeNulls,t:lowercase
+          role="bold">phase:1</emphasis>,t:removeNulls,t:lowercase
 SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
@@ -3493,12 +3498,12 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "Test" log,<emphasis
-          role="bold">redirect:http://www.hostname.com/failed.html</emphasis></programlisting>
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "Test" \
+    log,<emphasis role="bold">redirect:http://www.hostname.com/failed.html</emphasis></programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
-      <para>If the<literal moreinfo="none">status</literal>action is present
+      <para>If the <literal moreinfo="none">status</literal> action is present
       and its value is acceptable (301, 302, 303, or 307) it will be used for
       the redirection. Otherwise status code 302 will be used.</para>
     </section>
@@ -3518,8 +3523,8 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
-      <para>This action is used in combination with the<literal
-      moreinfo="none">id</literal>action to allow the same rule ID to be used
+      <para>This action is used in combination with the <literal
+      moreinfo="none">id</literal> action to allow the same rule ID to be used
       after changes take place but to still provide some indication the rule
       changed.</para>
     </section>
@@ -3580,8 +3585,8 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
       <para><emphasis role="bold">Action Group:</emphasis>
       Non-Disruptive</para>
 
-      <para>Example: For example, the example below will sanitise the data in
-      the Authorization header.</para>
+      <para>Example: This will sanitise the data in the Authorization
+      header.</para>
 
       <programlisting format="linespecific">SecAction log,phase:1,<emphasis
           role="bold">sanitiseRequestHeader:Authorization</emphasis></programlisting>
@@ -3600,8 +3605,8 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
       <para><emphasis role="bold">Action Group:</emphasis>
       Non-Disruptive</para>
 
-      <para>Example: For example, the example below will sanitise the
-      Set-Cookie data sent to the client.</para>
+      <para>Example: This will sanitise the Set-Cookie data sent to the
+      client.</para>
 
       <programlisting format="linespecific">SecAction log,phase:3,<emphasis
           role="bold">sanitiseResponseHeader:Set-Cookie</emphasis></programlisting>
@@ -3626,7 +3631,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
-      <para>The severity numbers follow the Syslog convention -</para>
+      <para>The severity numbers follow the Syslog convention:</para>
 
       <itemizedlist>
         <listitem>
@@ -3666,9 +3671,9 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
     <section>
       <title><literal>setuid</literal></title>
 
-      <para><emphasis role="bold">Description:</emphasis>
-      Special-purposeaction that initialises the <literal
-      moreinfo="none">USER</literal> collection.</para>
+      <para><emphasis role="bold">Description:</emphasis> Special-purpose
+      action that initialises the <literal moreinfo="none">USER</literal>
+      collection.</para>
 
       <para><emphasis role="bold">Action Group:</emphasis>
       Non-Disruptive</para>
@@ -3698,13 +3703,13 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
 
       <programlisting format="linespecific"># Initialise session variables using the session cookie value 
 SecRule REQUEST_COOKIES:PHPSESSID !^$ chain,nolog,pass
-SecAction<emphasis role="bold">setsid:%{REQUEST_COOKIES.PHPSESSID}</emphasis></programlisting>
+SecAction <emphasis role="bold">setsid:%{REQUEST_COOKIES.PHPSESSID}</emphasis></programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
       <para>On first invocation of this action the collection will be empty
-      (not taking the pre-defined variables into account - see<literal
-      moreinfo="none">initcol</literal>for more information). On subsequent
+      (not taking the pre-defined variables into account - see <literal
+      moreinfo="none">initcol</literal> for more information). On subsequent
       invocations the contents of the collection (session, in this case) will
       be retrieved from storage. After initialisation takes place the
       variable<literal moreinfo="none"> SESSIONID</literal> will be available
@@ -3781,8 +3786,10 @@ SecAction<emphasis role="bold">setsid:%{REQUEST_COOKIES.PHPSESSID}</emphasis></p
             role="bold">skip:2</emphasis>"
 SecRule REMOTE_ADDR "^127\.0\.0\.1$" "chain"
 SecRule REQUEST_HEADERS:User-Agent "^Apache \(internal dummy connection\)$" "t:none"  
-SecRule &amp;REQUEST_HEADERS:Host "@eq 0" "deny,log,status:400,id:960008,severity:4,msg:'Request Missing a Host Header'"
-SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" "log,deny,log,status:400,id:960015,msg:'Request Missing an Accept Header'"</programlisting></para>
+SecRule &amp;REQUEST_HEADERS:Host "@eq 0" \
+    "deny,log,status:400,id:960008,severity:4,msg:'Request Missing a Host Header'"
+SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
+    "log,deny,log,status:400,id:960015,msg:'Request Missing an Accept Header'"</programlisting></para>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -3831,9 +3838,9 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" "log,deny,log,status:400,id:960015,m
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecDefaultAction log,deny,phase:1,t:lowercase,t:removeNulls,t:lowercase 
-SecRule REQUEST_COOKIES:SESSIONID "47414e81cbbef3cf8366e84eeacba091" log,deny,status:403,<emphasis
-          role="bold">t:md5</emphasis></programlisting>
+      <programlisting format="linespecific">SecDefaultAction log,deny,phase:1,t:removeNulls,t:lowercase 
+SecRule REQUEST_COOKIES:SESSIONID "47414e81cbbef3cf8366e84eeacba091" \
+    log,deny,status:403,<emphasis role="bold">t:md5</emphasis></programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -3855,7 +3862,8 @@ SecRule REQUEST_COOKIES:SESSIONID "47414e81cbbef3cf8366e84eeacba091" log,deny,st
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecRule REQUEST_HEADERS:Content-Type "text/xml" phase:1,pass,ctl:requestBodyProcessor=XML,ctl:requestBodyAccess=On,<emphasis
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:Content-Type "text/xml" \
+    phase:1,pass,ctl:requestBodyProcessor=XML,ctl:requestBodyAccess=On,<emphasis
           role="bold">xmlns:xsd="http://www.w3.org/2001/XMLSchema"</emphasis>
 SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny</programlisting>
     </section>
@@ -4032,7 +4040,7 @@ SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny</progra
         </listitem>
 
         <listitem>
-          <para>It is executed in the flow or rules rather than being a build
+          <para>It is executed in the flow of rules rather than being a built
           in pre-check.</para>
         </listitem>
       </itemizedlist>
@@ -4042,12 +4050,13 @@ SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny</progra
       <title><literal>validateDTD</literal></title>
 
       <para><emphasis role="bold">Description:</emphasis> This operator
-      requires request body to be processed as XML.</para>
+      requires the request body to be processed as XML.</para>
 
       <para>Example:</para>
 
       <programlisting format="linespecific">SecDefaultAction log,deny,status:403,phase:2
-SecRule REQUEST_HEADERS:Content-Type ^text/xml$ phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML
+SecRule REQUEST_HEADERS:Content-Type ^text/xml$ \
+    phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML
 SecRule REQBODY_PROCESSOR "!^XML$" nolog,pass,skip:1
 SecRule XML "<emphasis role="bold">@validateDTD /path/to/apache2/conf/xml.dtd</emphasis>"</programlisting>
     </section>
@@ -4056,12 +4065,13 @@ SecRule XML "<emphasis role="bold">@validateDTD /path/to/apache2/conf/xml.dtd</e
       <title><literal>validateSchema</literal></title>
 
       <para><emphasis role="bold">Description:</emphasis> This operator
-      requires request body to be processed as XML.</para>
+      requires the request body to be processed as XML.</para>
 
       <para>Example:</para>
 
       <programlisting format="linespecific">SecDefaultAction log,deny,status:403,phase:2
-SecRule REQUEST_HEADERS:Content-Type ^text/xml$ phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML
+SecRule REQUEST_HEADERS:Content-Type ^text/xml$ \
+    phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML
 SecRule REQBODY_PROCESSOR "!^XML$" nolog,pass,skip:1
 SecRule XML "<emphasis role="bold">@validateSchema /path/to/apache2/conf/xml.xsd</emphasis>"</programlisting>
 
