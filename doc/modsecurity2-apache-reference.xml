@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.1.0-rc7 / (February 5, 2007)</releaseinfo>
+    <releaseinfo>Version 2.1.0 / (February 23, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -176,7 +176,7 @@
 
       <note>
         <para>ModSecurity, mod_security, and ModSecurity Pro are trademarks or
-        registered trademarks of Breach Security.</para>
+        registered trademarks of Breach Security, Inc.</para>
       </note>
     </section>
   </section>
@@ -394,30 +394,32 @@
 
     <para>The following section outlines all of the ModSecurity directives.
     Most of the ModSecurity directives can be used inside the various Apache
-    Scope Directives such as Virtual Hosts, Location, LocationMatch,
-    Directory, etc... There are others, however, that can only be used once in
-    the main configuration file. This information is specified in the Scope
-    sections below.</para>
+    Scope Directives such as <literal>VirtualHost</literal>,
+    <literal>Location</literal>, <literal>LocationMatch</literal>,
+    <literal>Directory</literal>, etc... There are others, however, that can
+    only be used once in the main configuration file. This information is
+    specified in the Scope sections below.</para>
 
     <para>These rules, along with the Core rules files, should be contained is
     files outside of the httpd.conf file and called up with Apache "Include"
     directives. This allows for easier updating/migration of the rules. If you
     create your own custom rules that you would like to use with the Core
     rules, you should create a file called -
-    modsecurity_crs_15_customrules.conf and place it in the same directory as
-    the Core rules files. By using this file name, your custom rules will be
-    called up after the standard ModSecurity Core rules configuration file but
-    before the other Core rules. This allows your rules to be evaluate first
-    which can be useful if you need to implement specific "allow" rules or to
-    correct any false positives in the Core rules as they are applied to your
-    site.</para>
+    <filename>modsecurity_crs_15_customrules.conf</filename> and place it in
+    the same directory as the Core rules files. By using this file name, your
+    custom rules will be called up after the standard ModSecurity Core rules
+    configuration file but before the other Core rules. This allows your rules
+    to be evaluate first which can be useful if you need to implement specific
+    "allow" rules or to correct any false positives in the Core rules as they
+    are applied to your site.</para>
 
     <para><emphasis role="bold">Note</emphasis></para>
 
     <para>It is highly encouraged that you do not edit the Core rules files
-    themselves but rather place all changes (such as SecRuleRemoveByID,
-    etc...) in your custom rules file. This will allow for easier upgrading as
-    newer Core rules are released by Breach on the ModSecurity website.</para>
+    themselves but rather place all changes (such as
+    <literal>SecRuleRemoveByID</literal>, etc...) in your custom rules file.
+    This will allow for easier upgrading as newer Core rules are released by
+    Breach Security on the ModSecurity website.</para>
 
     <section>
       <title><literal>SecAction</literal></title>
@@ -428,7 +430,7 @@
       parameter of<literal moreinfo="none"> SecRule</literal>.</para>
 
       <para><emphasis role="bold">Syntax:</emphasis> <literal
-      moreinfo="none">SecActionaction 1,action2,action2</literal></para>
+      moreinfo="none">SecAction action1,action2,action2</literal></para>
 
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
       moreinfo="none">SecAction
@@ -507,7 +509,7 @@
 SecAuditLogParts ABCFHZ
 SecAuditLogType concurrent
 SecAuditLogStorageDir logs/audit
-<emphasis role="bold">SecAuditLogRelevantStatus "^(4|5)"</emphasis></programlisting>
+<emphasis role="bold">SecAuditLogRelevantStatus ^[45]</emphasis></programlisting>
 
       <para>Possible values are:</para>
 
@@ -584,38 +586,38 @@ SecAuditLogStorageDir logs/audit
       </emphasis>Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes: </emphasis>At this time
-      ModSecurity does not log response bodies of stock Apache responses
-      (e.g.<literal moreinfo="none">404</literal>), or the<literal
-      moreinfo="none"> Server</literal> and<literal moreinfo="none"> Date
-      </literal>response headers.</para>
+      ModSecurity does not log response bodies of stock Apache responses (e.g.
+      <literal moreinfo="none">404</literal>), or the <literal
+      moreinfo="none">Server</literal> and <literal
+      moreinfo="none">Date</literal> response headers.</para>
 
-      <para>Default<literal moreinfo="none">ABCFHZ</literal>.</para>
+      <para>Default:<literal moreinfo="none"> ABCFHZ</literal>.</para>
 
       <para>Available audit log parts:</para>
 
       <itemizedlist>
         <listitem>
-          <para><literal moreinfo="none">A</literal>– audit log header
+          <para><literal moreinfo="none">A</literal> – audit log header
           (mandatory)</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">B</literal>– request headers</para>
+          <para><literal moreinfo="none">B</literal> – request headers</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">C</literal>– request body (present
+          <para><literal moreinfo="none">C</literal> – request body (present
           only if the request body exists and ModSecurity is configured to
           intercept it)</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">D</literal>- RESERVED for
+          <para><literal moreinfo="none">D</literal> - RESERVED for
           intermediary response headers, not implemented yet.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">E</literal>– intermediary response
+          <para><literal moreinfo="none">E</literal> – intermediary response
           body (present only if ModSecurity is configured to intercept
           response bodies, and if the audit log engine is configured to record
           it). Intermediary response body is the same as the actual response
@@ -626,22 +628,23 @@ SecAuditLogStorageDir logs/audit
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">F</literal>– final response headers
+          <para><literal moreinfo="none">F</literal> – final response headers
           (excluding the Date and Server headers, which are always added by
           Apache in the late stage of content delivery).</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">G</literal>– RESERVED for the actual
+          <para><literal moreinfo="none">G</literal> – RESERVED for the actual
           response body, not implemented yet.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">H</literal>- audit log trailer</para>
+          <para><literal moreinfo="none">H</literal> - audit log
+          trailer</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">I</literal>- This part is a
+          <para><literal moreinfo="none">I</literal> - This part is a
           replacement for part C. It will log the same data as C in all cases
           except when<literal
           moreinfo="none">multipart/form-data</literal>encoding in used. In
@@ -653,13 +656,13 @@ SecAuditLogStorageDir logs/audit
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">J</literal>- RESERVED. This part,
+          <para><literal moreinfo="none">J</literal> - RESERVED. This part,
           when implemented, will contain information about the files uploaded
           using multipart/form-data encoding.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">Z</literal>– final boundary,
+          <para><literal moreinfo="none">Z</literal> – final boundary,
           signifies the end of the entry (mandatory)</para>
         </listitem>
       </itemizedlist>
@@ -676,7 +679,7 @@ SecAuditLogStorageDir logs/audit
       moreinfo="none">SecAuditLogRelevantStatus REGEX</literal></para>
 
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
-      moreinfo="none">SecAuditLogRelevantStatus ^(4|5)</literal></para>
+      moreinfo="none">SecAuditLogRelevantStatus ^[45]</literal></para>
 
       <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
 
@@ -732,10 +735,10 @@ SecAuditLogStorageDir logs/audit
       of audit logging mechanism to be used.</para>
 
       <para><emphasis role="bold">Syntax:</emphasis> <literal
-      moreinfo="none">SecAuditLogType serial|concurrent</literal></para>
+      moreinfo="none">SecAuditLogType Serial|Concurrent</literal></para>
 
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
-      moreinfo="none">SecAuditLogType serial</literal></para>
+      moreinfo="none">SecAuditLogType Serial</literal></para>
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
@@ -965,8 +968,7 @@ SecAuditLogStorageDir logs/audit
 
       <para>The default value is:</para>
 
-      <programlisting format="linespecific">SecDefaultAction \
-  log,auditlog,deny,status:403,phase:2,t:lowercase,t:replaceNulls,t:compressWhitespace</programlisting>
+      <programlisting format="linespecific">SecDefaultAction log,auditlog,deny,status:403,phase:2,t:none</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -1864,7 +1866,7 @@ SecRule HTTP_Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis>"</program
       prevent buffer overflow issues). Example: Block request if the size of
       the arguments is above 25 characters.</para>
 
-      <programlisting format="linespecific">SecRule REQUEST_FILENAME "^/cgi-bin/login\.php$" "chain,log,deny,status:403,phase:2"
+      <programlisting format="linespecific">SecRule REQUEST_FILENAME "^/cgi-bin/login\.php$" "chain,log,deny,phase:2"
 SecRule<emphasis role="bold"> ARGS_COMBINED_SIZE </emphasis>"@gt 25"</programlisting>
     </section>
 
@@ -1957,7 +1959,7 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
       moreinfo="none">@inspectFile. </literal>Note: only available if files
       were extracted from the request body. Example:</para>
 
-      <programlisting format="linespecific">SecRule <emphasis role="bold">FILES_TMPNAMES</emphasis> "@inspectFile /usr/local/apache/tests/inspect_script.pl"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">FILES_TMPNAMES</emphasis> "@inspectFile /path/to/inspect_script.pl"</programlisting>
     </section>
 
     <section>
@@ -2309,7 +2311,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       action. Only available for expansion in action strings (e.g.<literal
       moreinfo="none">setvar:tx.varname=%{rule.id}</literal>). Example:</para>
 
-      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS:Host "@eq 0" "phase:2,deny,id:1,setvar:tx.varname=<emphasis
+      <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS:Host "@eq 0" "log,deny,setvar:tx.varname=<emphasis
           role="bold">%{rule.id}</emphasis>"</programlisting>
     </section>
 
@@ -2562,7 +2564,7 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
       this this request and then it will decided whether or not to allow/deny
       the request through.</para>
 
-      <programlisting format="linespecific">SecRule WEBSERVER_ERROR_LOG "File does not exist" "phase:5,pass,<emphasis
+      <programlisting format="linespecific">SecRule WEBSERVER_ERROR_LOG "does not exist" "phase:5,pass,<emphasis
           role="bold">setvar:tx.score=+5</emphasis>"
 SecRule<emphasis role="bold"> TX:SCORE</emphasis> "@gt 20" deny,log</programlisting>
     </section>
