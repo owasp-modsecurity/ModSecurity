@@ -1100,7 +1100,9 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
     /* Find the last update time (of the collection). */
     var_last_update_time = (msc_string *)apr_table_get(target_col, "LAST_UPDATE_TIME");
     if (var_last_update_time == NULL) {
-        msr_log(msr, 1, "Internal Error: Collection missing LAST_UPDATE_TIME.");
+        /* This is all right. If collection was created (and not restored from
+         * storage) then it won't have LAST_UPDATE_TIME - it was never updated.
+         */
         return 0;
     }
 

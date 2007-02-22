@@ -2,6 +2,8 @@
 22 Feb 2006 - 2.1.0-rc7+
 ------------------------
 
+* Removed the (harmless) message mentioning LAST_UPDATE_TIME missing.
+
 * It was not possible to remove a rule placed in phase 4 using
   SecRuleRemoveById or SecRuleRemoveByMsg. Fixed.
 
