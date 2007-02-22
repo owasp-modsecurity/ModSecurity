@@ -920,7 +920,7 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     count += msre_ruleset_phase_rule_remove_with_exception(ruleset, re, ruleset->phase_request_headers);
     count += msre_ruleset_phase_rule_remove_with_exception(ruleset, re, ruleset->phase_request_body);
     count += msre_ruleset_phase_rule_remove_with_exception(ruleset, re, ruleset->phase_response_headers);
-    count += msre_ruleset_phase_rule_remove_with_exception(ruleset, re, ruleset->phase_request_body);
+    count += msre_ruleset_phase_rule_remove_with_exception(ruleset, re, ruleset->phase_response_body);
 
     return count;    
 }
