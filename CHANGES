@@ -2,7 +2,8 @@
 22 Feb 2006 - 2.1.0-rc7+
 ------------------------
 
-* SecRuleRemoveById was unable to remove a rule placed in phase 4. Fixed.
+* It was not possible to remove a rule placed in phase 4 using
+  SecRuleRemoveById or SecRuleRemoveByMsg. Fixed.
 
 * Fixed a problem with incorrectly setting requestBodyProcessor using
   the ctl action.
