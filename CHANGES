@@ -2,6 +2,10 @@
 22 Feb 2006 - 2.1.0-rc7+
 ------------------------
 
+* Removed the "Connection reset by peer" message, which has nothing
+  to do with us. Actually the message was downgraded from ERROR to
+  NOTICE so it will still appear in the debug log.
+
 * Removed the (harmless) message mentioning LAST_UPDATE_TIME missing.
 
 * It was not possible to remove a rule placed in phase 4 using

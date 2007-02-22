@@ -569,8 +569,20 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
         rc = ap_pass_brigade(f->next, msr->of_brigade);
         if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "Output filter: Error while forwarding response data (%i): %s",
-                rc, get_apr_error(msr->mp, rc));
+            int log_level = 1;
+
+            if (APR_STATUS_IS_ECONNRESET(rc)) {
+                /* Message "Connection reset by peer" is common and not a sign
+                 * of something unusual. Hence we don't want to make a big deal
+                 * about it, logging at NOTICE level. Everything else we log
+                 * at ERROR level.
+                 */
+                log_level = 3;
+            }            
+
+            msr_log(msr, log_level, "Output filter: Error while forwarding response data (%i): %s",
+                    rc, get_apr_error(msr->mp, rc));
+
             return rc;
         }
     }
