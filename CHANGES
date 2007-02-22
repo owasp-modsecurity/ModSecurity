@@ -1,6 +1,6 @@
 
-22 Feb 2006 - 2.1.0-rc7+
-------------------------
+23 Feb 2006 - 2.1.0
+-------------------
 
 * Removed the "Connection reset by peer" message, which has nothing
   to do with us. Actually the message was downgraded from ERROR to
