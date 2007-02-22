@@ -29,8 +29,8 @@ static int sec_auditlog_write(modsec_rec *msr, const char *data, unsigned int le
 
     rc = apr_file_write_full(msr->new_auditlog_fd, data, nbytes, &nbytes_written);
     if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "Audit log: Failed writing (requested %ui bytes, written %ui)",
-            nbytes, nbytes_written);
+        msr_log(msr, 1, "Audit log: Failed writing (requested %" APR_SIZE_T_FMT
+            " bytes, written %" APR_SIZE_T_FMT ")", nbytes, nbytes_written);
         return -1;
     }
 
