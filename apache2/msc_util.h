@@ -64,9 +64,9 @@ char DSOLOCAL *log_escape_header_name(apr_pool_t *p, const char *text);
 char DSOLOCAL *_log_escape(apr_pool_t *p, const unsigned char *input,
     unsigned long int input_length, int escape_quotes, int escape_colon);
 
-int DSOLOCAL urldecode_uni_nonstrict_inplace_ex(char *input, long int input_length);
+int DSOLOCAL urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_length);
 
-int DSOLOCAL urldecode_nonstrict_inplace_ex(char *input, long int input_length, int *invalid_count);
+int DSOLOCAL urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_length, int *invalid_count);
 
 int DSOLOCAL html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int len);
 

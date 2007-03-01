@@ -308,7 +308,7 @@ static int output_filter_should_run(modsec_rec *msr, request_rec *r) {
             *p = '\0';
         }
 
-        strtolower_inplace(content_type);
+        strtolower_inplace((unsigned char *)content_type);
 
         if (strcmp(content_type, "text/html") == 0) {
             /* Useful information to have should we later

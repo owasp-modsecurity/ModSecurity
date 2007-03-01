@@ -1363,7 +1363,7 @@ static int var_request_filename_generate(modsec_rec *msr, msre_var *var, msre_ru
 
     if (value != NULL) {
         int invalid_count = 0;
-        urldecode_nonstrict_inplace_ex(value, strlen(value), &invalid_count);
+        urldecode_nonstrict_inplace_ex((unsigned char *)value, strlen(value), &invalid_count);
     }
 
     return var_simple_generate(var, vartab, mptmp, value);
