@@ -1,10 +1,11 @@
 
-?? ??? 2007 - ?????
--------------------
+01 Mar 2007 - 2.1.1-dev1
+------------------------
 
-* Fixed the date on the 2.1.0 release from 2006 to 2007 below.
+* Fixed the faulty REQUEST_FILENAME variable, which used to change
+  the internal Apache structures by mistake.
 
-* Fixed some casting issues for compiling on NetWare (patch from Guenter_Knauf).
+* Fixed some casting issues for compiling on NetWare (patch from Guenter Knauf).
 
 * Updates to quiet some compiler warnings.
 

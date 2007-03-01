@@ -1359,14 +1359,7 @@ static int var_request_headers_names_generate(modsec_rec *msr, msre_var *var, ms
 static int var_request_filename_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    char *value = msr->r->parsed_uri.path;
-
-    if (value != NULL) {
-        int invalid_count = 0;
-        urldecode_nonstrict_inplace_ex((unsigned char *)value, strlen(value), &invalid_count);
-    }
-
-    return var_simple_generate(var, vartab, mptmp, value);
+    return var_simple_generate(var, vartab, mptmp, msr->r->parsed_uri.path);
 }
 
 /* REQUEST_LINE */
