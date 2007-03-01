@@ -1,10 +1,12 @@
 
-01 Mar 2007 - 2.2.0
+?? ??? 2007 - ?????
 -------------------
 
 * Fixed the date on the 2.1.0 release from 2006 to 2007 below.
 
 * Fixed some casting issues for compiling on NetWare (patch from Guenter_Knauf).
+
+* Updates to quiet some compiler warnings.
 
 
 23 Feb 2007 - 2.1.0

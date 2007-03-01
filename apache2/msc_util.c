@@ -666,11 +666,11 @@ int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int
                     *d++ = c2;
                     count += 3;
                     i += 3;
-                    *invalid_count++;
+                    (*invalid_count)++; /* parens quiet compiler warning */
                 }
             } else {
                 /* Not enough bytes available, copy the raw bytes. */
-                *invalid_count++;
+                (*invalid_count)++; /* parens quiet compiler warning */
 
                 *d++ = '%';
                 count++;
