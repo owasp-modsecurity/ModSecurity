@@ -428,11 +428,11 @@ unsigned char *c2x(unsigned what, unsigned char *where) {
 }
 
 char *log_escape(apr_pool_t *mp, const char *text) {
-    return _log_escape(mp, (const unsigned char *)text, strlen(text), 1, 0);
+    return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 1, 0);
 }
 
 char *log_escape_nq(apr_pool_t *mp, const char *text) {
-    return _log_escape(mp, (const unsigned char *)text, strlen(text), 0, 0);
+    return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 0, 0);
 }
 
 char *log_escape_ex(apr_pool_t *mp, const char *text, unsigned long int text_length) {
@@ -444,7 +444,7 @@ char *log_escape_nq_ex(apr_pool_t *mp, const char *text, unsigned long int text_
 }
 
 char *log_escape_header_name(apr_pool_t *mp, const char *text) {
-    return _log_escape(mp, (const unsigned char *)text, strlen(text), 0, 1);
+    return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 0, 1);
 }
 
 /**
