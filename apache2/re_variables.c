@@ -370,7 +370,7 @@ static int var_xml_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     /* Process the XPath expression. */
 
     count = 0;
-    xpathExpr = var->param;
+    xpathExpr = (const xmlChar*)var->param;
 
     xpathCtx = xmlXPathNewContext(msr->xml->doc);
     if (xpathCtx == NULL) {
@@ -392,7 +392,7 @@ static int var_xml_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
             if (parse_name_eq_value(mptmp, action->param, &prefix, &href) < 0) return -1;
             if ((prefix == NULL)||(href == NULL)) return -1;
 
-            if(xmlXPathRegisterNs(xpathCtx, prefix, href) != 0) {
+            if(xmlXPathRegisterNs(xpathCtx, (const xmlChar*)prefix, (const xmlChar*)href) != 0) {
                 msr_log(msr, 1, "Failed to register XML namespace href \"%s\" prefix \"%s\".",
                     log_escape(mptmp, prefix), log_escape(mptmp, href));
                 return -1;
@@ -424,7 +424,7 @@ static int var_xml_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         msre_var *rvar = NULL;
         char *content = NULL;
 
-        content = xmlNodeGetContent(nodes->nodeTab[i]);
+        content = (char *)xmlNodeGetContent(nodes->nodeTab[i]);
         if (content != NULL) {
             rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
             rvar->value = apr_pstrdup(mptmp, content);
@@ -1359,14 +1359,7 @@ static int var_request_headers_names_generate(modsec_rec *msr, msre_var *var, ms
 static int var_request_filename_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    char *value = msr->r->parsed_uri.path;
-
-    if (value != NULL) {
-        int invalid_count = 0;
-        urldecode_nonstrict_inplace_ex(value, strlen(value), &invalid_count);
-    }
-
-    return var_simple_generate(var, vartab, mptmp, value);
+    return var_simple_generate(var, vartab, mptmp, msr->r->parsed_uri.path);
 }
 
 /* REQUEST_LINE */

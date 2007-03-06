@@ -229,7 +229,7 @@ static int msre_fn_urlDecodeUni_execute(apr_pool_t *mptmp, unsigned char *input,
 static int msre_fn_urlEncode_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
-    *rval = url_encode(mptmp, input, input_len);
+    *rval = url_encode(mptmp, (char *)input, input_len);
     *rval_len = strlen(*rval);
     
     return (*rval_len == input_len ? 0 : 1);
@@ -242,7 +242,7 @@ static int msre_fn_base64Encode_execute(apr_pool_t *mptmp, unsigned char *input,
 {
     *rval_len = apr_base64_encode_len(input_len); /* returns len with NULL byte included */
     *rval = apr_palloc(mptmp, *rval_len);
-    apr_base64_encode(*rval, input, input_len);
+    apr_base64_encode(*rval, (const char *)input, input_len);
     (*rval_len)--;
 
     return 1;
@@ -253,9 +253,9 @@ static int msre_fn_base64Encode_execute(apr_pool_t *mptmp, unsigned char *input,
 static int msre_fn_base64Decode_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
-    *rval_len = apr_base64_decode_len(input); /* returns len with NULL byte included */
+    *rval_len = apr_base64_decode_len((const char *)input); /* returns len with NULL byte included */
     *rval = apr_palloc(mptmp, *rval_len);
-    apr_base64_decode(*rval, input);
+    apr_base64_decode(*rval, (const char *)input);
     (*rval_len)--;
 
     return 1;
@@ -271,7 +271,7 @@ static int msre_fn_md5_execute(apr_pool_t *mptmp, unsigned char *input,
     apr_md5(digest, input, input_len);
 
     *rval_len = APR_MD5_DIGESTSIZE;
-    *rval = apr_pstrmemdup(mptmp, digest, APR_MD5_DIGESTSIZE);
+    *rval = apr_pstrmemdup(mptmp, (const char *)digest, APR_MD5_DIGESTSIZE);
 
     return 1;
 }
@@ -285,11 +285,11 @@ static int msre_fn_sha1_execute(apr_pool_t *mptmp, unsigned char *input,
     apr_sha1_ctx_t context;
 
     apr_sha1_init(&context);
-    apr_sha1_update(&context, input, input_len);
+    apr_sha1_update(&context, (const char *)input, input_len);
     apr_sha1_final(digest, &context);
 
     *rval_len = APR_SHA1_DIGESTSIZE;
-    *rval = apr_pstrmemdup(mptmp, digest, APR_SHA1_DIGESTSIZE);
+    *rval = apr_pstrmemdup(mptmp, (const char *)digest, APR_SHA1_DIGESTSIZE);
 
     return 1;    
 }
@@ -300,7 +300,7 @@ static int msre_fn_hexDecode_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
     *rval_len = hex2bytes_inplace(input, input_len);
-    *rval = input;
+    *rval = (char *)input;
 
     return 1;
 }
@@ -322,7 +322,7 @@ static int msre_fn_htmlEntityDecode_execute(apr_pool_t *mptmp, unsigned char *in
     long int input_len, char **rval, long int *rval_len)
 {
     *rval_len = html_entities_decode_inplace(mptmp, input, input_len);
-    *rval = input;
+    *rval = (char *)input;
 
     return (*rval_len == input_len ? 0 : 1);
 }
@@ -333,7 +333,7 @@ static int msre_fn_escapeSeqDecode_execute(apr_pool_t *mptmp, unsigned char *inp
     long int input_len, char **rval, long int *rval_len)
 {
     *rval_len = ansi_c_sequences_decode_inplace(input, input_len);
-    *rval = input;
+    *rval = (char *)input;
 
     return (*rval_len == input_len ? 0 : 1);
 }
@@ -344,7 +344,7 @@ static int msre_fn_normalisePath_execute(apr_pool_t *mptmp, unsigned char *input
     long int input_len, char **rval, long int *rval_len)
 {
     *rval_len = normalise_path_inplace(input, input_len, 0);
-    *rval = input;
+    *rval = (char *)input;
 
     return (*rval_len == input_len ? 0 : 1);
 }
@@ -355,7 +355,7 @@ static int msre_fn_normalisePathWin_execute(apr_pool_t *mptmp, unsigned char *in
     long int input_len, char **rval, long int *rval_len)
 {
     *rval_len = normalise_path_inplace(input, input_len, 1);
-    *rval = input;
+    *rval = (char *)input;
 
     return (*rval_len == input_len ? 0 : 1);
 }

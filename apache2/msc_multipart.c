@@ -291,7 +291,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
  */
 static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
     char *p = msr->mpd->buf + (MULTIPART_BUF_SIZE - msr->mpd->bufleft) - 2;
-    char localreserve[2];
+    char localreserve[2] = { '\0', '\0' }; /* initialized to quiet warning */
     int bytes_reserved = 0;
     
     if (error_msg == NULL) return -1;

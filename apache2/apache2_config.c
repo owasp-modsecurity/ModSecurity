@@ -867,7 +867,7 @@ static const char *cmd_response_body_mime_type(cmd_parms *cmd, void *_dcfg, cons
         dcfg->of_mime_types = apr_table_make(cmd->pool, 10);
     }
 
-    strtolower_inplace(p1);
+    strtolower_inplace((unsigned char *)p1);
     apr_table_setn(dcfg->of_mime_types, p1, "1");
 
     return NULL;

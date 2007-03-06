@@ -1,5 +1,18 @@
 
-23 Feb 2006 - 2.1.0
+01 Mar 2007 - 2.1.x
+-------------------
+
+* Fixed ASCIIZ (NUL) parsing for application/x-www-form-urlencoded forms
+
+* Fixed the faulty REQUEST_FILENAME variable, which used to change
+  the internal Apache structures by mistake.
+
+* Updates to quiet some compiler warnings.
+
+* Fixed some casting issues for compiling on NetWare (patch from Guenter Knauf).
+
+
+23 Feb 2007 - 2.1.0
 -------------------
 
 * Removed the "Connection reset by peer" message, which has nothing

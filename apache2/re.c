@@ -1391,7 +1391,7 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                 action = (msre_action *)telts[k].val;
                 metadata = (msre_tfn_metadata *)action->param_data;
 
-                rc = metadata->execute(mptmp, (char *)var->value, var->value_len,
+                rc = metadata->execute(mptmp, (unsigned char *)var->value, var->value_len,
                     &rval, &rval_length);
                 if (rc < 0) {
                     apr_pool_destroy(mptmp);

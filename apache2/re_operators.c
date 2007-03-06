@@ -261,7 +261,7 @@ static int msre_op_validateDTD_execute(modsec_rec *msr, msre_rule *rule, msre_va
         return -1;
     }
 
-    dtd = xmlParseDTD(NULL, rule->op_param); /* EHN support relative filenames */
+    dtd = xmlParseDTD(NULL, (const xmlChar *)rule->op_param); /* EHN support relative filenames */
     if (dtd == NULL) {
         *error_msg = apr_psprintf(msr->mp, "XML: Failed to load DTD: %s", rule->op_param);
         return -1;

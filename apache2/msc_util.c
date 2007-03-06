@@ -410,7 +410,7 @@ char *strtolower_inplace(unsigned char *str) {
         c++;
     }
 
-    return str;
+    return (char *)str;
 }
 
 /**
@@ -531,8 +531,8 @@ char *_log_escape(apr_pool_t *mp, const unsigned char *input, unsigned long int 
 /**
  *
  */
-int urldecode_uni_nonstrict_inplace_ex(char *input, long int input_len) {
-    unsigned char *d = (unsigned char *)input;
+int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len) {
+    unsigned char *d = input;
     long int i, count;
 
     if (input == NULL) return -1;
@@ -635,7 +635,7 @@ int urldecode_uni_nonstrict_inplace_ex(char *input, long int input_len) {
 /**
  *
  */
-int urldecode_nonstrict_inplace_ex(char *input, long int input_len, int *invalid_count) {
+int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int *invalid_count) {
     unsigned char *d = (unsigned char *)input;
     long int i, count;
 
@@ -666,11 +666,11 @@ int urldecode_nonstrict_inplace_ex(char *input, long int input_len, int *invalid
                     *d++ = c2;
                     count += 3;
                     i += 3;
-                    *invalid_count++;
+                    (*invalid_count)++; /* parens quiet compiler warning */
                 }
             } else {
                 /* Not enough bytes available, copy the raw bytes. */
-                *invalid_count++;
+                (*invalid_count)++; /* parens quiet compiler warning */
 
                 *d++ = '%';
                 count++;
@@ -736,7 +736,7 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
                     while((j < input_len)&&(isxdigit(input[j]))) j++;
                     if (j > k) { /* Do we have at least one digit? */
                         /* Decode the entity. */
-                        char *x = apr_pstrmemdup(mp, &input[k], j - k);
+                        char *x = apr_pstrmemdup(mp, (const char*)&input[k], j - k);
                         *d++ = (unsigned char)strtol(x, NULL, 16);
                         count++;
 
@@ -754,7 +754,7 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
                     while((j < input_len)&&(isdigit(input[j]))) j++;
                     if (j > k) { /* Do we have at least one digit? */
                         /* Decode the entity. */
-                        char *x = apr_pstrmemdup(mp, &input[k], j - k);
+                        char *x = apr_pstrmemdup(mp, (const char*)&input[k], j - k);
                         *d++ = (unsigned char)strtol(x, NULL, 10);
                         count++;
 
@@ -773,7 +773,7 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
                 k = j;
                 while((j < input_len)&&(isalnum(input[j]))) j++;
                 if (j > k) { /* Do we have at least one digit? */
-                    char *x = apr_pstrmemdup(mp, &input[k], j - k);
+                    char *x = apr_pstrmemdup(mp, (const char*)&input[k], j - k);
 
                     /* Decode the entity. */
                     if (strcasecmp(x, "quot") == 0) *d++ = '"';
@@ -941,7 +941,7 @@ int normalise_path_inplace(unsigned char *input, int input_len, int win) {
              * purpose.
              */
             if ((count >= 5)&&(*(d - 1) == '.')&&(*(d - 2) == '.')&&(*(d - 3) == '/')) {
-                char *cd = d - 4;
+                unsigned char *cd = d - 4;
                 int ccount = count - 4;
 
                 /* Go back until we reach the beginning or a forward slash. */

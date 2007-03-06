@@ -26,7 +26,7 @@ typedef struct msc_data_chunk msc_data_chunk;
 typedef struct msc_arg msc_arg;
 typedef struct msc_string msc_string;
 
-#ifndef WIN32
+#if !(defined(WIN32) || defined(NETWARE))
 #define DSOLOCAL __attribute__((visibility("hidden")))
 #else
 #define DSOLOCAL
@@ -50,7 +50,7 @@ typedef struct msc_string msc_string;
 #include "http_protocol.h"
 
 #define MODULE_NAME "ModSecurity"
-#define MODULE_RELEASE "2.1.0"
+#define MODULE_RELEASE "2.1.x"
 #define MODULE_NAME_FULL (MODULE_NAME " v" MODULE_RELEASE " (Apache 2.x)")
 
 #define PHASE_REQUEST_HEADERS       1
