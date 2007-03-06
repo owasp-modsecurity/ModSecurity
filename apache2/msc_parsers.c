@@ -199,19 +199,19 @@ int parse_cookies_v1(modsec_rec *msr, char *_cookie_header, apr_table_t *cookies
 /**
  *
  */
-int parse_arguments(modsec_rec *msr, const char *s, int argument_separator, const char *origin,
+int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
+    int argument_separator, const char *origin,
     apr_table_t *arguments, int *invalid_count)
 {
     msc_arg *arg;
-    long inputlength, i, j;
+    apr_size_t i, j;
     char *value = NULL;
     char *buf;
     int status;
 
     if (s == NULL) return -1;
-    inputlength = strlen(s);
     if (inputlength == 0) return 1;
-    if (inputlength + 1 <= 0) return -1;
+    if (inputlength < 0) return -1;
 
     buf = (char *)malloc(inputlength + 1);
     if (buf == NULL) return -1;

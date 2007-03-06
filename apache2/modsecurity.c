@@ -252,8 +252,10 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     if (msr->query_string != NULL) {
         int invalid_count = 0;
 
-        if (parse_arguments(msr, msr->query_string, msr->txcfg->argument_separator,
-                "QUERY_STRING", msr->arguments, &invalid_count) < 0) {
+        if (parse_arguments(msr, msr->query_string, strlen(msr->query_string), 
+            msr->txcfg->argument_separator, "QUERY_STRING", msr->arguments, 
+            &invalid_count) < 0)
+        {
             msr_log(msr, 1, "Initialisation: Error occurred while parsing QUERY_STRING arguments.");
             return -1;
         }

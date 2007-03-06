@@ -336,8 +336,8 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr) {
 
     /* Parse URL-encoded arguments in the request body. */    
 
-    if (parse_arguments(msr, msr->msc_reqbody_buffer, msr->txcfg->argument_separator,
-        "BODY", msr->arguments, &invalid_count) < 0)
+    if (parse_arguments(msr, msr->msc_reqbody_buffer, msr->msc_reqbody_length,
+        msr->txcfg->argument_separator, "BODY", msr->arguments, &invalid_count) < 0)
     {
         msr_log(msr, 1, "Initialisation: Error occurred while parsing BODY arguments.");
         return -1;
