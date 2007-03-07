@@ -211,7 +211,9 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
 
     if (s == NULL) return -1;
     if (inputlength == 0) return 1;
-    if (inputlength < 0) return -1;
+
+    /* Check that adding one will not overflow */
+    if (inputlength + 1 <= 0) return -1;
 
     buf = (char *)malloc(inputlength + 1);
     if (buf == NULL) return -1;
