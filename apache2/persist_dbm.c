@@ -152,6 +152,7 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
             if (var == NULL) {
                 /* Error. */
             } else {
+                int td;
                 counter = atoi(var->value);
                 var = (msc_string *)apr_table_get(col, "UPDATE_RATE");
                 if (var == NULL) {
@@ -160,8 +161,16 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
                     var->name_len = strlen(var->name);
                     apr_table_setn(col, var->name, (void *)var);
                 }
-                var->value = apr_psprintf(msr->mp, "%i",
-                    (int)((60 * counter)/(apr_time_sec(apr_time_now()) - create_time)));
+
+                /* NOTE: No rate if there has been no time elapsed */
+                td = (apr_time_sec(apr_time_now()) - create_time);
+                if (td == 0) {
+                    var->value = apr_psprintf(msr->mp, "%i", 0);
+                }
+                else {
+                    var->value = apr_psprintf(msr->mp, "%i",
+                        (int)((60 * counter)/td));
+                }
                 var->value_len = strlen(var->value);
             }
         }
