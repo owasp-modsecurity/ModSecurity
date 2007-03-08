@@ -736,7 +736,7 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
                     while((j < input_len)&&(isxdigit(input[j]))) j++;
                     if (j > k) { /* Do we have at least one digit? */
                         /* Decode the entity. */
-                        char *x = apr_pstrmemdup(mp, (const char*)&input[k], j - k);
+                        char *x = apr_pstrmemdup(mp, (const char *)&input[k], j - k);
                         *d++ = (unsigned char)strtol(x, NULL, 16);
                         count++;
 
@@ -754,7 +754,7 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
                     while((j < input_len)&&(isdigit(input[j]))) j++;
                     if (j > k) { /* Do we have at least one digit? */
                         /* Decode the entity. */
-                        char *x = apr_pstrmemdup(mp, (const char*)&input[k], j - k);
+                        char *x = apr_pstrmemdup(mp, (const char *)&input[k], j - k);
                         *d++ = (unsigned char)strtol(x, NULL, 10);
                         count++;
 
@@ -773,7 +773,7 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
                 k = j;
                 while((j < input_len)&&(isalnum(input[j]))) j++;
                 if (j > k) { /* Do we have at least one digit? */
-                    char *x = apr_pstrmemdup(mp, (const char*)&input[k], j - k);
+                    char *x = apr_pstrmemdup(mp, (const char *)&input[k], j - k);
 
                     /* Decode the entity. */
                     if (strcasecmp(x, "quot") == 0) *d++ = '"';
