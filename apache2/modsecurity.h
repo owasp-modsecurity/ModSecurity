@@ -50,7 +50,7 @@ typedef struct msc_string msc_string;
 #include "http_protocol.h"
 
 #define MODULE_NAME "ModSecurity"
-#define MODULE_RELEASE "2.1.1-dev3"
+#define MODULE_RELEASE "2.1.1-dev4"
 #define MODULE_NAME_FULL (MODULE_NAME " v" MODULE_RELEASE " (Apache 2.x)")
 
 #define PHASE_REQUEST_HEADERS       1

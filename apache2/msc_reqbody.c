@@ -56,7 +56,7 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr) {
      * to allocate structures from (not data, which is allocated
      * via malloc).
      */
-    apr_pool_create(&msr->msc_reqbody_mp, msr->mp);
+    apr_pool_create(&msr->msc_reqbody_mp, NULL);
 
     /* Initialise request body processors, if any. */
 
@@ -626,11 +626,10 @@ apr_status_t modsecurity_request_body_clear(modsec_rec *msr) {
         }
     }
 
-    /* NOTE No need to clear the pool as it has already been destroyed
-     * if (msr->msc_reqbody_mp != NULL) {
-     *    apr_pool_clear(msr->msc_reqbody_mp);
-     * }
-     */
+    if (msr->msc_reqbody_mp != NULL) {
+        apr_pool_destroy(msr->msc_reqbody_mp);
+        msr->msc_reqbody_mp = NULL;
+    }
 
     return 1;
 }
