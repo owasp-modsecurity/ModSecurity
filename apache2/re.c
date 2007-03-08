@@ -159,14 +159,14 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
     /* Resolve variable */
     var->metadata = msre_resolve_var(engine, var->name);
     if (var->metadata == NULL) {
-        *error_msg = apr_psprintf(engine->mp, "Unknown variable: %s", name);
+        *error_msg = apr_psprintf(pool, "Unknown variable: %s", name);
         return NULL;
     }
 
     /* The counting operator "&" can only be used against collections. */
     if (var->is_counting) {
         if (var->metadata->type == VAR_SIMPLE) {
-            *error_msg = apr_psprintf(engine->mp, "The & modificator does not apply to "
+            *error_msg = apr_psprintf(pool, "The & modificator does not apply to "
                 "non-collection variables.");
             return NULL;
         }
@@ -175,7 +175,7 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
     /* Check the parameter. */
     if (param == NULL) {
         if (var->metadata->argc_min > 0) {
-            *error_msg = apr_psprintf(engine->mp, "Missing mandatory parameter for variable %s.",
+            *error_msg = apr_psprintf(pool, "Missing mandatory parameter for variable %s.",
                 name);
             return NULL;
         }
@@ -183,7 +183,7 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
 
         /* Do we allow a parameter? */
         if (var->metadata->argc_max == 0) {
-            *error_msg = apr_psprintf(engine->mp, "Variable %s does not support parameters.",
+            *error_msg = apr_psprintf(pool, "Variable %s does not support parameters.",
                 name);
             return NULL;
         }
