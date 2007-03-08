@@ -54,7 +54,7 @@ msre_action_metadata *msre_resolve_action(msre_engine *engine, const char *name)
 msre_var *msre_create_var(msre_ruleset *ruleset, const char *name, const char *param,
     modsec_rec *msr, char **error_msg);
 
-msre_var *msre_create_var_ex(msre_engine *engine, const char *name, const char *param,
+msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *name, const char *param,
     modsec_rec *msr, char **error_msg);
 
 msre_action *msre_create_action(msre_engine *engine, const char *name,

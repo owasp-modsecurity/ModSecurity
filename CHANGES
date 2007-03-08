@@ -1,6 +1,8 @@
 
-01 Mar 2007 - 2.1.1-dev1
+01 Mar 2007 - 2.1.1-dev3
 ------------------------
+
+* Fixed potential memory corruption when expanding macros.
 
 * Fixed error when a collection var was fetched in the same second as creation
   by setting the rate to zero.

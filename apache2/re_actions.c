@@ -131,7 +131,7 @@ int DSOLOCAL expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, ap
                 *(msc_string **)apr_array_push(arr) = part;
 
                 /* Resolve the macro and add that to the array. */
-                var_resolved = msre_create_var_ex(msr->modsecurity->msre, var_name, var_value,
+                var_resolved = msre_create_var_ex(mptmp, msr->modsecurity->msre, var_name, var_value,
                     msr, &my_error_msg);
                 if (var_resolved != NULL) {
                     var_generated = generate_single_var(msr, var_resolved, rule, mptmp);
