@@ -121,10 +121,10 @@ msre_action_metadata *msre_resolve_action(msre_engine *engine, const char *name)
  * Creates a new variable instance given the variable name
  * and an (optional) parameter.
  */
-msre_var *msre_create_var_ex(msre_engine *engine, const char *name, const char *param,
+msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *name, const char *param,
     modsec_rec *msr, char **error_msg)
 {
-    msre_var *var = apr_pcalloc(engine->mp, sizeof(msre_var));
+    msre_var *var = apr_pcalloc(pool, sizeof(msre_var));
     if (var == NULL) return NULL;
 
     if (error_msg == NULL) return NULL;
@@ -147,7 +147,7 @@ msre_var *msre_create_var_ex(msre_engine *engine, const char *name, const char *
     /* CGI HTTP variables emulation. */
     if (strncasecmp(var->name, "HTTP_", 5) == 0) {    
         if (var->param != NULL) {
-            *error_msg = apr_psprintf(engine->mp, "Variable %s does not support parameters.",
+            *error_msg = apr_psprintf(pool, "Variable %s does not support parameters.",
                 var->name);
             return NULL;
         }
@@ -196,11 +196,14 @@ msre_var *msre_create_var_ex(msre_engine *engine, const char *name, const char *
 
 /**
  * Create a new variable object from the provided name and value.
+ *
+ * NOTE: this allocates out of the global pool and should not be used
+ *       per-request
  */
 msre_var *msre_create_var(msre_ruleset *ruleset, const char *name, const char *param,
     modsec_rec *msr, char **error_msg)
 {
-    msre_var *var = msre_create_var_ex(ruleset->engine, name, param, msr, error_msg);
+    msre_var *var = msre_create_var_ex(ruleset->engine->mp, ruleset->engine, name, param, msr, error_msg);
     if (var == NULL) return NULL;
 
     /* Validate & initialise variable */
