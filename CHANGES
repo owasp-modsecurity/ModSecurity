@@ -1,11 +1,11 @@
 
-08 Mar 2007 - 2.1.1-dev5
-------------------------
+11 Mar 2007 - 2.1.1-rc1
+-----------------------
 
 * Fixed potential memory corruption when expanding macros.
 
-* Fixed error when a collection var was fetched in the same second as creation
-  by setting the rate to zero.
+* Fixed error when a collection was retrieved from storage in the same second
+  as creation by setting the rate to zero.
 
 * Fixed ASCIIZ (NUL) parsing for application/x-www-form-urlencoded forms.
 
