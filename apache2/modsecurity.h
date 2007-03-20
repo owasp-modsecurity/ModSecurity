@@ -306,6 +306,9 @@ struct modsec_rec {
     /* other */
     apr_table_t         *collections;
     apr_table_t         *collections_dirty;
+
+    /* rule processing temp pool */
+    apr_pool_t          *msc_rule_mptmp;
 };
 
 struct directory_config {
