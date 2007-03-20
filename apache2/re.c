@@ -1178,7 +1178,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
      *   @REQUEST_HEADERS:Foo "@eq 0"
      *   @REQUEST_HEADERS:Foo "!@eq 1"
      */
-    if (var->param != NULL && var->name != NULL && strchr(var->name,':') == NULL) {
+    if ((var->param != NULL) && (var->name != NULL) && (strchr(var->name,':') == NULL)) {
         full_varname = apr_psprintf(mptmp, "%s%s:%s", 
                                     (var->is_counting ? "&" : ""),
                                     var->name, var->param);
