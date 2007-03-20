@@ -1168,7 +1168,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
 {
     apr_time_t time_before_regex;
     char *my_error_msg = NULL;
-    char *full_varname = NULL;
+    const char *full_varname = NULL;
     int rc;
 
     /* determine the full var name if not already resolved
