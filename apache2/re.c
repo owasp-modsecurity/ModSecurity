@@ -1269,12 +1269,22 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
         multi_match = 1;
     }
 
-    /* Create a memory pool that will be used during the
-     * processing of this rule only.
-     */
-    /* IMP1 Why not have one pool and just clear it between rules? */
-    if (apr_pool_create(&mptmp, NULL) != APR_SUCCESS) {
-        return -1;
+    /* Use a fresh memory sub-pool for processing each rule */
+    if (msr->msc_rule_mptmp == NULL) {
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Creating new rule processing memory pool");
+        }
+        if (apr_pool_create(&msr->msc_rule_mptmp, msr->mp) != APR_SUCCESS) {
+            return -1;
+        }
+        mptmp = msr->msc_rule_mptmp;
+    }
+    else {
+        mptmp = msr->msc_rule_mptmp;
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Clearing rule processing memory pool");
+        }
+        apr_pool_clear(mptmp);
     }
 
     tartab = apr_table_make(mptmp, 24);
@@ -1393,7 +1403,6 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                     rc = execute_operator(var, rule, msr, acting_actionset, mptmp);
 
                     if (rc < 0) {
-                        apr_pool_destroy(mptmp);
                         return -1;
                     }
 
@@ -1417,7 +1426,6 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                 rc = metadata->execute(mptmp, (unsigned char *)var->value, var->value_len,
                     &rval, &rval_length);
                 if (rc < 0) {
-                    apr_pool_destroy(mptmp);
                     return -1;
                 }
 
@@ -1443,7 +1451,6 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
             rc = execute_operator(var, rule, msr, acting_actionset, mptmp);
 
             if (rc < 0) {
-                apr_pool_destroy(mptmp);
                 return -1;
             }
 
@@ -1461,7 +1468,6 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
         }
     }
 
-    apr_pool_destroy(mptmp);
 
     return (match_count ? RULE_MATCH : RULE_NO_MATCH);
 }

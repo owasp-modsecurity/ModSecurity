@@ -2,6 +2,8 @@
 20 Mar 2007 - trunk
 -------------------
 
+* Performance improvements in memory management.
+
 * Fixed some collection variable names not printing with the parameter
   and/or counting operator in the debug log.
 
