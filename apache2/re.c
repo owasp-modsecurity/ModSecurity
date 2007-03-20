@@ -1168,12 +1168,32 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
 {
     apr_time_t time_before_regex;
     char *my_error_msg = NULL;
+    char *full_varname = NULL;
     int rc;
+
+    /* determine the full var name if not already resolved
+     *
+     * NOTE: this can happen if the var does not match but it is 
+     * being tested for non-existance as in:
+     *   @REQUEST_HEADERS:Foo "@eq 0"
+     *   @REQUEST_HEADERS:Foo "!@eq 1"
+     */
+    if (var->param != NULL && var->name != NULL && strchr(var->name,':') == NULL) {
+        full_varname = apr_psprintf(mptmp, "%s%s:%s", 
+                                    (var->is_counting ? "&" : ""),
+                                    var->name, var->param);
+    }
+    else if ((var->name != NULL) && var->is_counting && (*var->name != '&')) {
+        full_varname = apr_pstrcat(mptmp, "&", var->name);
+    }
+    else {
+        full_varname = var->name;
+    }
 
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Executing operator %s%s with param \"%s\" against %s.",
             (rule->op_negated ? "!" : ""), rule->op_name,
-            log_escape(msr->mp, rule->op_param), var->name);
+            log_escape(msr->mp, rule->op_param), full_varname);
     }
 
     if (msr->txcfg->debuglog_level >= 9) {
@@ -1204,7 +1224,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
             /* Operator did not match so we need to provide a message. */
             my_error_msg = apr_psprintf(msr->mp, "Match of \"%s %s\" against \"%s\" required.",
                 log_escape(msr->mp, rule->op_name), log_escape(msr->mp, rule->op_param),
-                log_escape(msr->mp, var->name));
+                log_escape(msr->mp, full_varname));
         }
 
         msr->matched_var = apr_pstrdup(msr->mp, var->name);

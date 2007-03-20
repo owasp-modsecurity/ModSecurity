@@ -1,6 +1,9 @@
 
-01 Mar 2007 - 2.1.1-dev3
-------------------------
+20 Mar 2007 - trunk
+-------------------
+
+* Fixed some collection variable names not printing with the parameter
+  and/or counting operator in the debug log.
 
 * Fixed potential memory corruption when expanding macros.
 
