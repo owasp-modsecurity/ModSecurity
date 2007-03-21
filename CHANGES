@@ -1,6 +1,8 @@
 
-20 Mar 2007 - trunk
+21 Mar 2007 - trunk
 -------------------
+
+* Do not log 'allow' action as intercepted in the debug log.
 
 * Optimize regex execution to not capture unless 'capture' action used.
 

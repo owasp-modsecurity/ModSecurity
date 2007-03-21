@@ -61,11 +61,13 @@ int perform_interception(modsec_rec *msr) {
 
     if (msr->was_intercepted == 0) {
         msr_log(msr, 1, "Internal Error: Asked to intercept request but was_intercepted is zero");
+        msr->was_intercepted = 0;
         return DECLINED;
     }
 
     if (msr->phase > 4) {
         msr_log(msr, 1, "Internal Error: Asked to intercept request in phase %i.", msr->phase);
+        msr->was_intercepted = 0;
         return DECLINED;
     }
 
@@ -184,6 +186,7 @@ int perform_interception(modsec_rec *msr) {
         case ACTION_ALLOW :
             status = DECLINED;
             message = apr_psprintf(msr->mp, "Access allowed%s.", phase_text);
+            msr->was_intercepted = 0;
             break;
 
         default :
