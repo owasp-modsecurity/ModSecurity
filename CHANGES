@@ -2,6 +2,10 @@
 21 Mar 2007 - trunk
 -------------------
 
+* Store filename/line for each rule and display it and the ID (if available)
+  in the debug log when invoking a rule.  Thanks to Christian Bockermann
+  for the idea.
+
 * Do not log 'allow' action as intercepted in the debug log.
 
 * Optimize regex execution to not capture unless 'capture' action used.

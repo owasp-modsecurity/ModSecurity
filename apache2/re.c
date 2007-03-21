@@ -703,7 +703,17 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         }
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Recipe: Invoking rule %x.", rule);
+            apr_pool_t *p = msr->mp;
+            const char *fn = NULL;
+            const char *id = NULL;
+            if (rule->filename != NULL) {
+                fn = apr_psprintf(p, " [%s:%d]", rule->filename, rule->line_num);
+            }
+            if (rule->actionset != NULL && rule->actionset->id != NULL) {
+                id = apr_psprintf(p, " [id \"%s\"]", rule->actionset->id);
+            }
+            msr_log(msr, 4, "Recipe: Invoking rule %x%s%s.",
+                    rule, (fn ? fn : ""), (id ? id : ""));
         }
 
         rc = msre_rule_process(rule, msr);
@@ -1008,7 +1018,8 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
  * Assembles a new rule using the strings that contain a list
  * of targets (variables), argumments, and actions.
  */
-msre_rule *msre_rule_create(msre_ruleset *ruleset, const char *targets,
+msre_rule *msre_rule_create(msre_ruleset *ruleset,
+    const char *fn, int line, const char *targets,
     const char *args, const char *actions, char **error_msg)
 {
     msre_rule *rule;
@@ -1023,6 +1034,8 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset, const char *targets,
     if (rule == NULL) return NULL;
     rule->ruleset = ruleset;
     rule->targets = apr_array_make(ruleset->mp, 10, sizeof(const msre_var *));
+    rule->filename = apr_pstrdup(ruleset->mp, fn);
+    rule->line_num = line;
 
     /* Parse targets */
     rc = msre_parse_targets(ruleset, targets, rule->targets, &my_error_msg);

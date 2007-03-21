@@ -422,7 +422,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
     }
 
     /* Create the rule now. */
-    rule = msre_rule_create(dcfg->ruleset, p1, p2, p3, &my_error_msg);
+    rule = msre_rule_create(dcfg->ruleset, cmd->directive->filename, cmd->directive->line_num, p1, p2, p3, &my_error_msg);
     if (rule == NULL) {
         return my_error_msg;
     }

@@ -119,12 +119,15 @@ struct msre_rule {
     msre_op_metadata        *op_metadata;
     unsigned int             op_negated;
     msre_actionset          *actionset;
+    const char              *filename;
+    int                      line_num;
     
     msre_ruleset            *ruleset;
     msre_rule               *chain_starter;
 };
 
-msre_rule *msre_rule_create(msre_ruleset *ruleset, const char *targets,
+msre_rule *msre_rule_create(msre_ruleset *ruleset,
+    const char *fn, int line, const char *targets,
     const char *args, const char *actions, char **error_msg);
 
 void msre_rule_actionset_init(msre_rule *rule);
