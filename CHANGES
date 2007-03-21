@@ -2,10 +2,16 @@
 20 Mar 2007 - trunk
 -------------------
 
+* Optimize regex execution to not capture unless 'capture' action used.
+
 * Performance improvements in memory management.
 
 * Fixed some collection variable names not printing with the parameter
   and/or counting operator in the debug log.
+
+
+11 Mar 2007 - 2.1.1-rc1
+-----------------------
 
 * Fixed potential memory corruption when expanding macros.
 

@@ -82,6 +82,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     unsigned int target_length;
     char *my_error_msg = NULL;
     int ovector[33];
+    int capture = 0;
     int rc;
 
     if (error_msg == NULL) return -1;
@@ -104,55 +105,51 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         target_length = var->value_len;
     }
 
-    /* IMP1 Can we tell the regex engine not to do any captures if we have no use for them? */
-    rc = msc_regexec_capture(regex, target, target_length, ovector, 30, &my_error_msg);
+    /* Are we supposed to capture subexpressions? */
+    capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
+
+    if (capture) {
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Using captured regex execution.");
+        }
+        rc = msc_regexec_capture(regex, target, target_length, ovector, 30, &my_error_msg);
+    }
+    else {
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Using uncaptured regex execution.");
+        }
+        rc = msc_regexec(regex, target, target_length, &my_error_msg);
+    }
     if (rc < -1) {
         *error_msg = apr_psprintf(msr->mp, "Regex execution failed: %s", my_error_msg);
         return -1;
     }
 
     /* Handle captured subexpressions. */
-    if (rc > 0) {
-        int capture = 0;
-        const apr_array_header_t *tarr;
-        const apr_table_entry_t *telts;
+    if (capture && rc > 0) {
         int i;
 
-        /* Are we supposed to store the captured subexpressions? */
-        /* IMP1 Can we use a flag to avoid having to iterate through the list every time. */
-        tarr = apr_table_elts(rule->actionset->actions);
-        telts = (const apr_table_entry_t*)tarr->elts;
-        for (i = 0; i < tarr->nelts; i++) {
-            msre_action *action = (msre_action *)telts[i].val;
-            if (strcasecmp(action->metadata->name, "capture") == 0) {
-                capture = 1;
-                break;
+        /* Use the available captures. */
+        for(i = 0; i < rc; i++) {
+            msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+            if (s == NULL) return -1;
+            s->name = apr_psprintf(msr->mp, "%i", i);
+            s->value = apr_pstrmemdup(msr->mp,
+                target + ovector[2*i], ovector[2*i + 1] - ovector[2*i]);
+            s->value_len = (ovector[2*i + 1] - ovector[2*i]);
+            if ((s->name == NULL)||(s->value == NULL)) return -1;
+            apr_table_setn(msr->tx_vars, s->name, (void *)s);
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Adding regex subexpression to TXVARS (%i): %s", i,
+                    log_escape_nq(msr->mp, s->value));
             }
         }
 
-        if (capture) {
-            int k;
-
-            /* Use the available captures. */
-            for(k = 0; k < rc; k++) {
-                msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-                if (s == NULL) return -1;
-                s->name = apr_psprintf(msr->mp, "%i", k);
-                s->value = apr_pstrmemdup(msr->mp,
-                    target + ovector[2*k], ovector[2*k + 1] - ovector[2*k]);
-                s->value_len = (ovector[2*k + 1] - ovector[2*k]);
-                if ((s->name == NULL)||(s->value == NULL)) return -1;
-                apr_table_setn(msr->tx_vars, s->name, (void *)s);
-                msr_log(msr, 9, "Adding regex subexpression to TXVARS (%i): %s", k,
-                    log_escape_nq(msr->mp, s->value));
-            }
-
-            /* Unset the remaining ones (from previous invocations). */
-            for(k = rc; k <= 9; k++) {
-                char buf[24];
-                apr_snprintf(buf, sizeof(buf), "%i", k);
-                apr_table_unset(msr->tx_vars, buf);
-            }
+        /* Unset the remaining ones (from previous invocations). */
+        for(i = rc; i <= 9; i++) {
+            char buf[24];
+            apr_snprintf(buf, sizeof(buf), "%i", i);
+            apr_table_unset(msr->tx_vars, buf);
         }
     }
 
@@ -518,7 +515,9 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
     for(i = 0; i < var->value_len; i++) {
         int x = ((unsigned char *)var->value)[i];
         if (!(table[x >> 3] & (1 << (x & 0x7)))) {
-            msr_log(msr, 9, "Value %i outside range: %s", x, rule->op_param);
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Value %i outside range: %s", x, rule->op_param);
+            }
             count++;
         }
     }
