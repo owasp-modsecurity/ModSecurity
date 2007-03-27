@@ -695,10 +695,10 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             const char *fn = NULL;
             const char *id = NULL;
             if (rule->filename != NULL) {
-                fn = apr_psprintf(p, " [%s:%d]", rule->filename, rule->line_num);
+                fn = apr_psprintf(p, " [file \"%s\"][line \"%d\"]", rule->filename, rule->line_num);
             }
             if (rule->actionset != NULL && rule->actionset->id != NULL) {
-                id = apr_psprintf(p, " [id \"%s\"]", rule->actionset->id);
+                id = apr_psprintf(p, "[id \"%s\"]", rule->actionset->id);
             }
             msr_log(msr, 4, "Recipe: Invoking rule %x%s%s.",
                     rule, (fn ? fn : ""), (id ? id : ""));
