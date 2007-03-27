@@ -64,7 +64,7 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
     *error_msg = NULL;
 
     /* Compile pattern */
-    regex = msc_pregcomp(rule->ruleset->mp, pattern, 0, &errptr, &erroffset);
+    regex = msc_pregcomp(rule->ruleset->mp, pattern, PCRE_DOTALL, &errptr, &erroffset);
     if (regex == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (pos %i): %s",
             erroffset, errptr);

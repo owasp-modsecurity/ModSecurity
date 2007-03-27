@@ -2,6 +2,9 @@
 21 Mar 2007 - trunk
 -------------------
 
+* Really set PCRE_DOTALL option when compiling the regular expression
+  for the @rx operator as the docs state.
+
 * Removed CGI style HTTP_* variables in favor of REQUEST_HEADERS:Header-Name.
 
 * Store filename/line for each rule and display it and the ID (if available)
