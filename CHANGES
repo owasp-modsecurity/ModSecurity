@@ -16,7 +16,7 @@
 * Write debug log messages when "capture" is set, but the regex does not
   capture and vice-versa.
 
-* Performance improvements in memory management.
+* Small performance improvement in memory management for rule execution.
 
 * Fixed some collection variable names not printing with the parameter
   and/or counting operator in the debug log.
