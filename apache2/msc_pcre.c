@@ -91,3 +91,11 @@ int msc_regexec(msc_regex_t *regex, const char *s, unsigned int slen,
 
     return msc_regexec_capture(regex, s, slen, NULL, 0, error_msg);
 }
+
+/**
+ * Gets info on a compiled regex.
+ */
+int msc_fullinfo(msc_regex_t *regex, int what, void *where)
+{
+    return pcre_fullinfo(regex->re, regex->pe, what, where);
+}

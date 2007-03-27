@@ -108,18 +108,19 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     /* Are we supposed to capture subexpressions? */
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
-    if (capture) {
-        if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "Using captured regex execution.");
+    /* Warn when the regex captures but "capture" is not set */
+    if (msr->txcfg->debuglog_level >= 2) {
+        int capcount;
+        rc = msc_fullinfo(regex, PCRE_INFO_CAPTURECOUNT, &capcount);
+        if ((capture == 0) && (capcount > 0)) {
+            msr_log(msr, 2, "Warning. regex captures, but \"capture\" action not set.");
         }
-        rc = msc_regexec_capture(regex, target, target_length, ovector, 30, &my_error_msg);
     }
-    else {
-        if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "Using uncaptured regex execution.");
-        }
-        rc = msc_regexec(regex, target, target_length, &my_error_msg);
-    }
+
+    /* We always use capture so that ovector can be used as working space
+     * and no memory has to be allocated for any backreferences.
+     */
+    rc = msc_regexec_capture(regex, target, target_length, ovector, 30, &my_error_msg);
     if (rc < -1) {
         *error_msg = apr_psprintf(msr->mp, "Regex execution failed: %s", my_error_msg);
         return -1;

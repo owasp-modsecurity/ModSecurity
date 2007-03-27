@@ -36,4 +36,6 @@ int DSOLOCAL msc_regexec_capture(msc_regex_t *regex, const char *s,
 int DSOLOCAL msc_regexec(msc_regex_t *regex, const char *s, unsigned int slen,
     char **error_msg);
 
+int DSOLOCAL msc_fullinfo(msc_regex_t *regex, int what, void *where);
+
 #endif
