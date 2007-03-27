@@ -2,6 +2,8 @@
 21 Mar 2007 - trunk
 -------------------
 
+* Removed CGI style HTTP_* variables in favor of REQUEST_HEADERS:Header-Name.
+
 * Store filename/line for each rule and display it and the ID (if available)
   in the debug log when invoking a rule.  Thanks to Christian Bockermann
   for the idea.

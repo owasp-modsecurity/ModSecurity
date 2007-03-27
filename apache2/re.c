@@ -144,18 +144,6 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
         var->name = name;
     }
 
-    /* CGI HTTP variables emulation. */
-    if (strncasecmp(var->name, "HTTP_", 5) == 0) {    
-        if (var->param != NULL) {
-            *error_msg = apr_psprintf(pool, "Variable %s does not support parameters.",
-                var->name);
-            return NULL;
-        }
-        
-        var->param = var->name + 5;
-        var->name = "REQUEST_HEADERS";
-    }
-
     /* Resolve variable */
     var->metadata = msre_resolve_var(engine, var->name);
     if (var->metadata == NULL) {
