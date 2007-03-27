@@ -109,11 +109,14 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     /* Warn when the regex captures but "capture" is not set */
-    if (msr->txcfg->debuglog_level >= 2) {
-        int capcount;
+    if (msr->txcfg->debuglog_level >= 3) {
+        int capcount = 0;
         rc = msc_fullinfo(regex, PCRE_INFO_CAPTURECOUNT, &capcount);
         if ((capture == 0) && (capcount > 0)) {
-            msr_log(msr, 2, "Warning. regex captures, but \"capture\" action not set.");
+            msr_log(msr, 4, "Ignoring regex captures since \"capture\" action is not enabled.");
+        }
+        if ((capture == 1) && (capcount == 0)) {
+            msr_log(msr, 3, "Notice. The \"capture\" action is enabled, but the regex does not have explicit captures.");
         }
     }
 

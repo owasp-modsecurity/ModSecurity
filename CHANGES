@@ -8,8 +8,8 @@
 
 * Do not log 'allow' action as intercepted in the debug log.
 
-* Warn if a regular expression captures subexpressions, but the
-  "capture" action was not specified.
+* Write debug log messages when "capture" is set, but the regex does not
+  capture and vice-versa.
 
 * Performance improvements in memory management.
 
