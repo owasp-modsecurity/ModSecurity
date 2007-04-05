@@ -2,29 +2,29 @@
 ?? ??? 2007 - trunk
 -------------------
 
-* Removed CGI style HTTP_* variables in favor of REQUEST_HEADERS:Header-Name.
+ * Removed CGI style HTTP_* variables in favor of REQUEST_HEADERS:Header-Name.
 
-* Store filename/line for each rule and display it and the ID (if available)
-  in the debug log when invoking a rule.  Thanks to Christian Bockermann
-  for the idea.
+ * Store filename/line for each rule and display it and the ID (if available)
+   in the debug log when invoking a rule.  Thanks to Christian Bockermann
+   for the idea.
 
-* Do not log 'allow' action as intercepted in the debug log.
+ * Do not log 'allow' action as intercepted in the debug log.
 
-* Write debug log messages when "capture" is set, but the regex does not
-  capture and vice-versa.
+ * Write debug log messages when "capture" is set, but the regex does not
+   capture and vice-versa.
 
-* Small performance improvement in memory management for rule execution.
+ * Small performance improvement in memory management for rule execution.
 
-* Fixed some collection variable names not printing with the parameter
-  and/or counting operator in the debug log.
+ * Fixed some collection variable names not printing with the parameter
+   and/or counting operator in the debug log.
 
 
-04 Apr 2007 - 2.1.1-rc2
+05 Apr 2007 - 2.1.1-rc2
 -----------------------
 
  * Add the PCRE_DOLLAR_ENDONLY option when compiling regular expression
    for the @rx operator and variables.
- 
+  
  * Really set PCRE_DOTALL option when compiling the regular expression
    for the @rx operator as the docs state.
 
@@ -32,158 +32,158 @@
 11 Mar 2007 - 2.1.1-rc1
 -----------------------
 
-* Fixed potential memory corruption when expanding macros.
+ * Fixed potential memory corruption when expanding macros.
 
-* Fixed error when a collection var was fetched in the same second as creation
-  by setting the rate to zero.
+ * Fixed error when a collection var was fetched in the same second as creation
+   by setting the rate to zero.
 
-* Fixed ASCIIZ (NUL) parsing for application/x-www-form-urlencoded forms
+ * Fixed ASCIIZ (NUL) parsing for application/x-www-form-urlencoded forms
 
-* Fixed the faulty REQUEST_FILENAME variable, which used to change
-  the internal Apache structures by mistake.
+ * Fixed the faulty REQUEST_FILENAME variable, which used to change
+   the internal Apache structures by mistake.
 
-* Updates to quiet some compiler warnings.
+ * Updates to quiet some compiler warnings.
 
-* Fixed some casting issues for compiling on NetWare (patch from Guenter Knauf).
+ * Fixed some casting issues for compiling on NetWare (patch from Guenter Knauf).
 
 
 23 Feb 2007 - 2.1.0
 -------------------
 
-* Removed the "Connection reset by peer" message, which has nothing
-  to do with us. Actually the message was downgraded from ERROR to
-  NOTICE so it will still appear in the debug log.
+ * Removed the "Connection reset by peer" message, which has nothing
+   to do with us. Actually the message was downgraded from ERROR to
+   NOTICE so it will still appear in the debug log.
 
-* Removed the (harmless) message mentioning LAST_UPDATE_TIME missing.
+ * Removed the (harmless) message mentioning LAST_UPDATE_TIME missing.
 
-* It was not possible to remove a rule placed in phase 4 using
-  SecRuleRemoveById or SecRuleRemoveByMsg. Fixed.
+ * It was not possible to remove a rule placed in phase 4 using
+   SecRuleRemoveById or SecRuleRemoveByMsg. Fixed.
 
-* Fixed a problem with incorrectly setting requestBodyProcessor using
-  the ctl action.
+ * Fixed a problem with incorrectly setting requestBodyProcessor using
+   the ctl action.
 
-* Bundled Core Rules 2.1-1.3.2b4.
+ * Bundled Core Rules 2.1-1.3.2b4.
 
-* Updates to the reference manual.
+ * Updates to the reference manual.
 
-* Reversed the return values of @validateDTD and @validateSchema, to
-  make them consistent with other operators.
+ * Reversed the return values of @validateDTD and @validateSchema, to
+   make them consistent with other operators.
 
-* Added a few helpful debug messages in the XML validation area.
+ * Added a few helpful debug messages in the XML validation area.
 
-* Updates to the reference manual.
+ * Updates to the reference manual.
 
-* Fixed the validateByteRange operator.
+ * Fixed the validateByteRange operator.
 
-* Default value for the status action is now 403 (as it was supposed to
-  be but it was effectively 500).
+ * Default value for the status action is now 403 (as it was supposed to
+   be but it was effectively 500).
 
-* Rule exceptions (removing using an ID range or an regular expression)
-  is now applied to the current context too. (Previously it only worked
-  on rules that are inherited from the parent context.)
+ * Rule exceptions (removing using an ID range or an regular expression)
+   is now applied to the current context too. (Previously it only worked
+   on rules that are inherited from the parent context.)
 
-* Fix of a bug with expired variables.
+ * Fix of a bug with expired variables.
 
-* Fixed regular expression variable selectors for many collections.
+ * Fixed regular expression variable selectors for many collections.
 
-* Performance improvements - up to two times for real-life work loads!
+ * Performance improvements - up to two times for real-life work loads!
 
-* Memory consumption improvements (not measured but significant).
+ * Memory consumption improvements (not measured but significant).
 
-* The allow action did not work in phases 3 and 4. Fixed.
+ * The allow action did not work in phases 3 and 4. Fixed.
 
-* Unlocked collections GLOBAL and RESOURCE.
+ * Unlocked collections GLOBAL and RESOURCE.
 
-* Added support for variable expansion in the msg action.
+ * Added support for variable expansion in the msg action.
 
-* New feature: It is now possible to make relative changes to the
-  audit log parts with the ctl action. For example: "ctl:auditLogParts=+E".
+ * New feature: It is now possible to make relative changes to the
+   audit log parts with the ctl action. For example: "ctl:auditLogParts=+E".
 
-* New feature: "tag" action. To be used for event categorisation.
+ * New feature: "tag" action. To be used for event categorisation.
 
-* XML parser was not reporting errors that occured at the end
-  of XML payload.
+ * XML parser was not reporting errors that occured at the end
+   of XML payload.
 
-* Files were not extracted from request if SecUploadKeepFiles was
-  Off. Fixed.
+ * Files were not extracted from request if SecUploadKeepFiles was
+   Off. Fixed.
 
-* Regular expressions that are too long are truncated to 256
-  characters before used in error messages. (In order to keep
-  the error messages in the log at a reasonable size.)
+ * Regular expressions that are too long are truncated to 256
+   characters before used in error messages. (In order to keep
+   the error messages in the log at a reasonable size.)
 
-* Fixed the sha1 transformation function.
+ * Fixed the sha1 transformation function.
 
-* Fixed the skip action.
+ * Fixed the skip action.
 
-* Fixed REQUEST_PROTOCOL, REMOTE_USER, and AUTH_TYPE.
+ * Fixed REQUEST_PROTOCOL, REMOTE_USER, and AUTH_TYPE.
 
-* SecRuleEngine did not work in child configuration contexts
-  (e.g. <Location>).
+ * SecRuleEngine did not work in child configuration contexts
+   (e.g. <Location>).
 
-* Fixed base64Decode and base64Encode.
+ * Fixed base64Decode and base64Encode.
 
 
 15 Nov 2006 - 2.0.4
 -------------------
 
-* Fixed the "deprecatevar" action.
+ * Fixed the "deprecatevar" action.
 
-* Decreasing variable values did not work.
+ * Decreasing variable values did not work.
 
-* Made "nolog" do what it is supposed to do - cause a rule match to
-  not be logged. Also "nolog" now implies "noauditlog" but it's
-  possible to follow "nolog" with "auditlog" and have the match
-  not logged to the error log but logged to the auditlog. (Not
-  something that strikes me as useful but it's possible.)
+ * Made "nolog" do what it is supposed to do - cause a rule match to
+   not be logged. Also "nolog" now implies "noauditlog" but it's
+   possible to follow "nolog" with "auditlog" and have the match
+   not logged to the error log but logged to the auditlog. (Not
+   something that strikes me as useful but it's possible.)
 
-* Relative paths given to SecDataDir will now be treated as relative
-  to the Apache server root.
+ * Relative paths given to SecDataDir will now be treated as relative
+   to the Apache server root.
 
-* Added checks to make sure only correct actions are specified in
-  SecDefaultAction (some actions are required, some don't make any
-  sense) and in rules that are not chain starters (same). This should
-  make the unhelpful "Internal Error: Failed to add rule to the ruleset"
-  message go away.
+ * Added checks to make sure only correct actions are specified in
+   SecDefaultAction (some actions are required, some don't make any
+   sense) and in rules that are not chain starters (same). This should
+   make the unhelpful "Internal Error: Failed to add rule to the ruleset"
+   message go away.
 
-* Fixed the problem when "SecRuleInheritance Off" is used in a context
-  with no rules defined.
+ * Fixed the problem when "SecRuleInheritance Off" is used in a context
+   with no rules defined.
 
-* Fixed a problem of lost input (request body) data on some redirections,
-  for example when mod_rewrite is used.
+ * Fixed a problem of lost input (request body) data on some redirections,
+   for example when mod_rewrite is used.
 
 
 26 Oct 2006 - 2.0.3
 -------------------
 
-* Fixed a memory leak (all platforms) and a concurrency control
-  problem that could cause a crash (multithreaded platforms only).
+ * Fixed a memory leak (all platforms) and a concurrency control
+   problem that could cause a crash (multithreaded platforms only).
 
-* Fixed a SecAuditLogRelevantStatus problem, which would not work
-  properly unless the regular expression contained a subexpression.
+ * Fixed a SecAuditLogRelevantStatus problem, which would not work
+   properly unless the regular expression contained a subexpression.
 
 
 19 Oct 2006 - 2.0.2
 -------------------
 
-* Fixed incorrect permissions on the global mutex, which prevented
-  the mutex from working properly.
+ * Fixed incorrect permissions on the global mutex, which prevented
+   the mutex from working properly.
 
-* Fixed incorrect actionset merging where the status was copied from
-  the child actionset even though it was not defined.
+ * Fixed incorrect actionset merging where the status was copied from
+   the child actionset even though it was not defined.
 
-* Fixed missing metadata information (in the logs) for warnings.
+ * Fixed missing metadata information (in the logs) for warnings.
 
 
 16 Oct 2006 - 2.0.1
 -------------------
 
-* Rules that used operator negation did not work. Fixed.
+ * Rules that used operator negation did not work. Fixed.
 
-* Fixed bug that prevented invalid regular expressions from being reported.
+ * Fixed bug that prevented invalid regular expressions from being reported.
 
 
 16 Oct 2006 - 2.0.0
 -------------------
 
-* First stable 2.x release.
+ * First stable 2.x release.
 
