@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.1.1-rc1 / (March 11, 2007)</releaseinfo>
+    <releaseinfo>Version 2.1.1-rc2 / (April 04, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -3998,9 +3998,11 @@ SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny</progra
         </listitem>
 
         <listitem>
-          <para>The<literal moreinfo="none"> PCRE_DOTALL </literal>flag is set
+          <para>The <literal moreinfo="none">PCRE_DOTALL</literal> and
+          <literal moreinfo="none">PCRE_DOLLAR_ENDONLY</literal> flags are set
           during compilation, meaning a single dot will match any character,
-          including the newlines.</para>
+          including the newlines and a <literal moreinfo="none">$</literal>
+					end anchor will not match a trailing newline charater.</para>
         </listitem>
       </orderedlist>
     </section>
