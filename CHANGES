@@ -1,6 +1,9 @@
 
-21 Mar 2007 - trunk
+?? ??? 2007 - trunk
 -------------------
+
+* Add the PCRE_DOLLAR_ENDONLY option when compiling regular expression
+  for the @rx operator and variables.
 
 * Really set PCRE_DOTALL option when compiling the regular expression
   for the @rx operator as the docs state.
