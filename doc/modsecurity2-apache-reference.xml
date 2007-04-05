@@ -3998,9 +3998,11 @@ SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny</progra
         </listitem>
 
         <listitem>
-          <para>The<literal moreinfo="none"> PCRE_DOTALL </literal>flag is set
+          <para>The <literal moreinfo="none">PCRE_DOTALL</literal> and
+          <literal moreinfo="none">PCRE_DOLLAR_ENDONLY</literal> flags are set
           during compilation, meaning a single dot will match any character,
-          including the newlines.</para>
+          including the newlines and a <literal moreinfo="none">$</literal>
+					end anchor will not match a trailing newline charater.</para>
         </listitem>
       </orderedlist>
     </section>
