@@ -1,7 +1,6 @@
+
 11 Apr 2007 - 2.1.1
 -------------------
-
- * Fixed potential corruption of AuditLogParts when ctl:auditLogParts used.
 
  * Add the PCRE_DOLLAR_ENDONLY option when compiling regular expression
    for the @rx operator and variables.
