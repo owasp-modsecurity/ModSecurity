@@ -646,7 +646,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
                     if (*s != c) {
                         *d++ = *s++;
                     } else {
-                        (*s)++; /* parens quiet compiler warning */
+                        s++;
                     }
                 }
                 *d = '\0';
