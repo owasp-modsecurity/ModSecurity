@@ -1009,12 +1009,13 @@ SecAuditLogStorageDir logs/audit
       <para>Development of a state of the art external protection tool will be
       a focus of subsequent ModSecurity releases. However, a fully functional
       tool is already available as part of the Apache httpd tools project
-      (<link linkend="http://www.apachesecurity.net/tools/">http://www.apachesecurity.net/tools/</link>). The
-      tool is called httpd-guardian and can be used to defend against Denial
-      of Service attacks. It uses the blacklist tool (from the same project)
-      to interact with an iptables-based (Linux) or pf-based (*BSD) firewall,
-      dynamically blacklisting the offending IP addresses. It can also
-      interact with SnortSam (http://www.snortsam.net). Assuming
+      (<link
+      linkend="http://www.apachesecurity.net/tools/">http://www.apachesecurity.net/tools/</link>).
+      The tool is called httpd-guardian and can be used to defend against
+      Denial of Service attacks. It uses the blacklist tool (from the same
+      project) to interact with an iptables-based (Linux) or pf-based (*BSD)
+      firewall, dynamically blacklisting the offending IP addresses. It can
+      also interact with SnortSam (http://www.snortsam.net). Assuming
       httpd-guardian is already configured (look into the source code for the
       detailed instructions) you only need to add one line to your Apache
       configuration to deploy it:</para>
@@ -1788,8 +1789,8 @@ SecRule HTTP_Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis>"</program
       not be able to be triggered as expected. Additionally, there are some
       response headers that are added by Apache at a later hook (such as Date,
       Server and Connection) that we would not be able to trigger on or
-      sanitize. This should work appropirately in a proxy setup
-      however.</para>
+      sanitize. This should work appropirately in a proxy setup or within
+      phase:5 (logging).</para>
     </section>
 
     <section>
@@ -1808,8 +1809,9 @@ SecRule HTTP_Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis>"</program
       <para>This phase is run just before logging takes place. The rules
       placed into this phase can only affect how the logging is performed.
       This phase can be used to inspect the error messages logged by Apache.
-      You can not deny/block connections in this phase as it is too
-      late.</para>
+      You can not deny/block connections in this phase as it is too late. This
+      phase also allows for inspection of other response headers that weren't
+      available during phase:3 or phase:4.</para>
     </section>
   </section>
 
@@ -1850,10 +1852,12 @@ SecRule HTTP_Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis>"</program
       expression in the selection operator itself. The following rule will
       look into all arguments whose names begin with <literal
       moreinfo="none">id_</literal>: <programlisting format="linespecific">SecRule ARGS:/^id_/ dirty</programlisting></para>
-            
-      <note><para>In ModSecurity 1.X, the <literal>ARGS</literal> variable stood
-      for <literal>QUERY_STRING</literal> + <literal>POST_PAYLOAD</literal>,
-      whereas now it expands to to individual variables.</para></note>
+
+      <note>
+        <para>In ModSecurity 1.X, the <literal>ARGS</literal> variable stood
+        for <literal>QUERY_STRING</literal> + <literal>POST_PAYLOAD</literal>,
+        whereas now it expands to to individual variables.</para>
+      </note>
     </section>
 
     <section>
@@ -2255,10 +2259,10 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para><emphasis role="bold">Note</emphasis></para>
 
       <para>This variable may not have access to some headers when running in
-      embedded-mode. Headers such as Server, Date and Connection are added
-      during a later Apache hook just prior to sending the data to the client.
-      This data should be available, however, when running in
-      proxy-mode.</para>
+      embedded-mode. Headers such as Server, Date, Connection and Content-Type
+      are added during a later Apache hook just prior to sending the data to
+      the client. This data should be available, however, either during
+      ModSecurity phase:5 (logging) or when running in proxy-mode.</para>
     </section>
 
     <section>
