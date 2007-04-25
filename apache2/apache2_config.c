@@ -58,7 +58,9 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     dcfg->auditlog_flag = NOT_SET;
     dcfg->auditlog_type = NOT_SET;
     dcfg->auditlog_name = NOT_SET_P;
+    dcfg->auditlog2_name = NOT_SET_P;
     dcfg->auditlog_fd = NOT_SET_P;
+    dcfg->auditlog2_fd = NOT_SET_P;
     dcfg->auditlog_storage_dir = NOT_SET_P;
     dcfg->auditlog_parts = NOT_SET_P;
     dcfg->auditlog_relevant_regex = NOT_SET_P;
@@ -324,6 +326,13 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
         merged->auditlog_fd = parent->auditlog_fd;
         merged->auditlog_name = parent->auditlog_name;
     }
+    if (child->auditlog2_fd != NOT_SET_P) {
+        merged->auditlog2_fd = child->auditlog2_fd;
+        merged->auditlog2_name = child->auditlog2_name;
+    } else {
+        merged->auditlog2_fd = parent->auditlog2_fd;
+        merged->auditlog2_name = parent->auditlog2_name;
+    }
     merged->auditlog_storage_dir = (child->auditlog_storage_dir == NOT_SET_P
         ? parent->auditlog_storage_dir : child->auditlog_storage_dir);
     merged->auditlog_parts = (child->auditlog_parts == NOT_SET_P
@@ -389,7 +398,9 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->auditlog_flag == NOT_SET) dcfg->auditlog_flag = 0;
     if (dcfg->auditlog_type == NOT_SET) dcfg->auditlog_type = AUDITLOG_SERIAL;
     if (dcfg->auditlog_fd == NOT_SET_P) dcfg->auditlog_fd = NULL;
+    if (dcfg->auditlog2_fd == NOT_SET_P) dcfg->auditlog2_fd = NULL;
     if (dcfg->auditlog_name == NOT_SET_P) dcfg->auditlog_name = NULL;
+    if (dcfg->auditlog2_name == NOT_SET_P) dcfg->auditlog2_name = NULL;
     if (dcfg->auditlog_storage_dir == NOT_SET_P) dcfg->auditlog_storage_dir = NULL;
     if (dcfg->auditlog_parts == NOT_SET_P) dcfg->auditlog_parts = "ABCFHZ";
     if (dcfg->auditlog_relevant_regex == NOT_SET_P) dcfg->auditlog_relevant_regex = NULL;
@@ -559,6 +570,43 @@ static const char *cmd_audit_log(cmd_parms *cmd, void *_dcfg, const char *p1) {
 
         if (rc != APR_SUCCESS) {
             return apr_psprintf(cmd->pool, "ModSecurity: Failed to open the audit log file: %s",
+                file_name);
+        }
+    }
+
+    return NULL;
+}
+
+static const char *cmd_audit_log2(cmd_parms *cmd, void *_dcfg, const char *p1) {
+    directory_config *dcfg = _dcfg;
+
+    if (dcfg->auditlog_name == NOT_SET_P) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Cannot configure a secondary audit log without a primary defined: %s", p1);
+    }
+
+    dcfg->auditlog2_name = (char *)p1;
+
+    if (dcfg->auditlog2_name[0] == '|') {
+        const char *pipe_name = ap_server_root_relative(cmd->pool, dcfg->auditlog2_name + 1);
+        piped_log *pipe_log;
+
+        pipe_log = ap_open_piped_log(cmd->pool, pipe_name);
+        if (pipe_log == NULL) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Failed to open the secondary audit log pipe: %s",
+                pipe_name);
+        }
+        dcfg->auditlog2_fd = ap_piped_log_write_fd(pipe_log);
+    }
+    else {
+        const char *file_name = ap_server_root_relative(cmd->pool, dcfg->auditlog2_name);
+        apr_status_t rc;
+
+        rc = apr_file_open(&dcfg->auditlog2_fd, file_name,
+            APR_WRITE | APR_APPEND | APR_CREATE | APR_BINARY,
+            CREATEMODE, cmd->pool);
+
+        if (rc != APR_SUCCESS) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Failed to open the secondary audit log file: %s",
                 file_name);
         }
     }
@@ -1076,7 +1124,15 @@ const command_rec module_directives[] = {
         cmd_audit_log,
         NULL,
         CMD_SCOPE_ANY,
-        "The filename of the audit log file"
+        "The filename of the primary audit log file"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecAuditLog2",
+        cmd_audit_log2,
+        NULL,
+        CMD_SCOPE_ANY,
+        "The filename of the secondary audit log file"
     ),
 
     AP_INIT_TAKE1 (

@@ -569,6 +569,34 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
+      <title><literal>SecAuditLog2</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Defines the path to
+      the secondary audit log index file when concurrent logging is enabled.
+      See <literal moreinfo="none">SecAuditLog2</literal> for more
+      details.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecAuditLog2 /path/to/auditlog2</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecAuditLog2
+      /usr/local/apache/logs/audit2.log</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> A main audit
+      log must be defined via <literal moreinfo="none">SecAuditLog</literal>
+      before this directive may be used. Additionally, this log is only used
+      for replicating the main audit log index file when concurrent audit
+      logging is used. It will <emphasis role="bold">not</emphasis> be used
+      for non-concurrent audit logging.</para>
+    </section>
+
+    <section>
       <title><literal>SecAuditLogParts</literal></title>
 
       <para><emphasis role="bold">Description:</emphasis> Defines the path to
