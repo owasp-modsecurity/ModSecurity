@@ -349,9 +349,12 @@ struct directory_config {
      * name of the index file (for the new audit log type)
      */
     char                *auditlog_name;
+    /* The name of the secondary index file */
+    char                *auditlog2_name;
 
-    /* The file descriptor for the file above */
+    /* The file descriptors for the files above */
     apr_file_t          *auditlog_fd;
+    apr_file_t          *auditlog2_fd;
 
     /* For the new-style audit log only, the path where
      * audit log entries will be stored
