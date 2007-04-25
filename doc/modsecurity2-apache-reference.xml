@@ -4006,7 +4006,7 @@ SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny</progra
           <literal moreinfo="none">PCRE_DOLLAR_ENDONLY</literal> flags are set
           during compilation, meaning a single dot will match any character,
           including the newlines and a <literal moreinfo="none">$</literal>
-					end anchor will not match a trailing newline charater.</para>
+          end anchor will not match a trailing newline charater.</para>
         </listitem>
       </orderedlist>
     </section>
