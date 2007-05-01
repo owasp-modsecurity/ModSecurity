@@ -44,6 +44,64 @@ static int msre_fn_lowercase_execute(apr_pool_t *mptmp, unsigned char *input,
     return changed;
 }
 
+/* trimLeft */
+
+static int msre_fn_trimLeft_execute(apr_pool_t *mptmp, unsigned char *input,
+    long int input_len, char **rval, long int *rval_len)
+{
+    long int i;
+
+    *rval = (char *)input;
+    for (i = 0; i < input_len; i++) {
+        if (isspace(**rval) == 0) {
+            break;
+        }
+        (*rval)++;
+    }
+
+    *rval_len = input_len - i;
+
+    return (*rval_len == input_len ? 0 : 1);
+}
+
+/* trimRight */
+
+static int msre_fn_trimRight_execute(apr_pool_t *mptmp, unsigned char *input,
+    long int input_len, char **rval, long int *rval_len)
+{
+    long int i;
+
+    *rval = (char *)input;
+    for (i = input_len - 1; i >= 0; i--) {
+        if (isspace((*rval)[i]) == 0) {
+            break;
+        }
+        (*rval)[i] = '\0';
+    }
+
+    *rval_len = i + 1;
+
+    return (*rval_len == input_len ? 0 : 1);
+}
+
+/* trim */
+
+static int msre_fn_trim_execute(apr_pool_t *mptmp, unsigned char *input,
+    long int input_len, char **rval, long int *rval_len)
+{
+    int rc = 0;
+
+    rc = msre_fn_trimLeft_execute(mptmp, input, input_len, rval, rval_len);
+    if (rc == 1) {
+        rc = msre_fn_trimRight_execute(mptmp, (unsigned char *)*rval, *rval_len, rval, rval_len);
+    }
+    else {
+        rc = msre_fn_trimRight_execute(mptmp, input, input_len, rval, rval_len);
+    }
+
+    return (*rval_len == input_len ? 0 : 1);
+}
+
 /* removeNulls */
 
 static int msre_fn_removeNulls_execute(apr_pool_t *mptmp, unsigned char *input,
@@ -490,6 +548,24 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     msre_engine_tfn_register(engine,
         "sha1",
         msre_fn_sha1_execute
+    );
+
+    /* trim */
+    msre_engine_tfn_register(engine,
+        "trim",
+        msre_fn_trim_execute
+    );
+
+    /* trimLeft */
+    msre_engine_tfn_register(engine,
+        "trimLeft",
+        msre_fn_trimLeft_execute
+    );
+
+    /* trimRight */
+    msre_engine_tfn_register(engine,
+        "trimRight",
+        msre_fn_trimRight_execute
     );
 
     /* urlDecode */
