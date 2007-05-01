@@ -1192,13 +1192,13 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
     }
 
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Executing operator %s%s with param \"%s\" against %s.",
+        msr_log(msr, 4, "Executing operator \"%s%s\" with param \"%s\" against %s.",
             (rule->op_negated ? "!" : ""), rule->op_name,
             log_escape(msr->mp, rule->op_param), full_varname);
     }
 
     if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "Target value: %s", log_escape_nq_ex(msr->mp, var->value,
+        msr_log(msr, 9, "Target value: \"%s\"", log_escape_nq_ex(msr->mp, var->value,
             var->value_len));
     }
         
@@ -1436,7 +1436,7 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                 var->value_len = rval_length;
 
                 if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "T (%i) %s: %s", rc, metadata->name,
+                    msr_log(msr, 9, "T (%i) %s: \"%s\"", rc, metadata->name,
                         log_escape_nq_ex(mptmp, var->value, var->value_len));
                 }
             }

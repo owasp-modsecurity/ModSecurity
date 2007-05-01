@@ -2,8 +2,8 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
- * Enhanced debug log output to log macro expansion and correctly display
-   values that contained NULs.
+ * Enhanced debug log output to log macro expansion, quote values and
+   correctly display values that contained NULs.
 
  * Removed support for %0 - %9 capture macros as they were incorrectly
    expanding url encoded values.  Use %{TX.0} - %{TX.9} instead.
