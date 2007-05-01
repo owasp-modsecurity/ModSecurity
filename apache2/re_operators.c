@@ -145,7 +145,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             apr_table_setn(msr->tx_vars, s->name, (void *)s);
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Adding regex subexpression to TXVARS (%i): %s", i,
-                    log_escape_nq(msr->mp, s->value));
+                    log_escape_nq_ex(msr->mp, s->value, s->value_len));
             }
         }
 

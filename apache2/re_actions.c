@@ -110,13 +110,18 @@ int DSOLOCAL expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, ap
                 } else {
                     next_text_start = t; /* *t was '\0' */
                 }
-            } else
-            if ((*(p + 1) >= '0')&&(*(p + 1) <= '9')) {
+            }
+/* Removed %0-9 macros as it messes up urlEncoding in the match
+ * where having '%0a' will be treated as %{TX.0}a, which is incorrect.
+ * */
+#if 0
+            else if ((*(p + 1) >= '0')&&(*(p + 1) <= '9')) {
                 /* Special case for regex captures. */
                 var_name = "TX";
                 var_value = apr_pstrmemdup(mptmp, p + 1, 1);
                 next_text_start = p + 2;
             }
+#endif
 
             if (var_name != NULL) {
                 char *my_error_msg = NULL;
@@ -141,15 +146,24 @@ int DSOLOCAL expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, ap
                         part->value_len = var_generated->value_len;
                         part->value = (char *)var_generated->value;
                         *(msc_string **)apr_array_push(arr) = part;
+                        msr_log(msr, 9, "Resolved macro %%{%s%s%s} to \"%s\"",
+                            var_name,
+                            (var_value ? "." : ""),
+                            (var_value ? var_value : ""),
+                            log_escape_ex(mptmp, part->value, part->value_len));
                     }
                 } else {
-                    /* ENH Should we log something because the macro could not be resolved? */
+                    msr_log(msr, 4, "Failed to resolve macro %%{%s%s%s}: %s",
+                        var_name,
+                        (var_value ? "." : ""),
+                        (var_value ? var_value : ""),
+                        my_error_msg);
                 }
             } else {
                 /* We could not identify a valid macro so add it as text. */
                 part = (msc_string *)apr_pcalloc(mptmp, sizeof(msc_string));
                 if (part == NULL) return -1;
-                part->value_len = p - text_start;
+                part->value_len = p - text_start + 1; /* len(text)+len("%") */
                 part->value = apr_pstrmemdup(mptmp, text_start, part->value_len);
                 *(msc_string **)apr_array_push(arr) = part;
 
@@ -952,8 +966,10 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
             var->value_len = strlen(var->value);
             apr_table_setn(target_col, var->name, (void *)var);
 
-            msr_log(msr, 9, "Set variable \"%s.%s\" to \"%s\".", log_escape(mptmp, col_name),
-                log_escape(mptmp, var->name), log_escape(mptmp, var->value));
+            msr_log(msr, 9, "Set variable \"%s.%s\" to \"%s\".",
+                log_escape(mptmp, col_name),
+                log_escape_ex(mptmp, var->name, var->name_len),
+                log_escape_ex(mptmp, var->value, var->value_len));
         } else {
             /* Absolute change. */
 
@@ -967,8 +983,10 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
             expand_macros(msr, var, rule, mptmp);
             apr_table_setn(target_col, var->name, (void *)var);
 
-            msr_log(msr, 9, "Set variable \"%s.%s\" to \"%s\".", log_escape(mptmp, col_name),
-                log_escape(mptmp, var->name), log_escape(mptmp, var->value));
+            msr_log(msr, 9, "Set variable \"%s.%s\" to \"%s\".",
+                log_escape(mptmp, col_name),
+                log_escape_ex(mptmp, var->name, var->name_len),
+                log_escape_ex(mptmp, var->value, var->value_len));
         }
     }
 
