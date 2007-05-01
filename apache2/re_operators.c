@@ -181,6 +181,214 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     return 0;
 }
 
+/* contains */
+
+static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    const char *match = (const char *)rule->op_param;
+    const char *target;
+    unsigned int match_length;
+    unsigned int target_length;
+    unsigned int i, i_max;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (match == NULL) {
+        *error_msg = "Internal Error: match string is null.";
+        return -1;
+    }
+
+    /* If the given target is null run against an empty
+     * string. This is a behaviour consistent with previous
+     * releases.
+     */
+    if (var->value == NULL) {
+        target = "";
+        target_length = 0;
+    } else {
+        target = var->value;
+        target_length = var->value_len;
+    }
+
+    match_length = strlen(match);
+
+    /* These are impossible to match */
+    if ((match_length == 0) || (match_length > target_length)) {
+        /* No match. */
+        return 0;
+    }
+
+    /* scan for first character, then compare from there until we
+     * have a match or there is no room left in the target
+     */
+    i_max = target_length - match_length;
+    for (i = 0; i <= i_max; i++) {
+        if (target[i] == match[0]) {
+            if (strncmp(match, (target + i), match_length) == 0) {
+                /* Match. */
+                *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
+                                log_escape_ex(msr->mp, match, match_length),
+                                var->name);
+                return 1;
+            }
+        }
+    }
+
+    /* No match. */
+    return 0;
+}
+
+/* is */
+
+static int msre_op_is_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    const char *match = NULL;
+    const char *target;
+    unsigned int match_length;
+    unsigned int target_length;
+
+    str->value = (char *)rule->op_param;
+    str->value_len = strlen(str->value);
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (str->value == NULL) {
+        *error_msg = "Internal Error: match string is null.";
+        return -1;
+    }
+
+    expand_macros(msr, str, rule, msr->mp);
+
+    match = (const char *)str->value;
+    match_length = str->value_len;
+
+    /* If the given target is null run against an empty
+     * string. This is a behaviour consistent with previous
+     * releases.
+     */
+    if (var->value == NULL) {
+        target = "";
+        target_length = 0;
+    } else {
+        target = var->value;
+        target_length = var->value_len;
+    }
+
+    /* These are impossible to match */
+    if (match_length != target_length) {
+        /* No match. */
+        return 0;
+    }
+
+    if (strncmp(match, target, target_length) == 0) {
+        /* Match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
+                        log_escape_ex(msr->mp, match, match_length),
+                        var->name);
+        return 1;
+    }
+
+    /* No match. */
+    return 0;
+}
+
+/* startsWith */
+
+static int msre_op_startsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    const char *match = (const char *)rule->op_param;
+    const char *target;
+    unsigned int match_length;
+    unsigned int target_length;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (match == NULL) {
+        *error_msg = "Internal Error: match string is null.";
+        return -1;
+    }
+
+    /* If the given target is null run against an empty
+     * string. This is a behaviour consistent with previous
+     * releases.
+     */
+    if (var->value == NULL) {
+        target = "";
+        target_length = 0;
+    } else {
+        target = var->value;
+        target_length = var->value_len;
+    }
+
+    match_length = strlen(match);
+
+    /* These are impossible to match */
+    if ((match_length == 0) || (match_length > target_length)) {
+        /* No match. */
+        return 0;
+    }
+
+    if (strncmp(match, target, match_length) == 0) {
+        /* Match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
+                        log_escape_ex(msr->mp, match, match_length),
+                        var->name);
+        return 1;
+    }
+
+    /* No match. */
+    return 0;
+}
+
+/* endsWith */
+
+static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    const char *match = (const char *)rule->op_param;
+    const char *target;
+    unsigned int match_length;
+    unsigned int target_length;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (match == NULL) {
+        *error_msg = "Internal Error: match string is null.";
+        return -1;
+    }
+
+    /* If the given target is null run against an empty
+     * string. This is a behaviour consistent with previous
+     * releases.
+     */
+    if (var->value == NULL) {
+        target = "";
+        target_length = 0;
+    } else {
+        target = var->value;
+        target_length = var->value_len;
+    }
+
+    match_length = strlen(match);
+
+    /* These are impossible to match */
+    if ((match_length == 0) || (match_length > target_length)) {
+        /* No match. */
+        return 0;
+    }
+
+    if (strncmp(match, (target + (target_length - match_length)), match_length) == 0) {
+        /* Match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
+                        log_escape_ex(msr->mp, match, match_length),
+                        var->name);
+        return 1;
+    }
+
+    /* No match. */
+    return 0;
+}
+
 /* m */
 
 static int msre_op_m_param_init(msre_rule *rule, char **error_msg) {
@@ -890,6 +1098,34 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "rx",
         msre_op_rx_param_init,
         msre_op_rx_execute
+    );
+
+    /* contains */
+    msre_engine_op_register(engine,
+        "contains",
+        NULL, /* ENH init function to flag var substitution */
+        msre_op_contains_execute
+    );
+
+    /* is */
+    msre_engine_op_register(engine,
+        "is",
+        NULL, /* ENH init function to flag var substitution */
+        msre_op_is_execute
+    );
+
+    /* startsWith */
+    msre_engine_op_register(engine,
+        "startsWith",
+        NULL, /* ENH init function to flag var substitution */
+        msre_op_startsWith_execute
+    );
+
+    /* endsWith */
+    msre_engine_op_register(engine,
+        "endsWith",
+        NULL, /* ENH init function to flag var substitution */
+        msre_op_endsWith_execute
     );
 
     /* m */
