@@ -2,6 +2,8 @@
 ?? ??? 2007 - trunk
 -------------------
 
+ * Added t:length to transform a value to its character length.
+
  * Added t:trimLeft, t:trimRight, t:trim to remove whitespace
    from a value on the left, right or both.
 

@@ -319,6 +319,17 @@ static int msre_fn_base64Decode_execute(apr_pool_t *mptmp, unsigned char *input,
     return 1;
 }
 
+/* length */
+
+static int msre_fn_length_execute(apr_pool_t *mptmp, unsigned char *input,
+    long int input_len, char **rval, long int *rval_len)
+{
+    *rval = apr_psprintf(mptmp, "%ld", input_len);
+    *rval_len = strlen(*rval);
+
+    return 1;
+}
+
 /* md5 */
 
 static int msre_fn_md5_execute(apr_pool_t *mptmp, unsigned char *input,
@@ -494,6 +505,12 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     msre_engine_tfn_register(engine,
         "htmlEntityDecode",
         msre_fn_htmlEntityDecode_execute
+    );
+
+    /* length */
+    msre_engine_tfn_register(engine,
+        "length",
+        msre_fn_length_execute
     );
 
     /* lowercase */
