@@ -1634,6 +1634,23 @@ static int var_response_content_encoding(modsec_rec *msr, msre_var *var, msre_ru
     return var_simple_generate(var, vartab, mptmp, msr->r->content_encoding);
 }
 
+/* RESPONSE_CONTENT_TYPE */
+
+static int var_response_content_type(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return var_simple_generate(var, vartab, mptmp, msr->r->content_type);
+}
+
+/* RESPONSE_CONTENT_LENGTH */
+
+static int var_response_content_length(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    const char *value = apr_psprintf(mptmp, "%" APR_OFF_T_FMT, msr->r->clength);
+    return var_simple_generate(var, vartab, mptmp, value);
+}
+
 /* USERID */
 
 static int var_userid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -2405,6 +2422,28 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         0, 0,
         NULL,
         var_response_content_encoding,
+        VAR_CACHE,
+        PHASE_RESPONSE_HEADERS
+    );
+
+    /* RESPONSE_CONTENT_TYPE */
+    msre_engine_variable_register(engine,
+        "RESPONSE_CONTENT_TYPE",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_response_content_type,
+        VAR_CACHE,
+        PHASE_RESPONSE_HEADERS
+    );
+
+    /* RESPONSE_CONTENT_LENGTH */
+    msre_engine_variable_register(engine,
+        "RESPONSE_CONTENT_LENGTH",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_response_content_length,
         VAR_CACHE,
         PHASE_RESPONSE_HEADERS
     );
