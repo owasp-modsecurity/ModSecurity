@@ -2,6 +2,9 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
+ * Added experimental variables RESPONSE_CONTENT_LENGTH, RESPONSE_CONTENT_TYPE,
+   and RESPONSE_CONTENT_ENCODING.
+
  * Added experimental support for content injection. Directive SecContentInjection
    (On|Off) controls whether injection is taking place. Actions "prepend"
    and "append" inject content when executed. Do note that it is your
