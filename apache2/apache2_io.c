@@ -384,7 +384,7 @@ static apr_status_t output_filter_init(modsec_rec *msr, ap_filter_t *f,
 apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
     request_rec *r = f->r;
     modsec_rec *msr = (modsec_rec *)f->ctx;
-    apr_bucket *bucket;
+    apr_bucket *bucket = NULL, *eos_bucket = NULL;
     apr_status_t rc;
 
     if (msr == NULL) {
@@ -445,12 +445,47 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                 /* Continue (observe the response body). */
                 break;
         }
+
+        // If injecting content unset headers now.
+        if (msr->txcfg->content_injection_enabled == 0) {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Content Injection: Not enabled.");
+            }
+        } else {
+            if ((msr->content_prepend) || (msr->content_append)) {
+                apr_table_unset(msr->r->headers_out, "Content-Length");
+                apr_table_unset(msr->r->headers_out, "Last-Modified");
+                apr_table_unset(msr->r->headers_out, "ETag");
+                apr_table_unset(msr->r->headers_out, "Expires");
+            
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Content Injection: Removing headers (C-L, L-M, Etag, Expires).");
+                }
+            } else {
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Content Injection: Nothing to inject.");
+                }
+            }
+        }
+          
+        // Content injection (prepend & non-buffering).
+        if (msr->txcfg->content_injection_enabled && msr->content_prepend) {
+            apr_bucket *bucket_ci = apr_bucket_heap_create(msr->content_prepend,
+                msr->content_prepend_len, NULL, f->r->connection->bucket_alloc);
+            APR_BRIGADE_INSERT_HEAD(bb_in, bucket_ci);
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Content Injection (nb): Added content to top: %s",
+                    log_escape_nq_ex(msr->mp, msr->content_prepend, msr->content_prepend_len));
+            }
+        }
     } else
     if (msr->of_status == OF_STATUS_COMPLETE) {
         msr_log(msr, 1, "Output filter: Internal error: output filtering complete yet filter was invoked.");
         ap_remove_output_filter(f);
         return APR_EGENERAL;
     }
+
 
     /* Loop through the buckets in the brigade in order
      * to extract the size of the data available.
@@ -490,6 +525,22 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         }
 
         if (APR_BUCKET_IS_EOS(bucket)) {
+            eos_bucket = bucket;
+
+            // Inject content (append & non-buffering).
+            if (msr->txcfg->content_injection_enabled && msr->content_append) {
+                apr_bucket *bucket_ci = NULL;
+
+                bucket_ci = apr_bucket_heap_create(msr->content_append,
+                    msr->content_append_len, NULL, f->r->connection->bucket_alloc);
+                APR_BUCKET_INSERT_BEFORE(bucket, bucket_ci);
+
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Content-Injection (nb): Added content to bottom: %s",
+                        log_escape_nq_ex(msr->mp, msr->content_append, msr->content_append_len));
+                }
+            }
+
             msr->of_done_reading = 1;
         }
     }
@@ -541,7 +592,6 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         }
 
         // TODO Why does the function below take pointer to length? Will it modify it?
-
         rc = apr_brigade_flatten(msr->of_brigade, msr->resbody_data, &msr->resbody_length);
         if (rc != APR_SUCCESS) {
             msr_log(msr, 1, "Output filter: Failed to flatten brigade (%i): %s", rc,
@@ -566,6 +616,34 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
     if (msr->of_skipping == 0) {
         record_time_checkpoint(msr, 3);
+
+        // Inject content into response (prepend & buffering).
+        if (msr->txcfg->content_injection_enabled && msr->content_prepend) {
+            apr_bucket *bucket_ci = NULL;
+
+            bucket_ci = apr_bucket_heap_create(msr->content_prepend,
+                msr->content_prepend_len, NULL, f->r->connection->bucket_alloc);
+            APR_BRIGADE_INSERT_HEAD(msr->of_brigade, bucket_ci);
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Content Injection (b): Added content to top: %s",
+                    log_escape_nq_ex(msr->mp, msr->content_prepend, msr->content_prepend_len));
+            }
+        }
+
+        // Inject content into response (append & buffering).
+        if (msr->txcfg->content_injection_enabled && msr->content_append) {
+            apr_bucket *bucket_ci = NULL;
+
+            bucket_ci = apr_bucket_heap_create(msr->content_append,
+                msr->content_append_len, NULL, f->r->connection->bucket_alloc);
+            APR_BUCKET_INSERT_BEFORE(eos_bucket, bucket_ci);
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Content-Injection (b): Added content to bottom: %s",
+                    log_escape_nq_ex(msr->mp, msr->content_append, msr->content_append_len));
+            }
+        }
 
         rc = ap_pass_brigade(f->next, msr->of_brigade);
         if (rc != APR_SUCCESS) {

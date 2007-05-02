@@ -1363,6 +1363,26 @@ static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
     return 1;
 }
 
+/* prepend */
+static apr_status_t msre_action_prepend_execute(modsec_rec *msr, apr_pool_t *mptmp,
+    msre_rule *rule, msre_action *action)
+{
+    msr->content_prepend = action->param;
+    msr->content_prepend_len = strlen(action->param);
+
+    return 1;
+}
+
+/* append */
+static apr_status_t msre_action_append_execute(modsec_rec *msr, apr_pool_t *mptmp,
+    msre_rule *rule, msre_action *action)
+{
+    msr->content_append = action->param;
+    msr->content_append_len = strlen(action->param);
+
+    return 1;
+}
+
 /* -- */
 
 /**
@@ -1812,5 +1832,29 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         NULL,
         NULL,
         NULL
+    );
+
+    /* prepend */
+    msre_engine_action_register(engine,
+        "prepend",
+        ACTION_NON_DISRUPTIVE,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_ONE,
+        NULL,
+        NULL,
+        msre_action_prepend_execute
+    );
+
+    /* append */
+    msre_engine_action_register(engine,
+        "append",
+        ACTION_NON_DISRUPTIVE,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_ONE,
+        NULL,
+        NULL,
+        msre_action_append_execute
     );
 }

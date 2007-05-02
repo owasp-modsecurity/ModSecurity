@@ -309,6 +309,12 @@ struct modsec_rec {
 
     /* rule processing temp pool */
     apr_pool_t          *msc_rule_mptmp;
+
+    /* content injection */
+    const char          *content_prepend;
+    apr_off_t            content_prepend_len;
+    const char          *content_append;
+    apr_off_t            content_append_len;
 };
 
 struct directory_config {
@@ -386,6 +392,9 @@ struct directory_config {
     /* Misc */
     const char          *data_dir;
     const char          *webappid;
+
+    /* Content injection. */
+    int                  content_injection_enabled;
 };
 
 struct error_message {

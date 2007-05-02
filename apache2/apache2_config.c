@@ -81,6 +81,9 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     dcfg->data_dir = NOT_SET_P;
     dcfg->webappid = NOT_SET_P;
 
+    /* Content injection. */
+    dcfg->content_injection_enabled = NOT_SET;
+
     return dcfg;
 }
 
@@ -356,6 +359,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     merged->webappid = (child->webappid == NOT_SET_P
         ? parent->webappid : child->webappid);
 
+    /* Content injection. */
+    merged->content_injection_enabled = (child->content_injection_enabled == NOT_SET
+        ? parent->content_injection_enabled : child->content_injection_enabled);
+
     return merged;
 }
 
@@ -414,6 +421,9 @@ void init_directory_config(directory_config *dcfg) {
     /* Misc */
     if (dcfg->data_dir == NOT_SET_P) dcfg->data_dir = NULL;
     if (dcfg->webappid == NOT_SET_P) dcfg->webappid = "default";
+
+    /* Content injection. */
+    if (dcfg->content_injection_enabled == NOT_SET) dcfg->content_injection_enabled = 0;
 }
 
 /**
@@ -693,6 +703,13 @@ static const char *cmd_chroot_dir(cmd_parms *cmd, void *_dcfg, const char *p1) {
             cwd, errno, strerror(errno));
     }
 
+    return NULL;
+}
+
+static const char *cmd_content_injection(cmd_parms *cmd, void *_dcfg, int flag) {
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+    dcfg->content_injection_enabled = flag;
     return NULL;
 }
 
@@ -1173,6 +1190,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_MAIN,
         "Path of the directory to which server will be chrooted"
+    ),
+
+    AP_INIT_FLAG (
+        "SecContentInjection",
+        cmd_content_injection,
+        NULL,
+        CMD_SCOPE_ANY,
+        "On or Off"
     ),
 
     AP_INIT_TAKE1 (

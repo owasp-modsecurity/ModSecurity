@@ -2,6 +2,12 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
+ * Added experimental support for content injection. Directive SecContentInjection
+   (On|Off) controls whether injection is taking place. Actions "prepend"
+   and "append" inject content when executed. Do note that it is your
+   responsibility to make sure the response is of the appropriate
+   content type (e.g. HTML, plain text, etc).
+
  * Added string comparison operators with support for macro expansion:
    @contains, @is, @beginsWith and @endsWith.
 
