@@ -2778,6 +2778,13 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
     </section>
 
     <section>
+      <title><literal>length</literal></title>
+
+      <para>This function converts the input to its numeric length (count of
+      characters).</para>
+    </section>
+
+    <section>
       <title><literal>lowercase</literal></title>
 
       <para>This function is enabled by default. It converts all charactes to
@@ -2875,6 +2882,27 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
       <title><literal>sha1</literal></title>
 
       <para>This function calculates a SHA1 hash from input.</para>
+    </section>
+
+    <section>
+      <title><literal>trimLeft</literal></title>
+
+      <para>This function removes whitespace from the left side of
+      input.</para>
+    </section>
+
+    <section>
+      <title><literal>trimRight</literal></title>
+
+      <para>This function removes whitespace from the right side of
+      input.</para>
+    </section>
+
+    <section>
+      <title><literal>trim</literal></title>
+
+      <para>This function removes whitespace from both the left and right
+      sides of input.</para>
     </section>
   </section>
 
@@ -3911,6 +3939,53 @@ SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny</progra
     name.</para>
 
     <section>
+      <title><literal>beginsWith</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      string comparison and returns true if the parameter value is found at
+      the beginning of the input. Macro expansion is performed so you may use
+      variable names such as %{TX.1}, etc.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_LINE "!<emphasis
+          role="bold">@beginsWith GET</emphasis>" t:none,deny,status:403
+SecRule REQUEST_ADDR "^(.*)\.\d+$" deny,status:403,capture,chain
+SecRule ARGS:gw "!<emphasis role="bold">@beginsWith %{TX.1}</emphasis>"</programlisting>
+    </section>
+
+    <section>
+      <title><literal>contains</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      string comparison and returns true if the parameter value is found
+      anywhere in the input. Macro expansion is performed so you may use
+      variable names such as %{TX.1}, etc.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_LINE "!<emphasis
+          role="bold">@contains .php </emphasis>" t:none,deny,status:403
+SecRule REQUEST_ADDR "^(.*)$" deny,status:403,capture,chain
+SecRule ARGS:ip "!<emphasis role="bold">@contains %{TX.1}</emphasis>"</programlisting>
+    </section>
+
+    <section>
+      <title><literal>endsWith</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      string comparison and returns true if the parameter value is found at
+      the end of the input. Macro expansion is performed so you may use
+      variable names such as %{TX.1}, etc.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_LINE "!<emphasis
+          role="bold">@endsWith HTTP/1.1</emphasis>" t:none,deny,status:403
+SecRule ARGS:route "!<emphasis role="bold">@endsWith %{REQUEST_ADDR}</emphasis>" t:none,deny,status:403</programlisting>
+    </section>
+
+    <section>
       <title><literal>eq</literal></title>
 
       <para><emphasis role="bold">Description: </emphasis>This operator is a
@@ -3957,6 +4032,22 @@ SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny</progra
 
       <programlisting format="linespecific">SecRule FILES_TMPNAMES "<emphasis
           role="bold">@inspectFile </emphasis>/opt/apache/bin/inspect_script.pl"</programlisting>
+    </section>
+
+    <section>
+      <title><literal>is</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      string comparison and returns true if the parameter value matches the
+      input exactly. Macro expansion is performed so you may use variable
+      names such as %{TX.1}, etc.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule ARGS:foo "!<emphasis
+          role="bold">@is bar</emphasis>" t:none,deny,status:403
+SecRule REQUEST_ADDR "^(.*)$" deny,status:403,capture,chain
+SecRule REQUEST_HEADERS:Ip-Address "!<emphasis role="bold">@is %{TX.1}</emphasis>"</programlisting>
     </section>
 
     <section>
