@@ -694,14 +694,18 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             apr_pool_t *p = msr->mp;
             const char *fn = NULL;
             const char *id = NULL;
+            const char *rev = NULL;
             if (rule->filename != NULL) {
-                fn = apr_psprintf(p, " [file \"%s\"][line \"%d\"]", rule->filename, rule->line_num);
+                fn = apr_psprintf(p, " [file \"%s\"] [line \"%d\"]", rule->filename, rule->line_num);
             }
             if (rule->actionset != NULL && rule->actionset->id != NULL) {
-                id = apr_psprintf(p, "[id \"%s\"]", rule->actionset->id);
+                id = apr_psprintf(p, " [id \"%s\"]", rule->actionset->id);
             }
-            msr_log(msr, 4, "Recipe: Invoking rule %x%s%s.",
-                    rule, (fn ? fn : ""), (id ? id : ""));
+            if (rule->actionset != NULL && rule->actionset->rev != NULL) {
+                rev = apr_psprintf(p, " [rev \"%s\"]", rule->actionset->rev);
+            }
+            msr_log(msr, 4, "Recipe: Invoking rule %x%s%s%s.",
+                    rule, (fn ? fn : ""), (id ? id : ""), (rev ? rev : ""));
         }
 
         rc = msre_rule_process(rule, msr);
@@ -1282,9 +1286,6 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
     }
     else {
         mptmp = msr->msc_rule_mptmp;
-        if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "Clearing rule processing memory pool");
-        }
         apr_pool_clear(mptmp);
     }
 
