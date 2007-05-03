@@ -2,6 +2,8 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
+ * Exported API for registering custom variables.  Example in api directory.
+
  * Added experimental variables RESPONSE_CONTENT_LENGTH, RESPONSE_CONTENT_TYPE,
    and RESPONSE_CONTENT_ENCODING.
 

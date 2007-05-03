@@ -24,6 +24,11 @@
 
 APR_DECLARE_OPTIONAL_FN(void, modsec_register_tfn, (const char *name, void *fn));
 APR_DECLARE_OPTIONAL_FN(void, modsec_register_operator, (const char *name, void *fn_init, void *fn_exec));
+APR_DECLARE_OPTIONAL_FN(void, modsec_register_variable,
+    (const char *name, unsigned int type,
+     unsigned int argc_min, unsigned int argc_max,
+     void *fn_validate, void *fn_generate,
+     unsigned int is_cacheable, unsigned int availability));
 
 
 /* Configuration functions. */

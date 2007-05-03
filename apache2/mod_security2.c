@@ -923,6 +923,22 @@ static void modsec_register_operator(const char *name, void *fn_init, void *fn_e
 }
 
 /**
+ * This function is exported for other Apache modules to
+ * register new variables.
+ */
+static void modsec_register_variable(const char *name, unsigned int type,
+                                     unsigned int argc_min, unsigned int argc_max,
+                                     void *fn_validate, void *fn_generate,
+                                     unsigned int is_cacheable, unsigned int availability) {
+    if (modsecurity != NULL) {
+        msre_engine_variable_register(modsecurity->msre, name, type, argc_min, argc_max, fn_validate, fn_generate, is_cacheable, availability);
+    }
+    else {
+        fprintf(stderr,"modsecurity is NULL\n");
+    }
+}
+
+/**
  * Registers module hooks with Apache.
  */
 static void register_hooks(apr_pool_t *mp) {
@@ -948,6 +964,7 @@ static void register_hooks(apr_pool_t *mp) {
     /* Export optional functions. */
     APR_REGISTER_OPTIONAL_FN(modsec_register_tfn);
     APR_REGISTER_OPTIONAL_FN(modsec_register_operator);
+    APR_REGISTER_OPTIONAL_FN(modsec_register_variable);
 
     /* Main hooks */
     ap_hook_pre_config(hook_pre_config, NULL, NULL, APR_HOOK_FIRST);

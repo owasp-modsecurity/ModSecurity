@@ -243,6 +243,11 @@ struct msre_actionset {
     int                      auditlog;
 };
 
+void msre_engine_variable_register(msre_engine *engine, const char *name, 
+    unsigned int type, unsigned int argc_min, unsigned int argc_max,
+    FN_VAR_VALIDATE(validate), FN_VAR_GENERATE(generate),
+    unsigned int is_cacheable, unsigned int availability);
+
 msre_actionset *msre_actionset_create(msre_engine *engine, const char *text,
     char **error_msg);
 
