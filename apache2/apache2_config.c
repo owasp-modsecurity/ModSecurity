@@ -84,6 +84,13 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     /* Content injection. */
     dcfg->content_injection_enabled = NOT_SET;
 
+    /* PDF XSS protection. */
+    dcfg->pdfp_enabled = NOT_SET;
+    dcfg->pdfp_secret = NOT_SET_P;
+    dcfg->pdfp_timeout = NOT_SET;
+    dcfg->pdfp_token_name = NOT_SET_P;
+    dcfg->pdfp_only_get = NOT_SET;
+
     return dcfg;
 }
 
@@ -363,6 +370,18 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     merged->content_injection_enabled = (child->content_injection_enabled == NOT_SET
         ? parent->content_injection_enabled : child->content_injection_enabled);
 
+    /* PDF XSS protection. */
+    merged->pdfp_enabled = (child->pdfp_enabled == NOT_SET
+        ? parent->pdfp_enabled : child->pdfp_enabled);
+    merged->pdfp_secret = (child->pdfp_secret == NOT_SET_P
+        ? parent->pdfp_secret : child->pdfp_secret);
+    merged->pdfp_timeout = (child->pdfp_timeout == NOT_SET
+        ? parent->pdfp_timeout : child->pdfp_timeout);
+    merged->pdfp_token_name = (child->pdfp_token_name == NOT_SET_P
+        ? parent->pdfp_token_name : child->pdfp_token_name);
+    merged->pdfp_only_get = (child->pdfp_only_get == NOT_SET
+        ? parent->pdfp_only_get : child->pdfp_only_get);
+
     return merged;
 }
 
@@ -424,6 +443,13 @@ void init_directory_config(directory_config *dcfg) {
 
     /* Content injection. */
     if (dcfg->content_injection_enabled == NOT_SET) dcfg->content_injection_enabled = 0;
+
+    /* PDF XSS protection. */
+    if (dcfg->pdfp_enabled == NOT_SET) dcfg->pdfp_enabled = 0;
+    if (dcfg->pdfp_secret == NOT_SET_P) dcfg->pdfp_secret = NULL;
+    if (dcfg->pdfp_timeout == NOT_SET) dcfg->pdfp_timeout = 10;
+    if (dcfg->pdfp_token_name == NOT_SET_P) dcfg->pdfp_token_name = "PDFPTOKEN";
+    if (dcfg->pdfp_only_get == NOT_SET) dcfg->pdfp_only_get = 0;
 }
 
 /**
@@ -1104,6 +1130,61 @@ static const char *cmd_web_app_id(cmd_parms *cmd, void *_dcfg, const char *p1) {
     return NULL;
 }
 
+/* -- PDF Protection configuration -- */
+
+static const char *cmd_pdf_protect(cmd_parms *cmd, void *_dcfg, int flag) {
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+    
+    dcfg->pdfp_enabled = flag;
+    
+    return NULL;
+}
+
+static const char *cmd_pdf_protect_secret(cmd_parms *cmd, void *_dcfg,
+    const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+    
+    dcfg->pdfp_secret = p1;
+    
+    return NULL;
+}
+
+static const char *cmd_pdf_protect_timeout(cmd_parms *cmd, void *_dcfg,
+    const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+    
+    dcfg->pdfp_timeout = atoi(p1);
+    
+    return NULL;
+}
+
+static const char *cmd_pdf_protect_token_name(cmd_parms *cmd, void *_dcfg,
+    const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+    
+    dcfg->pdfp_token_name = p1;
+    
+    return NULL;
+}
+
+static const char *cmd_pdf_protect_intercept_get_only(cmd_parms *cmd, void *_dcfg,
+    int flag)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+    
+    dcfg->pdfp_only_get = flag;
+    
+    return NULL;
+}
+
 
 /* -- Configuration directives definitions -- */
 
@@ -1401,6 +1482,46 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "" // TODO
+    ),
+
+    AP_INIT_FLAG (
+        "SecPdfProtect",
+        cmd_pdf_protect,
+        NULL,
+        RSRC_CONF,
+        "enable PDF protection module."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecPdfProtectSecret",
+        cmd_pdf_protect_secret,
+        NULL,
+        RSRC_CONF,
+        "secret that will be used to construct protection tokens."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecPdfProtectTimeout",
+        cmd_pdf_protect_timeout,
+        NULL,
+        RSRC_CONF,
+        "duration for which protection tokens will be valid."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecPdfProtectTokenName",
+        cmd_pdf_protect_token_name,
+        NULL,
+        RSRC_CONF,
+        "name of the protection token. The name 'PDFTOKEN' is used by default."
+    ),
+
+    AP_INIT_FLAG (
+        "SecPdfProtectInterceptGETOnly",
+        cmd_pdf_protect_intercept_get_only,
+        NULL,
+        RSRC_CONF,
+        "whether or not to intercept only GET requess."
     ),
 
     { NULL }

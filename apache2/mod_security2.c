@@ -17,6 +17,7 @@
 
 #include "modsecurity.h"
 #include "apache2.h"
+#include "pdf_protect.h"
 #include "msc_logging.h"
 #include "msc_util.h"
 
@@ -585,6 +586,15 @@ static int hook_request_late(request_rec *r) {
 
     init_directory_config(msr->txcfg);
 
+    /* Perform the PDF tests now. */
+    rc = pdfp_check(msr);
+    if (rc > 0) {
+        /* The PDF protection module has decided it needs to
+         * redirect the current transaction. So we let it do that.
+         */
+        return rc;
+    }
+
     if (msr->txcfg->is_enabled == 0) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Processing disabled, skipping (hook request_late).");
@@ -831,12 +841,18 @@ static int hook_log_transaction(request_rec *r) {
 static void hook_insert_filter(request_rec *r) {
     modsec_rec *msr = NULL;
 
-    /* Find the transaction context and make sure we are
-     * supposed to proceed.
-     */
+    /* Find the transaction context first. */
     msr = retrieve_tx_context(r);
     if (msr == NULL) return;
 
+    /* We always add the PDF XSS protection filter. */
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "Hook insert_filter: Adding PDF XSS protection output filter (r %x).", r);
+    }
+
+    ap_add_output_filter("PDFP_OUT", msr, r, r->connection);
+
+    /* Only proceed to add the second filter if the engine is enabled. */
     if (msr->txcfg->is_enabled == 0) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_filter: Processing disabled, skipping.");
@@ -844,10 +860,12 @@ static void hook_insert_filter(request_rec *r) {
         return;
     }
 
+    /* Add the input filter, but only if we need it to run. */
     if (msr->if_status == IF_STATUS_WANTS_TO_RUN) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_filter: Adding input forwarding filter (r %x).", r);
         }
+
         ap_add_input_filter("MODSECURITY_IN", msr, r, r->connection);
     }
 
@@ -859,6 +877,7 @@ static void hook_insert_filter(request_rec *r) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_filter: Adding output filter (r %x).", r);
         }
+
         ap_add_output_filter("MODSECURITY_OUT", msr, r, r->connection);
     }
 }
@@ -993,6 +1012,9 @@ static void register_hooks(apr_pool_t *mp) {
     ap_register_input_filter("MODSECURITY_IN", input_filter,
         NULL, AP_FTYPE_CONTENT_SET);
     ap_register_output_filter("MODSECURITY_OUT", output_filter,
+        NULL, AP_FTYPE_CONTENT_SET);
+
+    ap_register_output_filter("PDFP_OUT", pdfp_output_filter,
         NULL, AP_FTYPE_CONTENT_SET);
 }
 

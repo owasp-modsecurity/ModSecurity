@@ -2,7 +2,7 @@
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
  * Copyright (c) 2004-2006 Thinking Stone (http://www.thinkingstone.com)
  *
- * $Id: apache2.h,v 1.1.1.1 2006/10/14 09:30:43 ivanr Exp $
+ * $Id$
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
