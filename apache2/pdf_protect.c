@@ -343,7 +343,7 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 /**
  *
  */
-int DSOLOCAL pdfp_check(modsec_rec *msr) {
+int pdfp_check(modsec_rec *msr) {
     const char *token = NULL;
     directory_config *cfg = NULL;
     char *uri = NULL;

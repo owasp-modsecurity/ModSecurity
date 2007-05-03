@@ -2,6 +2,8 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
+ * Removed extraneous exported symbols.
+
  * Merged the PDF XSS protection functionality into ModSecurity.
 
  * Exported API for registering custom variables.  Example in api directory.

@@ -41,26 +41,26 @@ typedef struct msre_action msre_action;
 
 int DSOLOCAL expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t *mptmp);
 
-apr_status_t msre_parse_targets(msre_ruleset *ruleset, const char *text,
+apr_status_t DSOLOCAL msre_parse_targets(msre_ruleset *ruleset, const char *text,
     apr_array_header_t *arr, char **error_msg);
 
-apr_status_t msre_parse_actions(msre_engine *engine, msre_actionset *actionset,
+apr_status_t DSOLOCAL msre_parse_actions(msre_engine *engine, msre_actionset *actionset,
     const char *text, char **error_msg);
 
-msre_var_metadata *msre_resolve_var(msre_engine *engine, const char *name);
+msre_var_metadata DSOLOCAL *msre_resolve_var(msre_engine *engine, const char *name);
 
-msre_action_metadata *msre_resolve_action(msre_engine *engine, const char *name);
+msre_action_metadata DSOLOCAL *msre_resolve_action(msre_engine *engine, const char *name);
 
-msre_var *msre_create_var(msre_ruleset *ruleset, const char *name, const char *param,
+msre_var DSOLOCAL *msre_create_var(msre_ruleset *ruleset, const char *name, const char *param,
     modsec_rec *msr, char **error_msg);
 
-msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *name, const char *param,
+msre_var DSOLOCAL *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *name, const char *param,
     modsec_rec *msr, char **error_msg);
 
-msre_action *msre_create_action(msre_engine *engine, const char *name,
+msre_action DSOLOCAL *msre_create_action(msre_engine *engine, const char *name,
     const char *param, char **error_msg);
 
-int msre_parse_generic(apr_pool_t *pool, const char *text, apr_table_t *vartable,
+int DSOLOCAL msre_parse_generic(apr_pool_t *pool, const char *text, apr_table_t *vartable,
     char **error_msg);
 
 int DSOLOCAL rule_id_in_range(int ruleid, const char *range);
@@ -76,11 +76,11 @@ struct msre_engine {
     apr_table_t             *tfns;
 };
 
-msre_engine *msre_engine_create(apr_pool_t *parent_pool);
+msre_engine DSOLOCAL *msre_engine_create(apr_pool_t *parent_pool);
 
-void msre_engine_destroy(msre_engine *engine);
+void DSOLOCAL msre_engine_destroy(msre_engine *engine);
 
-msre_op_metadata *msre_engine_op_resolve(msre_engine *engine, const char *name);
+msre_op_metadata DSOLOCAL *msre_engine_op_resolve(msre_engine *engine, const char *name);
 
 struct msre_ruleset {
     apr_pool_t              *mp;
@@ -93,18 +93,18 @@ struct msre_ruleset {
     apr_array_header_t      *phase_logging;
 };
 
-apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr);
+apr_status_t DSOLOCAL msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr);
 
-apr_status_t msre_ruleset_process_phase_internal(msre_ruleset *ruleset, modsec_rec *msr);
+apr_status_t DSOLOCAL msre_ruleset_process_phase_internal(msre_ruleset *ruleset, modsec_rec *msr);
 
-msre_ruleset *msre_ruleset_create(msre_engine *engine, apr_pool_t *mp);
+msre_ruleset DSOLOCAL *msre_ruleset_create(msre_engine *engine, apr_pool_t *mp);
 
-int msre_ruleset_rule_add(msre_ruleset *ruleset, msre_rule *rule, int phase);
+int DSOLOCAL msre_ruleset_rule_add(msre_ruleset *ruleset, msre_rule *rule, int phase);
 
 int DSOLOCAL msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exception *re);
 
 /*
-int msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset, rule_exception *re,
+int DSOLOCAL msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset, rule_exception *re,
     apr_array_header_t *phase_arr);
 */
 
@@ -126,13 +126,13 @@ struct msre_rule {
     msre_rule               *chain_starter;
 };
 
-msre_rule *msre_rule_create(msre_ruleset *ruleset,
+msre_rule DSOLOCAL *msre_rule_create(msre_ruleset *ruleset,
     const char *fn, int line, const char *targets,
     const char *args, const char *actions, char **error_msg);
 
-void msre_rule_actionset_init(msre_rule *rule);
+void DSOLOCAL msre_rule_actionset_init(msre_rule *rule);
 
-apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr);
+apr_status_t DSOLOCAL msre_rule_process(msre_rule *rule, modsec_rec *msr);
 
 #define VAR_SIMPLE              0    /* REQUEST_URI */
 #define VAR_LIST                1
@@ -175,7 +175,7 @@ struct msre_tfn_metadata {
 void DSOLOCAL msre_engine_tfn_register(msre_engine *engine, const char *name,
     FN_TFN_EXECUTE(execute));
 
-void msre_engine_op_register(msre_engine *engine, const char *name,
+void DSOLOCAL msre_engine_op_register(msre_engine *engine, const char *name,
     FN_OP_PARAM_INIT(fn1), FN_OP_EXECUTE(fn2));
 
 void DSOLOCAL msre_engine_register_default_tfns(msre_engine *engine);
@@ -243,20 +243,20 @@ struct msre_actionset {
     int                      auditlog;
 };
 
-void msre_engine_variable_register(msre_engine *engine, const char *name, 
+void DSOLOCAL msre_engine_variable_register(msre_engine *engine, const char *name, 
     unsigned int type, unsigned int argc_min, unsigned int argc_max,
     FN_VAR_VALIDATE(validate), FN_VAR_GENERATE(generate),
     unsigned int is_cacheable, unsigned int availability);
 
-msre_actionset *msre_actionset_create(msre_engine *engine, const char *text,
+msre_actionset DSOLOCAL *msre_actionset_create(msre_engine *engine, const char *text,
     char **error_msg);
 
-msre_actionset *msre_actionset_merge(msre_engine *engine, msre_actionset *parent,
+msre_actionset DSOLOCAL *msre_actionset_merge(msre_engine *engine, msre_actionset *parent,
     msre_actionset *child, int inherit_by_default);
 
-msre_actionset *msre_actionset_create_default(msre_engine *engine);
+msre_actionset DSOLOCAL *msre_actionset_create_default(msre_engine *engine);
 
-void msre_actionset_init(msre_actionset *actionset, msre_rule *rule);
+void DSOLOCAL msre_actionset_init(msre_actionset *actionset, msre_rule *rule);
 
 #define FN_ACTION_VALIDATE(X)   char *(*X)(msre_engine *engine, msre_action *action)
 #define FN_ACTION_INIT(X)       apr_status_t (*X)(msre_engine *engine, msre_actionset *actionset, msre_action *action)
@@ -294,12 +294,12 @@ struct msre_action {
 
 /* -- MSRE Function Prototypes ---------------------------------------------- */
 
-msre_var_metadata *msre_resolve_var(msre_engine *engine, const char *name);
+msre_var_metadata DSOLOCAL *msre_resolve_var(msre_engine *engine, const char *name);
 
-int msre_parse_generic(apr_pool_t *pool, const char *text, apr_table_t *vartable,
+int DSOLOCAL msre_parse_generic(apr_pool_t *pool, const char *text, apr_table_t *vartable,
     char **error_msg);
 
-apr_status_t msre_parse_vars(msre_ruleset *ruleset, const char *text,
+apr_status_t DSOLOCAL msre_parse_vars(msre_ruleset *ruleset, const char *text,
     apr_array_header_t *arr, char **error_msg);
 
 char DSOLOCAL *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset);

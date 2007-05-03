@@ -62,7 +62,7 @@ static msre_var *generate_single_var(modsec_rec *msr, msre_var *var, msre_rule *
  * Expands macros ("%{NAME}" entities) if present
  * in the given variable.
  */
-int DSOLOCAL expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t *mptmp) {
+int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t *mptmp) {
     char *data = NULL;
     apr_array_header_t *arr = NULL;
     char *p = NULL, *q = NULL, *t = NULL;
