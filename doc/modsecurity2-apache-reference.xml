@@ -1745,7 +1745,7 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}
 
     <programlisting format="linespecific">SecDefaultAction "log,pass,<emphasis
         role="bold">phase:2</emphasis>"
-SecRule HTTP_Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis>"</programlisting>
+SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis>"</programlisting>
 
     <para><emphasis role="bold">Note on Rule and Phases</emphasis></para>
 
@@ -1992,21 +1992,6 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
       were extracted from the request body. Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">FILES_TMPNAMES</emphasis> "@inspectFile /path/to/inspect_script.pl"</programlisting>
-    </section>
-
-    <section>
-      <title><literal moreinfo="none">HTTP_</literal></title>
-
-      <para>This variable is a special prefix that is followed by a header
-      name and can be used to access any request header. Example:</para>
-
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> HTTP_REFERER</emphasis> "www\.badsite\.com"</programlisting>
-
-      <para><emphasis role="bold">Note</emphasis></para>
-
-      <para>This variable is for backward-compatibilty with ModSecurity 1.X
-      rules. It has been superceded by the REQUEST_HEADERS variable
-      (REQUEST_HEADERS:<emphasis>Headername</emphasis>)</para>
     </section>
 
     <section>
