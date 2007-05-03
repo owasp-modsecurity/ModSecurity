@@ -1065,6 +1065,58 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
+      <title>SecPdfProtect (Experimental)</title>
+
+      <para><emphasis role="bold">Description:</emphasis> Enables the PDF XSS
+      protection functionality. Once enabled access to PDF files is tracked.
+      Direct access attempts are redirected to links that contain one-time
+      tokens. Requests with valid tokens are allowed through unmodified.
+      Requests with invalid tokens are also allowed through but with forced
+      download of the PDF files. This implementation uses response headers to
+      detect PDF files and thus can be used with dynamically generated PDF
+      files that do not have the <filename>.pdf</filename> extension in the
+      request URI.</para>
+    </section>
+
+    <section>
+      <title>SecPdfProtectSecret (Experimental)</title>
+
+      <para><emphasis role="bold">Description:</emphasis> Defines the secret
+      that will be used to construct one-time tokens. You should use a
+      reasonably long value for the secret (e.g. 16 characters is good). Once
+      selected the secret should not be changed as as it will break the the
+      tokens that were sent prior to change. But it's not a big deal even if
+      you change it. It will just force dowload of PDF files with tokens that
+      were issued in the last few seconds.</para>
+    </section>
+
+    <section>
+      <title>SecPdfProtectTimeout (Experimental)</title>
+
+      <para><emphasis role="bold">Description:</emphasis> Defines the token
+      timeout. After token expires it can no longer be used to allow access to
+      PDF file. Request will be allowed through but the PDF will be delivered
+      as attachment.</para>
+
+      <para><emphasis role="bold">Default:</emphasis>
+      <literal>10</literal></para>
+    </section>
+
+    <section>
+      <title>SecPdfProtectTokenName (Experimental)</title>
+
+      <para><emphasis role="bold">Description:</emphasis> Defines the name of
+      the token. The only reason you would want to change the name of the
+      token is if you wanted to hide the fact you are running ModSecurity.
+      It's a good reason but it won't really help as the adversary can look
+      into the algorithm used for PDF protection and figure it out anyway. It
+      does raise the bar slightly so go ahead if you want to.</para>
+
+      <para><emphasis role="bold">Default:</emphasis>
+      <literal>PDFTOKEN</literal></para>
+    </section>
+
+    <section>
       <title><literal>SecRequestBodyAccess</literal></title>
 
       <para><emphasis role="bold">Description:</emphasis> Configures whether
