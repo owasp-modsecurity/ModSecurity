@@ -4020,22 +4020,6 @@ SecRule ARGS:route "!<emphasis role="bold">@endsWith %{REQUEST_ADDR}</emphasis>"
     </section>
 
     <section>
-      <title><literal>is</literal></title>
-
-      <para><emphasis role="bold">Description: </emphasis>This operator is a
-      string comparison and returns true if the parameter value matches the
-      input exactly. Macro expansion is performed so you may use variable
-      names such as %{TX.1}, etc.</para>
-
-      <para>Example:</para>
-
-      <programlisting format="linespecific">SecRule ARGS:foo "!<emphasis
-          role="bold">@is bar</emphasis>" t:none,deny,status:403
-SecRule REQUEST_ADDR "^(.*)$" deny,status:403,capture,chain
-SecRule REQUEST_HEADERS:Ip-Address "!<emphasis role="bold">@is %{TX.1}</emphasis>"</programlisting>
-    </section>
-
-    <section>
       <title><literal>le</literal></title>
 
       <para><emphasis role="bold">Description: </emphasis>This operator is a
@@ -4113,6 +4097,22 @@ SecRule REQUEST_HEADERS:Ip-Address "!<emphasis role="bold">@is %{TX.1}</emphasis
           end anchor will not match a trailing newline charater.</para>
         </listitem>
       </orderedlist>
+    </section>
+
+    <section>
+      <title><literal>streq</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      string comparison and returns true if the parameter value matches the
+      input exactly. Macro expansion is performed so you may use variable
+      names such as %{TX.1}, etc.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule ARGS:foo "!<emphasis
+          role="bold">@streq bar</emphasis>" t:none,deny,status:403
+SecRule REQUEST_ADDR "^(.*)$" deny,status:403,capture,chain
+SecRule REQUEST_HEADERS:Ip-Address "!<emphasis role="bold">@streq %{TX.1}</emphasis>"</programlisting>
     </section>
 
     <section>

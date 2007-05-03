@@ -14,7 +14,7 @@
    content type (e.g. HTML, plain text, etc).
 
  * Added string comparison operators with support for macro expansion:
-   @contains, @is, @beginsWith and @endsWith.
+   @contains, @streq, @beginsWith and @endsWith.
 
  * Enhanced debug log output to log macro expansion, quote values and
    correctly display values that contained NULs.

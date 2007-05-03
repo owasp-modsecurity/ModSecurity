@@ -238,9 +238,9 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     return 0;
 }
 
-/* is */
+/* streq */
 
-static int msre_op_is_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+static int msre_op_streq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     const char *match = NULL;
     const char *target;
@@ -1109,9 +1109,9 @@ void msre_engine_register_default_operators(msre_engine *engine) {
 
     /* is */
     msre_engine_op_register(engine,
-        "is",
+        "streq",
         NULL, /* ENH init function to flag var substitution */
-        msre_op_is_execute
+        msre_op_streq_execute
     );
 
     /* startsWith */
