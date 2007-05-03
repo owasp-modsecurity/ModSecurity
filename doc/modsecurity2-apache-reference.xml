@@ -2274,6 +2274,27 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
+      <title><literal>RESPONSE_CONTENT_LENGTH</literal> (Experimental)</title>
+
+      <para>Response body length in bytes. Can be available starting with
+      phase 3 but it does not have to be (as the length of response body is
+      not always known in advance.) Does not exist of the content length is
+      not know. (We will consider making it empty if the size is not
+      known.)</para>
+
+      <para>The value of this variable can change between phases if the body
+      is modified. For example, in embedded mode mod_deflate can compress the
+      response body between phases 4 and 5.</para>
+    </section>
+
+    <section>
+      <title><literal>RESPONSE_CONTENT_TYPE</literal> (Experimental)</title>
+
+      <para>Response content type. Only available starting with phase
+      3.</para>
+    </section>
+
+    <section>
       <title><literal moreinfo="none">RESPONSE_HEADERS</literal></title>
 
       <para>This variable is similar to the REQUEST_HEADERS variable and can
