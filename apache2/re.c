@@ -639,7 +639,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             arr = ruleset->phase_logging;
             break;
         default :
-            /* ENH Log a warning message here. */
+            msr_log(msr, 1, "Internal Error: Invalid phase %d", msr->phase);
             return -1;
     }
 
@@ -777,8 +777,12 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                 }
             }
         }
+        else if (rc < 0) {
+            msr_log(msr, 1, "Rule processing failed.");
+            return -1;
+        }
         else {
-            msr_log(msr, 1, "Unknown rule processing return code: %i.", rc);
+            msr_log(msr, 1, "Rule processing failed with unknown return code: %i.", rc);
             return -1;
         }
     }    

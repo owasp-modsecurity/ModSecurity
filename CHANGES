@@ -2,6 +2,10 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
+ * Do not try to intercept a request after a failed rule.  This fixes the
+   issue associated with an "Internal Error: Asked to intercept request
+   but was_intercepted is zero" error message.
+
  * Removed extraneous exported symbols.
 
  * Merged the PDF XSS protection functionality into ModSecurity.

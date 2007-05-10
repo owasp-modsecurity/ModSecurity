@@ -531,7 +531,7 @@ static int hook_request_early(request_rec *r) {
 
     /* Process phase REQUEST_HEADERS */
     rc = DECLINED;
-    if (modsecurity_process_phase(msr, PHASE_REQUEST_HEADERS)) {
+    if (modsecurity_process_phase(msr, PHASE_REQUEST_HEADERS) > 0) {
         rc = perform_interception(msr);
     }
 
@@ -649,7 +649,7 @@ static int hook_request_late(request_rec *r) {
     record_time_checkpoint(msr, 1);
 
     rc = DECLINED;
-    if (modsecurity_process_phase(msr, PHASE_REQUEST_BODY)) {
+    if (modsecurity_process_phase(msr, PHASE_REQUEST_BODY) > 0) {
         rc = perform_interception(msr);
     }
 
