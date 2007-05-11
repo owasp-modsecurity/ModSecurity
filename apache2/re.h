@@ -36,7 +36,6 @@ typedef struct msre_action msre_action;
 #include "persist_dbm.h"
 #include "apache2.h"
 
-
 /* Actions, variables, functions and operator functions */
 
 int DSOLOCAL expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t *mptmp);

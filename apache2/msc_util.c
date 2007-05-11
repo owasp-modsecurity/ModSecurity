@@ -447,6 +447,18 @@ char *log_escape_header_name(apr_pool_t *mp, const char *text) {
     return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 0, 1);
 }
 
+char *log_escape_raw(apr_pool_t *mp, const unsigned char *text, unsigned long int text_length) {
+    unsigned char *ret = apr_palloc(mp, text_length * 4 + 1);
+    unsigned long int i, j;
+
+    for (i = 0, j = 0; i < text_length; i++, j += 4) {
+        apr_snprintf((char *)ret+j, 5, "\\x%02x", text[i]);
+    }
+    ret[text_length * 4] = '\0';
+
+    return (char *)ret;
+}
+
 /**
  * Transform input into a form safe for logging.
  */

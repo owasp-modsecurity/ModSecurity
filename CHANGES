@@ -2,6 +2,9 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
+ * Add SecGeoLookupsDb, @geoLookups and GEO collection to support
+   geographical lookups by IP/host.
+
  * Do not try to intercept a request after a failed rule.  This fixes the
    issue associated with an "Internal Error: Asked to intercept request
    but was_intercepted is zero" error message.

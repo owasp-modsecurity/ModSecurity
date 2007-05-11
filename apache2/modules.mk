@@ -2,10 +2,11 @@
 MOD_SECURITY2 = mod_security2 apache2_config apache2_io apache2_util \
     re re_operators re_actions re_tfns re_variables \
     msc_logging msc_xml msc_multipart modsecurity msc_parsers msc_util msc_pcre \
-    persist_dbm msc_reqbody pdf_protect
+    persist_dbm msc_reqbody pdf_protect msc_geo
 
 H = re.h modsecurity.h msc_logging.h msc_multipart.h msc_parsers.h \
-    msc_pcre.h msc_util.h msc_xml.h persist_dbm.h apache2.h pdf_protect.h
+    msc_pcre.h msc_util.h msc_xml.h persist_dbm.h apache2.h pdf_protect.h \
+    msc_geo.h
 
 ${MOD_SECURITY2:=.slo}: ${H}
 ${MOD_SECURITY2:=.lo}: ${H}

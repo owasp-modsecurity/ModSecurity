@@ -61,6 +61,8 @@ char DSOLOCAL *log_escape_nq_ex(apr_pool_t *p, const char *text, unsigned long i
 
 char DSOLOCAL *log_escape_header_name(apr_pool_t *p, const char *text);
 
+char *log_escape_raw(apr_pool_t *mp, const unsigned char *text, unsigned long int text_length);
+
 char DSOLOCAL *_log_escape(apr_pool_t *p, const unsigned char *input,
     unsigned long int input_length, int escape_quotes, int escape_colon);
 

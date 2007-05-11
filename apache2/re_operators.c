@@ -12,6 +12,7 @@
  */
 #include "re.h"
 #include "msc_pcre.h"
+#include "msc_geo.h"
 #include "apr_strmatch.h"
 
 /**
@@ -559,6 +560,102 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
 }
 
 #endif
+
+/**
+ * Perform geograpical lookups on an IP/Host.
+ */
+static int msre_op_geoLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
+    char **error_msg)
+{
+    geo_rec rec;
+    geo_db *geo = msr->txcfg->geo;
+    const char *geo_host = var->value;
+    msc_string *s = NULL;
+    int rc;
+
+    if (geo == NULL) {
+        msr_log(msr, 1, "Geo lookup for \"%s\" attempted without a database.  Set SecGeoLookupDb.", geo_host);
+        return 0;
+    }
+
+
+    rc = geo_lookup(msr, &rec, geo_host, error_msg);
+    if (rc <= 0) {
+        return rc;
+    }
+
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "GEO: %s={country_code=%s, country_code3=%s, country_name=%s, country_continent=%s, region=%s, city=%s, postal_code=%s, latitude=%f, longitude=%f, dma_code=%d, area_code=%d}",
+                geo_host,
+                rec.country_code,
+                rec.country_code3,
+                rec.country_name,
+                rec.country_continent,
+                rec.region,
+                rec.city,
+                rec.postal_code,
+                rec.latitude,
+                rec.longitude,
+                rec.dma_code,
+                rec.area_code);
+    }
+
+    s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    s->name = apr_pstrdup(msr->mp, "country_code");
+    s->value = apr_pstrdup(msr->mp, rec.country_code ? rec.country_code : "");
+    s->value_len = strlen(s->value);
+    apr_table_setn(msr->geo_vars, s->name, (void *)s);
+
+    s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    s->name = apr_pstrdup(msr->mp, "country_code3");
+    s->value = apr_pstrdup(msr->mp, rec.country_code3 ? rec.country_code3 : "");
+    s->value_len = strlen(s->value);
+    apr_table_setn(msr->geo_vars, s->name, (void *)s);
+
+    s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    s->name = apr_pstrdup(msr->mp, "region");
+    s->value = apr_pstrdup(msr->mp, rec.region ? rec.region : "");
+    s->value_len = strlen(s->value);
+    apr_table_setn(msr->geo_vars, s->name, (void *)s);
+
+    s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    s->name = apr_pstrdup(msr->mp, "city");
+    s->value = apr_pstrdup(msr->mp, rec.city ? rec.city : "");
+    s->value_len = strlen(s->value);
+    apr_table_setn(msr->geo_vars, s->name, (void *)s);
+
+    s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    s->name = apr_pstrdup(msr->mp, "postal_code");
+    s->value = apr_pstrdup(msr->mp, rec.postal_code ? rec.postal_code : "");
+    s->value_len = strlen(s->value);
+    apr_table_setn(msr->geo_vars, s->name, (void *)s);
+
+    s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    s->name = apr_pstrdup(msr->mp, "latitude");
+    s->value = apr_psprintf(msr->mp, "%f", rec.latitude);
+    s->value_len = strlen(s->value);
+    apr_table_setn(msr->geo_vars, s->name, (void *)s);
+
+    s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    s->name = apr_pstrdup(msr->mp, "longitude");
+    s->value = apr_psprintf(msr->mp, "%f", rec.longitude);
+    s->value_len = strlen(s->value);
+    apr_table_setn(msr->geo_vars, s->name, (void *)s);
+
+    s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    s->name = apr_pstrdup(msr->mp, "dma_code");
+    s->value = apr_psprintf(msr->mp, "%d", rec.dma_code);
+    s->value_len = strlen(s->value);
+    apr_table_setn(msr->geo_vars, s->name, (void *)s);
+
+    s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    s->name = apr_pstrdup(msr->mp, "area_code");
+    s->value = apr_psprintf(msr->mp, "%d", rec.area_code);
+    s->value_len = strlen(s->value);
+    apr_table_setn(msr->geo_vars, s->name, (void *)s);
+
+    return 1;
+}
 
 /* rbl */
 
@@ -1152,6 +1249,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
     );
 
     #endif
+
+    /* geoLookup */
+    msre_engine_op_register(engine,
+        "geoLookup",
+        NULL,
+        msre_op_geoLookup_execute
+    );
 
     /* rbl */
     msre_engine_op_register(engine,

@@ -39,6 +39,7 @@ typedef struct msc_string msc_string;
 #ifdef WITH_LIBXML2
 #include "msc_xml.h"
 #endif
+#include "msc_geo.h"
 #include "re.h"
 
 #include "ap_config.h"
@@ -243,6 +244,9 @@ struct modsec_rec {
 
     apr_table_t         *tx_vars;
 
+    /* ENH: refactor to allow arbitrary var tables */
+    apr_table_t         *geo_vars;
+
     /* response */
     unsigned int         response_status;
     const char          *status_line;
@@ -402,6 +406,9 @@ struct directory_config {
     int                  pdfp_timeout;
     const char          *pdfp_token_name;
     int                  pdfp_only_get;
+
+    /* Geo Lookup */
+    geo_db              *geo;
 };
 
 struct error_message {

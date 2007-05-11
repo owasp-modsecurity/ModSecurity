@@ -91,6 +91,9 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     dcfg->pdfp_token_name = NOT_SET_P;
     dcfg->pdfp_only_get = NOT_SET;
 
+    /* Geo Lookups */
+    dcfg->geo = NOT_SET_P;
+
     return dcfg;
 }
 
@@ -382,6 +385,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     merged->pdfp_only_get = (child->pdfp_only_get == NOT_SET
         ? parent->pdfp_only_get : child->pdfp_only_get);
 
+    /* Geo Lookup */
+    merged->geo = (child->geo == NOT_SET_P
+        ? parent->geo : child->geo);
+
     return merged;
 }
 
@@ -450,6 +457,9 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->pdfp_timeout == NOT_SET) dcfg->pdfp_timeout = 10;
     if (dcfg->pdfp_token_name == NOT_SET_P) dcfg->pdfp_token_name = "PDFPTOKEN";
     if (dcfg->pdfp_only_get == NOT_SET) dcfg->pdfp_only_get = 0;
+
+    /* Geo Lookup */
+    if (dcfg->geo == NOT_SET_P) dcfg->geo = NULL;
 }
 
 /**
@@ -1185,6 +1195,22 @@ static const char *cmd_pdf_protect_intercept_get_only(cmd_parms *cmd, void *_dcf
     return NULL;
 }
 
+/* -- Geo Lookup configuration -- */
+
+static const char *cmd_geo_lookups_db(cmd_parms *cmd, void *_dcfg,
+    const char *p1)
+{
+    char *error_msg;
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+    
+    if (geo_init(dcfg, p1, &error_msg) <= 0) {
+        return error_msg;
+    }
+
+    return NULL;
+}
+
 
 /* -- Configuration directives definitions -- */
 
@@ -1522,6 +1548,14 @@ const command_rec module_directives[] = {
         NULL,
         RSRC_CONF,
         "whether or not to intercept only GET requess."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecGeoLookupsDb",
+        cmd_geo_lookups_db,
+        NULL,
+        RSRC_CONF,
+        "database for geographical lookups module."
     ),
 
     { NULL }

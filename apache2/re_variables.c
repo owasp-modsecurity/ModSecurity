@@ -548,6 +548,50 @@ static int var_tx_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     return count;
 }
 
+/* GEO */
+
+static int var_geo_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    const apr_array_header_t *arr = NULL;
+    const apr_table_entry_t *te = NULL;
+    int i, count = 0;
+
+    arr = apr_table_elts(msr->geo_vars);
+    te = (apr_table_entry_t *)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        msc_string *str = (msc_string *)te[i].val;
+        int match;
+
+        /* Figure out if we want to include this variable. */
+        match = 0;
+        if (var->param == NULL) match = 1; /* Unconditional inclusion. */
+        else {
+            if (var->param_data != NULL) { /* Regex. */
+                char *my_error_msg = NULL;
+                if (!(msc_regexec((msc_regex_t *)var->param_data, str->name,
+                    str->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+            } else { /* Simple comparison. */
+                if (strcasecmp(str->name, var->param) == 0) match = 1;
+            }
+        }
+
+        /* If we had a match add this argument to the collection. */
+        if (match) {
+            msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+
+            rvar->value = str->value;
+            rvar->value_len = str->value_len;
+            rvar->name = apr_psprintf(mptmp, "GEO:%s", log_escape_nq(mptmp, str->name));
+            apr_table_addn(vartab, rvar->name, (void *)rvar);
+
+            count++;
+        }
+    }
+
+    return count;
+}
+
 /* IP */
 
 static int var_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -1861,6 +1905,17 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         1, 1,
         var_generic_list_validate,
         var_tx_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* GEO */
+    msre_engine_variable_register(engine,
+        "GEO",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_geo_generate,
         VAR_CACHE,
         PHASE_REQUEST_HEADERS
     );

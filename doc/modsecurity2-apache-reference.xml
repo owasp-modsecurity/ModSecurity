@@ -1019,6 +1019,28 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
+      <title><literal>SecGeoLookupsDb</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Defines the path to
+      the geograpical database file.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecGeoLookupsDb /path/to/db</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecGeoLookupsDb
+      /usr/local/geo/data/GeoLiteCity.dat</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
+      </emphasis>Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> Check out
+      www.maxmind.com for free database files.</para>
+    </section>
+
+    <section>
       <title><literal>SecGuardianLog</literal></title>
 
       <para><emphasis role="bold">Description:</emphasis> Configuration
@@ -2057,6 +2079,80 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
       were extracted from the request body. Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">FILES_TMPNAMES</emphasis> "@inspectFile /path/to/inspect_script.pl"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">GEO</literal></title>
+
+      <para><literal>GEO</literal> is a collection populated by the <literal
+      moreinfo="none">@geoLookups</literal> operator. It can be used to match
+      geographical fields looked up by an IP address or hostname.</para>
+
+      <para>Available since 2.2.0.</para>
+
+      <para>Fields:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">COUNTRY_CODE:</emphasis> Two character
+          country code. EX: US, UK, etc.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">COUNTRY_CODE3:</emphasis> Up to three
+          character country code.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">COUNTRY_NAME:</emphasis> The full
+          country name.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">COUNTRY_CONTINENT:</emphasis> The teo
+          character continent that the country is located. EX: EU</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">REGION:</emphasis> The two character
+          region. For US, this is state. For Canada, providence, etc.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">CITY:</emphasis> The city name.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">POSTAL_CODE:</emphasis> The postal
+          code.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">LATITUDE:</emphasis> The
+          latitude.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">LONGITUDE:</emphasis> The
+          longitude.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">DMA_CODE:</emphasis> The metropoliton
+          area code. (US only)</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">AREA_CODE:</emphasis> The phone system
+          area code. (US only)</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REMOTE_ADDR "<emphasis
+          role="bold">@geoLookup</emphasis>" chain,drop,msg:'Non-UK IP address'
+SecRule GEO:COUNTRY_CODE "!@streq UK"</programlisting>
     </section>
 
     <section>
@@ -4122,6 +4218,22 @@ SecRule ARGS:route "!<emphasis role="bold">@endsWith %{REQUEST_ADDR}</emphasis>"
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis
           role="bold">@ge</emphasis> 15"</programlisting>
+    </section>
+
+    <section>
+      <title><literal>geoLookup</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> This operator looks
+      up various data fields from an IP address or hostname. The results will
+      be captured in the <literal moreinfo="none">GEO</literal>
+      collection.</para>
+
+      <para>You must provide a database via <literal
+      moreinfo="none">SecGeoLookupsDb</literal> before this operator can be
+      used.</para>
+
+      <para>See the <literal moreinfo="none">GEO</literal> variable for an
+      example and more information on various fields available.</para>
     </section>
 
     <section>
