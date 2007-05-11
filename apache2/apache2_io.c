@@ -469,7 +469,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         }
           
         // Content injection (prepend & non-buffering).
-        if (msr->txcfg->content_injection_enabled && msr->content_prepend) {
+        if (msr->txcfg->content_injection_enabled && msr->content_prepend && msr->of_skipping) {
             apr_bucket *bucket_ci = apr_bucket_heap_create(msr->content_prepend,
                 msr->content_prepend_len, NULL, f->r->connection->bucket_alloc);
             APR_BRIGADE_INSERT_HEAD(bb_in, bucket_ci);
@@ -528,7 +528,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
             eos_bucket = bucket;
 
             // Inject content (append & non-buffering).
-            if (msr->txcfg->content_injection_enabled && msr->content_append) {
+            if (msr->txcfg->content_injection_enabled && msr->content_append && msr->of_skipping) {
                 apr_bucket *bucket_ci = NULL;
 
                 bucket_ci = apr_bucket_heap_create(msr->content_append,
@@ -618,7 +618,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         record_time_checkpoint(msr, 3);
 
         // Inject content into response (prepend & buffering).
-        if (msr->txcfg->content_injection_enabled && msr->content_prepend) {
+        if (msr->txcfg->content_injection_enabled && msr->content_prepend && (!msr->of_skipping)) {
             apr_bucket *bucket_ci = NULL;
 
             bucket_ci = apr_bucket_heap_create(msr->content_prepend,
@@ -632,7 +632,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         }
 
         // Inject content into response (append & buffering).
-        if (msr->txcfg->content_injection_enabled && msr->content_append) {
+        if (msr->txcfg->content_injection_enabled && msr->content_append && (!msr->of_skipping)) {
             apr_bucket *bucket_ci = NULL;
 
             bucket_ci = apr_bucket_heap_create(msr->content_append,
