@@ -2,9 +2,12 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
+ * Fixed decoding full-width unicode in t:urlDecodeUni.
+
  * Only calculate debugging vars when we are debugging (more to come).
 
  * Removed strnlen() calls for non-GNU platforms.
+
 
 11 May 2007 - 2.2.0-dev1
 -------------------------
