@@ -2,6 +2,8 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
+ * Remove excessive debug log entries about "capture" action.
+
  * Fixed decoding full-width unicode in t:urlDecodeUni.
 
  * Only calculate debugging vars when we are debugging (more to come).

@@ -109,18 +109,12 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     /* Are we supposed to capture subexpressions? */
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
-    /* Warn when the regex captures but "capture" is not set */
-    if (msr->txcfg->debuglog_level >= 4) {
+    /* Show when the regex captures but "capture" is not set */
+    if (msr->txcfg->debuglog_level >= 6) {
         int capcount = 0;
         rc = msc_fullinfo(regex, PCRE_INFO_CAPTURECOUNT, &capcount);
         if ((capture == 0) && (capcount > 0)) {
-            msr_log(msr, 4, "Ignoring regex captures since \"capture\" action is not enabled.");
-        }
-        if ((capture == 1) && (capcount == 0)) {
-            msr_log(msr, 5, "The \"capture\" action is enabled, but the regex does not have explicit captures.");
-        }
-        if ((capture == 0) && (capcount > 0)) {
-            msr_log(msr, 6, "The \"capture\" action is not enabled, but the regex contains captures.");
+            msr_log(msr, 6, "Ignoring regex captures since \"capture\" action is not enabled.");
         }
     }
 
