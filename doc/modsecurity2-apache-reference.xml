@@ -3035,8 +3035,10 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
 
       <para>In addition to decoding %xx like <literal
       moreinfo="none">urlDecode, urlDecodeUni also </literal>decodes<literal
-      moreinfo="none"> <literal>%uXXXX</literal> </literal>encoding (only the
-      lower byte will be used, the higher byte will be discarded).</para>
+      moreinfo="none"> <literal>%uXXXX</literal> </literal>encoding. If the
+      code is in the range of FF01-FF5E (the full width ASCII codes), then the
+      higher byte is used to detect and adjust the lower byte. Otherwise, only
+      the lower byte will be used and the higher byte zeroed.</para>
     </section>
 
     <section>
