@@ -26,7 +26,7 @@ typedef struct msc_data_chunk msc_data_chunk;
 typedef struct msc_arg msc_arg;
 typedef struct msc_string msc_string;
 
-#if !(defined(WIN32) || defined(NETWARE))
+#if !(defined(WIN32) || defined(NETWARE) || defined(SOLARIS2))
 #define DSOLOCAL __attribute__((visibility("hidden")))
 #else
 #define DSOLOCAL

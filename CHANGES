@@ -2,6 +2,9 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
+ * Add Solaris to the list of platforms not supporting the hidden
+   visibility attribute.
+
  * Remove excessive debug log entries about "capture" action.
 
  * Fixed decoding full-width unicode in t:urlDecodeUni.
