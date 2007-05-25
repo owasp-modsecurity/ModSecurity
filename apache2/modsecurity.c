@@ -297,6 +297,9 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     msr->collections_dirty = apr_table_make(msr->mp, 8);
     if (msr->collections_dirty == NULL) return -1;
 
+    msr->tcache = apr_hash_make(msr->mp);
+    if (msr->tcache == NULL) return -1;
+
     return 1;
 }
 

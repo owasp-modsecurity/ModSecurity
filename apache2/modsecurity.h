@@ -25,6 +25,7 @@ typedef struct msc_engine msc_engine;
 typedef struct msc_data_chunk msc_data_chunk;
 typedef struct msc_arg msc_arg;
 typedef struct msc_string msc_string;
+typedef struct msc_cache_rec msc_cache_rec;
 
 #if !(defined(WIN32) || defined(NETWARE) || defined(SOLARIS2))
 #define DSOLOCAL __attribute__((visibility("hidden")))
@@ -45,6 +46,7 @@ typedef struct msc_string msc_string;
 #include "ap_config.h"
 #include "apr_md5.h"
 #include "apr_strings.h"
+#include "apr_hash.h"
 #include "httpd.h"
 #include "http_config.h"
 #include "http_log.h"
@@ -59,6 +61,8 @@ typedef struct msc_string msc_string;
 #define PHASE_RESPONSE_HEADERS      3
 #define PHASE_RESPONSE_BODY         4
 #define PHASE_LOGGING               5
+#define PHASE_FIRST                 PHASE_REQUEST_HEADERS
+#define PHASE_LAST                  PHASE_LOGGING
 
 #define NOT_SET     -1
 #define NOT_SET_P (void *)-1
@@ -319,6 +323,9 @@ struct modsec_rec {
     apr_off_t            content_prepend_len;
     const char          *content_append;
     apr_off_t            content_append_len;
+
+    /* data cache */
+    apr_hash_t           *tcache;
 };
 
 struct directory_config {
@@ -494,5 +501,15 @@ void DSOLOCAL msc_alert(modsec_rec *msr, int level, msre_actionset *actionset, c
     const char *rule_message);
 
 apr_status_t DSOLOCAL modsecurity_request_body_clear(modsec_rec *msr);
+
+/* Data Cache */
+
+struct msc_cache_rec {
+    int                      hits;
+    int                      changed;
+    const char              *key;
+    const char              *val;
+    apr_size_t               val_len;
+};
 
 #endif

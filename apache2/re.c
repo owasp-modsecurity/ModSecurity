@@ -294,7 +294,7 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
 
         /* we are at the beginning of the name */
         name = p;
-        while((*p != '\0')&&(*p != '|')&&(*p != ':')&&(*p != ',')&&(!isspace(*p))) p++; // ENH replace with isvarnamechar()
+        while((*p != '\0')&&(*p != '|')&&(*p != ':')&&(*p != ',')&&(!isspace(*p))) p++; /* ENH replace with isvarnamechar() */
 
         /* get the name */
         name = apr_pstrmemdup(mp, name, p - name);
@@ -1353,10 +1353,26 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
         {
             const apr_array_header_t *tarr;
             const apr_table_entry_t *telts;
+            msc_cache_rec **carr = NULL;
+            msc_cache_rec *crec = NULL;
+            char *tfnsvar = NULL;
+            char *tfnskey = NULL;
+            int tfnscount = 0;
+            int usecache = 0;
             apr_table_t *normtab;
             int k;
             msre_action *action;
             msre_tfn_metadata *metadata;
+
+            /* Is this var cacheable? */
+            if (var->metadata->is_cacheable == VAR_CACHE) {
+                usecache = 1;
+                tfnsvar = apr_psprintf(msr->mp, "%lx;%s", (unsigned long)var, var->name);
+                tfnskey = tfnsvar;
+            }
+            else {
+                msr_log(msr, 9, "CACHE: %s transformations are not cacheable", var->name);
+            }
 
             normtab = apr_table_make(mptmp, 10);
             if (normtab == NULL) return -1;
@@ -1369,6 +1385,8 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                 if (strcmp(telts[k].key, "t") == 0) {
                     if (strcmp(action->param, "none") == 0) {
                         apr_table_clear(normtab);
+                        tfnskey = tfnsvar;
+                        tfnscount = 0;
                         continue;
                     }
 
@@ -1376,11 +1394,42 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                         apr_table_unset(normtab, action->param);
                     } else {
                         apr_table_addn(normtab, action->param, (void *)action);
+                        tfnskey = apr_psprintf(msr->mp, "%s,%s", tfnskey, action->param);
+                        tfnscount++;
                     }
                 }
             }
 
             /* Perform transformations. */
+
+            /* Try to fetch the full multi-transformation from cache */
+            if (usecache && tfnscount > 1 && !multi_match) {
+                crec = NULL;
+                msr_log(msr, 9, "CACHE: Fetching %s (multi)", tfnskey);
+                carr = (msc_cache_rec **)apr_hash_get(msr->tcache, tfnskey, APR_HASH_KEY_STRING);
+                if (carr != NULL) {
+                    crec = carr[msr->phase];
+                }
+
+                /* Cache Miss - Reset the key to perform transformations */
+                if (crec == NULL) {
+                    tfnskey = tfnsvar;
+                }
+                /* Cache Hit - Use cache value and execute immediatly */
+                else {
+                    crec->hits++;
+                    if (crec->changed) {
+                        var->value = apr_pmemdup(msr->mp, crec->val, crec->val_len);
+                        var->value_len = crec->val_len;
+                    }
+
+                    msr_log(msr, 9, "T (%i) %s: \"%s\" [cached hits=%d]", crec->changed, (tfnskey + strlen(tfnsvar) + 1), log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
+
+                    rc = execute_operator(var, rule, msr, acting_actionset, mptmp);
+
+                    return (rc < 0) ? : rc;
+                }
+            }
 
             tarr = apr_table_elts(normtab);
 
@@ -1394,6 +1443,7 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
 
             /* Execute transformations in a loop. */
 
+            tfnskey = tfnsvar;
             changed = 1;
             telts = (const apr_table_entry_t*)tarr->elts;
             for (k = 0; k < tarr->nelts; k++) {
@@ -1431,6 +1481,31 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                 action = (msre_action *)telts[k].val;
                 metadata = (msre_tfn_metadata *)action->param_data;
 
+                /* Try to use the cache */
+                if (usecache) {
+                    /* Generate the cache key */
+                    tfnskey = apr_psprintf(msr->mp, "%s,%s", tfnskey, action->param);
+
+                    /* Try to fetch this transformation from cache */
+                    msr_log(msr, 9, "CACHE: Fetching %s", tfnskey);
+                    crec = NULL;
+                    carr = (msc_cache_rec **)apr_hash_get(msr->tcache, tfnskey, APR_HASH_KEY_STRING);
+                    if (carr != NULL) {
+                        crec = carr[msr->phase];
+                    }
+                    if (crec != NULL) {
+                        crec->hits++;
+
+                        if ((changed = crec->changed) == 1) {
+                            var->value = apr_pmemdup(msr->mp, crec->val, crec->val_len);
+                            var->value_len = crec->val_len;
+                        }
+
+                        msr_log(msr, 9, "T (%i) %s: \"%s\" [cached hits=%i]", crec->changed, metadata->name, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
+                        continue;
+                    }
+                }
+
                 rc = metadata->execute(mptmp, (unsigned char *)var->value, var->value_len,
                     &rval, &rval_length);
                 if (rc < 0) {
@@ -1441,6 +1516,26 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
 
                 var->value = rval;
                 var->value_len = rval_length;
+
+                /* Cache the transformation */
+                if (usecache) {
+                    /* ENH1: Add flag to vars to tell which ones can change across phases store the rest in a global cache */
+                    if (carr == NULL) {
+                        carr = (msc_cache_rec **)apr_pcalloc(msr->mp, (sizeof(msc_cache_rec *) * (PHASE_LAST + 1)));
+                        if (carr == NULL) return -1;
+                        memset(carr, 0, (sizeof(msc_cache_rec *) * (PHASE_LAST + 1)));
+                        apr_hash_set(msr->tcache, tfnskey, APR_HASH_KEY_STRING, carr);
+                    }
+                    crec = carr[msr->phase] = (msc_cache_rec *)apr_pcalloc(msr->mp, sizeof(msc_cache_rec));
+                    if (crec == NULL) return -1;
+
+                    crec->hits = 0;
+                    crec->changed = changed;
+                    crec->key = tfnskey;
+                    crec->val = changed ? apr_pmemdup(msr->mp, rval, rval_length) : NULL;
+                    crec->val_len = changed ? rval_length : -1;
+                    msr_log(msr, 9, "CACHE: Caching %s=\"%.*s\"", tfnskey, crec->val_len, crec->val);
+                }
 
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "T (%i) %s: \"%s\"", rc, metadata->name,
@@ -1476,6 +1571,33 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
         }
     }
 
+
+    msr_log(msr, 9, "CACHE: size=%u", apr_hash_count(msr->tcache));
+    #ifdef CACHE_DEBUG
+    if (msr->txcfg->debuglog_level >= 9) {
+        apr_hash_index_t *hi;
+        void *dummy;
+        msc_cache_rec **rec;
+        int hn = 0;
+        int ri;
+        for (hi = apr_hash_first(msr->mp, msr->tcache); hi; hi = apr_hash_next(hi)) {
+            hn++;
+            apr_hash_this(hi, NULL, NULL, &dummy);
+            rec = (msc_cache_rec **)dummy;
+            if (rec == NULL) continue;
+
+            for (ri = PHASE_FIRST; ri <= PHASE_LAST; ri++) {
+                if (rec[ri] == NULL) continue;
+                if (rec[ri]->changed) {
+                    msr_log(msr, 9, "CACHE: %5d) phase=%d hits=%d %s=\"%s\"", hn, msr->phase, rec[ri]->hits, rec[ri]->key, log_escape_nq_ex(mptmp, rec[ri]->val, rec[ri]->val_len));
+                }
+                else {
+                    msr_log(msr, 9, "CACHE: %5d) phase=%d hits=%d %s=<no change>", hn, msr->phase, rec[ri]->hits, rec[ri]->key);
+                }
+            }
+        }
+    }
+    #endif
 
     return (match_count ? RULE_MATCH : RULE_NO_MATCH);
 }
