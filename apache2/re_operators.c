@@ -182,19 +182,28 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 /* contains */
 
 static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    const char *match = (const char *)rule->op_param;
+    msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    const char *match = NULL;
     const char *target;
     unsigned int match_length;
     unsigned int target_length;
     unsigned int i, i_max;
 
+    str->value = (char *)rule->op_param;
+    str->value_len = strlen(str->value);
+
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    if (match == NULL) {
+    if (str->value == NULL) {
         *error_msg = "Internal Error: match string is null.";
         return -1;
     }
+
+    expand_macros(msr, str, rule, msr->mp);
+
+    match = (const char *)str->value;
+    match_length = str->value_len;
 
     /* If the given target is null run against an empty
      * string. This is a behaviour consistent with previous
@@ -207,8 +216,6 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         target = var->value;
         target_length = var->value_len;
     }
-
-    match_length = strlen(match);
 
     /* These are impossible to match */
     if ((match_length == 0) || (match_length > target_length)) {
@@ -291,21 +298,30 @@ static int msre_op_streq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var
     return 0;
 }
 
-/* startsWith */
+/* beginsWith */
 
-static int msre_op_startsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    const char *match = (const char *)rule->op_param;
+static int msre_op_beginsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    const char *match = NULL;
     const char *target;
     unsigned int match_length;
     unsigned int target_length;
 
+    str->value = (char *)rule->op_param;
+    str->value_len = strlen(str->value);
+
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    if (match == NULL) {
+    if (str->value == NULL) {
         *error_msg = "Internal Error: match string is null.";
         return -1;
     }
+
+    expand_macros(msr, str, rule, msr->mp);
+
+    match = (const char *)str->value;
+    match_length = str->value_len;
 
     /* If the given target is null run against an empty
      * string. This is a behaviour consistent with previous
@@ -318,8 +334,6 @@ static int msre_op_startsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var
         target = var->value;
         target_length = var->value_len;
     }
-
-    match_length = strlen(match);
 
     /* These are impossible to match */
     if ((match_length == 0) || (match_length > target_length)) {
@@ -342,18 +356,27 @@ static int msre_op_startsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var
 /* endsWith */
 
 static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    const char *match = (const char *)rule->op_param;
+    msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    const char *match = NULL;
     const char *target;
     unsigned int match_length;
     unsigned int target_length;
 
+    str->value = (char *)rule->op_param;
+    str->value_len = strlen(str->value);
+
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    if (match == NULL) {
+    if (str->value == NULL) {
         *error_msg = "Internal Error: match string is null.";
         return -1;
     }
+
+    expand_macros(msr, str, rule, msr->mp);
+
+    match = (const char *)str->value;
+    match_length = str->value_len;
 
     /* If the given target is null run against an empty
      * string. This is a behaviour consistent with previous
@@ -366,8 +389,6 @@ static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         target = var->value;
         target_length = var->value_len;
     }
-
-    match_length = strlen(match);
 
     /* These are impossible to match */
     if ((match_length == 0) || (match_length > target_length)) {
@@ -1208,11 +1229,11 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_streq_execute
     );
 
-    /* startsWith */
+    /* beginsWith */
     msre_engine_op_register(engine,
-        "startsWith",
+        "beginsWith",
         NULL, /* ENH init function to flag var substitution */
-        msre_op_startsWith_execute
+        msre_op_beginsWith_execute
     );
 
     /* endsWith */
