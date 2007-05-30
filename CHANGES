@@ -2,6 +2,8 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
+ * Cache transformations per-request/phase so they are not repeated.
+
  * Fixed problem with subrequests not being intercepted (only logged).
 
  * Add Solaris to the list of platforms not supporting the hidden
