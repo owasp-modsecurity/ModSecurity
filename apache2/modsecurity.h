@@ -325,7 +325,7 @@ struct modsec_rec {
     apr_off_t            content_append_len;
 
     /* data cache */
-    apr_hash_t           *tcache;
+    apr_hash_t          *tcache;
 };
 
 struct directory_config {
