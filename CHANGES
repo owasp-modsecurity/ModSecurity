@@ -2,6 +2,10 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
+ * Added new parallel matching operators, @pm and @pmfile.  These use
+   an alternate set based matching engine to perform faster keyword
+   type matches.
+
  * Cache transformations per-request/phase so they are not repeated.
 
  * Fixed problem with subrequests not being intercepted (only logged).

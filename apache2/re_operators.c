@@ -13,7 +13,9 @@
 #include "re.h"
 #include "msc_pcre.h"
 #include "msc_geo.h"
+#include "apr_lib.h"
 #include "apr_strmatch.h"
+#include "acmp.h"
 
 /**
  *
@@ -177,6 +179,135 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
     /* No match. */
     return 0;
+}
+
+/* pm */
+
+static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
+    if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pm'.");
+        return 0; /* ERROR */
+    }
+    
+    ACMP *p = acmp_create(0, rule->ruleset->mp);
+    if (p == NULL) return 0;
+
+    const char *s = rule->op_param;
+    const char *e = rule->op_param + strlen(rule->op_param);
+    
+    for (;;) {
+        while((isspace(*s) != 0) && (*s != 0)) s++;
+        if (*s == 0) break;
+        e = s;
+        while((isspace(*e) == 0) && (*e != 0)) e++;
+        acmp_add_pattern(p, s, NULL, NULL, e - s);
+        s = e;
+    }
+    acmp_prepare(p);
+    rule->op_param_data = p;
+    return 1;
+}
+
+/* pmfile */
+
+static int msre_op_pmfile_param_init(msre_rule *rule, char **error_msg) {
+    char errstr[1024];
+    char buf[HUGE_STRING_LEN + 1];
+    char *ptr = NULL;
+    apr_status_t rc;
+    apr_file_t *fd;
+
+    if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pm'.");
+        return 0; /* ERROR */
+    }
+    
+    ACMP *p = acmp_create(0, rule->ruleset->mp);
+    if (p == NULL) return 0;
+
+    char *fn = apr_pstrdup(rule->ruleset->mp, rule->op_param);
+    char *next = fn + strlen(rule->op_param);
+    
+    /* Loop through filenames */
+    for (;;) {
+        int line = 0;
+
+        /* Trim whitespace */
+        while((isspace(*fn) != 0) && (*fn != 0)) fn++;
+        if (*fn == '\0') break;
+        next = fn;
+        while((isspace(*next) == 0) && (*next != '\0')) next++;
+        while((isspace(*next) != 0) && (*next != '\0')) *next++ = '\0';
+
+        /* Open file and read */
+        rc = apr_file_open(&fd, fn, APR_READ | APR_FILE_NOCLEANUP, 0, rule->ruleset->mp);
+        if (rc != APR_SUCCESS) {
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Could not open pmfile \"%s\": %s", fn, apr_strerror(rc, errstr, 1024));
+            return 0;
+        }
+
+        #ifdef DEBUG_CONF
+        fprintf(stderr, "Loading pmfile: \"%s\"\n", fn);
+        #endif
+
+        /* Read one pattern per line skipping empty/commented */
+        for(;;) {
+            line++;
+            rc = apr_file_gets(buf, HUGE_STRING_LEN, fd);
+            if (rc == APR_EOF) break;
+            if (rc != APR_SUCCESS) {
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Could read \"%s\" line %d: %s", fn, line, apr_strerror(rc, errstr, 1024));
+                return 0;
+            }
+
+            /* Remove newline */
+            ptr = buf;
+            while(*ptr != '\0') ptr++;
+            if ((ptr > buf) && (*(ptr - 1) == '\n')) *(ptr - 1) = '\0';
+
+            /* Ignore empty lines and comments */
+            ptr = buf;
+            while((*ptr != '\0') && apr_isspace(*ptr)) ptr++;
+            if ((*ptr == '\0') || (*ptr == '#')) continue;
+
+            #ifdef DEBUG_CONF
+            fprintf(stderr, "Adding pmfile pattern: \"%s\"\n", buf);
+            #endif
+
+            acmp_add_pattern(p, buf, NULL, NULL, strlen(buf));
+        }
+        fn = next;
+    }
+    if (fd != NULL) apr_file_close(fd);
+    acmp_prepare(p);
+    rule->op_param_data = p;
+    return 1;
+}
+
+static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    const char *match = NULL;
+    apr_status_t rc = 0;
+    
+    /* Nothing to read */
+    if ((var->value == NULL) || (var->value_len == 0)) return 0;
+
+    ACMPT pt = {(ACMP *)rule->op_param_data, NULL};
+
+    rc = acmp_process_quick(&pt, &match, var->value, var->value_len);
+    if (rc) {
+        char *pattern_escaped = log_escape(msr->mp, match ? match : "<Unknown Pattern>");
+
+        /* This message will be logged. */
+        if (strlen(pattern_escaped) > 252) {
+            *error_msg = apr_psprintf(msr->mp, "Pattern match \"%.252s ...\" at %s.",
+                pattern_escaped, var->name);
+        } else {
+            *error_msg = apr_psprintf(msr->mp, "Pattern match \"%s\" at %s.",
+                pattern_escaped, var->name);
+        }
+        return 1;
+    }
+    return rc;
 }
 
 /* contains */
@@ -1213,6 +1344,20 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "rx",
         msre_op_rx_param_init,
         msre_op_rx_execute
+    );
+
+    /* pm */
+    msre_engine_op_register(engine,
+        "pm",
+        msre_op_pm_param_init,
+        msre_op_pm_execute
+    );
+
+    /* pmfile */
+    msre_engine_op_register(engine,
+        "pmfile",
+        msre_op_pmfile_param_init,
+        msre_op_pm_execute
     );
 
     /* contains */

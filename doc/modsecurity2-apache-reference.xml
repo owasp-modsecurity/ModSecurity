@@ -4288,6 +4288,40 @@ SecRule ARGS:route "!<emphasis role="bold">@endsWith %{REQUEST_ADDR}</emphasis>"
     </section>
 
     <section>
+      <title><literal>pm</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Parallel Match
+      operator. This operator uses a set based matching engine for faster
+      matches of keyword lists.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "<emphasis
+          role="bold">@pm</emphasis> WebZIP WebCopier Webster WebStripper SiteSnagger ProWebWalker CheeseBot" "deny,status:403</programlisting>
+
+      <para>The above would deny access with 403 if any of the words matched
+      within the User-Agent HTTP header value.</para>
+    </section>
+
+    <section>
+      <title><literal>pmfile</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Parallel Match
+      operator. This operator uses a set based matching engine for faster
+      matches of keyword lists. It is the same as <literal>@pm</literal>
+      except that it takes a list of files arguments. The contents of the
+      files should be one pattern per line.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "<emphasis
+          role="bold">@pm</emphasis> /path/to/blacklist1 /path/to/blacklist2" "deny,status:403</programlisting>
+
+      <para>The above would deny access with 403 if any of the patterns in the
+      two files matched within the User-Agent HTTP header value.</para>
+    </section>
+
+    <section>
       <title><literal>rbl</literal></title>
 
       <para><emphasis role="bold">Description:</emphasis> Look up the
