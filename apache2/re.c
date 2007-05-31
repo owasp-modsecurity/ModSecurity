@@ -1166,7 +1166,7 @@ static void msre_perform_disruptive_actions(modsec_rec *msr, msre_rule *rule,
 static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
     msre_actionset *acting_actionset, apr_pool_t *mptmp)
 {
-    apr_time_t time_before_regex;
+    apr_time_t time_before_regex = 0;
     char *my_error_msg = NULL;
     int rc;
 
@@ -1181,7 +1181,9 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
             var->value_len));
     }
         
-    time_before_regex = apr_time_now(); /* IMP1 time_before_regex? */
+    if (msr->txcfg->debuglog_level >= 4) {
+        time_before_regex = apr_time_now(); /* IMP1 time_before_regex? */
+    }
     rc = rule->op_metadata->execute(msr, rule, var, &my_error_msg);
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Operator completed in %" APR_TIME_T_FMT " usec.",

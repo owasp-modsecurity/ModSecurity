@@ -54,6 +54,7 @@ int perform_interception(modsec_rec *msr) {
     msre_actionset *actionset = NULL;
     const char *message = NULL;
     const char *phase_text = "";
+    const char *subreq_text = (msr->r->main == NULL) ? "" : "Subrequest. ";
     int status = DECLINED;
     int log_level = 1;
 
@@ -92,14 +93,14 @@ int perform_interception(modsec_rec *msr) {
         case ACTION_DENY :
             if (actionset->intercept_status != 0) {
                 status = actionset->intercept_status;
-                message = apr_psprintf(msr->mp, "Access denied with code %i%s.", status,
-                    phase_text);
+                message = apr_psprintf(msr->mp, "%sAccess denied with code %i%s.",
+                    subreq_text, status, phase_text);
             } else {
                 log_level = 1;
                 status = HTTP_INTERNAL_SERVER_ERROR;
-                message = apr_psprintf(msr->mp, "Access denied with code 500%s "
-                    "(Internal Error: Invalid status code requested %i).", phase_text,
-                    actionset->intercept_status);
+                message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
+                    "(Internal Error: Invalid status code requested %i).",
+                    subreq_text, phase_text, actionset->intercept_status);
             }
             break;
 
@@ -108,23 +109,25 @@ int perform_interception(modsec_rec *msr) {
                 if (ap_find_linked_module("mod_proxy.c") == NULL) {
                     log_level = 1;
                     status = HTTP_INTERNAL_SERVER_ERROR;
-                    message = apr_psprintf(msr->mp, "Access denied with code 500%s "
+                    message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                         "(Configuration Error: Proxy action to %s requested but mod_proxy not found).",
-                        phase_text, log_escape_nq(msr->mp, actionset->intercept_uri));
+                        subreq_text, phase_text,
+                        log_escape_nq(msr->mp, actionset->intercept_uri));
                 } else {
                     msr->r->filename = apr_psprintf(msr->mp, "proxy:%s", actionset->intercept_uri);
                     msr->r->proxyreq = PROXYREQ_REVERSE;
                     msr->r->handler = "proxy-server";
                     status = OK;
-                    message = apr_psprintf(msr->mp, "Access denied using proxy to %s%s.",
-                        phase_text, log_escape_nq(msr->mp, actionset->intercept_uri));
+                    message = apr_psprintf(msr->mp, "%sAccess denied using proxy to %s%s.",
+                        subreq_text, phase_text,
+                        log_escape_nq(msr->mp, actionset->intercept_uri));
                 }
             } else {
                 log_level = 1;
                 status = HTTP_INTERNAL_SERVER_ERROR;
-                message = apr_psprintf(msr->mp, "Access denied with code 500%s "
+                message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                     "(Configuration Error: Proxy action requested but it does not work in output phases).",
-                    phase_text);
+                    subreq_text, phase_text);
             }
             break;
 
@@ -141,29 +144,30 @@ int perform_interception(modsec_rec *msr) {
                 if (csd) {
                     if (apr_socket_close(csd) == APR_SUCCESS) {
                         status = HTTP_FORBIDDEN;
-                        message = apr_psprintf(msr->mp, "Access denied with connection close%s.",
-                            phase_text);
+                        message = apr_psprintf(msr->mp, "%sAccess denied with connection close%s.",
+                            subreq_text, phase_text);
                     } else {
                         log_level = 1;
                         status = HTTP_INTERNAL_SERVER_ERROR;
-                        message = apr_psprintf(msr->mp, "Access denied with code 500%s "
+                        message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                             "(Error: Connection drop requested but failed to close the "
-                            " socket).", phase_text);
+                            " socket).",
+                            subreq_text, phase_text);
                     }
                 } else {
                     log_level = 1;
                     status = HTTP_INTERNAL_SERVER_ERROR;
-                    message = apr_psprintf(msr->mp, "Access denied with code 500%s "
+                    message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                         "(Error: Connection drop requested but socket not found.",
-                        phase_text);
+                        subreq_text, phase_text);
                 }
             }
             #else
             log_level = 1;
             status = HTTP_INTERNAL_SERVER_ERROR;
-            message = apr_psprintf(msr->mp, "Access denied with code 500%s "
+            message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                 "(Error: Connection drop not implemented on this platform).",
-                phase_text);
+                subreq_text, phase_text);
             #endif
             break;
 
@@ -176,22 +180,24 @@ int perform_interception(modsec_rec *msr) {
             } else {
                 status = HTTP_MOVED_TEMPORARILY;
             }
-            message = apr_psprintf(msr->mp, "Access denied with redirection to %s using "
-                "status %i%s.", log_escape_nq(msr->mp, actionset->intercept_uri), status,
+            message = apr_psprintf(msr->mp, "%sAccess denied with redirection to %s using "
+                "status %i%s.",
+                subreq_text,
+                log_escape_nq(msr->mp, actionset->intercept_uri), status,
                 phase_text);
             break;
 
         case ACTION_ALLOW :
             status = DECLINED;
-            message = apr_psprintf(msr->mp, "Access allowed%s.", phase_text);
+            message = apr_psprintf(msr->mp, "%sAccess allowed%s.", subreq_text, phase_text);
             break;
 
         default :
             log_level = 1;
             status = HTTP_INTERNAL_SERVER_ERROR;
-            message = apr_psprintf(msr->mp, "Access denied with code 500%s "
+            message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                 "(Internal Error: invalid interception action %i).",
-                phase_text, actionset->intercept_action);
+                subreq_text, phase_text, actionset->intercept_action);
             break;
     }
 
@@ -558,6 +564,10 @@ static int hook_request_late(request_rec *r) {
 
     /* Has this phase been completed already? */
     if (msr->phase_request_body_complete) {
+        if (msr->was_intercepted) {
+            msr_log(msr, 4, "Phase REQUEST_BODY request already intercepted.  Intercepting additional request.");
+            return perform_interception(msr);
+        }
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Phase REQUEST_BODY already complete, skipping.");
         }

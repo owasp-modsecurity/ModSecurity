@@ -549,8 +549,18 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
                     if (  (VALID_HEX(input[i + 2]))&&(VALID_HEX(input[i + 3]))
                         &&(VALID_HEX(input[i + 4]))&&(VALID_HEX(input[i + 5])) )
                     {
-                        /* We make use of the lower byte here, ignoring the higher byte. */
-                        *d++ = x2c(&input[i + 4]);
+                        /* We first make use of the lower byte here, ignoring the higher byte. */
+                        *d = x2c(&input[i + 4]);
+
+                        /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
+                        if (   (*d > 0x00) && (*d < 0x5f)
+                            && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
+                            && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
+                        {
+                            *d += 0x20;
+                        }
+
+                        d++;
                         count++;
                         i += 6;
                     } else {

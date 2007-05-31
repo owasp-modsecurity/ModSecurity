@@ -1,5 +1,11 @@
-25 Apr 2007 - 2.1.1-breach1
----------------------------
+31 May 2007 - 2.1.2-rc1
+-----------------------
+
+ * Fixed problem with subrequests not being intercepted (only logged).
+
+ * Fixed decoding full-width unicode in t:urlDecodeUni.
+
+ * Only calculate debugging vars when we are debugging.
 
  * Added SecAuditLog2 directive to allow redundent concurrent audit log
    index files.  This will allow sending audit data to two consoles, etc.
