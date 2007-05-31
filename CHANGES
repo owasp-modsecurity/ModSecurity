@@ -2,6 +2,10 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
+ * TODO: Add file/line to audit log
+
+ * TODO: Detect static files (trac #15)
+
  * Added new parallel matching operators, @pm and @pmfile.  These use
    an alternate set based matching engine to perform faster keyword
    type matches.
