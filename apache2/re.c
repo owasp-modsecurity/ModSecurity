@@ -1282,9 +1282,6 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
 
     /* Use a fresh memory sub-pool for processing each rule */
     if (msr->msc_rule_mptmp == NULL) {
-        if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "Creating new rule processing memory pool");
-        }
         if (apr_pool_create(&msr->msc_rule_mptmp, msr->mp) != APR_SUCCESS) {
             return -1;
         }
