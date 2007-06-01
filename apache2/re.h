@@ -226,6 +226,7 @@ struct msre_actionset {
     const char              *msg;
     int                      severity;
     int                      phase;
+    msre_rule               *rule;
 
     /* Flow */
     int                      is_chained;
