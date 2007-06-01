@@ -295,15 +295,15 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
     rc = acmp_process_quick(&pt, &match, var->value, var->value_len);
     if (rc) {
-        char *pattern_escaped = log_escape(msr->mp, match ? match : "<Unknown Pattern>");
+        char *match_escaped = log_escape(msr->mp, match ? match : "<Unknown Match>");
 
         /* This message will be logged. */
-        if (strlen(pattern_escaped) > 252) {
-            *error_msg = apr_psprintf(msr->mp, "Pattern match \"%.252s ...\" at %s.",
-                pattern_escaped, var->name);
+        if (strlen(match_escaped) > 252) {
+            *error_msg = apr_psprintf(msr->mp, "Matched substring \"%.252s ...\" at %s.",
+                match_escaped, var->name);
         } else {
-            *error_msg = apr_psprintf(msr->mp, "Pattern match \"%s\" at %s.",
-                pattern_escaped, var->name);
+            *error_msg = apr_psprintf(msr->mp, "Matched substring \"%s\" at %s.",
+                match_escaped, var->name);
         }
         return 1;
     }
