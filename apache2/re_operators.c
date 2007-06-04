@@ -208,9 +208,9 @@ static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
     return 1;
 }
 
-/* pmfile */
+/* pmFromFile */
 
-static int msre_op_pmfile_param_init(msre_rule *rule, char **error_msg) {
+static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     char errstr[1024];
     char buf[HUGE_STRING_LEN + 1];
     char *ptr = NULL;
@@ -242,12 +242,12 @@ static int msre_op_pmfile_param_init(msre_rule *rule, char **error_msg) {
         /* Open file and read */
         rc = apr_file_open(&fd, fn, APR_READ | APR_FILE_NOCLEANUP, 0, rule->ruleset->mp);
         if (rc != APR_SUCCESS) {
-            *error_msg = apr_psprintf(rule->ruleset->mp, "Could not open pmfile \"%s\": %s", fn, apr_strerror(rc, errstr, 1024));
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Could not open phrase file \"%s\": %s", fn, apr_strerror(rc, errstr, 1024));
             return 0;
         }
 
         #ifdef DEBUG_CONF
-        fprintf(stderr, "Loading pmfile: \"%s\"\n", fn);
+        fprintf(stderr, "Loading phrase file: \"%s\"\n", fn);
         #endif
 
         /* Read one pattern per line skipping empty/commented */
@@ -271,7 +271,7 @@ static int msre_op_pmfile_param_init(msre_rule *rule, char **error_msg) {
             if ((*ptr == '\0') || (*ptr == '#')) continue;
 
             #ifdef DEBUG_CONF
-            fprintf(stderr, "Adding pmfile pattern: \"%s\"\n", buf);
+            fprintf(stderr, "Adding phrase file pattern: \"%s\"\n", buf);
             #endif
 
             acmp_add_pattern(p, buf, NULL, NULL, strlen(buf));
@@ -299,10 +299,10 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
         /* This message will be logged. */
         if (strlen(match_escaped) > 252) {
-            *error_msg = apr_psprintf(msr->mp, "Matched substring \"%.252s ...\" at %s.",
+            *error_msg = apr_psprintf(msr->mp, "Matched phrase \"%.252s ...\" at %s.",
                 match_escaped, var->name);
         } else {
-            *error_msg = apr_psprintf(msr->mp, "Matched substring \"%s\" at %s.",
+            *error_msg = apr_psprintf(msr->mp, "Matched phrase \"%s\" at %s.",
                 match_escaped, var->name);
         }
         return 1;
@@ -1353,10 +1353,10 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_pm_execute
     );
 
-    /* pmfile */
+    /* pmFromFile */
     msre_engine_op_register(engine,
-        "pmfile",
-        msre_op_pmfile_param_init,
+        "pmFromFile",
+        msre_op_pmFromFile_param_init,
         msre_op_pm_execute
     );
 

@@ -6,9 +6,9 @@
 
  * Added rule file/line to audit log messages.
 
- * Added new parallel matching operators, @pm and @pmfile.  These use
-   an alternate set based matching engine to perform faster keyword
-   type matches.
+ * Added new phrase matching operators, @pm and @pmFromFile.  These use
+   an alternate set based matching engine to perform faster phrase
+   type matches such as black/white lists, spam keywords, etc.
 
  * Cache transformations per-request/phase so they are not repeated.
 

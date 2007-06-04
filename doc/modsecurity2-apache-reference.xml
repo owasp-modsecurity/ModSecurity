@@ -4290,9 +4290,10 @@ SecRule ARGS:route "!<emphasis role="bold">@endsWith %{REQUEST_ADDR}</emphasis>"
     <section>
       <title><literal>pm</literal></title>
 
-      <para><emphasis role="bold">Description:</emphasis> Parallel Match
-      operator. This operator uses a set based matching engine for faster
-      matches of keyword lists.</para>
+      <para><emphasis role="bold">Description:</emphasis> Phrase Match
+      operator. This operator uses a set based matching engine (Aho-Corasick)
+      for faster matches of keyword lists. It will match any one of its
+      arguments anywhere in the target value.</para>
 
       <para>Example:</para>
 
@@ -4304,13 +4305,16 @@ SecRule ARGS:route "!<emphasis role="bold">@endsWith %{REQUEST_ADDR}</emphasis>"
     </section>
 
     <section>
-      <title><literal>pmfile</literal></title>
+      <title><literal>pmFromFile</literal></title>
 
-      <para><emphasis role="bold">Description:</emphasis> Parallel Match
-      operator. This operator uses a set based matching engine for faster
-      matches of keyword lists. It is the same as <literal>@pm</literal>
-      except that it takes a list of files arguments. The contents of the
-      files should be one pattern per line.</para>
+      <para><emphasis role="bold">Description:</emphasis> Phrase Match
+      operator. This operator uses a set based matching engine (Aho-Corasick)
+      for faster matches of keyword lists. This operator is the same as
+      <literal>@pm</literal> except that it takes a list of files as
+      arguments. It will match any one of the phrases listed in the file(s)
+      anywhere in the target value. The contents of the files should be one
+      phrase per line. End of line markers will be stripped from the phrases,
+      however, whitespace will not be trimmed from phrases in the file.</para>
 
       <para>Example:</para>
 
