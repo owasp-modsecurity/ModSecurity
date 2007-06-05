@@ -1364,8 +1364,8 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
         {
             const apr_array_header_t *tarr;
             const apr_table_entry_t *telts;
-            msc_cache_rec **carr = NULL;
-            msc_cache_rec *crec = NULL;
+            msre_cache_rec **carr = NULL;
+            msre_cache_rec *crec = NULL;
             char *tfnsvar = NULL;
             char *tfnskey = NULL;
             int tfnscount = 0;
@@ -1417,7 +1417,7 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
             if (usecache && tfnscount > 1 && !multi_match) {
                 crec = NULL;
                 msr_log(msr, 9, "CACHE: Fetching %s (multi)", tfnskey);
-                carr = (msc_cache_rec **)apr_hash_get(msr->tcache, tfnskey, APR_HASH_KEY_STRING);
+                carr = (msre_cache_rec **)apr_hash_get(msr->tcache, tfnskey, APR_HASH_KEY_STRING);
                 if (carr != NULL) {
                     crec = carr[msr->phase];
                 }
@@ -1500,7 +1500,7 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                     /* Try to fetch this transformation from cache */
                     msr_log(msr, 9, "CACHE: Fetching %s", tfnskey);
                     crec = NULL;
-                    carr = (msc_cache_rec **)apr_hash_get(msr->tcache, tfnskey, APR_HASH_KEY_STRING);
+                    carr = (msre_cache_rec **)apr_hash_get(msr->tcache, tfnskey, APR_HASH_KEY_STRING);
                     if (carr != NULL) {
                         crec = carr[msr->phase];
                     }
@@ -1532,12 +1532,12 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                 if (usecache) {
                     /* ENH1: Add flag to vars to tell which ones can change across phases store the rest in a global cache */
                     if (carr == NULL) {
-                        carr = (msc_cache_rec **)apr_pcalloc(msr->mp, (sizeof(msc_cache_rec *) * (PHASE_LAST + 1)));
+                        carr = (msre_cache_rec **)apr_pcalloc(msr->mp, (sizeof(msc_cache_rec *) * (PHASE_LAST + 1)));
                         if (carr == NULL) return -1;
                         memset(carr, 0, (sizeof(msc_cache_rec *) * (PHASE_LAST + 1)));
                         apr_hash_set(msr->tcache, tfnskey, APR_HASH_KEY_STRING, carr);
                     }
-                    crec = carr[msr->phase] = (msc_cache_rec *)apr_pcalloc(msr->mp, sizeof(msc_cache_rec));
+                    crec = carr[msr->phase] = (msre_cache_rec *)apr_pcalloc(msr->mp, sizeof(msre_cache_rec));
                     if (crec == NULL) return -1;
 
                     crec->hits = 0;

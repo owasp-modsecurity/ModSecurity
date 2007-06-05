@@ -28,6 +28,7 @@ typedef struct msre_tfn_metadata msre_tfn_metadata;
 typedef struct msre_actionset msre_actionset;
 typedef struct msre_action_metadata msre_action_metadata;
 typedef struct msre_action msre_action;
+typedef struct msre_cache_rec msre_cache_rec;
 
 #include "apr_general.h"
 #include "apr_tables.h"
@@ -303,5 +304,16 @@ apr_status_t DSOLOCAL msre_parse_vars(msre_ruleset *ruleset, const char *text,
     apr_array_header_t *arr, char **error_msg);
 
 char DSOLOCAL *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset);
+
+
+/* -- Data Cache -- */
+
+struct msre_cache_rec {
+    int                      hits;
+    int                      changed;
+    const char              *key;
+    const char              *val;
+    apr_size_t               val_len;
+};
 
 #endif

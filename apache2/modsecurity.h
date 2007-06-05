@@ -502,14 +502,4 @@ void DSOLOCAL msc_alert(modsec_rec *msr, int level, msre_actionset *actionset, c
 
 apr_status_t DSOLOCAL modsecurity_request_body_clear(modsec_rec *msr);
 
-/* Data Cache */
-
-struct msc_cache_rec {
-    int                      hits;
-    int                      changed;
-    const char              *key;
-    const char              *val;
-    apr_size_t               val_len;
-};
-
 #endif
