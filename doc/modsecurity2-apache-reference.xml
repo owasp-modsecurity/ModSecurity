@@ -2814,6 +2814,22 @@ SecRule REQBODY_PROCESSOR "<emphasis role="bold">!^XML$</emphasis>" skip:2
 SecRule <emphasis role="bold">XML:/employees/employee/name/text()</emphasis> Fred
 SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> Fred \
     xmlns:xq=http://www.example.com/employees</programlisting>
+
+      <para>To learn more about XPath we suggest the following
+      resources:</para>
+
+      <orderedlist>
+        <listitem>
+          <para><ulink url="http://www.w3.org/TR/xpath">XPath
+          Standard</ulink></para>
+        </listitem>
+
+        <listitem>
+          <para><ulink
+          url="http://www.zvon.org/xxl/XPathTutorial/General/examples.html">XPath
+          Tutorial</ulink></para>
+        </listitem>
+      </orderedlist>
     </section>
   </section>
 
