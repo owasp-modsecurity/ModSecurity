@@ -83,8 +83,8 @@ int perform_interception(modsec_rec *msr) {
      */
     log_level = (actionset->log != 1) ? 4 : 1;
 
-    /* Pause the request first (if configured to do so). */
-    if (actionset->intercept_pause) {
+    /* Pause the request first (if configured to do so and the main request). */
+    if (actionset->intercept_pause && (msr->r->main == NULL)) {
         msr_log(msr, (log_level > 3 ? log_level : log_level + 1), "Pausing transaction for "
             "%i msec.", actionset->intercept_pause);
         /* apr_sleep accepts microseconds */
