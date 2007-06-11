@@ -25,7 +25,6 @@ typedef struct msc_engine msc_engine;
 typedef struct msc_data_chunk msc_data_chunk;
 typedef struct msc_arg msc_arg;
 typedef struct msc_string msc_string;
-typedef struct msc_cache_rec msc_cache_rec;
 
 #if !(defined(WIN32) || defined(NETWARE) || defined(SOLARIS2))
 #define DSOLOCAL __attribute__((visibility("hidden")))

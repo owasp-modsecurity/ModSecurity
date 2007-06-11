@@ -1532,9 +1532,9 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                 if (usecache) {
                     /* ENH1: Add flag to vars to tell which ones can change across phases store the rest in a global cache */
                     if (carr == NULL) {
-                        carr = (msre_cache_rec **)apr_pcalloc(msr->mp, (sizeof(msc_cache_rec *) * (PHASE_LAST + 1)));
+                        carr = (msre_cache_rec **)apr_pcalloc(msr->mp, (sizeof(msre_cache_rec *) * (PHASE_LAST + 1)));
                         if (carr == NULL) return -1;
-                        memset(carr, 0, (sizeof(msc_cache_rec *) * (PHASE_LAST + 1)));
+                        memset(carr, 0, (sizeof(msre_cache_rec *) * (PHASE_LAST + 1)));
                         apr_hash_set(msr->tcache, tfnskey, APR_HASH_KEY_STRING, carr);
                     }
                     crec = carr[msr->phase] = (msre_cache_rec *)apr_pcalloc(msr->mp, sizeof(msre_cache_rec));
@@ -1588,13 +1588,13 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
     if (msr->txcfg->debuglog_level >= 9) {
         apr_hash_index_t *hi;
         void *dummy;
-        msc_cache_rec **rec;
+        msre_cache_rec **rec;
         int hn = 0;
         int ri;
         for (hi = apr_hash_first(msr->mp, msr->tcache); hi; hi = apr_hash_next(hi)) {
             hn++;
             apr_hash_this(hi, NULL, NULL, &dummy);
-            rec = (msc_cache_rec **)dummy;
+            rec = (msre_cache_rec **)dummy;
             if (rec == NULL) continue;
 
             for (ri = PHASE_FIRST; ri <= PHASE_LAST; ri++) {
