@@ -2,9 +2,9 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
- * TODO: Detect static files (trac #15)
+ * Do not trigger "pause" action for subrequests.
 
- * Added rule file/line to audit log messages.
+ * Added matching rule filename and line number to audit log.
 
  * Added new phrase matching operators, @pm and @pmFromFile.  These use
    an alternate set based matching engine to perform faster phrase
@@ -14,10 +14,10 @@
 
  * Fixed problem with subrequests not being intercepted (only logged).
 
- * Add Solaris to the list of platforms not supporting the hidden
+ * Added Solaris to the list of platforms not supporting the hidden
    visibility attribute.
 
- * Remove excessive debug log entries about "capture" action.
+ * Removed excessive debug log entries about "capture" action.
 
  * Fixed decoding full-width unicode in t:urlDecodeUni.
 

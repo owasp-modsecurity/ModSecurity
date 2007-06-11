@@ -79,9 +79,10 @@ int perform_interception(modsec_rec *msr) {
     phase_text = apr_psprintf(msr->mp, " (phase %i)", msr->phase);
 
     /* By default we log at level 1 but we switch to 4
-     * if a nolog action was used to hide the message.
+     * if a nolog action was used or this is a subrequest
+     * to hide the message.
      */
-    log_level = (actionset->log != 1) ? 4 : 1;
+    log_level = ((actionset->log != 1) || (msr->r->main != NULL)) ? 4 : 1;
 
     /* Pause the request first (if configured to do so and the main request). */
     if (actionset->intercept_pause && (msr->r->main == NULL)) {
