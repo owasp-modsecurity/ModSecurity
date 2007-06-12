@@ -1,11 +1,20 @@
 31 May 2007 - 2.1.2-rc1
 -----------------------
 
- * Fixed problem with subrequests not being intercepted (only logged).
+ * Do not trigger "pause" action for internal requests.
+
+ * Fixed issue with requests that use internal requests.  These had the
+   potential to be intercepted incorrectly when other Apache httpd modules
+   that used internal requests were used with mod_security.
+
 
  * Fixed decoding full-width unicode in t:urlDecodeUni.
 
- * Only calculate debugging vars when we are debugging.
+ * Lessen some overhead of debugging messages and calculations.
+
+ * Do not try to intercept a request after a failed rule.  This fixes the
+   issue associated with an "Internal Error: Asked to intercept request
+   but was_intercepted is zero" error message.
 
  * Added SecAuditLog2 directive to allow redundent concurrent audit log
    index files.  This will allow sending audit data to two consoles, etc.

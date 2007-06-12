@@ -54,9 +54,24 @@ int perform_interception(modsec_rec *msr) {
     msre_actionset *actionset = NULL;
     const char *message = NULL;
     const char *phase_text = "";
-    const char *subreq_text = (msr->r->main == NULL) ? "" : "Subrequest. ";
+    const char *intreq_text = "";
+    int is_initial_req = ap_is_initial_req(msr->r);
     int status = DECLINED;
     int log_level = 1;
+
+    /* Check for an initial request */
+
+    if (is_initial_req != 1) {
+        if (msr->r->main != NULL) {
+            intreq_text = "Sub-Request: ";
+        }
+        else if (msr->r->prev != NULL) {
+            intreq_text = "Internal Redirect: ";
+        }
+        else {
+            intreq_text = "Internal Request: ";
+        }
+    }
 
     /* Sanity checks first. */
 
@@ -67,6 +82,7 @@ int perform_interception(modsec_rec *msr) {
 
     if (msr->phase > 4) {
         msr_log(msr, 1, "Internal Error: Asked to intercept request in phase %i.", msr->phase);
+        msr->was_intercepted = 0;
         return DECLINED;
     }
 
@@ -76,12 +92,13 @@ int perform_interception(modsec_rec *msr) {
     phase_text = apr_psprintf(msr->mp, " (phase %i)", msr->phase);
 
     /* By default we log at level 1 but we switch to 4
-     * if a nolog action was used to hide the message.
+     * if a nolog action was used or this is not the initial request
+     * to hide the message.
      */
-    log_level = (actionset->log != 1) ? 4 : 1;
+    log_level = ((actionset->log != 1) || (is_initial_req != 1)) ? 4 : 1;
 
-    /* Pause the request first (if configured to do so). */
-    if (actionset->intercept_pause) {
+    /* Pause the request first (if configured and the initial request). */
+    if (actionset->intercept_pause && (is_initial_req == 1)) {
         msr_log(msr, (log_level > 3 ? log_level : log_level + 1), "Pausing transaction for "
             "%i msec.", actionset->intercept_pause);
         /* apr_sleep accepts microseconds */
@@ -94,13 +111,13 @@ int perform_interception(modsec_rec *msr) {
             if (actionset->intercept_status != 0) {
                 status = actionset->intercept_status;
                 message = apr_psprintf(msr->mp, "%sAccess denied with code %i%s.",
-                    subreq_text, status, phase_text);
+                    intreq_text, status, phase_text);
             } else {
                 log_level = 1;
                 status = HTTP_INTERNAL_SERVER_ERROR;
                 message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                     "(Internal Error: Invalid status code requested %i).",
-                    subreq_text, phase_text, actionset->intercept_status);
+                    intreq_text, phase_text, actionset->intercept_status);
             }
             break;
 
@@ -111,15 +128,15 @@ int perform_interception(modsec_rec *msr) {
                     status = HTTP_INTERNAL_SERVER_ERROR;
                     message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                         "(Configuration Error: Proxy action to %s requested but mod_proxy not found).",
-                        subreq_text, phase_text,
+                        intreq_text, phase_text,
                         log_escape_nq(msr->mp, actionset->intercept_uri));
                 } else {
                     msr->r->filename = apr_psprintf(msr->mp, "proxy:%s", actionset->intercept_uri);
                     msr->r->proxyreq = PROXYREQ_REVERSE;
                     msr->r->handler = "proxy-server";
                     status = OK;
-                    message = apr_psprintf(msr->mp, "%sAccess denied using proxy to %s%s.",
-                        subreq_text, phase_text,
+                    message = apr_psprintf(msr->mp, "%sAccess denied using proxy to%s %s.",
+                        intreq_text, phase_text,
                         log_escape_nq(msr->mp, actionset->intercept_uri));
                 }
             } else {
@@ -127,7 +144,7 @@ int perform_interception(modsec_rec *msr) {
                 status = HTTP_INTERNAL_SERVER_ERROR;
                 message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                     "(Configuration Error: Proxy action requested but it does not work in output phases).",
-                    subreq_text, phase_text);
+                    intreq_text, phase_text);
             }
             break;
 
@@ -145,21 +162,21 @@ int perform_interception(modsec_rec *msr) {
                     if (apr_socket_close(csd) == APR_SUCCESS) {
                         status = HTTP_FORBIDDEN;
                         message = apr_psprintf(msr->mp, "%sAccess denied with connection close%s.",
-                            subreq_text, phase_text);
+                            intreq_text, phase_text);
                     } else {
                         log_level = 1;
                         status = HTTP_INTERNAL_SERVER_ERROR;
                         message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                             "(Error: Connection drop requested but failed to close the "
                             " socket).",
-                            subreq_text, phase_text);
+                            intreq_text, phase_text);
                     }
                 } else {
                     log_level = 1;
                     status = HTTP_INTERNAL_SERVER_ERROR;
                     message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                         "(Error: Connection drop requested but socket not found.",
-                        subreq_text, phase_text);
+                        intreq_text, phase_text);
                 }
             }
             #else
@@ -167,7 +184,7 @@ int perform_interception(modsec_rec *msr) {
             status = HTTP_INTERNAL_SERVER_ERROR;
             message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                 "(Error: Connection drop not implemented on this platform).",
-                subreq_text, phase_text);
+                intreq_text, phase_text);
             #endif
             break;
 
@@ -182,14 +199,15 @@ int perform_interception(modsec_rec *msr) {
             }
             message = apr_psprintf(msr->mp, "%sAccess denied with redirection to %s using "
                 "status %i%s.",
-                subreq_text,
+                intreq_text,
                 log_escape_nq(msr->mp, actionset->intercept_uri), status,
                 phase_text);
             break;
 
         case ACTION_ALLOW :
             status = DECLINED;
-            message = apr_psprintf(msr->mp, "%sAccess allowed%s.", subreq_text, phase_text);
+            message = apr_psprintf(msr->mp, "%sAccess allowed%s.", intreq_text, phase_text);
+            msr->was_intercepted = 0;
             break;
 
         default :
@@ -197,7 +215,7 @@ int perform_interception(modsec_rec *msr) {
             status = HTTP_INTERNAL_SERVER_ERROR;
             message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                 "(Internal Error: invalid interception action %i).",
-                subreq_text, phase_text, actionset->intercept_action);
+                intreq_text, phase_text, actionset->intercept_action);
             break;
     }
 
@@ -533,7 +551,7 @@ static int hook_request_early(request_rec *r) {
 
     /* Process phase REQUEST_HEADERS */
     rc = DECLINED;
-    if (modsecurity_process_phase(msr, PHASE_REQUEST_HEADERS)) {
+    if (modsecurity_process_phase(msr, PHASE_REQUEST_HEADERS) > 0) {
         rc = perform_interception(msr);
     }
 
@@ -646,7 +664,7 @@ static int hook_request_late(request_rec *r) {
     record_time_checkpoint(msr, 1);
 
     rc = DECLINED;
-    if (modsecurity_process_phase(msr, PHASE_REQUEST_BODY)) {
+    if (modsecurity_process_phase(msr, PHASE_REQUEST_BODY) > 0) {
         rc = perform_interception(msr);
     }
 
@@ -838,12 +856,11 @@ static int hook_log_transaction(request_rec *r) {
 static void hook_insert_filter(request_rec *r) {
     modsec_rec *msr = NULL;
 
-    /* Find the transaction context and make sure we are
-     * supposed to proceed.
-     */
+    /* Find the transaction context first. */
     msr = retrieve_tx_context(r);
     if (msr == NULL) return;
 
+    /* Only proceed to add the filter if the engine is enabled. */
     if (msr->txcfg->is_enabled == 0) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_filter: Processing disabled, skipping.");
@@ -851,10 +868,12 @@ static void hook_insert_filter(request_rec *r) {
         return;
     }
 
+    /* Add the input filter, but only if we need it to run. */
     if (msr->if_status == IF_STATUS_WANTS_TO_RUN) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_filter: Adding input forwarding filter (r %x).", r);
         }
+
         ap_add_input_filter("MODSECURITY_IN", msr, r, r->connection);
     }
 
@@ -866,6 +885,7 @@ static void hook_insert_filter(request_rec *r) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_filter: Adding output filter (r %x).", r);
         }
+
         ap_add_output_filter("MODSECURITY_OUT", msr, r, r->connection);
     }
 }
