@@ -245,7 +245,7 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
  * Logs one message at the given level to the debug log (and to the
  * Apache error log if the message is important enough.
  */
-void _msr_log(modsec_rec *msr, int level, const char *text, ...) {
+void msr_log(modsec_rec *msr, int level, const char *text, ...) {
     va_list ap;
 
     va_start(ap, text);

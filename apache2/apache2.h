@@ -63,14 +63,7 @@ char DSOLOCAL *get_env_var(request_rec *r, char *name);
 void DSOLOCAL internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
     int level, const char *text, va_list ap);
 
-
-/* msr_log is now a macro to avoid function call overhead.  Nothing
- * is done to avoid expansion of arguments, so do not call with 
- * arguments that cannot be duplicated (ie no level++, etc.)
- */
-void DSOLOCAL _msr_log(modsec_rec *msr, int level, const char *text, ...);
-#define msr_log(msr, lvl, ...) \
-    do { if ((msr->txcfg != NULL) && (lvl <= msr->txcfg->debuglog_level)) _msr_log(msr, lvl, __VA_ARGS__); } while(0)
+void DSOLOCAL msr_log(modsec_rec *msr, int level, const char *text, ...);
 
 char DSOLOCAL *format_error_log_message(apr_pool_t *mp, error_message *em);
 
