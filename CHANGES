@@ -2,6 +2,8 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
+ * Update included core rules to latest version.
+
  * Do not trigger "pause" action for internal requests.
 
  * Added matching rule filename and line number to audit log.
