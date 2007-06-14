@@ -60,7 +60,7 @@ int perform_interception(modsec_rec *msr) {
 
     /* Check for an initial request */
 
-    if (is_initial_req == 0) {
+    if (is_initial_req != 1) {
         if (msr->r->main != NULL) {
             intreq_text = "Sub-Request: ";
         }
@@ -95,7 +95,7 @@ int perform_interception(modsec_rec *msr) {
      * if a nolog action was used or this is not the initial request
      * to hide the message.
      */
-    log_level = ((actionset->log != 1) || (is_initial_req == 0)) ? 4 : 1;
+    log_level = ((actionset->log != 1) || (is_initial_req != 1)) ? 4 : 1;
 
     /* Pause the request first (if configured and the initial request). */
     if (actionset->intercept_pause && (is_initial_req == 1)) {
