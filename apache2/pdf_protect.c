@@ -225,11 +225,14 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
     if (msr == NULL) {
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, f->r->server,
             "ModSecurity: Internal Error: Unable to retrieve context in PDF output filter.");
+
         ap_remove_output_filter(f);
+
         return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
     }
 
     if (msr->txcfg->pdfp_enabled == 1) {
+        // TODO Should we look at err_headers_out too?
         const char *h_content_type = apr_table_get(f->r->headers_out, "Content-Type");
 
         if (msr->txcfg->debuglog_level >= 9) {
@@ -258,7 +261,7 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
         // TODO application/x-pdf, application/vnd.fdf, application/vnd.adobe.xfdf,
         // application/vnd.adobe.xdp+xml, application/vnd.adobe.xfd+xml, application/vnd.pdf
-        // application/acrobat, text/pdf, text/x-pdf
+        // application/acrobat, text/pdf, text/x-pdf ???
         if (((f->r->content_type != NULL)&&(strcasecmp(f->r->content_type, "application/pdf") == 0))
             || ((h_content_type != NULL)&&(strcasecmp(h_content_type, "application/pdf") == 0)))
         {
@@ -270,13 +273,32 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                     log_escape_nq(msr->mp, r->uri));
             }
 
+            /* If we are configured with ForcedDownload protection method then we
+             * can do our thing here and finish early.
+             */
+            if (msr->txcfg->pdfp_method == PDF_PROTECT_METHOD_FORCED_DOWNLOAD) {
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "PdfProtect: Forcing download of a dynamically "
+                        "generated PDF file.");
+                }
+
+                apr_table_set(f->r->headers_out, "Content-Disposition", DISPOSITION_VALUE);
+                f->r->content_type = ATTACHMENT_MIME_TYPE;
+
+                ap_remove_output_filter(f);
+
+                return ap_pass_brigade(f->next, bb_in);
+            }
+
+            /* If we are here that means TokenRedirection is the desired protection method. */
+
             /* Is this a non-GET request? */
             if ((f->r->method_number != M_GET)&&
                 ((msr->txcfg->pdfp_only_get == 1)||(msr->txcfg->pdfp_only_get == -1))
             ) {
                 /* This is a non-GET request and we have been configured
-                 * not to intercept it. We are not going to do that but
-                 * we are going to tweak the headers to force download.
+                 * not to intercept it. So we are going to tweak the headers
+                 * to force download.
                  */
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "PdfProtect: Forcing download of a dynamically "
@@ -287,6 +309,7 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                 f->r->content_type = ATTACHMENT_MIME_TYPE;
 
                 ap_remove_output_filter(f);
+
                 return ap_pass_brigade(f->next, bb_in);
             }
 
@@ -357,6 +380,15 @@ int pdfp_check(modsec_rec *msr) {
     if (msr->txcfg->pdfp_enabled != 1) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "PdfProtect: Not enabled here.");
+        }
+
+        return 0;
+    }
+
+    if (msr->txcfg->pdfp_method != PDF_PROTECT_METHOD_TOKEN_REDIRECTION) {
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "PdfProtect: Configured with ForcedDownload as protection method, "
+                "skipping detection on the inbound.");
         }
 
         return 0;

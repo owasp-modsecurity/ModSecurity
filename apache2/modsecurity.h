@@ -412,6 +412,7 @@ struct directory_config {
     int                  pdfp_timeout;
     const char          *pdfp_token_name;
     int                  pdfp_only_get;
+    int                  pdfp_method;
 
     /* Geo Lookup */
     geo_db              *geo;
