@@ -1379,7 +1379,6 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                     rc = execute_operator(var, rule, msr, acting_actionset, mptmp);
 
                     if (rc < 0) {
-                        apr_pool_destroy(mptmp);
                         return -1;
                     }
 
@@ -1403,7 +1402,6 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                 rc = metadata->execute(mptmp, (unsigned char *)var->value, var->value_len,
                     &rval, &rval_length);
                 if (rc < 0) {
-                    apr_pool_destroy(mptmp);
                     return -1;
                 }
 
@@ -1429,7 +1427,6 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
             rc = execute_operator(var, rule, msr, acting_actionset, mptmp);
 
             if (rc < 0) {
-                apr_pool_destroy(mptmp);
                 return -1;
             }
 
@@ -1447,7 +1444,6 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
         }
     }
 
-    apr_pool_destroy(mptmp);
 
     return (match_count ? RULE_MATCH : RULE_NO_MATCH);
 }

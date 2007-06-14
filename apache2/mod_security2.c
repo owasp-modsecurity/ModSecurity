@@ -351,6 +351,8 @@ static modsec_rec *create_tx_context(request_rec *r) {
         msr_log(msr, 4, "Transaction context created (dcfg %x).", msr->dcfg1);
     }
 
+    msr->msc_rule_mptmp = NULL;
+
     return msr;    
 }
 
