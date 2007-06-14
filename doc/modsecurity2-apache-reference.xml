@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.2.0-trunk / (May 3, 2007)</releaseinfo>
+    <releaseinfo>Version 2.2.0-trunk / (June 14, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -1087,7 +1087,7 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
-      <title>SecPdfProtect (Experimental)</title>
+      <title><literal>SecPdfProtect</literal> (Experimental)</title>
 
       <para><emphasis role="bold">Description:</emphasis> Enables the PDF XSS
       protection functionality. Once enabled access to PDF files is tracked.
@@ -1101,7 +1101,25 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
-      <title>SecPdfProtectSecret (Experimental)</title>
+      <title><literal>SecPdfProtectMethod</literal> (Experimental)</title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configure desired
+      protection method to be used when requests for PDF files are detected.
+      Possible values are <literal>TokenRedirection</literal> and
+      <literal>ForcedDownload</literal>. The token redirection approach will
+      attempt to redirect with tokens where possible. This allows PDF files to
+      continue to be opened inline but only works for GET requests. Forced
+      download always causes PDF files to be delivered as opaque binaries and
+      attachments. The latter will always be used for non-GET requests. Forced
+      download is considered to be more secure but may cause usability
+      problems for users ("This PDF won't open anymore!").</para>
+
+      <para><emphasis role="bold">Default:</emphasis>
+      <literal>TokenRedirection</literal></para>
+    </section>
+
+    <section>
+      <title><literal>SecPdfProtectSecret</literal> (Experimental)</title>
 
       <para><emphasis role="bold">Description:</emphasis> Defines the secret
       that will be used to construct one-time tokens. You should use a
@@ -1113,7 +1131,7 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
-      <title>SecPdfProtectTimeout (Experimental)</title>
+      <title><literal>SecPdfProtectTimeout</literal> (Experimental)</title>
 
       <para><emphasis role="bold">Description:</emphasis> Defines the token
       timeout. After token expires it can no longer be used to allow access to
@@ -1125,7 +1143,7 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
-      <title>SecPdfProtectTokenName (Experimental)</title>
+      <title><literal>SecPdfProtectTokenName</literal> (Experimental)</title>
 
       <para><emphasis role="bold">Description:</emphasis> Defines the name of
       the token. The only reason you would want to change the name of the
