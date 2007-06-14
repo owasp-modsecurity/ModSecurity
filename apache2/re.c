@@ -1251,12 +1251,16 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
         multi_match = 1;
     }
 
-    /* Create a memory pool that will be used during the
-     * processing of this rule only.
-     */
-    /* IMP1 Why not have one pool and just clear it between rules? */
-    if (apr_pool_create(&mptmp, NULL) != APR_SUCCESS) {
-        return -1;
+    /* Use a fresh memory sub-pool for processing each rule */
+    if (msr->msc_rule_mptmp == NULL) {
+        if (apr_pool_create(&msr->msc_rule_mptmp, msr->mp) != APR_SUCCESS) {
+            return -1;
+        }
+        mptmp = msr->msc_rule_mptmp;
+    }
+    else {
+        mptmp = msr->msc_rule_mptmp;
+        apr_pool_clear(mptmp);
     }
 
     tartab = apr_table_make(mptmp, 24);

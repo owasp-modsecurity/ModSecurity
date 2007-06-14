@@ -21,6 +21,8 @@
  * Added SecAuditLog2 directive to allow redundent concurrent audit log
    index files.  This will allow sending audit data to two consoles, etc.
 
+ * Small performance improvement in memory management for rule execution.
+
 
 11 Apr 2007 - 2.1.1
 -------------------
