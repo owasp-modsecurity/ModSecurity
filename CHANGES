@@ -2,7 +2,7 @@
 ?? ??? 2007 - 2.2.0-trunk
 -------------------------
 
- * Do not trigger "pause" action for subrequests.
+ * Do not trigger "pause" action for internal requests.
 
  * Added matching rule filename and line number to audit log.
 
@@ -12,7 +12,9 @@
 
  * Cache transformations per-request/phase so they are not repeated.
 
- * Fixed problem with subrequests not being intercepted (only logged).
+ * Fixed issue with requests that use internal requests.  These had the
+   potential to be intercepted incorrectly when other Apache httpd modules
+   that used internal requests were used with mod_security.
 
  * Added Solaris to the list of platforms not supporting the hidden
    visibility attribute.
@@ -21,7 +23,8 @@
 
  * Fixed decoding full-width unicode in t:urlDecodeUni.
 
- * Only calculate debugging vars when we are debugging (more to come).
+ * Lessen some overhead of debugging messages and calculations 
+   TODO: more to come
 
  * Removed strnlen() calls for non-GNU platforms.
 

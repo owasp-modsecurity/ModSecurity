@@ -1,13 +1,11 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2006 Thinking Stone (http://www.thinkingstone.com)
- *
- * $Id: mod_security2.c,v 1.11 2006/12/15 15:06:04 ivanr Exp $
+ * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
  * or if you have any other questions related to the licence, please
- * write to Thinking Stone at contact@thinkingstone.com.
+ * write to Breach Security, Inc. at support@breach.com.
  *
  */
 #include <limits.h>
@@ -55,15 +53,30 @@ int perform_interception(modsec_rec *msr) {
     msre_actionset *actionset = NULL;
     const char *message = NULL;
     const char *phase_text = "";
-    const char *subreq_text = (msr->r->main == NULL) ? "" : "Subrequest. ";
+    const char *intreq_text = "";
+    int is_initial_req = ap_is_initial_req(msr->r);
     int status = DECLINED;
     int log_level = 1;
+
+    /* Check for an initial request */
+
+    if (is_initial_req == 0) {
+        if (msr->r->main != NULL) {
+            intreq_text = "Sub-Request: ";
+        }
+        else if (msr->r->prev != NULL) {
+            intreq_text = "Internal Redirect: ";
+        }
+        else {
+            intreq_text = "Internal Request: ";
+        }
+    }
+
 
     /* Sanity checks first. */
 
     if (msr->was_intercepted == 0) {
         msr_log(msr, 1, "Internal Error: Asked to intercept request but was_intercepted is zero");
-        msr->was_intercepted = 0;
         return DECLINED;
     }
 
@@ -79,13 +92,13 @@ int perform_interception(modsec_rec *msr) {
     phase_text = apr_psprintf(msr->mp, " (phase %i)", msr->phase);
 
     /* By default we log at level 1 but we switch to 4
-     * if a nolog action was used or this is a subrequest
+     * if a nolog action was used or this is not the initial request
      * to hide the message.
      */
-    log_level = ((actionset->log != 1) || (msr->r->main != NULL)) ? 4 : 1;
+    log_level = ((actionset->log != 1) || (is_initial_req == 0)) ? 4 : 1;
 
-    /* Pause the request first (if configured to do so and the main request). */
-    if (actionset->intercept_pause && (msr->r->main == NULL)) {
+    /* Pause the request first (if configured and the initial request). */
+    if (actionset->intercept_pause && (is_initial_req == 1)) {
         msr_log(msr, (log_level > 3 ? log_level : log_level + 1), "Pausing transaction for "
             "%i msec.", actionset->intercept_pause);
         /* apr_sleep accepts microseconds */
@@ -98,13 +111,13 @@ int perform_interception(modsec_rec *msr) {
             if (actionset->intercept_status != 0) {
                 status = actionset->intercept_status;
                 message = apr_psprintf(msr->mp, "%sAccess denied with code %i%s.",
-                    subreq_text, status, phase_text);
+                    intreq_text, status, phase_text);
             } else {
                 log_level = 1;
                 status = HTTP_INTERNAL_SERVER_ERROR;
                 message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                     "(Internal Error: Invalid status code requested %i).",
-                    subreq_text, phase_text, actionset->intercept_status);
+                    intreq_text, phase_text, actionset->intercept_status);
             }
             break;
 
@@ -115,15 +128,15 @@ int perform_interception(modsec_rec *msr) {
                     status = HTTP_INTERNAL_SERVER_ERROR;
                     message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                         "(Configuration Error: Proxy action to %s requested but mod_proxy not found).",
-                        subreq_text, phase_text,
+                        intreq_text, phase_text,
                         log_escape_nq(msr->mp, actionset->intercept_uri));
                 } else {
                     msr->r->filename = apr_psprintf(msr->mp, "proxy:%s", actionset->intercept_uri);
                     msr->r->proxyreq = PROXYREQ_REVERSE;
                     msr->r->handler = "proxy-server";
                     status = OK;
-                    message = apr_psprintf(msr->mp, "%sAccess denied using proxy to %s%s.",
-                        subreq_text, phase_text,
+                    message = apr_psprintf(msr->mp, "%sAccess denied using proxy to%s %s.",
+                        intreq_text, phase_text,
                         log_escape_nq(msr->mp, actionset->intercept_uri));
                 }
             } else {
@@ -131,7 +144,7 @@ int perform_interception(modsec_rec *msr) {
                 status = HTTP_INTERNAL_SERVER_ERROR;
                 message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                     "(Configuration Error: Proxy action requested but it does not work in output phases).",
-                    subreq_text, phase_text);
+                    intreq_text, phase_text);
             }
             break;
 
@@ -149,21 +162,21 @@ int perform_interception(modsec_rec *msr) {
                     if (apr_socket_close(csd) == APR_SUCCESS) {
                         status = HTTP_FORBIDDEN;
                         message = apr_psprintf(msr->mp, "%sAccess denied with connection close%s.",
-                            subreq_text, phase_text);
+                            intreq_text, phase_text);
                     } else {
                         log_level = 1;
                         status = HTTP_INTERNAL_SERVER_ERROR;
                         message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                             "(Error: Connection drop requested but failed to close the "
                             " socket).",
-                            subreq_text, phase_text);
+                            intreq_text, phase_text);
                     }
                 } else {
                     log_level = 1;
                     status = HTTP_INTERNAL_SERVER_ERROR;
                     message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                         "(Error: Connection drop requested but socket not found.",
-                        subreq_text, phase_text);
+                        intreq_text, phase_text);
                 }
             }
             #else
@@ -171,7 +184,7 @@ int perform_interception(modsec_rec *msr) {
             status = HTTP_INTERNAL_SERVER_ERROR;
             message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                 "(Error: Connection drop not implemented on this platform).",
-                subreq_text, phase_text);
+                intreq_text, phase_text);
             #endif
             break;
 
@@ -186,14 +199,14 @@ int perform_interception(modsec_rec *msr) {
             }
             message = apr_psprintf(msr->mp, "%sAccess denied with redirection to %s using "
                 "status %i%s.",
-                subreq_text,
+                intreq_text,
                 log_escape_nq(msr->mp, actionset->intercept_uri), status,
                 phase_text);
             break;
 
         case ACTION_ALLOW :
             status = DECLINED;
-            message = apr_psprintf(msr->mp, "%sAccess allowed%s.", subreq_text, phase_text);
+            message = apr_psprintf(msr->mp, "%sAccess allowed%s.", intreq_text, phase_text);
             msr->was_intercepted = 0;
             break;
 
@@ -202,7 +215,7 @@ int perform_interception(modsec_rec *msr) {
             status = HTTP_INTERNAL_SERVER_ERROR;
             message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
                 "(Internal Error: invalid interception action %i).",
-                subreq_text, phase_text, actionset->intercept_action);
+                intreq_text, phase_text, actionset->intercept_action);
             break;
     }
 

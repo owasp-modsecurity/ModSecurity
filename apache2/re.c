@@ -1,13 +1,11 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2006 Thinking Stone (http://www.thinkingstone.com)
- *
- * $Id: re.c,v 1.15 2006/12/29 10:44:25 ivanr Exp $
+ * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
  * or if you have any other questions related to the licence, please
- * write to Thinking Stone at contact@thinkingstone.com.
+ * write to Breach Security, Inc. at support@breach.com.
  *
  */
 #include <ctype.h>
@@ -1438,7 +1436,19 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
 
                     rc = execute_operator(var, rule, msr, acting_actionset, mptmp);
 
-                    return (rc < 0) ? : rc;
+                    if (rc < 0) {
+                        return -1;
+                    }
+                    if (rc == RULE_MATCH) {
+                        /* Return straight away if the transaction
+                        * was intercepted - no need to process the remaining
+                        * targets.
+                        */
+                        if (msr->was_intercepted) {
+                            return RULE_MATCH;
+                        }
+                    }
+                    continue; /* next target */
                 }
             }
 

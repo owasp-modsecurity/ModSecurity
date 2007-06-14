@@ -1,13 +1,11 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2006 Thinking Stone (http://www.thinkingstone.com)
- *
- * $Id$
+ * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
  * or if you have any other questions related to the licence, please
- * write to Thinking Stone at contact@thinkingstone.com.
+ * write to Breach Security, Inc. at support@breach.com.
  *
  */
 #ifndef _APACHE2_H_
@@ -65,7 +63,14 @@ char DSOLOCAL *get_env_var(request_rec *r, char *name);
 void DSOLOCAL internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
     int level, const char *text, va_list ap);
 
-void DSOLOCAL msr_log(modsec_rec *msr, int level, const char *text, ...);
+
+/* msr_log is now a macro to avoid function call overhead.  Nothing
+ * is done to avoid expansion of arguments, so do not call with 
+ * arguments that cannot be duplicated (ie no level++, etc.)
+ */
+void DSOLOCAL _msr_log(modsec_rec *msr, int level, const char *text, ...);
+#define msr_log(msr, lvl, ...) \
+    do { if ((msr->txcfg != NULL) && (lvl <= msr->txcfg->debuglog_level)) _msr_log(msr, lvl, __VA_ARGS__); } while(0)
 
 char DSOLOCAL *format_error_log_message(apr_pool_t *mp, error_message *em);
 
