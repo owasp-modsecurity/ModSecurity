@@ -547,6 +547,14 @@ struct directory_config {
     int                 stream_inbody_inspection;
     int                 stream_outbody_inspection;
 
+    /* PDF XSS Protection. */
+    int                  pdfp_enabled;
+    const char          *pdfp_secret;
+    int                  pdfp_timeout;
+    const char          *pdfp_token_name;
+    int                  pdfp_only_get;
+    int                  pdfp_method;
+
     /* Geo Lookup */
     geo_db              *geo;
 
