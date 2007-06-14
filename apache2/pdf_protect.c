@@ -400,12 +400,14 @@ int pdfp_check(modsec_rec *msr) {
         return 0;
     }
 
-    /* Ignore request methods other than GET if
+    /* Ignore request methods other than GET and HEAD if
      * configured to do so.
      */
-    if ((msr->r->method_number != M_GET)&&(cfg->pdfp_only_get != 0)) {
+    if ((msr->r->method_number != M_GET)&&(msr->r->method_number != M_HEAD)
+        &&(cfg->pdfp_only_get != 0))
+    {
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "PdfProtect: Configured not to intercept non-GET requests "
+            msr_log(msr, 4, "PdfProtect: Not intercepting a GET/HEAD request "
             "(method=%s/%i).", log_escape_nq(msr->mp, msr->r->method), msr->r->method_number);
         }
 

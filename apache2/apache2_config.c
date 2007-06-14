@@ -456,7 +456,7 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->pdfp_secret == NOT_SET_P) dcfg->pdfp_secret = NULL;
     if (dcfg->pdfp_timeout == NOT_SET) dcfg->pdfp_timeout = 10;
     if (dcfg->pdfp_token_name == NOT_SET_P) dcfg->pdfp_token_name = "PDFPTOKEN";
-    if (dcfg->pdfp_only_get == NOT_SET) dcfg->pdfp_only_get = 0;
+    if (dcfg->pdfp_only_get == NOT_SET) dcfg->pdfp_only_get = 1;
 
     /* Geo Lookup */
     if (dcfg->geo == NOT_SET_P) dcfg->geo = NULL;
@@ -1547,7 +1547,7 @@ const command_rec module_directives[] = {
         cmd_pdf_protect_intercept_get_only,
         NULL,
         RSRC_CONF,
-        "whether or not to intercept only GET requess."
+        "whether or not to intercept only GET and HEAD requess. Defaults to true."
     ),
 
     AP_INIT_TAKE1 (
