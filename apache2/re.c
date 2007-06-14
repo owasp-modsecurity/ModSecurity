@@ -1184,7 +1184,9 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
     if (msr->txcfg->debuglog_level >= 4) {
         time_before_regex = apr_time_now(); /* IMP1 time_before_regex? */
     }
+
     rc = rule->op_metadata->execute(msr, rule, var, &my_error_msg);
+
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Operator completed in %" APR_TIME_T_FMT " usec.",
             (apr_time_now() - time_before_regex));
