@@ -7,6 +7,9 @@
    potential to be intercepted incorrectly when other Apache httpd modules
    that used internal requests were used with mod_security.
 
+ * Added Solaris to the list of platforms not supporting the hidden
+   visibility attribute.
+
  * Fixed decoding full-width unicode in t:urlDecodeUni.
 
  * Lessen some overhead of debugging messages and calculations.

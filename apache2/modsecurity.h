@@ -1,13 +1,11 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2006 Thinking Stone (http://www.thinkingstone.com)
- *
- * $Id: modsecurity.h,v 1.27 2007/02/05 12:44:40 ivanr Exp $
+ * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
  * or if you have any other questions related to the licence, please
- * write to Thinking Stone at contact@thinkingstone.com.
+ * write to Breach Security, Inc. at support@breach.com.
  *
  */
 #ifndef _MODSECURITY_H_
@@ -26,7 +24,7 @@ typedef struct msc_data_chunk msc_data_chunk;
 typedef struct msc_arg msc_arg;
 typedef struct msc_string msc_string;
 
-#if !(defined(WIN32) || defined(NETWARE))
+#if !(defined(WIN32) || defined(NETWARE) || defined(SOLARIS2))
 #define DSOLOCAL __attribute__((visibility("hidden")))
 #else
 #define DSOLOCAL
