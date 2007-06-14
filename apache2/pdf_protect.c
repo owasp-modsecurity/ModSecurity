@@ -11,7 +11,6 @@
  *
  */
 #include "modsecurity.h"
-// #include "apache2.h"
 #include "pdf_protect.h"
 
 #include <ctype.h>
@@ -225,7 +224,7 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
     if (msr == NULL) {
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, f->r->server,
-            "ModSecurity: Internal Error: msr is null in PDF output filter.");
+            "ModSecurity: Internal Error: Unable to retrieve context in PDF output filter.");
         ap_remove_output_filter(f);
         return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
     }
@@ -235,7 +234,8 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
         if (msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "PdfProtect: r->content_type=%s, header C-T=%s",
-                f->r->content_type, h_content_type);
+                log_escape_nq(msr->mp, f->r->content_type),
+                log_escape_nq(msr->mp, h_content_type));
         }
 
         /* Have we been asked to tweak the headers? */
@@ -255,6 +255,10 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         }
 
         /* Proceed to detect dynamically-generated PDF files. */
+
+        // TODO application/x-pdf, application/vnd.fdf, application/vnd.adobe.xfdf,
+        // application/vnd.adobe.xdp+xml, application/vnd.adobe.xfd+xml, application/vnd.pdf
+        // application/acrobat, text/pdf, text/x-pdf
         if (((f->r->content_type != NULL)&&(strcasecmp(f->r->content_type, "application/pdf") == 0))
             || ((h_content_type != NULL)&&(strcasecmp(h_content_type, "application/pdf") == 0)))
         {
@@ -263,7 +267,7 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "PdfProtect: Detected a dynamically-generated PDF in %s",
-                    r->uri);
+                    log_escape_nq(msr->mp, r->uri));
             }
 
             /* Is this a non-GET request? */
@@ -298,10 +302,11 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                     /* Redirect user to the new URI. */
                     if (msr->txcfg->debuglog_level >= 9) {
                         msr_log(msr, 9, "PdfProtect: PDF request without a token - "
-                            "redirecting to %s.", new_uri);
+                            "redirecting to %s.", log_escape_nq(msr->mp, new_uri));
                     }
 
                     apr_table_set(r->headers_out, "Location", new_uri);
+
                     return send_error_bucket(f, REDIRECT_STATUS);
                 }
             } else { /* Token found. */
@@ -353,6 +358,7 @@ int pdfp_check(modsec_rec *msr) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "PdfProtect: Not enabled here.");
         }
+
         return 0;
     }
 
@@ -365,17 +371,18 @@ int pdfp_check(modsec_rec *msr) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "PdfProtect: Unable to inspect URI because it is NULL.");
         }
-        /* TODO Should we return -1 instead? */
-        return 0;
+
+        return -1; /* Error. */
     }
 
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "PdfProtect: URI=%s, filename=%s, QUERY_STRING=%s.",
-            msr->r->uri, msr->r->filename, msr->r->args);
+            log_escape_nq(msr->mp, msr->r->uri), log_escape_nq(msr->mp, msr->r->filename),
+            log_escape_nq(msr->mp, msr->r->args));
     }
 
     uri = apr_pstrdup(msr->mp, msr->r->uri);
-    if (uri == NULL) return -1;
+    if (uri == NULL) return -1; /* Error. */
     ap_str_tolower(uri);
 
     /* Attempt to figure out if this is a request for a PDF file. We are
@@ -389,6 +396,7 @@ int pdfp_check(modsec_rec *msr) {
             msr_log(msr, 4,  "PdfProtect: No indication in the URI this is a "
                 "request for a PDF file.");
         }
+
         return 0;
     }
 
@@ -398,8 +406,9 @@ int pdfp_check(modsec_rec *msr) {
     if ((msr->r->method_number != M_GET)&&(cfg->pdfp_only_get != 0)) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "PdfProtect: Configured not to intercept non-GET requests "
-            "(method=%s/%i).", msr->r->method, msr->r->method_number);
+            "(method=%s/%i).", log_escape_nq(msr->mp, msr->r->method), msr->r->method_number);
         }
+
         return 0;
     }
 
@@ -421,7 +430,7 @@ int pdfp_check(modsec_rec *msr) {
         /* Redirect user to the new URI. */
         if (msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "PdfProtect: PDF request without a token - redirecting to %s.",
-                new_uri);
+                log_escape_nq(msr->mp, new_uri));
         }
 
         apr_table_set(msr->r->headers_out, "Location", new_uri);
@@ -437,6 +446,7 @@ int pdfp_check(modsec_rec *msr) {
                 msr_log(msr, 9, "PdfProtect: PDF request with a valid token - "
                     "serving PDF file normally.");
             }
+
             return 0;
         } else { /* Not valid. */
             /* The token is not valid. We will tweak the response
