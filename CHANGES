@@ -1,6 +1,9 @@
 
-?? ??? 2007 - 2.2.0-trunk
+?? ??? 2007 - 2.5.0-trunk
 -------------------------
+
+ * Removed experimental variable RESPONSE_CONTENT_ENCODING which was not
+   working as intended.
 
  * Update included core rules to latest version.
 
@@ -9,8 +12,8 @@
  * Added matching rule filename and line number to audit log.
 
  * Added new phrase matching operators, @pm and @pmFromFile.  These use
-   an alternate set based matching engine to perform faster phrase
-   type matches such as black/white lists, spam keywords, etc.
+   an alternate set based matching engine (Aho-Corasick) to perform faster
+   phrase type matches such as black/white lists, spam keywords, etc.
 
  * Cache transformations per-request/phase so they are not repeated.
 
@@ -29,6 +32,34 @@
    TODO: more to come
 
  * Removed strnlen() calls for non-GNU platforms.
+
+
+14 June 2007 - 2.1.2-rc1
+------------------------
+
+ * Update included core rules to latest version.
+
+ * Do not trigger "pause" action for internal requests.
+
+ * Fixed issue with requests that use internal requests.  These had the
+   potential to be intercepted incorrectly when other Apache httpd modules
+   that used internal requests were used with mod_security.
+
+ * Added Solaris to the list of platforms not supporting the hidden
+   visibility attribute.
+
+ * Fixed decoding full-width unicode in t:urlDecodeUni.
+
+ * Lessen some overhead of debugging messages and calculations.
+
+ * Do not try to intercept a request after a failed rule.  This fixes the
+   issue associated with an "Internal Error: Asked to intercept request
+   but was_intercepted is zero" error message.
+
+ * Added SecAuditLog2 directive to allow redundent concurrent audit log
+   index files.  This will allow sending audit data to two consoles, etc.
+
+ * Small performance improvement in memory management for rule execution.
 
 
 11 May 2007 - 2.2.0-dev1

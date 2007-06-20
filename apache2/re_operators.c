@@ -190,16 +190,18 @@ static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
     ACMP *p = acmp_create(0, rule->ruleset->mp);
     if (p == NULL) return 0;
 
-    const char *s = rule->op_param;
-    const char *e = rule->op_param + strlen(rule->op_param);
+    const char *phrase = apr_pstrdup(rule->ruleset->mp, rule->op_param);
+    const char *next = rule->op_param + strlen(rule->op_param);
     
+    /* Loop through phrases */
+    /* ENH: Need to allow quoted phrases w/space */
     for (;;) {
-        while((isspace(*s) != 0) && (*s != 0)) s++;
-        if (*s == 0) break;
-        e = s;
-        while((isspace(*e) == 0) && (*e != 0)) e++;
-        acmp_add_pattern(p, s, NULL, NULL, e - s);
-        s = e;
+        while((isspace(*phrase) != 0) && (*phrase != '\0')) phrase++;
+        if (*phrase == '\0') break;
+        next = phrase;
+        while((isspace(*next) == 0) && (*next != 0)) next++;
+        acmp_add_pattern(p, phrase, NULL, NULL, next - phrase);
+        phrase = next;
     }
     acmp_prepare(p);
     rule->op_param_data = p;
@@ -211,7 +213,10 @@ static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
 static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     char errstr[1024];
     char buf[HUGE_STRING_LEN + 1];
-    char *ptr = NULL;
+    char *fn;
+    char *next;
+    char *ptr;
+    const char *rulefile_path;
     apr_status_t rc;
     apr_file_t *fd;
 
@@ -223,19 +228,37 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     ACMP *p = acmp_create(0, rule->ruleset->mp);
     if (p == NULL) return 0;
 
-    char *fn = apr_pstrdup(rule->ruleset->mp, rule->op_param);
-    char *next = fn + strlen(rule->op_param);
+    fn = apr_pstrdup(rule->ruleset->mp, rule->op_param);
+    next = fn + strlen(rule->op_param);
     
+    /* Get the path of the rule filename to use as a base */
+    rulefile_path = apr_pstrndup(rule->ruleset->mp, rule->filename, strlen(rule->filename) - strlen(apr_filepath_name_get(rule->filename)));
+
+    #ifdef DEBUG_CONF
+    fprintf(stderr, "Rulefile path: \"%s\"\n", rulefile_path);
+    #endif
+
     /* Loop through filenames */
+    /* ENH: Need to allow quoted filenames w/space */
     for (;;) {
+        const char *rootpath = NULL;
+        const char *filepath = NULL;
         int line = 0;
 
         /* Trim whitespace */
-        while((isspace(*fn) != 0) && (*fn != 0)) fn++;
+        while((isspace(*fn) != 0) && (*fn != '\0')) fn++;
         if (*fn == '\0') break;
         next = fn;
         while((isspace(*next) == 0) && (*next != '\0')) next++;
         while((isspace(*next) != 0) && (*next != '\0')) *next++ = '\0';
+
+        /* Add path of the rule filename for a relative phrase filename */
+        filepath = fn;
+        if (apr_filepath_root(&rootpath, &filepath, APR_FILEPATH_TRUENAME, rule->ruleset->mp) != APR_SUCCESS) {
+            /* We are not an absolute path.  It could mean an error, but
+             * let that pass through to the open call for a better error */
+            apr_filepath_merge(&fn, rulefile_path, fn, APR_FILEPATH_TRUENAME, rule->ruleset->mp);
+        }
 
         /* Open file and read */
         rc = apr_file_open(&fd, fn, APR_READ | APR_FILE_NOCLEANUP, 0, rule->ruleset->mp);

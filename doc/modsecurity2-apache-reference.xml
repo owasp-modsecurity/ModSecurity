@@ -4409,17 +4409,35 @@ SecRule ARGS:route "!<emphasis role="bold">@endsWith %{REQUEST_ADDR}</emphasis>"
       for faster matches of keyword lists. This operator is the same as
       <literal>@pm</literal> except that it takes a list of files as
       arguments. It will match any one of the phrases listed in the file(s)
-      anywhere in the target value. The contents of the files should be one
-      phrase per line. End of line markers will be stripped from the phrases,
-      however, whitespace will not be trimmed from phrases in the file.</para>
+      anywhere in the target value.</para>
+
+      <para>Notes:</para>
+
+      <orderedlist continuation="restarts" inheritnum="ignore">
+        <listitem>
+          <para>The contents of the files should be one phrase per line. End
+          of line markers will be stripped from the phrases, however,
+          whitespace will not be trimmed from phrases in the file. Empty lines
+          and comment lines (beginning with a '#') are ignored.</para>
+        </listitem>
+
+        <listitem>
+          <para>To allow easier inclusion of phrase files with rulesets,
+          relative paths may be used to the phrase files. In this case, the
+          path of the file containing the rule is prepended to the phrase file
+          path.</para>
+        </listitem>
+      </orderedlist>
 
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "<emphasis
-          role="bold">@pm</emphasis> /path/to/blacklist1 /path/to/blacklist2" "deny,status:403</programlisting>
+          role="bold">@pm</emphasis> /path/to/blacklist1 blacklist2" "deny,status:403</programlisting>
 
       <para>The above would deny access with 403 if any of the patterns in the
-      two files matched within the User-Agent HTTP header value.</para>
+      two files matched within the User-Agent HTTP header value. The
+      <literal>blacklist2</literal> file would need to be placed in the same
+      path as the file containing the rule.</para>
     </section>
 
     <section>
