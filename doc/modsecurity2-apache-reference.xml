@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.2.0-trunk / (June 14, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-trunk / (June 20, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -2832,6 +2832,56 @@ SecRule REQBODY_PROCESSOR "<emphasis role="bold">!^XML$</emphasis>" skip:2
 SecRule <emphasis role="bold">XML:/employees/employee/name/text()</emphasis> Fred
 SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> Fred \
     xmlns:xq=http://www.example.com/employees</programlisting>
+
+      <para>The first XPath expression does not use namespaces. It would match
+      against payload such as this one:</para>
+
+      <programlisting>&lt;employees&gt;
+    &lt;employee&gt;
+        &lt;name&gt;Fred Jones&lt;/name&gt;
+        &lt;address location="home"&gt;
+            &lt;street&gt;900 Aurora Ave.&lt;/street&gt;
+            &lt;city&gt;Seattle&lt;/city&gt;
+            &lt;state&gt;WA&lt;/state&gt;
+            &lt;zip&gt;98115&lt;/zip&gt;
+        &lt;/address&gt;
+        &lt;address location="work"&gt;
+            &lt;street&gt;2011 152nd Avenue NE&lt;/street&gt;
+            &lt;city&gt;Redmond&lt;/city&gt;
+            &lt;state&gt;WA&lt;/state&gt;
+            &lt;zip&gt;98052&lt;/zip&gt;
+        &lt;/address&gt;
+        &lt;phone location="work"&gt;(425)555-5665&lt;/phone&gt;
+        &lt;phone location="home"&gt;(206)555-5555&lt;/phone&gt;
+        &lt;phone location="mobile"&gt;(206)555-4321&lt;/phone&gt;
+    &lt;/employee&gt;
+&lt;/employees&gt;</programlisting>
+
+      <para>The second XPath expression does use namespaces. It would match
+      the following payload:</para>
+
+      <programlisting>&lt;xq:employees xmlns:xq="http://www.example.com/employees"&gt;
+    &lt;employee&gt;
+        &lt;name&gt;Fred Jones&lt;/name&gt;
+        &lt;address location="home"&gt;
+            &lt;street&gt;900 Aurora Ave.&lt;/street&gt;
+            &lt;city&gt;Seattle&lt;/city&gt;
+            &lt;state&gt;WA&lt;/state&gt;
+            &lt;zip&gt;98115&lt;/zip&gt;
+        &lt;/address&gt;
+        &lt;address location="work"&gt;
+            &lt;street&gt;2011 152nd Avenue NE&lt;/street&gt;
+            &lt;city&gt;Redmond&lt;/city&gt;
+            &lt;state&gt;WA&lt;/state&gt;
+            &lt;zip&gt;98052&lt;/zip&gt;
+        &lt;/address&gt;
+        &lt;phone location="work"&gt;(425)555-5665&lt;/phone&gt;
+        &lt;phone location="home"&gt;(206)555-5555&lt;/phone&gt;
+        &lt;phone location="mobile"&gt;(206)555-4321&lt;/phone&gt;
+    &lt;/employee&gt;
+&lt;/xq:employees&gt;</programlisting>
+
+      <para>Note the different namespace used in the second example.</para>
 
       <para>To learn more about XPath we suggest the following
       resources:</para>
