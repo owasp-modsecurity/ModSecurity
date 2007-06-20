@@ -1668,14 +1668,6 @@ static int var_response_status_generate(modsec_rec *msr, msre_var *var, msre_rul
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
-/* RESPONSE_CONTENT_ENCODING */
-
-static int var_response_content_encoding(modsec_rec *msr, msre_var *var, msre_rule *rule,
-    apr_table_t *vartab, apr_pool_t *mptmp)
-{
-    return var_simple_generate(var, vartab, mptmp, msr->r->content_encoding);
-}
-
 /* RESPONSE_CONTENT_TYPE */
 
 static int var_response_content_type(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -2464,17 +2456,6 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         0, 0,
         NULL,
         var_response_status_generate,
-        VAR_CACHE,
-        PHASE_RESPONSE_HEADERS
-    );
-
-    /* RESPONSE_CONTENT_ENCODING */
-    msre_engine_variable_register(engine,
-        "RESPONSE_CONTENT_ENCODING",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_response_content_encoding,
         VAR_CACHE,
         PHASE_RESPONSE_HEADERS
     );
