@@ -3630,6 +3630,17 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
         moreinfo="none"> SESSION</literal>, and <literal
         moreinfo="none">USER</literal>.</para>
       </note>
+
+      <note>
+        <para>Please note that ModSecurity does not implement atomic updates
+        of persistent variables at this time. Variables are read from storage
+        whenever <literal>initcol</literal> is encountered in the rules and
+        persisted at the end of request processing. On busy servers requests
+        often run in parallel, leading to situations where one request
+        overwrites the changes made by another request. We anticipate
+        implementing atomic updates of counter values in a future
+        version.</para>
+      </note>
     </section>
 
     <section>
