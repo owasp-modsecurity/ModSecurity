@@ -4654,10 +4654,11 @@ SecRule XML "<emphasis role="bold">@validateSchema /path/to/apache2/conf/xml.xsd
       <title><literal>within</literal></title>
 
       <para><emphasis role="bold">Description: </emphasis>This operator is a
-      string comparison similar to <literal>@contains</literal>, except that
-      the target and match values are reversed. It returns true if the input
-      value is found anywhere within the parameter value. Macro expansion is
-      performed so you may use variable names such as %{TX.1}, etc.</para>
+      string comparison and returns true if the input value is found anywhere
+      within the parameter value. Note that this is similar to
+      <literal>@contains</literal>, except that the target and match values
+      are reversed. Macro expansion is performed so you may use variable names
+      such as %{TX.1}, etc.</para>
 
       <para>Example:</para>
 
