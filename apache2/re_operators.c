@@ -331,6 +331,69 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     return rc;
 }
 
+/* within */
+
+static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    const char *match = NULL;
+    const char *target;
+    unsigned int match_length;
+    unsigned int target_length = 0;
+    unsigned int i, i_max;
+
+    str->value = (char *)rule->op_param;
+    str->value_len = strlen(str->value);
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (str->value == NULL) {
+        *error_msg = "Internal Error: match string is null.";
+        return -1;
+    }
+
+    expand_macros(msr, str, rule, msr->mp);
+
+    match = (const char *)str->value;
+    match_length = str->value_len;
+
+    /* If the given target is null we give up without a match */
+    if (var->value == NULL) {
+        /* No match. */
+        return 0;
+    }
+
+    target = var->value;
+    target_length = var->value_len;
+
+    /* These are impossible to match */
+    if ((match_length == 0) || (target_length > match_length)) {
+        /* No match. */
+        return 0;
+    }
+
+    /* scan for first character, then compare from there until we
+     * have a match or there is no room left in the target
+     */
+    msr_log(msr, 9, "match[%d]='%s' target[%d]='%s'", match_length, match, target_length, target);
+    i_max = match_length - target_length;
+    for (i = 0; i <= i_max; i++) {
+        if (match[i] == target[0]) {
+            if (strncmp(target, (match + i), target_length) == 0) {
+                /* match. */
+                *error_msg = apr_psprintf(msr->mp, "String match %s=\"%s\" within \"%s\".",
+                                var->name,
+                                log_escape_ex(msr->mp, target, target_length),
+                                log_escape_ex(msr->mp, match, match_length));
+                return 1;
+            }
+        }
+    }
+
+    /* No match. */
+    return 0;
+}
+
 /* contains */
 
 static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
@@ -338,7 +401,7 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     const char *match = NULL;
     const char *target;
     unsigned int match_length;
-    unsigned int target_length;
+    unsigned int target_length = 0;
     unsigned int i, i_max;
 
     str->value = (char *)rule->op_param;
@@ -1379,6 +1442,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "pmFromFile",
         msre_op_pmFromFile_param_init,
         msre_op_pm_execute
+    );
+
+    /* within */
+    msre_engine_op_register(engine,
+        "within",
+        NULL, /* ENH init function to flag var substitution */
+        msre_op_within_execute
     );
 
     /* contains */

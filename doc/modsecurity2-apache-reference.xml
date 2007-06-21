@@ -4649,5 +4649,23 @@ SecRule XML "<emphasis role="bold">@validateSchema /path/to/apache2/conf/xml.xsd
         </listitem>
       </itemizedlist>
     </section>
+
+    <section>
+      <title><literal>within</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      string comparison similar to <literal>@contains</literal>, except that
+      the target and match values are reversed. It returns true if the input
+      value is found anywhere within the parameter value. Macro expansion is
+      performed so you may use variable names such as %{TX.1}, etc.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_METHOD "!<emphasis
+          role="bold">@within get,post,head</emphasis>" t:lowercase,deny,status:403
+
+SecAction "pass,setvar:'tx.allowed_methods=get,post,head'"
+SecRule REQUEST_METHOD "!<emphasis role="bold">@within %{tx.allowed_methods}</emphasis>" t:lowercase,deny,status:403</programlisting>
+    </section>
   </section>
 </article>

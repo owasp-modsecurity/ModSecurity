@@ -2,6 +2,8 @@
 ?? ??? 2007 - 2.5.0-trunk
 -------------------------
 
+ * Added @within string comparison operator with support for macro expansion.
+
  * Removed experimental variable RESPONSE_CONTENT_ENCODING which was not
    working as intended.
 
