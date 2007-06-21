@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.2.0-dev1 / (May 11, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-dev2 / (June 21, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -1087,7 +1087,7 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
-      <title>SecPdfProtect (Experimental)</title>
+      <title><literal>SecPdfProtect</literal> (Experimental)</title>
 
       <para><emphasis role="bold">Description:</emphasis> Enables the PDF XSS
       protection functionality. Once enabled access to PDF files is tracked.
@@ -1101,7 +1101,25 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
-      <title>SecPdfProtectSecret (Experimental)</title>
+      <title><literal>SecPdfProtectMethod</literal> (Experimental)</title>
+
+      <para><emphasis role="bold">Description:</emphasis> Configure desired
+      protection method to be used when requests for PDF files are detected.
+      Possible values are <literal>TokenRedirection</literal> and
+      <literal>ForcedDownload</literal>. The token redirection approach will
+      attempt to redirect with tokens where possible. This allows PDF files to
+      continue to be opened inline but only works for GET requests. Forced
+      download always causes PDF files to be delivered as opaque binaries and
+      attachments. The latter will always be used for non-GET requests. Forced
+      download is considered to be more secure but may cause usability
+      problems for users ("This PDF won't open anymore!").</para>
+
+      <para><emphasis role="bold">Default:</emphasis>
+      <literal>TokenRedirection</literal></para>
+    </section>
+
+    <section>
+      <title><literal>SecPdfProtectSecret</literal> (Experimental)</title>
 
       <para><emphasis role="bold">Description:</emphasis> Defines the secret
       that will be used to construct one-time tokens. You should use a
@@ -1113,7 +1131,7 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
-      <title>SecPdfProtectTimeout (Experimental)</title>
+      <title><literal>SecPdfProtectTimeout</literal> (Experimental)</title>
 
       <para><emphasis role="bold">Description:</emphasis> Defines the token
       timeout. After token expires it can no longer be used to allow access to
@@ -1125,7 +1143,7 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
-      <title>SecPdfProtectTokenName (Experimental)</title>
+      <title><literal>SecPdfProtectTokenName</literal> (Experimental)</title>
 
       <para><emphasis role="bold">Description:</emphasis> Defines the name of
       the token. The only reason you would want to change the name of the
@@ -2422,21 +2440,23 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal>RESPONSE_CONTENT_LENGTH</literal> (Experimental)</title>
+      <title><literal>RESPONSE_CONTENT_LENGTH</literal></title>
 
       <para>Response body length in bytes. Can be available starting with
       phase 3 but it does not have to be (as the length of response body is
-      not always known in advance.) Does not exist of the content length is
-      not know. (We will consider making it empty if the size is not
-      known.)</para>
+      not always known in advance.) If the size is not known this variable
+      will contain a zero. If <literal>RESPONSE_CONTENT_LENGTH</literal>
+      contains a zero in phase 5 that means the actual size of the response
+      body was 0.</para>
 
       <para>The value of this variable can change between phases if the body
-      is modified. For example, in embedded mode mod_deflate can compress the
-      response body between phases 4 and 5.</para>
+      is modified. For example, in embedded mode
+      <literal>mod_deflate</literal> can compress the response body between
+      phases 4 and 5.</para>
     </section>
 
     <section>
-      <title><literal>RESPONSE_CONTENT_TYPE</literal> (Experimental)</title>
+      <title><literal>RESPONSE_CONTENT_TYPE</literal></title>
 
       <para>Response content type. Only available starting with phase
       3.</para>
@@ -2814,6 +2834,72 @@ SecRule REQBODY_PROCESSOR "<emphasis role="bold">!^XML$</emphasis>" skip:2
 SecRule <emphasis role="bold">XML:/employees/employee/name/text()</emphasis> Fred
 SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> Fred \
     xmlns:xq=http://www.example.com/employees</programlisting>
+
+      <para>The first XPath expression does not use namespaces. It would match
+      against payload such as this one:</para>
+
+      <programlisting>&lt;employees&gt;
+    &lt;employee&gt;
+        &lt;name&gt;Fred Jones&lt;/name&gt;
+        &lt;address location="home"&gt;
+            &lt;street&gt;900 Aurora Ave.&lt;/street&gt;
+            &lt;city&gt;Seattle&lt;/city&gt;
+            &lt;state&gt;WA&lt;/state&gt;
+            &lt;zip&gt;98115&lt;/zip&gt;
+        &lt;/address&gt;
+        &lt;address location="work"&gt;
+            &lt;street&gt;2011 152nd Avenue NE&lt;/street&gt;
+            &lt;city&gt;Redmond&lt;/city&gt;
+            &lt;state&gt;WA&lt;/state&gt;
+            &lt;zip&gt;98052&lt;/zip&gt;
+        &lt;/address&gt;
+        &lt;phone location="work"&gt;(425)555-5665&lt;/phone&gt;
+        &lt;phone location="home"&gt;(206)555-5555&lt;/phone&gt;
+        &lt;phone location="mobile"&gt;(206)555-4321&lt;/phone&gt;
+    &lt;/employee&gt;
+&lt;/employees&gt;</programlisting>
+
+      <para>The second XPath expression does use namespaces. It would match
+      the following payload:</para>
+
+      <programlisting>&lt;xq:employees xmlns:xq="http://www.example.com/employees"&gt;
+    &lt;employee&gt;
+        &lt;name&gt;Fred Jones&lt;/name&gt;
+        &lt;address location="home"&gt;
+            &lt;street&gt;900 Aurora Ave.&lt;/street&gt;
+            &lt;city&gt;Seattle&lt;/city&gt;
+            &lt;state&gt;WA&lt;/state&gt;
+            &lt;zip&gt;98115&lt;/zip&gt;
+        &lt;/address&gt;
+        &lt;address location="work"&gt;
+            &lt;street&gt;2011 152nd Avenue NE&lt;/street&gt;
+            &lt;city&gt;Redmond&lt;/city&gt;
+            &lt;state&gt;WA&lt;/state&gt;
+            &lt;zip&gt;98052&lt;/zip&gt;
+        &lt;/address&gt;
+        &lt;phone location="work"&gt;(425)555-5665&lt;/phone&gt;
+        &lt;phone location="home"&gt;(206)555-5555&lt;/phone&gt;
+        &lt;phone location="mobile"&gt;(206)555-4321&lt;/phone&gt;
+    &lt;/employee&gt;
+&lt;/xq:employees&gt;</programlisting>
+
+      <para>Note the different namespace used in the second example.</para>
+
+      <para>To learn more about XPath we suggest the following
+      resources:</para>
+
+      <orderedlist>
+        <listitem>
+          <para><ulink url="http://www.w3.org/TR/xpath">XPath
+          Standard</ulink></para>
+        </listitem>
+
+        <listitem>
+          <para><ulink
+          url="http://www.zvon.org/xxl/XPathTutorial/General/examples.html">XPath
+          Tutorial</ulink></para>
+        </listitem>
+      </orderedlist>
     </section>
   </section>
 
@@ -3035,8 +3121,10 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
 
       <para>In addition to decoding %xx like <literal
       moreinfo="none">urlDecode, urlDecodeUni also </literal>decodes<literal
-      moreinfo="none"> <literal>%uXXXX</literal> </literal>encoding (only the
-      lower byte will be used, the higher byte will be discarded).</para>
+      moreinfo="none"> <literal>%uXXXX</literal> </literal>encoding. If the
+      code is in the range of FF01-FF5E (the full width ASCII codes), then the
+      higher byte is used to detect and adjust the lower byte. Otherwise, only
+      the lower byte will be used and the higher byte zeroed.</para>
     </section>
 
     <section>
@@ -3543,6 +3631,17 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
         collections:<literal moreinfo="none"> IP</literal>,<literal
         moreinfo="none"> SESSION</literal>, and <literal
         moreinfo="none">USER</literal>.</para>
+      </note>
+
+      <note>
+        <para>Please note that ModSecurity does not implement atomic updates
+        of persistent variables at this time. Variables are read from storage
+        whenever <literal>initcol</literal> is encountered in the rules and
+        persisted at the end of request processing. On busy servers requests
+        often run in parallel, leading to situations where one request
+        overwrites the changes made by another request. We anticipate
+        implementing atomic updates of counter values in a future
+        version.</para>
       </note>
     </section>
 
@@ -4286,6 +4385,62 @@ SecRule ARGS:route "!<emphasis role="bold">@endsWith %{REQUEST_ADDR}</emphasis>"
     </section>
 
     <section>
+      <title><literal>pm</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Phrase Match
+      operator. This operator uses a set based matching engine (Aho-Corasick)
+      for faster matches of keyword lists. It will match any one of its
+      arguments anywhere in the target value.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "<emphasis
+          role="bold">@pm</emphasis> WebZIP WebCopier Webster WebStripper SiteSnagger ProWebWalker CheeseBot" "deny,status:403</programlisting>
+
+      <para>The above would deny access with 403 if any of the words matched
+      within the User-Agent HTTP header value.</para>
+    </section>
+
+    <section>
+      <title><literal>pmFromFile</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Phrase Match
+      operator. This operator uses a set based matching engine (Aho-Corasick)
+      for faster matches of keyword lists. This operator is the same as
+      <literal>@pm</literal> except that it takes a list of files as
+      arguments. It will match any one of the phrases listed in the file(s)
+      anywhere in the target value.</para>
+
+      <para>Notes:</para>
+
+      <orderedlist continuation="restarts" inheritnum="ignore">
+        <listitem>
+          <para>The contents of the files should be one phrase per line. End
+          of line markers will be stripped from the phrases, however,
+          whitespace will not be trimmed from phrases in the file. Empty lines
+          and comment lines (beginning with a '#') are ignored.</para>
+        </listitem>
+
+        <listitem>
+          <para>To allow easier inclusion of phrase files with rulesets,
+          relative paths may be used to the phrase files. In this case, the
+          path of the file containing the rule is prepended to the phrase file
+          path.</para>
+        </listitem>
+      </orderedlist>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "<emphasis
+          role="bold">@pm</emphasis> /path/to/blacklist1 blacklist2" "deny,status:403</programlisting>
+
+      <para>The above would deny access with 403 if any of the patterns in the
+      two files matched within the User-Agent HTTP header value. The
+      <literal>blacklist2</literal> file would need to be placed in the same
+      path as the file containing the rule.</para>
+    </section>
+
+    <section>
       <title><literal>rbl</literal></title>
 
       <para><emphasis role="bold">Description:</emphasis> Look up the
@@ -4493,6 +4648,25 @@ SecRule XML "<emphasis role="bold">@validateSchema /path/to/apache2/conf/xml.xsd
           avoiding the security check).</para>
         </listitem>
       </itemizedlist>
+    </section>
+
+    <section>
+      <title><literal>within</literal></title>
+
+      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      string comparison and returns true if the input value is found anywhere
+      within the parameter value. Note that this is similar to
+      <literal>@contains</literal>, except that the target and match values
+      are reversed. Macro expansion is performed so you may use variable names
+      such as %{TX.1}, etc.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule REQUEST_METHOD "!<emphasis
+          role="bold">@within get,post,head</emphasis>" t:lowercase,deny,status:403
+
+SecAction "pass,setvar:'tx.allowed_methods=get,post,head'"
+SecRule REQUEST_METHOD "!<emphasis role="bold">@within %{tx.allowed_methods}</emphasis>" t:lowercase,deny,status:403</programlisting>
     </section>
   </section>
 </article>

@@ -1,11 +1,11 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2006 Thinking Stone (http://www.thinkingstone.com)
+ * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
  * or if you have any other questions related to the licence, please
- * write to Thinking Stone at contact@thinkingstone.com.
+ * write to Breach Security, Inc. at support@breach.com.
  *
  */
 #include "msc_geo.h"
@@ -228,6 +228,23 @@ static int db_open(directory_config *dcfg, char **error_msg)
     return 1;
 }
 
+static int field_length(const char *field, int maxlen)
+{
+    int i;
+
+    if (field == NULL) {
+        return 0;
+    }
+
+    for (i = 0; i < maxlen; i++) {
+        if (field[i] == '\0') {
+            break;
+        }
+    }
+
+    return i;
+}
+
 /**
  * Initialise Geo data structure
  */
@@ -375,21 +392,21 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         remaining -= rec_offset;
 
         /* Region */
-        field_len = strnlen((const char *)cbuf+rec_offset,remaining);
+        field_len = field_length((const char *)cbuf+rec_offset, remaining);
         msr_log(msr, 9, "GEO: region=\"%.*s\"", ((field_len+1)*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
         georec->region = apr_pstrmemdup(msr->mp, (const char *)cbuf+rec_offset, (remaining));
         rec_offset += field_len + 1;
         remaining -= field_len + 1;
         
         /* City */
-        field_len = strnlen((const char *)cbuf+rec_offset,remaining);
+        field_len = field_length((const char *)cbuf+rec_offset, remaining);
         msr_log(msr, 9, "GEO: city=\"%.*s\"", ((field_len+1)*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
         georec->city = apr_pstrmemdup(msr->mp, (const char *)cbuf+rec_offset, (remaining));
         rec_offset += field_len + 1;
         remaining -= field_len + 1;
         
         /* Postal Code */
-        field_len = strnlen((const char *)cbuf+rec_offset,remaining);
+        field_len = field_length((const char *)cbuf+rec_offset, remaining);
         msr_log(msr, 9, "GEO: postal_code=\"%.*s\"", ((field_len+1)*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
         georec->postal_code = apr_pstrmemdup(msr->mp, (const char *)cbuf+rec_offset, (remaining));
         rec_offset += field_len + 1;

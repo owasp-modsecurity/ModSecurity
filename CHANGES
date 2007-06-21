@@ -1,3 +1,133 @@
+21 June 2007 - 2.5.0-dev2
+-------------------------
+
+ * Reversioned from 2.2.0 base version to 2.5.0 because of the large changeset.
+
+ * Added @within string comparison operator with support for macro expansion.
+
+ * Removed experimental variable RESPONSE_CONTENT_ENCODING which was not
+   working as intended.
+
+ * Update included core rules to latest version.
+
+ * Do not trigger "pause" action for internal requests.
+
+ * Added matching rule filename and line number to audit log.
+
+ * Added new phrase matching operators, @pm and @pmFromFile.  These use
+   an alternate set based matching engine (Aho-Corasick) to perform faster
+   phrase type matches such as black/white lists, spam keywords, etc.
+
+ * Cache transformations per-request/phase so they are not repeated.
+
+ * Fixed issue with requests that use internal requests.  These had the
+   potential to be intercepted incorrectly when other Apache httpd modules
+   that used internal requests were used with mod_security.
+
+ * Added Solaris to the list of platforms not supporting the hidden
+   visibility attribute.
+
+ * Removed excessive debug log entries about "capture" action.
+
+ * Fixed decoding full-width unicode in t:urlDecodeUni.
+
+ * Lessen some overhead of debugging messages and calculations 
+
+ * Removed strnlen() calls for non-GNU platforms.
+
+
+14 June 2007 - 2.1.2-rc1
+------------------------
+
+ * Update included core rules to latest version.
+
+ * Do not trigger "pause" action for internal requests.
+
+ * Fixed issue with requests that use internal requests.  These had the
+   potential to be intercepted incorrectly when other Apache httpd modules
+   that used internal requests were used with mod_security.
+
+ * Added Solaris to the list of platforms not supporting the hidden
+   visibility attribute.
+
+ * Fixed decoding full-width unicode in t:urlDecodeUni.
+
+ * Lessen some overhead of debugging messages and calculations.
+
+ * Do not try to intercept a request after a failed rule.  This fixes the
+   issue associated with an "Internal Error: Asked to intercept request
+   but was_intercepted is zero" error message.
+
+ * Added SecAuditLog2 directive to allow redundent concurrent audit log
+   index files.  This will allow sending audit data to two consoles, etc.
+
+ * Small performance improvement in memory management for rule execution.
+
+
+11 May 2007 - 2.2.0-dev1
+------------------------
+
+ * Added @within string comparison operator with support for macro expansion.
+
+ * Removed experimental variable RESPONSE_CONTENT_ENCODING which was not
+   working as intended.
+
+ * Update included core rules to latest version.
+
+ * Do not trigger "pause" action for internal requests.
+
+ * Added matching rule filename and line number to audit log.
+
+ * Added new phrase matching operators, @pm and @pmFromFile.  These use
+   an alternate set based matching engine (Aho-Corasick) to perform faster
+   phrase type matches such as black/white lists, spam keywords, etc.
+
+ * Cache transformations per-request/phase so they are not repeated.
+
+ * Fixed issue with requests that use internal requests.  These had the
+   potential to be intercepted incorrectly when other Apache httpd modules
+   that used internal requests were used with mod_security.
+
+ * Added Solaris to the list of platforms not supporting the hidden
+   visibility attribute.
+
+ * Removed excessive debug log entries about "capture" action.
+
+ * Fixed decoding full-width unicode in t:urlDecodeUni.
+
+ * Lessen some overhead of debugging messages and calculations 
+   TODO: more to come
+
+ * Removed strnlen() calls for non-GNU platforms.
+
+
+14 June 2007 - 2.1.2-rc1
+------------------------
+
+ * Update included core rules to latest version.
+
+ * Do not trigger "pause" action for internal requests.
+
+ * Fixed issue with requests that use internal requests.  These had the
+   potential to be intercepted incorrectly when other Apache httpd modules
+   that used internal requests were used with mod_security.
+
+ * Added Solaris to the list of platforms not supporting the hidden
+   visibility attribute.
+
+ * Fixed decoding full-width unicode in t:urlDecodeUni.
+
+ * Lessen some overhead of debugging messages and calculations.
+
+ * Do not try to intercept a request after a failed rule.  This fixes the
+   issue associated with an "Internal Error: Asked to intercept request
+   but was_intercepted is zero" error message.
+
+ * Added SecAuditLog2 directive to allow redundent concurrent audit log
+   index files.  This will allow sending audit data to two consoles, etc.
+
+ * Small performance improvement in memory management for rule execution.
+
 
 11 May 2007 - 2.2.0-dev1
 -------------------------
@@ -20,8 +150,8 @@
 
  * Added experimental support for content injection. Directive
    SecContentInjection (On|Off) controls whether injection is taking place.
-	 Actions "prepend" and "append" inject content when executed. Do note that
-	 it is your responsibility to make sure the response is of the appropriate
+   Actions "prepend" and "append" inject content when executed. Do note that
+   it is your responsibility to make sure the response is of the appropriate
    content type (e.g. HTML, plain text, etc).
 
  * Added string comparison operators with support for macro expansion:
@@ -32,7 +162,7 @@
 
  * Removed support for %0 - %9 capture macros as they were incorrectly
    expanding url encoded values.  Use %{TX.0} - %{TX.9} instead.
-	
+
  * Added t:length to transform a value to its character length.
 
  * Added t:trimLeft, t:trimRight, t:trim to remove whitespace
@@ -58,25 +188,21 @@
    and/or counting operator in the debug log.
 
 
-05 Apr 2007 - 2.1.1-rc2
------------------------
+11 Apr 2007 - 2.1.1
+-------------------
 
  * Add the PCRE_DOLLAR_ENDONLY option when compiling regular expression
    for the @rx operator and variables.
-  
+ 
  * Really set PCRE_DOTALL option when compiling the regular expression
    for the @rx operator as the docs state.
-
-
-11 Mar 2007 - 2.1.1-rc1
------------------------
-
+ 
  * Fixed potential memory corruption when expanding macros.
 
- * Fixed error when a collection var was fetched in the same second as creation
-   by setting the rate to zero.
+ * Fixed error when a collection was retrieved from storage in the same second
+   as creation by setting the rate to zero.
 
- * Fixed ASCIIZ (NUL) parsing for application/x-www-form-urlencoded forms
+ * Fixed ASCIIZ (NUL) parsing for application/x-www-form-urlencoded forms.
 
  * Fixed the faulty REQUEST_FILENAME variable, which used to change
    the internal Apache structures by mistake.

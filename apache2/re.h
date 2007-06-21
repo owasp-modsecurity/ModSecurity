@@ -1,13 +1,11 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2006 Thinking Stone (http://www.thinkingstone.com)
- *
- * $Id: re.h,v 1.7 2006/12/29 10:31:38 ivanr Exp $
+ * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
  * or if you have any other questions related to the licence, please
- * write to Thinking Stone at contact@thinkingstone.com.
+ * write to Breach Security, Inc. at support@breach.com.
  *
  */
 #ifndef _MSC_RE_H_
@@ -28,6 +26,7 @@ typedef struct msre_tfn_metadata msre_tfn_metadata;
 typedef struct msre_actionset msre_actionset;
 typedef struct msre_action_metadata msre_action_metadata;
 typedef struct msre_action msre_action;
+typedef struct msre_cache_rec msre_cache_rec;
 
 #include "apr_general.h"
 #include "apr_tables.h"
@@ -226,6 +225,7 @@ struct msre_actionset {
     const char              *msg;
     int                      severity;
     int                      phase;
+    msre_rule               *rule;
 
     /* Flow */
     int                      is_chained;
@@ -302,5 +302,16 @@ apr_status_t DSOLOCAL msre_parse_vars(msre_ruleset *ruleset, const char *text,
     apr_array_header_t *arr, char **error_msg);
 
 char DSOLOCAL *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset);
+
+
+/* -- Data Cache -- */
+
+struct msre_cache_rec {
+    int                      hits;
+    int                      changed;
+    const char              *key;
+    const char              *val;
+    apr_size_t               val_len;
+};
 
 #endif

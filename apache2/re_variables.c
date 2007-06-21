@@ -1,13 +1,11 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2006 Thinking Stone (http://www.thinkingstone.com)
- *
- * $Id: re_variables.c,v 1.7 2007/01/23 16:08:15 ivanr Exp $
+ * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
  * or if you have any other questions related to the licence, please
- * write to Thinking Stone at contact@thinkingstone.com.
+ * write to Breach Security, Inc. at support@breach.com.
  *
  */
 #include "http_core.h"
@@ -1670,14 +1668,6 @@ static int var_response_status_generate(modsec_rec *msr, msre_var *var, msre_rul
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
-/* RESPONSE_CONTENT_ENCODING */
-
-static int var_response_content_encoding(modsec_rec *msr, msre_var *var, msre_rule *rule,
-    apr_table_t *vartab, apr_pool_t *mptmp)
-{
-    return var_simple_generate(var, vartab, mptmp, msr->r->content_encoding);
-}
-
 /* RESPONSE_CONTENT_TYPE */
 
 static int var_response_content_type(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -2466,17 +2456,6 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         0, 0,
         NULL,
         var_response_status_generate,
-        VAR_CACHE,
-        PHASE_RESPONSE_HEADERS
-    );
-
-    /* RESPONSE_CONTENT_ENCODING */
-    msre_engine_variable_register(engine,
-        "RESPONSE_CONTENT_ENCODING",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_response_content_encoding,
         VAR_CACHE,
         PHASE_RESPONSE_HEADERS
     );

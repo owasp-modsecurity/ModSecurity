@@ -1,19 +1,19 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2006 Thinking Stone (http://www.thinkingstone.com)
- *
- * $Id: re_operators.c,v 1.7 2007/01/23 16:08:15 ivanr Exp $
+ * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
  * or if you have any other questions related to the licence, please
- * write to Thinking Stone at contact@thinkingstone.com.
+ * write to Breach Security, Inc. at support@breach.com.
  *
  */
 #include "re.h"
 #include "msc_pcre.h"
 #include "msc_geo.h"
+#include "apr_lib.h"
 #include "apr_strmatch.h"
+#include "acmp.h"
 
 /**
  *
@@ -109,15 +109,12 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     /* Are we supposed to capture subexpressions? */
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
-    /* Warn when the regex captures but "capture" is not set */
-    if (msr->txcfg->debuglog_level >= 3) {
+    /* Show when the regex captures but "capture" is not set */
+    if (msr->txcfg->debuglog_level >= 6) {
         int capcount = 0;
         rc = msc_fullinfo(regex, PCRE_INFO_CAPTURECOUNT, &capcount);
         if ((capture == 0) && (capcount > 0)) {
-            msr_log(msr, 4, "Ignoring regex captures since \"capture\" action is not enabled.");
-        }
-        if ((capture == 1) && (capcount == 0)) {
-            msr_log(msr, 3, "Notice. The \"capture\" action is enabled, but the regex does not have explicit captures.");
+            msr_log(msr, 6, "Ignoring regex captures since \"capture\" action is not enabled.");
         }
     }
 
@@ -182,22 +179,246 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     return 0;
 }
 
-/* contains */
+/* pm */
 
-static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    const char *match = (const char *)rule->op_param;
+static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
+    if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pm'.");
+        return 0; /* ERROR */
+    }
+    
+    ACMP *p = acmp_create(0, rule->ruleset->mp);
+    if (p == NULL) return 0;
+
+    const char *phrase = apr_pstrdup(rule->ruleset->mp, rule->op_param);
+    const char *next = rule->op_param + strlen(rule->op_param);
+    
+    /* Loop through phrases */
+    /* ENH: Need to allow quoted phrases w/space */
+    for (;;) {
+        while((isspace(*phrase) != 0) && (*phrase != '\0')) phrase++;
+        if (*phrase == '\0') break;
+        next = phrase;
+        while((isspace(*next) == 0) && (*next != 0)) next++;
+        acmp_add_pattern(p, phrase, NULL, NULL, next - phrase);
+        phrase = next;
+    }
+    acmp_prepare(p);
+    rule->op_param_data = p;
+    return 1;
+}
+
+/* pmFromFile */
+
+static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
+    char errstr[1024];
+    char buf[HUGE_STRING_LEN + 1];
+    char *fn;
+    char *next;
+    char *ptr;
+    const char *rulefile_path;
+    apr_status_t rc;
+    apr_file_t *fd;
+
+    if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pm'.");
+        return 0; /* ERROR */
+    }
+    
+    ACMP *p = acmp_create(0, rule->ruleset->mp);
+    if (p == NULL) return 0;
+
+    fn = apr_pstrdup(rule->ruleset->mp, rule->op_param);
+    next = fn + strlen(rule->op_param);
+    
+    /* Get the path of the rule filename to use as a base */
+    rulefile_path = apr_pstrndup(rule->ruleset->mp, rule->filename, strlen(rule->filename) - strlen(apr_filepath_name_get(rule->filename)));
+
+    #ifdef DEBUG_CONF
+    fprintf(stderr, "Rulefile path: \"%s\"\n", rulefile_path);
+    #endif
+
+    /* Loop through filenames */
+    /* ENH: Need to allow quoted filenames w/space */
+    for (;;) {
+        const char *rootpath = NULL;
+        const char *filepath = NULL;
+        int line = 0;
+
+        /* Trim whitespace */
+        while((isspace(*fn) != 0) && (*fn != '\0')) fn++;
+        if (*fn == '\0') break;
+        next = fn;
+        while((isspace(*next) == 0) && (*next != '\0')) next++;
+        while((isspace(*next) != 0) && (*next != '\0')) *next++ = '\0';
+
+        /* Add path of the rule filename for a relative phrase filename */
+        filepath = fn;
+        if (apr_filepath_root(&rootpath, &filepath, APR_FILEPATH_TRUENAME, rule->ruleset->mp) != APR_SUCCESS) {
+            /* We are not an absolute path.  It could mean an error, but
+             * let that pass through to the open call for a better error */
+            apr_filepath_merge(&fn, rulefile_path, fn, APR_FILEPATH_TRUENAME, rule->ruleset->mp);
+        }
+
+        /* Open file and read */
+        rc = apr_file_open(&fd, fn, APR_READ | APR_FILE_NOCLEANUP, 0, rule->ruleset->mp);
+        if (rc != APR_SUCCESS) {
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Could not open phrase file \"%s\": %s", fn, apr_strerror(rc, errstr, 1024));
+            return 0;
+        }
+
+        #ifdef DEBUG_CONF
+        fprintf(stderr, "Loading phrase file: \"%s\"\n", fn);
+        #endif
+
+        /* Read one pattern per line skipping empty/commented */
+        for(;;) {
+            line++;
+            rc = apr_file_gets(buf, HUGE_STRING_LEN, fd);
+            if (rc == APR_EOF) break;
+            if (rc != APR_SUCCESS) {
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Could read \"%s\" line %d: %s", fn, line, apr_strerror(rc, errstr, 1024));
+                return 0;
+            }
+
+            /* Remove newline */
+            ptr = buf;
+            while(*ptr != '\0') ptr++;
+            if ((ptr > buf) && (*(ptr - 1) == '\n')) *(ptr - 1) = '\0';
+
+            /* Ignore empty lines and comments */
+            ptr = buf;
+            while((*ptr != '\0') && apr_isspace(*ptr)) ptr++;
+            if ((*ptr == '\0') || (*ptr == '#')) continue;
+
+            #ifdef DEBUG_CONF
+            fprintf(stderr, "Adding phrase file pattern: \"%s\"\n", buf);
+            #endif
+
+            acmp_add_pattern(p, buf, NULL, NULL, strlen(buf));
+        }
+        fn = next;
+    }
+    if (fd != NULL) apr_file_close(fd);
+    acmp_prepare(p);
+    rule->op_param_data = p;
+    return 1;
+}
+
+static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    const char *match = NULL;
+    apr_status_t rc = 0;
+    
+    /* Nothing to read */
+    if ((var->value == NULL) || (var->value_len == 0)) return 0;
+
+    ACMPT pt = {(ACMP *)rule->op_param_data, NULL};
+
+    rc = acmp_process_quick(&pt, &match, var->value, var->value_len);
+    if (rc) {
+        char *match_escaped = log_escape(msr->mp, match ? match : "<Unknown Match>");
+
+        /* This message will be logged. */
+        if (strlen(match_escaped) > 252) {
+            *error_msg = apr_psprintf(msr->mp, "Matched phrase \"%.252s ...\" at %s.",
+                match_escaped, var->name);
+        } else {
+            *error_msg = apr_psprintf(msr->mp, "Matched phrase \"%s\" at %s.",
+                match_escaped, var->name);
+        }
+        return 1;
+    }
+    return rc;
+}
+
+/* within */
+
+static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    const char *match = NULL;
     const char *target;
     unsigned int match_length;
-    unsigned int target_length;
+    unsigned int target_length = 0;
     unsigned int i, i_max;
+
+    str->value = (char *)rule->op_param;
+    str->value_len = strlen(str->value);
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    if (match == NULL) {
+    if (str->value == NULL) {
         *error_msg = "Internal Error: match string is null.";
         return -1;
     }
+
+    expand_macros(msr, str, rule, msr->mp);
+
+    match = (const char *)str->value;
+    match_length = str->value_len;
+
+    /* If the given target is null we give up without a match */
+    if (var->value == NULL) {
+        /* No match. */
+        return 0;
+    }
+
+    target = var->value;
+    target_length = var->value_len;
+
+    /* These are impossible to match */
+    if ((match_length == 0) || (target_length > match_length)) {
+        /* No match. */
+        return 0;
+    }
+
+    /* scan for first character, then compare from there until we
+     * have a match or there is no room left in the target
+     */
+    msr_log(msr, 9, "match[%d]='%s' target[%d]='%s'", match_length, match, target_length, target);
+    i_max = match_length - target_length;
+    for (i = 0; i <= i_max; i++) {
+        if (match[i] == target[0]) {
+            if (strncmp(target, (match + i), target_length) == 0) {
+                /* match. */
+                *error_msg = apr_psprintf(msr->mp, "String match %s=\"%s\" within \"%s\".",
+                                var->name,
+                                log_escape_ex(msr->mp, target, target_length),
+                                log_escape_ex(msr->mp, match, match_length));
+                return 1;
+            }
+        }
+    }
+
+    /* No match. */
+    return 0;
+}
+
+/* contains */
+
+static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    const char *match = NULL;
+    const char *target;
+    unsigned int match_length;
+    unsigned int target_length = 0;
+    unsigned int i, i_max;
+
+    str->value = (char *)rule->op_param;
+    str->value_len = strlen(str->value);
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (str->value == NULL) {
+        *error_msg = "Internal Error: match string is null.";
+        return -1;
+    }
+
+    expand_macros(msr, str, rule, msr->mp);
+
+    match = (const char *)str->value;
+    match_length = str->value_len;
 
     /* If the given target is null run against an empty
      * string. This is a behaviour consistent with previous
@@ -210,8 +431,6 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         target = var->value;
         target_length = var->value_len;
     }
-
-    match_length = strlen(match);
 
     /* These are impossible to match */
     if ((match_length == 0) || (match_length > target_length)) {
@@ -294,21 +513,30 @@ static int msre_op_streq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var
     return 0;
 }
 
-/* startsWith */
+/* beginsWith */
 
-static int msre_op_startsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    const char *match = (const char *)rule->op_param;
+static int msre_op_beginsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    const char *match = NULL;
     const char *target;
     unsigned int match_length;
     unsigned int target_length;
 
+    str->value = (char *)rule->op_param;
+    str->value_len = strlen(str->value);
+
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    if (match == NULL) {
+    if (str->value == NULL) {
         *error_msg = "Internal Error: match string is null.";
         return -1;
     }
+
+    expand_macros(msr, str, rule, msr->mp);
+
+    match = (const char *)str->value;
+    match_length = str->value_len;
 
     /* If the given target is null run against an empty
      * string. This is a behaviour consistent with previous
@@ -321,8 +549,6 @@ static int msre_op_startsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var
         target = var->value;
         target_length = var->value_len;
     }
-
-    match_length = strlen(match);
 
     /* These are impossible to match */
     if ((match_length == 0) || (match_length > target_length)) {
@@ -345,18 +571,27 @@ static int msre_op_startsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var
 /* endsWith */
 
 static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    const char *match = (const char *)rule->op_param;
+    msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    const char *match = NULL;
     const char *target;
     unsigned int match_length;
     unsigned int target_length;
 
+    str->value = (char *)rule->op_param;
+    str->value_len = strlen(str->value);
+
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    if (match == NULL) {
+    if (str->value == NULL) {
         *error_msg = "Internal Error: match string is null.";
         return -1;
     }
+
+    expand_macros(msr, str, rule, msr->mp);
+
+    match = (const char *)str->value;
+    match_length = str->value_len;
 
     /* If the given target is null run against an empty
      * string. This is a behaviour consistent with previous
@@ -369,8 +604,6 @@ static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         target = var->value;
         target_length = var->value_len;
     }
-
-    match_length = strlen(match);
 
     /* These are impossible to match */
     if ((match_length == 0) || (match_length > target_length)) {
@@ -1197,6 +1430,27 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_rx_execute
     );
 
+    /* pm */
+    msre_engine_op_register(engine,
+        "pm",
+        msre_op_pm_param_init,
+        msre_op_pm_execute
+    );
+
+    /* pmFromFile */
+    msre_engine_op_register(engine,
+        "pmFromFile",
+        msre_op_pmFromFile_param_init,
+        msre_op_pm_execute
+    );
+
+    /* within */
+    msre_engine_op_register(engine,
+        "within",
+        NULL, /* ENH init function to flag var substitution */
+        msre_op_within_execute
+    );
+
     /* contains */
     msre_engine_op_register(engine,
         "contains",
@@ -1211,11 +1465,11 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_streq_execute
     );
 
-    /* startsWith */
+    /* beginsWith */
     msre_engine_op_register(engine,
-        "startsWith",
+        "beginsWith",
         NULL, /* ENH init function to flag var substitution */
-        msre_op_startsWith_execute
+        msre_op_beginsWith_execute
     );
 
     /* endsWith */

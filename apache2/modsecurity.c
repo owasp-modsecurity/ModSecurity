@@ -1,13 +1,11 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2006 Thinking Stone (http://www.thinkingstone.com)
- *
- * $Id: modsecurity.c,v 1.7 2006/12/28 10:39:13 ivanr Exp $
+ * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
  * or if you have any other questions related to the licence, please
- * write to Thinking Stone at contact@thinkingstone.com.
+ * write to Breach Security, Inc. at support@breach.com.
  *
  */
 #include <stdlib.h>
@@ -296,6 +294,9 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     if (msr->collections == NULL) return -1;
     msr->collections_dirty = apr_table_make(msr->mp, 8);
     if (msr->collections_dirty == NULL) return -1;
+
+    msr->tcache = apr_hash_make(msr->mp);
+    if (msr->tcache == NULL) return -1;
 
     return 1;
 }

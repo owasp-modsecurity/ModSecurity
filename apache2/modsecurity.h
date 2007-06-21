@@ -1,13 +1,11 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2006 Thinking Stone (http://www.thinkingstone.com)
- *
- * $Id: modsecurity.h,v 1.27 2007/02/05 12:44:40 ivanr Exp $
+ * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
  * or if you have any other questions related to the licence, please
- * write to Thinking Stone at contact@thinkingstone.com.
+ * write to Breach Security, Inc. at support@breach.com.
  *
  */
 #ifndef _MODSECURITY_H_
@@ -26,7 +24,7 @@ typedef struct msc_data_chunk msc_data_chunk;
 typedef struct msc_arg msc_arg;
 typedef struct msc_string msc_string;
 
-#if !(defined(WIN32) || defined(NETWARE))
+#if !(defined(WIN32) || defined(NETWARE) || defined(SOLARIS2))
 #define DSOLOCAL __attribute__((visibility("hidden")))
 #else
 #define DSOLOCAL
@@ -45,13 +43,14 @@ typedef struct msc_string msc_string;
 #include "ap_config.h"
 #include "apr_md5.h"
 #include "apr_strings.h"
+#include "apr_hash.h"
 #include "httpd.h"
 #include "http_config.h"
 #include "http_log.h"
 #include "http_protocol.h"
 
 #define MODULE_NAME "ModSecurity"
-#define MODULE_RELEASE "2.2.0-dev1"
+#define MODULE_RELEASE "2.5.0-dev2"
 #define MODULE_NAME_FULL (MODULE_NAME " v" MODULE_RELEASE " (Apache 2.x)")
 
 #define PHASE_REQUEST_HEADERS       1
@@ -59,6 +58,8 @@ typedef struct msc_string msc_string;
 #define PHASE_RESPONSE_HEADERS      3
 #define PHASE_RESPONSE_BODY         4
 #define PHASE_LOGGING               5
+#define PHASE_FIRST                 PHASE_REQUEST_HEADERS
+#define PHASE_LAST                  PHASE_LOGGING
 
 #define NOT_SET     -1
 #define NOT_SET_P (void *)-1
@@ -319,6 +320,9 @@ struct modsec_rec {
     apr_off_t            content_prepend_len;
     const char          *content_append;
     apr_off_t            content_append_len;
+
+    /* data cache */
+    apr_hash_t          *tcache;
 };
 
 struct directory_config {
@@ -406,6 +410,7 @@ struct directory_config {
     int                  pdfp_timeout;
     const char          *pdfp_token_name;
     int                  pdfp_only_get;
+    int                  pdfp_method;
 
     /* Geo Lookup */
     geo_db              *geo;

@@ -1,20 +1,18 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2006 Thinking Stone (http://www.thinkingstone.com)
- *
- * $Id: apache2_config.c,v 1.8 2006/12/28 10:39:13 ivanr Exp $
+ * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
  * or if you have any other questions related to the licence, please
- * write to Thinking Stone at contact@thinkingstone.com.
+ * write to Breach Security, Inc. at support@breach.com.
  *
  */
 #include <limits.h>
 
 #include "modsecurity.h"
 #include "msc_logging.h"
-
+#include "pdf_protect.h"
 #include "http_log.h"
 
 /* #define DEBUG_CONF 1 */
@@ -90,6 +88,7 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     dcfg->pdfp_timeout = NOT_SET;
     dcfg->pdfp_token_name = NOT_SET_P;
     dcfg->pdfp_only_get = NOT_SET;
+    dcfg->pdfp_method = NOT_SET;
 
     /* Geo Lookups */
     dcfg->geo = NOT_SET_P;
@@ -384,6 +383,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
         ? parent->pdfp_token_name : child->pdfp_token_name);
     merged->pdfp_only_get = (child->pdfp_only_get == NOT_SET
         ? parent->pdfp_only_get : child->pdfp_only_get);
+    merged->pdfp_method = (child->pdfp_method == NOT_SET
+        ? parent->pdfp_method : child->pdfp_method);
 
     /* Geo Lookup */
     merged->geo = (child->geo == NOT_SET_P
@@ -456,7 +457,8 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->pdfp_secret == NOT_SET_P) dcfg->pdfp_secret = NULL;
     if (dcfg->pdfp_timeout == NOT_SET) dcfg->pdfp_timeout = 10;
     if (dcfg->pdfp_token_name == NOT_SET_P) dcfg->pdfp_token_name = "PDFPTOKEN";
-    if (dcfg->pdfp_only_get == NOT_SET) dcfg->pdfp_only_get = 0;
+    if (dcfg->pdfp_only_get == NOT_SET) dcfg->pdfp_only_get = 1;
+    if (dcfg->pdfp_method == NOT_SET) dcfg->pdfp_method = PDF_PROTECT_METHOD_TOKEN_REDIRECTION;
 
     /* Geo Lookup */
     if (dcfg->geo == NOT_SET_P) dcfg->geo = NULL;
@@ -1195,6 +1197,25 @@ static const char *cmd_pdf_protect_intercept_get_only(cmd_parms *cmd, void *_dcf
     return NULL;
 }
 
+static const char *cmd_pdf_protect_method(cmd_parms *cmd, void *_dcfg,
+    const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "TokenRedirection") == 0) {
+        dcfg->pdfp_method = PDF_PROTECT_METHOD_TOKEN_REDIRECTION;
+    } else
+    if (strcasecmp(p1, "ForcedDownload") == 0) {
+        dcfg->pdfp_method = PDF_PROTECT_METHOD_FORCED_DOWNLOAD;
+    } else {
+        return (const char *)apr_psprintf(cmd->pool,
+            "ModSecurity: Unrecognised parameter value for SecPdfProtectMethod: %s", p1);
+    }
+    
+    return NULL;
+}
+
 /* -- Geo Lookup configuration -- */
 
 static const char *cmd_geo_lookups_db(cmd_parms *cmd, void *_dcfg,
@@ -1547,7 +1568,15 @@ const command_rec module_directives[] = {
         cmd_pdf_protect_intercept_get_only,
         NULL,
         RSRC_CONF,
-        "whether or not to intercept only GET requess."
+        "whether or not to intercept only GET and HEAD requess. Defaults to true."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecPdfProtectMethod",
+        cmd_pdf_protect_method,
+        NULL,
+        RSRC_CONF,
+        "protection method to use. Can be 'TokenRedirection' (default) or 'ForcedDownload'"
     ),
 
     AP_INIT_TAKE1 (

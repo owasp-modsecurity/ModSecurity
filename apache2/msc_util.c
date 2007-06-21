@@ -1,13 +1,11 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2006 Thinking Stone (http://www.thinkingstone.com)
- *
- * $Id: msc_util.c,v 1.1.1.1 2006/10/14 09:30:43 ivanr Exp $
+ * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
  * or if you have any other questions related to the licence, please
- * write to Thinking Stone at contact@thinkingstone.com.
+ * write to Breach Security, Inc. at support@breach.com.
  *
  */
 #include "msc_util.h"
@@ -561,8 +559,18 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
                     if (  (VALID_HEX(input[i + 2]))&&(VALID_HEX(input[i + 3]))
                         &&(VALID_HEX(input[i + 4]))&&(VALID_HEX(input[i + 5])) )
                     {
-                        /* We make use of the lower byte here, ignoring the higher byte. */
-                        *d++ = x2c(&input[i + 4]);
+                        /* We first make use of the lower byte here, ignoring the higher byte. */
+                        *d = x2c(&input[i + 4]);
+
+                        /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
+                        if (   (*d > 0x00) && (*d < 0x5f)
+                            && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
+                            && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
+                        {
+                            *d += 0x20;
+                        }
+
+                        d++;
                         count++;
                         i += 6;
                     } else {
