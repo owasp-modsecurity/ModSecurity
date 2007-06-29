@@ -3555,7 +3555,15 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
         </listitem>
 
         <listitem>
-          <para>400,000 and above; unreserved range.</para>
+          <para>400,000-419,999; unused.</para>
+        </listitem>
+
+        <listitem>
+          <para>420,000-429,999; reserved for ScalyWack.</para>
+        </listitem>
+
+        <listitem>
+          <para>430,000 and above; unused.</para>
         </listitem>
       </itemizedlist>
     </section>
