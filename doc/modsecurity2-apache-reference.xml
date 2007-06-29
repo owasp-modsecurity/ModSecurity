@@ -167,12 +167,11 @@
 
       <para>ModSecurity is available under two licenses. Users can choose to
       use the software under the terms of the GNU General Public License
-      (<ulink
-      url="http://www.gnu.org/licenses/gpl.html">http://www.gnu.org/licenses/gpl.html</ulink>),as
-      an Open Source / Free Software product. A range of commercial licenses
-      is also available, together with a range of commercial support
-      contracts. For more information on commercial licensing please contact
-      Breach Security.</para>
+      version 2 (licence text is included with the distribution), as an Open
+      Source / Free Software product. A range of commercial licenses is also
+      available, together with a range of commercial support contracts. For
+      more information on commercial licensing please contact Breach
+      Security.</para>
 
       <note>
         <para>ModSecurity, mod_security, and ModSecurity Pro are trademarks or
