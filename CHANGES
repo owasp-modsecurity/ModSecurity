@@ -1,3 +1,9 @@
+?? ???? 2007 - 2.5.0-dev3
+-------------------------
+
+ * Added Cygwin to the list of platforms not supporting the hidden
+   visibility attribute.
+
 21 June 2007 - 2.5.0-dev2
 -------------------------
 
