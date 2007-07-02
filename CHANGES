@@ -1,5 +1,10 @@
-
 ?? ??? 2007 - 2.5.0-trunk
+-------------------------
+
+ * Added Cygwin to the list of platforms not supporting the hidden
+   visibility attribute.
+
+21 June 2007 - 2.5.0-dev2
 -------------------------
 
  * Reversioned from 2.2.0 base version to 2.5.0 because of the large changeset.
