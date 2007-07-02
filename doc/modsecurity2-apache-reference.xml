@@ -2186,7 +2186,8 @@ SecRule GEO:COUNTRY_CODE "!@streq UK"</programlisting>
       <title><literal moreinfo="none">QUERY_STRING</literal></title>
 
       <para>This variable holds form data passed to the script/handler by
-      appending data after a question mark. Example:</para>
+      appending data after a question mark. Warning: Not URL-decoded.
+      Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">QUERY_STRING</emphasis> "attack"</programlisting>
     </section>
@@ -2323,8 +2324,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <title><literal moreinfo="none">REQUEST_FILENAME</literal></title>
 
       <para>This variable holds the relative REQUEST_URI minus the
-      QUERY_STRING part (e.g. /index.php). Warning: not urlDecoded.
-      Example:</para>
+      QUERY_STRING part (e.g. /index.php). Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_FILENAME</emphasis> "^/cgi-bin/login\.php$"</programlisting>
     </section>
