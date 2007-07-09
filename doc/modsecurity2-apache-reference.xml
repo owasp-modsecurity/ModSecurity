@@ -297,8 +297,8 @@
       </listitem>
 
       <listitem>
-        <para>(Optional) Install the latest version of libxml2, if it isn't
-        already installed on the server.</para>
+        <para>Install the latest version of libxml2, if it isn't already
+        installed on the server.</para>
       </listitem>
 
       <listitem>
@@ -315,10 +315,8 @@
       </listitem>
 
       <listitem>
-        <para>(Optional) Edit Makefile to enable ModSecurity to use libxml2
-        (uncomment line<literal moreinfo="none"> DEFS =
-        -DWITH_LIBXML2</literal>) and configure the include path (for example:
-        <filename
+        <para>Edit Makefile to configure the correct include path for libxml
+        (for example: <filename
         moreinfo="none">INCLUDES=-I/usr/include/libxml2</filename>)</para>
       </listitem>
 
