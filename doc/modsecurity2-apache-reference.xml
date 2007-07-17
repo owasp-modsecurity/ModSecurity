@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-trunk / (June 20, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-trunk / (July 17, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -3532,35 +3532,48 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
 
       <itemizedlist>
         <listitem>
-          <para>1 – 99999; reserved for your internal needs, use as you see
-          fit but don't publish them to others</para>
+          <para>1 – 99,999; reserved for local (internal) use. Use as you see
+          fit but do not use this range for rules that are distributed to
+          others.</para>
         </listitem>
 
         <listitem>
           <para>100,000-199,999; reserved for internal use of the engine, to
-          assign to rules that do not have explicit IDs</para>
+          assign to rules that do not have explicit IDs.</para>
         </listitem>
 
         <listitem>
           <para>200,000-299,999; reserved for rules published at
-          modsecurity.org</para>
+          modsecurity.org.</para>
         </listitem>
 
         <listitem>
           <para>300,000-399,999; reserved for rules published at
-          gotroot.com</para>
+          gotroot.com.</para>
         </listitem>
 
         <listitem>
-          <para>400,000-419,999; unused.</para>
+          <para>400,000-419,999; unused (available for reservation).</para>
         </listitem>
 
         <listitem>
-          <para>420,000-429,999; reserved for ScalyWack.</para>
+          <para>420,000-429,999; reserved for <ulink type=""
+          url="http://projects.otaku42.de/wiki/ScallyWhack">ScallyWack</ulink>.</para>
         </listitem>
 
         <listitem>
-          <para>430,000 and above; unused.</para>
+          <para>430,000-899,999; unused (available for reservation).</para>
+        </listitem>
+
+        <listitem>
+          <para>900,000-999,999; reserved for the <ulink
+          url="http://www.modsecurity.org/projects/rules/">Core Rules</ulink>
+          project.</para>
+        </listitem>
+
+        <listitem>
+          <para>1,000,000 and above; unused (available for
+          reservation).</para>
         </listitem>
       </itemizedlist>
     </section>
