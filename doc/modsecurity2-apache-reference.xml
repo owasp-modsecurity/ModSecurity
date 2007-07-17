@@ -3558,7 +3558,7 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
 
         <listitem>
           <para>420,000-429,999; reserved for <ulink type=""
-          url="http://projects.otaku42.de/wiki/ScallyWhack">ScallyWack</ulink>.</para>
+          url="http://projects.otaku42.de/wiki/ScallyWhack">ScallyWhack</ulink>.</para>
         </listitem>
 
         <listitem>
