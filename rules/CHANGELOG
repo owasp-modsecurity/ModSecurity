@@ -1,19 +1,57 @@
 
 --------------------------------
-version 1.4 build 2 - 2007/05/17
+version 1.4.3 - 2007/07/21
 --------------------------------
-New Feature:
-- Search for signatures in XML content
 
 New Events:
-- 950107 - Unicode Full/Half Width Abuse Attack Attempt
+- 950012 - HTTP Request Smuggling
+  For more info on this attack:
+  http://www.cgisecurity.com/lib/HTTP-Request-Smuggling.pdf
+- 960912 - Invalid request body
+  Malformed content will not be parsed by modsecurity, but still there might
+  be applications that will parse it, ignoring the errors.
+- 960913 - Invalid Request
+  Will trigger a security event when request was rejected by apache with
+  code 400, without going through ModSecurity rules.
+
+False Positives Fixes:
+- 950107 - Will allow a % sign in the middle of a string as well
+- 960911 - A more accurate expression based on the rfc:
+            http://www.ietf.org/rfc/rfc2396.txt
+- 950015 - Will not look for http/ pattern in the request headers
+
+Additional rules logic:
+- Since Apache applies scope directives only after ModSecurity phase 1
+  this directives cannot be used to exclude phase 1 rules. Therefore
+  we moved all inspection rules to phase 2.
+
+--------------------------------
+version 1.4 build 2 - 2007/05/17
+--------------------------------
+
+New Feature:
+- Search for signatures in XML content
+    XML Content will be parsed and ispected for signatures
+
+New Events:
+- 950116 - Unicode Full/Half Width Abuse Attack Attempt
+    Full-width unicode can by used to bypass content inspection. Such encoding will be forbidden
+    http://www.kb.cert.org/vuls/id/739224
 - 960911 - Invalid HTTP request line
+    Enforce request line to be valid, i.e.: <METHOD> <path> <HTTP version>
 - 960904 - Request Missing Content-Type (when there is content)
+    When a request contains content, the content-type must be specified. If not, the content will not be inspected
 - 970018 - IIS installed in default location (any drive)
+    Log once if IIS in installed in the /Inetpub directory (on any drive, not only C)
 - 950019 - Email Injection
+    Web forms used for sending mail (such as “tell a friend”) are often manipulated by spammers for sending anonymous emails
 
 Regular expressions fixes:
 - Further optimization of some regular expressions (using the non-greediness operator)
+    The non-greediness operator, <?>, prevents excessive backtracking
+
+FP fixes:
+- Rule 950107 - Will allow a parameter to end in a % sign from now on
 
 ------------------------
 version 1.4 - 2007/05/02
@@ -23,7 +61,7 @@ New Events:
 - 970021 - WebLogic information disclosure
     Matching of "<title>JSP compile error</title>" in the response body, will trigger this rule, with severity 4 (Warning)
 - 950015,950910,950911 - HTTP Response Splitting
-    Looking for HTTP Response Splitting patterns as described in Amit Klein's excellent article:
+    Looking for HTTP Response Splitting patterns as described in Amit Klein's excellent white paper:
     http://www.packetstormsecurity.org/papers/general/whitepaper_httpresponse.pdf
 ModSecurity does not support compressed content at the moment. Thus, the following rules have been added:
 - 960902 - Content-Encoding in request not supported
@@ -60,11 +98,11 @@ Added persistent PDF UXSS detection rule
 Version 1.3.2 build 3 2007/01/10
 --------------------------------
 
-Fixed regular expression in rule 960010 (file #30) to allow multipart form data 
+Fixed regular expression in rule 960010 (file #30) to allow multipart form data
 content
 
 --------------------------
-Version 1.3.2 - 2006/12/27 
+Version 1.3.2 - 2006/12/27
 --------------------------
 
 New events:
@@ -93,7 +131,7 @@ Additional rules logic:
 - Changed default action in file #50 to pass instead of deny.
 - Moved IP host header from protocol violations to protocol anomalies.
 
-Modified descriptions: 
+Modified descriptions:
 - 950107: URL Encoding Abuse Attack Attempt
 - 950801: UTF8 Encoding Abuse Attack Attempt
 - Added matched pattern in many events using capture and %{TX.0}
@@ -106,11 +144,11 @@ Version 1.2 - 2006/11/19
 Changes:
 + Move all events to the range of events allocated to Thinking Stone, now Breach
 by prefixing all event IDs with "9".
-+ Reverse severities to follow the Syslog format used by ModSecurity, now 1 is 
-the highest and 5 the lowest.   
++ Reverse severities to follow the Syslog format used by ModSecurity, now 1 is
+the highest and 5 the lowest.
 
 Bug fixes:
-+ Removed quotes from list of mime types inspected on exit (directive 
++ Removed quotes from list of mime types inspected on exit (directive
 SecResponseBodyMimeType)
 + Corrected "cd .." signature. Now the periods are escaped.
 + Too many FPs with events 950903 & 950905. Commented them out until fixed.
@@ -119,4 +157,4 @@ SecResponseBodyMimeType)
 Version 1.1 - 2006/10/18
 ------------------------
 
-Initial version 
+Initial version
