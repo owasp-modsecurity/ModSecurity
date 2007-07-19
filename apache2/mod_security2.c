@@ -687,6 +687,15 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
 
     if (r == NULL) return;
     msr = retrieve_tx_context((request_rec *)r);
+
+    /* Create a context for requests we never had the chance to process */ 
+    /* TODO: This needs more testing */
+    if (level & APLOG_ERR) { 
+        if (msr == NULL && apr_table_get(r->subprocess_env, "UNIQUE_ID")) { 
+            msr = create_tx_context((request_rec *)r); 
+        } 
+    } 
+
     if (msr == NULL) return;
 
     /* Store the error message for later */
