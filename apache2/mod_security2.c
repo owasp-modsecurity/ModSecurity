@@ -696,12 +696,11 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
     if (r == NULL) return;
     msr = retrieve_tx_context(r);
 
-    /* Alert for failed requests we never had the chance to process */ 
+    /* Create a context for requests we never had the chance to process */ 
     /* TODO: This needs more testing */
     if (level & APLOG_ERR) { 
         if (msr == NULL && apr_table_get(r->subprocess_env, "UNIQUE_ID")) { 
             msr = create_tx_context((request_rec *)r); 
-            msr_log(msr, 1, "Request failed before processing could begin"); 
         } 
     } 
 
