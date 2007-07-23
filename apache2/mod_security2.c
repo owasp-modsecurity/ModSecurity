@@ -689,11 +689,19 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
     msr = retrieve_tx_context((request_rec *)r);
 
     /* Create a context for requests we never had the chance to process */ 
-    /* TODO: This needs more testing */
-    if (level & APLOG_ERR) { 
-        if (msr == NULL && apr_table_get(r->subprocess_env, "UNIQUE_ID")) { 
-            msr = create_tx_context((request_rec *)r); 
-        } 
+    if ((msr == NULL)
+        && ((level & APLOG_LEVELMASK) < APLOG_DEBUG)
+        && apr_table_get(r->subprocess_env, "UNIQUE_ID"))
+    {
+        msr = create_tx_context((request_rec *)r); 
+        if (msr->txcfg->debuglog_level >= 9) {
+            if (msr == NULL) {
+                msr_log(msr, 9, "Failed to create context after request failure.");
+            }
+            else {
+                msr_log(msr, 9, "Context created after request failure.");
+            }
+        }
     } 
 
     if (msr == NULL) return;
