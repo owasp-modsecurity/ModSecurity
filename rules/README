@@ -1,21 +1,22 @@
 
-
+==============================
 ModSecurity Core Rule Set
 ==============================
 
-(c) 2006 Breach Secuiry Inc.
+(c) 2006-2007 Breach Secuiry Inc.
 
 The ModSecurity Core Rule Set is provided to you under the terms and 
 conditions of GPL version 2
 
 This directory contains the files for Core ModSecurity Rule Set
-The rules are compatible with ModSecurity 2.1 (as of version 1.3.2)
+The rules are compatible with ModSecurity 2.5 (as of version 1.4.3)
 
-   
+
+
 Overview
---------
+========
 
-Using ModSecurity requires rules. In order to enable users to take full 
+Using ModSecurity requires rules. In order to enable users to take full
 advantage of ModSecurity immediately, Breach Security Inc. is providing a free 
 Core rule set. Unlike intrusion detection and prevention systems which 
 rely on signature specific to known vulnerabilities, the Core Rule Set 
@@ -31,12 +32,13 @@ training and professional services to assist you in doing that. The Core
 Rule Set is heavily commented to allow it to be used as a step-by-step 
 deployment guide for ModSecurity.
 
-For more information refer to the Core Rule Set page at 
+For more information refer to the Core Rule Set page at
 http://www.modsecurity.org/
 
 
+
 Core Rule Set Structure & Usage
-------------------------------------
+====================================
 
 To activate the rules for your web server installation:
 
@@ -62,8 +64,38 @@ To activate the rules for your web server installation:
      to ModSecurity Console in real time, check the alert was
      correctly recorded there too.
 
+
+Known Issues
+===============
+
+Apache requests rejection and phase 2 rules
+-------------------------------------------
+
+Since now all inspection rules are executed in phase 2, several protocol
+validation is done by Apache prior to ModSecurity. This is by no means a
+security issue as Apache would block the requests, but the alert would appear
+in the ModSecurity audit log as a generic event "Invalid Request (960913)"
+
+Here's a list of the events that modsecurity might not log due to this issue:
+- Validate encoding - 950107
+    When invalid encoding is found in the URI
+- Validate utf-8 encoding - 950801
+    When invalid encoding is found in the URI
+- Method not allowed by policy - 960032
+    When the request uses a method that Apache doesn't know such as: CONNECT, SUBSCRIBE, etc.
+
+
+Google Analytics
+----------------
+
+For Google Analytics account activation, you will need to disable
+the Core Rules temporarily, then enable them after your Google account is
+activated. More info can be found in the mod-security-mailing-list:
+http://sourceforge.net/mailarchive/message.php?msg_name=1179692394.26994.10.camel%40localhost
+
+
 About Regular Expressions
--------------------------
+============================
 
 One of the advantages of the Core Rule Set, being a set of text files is your 
 ability to modify it. However you will find that the regular expressions used 
@@ -79,7 +111,7 @@ of regular expressions.
 
 
 Core Rule Set Content
---------------------------
+=========================
 
 In order to provide generic web applications protection, the Core Rule Set 
 uses the following techniques:
