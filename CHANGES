@@ -1,22 +1,9 @@
-24 July 2007 - 2.1.2-rc3
-------------------------
+27 July 2007 - 2.1.2
+--------------------
+
+ * Update included core rules to latest version (1.4.3).
 
  * Enhanced ability to alert/audit failed requests.
-
-
-19 July 2007 - 2.1.2-rc2
-------------------------
-
- * Added ability to alert/audit failed requests.
-
- * Added Cygwin to the list of platforms not supporting the hidden
-   visibility attribute.
-
-
-14 June 2007 - 2.1.2-rc1
-------------------------
-
- * Update included core rules to latest version.
 
  * Do not trigger "pause" action for internal requests.
 
@@ -24,7 +11,7 @@
    potential to be intercepted incorrectly when other Apache httpd modules
    that used internal requests were used with mod_security.
 
- * Added Solaris to the list of platforms not supporting the hidden
+ * Added Solaris and Cygwin to the list of platforms not supporting the hidden
    visibility attribute.
 
  * Fixed decoding full-width unicode in t:urlDecodeUni.
