@@ -1,10 +1,9 @@
 ModSecurity for Apache 2.x, http://www.modsecurity.org/
 Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
 
-You should have received a copy of the licence along with this
-program (stored in the file "LICENSE"). If the file is missing,
-or if you have any other questions related to the licence, please
-write to Breach Security, Inc. at support@breach.com.
+ModSecurity for Apache is an open source product, released under terms of
+the General Public Licence, Version 2 (GPLv2). Please refer to the
+file LICENSE, which contains the complete text of the licence.
 
 DOCUMENTATION
 
