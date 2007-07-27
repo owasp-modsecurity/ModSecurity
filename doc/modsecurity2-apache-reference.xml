@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-trunk / (July 17, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-trunk / (July 27, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -2254,11 +2254,26 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <title><literal
       moreinfo="none">REQBODY_PROCESSOR_ERROR</literal></title>
 
-      <para>0 (no error) or 1 (error). If you want to stop processing on an
-      error you must have an explicit rule in phase 2 to do so.
-      Example:</para>
+      <para>Possible values are 0 (no error) or 1 (error). This variable will
+      be set by request body processors (typically the
+      <classname>multipart/request-data</classname> parser or the XML parser)
+      when they fail to properly parse a request payload.</para>
+
+      <para>Example:</para>
 
       <programlisting format="linespecific">SecRule<emphasis role="bold"> REQBODY_PROCESSOR_ERROR</emphasis> "@eq 1" deny,phase:2</programlisting>
+
+      <note>
+        <para>Your policies <emphasis>must</emphasis> have a rule to check
+        REQBODY_PROCESSOR_ERROR at the beginning of phase 2. Failure to do so
+        will leave the door open for impedance mismatch attacks. It is
+        possible, for example, that a payload that cannot be parsed by
+        ModSecurity can be successfully parsed by more tolerant parser
+        operating in the application. If your policy dictates blocking then
+        you should reject the request if error is detected. When operating in
+        detection-only mode your rule should alert with high severity when
+        request body processing fails.</para>
+      </note>
     </section>
 
     <section>
