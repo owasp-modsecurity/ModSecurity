@@ -1180,7 +1180,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
     }
         
     if (msr->txcfg->debuglog_level >= 4) {
-        time_before_regex = apr_time_now(); /* IMP1 time_before_regex? */
+        time_before_regex = apr_time_now();
     }
 
     rc = rule->op_metadata->execute(msr, rule, var, &my_error_msg);
