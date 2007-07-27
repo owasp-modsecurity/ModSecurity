@@ -30,3 +30,11 @@ SecRequestBodyInMemoryLimit 131072
 # Buffer response bodies of up to
 # 512 KB in length
 SecResponseBodyLimit 524288
+
+# Verify that we've correctly processed the request body.
+# As a rule of thumb, when failing to process a request body
+# you should reject the request (when deployed in blocking mode)
+# or log a high-severity alert (when deployed in detection-only mode).
+SecRule REQBODY_PROCESSOR_ERROR "!@eq 0" \
+"phase:2,t:none,log,deny,msg:'Failed to parse request body.',severity:2"
+
