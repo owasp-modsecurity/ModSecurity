@@ -555,7 +555,7 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
                             && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
                             && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
                         {
-                            *d += 0x20;
+                            (*d) += 0x20;
                         }
 
                         d++;
