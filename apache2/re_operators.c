@@ -308,9 +308,13 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
 static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     const char *match = NULL;
     apr_status_t rc = 0;
+    int capture;
     
     /* Nothing to read */
     if ((var->value == NULL) || (var->value_len == 0)) return 0;
+
+    /* Are we supposed to capture subexpressions? */
+    capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     ACMPT pt = {(ACMP *)rule->op_param_data, NULL};
 
@@ -326,6 +330,33 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             *error_msg = apr_psprintf(msr->mp, "Matched phrase \"%s\" at %s.",
                 match_escaped, var->name);
         }
+
+        /* Handle capture as tx.0=match */
+        if (capture) {
+            int i;
+            msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+
+            if (s == NULL) return -1;
+
+            s->name = "0";
+            s->value = apr_pstrdup(msr->mp, match);
+            if (s->value == NULL) return -1;
+            s->value_len = strlen(s->value);
+            apr_table_setn(msr->tx_vars, s->name, (void *)s);
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Adding phrase match to TXVARS (0): %s",
+                    log_escape_nq_ex(msr->mp, s->value, s->value_len));
+            }
+
+            /* Unset the remaining ones (from previous invocations). */
+            for(i = rc; i <= 9; i++) {
+                char buf[2];
+                apr_snprintf(buf, sizeof(buf), "%i", i);
+                apr_table_unset(msr->tx_vars, buf);
+            }
+        }
+
         return 1;
     }
     return rc;
@@ -1145,89 +1176,91 @@ static int msre_op_validateUrlEncoding_execute(modsec_rec *msr, msre_rule *rule,
 #define UNICODE_ERROR_CHARACTERS_MISSING    -1
 #define UNICODE_ERROR_INVALID_ENCODING      -2
 #define UNICODE_ERROR_OVERLONG_CHARACTER    -3
+#define UNICODE_ERROR_RESTRICTED_CHARACTER  -4
+#define UNICODE_ERROR_DECODING_ERROR        -5
 
+/* NOTE: This is over-commented for ease of verification */
 static int detect_utf8_character(const char *p_read, unsigned int length) {
     int unicode_len = 0;
     unsigned int d = 0;
     unsigned char c;
 
-    if (p_read == NULL) return 0;
+    if (p_read == NULL) return UNICODE_ERROR_DECODING_ERROR;
     c = *p_read;
-    if (c == 0) return 0;
 
-    if ((c & 0xE0) == 0xC0) {
-        /* two byte unicode */
+    /* If first byte begins with binary 0 it is single byte encoding */
+    if ((c & 0x80) == 0) {
+        /* single byte unicode (7 bit ASCII equivilent) has no validation */
+        return 1;
+    }
+    /* If first byte begins with binary 110 it is two byte encoding*/
+    else if ((c & 0xE0) == 0xC0) {
+        /* check we have at least two bytes */
         if (length < 2) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
-        else
-        if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+        /* check second byte starts with binary 10 */
+        else if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
         else {
             unicode_len = 2;
+            /* compute character number */
             d = ((c & 0x1F) << 6) | (*(p_read + 1) & 0x3F);
         }
     }
+    /* If first byte begins with binary 1110 it is three byte encoding */
     else if ((c & 0xF0) == 0xE0) {
-        /* three byte unicode */
+        /* check we have at least three bytes */
         if (length < 3) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
-        else
-        if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+        /* check second byte starts with binary 10 */
+        else if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+        /* check third byte starts with binary 10 */
+        else if (((*(p_read + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
         else {
             unicode_len = 3;
+            /* compute character number */
             d = ((c & 0x0F) << 12) | ((*(p_read + 1) & 0x3F) << 6) | (*(p_read + 2) & 0x3F);
         }
     }
+    /* If first byte begins with binary 11110 it is four byte encoding */
     else if ((c & 0xF8) == 0xF0) {
-        /* four byte unicode */
+        /* restrict characters to UTF-8 range (U+0000 - U+10FFFF)*/
+        if (c >= 0xF5) {
+            return UNICODE_ERROR_RESTRICTED_CHARACTER;
+        }
+        /* check we have at least four bytes */
         if (length < 4) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
-        else
-        if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 3)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+        /* check second byte starts with binary 10 */
+        else if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+        /* check third byte starts with binary 10 */
+        else if (((*(p_read + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+        /* check forth byte starts with binary 10 */
+        else if (((*(p_read + 3)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
         else {
-            d = ((c & 0x07) << 18) | ((*(p_read + 1) & 0x3F) << 12) | ((*(p_read + 2) & 0x3F) < 6) | (*(p_read + 3) & 0x3F);
             unicode_len = 4;
+            /* compute character number */
+            d = ((c & 0x07) << 18) | ((*(p_read + 1) & 0x3F) << 12) | ((*(p_read + 2) & 0x3F) < 6) | (*(p_read + 3) & 0x3F);
         }
     }
-    else if ((c & 0xFC) == 0xF8) {
-        /* five byte unicode */
-        if (length < 5) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
-        else
-        if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 3)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 4)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else {
-            d = ((c & 0x03) << 24) | ((*(p_read + 1) & 0x3F) << 18) | ((*(p_read + 2) & 0x3F) << 12) | ((*(p_read + 3) & 0x3F) << 6) | (*(p_read + 4) & 0x3F);
-            unicode_len = 5;
-        }
-    }
-    else if ((c & 0xFE) == 0xFC) {
-        /* six byte unicode */
-        if (length < 6) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
-        else
-        if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 3)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 4)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 5)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else {
-            d = ((c & 0x01) << 30) | ((*(p_read + 1) & 0x3F) << 24) | ((*(p_read + 2) & 0x3F) << 18) | ((*(p_read + 3) & 0x3F) << 12) | ((*(p_read + 4) & 0x3F) << 6) | (*(p_read + 5) & 0x3F);
-            unicode_len = 6;
-        }
+    /* any other first byte is invalid (RFC 3629) */
+    else {
+        return UNICODE_ERROR_INVALID_ENCODING;
     }
 
-    if ((unicode_len > 1)&&((d & 0x7F) == d)) {
-        unicode_len = UNICODE_ERROR_OVERLONG_CHARACTER;
+    /* invalid UTF-8 character number range (RFC 3629) */
+    if ((d >= 0xD800) && (d <= 0xDFFF)) {
+        return UNICODE_ERROR_RESTRICTED_CHARACTER;
+    }
+
+    /* check for overlong */
+    if ((unicode_len == 4) && (d < 0x010000)) {
+        /* four byte could be represented with less bytes */
+        return UNICODE_ERROR_OVERLONG_CHARACTER;
+    }
+    else if ((unicode_len == 3) && (d < 0x0800)) {
+        /* three byte could be represented with less bytes */
+        return UNICODE_ERROR_OVERLONG_CHARACTER;
+    }
+    else if ((unicode_len == 2) && (d < 0x80)) {
+        /* two byte could be represented with less bytes */
+        return UNICODE_ERROR_OVERLONG_CHARACTER;
     }
 
     return unicode_len;
@@ -1239,6 +1272,7 @@ static int msre_op_validateUtf8Encoding_execute(modsec_rec *msr, msre_rule *rule
     unsigned int i, bytes_left;
 
     bytes_left = var->value_len;
+
     for(i = 0; i < var->value_len; i++) {
         int rc = detect_utf8_character(&var->value[i], bytes_left);
         switch(rc) {
@@ -1248,18 +1282,26 @@ static int msre_op_validateUtf8Encoding_execute(modsec_rec *msr, msre_rule *rule
                 return 1;
                 break;
             case UNICODE_ERROR_INVALID_ENCODING :
-                *error_msg = apr_psprintf(msr->mp, "Invalid Unicode encoding: invalid byte value "
+                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: invalid byte value "
                     "in character.");
                 return 1;
                 break;
             case UNICODE_ERROR_OVERLONG_CHARACTER :
-                *error_msg = apr_psprintf(msr->mp, "Invalid Unicode encoding: overlong "
+                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: overlong "
                     "character detected.");
+                return 1;
+                break;
+            case UNICODE_ERROR_RESTRICTED_CHARACTER :
+                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: use of restricted character");
+                return 1;
+                break;
+            case UNICODE_ERROR_DECODING_ERROR :
+                *error_msg = apr_psprintf(msr->mp, "Error validating UTF-8 decoding");
                 return 1;
                 break;
         }
 
-        bytes_left--;
+        bytes_left -= rc;
     }
 
     return 0;
