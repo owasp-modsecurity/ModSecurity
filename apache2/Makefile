@@ -28,9 +28,9 @@ APXS      = apxs
 APACHECTL = apachectl
 
 INCLUDES = -I /usr/include/libxml2
-DEFS = -DWITH_LIBXML2
+#DEFS = -DWITH_LIBXML2
 #DEFS = -DWITH_LIBXML2 -DDEBUG_CONF
-#DEFS = -DWITH_LIBXML2 -DCACHE_DEBUG
+DEFS = -DWITH_LIBXML2 -DCACHE_DEBUG
 #LIBS = -Lmy/lib/dir -lmylib
 
 CFLAGS = -O2 -g -Wuninitialized -Wall -Wmissing-prototypes -Wshadow -Wunused-variable -Wunused-value -Wchar-subscripts -Wsign-compare

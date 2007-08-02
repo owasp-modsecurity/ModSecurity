@@ -145,6 +145,9 @@ extern DSOLOCAL const command_rec module_directives[];
 #define MODSEC_DETECTION_ONLY           1
 #define MODSEC_ENABLED                  2
 
+#define MODSEC_CACHE_DISABLED           0
+#define MODSEC_CACHE_ENABLED            1
+
 #define MODSEC_OFFLINE                  0
 #define MODSEC_ONLINE                   1
 
@@ -414,6 +417,9 @@ struct directory_config {
 
     /* Geo Lookup */
     geo_db              *geo;
+
+    /* Cache */
+    int                  cache_trans;
 };
 
 struct error_message {

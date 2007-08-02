@@ -93,6 +93,9 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     /* Geo Lookups */
     dcfg->geo = NOT_SET_P;
 
+    /* Cache */
+    dcfg->cache_trans = NOT_SET;
+
     return dcfg;
 }
 
@@ -390,6 +393,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     merged->geo = (child->geo == NOT_SET_P
         ? parent->geo : child->geo);
 
+    /* Cache */
+    merged->cache_trans = (child->cache_trans == NOT_SET
+        ? parent->cache_trans : child->cache_trans);
+
     return merged;
 }
 
@@ -462,6 +469,9 @@ void init_directory_config(directory_config *dcfg) {
 
     /* Geo Lookup */
     if (dcfg->geo == NOT_SET_P) dcfg->geo = NULL;
+
+    /* Cache */
+    if (dcfg->cache_trans == NOT_SET_P) dcfg->cache_trans = MODSEC_CACHE_ENABLED;
 }
 
 /**
@@ -1233,6 +1243,25 @@ static const char *cmd_geo_lookups_db(cmd_parms *cmd, void *_dcfg,
 }
 
 
+/* -- Cache -- */
+
+static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg, const char *p1, const char *p2) {
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+
+    // TODO: p2 is options
+
+    if (strcasecmp(p1, "on") == 0)
+        dcfg->cache_trans = MODSEC_CACHE_ENABLED;
+    else if (strcasecmp(p1, "off") == 0)
+        dcfg->cache_trans = MODSEC_CACHE_DISABLED;
+    else
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecCacheTransformations: %s", p1);
+
+    return NULL;
+}
+
+
 /* -- Configuration directives definitions -- */
 
 #define CMD_SCOPE_MAIN  (RSRC_CONF)
@@ -1585,6 +1614,14 @@ const command_rec module_directives[] = {
         NULL,
         RSRC_CONF,
         "database for geographical lookups module."
+    ),
+
+    AP_INIT_TAKE12 (
+        "SecCacheTransformations",
+        cmd_cache_transformations,
+        NULL,
+        CMD_SCOPE_ANY,
+        "whether or not to cache transformations. Defaults to true."
     ),
 
     { NULL }

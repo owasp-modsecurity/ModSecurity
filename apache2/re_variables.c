@@ -1895,7 +1895,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         1, 1,
         var_generic_list_validate,
         var_tx_generate,
-        VAR_CACHE,
+        VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
 

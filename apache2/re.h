@@ -309,7 +309,8 @@ char DSOLOCAL *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset);
 struct msre_cache_rec {
     int                      hits;
     int                      changed;
-    const char              *key;
+    int                      num;
+    const char              *path;
     const char              *val;
     apr_size_t               val_len;
 };
