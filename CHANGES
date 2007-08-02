@@ -1,6 +1,8 @@
 27 July 2007 - 2.1.2
 --------------------
 
+ * Cleaned up and clarified some documentation.
+
  * Update included core rules to latest version (1.4.3).
 
  * Enhanced ability to alert/audit failed requests.
