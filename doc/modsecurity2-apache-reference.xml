@@ -617,16 +617,16 @@ SecAuditLogStorageDir logs/audit
 
       <itemizedlist>
         <listitem>
-          <para><literal moreinfo="none">A</literal> – audit log header
+          <para><literal moreinfo="none">A</literal> - audit log header
           (mandatory)</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">B</literal> – request headers</para>
+          <para><literal moreinfo="none">B</literal> - request headers</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">C</literal> – request body (present
+          <para><literal moreinfo="none">C</literal> - request body (present
           only if the request body exists and ModSecurity is configured to
           intercept it)</para>
         </listitem>
@@ -637,7 +637,7 @@ SecAuditLogStorageDir logs/audit
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">E</literal> – intermediary response
+          <para><literal moreinfo="none">E</literal> - intermediary response
           body (present only if ModSecurity is configured to intercept
           response bodies, and if the audit log engine is configured to record
           it). Intermediary response body is the same as the actual response
@@ -648,13 +648,13 @@ SecAuditLogStorageDir logs/audit
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">F</literal> – final response headers
+          <para><literal moreinfo="none">F</literal> - final response headers
           (excluding the Date and Server headers, which are always added by
           Apache in the late stage of content delivery).</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">G</literal> – RESERVED for the actual
+          <para><literal moreinfo="none">G</literal> - RESERVED for the actual
           response body, not implemented yet.</para>
         </listitem>
 
@@ -681,7 +681,7 @@ SecAuditLogStorageDir logs/audit
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">Z</literal> – final boundary,
+          <para><literal moreinfo="none">Z</literal> - final boundary,
           signifies the end of the entry (mandatory)</para>
         </listitem>
       </itemizedlist>
@@ -1862,7 +1862,7 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis
         </listitem>
 
         <listitem>
-          <para>multipart/form-data – used for file transfers</para>
+          <para>multipart/form-data - used for file transfers</para>
         </listitem>
 
         <listitem>
@@ -3512,7 +3512,7 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
 
       <itemizedlist>
         <listitem>
-          <para>1 – 99,999; reserved for local (internal) use. Use as you see
+          <para>1 - 99,999; reserved for local (internal) use. Use as you see
           fit but do not use this range for rules that are distributed to
           others.</para>
         </listitem>
