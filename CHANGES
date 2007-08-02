@@ -1,6 +1,10 @@
 ?? ??? 2007 - 2.5.0-trunk
 -------------------------
 
+ * Cleaned up some documentation.
+
+ * Performance improvements in caching transformations.
+
  * Stricter validation for @validateUtf8Encoding.
 
  * Capture the match in TX:0 when using "capture" action in phrase match

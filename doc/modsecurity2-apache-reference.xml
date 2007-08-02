@@ -16,14 +16,14 @@
   <section id="01-introduction">
     <title>Introduction</title>
 
-    <para><trademark class="trade">ModSecurity</trademark>is a web application
-    firewall (WAF). With over 70% of all attacks now carried out over the web
-    application level, organisations need every help they can get in making
-    their systems secure. WAFs are deployed to establish an external security
-    layer that increases security, detects, and prevents attacks before they
-    reach web applications. It provides protection from a range of attacks
-    against web applications and allows for HTTP traffic monitoring and
-    real-time analysis with little or no changes to existing
+    <para><trademark class="trade">ModSecurity</trademark> is a web
+    application firewall (WAF). With over 70% of all attacks now carried out
+    over the web application level, organisations need every help they can get
+    in making their systems secure. WAFs are deployed to establish an external
+    security layer that increases security, detects, and prevents attacks
+    before they reach web applications. It provides protection from a range of
+    attacks against web applications and allows for HTTP traffic monitoring
+    and real-time analysis with little or no changes to existing
     infrastructure.</para>
 
     <section>
@@ -198,7 +198,7 @@
       commented to allow it to be used as a step-by-step deployment guide for
       ModSecurity. The latest Core Rules can be found at the ModSecurity
       website - <ulink
-      url="???">http://www.modsecurity.org/projects/rules/</ulink>.</para>
+      url="http://www.modsecurity.org/projects/rules/">http://www.modsecurity.org/projects/rules/</ulink>.</para>
     </section>
 
     <section>
@@ -433,11 +433,9 @@
       moreinfo="none">SecAction
       nolog,redirect:http://www.hostname.com</literal></para>
 
-      <para><emphasis role="bold"> <emphasis
-      role="bold">ProcessingPhase:</emphasis> </emphasis>Any</para>
+      <para><emphasis role="bold">ProcessingPhase:</emphasis> Any</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
 
@@ -451,7 +449,7 @@
     <section>
       <title><literal>SecArgumentSeparator</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Specifies which
+      <para><emphasis role="bold">Description:</emphasis> Specifies which
       character to use as separator for<literal moreinfo="none">
       application/x-www-form-urlencoded</literal> content. Defaults to
       <literal moreinfo="none">&amp;</literal>. Applications are sometimes
@@ -467,7 +465,7 @@
       <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
 
       <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Main</para>
+      </emphasis> Main</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
 
@@ -490,10 +488,9 @@
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
       moreinfo="none">SecAuditEngine On</literal></para>
 
-      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> Can be
       set/changed with the "ctl" action for the current transaction.</para>
@@ -501,8 +498,8 @@
       <para>Example: The following example shows the various audit directives
       used together.</para>
 
-      <programlisting format="linespecific"><emphasis role="bold">SecAuditEngine RelevantOnly
-</emphasis>SecAuditLog logs/audit/audit.log
+      <programlisting format="linespecific"><emphasis role="bold">SecAuditEngine RelevantOnly</emphasis> 
+SecAuditLog logs/audit/audit.log
 SecAuditLogParts ABCFHZ
 SecAuditLogType concurrent
 SecAuditLogStorageDir logs/audit
@@ -512,7 +509,7 @@ SecAuditLogStorageDir logs/audit
 
       <itemizedlist>
         <listitem>
-          <para><literal moreinfo="none">On </literal>- log all transactions
+          <para><literal moreinfo="none">On</literal> - log all transactions
           by default.</para>
         </listitem>
 
@@ -522,7 +519,7 @@ SecAuditLogStorageDir logs/audit
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">RelevantOnly </literal>- by default
+          <para><literal moreinfo="none">RelevantOnly</literal> - by default
           only log transactions that have triggered a warning or an error, or
           have a status code that is considered to be relevant (see<literal
           moreinfo="none"> SecAuditLogRelevantStatus</literal>).</para>
@@ -545,8 +542,7 @@ SecAuditLogStorageDir logs/audit
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> This file is
       open on startup when the server typically still runs as<emphasis>
@@ -582,8 +578,7 @@ SecAuditLogStorageDir logs/audit
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> A main audit
       log must be defined via <literal moreinfo="none">SecAuditLog</literal>
@@ -605,12 +600,12 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
       moreinfo="none">SecAuditLogParts ABCFHZ</literal></para>
 
-      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
       <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      </emphasis> Any</para>
 
-      <para><emphasis role="bold">Dependencies/Notes: </emphasis>At this time
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> At this time
       ModSecurity does not log response bodies of stock Apache responses (e.g.
       <literal moreinfo="none">404</literal>), or the <literal
       moreinfo="none">Server</literal> and <literal
@@ -671,13 +666,12 @@ SecAuditLogStorageDir logs/audit
         <listitem>
           <para><literal moreinfo="none">I</literal> - This part is a
           replacement for part C. It will log the same data as C in all cases
-          except when<literal
-          moreinfo="none">multipart/form-data</literal>encoding in used. In
-          this case it will log a fake<literal moreinfo="none">
-          application/x-www-form-urlencoded</literal> body that contains the
-          information about parameters but not about the files. This is handy
-          if you don't want to have (often large) files stored in your audit
-          logs.</para>
+          except when<literal moreinfo="none">multipart/form-data</literal>
+          encoding in used. In this case it will log a fake <literal
+          moreinfo="none"> application/x-www-form-urlencoded</literal> body
+          that contains the information about parameters but not about the
+          files. This is handy if you don't want to have (often large) files
+          stored in your audit logs.</para>
         </listitem>
 
         <listitem>
@@ -696,7 +690,7 @@ SecAuditLogStorageDir logs/audit
     <section>
       <title><literal>SecAuditLogRelevantStatus</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Configures which
+      <para><emphasis role="bold">Description:</emphasis> Configures which
       response status code is to be considered relevant for the purpose of
       audit logging.</para>
 
@@ -706,10 +700,9 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
       moreinfo="none">SecAuditLogRelevantStatus ^[45]</literal></para>
 
-      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> Must have the
       SecAuditEngine set to RelevantOnly. The parameter is a regular
@@ -738,10 +731,9 @@ SecAuditLogStorageDir logs/audit
       moreinfo="none">SecAuditLogStorageDir
       /usr/local/apache/logs/audit</literal></para>
 
-      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis>
       SecAuditLogType must be set to Concurrent. The directory must already be
@@ -767,8 +759,7 @@ SecAuditLogStorageDir logs/audit
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> Must specify
       SecAuditLogStorageDir if you use concurrent logging.</para>
@@ -804,10 +795,9 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
       moreinfo="none">SecChrootDir /chroot</literal></para>
 
-      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Main</para>
+      <para><emphasis role="bold">Scope:</emphasis> Main</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> The internal
       chroot functionality provided by ModSecurity works great for simple
@@ -851,10 +841,9 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
       moreinfo="none">SecCookieFormat 0</literal></para>
 
-      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
 
@@ -868,7 +857,7 @@ SecAuditLogStorageDir logs/audit
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">1 </literal>- use version 1
+          <para><literal moreinfo="none">1</literal> - use version 1
           cookies.</para>
         </listitem>
       </itemizedlist>
@@ -890,7 +879,7 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
       <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Main</para>
+      </emphasis> Main</para>
 
       <para><emphasis role="bold">Dependencies/Notes: </emphasis> This
       directive is needed when initcol, setsid an setuid are used. Must be
@@ -912,8 +901,7 @@ SecAuditLogStorageDir logs/audit
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
     </section>
@@ -921,7 +909,7 @@ SecAuditLogStorageDir logs/audit
     <section>
       <title><literal>SecDebugLogLevel</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Configures the
+      <para><emphasis role="bold">Description:</emphasis> Configures the
       verboseness of the debug log data.</para>
 
       <para><emphasis role="bold">Syntax:</emphasis> <literal
@@ -932,50 +920,48 @@ SecAuditLogStorageDir logs/audit
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> Levels
-      <literal moreinfo="none">1</literal>-<literal moreinfo="none">3
-      </literal>are always sent to the Apache error log. Therefore you can
-      always use level<literal moreinfo="none"> 0 </literal>as the default
-      logging level in production. Level<literal moreinfo="none"> 5
-      </literal>is useful when debugging. It is not advisable to use higher
-      logging levels in production as excessive logging can slow down server
-      significantly.</para>
+      <literal moreinfo="none">1 - 3</literal> are always sent to the Apache
+      error log. Therefore you can always use level <literal
+      moreinfo="none">0</literal> as the default logging level in production.
+      Level <literal moreinfo="none">5</literal> is useful when debugging. It
+      is not advisable to use higher logging levels in production as excessive
+      logging can slow down server significantly.</para>
 
       <para>Possible values are:</para>
 
       <itemizedlist>
         <listitem>
-          <para><literal moreinfo="none">0 </literal>- no logging.</para>
+          <para><literal moreinfo="none">0</literal> - no logging.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">1 </literal>- errors (intercepted
+          <para><literal moreinfo="none">1</literal> - errors (intercepted
           requests) only.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">2 </literal>- warnings.</para>
+          <para><literal moreinfo="none">2</literal> - warnings.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">3 </literal>- notices.</para>
+          <para><literal moreinfo="none">3</literal> - notices.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">4 </literal>- details of how
+          <para><literal moreinfo="none">4</literal> - details of how
           transactions are handled.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">5 </literal>- as above, but including
+          <para><literal moreinfo="none">5</literal> - as above, but including
           information about each piece of information handled.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">9 </literal>- log everything,
+          <para><literal moreinfo="none">9</literal> - log everything,
           including very detailed debugging information.</para>
         </listitem>
       </itemizedlist>
@@ -995,12 +981,11 @@ SecAuditLogStorageDir logs/audit
       moreinfo="none">SecDefaultAction
       log,auditlog,deny,status:403,phase:2,t:lowercase</literal></para>
 
-      <para><emphasis role="bold">Processing Phase: </emphasis>Any</para>
+      <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
-      <para><emphasis role="bold">Dependencies/Notes: </emphasis>Rules
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> Rules
       following a SecDefaultAction directive will inherit this setting unless
       a specific action is specified for an indivdual rule or until another
       SecDefaultAction is specified.</para>
@@ -1030,8 +1015,7 @@ SecAuditLogStorageDir logs/audit
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> Check out
       www.maxmind.com for free database files.</para>
@@ -1051,12 +1035,11 @@ SecAuditLogStorageDir logs/audit
       moreinfo="none">SecGuardianLog
       |/usr/local/apache/bin/httpd-guardian</literal></para>
 
-      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Main</para>
+      <para><emphasis role="bold">Scope:</emphasis> Main</para>
 
-      <para><emphasis role="bold">Dependencies/Notes: </emphasis>By default
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> By default
       httpd-guardian will defend against clients that send more 120 requests
       in a minute, or more than 360 requests in five minutes.</para>
 
@@ -1166,12 +1149,11 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
       moreinfo="none">SecRequestBodyAccess On</literal></para>
 
-      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
-      <para><emphasis role="bold">Dependencies/Notes: </emphasis>This
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> This
       directive is required if you plan to inspect POST_PAYLOADS of requests.
       This directive must be used along with the "phase:2" processing phase
       action and REQUEST_BODY variable/location. If any of these 3 parts are
@@ -1187,7 +1169,7 @@ SecAuditLogStorageDir logs/audit
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">Off </literal>- do not attempt to
+          <para><literal moreinfo="none">Off</literal> - do not attempt to
           access request bodies.</para>
         </listitem>
       </itemizedlist>
@@ -1207,10 +1189,9 @@ SecAuditLogStorageDir logs/audit
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
-      <para><emphasis role="bold">Dependencies/Notes: </emphasis>131072 KB
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> 131072 KB
       (134217728 bytes) is the default setting. Anything over this limit will
       be rejected with status code 413 Request Entity Too Large. There is a
       hard limit of 1 GB.</para>
@@ -1219,7 +1200,7 @@ SecAuditLogStorageDir logs/audit
     <section>
       <title><literal>SecRequestBodyInMemoryLimit</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Configures the
+      <para><emphasis role="bold">Description:</emphasis> Configures the
       maximum request body size ModSecurity will store in memory.</para>
 
       <para><emphasis role="bold">Syntax:</emphasis> <literal
@@ -1231,8 +1212,7 @@ SecAuditLogStorageDir logs/audit
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
 
@@ -1245,7 +1225,7 @@ SecRequestBodyInMemoryLimit 131072</programlisting>
     <section>
       <title><literal>SecResponseBodyLimit</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Configures the
+      <para><emphasis role="bold">Description:</emphasis> Configures the
       maximum response body size that will be accepted for buffering.</para>
 
       <para><emphasis role="bold">Syntax:</emphasis> <literal
@@ -1254,12 +1234,11 @@ SecRequestBodyInMemoryLimit 131072</programlisting>
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
       moreinfo="none">SecResponseBodyLimit 524228</literal></para>
 
-      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
-      <para><emphasis role="bold">Dependencies/Notes: </emphasis>Anything over
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> Anything over
       this limit will be rejected with status code 500 Internal Server Error.
       This setting will not affect the responses with MIME types that are not
       marked for buffering. There is a hard limit of 1 GB.</para>
@@ -1273,7 +1252,7 @@ SecResponseBodyLimit 524288</programlisting>
     <section>
       <title><literal>SecResponseBodyMimeType</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Configures
+      <para><emphasis role="bold">Description:</emphasis> Configures
       which<literal moreinfo="none"> MIME</literal> types are to be considered
       for response body buffering.</para>
 
@@ -1286,8 +1265,7 @@ SecResponseBodyLimit 524288</programlisting>
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis>
       Multiple<literal moreinfo="none"> SecResponseBodyMimeType</literal>
@@ -1304,7 +1282,7 @@ SecResponseBodyLimit 524288</programlisting>
       <title><literal>SecResponseBodyMimeTypesClear</literal></title>
 
       <para><emphasis role="bold">Description:</emphasis> Clears the list of
-      <literal moreinfo="none">MIME </literal>types considered for response
+      <literal moreinfo="none">MIME</literal> types considered for response
       body buffering, allowing you to start populating the list from
       scratch.</para>
 
@@ -1314,10 +1292,9 @@ SecResponseBodyLimit 524288</programlisting>
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
       moreinfo="none">SecResponseBodyMimeTypesClear</literal></para>
 
-      <para><emphasis role="bold">Processing Phase: </emphasis>N/A</para>
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
     </section>
@@ -1336,8 +1313,7 @@ SecResponseBodyLimit 524288</programlisting>
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> This
       directive is required if you plan to inspect html responses. This
@@ -1349,12 +1325,12 @@ SecResponseBodyLimit 524288</programlisting>
 
       <itemizedlist>
         <listitem>
-          <para><literal moreinfo="none">On </literal>- access response bodies
+          <para><literal moreinfo="none">On</literal> - access response bodies
           (but only if the MIME type matches, see above).</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">Off </literal>- do not attempt to
+          <para><literal moreinfo="none">Off</literal> - do not attempt to
           access response bodies.</para>
         </listitem>
       </itemizedlist>
@@ -1364,7 +1340,7 @@ SecResponseBodyLimit 524288</programlisting>
       <title><literal>SecRule</literal></title>
 
       <para><emphasis role="bold">Description:</emphasis> <literal
-      moreinfo="none">SecRule</literal>is the main ModSecurity directive. It
+      moreinfo="none">SecRule</literal> is the main ModSecurity directive. It
       is used to analyse data and perform actions based on the results.</para>
 
       <para><emphasis role="bold">Syntax:</emphasis> <literal
@@ -1375,8 +1351,7 @@ SecResponseBodyLimit 524288</programlisting>
 
       <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> None</para>
 
@@ -1424,10 +1399,10 @@ SecResponseBodyLimit 524288</programlisting>
 
         <para>In the simplest possible case you will use a regular expression
         pattern as the second rule parameter. This is what we've done in the
-        examples above. If you do this ModSecurity assumes you want to use
-        the<literal moreinfo="none"> rx </literal>operator. You can explicitly
+        examples above. If you do this ModSecurity assumes you want to use the
+        <literal moreinfo="none">rx</literal> operator. You can explicitly
         specify the operator you want to use by using <literal
-        moreinfo="none">@ </literal>as the first character in the second rule
+        moreinfo="none">@</literal> as the first character in the second rule
         parameter:</para>
 
         <programlisting format="linespecific">SecRule REQUEST_URI "@rx dirty"</programlisting>
@@ -1475,12 +1450,11 @@ SecResponseBodyLimit 524288</programlisting>
 
       <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis>
       Resource-specific contexts (e.g.<literal moreinfo="none">
-      Location</literal>,<literal moreinfo="none"> Directory</literal>, etc)
+      Location</literal>, <literal moreinfo="none">Directory</literal>, etc)
       cannot override <emphasis>phase1</emphasis> rules configured in the main
       server or in the virtual server. This is because phase 1 is run early in
       the request processing process, before Apache maps request to resource.
@@ -1508,8 +1482,7 @@ SecDefaultAction log,deny,phase:1,redirect:http://www.site2.com
 &lt;VirtualHost *:80&gt; 
 ServerName app2.com 
 ServerAlias www.app2.com
-<emphasis role="bold">SecRuleInheritance On
-</emphasis>SecRule ARGS "attack" 
+<emphasis role="bold">SecRuleInheritance On</emphasis> SecRule ARGS "attack" 
 ... 
 &lt;/VirtualHost&gt;</programlisting>
 
@@ -1517,12 +1490,12 @@ ServerAlias www.app2.com
 
       <itemizedlist>
         <listitem>
-          <para><literal moreinfo="none">On </literal>- inherit rules from the
+          <para><literal moreinfo="none">On</literal> - inherit rules from the
           parent context.</para>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">Off </literal>- do not inherit rules
+          <para><literal moreinfo="none">Off</literal> - do not inherit rules
           from the parent context.</para>
         </listitem>
       </itemizedlist>
@@ -1542,8 +1515,7 @@ ServerAlias www.app2.com
 
       <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> Thisdirective
       can also be controled by the ctl action (ctl:ruleEngine=off) for per
@@ -1583,8 +1555,7 @@ ServerAlias www.app2.com
 
       <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> This
       directive supports multiple parameters, where each parameter can either
@@ -1608,19 +1579,18 @@ ServerAlias www.app2.com
 
       <para><emphasis role="bold">Processing Phase:</emphasis> Any</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> This
       directive supports multiple parameters. Each parameter is a regular
       expression that will be applied to the message (specified using the
-      <literal moreinfo="none">msg </literal>action).</para>
+      <literal moreinfo="none">msg</literal> action).</para>
     </section>
 
     <section>
       <title><literal>SecServerSignature</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Instructs
+      <para><emphasis role="bold">Description:</emphasis> Instructs
       ModSecurity to change the data presented in the "Server:" response
       header token.</para>
 
@@ -1634,8 +1604,7 @@ ServerAlias www.app2.com
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Main</para>
+      <para><emphasis role="bold">Scope:</emphasis> Main</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> In order for
       this directive to work, you must set the Apache ServerTokens directive
@@ -1659,10 +1628,9 @@ ServerAlias www.app2.com
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
-      <para><emphasis role="bold">Dependencies/Notes: </emphasis>Needs to be
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> Needs to be
       writable by the Apache user process. This is the directory location
       where Apache will swap data to disk if it runs out of memory (more data
       than what was specified in the SecRequestBodyInMemoryLimit directive)
@@ -1683,8 +1651,7 @@ ServerAlias www.app2.com
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> This
       directory must be on the same filesystem as the temporary directory
@@ -1707,10 +1674,9 @@ ServerAlias www.app2.com
 
       <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
-      <para><emphasis role="bold">Dependencies/Notes: </emphasis>This
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> This
       directive requires the storage directory to be defined (using <literal
       moreinfo="none">SecUploadDir</literal>).</para>
 
@@ -1747,10 +1713,9 @@ ServerAlias www.app2.com
       <para><emphasis role="bold">Example Usage:</emphasis> <literal
       moreinfo="none">SecWebAppId "WebApp1"</literal></para>
 
-      <para><emphasis role="bold">Processing Phase:</emphasis>N/A</para>
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
 
-      <para><emphasis role="bold"> <emphasis role="bold">Scope:</emphasis>
-      </emphasis>Any</para>
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
 
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> Partitions
       are used to avoid collisions between session IDs and user IDs. This
@@ -1961,23 +1926,23 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis
       invocations against the operator if argument p does not exist. Some
       variables are actually collections, which are expanded into more
       variables at runtime. The following example will examine all request
-      arguments:<programlisting format="linespecific">SecRule ARGS dirty</programlisting>Sometimes,
-      however, you will want to look only at parts of a collection. This can
-      be achieved with the help of the <emphasis>selection
+      arguments:<programlisting format="linespecific">SecRule ARGS dirty</programlisting>
+      Sometimes, however, you will want to look only at parts of a collection.
+      This can be achieved with the help of the <emphasis>selection
       operator</emphasis>(colon). The following example will only look at the
       arguments named<literal moreinfo="none"> p</literal> (do note that, in
       general, requests can contain multiple arguments with the same name):
-      <programlisting format="linespecific">SecRule ARGS:p dirty</programlisting>It
-      is also possible to specify exclusions. The following will examine all
-      request arguments for the word<emphasis> dirty</emphasis>, except the
-      ones named<literal moreinfo="none"> z </literal>(again, there can be
+      <programlisting format="linespecific">SecRule ARGS:p dirty</programlisting>
+      It is also possible to specify exclusions. The following will examine
+      all request arguments for the word<emphasis> dirty</emphasis>, except
+      the ones named <literal moreinfo="none">z</literal> (again, there can be
       zero or more arguments named<literal moreinfo="none"> z</literal>):
-      <programlisting format="linespecific">SecRule ARGS|!ARGS:z dirty</programlisting>There
-      is a special operator that allows you to count how many variables there
-      are in a collection. The following rule will trigger if there is more
-      than zero arguments in the request (ignore the second parameter for the
-      time being): <programlisting format="linespecific">SecRule &amp;ARGS !^0$</programlisting>And
-      sometimes you need to look at an array of parameters, each with a
+      <programlisting format="linespecific">SecRule ARGS|!ARGS:z dirty</programlisting>
+      There is a special operator that allows you to count how many variables
+      there are in a collection. The following rule will trigger if there is
+      more than zero arguments in the request (ignore the second parameter for
+      the time being): <programlisting format="linespecific">SecRule &amp;ARGS !^0$</programlisting>
+      And sometimes you need to look at an array of parameters, each with a
       slightly different name. In this case you can specify a regular
       expression in the selection operator itself. The following rule will
       look into all arguments whose names begin with <literal
@@ -2001,7 +1966,7 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis
       the arguments is above 25 characters.</para>
 
       <programlisting format="linespecific">SecRule REQUEST_FILENAME "^/cgi-bin/login\.php$" "chain,log,deny,phase:2"
-SecRule<emphasis role="bold"> ARGS_COMBINED_SIZE </emphasis>"@gt 25"</programlisting>
+SecRule <emphasis role="bold">ARGS_COMBINED_SIZE</emphasis> "@gt 25"</programlisting>
     </section>
 
     <section>
@@ -2024,7 +1989,7 @@ SecRule<emphasis role="bold"> ARGS_NAMES</emphasis> "!^(p|a)$"</programlisting>
       <para>This variable holds the authentication method used to validate a
       user. Example:</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> AUTH_TYPE </emphasis>"basic" log,deny,status:403,phase:1,t:lowercase</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">AUTH_TYPE</emphasis> "basic" log,deny,status:403,phase:1,t:lowercase</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -2082,7 +2047,7 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
       a size limitation on individual uploaded files. Note: only available if
       files were extracted from the request body. Example:</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> FILES_SIZES </emphasis>"@gt 100" log,deny,status:403,phase:2</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">FILES_SIZES</emphasis> "@gt 100" log,deny,status:403,phase:2</programlisting>
     </section>
 
     <section>
@@ -2090,7 +2055,7 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
 
       <para>Collection. Contains a collection of temporary files' names on the
       disk. Useful when used together with <literal
-      moreinfo="none">@inspectFile. </literal>Note: only available if files
+      moreinfo="none">@inspectFile.</literal> Note: only available if files
       were extracted from the request body. Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">FILES_TMPNAMES</emphasis> "@inspectFile /path/to/inspect_script.pl"</programlisting>
@@ -2196,7 +2161,7 @@ SecRule GEO:COUNTRY_CODE "!@streq UK"</programlisting>
       <para>This variable holds the IP address of the remote client.
       Example:</para>
 
-      <programlisting format="linespecific">SecRule <emphasis role="bold">REMOTE_ADDR </emphasis>"^192\.168\.1\.101$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REMOTE_ADDR</emphasis> "^192\.168\.1\.101$"</programlisting>
     </section>
 
     <section>
@@ -2208,7 +2173,7 @@ SecRule GEO:COUNTRY_CODE "!@streq UK"</programlisting>
       known bad client hosts or network blocks, or conversely, to allow in
       authorized hosts. Example:</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> REMOTE_HOST </emphasis>"\.evil\.network\org$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REMOTE_HOST</emphasis> "\.evil\.network\org$"</programlisting>
     </section>
 
     <section>
@@ -2220,7 +2185,7 @@ SecRule GEO:COUNTRY_CODE "!@streq UK"</programlisting>
       is less than 1024, which would indicate that the user is a privileged
       user (root).</para>
 
-      <programlisting format="linespecific">SecRule <emphasis role="bold">REMOTE_PORT </emphasis>"@lt 1024" phase:1,log,pass,setenv:remote_port=privileged</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REMOTE_PORT</emphasis> "@lt 1024" phase:1,log,pass,setenv:remote_port=privileged</programlisting>
     </section>
 
     <section>
@@ -2293,7 +2258,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <literal>REQUEST_FILENAME</literal> (e.g. index.php). Warning: not
       urlDecoded. Example:</para>
 
-      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_BASENAME </emphasis>"^login\.php$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_BASENAME</emphasis> "^login\.php$"</programlisting>
     </section>
 
     <section>
@@ -2304,7 +2269,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       the arguements is important (ARGS should be used in all other cases).
       Example:</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQUEST_BODY </emphasis>"^username=\w{25,}\&amp;password=\w{25,}\&amp;Submit\=login$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_BODY</emphasis> "^username=\w{25,}\&amp;password=\w{25,}\&amp;Submit\=login$"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -2351,7 +2316,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       example uses REQUEST_HEADERS as a collection and is applying the
       validateUrlEncoding operator against all headers.</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQUEST_HEADERS </emphasis>"@validateUrlEncoding"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_HEADERS</emphasis> "@validateUrlEncoding"</programlisting>
 
       <para>Example: the second example is targeting only the Host
       header.</para>
@@ -2379,7 +2344,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       GET, HEAD, POST or if the HTTP is something other than HTTP/0.9, 1.0 or
       1.1.</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQUEST_LINE </emphasis>"!(^((?:(?:pos|ge)t|head))|http/(0\.9|1\.0|1\.1)$)"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_LINE</emphasis> "!(^((?:(?:pos|ge)t|head))|http/(0\.9|1\.0|1\.1)$)"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -2410,7 +2375,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para>This variable holds the Request Protocol Version information.
       Example:</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQUEST_PROTOCOL </emphasis>"!^http/(0\.9|1\.0|1\.1)$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_PROTOCOL</emphasis> "!^http/(0\.9|1\.0|1\.1)$"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -2428,7 +2393,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       does not include either the REQUEST_METHOD or the HTTP version info.
       Example:</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> REQUEST_URI </emphasis>"attack"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_URI</emphasis> "attack"</programlisting>
     </section>
 
     <section>
@@ -2498,7 +2463,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para>This variable is a collection of the response header names.
       Example:</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> RESPONSE_HEADERS_NAMES </emphasis>"Set-Cookie"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">RESPONSE_HEADERS_NAMES</emphasis> "Set-Cookie"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -2512,7 +2477,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para>This variable holds the HTTP Response Protocol information.
       Example:</para>
 
-      <programlisting format="linespecific">SecRule <emphasis role="bold">RESPONSE_PROTOCOL </emphasis>"^HTTP\/0\.9"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">RESPONSE_PROTOCOL</emphasis> "^HTTP\/0\.9"</programlisting>
     </section>
 
     <section>
@@ -2521,7 +2486,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para>This variable holds the HTTP Response Status Code generated by
       Apache. Example:</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> RESPONSE_STATUS </emphasis>"^[45]"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">RESPONSE_STATUS</emphasis> "^[45]"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -2552,7 +2517,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para>This variable holds just the local filename part of
       SCRIPT_FILENAME. Example:</para>
 
-      <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_BASENAME </emphasis>"^login\.php$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_BASENAME</emphasis> "^login\.php$"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -2578,7 +2543,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para>This variable holds the groupid (numerical value) of the group
       owner of the script. Example:</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> SCRIPT_GID </emphasis>"!^46$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_GID</emphasis> "!^46$"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -2605,7 +2570,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       - 1=execute, 2=write, 4=read and 7=read/write/execute). Example: will
       trigger if the script has the WRITE permissions set.</para>
 
-      <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_MODE </emphasis>"^(2|3|6|7)$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_MODE</emphasis> "^(2|3|6|7)$"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -2632,7 +2597,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para>This variable holds the username of the owner of the script.
       Example:</para>
 
-      <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_USERNAME </emphasis>"!^apache$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_USERNAME</emphasis> "!^apache$"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -2654,7 +2619,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para>This variable contains the server's hostname or IP address.
       Example:</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> SERVER_NAME </emphasis>"hostname\.com$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">SERVER_NAME</emphasis> "hostname\.com$"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -2668,7 +2633,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para>This variable contains the local port that the web server is
       listening on. Example:</para>
 
-      <programlisting format="linespecific">SecRule <emphasis role="bold">SERVER_PORT </emphasis>"^80$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">SERVER_PORT</emphasis> "^80$"</programlisting>
     </section>
 
     <section>
@@ -2716,7 +2681,7 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
       would trigger anytime between the 10th and 20th days of the
       month.</para>
 
-      <programlisting format="linespecific">SecRule <emphasis role="bold">TIME_DAY </emphasis>"^(([1](0|1|2|3|4|5|6|7|8|9))|20)$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">TIME_DAY</emphasis> "^(([1](0|1|2|3|4|5|6|7|8|9))|20)$"</programlisting>
     </section>
 
     <section>
@@ -2771,7 +2736,7 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
       <para>This variable holds the current weekday (0-6). Example: this rule
       would trigger only on week-ends (Saturday and Sunday).</para>
 
-      <programlisting format="linespecific">SecRule<emphasis role="bold"> TIME_WDAY </emphasis>"^(0|6)$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">TIME_WDAY</emphasis> "^(0|6)$"</programlisting>
     </section>
 
     <section>
@@ -2780,7 +2745,7 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
       <para>This variable holds the current four-digit year data.
       Example:</para>
 
-      <programlisting format="linespecific">SecRule <emphasis role="bold">TIME_YEAR </emphasis>"^2006$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis role="bold">TIME_YEAR</emphasis> "^2006$"</programlisting>
     </section>
 
     <section>
@@ -2933,7 +2898,7 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
     case in order to evade the ModSecurity rule:</para>
 
     <para><programlisting format="linespecific">SecRule ARG:p "xp_cmdshell" <emphasis
-          role="bold">"t:lowercase"</emphasis></programlisting>multiple
+          role="bold">"t:lowercase"</emphasis></programlisting> multiple
     tranformation actions can be used in the same rule, for example the
     following rule also ensures that an attacker does not use URL encoding
     (%xx encoding) for evasion. Note the order of the transformation
@@ -2984,8 +2949,8 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
       moreinfo="none">\v</literal>, <literal moreinfo="none">\\</literal>,
       <literal moreinfo="none">\?</literal>, <literal
       moreinfo="none">\'</literal>, <literal moreinfo="none">\"</literal>,
-      <literal moreinfo="none">\xHH</literal>(hexadecimal), <literal
-      moreinfo="none">\0OOO</literal>(octal). Invalid encodings are left in
+      <literal moreinfo="none">\xHH</literal> (hexadecimal), <literal
+      moreinfo="none">\0OOO</literal> (octal). Invalid encodings are left in
       the output.</para>
     </section>
 
@@ -3026,7 +2991,7 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">&amp;nbs</literal>p and <literal
+          <para><literal moreinfo="none">&amp;nbsp</literal> and <literal
           moreinfo="none">&amp;nbsp;</literal></para>
         </listitem>
 
@@ -3132,11 +3097,11 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
       <title><literal>urlDecodeUni</literal></title>
 
       <para>In addition to decoding %xx like <literal
-      moreinfo="none">urlDecode, urlDecodeUni also </literal>decodes<literal
-      moreinfo="none"> <literal>%uXXXX</literal> </literal>encoding. If the
-      code is in the range of FF01-FF5E (the full width ASCII codes), then the
-      higher byte is used to detect and adjust the lower byte. Otherwise, only
-      the lower byte will be used and the higher byte zeroed.</para>
+      moreinfo="none">urlDecode, urlDecodeUni</literal> also decodes <literal
+      moreinfo="none">%uXXXX</literal> encoding. If the code is in the range
+      of FF01-FF5E (the full width ASCII codes), then the higher byte is used
+      to detect and adjust the lower byte. Otherwise, only the lower byte will
+      be used and the higher byte zeroed.</para>
     </section>
 
     <section>
@@ -3180,18 +3145,18 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
 
     <orderedlist continuation="restarts" inheritnum="ignore">
       <listitem>
-        <para><emphasis>Disruptive actions</emphasis>- are those actions where
-        ModSecurity will intercept the data. They can only appear in the first
-        rule in a chain.</para>
+        <para><emphasis>Disruptive actions</emphasis> - are those actions
+        where ModSecurity will intercept the data. They can only appear in the
+        first rule in a chain.</para>
       </listitem>
 
       <listitem>
-        <para><emphasis>Non-disruptive actions</emphasis>; can appear
+        <para><emphasis>Non-disruptive actions</emphasis> - can appear
         anywhere.</para>
       </listitem>
 
       <listitem>
-        <para><emphasis>Flow actions</emphasis>; can appear only in the first
+        <para><emphasis>Flow actions</emphasis> - can appear only in the first
         rule in a chain.</para>
       </listitem>
 
@@ -3199,12 +3164,12 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
         <para><emphasis>Meta-data actions</emphasis>(<literal
         moreinfo="none">id</literal>,<literal moreinfo="none">
         rev</literal>,<literal moreinfo="none"> severity</literal>,<literal
-        moreinfo="none"> msg</literal>); can only appear in the first rule in
+        moreinfo="none"> msg</literal>) - can only appear in the first rule in
         a chain.</para>
       </listitem>
 
       <listitem>
-        <para><emphasis>Data actions</emphasis>- can appear anywhere; these
+        <para><emphasis>Data actions</emphasis> - can appear anywhere; these
         actions are completely passive and only serve to carry data used by
         other actions.</para>
       </listitem>
@@ -3301,14 +3266,14 @@ SecRule TX:1 "(?:(?:a(dmin|nonymous)))"</programlisting>
     <section>
       <title><literal>chain</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Chains the rule
+      <para><emphasis role="bold">Description:</emphasis> Chains the rule
       where the action is placed with the rule that immediately follows it.
       The result is called a<emphasis> rule chain</emphasis>. Chained rules
       allow for more complex rule matches where you want to use a number of
       different VARIABLES to create a better rule and to help prevent false
       positives.</para>
 
-      <para><emphasis role="bold">Action Group: </emphasis>Flow</para>
+      <para><emphasis role="bold">Action Group:</emphasis> Flow</para>
 
       <para>Example:</para>
 
@@ -3394,7 +3359,7 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis role="bold">ctl:requ
       moreinfo="none">URLENCODED</literal> and<literal moreinfo="none">
       MULTIPART</literal> processors to process an <literal
       moreinfo="none">application/x-www-form-urlencoded</literal> and a
-      <literal moreinfo="none">multipart/form-data </literal>body,
+      <literal moreinfo="none">multipart/form-data</literal> body,
       respectively. A third processor, XML, is also supported, but it is never
       used implicitly. Instead you must tell ModSecurity to use it by placing
       a few rules in the<literal moreinfo="none"> REQUEST_HEADERS</literal>
@@ -3447,7 +3412,7 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis role="bold">ctl:requ
     <section>
       <title><literal>drop</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Immediately initiate
+      <para><emphasis role="bold">Description:</emphasis> Immediately initiate
       a "connection close" action to tear down the TCP connection by sending a
       FIN packet.</para>
 
@@ -3596,7 +3561,7 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
     <section>
       <title><literal>initcol</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Initialises a named
+      <para><emphasis role="bold">Description:</emphasis> Initialises a named
       persistent collection, either by loading data from storage or by
       creating a new collection in memory.</para>
 
@@ -3630,7 +3595,7 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">TIMEOUT</literal>- date/time in
+          <para><literal moreinfo="none">TIMEOUT</literal> - date/time in
           seconds when the collection will be updated on disk from memory (if
           no other updates occur).</para>
         </listitem>
@@ -3681,7 +3646,7 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
     <section>
       <title><literal>log</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Indicates that a
+      <para><emphasis role="bold">Description:</emphasis> Indicates that a
       successful match of the rule needs to be logged.</para>
 
       <para><emphasis role="bold">Action Group:</emphasis>
@@ -3721,7 +3686,7 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
     <section>
       <title><literal>multiMatch</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>If enabled
+      <para><emphasis role="bold">Description:</emphasis> If enabled
       ModSecurity will perform multiple operator invocations for every target,
       before and after every anti-evasion transformation is performed.</para>
 
@@ -3744,7 +3709,7 @@ SecRule ARGS "attack" <emphasis role="bold">multiMatch</emphasis></programlistin
     <section>
       <title><literal>noauditlog</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Indicates that a
+      <para><emphasis role="bold">Description:</emphasis> Indicates that a
       successful match of the rule should not be used as criteria whether the
       transaction should be logged to the audit log.</para>
 
@@ -3789,7 +3754,7 @@ SecRule ARGS "attack" <emphasis role="bold">multiMatch</emphasis></programlistin
     <section>
       <title><literal>pass</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Continues processing
+      <para><emphasis role="bold">Description:</emphasis> Continues processing
       with the next rule in spite of a successful match.</para>
 
       <para><emphasis role="bold">Action Group:</emphasis> Disruptive</para>
@@ -3875,7 +3840,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
     <section>
       <title><literal>proxy</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Intercepts
+      <para><emphasis role="bold">Description:</emphasis> Intercepts
       transaction by forwarding request to another web server using the proxy
       backend.</para>
 
@@ -3896,7 +3861,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
     <section>
       <title><literal>redirect</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Intercepts
+      <para><emphasis role="bold">Description:</emphasis> Intercepts
       transaction by issuing a redirect to the given location.</para>
 
       <para><emphasis role="bold">Action Group:</emphasis> Disruptive</para>
@@ -4168,10 +4133,9 @@ SecAction <emphasis role="bold">setsid:%{REQUEST_COOKIES.PHPSESSID}</emphasis></
 
       <programlisting format="linespecific">setvar:!tx.score</programlisting>
 
-      <para>To increase or decrease variable value use<literal
-      moreinfo="none">+</literal>and<literal
-      moreinfo="none">-</literal>characters in front of a numerical
-      value:</para>
+      <para>To increase or decrease variable value use <literal
+      moreinfo="none">+</literal> and <literal moreinfo="none">-</literal>
+      characters in front of a numerical value:</para>
 
       <programlisting format="linespecific">setvar:tx.score=+5</programlisting>
     </section>
@@ -4179,7 +4143,7 @@ SecAction <emphasis role="bold">setsid:%{REQUEST_COOKIES.PHPSESSID}</emphasis></
     <section>
       <title><literal>skip</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Skips one or more
+      <para><emphasis role="bold">Description:</emphasis> Skips one or more
       rules (or chains) on successful match.</para>
 
       <para><emphasis role="bold">Action Group:</emphasis>
@@ -4284,7 +4248,7 @@ SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny</progra
     <section>
       <title><literal>beginsWith</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      <para><emphasis role="bold">Description:</emphasis> This operator is a
       string comparison and returns true if the parameter value is found at
       the beginning of the input. Macro expansion is performed so you may use
       variable names such as %{TX.1}, etc.</para>
@@ -4300,7 +4264,7 @@ SecRule ARGS:gw "!<emphasis role="bold">@beginsWith %{TX.1}</emphasis>"</program
     <section>
       <title><literal>contains</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      <para><emphasis role="bold">Description:</emphasis> This operator is a
       string comparison and returns true if the parameter value is found
       anywhere in the input. Macro expansion is performed so you may use
       variable names such as %{TX.1}, etc.</para>
@@ -4308,7 +4272,7 @@ SecRule ARGS:gw "!<emphasis role="bold">@beginsWith %{TX.1}</emphasis>"</program
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule REQUEST_LINE "!<emphasis
-          role="bold">@contains .php </emphasis>" t:none,deny,status:403
+          role="bold">@contains .php</emphasis>" t:none,deny,status:403
 SecRule REQUEST_ADDR "^(.*)$" deny,status:403,capture,chain
 SecRule ARGS:ip "!<emphasis role="bold">@contains %{TX.1}</emphasis>"</programlisting>
     </section>
@@ -4316,7 +4280,7 @@ SecRule ARGS:ip "!<emphasis role="bold">@contains %{TX.1}</emphasis>"</programli
     <section>
       <title><literal>endsWith</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      <para><emphasis role="bold">Description:</emphasis> This operator is a
       string comparison and returns true if the parameter value is found at
       the end of the input. Macro expansion is performed so you may use
       variable names such as %{TX.1}, etc.</para>
@@ -4331,13 +4295,13 @@ SecRule ARGS:route "!<emphasis role="bold">@endsWith %{REQUEST_ADDR}</emphasis>"
     <section>
       <title><literal>eq</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      <para><emphasis role="bold">Description:</emphasis> This operator is a
       numerical comparison and stands for "equal to."</para>
 
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis
-          role="bold">@eq </emphasis>15"</programlisting>
+          role="bold">@eq</emphasis> 15"</programlisting>
     </section>
 
     <section>
@@ -4390,19 +4354,19 @@ SecRule ARGS:route "!<emphasis role="bold">@endsWith %{REQUEST_ADDR}</emphasis>"
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule FILES_TMPNAMES "<emphasis
-          role="bold">@inspectFile </emphasis>/opt/apache/bin/inspect_script.pl"</programlisting>
+          role="bold">@inspectFile</emphasis> /opt/apache/bin/inspect_script.pl"</programlisting>
     </section>
 
     <section>
       <title><literal>le</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      <para><emphasis role="bold">Description:</emphasis> This operator is a
       numerical comparison and stands for "less than or equal to."</para>
 
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis
-          role="bold">@le </emphasis>15"</programlisting>
+          role="bold">@le</emphasis> 15"</programlisting>
     </section>
 
     <section>
@@ -4414,7 +4378,7 @@ SecRule ARGS:route "!<emphasis role="bold">@endsWith %{REQUEST_ADDR}</emphasis>"
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis
-          role="bold">@lt </emphasis>15"</programlisting>
+          role="bold">@lt</emphasis> 15"</programlisting>
     </section>
 
     <section>
@@ -4496,7 +4460,7 @@ SecRule ARGS:route "!<emphasis role="bold">@endsWith %{REQUEST_ADDR}</emphasis>"
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "<emphasis
-          role="bold">@rx </emphasis>nikto"</programlisting>
+          role="bold">@rx</emphasis> nikto"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -4532,7 +4496,7 @@ SecRule ARGS:route "!<emphasis role="bold">@endsWith %{REQUEST_ADDR}</emphasis>"
     <section>
       <title><literal>streq</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      <para><emphasis role="bold">Description:</emphasis> This operator is a
       string comparison and returns true if the parameter value matches the
       input exactly. Macro expansion is performed so you may use variable
       names such as %{TX.1}, etc.</para>
@@ -4548,13 +4512,13 @@ SecRule REQUEST_HEADERS:Ip-Address "!<emphasis role="bold">@streq %{TX.1}</empha
     <section>
       <title><literal>validateByteRange</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>Validates the byte
+      <para><emphasis role="bold">Description:</emphasis> Validates the byte
       range used in the variable falls into the specified range.</para>
 
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule ARG:text "<emphasis
-          role="bold">@validateByteRange </emphasis>10, 13, 32-126"</programlisting>
+          role="bold">@validateByteRange</emphasis> 10, 13, 32-126"</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
@@ -4686,7 +4650,7 @@ SecRule XML "<emphasis role="bold">@validateSchema /path/to/apache2/conf/xml.xsd
     <section>
       <title><literal>within</literal></title>
 
-      <para><emphasis role="bold">Description: </emphasis>This operator is a
+      <para><emphasis role="bold">Description:</emphasis> This operator is a
       string comparison and returns true if the input value is found anywhere
       within the parameter value. Note that this is similar to
       <literal>@contains</literal>, except that the target and match values
