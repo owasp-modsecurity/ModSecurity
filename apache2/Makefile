@@ -17,7 +17,7 @@ builddir     = .
 #     Debian - /usr/share/apache2  (apache2-prefork-dev or apache2-threaded-dev
 #                                   needed, depending on your installation type)
 #
-top_dir      = /apps/httpd-2.0.47
+top_dir      = /apps/apache22
 
 top_srcdir   = ${top_dir}
 top_builddir = ${top_dir}
