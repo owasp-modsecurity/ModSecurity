@@ -420,6 +420,8 @@ struct directory_config {
 
     /* Cache */
     int                  cache_trans;
+    apr_size_t           cache_trans_min;
+    apr_size_t           cache_trans_max;
 };
 
 struct error_message {

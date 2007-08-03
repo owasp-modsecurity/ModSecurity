@@ -3,7 +3,7 @@
 
  * Cleaned up some documentation.
 
- * Performance improvements in caching transformations.
+ * Performance improvements and greater control over caching transformations.
 
  * Stricter validation for @validateUtf8Encoding.
 
@@ -16,6 +16,8 @@
 
 27 July 2007 - 2.1.2
 --------------------
+
+ * Cleaned up and clarified some documentation.
 
  * Update included core rules to latest version (1.4.3).
 

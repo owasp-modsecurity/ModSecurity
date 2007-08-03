@@ -95,6 +95,8 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
 
     /* Cache */
     dcfg->cache_trans = NOT_SET;
+    dcfg->cache_trans_min = NOT_SET;
+    dcfg->cache_trans_max = NOT_SET;
 
     return dcfg;
 }
@@ -396,6 +398,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     /* Cache */
     merged->cache_trans = (child->cache_trans == NOT_SET
         ? parent->cache_trans : child->cache_trans);
+    merged->cache_trans_min = (child->cache_trans_min == (apr_size_t)NOT_SET
+        ? parent->cache_trans_min : child->cache_trans_min);
+    merged->cache_trans_max = (child->cache_trans_max == (apr_size_t)NOT_SET
+        ? parent->cache_trans_max : child->cache_trans_max);
 
     return merged;
 }
@@ -471,7 +477,9 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->geo == NOT_SET_P) dcfg->geo = NULL;
 
     /* Cache */
-    if (dcfg->cache_trans == NOT_SET_P) dcfg->cache_trans = MODSEC_CACHE_ENABLED;
+    if (dcfg->cache_trans == NOT_SET) dcfg->cache_trans = MODSEC_CACHE_ENABLED;
+    if (dcfg->cache_trans_min == (apr_size_t)NOT_SET) dcfg->cache_trans_min = 15;
+    if (dcfg->cache_trans_max == (apr_size_t)NOT_SET) dcfg->cache_trans_max = 0;
 }
 
 /**
@@ -1247,9 +1255,8 @@ static const char *cmd_geo_lookups_db(cmd_parms *cmd, void *_dcfg,
 
 static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg, const char *p1, const char *p2) {
     directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
 
-    // TODO: p2 is options
+    if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "on") == 0)
         dcfg->cache_trans = MODSEC_CACHE_ENABLED;
@@ -1257,6 +1264,53 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg, const 
         dcfg->cache_trans = MODSEC_CACHE_DISABLED;
     else
         return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecCacheTransformations: %s", p1);
+
+    /* Process options */
+    if (p2 != NULL) {
+        apr_table_t *vartable = apr_table_make(cmd->pool, 10);
+        apr_status_t rc;
+        char *error_msg = NULL;
+        const char *charval = NULL;
+        apr_int64_t intval = 0;
+
+        if (vartable == NULL) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Unable to process options for SecCacheTransformations");
+        }
+        rc = msre_parse_generic(cmd->pool, p2, vartable, &error_msg);
+        if (rc < 0) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Unable to parse options for SecCacheTransformations: %s", error_msg);
+        }
+
+        /* minval */
+        charval = apr_table_get(vartable, "minlen");
+        if (charval != NULL) {
+            intval = apr_atoi64(charval);
+            if (intval < 0) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations minlen must be positive: %s", charval);
+            }
+            if (intval >= (apr_size_t)NOT_SET) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations minlen must be less than: %u", (apr_size_t)NOT_SET);
+            }
+            dcfg->cache_trans_min = (apr_size_t)intval;
+        }
+
+        /* maxval */
+        charval = apr_table_get(vartable, "maxlen");
+        if (charval != NULL) {
+            intval = apr_atoi64(charval);
+            if (intval < 0) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must be positive: %s", charval);
+            }
+            if (intval >= (apr_size_t)NOT_SET) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must be less than: %u", (apr_size_t)NOT_SET);
+            }
+            if ((intval != 0) && (intval < dcfg->cache_trans_min)) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must not be less than minlen: %u < %u", (apr_size_t)intval, dcfg->cache_trans_min);
+            }
+            dcfg->cache_trans_max = (apr_size_t)intval;
+
+        }
+    }
 
     return NULL;
 }

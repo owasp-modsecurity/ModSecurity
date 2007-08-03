@@ -784,6 +784,59 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
+      <title><literal>SecCacheTransformations</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Controls caching of
+      transformations.</para>
+
+      <para><emphasis role="bold">Syntax:</emphasis> <literal
+      moreinfo="none">SecCacheTransformations On|Off
+      [options]</literal></para>
+
+      <para><emphasis role="bold">Example Usage:</emphasis> <literal
+      moreinfo="none">SecCacheTransformations On
+      "minlen:64,maxlen:0"</literal></para>
+
+      <para><emphasis role="bold">Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis role="bold">Scope:</emphasis> Any</para>
+
+      <para><emphasis role="bold">Dependencies/Notes:</emphasis> N/A</para>
+
+      <para>First parameter:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><literal moreinfo="none">On</literal> - cache transformations
+          (per transaction, per phase) allowing identical transformations to
+          be performed only once. (default)</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">Off</literal> - do not cache any
+          transformations, forcing all transformations to be performed for
+          each rule executed.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>The following options are allowed (comma seperated):</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><literal moreinfo="none">minlen:N</literal> - do not cache the
+          transformation if the value's length is less than N bytes. (default:
+          15)</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">maxlen:N</literal> - do not cache the
+          transformation if the value's length is more than N bytes. A zero
+          value is interpreted as "unlimited". (default: 0)</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
       <title><literal>SecChrootDir</literal></title>
 
       <para><emphasis role="bold">Description:</emphasis> Configures the

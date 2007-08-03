@@ -1363,30 +1363,45 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
 
         /* Is this var cacheable? */
         if (msr->txcfg->cache_trans != MODSEC_CACHE_DISABLED) {
-            msr_log(msr, 9, "CACHE: Enabled");
-            if (var->metadata->is_cacheable == VAR_CACHE) {
-                usecache = 1;
+            usecache = 1;
 
-                /* Fetch cache table for this target */
-                carr = (apr_table_t **)apr_hash_get(msr->tcache, var->name, APR_HASH_KEY_STRING);
-                if (carr != NULL) {
-                    cachetab = carr[msr->phase];
+            /* check the cache options */
+            if (var->value_len < msr->txcfg->cache_trans_min) {
+                msr_log(msr, 9, "CACHE: Disabled - %s value length=%d, smaller than minlen=%d", var->name, var->value_len, msr->txcfg->cache_trans_min);
+                usecache = 0;
+            }
+            if ((msr->txcfg->cache_trans_max != 0) && (var->value_len > msr->txcfg->cache_trans_max)) {
+                msr_log(msr, 9, "CACHE: Disabled - %s value length=%d, larger than maxlen=%d", var->name, var->value_len, msr->txcfg->cache_trans_max);
+                usecache = 0;
+            }
+
+            /* if cache is still enabled, check the VAR for cacheablity */
+            if (usecache) {
+                if (var->metadata->is_cacheable == VAR_CACHE) {
+                    msr_log(msr, 9, "CACHE: Enabled");
+
+                    /* Fetch cache table for this target */
+                    carr = (apr_table_t **)apr_hash_get(msr->tcache, var->name, APR_HASH_KEY_STRING);
+                    if (carr != NULL) {
+                        cachetab = carr[msr->phase];
+                    }
+                    else {
+                        /* Create an array of cache tables (one table per phase) */
+                        carr = (apr_table_t **)apr_pcalloc(msr->mp, (sizeof(apr_table_t *) * (PHASE_LAST + 1)));
+                        if (carr == NULL) return -1;
+                        memset(carr, 0, (sizeof(apr_table_t *) * (PHASE_LAST + 1)));
+                        apr_hash_set(msr->tcache, var->name, APR_HASH_KEY_STRING, carr);
+                    }
+
+                    /* Create an empty cache table if this is the first time */
+                    if (cachetab == NULL) {
+                        cachetab = carr[msr->phase] = apr_table_make(msr->mp, 5);
+                    }
                 }
                 else {
-                    /* Create an array of cache tables (one table per phase) */
-                    carr = (apr_table_t **)apr_pcalloc(msr->mp, (sizeof(apr_table_t *) * (PHASE_LAST + 1)));
-                    if (carr == NULL) return -1;
-                    memset(carr, 0, (sizeof(apr_table_t *) * (PHASE_LAST + 1)));
-                    apr_hash_set(msr->tcache, var->name, APR_HASH_KEY_STRING, carr);
+                    usecache = 0;
+                    msr_log(msr, 9, "CACHE: %s transformations are not cacheable", var->name);
                 }
-
-                /* Create an empty cache table if this is the first time */
-                if (cachetab == NULL) {
-                    cachetab = carr[msr->phase] = apr_table_make(msr->mp, 5);
-                }
-            }
-            else {
-                msr_log(msr, 9, "CACHE: %s transformations are not cacheable", var->name);
             }
         }
         else {
@@ -1579,9 +1594,9 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                     crec->changed = changed;
                     crec->num = k + 1;
                     crec->path = tfnspath;
-                    crec->val = changed ? apr_pmemdup(msr->mp, rval, rval_length) : NULL;
-                    crec->val_len = changed ? rval_length : -1;
-                    msr_log(msr, 9, "CACHE: Caching %s=\"%.*s\"", tfnskey, crec->val_len, crec->val);
+                    crec->val = changed ? apr_pmemdup(msr->mp, var->value, var->value_len) : NULL;
+                    crec->val_len = changed ? var->value_len : 0;
+                    msr_log(msr, 9, "CACHE: Caching %s=\"%.*s\"", tfnskey, var->value_len, var->value);
                     apr_table_setn(cachetab, tfnskey, (void *)crec);
                 }
 
@@ -1619,8 +1634,6 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
         }
     }
 
-
-    msr_log(msr, 9, "CACHE: size=%u", apr_hash_count(msr->tcache));
     #ifdef CACHE_DEBUG
     if (msr->txcfg->debuglog_level >= 9) {
         apr_hash_index_t *hi;
@@ -1629,11 +1642,10 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
         const apr_array_header_t *ctarr;
         const apr_table_entry_t *ctelts;
         msre_cache_rec *rec;
-        int hn = 0;
+        int cn = 0;
         int ti, ri;
 
         for (hi = apr_hash_first(msr->mp, msr->tcache); hi; hi = apr_hash_next(hi)) {
-            hn++;
             apr_hash_this(hi, NULL, NULL, &dummy);
             tab = (apr_table_t **)dummy;
             if (tab == NULL) continue;
@@ -1643,12 +1655,13 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                 ctarr = apr_table_elts(tab[ti]);
                 ctelts = (const apr_table_entry_t*)ctarr->elts;
                 for (ri = 0; ri < ctarr->nelts; ri++) {
+                    cn++;
                     rec = (msre_cache_rec *)ctelts[ri].val;
                     if (rec->changed) {
-                        msr_log(msr, 9, "CACHE: %5d) phase=%d hits=%d %x;%s=\"%s\"", hn, msr->phase, rec->hits, rec->num, rec->path, log_escape_nq_ex(mptmp, rec->val, rec->val_len));
+                        msr_log(msr, 9, "CACHE: %5d) phase=%d hits=%d %x;%s=\"%s\"", cn, msr->phase, rec->hits, rec->num, rec->path, log_escape_nq_ex(mptmp, rec->val, rec->val_len));
                     }
                     else {
-                        msr_log(msr, 9, "CACHE: %5d) phase=%d hits=%d %x;%s=<no change>", hn, msr->phase, rec->hits, rec->num, rec->path);
+                        msr_log(msr, 9, "CACHE: %5d) phase=%d hits=%d %x;%s=<no change>", cn, msr->phase, rec->hits, rec->num, rec->path);
                     }
                 }
             }
