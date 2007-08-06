@@ -320,6 +320,8 @@ static int output_filter_should_run(modsec_rec *msr, request_rec *r) {
 
     if (apr_table_get(msr->txcfg->of_mime_types, content_type) != NULL) return 1;
 
+    msr_log(msr, 4, "Output filter: Not buffering response body for unconfigured MIME type \"%s\".", content_type);
+
     return 0;
 }
 
