@@ -177,13 +177,16 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    if ((msr->mpd->buf[0] == '\r')
-        &&(msr->mpd->buf[1] == '\n')
-        &&(msr->mpd->buf[2] == '\0'))
+    /* Is this an empty line? */
+    if (   ((msr->mpd->buf[0] == '\r')
+          &&(msr->mpd->buf[1] == '\n')
+          &&(msr->mpd->buf[2] == '\0') )
+        || ((msr->mpd->buf[0] == '\n')
+          &&(msr->mpd->buf[1] == '\0') ) )
     {
         char *header_value;
         
-        /* empty line */
+        /* Empty line. */
 
         header_value = (char *)apr_table_get(msr->mpd->mpp->headers, "Content-Disposition");
         if (header_value == NULL) {
@@ -212,7 +215,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
         msr->mpd->mpp_state = 1;
         msr->mpd->mpp->last_header_name = NULL;
     } else {
-        /* header line */
+        /* Header line. */
         if ((msr->mpd->buf[0] == '\t')||(msr->mpd->buf[0] == ' ')) {
             char *header_value, *new_value, *data;
             
@@ -288,22 +291,36 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
  *
  */
 static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
-    char *p = msr->mpd->buf + (MULTIPART_BUF_SIZE - msr->mpd->bufleft) - 2;
+    char *p = msr->mpd->buf + (MULTIPART_BUF_SIZE - msr->mpd->bufleft);
     char localreserve[2] = { '\0', '\0' }; /* initialized to quiet warning */
     int bytes_reserved = 0;
     
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
-    
-    /* preserve the last two bytes for later */
-    if (MULTIPART_BUF_SIZE - msr->mpd->bufleft >= 2) {
-        bytes_reserved = 1;
-        localreserve[0] = *p;
-        localreserve[1] = *(p + 1);
-        msr->mpd->bufleft += 2;
-        *p = 0;
-    }
 
+    /* Preserve some bytes for later. */
+    if (   ((MULTIPART_BUF_SIZE - msr->mpd->bufleft) >= 1)
+        && (*(p - 1) == '\n') )
+    {
+        if (   ((MULTIPART_BUF_SIZE - msr->mpd->bufleft) >= 2)
+            && (*(p - 2) == '\r') )
+        {
+            /* Two bytes. */
+            bytes_reserved = 2;
+            localreserve[0] = *(p - 1);
+            localreserve[1] = *(p - 2);
+            msr->mpd->bufleft += 2;
+            *(p - 2) = 0;
+        } else {
+            /* Only one byte. */
+            bytes_reserved = 1;
+            localreserve[0] = *(p - 1);
+            localreserve[1] = 0;
+            msr->mpd->bufleft += 1;
+            *(p - 1) = 0;
+        }
+    }
+    
     /* add data to the part we are building */
     if (msr->mpd->mpp->type == MULTIPART_FILE) {
 
@@ -318,8 +335,6 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
         if (msr->upload_extract_files) {
             /* first create a temporary file if we don't have it already */
             if (msr->mpd->mpp->tmp_file_fd == 0) {
-                // char *filename = multipart_construct_filename(msr);
-
                 /* construct temporary file name */
                 msr->mpd->mpp->tmp_file_name = apr_psprintf(msr->mp, "%s/%s-%s-file-XXXXXX",
                     msr->txcfg->tmp_dir, current_filetime(msr->mp), msr->txid);
@@ -337,14 +352,15 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
             }
 
             /* write the reserve first */
-            if (msr->mpd->reserve[0] == 1) {
-                if (write(msr->mpd->mpp->tmp_file_fd, &msr->mpd->reserve[1], 2) != 2) {
+            if (msr->mpd->reserve[0] != 0) {
+                if (write(msr->mpd->mpp->tmp_file_fd, &msr->mpd->reserve[1], msr->mpd->reserve[0]) != msr->mpd->reserve[0]) {
                     *error_msg = apr_psprintf(msr->mp, "Multipart: writing to \"%s\" failed",
                         log_escape(msr->mp, msr->mpd->mpp->tmp_file_name));
                     return -1;
                 }
-                msr->mpd->mpp->tmp_file_size += 2;
-                msr->mpd->mpp->length += 2;
+
+                msr->mpd->mpp->tmp_file_size += msr->mpd->reserve[0];
+                msr->mpd->mpp->length += msr->mpd->reserve[0];
             }
 
             /* write data to the file */
@@ -360,11 +376,8 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
             msr->mpd->mpp->length += (MULTIPART_BUF_SIZE - msr->mpd->bufleft);
         } else {
             /* just keep track of the file size */
-            if (msr->mpd->reserve[0] == 1) {
-                msr->mpd->mpp->tmp_file_size += 2;
-            }
-            msr->mpd->mpp->tmp_file_size += (MULTIPART_BUF_SIZE - msr->mpd->bufleft);
-            msr->mpd->mpp->length += (MULTIPART_BUF_SIZE - msr->mpd->bufleft);
+            msr->mpd->mpp->tmp_file_size += (MULTIPART_BUF_SIZE - msr->mpd->bufleft) + msr->mpd->reserve[0];
+            msr->mpd->mpp->length += (MULTIPART_BUF_SIZE - msr->mpd->bufleft)  + msr->mpd->reserve[0];
         }
     }
     else if (msr->mpd->mpp->type == MULTIPART_FORMDATA) {
@@ -376,12 +389,13 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
         if (msr->mpd->mpp->length == 0) {
             msr->mpd->mpp->offset = msr->mpd->buf_offset;
         }
-        
-        if (msr->mpd->reserve[0] == 1) {
-            value_part->data = apr_palloc(msr->mp, (MULTIPART_BUF_SIZE - msr->mpd->bufleft) + 2);
-            memcpy(value_part->data, &(msr->mpd->reserve[1]), 2);
-            memcpy(value_part->data + 2, msr->mpd->buf, (MULTIPART_BUF_SIZE - msr->mpd->bufleft));
-            value_part->length = (MULTIPART_BUF_SIZE - msr->mpd->bufleft) + 2;
+
+        if (msr->mpd->reserve[0] != 0) {
+            value_part->data = apr_palloc(msr->mp, (MULTIPART_BUF_SIZE - msr->mpd->bufleft) + msr->mpd->reserve[0]);
+            memcpy(value_part->data, &(msr->mpd->reserve[1]), msr->mpd->reserve[0]);
+            memcpy(value_part->data + msr->mpd->reserve[0], msr->mpd->buf, (MULTIPART_BUF_SIZE - msr->mpd->bufleft));
+
+            value_part->length = (MULTIPART_BUF_SIZE - msr->mpd->bufleft) + msr->mpd->reserve[0];
             msr->mpd->mpp->length += value_part->length;
         } else {
             value_part->length = (MULTIPART_BUF_SIZE - msr->mpd->bufleft);
@@ -403,14 +417,14 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
      * context so that they don't get lost
      */
     if (bytes_reserved) {
-        msr->mpd->reserve[0] = 1;
+        msr->mpd->reserve[0] = bytes_reserved;
         msr->mpd->reserve[1] = localreserve[0];
         msr->mpd->reserve[2] = localreserve[1];
-        msr->mpd->buf_offset += 2;
+        msr->mpd->buf_offset += bytes_reserved;
     }
     else {
+        msr->mpd->buf_offset -= msr->mpd->reserve[0];
         msr->mpd->reserve[0] = 0;
-        msr->mpd->buf_offset -= 2;
     }
     
     return 1;
@@ -517,10 +531,31 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
 
     msr->mpd->boundary = strstr(msr->request_content_type, "boundary=");
     if ((msr->mpd->boundary != NULL)&&(*(msr->mpd->boundary + 9) != 0)) {
-        msr->mpd->boundary = msr->mpd->boundary + 9;
+        char *b = msr->mpd->boundary + 9;
+        int len = strlen(b);
+
+        /* Is the boundary quoted? */
+        if ((len >= 2)&&(*b == '"')&&(*(b + len - 1) == '"')) {
+            /* Quoted. */
+            msr->mpd->boundary = apr_pstrndup(msr->mp, b + 1, len - 2);
+            msr->mpd->boundary_quoted = 1;
+        } else {
+            /* Not quoted. */
+            msr->mpd->boundary = apr_pstrdup(msr->mp, b);
+            msr->mpd->boundary_quoted = 0;
+        }
+
+        msr_log(msr, 9, "Multipart: Boundary%s: %s",
+            (msr->mpd->boundary_quoted ? " (quoted)" : ""),
+            log_escape_nq(msr->mp, msr->mpd->boundary));
+
+        if (strlen(msr->mpd->boundary) == 0) {
+            *error_msg = apr_psprintf(msr->mp, "Multipart boundary empty.");
+            return -1;
+        }
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Multipart Boundary not found or invalid.");
+        *error_msg = apr_psprintf(msr->mp, "Multipart boundary not found or invalid.");
         return -1;
     }
 
@@ -597,6 +632,9 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
         if ((c == 0x0a)||(msr->mpd->bufleft == 0)||(process_buffer)) {
             *(msr->mpd->bufptr) = 0;
 
+            //msr_log(msr, 9, "# Processing buffer: %s", log_escape_nq_ex(msr->mp, msr->mpd->buf,
+            //    MULTIPART_BUF_SIZE - msr->mpd->bufleft));
+
             /* boundary preconditions: length of the line greater than
              * the length of the boundary + the first two characters
              * are dashes "-"
@@ -604,27 +642,31 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
             if ( msr->mpd->buf_contains_line
                 && (strlen(msr->mpd->buf) > strlen(msr->mpd->boundary) + 2)
                 && (((*(msr->mpd->buf) == '-'))&&(*(msr->mpd->buf + 1) == '-'))
-                && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0) ) {
-                
+                && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0) )
+            {
                 char *boundary_end = msr->mpd->buf + 2 + strlen(msr->mpd->boundary);
-                    
-                if (  (*boundary_end == '\r')
-                    &&(*(boundary_end + 1) == '\n')
-                    &&(*(boundary_end + 2) == '\0')
-                ) {
-                    /* simple boundary */
-                    if (multipart_process_boundary(msr, 0, error_msg) < 0) return -1;
+                int is_final = 0;
+
+                /* Is this the final boundary? */                
+                if ((*boundary_end == '-')&&(*(boundary_end + 1)== '-')) {
+                    is_final = 1;
+                    boundary_end += 2;
                 }
-                else
-                if (  (*boundary_end == '-')
-                    &&(*(boundary_end + 1) == '-')
-                    &&(*(boundary_end + 2) == '\r')
-                    &&(*(boundary_end + 3) == '\n')
-                    &&(*(boundary_end + 4) == '\0')
-                ) {
-                    /* final boundary */
-                    msr->mpd->is_complete = 1;
-                    if (multipart_process_boundary(msr, 1, error_msg) < 0) return -1;
+
+                /* Allow for CRLF and LF line endings. */
+                if (   ( (*boundary_end == '\r')
+                          && (*(boundary_end + 1) == '\n')
+                          && (*(boundary_end + 2) == '\0') )
+                    || ( (*boundary_end == '\n')
+                          && (*(boundary_end + 1) == '\0') ) )
+                {
+                    if (multipart_process_boundary(msr, (is_final ? 1 : 0), error_msg) < 0) {
+                        return -1;
+                    }
+
+                    if (is_final) {
+                        msr->mpd->is_complete = 1;
+                    }
                 }
                 else {
                     /* error */

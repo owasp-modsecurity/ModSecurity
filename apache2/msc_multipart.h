@@ -64,6 +64,7 @@ struct multipart_data {
      * parts end and new begin
      */
     char                    *boundary;
+    int                      boundary_quoted;
 
     /* internal buffer and other variables
      * used while parsing
