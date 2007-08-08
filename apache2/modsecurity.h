@@ -320,6 +320,7 @@ struct modsec_rec {
     apr_time_t           time_checkpoint_3;
 
     const char          *matched_var;
+    int                  tx_severity;
 
     /* upload */
     int                  upload_extract_files;

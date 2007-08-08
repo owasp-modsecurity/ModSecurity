@@ -1,6 +1,9 @@
 ?? ??? 2007 - 2.5.0-trunk
 -------------------------
 
+ * Added TX_SEVERITY that keeps track of the highest severity
+   for any matched rules so far.
+
  * Added ARGS_GET, ARGS_POST, ARGS_GET_NAMES, ARGS_POST_NAMES variables to
    allow seperation of GET and POST arguments.
 

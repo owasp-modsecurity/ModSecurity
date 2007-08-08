@@ -734,6 +734,14 @@ static int var_tx_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     return count;
 }
 
+/* TX_SEVERITY */
+
+static int var_tx_severity_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return var_simple_generate(var, vartab, mptmp, apr_psprintf(mptmp, "%i", msr->tx_severity));
+}
+
 /* GEO */
 
 static int var_geo_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -2135,6 +2143,17 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         1, 1,
         var_generic_list_validate,
         var_tx_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* TX_SEVERITY */
+    msre_engine_variable_register(engine,
+        "TX_SEVERITY",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_tx_severity_generate,
         VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );

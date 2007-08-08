@@ -295,8 +295,11 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     msr->collections_dirty = apr_table_make(msr->mp, 8);
     if (msr->collections_dirty == NULL) return -1;
 
+    /* Other */
     msr->tcache = apr_hash_make(msr->mp);
     if (msr->tcache == NULL) return -1;
+
+    msr->tx_severity = 7; /* lowest */
 
     return 1;
 }

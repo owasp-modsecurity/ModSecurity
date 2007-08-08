@@ -1253,6 +1253,12 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
 
         msr->matched_var = apr_pstrdup(msr->mp, var->name);
 
+        /* Keep track of the highest severity matched so far */
+        if (acting_actionset->severity < msr->tx_severity) {
+            msr->tx_severity = acting_actionset->severity;
+        }
+
+
         /* Perform non-disruptive actions. */
         msre_perform_nondisruptive_actions(msr, rule, rule->actionset, mptmp);
 
