@@ -198,6 +198,194 @@ static int var_args_names_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
     return count;
 }
 
+/* ARGS_GET */
+
+static int var_args_get_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    const apr_array_header_t *arr = NULL;
+    const apr_table_entry_t *te = NULL;
+    int i, count = 0;
+
+    /* Loop through the arguments. */
+    arr = apr_table_elts(msr->arguments);
+    te = (apr_table_entry_t *)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        msc_arg *arg = (msc_arg *)te[i].val;
+        int match = 0;
+
+        /* Only QUERY_STRING arguments */
+        if (strcmp("QUERY_STRING", arg->origin) != 0) continue;
+
+        /* Figure out if we want to include this argument. */
+        if (var->param == NULL) match = 1; /* Unconditional inclusion. */
+        else {
+            if (var->param_data != NULL) { /* Regex. */
+                char *my_error_msg = NULL;
+                /* Run the regex against the argument name. */
+                if (!(msc_regexec((msc_regex_t *)var->param_data, arg->name,
+                    arg->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+            } else { /* Simple comparison. */
+                if (strcasecmp(arg->name, var->param) == 0) match = 1;
+            }
+        }
+
+        /* If we had a match add this argument to the collection. */
+        if (match) {
+            msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+
+            rvar->value = arg->value;
+            rvar->value_len = arg->value_len;
+            rvar->name = apr_psprintf(mptmp, "ARGS_GET:%s", log_escape_nq(mptmp, arg->name));
+            apr_table_addn(vartab, rvar->name, (void *)rvar);
+
+            count++;
+        }
+    }
+    
+    return count;
+}
+
+/* ARGS_GET_NAMES */
+
+static int var_args_get_names_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    const apr_array_header_t *arr = NULL;
+    const apr_table_entry_t *te = NULL;
+    int i, count = 0;
+
+    arr = apr_table_elts(msr->arguments);
+    te = (apr_table_entry_t *)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        msc_arg *arg = (msc_arg *)te[i].val;
+        int match = 0;
+
+        /* Only QUERY_STRING arguments */
+        if (strcmp("QUERY_STRING", arg->origin) != 0) continue;
+
+        /* Figure out if we want to include this variable. */
+        if (var->param == NULL) match = 1; /* Unconditional inclusion. */
+        else {
+            if (var->param_data != NULL) { /* Regex. */
+                char *my_error_msg = NULL;
+                if (!(msc_regexec((msc_regex_t *)var->param_data, arg->name,
+                    arg->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+            } else { /* Simple comparison. */
+                if (strcasecmp(arg->name, var->param) == 0) match = 1;
+            }
+        }
+
+        /* If we had a match add this argument to the collection. */
+        if (match) {
+            msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+
+            rvar->value = arg->name;
+            rvar->value_len = arg->name_len;
+            rvar->name = apr_psprintf(mptmp, "ARGS_GET_NAMES:%s", log_escape_nq(mptmp, arg->name));
+            apr_table_addn(vartab, rvar->name, (void *)rvar);
+
+            count++;
+        }
+    }
+    
+    return count;
+}
+
+/* ARGS_POST */
+
+static int var_args_post_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    const apr_array_header_t *arr = NULL;
+    const apr_table_entry_t *te = NULL;
+    int i, count = 0;
+
+    /* Loop through the arguments. */
+    arr = apr_table_elts(msr->arguments);
+    te = (apr_table_entry_t *)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        msc_arg *arg = (msc_arg *)te[i].val;
+        int match = 0;
+
+        /* Only BODY arguments */
+        if (strcmp("BODY", arg->origin) != 0) continue;
+
+        /* Figure out if we want to include this argument. */
+        if (var->param == NULL) match = 1; /* Unconditional inclusion. */
+        else {
+            if (var->param_data != NULL) { /* Regex. */
+                char *my_error_msg = NULL;
+                /* Run the regex against the argument name. */
+                if (!(msc_regexec((msc_regex_t *)var->param_data, arg->name,
+                    arg->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+            } else { /* Simple comparison. */
+                if (strcasecmp(arg->name, var->param) == 0) match = 1;
+            }
+        }
+
+        /* If we had a match add this argument to the collection. */
+        if (match) {
+            msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+
+            rvar->value = arg->value;
+            rvar->value_len = arg->value_len;
+            rvar->name = apr_psprintf(mptmp, "ARGS_POST:%s", log_escape_nq(mptmp, arg->name));
+            apr_table_addn(vartab, rvar->name, (void *)rvar);
+
+            count++;
+        }
+    }
+    
+    return count;
+}
+
+/* ARGS_POST_NAMES */
+
+static int var_args_post_names_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    const apr_array_header_t *arr = NULL;
+    const apr_table_entry_t *te = NULL;
+    int i, count = 0;
+
+    arr = apr_table_elts(msr->arguments);
+    te = (apr_table_entry_t *)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        msc_arg *arg = (msc_arg *)te[i].val;
+        int match = 0;
+
+        /* Only BODY arguments */
+        if (strcmp("BODY", arg->origin) != 0) continue;
+
+        /* Figure out if we want to include this variable. */
+        if (var->param == NULL) match = 1; /* Unconditional inclusion. */
+        else {
+            if (var->param_data != NULL) { /* Regex. */
+                char *my_error_msg = NULL;
+                if (!(msc_regexec((msc_regex_t *)var->param_data, arg->name,
+                    arg->name_len, &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+            } else { /* Simple comparison. */
+                if (strcasecmp(arg->name, var->param) == 0) match = 1;
+            }
+        }
+
+        /* If we had a match add this argument to the collection. */
+        if (match) {
+            msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+
+            rvar->value = arg->name;
+            rvar->value_len = arg->name_len;
+            rvar->name = apr_psprintf(mptmp, "ARGS_POST_NAMES:%s", log_escape_nq(mptmp, arg->name));
+            apr_table_addn(vartab, rvar->name, (void *)rvar);
+
+            count++;
+        }
+    }
+    
+    return count;
+}
+
 /* RULE */
 
 static int var_rule_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -1782,6 +1970,50 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         var_args_names_generate,
         VAR_CACHE,
         PHASE_REQUEST_HEADERS
+    );
+
+    /* ARGS_GET */
+    msre_engine_variable_register(engine,
+        "ARGS_GET",
+        VAR_LIST,
+        0, 1,
+        var_generic_list_validate,
+        var_args_get_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* ARGS_GET_NAMES */
+    msre_engine_variable_register(engine,
+        "ARGS_GET_NAMES",
+        VAR_LIST,
+        0, 1,
+        var_generic_list_validate,
+        var_args_get_names_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* ARGS_POST */
+    msre_engine_variable_register(engine,
+        "ARGS_POST",
+        VAR_LIST,
+        0, 1,
+        var_generic_list_validate,
+        var_args_post_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* ARGS_POST_NAMES */
+    msre_engine_variable_register(engine,
+        "ARGS_POST_NAMES",
+        VAR_LIST,
+        0, 1,
+        var_generic_list_validate,
+        var_args_post_names_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
     );
 
     /* ENV */

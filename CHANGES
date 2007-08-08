@@ -1,6 +1,9 @@
 ?? ??? 2007 - 2.5.0-trunk
 -------------------------
 
+ * Added ARGS_GET, ARGS_POST, ARGS_GET_NAME, ARGS_POST_NAMES variables to
+   allow seperation of GET and POST arguments.
+
  * Added MODSEC_BUILD variable that contains the numeric build value based
    on the ModSecurity version.
 
