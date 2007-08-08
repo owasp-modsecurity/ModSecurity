@@ -1,7 +1,9 @@
 ?? ??? 2007 - 2.5.0-trunk
 -------------------------
 
- * Cleaned up some documentation.
+ * Enhanced debug logging.
+
+ * Cleaned up and clarified some documentation.
 
  * Performance improvements and greater control over caching transformations.
 

@@ -1042,6 +1042,7 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset,
     if (rule == NULL) return NULL;
     rule->ruleset = ruleset;
     rule->targets = apr_array_make(ruleset->mp, 10, sizeof(const msre_var *));
+    rule->p1 = apr_pstrdup(ruleset->mp, targets);
     rule->filename = apr_pstrdup(ruleset->mp, fn);
     rule->line_num = line;
 
@@ -1341,6 +1342,23 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                 } else {
                     apr_table_unset(tartab, te[j].key);
                 }
+            }
+        }
+    }
+
+    /* Log the target variable expansion */
+    if (msr->txcfg->debuglog_level >= 4) {
+        const char *expnames = NULL;
+
+        arr = apr_table_elts(tartab);
+        te = (apr_table_entry_t *)arr->elts;
+        if (arr->nelts > 0) {
+            expnames = apr_pstrdup(mptmp, ((msre_var *)te[0].val)->name);
+            for(i = 1; i < arr->nelts; i++) {
+                expnames = apr_psprintf(mptmp, "%s|%s", expnames, ((msre_var *)te[i].val)->name);
+            }
+            if (strcmp(rule->p1, expnames) != 0) {
+                msr_log(msr, 4, "Expanded \"%s\" to \"%s\".", rule->p1, expnames);
             }
         }
     }

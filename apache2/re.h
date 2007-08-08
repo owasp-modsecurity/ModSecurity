@@ -117,6 +117,7 @@ struct msre_rule {
     msre_op_metadata        *op_metadata;
     unsigned int             op_negated;
     msre_actionset          *actionset;
+    const char              *p1;
     const char              *filename;
     int                      line_num;
     
