@@ -1089,7 +1089,7 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
         int x = ((unsigned char *)var->value)[i];
         if (!(table[x >> 3] & (1 << (x & 0x7)))) {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Value %i outside range: %s", x, rule->op_param);
+                msr_log(msr, 9, "Value %i in %s outside range: %s", x, var->name, rule->op_param);
             }
             count++;
         }
@@ -1097,8 +1097,8 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
 
     if (count == 0) return 0; /* Valid - no match. */
 
-    *error_msg = apr_psprintf(msr->mp, "Found %i byte(s) outside range: %s.",
-        count, rule->op_param);
+    *error_msg = apr_psprintf(msr->mp, "Found %i byte(s) in %s outside range: %s.",
+        count, var->name, rule->op_param);
 
     return 1; /* Invalid - match.*/
 }
