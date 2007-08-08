@@ -1020,6 +1020,14 @@ static int var_files_combined_size_generate(modsec_rec *msr, msre_var *var, msre
     return 1;
 }
 
+/* MODSEC_BUILD */
+
+static int var_modsec_build_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return var_simple_generate(var, vartab, mptmp, modsec_build(mptmp));
+}
+
 /* TIME */
 
 static int var_time_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -2018,6 +2026,17 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         var_files_tmpnames_generate,
         VAR_CACHE,
         PHASE_REQUEST_BODY
+    );
+
+    /* MODSEC_BUILD */
+    msre_engine_variable_register(engine,
+        "MODSEC_BUILD",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_modsec_build_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
     );
 
     /* TIME */

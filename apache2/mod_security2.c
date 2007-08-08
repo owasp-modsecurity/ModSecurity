@@ -24,6 +24,14 @@
 
 msc_engine DSOLOCAL *modsecurity = NULL;
 
+modsec_build_type_rec DSOLOCAL modsec_build_type[] = {
+    { "dev", 1 },     /* Development build */
+    { "rc", 3 },      /* Release Candidate build */
+    { "", 9 },        /* Production build */
+    { "breach", 9 },  /* Breach build */
+    { "trunk", 9 },   /* Trunk build */
+    { NULL, -1 }      /* terminator */
+};
 
 /* Global module variables; these are used for the Apache-specific functionality */
 
@@ -495,11 +503,11 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
     if (first_time) {
         if (new_server_signature != NULL) {
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "ModSecurity for Apache %s configured - %s", MODULE_RELEASE, real_server_signature);
+                "ModSecurity for Apache %s (build %s) configured - %s", MODULE_RELEASE, modsec_build(mp_temp), real_server_signature);
         }
         else {
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "ModSecurity for Apache %s configured", MODULE_RELEASE);
+                "ModSecurity for Apache %s (build %s) configured", MODULE_RELEASE, modsec_build(mp_temp));
         }
     }
 

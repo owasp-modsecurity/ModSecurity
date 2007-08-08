@@ -49,9 +49,23 @@ typedef struct msc_string msc_string;
 #include "http_log.h"
 #include "http_protocol.h"
 
+typedef struct modsec_build_type_rec {
+    const char * name;
+    int          val;
+} modsec_build_type_rec;
+extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
+
+#define MODSEC_VERSION_MAJOR       "2"
+#define MODSEC_VERSION_MINOR       "5"
+#define MODSEC_VERSION_MAINT       "0"
+#define MODSEC_VERSION_TYPE        "trunk"
+#define MODSEC_VERSION_RELEASE     "99"
+
 #define MODULE_NAME "ModSecurity"
-#define MODULE_RELEASE "2.5.0-trunk"
-#define MODULE_NAME_FULL (MODULE_NAME " v" MODULE_RELEASE " (Apache 2.x)")
+#define MODULE_RELEASE \
+  MODSEC_VERSION_MAJOR "." MODSEC_VERSION_MINOR "." MODSEC_VERSION_MAINT \
+  "-" MODSEC_VERSION_TYPE MODSEC_VERSION_RELEASE
+#define MODULE_NAME_FULL MODULE_NAME " v" MODULE_RELEASE " (Apache 2.x)"
 
 #define PHASE_REQUEST_HEADERS       1
 #define PHASE_REQUEST_BODY          2
@@ -61,8 +75,8 @@ typedef struct msc_string msc_string;
 #define PHASE_FIRST                 PHASE_REQUEST_HEADERS
 #define PHASE_LAST                  PHASE_LOGGING
 
-#define NOT_SET     -1
-#define NOT_SET_P (void *)-1
+#define NOT_SET                    -1
+#define NOT_SET_P          (void *)-1
 
 #define CREATEMODE ( APR_UREAD | APR_UWRITE | APR_GREAD )
 #define CREATEMODE_DIR ( APR_UREAD | APR_UWRITE | APR_UEXECUTE | APR_GREAD | APR_GEXECUTE )

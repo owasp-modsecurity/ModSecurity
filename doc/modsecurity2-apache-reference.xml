@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-trunk / (July 27, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-trunk / (Aug 8, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -2186,6 +2186,17 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
       <programlisting format="linespecific">SecRule REMOTE_ADDR "<emphasis
           role="bold">@geoLookup</emphasis>" chain,drop,msg:'Non-UK IP address'
 SecRule GEO:COUNTRY_CODE "!@streq UK"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">MODSEC_BUILD</literal></title>
+
+      <para>This variable holds the ModSecurity build number. This variable is
+      intended to be used to check the build number prior to using a feature
+      that is available only in a certain build. Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis role="bold">MODSEC_BUILD</emphasis> "!@ge 02050102" skip:1
+SecRule ARGS "@pm some key words" deny,status:500</programlisting>
     </section>
 
     <section>

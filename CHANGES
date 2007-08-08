@@ -1,6 +1,9 @@
 ?? ??? 2007 - 2.5.0-trunk
 -------------------------
 
+ * Added MODSEC_BUILD variable that contains the numeric build value based
+   on the ModSecurity version.
+
  * Enhanced debug logging.
 
  * Cleaned up and clarified some documentation.

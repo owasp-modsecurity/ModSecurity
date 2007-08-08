@@ -72,4 +72,6 @@ int DSOLOCAL html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, 
 
 int DSOLOCAL ansi_c_sequences_decode_inplace(unsigned char *input, int len);
 
+char DSOLOCAL *modsec_build(apr_pool_t *mp);
+
 #endif
