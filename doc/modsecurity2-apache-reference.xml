@@ -1975,11 +1975,13 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis
       (means all arguments including the POST Payload), with a static
       parameter (matches arguments with that name), or with a regular
       expression (matches all arguments with name that matches the regular
-      expression). Note: <literal>ARGS:p</literal> will not result in any
-      invocations against the operator if argument p does not exist. Some
-      variables are actually collections, which are expanded into more
-      variables at runtime. The following example will examine all request
-      arguments:<programlisting format="linespecific">SecRule ARGS dirty</programlisting>
+      expression). To look at only the query string or body arguments, see the
+      <literal>ARGS_GET</literal> and <literal>ARGS_POST</literal>
+      collections.</para>
+
+      <para>Some variables are actually collections, which are expanded into
+      more variables at runtime. The following example will examine all
+      request arguments:<programlisting format="linespecific">SecRule ARGS dirty</programlisting>
       Sometimes, however, you will want to look only at parts of a collection.
       This can be achieved with the help of the <emphasis>selection
       operator</emphasis>(colon). The following example will only look at the
@@ -2002,6 +2004,9 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis
       moreinfo="none">id_</literal>: <programlisting format="linespecific">SecRule ARGS:/^id_/ dirty</programlisting></para>
 
       <note>
+        <para>Using <literal>ARGS:p</literal> will not result in any
+        invocations against the operator if argument p does not exist.</para>
+
         <para>In ModSecurity 1.X, the <literal>ARGS</literal> variable stood
         for <literal>QUERY_STRING</literal> + <literal>POST_PAYLOAD</literal>,
         whereas now it expands to to individual variables.</para>
@@ -2034,6 +2039,37 @@ SecRule <emphasis role="bold">ARGS_COMBINED_SIZE</emphasis> "@gt 25"</programlis
 
       <programlisting format="linespecific">SecRule REQUEST_FILENAME "/index.php" "chain,log,deny,status:403,phase:2"
 SecRule<emphasis role="bold"> ARGS_NAMES</emphasis> "!^(p|a)$"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">ARGS_GET</literal></title>
+
+      <para><literal>ARGS_GET</literal> is similar to <literal>ARGS</literal>,
+      but only contains arguments from the query string.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">ARGS_GET_NAMES</literal></title>
+
+      <para><literal>ARGS_GET_NAMES</literal> is similar to
+      <literal>ARGS_NAMES</literal>, but only contains argument names from the
+      query string.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">ARGS_POST</literal></title>
+
+      <para><literal>ARGS_POST</literal> is similar to
+      <literal>ARGS</literal>, but only contains arguments from the POST
+      body.</para>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">ARGS_POST_NAMES</literal></title>
+
+      <para><literal>ARGS_POST_NAMES</literal> is similar to
+      <literal>ARGS_NAMES</literal>, but only contains argument names from the
+      POST body.</para>
     </section>
 
     <section>
