@@ -1969,17 +1969,6 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_REQUEST_HEADERS
     );
 
-    /* ARGS_NAMES */
-    msre_engine_variable_register(engine,
-        "ARGS_NAMES",
-        VAR_LIST,
-        0, 1,
-        var_generic_list_validate,
-        var_args_names_generate,
-        VAR_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
     /* ARGS_GET */
     msre_engine_variable_register(engine,
         "ARGS_GET",
@@ -1998,6 +1987,17 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         0, 1,
         var_generic_list_validate,
         var_args_get_names_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* ARGS_NAMES */
+    msre_engine_variable_register(engine,
+        "ARGS_NAMES",
+        VAR_LIST,
+        0, 1,
+        var_generic_list_validate,
+        var_args_names_generate,
         VAR_CACHE,
         PHASE_REQUEST_HEADERS
     );
@@ -2024,6 +2024,17 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_REQUEST_BODY
     );
 
+    /* AUTH_TYPE */
+    msre_engine_variable_register(engine,
+        "AUTH_TYPE",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_auth_type_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
     /* ENV */
     msre_engine_variable_register(engine,
         "ENV",
@@ -2031,195 +2042,6 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         0, 1,
         var_env_validate,
         var_env_generate,
-        VAR_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* REQBODY_PROCESSOR */
-    msre_engine_variable_register(engine,
-        "REQBODY_PROCESSOR",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_reqbody_processor_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* REQBODY_PROCESSOR_ERROR */
-    msre_engine_variable_register(engine,
-        "REQBODY_PROCESSOR_ERROR",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_reqbody_processor_error_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_BODY
-    );
-
-    /* REQBODY_PROCESSOR_ERROR_MSG */
-    msre_engine_variable_register(engine,
-        "REQBODY_PROCESSOR_ERROR_MSG",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_reqbody_processor_error_msg_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_BODY
-    );
-
-    #ifdef WITH_LIBXML2
-    /* XML */
-    msre_engine_variable_register(engine,
-        "XML",
-        VAR_LIST,
-        0, 1,
-        var_xml_validate,
-        var_xml_generate,
-        VAR_CACHE,
-        PHASE_REQUEST_BODY
-    );
-    #endif
-
-    /* WEBSERVER_ERROR_LOG */
-    msre_engine_variable_register(engine,
-        "WEBSERVER_ERROR_LOG",
-        VAR_LIST,
-        0, 0,
-        NULL,
-        var_webserver_error_log_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* REMOTE_ADDR */
-    msre_engine_variable_register(engine,
-        "REMOTE_ADDR",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_remote_addr_generate,
-        VAR_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* REMOTE_HOST */
-    msre_engine_variable_register(engine,
-        "REMOTE_HOST",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_remote_host_generate,
-        VAR_CACHE,
-        PHASE_REQUEST_BODY
-    );
-
-    /* REMOTE_PORT */
-    msre_engine_variable_register(engine,
-        "REMOTE_PORT",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_remote_port_generate,
-        VAR_CACHE,
-        PHASE_REQUEST_BODY
-    );
-
-    /* REMOTE_USER */
-    msre_engine_variable_register(engine,
-        "REMOTE_USER",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_remote_user_generate,
-        VAR_CACHE,
-        PHASE_REQUEST_BODY
-    );
-
-    /* TX */
-    msre_engine_variable_register(engine,
-        "TX",
-        VAR_LIST,
-        1, 1,
-        var_generic_list_validate,
-        var_tx_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* TX_SEVERITY */
-    msre_engine_variable_register(engine,
-        "TX_SEVERITY",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_tx_severity_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* GEO */
-    msre_engine_variable_register(engine,
-        "GEO",
-        VAR_LIST,
-        1, 1,
-        var_generic_list_validate,
-        var_geo_generate,
-        VAR_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* IP */
-    msre_engine_variable_register(engine,
-        "IP",
-        VAR_LIST,
-        1, 1,
-        var_generic_list_validate,
-        var_ip_generate,
-        VAR_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* SESSION */
-    msre_engine_variable_register(engine,
-        "SESSION",
-        VAR_LIST,
-        1, 1,
-        var_generic_list_validate,
-        var_session_generate,
-        VAR_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* USER */
-    msre_engine_variable_register(engine,
-        "USER",
-        VAR_LIST,
-        1, 1,
-        var_generic_list_validate,
-        var_user_generate,
-        VAR_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* GLOBAL */
-    msre_engine_variable_register(engine,
-        "GLOBAL",
-        VAR_LIST,
-        1, 1,
-        var_generic_list_validate,
-        var_global_generate,
-        VAR_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* RESOURCE */
-    msre_engine_variable_register(engine,
-        "RESOURCE",
-        VAR_LIST,
-        1, 1,
-        var_generic_list_validate,
-        var_resource_generate,
         VAR_CACHE,
         PHASE_REQUEST_HEADERS
     );
@@ -2279,6 +2101,39 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_REQUEST_BODY
     );
 
+    /* GEO */
+    msre_engine_variable_register(engine,
+        "GEO",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_geo_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* GLOBAL */
+    msre_engine_variable_register(engine,
+        "GLOBAL",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_global_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* IP */
+    msre_engine_variable_register(engine,
+        "IP",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_ip_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
     /* MODSEC_BUILD */
     msre_engine_variable_register(engine,
         "MODSEC_BUILD",
@@ -2290,103 +2145,15 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_REQUEST_HEADERS
     );
 
-    /* TIME */
+    /* PATH_INFO */
     msre_engine_variable_register(engine,
-        "TIME",
+        "PATH_INFO",
         VAR_SIMPLE,
         0, 0,
         NULL,
-        var_time_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* TIME_DAY */
-    msre_engine_variable_register(engine,
-        "TIME_DAY",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_time_day_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* TIME_EPOCH */
-    msre_engine_variable_register(engine,
-        "TIME_EPOCH",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_time_epoch_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* TIME_HOUR */
-    msre_engine_variable_register(engine,
-        "TIME_HOUR",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_time_hour_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* TIME_MIN */
-    msre_engine_variable_register(engine,
-        "TIME_MIN",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_time_min_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* TIME_MON */
-    msre_engine_variable_register(engine,
-        "TIME_MON",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_time_mon_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* TIME_SEC */
-    msre_engine_variable_register(engine,
-        "TIME_SEC",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_time_sec_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* TIME_WDAY */
-    msre_engine_variable_register(engine,
-        "TIME_WDAY",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_time_wday_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_HEADERS
-    );
-
-    /* TIME_YEAR */
-    msre_engine_variable_register(engine,
-        "TIME_YEAR",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_time_year_generate,
-        VAR_DONT_CACHE,
-        PHASE_REQUEST_HEADERS
+        var_path_info_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
     );
 
     /* QUERY_STRING */
@@ -2398,6 +2165,94 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         var_query_string_generate,
         VAR_CACHE,
         PHASE_REQUEST_HEADERS
+    );
+
+    /* REMOTE_ADDR */
+    msre_engine_variable_register(engine,
+        "REMOTE_ADDR",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_remote_addr_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* REMOTE_HOST */
+    msre_engine_variable_register(engine,
+        "REMOTE_HOST",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_remote_host_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* REMOTE_PORT */
+    msre_engine_variable_register(engine,
+        "REMOTE_PORT",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_remote_port_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* REMOTE_USER */
+    msre_engine_variable_register(engine,
+        "REMOTE_USER",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_remote_user_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* RESOURCE */
+    msre_engine_variable_register(engine,
+        "RESOURCE",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_resource_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* REQBODY_PROCESSOR */
+    msre_engine_variable_register(engine,
+        "REQBODY_PROCESSOR",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_reqbody_processor_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* REQBODY_PROCESSOR_ERROR */
+    msre_engine_variable_register(engine,
+        "REQBODY_PROCESSOR_ERROR",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_reqbody_processor_error_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* REQBODY_PROCESSOR_ERROR_MSG */
+    msre_engine_variable_register(engine,
+        "REQBODY_PROCESSOR_ERROR_MSG",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_reqbody_processor_error_msg_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_BODY
     );
 
     /* REQUEST_BASENAME */
@@ -2532,37 +2387,92 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_REQUEST_HEADERS
     );
 
-    /* SERVER_ADDR */
+    /* RESPONSE_BODY */
     msre_engine_variable_register(engine,
-        "SERVER_ADDR",
+        "RESPONSE_BODY",
         VAR_SIMPLE,
         0, 0,
         NULL,
-        var_server_addr_generate,
+        var_response_body_generate,
         VAR_CACHE,
-        PHASE_REQUEST_HEADERS
+        PHASE_RESPONSE_BODY
     );
 
-    /* SERVER_NAME */
+    /* RESPONSE_CONTENT_LENGTH */
     msre_engine_variable_register(engine,
-        "SERVER_NAME",
+        "RESPONSE_CONTENT_LENGTH",
         VAR_SIMPLE,
         0, 0,
         NULL,
-        var_server_name_generate,
+        var_response_content_length,
         VAR_CACHE,
-        PHASE_REQUEST_HEADERS
+        PHASE_RESPONSE_HEADERS
     );
 
-    /* SERVER_PORT */
+    /* RESPONSE_CONTENT_TYPE */
     msre_engine_variable_register(engine,
-        "SERVER_PORT",
+        "RESPONSE_CONTENT_TYPE",
         VAR_SIMPLE,
         0, 0,
         NULL,
-        var_server_port_generate,
+        var_response_content_type,
         VAR_CACHE,
-        PHASE_REQUEST_HEADERS
+        PHASE_RESPONSE_HEADERS
+    );
+
+    /* RESPONSE_HEADERS */
+    msre_engine_variable_register(engine,
+        "RESPONSE_HEADERS",
+        VAR_LIST,
+        0, 1,
+        var_generic_list_validate,
+        var_response_headers_generate,
+        VAR_CACHE,
+        PHASE_RESPONSE_HEADERS
+    );
+
+    /* RESPONSE_HEADERS_NAMES */
+    msre_engine_variable_register(engine,
+        "RESPONSE_HEADERS_NAMES",
+        VAR_LIST,
+        0, 1,
+        var_generic_list_validate,
+        var_response_headers_names_generate,
+        VAR_CACHE,
+        PHASE_RESPONSE_HEADERS
+    );
+
+    /* RESPONSE_PROTOCOL */
+    msre_engine_variable_register(engine,
+        "RESPONSE_PROTOCOL",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_response_protocol_generate,
+        VAR_CACHE,
+        PHASE_RESPONSE_HEADERS
+    );
+
+    /* RESPONSE_STATUS */
+    msre_engine_variable_register(engine,
+        "RESPONSE_STATUS",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_response_status_generate,
+        VAR_CACHE,
+        PHASE_RESPONSE_HEADERS
+    );
+
+    /* RULE */
+    msre_engine_variable_register(engine,
+        "RULE",
+        VAR_LIST,
+        1, 1,
+        NULL,
+        var_rule_generate,
+        VAR_DONT_CACHE,
+        PHASE_RESPONSE_HEADERS
     );
 
     /* SCRIPT_GID */
@@ -2642,58 +2552,58 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_REQUEST_BODY
     );
 
-    /* PATH_INFO */
+    /* SERVER_ADDR */
     msre_engine_variable_register(engine,
-        "PATH_INFO",
+        "SERVER_ADDR",
         VAR_SIMPLE,
         0, 0,
         NULL,
-        var_path_info_generate,
+        var_server_addr_generate,
         VAR_CACHE,
-        PHASE_REQUEST_BODY
+        PHASE_REQUEST_HEADERS
     );
 
-    /* AUTH_TYPE */
+    /* SERVER_NAME */
     msre_engine_variable_register(engine,
-        "AUTH_TYPE",
+        "SERVER_NAME",
         VAR_SIMPLE,
         0, 0,
         NULL,
-        var_auth_type_generate,
+        var_server_name_generate,
         VAR_CACHE,
-        PHASE_REQUEST_BODY
+        PHASE_REQUEST_HEADERS
     );
 
-    /* RESPONSE_BODY */
+    /* SERVER_PORT */
     msre_engine_variable_register(engine,
-        "RESPONSE_BODY",
+        "SERVER_PORT",
         VAR_SIMPLE,
         0, 0,
         NULL,
-        var_response_body_generate,
+        var_server_port_generate,
         VAR_CACHE,
-        PHASE_RESPONSE_BODY
+        PHASE_REQUEST_HEADERS
     );
 
-    /* RESPONSE_HEADERS */
+    /* SESSION */
     msre_engine_variable_register(engine,
-        "RESPONSE_HEADERS",
+        "SESSION",
         VAR_LIST,
-        0, 1,
+        1, 1,
         var_generic_list_validate,
-        var_response_headers_generate,
+        var_session_generate,
         VAR_CACHE,
-        PHASE_RESPONSE_HEADERS
+        PHASE_REQUEST_HEADERS
     );
 
-    /* RESPONSE_HEADERS_NAMES */
+    /* SESSIONID */
     msre_engine_variable_register(engine,
-        "RESPONSE_HEADERS_NAMES",
-        VAR_LIST,
-        0, 1,
-        var_generic_list_validate,
-        var_response_headers_names_generate,
-        VAR_CACHE,
+        "SESSIONID",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_sessionid_generate,
+        VAR_DONT_CACHE,
         PHASE_RESPONSE_HEADERS
     );
 
@@ -2708,59 +2618,15 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_RESPONSE_HEADERS
     );
 
-    /* RESPONSE_PROTOCOL */
+    /* USER */
     msre_engine_variable_register(engine,
-        "RESPONSE_PROTOCOL",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_response_protocol_generate,
-        VAR_CACHE,
-        PHASE_RESPONSE_HEADERS
-    );
-
-    /* RESPONSE_STATUS */
-    msre_engine_variable_register(engine,
-        "RESPONSE_STATUS",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_response_status_generate,
-        VAR_CACHE,
-        PHASE_RESPONSE_HEADERS
-    );
-
-    /* RESPONSE_CONTENT_TYPE */
-    msre_engine_variable_register(engine,
-        "RESPONSE_CONTENT_TYPE",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_response_content_type,
-        VAR_CACHE,
-        PHASE_RESPONSE_HEADERS
-    );
-
-    /* RESPONSE_CONTENT_LENGTH */
-    msre_engine_variable_register(engine,
-        "RESPONSE_CONTENT_LENGTH",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_response_content_length,
-        VAR_CACHE,
-        PHASE_RESPONSE_HEADERS
-    );
-
-    /* RULE */
-    msre_engine_variable_register(engine,
-        "RULE",
+        "USER",
         VAR_LIST,
         1, 1,
-        NULL,
-        var_rule_generate,
-        VAR_DONT_CACHE,
-        PHASE_RESPONSE_HEADERS
+        var_generic_list_validate,
+        var_user_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
     );
 
     /* USERID */
@@ -2774,15 +2640,125 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_RESPONSE_HEADERS
     );
 
-    /* SESSIONID */
+    /* TIME */
     msre_engine_variable_register(engine,
-        "SESSIONID",
+        "TIME",
         VAR_SIMPLE,
         0, 0,
         NULL,
-        var_sessionid_generate,
+        var_time_generate,
         VAR_DONT_CACHE,
-        PHASE_RESPONSE_HEADERS
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* TIME_DAY */
+    msre_engine_variable_register(engine,
+        "TIME_DAY",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_time_day_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* TIME_EPOCH */
+    msre_engine_variable_register(engine,
+        "TIME_EPOCH",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_time_epoch_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* TIME_HOUR */
+    msre_engine_variable_register(engine,
+        "TIME_HOUR",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_time_hour_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* TIME_MIN */
+    msre_engine_variable_register(engine,
+        "TIME_MIN",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_time_min_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* TIME_MON */
+    msre_engine_variable_register(engine,
+        "TIME_MON",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_time_mon_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* TIME_SEC */
+    msre_engine_variable_register(engine,
+        "TIME_SEC",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_time_sec_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* TIME_WDAY */
+    msre_engine_variable_register(engine,
+        "TIME_WDAY",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_time_wday_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* TIME_YEAR */
+    msre_engine_variable_register(engine,
+        "TIME_YEAR",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_time_year_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* TX */
+    msre_engine_variable_register(engine,
+        "TX",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_tx_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* TX_SEVERITY */
+    msre_engine_variable_register(engine,
+        "TX_SEVERITY",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_tx_severity_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
     );
 
     /* WEBAPPID */
@@ -2795,4 +2771,28 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_DONT_CACHE,
         PHASE_RESPONSE_HEADERS
     );
+
+    /* WEBSERVER_ERROR_LOG */
+    msre_engine_variable_register(engine,
+        "WEBSERVER_ERROR_LOG",
+        VAR_LIST,
+        0, 0,
+        NULL,
+        var_webserver_error_log_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    #ifdef WITH_LIBXML2
+    /* XML */
+    msre_engine_variable_register(engine,
+        "XML",
+        VAR_LIST,
+        0, 1,
+        var_xml_validate,
+        var_xml_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+    #endif
 }
