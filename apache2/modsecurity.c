@@ -299,7 +299,7 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     msr->tcache = apr_hash_make(msr->mp);
     if (msr->tcache == NULL) return -1;
 
-    msr->tx_severity = 7; /* lowest */
+    msr->highest_severity = 255; /* high, invalid value */
 
     return 1;
 }

@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-trunk / (Aug 8, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-trunk / (Aug 9, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -2222,6 +2222,23 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
       <programlisting format="linespecific">SecRule REMOTE_ADDR "<emphasis
           role="bold">@geoLookup</emphasis>" chain,drop,msg:'Non-UK IP address'
 SecRule GEO:COUNTRY_CODE "!@streq UK"</programlisting>
+    </section>
+
+    <section>
+      <title><literal moreinfo="none">HIGHEST_SEVERITY</literal></title>
+
+      <para>This variable holds the highest severity of any rules that have
+      matched so far. Severities are numeric values and thus can be used with
+      comparison operators such as <literal moreinfo="none">@lt</literal>,
+      etc.</para>
+
+      <note>
+        <para>Higher severities have a lower numeric value.</para>
+
+        <para>A value of 255 indicates no severity has been set.</para>
+      </note>
+
+      <programlisting format="linespecific">SecRule HIGHEST_SEVERITY "@le 2" "phase:2,deny,status:500,msg:'severity %{HIGHEST_SEVERITY}'"</programlisting>
     </section>
 
     <section>
