@@ -589,7 +589,7 @@ int multipart_complete(modsec_rec *msr, char **error_log) {
     if (msr->mpd == NULL) return 1;
 
     if ((msr->mpd->seen_data != 0)&&(msr->mpd->is_complete == 0)) {
-        *error_log = apr_psprintf(msr->mp, "Multipart: final boundary missing");
+        *error_log = apr_psprintf(msr->mp, "Multipart: Final boundary missing.");
         return -1;
     }
 
