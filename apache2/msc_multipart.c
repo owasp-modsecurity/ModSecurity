@@ -188,25 +188,38 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
         
         /* Empty line. */
 
+        if (msr->mpd->buf[0] == '\n') {
+            msr->mpd->flag_lf_line = 1;
+        }
+
         header_value = (char *)apr_table_get(msr->mpd->mpp->headers, "Content-Disposition");
         if (header_value == NULL) {
-            *error_msg = apr_psprintf(msr->mp, "Multipart: Part is missing the Content-Disposition header");
+            *error_msg = apr_psprintf(msr->mp, "Multipart: Part missing Content-Disposition header.");
             return -1;
         }
         
         rc = multipart_parse_content_disposition(msr, header_value);
         if (rc < 0) {
-            *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (%i): %s",
+            *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (%i): %s.",
                 rc, log_escape_nq(msr->mp, header_value));
             return -1;
         }
 
         if (msr->mpd->mpp->name == NULL) {
-            *error_msg = apr_psprintf(msr->mp, "Multipart: Part name missing");
+            *error_msg = apr_psprintf(msr->mp, "Multipart: Content-Disposition header missing name field.");
             return -1;
-        }        
-        
+        }
+
         if (msr->mpd->mpp->filename != NULL) {
+            /* Some parsers use crude methods to extract the name and filename
+             * values from the C-D header. We need to check for the case where they
+             * don't understand a C-D we do.
+             */
+            if (strstr(header_value, "filename=") == NULL) {
+                *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (filename).");
+                return -1;
+            }
+
             msr->mpd->mpp->type = MULTIPART_FILE;
         } else {
             msr->mpd->mpp->type = MULTIPART_FORMDATA;
@@ -220,14 +233,15 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
             char *header_value, *new_value, *data;
             
             /* header folding, add data to the header we are building */
+            msr->mpd->flag_header_folding = 1;
             
             if (msr->mpd->mpp->last_header_name == NULL) {
                 /* we are not building a header at this moment */
-                *error_msg = apr_psprintf(msr->mp, "Multipart: invalid part header (invalid folding)");
+                *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid part header (folding error).");
                 return -1;
             }
             
-            /* locate the beginning of the data */
+            /* locate the beginning of data */
             data = msr->mpd->buf;
             while((*data == '\t')||(*data == ' ')) data++;
             
@@ -244,7 +258,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
                 log_escape(msr->mp, data));
             
             if (strlen(new_value) > 4096) {
-                *error_msg = apr_psprintf(msr->mp, "Multpart: invalid part header (too long)");
+                *error_msg = apr_psprintf(msr->mp, "Multipart: Part header too long.");
                 return -1;
             }
         } else {
@@ -255,7 +269,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
             data = msr->mpd->buf;
             while((*data != ':')&&(*data != '\0')) data++;
             if (*data == '\0') {
-                *error_msg = apr_psprintf(msr->mp, "Multipart: invalid part header (missing colon): %s",
+                *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid part header (colon missing): %s.",
                     log_escape_nq(msr->mp, msr->mpd->buf));
                 return -1;
             }
@@ -270,7 +284,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
                         
             /* error if the name already exists */
             if (apr_table_get(msr->mpd->mpp->headers, header_name) != NULL) {
-                *error_msg = apr_psprintf(msr->mp, "Multipart: part header already exists: %s",
+                *error_msg = apr_psprintf(msr->mp, "Multipart: Duplicate part header: %s.",
                     log_escape_nq(msr->mp, header_name));
                 return -1;
             }
@@ -538,15 +552,15 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
         if ((len >= 2)&&(*b == '"')&&(*(b + len - 1) == '"')) {
             /* Quoted. */
             msr->mpd->boundary = apr_pstrndup(msr->mp, b + 1, len - 2);
-            msr->mpd->boundary_quoted = 1;
+            msr->mpd->flag_boundary_quoted = 1;
         } else {
             /* Not quoted. */
             msr->mpd->boundary = apr_pstrdup(msr->mp, b);
-            msr->mpd->boundary_quoted = 0;
+            msr->mpd->flag_boundary_quoted = 0;
         }
 
         msr_log(msr, 9, "Multipart: Boundary%s: %s",
-            (msr->mpd->boundary_quoted ? " (quoted)" : ""),
+            (msr->mpd->flag_boundary_quoted ? " (quoted)" : ""),
             log_escape_nq(msr->mp, msr->mpd->boundary));
 
         if (strlen(msr->mpd->boundary) == 0) {
@@ -599,6 +613,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
     if (msr->mpd->seen_data == 0) msr->mpd->seen_data = 1;
     
     if (msr->mpd->is_complete) {
+        msr->mpd->flag_data_before = 1;
         msr_log(msr, 4, "Multipart: Ignoring data after last boundary (received %i bytes)", size);
         return 1;
     }
@@ -660,6 +675,10 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                     || ( (*boundary_end == '\n')
                           && (*(boundary_end + 1) == '\0') ) )
                 {
+                    if (*boundary_end == '\n') {
+                        msr->mpd->flag_lf_line = 1;
+                    }
+
                     if (multipart_process_boundary(msr, (is_final ? 1 : 0), error_msg) < 0) {
                         return -1;
                     }
@@ -671,13 +690,14 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                 else {
                     /* error */
                     *error_msg = apr_psprintf(msr->mp,
-                        "Multipart: Invalid boundary detected: %s",
+                        "Multipart: Invalid boundary: %s",
                         log_escape_nq(msr->mp, msr->mpd->buf));
                     return -1;
                 }
             }
             else {
                 if (msr->mpd->mpp == NULL) {
+                    msr->mpd->flag_data_before = 1;
                     msr_log(msr, 4, "Multipart: Ignoring data before first boundary.");
                 } else {
                     if (msr->mpd->mpp_state == 0) {
@@ -712,6 +732,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
         }
         
         if ((msr->mpd->is_complete)&&(inleft != 0)) {
+            msr->mpd->flag_data_after = 1;
             msr_log(msr, 4, "Multipart: Ignoring data after last boundary (%i bytes left)", inleft);
             return 1;
         }

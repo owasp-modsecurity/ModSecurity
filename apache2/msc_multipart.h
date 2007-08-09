@@ -64,7 +64,6 @@ struct multipart_data {
      * parts end and new begin
      */
     char                    *boundary;
-    int                      boundary_quoted;
 
     /* internal buffer and other variables
      * used while parsing
@@ -98,6 +97,12 @@ struct multipart_data {
 
     int                     seen_data;    
     int                     is_complete;
+
+    int                     flag_data_before;
+    int                     flag_data_after;
+    int                     flag_header_folding;
+    int                     flag_boundary_quoted;
+    int                     flag_lf_line;
 };
 
 
