@@ -29,6 +29,7 @@ APACHECTL = apachectl
 
 INCLUDES = -I /usr/include/libxml2
 DEFS = -DWITH_LIBXML2
+#DEFS = -DWITH_LIBXML2 -DNO_MODSEC_API
 #LIBS = -Lmy/lib/dir -lmylib
 
 CFLAGS = -O2 -g -Wuninitialized -Wall -Wmissing-prototypes -Wshadow -Wunused-variable -Wunused-value -Wchar-subscripts -Wsign-compare
