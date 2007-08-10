@@ -1,9 +1,11 @@
-?? ???? ???? - 2.1.3-rc1
-------------------------
+10 Aug 2007 - 2.1.3-rc1
+-----------------------
+
+ * Cleaned up and reorganized some code.
 
  * Do not block internal ErrorDocument requests.
 
- * Added ability to compile without an external API (-DNO_MODSEC_API).
+ * Added ability to compile without an external API (use -DNO_MODSEC_API).
 
 
 27 July 2007 - 2.1.2
