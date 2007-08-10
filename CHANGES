@@ -1,6 +1,8 @@
 ?? ??? 2007 - 2.5.0-trunk
 -------------------------
 
+ * Added ability to compile without an external API (-DNO_MODSEC_API).
+
  * Added "logdata" meta action to allow safe logging of raw transaction data.
 
  * Added TX_SEVERITY that keeps track of the highest severity

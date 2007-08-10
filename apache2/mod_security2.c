@@ -972,6 +972,7 @@ static void hook_insert_error_filter(request_rec *r) {
 }
 #endif
 
+#ifdef NO_MODSEC_API
 /**
  * This function is exported for other Apache modules to
  * register new transformation functions.
@@ -1007,6 +1008,7 @@ static void modsec_register_variable(const char *name, unsigned int type,
         fprintf(stderr,"modsecurity is NULL\n");
     }
 }
+#endif
 
 /**
  * Registers module hooks with Apache.
@@ -1031,10 +1033,12 @@ static void register_hooks(apr_pool_t *mp) {
         NULL
     };
 
+#ifdef NO_MODSEC_API
     /* Export optional functions. */
     APR_REGISTER_OPTIONAL_FN(modsec_register_tfn);
     APR_REGISTER_OPTIONAL_FN(modsec_register_operator);
     APR_REGISTER_OPTIONAL_FN(modsec_register_variable);
+#endif
 
     /* Main hooks */
     ap_hook_pre_config(hook_pre_config, NULL, NULL, APR_HOOK_FIRST);
