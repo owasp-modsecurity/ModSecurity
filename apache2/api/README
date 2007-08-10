@@ -3,6 +3,9 @@ This directory contains two examples how you can extend
 ModSecurity without having to touch it directly, simply
 by creating custom Apache modules.
 
+NOTE: ModSecurity must be compiled with API support
+      to use this feature (do not use -DNO_MODSEC_API).
+
 1)
 
 Module mod_tfn_reverse.c creates a custom transformation

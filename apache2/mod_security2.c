@@ -972,7 +972,7 @@ static void hook_insert_error_filter(request_rec *r) {
 }
 #endif
 
-#ifdef NO_MODSEC_API
+#if (!defined(NO_MODSEC_API))
 /**
  * This function is exported for other Apache modules to
  * register new transformation functions.
@@ -1033,7 +1033,7 @@ static void register_hooks(apr_pool_t *mp) {
         NULL
     };
 
-#ifdef NO_MODSEC_API
+#if (!defined(NO_MODSEC_API))
     /* Export optional functions. */
     APR_REGISTER_OPTIONAL_FN(modsec_register_tfn);
     APR_REGISTER_OPTIONAL_FN(modsec_register_operator);

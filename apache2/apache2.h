@@ -18,7 +18,7 @@
 #include <apr_optional.h>
 
 
-#ifdef NO_MODSEC_API
+#if (!defined(NO_MODSEC_API))
 /* Optional functions. */
 
 APR_DECLARE_OPTIONAL_FN(void, modsec_register_tfn, (const char *name, void *fn));
