@@ -574,7 +574,11 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
             }
         } else {
             /* Not quoted. */
-            if (*b == '"') {
+
+            /* Test for partial quoting. */
+            if (   (*b == '"')
+                || ((len >= 2)&&(*(b + len - 1) == '"')) )
+            {
                 *error_msg = apr_psprintf(msr->mp, "Invalid boundary (quote).");
                 return -1;
             }
