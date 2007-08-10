@@ -546,6 +546,12 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
     msr->mpd = (multipart_data *)apr_pcalloc(msr->mp, sizeof(multipart_data));
     if (msr->mpd == NULL) return -1;
 
+    msr->mpd->parts = apr_array_make(msr->mp, 10, sizeof(multipart_part *));
+    msr->mpd->bufleft = MULTIPART_BUF_SIZE;
+    msr->mpd->bufptr = msr->mpd->buf;
+    msr->mpd->buf_contains_line = 1;
+    msr->mpd->mpp = NULL;
+
     if (msr->request_content_type == NULL) {
         *error_msg = apr_psprintf(msr->mp, "Multipart: Content-Type header not available.");
         return -1;
@@ -580,12 +586,6 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
         *error_msg = apr_psprintf(msr->mp, "Multipart boundary not found or invalid.");
         return -1;
     }
-
-    msr->mpd->parts = apr_array_make(msr->mp, 10, sizeof(multipart_part *));
-    msr->mpd->bufleft = MULTIPART_BUF_SIZE;
-    msr->mpd->bufptr = msr->mpd->buf;
-    msr->mpd->buf_contains_line = 1;
-    msr->mpd->mpp = NULL;
 
     return 1;
 }
