@@ -103,6 +103,7 @@ struct multipart_data {
     int                     flag_header_folding;
     int                     flag_boundary_quoted;
     int                     flag_lf_line;
+    int                     flag_unmatched_boundary;
 };
 
 

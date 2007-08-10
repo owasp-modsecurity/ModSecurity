@@ -624,7 +624,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
         return -1;
     }
 
-    /* here we loop through the data available, byte by byte */
+    /* here we loop through the available data, one byte at a time */
     while(inleft > 0) {
         char c = *inptr;
         int process_buffer = 0;
@@ -645,71 +645,79 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
          * or the end of our internal buffer
          */
         if ((c == 0x0a)||(msr->mpd->bufleft == 0)||(process_buffer)) {
+            int processed_as_boundary = 0;
+
             *(msr->mpd->bufptr) = 0;
 
-            /* boundary preconditions: length of the line greater than
-             * the length of the boundary + the first two characters
-             * are dashes "-"
-             */
-            if ( msr->mpd->buf_contains_line
-                && (strlen(msr->mpd->buf) > strlen(msr->mpd->boundary) + 2)
-                && (((*(msr->mpd->buf) == '-'))&&(*(msr->mpd->buf + 1) == '-'))
-                && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0) )
+            /* Do we have something that looks like a boundary? */
+            if (msr->mpd->buf_contains_line
+                && (strlen(msr->mpd->buf) > 3)
+                && (((*(msr->mpd->buf) == '-'))&&(*(msr->mpd->buf + 1) == '-')) )
             {
-                char *boundary_end = msr->mpd->buf + 2 + strlen(msr->mpd->boundary);
-                int is_final = 0;
-
-                /* Is this the final boundary? */                
-                if ((*boundary_end == '-')&&(*(boundary_end + 1)== '-')) {
-                    is_final = 1;
-                    boundary_end += 2;
-
-                    if (msr->mpd->is_complete != 0) {
-                        *error_msg = apr_psprintf(msr->mp,
-                            "Multipart: Invalid boundary (final duplicate).");
-                        return -1;
-                    }
-                }
-
-                /* Allow for CRLF and LF line endings. */
-                if (   ( (*boundary_end == '\r')
-                          && (*(boundary_end + 1) == '\n')
-                          && (*(boundary_end + 2) == '\0') )
-                    || ( (*boundary_end == '\n')
-                          && (*(boundary_end + 1) == '\0') ) )
+                /* Does it match our boundary? */
+                if ((strlen(msr->mpd->buf) >= strlen(msr->mpd->boundary) + 2)
+                    && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0) )
                 {
-                    if (*boundary_end == '\n') {
-                        msr->mpd->flag_lf_line = 1;
+                    char *boundary_end = msr->mpd->buf + 2 + strlen(msr->mpd->boundary);
+                    int is_final = 0;
+
+                    /* Is this the final boundary? */                
+                    if ((*boundary_end == '-')&&(*(boundary_end + 1)== '-')) {
+                        is_final = 1;
+                        boundary_end += 2;
+
+                        if (msr->mpd->is_complete != 0) {
+                            *error_msg = apr_psprintf(msr->mp,
+                                "Multipart: Invalid boundary (final duplicate).");
+                            return -1;
+                        }
                     }
 
-                    if (multipart_process_boundary(msr, (is_final ? 1 : 0), error_msg) < 0) {
+                    /* Allow for CRLF and LF line endings. */
+                    if (   ( (*boundary_end == '\r')
+                              && (*(boundary_end + 1) == '\n')
+                              && (*(boundary_end + 2) == '\0') )
+                        || ( (*boundary_end == '\n')
+                              && (*(boundary_end + 1) == '\0') ) )
+                    {
+                        if (*boundary_end == '\n') {
+                            msr->mpd->flag_lf_line = 1;
+                        }
+
+                        if (multipart_process_boundary(msr, (is_final ? 1 : 0), error_msg) < 0) {
+                            return -1;
+                        }
+
+                        if (is_final) {
+                            msr->mpd->is_complete = 1;
+                        }
+
+                        processed_as_boundary = 1;
+                    }
+                    else {
+                        /* error */
+                        *error_msg = apr_psprintf(msr->mp,
+                            "Multipart: Invalid boundary: %s",
+                            log_escape_nq(msr->mp, msr->mpd->buf));
+                        return -1;
+                    }
+                } else {
+                    if (   (msr->mpd->flag_boundary_quoted)
+                        && (strlen(msr->mpd->buf) > strlen(msr->mpd->boundary) + 3)
+                        && (((*(msr->mpd->buf) == '-'))&&(*(msr->mpd->buf + 1) == '-'))
+                        && (*(msr->mpd->buf + 2) == '"')
+                        && (strncmp(msr->mpd->buf + 3, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0)
+                    ) {
+                        *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary (quotes).");
                         return -1;
                     }
 
-                    if (is_final) {
-                        msr->mpd->is_complete = 1;
-                    }
-                }
-                else {
-                    /* error */
-                    *error_msg = apr_psprintf(msr->mp,
-                        "Multipart: Invalid boundary: %s",
-                        log_escape_nq(msr->mp, msr->mpd->buf));
-                    return -1;
+                    msr->mpd->flag_unmatched_boundary = 1;
                 }
             }
-            else {
-                if ( msr->mpd->buf_contains_line
-                    && (msr->mpd->flag_boundary_quoted)
-                    && (strlen(msr->mpd->buf) > strlen(msr->mpd->boundary) + 3)
-                    && (((*(msr->mpd->buf) == '-'))&&(*(msr->mpd->buf + 1) == '-'))
-                    && (*(msr->mpd->buf + 2) == '"')
-                    && (strncmp(msr->mpd->buf + 3, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0)
-                ) {
-                    *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary (quotes).");
-                    return -1;
-                }
 
+            /* Process as data if it was not a boundary. */
+            if (processed_as_boundary == 0) {
                 if (msr->mpd->mpp == NULL) {
                     msr->mpd->flag_data_before = 1;
                     msr_log(msr, 4, "Multipart: Ignoring data before first boundary.");
