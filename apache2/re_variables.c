@@ -1651,6 +1651,99 @@ static int var_webappid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
+/* MULTIPART_BOUNDARY_QUOTED */
+
+static int var_multipart_boundary_quoted_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if ((msr->mpd != NULL)&&(msr->mpd->flag_boundary_quoted != 0)) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
+/* MULTIPART_DATA_AFTER */
+
+static int var_multipart_data_after_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if ((msr->mpd != NULL)&&(msr->mpd->flag_data_after != 0)) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
+/* MULTIPART_DATA_BEFORE */
+
+static int var_multipart_data_before_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if ((msr->mpd != NULL)&&(msr->mpd->flag_data_before != 0)) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
+/* MULTIPART_HEADER_FOLDING */
+
+static int var_multipart_header_folding_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if ((msr->mpd != NULL)&&(msr->mpd->flag_header_folding != 0)) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
+/* MULTIPART_LF_LINE */
+
+static int var_multipart_lf_line_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if ((msr->mpd != NULL)&&(msr->mpd->flag_lf_line != 0)) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
+/* MULTIPART_STRICT_ERROR */
+
+static int var_multipart_strict_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if (msr->mpd != NULL) {
+        /* Respond positive if at least one of the multipart flags is raised. */
+        if (  (msr->mpd->flag_error)
+            ||(msr->mpd->flag_boundary_quoted != 0)
+            ||(msr->mpd->flag_data_before != 0)
+            ||(msr->mpd->flag_data_after != 0)
+            ||(msr->mpd->flag_header_folding != 0)
+            ||(msr->mpd->flag_lf_line != 0)
+        ) {
+            return var_simple_generate(var, vartab, mptmp, "1");
+        }
+    }
+
+    return var_simple_generate(var, vartab, mptmp, "0");
+}
+
+/* MULTIPART_UNMATCHED_BOUNDARY */
+
+static int var_multipart_unmatched_boundary_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if ((msr->mpd != NULL)&&(msr->mpd->flag_unmatched_boundary != 0)) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
 /* ---------------------------------------------- */
 
 /**
@@ -2430,5 +2523,82 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         var_webappid_generate,
         VAR_DONT_CACHE,
         PHASE_RESPONSE_HEADERS
+    );
+
+    /* MULTIPART_BOUNDARY_QUOTED */
+    msre_engine_variable_register(engine,
+        "MULTIPART_BOUNDARY_QUOTED",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_boundary_quoted_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_DATA_AFTER */
+    msre_engine_variable_register(engine,
+        "MULTIPART_DATA_AFTER",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_data_after_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_DATA_BEFORE */
+    msre_engine_variable_register(engine,
+        "MULTIPART_DATA_BEFORE",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_data_before_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_HEADER_FOLDING */
+    msre_engine_variable_register(engine,
+        "MULTIPART_HEADER_FOLDING",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_header_folding_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_LF_LINE */
+    msre_engine_variable_register(engine,
+        "MULTIPART_LF_LINE",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_lf_line_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_STRICT_ERROR */
+    msre_engine_variable_register(engine,
+        "MULTIPART_STRICT_ERROR",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_strict_error_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_UNMATCHED_BOUNDARY */
+    msre_engine_variable_register(engine,
+        "MULTIPART_UNMATCHED_BOUNDARY",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_unmatched_boundary_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
     );
 }

@@ -240,7 +240,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
             if (multipart_process_chunk(msr, data, length, &my_error_msg) < 0) {
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
-                msr_log(msr, 4, "%s", my_error_msg);
+                msr_log(msr, 1, "Request body processor error: %s", my_error_msg);
             }
         }
         #ifdef WITH_LIBXML2
@@ -249,7 +249,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
             if (xml_process_chunk(msr, data, length, &my_error_msg) < 0) {
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
-                msr_log(msr, 4, "%s", my_error_msg);
+                msr_log(msr, 1, "Request body processor error: %s", my_error_msg);
             }
         }
         #endif

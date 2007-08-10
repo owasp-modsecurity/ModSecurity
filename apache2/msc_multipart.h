@@ -97,6 +97,14 @@ struct multipart_data {
 
     int                     seen_data;    
     int                     is_complete;
+
+    int                     flag_error;
+    int                     flag_data_before;
+    int                     flag_data_after;
+    int                     flag_header_folding;
+    int                     flag_boundary_quoted;
+    int                     flag_lf_line;
+    int                     flag_unmatched_boundary;
 };
 
 
