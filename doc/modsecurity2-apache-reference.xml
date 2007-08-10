@@ -2617,9 +2617,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <title><literal moreinfo="none">RULE</literal></title>
 
       <para>This variable provides access to the <literal
-      moreinfo="none">id</literal>,<literal
-      moreinfo="none">rev</literal>,<literal
-      moreinfo="none">severity</literal>, and <literal
+      moreinfo="none">id</literal>, <literal moreinfo="none">rev</literal>,
+      <literal moreinfo="none">severity</literal>, <literal
+      moreinfo="none">logdata</literal>, and <literal
       moreinfo="none">msg</literal> fields of the rule that triggered the
       action. Only available for expansion in action strings (e.g.<literal
       moreinfo="none">setvar:tx.varname=%{rule.id}</literal>). Example:</para>
@@ -3778,6 +3778,28 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
 
       <para>This action will log matches to the Apache error log file and the
       ModSecurity audit log.</para>
+    </section>
+
+    <section>
+      <title><literal>logdata</literal></title>
+
+      <para><emphasis role="bold">Description:</emphasis> Allows logging a
+      data fragment.</para>
+
+      <para><emphasis role="bold">Action Group:</emphasis> Metadata</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule &amp;ARGS:p "@eq 0" "log,<emphasis
+          role="bold">logdata:'%{TX.0}'"</emphasis></programlisting>
+
+      <para><emphasis role="bold">Note</emphasis></para>
+
+      <para>The logdata information appears in the error and/or audit log
+      files and is not sent back to the client in response headers. Macro
+      expansion is preformed so you may use variable names such as %{TX.0},
+      etc. The information is properly escaped for use with logging binary
+      data.</para>
     </section>
 
     <section>
