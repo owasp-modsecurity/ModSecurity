@@ -1295,7 +1295,8 @@ static int var_multipart_strict_error_generate(modsec_rec *msr, msre_var *var, m
 {
     if (msr->mpd != NULL) {
         /* Respond positive if at least one of the multipart flags is raised. */
-        if (  (msr->mpd->flag_boundary_quoted != 0)
+        if (  (msr->mpd->flag_error)
+            ||(msr->mpd->flag_boundary_quoted != 0)
             ||(msr->mpd->flag_data_before != 0)
             ||(msr->mpd->flag_data_after != 0)
             ||(msr->mpd->flag_header_folding != 0)
