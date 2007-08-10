@@ -647,9 +647,6 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
         if ((c == 0x0a)||(msr->mpd->bufleft == 0)||(process_buffer)) {
             *(msr->mpd->bufptr) = 0;
 
-            //msr_log(msr, 9, "# Processing buffer: %s", log_escape_nq_ex(msr->mp, msr->mpd->buf,
-            //    MULTIPART_BUF_SIZE - msr->mpd->bufleft));
-
             /* boundary preconditions: length of the line greater than
              * the length of the boundary + the first two characters
              * are dashes "-"
@@ -666,6 +663,12 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                 if ((*boundary_end == '-')&&(*(boundary_end + 1)== '-')) {
                     is_final = 1;
                     boundary_end += 2;
+
+                    if (msr->mpd->is_complete != 0) {
+                        *error_msg = apr_psprintf(msr->mp,
+                            "Multipart: Invalid boundary (final duplicate).");
+                        return -1;
+                    }
                 }
 
                 /* Allow for CRLF and LF line endings. */
@@ -696,6 +699,17 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                 }
             }
             else {
+                if ( msr->mpd->buf_contains_line
+                    && (msr->mpd->flag_boundary_quoted)
+                    && (strlen(msr->mpd->buf) > strlen(msr->mpd->boundary) + 3)
+                    && (((*(msr->mpd->buf) == '-'))&&(*(msr->mpd->buf + 1) == '-'))
+                    && (*(msr->mpd->buf + 2) == '"')
+                    && (strncmp(msr->mpd->buf + 3, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0)
+                ) {
+                    *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary (quotes).");
+                    return -1;
+                }
+
                 if (msr->mpd->mpp == NULL) {
                     msr->mpd->flag_data_before = 1;
                     msr_log(msr, 4, "Multipart: Ignoring data before first boundary.");
