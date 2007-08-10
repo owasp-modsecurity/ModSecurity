@@ -329,8 +329,8 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
         {
             /* Two bytes. */
             bytes_reserved = 2;
-            localreserve[0] = *(p - 1);
-            localreserve[1] = *(p - 2);
+            localreserve[0] = *(p - 2);
+            localreserve[1] = *(p - 1);
             msr->mpd->bufleft += 2;
             *(p - 2) = 0;
         } else {
