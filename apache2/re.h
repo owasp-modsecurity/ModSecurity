@@ -224,6 +224,7 @@ struct msre_actionset {
     const char              *id;
     const char              *rev;
     const char              *msg;
+    const char              *logdata;
     int                      severity;
     int                      phase;
     msre_rule               *rule;

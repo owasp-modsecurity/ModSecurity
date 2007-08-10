@@ -532,7 +532,8 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
         /* Must NOT use metadata actions. */
         if ((rule->actionset->id != NOT_SET_P)
             ||(rule->actionset->rev != NOT_SET_P)
-            ||(rule->actionset->msg != NOT_SET_P))
+            ||(rule->actionset->msg != NOT_SET_P)
+            ||(rule->actionset->logdata != NOT_SET_P))
         {
             return apr_psprintf(cmd->pool, "ModSecurity: Metadata actions (id, rev, msg) "
                 " can only be specified by chain starter rules.");
@@ -832,7 +833,8 @@ static const char *cmd_default_action(cmd_parms *cmd, void *_dcfg, const char *p
     /* Must not use metadata actions. */
     if ((dcfg->tmp_default_actionset->id != NOT_SET_P)
         ||(dcfg->tmp_default_actionset->rev != NOT_SET_P)
-        ||(dcfg->tmp_default_actionset->msg != NOT_SET_P))
+        ||(dcfg->tmp_default_actionset->msg != NOT_SET_P)
+        ||(dcfg->tmp_default_actionset->logdata != NOT_SET_P))
     {
         return apr_psprintf(cmd->pool, "ModSecurity: SecDefaultAction must not "
             "contain any metadata actions (id, rev, msg).");

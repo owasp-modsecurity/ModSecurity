@@ -417,6 +417,7 @@ msre_actionset *msre_actionset_create(msre_engine *engine, const char *text,
     actionset->id = NOT_SET_P;
     actionset->rev = NOT_SET_P;
     actionset->msg = NOT_SET_P;
+    actionset->logdata = NOT_SET_P;
     actionset->phase = NOT_SET;
     actionset->severity = -1;
     actionset->rule = NOT_SET_P;
@@ -492,6 +493,7 @@ msre_actionset *msre_actionset_merge(msre_engine *engine, msre_actionset *parent
     if (child->id != NOT_SET_P) merged->id = child->id;
     if (child->rev != NOT_SET_P) merged->rev = child->rev;
     if (child->msg != NOT_SET_P) merged->msg = child->msg;
+    if (child->logdata != NOT_SET_P) merged->logdata = child->logdata;
     if (child->severity != NOT_SET) merged->severity = child->severity;
     if (child->phase != NOT_SET) merged->phase = child->phase;
     if (child->rule != NOT_SET_P) merged->rule = child->rule;
@@ -548,6 +550,7 @@ static void msre_actionset_set_defaults(msre_actionset *actionset) {
     if (actionset->id == NOT_SET_P) actionset->id = NULL;
     if (actionset->rev == NOT_SET_P) actionset->rev = NULL;
     if (actionset->msg == NOT_SET_P) actionset->msg = NULL;
+    if (actionset->logdata == NOT_SET_P) actionset->logdata = NULL;
     if (actionset->phase == NOT_SET) actionset->phase = 2;
     if (actionset->severity == -1); /* leave at -1 */
     if (actionset->rule == NOT_SET_P) actionset->rule = NULL;
@@ -973,6 +976,7 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
     char *id = "";
     char *rev = "";
     char *msg = "";
+    char *logdata = "";
     char *severity = "";
     char *tags = "";
     char *fn = "";
@@ -1002,6 +1006,17 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
         msg = apr_psprintf(msr->mp, " [msg \"%s\"]",
                            log_escape_ex(msr->mp, var->value, var->value_len));
     }
+    if (actionset->logdata != NULL) {
+    //TODO: restrict to 512 bytes
+        /* Expand variables in the message string. */
+        msc_string *var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+        var->value = (char *)actionset->logdata;
+        var->value_len = strlen(actionset->logdata);
+        expand_macros(msr, var, NULL, msr->mp);
+
+        logdata = apr_psprintf(msr->mp, " [data \"%s\"]",
+                           log_escape_hex(msr->mp, (unsigned char *)var->value, var->value_len));
+    }
     if ((actionset->severity >= 0)&&(actionset->severity <= 7)) {
         severity = apr_psprintf(msr->mp, " [severity \"%s\"]",
                                 msre_format_severity(actionset->severity));
@@ -1019,7 +1034,7 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
         }
     }
     
-    return apr_pstrcat(msr->mp, fn, id, rev, msg, severity, tags, NULL);
+    return apr_pstrcat(msr->mp, fn, id, rev, msg, logdata, severity, tags, NULL);
 }
 
 /**

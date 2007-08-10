@@ -409,6 +409,9 @@ static int var_rule_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     } else
     if ((strcasecmp(var->param, "msg") == 0)&&(actionset->msg != NULL)) {
         return var_simple_generate(var, vartab, mptmp, actionset->msg);
+    } else
+    if ((strcasecmp(var->param, "logdata") == 0)&&(actionset->logdata != NULL)) {
+        return var_simple_generate(var, vartab, mptmp, actionset->logdata);
     }
 
     return 0;

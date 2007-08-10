@@ -232,6 +232,15 @@ static apr_status_t msre_action_msg_init(msre_engine *engine, msre_actionset *ac
     return 1;
 }
 
+/* logdata */
+
+static apr_status_t msre_action_logdata_init(msre_engine *engine, msre_actionset *actionset,
+    msre_action *action)
+{
+    actionset->logdata = action->param;
+    return 1;
+}
+
 /* severity */
 
 static apr_status_t msre_action_severity_init(msre_engine *engine,
@@ -1421,6 +1430,18 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         ACTION_CARDINALITY_ONE,
         NULL,
         msre_action_msg_init,
+        NULL
+    );
+
+    /* logdata */
+    msre_engine_action_register(engine,
+        "logdata",
+        ACTION_METADATA,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_ONE,
+        NULL,
+        msre_action_logdata_init,
         NULL
     );
 
