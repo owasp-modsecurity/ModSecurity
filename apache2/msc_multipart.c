@@ -172,10 +172,18 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
  *
  */
 static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
-    int rc;
+    int i, rc;
     
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
+
+    /* Check for nul bytes. */
+    for(i = 0; i < (MULTIPART_BUF_SIZE - msr->mpd->bufleft); i++) {
+        if (msr->mpd->buf[i] == '\0') {
+            *error_msg = apr_psprintf(msr->mp, "Multipart: Nul byte in part headers.");
+            return -1;
+        }
+    }
 
     /* Is this an empty line? */
     if (   ((msr->mpd->buf[0] == '\r')
@@ -213,7 +221,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
         if (msr->mpd->mpp->filename != NULL) {
             /* Some parsers use crude methods to extract the name and filename
              * values from the C-D header. We need to check for the case where they
-             * don't understand a C-D we do.
+             * don't understand and C-D we do.
              */
             if (strstr(header_value, "filename=") == NULL) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (filename).");
