@@ -1432,7 +1432,7 @@ static int var_script_filename_generate(modsec_rec *msr, msre_var *var, msre_rul
 static int var_script_gid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    char *value = apr_psprintf(mptmp, "%i", msr->r->finfo.group);
+    char *value = apr_psprintf(mptmp, "%d", msr->r->finfo.group);
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
@@ -1462,7 +1462,7 @@ static int var_script_mode_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_script_uid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    char *value = apr_psprintf(mptmp, "%i", msr->r->finfo.user);
+    char *value = apr_psprintf(mptmp, "%d", msr->r->finfo.user);
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
