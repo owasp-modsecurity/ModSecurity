@@ -221,7 +221,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
         if (msr->mpd->mpp->filename != NULL) {
             /* Some parsers use crude methods to extract the name and filename
              * values from the C-D header. We need to check for the case where they
-             * don't understand and C-D we do.
+             * don't understand C-D but we do.
              */
             if (strstr(header_value, "filename=") == NULL) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (filename).");
@@ -579,7 +579,7 @@ static int multipart_boundary_characters_valid(char *boundary) {
         p++;
     }
 
-    return 0;
+    return 1;
 }
 
 static int multipart_count_boundary_params(apr_pool_t *mp, const char *header_value) {
@@ -764,7 +764,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
 
     if (size == 0) return 1;
 
-    if (msr->mpd->seen_data == 0) msr->mpd->seen_data = 1;
+    msr->mpd->seen_data = 1;
     
     if (msr->mpd->is_complete) {
         msr->mpd->flag_data_before = 1;
