@@ -535,6 +535,73 @@ static int multipart_process_boundary(modsec_rec *msr, int last_part, char **err
     return 1;
 }
 
+static int multipart_boundary_characters_valid(char *boundary) {
+    unsigned char *p = (unsigned char *)boundary;
+    unsigned char c;
+
+    if (p == NULL) return -1;
+    while((c = *p) != '\0') {
+        /* Control characters and space not allowed. */
+        if (c < 32) {
+            return 0;
+        }
+
+        /* Non-ASCII characters not allowed. */
+        if (c > 126) {
+            return 0;
+        }
+
+        switch(c) {
+            /* Special characters not allowed. */
+            case '(' :
+            case ')' :
+            case '<' :
+            case '>' :
+            case '@' :
+            case ',' :
+            case ';' :
+            case ':' :
+            case '\\' :
+            case '"' :
+            case '/' :
+            case '[' :
+            case ']' :
+            case '?' :
+            case '=' :
+                return 0;
+                break;
+            
+            default :
+                /* Do nothing. */
+                break;
+        }
+
+        p++;
+    }
+
+    return 0;
+}
+
+static int multipart_count_boundary_params(apr_pool_t *mp, const char *header_value) {
+    char *duplicate = NULL;
+    char *s = NULL;
+    int count = 0;
+
+    if (header_value == NULL) return -1;
+    duplicate = apr_pstrdup(mp, header_value);
+    if (duplicate == NULL) return -1;
+
+    /* Performing a case-insensitive search. */
+    strtolower_inplace(duplicate);
+
+    s = duplicate;
+    while((s = strstr(s, "boundary")) != NULL) {
+        count++;
+        s += 8;
+    }
+
+    return count;
+}
 
 /**
  *
@@ -553,23 +620,60 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
     msr->mpd->mpp = NULL;
 
     if (msr->request_content_type == NULL) {
+        msr->mpd->flag_error = 1;
         *error_msg = apr_psprintf(msr->mp, "Multipart: Content-Type header not available.");
         return -1;
     }
 
-    msr->mpd->boundary = strstr(msr->request_content_type, "boundary=");
-    if ((msr->mpd->boundary != NULL)&&(*(msr->mpd->boundary + 9) != 0)) {
-        char *b = msr->mpd->boundary + 9;
-        int len = strlen(b);
+    /* Count how many times the word "boundary" appears in the C-T header. */
+    if (multipart_count_boundary_params(msr->mp, msr->request_content_type) > 1) {
+        msr->mpd->flag_error = 1;
+        *error_msg = apr_psprintf(msr->mp, "Multipart: Multiple boundary parameters in C-T.");
+        return -1;
+    }
+    
+    msr->mpd->boundary = strstr(msr->request_content_type, "boundary");
+    if (msr->mpd->boundary != NULL) {
+        char *b = NULL;
+        int len = 0;
+
+        b = strchr(msr->mpd->boundary + 8, '=');
+        if (b == NULL) {
+            msr->mpd->flag_error = 1;
+            *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (malformed).");
+            return -1;
+        }
+
+        /* Check parameter name ends well. */
+        if (b != (msr->mpd->boundary + 8)) {
+            if (isspace(*(msr->mpd->boundary + 8))) {
+                /* Flag for whitespace after parameter name. */
+                msr->mpd->flag_boundary_whitespace = 1;
+            } else {
+                msr->mpd->flag_error = 1;
+                *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (parameter name).");
+                return -1;
+            }
+        }
+        
+        b++; /* Go over the = character. */
+        len = strlen(b);
+        
+        /* Flag for whitespace before parameter value. */
+        if (isspace(*b)) {
+            msr->mpd->flag_boundary_whitespace = 1;
+        }
 
         /* Is the boundary quoted? */
         if ((len >= 2)&&(*b == '"')&&(*(b + len - 1) == '"')) {
             /* Quoted. */
             msr->mpd->boundary = apr_pstrndup(msr->mp, b + 1, len - 2);
+            if (msr->mpd->boundary == NULL) return -1;
             msr->mpd->flag_boundary_quoted = 1;
 
             if (strstr(msr->mpd->boundary, "\"") != NULL) {
-                *error_msg = apr_psprintf(msr->mp, "Invalid boundary in C-T (quote).");
+                msr->mpd->flag_error = 1;
+                *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (quote).");
                 return -1;
             }
         } else {
@@ -579,12 +683,28 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
             if (   (*b == '"')
                 || ((len >= 2)&&(*(b + len - 1) == '"')) )
             {
-                *error_msg = apr_psprintf(msr->mp, "Invalid boundary in C-T (quote).");
+                msr->mpd->flag_error = 1;
+                *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (quote).");
                 return -1;
             }
 
             msr->mpd->boundary = apr_pstrdup(msr->mp, b);
+            if (msr->mpd->boundary == NULL) return -1;
             msr->mpd->flag_boundary_quoted = 0;
+        }
+
+        /* Case-insensitive test for the string "boundary" in the boundary. */
+        if (multipart_count_boundary_params(msr->mp, msr->mpd->boundary) != 0) {
+            msr->mpd->flag_error = 1;
+            *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (content).");
+            return -1;
+        }
+
+        /* Validate the characters used in the boundary. */
+        if (multipart_boundary_characters_valid(msr->mpd->boundary) != 1) {
+            msr->mpd->flag_error = 1;
+            *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (characters).");
+            return -1;
         }
 
         msr_log(msr, 9, "Multipart: Boundary%s: %s",
@@ -592,12 +712,20 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
             log_escape_nq(msr->mp, msr->mpd->boundary));
 
         if (strlen(msr->mpd->boundary) == 0) {
-            *error_msg = apr_psprintf(msr->mp, "Multipart boundary in C-T empty.");
+            msr->mpd->flag_error = 1;
+            *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (empty).");
             return -1;
         }
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Multipart boundary in C-T not found or invalid.");
+        /* Test for case-insensitive boundary. Allowed by the RFC but highly unusual. */
+        if (multipart_count_boundary_params(msr->mp, msr->request_content_type) > 0) {
+            msr->mpd->flag_error = 1;
+            *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (case sensitivity).");
+            return -1;
+        }
+
+        *error_msg = apr_psprintf(msr->mp, "Multipart: Boundary not found in C-T.");
         return -1;
     }
 
@@ -611,7 +739,11 @@ int multipart_complete(modsec_rec *msr, char **error_log) {
     if (msr->mpd == NULL) return 1;
 
     if ((msr->mpd->seen_data != 0)&&(msr->mpd->is_complete == 0)) {
-        *error_log = apr_psprintf(msr->mp, "Multipart: Final boundary missing.");
+        if (msr->mpd->boundary_count > 0) {
+            *error_log = apr_psprintf(msr->mp, "Multipart: Final boundary missing.");
+        } else {
+            *error_log = apr_psprintf(msr->mp, "Multipart: No boundaries found in payload.");
+        }
         return -1;
     }
 
@@ -718,6 +850,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                         }
 
                         processed_as_boundary = 1;
+                        msr->mpd->boundary_count++;
                     }
                     else {
                         /* error */
@@ -728,14 +861,31 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                         return -1;
                     }
                 } else {
+                    char *p = NULL;
+
+                    /* Check if an attempt to use quotes around the boundary was made. */
                     if (   (msr->mpd->flag_boundary_quoted)
                         && (strlen(msr->mpd->buf) >= strlen(msr->mpd->boundary) + 3)
-                        && (((*(msr->mpd->buf) == '-'))&&(*(msr->mpd->buf + 1) == '-'))
                         && (*(msr->mpd->buf + 2) == '"')
                         && (strncmp(msr->mpd->buf + 3, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0)
                     ) {
                         msr->mpd->flag_error = 1;
                         *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary (quotes).");
+                        return -1;
+                    }
+
+                    /* Check the beginning of the boundary for whitespace. */
+                    p = msr->mpd->buf + 2;
+                    while(isspace(*p)) {
+                        p++;
+                    }
+    
+                    if (   (p != msr->mpd->buf)
+                        && (strncmp(p, msr->mpd->boundary, strlen(msr->mpd->boundary)))
+                    ) {
+                        /* Found whitespace at the beginning of the boundary. */
+                        msr->mpd->flag_error = 1;
+                        *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary (whitespace).");
                         return -1;
                     }
 
