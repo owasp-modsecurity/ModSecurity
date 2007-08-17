@@ -1240,6 +1240,18 @@ static int var_multipart_boundary_quoted_generate(modsec_rec *msr, msre_var *var
     }
 }
 
+/* MULTIPART_BOUNDARY_WHITESPACE */
+
+static int var_multipart_boundary_whitespace_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if ((msr->mpd != NULL)&&(msr->mpd->flag_boundary_whitespace != 0)) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
 /* MULTIPART_DATA_AFTER */
 
 static int var_multipart_data_after_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -1297,6 +1309,7 @@ static int var_multipart_strict_error_generate(modsec_rec *msr, msre_var *var, m
         /* Respond positive if at least one of the multipart flags is raised. */
         if (  (msr->mpd->flag_error)
             ||(msr->mpd->flag_boundary_quoted != 0)
+            ||(msr->mpd->flag_boundary_whitespace != 0)
             ||(msr->mpd->flag_data_before != 0)
             ||(msr->mpd->flag_data_after != 0)
             ||(msr->mpd->flag_header_folding != 0)
@@ -2260,6 +2273,17 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         0, 0,
         NULL,
         var_multipart_boundary_quoted_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_BOUNDARY_WHITESPACE */
+    msre_engine_variable_register(engine,
+        "MULTIPART_BOUNDARY_WHITESPACE",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_boundary_whitespace_generate,
         VAR_CACHE,
         PHASE_REQUEST_BODY
     );
