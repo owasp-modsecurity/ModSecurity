@@ -188,9 +188,9 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
 
     if (len > 1) {
         if (msr->mpd->buf[len - 2] == '\r') {
-            msr->mpd->flag_lf_line = 1;
-        } else {
             msr->mpd->flag_crlf_line = 1;
+        } else {
+            msr->mpd->flag_lf_line = 1;
         }
     } else {
         msr->mpd->flag_lf_line = 1;
@@ -202,16 +202,8 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
           &&(msr->mpd->buf[2] == '\0') )
         || ((msr->mpd->buf[0] == '\n')
           &&(msr->mpd->buf[1] == '\0') ) )
-    {
-        char *header_value;
-        
-        /* Empty line. */
-
-        //if (msr->mpd->buf[0] == '\n') {
-        //    msr->mpd->flag_lf_line = 1;
-        //} else {
-        //    msr->mpd->flag_crlf_line = 1;
-        //}
+    { /* Empty line. */
+        char *header_value = NULL;
 
         header_value = (char *)apr_table_get(msr->mpd->mpp->headers, "Content-Disposition");
         if (header_value == NULL) {
@@ -250,8 +242,6 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
         msr->mpd->mpp->last_header_name = NULL;
     } else {
         /* Header line. */
-
-        // XXX
 
         if ((msr->mpd->buf[0] == '\t')||(msr->mpd->buf[0] == ' ')) {
             char *header_value, *new_value, *data;
@@ -638,6 +628,12 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
     if (msr->request_content_type == NULL) {
         msr->mpd->flag_error = 1;
         *error_msg = apr_psprintf(msr->mp, "Multipart: Content-Type header not available.");
+        return -1;
+    }
+
+    if (strlen(msr->request_content_type) > 1024) {
+        msr->mpd->flag_error = 1;
+        *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (length).");
         return -1;
     }
 
