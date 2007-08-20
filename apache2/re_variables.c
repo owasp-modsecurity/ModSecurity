@@ -1288,6 +1288,30 @@ static int var_multipart_header_folding_generate(modsec_rec *msr, msre_var *var,
     }
 }
 
+/* MULTIPART_CRLF_LINE */
+
+static int var_multipart_crlf_line_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if ((msr->mpd != NULL)&&(msr->mpd->flag_crlf_line != 0)) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
+/* MULTIPART_CRLF_LF_LINES */
+
+static int var_multipart_crlf_lf_lines_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if ((msr->mpd != NULL)&&(msr->mpd->flag_lf_line != 0)&&(msr->mpd->flag_crlf_line != 0)) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
 /* MULTIPART_LF_LINE */
 
 static int var_multipart_lf_line_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -2317,6 +2341,28 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         0, 0,
         NULL,
         var_multipart_header_folding_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_CRLF_LINE */
+    msre_engine_variable_register(engine,
+        "MULTIPART_CRLF_LINE",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_crlf_line_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_CRLF_LF_LINES */
+    msre_engine_variable_register(engine,
+        "MULTIPART_CRLF_LF_LINES",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_crlf_lf_lines_generate,
         VAR_CACHE,
         PHASE_REQUEST_BODY
     );
