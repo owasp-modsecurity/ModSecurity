@@ -994,6 +994,10 @@ static void register_hooks(apr_pool_t *mp) {
         NULL
     };
     static const char *postread_beforeme_list[] = {
+        "mod_rpaf.c",
+        "mod_extract_forwarded2.c",
+        "mod_breach_realip.c",
+        "mod_breach_trans.c",
         "mod_unique_id.c",
         NULL
     };

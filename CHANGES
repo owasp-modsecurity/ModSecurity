@@ -1,7 +1,9 @@
-?? ??? ???? - 2.1.3-rc2
+22 Aug 2007 - 2.1.3-rc2
 -----------------------
 
-* Quiet some compiler warnings.
+ * Allow mod_rpaf and mod_extract_forwarded2 to work before ModSecurity.
+
+ * Quiet some compiler warnings.
 
 
 10 Aug 2007 - 2.1.3-rc1
