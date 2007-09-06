@@ -1,21 +1,19 @@
-22 Aug 2007 - 2.1.3-rc2
------------------------
+05 Sep 2007 - 2.1.3
+-------------------
+
+ * Updated multipart parsing code.
 
  * Allow mod_rpaf and mod_extract_forwarded2 to work before ModSecurity.
 
  * Quiet some compiler warnings.
-
-
-10 Aug 2007 - 2.1.3-rc1
------------------------
 
  * Do not block internal ErrorDocument requests.
 
  * Added ability to compile without an external API (use -DNO_MODSEC_API).
 
 
-27 July 2007 - 2.1.2
---------------------
+27 Jul 2007 - 2.1.2
+-------------------
 
  * Cleaned up and clarified some documentation.
 
