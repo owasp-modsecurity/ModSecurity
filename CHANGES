@@ -1,7 +1,8 @@
 05 Sep 2007 - 2.1.3
 -------------------
 
- * Updated multipart parsing code.
+ * Updated multipart parsing code and added variables to allow checking
+   for parsing issues.
 
  * Allow mod_rpaf and mod_extract_forwarded2 to work before ModSecurity.
 
