@@ -108,6 +108,7 @@ struct multipart_data {
     int                      flag_crlf_line;
     int                      flag_unmatched_boundary;
     int                      flag_boundary_whitespace;
+    int                      flag_missing_semicolon;
 };
 
 
