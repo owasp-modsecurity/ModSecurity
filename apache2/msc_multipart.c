@@ -188,9 +188,9 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
 
     if (len > 1) {
         if (msr->mpd->buf[len - 2] == '\r') {
-            msr->mpd->flag_lf_line = 1;
-        } else {
             msr->mpd->flag_crlf_line = 1;
+        } else {
+            msr->mpd->flag_lf_line = 1;
         }
     } else {
         msr->mpd->flag_lf_line = 1;
@@ -202,16 +202,8 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
           &&(msr->mpd->buf[2] == '\0') )
         || ((msr->mpd->buf[0] == '\n')
           &&(msr->mpd->buf[1] == '\0') ) )
-    {
-        char *header_value;
-        
-        /* Empty line. */
-
-        //if (msr->mpd->buf[0] == '\n') {
-        //    msr->mpd->flag_lf_line = 1;
-        //} else {
-        //    msr->mpd->flag_crlf_line = 1;
-        //}
+    { /* Empty line. */
+        char *header_value = NULL;
 
         header_value = (char *)apr_table_get(msr->mpd->mpp->headers, "Content-Disposition");
         if (header_value == NULL) {
@@ -250,8 +242,6 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
         msr->mpd->mpp->last_header_name = NULL;
     } else {
         /* Header line. */
-
-        // XXX
 
         if ((msr->mpd->buf[0] == '\t')||(msr->mpd->buf[0] == ' ')) {
             char *header_value, *new_value, *data;
@@ -641,6 +631,18 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
         return -1;
     }
 
+    if (strlen(msr->request_content_type) > 1024) {
+        msr->mpd->flag_error = 1;
+        *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (length).");
+        return -1;
+    }
+
+    if (strncasecmp(msr->request_content_type, "multipart/form-data", 19) != 0) {
+        msr->mpd->flag_error = 1;
+        *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid MIME type.");
+        return -1;
+    }
+
     /* Count how many times the word "boundary" appears in the C-T header. */
     if (multipart_count_boundary_params(msr->mp, msr->request_content_type) > 1) {
         msr->mpd->flag_error = 1;
@@ -650,9 +652,28 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
     
     msr->mpd->boundary = strstr(msr->request_content_type, "boundary");
     if (msr->mpd->boundary != NULL) {
+        char *p = NULL;
         char *b = NULL;
+        int seen_semicolon = 0;
         int len = 0;
 
+        /* Check for extra characters before the boundary. */
+        for (p = (char *)(msr->request_content_type + 19); p < msr->mpd->boundary; p++) {
+            if (!isspace(*p)) {
+                if ((seen_semicolon == 0)&&(*p == ';')) {
+                    seen_semicolon = 1; /* It is OK to have one semicolon. */
+                } else {
+                    *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (malformed).");
+                    return -1;
+                }
+            }
+        }
+
+        /* Have we seen the semicolon in the header? */
+        if (seen_semicolon == 0) {
+            msr->mpd->flag_missing_semicolon = 1;
+        }
+        
         b = strchr(msr->mpd->boundary + 8, '=');
         if (b == NULL) {
             msr->mpd->flag_error = 1;
@@ -662,13 +683,18 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
 
         /* Check parameter name ends well. */
         if (b != (msr->mpd->boundary + 8)) {
-            if (isspace(*(msr->mpd->boundary + 8))) {
-                /* Flag for whitespace after parameter name. */
-                msr->mpd->flag_boundary_whitespace = 1;
-            } else {
-                msr->mpd->flag_error = 1;
-                *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (parameter name).");
-                return -1;
+            /* Check all characters between the end of the boundary
+             * and the = character.
+             */
+            for (p = msr->mpd->boundary + 8; p < b; p++) {
+                if (isspace(*p)) {
+                    /* Flag for whitespace after parameter name. */
+                    msr->mpd->flag_boundary_whitespace = 1;
+                } else {
+                    msr->mpd->flag_error = 1;
+                    *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (parameter name).");
+                    return -1;
+                }
             }
         }
         
@@ -878,7 +904,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                             log_escape_nq(msr->mp, msr->mpd->buf));
                         return -1;
                     }
-                } else {
+                } else { /* It looks like a boundary but we couldn't match it. */
                     char *p = NULL;
 
                     /* Check if an attempt to use quotes around the boundary was made. */
@@ -908,6 +934,23 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                     }
 
                     msr->mpd->flag_unmatched_boundary = 1;
+                }
+            } else { /* We do not think the buffer contains a boundary. */
+                /* Look into the buffer to see if there's anything
+                 * there that resembles a boundary.
+                 */
+                if (msr->mpd->buf_contains_line) {
+                    int i, len = (MULTIPART_BUF_SIZE - msr->mpd->bufleft);
+                    char *p = msr->mpd->buf;
+
+                    for(i = 0; i < len; i++) {
+                        if ((p[i] == '-')&&(i + 1 < len)&&(p[i + 1] == '-')) {
+                            if (strncmp(p + i + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0) {
+                                msr->mpd->flag_unmatched_boundary = 1;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -1073,7 +1116,7 @@ int multipart_get_arguments(modsec_rec *msr, char *origin, apr_table_t *argument
             if (arg == NULL) return -1;
 
             arg->name = parts[i]->name;
-            arg->name_len = strlen(parts[i]->name); // TODO
+            arg->name_len = strlen(parts[i]->name);
             arg->value = parts[i]->value;
             arg->value_len = parts[i]->length;
             arg->value_origin_offset = parts[i]->offset;
@@ -1097,8 +1140,6 @@ char *multipart_reconstruct_urlencoded_body_sanitise(modsec_rec *msr) {
     int i;
     
     if (msr->mpd == NULL) return NULL;
-
-    // TODO Cache this data somewhere in the structure
 
     /* calculate the size of the buffer */
     body_len = 1;
