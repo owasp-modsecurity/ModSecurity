@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-trunk / (Aug 9, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-trunk / (September 7, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -2250,6 +2250,71 @@ SecRule GEO:COUNTRY_CODE "!@streq UK"</programlisting>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">MODSEC_BUILD</emphasis> "!@ge 02050102" skip:1
 SecRule ARGS "@pm some key words" deny,status:500</programlisting>
+    </section>
+
+    <section>
+      <title><literal>MULTIPART_STRICT_ERROR</literal></title>
+
+      <para><literal>MULTIPART_STRICT_ERROR</literal> will be set to
+      <literal>1</literal> when any of the following variables is also set to
+      <literal>1</literal>: <literal>REQBODY_PROCESSOR_ERROR</literal>,
+      <literal>MULTIPART_BOUNDARY_QUOTED</literal>,
+      <literal>MULTIPART_BOUNDARY_WHITESPACE</literal>,
+      <literal>MULTIPART_DATA_BEFORE</literal>,
+      <literal>MULTIPART_DATA_AFTER</literal>,
+      <literal>MULTIPART_HEADER_FOLDING</literal>,
+      <literal>MULTIPART_LF_LINE</literal>,
+      <literal>MULTIPART_SEMICOLON_MISSING</literal>. Each of these variables
+      covers one unusual (although sometimes legal) aspect of the request body
+      in <literal>multipart/form-data format</literal>. Your policies should
+      <emphasis>always</emphasis> contain a rule to check either this variable
+      (easier) or one or more individual variables (if you know exactly what
+      you want to accomplish). Depending on the rate of false positives and
+      your default policy you should decide whether to block or just warn when
+      the rule is triggered.</para>
+
+      <para>The best way to use this variable is as in the example
+      below:</para>
+
+      <programlisting>SecRule MULTIPART_STRICT_ERROR "!@eq 0" \
+"phase:2,t:none,log,deny,msg:'Multipart request body \
+failed strict validation: \
+PE %{REQBODY_PROCESSOR_ERROR}, \
+BQ %{MULTIPART_BOUNDARY_QUOTED}, \
+BW %{MULTIPART_BOUNDARY_WHITESPACE}, \
+DB %{MULTIPART_DATA_BEFORE}, \
+DA %{MULTIPART_DATA_AFTER}, \
+HF %{MULTIPART_HEADER_FOLDING}, \
+LF %{MULTIPART_LF_LINE}, \
+SM %{MULTIPART_SEMICOLON_MISSING}'"</programlisting>
+
+      <para>The <literal>multipart/form-data</literal> parser was upgraded in
+      ModSecurity v2.1.3 to actively look for signs of evasion. Many variables
+      (as listed above) were added to expose various facts discovered during
+      the parsing process. The <literal>MULTIPART_STRICT_ERROR</literal>
+      variable is handy to check on all abnormalities at once. The individual
+      variables allow detection to be fine-tuned according to your
+      circumstances in order to reduce the number of false positives. Detailed
+      analysis of various evasion techniques covered will be released as a
+      separated document at a later date.</para>
+    </section>
+
+    <section>
+      <title><literal>MULTIPART_UNMATCHED_BOUNDARY</literal></title>
+
+      <para>Set to <literal>1</literal> when, during the parsing phase of a
+      <literal>multipart/request-body</literal>, ModSecurity encounters what
+      feels like a boundary but it is not. Such an event may occur when
+      evasion of ModSecurity is attempted.</para>
+
+      <para>The best wasy to use this variable is as in the example
+      below:</para>
+
+      <programlisting>SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
+"phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"</programlisting>
+
+      <para>Change the rule from blocking to logging-only if many false
+      positives are encountered.</para>
     </section>
 
     <section>
@@ -4803,6 +4868,106 @@ SecRule XML "<emphasis role="bold">@validateSchema /path/to/apache2/conf/xml.xsd
 
 SecAction "pass,setvar:'tx.allowed_methods=get,post,head'"
 SecRule REQUEST_METHOD "!<emphasis role="bold">@within %{tx.allowed_methods}</emphasis>" t:lowercase,deny,status:403</programlisting>
+    </section>
+  </section>
+
+  <section>
+    <title>Miscellaneous Topics</title>
+
+    <para></para>
+
+    <section>
+      <title>Impedance Mismatch</title>
+
+      <para>Web application firewalls have a difficult job trying to make
+      sense of data that passes by, without any knowledge of the application
+      and its business logic. The protection they provide comes from having an
+      independent layer of security on the outside. Because data validation is
+      done twice, security can be increased without having to touch the
+      application. In some cases, however, the fact that everything is done
+      twice brings problems. Problems can arise in the areas where the
+      communication protocols are not well specified, or where either the
+      device or the application do things that are not in the specification.
+      In such cases it may be possible to design payload that will be
+      interpreted in one way by one device and in another by the other device.
+      This problem is better known as Impedance Mismatch. It can be exploited
+      to evade the security devices.</para>
+
+      <para>While we will continue to enhance ModSecurity to deal with various
+      evasion techniques the problem can only be minimized, but never solved.
+      With so many different application backends chances are some will always
+      do something completely unexpected. The only solution is to be aware of
+      the technologies in the backend when writing rules, adapting the rules
+      to remove the mismatch. See the next section for some examples.</para>
+
+      <section>
+        <title>PHP Peculiarities for ModSecurity Users</title>
+
+        <para>When writing rules to protect PHP applications you need to pay
+        attention to the following facts:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>When "register_globals" is set to "On" request parameters
+            are automatically converted to script variables. In some PHP
+            versions it is even possible to override the $GLOBALS
+            array.</para>
+          </listitem>
+
+          <listitem>
+            <para>Whitespace at the beginning of parameter names is ignored.
+            (This is very dangerous if you are writing rules to target
+            specific named variables.)</para>
+          </listitem>
+
+          <listitem>
+            <para>The remaining whitespace (in parameter names) is converted
+            to underscores. The same applies to dots and to a "[" if the
+            variable name does not contain a matching closing bracket.
+            (Meaning that if you want to exploit a script through a variable
+            that contains an underscore in the name you can send a parameter
+            with a whitespace or a dot instead.)</para>
+          </listitem>
+
+          <listitem>
+            <para>Cookies can be treated as request parameters.</para>
+          </listitem>
+
+          <listitem>
+            <para>The discussion about variable names applies equally to the
+            cookie names.</para>
+          </listitem>
+
+          <listitem>
+            <para>The order in which parameters are taken from the request and
+            the environment is EGPCS (environment, GET, POST, Cookies,
+            built-in variables). This means that a POST parameter will
+            overwrite the parameters transported on the request line (in
+            QUERY_STRING).</para>
+          </listitem>
+
+          <listitem>
+            <para>When "magic_quotes_gpc" is set to "On" PHP will use
+            backslash to escape the following characters: single quote, double
+            quote, backslash, and the nul byte.</para>
+          </listitem>
+
+          <listitem>
+            <para>If "magic_quotes_sybase" is set to "On" only the single
+            quote will be escaped using another single quote. In this case the
+            "magic_quotes_gpc" setting becomes irrelevant. The
+            "magic_quotes_sybase" setting completely overrides the
+            "magic_quotes_gpc" behaviour but "magic_quotes_gpc" still must be
+            set to "On" for the Sybase-specific quoting to be work.</para>
+          </listitem>
+
+          <listitem>
+            <para>PHP will also automatically create nested arrays for you.
+            For example "p[x][y]=1" results in a total of three
+            variables.</para>
+          </listitem>
+        </orderedlist>
+      </section>
     </section>
   </section>
 </article>
