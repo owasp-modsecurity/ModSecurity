@@ -1773,6 +1773,7 @@ static int var_multipart_strict_error_generate(modsec_rec *msr, msre_var *var, m
             ||(msr->mpd->flag_data_after != 0)
             ||(msr->mpd->flag_header_folding != 0)
             ||(msr->mpd->flag_lf_line != 0)
+            ||(msr->mpd->flag_missing_semicolon != 0)
         ) {
             return var_simple_generate(var, vartab, mptmp, "1");
         }
