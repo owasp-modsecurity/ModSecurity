@@ -226,7 +226,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
         if (msr->mpd->mpp->filename != NULL) {
             /* Some parsers use crude methods to extract the name and filename
              * values from the C-D header. We need to check for the case where they
-             * don't understand C-D but we do.
+             * didn't understand C-D but we did.
              */
             if (strstr(header_value, "filename=") == NULL) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (filename).");
@@ -546,6 +546,7 @@ static int multipart_boundary_characters_valid(char *boundary) {
     unsigned char c;
 
     if (p == NULL) return -1;
+
     while((c = *p) != '\0') {
         /* Control characters and space not allowed. */
         if (c < 32) {
@@ -663,6 +664,7 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
                 if ((seen_semicolon == 0)&&(*p == ';')) {
                     seen_semicolon = 1; /* It is OK to have one semicolon. */
                 } else {
+                    msr->mpd->flag_error = 1;
                     *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (malformed).");
                     return -1;
                 }
@@ -712,12 +714,6 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
             msr->mpd->boundary = apr_pstrndup(msr->mp, b + 1, len - 2);
             if (msr->mpd->boundary == NULL) return -1;
             msr->mpd->flag_boundary_quoted = 1;
-
-            if (strstr(msr->mpd->boundary, "\"") != NULL) {
-                msr->mpd->flag_error = 1;
-                *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (quote).");
-                return -1;
-            }
         } else {
             /* Not quoted. */
 
@@ -759,10 +755,11 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
             return -1;
         }
     }
-    else {
+    else { /* Could not find boundary in the C-T header. */
+        msr->mpd->flag_error = 1;
+
         /* Test for case-insensitive boundary. Allowed by the RFC but highly unusual. */
         if (multipart_count_boundary_params(msr->mp, msr->request_content_type) > 0) {
-            msr->mpd->flag_error = 1;
             *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (case sensitivity).");
             return -1;
         }
@@ -924,10 +921,10 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                         p++;
                     }
     
-                    if (   (p != msr->mpd->buf)
+                    if (   (p != msr->mpd->buf + 2)
                         && (strncmp(p, msr->mpd->boundary, strlen(msr->mpd->boundary)))
                     ) {
-                        /* Found whitespace at the beginning of the boundary. */
+                        /* Found whitespace in front of a boundary. */
                         msr->mpd->flag_error = 1;
                         *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary (whitespace).");
                         return -1;
