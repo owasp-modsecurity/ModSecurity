@@ -1,5 +1,5 @@
 
-07 Sep 2007 - 2.1.3
+11 Sep 2007 - 2.1.3
 -------------------
 
  * Updated multipart parsing code adding variables to allow checking
@@ -9,7 +9,7 @@
 
  * Quiet some compiler warnings.
 
- * Do not block internal ErrorDocument requests.
+ * Do not block internal ErrorDocument requests after blocking request.
 
  * Added ability to compile without an external API (use -DNO_MODSEC_API).
 
