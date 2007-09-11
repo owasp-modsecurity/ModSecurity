@@ -599,7 +599,7 @@ static int multipart_count_boundary_params(apr_pool_t *mp, const char *header_va
     if (duplicate == NULL) return -1;
 
     /* Performing a case-insensitive search. */
-    strtolower_inplace(duplicate);
+    strtolower_inplace((unsigned char *)duplicate);
 
     s = duplicate;
     while((s = strstr(s, "boundary")) != NULL) {
