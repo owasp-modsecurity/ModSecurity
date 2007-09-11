@@ -379,7 +379,8 @@ static apr_status_t change_server_signature(server_rec *s) {
 
     if (new_server_signature == NULL) return 0;
 
-    server_version = (char *)ap_get_server_version();
+    server_version = (char *)apache_get_server_version();
+
     if (server_version == NULL) {
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, s,
             "SecServerSignature: Apache returned null as signature.");
@@ -442,7 +443,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
     }
 
     /* Store the original server signature */
-    real_server_signature = apr_pstrdup(mp, ap_get_server_version());
+    real_server_signature = apr_pstrdup(mp, apache_get_server_version());
 
     /* Make some space in the server signature for later */
     if (new_server_signature != NULL) {

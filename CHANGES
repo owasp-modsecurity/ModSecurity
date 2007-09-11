@@ -1,6 +1,8 @@
 ?? ??? 2007 - 2.5.0-trunk
 -------------------------
 
+ * Used new API calls to get the server version/banner when available.
+
  * Allow mod_rpaf and mod_extract_forwarded2 to work before ModSecurity.
 
  * Quiet some compiler warnings.
