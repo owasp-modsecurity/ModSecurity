@@ -237,13 +237,14 @@ int perform_interception(modsec_rec *msr) {
  * Retrieves a previously stored transaction context by
  * looking at the main request, and the previous requests.
  */
-static modsec_rec *retrieve_tx_context(const request_rec *r) {
+static modsec_rec *retrieve_tx_context(request_rec *r) {
     modsec_rec *msr = NULL;
     request_rec *rx = NULL;
 
     /* Look in the current request first. */
     msr = (modsec_rec *)apr_table_get(r->notes, NOTE_MSR);
     if (msr != NULL) {
+        msr->r = r;
         return msr;
     }
 
@@ -251,6 +252,7 @@ static modsec_rec *retrieve_tx_context(const request_rec *r) {
     if (r->main != NULL) {
         msr = (modsec_rec *)apr_table_get(r->main->notes, NOTE_MSR);
         if (msr != NULL) {
+            msr->r = r;
             return msr;
         }
     }
@@ -260,6 +262,7 @@ static modsec_rec *retrieve_tx_context(const request_rec *r) {
     while(rx != NULL) {
         msr = (modsec_rec *)apr_table_get(rx->notes, NOTE_MSR);
         if (msr != NULL) {
+            msr->r = r;
             return msr;
         }
         rx = rx->prev;
@@ -588,8 +591,6 @@ static int hook_request_late(request_rec *r) {
          */
         return DECLINED;
     }
-    msr->r = r;
-    msr->remote_user = r->user;
 
     /* Has this phase been completed already? */
     if (msr->phase_request_body_complete) {
@@ -603,6 +604,8 @@ static int hook_request_late(request_rec *r) {
         return DECLINED;
     }
     msr->phase_request_body_complete = 1;
+
+    msr->remote_user = r->user;
 
     /* Get the second configuration context. */
     msr->dcfg2 = (directory_config *)ap_get_module_config(r->per_dir_config,
@@ -703,7 +706,7 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
     error_message *em = NULL;
 
     if (r == NULL) return;
-    msr = retrieve_tx_context(r);
+    msr = retrieve_tx_context((request_rec *)r);
 
     /* Create a context for requests we never had the chance to process */ 
     if ((msr == NULL)
@@ -719,7 +722,7 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
                 msr_log(msr, 9, "Context created after request failure.");
             }
         }
-     } 
+    } 
 
     if (msr == NULL) return;
 
@@ -909,6 +912,7 @@ static void hook_insert_filter(request_rec *r) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_filter: Processing disabled, skipping.");
         }
+
         return;
     }
 

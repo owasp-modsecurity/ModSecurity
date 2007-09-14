@@ -38,6 +38,8 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         return APR_EGENERAL;
     }
 
+    msr->r = f->r;
+
     if ((msr->if_status == IF_STATUS_COMPLETE)||(msr->if_status == IF_STATUS_NONE)) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Input filter: Input forwarding already complete, skipping (f %x, r %x).", f, f->r);
@@ -393,6 +395,8 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         ap_remove_output_filter(f);
         return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
     }
+
+    msr->r = r;
 
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Output filter: Receiving output (f %x, r %x).", f, f->r);
