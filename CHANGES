@@ -1,6 +1,9 @@
 ?? ??? 2007 - 2.5.0-dev3
 ------------------------
 
+ * Return from the output filter with an error in addition to setting
+   up the HTTP error status in the output data.
+
  * Used new API calls to get the server version/banner when available.
 
  * Added "logdata" meta action to allow safe logging of raw transaction data.

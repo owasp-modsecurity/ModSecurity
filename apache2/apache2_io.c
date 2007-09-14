@@ -260,14 +260,31 @@ static apr_status_t send_error_bucket(ap_filter_t *f, int status) {
 
     brigade = apr_brigade_create(f->r->pool, f->r->connection->bucket_alloc);
     if (brigade == NULL) return APR_EGENERAL;
+
     bucket = ap_bucket_error_create(status, NULL, f->r->pool, f->r->connection->bucket_alloc);
     if (bucket == NULL) return APR_EGENERAL;
-    APR_BRIGADE_INSERT_TAIL(brigade, bucket);
-    bucket = apr_bucket_eos_create(f->r->connection->bucket_alloc);
-    if (bucket == NULL) return APR_EGENERAL;
+
     APR_BRIGADE_INSERT_TAIL(brigade, bucket);
 
-    return ap_pass_brigade(f->next, brigade);
+    bucket = apr_bucket_eos_create(f->r->connection->bucket_alloc);
+    if (bucket == NULL) return APR_EGENERAL;
+
+    APR_BRIGADE_INSERT_TAIL(brigade, bucket);
+
+    ap_pass_brigade(f->next, brigade);
+
+    // TODO: Should return an error if this function failed, but currently
+    // coded to pass this on as the filter return value.  The calling code
+    // needs changed to return an error after checking this return value
+    // and possibly generating a log entry.
+    //
+    // Also note that ap_pass_brigade will return APR_SUCCESS, so we should
+    // not pass this on to be returned by the filter on error.  Although
+    // it may not matter what we return from the filter as it may be too
+    // late to even generate an error (already sent to client).  Nick Kew
+    // recommends to return APR_EGENERAL in hopes that the handler in control
+    // will notice and do The Right Thing.  So, that is what we do now.
+    return APR_EGENERAL;
 }
 
 /**
@@ -596,6 +613,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         }
 
         // TODO Why does the function below take pointer to length? Will it modify it?
+        // BR: Yes - The maximum length of the char array. On return, it is the actual length of the char array.
         rc = apr_brigade_flatten(msr->of_brigade, msr->resbody_data, &msr->resbody_length);
         if (rc != APR_SUCCESS) {
             msr_log(msr, 1, "Output filter: Failed to flatten brigade (%i): %s", rc,
