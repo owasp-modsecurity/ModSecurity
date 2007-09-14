@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-trunk / (September 7, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-dev3 / (September 14, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -666,9 +666,9 @@ SecAuditLogStorageDir logs/audit
         <listitem>
           <para><literal moreinfo="none">I</literal> - This part is a
           replacement for part C. It will log the same data as C in all cases
-          except when<literal moreinfo="none">multipart/form-data</literal>
+          except when <literal moreinfo="none">multipart/form-data</literal>
           encoding in used. In this case it will log a fake <literal
-          moreinfo="none"> application/x-www-form-urlencoded</literal> body
+          moreinfo="none">application/x-www-form-urlencoded</literal> body
           that contains the information about parameters but not about the
           files. This is handy if you don't want to have (often large) files
           stored in your audit logs.</para>
@@ -677,7 +677,7 @@ SecAuditLogStorageDir logs/audit
         <listitem>
           <para><literal moreinfo="none">J</literal> - RESERVED. This part,
           when implemented, will contain information about the files uploaded
-          using multipart/form-data encoding.</para>
+          using <literal>multipart/form-data</literal> encoding.</para>
         </listitem>
 
         <listitem>
@@ -1910,16 +1910,17 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis
 
       <itemizedlist>
         <listitem>
-          <para>application/x-www-form-urlencoded - used to transfer form
-          data</para>
-        </listitem>
-
-        <listitem>
-          <para>multipart/form-data - used for file transfers</para>
-        </listitem>
-
-        <listitem>
-          <para>text/xml - used for passing XML data</para>
+          <para><literal>application/x-www-form-urlencoded</literal> - used to 
+          transfer form data</para> 
+        </listitem> 
+ 
+        <listitem> 
+          <para><literal>multipart/form-data</literal> - used for file 
+          transfers</para> 
+        </listitem> 
+ 
+        <listitem> 
+          <para><literal>text/xml</literal> - used for passing XML data</para> 
         </listitem>
       </itemizedlist>
 
@@ -3694,7 +3695,7 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
 
       <itemizedlist>
         <listitem>
-          <para>1 - 99,999; reserved for local (internal) use. Use as you see
+          <para>1-99,999; reserved for local (internal) use. Use as you see
           fit but do not use this range for rules that are distributed to
           others.</para>
         </listitem>
@@ -4730,10 +4731,11 @@ SecRule REQUEST_HEADERS:Ip-Address "!<emphasis role="bold">@streq %{TX.1}</empha
       byte range. This can be useful to avoid stack overflow attacks (since
       they usually contain "random" binary content). Default range values are
       0 and 255, i.e. all byte values are allowed. This directive does not
-      check byte range in a POST payload when multipart/form-data encoding
-      (file upload) is used. Doing so would prevent binary files from being
-      uploaded. However, after the parameters are extracted from such request
-      they are checked for a valid range.</para>
+      check byte range in a POST payload when
+      <literal>multipart/form-data</literal> encoding (file upload) is used.
+      Doing so would prevent binary files from being uploaded. However, after
+      the parameters are extracted from such request they are checked for a
+      valid range.</para>
 
       <para>validateByteRange is similar to the ModSecurity 1.X
       SecFilterForceByteRange Directive however since it works in a rule
@@ -4804,8 +4806,9 @@ SecRule XML "<emphasis role="bold">@validateSchema /path/to/apache2/conf/xml.xsd
       <para>URL encoding is an HTTP standard for encoding byte values within a
       URL. The byte is escaped with a % followed by two hexadecimal values
       (0-F). This directive does not check encoding in a POST payload when the
-      multipart/form-data encoding (file upload) is used. It is not necessary
-      to do so because URL encoding is not used for this encoding.</para>
+      <literal>multipart/form-data</literal> encoding (file upload) is used.
+      It is not necessary to do so because URL encoding is not used for this
+      encoding.</para>
     </section>
 
     <section>

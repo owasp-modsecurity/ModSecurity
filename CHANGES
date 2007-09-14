@@ -1,13 +1,7 @@
-?? ??? 2007 - 2.5.0-trunk
--------------------------
+?? ??? 2007 - 2.5.0-dev3
+------------------------
 
  * Used new API calls to get the server version/banner when available.
-
- * Allow mod_rpaf and mod_extract_forwarded2 to work before ModSecurity.
-
- * Quiet some compiler warnings.
-
- * Added ability to compile without an external API (-DNO_MODSEC_API).
 
  * Added "logdata" meta action to allow safe logging of raw transaction data.
 
@@ -35,8 +29,23 @@
    visibility attribute.
 
 
-27 July 2007 - 2.1.2
---------------------
+11 Sep 2007 - 2.1.3
+-------------------
+
+ * Updated multipart parsing code adding variables to allow checking
+   for various parsing issues (request body abnormalities).
+
+ * Allow mod_rpaf and mod_extract_forwarded2 to work before ModSecurity.
+
+ * Quiet some compiler warnings.
+
+ * Do not block internal ErrorDocument requests after blocking request.
+
+ * Added ability to compile without an external API (use -DNO_MODSEC_API).
+
+
+27 Jul 2007 - 2.1.2
+-------------------
 
  * Cleaned up and clarified some documentation.
 
