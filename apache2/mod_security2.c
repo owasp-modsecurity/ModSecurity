@@ -594,13 +594,25 @@ static int hook_request_late(request_rec *r) {
 
     /* Has this phase been completed already? */
     if (msr->phase_request_body_complete) {
+        /* If we are redirecting and there was no previous response it is
+         * an error page request and we ignore it.
+         */
+        if (    (msr->r->prev != NULL)
+            && ((msr->r->prev->headers_out == NULL) || (apr_is_empty_table(msr->r->prev->headers_out))) )
+        {
+            msr_log(msr, 9, "Allowing internally redirected error document: %s", msr->r->uri);
+            return DECLINED;
+        }
+
         if (msr->was_intercepted) {
-            msr_log(msr, 4, "Phase REQUEST_BODY request already intercepted.  Intercepting additional request.");
+            msr_log(msr, 4, "Phase REQUEST_BODY request already intercepted. Intercepting additional request.");
             return perform_interception(msr);
         }
+
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Phase REQUEST_BODY already complete, skipping.");
         }
+
         return DECLINED;
     }
     msr->phase_request_body_complete = 1;
