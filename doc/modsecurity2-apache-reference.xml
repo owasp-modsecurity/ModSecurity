@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-dev3 / (September 14, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-dev3 / (September 21, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -1303,6 +1303,40 @@ SecResponseBodyLimit 524288</programlisting>
     </section>
 
     <section>
+      <title><literal>SecResponseBodyLimitAction</literal></title>
+
+      <para><emphasis role="bold">Description</emphasis>: Controls what
+      happens once a response body limit, configured with
+      <literal>SecResponseBodyLimit</literal>, is encountered. By default
+      ModSecurity wil reject a response body that is longer than specified.
+      Some web sites, however, will produce very long responses making it
+      difficult to come up with a reasonable limit. Such sites would have to
+      raise the limit significantly to function properly defying the purpose
+      of having the limit in the first place (to control memory consumption).
+      With the ability to choose what happens once a limit is reached site
+      administrators can choose to inspect only the first part of the
+      response, the part that can fit into the desired limit, and let the rest
+      through. Some could argue that allowing parts of responses to go
+      uninspected is a weakness. This is true in theory but only applies to
+      cases where the attacker controls the output (e.g. can make it arbitrary
+      long). In such cases, however, it is not possible to prevent leakage
+      anyway. The attacker could compress, obfuscate, or even encrypt data
+      before it is sent back, and therefore bypass any monitoring
+      device.</para>
+
+      <para><emphasis role="bold">Syntax</emphasis>:
+      <literal>SecResponseBodyLimitAction
+      Reject|ProcessPartial</literal></para>
+
+      <para><emphasis role="bold">Example Usage</emphasis>:
+      <literal>SecResponseBodyLimitAction ProcessPartial</literal></para>
+
+      <para><emphasis role="bold">Processing Phase</emphasis>: N/A</para>
+
+      <para><emphasis role="bold">Scope</emphasis>: Any</para>
+    </section>
+
+    <section>
       <title><literal>SecResponseBodyMimeType</literal></title>
 
       <para><emphasis role="bold">Description:</emphasis> Configures
@@ -1910,17 +1944,17 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis
 
       <itemizedlist>
         <listitem>
-          <para><literal>application/x-www-form-urlencoded</literal> - used to 
-          transfer form data</para> 
-        </listitem> 
- 
-        <listitem> 
-          <para><literal>multipart/form-data</literal> - used for file 
-          transfers</para> 
-        </listitem> 
- 
-        <listitem> 
-          <para><literal>text/xml</literal> - used for passing XML data</para> 
+          <para><literal>application/x-www-form-urlencoded</literal> - used to
+          transfer form data</para>
+        </listitem>
+
+        <listitem>
+          <para><literal>multipart/form-data</literal> - used for file
+          transfers</para>
+        </listitem>
+
+        <listitem>
+          <para><literal>text/xml</literal> - used for passing XML data</para>
         </listitem>
       </itemizedlist>
 
