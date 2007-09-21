@@ -1,6 +1,13 @@
 ?? ??? 2007 - 2.5.0-dev3
 ------------------------
 
+ * ModSecurity will now process phases 3 and 4 when request processing
+   is interrupted (either by Apache - e.g. by responding with 400, 401
+   or 403, or by ModSecurity itself).
+
+ * Fix the base64decode transformation function to not return extra
+   characters at the end.
+
  * Fixed potential corruption at end of strings after using base64Decode
    (APR-Util issue). TODO make a better CHANGELOG entry ;)
 
