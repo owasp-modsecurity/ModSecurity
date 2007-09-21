@@ -142,15 +142,21 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
         if (strcmp(name, "name") == 0) {
             if (msr->mpd->mpp->name != NULL) return -14;
             msr->mpd->mpp->name = value;
-            msr_log(msr, 9, "Multipart: Content-Disposition name: %s",
-                log_escape_nq(msr->mp, value));
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Multipart: Content-Disposition name: %s",
+                    log_escape_nq(msr->mp, value));
+            }
         }
         else
         if (strcmp(name, "filename") == 0) {
             if (msr->mpd->mpp->filename != NULL) return -15;
             msr->mpd->mpp->filename = value;
-            msr_log(msr, 9, "Multipart: Content-Disposition filename: %s",
-                log_escape_nq(msr->mp, value));
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Multipart: Content-Disposition filename: %s",
+                    log_escape_nq(msr->mp, value));
+            }
         }
         else return -11;
         
@@ -267,9 +273,11 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
             new_value = apr_pstrcat(msr->mp, header_value, " ", new_value, NULL);
             apr_table_set(msr->mpd->mpp->headers, msr->mpd->mpp->last_header_name, new_value);
             
-            msr_log(msr, 9, "Multipart: Continued folder header \"%s\" with \"%s\"",
-                log_escape(msr->mp, msr->mpd->mpp->last_header_name),
-                log_escape(msr->mp, data));
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Multipart: Continued folder header \"%s\" with \"%s\"",
+                    log_escape(msr->mp, msr->mpd->mpp->last_header_name),
+                    log_escape(msr->mp, data));
+            }
             
             if (strlen(new_value) > 4096) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Part header too long.");
@@ -306,9 +314,11 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
             apr_table_setn(msr->mpd->mpp->headers, header_name, header_value);
             msr->mpd->mpp->last_header_name = header_name;
             
-            msr_log(msr, 9, "Multipart: Added part header \"%s\" \"%s\"",
-                log_escape(msr->mp, header_name),
-                log_escape(msr->mp, header_value));
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Multipart: Added part header \"%s\" \"%s\"",
+                    log_escape(msr->mp, header_name),
+                    log_escape(msr->mp, header_value));
+            }
         }
     }
     
@@ -375,8 +385,10 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
                     return -1;
                 }
 
-                msr_log(msr, 4, "Multipart: Created temporary file: %s",
-                    log_escape_nq(msr->mp, msr->mpd->mpp->tmp_file_name));
+                if (msr->txcfg->debuglog_level >= 4) {
+                    msr_log(msr, 4, "Multipart: Created temporary file: %s",
+                        log_escape_nq(msr->mp, msr->mpd->mpp->tmp_file_name));
+                }
             }
 
             /* write the reserve first */
@@ -433,8 +445,10 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
         
         *(value_part_t **)apr_array_push(msr->mpd->mpp->value_parts) = value_part;
 
-        msr_log(msr, 9, "Multipart: Added data to variable: %s",
-            log_escape_nq_ex(msr->mp, value_part->data, value_part->length));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Multipart: Added data to variable: %s",
+                log_escape_nq_ex(msr->mp, value_part->data, value_part->length));
+        }
     }
     else {
         *error_msg = apr_psprintf(msr->mp, "Multipart: unknown part type %i", msr->mpd->mpp->type);
@@ -505,17 +519,22 @@ static int multipart_process_boundary(modsec_rec *msr, int last_part, char **err
         /* add the part to the list of parts */
         *(multipart_part **)apr_array_push(msr->mpd->parts) = msr->mpd->mpp;
         if (msr->mpd->mpp->type == MULTIPART_FILE) {
-            msr_log(msr, 9, "Multipart: Added file part %x to the list: name \"%s\" "
-                "file name \"%s\" (offset %u, length %u)",
-                msr->mpd->mpp, log_escape(msr->mp, msr->mpd->mpp->name),
-                log_escape(msr->mp, msr->mpd->mpp->filename),
-                msr->mpd->mpp->offset, msr->mpd->mpp->length);
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Multipart: Added file part %x to the list: name \"%s\" "
+                    "file name \"%s\" (offset %u, length %u)",
+                    msr->mpd->mpp, log_escape(msr->mp, msr->mpd->mpp->name),
+                    log_escape(msr->mp, msr->mpd->mpp->filename),
+                    msr->mpd->mpp->offset, msr->mpd->mpp->length);
+            }
         }
         else {
-            msr_log(msr, 9, "Multipart: Added part %x to the list: name \"%s\" "
-                "(offset %u, length %u)", msr->mpd->mpp, log_escape(msr->mp, msr->mpd->mpp->name),
-                msr->mpd->mpp->offset, msr->mpd->mpp->length);
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Multipart: Added part %x to the list: name \"%s\" "
+                    "(offset %u, length %u)", msr->mpd->mpp, log_escape(msr->mp, msr->mpd->mpp->name),
+                    msr->mpd->mpp->offset, msr->mpd->mpp->length);
+            }
         }
+
         msr->mpd->mpp = NULL;
     }
 
@@ -745,9 +764,11 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
             return -1;
         }
 
-        msr_log(msr, 9, "Multipart: Boundary%s: %s",
-            (msr->mpd->flag_boundary_quoted ? " (quoted)" : ""),
-            log_escape_nq(msr->mp, msr->mpd->boundary));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Multipart: Boundary%s: %s",
+                (msr->mpd->flag_boundary_quoted ? " (quoted)" : ""),
+                log_escape_nq(msr->mp, msr->mpd->boundary));
+        }
 
         if (strlen(msr->mpd->boundary) == 0) {
             msr->mpd->flag_error = 1;
@@ -807,7 +828,11 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
     
     if (msr->mpd->is_complete) {
         msr->mpd->flag_data_before = 1;
-        msr_log(msr, 4, "Multipart: Ignoring data after last boundary (received %i bytes)", size);
+
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Multipart: Ignoring data after last boundary (received %i bytes)", size);
+        }
+
         return 1;
     }
     
@@ -955,7 +980,10 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
             if (processed_as_boundary == 0) {
                 if (msr->mpd->mpp == NULL) {
                     msr->mpd->flag_data_before = 1;
-                    msr_log(msr, 4, "Multipart: Ignoring data before first boundary.");
+
+                    if (msr->txcfg->debuglog_level >= 4) {
+                        msr_log(msr, 4, "Multipart: Ignoring data before first boundary.");
+                    }
                 } else {
                     if (msr->mpd->mpp_state == 0) {
                         if ((msr->mpd->bufleft == 0)||(process_buffer)) {
@@ -998,7 +1026,11 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
         
         if ((msr->mpd->is_complete)&&(inleft != 0)) {
             msr->mpd->flag_data_after = 1;
-            msr_log(msr, 4, "Multipart: Ignoring data after last boundary (%i bytes left)", inleft);
+
+            if (msr->txcfg->debuglog_level >= 4) {
+                msr_log(msr, 4, "Multipart: Ignoring data after last boundary (%i bytes left)", inleft);
+            }
+
             return 1;
         }
     }
@@ -1014,7 +1046,9 @@ apr_status_t multipart_cleanup(modsec_rec *msr) {
 
     if (msr->mpd == NULL) return -1;
 
-    msr_log(msr, 4, "Multipart: Cleanup started (remove files %i).", msr->upload_remove_files);
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "Multipart: Cleanup started (remove files %i).", msr->upload_remove_files);
+    }
 
     if (msr->upload_remove_files == 0) {
         if (msr->txcfg->upload_dir == NULL) {
@@ -1043,8 +1077,10 @@ apr_status_t multipart_cleanup(modsec_rec *msr) {
                         msr_log(msr, 1, "Multipart: Failed to delete file (part) \"%s\" because %d(%s)",
                             log_escape(msr->mp, parts[i]->tmp_file_name), errno, strerror(errno));
                     } else {
-                        msr_log(msr, 4, "Multipart: Deleted file (part) \"%s\"",
-                            log_escape(msr->mp, parts[i]->tmp_file_name));
+                        if (msr->txcfg->debuglog_level >= 4) {
+                            msr_log(msr, 4, "Multipart: Deleted file (part) \"%s\"",
+                                log_escape(msr->mp, parts[i]->tmp_file_name));
+                        }
                     }
                 }
             }
@@ -1063,8 +1099,10 @@ apr_status_t multipart_cleanup(modsec_rec *msr) {
                         msr_log(msr, 1, "Multipart: Failed to delete empty file (part) \"%s\" because %d(%s)",
                             log_escape(msr->mp, parts[i]->tmp_file_name), errno, strerror(errno));
                     } else {
-                        msr_log(msr, 4, "Multipart: Deleted empty file (part) \"%s\"",
-                            log_escape(msr->mp, parts[i]->tmp_file_name));
+                        if (msr->txcfg->debuglog_level >= 4) {
+                            msr_log(msr, 4, "Multipart: Deleted empty file (part) \"%s\"",
+                                log_escape(msr->mp, parts[i]->tmp_file_name));
+                        }
                     }
                 }
             } else {
@@ -1087,9 +1125,11 @@ apr_status_t multipart_cleanup(modsec_rec *msr) {
                             log_escape(msr->mp, new_filename));
                         return -1;
                     } else {
-                        msr_log(msr, 4, "Input filter: Moved file from \"%s\" to \"%s\".",
-                            log_escape(msr->mp, parts[i]->tmp_file_name),
-                            log_escape(msr->mp, new_filename));
+                        if (msr->txcfg->debuglog_level >= 4) {
+                            msr_log(msr, 4, "Input filter: Moved file from \"%s\" to \"%s\".",
+                                log_escape(msr->mp, parts[i]->tmp_file_name),
+                                log_escape(msr->mp, new_filename));
+                        }
                     }
                 }
             }
