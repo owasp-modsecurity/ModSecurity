@@ -1,6 +1,9 @@
 ?? ??? 2007 - 2.5.0-dev3
 ------------------------
 
+ * Fixed potential corruption at end of strings after using base64Decode
+   (APR-Util issue). TODO make a better CHANGELOG entry ;)
+
  * Return from the output filter with an error in addition to setting
    up the HTTP error status in the output data.
 

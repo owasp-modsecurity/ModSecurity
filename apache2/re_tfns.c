@@ -311,8 +311,7 @@ static int msre_fn_base64Decode_execute(apr_pool_t *mptmp, unsigned char *input,
 {
     *rval_len = apr_base64_decode_len((const char *)input); /* returns len with NULL byte included */
     *rval = apr_palloc(mptmp, *rval_len);
-    apr_base64_decode(*rval, (const char *)input);
-    (*rval_len)--;
+    *rval_len = apr_base64_decode(*rval, (const char *)input);
 
     return 1;
 }
