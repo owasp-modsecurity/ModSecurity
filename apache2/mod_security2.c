@@ -950,7 +950,6 @@ static void hook_insert_filter(request_rec *r) {
     }
 }
 
-#if 0
 /**
  * Invoked whenever Apache starts processing an error. A chance
  * to insert ourselves into the output filter chain.
@@ -961,25 +960,30 @@ static void hook_insert_error_filter(request_rec *r) {
     /* Find the transaction context and make sure we are
      * supposed to proceed.
      */
-
-    /* TODO Insert filter but make a note that it's the error
-     *      response the filter would be receiving.
-     */
-
     msr = retrieve_tx_context(r);
     if (msr == NULL) return;
 
+    /* Do not run if not enabled. */
     if (msr->txcfg->is_enabled == 0) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_error_filter: Processing disabled, skipping.");
         }
         return;
     }
-    
+
+    /* Do not run if the output filter already completed. This will
+     * happen if we intercept in phase 4.
+     */
     if (msr->of_status != OF_STATUS_COMPLETE) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_error_filter: Adding output filter (r %x).", r);
         }
+
+        /* Make a note that the output we will be receiving is a
+         * result of error processing.
+         */
+        msr->of_is_error = 1;
+
         ap_add_output_filter("MODSECURITY_OUT", msr, r, r->connection);
     } else {
         if (msr->txcfg->debuglog_level >= 4) {
@@ -987,7 +991,6 @@ static void hook_insert_error_filter(request_rec *r) {
         }
     }
 }
-#endif
 
 #if (!defined(NO_MODSEC_API))
 /**
@@ -1083,7 +1086,7 @@ static void register_hooks(apr_pool_t *mp) {
 
     /* Filter hooks */
     ap_hook_insert_filter(hook_insert_filter, NULL, NULL, APR_HOOK_FIRST);
-    /* ap_hook_insert_error_filter(hook_insert_error_filter, NULL, NULL, APR_HOOK_FIRST); */
+    ap_hook_insert_error_filter(hook_insert_error_filter, NULL, NULL, APR_HOOK_FIRST);
 
     ap_register_input_filter("MODSECURITY_IN", input_filter,
         NULL, AP_FTYPE_CONTENT_SET);

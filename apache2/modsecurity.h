@@ -213,6 +213,7 @@ struct modsec_rec {
     unsigned int         of_status;
     unsigned int         of_done_reading;
     unsigned int         of_skipping;
+    unsigned int         of_is_error;
 
     unsigned int         resbody_status;
     apr_size_t           resbody_length;
