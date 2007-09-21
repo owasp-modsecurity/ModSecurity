@@ -300,13 +300,14 @@ static int output_filter_should_run(modsec_rec *msr, request_rec *r) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Output filter: Response body buffering is not enabled.");
         }
+
         return 0;
     }
 
     /* Check MIME type. */
 
     if ((msr->txcfg->of_mime_types == NULL)||(msr->txcfg->of_mime_types == NOT_SET_P)) {
-        msr_log(msr, 1, "Output filter: MIME type structures are corrupted (internal error).");
+        msr_log(msr, 1, "Output filter: MIME type structures corrupted (internal error).");
         return -1;
     }
 
@@ -362,13 +363,21 @@ static apr_status_t output_filter_init(modsec_rec *msr, ap_filter_t *f,
     if (rc < 0) return -1;
     if (rc == 0) return 0;
 
+    /* Do not check the output limit if we are willing to
+     * process partial response bodies.
+     */
+
+    if (msr->txcfg->of_limit_action == RESPONSE_BODY_LIMIT_ACTION_PARTIAL) {
+        return 1;
+    }
+
     /* Look up the Content-Length header to see if we know
      * the amount of data coming our way. If we do and if
      * it's too much we might want to stop processing right here.
      */
     s_content_length = apr_table_get(r->headers_out, "Content-Length");
     if (s_content_length == NULL) {
-        /* Try this too, mod_cgi seems to put headers there */
+        /* Try this too, mod_cgi seems to put headers there. */
         s_content_length = apr_table_get(r->err_headers_out, "Content-Length");
     }
 
@@ -377,22 +386,107 @@ static apr_status_t output_filter_init(modsec_rec *msr, ap_filter_t *f,
 
         len = strtol(s_content_length, NULL, 10);
         if ((len == LONG_MIN)||(len == LONG_MAX)||(len < 0)||(len >= 1073741824)) {
-            msr_log(msr, 1, "Output filter: Invalid Content-Length: %s", log_escape_nq(r->pool, (char *)s_content_length));
-            return -1;
+            msr_log(msr, 1, "Output filter: Invalid Content-Length: %s", log_escape_nq(r->pool,
+                (char *)s_content_length));
+            return -1; /* Invalid. */
         }
 
         if (len == 0) {
             if (msr->txcfg->debuglog_level >= 4) {
                 msr_log(msr, 4, "Output filter: Skipping response since Content-Length is zero.");
             }
+
             return 0;
         }
 
         if (len > msr->txcfg->of_limit) {
-            msr_log(msr, 1, "Output filter: Content-Length (%s) over the limit (%lu).", log_escape_nq(r->pool, (char *)s_content_length), msr->txcfg->of_limit);
-            return -2;
+            msr_log(msr, 1, "Output filter: Content-Length (%s) over the limit (%lu).",
+                log_escape_nq(r->pool, (char *)s_content_length), msr->txcfg->of_limit);
+            return -2; /* Over the limit. */
         }
     }
+
+    return 1;
+}
+
+/**
+ * Send the accumulated content down the filter stream
+ * and to the client.
+ */
+static apr_status_t send_of_brigade(modsec_rec *msr, ap_filter_t *f) {
+    apr_status_t rc;
+
+    rc = ap_pass_brigade(f->next, msr->of_brigade);
+    if (rc != APR_SUCCESS) {
+        int log_level = 1;
+
+        if (APR_STATUS_IS_ECONNRESET(rc)) {
+            /* Message "Connection reset by peer" is common and not a sign
+             * of something unusual. Hence we don't want to make a big deal
+             * about it, logging at NOTICE level. Everything else we log
+             * at ERROR level.
+             */
+             log_level = 3;
+        }
+
+        if (msr->txcfg->debuglog_level >= log_level) {
+            msr_log(msr, log_level, "Output filter: Error while forwarding response data (%i): %s",
+                rc, get_apr_error(msr->mp, rc));
+        }
+
+        return rc;
+    }
+
+    return APR_SUCCESS;
+}
+
+/**
+ *
+ */
+static void prepend_content_to_of_brigade(modsec_rec *msr, ap_filter_t *f) {
+    if ((msr->txcfg->content_injection_enabled) && (msr->content_prepend) && (!msr->of_skipping)) {
+        apr_bucket *bucket_ci = NULL;
+
+        bucket_ci = apr_bucket_heap_create(msr->content_prepend,
+        msr->content_prepend_len, NULL, f->r->connection->bucket_alloc);
+            APR_BRIGADE_INSERT_HEAD(msr->of_brigade, bucket_ci);
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Content Injection (b): Added content to top: %s",
+                log_escape_nq_ex(msr->mp, msr->content_prepend, msr->content_prepend_len));
+        }
+    }
+}
+
+/**
+ *
+ */
+static int flatten_response_body(modsec_rec *msr) {
+    apr_status_t rc;
+
+    msr->resbody_status = RESBODY_STATUS_READ_BRIGADE;
+
+    if (msr->resbody_length + 1 <= 0) {
+        msr_log(msr, 1, "Output filter: Invalid response length: %lu", msr->resbody_length);
+        return -1;
+    }
+
+    msr->resbody_data = apr_palloc(msr->mp, msr->resbody_length + 1); 
+    if (msr->resbody_data == NULL) {
+        msr_log(msr, 1, "Output filter: Response body data memory allocation failed. Asked for: %li",
+            msr->resbody_length + 1);
+        return -1;
+    }
+
+    rc = apr_brigade_flatten(msr->of_brigade, msr->resbody_data, &msr->resbody_length);
+    if (rc != APR_SUCCESS) {
+        msr_log(msr, 1, "Output filter: Failed to flatten brigade (%i): %s", rc,
+            get_apr_error(msr->mp, rc));
+        return -1;
+    }
+
+    msr->resbody_data[msr->resbody_length] = '\0';
+    msr->resbody_status = RESBODY_STATUS_READ;
 
     return 1;
 }
@@ -405,7 +499,9 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
     modsec_rec *msr = (modsec_rec *)f->ctx;
     apr_bucket *bucket = NULL, *eos_bucket = NULL;
     apr_status_t rc;
+    int start_skipping = 0;
 
+    /* Do we have the context? */
     if (msr == NULL) {
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, f->r->server,
             "ModSecurity: Internal Error: msr is null in output filter.");
@@ -490,7 +586,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         }
           
         /* Content injection (prepend & non-buffering). */
-        if (msr->txcfg->content_injection_enabled && msr->content_prepend && msr->of_skipping) {
+        if ((msr->txcfg->content_injection_enabled) && (msr->content_prepend) && (msr->of_skipping)) {
             apr_bucket *bucket_ci = apr_bucket_heap_create(msr->content_prepend,
                 msr->content_prepend_len, NULL, f->r->connection->bucket_alloc);
             APR_BRIGADE_INSERT_HEAD(bb_in, bucket_ci);
@@ -517,13 +613,19 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         const char *buf;
         apr_size_t buflen;
 
-        if (msr->of_skipping == 0) {
+        /* Look into response data if configured to do so,
+         * unless we've already processed a partial response.
+         */
+        if ((msr->of_skipping == 0)&&(!msr->of_partial)) { /* Observe the response data. */
+            /* Retrieve data from the bucket. */
             rc = apr_bucket_read(bucket, &buf, &buflen, APR_BLOCK_READ);
             if (rc != APR_SUCCESS) {   
                 msr->of_status = OF_STATUS_COMPLETE;
                 msr->resbody_status = RESBODY_STATUS_ERROR;
+
                 msr_log(msr, 1, "Output filter: Failed to read bucket (rc %i): %s",
                     rc, get_apr_error(r->pool, rc));
+
                 ap_remove_output_filter(f);
                 return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
             }
@@ -533,23 +635,45 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                     bucket->type->name, buflen);
             }
 
+            /* Check the response size. */
             if (msr->resbody_length > (apr_size_t)msr->txcfg->of_limit) {
-                msr_log(msr, 1, "Output filter: Response body too large (over limit of %lu, total length not known).",
-                    msr->txcfg->of_limit);
-                msr->of_status = OF_STATUS_COMPLETE;
-                msr->resbody_status = RESBODY_STATUS_PARTIAL;
-                ap_remove_output_filter(f);
-                return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
-            }
+                /* The size of the response is larger than what we're
+                 * ready to accept. We need to decide what we want to do
+                 * about it.
+                 */
+                if (msr->txcfg->of_limit_action == RESPONSE_BODY_LIMIT_ACTION_REJECT) {
+                    /* Reject response. */
+                    msr_log(msr, 1, "Output filter: Response body too large (over limit of %lu, "
+                        "total length not known).", msr->txcfg->of_limit);
 
-            msr->resbody_length += buflen;
+                    msr->of_status = OF_STATUS_COMPLETE;
+                    msr->resbody_status = RESBODY_STATUS_PARTIAL;
+
+                    ap_remove_output_filter(f);
+                    return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
+                } else {
+                    /* Process partial response. */
+                    start_skipping = 1;
+                    msr->resbody_length = msr->txcfg->of_limit;
+
+                    if (msr->txcfg->debuglog_level >= 4) {
+                        msr_log(msr, 4, "Output filter: Processing partial response body (limit %lu)",
+                            msr->txcfg->of_limit);
+                    }
+                }
+            } else {
+                msr->resbody_length += buflen;
+            }
         }
 
+        /* Have we reached the end of the response? */
         if (APR_BUCKET_IS_EOS(bucket)) {
             eos_bucket = bucket;
 
             /* Inject content (append & non-buffering). */
-            if (msr->txcfg->content_injection_enabled && msr->content_append && msr->of_skipping) {
+            if ((msr->txcfg->content_injection_enabled) && (msr->content_append)
+                && (msr->of_skipping || msr->of_partial || start_skipping))
+            {
                 apr_bucket *bucket_ci = NULL;
 
                 bucket_ci = apr_bucket_heap_create(msr->content_append,
@@ -570,8 +694,36 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
      * we have in the context, but only if we actually
      * want to keep the response body.
      */
-    if (msr->of_skipping == 0) {
+    if ((msr->of_skipping == 0)&&(msr->of_partial == 0)) {
         ap_save_brigade(f, &msr->of_brigade, &bb_in, msr->mp);
+
+        /* Do we need to process a partial response? */
+        if (start_skipping) {
+            if (flatten_response_body(msr) < 0) {
+                return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            /* Process phase RESPONSE_BODY */
+            rc = modsecurity_process_phase(msr, PHASE_RESPONSE_BODY);
+            if (rc < 0) {
+                return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
+            }
+            if (rc > 0) {
+                int status = perform_interception(msr);
+                if (status != DECLINED) { /* DECLINED means we allow-ed the request. */
+                    return send_error_bucket(f, status);
+                }
+            }
+
+            /* Prepend content as necessary. */
+            prepend_content_to_of_brigade(msr, f);
+
+            if ((rc = send_of_brigade(msr, f)) != APR_SUCCESS) {
+                return rc;
+            }
+
+            msr->of_partial = 1;
+        }
 
         if (msr->of_done_reading == 0) {
             /* We are done for now. We will be called again with more data. */        
@@ -579,82 +731,57 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         }
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Output filter: Completed receiving response (length %lu).",
-                msr->resbody_length);
+            msr_log(msr, 4, "Output filter: Completed receiving response body (buffered %s - %lu bytes).",
+                (msr->of_partial ? "partial" : "full"), msr->resbody_length);
         }
-    } else {
+    } else { /* Not looking at response data. */
         if (msr->of_done_reading == 0) {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Output filter: Sending input brigade directly.");
+            }
+
             return ap_pass_brigade(f->next, bb_in);
         }
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Output filter: Completed receiving response.");
+            msr_log(msr, 4, "Output filter: Completed receiving response body (non-buffering).");
         }
     }
 
-    /* We're not coming back here. */
+    /* We've done our thing; remove us from the filter list. */
     msr->of_status = OF_STATUS_COMPLETE;
     ap_remove_output_filter(f);
 
-    if (msr->of_skipping == 0) {
-        /* We've done with reading, it's time to inspect the data. */
-        msr->resbody_status = RESBODY_STATUS_READ_BRIGADE;
-
-        if (msr->resbody_length + 1 <= 0) {
-            msr_log(msr, 1, "Output filter: Invalid response length: %lu", msr->resbody_length);
+    /* Process phase RESPONSE_BODY, but
+     * only if it hasn't been processed already.
+     */
+    if (msr->phase < PHASE_RESPONSE_BODY) {
+        if (flatten_response_body(msr) < 0) {
             return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        msr->resbody_data = apr_palloc(msr->mp, msr->resbody_length + 1); 
-        if (msr->resbody_data == NULL) {
-            msr_log(msr, 1, "Output filter: Response body data memory allocation failed. Asked for: %li",
-                msr->resbody_length + 1);
+        rc = modsecurity_process_phase(msr, PHASE_RESPONSE_BODY);
+        if (rc < 0) {
             return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        // TODO Why does the function below take pointer to length? Will it modify it?
-        // BR: Yes - The maximum length of the char array. On return, it is the actual length of the char array.
-        rc = apr_brigade_flatten(msr->of_brigade, msr->resbody_data, &msr->resbody_length);
-        if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "Output filter: Failed to flatten brigade (%i): %s", rc,
-                get_apr_error(r->pool, rc));
-            return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
-        }
-        msr->resbody_data[msr->resbody_length] = '\0';
-        msr->resbody_status = RESBODY_STATUS_READ;
-    }
-
-    /* Process phase RESPONSE_BODY */
-    rc = modsecurity_process_phase(msr, PHASE_RESPONSE_BODY);
-    if (rc < 0) {
-        return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
-    }
-    if (rc > 0) {
-        int status = perform_interception(msr);
-        if (status != DECLINED) { /* DECLINED means we allow-ed the request. */
-            return send_error_bucket(f, status);
-        }
-    }
-
-    if (msr->of_skipping == 0) {
-        record_time_checkpoint(msr, 3);
-
-        /* Inject content into response (prepend & buffering). */
-        if (msr->txcfg->content_injection_enabled && msr->content_prepend && (!msr->of_skipping)) {
-            apr_bucket *bucket_ci = NULL;
-
-            bucket_ci = apr_bucket_heap_create(msr->content_prepend,
-                msr->content_prepend_len, NULL, f->r->connection->bucket_alloc);
-            APR_BRIGADE_INSERT_HEAD(msr->of_brigade, bucket_ci);
-
-            if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Content Injection (b): Added content to top: %s",
-                    log_escape_nq_ex(msr->mp, msr->content_prepend, msr->content_prepend_len));
+        if (rc > 0) {
+            int status = perform_interception(msr);
+            if (status != DECLINED) { /* DECLINED means we allow-ed the request. */
+                return send_error_bucket(f, status);
             }
         }
+    }
+
+    /* Now send data down the filter stream
+     * (full-buffering only).
+     */
+    if ((msr->of_skipping == 0)&&(!msr->of_partial)) {
+        record_time_checkpoint(msr, 3);
+
+        prepend_content_to_of_brigade(msr, f);
 
         /* Inject content into response (append & buffering). */
-        if (msr->txcfg->content_injection_enabled && msr->content_append && (!msr->of_skipping)) {
+        if ((msr->txcfg->content_injection_enabled) && (msr->content_append)) {
             apr_bucket *bucket_ci = NULL;
 
             bucket_ci = apr_bucket_heap_create(msr->content_append,
@@ -667,22 +794,8 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
             }
         }
 
-        rc = ap_pass_brigade(f->next, msr->of_brigade);
-        if (rc != APR_SUCCESS) {
-            int log_level = 1;
-
-            if (APR_STATUS_IS_ECONNRESET(rc)) {
-                /* Message "Connection reset by peer" is common and not a sign
-                 * of something unusual. Hence we don't want to make a big deal
-                 * about it, logging at NOTICE level. Everything else we log
-                 * at ERROR level.
-                 */
-                log_level = 3;
-            }            
-
-            msr_log(msr, log_level, "Output filter: Error while forwarding response data (%i): %s",
-                    rc, get_apr_error(msr->mp, rc));
-
+        /* Send data down the filter stream. */
+        if ((rc = send_of_brigade(msr, f)) != APR_SUCCESS) {
             return rc;
         }
     }
@@ -692,9 +805,13 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         msr_log(msr, 4, "Output filter: Output forwarding complete.");
     }
 
-    if (msr->of_skipping == 0) {
+    if ((msr->of_skipping == 0)&&(msr->of_partial == 0)) {
         return APR_SUCCESS;
     } else {
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Output filter: Sending input brigade directly.");
+        }
+
         return ap_pass_brigade(f->next, bb_in);
     }
 }

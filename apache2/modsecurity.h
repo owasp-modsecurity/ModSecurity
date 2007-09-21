@@ -103,6 +103,9 @@ extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
 #define RESPONSE_BODY_DEFAULT_LIMIT             524288
 #define RESPONSE_BODY_HARD_LIMIT                1073741824L
 
+#define RESPONSE_BODY_LIMIT_ACTION_REJECT       0
+#define RESPONSE_BODY_LIMIT_ACTION_PARTIAL      1
+
 #if !defined(OS2) && !defined(WIN32) && !defined(BEOS) && !defined(NETWARE)
 #include "unixd.h"
 #define __SET_MUTEX_PERMS
@@ -213,6 +216,7 @@ struct modsec_rec {
     unsigned int         of_status;
     unsigned int         of_done_reading;
     unsigned int         of_skipping;
+    unsigned int         of_partial;
     unsigned int         of_is_error;
 
     unsigned int         resbody_status;
@@ -358,6 +362,7 @@ struct directory_config {
     long int             of_limit;
     apr_table_t         *of_mime_types;
     int                  of_mime_types_cleared;
+    int                  of_limit_action;
 
     const char          *debuglog_name;
     int                  debuglog_level;

@@ -1,7 +1,14 @@
+
 ?? ??? 2007 - 2.5.0-dev3
 ------------------------
 
- * ModSecurity will now process phases 3 and 4 when request processing
+ * Enable ModSecurity to look at partial response bodies. In previous
+   versions ModSecurity would respond with status code 500 when the
+   response body was too long. Now, if SecResponseBodyLimitAction is
+   set to "ProcessPartial", it will process the part of the response
+   body received up until that point but send the rest without buffering.
+
+ * ModSecurity will now process phases 3 and 4 even when request processing
    is interrupted (either by Apache - e.g. by responding with 400, 401
    or 403, or by ModSecurity itself).
 

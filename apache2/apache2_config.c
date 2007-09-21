@@ -43,6 +43,7 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     dcfg->debuglog_fd = NOT_SET_P;
 
     dcfg->of_limit = NOT_SET;
+    dcfg->of_limit_action = NOT_SET;
     dcfg->of_mime_types = NOT_SET_P;    
     dcfg->of_mime_types_cleared = NOT_SET;
 
@@ -216,6 +217,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
 
     merged->of_limit = (child->of_limit == NOT_SET
         ? parent->of_limit : child->of_limit);    
+    merged->of_limit_action = (child->of_limit_action == NOT_SET
+        ? parent->of_limit_action : child->of_limit_action);
 
     if (child->of_mime_types != NOT_SET_P) {
         /* Child added to the table */
@@ -423,6 +426,7 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->reqbody_limit == NOT_SET) dcfg->reqbody_limit = REQUEST_BODY_DEFAULT_LIMIT;
     if (dcfg->resbody_access == NOT_SET) dcfg->resbody_access = 0;
     if (dcfg->of_limit == NOT_SET) dcfg->of_limit = RESPONSE_BODY_DEFAULT_LIMIT;
+    if (dcfg->of_limit_action == NOT_SET) dcfg->of_limit_action = RESPONSE_BODY_LIMIT_ACTION_REJECT;
 
     if (dcfg->of_mime_types == NOT_SET_P) {
         dcfg->of_mime_types = apr_table_make(dcfg->mp, 3);
@@ -980,6 +984,19 @@ static const char *cmd_response_body_limit(cmd_parms *cmd, void *_dcfg, const ch
     return NULL;
 }
 
+static const char *cmd_response_body_limit_action(cmd_parms *cmd, void *_dcfg, const char *p1) {
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "ProcessPartial") == 0) dcfg->of_limit_action = RESPONSE_BODY_LIMIT_ACTION_PARTIAL;
+    else
+    if (strcasecmp(p1, "Reject") == 0) dcfg->of_limit_action = RESPONSE_BODY_LIMIT_ACTION_REJECT;
+    else
+    return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecResponseBodyLimitAction: %s", p1);
+
+    return NULL;
+}
+
 static const char *cmd_response_body_mime_type(cmd_parms *cmd, void *_dcfg, const char *_p1) {
     directory_config *dcfg = (directory_config *)_dcfg;
     char *p1 = apr_pstrdup(cmd->pool, _p1);
@@ -1497,6 +1514,14 @@ const command_rec module_directives[] = {
     AP_INIT_TAKE1 (
         "SecResponseBodyLimit",
         cmd_response_body_limit,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecResponseBodyLimitAction",
+        cmd_response_body_limit_action,
         NULL,
         CMD_SCOPE_ANY,
         "" // TODO
