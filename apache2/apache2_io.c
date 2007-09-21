@@ -467,7 +467,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                 break;
         }
 
-        // If injecting content unset headers now.
+        /* If injecting content unset headers now. */
         if (msr->txcfg->content_injection_enabled == 0) {
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Content Injection: Not enabled.");
@@ -489,7 +489,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
             }
         }
           
-        // Content injection (prepend & non-buffering).
+        /* Content injection (prepend & non-buffering). */
         if (msr->txcfg->content_injection_enabled && msr->content_prepend && msr->of_skipping) {
             apr_bucket *bucket_ci = apr_bucket_heap_create(msr->content_prepend,
                 msr->content_prepend_len, NULL, f->r->connection->bucket_alloc);
@@ -548,7 +548,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         if (APR_BUCKET_IS_EOS(bucket)) {
             eos_bucket = bucket;
 
-            // Inject content (append & non-buffering).
+            /* Inject content (append & non-buffering). */
             if (msr->txcfg->content_injection_enabled && msr->content_append && msr->of_skipping) {
                 apr_bucket *bucket_ci = NULL;
 
@@ -639,7 +639,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
     if (msr->of_skipping == 0) {
         record_time_checkpoint(msr, 3);
 
-        // Inject content into response (prepend & buffering).
+        /* Inject content into response (prepend & buffering). */
         if (msr->txcfg->content_injection_enabled && msr->content_prepend && (!msr->of_skipping)) {
             apr_bucket *bucket_ci = NULL;
 
@@ -653,7 +653,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
             }
         }
 
-        // Inject content into response (append & buffering).
+        /* Inject content into response (append & buffering). */
         if (msr->txcfg->content_injection_enabled && msr->content_append && (!msr->of_skipping)) {
             apr_bucket *bucket_ci = NULL;
 
