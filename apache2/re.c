@@ -614,12 +614,18 @@ void msre_engine_destroy(msre_engine *engine) {
 #define NEXT_RULE   2
 #define SKIP_RULES  3
 
+
+
 /**
  * Default implementation of the ruleset phase processing; it processes
  * the rules in the ruleset attached to the currently active
  * transaction phase.
  */
+#if defined(PERFORMANCE_MEASUREMENT)
+static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_rec *msr) {
+#else
 apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) {
+#endif
     apr_array_header_t *arr = NULL;
     msre_rule **rules;
     apr_status_t rc;
@@ -657,6 +663,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msre_rule *rule = rules[i];
+        apr_time_t time1 = 0;
 
         /* NEXT_CHAIN is used when one of the rules in a chain
          * fails to match and then we need to skip the remaining
@@ -712,7 +719,15 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                     rule, (fn ? fn : ""), (id ? id : ""), (rev ? rev : ""));
         }
 
+#if defined(PERFORMANCE_MEASUREMENT)
+        time1 = apr_time_now();
+#endif
+
         rc = msre_rule_process(rule, msr);
+
+#if defined(PERFORMANCE_MEASUREMENT)
+        rule->execution_time += (apr_time_now() - time1);
+#endif
 
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Rule returned %i.", rc);
@@ -795,6 +810,63 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
 
     return 0;
 }
+
+#if defined(PERFORMANCE_MEASUREMENT)
+apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) {
+    apr_array_header_t *arr = NULL;
+    msre_rule **rules = NULL;
+    apr_status_t rc;
+    apr_time_t time1;
+    int i;
+
+    switch (msr->phase) {
+        case PHASE_REQUEST_HEADERS :
+            arr = ruleset->phase_request_headers;
+            break;
+        case PHASE_REQUEST_BODY :
+            arr = ruleset->phase_request_body;
+            break;
+        case PHASE_RESPONSE_HEADERS :
+            arr = ruleset->phase_response_headers;
+            break;
+        case PHASE_RESPONSE_BODY :
+            arr = ruleset->phase_response_body;
+            break;
+        case PHASE_LOGGING :
+            arr = ruleset->phase_logging;
+            break;
+        default :
+            msr_log(msr, 1, "Internal Error: Invalid phase %d", msr->phase);
+            return -1;
+    }
+
+    rules = (msre_rule **)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        msre_rule *rule = rules[i];
+        rule->execution_time = 0;
+    }    
+
+    time1 = apr_time_now();
+
+    for (i = 0; i < 10000; i++) {
+        rc = msre_ruleset_process_phase_(ruleset, msr);
+    }
+
+    msr_log(msr, 1, "Phase %i: %" APR_TIME_T_FMT " usec", msr->phase, ((apr_time_now() - time1) / 10000));
+
+    rules = (msre_rule **)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        msre_rule *rule = rules[i];
+        msr_log(msr, 1, "Rule %x [id \"%s\"][file \"%s\"][line \"%d\"]: %lu usec", rule,
+            ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+            rule->filename != NULL ? rule->filename : "-",
+            rule->line_num,
+            (rule->execution_time / 10000));
+    }
+    
+    return rc;
+}
+#endif
 
 /**
  * Creates a ruleset that will be handled by the default
@@ -1241,7 +1313,9 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
     if (msr->txcfg->debuglog_level >= 4) {
         time_before_regex = apr_time_now();
     }
+
     rc = rule->op_metadata->execute(msr, rule, var, &my_error_msg);
+
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Operator completed in %" APR_TIME_T_FMT " usec.",
             (apr_time_now() - time_before_regex));

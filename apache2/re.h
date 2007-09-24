@@ -123,6 +123,9 @@ struct msre_rule {
     
     msre_ruleset            *ruleset;
     msre_rule               *chain_starter;
+#if defined(PERFORMANCE_MEASUREMENT)
+    unsigned int             execution_time;
+#endif
 };
 
 msre_rule DSOLOCAL *msre_rule_create(msre_ruleset *ruleset,
