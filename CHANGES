@@ -2,6 +2,9 @@
 ?? ??? 2007 - 2.5.0-dev3
 ------------------------
 
+ * Fixed deprecatevar:var=N/S action so that it decrements N every S seconds
+   as documented instead of decrementing by a rate.
+
  * Enable ModSecurity to look at partial response bodies. In previous
    versions ModSecurity would respond with status code 500 when the
    response body was too long. Now, if SecResponseBodyLimitAction is

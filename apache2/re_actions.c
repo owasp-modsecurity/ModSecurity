@@ -1147,7 +1147,7 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
      * time elapsed since the last update.
      */
     new_value = current_value -
-        ((current_time - last_update_time) * atoi(var_value) / atoi(s));
+        (atoi(var_value) * ((current_time - last_update_time) / atoi(s)));
     if (new_value < 0) new_value = 0;
 
     /* Only change the value if it differs. */
