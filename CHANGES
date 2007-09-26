@@ -17,11 +17,11 @@
    is interrupted (either by Apache - e.g. by responding with 400, 401
    or 403, or by ModSecurity itself).
 
- * Fix the base64decode transformation function to not return extra
+ * Fixed the base64decode transformation function to not return extra
    characters at the end.
 
- * Fixed potential corruption at end of strings after using base64Decode
-   (APR-Util issue). TODO make a better CHANGELOG entry ;)
+ * Removed potential for extra characters to be appended to the value when
+   using base64Decode.
 
  * Return from the output filter with an error in addition to setting
    up the HTTP error status in the output data.
