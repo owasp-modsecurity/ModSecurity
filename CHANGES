@@ -2,6 +2,8 @@
 ?? ??? 2007 - 2.5.0-dev3
 ------------------------
 
+ * Do not process subrequests in phase 2.
+
  * Fixed deprecatevar:var=N/S action so that it decrements N every S seconds
    as documented instead of decrementing by a rate.
 
