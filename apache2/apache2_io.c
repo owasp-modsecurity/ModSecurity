@@ -30,6 +30,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
     msc_data_chunk *chunk = NULL;
     apr_bucket *bucket;
     apr_status_t rc;
+    char *my_error_msg = NULL;
 
     if (msr == NULL) {
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, f->r->server,
@@ -55,16 +56,20 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 
     if (msr->if_started_forwarding == 0) {
         msr->if_started_forwarding = 1;
-        rc = modsecurity_request_body_retrieve_start(msr);
+        rc = modsecurity_request_body_retrieve_start(msr, &my_error_msg);
         if (rc == -1) {
-            // TODO err
+            if (my_error_msg != NULL) {
+                msr_log(msr, 1, "%s", my_error_msg);
+            }
             return APR_EGENERAL;
         }
     }
 
-    rc = modsecurity_request_body_retrieve(msr, &chunk, (unsigned int)nbytes);
+    rc = modsecurity_request_body_retrieve(msr, &chunk, (unsigned int)nbytes, &my_error_msg);
     if (rc == -1) {
-        // TODO err
+        if (my_error_msg != NULL) {
+            msr_log(msr, 1, "%s", my_error_msg);
+        }
         return APR_EGENERAL;
     }
 
@@ -151,8 +156,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
         msr_log(msr, 4, "Input filter: Reading request body.");
     }
 
-    if (modsecurity_request_body_start(msr) < 0) {
-        // TODO err
+    if (modsecurity_request_body_start(msr, error_msg) < 0) {
         return -1;
     }
 
@@ -169,25 +173,18 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
              */
             switch(rc) {
                 case APR_TIMEUP :
+                    *error_msg = apr_psprintf(msr->mp, "Error reading request body: %s", get_apr_error(msr->mp, rc));
                     return -4;
-                    break;
                 case -3 :
                     *error_msg = apr_psprintf(msr->mp, "Error reading request body: HTTP Error 413 - Request entity too large. (Most likely.)");
-                    rc = -3;
-                    break;
+                    return -3;
                 case APR_EGENERAL :
                     *error_msg = apr_psprintf(msr->mp, "Error reading request body: Client went away.");
-                    rc = -2;
-                    break;
+                    return -2;
                 default :
                     *error_msg = apr_psprintf(msr->mp, "Error reading request body: %s", get_apr_error(msr->mp, rc));
-                    rc = -1;
-                    break;
+                    return -1;
             }
-
-            if (*error_msg) msr_log(msr, 1, "%s", *error_msg);
-
-            return rc;
         }
 
         /* Loop through the buckets in the brigade in order
@@ -202,8 +199,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
             rc = apr_bucket_read(bucket, &buf, &buflen, APR_BLOCK_READ);
             if (rc != APR_SUCCESS) {   
-                msr_log(msr, 1, "Input filter: Failed reading input / bucket (%i): %s",
-                    rc, get_apr_error(msr->mp, rc));
+                *error_msg = apr_psprintf(msr->mp, "Failed reading input / bucket (%i): %s", rc, get_apr_error(msr->mp, rc));
                 return -1;
             }
 
@@ -220,8 +216,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
             }
 
             if (buflen != 0) {
-                if (modsecurity_request_body_store(msr, buf, buflen) < 0) {
-                    // TODO err
+                if (modsecurity_request_body_store(msr, buf, buflen, error_msg) < 0) {
                     return -1;
                 }
 
@@ -236,7 +231,8 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
         apr_brigade_cleanup(bb_in);
     } while(!seen_eos);
 
-    modsecurity_request_body_end(msr);
+    // TODO: Why ignore the return code here?
+    modsecurity_request_body_end(msr, error_msg);
 
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Input filter: Completed receiving request body (length %lu).",
@@ -250,41 +246,6 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
 
 /* -- Output filter -- */
-
-/**
- * Sends a brigade with an error bucket down the filter chain.
- */
-static apr_status_t send_error_bucket(ap_filter_t *f, int status) {
-    apr_bucket_brigade *brigade = NULL;
-    apr_bucket *bucket = NULL;
-
-    /* Set the status line explicitly for the error document */
-    f->r->status_line = ap_get_status_line(status);
-
-    brigade = apr_brigade_create(f->r->pool, f->r->connection->bucket_alloc);
-    if (brigade == NULL) return APR_EGENERAL;
-
-    bucket = ap_bucket_error_create(status, NULL, f->r->pool, f->r->connection->bucket_alloc);
-    if (bucket == NULL) return APR_EGENERAL;
-
-    APR_BRIGADE_INSERT_TAIL(brigade, bucket);
-
-    bucket = apr_bucket_eos_create(f->r->connection->bucket_alloc);
-    if (bucket == NULL) return APR_EGENERAL;
-
-    APR_BRIGADE_INSERT_TAIL(brigade, bucket);
-
-    ap_pass_brigade(f->next, brigade);
-
-    /* NOTE:
-     * It may not matter what we do from the filter as it may be too
-     * late to even generate an error (already sent to client).  Nick Kew
-     * recommends to return APR_EGENERAL in hopes that the handler in control
-     * will notice and do The Right Thing.  So, that is what we do now.
-     */
-
-    return APR_EGENERAL;
-}
 
 /**
  * Examines the configuration and the response MIME type
@@ -505,7 +466,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, f->r->server,
             "ModSecurity: Internal Error: msr is null in output filter.");
         ap_remove_output_filter(f);
-        return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
+        return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
     }
 
     msr->r = r;
@@ -528,13 +489,13 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         rc = modsecurity_process_phase(msr, PHASE_RESPONSE_HEADERS);
         if (rc < 0) { /* error */
             ap_remove_output_filter(f);
-            return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
+            return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
         }
         if (rc > 0) { /* transaction needs to be interrupted */
             int status = perform_interception(msr);
             if (status != DECLINED) { /* DECLINED means we allow-ed the request. */
                 ap_remove_output_filter(f);
-                return send_error_bucket(f, status);
+                return send_error_bucket(msr, f, status);
             }
         }
 
@@ -547,7 +508,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                 ap_remove_output_filter(f);
                 msr->of_status = OF_STATUS_COMPLETE;
                 msr->resbody_status = RESBODY_STATUS_ERROR;
-                return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
+                return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
             case 0 :
                 /* We do not want to observe this response body
                  * but we need to remain attached to observe
@@ -626,7 +587,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                     rc, get_apr_error(r->pool, rc));
 
                 ap_remove_output_filter(f);
-                return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
+                return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
             }
 
             if (msr->txcfg->debuglog_level >= 9) {
@@ -649,7 +610,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                     msr->resbody_status = RESBODY_STATUS_PARTIAL;
 
                     ap_remove_output_filter(f);
-                    return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
+                    return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
                 } else {
                     /* Process partial response. */
                     start_skipping = 1;
@@ -699,18 +660,18 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         /* Do we need to process a partial response? */
         if (start_skipping) {
             if (flatten_response_body(msr) < 0) {
-                return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
+                return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
             }
 
             /* Process phase RESPONSE_BODY */
             rc = modsecurity_process_phase(msr, PHASE_RESPONSE_BODY);
             if (rc < 0) {
-                return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
+                return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
             }
             if (rc > 0) {
                 int status = perform_interception(msr);
                 if (status != DECLINED) { /* DECLINED means we allow-ed the request. */
-                    return send_error_bucket(f, status);
+                    return send_error_bucket(msr, f, status);
                 }
             }
 
@@ -756,17 +717,17 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
      */
     if (msr->phase < PHASE_RESPONSE_BODY) {
         if (flatten_response_body(msr) < 0) {
-            return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
+            return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
         }
 
         rc = modsecurity_process_phase(msr, PHASE_RESPONSE_BODY);
         if (rc < 0) {
-            return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
+            return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
         }
         if (rc > 0) {
             int status = perform_interception(msr);
             if (status != DECLINED) { /* DECLINED means we allow-ed the request. */
-                return send_error_bucket(f, status);
+                return send_error_bucket(msr, f, status);
             }
         }
     }

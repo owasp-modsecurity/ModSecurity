@@ -465,6 +465,7 @@ void sec_audit_logger(modsec_rec *msr) {
             unsigned int offset = 0, last_offset = 0;
             msc_arg *nextarg = NULL;
             int sanitise = 0; /* IMP1 Use constants for "sanitise" values. */
+            char *my_error_msg = NULL;
 
             sorted_args = apr_array_make(msr->mp, 25, sizeof(const msc_arg *));
 
@@ -521,9 +522,9 @@ void sec_audit_logger(modsec_rec *msr) {
              * sanitise data in pieces.
              */
 
-            rc = modsecurity_request_body_retrieve_start(msr);
+            rc = modsecurity_request_body_retrieve_start(msr, &my_error_msg);
             if (rc < 0) {
-                msr_log(msr, 1, "Audit log: Failed retrieving request body.");
+                msr_log(msr, 1, "Audit log: %s", my_error_msg);
             } else {
                 msc_data_chunk *chunk = NULL;
                 unsigned int chunk_offset = 0;
@@ -534,7 +535,7 @@ void sec_audit_logger(modsec_rec *msr) {
                 sec_auditlog_write(msr, text, strlen(text));
 
                 for(;;) {
-                    rc = modsecurity_request_body_retrieve(msr, &chunk, -1);
+                    rc = modsecurity_request_body_retrieve(msr, &chunk, -1, &my_error_msg);
                     if (chunk != NULL) {
                         /* Anything greater than 1 means we have more data to sanitise. */
                         while (sanitise > 1) {
@@ -594,7 +595,10 @@ void sec_audit_logger(modsec_rec *msr) {
                         chunk_offset += chunk->length;
                     }
 
-                    if (rc <= 0) break;
+                    if (rc <= 0) {
+                        msr_log(msr, 1, "Audit log: %s", my_error_msg);
+                        break;
+                    }
                 }
 
                 modsecurity_request_body_retrieve_end(msr);

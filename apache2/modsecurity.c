@@ -136,6 +136,7 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
     apr_table_entry_t *te;
     int collect_garbage = 0;
     int i;
+    char *my_error_msg = NULL;
     
     if (msr == NULL) return APR_SUCCESS;
 
@@ -167,7 +168,11 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
     if (msr->xml != NULL) xml_cleanup(msr);
     #endif
 
-    modsecurity_request_body_clear(msr);
+    // TODO: Why do we ignore return code here?
+    modsecurity_request_body_clear(msr, &my_error_msg);
+    if (my_error_msg != NULL) {
+        msr_log(msr, 1, "%s", my_error_msg);
+    }
 
     return APR_SUCCESS;
 }
@@ -431,7 +436,7 @@ static apr_status_t modsecurity_process_phase_logging(modsec_rec *msr) {
             break;
 
         default :
-            return HTTP_INTERNAL_SERVER_ERROR;
+            msr_log(msr, 1, "Internal error: Could not determine if auditing is needed, so forcing auditing.");
             break;
     }
 

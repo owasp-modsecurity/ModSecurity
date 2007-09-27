@@ -9,6 +9,7 @@
  *
  */
 #include "modsecurity.h"
+#include "apache2.h"
 #include "pdf_protect.h"
 
 #include <ctype.h>
@@ -200,23 +201,6 @@ static int verify_token(modsec_rec *msr, const char *token, char **error_msg) {
 /**
  *
  */
-static apr_status_t send_error_bucket(ap_filter_t *f, int status) {
-    apr_bucket_brigade *brigade = NULL;
-    apr_bucket *bucket = NULL;
-
-    brigade = apr_brigade_create(f->r->pool, f->r->connection->bucket_alloc);
-    if (brigade == NULL) return APR_EGENERAL;
-    bucket = ap_bucket_error_create(status, NULL, f->r->pool, f->r->connection->bucket_alloc);
-    if (bucket == NULL) return APR_EGENERAL;
-    APR_BRIGADE_INSERT_TAIL(brigade, bucket);
-
-    f->r->connection->keepalive = AP_CONN_CLOSE;
-    return ap_pass_brigade(f->next, brigade);
-}
-
-/**
- *
- */
 apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
     modsec_rec *msr = (modsec_rec *)f->ctx;
 
@@ -226,7 +210,7 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
         ap_remove_output_filter(f);
 
-        return send_error_bucket(f, HTTP_INTERNAL_SERVER_ERROR);
+        return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
     }
 
     if (msr->txcfg->pdfp_enabled == 1) {
@@ -328,7 +312,7 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
                     apr_table_set(r->headers_out, "Location", new_uri);
 
-                    return send_error_bucket(f, REDIRECT_STATUS);
+                    return send_error_bucket(msr, f, REDIRECT_STATUS);
                 }
             } else { /* Token found. */
                 char *my_error_msg = NULL;

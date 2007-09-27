@@ -69,6 +69,8 @@ apr_status_t DSOLOCAL read_request_body(modsec_rec *msr, char **error_msg);
 
 int DSOLOCAL perform_interception(modsec_rec *msr);
 
+apr_status_t DSOLOCAL send_error_bucket(modsec_rec *msr, ap_filter_t *f, int status);
+
 int DSOLOCAL apache2_exec(modsec_rec *msr, const char *command, const char **argv, char **output);
 
 void DSOLOCAL record_time_checkpoint(modsec_rec *msr, int checkpoint_no);

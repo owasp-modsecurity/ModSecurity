@@ -503,14 +503,14 @@ apr_status_t DSOLOCAL modsecurity_process_phase(modsec_rec *msr, int phase);
 
 /* Request body functions */
 
-apr_status_t DSOLOCAL modsecurity_request_body_start(modsec_rec *msr);
+apr_status_t DSOLOCAL modsecurity_request_body_start(modsec_rec *msr, char **error_msg);
 
 apr_status_t DSOLOCAL modsecurity_request_body_store(modsec_rec *msr,
-    const char *data, apr_size_t length);
+    const char *data, apr_size_t length, char **error_msg);
 
-apr_status_t DSOLOCAL modsecurity_request_body_end(modsec_rec *msr);
+apr_status_t DSOLOCAL modsecurity_request_body_end(modsec_rec *msr, char **error_msg);
 
-apr_status_t DSOLOCAL modsecurity_request_body_retrieve_start(modsec_rec *msr);
+apr_status_t DSOLOCAL modsecurity_request_body_retrieve_start(modsec_rec *msr, char **error_msg);
 
 apr_status_t DSOLOCAL modsecurity_request_body_retrieve_end(modsec_rec *msr);
 
@@ -519,7 +519,7 @@ apr_status_t DSOLOCAL modsecurity_request_body_retrieve_end(modsec_rec *msr);
  * nbytes will contain the number of bytes stored in the buffer.
  */
 apr_status_t DSOLOCAL modsecurity_request_body_retrieve(modsec_rec *msr, msc_data_chunk **chunk,
-    long int nbytes);
+    long int nbytes, char **error_msg);
 
 void DSOLOCAL msc_add(modsec_rec *msr, int level, msre_actionset *actionset,
     const char *action_message, const char *rule_message);
@@ -527,6 +527,6 @@ void DSOLOCAL msc_add(modsec_rec *msr, int level, msre_actionset *actionset,
 void DSOLOCAL msc_alert(modsec_rec *msr, int level, msre_actionset *actionset, const char *action_message,
     const char *rule_message);
 
-apr_status_t DSOLOCAL modsecurity_request_body_clear(modsec_rec *msr);
+apr_status_t DSOLOCAL modsecurity_request_body_clear(modsec_rec *msr, char **error_msg);
 
 #endif

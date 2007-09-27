@@ -2,6 +2,9 @@
 ?? ??? 2007 - 2.5.0-dev3
 ------------------------
 
+ * Situations where ModSecurity will intercept, generate an error or log
+   an alert to the debug log are now marked as 'relevant'.
+
  * Do not process subrequests in phase 2-4.
 
  * Fixed deprecatevar:var=N/S action so that it decrements N every S seconds

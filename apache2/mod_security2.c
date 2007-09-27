@@ -639,14 +639,22 @@ static int hook_request_late(request_rec *r) {
     if (rc < 0) {
         switch(rc) {
             case -1 :
-                msr_log(msr, 1, "%s", my_error_msg);
+                if ((my_error_msg != NULL)||(msr->is_relevant == 0)) {
+                    msr_log(msr, 1, "%s", my_error_msg);
+                }
                 return HTTP_INTERNAL_SERVER_ERROR;
                 break;
             case -4 : /* Timeout. */
+                if ((my_error_msg != NULL)||(msr->is_relevant == 0)) {
+                    msr_log(msr, 4, "%s", my_error_msg);
+                }
                 r->connection->keepalive = AP_CONN_CLOSE;
                 return HTTP_REQUEST_TIME_OUT;
                 break;
             case -5 : /* Request body limit reached. */
+                if ((my_error_msg != NULL)||(msr->is_relevant == 0)) {
+                    msr_log(msr, 1, "%s", my_error_msg);
+                }
                 r->connection->keepalive = AP_CONN_CLOSE;
                 return HTTP_REQUEST_ENTITY_TOO_LARGE;
                 break;
