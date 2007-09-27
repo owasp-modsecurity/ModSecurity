@@ -72,7 +72,7 @@ int perform_interception(modsec_rec *msr) {
     }
 
     if (msr->phase > 4) {
-        msr_log(msr, 1, "Internal Error: Asked to intercept request in phase %i.", msr->phase);
+        msr_log(msr, 1, "Internal Error: Asked to intercept request in phase %d.", msr->phase);
         msr->was_intercepted = 0;
         return DECLINED;
     }
@@ -80,7 +80,7 @@ int perform_interception(modsec_rec *msr) {
     /* OK, we're good to go. */
 
     actionset = msr->intercept_actionset;
-    phase_text = apr_psprintf(msr->mp, " (phase %i)", msr->phase);
+    phase_text = apr_psprintf(msr->mp, " (phase %d)", msr->phase);
 
     /* By default we log at level 1 but we switch to 4
      * if a nolog action was used or this is not the initial request
@@ -91,7 +91,7 @@ int perform_interception(modsec_rec *msr) {
     /* Pause the request first (if configured and the initial request). */
     if (actionset->intercept_pause) {
         msr_log(msr, (log_level > 3 ? log_level : log_level + 1), "Pausing transaction for "
-            "%i msec.", actionset->intercept_pause);
+            "%d msec.", actionset->intercept_pause);
         /* apr_sleep accepts microseconds */
         apr_sleep((apr_interval_time_t)(actionset->intercept_pause * 1000));
     }
@@ -101,13 +101,13 @@ int perform_interception(modsec_rec *msr) {
         case ACTION_DENY :
             if (actionset->intercept_status != 0) {
                 status = actionset->intercept_status;
-                message = apr_psprintf(msr->mp, "Access denied with code %i%s.",
+                message = apr_psprintf(msr->mp, "Access denied with code %d%s.",
                     status, phase_text);
             } else {
                 log_level = 1;
                 status = HTTP_INTERNAL_SERVER_ERROR;
                 message = apr_psprintf(msr->mp, "Access denied with code 500%s "
-                    "(Internal Error: Invalid status code requested %i).",
+                    "(Internal Error: Invalid status code requested %d).",
                     phase_text, actionset->intercept_status);
             }
             break;
@@ -189,7 +189,7 @@ int perform_interception(modsec_rec *msr) {
                 status = HTTP_MOVED_TEMPORARILY;
             }
             message = apr_psprintf(msr->mp, "Access denied with redirection to %s using "
-                "status %i%s.",
+                "status %d%s.",
                 log_escape_nq(msr->mp, actionset->intercept_uri), status,
                 phase_text);
             break;
@@ -204,7 +204,7 @@ int perform_interception(modsec_rec *msr) {
             log_level = 1;
             status = HTTP_INTERNAL_SERVER_ERROR;
             message = apr_psprintf(msr->mp, "Access denied with code 500%s "
-                "(Internal Error: invalid interception action %i).",
+                "(Internal Error: invalid interception action %d).",
                 phase_text, actionset->intercept_action);
             break;
     }
@@ -780,7 +780,7 @@ static void sec_guardian_logger(request_rec *r, request_rec *origr, modsec_rec *
      * The fields SESSION_ID, MODSEC_MESSAGE, and MODSEC_RATING are not used at the moment.
      */
 
-    str2 = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT " %" APR_TIME_T_FMT " \"%s\" %i",
+    str2 = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT " %" APR_TIME_T_FMT " \"%s\" %d",
         duration, apr_time_sec(duration), log_escape(msr->mp, modsec_message), modsec_rating);
     if (str2 == NULL) return;
 
@@ -801,7 +801,7 @@ static void sec_guardian_logger(request_rec *r, request_rec *origr, modsec_rec *
 
     limit = limit - strlen(str2) - 5;
     if (limit <= 0) {
-        msr_log(msr, 1, "Audit Log: Atomic PIPE write buffer too small: %i", PIPE_BUF);
+        msr_log(msr, 1, "Audit Log: Atomic PIPE write buffer too small: %d", PIPE_BUF);
         return;
     }
 

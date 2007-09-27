@@ -67,7 +67,7 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
     /* Compile pattern */
     regex = msc_pregcomp(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset);
     if (regex == NULL) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (pos %i): %s",
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (pos %d): %s",
             erroffset, errptr);
         return 0;
     }
@@ -135,14 +135,14 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         for(i = 0; i < rc; i++) {
             msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
             if (s == NULL) return -1;
-            s->name = apr_psprintf(msr->mp, "%i", i);
+            s->name = apr_psprintf(msr->mp, "%d", i);
             s->value = apr_pstrmemdup(msr->mp,
                 target + ovector[2*i], ovector[2*i + 1] - ovector[2*i]);
             s->value_len = (ovector[2*i + 1] - ovector[2*i]);
             if ((s->name == NULL)||(s->value == NULL)) return -1;
             apr_table_setn(msr->tx_vars, s->name, (void *)s);
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Adding regex subexpression to TXVARS (%i): %s", i,
+                msr_log(msr, 9, "Adding regex subexpression to TXVARS (%d): %s", i,
                     log_escape_nq_ex(msr->mp, s->value, s->value_len));
             }
         }
@@ -150,7 +150,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         /* Unset the remaining ones (from previous invocations). */
         for(i = rc; i <= 9; i++) {
             char buf[24];
-            apr_snprintf(buf, sizeof(buf), "%i", i);
+            apr_snprintf(buf, sizeof(buf), "%d", i);
             apr_table_unset(msr->tx_vars, buf);
         }
     }
@@ -352,7 +352,7 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             /* Unset the remaining ones (from previous invocations). */
             for(i = rc; i <= 9; i++) {
                 char buf[2];
-                apr_snprintf(buf, sizeof(buf), "%i", i);
+                apr_snprintf(buf, sizeof(buf), "%d", i);
                 apr_table_unset(msr->tx_vars, buf);
             }
         }
@@ -941,7 +941,7 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
     /* Construct the host name we want to resolve. */
     if (sscanf(target, "%d.%d.%d.%d", &h0, &h1, &h2, &h3) == 4) {
         /* IPv4 address */
-        name_to_check = apr_psprintf(msr->mp, "%i.%i.%i.%i.%s", h3, h2, h1, h0, rule->op_param);
+        name_to_check = apr_psprintf(msr->mp, "%d.%d.%d.%d.%s", h3, h2, h1, h0, rule->op_param);
     } else {
         /* Assume the input is a domain name. */
         name_to_check = apr_psprintf(msr->mp, "%s.%s", target, rule->op_param);
@@ -1032,7 +1032,7 @@ static int msre_op_validateByteRange_init(msre_rule *rule, char **error_msg) {
             /* Single value. */
             int x = atoi(p);
             if ((x < 0)||(x > 255)) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range value: %i", x);
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range value: %d", x);
                 return 0;
             }
             table[x>>3] = (table[x>>3] | (1 << (x & 0x7)));
@@ -1042,16 +1042,16 @@ static int msre_op_validateByteRange_init(msre_rule *rule, char **error_msg) {
             int end = atoi(s + 1);
 
             if ((start < 0)||(start > 255)) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range start value: %i",
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range start value: %d",
                     start);
                 return 0;
             }
             if ((end < 0)||(end > 255)) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range end value: %i", end);
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range end value: %d", end);
                 return 0;
             }
             if (start > end) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range: %i-%i", start, end);
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range: %d-%d", start, end);
                 return 0;
             }
 
@@ -1089,7 +1089,7 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
         int x = ((unsigned char *)var->value)[i];
         if (!(table[x >> 3] & (1 << (x & 0x7)))) {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Value %i in %s outside range: %s", x, var->name, rule->op_param);
+                msr_log(msr, 9, "Value %d in %s outside range: %s", x, var->name, rule->op_param);
             }
             count++;
         }
@@ -1097,7 +1097,7 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
 
     if (count == 0) return 0; /* Valid - no match. */
 
-    *error_msg = apr_psprintf(msr->mp, "Found %i byte(s) in %s outside range: %s.",
+    *error_msg = apr_psprintf(msr->mp, "Found %d byte(s) in %s outside range: %s.",
         count, var->name, rule->op_param);
 
     return 1; /* Invalid - match.*/
@@ -1161,7 +1161,7 @@ static int msre_op_validateUrlEncoding_execute(modsec_rec *msr, msre_rule *rule,
             break;
         case -1 :
         default :
-            *error_msg = apr_psprintf(msr->mp, "Invalid URL Encoding: Internal Error (rc = %i)", rc);
+            *error_msg = apr_psprintf(msr->mp, "Invalid URL Encoding: Internal Error (rc = %d)", rc);
             return -1;
             break;
 
@@ -1330,7 +1330,7 @@ static int msre_op_eq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator EQ match: %i.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator EQ match: %d.", right);
         /* Match. */
         return 1;
     }
@@ -1359,7 +1359,7 @@ static int msre_op_gt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator GT match: %i.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator GT match: %d.", right);
         /* Match. */
         return 1;
     }
@@ -1388,7 +1388,7 @@ static int msre_op_lt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator LT match: %i.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator LT match: %d.", right);
         /* Match. */
         return 1;
     }
@@ -1417,7 +1417,7 @@ static int msre_op_ge_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator GE match: %i.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator GE match: %d.", right);
         /* Match. */
         return 1;
     }
@@ -1446,7 +1446,7 @@ static int msre_op_le_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator LE match: %i.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator LE match: %d.", right);
         /* Match. */
         return 1;
     }

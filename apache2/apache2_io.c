@@ -50,7 +50,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
     }
 
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Input filter: Forwarding input: mode=%i, block=%i, nbytes=%" APR_OFF_T_FMT
+        msr_log(msr, 4, "Input filter: Forwarding input: mode=%d, block=%d, nbytes=%" APR_OFF_T_FMT
             " (f %x, r %x).", mode, block, nbytes, f, f->r);
     }
 
@@ -199,12 +199,12 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
             rc = apr_bucket_read(bucket, &buf, &buflen, APR_BLOCK_READ);
             if (rc != APR_SUCCESS) {   
-                *error_msg = apr_psprintf(msr->mp, "Failed reading input / bucket (%i): %s", rc, get_apr_error(msr->mp, rc));
+                *error_msg = apr_psprintf(msr->mp, "Failed reading input / bucket (%d): %s", rc, get_apr_error(msr->mp, rc));
                 return -1;
             }
 
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Input filter: Bucket type %s contains %i bytes.",
+                msr_log(msr, 9, "Input filter: Bucket type %s contains %d bytes.",
                     bucket->type->name, buflen);
             }
 
@@ -390,7 +390,7 @@ static apr_status_t send_of_brigade(modsec_rec *msr, ap_filter_t *f) {
         }
 
         if (msr->txcfg->debuglog_level >= log_level) {
-            msr_log(msr, log_level, "Output filter: Error while forwarding response data (%i): %s",
+            msr_log(msr, log_level, "Output filter: Error while forwarding response data (%d): %s",
                 rc, get_apr_error(msr->mp, rc));
         }
 
@@ -440,7 +440,7 @@ static int flatten_response_body(modsec_rec *msr) {
 
     rc = apr_brigade_flatten(msr->of_brigade, msr->resbody_data, &msr->resbody_length);
     if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "Output filter: Failed to flatten brigade (%i): %s", rc,
+        msr_log(msr, 1, "Output filter: Failed to flatten brigade (%d): %s", rc,
             get_apr_error(msr->mp, rc));
         return -1;
     }
@@ -583,7 +583,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                 msr->of_status = OF_STATUS_COMPLETE;
                 msr->resbody_status = RESBODY_STATUS_ERROR;
 
-                msr_log(msr, 1, "Output filter: Failed to read bucket (rc %i): %s",
+                msr_log(msr, 1, "Output filter: Failed to read bucket (rc %d): %s",
                     rc, get_apr_error(r->pool, rc));
 
                 ap_remove_output_filter(f);
@@ -591,7 +591,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
             }
 
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Output filter: Bucket type %s contains %i bytes.",
+                msr_log(msr, 9, "Output filter: Bucket type %s contains %" APR_SIZE_T_FMT " bytes.",
                     bucket->type->name, buflen);
             }
 

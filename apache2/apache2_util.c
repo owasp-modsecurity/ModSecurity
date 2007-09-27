@@ -86,7 +86,7 @@ int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char *
 
     procnew = apr_pcalloc(r->pool, sizeof(*procnew));
     if (procnew == NULL) {
-        msr_log(msr, 1, "Exec: Unable to allocate %i bytes.", sizeof(*procnew));
+        msr_log(msr, 1, "Exec: Unable to allocate %d bytes.", sizeof(*procnew));
         return -1;
     }
 
@@ -171,17 +171,17 @@ void record_time_checkpoint(modsec_rec *msr, int checkpoint_no) {
             msr->time_checkpoint_3 = now;
             break;
         default :
-            msr_log(msr, 1, "Internal Error: Unknown checkpoint: %i", checkpoint_no);
+            msr_log(msr, 1, "Internal Error: Unknown checkpoint: %d", checkpoint_no);
             return;
             break;
     }
 
     /* Apache-specific stuff. */
     apr_snprintf(note, 99, "%" APR_TIME_T_FMT, (now - msr->request_time));
-    apr_snprintf(note_name, 99, "mod_security-time%i", checkpoint_no);
+    apr_snprintf(note_name, 99, "mod_security-time%d", checkpoint_no);
     apr_table_set(msr->r->notes, note_name, note);
 
-    msr_log(msr, 4, "Time #%i: %s", checkpoint_no, note);
+    msr_log(msr, 4, "Time #%d: %s", checkpoint_no, note);
 }
 
 /**
@@ -240,7 +240,7 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
 
     /* Construct the message. */
     apr_vsnprintf(str1, sizeof(str1), text, ap);
-    apr_snprintf(str2, sizeof(str2), "[%s] [%s/sid#%lx][rid#%lx][%s][%i] %s\n",
+    apr_snprintf(str2, sizeof(str2), "[%s] [%s/sid#%lx][rid#%lx][%s][%d] %s\n",
         current_logtime(msr->mp), ap_get_server_name(r), (unsigned long)(r->server),
         (unsigned long)r, ((r->uri == NULL) ? "" : log_escape_nq(msr->mp, r->uri)),
         level, str1);
@@ -314,15 +314,15 @@ char *format_error_log_message(apr_pool_t *mp, error_message *em) {
     }
     
     if (em->line > 0) {
-        s_line = apr_psprintf(mp, "[line %i] ", em->line);
+        s_line = apr_psprintf(mp, "[line %d] ", em->line);
         if (s_line == NULL) return NULL;
     }
 
-    s_level = apr_psprintf(mp, "[level %i] ", em->level);
+    s_level = apr_psprintf(mp, "[level %d] ", em->level);
     if (s_level == NULL) return NULL;
 
     if (em->status != 0) {
-        s_status = apr_psprintf(mp, "[status %i] ", em->status);
+        s_status = apr_psprintf(mp, "[status %d] ", em->status);
         if (s_status == NULL) return NULL;
     }
 

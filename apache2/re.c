@@ -316,7 +316,7 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
                 continue;
             }
 
-            *error_msg = apr_psprintf(mp, "Unexpected character at position %i: %s",
+            *error_msg = apr_psprintf(mp, "Unexpected character at position %d: %s",
                 (int)(p - text), text);
             return -1;
         }
@@ -351,14 +351,14 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
 
             for(;;) {
                 if (*p == '\0') {
-                    *error_msg = apr_psprintf(mp, "Missing closing quote at position %i: %s",
+                    *error_msg = apr_psprintf(mp, "Missing closing quote at position %d: %s",
                         (int)(p - text), text);
                     free(value);
                     return -1;
                 } else
                 if (*p == '\\') {
                     if ( (*(p + 1) == '\0') || ((*(p + 1) != '\'')&&(*(p + 1) != '\\')) ) {
-                        *error_msg = apr_psprintf(mp, "Invalid quoted pair at position %i: %s",
+                        *error_msg = apr_psprintf(mp, "Invalid quoted pair at position %d: %s",
                             (int)(p - text), text);
                         free(value);
                         return -1;
@@ -654,7 +654,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     }
 
     if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "This phase consists of %i rule(s).", arr->nelts);
+        msr_log(msr, 9, "This phase consists of %d rule(s).", arr->nelts);
     }
 
     /* Loop through the rules in the selected set. */
@@ -730,7 +730,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
 #endif
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Rule returned %i.", rc);
+            msr_log(msr, 4, "Rule returned %d.", rc);
         }
 
         if (rc == RULE_NO_MATCH) {
@@ -784,14 +784,14 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                     if (rule->chain_starter->actionset->skip_count > 0) {
                         skip = rule->chain_starter->actionset->skip_count;
                         if (msr->txcfg->debuglog_level >= 4) {
-                            msr_log(msr, 4, "Skipping %i rules/chains (from a chain).", skip);
+                            msr_log(msr, 4, "Skipping %d rules/chains (from a chain).", skip);
                         }
                     }
                 }
                 else if (rule->actionset->skip_count > 0) {
                     skip = rule->actionset->skip_count;
                     if (msr->txcfg->debuglog_level >= 4) {
-                        msr_log(msr, 4, "Skipping %i rules/chains.", skip);
+                        msr_log(msr, 4, "Skipping %d rules/chains.", skip);
                     }
                 }
             }
@@ -801,7 +801,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             return -1;
         }
         else {
-            msr_log(msr, 1, "Rule processing failed with unknown return code: %i.", rc);
+            msr_log(msr, 1, "Rule processing failed with unknown return code: %d.", rc);
             return -1;
         }
     }    
@@ -852,7 +852,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         rc = msre_ruleset_process_phase_(ruleset, msr);
     }
 
-    msr_log(msr, 1, "Phase %i: %" APR_TIME_T_FMT " usec", msr->phase, ((apr_time_now() - time1) / 10000));
+    msr_log(msr, 1, "Phase %d: %" APR_TIME_T_FMT " usec", msr->phase, ((apr_time_now() - time1) / 10000));
 
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
@@ -1425,7 +1425,7 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
         if (targets[i]->is_counting) {
             /* Count how many there are and just add the score to the target list. */
             msre_var *newvar = (msre_var *)apr_pmemdup(mptmp, targets[i], sizeof(msre_var));
-            newvar->value = apr_psprintf(mptmp, "%i", list_count);
+            newvar->value = apr_psprintf(mptmp, "%d", list_count);
             newvar->value_len = strlen(newvar->value);
             apr_table_addn(tartab, newvar->name, (void *)newvar);
         } else {
@@ -1583,7 +1583,7 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                     var->value_len = crec->val_len;
                 }
 
-                msr_log(msr, 9, "T (%i) %s: \"%s\" [cached hits=%d]", crec->changed, crec->path, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
+                msr_log(msr, 9, "T (%d) %s: \"%s\" [cached hits=%d]", crec->changed, crec->path, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
 
                 rc = execute_operator(var, rule, msr, acting_actionset, mptmp);
 
@@ -1682,7 +1682,7 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                             var->value_len = crec->val_len;
                         }
 
-                        msr_log(msr, 9, "T (%i) %s: \"%s\" [cached hits=%i]", crec->changed, metadata->name, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
+                        msr_log(msr, 9, "T (%d) %s: \"%s\" [cached hits=%d]", crec->changed, metadata->name, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
                         continue;
                     }
                 }
@@ -1715,7 +1715,7 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                 }
 
                 if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "T (%i) %s: \"%s\"", rc, metadata->name,
+                    msr_log(msr, 9, "T (%d) %s: \"%s\"", rc, metadata->name,
                         log_escape_nq_ex(mptmp, var->value, var->value_len));
                 }
             }

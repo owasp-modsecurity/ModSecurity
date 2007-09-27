@@ -33,7 +33,7 @@ static void xml_receive_sax_error(void *data, const char *msg, ...) {
     
     if (msr == NULL) return;
 
-    apr_snprintf(message, sizeof(message), "%s (line %i pos %i)",
+    apr_snprintf(message, sizeof(message), "%s (line %d pos %d)",
         log_escape_nq(msr->mp, msr->xml->parsing_ctx->lastError.message),
         msr->xml->parsing_ctx->lastError.line,
         msr->xml->parsing_ctx->lastError.int2);
@@ -109,7 +109,7 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
         /* Clean up everything else. */
         xmlFreeParserCtxt(msr->xml->parsing_ctx);
         msr->xml->parsing_ctx = NULL;
-        msr_log(msr, 4, "XML: Parsing complete (well_formed %i).", msr->xml->well_formed);
+        msr_log(msr, 4, "XML: Parsing complete (well_formed %d).", msr->xml->well_formed);
 
         if (msr->xml->well_formed != 1) {
             *error_msg = apr_psprintf(msr->mp, "XML: Failed parsing document.");

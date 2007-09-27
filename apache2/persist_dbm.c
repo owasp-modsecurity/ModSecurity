@@ -163,10 +163,10 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
                 /* NOTE: No rate if there has been no time elapsed */
                 td = (apr_time_sec(apr_time_now()) - create_time);
                 if (td == 0) {
-                    var->value = apr_psprintf(msr->mp, "%i", 0);
+                    var->value = apr_psprintf(msr->mp, "%d", 0);
                 }
                 else {
-                    var->value = apr_psprintf(msr->mp, "%i",
+                    var->value = apr_psprintf(msr->mp, "%d",
                         (int)((60 * counter)/td));
                 }
                 var->value_len = strlen(var->value);
@@ -279,7 +279,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
             int timeout = atoi(var->value);
             var = (msc_string *)apr_table_get(col, "__expire_KEY");
             if (var != NULL) {
-                var->value = apr_psprintf(msr->mp, "%i", (int)(apr_time_sec(apr_time_now()) + timeout));
+                var->value = apr_psprintf(msr->mp, "%d", (int)(apr_time_sec(apr_time_now()) + timeout));
                 var->value_len = strlen(var->value);
             }
         }
@@ -294,7 +294,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
             var->name_len = strlen(var->name);
             apr_table_setn(col, var->name, (void *)var);
         }
-        var->value = apr_psprintf(msr->mp, "%i", (int)(apr_time_sec(apr_time_now())));
+        var->value = apr_psprintf(msr->mp, "%d", (int)(apr_time_sec(apr_time_now())));
         var->value_len = strlen(var->value);
     }
 
@@ -310,7 +310,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         } else {
             counter = atoi(var->value);
         }
-        var->value = apr_psprintf(msr->mp, "%i", counter + 1);
+        var->value = apr_psprintf(msr->mp, "%d", counter + 1);
         var->value_len = strlen(var->value);
     }
 
@@ -459,7 +459,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     }
     apr_sdbm_unlock(dbm);
 
-    msr_log(msr, 9, "Found %i record(s) in file \"%s\".", keys_arr->nelts,
+    msr_log(msr, 9, "Found %d record(s) in file \"%s\".", keys_arr->nelts,
         log_escape(msr->mp, dbm_filename));
 
     /* Now retrieve the entires one by one. */
@@ -493,7 +493,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
             } else {
                 unsigned int expiry_time = atoi(var->value);
 
-                msr_log(msr, 9, "Record (name \"%s\", key \"%s\") set to expire in %i seconds.",
+                msr_log(msr, 9, "Record (name \"%s\", key \"%s\") set to expire in %d seconds.",
                     log_escape(msr->mp, col_name), log_escape(msr->mp, key.dptr),
                     expiry_time - now);
 

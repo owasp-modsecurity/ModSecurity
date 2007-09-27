@@ -323,13 +323,13 @@ static int is_response_status_relevant(modsec_rec *msr, int status) {
         return 0;
     }
 
-    apr_snprintf(buf, sizeof(buf), "%i", status);
+    apr_snprintf(buf, sizeof(buf), "%d", status);
 
     rc = msc_regexec(msr->txcfg->auditlog_relevant_regex, buf, strlen(buf), &my_error_msg);
     if (rc >= 0) return 1;
     if (rc == PCRE_ERROR_NOMATCH) return 0;
 
-    msr_log(msr, 1, "Regex processing failed (rc %i): %s", rc, my_error_msg);
+    msr_log(msr, 1, "Regex processing failed (rc %d): %s", rc, my_error_msg);
     return 0;
 }
 
@@ -473,7 +473,7 @@ apr_status_t modsecurity_process_phase(modsec_rec *msr, int phase) {
             return modsecurity_process_phase_logging(msr);
             break;
         default :
-            msr_log(msr, 1, "Invalid processing phase: %i", msr->phase);
+            msr_log(msr, 1, "Invalid processing phase: %d", msr->phase);
             return -1;
             break;
     }

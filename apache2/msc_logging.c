@@ -78,7 +78,7 @@ char *construct_log_vcombinedus(modsec_rec *msr) {
     /* sessionid */
     sessionid = (msr->sessionid == NULL ? "-" : msr->sessionid);
 
-    return apr_psprintf(msr->mp, "%s %s %s %s [%s] \"%s\" %i %" APR_OFF_T_FMT " \"%s\" \"%s\" %s \"%s\"",
+    return apr_psprintf(msr->mp, "%s %s %s %s [%s] \"%s\" %d %" APR_OFF_T_FMT " \"%s\" \"%s\" %s \"%s\"",
         log_escape_nq(msr->mp, msr->hostname), msr->remote_addr, log_escape_nq(msr->mp, remote_user),
         log_escape_nq(msr->mp, local_user), current_logtime(msr->mp),
         ((msr->request_line == NULL) ? "" : log_escape(msr->mp, msr->request_line)),
@@ -149,7 +149,7 @@ char *construct_log_vcombinedus_limited(modsec_rec *msr, int _limit, int *was_li
     limit -= strlen(sessionid);                  /* session id */
 
     if (limit <= 0) {
-        msr_log(msr, 1, "GuardianLog: Atomic pipe write size too small: %i", PIPE_BUF);
+        msr_log(msr, 1, "GuardianLog: Atomic pipe write size too small: %d", PIPE_BUF);
         return NULL;
     }
 
@@ -189,21 +189,21 @@ char *construct_log_vcombinedus_limited(modsec_rec *msr, int _limit, int *was_li
         limit -= strlen(user_agent);
 
         if (limit <= 0) {
-            msr_log(msr, 1, "GuardianLog: Atomic pipe write size too small: %i.", PIPE_BUF);
+            msr_log(msr, 1, "GuardianLog: Atomic pipe write size too small: %d.", PIPE_BUF);
             return NULL;
         }
 
         /* use what's left for the request line */
         if ((int)strlen(the_request) > limit) {
             the_request[limit] = '\0';
-            msr_log(msr, 9, "GuardianLog: Reduced the_request to %i bytes.", limit);
+            msr_log(msr, 9, "GuardianLog: Reduced the_request to %d bytes.", limit);
         }
     } else {
         /* Yay! We have enough space! */
         *was_limited = 0;
     }
 
-    return apr_psprintf(msr->mp, "%s %s %s %s [%s] \"%s\" %i %s \"%s\" \"%s\" %s \"%s\"",
+    return apr_psprintf(msr->mp, "%s %s %s %s [%s] \"%s\" %d %s \"%s\" \"%s\" %s \"%s\"",
         hostname, msr->remote_addr, remote_user,
         local_user, current_logtime(msr->mp), the_request,
         msr->response_status, bytes_sent, referer, user_agent,
@@ -284,7 +284,7 @@ static void sanitise_request_line(modsec_rec *msr) {
             j = arg->value_origin_offset;
             while((*p != '\0')&&(j--)) p++;
             if (*p == '\0') {
-                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %i of QUERY_STRING"
+                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %d of QUERY_STRING"
                     "because the request line is too short.",
                     log_escape_ex(msr->mp, arg->name, arg->name_len),
                     arg->value_origin_offset);
@@ -297,7 +297,7 @@ static void sanitise_request_line(modsec_rec *msr) {
                 *p++ = '*';
             }
             if (*p == '\0') {
-                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %i (size %i) "
+                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %d (size %d) "
                     "of QUERY_STRING because the request line is too short.",
                     log_escape_ex(msr->mp, arg->name, arg->name_len),
                     arg->value_origin_offset, arg->value_origin_len);
@@ -418,7 +418,7 @@ void sec_audit_logger(modsec_rec *msr) {
 
     /* Format: time transaction_id remote_addr remote_port local_addr local_port */
 
-    text = apr_psprintf(msr->mp, "[%s] %s %s %i %s %i",
+    text = apr_psprintf(msr->mp, "[%s] %s %s %d %s %d",
         current_logtime(msr->mp), msr->txid, msr->remote_addr, msr->remote_port,
         msr->local_addr, msr->local_port);
     sec_auditlog_write(msr, text, strlen(text));
@@ -635,7 +635,7 @@ void sec_audit_logger(modsec_rec *msr) {
                 text = apr_psprintf(msr->mp, "%s %s\n", msr->response_protocol,
                     msr->status_line);
             } else {
-                text = apr_psprintf(msr->mp, "%s %i\n", msr->response_protocol,
+                text = apr_psprintf(msr->mp, "%s %d\n", msr->response_protocol,
                     msr->response_status);
             }
             sec_auditlog_write(msr, text, strlen(text));
@@ -691,7 +691,7 @@ void sec_audit_logger(modsec_rec *msr) {
         
         /* Action */
         if (msr->was_intercepted) {
-            text = apr_psprintf(msr->mp, "Action: Intercepted (phase %i)\n", msr->intercept_phase);
+            text = apr_psprintf(msr->mp, "Action: Intercepted (phase %d)\n", msr->intercept_phase);
             sec_auditlog_write(msr, text, strlen(text));
         }
 
@@ -853,7 +853,7 @@ void sec_audit_logger(modsec_rec *msr) {
     /* Calculate hash of the entry. */
     apr_md5_final(md5hash, &msr->new_auditlog_md5ctx);
 
-    str2 = apr_psprintf(msr->mp, "%s %i %i md5:%s", msr->new_auditlog_filename, 0,
+    str2 = apr_psprintf(msr->mp, "%s %d %d md5:%s", msr->new_auditlog_filename, 0,
         msr->new_auditlog_size, bytes2hex(msr->mp, md5hash, 16));
     if (str2 == NULL) return;
     
@@ -873,7 +873,7 @@ void sec_audit_logger(modsec_rec *msr) {
 
     limit = limit - strlen(str2) - 5;
     if (limit <= 0) {
-        msr_log(msr, 1, "Audit Log: Atomic PIPE write buffer too small: %i", PIPE_BUF);
+        msr_log(msr, 1, "Audit Log: Atomic PIPE write buffer too small: %d", PIPE_BUF);
         return;
     }
 

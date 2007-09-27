@@ -74,7 +74,7 @@ static char *create_token(modsec_rec *msr) {
     }
     
     current_time = apr_time_sec(apr_time_now());
-    time_string = apr_psprintf(msr->mp, "%i", current_time + timeout);
+    time_string = apr_psprintf(msr->mp, "%d", current_time + timeout);
     if (time_string == NULL) return NULL;
     
     hash = create_hash(msr, time_string);
@@ -420,7 +420,7 @@ int pdfp_check(modsec_rec *msr) {
     if ((msr->r->method_number != M_GET)&&(cfg->pdfp_only_get != 0)) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "PdfProtect: Not intercepting a GET/HEAD request "
-            "(method=%s/%i).", log_escape_nq(msr->mp, msr->r->method), msr->r->method_number);
+            "(method=%s/%d).", log_escape_nq(msr->mp, msr->r->method), msr->r->method_number);
         }
 
         return 0;

@@ -69,7 +69,7 @@ static char *var_generic_list_validate(msre_ruleset *ruleset, msre_var *var) {
 
         regex = msc_pregcomp(ruleset->mp, pattern, PCRE_DOTALL | PCRE_CASELESS | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset);
         if (regex == NULL) {
-            return apr_psprintf(ruleset->mp, "Error compiling pattern (pos %i): %s",
+            return apr_psprintf(ruleset->mp, "Error compiling pattern (pos %d): %s",
                 erroffset, errptr);
         }
 
@@ -404,7 +404,7 @@ static int var_rule_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
         return var_simple_generate(var, vartab, mptmp, actionset->rev);
     } else
     if ((strcasecmp(var->param, "severity") == 0)&&(actionset->severity != -1)) {
-        char *value = apr_psprintf(mptmp, "%i", actionset->severity);
+        char *value = apr_psprintf(mptmp, "%d", actionset->severity);
         return var_simple_generate(var, vartab, mptmp, value);
     } else
     if ((strcasecmp(var->param, "msg") == 0)&&(actionset->msg != NULL)) {
@@ -486,7 +486,7 @@ static int var_reqbody_processor_error_generate(modsec_rec *msr, msre_var *var, 
 {
     msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
 
-    rvar->value = apr_psprintf(mptmp, "%i", msr->msc_reqbody_error);
+    rvar->value = apr_psprintf(mptmp, "%d", msr->msc_reqbody_error);
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -681,7 +681,7 @@ static int var_remote_host_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_remote_port_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    char *value = apr_psprintf(mptmp, "%i", msr->remote_port);
+    char *value = apr_psprintf(mptmp, "%d", msr->remote_port);
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
@@ -1539,7 +1539,7 @@ static int var_time_epoch_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
     tc = time(NULL);
     tm = localtime(&tc);
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
-    rvar->value = apr_psprintf(mptmp, "%i", (int)tc);
+    rvar->value = apr_psprintf(mptmp, "%d", (int)tc);
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -1800,7 +1800,7 @@ static int var_server_name_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_server_port_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    char *value = apr_psprintf(mptmp, "%i", msr->local_port);
+    char *value = apr_psprintf(mptmp, "%d", msr->local_port);
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
@@ -2015,7 +2015,7 @@ static int var_response_protocol_generate(modsec_rec *msr, msre_var *var, msre_r
 static int var_response_status_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    const char *value = apr_psprintf(mptmp, "%i", msr->response_status);
+    const char *value = apr_psprintf(mptmp, "%d", msr->response_status);
     return var_simple_generate(var, vartab, mptmp, value);
 }
 

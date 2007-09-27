@@ -605,7 +605,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (pv == -1) return -1;
         msr->txcfg->reqbody_access = pv;
         msr->usercfg->reqbody_access = pv;
-        msr_log(msr, 4, "Ctl: Set requestBodyAccess to %i.", pv);
+        msr_log(msr, 4, "Ctl: Set requestBodyAccess to %d.", pv);
 
         return 1;
     } else
@@ -621,7 +621,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (pv == -1) return -1;
         msr->txcfg->resbody_access = pv;
         msr->usercfg->resbody_access = pv;
-        msr_log(msr, 4, "Ctl: Set responseBodyAccess to %i.", pv);
+        msr_log(msr, 4, "Ctl: Set responseBodyAccess to %d.", pv);
 
         return 1;
     } else
@@ -641,7 +641,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
             msr->usercfg->auditlog_flag = AUDITLOG_RELEVANT;
         }
 
-        msr_log(msr, 4, "Ctl: Set auditEngine to %i.", msr->txcfg->auditlog_flag); // TODO
+        msr_log(msr, 4, "Ctl: Set auditEngine to %d.", msr->txcfg->auditlog_flag); // TODO
 
         return 1;
     } else
@@ -684,7 +684,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
     if (strcmp(name, "debugLogLevel") == 0) {
         msr->txcfg->debuglog_level = atoi(value);
         msr->usercfg->debuglog_level = atoi(value);
-        msr_log(msr, 4, "Ctl: Set debugLogLevel to %i.", msr->txcfg->debuglog_level);
+        msr_log(msr, 4, "Ctl: Set debugLogLevel to %d.", msr->txcfg->debuglog_level);
 
         return 1;
     } else
@@ -969,7 +969,7 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
             if (value < 0) value = 0; /* Counters never go below zero. */
 
             /* Put the variable back. */
-            var->value = apr_psprintf(msr->mp, "%i", value);
+            var->value = apr_psprintf(msr->mp, "%d", value);
             var->value_len = strlen(var->value);
             apr_table_setn(target_col, var->name, (void *)var);
 
@@ -1056,7 +1056,7 @@ static apr_status_t msre_action_expirevar_execute(modsec_rec *msr, apr_pool_t *m
     var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     var->name = apr_psprintf(msr->mp, "__expire_%s", var_name);
     var->name_len = strlen(var->name);
-    var->value = apr_psprintf(msr->mp, "%i", (int)(apr_time_sec(msr->request_time)
+    var->value = apr_psprintf(msr->mp, "%d", (int)(apr_time_sec(msr->request_time)
         + atoi(var_value)));
     var->value_len = strlen(var->value);
     apr_table_setn(target_col, var->name, (void *)var);
@@ -1152,17 +1152,17 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
 
     /* Only change the value if it differs. */
     if (new_value != current_value) {
-        var->value = apr_psprintf(msr->mp, "%i", (int)new_value);
+        var->value = apr_psprintf(msr->mp, "%d", (int)new_value);
         var->value_len = strlen(var->value);
 
-        msr_log(msr, 4, "Deprecated variable \"%s.%s\" from %li to %li (%i seconds since "
+        msr_log(msr, 4, "Deprecated variable \"%s.%s\" from %li to %li (%d seconds since "
             "last update).", log_escape(msr->mp, col_name), log_escape(msr->mp, var_name),
             current_value, new_value, current_time - last_update_time);
 
         apr_table_set(msr->collections_dirty, col_name, "1");
     } else {
         msr_log(msr, 9, "Not deprecating variable \"%s.%s\" because the new value (%li) is "
-            "the same as the old one (%li) (%i seconds since last update).",
+            "the same as the old one (%li) (%d seconds since last update).",
             log_escape(msr->mp, col_name), log_escape(msr->mp, var_name), current_value,
             new_value, current_time - last_update_time);
     }
@@ -1201,7 +1201,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
         var->name = "__expire_KEY";
         var->name_len = strlen(var->name);
-        var->value = apr_psprintf(msr->mp, "%i", (int)(apr_time_sec(msr->request_time) + 3600));
+        var->value = apr_psprintf(msr->mp, "%d", (int)(apr_time_sec(msr->request_time) + 3600));
         var->value_len = strlen(var->value);
         apr_table_setn(table, var->name, (void *)var);
 
@@ -1217,7 +1217,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var = apr_pcalloc(msr->mp, sizeof(msc_string));
         var->name = "TIMEOUT";
         var->name_len = strlen(var->name);
-        var->value = apr_psprintf(msr->mp, "%i", 3600);
+        var->value = apr_psprintf(msr->mp, "%d", 3600);
         var->value_len = strlen(var->value);
         apr_table_setn(table, var->name, (void *)var);
 
@@ -1249,7 +1249,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var = apr_pcalloc(msr->mp, sizeof(msc_string));
         var->name = "CREATE_TIME";
         var->name_len = strlen(var->name);
-        var->value = apr_psprintf(msr->mp, "%i", (int)apr_time_sec(msr->request_time));
+        var->value = apr_psprintf(msr->mp, "%d", (int)apr_time_sec(msr->request_time));
         var->value_len = strlen(var->value);
         apr_table_setn(table, var->name, (void *)var);
 

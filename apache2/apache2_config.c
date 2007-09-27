@@ -1114,7 +1114,7 @@ static const char *cmd_rule_remove_by_msg(cmd_parms *cmd, void *_dcfg, const cha
     msre_ruleset_rule_remove_with_exception(dcfg->ruleset, re);
 
     #ifdef DEBUG_CONF
-    fprintf(stderr, "Added exception %x (%i %s) to dcfg %x.\n", re, re->type, re->param, dcfg);
+    fprintf(stderr, "Added exception %x (%d %s) to dcfg %x.\n", re, re->type, re->param, dcfg);
     #endif
 
     return NULL;

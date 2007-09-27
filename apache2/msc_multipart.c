@@ -219,7 +219,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
         
         rc = multipart_parse_content_disposition(msr, header_value);
         if (rc < 0) {
-            *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (%i): %s.",
+            *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (%d): %s.",
                 rc, log_escape_nq(msr->mp, header_value));
             return -1;
         }
@@ -451,7 +451,7 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
         }
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Multipart: unknown part type %i", msr->mpd->mpp->type);
+        *error_msg = apr_psprintf(msr->mp, "Multipart: unknown part type %d", msr->mpd->mpp->type);
         return -1;
     }
 
@@ -830,7 +830,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
         msr->mpd->flag_data_before = 1;
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Multipart: Ignoring data after last boundary (received %i bytes)", size);
+            msr_log(msr, 4, "Multipart: Ignoring data after last boundary (received %d bytes)", size);
         }
 
         return 1;
@@ -992,7 +992,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                              */
                             msr->mpd->flag_error = 1;
                             *error_msg = apr_psprintf(msr->mp,
-                                "Multipart: Part header line over %i bytes long",
+                                "Multipart: Part header line over %d bytes long",
                                 MULTIPART_BUF_SIZE);
                             return -1;
                         }
@@ -1028,7 +1028,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
             msr->mpd->flag_data_after = 1;
 
             if (msr->txcfg->debuglog_level >= 4) {
-                msr_log(msr, 4, "Multipart: Ignoring data after last boundary (%i bytes left)", inleft);
+                msr_log(msr, 4, "Multipart: Ignoring data after last boundary (%d bytes left)", inleft);
             }
 
             return 1;
@@ -1047,7 +1047,7 @@ apr_status_t multipart_cleanup(modsec_rec *msr) {
     if (msr->mpd == NULL) return -1;
 
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Multipart: Cleanup started (remove files %i).", msr->upload_remove_files);
+        msr_log(msr, 4, "Multipart: Cleanup started (remove files %d).", msr->upload_remove_files);
     }
 
     if (msr->upload_remove_files == 0) {
