@@ -663,7 +663,9 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msre_rule *rule = rules[i];
+#if defined(PERFORMANCE_MEASUREMENT)
         apr_time_t time1 = 0;
+#endif
 
         /* NEXT_CHAIN is used when one of the rules in a chain
          * fails to match and then we need to skip the remaining
