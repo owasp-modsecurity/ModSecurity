@@ -161,15 +161,16 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     {
     */
     if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
-        char *pattern_escaped = log_escape(msr->mp, regex->pattern);
+        /* We no longer escape the pattern here as it is done when logging */
+        char *pattern = apr_pstrdup(msr->mp, regex->pattern);
 
         /* This message will be logged. */
-        if (strlen(pattern_escaped) > 252) {
+        if (strlen(pattern) > 252) {
             *error_msg = apr_psprintf(msr->mp, "Pattern match \"%.252s ...\" at %s.",
-                pattern_escaped, var->name);
+                pattern, var->name);
         } else {
             *error_msg = apr_psprintf(msr->mp, "Pattern match \"%s\" at %s.",
-                pattern_escaped, var->name);
+                pattern, var->name);
         }
 
         return 1;

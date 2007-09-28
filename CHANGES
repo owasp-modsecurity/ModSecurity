@@ -3,7 +3,8 @@
 ------------------------
 
  * Situations where ModSecurity will intercept, generate an error or log
-   an alert to the debug log are now marked as 'relevant'.
+   a level 1-3 message to the debug log are now marked as 'relevant' and may
+   generate an audit log entry.
 
  * Do not process subrequests in phase 2-4.
 

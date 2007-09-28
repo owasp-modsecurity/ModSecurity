@@ -312,6 +312,8 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
                     apr_table_set(r->headers_out, "Location", new_uri);
 
+                    ap_remove_output_filter(f);
+
                     return send_error_bucket(msr, f, REDIRECT_STATUS);
                 }
             } else { /* Token found. */

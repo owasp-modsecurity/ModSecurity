@@ -596,9 +596,12 @@ void sec_audit_logger(modsec_rec *msr) {
                     }
 
                     if (rc <= 0) {
-                        msr_log(msr, 1, "Audit log: %s", my_error_msg);
                         break;
                     }
+                }
+
+                if (rc < 0) {
+                    msr_log(msr, 1, "Audit log: %s", my_error_msg);
                 }
 
                 modsecurity_request_body_retrieve_end(msr);

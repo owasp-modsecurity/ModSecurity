@@ -275,7 +275,10 @@ static int output_filter_should_run(modsec_rec *msr, request_rec *r) {
         char *p = NULL;
 
         content_type = apr_pstrdup(msr->mp, r->content_type);
-        if (content_type == NULL) return -1;
+        if (content_type == NULL) {
+            msr_log(msr, 1, "Output filter: Failed to allocate memory for content type.");
+            return -1;
+        }
 
         /* Hide the character encoding information
          * if present. Sometimes the content type header
@@ -316,11 +319,14 @@ static apr_status_t output_filter_init(modsec_rec *msr, ap_filter_t *f,
     apr_status_t rc;
 
     msr->of_brigade = apr_brigade_create(msr->mp, f->c->bucket_alloc);
-    if (msr->of_brigade == NULL) return -1;
+    if (msr->of_brigade == NULL) {
+        msr_log(msr, 1, "Output filter: Failed to create brigade.");
+        return -1;
+    }
     msr->of_status = OF_STATUS_IN_PROGRESS;
     
     rc = output_filter_should_run(msr, r);
-    if (rc < 0) return -1;
+    if (rc < 0) return -1; /* output_filter_should_run() generates error msg */
     if (rc == 0) return 0;
 
     /* Do not check the output limit if we are willing to

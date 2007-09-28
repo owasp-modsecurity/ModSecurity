@@ -17,6 +17,8 @@
  * Prepare to accept the request body (part 2).
  */
 static apr_status_t modsecurity_request_body_start_init(modsec_rec *msr, char **error_msg) {
+    *error_msg = NULL;
+
     if(msr->msc_reqbody_storage == MSC_REQBODY_MEMORY) {
         /* Prepare to store request body in memory. */
 
@@ -55,6 +57,7 @@ static apr_status_t modsecurity_request_body_start_init(modsec_rec *msr, char **
  * Prepare to accept the request body (part 1).
  */
 apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
+    *error_msg = NULL;
     msr->msc_reqbody_length = 0;
 
     /* Create a separate memory pool that will be used
@@ -104,7 +107,11 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
 static apr_status_t modsecurity_request_body_store_disk(modsec_rec *msr,
     const char *data, apr_size_t length, char **error_msg)
 {
-    apr_size_t i = write(msr->msc_reqbody_fd, data, length);
+    apr_size_t i;
+
+    *error_msg = NULL;
+
+    i = write(msr->msc_reqbody_fd, data, length);
     if (i != length) {
         *error_msg = apr_psprintf(msr->mp, "Input filter: Failed writing %" APR_SIZE_T_FMT " bytes to temporary file (rc %" APR_SIZE_T_FMT ").", length, i);
         return -1;
@@ -119,6 +126,8 @@ static apr_status_t modsecurity_request_body_store_disk(modsec_rec *msr,
 static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
     const char *data, apr_size_t length, char **error_msg)
 {
+    *error_msg = NULL;
+
     /* Would storing this chunk mean going over the limit? */
     if ((msr->msc_reqbody_spilltodisk)
         && (msr->msc_reqbody_length + length > (apr_size_t)msr->txcfg->reqbody_inmemory_limit))
@@ -242,6 +251,8 @@ static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
 apr_status_t modsecurity_request_body_store(modsec_rec *msr,
     const char *data, apr_size_t length, char **error_msg)
 {
+    *error_msg = NULL;
+
     /* If we have a processor for this request body send
      * data to it first (but only if it did not report an
      * error on previous invocations).
@@ -299,6 +310,8 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, cha
     char *d;
     int i, sofar;
     int invalid_count = 0;
+
+    *error_msg = NULL;
 
     /* Allocate a buffer large enough to hold the request body. */
 
@@ -367,6 +380,7 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, cha
  * Stops receiving the request body.
  */
 apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
+    *error_msg = NULL;
 
     /* Close open file descriptors, if any. */
     if (msr->msc_reqbody_storage == MSC_REQBODY_DISK) {
@@ -420,6 +434,8 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
  * Prepares to forward the request body.
  */
 apr_status_t modsecurity_request_body_retrieve_start(modsec_rec *msr, char **error_msg) {
+    *error_msg = NULL;
+
     if (msr->msc_reqbody_storage == MSC_REQBODY_MEMORY) {
         msr->msc_reqbody_chunk_position = 0;
         msr->msc_reqbody_chunk_offset = 0;
@@ -484,6 +500,8 @@ apr_status_t modsecurity_request_body_retrieve(modsec_rec *msr,
     msc_data_chunk **chunk, long int nbytes, char **error_msg)
 {
     msc_data_chunk **chunks;
+
+    *error_msg = NULL;
 
     if (chunk == NULL) {
         *error_msg = apr_pstrdup(msr->mp, "Internal error, retrieving request body chunk.");
@@ -581,6 +599,8 @@ apr_status_t modsecurity_request_body_retrieve(modsec_rec *msr,
  *
  */
 apr_status_t modsecurity_request_body_clear(modsec_rec *msr, char **error_msg) {
+    *error_msg = NULL;
+
     /* Release memory we used to store request body data. */    
     if (msr->msc_reqbody_chunks != NULL) {
         msc_data_chunk **chunks = (msc_data_chunk **)msr->msc_reqbody_chunks->elts;

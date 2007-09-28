@@ -338,7 +338,10 @@ static modsec_rec *create_tx_context(request_rec *r) {
     msr->hostname = ap_get_server_name(r);
 
     /* Invoke the engine to continue with initialisation */
-    if (modsecurity_tx_init(msr) < 0) return NULL;
+    if (modsecurity_tx_init(msr) < 0) {
+        msr_log(msr, 1, "Failed to initialising transaction (txid %s).", msr->txid);
+        return NULL;
+    }
 
     store_tx_context(msr, r);
 
@@ -400,10 +403,8 @@ static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_te
     /* Initialise ModSecurity engine */
     modsecurity = modsecurity_create(mp, MODSEC_ONLINE);
     if (modsecurity == NULL) {
-        /* ENH Since s not available, how do we log from here? stderr?
-         * ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-         *    "ModSecurity: Failed to initialise engine.");
-         */
+        ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
+            "ModSecurity: Failed to initialise engine.");
         return HTTP_INTERNAL_SERVER_ERROR;
     }    
 
@@ -639,20 +640,20 @@ static int hook_request_late(request_rec *r) {
     if (rc < 0) {
         switch(rc) {
             case -1 :
-                if ((my_error_msg != NULL)||(msr->is_relevant == 0)) {
+                if (my_error_msg != NULL) {
                     msr_log(msr, 1, "%s", my_error_msg);
                 }
                 return HTTP_INTERNAL_SERVER_ERROR;
                 break;
             case -4 : /* Timeout. */
-                if ((my_error_msg != NULL)||(msr->is_relevant == 0)) {
+                if (my_error_msg != NULL) {
                     msr_log(msr, 4, "%s", my_error_msg);
                 }
                 r->connection->keepalive = AP_CONN_CLOSE;
                 return HTTP_REQUEST_TIME_OUT;
                 break;
             case -5 : /* Request body limit reached. */
-                if ((my_error_msg != NULL)||(msr->is_relevant == 0)) {
+                if (my_error_msg != NULL) {
                     msr_log(msr, 1, "%s", my_error_msg);
                 }
                 r->connection->keepalive = AP_CONN_CLOSE;
