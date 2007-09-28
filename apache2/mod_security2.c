@@ -337,6 +337,8 @@ static modsec_rec *create_tx_context(request_rec *r) {
     msr->request_headers = apr_table_copy(msr->mp, r->headers_in);
     msr->hostname = ap_get_server_name(r);
 
+    msr->msc_rule_mptmp = NULL;
+
     /* Invoke the engine to continue with initialisation */
     if (modsecurity_tx_init(msr) < 0) {
         msr_log(msr, 1, "Failed to initialising transaction (txid %s).", msr->txid);
@@ -348,8 +350,6 @@ static modsec_rec *create_tx_context(request_rec *r) {
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Transaction context created (dcfg %x).", msr->dcfg1);
     }
-
-    msr->msc_rule_mptmp = NULL;
 
     return msr;    
 }
