@@ -1295,7 +1295,9 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
                                     var->name, var->param);
     }
     else if ((var->name != NULL) && var->is_counting && (*var->name != '&')) {
-        full_varname = apr_pstrcat(mptmp, "&", var->name);
+        // TODO: This fails (sigsegv) on FC4, but apr_psprintf works
+        //full_varname = apr_pstrcat(mptmp, "&", var->name);
+        full_varname = apr_psprintf(mptmp, "&%s", var->name);
     }
     else {
         full_varname = var->name;
