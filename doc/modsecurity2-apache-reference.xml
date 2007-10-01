@@ -855,17 +855,38 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis role="bold">Dependencies/Notes:</emphasis> The internal
       chroot functionality provided by ModSecurity works great for simple
       setups. One example of a simple setup is Apache serving static files
-      only, or running scripts using modules. For more complex setups you
-      should consider building a jail the old-fashioned way. The internal
-      chroot feature should be treated as somewhat experimental. Due to the
-      large number of default and third-party modules available for the Apache
-      web server, it is not possible to verify the internal chroot works
-      reliably with all of them. You are advised to think about your option
-      and make your own decision. In particular, if you are using any of the
-      modules that fork in the module initialisation phase (e.g. mod_fastcgi,
-      mod_fcgid, mod_cgid), you are advised to examine each Apache process and
-      observe its current working directory, process root, and the list of
-      open files.</para>
+      only, or running scripts using modules. Some problems you might
+      encounter with more complex setups:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>DNS lookups do not work (this is because this feature requires
+          a shared library that is loaded on demand, after chroot takes
+          place).</para>
+        </listitem>
+
+        <listitem>
+          <para>You cannot send email from PHP because it uses sendmail and
+          sendmail is outside the jail.</para>
+        </listitem>
+
+        <listitem>
+          <para>In some cases Apache graceful no longer works.</para>
+        </listitem>
+      </orderedlist>
+
+      <para>You should be aware that the internal chroot feature might not be
+      100% reliable. Due to the large number of default and third-party
+      modules available for the Apache web server, it is not possible to
+      verify the internal chroot works reliably with all of them. A module,
+      working from within Apache, can do things that make it easy to break out
+      of the jail. In particular, if you are using any of the modules that
+      fork in the module initialisation phase (e.g.
+      <literal>mod_fastcgi</literal>, <literal>mod_fcgid</literal>,
+      <literal>mod_cgid</literal>), you are advised to examine each Apache
+      process and observe its current working directory, process root, and the
+      list of open files. Consider what your options are and make your own
+      decision.</para>
     </section>
 
     <section>
