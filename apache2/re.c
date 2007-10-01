@@ -1113,7 +1113,7 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
 
 /**
  * Assembles a new rule using the strings that contain a list
- * of targets (variables), argumments, and actions.
+ * of targets (variables), arguments, and actions.
  */
 msre_rule *msre_rule_create(msre_ruleset *ruleset,
     const char *fn, int line, const char *targets,
