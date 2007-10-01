@@ -890,6 +890,7 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
     char *s = NULL;
     apr_table_t *target_col = NULL;
     int is_negated = 0;
+    msc_string *var = NULL;
 
     /* Extract the name and the value. */
     /* IMP1 We have a function for this now, parse_name_eq_value? */
@@ -904,6 +905,22 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
 
         while ((*var_value != '\0')&&(isspace(*var_value))) var_value++;
     }
+
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Setting variable: %s=%s", var_name, var_value);
+    }
+
+
+    /* Expand and escape any macros in the name */
+    var = apr_palloc(msr->mp, sizeof(msc_string));
+    if (var == NULL) {
+        msr_log(msr, 1, "Failed to allocate space to expand name macros");
+        return -1;
+    }
+    var->value = var_name;
+    var->value_len = strlen(var->value);
+    expand_macros(msr, var, rule, mptmp);
+    var_name = log_escape_ex(msr->mp, var->value, var->value_len);
 
     /* Handle the exclamation mark. */
     if (var_name[0] == '!') {
@@ -943,25 +960,45 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
         /* ENH Refuse to remove certain variables, e.g. TIMEOUT, internal variables, etc... */
 
         apr_table_unset(target_col, var_name);
-        msr_log(msr, 9, "Unset variable \"%s.%s\".", log_escape(mptmp, col_name),
-            log_escape(mptmp, var_name));
-    } else {
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Unset variable \"%s.%s\".", col_name, var_name);
+        }
+    }
+    else {
         /* Set or change variable. */
 
         if ((var_value[0] == '+')||(var_value[0] == '-')) {
             /* Relative change. */
-            msc_string *var = NULL;
+            msc_string *rec = NULL;
+            msc_string *val = apr_palloc(msr->mp, sizeof(msc_string));
             int value = 0;
 
+            if (val == NULL) {
+                msr_log(msr, 1, "Failed to allocate space to expand value macros");
+                return -1;
+            }
+
             /* Retrieve  variable or generate (if it does not exist). */
-            var = (msc_string *)apr_table_get(target_col, var_name);
-            if (var == NULL) {
-                var = apr_pcalloc(msr->mp, sizeof(msc_string));
-                var->name = apr_pstrdup(msr->mp, var_name);
-                var->name_len = strlen(var->name);
+            rec = (msc_string *)apr_table_get(target_col, var_name);
+            if (rec == NULL) {
+                rec = var; /* use the already allocated space for var */
+                rec->name = apr_pstrdup(msr->mp, var_name);
+                rec->name_len = strlen(rec->name);
                 value = 0;
-            } else {
-                value = atoi(var->value);
+            }
+            else {
+                value = atoi(rec->value);
+            }
+
+            /* Expand values in value */
+            val->value = var_value;
+            val->value_len = strlen(val->value);
+            expand_macros(msr, val, rule, mptmp);
+            var_value = val->value;
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Relative change: %s=%d%s", var_name, value, var_value);
             }
 
             /* Change value. */
@@ -969,20 +1006,19 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
             if (value < 0) value = 0; /* Counters never go below zero. */
 
             /* Put the variable back. */
-            var->value = apr_psprintf(msr->mp, "%d", value);
-            var->value_len = strlen(var->value);
-            apr_table_setn(target_col, var->name, (void *)var);
+            rec->value = apr_psprintf(msr->mp, "%d", value);
+            rec->value_len = strlen(rec->value);
+            apr_table_setn(target_col, rec->name, (void *)rec);
 
-            msr_log(msr, 9, "Set variable \"%s.%s\" to \"%s\".",
-                log_escape(mptmp, col_name),
-                log_escape_ex(mptmp, var->name, var->name_len),
-                log_escape_ex(mptmp, var->value, var->value_len));
-        } else {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Set variable \"%s.%s\" to \"%s\".",
+                    col_name, rec->name,
+                    log_escape_ex(mptmp, rec->value, rec->value_len));
+            }
+        }
+        else {
             /* Absolute change. */
 
-            msc_string *var = NULL;
-
-            var = apr_pcalloc(msr->mp, sizeof(msc_string));
             var->name = apr_pstrdup(msr->mp, var_name);
             var->name_len = strlen(var->name);
             var->value = apr_pstrdup(msr->mp, var_value);
@@ -990,10 +1026,12 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
             expand_macros(msr, var, rule, mptmp);
             apr_table_setn(target_col, var->name, (void *)var);
 
-            msr_log(msr, 9, "Set variable \"%s.%s\" to \"%s\".",
-                log_escape(mptmp, col_name),
-                log_escape_ex(mptmp, var->name, var->name_len),
-                log_escape_ex(mptmp, var->value, var->value_len));
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Set variable \"%s.%s\" to \"%s\".",
+                    log_escape(mptmp, col_name),
+                    log_escape_ex(mptmp, var->name, var->name_len),
+                    log_escape_ex(mptmp, var->value, var->value_len));
+            }
         }
     }
 
