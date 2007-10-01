@@ -142,7 +142,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             if ((s->name == NULL)||(s->value == NULL)) return -1;
             apr_table_setn(msr->tx_vars, s->name, (void *)s);
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Adding regex subexpression to TXVARS (%d): %s", i,
+                msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
                     log_escape_nq_ex(msr->mp, s->value, s->value_len));
             }
         }
@@ -346,7 +346,7 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Adding phrase match to TXVARS (0): %s",
+                msr_log(msr, 9, "Added phrase match to TX.0: %s",
                     log_escape_nq_ex(msr->mp, s->value, s->value_len));
             }
 

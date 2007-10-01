@@ -1,6 +1,9 @@
 
-?? ??? 2007 - 2.5.0-dev3
+01 Oct 2007 - 2.5.0-dev3
 ------------------------
+
+ * Used new TX:LAST_MATCHED_VAR_NAME to store the last matched variable name
+   so that it can be more easily used by rules.
 
  * Fixed expansion of macros when using relative changes with setvar.  In
    addition, added support for expanding macros in the variable name.

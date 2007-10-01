@@ -1335,6 +1335,8 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
     else {
         /* Match. */
 
+        msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+
         if (rc == 0) {
             /* Operator did not match so we need to provide a message. */
             my_error_msg = apr_psprintf(msr->mp, "Match of \"%s %s\" against \"%s\" required.",
@@ -1343,6 +1345,21 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         }
 
         msr->matched_var = apr_pstrdup(msr->mp, var->name);
+
+        if (s == NULL) {
+            msr_log(msr, 3, "Internal error: Failed to allocate space for TX.last_matched_var_name.");
+        }
+        else {
+            s->name = "last_matched_var_name";
+            s->value = apr_pstrdup(msr->mp, var->name);
+            s->value_len = strlen(var->name);
+            if ((s->name == NULL)||(s->value == NULL)) return -1;
+            apr_table_setn(msr->tx_vars, s->name, (void *)s);
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Added matched variable name to TX.%s: %s", s->name, var->name);
+            }
+        }
+
 
         /* Keep track of the highest severity matched so far */
         if ((acting_actionset->severity > 0) && (acting_actionset->severity < msr->highest_severity))
