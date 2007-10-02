@@ -411,7 +411,7 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
     i_max = match_length - target_length;
     for (i = 0; i <= i_max; i++) {
         if (match[i] == target[0]) {
-            if (strncmp(target, (match + i), target_length) == 0) {
+            if (memcmp((target + 1), (match + i + 1), (target_length - 1)) == 0) {
                 /* match. */
                 *error_msg = apr_psprintf(msr->mp, "String match %s=\"%s\" within \"%s\".",
                                 var->name,
@@ -476,7 +476,7 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     i_max = target_length - match_length;
     for (i = 0; i <= i_max; i++) {
         if (target[i] == match[0]) {
-            if (strncmp(match, (target + i), match_length) == 0) {
+            if (memcmp((match + 1), (target + i + 1), (match_length - 1)) == 0) {
                 /* Match. */
                 *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
                                 log_escape_ex(msr->mp, match, match_length),
@@ -487,6 +487,98 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     }
 
     /* No match. */
+    return 0;
+}
+
+/* containsWord */
+
+static int msre_op_containsWord_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    const char *match = NULL;
+    const char *target;
+    unsigned int match_length;
+    unsigned int target_length = 0;
+    unsigned int i, i_max;
+
+    str->value = (char *)rule->op_param;
+    str->value_len = strlen(str->value);
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (str->value == NULL) {
+        *error_msg = "Internal Error: match string is null.";
+        return -1;
+    }
+
+    expand_macros(msr, str, rule, msr->mp);
+
+    match = (const char *)str->value;
+    match_length = str->value_len;
+
+    /* If the given target is null run against an empty
+     * string. This is a behaviour consistent with previous
+     * releases.
+     */
+    if (var->value == NULL) {
+        target = "";
+        target_length = 0;
+    } else {
+        target = var->value;
+        target_length = var->value_len;
+    }
+
+    /* These are impossible to match */
+    if ((match_length == 0) || (match_length > target_length)) {
+        /* No match. */
+        return 0;
+    }
+
+    /* scan for first character, then compare from there until we
+     * have a match or there is no room left in the target
+     */
+    i_max = target_length - match_length;
+    for (i = 0; i <= i_max; i++) {
+
+        /* Previous char must have been a start or non-word */
+        if ((i > 0) && (isalnum(target[i-1])||(target[i-1] == '_')))
+            continue;
+
+
+        /* First character matched */
+        if (target[i] == match[0]) {
+
+            /* Maybe a match. */
+            *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
+                            log_escape_ex(msr->mp, match, match_length),
+                            var->name);
+
+            /* only one character */
+            if (match_length == 1) return 1;
+
+            /* remaining matched */
+            if (memcmp((match + 1), (target + i + 1), (match_length - 1)) == 0) {
+
+
+                /* check boundaries */
+                if (i == i_max) {
+                    /* exact/end word match */
+                    return 1;
+                }
+                else if (!(isalnum(target[i+match_length])||(target[i+match_length] == '_'))) {
+                    /* start/mid word match */
+                    return 1;
+                }
+
+                /* No word match */
+                *error_msg = NULL;
+                return 0;
+            }
+        }
+    }
+
+    /* No match. */
+    *error_msg = NULL;
     return 0;
 }
 
@@ -533,7 +625,7 @@ static int msre_op_streq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var
         return 0;
     }
 
-    if (strncmp(match, target, target_length) == 0) {
+    if (memcmp(match, target, target_length) == 0) {
         /* Match. */
         *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
                         log_escape_ex(msr->mp, match, match_length),
@@ -588,7 +680,7 @@ static int msre_op_beginsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var
         return 0;
     }
 
-    if (strncmp(match, target, match_length) == 0) {
+    if (memcmp(match, target, match_length) == 0) {
         /* Match. */
         *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
                         log_escape_ex(msr->mp, match, match_length),
@@ -643,7 +735,7 @@ static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         return 0;
     }
 
-    if (strncmp(match, (target + (target_length - match_length)), match_length) == 0) {
+    if (memcmp(match, (target + (target_length - match_length)), match_length) == 0) {
         /* Match. */
         *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
                         log_escape_ex(msr->mp, match, match_length),
@@ -1499,6 +1591,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "contains",
         NULL, /* ENH init function to flag var substitution */
         msre_op_contains_execute
+    );
+
+    /* containsWord */
+    msre_engine_op_register(engine,
+        "containsWord",
+        NULL, /* ENH init function to flag var substitution */
+        msre_op_containsWord_execute
     );
 
     /* is */
