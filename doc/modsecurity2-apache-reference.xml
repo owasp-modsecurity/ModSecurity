@@ -2025,7 +2025,9 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis
     <para>The following variables are supported in ModSecurity 2.x:</para>
 
     <section>
-      <title><literal moreinfo="none">ARGS</literal></title>
+      <title>
+        <literal moreinfo="none">ARGS</literal>
+      </title>
 
       <para><literal>ARGS</literal> is a collection and can be used on its own
       (means all arguments including the POST Payload), with a static
@@ -2070,7 +2072,9 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis role="bold">phase:1</emphasis
     </section>
 
     <section>
-      <title><literal moreinfo="none">ARGS_COMBINED_SIZE</literal></title>
+      <title>
+        <literal moreinfo="none">ARGS_COMBINED_SIZE</literal>
+      </title>
 
       <para>This variable allows you to set more targeted evaluations on the
       total size of the Arguments as compared with normal Apache LimitRequest
@@ -2084,7 +2088,9 @@ SecRule <emphasis role="bold">ARGS_COMBINED_SIZE</emphasis> "@gt 25"</programlis
     </section>
 
     <section>
-      <title><literal moreinfo="none">ARGS_NAMES</literal></title>
+      <title>
+        <literal moreinfo="none">ARGS_NAMES</literal>
+      </title>
 
       <para>Is a collection of the argument names. You can search for specific
       argument names that you want to block. In a positive policy scenario,
@@ -2098,14 +2104,18 @@ SecRule<emphasis role="bold"> ARGS_NAMES</emphasis> "!^(p|a)$"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">ARGS_GET</literal></title>
+      <title>
+        <literal moreinfo="none">ARGS_GET</literal>
+      </title>
 
       <para><literal>ARGS_GET</literal> is similar to <literal>ARGS</literal>,
       but only contains arguments from the query string.</para>
     </section>
 
     <section>
-      <title><literal moreinfo="none">ARGS_GET_NAMES</literal></title>
+      <title>
+        <literal moreinfo="none">ARGS_GET_NAMES</literal>
+      </title>
 
       <para><literal>ARGS_GET_NAMES</literal> is similar to
       <literal>ARGS_NAMES</literal>, but only contains argument names from the
@@ -2113,7 +2123,9 @@ SecRule<emphasis role="bold"> ARGS_NAMES</emphasis> "!^(p|a)$"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">ARGS_POST</literal></title>
+      <title>
+        <literal moreinfo="none">ARGS_POST</literal>
+      </title>
 
       <para><literal>ARGS_POST</literal> is similar to
       <literal>ARGS</literal>, but only contains arguments from the POST
@@ -2121,7 +2133,9 @@ SecRule<emphasis role="bold"> ARGS_NAMES</emphasis> "!^(p|a)$"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">ARGS_POST_NAMES</literal></title>
+      <title>
+        <literal moreinfo="none">ARGS_POST_NAMES</literal>
+      </title>
 
       <para><literal>ARGS_POST_NAMES</literal> is similar to
       <literal>ARGS_NAMES</literal>, but only contains argument names from the
@@ -2129,14 +2143,18 @@ SecRule<emphasis role="bold"> ARGS_NAMES</emphasis> "!^(p|a)$"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">AUTH_TYPE</literal></title>
+      <title>
+        <literal moreinfo="none">AUTH_TYPE</literal>
+      </title>
 
       <para>This variable holds the authentication method used to validate a
       user. Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">AUTH_TYPE</emphasis> "basic" log,deny,status:403,phase:1,t:lowercase</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>This data will not be available in a proxy-mode deployment as the
       authentication is not local. In a proxy-mode deployment, you would need
@@ -2145,7 +2163,9 @@ SecRule<emphasis role="bold"> ARGS_NAMES</emphasis> "!^(p|a)$"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">ENV</literal></title>
+      <title>
+        <literal moreinfo="none">ENV</literal>
+      </title>
 
       <para>Collection, requires a single parameter (after a colon character).
       The ENV variable is set with setenv and does not give access to the CGI
@@ -2157,7 +2177,9 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">FILES</literal></title>
+      <title>
+        <literal moreinfo="none">FILES</literal>
+      </title>
 
       <para>Collection. Contains a collection of original file names (as they
       were called on the remote user's file system). Note: only available if
@@ -2167,7 +2189,9 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">FILES_COMBINED_SIZE</literal></title>
+      <title>
+        <literal moreinfo="none">FILES_COMBINED_SIZE</literal>
+      </title>
 
       <para>Single value. Total size of the uploaded files. Note: only
       available if files were extracted from the request body. Example:</para>
@@ -2176,7 +2200,9 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">FILES_NAMES</literal></title>
+      <title>
+        <literal moreinfo="none">FILES_NAMES</literal>
+      </title>
 
       <para>Collection w/o parameter. Contains a list of form fields that were
       used for file upload. Note: only available if files were extracted from
@@ -2186,7 +2212,9 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">FILES_SIZES</literal></title>
+      <title>
+        <literal moreinfo="none">FILES_SIZES</literal>
+      </title>
 
       <para>Collection. Contains a list of file sizes. Useful for implementing
       a size limitation on individual uploaded files. Note: only available if
@@ -2196,7 +2224,9 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">FILES_TMPNAMES</literal></title>
+      <title>
+        <literal moreinfo="none">FILES_TMPNAMES</literal>
+      </title>
 
       <para>Collection. Contains a collection of temporary files' names on the
       disk. Useful when used together with <literal
@@ -2207,7 +2237,9 @@ SecRule <emphasis role="bold">ENV:tag</emphasis> "suspicious"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">GEO</literal></title>
+      <title>
+        <literal moreinfo="none">GEO</literal>
+      </title>
 
       <para><literal>GEO</literal> is a collection populated by the <literal
       moreinfo="none">@geoLookups</literal> operator. It can be used to match
@@ -2281,7 +2313,9 @@ SecRule GEO:COUNTRY_CODE "!@streq UK"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">HIGHEST_SEVERITY</literal></title>
+      <title>
+        <literal moreinfo="none">HIGHEST_SEVERITY</literal>
+      </title>
 
       <para>This variable holds the highest severity of any rules that have
       matched so far. Severities are numeric values and thus can be used with
@@ -2298,7 +2332,22 @@ SecRule GEO:COUNTRY_CODE "!@streq UK"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">MODSEC_BUILD</literal></title>
+      <title>
+        <literal moreinfo="none">MATCHED_VAR</literal>
+      </title>
+
+      <para>This variable holds the full name of the variable that was matched
+      against.</para>
+
+      <programlisting format="linespecific">SecRule ARGS pattern setvar:tx.mymatch=%{MATCHED_VAR}
+...
+SecRule <emphasis role="bold">TX:MYMATCH</emphasis> "@eq ARGS:param" deny</programlisting>
+    </section>
+
+    <section>
+      <title>
+        <literal moreinfo="none">MODSEC_BUILD</literal>
+      </title>
 
       <para>This variable holds the ModSecurity build number. This variable is
       intended to be used to check the build number prior to using a feature
@@ -2309,7 +2358,9 @@ SecRule ARGS "@pm some key words" deny,status:500</programlisting>
     </section>
 
     <section>
-      <title><literal>MULTIPART_STRICT_ERROR</literal></title>
+      <title>
+        <literal>MULTIPART_STRICT_ERROR</literal>
+      </title>
 
       <para><literal>MULTIPART_STRICT_ERROR</literal> will be set to
       <literal>1</literal> when any of the following variables is also set to
@@ -2356,7 +2407,9 @@ SM %{MULTIPART_SEMICOLON_MISSING}'"</programlisting>
     </section>
 
     <section>
-      <title><literal>MULTIPART_UNMATCHED_BOUNDARY</literal></title>
+      <title>
+        <literal>MULTIPART_UNMATCHED_BOUNDARY</literal>
+      </title>
 
       <para>Set to <literal>1</literal> when, during the parsing phase of a
       <literal>multipart/request-body</literal>, ModSecurity encounters what
@@ -2374,7 +2427,9 @@ SM %{MULTIPART_SEMICOLON_MISSING}'"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">PATH_INFO</literal></title>
+      <title>
+        <literal moreinfo="none">PATH_INFO</literal>
+      </title>
 
       <para>Besides passing query information to a script/handler, you can
       also pass additional data, known as extra path information, as part of
@@ -2384,7 +2439,9 @@ SM %{MULTIPART_SEMICOLON_MISSING}'"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">QUERY_STRING</literal></title>
+      <title>
+        <literal moreinfo="none">QUERY_STRING</literal>
+      </title>
 
       <para>This variable holds form data passed to the script/handler by
       appending data after a question mark. Warning: Not URL-decoded.
@@ -2394,7 +2451,9 @@ SM %{MULTIPART_SEMICOLON_MISSING}'"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REMOTE_ADDR</literal></title>
+      <title>
+        <literal moreinfo="none">REMOTE_ADDR</literal>
+      </title>
 
       <para>This variable holds the IP address of the remote client.
       Example:</para>
@@ -2403,7 +2462,9 @@ SM %{MULTIPART_SEMICOLON_MISSING}'"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REMOTE_HOST</literal></title>
+      <title>
+        <literal moreinfo="none">REMOTE_HOST</literal>
+      </title>
 
       <para>If HostnameLookUps are set to On, then this variable will hold the
       DNS resolved remote host name. If it is set to Off, then it will hold
@@ -2415,7 +2476,9 @@ SM %{MULTIPART_SEMICOLON_MISSING}'"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REMOTE_PORT</literal></title>
+      <title>
+        <literal moreinfo="none">REMOTE_PORT</literal>
+      </title>
 
       <para>This variable holds information on the source port that the client
       used when initiating the connection to our web server. Example: in this
@@ -2427,7 +2490,9 @@ SM %{MULTIPART_SEMICOLON_MISSING}'"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REMOTE_USER</literal></title>
+      <title>
+        <literal moreinfo="none">REMOTE_USER</literal>
+      </title>
 
       <para>This variable holds the username of the authenticated user. If
       there are no password (basic|digest) access controls in place, then this
@@ -2435,14 +2500,18 @@ SM %{MULTIPART_SEMICOLON_MISSING}'"</programlisting>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">REMOTE_USER</emphasis> "admin"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>This data will not be available in a proxy-mode deployment as the
       authentication is not local.</para>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REQBODY_PROCESSOR</literal></title>
+      <title>
+        <literal moreinfo="none">REQBODY_PROCESSOR</literal>
+      </title>
 
       <para>Built-in processors are <literal
       moreinfo="none">URLENCODED</literal>,<literal moreinfo="none">
@@ -2454,8 +2523,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal
-      moreinfo="none">REQBODY_PROCESSOR_ERROR</literal></title>
+      <title>
+        <literal moreinfo="none">REQBODY_PROCESSOR_ERROR</literal>
+      </title>
 
       <para>Possible values are 0 (no error) or 1 (error). This variable will
       be set by request body processors (typically the
@@ -2480,8 +2550,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal
-      moreinfo="none">REQBODY_PROCESSOR_ERROR_MSG</literal></title>
+      <title>
+        <literal moreinfo="none">REQBODY_PROCESSOR_ERROR_MSG</literal>
+      </title>
 
       <para>Empty, or contains the error message from the processor.
       Example:</para>
@@ -2490,7 +2561,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REQUEST_BASENAME</literal></title>
+      <title>
+        <literal moreinfo="none">REQUEST_BASENAME</literal>
+      </title>
 
       <para>This variable holds just the filename part of
       <literal>REQUEST_FILENAME</literal> (e.g. index.php). Warning: not
@@ -2500,7 +2573,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REQUEST_BODY</literal></title>
+      <title>
+        <literal moreinfo="none">REQUEST_BODY</literal>
+      </title>
 
       <para>This variable holds the data in the request body (including
       POST_PAYLOAD data). REQUEST_BODY should be used if the original order of
@@ -2509,14 +2584,18 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_BODY</emphasis> "^username=\w{25,}\&amp;password=\w{25,}\&amp;Submit\=login$"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>This variable is only available if the content type is
       application/x-www-form-urlencoded.</para>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REQUEST_COOKIES</literal></title>
+      <title>
+        <literal moreinfo="none">REQUEST_COOKIES</literal>
+      </title>
 
       <para>This variable is a collection of all of the cookie data. Example:
       the following example is using the Ampersand special operator to count
@@ -2527,7 +2606,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REQUEST_COOKIES_NAMES</literal></title>
+      <title>
+        <literal moreinfo="none">REQUEST_COOKIES_NAMES</literal>
+      </title>
 
       <para>This variable is a collection of the cookie names in the request
       headers. Example: the following rule will trigger if the JSESSIONID
@@ -2537,7 +2618,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REQUEST_FILENAME</literal></title>
+      <title>
+        <literal moreinfo="none">REQUEST_FILENAME</literal>
+      </title>
 
       <para>This variable holds the relative REQUEST_URI minus the
       QUERY_STRING part (e.g. /index.php). Example:</para>
@@ -2546,7 +2629,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REQUEST_HEADERS</literal></title>
+      <title>
+        <literal moreinfo="none">REQUEST_HEADERS</literal>
+      </title>
 
       <para>This variable can be used as either a collection of all of the
       Request Headers or can be used to specify indivudual headers (by using
@@ -2564,7 +2649,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REQUEST_HEADERS_NAMES</literal></title>
+      <title>
+        <literal moreinfo="none">REQUEST_HEADERS_NAMES</literal>
+      </title>
 
       <para>This variable is a collection of the names of all of the Request
       Headers. Example:</para>
@@ -2574,7 +2661,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REQUEST_LINE</literal></title>
+      <title>
+        <literal moreinfo="none">REQUEST_LINE</literal>
+      </title>
 
       <para>This variable holds the complete request line sent to the server
       (including the REQUEST_METHOD and HTTP version data). Example: this
@@ -2584,7 +2673,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_LINE</emphasis> "!(^((?:(?:pos|ge)t|head))|http/(0\.9|1\.0|1\.1)$)"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>Due to the default action transformation function lowercase, the
       regex strings should be in lowercase as well unless the t:none
@@ -2592,7 +2683,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REQUEST_METHOD</literal></title>
+      <title>
+        <literal moreinfo="none">REQUEST_METHOD</literal>
+      </title>
 
       <para>This variable holds the Request Method used by the client.
       Example: the following example will trigger if the Request Method is
@@ -2600,7 +2693,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_METHOD</emphasis> "^((?:connect|trace))$"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>Due to the default action transformation function lowercase, the
       regex strings should be in lowercase as well unless the t:none
@@ -2608,14 +2703,18 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REQUEST_PROTOCOL</literal></title>
+      <title>
+        <literal moreinfo="none">REQUEST_PROTOCOL</literal>
+      </title>
 
       <para>This variable holds the Request Protocol Version information.
       Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">REQUEST_PROTOCOL</emphasis> "!^http/(0\.9|1\.0|1\.1)$"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>Due to the default action transformation function lowercase, the
       regex strings should be in lowercase as well unless the t:none
@@ -2623,7 +2722,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REQUEST_URI</literal></title>
+      <title>
+        <literal moreinfo="none">REQUEST_URI</literal>
+      </title>
 
       <para>This variable holds the full URL including the QUERY_STRING data
       (e.g. /index.php?p=X), however it will never contain a domain name, even
@@ -2635,7 +2736,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">REQUEST_URI_RAW</literal></title>
+      <title>
+        <literal moreinfo="none">REQUEST_URI_RAW</literal>
+      </title>
 
       <para>Same as REQUEST_URI but will contain the domain name if it was
       provided on the request line (e.g.
@@ -2646,7 +2749,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">RESPONSE_BODY</literal></title>
+      <title>
+        <literal moreinfo="none">RESPONSE_BODY</literal>
+      </title>
 
       <para>This variable holds the data for the response payload.
       Example:</para>
@@ -2655,7 +2760,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal>RESPONSE_CONTENT_LENGTH</literal></title>
+      <title>
+        <literal>RESPONSE_CONTENT_LENGTH</literal>
+      </title>
 
       <para>Response body length in bytes. Can be available starting with
       phase 3 but it does not have to be (as the length of response body is
@@ -2671,14 +2778,18 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal>RESPONSE_CONTENT_TYPE</literal></title>
+      <title>
+        <literal>RESPONSE_CONTENT_TYPE</literal>
+      </title>
 
       <para>Response content type. Only available starting with phase
       3.</para>
     </section>
 
     <section>
-      <title><literal moreinfo="none">RESPONSE_HEADERS</literal></title>
+      <title>
+        <literal moreinfo="none">RESPONSE_HEADERS</literal>
+      </title>
 
       <para>This variable is similar to the REQUEST_HEADERS variable and can
       be used in the same manner. Example:</para>
@@ -2686,7 +2797,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <programlisting format="linespecific">SecRule<emphasis role="bold"> RESPONSE_HEADERS</emphasis><emphasis
           role="bold">:X-Cache</emphasis> "MISS"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>This variable may not have access to some headers when running in
       embedded-mode. Headers such as Server, Date, Connection and Content-Type
@@ -2696,21 +2809,27 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">RESPONSE_HEADERS_NAMES</literal></title>
+      <title>
+        <literal moreinfo="none">RESPONSE_HEADERS_NAMES</literal>
+      </title>
 
       <para>This variable is a collection of the response header names.
       Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">RESPONSE_HEADERS_NAMES</emphasis> "Set-Cookie"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>Same limitations as RESPONSE_HEADERS with regards to access to
       some headers in embedded-mode.</para>
     </section>
 
     <section>
-      <title><literal moreinfo="none">RESPONSE_PROTOCOL</literal></title>
+      <title>
+        <literal moreinfo="none">RESPONSE_PROTOCOL</literal>
+      </title>
 
       <para>This variable holds the HTTP Response Protocol information.
       Example:</para>
@@ -2719,14 +2838,18 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">RESPONSE_STATUS</literal></title>
+      <title>
+        <literal moreinfo="none">RESPONSE_STATUS</literal>
+      </title>
 
       <para>This variable holds the HTTP Response Status Code generated by
       Apache. Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">RESPONSE_STATUS</emphasis> "^[45]"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>This directive may not work as expected in embedded-mode as Apache
       handles many of the stock response codes (404, 401, etc...) earlier in
@@ -2735,7 +2858,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">RULE</literal></title>
+      <title>
+        <literal moreinfo="none">RULE</literal>
+      </title>
 
       <para>This variable provides access to the <literal
       moreinfo="none">id</literal>, <literal moreinfo="none">rev</literal>,
@@ -2750,59 +2875,77 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">SCRIPT_BASENAME</literal></title>
+      <title>
+        <literal moreinfo="none">SCRIPT_BASENAME</literal>
+      </title>
 
       <para>This variable holds just the local filename part of
       SCRIPT_FILENAME. Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_BASENAME</emphasis> "^login\.php$"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>This variable is not available in proxy mode.</para>
     </section>
 
     <section>
-      <title><literal moreinfo="none">SCRIPT_FILENAME</literal></title>
+      <title>
+        <literal moreinfo="none">SCRIPT_FILENAME</literal>
+      </title>
 
       <para>This variable holds the full path on the server to the requested
       script. (e.g. SCRIPT_NAME plus the server path). Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_FILENAME</emphasis> "^/usr/local/apache/cgi-bin/login\.php$"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>This variable is not available in proxy mode.</para>
     </section>
 
     <section>
-      <title><literal moreinfo="none">SCRIPT_GID</literal></title>
+      <title>
+        <literal moreinfo="none">SCRIPT_GID</literal>
+      </title>
 
       <para>This variable holds the groupid (numerical value) of the group
       owner of the script. Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_GID</emphasis> "!^46$"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>This variable is not available in proxy mode.</para>
     </section>
 
     <section>
-      <title><literal moreinfo="none">SCRIPT_GROUPNAME</literal></title>
+      <title>
+        <literal moreinfo="none">SCRIPT_GROUPNAME</literal>
+      </title>
 
       <para>This variable holds the group name of the group owner of the
       script. Example:</para>
 
       <programlisting format="linespecific">SecRule<emphasis role="bold"> SCRIPT_GROUPNAME</emphasis> "!^apache$"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>This variable is not available in proxy mode.</para>
     </section>
 
     <section>
-      <title><literal moreinfo="none">SCRIPT_MODE</literal></title>
+      <title>
+        <literal moreinfo="none">SCRIPT_MODE</literal>
+      </title>
 
       <para>This variable holds the script's permissions mode data (numerical
       - 1=execute, 2=write, 4=read and 7=read/write/execute). Example: will
@@ -2810,13 +2953,17 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_MODE</emphasis> "^(2|3|6|7)$"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>This variable is not available in proxy mode.</para>
     </section>
 
     <section>
-      <title><literal moreinfo="none">SCRIPT_UID</literal></title>
+      <title>
+        <literal moreinfo="none">SCRIPT_UID</literal>
+      </title>
 
       <para>This variable holds the userid (numerical value) of the owner of
       the script. Example: the example rule below will trigger if the UID is
@@ -2824,26 +2971,34 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
 
       <programlisting format="linespecific">SecRule<emphasis role="bold"> SCRIPT_UID</emphasis> "!^46$"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>This variable is not available in proxy mode.</para>
     </section>
 
     <section>
-      <title><literal moreinfo="none">SCRIPT_USERNAME</literal></title>
+      <title>
+        <literal moreinfo="none">SCRIPT_USERNAME</literal>
+      </title>
 
       <para>This variable holds the username of the owner of the script.
       Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">SCRIPT_USERNAME</emphasis> "!^apache$"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>This variable is not available in proxy mode.</para>
     </section>
 
     <section>
-      <title><literal moreinfo="none">SERVER_ADDR</literal></title>
+      <title>
+        <literal moreinfo="none">SERVER_ADDR</literal>
+      </title>
 
       <para>This variable contains the IP address of the server.
       Example:</para>
@@ -2852,21 +3007,27 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">SERVER_NAME</literal></title>
+      <title>
+        <literal moreinfo="none">SERVER_NAME</literal>
+      </title>
 
       <para>This variable contains the server's hostname or IP address.
       Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">SERVER_NAME</emphasis> "hostname\.com$"</programlisting>
 
-      <para><emphasis role="bold">Note</emphasis></para>
+      <para>
+        <emphasis role="bold">Note</emphasis>
+      </para>
 
       <para>This data is taken from the Host header submitted in the client
       request.</para>
     </section>
 
     <section>
-      <title><literal moreinfo="none">SERVER_PORT</literal></title>
+      <title>
+        <literal moreinfo="none">SERVER_PORT</literal>
+      </title>
 
       <para>This variable contains the local port that the web server is
       listening on. Example:</para>
@@ -2875,7 +3036,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">SESSION</literal></title>
+      <title>
+        <literal moreinfo="none">SESSION</literal>
+      </title>
 
       <para>This variable is a collection, available only after <literal
       moreinfo="none">setsid</literal> is executed. Example: the following
@@ -2893,7 +3056,9 @@ SecRule<emphasis role="bold"> SESSION:BLOCKED</emphasis> "@eq 1" "log,deny,statu
     </section>
 
     <section>
-      <title><literal moreinfo="none">SESSIONID</literal></title>
+      <title>
+        <literal moreinfo="none">SESSIONID</literal>
+      </title>
 
       <para>This variable is the value set with <literal
       moreinfo="none">setsid</literal>. Example:</para>
@@ -2904,7 +3069,9 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">TIME</literal></title>
+      <title>
+        <literal moreinfo="none">TIME</literal>
+      </title>
 
       <para>This variable holds a formatted string representing the time
       (hour:minute:second). Example:</para>
@@ -2913,7 +3080,9 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">TIME_DAY</literal></title>
+      <title>
+        <literal moreinfo="none">TIME_DAY</literal>
+      </title>
 
       <para>This variable holds the current date (1-31). Example: this rule
       would trigger anytime between the 10th and 20th days of the
@@ -2923,7 +3092,9 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">TIME_EPOCH</literal></title>
+      <title>
+        <literal moreinfo="none">TIME_EPOCH</literal>
+      </title>
 
       <para>This variable holds the time in seconds since 1970.
       Example:</para>
@@ -2932,7 +3103,9 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">TIME_HOUR</literal></title>
+      <title>
+        <literal moreinfo="none">TIME_HOUR</literal>
+      </title>
 
       <para>This variable holds the current hour (0-23). Example: this rule
       would trigger during "off hours".</para>
@@ -2941,7 +3114,9 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">TIME_MIN</literal></title>
+      <title>
+        <literal moreinfo="none">TIME_MIN</literal>
+      </title>
 
       <para>This variable holds the current minute (0-59). Example: this rule
       would trigger during the last half hour of every hour.</para>
@@ -2950,7 +3125,9 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">TIME_MON</literal></title>
+      <title>
+        <literal moreinfo="none">TIME_MON</literal>
+      </title>
 
       <para>This variable holds the current month (0-11). Example: this rule
       would match if the month was either November (10) or December
@@ -2960,7 +3137,9 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">TIME_SEC</literal></title>
+      <title>
+        <literal moreinfo="none">TIME_SEC</literal>
+      </title>
 
       <para>This variable holds the current second count (0-59).
       Example:</para>
@@ -2969,7 +3148,9 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">TIME_WDAY</literal></title>
+      <title>
+        <literal moreinfo="none">TIME_WDAY</literal>
+      </title>
 
       <para>This variable holds the current weekday (0-6). Example: this rule
       would trigger only on week-ends (Saturday and Sunday).</para>
@@ -2978,7 +3159,9 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">TIME_YEAR</literal></title>
+      <title>
+        <literal moreinfo="none">TIME_YEAR</literal>
+      </title>
 
       <para>This variable holds the current four-digit year data.
       Example:</para>
@@ -2987,7 +3170,9 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">TX</literal></title>
+      <title>
+        <literal moreinfo="none">TX</literal>
+      </title>
 
       <para>Transaction Collection. This is used to store pieces of data,
       create a transaction anomaly score, and so on. Transaction variables are
@@ -3015,11 +3200,6 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
           moreinfo="none">@rx</literal> operator with capturing parens and the
           <literal moreinfo="none">capture</literal> action.</para>
         </listitem>
-
-        <listitem>
-          <para><literal moreinfo="none">TX:LAST_MATCHED_VAR_NAME</literal> -
-          The full name of the variable that was matched against.</para>
-        </listitem>
       </itemizedlist>
 
       <programlisting format="linespecific">SecRule WEBSERVER_ERROR_LOG "does not exist" "phase:5,pass,<emphasis
@@ -3028,7 +3208,9 @@ SecRule<emphasis role="bold"> TX:SCORE</emphasis> "@gt 20" deny,log</programlist
     </section>
 
     <section>
-      <title><literal moreinfo="none">USERID</literal></title>
+      <title>
+        <literal moreinfo="none">USERID</literal>
+      </title>
 
       <para>This variable is the value set with <literal
       moreinfo="none">setuid</literal>. Example:</para>
@@ -3038,7 +3220,9 @@ SecRule<emphasis role="bold"> USERID</emphasis> "Admin"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">WEBAPPID</literal></title>
+      <title>
+        <literal moreinfo="none">WEBAPPID</literal>
+      </title>
 
       <para>This variable is the value set with <literal
       moreinfo="none">SecWebAppId</literal>. Example:</para>
@@ -3049,7 +3233,9 @@ SecRule REQUEST_HEADERS:Transfer-Encoding "!^$"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">WEBSERVER_ERROR_LOG</literal></title>
+      <title>
+        <literal moreinfo="none">WEBSERVER_ERROR_LOG</literal>
+      </title>
 
       <para>Contains zero or more error messages produced by the web server.
       Access to this variable is in phase:5 (logging). Example:</para>
@@ -3058,7 +3244,9 @@ SecRule REQUEST_HEADERS:Transfer-Encoding "!^$"</programlisting>
     </section>
 
     <section>
-      <title><literal moreinfo="none">XML</literal></title>
+      <title>
+        <literal moreinfo="none">XML</literal>
+      </title>
 
       <para>Can be used standalone (as a target for validateDTD and
       validateSchema) or with an XPath expression parameter (which makes it a
@@ -3129,14 +3317,17 @@ SecRule <emphasis role="bold">XML:/xq:employees/employee/name/text()</emphasis> 
 
       <orderedlist>
         <listitem>
-          <para><ulink url="http://www.w3.org/TR/xpath">XPath
-          Standard</ulink></para>
+          <para>
+            <ulink url="http://www.w3.org/TR/xpath">XPath Standard</ulink>
+          </para>
         </listitem>
 
         <listitem>
-          <para><ulink
-          url="http://www.zvon.org/xxl/XPathTutorial/General/examples.html">XPath
-          Tutorial</ulink></para>
+          <para>
+            <ulink
+            url="http://www.zvon.org/xxl/XPathTutorial/General/examples.html">XPath
+            Tutorial</ulink>
+          </para>
         </listitem>
       </orderedlist>
     </section>

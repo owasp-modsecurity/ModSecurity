@@ -838,6 +838,15 @@ static int var_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     return count;
 }
 
+/* MATCHED_VAR */
+
+static int var_matched_var_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return var_simple_generate(var, vartab, mptmp,
+                               apr_pstrdup(mptmp, msr->matched_var));
+}
+
 /* SESSION */
 
 static int var_session_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -2289,6 +2298,17 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         var_generic_list_validate,
         var_ip_generate,
         VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* MATCHED_VAR */
+    msre_engine_variable_register(engine,
+        "MATCHED_VAR",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_matched_var_generate,
+        VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
 

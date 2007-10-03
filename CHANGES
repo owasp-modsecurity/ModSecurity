@@ -5,7 +5,7 @@
  * Added a @containsWord operator that will match a given string anywhere in
    the target value, but only on word boundaries.
 
- * Used new TX:LAST_MATCHED_VAR_NAME to store the last matched variable name
+ * New MATCHED_VAR variable to store the last matched variable name
    so that it can be more easily used by rules.
 
  * Fixed expansion of macros when using relative changes with setvar.  In
