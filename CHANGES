@@ -1,7 +1,10 @@
+
 15 Oct 2007 - 2.1.4-rc1
 -----------------------
 
  * Do not process subrequests in phase 2-4.
+
+ * Fix a blocking FP in the multipart parser, which affected Safari.
 
 
 11 Sep 2007 - 2.1.3
