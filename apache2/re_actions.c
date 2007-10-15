@@ -769,39 +769,40 @@ static apr_status_t msre_action_sanitiseMatched_execute(modsec_rec *msr, apr_poo
     const apr_array_header_t *tarr;
     const apr_table_entry_t *telts;
     int i, type = 0;
+    msc_string *mvar = msr->matched_var;
 
-    if (msr->matched_var == NULL) return 0;
+    if (mvar->name_len == 0) return 0;
 
     /* IMP1 We need to extract the variable name properly here,
      *      taking into account it may have been escaped.
      */
-    if (strncmp(msr->matched_var, "ARGS:", 5) == 0) {
-        sargname = apr_pstrdup(msr->mp, msr->matched_var + 5);
+    if ((mvar->name_len > 5) && (strncmp(mvar->name, "ARGS:", 5) == 0)) {
+        sargname = apr_pstrdup(msr->mp, mvar->name + 5);
         type = SANITISE_ARG;
     } else
-    if (strncmp(msr->matched_var, "ARGS_NAMES:", 11) == 0) {
-        sargname = apr_pstrdup(msr->mp, msr->matched_var + 11);
+    if ((mvar->name_len > 11) && (strncmp(mvar->name, "ARGS_NAMES:", 11) == 0)) {
+        sargname = apr_pstrdup(msr->mp, mvar->name + 11);
         type = SANITISE_ARG;
     } else
-    if (strncmp(msr->matched_var, "REQUEST_HEADERS:", 16) == 0) {
-        sargname = apr_pstrdup(msr->mp, msr->matched_var + 16);
+    if ((mvar->name_len > 16) && (strncmp(mvar->name, "REQUEST_HEADERS:", 16) == 0)) {
+        sargname = apr_pstrdup(msr->mp, mvar->name + 16);
         type = SANITISE_REQUEST_HEADER;
     } else
-    if (strncmp(msr->matched_var, "REQUEST_HEADERS_NAMES:", 22) == 0) {
-        sargname = apr_pstrdup(msr->mp, msr->matched_var + 22);
+    if ((mvar->name_len > 22) && (strncmp(mvar->name, "REQUEST_HEADERS_NAMES:", 22) == 0)) {
+        sargname = apr_pstrdup(msr->mp, mvar->name + 22);
         type = SANITISE_REQUEST_HEADER;
     } else
-    if (strncmp(msr->matched_var, "RESPONSE_HEADERS:", 17) == 0) {
-        sargname = apr_pstrdup(msr->mp, msr->matched_var + 17);
+    if ((mvar->name_len > 17) && (strncmp(mvar->name, "RESPONSE_HEADERS:", 17) == 0)) {
+        sargname = apr_pstrdup(msr->mp, mvar->name + 17);
         type = SANITISE_RESPONSE_HEADER;
     } else
-    if (strncmp(msr->matched_var, "RESPONSE_HEADERS_NAMES:", 23) == 0) {
-        sargname = apr_pstrdup(msr->mp, msr->matched_var + 23);
+    if ((mvar->name_len > 23) && (strncmp(mvar->name, "RESPONSE_HEADERS_NAMES:", 23) == 0)) {
+        sargname = apr_pstrdup(msr->mp, mvar->name + 23);
         type = SANITISE_RESPONSE_HEADER;
     }
     else {
         msr_log(msr, 3, "sanitiseMatched: Don't know how to handle variable: %s",
-            msr->matched_var);
+            mvar->name);
         return 0;
     }
 

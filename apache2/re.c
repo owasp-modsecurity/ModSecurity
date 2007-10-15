@@ -1342,7 +1342,11 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
                 log_escape(msr->mp, full_varname));
         }
 
-        msr->matched_var = apr_pstrdup(msr->mp, var->name);
+        /* Save the last matched var data */
+        msr->matched_var->name = apr_pstrdup(msr->mp, var->name);
+        msr->matched_var->name_len = strlen(msr->matched_var->name);
+        msr->matched_var->value = apr_pmemdup(msr->mp, var->value, var->value_len);
+        msr->matched_var->value_len = var->value_len;
 
         /* Keep track of the highest severity matched so far */
         if ((acting_actionset->severity > 0) && (acting_actionset->severity < msr->highest_severity))

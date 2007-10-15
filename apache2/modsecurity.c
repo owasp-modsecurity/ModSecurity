@@ -304,6 +304,9 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     msr->tcache = apr_hash_make(msr->mp);
     if (msr->tcache == NULL) return -1;
 
+    msr->matched_var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    if (msr->matched_var == NULL) return -1;
+
     msr->highest_severity = 255; /* high, invalid value */
 
     return 1;

@@ -324,7 +324,7 @@ struct modsec_rec {
     apr_time_t           time_checkpoint_2;
     apr_time_t           time_checkpoint_3;
 
-    const char          *matched_var;
+    msc_string          *matched_var;
     int                  highest_severity;
 
     /* upload */
