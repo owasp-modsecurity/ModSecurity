@@ -622,8 +622,11 @@ static int multipart_count_boundary_params(apr_pool_t *mp, const char *header_va
 
     s = duplicate;
     while((s = strstr(s, "boundary")) != NULL) {
-        count++;
         s += 8;
+
+        if (strchr(s, "=") != NULL) {
+            count++;
+        }
     }
 
     return count;
