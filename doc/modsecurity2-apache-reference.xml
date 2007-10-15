@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-dev3 / (October 1, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-dev?/ (October 15, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -2330,6 +2330,24 @@ SecRule <emphasis role="bold">TX:MYMATCH</emphasis> "@eq ARGS:param" deny</progr
 
       <programlisting format="linespecific">SecRule <emphasis role="bold">MODSEC_BUILD</emphasis> "!@ge 02050102" skip:1
 SecRule ARGS "@pm some key words" deny,status:500</programlisting>
+    </section>
+
+    <section>
+      <title><literal>MULTIPART_CRLF_LF_LINES</literal></title>
+
+      <para>This flag variable will be set to <literal>1</literal> whenever a
+      multipart request uses mixed line terminators. The
+      <literal>multipart/form-data</literal> RFC requires
+      <literal>CRLF</literal> sequence to be used to terminate lines. Since
+      some client implementations use only <literal>LF</literal> to terminate
+      lines you might want to allow them to proceed under certain
+      circumstances (if you want to do this you will need to stop using
+      <literal>MULTIPART_STRICT_ERROR</literal> and check each multipart flag
+      variable individually, avoding <literal>MULTIPART_LF_LINE</literal>).
+      However, mixing <literal>CRLF</literal> and <literal>LF</literal> line
+      terminators is dangerous as it can allow for evasion. Therefore, in such
+      cases, you will have to add a check for
+      <literal>MULTIPART_CRLF_LF_LINES</literal>. </para>
     </section>
 
     <section>
