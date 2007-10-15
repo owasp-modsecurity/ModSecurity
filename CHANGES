@@ -1,5 +1,7 @@
-xx xxx 2007 - 2.1.x
--------------------
+15 Oct 2007 - 2.1.4-rc1
+-----------------------
+
+ * Do not process subrequests in phase 2-4.
 
 
 11 Sep 2007 - 2.1.3
