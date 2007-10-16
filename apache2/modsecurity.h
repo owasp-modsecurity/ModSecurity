@@ -346,6 +346,9 @@ struct modsec_rec {
 
     /* data cache */
     apr_hash_t          *tcache;
+
+    /* removed rules */
+    apr_array_header_t  *removed_rules;
 };
 
 struct directory_config {

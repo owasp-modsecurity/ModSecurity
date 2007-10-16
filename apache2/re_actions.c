@@ -476,40 +476,44 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
     }
 
     /* Validate value. */
-    if (strcmp(name, "ruleEngine") == 0) {
+    if (strcasecmp(name, "ruleEngine") == 0) {
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
         if (strcasecmp(value, "detectiononly") == 0) return NULL;
         return apr_psprintf(engine->mp, "Invalid setting for ctl name ruleEngine: %s", value);
     } else
-    if (strcmp(name, "requestBodyAccess") == 0) {
+    if (strcasecmp(name, "removeRuleById") == 0) {
+        /* ENH nothing yet */
+        return NULL;
+    } else
+    if (strcasecmp(name, "requestBodyAccess") == 0) {
         if (parse_boolean(value) == -1) {
             return apr_psprintf(engine->mp, "Invalid setting for ctl name "
                 " requestBodyAccess: %s", value);
         }
         return NULL;
     } else
-    if (strcmp(name, "requestBodyProcessor") == 0) {
+    if (strcasecmp(name, "requestBodyProcessor") == 0) {
         /* ENH We will accept anything for now but it'd be nice
          * to add a check here that the processor name is a valid one.
          */
         return NULL;
     } else
-    if (strcmp(name, "responseBodyAccess") == 0) {
+    if (strcasecmp(name, "responseBodyAccess") == 0) {
         if (parse_boolean(value) == -1) {
             return apr_psprintf(engine->mp, "Invalid setting for ctl name "
                 " responseBodyAccess: %s", value);
         }
         return NULL;
     } else
-    if (strcmp(name, "auditEngine") == 0) {
+    if (strcasecmp(name, "auditEngine") == 0) {
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
         if (strcasecmp(value, "relevantonly") == 0) return NULL;
         return apr_psprintf(engine->mp, "Invalid setting for ctl name "
             " auditEngine: %s", value);
     } else
-    if (strcmp(name, "auditLogParts") == 0) {
+    if (strcasecmp(name, "auditLogParts") == 0) {
         if ((value[0] == '+')||(value[0] == '-')) {
             if (is_valid_parts_specification(value + 1) != 1) {
             return apr_psprintf(engine->mp, "Invalid setting for ctl name "
@@ -523,12 +527,12 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
         }
         return NULL;
     } else
-    if (strcmp(name, "debugLogLevel") == 0) {
+    if (strcasecmp(name, "debugLogLevel") == 0) {
         if ((atoi(value) >= 0)&&(atoi(value) <= 9)) return NULL;
         return apr_psprintf(engine->mp, "Invalid setting for ctl name "
             "debugLogLevel: %s", value);
     } else
-    if (strcmp(name, "requestBodyLimit") == 0) {
+    if (strcasecmp(name, "requestBodyLimit") == 0) {
         long int limit = strtol(value, NULL, 10);
 
         if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
@@ -543,7 +547,7 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
 
         return NULL;
     } else
-    if (strcmp(name, "responseBodyLimit") == 0) {
+    if (strcasecmp(name, "responseBodyLimit") == 0) {
         long int limit = strtol(value, NULL, 10);
 
         if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
@@ -581,7 +585,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
     if (value == NULL) return -1;
 
     /* Validate value. */
-    if (strcmp(name, "ruleEngine") == 0) {
+    if (strcasecmp(name, "ruleEngine") == 0) {
         if (strcasecmp(value, "on") == 0) {
             msr->txcfg->is_enabled = MODSEC_ENABLED;
             msr->usercfg->is_enabled = MODSEC_ENABLED;
@@ -599,7 +603,11 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
-    if (strcmp(name, "requestBodyAccess") == 0) {
+    if (strcasecmp(name, "removeRuleById") == 0) {
+        *(const char **)apr_array_push(msr->removed_rules) = (const char *)apr_pstrdup(msr->mp, value);
+        return 1;
+    } else
+    if (strcasecmp(name, "requestBodyAccess") == 0) {
         int pv = parse_boolean(value);
 
         if (pv == -1) return -1;
@@ -609,13 +617,13 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
-    if (strcmp(name, "requestBodyProcessor") == 0) {
+    if (strcasecmp(name, "requestBodyProcessor") == 0) {
         msr->msc_reqbody_processor = value;
         msr_log(msr, 4, "Ctl: Set requestBodyProcessor to %s.", value);
 
         return 1;
     } else
-    if (strcmp(name, "responseBodyAccess") == 0) {
+    if (strcasecmp(name, "responseBodyAccess") == 0) {
         int pv = parse_boolean(value);
 
         if (pv == -1) return -1;
@@ -625,7 +633,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
-    if (strcmp(name, "auditEngine") == 0) {
+    if (strcasecmp(name, "auditEngine") == 0) {
         if (strcasecmp(value, "on") == 0) {
             msr->txcfg->auditlog_flag = AUDITLOG_ON;
             msr->usercfg->auditlog_flag = AUDITLOG_ON;
@@ -645,7 +653,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
-    if (strcmp(name, "auditLogParts") == 0) {
+    if (strcasecmp(name, "auditLogParts") == 0) {
         char *new_value = value;
 
         if (value[0] == '+') {
@@ -681,14 +689,14 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
-    if (strcmp(name, "debugLogLevel") == 0) {
+    if (strcasecmp(name, "debugLogLevel") == 0) {
         msr->txcfg->debuglog_level = atoi(value);
         msr->usercfg->debuglog_level = atoi(value);
         msr_log(msr, 4, "Ctl: Set debugLogLevel to %d.", msr->txcfg->debuglog_level);
 
         return 1;
     } else
-    if (strcmp(name, "requestBodyLimit") == 0) {
+    if (strcasecmp(name, "requestBodyLimit") == 0) {
         long int limit = strtol(value, NULL, 10);
 
         /* ENH Accept only in correct phase warn otherwise. */
@@ -697,7 +705,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
-    if (strcmp(name, "responseBodyLimit") == 0) {
+    if (strcasecmp(name, "responseBodyLimit") == 0) {
         long int limit = strtol(value, NULL, 10);
 
         /* ENH Accept only in correct phase warn otherwise. */

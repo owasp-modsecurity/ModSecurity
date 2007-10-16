@@ -309,6 +309,9 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
 
     msr->highest_severity = 255; /* high, invalid value */
 
+    msr->removed_rules = apr_array_make(msr->mp, 16, sizeof(char *));
+    if (msr->removed_rules == NULL) return -1;
+
     return 1;
 }
 
