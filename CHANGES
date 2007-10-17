@@ -2,6 +2,10 @@
 17 Oct 2007 - 2.5.0-dev3
 ------------------------
 
+ * Added skipAfter:<id> action to allow skipping all rules until a rule
+   with a specified ID is reached.  Rule execution then continues after
+   the specified rule.
+
  * Added ctl:ruleRemoveById action to allow rule removal on a match.
 
  * Added a @containsWord operator that will match a given string anywhere in

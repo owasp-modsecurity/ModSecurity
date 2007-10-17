@@ -235,6 +235,7 @@ struct msre_actionset {
     /* Flow */
     int                      is_chained;
     int                      skip_count;
+    const char              *skip_after;
 
     /* Disruptive */
     int                      intercept_action;

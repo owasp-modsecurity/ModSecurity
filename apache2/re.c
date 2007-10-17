@@ -425,6 +425,7 @@ msre_actionset *msre_actionset_create(msre_engine *engine, const char *text,
     /* Flow */
     actionset->is_chained = NOT_SET;
     actionset->skip_count = NOT_SET;
+    actionset->skip_after = NOT_SET_P;
 
     /* Disruptive */
     actionset->intercept_action = NOT_SET;
@@ -501,6 +502,7 @@ msre_actionset *msre_actionset_merge(msre_engine *engine, msre_actionset *parent
     /* Flow */
     merged->is_chained = child->is_chained;
     if (child->skip_count != NOT_SET) merged->skip_count = child->skip_count;
+    if (child->skip_after != NOT_SET_P) merged->skip_after = child->skip_after;
 
     /* Disruptive */
     if (child->intercept_action != NOT_SET) {
@@ -558,6 +560,7 @@ static void msre_actionset_set_defaults(msre_actionset *actionset) {
     /* Flow */
     if (actionset->is_chained == NOT_SET) actionset->is_chained = 0;
     if (actionset->skip_count == NOT_SET) actionset->skip_count = 0;
+    if (actionset->skip_after == NOT_SET_P) actionset->skip_after = NULL;
 
     /* Disruptive */
     if (actionset->intercept_action == NOT_SET) actionset->intercept_action = ACTION_NONE;
@@ -629,6 +632,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     apr_array_header_t *arr = NULL;
     msre_rule **rules;
     apr_status_t rc;
+    const char *skip_after = NULL;
     int i, mode, skip;
 
     /* First determine which set of rules we need to use. */
@@ -666,6 +670,30 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
 #if defined(PERFORMANCE_MEASUREMENT)
         apr_time_t time1 = 0;
 #endif
+
+        // TODO: Still need to skip over placeholders
+
+        /* SKIP_RULES is used to skip all rules until we hit a placeholder
+         * with the specified rule ID and then resume execution after that.
+         */
+        if (mode == SKIP_RULES) {
+            /* Go to the next rule if we have not yet hit the skip_after ID */
+            // TODO: must be a placeholder as well
+            if ((rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0)) {
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Skipping rule id=\"%s\" while looking for id=\"%s\"", (rule->actionset->id ? rule->actionset->id : "(none)"), skip_after);
+                }
+                continue;
+            }
+            if (msr->txcfg->debuglog_level >= 4) {
+                msr_log(msr, 4, "Continuing execution after rule id=\"%s\"", skip_after);
+            }
+            skip_after = NULL;
+            mode = NEXT_RULE;
+
+            /* Go to the rule *after* this one to continue execution. */
+            continue;
+        }
 
         /* NEXT_CHAIN is used when one of the rules in a chain
          * fails to match and then we need to skip the remaining
@@ -794,6 +822,17 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                     msr_log(msr, 9, "Match, intercepted -> returning.");
                 }
                 return 1;
+            }
+
+            if (rule->actionset->skip_after != NULL) {
+                skip_after = rule->actionset->skip_after;
+                mode = SKIP_RULES;
+
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Skipping after rule id=\"%s\" -> mode SKIP_RULES.", skip_after);
+                }
+
+                continue;
             }
 
             /* We had a match but the transaction was not

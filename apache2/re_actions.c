@@ -420,6 +420,21 @@ static apr_status_t msre_action_skip_init(msre_engine *engine, msre_actionset *a
     return 1;
 }
 
+/* skipAfter */
+
+static char *msre_action_skipAfter_validate(msre_engine *engine, msre_action *action) {
+    /* ENH Add validation. */
+    return NULL;
+}
+
+static apr_status_t msre_action_skipAfter_init(msre_engine *engine, msre_actionset *actionset,
+    msre_action *action)
+{
+    // TODO: Need to keep track of skipAfter IDs so we can insert placeholders after we get to the real rule with that ID.
+    actionset->skip_after = action->param;
+    return 1;
+}
+
 /* allow */
 
 static apr_status_t msre_action_allow_init(msre_engine *engine, msre_actionset *actionset,
@@ -1657,6 +1672,18 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         ACTION_CARDINALITY_ONE,
         msre_action_skip_validate,
         msre_action_skip_init,
+        NULL
+    );
+
+    /* skipAfter */
+    msre_engine_action_register(engine,
+        "skipAfter",
+        ACTION_DISRUPTIVE,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_ONE,
+        msre_action_skipAfter_validate,
+        msre_action_skipAfter_init,
         NULL
     );
 
