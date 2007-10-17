@@ -901,7 +901,7 @@ static void hook_insert_filter(request_rec *r) {
         ap_add_input_filter("MODSECURITY_IN", msr, r, r->connection);
     }
 
-    /* This function needs to run only once per transaction
+    /* The output filters only need to be added only once per transaction
      * (i.e. subrequests and redirects are excluded).
      */
     if ((r->main != NULL)||(r->prev != NULL)) {
@@ -916,7 +916,6 @@ static void hook_insert_filter(request_rec *r) {
     ap_add_output_filter("PDFP_OUT", msr, r, r->connection);
 
     /* Only proceed to add the second filter if the engine is enabled. */
-    // TODO: Do we need this anymore?
     if (msr->txcfg->is_enabled == 0) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_filter: Processing disabled, skipping.");

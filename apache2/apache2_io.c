@@ -41,8 +41,8 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 
     msr->r = f->r;
 
-    if (msr->phase > PHASE_REQUEST_BODY) {
-            msr_log(msr, 1, "Internal error: Still in input filter in phase %d", msr->phase);
+    if (msr->phase < PHASE_REQUEST_BODY) {
+            msr_log(msr, 1, "Internal error: REQUEST_BODY phase incomplete for input filter in phase %d", msr->phase);
             return APR_EGENERAL;
     }
 
