@@ -860,16 +860,26 @@ static int hook_log_transaction(request_rec *r) {
 static void hook_insert_filter(request_rec *r) {
     modsec_rec *msr = NULL;
 
-    /* This function needs to run only once per transaction
+    /* Find the transaction context first. */
+    msr = retrieve_tx_context(r);
+    if (msr == NULL) return;
+
+    /* Add the input filter, but only if we need it to run. */
+    if (msr->if_status == IF_STATUS_WANTS_TO_RUN) {
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Hook insert_filter: Adding input forwarding filter %s(r %x).", (((r->main != NULL)||(r->prev != NULL)) ? "for subrequest " : ""), r);
+        }
+
+        ap_add_input_filter("MODSECURITY_IN", msr, r, r->connection);
+    }
+
+
+    /* The output filters only need to be added only once per transaction
      * (i.e. subrequests and redirects are excluded).
      */
     if ((r->main != NULL)||(r->prev != NULL)) {
         return;
     }
-
-    /* Find the transaction context first. */
-    msr = retrieve_tx_context(r);
-    if (msr == NULL) return;
 
     /* Only proceed to add the filter if the engine is enabled. */
     if (msr->txcfg->is_enabled == 0) {
@@ -878,15 +888,6 @@ static void hook_insert_filter(request_rec *r) {
         }
 
         return;
-    }
-
-    /* Add the input filter, but only if we need it to run. */
-    if (msr->if_status == IF_STATUS_WANTS_TO_RUN) {
-        if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Hook insert_filter: Adding input forwarding filter (r %x).", r);
-        }
-
-        ap_add_input_filter("MODSECURITY_IN", msr, r, r->connection);
     }
 
     /* We always add the output filter because that's where we need to
