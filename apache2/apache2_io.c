@@ -41,6 +41,11 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 
     msr->r = f->r;
 
+    if (msr->phase > PHASE_REQUEST_BODY) {
+            msr_log(msr, 1, "Internal error: Still in input filter in phase %d", msr->phase);
+            return APR_EGENERAL;
+    }
+
     if ((msr->if_status == IF_STATUS_COMPLETE)||(msr->if_status == IF_STATUS_NONE)) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Input filter: Input forwarding already complete, skipping (f %x, r %x).", f, f->r);

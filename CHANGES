@@ -21,7 +21,7 @@
    a level 1-3 message to the debug log are now marked as 'relevant' and may
    generate an audit log entry.
 
- * Do not process subrequests in phase 2-4.
+ * Do not process subrequests in phase 2-4, but do hand off the request data.
 
  * Fixed deprecatevar:var=N/S action so that it decrements N every S seconds
    as documented instead of decrementing by a rate.

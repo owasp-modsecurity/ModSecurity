@@ -888,16 +888,25 @@ static int hook_log_transaction(request_rec *r) {
 static void hook_insert_filter(request_rec *r) {
     modsec_rec *msr = NULL;
 
+    /* Find the transaction context first. */
+    msr = retrieve_tx_context(r);
+    if (msr == NULL) return;
+
+    /* Add the input filter, but only if we need it to run. */
+    if (msr->if_status == IF_STATUS_WANTS_TO_RUN) {
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Hook insert_filter: Adding input forwarding filter %s(r %x).", (((r->main != NULL)||(r->prev != NULL)) ? "for subrequest " : ""), r);
+        }
+
+        ap_add_input_filter("MODSECURITY_IN", msr, r, r->connection);
+    }
+
     /* This function needs to run only once per transaction
      * (i.e. subrequests and redirects are excluded).
      */
     if ((r->main != NULL)||(r->prev != NULL)) {
         return;
     }
-
-    /* Find the transaction context first. */
-    msr = retrieve_tx_context(r);
-    if (msr == NULL) return;
 
     /* We always add the PDF XSS protection filter. */
     if (msr->txcfg->debuglog_level >= 4) {
@@ -907,21 +916,13 @@ static void hook_insert_filter(request_rec *r) {
     ap_add_output_filter("PDFP_OUT", msr, r, r->connection);
 
     /* Only proceed to add the second filter if the engine is enabled. */
+    // TODO: Do we need this anymore?
     if (msr->txcfg->is_enabled == 0) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_filter: Processing disabled, skipping.");
         }
 
         return;
-    }
-
-    /* Add the input filter, but only if we need it to run. */
-    if (msr->if_status == IF_STATUS_WANTS_TO_RUN) {
-        if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Hook insert_filter: Adding input forwarding filter (r %x).", r);
-        }
-
-        ap_add_input_filter("MODSECURITY_IN", msr, r, r->connection);
     }
 
     /* We always add the output filter because that's where we need to
