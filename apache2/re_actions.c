@@ -482,7 +482,7 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
         if (strcasecmp(value, "detectiononly") == 0) return NULL;
         return apr_psprintf(engine->mp, "Invalid setting for ctl name ruleEngine: %s", value);
     } else
-    if (strcasecmp(name, "removeRuleById") == 0) {
+    if (strcasecmp(name, "ruleRemoveById") == 0) {
         /* ENH nothing yet */
         return NULL;
     } else
@@ -603,7 +603,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
-    if (strcasecmp(name, "removeRuleById") == 0) {
+    if (strcasecmp(name, "ruleRemoveById") == 0) {
         *(const char **)apr_array_push(msr->removed_rules) = (const char *)apr_pstrdup(msr->mp, value);
         return 1;
     } else

@@ -1,6 +1,8 @@
 
-01 Oct 2007 - 2.5.0-dev3
+17 Oct 2007 - 2.5.0-dev3
 ------------------------
+
+ * Added ctl:ruleRemoveById action to allow rule removal on a match.
 
  * Added a @containsWord operator that will match a given string anywhere in
    the target value, but only on word boundaries.

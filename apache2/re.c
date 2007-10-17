@@ -703,6 +703,34 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             continue;
         }
 
+        /* Check if this rule was removed at runtime */
+        if ((rule->actionset->id !=NULL) && (! apr_is_empty_array(msr->removed_rules))) {
+                int j;
+                int do_process = 1;
+                const char *range;
+
+                for(j = 0; j < msr->removed_rules->nelts; j++) {
+                    range = ((const char**)msr->removed_rules->elts)[j];
+
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Checking removal of rule id=\"%s\" against: %s", rule->actionset->id, range);
+                    }
+
+                    if (rule_id_in_range(atoi(rule->actionset->id), range)) {
+                        do_process = 0;
+                        break;
+                    }
+                }
+
+                /* Go to the next rule if this one has been removed. */
+                if (do_process == 0) {
+                    if (msr->txcfg->debuglog_level >= 5) {
+                        msr_log(msr, 5, "Not processing rule id=\"%s\": removed by ctl action", rule->actionset->id);
+                    }
+                    continue;
+                }
+        }
+
         if (msr->txcfg->debuglog_level >= 4) {
             apr_pool_t *p = msr->mp;
             const char *fn = NULL;
@@ -1383,25 +1411,6 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
     int i, rc, match_count = 0;
     int invocations = 0;
     int multi_match = 0;    
-
-    /* Check if this rule was excluded at runtime */
-    if ((rule->actionset->id !=NULL) && (! apr_is_empty_array(msr->removed_rules))) {
-            const char *range;
-
-            for(i = 0; i < msr->removed_rules->nelts; i++) {
-                range = ((const char**)msr->removed_rules->elts)[i];
-
-                if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "Checking rule id=\"%s\" against exclusion: %s", rule->actionset->id, range);
-                }
-
-                if (rule_id_in_range(atoi(rule->actionset->id), range)) {
-                    msr_log(msr, 5, "Rule id=\"%s\" excluded.", rule->actionset->id);
-                    return RULE_NO_MATCH;
-                }
-            }
-        
-    }
 
     /* Choose the correct metadata/disruptive action actionset. */
     acting_actionset = rule->actionset;

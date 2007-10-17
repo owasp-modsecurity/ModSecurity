@@ -3625,6 +3625,10 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis role="bold">ctl:requ
         </listitem>
 
         <listitem>
+          <para><literal moreinfo="none">ruleRemoveById</literal></para>
+        </listitem>
+
+        <listitem>
           <para><literal moreinfo="none">requestBodyAccess</literal></para>
         </listitem>
 
