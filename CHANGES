@@ -1,6 +1,8 @@
 17 Oct 2007 - 2.1.4-rc2
 -----------------------
 
+ * TODO: Fix any warnings/issues compiling on Solaris before release.
+
  * Do not process subrequests in phase 2-4, but do hand off the request data.
 
 
