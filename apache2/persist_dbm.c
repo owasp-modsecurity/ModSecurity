@@ -161,7 +161,7 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
                 }
 
                 /* NOTE: No rate if there has been no time elapsed */
-                td = (apr_time_sec(apr_time_now()) - create_time);
+                td = (int)(apr_time_sec(apr_time_now()) - create_time);
                 if (td == 0) {
                     var->value = apr_psprintf(msr->mp, "%d", 0);
                 }
