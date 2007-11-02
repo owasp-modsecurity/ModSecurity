@@ -1304,11 +1304,18 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg, const 
         charval = apr_table_get(vartable, "minlen");
         if (charval != NULL) {
             intval = apr_atoi64(charval);
+            if (errno == ERANGE) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations minlen out of range: %s", charval);
+            }
             if (intval < 0) {
                 return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations minlen must be positive: %s", charval);
             }
-            if (intval >= (apr_size_t)NOT_SET) {
-                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations minlen must be less than: %u", (apr_size_t)NOT_SET);
+
+            /* The NOT_SET indicator is -1, a signed long, and therfore
+             * we cannot be >= the unsigned value of NOT_SET.
+             */
+            if ((unsigned long)intval >= (unsigned long)NOT_SET) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations minlen must be less than: %u", (unsigned long)NOT_SET);
             }
             dcfg->cache_trans_min = (apr_size_t)intval;
         }
@@ -1317,14 +1324,21 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg, const 
         charval = apr_table_get(vartable, "maxlen");
         if (charval != NULL) {
             intval = apr_atoi64(charval);
+            if (errno == ERANGE) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen out of range: %s", charval);
+            }
             if (intval < 0) {
                 return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must be positive: %s", charval);
             }
-            if (intval >= (apr_size_t)NOT_SET) {
-                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must be less than: %u", (apr_size_t)NOT_SET);
+
+            /* The NOT_SET indicator is -1, a signed long, and therfore
+             * we cannot be >= the unsigned value of NOT_SET.
+             */
+            if ((unsigned long)intval >= (unsigned long)NOT_SET) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must be less than: %u", (unsigned long)NOT_SET);
             }
-            if ((intval != 0) && (intval < dcfg->cache_trans_min)) {
-                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must not be less than minlen: %u < %u", (apr_size_t)intval, dcfg->cache_trans_min);
+            if ((intval != 0) && ((apr_size_t)intval < dcfg->cache_trans_min)) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must not be less than minlen: %u < %" APR_SIZE_T_FMT, (unsigned long)intval, dcfg->cache_trans_min);
             }
             dcfg->cache_trans_max = (apr_size_t)intval;
 

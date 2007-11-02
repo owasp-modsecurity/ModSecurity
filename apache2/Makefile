@@ -17,7 +17,17 @@ builddir     = .
 #     Debian - /usr/share/apache2  (apache2-prefork-dev or apache2-threaded-dev
 #                                   needed, depending on your installation type)
 #
-top_dir      = /apps/apache22
+# NOTE: On Solaris the top_builddir is /var/apache2.  This version of Apache
+# httpd uses the buildin PCRE, but you must still install the PCRE headers
+# to compile ModSecurity as they are not installed with Apache httpd. Because
+# of this, it is recommended to install your own version of Apache httpd.
+#
+# Additionally, if you do not have PCRE installed, you can use the
+# headers included with Apache httpd.  To do this, add the PCRE
+# include directory to the INCLUDES variable below
+# Something like: -I /path/to/httpd-x.y/srclib/pcre
+#
+top_dir      = /usr/local/apache2
 
 top_srcdir   = ${top_dir}
 top_builddir = ${top_dir}
@@ -28,6 +38,7 @@ APXS      = apxs
 APACHECTL = apachectl
 
 INCLUDES = -I /usr/include/libxml2
+#INCLUDES = -I /usr/include/libxml2 -I /path/to/httpd-x.y/srclib/pcre
 DEFS = -DWITH_LIBXML2
 #DEFS = -DWITH_LIBXML2 -DPERFORMANCE_MEASUREMENT
 #DEFS = -DWITH_LIBXML2 -DNO_MODSEC_API

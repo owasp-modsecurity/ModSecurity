@@ -1,6 +1,7 @@
-
-17 Oct 2007 - 2.5.0-dev3
+02 Nov 2007 - 2.5.0-dev3
 ------------------------
+
+ * Fix warnings on Solaris and/or 64bit builds.
 
  * Added skipAfter:<id> action to allow skipping all rules until a rule
    with a specified ID is reached.  Rule execution then continues after

@@ -145,17 +145,16 @@ apr_status_t DSOLOCAL msre_rule_process(msre_rule *rule, modsec_rec *msr);
 #define PHASE_RESPONSE_BODY     4
 #define PHASE_LOGGING           5
 
-#define FN_OP_PARAM_INIT(X) int (*X)(msre_rule *rule, char **error_msg)
-#define FN_OP_EXECUTE(X)    int (*X)(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg)
-
+typedef int (*fn_op_param_init_t)(msre_rule *rule, char **error_msg);
+typedef int (*fn_op_execute_t)(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg);
 
 struct msre_op_metadata {
     const char              *name;
-    FN_OP_PARAM_INIT        (param_init);
-    FN_OP_EXECUTE           (execute);
+    fn_op_param_init_t       param_init;
+    fn_op_execute_t          execute;
 };
 
-#define FN_TFN_EXECUTE(X)    int (*X)(apr_pool_t *pool, unsigned char *input, long int input_length, char **rval, long int *rval_length)
+typedef int (*fn_tfn_execute_t)(apr_pool_t *pool, unsigned char *input, long int input_length, char **rval, long int *rval_length);
 
 struct msre_tfn_metadata {
     const char              *name;
@@ -171,14 +170,14 @@ struct msre_tfn_metadata {
      *
      * NOTE Strict transformation functions not supported yet.
      */
-    FN_TFN_EXECUTE(execute);    
+    fn_tfn_execute_t execute;    
 };
 
 void DSOLOCAL msre_engine_tfn_register(msre_engine *engine, const char *name,
-    FN_TFN_EXECUTE(execute));
+    fn_tfn_execute_t execute);
 
 void DSOLOCAL msre_engine_op_register(msre_engine *engine, const char *name,
-    FN_OP_PARAM_INIT(fn1), FN_OP_EXECUTE(fn2));
+    fn_op_param_init_t fn1, fn_op_execute_t fn2);
 
 void DSOLOCAL msre_engine_register_default_tfns(msre_engine *engine);
 
@@ -193,16 +192,16 @@ msre_tfn_metadata DSOLOCAL *msre_engine_tfn_resolve(msre_engine *engine, const c
 #define VAR_DONT_CACHE  0
 #define VAR_CACHE       1
 
-#define FN_VAR_VALIDATE(X)  char *(*X)(msre_ruleset *ruleset, msre_var *var)
-#define FN_VAR_GENERATE(X)  int (*X)(modsec_rec *msr, msre_var *var, msre_rule *rule, apr_table_t *table, apr_pool_t *mptmp)
+typedef char *(*fn_var_validate_t)(msre_ruleset *ruleset, msre_var *var);
+typedef int (*fn_var_generate_t)(modsec_rec *msr, msre_var *var, msre_rule *rule, apr_table_t *table, apr_pool_t *mptmp);
 
 struct msre_var_metadata {
     const char              *name;
     unsigned int             type;          /* VAR_TYPE_ constants */
     unsigned int             argc_min;
     unsigned int             argc_max;
-    FN_VAR_VALIDATE          (validate);
-    FN_VAR_GENERATE          (generate);
+    fn_var_validate_t        validate;
+    fn_var_generate_t        generate;
     unsigned int             is_cacheable;  /* 0 - no, 1 - yes */
     unsigned int             availability;  /* when does this variable become available? */
 };
@@ -250,7 +249,7 @@ struct msre_actionset {
 
 void DSOLOCAL msre_engine_variable_register(msre_engine *engine, const char *name, 
     unsigned int type, unsigned int argc_min, unsigned int argc_max,
-    FN_VAR_VALIDATE(validate), FN_VAR_GENERATE(generate),
+    fn_var_validate_t validate, fn_var_generate_t generate,
     unsigned int is_cacheable, unsigned int availability);
 
 msre_actionset DSOLOCAL *msre_actionset_create(msre_engine *engine, const char *text,
@@ -263,9 +262,9 @@ msre_actionset DSOLOCAL *msre_actionset_create_default(msre_engine *engine);
 
 void DSOLOCAL msre_actionset_init(msre_actionset *actionset, msre_rule *rule);
 
-#define FN_ACTION_VALIDATE(X)   char *(*X)(msre_engine *engine, msre_action *action)
-#define FN_ACTION_INIT(X)       apr_status_t (*X)(msre_engine *engine, msre_actionset *actionset, msre_action *action)
-#define FN_ACTION_EXECUTE(X)    apr_status_t (*X)(modsec_rec *msr, apr_pool_t *mptmp, msre_rule *rule, msre_action *action)
+typedef char *(*fn_action_validate_t)(msre_engine *engine, msre_action *action);
+typedef apr_status_t (*fn_action_init_t)(msre_engine *engine, msre_actionset *actionset, msre_action *action);
+typedef apr_status_t (*fn_action_execute_t)(modsec_rec *msr, apr_pool_t *mptmp, msre_rule *rule, msre_action *action);
 
 #define ACTION_DISRUPTIVE       1
 #define ACTION_NON_DISRUPTIVE   2
@@ -285,9 +284,9 @@ struct msre_action_metadata {
     unsigned int             argc_max;
     unsigned int             allow_param_plusminus;
     unsigned int             cardinality;
-    FN_ACTION_VALIDATE       (validate);
-    FN_ACTION_INIT           (init);
-    FN_ACTION_EXECUTE        (execute);
+    fn_action_validate_t     validate;
+    fn_action_init_t         init;
+    fn_action_execute_t      execute;
 };
 
 struct msre_action {

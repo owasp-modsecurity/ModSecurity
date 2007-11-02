@@ -75,8 +75,8 @@ extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
 #define PHASE_FIRST                 PHASE_REQUEST_HEADERS
 #define PHASE_LAST                  PHASE_LOGGING
 
-#define NOT_SET                    -1
-#define NOT_SET_P          (void *)-1
+#define NOT_SET                    -1l
+#define NOT_SET_P          (void *)-1l
 
 #define CREATEMODE ( APR_UREAD | APR_UWRITE | APR_GREAD )
 #define CREATEMODE_DIR ( APR_UREAD | APR_UWRITE | APR_UEXECUTE | APR_GREAD | APR_GEXECUTE )

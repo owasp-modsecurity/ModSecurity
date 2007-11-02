@@ -2094,7 +2094,7 @@ static int var_webappid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
  */
 void msre_engine_variable_register(msre_engine *engine, const char *name, 
     unsigned int type, unsigned int argc_min, unsigned int argc_max,
-    FN_VAR_VALIDATE(validate), FN_VAR_GENERATE(generate),
+    fn_var_validate_t validate, fn_var_generate_t generate,
     unsigned int is_cacheable, unsigned int availability)
 {
     msre_var_metadata *metadata = (msre_var_metadata *)apr_pcalloc(engine->mp,
