@@ -163,14 +163,14 @@ struct msre_tfn_metadata {
      *
      * NOTE Strict transformation functions not supported yet.
      */
-    FN_TFN_EXECUTE(execute);    
+    fn_tfn_execute_t execute;
 };
 
 void DSOLOCAL msre_engine_tfn_register(msre_engine *engine, const char *name,
-    FN_TFN_EXECUTE(execute));
+    fn_tfn_execute_t execute);
 
 void msre_engine_op_register(msre_engine *engine, const char *name,
-    FN_OP_PARAM_INIT(fn1), FN_OP_EXECUTE(fn2));
+    fn_op_param_init_t fn1, fn_op_execute_t fn2);
 
 void DSOLOCAL msre_engine_register_default_tfns(msre_engine *engine);
 
