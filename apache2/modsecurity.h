@@ -57,8 +57,8 @@ typedef struct msc_string msc_string;
 #define PHASE_RESPONSE_BODY         4
 #define PHASE_LOGGING               5
 
-#define NOT_SET     -1
-#define NOT_SET_P (void *)-1
+#define NOT_SET                    -1l
+#define NOT_SET_P          (void *)-1l
 
 #define CREATEMODE ( APR_UREAD | APR_UWRITE | APR_GREAD )
 #define CREATEMODE_DIR ( APR_UREAD | APR_UWRITE | APR_UEXECUTE | APR_GREAD | APR_GEXECUTE )

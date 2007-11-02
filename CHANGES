@@ -1,3 +1,9 @@
+02 Nov 2007 - 2.1.4-rc3
+-----------------------
+
+ * Fix warnings on Solaris and/or 64bit builds.
+
+
 25 Oct 2007 - 2.1.4-rc2
 -----------------------
 

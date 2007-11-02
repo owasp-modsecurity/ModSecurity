@@ -438,7 +438,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
 
         if (first_time == 0) {
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "ModSecurity: chroot checkpoint #2 (pid=%d ppid=%d)", getpid(), getppid());
+                "ModSecurity: chroot checkpoint #2 (pid=%d ppid=%d)", (int)getpid(), (int)getppid());
 
             if (chdir(chroot_dir) < 0) {
                 ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, s,
@@ -467,7 +467,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
                 "ModSecurity: chroot successful, path=%s", chroot_dir);
         } else {
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "ModSecurity: chroot checkpoint #1 (pid=%d ppid=%d)", getpid(), getppid());
+                "ModSecurity: chroot checkpoint #1 (pid=%d ppid=%d)", (int)getpid(), (int)getppid());
         }
     }
     #endif

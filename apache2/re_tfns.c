@@ -364,7 +364,7 @@ static int msre_fn_normalisePathWin_execute(apr_pool_t *mptmp, unsigned char *in
  * Registers one transformation function with the engine.
  */
 void msre_engine_tfn_register(msre_engine *engine, const char *name,
-    FN_TFN_EXECUTE(execute))
+    fn_tfn_execute_t execute)
 {
     msre_tfn_metadata *metadata = (msre_tfn_metadata *)apr_pcalloc(engine->mp,
         sizeof(msre_tfn_metadata));

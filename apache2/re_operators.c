@@ -16,7 +16,7 @@
  *
  */
 void msre_engine_op_register(msre_engine *engine, const char *name,
-    FN_OP_PARAM_INIT(fn1), FN_OP_EXECUTE(fn2))
+    fn_op_param_init_t fn1, fn_op_execute_t fn2)
 {
     msre_op_metadata *metadata = (msre_op_metadata *)apr_pcalloc(engine->mp,
         sizeof(msre_op_metadata));
@@ -573,17 +573,17 @@ static int msre_op_validateUrlEncoding_execute(modsec_rec *msr, msre_rule *rule,
     int rc = validate_url_encoding(var->value, var->value_len);
     switch(rc) {
         case 1 :
-            return 0; /* Encoding is valid, no match. */
+            /* Encoding is valid */
             break;
         case -2 :
             *error_msg = apr_psprintf(msr->mp, "Invalid URL Encoding: Non-hexadecimal "
                 "digits used.");
-            return 1; /* Invalid, match. */
+            return 1; /* Invalid match. */
             break;
         case -3 :
             *error_msg = apr_psprintf(msr->mp, "Invalid URL Encoding: Not enough characters "
                 "at the end of input.");
-            return 1; /* Invalid, match. */
+            return 1; /* Invalid match. */
             break;
         case -1 :
         default :

@@ -16,8 +16,8 @@
  */
 static void msre_engine_action_register(msre_engine *engine, const char *name, unsigned int type,
     unsigned int argc_min, unsigned int argc_max, unsigned int allow_param_plusminus,
-    unsigned int cardinality, FN_ACTION_VALIDATE(validate), FN_ACTION_INIT(init),
-    FN_ACTION_EXECUTE(execute))
+    unsigned int cardinality, fn_action_validate_t validate, fn_action_init_t init,
+    fn_action_execute_t execute)
 {
     msre_action_metadata *metadata = (msre_action_metadata *)apr_pcalloc(engine->mp,
         sizeof(msre_action_metadata));

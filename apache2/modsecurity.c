@@ -460,9 +460,8 @@ apr_status_t modsecurity_process_phase(modsec_rec *msr, int phase) {
             break;
         default :
             msr_log(msr, 1, "Invalid processing phase: %i", msr->phase);
-            return -1;
             break;
     }
 
-    return 0;
+    return -1;
 }
