@@ -197,7 +197,7 @@ static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
                 msr->msc_reqbody_chunk_current = (msc_data_chunk *)
                     apr_pcalloc(msr->msc_reqbody_mp, sizeof(msc_data_chunk));
                 if (msr->msc_reqbody_chunk_current == NULL) {
-                    *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to allocate %d bytes for request body chunk.", sizeof(msc_data_chunk));
+                    *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to allocate %lu bytes for request body chunk.", (unsigned long)sizeof(msc_data_chunk));
                     return -1;
                 }
 
@@ -316,12 +316,12 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, cha
     /* Allocate a buffer large enough to hold the request body. */
 
     if (msr->msc_reqbody_length + 1 == 0) {
-        *error_msg = apr_psprintf(msr->mp, "Internal error, request body length will overflow: %d", msr->msc_reqbody_length);
+        *error_msg = apr_psprintf(msr->mp, "Internal error, request body length will overflow: %u", msr->msc_reqbody_length);
         return -1;
     }
     msr->msc_reqbody_buffer = malloc(msr->msc_reqbody_length + 1);
     if (msr->msc_reqbody_buffer == NULL) {
-        *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body. Asked for %" APR_SIZE_T_FMT " bytes.",
+        *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body. Asked for %u bytes.",
             msr->msc_reqbody_length + 1);
         return -1;
     }
@@ -442,7 +442,7 @@ apr_status_t modsecurity_request_body_retrieve_start(modsec_rec *msr, char **err
         
         msr->msc_reqbody_disk_chunk = apr_pcalloc(msr->msc_reqbody_mp, sizeof(msc_data_chunk));
         if (msr->msc_reqbody_disk_chunk == NULL) {
-            *error_msg = apr_psprintf(msr->mp, "Failed to allocate %d bytes for request body disk chunk.", sizeof(msc_data_chunk));
+            *error_msg = apr_psprintf(msr->mp, "Failed to allocate %lu bytes for request body disk chunk.", (unsigned long)sizeof(msc_data_chunk));
             return -1;
         }
         msr->msc_reqbody_disk_chunk->is_permanent = 1;
@@ -451,7 +451,7 @@ apr_status_t modsecurity_request_body_retrieve_start(modsec_rec *msr, char **err
     if (msr->msc_reqbody_storage == MSC_REQBODY_DISK) {
         msr->msc_reqbody_disk_chunk = apr_pcalloc(msr->msc_reqbody_mp, sizeof(msc_data_chunk));
         if (msr->msc_reqbody_disk_chunk == NULL) {
-            *error_msg = apr_psprintf(msr->mp, "Failed to allocate %d bytes for request body disk chunk.", sizeof(msc_data_chunk));
+            *error_msg = apr_psprintf(msr->mp, "Failed to allocate %lu bytes for request body disk chunk.", (unsigned long)sizeof(msc_data_chunk));
             return -1;
         }
 

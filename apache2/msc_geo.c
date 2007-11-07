@@ -165,7 +165,7 @@ static int db_open(directory_config *dcfg, char **error_msg)
         fprintf(stderr, "GEO: read 0x%02x%02x%02x\n", buf[0], buf[1], buf[2]);
         #endif
         if ((rc != APR_SUCCESS) || (nbytes != 3)) {
-            *error_msg = apr_psprintf(mp, "Could not read from geo database \"%s\" (%d/3 bytes read): %s", geo->dbfn, nbytes, apr_strerror(rc, errstr, 1024));
+            *error_msg = apr_psprintf(mp, "Could not read from geo database \"%s\" (%" APR_SIZE_T_FMT "/3 bytes read): %s", geo->dbfn, nbytes, apr_strerror(rc, errstr, 1024));
             return -1;
         }
         if ((buf[0] == 0xff) && (buf[1] == 0xff) && (buf[2] == 0xff)) {
@@ -190,7 +190,7 @@ static int db_open(directory_config *dcfg, char **error_msg)
                 memset(buf, 0, 3);
                 rc = apr_file_read_full(geo->db, &buf, 3, &nbytes);
                 if ((rc != APR_SUCCESS) || (nbytes != 3)) {
-                    *error_msg = apr_psprintf(mp, "Could not read geo database \"%s\" country offset (%d/3 bytes read): %s", geo->dbfn, nbytes, apr_strerror(rc, errstr, 1024));
+                    *error_msg = apr_psprintf(mp, "Could not read geo database \"%s\" country offset (%" APR_SIZE_T_FMT "/3 bytes read): %s", geo->dbfn, nbytes, apr_strerror(rc, errstr, 1024));
                     return -1;
                 }
                 #ifdef DEBUG_CONF
