@@ -1315,7 +1315,7 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg, const 
              * we cannot be >= the unsigned value of NOT_SET.
              */
             if ((unsigned long)intval >= (unsigned long)NOT_SET) {
-                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations minlen must be less than: %u", (unsigned long)NOT_SET);
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations minlen must be less than: %lu", (unsigned long)NOT_SET);
             }
             dcfg->cache_trans_min = (apr_size_t)intval;
         }
@@ -1335,10 +1335,10 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg, const 
              * we cannot be >= the unsigned value of NOT_SET.
              */
             if ((unsigned long)intval >= (unsigned long)NOT_SET) {
-                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must be less than: %u", (unsigned long)NOT_SET);
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must be less than: %lu", (unsigned long)NOT_SET);
             }
             if ((intval != 0) && ((apr_size_t)intval < dcfg->cache_trans_min)) {
-                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must not be less than minlen: %u < %" APR_SIZE_T_FMT, (unsigned long)intval, dcfg->cache_trans_min);
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must not be less than minlen: %lu < %" APR_SIZE_T_FMT, (unsigned long)intval, dcfg->cache_trans_min);
             }
             dcfg->cache_trans_max = (apr_size_t)intval;
 
