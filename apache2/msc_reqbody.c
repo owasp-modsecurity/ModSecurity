@@ -265,6 +265,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
                 *error_msg = apr_psprintf(msr->mp, "Request body processor error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
+                msr_log(msr, 2, "Request body processor error: %s", my_error_msg);
             }
         }
         #ifdef WITH_LIBXML2
@@ -274,6 +275,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
                 *error_msg = apr_psprintf(msr->mp, "Request body processor error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
+                msr_log(msr, 2, "Request body processor error: %s", my_error_msg);
             }
         }
         #endif
@@ -282,7 +284,8 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
             /* Do nothing, URLENCODED processor does not support streaming. */
         }
         else {
-            *error_msg = apr_psprintf(msr->mp, "Unknown request body processor: %s", msr->msc_reqbody_processor);
+            *error_msg = apr_psprintf(msr->mp, "Unknown request body processor: %s",
+                msr->msc_reqbody_processor);
             return -1;
         }
     }
