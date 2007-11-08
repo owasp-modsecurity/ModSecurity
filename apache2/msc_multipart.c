@@ -925,7 +925,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                     }
     
                     if (   (p != msr->mpd->buf + 2)
-                        && (strncmp(p, msr->mpd->boundary, strlen(msr->mpd->boundary)))
+                        && (strncmp(p, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0)
                     ) {
                         /* Found whitespace in front of a boundary. */
                         msr->mpd->flag_error = 1;
