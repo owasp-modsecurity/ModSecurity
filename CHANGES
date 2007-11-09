@@ -1,3 +1,9 @@
+09 Nov 2007 - 2.1.4-rc4
+-----------------------
+
+ * Fix for an evasion FP, mistaking a multipart non-boundary for a boundary.
+
+
 06 Nov 2007 - 2.1.4-rc3
 -----------------------
 
