@@ -27,7 +27,7 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     if (dcfg == NULL) return NULL;
 
     #ifdef DEBUG_CONF
-    fprintf(stderr, "Created directory config %p path %s\n", (void *)dcfg, path);
+    fprintf(stderr, "Created directory config %p path %s\n", dcfg, path);
     #endif
 
     dcfg->mp = mp;
