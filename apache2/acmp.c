@@ -431,7 +431,6 @@ static void acmp_found(ACMP *parser, acmp_node_t *node) {
             parser->bp_buffer[(parser->char_pos - node->depth - 1) % parser->bp_buff_len],
             parser->char_pos - node->depth - 1);
     }
-    /* printf("found: %s at position %d\n", node->pattern, parser->char_pos - node->depth - 1); */
     node->hit_count++;
     parser->hit_count++;
 }

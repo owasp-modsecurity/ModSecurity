@@ -78,7 +78,7 @@ char *construct_log_vcombinedus(modsec_rec *msr) {
     /* sessionid */
     sessionid = (msr->sessionid == NULL ? "-" : msr->sessionid);
 
-    return apr_psprintf(msr->mp, "%s %s %s %s [%s] \"%s\" %d %" APR_OFF_T_FMT " \"%s\" \"%s\" %s \"%s\"",
+    return apr_psprintf(msr->mp, "%s %s %s %s [%s] \"%s\" %u %" APR_OFF_T_FMT " \"%s\" \"%s\" %s \"%s\"",
         log_escape_nq(msr->mp, msr->hostname), msr->remote_addr, log_escape_nq(msr->mp, remote_user),
         log_escape_nq(msr->mp, local_user), current_logtime(msr->mp),
         ((msr->request_line == NULL) ? "" : log_escape(msr->mp, msr->request_line)),
@@ -203,7 +203,7 @@ char *construct_log_vcombinedus_limited(modsec_rec *msr, int _limit, int *was_li
         *was_limited = 0;
     }
 
-    return apr_psprintf(msr->mp, "%s %s %s %s [%s] \"%s\" %d %s \"%s\" \"%s\" %s \"%s\"",
+    return apr_psprintf(msr->mp, "%s %s %s %s [%s] \"%s\" %u %s \"%s\" \"%s\" %s \"%s\"",
         hostname, msr->remote_addr, remote_user,
         local_user, current_logtime(msr->mp), the_request,
         msr->response_status, bytes_sent, referer, user_agent,
@@ -284,7 +284,7 @@ static void sanitise_request_line(modsec_rec *msr) {
             j = arg->value_origin_offset;
             while((*p != '\0')&&(j--)) p++;
             if (*p == '\0') {
-                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %d of QUERY_STRING"
+                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %u of QUERY_STRING"
                     "because the request line is too short.",
                     log_escape_ex(msr->mp, arg->name, arg->name_len),
                     arg->value_origin_offset);
@@ -297,7 +297,7 @@ static void sanitise_request_line(modsec_rec *msr) {
                 *p++ = '*';
             }
             if (*p == '\0') {
-                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %d (size %d) "
+                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %u (size %d) "
                     "of QUERY_STRING because the request line is too short.",
                     log_escape_ex(msr->mp, arg->name, arg->name_len),
                     arg->value_origin_offset, arg->value_origin_len);
@@ -418,7 +418,7 @@ void sec_audit_logger(modsec_rec *msr) {
 
     /* Format: time transaction_id remote_addr remote_port local_addr local_port */
 
-    text = apr_psprintf(msr->mp, "[%s] %s %s %d %s %d",
+    text = apr_psprintf(msr->mp, "[%s] %s %s %u %s %u",
         current_logtime(msr->mp), msr->txid, msr->remote_addr, msr->remote_port,
         msr->local_addr, msr->local_port);
     sec_auditlog_write(msr, text, strlen(text));
@@ -638,7 +638,7 @@ void sec_audit_logger(modsec_rec *msr) {
                 text = apr_psprintf(msr->mp, "%s %s\n", msr->response_protocol,
                     msr->status_line);
             } else {
-                text = apr_psprintf(msr->mp, "%s %d\n", msr->response_protocol,
+                text = apr_psprintf(msr->mp, "%s %u\n", msr->response_protocol,
                     msr->response_status);
             }
             sec_auditlog_write(msr, text, strlen(text));

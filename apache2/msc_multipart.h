@@ -45,7 +45,7 @@ struct multipart_part {
     /* files only, the name of the temporary file holding data */
     char                    *tmp_file_name;
     int                      tmp_file_fd;
-    unsigned                 tmp_file_size;
+    unsigned int             tmp_file_size;
     /* files only, filename as supplied by the browser */
     char                    *filename;
     

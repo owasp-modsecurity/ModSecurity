@@ -520,7 +520,7 @@ static int multipart_process_boundary(modsec_rec *msr, int last_part, char **err
         *(multipart_part **)apr_array_push(msr->mpd->parts) = msr->mpd->mpp;
         if (msr->mpd->mpp->type == MULTIPART_FILE) {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Multipart: Added file part %x to the list: name \"%s\" "
+                msr_log(msr, 9, "Multipart: Added file part %p to the list: name \"%s\" "
                     "file name \"%s\" (offset %u, length %u)",
                     msr->mpd->mpp, log_escape(msr->mp, msr->mpd->mpp->name),
                     log_escape(msr->mp, msr->mpd->mpp->filename),
@@ -529,7 +529,7 @@ static int multipart_process_boundary(modsec_rec *msr, int last_part, char **err
         }
         else {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Multipart: Added part %x to the list: name \"%s\" "
+                msr_log(msr, 9, "Multipart: Added part %p to the list: name \"%s\" "
                     "(offset %u, length %u)", msr->mpd->mpp, log_escape(msr->mp, msr->mpd->mpp->name),
                     msr->mpd->mpp->offset, msr->mpd->mpp->length);
             }
@@ -833,7 +833,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
         msr->mpd->flag_data_before = 1;
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Multipart: Ignoring data after last boundary (received %d bytes)", size);
+            msr_log(msr, 4, "Multipart: Ignoring data after last boundary (received %u bytes)", size);
         }
 
         return 1;
@@ -1031,7 +1031,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
             msr->mpd->flag_data_after = 1;
 
             if (msr->txcfg->debuglog_level >= 4) {
-                msr_log(msr, 4, "Multipart: Ignoring data after last boundary (%d bytes left)", inleft);
+                msr_log(msr, 4, "Multipart: Ignoring data after last boundary (%u bytes left)", inleft);
             }
 
             return 1;

@@ -109,7 +109,7 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
         /* Clean up everything else. */
         xmlFreeParserCtxt(msr->xml->parsing_ctx);
         msr->xml->parsing_ctx = NULL;
-        msr_log(msr, 4, "XML: Parsing complete (well_formed %d).", msr->xml->well_formed);
+        msr_log(msr, 4, "XML: Parsing complete (well_formed %u).", msr->xml->well_formed);
 
         if (msr->xml->well_formed != 1) {
             *error_msg = apr_psprintf(msr->mp, "XML: Failed parsing document.");

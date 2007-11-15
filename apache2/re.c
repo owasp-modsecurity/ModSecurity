@@ -351,6 +351,7 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
 
             for(;;) {
                 if (*p == '\0') {
+                    // TODO better 64-bit support here
                     *error_msg = apr_psprintf(mp, "Missing closing quote at position %d: %s",
                         (int)(p - text), text);
                     free(value);
@@ -358,6 +359,7 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
                 } else
                 if (*p == '\\') {
                     if ( (*(p + 1) == '\0') || ((*(p + 1) != '\'')&&(*(p + 1) != '\\')) ) {
+                        // TODO better 64-bit support here
                         *error_msg = apr_psprintf(mp, "Invalid quoted pair at position %d: %s",
                             (int)(p - text), text);
                         free(value);
@@ -773,7 +775,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             if (rule->actionset != NULL && rule->actionset->rev != NULL) {
                 rev = apr_psprintf(p, " [rev \"%s\"]", rule->actionset->rev);
             }
-            msr_log(msr, 4, "Recipe: Invoking rule %x;%s%s%s.",
+            msr_log(msr, 4, "Recipe: Invoking rule %p;%s%s%s.",
                     rule, (fn ? fn : ""), (id ? id : ""), (rev ? rev : ""));
         }
 
@@ -926,7 +928,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msre_rule *rule = rules[i];
-        msr_log(msr, 1, "Rule %x [id \"%s\"][file \"%s\"][line \"%d\"]: %lu usec", rule,
+        msr_log(msr, 1, "Rule %p [id \"%s\"][file \"%s\"][line \"%d\"]: %lu usec", rule,
             ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
             rule->filename != NULL ? rule->filename : "-",
             rule->line_num,
@@ -1554,11 +1556,11 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
 
             /* check the cache options */
             if (var->value_len < msr->txcfg->cache_trans_min) {
-                msr_log(msr, 9, "CACHE: Disabled - %s value length=%d, smaller than minlen=%d", var->name, var->value_len, msr->txcfg->cache_trans_min);
+                msr_log(msr, 9, "CACHE: Disabled - %s value length=%u, smaller than minlen=%" APR_SIZE_T_FMT, var->name, var->value_len, msr->txcfg->cache_trans_min);
                 usecache = 0;
             }
             if ((msr->txcfg->cache_trans_max != 0) && (var->value_len > msr->txcfg->cache_trans_max)) {
-                msr_log(msr, 9, "CACHE: Disabled - %s value length=%d, larger than maxlen=%d", var->name, var->value_len, msr->txcfg->cache_trans_max);
+                msr_log(msr, 9, "CACHE: Disabled - %s value length=%u, larger than maxlen=%" APR_SIZE_T_FMT, var->name, var->value_len, msr->txcfg->cache_trans_max);
                 usecache = 0;
             }
 

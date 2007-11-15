@@ -48,7 +48,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 
     if ((msr->if_status == IF_STATUS_COMPLETE)||(msr->if_status == IF_STATUS_NONE)) {
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Input filter: Input forwarding already complete, skipping (f %x, r %x).", f, f->r);
+            msr_log(msr, 4, "Input filter: Input forwarding already complete, skipping (f %p, r %p).", f, f->r);
         }
         ap_remove_input_filter(f);
         return ap_get_brigade(f->next, bb_out, mode, block, nbytes);
@@ -56,7 +56,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Input filter: Forwarding input: mode=%d, block=%d, nbytes=%" APR_OFF_T_FMT
-            " (f %x, r %x).", mode, block, nbytes, f, f->r);
+            " (f %p, r %p).", mode, block, nbytes, f, f->r);
     }
 
     if (msr->if_started_forwarding == 0) {
@@ -209,7 +209,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
             }
 
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Input filter: Bucket type %s contains %d bytes.",
+                msr_log(msr, 9, "Input filter: Bucket type %s contains %" APR_SIZE_T_FMT " bytes.",
                     bucket->type->name, buflen);
             }
 
@@ -483,7 +483,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
     msr->r = r;
 
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Output filter: Receiving output (f %x, r %x).", f, f->r);
+        msr_log(msr, 4, "Output filter: Receiving output (f %p, r %p).", f, f->r);
     }
     
     /* Initialise on first invocation */

@@ -150,7 +150,7 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
             if (var == NULL) {
                 /* Error. */
             } else {
-                int td;
+                apr_time_t td;
                 counter = atoi(var->value);
                 var = (msc_string *)apr_table_get(col, "UPDATE_RATE");
                 if (var == NULL) {
@@ -161,13 +161,13 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
                 }
 
                 /* NOTE: No rate if there has been no time elapsed */
-                td = (int)(apr_time_sec(apr_time_now()) - create_time);
+                td = (apr_time_sec(apr_time_now()) - create_time);
                 if (td == 0) {
                     var->value = apr_psprintf(msr->mp, "%d", 0);
                 }
                 else {
-                    var->value = apr_psprintf(msr->mp, "%d",
-                        (int)((60 * counter)/td));
+                    var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT,
+                        (apr_time_t)((60 * counter)/td));
                 }
                 var->value_len = strlen(var->value);
             }
@@ -279,7 +279,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
             int timeout = atoi(var->value);
             var = (msc_string *)apr_table_get(col, "__expire_KEY");
             if (var != NULL) {
-                var->value = apr_psprintf(msr->mp, "%d", (int)(apr_time_sec(apr_time_now()) + timeout));
+                var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)(apr_time_sec(apr_time_now()) + timeout));
                 var->value_len = strlen(var->value);
             }
         }
@@ -294,7 +294,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
             var->name_len = strlen(var->name);
             apr_table_setn(col, var->name, (void *)var);
         }
-        var->value = apr_psprintf(msr->mp, "%d", (int)(apr_time_sec(apr_time_now())));
+        var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)(apr_time_sec(apr_time_now())));
         var->value_len = strlen(var->value);
     }
 
@@ -418,7 +418,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     apr_array_header_t *keys_arr;
     char **keys;
     int i;
-    unsigned int now = (unsigned int)apr_time_sec(msr->request_time);
+    apr_time_t now = apr_time_sec(msr->request_time);
 
     if (msr->txcfg->data_dir == NULL) {
         /* The user has been warned about this problem enough times already by now. 
@@ -493,7 +493,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
             } else {
                 unsigned int expiry_time = atoi(var->value);
 
-                msr_log(msr, 9, "Record (name \"%s\", key \"%s\") set to expire in %d seconds.",
+                msr_log(msr, 9, "Record (name \"%s\", key \"%s\") set to expire in %" APR_TIME_T_FMT " seconds.",
                     log_escape(msr->mp, col_name), log_escape(msr->mp, key.dptr),
                     expiry_time - now);
 

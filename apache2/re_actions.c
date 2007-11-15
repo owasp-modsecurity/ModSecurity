@@ -557,7 +557,7 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
 
         if (limit > REQUEST_BODY_HARD_LIMIT) {
             return apr_psprintf(engine->mp, "Request size limit cannot exceed "
-                "the hard limit: %li", RESPONSE_BODY_HARD_LIMIT);
+                "the hard limit: %ld", RESPONSE_BODY_HARD_LIMIT);
         }
 
         return NULL;
@@ -572,7 +572,7 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
 
         if (limit > RESPONSE_BODY_HARD_LIMIT) {
             return apr_psprintf(engine->mp, "Response size limit cannot exceed "
-                "the hard limit: %li", RESPONSE_BODY_HARD_LIMIT);
+                "the hard limit: %ld", RESPONSE_BODY_HARD_LIMIT);
         }
 
         return NULL;
@@ -1118,7 +1118,7 @@ static apr_status_t msre_action_expirevar_execute(modsec_rec *msr, apr_pool_t *m
     var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     var->name = apr_psprintf(msr->mp, "__expire_%s", var_name);
     var->name_len = strlen(var->name);
-    var->value = apr_psprintf(msr->mp, "%d", (int)(apr_time_sec(msr->request_time)
+    var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)(apr_time_sec(msr->request_time)
         + atoi(var_value)));
     var->value_len = strlen(var->value);
     apr_table_setn(target_col, var->name, (void *)var);
@@ -1140,8 +1140,8 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
     char *s = NULL;
     apr_table_t *target_col = NULL;
     msc_string *var = NULL, *var_last_update_time = NULL;
-    unsigned int last_update_time, current_time;
-    long int current_value, new_value;
+    apr_time_t last_update_time, current_time;
+    long current_value, new_value;
 
     /* Extract the name and the value. */
     /* IMP1 We have a function for this now, parse_name_eq_value? */
@@ -1193,7 +1193,7 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
         return 0;
     }
 
-    current_time = (unsigned int)apr_time_sec(apr_time_now());
+    current_time = apr_time_sec(apr_time_now());
     last_update_time = atoi(var_last_update_time->value);
 
     s = strstr(var_value, "/");
@@ -1209,24 +1209,24 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
      * time elapsed since the last update.
      */
     new_value = current_value -
-        (atoi(var_value) * ((current_time - last_update_time) / atoi(s)));
+        (atol(var_value) * ((current_time - last_update_time) / atol(s)));
     if (new_value < 0) new_value = 0;
 
     /* Only change the value if it differs. */
     if (new_value != current_value) {
-        var->value = apr_psprintf(msr->mp, "%d", (int)new_value);
+        var->value = apr_psprintf(msr->mp, "%ld", new_value);
         var->value_len = strlen(var->value);
 
-        msr_log(msr, 4, "Deprecated variable \"%s.%s\" from %li to %li (%d seconds since "
+        msr_log(msr, 4, "Deprecated variable \"%s.%s\" from %ld to %ld (%" APR_TIME_T_FMT " seconds since "
             "last update).", log_escape(msr->mp, col_name), log_escape(msr->mp, var_name),
-            current_value, new_value, current_time - last_update_time);
+            current_value, new_value, (apr_time_t)(current_time - last_update_time));
 
         apr_table_set(msr->collections_dirty, col_name, "1");
     } else {
-        msr_log(msr, 9, "Not deprecating variable \"%s.%s\" because the new value (%li) is "
-            "the same as the old one (%li) (%d seconds since last update).",
+        msr_log(msr, 9, "Not deprecating variable \"%s.%s\" because the new value (%ld) is "
+            "the same as the old one (%ld) (%" APR_TIME_T_FMT " seconds since last update).",
             log_escape(msr->mp, col_name), log_escape(msr->mp, var_name), current_value,
-            new_value, current_time - last_update_time);
+            new_value, (apr_time_t)(current_time - last_update_time));
     }
     
     return 1;
@@ -1263,7 +1263,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
         var->name = "__expire_KEY";
         var->name_len = strlen(var->name);
-        var->value = apr_psprintf(msr->mp, "%d", (int)(apr_time_sec(msr->request_time) + 3600));
+        var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)(apr_time_sec(msr->request_time) + 3600));
         var->value_len = strlen(var->value);
         apr_table_setn(table, var->name, (void *)var);
 
@@ -1311,7 +1311,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var = apr_pcalloc(msr->mp, sizeof(msc_string));
         var->name = "CREATE_TIME";
         var->name_len = strlen(var->name);
-        var->value = apr_psprintf(msr->mp, "%d", (int)apr_time_sec(msr->request_time));
+        var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)apr_time_sec(msr->request_time));
         var->value_len = strlen(var->value);
         apr_table_setn(table, var->name, (void *)var);
 

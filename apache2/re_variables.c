@@ -681,7 +681,7 @@ static int var_remote_host_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_remote_port_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    char *value = apr_psprintf(mptmp, "%d", msr->remote_port);
+    char *value = apr_psprintf(mptmp, "%u", msr->remote_port);
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
@@ -1563,7 +1563,7 @@ static int var_time_epoch_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
     tc = time(NULL);
     tm = localtime(&tc);
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
-    rvar->value = apr_psprintf(mptmp, "%d", (int)tc);
+    rvar->value = apr_psprintf(mptmp, "%ld", (long)tc);
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -1824,7 +1824,7 @@ static int var_server_name_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_server_port_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    char *value = apr_psprintf(mptmp, "%d", msr->local_port);
+    char *value = apr_psprintf(mptmp, "%u", msr->local_port);
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
@@ -1851,7 +1851,7 @@ static int var_script_filename_generate(modsec_rec *msr, msre_var *var, msre_rul
 static int var_script_gid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    char *value = apr_psprintf(mptmp, "%d", msr->r->finfo.group);
+    char *value = apr_psprintf(mptmp, "%ld", (long)msr->r->finfo.group);
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
@@ -1881,7 +1881,7 @@ static int var_script_mode_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 static int var_script_uid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    char *value = apr_psprintf(mptmp, "%d", msr->r->finfo.user);
+    char *value = apr_psprintf(mptmp, "%ld", (long)msr->r->finfo.user);
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
@@ -2039,7 +2039,7 @@ static int var_response_protocol_generate(modsec_rec *msr, msre_var *var, msre_r
 static int var_response_status_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    const char *value = apr_psprintf(mptmp, "%d", msr->response_status);
+    const char *value = apr_psprintf(mptmp, "%u", msr->response_status);
     return var_simple_generate(var, vartab, mptmp, value);
 }
 

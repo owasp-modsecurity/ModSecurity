@@ -27,7 +27,7 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     if (dcfg == NULL) return NULL;
 
     #ifdef DEBUG_CONF
-    fprintf(stderr, "Created directory config %x path %s\n", dcfg, path);
+    fprintf(stderr, "Created directory config %p path %s\n", (void *)dcfg, path);
     #endif
 
     dcfg->mp = mp;
@@ -193,7 +193,7 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     directory_config *merged = create_directory_config(mp, NULL);
 
     #ifdef DEBUG_CONF
-    fprintf(stderr, "Merge parent %x child %x RESULT %x\n", _parent, _child, merged);
+    fprintf(stderr, "Merge parent %p child %p RESULT %p\n", _parent, _child, merged);
     #endif
 
     if (merged == NULL) return NULL;
@@ -1114,7 +1114,7 @@ static const char *cmd_rule_remove_by_msg(cmd_parms *cmd, void *_dcfg, const cha
     msre_ruleset_rule_remove_with_exception(dcfg->ruleset, re);
 
     #ifdef DEBUG_CONF
-    fprintf(stderr, "Added exception %x (%d %s) to dcfg %x.\n", re, re->type, re->param, dcfg);
+    fprintf(stderr, "Added exception %p (%d %s) to dcfg %p.\n", re, re->type, re->param, dcfg);
     #endif
 
     return NULL;

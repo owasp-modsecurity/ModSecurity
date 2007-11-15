@@ -348,7 +348,7 @@ static modsec_rec *create_tx_context(request_rec *r) {
     store_tx_context(msr, r);
 
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Transaction context created (dcfg %x).", msr->dcfg1);
+        msr_log(msr, 4, "Transaction context created (dcfg %p).", msr->dcfg1);
     }
 
     return msr;    
@@ -449,7 +449,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
 
         if (first_time == 0) {
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "ModSecurity: chroot checkpoint #2 (pid=%d ppid=%d)", (int)getpid(), (int)getppid());
+                "ModSecurity: chroot checkpoint #2 (pid=%ld ppid=%ld)", (long)getpid(), (long)getppid());
 
             if (chdir(chroot_dir) < 0) {
                 ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, s,
@@ -478,7 +478,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
                 "ModSecurity: chroot successful, path=%s", chroot_dir);
         } else {
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "ModSecurity: chroot checkpoint #1 (pid=%d ppid=%d)", (int)getpid(), (int)getppid());
+                "ModSecurity: chroot checkpoint #1 (pid=%ld ppid=%ld)", (long)getpid(), (long)getppid());
         }
     }
     #endif
@@ -625,7 +625,7 @@ static int hook_request_late(request_rec *r) {
     }
 
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Second phase starting (dcfg %x).", msr->dcfg2);
+        msr_log(msr, 4, "Second phase starting (dcfg %p).", msr->dcfg2);
     }
 
     /* Figure out whether or not to extract multipart files. */
@@ -895,7 +895,7 @@ static void hook_insert_filter(request_rec *r) {
     /* Add the input filter, but only if we need it to run. */
     if (msr->if_status == IF_STATUS_WANTS_TO_RUN) {
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Hook insert_filter: Adding input forwarding filter %s(r %x).", (((r->main != NULL)||(r->prev != NULL)) ? "for subrequest " : ""), r);
+            msr_log(msr, 4, "Hook insert_filter: Adding input forwarding filter %s(r %p).", (((r->main != NULL)||(r->prev != NULL)) ? "for subrequest " : ""), r);
         }
 
         ap_add_input_filter("MODSECURITY_IN", msr, r, r->connection);
@@ -910,7 +910,7 @@ static void hook_insert_filter(request_rec *r) {
 
     /* We always add the PDF XSS protection filter. */
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Hook insert_filter: Adding PDF XSS protection output filter (r %x).", r);
+        msr_log(msr, 4, "Hook insert_filter: Adding PDF XSS protection output filter (r %p).", r);
     }
 
     ap_add_output_filter("PDFP_OUT", msr, r, r->connection);
@@ -930,7 +930,7 @@ static void hook_insert_filter(request_rec *r) {
      */
     if (msr->of_status != OF_STATUS_COMPLETE) {
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Hook insert_filter: Adding output filter (r %x).", r);
+            msr_log(msr, 4, "Hook insert_filter: Adding output filter (r %p).", r);
         }
 
         ap_add_output_filter("MODSECURITY_OUT", msr, r, r->connection);
@@ -963,7 +963,7 @@ static void hook_insert_error_filter(request_rec *r) {
      */
     if (msr->of_status != OF_STATUS_COMPLETE) {
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Hook insert_error_filter: Adding output filter (r %x).", r);
+            msr_log(msr, 4, "Hook insert_error_filter: Adding output filter (r %p).", r);
         }
 
         /* Make a note that the output we will be receiving is a

@@ -278,7 +278,7 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
             rc = apr_file_gets(buf, HUGE_STRING_LEN, fd);
             if (rc == APR_EOF) break;
             if (rc != APR_SUCCESS) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Could read \"%s\" line %d: %s", fn, line, apr_strerror(rc, errstr, 1024));
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Could not read \"%s\" line %d: %s", fn, line, apr_strerror(rc, errstr, 1024));
                 return 0;
             }
 
@@ -407,7 +407,7 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
     /* scan for first character, then compare from there until we
      * have a match or there is no room left in the target
      */
-    msr_log(msr, 9, "match[%d]='%s' target[%d]='%s'", match_length, match, target_length, target);
+    msr_log(msr, 9, "match[%u]='%s' target[%u]='%s'", match_length, match, target_length, target);
     i_max = match_length - target_length;
     for (i = 0; i <= i_max; i++) {
         if (match[i] == target[0]) {

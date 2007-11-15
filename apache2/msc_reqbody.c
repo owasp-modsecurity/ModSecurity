@@ -300,7 +300,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
     }
 
     /* Should never happen. */
-    *error_msg = apr_psprintf(msr->mp, "Internal error, unknown value for msc_reqbody_storage: %d",
+    *error_msg = apr_psprintf(msr->mp, "Internal error, unknown value for msc_reqbody_storage: %u",
         msr->msc_reqbody_storage);
     return -1;
 }
@@ -592,7 +592,8 @@ apr_status_t modsecurity_request_body_retrieve(modsec_rec *msr,
         return 1; /* More data available. */
     }
 
-    *error_msg = apr_psprintf(msr->mp, "Internal error, invalid msc_reqbody_storage value: %d",
+    /* Should never happen. */
+    *error_msg = apr_psprintf(msr->mp, "Internal error, invalid msc_reqbody_storage value: %u",
         msr->msc_reqbody_storage);
 
     return -1;

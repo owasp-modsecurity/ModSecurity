@@ -92,7 +92,7 @@ int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char *
 
     procnew = apr_pcalloc(r->pool, sizeof(*procnew));
     if (procnew == NULL) {
-        msr_log(msr, 1, "Exec: Unable to allocate %d bytes.", sizeof(*procnew));
+        msr_log(msr, 1, "Exec: Unable to allocate %lu bytes.", (unsigned long)sizeof(*procnew));
         return -1;
     }
 
@@ -246,9 +246,9 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
 
     /* Construct the message. */
     apr_vsnprintf(str1, sizeof(str1), text, ap);
-    apr_snprintf(str2, sizeof(str2), "[%s] [%s/sid#%lx][rid#%lx][%s][%d] %s\n",
-        current_logtime(msr->mp), ap_get_server_name(r), (unsigned long)(r->server),
-        (unsigned long)r, ((r->uri == NULL) ? "" : log_escape_nq(msr->mp, r->uri)),
+    apr_snprintf(str2, sizeof(str2), "[%s] [%s/sid#%p][rid#%p][%s][%d] %s\n",
+        current_logtime(msr->mp), ap_get_server_name(r), (r->server),
+        r, ((r->uri == NULL) ? "" : log_escape_nq(msr->mp, r->uri)),
         level, str1);
 
     /* Write to the debug log. */

@@ -64,7 +64,7 @@ static char *create_hash(modsec_rec *msr,
  *
  */
 static char *create_token(modsec_rec *msr) {
-    unsigned int current_time;
+    apr_time_t current_time;
     const char *time_string = NULL;
     const char *hash = NULL;
     int timeout = DEFAULT_TIMEOUT;
@@ -74,7 +74,7 @@ static char *create_token(modsec_rec *msr) {
     }
     
     current_time = apr_time_sec(apr_time_now());
-    time_string = apr_psprintf(msr->mp, "%d", current_time + timeout);
+    time_string = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)(current_time + timeout));
     if (time_string == NULL) return NULL;
     
     hash = create_hash(msr, time_string);
