@@ -3688,8 +3688,8 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis role="bold">ctl:requ
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "nikto" log,<emphasis
-          role="bold">deny</emphasis>,msg:'Nikto Scanners Identified"</programlisting>
+      <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "nikto" "log,<emphasis
+          role="bold">deny</emphasis>,msg:'Nikto Scanners Identified'"</programlisting>
     </section>
 
     <section>
