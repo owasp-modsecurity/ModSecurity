@@ -308,6 +308,37 @@ static void sanitise_request_line(modsec_rec *msr) {
 }
 
 /**
+ * Output the Producer header.
+ */
+static void sec_auditlog_write_producer_header(modsec_rec *msr) {
+    char **signatures = NULL;
+    char *text = NULL;
+    int i;
+
+    /* Try to write everything in one go. */
+    if (msr->txcfg->component_signatures->nelts == 0) {
+        text = apr_psprintf(msr->mp, "Producer: %s.\n", MODULE_NAME_FULL);
+        sec_auditlog_write(msr, text, strlen(text));
+
+        return;
+    }
+
+    /* Start with the ModSecurity signature. */
+    text = apr_psprintf(msr->mp, "Producer: %s", MODULE_NAME_FULL);        
+    sec_auditlog_write(msr, text, strlen(text));
+
+
+    /* Then loop through the components and output individual signatures. */    
+    signatures = (char **)msr->txcfg->component_signatures->elts;
+    for(i = 0; i < msr->txcfg->component_signatures->nelts; i++) {
+        text = apr_psprintf(msr->mp, "; %s", (char *)signatures[i]);
+        sec_auditlog_write(msr, text, strlen(text));
+    }
+
+    sec_auditlog_write(msr, ".\n", 2);
+}
+
+/**
  * Produce an audit log entry.
  */
 void sec_audit_logger(modsec_rec *msr) {
@@ -741,10 +772,8 @@ void sec_audit_logger(modsec_rec *msr) {
             text = apr_psprintf(msr->mp, "Response-Body-Transformed: Dechunked\n");
             sec_auditlog_write(msr, text, strlen(text));
         }
-        
-        /* Producer */
-        text = apr_psprintf(msr->mp, "Producer: %s.\n", MODULE_NAME_FULL);
-        sec_auditlog_write(msr, text, strlen(text));
+
+        sec_auditlog_write_producer_header(msr);
         
         /* Server */
         if (msr->server_software != NULL) {

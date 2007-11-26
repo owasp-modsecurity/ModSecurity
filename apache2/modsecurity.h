@@ -446,6 +446,11 @@ struct directory_config {
     int                  cache_trans;
     apr_size_t           cache_trans_min;
     apr_size_t           cache_trans_max;
+
+    /* Array to hold signatures of components, which will
+     * appear in the ModSecurity signature in the audit log.
+     */
+    apr_array_header_t  *component_signatures;
 };
 
 struct error_message {

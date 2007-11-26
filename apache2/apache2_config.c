@@ -99,6 +99,8 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     dcfg->cache_trans_min = NOT_SET;
     dcfg->cache_trans_max = NOT_SET;
 
+    dcfg->component_signatures = apr_array_make(mp, 16, sizeof(char *));
+
     return dcfg;
 }
 
@@ -405,6 +407,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
         ? parent->cache_trans_min : child->cache_trans_min);
     merged->cache_trans_max = (child->cache_trans_max == (apr_size_t)NOT_SET
         ? parent->cache_trans_max : child->cache_trans_max);
+
+    /* Merge component signatures. */
+    merged->component_signatures = apr_array_append(mp, parent->component_signatures,
+        child->component_signatures);
 
     return merged;
 }
@@ -767,6 +773,18 @@ static const char *cmd_chroot_dir(cmd_parms *cmd, void *_dcfg, const char *p1) {
     return NULL;
 }
 
+/**
+ * Adds component signature to the list of signatures kept in configuration.
+ */
+static const char *cmd_component_signature(cmd_parms *cmd, void *_dcfg, const char *p1) {
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    /* TODO Enforce "Name/VersionX.Y.Z (comment)" format. */
+    *(char **)apr_array_push(dcfg->component_signatures) = (char *)p1;
+
+    return NULL;
+}
+
 static const char *cmd_content_injection(cmd_parms *cmd, void *_dcfg, int flag) {
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
@@ -1056,7 +1074,7 @@ static const char *cmd_rule_import_by_id(cmd_parms *cmd, void *_dcfg, const char
     re->type = RULE_EXCEPTION_IMPORT_ID;
     // TODO verify p1
     re->param = p1;
-    *(rule_exception **)apr_array_push(dcfg->rule_exceptions) = re;
+       *(rule_exception **)apr_array_push(dcfg->rule_exceptions) = re;
     
     return NULL;
 }
@@ -1428,12 +1446,28 @@ const command_rec module_directives[] = {
         "path to the audit log storage area; absolute, or relative to the root of the server"
     ),
 
+    AP_INIT_TAKE12 (
+        "SecCacheTransformations",
+        cmd_cache_transformations,
+        NULL,
+        CMD_SCOPE_ANY,
+        "whether or not to cache transformations. Defaults to true."
+    ),
+
     AP_INIT_TAKE1 (
         "SecChrootDir",
         cmd_chroot_dir,
         NULL,
         CMD_SCOPE_MAIN,
-        "Path of the directory to which server will be chrooted"
+        "path of the directory to which server will be chrooted"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecComponentSignature",
+        cmd_component_signature,
+        NULL,
+        CMD_SCOPE_MAIN,
+        "component signature to add to ModSecurity signature."
     ),
 
     AP_INIT_FLAG (
@@ -1485,12 +1519,68 @@ const command_rec module_directives[] = {
         "" // TODO
     ),
 
+    AP_INIT_TAKE1 (
+        "SecGeoLookupsDb",
+        cmd_geo_lookups_db,
+        NULL,
+        RSRC_CONF,
+        "database for geographical lookups module."
+    ),
+
     AP_INIT_TAKE12 (
         "SecGuardianLog",
         cmd_guardian_log,
         NULL,
         CMD_SCOPE_MAIN,
         "The filename of the filter debugging log file"
+    ),
+
+    AP_INIT_FLAG (
+        "SecPdfProtect",
+        cmd_pdf_protect,
+        NULL,
+        RSRC_CONF,
+        "enable PDF protection module."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecPdfProtectSecret",
+        cmd_pdf_protect_secret,
+        NULL,
+        RSRC_CONF,
+        "secret that will be used to construct protection tokens."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecPdfProtectTimeout",
+        cmd_pdf_protect_timeout,
+        NULL,
+        RSRC_CONF,
+        "duration for which protection tokens will be valid."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecPdfProtectTokenName",
+        cmd_pdf_protect_token_name,
+        NULL,
+        RSRC_CONF,
+        "name of the protection token. The name 'PDFTOKEN' is used by default."
+    ),
+
+    AP_INIT_FLAG (
+        "SecPdfProtectInterceptGETOnly",
+        cmd_pdf_protect_intercept_get_only,
+        NULL,
+        RSRC_CONF,
+        "whether or not to intercept only GET and HEAD requess. Defaults to true."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecPdfProtectMethod",
+        cmd_pdf_protect_method,
+        NULL,
+        RSRC_CONF,
+        "protection method to use. Can be 'TokenRedirection' (default) or 'ForcedDownload'"
     ),
 
     AP_INIT_TAKE1 (
@@ -1573,24 +1663,6 @@ const command_rec module_directives[] = {
         "On or Off"
     ),
 
-    /*
-    AP_INIT_TAKE1 (
-        "SecRuleImportById",
-        cmd_rule_import_by_id,
-        NULL,
-        CMD_SCOPE_ANY,
-        "" // TODO
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecRuleImportByMsg",
-        cmd_rule_import_by_msg,
-        NULL,
-        CMD_SCOPE_ANY,
-        "" // TODO
-    ),
-    */
-
     AP_INIT_FLAG (
         "SecRuleInheritance",
         cmd_rule_inheritance,
@@ -1653,70 +1725,6 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "" // TODO
-    ),
-
-    AP_INIT_FLAG (
-        "SecPdfProtect",
-        cmd_pdf_protect,
-        NULL,
-        RSRC_CONF,
-        "enable PDF protection module."
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecPdfProtectSecret",
-        cmd_pdf_protect_secret,
-        NULL,
-        RSRC_CONF,
-        "secret that will be used to construct protection tokens."
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecPdfProtectTimeout",
-        cmd_pdf_protect_timeout,
-        NULL,
-        RSRC_CONF,
-        "duration for which protection tokens will be valid."
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecPdfProtectTokenName",
-        cmd_pdf_protect_token_name,
-        NULL,
-        RSRC_CONF,
-        "name of the protection token. The name 'PDFTOKEN' is used by default."
-    ),
-
-    AP_INIT_FLAG (
-        "SecPdfProtectInterceptGETOnly",
-        cmd_pdf_protect_intercept_get_only,
-        NULL,
-        RSRC_CONF,
-        "whether or not to intercept only GET and HEAD requess. Defaults to true."
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecPdfProtectMethod",
-        cmd_pdf_protect_method,
-        NULL,
-        RSRC_CONF,
-        "protection method to use. Can be 'TokenRedirection' (default) or 'ForcedDownload'"
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecGeoLookupsDb",
-        cmd_geo_lookups_db,
-        NULL,
-        RSRC_CONF,
-        "database for geographical lookups module."
-    ),
-
-    AP_INIT_TAKE12 (
-        "SecCacheTransformations",
-        cmd_cache_transformations,
-        NULL,
-        CMD_SCOPE_ANY,
-        "whether or not to cache transformations. Defaults to true."
     ),
 
     { NULL }
