@@ -76,6 +76,7 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart parser init failed: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
+                msr_log(msr, 2, "Multipart parser init failed: %s", my_error_msg);
             }
         }
         #ifdef WITH_LIBXML2
@@ -85,6 +86,7 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
                 *error_msg = apr_psprintf(msr->mp, "XML parser init failed: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
+                msr_log(msr, 2, "Multipart parser init failed: %s", my_error_msg);
             }
         }
         #endif
