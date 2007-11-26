@@ -1273,7 +1273,7 @@ static const char *cmd_pdf_protect_method(cmd_parms *cmd, void *_dcfg,
 
 /* -- Geo Lookup configuration -- */
 
-static const char *cmd_geo_lookups_db(cmd_parms *cmd, void *_dcfg,
+static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
     const char *p1)
 {
     char *error_msg;
@@ -1520,8 +1520,8 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_TAKE1 (
-        "SecGeoLookupsDb",
-        cmd_geo_lookups_db,
+        "SecGeoLookupDB",
+        cmd_geo_lookup_db,
         NULL,
         RSRC_CONF,
         "database for geographical lookups module."

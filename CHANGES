@@ -2,6 +2,8 @@
 26 Nov 2007 - 2.5.0-dev3
 ------------------------
 
+ * Renamed SecGeoLookupsDb to SecGeoLookupDB.
+
  * Implement SecComponentSignature.
 
  * Fix warnings on Solaris and/or 64bit builds.

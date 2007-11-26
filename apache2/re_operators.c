@@ -931,7 +931,7 @@ static int msre_op_geoLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     int rc;
 
     if (geo == NULL) {
-        msr_log(msr, 1, "Geo lookup for \"%s\" attempted without a database.  Set SecGeoLookupDb.", geo_host);
+        msr_log(msr, 1, "Geo lookup for \"%s\" attempted without a database.  Set SecGeoLookupDB.", geo_host);
         return 0;
     }
 
