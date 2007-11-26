@@ -921,14 +921,14 @@ void sec_audit_logger(modsec_rec *msr) {
 
     nbytes = strlen(text);
     if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "Audit Log: Writing %d bytes to primary concurrent index", nbytes);
+        msr_log(msr, 9, "Audit Log: Writing %" APR_SIZE_T_FMT " bytes to primary concurrent index", nbytes);
     }
     apr_file_write_full(msr->txcfg->auditlog_fd, text, nbytes, &nbytes_written);
 
     /* Write to the secondary audit log if we have one */
     if (msr->txcfg->auditlog2_fd != NULL) {
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "Audit Log: Writing %d bytes to secondary concurrent index", nbytes);
+            msr_log(msr, 9, "Audit Log: Writing %" APR_SIZE_T_FMT " bytes to secondary concurrent index", nbytes);
         }
         apr_file_write_full(msr->txcfg->auditlog2_fd, text, nbytes, &nbytes_written);
     }

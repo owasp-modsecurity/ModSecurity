@@ -316,7 +316,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
     /* Why is this in host byte order? */
     ipnum = ntohl(addr->sa.sin.sin_addr.s_addr);
 
-    msr_log(msr, 9, "GEO: Using address \"%s\" (0x%08x).", targetip, ipnum);
+    msr_log(msr, 9, "GEO: Using address \"%s\" (0x%08lx).", targetip, ipnum);
 
     for (level = 31; level >= 0; level--) {
 

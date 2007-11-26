@@ -246,7 +246,7 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
 
     /* Construct the message. */
     apr_vsnprintf(str1, sizeof(str1), text, ap);
-    apr_snprintf(str2, sizeof(str2), "[%s] [%s/sid#%p][rid#%p][%s][%d] %s\n",
+    apr_snprintf(str2, sizeof(str2), "[%s] [%s/sid#%pp][rid#%pp][%s][%d] %s\n",
         current_logtime(msr->mp), ap_get_server_name(r), (r->server),
         r, ((r->uri == NULL) ? "" : log_escape_nq(msr->mp, r->uri)),
         level, str1);

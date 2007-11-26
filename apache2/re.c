@@ -782,7 +782,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             if (rule->actionset != NULL && rule->actionset->rev != NULL) {
                 rev = apr_psprintf(p, " [rev \"%s\"]", rule->actionset->rev);
             }
-            msr_log(msr, 4, "Recipe: Invoking rule %p;%s%s%s.",
+            msr_log(msr, 4, "Recipe: Invoking rule %pp;%s%s%s.",
                     rule, (fn ? fn : ""), (id ? id : ""), (rev ? rev : ""));
         }
 
@@ -935,7 +935,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msre_rule *rule = rules[i];
-        msr_log(msr, 1, "Rule %p [id \"%s\"][file \"%s\"][line \"%d\"]: %lu usec", rule,
+        msr_log(msr, 1, "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"]: %lu usec", rule,
             ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
             rule->filename != NULL ? rule->filename : "-",
             rule->line_num,

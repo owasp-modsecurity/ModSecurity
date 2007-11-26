@@ -170,7 +170,7 @@ static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
         msr->msc_reqbody_chunks = NULL;
         apr_pool_clear(msr->msc_reqbody_mp);
 
-        msr_log(msr, 4, "Input filter: Wrote %" APR_SIZE_T_FMT " bytes from memory to disk.", disklen);
+        msr_log(msr, 4, "Input filter: Wrote %u bytes from memory to disk.", disklen);
 
         /* Continue with disk storage from now on */
         return modsecurity_request_body_store_disk(msr, data, length, error_msg);

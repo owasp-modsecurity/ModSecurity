@@ -348,7 +348,7 @@ static modsec_rec *create_tx_context(request_rec *r) {
     store_tx_context(msr, r);
 
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Transaction context created (dcfg %p).", msr->dcfg1);
+        msr_log(msr, 4, "Transaction context created (dcfg %pp).", msr->dcfg1);
     }
 
     return msr;    
@@ -629,7 +629,7 @@ static int hook_request_late(request_rec *r) {
     }
 
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Second phase starting (dcfg %p).", msr->dcfg2);
+        msr_log(msr, 4, "Second phase starting (dcfg %pp).", msr->dcfg2);
     }
 
     /* Figure out whether or not to extract multipart files. */
@@ -899,7 +899,7 @@ static void hook_insert_filter(request_rec *r) {
     /* Add the input filter, but only if we need it to run. */
     if (msr->if_status == IF_STATUS_WANTS_TO_RUN) {
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Hook insert_filter: Adding input forwarding filter %s(r %p).", (((r->main != NULL)||(r->prev != NULL)) ? "for subrequest " : ""), r);
+            msr_log(msr, 4, "Hook insert_filter: Adding input forwarding filter %s(r %pp).", (((r->main != NULL)||(r->prev != NULL)) ? "for subrequest " : ""), r);
         }
 
         ap_add_input_filter("MODSECURITY_IN", msr, r, r->connection);
@@ -914,7 +914,7 @@ static void hook_insert_filter(request_rec *r) {
 
     /* We always add the PDF XSS protection filter. */
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Hook insert_filter: Adding PDF XSS protection output filter (r %p).", r);
+        msr_log(msr, 4, "Hook insert_filter: Adding PDF XSS protection output filter (r %pp).", r);
     }
 
     ap_add_output_filter("PDFP_OUT", msr, r, r->connection);
@@ -934,7 +934,7 @@ static void hook_insert_filter(request_rec *r) {
      */
     if (msr->of_status != OF_STATUS_COMPLETE) {
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Hook insert_filter: Adding output filter (r %p).", r);
+            msr_log(msr, 4, "Hook insert_filter: Adding output filter (r %pp).", r);
         }
 
         ap_add_output_filter("MODSECURITY_OUT", msr, r, r->connection);
@@ -967,7 +967,7 @@ static void hook_insert_error_filter(request_rec *r) {
      */
     if (msr->of_status != OF_STATUS_COMPLETE) {
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Hook insert_error_filter: Adding output filter (r %p).", r);
+            msr_log(msr, 4, "Hook insert_error_filter: Adding output filter (r %pp).", r);
         }
 
         /* Make a note that the output we will be receiving is a
