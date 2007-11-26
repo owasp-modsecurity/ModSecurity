@@ -743,7 +743,7 @@ void sec_audit_logger(modsec_rec *msr) {
         }
         
         /* Producer */
-        text = apr_psprintf(msr->mp, "Producer: %s\n", MODULE_NAME_FULL);
+        text = apr_psprintf(msr->mp, "Producer: %s.\n", MODULE_NAME_FULL);
         sec_auditlog_write(msr, text, strlen(text));
         
         /* Server */
