@@ -423,6 +423,7 @@ struct directory_config {
     /* Used only in the configuration phase. */
     msre_rule           *tmp_chain_starter;
     msre_actionset      *tmp_default_actionset;
+    apr_table_t         *tmp_rule_placeholders;
 
     /* Misc */
     const char          *data_dir;

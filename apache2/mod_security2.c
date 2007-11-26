@@ -418,6 +418,10 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
     void *init_flag = NULL;
     int first_time = 0;
 
+    /* ENH Figure out a way to validate config before we start
+     * - skipafter: need to make sure we found all of our targets
+     */
+
     /* Figure out if we are here for the first time */
     apr_pool_userdata_get(&init_flag, "modsecurity-init-flag", s->process->pool);
     if (init_flag == NULL) {

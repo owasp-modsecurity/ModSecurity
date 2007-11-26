@@ -1939,7 +1939,7 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis>phase:1</emphasis>"</programl
     different phases, they would not happen one after the other. The order of
     rules in the configuration file is important only within the rules of each
     phase. This is especially important when using the <literal>skip</literal>
-    action.</para>
+    and <literal>skipAfter</literal> actions.</para>
 
     <section>
       <title>Phase Request Headers</title>
@@ -2333,8 +2333,8 @@ SecRule <emphasis>TX:MYMATCH</emphasis> "@eq ARGS:param" deny</programlisting>
       intended to be used to check the build number prior to using a feature
       that is available only in a certain build. Example:</para>
 
-      <programlisting format="linespecific">SecRule <emphasis>MODSEC_BUILD</emphasis> "!@ge 02050102" skip:1
-SecRule ARGS "@pm some key words" deny,status:500</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis>MODSEC_BUILD</emphasis> "!@ge 02050102" skipAfter:12345
+SecRule ARGS "@pm some key words" id:12345,deny,status:500</programlisting>
     </section>
 
     <section>
@@ -3106,10 +3106,10 @@ SecRule REQUEST_HEADERS:Transfer-Encoding "!^$"</programlisting>
       <programlisting format="linespecific">SecDefaultAction log,deny,status:403,phase:2
 SecRule REQUEST_HEADERS:Content-Type ^text/xml$ \
     phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=<emphasis>XML</emphasis>
-SecRule REQBODY_PROCESSOR "<emphasis>!^XML$</emphasis>" skip:2
+SecRule REQBODY_PROCESSOR "<emphasis>!^XML$</emphasis>" skipAfter:12345
 SecRule <emphasis>XML:/employees/employee/name/text()</emphasis> Fred
 SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
-    xmlns:xq=http://www.example.com/employees</programlisting>
+    id:12345,xmlns:xq=http://www.example.com/employees</programlisting>
 
       <para>The first XPath expression does not use namespaces. It would match
       against payload such as this one:</para>
@@ -3576,8 +3576,8 @@ SecRule REQUEST_HEADER:Content-Length ^$</programlisting>
       first portion of the chained rule will only be triggered if all of the
       variable checks return positive hits. If one aspect of the chained rule
       is negative, then the entire rule chain is negative. Also note that
-      disruptive actions, execution phases, metadata actions (id, rev, msg)
-      and skip actions can only be specified on by the chain starter
+      disruptive actions, execution phases, metadata actions (id, rev, msg),
+      skip and skipAfter actions can only be specified on by the chain starter
       rule.</para>
     </section>
 
@@ -4444,6 +4444,34 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
     </section>
 
     <section>
+      <title><literal>skipAfter</literal></title>
+
+      <para><emphasis>Description:</emphasis> Skips rules (or chains) on
+      successful match resuming rule execution after the specified rule id is
+      found.</para>
+
+      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+
+      <para>Example:</para>
+
+      <para><programlisting format="linespecific">SecRule REQUEST_URI "^/$" "chain,<emphasis>skipAfter:960015</emphasis>"
+SecRule REMOTE_ADDR "^127\.0\.0\.1$" "chain"
+SecRule REQUEST_HEADERS:User-Agent "^Apache \(internal dummy connection\)$" "t:none"  
+SecRule &amp;REQUEST_HEADERS:Host "@eq 0" \
+    "deny,log,status:400,id:960008,severity:4,msg:'Request Missing a Host Header'"
+SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
+    "log,deny,log,status:400,id:960015,msg:'Request Missing an Accept Header'"</programlisting></para>
+
+      <para><emphasis>Note</emphasis></para>
+
+      <para>SkipAfter only applies to the current processing phase and not
+      necessarily the order in which the rules appear in the configuration
+      file. If you group rules by processing phases, then skip should work as
+      expected. This action can not be used to skip rules within one chain.
+      Accepts a single paramater denoting the last rule ID to skip.</para>
+    </section>
+
+    <section>
       <title><literal>status</literal></title>
 
       <para><emphasis>Description:</emphasis> Specifies the response status
@@ -4837,8 +4865,8 @@ SecRule REQUEST_HEADERS:Ip-Address "!<emphasis>@streq %{TX.1}</emphasis>"</progr
       <programlisting format="linespecific">SecDefaultAction log,deny,status:403,phase:2
 SecRule REQUEST_HEADERS:Content-Type ^text/xml$ \
     phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML
-SecRule REQBODY_PROCESSOR "!^XML$" nolog,pass,skip:1
-SecRule XML "<emphasis>@validateDTD /path/to/apache2/conf/xml.dtd</emphasis>"</programlisting>
+SecRule REQBODY_PROCESSOR "!^XML$" nolog,pass,skipAfter:12345
+SecRule XML "<emphasis>@validateDTD /path/to/apache2/conf/xml.dtd</emphasis>,id:12345"</programlisting>
     </section>
 
     <section>
@@ -4852,8 +4880,8 @@ SecRule XML "<emphasis>@validateDTD /path/to/apache2/conf/xml.dtd</emphasis>"</p
       <programlisting format="linespecific">SecDefaultAction log,deny,status:403,phase:2
 SecRule REQUEST_HEADERS:Content-Type ^text/xml$ \
     phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML
-SecRule REQBODY_PROCESSOR "!^XML$" nolog,pass,skip:1
-SecRule XML "<emphasis>@validateSchema /path/to/apache2/conf/xml.xsd</emphasis>"</programlisting>
+SecRule REQBODY_PROCESSOR "!^XML$" nolog,pass,skipAfter:12345
+SecRule XML "<emphasis>@validateSchema /path/to/apache2/conf/xml.xsd</emphasis>,id:12345"</programlisting>
 
       <para>This operator requires request body to be processed as XML.</para>
     </section>

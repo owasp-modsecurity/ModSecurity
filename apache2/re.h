@@ -109,6 +109,9 @@ int DSOLOCAL msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset
 #define RULE_NO_MATCH           0
 #define RULE_MATCH              1
 
+#define RULE_PH_NONE            0  /* Not a placeholder */
+#define RULE_PH_TARGET          1  /* Placeholder for skipafter targets */
+
 struct msre_rule {
     apr_array_header_t      *targets;
     const char              *op_name;
@@ -120,6 +123,7 @@ struct msre_rule {
     const char              *p1;
     const char              *filename;
     int                      line_num;
+    int                      placeholder;
     
     msre_ruleset            *ruleset;
     msre_rule               *chain_starter;

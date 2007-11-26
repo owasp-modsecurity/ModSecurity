@@ -27,7 +27,7 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     if (dcfg == NULL) return NULL;
 
     #ifdef DEBUG_CONF
-    fprintf(stderr, "Created directory config %p path %s\n", dcfg, path);
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Created directory config %pp path %s", dcfg, path);
     #endif
 
     dcfg->mp = mp;
@@ -75,6 +75,7 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     /* These are only used during the configuration process. */
     dcfg->tmp_chain_starter = NULL;
     dcfg->tmp_default_actionset = NULL;
+    dcfg->tmp_rule_placeholders = NULL;
 
     /* Misc */
     dcfg->data_dir = NOT_SET_P;
@@ -195,7 +196,7 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     directory_config *merged = create_directory_config(mp, NULL);
 
     #ifdef DEBUG_CONF
-    fprintf(stderr, "Merge parent %p child %p RESULT %p\n", _parent, _child, merged);
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Merge parent %pp child %pp RESULT %pp", _parent, _child, merged);
     #endif
 
     if (merged == NULL) return NULL;
@@ -580,11 +581,48 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
         dcfg->upload_validates_files = 1;
     }
 
+    /* Create skip table if one does not already exist. */
+    if (dcfg->tmp_rule_placeholders == NULL) {
+        dcfg->tmp_rule_placeholders = apr_table_make(cmd->pool, 10);
+        if (dcfg->tmp_rule_placeholders == NULL) return FATAL_ERROR;
+    }
+
+    /* Keep track of any rule IDs we need to skip after */
+    if (rule->actionset->skip_after != NOT_SET_P) {
+        char *tmp_id = apr_pstrdup(cmd->pool, rule->actionset->skip_after);
+        apr_table_setn(dcfg->tmp_rule_placeholders, tmp_id, tmp_id);
+
+        #ifdef DEBUG_CONF
+        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool, "Watching for skipafter target rule id=\"%s\".", tmp_id);
+        #endif
+
+    }
+
     /* Add rule to the recipe. */
     if (msre_ruleset_rule_add(dcfg->ruleset, rule, rule->actionset->phase) < 0) {
         return "Internal Error: Failed to add rule to the ruleset.";
     }
 
+    /* Add an additional placeholder if this rule ID is on the list */
+    if ((rule->actionset->id != NULL) && apr_table_get(dcfg->tmp_rule_placeholders, rule->actionset->id)) {
+        msre_rule *phrule = apr_palloc(rule->ruleset->mp, sizeof(msre_rule));
+
+        #ifdef DEBUG_CONF
+        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool, "Adding placeholder for rule id=\"%s\".", rule->actionset->id);
+        #endif
+
+        /* shallow copy of original rule with placeholder marked as target */
+        memcpy(phrule, rule, sizeof(msre_rule));
+        phrule->placeholder = RULE_PH_TARGET;
+
+        /* Add placeholder. */
+        if (msre_ruleset_rule_add(dcfg->ruleset, phrule, phrule->actionset->phase) < 0) {
+            return "Internal Error: Failed to add placeholder to the ruleset.";
+        }
+
+        apr_table_unset(dcfg->tmp_rule_placeholders, rule->actionset->id);
+    }
+        
     return NULL;    
 }
 
@@ -1132,7 +1170,7 @@ static const char *cmd_rule_remove_by_msg(cmd_parms *cmd, void *_dcfg, const cha
     msre_ruleset_rule_remove_with_exception(dcfg->ruleset, re);
 
     #ifdef DEBUG_CONF
-    fprintf(stderr, "Added exception %p (%d %s) to dcfg %p.\n", re, re->type, re->param, dcfg);
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool, "Added exception %pp (%d %s) to dcfg %pp.", re, re->type, re->param, dcfg);
     #endif
 
     return NULL;

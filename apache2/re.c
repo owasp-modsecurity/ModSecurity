@@ -673,27 +673,34 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         apr_time_t time1 = 0;
 #endif
 
-        // TODO: Still need to skip over placeholders
-
         /* SKIP_RULES is used to skip all rules until we hit a placeholder
          * with the specified rule ID and then resume execution after that.
          */
         if (mode == SKIP_RULES) {
             /* Go to the next rule if we have not yet hit the skip_after ID */
-            // TODO: must be a placeholder as well
-            if ((rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0)) {
+            if ((rule->placeholder != RULE_PH_NONE) && ((rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0))) {
                 if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "Skipping rule id=\"%s\" while looking for id=\"%s\"", (rule->actionset->id ? rule->actionset->id : "(none)"), skip_after);
+                    msr_log(msr, 9, "Skipping rule id=\"%s\": Skipping until after id=\"%s\"", (rule->actionset->id ? rule->actionset->id : "(none)"), skip_after);
+
                 }
                 continue;
             }
-            if (msr->txcfg->debuglog_level >= 4) {
-                msr_log(msr, 4, "Continuing execution after rule id=\"%s\"", skip_after);
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Found rule id=\"%s\"%s.", skip_after, (rule->placeholder ? " placeholder" : ""));
             }
-            skip_after = NULL;
-            mode = NEXT_RULE;
 
             /* Go to the rule *after* this one to continue execution. */
+            if (msr->txcfg->debuglog_level >= 4) {
+                msr_log(msr, 4, "Continuing execution after rule id=\"%s\".", skip_after);
+            }
+
+            skip_after = NULL;
+            mode = NEXT_RULE;
+            continue;
+        }
+
+        /* Skip any rule marked as a placeholder */
+        if (rule->placeholder != RULE_PH_NONE) {
             continue;
         }
 
