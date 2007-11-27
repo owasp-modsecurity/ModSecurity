@@ -1,7 +1,45 @@
+------------------------
+Version 1.5 - 2007/11/23
+------------------------
 
---------------------------------
+New Rulesets:
+- 23 - Request Limits
+    "Judging by appearances". This rulesets contains rules blocking based on
+    the size of the request, for example, a request with too many arguments
+    will be denied.
+
+Default policy changes:
+- XML protection off by default
+- BLOCKING dir renamed to optional_rules
+- Ruleset 55 (marketing) is now optional (added to the optional_rules dir)
+- Ruleset 21 - The exception for apache internal monitor will not log anymore
+
+New Events:
+- 960912 - Invalid request body
+  Malformed content will not be parsed by modsecurity, but still there might
+  be applications that will parse it, ignoring the errors.
+- 960913 - Invalid Request
+  Will trigger a security event when request was rejected by apache with
+  code 400, without going through ModSecurity rules.
+
+Additional rules logic:
+- 950001 - New signature: delete from
+- 950007 - New signature: waitfor delay
+
+False Positives Fixes:
+- 950006 - Will not be looking for /cc pattern in User-Agent header
+- 950002 - "Internet Explorer" signature removed
+- Double decoding bug used to cause FPs. Some of the parameters are already
+  url-decoded by apache. This caused FPs when the rule performed another
+  url-decoding transformation. The rules have been split so that parameters
+  already decoded by apache will not be decoded by the rules anymore.
+- 960911 - Expression is much more permissive now
+- 950801 - Commented out entirely. NOTE: If your system uses UTF8 encoding,
+           then you should uncomment this rule (in file 20)
+
+--------------------------
 version 1.4.3 - 2007/07/21
---------------------------------
+--------------------------
 
 New Events:
 - 950012 - HTTP Request Smuggling
@@ -25,6 +63,7 @@ Additional rules logic:
   this directives cannot be used to exclude phase 1 rules. Therefore
   we moved all inspection rules to phase 2.
 
+
 --------------------------------
 version 1.4 build 2 - 2007/05/17
 --------------------------------
@@ -44,7 +83,7 @@ New Events:
 - 970018 - IIS installed in default location (any drive)
     Log once if IIS in installed in the /Inetpub directory (on any drive, not only C)
 - 950019 - Email Injection
-    Web forms used for sending mail (such as “tell a friend”) are often manipulated by spammers for sending anonymous emails
+    Web forms used for sending mail (such as "tell a friend") are often manipulated by spammers for sending anonymous emails
 
 Regular expressions fixes:
 - Further optimization of some regular expressions (using the non-greediness operator)
