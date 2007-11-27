@@ -310,19 +310,22 @@
         directory. You can check this by identifying the ServerRoot directive
         setting in your httpd.conf file. This is the path that was specified
         with the "--install-path=" configuration flag during compilation (for
-        example, in Fedora Core4:<filename moreinfo="none"> top_dir =
-        /etc/httpd</filename>).</para>
+        example, in Fedora Core4: <literal moreinfo="none">top_dir =
+        /etc/httpd</literal>).</para>
       </listitem>
 
       <listitem>
         <para>Edit Makefile to configure the correct include path for libxml
-        (for example: <filename
-        moreinfo="none">INCLUDES=-I/usr/include/libxml2</filename>)</para>
-        <para>Please consider XML support required.  Note that the ModSecurity
-        Core rules may assume XML support is available (-DWITH_LIBXML2).  You
-        may have to manually remove any XML references in the Core rules if
-        you choose not to include XML support.  In future versions of
-        ModSecurity XML support will be required.</para>
+        (for example: <literal
+        moreinfo="none">INCLUDES=-I/usr/include/libxml2</literal>)</para>
+        <note>
+            <para>Please consider XML support required.  Note that the
+            ModSecurity Core rules may assume XML support is available
+            (compiled with -DWITH_LIBXML2).  You may have to manually remove
+            any XML references in the Core rules if you choose not to include
+            XML support.  In future versions of ModSecurity XML support will
+            be required.</para>
+        </note>
       </listitem>
 
       <listitem>
@@ -339,13 +342,14 @@
       </listitem>
 
       <listitem>
-        <para>(Optional) Add one line to your configuration to load libxml2:
-        <filename moreinfo="none">LoadFile
-        /usr/lib/libxml2.so</filename></para>
+        <para>Add one line to your configuration to load libxml2:</para>
+        <para><literal moreinfo="none">LoadFile
+        /usr/lib/libxml2.so</literal></para>
       </listitem>
 
       <listitem>
-        <para>Add one line to your configuration to load ModSecurity: <literal
+        <para>Add one line to your configuration to load ModSecurity:</para>
+        <para><literal
         moreinfo="none">LoadModule security2_module
         modules/mod_security2.so</literal></para>
       </listitem>
