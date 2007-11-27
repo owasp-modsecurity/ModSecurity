@@ -318,14 +318,6 @@
         <para>Edit Makefile to configure the correct include path for libxml
         (for example: <literal
         moreinfo="none">INCLUDES=-I/usr/include/libxml2</literal>)</para>
-        <note>
-            <para>Please consider XML support required.  Note that the
-            ModSecurity Core rules may assume XML support is available
-            (compiled with -DWITH_LIBXML2).  You may have to manually remove
-            any XML references in the Core rules if you choose not to include
-            XML support.  In future versions of ModSecurity XML support will
-            be required.</para>
-        </note>
       </listitem>
 
       <listitem>
@@ -368,7 +360,17 @@
     </orderedlist>
 
     <note>
-      <para>If you have compiled Apache yourself you might experience problems
+      <para>If you have compiled Apache yourself or are compiling for a
+      distribution, please read the following notes.</para>
+
+      <para>The ModSecurity Core rules may assume XML support is
+      available (compiled with -DWITH_LIBXML2).  You may have to manually
+      remove any XML references in the Core rules if you choose not to
+      include XML support.  In future versions of ModSecurity XML support
+      will be required.  For these reasons, please consider XML support
+      required.</para>
+
+      <para>You might experience problems
       compiling ModSecurity against PCRE. This is because Apache bundles PCRE
       but this library is also typically provided by the operating system. I
       would expect most (all) vendor-packaged Apache distributions to be
@@ -387,7 +389,7 @@
       available only in the Apache source code) and change the include path
       for ModSecurity (as you did in step 7 above) to point to them.</para>
 
-      <para>Do note that if your Apache is using an external PCRE library you
+      <para>If your Apache is using an external PCRE library you
       can compile ModSecurity with <literal
       moreinfo="none">WITH_PCRE_STUDY</literal> defined,which would possibly
       give you a slight performance edge in regular expression
