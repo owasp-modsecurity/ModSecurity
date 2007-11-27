@@ -1,27 +1,16 @@
-09 Nov 2007 - 2.1.4-rc4
------------------------
+27 Nov 2007 - 2.1.4
+-------------------
 
- * Fix for an evasion FP, mistaking a multipart non-boundary for a boundary.
+ * Updated included Core Ruleset to version 1.5 and noted in the docs that
+   XML support is required to use the rules without modification.
 
+ * Fixed an evasion FP, mistaking a multipart non-boundary for a boundary.
 
-06 Nov 2007 - 2.1.4-rc3
------------------------
-
- * Fix warnings on Solaris and/or 64bit builds.
-
-
-25 Oct 2007 - 2.1.4-rc2
------------------------
+ * Fixed multiple warnings on Solaris and/or 64bit builds.
 
  * Do not process subrequests in phase 2-4, but do hand off the request data.
 
-
-15 Oct 2007 - 2.1.4-rc1
------------------------
-
- * Do not process subrequests in phase 2-4.
-
- * Fix a blocking FP in the multipart parser, which affected Safari.
+ * Fixed a blocking FP in the multipart parser, which affected Safari.
 
 
 11 Sep 2007 - 2.1.3

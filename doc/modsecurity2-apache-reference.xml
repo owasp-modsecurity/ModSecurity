@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.1.4-rc4 / (November 9, 2007)</releaseinfo>
+    <releaseinfo>Version 2.1.4 / (November 27, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -318,6 +318,11 @@
         <para>Edit Makefile to configure the correct include path for libxml
         (for example: <filename
         moreinfo="none">INCLUDES=-I/usr/include/libxml2</filename>)</para>
+        <para>Please consider XML support required.  Note that the ModSecurity
+        Core rules may assume XML support is available (-DWITH_LIBXML2).  You
+        may have to manually remove any XML references in the Core rules if
+        you choose not to include XML support.  In future versions of
+        ModSecurity XML support will be required.</para>
       </listitem>
 
       <listitem>
@@ -978,7 +983,7 @@ SecAuditLogStorageDir logs/audit
 
       <para>The default value is:</para>
 
-      <programlisting format="linespecific">SecDefaultAction log,auditlog,deny,status:403,phase:2,t:none</programlisting>
+      <programlisting format="linespecific">SecDefaultAction log,auditlog,deny,status:403,phase:2,t:lowercase,t:replaceNulls,t:compressWhitespace</programlisting>
 
       <para><emphasis role="bold">Note</emphasis></para>
 
