@@ -154,8 +154,8 @@ Regular expressions fixes:
 - Command Injections now always require certain characters both before and after the command. Important since many are common English words (finger, mail)
 - The command injection wget is not searched in the UA header as it has different meaning there.
 - LDAP Fixed to reduce FPs:
-	+ More accurate regular expressions
-	+ high bit characters not accpeted between signature tokens.
+  + More accurate regular expressions
+  + high bit characters not accpeted between signature tokens.
 - Do not detect <?xml as a PHP tag in both PHP injection and PHP source leakage
 - Removed Java from automation UA
 - When validating encoding, added regexp based chained rule that accepts both %xx and %uxxxxx encoding bypassing a limitation of "@validateUrlEncoding"
