@@ -2,6 +2,9 @@
 26 Nov 2007 - 2.5.0-dev3
 ------------------------
 
+ * Enhance handling of the case where we run out of disk space while
+   writing to audit log entry.
+
  * Renamed SecGeoLookupsDb to SecGeoLookupDB.
 
  * Implement SecComponentSignature.

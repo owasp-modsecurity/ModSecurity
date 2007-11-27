@@ -23,22 +23,39 @@ static int sec_auditlog_write(modsec_rec *msr, const char *data, unsigned int le
     apr_size_t nbytes_written, nbytes = len;
     apr_status_t rc;
 
-    if ((msr->new_auditlog_fd == NULL)||(data == NULL)) return -1;
+    /* Do nothing if there's no data. */
+    if (data == NULL) return -1;
 
-    rc = apr_file_write_full(msr->new_auditlog_fd, data, nbytes, &nbytes_written);
-    if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "Audit log: Failed writing (requested %" APR_SIZE_T_FMT
-            " bytes, written %" APR_SIZE_T_FMT ")", nbytes, nbytes_written);
-        return -1;
-    }
-
-    /* Note the following will only take into account the actual
-     * amount of bytes we've written.
+    /* Update size counters and the hash calculation. We always do this,
+     * even in cases where write fails. That will make it easier to detect
+     * problems with partial writes.
      */
     msr->new_auditlog_size += nbytes_written;
     apr_md5_update(&msr->new_auditlog_md5ctx, data, nbytes_written);
 
-    return rc;
+    /* Do not write if we do not have a file descriptor. */
+    if (msr->new_auditlog_fd == NULL) return -1;
+
+    /* Write data to file. */
+    rc = apr_file_write_full(msr->new_auditlog_fd, data, nbytes, &nbytes_written);
+    if (rc != APR_SUCCESS) {
+        msr_log(msr, 1, "Audit log: Failed writing (requested %" APR_SIZE_T_FMT
+            " bytes, written %" APR_SIZE_T_FMT ")", nbytes, nbytes_written);
+
+        /* Set to NULL to prevent more than one error message on
+         * out-of-disk-space events and to prevent further attempts
+         * to write to the same file in this request.
+         *
+         * Note that, as we opened the file throught the pool mechanism of
+         * the APR, we do not need to close the file here. It will be closed
+         * automatically at the end of the request.
+         */
+        msr->new_auditlog_fd = NULL;
+
+        return -1;
+    }    
+
+    return 1;
 }
 
 /**
