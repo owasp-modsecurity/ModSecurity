@@ -33,6 +33,8 @@ typedef struct msc_string msc_string;
 /* For GNU C, tell the compiler to check printf like formatters */
 #if defined(__GNUC__)
 #define PRINTF_ATTRIBUTE(a,b) __attribute__((format (printf, a, b)))
+#else
+#define PRINTF_ATTRIBUTE(a,b)
 #endif
 
 #include "msc_logging.h"
