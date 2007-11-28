@@ -678,15 +678,15 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
          */
         if (mode == SKIP_RULES) {
             /* Go to the next rule if we have not yet hit the skip_after ID */
-            if ((rule->placeholder != RULE_PH_NONE) && ((rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0))) {
+            if ((rule->placeholder == RULE_PH_NONE) || (rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0)) {
                 if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "Skipping rule id=\"%s\": Skipping until after id=\"%s\"", (rule->actionset->id ? rule->actionset->id : "(none)"), skip_after);
+                    msr_log(msr, 9, "Skipping rule %pp id=\"%s\": Skipping until after id=\"%s\"", rule, (rule->actionset->id ? rule->actionset->id : "(none)"), skip_after);
 
                 }
                 continue;
             }
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Found rule id=\"%s\"%s.", skip_after, (rule->placeholder ? " placeholder" : ""));
+                msr_log(msr, 9, "Found rule %pp id=\"%s\".", rule, skip_after);
             }
 
             /* Go to the rule *after* this one to continue execution. */
@@ -838,7 +838,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                 mode = SKIP_RULES;
 
                 if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "Skipping after rule id=\"%s\" -> mode SKIP_RULES.", skip_after);
+                    msr_log(msr, 9, "Skipping after rule %pp id=\"%s\" -> mode SKIP_RULES.", rule, skip_after);
                 }
 
                 continue;

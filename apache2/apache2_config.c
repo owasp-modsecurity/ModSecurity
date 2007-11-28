@@ -15,8 +15,6 @@
 #include "pdf_protect.h"
 #include "http_log.h"
 
-/* #define DEBUG_CONF 1 */
-
 /* -- Directory context creation and initialisation -- */
 
 /**
@@ -149,6 +147,10 @@ static void copy_rules_phase(apr_pool_t *mp, apr_array_header_t *parent_phase_ar
             }
 
             if (copy > 0) {
+                #ifdef DEBUG_CONF
+                ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy rule %pp [id \"%s\"]", rule, rule->actionset->id);
+                #endif
+
                 /* Copy the rule. */
                 *(msre_rule **)apr_array_push(child_phase_arr) = rule;
                 if (rule->actionset->is_chained) mode = 2;
@@ -157,6 +159,10 @@ static void copy_rules_phase(apr_pool_t *mp, apr_array_header_t *parent_phase_ar
             }
         } else {
             if (mode == 2) {
+                #ifdef DEBUG_CONF
+                ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy chain %pp for rule %pp [id \"%s\"]", rule, rule->chain_starter, rule->chain_starter->actionset->id);
+                #endif
+
                 /* Copy the rule (it belongs to the chain we want to include. */
                 *(msre_rule **)apr_array_push(child_phase_arr) = rule;
             }
@@ -279,14 +285,26 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     if ((child->rule_inheritance == NOT_SET)||(child->rule_inheritance == 1)) {
         merged->rule_inheritance = parent->rule_inheritance;
         if ((child->ruleset == NULL)&&(parent->ruleset == NULL)) {
+            #ifdef DEBUG_CONF
+            ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "No rules in this context.");
+            #endif
+
             /* Do nothing, there are no rules in either context. */
         } else
         if (child->ruleset == NULL) {
+            #ifdef DEBUG_CONF
+            ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Using parent rules in this context.");
+            #endif
+
             /* Copy the rules from the parent context. */
             merged->ruleset = msre_ruleset_create(parent->ruleset->engine, mp);
             copy_rules(mp, parent->ruleset, merged->ruleset, child->rule_exceptions);
         } else
         if (parent->ruleset == NULL) {
+            #ifdef DEBUG_CONF
+            ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Using child rules in this context.");
+            #endif
+
             /* Copy child rules. */
             merged->ruleset = msre_ruleset_create(child->ruleset->engine, mp);
             merged->ruleset->phase_request_headers = apr_array_copy(mp,
@@ -300,6 +318,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
             merged->ruleset->phase_logging = apr_array_copy(mp,
                 child->ruleset->phase_logging);
         } else {
+            #ifdef DEBUG_CONF
+            ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Using parent then child rules in this context.");
+            #endif
+
             /* Copy parent rules, then add child rules to it. */
             merged->ruleset = msre_ruleset_create(parent->ruleset->engine, mp);
             copy_rules(mp, parent->ruleset, merged->ruleset, child->rule_exceptions);
@@ -598,6 +620,10 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
 
     }
 
+    #ifdef DEBUG_CONF
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool, "Adding rule %pp id=\"%s\".", rule, (rule->actionset->id == NOT_SET_P ? "(none)" : rule->actionset->id));
+    #endif
+
     /* Add rule to the recipe. */
     if (msre_ruleset_rule_add(dcfg->ruleset, rule, rule->actionset->phase) < 0) {
         return "Internal Error: Failed to add rule to the ruleset.";
@@ -608,7 +634,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
         msre_rule *phrule = apr_palloc(rule->ruleset->mp, sizeof(msre_rule));
 
         #ifdef DEBUG_CONF
-        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool, "Adding placeholder for rule id=\"%s\".", rule->actionset->id);
+        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool, "Adding placeholder %pp for rule %pp id=\"%s\".", phrule, rule, rule->actionset->id);
         #endif
 
         /* shallow copy of original rule with placeholder marked as target */
