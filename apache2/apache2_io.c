@@ -104,7 +104,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Input filter: Forwarded %lu bytes.", chunk->length);
+            msr_log(msr, 4, "Input filter: Forwarded %" APR_SIZE_T_FMT " bytes.", chunk->length);
         }
     }
 
@@ -240,7 +240,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
     modsecurity_request_body_end(msr, error_msg);
 
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Input filter: Completed receiving request body (length %lu).",
+        msr_log(msr, 4, "Input filter: Completed receiving request body (length %" APR_SIZE_T_FMT ").",
             msr->reqbody_length);
     }
 
@@ -444,7 +444,7 @@ static int flatten_response_body(modsec_rec *msr) {
 
     msr->resbody_data = apr_palloc(msr->mp, msr->resbody_length + 1); 
     if (msr->resbody_data == NULL) {
-        msr_log(msr, 1, "Output filter: Response body data memory allocation failed. Asked for: %li",
+        msr_log(msr, 1, "Output filter: Response body data memory allocation failed. Asked for: %" APR_SIZE_T_FMT,
             msr->resbody_length + 1);
         return -1;
     }
@@ -702,7 +702,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         }
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Output filter: Completed receiving response body (buffered %s - %lu bytes).",
+            msr_log(msr, 4, "Output filter: Completed receiving response body (buffered %s - %" APR_SIZE_T_FMT " bytes).",
                 (msr->of_partial ? "partial" : "full"), msr->resbody_length);
         }
     } else { /* Not looking at response data. */
