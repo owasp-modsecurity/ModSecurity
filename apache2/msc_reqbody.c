@@ -25,7 +25,6 @@ static apr_status_t modsecurity_request_body_start_init(modsec_rec *msr, char **
         msr->msc_reqbody_chunks = apr_array_make(msr->msc_reqbody_mp,
             32, sizeof(msc_data_chunk *));
         if (msr->msc_reqbody_chunks == NULL) {
-        
             *error_msg = apr_pstrdup(msr->mp, "Input filter: Failed to prepare in-memory storage.");
             return -1;
         }
@@ -263,6 +262,11 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
         char *my_error_msg = NULL;
 
         if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
+            /* The per-request data length counter will
+             * be updated by the multipart parser.
+             */
+
+            /* Process data as multipart/form-data. */
             if (multipart_process_chunk(msr, data, length, &my_error_msg) < 0) {
                 *error_msg = apr_psprintf(msr->mp, "Request body processor error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
@@ -273,6 +277,10 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
         #ifdef WITH_LIBXML2
         else
         if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
+            /* Increase per-request data length counter. */
+            msr->msc_reqbody_no_files_length += length;
+
+            /* Process data as XML. */
             if (xml_process_chunk(msr, data, length, &my_error_msg) < 0) {
                 *error_msg = apr_psprintf(msr->mp, "Request body processor error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
@@ -283,7 +291,10 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
         #endif
         else
         if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
-            /* Do nothing, URLENCODED processor does not support streaming. */
+            /* Increase per-request data length counter. */
+            msr->msc_reqbody_no_files_length += length;
+
+            /* Do nothing else, URLENCODED processor does not support streaming. */
         }
         else {
             *error_msg = apr_psprintf(msr->mp, "Unknown request body processor: %s",
@@ -291,6 +302,11 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
             return -1;
         }
     }
+    
+    /* Check that we are not over the request body no files limit. */
+    if (msr->msc_reqbody_no_files_length >= (unsigned long) msr->txcfg->reqbody_no_files_limit) {
+        return -5;
+    }    
 
     /* Store data. */
     if (msr->msc_reqbody_storage == MSC_REQBODY_MEMORY) {
@@ -395,8 +411,10 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
         }
     }
 
+    /* Note that we've read the body. */
     msr->msc_reqbody_read = 1;
 
+    /* Finalise body processing. */
     if ((msr->msc_reqbody_processor != NULL)&&(msr->msc_reqbody_error == 0)) {
         char *my_error_msg = NULL;
 
@@ -431,6 +449,9 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
         }
         #endif
     }
+
+    /* Note the request body no files length. */
+    msr_log(msr, 4, "Reqest body no files length: %lu", msr->msc_reqbody_no_files_length);
 
     return 1;
 }

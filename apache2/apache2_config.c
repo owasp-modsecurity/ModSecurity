@@ -34,6 +34,7 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     dcfg->reqbody_access = NOT_SET;
     dcfg->reqbody_inmemory_limit = NOT_SET;
     dcfg->reqbody_limit = NOT_SET;
+    dcfg->reqbody_no_files_limit = NOT_SET;
     dcfg->resbody_access = NOT_SET;
 
     dcfg->debuglog_name = NOT_SET_P;
@@ -221,6 +222,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
         ? parent->reqbody_inmemory_limit : child->reqbody_inmemory_limit);
     merged->reqbody_limit = (child->reqbody_limit == NOT_SET
         ? parent->reqbody_limit : child->reqbody_limit);
+    merged->reqbody_no_files_limit = (child->reqbody_no_files_limit == NOT_SET
+        ? parent->reqbody_no_files_limit : child->reqbody_no_files_limit);
     merged->resbody_access = (child->resbody_access == NOT_SET
         ? parent->resbody_access : child->resbody_access);
 
@@ -453,6 +456,7 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->reqbody_inmemory_limit == NOT_SET)
         dcfg->reqbody_inmemory_limit = REQUEST_BODY_DEFAULT_INMEMORY_LIMIT;
     if (dcfg->reqbody_limit == NOT_SET) dcfg->reqbody_limit = REQUEST_BODY_DEFAULT_LIMIT;
+    if (dcfg->reqbody_no_files_limit == NOT_SET) dcfg->reqbody_no_files_limit = REQUEST_BODY_NO_FILES_DEFAULT_LIMIT;
     if (dcfg->resbody_access == NOT_SET) dcfg->resbody_access = 0;
     if (dcfg->of_limit == NOT_SET) dcfg->of_limit = RESPONSE_BODY_DEFAULT_LIMIT;
     if (dcfg->of_limit_action == NOT_SET) dcfg->of_limit_action = RESPONSE_BODY_LIMIT_ACTION_REJECT;
@@ -1018,6 +1022,22 @@ static const char *cmd_request_body_limit(cmd_parms *cmd, void *_dcfg, const cha
     }
 
     dcfg->reqbody_limit = limit;
+
+    return NULL;
+}
+
+static const char *cmd_request_body_no_files_limit(cmd_parms *cmd, void *_dcfg, const char *p1) {
+    directory_config *dcfg = (directory_config *)_dcfg;
+    long int limit;
+
+    if (dcfg == NULL) return NULL;
+
+    limit = strtol(p1, NULL, 10);
+    if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRequestBodyNoFilesLimit: %s", p1);
+    }
+
+    dcfg->reqbody_no_files_limit = limit;
 
     return NULL;
 }
@@ -1668,7 +1688,15 @@ const command_rec module_directives[] = {
         cmd_request_body_limit,
         NULL,
         CMD_SCOPE_ANY,
-        "maximum request body size ModSecurity is allowed to access."
+        "maximum request body size ModSecurity will accept."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecRequestBodyNoFilesLimit",
+        cmd_request_body_no_files_limit,
+        NULL,
+        CMD_SCOPE_ANY,
+        "maximum request body size ModSecurity will accept, but excluding the size of uploaded files."
     ),
 
     AP_INIT_TAKE1 (

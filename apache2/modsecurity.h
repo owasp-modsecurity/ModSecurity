@@ -107,6 +107,7 @@ extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
 #define REQUEST_BODY_HARD_LIMIT                 1073741824L
 #define REQUEST_BODY_DEFAULT_INMEMORY_LIMIT     131072
 #define REQUEST_BODY_DEFAULT_LIMIT              134217728
+#define REQUEST_BODY_NO_FILES_DEFAULT_LIMIT     1048576
 #define RESPONSE_BODY_DEFAULT_LIMIT             524288
 #define RESPONSE_BODY_HARD_LIMIT                1073741824L
 
@@ -306,6 +307,8 @@ struct modsec_rec {
     int                  msc_reqbody_error;
     const char          *msc_reqbody_error_msg;
 
+    apr_size_t           msc_reqbody_no_files_length;
+
     multipart_data      *mpd;                        /* MULTIPART processor data structure */
 
     #ifdef WITH_LIBXML2
@@ -366,6 +369,7 @@ struct directory_config {
     int                  reqbody_access;
     long int             reqbody_inmemory_limit;
     long int             reqbody_limit;
+    long int             reqbody_no_files_limit;
     int                  resbody_access;
 
     long int             of_limit;

@@ -1278,14 +1278,42 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis>Example Usage:</emphasis> <literal
       moreinfo="none">SecRequestBodyLimit 134217728</literal></para>
 
-      <para><emphasis>Processing Phase:</emphasis> N/A</para>
-
       <para><emphasis>Scope:</emphasis> Any</para>
 
       <para><emphasis>Dependencies/Notes:</emphasis> 131072 KB (134217728
       bytes) is the default setting. Anything over this limit will be rejected
       with status code 413 Request Entity Too Large. There is a hard limit of
       1 GB.</para>
+    </section>
+    
+    <section>
+      <title><literal>SecRequestBodyNoFilesLimit</literal></title>
+
+      <para><emphasis>Description:</emphasis> Configures the maximum request
+      body size ModSecurity will accept for buffering, excluding the size of
+      files being transported in the request. This directive comes handy to
+      further reduce susceptability to DoS attacks when someone is sending
+      request bodies of very large sizes. Web applications that require file
+      uploads must configure <literal>SecRequestBodyLimit</literal> to a
+      high value. Since large files are streamed to disk file uploads will
+      not increase memory consumption. However, it's still possible for
+      someone to take advantage of a large request body limit and send
+      non-upload requests with large body sizes. This directive eliminates
+      that loophole. </para>
+
+      <para><emphasis>Syntax:</emphasis> <literal
+      moreinfo="none">SecRequestBodyNoFilesLimit NUMBER_IN_BYTES</literal></para>
+
+      <para><emphasis>Example Usage:</emphasis> <literal
+      moreinfo="none">SecRequestBodyLimit 131072</literal></para>
+
+      <para><emphasis>Scope:</emphasis> Any</para>
+
+      <para><emphasis>Dependencies/Notes:</emphasis> 1 MB (1048576
+      bytes) is the default setting. This value is very conservative. For
+      most applications you should be able to reduce it down to 128 KB or
+      lower. Anything over the limit will be rejected with status code <literal>413
+      Request Entity Too Large</literal>. There is a hard limit of 1 GB.</para>
     </section>
 
     <section>

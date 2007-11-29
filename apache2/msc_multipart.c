@@ -192,6 +192,9 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
         }        
     }
 
+    /* The buffer is data so increase the data length counter. */
+    msr->msc_reqbody_no_files_length += (MULTIPART_BUF_SIZE - msr->mpd->bufleft);
+
     if (len > 1) {
         if (msr->mpd->buf[len - 2] == '\r') {
             msr->mpd->flag_crlf_line = 1;
@@ -422,6 +425,9 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
     }
     else if (msr->mpd->mpp->type == MULTIPART_FORMDATA) {
         value_part_t *value_part = apr_pcalloc(msr->mp, sizeof(value_part_t));
+
+        /* The buffer contains data so increase the data length counter. */
+        msr->msc_reqbody_no_files_length += (MULTIPART_BUF_SIZE - msr->mpd->bufleft) + msr->mpd->reserve[0];
     
         /* add this part to the list of parts */
 

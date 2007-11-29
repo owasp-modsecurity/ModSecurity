@@ -221,7 +221,14 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
             }
 
             if (buflen != 0) {
-                if (modsecurity_request_body_store(msr, buf, buflen, error_msg) < 0) {
+                int rcbs = modsecurity_request_body_store(msr, buf, buflen, error_msg);
+                if (rcbs < 0) {
+                    if (rcbs == -5) {
+                        *error_msg = apr_psprintf(msr->mp, "Requests body no files data length is larger than the "
+                            "configured limit (%lu).", msr->txcfg->reqbody_no_files_limit);
+                        return -5;
+                    }
+
                     return -1;
                 }
 
