@@ -30,8 +30,8 @@ static int sec_auditlog_write(modsec_rec *msr, const char *data, unsigned int le
      * even in cases where write fails. That will make it easier to detect
      * problems with partial writes.
      */
-    msr->new_auditlog_size += nbytes_written;
-    apr_md5_update(&msr->new_auditlog_md5ctx, data, nbytes_written);
+    msr->new_auditlog_size += len;
+    apr_md5_update(&msr->new_auditlog_md5ctx, data, len);
 
     /* Do not write if we do not have a file descriptor. */
     if (msr->new_auditlog_fd == NULL) return -1;
