@@ -680,8 +680,14 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             /* Go to the next rule if we have not yet hit the skip_after ID */
             if ((rule->placeholder == RULE_PH_NONE) || (rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0)) {
                 if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "Skipping rule %pp id=\"%s\": Skipping until after id=\"%s\"", rule, (rule->actionset->id ? rule->actionset->id : "(none)"), skip_after);
+                    if (rule->chain_starter != NULL) {
+                        msr_log(msr, 9, "Skipping chain rule %pp id=\"%s\" until after id=\"%s\"", rule, (rule->chain_starter->actionset->id ? rule->chain_starter->actionset->id : "(none)"), skip_after);
 
+                    }
+                    else {
+                        msr_log(msr, 9, "Skipping rule %pp id=\"%s\" until after id=\"%s\"", rule, (rule->actionset->id ? rule->actionset->id : "(none)"), skip_after);
+
+                    }
                 }
                 continue;
             }
