@@ -2,8 +2,6 @@
 29 Nov 2007 - 2.5.0-dev3
 ------------------------
 
- * Fixed utf-8 validation (again). It was broken in 2.1.2.
-
  * Implemented SecRequestBodyNoFilesLimit.
 
  * Enhance handling of the case where we run out of disk space while
