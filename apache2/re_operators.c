@@ -916,6 +916,179 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
     return 0;
 }
 
+/* verifyCC */
+
+static int validate_cc (modsec_rec *msr, const char *ccnumber, int len) {
+    char ccdigits[16];
+    char *cdst = ccdigits;
+    const char *csrc = ccnumber;
+    int digits = 0;
+    int srclen = 0;
+    int multiply;
+    int digit;
+    int add;
+    int sum = 0;
+ 
+    /* Remove non digits characters */
+
+    while ((srclen++ <= len) && (digits < 16)) {
+        if (isdigit(*csrc)) {
+            *(cdst++) = *csrc - 48;
+            ++digits;                    
+        }
+        csrc++;
+
+        msr_log(msr, 9, "cdst[%d]: %.*s", digits, digits, ccdigits);
+    }
+   
+    /* Credit card checksum algorithm */
+
+    for (digit = digits - 1, multiply = 0; digit >= 0; digit--) {
+        if (multiply) {
+            add = ccdigits[digit] * 2;
+        }
+        else {
+            add = ccdigits[digit];
+        }
+
+        if (add > 9) {
+            sum += add - 9;
+        }
+        else {
+            sum += add;
+        }
+
+        multiply = 1 - multiply;
+    }
+ 
+    /* See if the final digit is a zero, if so the card is valid. */   
+    if ((sum % 10) != 0) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+static int msre_op_verifyCC_init(msre_rule *rule, char **error_msg) {
+    const char *errptr = NULL;
+    int erroffset;
+    msc_regex_t *regex;
+    const char *pattern = rule->op_param;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    /* Compile pattern */
+    regex = msc_pregcomp(rule->ruleset->mp, pattern, 0, &errptr, &erroffset);
+    if (regex == NULL) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (pos %i): %s",
+            erroffset, errptr);
+        return 0;
+    }
+
+    rule->op_param_data = regex;
+
+    return 1; /* OK */
+}
+
+static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    msc_regex_t *regex = (msc_regex_t *)rule->op_param_data;
+    const char *target;
+    unsigned int target_length;
+    char *my_error_msg = NULL;
+    int ovector[33];
+    int rc;
+    int is_cc = 0;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (regex == NULL) {
+        *error_msg = "Internal Error: regex data is null.";
+        return -1;
+    }
+
+    /* If the given target is null run against an empty
+     * string. This is a behaviour consistent with previous
+     * releases.
+     */
+    if (var->value == NULL) {
+        target = "";
+        target_length = 0;
+    } else {
+        target = var->value;
+        target_length = var->value_len;
+    }
+
+    rc = msc_regexec_capture(regex, target, target_length, ovector, 30, &my_error_msg);
+    if (rc < -1) {
+        *error_msg = apr_psprintf(msr->mp, "Regex execution failed: %s", my_error_msg);
+        return -1;
+    }
+
+    /* Handle captured subexpressions. */
+    if (rc > 0) {
+        int capture = 0;
+        const apr_array_header_t *tarr;
+        const apr_table_entry_t *telts;
+        int i;
+
+        /* Are we supposed to store the captured subexpressions? */
+        /* IMP1 Can we use a flag to avoid having to iterate through the list every time. */
+        tarr = apr_table_elts(rule->actionset->actions);
+        telts = (const apr_table_entry_t*)tarr->elts;
+        for (i = 0; i < tarr->nelts; i++) {
+            msre_action *action = (msre_action *)telts[i].val;
+            if (strcasecmp(action->metadata->name, "capture") == 0) {
+                capture = 1;
+                break;
+            }
+        }
+
+        int k;
+
+        /* Use the available captures. */
+        /* to avoid memory manipulation I use the same captures for now to check for CC# */
+        for(k = 0; k < rc; k++) {
+            msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+            if (s == NULL) return -1;
+            s->name = apr_psprintf(msr->mp, "%i", k);
+            s->value = apr_pstrmemdup(msr->mp,
+                target + ovector[2*k], ovector[2*k + 1] - ovector[2*k]);
+            s->value_len = (ovector[2*k + 1] - ovector[2*k]);
+            if ((s->name == NULL)||(s->value == NULL)) return -1;
+            apr_table_setn(msr->tx_vars, s->name, (void *)s);
+
+            msr_log(msr, 9, "Adding regex subexpression to TXVARS (%i): %s", k,
+                log_escape_nq(msr->mp, s->value));
+
+            if ((k > 0) && validate_cc (msr, s->value, s->value_len)) {
+                is_cc = 1;
+            }            
+        }
+    
+        /* Unset the remaining ones (from previous invocations). */
+        for(k = rc; k <= 9; k++) {
+            char buf[24];
+            apr_snprintf(buf, sizeof(buf), "%i", k);
+            apr_table_unset(msr->tx_vars, buf);
+        }
+    }
+
+    if ((rc != PCRE_ERROR_NOMATCH) && is_cc) {
+        /* Match. */
+
+        /* This message will be logged. */
+        *error_msg = apr_psprintf(msr->mp, "CC# match \"%s\" at %s.",
+            regex->pattern, var->name);
+        return 1;
+    }
+
+    /* No match. */
+    return 0;
+}
+
+
 #endif
 
 /**
@@ -1653,6 +1826,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
     );
 
     #endif
+
+    /* verifyCC */
+    msre_engine_op_register(engine,
+        "verifyCC",
+        msre_op_verifyCC_init,
+        msre_op_verifyCC_execute
+    );
 
     /* geoLookup */
     msre_engine_op_register(engine,

@@ -4982,6 +4982,23 @@ SecRule XML "<emphasis>@validateSchema /path/to/apache2/conf/xml.xsd</emphasis>,
     </section>
 
     <section>
+      <title><literal>verifyCC</literal></title>
+
+      <para><emphasis>Description:</emphasis> This operator verifies a given
+      regular expression as a potential credit card number. It first matches
+      with a single generic regular expression then runs the resulting match
+      through a Luhn checksum algorithm to further verify it as a potential
+      credit card number.</para>
+
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule ARGS "<emphasis>@verifyCC \d{13,16}</emphasis>" \
+              "phase:2,sanitiseMatched,log,auditlog,pass,msg:'Potential credit card number'"</programlisting>
+    </section>
+
+    <section>
+
+    <section>
       <title><literal>within</literal></title>
 
       <para><emphasis>Description:</emphasis> This operator is a string
