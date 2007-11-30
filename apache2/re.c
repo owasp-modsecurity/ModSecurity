@@ -790,6 +790,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             }
             msr_log(msr, 4, "Recipe: Invoking rule %pp;%s%s%s.",
                     rule, (fn ? fn : ""), (id ? id : ""), (rev ? rev : ""));
+            msr_log(msr, 5, "Rule %pp: %s", rule, rule->unparsed);
         }
 
 #if defined(PERFORMANCE_MEASUREMENT)
@@ -1214,9 +1215,16 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset,
     rule->ruleset = ruleset;
     rule->targets = apr_array_make(ruleset->mp, 10, sizeof(const msre_var *));
     rule->p1 = apr_pstrdup(ruleset->mp, targets);
-    rule->unparsed = apr_pstrcat(ruleset->mp, ((strcmp(SECACTION_TARGETS, targets) || strcmp(SECACTION_TARGETS, args)) ? "SecRule" : "SecAction"), " ", targets, " ", args, " ", actions, NULL);
     rule->filename = apr_pstrdup(ruleset->mp, fn);
     rule->line_num = line;
+
+    /* Add the unparsed rule */
+    if ((strcmp(SECACTION_TARGETS, targets) == 0) && (strcmp(SECACTION_ARGS, args) == 0)) {
+        rule->unparsed = apr_pstrcat(ruleset->mp, "SecAction", " \"", actions, "\"", NULL);
+    }
+    else {
+        rule->unparsed = apr_pstrcat(ruleset->mp, "SecRule", " \"", targets, "\" \"", args, "\"", (actions != NULL ? " \"" : ""), (actions != NULL ? actions : ""), (actions != NULL ? "\"" : ""), NULL);
+    }
 
     /* Parse targets */
     rc = msre_parse_targets(ruleset, targets, rule->targets, &my_error_msg);

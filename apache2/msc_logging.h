@@ -28,7 +28,9 @@
 #define AUDITLOG_PART_A_RESPONSE_BODY       'G'
 #define AUDITLOG_PART_TRAILER               'H'
 #define AUDITLOG_PART_FAKE_REQUEST_BODY     'I'
-#define AUDITLOG_PART_LAST                  'I'
+#define AUDITLOG_PART_UPLOADS               'J'
+#define AUDITLOG_PART_MATCHEDRULES          'K'
+#define AUDITLOG_PART_LAST                  'K'
 #define AUDITLOG_PART_ENDMARKER             'Z'
 
 #include "modsecurity.h"

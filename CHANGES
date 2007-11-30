@@ -2,7 +2,9 @@
 29 Nov 2007 - 2.5.0-dev3
 ------------------------
 
- * Added matching rules to audit log data.
+ * The invoked rule is now logged in the debug log at level 5.
+
+ * New audit log part 'K' logs all matching rules.
 
  * Implemented SecRequestBodyNoFilesLimit.
 

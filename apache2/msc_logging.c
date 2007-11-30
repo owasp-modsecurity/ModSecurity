@@ -463,7 +463,7 @@ void sec_audit_logger(modsec_rec *msr) {
 
     /* AUDITLOG_PART_HEADER */
 
-    text = apr_psprintf(msr->mp, "--%s-A--\n", msr->new_auditlog_boundary);
+    text = apr_psprintf(msr->mp, "--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_HEADER);
     sec_auditlog_write(msr, text, strlen(text));
 
     /* Format: time transaction_id remote_addr remote_port local_addr local_port */
@@ -477,7 +477,7 @@ void sec_audit_logger(modsec_rec *msr) {
     /* AUDITLOG_PART_REQUEST_HEADERS */
 
     if (strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_REQUEST_HEADERS) != NULL) {
-        text = apr_psprintf(msr->mp, "\n--%s-B--\n", msr->new_auditlog_boundary);
+        text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_REQUEST_HEADERS);
         sec_auditlog_write(msr, text, strlen(text));
 
         sanitise_request_line(msr);
@@ -581,7 +581,7 @@ void sec_audit_logger(modsec_rec *msr) {
                 unsigned int sanitise_offset = 0;
                 unsigned int sanitise_length = 0;
 
-                text = apr_psprintf(msr->mp, "\n--%s-C--\n", msr->new_auditlog_boundary);
+                text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_REQUEST_BODY);
                 sec_auditlog_write(msr, text, strlen(text));
 
                 for(;;) {
@@ -669,7 +669,7 @@ void sec_audit_logger(modsec_rec *msr) {
             if (buffer == NULL) {
                 msr_log(msr, 1, "Audit log: Failed to reconstruct request body.");
             } else {
-                text = apr_psprintf(msr->mp, "\n--%s-I--\n", msr->new_auditlog_boundary);
+                text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_FAKE_REQUEST_BODY);
                 sec_auditlog_write(msr, text, strlen(text));
                 sec_auditlog_write(msr, buffer, strlen(buffer));
             }
@@ -679,7 +679,7 @@ void sec_audit_logger(modsec_rec *msr) {
     /* AUDITLOG_PART_A_RESPONSE_HEADERS */
 
     if (strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_A_RESPONSE_HEADERS) != NULL) {
-        text = apr_psprintf(msr->mp, "\n--%s-F--\n", msr->new_auditlog_boundary);
+        text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_A_RESPONSE_HEADERS);
         sec_auditlog_write(msr, text, strlen(text));
 
         /* There are no response headers (or the status line) in HTTP 0.9 */
@@ -713,7 +713,7 @@ void sec_audit_logger(modsec_rec *msr) {
 
     if (strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_RESPONSE_BODY) != NULL) {
         if (msr->resbody_data != NULL) {
-            text = apr_psprintf(msr->mp, "\n--%s-E--\n", msr->new_auditlog_boundary);
+            text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_RESPONSE_BODY);
             sec_auditlog_write(msr, text, strlen(text));
             sec_auditlog_write(msr, msr->resbody_data, msr->resbody_length);
             wrote_response_body = 1;
@@ -725,19 +725,12 @@ void sec_audit_logger(modsec_rec *msr) {
     if (strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_TRAILER) != NULL) {
         apr_time_t now = apr_time_now();
 
-        text = apr_psprintf(msr->mp, "\n--%s-H--\n", msr->new_auditlog_boundary);
+        text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_TRAILER);
         sec_auditlog_write(msr, text, strlen(text));
 
         /* Messages */
         for(i = 0; i < msr->alerts->nelts; i++) {
             text = apr_psprintf(msr->mp, "Message: %s\n", ((char **)msr->alerts->elts)[i]);
-            sec_auditlog_write(msr, text, strlen(text));
-        }
-    
-        /* Matched Rules */
-        for(i = 0; i < msr->matched_rules->nelts; i++) {
-            rule = ((msre_rule **)msr->matched_rules->elts)[i];
-            text = apr_psprintf(msr->mp, "MatchedRule: %s\n", rule->unparsed);
             sec_auditlog_write(msr, text, strlen(text));
         }
     
@@ -880,10 +873,28 @@ void sec_audit_logger(modsec_rec *msr) {
         }
     }
 
+    /* AUDITLOG_PART_UPLOADS */
+    // TODO: Implement
+
+
+    /* AUDITLOG_PART_MATCHEDRULES */
+
+    if (strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_MATCHEDRULES) != NULL) {
+        text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_MATCHEDRULES);
+        sec_auditlog_write(msr, text, strlen(text));
+
+        /* Matched Rules */
+        for(i = 0; i < msr->matched_rules->nelts; i++) {
+            rule = ((msre_rule **)msr->matched_rules->elts)[i];
+            text = apr_psprintf(msr->mp, "%s\n", rule->unparsed);
+            sec_auditlog_write(msr, text, strlen(text));
+        }
+    }
+    
 
     /* AUDITLOG_PART_ENDMARKER */
 
-    text = apr_psprintf(msr->mp, "\n--%s-Z--\n", msr->new_auditlog_boundary);
+    text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_ENDMARKER);
     sec_auditlog_write(msr, text, strlen(text));
 
     /* Return here if we were writing to a serial log

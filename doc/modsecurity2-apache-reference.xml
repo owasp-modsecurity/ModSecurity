@@ -677,6 +677,11 @@ SecAuditLogStorageDir logs/audit
         </listitem>
 
         <listitem>
+          <para><literal moreinfo="none">K</literal> - This part contains a
+          full list of every rule that matched (one per line) in the order they were matched.</para>
+        </listitem>
+
+        <listitem>
           <para><literal moreinfo="none">Z</literal> - final boundary,
           signifies the end of the entry (mandatory)</para>
         </listitem>
