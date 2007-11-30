@@ -304,6 +304,9 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     msr->tcache = apr_hash_make(msr->mp);
     if (msr->tcache == NULL) return -1;
 
+    msr->matched_rules = apr_array_make(msr->mp, 16, sizeof(void *));
+    if (msr->matched_rules == NULL) return -1;
+
     msr->matched_var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     if (msr->matched_var == NULL) return -1;
 

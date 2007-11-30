@@ -659,7 +659,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
 /* -- Configuration directives -- */
 
 static const char *cmd_action(cmd_parms *cmd, void *_dcfg, const char *p1) {
-    return add_rule(cmd, (directory_config *)_dcfg, "REQUEST_URI", "@unconditionalMatch", p1);
+    return add_rule(cmd, (directory_config *)_dcfg, SECACTION_TARGETS, SECACTION_ARGS, p1);
 }
 
 static const char *cmd_argument_separator(cmd_parms *cmd, void *_dcfg, const char *p1) {

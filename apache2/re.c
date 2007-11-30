@@ -1214,6 +1214,7 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset,
     rule->ruleset = ruleset;
     rule->targets = apr_array_make(ruleset->mp, 10, sizeof(const msre_var *));
     rule->p1 = apr_pstrdup(ruleset->mp, targets);
+    rule->unparsed = apr_pstrcat(ruleset->mp, ((strcmp(SECACTION_TARGETS, targets) || strcmp(SECACTION_TARGETS, args)) ? "SecRule" : "SecAction"), " ", targets, " ", args, " ", actions, NULL);
     rule->filename = apr_pstrdup(ruleset->mp, fn);
     rule->line_num = line;
 
@@ -1423,6 +1424,9 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
                 log_escape(msr->mp, rule->op_name), log_escape(msr->mp, rule->op_param),
                 log_escape(msr->mp, full_varname));
         }
+
+        /* Save the rules that match */
+        *(const msre_rule **)apr_array_push(msr->matched_rules) = rule;
 
         /* Save the last matched var data */
         msr->matched_var->name = apr_pstrdup(msr->mp, var->name);

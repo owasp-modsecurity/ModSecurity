@@ -8,6 +8,7 @@
  * write to Breach Security, Inc. at support@breach.com.
  *
  */
+#include "re.h"
 #include "msc_logging.h"
 #include "httpd.h"
 #include "apr_strings.h"
@@ -362,6 +363,7 @@ void sec_audit_logger(modsec_rec *msr) {
     const apr_array_header_t *arr = NULL;
     apr_table_entry_t *te = NULL;
     char *str1 = NULL, *str2 = NULL, *text = NULL;
+    const msre_rule *rule = NULL;
     apr_size_t nbytes, nbytes_written;
     unsigned char md5hash[APR_MD5_DIGESTSIZE];
     int was_limited = 0;
@@ -729,6 +731,13 @@ void sec_audit_logger(modsec_rec *msr) {
         /* Messages */
         for(i = 0; i < msr->alerts->nelts; i++) {
             text = apr_psprintf(msr->mp, "Message: %s\n", ((char **)msr->alerts->elts)[i]);
+            sec_auditlog_write(msr, text, strlen(text));
+        }
+    
+        /* Matched Rules */
+        for(i = 0; i < msr->matched_rules->nelts; i++) {
+            rule = ((msre_rule **)msr->matched_rules->elts)[i];
+            text = apr_psprintf(msr->mp, "MatchedRule: %s\n", rule->unparsed);
             sec_auditlog_write(msr, text, strlen(text));
         }
     

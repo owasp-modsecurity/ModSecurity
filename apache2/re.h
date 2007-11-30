@@ -121,6 +121,7 @@ struct msre_rule {
     unsigned int             op_negated;
     msre_actionset          *actionset;
     const char              *p1;
+    const char              *unparsed;
     const char              *filename;
     int                      line_num;
     int                      placeholder;

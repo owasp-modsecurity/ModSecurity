@@ -114,6 +114,9 @@ extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
 #define RESPONSE_BODY_LIMIT_ACTION_REJECT       0
 #define RESPONSE_BODY_LIMIT_ACTION_PARTIAL      1
 
+#define SECACTION_TARGETS                       "REQUEST_URI"
+#define SECACTION_ARGS                          "@unconditionalMatch"
+
 #if !defined(OS2) && !defined(WIN32) && !defined(BEOS) && !defined(NETWARE)
 #include "unixd.h"
 #define __SET_MUTEX_PERMS
@@ -333,6 +336,7 @@ struct modsec_rec {
     apr_time_t           time_checkpoint_2;
     apr_time_t           time_checkpoint_3;
 
+    apr_array_header_t  *matched_rules;
     msc_string          *matched_var;
     int                  highest_severity;
 
