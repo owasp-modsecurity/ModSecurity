@@ -918,55 +918,47 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
 
 /* verifyCC */
 
-static int validate_cc (modsec_rec *msr, const char *ccnumber, int len) {
+/**
+ * Luhn Mod-10 Method (ISO 2894/ANSI 4.13)
+ */
+static int luhn_verify(const char *ccnumber, int len) {
     char ccdigits[16];
     char *cdst = ccdigits;
     const char *csrc = ccnumber;
     int digits = 0;
     int srclen = 0;
-    int multiply;
-    int digit;
-    int add;
     int sum = 0;
- 
-    /* Remove non digits characters */
+    int weight;
+    int i;
 
+    /* Weighted lookup table which is just a precalculated (i = index):
+     *   i*2 + (( (i*2) > 9 ) ? -9 : 0)
+     */
+    static int wtable[10] = {0, 2, 4, 6, 8, 1, 3, 5, 7, 9}; /* weight lookup table */
+ 
+    /* Remove non digits characters and calculate the true length */
     while ((srclen++ <= len) && (digits < 16)) {
         if (isdigit(*csrc)) {
-            *(cdst++) = *csrc - 48;
+            *(cdst++) = *csrc;
             ++digits;                    
         }
         csrc++;
-
-        msr_log(msr, 9, "cdst[%d]: %.*s", digits, digits, ccdigits);
     }
+
+    /* Determine if the first digit is weighted: odd=no, even=yes */
+    weight = !(digits & 1);
    
-    /* Credit card checksum algorithm */
-
-    for (digit = digits - 1, multiply = 0; digit >= 0; digit--) {
-        if (multiply) {
-            add = ccdigits[digit] * 2;
-        }
-        else {
-            add = ccdigits[digit];
-        }
-
-        if (add > 9) {
-            sum += add - 9;
-        }
-        else {
-            sum += add;
-        }
-
-        multiply = 1 - multiply;
+    /* Add up digits (weighted digits via lookup table) */
+    for (i = 0; i < digits; i++) {
+        sum += (weight ? wtable[ccdigits[i] - '0'] : (ccdigits[i] - '0'));
+        weight = !weight; /* alternate weights */
     }
- 
-    /* See if the final digit is a zero, if so the card is valid. */   
-    if ((sum % 10) != 0) {
-        return 0;
-    } else {
-        return 1;
-    }
+
+    /* Do a mod 10 on the sum */
+    sum %= 10;
+
+    /* If the result is a zero the card is valid. */   
+    return sum ? 0 : 1;
 }
 
 static int msre_op_verifyCC_init(msre_rule *rule, char **error_msg) {
@@ -1062,7 +1054,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
             msr_log(msr, 9, "Adding regex subexpression to TXVARS (%i): %s", k,
                 log_escape_nq(msr->mp, s->value));
 
-            if ((k > 0) && validate_cc (msr, s->value, s->value_len)) {
+            if ((k > 0) && luhn_verify (s->value, s->value_len)) {
                 is_cc = 1;
             }            
         }
