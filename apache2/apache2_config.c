@@ -643,7 +643,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
 
         /* shallow copy of original rule with placeholder marked as target */
         memcpy(phrule, rule, sizeof(msre_rule));
-        phrule->placeholder = RULE_PH_TARGET;
+        phrule->placeholder = RULE_PH_SKIPAFTER;
 
         /* Add placeholder. */
         if (msre_ruleset_rule_add(dcfg->ruleset, phrule, phrule->actionset->phase) < 0) {
