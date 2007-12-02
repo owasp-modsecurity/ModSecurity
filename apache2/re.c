@@ -1028,31 +1028,34 @@ static int msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset, 
         if (mode == 0) { /* Looking for next rule. */
             int remove_rule = 0;
 
-            switch(re->type) {
-                case RULE_EXCEPTION_REMOVE_ID :
-                    if ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) {
-                        int ruleid = atoi(rule->actionset->id);
+            /* Only remove non-placeholder rules */
+            if (rule->placeholder == RULE_PH_NONE) {
+                switch(re->type) {
+                    case RULE_EXCEPTION_REMOVE_ID :
+                        if ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) {
+                            int ruleid = atoi(rule->actionset->id);
 
-                        if (rule_id_in_range(ruleid, re->param)) {
-                            remove_rule = 1;
+                            if (rule_id_in_range(ruleid, re->param)) {
+                                remove_rule = 1;
+                            }
                         }
-                    }
 
-                    break;
+                        break;
 
-                case RULE_EXCEPTION_REMOVE_MSG :
-                    if ((rule->actionset != NULL)&&(rule->actionset->msg != NULL)) {
-                        char *my_error_msg = NULL;
+                    case RULE_EXCEPTION_REMOVE_MSG :
+                        if ((rule->actionset != NULL)&&(rule->actionset->msg != NULL)) {
+                            char *my_error_msg = NULL;
 
-                        int rc = msc_regexec(re->param_data,
-                            rule->actionset->msg, strlen(rule->actionset->msg),
-                            &my_error_msg);
-                        if (rc >= 0) {
-                            remove_rule = 1;
+                            int rc = msc_regexec(re->param_data,
+                                rule->actionset->msg, strlen(rule->actionset->msg),
+                                &my_error_msg);
+                            if (rc >= 0) {
+                                remove_rule = 1;
+                            }
                         }
-                    }
 
-                    break;
+                        break;
+                }
             }
 
             if (remove_rule) {
