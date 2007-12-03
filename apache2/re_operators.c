@@ -973,7 +973,7 @@ static int msre_op_verifyCC_init(msre_rule *rule, char **error_msg) {
     /* Compile pattern */
     regex = msc_pregcomp(rule->ruleset->mp, pattern, 0, &errptr, &erroffset);
     if (regex == NULL) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (pos %i): %s",
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (pos %d): %s",
             erroffset, errptr);
         return 0;
     }
@@ -1537,26 +1537,26 @@ static int msre_op_validateUtf8Encoding_execute(modsec_rec *msr, msre_rule *rule
         switch(rc) {
             case UNICODE_ERROR_CHARACTERS_MISSING :
                 *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: not enough bytes in "
-                    "character (pos %i).", i);
+                    "character (pos %d).", i);
                 return 1;
                 break;
             case UNICODE_ERROR_INVALID_ENCODING :
                 *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: invalid byte value "
-                    "in character (pos %i).", i);
+                    "in character (pos %d).", i);
                 return 1;
                 break;
             case UNICODE_ERROR_OVERLONG_CHARACTER :
                 *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: overlong "
-                    "character detected (pos %i).", i);
+                    "character detected (pos %d).", i);
                 return 1;
                 break;
             case UNICODE_ERROR_RESTRICTED_CHARACTER :
                 *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: use of restricted character"
-                    " (pos %i).", i);
+                    " (pos %d).", i);
                 return 1;
                 break;
             case UNICODE_ERROR_DECODING_ERROR :
-                *error_msg = apr_psprintf(msr->mp, "Error validating UTF-8 decoding (pos %i).", i);
+                *error_msg = apr_psprintf(msr->mp, "Error validating UTF-8 decoding (pos %d).", i);
                 return 1;
                 break;
         }
