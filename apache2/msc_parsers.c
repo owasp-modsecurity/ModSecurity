@@ -9,7 +9,9 @@
  *
  */
 #include "msc_parsers.h"
+#include "iconv.h"
 #include <ctype.h>
+#include <errno.h>
 
 /**
  *
@@ -255,10 +257,8 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
                 arg->value_len = 0;
                 arg->value = "";
 
-                apr_table_addn(arguments, arg->name, (void *)arg);
-                msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
-                    arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
-                    log_escape_ex(msr->mp, arg->value, arg->value_len));
+                // apr_table_addn(arguments, arg->name, (void *)arg);
+                add_argument(msr, arguments, arg);
 
                 arg = (msc_arg *)apr_pcalloc(msr->mp, sizeof(msc_arg));
                 arg->origin = origin;
@@ -274,10 +274,8 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
             arg->value_len = urldecode_nonstrict_inplace_ex((unsigned char *)value, arg->value_origin_len, invalid_count);
             arg->value = apr_pstrmemdup(msr->mp, value, arg->value_len);
 
-            apr_table_addn(arguments, arg->name, (void *)arg);
-            msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
-                arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
-                log_escape_ex(msr->mp, arg->value, arg->value_len));
+            // apr_table_addn(arguments, arg->name, (void *)arg);
+            add_argument(msr, arguments, arg);
 
             arg = (msc_arg *)apr_pcalloc(msr->mp, sizeof(msc_arg));
             arg->origin = origin;
@@ -294,12 +292,67 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
         arg->value_len = 0;
         arg->value = "";
 
-        apr_table_addn(arguments, arg->name, (void *)arg);
-        msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
-            arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
-            log_escape_ex(msr->mp, arg->value, arg->value_len));
+        // apr_table_addn(arguments, arg->name, (void *)arg);
+        add_argument(msr, arguments, arg);
     }
 
     free(buf);
+
     return 1;
+}
+
+/**
+ *
+ */
+void add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg) {
+    msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
+        arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
+        log_escape_ex(msr->mp, arg->value, arg->value_len));
+
+    #ifdef WITH_ICONV
+    if (msr->txcfg->request_encoding != NULL) {
+        iconv_t convset;
+
+        // TODO Convert parameter names too.
+
+        /* Initialise iconv. */
+        convset = iconv_open("ISO-8859-1", msr->txcfg->request_encoding);
+        if (convset == (iconv_t)(-1)) {
+            msr_log(msr, 1, "Iconv init to %s failed: %s",
+                msr->txcfg->request_encoding, strerror(errno));
+        } else {
+            int ctlparam = 1;
+            size_t input_bytes = arg->value_len;
+            size_t output_bytes = arg->value_len;
+            char *o, *outbuf;
+
+            // TODO Can output be longer than input?
+            o = outbuf = apr_palloc(msr->mp, output_bytes);
+
+            /* Tell iconv to reject invalid character sequences. */
+            iconvctl(convset, ICONV_SET_DISCARD_ILSEQ, &ctlparam);
+
+            /* Convert input character sequence. */
+            if (iconv(convset, (const char **)&arg->value,
+                (size_t *)&input_bytes,
+                (char **)&outbuf,
+                (size_t *)&output_bytes) == (size_t)(-1))
+            {
+                msr_log(msr, 1, "Error converting to %s: %s",
+                    msr->txcfg->request_encoding, strerror(errno));
+            } else {
+                arg->value = o;
+                arg->value_len = arg->value_len - output_bytes;
+
+                msr_log(msr, 5, "Parameter value after conversion from %s: %s",
+                    msr->txcfg->request_encoding,
+                    log_escape_nq_ex(msr->mp, arg->value, arg->value_len));
+            }
+
+            iconv_close(convset);
+        }
+    }
+    #endif
+
+    apr_table_addn(arguments, arg->name, (void *)arg);
 }

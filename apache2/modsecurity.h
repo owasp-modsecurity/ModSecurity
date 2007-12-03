@@ -466,6 +466,9 @@ struct directory_config {
      * appear in the ModSecurity signature in the audit log.
      */
     apr_array_header_t  *component_signatures;
+
+    /* Request character encoding. */
+    const char          *request_encoding;
 };
 
 struct error_message {

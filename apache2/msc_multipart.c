@@ -12,6 +12,7 @@
 
 #include "msc_multipart.h"
 #include "msc_util.h"
+#include "msc_parsers.h"
 
 
 #if 0
@@ -1169,7 +1170,8 @@ int multipart_get_arguments(modsec_rec *msr, char *origin, apr_table_t *argument
             arg->value_origin_len = parts[i]->length;
             arg->origin = origin;
 
-            apr_table_addn(arguments, arg->name, (void *)arg);
+            // apr_table_addn(arguments, arg->name, (void *)arg);
+            add_argument(msr, arguments, arg);
         }
     }
 

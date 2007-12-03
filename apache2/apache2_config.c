@@ -101,6 +101,8 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
 
     dcfg->component_signatures = apr_array_make(mp, 16, sizeof(char *));
 
+    dcfg->request_encoding = NOT_SET_P;
+
     return dcfg;
 }
 
@@ -438,6 +440,9 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     merged->component_signatures = apr_array_append(mp, parent->component_signatures,
         child->component_signatures);
 
+    merged->request_encoding = (child->request_encoding == NOT_SET_P
+        ? parent->request_encoding : child->request_encoding);
+
     return merged;
 }
 
@@ -517,6 +522,8 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->cache_trans == NOT_SET) dcfg->cache_trans = MODSEC_CACHE_ENABLED;
     if (dcfg->cache_trans_min == (apr_size_t)NOT_SET) dcfg->cache_trans_min = 15;
     if (dcfg->cache_trans_max == (apr_size_t)NOT_SET) dcfg->cache_trans_max = 0;
+
+    if (dcfg->request_encoding == NOT_SET_P) dcfg->request_encoding = NULL;
 }
 
 /**
@@ -1051,6 +1058,18 @@ static const char *cmd_request_body_access(cmd_parms *cmd, void *_dcfg, const ch
     if (strcasecmp(p1, "off") == 0) dcfg->reqbody_access = 0;
     else
     return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRequestBodyAccess: %s", p1);
+
+    return NULL;
+}
+
+static const char *cmd_request_encoding(cmd_parms *cmd, void *_dcfg, const char *p1) {
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+
+    // TODO Validate encoding
+    // return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRequestBodyAccess: %s", p1);
+
+    dcfg->request_encoding = p1;
 
     return NULL;
 }
@@ -1697,6 +1716,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "maximum request body size ModSecurity will accept, but excluding the size of uploaded files."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecRequestEncoding",
+        cmd_request_encoding,
+        NULL,
+        CMD_SCOPE_ANY,
+        "character encoding used in request."
     ),
 
     AP_INIT_TAKE1 (
