@@ -40,6 +40,7 @@ APACHECTL = apachectl
 INCLUDES = -I /usr/include/libxml2
 #INCLUDES = -I /usr/include/libxml2 -I /path/to/httpd-x.y/srclib/pcre
 DEFS = -DWITH_LIBXML2
+# DEFS = -DWITH_ICONV
 #DEFS = -DWITH_LIBXML2 -DPERFORMANCE_MEASUREMENT
 #DEFS = -DWITH_LIBXML2 -DNO_MODSEC_API
 #DEFS = -DWITH_LIBXML2 -DDEBUG_CONF

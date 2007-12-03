@@ -257,7 +257,6 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
                 arg->value_len = 0;
                 arg->value = "";
 
-                // apr_table_addn(arguments, arg->name, (void *)arg);
                 add_argument(msr, arguments, arg);
 
                 arg = (msc_arg *)apr_pcalloc(msr->mp, sizeof(msc_arg));
@@ -274,7 +273,6 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
             arg->value_len = urldecode_nonstrict_inplace_ex((unsigned char *)value, arg->value_origin_len, invalid_count);
             arg->value = apr_pstrmemdup(msr->mp, value, arg->value_len);
 
-            // apr_table_addn(arguments, arg->name, (void *)arg);
             add_argument(msr, arguments, arg);
 
             arg = (msc_arg *)apr_pcalloc(msr->mp, sizeof(msc_arg));
@@ -292,7 +290,6 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
         arg->value_len = 0;
         arg->value = "";
 
-        // apr_table_addn(arguments, arg->name, (void *)arg);
         add_argument(msr, arguments, arg);
     }
 
@@ -327,6 +324,9 @@ void add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg) {
             char *o, *outbuf;
 
             // TODO Can output be longer than input?
+            // TODO We are currently using more memory than necessary
+            //      as the parameter values before transformation are
+            //      not freed after conversion.
             o = outbuf = apr_palloc(msr->mp, output_bytes);
 
             /* Tell iconv to reject invalid character sequences. */
@@ -352,7 +352,41 @@ void add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg) {
             iconv_close(convset);
         }
     }
+    #else
+    if (msr->txcfg->request_encoding != NULL) {
+        apr_xlate_t *convset = NULL;
+        int rc;
+
+        rc = apr_xlate_open(&convset, "ISO-8859-1", msr->txcfg->request_encoding, msr->mp);
+        if (rc != APR_SUCCESS) {
+            msr_log(msr, 1, "apr_xlate_open failed: %s", get_apr_error(msr->mp, rc));
+        } else {
+            apr_size_t input_bytes = arg->value_len;
+            apr_size_t output_bytes = arg->value_len;
+            char *o, *outbuf;
+
+            o = outbuf = apr_palloc(msr->mp, output_bytes);
+
+            rc = apr_xlate_conv_buffer(convset, arg->value, &input_bytes, outbuf, &output_bytes);
+            if (rc != APR_SUCCESS) {
+                msr_log(msr, 1, "Error converting to %s: %s",
+                    msr->txcfg->request_encoding, get_apr_error(msr->mp, rc));
+            } else {
+                apr_xlate_conv_buffer(convset, NULL, NULL, outbuf, &output_bytes);
+
+                arg->value = o;
+                arg->value_len = arg->value_len - output_bytes;
+
+                msr_log(msr, 5, "Parameter value after conversion from %s: %s",
+                    msr->txcfg->request_encoding,
+                    log_escape_nq_ex(msr->mp, arg->value, arg->value_len));
+            }
+
+            apr_xlate_close(convset);
+        }
+    }
     #endif
 
     apr_table_addn(arguments, arg->name, (void *)arg);
 }
+
