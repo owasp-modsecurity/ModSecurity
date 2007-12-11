@@ -2,6 +2,8 @@
 29 Nov 2007 - 2.5.0-dev3
 ------------------------
 
+ * Added SecMarker <id> directive to allow a fixed target for skipAfter.
+
  * The invoked rule is now logged in the debug log at level 5.
 
  * New audit log part 'K' logs all matching rules.

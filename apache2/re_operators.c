@@ -53,6 +53,17 @@ static int msre_op_unconditionalmatch_execute(modsec_rec *msr, msre_rule *rule,
     return 1;
 }
 
+/* noMatch */
+
+static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
+    msre_var *var, char **error_msg)
+{
+    *error_msg = "No match.";
+
+    /* Never match. */
+    return 0;
+}
+
 /* rx */
 
 static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
@@ -1729,6 +1740,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "unconditionalMatch",
         NULL,
         msre_op_unconditionalmatch_execute
+    );
+
+    /* noMatch */
+    msre_engine_op_register(engine,
+        "noMatch",
+        NULL,
+        msre_op_nomatch_execute
     );
 
     /* rx */

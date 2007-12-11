@@ -657,8 +657,48 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
             return "Internal Error: Failed to add placeholder to the ruleset.";
         }
 
+        /* No longer need to search for the ID */
         apr_table_unset(dcfg->tmp_rule_placeholders, rule->actionset->id);
     }
+        
+    return NULL;    
+}
+
+/**
+ * TODO
+ */
+static const char *add_marker(cmd_parms *cmd, directory_config *dcfg, const char *p1, 
+    const char *p2, const char *p3)
+{
+    char *my_error_msg = NULL;
+    msre_rule *rule = NULL;
+    extern msc_engine *modsecurity;
+    int p;
+
+    /* Create a ruleset if one does not exist. */
+    if ((dcfg->ruleset == NULL)||(dcfg->ruleset == NOT_SET_P)) {
+        dcfg->ruleset = msre_ruleset_create(modsecurity->msre, cmd->pool);
+        if (dcfg->ruleset == NULL) return FATAL_ERROR;
+    }
+
+    /* Create the rule now. */
+    rule = msre_rule_create(dcfg->ruleset, cmd->directive->filename, cmd->directive->line_num, p1, p2, p3, &my_error_msg);
+    if (rule == NULL) {
+        return my_error_msg;
+    }
+
+    /* This is a marker */
+    rule->placeholder = RULE_PH_MARKER;
+
+    /* Add placeholder to each phase */
+    for (p = PHASE_FIRST; p <= PHASE_LAST; p++) {
+        if (msre_ruleset_rule_add(dcfg->ruleset, rule, p) < 0) {
+            return "Internal Error: Failed to add marker to the ruleset.";
+        }
+    }
+
+    /* No longer need to search for the ID */
+    apr_table_unset(dcfg->tmp_rule_placeholders, rule->actionset->id);
         
     return NULL;    
 }
@@ -667,6 +707,12 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
 
 static const char *cmd_action(cmd_parms *cmd, void *_dcfg, const char *p1) {
     return add_rule(cmd, (directory_config *)_dcfg, SECACTION_TARGETS, SECACTION_ARGS, p1);
+}
+
+static const char *cmd_marker(cmd_parms *cmd, void *_dcfg, const char *p1) {
+    directory_config *dcfg = (directory_config *)_dcfg;
+    const char *action = apr_pstrcat(dcfg->mp, SECMARKER_BASE_ACTIONS, p1, NULL);
+    return add_marker(cmd, (directory_config *)_dcfg, SECMARKER_TARGETS, SECMARKER_ARGS, action);
 }
 
 static const char *cmd_argument_separator(cmd_parms *cmd, void *_dcfg, const char *p1) {
@@ -1638,6 +1684,14 @@ const command_rec module_directives[] = {
         "The filename of the filter debugging log file"
     ),
 
+    AP_INIT_TAKE1 (
+        "SecMarker",
+        cmd_marker,
+        NULL,
+        CMD_SCOPE_ANY,
+        "marker for a skipAfter target"
+    ),
+    
     AP_INIT_FLAG (
         "SecPdfProtect",
         cmd_pdf_protect,

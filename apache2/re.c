@@ -1225,6 +1225,9 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset,
     if ((strcmp(SECACTION_TARGETS, targets) == 0) && (strcmp(SECACTION_ARGS, args) == 0)) {
         rule->unparsed = apr_pstrcat(ruleset->mp, "SecAction", " \"", actions, "\"", NULL);
     }
+    else if ((strcmp(SECMARKER_TARGETS, targets) == 0) && (strcmp(SECMARKER_ARGS, args) == 0) && (strncmp(SECMARKER_BASE_ACTIONS, actions, strlen(SECMARKER_BASE_ACTIONS)) == 0)) {
+        rule->unparsed = apr_pstrcat(ruleset->mp, "SecMarker", " \"", (actions + strlen(SECMARKER_BASE_ACTIONS)), "\"", NULL);
+    }
     else {
         rule->unparsed = apr_pstrcat(ruleset->mp, "SecRule", " \"", targets, "\" \"", args, "\"", (actions != NULL ? " \"" : ""), (actions != NULL ? actions : ""), (actions != NULL ? "\"" : ""), NULL);
     }

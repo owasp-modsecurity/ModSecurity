@@ -110,7 +110,8 @@ int DSOLOCAL msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset
 #define RULE_MATCH              1
 
 #define RULE_PH_NONE            0  /* Not a placeholder */
-#define RULE_PH_SKIPAFTER       1  /* Placeholder for skipAfter targets */
+#define RULE_PH_SKIPAFTER       1  /* Implicit placeholder for skipAfter */
+#define RULE_PH_MARKER          2  /* Explicit placeholder for SecMarker */
 
 struct msre_rule {
     apr_array_header_t      *targets;

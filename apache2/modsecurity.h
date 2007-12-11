@@ -117,6 +117,10 @@ extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
 #define SECACTION_TARGETS                       "REQUEST_URI"
 #define SECACTION_ARGS                          "@unconditionalMatch"
 
+#define SECMARKER_TARGETS                       "REQUEST_URI"
+#define SECMARKER_ARGS                          "@noMatch"
+#define SECMARKER_BASE_ACTIONS                  "t:none,pass,id:"
+
 #if !defined(OS2) && !defined(WIN32) && !defined(BEOS) && !defined(NETWARE)
 #include "unixd.h"
 #define __SET_MUTEX_PERMS

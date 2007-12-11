@@ -678,7 +678,8 @@ SecAuditLogStorageDir logs/audit
 
         <listitem>
           <para><literal moreinfo="none">K</literal> - This part contains a
-          full list of every rule that matched (one per line) in the order they were matched.</para>
+          full list of every rule that matched (one per line) in the order
+          they were matched.</para>
         </listitem>
 
         <listitem>
@@ -1168,6 +1169,35 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
+      <title><literal>SecMarker</literal></title>
+
+      <para><emphasis>Description:</emphasis> Adds a fixed rule marker in the
+      ruleset to be used as a target in a <emphasis>skipAfter</emphasis>
+      action.</para>
+
+      <para><emphasis>Syntax:</emphasis> <literal moreinfo="none">SecMarker
+      id</literal></para>
+
+      <para><emphasis>Example Usage:</emphasis> <literal
+      moreinfo="none">SecMarker 9999</literal></para>
+
+      <para><emphasis>ProcessingPhase:</emphasis> Any</para>
+
+      <para><emphasis>Scope:</emphasis> Any</para>
+
+      <para><emphasis>Dependencies/Notes:</emphasis> None</para>
+
+      <para><programlisting format="linespecific">SecRule REQUEST_URI "^/$" "chain,<emphasis>skipAfter:960099</emphasis>"
+SecRule REMOTE_ADDR "^127\.0\.0\.1$" "chain"
+SecRule REQUEST_HEADERS:User-Agent "^Apache \(internal dummy connection\)$" "t:none"  
+SecRule &amp;REQUEST_HEADERS:Host "@eq 0" \
+    "deny,log,status:400,id:960008,severity:4,msg:'Request Missing a Host Header'"
+SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
+    "log,deny,log,status:400,id:960015,msg:'Request Missing an Accept Header'"
+<emphasis>SecMarker 960099</emphasis></programlisting></para>
+    </section>
+
+    <section>
       <title><literal>SecPdfProtect</literal> (Experimental)</title>
 
       <para><emphasis>Description:</emphasis> Enables the PDF XSS protection
@@ -1290,7 +1320,7 @@ SecAuditLogStorageDir logs/audit
       with status code 413 Request Entity Too Large. There is a hard limit of
       1 GB.</para>
     </section>
-    
+
     <section>
       <title><literal>SecRequestBodyNoFilesLimit</literal></title>
 
@@ -1299,26 +1329,28 @@ SecAuditLogStorageDir logs/audit
       files being transported in the request. This directive comes handy to
       further reduce susceptability to DoS attacks when someone is sending
       request bodies of very large sizes. Web applications that require file
-      uploads must configure <literal>SecRequestBodyLimit</literal> to a
-      high value. Since large files are streamed to disk file uploads will
-      not increase memory consumption. However, it's still possible for
-      someone to take advantage of a large request body limit and send
-      non-upload requests with large body sizes. This directive eliminates
-      that loophole. </para>
+      uploads must configure <literal>SecRequestBodyLimit</literal> to a high
+      value. Since large files are streamed to disk file uploads will not
+      increase memory consumption. However, it's still possible for someone to
+      take advantage of a large request body limit and send non-upload
+      requests with large body sizes. This directive eliminates that
+      loophole.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
-      moreinfo="none">SecRequestBodyNoFilesLimit NUMBER_IN_BYTES</literal></para>
+      moreinfo="none">SecRequestBodyNoFilesLimit
+      NUMBER_IN_BYTES</literal></para>
 
       <para><emphasis>Example Usage:</emphasis> <literal
       moreinfo="none">SecRequestBodyLimit 131072</literal></para>
 
       <para><emphasis>Scope:</emphasis> Any</para>
 
-      <para><emphasis>Dependencies/Notes:</emphasis> 1 MB (1048576
-      bytes) is the default setting. This value is very conservative. For
-      most applications you should be able to reduce it down to 128 KB or
-      lower. Anything over the limit will be rejected with status code <literal>413
-      Request Entity Too Large</literal>. There is a hard limit of 1 GB.</para>
+      <para><emphasis>Dependencies/Notes:</emphasis> 1 MB (1048576 bytes) is
+      the default setting. This value is very conservative. For most
+      applications you should be able to reduce it down to 128 KB or lower.
+      Anything over the limit will be rejected with status code <literal>413
+      Request Entity Too Large</literal>. There is a hard limit of 1
+      GB.</para>
     </section>
 
     <section>
@@ -4995,8 +5027,6 @@ SecRule XML "<emphasis>@validateSchema /path/to/apache2/conf/xml.xsd</emphasis>,
       <programlisting format="linespecific">SecRule ARGS "<emphasis>@verifyCC \d{13,16}</emphasis>" \
               "phase:2,sanitiseMatched,log,auditlog,pass,msg:'Potential credit card number'"</programlisting>
     </section>
-
-    <section>
 
     <section>
       <title><literal>within</literal></title>
