@@ -4512,8 +4512,8 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
       <title><literal>skipAfter</literal></title>
 
       <para><emphasis>Description:</emphasis> Skips rules (or chains) on
-      successful match resuming rule execution after the specified rule id is
-      found.</para>
+      successful match resuming rule execution after the specified rule id or
+      marker (see SecMarker) is found.</para>
 
       <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
 
