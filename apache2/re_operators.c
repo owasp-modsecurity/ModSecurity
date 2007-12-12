@@ -990,7 +990,6 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     int ovector[33];
     int rc;
     int is_cc = 0;
-    int capture = 0;
     int offset;
 
     if (error_msg == NULL) return -1;
@@ -1016,51 +1015,54 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     }
 
     for (offset = 0; ((unsigned int)offset < target_length) && (is_cc == 0); offset++) {
+        if (msr->txcfg->debuglog_level >= 9) {
+            if (offset > 0) {
+                msr_log(msr, 9, "Continuing CC# search at target offset %d.", offset);
+            }
+        }
 
-        rc = msc_regexec_ex(regex, target, target_length, offset, PCRE_NOTEMPTY | PCRE_ANCHORED, ovector, 30, &my_error_msg);
+        rc = msc_regexec_ex(regex, target, target_length, offset, PCRE_NOTEMPTY, ovector, 30, &my_error_msg);
 
-        msr_log(msr, 9,  "ATTEMPT: %d rc=%d ov:%d,%d \"%.*s\"", offset, rc, ovector[0], ovector[1], (target_length - offset), (target + offset));
-
+        /* If there was no match, then we are done. */
         if (rc == PCRE_ERROR_NOMATCH) {
-            continue;
+            break;
         }
 
         if (rc < -1) {
-            *error_msg = apr_psprintf(msr->mp, "Regex execution failed: %s", my_error_msg);
+            *error_msg = apr_psprintf(msr->mp, "CC# regex execution failed: %s", my_error_msg);
             return -1;
         }
 
-        /* Handle captured subexpressions. */
+        /* Verify a match. */
         if (rc > 0) {
-            int i;
+            const char *match = target + ovector[0];
+            int length = ovector[1] - ovector[0];
+            int i = 0;
 
-            /* Are we supposed to capture subexpressions? */
-            capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
+            offset = ovector[2*i];
 
-            /* Use the available captures. */
-            /* to avoid memory manipulation I use the same captures for now to check for CC# */
-            for(i = 0; i < rc; i++) {
-                const char *match = target + ovector[2*i];
-                int length = ovector[2*i + 1] - ovector[2*i];
+            /* Check the Luhn using the match string */
+            is_cc = luhn_verify(match, length);
 
-                msr_log(msr, 9, "LUHN[%d]: %.*s", length, length, match);
-
-                /* Verify agaist Luhn */
-                is_cc = luhn_verify(match, length);
-
-                if (!is_cc) {
-                    if (msr->txcfg->debuglog_level >= 9) {
-                        msr_log(msr, 9, "Luhn check failed for \"%.*s\"", length, match);
-                    }
-                    break;
+            /* Not a CC number, then try another match where we left off. */
+            if (!is_cc) {
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "CC# Luhn check failed at target offset %d: \"%.*s\"", offset, length, match);
                 }
 
-                if (capture) {
+                continue;
+            }
+
+            /* We have a potential CC number and need to set any captures
+             * and we are done.
+             */
+
+            if (apr_table_get(rule->actionset->actions, "capture")) {
+                for(; i < rc; i++) {
                     msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
                     if (s == NULL) return -1;
                     s->name = apr_psprintf(msr->mp, "%d", i);
-                    s->value = apr_pstrmemdup(msr->mp,
-                        match, length);
+                    s->value = apr_pstrmemdup(msr->mp, match, length);
                     s->value_len = length;
                     if ((s->name == NULL)||(s->value == NULL)) return -1;
 
@@ -1070,17 +1072,17 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
                         msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
                             log_escape_nq_ex(msr->mp, s->value, s->value_len));
                     }
-                    continue;
                 }
-                break;
             }
         
             /* Unset the remaining TX vars (from previous invocations). */
-            for(i = rc; i <= 9; i++) {
+            for(; i <= 9; i++) {
                 char buf[24];
                 apr_snprintf(buf, sizeof(buf), "%i", i);
                 apr_table_unset(msr->tx_vars, buf);
             }
+
+            break;
         }
     }
 
@@ -1088,8 +1090,9 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         /* Match. */
 
         /* This message will be logged. */
-        *error_msg = apr_psprintf(msr->mp, "CC# match \"%s\" at %s.",
-            regex->pattern, var->name);
+        *error_msg = apr_psprintf(msr->mp, "CC# match \"%s\" at %s. [offset \"%d\"]",
+            regex->pattern, var->name, offset);
+
         return 1;
     }
 
