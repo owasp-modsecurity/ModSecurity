@@ -65,14 +65,14 @@ extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
 #define MODSEC_VERSION_MAJOR       "2"
 #define MODSEC_VERSION_MINOR       "5"
 #define MODSEC_VERSION_MAINT       "0"
-#define MODSEC_VERSION_TYPE        "dev"
-#define MODSEC_VERSION_RELEASE     "3"
+#define MODSEC_VERSION_TYPE        "rc"
+#define MODSEC_VERSION_RELEASE     "1"
 
 #define MODULE_NAME "ModSecurity for Apache"
 #define MODULE_RELEASE \
   MODSEC_VERSION_MAJOR "." MODSEC_VERSION_MINOR "." MODSEC_VERSION_MAINT \
   "-" MODSEC_VERSION_TYPE MODSEC_VERSION_RELEASE
-#define MODULE_NAME_FULL MODULE_NAME "/" MODULE_RELEASE " (http://www.modsecurity.org)"
+#define MODULE_NAME_FULL MODULE_NAME "/" MODULE_RELEASE " (http://www.modsecurity.org/)"
 
 #define PHASE_REQUEST_HEADERS       1
 #define PHASE_REQUEST_BODY          2
@@ -83,7 +83,7 @@ extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
 #define PHASE_LAST                  PHASE_LOGGING
 
 #define NOT_SET                    -1l
-#define NOT_SET_P          (void *)-1l
+#define NOT_SET_P         ((void *)-1l)
 
 #define CREATEMODE ( APR_UREAD | APR_UWRITE | APR_GREAD )
 #define CREATEMODE_DIR ( APR_UREAD | APR_UWRITE | APR_UEXECUTE | APR_GREAD | APR_GEXECUTE )

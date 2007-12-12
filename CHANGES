@@ -1,5 +1,5 @@
-12 Dec 2007 - 2.5.0-dev3
-------------------------
+12 Dec 2007 - 2.5.0-rc1
+-----------------------
 
  * Added IS_NEW and IS_EXPIRED built-in collection variables.
 
