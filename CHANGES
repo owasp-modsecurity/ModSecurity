@@ -1,6 +1,7 @@
-
-29 Nov 2007 - 2.5.0-dev3
+12 Dec 2007 - 2.5.0-dev3
 ------------------------
+
+ * Added IS_NEW and IS_EXPIRED built-in collection variables.
 
  * Added SecMarker <id> directive to allow a fixed target for skipAfter.
 

@@ -3935,6 +3935,16 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
         </listitem>
 
         <listitem>
+          <para><literal moreinfo="none">IS_EXPIRED</literal> - set to 1 if
+          the collection is expired otherwise set to 0.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">IS_NEW</literal> - set to 1 if the
+          collection is new (not yet persisted) otherwise set to 0.</para>
+        </listitem>
+
+        <listitem>
           <para><literal moreinfo="none">KEY</literal> - the value of the
           initcol variable (the client's IP address in the example).</para>
         </listitem>

@@ -72,6 +72,7 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
     apr_table_t *col = NULL;
     const apr_array_header_t *arr;
     apr_table_entry_t *te;
+    int expired = 0;
     int i;
 
     if (msr->txcfg->data_dir == NULL) {
@@ -119,11 +120,16 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
                 msc_string *var = (msc_string *)te[i].val;
                 int expiry_time = atoi(var->value);
 
-                /* Do not remove the record itself. */
-                if (strcmp(te[i].key, "__expire_KEY") == 0) continue;                
-
                 if (expiry_time <= apr_time_sec(msr->request_time)) {
+                    // TODO Why dup this?
                     char *key_to_expire = apr_pstrdup(msr->mp, te[i].key);
+
+                    /* Do not remove the record itself. */
+                    if (strcmp(te[i].key, "__expire_KEY") == 0) {
+                        expired = 1;
+                        continue;
+                    }
+
                     msr_log(msr, 9, "Removing key \"%s\" from collection.", key_to_expire + 9);
                     apr_table_unset(col, key_to_expire + 9);
                     msr_log(msr, 9, "Removing key \"%s\" from collection.", key_to_expire);
@@ -135,6 +141,19 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
         }
     } while(i != arr->nelts);
     
+   /* Set IS_EXPIRED if expired */
+    if (expired) {
+        msc_string *var = (msc_string *)apr_table_get(col, "IS_EXPIRED");
+        if (var == NULL) {
+            var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+            var->name = "IS_EXPIRED";
+            var->name_len = strlen(var->name);
+        }
+        if (var != NULL) {
+            var->value = "1";
+            var->value_len = strlen(var->value);
+        }
+    }
 
     /* Update UPDATE_RATE */
     {
@@ -176,8 +195,8 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
 
     apr_sdbm_close(dbm);
 
-    msr_log(msr, 4, "Retrieved collection (name \"%s\", key \"%s\").",
-            log_escape(msr->mp, col_name), log_escape(msr->mp, col_key));
+    msr_log(msr, 4, "Retrieved collection (name \"%s\", key \"%s\", expired \"%d\").",
+            log_escape(msr->mp, col_name), log_escape(msr->mp, col_key), expired);
 
     return col;
 }
@@ -270,6 +289,24 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         apr_sdbm_close(dbm);
 
         return 1;
+    }
+
+    /* Set IS_NEW to 0 on store. */
+    {
+        msc_string *var = (msc_string *)apr_table_get(col, "IS_NEW");
+        if (var != NULL) {
+            var->value = "0";
+            var->value_len = strlen(var->value);
+        }
+    }
+
+    /* Set IS_EXPIRED to 0 on store. */
+    {
+        msc_string *var = (msc_string *)apr_table_get(col, "IS_EXPIRED");
+        if (var != NULL) {
+            var->value = "0";
+            var->value_len = strlen(var->value);
+        }
     }
 
     /* Update the timeout value. */
