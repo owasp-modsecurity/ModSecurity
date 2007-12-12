@@ -78,7 +78,7 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
     /* Compile pattern */
     regex = msc_pregcomp(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset);
     if (regex == NULL) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (pos %d): %s",
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
             erroffset, errptr);
         return 0;
     }
@@ -972,7 +972,7 @@ static int msre_op_verifyCC_init(msre_rule *rule, char **error_msg) {
     /* Compile pattern */
     regex = msc_pregcomp(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset);
     if (regex == NULL) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (pos %d): %s",
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
             erroffset, errptr);
         return 0;
     }

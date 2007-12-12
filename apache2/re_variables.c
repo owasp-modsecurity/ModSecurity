@@ -69,7 +69,7 @@ static char *var_generic_list_validate(msre_ruleset *ruleset, msre_var *var) {
 
         regex = msc_pregcomp(ruleset->mp, pattern, PCRE_DOTALL | PCRE_CASELESS | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset);
         if (regex == NULL) {
-            return apr_psprintf(ruleset->mp, "Error compiling pattern (pos %d): %s",
+            return apr_psprintf(ruleset->mp, "Error compiling pattern (offset %d): %s",
                 erroffset, errptr);
         }
 

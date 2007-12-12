@@ -33,7 +33,7 @@ static void xml_receive_sax_error(void *data, const char *msg, ...) {
     
     if (msr == NULL) return;
 
-    apr_snprintf(message, sizeof(message), "%s (line %d pos %d)",
+    apr_snprintf(message, sizeof(message), "%s (line %d offset %d)",
         log_escape_nq(msr->mp, msr->xml->parsing_ctx->lastError.message),
         msr->xml->parsing_ctx->lastError.line,
         msr->xml->parsing_ctx->lastError.int2);
