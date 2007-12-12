@@ -1556,33 +1556,39 @@ static int msre_op_validateUtf8Encoding_execute(modsec_rec *msr, msre_rule *rule
 
         switch(rc) {
             case UNICODE_ERROR_CHARACTERS_MISSING :
-                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: not enough bytes in "
-                    "character (pos %d).", i);
+                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: "
+                    "not enough bytes in character "
+                    "at %s. [offset \"%d\"]", var->name, i);
                 return 1;
                 break;
             case UNICODE_ERROR_INVALID_ENCODING :
-                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: invalid byte value "
-                    "in character (pos %d).", i);
+                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: "
+                    "invalid byte value in character "
+                    "at %s. [offset \"%d\"]", var->name, i);
                 return 1;
                 break;
             case UNICODE_ERROR_OVERLONG_CHARACTER :
-                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: overlong "
-                    "character detected (pos %d).", i);
+                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: "
+                    "overlong character detected "
+                    "at %s. [offset \"%d\"]", var->name, i);
                 return 1;
                 break;
             case UNICODE_ERROR_RESTRICTED_CHARACTER :
-                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: use of restricted character"
-                    " (pos %d).", i);
+                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: "
+                    "use of restricted character "
+                    "at %s. [offset \"%d\"]", var->name, i);
                 return 1;
                 break;
             case UNICODE_ERROR_DECODING_ERROR :
-                *error_msg = apr_psprintf(msr->mp, "Error validating UTF-8 decoding (pos %d).", i);
+                *error_msg = apr_psprintf(msr->mp, "Error validating UTF-8 decoding "
+                    "at %s. [offset \"%d\"]", var->name, i);
                 return 1;
                 break;
         }
 
         if (rc <= 0) {
-            *error_msg = apr_psprintf(msr->mp, "Internal error during UTF-8 validation.");
+            *error_msg = apr_psprintf(msr->mp, "Internal error during UTF-8 validation "
+                "at %s.", var->name);
             return 1;
         }
 
