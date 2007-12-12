@@ -933,13 +933,8 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
  * Luhn Mod-10 Method (ISO 2894/ANSI 4.13)
  */
 static int luhn_verify(const char *ccnumber, int len) {
-    char ccdigits[16];
-    char *cdst = ccdigits;
-    const char *csrc = ccnumber;
-    int digits = 0;
-    int srclen = 0;
-    int sum = 0;
-    int weight;
+    int sum[2] = { 0, 0 };
+    int odd = 0;
     int i;
 
     /* Weighted lookup table which is just a precalculated (i = index):
@@ -947,42 +942,35 @@ static int luhn_verify(const char *ccnumber, int len) {
      */
     static int wtable[10] = {0, 2, 4, 6, 8, 1, 3, 5, 7, 9}; /* weight lookup table */
  
-    /* Remove non digits characters and calculate the true length */
-    while ((srclen++ <= len) && (digits < 16)) {
-        if (isdigit(*csrc)) {
-            *(cdst++) = *csrc;
-            ++digits;                    
+    /* Add up only digits (weighted digits via lookup table)
+     * for both odd and even CC numbers to avoid 2 passes.
+     */
+    for (i = 0; i < len; i++) {
+        if (isdigit(ccnumber[i])) {
+            sum[0] += (!odd ? wtable[ccnumber[i] - '0'] : (ccnumber[i] - '0'));
+            sum[1] += (odd ? wtable[ccnumber[i] - '0'] : (ccnumber[i] - '0'));
+            odd = 1 - odd; /* alternate weights */
         }
-        csrc++;
-    }
-
-    /* Determine if the first digit is weighted: odd=no, even=yes */
-    weight = !(digits & 1);
-   
-    /* Add up digits (weighted digits via lookup table) */
-    for (i = 0; i < digits; i++) {
-        sum += (weight ? wtable[ccdigits[i] - '0'] : (ccdigits[i] - '0'));
-        weight = !weight; /* alternate weights */
     }
 
     /* Do a mod 10 on the sum */
-    sum %= 10;
+    sum[odd] %= 10;
 
     /* If the result is a zero the card is valid. */   
-    return sum ? 0 : 1;
+    return sum[odd] ? 0 : 1;
 }
 
 static int msre_op_verifyCC_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
     msc_regex_t *regex;
-    const char *pattern = rule->op_param;
+    const char *pattern = apr_psprintf(rule->ruleset->mp, "(?:%s)(?C)", rule->op_param); /* Add on a callback to the end */
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     /* Compile pattern */
-    regex = msc_pregcomp(rule->ruleset->mp, pattern, 0, &errptr, &erroffset);
+    regex = msc_pregcomp(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset);
     if (regex == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (pos %d): %s",
             erroffset, errptr);
@@ -1002,6 +990,8 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     int ovector[33];
     int rc;
     int is_cc = 0;
+    int capture = 0;
+    int offset;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -1010,6 +1000,8 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         *error_msg = "Internal Error: regex data is null.";
         return -1;
     }
+
+    memset(ovector, 0, sizeof(ovector));
 
     /* If the given target is null run against an empty
      * string. This is a behaviour consistent with previous
@@ -1023,62 +1015,76 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         target_length = var->value_len;
     }
 
-    rc = msc_regexec_capture(regex, target, target_length, ovector, 30, &my_error_msg);
-    if (rc < -1) {
-        *error_msg = apr_psprintf(msr->mp, "Regex execution failed: %s", my_error_msg);
-        return -1;
-    }
+    for (offset = 0; ((unsigned int)offset < target_length) && (is_cc == 0); offset++) {
 
-    /* Handle captured subexpressions. */
-    if (rc > 0) {
-        int capture = 0;
-        const apr_array_header_t *tarr;
-        const apr_table_entry_t *telts;
-        int i;
+        rc = msc_regexec_ex(regex, target, target_length, offset, PCRE_NOTEMPTY | PCRE_ANCHORED, ovector, 30, &my_error_msg);
 
-        /* Are we supposed to store the captured subexpressions? */
-        /* IMP1 Can we use a flag to avoid having to iterate through the list every time. */
-        tarr = apr_table_elts(rule->actionset->actions);
-        telts = (const apr_table_entry_t*)tarr->elts;
-        for (i = 0; i < tarr->nelts; i++) {
-            msre_action *action = (msre_action *)telts[i].val;
-            if (strcasecmp(action->metadata->name, "capture") == 0) {
-                capture = 1;
+        msr_log(msr, 9,  "ATTEMPT: %d rc=%d ov:%d,%d \"%.*s\"", offset, rc, ovector[0], ovector[1], (target_length - offset), (target + offset));
+
+        if (rc == PCRE_ERROR_NOMATCH) {
+            continue;
+        }
+
+        if (rc < -1) {
+            *error_msg = apr_psprintf(msr->mp, "Regex execution failed: %s", my_error_msg);
+            return -1;
+        }
+
+        /* Handle captured subexpressions. */
+        if (rc > 0) {
+            int i;
+
+            /* Are we supposed to capture subexpressions? */
+            capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
+
+            /* Use the available captures. */
+            /* to avoid memory manipulation I use the same captures for now to check for CC# */
+            for(i = 0; i < rc; i++) {
+                const char *match = target + ovector[2*i];
+                int length = ovector[2*i + 1] - ovector[2*i];
+
+                msr_log(msr, 9, "LUHN[%d]: %.*s", length, length, match);
+
+                /* Verify agaist Luhn */
+                is_cc = luhn_verify(match, length);
+
+                if (!is_cc) {
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Luhn check failed for \"%.*s\"", length, match);
+                    }
+                    break;
+                }
+
+                if (capture) {
+                    msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+                    if (s == NULL) return -1;
+                    s->name = apr_psprintf(msr->mp, "%d", i);
+                    s->value = apr_pstrmemdup(msr->mp,
+                        match, length);
+                    s->value_len = length;
+                    if ((s->name == NULL)||(s->value == NULL)) return -1;
+
+                    apr_table_setn(msr->tx_vars, s->name, (void *)s);
+
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
+                            log_escape_nq_ex(msr->mp, s->value, s->value_len));
+                    }
+                    continue;
+                }
                 break;
             }
-        }
-
-        int k;
-
-        /* Use the available captures. */
-        /* to avoid memory manipulation I use the same captures for now to check for CC# */
-        for(k = 0; k < rc; k++) {
-            msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-            if (s == NULL) return -1;
-            s->name = apr_psprintf(msr->mp, "%i", k);
-            s->value = apr_pstrmemdup(msr->mp,
-                target + ovector[2*k], ovector[2*k + 1] - ovector[2*k]);
-            s->value_len = (ovector[2*k + 1] - ovector[2*k]);
-            if ((s->name == NULL)||(s->value == NULL)) return -1;
-            apr_table_setn(msr->tx_vars, s->name, (void *)s);
-
-            msr_log(msr, 9, "Adding regex subexpression to TXVARS (%i): %s", k,
-                log_escape_nq(msr->mp, s->value));
-
-            if ((k > 0) && luhn_verify (s->value, s->value_len)) {
-                is_cc = 1;
-            }            
-        }
-    
-        /* Unset the remaining ones (from previous invocations). */
-        for(k = rc; k <= 9; k++) {
-            char buf[24];
-            apr_snprintf(buf, sizeof(buf), "%i", k);
-            apr_table_unset(msr->tx_vars, buf);
+        
+            /* Unset the remaining TX vars (from previous invocations). */
+            for(i = rc; i <= 9; i++) {
+                char buf[24];
+                apr_snprintf(buf, sizeof(buf), "%i", i);
+                apr_table_unset(msr->tx_vars, buf);
+            }
         }
     }
 
-    if ((rc != PCRE_ERROR_NOMATCH) && is_cc) {
+    if (is_cc) {
         /* Match. */
 
         /* This message will be logged. */

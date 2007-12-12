@@ -64,6 +64,20 @@ void *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
 }
 
 /**
+ * Executes regular expression with extended options.
+ * Returns PCRE_ERROR_NOMATCH when there is no match, error code < -1
+ * on errors, and a value > 0 when there is a match.
+ */                              
+int msc_regexec_ex(msc_regex_t *regex, const char *s, unsigned int slen,
+    int startoffset, int options, int *ovector, int ovecsize, char **error_msg)
+{
+    if (error_msg == NULL) return -1000; /* To differentiate from PCRE as it already uses -1. */
+    *error_msg = NULL;
+
+    return pcre_exec(regex->re, regex->pe, s, slen, startoffset, options, ovector, ovecsize);
+}
+
+/**
  * Executes regular expression, capturing subexpressions in the given
  * vector. Returns PCRE_ERROR_NOMATCH when there is no match, error code < -1
  * on errors, and a value > 0 when there is a match.
@@ -74,7 +88,7 @@ int msc_regexec_capture(msc_regex_t *regex, const char *s, unsigned int slen,
     if (error_msg == NULL) return -1000; /* To differentiate from PCRE as it already uses -1. */
     *error_msg = NULL;
 
-    return pcre_exec(regex->re, regex->pe, s, slen, 0, 0, ovector, ovecsize);
+    return msc_regexec_ex(regex, s, slen, 0, 0, ovector, ovecsize, error_msg);
 }
 
 /**
@@ -87,7 +101,7 @@ int msc_regexec(msc_regex_t *regex, const char *s, unsigned int slen,
     if (error_msg == NULL) return -1000; /* To differentiate from PCRE as it already uses -1. */
     *error_msg = NULL;
 
-    return msc_regexec_capture(regex, s, slen, NULL, 0, error_msg);
+    return msc_regexec_ex(regex, s, slen, 0, 0, NULL, 0, error_msg);
 }
 
 /**
