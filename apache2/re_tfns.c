@@ -251,6 +251,20 @@ static int msre_fn_replaceComments_execute(apr_pool_t *mptmp, unsigned char *inp
     return changed;
 }
 
+/* jsDecodeUni */
+
+static int msre_fn_jsDecodeUni_execute(apr_pool_t *mptmp, unsigned char *input,
+    long int input_len, char **rval, long int *rval_len)
+{
+    long int length;
+
+    length = jsdecode_uni_nonstrict_inplace_ex(input, input_len);
+    *rval = (char *)input;
+    *rval_len = length;
+    
+    return (*rval_len == input_len ? 0 : 1);
+}
+
 /* urlDecode */
 
 static int msre_fn_urlDecode_execute(apr_pool_t *mptmp, unsigned char *input,
@@ -502,6 +516,12 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     msre_engine_tfn_register(engine,
         "htmlEntityDecode",
         msre_fn_htmlEntityDecode_execute
+    );
+
+    /* jsDecodeUni */
+    msre_engine_tfn_register(engine,
+        "jsDecodeUni",
+        msre_fn_jsDecodeUni_execute
     );
 
     /* length */

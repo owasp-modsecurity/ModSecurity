@@ -66,6 +66,8 @@ char DSOLOCAL *log_escape_raw(apr_pool_t *mp, const unsigned char *text, unsigne
 char DSOLOCAL *_log_escape(apr_pool_t *p, const unsigned char *input,
     unsigned long int input_length, int escape_quotes, int escape_colon);
 
+int DSOLOCAL jsdecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len);
+
 int DSOLOCAL urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_length);
 
 int DSOLOCAL urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_length, int *invalid_count);

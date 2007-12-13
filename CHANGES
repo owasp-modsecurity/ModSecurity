@@ -1,6 +1,8 @@
 12 Dec 2007 - 2.5.0-rc1
 -----------------------
 
+ * Added t:jsDecodeUni to decode JavScript \uXXXX encoding.
+
  * Added IS_NEW and IS_EXPIRED built-in collection variables.
 
  * Added SecMarker <id> directive to allow a fixed target for skipAfter.

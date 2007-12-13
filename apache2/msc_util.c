@@ -16,6 +16,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+/* NOTE: Be careful as this can only be used on static values for X.
+ * (i.e. VALID_HEX(c++) will NOT work)
+ */
+#define VALID_HEX(X) (((X >= '0')&&(X <= '9')) || ((X >= 'a')&&(X <= 'f')) || ((X >= 'A')&&(X <= 'F')))
+
 /**
  *
  */
@@ -566,7 +571,68 @@ char *_log_escape(apr_pool_t *mp, const unsigned char *input, unsigned long int 
     return ret;
 }
 
-#define VALID_HEX(X) (((X >= '0')&&(X <= '9')) || ((X >= 'a')&&(X <= 'f')) || ((X >= 'A')&&(X <= 'F')))
+/**
+ * JavaScript \uXXXX decoding.
+ */
+int jsdecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len) {
+    unsigned char *d = (unsigned char *)input;
+    long int i, count;
+
+    if (input == NULL) return -1;
+
+    i = count = 0;
+    while (i < input_len) {
+        if (input[i] == '\\') {
+            /* Character is an escape. */
+
+            if ((i + 5 < input_len) && (input[i + 1] == 'u')) {
+                /* We have at least 4 data bytes. */
+                if (   (VALID_HEX(input[i + 2])) && (VALID_HEX(input[i + 3]))
+                    && (VALID_HEX(input[i + 4])) && (VALID_HEX(input[i + 5])) )
+                {
+                    /* We first make use of the lower byte here, ignoring the higher byte. */
+                    *d = x2c(&input[i + 4]);
+
+                    /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
+                    if (   (*d > 0x00) && (*d < 0x5f)
+                        && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
+                        && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
+                    {
+                        (*d) += 0x20;
+                    }
+
+                    d++;
+                    count++;
+                    i += 6;
+                }
+                else {
+                    /* Invalid data. */
+                    int j;
+
+                    for(j = 0; (j < 6)&&(i < input_len); j++) {
+                        *d++ = input[i++];
+                        count++;
+                    }
+                }
+            }
+            else {
+                /* Not enough bytes available (4 data bytes were needed). */
+                while(i < input_len) {
+                    *d++ = input[i++];
+                    count++;
+                }
+            }
+        }
+        else {
+            *d++ = input[i++];
+            count++;
+        }
+    }
+
+    *d = '\0';
+
+    return count;
+}
 
 /**
  *
@@ -632,12 +698,7 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
                     char c1 = input[i + 1];
                     char c2 = input[i + 2];
 
-                    /* ENH Use VALID_HEX? */
-                    if ( (((c1 >= '0')&&(c1 <= '9')) || ((c1 >= 'a')&&(c1 <= 'f')) ||
-                          ((c1 >= 'A')&&(c1 <= 'F')))
-                        && (((c2 >= '0')&&(c2 <= '9')) || ((c2 >= 'a')&&(c2 <= 'f')) ||
-                            ((c2 >= 'A')&&(c2 <= 'F'))) )
-                    {
+                    if (VALID_HEX(c1) && VALID_HEX(c2)) {
                         *d++ = x2c(&input[i + 1]);
                         count++;
                         i += 3;
@@ -701,10 +762,7 @@ int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int
                 char c1 = input[i + 1];
                 char c2 = input[i + 2];
 
-                /* ENH Use VALID_HEX? */
-                if ( (((c1 >= '0')&&(c1 <= '9')) || ((c1 >= 'a')&&(c1 <= 'f')) || ((c1 >= 'A')&&(c1 <= 'F')))
-                    && (((c2 >= '0')&&(c2 <= '9')) || ((c2 >= 'a')&&(c2 <= 'f')) || ((c2 >= 'A')&&(c2 <= 'F'))) )
-                {
+                if (VALID_HEX(c1) && VALID_HEX(c2)) {
                     /* Valid encoding - decode it. */
                     *d++ = x2c(&input[i + 1]);
                     count++;
