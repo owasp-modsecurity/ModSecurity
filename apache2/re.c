@@ -1816,7 +1816,7 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                     crec->path = tfnspath;
                     crec->val = changed ? apr_pmemdup(msr->mp, var->value, var->value_len) : NULL;
                     crec->val_len = changed ? var->value_len : 0;
-                    msr_log(msr, 9, "CACHE: Caching %s=\"%.*s\"", tfnskey, var->value_len, var->value);
+                    msr_log(msr, 9, "CACHE: Caching %s=\"%.*s\"", tfnskey, var->value_len, log_escape_nq_ex(mptmp, var->value, var->value_len));
                     apr_table_setn(cachetab, tfnskey, (void *)crec);
                 }
 
