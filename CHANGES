@@ -5,8 +5,8 @@ Changes since 2.5.0-dev2:
 
  * Stricter configuration parsing.  Disruptive actions, meta actions and
    phases are no longer allowed in a chained rule.  Disruptive actions,
-	 are no longer allowed in a logging phase (phase 5) rule, including
-	 inheriting from SecDefaultAction.
+   are no longer allowed in a logging phase (phase 5) rule, including
+   inheriting from SecDefaultAction.
 
  * More efficient collection persistance.
 
