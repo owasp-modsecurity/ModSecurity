@@ -46,7 +46,7 @@ static apr_table_t *collection_unpack(modsec_rec *msr, char *blob, unsigned int 
         blob_offset += var->value_len;
         var->value_len--;
 
-        if (log_vars) {
+        if (log_vars && (msr->txcfg->debuglog_level >= 9)) {
             msr_log(msr, 9, "Read variable: name \"%s\", value \"%s\".",
                 log_escape_ex(msr->mp, var->name, var->name_len),
                 log_escape_ex(msr->mp, var->value, var->value_len));
@@ -78,11 +78,14 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
     if (msr->txcfg->data_dir == NULL) {
         msr_log(msr, 1, "Unable to retrieve collection (name \"%s\", key \"%s\"). Use "
             "SecDataDir to define data directory first.", log_escape(msr->mp, col_name),
-            log_escape(msr->mp, col_key));
+            log_escape_ex(msr->mp, col_key, col_key_len));
         return NULL;
     }
 
     dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);
+
+    key.dptr = (char *)col_key;
+    key.dsize = col_key_len + 1;
 
     rc = apr_sdbm_open(&dbm, dbm_filename, APR_READ | APR_SHARELOCK,
         CREATEMODE, msr->mp);
@@ -90,15 +93,15 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
         return NULL;
     }
 
-    key.dptr = (char *)col_key;
-    key.dsize = col_key_len + 1;
-
     value = (apr_sdbm_datum_t *)apr_pcalloc(msr->mp, sizeof(apr_sdbm_datum_t));
     rc = apr_sdbm_fetch(dbm, value, key);
+
+    apr_sdbm_close(dbm);
+
     if (rc != APR_SUCCESS) {
-        apr_sdbm_close(dbm);
         msr_log(msr, 1, "Failed to read from DBM file \"%s\": %s", log_escape(msr->mp,
             dbm_filename), get_apr_error(msr->mp, rc));
+        apr_sdbm_close(dbm);
         return NULL;
     }
     
@@ -106,6 +109,11 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
         apr_sdbm_close(dbm);
         return NULL;
     }
+
+    /* ENH Need expiration (and perhaps other metadata) accessible in blob
+     * form so we can determine if we need to convert to a table.  This will
+     * save some cycles.
+     */
 
     /* Transform raw data into a table. */
     col = collection_unpack(msr, value->dptr, value->dsize, 1);
@@ -121,38 +129,61 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
                 int expiry_time = atoi(var->value);
 
                 if (expiry_time <= apr_time_sec(msr->request_time)) {
-                    // TODO Why dup this?
-                    char *key_to_expire = apr_pstrdup(msr->mp, te[i].key);
+                    char *key_to_expire = te[i].key;
 
-                    /* Do not remove the record itself. */
-                    if (strcmp(te[i].key, "__expire_KEY") == 0) {
+                    /* Done early if the col expired */
+                    if (strcmp(key_to_expire, "__expire_KEY") == 0) {
                         expired = 1;
-                        continue;
                     }
-
-                    msr_log(msr, 9, "Removing key \"%s\" from collection.", key_to_expire + 9);
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Removing key \"%s\" from collection.", key_to_expire + 9);
+                        msr_log(msr, 9, "Removing key \"%s\" from collection.", key_to_expire);
+                    }
                     apr_table_unset(col, key_to_expire + 9);
-                    msr_log(msr, 9, "Removing key \"%s\" from collection.", key_to_expire);
                     apr_table_unset(col, key_to_expire);
-                    msr_log(msr, 4, "Removed expired variable \"%s\".", key_to_expire + 9);
+                    if (msr->txcfg->debuglog_level >= 4) {
+                        msr_log(msr, 4, "Removed expired variable \"%s\".", key_to_expire + 9);
+                    }
                     break;
                 }
             }
         }
-    } while(i != arr->nelts);
+    } while(!expired && (i != arr->nelts));
     
-   /* Set IS_EXPIRED if expired */
-    if (expired) {
-        msc_string *var = (msc_string *)apr_table_get(col, "IS_EXPIRED");
-        if (var == NULL) {
-            var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-            var->name = "IS_EXPIRED";
-            var->name_len = strlen(var->name);
+    /* Delete the collection if the variable "KEY" does not exist.
+     *
+     * ENH It would probably be more efficient to hold the DBM
+     * open until we determine if it needs deleted than to open a second
+     * time.
+     */
+    if (apr_table_get(col, "KEY") == NULL) {
+        rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
+            CREATEMODE, msr->mp);
+        if (rc != APR_SUCCESS) {
+            msr_log(msr, 1, "Failed to access DBM file \"%s\": %s",
+                log_escape(msr->mp, dbm_filename), get_apr_error(msr->mp, rc));
+            return NULL;
         }
-        if (var != NULL) {
-            var->value = "1";
-            var->value_len = strlen(var->value);
+
+        rc = apr_sdbm_delete(dbm, key);
+
+        apr_sdbm_close(dbm);
+
+        if (rc != APR_SUCCESS) {
+            msr_log(msr, 1, "Failed deleting collection (name \"%s\", "
+                "key \"%s\"): %s", log_escape(msr->mp, col_name),
+                log_escape_ex(msr->mp, col_key, col_key_len), get_apr_error(msr->mp, rc));
+            return NULL;
         }
+
+        if (expired && (msr->txcfg->debuglog_level >= 9)) {
+            msr_log(msr, 9, "Collection expired (name \"%s\", key \"%s\").", col_name, log_escape_ex(msr->mp, col_key, col_key_len));
+        }
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Deleted collection (name \"%s\", key \"%s\").", 
+                log_escape(msr->mp, col_name), log_escape_ex(msr->mp, col_key, col_key_len));
+        }
+        return NULL;
     }
 
     /* Update UPDATE_RATE */
@@ -171,13 +202,12 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
             } else {
                 apr_time_t td;
                 counter = atoi(var->value);
-                var = (msc_string *)apr_table_get(col, "UPDATE_RATE");
-                if (var == NULL) {
-                    var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-                    var->name = "UPDATE_RATE";
-                    var->name_len = strlen(var->name);
-                    apr_table_setn(col, var->name, (void *)var);
-                }
+
+                /* UPDATE_RATE is removed on store, so we add it back here */
+                var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+                var->name = "UPDATE_RATE";
+                var->name_len = strlen(var->name);
+                apr_table_setn(col, var->name, (void *)var);
 
                 /* NOTE: No rate if there has been no time elapsed */
                 td = (apr_time_sec(apr_time_now()) - create_time);
@@ -193,10 +223,10 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
         }
     }
 
-    apr_sdbm_close(dbm);
-
-    msr_log(msr, 4, "Retrieved collection (name \"%s\", key \"%s\", expired \"%d\").",
-            log_escape(msr->mp, col_name), log_escape(msr->mp, col_key), expired);
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "Retrieved collection (name \"%s\", key \"%s\").",
+                log_escape(msr->mp, col_name), log_escape_ex(msr->mp, col_key, col_key_len));
+    }
 
     return col;
 }
@@ -230,84 +260,17 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     if (msr->txcfg->data_dir == NULL) {
         msr_log(msr, 1, "Unable to store collection (name \"%s\", key \"%s\"). Use "
             "SecDataDir to define data directory first.",
-            log_escape(msr->mp, var_name->value), log_escape(msr->mp, var_key->value));
+            log_escape_ex(msr->mp, var_name->value, var_name->value_len), log_escape_ex(msr->mp, var_key->value, var_key->value_len));
         return -1;
     }
 
     dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);    
 
-    /* Remove expired variables. */
-    do {
-        arr = apr_table_elts(col);
-        te = (apr_table_entry_t *)arr->elts;
-        for (i = 0; i < arr->nelts; i++) {
-            if (strncmp(te[i].key, "__expire_", 9) == 0) {
-                msc_string *var = (msc_string *)te[i].val;
-                int expiry_time = atoi(var->value);
+    /* Delete IS_NEW on store. */
+    apr_table_unset(col, "IS_NEW");
 
-                /* Do not remove the record itself. */
-                if (strcmp(te[i].key, "__expire_KEY") == 0) continue;                
-
-                if (expiry_time <= apr_time_sec(msr->request_time)) {
-                    char *key_to_expire = apr_pstrdup(msr->mp, te[i].key);
-                    msr_log(msr, 9, "Removing key \"%s\" from collection.", key_to_expire + 9);
-                    apr_table_unset(col, key_to_expire + 9);
-                    msr_log(msr, 9, "Removing key \"%s\" from collection.", key_to_expire);
-                    apr_table_unset(col, key_to_expire);
-                    msr_log(msr, 4, "Removed expired variable \"%s\".", key_to_expire + 9);
-                    break;
-                }
-            }
-        }
-    } while(i != arr->nelts);
-
-    /* Delete the collection if the variable "KEY" does not exist. */
-    if (apr_table_get(col, "KEY") == NULL) {
-
-        rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
-            CREATEMODE, msr->mp);
-        if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "Failed to access DBM file \"%s\": %s",
-                log_escape(msr->mp, dbm_filename), get_apr_error(msr->mp, rc));
-            return -1;
-        }
-
-        key.dptr = var_key->value;
-        key.dsize = var_key->value_len + 1;
-
-        rc = apr_sdbm_delete(dbm, key);
-        if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "Failed deleting collection (name \"%s\", "
-                "key \"%s\"): %s", log_escape(msr->mp, var_name->value),
-                log_escape(msr->mp, var_key->value), get_apr_error(msr->mp, rc));
-            apr_sdbm_close(dbm);
-            return -1;
-        }
-
-        msr_log(msr, 4, "Deleted collection (name \"%s\", key \"%s\").", 
-            log_escape(msr->mp, var_name->value), log_escape(msr->mp, var_key->value));
-        apr_sdbm_close(dbm);
-
-        return 1;
-    }
-
-    /* Set IS_NEW to 0 on store. */
-    {
-        msc_string *var = (msc_string *)apr_table_get(col, "IS_NEW");
-        if (var != NULL) {
-            var->value = "0";
-            var->value_len = strlen(var->value);
-        }
-    }
-
-    /* Set IS_EXPIRED to 0 on store. */
-    {
-        msc_string *var = (msc_string *)apr_table_get(col, "IS_EXPIRED");
-        if (var != NULL) {
-            var->value = "0";
-            var->value_len = strlen(var->value);
-        }
-    }
+    /* Delete UPDATE_RATE on store to save space as it is calculated */
+    apr_table_unset(col, "UPDATE_RATE");
 
     /* Update the timeout value. */
     {
@@ -350,6 +313,11 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         var->value = apr_psprintf(msr->mp, "%d", counter + 1);
         var->value_len = strlen(var->value);
     }
+
+    /* ENH Make the expiration timestamp accessible in blob form so that
+     * it is easier/faster to determine expiration without having to
+     * convert back to table form
+     */
 
     /* Calculate the size first. */
     blob_size = 3 + 2;
@@ -403,9 +371,11 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         blob[blob_offset + 2 + len - 1] = '\0';
         blob_offset += 2 + len;
 
-        msr_log(msr, 9, "Wrote variable: name \"%s\", value \"%s\".",
-            log_escape_ex(msr->mp, var->name, var->name_len),
-            log_escape_ex(msr->mp, var->value, var->value_len));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Wrote variable: name \"%s\", value \"%s\".",
+                log_escape_ex(msr->mp, var->name, var->name_len),
+                log_escape_ex(msr->mp, var->value, var->value_len));
+        }
     }
 
     blob[blob_offset] = 0;
@@ -413,6 +383,12 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 
     /* And, finally, store it. */
     dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);    
+
+    key.dptr = var_key->value;
+    key.dsize = var_key->value_len + 1;
+
+    value.dptr = (char *)blob;
+    value.dsize = blob_size;
 
     rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
         CREATEMODE, msr->mp);
@@ -422,24 +398,20 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         return -1;
     }
 
-    key.dptr = var_key->value;
-    key.dsize = var_key->value_len + 1;
-
-    value.dptr = (char *)blob;
-    value.dsize = blob_size;
-
     rc = apr_sdbm_store(dbm, key, value, APR_SDBM_REPLACE);
+
+    apr_sdbm_close(dbm);
+
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Failed to write to DBM file \"%s\": %s", dbm_filename,
             get_apr_error(msr->mp, rc));
-        apr_sdbm_close(dbm);
         return -1;
     }    
 
-    msr_log(msr, 4, "Persisted collection (name \"%s\", key \"%s\").",
-        log_escape(msr->mp, var_name->value), log_escape(msr->mp, var_key->value));
-
-    apr_sdbm_close(dbm);
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "Persisted collection (name \"%s\", key \"%s\").",
+            log_escape_ex(msr->mp, var_name->value, var_name->value_len), log_escape_ex(msr->mp, var_key->value, var_key->value_len));
+    }
 
     return 0;    
 }
@@ -490,14 +462,16 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
      */
     rc = apr_sdbm_firstkey(dbm, &key);
     while(rc == APR_SUCCESS) {
-        char *s = apr_pstrmemdup(msr->mp, key.dptr, key.dsize);
+        char *s = apr_pstrmemdup(msr->mp, key.dptr, key.dsize - 1);
         *(char **)apr_array_push(keys_arr) = s;
         rc = apr_sdbm_nextkey(dbm, &key);
     }
     apr_sdbm_unlock(dbm);
 
-    msr_log(msr, 9, "Found %d record(s) in file \"%s\".", keys_arr->nelts,
-        log_escape(msr->mp, dbm_filename));
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Found %d record(s) in file \"%s\".", keys_arr->nelts,
+            log_escape(msr->mp, dbm_filename));
+    }
 
     /* Now retrieve the entires one by one. */
     keys = (char **)keys_arr->elts;
@@ -519,6 +493,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
 
             col = collection_unpack(msr, value.dptr, value.dsize, 0);
             if (col == NULL) {
+                apr_sdbm_close(dbm);
                 return -1;
             }
 
@@ -526,25 +501,30 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
             if (var == NULL) {
                 msr_log(msr, 1, "Collection cleanup discovered entry with no "
                     "__expire_KEY (name \"%s\", key \"%s\").",
-                    log_escape(msr->mp, col_name), log_escape(msr->mp, key.dptr));
+                    log_escape(msr->mp, col_name), log_escape_ex(msr->mp, key.dptr, key.dsize - 1));
             } else {
                 unsigned int expiry_time = atoi(var->value);
 
-                msr_log(msr, 9, "Record (name \"%s\", key \"%s\") set to expire in %" APR_TIME_T_FMT " seconds.",
-                    log_escape(msr->mp, col_name), log_escape(msr->mp, key.dptr),
-                    expiry_time - now);
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Record (name \"%s\", key \"%s\") set to expire in %" APR_TIME_T_FMT " seconds.",
+                        log_escape(msr->mp, col_name), log_escape_ex(msr->mp, key.dptr, key.dsize - 1),
+                        expiry_time - now);
+                }
 
                 if (expiry_time <= now) {
                     rc = apr_sdbm_delete(dbm, key);
                     if (rc != APR_SUCCESS) {
                         msr_log(msr, 1, "Failed deleting collection (name \"%s\", "
                             "key \"%s\"): %s", log_escape(msr->mp, col_name),
-                            log_escape(msr->mp, key.dptr), get_apr_error(msr->mp, rc));
+                            log_escape_ex(msr->mp, key.dptr, key.dsize - 1), get_apr_error(msr->mp, rc));
+                        apr_sdbm_close(dbm);
                         return -1;
                     }
-                    msr_log(msr, 4, "Removed stale collection (name \"%s\", "
-                            "key \"%s\").", log_escape(msr->mp, col_name),
-                            log_escape(msr->mp, key.dptr));
+                    if (msr->txcfg->debuglog_level >= 4) {
+                        msr_log(msr, 4, "Removed stale collection (name \"%s\", "
+                                "key \"%s\").", log_escape(msr->mp, col_name),
+                                log_escape_ex(msr->mp, key.dptr, key.dsize - 1));
+                    }
                 }
             }
         } else {

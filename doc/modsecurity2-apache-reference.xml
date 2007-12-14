@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-rc1/ (December 13, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-rc1/ (December 14, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -3941,11 +3941,6 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
         <listitem>
           <para><literal moreinfo="none">CREATE_TIME</literal> - date/time of
           the creation of the collection.</para>
-        </listitem>
-
-        <listitem>
-          <para><literal moreinfo="none">IS_EXPIRED</literal> - set to 1 if
-          the collection is expired otherwise set to 0.</para>
         </listitem>
 
         <listitem>

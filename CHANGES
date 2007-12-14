@@ -1,5 +1,7 @@
-13 Dec 2007 - 2.5.0-rc1
+14 Dec 2007 - 2.5.0-rc1
 -----------------------
+
+ * More efficient collection persistance.
 
  * Fixed t:escapeSeqDecode to better follow ANSI C escapes.
 

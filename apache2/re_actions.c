@@ -1330,14 +1330,6 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var->value = "1";
         var->value_len = strlen(var->value);
         apr_table_setn(table, var->name, (void *)var);
-
-        /* It has not yet expired. */
-        var = apr_pcalloc(msr->mp, sizeof(msc_string));
-        var->name = "IS_EXPIRED";
-        var->name_len = strlen(var->name);
-        var->value = "0";
-        var->value_len = strlen(var->value);
-        apr_table_setn(table, var->name, (void *)var);
     }
 
     /* Add the collection to the list. */
