@@ -1090,7 +1090,9 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis>Dependencies/Notes:</emphasis> Rules following a
       SecDefaultAction directive will inherit this setting unless a specific
       action is specified for an indivdual rule or until another
-      SecDefaultAction is specified.</para>
+      SecDefaultAction is specified.  Take special note that in the logging
+      disruptive actions are not allowed, but this can inadvertantly be
+      inherited using a disruptive action in SecDefaultAction.</para>
 
       <para>The default value is:</para>
 
@@ -2090,7 +2092,9 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis>phase:1</emphasis>"</programl
       This phase can be used to inspect the error messages logged by Apache.
       You can not deny/block connections in this phase as it is too late. This
       phase also allows for inspection of other response headers that weren't
-      available during phase:3 or phase:4.</para>
+      available during phase:3 or phase:4.  Note that you must be careful
+      not to inherit a disruptive action into a rule in this phase as this
+      is a configuration error in ModSecurity 2.5.0 and later versions.</para>
     </section>
   </section>
 

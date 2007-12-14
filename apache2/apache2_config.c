@@ -554,21 +554,24 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
         if (dcfg->tmp_default_actionset == NULL) return FATAL_ERROR;
     }
 
-    /* Merge actions with the parent. */
-    rule->actionset = msre_actionset_merge(modsecurity->msre, dcfg->tmp_default_actionset,
-        rule->actionset, 1);
+    /* Check some cases prior to merging so we know where it came from */
 
+    /* Must NOT specify a disruptive action in logging phase. */
+    if (rule->actionset->phase == PHASE_LOGGING && (rule->actionset->intercept_action != ACTION_ALLOW && rule->actionset->intercept_action != ACTION_NONE)) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Disruptive actions "
+            "cannot be specified in the logging phase. %d", rule->actionset->intercept_action);
+    }
+
+    /* Check syntax for chained rules */
     if (dcfg->tmp_chain_starter != NULL) {
-        /* This rule is part of a chain. */
-
         /* Must NOT specify a disruptive action. */
-        if (rule->actionset->intercept_action == NOT_SET) {
+        if (rule->actionset->intercept_action != NOT_SET) {
             return apr_psprintf(cmd->pool, "ModSecurity: Disruptive actions can only "
                 "be specified by chain starter rules.");
         }
 
         /* Must NOT specify a phase. */
-        if (rule->actionset->phase == NOT_SET) {
+        if (rule->actionset->phase != NOT_SET) {
             return apr_psprintf(cmd->pool, "ModSecurity: Execution phases can only be "
                 "specified by chain starter rules.");
         }
@@ -592,6 +595,13 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
         rule->chain_starter = dcfg->tmp_chain_starter;
         rule->actionset->phase = rule->chain_starter->actionset->phase;
     }
+
+    /* Merge actions with the parent.
+     *
+     * ENH Probably do not want this done fully for chained rules.
+     */
+    rule->actionset = msre_actionset_merge(modsecurity->msre, dcfg->tmp_default_actionset,
+        rule->actionset, 1);
 
     if (rule->actionset->is_chained != 1) {
         /* If this rule is part of the chain but does
