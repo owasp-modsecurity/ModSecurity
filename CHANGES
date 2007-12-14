@@ -1,6 +1,8 @@
 14 Dec 2007 - 2.5.0-rc1
 -----------------------
 
+Changes since 2.5.0-dev2:
+
  * More efficient collection persistance.
 
  * Fixed t:escapeSeqDecode to better follow ANSI C escapes.
@@ -8,10 +10,6 @@
  * Added t:jsDecode to decode JavScript escape sequences.
 
  * Added IS_NEW and IS_EXPIRED built-in collection variables.
-
- * Added SecMarker <id> directive to allow a fixed target for skipAfter.
-
- * The invoked rule is now logged in the debug log at level 5.
 
  * New audit log part 'K' logs all matching rules.
 
@@ -22,20 +20,24 @@
 
  * Renamed SecGeoLookupsDb to SecGeoLookupDB.
 
- * Implement SecComponentSignature.
-
- * Fix warnings on Solaris and/or 64bit builds.
+ * Added SecComponentSignature to allow other components the ability
+   to append to the logged signature.
 
  * Added skipAfter:<id> action to allow skipping all rules until a rule
    with a specified ID is reached.  Rule execution then continues after
    the specified rule.
+
+ * Added SecMarker <id> directive to allow a fixed target for skipAfter.
 
  * Added ctl:ruleRemoveById action to allow rule removal on a match.
 
  * Added a @containsWord operator that will match a given string anywhere in
    the target value, but only on word boundaries.
 
- * New MATCHED_VAR variable to store the last matched variable name
+ * Added a MATCHED_VAR_NAME variable to store the last matched variable name
+   so that it can be more easily used by rules.
+
+ * Added a MATCHED_VAR variable to store the last matched variable value
    so that it can be more easily used by rules.
 
  * Fixed expansion of macros when using relative changes with setvar.  In
@@ -44,8 +46,6 @@
  * Situations where ModSecurity will intercept, generate an error or log
    a level 1-3 message to the debug log are now marked as 'relevant' and may
    generate an audit log entry.
-
- * Do not process subrequests in phase 2-4, but do hand off the request data.
 
  * Fixed deprecatevar:var=N/S action so that it decrements N every S seconds
    as documented instead of decrementing by a rate.
@@ -63,15 +63,12 @@
  * Fixed the base64decode transformation function to not return extra
    characters at the end.
 
- * Removed potential for extra characters to be appended to the value when
-   using base64Decode.
-
  * Return from the output filter with an error in addition to setting
    up the HTTP error status in the output data.
 
- * Used new API calls to get the server version/banner when available.
+ * Used new Apache API calls to get the server version/banner when available.
 
- * Added "logdata" meta action to allow safe logging of raw transaction data.
+ * Added "logdata" meta action to allow logging of raw transaction data.
 
  * Added TX_SEVERITY that keeps track of the highest severity
    for any matched rules so far.
@@ -82,7 +79,8 @@
  * Added MODSEC_BUILD variable that contains the numeric build value based
    on the ModSecurity version.
 
- * Enhanced debug logging.
+ * Enhanced debug logging by displaying more data on rule execution.  All
+   invoked rules are now logged in the debug log at level 5.
 
  * Cleaned up and clarified some documentation.
 
@@ -90,8 +88,12 @@
 
  * Stricter validation for @validateUtf8Encoding.
 
- * Capture the match in TX:0 when using "capture" action in phrase match
+ * Now capture the match in TX:0 when using "capture" action in phrase match
    operators.
+
+ * No longer process internal subrequests.
+
+ * Fixed warnings on Solaris and/or 64bit builds.
 
  * Added Cygwin to the list of platforms not supporting the hidden
    visibility attribute.
