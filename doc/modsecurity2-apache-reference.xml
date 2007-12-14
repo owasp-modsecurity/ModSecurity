@@ -3369,13 +3369,12 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     </section>
 
     <section>
-      <title><literal>jsDecodeUni</literal></title>
+      <title><literal>jsDecode</literal></title>
 
-      <para>Decodes <literal moreinfo="none">\uXXXX</literal> JavaScript
-      encoding. If the code is in the range of FF01-FF5E (the full width ASCII
-      codes), then the higher byte is used to detect and adjust the lower
-      byte. Otherwise, only the lower byte will be used and the higher byte
-      zeroed.</para>
+      <para>Decodes JavaScript escape sequences. If a \uHHHH code is in the
+      range of FF01-FF5E (the full width ASCII codes), then the higher byte is
+      used to detect and adjust the lower byte. Otherwise, only the lower byte
+      will be used and the higher byte zeroed.</para>
     </section>
 
     <section>

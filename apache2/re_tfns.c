@@ -251,14 +251,14 @@ static int msre_fn_replaceComments_execute(apr_pool_t *mptmp, unsigned char *inp
     return changed;
 }
 
-/* jsDecodeUni */
+/* jsDecode */
 
-static int msre_fn_jsDecodeUni_execute(apr_pool_t *mptmp, unsigned char *input,
+static int msre_fn_jsDecode_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
     long int length;
 
-    length = jsdecode_uni_nonstrict_inplace_ex(input, input_len);
+    length = js_decode_nonstrict_inplace(input, input_len);
     *rval = (char *)input;
     *rval_len = length;
     
@@ -518,10 +518,10 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
         msre_fn_htmlEntityDecode_execute
     );
 
-    /* jsDecodeUni */
+    /* jsDecode */
     msre_engine_tfn_register(engine,
-        "jsDecodeUni",
-        msre_fn_jsDecodeUni_execute
+        "jsDecode",
+        msre_fn_jsDecode_execute
     );
 
     /* length */

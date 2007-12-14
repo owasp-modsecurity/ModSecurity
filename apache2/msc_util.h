@@ -35,7 +35,7 @@ int DSOLOCAL is_token_char(unsigned char c);
 
 int DSOLOCAL remove_lf_crlf_inplace(char *text);
 
-unsigned DSOLOCAL char x2c(unsigned char *what);
+unsigned char DSOLOCAL x2c(unsigned char *what);
 
 char DSOLOCAL *guess_tmp_dir(apr_pool_t *p);
 
@@ -66,7 +66,7 @@ char DSOLOCAL *log_escape_raw(apr_pool_t *mp, const unsigned char *text, unsigne
 char DSOLOCAL *_log_escape(apr_pool_t *p, const unsigned char *input,
     unsigned long int input_length, int escape_quotes, int escape_colon);
 
-int DSOLOCAL jsdecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len);
+int DSOLOCAL js_decode_nonstrict_inplace(unsigned char *input, long int input_len);
 
 int DSOLOCAL urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_length);
 
