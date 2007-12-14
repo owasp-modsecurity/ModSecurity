@@ -99,6 +99,21 @@ Changes since 2.5.0-dev2:
    visibility attribute.
 
 
+27 Nov 2007 - 2.1.4
+-------------------
+
+ * Updated included Core Ruleset to version 1.5 and noted in the docs that
+   XML support is required to use the rules without modification.
+
+ * Fixed an evasion FP, mistaking a multipart non-boundary for a boundary.
+
+ * Fixed multiple warnings on Solaris and/or 64bit builds.
+
+ * Do not process subrequests in phase 2-4, but do hand off the request data.
+
+ * Fixed a blocking FP in the multipart parser, which affected Safari.
+
+
 11 Sep 2007 - 2.1.3
 -------------------
 
