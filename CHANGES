@@ -1,5 +1,7 @@
-12 Dec 2007 - 2.5.0-rc1
+13 Dec 2007 - 2.5.0-rc1
 -----------------------
+
+ * Fixed t:escapeSeqDecode to better follow ANSI C escapes.
 
  * Added t:jsDecode to decode JavScript escape sequences.
 
