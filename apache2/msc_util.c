@@ -889,7 +889,7 @@ int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len) {
                     }
                 }
                 else
-                if (isdigit(input[i + 1])) { /* Octal. */
+                if (ISODIGIT(input[i + 1])) { /* Octal. */
                     char buf[10];
                     int j = 0, l = 3;
 

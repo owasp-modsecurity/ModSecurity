@@ -35,7 +35,7 @@ int DSOLOCAL is_token_char(unsigned char c);
 
 int DSOLOCAL remove_lf_crlf_inplace(char *text);
 
-unsigned DSOLOCAL char x2c(unsigned char *what);
+unsigned char DSOLOCAL x2c(unsigned char *what);
 
 char DSOLOCAL *guess_tmp_dir(apr_pool_t *p);
 
