@@ -441,21 +441,18 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
         if (dcfg->tmp_default_actionset == NULL) return FATAL_ERROR;
     }
 
-    /* Merge actions with the parent. */
-    rule->actionset = msre_actionset_merge(modsecurity->msre, dcfg->tmp_default_actionset,
-        rule->actionset, 1);
+    /* Check some cases prior to merging so we know where it came from */
 
-    if (dcfg->tmp_chain_starter != NULL) {
-        /* This rule is part of a chain. */
-
+    /* Check syntax for chained rules */
+    if ((rule->actionset != NULL) && (dcfg->tmp_chain_starter != NULL)) {
         /* Must NOT specify a disruptive action. */
-        if (rule->actionset->intercept_action == NOT_SET) {
+        if (rule->actionset->intercept_action != NOT_SET) {
             return apr_psprintf(cmd->pool, "ModSecurity: Disruptive actions can only "
                 "be specified by chain starter rules.");
         }
 
         /* Must NOT specify a phase. */
-        if (rule->actionset->phase == NOT_SET) {
+        if (rule->actionset->phase != NOT_SET) {
             return apr_psprintf(cmd->pool, "ModSecurity: Execution phases can only be "
                 "specified by chain starter rules.");
         }
@@ -474,7 +471,13 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
             return apr_psprintf(cmd->pool, "ModSecurity: The skip action can only be used "
                 " by chain starter rules. ");
         }
+    }
 
+    /* Merge actions with the parent. */
+    rule->actionset = msre_actionset_merge(modsecurity->msre, dcfg->tmp_default_actionset,
+        rule->actionset, 1);
+
+    if (dcfg->tmp_chain_starter != NULL) {
         rule->chain_starter = dcfg->tmp_chain_starter;
         rule->actionset->phase = rule->chain_starter->actionset->phase;
     }
