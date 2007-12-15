@@ -731,7 +731,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         }
         else
         if (rc == RULE_MATCH) {
-            if (msr->was_intercepted) {
+            if ((msr->phase == msr->intercept_phase) && msr->was_intercepted) {
                 /* If the transaction was intercepted we will
                  * go back. Do note that we are relying on the
                  * rule to know if it is a part of a chain and
