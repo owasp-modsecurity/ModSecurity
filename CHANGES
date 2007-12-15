@@ -3,6 +3,9 @@
 
 Changes since 2.5.0-dev2:
 
+ * Fixed issue where only the first phase 5 rule would run when the
+   request was intercepted in an earlier phase.
+
  * Updated included Core Ruleset to version 1.5 and noted in the docs that
    XML support is required to use the rules without modification.
 
