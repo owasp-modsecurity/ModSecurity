@@ -489,8 +489,8 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
     msr->r = r;
 
-    if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Output filter: Receiving output (f %pp, r %pp).", f, f->r);
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Output filter: Receiving output (f %pp, r %pp).", f, f->r);
     }
     
     /* Initialise on first invocation */
