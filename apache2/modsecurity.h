@@ -172,6 +172,8 @@ extern DSOLOCAL const command_rec module_directives[];
 #define ACTION_PROXY                    3
 #define ACTION_DROP                     4
 #define ACTION_ALLOW                    5
+#define ACTION_ALLOW_REQUEST            6
+#define ACTION_ALLOW_PHASE              7
 
 #define MODSEC_DISABLED                 0
 #define MODSEC_DETECTION_ONLY           1
@@ -366,6 +368,14 @@ struct modsec_rec {
 
     /* removed rules */
     apr_array_header_t  *removed_rules;
+
+    /* When "allow" is executed the variable below is
+     * updated to contain the scope of the allow action. Set
+     * at 0 by default, it will have ACTION_ALLOW if we are
+     * to allow phases 1-4 and ACTION_ALLOW_REQUEST if we
+     * are to allow phases 1-2 only.
+     */
+    unsigned int         allow_scope;
 };
 
 struct directory_config {

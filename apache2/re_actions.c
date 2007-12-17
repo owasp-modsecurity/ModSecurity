@@ -430,7 +430,8 @@ static char *msre_action_skipAfter_validate(msre_engine *engine, msre_action *ac
 static apr_status_t msre_action_skipAfter_init(msre_engine *engine, msre_actionset *actionset,
     msre_action *action)
 {
-    // TODO: Need to keep track of skipAfter IDs so we can insert placeholders after we get to the real rule with that ID.
+    // TODO: Need to keep track of skipAfter IDs so we can insert placeholders after
+    // we get to the real rule with that ID.
     actionset->skip_after = action->param;
     return 1;
 }
@@ -441,7 +442,32 @@ static apr_status_t msre_action_allow_init(msre_engine *engine, msre_actionset *
     msre_action *action)
 {
     actionset->intercept_action = ACTION_ALLOW;
+
+    if (action->param != NULL) {
+        if (strcasecmp(action->param, "phase") == 0) {
+            actionset->intercept_action = ACTION_ALLOW_PHASE;
+        } else
+        if (strcasecmp(action->param, "request") == 0) {
+            actionset->intercept_action = ACTION_ALLOW_REQUEST;
+        }
+    }
+
     return 1;
+}
+
+static char *msre_action_allow_validate(msre_engine *engine, msre_action *action) {
+    if (action->param != NULL) {
+        if (strcasecmp(action->param, "phase") == 0) {
+            return NULL;
+        } else
+        if (strcasecmp(action->param, "request") == 0) {
+            return NULL;
+        } else {
+            return apr_psprintf("Invalid parameter for allow: %s", action->param);
+        }
+    }
+
+    return NULL;
 }
 
 /* phase */
@@ -1699,10 +1725,10 @@ void msre_engine_register_default_actions(msre_engine *engine) {
     msre_engine_action_register(engine,
         "allow",
         ACTION_DISRUPTIVE,
-        0, 0,
+        0, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
-        NULL,
+        msre_action_allow_validate,
         msre_action_allow_init,
         NULL
     );

@@ -1,7 +1,13 @@
-14 Dec 2007 - 2.5.0-rc1
+
+17 Dec 2007 - 2.5.0-rc1
 -----------------------
 
 Changes since 2.5.0-dev2:
+
+ * Changed how allow works. Used on its own it now allows phases 1-4. Used
+   with parameter "phase" (e.g. SecAction allow:phase) it only affects
+   the current phase. Used with parameter "request" it allows phases
+   1-2.
 
  * Fixed issue where only the first phase 5 rule would run when the
    request was intercepted in an earlier phase.

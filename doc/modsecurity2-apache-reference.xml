@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-rc1/ (December 14, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-rc1/ (December 17, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -1090,7 +1090,7 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis>Dependencies/Notes:</emphasis> Rules following a
       SecDefaultAction directive will inherit this setting unless a specific
       action is specified for an indivdual rule or until another
-      SecDefaultAction is specified.  Take special note that in the logging
+      SecDefaultAction is specified. Take special note that in the logging
       disruptive actions are not allowed, but this can inadvertantly be
       inherited using a disruptive action in SecDefaultAction.</para>
 
@@ -1963,27 +1963,25 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}
 
     <orderedlist continuation="restarts" inheritnum="ignore">
       <listitem>
-        <para>Request headers</para>
+        <para>Request headers (REQUEST_HEADERS)</para>
       </listitem>
 
       <listitem>
-        <para>Request body</para>
+        <para>Request body (REQUEST_BODY)</para>
       </listitem>
 
       <listitem>
-        <para>Response headers</para>
+        <para>Response headers (RESPONSE_HEADERS)</para>
       </listitem>
 
       <listitem>
-        <para>Response body</para>
+        <para>Response body (RESPONSE_BODY)</para>
       </listitem>
 
       <listitem>
-        <para>Logging</para>
+        <para>Logging (LOGGING)</para>
       </listitem>
     </orderedlist>
-
-    <para><emphasis>ModSecurity Processing Phases Diagram</emphasis></para>
 
     <para><emphasis> <emphasis>Below is a diagram of the standard Apache
     Request Cycle. In the diagram, the 5 ModSecurity processing phases are
@@ -1999,14 +1997,22 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}
     <programlisting format="linespecific">SecDefaultAction "log,pass,<emphasis>phase:2</emphasis>"
 SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis>phase:1</emphasis>"</programlisting>
 
-    <para><emphasis>Note on Rule and Phases</emphasis></para>
+    <note>
+      <para>Keep in mind that rules are executed according to phases, so even
+      if two rules are adjacent in a configuration file, but are set to
+      execute in different phases, they would not happen one after the other.
+      The order of rules in the configuration file is important only within
+      the rules of each phase. This is especially important when using the
+      <literal>skip</literal> and <literal>skipAfter</literal> actions.</para>
+    </note>
 
-    <para>Keep in mind that rules are executed according to phases, so even if
-    two rules are adjacent in a configuration file, but are set to execute in
-    different phases, they would not happen one after the other. The order of
-    rules in the configuration file is important only within the rules of each
-    phase. This is especially important when using the <literal>skip</literal>
-    and <literal>skipAfter</literal> actions.</para>
+    <note>
+      <para>The <literal>LOGGING</literal> phase is special. It is executed at
+      the end of each transaction no matter what happened in the previous
+      phases. This means it will be processed even if the request was
+      intercepted of the <literal>allow</literal> action was used to pass the
+      transaction through.</para>
+    </note>
 
     <section>
       <title>Phase Request Headers</title>
@@ -2092,9 +2098,9 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis>phase:1</emphasis>"</programl
       This phase can be used to inspect the error messages logged by Apache.
       You can not deny/block connections in this phase as it is too late. This
       phase also allows for inspection of other response headers that weren't
-      available during phase:3 or phase:4.  Note that you must be careful
-      not to inherit a disruptive action into a rule in this phase as this
-      is a configuration error in ModSecurity 2.5.0 and later versions.</para>
+      available during phase:3 or phase:4. Note that you must be careful not
+      to inherit a disruptive action into a rule in this phase as this is a
+      configuration error in ModSecurity 2.5.0 and later versions.</para>
     </section>
   </section>
 
@@ -3552,8 +3558,8 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <section>
       <title><literal>allow</literal></title>
 
-      <para><emphasis>Description:</emphasis> Stops processing on a successful
-      match and allows transaction to proceed.</para>
+      <para><emphasis>Description:</emphasis> Stops rule processing on a
+      successful match and allows the transaction to proceed.</para>
 
       <para><emphasis>Action Group:</emphasis> Disruptive</para>
 
@@ -3561,12 +3567,51 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
 
       <programlisting format="linespecific">SecRule REMOTE_ADDR "^192\.168\.1\.100$" nolog,phase:1,<emphasis>allow</emphasis></programlisting>
 
-      <para><emphasis>Note</emphasis></para>
+      <para>Prior to ModSecurity 2.5 the <literal>allow</literal> action would
+      only affect the current phase. An <literal>allow</literal> in phase 1
+      would skip processing the remaining rules in phase 1 but the rules from
+      phase 2 would execute. Starting with v2.5 <literal>allow</literal> was
+      enhanced to allow for fine-grained control of what is done. The
+      following rules now apply:</para>
 
-      <para>The allow action only applies to the current processing phase. If
-      your intent is to explicitly allow a request, then you should use the
-      "ctl" action to turn the ruleEngine off -<literal moreinfo="none">
-      ctl:ruleEngine=Off</literal>.</para>
+      <orderedlist>
+        <listitem>
+          <para>If used one its own, like in the example above,
+          <literal>allow</literal> will affect the entire transaction,
+          stopping processing of the current phase but also skipping over all
+          other phases apart from the logging phase. (The logging phase is
+          special; it is designed to always execute.)</para>
+        </listitem>
+
+        <listitem>
+          <para>If used with parameter "phase", <literal>allow</literal> will
+          cause the engine to stop processing the current phase. Other phases
+          will continue as normal.</para>
+        </listitem>
+
+        <listitem>
+          <para>If used with parameter "request", <literal>allow</literal>
+          will cause the engine to stop processing the current phase. The next
+          phase to be processed will be phase
+          <literal>RESPONSE_HEADERS</literal>.</para>
+        </listitem>
+      </orderedlist>
+
+      <para>Examples:</para>
+
+      <programlisting># Do not process request but process response.
+SecAction phase:1,allow:request
+
+# Do not process transaction (request and response).
+SecAction phase:1,allow
+</programlisting>
+
+      <para>If you want to allow a response through, put a rule in phase
+      <literal>RESPONSE_HEADERS</literal> and simply use
+      <literal>allow</literal> on its own:</para>
+
+      <programlisting># Allow response through.
+SecAction phase:3,allow</programlisting>
     </section>
 
     <section>

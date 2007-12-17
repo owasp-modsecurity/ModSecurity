@@ -595,7 +595,12 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
         rule->actionset, 1);
 
     /* Must NOT specify a disruptive action in logging phase. */
-    if ((rule->actionset != NULL) && (rule->actionset->phase == PHASE_LOGGING) && (rule->actionset->intercept_action != ACTION_ALLOW) && (rule->actionset->intercept_action != ACTION_NONE)) {
+    if ((rule->actionset != NULL)
+        && (rule->actionset->phase == PHASE_LOGGING)
+        && (rule->actionset->intercept_action != ACTION_ALLOW)
+        && (rule->actionset->intercept_action != ACTION_ALLOW_REQUEST)
+        && (rule->actionset->intercept_action != ACTION_NONE)
+    ) {
         return apr_psprintf(cmd->pool, "ModSecurity: Disruptive actions "
             "cannot be specified in the logging phase.");
     }

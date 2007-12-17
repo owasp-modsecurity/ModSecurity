@@ -359,7 +359,12 @@ static apr_status_t modsecurity_process_phase_request_headers(modsec_rec *msr) {
  *
  */
 static apr_status_t modsecurity_process_phase_request_body(modsec_rec *msr) {
-    msr_log(msr, 4, "Starting phase REQUEST_BODY.");
+    if ((msr->allow_scope == ACTION_ALLOW_REQUEST)||(msr->allow_scope == ACTION_ALLOW)) {
+        msr_log(msr, 4, "Skipping phase REQUEST_BODY (allow used).");
+        return 0;
+    } else {
+        msr_log(msr, 4, "Starting phase REQUEST_BODY.");
+    }
 
     if (msr->txcfg->ruleset != NULL) {
         return msre_ruleset_process_phase(msr->txcfg->ruleset, msr);
@@ -372,7 +377,12 @@ static apr_status_t modsecurity_process_phase_request_body(modsec_rec *msr) {
  *
  */
 static apr_status_t modsecurity_process_phase_response_headers(modsec_rec *msr) {
-    msr_log(msr, 4, "Starting phase RESPONSE_HEADERS.");
+    if (msr->allow_scope == ACTION_ALLOW) {
+        msr_log(msr, 4, "Skipping phase RESPONSE_HEADERS (allow used).");
+        return 0;
+    } else {
+        msr_log(msr, 4, "Starting phase RESPONSE_HEADERS.");
+    }
 
     if (msr->txcfg->ruleset != NULL) {
         return msre_ruleset_process_phase(msr->txcfg->ruleset, msr);
@@ -385,7 +395,12 @@ static apr_status_t modsecurity_process_phase_response_headers(modsec_rec *msr) 
  *
  */
 static apr_status_t modsecurity_process_phase_response_body(modsec_rec *msr) {
-    msr_log(msr, 4, "Starting phase RESPONSE_BODY.");
+    if (msr->allow_scope == ACTION_ALLOW) {
+        msr_log(msr, 4, "Skipping phase RESPONSE_BODY (allow used).");
+        return 0;
+    } else {
+        msr_log(msr, 4, "Starting phase RESPONSE_BODY.");
+    }
 
     if (msr->txcfg->ruleset != NULL) {
         return msre_ruleset_process_phase(msr->txcfg->ruleset, msr);

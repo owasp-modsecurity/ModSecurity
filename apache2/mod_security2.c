@@ -198,6 +198,21 @@ int perform_interception(modsec_rec *msr) {
             status = DECLINED;
             message = apr_psprintf(msr->mp, "Access allowed%s.", phase_text);
             msr->was_intercepted = 0;
+            msr->allow_scope = ACTION_ALLOW;
+            break;
+
+        case ACTION_ALLOW_PHASE :
+            status = DECLINED;
+            message = apr_psprintf(msr->mp, "Access to phase allowed%s.", phase_text);
+            msr->was_intercepted = 0;
+            msr->allow_scope = ACTION_ALLOW_PHASE;
+            break;
+
+        case ACTION_ALLOW_REQUEST :
+            status = DECLINED;
+            message = apr_psprintf(msr->mp, "Access to request allowed%s.", phase_text);
+            msr->was_intercepted = 0;
+            msr->allow_scope = ACTION_ALLOW_REQUEST;
             break;
 
         default :
