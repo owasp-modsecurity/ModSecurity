@@ -332,6 +332,7 @@ struct modsec_rec {
     apr_md5_ctx_t        new_auditlog_md5ctx;
 
     unsigned int         was_intercepted;
+    unsigned int         rule_was_intercepted;
     unsigned int         intercept_phase;
     msre_actionset      *intercept_actionset;
     const char          *intercept_message;

@@ -673,6 +673,9 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         apr_time_t time1 = 0;
 #endif
 
+        /* Reset the rule interception flag */
+        msr->rule_was_intercepted = 0;
+
         /* SKIP_RULES is used to skip all rules until we hit a placeholder
          * with the specified rule ID and then resume execution after that.
          */
@@ -828,8 +831,8 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         }
         else
         if (rc == RULE_MATCH) {
-            if ((msr->phase == msr->intercept_phase) && msr->was_intercepted) {
-                /* If the transaction was intercepted we will
+            if (msr->rule_was_intercepted) {
+                /* If the transaction was intercepted by this rule we will
                  * go back. Do note that we are relying on the
                  * rule to know if it is a part of a chain and
                  * not intercept if it is.
@@ -1363,6 +1366,7 @@ static void msre_perform_disruptive_actions(modsec_rec *msr, msre_rule *rule,
      * transaction, and rememer the rule that caused it.
      */
     msr->was_intercepted = 1;
+    msr->rule_was_intercepted = 1;
     msr->intercept_phase = msr->phase;
     msr->intercept_actionset = actionset;
     msr->intercept_message = message;
@@ -1701,7 +1705,7 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                      * was intercepted - no need to process the remaining
                      * targets.
                      */
-                    if (msr->was_intercepted) {
+                    if (msr->rule_was_intercepted) {
                         return RULE_MATCH;
                     }
                 }
@@ -1761,7 +1765,7 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                         * was intercepted - no need to process the remaining
                         * targets.
                         */
-                        if (msr->was_intercepted) {
+                        if (msr->rule_was_intercepted) {
                             return RULE_MATCH;
                         }
                     }
@@ -1847,7 +1851,7 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
                  * was intercepted - no need to process the remaining
                  * targets.
                  */
-                if (msr->was_intercepted) {
+                if (msr->rule_was_intercepted) {
                     return RULE_MATCH;
                 }
             }
