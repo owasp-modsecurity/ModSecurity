@@ -463,7 +463,7 @@ static char *msre_action_allow_validate(msre_engine *engine, msre_action *action
         if (strcasecmp(action->param, "request") == 0) {
             return NULL;
         } else {
-            return apr_psprintf("Invalid parameter for allow: %s", action->param);
+            return apr_psprintf(engine->mp, "Invalid parameter for allow: %s", action->param);
         }
     }
 
