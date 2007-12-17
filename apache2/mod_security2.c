@@ -15,6 +15,7 @@
 
 #include "modsecurity.h"
 #include "apache2.h"
+#include "http_main.h"
 #include "pdf_protect.h"
 #include "msc_logging.h"
 #include "msc_util.h"
@@ -415,6 +416,9 @@ static apr_status_t module_cleanup(void *data) {
  * Pre-configuration initialisation hook.
  */
 static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_temp) {
+    /* Add the MODSEC_a.b define */
+    *(char **)apr_array_push(ap_server_config_defines) = apr_psprintf(mp, "MODSEC_%s.%s", MODSEC_VERSION_MAJOR, MODSEC_VERSION_MINOR);
+
     /* Initialise ModSecurity engine */
     modsecurity = modsecurity_create(mp, MODSEC_ONLINE);
     if (modsecurity == NULL) {
