@@ -556,12 +556,6 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
 
     /* Check some cases prior to merging so we know where it came from */
 
-    /* Must NOT specify a disruptive action in logging phase. */
-    if ((rule->actionset != NULL) && (rule->actionset->phase == PHASE_LOGGING) && (rule->actionset->intercept_action != ACTION_ALLOW && rule->actionset->intercept_action != ACTION_NONE)) {
-        return apr_psprintf(cmd->pool, "ModSecurity: Disruptive actions "
-            "cannot be specified in the logging phase. %d", rule->actionset->intercept_action);
-    }
-
     /* Check syntax for chained rules */
     if ((rule->actionset != NULL) && (dcfg->tmp_chain_starter != NULL)) {
         /* Must NOT specify a disruptive action. */
@@ -599,6 +593,12 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
      */
     rule->actionset = msre_actionset_merge(modsecurity->msre, dcfg->tmp_default_actionset,
         rule->actionset, 1);
+
+    /* Must NOT specify a disruptive action in logging phase. */
+    if ((rule->actionset != NULL) && (rule->actionset->phase == PHASE_LOGGING) && (rule->actionset->intercept_action != ACTION_ALLOW) && (rule->actionset->intercept_action != ACTION_NONE)) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Disruptive actions "
+            "cannot be specified in the logging phase.");
+    }
 
     if (dcfg->tmp_chain_starter != NULL) {
         rule->chain_starter = dcfg->tmp_chain_starter;
