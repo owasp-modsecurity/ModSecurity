@@ -3404,7 +3404,9 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <section>
       <title><literal>md5</literal></title>
 
-      <para>This function calculates an MD5 hash from input.</para>
+      <para>This function calculates an MD5 hash from input.  Note that
+      the computed hash is in a raw binary form and should be hex encoded
+      to be human readable (t:md5,t:hexEncode).</para>
     </section>
 
     <section>
@@ -3493,7 +3495,9 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <section>
       <title><literal>sha1</literal></title>
 
-      <para>This function calculates a SHA1 hash from input.</para>
+      <para>This function calculates a SHA1 hash from input.  Note that
+      the computed hash is in a raw binary form and should be hex encoded
+      to be human readable (t:sha1,t:hexEncode).</para>
     </section>
 
     <section>
@@ -4636,7 +4640,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
 
       <programlisting format="linespecific">SecDefaultAction log,deny,phase:1,t:removeNulls,t:lowercase 
 SecRule REQUEST_COOKIES:SESSIONID "47414e81cbbef3cf8366e84eeacba091" \
-    log,deny,status:403,<emphasis>t:md5</emphasis></programlisting>
+    log,deny,status:403,<emphasis>t:md5,t:hexEncode</emphasis></programlisting>
 
       <para><emphasis>Note</emphasis></para>
 
