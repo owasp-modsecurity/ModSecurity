@@ -964,13 +964,12 @@ static int msre_op_verifyCC_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
     msc_regex_t *regex;
-    const char *pattern = apr_psprintf(rule->ruleset->mp, "(?:%s)(?C)", rule->op_param); /* Add on a callback to the end */
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    /* Compile pattern */
-    regex = msc_pregcomp(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset);
+    /* Compile rule->op_param */
+    regex = msc_pregcomp(rule->ruleset->mp, rule->op_param, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset);
     if (regex == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
             erroffset, errptr);
