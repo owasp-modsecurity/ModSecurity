@@ -240,8 +240,8 @@ int lua_execute(msre_rule *rule, modsec_rec *msr, char **error_msg) {
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "Lua: Executing script: %s", rule->script->name);
+    if (msr->txcfg->debuglog_level >= 8) {
+        msr_log(msr, 8, "Lua: Executing script: %s", rule->script->name);
     }
 
     time_before = apr_time_now();
@@ -278,8 +278,8 @@ int lua_execute(msre_rule *rule, modsec_rec *msr, char **error_msg) {
     lua_close(L);
 
     /* Returns status code to caller. */
-    if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "Lua: Script completed in %" APR_TIME_T_FMT " usec, returning: %s.",
+    if (msr->txcfg->debuglog_level >= 8) {
+        msr_log(msr, 8, "Lua: Script completed in %" APR_TIME_T_FMT " usec, returning: %s.",
             (apr_time_now() - time_before), *error_msg);
     }
 
