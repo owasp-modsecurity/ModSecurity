@@ -19,15 +19,6 @@
 
 #define BUFLEN 8192
 
-modsec_build_type_rec DSOLOCAL modsec_build_type[] = {
-    { "dev", 1 },     /* Development build */
-    { "rc", 3 },      /* Release Candidate build */
-    { "", 9 },        /* Production build */
-    { "breach", 9 },  /* Breach build */
-    { "trunk", 9 },   /* Trunk build */
-    { NULL, -1 }      /* terminator */
-};
-
 #define RESULT_SUCCESS           0
 #define RESULT_ERROR            -1
 #define RESULT_MISMATCHED       -2

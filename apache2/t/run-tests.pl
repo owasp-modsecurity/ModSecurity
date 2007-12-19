@@ -3,7 +3,7 @@ use strict;
 use File::Basename qw(basename dirname);
 
 my @TYPES = qw(tfns operators);
-my $TEST = "./msc-test";
+my $TEST = "./msc_test";
 my $SCRIPT = basename($0);
 my $SCRIPTDIR = dirname($0);
 my $PASSED = 0;
