@@ -2,7 +2,7 @@
 use strict;
 use File::Basename qw(basename dirname);
 
-my @TYPES = qw(tfns operators);
+my @TYPES = qw(tfn op);
 my $TEST = "./msc_test";
 my $SCRIPT = basename($0);
 my $SCRIPTDIR = dirname($0);
@@ -59,9 +59,20 @@ sub runfile {
 		my $in = $t{input};
 		my $out = escape($t{output}); # Escape so we can send via commandline
 		quit(1, "Failed to interpret output \"$cfg\": $@") if ($@);
+		my $param;
 		my $rc = 0;
 
-		open(TEST, "|-", $TEST, $t{type}, $t{name}, $out, (exists($t{ret}) ? ($t{ret}) : ())) or quit(1, "Failed to execute test \"$cfg\": $!");
+		if ($t{type} eq "tfn") {
+			$param = $t{output};
+		}
+		elsif ($t{type} eq "op") {
+			$param = $t{param};
+		}
+		else {
+			quit(1, "Unknown type \"$t{type}\" - should be one of: " . join(",",@TYPES));
+		}
+
+		open(TEST, "|-", $TEST, $t{type}, $t{name}, $param, (exists($t{ret}) ? ($t{ret}) : ())) or quit(1, "Failed to execute test \"$cfg\": $!");
 		print TEST "$in";
 		close TEST;
 
@@ -102,7 +113,7 @@ sub quit {
 
 sub done {
 	if ($PASSED != $TOTAL) {
-		quit(1, "\nOnly $PASSED/$TOTAL tests passed.");
+		quit(1, "\n$PASSED/$TOTAL tests passed.");
 	}
 
 	quit(0, "\nAll tests passed ($TOTAL).");
