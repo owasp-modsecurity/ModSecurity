@@ -1,6 +1,6 @@
 ### Empty
 {
-	type => "tfns",
+	type => "tfn",
 	name => "hexEncode",
 	input => "",
 	output => "",
@@ -9,7 +9,7 @@
 
 ### Basic
 {
-	type => "tfns",
+	type => "tfn",
 	name => "hexEncode",
 	input => "TestCase",
 	output => "5465737443617365",
@@ -18,7 +18,7 @@
 
 ### Basic w/NULL
 {
-	type => "tfns",
+	type => "tfn",
 	name => "hexEncode",
 	input => "Test\0Case",
 	output => "546573740043617365",

@@ -1,6 +1,6 @@
 ### Empty
 {
-	type => "tfns",
+	type => "tfn",
 	name => "hexDecode",
 	input => "",
 	output => "",
@@ -9,7 +9,7 @@
 
 ### Basic
 {
-	type => "tfns",
+	type => "tfn",
 	name => "hexDecode",
 	input => "5465737443617365",
 	output => "TestCase",
@@ -18,7 +18,7 @@
 
 ### Basic w/NULL
 {
-	type => "tfns",
+	type => "tfn",
 	name => "hexDecode",
 	input => "546573740043617365",
 	output => "Test\0Case",
@@ -28,21 +28,21 @@
 ### Invalid
 # What should happen here?  Probably just fail and leave alone.
 {
-	type => "tfns",
+	type => "tfn",
 	name => "hexDecode",
 	input => "01234567890a0z01234567890a",
 	output => "01234567890a0z01234567890a",
 	ret => 0,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "hexDecode",
 	input => "01234567890az",
 	output => "01234567890az",
 	ret => 0,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "hexDecode",
 	input => "01234567890a0",
 	output => "01234567890a0",

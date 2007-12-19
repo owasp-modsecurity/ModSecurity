@@ -1,6 +1,6 @@
 ### Empty
 {
-	type => "tfns",
+	type => "tfn",
 	name => "lowercase",
 	input => "",
 	output => "",
@@ -9,14 +9,14 @@
 
 ### Nothing
 {
-	type => "tfns",
+	type => "tfn",
 	name => "lowercase",
 	input => "testcase",
 	output => "testcase",
 	ret => 0,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "lowercase",
 	input => "test\0case",
 	output => "test\0case",
@@ -25,14 +25,14 @@
 
 ### Basic
 {
-	type => "tfns",
+	type => "tfn",
 	name => "lowercase",
 	input => "TestCase",
 	output => "testcase",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "lowercase",
 	input => "Test\0Case",
 	output => "test\0case",

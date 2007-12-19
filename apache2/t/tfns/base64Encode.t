@@ -1,6 +1,6 @@
 ### Empty
 {
-	type => "tfns",
+	type => "tfn",
 	name => "base64Encode",
 	input => "",
 	output => "",
@@ -9,21 +9,21 @@
 
 ### Test values with varying lengths to check padding
 {
-	type => "tfns",
+	type => "tfn",
 	name => "base64Encode",
 	input => "TestCase",
 	output => "VGVzdENhc2U=",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "base64Encode",
 	input => "TestCase1",
 	output => "VGVzdENhc2Ux",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "base64Encode",
 	input => "TestCase12",
 	output => "VGVzdENhc2UxMg==",
@@ -32,7 +32,7 @@
 
 ### Check with a NUL
 {
-	type => "tfns",
+	type => "tfn",
 	name => "base64Encode",
 	input => "Test\0Case",
 	output => "VGVzdABDYXNl",

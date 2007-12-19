@@ -1,6 +1,6 @@
 ### Empty
 {
-	type => "tfns",
+	type => "tfn",
 	name => "length",
 	input => "",
 	output => "0",
@@ -10,14 +10,14 @@
 
 ### Basic normal and large
 {
-	type => "tfns",
+	type => "tfn",
 	name => "length",
 	input => "0123456789abcdef",
 	output => "16",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "length",
 	input => ('x' x 8192),
 	output => "8192",
@@ -26,7 +26,7 @@
 
 ### With TAB
 {
-	type => "tfns",
+	type => "tfn",
 	name => "length",
 	input => "0123456789\tabcdef",
 	output => "17",
@@ -35,7 +35,7 @@
 
 ### With NUL
 {
-	type => "tfns",
+	type => "tfn",
 	name => "length",
 	input => "Test\0Case",
 	output => "9",

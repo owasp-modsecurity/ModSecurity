@@ -1,6 +1,6 @@
 ### Empty
 {
-	type => "tfns",
+	type => "tfn",
 	name => "normalisePath",
 	input => "",
 	output => "",
@@ -9,14 +9,14 @@
 
 ### Nothing
 {
-	type => "tfns",
+	type => "tfn",
 	name => "normalisePath",
 	input => "/foo/bar/baz",
 	output => "/foo/bar/baz",
 	ret => 0,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "normalisePath",
 	input => "/foo/bar\0/baz",
 	output => "/foo/bar\0/baz",
@@ -25,63 +25,63 @@
 
 ### Basic
 {
-	type => "tfns",
+	type => "tfn",
 	name => "normalisePath",
 	input => "/foo/bar//baz",
 	output => "/foo/bar/baz",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "normalisePath",
 	input => "/foo/bar baz/././././boo//eek/././../whoa",
 	output => "/foo/bar baz/boo/whoa",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "normalisePath",
 	input => "./foo/bar baz/././././boo//eek/././../whoa",
 	output => "./foo/bar baz/boo/whoa",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "normalisePath",
 	input => "/./foo/bar baz/././././boo//eek/././../whoa",
 	output => "/foo/bar baz/boo/whoa",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "normalisePath",
 	input => "//foo/bar baz/././././boo//eek/././../whoa",
 	output => "/foo/bar baz/boo/whoa",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "normalisePath",
 	input => "//foo/bar baz/././././boo//eek/././../whoa/./",
 	output => "/foo/bar baz/boo/whoa/",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "normalisePath",
 	input => "/./foo/bar baz/././././boo//eek/././../whoa//",
 	output => "/foo/bar baz/boo/whoa/",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "normalisePath",
 	input => "/./../../../../../../../../etc/passwd",
 	output => "/etc/passwd",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "normalisePath",
 	input => "/./.././../../../../../../../etc/../etc/./passwd",
 	output => "/etc/passwd",
@@ -90,7 +90,7 @@
 
 ### With NUL
 {
-	type => "tfns",
+	type => "tfn",
 	name => "normalisePath",
 	input => "/./.././../../../../../../../\0/../etc/./passwd",
 	output => "/etc/passwd",

@@ -1,6 +1,6 @@
 ### Empty
 {
-	type => "tfns",
+	type => "tfn",
 	name => "replaceNulls",
 	input => "",
 	output => "",
@@ -9,7 +9,7 @@
 
 ### Nothing
 {
-	type => "tfns",
+	type => "tfn",
 	name => "replaceNulls",
 	input => "TestCase",
 	output => "TestCase",
@@ -19,35 +19,35 @@
 
 ### Basics
 {
-	type => "tfns",
+	type => "tfn",
 	name => "replaceNulls",
 	input => "\0TestCase",
 	output => " TestCase",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "replaceNulls",
 	input => "Test\0Case",
 	output => "Test Case",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "replaceNulls",
 	input => "Test\0\0Case",
 	output => "Test  Case",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "replaceNulls",
 	input => "TestCase\0",
 	output => "TestCase ",
 	ret => 1,
 },
 {
-	type => "tfns",
+	type => "tfn",
 	name => "replaceNulls",
 	input => "\0Test\0Case\0",
 	output => " Test Case ",
