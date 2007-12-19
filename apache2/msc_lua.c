@@ -133,7 +133,8 @@ static int l_log(lua_State *L) {
  *
  */
 static int l_getvar(lua_State *L) {
-    const char *varname = NULL;
+    char *varname = NULL;
+    char *param = NULL;
     modsec_rec *msr = NULL;
     char *my_error_msg = NULL;
 
@@ -145,6 +146,12 @@ static int l_getvar(lua_State *L) {
     msr = (modsec_rec *)lua_topointer(L, -1);
 
     /* Resolve variable $varname. */
+    param = strchr(varname, ':');
+    if (param != NULL) {
+        *param = '\0';
+        param++;
+    }
+
     msre_var *var = msre_create_var_ex(msr->msc_rule_mptmp, msr->modsecurity->msre,
         varname, NULL, msr, &my_error_msg);
 
@@ -152,7 +159,7 @@ static int l_getvar(lua_State *L) {
         msr_log(msr, 1, "SecRuleScript: Failed to resolve variable: %s", varname);
         return 0;
     } else {
-        msre_var *vx = generate_single_var(msr, var, NULL, msr->msc_rule_mptmp);
+        msre_var *vx = generate_single_var(msr, var, param, msr->msc_rule_mptmp);
         if (vx != NULL) {
             /* Transform the variable if a list of transformation
              * functions has been supplied.
