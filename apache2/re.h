@@ -35,6 +35,8 @@ typedef struct msre_cache_rec msre_cache_rec;
 #include "persist_dbm.h"
 #include "apache2.h"
 
+#include "msc_lua.h"
+
 /* Actions, variables, functions and operator functions */
 
 int DSOLOCAL expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t *mptmp);
@@ -113,6 +115,10 @@ int DSOLOCAL msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset
 #define RULE_PH_SKIPAFTER       1  /* Implicit placeholder for skipAfter */
 #define RULE_PH_MARKER          2  /* Explicit placeholder for SecMarker */
 
+#define RULE_TYPE_NORMAL        0
+#define RULE_TYPE_ACTION        1
+#define RULE_TYPE_LUA           2
+
 struct msre_rule {
     apr_array_header_t      *targets;
     const char              *op_name;
@@ -126,17 +132,26 @@ struct msre_rule {
     const char              *filename;
     int                      line_num;
     int                      placeholder;
+    int                      type;
     
     msre_ruleset            *ruleset;
     msre_rule               *chain_starter;
-#if defined(PERFORMANCE_MEASUREMENT)
+    #if defined(PERFORMANCE_MEASUREMENT)
     unsigned int             execution_time;
-#endif
+    #endif
+
+    #if defined(WITH_LUA)
+    msc_script              *script;
+    #endif
 };
 
 msre_rule DSOLOCAL *msre_rule_create(msre_ruleset *ruleset,
     const char *fn, int line, const char *targets,
     const char *args, const char *actions, char **error_msg);
+
+msre_rule DSOLOCAL *msre_rule_lua_create(msre_ruleset *ruleset,
+    const char *fn, int line, const char *script_filename,
+    const char *actions, char **error_msg);
 
 void DSOLOCAL msre_rule_actionset_init(msre_rule *rule);
 

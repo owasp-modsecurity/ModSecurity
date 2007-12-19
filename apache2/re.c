@@ -12,6 +12,8 @@
 
 #include "re.h"
 
+#include "msc_lua.h"
+
 
 /* -- Actions, variables, functions and operator functions ----------------- */
 
@@ -1299,6 +1301,51 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset,
     return rule;
 }
 
+#ifdef WITH_LUA
+/**
+ *
+ */
+msre_rule *msre_rule_lua_create(msre_ruleset *ruleset,
+    const char *fn, int line, const char *script_filename,
+    const char *actions, char **error_msg)
+{
+    msre_rule *rule;
+    char *my_error_msg;
+
+    if (error_msg == NULL) return NULL;
+    *error_msg = NULL;
+
+    rule = (msre_rule *)apr_pcalloc(ruleset->mp, sizeof(msre_rule));
+    if (rule == NULL) return NULL;
+    rule->ruleset = ruleset;
+    rule->filename = apr_pstrdup(ruleset->mp, fn);
+    rule->line_num = line;
+
+    rule->type = RULE_TYPE_LUA;
+
+    rule->unparsed = apr_pstrcat(ruleset->mp, "SecRuleScript ", script_filename,
+        (actions != NULL ? " ACTIONS" : ""), NULL);
+
+    /* Compile script. */
+    *error_msg = lua_compile(&rule->script, script_filename, ruleset->mp);
+    if (*error_msg != NULL) {
+        return NULL;
+    }
+
+    /* Parse actions */
+    if (actions != NULL) {
+        /* Create per-rule actionset */
+        rule->actionset = msre_actionset_create(ruleset->engine, actions, &my_error_msg);
+        if (rule->actionset == NULL) {
+            *error_msg = apr_psprintf(ruleset->mp, "Error parsing actions: %s", my_error_msg);
+            return NULL;
+        }
+    }
+
+    return rule;
+}
+#endif
+
 /**
  * Perform non-disruptive actions associated with the provided actionset.
  */
@@ -1480,7 +1527,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
 /**
  * Executes rule against the given transaction.
  */
-apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
+static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
     msre_actionset *acting_actionset = NULL;
@@ -1898,6 +1945,76 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
     #endif
 
     return (match_count ? RULE_MATCH : RULE_NO_MATCH);
+}
+
+/**
+ *
+ */
+#if defined(WITH_LUA)
+static apr_status_t msre_rule_process_lua(msre_rule *rule, modsec_rec *msr) {
+    apr_time_t time_before;
+    lua_State *L = NULL;
+    int rc;
+
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Lua: Executing script: %s", rule->script->name);
+    }
+
+    time_before = apr_time_now();
+
+    /* Create new state. */
+    L = lua_open();
+    luaL_openlibs(L);
+   
+    /* Associate msr with the state. */
+    lua_pushlightuserdata(L, (void *)msr);
+    lua_setglobal(L, "__msr");
+
+    rc = lua_restore(L, rule->script);
+    if (rc) {
+        msr_log(msr, 1, "Lua: Failed to restore script with %i.", rc);
+        return -1;
+    }
+
+    /* Execute script. */
+    if (lua_pcall(L, 0, 1, 0)) {
+        msr_log(msr, 1, "Lua: Script execution failed: %s", lua_tostring(L, -1));
+        return -1;
+    }
+
+    /* Obtain the result code. */
+    if (!lua_isnumber(L, -1)) {
+        msr_log(msr, 1, "Lua: Script failed to return a number value.");
+        return -1;
+    }
+
+    rc = lua_tonumber(L, -1);
+
+    /* Destroy state. */
+    lua_pop(L, 1);
+    lua_close(L);
+
+    /* Returns status code to caller. */
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Lua: Script completed in %" APR_TIME_T_FMT " usec, returning %i.",
+            (apr_time_now() - time_before), rc);
+    }
+
+    return (rc ? RULE_MATCH : RULE_NO_MATCH);
+}
+#endif
+
+/**
+ *
+ */
+apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
+    #if defined(WITH_LUA)
+    if (rule->type == RULE_TYPE_LUA) {
+        return msre_rule_process_lua(rule, msr);
+    }
+    #endif
+
+    return msre_rule_process_normal(rule, msr);
 }
 
 /**

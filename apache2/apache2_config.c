@@ -15,6 +15,8 @@
 #include "pdf_protect.h"
 #include "http_log.h"
 
+#include "msc_lua.h"
+
 /* -- Directory context creation and initialisation -- */
 
 /**
@@ -527,10 +529,10 @@ void init_directory_config(directory_config *dcfg) {
 }
 
 /**
- * TODO
+ *
  */
-static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *p1, 
-    const char *p2, const char *p3)
+static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
+    const char *p1, const char *p2, const char *p3)
 {
     char *my_error_msg = NULL;
     msre_rule *rule = NULL;
@@ -543,7 +545,17 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
     }
 
     /* Create the rule now. */
-    rule = msre_rule_create(dcfg->ruleset, cmd->directive->filename, cmd->directive->line_num, p1, p2, p3, &my_error_msg);
+    switch(type) {
+        case RULE_TYPE_LUA :
+            rule = msre_rule_lua_create(dcfg->ruleset, cmd->directive->filename,
+                cmd->directive->line_num, p1, p2, &my_error_msg);
+            break;
+        default :
+            rule = msre_rule_create(dcfg->ruleset, cmd->directive->filename,
+                cmd->directive->line_num, p1, p2, p3, &my_error_msg);
+            break;
+    }
+    
     if (rule == NULL) {
         return my_error_msg;
     }
@@ -627,7 +639,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
     }
 
     /* Optimisation */
-    if (strcasecmp(rule->op_name, "inspectFile") == 0) {
+    if ((rule->op_name != NULL)&&(strcasecmp(rule->op_name, "inspectFile") == 0)) {
         dcfg->upload_validates_files = 1;
     }
 
@@ -643,13 +655,16 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
         apr_table_setn(dcfg->tmp_rule_placeholders, tmp_id, tmp_id);
 
         #ifdef DEBUG_CONF
-        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool, "Watching for skipafter target rule id=\"%s\".", tmp_id);
+        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
+            "Watching for skipafter target rule id=\"%s\".", tmp_id);
         #endif
 
     }
 
     #ifdef DEBUG_CONF
-    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool, "Adding rule %pp id=\"%s\".", rule, (rule->actionset->id == NOT_SET_P ? "(none)" : rule->actionset->id));
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
+        "Adding rule %pp id=\"%s\".", rule, (rule->actionset->id == NOT_SET_P
+        ? "(none)" : rule->actionset->id));
     #endif
 
     /* Add rule to the recipe. */
@@ -662,7 +677,8 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, const char *
         msre_rule *phrule = apr_palloc(rule->ruleset->mp, sizeof(msre_rule));
 
         #ifdef DEBUG_CONF
-        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool, "Adding placeholder %pp for rule %pp id=\"%s\".", phrule, rule, rule->actionset->id);
+        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
+            "Adding placeholder %pp for rule %pp id=\"%s\".", phrule, rule, rule->actionset->id);
         #endif
 
         /* shallow copy of original rule with placeholder marked as target */
@@ -723,7 +739,7 @@ static const char *add_marker(cmd_parms *cmd, directory_config *dcfg, const char
 /* -- Configuration directives -- */
 
 static const char *cmd_action(cmd_parms *cmd, void *_dcfg, const char *p1) {
-    return add_rule(cmd, (directory_config *)_dcfg, SECACTION_TARGETS, SECACTION_ARGS, p1);
+    return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_NORMAL, SECACTION_TARGETS, SECACTION_ARGS, p1);
 }
 
 static const char *cmd_marker(cmd_parms *cmd, void *_dcfg, const char *p1) {
@@ -1213,7 +1229,7 @@ static const char *cmd_response_body_mime_types_clear(cmd_parms *cmd, void *_dcf
 static const char *cmd_rule(cmd_parms *cmd, void *_dcfg, const char *p1,
     const char *p2, const char *p3)
 {
-    return add_rule(cmd, (directory_config *)_dcfg, p1, p2, p3);
+    return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_NORMAL, p1, p2, p3);
 }
 
 static const char *cmd_rule_engine(cmd_parms *cmd, void *_dcfg, const char *p1) {
@@ -1265,6 +1281,14 @@ static const char *cmd_rule_inheritance(cmd_parms *cmd, void *_dcfg, int flag) {
     dcfg->rule_inheritance = flag;
     return NULL;
 }
+
+#ifdef WITH_LUA
+static const char *cmd_rule_script(cmd_parms *cmd, void *_dcfg, const char *p1,
+    const char *p2)
+{
+    return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_LUA, p1, p2, NULL);
+}
+#endif
 
 static const char *cmd_rule_remove_by_id(cmd_parms *cmd, void *_dcfg, const char *p1) {
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1860,6 +1884,16 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "On or Off"
     ),
+
+    #ifdef WITH_LUA
+    AP_INIT_TAKE12 (
+        "SecRuleScript",
+        cmd_rule_script,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+    #endif
 
     AP_INIT_ITERATE (
         "SecRuleRemoveById",
