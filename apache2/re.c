@@ -1232,13 +1232,26 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset,
 
     /* Add the unparsed rule */
     if ((strcmp(SECACTION_TARGETS, targets) == 0) && (strcmp(SECACTION_ARGS, args) == 0)) {
-        rule->unparsed = apr_pstrcat(ruleset->mp, "SecAction", " \"", actions, "\"", NULL);
+        rule->unparsed = apr_psprintf(ruleset->mp, "SecAction \"%s\"",
+            log_escape(ruleset->mp, actions));
     }
-    else if ((strcmp(SECMARKER_TARGETS, targets) == 0) && (strcmp(SECMARKER_ARGS, args) == 0) && (strncmp(SECMARKER_BASE_ACTIONS, actions, strlen(SECMARKER_BASE_ACTIONS)) == 0)) {
-        rule->unparsed = apr_pstrcat(ruleset->mp, "SecMarker", " \"", (actions + strlen(SECMARKER_BASE_ACTIONS)), "\"", NULL);
+    else
+        if ((strcmp(SECMARKER_TARGETS, targets) == 0)
+            && (strcmp(SECMARKER_ARGS, args) == 0)
+            && (strncmp(SECMARKER_BASE_ACTIONS, actions, strlen(SECMARKER_BASE_ACTIONS)) == 0))
+        {
+            rule->unparsed = apr_psprintf(ruleset->mp, "SecMarker \"%s\"",
+                log_escape(ruleset->mp, actions + strlen(SECMARKER_BASE_ACTIONS)));
     }
     else {
-        rule->unparsed = apr_pstrcat(ruleset->mp, "SecRule", " \"", targets, "\" \"", args, "\"", (actions != NULL ? " \"" : ""), (actions != NULL ? actions : ""), (actions != NULL ? "\"" : ""), NULL);
+        if (actions == NULL) {
+            rule->unparsed = apr_psprintf(ruleset->mp, "SecRule \"%s\" \"%s\"",
+                log_escape(ruleset->mp, targets), log_escape(ruleset->mp, args));
+        } else {
+            rule->unparsed = apr_psprintf(ruleset->mp, "SecRule \"%s\" \"%s\" \"%s\"",
+                log_escape(ruleset->mp, targets), log_escape(ruleset->mp, args),
+                log_escape(ruleset->mp, actions));
+        }
     }
 
     /* Parse targets */
@@ -1323,8 +1336,13 @@ msre_rule *msre_rule_lua_create(msre_ruleset *ruleset,
 
     rule->type = RULE_TYPE_LUA;
 
-    rule->unparsed = apr_pstrcat(ruleset->mp, "SecRuleScript ", script_filename,
-        (actions != NULL ? " ACTIONS" : ""), NULL);
+    if (actions == NULL) {
+        rule->unparsed = apr_psprintf(ruleset->mp, "SecRuleScript \"%s\"",
+            script_filename);
+    } else {
+        rule->unparsed = apr_psprintf(ruleset->mp, "SecRuleScript \"%s\" \"%s\"",
+            script_filename, log_escape(ruleset->mp, actions));
+    }
 
     /* Compile script. */
     *error_msg = lua_compile(&rule->script, script_filename, ruleset->mp);

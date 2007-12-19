@@ -1286,6 +1286,7 @@ static const char *cmd_rule_inheritance(cmd_parms *cmd, void *_dcfg, int flag) {
 static const char *cmd_rule_script(cmd_parms *cmd, void *_dcfg, const char *p1,
     const char *p2)
 {
+    // TODO Support script filenames relative to the configuration file.
     return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_LUA, p1, p2, NULL);
 }
 #endif
