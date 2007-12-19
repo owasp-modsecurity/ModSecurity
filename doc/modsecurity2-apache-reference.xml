@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-rc1/ (December 17, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-rc1/ (December 19, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -320,6 +320,12 @@
       </listitem>
 
       <listitem>
+        <para>(Optional) If you want to use Lua scripting add
+        <literal>-DWITH_LUA</literal> and configure the path to Lua include
+        files (for example <literal>-I /usr/include/lua5.1</literal>).</para>
+      </listitem>
+
+      <listitem>
         <para>Compile with <literal moreinfo="none">make</literal></para>
       </listitem>
 
@@ -336,6 +342,11 @@
         <para>(Optional) Add one line to your configuration to load libxml2:
         <filename moreinfo="none">LoadFile
         /usr/lib/libxml2.so</filename></para>
+      </listitem>
+
+      <listitem>
+        <para>(Optional) Add one line to load Lua before ModSecurity:
+        <literal>LoadFile /usr/lib/liblua5.1.so</literal>.</para>
       </listitem>
 
       <listitem>
@@ -1774,6 +1785,51 @@ ServerAlias www.app2.com
       multiple parameters. Each parameter is a regular expression that will be
       applied to the message (specified using the <literal
       moreinfo="none">msg</literal> action).</para>
+    </section>
+
+    <section>
+      <title><literal>SecRuleScript</literal> (Experimental)</title>
+
+      <para><emphasis>Description:</emphasis> This directive creates a special
+      rule that executes a Lua script to decide whether to match or not. The
+      main difference from <literal>SecRule</literal> is that there are no
+      targets nor operators. The script can fetch any variable from the
+      ModSecurity context and use any (Lua) operator to test them. The second
+      optional parameter is the list of actions whose meaning is identical to
+      that of <literal>SecRule</literal>.</para>
+
+      <para><emphasis>Syntax:</emphasis> SecRuleScript /path/to/script.lua
+      [ACTIONS]</para>
+
+      <para>Example script:</para>
+
+      <programlisting>-- Your script must define the <emphasis>main</emphasis> entry
+-- point, as below.
+function main()
+    -- Log something at level 1. Normally you shouldn't be
+    -- logging anything, especially not at level 1, but this is
+    -- just to show you can. Useful for debugging.
+    m.log(1, "Hello world!");
+
+    -- Retrieve one variable.
+    var1 = m.getvar("REMOTE_ADDR");
+
+    -- Retrieve one variable, applying one transformation function.
+    -- The second parameter is a string.
+    var2 = m.getvar("REQUEST_URI", "normalisePath");
+
+    -- Retrieve one variable, applying several transformation functions.
+    -- Notice how the second parameter is now a list.
+    var3 = m.getvar("ARGS:p", { "lowercase", "compressWhitespace" } );
+
+    -- If you want this rule to match return a string
+    -- containing the error message. It is a good idea to mention
+    -- where the problem is located.
+    -- return "Variable ARGS:p looks suspicious!"
+
+    -- Otherwise, simply return null.
+    return null;
+end</programlisting>
     </section>
 
     <section>
@@ -3404,9 +3460,9 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <section>
       <title><literal>md5</literal></title>
 
-      <para>This function calculates an MD5 hash from input.  Note that
-      the computed hash is in a raw binary form and should be hex encoded
-      to be human readable (t:md5,t:hexEncode).</para>
+      <para>This function calculates an MD5 hash from input. Note that the
+      computed hash is in a raw binary form and should be hex encoded to be
+      human readable (t:md5,t:hexEncode).</para>
     </section>
 
     <section>
@@ -3495,9 +3551,9 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <section>
       <title><literal>sha1</literal></title>
 
-      <para>This function calculates a SHA1 hash from input.  Note that
-      the computed hash is in a raw binary form and should be hex encoded
-      to be human readable (t:sha1,t:hexEncode).</para>
+      <para>This function calculates a SHA1 hash from input. Note that the
+      computed hash is in a raw binary form and should be hex encoded to be
+      human readable (t:sha1,t:hexEncode).</para>
     </section>
 
     <section>
