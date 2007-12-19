@@ -163,10 +163,8 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
     /* Multipart processor cleanup. */
     if (msr->mpd != NULL) multipart_cleanup(msr);
 
-    #ifdef WITH_LIBXML2
     /* XML processor cleanup. */
     if (msr->xml != NULL) xml_cleanup(msr);
-    #endif
 
     // TODO: Why do we ignore return code here?
     modsecurity_request_body_clear(msr, &my_error_msg);

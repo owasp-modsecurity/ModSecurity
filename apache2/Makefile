@@ -39,13 +39,12 @@ APACHECTL = apachectl
 
 INCLUDES = -I /usr/include/libxml2 -I /usr/include/lua5.1
 # INCLUDES = -I /usr/include/libxml2 -I /path/to/httpd-x.y/srclib/pcre
-DEFS = -DWITH_LIBXML2 -DWITH_LUA
+DEFS = -DWITH_LUA
 # DEFS = -DWITH_ICONV
-#
-# DEFS = -DWITH_LIBXML2 -DPERFORMANCE_MEASUREMENT
-# DEFS = -DWITH_LIBXML2 -DNO_MODSEC_API
-# DEFS = -DWITH_LIBXML2 -DDEBUG_CONF
-# DEFS = -DWITH_LIBXML2 -DCACHE_DEBUG
+# DEFS = -DPERFORMANCE_MEASUREMENT
+# DEFS = -DNO_MODSEC_API
+# DEFS = -DDEBUG_CONF
+# DEFS = -DCACHE_DEBUG
 # LIBS = -Lmy/lib/dir -lmylib
 
 CFLAGS = -O2 -g -Wuninitialized -Wall -Wmissing-prototypes -Wshadow -Wunused-variable -Wunused-value -Wchar-subscripts -Wsign-compare

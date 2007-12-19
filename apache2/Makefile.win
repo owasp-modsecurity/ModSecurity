@@ -4,7 +4,6 @@ BASE = "C:/Program Files/Apache Group/Apache2/"
 
 CC = cl
 
-# Add -DWITH_LIBXML2 below if you want to link against libxml2
 DEFS = /nologo /Od /LD /W3 -DWIN32 -DWINNT
 DLL = mod_security2.dll
 

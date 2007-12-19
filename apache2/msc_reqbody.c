@@ -78,7 +78,6 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
                 msr_log(msr, 2, "Multipart parser init failed: %s", my_error_msg);
             }
         }
-        #ifdef WITH_LIBXML2
         else
         if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
             if (xml_init(msr, &my_error_msg) < 0) {
@@ -88,7 +87,6 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
                 msr_log(msr, 2, "Multipart parser init failed: %s", my_error_msg);
             }
         }
-        #endif
         else
         if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
             /* Do nothing, URLENCODED processor does not support streaming yet. */
@@ -274,7 +272,6 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
                 msr_log(msr, 2, "Request body processor error: %s", my_error_msg);
             }
         }
-        #ifdef WITH_LIBXML2
         else
         if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
             /* Increase per-request data length counter. */
@@ -288,7 +285,6 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
                 msr_log(msr, 2, "Request body processor error: %s", my_error_msg);
             }
         }
-        #endif
         else
         if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
             /* Increase per-request data length counter. */
@@ -437,7 +433,6 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
         if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
             return modsecurity_request_body_end_urlencoded(msr, error_msg);
         }
-        #ifdef WITH_LIBXML2
         else
         if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
             if (xml_complete(msr, &my_error_msg) < 0) {
@@ -447,7 +442,6 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
                 return -1;
             }
         }
-        #endif
     }
 
     /* Note the request body no files length. */

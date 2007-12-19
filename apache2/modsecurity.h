@@ -41,9 +41,7 @@ typedef struct msc_string msc_string;
 #include "msc_multipart.h"
 #include "msc_pcre.h"
 #include "msc_util.h"
-#ifdef WITH_LIBXML2
 #include "msc_xml.h"
-#endif
 #include "msc_geo.h"
 #include "re.h"
 
@@ -320,9 +318,7 @@ struct modsec_rec {
 
     multipart_data      *mpd;                        /* MULTIPART processor data structure */
 
-    #ifdef WITH_LIBXML2
     xml_data            *xml;                        /* XML processor data structure       */
-    #endif
 
     /* audit logging */
     char                *new_auditlog_boundary;

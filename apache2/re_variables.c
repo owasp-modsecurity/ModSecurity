@@ -15,9 +15,7 @@
 #include "re.h"
 #include "msc_util.h"
 
-#ifdef WITH_LIBXML2
 #include "libxml/xpathInternals.h"
-#endif
 
 /**
  * Generates a variable from a string and a length.
@@ -513,8 +511,6 @@ static int var_reqbody_processor_error_msg_generate(modsec_rec *msr, msre_var *v
     return 1;
 }
 
-#ifdef WITH_LIBXML2
-
 /* XML */
 
 static char *var_xml_validate(msre_ruleset *ruleset, msre_var *var) {
@@ -630,7 +626,6 @@ static int var_xml_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 
     return count;
 }
-#endif
 
 /* WEBSERVER_ERROR_LOG */
 
@@ -3097,7 +3092,6 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_REQUEST_HEADERS
     );
 
-    #ifdef WITH_LIBXML2
     /* XML */
     msre_engine_variable_register(engine,
         "XML",
@@ -3108,5 +3102,4 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_CACHE,
         PHASE_REQUEST_BODY
     );
-    #endif
 }

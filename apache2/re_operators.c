@@ -818,8 +818,6 @@ static int msre_op_m_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, ch
     return 1;
 }
 
-#ifdef WITH_LIBXML2
-
 /* validateDTD */
 
 static int msre_op_validateDTD_init(msre_rule *rule, char **error_msg) {
@@ -1099,8 +1097,6 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     return 0;
 }
 
-
-#endif
 
 /**
  * Perform geograpical lookups on an IP/Host.
@@ -1833,8 +1829,6 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_m_execute
     );
 
-    #ifdef WITH_LIBXML2
-
     /* validateDTD */
     msre_engine_op_register(engine,
         "validateDTD",
@@ -1848,8 +1842,6 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_validateSchema_init,
         msre_op_validateSchema_execute
     );
-
-    #endif
 
     /* verifyCC */
     msre_engine_op_register(engine,

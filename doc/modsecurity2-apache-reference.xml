@@ -339,7 +339,7 @@
       </listitem>
 
       <listitem>
-        <para>(Optional) Add one line to your configuration to load libxml2:
+        <para>Add one line to your configuration to load libxml2:
         <filename moreinfo="none">LoadFile
         /usr/lib/libxml2.so</filename></para>
       </listitem>

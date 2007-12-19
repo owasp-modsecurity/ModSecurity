@@ -8,8 +8,6 @@
  * write to Breach Security, Inc. at support@breach.com.
  *
  */
-#ifdef WITH_LIBXML2
-
 #include "msc_xml.h"
 
 
@@ -131,5 +129,3 @@ apr_status_t xml_cleanup(modsec_rec *msr) {
 
     return 1;
 }
-
-#endif
