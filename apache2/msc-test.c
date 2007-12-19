@@ -75,6 +75,9 @@ apr_status_t unixd_set_proc_mutex_perms(apr_proc_mutex_t *pmutex) {
     return APR_SUCCESS;
 }
 
+
+/* Escaping functions */
+
 static unsigned char hex2dec(unsigned char *what) {
     register unsigned char digit;
 
@@ -125,6 +128,8 @@ static char *escape(unsigned char *str, apr_size_t *len)
 }
 
 
+/* Testing functions */
+
 static int test_tfn(const char *name, unsigned char *input, long input_len, unsigned char **rval, long *rval_len, char **errmsg) 
 {
     int rc = -1;
@@ -149,6 +154,8 @@ static int test_tfn(const char *name, unsigned char *input, long input_len, unsi
     return rc;
 }
 
+
+/* Main */
 
 int main(int argc, const char * const argv[])
 {
