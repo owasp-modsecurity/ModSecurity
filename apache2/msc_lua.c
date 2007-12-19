@@ -123,7 +123,7 @@ static int l_log(lua_State *L) {
 
     /* Log message. */
     if (msr != NULL) {
-        msr_log(msr, level, text);
+        msr_log(msr, level, "%s", text);
     }
 
     return 0;
