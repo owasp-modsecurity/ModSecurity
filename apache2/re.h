@@ -65,6 +65,9 @@ int DSOLOCAL msre_parse_generic(apr_pool_t *pool, const char *text, apr_table_t 
 
 int DSOLOCAL rule_id_in_range(int ruleid, const char *range);
 
+msre_var DSOLOCAL *generate_single_var(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_pool_t *mptmp);
+
 
 /* Structures with the corresponding functions */
 

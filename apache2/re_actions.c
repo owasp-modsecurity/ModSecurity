@@ -39,7 +39,7 @@ static void msre_engine_action_register(msre_engine *engine, const char *name, u
 /**
  * Generates a single variable (from the supplied metadata).
  */
-static msre_var *generate_single_var(modsec_rec *msr, msre_var *var, msre_rule *rule,
+msre_var *generate_single_var(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_pool_t *mptmp)
 {
     apr_table_t *vartab = NULL;
