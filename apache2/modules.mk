@@ -1,4 +1,3 @@
-
 MOD_SECURITY2 = mod_security2 apache2_config apache2_io apache2_util \
     re re_operators re_actions re_tfns re_variables \
     msc_logging msc_xml msc_multipart modsecurity msc_parsers msc_util msc_pcre \

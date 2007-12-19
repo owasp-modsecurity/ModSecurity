@@ -51,6 +51,19 @@ CFLAGS = -O2 -g -Wuninitialized -Wall -Wmissing-prototypes -Wshadow -Wunused-var
 
 all: local-shared-build
 
+### Experimental Test Framework (UNIX only right now)
+TESTOBJS = \
+    re.o re_operators.o re_actions.o re_tfns.o re_variables.o \
+    msc_logging.o msc_xml.o msc_multipart.o modsecurity.o msc_parsers.o msc_util.o msc_pcre.o \
+    persist_dbm.o msc_reqbody.o msc_geo.o acmp.o
+
+msc-test: msc-test.c ${TESTOBJS}
+	@${CC} -I .. -I `${top_dir}/bin/${APXS} -q INCLUDEDIR` ${INCLUDES} ${DEFS} -L ${top_dir}/lib -o msc-test ${TESTOBJS} msc-test.c -lapr-1 -laprutil-1 -lpcre -lxml2
+
+test: msc-test
+	t/run-tests.pl
+
 clean:
-	-rm -f *.o *.lo *.slo *.la *~ .libs
-    
+	-rm -f *.o *.lo *.slo *.la *~ .libs msc-test
+
+.PHONY: all clean test
