@@ -56,7 +56,7 @@ static int dump_writer(lua_State *L, const void* data, size_t len, void* user_da
 /**
  *
  */
-int lua_restore(lua_State *L, msc_script *script) {
+static int lua_restore(lua_State *L, msc_script *script) {
     msc_lua_dumpr_t dumpr;
 
     dumpr.script = script;
@@ -102,6 +102,92 @@ char *lua_compile(msc_script **script, const char *filename, apr_pool_t *pool) {
     lua_close(L);
 
     return NULL;
+}
+
+/**
+ *
+ */
+static int l_log(lua_State *L) {
+    modsec_rec *msr = NULL;
+    const char *text;
+    int level;
+    
+    /* Retrieve parameters. */
+    level = luaL_checknumber(L, 1);
+    text = luaL_checkstring(L, 2);
+
+    /* Retrieve msr. */
+    lua_getglobal(L, "__msr");
+    msr = (modsec_rec *)lua_topointer(L, 3);
+
+    /* Log message. */
+    if (msr != NULL) {
+        msr_log(msr, level, text);
+    }
+
+    return 0;
+}
+
+static const struct luaL_Reg mylib[] = {
+    { "log", l_log },
+    { NULL, NULL }
+};
+
+/**
+ *
+ */
+int lua_execute(msre_rule *rule, modsec_rec *msr, char **error_msg) {
+    apr_time_t time_before;
+    lua_State *L = NULL;
+    int rc;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Lua: Executing script: %s", rule->script->name);
+    }
+
+    time_before = apr_time_now();
+
+    /* Create new state. */
+    L = lua_open();
+
+    luaL_openlibs(L);
+
+    /* Associate msr with the state. */
+    lua_pushlightuserdata(L, (void *)msr);
+    lua_setglobal(L, "__msr");
+
+    /* Register functions. */
+    luaL_register(L, "m", mylib);
+
+    rc = lua_restore(L, rule->script);
+    if (rc) {
+        *error_msg = apr_psprintf(msr->mp, "Lua: Failed to restore script with %i.", rc);
+        return -1;
+    }
+
+    /* Execute script. */
+    if (lua_pcall(L, 0, 1, 0)) {
+        *error_msg = apr_psprintf(msr->mp, "Lua: Script execution failed: %s", lua_tostring(L, -1));
+        return -1;
+    }
+
+    // TODO Who will need to free msg?
+    *error_msg = (char *)lua_tostring(L, -1);
+
+    /* Destroy state. */
+    lua_pop(L, 1);
+    lua_close(L);
+
+    /* Returns status code to caller. */
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Lua: Script completed in %" APR_TIME_T_FMT " usec, returning: %s.",
+            (apr_time_now() - time_before), *error_msg);
+    }
+
+    return ((*error_msg != NULL) ? RULE_MATCH : RULE_NO_MATCH);
 }
 
 #endif

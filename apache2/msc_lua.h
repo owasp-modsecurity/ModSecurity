@@ -36,7 +36,7 @@ struct msc_script_part {
 
 char DSOLOCAL *lua_compile(msc_script **script, const char *filename, apr_pool_t *pool);
 
-int DSOLOCAL lua_restore(lua_State *L, msc_script *script);
+int DSOLOCAL lua_execute(msre_rule *rule, modsec_rec *msr, char **error_msg);
 
 #endif
 #endif

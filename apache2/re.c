@@ -1486,7 +1486,6 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
     }
     else {
         /* Match. */
-
         if (rc == 0) {
             /* Operator did not match so we need to provide a message. */
             my_error_msg = apr_psprintf(msr->mp, "Match of \"%s %s\" against \"%s\" required.",
@@ -1532,7 +1531,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
     const apr_table_entry_t *te = NULL;
     msre_actionset *acting_actionset = NULL;
     msre_var **targets = NULL;
-    apr_pool_t *mptmp = NULL;
+    apr_pool_t *mptmp = msr->msc_rule_mptmp;
     apr_table_t *tartab = NULL;
     apr_table_t *vartab = NULL;
     int i, rc, match_count = 0;
@@ -1548,18 +1547,6 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
     /* Configure recursive matching. */
     if (apr_table_get(rule->actionset->actions, "multiMatch") != NULL) {
         multi_match = 1;
-    }
-
-    /* Use a fresh memory sub-pool for processing each rule */
-    if (msr->msc_rule_mptmp == NULL) {
-        if (apr_pool_create(&msr->msc_rule_mptmp, msr->mp) != APR_SUCCESS) {
-            return -1;
-        }
-        mptmp = msr->msc_rule_mptmp;
-    }
-    else {
-        mptmp = msr->msc_rule_mptmp;
-        apr_pool_clear(mptmp);
     }
 
     tartab = apr_table_make(mptmp, 24);
@@ -1950,64 +1937,52 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
 /**
  *
  */
-#if defined(WITH_LUA)
 static apr_status_t msre_rule_process_lua(msre_rule *rule, modsec_rec *msr) {
-    apr_time_t time_before;
-    lua_State *L = NULL;
+    msre_actionset *acting_actionset = NULL;
+    char *my_error_msg = NULL;
     int rc;
 
-    if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "Lua: Executing script: %s", rule->script->name);
+    /* Choose the correct metadata/disruptive action actionset. */
+    acting_actionset = rule->actionset;
+    if (rule->chain_starter != NULL) {
+        acting_actionset = rule->chain_starter->actionset;
     }
 
-    time_before = apr_time_now();
-
-    /* Create new state. */
-    L = lua_open();
-    luaL_openlibs(L);
-   
-    /* Associate msr with the state. */
-    lua_pushlightuserdata(L, (void *)msr);
-    lua_setglobal(L, "__msr");
-
-    rc = lua_restore(L, rule->script);
-    if (rc) {
-        msr_log(msr, 1, "Lua: Failed to restore script with %i.", rc);
+    rc = lua_execute(rule, msr, &my_error_msg);
+    if (rc < 0) {
+        msr_log(msr, 1, "%s", my_error_msg);
         return -1;
     }
 
-    /* Execute script. */
-    if (lua_pcall(L, 0, 1, 0)) {
-        msr_log(msr, 1, "Lua: Script execution failed: %s", lua_tostring(L, -1));
-        return -1;
+    /* A non-NULL error message means the rule matched. */
+    if (my_error_msg != NULL) {
+        /* Perform non-disruptive actions. */
+        msre_perform_nondisruptive_actions(msr, rule, rule->actionset, msr->msc_rule_mptmp);
+
+        /* Perform disruptive actions, but only if
+         * this rule is not part of a chain.
+         */
+        if (rule->actionset->is_chained == 0) {
+            msre_perform_disruptive_actions(msr, rule, acting_actionset, msr->msc_rule_mptmp, my_error_msg);
+        }
     }
 
-    /* Obtain the result code. */
-    if (!lua_isnumber(L, -1)) {
-        msr_log(msr, 1, "Lua: Script failed to return a number value.");
-        return -1;
-    }
-
-    rc = lua_tonumber(L, -1);
-
-    /* Destroy state. */
-    lua_pop(L, 1);
-    lua_close(L);
-
-    /* Returns status code to caller. */
-    if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "Lua: Script completed in %" APR_TIME_T_FMT " usec, returning %i.",
-            (apr_time_now() - time_before), rc);
-    }
-
-    return (rc ? RULE_MATCH : RULE_NO_MATCH);
+    return rc;
 }
-#endif
 
 /**
  *
  */
 apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
+    /* Use a fresh memory sub-pool for processing each rule */
+    if (msr->msc_rule_mptmp == NULL) {
+        if (apr_pool_create(&msr->msc_rule_mptmp, msr->mp) != APR_SUCCESS) {
+            return -1;
+        }
+    } else {
+        apr_pool_clear(msr->msc_rule_mptmp);
+    }
+
     #if defined(WITH_LUA)
     if (rule->type == RULE_TYPE_LUA) {
         return msre_rule_process_lua(rule, msr);
