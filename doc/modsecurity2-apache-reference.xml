@@ -3461,8 +3461,8 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
       <title><literal>md5</literal></title>
 
       <para>This function calculates an MD5 hash from input. Note that the
-      computed hash is in a raw binary form and should be hex encoded to be
-      human readable (t:md5,t:hexEncode).</para>
+      computed hash is in a raw binary form and may need encoded to be useable
+      (EX: t:md5,t:hexEncode).</para>
     </section>
 
     <section>
@@ -3552,8 +3552,8 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
       <title><literal>sha1</literal></title>
 
       <para>This function calculates a SHA1 hash from input. Note that the
-      computed hash is in a raw binary form and should be hex encoded to be
-      human readable (t:sha1,t:hexEncode).</para>
+      computed hash is in a raw binary form and may need encoded to be useable
+      (EX: t:sha1,t:hexEncode).</para>
     </section>
 
     <section>
