@@ -611,7 +611,8 @@ int js_decode_nonstrict_inplace(unsigned char *input, long int input_len) {
                 count++;
                 i += 6;
             }
-            else if ((i + 3 < input_len) && (input[i + 1] == 'x')) {
+            else if (   (i + 3 < input_len) && (input[i + 1] == 'x')
+                     && VALID_HEX(input[i + 2]) && VALID_HEX(input[i + 3])) {
                 /* \xHH */
                 *d++ = x2c(&input[i + 2]);
                 count++;
