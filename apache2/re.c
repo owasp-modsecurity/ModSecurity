@@ -669,9 +669,9 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msre_rule *rule = rules[i];
-#if defined(PERFORMANCE_MEASUREMENT)
+        #if defined(PERFORMANCE_MEASUREMENT)
         apr_time_t time1 = 0;
-#endif
+        #endif
 
         /* Reset the rule interception flag */
         msr->rule_was_intercepted = 0;
@@ -782,29 +782,33 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             const char *fn = NULL;
             const char *id = NULL;
             const char *rev = NULL;
+
             if (rule->filename != NULL) {
                 fn = apr_psprintf(p, " [file \"%s\"] [line \"%d\"]", rule->filename, rule->line_num);
             }
+
             if (rule->actionset != NULL && rule->actionset->id != NULL) {
                 id = apr_psprintf(p, " [id \"%s\"]", rule->actionset->id);
             }
+
             if (rule->actionset != NULL && rule->actionset->rev != NULL) {
                 rev = apr_psprintf(p, " [rev \"%s\"]", rule->actionset->rev);
             }
+
             msr_log(msr, 4, "Recipe: Invoking rule %pp;%s%s%s.",
                     rule, (fn ? fn : ""), (id ? id : ""), (rev ? rev : ""));
             msr_log(msr, 5, "Rule %pp: %s", rule, rule->unparsed);
         }
 
-#if defined(PERFORMANCE_MEASUREMENT)
+        #if defined(PERFORMANCE_MEASUREMENT)
         time1 = apr_time_now();
-#endif
+        #endif
 
         rc = msre_rule_process(rule, msr);
 
-#if defined(PERFORMANCE_MEASUREMENT)
+        #if defined(PERFORMANCE_MEASUREMENT)
         rule->execution_time += (apr_time_now() - time1);
-#endif
+        #endif
 
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Rule returned %d.", rc);
