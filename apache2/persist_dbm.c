@@ -101,12 +101,10 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Failed to read from DBM file \"%s\": %s", log_escape(msr->mp,
             dbm_filename), get_apr_error(msr->mp, rc));
-        apr_sdbm_close(dbm);
         return NULL;
     }
     
     if (value->dptr == NULL) { /* Key not found in DBM file. */
-        apr_sdbm_close(dbm);
         return NULL;
     }
 
