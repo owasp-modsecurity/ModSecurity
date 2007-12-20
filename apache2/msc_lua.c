@@ -83,12 +83,6 @@ char *lua_compile(msc_script **script, const char *filename, apr_pool_t *pool) {
             filename, lua_tostring(L, -1));
     }
 
-    /* Compile script. */
-    // lua_pcall(L, 0, 0, 0);
-
-    /* Find the execution entry point. */
-    // lua_getglobal(L, "main");
-
     /* Dump the script into binary form. */
     dump.pool = pool;
     dump.parts = apr_array_make(pool, 128, sizeof(msc_script_part *));
@@ -136,6 +130,7 @@ static int l_getvar(lua_State *L) {
     char *varname = NULL;
     char *param = NULL;
     modsec_rec *msr = NULL;
+    msre_rule *rule = NULL;
     char *my_error_msg = NULL;
 
     /* Retrieve parameters. */
@@ -145,21 +140,27 @@ static int l_getvar(lua_State *L) {
     lua_getglobal(L, "__msr");
     msr = (modsec_rec *)lua_topointer(L, -1);
 
+    /* Retrieve rule. */
+    lua_getglobal(L, "__rule");
+    rule = (msre_rule *)lua_topointer(L, -1);
+
     /* Resolve variable $varname. */
-    param = strchr(varname, ':');
+    param = strchr(varname, '.');
     if (param != NULL) {
         *param = '\0';
         param++;
     }
 
     msre_var *var = msre_create_var_ex(msr->msc_rule_mptmp, msr->modsecurity->msre,
-        varname, NULL, msr, &my_error_msg);
+        varname, param, msr, &my_error_msg);
 
     if (var == NULL) {
         msr_log(msr, 1, "SecRuleScript: Failed to resolve variable: %s", varname);
         return 0;
     } else {
-        msre_var *vx = generate_single_var(msr, var, param, msr->msc_rule_mptmp);
+        msre_var *vx = NULL;
+
+        vx = generate_single_var(msr, var, rule, msr->msc_rule_mptmp);
         if (vx != NULL) {
             /* Transform the variable if a list of transformation
              * functions has been supplied.
@@ -186,12 +187,12 @@ static int l_getvar(lua_State *L) {
                     rc = tfn->execute(msr->msc_rule_mptmp, vx->value, vx->value_len, &vx->value, &vx->value_len);
 
                     if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "T (%d) %s: \"%s\"", rc, tfn->name,
-                        log_escape_nq_ex(msr->msc_rule_mptmp, vx->value, vx->value_len));
+                        msr_log(msr, 9, "T (%d) %s: \"%s\"", rc, tfn->name,
+                            log_escape_nq_ex(msr->msc_rule_mptmp, vx->value, vx->value_len));
+                    }
                 }
-                }
-            } else
-            if (lua_isstring(L, 2)) { /* The second parameter may be a simple string? */
+            }
+            else if (lua_isstring(L, 2)) { /* The second parameter may be a simple string? */
                 msre_tfn_metadata *tfn = NULL;
                 char *name = NULL;
                 int rc = 0;
@@ -254,6 +255,10 @@ int lua_execute(msre_rule *rule, modsec_rec *msr, char **error_msg) {
     /* Associate msr with the state. */
     lua_pushlightuserdata(L, (void *)msr);
     lua_setglobal(L, "__msr");
+
+    /* Associate rule with the state. */
+    lua_pushlightuserdata(L, (void *)rule);
+    lua_setglobal(L, "__rule");
 
     /* Register functions. */
     luaL_register(L, "m", mylib);
