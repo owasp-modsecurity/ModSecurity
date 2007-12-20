@@ -9,6 +9,7 @@
  *
  */
 #include <limits.h>
+#include <apr_lib.h>
 
 #include "modsecurity.h"
 #include "msc_logging.h"
@@ -16,6 +17,16 @@
 #include "http_log.h"
 
 #include "msc_lua.h"
+
+static const char *configuration_relative_path(apr_pool_t *pool, const char *parent_filename, const char *filename) {
+    if (filename == NULL) return NULL;
+    // TODO Support paths on operating systems other than Unix.
+    if (filename[0] == '/') return filename;
+
+    return apr_pstrcat(pool, apr_pstrndup(pool, parent_filename,
+        strlen(parent_filename) - strlen(apr_filepath_name_get(parent_filename))),
+        filename, NULL);
+}
 
 /* -- Directory context creation and initialisation -- */
 
@@ -1286,8 +1297,8 @@ static const char *cmd_rule_inheritance(cmd_parms *cmd, void *_dcfg, int flag) {
 static const char *cmd_rule_script(cmd_parms *cmd, void *_dcfg, const char *p1,
     const char *p2)
 {
-    // TODO Support script filenames relative to the configuration file.
-    return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_LUA, p1, p2, NULL);
+    const char *filename = configuration_relative_path(cmd->pool, cmd->directive->filename, p1);
+    return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_LUA, filename, p2, NULL);
 }
 #endif
 
