@@ -1,4 +1,12 @@
 #!/usr/bin/perl
+#
+# Run unit tests.
+#
+# Syntax:
+#          All: run-tests.pl
+#	 All in file: run-tests.pl file
+#	 Nth in file: run-tests.pl file N
+#
 use strict;
 use File::Basename qw(basename dirname);
 
@@ -10,7 +18,7 @@ my $PASSED = 0;
 my $TOTAL = 0;
 
 if (defined $ARGV[0]) {
-	runfile(dirname($ARGV[0]), basename($ARGV[0]));
+	runfile(dirname($ARGV[0]), basename($ARGV[0]), $ARGV[1]);
 	done();
 }
 
@@ -32,7 +40,7 @@ done();
 
 
 sub runfile {
-	my($dir, $cfg) = @_;
+	my($dir, $cfg, $testnum) = @_;
 	my $fn = "$dir/$cfg";
 	my @data = ();
 	my $edata;
@@ -54,8 +62,11 @@ sub runfile {
 
 	msg("\nLoaded ".@C." tests from $fn");
 	for my $t (@C) {
+		$n++;
+		next if (defined $testnum and $n != $testnum);
+
 		my %t = %{$t || {}};
-		my $id = sprintf("%6d", $n + 1);
+		my $id = sprintf("%6d", $n);
 		my $in = $t{input};
 		my $out = escape($t{output}); # Escape so we can send via commandline
 		quit(1, "Failed to interpret output \"$cfg\": $@") if ($@);
@@ -76,7 +87,6 @@ sub runfile {
 		print TEST "$in";
 		close TEST;
 
-		$n++;
 
 		$rc = $?;
 		$pass += $rc ? 0 : 1;
@@ -84,10 +94,10 @@ sub runfile {
 		
 	}
 
-	$TOTAL += $n;
+	$TOTAL += $testnum ? 1 : $n;
 	$PASSED += $pass;
 
-	msg(sprintf("Passed: %2d; Failed %2d", $pass, ($n - $pass)));
+	msg(sprintf("Passed: %2d; Failed %2d", $pass, $testnum ? (1 - $pass) : ($n - $pass)));
 }
 
 sub escape {

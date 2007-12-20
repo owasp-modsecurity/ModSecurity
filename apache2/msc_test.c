@@ -323,7 +323,7 @@ int main(int argc, const char * const argv[])
     type = argv[1];
     name = argv[2];
     param_len = strlen(argv[3]);
-    param = apr_pmemdup(g_mp, argv[3], param_len);
+    param = (unsigned char *)apr_pstrmemdup(g_mp, argv[3], param_len);
     unescape_inplace(param, &param_len);
     if (argc >= 5) {
         returnval = argv[4];
