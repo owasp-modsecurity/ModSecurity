@@ -13,13 +13,13 @@
 
 #include "modsecurity.h"
 
-int DSOLOCAL normalise_path_inplace(unsigned char *input, int len, int win);
+int DSOLOCAL normalise_path_inplace(unsigned char *input, int len, int win, int *changed);
 
 int DSOLOCAL parse_boolean(const char *input);
 
 int DSOLOCAL parse_name_eq_value(apr_pool_t *mp, const char *input, char **name, char **value);
 
-char DSOLOCAL *url_encode(apr_pool_t *mp, char *input, unsigned int input_len);
+char DSOLOCAL *url_encode(apr_pool_t *mp, char *input, unsigned int input_len, int *changed);
 
 char DSOLOCAL *strnurlencat(char *destination, char *source, unsigned int maxlen);
 
@@ -68,9 +68,9 @@ char DSOLOCAL *_log_escape(apr_pool_t *p, const unsigned char *input,
 
 int DSOLOCAL js_decode_nonstrict_inplace(unsigned char *input, long int input_len);
 
-int DSOLOCAL urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_length);
+int DSOLOCAL urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_length, int * changed);
 
-int DSOLOCAL urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_length, int *invalid_count);
+int DSOLOCAL urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_length, int *invalid_count, int *changed);
 
 int DSOLOCAL html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int len);
 

@@ -279,12 +279,13 @@ static int msre_fn_urlDecode_execute(apr_pool_t *mptmp, unsigned char *input,
 {
     long int length;
     int invalid_count;
+    int changed;
 
-    length = urldecode_nonstrict_inplace_ex(input, input_len, &invalid_count);
+    length = urldecode_nonstrict_inplace_ex(input, input_len, &invalid_count, &changed);
     *rval = (char *)input;
     *rval_len = length;
     
-    return (*rval_len == input_len ? 0 : 1);
+    return changed;
 }
 
 /* urlDecodeUni */
@@ -293,12 +294,13 @@ static int msre_fn_urlDecodeUni_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
     long int length;
+    int changed;
 
-    length = urldecode_uni_nonstrict_inplace_ex(input, input_len);
+    length = urldecode_uni_nonstrict_inplace_ex(input, input_len, &changed);
     *rval = (char *)input;
     *rval_len = length;
     
-    return (*rval_len == input_len ? 0 : 1);
+    return changed;
 }
 
 /* urlEncode */
@@ -306,10 +308,12 @@ static int msre_fn_urlDecodeUni_execute(apr_pool_t *mptmp, unsigned char *input,
 static int msre_fn_urlEncode_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
-    *rval = url_encode(mptmp, (char *)input, input_len);
+    int changed;
+
+    *rval = url_encode(mptmp, (char *)input, input_len, &changed);
     *rval_len = strlen(*rval);
     
-    return (*rval_len == input_len ? 0 : 1);
+    return changed;
 }
 
 /* base64Encode */
@@ -430,10 +434,12 @@ static int msre_fn_escapeSeqDecode_execute(apr_pool_t *mptmp, unsigned char *inp
 static int msre_fn_normalisePath_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
-    *rval_len = normalise_path_inplace(input, input_len, 0);
+    int changed;
+
+    *rval_len = normalise_path_inplace(input, input_len, 0, &changed);
     *rval = (char *)input;
 
-    return (*rval_len == input_len ? 0 : 1);
+    return changed;
 }
 
 /* normalisePathWin */
@@ -441,10 +447,12 @@ static int msre_fn_normalisePath_execute(apr_pool_t *mptmp, unsigned char *input
 static int msre_fn_normalisePathWin_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
-    *rval_len = normalise_path_inplace(input, input_len, 1);
+    int changed;
+
+    *rval_len = normalise_path_inplace(input, input_len, 1, &changed);
     *rval = (char *)input;
 
-    return (*rval_len == input_len ? 0 : 1);
+    return changed;
 }
 
 /* ------------------------------------------------------------------------------ */

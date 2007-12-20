@@ -208,6 +208,7 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
     char *value = NULL;
     char *buf;
     int status;
+    int changed;
 
     if (s == NULL) return -1;
     if (inputlength == 0) return 1;
@@ -249,7 +250,7 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
         }
 
         if (status == 0) {
-            arg->name_len = urldecode_nonstrict_inplace_ex((unsigned char *)buf, arg->name_origin_len, invalid_count);
+            arg->name_len = urldecode_nonstrict_inplace_ex((unsigned char *)buf, arg->name_origin_len, invalid_count, &changed);
             arg->name = apr_pstrmemdup(msr->mp, buf, arg->name_len);
 
             if (s[i] == argument_separator) {
@@ -270,7 +271,7 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
             }
         }
         else {
-            arg->value_len = urldecode_nonstrict_inplace_ex((unsigned char *)value, arg->value_origin_len, invalid_count);
+            arg->value_len = urldecode_nonstrict_inplace_ex((unsigned char *)value, arg->value_origin_len, invalid_count, &changed);
             arg->value = apr_pstrmemdup(msr->mp, value, arg->value_len);
 
             add_argument(msr, arguments, arg);

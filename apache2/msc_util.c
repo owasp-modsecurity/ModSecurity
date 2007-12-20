@@ -74,9 +74,11 @@ int parse_name_eq_value(apr_pool_t *mp, const char *input, char **name, char **v
  *
  * IMP1 Assumes NUL-terminated
  */
-char *url_encode(apr_pool_t *mp, char *input, unsigned int input_len) {
+char *url_encode(apr_pool_t *mp, char *input, unsigned int input_len, int *changed) {
     char *rval, *d;
     unsigned int i, len;
+
+    *changed = 0;
 
     len = input_len * 3 + 1;
     d = rval = apr_palloc(mp, len);
@@ -89,6 +91,7 @@ char *url_encode(apr_pool_t *mp, char *input, unsigned int input_len) {
 
         if (c == ' ') {
             *d++ = '+';
+            *changed = 1;
         } else
         if ( (c == 42) || ((c >= 48)&&(c <= 57)) || ((c >= 65)&&(c <= 90))
             || ((c >= 97)&&(c <= 122))
@@ -98,6 +101,7 @@ char *url_encode(apr_pool_t *mp, char *input, unsigned int input_len) {
             *d++ = '%';
             c2x(c, (unsigned char *)d);
             d += 2;
+            *changed = 1;
         }
     }
 
@@ -700,9 +704,11 @@ int js_decode_nonstrict_inplace(unsigned char *input, long int input_len) {
  *
  * IMP1 Assumes NUL-terminated
  */
-int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len) {
+int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len, int *changed) {
     unsigned char *d = input;
     long int i, count;
+
+    *changed = 0;
 
     if (input == NULL) return -1;
 
@@ -732,6 +738,7 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
                         d++;
                         count++;
                         i += 6;
+                        *changed = 1;
                     } else {
                         /* Invalid data, skip %u. */
                         *d++ = input[i++];
@@ -761,6 +768,7 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
                         *d++ = x2c(&input[i + 1]);
                         count++;
                         i += 3;
+                        *changed = 1;
                     } else {
                         /* Not a valid encoding, skip this % */
                         *d++ = input[i++];
@@ -777,6 +785,7 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
             /* Character is not a percent sign. */
             if (input[i] == '+') {
                 *d++ = ' ';
+                *changed = 1;
             } else {
                 *d++ = input[i];
             }
@@ -795,9 +804,11 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
  *
  * IMP1 Assumes NUL-terminated
  */
-int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int *invalid_count) {
+int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int *invalid_count, int *changed) {
     unsigned char *d = (unsigned char *)input;
     long int i, count;
+
+    *changed = 0;
 
     if (input == NULL) return -1;
 
@@ -816,6 +827,7 @@ int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int
                     *d++ = x2c(&input[i + 1]);
                     count++;
                     i += 3;
+                    *changed = 1;
                 } else {
                     /* Not a valid encoding, skip this % */
                     *d++ = input[i++];
@@ -832,6 +844,7 @@ int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int
             /* Character is not a percent sign. */
             if (input[i] == '+') {
                 *d++ = ' ';
+                *changed = 1;
             } else {
                 *d++ = input[i];
             }
@@ -1071,16 +1084,21 @@ int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len) {
  *
  * IMP1 Assumes NUL-terminated
  */
-int normalise_path_inplace(unsigned char *input, int input_len, int win) {
+int normalise_path_inplace(unsigned char *input, int input_len, int win, int *changed) {
     unsigned char *d = input;
     int i, count;
+
+    *changed = 0;
 
     i = count = 0;
     while ((i < input_len)&&(count < input_len)) {
         char c = input[i];
 
         /* Convert backslash to forward slash on Windows only. */
-        if ((win)&&(c == '\\')) c = '/';
+        if ((win)&&(c == '\\')) {
+            c = '/';
+            *changed = 1;
+        }
 
         if (c == '/') {
             /* Is there a directory back-reference? Yes, we
@@ -1090,6 +1108,8 @@ int normalise_path_inplace(unsigned char *input, int input_len, int win) {
             if ((count >= 5)&&(*(d - 1) == '.')&&(*(d - 2) == '.')&&(*(d - 3) == '/')) {
                 unsigned char *cd = d - 4;
                 int ccount = count - 4;
+
+                *changed = 1;
 
                 /* Go back until we reach the beginning or a forward slash. */
                 while ((ccount > 0)&&(*cd != '/')) {
@@ -1107,12 +1127,14 @@ int normalise_path_inplace(unsigned char *input, int input_len, int win) {
                 /* Ignore the last two bytes. */
                 d -= 2;
                 count -= 2;
+                *changed = 1;
             } else
             /* Or are there just multiple occurences of forward slash? */
             if ((count >= 1)&&(*(d - 1) == '/')) {
                 /* Ignore the last one byte. */
                 d--;
                 count--;
+                *changed = 1;
             }
         }
 
