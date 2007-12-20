@@ -1002,10 +1002,6 @@ int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len) {
         if ((input[i] == '\\')&&(i + 1 < input_len)) {
             int c = -1;
         
-            /* ENH Should we handle \c as well?
-             *     See http://www.opengroup.org/onlinepubs/009695399/utilities/printf.html
-             */
-
             switch(input[i + 1]) {
                 case 'a' :
                     c = '\a';
@@ -1058,13 +1054,10 @@ int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len) {
                 }
                 else
                 if (ISODIGIT(input[i + 1])) { /* Octal. */
-                    char buf[10];
-                    int j = 0, l = 3;
+                    char buf[4];
+                    int j = 0;
 
-                    /* Up to 4 digits if the first digit is a zero. */
-                    if (input[i + 1] == '0') l = 4;
-
-                    while((i + 1 + j < input_len)&&(j <= l)) {
+                    while((i + 1 + j < input_len)&&(j < 3)) {
                         buf[j] = input[i + 1 + j];
                         j++;
                         if (!ISODIGIT(input[i + 1 + j])) break;
