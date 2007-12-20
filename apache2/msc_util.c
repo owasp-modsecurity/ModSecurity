@@ -733,20 +733,16 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
                         count++;
                         i += 6;
                     } else {
-                        /* Invalid data. */
-                        int j;
-
-                        for(j = 0; (j < 6)&&(i < input_len); j++) {
-                            *d++ = input[i++];
-                            count++;
-                        }
+                        /* Invalid data, skip %u. */
+                        *d++ = input[i++];
+                        *d++ = input[i++];
+                        count += 2;
                     }
                 } else {
-                    /* Not enough bytes available (4 data bytes were needed). */
-                    while(i < input_len) {
-                        *d++ = input[i++];
-                        count++;
-                    }
+                    /* Not enough bytes (4 data bytes), skip %u. */
+                    *d++ = input[i++];
+                    *d++ = input[i++];
+                    count += 2;
                 }
             }
             else {
@@ -766,25 +762,14 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
                         count++;
                         i += 3;
                     } else {
-                        /* Not a valid encoding, copy the raw input bytes. */
-                        *d++ = '%';
-                        *d++ = c1;
-                        *d++ = c2;
-                        count += 3;
-                        i += 3;
+                        /* Not a valid encoding, skip this % */
+                        *d++ = input[i++];
+                        count++;
                     }
                 } else {
-                    /* Not enough bytes available. */
-                
-                    *d++ = '%';
+                    /* Not enough bytes available, skip this % */
+                    *d++ = input[i++];
                     count++;
-                    i++;
-
-                    if (i + 1 < input_len) {
-                        *d++ = input[i];
-                        count++;
-                        i++;
-                    }
                 }
             }
         }
@@ -832,27 +817,16 @@ int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int
                     count++;
                     i += 3;
                 } else {
-                    /* Invalid encoding, just copy the raw bytes. */
-                    *d++ = '%';
-                    *d++ = c1;
-                    *d++ = c2;
-                    count += 3;
-                    i += 3;
+                    /* Not a valid encoding, skip this % */
+                    *d++ = input[i++];
+                    count ++;
                     (*invalid_count)++; /* parens quiet compiler warning */
                 }
             } else {
                 /* Not enough bytes available, copy the raw bytes. */
+                *d++ = input[i++];
+                count ++;
                 (*invalid_count)++; /* parens quiet compiler warning */
-
-                *d++ = '%';
-                count++;
-                i++;
-
-                if (i + 1 < input_len) {
-                    *d++ = input[i];
-                    count++;
-                    i++;
-                }
             }
         } else {
             /* Character is not a percent sign. */
