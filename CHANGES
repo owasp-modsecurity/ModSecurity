@@ -1,8 +1,10 @@
 
-17 Dec 2007 - 2.5.0-rc1
+20 Dec 2007 - 2.5.0-rc1
 -----------------------
 
 Changes since 2.5.0-dev2:
+
+ * Updated included Core Ruleset to version 1.5.1.
 
  * Changed how allow works. Used on its own it now allows phases 1-4. Used
    with parameter "phase" (e.g. SecAction allow:phase) it only affects

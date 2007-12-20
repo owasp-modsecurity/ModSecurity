@@ -1,3 +1,20 @@
+-------------------------
+Version 1.5.1 - 2007/12/6
+-------------------------
+
+False Positives Fixes:
+- Protocol Anomalies (file 21) - exception for Apache SSL pinger (Request: GET /)
+
+New Events:
+- 960019 - Detect HTTP/0.9 Requests
+  HTTP/0.9 request are not common these days. This rule will log by default,
+  and block in the blocking version of file 21
+  
+Other Fixes:
+- File 40, Rules 950004,950005 - Repaired the correction for the double
+  url decoding problem
+- File 55 contained empty regular expressions. Fixed.             
+
 ------------------------
 Version 1.5 - 2007/11/23
 ------------------------
@@ -154,8 +171,8 @@ Regular expressions fixes:
 - Command Injections now always require certain characters both before and after the command. Important since many are common English words (finger, mail)
 - The command injection wget is not searched in the UA header as it has different meaning there.
 - LDAP Fixed to reduce FPs:
-  + More accurate regular expressions
-  + high bit characters not accpeted between signature tokens.
+	+ More accurate regular expressions
+	+ high bit characters not accpeted between signature tokens.
 - Do not detect <?xml as a PHP tag in both PHP injection and PHP source leakage
 - Removed Java from automation UA
 - When validating encoding, added regexp based chained rule that accepts both %xx and %uxxxxx encoding bypassing a limitation of "@validateUrlEncoding"
