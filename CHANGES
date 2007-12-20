@@ -1,5 +1,7 @@
-14 Dec 2007 - 2.1.5-rc1
+20 Dec 2007 - 2.1.5-rc1
 -----------------------
+
+ * Updated included Core Ruleset to version 1.5.1.
 
  * Fixed issue where only the first phase 5 rule would run when the
    request was intercepted in an earlier phase.
