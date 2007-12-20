@@ -134,7 +134,7 @@ static int l_getvar(lua_State *L) {
     char *my_error_msg = NULL;
 
     /* Retrieve parameters. */
-    varname = luaL_checkstring(L, 1);
+    varname = (char *)luaL_checkstring(L, 1);
 
     /* Retrieve msr. */
     lua_getglobal(L, "__msr");
@@ -162,6 +162,9 @@ static int l_getvar(lua_State *L) {
 
         vx = generate_single_var(msr, var, rule, msr->msc_rule_mptmp);
         if (vx != NULL) {
+            char *rval = NULL;
+            long int rval_len = -1;
+
             /* Transform the variable if a list of transformation
              * functions has been supplied.
             */
@@ -184,7 +187,11 @@ static int l_getvar(lua_State *L) {
                         return 0;
                     }
 
-                    rc = tfn->execute(msr->msc_rule_mptmp, vx->value, vx->value_len, &vx->value, &vx->value_len);
+                    rc = tfn->execute(msr->msc_rule_mptmp, (unsigned char*)vx->value,
+                        vx->value_len, &rval, &rval_len);
+
+                    vx->value = rval;
+                    vx->value_len = rval_len;
 
                     if (msr->txcfg->debuglog_level >= 9) {
                         msr_log(msr, 9, "T (%d) %s: \"%s\"", rc, tfn->name,
@@ -207,7 +214,11 @@ static int l_getvar(lua_State *L) {
                     return 0;
                 }
 
-                rc = tfn->execute(msr->msc_rule_mptmp, vx->value, vx->value_len, &vx->value, &vx->value_len);
+                rc = tfn->execute(msr->msc_rule_mptmp, (unsigned char *)vx->value,
+                    vx->value_len, &rval, &rval_len);
+
+                vx->value = rval;
+                vx->value_len = rval_len;
 
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "T (%d) %s: \"%s\"", rc, tfn->name,
