@@ -158,13 +158,16 @@ static int msre_fn_compressWhitespace_execute(apr_pool_t *mptmp, unsigned char *
 {
     long int i, j, count;
     int changed = 0;
+    int inwhitespace = 0;
 
     i = j = count = 0;
     while(i < input_len) {
         if (isspace(input[i])||(input[i] == NBSP)) {
-            changed = 1;
+            if (inwhitespace) changed = 1;
+            inwhitespace = 1;
             count++;
         } else {
+            inwhitespace = 0;
             if (count) {
                 input[j] = ' ';
                 count = 0;
@@ -245,6 +248,10 @@ static int msre_fn_replaceComments_execute(apr_pool_t *mptmp, unsigned char *inp
         }
     }
 
+    if (incomment) {
+        input[j++] = ' ';
+    }
+
     *rval = (char *)input;
     *rval_len = j;
 
@@ -315,7 +322,7 @@ static int msre_fn_base64Encode_execute(apr_pool_t *mptmp, unsigned char *input,
     apr_base64_encode(*rval, (const char *)input, input_len);
     (*rval_len)--;
 
-    return 1;
+    return *rval_len ? 1 : 0;
 }
 
 /* base64Decode */
@@ -327,7 +334,7 @@ static int msre_fn_base64Decode_execute(apr_pool_t *mptmp, unsigned char *input,
     *rval = apr_palloc(mptmp, *rval_len);
     *rval_len = apr_base64_decode(*rval, (const char *)input);
 
-    return 1;
+    return *rval_len ? 1 : 0;
 }
 
 /* length */
