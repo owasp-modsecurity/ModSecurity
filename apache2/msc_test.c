@@ -12,10 +12,9 @@
 
 #include "modsecurity.h"
 #include "re.h"
+#include "pdf_protect.h"
 
 #define ISHEX(X) (((X >= '0')&&(X <= '9')) || ((X >= 'a')&&(X <= 'f')) || ((X >= 'A')&&(X <= 'F')))
-
-#define TFNS_DIR "t/tfns"
 
 #define BUFLEN 8192
 
@@ -26,7 +25,8 @@
 #define RESULT_WRONGRET         -4
 
 /* Globals */
-apr_pool_t *mp = NULL;
+static apr_pool_t *g_mp = NULL;
+static modsec_rec *g_msr = NULL;
 msc_engine *modsecurity = NULL;
 
 
@@ -102,7 +102,7 @@ static unsigned char *unescape_inplace(unsigned char *str, apr_size_t *len)
 
 static char *escape(unsigned char *str, apr_size_t *len)
 {
-    char *new = apr_pcalloc(mp, (*len * 4) + 1);
+    char *new = apr_pcalloc(g_mp, (*len * 4) + 1);
     apr_size_t i, j;
     for (i = j = 0; i < *len; i++) {
         if ((str[i] >= 0x20) && (str[i] <= 0x7e)) {
@@ -121,28 +121,171 @@ static char *escape(unsigned char *str, apr_size_t *len)
 
 /* Testing functions */
 
-static int test_tfn(const char *name, unsigned char *input, long input_len, unsigned char **rval, long *rval_len, char **errmsg) 
+static int test_tfn(const char *name, unsigned char *input, apr_size_t input_len, unsigned char **rval, apr_size_t *rval_len, char **errmsg) 
 {
     int rc = -1;
     msre_tfn_metadata *metadata = NULL;
-    const apr_array_header_t *arr = apr_table_elts(modsecurity->msre->tfns);
     
-    metadata = (msre_tfn_metadata *)apr_table_get(modsecurity->msre->tfns, name);
-
     *errmsg = NULL;
 
+    /* Lookup the tfn */
+    metadata = msre_engine_tfn_resolve(modsecurity->msre, name);
+
     if (metadata == NULL) {
-        *errmsg = apr_psprintf(mp, "Failed to fetch TFN \"%s\".", name);
+        *errmsg = apr_psprintf(g_mp, "Failed to fetch tfn \"%s\".", name);
         return -1;
     }
 
-    rc = metadata->execute(mp, input, input_len, (char **)rval, rval_len);
-
+    /* Execute the tfn */
+    rc = metadata->execute(g_mp, input, (long)input_len, (char **)rval, (long *)rval_len);
     if (rc < 0) {
-        *errmsg = apr_psprintf(mp, "Failed to execute TFN \"%s\".", name);
+        *errmsg = apr_psprintf(g_mp, "Failed to execute tfn \"%s\".", name);
     }
 
     return rc;
+}
+
+static int test_op(const char *name, const char *param, const unsigned char *input, apr_size_t input_len, char **errmsg) 
+{
+    const char *args = apr_psprintf(g_mp, "@%s %s", name, param);
+    msre_ruleset *ruleset = NULL;
+    msre_rule *rule = NULL;
+    msre_var *var = NULL;
+    msre_op_metadata *metadata = NULL;
+    int rc = -1;
+
+    *errmsg = NULL;
+
+    /* Register UNIT_TEST variable */
+    msre_engine_variable_register(modsecurity->msre,
+        "UNIT_TEST",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        NULL,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* Lookup the operator */
+    metadata = msre_engine_op_resolve(modsecurity->msre, name);
+    if (metadata == NULL) {
+        *errmsg = apr_psprintf(g_mp, "Failed to fetch op \"%s\".", name);
+        return -1;
+    }
+
+    /* Create a ruleset/rule */
+    ruleset = msre_ruleset_create(modsecurity->msre, g_mp);
+    if (ruleset == NULL) {
+        *errmsg = apr_psprintf(g_mp, "Failed to create ruleset for op \"%s\".", name);
+        return -1;
+    }
+    rule = msre_rule_create(ruleset, "unit-test", 1, "UNIT_TEST", args, "t:none,pass,nolog", errmsg);
+    if (rule == NULL) {
+        *errmsg = apr_psprintf(g_mp, "Failed to create rule for op \"%s\": %s", name, *errmsg);
+        return -1;
+    }
+
+    /* Create a fake variable */
+    var = (msre_var *)apr_pcalloc(g_mp, sizeof(msre_var));
+    var->name = "UNIT_TEST";
+    var->value = apr_pstrmemdup(g_mp, (char *)input, input_len);
+    var->value_len = input_len;
+    var->metadata = msre_resolve_var(modsecurity->msre, var->name);
+
+    /* Initialize the operator parameter */
+    rc = metadata->param_init(rule, errmsg);
+    if (rc < 0) {
+        *errmsg = apr_psprintf(g_mp, "Failed to init op \"%s\": %s", name, *errmsg);
+        return rc;
+    }
+    
+    /* Execute the operator */
+    rc = metadata->execute(g_msr, rule, var, errmsg);
+    if (rc < 0) {
+        *errmsg = apr_psprintf(g_mp, "Failed to execute op \"%s\": %s", name, *errmsg);
+    }
+
+    return rc;
+}
+
+
+/* Initialization */
+static void init_msr() {
+    directory_config *dcfg = NULL;
+    request_rec *r = NULL;
+    r = (request_rec *)apr_pcalloc(g_mp, sizeof(request_rec));
+
+    dcfg = (directory_config *)apr_pcalloc(g_mp, sizeof(directory_config));
+    dcfg->is_enabled = 0;
+    dcfg->reqbody_access = 0;
+    dcfg->reqbody_inmemory_limit = REQUEST_BODY_DEFAULT_INMEMORY_LIMIT;
+    dcfg->reqbody_limit = REQUEST_BODY_DEFAULT_LIMIT;
+    dcfg->reqbody_no_files_limit = REQUEST_BODY_NO_FILES_DEFAULT_LIMIT;
+    dcfg->resbody_access = 0;
+    dcfg->of_limit = RESPONSE_BODY_DEFAULT_LIMIT;
+    dcfg->of_limit_action = RESPONSE_BODY_LIMIT_ACTION_REJECT;
+    dcfg->debuglog_fd = NULL;
+    dcfg->debuglog_name = NULL;
+    dcfg->debuglog_level = 0;
+    dcfg->cookie_format = 0;
+    dcfg->argument_separator = '&';
+    dcfg->rule_inheritance = 0;
+    dcfg->auditlog_flag = 0;
+    dcfg->auditlog_type = AUDITLOG_SERIAL;
+    dcfg->auditlog_fd = NULL;
+    dcfg->auditlog2_fd = NULL;
+    dcfg->auditlog_name = NULL;
+    dcfg->auditlog2_name = NULL;
+    dcfg->auditlog_storage_dir = NULL;
+    dcfg->auditlog_parts = "ABCFHZ";
+    dcfg->auditlog_relevant_regex = NULL;
+    dcfg->tmp_dir = guess_tmp_dir(g_mp);
+    dcfg->upload_dir = NULL;
+    dcfg->upload_keep_files = KEEP_FILES_OFF;
+    dcfg->upload_validates_files = 0;
+    dcfg->data_dir = NULL;
+    dcfg->webappid = "default";
+    dcfg->content_injection_enabled = 0;
+    dcfg->pdfp_enabled = 0;
+    dcfg->pdfp_secret = NULL;
+    dcfg->pdfp_timeout = 10;
+    dcfg->pdfp_token_name = "PDFPTOKEN";
+    dcfg->pdfp_only_get = 1;
+    dcfg->pdfp_method = PDF_PROTECT_METHOD_TOKEN_REDIRECTION;
+    dcfg->geo = NULL;
+    dcfg->cache_trans = MODSEC_CACHE_ENABLED;
+    dcfg->cache_trans_min = 15;
+    dcfg->cache_trans_max = 0;
+    dcfg->request_encoding = NULL;
+    dcfg->debuglog_level = 0;
+
+    g_msr = (modsec_rec *)apr_pcalloc(g_mp, sizeof(modsec_rec));
+    g_msr->modsecurity = modsecurity;
+    g_msr->mp = g_mp;
+    g_msr->r = r;
+    g_msr->r_early = r;
+    g_msr->request_time = apr_time_now();
+    g_msr->dcfg1 = NULL;
+    g_msr->usercfg = NULL;
+    g_msr->txcfg = dcfg;
+    g_msr->txid = "FAKE-TXID";
+    g_msr->error_messages = NULL;
+    g_msr->alerts = NULL;
+    g_msr->server_software = "FAKE-SERVER-SOFTWARE";
+    g_msr->local_addr = "127.0.0.1";
+    g_msr->local_port = 80;
+    g_msr->remote_addr = "127.0.0.1";
+    g_msr->remote_port = 1080;
+    g_msr->request_line = "GET /unit-tests HTTP/1.1";
+    g_msr->request_uri = "http://localhost/unit-tests";
+    g_msr->request_method = "GET";
+    g_msr->query_string = "";
+    g_msr->request_protocol = "HTTP/1.1";
+    g_msr->request_headers = NULL;
+    g_msr->hostname = "localhost";
+    g_msr->msc_rule_mptmp = g_mp;
+    g_msr->tx_vars = apr_table_make(g_mp, 10);
 }
 
 
@@ -156,39 +299,37 @@ int main(int argc, const char * const argv[])
     unsigned char input[BUFLEN];
     const char *type = NULL;
     const char *name = NULL;
-    unsigned char *expected = NULL;
+    unsigned char *param = NULL;
     const char *returnval = NULL;
-    char *p = NULL;
-    apr_size_t input_len = 0;
-    apr_size_t expected_len = 0;
     char *errmsg = NULL;
     unsigned char *out = NULL;
-    long out_len = 0;
+    apr_size_t input_len = 0;
+    apr_size_t param_len = 0;
+    apr_size_t out_len = 0;
     int rc = 0;
     int result = 0;
 
     apr_app_initialize(&argc, &argv, NULL);
     atexit(apr_terminate);
 
-    apr_pool_create(&mp, NULL);
-
     if (argc < 4) {
-        fprintf(stderr, "Usage: %s <type> <name> <expected> [<returnval>]\n", argv[0]);
+        fprintf(stderr, "Usage: %s <type> <name> <param> [<returnval>]\n", argv[0]);
         exit(1);
     }
 
-    modsecurity = modsecurity_create(mp, MODSEC_OFFLINE);
+    apr_pool_create(&g_mp, NULL);
+    modsecurity = modsecurity_create(g_mp, MODSEC_OFFLINE);
 
     type = argv[1];
     name = argv[2];
-    expected_len = strlen(argv[3]);
-    expected = apr_pmemdup(mp, argv[3], expected_len);
-    unescape_inplace(expected, &expected_len);
+    param_len = strlen(argv[3]);
+    param = apr_pmemdup(g_mp, argv[3], param_len);
+    unescape_inplace(param, &param_len);
     if (argc >= 5) {
         returnval = argv[4];
     }
 
-    if (apr_file_open_stdin(&fd, mp) != APR_SUCCESS) {
+    if (apr_file_open_stdin(&fd, g_mp) != APR_SUCCESS) {
         fprintf(stderr, "Failed to open stdin\n");
         exit(1);
     }
@@ -211,44 +352,78 @@ int main(int argc, const char * const argv[])
     memcpy(input, buf, BUFLEN);
     input_len = nbytes;
 
-    if (strcmp("tfns", type) == 0) {
-        /* TFNS */
+    if (strcmp("tfn", type) == 0) {
+        /* Transformations */
         int ret = returnval ? atoi(returnval) : -8888;
         rc = test_tfn(name, input, input_len, &out, &out_len, &errmsg);
-        if ((ret != -8888) && (rc != ret)) {
+        if (rc < 0) {
+            fprintf(stderr, "ERROR: %s\n", errmsg);
+            result = RESULT_ERROR;
+        }
+        else if ((ret != -8888) && (rc != ret)) {
             fprintf(stderr, "Returned %d (expected %d)\n", rc, ret);
             result = RESULT_WRONGRET;
         }
-        else if (expected_len != out_len) {
-            fprintf(stderr, "Lenth %" APR_SIZE_T_FMT " (expected %" APR_SIZE_T_FMT ")\n", out_len, expected_len);
+        else if (param_len != out_len) {
+            fprintf(stderr, "Lenth %" APR_SIZE_T_FMT " (param %" APR_SIZE_T_FMT ")\n", out_len, param_len);
             result = RESULT_WRONGSIZE;
         }
         else {
-            result = memcmp(expected, out, expected_len) ? RESULT_MISMATCHED : RESULT_SUCCESS;
+            result = memcmp(param, out, param_len) ? RESULT_MISMATCHED : RESULT_SUCCESS;
+        }
+
+        if (result != RESULT_SUCCESS) {
+            apr_size_t s0len = nbytes;
+            const char *s0 = escape(buf, &s0len);
+            apr_size_t s1len = out_len;
+            const char *s1 = escape(out, &s1len);
+            apr_size_t s2len = param_len;
+            const char *s2 = escape(param, &s2len);
+
+            fprintf(stderr, " Input: '%s' len=%" APR_SIZE_T_FMT "\n"
+                            "Output: '%s' len=%" APR_SIZE_T_FMT "\n"
+                            "Expect: '%s' len=%" APR_SIZE_T_FMT "\n",
+                            s0, nbytes, s1, out_len, s2, param_len);
+            exit(1);
         }
     }
-    else if (strcmp("operators", type) == 0) {
-        /* OPERATORS */
-        fprintf(stderr, "Type not implemented yet: \"%s\"\n", type);
-        exit(1);
+    else if (strcmp("op", type) == 0) {
+        /* Operators */
+        int ret = 0;
+        
+        if (!returnval) {
+            fprintf(stderr, "Return value required for type \"%s\"\n", type);
+            exit(1);
+        }
+        ret = atoi(returnval);
+
+        init_msr();
+
+        rc = test_op(name, (const char *)param, (const unsigned char *)input, input_len, &errmsg);
+        if (rc < 0) {
+            fprintf(stderr, "ERROR: %s\n", errmsg);
+            result = RESULT_ERROR;
+        }
+        else if (rc != ret) {
+            fprintf(stderr, "Returned %d (expected %d)\n", rc, ret);
+            result = RESULT_WRONGRET;
+        }
+        else {
+            result = RESULT_SUCCESS;
+        }
+
+        if (result != RESULT_SUCCESS) {
+            apr_size_t s0len = nbytes;
+            const char *s0 = escape(buf, &s0len);
+
+            fprintf(stderr, " Test: '@%s %s'\n"
+                            "Input: '%s' len=%" APR_SIZE_T_FMT "\n",
+                            name, param, s0, nbytes);
+            exit(1);
+        }
     }
     else {
         fprintf(stderr, "Unknown type: \"%s\"\n", type);
-        exit(1);
-    }
-
-    if (result != RESULT_SUCCESS) {
-        apr_size_t s0len = nbytes;
-        const char *s0 = escape(buf, &s0len);
-        apr_size_t s1len = out_len;
-        const char *s1 = escape(out, &s1len);
-        apr_size_t s2len = expected_len;
-        const char *s2 = escape(expected, &s2len);
-
-        fprintf(stderr, " Input: '%s' len=%" APR_SIZE_T_FMT "\n"
-                        "Output: '%s' len=%" APR_SIZE_T_FMT "\n"
-                        "Expect: '%s' len=%" APR_SIZE_T_FMT "\n",
-                        s0, nbytes, s1, out_len, s2, expected_len);
         exit(1);
     }
 

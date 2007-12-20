@@ -58,7 +58,7 @@ TESTOBJS = re.o re_operators.o re_actions.o re_tfns.o re_variables.o \
            msc_reqbody.o msc_geo.o acmp.o msc_lua.o
 
 msc_test: msc_test.c ${TESTOBJS}
-	@${CC} -I `${top_dir}/bin/${APXS} -q INCLUDEDIR` ${INCLUDES} ${DEFS} -L ${top_dir}/lib -o msc_test ${TESTOBJS} msc_test.c -lapr-1 -laprutil-1 -lpcre -lxml2 -llua5.1
+	@${CC} ${CFLAGS} -I `${top_dir}/bin/${APXS} -q INCLUDEDIR` ${INCLUDES} ${DEFS} -L ${top_dir}/lib -o msc_test ${TESTOBJS} msc_test.c -lapr-1 -laprutil-1 -lpcre -lxml2 -llua5.1
 
 test: msc_test
 	t/run-tests.pl

@@ -4,7 +4,7 @@
 	name => "verifyCC",
 	param => "\\d{15,16}",
 	input => "",
-	rc => 0,
+	ret => 0,
 },
 
 ### Non-matching
@@ -13,7 +13,7 @@
 	name => "verifyCC",
 	param => "\\d{15,16}",
 	input => "TestCase",
-	rc => 0,
+	ret => 0,
 },
 
 ### Bad CC#
@@ -22,7 +22,7 @@
 	name => "verifyCC",
 	param => "\\d{15,16}",
 	input => "01234567890123456",
-	rc => 0,
+	ret => 0,
 },
 
 ### Good CC#
@@ -31,5 +31,5 @@
 	name => "verifyCC",
 	param => "\\d{15,16}",
 	input => "372802490654059",
-	rc => 0,
+	ret => 1,
 },
