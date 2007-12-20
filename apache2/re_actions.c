@@ -1452,15 +1452,50 @@ static apr_status_t msre_action_setuid_execute(modsec_rec *msr, apr_pool_t *mptm
 }
 
 /* exec */
+static char *msre_action_exec_validate(msre_engine *engine, msre_action *action) {
+    char *filename = (char *)action->param;
+
+    /* TODO Support relative filenames. */
+
+    #ifdef WITH_LUA
+    /* Process Lua scripts internally. */
+    if (strlen(filename) > 4) {
+        char *p = filename + strlen(filename) - 4;
+        if ((p[0] == '.')&&(p[1] == 'l')&&(p[2] == 'u')&&(p[3] == 'a')) {
+            /* It's a Lua script. */
+            msc_script *script = NULL;
+
+            /* Compile script. */
+            char *msg = lua_compile(&script, filename, engine->mp);
+            if (msg != NULL) return msg;
+
+            action->param_data = script;
+        }
+    }
+    #endif
+
+    return NULL;
+}
+
 static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
-    char *script_output = NULL;
+    if (action->param_data != NULL) { /* Lua */
+        msc_script *script = (msc_script *)action->param_data;
+        char *my_error_msg = NULL;
 
-    int rc = apache2_exec(msr, action->param, NULL, &script_output);
-    if (rc != 1) {
-        msr_log(msr, 1, "Failed to execute: %s", action->param);
-        return 0;
+        if (lua_execute(script, msr, rule, &my_error_msg) < 0) {
+            msr_log(msr, 1, "%s", my_error_msg);
+            return 0;
+        }
+    } else { /* Execute as shell script. */
+        char *script_output = NULL;
+
+        int rc = apache2_exec(msr, action->param, NULL, &script_output);
+        if (rc != 1) {
+            msr_log(msr, 1, "Failed to execute: %s", action->param);
+            return 0;
+        }
     }
 
     return 1;
@@ -1932,7 +1967,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
-        NULL,
+        msre_action_exec_validate,
         NULL,
         msre_action_exec_execute
     );

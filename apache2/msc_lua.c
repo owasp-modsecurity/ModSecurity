@@ -79,7 +79,7 @@ char *lua_compile(msc_script **script, const char *filename, apr_pool_t *pool) {
 
     /* Find script. */
     if (luaL_loadfile(L, filename)) {
-        return apr_psprintf(pool, "ModSecurity: Failed to open script %s: %s",
+        return apr_psprintf(pool, "ModSecurity: Failed to compile script %s: %s",
             filename, lua_tostring(L, -1));
     }
 
@@ -244,7 +244,7 @@ static const struct luaL_Reg mylib[] = {
 /**
  *
  */
-int lua_execute(msre_rule *rule, modsec_rec *msr, char **error_msg) {
+int lua_execute(msc_script *script, modsec_rec *msr, msre_rule *rule, char **error_msg) {
     apr_time_t time_before;
     lua_State *L = NULL;
     int rc;
@@ -253,7 +253,7 @@ int lua_execute(msre_rule *rule, modsec_rec *msr, char **error_msg) {
     *error_msg = NULL;
 
     if (msr->txcfg->debuglog_level >= 8) {
-        msr_log(msr, 8, "Lua: Executing script: %s", rule->script->name);
+        msr_log(msr, 8, "Lua: Executing script: %s", script->name);
     }
 
     time_before = apr_time_now();
@@ -268,13 +268,15 @@ int lua_execute(msre_rule *rule, modsec_rec *msr, char **error_msg) {
     lua_setglobal(L, "__msr");
 
     /* Associate rule with the state. */
-    lua_pushlightuserdata(L, (void *)rule);
-    lua_setglobal(L, "__rule");
+    if (rule != NULL) {
+        lua_pushlightuserdata(L, (void *)rule);
+        lua_setglobal(L, "__rule");
+    }
 
     /* Register functions. */
     luaL_register(L, "m", mylib);
 
-    rc = lua_restore(L, rule->script);
+    rc = lua_restore(L, script);
     if (rc) {
         *error_msg = apr_psprintf(msr->mp, "Lua: Failed to restore script with %i.", rc);
         return -1;
@@ -291,8 +293,11 @@ int lua_execute(msre_rule *rule, modsec_rec *msr, char **error_msg) {
         return -1;
     }
 
-    // TODO Who will need to free msg?
+    // Get the response from the script.
     *error_msg = (char *)lua_tostring(L, -1);
+    if (*error_msg != NULL) {
+        *error_msg = apr_pstrdup(msr->mp, *error_msg);
+    }
 
     /* Destroy state. */
     lua_pop(L, 1);
