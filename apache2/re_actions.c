@@ -1484,7 +1484,7 @@ static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
         msc_script *script = (msc_script *)action->param_data;
         char *my_error_msg = NULL;
 
-        if (lua_execute(script, msr, rule, &my_error_msg) < 0) {
+        if (lua_execute(script, NULL, msr, rule, &my_error_msg) < 0) {
             msr_log(msr, 1, "%s", my_error_msg);
             return 0;
         }

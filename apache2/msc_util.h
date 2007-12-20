@@ -78,4 +78,8 @@ int DSOLOCAL ansi_c_sequences_decode_inplace(unsigned char *input, int len);
 
 char DSOLOCAL *modsec_build(apr_pool_t *mp);
 
+int DSOLOCAL is_empty_string(const char *string);
+
+char DSOLOCAL *resolve_relative_path(apr_pool_t *pool, const char *parent_filename, const char *filename);
+
 #endif

@@ -1966,7 +1966,7 @@ static apr_status_t msre_rule_process_lua(msre_rule *rule, modsec_rec *msr) {
         acting_actionset = rule->chain_starter->actionset;
     }
 
-    rc = lua_execute(rule->script, msr, rule, &my_error_msg);
+    rc = lua_execute(rule->script, NULL, msr, rule, &my_error_msg);
     if (rc < 0) {
         msr_log(msr, 1, "%s", my_error_msg);
         return -1;

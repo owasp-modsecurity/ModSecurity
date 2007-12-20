@@ -244,7 +244,7 @@ static const struct luaL_Reg mylib[] = {
 /**
  *
  */
-int lua_execute(msc_script *script, modsec_rec *msr, msre_rule *rule, char **error_msg) {
+int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rule, char **error_msg) {
     apr_time_t time_before;
     lua_State *L = NULL;
     int rc;
@@ -288,7 +288,12 @@ int lua_execute(msc_script *script, modsec_rec *msr, msre_rule *rule, char **err
     /* Execute main() */
     lua_getglobal(L, "main");
 
-    if (lua_pcall(L, 0, 1, 0)) {
+    /* Put the parameter on the stack. */
+    if (param != NULL) {
+        lua_pushlstring(L, param, strlen(param));
+    }
+
+    if (lua_pcall(L, ((param != NULL) ? 1 : 0), 1, 0)) {
         *error_msg = apr_psprintf(msr->mp, "Lua: Script execution failed: %s", lua_tostring(L, -1));
         return -1;
     }

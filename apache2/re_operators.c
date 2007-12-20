@@ -1237,44 +1237,99 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
 }
 
 /* inspectFile */
-static int msre_op_inspectFile_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
-    char **error_msg)
-{
-    char *script_output = NULL;
-    char const *argv[5];
-    const char *approver_script = rule->op_param;
-    const char *target_file = apr_pstrmemdup(msr->mp, var->value, var->value_len);
+
+static int msre_op_inspectFile_init(msre_rule *rule, char **error_msg) {
+    char *filename = (char *)rule->op_param;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    msr_log(msr, 4, "Executing %s to inspect %s.", approver_script, target_file);
-
-    argv[0] = approver_script;
-    argv[1] = target_file;
-    argv[2] = NULL;    
-
-    if (apache2_exec(msr, approver_script, (const char **)argv, &script_output) <= 0) {
-        *error_msg = apr_psprintf(msr->mp, "Execution of the approver script \"%s\" failed (invocation failed).",
-            log_escape(msr->mp, approver_script));
+    if ((filename == NULL)||(is_empty_string(filename))) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Operator @inspectFile requires parameter.");
         return -1;
     }
 
-    if (script_output == NULL) {
-        *error_msg = apr_psprintf(msr->mp, "Execution of the approver script \"%s\" failed (no output).",
-            log_escape(msr->mp, approver_script));
-        return -1;
+    filename = resolve_relative_path(rule->ruleset->mp, rule->filename, filename);
+
+    #ifdef WITH_LUA
+    // TODO Write & use string_ends(s, e).
+    if (strlen(rule->op_param) > 4) {
+        char *p = filename + strlen(filename) - 4;
+        if ((p[0] == '.')&&(p[1] == 'l')&&(p[2] == 'u')&&(p[3] == 'a'))
+        {
+            msc_script *script = NULL;
+
+            /* Compile script. */
+            *error_msg = lua_compile(&script, filename, rule->ruleset->mp);
+            if (*error_msg != NULL) return -1;
+
+            rule->op_param_data = script;
+        }
+    }
+    #endif
+
+    if (rule->op_param_data == NULL) {
+        // TODO Verify the script exists and that we have
+        // the rights to execute it.
     }
 
-    if (script_output[0] != '1') {
-        *error_msg = apr_psprintf(msr->mp, "File \"%s\" rejected by the approver script \"%s\": %s",
-            log_escape(msr->mp, target_file), log_escape(msr->mp, approver_script),
-            log_escape_nq(msr->mp,  script_output));
-        return 1; /* Match. */
-    }
+    return 1;
+}
 
-    /* No match. */
-    return 0;
+static int msre_op_inspectFile_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
+    char **error_msg)
+{
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (rule->op_param_data == NULL) {
+        /* Execute externally, as native binary/shell script. */
+        char *script_output = NULL;
+        char const *argv[5];
+        const char *approver_script = rule->op_param;
+        const char *target_file = apr_pstrmemdup(msr->mp, var->value, var->value_len);
+
+        msr_log(msr, 4, "Executing %s to inspect %s.", approver_script, target_file);
+
+        argv[0] = approver_script;
+        argv[1] = target_file;
+        argv[2] = NULL;    
+
+        if (apache2_exec(msr, approver_script, (const char **)argv, &script_output) <= 0) {
+            *error_msg = apr_psprintf(msr->mp, "Execution of the approver script \"%s\" failed (invocation failed).",
+                log_escape(msr->mp, approver_script));
+            return -1;
+        }
+
+        if (script_output == NULL) {
+            *error_msg = apr_psprintf(msr->mp, "Execution of the approver script \"%s\" failed (no output).",
+                log_escape(msr->mp, approver_script));
+            return -1;
+        }
+
+        if (script_output[0] != '1') {
+            *error_msg = apr_psprintf(msr->mp, "File \"%s\" rejected by the approver script \"%s\": %s",
+                log_escape(msr->mp, target_file), log_escape(msr->mp, approver_script),
+                log_escape_nq(msr->mp,  script_output));
+            return 1; /* Match. */
+        }
+
+        /* No match. */
+        return 0;
+    } else {
+        /* Execute internally, as Lua script. */
+        char *target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
+        msc_script *script = (msc_script *)rule->op_param_data;
+        int rc;
+
+        rc = lua_execute(script, target, msr, rule, error_msg);
+        if (rc < 0) {
+            /* Error. */
+            return -1;
+        }
+
+        return rc;
+    }
 }
 
 /* validateByteRange */
@@ -1867,7 +1922,7 @@ void msre_engine_register_default_operators(msre_engine *engine) {
     /* inspectFile */
     msre_engine_op_register(engine,
         "inspectFile",
-        NULL,
+        msre_op_inspectFile_init,
         msre_op_inspectFile_execute
     );
 

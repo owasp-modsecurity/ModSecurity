@@ -339,9 +339,8 @@
       </listitem>
 
       <listitem>
-        <para>Add one line to your configuration to load libxml2:
-        <filename moreinfo="none">LoadFile
-        /usr/lib/libxml2.so</filename></para>
+        <para>Add one line to your configuration to load libxml2: <filename
+        moreinfo="none">LoadFile /usr/lib/libxml2.so</filename></para>
       </listitem>
 
       <listitem>
@@ -420,13 +419,13 @@
     "allow" rules or to correct any false positives in the Core rules as they
     are applied to your site.</para>
 
-    <para><emphasis>Note</emphasis></para>
-
-    <para>It is highly encouraged that you do not edit the Core rules files
-    themselves but rather place all changes (such as
-    <literal>SecRuleRemoveByID</literal>, etc...) in your custom rules file.
-    This will allow for easier upgrading as newer Core rules are released by
-    Breach Security on the ModSecurity website.</para>
+    <note>
+      <para>It is highly encouraged that you do not edit the Core rules files
+      themselves but rather place all changes (such as
+      <literal>SecRuleRemoveByID</literal>, etc...) in your custom rules file.
+      This will allow for easier upgrading as newer Core rules are released by
+      Breach Security on the ModSecurity website.</para>
+    </note>
 
     <section>
       <title><literal>SecAction</literal></title>
@@ -690,7 +689,7 @@ SecAuditLogStorageDir logs/audit
         <listitem>
           <para><literal moreinfo="none">K</literal> - This part contains a
           full list of every rule that matched (one per line) in the order
-          they were matched.</para>
+          they were matched. Supported as of v2.5.0</para>
         </listitem>
 
         <listitem>
@@ -1798,8 +1797,13 @@ ServerAlias www.app2.com
       optional parameter is the list of actions whose meaning is identical to
       that of <literal>SecRule</literal>.</para>
 
-      <para><emphasis>Syntax:</emphasis> SecRuleScript /path/to/script.lua
-      [ACTIONS]</para>
+      <para><emphasis>Syntax:</emphasis> <literal>SecRuleScript
+      /path/to/script.lua [ACTIONS]</literal></para>
+
+      <para>The first parameter, path to the script, can be absolute or
+      relative to the configuration file in which
+      <literal>SecRuleScript</literal> resides. This allows you to place your
+      script in the same folder as the configuration files using them.</para>
 
       <para>Example script:</para>
 
@@ -1819,8 +1823,10 @@ function main()
     var2 = m.getvar("REQUEST_URI", "normalisePath");
 
     -- Retrieve one variable, applying several transformation functions.
-    -- Notice how the second parameter is now a list.
-    var3 = m.getvar("ARGS:p", { "lowercase", "compressWhitespace" } );
+    -- The second parameter is now a list. You should note that m.getvar()
+    -- requires the use of comma to separate collection names from
+    -- variable names. This is because only one variable is returned.
+    var3 = m.getvar("ARGS.p", { "lowercase", "compressWhitespace" } );
 
     -- If you want this rule to match return a string
     -- containing the error message. It is a good idea to mention
@@ -1830,6 +1836,13 @@ function main()
     -- Otherwise, simply return null.
     return null;
 end</programlisting>
+
+      <note>
+        <para>Go to <ulink url="http://www.lua.org">http://www.lua.org</ulink>
+        to find more about the Lua programming language. The reference manual
+        too is available online, at <ulink
+        url="http://www.lua.org/manual/5.1/">http://www.lua.org/manual/5.1/</ulink>.</para>
+      </note>
     </section>
 
     <section>
@@ -2412,7 +2425,7 @@ SecRule <emphasis>ENV:tag</emphasis> "suspicious"</programlisting>
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecRule REMOTE_ADDR "<emphasis>@geoLookup</emphasis>" chain,drop,msg:'Non-UK IP address'
+      <programlisting format="linespecific">SecRule REMOTE_ADDR "<emphasis>@geoLookup</emphasis>" "chain,drop,msg:'Non-UK IP address'"
 SecRule GEO:COUNTRY_CODE "!@streq UK"</programlisting>
     </section>
 
@@ -3913,27 +3926,42 @@ SecRule IP:AUTH_ATTEMPT "@gt 25" \
       <title><literal>exec</literal></title>
 
       <para><emphasis>Description:</emphasis> Executes an external
-      script/binary supplied as parameter.</para>
+      script/binary supplied as parameter. As of v2.5, when the support for
+      Lua scripting is enabled, and the parameter supplied to
+      <literal>exec</literal> is a Lua script (detected by the
+      <filename>.lua</filename> extension) the script will be processed
+      <emphasis>internally</emphasis>. This means you will get direct access
+      to the internal request context from the script. Please read the
+      <literal>SecRuleScript</literal> documentation for more details on how
+      to write Lua scripts.</para>
 
       <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
-    "log,<emphasis>exec:/usr/local/apache/bin/test.sh</emphasis>,phase:1"</programlisting>
+      <programlisting format="linespecific"># The following is going to execute /usr/local/apache/bin/test.sh
+# as a shell script on rule match.
+SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
+    "log,<emphasis>exec:/usr/local/apache/bin/test.sh</emphasis>"
 
-      <para><emphasis>Note</emphasis></para>
+# The following is going to process /usr/local/apache/conf/exec.lua
+# internally as a Lua script on rule match, provided ModSecurity was
+# compiled with Lua support enabled.
+SecRule ARGS:p attack log,<emphasis>exec:/usr/local/apache/conf/exec.lua</emphasis></programlisting>
 
-      <para>This directive does not effect a primary action if it exists. This
-      action will always call script with no parameters, but providing all
-      information in the environment. All the usual CGI environment variables
-      will be there. You can have one binary executed per filter match.
-      Execution will add the header mod_security-executed to the list of
-      request headers. You should be aware that forking a threaded process
-      results in all threads being replicated in the new process. Forking can
-      therefore incur larger overhead in multithreaded operation. The script
-      you execute must write something (anything) to stdout. If it doesn't
-      ModSecurity will assume execution didn't work.</para>
+      <note>
+        <para>This directive does not effect a primary action if it exists.
+        This action will always call script with no parameters, but providing
+        all information in the environment. All the usual CGI environment
+        variables will be there. You can have one binary executed per filter
+        match. Execution will add the header mod_security-executed to the list
+        of request headers. You should be aware that forking a threaded
+        process results in all threads being replicated in the new process.
+        Forking can therefore incur larger overhead in multithreaded
+        operation. The script you execute must write something (anything) to
+        stdout. If it doesn't ModSecurity will assume execution didn't
+        work.</para>
+      </note>
     </section>
 
     <section>
@@ -4847,11 +4875,37 @@ SecRule ARGS:route "!<emphasis>@endsWith %{REQUEST_ADDR}</emphasis>" t:none,deny
 
       <para><emphasis>Description:</emphasis> Executes the external
       script/binary given as parameter to the operator against every file
-      extracted from the request.</para>
+      extracted from the request. As of v2.5, if the supplied filename is not
+      absolute it is treated as relative to the directory in which the
+      configuration file resides. Also as of v2.5 if the filename is
+      determined to be a Lua script (based on its extension) and the Lua
+      support is compiled in, the script will be processed by the internal
+      engine. As such it will have full access to the ModSecurity
+      context.</para>
 
-      <para>Example:</para>
+      <para>Example of using an external binary/script:</para>
 
-      <programlisting format="linespecific">SecRule FILES_TMPNAMES "<emphasis>@inspectFile</emphasis> /opt/apache/bin/inspect_script.pl"</programlisting>
+      <programlisting format="linespecific"># Execute external script to validate uploaded files.
+SecRule FILES_TMPNAMES "<emphasis>@inspectFile</emphasis> /opt/apache/bin/inspect_script.pl"</programlisting>
+
+      <para>Example of using Lua script:</para>
+
+      <programlisting>SecRule FILES_TMPNANMES "@inspectFile <emphasis>inspect.lua</emphasis>"</programlisting>
+
+      <para>Script <filename>inspect.lua</filename>:</para>
+
+      <programlisting>function main(filename)
+    -- Do something to the file to verify it. In this example, we
+    -- read up to 10 characters from the beginning of the file.
+    local f = io.open(filename, "rb");
+    local d = f:read(10);
+    f:close();
+   
+    -- Return null if there is no reason to believe there is ansything
+    -- wrong with the file (no match). Returning any text will be taken
+    -- to mean a match should be trigerred.
+    return null;
+end</programlisting>
     </section>
 
     <section>

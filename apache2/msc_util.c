@@ -16,6 +16,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <apr_lib.h>
+
 /* NOTE: Be careful as these can ONLY be used on static values for X.
  * (i.e. VALID_HEX(c++) will NOT work)
  */
@@ -1175,4 +1177,29 @@ char *modsec_build(apr_pool_t *mp) {
                             atoi(MODSEC_VERSION_MAINT),
                             build_type,
                             atoi(MODSEC_VERSION_RELEASE));
+}
+
+int is_empty_string(const char *string) {
+    unsigned int i;
+
+    if (string == NULL) return 1;
+    if (strlen(string) == 0) return 1;
+
+    for(i = 0; i < strlen(string); i++) {
+        if (!isspace(string[i])) {
+            return 0;
+        }
+    }        
+
+    return 1;
+}
+
+char *resolve_relative_path(apr_pool_t *pool, const char *parent_filename, const char *filename) {
+    if (filename == NULL) return NULL;
+    // TODO Support paths on operating systems other than Unix.
+    if (filename[0] == '/') return (char *)filename;
+
+    return apr_pstrcat(pool, apr_pstrndup(pool, parent_filename,
+        strlen(parent_filename) - strlen(apr_filepath_name_get(parent_filename))),
+        filename, NULL);
 }
