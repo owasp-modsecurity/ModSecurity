@@ -41,14 +41,14 @@
 
 ### Invalid Sequences
 # \8 and \9 are not octal
-# \666 is a byte overflow (0x1b6) and should be truncated to a byte as \xff
+# \666 is a byte overflow (0x1b6) and should be truncated to a byte as 0xb6
 # \xag and \xga are not hex,
 # \0123 is \012 + '3'
 {
 	type => "tfn",
 	name => "escapeSeqDecode",
 	input => "\\8\\9\\666\\xag\\xga\\0123",
-	output => "89\xffxagxga\x0a3",
+	output => "89\xb6xagxga\x0a3",
 	ret => 1,
 },
 
@@ -72,6 +72,28 @@
 	name => "escapeSeqDecode",
 	input => "\\x\\x0\0",
 	output => "xx0\0",
+	ret => 1,
+},
+# Octal at end
+{
+	type => "tfn",
+	name => "escapeSeqDecode",
+	input => "\\0",
+	output => "\x00",
+	ret => 1,
+},
+{
+	type => "tfn",
+	name => "escapeSeqDecode",
+	input => "\\01",
+	output => "\x01",
+	ret => 1,
+},
+{
+	type => "tfn",
+	name => "escapeSeqDecode",
+	input => "\\012",
+	output => "\x0a",
 	ret => 1,
 },
 # A forward slash with nothing after

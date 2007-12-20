@@ -323,7 +323,7 @@ int main(int argc, const char * const argv[])
     type = argv[1];
     name = argv[2];
     param_len = strlen(argv[3]);
-    param = (unsigned char *)apr_pstrmemdup(g_mp, argv[3], param_len);
+    param = apr_pmemdup(g_mp, argv[3], param_len + 1);
     unescape_inplace(param, &param_len);
     if (argc >= 5) {
         returnval = argv[4];
@@ -365,7 +365,7 @@ int main(int argc, const char * const argv[])
             result = RESULT_WRONGRET;
         }
         else if (param_len != out_len) {
-            fprintf(stderr, "Lenth %" APR_SIZE_T_FMT " (param %" APR_SIZE_T_FMT ")\n", out_len, param_len);
+            fprintf(stderr, "Lenth %" APR_SIZE_T_FMT " (expected %" APR_SIZE_T_FMT ")\n", out_len, param_len);
             result = RESULT_WRONGSIZE;
         }
         else {

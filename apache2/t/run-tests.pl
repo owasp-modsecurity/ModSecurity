@@ -68,16 +68,14 @@ sub runfile {
 		my %t = %{$t || {}};
 		my $id = sprintf("%6d", $n);
 		my $in = $t{input};
-		my $out = escape($t{output}); # Escape so we can send via commandline
-		quit(1, "Failed to interpret output \"$cfg\": $@") if ($@);
-		my $param;
 		my $rc = 0;
+		my $param;
 
 		if ($t{type} eq "tfn") {
-			$param = $t{output};
+			$param = escape($t{output});
 		}
 		elsif ($t{type} eq "op") {
-			$param = $t{param};
+			$param = escape($t{param});
 		}
 		else {
 			quit(1, "Unknown type \"$t{type}\" - should be one of: " . join(",",@TYPES));
