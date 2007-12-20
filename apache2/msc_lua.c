@@ -84,10 +84,10 @@ char *lua_compile(msc_script **script, const char *filename, apr_pool_t *pool) {
     }
 
     /* Compile script. */
-    lua_pcall(L, 0, 0, 0);
+    // lua_pcall(L, 0, 0, 0);
 
     /* Find the execution entry point. */
-    lua_getglobal(L, "main");
+    // lua_getglobal(L, "main");
 
     /* Dump the script into binary form. */
     dump.pool = pool;
@@ -264,7 +264,12 @@ int lua_execute(msre_rule *rule, modsec_rec *msr, char **error_msg) {
         return -1;
     }
 
-    /* Execute script. */
+    /* Execute the chunk so that the functions are defined. */
+    lua_pcall(L, 0, 0, 0);
+
+    /* Execute main() */
+    lua_getglobal(L, "main");
+
     if (lua_pcall(L, 0, 1, 0)) {
         *error_msg = apr_psprintf(msr->mp, "Lua: Script execution failed: %s", lua_tostring(L, -1));
         return -1;
