@@ -933,6 +933,7 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
 static int luhn_verify(const char *ccnumber, int len) {
     int sum[2] = { 0, 0 };
     int odd = 0;
+    int digits = 0;
     int i;
 
     /* Weighted lookup table which is just a precalculated (i = index):
@@ -948,8 +949,12 @@ static int luhn_verify(const char *ccnumber, int len) {
             sum[0] += (!odd ? wtable[ccnumber[i] - '0'] : (ccnumber[i] - '0'));
             sum[1] += (odd ? wtable[ccnumber[i] - '0'] : (ccnumber[i] - '0'));
             odd = 1 - odd; /* alternate weights */
+            digits++;
         }
     }
+
+    /* No digits extracted */
+    if (digits == 0) return 0;
 
     /* Do a mod 10 on the sum */
     sum[odd] %= 10;
