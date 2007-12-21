@@ -46,6 +46,6 @@
 	type => "tfn",
 	name => "base64Decode",
 	input => "VGVzdENhc2U=\0VGVzdENhc2U=",
-	output => "VGVzdENhc2U=\0VGVzdENhc2U=",
-	ret => 0,
+	output => "TestCase",
+	ret => 1,
 },
