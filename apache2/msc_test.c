@@ -192,18 +192,26 @@ static int test_op(const char *name, const char *param, const unsigned char *inp
     var->value = apr_pstrmemdup(g_mp, (char *)input, input_len);
     var->value_len = input_len;
     var->metadata = msre_resolve_var(modsecurity->msre, var->name);
+    if (var->metadata == NULL) {
+        *errmsg = apr_psprintf(g_mp, "Failed to resolve variable for op \"%s\": %s", name, var->name);
+        return -1;
+    }
 
     /* Initialize the operator parameter */
-    rc = metadata->param_init(rule, errmsg);
-    if (rc < 0) {
-        *errmsg = apr_psprintf(g_mp, "Failed to init op \"%s\": %s", name, *errmsg);
-        return rc;
+    if (metadata->param_init != NULL) {
+        rc = metadata->param_init(rule, errmsg);
+        if (rc < 0) {
+            *errmsg = apr_psprintf(g_mp, "Failed to init op \"%s\": %s", name, *errmsg);
+            return rc;
+        }
     }
     
     /* Execute the operator */
-    rc = metadata->execute(g_msr, rule, var, errmsg);
-    if (rc < 0) {
-        *errmsg = apr_psprintf(g_mp, "Failed to execute op \"%s\": %s", name, *errmsg);
+    if (metadata->execute != NULL) {
+        rc = metadata->execute(g_msr, rule, var, errmsg);
+        if (rc < 0) {
+            *errmsg = apr_psprintf(g_mp, "Failed to execute op \"%s\": %s", name, *errmsg);
+        }
     }
 
     return rc;

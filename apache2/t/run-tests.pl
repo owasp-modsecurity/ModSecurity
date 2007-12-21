@@ -8,6 +8,7 @@
 #	 Nth in file: run-tests.pl file N
 #
 use strict;
+use POSIX qw(WIFEXITED WEXITSTATUS WIFSIGNALED WTERMSIG);
 use File::Basename qw(basename dirname);
 
 my @TYPES = qw(tfn op);
@@ -45,6 +46,8 @@ sub runfile {
 	my @data = ();
 	my $edata;
 	my @C = ();
+	my @test = ();
+	my $teststr;
 	my $n = 0;
 	my $pass = 0;
 
@@ -81,13 +84,30 @@ sub runfile {
 			quit(1, "Unknown type \"$t{type}\" - should be one of: " . join(",",@TYPES));
 		}
 
-		open(TEST, "|-", $TEST, $t{type}, $t{name}, $param, (exists($t{ret}) ? ($t{ret}) : ())) or quit(1, "Failed to execute test \"$cfg\": $!");
+		@test = ($t{type}, $t{name}, $param, (exists($t{ret}) ? ($t{ret}) : ()));
+		$teststr = "$TEST " . join(" ", map { "\"$_\"" } @test);
+		open(TEST, "|-", $TEST, @test) or quit(1, "Failed to execute test: $teststr\": $!");
 		print TEST "$in";
 		close TEST;
 
-
 		$rc = $?;
-		$pass += $rc ? 0 : 1;
+		if ( WIFEXITED($rc) ) {
+			$rc = WEXITSTATUS($rc);
+		}
+		elsif( WIFSIGNALED($rc) ) {
+			msg("Test exited with signal " . WTERMSIG($rc) . ".");
+			msg("Executed: $teststr");
+			$rc = -1;
+		}
+		else {
+			msg("Test exited with unknown error.");
+			$rc = -1;
+		}
+
+		if ($rc == 0) {
+			$pass++;
+		}
+
 		msg(sprintf("%s) %s \"%s\": %s", $id, $t{type}, $t{name}, ($rc ? "failed" : "passed")));
 		
 	}
