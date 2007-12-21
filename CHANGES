@@ -1,4 +1,4 @@
-20 Dec 2007 - 2.1.5-rc1
+21 Dec 2007 - 2.1.5-rc1
 -----------------------
 
  * Updated included Core Ruleset to version 1.5.1.
@@ -6,8 +6,8 @@
  * Fixed issue where only the first phase 5 rule would run when the
    request was intercepted in an earlier phase.
 
- * Stricter configuration parsing.  Disruptive actions, meta actions and
-   phases are no longer allowed in a chained rule.
+ * Fixed configuration parsing so that disruptive actions, meta actions
+   and phases are not allowed in a chained rule (as originally intended).
 
  * Fixed t:escapeSeqDecode to better follow ANSI C escapes.
 
