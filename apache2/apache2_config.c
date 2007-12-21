@@ -1283,14 +1283,12 @@ static const char *cmd_rule_inheritance(cmd_parms *cmd, void *_dcfg, int flag) {
     return NULL;
 }
 
-#ifdef WITH_LUA
 static const char *cmd_rule_script(cmd_parms *cmd, void *_dcfg, const char *p1,
     const char *p2)
 {
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
     return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_LUA, filename, p2, NULL);
 }
-#endif
 
 static const char *cmd_rule_remove_by_id(cmd_parms *cmd, void *_dcfg, const char *p1) {
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1887,7 +1885,6 @@ const command_rec module_directives[] = {
         "On or Off"
     ),
 
-    #ifdef WITH_LUA
     AP_INIT_TAKE12 (
         "SecRuleScript",
         cmd_rule_script,
@@ -1895,7 +1892,6 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "" // TODO
     ),
-    #endif
 
     AP_INIT_ITERATE (
         "SecRuleRemoveById",

@@ -1,9 +1,6 @@
 
 #include "msc_lua.h"
 
-
-#ifdef WITH_LUA
-
 #include "apr_strings.h"
 
 typedef struct {
@@ -126,15 +123,57 @@ static int l_log(lua_State *L) {
 /**
  *
  */
+static apr_array_header_t *resolve_tfns(lua_State *L, int idx, modsec_rec *msr, apr_pool_t *mp) {
+    apr_array_header_t *tfn_arr = NULL;
+    msre_tfn_metadata *tfn = NULL;
+    char *name = NULL;
+
+    tfn_arr = apr_array_make(mp, 25, sizeof(msre_tfn_metadata *));
+    if (tfn_arr == NULL) return NULL;
+
+    if (lua_istable(L, idx)) { /* Is the second parameter an array? */
+        int i, n = lua_objlen(L, idx);
+
+        for(i = 1; i <= n; i++) {
+            lua_rawgeti(L, idx, i);
+            name = (char *)luaL_checkstring(L, -1);
+            tfn = msre_engine_tfn_resolve(msr->modsecurity->msre, name);
+            if (tfn == NULL) {
+                msr_log(msr, 1, "SecRuleScript: Invalid transformation function: %s", name);
+            } else {
+                *(msre_tfn_metadata **)apr_array_push(tfn_arr) = tfn;
+            }
+        }
+    } else if (lua_isstring(L, idx)) { /* The second parameter may be a simple string? */
+        name = (char *)luaL_checkstring(L, idx);
+        tfn = msre_engine_tfn_resolve(msr->modsecurity->msre, name);
+        if (tfn == NULL) {
+            msr_log(msr, 1, "SecRuleScript: Invalid transformation function: %s", name);
+        } else {
+            *(msre_tfn_metadata **)apr_array_push(tfn_arr) = tfn;
+        }
+    } else {
+        // TODO Error
+        return NULL;
+    }
+
+    return tfn_arr;
+}
+
+/**
+ *
+ */
 static int l_getvar(lua_State *L) {
-    char *varname = NULL;
-    char *param = NULL;
+    char *varname = NULL, *param = NULL;
     modsec_rec *msr = NULL;
     msre_rule *rule = NULL;
     char *my_error_msg = NULL;
+    char *p1 = NULL;
+    apr_array_header_t *tfn_arr = NULL;
+    msre_var *vx = NULL;
 
     /* Retrieve parameters. */
-    varname = (char *)luaL_checkstring(L, 1);
+    p1 = (char *)luaL_checkstring(L, 1);
 
     /* Retrieve msr. */
     lua_getglobal(L, "__msr");
@@ -144,100 +183,123 @@ static int l_getvar(lua_State *L) {
     lua_getglobal(L, "__rule");
     rule = (msre_rule *)lua_topointer(L, -1);
 
-    /* Resolve variable $varname. */
+    /* Extract the variable name and its parameter from the script. */
+    varname = apr_pstrdup(msr->msc_rule_mptmp, p1);
     param = strchr(varname, '.');
     if (param != NULL) {
         *param = '\0';
         param++;
     }
 
+    /* Resolve variable. */
     msre_var *var = msre_create_var_ex(msr->msc_rule_mptmp, msr->modsecurity->msre,
         varname, param, msr, &my_error_msg);
 
     if (var == NULL) {
-        msr_log(msr, 1, "SecRuleScript: Failed to resolve variable: %s", varname);
+        msr_log(msr, 1, "%s", my_error_msg);
+        
+        lua_pushnil(L);
+
         return 0;
-    } else {
-        msre_var *vx = NULL;
-
-        vx = generate_single_var(msr, var, rule, msr->msc_rule_mptmp);
-        if (vx != NULL) {
-            char *rval = NULL;
-            long int rval_len = -1;
-
-            /* Transform the variable if a list of transformation
-             * functions has been supplied.
-            */
-            if (lua_istable(L, 2)) { /* Is the second parameter an array? */
-                int i, n = lua_objlen(L, 2);
-
-                /* Make a copy so that we don't ruin the original value. */
-                vx->value = apr_pstrmemdup(msr->msc_rule_mptmp, vx->value, vx->value_len);
-
-                for(i = 1; i <= n; i++) {
-                    msre_tfn_metadata *tfn = NULL;
-                    char *name = NULL;
-                    int rc = 0;
-
-                    lua_rawgeti(L, 2, i);
-                    name = (char *)luaL_checkstring(L, -1);
-                    tfn = msre_engine_tfn_resolve(msr->modsecurity->msre, name);
-                    if (tfn == NULL) {
-                        msr_log(msr, 1, "SecRuleScript: Invalid transformation function in getvar() call: %s", name);
-                        return 0;
-                    }
-
-                    rc = tfn->execute(msr->msc_rule_mptmp, (unsigned char*)vx->value,
-                        vx->value_len, &rval, &rval_len);
-
-                    vx->value = rval;
-                    vx->value_len = rval_len;
-
-                    if (msr->txcfg->debuglog_level >= 9) {
-                        msr_log(msr, 9, "T (%d) %s: \"%s\"", rc, tfn->name,
-                            log_escape_nq_ex(msr->msc_rule_mptmp, vx->value, vx->value_len));
-                    }
-                }
-            }
-            else if (lua_isstring(L, 2)) { /* The second parameter may be a simple string? */
-                msre_tfn_metadata *tfn = NULL;
-                char *name = NULL;
-                int rc = 0;
-
-                /* Make a copy so that we don't ruin the original value. */
-                vx->value = apr_pstrmemdup(msr->msc_rule_mptmp, vx->value, vx->value_len);
-
-                name = (char *)luaL_checkstring(L, 2);
-                tfn = msre_engine_tfn_resolve(msr->modsecurity->msre, name);
-                if (tfn == NULL) {
-                    msr_log(msr, 1, "SecRuleScript: Invalid transformation function in getvar() call: %s", name);
-                    return 0;
-                }
-
-                rc = tfn->execute(msr->msc_rule_mptmp, (unsigned char *)vx->value,
-                    vx->value_len, &rval, &rval_len);
-
-                vx->value = rval;
-                vx->value_len = rval_len;
-
-                if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "T (%d) %s: \"%s\"", rc, tfn->name,
-                        log_escape_nq_ex(msr->msc_rule_mptmp, vx->value, vx->value_len));
-                }
-            }
-
-            lua_pushlstring(L, vx->value, vx->value_len);
-
-            return 1;
-        }
     }
 
-    return 0;
+    /* Resolve transformation functions. */
+    tfn_arr = resolve_tfns(L, 2, msr, msr->msc_rule_mptmp);
+
+    /* Generate variable. */
+    vx = generate_single_var(msr, var, tfn_arr, rule, msr->msc_rule_mptmp);
+    if (vx == NULL) {
+        lua_pushnil(L);
+
+        return 0;
+    }
+
+    /* Return variable value. */
+    lua_pushlstring(L, vx->value, vx->value_len);            
+
+    return 1;
+}
+
+/**
+ *
+ */
+static int l_getvars(lua_State *L) {
+    const apr_array_header_t *tarr;
+    const apr_table_entry_t *telts;
+    apr_table_t *vartable = NULL;
+    apr_array_header_t *tfn_arr = NULL;
+    char *varname = NULL, *param = NULL;
+    modsec_rec *msr = NULL;
+    msre_rule *rule = NULL;
+    msre_var *vartemplate = NULL;
+    char *my_error_msg = NULL;
+    char *p1 = NULL;
+    int i;
+
+    /* Retrieve parameters. */
+    p1 = (char *)luaL_checkstring(L, 1);
+
+    /* Retrieve msr. */
+    lua_getglobal(L, "__msr");
+    msr = (modsec_rec *)lua_topointer(L, -1);
+
+    /* Retrieve rule. */
+    lua_getglobal(L, "__rule");
+    rule = (msre_rule *)lua_topointer(L, -1);
+
+    /* Extract the variable name and its parameter from the script. */
+    varname = apr_pstrdup(msr->msc_rule_mptmp, p1);
+    param = strchr(varname, '.');
+    if (param != NULL) {
+        *param = '\0';
+        param++;
+    }
+
+    /* Resolve transformation functions. */
+    tfn_arr = resolve_tfns(L, 2, msr, msr->msc_rule_mptmp);
+
+    lua_newtable(L);
+
+    /* Resolve variable. */
+    vartemplate = msre_create_var_ex(msr->msc_rule_mptmp, msr->modsecurity->msre,
+        varname, param, msr, &my_error_msg);
+
+    if (vartemplate == NULL) {
+        msr_log(msr, 1, "%s", my_error_msg);
+
+        /* Returning empty table. */
+        return 1;
+    }
+
+    vartable = generate_multi_var(msr, vartemplate, tfn_arr, rule, msr->msc_rule_mptmp);
+
+    tarr = apr_table_elts(vartable);
+    telts = (const apr_table_entry_t*)tarr->elts;
+    for (i = 0; i < tarr->nelts; i++) {
+        msre_var *var = (msre_var *)telts[i].val;
+
+        lua_pushnumber(L, i + 1); /* Index is not zero-based. */
+
+        lua_newtable(L); /* Per-parameter table. */
+
+        lua_pushstring(L, "name");
+        lua_pushlstring(L, var->name, strlen(var->name));
+        lua_settable(L, -3);
+
+        lua_pushstring(L, "value");
+        lua_pushlstring(L, var->value, var->value_len);
+        lua_settable(L, -3);
+
+        lua_settable(L, -3); /* Push one parameter into the results table. */    
+    }
+
+    return 1;
 }
 
 static const struct luaL_Reg mylib[] = {
     { "log", l_log },
     { "getvar", l_getvar },
+    { "getvars", l_getvars },
     { NULL, NULL }
 };
 
@@ -317,4 +379,3 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
     return ((*error_msg != NULL) ? RULE_MATCH : RULE_NO_MATCH);
 }
 
-#endif

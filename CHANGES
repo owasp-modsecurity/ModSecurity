@@ -1,8 +1,13 @@
 
-20 Dec 2007 - 2.5.0-rc1
+21 Dec 2007 - 2.5.0-rc1
 -----------------------
 
 Changes since 2.5.0-dev2:
+
+ * Added support for Lua scripting in the following ways: SecRuleScript
+   can be used to specify a script to execute as a rule, the exec
+   action processes Lua scripts internally, and does the @inspectFile
+   operator. Refer to the documentation for more details.
 
  * Updated included Core Ruleset to version 1.5.1.
 

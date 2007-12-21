@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-rc1/ (December 19, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-rc1/ (December 21, 2007)</releaseinfo>
 
     <copyright>
       <year>2004-2007</year>
@@ -301,6 +301,11 @@
       </listitem>
 
       <listitem>
+        <para>Install the latest version of Lua in the 5.1.x branch, if it
+        isn't already installed on the server.</para>
+      </listitem>
+
+      <listitem>
         <para>Unpack the ModSecurity archive</para>
       </listitem>
 
@@ -315,14 +320,13 @@
 
       <listitem>
         <para>Edit Makefile to configure the correct include path for libxml
-        (for example: <filename
-        moreinfo="none">INCLUDES=-I/usr/include/libxml2</filename>)</para>
+        (for example <filename moreinfo="none">-I
+        /usr/include/libxml2</filename>)</para>
       </listitem>
 
       <listitem>
-        <para>(Optional) If you want to use Lua scripting add
-        <literal>-DWITH_LUA</literal> and configure the path to Lua include
-        files (for example <literal>-I /usr/include/lua5.1</literal>).</para>
+        <para>Edit Makefile to configure the correct incpude path for Lua (for
+        example <literal>-I /usr/include/lua5.1</literal>).</para>
       </listitem>
 
       <listitem>
@@ -339,19 +343,18 @@
       </listitem>
 
       <listitem>
-        <para>Add one line to your configuration to load libxml2: <filename
+        <para>Load libxml2 before ModSecurity: <filename
         moreinfo="none">LoadFile /usr/lib/libxml2.so</filename></para>
       </listitem>
 
       <listitem>
-        <para>(Optional) Add one line to load Lua before ModSecurity:
-        <literal>LoadFile /usr/lib/liblua5.1.so</literal>.</para>
+        <para>Load Lua before ModSecurity: <literal>LoadFile
+        /usr/lib/liblua5.1.so</literal>.</para>
       </listitem>
 
       <listitem>
-        <para>Add one line to your configuration to load ModSecurity: <literal
-        moreinfo="none">LoadModule security2_module
-        modules/mod_security2.so</literal></para>
+        <para>Load ModSecurity itself: <literal moreinfo="none">LoadModule
+        security2_module modules/mod_security2.so</literal></para>
       </listitem>
 
       <listitem>
@@ -1805,6 +1808,12 @@ ServerAlias www.app2.com
       <literal>SecRuleScript</literal> resides. This allows you to place your
       script in the same folder as the configuration files using them.</para>
 
+      <note>
+        <para>All Lua scripts are compiled at configuration time and cached in
+        memory. To reload scripts you must reload the entire ModSecurity
+        configuration by restarting Apache.</para>
+      </note>
+
       <para>Example script:</para>
 
       <programlisting>-- Your script must define the <emphasis>main</emphasis> entry
@@ -1816,24 +1825,50 @@ function main()
     m.log(1, "Hello world!");
 
     -- Retrieve one variable.
-    var1 = m.getvar("REMOTE_ADDR");
+    local var1 = m.getvar("REMOTE_ADDR");
 
     -- Retrieve one variable, applying one transformation function.
     -- The second parameter is a string.
-    var2 = m.getvar("REQUEST_URI", "normalisePath");
+    local var2 = m.getvar("REQUEST_URI", "normalisePath");
 
     -- Retrieve one variable, applying several transformation functions.
     -- The second parameter is now a list. You should note that m.getvar()
     -- requires the use of comma to separate collection names from
     -- variable names. This is because only one variable is returned.
-    var3 = m.getvar("ARGS.p", { "lowercase", "compressWhitespace" } );
+    local var3 = m.getvar("ARGS.p", { "lowercase", "compressWhitespace" } );
 
     -- If you want this rule to match return a string
-    -- containing the error message. It is a good idea to mention
-    -- where the problem is located.
+    -- containing the error message. The message <emphasis>must</emphasis> contain the name
+    -- of the variable where the problem is located.
     -- return "Variable ARGS:p looks suspicious!"
 
     -- Otherwise, simply return null.
+    return null;
+end</programlisting>
+
+      <para>In this first example we were only retrieving one variable at the
+      time. In this case the name of the variable is known to you. In many
+      cases, however, you will want to examine variables whose names you won't
+      know in advance, for example script parameters.</para>
+
+      <para>Example showing use of <literal>m.getvars()</literal> to retrieve
+      many variables at once:</para>
+
+      <programlisting>function main()
+    -- Retrieve script parameters.
+    local d = m.getvars("ARGS", { "lowercase", "htmlEntityDecode" } );
+
+    -- Loop through the paramters.
+    for i = 1, #d do
+        -- Examine parameter value.
+        if (string.find(d[i].value, "&lt;script")) then
+            -- Always specify the name of the variable where the
+            -- problem is located in the error message.
+            return ("Suspected XSS in variable " .. d[i].name .. ".");
+        end
+    end
+
+    -- Nothing wrong found.
     return null;
 end</programlisting>
 
@@ -1842,6 +1877,12 @@ end</programlisting>
         to find more about the Lua programming language. The reference manual
         too is available online, at <ulink
         url="http://www.lua.org/manual/5.1/">http://www.lua.org/manual/5.1/</ulink>.</para>
+      </note>
+
+      <note>
+        <para>Lua support is marked as <emphasis>experimental</emphasis>
+        because the way the scripts are written and function names may still
+        change while we are working for the best implementation style.</para>
       </note>
     </section>
 
@@ -3926,9 +3967,8 @@ SecRule IP:AUTH_ATTEMPT "@gt 25" \
       <title><literal>exec</literal></title>
 
       <para><emphasis>Description:</emphasis> Executes an external
-      script/binary supplied as parameter. As of v2.5, when the support for
-      Lua scripting is enabled, and the parameter supplied to
-      <literal>exec</literal> is a Lua script (detected by the
+      script/binary supplied as parameter. As of v2.5, if tge parameter
+      supplied to <literal>exec</literal> is a Lua script (detected by the
       <filename>.lua</filename> extension) the script will be processed
       <emphasis>internally</emphasis>. This means you will get direct access
       to the internal request context from the script. Please read the
@@ -3945,8 +3985,7 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
     "log,<emphasis>exec:/usr/local/apache/bin/test.sh</emphasis>"
 
 # The following is going to process /usr/local/apache/conf/exec.lua
-# internally as a Lua script on rule match, provided ModSecurity was
-# compiled with Lua support enabled.
+# internally as a Lua script on rule match.
 SecRule ARGS:p attack log,<emphasis>exec:/usr/local/apache/conf/exec.lua</emphasis></programlisting>
 
       <note>
@@ -4878,10 +4917,9 @@ SecRule ARGS:route "!<emphasis>@endsWith %{REQUEST_ADDR}</emphasis>" t:none,deny
       extracted from the request. As of v2.5, if the supplied filename is not
       absolute it is treated as relative to the directory in which the
       configuration file resides. Also as of v2.5 if the filename is
-      determined to be a Lua script (based on its extension) and the Lua
-      support is compiled in, the script will be processed by the internal
-      engine. As such it will have full access to the ModSecurity
-      context.</para>
+      determined to be a Lua script (based on its extension) the script will
+      be processed by the internal engine. As such it will have full access to
+      the ModSecurity context.</para>
 
       <para>Example of using an external binary/script:</para>
 

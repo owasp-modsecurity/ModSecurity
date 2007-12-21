@@ -39,21 +39,118 @@ static void msre_engine_action_register(msre_engine *engine, const char *name, u
 /**
  * Generates a single variable (from the supplied metadata).
  */
-msre_var *generate_single_var(modsec_rec *msr, msre_var *var, msre_rule *rule,
-    apr_pool_t *mptmp)
+msre_var *generate_single_var(modsec_rec *msr, msre_var *var, apr_array_header_t *tfn_arr,
+    msre_rule *rule, apr_pool_t *mptmp)
 {
     apr_table_t *vartab = NULL;
     const apr_table_entry_t *te = NULL;
     const apr_array_header_t *arr = NULL;
+    msre_var *rvar = NULL;
+    int i;
 
-    if (var->metadata->generate == NULL) return NULL;
+    /* Sanity check. */
+    if ((var == NULL)||(var->metadata == NULL)||(var->metadata->generate == NULL)) return NULL;
+
     vartab = apr_table_make(mptmp, 16);
     var->metadata->generate(msr, var, rule, vartab, mptmp);
+
     arr = apr_table_elts(vartab);
     if (arr->nelts == 0) return NULL;
-    te = (apr_table_entry_t *)arr->elts;    
+    te = (apr_table_entry_t *)arr->elts;
 
-    return (msre_var *)te[0].val;
+    rvar = (msre_var *)te[0].val;
+
+    /* Return straight away if there were no 
+     * transformation functions supplied.
+     */
+    if ((tfn_arr == NULL)||(tfn_arr->nelts == 0)) {
+        return rvar;
+    }
+
+    /* Copy the value so that we can transform it in piece. */
+    rvar->value = apr_pstrndup(mptmp, rvar->value, rvar->value_len);
+
+    /* Transform rvar in a loop. */
+    for (i = 0; i < tfn_arr->nelts; i++) {
+        msre_tfn_metadata *tfn = ((msre_tfn_metadata **)tfn_arr->elts)[i];
+        char *rval;
+        int rc;
+        long int rval_len;
+
+        rc = tfn->execute(mptmp, (unsigned char *)rvar->value,
+                    rvar->value_len, &rval, &rval_len);
+
+        rvar->value = rval;
+        rvar->value_len = rval_len;
+    
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "T (%d) %s: \"%s\"", rc, tfn->name,
+                log_escape_nq_ex(mptmp, rvar->value, rvar->value_len));
+        }
+    }
+
+    return rvar;
+}
+
+/**
+ *
+ */
+apr_table_t *generate_multi_var(modsec_rec *msr, msre_var *var, apr_array_header_t *tfn_arr,
+    msre_rule *rule, apr_pool_t *mptmp)
+{
+    const apr_array_header_t *tarr;
+    const apr_table_entry_t *telts;
+    apr_table_t *vartab = NULL, *tvartab = NULL;
+    msre_var *rvar = NULL;
+    int i, j;
+
+    /* Sanity check. */
+    if ((var == NULL)||(var->metadata == NULL)||(var->metadata->generate == NULL)) return NULL;
+
+    /* Generate variables. */
+    vartab = apr_table_make(mptmp, 16);
+    var->metadata->generate(msr, var, rule, vartab, mptmp);
+
+    /* Return straight away if there were no 
+     * transformation functions supplied.
+     */
+    if ((tfn_arr == NULL)||(tfn_arr->nelts == 0)) {
+        return vartab;
+    }
+
+    tvartab = apr_table_make(mptmp, 16);
+
+    tarr = apr_table_elts(vartab);
+    telts = (const apr_table_entry_t*)tarr->elts;
+    for (j = 0; j < tarr->nelts; j++) {
+        rvar = (msre_var *)telts[j].val;
+
+        /* Copy the value so that we can transform it in piece. */
+        rvar->value = apr_pstrndup(mptmp, rvar->value, rvar->value_len);
+
+        /* Transform rvar in a loop. */
+        for (i = 0; i < tfn_arr->nelts; i++) {
+            msre_tfn_metadata *tfn = ((msre_tfn_metadata **)tfn_arr->elts)[i];
+            char *rval;
+            int rc;
+            long int rval_len;
+
+            rc = tfn->execute(mptmp, (unsigned char *)rvar->value,
+                rvar->value_len, &rval, &rval_len);
+
+            rvar->value = rval;
+            rvar->value_len = rval_len;
+    
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "T (%d) %s: \"%s\"", rc, tfn->name,
+                    log_escape_nq_ex(mptmp, rvar->value, rvar->value_len));
+            }
+        }
+
+        apr_table_addn(tvartab, rvar->name, (void *)rvar);
+    }
+
+    return tvartab;
 }
 
 /**
@@ -137,7 +234,7 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
                 var_resolved = msre_create_var_ex(mptmp, msr->modsecurity->msre, var_name, var_value,
                     msr, &my_error_msg);
                 if (var_resolved != NULL) {
-                    var_generated = generate_single_var(msr, var_resolved, rule, mptmp);
+                    var_generated = generate_single_var(msr, var_resolved, NULL, rule, mptmp);
                     if (var_generated != NULL) {
                         part = (msc_string *)apr_pcalloc(mptmp, sizeof(msc_string));
                         if (part == NULL) return -1;
@@ -1457,7 +1554,6 @@ static char *msre_action_exec_validate(msre_engine *engine, msre_action *action)
 
     /* TODO Support relative filenames. */
 
-    #ifdef WITH_LUA
     /* Process Lua scripts internally. */
     if (strlen(filename) > 4) {
         char *p = filename + strlen(filename) - 4;
@@ -1472,7 +1568,6 @@ static char *msre_action_exec_validate(msre_engine *engine, msre_action *action)
             action->param_data = script;
         }
     }
-    #endif
 
     return NULL;
 }

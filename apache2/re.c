@@ -1314,7 +1314,6 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset,
     return rule;
 }
 
-#ifdef WITH_LUA
 /**
  *
  */
@@ -1362,7 +1361,6 @@ msre_rule *msre_rule_lua_create(msre_ruleset *ruleset,
 
     return rule;
 }
-#endif
 
 /**
  * Perform non-disruptive actions associated with the provided actionset.
@@ -2001,11 +1999,9 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
         apr_pool_clear(msr->msc_rule_mptmp);
     }
 
-    #if defined(WITH_LUA)
     if (rule->type == RULE_TYPE_LUA) {
         return msre_rule_process_lua(rule, msr);
     }
-    #endif
 
     return msre_rule_process_normal(rule, msr);
 }

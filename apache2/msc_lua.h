@@ -11,8 +11,6 @@
 #ifndef _MSC_LUA_H_
 #define _MSC_LUA_H_
 
-#if defined(WITH_LUA)
-
 typedef struct msc_script msc_script;
 typedef struct msc_script_part msc_script_part;
 
@@ -38,5 +36,4 @@ char DSOLOCAL *lua_compile(msc_script **script, const char *filename, apr_pool_t
 
 int DSOLOCAL lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rule, char **error_msg);
 
-#endif
 #endif

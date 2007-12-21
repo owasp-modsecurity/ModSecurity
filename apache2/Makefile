@@ -39,8 +39,6 @@ APACHECTL = apachectl
 
 INCLUDES = -I /usr/include/libxml2 -I /usr/include/lua5.1
 # INCLUDES = -I /usr/include/libxml2 -I /path/to/httpd-x.y/srclib/pcre
-DEFS = -DWITH_LUA
-# DEFS = -DWITH_ICONV
 # DEFS = -DPERFORMANCE_MEASUREMENT
 # DEFS = -DNO_MODSEC_API
 # DEFS = -DDEBUG_CONF
