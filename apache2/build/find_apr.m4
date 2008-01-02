@@ -2,11 +2,15 @@ dnl Check for APR Libraries
 dnl CHECK_APR(ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND])
 dnl Sets:
 dnl  APR_CFLAGS
+dnl  APR_LDFLAGS
 dnl  APR_LIBS
+dnl  APR_LINK_LD
 
 APR_CONFIG="apr-config"
 APR_CFLAGS=""
+APR_LDFLAGS=""
 APR_LIBS=""
+APR_LINK_LD=""
 
 AC_DEFUN([CHECK_APR],
 [dnl
@@ -36,8 +40,10 @@ done
 if test -n "${with_apr}"; then
     APR_CONFIG="${with_apr}/bin/${APR_CONFIG}"
     AC_MSG_RESULT([${APR_CONFIG}])
-    APR_CFLAGS="`${APR_CONFIG} --cflags`"
+    APR_CFLAGS="`${APR_CONFIG} --includes`"
+    APR_LDFLAGS="`${APR_CONFIG} --ldflags`"
     APR_LIBS="`${APR_CONFIG} --libs`"
+    APR_LINK_LD="`${APR_CONFIG} --link-ld`"
     CFLAGS=$save_CFLAGS
     LDFLAGS=$save_LDFLAGS
 else
@@ -46,6 +52,8 @@ fi
 
 AC_SUBST(APR_LIBS)
 AC_SUBST(APR_CFLAGS)
+AC_SUBST(APR_LDFLAGS)
+AC_SUBST(APR_LINK_LD)
 
 if test -z "${APR_LIBS}"; then
   AC_MSG_NOTICE([*** apr library not found.])

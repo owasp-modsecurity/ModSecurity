@@ -1,7 +1,5 @@
 # Makefile for ModSecurity
 
-APXS=@APXS@
-
 MOD_SECURITY2 = mod_security2 apache2_config apache2_io apache2_util \
     re re_operators re_actions re_tfns re_variables \
     msc_logging msc_xml msc_multipart modsecurity msc_parsers msc_util msc_pcre \
@@ -11,8 +9,15 @@ MOD_SECURITY2_H = re.h modsecurity.h msc_logging.h msc_multipart.h msc_parsers.h
     msc_pcre.h msc_util.h msc_xml.h persist_dbm.h apache2.h pdf_protect.h \
     msc_geo.h acmp.h utf8tables.h msc_lua.h
 
+### Must be in APXS format: -Wc,-flag
 EXTRA_CFLAGS = -Wc,-O2 -Wc,-g -Wc,-Wall -Wc,-Werror
-#EXTRA_CFLAGS = -Wc,-O2 -Wc,-g -Wc,-Wuninitialized -Wc,-Wall -Wc,-Werror -Wc,-Wmissing-prototypes -Wc,-Wshadow -Wc,-Wunused-variable -Wc,-Wunused-value -Wc,-Wchar-subscripts -Wc,-Wsign-compare
+
+
+APXS = @APXS@
+APXS_INCLUDES = @APXS_INCLUDES@
+APXS_CFLAGS = @APXS_CFLAGS@
+APXS_LDFLAGS = @APXS_LDFLAGS@
+APXS_LIBS = @APXS_LIBS@
 
 PCRE_CFLAGS = @PCRE_CFLAGS@
 PCRE_LIBS = @PCRE_LIBS@
@@ -23,7 +28,17 @@ LUA_LIBS = @LUA_LIBS@
 LIBXML_CFLAGS = @LIBXML_CFLAGS@
 LIBXML_LIBS = @LIBXML_LIBS@
 
-CPPFLAGS=$(PCRE_CFLAGS) $(LIBXML_CFLAGS) $(LUA_CFLAGS) $(EXTRA_CFLAGS)
+APR_CFLAGS = @APR_CFLAGS@
+APR_LDFLAGS = @APR_LDFLAGS@
+APR_LIBS = @APR_LIBS@
+APR_LINK_LD = @APR_LINK_LD@
+
+APU_CFLAGS = @APU_CFLAGS@
+APU_LDFLAGS = @APU_LDFLAGS@
+APU_LIBS = @APU_LIBS@
+APU_LINK_LD = @APU_LINK_LD@
+
+CPPFLAGS=$(PCRE_CFLAGS) $(LIBXML_CFLAGS) $(LUA_CFLAGS)
 LIBS=$(PCRE_LIBS) $(LIBXML_LIBS) $(LUA_LIBS)
 LDFLAGS=
 
@@ -36,7 +51,7 @@ all: mod_security2.la
 install: install-mods
 
 clean:
-	@rm -rf *.la *.lo *.o *.slo .libs
+	@rm -rf *.la *.lo *.o *.slo .libs msc_test
 
 maintainer-clean: clean
 	@rm -rf Makefile config config.log config.status configure mod_security2_config.h
@@ -46,16 +61,32 @@ dist-clean: maintainer-clean
 install-mods: mod_security2.la
 	$(INSTALL_MOD_SHARED) mod_security2.la
 
-${MOD_SECURITY2:=.slo}: ${MOD_SECURITY2_H}
+${MOD_SECURITY2:=.slo}: $(MOD_SECURITY2_H)
+${MOD_SECURITY2:=.lo}: $(MOD_SECURITY2_H)
+${MOD_SECURITY2:=.o}: $(MOD_SECURITY2_H})
 
-${MOD_SECURITY2:=.lo}: ${MOD_SECURITY2_H}
-
-${MOD_SECURITY2:=.o}: ${MOD_SECURITY2_H}
-
-mod_security2.la: ${MOD_SECURITY2:=.slo}
+mod_security2.la: $(MOD_SECURITY2_H) *.c
 	@src=""; \
 	for f in $(MOD_SECURITY2); do \
 		src="$$src $$f.c"; \
 	done; \
-	$(COMPILE_APACHE_MOD) $$src
+	echo "$(COMPILE_APACHE_MOD) $(EXTRA_CFLAGS) $$src"; \
+	$(COMPILE_APACHE_MOD) $(EXTRA_CFLAGS) $$src
+
+### Experimental Test Framework (UNIX only right now)
+TESTOBJS = re.o re_operators.o re_actions.o re_tfns.o re_variables.o \
+           msc_logging.o msc_xml.o msc_multipart.o modsecurity.o \
+           msc_parsers.o msc_util.o msc_pcre.o  persist_dbm.o \
+           msc_reqbody.o msc_geo.o acmp.o msc_lua.o
+
+msc_test: mod_security2.la msc_test.c
+	@cflags=""; \
+	for f in $(EXTRA_CFLAGS); do \
+		F=`echo $$f | cut -c 5-`; \
+		cflags="$$cflags $$F"; \
+	done; \
+	$(CC) $(CPPFLAGS) $(LDFLAGS) $(APXS_INCLUDES) $$cflags $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test $(TESTOBJS) msc_test.c $(LIBS) $(APR_LIBS) $(APU_LIBS) $(APXS_LIBS) $(APR_LINK_LD) $(APU_LINK_LD)
+
+test: msc_test
+	@t/run-tests.pl
 
