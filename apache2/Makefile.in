@@ -1,0 +1,61 @@
+# Makefile for ModSecurity
+
+APXS=@APXS@
+
+MOD_SECURITY2 = mod_security2 apache2_config apache2_io apache2_util \
+    re re_operators re_actions re_tfns re_variables \
+    msc_logging msc_xml msc_multipart modsecurity msc_parsers msc_util msc_pcre \
+    persist_dbm msc_reqbody pdf_protect msc_geo acmp msc_lua
+
+MOD_SECURITY2_H = re.h modsecurity.h msc_logging.h msc_multipart.h msc_parsers.h \
+    msc_pcre.h msc_util.h msc_xml.h persist_dbm.h apache2.h pdf_protect.h \
+    msc_geo.h acmp.h utf8tables.h msc_lua.h
+
+EXTRA_CFLAGS = -Wc,-O2 -Wc,-g -Wc,-Wall -Wc,-Werror
+#EXTRA_CFLAGS = -Wc,-O2 -Wc,-g -Wc,-Wuninitialized -Wc,-Wall -Wc,-Werror -Wc,-Wmissing-prototypes -Wc,-Wshadow -Wc,-Wunused-variable -Wc,-Wunused-value -Wc,-Wchar-subscripts -Wc,-Wsign-compare
+
+PCRE_CFLAGS = @PCRE_CFLAGS@
+PCRE_LIBS = @PCRE_LIBS@
+
+LUA_CFLAGS = @LUA_CFLAGS@
+LUA_LIBS = @LUA_LIBS@
+
+LIBXML_CFLAGS = @LIBXML_CFLAGS@
+LIBXML_LIBS = @LIBXML_LIBS@
+
+CPPFLAGS=$(PCRE_CFLAGS) $(LIBXML_CFLAGS) $(LUA_CFLAGS) $(EXTRA_CFLAGS)
+LIBS=$(PCRE_LIBS) $(LIBXML_LIBS) $(LUA_LIBS)
+LDFLAGS=
+
+COMPILE_APACHE_MOD = $(APXS) -c $(CPPFLAGS) $(LDFLAGS) $(LIBS)
+
+INSTALL_MOD_SHARED = $(APXS) -i
+
+all: mod_security2.la
+
+install: install-mods
+
+clean:
+	@rm -rf *.la *.lo *.o *.slo .libs
+
+maintainer-clean: clean
+	@rm -rf Makefile config config.log config.status configure mod_security2_config.h
+
+dist-clean: maintainer-clean
+
+install-mods: mod_security2.la
+	$(INSTALL_MOD_SHARED) mod_security2.la
+
+${MOD_SECURITY2:=.slo}: ${MOD_SECURITY2_H}
+
+${MOD_SECURITY2:=.lo}: ${MOD_SECURITY2_H}
+
+${MOD_SECURITY2:=.o}: ${MOD_SECURITY2_H}
+
+mod_security2.la: ${MOD_SECURITY2:=.slo}
+	@src=""; \
+	for f in $(MOD_SECURITY2); do \
+		src="$$src $$f.c"; \
+	done; \
+	$(COMPILE_APACHE_MOD) $$src
+

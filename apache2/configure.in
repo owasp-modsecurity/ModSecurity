@@ -1,0 +1,82 @@
+dnl
+dnl Autoconf configuration for ModSecurity
+dnl
+dnl     Use ./buildconf to produce a configure script
+dnl
+
+AC_PREREQ(2.50)
+
+AC_INIT
+AC_CONFIG_HEADER(mod_security2_config.h)
+AC_CONFIG_AUX_DIR(build)
+
+# Include M4 macros
+sinclude(build/find_pcre.m4)
+sinclude(build/find_lua.m4)
+sinclude(build/find_xml.m4)
+sinclude(build/find_apr.m4)
+sinclude(build/find_apu.m4)
+
+AC_MSG_NOTICE(looking for Apache module support via DSO through APXS)
+AC_ARG_WITH(apxs,
+            [AS_HELP_STRING([[--with-apxs=[=FILE]]],
+                            [FILE is the path to apxs; defaults to "apxs".])],
+[
+  if test "$withval" = "yes"; then
+    APXS=apxs
+  else
+    APXS="$withval"
+  fi
+])
+
+if test -z "$APXS"; then
+  for i in /usr/sbin \
+           /usr/local/apache/bin \
+           /usr/local/apache2/bin \
+           /usr/local/sbin ; do
+    if test -f "$i/apxs2"; then
+      APXS="$i/apxs2"
+      break
+    elif test -f "$i/apxs"; then
+      APXS="$i/apxs"
+      break
+    fi
+  done
+fi
+
+# arbitrarily picking the same version subversion looks for, don't know how
+# accurate this really is, but at least it'll force us to have apache2...
+HTTPD_WANTED_MMN=20020903
+
+if test -n "$APXS" -a "$APXS" != "no" -a -x "$APXS" ; then
+  APXS_INCLUDE="`$APXS -q INCLUDEDIR`"
+  if test -r $APXS_INCLUDE/httpd.h; then
+    AC_MSG_NOTICE(found apxs at $APXS)
+    AC_MSG_NOTICE(checking httpd version)
+    AC_EGREP_CPP(VERSION_OK,
+    [
+#include "$APXS_INCLUDE/ap_mmn.h"
+#if AP_MODULE_MAGIC_AT_LEAST($HTTPD_WANTED_MMN,0)
+VERSION_OK
+#endif],
+    [AC_MSG_NOTICE(httpd is recent enough)],
+    [AC_MSG_ERROR(apache is too old, mmn must be at least $HTTPD_WANTED_MMN)])
+  fi
+else
+  AC_MSG_ERROR(couldn't find APXS)
+fi
+
+CHECK_PCRE()
+CHECK_LUA()
+CHECK_LIBXML()
+
+save_CPPFLAGS=$CPPFLAGS
+APXS_INCLUDES="`$APXS -q EXTRA_INCLUDES`"
+CPPFLAGS="$APXS_INCLUDES $CPPFLAGS"
+CPPFLAGS=$save_CPPFLAGS
+
+AC_SUBST(APXS)
+
+AC_CONFIG_FILES([Makefile])
+
+AC_OUTPUT
