@@ -6,9 +6,36 @@ dnl
 
 AC_PREREQ(2.50)
 
-AC_INIT
-AC_CONFIG_HEADER(mod_security2_config.h)
-AC_CONFIG_AUX_DIR(build)
+AC_INIT(ModSecurity, 2.5, mod-security-users@lists.sourceforge.net, modsecurity-apache)
+AC_CONFIG_SRCDIR([mod_security2.c])
+AC_CONFIG_HEADER([mod_security2_config.h])
+AC_CONFIG_AUX_DIR([build])
+
+# Checks for programs.
+AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([fcntl.h limits.h stdlib.h string.h unistd.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+AC_C_RESTRICT
+AC_TYPE_SIZE_T
+AC_STRUCT_TM
+AC_TYPE_UINT8_T
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+AC_FUNC_MEMCMP
+AC_CHECK_FUNCS([atexit getcwd memset strcasecmp strchr strdup strerror strncasecmp strrchr strstr strtol])
 
 # Include M4 macros
 sinclude(build/find_pcre.m4)
@@ -19,7 +46,7 @@ sinclude(build/find_apu.m4)
 
 AC_MSG_NOTICE(looking for Apache module support via DSO through APXS)
 AC_ARG_WITH(apxs,
-            [AS_HELP_STRING([[--with-apxs=[=FILE]]],
+            [AS_HELP_STRING([[--with-apxs=FILE]],
                             [FILE is the path to apxs; defaults to "apxs".])],
 [
   if test "$withval" = "yes"; then
@@ -31,8 +58,9 @@ AC_ARG_WITH(apxs,
 
 if test -z "$APXS"; then
   for i in /usr/sbin \
-           /usr/local/apache/bin \
+           /usr/local/apache22/bin \
            /usr/local/apache2/bin \
+           /usr/local/apache/bin \
            /usr/local/sbin ; do
     if test -f "$i/apxs2"; then
       APXS="$i/apxs2"
@@ -66,7 +94,6 @@ VERSION_OK
   APXS_CFLAGS="`$APXS -q CFLAGS`"
   APXS_LDFLAGS="`$APXS -q LDFLAGS`"
   APXS_LIBS="`$APXS -q LIBS`"
-  AC_MSG_NOTICE([APXS_INCLUDES=${APXS_INCLUDES}])
 else
   AC_MSG_ERROR(couldn't find APXS)
 fi
@@ -82,10 +109,10 @@ AC_SUBST(APXS_LDFLAGS)
 AC_SUBST(APXS_LIBS)
 
 CHECK_PCRE()
-CHECK_LUA()
-CHECK_LIBXML()
 CHECK_APR()
 CHECK_APU()
+CHECK_LIBXML()
+CHECK_LUA()
 
 AC_CONFIG_FILES([Makefile])
 
