@@ -1,0 +1,941 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Review id="pre-2.5">
+  <ReviewIssue id="FB137W3T">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 10:55:40:361 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 10:57:29:687 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="2204">apache2/re_variables.c</File>
+    <Type>Suggestion</Type>
+    <Severity>item.severity.label.normal</Severity>
+    <Summary>Is ENV really cacheable?  It could change via setenv.</Summary>
+    <Description>/* ENV */
+    msre_engine_variable_register(engine,
+        "ENV",
+        VAR_LIST,
+        0, 1,
+        var_env_validate,
+        var_env_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB13ARFR">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 10:57:54:279 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:16:11:570 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="2270">apache2/re_variables.c</File>
+    <Type>Suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>GEO is probably not cacheable as it changes with every @geoLookup operator.</Summary>
+    <Description>/* GEO */
+    msre_engine_variable_register(engine,
+        "GEO",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_geo_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB13GOJ6">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:02:30:450 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:03:43:300 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="2281">apache2/re_variables.c</File>
+    <Type>Suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>GLOBAL is not documented.  Is it cacheable?</Summary>
+    <Description>/* GLOBAL */
+    msre_engine_variable_register(engine,
+        "GLOBAL",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_global_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB13M9C2">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:06:50:690 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:07:26:033 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="2303">apache2/re_variables.c</File>
+    <Type>Suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>IP undocumented.  Probably not cacheable as it can change via setvar, etc.</Summary>
+    <Description>/* IP */
+    msre_engine_variable_register(engine,
+        "IP",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_ip_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB13OJ5P">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:08:36:733 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:09:06:681 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="2534">apache2/re_variables.c</File>
+    <Type>Suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>RESOURCE is undocumented.  Probably not cacheable as it is easily changed.</Summary>
+    <Description>/* RESOURCE */
+    msre_engine_variable_register(engine,
+        "RESOURCE",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_resource_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB13W5BF">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:14:32:043 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 14:52:02:794 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="2908">apache2/re_variables.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>SESSION is probably not cacheable since it is modifyable via setvar.</Summary>
+    <Description>/* SESSION */
+    msre_engine_variable_register(engine,
+        "SESSION",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_session_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB14A5TJ">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:25:25:879 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:26:10:856 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="95">apache2/apache2_util.c</File>
+    <Type>Suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Portable way to format sizeof()?</Summary>
+    <Description>msr_log(msr, 1, "Exec: Unable to allocate %lu bytes.", (unsigned long)sizeof(*procnew));</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB154B83">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:48:52:563 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:50:30:473 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="209">apache2/re_actions.c</File>
+    <Type>item.type.label.irrelevant</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>This #if 0'd out code should be removed.</Summary>
+    <Description>/* Removed %0-9 macros as it messes up urlEncoding in the match
+ * where having '%0a' will be treated as %{TX.0}a, which is incorrect.
+ * */
+#if 0
+            else if ((*(p + 1) &gt;= '0')&amp;&amp;(*(p + 1) &lt;= '9')) {
+                /* Special case for regex captures. */
+                var_name = "TX";
+                var_value = apr_pstrmemdup(mptmp, p + 1, 1);
+                next_text_start = p + 2;
+            }
+#endif</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB15AL3F">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:53:45:291 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 14:51:42:573 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="276">apache2/re_actions.c</File>
+    <Type>item.type.label.optimization</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Use apr_array_pstrcat(msr-&gt;mp, arr, NULL) instead?</Summary>
+    <Description>/* If there's more than one member of the array that
+     * means there was at least one macro present. Combine
+     * text parts into a single string now.
+     */
+    if (arr-&gt;nelts &gt; 1) {
+        /* Figure out the required size for the string. */
+        var-&gt;value_len = 0;
+        for(i = 0; i &lt; arr-&gt;nelts; i++) {
+            part = ((msc_string **)arr-&gt;elts)[i];
+            var-&gt;value_len += part-&gt;value_len;
+        }
+
+        /* Allocate the string. */
+        var-&gt;value = apr_palloc(msr-&gt;mp, var-&gt;value_len + 1);
+        if (var-&gt;value == NULL) return -1;
+
+        /* Combine the parts. */
+        offset = 0;
+        for(i = 0; i &lt; arr-&gt;nelts; i++) {
+            part = ((msc_string **)arr-&gt;elts)[i];
+            memcpy((char *)(var-&gt;value + offset), part-&gt;value, part-&gt;value_len);
+            offset += part-&gt;value_len;
+        }
+        var-&gt;value[offset] = '\0';
+    }</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB15JPH9">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 12:00:50:877 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 12:03:50:156 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="246">apache2/re_operators.c</File>
+    <Type>Suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Use resolve_relative_path() instead?  Maybe a config_relative_path() to just get the path?</Summary>
+    <Description>/* Get the path of the rule filename to use as a base */
+    rulefile_path = apr_pstrndup(rule-&gt;ruleset-&gt;mp, rule-&gt;filename, strlen(rule-&gt;filename) - strlen(apr_filepath_name_get(rule-&gt;filename)));</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB18IF9M">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 13:23:49:834 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 13:24:14:701 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="265">apache2/re_operators.c</File>
+    <Type>item.type.label.clarity</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Add parens for clarity.</Summary>
+    <Description>*next++ = '\0';</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1BQL2O">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 14:54:09:456 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 14:55:05:945 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="310">apache2/re_operators.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Need to check return code and log an error on failure.</Summary>
+    <Description>acmp_add_pattern(p, buf, NULL, NULL, strlen(buf));</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1BST7G">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 14:55:53:308 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 14:56:17:267 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="315">apache2/re_operators.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Need to check return code and log an error on failure.</Summary>
+    <Description>acmp_prepare(p);</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1BVP52">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 14:58:08:006 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:00:17:190 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="379">apache2/re_operators.c</File>
+    <Type>item.type.label.optimization</Type>
+    <Severity>item.severity.label.minor</Severity>
+    <Summary>See if apr_strmatch is faster.</Summary>
+    <Description>msre_op_within_execute</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1BXI7P">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 14:59:32:341 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 14:59:59:858 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="442">apache2/re_operators.c</File>
+    <Type>item.type.label.optimization</Type>
+    <Severity>item.severity.label.minor</Severity>
+    <Summary>See if apr_strmatch is faster.</Summary>
+    <Description>msre_op_contains_execute</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1C083S">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:01:39:208 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:02:04:258 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="506">apache2/re_operators.c</File>
+    <Type>item.type.label.optimization</Type>
+    <Severity>item.severity.label.minor</Severity>
+    <Summary>See if apr_strmatch is faster.</Summary>
+    <Description>msre_op_containsWord_execute</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1C28BC">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:03:12:792 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:04:40:965 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="170">apache2/re_actions.c</File>
+    <Type>item.type.label.optimization</Type>
+    <Severity>item.severity.label.minor</Severity>
+    <Summary>This implementation comment needs to be coded as many string operators now attempt to resolve macros.</Summary>
+    <Description>/* IMP1 Duplicate the string and create the array on
+     *      demand, thus not having to do it if there are
+     *      no macros in the input data.
+     */
+
+    data = apr_pstrdup(mptmp, var-&gt;value); /* IMP1 Are we modifying data anywhere? */
+    arr = apr_array_make(mptmp, 16, sizeof(msc_string *));
+    if ((data == NULL)||(arr == NULL)) return -1;</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1CEPS4">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:12:55:300 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:13:19:677 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1">apache2/re_operators.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.minor</Severity>
+    <Summary>Need more unit tests for operators.  Start with new operators.</Summary>
+    <Description />
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1D9K44">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:36:54:292 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:37:50:111 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1885">apache2/re_operators.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>@m operator is not documented.  This does the same as @contains, so it was suggested earlier to use the @m algorithm for contains (if faster) and drop @m.</Summary>
+    <Description>/* m */
+    msre_engine_op_register(engine,
+        "m",
+        msre_op_m_param_init,
+        msre_op_m_execute
+    );</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1DI9VN">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:43:40:931 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:45:51:571 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1109">apache2/re_operators.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>@geoLookup should set error_msg on success to something like "Successful geograpical lookup of \"%s\" at %s."</Summary>
+    <Description>msre_op_geoLookup_execute</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1DMQVA">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:47:09:574 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:48:00:456 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1230">apache2/re_operators.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>@rbl fails to set the var name in error_msg.  Should append "at %s".</Summary>
+    <Description>rc = apr_sockaddr_info_get(&amp;sa, name_to_check,
+        APR_UNSPEC/*msr-&gt;r-&gt;connection-&gt;remote_addr-&gt;family*/, 0, 0, msr-&gt;mp);
+    if (rc == APR_SUCCESS) {
+        *error_msg = apr_psprintf(msr-&gt;r-&gt;pool, "RBL lookup of %s succeeded.",
+            log_escape_nq(msr-&gt;mp, name_to_check));
+        return 1; /* Match. */
+    }</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1DP8LY">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:49:05:878 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:51:13:090 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1275">apache2/re_operators.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.major</Severity>
+    <Summary>Need to resolve the TODOs introduced by Lua processing.</Summary>
+    <Description />
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1DW247">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:54:24:055 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:55:22:775 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1259">apache2/re_operators.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Need to remove the LUA #ifdef's</Summary>
+    <Description>#ifdef WITH_LUA</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1DYM7R">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:56:23:415 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:57:17:579 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1324">apache2/re_operators.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>The LUA #ifdef's should be removed, but if it is decided not to, then this lua call needs to be #ifdef'd.</Summary>
+    <Description>} else {
+        /* Execute internally, as Lua script. */
+        char *target = apr_pstrmemdup(msr-&gt;mp, var-&gt;value, var-&gt;value_len);
+        msc_script *script = (msc_script *)rule-&gt;op_param_data;
+        int rc;
+
+        rc = lua_execute(script, target, msr, rule, error_msg);
+        if (rc &lt; 0) {
+            /* Error. */
+            return -1;
+        }
+
+        return rc;
+    }</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1E0Q7Y">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:58:01:918 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:58:58:621 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1330">apache2/re_operators.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.major</Severity>
+    <Summary>Need an error_msg set for lua execution error.</Summary>
+    <Description>rc = lua_execute(script, target, msr, rule, error_msg);
+        if (rc &lt; 0) {
+            /* Error. */
+            return -1;
+        }</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1E3GFO">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:00:09:204 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:07:33:188 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1403">apache2/re_operators.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>@validateByteRange does not output the VAR name on match.  Need to append " at %s."</Summary>
+    <Description>msre_op_validateByteRange_execute</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1E5VS3">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:02:02:403 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:06:22:410 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1477">apache2/re_operators.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>@validateurlEncoding does not output VAR name nor offset in error_msg on match.</Summary>
+    <Description>msre_op_validateUrlEncoding_execute</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1E87O7">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:03:51:127 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:06:13:415 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1659">apache2/re_operators.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Numeric operators (@eq, etc) do not output VAR name on match.</Summary>
+    <Description>msre_op_eq_execute
+msre_op_gt_execute
+msre_op_lt_execute
+msre_op_ge_execute
+msre_op_le_execute</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1EJCRJ">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:12:30:943 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:12:47:358 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="202">apache2/re_actions.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>No.</Summary>
+    <Description>/* ENH Do we want to support %{DIGIT} as well? */</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1EMD8B">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:14:51:515 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:17:03:426 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="402">apache2/re_actions.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Implement.</Summary>
+    <Description>/* status */
+static char *msre_action_status_validate(msre_engine *engine, msre_action *action) {
+    /* ENH action-&gt;param must be a valid HTTP status code. */
+    return NULL;
+}</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1ENQBX">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:15:55:149 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:16:52:467 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="422">apache2/re_actions.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Implement.</Summary>
+    <Description>/* pause */
+static char *msre_action_pause_validate(msre_engine *engine, msre_action *action) {
+    /* ENH Validate a positive number. */
+    return NULL;
+}</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1EPUYO">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:17:34:464 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:22:35:501 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="434">apache2/re_actions.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Implement as a valid URI check with apr_uri_parse()?</Summary>
+    <Description>/* redirect */
+
+static char *msre_action_redirect_validate(msre_engine *engine, msre_action *action) {
+    /* ENH Add validation. */
+    return NULL;
+}</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1EWH8Q">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:22:43:274 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:22:54:679 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="465">apache2/re_actions.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Implement as a valid URI check with apr_uri_parse()?</Summary>
+    <Description>/* proxy */
+
+static char *msre_action_proxy_validate(msre_engine *engine, msre_action *action) {
+    /* ENH Add validation. */
+    return NULL;
+}</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1EZDG2">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:24:58:322 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:25:17:586 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="530">apache2/re_actions.c</File>
+    <Type>item.type.label.irrelevant</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>I believe this is already done and comment needs removed.</Summary>
+    <Description>// TODO: Need to keep track of skipAfter IDs so we can insert placeholders after
+    // we get to the real rule with that ID.</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1F1P3G">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:26:46:732 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:27:54:881 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="507">apache2/re_actions.c</File>
+    <Type>item.type.label.irrelevant</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>I do not see a need to validate beyound what is already done in the init function.</Summary>
+    <Description>msre_action_skip_validate
+msre_action_skipAfter_validate</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1F4AX8">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:28:48:332 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:29:03:587 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="570">apache2/re_actions.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Implement.</Summary>
+    <Description>/* phase */
+
+static char *msre_action_phase_validate(msre_engine *engine, msre_action *action) {
+    /* ENH Add validation. */
+    return NULL;
+}</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1FXYL9">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:51:52:029 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:03:32:872 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="612">apache2/re_actions.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Probably should also calc length and validate a length &gt; 0 instead of just checking NULL.  Other checks would benefit from checking a length as well, so no harm in calculating that.</Summary>
+    <Description>if (value == NULL) {
+        return apr_psprintf(engine-&gt;mp, "Missing ctl value for name: %s", name);
+    }</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1G3IER">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:56:10:995 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:59:47:800 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="708">apache2/re_actions.c</File>
+    <Type>item.type.label.irrelevant</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Why register init() if we do not use it?</Summary>
+    <Description>static apr_status_t msre_action_ctl_init(msre_engine *engine, msre_actionset *actionset,
+    msre_action *action)
+{
+    /* Do nothing. */
+    return 1;
+}</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1G9H6K">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:00:49:340 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:02:15:141 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="235">apache2/msc_logging.c</File>
+    <Type>item.type.label.programLogic</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>This allows an empty string as a valid part.  This misvalidates "ctl:auditLogParts=+", etc.</Summary>
+    <Description>is_valid_parts_specification</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1GENRN">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:04:51:155 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:08:12:017 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="726">apache2/re_actions.c</File>
+    <Type>item.type.label.optimization</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Inner if's should be else if's.</Summary>
+    <Description>if (strcasecmp(name, "ruleEngine") == 0) {
+        if (strcasecmp(value, "on") == 0) {
+            msr-&gt;txcfg-&gt;is_enabled = MODSEC_ENABLED;
+            msr-&gt;usercfg-&gt;is_enabled = MODSEC_ENABLED;
+        }
+
+        if (strcasecmp(value, "off") == 0) {
+            msr-&gt;txcfg-&gt;is_enabled = MODSEC_DISABLED;
+            msr-&gt;usercfg-&gt;is_enabled = MODSEC_DISABLED;
+        }
+
+        if (strcasecmp(value, "detectiononly") == 0) {
+            msr-&gt;txcfg-&gt;is_enabled = MODSEC_DETECTION_ONLY;
+            msr-&gt;usercfg-&gt;is_enabled = MODSEC_DETECTION_ONLY;
+        }
+
+        return 1;
+    } else</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1GFT4L">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:05:44:757 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:07:58:245 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="774">apache2/re_actions.c</File>
+    <Type>item.type.label.optimization</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>inner if's should be else if's.</Summary>
+    <Description>if (strcasecmp(name, "auditEngine") == 0) {
+        if (strcasecmp(value, "on") == 0) {
+            msr-&gt;txcfg-&gt;auditlog_flag = AUDITLOG_ON;
+            msr-&gt;usercfg-&gt;auditlog_flag = AUDITLOG_ON;
+        }
+
+        if (strcasecmp(value, "off") == 0) {
+            msr-&gt;txcfg-&gt;auditlog_flag = AUDITLOG_OFF;
+            msr-&gt;usercfg-&gt;auditlog_flag = AUDITLOG_OFF;
+        }
+
+        if (strcasecmp(value, "relevantonly") == 0) {
+            msr-&gt;txcfg-&gt;auditlog_flag = AUDITLOG_RELEVANT;
+            msr-&gt;usercfg-&gt;auditlog_flag = AUDITLOG_RELEVANT;
+        }
+
+        msr_log(msr, 4, "Ctl: Set auditEngine to %d.", msr-&gt;txcfg-&gt;auditlog_flag); // TODO
+
+        return 1;
+    } else</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1GIPSC">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:08:00:396 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:11:59:825 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="812">apache2/re_actions.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>That warning quieter should be s++.  An evil typo that was fixed in 2.1.x, but not trunk!</Summary>
+    <Description>while(*s != '\0') {
+                    if (*s != c) {
+                        *d++ = *s++;
+                    } else {
+                        (*s)++; /* parens quiet compiler warning */
+                    }
+                }
+                *d = '\0';</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB1GPE4U">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:13:11:886 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:13:40:681 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="855">apache2/re_actions.c</File>
+    <Type>item.type.label.missing</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Should log an internal error here.</Summary>
+    <Description>else {
+        /* ENH Should never happen, but log if it does. */
+        return -1;
+    }</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+</Review>
+
