@@ -25,17 +25,17 @@ else
     test_paths="${lua_path}"
 fi
 
-AC_MSG_CHECKING([for ${LUA_CONFIG} for Lua])
+AC_MSG_CHECKING([for pkg-config script for liblua])
 for x in ${test_paths}; do
     if test -e "${x}/bin/${LUA_CONFIG}"; then
-        with_lua="${x}"
+        with_lua="${x}/bin"
         break
     else
         with_lua=""
     fi
 done
 if test -n "${with_lua}"; then
-    LUA_CONFIG="${with_lua}/bin/${LUA_CONFIG}"
+    LUA_CONFIG="${with_lua}/${LUA_CONFIG}"
     AC_MSG_RESULT([${LUA_CONFIG} ${LUA_PKGNAME}])
     LUA_CFLAGS="`${LUA_CONFIG} ${LUA_PKGNAME} --cflags`"
     LUA_LIBS="`${LUA_CONFIG} ${LUA_PKGNAME} --libs`"

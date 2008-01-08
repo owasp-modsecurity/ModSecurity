@@ -24,17 +24,17 @@ else
     test_paths="${libxml_path}"
 fi
 
-AC_MSG_CHECKING([for ${LIBXML_CONFIG}])
+AC_MSG_CHECKING([for libxml2 config script])
 for x in ${test_paths}; do
     if test -e "${x}/bin/${LIBXML_CONFIG}"; then
-        with_libxml="${x}"
+        with_libxml="${x}/bin"
         break
     else
         with_libxml=""
     fi
 done
 if test -n "${with_libxml}"; then
-    LIBXML_CONFIG="${with_libxml}/bin/${LIBXML_CONFIG}"
+    LIBXML_CONFIG="${with_libxml}/${LIBXML_CONFIG}"
     AC_MSG_RESULT([${LIBXML_CONFIG}])
     LIBXML_CFLAGS="`${LIBXML_CONFIG} --cflags`"
     LIBXML_LIBS="`${LIBXML_CONFIG} --libs`"

@@ -6,7 +6,7 @@ dnl  APR_LDFLAGS
 dnl  APR_LIBS
 dnl  APR_LINK_LD
 
-APR_CONFIG="apr-config"
+APR_CONFIG=""
 APR_CFLAGS=""
 APR_LDFLAGS=""
 APR_LIBS=""
@@ -28,17 +28,22 @@ else
     test_paths="${apr_path}"
 fi
 
-AC_MSG_CHECKING([for ${APR_CONFIG}])
+AC_MSG_CHECKING([for libapr config script])
 for x in ${test_paths}; do
-    if test -e "${x}/bin/${APR_CONFIG}"; then
-        with_apr="${x}"
-        break
-    else
-        with_apr=""
-    fi
+    for APR_CONFIG in apr-config apr-1-config; do
+        if test -e "${x}/bin/${APR_CONFIG}"; then
+            with_apr="${x}/bin"
+            break
+        elif test -e "${x}/${APR_CONFIG}"; then
+            with_apr="${x}"
+            break
+        else
+            with_apr=""
+        fi
+    done
 done
 if test -n "${with_apr}"; then
-    APR_CONFIG="${with_apr}/bin/${APR_CONFIG}"
+    APR_CONFIG="${with_apr}/${APR_CONFIG}"
     AC_MSG_RESULT([${APR_CONFIG}])
     APR_CFLAGS="`${APR_CONFIG} --includes`"
     APR_LDFLAGS="`${APR_CONFIG} --ldflags`"

@@ -24,9 +24,12 @@ else
     test_paths="${pcre_path}"
 fi
 
-AC_MSG_CHECKING([for ${PCRE_CONFIG}])
+AC_MSG_CHECKING([for libpcre config script])
 for x in ${test_paths}; do
     if test -e "${x}/bin/${PCRE_CONFIG}"; then
+        with_pcre="${x}/bin"
+        break
+    elif test -e "${x}/${PCRE_CONFIG}"; then
         with_pcre="${x}"
         break
     else
@@ -34,7 +37,7 @@ for x in ${test_paths}; do
     fi
 done
 if test -n "${with_pcre}"; then
-    PCRE_CONFIG="${with_pcre}/bin/${PCRE_CONFIG}"
+    PCRE_CONFIG="${with_pcre}/${PCRE_CONFIG}"
     AC_MSG_RESULT([${PCRE_CONFIG}])
     PCRE_CFLAGS="`${PCRE_CONFIG} --cflags`"
     PCRE_LIBS="`${PCRE_CONFIG} --libs`"

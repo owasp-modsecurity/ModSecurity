@@ -28,9 +28,12 @@ else
     test_paths="${apu_path}"
 fi
 
-AC_MSG_CHECKING([for ${APU_CONFIG}])
+AC_MSG_CHECKING([for libapr-util config script])
 for x in ${test_paths}; do
     if test -e "${x}/bin/${APU_CONFIG}"; then
+        with_apu="${x}/bin"
+        break
+    elif test -e "${x}/${APU_CONFIG}"; then
         with_apu="${x}"
         break
     else
@@ -38,7 +41,7 @@ for x in ${test_paths}; do
     fi
 done
 if test -n "${with_apu}"; then
-    APU_CONFIG="${with_apu}/bin/${APU_CONFIG}"
+    APU_CONFIG="${with_apu}/${APU_CONFIG}"
     AC_MSG_RESULT([${APU_CONFIG}])
     APU_CFLAGS="`${APU_CONFIG} --includes`"
     APU_LDFLAGS="`${APU_CONFIG} --ldflags`"
@@ -59,7 +62,7 @@ if test -z "${APU_LIBS}"; then
   AC_MSG_NOTICE([*** apu library not found.])
   ifelse([$2], , AC_MSG_ERROR([apu library is required]), $2)
 else
-  AC_MSG_NOTICE([using '${APU_LIBS}' for apu Library])
+  AC_MSG_NOTICE([using '${APU_LINK_LD}' for apu Library])
   ifelse([$1], , , $1) 
 fi 
 ])
