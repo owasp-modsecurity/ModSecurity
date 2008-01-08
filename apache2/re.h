@@ -143,6 +143,8 @@ struct msre_rule {
     msre_rule               *chain_starter;
     #if defined(PERFORMANCE_MEASUREMENT)
     unsigned int             execution_time;
+    unsigned int             trans_time;
+    unsigned int             op_time;
     #endif
 
     /* Compiled Lua script. */

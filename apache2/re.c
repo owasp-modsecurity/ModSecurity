@@ -951,11 +951,14 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msre_rule *rule = rules[i];
-        msr_log(msr, 1, "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"]: %lu usec", rule,
+        msr_log(msr, 1, "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"]: %u usec (trans:%u usec, op:%u usec)",
+            rule,
             ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
             rule->filename != NULL ? rule->filename : "-",
             rule->line_num,
-            (rule->execution_time / 10000));
+            (rule->execution_time / 10000),
+            (rule->trans_time / 10000),
+            (rule->op_time / 10000));
     }
     
     return rc;
@@ -1445,7 +1448,7 @@ static void msre_perform_disruptive_actions(modsec_rec *msr, msre_rule *rule,
 static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
     msre_actionset *acting_actionset, apr_pool_t *mptmp)
 {
-    apr_time_t time_before_regex = 0;
+    apr_time_t time_before_op = 0;
     char *my_error_msg = NULL;
     const char *full_varname = NULL;
     int rc;
@@ -1480,15 +1483,23 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
             var->value_len));
     }
         
-    if (msr->txcfg->debuglog_level >= 4) {
-        time_before_regex = apr_time_now();
-    }
+    #if !defined(PERFORMANCE_MEASUREMENT)
+    if (msr->txcfg->debuglog_level >= 4)
+    #endif
+        time_before_op = apr_time_now();
 
     rc = rule->op_metadata->execute(msr, rule, var, &my_error_msg);
 
-    if (msr->txcfg->debuglog_level >= 4) {
+    #if !defined(PERFORMANCE_MEASUREMENT)
+    if (msr->txcfg->debuglog_level >= 4)
+    #endif
+    {
+        apr_time_t t1 = apr_time_now();
+        #if defined(PERFORMANCE_MEASUREMENT)
+        rule->op_time += (t1 - time_before_op);
+        #endif
         msr_log(msr, 4, "Operator completed in %" APR_TIME_T_FMT " usec.",
-            (apr_time_now() - time_before_regex));
+            (t1 - time_before_op));
     }
 
     if (rc < 0) {
@@ -1635,6 +1646,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
         int usecache = 0;
         apr_table_t **carr = NULL;
         apr_table_t *cachetab = NULL;
+        apr_time_t time_before_trans = 0;
        
         /* Take one target. */ 
         msre_var *var = (msre_var *)te[i].val;
@@ -1685,6 +1697,11 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
         else {
             msr_log(msr, 9, "CACHE: Disabled");
         }
+
+        #if !defined(PERFORMANCE_MEASUREMENT)
+        if (msr->txcfg->debuglog_level >= 4)
+        #endif
+            time_before_trans = apr_time_now();
 
 
         /* Transform target. */
@@ -1749,6 +1766,18 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
 
                 msr_log(msr, 9, "T (%d) %s: \"%s\" [cached hits=%d]", crec->changed, crec->path, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
 
+                #if !defined(PERFORMANCE_MEASUREMENT)
+                if (msr->txcfg->debuglog_level >= 4)
+                #endif
+                {
+                    apr_time_t t1 = apr_time_now();
+                    #if defined(PERFORMANCE_MEASUREMENT)
+                    rule->trans_time += (t1 - time_before_trans);
+                    #endif
+                    msr_log(msr, 4, "Transformation completed in %" APR_TIME_T_FMT " usec.",
+                        (t1 - time_before_trans));
+                }
+
                 rc = execute_operator(var, rule, msr, acting_actionset, mptmp);
 
                 if (rc < 0) {
@@ -1805,6 +1834,18 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                  */
                 if (multi_match && changed) {
                     invocations++;
+
+                    #if !defined(PERFORMANCE_MEASUREMENT)
+                    if (msr->txcfg->debuglog_level >= 4)
+                    #endif
+                    {
+                        apr_time_t t1 = apr_time_now();
+                        #if defined(PERFORMANCE_MEASUREMENT)
+                        rule->trans_time += (t1 - time_before_trans);
+                        #endif
+                        msr_log(msr, 4, "Transformation completed in %" APR_TIME_T_FMT " usec.",
+                            (t1 - time_before_trans));
+                    }
 
                     rc = execute_operator(var, rule, msr, acting_actionset, mptmp);
 
@@ -1891,6 +1932,18 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
          */
         if (!multi_match || changed) {
             invocations++;
+
+            #if !defined(PERFORMANCE_MEASUREMENT)
+            if (msr->txcfg->debuglog_level >= 4)
+            #endif
+            {
+                apr_time_t t1 = apr_time_now();
+                #if defined(PERFORMANCE_MEASUREMENT)
+                rule->trans_time += (t1 - time_before_trans);
+                #endif
+                msr_log(msr, 4, "Transformation completed in %" APR_TIME_T_FMT " usec.",
+                    (t1 - time_before_trans));
+            }
 
             rc = execute_operator(var, rule, msr, acting_actionset, mptmp);
 
