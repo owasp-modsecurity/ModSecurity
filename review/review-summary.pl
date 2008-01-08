@@ -29,7 +29,7 @@ for my $rec (values %{$review->{ReviewIssue} || {}}) {
 
 
 # Write report
-for my $fn (@ARGV ? (@ARGV) : (keys %ISSUES)) {
+for my $fn (@ARGV ? (@ARGV) : (sort keys %ISSUES)) {
 	print "File: $fn\n";
   print "===================================================================\n";
 	for my $r (sort { $a->{File}->{line} <=> $b->{File}->{line} || $a->{ReviewerId} cmp $b->{ReviewerId} } @{$ISSUES{$fn} || []}) {
