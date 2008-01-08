@@ -10,7 +10,7 @@ MOD_SECURITY2_H = re.h modsecurity.h msc_logging.h msc_multipart.h msc_parsers.h
     msc_geo.h acmp.h utf8tables.h msc_lua.h
 
 ### Must be in APXS format: -Wc,-flag
-EXTRA_CFLAGS = -Wc,-O2 -Wc,-g -Wc,-Wall -Wc,-Werror
+EXTRA_CFLAGS = @EXTRA_CFLAGS@
 
 
 APXS = @APXS@
