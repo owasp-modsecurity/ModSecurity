@@ -1732,7 +1732,6 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                     if (strcmp(action->param, "none") == 0) {
                         apr_table_clear(normtab);
                         tfnspath = NULL;
-                        tfnskey = NULL;
                         tfnscount = 0;
                         last_cached_tfn = 0;
                         continue;
@@ -1740,17 +1739,24 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
 
                     if (action->param_plusminus == NEGATIVE_VALUE) {
                         apr_table_unset(normtab, action->param);
-                    } else {
+                    }
+                    else {
+                        tfnscount++;
+
                         apr_table_addn(normtab, action->param, (void *)action);
 
-                        /* check cache, saving the 'most complete' */
-                        crec = (msre_cache_rec *)apr_table_get(cachetab, tfnskey);
-                        if (crec != NULL) {
-                            last_crec = crec;
-                            last_cached_tfn = tfnscount;
+                        /* Check the cache, saving the 'most complete' as a
+                         * starting point
+                         */
+                        if (usecache) {
+                            tfnspath = apr_psprintf(msr->mp, "%s%s%s", (tfnspath?tfnspath:""), (tfnspath?",":""), action->param);
+                            tfnskey = apr_psprintf(msr->mp, "%x;%s", tfnscount, tfnspath);
+                            crec = (msre_cache_rec *)apr_table_get(cachetab, tfnskey);
+                            if (crec != NULL) {
+                                last_crec = crec;
+                                last_cached_tfn = tfnscount;
+                            }
                         }
-
-                        tfnscount++;
                     }
                 }
             }
@@ -1813,16 +1819,25 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
 
             /* Start after the last known cached transformation if we can */
             if (!multi_match && (last_crec != NULL)) {
-                k = last_cached_tfn + 1;
+                k = last_cached_tfn;
                 tfnspath = last_crec->path;
-                msr_log(msr, 9, "CACHE: starting after '%s'", tfnspath);
+                last_crec->hits++;
+
+                if ((changed = last_crec->changed) == 1) {
+                    var->value = apr_pmemdup(msr->mp, last_crec->val, last_crec->val_len);
+                    var->value_len = last_crec->val_len;
+                }
+
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "T (%d) %s: \"%s\" [partially cached hits=%d]", last_crec->changed, tfnspath, log_escape_nq_ex(mptmp, var->value, var->value_len), last_crec->hits);
+                }
             }
             else {
+                changed = 1;
                 tfnspath = NULL;
                 k = 0;
             }
 
-            changed = 1;
             telts = (const apr_table_entry_t*)tarr->elts;
             for (; k < tarr->nelts; k++) {
                 char *rval = NULL;
@@ -1878,7 +1893,9 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                     tfnskey = apr_psprintf(msr->mp, "%x;%s", (k + 1), tfnspath);
 
                     /* Try to fetch this transformation from cache */
+                    #ifdef CACHE_DEBUG
                     msr_log(msr, 9, "CACHE: Fetching %s %s ", var->name, tfnskey);
+                    #endif
                     crec = (msre_cache_rec *)apr_table_get(cachetab, tfnskey);
                     if (crec != NULL) {
                         crec->hits++;
@@ -1916,7 +1933,9 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                     crec->path = tfnspath;
                     crec->val = changed ? apr_pmemdup(msr->mp, var->value, var->value_len) : NULL;
                     crec->val_len = changed ? var->value_len : 0;
+                    #ifdef CACHE_DEBUG
                     msr_log(msr, 9, "CACHE: Caching %s=\"%.*s\"", tfnskey, var->value_len, log_escape_nq_ex(mptmp, var->value, var->value_len));
+                    #endif
                     apr_table_setn(cachetab, tfnskey, (void *)crec);
                 }
 
