@@ -622,7 +622,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                 if (msr->txcfg->of_limit_action == RESPONSE_BODY_LIMIT_ACTION_REJECT) {
                     /* Reject response. */
                     msr_log(msr, 1, "Output filter: Response body too large (over limit of %lu, "
-                        "total length not known).", msr->txcfg->of_limit);
+                        "total not specified).", msr->txcfg->of_limit);
 
                     msr->of_status = OF_STATUS_COMPLETE;
                     msr->resbody_status = RESBODY_STATUS_PARTIAL;
