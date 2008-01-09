@@ -1654,5 +1654,70 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
     <Status>item.status.label.open</Status>
   </ReviewIssue>
+  <ReviewIssue id="FB6UPQJW">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 11:44:13:484 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 11:45:29:864 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1528">apache2/re.c</File>
+    <Type>item.type.label.optimization</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>This causes two loops through the action list.  Perhaps there is a more performant way to do these at the same time?  Maybe split into two lists?</Summary>
+    <Description>/* Perform non-disruptive actions. */
+        msre_perform_nondisruptive_actions(msr, rule, rule-&gt;actionset, mptmp);
+
+        /* Perform disruptive actions, but only if
+         * this rule is not part of a chain.
+         */
+        if (rule-&gt;actionset-&gt;is_chained == 0) {
+            msre_perform_disruptive_actions(msr, rule, acting_actionset, mptmp, my_error_msg);
+        }</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB6VV1A0">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 12:16:20:280 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 12:16:40:432 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1716">apache2/re.c</File>
+    <Type>item.type.label.irrelevant</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>These do not appear to be needed.</Summary>
+    <Description>tfnspath = NULL;
+                        tfnskey = NULL;</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB6W0DKJ">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 12:20:29:491 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 12:28:11:109 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1728">apache2/re.c</File>
+    <Type>item.type.label.programLogic</Type>
+    <Severity>item.severity.label.major</Severity>
+    <Summary>This does not appear to work as the tfnskey is not being built here.  Need to build the tfnskey in this loop for this to work.</Summary>
+    <Description>/* check cache, saving the 'most complete' */
+                        crec = (msre_cache_rec *)apr_table_get(cachetab, tfnskey);
+                        if (crec != NULL) {
+                            last_crec = crec;
+                            last_cached_tfn = tfnscount;
+                        }</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
 </Review>
 
