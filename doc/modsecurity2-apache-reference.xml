@@ -3849,8 +3849,8 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis>ctl:requestBodyProce
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">ruleRemoveById</literal> (single rule ID, or a
-          single rule ID range accepted as parameter)</para>
+          <para><literal moreinfo="none">ruleRemoveById</literal> (single rule
+          ID, or a single rule ID range accepted as parameter)</para>
         </listitem>
 
         <listitem>
@@ -5286,7 +5286,7 @@ is not allowed by policy"] [severity "CRITICAL"] [uri "/"] [unique_id
       <programlisting>Access denied with code 505 (phase 1). Match of "rx ^HTTP/(0\\\\.9|1\\\\.[01])$"
 against "REQUEST_PROTOCOL" required.</programlisting>
 
-      <para>The engine message consist of two parts. The first part tells you
+      <para>The engine message consists of two parts. The first part tells you
       whether ModSecurity acted to interrupt transaction or rule processing.
       If it did nothing the first part of the message will simply say
       "Warning". If an action was taken then one of the following messages
@@ -5334,7 +5334,7 @@ against "REQUEST_PROTOCOL" required.</programlisting>
       </itemizedlist>
 
       <para>The second part of the engine message explains
-      <emphasis>why</emphasis> was the event generated. Since it is
+      <emphasis>why</emphasis> the event was generated. Since it is
       automatically generated from the rules it will be very technical in
       nature talking about operators and their parameters and give you insight
       into what the rule looked like. But this message cannot give you insight
@@ -5449,8 +5449,8 @@ GET //EvilBoard_0.1a/index.php?c='/**/union/**/select/**/1,concat(username,char(
  /**/eb_members/**/where/**/userid=1/*http://kamloopstutor.com/images/banners/on.txt?
  HTTP/1.1
 TE: deflate,gzip;q=0.3
-Connection: TE, close
-Host: www.thinkingstone.com
+Connection: TE, cslose
+Host: www.example.com
 User-Agent: libwww-perl/5.808
 
 --c7036611-F--
@@ -5465,8 +5465,8 @@ Message: Warning. Match of "rx ^apache.*perl" against "REQUEST_HEADERS:User-Agen
 Message: Warning. Pattern match "(?:\\b(?:(?:s(?:elect\\b(?:.{1,100}?\\b(?:(?:length|count|top)\\b.{1,100}
  ?\\bfrom|from\\b.{1,100}?\\bwhere)|.*?\\b(?:d(?:ump\\b.*\\bfrom|ata_type)|(?:to_(?:numbe|cha)|inst)r))|p_
  (?:(?:addextendedpro|sqlexe)c|(?:oacreat|prepar)e|execute(?:sql)?|makewebt ..." at ARGS:c. [id "950001"]
- [msg "SQL Injection Attack. Matched signature &lt;union select&gt;"] [severity "CRITICAL"]
-Apache-Error: [file "/tmp/buildd/apache2-2.0.54/build-tree/apache2/server/core.c"] [line 3505] [level 3]
+ [msg "SQL Injection Attack. Matched signature: union select"] [severity "CRITICAL"]
+Apache-Error: [file "/tmp/buildd/apache2-2.x.x/build-tree/apache2/server/core.c"] [line 3505] [level 3]
  File does not exist: /var/www/EvilBoard_0.1a
 Stopwatch: 1199881676978327 2514 (396 2224 -)
 Producer: ModSecurity v2.x.x (Apache 2.x)
@@ -5498,8 +5498,8 @@ Server: Apache/2.x.x
         </listitem>
 
         <listitem>
-          <para>Section identifier, currently a single uppercase letter.
-          </para>
+          <para>Section identifier, currently a single uppercase
+          letter.</para>
         </listitem>
 
         <listitem>
@@ -5507,8 +5507,9 @@ Server: Apache/2.x.x
         </listitem>
       </orderedlist>
 
-      <para>Refer to the documenation for <literal>SecAuditLogParts</literal>
-      for the explanation of each part.</para>
+      <para>Refer to the documentsation for
+      <literal>SecAuditLogParts</literal> for the explanation of each
+      part.</para>
     </section>
   </section>
 
