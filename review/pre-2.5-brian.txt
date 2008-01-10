@@ -1,0 +1,1898 @@
+File: CHANGES
+===================================================================
+[brian] Suggestion @ 227
+
+Remove TODO.
+
+TODO: more to come
+
+
+
+File: apache2/acmp.c
+===================================================================
+[brian] Clarity @ 181
+
+Add parens for clarity.
+
+*ucs_chars++ = *c++;
+
+
+[brian] Suggestion @ 278
+
+Remove comment.
+
+//return acmp_child_for_code(node, letter)
+
+
+[brian] Suggestion @ 316
+
+Change to #idef DEBUG_ACMP or similar.
+
+/* printf("%c ->left %c \n", node->node->letter, node->left->node->letter); */
+
+
+[brian] Suggestion @ 323
+
+Change to #idef DEBUG_ACMP or similar.
+
+/* printf("%c ->right %c \n", node->node->letter, node->right->node->letter); */
+
+
+[brian] Suggestion @ 385
+
+Change to #idef DEBUG_ACMP or similar.
+
+/* printf("fail direction: *%s* => *%s*\n", child->text, child->fail->text); */
+
+
+[brian] Suggestion @ 396
+
+Change to #idef DEBUG_ACMP or similar.
+
+/* printf("fail direction: *%s* => *%s*\n", node->text, node->fail->text); */
+
+
+
+File: apache2/apache2_config.c
+===================================================================
+[brian] Suggestion @ 586
+
+The 'tag' and 'severity' metadata actions should be included.  Some actions are missing from the log msg.
+
+/* Must NOT use metadata actions. */
+        if ((rule->actionset->id != NOT_SET_P)
+            ||(rule->actionset->rev != NOT_SET_P)
+            ||(rule->actionset->msg != NOT_SET_P)
+            ||(rule->actionset->logdata != NOT_SET_P))
+        {
+            return apr_psprintf(cmd->pool, "ModSecurity: Metadata actions (id, rev, msg) "
+                " can only be specified by chain starter rules.");
+        }
+
+
+[brian] Suggestion @ 678
+
+Probably should check we were able to allocate.
+
+msre_rule *phrule = apr_palloc(rule->ruleset->mp, sizeof(msre_rule));
+
+
+[brian] Suggestion @ 702
+
+Comment or remove.
+
+TODO
+
+
+[brian] Suggestion @ 937
+
+ENH instead of TODO
+
+TODO
+
+
+[brian] Suggestion @ 1010
+
+The 'tag' and 'severity' metadata actions should be included.  Some actions are missing from the log msg.
+
+/* Must not use metadata actions. */
+    if ((dcfg->tmp_default_actionset->id != NOT_SET_P)
+        ||(dcfg->tmp_default_actionset->rev != NOT_SET_P)
+        ||(dcfg->tmp_default_actionset->msg != NOT_SET_P)
+        ||(dcfg->tmp_default_actionset->logdata != NOT_SET_P))
+    {
+        return apr_psprintf(cmd->pool, "ModSecurity: SecDefaultAction must not "
+            "contain any metadata actions (id, rev, msg).");
+    }
+
+
+[brian] Suggestion @ 1149
+
+Fix TODO or make ENH
+
+// TODO Validate encoding
+    // return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRequestBodyAccess: %s", p1);
+
+
+[brian] Suggestion @ 1205
+
+Fix TODO or change to ENH.
+
+// TODO check whether the parameter is a valid MIME type of "null"
+
+
+[brian] Irrelevant @ 1251
+
+Remove code?
+
+/*
+static const char *cmd_rule_import_by_id(cmd_parms *cmd, void *_dcfg, const char *p1) {
+    directory_config *dcfg = (directory_config *)_dcfg;
+    rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
+    if (dcfg == NULL) return NULL;
+
+    re->type = RULE_EXCEPTION_IMPORT_ID;
+    // TODO verify p1
+    re->param = p1;
+       *(rule_exception **)apr_array_push(dcfg->rule_exceptions) = re;
+    
+    return NULL;
+}
+
+static const char *cmd_rule_import_by_msg(cmd_parms *cmd, void *_dcfg, const char *p1) {
+    directory_config *dcfg = (directory_config *)_dcfg;
+    rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
+    if (dcfg == NULL) return NULL;
+
+    re->type = RULE_EXCEPTION_IMPORT_MSG;
+    // TODO verify p1
+    re->param = p1;
+    *(rule_exception **)apr_array_push(dcfg->rule_exceptions) = re;    
+
+    return NULL;
+}
+*/
+
+
+[brian] Suggestion @ 1384
+
+Fix or TODO->ENH
+
+// TODO enforce format (letters, digits, ., _, -)
+
+
+[brian] Suggestion @ 1464
+
+Need to allow for relative filename based of rule file.
+
+/* -- Geo Lookup configuration -- */
+
+static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
+    const char *p1)
+{
+    char *error_msg;
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+    
+    if (geo_init(dcfg, p1, &error_msg) <= 0) {
+        return error_msg;
+    }
+
+    return NULL;
+}
+
+
+[brian] Suggestion @ 1514
+
+Could use strtol as Ivan has as well.
+
+intval = apr_atoi64(charval);
+            if (errno == ERANGE) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations minlen out of range: %s", charval);
+            }
+            if (intval < 0) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations minlen must be positive: %s", charval);
+            }
+
+
+[brian] Suggestion @ 1522
+
+Portable?
+
+/* The NOT_SET indicator is -1, a signed long, and therfore
+             * we cannot be >= the unsigned value of NOT_SET.
+             */
+            if ((unsigned long)intval >= (unsigned long)NOT_SET) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations minlen must be less than: %lu", (unsigned long)NOT_SET);
+            }
+
+
+[brian] Suggestion @ 1534
+
+Could use strtol as Ivan has as well.
+
+intval = apr_atoi64(charval);
+            if (errno == ERANGE) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen out of range: %s", charval);
+            }
+            if (intval < 0) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must be positive: %s", charval);
+            }
+
+
+[brian] Suggestion @ 1542
+
+Portable?
+
+/* The NOT_SET indicator is -1, a signed long, and therfore
+             * we cannot be >= the unsigned value of NOT_SET.
+             */
+            if ((unsigned long)intval >= (unsigned long)NOT_SET) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must be less than: %lu", (unsigned long)NOT_SET);
+            }
+
+
+[brian] Suggestion @ 1567
+
+Fix TODO or change to ENH.
+
+AP_INIT_TAKE1 (
+        "SecAction",
+        cmd_action,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+
+
+[brian] Suggestion @ 1679
+
+Fix TODO or change to ENH.
+
+AP_INIT_TAKE1 (
+        "SecDataDir",
+        cmd_data_dir,
+        NULL,
+        CMD_SCOPE_MAIN,
+        "" // TODO
+    ),
+
+
+[brian] Suggestion @ 1704
+
+Fix TODO or change to ENH.
+
+AP_INIT_TAKE1 (
+        "SecDefaultAction",
+        cmd_default_action,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+
+
+[brian] Suggestion @ 1832
+
+Fix TODO or change to ENH.
+
+AP_INIT_TAKE1 (
+        "SecResponseBodyLimit",
+        cmd_response_body_limit,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+
+
+[brian] Suggestion @ 1840
+
+Fix TODO or change to ENH.
+
+AP_INIT_TAKE1 (
+        "SecResponseBodyLimitAction",
+        cmd_response_body_limit_action,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+
+
+[brian] Suggestion @ 1864
+
+Fix TODO or change to ENH.
+
+AP_INIT_TAKE23 (
+        "SecRule",
+        cmd_rule,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+
+
+[brian] Suggestion @ 1888
+
+Fix TODO or change to ENH.
+
+AP_INIT_TAKE12 (
+        "SecRuleScript",
+        cmd_rule_script,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+
+    AP_INIT_ITERATE (
+        "SecRuleRemoveById",
+        cmd_rule_remove_by_id,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+
+    AP_INIT_ITERATE (
+        "SecRuleRemoveByMsg",
+        cmd_rule_remove_by_msg,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+
+
+[brian] Suggestion @ 1920
+
+Fix TODO or change to ENH.
+
+AP_INIT_TAKE1 (
+        "SecTmpDir",
+        cmd_tmp_dir,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecUploadDir",
+        cmd_upload_dir,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecUploadKeepFiles",
+        cmd_upload_keep_files,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecWebAppId",
+        cmd_web_app_id,
+        NULL,
+        CMD_SCOPE_ANY,
+        "" // TODO
+    ),
+
+
+
+File: apache2/apache2_io.c
+===================================================================
+[brian] ProgramLogic @ 17
+
+Remove code?  It is actually used below, so need to verify.
+
+#if 0
+static void dummy_free_func(void *data) {}
+#endif
+
+
+[brian] ProgramLogic @ 92
+
+dummy_free_func() is defined where?  It is ifdef'd out at the top of source, so need to verify it is valid.
+
+/* Do not make a copy of the data we received in the chunk. */
+            bucket = apr_bucket_heap_create(chunk->data, chunk->length, dummy_free_func,
+                f->r->connection->bucket_alloc);
+
+
+[brian] ProgramLogic @ 224
+
+Returning here may fail to free chunks data due to modsecurity_request_body_end() not being called.
+
+int rcbs = modsecurity_request_body_store(msr, buf, buflen, error_msg);
+                if (rcbs < 0) {
+                    if (rcbs == -5) {
+                        *error_msg = apr_psprintf(msr->mp, "Requests body no files data length is larger than the "
+                            "configured limit (%lu).", msr->txcfg->reqbody_no_files_limit);
+                        return -5;
+                    }
+
+                    return -1;
+                }
+
+
+[brian] Suggestion @ 246
+
+Yes, why do we ignore the rc - why have one at all?
+
+// TODO: Why ignore the return code here?
+
+
+
+File: apache2/apache2_util.c
+===================================================================
+[brian] Suggestion @ 95
+
+Portable way to format sizeof()?
+
+msr_log(msr, 1, "Exec: Unable to allocate %lu bytes.", (unsigned long)sizeof(*procnew));
+
+
+
+File: apache2/mod_security2.c
+===================================================================
+[brian] Suggestion @ 685
+
+Fix TODO or change to ENH.
+
+/* Update the request headers. They might have changed after
+     * the body was read (trailers).
+     */
+    // TODO We still need to keep a copy of the original headers
+    //      to log in the audit log.
+    msr->request_headers = apr_table_copy(msr->mp, r->headers_in);
+
+
+[brian] Suggestion @ 1074
+
+What is the history of this?
+
+/* Our own hook to handle RPC transactions (not used at the moment).
+     * // ap_hook_handler(hook_handler, NULL, NULL, APR_HOOK_MIDDLE);
+     */
+
+
+
+File: apache2/modsecurity.c
+===================================================================
+[brian] Irrelevant @ 100
+
+Remove commented code?
+
+/* Serial audit log mutext */
+    rc = apr_global_mutex_create(&msce->auditlog_lock, NULL, APR_LOCK_DEFAULT, mp);
+    if (rc != APR_SUCCESS) {
+        //ap_log_error(APLOG_MARK, APLOG_ERR, rv, s, "mod_security: Could not create modsec_auditlog_lock");
+        //return HTTP_INTERNAL_SERVER_ERROR;
+        return -1;
+    }
+
+    #ifdef __SET_MUTEX_PERMS
+    rc = unixd_set_global_mutex_perms(msce->auditlog_lock);
+    if (rc != APR_SUCCESS) {
+        // ap_log_error(APLOG_MARK, APLOG_ERR, rc, s, "mod_security: Could not set permissions on modsec_auditlog_lock; check User and Group directives");
+        // return HTTP_INTERNAL_SERVER_ERROR;
+        return -1;
+    }
+    #endif
+
+
+[brian] Suggestion @ 126
+
+What *should* we do on error here?
+
+if (rc != APR_SUCCESS) {
+            // ap_log_error(APLOG_MARK, APLOG_ERR, rs, s, "Failed to child-init auditlog mutex");
+        }
+
+
+[brian] Suggestion @ 132
+
+This does nothing.
+
+/**
+ * Releases resources held by engine instance.
+ */
+void modsecurity_shutdown(msc_engine *msce) {
+    if (msce == NULL) return;
+}
+
+
+[brian] Suggestion @ 178
+
+Yes, why do we ignore the rc - why have one at all?
+
+// TODO: Why do we ignore return code here?
+    modsecurity_request_body_clear(msr, &my_error_msg);
+
+
+[brian] Suggestion @ 196
+
+Good.  This looks to solve the other issues noted as possible memory leaks in body chunk data due to modsecurity_request_body_end() not being called.  Need to verify, though.
+
+/* Register TX cleanup */
+    apr_pool_cleanup_register(msr->mp, msr, modsecurity_tx_cleanup, apr_pool_cleanup_null);
+
+
+[brian] Suggestion @ 298
+
+Figure out the optimal initial size for the arrays/tables.
+
+/* Collections. */
+    msr->tx_vars = apr_table_make(msr->mp, 32);
+    if (msr->tx_vars == NULL) return -1;
+
+    msr->geo_vars = apr_table_make(msr->mp, 8);
+    if (msr->geo_vars == NULL) return -1;
+
+    msr->collections = apr_table_make(msr->mp, 8);
+    if (msr->collections == NULL) return -1;
+    msr->collections_dirty = apr_table_make(msr->mp, 8);
+    if (msr->collections_dirty == NULL) return -1;
+
+    /* Other */
+    msr->tcache = apr_hash_make(msr->mp);
+    if (msr->tcache == NULL) return -1;
+
+    msr->matched_rules = apr_array_make(msr->mp, 16, sizeof(void *));
+    if (msr->matched_rules == NULL) return -1;
+
+    msr->matched_var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    if (msr->matched_var == NULL) return -1;
+
+    msr->highest_severity = 255; /* high, invalid value */
+
+    msr->removed_rules = apr_array_make(msr->mp, 16, sizeof(char *));
+    if (msr->removed_rules == NULL) return -1;
+
+
+
+File: apache2/modsecurity.h
+===================================================================
+[brian] Suggestion @ 63
+
+Should probably use STRINGIFY and define the numeric value.
+
+#define MODSEC_VERSION_MAJOR       "2"
+#define MODSEC_VERSION_MINOR       "5"
+#define MODSEC_VERSION_MAINT       "0"
+#define MODSEC_VERSION_TYPE        "rc"
+#define MODSEC_VERSION_RELEASE     "1"
+
+
+[brian] Optimization @ 363
+
+Need to re-test implementing this as just a table.
+
+/* data cache */
+    apr_hash_t          *tcache;
+
+
+
+File: apache2/msc_geo.c
+===================================================================
+[brian] Suggestion
+
+Check portability due to endianness.  It seems that the DB values are assumed to be in host order.  Perhaps the compiled DB is little-endian and we need to compensate?
+
+
+[brian] Suggestion @ 153
+
+Fix TODO.
+
+offset = -3;
+    apr_file_seek(geo->db, APR_END, &offset);
+    /* TODO check offset */
+
+
+[brian] Suggestion @ 176
+
+Fix TODO.
+
+rc = apr_file_read_full(geo->db, &buf, 1, &nbytes);
+            /* TODO: check rc */
+            geo->dbtype = (int)buf[0];
+
+
+[brian] Suggestion @ 325
+
+Fix TODO.
+
+apr_file_seek(geo->db, APR_SET, &seekto);
+        /* TODO: check rc */
+        rc = apr_file_read_full(geo->db, &buf, (2 * reclen), &nbytes);
+
+
+[brian] Suggestion @ 374
+
+Fix TODO.
+
+apr_file_seek(geo->db, APR_SET, &seekto);
+        /* TODO: check rc */
+        rc = apr_file_read_full(geo->db, &cbuf, sizeof(cbuf), &nbytes);
+
+
+
+File: apache2/msc_geo.h
+===================================================================
+[brian] Suggestion @ 16
+
+This value may not be portable based on endianness.  The algorithm compares it to the IP address as int in host order.
+
+#define GEO_COUNTRY_OFFSET        0xffff00
+
+
+
+File: apache2/msc_logging.c
+===================================================================
+[brian] Suggestion @ 50
+
+Spelling.
+
+throught
+
+
+[brian] ProgramLogic @ 235
+
+This allows an empty string as a valid part.  This misvalidates "ctl:auditLogParts=+", etc.
+
+is_valid_parts_specification
+
+
+[brian] Suggestion @ 406
+
+Fix TODO or change to ENH.
+
+/* The audit log storage directory should be explicitly
+         * defined. But if it isn't try to write to the same
+         * directory where the index file is placed. Of course,
+         * it is *very* bad practice to allow the Apache user
+         * to write to the same directory where a root user is
+         * writing to but it's not us that's causing the problem
+         * and there isn't anything we can do about that.
+         *
+         * TODO Actually there is something we can do! We will make
+         * SecAuditStorageDir mandatory, ask the user to explicitly
+         * define the storage location *and* refuse to work if the
+         * index and the storage location are in the same folder.
+         */
+        if (msr->txcfg->auditlog_storage_dir == NULL) {
+            entry_filename = file_dirname(msr->mp, msr->txcfg->auditlog_name);
+        }
+        else {
+            entry_filename = msr->txcfg->auditlog_storage_dir;
+        }
+        if (entry_filename == NULL) return;
+
+
+[brian] Suggestion @ 432
+
+apr_dir_make_recursive will attempt to create the dir straight away and if that fails keep backing off a dir until it can start creating, so I see no need to cache.  Besides, what happens if you cache, then someone deletes the path from outside apache?
+
+/* IMP1 Surely it would be more efficient to check the folders for
+         * the audit log repository base path in the configuration phase, to reduce
+         * the work we do on every request. Also, since our path depends on time,
+         * we could cache the time we last checked and don't check if we know
+         * the folder is there.
+         */
+         rc = apr_dir_make_recursive(entry_basename, CREATEMODE_DIR, msr->mp);
+
+
+[brian] Suggestion @ 876
+
+Change TODO to ENH.
+
+/* AUDITLOG_PART_UPLOADS */
+    // TODO: Implement
+
+
+
+File: apache2/msc_lua.c
+===================================================================
+[brian] Missing @ 155
+
+Log an error.
+
+} else {
+        // TODO Error
+        return NULL;
+    }
+
+
+[brian] Suggestion @ 363
+
+Change C++ to C style comment.
+
+// Get the response from the script.
+
+
+
+File: apache2/msc_multipart.c
+===================================================================
+[brian] Irrelevant @ 18
+
+Remove code?
+
+#if 0
+static char *multipart_construct_filename(modsec_rec *msr) {
+    char c, *p, *q = msr->mpd->mpp->filename;
+    char *filename;
+
+    /* find the last backward slash and consider the
+     * filename to be only what's right from it
+     */
+    p = strrchr(q, '\\');
+    if (p != NULL) q = p + 1;
+
+    /* do the same for the forward slash */
+    p = strrchr(q, '/');
+    if (p != NULL) q = p + 1;
+
+    /* allow letters, digits and dots, replace
+     * everything else with underscores
+     */
+    p = filename = apr_pstrdup(msr->mp, q);
+    while((c = *p) != 0) {
+        if (!( isalnum(c)||(c == '.') )) *p = '_';
+        p++;
+    }
+
+    return filename;
+}
+#endif
+
+
+[brian] ProgramLogic @ 52
+
+The multipart C-D header is case insensitive (rfc 2183), so we should probably use strncasecmp() here.
+
+/* accept only what we understand */
+    if (strncmp(c_d_value, "form-data", 9) != 0) {
+        return -1;
+    }
+
+
+[brian] Suggestion @ 75
+
+This allows for a name of "", so maybe check for name[0] == '\0' and return an error.  Although we catch this later on as an unrecognized name and return -10.
+
+start = p;
+        while((*p != '\0')&&(*p != '=')&&(*p != '\t')&&(*p != ' ')) p++;
+        if (*p == '\0') return -4;
+        
+        name = apr_pstrmemdup(msr->mp, start, (p - start));
+
+
+[brian] Suggestion @ 106
+
+I think this is wrong.  RFC 822 defines a quoted-string as <"> *(qtext/quoted-pair) <"> and quoted-par being able to quote any CHAR.
+
+/* only " and \ can be escaped */
+                    if ((*(p + 1) == '"')||(*(p + 1) == '\\')) {
+                        p++;
+                    }
+                    else {
+                        /* improper escaping */
+                        
+                        /* We allow for now because IE sends
+                         * improperly escaped content and there's
+                         * nothing we can do about it.
+                         *
+                         * return -9;
+                         */
+                    }
+
+
+[brian] Suggestion @ 122
+
+For a quoted value we just include everything until the end quote.  The field values should be US-ASCII 'qtext' or 'quoted-pair' (RFC 822) or escaped using RFC 2047.
+
+if (*p == '"') {
+                    *t = '\0';
+                    break;
+                }
+
+
+[brian] Clarity @ 127
+
+Add parens for clarity.
+
+*t++ = *p++;
+
+
+[brian] Suggestion @ 143
+
+RFC 2045 defines an 'attribute' as "ALWAYS case-insensitive", so these should be strncasecmp()
+
+if (strcmp(name, "name") == 0) {
+            if (msr->mpd->mpp->name != NULL) return -14;
+            msr->mpd->mpp->name = value;
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Multipart: Content-Disposition name: %s",
+                    log_escape_nq(msr->mp, value));
+            }
+        }
+        else
+        if (strcmp(name, "filename") == 0) {
+
+
+[brian] Suggestion @ 199
+
+len is always assumed to be at least 1.  What is preventing a len of 0?
+
+if (len > 1) {
+
+
+[brian] Suggestion @ 286
+
+Use MULTIPART_BUF_SIZE for the constant.
+
+if (strlen(new_value) > 4096) {
+
+
+[brian] Suggestion @ 722
+
+Cannot find anything that supports that this is or is not allowed.
+
+/* Flag for whitespace after parameter name. */
+
+
+[brian] Suggestion @ 735
+
+Cannot find anything that supports that this is or is not allowed.
+
+/* Flag for whitespace before parameter value. */
+
+
+[brian] Suggestion @ 861
+
+Use '\r' vs 0x0d as is done elsewhere.
+
+if ((c == 0x0d)&&(msr->mpd->bufleft == 1)) {
+            /* we don't want to take 0x0d as the last byte in the buffer */
+
+
+[brian] Suggestion @ 876
+
+Use '\n' vs 0x0a as is done elsewhere.
+
+if ((c == 0x0a)||(msr->mpd->bufleft == 0)||(process_buffer)) {
+
+
+
+File: apache2/msc_parsers.c
+===================================================================
+[brian] Suggestion @ 12
+
+Headers are not used.  I think they were added for iconv support, but Ivan removed it.
+
+#include "iconv.h"
+#include <errno.h>
+
+
+
+File: apache2/msc_reqbody.c
+===================================================================
+[brian] Suggestion @ 199
+
+Portable way to format sizeof()?
+
+*error_msg = apr_psprintf(msr->mp, "Input filter: Failed to allocate %lu bytes for request body chunk.", (unsigned long)sizeof(msc_data_chunk));
+
+
+[brian] Suggestion @ 465
+
+Portable way to format sizeof()?
+
+*error_msg = apr_psprintf(msr->mp, "Failed to allocate %lu bytes for request body disk chunk.", (unsigned long)sizeof(msc_data_chunk));
+
+
+[brian] Suggestion @ 474
+
+Portable way to format sizeof()?
+
+*error_msg = apr_psprintf(msr->mp, "Failed to allocate %lu bytes for request body disk chunk.", (unsigned long)sizeof(msc_data_chunk));
+
+
+
+File: apache2/msc_util.c
+===================================================================
+[brian] Suggestion @ 24
+
+Be more consistent in naming.
+
+#define VALID_HEX(X) (((X >= '0')&&(X <= '9')) || ((X >= 'a')&&(X <= 'f')) || ((X >= 'A')&&(X <= 'F')))
+#define ISODIGIT(X) ((X >= '0')&&(X <= '7'))
+
+
+[brian] Suggestion @ 835
+
+Actually, the parens are *required* for correctness, so remove the comments.
+
+(*invalid_count)++; /* parens quiet compiler warning */
+                }
+            } else {
+                /* Not enough bytes available, copy the raw bytes. */
+                *d++ = input[i++];
+                count ++;
+                (*invalid_count)++; /* parens quiet compiler warning */
+
+
+[brian] Optimization @ 1175
+
+No need to do a strlen twice *and* loop through the string.  Just loop and exit on non-space.
+
+if (strlen(string) == 0) return 1;
+
+    for(i = 0; i < strlen(string); i++) {
+        if (!isspace(string[i])) {
+            return 0;
+        }
+    }
+
+
+[brian] Suggestion @ 1186
+
+Fix TODO.
+
+char *resolve_relative_path(apr_pool_t *pool, const char *parent_filename, const char *filename) {
+    if (filename == NULL) return NULL;
+    // TODO Support paths on operating systems other than Unix.
+    if (filename[0] == '/') return (char *)filename;
+
+    return apr_pstrcat(pool, apr_pstrndup(pool, parent_filename,
+        strlen(parent_filename) - strlen(apr_filepath_name_get(parent_filename))),
+        filename, NULL);
+}
+
+
+
+File: apache2/msc_xml.c
+===================================================================
+[brian] Suggestion @ 27
+
+Remove #if 0'd code?
+
+#if 0
+static void xml_receive_sax_error(void *data, const char *msg, ...) {
+    modsec_rec *msr = (modsec_rec *)data;
+    char message[256];
+    
+    if (msr == NULL) return;
+
+    apr_snprintf(message, sizeof(message), "%s (line %d offset %d)",
+        log_escape_nq(msr->mp, msr->xml->parsing_ctx->lastError.message),
+        msr->xml->parsing_ctx->lastError.line,
+        msr->xml->parsing_ctx->lastError.int2);
+    
+    msr_log(msr, 5, "XML: Parsing error: %s", message);
+}
+#endif
+
+
+
+File: apache2/pdf_protect.c
+===================================================================
+[brian] Suggestion @ 26
+
+Change from TODO to ENH.
+
+// TODO We need ID and REV values for the PDF XSS alert.
+
+// TODO It would be nice if the user could choose the ID/REV/SEVERITY/MESSAGE, etc.
+
+
+[brian] Suggestion @ 217
+
+Change from TODO to ENH.
+
+// TODO Should we look at err_headers_out too?
+
+
+[brian] Suggestion @ 244
+
+Change from TODO to ENH.
+
+// TODO application/x-pdf, application/vnd.fdf, application/vnd.adobe.xfdf,
+        // application/vnd.adobe.xdp+xml, application/vnd.adobe.xfd+xml, application/vnd.pdf
+        // application/acrobat, text/pdf, text/x-pdf ???
+
+
+[brian] Missing @ 472
+
+Add the missing alert.
+
+// TODO Log alert
+
+
+
+File: apache2/re.c
+===================================================================
+[brian] Missing @ 47
+
+Need to log on failure.
+
+var = msre_create_var(ruleset, telts[i].key, telts[i].val, NULL, error_msg);
+        if (var == NULL) return -1;
+
+
+[brian] Suggestion @ 200
+
+No logging should be done here as we are passing the error_msg back to the parent and they are responsible for this.
+
+if (*error_msg != NULL) {
+            /* ENH Shouldn't we log the problem? */
+            return NULL;
+        }
+
+
+[brian] Suggestion @ 297
+
+Should replace with isvarnamechar() if possible.
+
+while((*p != '\0')&&(*p != '|')&&(*p != ':')&&(*p != ',')&&(!isspace(*p))) p++; /* ENH replace with isvarnamechar() */
+
+
+[brian] Suggestion @ 356
+
+Fix or remove TODO.
+
+// TODO better 64-bit support here
+                    *error_msg = apr_psprintf(mp, "Missing closing quote at position %d: %s",
+                        (int)(p - text), text);
+                    free(value);
+
+
+[brian] Suggestion @ 364
+
+Fix or remove TODO.
+
+// TODO better 64-bit support here
+                        *error_msg = apr_psprintf(mp, "Invalid quoted pair at position %d: %s",
+                            (int)(p - text), text);
+                        free(value);
+
+
+[brian] Clarity @ 371
+
+Add parens for clarity.
+
+*d++ = *p++;
+
+
+[brian] Clarity @ 379
+
+Add parens for clarity.
+
+*d++ = *p++;
+
+
+[brian] Irrelevant @ 608
+
+Does not appear to be used anywhere.
+
+/**
+ * Destroys an engine instance, releasing the consumed memory.
+ */
+void msre_engine_destroy(msre_engine *engine) {
+    /* Destroyed automatically by the parent pool.
+     * apr_pool_destroy(engine->mp);
+     */
+}
+
+
+[brian] Clarity @ 908
+
+This version should be moved up next to the normal version.
+
+#if defined(PERFORMANCE_MEASUREMENT)
+apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) {
+ ...
+}
+
+
+[brian] Missing @ 1096
+
+Hmm, I thought this had already been fixed in trunk.  Missing logging phase.  Need to fix in 2.1.5 as well.
+
+/**
+ * Removes from the ruleset all rules that match the given exception.
+ */
+int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exception *re) {
+    int count = 0;
+
+    if (ruleset == NULL) return 0;
+
+    count += msre_ruleset_phase_rule_remove_with_exception(ruleset, re, ruleset->phase_request_headers);
+    count += msre_ruleset_phase_rule_remove_with_exception(ruleset, re, ruleset->phase_request_body);
+    count += msre_ruleset_phase_rule_remove_with_exception(ruleset, re, ruleset->phase_response_headers);
+    count += msre_ruleset_phase_rule_remove_with_exception(ruleset, re, ruleset->phase_response_body);
+
+    return count;    
+}
+
+
+[brian] Optimization @ 1119
+
+Should move this to a static global for performance.
+
+static const char *const severities[] = {
+        "EMERGENCY",
+        "ALERT",
+        "CRITICAL",
+        "ERROR",
+        "WARNING",
+        "NOTICE",
+        "INFO",
+        "DEBUG",
+        NULL,
+    };
+
+
+[brian] Optimization @ 1150
+
+tags set to NULL would be a bit better as it would stop apr_pstrcat() earlier, but tags *must* remain last or wierd results.
+
+char *tags = "";
+
+
+[brian] Suggestion @ 1179
+
+Implement TODO.
+
+//TODO: restrict to 512 bytes
+
+
+[brian] Suggestion @ 1233
+
+Should not log_escape the actions as they will get double escaped (once now and again when logged).
+
+/* Add the unparsed rule */
+    if ((strcmp(SECACTION_TARGETS, targets) == 0) && (strcmp(SECACTION_ARGS, args) == 0)) {
+        rule->unparsed = apr_psprintf(ruleset->mp, "SecAction \"%s\"",
+            log_escape(ruleset->mp, actions));
+    }
+    else
+        if ((strcmp(SECMARKER_TARGETS, targets) == 0)
+            && (strcmp(SECMARKER_ARGS, args) == 0)
+            && (strncmp(SECMARKER_BASE_ACTIONS, actions, strlen(SECMARKER_BASE_ACTIONS)) == 0))
+        {
+            rule->unparsed = apr_psprintf(ruleset->mp, "SecMarker \"%s\"",
+                log_escape(ruleset->mp, actions + strlen(SECMARKER_BASE_ACTIONS)));
+    }
+    else {
+        if (actions == NULL) {
+            rule->unparsed = apr_psprintf(ruleset->mp, "SecRule \"%s\" \"%s\"",
+                log_escape(ruleset->mp, targets), log_escape(ruleset->mp, args));
+        } else {
+            rule->unparsed = apr_psprintf(ruleset->mp, "SecRule \"%s\" \"%s\" \"%s\"",
+                log_escape(ruleset->mp, targets), log_escape(ruleset->mp, args),
+                log_escape(ruleset->mp, actions));
+        }
+    }
+
+
+[brian] Suggestion @ 1341
+
+Should not log_escape the actions as they will get double escaped (once now and again when logged).
+
+} else {
+        rule->unparsed = apr_psprintf(ruleset->mp, "SecRuleScript \"%s\" \"%s\"",
+            script_filename, log_escape(ruleset->mp, actions));
+    }
+
+
+[brian] Optimization @ 1528
+
+This causes two loops through the action list.  Perhaps there is a more performant way to do these at the same time?  Maybe split into two lists?
+
+/* Perform non-disruptive actions. */
+        msre_perform_nondisruptive_actions(msr, rule, rule->actionset, mptmp);
+
+        /* Perform disruptive actions, but only if
+         * this rule is not part of a chain.
+         */
+        if (rule->actionset->is_chained == 0) {
+            msre_perform_disruptive_actions(msr, rule, acting_actionset, mptmp, my_error_msg);
+        }
+
+
+[brian] Irrelevant @ 1716
+
+These do not appear to be needed.
+
+tfnspath = NULL;
+                        tfnskey = NULL;
+
+
+[brian] ProgramLogic @ 1728
+
+This does not appear to work as the tfnskey is not being built here.  Need to build the tfnskey in this loop for this to work.
+
+/* check cache, saving the 'most complete' */
+                        crec = (msre_cache_rec *)apr_table_get(cachetab, tfnskey);
+                        if (crec != NULL) {
+                            last_crec = crec;
+                            last_cached_tfn = tfnscount;
+                        }
+
+
+
+File: apache2/re.h
+===================================================================
+[brian] Irrelevant @ 86
+
+Does not appear to be used anywhere.
+
+void DSOLOCAL msre_engine_destroy(msre_engine *engine);
+
+
+[brian] Suggestion @ 148
+
+Why not stored in op_param_data like @rx, etc.  The param_data is used w/exec action for lua.
+
+/* Compiled Lua script. */
+    msc_script              *script;
+
+
+
+File: apache2/re_actions.c
+===================================================================
+[brian] Optimization @ 170
+
+This implementation comment needs to be coded as many string operators now attempt to resolve macros.
+
+/* IMP1 Duplicate the string and create the array on
+     *      demand, thus not having to do it if there are
+     *      no macros in the input data.
+     */
+
+    data = apr_pstrdup(mptmp, var->value); /* IMP1 Are we modifying data anywhere? */
+    arr = apr_array_make(mptmp, 16, sizeof(msc_string *));
+    if ((data == NULL)||(arr == NULL)) return -1;
+
+
+[brian] Suggestion @ 202
+
+No.
+
+/* ENH Do we want to support %{DIGIT} as well? */
+
+
+[brian] Irrelevant @ 209
+
+This #if 0'd out code should be removed.
+
+/* Removed %0-9 macros as it messes up urlEncoding in the match
+ * where having '%0a' will be treated as %{TX.0}a, which is incorrect.
+ * */
+#if 0
+            else if ((*(p + 1) >= '0')&&(*(p + 1) <= '9')) {
+                /* Special case for regex captures. */
+                var_name = "TX";
+                var_value = apr_pstrmemdup(mptmp, p + 1, 1);
+                next_text_start = p + 2;
+            }
+#endif
+
+
+[brian] Suggestion @ 257
+
+Should log a level 9 msg here.
+
+} else {
+                /* We could not identify a valid macro so add it as text. */
+                part = (msc_string *)apr_pcalloc(mptmp, sizeof(msc_string));
+                if (part == NULL) return -1;
+                part->value_len = p - text_start + 1; /* len(text)+len("%") */
+                part->value = apr_pstrmemdup(mptmp, text_start, part->value_len);
+                *(msc_string **)apr_array_push(arr) = part;
+
+                next_text_start = p + 1;
+            }
+
+
+[brian] Optimization @ 276
+
+Use apr_array_pstrcat(msr->mp, arr, NULL) instead?
+
+/* If there's more than one member of the array that
+     * means there was at least one macro present. Combine
+     * text parts into a single string now.
+     */
+    if (arr->nelts > 1) {
+        /* Figure out the required size for the string. */
+        var->value_len = 0;
+        for(i = 0; i < arr->nelts; i++) {
+            part = ((msc_string **)arr->elts)[i];
+            var->value_len += part->value_len;
+        }
+
+        /* Allocate the string. */
+        var->value = apr_palloc(msr->mp, var->value_len + 1);
+        if (var->value == NULL) return -1;
+
+        /* Combine the parts. */
+        offset = 0;
+        for(i = 0; i < arr->nelts; i++) {
+            part = ((msc_string **)arr->elts)[i];
+            memcpy((char *)(var->value + offset), part->value, part->value_len);
+            offset += part->value_len;
+        }
+        var->value[offset] = '\0';
+    }
+
+
+[brian] Missing @ 402
+
+Implement.  Need to check if Apache will return an invalid status code
+
+/* status */
+static char *msre_action_status_validate(msre_engine *engine, msre_action *action) {
+    /* ENH action->param must be a valid HTTP status code. */
+    return NULL;
+}
+
+
+[brian] Missing @ 422
+
+Implement.
+
+/* pause */
+static char *msre_action_pause_validate(msre_engine *engine, msre_action *action) {
+    /* ENH Validate a positive number. */
+    return NULL;
+}
+
+
+[brian] Missing @ 434
+
+Implement as a valid URI check with apr_uri_parse()?
+
+/* redirect */
+
+static char *msre_action_redirect_validate(msre_engine *engine, msre_action *action) {
+    /* ENH Add validation. */
+    return NULL;
+}
+
+
+[brian] Missing @ 465
+
+Implement as a valid URI check with apr_uri_parse()?
+
+/* proxy */
+
+static char *msre_action_proxy_validate(msre_engine *engine, msre_action *action) {
+    /* ENH Add validation. */
+    return NULL;
+}
+
+
+[brian] Irrelevant @ 507
+
+I do not see a need to validate beyound what is already done in the init function.
+
+msre_action_skip_validate
+msre_action_skipAfter_validate
+
+
+[brian] Irrelevant @ 530
+
+I believe this is already done and comment needs removed.
+
+// TODO: Need to keep track of skipAfter IDs so we can insert placeholders after
+    // we get to the real rule with that ID.
+
+
+[brian] Missing @ 570
+
+Implement.
+
+/* phase */
+
+static char *msre_action_phase_validate(msre_engine *engine, msre_action *action) {
+    /* ENH Add validation. */
+    return NULL;
+}
+
+
+[brian] Suggestion @ 612
+
+Probably should also calc length and validate a length > 0 instead of just checking NULL.  Other checks would benefit from checking a length as well, so no harm in calculating that.
+
+if (value == NULL) {
+        return apr_psprintf(engine->mp, "Missing ctl value for name: %s", name);
+    }
+
+
+[brian] Irrelevant @ 708
+
+Why register init() if we do not use it?
+
+static apr_status_t msre_action_ctl_init(msre_engine *engine, msre_actionset *actionset,
+    msre_action *action)
+{
+    /* Do nothing. */
+    return 1;
+}
+
+
+[brian] Optimization @ 726
+
+Inner if's should be else if's.
+
+if (strcasecmp(name, "ruleEngine") == 0) {
+        if (strcasecmp(value, "on") == 0) {
+            msr->txcfg->is_enabled = MODSEC_ENABLED;
+            msr->usercfg->is_enabled = MODSEC_ENABLED;
+        }
+
+        if (strcasecmp(value, "off") == 0) {
+            msr->txcfg->is_enabled = MODSEC_DISABLED;
+            msr->usercfg->is_enabled = MODSEC_DISABLED;
+        }
+
+        if (strcasecmp(value, "detectiononly") == 0) {
+            msr->txcfg->is_enabled = MODSEC_DETECTION_ONLY;
+            msr->usercfg->is_enabled = MODSEC_DETECTION_ONLY;
+        }
+
+        return 1;
+    } else
+
+
+[brian] Optimization @ 774
+
+inner if's should be else if's.  TODO needs looked into.
+
+if (strcasecmp(name, "auditEngine") == 0) {
+        if (strcasecmp(value, "on") == 0) {
+            msr->txcfg->auditlog_flag = AUDITLOG_ON;
+            msr->usercfg->auditlog_flag = AUDITLOG_ON;
+        }
+
+        if (strcasecmp(value, "off") == 0) {
+            msr->txcfg->auditlog_flag = AUDITLOG_OFF;
+            msr->usercfg->auditlog_flag = AUDITLOG_OFF;
+        }
+
+        if (strcasecmp(value, "relevantonly") == 0) {
+            msr->txcfg->auditlog_flag = AUDITLOG_RELEVANT;
+            msr->usercfg->auditlog_flag = AUDITLOG_RELEVANT;
+        }
+
+        msr_log(msr, 4, "Ctl: Set auditEngine to %d.", msr->txcfg->auditlog_flag); // TODO
+
+        return 1;
+    } else
+
+
+[brian] Suggestion @ 790
+
+Not positive why the TODO here.  Perhaps for a decision as to log and/or at what level?
+
+msr_log(msr, 4, "Ctl: Set auditEngine to %d.", msr->txcfg->auditlog_flag); // TODO
+
+
+[brian] Suggestion @ 812
+
+That warning quieter should be s++.  An evil typo that was fixed in 2.1.x, but not trunk!
+
+while(*s != '\0') {
+                    if (*s != c) {
+                        *d++ = *s++;
+                    } else {
+                        (*s)++; /* parens quiet compiler warning */
+                    }
+                }
+                *d = '\0';
+
+
+[brian] Clarity @ 814
+
+Add parens for clarity.
+
+*d++ = *s++;
+
+
+[brian] Missing @ 855
+
+Should log an internal error here.
+
+else {
+        /* ENH Should never happen, but log if it does. */
+        return -1;
+    }
+
+
+[brian] Suggestion @ 1152
+
+Probably should use apr_strtoi64 where we can tell if there was an error in conversion since we are potentially taking a value from a macro expansion.  Also may want to look for overflow.
+
+value += atoi(var_value);
+
+
+[brian] Missing @ 1232
+
+Missing error log needs implemented.
+
+} else {
+        /* ENH Log warning detected variable name but no collection. */
+        return 0;
+    }
+
+
+[brian] Suggestion @ 1288
+
+Not sure why we would not want to deprecate a TX var.  Further rules could use this even if TX is not persisted.
+
+/* IMP1 Add message TX variables cannot deprecate in value. */
+
+
+[brian] Suggestion @ 1296
+
+Missing error log needs implemented.
+
+} else {
+        /* ENH Log warning detected variable name but no collection. */
+        return 0;
+    }
+
+
+[brian] Suggestion @ 1383
+
+The timeout is hardcoded to 3600.  The docs state TIMEOUT is read-only, but this is not true.  So, you can modify TIMEOUT.
+
+/* IMP1 Is the timeout hard-coded to 3600? */
+
+
+[brian] Suggestion @ 1555
+
+We already have support for relative filenames, but cannot get to this data from here.  This needs solved by passing more data to the validate function (cmd_parms rec).  Maybe need a warning here stating we do not support them yet, or it might be confusing to users that we do not here but do elsewhere.
+
+/* TODO Support relative filenames. */
+
+
+[brian] Suggestion @ 1557
+
+Not sure using an extension is a good idea here.  Better I think would be to specify a type: "exec:[type=]/path/to/file" as in "exec:lua=/path/to/script" and make param_data a script_rec with a type and value.  Also we use the abstract param_data here vs using a specific field as in SecRuleScript.
+
+/* Process Lua scripts internally. */
+    if (strlen(filename) > 4) {
+        char *p = filename + strlen(filename) - 4;
+        if ((p[0] == '.')&&(p[1] == 'l')&&(p[2] == 'u')&&(p[3] == 'a')) {
+            /* It's a Lua script. */
+            msc_script *script = NULL;
+
+            /* Compile script. */
+            char *msg = lua_compile(&script, filename, engine->mp);
+            if (msg != NULL) return msg;
+
+            action->param_data = script;
+        }
+    }
+
+
+[brian] Suggestion @ 1578
+
+This assumes lua is the only type (which it is now), but should be re-writen with a script_rec stored in param_data.
+
+if (action->param_data != NULL) { /* Lua */
+        msc_script *script = (msc_script *)action->param_data;
+        char *my_error_msg = NULL;
+
+        if (lua_execute(script, NULL, msr, rule, &my_error_msg) < 0) {
+            msr_log(msr, 1, "%s", my_error_msg);
+            return 0;
+        }
+    } else { /* Execute as shell script. */
+
+
+
+File: apache2/re_operators.c
+===================================================================
+[brian] Missing
+
+Need more unit tests for operators.  Start with new operators.
+
+
+[brian] Suggestion @ 246
+
+Use resolve_relative_path() instead?  Maybe a config_relative_path() to just get the path?
+
+/* Get the path of the rule filename to use as a base */
+    rulefile_path = apr_pstrndup(rule->ruleset->mp, rule->filename, strlen(rule->filename) - strlen(apr_filepath_name_get(rule->filename)));
+
+
+[brian] Clarity @ 265
+
+Add parens for clarity.
+
+*next++ = '\0';
+
+
+[brian] Missing @ 310
+
+Need to check return code and log an error on failure.
+
+acmp_add_pattern(p, buf, NULL, NULL, strlen(buf));
+
+
+[brian] Missing @ 315
+
+Need to check return code and log an error on failure.
+
+acmp_prepare(p);
+
+
+[brian] Optimization @ 379
+
+See if apr_strmatch is faster.
+
+msre_op_within_execute
+
+
+[brian] Optimization @ 442
+
+See if apr_strmatch is faster.
+
+msre_op_contains_execute
+
+
+[brian] Optimization @ 506
+
+See if apr_strmatch is faster.
+
+msre_op_containsWord_execute
+
+
+[brian] Missing @ 1109
+
+@geoLookup should set error_msg on success to something like "Successful geograpical lookup of \"%s\" at %s."
+
+msre_op_geoLookup_execute
+
+
+[brian] Missing @ 1230
+
+@rbl fails to set the var name in error_msg.  Should append "at %s".
+
+rc = apr_sockaddr_info_get(&sa, name_to_check,
+        APR_UNSPEC/*msr->r->connection->remote_addr->family*/, 0, 0, msr->mp);
+    if (rc == APR_SUCCESS) {
+        *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded.",
+            log_escape_nq(msr->mp, name_to_check));
+        return 1; /* Match. */
+    }
+
+
+[brian] Suggestion @ 1259
+
+Remove the ifdef as lua is required?
+
+#ifdef WITH_LUA
+
+
+[brian] Suggestion @ 1259
+
+Need to remove the LUA #ifdef's
+
+#ifdef WITH_LUA
+
+
+[brian] Suggestion @ 1260
+
+Change from TODO to ENH.
+
+// TODO Write & use string_ends(s, e).
+
+
+[brian] Suggestion @ 1275
+
+Change from TODO to ENH.
+
+
+[brian] Suggestion @ 1324
+
+The LUA #ifdef's should be removed, but if it is decided not to, then this lua call needs to be #ifdef'd.
+
+} else {
+        /* Execute internally, as Lua script. */
+        char *target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
+        msc_script *script = (msc_script *)rule->op_param_data;
+        int rc;
+
+        rc = lua_execute(script, target, msr, rule, error_msg);
+        if (rc < 0) {
+            /* Error. */
+            return -1;
+        }
+
+        return rc;
+    }
+
+
+[brian] Missing @ 1330
+
+Need an error_msg set for lua execution error.
+
+rc = lua_execute(script, target, msr, rule, error_msg);
+        if (rc < 0) {
+            /* Error. */
+            return -1;
+        }
+
+
+[brian] Missing @ 1403
+
+@validateByteRange does not output the VAR name on match.  Need to append " at %s."
+
+msre_op_validateByteRange_execute
+
+
+[brian] Missing @ 1477
+
+@validateurlEncoding does not output VAR name nor offset in error_msg on match.
+
+msre_op_validateUrlEncoding_execute
+
+
+[brian] Missing @ 1659
+
+Numeric operators (@eq, etc) do not output VAR name on match.
+
+msre_op_eq_execute
+msre_op_gt_execute
+msre_op_lt_execute
+msre_op_ge_execute
+msre_op_le_execute
+
+
+[brian] Missing @ 1885
+
+@m operator is not documented.  This does the same as @contains, so it was suggested earlier to use the @m algorithm for contains (if faster) and drop @m.
+
+/* m */
+    msre_engine_op_register(engine,
+        "m",
+        msre_op_m_param_init,
+        msre_op_m_execute
+    );
+
+
+
+File: apache2/re_tfns.c
+===================================================================
+[brian] Optimization @ 77
+
+No need to set this on all.  Only set it once when we find the first non-space char.
+
+(*rval)[i] = '\0';
+
+
+
+File: apache2/re_variables.c
+===================================================================
+[brian] Suggestion @ 841
+
+Indention off.
+
+return var_simple_generate_ex(var, vartab, mptmp,
+                               apr_pmemdup(mptmp,
+                                   msr->matched_var->value,
+                                   msr->matched_var->value_len),
+                               msr->matched_var->value_len);
+
+
+[brian] Suggestion @ 853
+
+Indention off.
+
+return var_simple_generate_ex(var, vartab, mptmp,
+                               apr_pmemdup(mptmp,
+                                   msr->matched_var->name,
+                                   msr->matched_var->name_len),
+                               msr->matched_var->name_len);
+
+
+[brian] Suggestion @ 2204
+
+Is ENV really cacheable?  It could change via setenv.
+
+/* ENV */
+    msre_engine_variable_register(engine,
+        "ENV",
+        VAR_LIST,
+        0, 1,
+        var_env_validate,
+        var_env_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+
+[brian] Suggestion @ 2270
+
+GEO is probably not cacheable as it changes with every @geoLookup operator.
+
+/* GEO */
+    msre_engine_variable_register(engine,
+        "GEO",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_geo_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+
+[brian] Suggestion @ 2281
+
+GLOBAL is not documented.  Is it cacheable?
+
+/* GLOBAL */
+    msre_engine_variable_register(engine,
+        "GLOBAL",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_global_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+
+[brian] Suggestion @ 2303
+
+IP undocumented.  Probably not cacheable as it can change via setvar, etc.
+
+/* IP */
+    msre_engine_variable_register(engine,
+        "IP",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_ip_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+
+[brian] Suggestion @ 2534
+
+RESOURCE is undocumented.  Probably not cacheable as it is easily changed.
+
+/* RESOURCE */
+    msre_engine_variable_register(engine,
+        "RESOURCE",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_resource_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+
+[brian] Suggestion @ 2908
+
+SESSION is probably not cacheable since it is modifyable via setvar.
+
+/* SESSION */
+    msre_engine_variable_register(engine,
+        "SESSION",
+        VAR_LIST,
+        1, 1,
+        var_generic_list_validate,
+        var_session_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+
+
