@@ -1406,34 +1406,6 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
     <Status>item.status.label.open</Status>
   </ReviewIssue>
-  <ReviewIssue id="FB605I87">
-    <ReviewIssueMeta>
-      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 21:28:41:095 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 21:40:15:511 GMT-08:00</LastModificationDate>
-    </ReviewIssueMeta>
-    <ReviewerId>brian</ReviewerId>
-    <AssignedTo>brian</AssignedTo>
-    <File line="149">apache2/msc_reqbody.c</File>
-    <Type>item.type.label.programLogic</Type>
-    <Severity>item.severity.label.major</Severity>
-    <Summary>Potential memory leak if modsecurity_request_body_store_disk() fails.  Returning here causes modsecurity_request_body_end() to never be called and never free chunk data.  See also notes in read_request_body() in apache_io.c.</Summary>
-    <Description>/* Write the data we keep in memory */
-        chunks = (msc_data_chunk **)msr-&gt;msc_reqbody_chunks-&gt;elts;
-        for(i = 0; i &lt; msr-&gt;msc_reqbody_chunks-&gt;nelts; i++) {
-            disklen += chunks[i]-&gt;length;
-
-            if (modsecurity_request_body_store_disk(msr, chunks[i]-&gt;data, chunks[i]-&gt;length, error_msg) &lt; 0) {
-                return -1;
-            }
-
-            free(chunks[i]-&gt;data);
-            chunks[i]-&gt;data = NULL;
-        }</Description>
-    <Annotation />
-    <Revision />
-    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
-  </ReviewIssue>
   <ReviewIssue id="FB60NQ60">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 21:42:51:192 GMT-08:00</CreationDate>
@@ -3111,6 +3083,350 @@ static char *multipart_construct_filename(modsec_rec *msr) {
         }
         else
         if (strcmp(name, "filename") == 0) {</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9R1V3P">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 12:24:59:317 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 12:25:40:036 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="199">apache2/msc_multipart.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>len is always assumed to be at least 1.  What is preventing a len of 0?</Summary>
+    <Description>if (len &gt; 1) {</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9R56TK">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 12:27:34:472 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:16:19:644 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="286">apache2/msc_multipart.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Use MULTIPART_BUF_SIZE for the constant.</Summary>
+    <Description>if (strlen(new_value) &gt; 4096) {</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9SGM20">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:04:27:048 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:04:57:229 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="722">apache2/msc_multipart.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Cannot find anything that supports that this is or is not allowed.</Summary>
+    <Description>/* Flag for whitespace after parameter name. */</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9SHGAA">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:05:06:226 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:05:11:552 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="735">apache2/msc_multipart.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Cannot find anything that supports that this is or is not allowed.</Summary>
+    <Description>/* Flag for whitespace before parameter value. */</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9SQR7V">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:12:20:299 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:12:45:495 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="861">apache2/msc_multipart.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Use '\r' vs 0x0d as is done elsewhere.</Summary>
+    <Description>if ((c == 0x0d)&amp;&amp;(msr-&gt;mpd-&gt;bufleft == 1)) {
+            /* we don't want to take 0x0d as the last byte in the buffer */</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9SRHG7">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:12:54:295 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:13:12:297 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="876">apache2/msc_multipart.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Use '\n' vs 0x0a as is done elsewhere.</Summary>
+    <Description>if ((c == 0x0a)||(msr-&gt;mpd-&gt;bufleft == 0)||(process_buffer)) {</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9SZOE3">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:19:16:539 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:20:00:685 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="12">apache2/msc_parsers.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Headers are not used.  I think they were added for iconv support, but Ivan removed it.</Summary>
+    <Description>#include "iconv.h"
+#include &lt;errno.h&gt;</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9T9JDT">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:26:56:609 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:27:21:817 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="24">apache2/msc_util.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Be more consistent in naming.</Summary>
+    <Description>#define VALID_HEX(X) (((X &gt;= '0')&amp;&amp;(X &lt;= '9')) || ((X &gt;= 'a')&amp;&amp;(X &lt;= 'f')) || ((X &gt;= 'A')&amp;&amp;(X &lt;= 'F')))
+#define ISODIGIT(X) ((X &gt;= '0')&amp;&amp;(X &lt;= '7'))</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9TGO2M">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:32:29:278 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:34:07:812 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1175">apache2/msc_util.c</File>
+    <Type>item.type.label.optimization</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>No need to do a strlen twice *and* loop through the string.  Just loop and exit on non-space.</Summary>
+    <Description>if (strlen(string) == 0) return 1;
+
+    for(i = 0; i &lt; strlen(string); i++) {
+        if (!isspace(string[i])) {
+            return 0;
+        }
+    }</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9TKRGZ">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:35:40:307 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:36:03:933 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="100">apache2/modsecurity.c</File>
+    <Type>item.type.label.irrelevant</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Remove commented code?</Summary>
+    <Description>/* Serial audit log mutext */
+    rc = apr_global_mutex_create(&amp;msce-&gt;auditlog_lock, NULL, APR_LOCK_DEFAULT, mp);
+    if (rc != APR_SUCCESS) {
+        //ap_log_error(APLOG_MARK, APLOG_ERR, rv, s, "mod_security: Could not create modsec_auditlog_lock");
+        //return HTTP_INTERNAL_SERVER_ERROR;
+        return -1;
+    }
+
+    #ifdef __SET_MUTEX_PERMS
+    rc = unixd_set_global_mutex_perms(msce-&gt;auditlog_lock);
+    if (rc != APR_SUCCESS) {
+        // ap_log_error(APLOG_MARK, APLOG_ERR, rc, s, "mod_security: Could not set permissions on modsec_auditlog_lock; check User and Group directives");
+        // return HTTP_INTERNAL_SERVER_ERROR;
+        return -1;
+    }
+    #endif</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9TLSG5">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:36:28:229 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:36:52:702 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="126">apache2/modsecurity.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>What *should* we do on error here?</Summary>
+    <Description>if (rc != APR_SUCCESS) {
+            // ap_log_error(APLOG_MARK, APLOG_ERR, rs, s, "Failed to child-init auditlog mutex");
+        }</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9TMUBY">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:37:17:326 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:37:25:682 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="132">apache2/modsecurity.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>This does nothing.</Summary>
+    <Description>/**
+ * Releases resources held by engine instance.
+ */
+void modsecurity_shutdown(msc_engine *msce) {
+    if (msce == NULL) return;
+}</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9TP2J5">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:39:01:265 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:39:22:070 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="298">apache2/modsecurity.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Figure out the optimal initial size for the arrays/tables.</Summary>
+    <Description>/* Collections. */
+    msr-&gt;tx_vars = apr_table_make(msr-&gt;mp, 32);
+    if (msr-&gt;tx_vars == NULL) return -1;
+
+    msr-&gt;geo_vars = apr_table_make(msr-&gt;mp, 8);
+    if (msr-&gt;geo_vars == NULL) return -1;
+
+    msr-&gt;collections = apr_table_make(msr-&gt;mp, 8);
+    if (msr-&gt;collections == NULL) return -1;
+    msr-&gt;collections_dirty = apr_table_make(msr-&gt;mp, 8);
+    if (msr-&gt;collections_dirty == NULL) return -1;
+
+    /* Other */
+    msr-&gt;tcache = apr_hash_make(msr-&gt;mp);
+    if (msr-&gt;tcache == NULL) return -1;
+
+    msr-&gt;matched_rules = apr_array_make(msr-&gt;mp, 16, sizeof(void *));
+    if (msr-&gt;matched_rules == NULL) return -1;
+
+    msr-&gt;matched_var = (msc_string *)apr_pcalloc(msr-&gt;mp, sizeof(msc_string));
+    if (msr-&gt;matched_var == NULL) return -1;
+
+    msr-&gt;highest_severity = 255; /* high, invalid value */
+
+    msr-&gt;removed_rules = apr_array_make(msr-&gt;mp, 16, sizeof(char *));
+    if (msr-&gt;removed_rules == NULL) return -1;</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9TTMB2">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:42:33:518 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:42:50:351 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="27">apache2/msc_xml.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Remove #if 0'd code?</Summary>
+    <Description>#if 0
+static void xml_receive_sax_error(void *data, const char *msg, ...) {
+    modsec_rec *msr = (modsec_rec *)data;
+    char message[256];
+    
+    if (msr == NULL) return;
+
+    apr_snprintf(message, sizeof(message), "%s (line %d offset %d)",
+        log_escape_nq(msr-&gt;mp, msr-&gt;xml-&gt;parsing_ctx-&gt;lastError.message),
+        msr-&gt;xml-&gt;parsing_ctx-&gt;lastError.line,
+        msr-&gt;xml-&gt;parsing_ctx-&gt;lastError.int2);
+    
+    msr_log(msr, 5, "XML: Parsing error: %s", message);
+}
+#endif</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9U8OHT">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:54:16:193 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:54:45:610 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1074">apache2/mod_security2.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>What is the history of this?</Summary>
+    <Description>/* Our own hook to handle RPC transactions (not used at the moment).
+     * // ap_hook_handler(hook_handler, NULL, NULL, APR_HOOK_MIDDLE);
+     */</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB9UC5NX">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:56:58:413 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:57:23:209 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="363">apache2/msc_lua.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Change C++ to C style comment.</Summary>
+    <Description>// Get the response from the script.</Description>
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
