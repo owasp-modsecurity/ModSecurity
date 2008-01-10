@@ -1,7 +1,9 @@
-21 Dec 2007 - 2.1.5-rc1
------------------------
+10 Jan 2007 - 2.1.5
+-------------------
 
  * Updated included Core Ruleset to version 1.5.1.
+
+ * Phase 5 rules can now be removed via SecRuleRemoveBy* directives.
 
  * Fixed issue where only the first phase 5 rule would run when the
    request was intercepted in an earlier phase.
