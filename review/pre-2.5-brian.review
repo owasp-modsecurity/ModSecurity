@@ -2904,5 +2904,217 @@ static void dummy_free_func(void *data) {}
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
     <Status>item.status.label.open</Status>
   </ReviewIssue>
+  <ReviewIssue id="FB8FASAX">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 14:08:14:025 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 14:08:38:129 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="50">apache2/msc_logging.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Spelling.</Summary>
+    <Description>throught</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB8FRWMM">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 14:21:32:782 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 14:22:32:803 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="16">apache2/msc_geo.h</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>This value may not be portable based on endianness.  The algorithm compares it to the IP address as int in host order.</Summary>
+    <Description>#define GEO_COUNTRY_OFFSET        0xffff00</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB8G4M54">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 14:31:25:720 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 14:45:20:612 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="1">apache2/msc_geo.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Check portability due to endianness.  It seems that the DB values are assumed to be in host order.  Perhaps the compiled DB is little-endian and we need to compensate?</Summary>
+    <Description />
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB8I5OF7">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 15:28:14:563 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 15:28:24:203 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="18">apache2/msc_multipart.c</File>
+    <Type>item.type.label.irrelevant</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>Remove code?</Summary>
+    <Description>#if 0
+static char *multipart_construct_filename(modsec_rec *msr) {
+    char c, *p, *q = msr-&gt;mpd-&gt;mpp-&gt;filename;
+    char *filename;
+
+    /* find the last backward slash and consider the
+     * filename to be only what's right from it
+     */
+    p = strrchr(q, '\\');
+    if (p != NULL) q = p + 1;
+
+    /* do the same for the forward slash */
+    p = strrchr(q, '/');
+    if (p != NULL) q = p + 1;
+
+    /* allow letters, digits and dots, replace
+     * everything else with underscores
+     */
+    p = filename = apr_pstrdup(msr-&gt;mp, q);
+    while((c = *p) != 0) {
+        if (!( isalnum(c)||(c == '.') )) *p = '_';
+        p++;
+    }
+
+    return filename;
+}
+#endif</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB8IFGLE">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 15:35:50:978 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 15:49:54:128 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="52">apache2/msc_multipart.c</File>
+    <Type>item.type.label.programLogic</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>The multipart C-D header is case insensitive (rfc 2183), so we should probably use strncasecmp() here.</Summary>
+    <Description>/* accept only what we understand */
+    if (strncmp(c_d_value, "form-data", 9) != 0) {
+        return -1;
+    }</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB8JH2GX">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 16:05:05:601 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 16:07:17:436 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="75">apache2/msc_multipart.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>This allows for a name of "", so maybe check for name[0] == '\0' and return an error.  Although we catch this later on as an unrecognized name and return -10.</Summary>
+    <Description>start = p;
+        while((*p != '\0')&amp;&amp;(*p != '=')&amp;&amp;(*p != '\t')&amp;&amp;(*p != ' ')) p++;
+        if (*p == '\0') return -4;
+        
+        name = apr_pstrmemdup(msr-&gt;mp, start, (p - start));</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB8JTATV">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 16:14:36:307 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 17:02:47:324 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="122">apache2/msc_multipart.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>For a quoted value we just include everything until the end quote.  The field values should be US-ASCII 'qtext' or 'quoted-pair' (RFC 822) or escaped using RFC 2047.</Summary>
+    <Description>if (*p == '"') {
+                    *t = '\0';
+                    break;
+                }</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB8LENT4">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 16:59:12:520 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 17:00:55:566 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="106">apache2/msc_multipart.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>I think this is wrong.  RFC 822 defines a quoted-string as &lt;"&gt; *(qtext/quoted-pair) &lt;"&gt; and quoted-par being able to quote any CHAR.</Summary>
+    <Description>/* only " and \ can be escaped */
+                    if ((*(p + 1) == '"')||(*(p + 1) == '\\')) {
+                        p++;
+                    }
+                    else {
+                        /* improper escaping */
+                        
+                        /* We allow for now because IE sends
+                         * improperly escaped content and there's
+                         * nothing we can do about it.
+                         *
+                         * return -9;
+                         */
+                    }</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
+  <ReviewIssue id="FB8LLH1X">
+    <ReviewIssueMeta>
+      <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 17:04:30:357 GMT-08:00</CreationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 17:05:19:369 GMT-08:00</LastModificationDate>
+    </ReviewIssueMeta>
+    <ReviewerId>brian</ReviewerId>
+    <AssignedTo>brian</AssignedTo>
+    <File line="143">apache2/msc_multipart.c</File>
+    <Type>item.type.label.suggestion</Type>
+    <Severity>item.severity.label.trivial</Severity>
+    <Summary>RFC 2045 defines an 'attribute' as "ALWAYS case-insensitive", so these should be strncasecmp()</Summary>
+    <Description>if (strcmp(name, "name") == 0) {
+            if (msr-&gt;mpd-&gt;mpp-&gt;name != NULL) return -14;
+            msr-&gt;mpd-&gt;mpp-&gt;name = value;
+
+            if (msr-&gt;txcfg-&gt;debuglog_level &gt;= 9) {
+                msr_log(msr, 9, "Multipart: Content-Disposition name: %s",
+                    log_escape_nq(msr-&gt;mp, value));
+            }
+        }
+        else
+        if (strcmp(name, "filename") == 0) {</Description>
+    <Annotation />
+    <Revision />
+    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
+    <Status>item.status.label.open</Status>
+  </ReviewIssue>
 </Review>
 
