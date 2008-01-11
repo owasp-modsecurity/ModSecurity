@@ -45,7 +45,7 @@ done
 if test -n "${with_apr}"; then
     APR_CONFIG="${with_apr}/${APR_CONFIG}"
     AC_MSG_RESULT([${APR_CONFIG}])
-    APR_CFLAGS="`${APR_CONFIG} --includes`"
+    APR_CFLAGS="`${APR_CONFIG} --includes --cppflags`"
     APR_LDFLAGS="`${APR_CONFIG} --ldflags`"
     APR_LIBS="`${APR_CONFIG} --libs`"
     APR_LINK_LD="`${APR_CONFIG} --link-ld`"

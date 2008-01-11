@@ -9,9 +9,13 @@ MOD_SECURITY2_H = re.h modsecurity.h msc_logging.h msc_multipart.h msc_parsers.h
     msc_pcre.h msc_util.h msc_xml.h persist_dbm.h apache2.h pdf_protect.h \
     msc_geo.h acmp.h utf8tables.h msc_lua.h
 
-### Must be in APXS format: -Wc,-flag
+CC = @CC@
 EXTRA_CFLAGS = @EXTRA_CFLAGS@
+MODSEC_EXTRA_CFLAGS = @MODSEC_EXTRA_CFLAGS@
 
+### Note: must be in APXS format: -Wc,-flag
+APXS_EXTRA_CFLAGS = @APXS_EXTRA_CFLAGS@
+MODSEC_APXS_EXTRA_CFLAGS = @MODSEC_APXS_EXTRA_CFLAGS@
 
 APXS = @APXS@
 APXS_INCLUDES = @APXS_INCLUDES@
@@ -50,7 +54,13 @@ all: mod_security2.la
 
 install: install-mods
 
-clean:
+clean-extras:
+	@for dir in mlogc-src; do \
+	  test -e $$dir && $(MAKE) -C $$dir clean; \
+	done;
+	rm -rf mlogc mlogc-static
+
+clean: clean-extras
 	@rm -rf *.la *.lo *.o *.slo .libs msc_test
 
 maintainer-clean: clean
@@ -70,7 +80,7 @@ mod_security2.la: $(MOD_SECURITY2_H) *.c
 	for f in $(MOD_SECURITY2); do \
 		src="$$src $$f.c"; \
 	done; \
-	$(COMPILE_APACHE_MOD) $(EXTRA_CFLAGS) $$src
+	$(COMPILE_APACHE_MOD) $(APXS_EXTRA_CFLAGS) $(MODSEC_APXS_EXTRA_CFLAGS) $$src
 
 ### Experimental Test Framework (UNIX only right now)
 TESTOBJS = re.o re_operators.o re_actions.o re_tfns.o re_variables.o \
@@ -79,13 +89,15 @@ TESTOBJS = re.o re_operators.o re_actions.o re_tfns.o re_variables.o \
            msc_reqbody.o msc_geo.o acmp.o msc_lua.o
 
 msc_test: mod_security2.la msc_test.c
-	@cflags=""; \
-	for f in $(EXTRA_CFLAGS); do \
-		F=`echo $$f | cut -c 5-`; \
-		cflags="$$cflags $$F"; \
-	done; \
-	$(CC) $(CPPFLAGS) $(LDFLAGS) $(APXS_INCLUDES) $$cflags $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test $(TESTOBJS) msc_test.c $(LIBS) $(APR_LIBS) $(APU_LIBS) $(APXS_LIBS) $(APR_LINK_LD) $(APU_LINK_LD)
+	$(CC) $(CPPFLAGS) $(LDFLAGS) $(APXS_INCLUDES) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test $(TESTOBJS) msc_test.c $(LIBS) $(APR_LIBS) $(APU_LIBS) $(APXS_LIBS) $(APR_LINK_LD) $(APU_LINK_LD)
 
 test: msc_test
 	@t/run-tests.pl
 
+mlogc:
+	@$(MAKE) -C mlogc-src mlogc \
+	&& cp -p mlogc-src/mlogc .
+
+mlogc-static:
+	@$(MAKE) -C mlogc-src static \
+	&& cp -p mlogc-src/mlogc mlogc-static
