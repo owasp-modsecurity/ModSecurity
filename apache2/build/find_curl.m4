@@ -49,7 +49,7 @@ AC_SUBST(CURL_CFLAGS)
 
 if test -z "${CURL_LIBS}"; then
   AC_MSG_NOTICE([*** curl library not found.])
-  ifelse([$2], , AC_MSG_NOTICE([NOTE: curl library is required for building mlogc]), $2)
+  ifelse([$2], , AC_MSG_NOTICE([NOTE: curl library is only required for building mlogc]), $2)
 else
   AC_MSG_NOTICE([using '${CURL_LIBS}' for curl Library])
   ifelse([$1], , , $1) 

@@ -212,11 +212,12 @@ CHECK_APR()
 CHECK_APU()
 CHECK_LIBXML()
 CHECK_LUA()
-CHECK_CURL()
 
-AC_CONFIG_FILES([Makefile])
 if test -e "mlogc-src/Makefile.in"; then
+    CHECK_CURL()
     AC_CONFIG_FILES([mlogc-src/Makefile])
 fi
+
+AC_CONFIG_FILES([Makefile])
 
 AC_OUTPUT
