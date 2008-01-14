@@ -115,7 +115,7 @@ sub runfile {
 	$TOTAL += $testnum ? 1 : $n;
 	$PASSED += $pass;
 
-	msg(sprintf("Passed: %2d; Failed %2d", $pass, $testnum ? (1 - $pass) : ($n - $pass)));
+	msg(sprintf("Passed: %2d; Failed: %2d", $pass, $testnum ? (1 - $pass) : ($n - $pass)));
 }
 
 sub escape {

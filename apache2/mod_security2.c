@@ -392,6 +392,18 @@ static apr_status_t change_server_signature(server_rec *s) {
         return -1;
     }
 
+    /* Check that it really changed.  This assumes that what we got was
+     * not a copy and this could change in future versions of Apache.
+     */
+    server_version = (char *)apache_get_server_version();
+    if ((server_version == NULL) || (strcmp(server_version, new_server_signature) != 0)) {
+        ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, s, "SecServerSignature: Failed to change server signature to \"%s\".", new_server_signature);
+        return 0;
+    }
+    else {
+        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, 0, s, "SecServerSignature: Changed server signature to \"%s\".", server_version);
+    }
+
     return 1;
 }
 

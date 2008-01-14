@@ -1695,9 +1695,6 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 }
             }
         }
-        else {
-            msr_log(msr, 9, "CACHE: Disabled");
-        }
 
         #if !defined(PERFORMANCE_MEASUREMENT)
         if (msr->txcfg->debuglog_level >= 4)

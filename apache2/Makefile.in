@@ -57,7 +57,7 @@ install: install-mods
 clean-extras:
 	@for dir in mlogc-src; do \
 	  test -e $$dir && $(MAKE) -C $$dir clean; \
-	done;
+	done; \
 	rm -rf mlogc mlogc-static
 
 clean: clean-extras
@@ -89,7 +89,7 @@ TESTOBJS = re.o re_operators.o re_actions.o re_tfns.o re_variables.o \
            msc_reqbody.o msc_geo.o acmp.o msc_lua.o
 
 msc_test: mod_security2.la msc_test.c
-	$(CC) $(CPPFLAGS) $(LDFLAGS) $(APXS_INCLUDES) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test $(TESTOBJS) msc_test.c $(LIBS) $(APR_LIBS) $(APU_LIBS) $(APXS_LIBS) $(APR_LINK_LD) $(APU_LINK_LD)
+	@$(CC) $(CPPFLAGS) $(LDFLAGS) $(APXS_INCLUDES) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test $(TESTOBJS) msc_test.c $(LIBS) $(APR_LIBS) $(APU_LIBS) $(APXS_LIBS) $(APR_LINK_LD) $(APU_LINK_LD)
 
 test: msc_test
 	@t/run-tests.pl
