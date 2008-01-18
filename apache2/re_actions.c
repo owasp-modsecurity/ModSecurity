@@ -713,12 +713,12 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
             msr->txcfg->is_enabled = MODSEC_ENABLED;
             msr->usercfg->is_enabled = MODSEC_ENABLED;
         }
-		else
+        else
         if (strcasecmp(value, "off") == 0) {
             msr->txcfg->is_enabled = MODSEC_DISABLED;
             msr->usercfg->is_enabled = MODSEC_DISABLED;
         }
-		else
+        else
         if (strcasecmp(value, "detectiononly") == 0) {
             msr->txcfg->is_enabled = MODSEC_DETECTION_ONLY;
             msr->usercfg->is_enabled = MODSEC_DETECTION_ONLY;
@@ -761,12 +761,12 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
             msr->txcfg->auditlog_flag = AUDITLOG_ON;
             msr->usercfg->auditlog_flag = AUDITLOG_ON;
         }
-		else
+        else
         if (strcasecmp(value, "off") == 0) {
             msr->txcfg->auditlog_flag = AUDITLOG_OFF;
             msr->usercfg->auditlog_flag = AUDITLOG_OFF;
         }
-		else
+        else
         if (strcasecmp(value, "relevantonly") == 0) {
             msr->txcfg->auditlog_flag = AUDITLOG_RELEVANT;
             msr->usercfg->auditlog_flag = AUDITLOG_RELEVANT;

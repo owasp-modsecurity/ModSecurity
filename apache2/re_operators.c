@@ -1125,7 +1125,7 @@ static int msre_op_geoLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
     rc = geo_lookup(msr, &rec, geo_host, error_msg);
     if (rc <= 0) {
-    	*error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" failed at %s.", log_escape_nq(msr->mp, geo_host), var->name); 
+        *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" failed at %s.", log_escape_nq(msr->mp, geo_host), var->name); 
         return rc;
     }
     *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" succeeded at %s.",

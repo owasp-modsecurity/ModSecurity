@@ -679,7 +679,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
     if ((rule->actionset->id != NULL) && apr_table_get(dcfg->tmp_rule_placeholders, rule->actionset->id)) {
         msre_rule *phrule = apr_palloc(rule->ruleset->mp, sizeof(msre_rule));
         if (phrule == NULL) {
-        	return FATAL_ERROR;
+            return FATAL_ERROR;
         }
 
         #ifdef DEBUG_CONF
