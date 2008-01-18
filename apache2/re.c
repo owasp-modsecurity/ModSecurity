@@ -1618,7 +1618,6 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
             te = (apr_table_entry_t *)arr->elts;
             expnames = apr_pstrdup(mptmp, ((msre_var *)te[0].val)->name);
             for(i = 1; i < arr->nelts; i++) {
-                msr_log(msr, 4, "Combine %s|%s.", expnames, ((msre_var *)te[i].val)->name);
                 expnames = apr_psprintf(mptmp, "%s|%s", expnames, ((msre_var *)te[i].val)->name);
             }
             if (strcmp(rule->p1, expnames) != 0) {
