@@ -310,51 +310,62 @@
       </listitem>
 
       <listitem>
-        <para>Edit Makefile to configure the path to the Apache ServerRoot
-        directory. You can check this by identifying the ServerRoot directive
-        setting in your httpd.conf file. This is the path that was specified
-        with the "--install-path=" configuration flag during compilation (for
-        example, in Fedora Core4:<filename moreinfo="none"> top_dir =
-        /etc/httpd</filename>).</para>
+        <para>Run the configure script to generate a Makefile. Typically no
+        options are needed.</para>
+
+        <para><literal>./configure</literal></para>
+
+        <para>Options are available for more customization (use
+        <literal>./configure --help</literal> for a full list), but typically
+        you will only need to specify the location of the
+        <literal>apxs</literal> command installed by Apache httpd with the
+        <literal>--with-apxs</literal> option.</para>
+
+        <para><literal>./configure
+        --with-apxs=/path/to/httpd-2.x.y/bin/apxs</literal></para>
       </listitem>
 
       <listitem>
-        <para>Edit Makefile to configure the correct include path for libxml
-        (for example <filename moreinfo="none">-I
-        /usr/include/libxml2</filename>)</para>
+        <para>Compile with: <literal>make</literal></para>
       </listitem>
 
       <listitem>
-        <para>Edit Makefile to configure the correct incpude path for Lua (for
-        example <literal>-I /usr/include/lua5.1</literal>).</para>
+        <para>Optionally test with: <literal>make test</literal></para>
       </listitem>
 
       <listitem>
-        <para>Compile with <literal moreinfo="none">make</literal></para>
+        <para>Optionally build the ModSecurity Log Collector with:
+        <literal>make mlogc</literal></para>
       </listitem>
 
       <listitem>
-        <para>Stop Apache</para>
+        <para>Stop Apache httpd</para>
       </listitem>
 
       <listitem>
-        <para>Install with<literal moreinfo="none"> make
+        <para>Optionally install <literal>mlogc</literal>: Review the
+        <literal>INSTALL</literal> file included in the apache2/mlogc-src
+        directory in the distribution.</para>
+      </listitem>
+
+      <listitem>
+        <para>Install the ModSecurity module with: <literal>make
         install</literal></para>
       </listitem>
 
       <listitem>
-        <para>Load libxml2 before ModSecurity: <filename
-        moreinfo="none">LoadFile /usr/lib/libxml2.so</filename></para>
+        <para>Load libxml2 before ModSecurity: <literal>LoadFile
+        /usr/lib/libxml2.so</literal></para>
       </listitem>
 
       <listitem>
         <para>Load Lua before ModSecurity: <literal>LoadFile
-        /usr/lib/liblua5.1.so</literal>.</para>
+        /usr/lib/liblua5.1.so.</literal></para>
       </listitem>
 
       <listitem>
-        <para>Load ModSecurity itself: <literal moreinfo="none">LoadModule
-        security2_module modules/mod_security2.so</literal></para>
+        <para>Load ModSecurity itself: <literal>LoadModule security2_module
+        modules/mod_security2.so</literal></para>
       </listitem>
 
       <listitem>
@@ -362,7 +373,7 @@
       </listitem>
 
       <listitem>
-        <para>Start Apache</para>
+        <para>Start Apache httpd</para>
       </listitem>
 
       <listitem>
@@ -445,17 +456,17 @@
       moreinfo="none">SecAction
       nolog,redirect:http://www.hostname.com</literal></para>
 
-      <para><emphasis>ProcessingPhase:</emphasis> Any</para>
+      <para><emphasis>Processing Phase:</emphasis> Any</para>
 
       <para><emphasis>Scope:</emphasis> Any</para>
 
       <para><emphasis>Dependencies/Notes:</emphasis> None</para>
 
-      <para>SecAction is best used when you uncondiationally execute an
-      action. This is explicit triggering whereas the normal Actions are
-      conditional based on data inspection of the request/response. This is a
-      useful directive when you want to run certian actions such as initcol to
-      initialize collections.</para>
+      <para>SecAction is best used when you unconditionally execute an action.
+      This is explicit triggering whereas the normal Actions are conditional
+      based on data inspection of the request/response. This is a useful
+      directive when you want to run certain actions such as
+      <literal>initcol</literal> to initialize collections.</para>
     </section>
 
     <section>
@@ -480,10 +491,10 @@
 
       <para><emphasis>Dependencies/Notes:</emphasis> None</para>
 
-      <para>This directive is needed if a backend web appliaction is using a
+      <para>This directive is needed if a backend web application is using a
       non-standard argument separator. If this directive is not set properly
-      for each web app, then ModSecurity will not be able to parse the
-      arguements appropriately and the effectiveness of the rule matching will
+      for each web application, then ModSecurity will not be able to parse the
+      arguments appropriately and the effectiveness of the rule matching will
       be significantly decreased.</para>
     </section>
 
@@ -504,7 +515,7 @@
       <para><emphasis>Scope:</emphasis> Any</para>
 
       <para><emphasis>Dependencies/Notes:</emphasis> Can be set/changed with
-      the "ctl" action for the current transaction.</para>
+      the "<literal>ctl</literal>" action for the current transaction.</para>
 
       <para>Example: The following example shows the various audit directives
       used together.</para>
@@ -564,12 +575,12 @@ SecAuditLogStorageDir logs/audit
       audit logging format is used. If concurrent audit logging format is used
       this file will be used as an index, and contain a record of all audit
       log files created. If you are planning to use Concurrent audit logging
-      and sending your audit log data off to a remote Console host, then you
-      will need to use the modsec-auditlog-collector.pl script and use the
-      following format:</para>
+      and sending your audit log data off to a remote Console host or
+      commercial ModSecurity Management Appliance, then you will need to
+      configure and use the ModSecurity Log Collector (mlogc) and use the
+      following format for the audit log:</para>
 
-      <para><programlisting format="linespecific">SecAuditLog \
-  "|/path/modsec-auditlog-collector.pl /path/SecAuditLogDataDir /path/SecAuditLog"</programlisting></para>
+      <para><programlisting format="linespecific">SecAuditLog "|/path/to/mlogc /path/to/mlogc.conf"</programlisting></para>
     </section>
 
     <section>
@@ -837,7 +848,7 @@ SecAuditLogStorageDir logs/audit
         </listitem>
       </itemizedlist>
 
-      <para>The following options are allowed (comma seperated):</para>
+      <para>The following options are allowed (comma separated):</para>
 
       <itemizedlist>
         <listitem>
@@ -1102,9 +1113,9 @@ SecAuditLogStorageDir logs/audit
 
       <para><emphasis>Dependencies/Notes:</emphasis> Rules following a
       SecDefaultAction directive will inherit this setting unless a specific
-      action is specified for an indivdual rule or until another
+      action is specified for an individual rule or until another
       SecDefaultAction is specified. Take special note that in the logging
-      disruptive actions are not allowed, but this can inadvertantly be
+      disruptive actions are not allowed, but this can inadvertently be
       inherited using a disruptive action in SecDefaultAction.</para>
 
       <para>The default value is:</para>
@@ -1121,7 +1132,7 @@ SecAuditLogStorageDir logs/audit
       <title><literal>SecGeoLookupDb</literal></title>
 
       <para><emphasis>Description:</emphasis> Defines the path to the
-      geograpical database file.</para>
+      geographical database file.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
       moreinfo="none">SecGeoLookupDb /path/to/db</literal></para>
@@ -1196,7 +1207,7 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis>Example Usage:</emphasis> <literal
       moreinfo="none">SecMarker 9999</literal></para>
 
-      <para><emphasis>ProcessingPhase:</emphasis> Any</para>
+      <para><emphasis>Processing Phase:</emphasis> Any</para>
 
       <para><emphasis>Scope:</emphasis> Any</para>
 
@@ -1249,10 +1260,10 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
       <para><emphasis>Description:</emphasis> Defines the secret that will be
       used to construct one-time tokens. You should use a reasonably long
       value for the secret (e.g. 16 characters is good). Once selected the
-      secret should not be changed as as it will break the the tokens that
-      were sent prior to change. But it's not a big deal even if you change
-      it. It will just force dowload of PDF files with tokens that were issued
-      in the last few seconds.</para>
+      secret should not be changed as it will break the tokens that were sent
+      prior to change. But it's not a big deal even if you change it. It will
+      just force download of PDF files with tokens that were issued in the
+      last few seconds.</para>
     </section>
 
     <section>
@@ -1342,7 +1353,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
       <para><emphasis>Description:</emphasis> Configures the maximum request
       body size ModSecurity will accept for buffering, excluding the size of
       files being transported in the request. This directive comes handy to
-      further reduce susceptability to DoS attacks when someone is sending
+      further reduce susceptibility to DoS attacks when someone is sending
       request bodies of very large sizes. Web applications that require file
       uploads must configure <literal>SecRequestBodyLimit</literal> to a high
       value. Since large files are streamed to disk file uploads will not
@@ -1426,7 +1437,7 @@ SecResponseBodyLimit 524288</programlisting>
       <para><emphasis>Description</emphasis>: Controls what happens once a
       response body limit, configured with
       <literal>SecResponseBodyLimit</literal>, is encountered. By default
-      ModSecurity wil reject a response body that is longer than specified.
+      ModSecurity will reject a response body that is longer than specified.
       Some web sites, however, will produce very long responses making it
       difficult to come up with a reasonable limit. Such sites would have to
       raise the limit significantly to function properly defying the purpose
@@ -1519,7 +1530,7 @@ SecResponseBodyLimit 524288</programlisting>
       <para><emphasis>Scope:</emphasis> Any</para>
 
       <para><emphasis>Dependencies/Notes:</emphasis> This directive is
-      required if you plan to inspect html responses. This directive must be
+      required if you plan to inspect HTML responses. This directive must be
       used along with the "phase:4" processing phase action and RESPONSE_BODY
       variable/location. If any of these 3 parts are not configured, you will
       not be able to inspect the response bodies.</para>
@@ -1666,7 +1677,7 @@ SecResponseBodyLimit 524288</programlisting>
       <para>Example: The following example shows where ModSecurity may be
       enabled in the main Apache configuration scope, however you might want
       to configure your VirtualHosts differently. In the first example, the
-      first virtualhost is not inheriting the ModSecurity main config
+      first VirtualHost is not inheriting the ModSecurity main config
       directives and in the second one it is.</para>
 
       <programlisting format="linespecific">SecRuleEnine On
@@ -1719,8 +1730,8 @@ ServerAlias www.app2.com
 
       <para><emphasis>Scope:</emphasis> Any</para>
 
-      <para><emphasis>Dependencies/Notes:</emphasis> Thisdirective can also be
-      controled by the ctl action (ctl:ruleEngine=off) for per rule
+      <para><emphasis>Dependencies/Notes:</emphasis> This directive can also
+      be controlled by the ctl action (ctl:ruleEngine=off) for per rule
       processing.</para>
 
       <para>Possible values are:</para>
@@ -2040,7 +2051,7 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}
 &lt;/VirtualHost&gt;</programlisting>
 
       <para>In the two examples configurations shown, SecWebAppId is being
-      used in conjuction with the Apache VirtualHost directives. What this
+      used in conjunction with the Apache VirtualHost directives. What this
       achieves is to create more unique collection names when being hosted on
       one server. Normally, when setsid is used, ModSecurity will create a
       collection with the name "SESSION" and it will hold the value specified.
@@ -2186,7 +2197,7 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis>phase:1</emphasis>"</programl
       not be able to be triggered as expected. Additionally, there are some
       response headers that are added by Apache at a later hook (such as Date,
       Server and Connection) that we would not be able to trigger on or
-      sanitize. This should work appropirately in a proxy setup or within
+      sanitize. This should work appropriately in a proxy setup or within
       phase:5 (logging).</para>
     </section>
 
@@ -2196,7 +2207,7 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis>phase:1</emphasis>"</programl
       <para>This is the general-purpose output analysis phase. At this point
       you can run rules against the response body (provided it was buffered,
       of course). This is the phase where you would want to inspect the
-      outbound html for information discloure, error messages or failed
+      outbound HTML for information disclosure, error messages or failed
       authentication text.</para>
     </section>
 
@@ -2260,7 +2271,7 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis>phase:1</emphasis>"</programl
 
         <para>In ModSecurity 1.X, the <literal>ARGS</literal> variable stood
         for <literal>QUERY_STRING</literal> + <literal>POST_PAYLOAD</literal>,
-        whereas now it expands to to individual variables.</para>
+        whereas now it expands to individual variables.</para>
       </note>
     </section>
 
@@ -2335,7 +2346,7 @@ SecRule<emphasis> ARGS_NAMES</emphasis> "!^(p|a)$"</programlisting>
 
       <para>This data will not be available in a proxy-mode deployment as the
       authentication is not local. In a proxy-mode deployment, you would need
-      to inpect the <literal>REQUEST_HEADERS:Authorization</literal>
+      to inspect the <literal>REQUEST_HEADERS:Authorization</literal>
       header.</para>
     </section>
 
@@ -2428,7 +2439,7 @@ SecRule <emphasis>ENV:tag</emphasis> "suspicious"</programlisting>
         </listitem>
 
         <listitem>
-          <para><emphasis>COUNTRY_CONTINENT:</emphasis> The teo character
+          <para><emphasis>COUNTRY_CONTINENT:</emphasis> The two character
           continent that the country is located. EX: EU</para>
         </listitem>
 
@@ -2454,7 +2465,7 @@ SecRule <emphasis>ENV:tag</emphasis> "suspicious"</programlisting>
         </listitem>
 
         <listitem>
-          <para><emphasis>DMA_CODE:</emphasis> The metropoliton area code. (US
+          <para><emphasis>DMA_CODE:</emphasis> The metropolitan area code. (US
           only)</para>
         </listitem>
 
@@ -2526,14 +2537,14 @@ SecRule ARGS "@pm some key words" id:12345,deny,status:500</programlisting>
       <title><literal>MULTIPART_CRLF_LF_LINES</literal></title>
 
       <para>This flag variable will be set to <literal>1</literal> whenever a
-      multipart request uses mixed line terminators. The
+      multi-part request uses mixed line terminators. The
       <literal>multipart/form-data</literal> RFC requires
       <literal>CRLF</literal> sequence to be used to terminate lines. Since
       some client implementations use only <literal>LF</literal> to terminate
       lines you might want to allow them to proceed under certain
       circumstances (if you want to do this you will need to stop using
-      <literal>MULTIPART_STRICT_ERROR</literal> and check each multipart flag
-      variable individually, avoding <literal>MULTIPART_LF_LINE</literal>).
+      <literal>MULTIPART_STRICT_ERROR</literal> and check each multi-part flag
+      variable individually, avoiding <literal>MULTIPART_LF_LINE</literal>).
       However, mixing <literal>CRLF</literal> and <literal>LF</literal> line
       terminators is dangerous as it can allow for evasion. Therefore, in such
       cases, you will have to add a check for
@@ -2595,7 +2606,7 @@ SM %{MULTIPART_SEMICOLON_MISSING}'"</programlisting>
       feels like a boundary but it is not. Such an event may occur when
       evasion of ModSecurity is attempted.</para>
 
-      <para>The best wasy to use this variable is as in the example
+      <para>The best way to use this variable is as in the example
       below:</para>
 
       <programlisting>SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
@@ -2725,8 +2736,8 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <title><literal moreinfo="none">REQUEST_BASENAME</literal></title>
 
       <para>This variable holds just the filename part of
-      <literal>REQUEST_FILENAME</literal> (e.g. index.php). Warning: not
-      urlDecoded. Example:</para>
+      <literal>REQUEST_FILENAME</literal> (e.g. index.php). Warning: not URL
+      decoded. Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis>REQUEST_BASENAME</emphasis> "^login\.php$"</programlisting>
     </section>
@@ -2736,7 +2747,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
 
       <para>This variable holds the data in the request body (including
       POST_PAYLOAD data). REQUEST_BODY should be used if the original order of
-      the arguements is important (ARGS should be used in all other cases).
+      the arguments is important (ARGS should be used in all other cases).
       Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis>REQUEST_BODY</emphasis> "^username=\w{25,}\&amp;password=\w{25,}\&amp;Submit\=login$"</programlisting>
@@ -2781,7 +2792,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <title><literal moreinfo="none">REQUEST_HEADERS</literal></title>
 
       <para>This variable can be used as either a collection of all of the
-      Request Headers or can be used to specify indivudual headers (by using
+      Request Headers or can be used to specify individual headers (by using
       REQUEST_HEADERS<emphasis>:Header-Name</emphasis>). Example: the first
       example uses REQUEST_HEADERS as a collection and is applying the
       validateUrlEncoding operator against all headers.</para>
@@ -2859,9 +2870,9 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
 
       <para>This variable holds the full URL including the QUERY_STRING data
       (e.g. /index.php?p=X), however it will never contain a domain name, even
-      if it was provided on the request line. Warning: not urlDecoded. It also
-      does not include either the REQUEST_METHOD or the HTTP version info.
-      Example:</para>
+      if it was provided on the request line. Warning: not URL decoded. It
+      also does not include either the REQUEST_METHOD or the HTTP version
+      info. Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis>REQUEST_URI</emphasis> "attack"</programlisting>
     </section>
@@ -2871,7 +2882,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
 
       <para>Same as REQUEST_URI but will contain the domain name if it was
       provided on the request line (e.g.
-      http://www.example.com/index.php?p=X). Warning: not urlDecoded.
+      http://www.example.com/index.php?p=X). Warning: not URL decoded.
       Example:</para>
 
       <programlisting format="linespecific">SecRule<emphasis> REQUEST_URI_RAW</emphasis> "http:/"</programlisting>
@@ -3008,7 +3019,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     <section>
       <title><literal moreinfo="none">SCRIPT_GID</literal></title>
 
-      <para>This variable holds the groupid (numerical value) of the group
+      <para>This variable holds the group id (numerical value) of the group
       owner of the script. Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis>SCRIPT_GID</emphasis> "!^46$"</programlisting>
@@ -3048,7 +3059,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     <section>
       <title><literal moreinfo="none">SCRIPT_UID</literal></title>
 
-      <para>This variable holds the userid (numerical value) of the owner of
+      <para>This variable holds the user id (numerical value) of the owner of
       the script. Example: the example rule below will trigger if the UID is
       not 46 (the Apache user).</para>
 
@@ -3224,8 +3235,8 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
       last past the current request/response process. Example: In this
       example, we are using setvar to increase the tx.score value by 5 points.
       We then have a follow-up run that will evaluate the transactional score
-      this this request and then it will decided whether or not to allow/deny
-      the request through.</para>
+      this request and then it will decided whether or not to allow/deny the
+      request through.</para>
 
       <para>The following is a list of reserved names in the TX
       collection:</para>
@@ -3382,7 +3393,7 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     case in order to evade the ModSecurity rule:</para>
 
     <para><programlisting format="linespecific">SecRule ARG:p "xp_cmdshell" <emphasis>"t:lowercase"</emphasis></programlisting>
-    multiple tranformation actions can be used in the same rule, for example
+    multiple transformation actions can be used in the same rule, for example
     the following rule also ensures that an attacker does not use URL encoding
     (%xx encoding) for evasion. Note the order of the transformation
     functions, which ensures that a URL encoded letter is first decoded and
@@ -3390,10 +3401,10 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
 
     <para><programlisting format="linespecific">SecRule ARG:p "xp_cmdshell" <emphasis>"t:urlDecode,t:lowercase"</emphasis></programlisting></para>
 
-    <para>One can use the SetDefaultAction command to ensure the translation
+    <para>One can use the SecDefaultAction command to ensure the translation
     occurs for every rule until the next. Note that translation actions are
     additive, so if a rule explicitly list actions, the translation actions
-    set by SetDefaultAction are still performed.</para>
+    set by SecDefaultAction are still performed.</para>
 
     <para><programlisting format="linespecific">SecDefaultAction <emphasis>t:urlDecode,t:lowercase</emphasis></programlisting></para>
 
@@ -3402,7 +3413,7 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <section>
       <title><literal>base64Decode</literal></title>
 
-      <para>This function decoes a base64-encoded string.</para>
+      <para>This function decodes a base64-encoded string.</para>
     </section>
 
     <section>
@@ -3507,7 +3518,7 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <section>
       <title><literal>lowercase</literal></title>
 
-      <para>This function is enabled by default. It converts all charactes to
+      <para>This function is enabled by default. It converts all characters to
       lowercase using the current C locale.</para>
     </section>
 
@@ -3515,7 +3526,7 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
       <title><literal>md5</literal></title>
 
       <para>This function calculates an MD5 hash from input. Note that the
-      computed hash is in a raw binary form and may need encoded to be useable
+      computed hash is in a raw binary form and may need encoded to be usable
       (EX: t:md5,t:hexEncode).</para>
     </section>
 
@@ -3557,9 +3568,9 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <section>
       <title><literal>replaceComments</literal></title>
 
-      <para>This function replaces each occurence of a C-style comments
+      <para>This function replaces each occurrence of a C-style comments
       (<literal moreinfo="none">/* ... */</literal>) with a single space
-      (multiple consecutive occurences of a space will not be compressed).
+      (multiple consecutive occurrences of a space will not be compressed).
       Unterminated comments will too be replaced with a space (ASCII 32).
       However, a standalone termination of a comment (<literal
       moreinfo="none">*/</literal>) will not be acted upon.</para>
@@ -3606,7 +3617,7 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
       <title><literal>sha1</literal></title>
 
       <para>This function calculates a SHA1 hash from input. Note that the
-      computed hash is in a raw binary form and may need encoded to be useable
+      computed hash is in a raw binary form and may need encoded to be usable
       (EX: t:sha1,t:hexEncode).</para>
     </section>
 
@@ -3784,7 +3795,7 @@ SecRule TX:1 "(?:(?:a(dmin|nonymous)))"</programlisting>
       <para><emphasis>Note</emphasis></para>
 
       <para>The 0 data captures the entire REGEX match and 1 captures the data
-      in the first parantheses, etc...</para>
+      in the first parens, etc...</para>
     </section>
 
     <section>
@@ -3968,7 +3979,7 @@ SecRule IP:AUTH_ATTEMPT "@gt 25" \
       <title><literal>exec</literal></title>
 
       <para><emphasis>Description:</emphasis> Executes an external
-      script/binary supplied as parameter. As of v2.5, if tge parameter
+      script/binary supplied as parameter. As of v2.5, if the parameter
       supplied to <literal>exec</literal> is a Lua script (detected by the
       <filename>.lua</filename> extension) the script will be processed
       <emphasis>internally</emphasis>. This means you will get direct access
@@ -3997,7 +4008,7 @@ SecRule ARGS:p attack log,<emphasis>exec:/usr/local/apache/conf/exec.lua</emphas
         match. Execution will add the header mod_security-executed to the list
         of request headers. You should be aware that forking a threaded
         process results in all threads being replicated in the new process.
-        Forking can therefore incur larger overhead in multithreaded
+        Forking can therefore incur larger overhead in multi-threaded
         operation. The script you execute must write something (anything) to
         stdout. If it doesn't ModSecurity will assume execution didn't
         work.</para>
@@ -4007,8 +4018,8 @@ SecRule ARGS:p attack log,<emphasis>exec:/usr/local/apache/conf/exec.lua</emphas
     <section>
       <title><literal>expirevar</literal></title>
 
-      <para><emphasis>Description:</emphasis> Configurescollection variable to
-      expire after the given time in seconds.</para>
+      <para><emphasis>Description:</emphasis> Configures a collection variable
+      to expire after the given time in seconds.</para>
 
       <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
 
@@ -4022,7 +4033,7 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
       <para><emphasis>Note</emphasis></para>
 
       <para>You should use expirevar actions at the same time that you use
-      setvar actions in order to keep the indended expiration time. If they
+      setvar actions in order to keep the indented expiration time. If they
       are used on their own (perhaps in a SecAction directive) the expire time
       could get re-set. When variables are removed from collections, and there
       are no other changes, collections are not written to disk at the end of
@@ -4283,7 +4294,7 @@ SecRule ARGS "attack" <emphasis>multiMatch</emphasis></programlisting>
       be logged. If it is set to RelevantOnly, then you can control it with
       the noauditlog action. Even if the noauditlog action is applied to a
       specific rule and a rule either before or after triggered an audit
-      event, then the tranaction will be logged to the audit log. The correct
+      event, then the transaction will be logged to the audit log. The correct
       way to disable audit logging for the entire transaction is to use
       "<literal moreinfo="none">ctl:auditEngine=Off</literal>"</para>
     </section>
@@ -4596,7 +4607,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
     <section>
       <title><literal>setsid</literal></title>
 
-      <para><emphasis>Description:</emphasis> Special-purposeaction that
+      <para><emphasis>Description:</emphasis> Special-purpose action that
       initialises the <literal moreinfo="none">SESSION</literal>
       collection.</para>
 
@@ -4611,7 +4622,7 @@ SecAction <emphasis>setsid:%{REQUEST_COOKIES.PHPSESSID}</emphasis></programlisti
       <para><emphasis>Note</emphasis></para>
 
       <para>On first invocation of this action the collection will be empty
-      (not taking the pre-defined variables into account - see <literal
+      (not taking the predefined variables into account - see <literal
       moreinfo="none">initcol</literal> for more information). On subsequent
       invocations the contents of the collection (session, in this case) will
       be retrieved from storage. After initialisation takes place the
@@ -4695,7 +4706,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
       necessarily the order in which the rules appear in the configuration
       file. If you group rules by processing phases, then skip should work as
       expected. This action can not be used to skip rules within one chain.
-      Accepts a single paramater denoting the number of rules (or chains) to
+      Accepts a single parameter denoting the number of rules (or chains) to
       skip.</para>
     </section>
 
@@ -4724,7 +4735,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
       necessarily the order in which the rules appear in the configuration
       file. If you group rules by processing phases, then skip should work as
       expected. This action can not be used to skip rules within one chain.
-      Accepts a single paramater denoting the last rule ID to skip.</para>
+      Accepts a single parameter denoting the last rule ID to skip.</para>
     </section>
 
     <section>
@@ -4742,8 +4753,8 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
 
       <para><emphasis>Note</emphasis></para>
 
-      <para>Staus actions defined in Apache scope locations (such as
-      Directory, Location, etc...) may be superceded by phase:1 action
+      <para>Status actions defined in Apache scope locations (such as
+      Directory, Location, etc...) may be superseded by phase:1 action
       settings. The Apache ErrorDocument directive will be triggered if
       present in the configuration. Therefore if you have previously defined a
       custom error page for a given status then it will be executed and its
@@ -4769,7 +4780,7 @@ SecRule REQUEST_COOKIES:SESSIONID "47414e81cbbef3cf8366e84eeacba091" \
       <para><emphasis>Note</emphasis></para>
 
       <para>Any transformation functions that you specify in a SecRule will be
-      in addtion to previous ones specified in SecDefaultAction. Use of
+      in addition to previous ones specified in SecDefaultAction. Use of
       "t:none" will remove all transformation functions for the specified
       rule.</para>
     </section>
@@ -5062,9 +5073,8 @@ end</programlisting>
           <para>All matches are case-sensitive. If you do not care about case
           sensitivity you either need to implement the <literal
           moreinfo="none">lowercase</literal> transformational function, or
-          use the per-pattern<literal
-          moreinfo="none">(?i)</literal>modificator, as allowed by
-          PCRE.</para>
+          use the per-pattern<literal moreinfo="none">(?i)</literal>modifier,
+          as allowed by PCRE.</para>
         </listitem>
 
         <listitem>
@@ -5072,7 +5082,7 @@ end</programlisting>
           <literal moreinfo="none">PCRE_DOLLAR_ENDONLY</literal> flags are set
           during compilation, meaning a single dot will match any character,
           including the newlines and a <literal moreinfo="none">$</literal>
-          end anchor will not match a trailing newline charater.</para>
+          end anchor will not match a trailing newline character.</para>
         </listitem>
       </orderedlist>
     </section>
@@ -5507,9 +5517,8 @@ Server: Apache/2.x.x
         </listitem>
       </orderedlist>
 
-      <para>Refer to the documentsation for
-      <literal>SecAuditLogParts</literal> for the explanation of each
-      part.</para>
+      <para>Refer to the documentation for <literal>SecAuditLogParts</literal>
+      for the explanation of each part.</para>
     </section>
   </section>
 
@@ -5521,7 +5530,7 @@ Server: Apache/2.x.x
     <section>
       <title>Impedance Mismatch</title>
 
-      <para>Web application firewalls have a difficult job trying to make
+      <para>Web application fireballs have a difficult job trying to make
       sense of data that passes by, without any knowledge of the application
       and its business logic. The protection they provide comes from having an
       independent layer of security on the outside. Because data validation is
@@ -5537,7 +5546,7 @@ Server: Apache/2.x.x
 
       <para>While we will continue to enhance ModSecurity to deal with various
       evasion techniques the problem can only be minimized, but never solved.
-      With so many different application backends chances are some will always
+      With so many different application backend chances are some will always
       do something completely unexpected. The only solution is to be aware of
       the technologies in the backend when writing rules, adapting the rules
       to remove the mismatch. See the next section for some examples.</para>

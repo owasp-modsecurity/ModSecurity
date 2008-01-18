@@ -10,6 +10,7 @@ MOD_SECURITY2_H = re.h modsecurity.h msc_logging.h msc_multipart.h msc_parsers.h
     msc_geo.h acmp.h utf8tables.h msc_lua.h
 
 CC = @CC@
+PERL = @PERL@
 EXTRA_CFLAGS = @EXTRA_CFLAGS@
 MODSEC_EXTRA_CFLAGS = @MODSEC_EXTRA_CFLAGS@
 
@@ -64,7 +65,7 @@ clean: clean-extras
 	@rm -rf *.la *.lo *.o *.slo .libs msc_test
 
 maintainer-clean: clean
-	@rm -rf Makefile config config.log config.status configure mod_security2_config.h
+	@rm -rf Makefile mlogc-src/Makefile t/run-tests.pl config config.log config.status configure mod_security2_config.h
 
 dist-clean: maintainer-clean
 
@@ -91,8 +92,8 @@ TESTOBJS = re.o re_operators.o re_actions.o re_tfns.o re_variables.o \
 msc_test: mod_security2.la msc_test.c
 	@$(CC) $(CPPFLAGS) $(LDFLAGS) $(APXS_INCLUDES) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test $(TESTOBJS) msc_test.c $(LIBS) $(APR_LIBS) $(APU_LIBS) $(APXS_LIBS) $(APR_LINK_LD) $(APU_LINK_LD)
 
-test: msc_test
-	@t/run-tests.pl
+test: t/run-tests.pl msc_test
+	@$(PERL) t/run-tests.pl
 
 mlogc:
 	@$(MAKE) -C mlogc-src mlogc \

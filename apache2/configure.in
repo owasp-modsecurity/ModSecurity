@@ -19,6 +19,7 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+AC_PATH_PROGS(PERL, perl perl5, )
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -233,6 +234,9 @@ CHECK_LUA()
 CHECK_CURL()
 
 AC_CONFIG_FILES([Makefile])
+if test -e "$PERL"; then
+    AC_CONFIG_FILES([t/run-tests.pl])
+fi
 if test -e "mlogc-src/Makefile.in"; then
     AC_CONFIG_FILES([mlogc-src/Makefile])
 fi
