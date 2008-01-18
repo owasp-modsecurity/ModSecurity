@@ -14,6 +14,17 @@
 
 #include "msc_lua.h"
 
+static const char *const severities[] = {
+    "EMERGENCY",
+    "ALERT",
+    "CRITICAL",
+    "ERROR",
+    "WARNING",
+    "NOTICE",
+    "INFO",
+    "DEBUG",
+    NULL,
+};
 
 /* -- Actions, variables, functions and operator functions ----------------- */
 
@@ -198,7 +209,6 @@ msre_var *msre_create_var(msre_ruleset *ruleset, const char *name, const char *p
     if (var->metadata->validate != NULL) {
         *error_msg = var->metadata->validate(ruleset, var);
         if (*error_msg != NULL) {
-            /* ENH Shouldn't we log the problem? */
             return NULL;
         }
     }
@@ -353,7 +363,6 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
 
             for(;;) {
                 if (*p == '\0') {
-                    // TODO better 64-bit support here
                     *error_msg = apr_psprintf(mp, "Missing closing quote at position %d: %s",
                         (int)(p - text), text);
                     free(value);
@@ -361,14 +370,13 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
                 } else
                 if (*p == '\\') {
                     if ( (*(p + 1) == '\0') || ((*(p + 1) != '\'')&&(*(p + 1) != '\\')) ) {
-                        // TODO better 64-bit support here
                         *error_msg = apr_psprintf(mp, "Invalid quoted pair at position %d: %s",
                             (int)(p - text), text);
                         free(value);
                         return -1;
                     }
                     p++;
-                    *d++ = *p++;
+                    *(d++) = *(p++);
                 } else
                 if (*p == '\'') {
                     *d = '\0';
@@ -376,7 +384,7 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
                     break;
                 }
                 else {
-                    *d++ = *p++;
+                    *(d++) = *(p++);
                 }
             }
 
@@ -629,6 +637,61 @@ void msre_engine_destroy(msre_engine *engine) {
  * transaction phase.
  */
 #if defined(PERFORMANCE_MEASUREMENT)
+apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) {
+    apr_array_header_t *arr = NULL;
+    msre_rule **rules = NULL;
+    apr_status_t rc;
+    apr_time_t time1;
+    int i;
+
+    switch (msr->phase) {
+        case PHASE_REQUEST_HEADERS :
+            arr = ruleset->phase_request_headers;
+            break;
+        case PHASE_REQUEST_BODY :
+            arr = ruleset->phase_request_body;
+            break;
+        case PHASE_RESPONSE_HEADERS :
+            arr = ruleset->phase_response_headers;
+            break;
+        case PHASE_RESPONSE_BODY :
+            arr = ruleset->phase_response_body;
+            break;
+        case PHASE_LOGGING :
+            arr = ruleset->phase_logging;
+            break;
+        default :
+            msr_log(msr, 1, "Internal Error: Invalid phase %d", msr->phase);
+            return -1;
+    }
+
+    rules = (msre_rule **)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        msre_rule *rule = rules[i];
+        rule->execution_time = 0;
+    }    
+
+    time1 = apr_time_now();
+
+    for (i = 0; i < 10000; i++) {
+        rc = msre_ruleset_process_phase_(ruleset, msr);
+    }
+
+    msr_log(msr, 1, "Phase %d: %" APR_TIME_T_FMT " usec", msr->phase, ((apr_time_now() - time1) / 10000));
+
+    rules = (msre_rule **)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        msre_rule *rule = rules[i];
+        msr_log(msr, 1, "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"]: %lu usec", rule,
+            ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+            rule->filename != NULL ? rule->filename : "-",
+            rule->line_num,
+            (rule->execution_time / 10000));
+    }
+    
+    return rc;
+}
+
 static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_rec *msr) {
 #else
 apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) {
@@ -905,66 +968,6 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     return 0;
 }
 
-#if defined(PERFORMANCE_MEASUREMENT)
-apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) {
-    apr_array_header_t *arr = NULL;
-    msre_rule **rules = NULL;
-    apr_status_t rc;
-    apr_time_t time1;
-    int i;
-
-    switch (msr->phase) {
-        case PHASE_REQUEST_HEADERS :
-            arr = ruleset->phase_request_headers;
-            break;
-        case PHASE_REQUEST_BODY :
-            arr = ruleset->phase_request_body;
-            break;
-        case PHASE_RESPONSE_HEADERS :
-            arr = ruleset->phase_response_headers;
-            break;
-        case PHASE_RESPONSE_BODY :
-            arr = ruleset->phase_response_body;
-            break;
-        case PHASE_LOGGING :
-            arr = ruleset->phase_logging;
-            break;
-        default :
-            msr_log(msr, 1, "Internal Error: Invalid phase %d", msr->phase);
-            return -1;
-    }
-
-    rules = (msre_rule **)arr->elts;
-    for (i = 0; i < arr->nelts; i++) {
-        msre_rule *rule = rules[i];
-        rule->execution_time = 0;
-    }    
-
-    time1 = apr_time_now();
-
-    for (i = 0; i < 10000; i++) {
-        rc = msre_ruleset_process_phase_(ruleset, msr);
-    }
-
-    msr_log(msr, 1, "Phase %d: %" APR_TIME_T_FMT " usec", msr->phase, ((apr_time_now() - time1) / 10000));
-
-    rules = (msre_rule **)arr->elts;
-    for (i = 0; i < arr->nelts; i++) {
-        msre_rule *rule = rules[i];
-        msr_log(msr, 1, "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"]: %u usec (trans:%u usec, op:%u usec)",
-            rule,
-            ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
-            rule->filename != NULL ? rule->filename : "-",
-            rule->line_num,
-            (rule->execution_time / 10000),
-            (rule->trans_time / 10000),
-            (rule->op_time / 10000));
-    }
-    
-    return rc;
-}
-#endif
-
 /**
  * Creates a ruleset that will be handled by the default
  * implementation.
@@ -1120,18 +1123,6 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
  * Returns the name of the supplied severity level.
  */
 static const char *msre_format_severity(int severity) {
-    static const char *const severities[] = {
-        "EMERGENCY",
-        "ALERT",
-        "CRITICAL",
-        "ERROR",
-        "WARNING",
-        "NOTICE",
-        "INFO",
-        "DEBUG",
-        NULL,
-    };
-
     if ((severity >= 0)&&(severity <= 7)) {
         return severities[severity];
     }
@@ -1623,10 +1614,11 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
         const char *expnames = NULL;
 
         arr = apr_table_elts(tartab);
-        te = (apr_table_entry_t *)arr->elts;
         if (arr->nelts > 0) {
+            te = (apr_table_entry_t *)arr->elts;
             expnames = apr_pstrdup(mptmp, ((msre_var *)te[0].val)->name);
             for(i = 1; i < arr->nelts; i++) {
+                msr_log(msr, 4, "Combine %s|%s.", expnames, ((msre_var *)te[i].val)->name);
                 expnames = apr_psprintf(mptmp, "%s|%s", expnames, ((msre_var *)te[i].val)->name);
             }
             if (strcmp(rule->p1, expnames) != 0) {

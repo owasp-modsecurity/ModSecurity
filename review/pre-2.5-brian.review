@@ -3,12 +3,12 @@
   <ReviewIssue id="FB137W3T">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 10:55:40:361 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 10:57:29:687 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:47:15:701 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
     <File line="2204">apache2/re_variables.c</File>
-    <Type>Suggestion</Type>
+    <Type>item.type.label.suggestion</Type>
     <Severity>item.severity.label.normal</Severity>
     <Summary>Is ENV really cacheable?  It could change via setenv.</Summary>
     <Description>/* ENV */
@@ -24,17 +24,17 @@
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB13ARFR">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 10:57:54:279 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:16:11:570 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:43:38:825 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
     <File line="2270">apache2/re_variables.c</File>
-    <Type>Suggestion</Type>
+    <Type>item.type.label.suggestion</Type>
     <Severity>item.severity.label.trivial</Severity>
     <Summary>GEO is probably not cacheable as it changes with every @geoLookup operator.</Summary>
     <Description>/* GEO */
@@ -50,17 +50,17 @@
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB13GOJ6">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:02:30:450 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:03:43:300 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:43:20:652 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
     <File line="2281">apache2/re_variables.c</File>
-    <Type>Suggestion</Type>
+    <Type>item.type.label.suggestion</Type>
     <Severity>item.severity.label.trivial</Severity>
     <Summary>GLOBAL is not documented.  Is it cacheable?</Summary>
     <Description>/* GLOBAL */
@@ -76,17 +76,17 @@
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB13M9C2">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:06:50:690 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:07:26:033 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:43:02:916 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
     <File line="2303">apache2/re_variables.c</File>
-    <Type>Suggestion</Type>
+    <Type>item.type.label.suggestion</Type>
     <Severity>item.severity.label.trivial</Severity>
     <Summary>IP undocumented.  Probably not cacheable as it can change via setvar, etc.</Summary>
     <Description>/* IP */
@@ -102,17 +102,17 @@
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB13OJ5P">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:08:36:733 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:09:06:681 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:42:44:589 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
     <File line="2534">apache2/re_variables.c</File>
-    <Type>Suggestion</Type>
+    <Type>item.type.label.suggestion</Type>
     <Severity>item.severity.label.trivial</Severity>
     <Summary>RESOURCE is undocumented.  Probably not cacheable as it is easily changed.</Summary>
     <Description>/* RESOURCE */
@@ -128,12 +128,12 @@
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB13W5BF">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:14:32:043 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 14:52:02:794 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:41:31:558 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -154,12 +154,12 @@
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB14A5TJ">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 11:25:25:879 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:54:38:835 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 17:00:23:571 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -171,7 +171,7 @@
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB154B83">
     <ReviewIssueMeta>
@@ -262,7 +262,7 @@
   <ReviewIssue id="FB18IF9M">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 13:23:49:834 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 13:24:14:701 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:26:24:257 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -274,7 +274,7 @@
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB1BQL2O">
     <ReviewIssueMeta>
@@ -427,7 +427,7 @@
   <ReviewIssue id="FB1DI9VN">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:43:40:931 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:45:51:571 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:38:59:940 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -439,12 +439,12 @@
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB1DMQVA">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:47:09:574 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:48:00:456 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:40:07:483 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -462,12 +462,12 @@
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB1DP8LY">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:49:05:878 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:15:53:256 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:56:55:081 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -479,12 +479,12 @@
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB1DW247">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:54:24:055 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:55:22:775 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:57:08:520 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -496,12 +496,12 @@
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB1DYM7R">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:56:23:415 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 15:57:17:579 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:57:21:641 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -526,7 +526,7 @@
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB1E0Q7Y">
     <ReviewIssueMeta>
@@ -552,7 +552,7 @@
   <ReviewIssue id="FB1E3GFO">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:00:09:204 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:07:33:188 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:38:08:350 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -563,8 +563,8 @@
     <Description>msre_op_validateByteRange_execute</Description>
     <Annotation />
     <Revision />
-    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Resolution>item.resolution.label.invalidWontfix</Resolution>
+    <Status>item.status.label.closed</Status>
   </ReviewIssue>
   <ReviewIssue id="FB1E5VS3">
     <ReviewIssueMeta>
@@ -586,7 +586,7 @@
   <ReviewIssue id="FB1E87O7">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:03:51:127 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:06:13:415 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:30:07:550 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -602,12 +602,12 @@ msre_op_le_execute</Description>
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB1EJCRJ">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:12:30:943 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:12:47:358 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:57:45:711 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -619,7 +619,7 @@ msre_op_le_execute</Description>
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB1EMD8B">
     <ReviewIssueMeta>
@@ -710,7 +710,7 @@ static char *msre_action_proxy_validate(msre_engine *engine, msre_action *action
   <ReviewIssue id="FB1EZDG2">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:24:58:322 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 16:25:17:586 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:13:48:178 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -723,7 +723,7 @@ static char *msre_action_proxy_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB1F1P3G">
     <ReviewIssueMeta>
@@ -826,7 +826,7 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
   <ReviewIssue id="FB1GENRN">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:04:51:155 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:08:12:017 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:12:33:664 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -855,19 +855,19 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB1GFT4L">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:05:44:757 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 23:10:38:787 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:12:12:876 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
     <File line="774">apache2/re_actions.c</File>
     <Type>item.type.label.optimization</Type>
     <Severity>item.severity.label.trivial</Severity>
-    <Summary>inner if's should be else if's.  TODO needs looked into.</Summary>
+    <Summary>TODO needs looked into.</Summary>
     <Description>if (strcasecmp(name, "auditEngine") == 0) {
         if (strcasecmp(value, "on") == 0) {
             msr-&gt;txcfg-&gt;auditlog_flag = AUDITLOG_ON;
@@ -896,7 +896,7 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
   <ReviewIssue id="FB1GIPSC">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:08:00:396 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-04 :: 17:11:59:825 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:59:05:782 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -915,7 +915,7 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB1GPE4U">
     <ReviewIssueMeta>
@@ -983,7 +983,7 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
   <ReviewIssue id="FB5F8LTP">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 11:43:13:789 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 11:43:36:608 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:10:24:140 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -998,7 +998,7 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB5FKPU1">
     <ReviewIssueMeta>
@@ -1020,7 +1020,7 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
   <ReviewIssue id="FB5FMRRL">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 11:54:14:673 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 11:54:26:858 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:04:13:383 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1035,7 +1035,7 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB5FYEPM">
     <ReviewIssueMeta>
@@ -1170,7 +1170,7 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
   <ReviewIssue id="FB5OQ8VP">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:08:53:365 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:09:41:123 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:25:58:269 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1184,13 +1184,13 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     }</Description>
     <Annotation />
     <Revision />
-    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Resolution>item.resolution.label.invalidWontfix</Resolution>
+    <Status>item.status.label.closed</Status>
   </ReviewIssue>
   <ReviewIssue id="FB5P1XTB">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:17:58:895 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:18:20:235 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:26:18:631 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1223,13 +1223,13 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     }</Description>
     <Annotation />
     <Revision />
-    <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Resolution>item.resolution.label.invalidWontfix</Resolution>
+    <Status>item.status.label.closed</Status>
   </ReviewIssue>
   <ReviewIssue id="FB5P819B">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:22:43:295 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:32:24:969 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:26:48:665 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1244,7 +1244,7 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB5PIA63">
     <ReviewIssueMeta>
@@ -1284,7 +1284,7 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
   <ReviewIssue id="FB5PTFC4">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:39:21:316 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:39:30:027 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:28:02:997 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1299,12 +1299,12 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB5PTZEE">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:39:47:318 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:39:57:589 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:28:24:355 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1319,12 +1319,12 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB5PUL8Y">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:40:15:634 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:40:35:216 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:07:58:168 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1336,12 +1336,12 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB5PV6Q0">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:40:43:464 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 16:41:41:536 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:07:34:306 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1353,12 +1353,12 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB5YNPAO">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 20:46:50:832 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 20:48:20:448 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:06:54:324 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1370,12 +1370,12 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB5YP23X">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 20:47:54:093 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 20:48:06:880 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:06:02:231 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1387,12 +1387,12 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB5YQ3DS">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 20:48:42:400 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 20:50:00:027 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:05:23:686 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1404,7 +1404,7 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB60NQ60">
     <ReviewIssueMeta>
@@ -1453,7 +1453,7 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
   <ReviewIssue id="FB6197M3">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 21:59:33:579 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 22:00:34:198 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:29:21:240 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1471,7 +1471,7 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB61EAWY">
     <ReviewIssueMeta>
@@ -1517,7 +1517,7 @@ void msre_engine_destroy(msre_engine *engine) {
   <ReviewIssue id="FB624EJX">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 22:23:48:909 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 22:24:44:929 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:04:30:061 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1532,12 +1532,12 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB62D9GN">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 22:30:42:215 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 22:45:42:260 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:02:09:916 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1563,12 +1563,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB62Y1B3">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 22:46:51:423 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-07 :: 22:47:22:231 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:01:31:111 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1590,7 +1590,7 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB630W8M">
     <ReviewIssueMeta>
@@ -1654,7 +1654,7 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
   <ReviewIssue id="FB6VV1A0">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 12:16:20:280 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 12:16:40:432 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:59:48:300 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1667,12 +1667,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB6W0DKJ">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 12:20:29:491 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 12:28:11:109 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:59:23:210 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1689,7 +1689,7 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB7FM2YX">
     <ReviewIssueMeta>
@@ -1711,7 +1711,7 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
   <ReviewIssue id="FB7H1FEN">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 22:09:10:463 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 22:09:21:755 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:20:53:411 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1727,12 +1727,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB7H1YUO">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 22:09:35:664 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-08 :: 22:09:42:366 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:21:28:242 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1748,12 +1748,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB88F43Z">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 10:55:38:639 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 10:55:46:491 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:25:15:860 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1765,12 +1765,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB88M1H3">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 11:01:01:815 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 11:01:33:567 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:55:50:363 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1782,12 +1782,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB88MW1C">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 11:01:41:424 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 11:01:46:101 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:56:10:175 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1799,12 +1799,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB88NRK7">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 11:02:22:279 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 11:02:26:609 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:56:41:045 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1816,12 +1816,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB88O7GX">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 11:02:42:897 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 11:02:46:061 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:54:16:807 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1833,12 +1833,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB88Y45H">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 11:10:25:157 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 11:14:15:361 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:24:57:212 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1858,12 +1858,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB898OY8">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 11:18:38:672 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 11:18:53:777 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:29:49:134 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1875,12 +1875,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8AX6MT">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:05:40:949 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:05:54:630 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:30:01:771 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1892,12 +1892,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8AYMVH">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:06:48:653 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:06:58:541 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:30:40:514 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1909,12 +1909,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8B1TFE">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:09:17:114 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:09:22:181 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:31:50:812 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1934,12 +1934,12 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8BBVRS">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:17:06:712 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:19:23:680 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:33:23:560 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -1952,7 +1952,7 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8BCXG9">
     <ReviewIssueMeta>
@@ -2000,7 +2000,7 @@ static const char *cmd_rule_import_by_msg(cmd_parms *cmd, void *_dcfg, const cha
   <ReviewIssue id="FB8BDRFJ">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:18:34:399 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:19:04:870 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:34:07:673 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2012,12 +2012,12 @@ static const char *cmd_rule_import_by_msg(cmd_parms *cmd, void *_dcfg, const cha
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8BFY0A">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:20:16:234 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:20:36:635 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:40:53:633 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2043,7 +2043,7 @@ static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8BJFFY">
     <ReviewIssueMeta>
@@ -2193,7 +2193,7 @@ static void dummy_free_func(void *data) {}
   <ReviewIssue id="FB8CP101">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:55:19:633 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:55:25:567 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 17:00:04:416 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2205,12 +2205,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8CPGE9">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:55:39:585 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:55:46:993 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:58:16:438 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2222,12 +2222,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8CQ08M">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:56:05:302 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:56:08:927 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:57:58:049 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2239,12 +2239,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8CR02E">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:56:51:734 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:57:16:674 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:41:50:773 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2256,12 +2256,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8CSPHF">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:58:11:331 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:58:18:022 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:42:59:645 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2279,12 +2279,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8CT3H1">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:58:29:461 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:58:33:945 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:46:15:813 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2302,12 +2302,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8CTFYN">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:58:45:647 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:58:50:500 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:46:51:173 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2325,12 +2325,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8CTU3B">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:59:03:959 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:59:08:138 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:47:05:294 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2348,12 +2348,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8CU4LO">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:59:17:580 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 12:59:25:064 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:49:00:349 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2371,12 +2371,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8CV4KT">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:00:04:205 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:00:12:200 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:50:22:367 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2394,12 +2394,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8CVOY6">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:00:30:606 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:00:38:609 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:51:16:772 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2433,12 +2433,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8CW8SF">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:00:56:319 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:01:04:256 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:52:48:192 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2480,12 +2480,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8CX138">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:01:32:996 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:01:39:326 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:54:32:209 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2502,7 +2502,7 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8CXPT7">
     <ReviewIssueMeta>
@@ -2601,7 +2601,7 @@ static void dummy_free_func(void *data) {}
   <ReviewIssue id="FB8D3Q5Q">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:06:45:422 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:06:56:494 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:55:10:355 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2632,12 +2632,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8D4IOU">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:07:22:398 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:07:33:012 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 14:55:42:896 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2650,12 +2650,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8D5DPX">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:08:02:613 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:08:21:014 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:51:28:546 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2670,7 +2670,7 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8D6FT6">
     <ReviewIssueMeta>
@@ -2789,7 +2789,7 @@ static void dummy_free_func(void *data) {}
   <ReviewIssue id="FB8DD3BF">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:14:02:379 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:14:19:589 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:42:21:749 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2801,12 +2801,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8DDOAR">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:14:29:571 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:14:57:669 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:43:53:997 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2818,12 +2818,12 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8DHX7Z">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:17:47:759 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 13:17:59:417 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:41:12:538 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2835,7 +2835,7 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8E42E3">
     <ReviewIssueMeta>
@@ -2879,7 +2879,7 @@ static void dummy_free_func(void *data) {}
   <ReviewIssue id="FB8FASAX">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 14:08:14:025 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-09 :: 14:08:38:129 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:40:12:054 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -2891,7 +2891,7 @@ static void dummy_free_func(void *data) {}
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB8FRWMM">
     <ReviewIssueMeta>
@@ -3091,7 +3091,7 @@ static char *multipart_construct_filename(modsec_rec *msr) {
   <ReviewIssue id="FB9R1V3P">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 12:24:59:317 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 12:25:40:036 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:58:44:275 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -3103,12 +3103,12 @@ static char *multipart_construct_filename(modsec_rec *msr) {
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB9R56TK">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 12:27:34:472 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:16:19:644 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:39:17:001 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -3120,7 +3120,7 @@ static char *multipart_construct_filename(modsec_rec *msr) {
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB9SGM20">
     <ReviewIssueMeta>
@@ -3159,7 +3159,7 @@ static char *multipart_construct_filename(modsec_rec *msr) {
   <ReviewIssue id="FB9SQR7V">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:12:20:299 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:12:45:495 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:38:39:261 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -3172,12 +3172,12 @@ static char *multipart_construct_filename(modsec_rec *msr) {
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB9SRHG7">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:12:54:295 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:13:12:297 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:36:43:726 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -3189,12 +3189,12 @@ static char *multipart_construct_filename(modsec_rec *msr) {
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB9SZOE3">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:19:16:539 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:20:00:685 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:35:53:104 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -3207,7 +3207,7 @@ static char *multipart_construct_filename(modsec_rec *msr) {
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB9T9JDT">
     <ReviewIssueMeta>
@@ -3230,7 +3230,7 @@ static char *multipart_construct_filename(modsec_rec *msr) {
   <ReviewIssue id="FB9TGO2M">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:32:29:278 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:34:07:812 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 16:51:13:950 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -3248,7 +3248,7 @@ static char *multipart_construct_filename(modsec_rec *msr) {
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
   <ReviewIssue id="FB9TKRGZ">
     <ReviewIssueMeta>
@@ -3418,7 +3418,7 @@ static void xml_receive_sax_error(void *data, const char *msg, ...) {
   <ReviewIssue id="FB9UC5NX">
     <ReviewIssueMeta>
       <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:56:58:413 GMT-08:00</CreationDate>
-      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-10 :: 13:57:23:209 GMT-08:00</LastModificationDate>
+      <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z">2008-01-11 :: 15:34:14:676 GMT-08:00</LastModificationDate>
     </ReviewIssueMeta>
     <ReviewerId>brian</ReviewerId>
     <AssignedTo>brian</AssignedTo>
@@ -3430,7 +3430,7 @@ static void xml_receive_sax_error(void *data, const char *msg, ...) {
     <Annotation />
     <Revision />
     <Resolution>item.resolution.label.validNeedsfixing</Resolution>
-    <Status>item.status.label.open</Status>
+    <Status>item.status.label.resolved</Status>
   </ReviewIssue>
 </Review>
 

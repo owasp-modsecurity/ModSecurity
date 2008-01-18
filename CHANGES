@@ -225,8 +225,7 @@ Changes since 2.5.0-dev2:
 
  * Fixed decoding full-width unicode in t:urlDecodeUni.
 
- * Lessen some overhead of debugging messages and calculations 
-   TODO: more to come
+ * Lessen some overhead of debugging messages and calculations.
 
  * Removed strnlen() calls for non-GNU platforms.
 

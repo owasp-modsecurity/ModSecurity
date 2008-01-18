@@ -124,7 +124,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                     break;
                 }
                 
-                *t++ = *p++;
+                *(t++) = *(p++);
             }
             if (*p == '\0') return -10;
             
@@ -283,7 +283,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
                     log_escape(msr->mp, data));
             }
             
-            if (strlen(new_value) > 4096) {
+            if (strlen(new_value) > MULTIPART_BUF_SIZE) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Part header too long.");
                 return -1;
             }
@@ -858,8 +858,8 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
         char c = *inptr;
         int process_buffer = 0;
 
-        if ((c == 0x0d)&&(msr->mpd->bufleft == 1)) {
-            /* we don't want to take 0x0d as the last byte in the buffer */
+        if ((c == '\r')&&(msr->mpd->bufleft == 1)) {
+            /* we don't want to take \r as the last byte in the buffer */
             process_buffer = 1;
         } else {
             inptr++;
@@ -873,7 +873,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
         /* until we either reach the end of the line
          * or the end of our internal buffer
          */
-        if ((c == 0x0a)||(msr->mpd->bufleft == 0)||(process_buffer)) {
+        if ((c == '\n')||(msr->mpd->bufleft == 0)||(process_buffer)) {
             int processed_as_boundary = 0;
 
             *(msr->mpd->bufptr) = 0;

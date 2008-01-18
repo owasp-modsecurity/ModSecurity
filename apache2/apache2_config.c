@@ -584,12 +584,14 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         }
 
         /* Must NOT use metadata actions. */
+        /* ENH: loop through to check for tags */
         if ((rule->actionset->id != NOT_SET_P)
             ||(rule->actionset->rev != NOT_SET_P)
             ||(rule->actionset->msg != NOT_SET_P)
+            ||(rule->actionset->severity != NOT_SET)
             ||(rule->actionset->logdata != NOT_SET_P))
         {
-            return apr_psprintf(cmd->pool, "ModSecurity: Metadata actions (id, rev, msg) "
+            return apr_psprintf(cmd->pool, "ModSecurity: Metadata actions (id, rev, msg, tag, severity, logdata) "
                 " can only be specified by chain starter rules.");
         }
 
@@ -676,6 +678,9 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
     /* Add an additional placeholder if this rule ID is on the list */
     if ((rule->actionset->id != NULL) && apr_table_get(dcfg->tmp_rule_placeholders, rule->actionset->id)) {
         msre_rule *phrule = apr_palloc(rule->ruleset->mp, sizeof(msre_rule));
+        if (phrule == NULL) {
+        	return FATAL_ERROR;
+        }
 
         #ifdef DEBUG_CONF
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
@@ -699,7 +704,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 }
 
 /**
- * TODO
+ * 
  */
 static const char *add_marker(cmd_parms *cmd, directory_config *dcfg, const char *p1, 
     const char *p2, const char *p3)
@@ -934,7 +939,7 @@ static const char *cmd_chroot_dir(cmd_parms *cmd, void *_dcfg, const char *p1) {
 static const char *cmd_component_signature(cmd_parms *cmd, void *_dcfg, const char *p1) {
     directory_config *dcfg = (directory_config *)_dcfg;
 
-    /* TODO Enforce "Name/VersionX.Y.Z (comment)" format. */
+    /* ENH Enforce "Name/VersionX.Y.Z (comment)" format. */
     *(char **)apr_array_push(dcfg->component_signatures) = (char *)p1;
 
     return NULL;
@@ -1008,13 +1013,15 @@ static const char *cmd_default_action(cmd_parms *cmd, void *_dcfg, const char *p
     }
 
     /* Must not use metadata actions. */
+    /* ENH: loop through to check for tags */
     if ((dcfg->tmp_default_actionset->id != NOT_SET_P)
         ||(dcfg->tmp_default_actionset->rev != NOT_SET_P)
         ||(dcfg->tmp_default_actionset->msg != NOT_SET_P)
+        ||(dcfg->tmp_default_actionset->severity != NOT_SET)
         ||(dcfg->tmp_default_actionset->logdata != NOT_SET_P))
     {
         return apr_psprintf(cmd->pool, "ModSecurity: SecDefaultAction must not "
-            "contain any metadata actions (id, rev, msg).");
+            "contain any metadata actions (id, rev, msg, tag, severity, logdata).");
     }
 
     /* Must not use chain. */
@@ -1146,8 +1153,7 @@ static const char *cmd_request_encoding(cmd_parms *cmd, void *_dcfg, const char 
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
 
-    // TODO Validate encoding
-    // return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRequestBodyAccess: %s", p1);
+    /* ENH Validate encoding */
 
     dcfg->request_encoding = p1;
 
@@ -1202,7 +1208,7 @@ static const char *cmd_response_body_mime_type(cmd_parms *cmd, void *_dcfg, cons
     directory_config *dcfg = (directory_config *)_dcfg;
     char *p1 = apr_pstrdup(cmd->pool, _p1);
 
-    // TODO check whether the parameter is a valid MIME type of "null"
+    /* TODO check whether the parameter is a valid MIME type of "???" */
 
     if ((dcfg->of_mime_types == NULL)||(dcfg->of_mime_types == NOT_SET_P)) {
         dcfg->of_mime_types = apr_table_make(cmd->pool, 10);
@@ -1381,7 +1387,7 @@ static const char *cmd_upload_keep_files(cmd_parms *cmd, void *_dcfg, const char
 static const char *cmd_web_app_id(cmd_parms *cmd, void *_dcfg, const char *p1) {
     directory_config *dcfg = (directory_config *)_dcfg;
 
-    // TODO enforce format (letters, digits, ., _, -)
+    /* ENH enforce format (letters, digits, ., _, -) */
     dcfg->webappid = p1;
 
     return NULL;
@@ -1466,11 +1472,12 @@ static const char *cmd_pdf_protect_method(cmd_parms *cmd, void *_dcfg,
 static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
     const char *p1)
 {
+    const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
     char *error_msg;
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
     
-    if (geo_init(dcfg, p1, &error_msg) <= 0) {
+    if (geo_init(dcfg, filename, &error_msg) <= 0) {
         return error_msg;
     }
 
@@ -1569,7 +1576,7 @@ const command_rec module_directives[] = {
         cmd_action,
         NULL,
         CMD_SCOPE_ANY,
-        "" // TODO
+        "an action list"
     ),
     
     AP_INIT_TAKE1 (
@@ -1593,7 +1600,7 @@ const command_rec module_directives[] = {
         cmd_audit_log,
         NULL,
         CMD_SCOPE_ANY,
-        "The filename of the primary audit log file"
+        "filename of the primary audit log file"
     ),
 
     AP_INIT_TAKE1 (
@@ -1601,7 +1608,7 @@ const command_rec module_directives[] = {
         cmd_audit_log2,
         NULL,
         CMD_SCOPE_ANY,
-        "The filename of the secondary audit log file"
+        "filename of the secondary audit log file"
     ),
 
     AP_INIT_TAKE1 (
@@ -1681,7 +1688,7 @@ const command_rec module_directives[] = {
         cmd_data_dir,
         NULL,
         CMD_SCOPE_MAIN,
-        "" // TODO
+        "path to the persistent data storage area" // TODO
     ),
 
     AP_INIT_TAKE1 (
@@ -1706,7 +1713,7 @@ const command_rec module_directives[] = {
         cmd_default_action,
         NULL,
         CMD_SCOPE_ANY,
-        "" // TODO
+        "default action list"
     ),
 
     AP_INIT_TAKE1 (
@@ -1834,7 +1841,7 @@ const command_rec module_directives[] = {
         cmd_response_body_limit,
         NULL,
         CMD_SCOPE_ANY,
-        "" // TODO
+        "byte limit for response body"
     ),
 
     AP_INIT_TAKE1 (
@@ -1842,7 +1849,7 @@ const command_rec module_directives[] = {
         cmd_response_body_limit_action,
         NULL,
         CMD_SCOPE_ANY,
-        "" // TODO
+        "what happens when the response body limit is reached"
     ),
 
     AP_INIT_ITERATE (
@@ -1866,7 +1873,7 @@ const command_rec module_directives[] = {
         cmd_rule,
         NULL,
         CMD_SCOPE_ANY,
-        "" // TODO
+        "rule target, operator and optional action list"
     ),
 
     AP_INIT_TAKE1 (
@@ -1890,7 +1897,7 @@ const command_rec module_directives[] = {
         cmd_rule_script,
         NULL,
         CMD_SCOPE_ANY,
-        "" // TODO
+        "rule script and optional actionlist"
     ),
 
     AP_INIT_ITERATE (
@@ -1898,7 +1905,7 @@ const command_rec module_directives[] = {
         cmd_rule_remove_by_id,
         NULL,
         CMD_SCOPE_ANY,
-        "" // TODO
+        "rule ID for removal"
     ),
 
     AP_INIT_ITERATE (
@@ -1906,7 +1913,7 @@ const command_rec module_directives[] = {
         cmd_rule_remove_by_msg,
         NULL,
         CMD_SCOPE_ANY,
-        "" // TODO
+        "rule message for removal"
     ),
 
     AP_INIT_TAKE1 (
@@ -1914,7 +1921,7 @@ const command_rec module_directives[] = {
         cmd_server_signature,
         NULL,
         CMD_SCOPE_MAIN,
-        "The new signature of the server"
+        "the new signature of the server"
     ),
 
     AP_INIT_TAKE1 (
@@ -1922,7 +1929,7 @@ const command_rec module_directives[] = {
         cmd_tmp_dir,
         NULL,
         CMD_SCOPE_ANY,
-        "" // TODO
+        "path to the temporary storage area"
     ),
 
     AP_INIT_TAKE1 (
@@ -1930,7 +1937,7 @@ const command_rec module_directives[] = {
         cmd_upload_dir,
         NULL,
         CMD_SCOPE_ANY,
-        "" // TODO
+        "path to the file upload area"
     ),
 
     AP_INIT_TAKE1 (
@@ -1938,7 +1945,7 @@ const command_rec module_directives[] = {
         cmd_upload_keep_files,
         NULL,
         CMD_SCOPE_ANY,
-        "" // TODO
+        "On or Off"
     ),
 
     AP_INIT_TAKE1 (
@@ -1946,7 +1953,7 @@ const command_rec module_directives[] = {
         cmd_web_app_id,
         NULL,
         CMD_SCOPE_ANY,
-        "" // TODO
+        "id"
     ),
 
     { NULL }

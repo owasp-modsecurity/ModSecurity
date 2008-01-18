@@ -116,7 +116,7 @@ static int var_args_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 
             rvar->value = arg->value;
             rvar->value_len = arg->value_len;
-            rvar->name = apr_psprintf(mptmp, "ARGS:%s", log_escape_nq(mptmp, arg->name));
+            rvar->name = apr_psprintf(mptmp, "ARGS:%s", log_escape_nq_ex(mptmp, arg->name, arg->name_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -186,7 +186,7 @@ static int var_args_names_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
 
             rvar->value = arg->name;
             rvar->value_len = arg->name_len;
-            rvar->name = apr_psprintf(mptmp, "ARGS_NAMES:%s", log_escape_nq(mptmp, arg->name));
+            rvar->name = apr_psprintf(mptmp, "ARGS_NAMES:%s", log_escape_nq_ex(mptmp, arg->name, arg->name_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -234,7 +234,7 @@ static int var_args_get_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
 
             rvar->value = arg->value;
             rvar->value_len = arg->value_len;
-            rvar->name = apr_psprintf(mptmp, "ARGS_GET:%s", log_escape_nq(mptmp, arg->name));
+            rvar->name = apr_psprintf(mptmp, "ARGS_GET:%s", log_escape_nq_ex(mptmp, arg->name, arg->name_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -280,7 +280,7 @@ static int var_args_get_names_generate(modsec_rec *msr, msre_var *var, msre_rule
 
             rvar->value = arg->name;
             rvar->value_len = arg->name_len;
-            rvar->name = apr_psprintf(mptmp, "ARGS_GET_NAMES:%s", log_escape_nq(mptmp, arg->name));
+            rvar->name = apr_psprintf(mptmp, "ARGS_GET_NAMES:%s", log_escape_nq_ex(mptmp, arg->name, arg->name_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -328,7 +328,7 @@ static int var_args_post_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
 
             rvar->value = arg->value;
             rvar->value_len = arg->value_len;
-            rvar->name = apr_psprintf(mptmp, "ARGS_POST:%s", log_escape_nq(mptmp, arg->name));
+            rvar->name = apr_psprintf(mptmp, "ARGS_POST:%s", log_escape_nq_ex(mptmp, arg->name, arg->name_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -374,7 +374,7 @@ static int var_args_post_names_generate(modsec_rec *msr, msre_var *var, msre_rul
 
             rvar->value = arg->name;
             rvar->value_len = arg->name_len;
-            rvar->name = apr_psprintf(mptmp, "ARGS_POST_NAMES:%s", log_escape_nq(mptmp, arg->name));
+            rvar->name = apr_psprintf(mptmp, "ARGS_POST_NAMES:%s", log_escape_nq_ex(mptmp, arg->name, arg->name_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -722,7 +722,7 @@ static int var_tx_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 
             rvar->value = str->value;
             rvar->value_len = str->value_len;
-            rvar->name = apr_psprintf(mptmp, "TX:%s", log_escape_nq(mptmp, str->name));
+            rvar->name = apr_psprintf(mptmp, "TX:%s", log_escape_nq_ex(mptmp, str->name, str->name_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -766,7 +766,7 @@ static int var_geo_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 
             rvar->value = str->value;
             rvar->value_len = str->value_len;
-            rvar->name = apr_psprintf(mptmp, "GEO:%s", log_escape_nq(mptmp, str->name));
+            rvar->name = apr_psprintf(mptmp, "GEO:%s", log_escape_nq_ex(mptmp, str->name, str->name_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -823,7 +823,7 @@ static int var_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 
             rvar->value = str->value;
             rvar->value_len = str->value_len;
-            rvar->name = apr_psprintf(mptmp, "IP:%s", log_escape_nq(mptmp, str->name));
+            rvar->name = apr_psprintf(mptmp, "IP:%s", log_escape_nq_ex(mptmp, str->name, str->name_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -839,10 +839,10 @@ static int var_matched_var_generate(modsec_rec *msr, msre_var *var, msre_rule *r
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     return var_simple_generate_ex(var, vartab, mptmp,
-                               apr_pmemdup(mptmp,
-                                   msr->matched_var->value,
-                                   msr->matched_var->value_len),
-                               msr->matched_var->value_len);
+                                  apr_pmemdup(mptmp,
+                                      msr->matched_var->value,
+                                      msr->matched_var->value_len),
+                                  msr->matched_var->value_len);
 }
 
 /* MATCHED_VAR_NAME */
@@ -851,10 +851,10 @@ static int var_matched_var_name_generate(modsec_rec *msr, msre_var *var, msre_ru
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     return var_simple_generate_ex(var, vartab, mptmp,
-                               apr_pmemdup(mptmp,
-                                   msr->matched_var->name,
-                                   msr->matched_var->name_len),
-                               msr->matched_var->name_len);
+                                  apr_pmemdup(mptmp,
+                                      msr->matched_var->name,
+                                      msr->matched_var->name_len),
+                                  msr->matched_var->name_len);
 }
 
 /* SESSION */
@@ -895,7 +895,7 @@ static int var_session_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 
             rvar->value = str->value;
             rvar->value_len = str->value_len;
-            rvar->name = apr_psprintf(mptmp, "SESSION:%s", log_escape_nq(mptmp, str->name));
+            rvar->name = apr_psprintf(mptmp, "SESSION:%s", log_escape_nq_ex(mptmp, str->name, str->name_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -943,7 +943,7 @@ static int var_user_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 
             rvar->value = str->value;
             rvar->value_len = str->value_len;
-            rvar->name = apr_psprintf(mptmp, "USER:%s", log_escape_nq(mptmp, str->name));
+            rvar->name = apr_psprintf(mptmp, "USER:%s", log_escape_nq_ex(mptmp, str->name, str->name_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -991,7 +991,7 @@ static int var_global_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 
             rvar->value = str->value;
             rvar->value_len = str->value_len;
-            rvar->name = apr_psprintf(mptmp, "GLOBAL:%s", log_escape_nq(mptmp, str->name));
+            rvar->name = apr_psprintf(mptmp, "GLOBAL:%s", log_escape_nq_ex(mptmp, str->name, str->name_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -1039,7 +1039,7 @@ static int var_resource_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
 
             rvar->value = str->value;
             rvar->value_len = str->value_len;
-            rvar->name = apr_psprintf(mptmp, "RESOURCE:%s", log_escape_nq(mptmp, str->name));
+            rvar->name = apr_psprintf(mptmp, "RESOURCE:%s", log_escape_nq_ex(mptmp, str->name, str->name_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -1202,7 +1202,7 @@ static int var_files_names_generate(modsec_rec *msr, msre_var *var, msre_rule *r
             rvar->value = parts[i]->name;
             rvar->value_len = strlen(rvar->value);
             rvar->name = apr_psprintf(mptmp, "FILES_NAMES:%s",
-                log_escape_nq(mptmp, parts[i]->name));
+                log_escape_nq_ex(mptmp, parts[i]->name, rvar->value_len));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             count++;
@@ -2208,7 +2208,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         0, 1,
         var_env_validate,
         var_env_generate,
-        VAR_CACHE,
+        VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
 
@@ -2274,7 +2274,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         1, 1,
         var_generic_list_validate,
         var_geo_generate,
-        VAR_CACHE,
+        VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
 
@@ -2285,7 +2285,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         1, 1,
         var_generic_list_validate,
         var_global_generate,
-        VAR_CACHE,
+        VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
 
@@ -2307,7 +2307,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         1, 1,
         var_generic_list_validate,
         var_ip_generate,
-        VAR_CACHE,
+        VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
 
@@ -2538,7 +2538,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         1, 1,
         var_generic_list_validate,
         var_resource_generate,
-        VAR_CACHE,
+        VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
 
@@ -2912,7 +2912,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         1, 1,
         var_generic_list_validate,
         var_session_generate,
-        VAR_CACHE,
+        VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
 

@@ -419,9 +419,6 @@ static apr_status_t module_cleanup(void *data) {
  * Pre-configuration initialisation hook.
  */
 static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_temp) {
-    /* Add the MODSEC_a.b define */
-    *(char **)apr_array_push(ap_server_config_defines) = apr_psprintf(mp, "MODSEC_%s.%s", MODSEC_VERSION_MAJOR, MODSEC_VERSION_MINOR);
-
     /* Initialise ModSecurity engine */
     modsecurity = modsecurity_create(mp, MODSEC_ONLINE);
     if (modsecurity == NULL) {
@@ -697,8 +694,9 @@ static int hook_request_late(request_rec *r) {
     /* Update the request headers. They might have changed after
      * the body was read (trailers).
      */
-    // TODO We still need to keep a copy of the original headers
-    //      to log in the audit log.
+    /* NOTE We still need to keep a copy of the original headers
+     *      to log in the audit log.
+     */
     msr->request_headers = apr_table_copy(msr->mp, r->headers_in);
 
     /* Process phase REQUEST_BODY */
@@ -1069,6 +1067,9 @@ static void register_hooks(apr_pool_t *mp) {
         "mod_log_forensic.c",
         NULL
     };
+
+    /* Add the MODSEC_a.b define */
+    *(char **)apr_array_push(ap_server_config_defines) = apr_psprintf(mp, "MODSEC_%s.%s", MODSEC_VERSION_MAJOR, MODSEC_VERSION_MINOR);
 
 #if (!defined(NO_MODSEC_API))
     /* Export optional functions. */

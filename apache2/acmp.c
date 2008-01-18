@@ -178,11 +178,11 @@ static void acmp_strtoucs(ACMP *parser, const char *str, acmp_utf8_char_t *ucs_c
 
     if (parser->is_utf8 == 0) {
         for (i = 0; i < len; i++) {
-            *ucs_chars++ = *c++;
+            *(ucs_chars++) = *(c++);
         }
     } else {
         for (i = 0; i < len; i++) {
-            *ucs_chars++ = utf8_decodechar(c);
+            *(ucs_chars++) = utf8_decodechar(c);
             c += utf8_seq_len(c);
         }
     }
@@ -275,7 +275,6 @@ static inline acmp_node_t *acmp_btree_find(acmp_node_t *node, acmp_utf8_char_t l
  *
  */
 static inline acmp_node_t *acmp_goto(acmp_node_t *node, acmp_utf8_char_t letter) {
-    //return acmp_child_for_code(node, letter);
     return acmp_btree_find(node, letter);
 }
 
@@ -313,14 +312,18 @@ static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
         node->left = apr_pcalloc(pool, sizeof(acmp_btree_node_t));
         node->left->node = nodes[left];
         node->left->letter = nodes[left]->letter;
-        /* printf("%c ->left %c \n", node->node->letter, node->left->node->letter); */
+        #ifdef DEBUG_ACMP
+        fprintf(stderr, "%lc ->left %lc\n", (wint_t)node->node->letter, (wint_t)node->left->node->letter);
+        #endif
     }
     if ((rb - pos) > 1) {
         right = pos + (rb - pos) / 2;
         node->right = apr_pcalloc(pool, sizeof(acmp_btree_node_t));
         node->right->node = nodes[right];
         node->right->letter = nodes[right]->letter;
-        /* printf("%c ->right %c \n", node->node->letter, node->right->node->letter); */
+        #ifdef DEBUG_ACMP
+        fprintf(stderr, "%lc ->right %lc\n", (wint_t)node->node->letter, (wint_t)node->right->node->letter);
+        #endif
     }
     if (node->right != NULL) {
         acmp_add_btree_leaves(node->right, nodes, right, pos, rb, pool);
@@ -382,7 +385,9 @@ static apr_status_t acmp_connect_fail_branches(ACMP *parser) {
     for (child = parser->root_node->child; child != NULL; child = child->sibling) {
         child->fail = parser->root_node;
         *(acmp_node_t **)apr_array_push(arr) = child;
-        /* printf("fail direction: *%s* => *%s*\n", child->text, child->fail->text); */
+        #ifdef DEBUG_ACMP
+        fprintf(stderr, "fail direction: *%s* => *%s*\n", child->text, child->fail->text);
+        #endif
     }
     
     for (;;) {
@@ -393,7 +398,9 @@ static apr_status_t acmp_connect_fail_branches(ACMP *parser) {
                 goto_node = acmp_child_for_code(node->parent->fail, node->letter);
                 node->fail = (goto_node != NULL) ? goto_node : parser->root_node;
             }
-            /* printf("fail direction: *%s* => *%s*\n", node->text, node->fail->text); */
+            #ifdef DEBUG_ACMP
+            fprintf(stderr, "fail direction: *%s* => *%s*\n", node->text, node->fail->text);
+            #endif
             child = node->child;
             while (child != NULL) {
                 *(acmp_node_t **)apr_array_push(arr2) = child;

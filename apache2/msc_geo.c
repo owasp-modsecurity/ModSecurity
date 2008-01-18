@@ -355,10 +355,8 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
             *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\".", target);
             return 0;
         }
-        msr_log(msr, 9, "GEO: rec=\"%s\"", log_escape_raw(msr->mp, buf, sizeof(buf)));
 
         /* Country */
-        msr_log(msr, 9, "GEO: country=\"%.*s\"", (1*4), log_escape_raw(msr->mp, (unsigned char *)&rec_val, 1));
         georec->country_code = geo_country_code[country];
         georec->country_code3 = geo_country_code3[country];
         georec->country_name = geo_country_name[country];

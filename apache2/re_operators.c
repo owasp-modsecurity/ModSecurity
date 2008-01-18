@@ -262,7 +262,7 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
         if (*fn == '\0') break;
         next = fn;
         while((isspace(*next) == 0) && (*next != '\0')) next++;
-        while((isspace(*next) != 0) && (*next != '\0')) *next++ = '\0';
+        while((isspace(*next) != 0) && (*next != '\0')) *(next++) = '\0';
 
         /* Add path of the rule filename for a relative phrase filename */
         filepath = fn;
@@ -1114,17 +1114,22 @@ static int msre_op_geoLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     const char *geo_host = var->value;
     msc_string *s = NULL;
     int rc;
+    
+    *error_msg = NULL;
 
     if (geo == NULL) {
-        msr_log(msr, 1, "Geo lookup for \"%s\" attempted without a database.  Set SecGeoLookupDB.", geo_host);
+        msr_log(msr, 1, "Geo lookup for \"%s\" attempted without a database.  Set SecGeoLookupDB.", log_escape_nq(msr->mp, geo_host));
         return 0;
     }
 
 
     rc = geo_lookup(msr, &rec, geo_host, error_msg);
     if (rc <= 0) {
+    	*error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" failed at %s.", log_escape_nq(msr->mp, geo_host), var->name); 
         return rc;
     }
+    *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" succeeded at %s.",
+        log_escape_nq(msr->mp, geo_host), var->name);
 
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "GEO: %s={country_code=%s, country_code3=%s, country_name=%s, country_continent=%s, region=%s, city=%s, postal_code=%s, latitude=%f, longitude=%f, dma_code=%d, area_code=%d}",
@@ -1144,54 +1149,63 @@ static int msre_op_geoLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "country_code");
+    s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.country_code ? rec.country_code : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "country_code3");
+    s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.country_code3 ? rec.country_code3 : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "region");
+    s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.region ? rec.region : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "city");
+    s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.city ? rec.city : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "postal_code");
+    s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.postal_code ? rec.postal_code : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "latitude");
+    s->name_len = strlen(s->name);
     s->value = apr_psprintf(msr->mp, "%f", rec.latitude);
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "longitude");
+    s->name_len = strlen(s->name);
     s->value = apr_psprintf(msr->mp, "%f", rec.longitude);
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "dma_code");
+    s->name_len = strlen(s->name);
     s->value = apr_psprintf(msr->mp, "%d", rec.dma_code);
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "area_code");
+    s->name_len = strlen(s->name);
     s->value = apr_psprintf(msr->mp, "%d", rec.area_code);
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
@@ -1230,12 +1244,12 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
     rc = apr_sockaddr_info_get(&sa, name_to_check,
         APR_UNSPEC/*msr->r->connection->remote_addr->family*/, 0, 0, msr->mp);
     if (rc == APR_SUCCESS) {
-        *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded.",
-            log_escape_nq(msr->mp, name_to_check));
+        *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s.",
+            log_escape_nq(msr->mp, name_to_check), var->name);
         return 1; /* Match. */
     }
 
-    msr_log(msr, 5, "RBL lookup of %s failed.", log_escape_nq(msr->mp, name_to_check));
+    msr_log(msr, 5, "RBL lookup of %s failed at %s.", log_escape_nq(msr->mp, name_to_check), var->name);
 
     /* No match. */
     return 0;
@@ -1256,8 +1270,7 @@ static int msre_op_inspectFile_init(msre_rule *rule, char **error_msg) {
 
     filename = resolve_relative_path(rule->ruleset->mp, rule->filename, filename);
 
-    #ifdef WITH_LUA
-    // TODO Write & use string_ends(s, e).
+    /* ENH Write & use string_ends(s, e). */
     if (strlen(rule->op_param) > 4) {
         char *p = filename + strlen(filename) - 4;
         if ((p[0] == '.')&&(p[1] == 'l')&&(p[2] == 'u')&&(p[3] == 'a'))
@@ -1271,11 +1284,11 @@ static int msre_op_inspectFile_init(msre_rule *rule, char **error_msg) {
             rule->op_param_data = script;
         }
     }
-    #endif
 
     if (rule->op_param_data == NULL) {
-        // TODO Verify the script exists and that we have
-        // the rights to execute it.
+        /* ENH Verify the script exists and that we have
+         * the rights to execute it.
+         */
     }
 
     return 1;
@@ -1481,6 +1494,7 @@ static int msre_op_validateUrlEncoding_execute(modsec_rec *msr, msre_rule *rule,
     switch(rc) {
         case 1 :
             /* Encoding is valid */
+            *error_msg = apr_psprintf(msr->mp, "Valid URL Encoding at %s.", var->name);
             break;
         case -2 :
             *error_msg = apr_psprintf(msr->mp, "Invalid URL Encoding: Non-hexadecimal "
@@ -1677,7 +1691,7 @@ static int msre_op_eq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator EQ match: %d.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator EQ matched %d at %s.", right, var->name);
         /* Match. */
         return 1;
     }
@@ -1706,7 +1720,7 @@ static int msre_op_gt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator GT match: %d.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator GT matched %d at %s.", right, var->name);
         /* Match. */
         return 1;
     }
@@ -1735,7 +1749,7 @@ static int msre_op_lt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator LT match: %d.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator LT matched %d at %s.", right, var->name);
         /* Match. */
         return 1;
     }
@@ -1764,7 +1778,7 @@ static int msre_op_ge_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator GE match: %d.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator GE matched %d at %s.", right, var->name);
         /* Match. */
         return 1;
     }
@@ -1793,7 +1807,7 @@ static int msre_op_le_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator LE match: %d.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator LE matched %d at %s.", right, var->name);
         /* Match. */
         return 1;
     }

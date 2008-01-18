@@ -832,13 +832,13 @@ int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int
                     /* Not a valid encoding, skip this % */
                     *d++ = input[i++];
                     count ++;
-                    (*invalid_count)++; /* parens quiet compiler warning */
+                    (*invalid_count)++;
                 }
             } else {
                 /* Not enough bytes available, copy the raw bytes. */
                 *d++ = input[i++];
                 count ++;
-                (*invalid_count)++; /* parens quiet compiler warning */
+                (*invalid_count)++;
             }
         } else {
             /* Character is not a percent sign. */
@@ -1172,9 +1172,8 @@ int is_empty_string(const char *string) {
     unsigned int i;
 
     if (string == NULL) return 1;
-    if (strlen(string) == 0) return 1;
 
-    for(i = 0; i < strlen(string); i++) {
+    for(i = 0; string[i] != '\0'; i++) {
         if (!isspace(string[i])) {
             return 0;
         }

@@ -9,9 +9,7 @@
  *
  */
 #include "msc_parsers.h"
-#include "iconv.h"
 #include <ctype.h>
-#include <errno.h>
 
 /**
  *
@@ -307,6 +305,6 @@ void add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg) {
         arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
         log_escape_ex(msr->mp, arg->value, arg->value_len));
 
-    apr_table_addn(arguments, arg->name, (void *)arg);
+    apr_table_addn(arguments, log_escape_nq_ex(msr->mp, arg->name, arg->name_len), (void *)arg);
 }
 

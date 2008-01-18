@@ -199,24 +199,11 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
                         *q = '\0';
                     }
 
-                    /* ENH Do we want to support %{DIGIT} as well? */
-
                     next_text_start = t + 1; /* *t was '}' */
                 } else {
                     next_text_start = t; /* *t was '\0' */
                 }
             }
-/* Removed %0-9 macros as it messes up urlEncoding in the match
- * where having '%0a' will be treated as %{TX.0}a, which is incorrect.
- * */
-#if 0
-            else if ((*(p + 1) >= '0')&&(*(p + 1) <= '9')) {
-                /* Special case for regex captures. */
-                var_name = "TX";
-                var_value = apr_pstrmemdup(mptmp, p + 1, 1);
-                next_text_start = p + 2;
-            }
-#endif
 
             if (var_name != NULL) {
                 char *my_error_msg = NULL;
@@ -527,8 +514,6 @@ static char *msre_action_skipAfter_validate(msre_engine *engine, msre_action *ac
 static apr_status_t msre_action_skipAfter_init(msre_engine *engine, msre_actionset *actionset,
     msre_action *action)
 {
-    // TODO: Need to keep track of skipAfter IDs so we can insert placeholders after
-    // we get to the real rule with that ID.
     actionset->skip_after = action->param;
     return 1;
 }
@@ -728,12 +713,12 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
             msr->txcfg->is_enabled = MODSEC_ENABLED;
             msr->usercfg->is_enabled = MODSEC_ENABLED;
         }
-
+		else
         if (strcasecmp(value, "off") == 0) {
             msr->txcfg->is_enabled = MODSEC_DISABLED;
             msr->usercfg->is_enabled = MODSEC_DISABLED;
         }
-
+		else
         if (strcasecmp(value, "detectiononly") == 0) {
             msr->txcfg->is_enabled = MODSEC_DETECTION_ONLY;
             msr->usercfg->is_enabled = MODSEC_DETECTION_ONLY;
@@ -776,12 +761,12 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
             msr->txcfg->auditlog_flag = AUDITLOG_ON;
             msr->usercfg->auditlog_flag = AUDITLOG_ON;
         }
-
+		else
         if (strcasecmp(value, "off") == 0) {
             msr->txcfg->auditlog_flag = AUDITLOG_OFF;
             msr->usercfg->auditlog_flag = AUDITLOG_OFF;
         }
-
+		else
         if (strcasecmp(value, "relevantonly") == 0) {
             msr->txcfg->auditlog_flag = AUDITLOG_RELEVANT;
             msr->usercfg->auditlog_flag = AUDITLOG_RELEVANT;
@@ -811,7 +796,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
                 while(*s != '\0') {
                     if (*s != c) {
-                        *d++ = *s++;
+                        *(d++) = *(s++);
                     } else {
                         s++;
                     }
@@ -853,7 +838,8 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         return 1;
     }
     else {
-        /* ENH Should never happen, but log if it does. */
+        /* Should never happen, but log if it does. */
+        msr_log(msr, 1, "Internal Error: Unknown ctl action \"%s\".", name);
         return -1;
     }    
 }
@@ -1082,8 +1068,9 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
     target_col = msr->tx_vars;
     s = strstr(var_name, ".");
     if (s == NULL) {
-        /* ENH Log warning detected variable name but no collection. */
-        return 0;
+        msr_log(msr, 3, "Asked to set variable \"%s\", but no collection name specified. ", 
+            log_escape(msr->mp, var_name)); 
+         return 0;
     }
     col_name = var_name;
     var_name = s + 1;
@@ -1225,12 +1212,13 @@ static apr_status_t msre_action_expirevar_execute(modsec_rec *msr, apr_pool_t *m
 
         target_col = (apr_table_t *)apr_table_get(msr->collections, col_name);
         if (target_col == NULL) {
-            msr_log(msr, 3, "Could not set variable \"%s.%s\" as the collection does not exist.",
+            msr_log(msr, 3, "Could not expire variable \"%s.%s\" as the collection does not exist.",
                 log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
             return 0;
         }
     } else {
-        /* ENH Log warning detected variable name but no collection. */
+        msr_log(msr, 3, "Asked to expire variable \"%s\", but no collection name specified. ",
+            log_escape(msr->mp, var_name));
         return 0;
     }
 
@@ -1294,14 +1282,15 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
             return 0;
         }
     } else {
-        /* ENH Log warning detected variable name but no collection. */
+        msr_log(msr, 3, "Asked to deprecate variable \"%s\", but no collection name specified. ",
+            log_escape(msr->mp, var_name));
         return 0;
     }
 
     /* Find the current value. */
     var = (msc_string *)apr_table_get(target_col, var_name);
     if (var == NULL) {
-        msr_log(msr, 9, "Asked to deprecate variable \"%s.%s\" but it does not exist.",
+        msr_log(msr, 9, "Asked to deprecate variable \"%s.%s\", but it does not exist.",
             log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
         return 0;
     }

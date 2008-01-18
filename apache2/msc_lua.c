@@ -153,7 +153,7 @@ static apr_array_header_t *resolve_tfns(lua_State *L, int idx, modsec_rec *msr, 
             *(msre_tfn_metadata **)apr_array_push(tfn_arr) = tfn;
         }
     } else {
-        // TODO Error
+        msr_log(msr, 1, "SecRuleScript: Transformation parameter must be a transformation name or array of transformation names.");
         return NULL;
     }
 
@@ -360,7 +360,7 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
         return -1;
     }
 
-    // Get the response from the script.
+    /* Get the response from the script. */
     *error_msg = (char *)lua_tostring(L, -1);
     if (*error_msg != NULL) {
         *error_msg = apr_pstrdup(msr->mp, *error_msg);

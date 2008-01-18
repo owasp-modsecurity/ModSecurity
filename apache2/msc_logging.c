@@ -47,7 +47,7 @@ static int sec_auditlog_write(modsec_rec *msr, const char *data, unsigned int le
          * out-of-disk-space events and to prevent further attempts
          * to write to the same file in this request.
          *
-         * Note that, as we opened the file throught the pool mechanism of
+         * Note that, as we opened the file through the pool mechanism of
          * the APR, we do not need to close the file here. It will be closed
          * automatically at the end of the request.
          */
@@ -411,7 +411,7 @@ void sec_audit_logger(modsec_rec *msr) {
          * writing to but it's not us that's causing the problem
          * and there isn't anything we can do about that.
          *
-         * TODO Actually there is something we can do! We will make
+         * ENH Actually there is something we can do! We will make
          * SecAuditStorageDir mandatory, ask the user to explicitly
          * define the storage location *and* refuse to work if the
          * index and the storage location are in the same folder.
@@ -874,7 +874,7 @@ void sec_audit_logger(modsec_rec *msr) {
     }
 
     /* AUDITLOG_PART_UPLOADS */
-    // TODO: Implement
+    /* ENH: Implement */
 
 
     /* AUDITLOG_PART_MATCHEDRULES */
