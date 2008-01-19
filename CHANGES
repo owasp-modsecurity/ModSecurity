@@ -1,6 +1,8 @@
 02 Jan 2008 - 2.5.0-rc2
 -----------------------
 
+ * Implemented SecRuleUpdateActionById.
+
  * Phase 5 rules can now be removed via SecRuleRemoveBy* directives.
 
  * Build is now 'configure' based (autotools).

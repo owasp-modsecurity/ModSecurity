@@ -106,6 +106,8 @@ msre_ruleset DSOLOCAL *msre_ruleset_create(msre_engine *engine, apr_pool_t *mp);
 
 int DSOLOCAL msre_ruleset_rule_add(msre_ruleset *ruleset, msre_rule *rule, int phase);
 
+msre_rule DSOLOCAL *msre_ruleset_fetch_rule(msre_ruleset *ruleset, const char *id);
+
 int DSOLOCAL msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exception *re);
 
 /*
@@ -158,8 +160,6 @@ msre_rule DSOLOCAL *msre_rule_create(msre_ruleset *ruleset,
 msre_rule DSOLOCAL *msre_rule_lua_create(msre_ruleset *ruleset,
     const char *fn, int line, const char *script_filename,
     const char *actions, char **error_msg);
-
-void DSOLOCAL msre_rule_actionset_init(msre_rule *rule);
 
 apr_status_t DSOLOCAL msre_rule_process(msre_rule *rule, modsec_rec *msr);
 
@@ -286,6 +286,8 @@ msre_actionset DSOLOCAL *msre_actionset_merge(msre_engine *engine, msre_actionse
     msre_actionset *child, int inherit_by_default);
 
 msre_actionset DSOLOCAL *msre_actionset_create_default(msre_engine *engine);
+
+void DSOLOCAL msre_actionset_set_defaults(msre_actionset *actionset);
 
 void DSOLOCAL msre_actionset_init(msre_actionset *actionset, msre_rule *rule);
 

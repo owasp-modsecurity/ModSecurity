@@ -742,6 +742,120 @@ static const char *add_marker(cmd_parms *cmd, directory_config *dcfg, const char
     return NULL;    
 }
 
+/**
+ *
+ */
+static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
+    const char *p1, const char *p2)
+{
+    char *my_error_msg = NULL;
+    msre_rule *rule = NULL;
+    msre_actionset *new_actionset = NULL;
+    msre_ruleset *ruleset = dcfg->ruleset;
+    extern msc_engine *modsecurity;
+
+    /* Get the ruleset if one exists */
+    if ((ruleset == NULL)||(ruleset == NOT_SET_P)) {
+        return NULL;
+    }
+
+    #ifdef DEBUG_CONF
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
+        "Looking to update rule id=\"%s\" with \"%s\".", p1, p2);
+    #endif
+
+    /* Fetch the rule */
+    rule = msre_ruleset_fetch_rule(ruleset, p1);
+    if (rule == NULL) {
+        #ifdef DEBUG_CONF
+        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
+            "Failed to update rule id=\"%s\" with \"%s\": Rule not found.", p1, p2);
+        #endif
+        return NULL;
+    }
+
+    /* Check the rule actionset */
+    /* ENH: Can this happen? */
+    if (rule->actionset == NULL) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Attempt to update action for rule \"%s\" failed: Rule does not have an actionset.", p1);
+    }
+
+    /* Create a new actionset */
+    new_actionset = msre_actionset_create(modsecurity->msre, p2, &my_error_msg);
+    if (dcfg->tmp_default_actionset == NULL) return FATAL_ERROR;
+    if (my_error_msg != NULL) return my_error_msg;
+
+    /* Must NOT change an id */
+    if ((new_actionset->id != NOT_SET_P) && (rule->actionset->id != NULL) && (strcmp(rule->actionset->id, new_actionset->id) != 0)) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Rule IDs cannot be updated via SecRuleUpdateActionById.");
+    }
+
+    /* Must NOT alter the phase */
+    if ((new_actionset->phase != NOT_SET) && (rule->actionset->phase != new_actionset->phase)) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Rule phases cannot be updated via SecRuleUpdateActionById.");
+    }
+
+    #ifdef DEBUG_CONF
+    {
+        const apr_array_header_t *tarr = apr_table_elts(rule->actionset->actions);
+        const apr_table_entry_t *telts = (const apr_table_entry_t*)tarr->elts;
+        char *actions = NULL;
+        int i;
+        for (i = 0; i < tarr->nelts; i++) {
+            msre_action *action = (msre_action *)telts[i].val;
+            actions = apr_pstrcat(ruleset->mp,
+                (actions == NULL) ? "" : actions,
+                (actions == NULL) ? "" : ",",
+                action->metadata->name,
+                (action->param == NULL) ? "" : ":'",
+                (action->param == NULL) ? "" : action->param,
+                (action->param == NULL) ? "" : "'",
+                NULL);
+        }
+        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
+            "Updating rule %pp id=\"%s\" action: \"%s\"",
+            rule,
+            (rule->actionset->id == NOT_SET_P ? "(none)" : rule->actionset->id),
+            actions);
+    }
+    #endif
+
+    /* Merge new actions with the rule */
+    /* ENH: Will this leak the old actionset? */
+    rule->actionset = msre_actionset_merge(modsecurity->msre, rule->actionset,
+        new_actionset, 1);
+    msre_actionset_set_defaults(rule->actionset);
+
+    /* ENH: Change the unparsed string, but may be impossible. */
+
+    #ifdef DEBUG_CONF
+    {
+        const apr_array_header_t *tarr = apr_table_elts(rule->actionset->actions);
+        const apr_table_entry_t *telts = (const apr_table_entry_t*)tarr->elts;
+        char *actions = NULL;
+        int i;
+        for (i = 0; i < tarr->nelts; i++) {
+            msre_action *action = (msre_action *)telts[i].val;
+            actions = apr_pstrcat(ruleset->mp,
+                (actions == NULL) ? "" : actions,
+                (actions == NULL) ? "" : ",",
+                action->metadata->name,
+                (action->param == NULL) ? "" : ":'",
+                (action->param == NULL) ? "" : action->param,
+                (action->param == NULL) ? "" : "'",
+                NULL);
+        }
+        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
+            "Updated rule %pp id=\"%s\" action: \"%s\"",
+            rule,
+            (rule->actionset->id == NOT_SET_P ? "(none)" : rule->actionset->id),
+            actions);
+    }
+    #endif
+        
+    return NULL;    
+}
+
 /* -- Configuration directives -- */
 
 static const char *cmd_action(cmd_parms *cmd, void *_dcfg, const char *p1) {
@@ -1334,6 +1448,12 @@ static const char *cmd_rule_remove_by_msg(cmd_parms *cmd, void *_dcfg, const cha
     return NULL;
 }
 
+static const char *cmd_rule_update_action_by_id(cmd_parms *cmd, void *_dcfg,
+    const char *p1, const char *p2)
+{
+    return update_rule_action(cmd, (directory_config *)_dcfg, p1, p2);
+}
+
 static const char *cmd_server_signature(cmd_parms *cmd, void *_dcfg, const char *p1) {
     if (cmd->server->is_virtual) {
         return "ModSecurity: SecServerSignature not allowed in VirtualHost";
@@ -1914,6 +2034,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "rule message for removal"
+    ),
+
+    AP_INIT_TAKE2 (
+        "SecRuleUpdateActionById",
+        cmd_rule_update_action_by_id,
+        NULL,
+        CMD_SCOPE_ANY,
+        "updated action list"
     ),
 
     AP_INIT_TAKE1 (

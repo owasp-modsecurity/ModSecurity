@@ -98,11 +98,13 @@ test: t/run-tests.pl msc_test
 mlogc:
 	@$(MAKE) -C mlogc-src mlogc \
 	&& cp -p mlogc-src/mlogc . \
-	&& echo "mlogc-src/INSTALL" \
+	&& echo \
+	&& echo "See: mlogc-src/INSTALL" \
 	&& echo
 
 mlogc-static:
 	@$(MAKE) -C mlogc-src static \
 	&& cp -p mlogc-src/mlogc mlogc-static \
-	&& echo "mlogc-src/INSTALL" \
+	&& echo \
+	&& echo "See: mlogc-src/INSTALL" \
 	&& echo

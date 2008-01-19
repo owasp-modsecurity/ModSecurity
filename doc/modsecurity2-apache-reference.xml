@@ -1898,6 +1898,40 @@ end</programlisting>
     </section>
 
     <section>
+      <title><literal>SecRuleUpdateActionById</literal></title>
+
+      <para><emphasis>Description:</emphasis> Updates the action list of the
+      specified rule.</para>
+
+      <para><emphasis>Syntax:</emphasis> <literal
+      moreinfo="none">SecRuleRemoveById RULEID ACTIONLIST</literal></para>
+
+      <para><emphasis>Example Usage:</emphasis> <literal
+      moreinfo="none">SecRuleUpdateActionById 12345
+      deny,status:403</literal></para>
+
+      <para><emphasis>Processing Phase:</emphasis> Any</para>
+
+      <para><emphasis>Scope:</emphasis> Any</para>
+
+      <para><emphasis>Dependencies/Notes:</emphasis> This directive merges the
+      specified action list with the rule's action list. There are two
+      limitations. The rule ID cannot be changed, nor can the phase. Further
+      note that actions that may be specified multiple times are appended to
+      the original.</para>
+
+      <programlisting format="linespecific">SecAction \
+  "t:lowercase,phase:2,id:12345,pass,msg:'The Message',log,auditlog"
+SecRuleUpdateActionById 12345 "t:compressWhitespace,deny,status:403,msg:'A new message'</programlisting>
+
+      <para>The example above will cause the rule to be executed as if it was
+      specified as follows:</para>
+
+      <programlisting format="linespecific">SecAction \
+  "t:lowercase,phase:2,id:12345,log,auditlog,t:compressWhitespace,deny,status:403,msg:'A new message'"</programlisting>
+    </section>
+
+    <section>
       <title><literal>SecServerSignature</literal></title>
 
       <para><emphasis>Description:</emphasis> Instructs ModSecurity to change

@@ -559,7 +559,7 @@ msre_actionset *msre_actionset_create_default(msre_engine *engine) {
 /**
  * Sets the default values for the hard-coded actionset configuration.
  */
-static void msre_actionset_set_defaults(msre_actionset *actionset) {
+void msre_actionset_set_defaults(msre_actionset *actionset) {
     /* Metadata */
     if (actionset->id == NOT_SET_P) actionset->id = NULL;
     if (actionset->rev == NOT_SET_P) actionset->rev = NULL;
@@ -1025,6 +1025,53 @@ int msre_ruleset_rule_add(msre_ruleset *ruleset, msre_rule *rule, int phase) {
     *(const msre_rule **)apr_array_push(arr) = rule;
 
     return 1;
+}
+
+static msre_rule * msre_ruleset_fetch_phase_rule(const msre_ruleset *ruleset, const char *id,
+    const apr_array_header_t *phase_arr)
+{
+    msre_rule **rules = (msre_rule **)phase_arr->elts;
+    int i;
+
+    for (i = 0; i < phase_arr->nelts; i++) {
+        msre_rule *rule = (msre_rule *)rules[i];
+
+        if (  (rule->actionset != NULL)
+           && !rule->actionset->is_chained
+           && (rule->actionset->id != NULL)
+           && (strcmp(rule->actionset->id, id) == 0))
+        {
+            /* Return rule that matched unless it is a placeholder */
+            return (rule->placeholder == RULE_PH_NONE) ? rule : NULL;
+        }
+    }
+
+    return NULL;
+}
+
+/**
+ * Fetches rule from the ruleset all rules that match the given exception.
+ */
+msre_rule * msre_ruleset_fetch_rule(msre_ruleset *ruleset, const char *id) {
+    msre_rule *rule = NULL;
+
+    if (ruleset == NULL) return NULL;
+
+    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_request_headers);
+    if (rule != NULL) return rule;
+
+    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_request_body);
+    if (rule != NULL) return rule;
+
+    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_response_headers);
+    if (rule != NULL) return rule;
+
+    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_response_body);
+    if (rule != NULL) return rule;
+
+    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_logging);
+
+    return rule;    
 }
 
 static int msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset, rule_exception *re,
