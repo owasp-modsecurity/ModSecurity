@@ -29,6 +29,65 @@ static const char *const severities[] = {
 /* -- Actions, variables, functions and operator functions ----------------- */
 
 /**
+ * Remove actions with the same cardinality group from the actionset.
+ */
+static void msre_actionset_cardinality_fixup(msre_actionset *actionset, msre_action *action) {
+    const apr_array_header_t *tarr = apr_table_elts(actionset->actions);
+    const apr_table_entry_t *telts = (const apr_table_entry_t*)tarr->elts;
+    int i;
+
+    if ((actionset == NULL) || (action == NULL)) return;
+
+    for (i = 0; i < tarr->nelts; i++) {
+        msre_action *target = (msre_action *)telts[i].val;
+        if (target->metadata->cardinality_group == action->metadata->cardinality_group) {
+
+            apr_table_unset(actionset->actions, target->metadata->name);
+        }
+    }
+}
+
+/**
+ * Generate an action string from an actionset.
+ */
+char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)
+{
+    const apr_array_header_t *tarr = apr_table_elts(actionset->actions);
+    const apr_table_entry_t *telts = (const apr_table_entry_t*)tarr->elts;
+    char *actions = NULL;
+    int i;
+
+    for (i = 0; i < tarr->nelts; i++) {
+        msre_action *action = (msre_action *)telts[i].val;
+        int use_quotes = 0;
+
+        /* Check if we need any quotes */
+        if (action->param != NULL) {
+            int j;
+            for(j = 0; action->param[j] != '\0'; j++) {
+                if (isspace(action->param[j])) {
+                    use_quotes = 1;
+                    break;
+                }
+            }        
+            if (j == 0) use_quotes = 1;
+        }
+
+        actions = apr_pstrcat(pool,
+            (actions == NULL) ? "" : actions,
+            (actions == NULL) ? "" : ",",
+            action->metadata->name,
+            (action->param == NULL) ? "" : ":",
+            (use_quotes) ? "'" : "",
+            (action->param == NULL) ? "" : action->param,
+            (use_quotes) ? "'" : "",
+            NULL);
+    }
+
+    return actions;
+}
+
+/**
  * Creates msre_var instances (rule variables) out of the 
  * given text string and places them into the supplied table.
  */
@@ -98,6 +157,10 @@ apr_status_t msre_parse_actions(msre_engine *engine, msre_actionset *actionset,
         /* Initialise action (option). */
         if (action->metadata->init != NULL) {
             action->metadata->init(engine, actionset, action);
+        }
+
+        if (action->metadata->cardinality_group != ACTION_CGROUP_NONE) {
+            msre_actionset_cardinality_fixup(actionset, action);
         }
 
         if (action->metadata->cardinality == ACTION_CARDINALITY_ONE) {
@@ -536,6 +599,11 @@ msre_actionset *msre_actionset_merge(msre_engine *engine, msre_actionset *parent
     telts = (const apr_table_entry_t*)tarr->elts;
     for (i = 0; i < tarr->nelts; i++) {
         msre_action *action = (msre_action *)telts[i].val;
+
+        if (action->metadata->cardinality_group != ACTION_CGROUP_NONE) {
+            msre_actionset_cardinality_fixup(merged, action);
+        }
+
         if (action->metadata->cardinality == ACTION_CARDINALITY_ONE) {
             apr_table_setn(merged->actions, action->metadata->name, (void *)action);
         } else {
@@ -1248,11 +1316,63 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
     return apr_pstrcat(msr->mp, fn, id, rev, msg, logdata, severity, tags, NULL);
 }
 
+char * msre_rule_generate_unparsed(apr_pool_t *pool,  const msre_rule *rule, const char *targets,
+    const char *args, const char *actions)
+{
+    char *unparsed = NULL;
+    const char *r_targets = targets;
+    const char *r_args = args;
+    const char *r_actions = actions;
+
+    if (r_targets == NULL) {
+        r_targets = rule->p1;
+    }
+    if (r_args == NULL) {
+        r_args = apr_pstrcat(pool, (rule->op_negated ? "!" : ""), "@", rule->op_name, " ", rule->op_param, NULL);
+    }
+    if (r_actions == NULL) {
+        r_actions = msre_actionset_generate_action_string(pool, rule->actionset);
+    }
+
+    switch (rule->type) {
+    case RULE_TYPE_NORMAL:
+        if (r_actions == NULL) {
+            unparsed = apr_psprintf(pool, "SecRule \"%s\" \"%s\"",
+                           log_escape(pool, r_targets), log_escape(pool, r_args));
+        }
+        else {
+            unparsed = apr_psprintf(pool, "SecRule \"%s\" \"%s\" \"%s\"",
+                           log_escape(pool, r_targets), log_escape(pool, r_args),
+                           log_escape(pool, r_actions));
+        }
+        break;
+    case RULE_TYPE_ACTION:
+        unparsed = apr_psprintf(pool, "SecAction \"%s\"",
+                       log_escape(pool, r_actions));
+        break;
+    case RULE_TYPE_MARKER:
+        unparsed = apr_psprintf(pool, "SecMarker \"%s\"", rule->actionset->id);
+        break;
+    case RULE_TYPE_LUA:
+        /* SecRuleScript */
+        if (r_actions == NULL) {
+            unparsed = apr_psprintf(pool, "SecRuleScript \"%s\"", r_args);
+        }
+        else {
+            unparsed = apr_psprintf(pool, "SecRuleScript \"%s\" \"%s\"",
+                           r_args, log_escape(pool, r_actions));
+        }
+        break;
+    }
+
+    return unparsed;
+}
+
 /**
  * Assembles a new rule using the strings that contain a list
  * of targets (variables), arguments, and actions.
  */
-msre_rule *msre_rule_create(msre_ruleset *ruleset,
+msre_rule *msre_rule_create(msre_ruleset *ruleset, int type,
     const char *fn, int line, const char *targets,
     const char *args, const char *actions, char **error_msg)
 {
@@ -1266,35 +1386,13 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset,
 
     rule = (msre_rule *)apr_pcalloc(ruleset->mp, sizeof(msre_rule));
     if (rule == NULL) return NULL;
+
+    rule->type = type;
     rule->ruleset = ruleset;
     rule->targets = apr_array_make(ruleset->mp, 10, sizeof(const msre_var *));
     rule->p1 = apr_pstrdup(ruleset->mp, targets);
     rule->filename = apr_pstrdup(ruleset->mp, fn);
     rule->line_num = line;
-
-    /* Add the unparsed rule */
-    if ((strcmp(SECACTION_TARGETS, targets) == 0) && (strcmp(SECACTION_ARGS, args) == 0)) {
-        rule->unparsed = apr_psprintf(ruleset->mp, "SecAction \"%s\"",
-            log_escape(ruleset->mp, actions));
-    }
-    else
-        if ((strcmp(SECMARKER_TARGETS, targets) == 0)
-            && (strcmp(SECMARKER_ARGS, args) == 0)
-            && (strncmp(SECMARKER_BASE_ACTIONS, actions, strlen(SECMARKER_BASE_ACTIONS)) == 0))
-        {
-            rule->unparsed = apr_psprintf(ruleset->mp, "SecMarker \"%s\"",
-                log_escape(ruleset->mp, actions + strlen(SECMARKER_BASE_ACTIONS)));
-    }
-    else {
-        if (actions == NULL) {
-            rule->unparsed = apr_psprintf(ruleset->mp, "SecRule \"%s\" \"%s\"",
-                log_escape(ruleset->mp, targets), log_escape(ruleset->mp, args));
-        } else {
-            rule->unparsed = apr_psprintf(ruleset->mp, "SecRule \"%s\" \"%s\" \"%s\"",
-                log_escape(ruleset->mp, targets), log_escape(ruleset->mp, args),
-                log_escape(ruleset->mp, actions));
-        }
-    }
 
     /* Parse targets */
     rc = msre_parse_targets(ruleset, targets, rule->targets, &my_error_msg);
@@ -1353,6 +1451,9 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset,
         }
     }
 
+    /* Add the unparsed rule */
+    rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, targets, args, NULL);
+
     return rule;
 }
 
@@ -1371,19 +1472,11 @@ msre_rule *msre_rule_lua_create(msre_ruleset *ruleset,
 
     rule = (msre_rule *)apr_pcalloc(ruleset->mp, sizeof(msre_rule));
     if (rule == NULL) return NULL;
+
+    rule->type = RULE_TYPE_LUA;
     rule->ruleset = ruleset;
     rule->filename = apr_pstrdup(ruleset->mp, fn);
     rule->line_num = line;
-
-    rule->type = RULE_TYPE_LUA;
-
-    if (actions == NULL) {
-        rule->unparsed = apr_psprintf(ruleset->mp, "SecRuleScript \"%s\"",
-            script_filename);
-    } else {
-        rule->unparsed = apr_psprintf(ruleset->mp, "SecRuleScript \"%s\" \"%s\"",
-            script_filename, log_escape(ruleset->mp, actions));
-    }
 
     /* Compile script. */
     *error_msg = lua_compile(&rule->script, script_filename, ruleset->mp);
@@ -1400,6 +1493,9 @@ msre_rule *msre_rule_lua_create(msre_ruleset *ruleset,
             return NULL;
         }
     }
+
+    /* Add the unparsed rule */
+    rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, NULL, script_filename, NULL);
 
     return rule;
 }

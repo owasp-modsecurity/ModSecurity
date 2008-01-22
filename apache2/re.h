@@ -122,9 +122,10 @@ int DSOLOCAL msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset
 #define RULE_PH_SKIPAFTER       1  /* Implicit placeholder for skipAfter */
 #define RULE_PH_MARKER          2  /* Explicit placeholder for SecMarker */
 
-#define RULE_TYPE_NORMAL        0
-#define RULE_TYPE_ACTION        1
-#define RULE_TYPE_LUA           2
+#define RULE_TYPE_NORMAL        0  /* SecRule */
+#define RULE_TYPE_ACTION        1  /* SecAction */
+#define RULE_TYPE_MARKER        2  /* SecMarker */
+#define RULE_TYPE_LUA           3  /* SecRuleScript */
 
 struct msre_rule {
     apr_array_header_t      *targets;
@@ -153,7 +154,9 @@ struct msre_rule {
     msc_script              *script;
 };
 
-msre_rule DSOLOCAL *msre_rule_create(msre_ruleset *ruleset,
+char DSOLOCAL *msre_rule_generate_unparsed(apr_pool_t *pool, const msre_rule *rule, const char *targets, const char *args, const char *actions);
+
+msre_rule DSOLOCAL *msre_rule_create(msre_ruleset *ruleset, int type,
     const char *fn, int line, const char *targets,
     const char *args, const char *actions, char **error_msg);
 
@@ -274,6 +277,8 @@ struct msre_actionset {
     int                      auditlog;
 };
 
+char DSOLOCAL *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset);
+
 void DSOLOCAL msre_engine_variable_register(msre_engine *engine, const char *name, 
     unsigned int type, unsigned int argc_min, unsigned int argc_max,
     fn_var_validate_t validate, fn_var_generate_t generate,
@@ -306,6 +311,11 @@ typedef apr_status_t (*fn_action_execute_t)(modsec_rec *msr, apr_pool_t *mptmp, 
 #define ACTION_CARDINALITY_ONE  1
 #define ACTION_CARDINALITY_MANY 2
 
+#define ACTION_CGROUP_NONE       0
+#define ACTION_CGROUP_DISRUPTIVE 1
+#define ACTION_CGROUP_LOG        2
+#define ACTION_CGROUP_AUDITLOG   3
+
 struct msre_action_metadata {
     const char              *name;
     unsigned int             type;
@@ -313,6 +323,7 @@ struct msre_action_metadata {
     unsigned int             argc_max;
     unsigned int             allow_param_plusminus;
     unsigned int             cardinality;
+    unsigned int             cardinality_group;
     fn_action_validate_t     validate;
     fn_action_init_t         init;
     fn_action_execute_t      execute;

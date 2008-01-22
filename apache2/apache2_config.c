@@ -552,7 +552,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
                 cmd->directive->line_num, p1, p2, &my_error_msg);
             break;
         default :
-            rule = msre_rule_create(dcfg->ruleset, cmd->directive->filename,
+            rule = msre_rule_create(dcfg->ruleset, type, cmd->directive->filename,
                 cmd->directive->line_num, p1, p2, p3, &my_error_msg);
             break;
     }
@@ -721,7 +721,7 @@ static const char *add_marker(cmd_parms *cmd, directory_config *dcfg, const char
     }
 
     /* Create the rule now. */
-    rule = msre_rule_create(dcfg->ruleset, cmd->directive->filename, cmd->directive->line_num, p1, p2, p3, &my_error_msg);
+    rule = msre_rule_create(dcfg->ruleset, RULE_TYPE_MARKER, cmd->directive->filename, cmd->directive->line_num, p1, p2, p3, &my_error_msg);
     if (rule == NULL) {
         return my_error_msg;
     }
@@ -797,21 +797,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
 
     #ifdef DEBUG_CONF
     {
-        const apr_array_header_t *tarr = apr_table_elts(rule->actionset->actions);
-        const apr_table_entry_t *telts = (const apr_table_entry_t*)tarr->elts;
-        char *actions = NULL;
-        int i;
-        for (i = 0; i < tarr->nelts; i++) {
-            msre_action *action = (msre_action *)telts[i].val;
-            actions = apr_pstrcat(ruleset->mp,
-                (actions == NULL) ? "" : actions,
-                (actions == NULL) ? "" : ",",
-                action->metadata->name,
-                (action->param == NULL) ? "" : ":'",
-                (action->param == NULL) ? "" : action->param,
-                (action->param == NULL) ? "" : "'",
-                NULL);
-        }
+        char *actions = msre_actionset_generate_action_string(ruleset->mp, rule->actionset);
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
             "Updating rule %pp id=\"%s\" action: \"%s\"",
             rule,
@@ -826,25 +812,12 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
         new_actionset, 1);
     msre_actionset_set_defaults(rule->actionset);
 
-    /* ENH: Change the unparsed string, but may be impossible. */
+    /* Update the unparsed rule */
+    rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, NULL, NULL, NULL);
 
     #ifdef DEBUG_CONF
     {
-        const apr_array_header_t *tarr = apr_table_elts(rule->actionset->actions);
-        const apr_table_entry_t *telts = (const apr_table_entry_t*)tarr->elts;
-        char *actions = NULL;
-        int i;
-        for (i = 0; i < tarr->nelts; i++) {
-            msre_action *action = (msre_action *)telts[i].val;
-            actions = apr_pstrcat(ruleset->mp,
-                (actions == NULL) ? "" : actions,
-                (actions == NULL) ? "" : ",",
-                action->metadata->name,
-                (action->param == NULL) ? "" : ":'",
-                (action->param == NULL) ? "" : action->param,
-                (action->param == NULL) ? "" : "'",
-                NULL);
-        }
+        char *actions = msre_actionset_generate_action_string(ruleset->mp, rule->actionset);
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
             "Updated rule %pp id=\"%s\" action: \"%s\"",
             rule,
@@ -859,7 +832,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
 /* -- Configuration directives -- */
 
 static const char *cmd_action(cmd_parms *cmd, void *_dcfg, const char *p1) {
-    return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_NORMAL, SECACTION_TARGETS, SECACTION_ARGS, p1);
+    return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_ACTION, SECACTION_TARGETS, SECACTION_ARGS, p1);
 }
 
 static const char *cmd_marker(cmd_parms *cmd, void *_dcfg, const char *p1) {

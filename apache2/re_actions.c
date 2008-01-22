@@ -14,10 +14,11 @@
 /**
  * Register action with the engine.
  */
-static void msre_engine_action_register(msre_engine *engine, const char *name, unsigned int type,
-    unsigned int argc_min, unsigned int argc_max, unsigned int allow_param_plusminus,
-    unsigned int cardinality, fn_action_validate_t validate, fn_action_init_t init,
-    fn_action_execute_t execute)
+static void msre_engine_action_register(msre_engine *engine, const char *name,
+    unsigned int type, unsigned int argc_min, unsigned int argc_max,
+    unsigned int allow_param_plusminus, unsigned int cardinality,
+    unsigned int cardinality_group, fn_action_validate_t validate,
+    fn_action_init_t init, fn_action_execute_t execute)
 {
     msre_action_metadata *metadata = (msre_action_metadata *)apr_pcalloc(engine->mp,
         sizeof(msre_action_metadata));
@@ -29,6 +30,7 @@ static void msre_engine_action_register(msre_engine *engine, const char *name, u
     metadata->argc_max = argc_max;
     metadata->allow_param_plusminus = allow_param_plusminus;
     metadata->cardinality = cardinality;
+    metadata->cardinality_group = cardinality_group;
     metadata->validate = validate;
     metadata->init = init;
     metadata->execute = execute;
@@ -1619,6 +1621,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         msre_action_id_init,
         NULL
@@ -1631,6 +1634,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         msre_action_rev_init,
         NULL
@@ -1643,6 +1647,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         msre_action_msg_init,
         NULL
@@ -1655,6 +1660,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         msre_action_logdata_init,
         NULL
@@ -1667,6 +1673,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         msre_action_severity_init,
         NULL
@@ -1679,6 +1686,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         msre_action_chain_init,
         NULL
@@ -1691,6 +1699,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_LOG,
         NULL,
         msre_action_log_init,
         NULL
@@ -1703,6 +1712,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_LOG,
         NULL,
         msre_action_nolog_init,
         NULL
@@ -1715,6 +1725,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_AUDITLOG,
         NULL,
         msre_action_auditlog_init,
         NULL
@@ -1727,6 +1738,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_AUDITLOG,
         NULL,
         msre_action_noauditlog_init,
         NULL
@@ -1739,6 +1751,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         NULL,
         msre_action_deny_init,
         NULL
@@ -1751,6 +1764,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         msre_action_status_validate,
         msre_action_status_init,
         NULL
@@ -1763,6 +1777,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         NULL,
         msre_action_drop_init,
         NULL
@@ -1775,6 +1790,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         msre_action_pause_validate,
         msre_action_pause_init,
         NULL
@@ -1787,6 +1803,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         msre_action_redirect_validate,
         msre_action_redirect_init,
         msre_action_redirect_execute
@@ -1799,6 +1816,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         msre_action_proxy_validate,
         msre_action_proxy_init,
         msre_action_proxy_execute
@@ -1811,6 +1829,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         NULL,
         msre_action_pass_init,
         NULL
@@ -1823,6 +1842,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         msre_action_skip_validate,
         msre_action_skip_init,
         NULL
@@ -1835,6 +1855,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         msre_action_skipAfter_validate,
         msre_action_skipAfter_init,
         NULL
@@ -1847,6 +1868,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         msre_action_allow_validate,
         msre_action_allow_init,
         NULL
@@ -1859,6 +1881,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         msre_action_phase_validate,
         msre_action_phase_init,
         NULL
@@ -1871,6 +1894,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         ALLOW_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         msre_action_t_validate,
         msre_action_t_init,
         NULL
@@ -1883,6 +1907,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         msre_action_ctl_validate,
         msre_action_ctl_init,
         msre_action_ctl_execute
@@ -1895,6 +1920,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         msre_action_xmlns_validate,
         NULL,
         NULL
@@ -1907,6 +1933,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         NULL
@@ -1919,6 +1946,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_sanitiseArg_execute
@@ -1931,6 +1959,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_sanitiseMatched_execute
@@ -1943,6 +1972,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_sanitiseRequestHeader_execute
@@ -1955,6 +1985,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_sanitiseResponseHeader_execute
@@ -1967,6 +1998,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_setenv_execute
@@ -1979,6 +2011,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_setvar_execute
@@ -1991,6 +2024,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_expirevar_execute
@@ -2003,6 +2037,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_deprecatevar_execute
@@ -2015,6 +2050,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_initcol_execute
@@ -2027,6 +2063,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_setsid_execute
@@ -2039,6 +2076,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_setuid_execute
@@ -2051,6 +2089,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         msre_action_exec_validate,
         NULL,
         msre_action_exec_execute
@@ -2063,6 +2102,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         NULL
@@ -2075,6 +2115,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         NULL
@@ -2087,6 +2128,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_prepend_execute
@@ -2099,6 +2141,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_append_execute
