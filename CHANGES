@@ -5,6 +5,8 @@
 
  * Implemented SecRuleUpdateActionById.
 
+ * Cleanup documentation.
+
  * Phase 5 rules can now be removed via SecRuleRemoveBy* directives.
 
  * Build is now 'configure' based (autotools).
@@ -44,7 +46,7 @@ Changes since 2.5.0-dev2:
 
  * Added t:jsDecode to decode JavScript escape sequences.
 
- * Added IS_NEW and IS_EXPIRED built-in collection variables.
+ * Added IS_NEW built-in collection variables.
 
  * New audit log part 'K' logs all matching rules.
 
