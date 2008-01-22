@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-rc1/ (January 10, 2008)</releaseinfo>
+    <releaseinfo>Version 2.5.0-rc1/ (January 21, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -2859,13 +2859,8 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       GET, HEAD, POST or if the HTTP is something other than HTTP/0.9, 1.0 or
       1.1.</para>
 
-      <programlisting format="linespecific">SecRule <emphasis>REQUEST_LINE</emphasis> "!(^((?:(?:pos|ge)t|head))|http/(0\.9|1\.0|1\.1)$)"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis>REQUEST_LINE</emphasis> "!(^((?:(?:pos|ge)t|head))|http/(0\.9|1\.0|1\.1)$)" t:none,t:lowercase</programlisting>
 
-      <para><emphasis>Note</emphasis></para>
-
-      <para>Due to the default action transformation function lowercase, the
-      regex strings should be in lowercase as well unless the t:none
-      transformation function is specified for this particular rule.</para>
     </section>
 
     <section>
@@ -2875,13 +2870,8 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       Example: the following example will trigger if the Request Method is
       either CONNECT or TRACE.</para>
 
-      <programlisting format="linespecific">SecRule <emphasis>REQUEST_METHOD</emphasis> "^((?:connect|trace))$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis>REQUEST_METHOD</emphasis> "^((?:connect|trace))$" t:none,t:lowercase</programlisting>
 
-      <para><emphasis>Note</emphasis></para>
-
-      <para>Due to the default action transformation function lowercase, the
-      regex strings should be in lowercase as well unless the t:none
-      transformation function is specified for this particular rule.</para>
     </section>
 
     <section>
@@ -2890,13 +2880,8 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para>This variable holds the Request Protocol Version information.
       Example:</para>
 
-      <programlisting format="linespecific">SecRule <emphasis>REQUEST_PROTOCOL</emphasis> "!^http/(0\.9|1\.0|1\.1)$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis>REQUEST_PROTOCOL</emphasis> "!^http/(0\.9|1\.0|1\.1)$" t:none,t:lowercase</programlisting>
 
-      <para><emphasis>Note</emphasis></para>
-
-      <para>Due to the default action transformation function lowercase, the
-      regex strings should be in lowercase as well unless the t:none
-      transformation function is specified for this particular rule.</para>
     </section>
 
     <section>
@@ -3420,8 +3405,8 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
 
     <para><emphasis>Note</emphasis></para>
 
-    <para>The default transformation function setting is - lowercase,
-    replaceNulls and compressWhitespace (in this order).</para>
+    <para>There are no default transformation functions as there were in
+    previous versions of ModSecurity.</para>
 
     <para>The following rule will ensure that an attacker does not use mixed
     case in order to evade the ModSecurity rule:</para>
@@ -3436,7 +3421,7 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <para><programlisting format="linespecific">SecRule ARG:p "xp_cmdshell" <emphasis>"t:urlDecode,t:lowercase"</emphasis></programlisting></para>
 
     <para>One can use the SecDefaultAction command to ensure the translation
-    occurs for every rule until the next. Note that translation actions are
+    occurs for every rule until the next. Note that transformation actions are
     additive, so if a rule explicitly list actions, the translation actions
     set by SecDefaultAction are still performed.</para>
 
@@ -3625,7 +3610,7 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
       ones that are at the end of string and have one or two characters
       missing) will not be converted. If you want to detect invalid encodings
       use the <literal moreinfo="none">@validateUrlEncoding</literal>
-      operator. The transformational function should not be used against
+      operator. The transformation function should not be used against
       variables that have already been URL-decoded unless it is your intention
       to perform URL decoding twice!</para>
     </section>
@@ -5106,7 +5091,7 @@ end</programlisting>
         <listitem>
           <para>All matches are case-sensitive. If you do not care about case
           sensitivity you either need to implement the <literal
-          moreinfo="none">lowercase</literal> transformational function, or
+          moreinfo="none">lowercase</literal> transformation function, or
           use the per-pattern<literal moreinfo="none">(?i)</literal>modifier,
           as allowed by PCRE.</para>
         </listitem>

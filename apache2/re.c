@@ -620,7 +620,7 @@ msre_actionset *msre_actionset_merge(msre_engine *engine, msre_actionset *parent
 msre_actionset *msre_actionset_create_default(msre_engine *engine) {
     char  *my_error_msg = NULL;
     return msre_actionset_create(engine,
-        "log,auditlog,deny,status:403,phase:2,t:lowercase,t:replaceNulls,t:compressWhitespace",
+        "log,auditlog,deny,status:403,phase:2",
         &my_error_msg);
 }
 
