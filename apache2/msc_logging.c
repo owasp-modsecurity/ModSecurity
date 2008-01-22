@@ -235,7 +235,7 @@ char *construct_log_vcombinedus_limited(modsec_rec *msr, int _limit, int *was_li
 int is_valid_parts_specification(char *p) {
     char c, *t = p;
 
-    while((c = *t++) != '\0') {
+    while((c = *(t++)) != '\0') {
         if ((c != AUDITLOG_PART_ENDMARKER)&&((c < AUDITLOG_PART_FIRST)||(c > AUDITLOG_PART_LAST))) {
             return 0;
         }
