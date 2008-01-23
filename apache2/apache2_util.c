@@ -230,7 +230,7 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
 
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
             "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", r->connection->remote_ip, str1,
-            hostname, log_escape(msr->mp, r->unparsed_uri), unique_id);
+            hostname, log_escape(msr->mp, r->uri), unique_id);
 
         /* Add this message to the list. */
         if (msr != NULL) {
