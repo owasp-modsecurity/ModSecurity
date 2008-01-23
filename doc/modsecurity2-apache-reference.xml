@@ -2860,7 +2860,6 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       1.1.</para>
 
       <programlisting format="linespecific">SecRule <emphasis>REQUEST_LINE</emphasis> "!(^((?:(?:pos|ge)t|head))|http/(0\.9|1\.0|1\.1)$)" t:none,t:lowercase</programlisting>
-
     </section>
 
     <section>
@@ -2871,7 +2870,6 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       either CONNECT or TRACE.</para>
 
       <programlisting format="linespecific">SecRule <emphasis>REQUEST_METHOD</emphasis> "^((?:connect|trace))$" t:none,t:lowercase</programlisting>
-
     </section>
 
     <section>
@@ -2881,7 +2879,6 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis>REQUEST_PROTOCOL</emphasis> "!^http/(0\.9|1\.0|1\.1)$" t:none,t:lowercase</programlisting>
-
     </section>
 
     <section>
@@ -4562,45 +4559,52 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecRule REQUEST_METHOD "^PUT$" "id:340002,rev:1,<emphasis>severity:2</emphasis>,msg:'Restricted HTTP function'"</programlisting>
+      <programlisting format="linespecific">SecRule REQUEST_METHOD "^PUT$" "id:340002,rev:1,<emphasis>severity:CRITICAL</emphasis>,msg:'Restricted HTTP function'"</programlisting>
 
       <para><emphasis>Note</emphasis></para>
 
-      <para>The severity numbers follow the Syslog convention:</para>
+      <para>Severity values in ModSecurity follow those of syslog, as
+      below:</para>
 
       <itemizedlist>
         <listitem>
-          <para>0 = EMERGENCY</para>
+          <para>0 - EMERGENCY</para>
         </listitem>
 
         <listitem>
-          <para>1 = ALERT</para>
+          <para>1 - ALERT</para>
         </listitem>
 
         <listitem>
-          <para>2 = CRITICAL</para>
+          <para>2 - CRITICAL</para>
         </listitem>
 
         <listitem>
-          <para>3 = ERROR</para>
+          <para>3 - ERROR</para>
         </listitem>
 
         <listitem>
-          <para>4 = WARNING</para>
+          <para>4 - WARNING</para>
         </listitem>
 
         <listitem>
-          <para>5 = NOTICE</para>
+          <para>5 - NOTICE</para>
         </listitem>
 
         <listitem>
-          <para>6 = INFO</para>
+          <para>6 - INFO</para>
         </listitem>
 
         <listitem>
-          <para>7 = DEBUG</para>
+          <para>7 - DEBUG</para>
         </listitem>
       </itemizedlist>
+
+      <para>It is possible to specify severity levels using either the
+      numerical values or the text values. You should always specify severity
+      levels using the text values. The use of the numerical values is
+      deprecated (as of v2.5) and may be removed in one of the susequent major
+      updates.</para>
     </section>
 
     <section>
@@ -5091,9 +5095,9 @@ end</programlisting>
         <listitem>
           <para>All matches are case-sensitive. If you do not care about case
           sensitivity you either need to implement the <literal
-          moreinfo="none">lowercase</literal> transformation function, or
-          use the per-pattern<literal moreinfo="none">(?i)</literal>modifier,
-          as allowed by PCRE.</para>
+          moreinfo="none">lowercase</literal> transformation function, or use
+          the per-pattern<literal moreinfo="none">(?i)</literal>modifier, as
+          allowed by PCRE.</para>
         </listitem>
 
         <listitem>
