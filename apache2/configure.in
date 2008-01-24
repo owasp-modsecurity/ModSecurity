@@ -6,7 +6,8 @@ dnl
 
 AC_PREREQ(2.50)
 
-AC_INIT(ModSecurity, 2.5, mod-security-users@lists.sourceforge.net, modsecurity-apache)
+AC_INIT()
+dnl AC_INIT(ModSecurity, 2.5, mod-security-users@lists.sourceforge.net, modsecurity-apache)
 AC_CONFIG_SRCDIR([mod_security2.c])
 AC_CONFIG_HEADER([mod_security2_config.h])
 AC_CONFIG_AUX_DIR([build])
@@ -36,7 +37,7 @@ AC_TYPE_UINT8_T
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
-AC_CHECK_FUNCS([atexit getcwd memset strcasecmp strchr strdup strerror strncasecmp strrchr strstr strtol])
+AC_CHECK_FUNCS([atexit fchmod getcwd memset strcasecmp strchr strdup strerror strncasecmp strrchr strstr strtol])
 
 # Find apxs
 AC_MSG_NOTICE(looking for Apache module support via DSO through APXS)

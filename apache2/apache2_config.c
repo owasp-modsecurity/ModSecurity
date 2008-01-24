@@ -73,6 +73,7 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     dcfg->upload_dir = NOT_SET_P;
     dcfg->upload_keep_files = NOT_SET;
     dcfg->upload_validates_files = NOT_SET;
+    dcfg->upload_filemode = NOT_SET;
 
     /* These are only used during the configuration process. */
     dcfg->tmp_chain_starter = NULL;
@@ -402,6 +403,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
         ? parent->upload_keep_files : child->upload_keep_files);
     merged->upload_validates_files = (child->upload_validates_files == NOT_SET
         ? parent->upload_validates_files : child->upload_validates_files);
+    merged->upload_filemode = (child->upload_filemode == NOT_SET
+        ? parent->upload_filemode : child->upload_filemode);
 
     /* Misc */
     merged->data_dir = (child->data_dir == NOT_SET_P
@@ -502,6 +505,7 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->upload_dir == NOT_SET_P) dcfg->upload_dir = NULL;
     if (dcfg->upload_keep_files == NOT_SET) dcfg->upload_keep_files = KEEP_FILES_OFF;
     if (dcfg->upload_validates_files == NOT_SET) dcfg->upload_validates_files = 0;
+    if (dcfg->upload_filemode == NOT_SET) dcfg->upload_filemode = 0600;
 
     /* Misc */
     if (dcfg->data_dir == NOT_SET_P) dcfg->data_dir = NULL;
@@ -1461,6 +1465,26 @@ static const char *cmd_upload_dir(cmd_parms *cmd, void *_dcfg, const char *p1) {
     return NULL;
 }
 
+static const char *cmd_upload_filemode(cmd_parms *cmd, void *_dcfg, const char *p1) {
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "default") == 0) {
+        dcfg->upload_filemode = NOT_SET;
+    }
+    else {
+        long int mode = strtol(p1, NULL, 8); /* expects octal mode */
+        if ((mode == LONG_MAX)||(mode == LONG_MIN)||(mode <= 0)||(mode > 0777)) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecUploadFileMode: %s", p1);
+        }
+        
+        dcfg->upload_filemode = (int)mode;
+    }
+
+    return NULL;
+}
+
 static const char *cmd_upload_keep_files(cmd_parms *cmd, void *_dcfg, const char *p1) {
     directory_config *dcfg = (directory_config *)_dcfg;
 
@@ -2043,6 +2067,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "path to the file upload area"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecUploadFileMode",
+        cmd_upload_filemode,
+        NULL,
+        CMD_SCOPE_ANY,
+        "octal permissions mode for uploaded files"
     ),
 
     AP_INIT_TAKE1 (

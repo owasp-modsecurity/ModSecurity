@@ -3,6 +3,9 @@
 /* Define to 1 if you have the `atexit' function. */
 #undef HAVE_ATEXIT
 
+/* Define to 1 if you have the `fchmod' function. */
+#undef HAVE_FCHMOD
+
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 

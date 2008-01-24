@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-rc2/ (January 23, 2008)</releaseinfo>
+    <releaseinfo>Version 2.5.0-rc2/ (January 24, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -2000,6 +2000,29 @@ SecRuleUpdateActionById 12345 "t:compressWhitespace,deny,status:403,msg:'A new m
       the same filesystem as the temporary directory defined with <literal
       moreinfo="none">SecTmpDir</literal>. This directive is used with
       <literal>SecUploadKeepFiles</literal>.</para>
+    </section>
+
+    <section>
+      <title><literal>SecUploadFileMode</literal></title>
+
+      <para><emphasis>Description:</emphasis> Configures the mode
+      (permissions) of any uploaded files using an octal number.</para>
+
+      <para><emphasis>Syntax:</emphasis> <literal
+      moreinfo="none">SecUploadFileMode octal_mode</literal></para>
+
+      <para><emphasis>Example Usage:</emphasis> <literal
+      moreinfo="none">SecUploadFileMode 0640</literal></para>
+
+      <para><emphasis>Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis>Scope:</emphasis> Any</para>
+
+      <para><emphasis>Dependencies/Notes:</emphasis> The mode is an octal
+      number (as used in chmod). The default mode is for only the account
+      writing the file to have read/write access (0600). Use this directive
+      with caution to avoid exposing potentially sensitive data to
+      unauthorized users.</para>
     </section>
 
     <section>

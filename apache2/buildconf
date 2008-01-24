@@ -23,6 +23,9 @@
 #
 build/buildcheck.sh || exit 1
 
+echo "Generating config header ..."
+autoheader -Wall || exit 1
+
 libtoolize=`build/PrintPath glibtoolize libtoolize15 libtoolize14 libtoolize`
 if [ "x$libtoolize" = "x" ]; then
     echo "libtoolize not found in path"

@@ -9,7 +9,9 @@
  *
  */
 #include <ctype.h>
+#include <sys/stat.h>
 
+#include "mod_security2_config.h"
 #include "msc_multipart.h"
 #include "msc_util.h"
 #include "msc_parsers.h"
@@ -393,6 +395,21 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
                     msr_log(msr, 4, "Multipart: Created temporary file: %s",
                         log_escape_nq(msr->mp, msr->mpd->mpp->tmp_file_name));
                 }
+
+                #ifdef HAVE_FCHMOD
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Multipart: Changing file mode to %04o: %s", msr->txcfg->upload_filemode, log_escape_nq(msr->mp, msr->mpd->mpp->tmp_file_name));
+                }
+                if (fchmod(msr->mpd->mpp->tmp_file_fd, msr->txcfg->upload_filemode) < 0) {
+                    
+                    char errbuf[256];
+                    if (msr->txcfg->debuglog_level >= 3) {
+                        msr_log(msr, 3, "Multipart: Could not change mode on \"%s\" (%d): %s",
+                            log_escape_nq(msr->mp, msr->mpd->mpp->tmp_file_name),
+                            errno, apr_strerror(APR_FROM_OS_ERROR(errno), errbuf, 256));
+                    }
+                }
+                #endif
             }
 
             /* write the reserve first */
