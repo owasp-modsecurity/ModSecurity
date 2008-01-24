@@ -1570,7 +1570,7 @@ ServerAlias www.app2.com
       (permissions) of any uploaded files using an octal number.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
-      moreinfo="none">SecUploadFileMode octal_mode</literal></para>
+      moreinfo="none">SecUploadFileMode octal_mode|"default"</literal></para>
 
       <para><emphasis>Example Usage:</emphasis> <literal
       moreinfo="none">SecUploadFileMode 0640</literal></para>
@@ -1583,7 +1583,8 @@ ServerAlias www.app2.com
       number (as used in chmod). The default mode is for only the account
       writing the file to have read/write access (0600). Use this directive
       with caution to avoid exposing potentially sensitive data to
-      unauthorized users.</para>
+      unauthorized users. Using the value "default" will revert back to the
+      default setting.</para>
     </section>
 
     <section>
