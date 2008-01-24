@@ -932,8 +932,17 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                 /* Go to the next rule if this one has been removed. */
                 if (do_process == 0) {
                     if (msr->txcfg->debuglog_level >= 5) {
-                        msr_log(msr, 5, "Not processing rule id=\"%s\": removed by ctl action", rule->actionset->id);
+                        msr_log(msr, 5, "Not processing %srule id=\"%s\": "
+                                        "removed by ctl action",
+                                        rule->actionset->is_chained ? "chained " : "",
+                                        rule->actionset->id);
                     }
+
+                    /* Skip the whole chain, if this is a chained rule */
+                    if (rule->actionset->is_chained) {
+                        mode = NEXT_CHAIN;
+                    }
+
                     continue;
                 }
         }

@@ -1,6 +1,8 @@
 24 Jan 2008 - 2.5.0-rc2
 -----------------------
 
+ * Fixed removal of chained rules via ctl:ruleRemoveById.
+
  * Implemented SecUploadFileMode to allow setting the mode for uploaded files.
 
  * Implemented "block" action.
