@@ -378,11 +378,21 @@ static apr_status_t msre_action_noauditlog_init(msre_engine *engine, msre_action
     return 1;
 }
 
+/* block */
+static apr_status_t msre_action_block_init(msre_engine *engine, msre_actionset *actionset,
+    msre_action *action)
+{
+    /* Right now we just set a flag and inherit the real disruptive action */
+    actionset->block = 1;
+    return 1;
+}
+
 /* deny */
 static apr_status_t msre_action_deny_init(msre_engine *engine, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->intercept_action = ACTION_DENY;
+    actionset->intercept_action_rec = action;
     return 1;
 }
 
@@ -404,6 +414,7 @@ static apr_status_t msre_action_drop_init(msre_engine *engine, msre_actionset *a
     msre_action *action)
 {
     actionset->intercept_action = ACTION_DROP;
+    actionset->intercept_action_rec = action;
     return 1;
 }
 
@@ -432,6 +443,7 @@ static apr_status_t msre_action_redirect_init(msre_engine *engine, msre_actionse
 {
     actionset->intercept_action = ACTION_REDIRECT;
     actionset->intercept_uri = action->param;
+    actionset->intercept_action_rec = action;
     return 1;
 }
 
@@ -463,6 +475,7 @@ static apr_status_t msre_action_proxy_init(msre_engine *engine, msre_actionset *
 {
     actionset->intercept_action = ACTION_PROXY;
     actionset->intercept_uri = action->param;
+    actionset->intercept_action_rec = action;
     return 1;
 }
 
@@ -488,6 +501,7 @@ static apr_status_t msre_action_pass_init(msre_engine *engine, msre_actionset *a
     msre_action *action)
 {
     actionset->intercept_action = ACTION_NONE;
+    actionset->intercept_action_rec = action;
     return 1;
 }
 
@@ -526,6 +540,7 @@ static apr_status_t msre_action_allow_init(msre_engine *engine, msre_actionset *
     msre_action *action)
 {
     actionset->intercept_action = ACTION_ALLOW;
+    actionset->intercept_action_rec = action;
 
     if (action->param != NULL) {
         if (strcasecmp(action->param, "phase") == 0) {
@@ -1741,6 +1756,19 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         ACTION_CGROUP_AUDITLOG,
         NULL,
         msre_action_noauditlog_init,
+        NULL
+    );
+
+    /* deny */
+    msre_engine_action_register(engine,
+        "block",
+        ACTION_DISRUPTIVE,
+        0, 0,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
+        NULL,
+        msre_action_block_init,
         NULL
     );
 

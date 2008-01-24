@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-rc2/ (January 21, 2008)</releaseinfo>
+    <releaseinfo>Version 2.5.0-rc2/ (January 23, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -3790,6 +3790,59 @@ SecAction phase:3,allow</programlisting>
 
       <para>The auditlog action is now explicit if log is already
       specified.</para>
+    </section>
+
+    <section>
+      <title><literal>block</literal></title>
+
+      <para><emphasis>Description:</emphasis> Performs the default disruptive
+      action.</para>
+
+      <para><emphasis>Action Group:</emphasis> Disruptive</para>
+
+      <para>It is intended to be used by ruleset writers to signify that the
+      rule was intended to block and leaves the "how" up to the administrator.
+      This action is currently a placeholder which will just be replaced by
+      the action from the last <literal>SecDefaultAction</literal> in the same
+      context. Using the <literal>block</literal> action with the
+      <literal>SecRuleUpdateActionById</literal> directive allows a rule to be
+      reverted back to the previous <literal>SecDefaultAction</literal>
+      disruptive action.</para>
+
+      <para>In future versions of ModSecurity, more control and functionality
+      will be added to define "how" to block.</para>
+
+      <para>Examples:</para>
+
+      <para>In the following example, the second rule will "deny" because of
+      the SecDefaultAction disruptive action. The intent being that the
+      administrator could easily change this to another disruptive action
+      without editing the actual rules.</para>
+
+      <programlisting format="linespecific">### Administrator defines "how" to block (deny,status:403)...
+SecDefaultAction phase:2,deny,status:403,log,auditlog
+
+### Included from a rulest...
+# Intent is to warn for this User Agent
+SecRule REQUEST_HEADERS:User-Agent "perl" "phase:2,<emphasis>pass</emphasis>,msg:'Perl based user agent identified'"
+# Intent is to block for this User Agent, "how" described in SecDefaultAction
+SecRule REQUEST_HEADERS:User-Agent "nikto" "phase:2,<emphasis>block</emphasis>,msg:'Nikto Scanners Identified'"</programlisting>
+
+      <para>In the following example, The rule is reverted back to the
+      <literal>pass</literal> action defined in the SecDefaultAction directive
+      by using the <literal>SecRuleUpdateActionById</literal> directive in
+      conjuction with the <literal>block</literal> action. This allows an
+      administrator to override an action in a 3rd party rule without
+      modifying the rule itself.</para>
+
+      <programlisting format="linespecific">### Administrator defines "how" to block (deny,status:403)...
+SecDefaultAction phase:2,pass,log,auditlog
+
+### Included from a rulest...
+SecRule REQUEST_HEADERS:User-Agent "nikto" "id:1,phase:2,<emphasis>deny</emphasis>,msg:'Nikto Scanners Identified'"
+
+### Added by the administrator
+SecRuleUpdateActionById 1 "<emphasis>block</emphasis>"</programlisting>
     </section>
 
     <section>

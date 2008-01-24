@@ -1,6 +1,8 @@
 23 Jan 2008 - 2.5.0-rc2
 -----------------------
 
+ * Implemented "block" action.
+
  * No longer log the query portion of the URI in the error log as
    it may contain sensitive data.
 

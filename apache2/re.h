@@ -272,9 +272,15 @@ struct msre_actionset {
     int                      intercept_status;
     int                      intercept_pause;
 
+    /* "block" needs parent action to reset it */
+    msre_action             *parent_intercept_action_rec;
+    msre_action             *intercept_action_rec;
+    int                      parent_intercept_action;
+
     /* Other */
     int                      log;
     int                      auditlog;
+    int                      block;
 };
 
 char DSOLOCAL *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset);

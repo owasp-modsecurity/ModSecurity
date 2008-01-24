@@ -88,6 +88,35 @@ char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actions
 }
 
 /**
+ * Add an action to an actionset.
+ */
+static void msre_actionset_action_add(msre_actionset *actionset, msre_action *action)
+{
+    msre_action *add_action = action;
+
+    /**
+     * The "block" action is just a placeholder for the parent action.
+     */
+    if ((actionset->parent_intercept_action_rec != NULL) && (actionset->parent_intercept_action_rec != NOT_SET_P) && (strcmp("block", action->metadata->name) == 0) && (strcmp("block", action->metadata->name) == 0)) {
+        /* revert back to parent */
+        actionset->intercept_action = actionset->parent_intercept_action;
+        add_action = actionset->parent_intercept_action_rec;
+    }
+
+    if (add_action->metadata->cardinality_group != ACTION_CGROUP_NONE) {
+        msre_actionset_cardinality_fixup(actionset, add_action);
+    }
+
+    if (add_action->metadata->cardinality == ACTION_CARDINALITY_ONE) {
+        /* One action per actionlist. */
+        apr_table_setn(actionset->actions, add_action->metadata->name, (void *)add_action);
+    } else {
+        /* Multiple actions per actionlist. */
+        apr_table_addn(actionset->actions, add_action->metadata->name, (void *)add_action);
+    }
+}
+
+/**
  * Creates msre_var instances (rule variables) out of the 
  * given text string and places them into the supplied table.
  */
@@ -159,17 +188,7 @@ apr_status_t msre_parse_actions(msre_engine *engine, msre_actionset *actionset,
             action->metadata->init(engine, actionset, action);
         }
 
-        if (action->metadata->cardinality_group != ACTION_CGROUP_NONE) {
-            msre_actionset_cardinality_fixup(actionset, action);
-        }
-
-        if (action->metadata->cardinality == ACTION_CARDINALITY_ONE) {
-            /* One action per actionlist. */
-            apr_table_setn(actionset->actions, action->metadata->name, (void *)action);
-        } else {
-            /* Multiple actions per actionlist. */
-            apr_table_addn(actionset->actions, action->metadata->name, (void *)action);
-        }
+        msre_actionset_action_add(actionset, action);
 
         count++;
     }
@@ -503,6 +522,9 @@ msre_actionset *msre_actionset_create(msre_engine *engine, const char *text,
     actionset->skip_after = NOT_SET_P;
 
     /* Disruptive */
+    actionset->parent_intercept_action_rec = NOT_SET_P;
+    actionset->intercept_action_rec = NOT_SET_P;
+    actionset->parent_intercept_action = NOT_SET;
     actionset->intercept_action = NOT_SET;
     actionset->intercept_uri = NOT_SET_P;
     actionset->intercept_status = NOT_SET;
@@ -581,6 +603,7 @@ msre_actionset *msre_actionset_merge(msre_engine *engine, msre_actionset *parent
 
     /* Disruptive */
     if (child->intercept_action != NOT_SET) {
+        merged->intercept_action_rec = child->intercept_action_rec;
         merged->intercept_action = child->intercept_action;
         merged->intercept_uri = child->intercept_uri;
     }
@@ -598,17 +621,7 @@ msre_actionset *msre_actionset_merge(msre_engine *engine, msre_actionset *parent
     tarr = apr_table_elts(child->actions);
     telts = (const apr_table_entry_t*)tarr->elts;
     for (i = 0; i < tarr->nelts; i++) {
-        msre_action *action = (msre_action *)telts[i].val;
-
-        if (action->metadata->cardinality_group != ACTION_CGROUP_NONE) {
-            msre_actionset_cardinality_fixup(merged, action);
-        }
-
-        if (action->metadata->cardinality == ACTION_CARDINALITY_ONE) {
-            apr_table_setn(merged->actions, action->metadata->name, (void *)action);
-        } else {
-            apr_table_addn(merged->actions, action->metadata->name, (void *)action);
-        }
+        msre_actionset_action_add(merged, (msre_action *)telts[i].val);
     }
 
     return merged;
@@ -643,6 +656,9 @@ void msre_actionset_set_defaults(msre_actionset *actionset) {
     if (actionset->skip_after == NOT_SET_P) actionset->skip_after = NULL;
 
     /* Disruptive */
+    if (actionset->parent_intercept_action_rec == NOT_SET_P) actionset->parent_intercept_action_rec = NULL;
+    if (actionset->intercept_action_rec == NOT_SET_P) actionset->intercept_action_rec = NULL;
+    if (actionset->parent_intercept_action == NOT_SET) actionset->parent_intercept_action = ACTION_NONE;
     if (actionset->intercept_action == NOT_SET) actionset->intercept_action = ACTION_NONE;
     if (actionset->intercept_uri == NOT_SET_P) actionset->intercept_uri = NULL;
     if (actionset->intercept_status == NOT_SET) actionset->intercept_status = 403;

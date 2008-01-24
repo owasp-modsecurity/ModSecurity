@@ -609,6 +609,10 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
     rule->actionset = msre_actionset_merge(modsecurity->msre, dcfg->tmp_default_actionset,
         rule->actionset, 1);
 
+    /* Keep track of the parent action for "block" */
+    rule->actionset->parent_intercept_action_rec = dcfg->tmp_default_actionset->intercept_action_rec;
+    rule->actionset->parent_intercept_action = dcfg->tmp_default_actionset->intercept_action;
+
     /* Must NOT specify a disruptive action in logging phase. */
     if ((rule->actionset != NULL)
         && (rule->actionset->phase == PHASE_LOGGING)
@@ -761,7 +765,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
 
     #ifdef DEBUG_CONF
     ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-        "Looking to update rule id=\"%s\" with \"%s\".", p1, p2);
+        "Update rule id=\"%s\" with action \"%s\".", p1, p2);
     #endif
 
     /* Fetch the rule */
@@ -769,7 +773,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
     if (rule == NULL) {
         #ifdef DEBUG_CONF
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-            "Failed to update rule id=\"%s\" with \"%s\": Rule not found.", p1, p2);
+            "Update rule id=\"%s\" with action \"%s\" failed: Rule not found.", p1, p2);
         #endif
         return NULL;
     }
@@ -799,7 +803,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
     {
         char *actions = msre_actionset_generate_action_string(ruleset->mp, rule->actionset);
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-            "Updating rule %pp id=\"%s\" action: \"%s\"",
+            "Update rule %pp id=\"%s\" old action: \"%s\"",
             rule,
             (rule->actionset->id == NOT_SET_P ? "(none)" : rule->actionset->id),
             actions);
@@ -819,7 +823,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
     {
         char *actions = msre_actionset_generate_action_string(ruleset->mp, rule->actionset);
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-            "Updated rule %pp id=\"%s\" action: \"%s\"",
+            "Update rule %pp id=\"%s\" new action: \"%s\"",
             rule,
             (rule->actionset->id == NOT_SET_P ? "(none)" : rule->actionset->id),
             actions);
