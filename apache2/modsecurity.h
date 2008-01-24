@@ -377,6 +377,7 @@ struct directory_config {
     const char          *upload_dir;
     int                  upload_keep_files;
     int                  upload_validates_files;
+    int                  upload_filemode;
 
     /* Used only in the configuration phase. */
     msre_rule           *tmp_chain_starter;

@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.1.6-rc1 / (Jan 23, 2008)</releaseinfo>
+    <releaseinfo>Version 2.1.6-rc1 / (Jan 24, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -335,14 +335,15 @@
 
       <listitem>
         <para>Add one line to your configuration to load libxml2:</para>
+
         <para><literal moreinfo="none">LoadFile
         /usr/lib/libxml2.so</literal></para>
       </listitem>
 
       <listitem>
         <para>Add one line to your configuration to load ModSecurity:</para>
-        <para><literal
-        moreinfo="none">LoadModule security2_module
+
+        <para><literal moreinfo="none">LoadModule security2_module
         modules/mod_security2.so</literal></para>
       </listitem>
 
@@ -363,19 +364,17 @@
       <para>If you have compiled Apache yourself or are compiling for a
       distribution, please read the following notes.</para>
 
-      <para>The ModSecurity Core rules may assume XML support is
-      available (compiled with -DWITH_LIBXML2).  You may have to manually
-      remove any XML references in the Core rules if you choose not to
-      include XML support.  In future versions of ModSecurity XML support
-      will be required.  For these reasons, please consider XML support
-      required.</para>
+      <para>The ModSecurity Core rules may assume XML support is available
+      (compiled with -DWITH_LIBXML2). You may have to manually remove any XML
+      references in the Core rules if you choose not to include XML support.
+      In future versions of ModSecurity XML support will be required. For
+      these reasons, please consider XML support required.</para>
 
-      <para>You might experience problems
-      compiling ModSecurity against PCRE. This is because Apache bundles PCRE
-      but this library is also typically provided by the operating system. I
-      would expect most (all) vendor-packaged Apache distributions to be
-      configured to use an external PCRE library (so this should not be a
-      problem).</para>
+      <para>You might experience problems compiling ModSecurity against PCRE.
+      This is because Apache bundles PCRE but this library is also typically
+      provided by the operating system. I would expect most (all)
+      vendor-packaged Apache distributions to be configured to use an external
+      PCRE library (so this should not be a problem).</para>
 
       <para>You want to avoid Apache using the bundled PCRE library and
       ModSecurity linking against the one provided by the operating system.
@@ -389,11 +388,10 @@
       available only in the Apache source code) and change the include path
       for ModSecurity (as you did in step 7 above) to point to them.</para>
 
-      <para>If your Apache is using an external PCRE library you
-      can compile ModSecurity with <literal
-      moreinfo="none">WITH_PCRE_STUDY</literal> defined,which would possibly
-      give you a slight performance edge in regular expression
-      processing.</para>
+      <para>If your Apache is using an external PCRE library you can compile
+      ModSecurity with <literal moreinfo="none">WITH_PCRE_STUDY</literal>
+      defined,which would possibly give you a slight performance edge in
+      regular expression processing.</para>
     </note>
   </section>
 
@@ -1563,6 +1561,29 @@ ServerAlias www.app2.com
       directory must be on the same filesystem as the temporary directory
       defined with <literal moreinfo="none">SecTmpDir</literal>. This
       directive is used with <literal>SecUploadKeepFiles</literal>.</para>
+    </section>
+
+    <section>
+      <title><literal>SecUploadFileMode</literal></title>
+
+      <para><emphasis>Description:</emphasis> Configures the mode
+      (permissions) of any uploaded files using an octal number.</para>
+
+      <para><emphasis>Syntax:</emphasis> <literal
+      moreinfo="none">SecUploadFileMode octal_mode</literal></para>
+
+      <para><emphasis>Example Usage:</emphasis> <literal
+      moreinfo="none">SecUploadFileMode 0640</literal></para>
+
+      <para><emphasis>Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis>Scope:</emphasis> Any</para>
+
+      <para><emphasis>Dependencies/Notes:</emphasis> The mode is an octal
+      number (as used in chmod). The default mode is for only the account
+      writing the file to have read/write access (0600). Use this directive
+      with caution to avoid exposing potentially sensitive data to
+      unauthorized users.</para>
     </section>
 
     <section>

@@ -1,5 +1,7 @@
-23 Jan 2008 - 2.1.6-rc1
+24 Jan 2008 - 2.1.6-rc1
 -----------------------
+
+ * Implemented SecUploadFileMode to allow setting the mode for uploaded files.
 
  * No longer log the query portion of the URI in the error log as
    it may contain sensitive data.
