@@ -32,11 +32,14 @@ static const char *const severities[] = {
  * Remove actions with the same cardinality group from the actionset.
  */
 static void msre_actionset_cardinality_fixup(msre_actionset *actionset, msre_action *action) {
-    const apr_array_header_t *tarr = apr_table_elts(actionset->actions);
-    const apr_table_entry_t *telts = (const apr_table_entry_t*)tarr->elts;
+    const apr_array_header_t *tarr = NULL;
+    const apr_table_entry_t *telts = NULL;
     int i;
 
     if ((actionset == NULL) || (action == NULL)) return;
+
+    tarr = apr_table_elts(actionset->actions);
+    telts = (const apr_table_entry_t*)tarr->elts;
 
     for (i = 0; i < tarr->nelts; i++) {
         msre_action *target = (msre_action *)telts[i].val;
@@ -52,10 +55,15 @@ static void msre_actionset_cardinality_fixup(msre_actionset *actionset, msre_act
  */
 char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)
 {
-    const apr_array_header_t *tarr = apr_table_elts(actionset->actions);
-    const apr_table_entry_t *telts = (const apr_table_entry_t*)tarr->elts;
+    const apr_array_header_t *tarr = NULL;
+    const apr_table_entry_t *telts = NULL;
     char *actions = NULL;
     int i;
+
+    if (actionset == NULL) return apr_pstrdup(pool, "");
+
+    tarr = apr_table_elts(actionset->actions);
+    telts = (const apr_table_entry_t*)tarr->elts;
 
     for (i = 0; i < tarr->nelts; i++) {
         msre_action *action = (msre_action *)telts[i].val;
@@ -84,7 +92,7 @@ char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actions
             NULL);
     }
 
-    return actions;
+    return (actions == NULL) ? apr_pstrdup(pool, "") : actions;
 }
 
 /**
@@ -94,6 +102,8 @@ static void msre_actionset_action_add(msre_actionset *actionset, msre_action *ac
 {
     msre_action *add_action = action;
 
+    if ((actionset == NULL)) return;
+
     /**
      * The "block" action is just a placeholder for the parent action.
      */
@@ -102,6 +112,8 @@ static void msre_actionset_action_add(msre_actionset *actionset, msre_action *ac
         actionset->intercept_action = actionset->parent_intercept_action;
         add_action = actionset->parent_intercept_action_rec;
     }
+
+    if ((add_action == NULL)) return;
 
     if (add_action->metadata->cardinality_group != ACTION_CGROUP_NONE) {
         msre_actionset_cardinality_fixup(actionset, add_action);
