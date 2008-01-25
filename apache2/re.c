@@ -1585,8 +1585,11 @@ static void msre_perform_disruptive_actions(modsec_rec *msr, msre_rule *rule,
         }
     }
 
-    /* If "noauditlog" was used do not mark the transaction for audit logging. */
-    if (actionset->auditlog == 1) {
+    /* If "noauditlog" used do not mark the transaction for audit logging. */
+    if (actionset->auditlog == 0) {
+        msr->is_relevant = 0;
+    }
+    else {
         msr->is_relevant++;
     }
 
@@ -1598,8 +1601,8 @@ static void msre_perform_disruptive_actions(modsec_rec *msr, msre_rule *rule,
         || (msr->modsecurity->processing_mode == MODSEC_OFFLINE)
         || (actionset->intercept_action == ACTION_NONE))
     {
-        /* If "nolog" was used log at a higher level. */
-        msc_alert(msr, (actionset->log == 0 ? 4 : 2), actionset,
+        /* If "no(audit)?log" was used log at a higher level. */
+        msc_alert(msr, ((actionset->log == 0) || (actionset->auditlog == 0) ? 4 : 2), actionset,
             "Warning.", message);
         return;
     }

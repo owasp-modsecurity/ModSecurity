@@ -333,6 +333,10 @@ static int is_response_status_relevant(modsec_rec *msr, int status) {
     apr_status_t rc;
     char buf[32];
 
+    /* ENH: Setting is_relevant here will cause an audit even if noauditlog
+     * was set for the last rule that matched.  Is this what we want?
+     */
+
     if ((msr->txcfg->auditlog_relevant_regex == NULL)
         ||(msr->txcfg->auditlog_relevant_regex == NOT_SET_P))
     {
