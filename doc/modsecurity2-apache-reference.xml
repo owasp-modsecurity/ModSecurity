@@ -1118,9 +1118,9 @@ SecAuditLogStorageDir logs/audit
       disruptive actions are not allowed, but this can inadvertently be
       inherited using a disruptive action in SecDefaultAction.</para>
 
-      <para>The default value is:</para>
+      <para>The default value is minimal (differing from previous versions):</para>
 
-      <programlisting format="linespecific">SecDefaultAction log,auditlog,deny,status:403,phase:2,t:none</programlisting>
+      <programlisting format="linespecific">SecDefaultAction phase:2,log,pass</programlisting>
 
       <para><emphasis>Note</emphasis></para>
 

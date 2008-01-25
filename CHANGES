@@ -10,7 +10,8 @@
  * No longer log the query portion of the URI in the error log as
    it may contain sensitive data.
 
- * There are no longer any default transformations performed.
+ * The default action is now a minimal "phase:2,log,pass" with no default
+   transformations performed.
 
  * Implemented SecRuleUpdateActionById.
 

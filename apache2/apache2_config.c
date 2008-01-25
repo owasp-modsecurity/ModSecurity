@@ -708,6 +708,9 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         apr_table_unset(dcfg->tmp_rule_placeholders, rule->actionset->id);
     }
         
+    /* Update the unparsed rule */
+    rule->unparsed = msre_rule_generate_unparsed(dcfg->ruleset->mp, rule, NULL, NULL, NULL);
+
     return NULL;    
 }
 
@@ -790,7 +793,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
 
     /* Create a new actionset */
     new_actionset = msre_actionset_create(modsecurity->msre, p2, &my_error_msg);
-    if (dcfg->tmp_default_actionset == NULL) return FATAL_ERROR;
+    if (new_actionset == NULL) return FATAL_ERROR;
     if (my_error_msg != NULL) return my_error_msg;
 
     /* Must NOT change an id */
@@ -1098,11 +1101,13 @@ static const char *cmd_default_action(cmd_parms *cmd, void *_dcfg, const char *p
     }
 
     /* Must specify a disruptive action. */
+    /* ENH: Remove this requirement? */
     if (dcfg->tmp_default_actionset->intercept_action == NOT_SET) {
         return apr_psprintf(cmd->pool, "ModSecurity: SecDefaultAction must specify a disruptive action.");
     }
 
     /* Must specify a phase. */
+    /* ENH: Remove this requirement? */
     if (dcfg->tmp_default_actionset->phase == NOT_SET) {
         return apr_psprintf(cmd->pool, "ModSecurity: SecDefaultAction must specify a phase.");
     }
@@ -1129,6 +1134,12 @@ static const char *cmd_default_action(cmd_parms *cmd, void *_dcfg, const char *p
     if (dcfg->tmp_default_actionset->skip_count != NOT_SET) {
         return apr_psprintf(cmd->pool, "ModSecurity: SecDefaultAction must not "
             "contain a skip action.");
+    }
+
+    /* Must not use skipAfter. */
+    if (dcfg->tmp_default_actionset->skip_after != NOT_SET_P) {
+        return apr_psprintf(cmd->pool, "ModSecurity: SecDefaultAction must not "
+            "contain a skipAfter action.");
     }
 
     return NULL;
