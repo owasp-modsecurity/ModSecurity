@@ -180,7 +180,7 @@ static int test_op(const char *name, const char *param, const unsigned char *inp
         *errmsg = apr_psprintf(g_mp, "Failed to create ruleset for op \"%s\".", name);
         return -1;
     }
-    rule = msre_rule_create(ruleset, "unit-test", 1, "UNIT_TEST", args, "t:none,pass,nolog", errmsg);
+    rule = msre_rule_create(ruleset, RULE_TYPE_NORMAL, "unit-test", 1, "UNIT_TEST", args, "t:none,pass,nolog", errmsg);
     if (rule == NULL) {
         *errmsg = apr_psprintf(g_mp, "Failed to create rule for op \"%s\": %s", name, *errmsg);
         return -1;
