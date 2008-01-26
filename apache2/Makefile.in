@@ -65,7 +65,7 @@ clean: clean-extras
 	@rm -rf *.la *.lo *.o *.slo .libs msc_test
 
 maintainer-clean: clean
-	@rm -rf Makefile mlogc-src/Makefile t/run-tests.pl config config.log config.status configure mod_security2_config.h
+	@rm -rf Makefile mlogc-src/Makefile t/run-tests.pl config config.log config.status configure mod_security2_config.h ../tools/*.pl
 
 dist-clean: maintainer-clean
 

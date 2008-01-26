@@ -236,7 +236,10 @@ CHECK_CURL()
 
 AC_CONFIG_FILES([Makefile])
 if test -e "$PERL"; then
-    AC_CONFIG_FILES([t/run-tests.pl])
+    AC_CONFIG_FILES([t/run-tests.pl], [chmod +x t/run-tests.pl])
+
+    # Perl based tools
+    AC_CONFIG_FILES([../tools/rules-updater.pl], [chmod +x ../tools/rules-updater.pl])
 fi
 if test -e "mlogc-src/Makefile.in"; then
     AC_CONFIG_FILES([mlogc-src/Makefile])

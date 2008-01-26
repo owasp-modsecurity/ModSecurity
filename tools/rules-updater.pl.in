@@ -1,0 +1,258 @@
+#!@PERL@
+#
+# Fetches the latest ModSecurity Ruleset
+#
+
+use strict;
+use LWP::UserAgent ();
+use LWP::Debug qw(-);
+use URI ();
+use HTTP::Date ();
+use Cwd qw(getcwd);
+use Getopt::Std;
+
+my $VERSION = "0.0.1";
+my($SCRIPT) = ($0 =~ m/([^\/\\]+)$/);
+my $CRLFRE = qr/\015?\012/;
+my %PREFIX_MAP = (
+	-dev => 0,
+	-rc => 1,
+	"" => 9,
+);
+
+################################################################################
+################################################################################
+
+my %opt = ();
+getopts('r:p:v:S:D:R:U:F:ldh', \%opt);
+
+usage(1) if(defined $opt{h});
+usage(1, "Repository (-r) required.") unless(defined $opt{r});
+usage(1, "Local path (-p) required.") unless(defined $opt{p} or defined $opt{l});
+
+# Make sure we have an action
+if (! grep { defined } @opt{qw(S D R U F l)}) {
+	usage(1, "Action required.");
+}
+
+LWP::Debug::level("+") if ($opt{d});
+
+# Remove trailing slashes from uri and path
+$opt{r} =~ s/\/+$//;
+$opt{p} =~ s/\/+$//;
+
+# Make the version into a regex
+if (defined $opt{v}) {
+	my($a,$b,$c,$d) = ($opt{v} =~ m/^(\d+)\.?(\d+)?\.?(\d+)?(?:-(\D+\d+$)|($))/);
+	if (defined $d) {
+		(my $key = $d) =~ s/^(\D+)\d+$/-$1/;
+		unless (exists $PREFIX_MAP{$key}) {
+			usage(1, "Invalid version (bad suffix \"$d\"): $opt{v}");
+		}
+		$opt{v} = qr/^$a\.$b\.$c-$d$/;
+	}
+	elsif (defined $c) {
+		$opt{v} = qr/^$a\.$b\.$c(?:-|$)/;
+	}
+	elsif (defined $b) {
+		$opt{v} = qr/^$a\.$b\./;
+	}
+	elsif (defined $a) {
+		$opt{v} = qr/^$a\./;
+	}
+	else {
+		usage(1, "Invalid version: $opt{v}");
+	}
+	if ($opt{d}) {
+		print STDERR "Using version pattern: $opt{v}\n";
+	}
+}
+else {
+	$opt{v} = qr/^/;
+}
+
+my $ua = LWP::UserAgent->new(
+	agent => "ModSecurity Updator/$VERSION",
+	keep_alive => 1,
+	env_proxy => 1,
+	max_redirect => 5,
+	requests_redirectable => [qw(GET HEAD)],
+	timeout => 60,
+);
+
+sub sort_versions {
+	(my $A = $a) =~ s/^(\d+)\.(\d+)\.(\d+)(-[^-\d]+|)(\d*)$/sprintf("%03d%03d%03d%03d%03d", $1, $2, $3, $PREFIX_MAP{$4}, $5)/e;
+	(my $B = $b) =~ s/^(\d+)\.(\d+)\.(\d+)(-[^-\d]+|)(\d*)$/sprintf("%03d%03d%03d%03d%03d", $1, $2, $3, $PREFIX_MAP{$4}, $5)/e;
+	return $A cmp $B;
+}
+
+sub repository_listing {
+	my $res = $ua->get("$opt{r}/.listing");
+	return undef unless ($res->is_success());
+	return grep(/\S/, split(/$CRLFRE/, $res->content)) ;
+}
+
+sub ruleset_listing {
+	my $res = $ua->get("$opt{r}/$_[0]/.listing");
+	return undef unless ($res->is_success());
+	return grep(/\S/, split(/$CRLFRE/, $res->content)) ;
+}
+
+sub ruleset_available_versions {
+	return sort sort_versions map { m/_([^_]+)\.zip.*$/; $1 } ruleset_listing($_[0]);
+}
+
+sub fetch_ruleset {
+	my($repo, $version) = @_;
+	# TODO: mkdirs
+	if (! -e "$opt{p}" ) {
+		mkdir "$opt{p}" or die "Failed to create \"$opt{p}\": $!\n";
+	}
+	if (! -e "$opt{p}/$repo" ) {
+		mkdir "$opt{p}/$repo" or die "Failed to create \"$opt{p}/$repo\": $!\n";
+	}
+	my $ruleset = "$repo/${repo}_$version.zip";
+	my $ruleset_sig = "$repo/${repo}_$version.zip.sig";
+
+	print STDERR "Fetching: $ruleset ...\n";
+
+	my $res = $ua->get(
+		"$opt{r}/$ruleset",
+		":content_file" => "$opt{p}/$ruleset",
+	);
+	die "Failed to retrieve ruleset $ruleset: ".$res->status_line()."\n" unless ($res->is_success());
+	my $res = $ua->get(
+		"$opt{r}/$ruleset_sig",
+		":content_file" => "$opt{p}/$ruleset_sig",
+	);
+	# Optional right now
+	#die "Failed to retrieve ruleset signature $ruleset_sig: ".$res->status_line()."\n" unless ($res->is_success());
+}
+
+sub repository_dump {
+	for my $repo (repository_listing()) {
+		print "$repo {\n";
+		my @versions = ruleset_available_versions($repo);
+		for my $version (@versions) {
+			if ($version =~ m/$opt{v}/) {
+				printf "%15s: %s_%s.zip\n", $version, $repo, $version;
+			}
+			elsif ($opt{d}) {
+				print STDERR "Skipping version: $version\n";
+			}
+		}
+		print "}\n";
+	}
+}
+
+sub fetch_latest_ruleset {
+	my($repo, $type) = @_;
+	my @versions = ruleset_available_versions($repo);
+	my $verre = defined($opt{v}) ? qr/^$opt{v}/ : qr/^/;
+	my $typere = undef;
+	
+	# Figure out what to look for
+	if (defined($type) and $type ne "") {
+		if ($type eq "UNSTABLE") {
+			$typere = qr/\d-\D+\d+$/;
+		}
+		else {
+			$typere = qr/\d-$type\d+$/;
+		}
+	}
+	elsif (defined($type)) {
+		qr/\.\d+$/;
+	}
+
+	while (@versions) {
+		my $last = pop(@versions);
+		# Check REs on version
+		if ($last =~ m/$opt{v}/ and (!defined($typere) || $last =~ m/$typere/)) {
+			return fetch_ruleset($repo, $last);
+		}
+		if ($opt{d}) {
+			print STDERR "Skipping version: $last\n";
+		}
+	}
+
+	die "No $type ruleset found.\n";
+}
+
+sub usage {
+	my $rc = defined($$_[0]) ? $_[0] : 0;
+	my $msg = defined($_[1]) ? "\n$_[1]\n\n" : "";
+
+	print STDERR << "EOT";
+${msg}Usage: $SCRIPT [options] [action]
+
+ Options:
+  -r uri     Repository
+  -p path    Local path to use as base for downloads
+  -v version Full or partial version (EX: 1, 1.5, 1.5.2, 1.5.2-dev3)
+  -d         Print out lots of debugging
+  -h         This help
+
+ Actions:
+  -S name    Fetch the latest stable ruleset, "name"
+  -D name    Fetch the latest development ruleset, "name"
+  -R name    Fetch the latest release candidate ruleset, "name"
+  -U name    Fetch the latest unstable (non-stable) ruleset, "name"
+  -F name    Fetch the latest ruleset, "name"
+  -l         Print listing of what is available
+
+Examples:
+
+# Get a list of what the repository contains:
+$SCRIPT -rhttp://host/repo/ -l
+
+# Get a partial list of versions 1.5.x:
+$SCRIPT -rhttp://host/repo/ -v1.5 -l
+
+# Get the latest stable version of "breach_ModSecurityCoreRules":
+$SCRIPT -rhttp://host/repo/ -p/my/repo -Sbreach_ModSecurityCoreRules
+
+# Get the latest stable 1.5 release of "breach_ModSecurityCoreRules":
+$SCRIPT -rhttp://host/repo/ -p/my/repo -v1.5 -Sbreach_ModSecurityCoreRules
+EOT
+	exit $rc;
+}
+
+################################################################################
+################################################################################
+
+# List what is there
+if ($opt{l}) {
+	print STDERR "\nRepository: $opt{r}\n\n";
+	repository_dump();
+	exit 0;
+}
+
+# Latest stable
+if (defined($opt{S})) {
+	fetch_latest_ruleset($opt{S}, "");
+	exit 0;
+}
+
+# Latest development
+if (defined($opt{D})) {
+	fetch_latest_ruleset($opt{D}, "dev");
+	exit 0;
+}
+
+# Latest release candidate
+if (defined($opt{R})) {
+	fetch_latest_ruleset($opt{R}, "rc");
+	exit 0;
+}
+
+# Latest unstable
+if (defined($opt{U})) {
+	fetch_latest_ruleset($opt{U}, "UNSTABLE");
+	exit 0;
+}
+
+# Latest (any type)
+if (defined($opt{F})) {
+	fetch_latest_ruleset($opt{F}, undef);
+	exit 0;
+}
