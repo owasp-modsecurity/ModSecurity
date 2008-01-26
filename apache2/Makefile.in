@@ -59,7 +59,7 @@ clean-extras:
 	@for dir in mlogc-src; do \
 	  test -e $$dir && $(MAKE) -C $$dir clean; \
 	done; \
-	rm -rf mlogc mlogc-static
+	rm -rf ../tools/mlogc ../tools/mlogc-static
 
 clean: clean-extras
 	@rm -rf *.la *.lo *.o *.slo .libs msc_test
@@ -97,14 +97,16 @@ test: t/run-tests.pl msc_test
 
 mlogc:
 	@$(MAKE) -C mlogc-src mlogc \
-	&& cp -p mlogc-src/mlogc . \
+	&& cp -p mlogc-src/mlogc ../tools \
 	&& echo \
+	&& echo "Successfully built \"mlogc\" in ../tools." \
 	&& echo "See: mlogc-src/INSTALL" \
 	&& echo
 
 mlogc-static:
 	@$(MAKE) -C mlogc-src static \
-	&& cp -p mlogc-src/mlogc mlogc-static \
+	&& cp -p mlogc-src/mlogc ../tools/mlogc-static \
 	&& echo \
+	&& echo "Successfully built \"mlogc-static\" in ../tools." \
 	&& echo "See: mlogc-src/INSTALL" \
 	&& echo
