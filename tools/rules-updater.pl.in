@@ -18,11 +18,30 @@ my $CRLFRE = qr/\015?\012/;
 my $HOST = Sys::Hostname::hostname();
 my $UNZIP = [qw(unzip -a)];
 my $SENDMAIL = [qw(/usr/lib/sendmail -oi -t)];
+my $HAVE_GNUPG = 0;
 my %PREFIX_MAP = (
 	-dev => 0,
 	-rc => 1,
 	"" => 9,
 );
+my %GPG_TRUST = ();
+my $REQUIRED_SIG_TRUST;
+
+eval "use GnuPG qw(:trust)";
+if ($@) {
+	warn "Could not load GnuPG module - cannot verify ruleset signatures\n";
+}
+else {
+	$HAVE_GNUPG = 1;
+	%GPG_TRUST = (
+		&TRUST_UNDEFINED    => "not",
+		&TRUST_NEVER        => "not",
+		&TRUST_MARGINAL     => "marginally",
+		&TRUST_FULLY        => "fully",
+		&TRUST_ULTIMATE     => "ultimatly",
+	);
+	$REQUIRED_SIG_TRUST = &TRUST_FULLY;
+}
 
 ################################################################################
 ################################################################################
@@ -251,14 +270,15 @@ sub ruleset_fetch {
 		die "Refused to overwrite ruleset \"$opt{p}/$ruleset\".\n";
 	}
 
+	# Fetch the ruleset
 	print STDERR "Fetching: $ruleset ...\n";
-
 	my $res = $ua->get(
 		"$opt{r}/$ruleset",
 		":content_file" => "$opt{p}/$ruleset",
 	);
 	die "Failed to retrieve ruleset $ruleset: ".$res->status_line()."\n" unless ($res->is_success());
 
+	# Fetch the ruleset signature
 	if (-e "$opt{p}/$ruleset_sig") {
 		die "Refused to overwrite ruleset signature \"$opt{p}/$ruleset_sig\".\n";
 	}
@@ -266,8 +286,13 @@ sub ruleset_fetch {
 		"$opt{r}/$ruleset_sig",
 		":content_file" => "$opt{p}/$ruleset_sig",
 	);
-	# Optional right now
-	#die "Failed to retrieve ruleset signature $ruleset_sig: ".$res->status_line()."\n" unless ($res->is_success());
+
+	# Verify the signature if we can
+	if ($HAVE_GNUPG) {
+		die "Failed to retrieve ruleset signature $ruleset_sig: ".$res->status_line()."\n" unless ($res->is_success());
+
+		ruleset_verifysig("$opt{p}/$ruleset", "$opt{p}/$ruleset_sig");
+	}
 	push @fetched, [$repo, $version, $ruleset, undef];
 }
 
@@ -303,11 +328,12 @@ sub ruleset_unpack {
 		chdir $pwd;
 		die "Failed to chdir to \"$unpackdir\": $err\n";
 	}
+	undef $!;
 	system(@$UNZIP, $fn);
 	if ($? != 0) {
 		my $err = $!;
 		chdir $pwd;
-		die "Failed to unpack \"$unpackdir\"".(defined($err)? ": $err":".")."\n";
+		die "Failed to unpack \"$unpackdir\"".($err?": $err":".")."\n";
 	}
 	chdir $pwd;
 
@@ -372,6 +398,30 @@ Subject: [$HOST] ModSecurity Ruleset Update Notification
 $body
 EOT
 	close SM;
+}
+
+sub ruleset_verifysig {
+	my($fn, $sigfn) = @_;
+
+	print STDERR "Verifying \"$fn\" with signature \"$sigfn\"\n";
+	my $gpg = new GnuPG();
+	my $sig = eval { $gpg->verify( signature => $sigfn, file => $fn ) };
+	if (defined $sig) {
+		print STDERR sig2str($sig)."\n"; 
+	}
+	if (!defined($sig)) {
+		die "Signature validation failed.\n";
+	}
+	if ( $sig->{trust} < $REQUIRED_SIG_TRUST ) {
+		die "Signature is not trusted ".$GPG_TRUST{$REQUIRED_SIG_TRUST}.".\n";
+	}
+
+	return;
+}
+
+sub sig2str {
+	my %sig = %{ $_[0] || {} };
+	"Signature made ".localtime($sig{timestamp})." by $sig{user} (ID: $sig{keyid}) and is $GPG_TRUST{$sig{trust}} trusted.";
 }
 
 ################################################################################
