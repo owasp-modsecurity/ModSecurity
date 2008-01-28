@@ -4,6 +4,7 @@
 #
 
 use strict;
+use Sys::Hostname;
 use LWP::UserAgent ();
 use LWP::Debug qw(-);
 use URI ();
@@ -14,6 +15,9 @@ use Getopt::Std;
 my $VERSION = "0.0.1";
 my($SCRIPT) = ($0 =~ m/([^\/\\]+)$/);
 my $CRLFRE = qr/\015?\012/;
+my $HOST = Sys::Hostname::hostname();
+my $UNZIP = [qw(unzip -a)];
+my $SENDMAIL = [qw(/usr/lib/sendmail -oi -t)];
 my %PREFIX_MAP = (
 	-dev => 0,
 	-rc => 1,
@@ -23,23 +27,24 @@ my %PREFIX_MAP = (
 ################################################################################
 ################################################################################
 
+my @fetched = ();
 my %opt = ();
-getopts('r:p:v:S:D:R:U:F:ldh', \%opt);
+getopts('c:r:p:s:v:t:e:f:EuS:D:R:U:F:ldh', \%opt);
 
 usage(1) if(defined $opt{h});
-usage(1, "Repository (-r) required.") unless(defined $opt{r});
-usage(1, "Local path (-p) required.") unless(defined $opt{p} or defined $opt{l});
+usage(1) if(@ARGV > 1);
 
 # Make sure we have an action
 if (! grep { defined } @opt{qw(S D R U F l)}) {
 	usage(1, "Action required.");
 }
 
-LWP::Debug::level("+") if ($opt{d});
+# Merge config with commandline opts
+if ($opt{c}) {
+	%opt = parse_config($opt{c}, \%opt);
+}
 
-# Remove trailing slashes from uri and path
-$opt{r} =~ s/\/+$//;
-$opt{p} =~ s/\/+$//;
+LWP::Debug::level("+") if ($opt{d});
 
 # Make the version into a regex
 if (defined $opt{v}) {
@@ -64,12 +69,20 @@ if (defined $opt{v}) {
 		usage(1, "Invalid version: $opt{v}");
 	}
 	if ($opt{d}) {
-		print STDERR "Using version pattern: $opt{v}\n";
+		print STDERR "Using version regex: $opt{v}\n";
 	}
 }
 else {
 	$opt{v} = qr/^/;
 }
+
+# Remove trailing slashes from uri and path
+$opt{r} =~ s/\/+$//;
+$opt{p} =~ s/\/+$//;
+
+# Required opts
+usage(1, "Repository (-r) required.") unless(defined $opt{r});
+usage(1, "Local path (-p) required.") unless(defined $opt{p} or defined $opt{l});
 
 my $ua = LWP::UserAgent->new(
 	agent => "ModSecurity Updator/$VERSION",
@@ -77,8 +90,55 @@ my $ua = LWP::UserAgent->new(
 	env_proxy => 1,
 	max_redirect => 5,
 	requests_redirectable => [qw(GET HEAD)],
-	timeout => 60,
+	timeout => ($opt{t} || 600),
 );
+
+sub usage {
+	my $rc = defined($$_[0]) ? $_[0] : 0;
+	my $msg = defined($_[1]) ? "\n$_[1]\n\n" : "";
+
+	print STDERR << "EOT";
+${msg}Usage: $SCRIPT [-c config_file] [[options] [action]
+
+ Options (commandline will override config file):
+  -r uri   RepositoryURI   Repository URI.
+  -p path  LocalRepository Local repository path to use as base for downloads.
+  -s path  LocalRules      Local rules base path to use for unpacking.
+  -v text  Version         Full/partial version (EX: 1, 1.5, 1.5.2, 1.5.2-dev3)
+  -t secs  Timeout         Timeout for fetching data in seconds (default 600).
+  -e addr  NotifyEmail     Notify via email on update (comma separated list).
+  -f addr  NotifyEmailFrom From address for notification email.
+  -u       Unpack          Unpack into LocalRules/version path.
+  -d       Debug           Print out lots of debugging.
+
+ Actions:
+  -S name    Fetch the latest stable ruleset, "name"
+  -D name    Fetch the latest development ruleset, "name"
+  -R name    Fetch the latest release candidate ruleset, "name"
+  -U name    Fetch the latest unstable (non-stable) ruleset, "name"
+  -F name    Fetch the latest ruleset, "name"
+  -l         Print listing of what is available
+
+ Misc:
+  -c         Specify a config file for options.
+  -h         This help
+
+Examples:
+
+# Get a list of what the repository contains:
+$SCRIPT -rhttp://host/repo/ -l
+
+# Get a partial list of versions 1.5.x:
+$SCRIPT -rhttp://host/repo/ -v1.5 -l
+
+# Get the latest stable version of "breach_ModSecurityCoreRules":
+$SCRIPT -rhttp://host/repo/ -p/my/repo -Sbreach_ModSecurityCoreRules
+
+# Get the latest stable 1.5 release of "breach_ModSecurityCoreRules":
+$SCRIPT -rhttp://host/repo/ -p/my/repo -v1.5 -Sbreach_ModSecurityCoreRules
+EOT
+	exit $rc;
+}
 
 sub sort_versions {
 	(my $A = $a) =~ s/^(\d+)\.(\d+)\.(\d+)(-[^-\d]+|)(\d*)$/sprintf("%03d%03d%03d%03d%03d", $1, $2, $3, $PREFIX_MAP{$4}, $5)/e;
@@ -86,51 +146,58 @@ sub sort_versions {
 	return $A cmp $B;
 }
 
-sub repository_listing {
-	my $res = $ua->get("$opt{r}/.listing");
-	return undef unless ($res->is_success());
-	return grep(/\S/, split(/$CRLFRE/, $res->content)) ;
-}
+sub parse_config {
+	my($file,$clo) = @_;
+	my %cfg = ();
 
-sub ruleset_listing {
-	my $res = $ua->get("$opt{r}/$_[0]/.listing");
-	return undef unless ($res->is_success());
-	return grep(/\S/, split(/$CRLFRE/, $res->content)) ;
-}
+	print STDERR "Parsing config: $file\n" if ($opt{d});
+	open(CFG, "<$file") or die "Failed to open config \"$file\": $!\n";
+	while(<CFG>) {
+		# Skip comments and empty lines
+		next if (/^\s*(?:#|$)/);
 
-sub ruleset_available_versions {
-	return sort sort_versions map { m/_([^_]+)\.zip.*$/; $1 } ruleset_listing($_[0]);
-}
+		# Parse
+		chomp;
+		my($var,$q1,$val,$q2) = (m/^\s*(\S+)\s+(['"]?)(.*)(\2)\s*$/);
 
-sub fetch_ruleset {
-	my($repo, $version) = @_;
-	# TODO: mkdirs
-	if (! -e "$opt{p}" ) {
-		mkdir "$opt{p}" or die "Failed to create \"$opt{p}\": $!\n";
+		# Fixup values
+		$var = lc($var);
+		if ($val =~ m/^(?:true|on)$/i) { $val = 1 };
+		if ($val =~ m/^(?:false|off)$/i) { $val = 0 };
+
+		# Set opts
+		if    ($var eq "repositoryuri")       { $cfg{r} = $val }
+		elsif ($var eq "localrepository")        { $cfg{p} = $val }
+		elsif ($var eq "localrules")       { $cfg{s} = $val }
+		elsif ($var eq "version")          { $cfg{v} = $val }
+		elsif ($var eq "timeout")          { $cfg{t} = $val }
+		elsif ($var eq "notifyemail")      { $cfg{e} = $val }
+		elsif ($var eq "notifyemailfrom")  { $cfg{f} = $val }
+		elsif ($var eq "notifyemaildiff")  { $cfg{E} = $val }
+		elsif ($var eq "unpack")           { $cfg{u} = $val }
+		elsif ($var eq "debug")            { $cfg{d} = $val }
+		else { die "Invalid config directive: $var\n" }
 	}
-	if (! -e "$opt{p}/$repo" ) {
-		mkdir "$opt{p}/$repo" or die "Failed to create \"$opt{p}/$repo\": $!\n";
+	close CFG;
+
+	my($k, $v);
+	while (($k, $v) = each %{$clo || {}}) {
+		$cfg{$k} = $v if (defined $v);
 	}
-	my $ruleset = "$repo/${repo}_$version.zip";
-	my $ruleset_sig = "$repo/${repo}_$version.zip.sig";
 
-	print STDERR "Fetching: $ruleset ...\n";
-
-	my $res = $ua->get(
-		"$opt{r}/$ruleset",
-		":content_file" => "$opt{p}/$ruleset",
-	);
-	die "Failed to retrieve ruleset $ruleset: ".$res->status_line()."\n" unless ($res->is_success());
-	my $res = $ua->get(
-		"$opt{r}/$ruleset_sig",
-		":content_file" => "$opt{p}/$ruleset_sig",
-	);
-	# Optional right now
-	#die "Failed to retrieve ruleset signature $ruleset_sig: ".$res->status_line()."\n" unless ($res->is_success());
+	return %cfg;
 }
 
 sub repository_dump {
-	for my $repo (repository_listing()) {
+	my @replist = repository_listing();
+
+	print STDERR "\nRepository: $opt{r}\n\n";
+	unless (@replist) {
+		print STDERR "No matching entries.\n";
+		return;
+	}
+
+	for my $repo (@replist) {
 		print "$repo {\n";
 		my @versions = ruleset_available_versions($repo);
 		for my $version (@versions) {
@@ -145,7 +212,112 @@ sub repository_dump {
 	}
 }
 
-sub fetch_latest_ruleset {
+sub repository_listing {
+	my $res = $ua->get("$opt{r}/.listing");
+	unless ($res->is_success()) {
+		die "Failed to get repository listing \"$opt{r}/.listing\": ".$res->status_line()."\n";
+	}
+	return grep(/\S/, split(/$CRLFRE/, $res->content)) ;
+}
+
+sub ruleset_listing {
+	my $res = $ua->get("$opt{r}/$_[0]/.listing");
+	unless ($res->is_success()) {
+		die "Failed to get ruleset listing \"$opt{r}/$_[0]/.listing\": ".$res->status_line()."\n";
+	}
+	return grep(/\S/, split(/$CRLFRE/, $res->content)) ;
+}
+
+sub ruleset_available_versions {
+	return sort sort_versions map { m/_([^_]+)\.zip.*$/; $1 } ruleset_listing($_[0]);
+}
+
+sub ruleset_fetch {
+	my($repo, $version) = @_;
+
+	# Create paths
+	if (! -e "$opt{p}" ) {
+		mkdir "$opt{p}" or die "Failed to create \"$opt{p}\": $!\n";
+	}
+	if (! -e "$opt{p}/$repo" ) {
+		mkdir "$opt{p}/$repo" or die "Failed to create \"$opt{p}/$repo\": $!\n";
+	}
+
+	my $fn = "${repo}_$version.zip";
+	my $ruleset = "$repo/$fn";
+	my $ruleset_sig = "$repo/$fn.sig";
+
+	if (-e "$opt{p}/$ruleset") {
+		die "Refused to overwrite ruleset \"$opt{p}/$ruleset\".\n";
+	}
+
+	print STDERR "Fetching: $ruleset ...\n";
+
+	my $res = $ua->get(
+		"$opt{r}/$ruleset",
+		":content_file" => "$opt{p}/$ruleset",
+	);
+	die "Failed to retrieve ruleset $ruleset: ".$res->status_line()."\n" unless ($res->is_success());
+
+	if (-e "$opt{p}/$ruleset_sig") {
+		die "Refused to overwrite ruleset signature \"$opt{p}/$ruleset_sig\".\n";
+	}
+	$res = $ua->get(
+		"$opt{r}/$ruleset_sig",
+		":content_file" => "$opt{p}/$ruleset_sig",
+	);
+	# Optional right now
+	#die "Failed to retrieve ruleset signature $ruleset_sig: ".$res->status_line()."\n" unless ($res->is_success());
+	push @fetched, [$repo, $version, $ruleset, undef];
+}
+
+sub ruleset_unpack {
+	my($repo, $version, $ruleset) = @{ $_[0] || [] };
+	my $fn = "$opt{p}/$ruleset";
+
+	if (! -e "$fn" ) {
+		die "Internal Error: No ruleset to unpack - \"$fn\"\n";
+	}
+
+	# Create paths
+	if (! -e "$opt{s}" ) {
+		mkdir "$opt{s}" or die "Failed to create \"$opt{p}\": $!\n";
+	}
+	if (! -e "$opt{s}/$repo" ) {
+		mkdir "$opt{s}/$repo" or die "Failed to create \"$opt{p}/$repo\": $!\n";
+	}
+	if (! -e "$opt{s}/$repo/$version" ) {
+		mkdir "$opt{s}/$repo/$version" or die "Failed to create \"$opt{p}/$repo/$version\": $!\n";
+	}
+	else {
+		die "Refused to overwrite previously unpacked \"$opt{s}/$repo/$version\".\n";
+	}
+
+	# TODO: Verify sig
+
+	my $pwd = getcwd();
+	my $unpackdir = "$opt{s}/$repo/$version";
+	chdir "$unpackdir";
+	if ($@) {
+		my $err = $!;
+		chdir $pwd;
+		die "Failed to chdir to \"$unpackdir\": $err\n";
+	}
+	system(@$UNZIP, $fn);
+	if ($? != 0) {
+		my $err = $!;
+		chdir $pwd;
+		die "Failed to unpack \"$unpackdir\"".(defined($err)? ": $err":".")."\n";
+	}
+	chdir $pwd;
+
+	# Add where we unpacked it
+	$_->[3] = $unpackdir;
+
+	return 0;
+}
+
+sub ruleset_fetch_latest {
 	my($repo, $type) = @_;
 	my @versions = ruleset_available_versions($repo);
 	my $verre = defined($opt{v}) ? qr/^$opt{v}/ : qr/^/;
@@ -168,7 +340,7 @@ sub fetch_latest_ruleset {
 		my $last = pop(@versions);
 		# Check REs on version
 		if ($last =~ m/$opt{v}/ and (!defined($typere) || $last =~ m/$typere/)) {
-			return fetch_ruleset($repo, $last);
+			return ruleset_fetch($repo, $last);
 		}
 		if ($opt{d}) {
 			print STDERR "Skipping version: $last\n";
@@ -178,81 +350,55 @@ sub fetch_latest_ruleset {
 	die "No $type ruleset found.\n";
 }
 
-sub usage {
-	my $rc = defined($$_[0]) ? $_[0] : 0;
-	my $msg = defined($_[1]) ? "\n$_[1]\n\n" : "";
+sub notify_email {
+	my $version_text = join("\n", map { "$_->[0] v$_->[1]".(defined($_->[3])?": $_->[3]":"") } @_);
+	my $from = $opt{f} ? "From: $opt{f}\n" : "";
+	my $body = << "EOT";
+ModSecurity rulesets updated and ready to install on host $HOST:
 
-	print STDERR << "EOT";
-${msg}Usage: $SCRIPT [options] [action]
+$version_text
 
- Options:
-  -r uri     Repository
-  -p path    Local path to use as base for downloads
-  -v version Full or partial version (EX: 1, 1.5, 1.5.2, 1.5.2-dev3)
-  -d         Print out lots of debugging
-  -h         This help
-
- Actions:
-  -S name    Fetch the latest stable ruleset, "name"
-  -D name    Fetch the latest development ruleset, "name"
-  -R name    Fetch the latest release candidate ruleset, "name"
-  -U name    Fetch the latest unstable (non-stable) ruleset, "name"
-  -F name    Fetch the latest ruleset, "name"
-  -l         Print listing of what is available
-
-Examples:
-
-# Get a list of what the repository contains:
-$SCRIPT -rhttp://host/repo/ -l
-
-# Get a partial list of versions 1.5.x:
-$SCRIPT -rhttp://host/repo/ -v1.5 -l
-
-# Get the latest stable version of "breach_ModSecurityCoreRules":
-$SCRIPT -rhttp://host/repo/ -p/my/repo -Sbreach_ModSecurityCoreRules
-
-# Get the latest stable 1.5 release of "breach_ModSecurityCoreRules":
-$SCRIPT -rhttp://host/repo/ -p/my/repo -v1.5 -Sbreach_ModSecurityCoreRules
+ModSecurity - http://www.modsecurity.org/
 EOT
-	exit $rc;
+
+	# TODO: Diffs
+
+	open(SM, "|-", @$SENDMAIL) or die "Failed to send mail: $!\n";
+	print STDERR "Sending notification email to: $opt{e}\n";
+	print SM << "EOT";
+${from}To: $opt{e}
+Subject: [$HOST] ModSecurity Ruleset Update Notification
+
+$body
+EOT
+	close SM;
 }
 
 ################################################################################
 ################################################################################
 
 # List what is there
-if ($opt{l}) {
-	print STDERR "\nRepository: $opt{r}\n\n";
-	repository_dump();
-	exit 0;
-}
-
+if ($opt{l}) { repository_dump(); exit 0 }
 # Latest stable
-if (defined($opt{S})) {
-	fetch_latest_ruleset($opt{S}, "");
-	exit 0;
-}
-
+elsif (defined($opt{S})) { ruleset_fetch_latest($opt{S}, "") }
 # Latest development
-if (defined($opt{D})) {
-	fetch_latest_ruleset($opt{D}, "dev");
-	exit 0;
-}
-
+elsif (defined($opt{D})) { ruleset_fetch_latest($opt{D}, "dev") }
 # Latest release candidate
-if (defined($opt{R})) {
-	fetch_latest_ruleset($opt{R}, "rc");
-	exit 0;
-}
-
+elsif (defined($opt{R})) { ruleset_fetch_latest($opt{R}, "rc") }
 # Latest unstable
-if (defined($opt{U})) {
-	fetch_latest_ruleset($opt{U}, "UNSTABLE");
-	exit 0;
+elsif (defined($opt{U})) { ruleset_fetch_latest($opt{U}, "UNSTABLE") }
+# Latest (any type)
+elsif (defined($opt{F})) { ruleset_fetch_latest($opt{F}, undef) }
+
+# Unpack
+if ($opt{u}) {
+	if (! defined $opt{s} ) { usage(1, "LocalRules is required for unpacking.") }
+	for (@fetched) {
+		ruleset_unpack($_);
+	}
 }
 
-# Latest (any type)
-if (defined($opt{F})) {
-	fetch_latest_ruleset($opt{F}, undef);
-	exit 0;
+# Unpack
+if ($opt{e}) {
+	notify_email(@fetched);
 }
