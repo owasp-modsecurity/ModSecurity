@@ -1585,11 +1585,8 @@ static void msre_perform_disruptive_actions(modsec_rec *msr, msre_rule *rule,
         }
     }
 
-    /* If "noauditlog" used do not mark the transaction for audit logging. */
-    if (actionset->auditlog == 0) {
-        msr->is_relevant = 0;
-    }
-    else {
+    /* If "noauditlog" used do not mark the transaction relevant. */
+    if (actionset->auditlog != 0) {
         msr->is_relevant++;
     }
 
