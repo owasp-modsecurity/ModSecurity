@@ -703,7 +703,9 @@ SecAuditLogStorageDir logs/audit
         <listitem>
           <para><literal moreinfo="none">K</literal> - This part contains a
           full list of every rule that matched (one per line) in the order
-          they were matched. Supported as of v2.5.0</para>
+          they were matched. The rules are fully qualified and will thus
+          show inherited actions and default operators.  Supported as of
+          v2.5.0</para>
         </listitem>
 
         <listitem>
