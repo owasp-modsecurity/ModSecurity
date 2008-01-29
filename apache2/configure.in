@@ -104,6 +104,7 @@ AC_ARG_WITH(httpd-src,
 [
   if test -n "$withval"; then
     CPPFLAGS="$CPPFLAGS -I$withval/srclib/pcre"
+    LDFLAGS="$LDFLAGS -L$withval/srclib/pcre"
     pcre_path="$withval/srclib/pcre"
     apr_path="$withval/srclib/apr"
     apu_path="$withval/srclib/apr-util"
@@ -217,6 +218,8 @@ done;
 
 save_CPPFLAGS=$CPPFLAGS
 CPPFLAGS="$APXS_INCLUDES $CPPFLAGS"
+save_LDFLAGS=$LDFLAGS
+LDFLAGS="$APXS_LDFLAGS $LDFLAGS"
 
 AC_SUBST(EXTRA_CFLAGS)
 AC_SUBST(MODSEC_EXTRA_CFLAGS)
