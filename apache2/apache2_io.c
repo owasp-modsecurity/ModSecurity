@@ -445,7 +445,7 @@ static int flatten_response_body(modsec_rec *msr) {
     msr->resbody_status = RESBODY_STATUS_READ_BRIGADE;
 
     if (msr->resbody_length + 1 <= 0) {
-        msr_log(msr, 1, "Output filter: Invalid response length: %lu", msr->resbody_length);
+        msr_log(msr, 1, "Output filter: Invalid response length: %" APR_SIZE_T_FMT, msr->resbody_length);
         return -1;
     }
 
