@@ -103,6 +103,7 @@ AC_ARG_WITH(httpd-src,
                             [PATH is to the Apache httpd source tree where srclib will be used as a base for pcre, apr and apu config scripts.])],
 [
   if test -n "$withval"; then
+    CPPFLAGS="$CPPFLAGS -I$withval/srclib/pcre"
     pcre_path="$withval/srclib/pcre"
     apr_path="$withval/srclib/apr"
     apu_path="$withval/srclib/apr-util"
@@ -216,7 +217,6 @@ done;
 
 save_CPPFLAGS=$CPPFLAGS
 CPPFLAGS="$APXS_INCLUDES $CPPFLAGS"
-CPPFLAGS=$save_CPPFLAGS
 
 AC_SUBST(EXTRA_CFLAGS)
 AC_SUBST(MODSEC_EXTRA_CFLAGS)
