@@ -202,6 +202,7 @@ AC_ARG_ENABLE(modsec-api,
 EXTRA_CFLAGS="-O2 -g -Wall -Werror"
 MODSEC_EXTRA_CFLAGS="$debug_conf $debug_cache $debug_acmp $perf_meas $modsec_api"
 
+APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""
 for f in $EXTRA_CFLAGS; do
     APXS_EXTRA_CFLAGS="$APXS_EXTRA_CFLAGS -Wc,$f"
@@ -220,6 +221,7 @@ CPPFLAGS=$save_CPPFLAGS
 AC_SUBST(EXTRA_CFLAGS)
 AC_SUBST(MODSEC_EXTRA_CFLAGS)
 AC_SUBST(APXS)
+AC_SUBST(APXS_WRAPPER)
 AC_SUBST(APXS_INCLUDES)
 AC_SUBST(APXS_EXTRA_CFLAGS)
 AC_SUBST(MODSEC_APXS_EXTRA_CFLAGS)
@@ -235,6 +237,7 @@ CHECK_LUA()
 CHECK_CURL()
 
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([build/apxs-wrapper], [chmod +x build/apxs-wrapper])
 if test -e "$PERL"; then
     AC_CONFIG_FILES([t/run-tests.pl], [chmod +x t/run-tests.pl])
 
