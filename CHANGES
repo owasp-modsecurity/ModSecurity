@@ -1,25 +1,25 @@
-24 Jan 2008 - 2.5.0-rc2
+29 Jan 2008 - 2.5.0-rc2
 -----------------------
 
- * Fixed removal of chained rules via ctl:ruleRemoveById.
+ * The default action is now a minimal "phase:2,log,pass" with no default
+   transformations performed.
 
  * Implemented SecUploadFileMode to allow setting the mode for uploaded files.
 
  * Implemented "block" action.
 
+ * Implemented SecRuleUpdateActionById.
+
+ * Fixed removal of chained rules via ctl:ruleRemoveById.
+
+ * Fixed removal of phase 5 rules via SecRuleRemoveBy* directives.
+
  * No longer log the query portion of the URI in the error log as
    it may contain sensitive data.
 
- * The default action is now a minimal "phase:2,log,pass" with no default
-   transformations performed.
-
- * Implemented SecRuleUpdateActionById.
-
  * Cleanup documentation.
 
- * Phase 5 rules can now be removed via SecRuleRemoveBy* directives.
-
- * Build is now 'configure' based (autotools).
+ * Build is now 'configure' based: ./configure && make && make install
 
 
 21 Dec 2007 - 2.5.0-rc1
