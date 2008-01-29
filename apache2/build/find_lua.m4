@@ -43,6 +43,41 @@ if test -n "${with_lua}"; then
     LDFLAGS=$save_LDFLAGS
 else
     AC_MSG_RESULT([no])
+
+    dnl Hack to just try to find the lib and include
+    AC_MSG_CHECKING([for lua install])
+    for x in ${test_paths}; do
+        if test -e "${x}/liblua5.1.so"; then
+            with_lua_lib="${x}"
+            break
+        elif test -e "${x}/lib/liblua5.1.so"; then
+            with_lua_lib="${x}"
+            break
+        else
+            with_lua_lib=""
+        fi
+    done
+    for x in ${test_paths}; do
+        if test -e "${x}/lua.h"; then
+            with_lua_inc="${x}"
+            break
+        elif test -e "${x}/include/lua.h"; then
+            with_lua_inc="${x}"
+            break
+        else
+            with_lua_inc=""
+        fi
+    done
+    if test -n "${with_lua_lib}" -a -n "${with_lua_inc}"; then
+        LUA_CONFIG=""
+        AC_MSG_RESULT([${with_lua_lib} ${with_lua_inc}])
+        LUA_CFLAGS="-I${with_lua_inc}"
+        LUA_LIBS="-L${with_lua_lib} -llua5.1"
+        CFLAGS=$save_CFLAGS
+        LDFLAGS=$save_LDFLAGS
+    else
+        AC_MSG_RESULT([no])
+    fi
 fi
 
 AC_SUBST(LUA_LIBS)
