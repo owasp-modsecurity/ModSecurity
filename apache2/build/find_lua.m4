@@ -51,7 +51,7 @@ else
             with_lua_lib="${x}"
             break
         elif test -e "${x}/lib/liblua5.1.so"; then
-            with_lua_lib="${x}"
+            with_lua_lib="${x}/lib"
             break
         else
             with_lua_lib=""
@@ -62,7 +62,7 @@ else
             with_lua_inc="${x}"
             break
         elif test -e "${x}/include/lua.h"; then
-            with_lua_inc="${x}"
+            with_lua_inc="${x}/include"
             break
         else
             with_lua_inc=""
