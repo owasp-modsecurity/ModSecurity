@@ -293,16 +293,24 @@
       <listitem>
         <para>Make sure you have <literal
         moreinfo="none">mod_unique_id</literal> installed.</para>
+
+        <para>mod_unique_id is packaged with Apache httpd.</para>
       </listitem>
 
       <listitem>
         <para>Install the latest version of libxml2, if it isn't already
         installed on the server.</para>
+
+        <para><ulink type=""
+        url="http://xmlsoft.org/downloads.html">http://xmlsoft.org/downloads.html</ulink></para>
       </listitem>
 
       <listitem>
         <para>Install the latest version of Lua in the 5.1.x branch, if it
         isn't already installed on the server.</para>
+
+        <para><ulink type=""
+        url="http://www.lua.org/download.html">http://www.lua.org/download.html</ulink></para>
       </listitem>
 
       <listitem>
@@ -703,8 +711,8 @@ SecAuditLogStorageDir logs/audit
         <listitem>
           <para><literal moreinfo="none">K</literal> - This part contains a
           full list of every rule that matched (one per line) in the order
-          they were matched. The rules are fully qualified and will thus
-          show inherited actions and default operators.  Supported as of
+          they were matched. The rules are fully qualified and will thus show
+          inherited actions and default operators. Supported as of
           v2.5.0</para>
         </listitem>
 
@@ -1120,7 +1128,8 @@ SecAuditLogStorageDir logs/audit
       disruptive actions are not allowed, but this can inadvertently be
       inherited using a disruptive action in SecDefaultAction.</para>
 
-      <para>The default value is minimal (differing from previous versions):</para>
+      <para>The default value is minimal (differing from previous
+      versions):</para>
 
       <programlisting format="linespecific">SecDefaultAction phase:2,log,pass</programlisting>
 
