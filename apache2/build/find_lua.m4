@@ -5,7 +5,7 @@ dnl  LUA_CFLAGS
 dnl  LUA_LIBS
 
 LUA_CONFIG="pkg-config"
-LUA_PKGNAME="lua5.1"
+LUA_PKGNAME="lua51"
 LUA_CFLAGS=""
 LUA_LIBS=""
 
@@ -47,14 +47,25 @@ else
     dnl Hack to just try to find the lib and include
     AC_MSG_CHECKING([for lua install])
     for x in ${test_paths}; do
-        if test -e "${x}/liblua5.1.so"; then
+        if test -e "${x}/liblua5.1.a"; then
             with_lua_lib="${x}"
+						lua_lib_name="lua5.1"
             break
-        elif test -e "${x}/lib/liblua5.1.so"; then
+        elif test -e "${x}/lib/liblua5.1.a"; then
             with_lua_lib="${x}/lib"
+						lua_lib_name="lua5.1"
+            break
+        elif test -e "${x}/liblua.a"; then
+            with_lua_lib="${x}"
+						lua_lib_name="lua"
+            break
+        elif test -e "${x}/lib/liblua.a"; then
+            with_lua_lib="${x}/lib"
+						lua_lib_name="lua"
             break
         else
             with_lua_lib=""
+						lua_lib_name=""
         fi
     done
     for x in ${test_paths}; do
@@ -72,7 +83,7 @@ else
         LUA_CONFIG=""
         AC_MSG_RESULT([${with_lua_lib} ${with_lua_inc}])
         LUA_CFLAGS="-I${with_lua_inc}"
-        LUA_LIBS="-L${with_lua_lib} -llua5.1"
+        LUA_LIBS="-L${with_lua_lib} -l${lua_lib_name}"
         CFLAGS=$save_CFLAGS
         LDFLAGS=$save_LDFLAGS
     else

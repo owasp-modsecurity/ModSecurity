@@ -23,7 +23,7 @@ AC_ARG_WITH(
 
 dnl # Determine apu lib directory
 if test -z "${apu_path}"; then
-    test_paths="/usr/local /usr"
+    test_paths="/usr/local/apu /usr/local/apr-util /usr/local /usr"
 else
     test_paths="${apu_path}"
 fi

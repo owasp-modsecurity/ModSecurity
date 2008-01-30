@@ -23,7 +23,7 @@ AC_ARG_WITH(
 
 dnl # Determine apr lib directory
 if test -z "${apr_path}"; then
-    test_paths="/usr/local /usr"
+    test_paths="/usr/local/apr /usr/local /usr"
 else
     test_paths="${apr_path}"
 fi
@@ -41,6 +41,9 @@ for x in ${test_paths}; do
             with_apr=""
         fi
     done
+		if test -n "$with_apr"; then
+		    break
+		fi
 done
 if test -n "${with_apr}"; then
     APR_CONFIG="${with_apr}/${APR_CONFIG}"

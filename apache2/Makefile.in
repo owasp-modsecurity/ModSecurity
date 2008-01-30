@@ -44,8 +44,8 @@ APU_LDFLAGS = @APU_LDFLAGS@
 APU_LIBS = @APU_LIBS@
 APU_LINK_LD = @APU_LINK_LD@
 
-CPPFLAGS = @CPPFLAGS@ $(PCRE_CFLAGS) $(LIBXML_CFLAGS) $(LUA_CFLAGS)
-LIBS = $(PCRE_LIBS) $(LIBXML_LIBS) $(LUA_LIBS)
+CPPFLAGS = @CPPFLAGS@ $(PCRE_CFLAGS) $(LIBXML_CFLAGS) $(LUA_CFLAGS) 
+LIBS = @LIBS@ $(PCRE_LIBS) $(LIBXML_LIBS) $(LUA_LIBS)
 LDFLAGS = @LDFLAGS@
 
 COMPILE_APACHE_MOD = $(APXS_WRAPPER) -c $(CPPFLAGS) $(LDFLAGS) $(LIBS)
@@ -58,9 +58,11 @@ install: install-mods
 
 clean-extras:
 	@for dir in mlogc-src; do \
-	  test -e $$dir && $(MAKE) -C $$dir clean; \
-	done; \
-	rm -rf ../tools/mlogc ../tools/mlogc-static
+	  if test -d $$dir; then \
+			$(MAKE) -C $$dir clean; \
+		fi; \
+	done
+	@rm -rf ../tools/mlogc ../tools/mlogc-static
 
 clean: clean-extras
 	@rm -rf *.la *.lo *.o *.slo .libs msc_test
