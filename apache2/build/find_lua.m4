@@ -5,7 +5,7 @@ dnl  LUA_CFLAGS
 dnl  LUA_LIBS
 
 LUA_CONFIG="pkg-config"
-LUA_PKGNAME="lua51"
+LUA_PKGNAME="lua5.1"
 LUA_CFLAGS=""
 LUA_LIBS=""
 
