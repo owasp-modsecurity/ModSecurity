@@ -952,7 +952,7 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
-      <title><literal>SecContentInjection (Experimental)</literal></title>
+      <title><literal>SecContentInjection</literal></title>
 
       <para><emphasis>Description:</emphasis> Enables content injection using
       actions <literal>append</literal> and <literal>prepend</literal>.</para>
@@ -1235,7 +1235,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
     </section>
 
     <section>
-      <title><literal>SecPdfProtect</literal> (Experimental)</title>
+      <title><literal>SecPdfProtect</literal></title>
 
       <para><emphasis>Description:</emphasis> Enables the PDF XSS protection
       functionality. Once enabled access to PDF files is tracked. Direct
@@ -1248,7 +1248,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
     </section>
 
     <section>
-      <title><literal>SecPdfProtectMethod</literal> (Experimental)</title>
+      <title><literal>SecPdfProtectMethod</literal></title>
 
       <para><emphasis>Description:</emphasis> Configure desired protection
       method to be used when requests for PDF files are detected. Possible
@@ -1266,7 +1266,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
     </section>
 
     <section>
-      <title><literal>SecPdfProtectSecret</literal> (Experimental)</title>
+      <title><literal>SecPdfProtectSecret</literal></title>
 
       <para><emphasis>Description:</emphasis> Defines the secret that will be
       used to construct one-time tokens. You should use a reasonably long
@@ -1278,7 +1278,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
     </section>
 
     <section>
-      <title><literal>SecPdfProtectTimeout</literal> (Experimental)</title>
+      <title><literal>SecPdfProtectTimeout</literal></title>
 
       <para><emphasis>Description:</emphasis> Defines the token timeout. After
       token expires it can no longer be used to allow access to PDF file.
@@ -1289,7 +1289,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
     </section>
 
     <section>
-      <title><literal>SecPdfProtectTokenName</literal> (Experimental)</title>
+      <title><literal>SecPdfProtectTokenName</literal></title>
 
       <para><emphasis>Description:</emphasis> Defines the name of the token.
       The only reason you would want to change the name of the token is if you
@@ -3791,7 +3791,7 @@ SecAction phase:3,allow</programlisting>
     </section>
 
     <section>
-      <title>append (Experimental)</title>
+      <title>append</title>
 
       <para><emphasis>Description:</emphasis> Appends text given as parameter
       to the end of response body. For this action to work content injection
@@ -4482,7 +4482,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
     </section>
 
     <section>
-      <title>prepend (Experimental)</title>
+      <title>prepend</title>
 
       <para><emphasis>Description:</emphasis> Prepends text given as parameter
       to the response body. For this action to work content injection must be
