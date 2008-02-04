@@ -216,7 +216,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
             /* Check request body limit (should only trigger on chunked requests). */
             if (msr->reqbody_length + buflen > (apr_size_t)msr->txcfg->reqbody_limit) {
                 *error_msg = apr_psprintf(msr->mp, "Requests body is larger than the "
-                    "configured limit (%lu).", msr->txcfg->reqbody_limit);
+                    "configured limit (%ld).", msr->txcfg->reqbody_limit);
                 return -5;
             }
 
@@ -225,7 +225,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                 if (rcbs < 0) {
                     if (rcbs == -5) {
                         *error_msg = apr_psprintf(msr->mp, "Requests body no files data length is larger than the "
-                            "configured limit (%lu).", msr->txcfg->reqbody_no_files_limit);
+                            "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
                         return -5;
                     }
 
@@ -378,7 +378,7 @@ static apr_status_t output_filter_init(modsec_rec *msr, ap_filter_t *f,
         }
 
         if (len > msr->txcfg->of_limit) {
-            msr_log(msr, 1, "Output filter: Content-Length (%s) over the limit (%lu).",
+            msr_log(msr, 1, "Output filter: Content-Length (%s) over the limit (%ld).",
                 log_escape_nq(r->pool, (char *)s_content_length), msr->txcfg->of_limit);
             return -2; /* Over the limit. */
         }
@@ -621,7 +621,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                  */
                 if (msr->txcfg->of_limit_action == RESPONSE_BODY_LIMIT_ACTION_REJECT) {
                     /* Reject response. */
-                    msr_log(msr, 1, "Output filter: Response body too large (over limit of %lu, "
+                    msr_log(msr, 1, "Output filter: Response body too large (over limit of %ld, "
                         "total not specified).", msr->txcfg->of_limit);
 
                     msr->of_status = OF_STATUS_COMPLETE;
@@ -635,7 +635,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                     msr->resbody_length = msr->txcfg->of_limit;
 
                     if (msr->txcfg->debuglog_level >= 4) {
-                        msr_log(msr, 4, "Output filter: Processing partial response body (limit %lu)",
+                        msr_log(msr, 4, "Output filter: Processing partial response body (limit %ld)",
                             msr->txcfg->of_limit);
                     }
                 }

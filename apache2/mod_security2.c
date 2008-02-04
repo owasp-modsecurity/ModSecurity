@@ -565,7 +565,7 @@ static int hook_request_early(request_rec *r) {
     /* Check request body limit (should only trigger on non-chunked requests). */
     if (msr->request_content_length > msr->txcfg->reqbody_limit) {
         msr_log(msr, 1, "Request body is larger than the "
-                     "configured limit (%lu).", msr->txcfg->reqbody_limit);
+                     "configured limit (%ld).", msr->txcfg->reqbody_limit);
         return HTTP_REQUEST_ENTITY_TOO_LARGE;
     }
 
