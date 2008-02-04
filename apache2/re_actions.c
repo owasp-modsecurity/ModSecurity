@@ -1006,6 +1006,7 @@ static apr_status_t msre_action_setenv_execute(modsec_rec *msr, apr_pool_t *mptm
     char *data = apr_pstrdup(mptmp, action->param);
     char *env_name = NULL, *env_value = NULL;
     char *s = NULL;
+    msc_string *env = NULL;
 
     /* Extract the name and the value. */
     /* IMP1 We have a function for this now, parse_name_eq_value? */
@@ -1019,13 +1020,53 @@ static apr_status_t msre_action_setenv_execute(modsec_rec *msr, apr_pool_t *mptm
         *s = '\0';
     }
 
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Setting env enviable: %s=%s", env_name, env_value);
+    }
+
+    /* Expand and escape any macros in the name */
+    env = apr_palloc(msr->mp, sizeof(msc_string));
+    if (env == NULL) {
+        msr_log(msr, 1, "Failed to allocate space to expand name macros");
+        return -1;
+    }
+    env->value = env_name;
+    env->value_len = strlen(env->value);
+    expand_macros(msr, env, rule, mptmp);
+    env_name = log_escape_ex(msr->mp, env->value, env->value_len);
+
     /* Execute the requested action. */
     if (env_name[0] == '!') {
         /* Delete */
         apr_table_unset(msr->r->subprocess_env, env_name + 1);
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Unset env variable \"%s\".", env_name);
+        }
     } else {
         /* Set */
-        apr_table_set(msr->r->subprocess_env, env_name, env_value);
+        char * val_value = NULL;
+        msc_string *val = apr_palloc(msr->mp, sizeof(msc_string));
+        if (val == NULL) {
+            msr_log(msr, 1, "Failed to allocate space to expand value macros");
+            return -1;
+        }
+
+        /* Expand values in value */
+        val->value = env_value;
+        val->value_len = strlen(val->value);
+        expand_macros(msr, val, rule, mptmp);
+
+        /* To be safe, we escape the value as it goes in subprocess_env. */
+        val_value = log_escape_ex(msr->mp, val->value, val->value_len);
+
+        apr_table_set(msr->r->subprocess_env, env_name, val_value);
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Set env variable \"%s\" to \"%s\".",
+                env_name,
+                log_escape(mptmp, val_value));
+        }
     }
 
     return 1;
