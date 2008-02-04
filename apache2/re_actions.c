@@ -850,9 +850,34 @@ static apr_status_t msre_action_setenv_execute(modsec_rec *msr, apr_pool_t *mptm
     if (env_name[0] == '!') {
         /* Delete */
         apr_table_unset(msr->r->subprocess_env, env_name + 1);
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Unset env variable \"%s\".", env_name);
+        }
     } else {
         /* Set */
-        apr_table_set(msr->r->subprocess_env, env_name, env_value);
+        char * val_value = NULL;
+        msc_string *val = apr_palloc(msr->mp, sizeof(msc_string));
+        if (val == NULL) {
+            msr_log(msr, 1, "Failed to allocate space to expand value macros");
+            return -1;
+        }
+
+        /* Expand values in value */
+        val->value = env_value;
+        val->value_len = strlen(val->value);
+        expand_macros(msr, val, rule, mptmp);
+
+        /* To be safe, we escape the value as it goes in subprocess_env. */
+        val_value = log_escape_ex(msr->mp, val->value, val->value_len);
+
+        apr_table_set(msr->r->subprocess_env, env_name, val_value);
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Set env variable \"%s\" to \"%s\".",
+                env_name,
+                log_escape(mptmp, val_value));
+        }
     }
 
     return 1;
