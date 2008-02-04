@@ -137,6 +137,13 @@ static apr_array_header_t *resolve_tfns(lua_State *L, int idx, modsec_rec *msr, 
         for(i = 1; i <= n; i++) {
             lua_rawgeti(L, idx, i);
             name = (char *)luaL_checkstring(L, -1);
+
+            /* A "none" means start over */
+            if (strcmp("none", name) == 0) {
+                tfn_arr->nelts = 0;
+                continue;
+            }
+
             tfn = msre_engine_tfn_resolve(msr->modsecurity->msre, name);
             if (tfn == NULL) {
                 msr_log(msr, 1, "SecRuleScript: Invalid transformation function: %s", name);
@@ -146,11 +153,18 @@ static apr_array_header_t *resolve_tfns(lua_State *L, int idx, modsec_rec *msr, 
         }
     } else if (lua_isstring(L, idx)) { /* The second parameter may be a simple string? */
         name = (char *)luaL_checkstring(L, idx);
-        tfn = msre_engine_tfn_resolve(msr->modsecurity->msre, name);
-        if (tfn == NULL) {
-            msr_log(msr, 1, "SecRuleScript: Invalid transformation function: %s", name);
-        } else {
-            *(msre_tfn_metadata **)apr_array_push(tfn_arr) = tfn;
+
+        /* A "none" means start over */
+        if (strcmp("none", name) == 0) {
+            tfn_arr->nelts = 0;
+        }
+        else {
+            tfn = msre_engine_tfn_resolve(msr->modsecurity->msre, name);
+            if (tfn == NULL) {
+                msr_log(msr, 1, "SecRuleScript: Invalid transformation function: %s", name);
+            } else {
+                *(msre_tfn_metadata **)apr_array_push(tfn_arr) = tfn;
+            }
         }
     } else {
         msr_log(msr, 1, "SecRuleScript: Transformation parameter must be a transformation name or array of transformation names.");
