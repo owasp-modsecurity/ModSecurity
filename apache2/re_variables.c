@@ -229,6 +229,9 @@ static int var_rule_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
 /* ENV */
 
 static char *var_env_validate(msre_ruleset *ruleset, msre_var *var) {
+    if (var->param == NULL) {
+        return apr_psprintf(ruleset->mp, "Parameter required for ENV.");
+    }
     if ((strlen(var->param) > 2)&&(var->param[0] == '/')
         &&(var->param[strlen(var->param) - 1] == '/'))
     {
