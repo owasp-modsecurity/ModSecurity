@@ -1794,7 +1794,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
         const char *expnames = NULL;
 
         arr = apr_table_elts(tartab);
-        if (arr->nelts > 0) {
+        if (arr->nelts > 1) {
             te = (apr_table_entry_t *)arr->elts;
             expnames = apr_pstrdup(mptmp, ((msre_var *)te[0].val)->name);
             for(i = 1; i < arr->nelts; i++) {
