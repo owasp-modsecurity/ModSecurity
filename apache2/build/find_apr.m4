@@ -30,7 +30,7 @@ fi
 
 AC_MSG_CHECKING([for libapr config script])
 for x in ${test_paths}; do
-    for APR_CONFIG in apr-config apr-1-config; do
+    for APR_CONFIG in apr-1-config apr-config; do
         if test -e "${x}/bin/${APR_CONFIG}"; then
             with_apr="${x}/bin"
             break
@@ -41,9 +41,9 @@ for x in ${test_paths}; do
             with_apr=""
         fi
     done
-		if test -n "$with_apr"; then
-		    break
-		fi
+    if test -n "$with_apr"; then
+        break
+    fi
 done
 if test -n "${with_apr}"; then
     APR_CONFIG="${with_apr}/${APR_CONFIG}"

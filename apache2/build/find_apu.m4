@@ -6,7 +6,7 @@ dnl  APU_LDFLAGS
 dnl  APU_LIBS
 dnl  APU_LINK_LD
 
-APU_CONFIG="apu-1-config"
+APU_CONFIG=""
 APU_CFLAGS=""
 APU_LDFLAGS=""
 APU_LIBS=""
@@ -30,14 +30,19 @@ fi
 
 AC_MSG_CHECKING([for libapr-util config script])
 for x in ${test_paths}; do
-    if test -e "${x}/bin/${APU_CONFIG}"; then
-        with_apu="${x}/bin"
+    for APU_CONFIG in apu-1-config apu-config; do
+        if test -e "${x}/bin/${APU_CONFIG}"; then
+            with_apu="${x}/bin"
+            break
+        elif test -e "${x}/${APU_CONFIG}"; then
+            with_apu="${x}"
+            break
+        else
+            with_apu=""
+        fi
+    done
+    if test -n "$with_apu"; then
         break
-    elif test -e "${x}/${APU_CONFIG}"; then
-        with_apu="${x}"
-        break
-    else
-        with_apu=""
     fi
 done
 if test -n "${with_apu}"; then
