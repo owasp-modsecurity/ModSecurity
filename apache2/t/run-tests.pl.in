@@ -76,6 +76,7 @@ sub runfile {
 		my $out;
 		my $test_in = new FileHandle();
 		my $test_out = new FileHandle();
+		my $test_pid;
 		my $rc = 0;
 		my $param;
 
@@ -91,11 +92,12 @@ sub runfile {
 
 		@test = ($t{type}, $t{name}, $param, (exists($t{ret}) ? ($t{ret}) : ()));
 		$teststr = "$TEST " . join(" ", map { "\"$_\"" } @test);
-		open2($test_out, $test_in, $TEST, @test) or quit(1, "Failed to execute test: $teststr\": $!");
+		$test_pid = open2($test_out, $test_in, $TEST, @test) or quit(1, "Failed to execute test: $teststr\": $!");
 		print $test_in "$in";
 		close $test_in;
 		$out = join("\\n", split(/\n/, <$test_out>));
 		close $test_out;
+		waitpid($test_pid, 0);
 
 		$rc = $?;
 		if ( WIFEXITED($rc) ) {
