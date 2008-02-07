@@ -10,6 +10,8 @@
 use strict;
 use POSIX qw(WIFEXITED WEXITSTATUS WIFSIGNALED WTERMSIG);
 use File::Basename qw(basename dirname);
+use FileHandle;
+use IPC::Open2 qw(open2);
 
 my @TYPES = qw(tfn op);
 my $TEST = "./msc_test";
@@ -71,6 +73,9 @@ sub runfile {
 		my %t = %{$t || {}};
 		my $id = sprintf("%6d", $n);
 		my $in = $t{input};
+		my $out;
+		my $test_in = new FileHandle();
+		my $test_out = new FileHandle();
 		my $rc = 0;
 		my $param;
 
@@ -86,9 +91,11 @@ sub runfile {
 
 		@test = ($t{type}, $t{name}, $param, (exists($t{ret}) ? ($t{ret}) : ()));
 		$teststr = "$TEST " . join(" ", map { "\"$_\"" } @test);
-		open(TEST, "|-", $TEST, @test) or quit(1, "Failed to execute test: $teststr\": $!");
-		print TEST "$in";
-		close TEST;
+		open2($test_out, $test_in, $TEST, @test) or quit(1, "Failed to execute test: $teststr\": $!");
+		print $test_in "$in";
+		close $test_in;
+		$out = join("\\n", split(/\n/, <$test_out>));
+		close $test_out;
 
 		$rc = $?;
 		if ( WIFEXITED($rc) ) {
@@ -108,7 +115,7 @@ sub runfile {
 			$pass++;
 		}
 
-		msg(sprintf("%s) %s \"%s\": %s", $id, $t{type}, $t{name}, ($rc ? "failed" : "passed")));
+		msg(sprintf("%s) %s \"%s\": %s%s", $id, $t{type}, $t{name}, ($rc ? "failed" : "passed"), ((defined($out) && $out ne "")? " ($out)" : "")));
 		
 	}
 

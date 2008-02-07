@@ -48,6 +48,29 @@ char *get_apr_error(apr_pool_t *p, apr_status_t rc) {
 }
 
 void msr_log(modsec_rec *msr, int level, const char *text, ...) {
+    va_list ap;
+    char str1[1024] = "";
+    char str2[1256] = "";
+
+    if ((msr == NULL) || (level > msr->txcfg->debuglog_level)) {
+        return;
+    }
+    if (msr->txcfg->debuglog_fd == NOT_SET_P) {
+        if (apr_file_open(&msr->txcfg->debuglog_fd, msr->txcfg->debuglog_name, APR_READ|APR_WRITE|APR_CREATE|APR_APPEND|APR_BINARY, APR_OS_DEFAULT, g_mp) != APR_SUCCESS) {
+            fprintf(stderr, "ERROR: failed to create unit test debug log \"%s\".\n", msr->txcfg->debuglog_name);
+            msr->txcfg->debuglog_fd = NULL;
+        }
+    }
+
+    va_start(ap, text);
+    if (msr->txcfg->debuglog_fd != NULL) {
+        apr_size_t nbytes_written = 0;
+        apr_vsnprintf(str1, sizeof(str1), text, ap);
+        apr_snprintf(str2, sizeof(str2), "[%d] %s\n", level, str1);
+
+        apr_file_write_full(msr->txcfg->debuglog_fd, str2, strlen(str2), &nbytes_written);
+    }
+    va_end(ap);
 }
 
 const char *ap_get_remote_host(conn_rec *conn, void *dir_config, int type, int *str_is_ip) {
@@ -121,11 +144,11 @@ static char *escape(unsigned char *str, apr_size_t *len)
 
 /* Testing functions */
 
-static int test_tfn(const char *name, unsigned char *input, apr_size_t input_len, unsigned char **rval, apr_size_t *rval_len, char **errmsg) 
+static int test_tfn(const char *name, unsigned char *input, apr_size_t input_len, unsigned char **rval, apr_size_t *rval_len, char **errmsg)
 {
     int rc = -1;
     msre_tfn_metadata *metadata = NULL;
-    
+
     *errmsg = NULL;
 
     /* Lookup the tfn */
@@ -145,9 +168,10 @@ static int test_tfn(const char *name, unsigned char *input, apr_size_t input_len
     return rc;
 }
 
-static int test_op(const char *name, const char *param, const unsigned char *input, apr_size_t input_len, char **errmsg) 
+static int test_op(const char *name, const char *param, const unsigned char *input, apr_size_t input_len, char **errmsg)
 {
     const char *args = apr_psprintf(g_mp, "@%s %s", name, param);
+    char *conf_fn;
     msre_ruleset *ruleset = NULL;
     msre_rule *rule = NULL;
     msre_var *var = NULL;
@@ -155,6 +179,11 @@ static int test_op(const char *name, const char *param, const unsigned char *inp
     int rc = -1;
 
     *errmsg = NULL;
+
+    if ( apr_filepath_merge(&conf_fn, NULL, "t/unit-test.conf", APR_FILEPATH_TRUENAME, g_mp) != APR_SUCCESS) {
+        *errmsg = apr_psprintf(g_mp, "Failed to build a conf filename.");
+        return -1;
+    }
 
     /* Register UNIT_TEST variable */
     msre_engine_variable_register(modsecurity->msre,
@@ -180,7 +209,7 @@ static int test_op(const char *name, const char *param, const unsigned char *inp
         *errmsg = apr_psprintf(g_mp, "Failed to create ruleset for op \"%s\".", name);
         return -1;
     }
-    rule = msre_rule_create(ruleset, RULE_TYPE_NORMAL, "unit-test", 1, "UNIT_TEST", args, "t:none,pass,nolog", errmsg);
+    rule = msre_rule_create(ruleset, RULE_TYPE_NORMAL, conf_fn, 1, "UNIT_TEST", args, "t:none,pass,nolog", errmsg);
     if (rule == NULL) {
         *errmsg = apr_psprintf(g_mp, "Failed to create rule for op \"%s\": %s", name, *errmsg);
         return -1;
@@ -205,7 +234,7 @@ static int test_op(const char *name, const char *param, const unsigned char *inp
             return rc;
         }
     }
-    
+
     /* Execute the operator */
     if (metadata->execute != NULL) {
         rc = metadata->execute(g_msr, rule, var, errmsg);
@@ -233,9 +262,9 @@ static void init_msr() {
     dcfg->resbody_access = 0;
     dcfg->of_limit = RESPONSE_BODY_DEFAULT_LIMIT;
     dcfg->of_limit_action = RESPONSE_BODY_LIMIT_ACTION_REJECT;
-    dcfg->debuglog_fd = NULL;
-    dcfg->debuglog_name = NULL;
-    dcfg->debuglog_level = 0;
+    dcfg->debuglog_fd = NOT_SET_P;
+    dcfg->debuglog_name = "msc-test-debug.log";
+    dcfg->debuglog_level = 9;
     dcfg->cookie_format = 0;
     dcfg->argument_separator = '&';
     dcfg->rule_inheritance = 0;
@@ -266,7 +295,6 @@ static void init_msr() {
     dcfg->cache_trans_min = 15;
     dcfg->cache_trans_max = 0;
     dcfg->request_encoding = NULL;
-    dcfg->debuglog_level = 0;
 
     g_msr = (modsec_rec *)apr_pcalloc(g_mp, sizeof(modsec_rec));
     g_msr->modsecurity = modsecurity;
@@ -398,7 +426,7 @@ int main(int argc, const char * const argv[])
     else if (strcmp("op", type) == 0) {
         /* Operators */
         int ret = 0;
-        
+
         if (!returnval) {
             fprintf(stderr, "Return value required for type \"%s\"\n", type);
             exit(1);
@@ -434,6 +462,8 @@ int main(int argc, const char * const argv[])
         fprintf(stderr, "Unknown type: \"%s\"\n", type);
         exit(1);
     }
+
+    fprintf(stdout, "%s\n", errmsg ? errmsg : "");
 
     return 0;
 }
