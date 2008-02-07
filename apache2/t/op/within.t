@@ -4,14 +4,14 @@
 	name => "within",
 	param => "",
 	input => "",
-	ret => 0,
+	ret => 1,
 },
 {
 	type => "op",
 	name => "within",
 	param => "TestCase",
 	input => "",
-	ret => 0,
+	ret => 1,
 },
 {
 	type => "op",

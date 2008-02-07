@@ -4,7 +4,7 @@
 	name => "containsWord",
 	param => "",
 	input => "",
-	ret => 0,
+	ret => 1,
 },
 {
 	type => "op",
@@ -18,7 +18,7 @@
 	name => "containsWord",
 	param => "",
 	input => "TestCase",
-	ret => 0,
+	ret => 1,
 },
 
 ### General

@@ -409,8 +409,17 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
     target = var->value;
     target_length = var->value_len;
 
-    /* These are impossible to match */
-    if ((match_length == 0) || (target_length > match_length)) {
+    /* The empty string always matches */
+    if (target_length == 0) {
+        /* Match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"\" within \"%s\" at %s.",
+                        log_escape_ex(msr->mp, match, match_length),
+                        var->name);
+        return 1;
+    }
+
+    /* This is impossible to match */
+    if (target_length > match_length) {
         /* No match. */
         return 0;
     }
@@ -424,10 +433,10 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
         if (match[i] == target[0]) {
             if (memcmp((target + 1), (match + i + 1), (target_length - 1)) == 0) {
                 /* match. */
-                *error_msg = apr_psprintf(msr->mp, "String match %s=\"%s\" within \"%s\".",
-                                var->name,
+                *error_msg = apr_psprintf(msr->mp, "String match \"%s\" within \"%s\" at %s.",
                                 log_escape_ex(msr->mp, target, target_length),
-                                log_escape_ex(msr->mp, match, match_length));
+                                log_escape_ex(msr->mp, match, match_length),
+                                var->name);
                 return 1;
             }
         }
@@ -475,8 +484,15 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         target_length = var->value_len;
     }
 
-    /* These are impossible to match */
-    if ((match_length == 0) || (match_length > target_length)) {
+    /* The empty string always matches */
+    if (match_length == 0) {
+        /* Match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"\" at %s.", var->name);
+        return 1;
+    }
+
+    /* This is impossible to match */
+    if (match_length > target_length) {
         /* No match. */
         return 0;
     }
@@ -539,8 +555,15 @@ static int msre_op_containsWord_execute(modsec_rec *msr, msre_rule *rule, msre_v
         target_length = var->value_len;
     }
 
-    /* These are impossible to match */
-    if ((match_length == 0) || (match_length > target_length)) {
+    /* The empty string always matches */
+    if (match_length == 0) {
+        /* Match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"\" at %s.", var->name);
+        return 1;
+    }
+
+    /* This is impossible to match */
+    if (match_length > target_length) {
         /* No match. */
         return 0;
     }
