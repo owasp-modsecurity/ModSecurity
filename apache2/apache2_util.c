@@ -318,7 +318,7 @@ char *format_error_log_message(apr_pool_t *mp, error_message *em) {
             log_escape(mp, (char *)em->file));
         if (s_file == NULL) return NULL;
     }
-    
+
     if (em->line > 0) {
         s_line = apr_psprintf(mp, "[line %d] ", em->line);
         if (s_line == NULL) return NULL;

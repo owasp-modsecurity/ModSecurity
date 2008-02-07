@@ -27,7 +27,7 @@ static const char* dump_reader(lua_State* L, void* user_data, size_t* size) {
     /* Get one chunk. */
     msc_script_part *part = ((msc_script_part **)dumpr->script->parts->elts)[dumpr->index];
     *size = part->len;
-    
+
     dumpr->index++;
 
     return part->data;
@@ -88,8 +88,8 @@ char *lua_compile(msc_script **script, const char *filename, apr_pool_t *pool) {
 
     (*script) = apr_pcalloc(pool, sizeof(msc_script));
     (*script)->name = filename;
-    (*script)->parts = dump.parts;        
-    
+    (*script)->parts = dump.parts;
+
     /* Destroy state. */
     lua_close(L);
 
@@ -103,7 +103,7 @@ static int l_log(lua_State *L) {
     modsec_rec *msr = NULL;
     const char *text;
     int level;
-    
+
     /* Retrieve parameters. */
     level = luaL_checknumber(L, 1);
     text = luaL_checkstring(L, 2);
@@ -211,7 +211,7 @@ static int l_getvar(lua_State *L) {
 
     if (var == NULL) {
         msr_log(msr, 1, "%s", my_error_msg);
-        
+
         lua_pushnil(L);
 
         return 0;
@@ -229,7 +229,7 @@ static int l_getvar(lua_State *L) {
     }
 
     /* Return variable value. */
-    lua_pushlstring(L, vx->value, vx->value_len);            
+    lua_pushlstring(L, vx->value, vx->value_len);
 
     return 1;
 }
@@ -304,7 +304,7 @@ static int l_getvars(lua_State *L) {
         lua_pushlstring(L, var->value, var->value_len);
         lua_settable(L, -3);
 
-        lua_settable(L, -3); /* Push one parameter into the results table. */    
+        lua_settable(L, -3); /* Push one parameter into the results table. */
     }
 
     return 1;

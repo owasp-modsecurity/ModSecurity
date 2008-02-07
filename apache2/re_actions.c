@@ -62,7 +62,7 @@ msre_var *generate_single_var(modsec_rec *msr, msre_var *var, apr_array_header_t
 
     rvar = (msre_var *)te[0].val;
 
-    /* Return straight away if there were no 
+    /* Return straight away if there were no
      * transformation functions supplied.
      */
     if ((tfn_arr == NULL)||(tfn_arr->nelts == 0)) {
@@ -84,7 +84,7 @@ msre_var *generate_single_var(modsec_rec *msr, msre_var *var, apr_array_header_t
 
         rvar->value = rval;
         rvar->value_len = rval_len;
-    
+
         if (msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "T (%d) %s: \"%s\"", rc, tfn->name,
                 log_escape_nq_ex(mptmp, rvar->value, rvar->value_len));
@@ -113,7 +113,7 @@ apr_table_t *generate_multi_var(modsec_rec *msr, msre_var *var, apr_array_header
     vartab = apr_table_make(mptmp, 16);
     var->metadata->generate(msr, var, rule, vartab, mptmp);
 
-    /* Return straight away if there were no 
+    /* Return straight away if there were no
      * transformation functions supplied.
      */
     if ((tfn_arr == NULL)||(tfn_arr->nelts == 0)) {
@@ -142,7 +142,7 @@ apr_table_t *generate_multi_var(modsec_rec *msr, msre_var *var, apr_array_header
 
             rvar->value = rval;
             rvar->value_len = rval_len;
-    
+
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "T (%d) %s: \"%s\"", rc, tfn->name,
                     log_escape_nq_ex(mptmp, rvar->value, rvar->value_len));
@@ -459,7 +459,7 @@ static apr_status_t msre_action_redirect_execute(modsec_rec *msr, apr_pool_t *mp
     expand_macros(msr, var, rule, mptmp);
 
     rule->actionset->intercept_uri = apr_pstrmemdup(msr->mp, var->value, var->value_len);
-    
+
     return 1;
 }
 
@@ -491,7 +491,7 @@ static apr_status_t msre_action_proxy_execute(modsec_rec *msr, apr_pool_t *mptmp
     expand_macros(msr, var, rule, mptmp);
 
     rule->actionset->intercept_uri = apr_pstrmemdup(msr->mp, var->value, var->value_len);
-    
+
     return 1;
 }
 
@@ -858,7 +858,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         /* Should never happen, but log if it does. */
         msr_log(msr, 1, "Internal Error: Unknown ctl action \"%s\".", name);
         return -1;
-    }    
+    }
 }
 
 /* xmlns */
@@ -1126,8 +1126,8 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
     target_col = msr->tx_vars;
     s = strstr(var_name, ".");
     if (s == NULL) {
-        msr_log(msr, 3, "Asked to set variable \"%s\", but no collection name specified. ", 
-            log_escape(msr->mp, var_name)); 
+        msr_log(msr, 3, "Asked to set variable \"%s\", but no collection name specified. ",
+            log_escape(msr->mp, var_name));
          return 0;
     }
     col_name = var_name;
@@ -1144,7 +1144,7 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
                 log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
             return 0;
         }
-    }        
+    }
 
     if (is_negated) {
         /* Unset variable. */
@@ -1398,7 +1398,7 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
             log_escape(msr->mp, col_name), log_escape(msr->mp, var_name), current_value,
             new_value, (apr_time_t)(current_time - last_update_time));
     }
-    
+
     return 1;
 }
 
@@ -1425,7 +1425,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         msr_log(msr, 4, "Creating collection (name \"%s\", key \"%s\").",
             real_col_name, col_key);
 
-        table = apr_table_make(msr->mp, 24);    
+        table = apr_table_make(msr->mp, 24);
 
         /* IMP1 Is the timeout hard-coded to 3600? */
 
@@ -1523,7 +1523,7 @@ static apr_status_t msre_action_initcol_execute(modsec_rec *msr, apr_pool_t *mpt
     char *data = apr_pstrdup(msr->mp, action->param);
     char *col_name = NULL, *col_key = NULL;
     unsigned int col_key_len;
-    
+
     msc_string *var = NULL;
     char *s = NULL;
 
@@ -1850,7 +1850,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         NULL,
         msre_action_drop_init,
         NULL
-    );    
+    );
 
     /* pause */
     msre_engine_action_register(engine,
@@ -1864,7 +1864,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         msre_action_pause_init,
         NULL
     );
-        
+
     /* redirect */
     msre_engine_action_register(engine,
         "redirect",
@@ -2111,7 +2111,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         NULL,
         msre_action_deprecatevar_execute
     );
-    
+
     /* initcol */
     msre_engine_action_register(engine,
         "initcol",

@@ -103,7 +103,7 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
             dbm_filename), get_apr_error(msr->mp, rc));
         return NULL;
     }
-    
+
     if (value->dptr == NULL) { /* Key not found in DBM file. */
         return NULL;
     }
@@ -147,7 +147,7 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
             }
         }
     } while(!expired && (i != arr->nelts));
-    
+
     /* Delete the collection if the variable "KEY" does not exist.
      *
      * ENH It would probably be more efficient to hold the DBM
@@ -178,7 +178,7 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
             msr_log(msr, 9, "Collection expired (name \"%s\", key \"%s\").", col_name, log_escape_ex(msr->mp, col_key, col_key_len));
         }
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Deleted collection (name \"%s\", key \"%s\").", 
+            msr_log(msr, 4, "Deleted collection (name \"%s\", key \"%s\").",
                 log_escape(msr->mp, col_name), log_escape_ex(msr->mp, col_key, col_key_len));
         }
         return NULL;
@@ -262,7 +262,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         return -1;
     }
 
-    dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);    
+    dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);
 
     /* Delete IS_NEW on store. */
     apr_table_unset(col, "IS_NEW");
@@ -380,7 +380,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     blob[blob_offset + 1] = 0;
 
     /* And, finally, store it. */
-    dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);    
+    dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);
 
     key.dptr = var_key->value;
     key.dsize = var_key->value_len + 1;
@@ -404,14 +404,14 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         msr_log(msr, 1, "Failed to write to DBM file \"%s\": %s", dbm_filename,
             get_apr_error(msr->mp, rc));
         return -1;
-    }    
+    }
 
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Persisted collection (name \"%s\", key \"%s\").",
             log_escape_ex(msr->mp, var_name->value, var_name->value_len), log_escape_ex(msr->mp, var_key->value, var_key->value_len));
     }
 
-    return 0;    
+    return 0;
 }
 
 /**
@@ -428,7 +428,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     apr_time_t now = apr_time_sec(msr->request_time);
 
     if (msr->txcfg->data_dir == NULL) {
-        /* The user has been warned about this problem enough times already by now. 
+        /* The user has been warned about this problem enough times already by now.
          * msr_log(msr, 1, "Unable to access collection file (name \"%s\"). Use SecDataDir to "
          *     "define data directory first.", log_escape(msr->mp, col_name));
          */

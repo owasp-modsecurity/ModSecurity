@@ -45,7 +45,7 @@ static apr_status_t modsecurity_request_body_start_init(modsec_rec *msr, char **
             return -1;
         }
 
-        msr_log(msr, 4, "Input filter: Created temporary file to store request body: %s", 
+        msr_log(msr, 4, "Input filter: Created temporary file to store request body: %s",
             msr->msc_reqbody_filename);
     }
 
@@ -298,11 +298,11 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
             return -1;
         }
     }
-    
+
     /* Check that we are not over the request body no files limit. */
     if (msr->msc_reqbody_no_files_length >= (unsigned long) msr->txcfg->reqbody_no_files_limit) {
         return -5;
-    }    
+    }
 
     /* Store data. */
     if (msr->msc_reqbody_storage == MSC_REQBODY_MEMORY) {
@@ -343,7 +343,7 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, cha
         return -1;
     }
     msr->msc_reqbody_buffer[msr->msc_reqbody_length] = '\0';
-        
+
     /* Copy the data we keep in chunks into the new buffer. */
 
     sofar = 0;
@@ -381,7 +381,7 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, cha
     one_chunk->is_permanent = 1;
     *(const msc_data_chunk **)apr_array_push(msr->msc_reqbody_chunks) = one_chunk;
 
-    /* Parse URL-encoded arguments in the request body. */    
+    /* Parse URL-encoded arguments in the request body. */
 
     if (parse_arguments(msr, msr->msc_reqbody_buffer, msr->msc_reqbody_length,
         msr->txcfg->argument_separator, "BODY", msr->arguments, &invalid_count) < 0)
@@ -459,7 +459,7 @@ apr_status_t modsecurity_request_body_retrieve_start(modsec_rec *msr, char **err
     if (msr->msc_reqbody_storage == MSC_REQBODY_MEMORY) {
         msr->msc_reqbody_chunk_position = 0;
         msr->msc_reqbody_chunk_offset = 0;
-        
+
         msr->msc_reqbody_disk_chunk = apr_pcalloc(msr->msc_reqbody_mp, sizeof(msc_data_chunk));
         if (msr->msc_reqbody_disk_chunk == NULL) {
             *error_msg = apr_psprintf(msr->mp, "Failed to allocate %lu bytes for request body disk chunk.", (unsigned long)sizeof(msc_data_chunk));
@@ -622,7 +622,7 @@ apr_status_t modsecurity_request_body_retrieve(modsec_rec *msr,
 apr_status_t modsecurity_request_body_clear(modsec_rec *msr, char **error_msg) {
     *error_msg = NULL;
 
-    /* Release memory we used to store request body data. */    
+    /* Release memory we used to store request body data. */
     if (msr->msc_reqbody_chunks != NULL) {
         msc_data_chunk **chunks = (msc_data_chunk **)msr->msc_reqbody_chunks->elts;
         int i;
@@ -666,7 +666,7 @@ apr_status_t modsecurity_request_body_clear(modsec_rec *msr, char **error_msg) {
                     return -1;
                 }
                 put_filename = apr_psprintf(msr->msc_reqbody_mp, "%s/%s",
-                    msr->txcfg->upload_dir, put_basename);                    
+                    msr->txcfg->upload_dir, put_basename);
                 if (put_filename == NULL) {
                     *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to generate filename to PUT file \"%s\"", log_escape(msr->msc_reqbody_mp, msr->msc_reqbody_filename));
                     return -1;

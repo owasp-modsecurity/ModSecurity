@@ -260,7 +260,7 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
 
                 arg = (msc_arg *)apr_pcalloc(msr->mp, sizeof(msc_arg));
                 arg->origin = origin;
-                
+
                 status = 0; /* unchanged */
                 j = 0;
             } else {

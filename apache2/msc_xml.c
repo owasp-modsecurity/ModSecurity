@@ -28,14 +28,14 @@ int xml_init(modsec_rec *msr, char **error_msg) {
 static void xml_receive_sax_error(void *data, const char *msg, ...) {
     modsec_rec *msr = (modsec_rec *)data;
     char message[256];
-    
+
     if (msr == NULL) return;
 
     apr_snprintf(message, sizeof(message), "%s (line %d offset %d)",
         log_escape_nq(msr->mp, msr->xml->parsing_ctx->lastError.message),
         msr->xml->parsing_ctx->lastError.line,
         msr->xml->parsing_ctx->lastError.int2);
-    
+
     msr_log(msr, 5, "XML: Parsing error: %s", message);
 }
 #endif

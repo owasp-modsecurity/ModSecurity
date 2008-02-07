@@ -32,17 +32,17 @@ struct acmp_node_t {
     acmp_callback_t callback;
     void *callback_data;
     int depth;
-    
+
     acmp_node_t *child;
     acmp_node_t *sibling;
     acmp_node_t *fail;
     acmp_node_t *parent;
     acmp_node_t *o_match;
-    
+
     acmp_btree_node_t *btree;
-    
+
     apr_size_t hit_count;
-    
+
     char *text;
     char *pattern;
 };
@@ -62,20 +62,20 @@ struct ACMP {
     int is_case_sensitive;
     apr_pool_t *parent_pool;
     apr_pool_t *pool;
-    
+
     int dict_count;
     apr_size_t longest_entry;
-    
+
     acmp_node_t *root_node;
-    
+
     const char *data_start;
     const char *data_end;
     const char *data_pos;
     apr_size_t data_len;
-    
+
     apr_size_t *bp_buffer;
     apr_size_t bp_buff_len;
-    
+
     acmp_node_t *active_node;
     char u8_buff[6];
     apr_size_t  u8buff_len;
@@ -96,7 +96,7 @@ struct ACMP {
  * Returns length of utf-8 sequence based on its first byte
  */
 static int utf8_seq_len(const char *first_byte) {
-    return utf8_seq_lengths[(unsigned int)(unsigned char)first_byte[0]];    
+    return utf8_seq_lengths[(unsigned int)(unsigned char)first_byte[0]];
 }
 
 /**
@@ -107,7 +107,7 @@ static size_t utf8_strlen(const char *str) {
     const char *c = str;
     while (*c != 0) {
         c += utf8_seq_len(c);
-        len++;        
+        len++;
     }
     return len;
 }
@@ -131,7 +131,7 @@ static acmp_utf8_char_t utf8_decodechar(const char *str) {
 }
 
 /**
- * Returns lowercase for given unicode character. Searches through 
+ * Returns lowercase for given unicode character. Searches through
  *   utf8_lcase_map table, if it doesn't find the code assumes
  *   it doesn't have a lowercase variant and returns code itself.
  */
@@ -234,7 +234,7 @@ static void acmp_clone_node_no_state(acmp_node_t *from, acmp_node_t *to) {
 }
 
 /**
- * Copies sibling nodes and child node for from given "from" node to "to" node. 
+ * Copies sibling nodes and child node for from given "from" node to "to" node.
  *   Both nodes must already exist.
  */
 static void acmp_copy_nodes_recursive(acmp_node_t *from, acmp_node_t *to, apr_pool_t *pool) {
@@ -245,7 +245,7 @@ static void acmp_copy_nodes_recursive(acmp_node_t *from, acmp_node_t *to, apr_po
     nn2->parent = to;
     to->child = nn2;
     acmp_copy_nodes_recursive(from->child, to->child, pool);
-    
+
     for (;;) {
         old_node = old_node->sibling;
         if (old_node == NULL) break;
@@ -283,7 +283,7 @@ static inline acmp_node_t *acmp_goto(acmp_node_t *node, acmp_utf8_char_t letter)
  */
 static void acmp_connect_other_matches(ACMP *parser, acmp_node_t *node) {
     acmp_node_t *child, *om;
-    
+
     for (child = node->child; child != NULL; child = child->sibling) {
         if (child->fail == NULL) continue;
         for (om = child->fail; om != parser->root_node; om = om->fail) {
@@ -293,7 +293,7 @@ static void acmp_connect_other_matches(ACMP *parser, acmp_node_t *node) {
             }
         }
     }
-    
+
     /* Go recursively through children of this node that have a child node */
     for(child = node->child; child != NULL; child = child->sibling) {
         if (child->child != NULL) acmp_connect_other_matches(parser, child);
@@ -339,7 +339,7 @@ static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
 static void acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
     apr_size_t count, i, j;
     acmp_node_t *child = node->child;
-    
+
     for (count = 0; child != NULL; child = child->sibling) count++;
     acmp_node_t *nodes[count];
     child = node->child;
@@ -374,13 +374,13 @@ static apr_status_t acmp_connect_fail_branches(ACMP *parser) {
     if (parser->is_failtree_done != 0) return APR_SUCCESS;
     acmp_node_t *child, *node, *goto_node;
     apr_array_header_t *arr, *arr2, *tmp;
-    
+
     parser->root_node->text = "";
     arr  = apr_array_make(parser->pool, 32, sizeof(acmp_node_t *));
     arr2 = apr_array_make(parser->pool, 32, sizeof(acmp_node_t *));
-    
+
     parser->root_node->fail = parser->root_node;
-    
+
     /* All first-level children will fail back to root node */
     for (child = parser->root_node->child; child != NULL; child = child->sibling) {
         child->fail = parser->root_node;
@@ -389,7 +389,7 @@ static apr_status_t acmp_connect_fail_branches(ACMP *parser) {
         fprintf(stderr, "fail direction: *%s* => *%s*\n", child->text, child->fail->text);
         #endif
     }
-    
+
     for (;;) {
         while (apr_is_empty_array(arr) == 0) {
             node = *(acmp_node_t **)apr_array_pop(arr);
@@ -408,7 +408,7 @@ static apr_status_t acmp_connect_fail_branches(ACMP *parser) {
             }
         }
         if (apr_is_empty_array(arr2) != 0) break;
-        
+
         tmp = arr;
         arr = arr2;
         arr2 = tmp;
@@ -434,7 +434,7 @@ static void acmp_clear_hit_count_recursive(acmp_node_t *node) {
  */
 static void acmp_found(ACMP *parser, acmp_node_t *node) {
     if (node->callback) {
-        node->callback(parser, node->callback_data, 
+        node->callback(parser, node->callback_data,
             parser->bp_buffer[(parser->char_pos - node->depth - 1) % parser->bp_buff_len],
             parser->char_pos - node->depth - 1);
     }
@@ -458,7 +458,7 @@ ACMP *acmp_create(int flags, apr_pool_t *pool) {
     apr_pool_t *p;
     rc = apr_pool_create(&p, pool);
     if (rc != APR_SUCCESS) return NULL;
-    
+
     ACMP *parser = apr_pcalloc(p, sizeof(ACMP));
     parser->pool = p;
     parser->parent_pool = pool;
@@ -487,11 +487,11 @@ void acmp_destroy(ACMP *parser) {
 ACMP *acmp_duplicate(ACMP *parser, apr_pool_t *pool) {
     apr_status_t rc;
     apr_pool_t *p;
-    
+
     if (pool == NULL) pool = parser->parent_pool;
     rc = apr_pool_create(&p, pool);
     if (rc != APR_SUCCESS) return NULL;
-    
+
     ACMP *new_parser = apr_pcalloc(p, sizeof(ACMP));
     new_parser->pool = p;
     new_parser->parent_pool = pool;
@@ -529,17 +529,17 @@ apr_status_t acmp_prepare(ACMP *parser) {
  *   is supplied
  * len - Length of pattern in characters, if zero string length is used.
  */
-apr_status_t acmp_add_pattern(ACMP *parser, const char *pattern, 
-    acmp_callback_t callback, void *data, apr_size_t len) 
+apr_status_t acmp_add_pattern(ACMP *parser, const char *pattern,
+    acmp_callback_t callback, void *data, apr_size_t len)
 {
     if (parser->is_active != 0) return APR_EGENERAL;
     size_t length = (len == 0) ? acmp_strlen(parser, pattern) : len;
     size_t i, j;
     acmp_utf8_char_t ucs_chars[length];
-    
+
     acmp_node_t *parent = parser->root_node, *child;
     acmp_strtoucs(parser, pattern, ucs_chars, length);
-    
+
     for (i = 0; i < length; i++) {
         acmp_utf8_char_t letter = ucs_chars[i];
         if (parser->is_case_sensitive == 0) {
@@ -569,7 +569,7 @@ apr_status_t acmp_add_pattern(ACMP *parser, const char *pattern,
     }
     if (length > parser->longest_entry) parser->longest_entry = length;
     parser->is_failtree_done = 0;
-    
+
     return APR_SUCCESS;
 }
 
@@ -583,7 +583,7 @@ apr_status_t acmp_process(ACMP *parser, const char *data, apr_size_t len) {
     acmp_node_t *node = parser->active_node, *go_to;
     apr_size_t seq_length;
     const char *end = (data + len);
-    
+
     while (data < end) {
         parser->bp_buffer[parser->char_pos % parser->bp_buff_len] = parser->byte_pos;
         acmp_utf8_char_t letter;
@@ -637,9 +637,9 @@ apr_status_t acmp_process(ACMP *parser, const char *data, apr_size_t len) {
             if (go_to == NULL) node = node->fail;
         }
         if (go_to != NULL) node = go_to;
-        
+
         /* We need to collect other nodes that are last letters of phrase. These
-         *   will be fail node of current node if it has is_last flag set, and 
+         *   will be fail node of current node if it has is_last flag set, and
          *   fail node of that node, recursively down to root node.
          */
         go_to = node;
@@ -655,7 +655,7 @@ apr_status_t acmp_process(ACMP *parser, const char *data, apr_size_t len) {
 
 /**
  * Resets the state of parser so you can start using it with new set of data.
- * 
+ *
  * No need to clear buffer since it will be re-initialized at first run of
  * acmp_process
  */
@@ -689,7 +689,7 @@ apr_status_t acmp_process_quick(ACMPT *acmpt, const char **match, const char *da
     if (acmpt->ptr == NULL) acmpt->ptr = parser->root_node;
     acmp_node_t *node = acmpt->ptr, *go_to;
     const char *end = (data + len);
-    
+
     while (data < end) {
         acmp_utf8_char_t letter = (unsigned char)*data++;
         go_to = NULL;
@@ -705,7 +705,7 @@ apr_status_t acmp_process_quick(ACMPT *acmpt, const char **match, const char *da
             if (go_to == NULL) node = node->fail;
         }
         if (go_to != NULL) node = go_to;
-        
+
         /* If node has o_match, then we found a pattern */
         if (node->o_match != NULL) {
             *match = node->text;

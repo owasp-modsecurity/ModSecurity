@@ -265,7 +265,7 @@ struct modsec_rec {
     const char          *request_protocol;
 
     const char          *hostname;
-    
+
     apr_table_t         *request_headers;
 
     apr_off_t            request_content_length;
@@ -305,7 +305,7 @@ struct modsec_rec {
     unsigned int         msc_reqbody_chunk_offset;   /* offset of the chunk currently in use     */
     msc_data_chunk      *msc_reqbody_chunk_current;  /* current chunk                            */
     char                *msc_reqbody_buffer;
-    
+
     const char          *msc_reqbody_filename;       /* when stored on disk */
     int                  msc_reqbody_fd;
     msc_data_chunk      *msc_reqbody_disk_chunk;
@@ -437,7 +437,7 @@ struct directory_config {
     /* A regular expression that determines if a response
      * status is treated as relevant.
      */
-    msc_regex_t         *auditlog_relevant_regex;    
+    msc_regex_t         *auditlog_relevant_regex;
 
     /* Upload */
     const char          *tmp_dir;

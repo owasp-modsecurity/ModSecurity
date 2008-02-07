@@ -304,7 +304,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
 
     /* NOTE: This only works with ipv4 */
     if ((rc = apr_sockaddr_info_get(&addr, target, APR_INET, 0, 0, msr->mp)) != APR_SUCCESS) {
-        
+
         *error_msg = apr_psprintf(msr->mp, "Geo lookup of \"%s\" failed: %s", target, apr_strerror(rc, errstr, 1024));
         return 0;
     }
@@ -395,14 +395,14 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         georec->region = apr_pstrmemdup(msr->mp, (const char *)cbuf+rec_offset, (remaining));
         rec_offset += field_len + 1;
         remaining -= field_len + 1;
-        
+
         /* City */
         field_len = field_length((const char *)cbuf+rec_offset, remaining);
         msr_log(msr, 9, "GEO: city=\"%.*s\"", ((field_len+1)*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
         georec->city = apr_pstrmemdup(msr->mp, (const char *)cbuf+rec_offset, (remaining));
         rec_offset += field_len + 1;
         remaining -= field_len + 1;
-        
+
         /* Postal Code */
         field_len = field_length((const char *)cbuf+rec_offset, remaining);
         msr_log(msr, 9, "GEO: postal_code=\"%.*s\"", ((field_len+1)*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
@@ -419,7 +419,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         rec_offset += 3;
         remaining -= 3;
 
-        
+
         /* Longitude */
         msr_log(msr, 9, "GEO: longitude=\"%.*s\"", (3*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
         dtmp = cbuf[rec_offset] +
@@ -444,7 +444,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
             rec_offset += 6;
             remaining -= 6;
         }
-        
+
     }
 
     *error_msg = apr_psprintf(msr->mp, "Geo lookup of \"%s\" succeeded.", target);

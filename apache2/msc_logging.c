@@ -54,7 +54,7 @@ static int sec_auditlog_write(modsec_rec *msr, const char *data, unsigned int le
         msr->new_auditlog_fd = NULL;
 
         return -1;
-    }    
+    }
 
     return 1;
 }
@@ -187,19 +187,19 @@ char *construct_log_vcombinedus_limited(modsec_rec *msr, int _limit, int *was_li
             remote_user[32] = '\0';
         }
         limit -= strlen(remote_user);
-        
+
         if (strlen(local_user) > 32) {
             msr_log(msr, 9, "GuardianLog: Reduced local_user to 32.");
             local_user[32] = '\0';
         }
         limit -= strlen(local_user);
-        
+
         if (strlen(referer) > 64) {
             msr_log(msr, 9, "GuardianLog: Reduced referer to 64.");
             referer[64] = '\0';
         }
         limit -= strlen(referer);
-        
+
         if (strlen(user_agent) > 64) {
             msr_log(msr, 9, "GuardianLog: Reduced user_agent to 64.");
             user_agent[64] = '\0';
@@ -342,11 +342,11 @@ static void sec_auditlog_write_producer_header(modsec_rec *msr) {
     }
 
     /* Start with the ModSecurity signature. */
-    text = apr_psprintf(msr->mp, "Producer: %s", MODULE_NAME_FULL);        
+    text = apr_psprintf(msr->mp, "Producer: %s", MODULE_NAME_FULL);
     sec_auditlog_write(msr, text, strlen(text));
 
 
-    /* Then loop through the components and output individual signatures. */    
+    /* Then loop through the components and output individual signatures. */
     signatures = (char **)msr->txcfg->component_signatures->elts;
     for(i = 0; i < msr->txcfg->component_signatures->nelts; i++) {
         text = apr_psprintf(msr->mp, "; %s", (char *)signatures[i]);
@@ -382,7 +382,7 @@ void sec_audit_logger(modsec_rec *msr) {
         msr_log(msr, 4, "Audit log: Skipping request whose request_line is null.");
         return;
     }
-    
+
     /* Also return silently if we don't have a file descriptor. */
     if (msr->txcfg->auditlog_fd == NULL) {
         msr_log(msr, 4, "Audit log: Skipping request since there is nowhere to write to.");
@@ -553,7 +553,7 @@ void sec_audit_logger(modsec_rec *msr) {
                         }
                     }
                 }
-        
+
                 /* If we don't have the next argument that means
                  * we're done here.
                  */
@@ -614,7 +614,7 @@ void sec_audit_logger(modsec_rec *msr) {
                                     unsigned int len;  /* amount in this chunk to sanitise */
 
                                     soff = sanitise_offset - chunk_offset;
-                                       
+
                                     if (soff + sanitise_length <= chunk->length) {
                                         /* The entire argument resides in the current chunk. */
                                         len = sanitise_length;
@@ -708,7 +708,7 @@ void sec_audit_logger(modsec_rec *msr) {
             }
         }
     }
-    
+
     /* AUDITLOG_PART_RESPONSE_BODY */
 
     if (strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_RESPONSE_BODY) != NULL) {
@@ -733,7 +733,7 @@ void sec_audit_logger(modsec_rec *msr) {
             text = apr_psprintf(msr->mp, "Message: %s\n", ((char **)msr->alerts->elts)[i]);
             sec_auditlog_write(msr, text, strlen(text));
         }
-    
+
         /* Apache error messages */
         for(i = 0; i < msr->error_messages->nelts; i++) {
             error_message *em = (((error_message**)msr->error_messages->elts)[i]);
@@ -741,7 +741,7 @@ void sec_audit_logger(modsec_rec *msr) {
                 format_error_log_message(msr->mp, em));
             sec_auditlog_write(msr, text, strlen(text));
         }
-        
+
         /* Action */
         if (msr->was_intercepted) {
             text = apr_psprintf(msr->mp, "Action: Intercepted (phase %d)\n", msr->intercept_phase);
@@ -783,7 +783,7 @@ void sec_audit_logger(modsec_rec *msr) {
         }
 
         sec_auditlog_write(msr, text, strlen(text));
-        
+
         /* Our response body does not contain chunks */
         /* ENH Only write this when the output was chunked. */
         /* ENH Add info when request body was decompressed, dechunked too. */
@@ -793,7 +793,7 @@ void sec_audit_logger(modsec_rec *msr) {
         }
 
         sec_auditlog_write_producer_header(msr);
-        
+
         /* Server */
         if (msr->server_software != NULL) {
             text = apr_psprintf(msr->mp, "Server: %s\n", msr->server_software);
@@ -890,7 +890,7 @@ void sec_audit_logger(modsec_rec *msr) {
             sec_auditlog_write(msr, text, strlen(text));
         }
     }
-    
+
 
     /* AUDITLOG_PART_ENDMARKER */
 
@@ -914,7 +914,7 @@ void sec_audit_logger(modsec_rec *msr) {
     }
 
     /* From here on only concurrent-style processing. */
-    
+
     apr_file_close(msr->new_auditlog_fd);
 
     /* Write an entry to the index file */
@@ -925,7 +925,7 @@ void sec_audit_logger(modsec_rec *msr) {
     str2 = apr_psprintf(msr->mp, "%s %d %d md5:%s", msr->new_auditlog_filename, 0,
         msr->new_auditlog_size, bytes2hex(msr->mp, md5hash, 16));
     if (str2 == NULL) return;
-    
+
     /* We do not want the index line to be longer than 3980 bytes. */
     limit = 3980;
     was_limited = 0;

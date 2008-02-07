@@ -90,7 +90,7 @@ msre_op_metadata DSOLOCAL *msre_engine_op_resolve(msre_engine *engine, const cha
 struct msre_ruleset {
     apr_pool_t              *mp;
     msre_engine             *engine;
-    
+
     apr_array_header_t      *phase_request_headers;
     apr_array_header_t      *phase_request_body;
     apr_array_header_t      *phase_response_headers;
@@ -141,7 +141,7 @@ struct msre_rule {
     int                      line_num;
     int                      placeholder;
     int                      type;
-    
+
     msre_ruleset            *ruleset;
     msre_rule               *chain_starter;
     #if defined(PERFORMANCE_MEASUREMENT)
@@ -200,7 +200,7 @@ struct msre_tfn_metadata {
      *
      * NOTE Strict transformation functions not supported yet.
      */
-    fn_tfn_execute_t execute;    
+    fn_tfn_execute_t execute;
 };
 
 void DSOLOCAL msre_engine_tfn_register(msre_engine *engine, const char *name,
@@ -285,7 +285,7 @@ struct msre_actionset {
 
 char DSOLOCAL *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset);
 
-void DSOLOCAL msre_engine_variable_register(msre_engine *engine, const char *name, 
+void DSOLOCAL msre_engine_variable_register(msre_engine *engine, const char *name,
     unsigned int type, unsigned int argc_min, unsigned int argc_max,
     fn_var_validate_t validate, fn_var_generate_t generate,
     unsigned int is_cacheable, unsigned int availability);

@@ -198,13 +198,13 @@ static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pm'.");
         return 0; /* ERROR */
     }
-    
+
     ACMP *p = acmp_create(0, rule->ruleset->mp);
     if (p == NULL) return 0;
 
     const char *phrase = apr_pstrdup(rule->ruleset->mp, rule->op_param);
     const char *next = rule->op_param + strlen(rule->op_param);
-    
+
     /* Loop through phrases */
     /* ENH: Need to allow quoted phrases w/space */
     for (;;) {
@@ -236,13 +236,13 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pm'.");
         return 0; /* ERROR */
     }
-    
+
     ACMP *p = acmp_create(0, rule->ruleset->mp);
     if (p == NULL) return 0;
 
     fn = apr_pstrdup(rule->ruleset->mp, rule->op_param);
     next = fn + strlen(rule->op_param);
-    
+
     /* Get the path of the rule filename to use as a base */
     rulefile_path = apr_pstrndup(rule->ruleset->mp, rule->filename, strlen(rule->filename) - strlen(apr_filepath_name_get(rule->filename)));
 
@@ -321,7 +321,7 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     const char *match = NULL;
     apr_status_t rc = 0;
     int capture;
-    
+
     /* Nothing to read */
     if ((var->value == NULL) || (var->value_len == 0)) return 0;
 
@@ -940,7 +940,7 @@ static int luhn_verify(const char *ccnumber, int len) {
      *   i*2 + (( (i*2) > 9 ) ? -9 : 0)
      */
     static int wtable[10] = {0, 2, 4, 6, 8, 1, 3, 5, 7, 9}; /* weight lookup table */
- 
+
     /* Add up only digits (weighted digits via lookup table)
      * for both odd and even CC numbers to avoid 2 passes.
      */
@@ -959,7 +959,7 @@ static int luhn_verify(const char *ccnumber, int len) {
     /* Do a mod 10 on the sum */
     sum[odd] %= 10;
 
-    /* If the result is a zero the card is valid. */   
+    /* If the result is a zero the card is valid. */
     return sum[odd] ? 0 : 1;
 }
 
@@ -1076,7 +1076,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
                     }
                 }
             }
-        
+
             /* Unset the remaining TX vars (from previous invocations). */
             for(; i <= 9; i++) {
                 char buf[24];
@@ -1114,7 +1114,7 @@ static int msre_op_geoLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     const char *geo_host = var->value;
     msc_string *s = NULL;
     int rc;
-    
+
     *error_msg = NULL;
 
     if (geo == NULL) {
@@ -1125,7 +1125,7 @@ static int msre_op_geoLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
     rc = geo_lookup(msr, &rec, geo_host, error_msg);
     if (rc <= 0) {
-        *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" failed at %s.", log_escape_nq(msr->mp, geo_host), var->name); 
+        *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" failed at %s.", log_escape_nq(msr->mp, geo_host), var->name);
         return rc;
     }
     *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" succeeded at %s.",
@@ -1311,7 +1311,7 @@ static int msre_op_inspectFile_execute(modsec_rec *msr, msre_rule *rule, msre_va
 
         argv[0] = approver_script;
         argv[1] = target_file;
-        argv[2] = NULL;    
+        argv[2] = NULL;
 
         if (apache2_exec(msr, approver_script, (const char **)argv, &script_output) <= 0) {
             *error_msg = apr_psprintf(msr->mp, "Execution of the approver script \"%s\" failed (invocation failed).",
@@ -1738,7 +1738,7 @@ static int msre_op_lt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         /* NULL values do not match anything. */
         return 0;
     }
-    
+
     target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
     if (target == NULL) return -1;
     left = atoi(target);

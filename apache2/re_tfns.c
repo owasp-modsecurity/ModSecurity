@@ -27,7 +27,7 @@ static int msre_fn_lowercase_execute(apr_pool_t *mptmp, unsigned char *input,
 
     if (rval == NULL) return -1;
     *rval = NULL;
-    
+
     i = 0;
     while(i < input_len) {
         int x = input[i];
@@ -268,7 +268,7 @@ static int msre_fn_jsDecode_execute(apr_pool_t *mptmp, unsigned char *input,
     length = js_decode_nonstrict_inplace(input, input_len);
     *rval = (char *)input;
     *rval_len = length;
-    
+
     return (*rval_len == input_len ? 0 : 1);
 }
 
@@ -284,7 +284,7 @@ static int msre_fn_urlDecode_execute(apr_pool_t *mptmp, unsigned char *input,
     length = urldecode_nonstrict_inplace_ex(input, input_len, &invalid_count, &changed);
     *rval = (char *)input;
     *rval_len = length;
-    
+
     return changed;
 }
 
@@ -299,7 +299,7 @@ static int msre_fn_urlDecodeUni_execute(apr_pool_t *mptmp, unsigned char *input,
     length = urldecode_uni_nonstrict_inplace_ex(input, input_len, &changed);
     *rval = (char *)input;
     *rval_len = length;
-    
+
     return changed;
 }
 
@@ -312,7 +312,7 @@ static int msre_fn_urlEncode_execute(apr_pool_t *mptmp, unsigned char *input,
 
     *rval = url_encode(mptmp, (char *)input, input_len, &changed);
     *rval_len = strlen(*rval);
-    
+
     return changed;
 }
 
@@ -382,7 +382,7 @@ static int msre_fn_sha1_execute(apr_pool_t *mptmp, unsigned char *input,
     *rval_len = APR_SHA1_DIGESTSIZE;
     *rval = apr_pstrmemdup(mptmp, (const char *)digest, APR_SHA1_DIGESTSIZE);
 
-    return 1;    
+    return 1;
 }
 
 /* hexDecode */
@@ -519,7 +519,7 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     msre_engine_tfn_register(engine,
         "hexDecode",
         msre_fn_hexDecode_execute
-    );    
+    );
 
     /* hexEncode */
     msre_engine_tfn_register(engine,

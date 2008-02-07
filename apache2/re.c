@@ -77,7 +77,7 @@ char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actions
                     use_quotes = 1;
                     break;
                 }
-            }        
+            }
             if (j == 0) use_quotes = 1;
         }
 
@@ -129,7 +129,7 @@ static void msre_actionset_action_add(msre_actionset *actionset, msre_action *ac
 }
 
 /**
- * Creates msre_var instances (rule variables) out of the 
+ * Creates msre_var instances (rule variables) out of the
  * given text string and places them into the supplied table.
  */
 apr_status_t msre_parse_targets(msre_ruleset *ruleset, const char *text,
@@ -142,14 +142,14 @@ apr_status_t msre_parse_targets(msre_ruleset *ruleset, const char *text,
     apr_status_t rc;
     msre_var *var;
     int i;
-    
+
     if (text == NULL) return -1;
 
     /* Extract name & value pairs first */
     vartable = apr_table_make(ruleset->mp, 10);
     if (vartable == NULL) return -1;
     rc = msre_parse_generic(ruleset->mp, text, vartable, error_msg);
-    if (rc < 0) return rc;    
+    if (rc < 0) return rc;
 
     /* Loop through the table and create variables */
     tarr = apr_table_elts(vartable);
@@ -179,13 +179,13 @@ apr_status_t msre_parse_actions(msre_engine *engine, msre_actionset *actionset,
     msre_action *action;
     int i;
 
-    if (text == NULL) return -1;    
+    if (text == NULL) return -1;
 
     /* Extract name & value pairs first */
     vartable = apr_table_make(engine->mp, 10);
     if (vartable == NULL) return -1;
     rc = msre_parse_generic(engine->mp, text, vartable, error_msg);
-    if (rc < 0) return rc;    
+    if (rc < 0) return rc;
 
     /* Loop through the table and create actions */
     tarr = apr_table_elts(vartable);
@@ -212,14 +212,14 @@ apr_status_t msre_parse_actions(msre_engine *engine, msre_actionset *actionset,
  * Locates variable metadata given the variable name.
  */
 msre_var_metadata *msre_resolve_var(msre_engine *engine, const char *name) {
-    return (msre_var_metadata *)apr_table_get(engine->variables, name);    
+    return (msre_var_metadata *)apr_table_get(engine->variables, name);
 }
 
 /**
  * Locates action metadata given the action name.
  */
 msre_action_metadata *msre_resolve_action(msre_engine *engine, const char *name) {
-    return (msre_action_metadata *)apr_table_get(engine->actions, name);    
+    return (msre_action_metadata *)apr_table_get(engine->actions, name);
 }
 
 /**
@@ -410,7 +410,7 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
 
             /* go over any whitespace present */
             while(isspace(*p)) p++;
-    
+
             /* we're done */
             if (*p == '\0') {
                 return count;
@@ -498,7 +498,7 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
         /* move to the first character of the next name-value pair */
         while(isspace(*p)||(*p == ',')||(*p == '|')) p++;
     }
-    
+
     return count;
 }
 
@@ -553,7 +553,7 @@ msre_actionset *msre_actionset_create(msre_engine *engine, const char *text,
         }
     }
 
-    return actionset;    
+    return actionset;
 }
 
 /**
@@ -706,7 +706,7 @@ msre_engine *msre_engine_create(apr_pool_t *parent_pool) {
     engine->actions = apr_table_make(mp, 25);
     if (engine->actions == NULL) return NULL;
 
-    return engine;    
+    return engine;
 }
 
 /**
@@ -765,7 +765,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     for (i = 0; i < arr->nelts; i++) {
         msre_rule *rule = rules[i];
         rule->execution_time = 0;
-    }    
+    }
 
     time1 = apr_time_now();
 
@@ -784,7 +784,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             rule->line_num,
             (rule->execution_time / 10000));
     }
-    
+
     return rc;
 }
 
@@ -1066,7 +1066,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             msr_log(msr, 1, "Rule processing failed with unknown return code: %d.", rc);
             return -1;
         }
-    }    
+    }
 
     /* ENH warn if chained rules are missing. */
 
@@ -1176,7 +1176,7 @@ msre_rule * msre_ruleset_fetch_rule(msre_ruleset *ruleset, const char *id) {
 
     rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_logging);
 
-    return rule;    
+    return rule;
 }
 
 static int msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset, rule_exception *re,
@@ -1232,7 +1232,7 @@ static int msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset, 
             } else {
                 if (rule->actionset->is_chained) mode = 1; /* Keep rules in this chain. */
                 rules[j++] = rules[i];
-            }            
+            }
         } else { /* Handling rule that is part of a chain. */
             if (mode == 2) { /* We want to remove the rule. */
                 /* Do not increment j. */
@@ -1265,7 +1265,7 @@ int msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exceptio
     count += msre_ruleset_phase_rule_remove_with_exception(ruleset, re, ruleset->phase_response_body);
     count += msre_ruleset_phase_rule_remove_with_exception(ruleset, re, ruleset->phase_logging);
 
-    return count;    
+    return count;
 }
 
 
@@ -1349,7 +1349,7 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
                 log_escape(msr->mp, action->param));
         }
     }
-    
+
     return apr_pstrcat(msr->mp, fn, id, rev, msg, logdata, severity, tags, NULL);
 }
 
@@ -1441,7 +1441,7 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset, int type,
     /* Parse args */
     argsp = args;
 
-    /* Is negation used? */    
+    /* Is negation used? */
     if (*argsp == '!') {
         rule->op_negated = 1;
         argsp++;
@@ -1627,13 +1627,13 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
 
     /* determine the full var name if not already resolved
      *
-     * NOTE: this can happen if the var does not match but it is 
+     * NOTE: this can happen if the var does not match but it is
      * being tested for non-existance as in:
      *   @REQUEST_HEADERS:Foo "@eq 0"
      *   @REQUEST_HEADERS:Foo "!@eq 1"
      */
     if ((var->param != NULL) && (var->name != NULL) && (strchr(var->name,':') == NULL)) {
-        full_varname = apr_psprintf(mptmp, "%s%s:%s", 
+        full_varname = apr_psprintf(mptmp, "%s%s:%s",
                                     (var->is_counting ? "&" : ""),
                                     var->name, var->param);
     }
@@ -1654,7 +1654,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         msr_log(msr, 9, "Target value: \"%s\"", log_escape_nq_ex(msr->mp, var->value,
             var->value_len));
     }
-        
+
     #if !defined(PERFORMANCE_MEASUREMENT)
     if (msr->txcfg->debuglog_level >= 4)
     #endif
@@ -1735,7 +1735,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
     apr_table_t *vartab = NULL;
     int i, rc, match_count = 0;
     int invocations = 0;
-    int multi_match = 0;    
+    int multi_match = 0;
 
     /* Choose the correct metadata/disruptive action actionset. */
     acting_actionset = rule->actionset;
@@ -1819,8 +1819,8 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
         apr_table_t **carr = NULL;
         apr_table_t *cachetab = NULL;
         apr_time_t time_before_trans = 0;
-       
-        /* Take one target. */ 
+
+        /* Take one target. */
         msre_var *var = (msre_var *)te[i].val;
 
         /* Is this var cacheable? */
@@ -2039,7 +2039,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
 
                     if (rc == RULE_MATCH) {
                         match_count++;
-        
+
                         /* Return straight away if the transaction
                         * was intercepted - no need to process the remaining
                         * targets.
@@ -2141,7 +2141,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
 
             if (rc == RULE_MATCH) {
                 match_count++;
-        
+
                 /* Return straight away if the transaction
                  * was intercepted - no need to process the remaining
                  * targets.
@@ -2257,7 +2257,7 @@ int rule_id_in_range(int ruleid, const char *range) {
     if (range == NULL) return 0;
     data = strdup(range);
     if (data == NULL) return 0;
-    
+
     p = apr_strtok(data, ",", &saveptr);
     while(p != NULL) {
         char *s = strstr(p, "-");

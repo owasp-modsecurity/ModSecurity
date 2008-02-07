@@ -47,7 +47,7 @@ static const acmp_utf8_char_t utf8_offsets[6] = {
 #define UTF8_LCASEMAP_LEN 759
 
 /**
- * Table mapping is from PHP's mbstring extension, maps uppercase 
+ * Table mapping is from PHP's mbstring extension, maps uppercase
  */
 static const acmp_utf8_char_t utf8_lcase_map[UTF8_LCASEMAP_LEN * 2] = {
     0x00000061, 0x00000041,

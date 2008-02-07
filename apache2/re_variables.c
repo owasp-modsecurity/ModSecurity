@@ -122,7 +122,7 @@ static int var_args_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
             count++;
         }
     }
-    
+
     return count;
 }
 
@@ -144,9 +144,9 @@ static int var_args_combined_size_generate(modsec_rec *msr, msre_var *var, msre_
         combined_size += arg->name_len;
         combined_size += arg->value_len;
     }
-    
+
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
-    rvar->value = apr_psprintf(mptmp, "%u", combined_size);    
+    rvar->value = apr_psprintf(mptmp, "%u", combined_size);
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
@@ -192,7 +192,7 @@ static int var_args_names_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
             count++;
         }
     }
-    
+
     return count;
 }
 
@@ -240,7 +240,7 @@ static int var_args_get_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
             count++;
         }
     }
-    
+
     return count;
 }
 
@@ -286,7 +286,7 @@ static int var_args_get_names_generate(modsec_rec *msr, msre_var *var, msre_rule
             count++;
         }
     }
-    
+
     return count;
 }
 
@@ -334,7 +334,7 @@ static int var_args_post_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
             count++;
         }
     }
-    
+
     return count;
 }
 
@@ -380,7 +380,7 @@ static int var_args_post_names_generate(modsec_rec *msr, msre_var *var, msre_rul
             count++;
         }
     }
-    
+
     return count;
 }
 
@@ -595,7 +595,7 @@ static int var_xml_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     xpathObj = xmlXPathEvalExpression(xpathExpr, xpathCtx);
     if (xpathObj == NULL) {
         msr_log(msr, 1, "XML: Unable to evaluate xpath expression.");
-        xmlXPathFreeContext(xpathCtx); 
+        xmlXPathFreeContext(xpathCtx);
         return -1;
     }
 
@@ -625,7 +625,7 @@ static int var_xml_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     }
 
     xmlXPathFreeObject(xpathObj);
-    xmlXPathFreeContext(xpathCtx);    
+    xmlXPathFreeContext(xpathCtx);
 
     return count;
 }
@@ -806,7 +806,7 @@ static int var_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     for (i = 0; i < arr->nelts; i++) {
         msc_string *str = (msc_string *)te[i].val;
         int match;
-        
+
         /* Figure out if we want to include this variable. */
         match = 0;
         if (var->param == NULL) match = 1; /* Unconditional inclusion. */
@@ -1080,7 +1080,7 @@ static int var_files_tmpnames_generate(modsec_rec *msr, msre_var *var, msre_rule
             }
 
             /* If we had a match add this argument to the collection. */
-            if (match) {            
+            if (match) {
                 msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
 
                 rvar->value = parts[i]->tmp_file_name;
@@ -1125,7 +1125,7 @@ static int var_files_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
             }
 
             /* If we had a match add this argument to the collection. */
-            if (match) {            
+            if (match) {
                 msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
 
                 rvar->value = parts[i]->filename;
@@ -1170,7 +1170,7 @@ static int var_files_sizes_generate(modsec_rec *msr, msre_var *var, msre_rule *r
             }
 
             /* If we had a match add this argument to the collection. */
-            if (match) {            
+            if (match) {
                 msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
 
                 rvar->value = apr_psprintf(mptmp, "%u", parts[i]->tmp_file_size);
@@ -1636,7 +1636,7 @@ static int var_request_cookies_generate(modsec_rec *msr, msre_var *var, msre_rul
             count++;
         }
     }
-    
+
     return count;
 }
 
@@ -1679,7 +1679,7 @@ static int var_request_cookies_names_generate(modsec_rec *msr, msre_var *var, ms
             count++;
         }
     }
-    
+
     return count;
 }
 
@@ -1722,7 +1722,7 @@ static int var_request_headers_generate(modsec_rec *msr, msre_var *var, msre_rul
             count++;
         }
     }
-    
+
     return count;
 }
 
@@ -1765,7 +1765,7 @@ static int var_request_headers_names_generate(modsec_rec *msr, msre_var *var, ms
             count++;
         }
     }
-    
+
     return count;
 }
 
@@ -1967,7 +1967,7 @@ static int var_response_headers_generate(modsec_rec *msr, msre_var *var, msre_ru
             count++;
         }
     }
-    
+
     return count;
 }
 
@@ -2010,7 +2010,7 @@ static int var_response_headers_names_generate(modsec_rec *msr, msre_var *var, m
             count++;
         }
     }
-    
+
     return count;
 }
 
@@ -2090,7 +2090,7 @@ static int var_webappid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
 /**
  *
  */
-void msre_engine_variable_register(msre_engine *engine, const char *name, 
+void msre_engine_variable_register(msre_engine *engine, const char *name,
     unsigned int type, unsigned int argc_min, unsigned int argc_max,
     fn_var_validate_t validate, fn_var_generate_t generate,
     unsigned int is_cacheable, unsigned int availability)
@@ -2689,7 +2689,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
     );
 
     /* REQUEST_URI */
-    msre_engine_variable_register(engine, 
+    msre_engine_variable_register(engine,
         "REQUEST_URI",
         VAR_SIMPLE,
         0, 0,
@@ -2700,7 +2700,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
     );
 
     /* REQUEST_URI_RAW */
-    msre_engine_variable_register(engine, 
+    msre_engine_variable_register(engine,
         "REQUEST_URI_RAW",
         VAR_SIMPLE,
         0, 0,

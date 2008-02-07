@@ -41,12 +41,12 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     dcfg->resbody_access = NOT_SET;
 
     dcfg->debuglog_name = NOT_SET_P;
-    dcfg->debuglog_level = NOT_SET;    
+    dcfg->debuglog_level = NOT_SET;
     dcfg->debuglog_fd = NOT_SET_P;
 
     dcfg->of_limit = NOT_SET;
     dcfg->of_limit_action = NOT_SET;
-    dcfg->of_mime_types = NOT_SET_P;    
+    dcfg->of_mime_types = NOT_SET_P;
     dcfg->of_mime_types_cleared = NOT_SET;
 
     dcfg->cookie_format = NOT_SET;
@@ -196,7 +196,7 @@ static int copy_rules(apr_pool_t *mp, msre_ruleset *parent_ruleset, msre_ruleset
         child_ruleset->phase_response_body, exceptions_arr);
     copy_rules_phase(mp, parent_ruleset->phase_logging,
         child_ruleset->phase_logging, exceptions_arr);
-    
+
     return 1;
 }
 
@@ -217,7 +217,7 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     /* Use values from the child configuration where possible,
      * otherwise use the parent's.
      */
-        
+
     merged->is_enabled = (child->is_enabled == NOT_SET
         ? parent->is_enabled : child->is_enabled);
 
@@ -234,7 +234,7 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
         ? parent->resbody_access : child->resbody_access);
 
     merged->of_limit = (child->of_limit == NOT_SET
-        ? parent->of_limit : child->of_limit);    
+        ? parent->of_limit : child->of_limit);
     merged->of_limit_action = (child->of_limit_action == NOT_SET
         ? parent->of_limit_action : child->of_limit_action);
 
@@ -372,7 +372,7 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     merged->auditlog_flag = (child->auditlog_flag == NOT_SET
         ? parent->auditlog_flag : child->auditlog_flag);
     merged->auditlog_type = (child->auditlog_type == NOT_SET
-        ? parent->auditlog_type : child->auditlog_type);    
+        ? parent->auditlog_type : child->auditlog_type);
     if (child->auditlog_fd != NOT_SET_P) {
         merged->auditlog_fd = child->auditlog_fd;
         merged->auditlog_name = child->auditlog_name;
@@ -392,7 +392,7 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     merged->auditlog_parts = (child->auditlog_parts == NOT_SET_P
         ? parent->auditlog_parts : child->auditlog_parts);
     merged->auditlog_relevant_regex = (child->auditlog_relevant_regex == NOT_SET_P
-        ? parent->auditlog_relevant_regex : child->auditlog_relevant_regex);    
+        ? parent->auditlog_relevant_regex : child->auditlog_relevant_regex);
 
     /* Upload */
     merged->tmp_dir = (child->tmp_dir == NOT_SET_P
@@ -560,7 +560,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
                 cmd->directive->line_num, p1, p2, p3, &my_error_msg);
             break;
     }
-    
+
     if (rule == NULL) {
         return my_error_msg;
     }
@@ -638,7 +638,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
          * not want more rules to follow in the chain
          * then cut it (the chain).
          */
-        dcfg->tmp_chain_starter = NULL;        
+        dcfg->tmp_chain_starter = NULL;
     } else {
         /* On the other hand, if this rule wants other
          * rules to follow it, then start a new chain
@@ -707,17 +707,17 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         /* No longer need to search for the ID */
         apr_table_unset(dcfg->tmp_rule_placeholders, rule->actionset->id);
     }
-        
+
     /* Update the unparsed rule */
     rule->unparsed = msre_rule_generate_unparsed(dcfg->ruleset->mp, rule, NULL, NULL, NULL);
 
-    return NULL;    
+    return NULL;
 }
 
 /**
- * 
+ *
  */
-static const char *add_marker(cmd_parms *cmd, directory_config *dcfg, const char *p1, 
+static const char *add_marker(cmd_parms *cmd, directory_config *dcfg, const char *p1,
     const char *p2, const char *p3)
 {
     char *my_error_msg = NULL;
@@ -749,8 +749,8 @@ static const char *add_marker(cmd_parms *cmd, directory_config *dcfg, const char
 
     /* No longer need to search for the ID */
     apr_table_unset(dcfg->tmp_rule_placeholders, rule->actionset->id);
-        
-    return NULL;    
+
+    return NULL;
 }
 
 /**
@@ -836,8 +836,8 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
             actions);
     }
     #endif
-        
-    return NULL;    
+
+    return NULL;
 }
 
 /* -- Configuration directives -- */
@@ -858,7 +858,7 @@ static const char *cmd_argument_separator(cmd_parms *cmd, void *_dcfg, const cha
     if (strlen(p1) != 1) {
         return apr_psprintf(cmd->pool, "ModSecurity: Invalid argument separator: %s", p1);
     }
-    
+
     dcfg->argument_separator = p1[0];
 
     return NULL;
@@ -1370,7 +1370,7 @@ static const char *cmd_rule_import_by_id(cmd_parms *cmd, void *_dcfg, const char
     // TODO verify p1
     re->param = p1;
        *(rule_exception **)apr_array_push(dcfg->rule_exceptions) = re;
-    
+
     return NULL;
 }
 
@@ -1382,7 +1382,7 @@ static const char *cmd_rule_import_by_msg(cmd_parms *cmd, void *_dcfg, const cha
     re->type = RULE_EXCEPTION_IMPORT_MSG;
     // TODO verify p1
     re->param = p1;
-    *(rule_exception **)apr_array_push(dcfg->rule_exceptions) = re;    
+    *(rule_exception **)apr_array_push(dcfg->rule_exceptions) = re;
 
     return NULL;
 }
@@ -1406,7 +1406,7 @@ static const char *cmd_rule_remove_by_id(cmd_parms *cmd, void *_dcfg, const char
     directory_config *dcfg = (directory_config *)_dcfg;
     rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
     if (dcfg == NULL) return NULL;
-    
+
     re->type = RULE_EXCEPTION_REMOVE_ID;
     re->param = p1;
     *(rule_exception **)apr_array_push(dcfg->rule_exceptions) = re;
@@ -1421,7 +1421,7 @@ static const char *cmd_rule_remove_by_msg(cmd_parms *cmd, void *_dcfg, const cha
     directory_config *dcfg = (directory_config *)_dcfg;
     rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
     if (dcfg == NULL) return NULL;
-    
+
     re->type = RULE_EXCEPTION_REMOVE_MSG;
     re->param = p1;
     re->param_data = msc_pregcomp(cmd->pool, p1, 0, NULL, NULL);
@@ -1489,7 +1489,7 @@ static const char *cmd_upload_filemode(cmd_parms *cmd, void *_dcfg, const char *
         if ((mode == LONG_MAX)||(mode == LONG_MIN)||(mode <= 0)||(mode > 0777)) {
             return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecUploadFileMode: %s", p1);
         }
-        
+
         dcfg->upload_filemode = (int)mode;
     }
 
@@ -1503,7 +1503,7 @@ static const char *cmd_upload_keep_files(cmd_parms *cmd, void *_dcfg, const char
 
     if (strcasecmp(p1, "on") == 0) {
         dcfg->upload_keep_files = KEEP_FILES_ON;
-    } else 
+    } else
     if (strcasecmp(p1, "off") == 0) {
         dcfg->upload_keep_files = KEEP_FILES_OFF;
     } else
@@ -1530,9 +1530,9 @@ static const char *cmd_web_app_id(cmd_parms *cmd, void *_dcfg, const char *p1) {
 static const char *cmd_pdf_protect(cmd_parms *cmd, void *_dcfg, int flag) {
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
-    
+
     dcfg->pdfp_enabled = flag;
-    
+
     return NULL;
 }
 
@@ -1541,9 +1541,9 @@ static const char *cmd_pdf_protect_secret(cmd_parms *cmd, void *_dcfg,
 {
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
-    
+
     dcfg->pdfp_secret = p1;
-    
+
     return NULL;
 }
 
@@ -1552,9 +1552,9 @@ static const char *cmd_pdf_protect_timeout(cmd_parms *cmd, void *_dcfg,
 {
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
-    
+
     dcfg->pdfp_timeout = atoi(p1);
-    
+
     return NULL;
 }
 
@@ -1563,9 +1563,9 @@ static const char *cmd_pdf_protect_token_name(cmd_parms *cmd, void *_dcfg,
 {
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
-    
+
     dcfg->pdfp_token_name = p1;
-    
+
     return NULL;
 }
 
@@ -1574,9 +1574,9 @@ static const char *cmd_pdf_protect_intercept_get_only(cmd_parms *cmd, void *_dcf
 {
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
-    
+
     dcfg->pdfp_only_get = flag;
-    
+
     return NULL;
 }
 
@@ -1595,7 +1595,7 @@ static const char *cmd_pdf_protect_method(cmd_parms *cmd, void *_dcfg,
         return (const char *)apr_psprintf(cmd->pool,
             "ModSecurity: Unrecognised parameter value for SecPdfProtectMethod: %s", p1);
     }
-    
+
     return NULL;
 }
 
@@ -1608,7 +1608,7 @@ static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
     char *error_msg;
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
-    
+
     if (geo_init(dcfg, filename, &error_msg) <= 0) {
         return error_msg;
     }
@@ -1710,7 +1710,7 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "an action list"
     ),
-    
+
     AP_INIT_TAKE1 (
         "SecArgumentSeparator",
         cmd_argument_separator,
@@ -1871,7 +1871,7 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "marker for a skipAfter target"
     ),
-    
+
     AP_INIT_FLAG (
         "SecPdfProtect",
         cmd_pdf_protect,

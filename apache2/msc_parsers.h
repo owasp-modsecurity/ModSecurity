@@ -17,7 +17,7 @@ int DSOLOCAL parse_cookies_v0(modsec_rec *msr, char *_cookie_header, apr_table_t
 
 int DSOLOCAL parse_cookies_v1(modsec_rec *msr, char *_cookie_header, apr_table_t *cookies);
 
-int DSOLOCAL parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength, 
+int DSOLOCAL parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
     int argument_separator, const char *origin, apr_table_t *arguments, int *invalid_count);
 
 void DSOLOCAL add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg);

@@ -146,7 +146,7 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
     int collect_garbage = 0;
     int i;
     char *my_error_msg = NULL;
-    
+
     if (msr == NULL) return APR_SUCCESS;
 
     if (rand() < RAND_MAX/100) {
@@ -242,7 +242,7 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
         {
             msr->msc_reqbody_storage = MSC_REQBODY_DISK;
         }
-        
+
         /* In all other cases, try using the memory first
          * but switch over to disk for larger bodies.
          */
@@ -262,8 +262,8 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     if (msr->query_string != NULL) {
         int invalid_count = 0;
 
-        if (parse_arguments(msr, msr->query_string, strlen(msr->query_string), 
-            msr->txcfg->argument_separator, "QUERY_STRING", msr->arguments, 
+        if (parse_arguments(msr, msr->query_string, strlen(msr->query_string),
+            msr->txcfg->argument_separator, "QUERY_STRING", msr->arguments,
             &invalid_count) < 0)
         {
             msr_log(msr, 1, "Initialisation: Error occurred while parsing QUERY_STRING arguments.");
@@ -444,7 +444,7 @@ static apr_status_t modsecurity_process_phase_logging(modsec_rec *msr) {
     }
 
     /* Figure out if we want to keep the files (if there are any, of course). */
-    if ((msr->txcfg->upload_keep_files == KEEP_FILES_ON)    
+    if ((msr->txcfg->upload_keep_files == KEEP_FILES_ON)
         || ((msr->txcfg->upload_keep_files == KEEP_FILES_RELEVANT_ONLY)&&(msr->is_relevant)))
     {
         msr->upload_remove_files = 0;

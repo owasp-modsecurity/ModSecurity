@@ -140,7 +140,7 @@ int perform_interception(modsec_rec *msr) {
                 extern module core_module;
                 apr_socket_t *csd = ap_get_module_config(msr->r->connection->conn_config,
                     &core_module);
-                
+
                 if (csd) {
                     if (apr_socket_close(csd) == APR_SUCCESS) {
                         status = HTTP_FORBIDDEN;
@@ -358,7 +358,7 @@ static modsec_rec *create_tx_context(request_rec *r) {
         msr_log(msr, 4, "Transaction context created (dcfg %pp).", msr->dcfg1);
     }
 
-    return msr;    
+    return msr;
 }
 
 
@@ -425,7 +425,7 @@ static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_te
         ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
             "ModSecurity: Failed to initialise engine.");
         return HTTP_INTERNAL_SERVER_ERROR;
-    }    
+    }
 
     return OK;
 }
@@ -616,7 +616,7 @@ static int hook_request_late(request_rec *r) {
 
     /* Get the second configuration context. */
     msr->dcfg2 = (directory_config *)ap_get_module_config(r->per_dir_config,
-        &security2_module);    
+        &security2_module);
 
     /* Create a transaction context. */
     msr->txcfg = create_directory_config(msr->mp, NULL);
@@ -724,12 +724,12 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
     if (r == NULL) return;
     msr = retrieve_tx_context((request_rec *)r);
 
-    /* Create a context for requests we never had the chance to process */ 
+    /* Create a context for requests we never had the chance to process */
     if ((msr == NULL)
         && ((level & APLOG_LEVELMASK) < APLOG_DEBUG)
         && apr_table_get(r->subprocess_env, "UNIQUE_ID"))
     {
-        msr = create_tx_context((request_rec *)r); 
+        msr = create_tx_context((request_rec *)r);
         if (msr->txcfg->debuglog_level >= 9) {
             if (msr == NULL) {
                 msr_log(msr, 9, "Failed to create context after request failure.");
@@ -738,7 +738,7 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
                 msr_log(msr, 9, "Context created after request failure.");
             }
         }
-    } 
+    }
 
     if (msr == NULL) return;
 
@@ -881,11 +881,11 @@ static int hook_log_transaction(request_rec *r) {
     while ((arr->nelts == 0)&&(r->prev != NULL)) {
         r = r->prev;
         arr = apr_table_elts(r->headers_out);
-    }    
+    }
 
     msr->r = r;
     msr->response_status = r->status;
-    msr->status_line = ((r->status_line != NULL)    
+    msr->status_line = ((r->status_line != NULL)
         ? r->status_line : ap_get_status_line(r->status));
     msr->response_protocol = get_response_protocol(origr);
     msr->response_headers = apr_table_copy(msr->mp, r->headers_out);
@@ -1087,7 +1087,7 @@ static void register_hooks(apr_pool_t *mp) {
     /* Our own hook to handle RPC transactions (not used at the moment).
      * // ap_hook_handler(hook_handler, NULL, NULL, APR_HOOK_MIDDLE);
      */
-    
+
     /* Transaction processing hooks */
     ap_hook_post_read_request(hook_request_early,
         postread_beforeme_list, postread_afterme_list, APR_HOOK_REALLY_FIRST);

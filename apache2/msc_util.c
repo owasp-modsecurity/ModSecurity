@@ -37,7 +37,7 @@ int parse_boolean(const char *input) {
     if (strcasecmp(input, "false") == 0) return 0;
     if (strcasecmp(input, "0") == 0) return 0;
 
-    return -1;    
+    return -1;
 }
 
 /**
@@ -67,7 +67,7 @@ int parse_name_eq_value(apr_pool_t *mp, const char *input, char **name, char **v
     *value = apr_pstrdup(mp, p);
     if (*value == NULL) return -1;
 
-    return 1;    
+    return 1;
 }
 
 /**
@@ -106,7 +106,7 @@ char *url_encode(apr_pool_t *mp, char *input, unsigned int input_len, int *chang
     }
 
     *d = '\0';
-    
+
     return rval;
 }
 
@@ -129,7 +129,7 @@ char *strnurlencat(char *destination, char *source, unsigned int maxlen) {
      */
     while((*s != '\0')&&(maxlen > 0)) {
         unsigned char c = *s;
-        
+
         if (c == ' ') {
             *d++ = '+';
             maxlen--;
@@ -152,12 +152,12 @@ char *strnurlencat(char *destination, char *source, unsigned int maxlen) {
                 maxlen = 0;
             }
         }
-        
+
         s++;
     }
 
     *d++ = '\0';
-    
+
     return destination;
 }
 
@@ -296,13 +296,13 @@ int remove_lf_crlf_inplace(char *text) {
     char *p = text;
     int count = 0;
 
-    if (text == NULL) return -1;    
-    
+    if (text == NULL) return -1;
+
     while(*p != '\0') {
         count++;
         p++;
     }
-    
+
     if (count > 0) {
         if (*(p - 1) == '\n') {
             *(p - 1) = '\0';
@@ -313,7 +313,7 @@ int remove_lf_crlf_inplace(char *text) {
             }
         }
     }
-    
+
     return 1;
 }
 
@@ -866,8 +866,8 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
     unsigned char *d = input;
     int i, count;
 
-    if ((input == NULL)||(input_len <= 0)) return 0;    
-    
+    if ((input == NULL)||(input_len <= 0)) return 0;
+
     i = count = 0;
     while((i < input_len)&&(count < input_len)) {
         int z, copy = 1;
@@ -988,7 +988,7 @@ int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len) {
     while(i < input_len) {
         if ((input[i] == '\\')&&(i + 1 < input_len)) {
             int c = -1;
-        
+
             switch(input[i + 1]) {
                 case 'a' :
                     c = '\a';
@@ -1177,7 +1177,7 @@ int is_empty_string(const char *string) {
         if (!isspace(string[i])) {
             return 0;
         }
-    }        
+    }
 
     return 1;
 }

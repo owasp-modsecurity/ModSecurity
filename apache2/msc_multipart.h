@@ -38,7 +38,7 @@ struct multipart_part {
     /* variables only, variable value */
     char                    *value;
     apr_array_header_t      *value_parts;
-    
+
     /* files only, the content type (where available) */
     char                    *content_type;
 
@@ -48,7 +48,7 @@ struct multipart_part {
     unsigned int             tmp_file_size;
     /* files only, filename as supplied by the browser */
     char                    *filename;
-    
+
     char                    *last_header_name;
     apr_table_t             *headers;
 
@@ -95,10 +95,10 @@ struct multipart_data {
      * 0 - no content, 1 - two data bytes available
      */
     char                     reserve[4];
- 
-    int                      seen_data;    
+
+    int                      seen_data;
     int                      is_complete;
- 
+
     int                      flag_error;
     int                      flag_data_before;
     int                      flag_data_after;

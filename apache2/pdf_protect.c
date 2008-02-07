@@ -49,14 +49,14 @@ static char *create_hash(modsec_rec *msr,
         msr_log(msr, 1, "PdfProtect: Unable to generate hash. Please configure SecPdfProtectSecret.");
         return NULL;
     }
-    
+
     /* Our protection token is made out of the client's IP
      * address, the secret key, and the token expiry time.
      */
     content = apr_pstrcat(msr->mp, msr->remote_addr, msr->txcfg->pdfp_secret,
         time_string, NULL);
     if (content == NULL) return NULL;
-    
+
     return encode_sha1_base64(msr->mp, content);
 }
 
@@ -72,14 +72,14 @@ static char *create_token(modsec_rec *msr) {
     if (msr->txcfg->pdfp_timeout != -1) {
         timeout = msr->txcfg->pdfp_timeout;
     }
-    
+
     current_time = apr_time_sec(apr_time_now());
     time_string = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)(current_time + timeout));
     if (time_string == NULL) return NULL;
-    
+
     hash = create_hash(msr, time_string);
     if (hash == NULL) return NULL;
-    
+
     return apr_pstrcat(msr->mp, hash, "|", time_string, NULL);
 }
 
@@ -98,17 +98,17 @@ static char *construct_new_uri(modsec_rec *msr) {
     if (msr->txcfg->pdfp_token_name != NULL) {
         token_name = msr->txcfg->pdfp_token_name;
     }
-    
+
     token_parameter = apr_pstrcat(msr->mp, token_name, "=", token, NULL);
     if (token_parameter == NULL) return NULL;
-    
+
     if (msr->r->args == NULL) { /* No other parameters. */
         new_uri = apr_pstrcat(msr->mp, msr->r->uri, "?", token_parameter, "#PDFP", NULL);
     } else { /* Preserve existing paramters. */
         new_uri = apr_pstrcat(msr->mp, msr->r->uri, "?", msr->r->args, "&",
             token_parameter, "#PDFP", NULL);
     }
-    
+
     return (char *)new_uri;
 }
 
@@ -119,7 +119,7 @@ static char *extract_token(modsec_rec *msr) {
     char *search_string = NULL;
     char *p = NULL, *t = NULL;
     const char *token_name = DEFAULT_TOKEN_NAME;
-    
+
     if ((msr->r == NULL)||(msr->r->args == NULL)) {
         return NULL;
     }
@@ -127,18 +127,18 @@ static char *extract_token(modsec_rec *msr) {
     if (msr->txcfg->pdfp_token_name != NULL) {
         token_name = msr->txcfg->pdfp_token_name;
     }
-    
+
     search_string = apr_pstrcat(msr->mp, msr->txcfg->pdfp_token_name, "=", NULL);
     if (search_string == NULL) return NULL;
-    
+
     p = strstr(msr->r->args, search_string);
     if (p == NULL) return NULL;
 
     t = p = p + strlen(search_string);
     while ((*t != '\0')&&(*t != '&')) t++;
-    
+
     return apr_pstrmemdup(msr->mp, p, t - p);
-} 
+}
 
 /**
  *
@@ -166,11 +166,11 @@ static int verify_token(modsec_rec *msr, const char *token, char **error_msg) {
 
     if (error_msg == NULL) return 0;
     *error_msg = NULL;
-    
+
     /* Split token into its parts - hash and expiry time. */
     p = strstr(token, "|");
     if (p == NULL) return 0;
-    
+
     given_hash = apr_pstrmemdup(msr->mp, token, p - token);
     time_string = p + 1;
     if (!validate_time_string(time_string)) {
@@ -194,7 +194,7 @@ static int verify_token(modsec_rec *msr, const char *token, char **error_msg) {
         *error_msg = apr_psprintf(msr->mp, "PdfProtect: Token has expired.");
         return 0;
     }
-    
+
     return 1;
 }
 
@@ -297,7 +297,7 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
             /* Locate the protection token. */
             token = extract_token(msr);
-    
+
             if (token == NULL) { /* No token. */
                 char *new_uri = NULL;
 
@@ -320,7 +320,7 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                 char *my_error_msg = NULL;
 
                 /* Verify the token is valid. */
-                
+
                 if (verify_token(msr, token, &my_error_msg)) { /* Valid. */
                     /* Do nothing - serve the PDF file. */
                     if (msr->txcfg->debuglog_level >= 9) {
@@ -340,12 +340,12 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
                     apr_table_set(r->headers_out, "Content-Disposition", DISPOSITION_VALUE);
                     r->content_type = ATTACHMENT_MIME_TYPE;
-            
+
                     /* Fall through. */
                 }
             }
         }
-    }    
+    }
 
     ap_remove_output_filter(f);
 
@@ -435,14 +435,14 @@ int pdfp_check(modsec_rec *msr) {
 
     /* Locate the protection token. */
     token = extract_token(msr);
-    
+
     if (token == NULL) { /* No token. */
         char *new_uri = NULL;
 
         /* Create a new URI with the protection token inside. */
         new_uri = construct_new_uri(msr);
         if (new_uri == NULL) return DECLINED;
-        
+
         /* Redirect user to the new URI. */
         if (msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "PdfProtect: PDF request without a token - redirecting to %s.",
@@ -479,7 +479,7 @@ int pdfp_check(modsec_rec *msr) {
             apr_table_set(msr->r->headers_out, "Content-Disposition", DISPOSITION_VALUE);
             msr->r->content_type = ATTACHMENT_MIME_TYPE;
             apr_table_set(msr->r->notes, NOTE_TWEAK_HEADERS, "1");
-            
+
             /* Proceed with response (PDF) generation. */
             return 0;
         }

@@ -167,7 +167,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
     seen_eos = 0;
     bb_in = apr_brigade_create(msr->mp, r->connection->bucket_alloc);
-    if (bb_in == NULL) return -1;    
+    if (bb_in == NULL) return -1;
     do {
         apr_status_t rc;
 
@@ -203,7 +203,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
             apr_size_t buflen;
 
             rc = apr_bucket_read(bucket, &buf, &buflen, APR_BLOCK_READ);
-            if (rc != APR_SUCCESS) {   
+            if (rc != APR_SUCCESS) {
                 *error_msg = apr_psprintf(msr->mp, "Failed reading input / bucket (%d): %s", rc, get_apr_error(msr->mp, rc));
                 return -1;
             }
@@ -336,7 +336,7 @@ static apr_status_t output_filter_init(modsec_rec *msr, ap_filter_t *f,
         return -1;
     }
     msr->of_status = OF_STATUS_IN_PROGRESS;
-    
+
     rc = output_filter_should_run(msr, r);
     if (rc < 0) return -1; /* output_filter_should_run() generates error msg */
     if (rc == 0) return 0;
@@ -449,7 +449,7 @@ static int flatten_response_body(modsec_rec *msr) {
         return -1;
     }
 
-    msr->resbody_data = apr_palloc(msr->mp, msr->resbody_length + 1); 
+    msr->resbody_data = apr_palloc(msr->mp, msr->resbody_length + 1);
     if (msr->resbody_data == NULL) {
         msr_log(msr, 1, "Output filter: Response body data memory allocation failed. Asked for: %" APR_SIZE_T_FMT,
             msr->resbody_length + 1);
@@ -492,18 +492,18 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "Output filter: Receiving output (f %pp, r %pp).", f, f->r);
     }
-    
+
     /* Initialise on first invocation */
     if (msr->of_status == OF_STATUS_NOT_STARTED) {
         /* Update our context from the request structure. */
         msr->r = r;
         msr->response_status = r->status;
-        msr->status_line = ((r->status_line != NULL)    
+        msr->status_line = ((r->status_line != NULL)
             ? r->status_line : ap_get_status_line(r->status));
         msr->response_protocol = get_response_protocol(r);
         msr->response_headers = apr_table_overlay(msr->mp, r->err_headers_out, r->headers_out);
 
-        /* Process phase RESPONSE_HEADERS */        
+        /* Process phase RESPONSE_HEADERS */
         rc = modsecurity_process_phase(msr, PHASE_RESPONSE_HEADERS);
         if (rc < 0) { /* error */
             ap_remove_output_filter(f);
@@ -552,7 +552,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                 apr_table_unset(msr->r->headers_out, "Last-Modified");
                 apr_table_unset(msr->r->headers_out, "ETag");
                 apr_table_unset(msr->r->headers_out, "Expires");
-            
+
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "Content Injection: Removing headers (C-L, L-M, Etag, Expires).");
                 }
@@ -562,7 +562,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                 }
             }
         }
-          
+
         /* Content injection (prepend & non-buffering). */
         if ((msr->txcfg->content_injection_enabled) && (msr->content_prepend) && (msr->of_skipping)) {
             apr_bucket *bucket_ci = apr_bucket_heap_create(msr->content_prepend,
@@ -597,7 +597,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         if ((msr->of_skipping == 0)&&(!msr->of_partial)) { /* Observe the response data. */
             /* Retrieve data from the bucket. */
             rc = apr_bucket_read(bucket, &buf, &buflen, APR_BLOCK_READ);
-            if (rc != APR_SUCCESS) {   
+            if (rc != APR_SUCCESS) {
                 msr->of_status = OF_STATUS_COMPLETE;
                 msr->resbody_status = RESBODY_STATUS_ERROR;
 
@@ -704,7 +704,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         }
 
         if (msr->of_done_reading == 0) {
-            /* We are done for now. We will be called again with more data. */        
+            /* We are done for now. We will be called again with more data. */
             return APR_SUCCESS;
         }
 
@@ -777,7 +777,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
             return rc;
         }
     }
-    
+
     /* Another job well done! */
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Output filter: Output forwarding complete.");

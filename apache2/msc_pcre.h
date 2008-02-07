@@ -24,7 +24,7 @@ struct msc_regex_t {
 };
 
 apr_status_t DSOLOCAL msc_pcre_cleanup(msc_regex_t *regex);
-  
+
 void DSOLOCAL *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
     const char **_errptr, int *_erroffset);
 
