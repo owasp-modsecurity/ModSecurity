@@ -229,7 +229,7 @@ static int test_op(const char *name, const char *param, const unsigned char *inp
     /* Initialize the operator parameter */
     if (metadata->param_init != NULL) {
         rc = metadata->param_init(rule, errmsg);
-        if (rc < 0) {
+        if (rc <= 0) {
             *errmsg = apr_psprintf(g_mp, "Failed to init op \"%s\": %s", name, *errmsg);
             return rc;
         }
