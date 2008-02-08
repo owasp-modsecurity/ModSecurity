@@ -1,5 +1,9 @@
-04 Feb 2008 - 2.5.0-rc3
+07 Feb 2008 - 2.5.0-rc3
 -----------------------
+
+ * Update some more unit tests.
+
+ * Fixed new string operators not matching with an empty string pattern.
 
  * Cleanup some string formatters as to not generate compile warnings.
 
