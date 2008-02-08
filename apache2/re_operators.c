@@ -1533,17 +1533,17 @@ static int msre_op_validateUrlEncoding_execute(modsec_rec *msr, msre_rule *rule,
             break;
         case -2 :
             *error_msg = apr_psprintf(msr->mp, "Invalid URL Encoding: Non-hexadecimal "
-                "digits used.");
+                "digits used at %s.", var->name);
             return 1; /* Invalid match. */
             break;
         case -3 :
             *error_msg = apr_psprintf(msr->mp, "Invalid URL Encoding: Not enough characters "
-                "at the end of input.");
+                "at the end of input at %s.", var->name);
             return 1; /* Invalid match. */
             break;
         case -1 :
         default :
-            *error_msg = apr_psprintf(msr->mp, "Invalid URL Encoding: Internal Error (rc = %d)", rc);
+            *error_msg = apr_psprintf(msr->mp, "Invalid URL Encoding: Internal Error (rc = %d) at %s", rc, var->name);
             return -1;
             break;
 
