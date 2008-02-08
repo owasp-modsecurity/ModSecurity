@@ -412,8 +412,7 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
     /* The empty string always matches */
     if (target_length == 0) {
         /* Match. */
-        *error_msg = apr_psprintf(msr->mp, "String match \"\" within \"%s\" at %s.",
-                        log_escape_ex(msr->mp, match, match_length),
+        *error_msg = apr_psprintf(msr->mp, "String match within \"\" at %s.",
                         var->name);
         return 1;
     }
@@ -433,8 +432,7 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
         if (match[i] == target[0]) {
             if (memcmp((target + 1), (match + i + 1), (target_length - 1)) == 0) {
                 /* match. */
-                *error_msg = apr_psprintf(msr->mp, "String match \"%s\" within \"%s\" at %s.",
-                                log_escape_ex(msr->mp, target, target_length),
+                *error_msg = apr_psprintf(msr->mp, "String match within \"%s\" at %s.",
                                 log_escape_ex(msr->mp, match, match_length),
                                 var->name);
                 return 1;
@@ -708,8 +706,15 @@ static int msre_op_beginsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var
         target_length = var->value_len;
     }
 
-    /* These are impossible to match */
-    if ((match_length == 0) || (match_length > target_length)) {
+    /* The empty string always matches */
+    if (match_length == 0) {
+        /* Match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"\" at %s.", var->name);
+        return 1;
+    }
+
+    /* This is impossible to match */
+    if (match_length > target_length) {
         /* No match. */
         return 0;
     }
@@ -763,8 +768,15 @@ static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         target_length = var->value_len;
     }
 
-    /* These are impossible to match */
-    if ((match_length == 0) || (match_length > target_length)) {
+    /* The empty string always matches */
+    if (match_length == 0) {
+        /* Match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"\" at %s.", var->name);
+        return 1;
+    }
+
+    /* This is impossible to match */
+    if (match_length > target_length) {
         /* No match. */
         return 0;
     }
