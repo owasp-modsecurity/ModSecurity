@@ -344,6 +344,7 @@ int main(int argc, const char * const argv[])
     apr_size_t out_len = 0;
     int rc = 0;
     int result = 0;
+    int ec = 0;
 
     apr_app_initialize(&argc, &argv, NULL);
     atexit(apr_terminate);
@@ -420,7 +421,7 @@ int main(int argc, const char * const argv[])
                             "Output: '%s' len=%" APR_SIZE_T_FMT "\n"
                             "Expect: '%s' len=%" APR_SIZE_T_FMT "\n",
                             s0, nbytes, s1, out_len, s2, param_len);
-            exit(1);
+            ec = 1;
         }
     }
     else if (strcmp("op", type) == 0) {
@@ -455,7 +456,7 @@ int main(int argc, const char * const argv[])
             fprintf(stderr, " Test: '@%s %s'\n"
                             "Input: '%s' len=%" APR_SIZE_T_FMT "\n",
                             name, param, s0, nbytes);
-            exit(1);
+            ec = 1;
         }
     }
     else {
@@ -465,7 +466,7 @@ int main(int argc, const char * const argv[])
 
     fprintf(stdout, "%s\n", errmsg ? errmsg : "");
 
-    return 0;
+    return ec;
 }
 
 
