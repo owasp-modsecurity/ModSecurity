@@ -5,11 +5,17 @@ MOD_SECURITY2 = mod_security2 apache2_config apache2_io apache2_util \
     msc_logging msc_xml msc_multipart modsecurity msc_parsers msc_util msc_pcre \
     persist_dbm msc_reqbody pdf_protect msc_geo acmp msc_lua
 
+MSC_TEST = re re_operators re_actions re_tfns re_variables \
+    msc_logging msc_xml msc_multipart modsecurity \
+    msc_parsers msc_util msc_pcre  persist_dbm \
+    msc_reqbody msc_geo acmp msc_lua
+
 MOD_SECURITY2_H = re.h modsecurity.h msc_logging.h msc_multipart.h msc_parsers.h \
     msc_pcre.h msc_util.h msc_xml.h persist_dbm.h apache2.h pdf_protect.h \
     msc_geo.h acmp.h utf8tables.h msc_lua.h
 
-CC = @CC@
+CC = @APXS_CC@
+LIBTOOL = @APXS_LIBTOOL@
 PERL = @PERL@
 EXTRA_CFLAGS = @EXTRA_CFLAGS@
 MODSEC_EXTRA_CFLAGS = @MODSEC_EXTRA_CFLAGS@
@@ -86,18 +92,7 @@ mod_security2.la: $(MOD_SECURITY2_H) *.c
 	done; \
 	$(COMPILE_APACHE_MOD) $(APXS_EXTRA_CFLAGS) $(MODSEC_APXS_EXTRA_CFLAGS) $$src
 
-### Experimental Test Framework (UNIX only right now)
-TESTOBJS = re.o re_operators.o re_actions.o re_tfns.o re_variables.o \
-           msc_logging.o msc_xml.o msc_multipart.o modsecurity.o \
-           msc_parsers.o msc_util.o msc_pcre.o  persist_dbm.o \
-           msc_reqbody.o msc_geo.o acmp.o msc_lua.o
-
-msc_test: mod_security2.la msc_test.c
-	@$(CC) $(CPPFLAGS) $(LDFLAGS) $(APXS_INCLUDES) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test $(TESTOBJS) msc_test.c $(LIBS) $(APR_LIBS) $(APU_LIBS) $(APXS_LIBS) $(APR_LINK_LD) $(APU_LINK_LD)
-
-test: t/run-tests.pl msc_test
-	@$(PERL) t/run-tests.pl
-
+### MLogC
 mlogc:
 	@$(MAKE) -C mlogc-src mlogc \
 	&& cp -p mlogc-src/mlogc ../tools \
@@ -113,3 +108,19 @@ mlogc-static:
 	&& echo "Successfully built \"mlogc-static\" in ../tools." \
 	&& echo "See: mlogc-src/INSTALL" \
 	&& echo
+
+### Experimental Test Framework (*NIX only right now)
+msc_test.lo: msc_test.c
+	$(LIBTOOL) --mode=compile $(CC) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(CPPFLAGS) -c msc_test.c
+
+msc_test: $(TESTOBJS) msc_test.lo
+	@objs=""; \
+	for f in $(MSC_TEST); do \
+		objs="$$objs $$f.lo"; \
+	done; \
+	$(LIBTOOL) --mode=link $(CC) $$objs -o msc_test msc_test.lo $(LDFLAGS) $(LIBS) $(APR_LINK_LD) $(APU_LINK_LD)
+
+test: t/run-tests.pl msc_test
+	@rm -f msc-test-debug.log; \
+	$(PERL) t/run-tests.pl
+

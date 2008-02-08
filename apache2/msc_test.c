@@ -25,6 +25,7 @@
 #define RESULT_WRONGRET         -4
 
 /* Globals */
+static char *test_name = NULL;
 static apr_pool_t *g_mp = NULL;
 static modsec_rec *g_msr = NULL;
 msc_engine *modsecurity = NULL;
@@ -66,7 +67,7 @@ void msr_log(modsec_rec *msr, int level, const char *text, ...) {
     if (msr->txcfg->debuglog_fd != NULL) {
         apr_size_t nbytes_written = 0;
         apr_vsnprintf(str1, sizeof(str1), text, ap);
-        apr_snprintf(str2, sizeof(str2), "[%d] %s\n", level, str1);
+        apr_snprintf(str2, sizeof(str2), "[%d] [%s] %s\n", level, test_name, str1);
 
         apr_file_write_full(msr->txcfg->debuglog_fd, str2, strlen(str2), &nbytes_written);
     }
@@ -365,6 +366,8 @@ int main(int argc, const char * const argv[])
     if (argc >= 5) {
         returnval = argv[4];
     }
+
+    test_name = apr_psprintf(g_mp, "%s/%s", type, name);
 
     if (apr_file_open_stdin(&fd, g_mp) != APR_SUCCESS) {
         fprintf(stderr, "Failed to open stdin\n");
