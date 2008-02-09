@@ -1,17 +1,19 @@
-07 Feb 2008 - 2.5.0-rc3
+08 Feb 2008 - 2.5.0-rc3
 -----------------------
 
  * Update some more unit tests.
 
  * Fixed new string operators not matching with an empty string pattern.
 
- * Cleanup some string formatters as to not generate compile warnings.
+ * Cleaned up some string formatters as to not generate compile warnings.
 
  * Fixed crash on startup when using "none" transformation in Lua rule.
 
  * Fixed crash on startup when ENV is improperly used without a parameter.
 
  * Allow macro resolution in setenv action.
+
+ * Cleaned up the configure process.
 
 
 29 Jan 2008 - 2.5.0-rc2
