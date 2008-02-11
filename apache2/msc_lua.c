@@ -140,7 +140,10 @@ static apr_array_header_t *resolve_tfns(lua_State *L, int idx, modsec_rec *msr, 
     tfn_arr = apr_array_make(mp, 25, sizeof(msre_tfn_metadata *));
     if (tfn_arr == NULL) return NULL;
 
-    if (lua_istable(L, idx)) { /* Is the second parameter an array? */
+    /* ENH: Why is this userdata and not none/nil when parameter not given? */
+    if (lua_isuserdata(L, idx) || lua_isnoneornil(L, idx)) { /* No second parameter */
+        return tfn_arr;
+    } else if (lua_istable(L, idx)) { /* Is the second parameter an array? */
         int i, n = lua_objlen(L, idx);
 
         for(i = 1; i <= n; i++) {
@@ -176,7 +179,7 @@ static apr_array_header_t *resolve_tfns(lua_State *L, int idx, modsec_rec *msr, 
             }
         }
     } else {
-        msr_log(msr, 1, "SecRuleScript: Transformation parameter must be a transformation name or array of transformation names.");
+        msr_log(msr, 1, "SecRuleScript: Transformation parameter must be a transformation name or array of transformation names, but found \"%s\" (type %d).", lua_typename(L, idx), lua_type(L, idx));
         return NULL;
     }
 
