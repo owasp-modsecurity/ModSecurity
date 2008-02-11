@@ -74,7 +74,7 @@ clean: clean-extras
 	@rm -rf *.la *.lo *.o *.slo .libs msc_test msc-test-debug.log
 
 maintainer-clean: clean
-	@rm -rf Makefile mlogc-src/Makefile t/run-tests.pl config config.log config.status configure mod_security2_config.h ../tools/*.pl autoscan.log configure.scan build/libtool.m4 build/config.guess build/config.sub build/ltmain.sh
+	@rm -rf Makefile mlogc-src/Makefile t/run-tests.pl config config.log config.status configure mod_security2_config.h ../tools/*.pl autoscan.log configure.scan build/libtool.m4 build/config.guess build/config.sub build/ltmain.sh build/apxs-wrapper
 
 dist-clean: maintainer-clean
 

@@ -1,6 +1,8 @@
 11 Feb 2008 - 2.5.0-rc3
 -----------------------
 
+ * Updated included Core Ruleset to version 1.6.0-rc3 using 2.5 features.
+
  * Update some more unit tests.
 
  * Fixed new string operators not matching with an empty string pattern.

@@ -1,3 +1,41 @@
+------------------------------
+Version 1.6.0-rc3 - 2008/02/11
+------------------------------
+
+New Rulesets & Features:
+- 42 - Tight Security
+    This ruleset contains currently 2 rules which are considered highly prone
+    to FPs. They take care of Path Traversal attacks, and RFI attacks. This
+    ruleset is included in the optional_rulesets dir
+- 42 - Comment Spam
+    Comment Spam is used by the spammers to increase their rating in search
+    engines by posting links to their site in other sites that allow posting
+    of comments and messages. The rules in this ruleset will work against that.
+    (Requires ModSecurity 2.5)
+- Tags
+    A single type of attack is often detected by multiple rules. The new alert
+    classification tags solve this issue by providing an alternative alert type
+    indication and can serve for filtering and analysis of audit logs.
+    The classification tags are hierarchical with slashes separating levels.
+    Usually there are two levels with the top level describing the alert group
+    and the lower level denoting the alert type itself, for example:
+    WEB_ATTACK/SQL_INJECTION.
+
+False Positives Fixes:
+- Rule 960903 - Moved to phase 4 instead of 5 to avoid FPs
+- Rule 950107 - Will look for invalid url decoding in variables that are not
+                automatically url decoded
+
+Additional rules logic:
+- Using the new "logdata" action for logging the matched signature in rules
+- When logging an event once, init the collection only if the alert needs to log
+- Using the new operator @pm as a qualifier before large rules to enhance
+    performance (Requires ModSecurity 2.5)
+- SQL injection - A smarter regexp is used to detect 1=1,2=2,etc.. and not
+    only 1=1. (Thanks to Marc Stern for the idea) 
+- New XSS signatures - iframe & flash XSS
+
+
 -------------------------
 Version 1.5.1 - 2007/12/6
 -------------------------
@@ -171,8 +209,8 @@ Regular expressions fixes:
 - Command Injections now always require certain characters both before and after the command. Important since many are common English words (finger, mail)
 - The command injection wget is not searched in the UA header as it has different meaning there.
 - LDAP Fixed to reduce FPs:
-	+ More accurate regular expressions
-	+ high bit characters not accpeted between signature tokens.
+  + More accurate regular expressions
+  + high bit characters not accpeted between signature tokens.
 - Do not detect <?xml as a PHP tag in both PHP injection and PHP source leakage
 - Removed Java from automation UA
 - When validating encoding, added regexp based chained rule that accepts both %xx and %uxxxxx encoding bypassing a limitation of "@validateUrlEncoding"
