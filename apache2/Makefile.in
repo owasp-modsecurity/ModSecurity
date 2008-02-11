@@ -111,7 +111,7 @@ mlogc-static:
 
 ### Experimental Test Framework (*NIX only right now)
 msc_test.lo: msc_test.c
-	$(LIBTOOL) --mode=compile $(CC) $(APXS_CFLAGS) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(CPPFLAGS) -c msc_test.c
+	$(LIBTOOL) --mode=compile $(CC) $(APXS_CFLAGS) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(CPPFLAGS) -o msc_test.lo -c msc_test.c
 
 msc_test: $(TESTOBJS) msc_test.lo
 	@objs=""; \
