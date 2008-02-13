@@ -1,7 +1,7 @@
-12 Feb 2008 - 2.5.0-rc4
+13 Feb 2008 - 2.5.0-rc4
 -----------------------
 
- * Updated code to be more portable so it builds with MS VC++ 8.
+ * Updated code to be more portable so it builds with MS VC++.
 
 
 11 Feb 2008 - 2.5.0-rc3

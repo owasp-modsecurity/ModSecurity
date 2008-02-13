@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-rc4 (February 12, 2008)</releaseinfo>
+    <releaseinfo>Version 2.5.0-rc4 (February 13, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -391,6 +391,14 @@
                 <para>Install the ModSecurity module with: <literal>nmake -f
                 Makefile.win install</literal></para>
               </listitem>
+
+              <listitem>
+                <para>Copy the <literal>libxml2.dll</literal> and
+                <literal>lua5.1.dll</literal> to the Apache
+                <literal>bin</literal> directory. Alternatively you can follow
+                the step below for using LoadFile to load these
+                libraries.</para>
+              </listitem>
             </orderedlist>
           </listitem>
         </itemizedlist>
@@ -400,7 +408,8 @@
         <para>Edit the main Apache httpd config file (usually
         <literal>httpd.conf</literal>)</para>
 
-        <para>On UNIX you must load libxml2 and lua before ModSecurity with
+        <para>On UNIX (and Windows if you did not copy the DLLs as stated
+        above) you must load libxml2 and lua5.1 before ModSecurity with
         something like this:</para>
 
         <para><programlisting>LoadFile /usr/lib/libxml2.so

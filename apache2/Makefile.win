@@ -6,31 +6,40 @@
 # Path to Apache httpd installation
 BASE = C:\Apache2
 
-# Path to required libraries
+# Paths to required libraries
 LIBXML2 = C:\work\libxml2-2.6.31
-LUA = C:\work\lua-5.1.3\src
+LUA = C:\work\lua-5.1.3
 PCRE = C:\work\httpd-2.2.8\srclib\pcre
+
+# Linking libraries
+LIBS = $(BASE)\lib\libhttpd.lib \
+       $(BASE)\lib\libapr-1.lib \
+       $(BASE)\lib\libaprutil-1.lib \
+       $(PCRE)\LibR\pcre.lib \
+       $(LIBXML2)\win32\bin.msvc\libxml2.lib \
+       $(LUA)\lua5.1.lib \
+       wsock32.lib
 
 ###########################################################################
 ###########################################################################
 
 CC = cL
 
+MT = mt
+
 DEFS = /nologo /O2 /LD /W3 /wd4244 -DWIN32 -DWINNT -Dinline=APR_INLINE
 
 DLL = mod_security2.so
 
-INCLUDES = -I. -I$(PCRE) -I$(LIBXML2)\include -I$(LUA) -I$(BASE)\include 
+INCLUDES = -I. \
+           -I$(PCRE)\include -I$(PCRE) \
+           -I$(LIBXML2)\include \
+           -I$(LUA)\include -I$(LUA) \
+           -I$(BASE)\include 
 
 CFLAGS= -MD $(INCLUDES) $(DEFS)
 
-LIBS = $(BASE)\lib\libhttpd.lib \
-       $(BASE)\lib\libapr-1.lib \
-       $(BASE)\lib\libaprutil-1.lib \
-       $(PCRE)\LibR\pcre.lib \
-       $(LIBXML2)\win32\bin.msvc\libxml2.lib \
-       $(LUA)\lua.lib \
-       wsock32.lib
+LDFLAGS = 
 
 OBJS = mod_security2.obj apache2_config.obj apache2_io.obj apache2_util.obj \
        re.obj re_operators.obj re_actions.obj re_tfns.obj re_variables.obj \
@@ -53,10 +62,11 @@ mod_security2_config.h: mod_security2_config.hw
 	$(CC) $(CFLAGS) -c $< -Fo$@
 
 $(DLL): mod_security2_config.h $(OBJS)
-	$(CC) $(CFLAGS) -LD $(OBJS) -Fe$(DLL) $(LIBS) /link
+	$(CC) $(CFLAGS) $(LDFLAGS) -LD $(OBJS) -Fe$(DLL) $(LIBS) /link
+	IF EXIST $(DLL).manifest $(MT) -manifest $(DLL).manifest -outputresource:$(DLL);2
 
 install: $(DLL)
 	copy $(DLL) $(BASE)\modules
 
 clean:
-	del $(OBJS) *.dll *.lib *.pdb *.idb *.ilk *.exp *.res *.rc *.bin mod_security2_config.h
+	del $(OBJS) $(DLL) *.dll *.lib *.pdb *.idb *.ilk *.exp *.res *.rc *.bin mod_security2_config.h *.manifest
