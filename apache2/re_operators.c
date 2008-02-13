@@ -194,16 +194,20 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 /* pm */
 
 static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
+    ACMP *p;
+    const char *phrase;
+    const char *next;
+
     if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pm'.");
         return 0; /* ERROR */
     }
 
-    ACMP *p = acmp_create(0, rule->ruleset->mp);
+    p = acmp_create(0, rule->ruleset->mp);
     if (p == NULL) return 0;
 
-    const char *phrase = apr_pstrdup(rule->ruleset->mp, rule->op_param);
-    const char *next = rule->op_param + strlen(rule->op_param);
+    phrase = apr_pstrdup(rule->ruleset->mp, rule->op_param);
+    next = rule->op_param + strlen(rule->op_param);
 
     /* Loop through phrases */
     /* ENH: Need to allow quoted phrases w/space */
@@ -231,13 +235,14 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     const char *rulefile_path;
     apr_status_t rc;
     apr_file_t *fd;
+    ACMP *p;
 
     if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pm'.");
         return 0; /* ERROR */
     }
 
-    ACMP *p = acmp_create(0, rule->ruleset->mp);
+    p = acmp_create(0, rule->ruleset->mp);
     if (p == NULL) return 0;
 
     fn = apr_pstrdup(rule->ruleset->mp, rule->op_param);
@@ -321,6 +326,7 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     const char *match = NULL;
     apr_status_t rc = 0;
     int capture;
+    ACMPT pt;
 
     /* Nothing to read */
     if ((var->value == NULL) || (var->value_len == 0)) return 0;
@@ -328,7 +334,8 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     /* Are we supposed to capture subexpressions? */
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
-    ACMPT pt = {(ACMP *)rule->op_param_data, NULL};
+    pt.parser = (ACMP *)rule->op_param_data;
+    pt.ptr = NULL;
 
     rc = acmp_process_quick(&pt, &match, var->value, var->value_len);
     if (rc) {

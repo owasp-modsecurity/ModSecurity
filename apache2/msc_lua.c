@@ -27,6 +27,7 @@ typedef struct {
  */
 static const char* dump_reader(lua_State* L, void* user_data, size_t* size) {
     msc_lua_dumpr_t *dumpr = (msc_lua_dumpr_t *)user_data;
+    msc_script_part *part;
 
     /* Do we have more chunks to return? */
     if (dumpr->index == dumpr->script->parts->nelts) {
@@ -34,7 +35,7 @@ static const char* dump_reader(lua_State* L, void* user_data, size_t* size) {
     }
 
     /* Get one chunk. */
-    msc_script_part *part = ((msc_script_part **)dumpr->script->parts->elts)[dumpr->index];
+    part = ((msc_script_part **)dumpr->script->parts->elts)[dumpr->index];
     *size = part->len;
 
     dumpr->index++;
@@ -47,9 +48,10 @@ static const char* dump_reader(lua_State* L, void* user_data, size_t* size) {
  */
 static int dump_writer(lua_State *L, const void* data, size_t len, void* user_data) {
     msc_lua_dumpw_t *dump = (msc_lua_dumpw_t *)user_data;
+    msc_script_part *part;
 
     /* Allocate new part, copy the data into it. */
-    msc_script_part *part = apr_palloc(dump->pool, sizeof(msc_script_part));
+    part = apr_palloc(dump->pool, sizeof(msc_script_part));
     part->data = apr_palloc(dump->pool, len);
     part->len = len;
     memcpy((void *)part->data, data, len);
@@ -197,6 +199,7 @@ static int l_getvar(lua_State *L) {
     char *p1 = NULL;
     apr_array_header_t *tfn_arr = NULL;
     msre_var *vx = NULL;
+    msre_var *var;
 
     /* Retrieve parameters. */
     p1 = (char *)luaL_checkstring(L, 1);
@@ -218,7 +221,7 @@ static int l_getvar(lua_State *L) {
     }
 
     /* Resolve variable. */
-    msre_var *var = msre_create_var_ex(msr->msc_rule_mptmp, msr->modsecurity->msre,
+    var = msre_create_var_ex(msr->msc_rule_mptmp, msr->modsecurity->msre,
         varname, param, msr, &my_error_msg);
 
     if (var == NULL) {

@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-rc3 (February 11, 2008)</releaseinfo>
+    <releaseinfo>Version 2.5.0-rc4 (February 12, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -314,66 +314,99 @@
       </listitem>
 
       <listitem>
-        <para>Unpack the ModSecurity archive</para>
-      </listitem>
-
-      <listitem>
-        <para>Run the configure script to generate a Makefile. Typically no
-        options are needed.</para>
-
-        <para><literal>./configure</literal></para>
-
-        <para>Options are available for more customization (use
-        <literal>./configure --help</literal> for a full list), but typically
-        you will only need to specify the location of the
-        <literal>apxs</literal> command installed by Apache httpd with the
-        <literal>--with-apxs</literal> option.</para>
-
-        <para><literal>./configure
-        --with-apxs=/path/to/httpd-2.x.y/bin/apxs</literal></para>
-      </listitem>
-
-      <listitem>
-        <para>Compile with: <literal>make</literal></para>
-      </listitem>
-
-      <listitem>
-        <para>Optionally test with: <literal>make test</literal></para>
-      </listitem>
-
-      <listitem>
-        <para>Optionally build the ModSecurity Log Collector with:
-        <literal>make mlogc</literal></para>
-      </listitem>
-
-      <listitem>
         <para>Stop Apache httpd</para>
       </listitem>
 
       <listitem>
-        <para>Optionally install <literal>mlogc</literal>: Review the
-        <literal>INSTALL</literal> file included in the apache2/mlogc-src
-        directory in the distribution.</para>
+        <para>Unpack the ModSecurity archive</para>
       </listitem>
 
       <listitem>
-        <para>Install the ModSecurity module with: <literal>make
-        install</literal></para>
+        <para>Building differs for UNIX (or UNIX-like) operating systems and
+        Windows.</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>UNIX</para>
+
+            <orderedlist>
+              <listitem>
+                <para>Run the configure script to generate a Makefile.
+                Typically no options are needed.</para>
+
+                <para><literal>./configure</literal></para>
+
+                <para>Options are available for more customization (use
+                <literal>./configure --help</literal> for a full list), but
+                typically you will only need to specify the location of the
+                <literal>apxs</literal> command installed by Apache httpd with
+                the <literal>--with-apxs</literal> option.</para>
+
+                <para><literal>./configure
+                --with-apxs=/path/to/httpd-2.x.y/bin/apxs</literal></para>
+              </listitem>
+
+              <listitem>
+                <para>Compile with: <literal>make</literal></para>
+              </listitem>
+
+              <listitem>
+                <para>Optionally test with: <literal>make
+                test</literal></para>
+              </listitem>
+
+              <listitem>
+                <para>Optionally build the ModSecurity Log Collector with:
+                <literal>make mlogc</literal></para>
+              </listitem>
+
+              <listitem>
+                <para>Optionally install <literal>mlogc</literal>: Review the
+                <literal>INSTALL</literal> file included in the
+                apache2/mlogc-src directory in the distribution.</para>
+              </listitem>
+
+              <listitem>
+                <para>Install the ModSecurity module with: <literal>make
+                install</literal></para>
+              </listitem>
+            </orderedlist>
+          </listitem>
+
+          <listitem>
+            <para>Windows (MS VC++ 8)</para>
+
+            <orderedlist>
+              <listitem>
+                <para>Edit <literal>Makefile.win</literal> to configure the
+                Apache base and library paths.</para>
+              </listitem>
+
+              <listitem>
+                <para>Compile with: <literal>nmake -f
+                Makefile.win</literal></para>
+              </listitem>
+
+              <listitem>
+                <para>Install the ModSecurity module with: <literal>nmake -f
+                Makefile.win install</literal></para>
+              </listitem>
+            </orderedlist>
+          </listitem>
+        </itemizedlist>
       </listitem>
 
       <listitem>
-        <para>Load libxml2 before ModSecurity: <literal>LoadFile
-        /usr/lib/libxml2.so</literal></para>
-      </listitem>
+        <para>Edit the main Apache httpd config file (usually
+        <literal>httpd.conf</literal>)</para>
 
-      <listitem>
-        <para>Load Lua before ModSecurity: <literal>LoadFile
-        /usr/lib/liblua5.1.so.</literal></para>
-      </listitem>
+        <para>On UNIX you must load libxml2 and lua before ModSecurity with
+        something like this:</para>
 
-      <listitem>
-        <para>Load ModSecurity itself: <literal>LoadModule security2_module
-        modules/mod_security2.so</literal></para>
+        <para><programlisting>LoadFile /usr/lib/libxml2.so
+LoadFile /usr/lib/liblua5.1.so</programlisting></para>
+
+        <para>Load the ModSecurity module with:<programlisting>LoadModule security2_module modules/mod_security2.so</programlisting></para>
       </listitem>
 
       <listitem>
@@ -385,7 +418,7 @@
       </listitem>
 
       <listitem>
-        <para>You now have ModSecurity 2.x up and running.</para>
+        <para>You should now have ModSecurity 2.x up and running.</para>
       </listitem>
     </orderedlist>
 

@@ -64,7 +64,7 @@ extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
 #define MODSEC_VERSION_MINOR       "5"
 #define MODSEC_VERSION_MAINT       "0"
 #define MODSEC_VERSION_TYPE        "rc"
-#define MODSEC_VERSION_RELEASE     "3"
+#define MODSEC_VERSION_RELEASE     "4"
 
 #define MODULE_NAME "ModSecurity for Apache"
 #define MODULE_RELEASE \
