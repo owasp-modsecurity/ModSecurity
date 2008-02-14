@@ -1,5 +1,7 @@
-13 Feb 2008 - 2.5.0-rc4
+14 Feb 2008 - 2.5.0-rc4
 -----------------------
+
+ * Cleaned up build process for unit tests.
 
  * Updated code to be more portable so it builds with MS VC++.
 

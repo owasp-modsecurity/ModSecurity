@@ -3,7 +3,7 @@
   <title>ModSecurity Reference Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.0-rc4 (February 13, 2008)</releaseinfo>
+    <releaseinfo>Version 2.5.0-rc4 (February 14, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -1906,8 +1906,8 @@ function main()
     -- of the variable where the problem is located.
     -- return "Variable ARGS:p looks suspicious!"
 
-    -- Otherwise, simply return null.
-    return null;
+    -- Otherwise, simply return nil.
+    return nil;
 end</programlisting>
 
       <para>In this first example we were only retrieving one variable at the
@@ -1933,7 +1933,7 @@ end</programlisting>
     end
 
     -- Nothing wrong found.
-    return null;
+    return nil;
 end</programlisting>
 
       <note>
