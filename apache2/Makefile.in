@@ -53,6 +53,7 @@ APU_LINK_LD = @APU_LINK_LD@
 CPPFLAGS = @CPPFLAGS@ $(PCRE_CFLAGS) $(LIBXML_CFLAGS) $(LUA_CFLAGS) 
 LIBS = @LIBS@ $(PCRE_LIBS) $(LIBXML_LIBS) $(LUA_LIBS)
 LDFLAGS = @LDFLAGS@
+CFLAGS = @CFLAGS@
 
 COMPILE_APACHE_MOD = $(APXS_WRAPPER) -c $(CPPFLAGS) $(LDFLAGS) $(LIBS)
 
@@ -111,7 +112,7 @@ mlogc-static:
 
 ### Experimental Test Framework (*NIX only right now)
 msc_test.lo: msc_test.c
-	$(LIBTOOL) --mode=compile $(CC) $(APXS_CFLAGS) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(CPPFLAGS) -o msc_test.lo -c msc_test.c
+	$(LIBTOOL) --mode=compile $(CC) $(APXS_CFLAGS) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(CPPFLAGS) $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test.lo -c msc_test.c
 
 msc_test: $(TESTOBJS) msc_test.lo
 	@objs=""; \
