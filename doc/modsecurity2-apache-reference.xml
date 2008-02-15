@@ -5599,33 +5599,32 @@ against "REQUEST_PROTOCOL" required.</programlisting>
           <itemizedlist>
             <listitem>
               <para>Invalid UTF-8 encoding: not enough bytes in character at
-              %0 [offset %1].</para>
+              %0.</para>
             </listitem>
 
             <listitem>
               <para>Invalid UTF-8 encoding: invalid byte value in character at
-              %0 [offset %1].</para>
+              %0.</para>
             </listitem>
 
             <listitem>
-              <para>Invalid UTF-8 encoding: overlong character detected at %0
-              [offset %1].</para>
+              <para>Invalid UTF-8 encoding: overlong character detected at
+              %0.</para>
             </listitem>
 
             <listitem>
-              <para>Invalid UTF-8 encoding: use of restricted character at %0
-              [offset %1].</para>
+              <para>Invalid UTF-8 encoding: use of restricted character at
+              %0.</para>
             </listitem>
 
             <listitem>
-              <para>Invalid UTF-8 encoding: decoding error at %0 [offset
-              %1].</para>
+              <para>Invalid UTF-8 encoding: decoding error at %0.</para>
             </listitem>
           </itemizedlist>
         </listitem>
 
         <listitem>
-          <para>@verifyCC - CC# match %0 at %1 [offset %2].</para>
+          <para>@verifyCC - CC# match %0 at %1.</para>
         </listitem>
       </itemizedlist>
 
@@ -5654,6 +5653,11 @@ against "REQUEST_PROTOCOL" required.</programlisting>
       <para>The following metadata fields are currently used:</para>
 
       <orderedlist>
+        <listitem>
+          <para><literal>offset</literal> - The byte offset where a match
+          occured within the target data. This is not always available.</para>
+        </listitem>
+
         <listitem>
           <para><literal>id</literal> - Unique rule ID, as specified by the
           <literal>id</literal> action.</para>
