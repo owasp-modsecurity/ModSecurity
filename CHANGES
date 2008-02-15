@@ -1,5 +1,5 @@
-11 Feb 2008 - 2.1.6-rc1
------------------------
+19 Feb 2008 - 2.1.6
+-------------------
 
  * Fixed crash on startup when ENV is improperly used without a parameter.
 
