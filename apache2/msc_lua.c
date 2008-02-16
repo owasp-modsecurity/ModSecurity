@@ -8,6 +8,8 @@
  * write to Breach Security, Inc. at support@breach.com.
  *
  */
+#if defined(WITH_LUA)
+
 #include "msc_lua.h"
 
 #include "apr_strings.h"
@@ -408,3 +410,4 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
     return ((*error_msg != NULL) ? RULE_MATCH : RULE_NO_MATCH);
 }
 
+#endif /* WITH_LUA */

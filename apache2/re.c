@@ -12,7 +12,9 @@
 
 #include "re.h"
 
+#if defined(WITH_LUA)
 #include "msc_lua.h"
+#endif
 
 static const char *const severities[] = {
     "EMERGENCY",
@@ -1390,6 +1392,7 @@ char * msre_rule_generate_unparsed(apr_pool_t *pool,  const msre_rule *rule, con
     case RULE_TYPE_MARKER:
         unparsed = apr_psprintf(pool, "SecMarker \"%s\"", rule->actionset->id);
         break;
+    #if defined(WITH_LUA)
     case RULE_TYPE_LUA:
         /* SecRuleScript */
         if (r_actions == NULL) {
@@ -1400,6 +1403,7 @@ char * msre_rule_generate_unparsed(apr_pool_t *pool,  const msre_rule *rule, con
                            r_args, log_escape(pool, r_actions));
         }
         break;
+    #endif
     }
 
     return unparsed;
@@ -1494,6 +1498,7 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset, int type,
     return rule;
 }
 
+#if defined(WITH_LUA)
 /**
  *
  */
@@ -1536,6 +1541,7 @@ msre_rule *msre_rule_lua_create(msre_ruleset *ruleset,
 
     return rule;
 }
+#endif
 
 /**
  * Perform non-disruptive actions associated with the provided actionset.
@@ -2191,6 +2197,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
     return (match_count ? RULE_MATCH : RULE_NO_MATCH);
 }
 
+#if defined(WITH_LUA)
 /**
  *
  */
@@ -2226,6 +2233,7 @@ static apr_status_t msre_rule_process_lua(msre_rule *rule, modsec_rec *msr) {
 
     return rc;
 }
+#endif
 
 /**
  *
@@ -2240,9 +2248,11 @@ apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
         apr_pool_clear(msr->msc_rule_mptmp);
     }
 
+    #if defined(WITH_LUA)
     if (rule->type == RULE_TYPE_LUA) {
         return msre_rule_process_lua(rule, msr);
     }
+    #endif
 
     return msre_rule_process_normal(rule, msr);
 }

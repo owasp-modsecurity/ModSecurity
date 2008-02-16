@@ -35,7 +35,9 @@ typedef struct msre_cache_rec msre_cache_rec;
 #include "persist_dbm.h"
 #include "apache2.h"
 
+#if defined(WITH_LUA)
 #include "msc_lua.h"
+#endif
 
 /* Actions, variables, functions and operator functions */
 
@@ -125,7 +127,9 @@ int DSOLOCAL msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset
 #define RULE_TYPE_NORMAL        0  /* SecRule */
 #define RULE_TYPE_ACTION        1  /* SecAction */
 #define RULE_TYPE_MARKER        2  /* SecMarker */
+#if defined(WITH_LUA)
 #define RULE_TYPE_LUA           3  /* SecRuleScript */
+#endif
 
 struct msre_rule {
     apr_array_header_t      *targets;
@@ -150,8 +154,10 @@ struct msre_rule {
     unsigned int             op_time;
     #endif
 
+    #if defined(WITH_LUA)
     /* Compiled Lua script. */
     msc_script              *script;
+    #endif
 };
 
 char DSOLOCAL *msre_rule_generate_unparsed(apr_pool_t *pool, const msre_rule *rule, const char *targets, const char *args, const char *actions);
@@ -160,9 +166,11 @@ msre_rule DSOLOCAL *msre_rule_create(msre_ruleset *ruleset, int type,
     const char *fn, int line, const char *targets,
     const char *args, const char *actions, char **error_msg);
 
+#if defined(WITH_LUA)
 msre_rule DSOLOCAL *msre_rule_lua_create(msre_ruleset *ruleset,
     const char *fn, int line, const char *script_filename,
     const char *actions, char **error_msg);
+#endif
 
 apr_status_t DSOLOCAL msre_rule_process(msre_rule *rule, modsec_rec *msr);
 

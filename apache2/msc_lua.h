@@ -8,6 +8,8 @@
  * write to Breach Security, Inc. at support@breach.com.
  *
  */
+#if defined(WITH_LUA)
+
 #ifndef _MSC_LUA_H_
 #define _MSC_LUA_H_
 
@@ -37,3 +39,5 @@ char DSOLOCAL *lua_compile(msc_script **script, const char *filename, apr_pool_t
 int DSOLOCAL lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rule, char **error_msg);
 
 #endif
+
+#endif /* WITH_LUA */

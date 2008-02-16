@@ -1597,6 +1597,7 @@ static apr_status_t msre_action_setuid_execute(modsec_rec *msr, apr_pool_t *mptm
 
 /* exec */
 static char *msre_action_exec_validate(msre_engine *engine, msre_action *action) {
+    #if defined(WITH_LUA)
     char *filename = (char *)action->param;
 
     /* TODO Support relative filenames. */
@@ -1615,6 +1616,7 @@ static char *msre_action_exec_validate(msre_engine *engine, msre_action *action)
             action->param_data = script;
         }
     }
+    #endif
 
     return NULL;
 }
@@ -1622,6 +1624,7 @@ static char *msre_action_exec_validate(msre_engine *engine, msre_action *action)
 static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
+    #if defined(WITH_LUA)
     if (action->param_data != NULL) { /* Lua */
         msc_script *script = (msc_script *)action->param_data;
         char *my_error_msg = NULL;
@@ -1630,7 +1633,9 @@ static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
             msr_log(msr, 1, "%s", my_error_msg);
             return 0;
         }
-    } else { /* Execute as shell script. */
+    } else
+    #endif
+    { /* Execute as shell script. */
         char *script_output = NULL;
 
         int rc = apache2_exec(msr, action->param, NULL, &script_output);

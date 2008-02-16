@@ -1312,6 +1312,7 @@ static int msre_op_inspectFile_init(msre_rule *rule, char **error_msg) {
 
     filename = resolve_relative_path(rule->ruleset->mp, rule->filename, filename);
 
+    #if defined(WITH_LUA)
     /* ENH Write & use string_ends(s, e). */
     if (strlen(rule->op_param) > 4) {
         char *p = filename + strlen(filename) - 4;
@@ -1326,6 +1327,7 @@ static int msre_op_inspectFile_init(msre_rule *rule, char **error_msg) {
             rule->op_param_data = script;
         }
     }
+    #endif
 
     if (rule->op_param_data == NULL) {
         /* ENH Verify the script exists and that we have
@@ -1373,10 +1375,9 @@ static int msre_op_inspectFile_execute(modsec_rec *msr, msre_rule *rule, msre_va
                 log_escape_nq(msr->mp,  script_output));
             return 1; /* Match. */
         }
-
-        /* No match. */
-        return 0;
-    } else {
+    }
+    #if defined(WITH_LUA)
+    else {
         /* Execute internally, as Lua script. */
         char *target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
         msc_script *script = (msc_script *)rule->op_param_data;
@@ -1390,6 +1391,10 @@ static int msre_op_inspectFile_execute(modsec_rec *msr, msre_rule *rule, msre_va
 
         return rc;
     }
+    #endif
+
+    /* No match. */
+    return 0;
 }
 
 /* validateByteRange */

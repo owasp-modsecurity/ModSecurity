@@ -77,7 +77,7 @@ clean: clean-extras
 maintainer-clean: clean
 	@rm -rf Makefile mlogc-src/Makefile t/run-tests.pl config config.log config.status configure mod_security2_config.h ../tools/*.pl autoscan.log configure.scan build/libtool.m4 build/config.guess build/config.sub build/ltmain.sh build/apxs-wrapper
 
-dist-clean: maintainer-clean
+distclean: maintainer-clean
 
 install-mods: mod_security2.la
 	$(INSTALL_MOD_SHARED) mod_security2.la

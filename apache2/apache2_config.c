@@ -15,7 +15,9 @@
 #include "pdf_protect.h"
 #include "http_log.h"
 
+#if defined(WITH_LUA)
 #include "msc_lua.h"
+#endif
 
 
 /* -- Directory context creation and initialisation -- */
@@ -551,10 +553,12 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 
     /* Create the rule now. */
     switch(type) {
+        #if defined(WITH_LUA)
         case RULE_TYPE_LUA :
             rule = msre_rule_lua_create(dcfg->ruleset, cmd->directive->filename,
                 cmd->directive->line_num, p1, p2, &my_error_msg);
             break;
+        #endif
         default :
             rule = msre_rule_create(dcfg->ruleset, type, cmd->directive->filename,
                 cmd->directive->line_num, p1, p2, p3, &my_error_msg);
@@ -1398,8 +1402,13 @@ static const char *cmd_rule_inheritance(cmd_parms *cmd, void *_dcfg, int flag) {
 static const char *cmd_rule_script(cmd_parms *cmd, void *_dcfg, const char *p1,
     const char *p2)
 {
+    #if defined(WITH_LUA)
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
     return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_LUA, filename, p2, NULL);
+    #else
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool, "Ignoring SecRuleScript \"%s\" directive (%s:%d): No Lua scripting support.", p1, cmd->directive->filename, cmd->directive->line_num);
+    return NULL;
+    #endif
 }
 
 static const char *cmd_rule_remove_by_id(cmd_parms *cmd, void *_dcfg, const char *p1) {
