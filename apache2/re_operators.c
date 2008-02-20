@@ -166,11 +166,6 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         }
     }
 
-    /*
-    if ( ((rc == PCRE_ERROR_NOMATCH)&&(rule->op_negated == 1))
-        || ((rc != PCRE_ERROR_NOMATCH)&&(rule->op_negated == 0)) )
-    {
-    */
     if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
         /* We no longer escape the pattern here as it is done when logging */
         char *pattern = apr_pstrdup(msr->mp, regex->pattern);
@@ -207,15 +202,14 @@ static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
     if (p == NULL) return 0;
 
     phrase = apr_pstrdup(rule->ruleset->mp, rule->op_param);
-    next = rule->op_param + strlen(rule->op_param);
 
     /* Loop through phrases */
     /* ENH: Need to allow quoted phrases w/space */
     for (;;) {
-        while((isspace(*phrase) != 0) && (*phrase != '\0')) phrase++;
+        while((apr_isspace(*phrase) != 0) && (*phrase != '\0')) phrase++;
         if (*phrase == '\0') break;
         next = phrase;
-        while((isspace(*next) == 0) && (*next != 0)) next++;
+        while((apr_isspace(*next) == 0) && (*next != 0)) next++;
         acmp_add_pattern(p, phrase, NULL, NULL, next - phrase);
         phrase = next;
     }
@@ -238,7 +232,7 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     ACMP *p;
 
     if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pm'.");
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pmFromFile'.");
         return 0; /* ERROR */
     }
 
@@ -246,7 +240,6 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     if (p == NULL) return 0;
 
     fn = apr_pstrdup(rule->ruleset->mp, rule->op_param);
-    next = fn + strlen(rule->op_param);
 
     /* Get the path of the rule filename to use as a base */
     rulefile_path = apr_pstrndup(rule->ruleset->mp, rule->filename, strlen(rule->filename) - strlen(apr_filepath_name_get(rule->filename)));
@@ -263,11 +256,11 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
         int line = 0;
 
         /* Trim whitespace */
-        while((isspace(*fn) != 0) && (*fn != '\0')) fn++;
+        while((apr_isspace(*fn) != 0) && (*fn != '\0')) fn++;
         if (*fn == '\0') break;
         next = fn;
-        while((isspace(*next) == 0) && (*next != '\0')) next++;
-        while((isspace(*next) != 0) && (*next != '\0')) *(next++) = '\0';
+        while((apr_isspace(*next) == 0) && (*next != '\0')) next++;
+        while((apr_isspace(*next) != 0) && (*next != '\0')) *(next++) = '\0';
 
         /* Add path of the rule filename for a relative phrase filename */
         filepath = fn;
@@ -433,7 +426,6 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
     /* scan for first character, then compare from there until we
      * have a match or there is no room left in the target
      */
-    msr_log(msr, 9, "match[%u]='%s' target[%u]='%s'", match_length, match, target_length, target);
     i_max = match_length - target_length;
     for (i = 0; i <= i_max; i++) {
         if (match[i] == target[0]) {
@@ -507,8 +499,12 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
      */
     i_max = target_length - match_length;
     for (i = 0; i <= i_max; i++) {
+        /* First character matched - avoid func call */
         if (target[i] == match[0]) {
-            if (memcmp((match + 1), (target + i + 1), (match_length - 1)) == 0) {
+            /* See if remaining matches */
+            if (   (match_length == 1)
+                || (memcmp((match + 1), (target + i + 1), (match_length - 1)) == 0))
+            {
                 /* Match. */
                 *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
                                 log_escape_ex(msr->mp, match, match_length),
@@ -531,6 +527,7 @@ static int msre_op_containsWord_execute(modsec_rec *msr, msre_rule *rule, msre_v
     unsigned int match_length;
     unsigned int target_length = 0;
     unsigned int i, i_max;
+    int rc = 0;
 
     str->value = (char *)rule->op_param;
     str->value_len = strlen(str->value);
@@ -580,40 +577,34 @@ static int msre_op_containsWord_execute(modsec_rec *msr, msre_rule *rule, msre_v
     for (i = 0; i <= i_max; i++) {
 
         /* Previous char must have been a start or non-word */
-        if ((i > 0) && (isalnum(target[i-1])||(target[i-1] == '_')))
+        if ((i > 0) && (apr_isalnum(target[i-1])||(target[i-1] == '_')))
             continue;
 
-
-        /* First character matched */
+        /* First character matched - avoid func call */
         if (target[i] == match[0]) {
-
-            /* Maybe a match. */
-            *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
-                            log_escape_ex(msr->mp, match, match_length),
-                            var->name);
-
-            /* only one character */
-            if (match_length == 1) return 1;
-
-            /* remaining matched */
-            if (memcmp((match + 1), (target + i + 1), (match_length - 1)) == 0) {
-
-
+            /* See if remaining matches */
+            if (   (match_length == 1)
+                || (memcmp((match + 1), (target + i + 1), (match_length - 1)) == 0))
+            {
                 /* check boundaries */
                 if (i == i_max) {
                     /* exact/end word match */
-                    return 1;
+                    rc = 1;
                 }
-                else if (!(isalnum(target[i+match_length])||(target[i+match_length] == '_'))) {
+                else if (!(apr_isalnum(target[i + match_length])||(target[i + match_length] == '_'))) {
                     /* start/mid word match */
-                    return 1;
+                    rc = 1;
                 }
-
-                /* No word match */
-                *error_msg = NULL;
-                return 0;
             }
         }
+    }
+
+    if (rc == 1) {
+        /* Maybe a match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
+                        log_escape_ex(msr->mp, match, match_length),
+                        var->name);
+        return 1;
     }
 
     /* No match. */
@@ -987,7 +978,7 @@ static int luhn_verify(const char *ccnumber, int len) {
      * for both odd and even CC numbers to avoid 2 passes.
      */
     for (i = 0; i < len; i++) {
-        if (isdigit(ccnumber[i])) {
+        if (apr_isdigit(ccnumber[i])) {
             sum[0] += (!odd ? wtable[ccnumber[i] - '0'] : (ccnumber[i] - '0'));
             sum[1] += (odd ? wtable[ccnumber[i] - '0'] : (ccnumber[i] - '0'));
             odd = 1 - odd; /* alternate weights */
@@ -1160,7 +1151,7 @@ static int msre_op_geoLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     *error_msg = NULL;
 
     if (geo == NULL) {
-        msr_log(msr, 1, "Geo lookup for \"%s\" attempted without a database.  Set SecGeoLookupDB.", log_escape_nq(msr->mp, geo_host));
+        msr_log(msr, 1, "Geo lookup for \"%s\" attempted without a database.  Set SecGeoLookupDB.", log_escape(msr->mp, geo_host));
         return 0;
     }
 

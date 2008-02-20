@@ -348,7 +348,7 @@ static modsec_rec *create_tx_context(request_rec *r) {
 
     /* Invoke the engine to continue with initialisation */
     if (modsecurity_tx_init(msr) < 0) {
-        msr_log(msr, 1, "Failed to initialising transaction (txid %s).", msr->txid);
+        msr_log(msr, 1, "Failed to initialise transaction (txid %s).", msr->txid);
         return NULL;
     }
 

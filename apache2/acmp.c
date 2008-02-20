@@ -9,7 +9,17 @@
  *
  */
 #include "acmp.h"
+
+#ifdef ACMP_USE_UTF8
+/* UTF support */
 #include "utf8tables.h"
+#else
+/* No UTF support */
+#define acmp_utf8_char_t long
+#include <apr_lib.h>
+#define utf8_lcase(a) apr_tolower(a)
+#endif
+
 #include <apr_tables.h>
 #include <stdio.h>
 #include <string.h>
@@ -58,7 +68,9 @@ struct acmp_btree_node_t {
  * Data related to parser, not to individual nodes
  */
 struct ACMP {
+    #ifdef ACMP_USE_UTF8
     int is_utf8;
+    #endif
     int is_case_sensitive;
     apr_pool_t *parent_pool;
     apr_pool_t *pool;
@@ -92,6 +104,7 @@ struct ACMP {
  * Functions for UTF-8 support
  */
 
+#ifdef ACMP_USE_UTF8
 /**
  * Returns length of utf-8 sequence based on its first byte
  */
@@ -152,6 +165,7 @@ static long utf8_lcase(acmp_utf8_char_t ucs_code) {
     }
     return ucs_code;
 }
+#endif
 
 /*
  *******************************************************************************
@@ -163,7 +177,11 @@ static long utf8_lcase(acmp_utf8_char_t ucs_code) {
  * Returns length of given string for parser's encoding
  */
 static size_t acmp_strlen(ACMP *parser, const char *str) {
+    #ifdef ACMP_USE_UTF8
     return (parser->is_utf8 == 0) ? strlen(str) : utf8_strlen(str);
+    #else
+    return strlen(str);
+    #endif
 }
 
 /**
@@ -176,14 +194,17 @@ static void acmp_strtoucs(ACMP *parser, const char *str, acmp_utf8_char_t *ucs_c
     int i;
     const char *c = str;
 
-    if (parser->is_utf8 == 0) {
-        for (i = 0; i < len; i++) {
-            *(ucs_chars++) = *(c++);
-        }
-    } else {
+    #ifdef ACMP_USE_UTF8
+    if (parser->is_utf8) {
         for (i = 0; i < len; i++) {
             *(ucs_chars++) = utf8_decodechar(c);
             c += utf8_seq_len(c);
+        }
+    } else
+    #endif
+    {
+        for (i = 0; i < len; i++) {
+            *(ucs_chars++) = *(c++);
         }
     }
 }
@@ -484,7 +505,9 @@ ACMP *acmp_create(int flags, apr_pool_t *pool) {
     /* ENH: Check alloc succeded */
     parser->pool = p;
     parser->parent_pool = pool;
+    #ifdef ACMP_USE_UTF8
     parser->is_utf8 = (flags & ACMP_FLAG_UTF8) == 0 ? 0 : 1;
+    #endif
     parser->is_case_sensitive = (flags & ACMP_FLAG_CASE_SENSITIVE) == 0 ? 0 : 1;
     parser->root_node = apr_pcalloc(p, sizeof(acmp_node_t));
     /* ENH: Check alloc succeded */
@@ -520,7 +543,9 @@ ACMP *acmp_duplicate(ACMP *parser, apr_pool_t *pool) {
     /* ENH: Check alloc succeded */
     new_parser->pool = p;
     new_parser->parent_pool = pool;
+    #ifdef ACMP_USE_UTF8
     new_parser->is_utf8 = parser->is_utf8;
+    #endif
     new_parser->is_case_sensitive = parser->is_case_sensitive;
     new_parser->root_node = apr_pcalloc(p, sizeof(acmp_node_t));
     /* ENH: Check alloc succeded */
@@ -618,7 +643,9 @@ apr_status_t acmp_add_pattern(ACMP *parser, const char *pattern,
  */
 apr_status_t acmp_process(ACMP *parser, const char *data, apr_size_t len) {
     acmp_node_t *node, *go_to;
+    #ifdef ACMP_USE_UTF8
     apr_size_t seq_length;
+    #endif
     const char *end;
 
     if (parser->is_failtree_done == 0) acmp_prepare(parser);
@@ -630,6 +657,7 @@ apr_status_t acmp_process(ACMP *parser, const char *data, apr_size_t len) {
         acmp_utf8_char_t letter;
 
         parser->bp_buffer[parser->char_pos % parser->bp_buff_len] = parser->byte_pos;
+        #ifdef ACMP_USE_UTF8
         if (parser->is_utf8) {
             if (parser->u8buff_len > 0) {
                 /* Resuming partial utf-8 sequence */
@@ -657,7 +685,9 @@ apr_status_t acmp_process(ACMP *parser, const char *data, apr_size_t len) {
                     parser->char_pos++;
                 }
             }
-        } else {
+        } else
+        #endif
+        {
             letter = *data++;
             parser->byte_pos++;
             parser->char_pos++;

@@ -300,33 +300,34 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
     georec->dma_code = 0;
     georec->area_code = 0;
 
-    msr_log(msr, 9, "GEO: Looking up \"%s\".", target);
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "GEO: Looking up \"%s\".", log_escape(msr->mp, target));
+    }
 
     /* NOTE: This only works with ipv4 */
     if ((rc = apr_sockaddr_info_get(&addr, target, APR_INET, 0, 0, msr->mp)) != APR_SUCCESS) {
 
-        *error_msg = apr_psprintf(msr->mp, "Geo lookup of \"%s\" failed: %s", target, apr_strerror(rc, errstr, 1024));
+        *error_msg = apr_psprintf(msr->mp, "Geo lookup of \"%s\" failed: %s", log_escape(msr->mp, target), apr_strerror(rc, errstr, 1024));
         return 0;
     }
     if ((rc = apr_sockaddr_ip_get(&targetip, addr)) != APR_SUCCESS) {
-        *error_msg = apr_psprintf(msr->mp, "Geo lookup of \"%s\" failed: %s", target, apr_strerror(rc, errstr, 1024));
+        *error_msg = apr_psprintf(msr->mp, "Geo lookup of \"%s\" failed: %s", log_escape(msr->mp, target), apr_strerror(rc, errstr, 1024));
         return 0;
     };
 
     /* Why is this in host byte order? */
     ipnum = ntohl(addr->sa.sin.sin_addr.s_addr);
 
-    msr_log(msr, 9, "GEO: Using address \"%s\" (0x%08lx).", targetip, ipnum);
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "GEO: Using address \"%s\" (0x%08lx).", targetip, ipnum);
+    }
 
     for (level = 31; level >= 0; level--) {
-
         /* Read the record */
         seekto = 2 * reclen * rec_val;
         apr_file_seek(geo->db, APR_SET, &seekto);
         /* TODO: check rc */
         rc = apr_file_read_full(geo->db, &buf, (2 * reclen), &nbytes);
-
-
 
         /* NOTE: This is hard-coded for size 3 records */
         /* Left */
@@ -352,7 +353,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         country = rec_val;
         country -= geo->ctry_offset;
         if (country <= 0) {
-            *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\".", target);
+            *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\".", log_escape(msr->mp, target));
             return 0;
         }
 
@@ -375,13 +376,17 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
 
         country = cbuf[0];
         if (country <= 0) {
-            *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\".", target);
+            *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\".", log_escape(msr->mp, target));
             return 0;
         }
-        msr_log(msr, 9, "GEO: rec=\"%s\"", log_escape_raw(msr->mp, cbuf, sizeof(cbuf)));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "GEO: rec=\"%s\"", log_escape_raw(msr->mp, cbuf, sizeof(cbuf)));
+        }
 
         /* Country */
-        msr_log(msr, 9, "GEO: country=\"%.*s\"", (1*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf)));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "GEO: country=\"%.*s\"", (1*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf)));
+        }
         georec->country_code = geo_country_code[country];
         georec->country_code3 = geo_country_code3[country];
         georec->country_name = geo_country_name[country];
@@ -391,27 +396,35 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
 
         /* Region */
         field_len = field_length((const char *)cbuf+rec_offset, remaining);
-        msr_log(msr, 9, "GEO: region=\"%.*s\"", ((field_len+1)*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "GEO: region=\"%.*s\"", ((field_len+1)*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
+        }
         georec->region = apr_pstrmemdup(msr->mp, (const char *)cbuf+rec_offset, (remaining));
         rec_offset += field_len + 1;
         remaining -= field_len + 1;
 
         /* City */
         field_len = field_length((const char *)cbuf+rec_offset, remaining);
-        msr_log(msr, 9, "GEO: city=\"%.*s\"", ((field_len+1)*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "GEO: city=\"%.*s\"", ((field_len+1)*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
+        }
         georec->city = apr_pstrmemdup(msr->mp, (const char *)cbuf+rec_offset, (remaining));
         rec_offset += field_len + 1;
         remaining -= field_len + 1;
 
         /* Postal Code */
         field_len = field_length((const char *)cbuf+rec_offset, remaining);
-        msr_log(msr, 9, "GEO: postal_code=\"%.*s\"", ((field_len+1)*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "GEO: postal_code=\"%.*s\"", ((field_len+1)*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
+        }
         georec->postal_code = apr_pstrmemdup(msr->mp, (const char *)cbuf+rec_offset, (remaining));
         rec_offset += field_len + 1;
         remaining -= field_len + 1;
 
         /* Latitude */
-        msr_log(msr, 9, "GEO: latitude=\"%.*s\"", (3*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "GEO: latitude=\"%.*s\"", (3*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
+        }
         dtmp = cbuf[rec_offset] +
                (cbuf[rec_offset+1] << 8) +
                (cbuf[rec_offset+2] << 16);
@@ -421,7 +434,9 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
 
 
         /* Longitude */
-        msr_log(msr, 9, "GEO: longitude=\"%.*s\"", (3*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "GEO: longitude=\"%.*s\"", (3*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
+        }
         dtmp = cbuf[rec_offset] +
               (cbuf[rec_offset+1] << 8) +
               (cbuf[rec_offset+2] << 16);
@@ -430,7 +445,9 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         remaining -= 3;
 
         /* dma/area codes are in city rev1 and US only */
-        msr_log(msr, 9, "GEO: dma/area=\"%.*s\"", (3*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "GEO: dma/area=\"%.*s\"", (3*4), log_escape_raw(msr->mp, cbuf, sizeof(cbuf))+(rec_offset*4));
+        }
         if (geo->dbtype == GEO_CITY_DATABASE_1
             && georec->country_code[0] == 'U'
             && georec->country_code[1] == 'S')
@@ -447,7 +464,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
 
     }
 
-    *error_msg = apr_psprintf(msr->mp, "Geo lookup of \"%s\" succeeded.", target);
+    *error_msg = apr_psprintf(msr->mp, "Geo lookup of \"%s\" succeeded.", log_escape(msr->mp, target));
     return 1;
 }
 

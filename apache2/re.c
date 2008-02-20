@@ -1325,7 +1325,6 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
                            log_escape_ex(msr->mp, var->value, var->value_len));
     }
     if (actionset->logdata != NULL) {
-    //TODO: restrict to 512 bytes
         /* Expand variables in the message string. */
         msc_string *var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
         var->value = (char *)actionset->logdata;
@@ -1334,6 +1333,18 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
 
         logdata = apr_psprintf(msr->mp, " [data \"%s\"]",
                            log_escape_hex(msr->mp, (unsigned char *)var->value, var->value_len));
+
+        /* If it is > 512 bytes, then truncate at 512 with ellipsis.
+         * NOTE: 512 actual data + 9 bytes of label = 521
+         */
+        if (strlen(logdata) > 521) {
+            logdata[517] = '.';
+            logdata[518] = '.';
+            logdata[519] = '.';
+            logdata[520] = '"';
+            logdata[521] = ']';
+            logdata[522] = '\0';
+        }
     }
     if ((actionset->severity >= 0)&&(actionset->severity <= 7)) {
         severity = apr_psprintf(msr->mp, " [severity \"%s\"]",
@@ -1835,18 +1846,24 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
 
             /* check the cache options */
             if (var->value_len < msr->txcfg->cache_trans_min) {
-                msr_log(msr, 9, "CACHE: Disabled - %s value length=%u, smaller than minlen=%" APR_SIZE_T_FMT, var->name, var->value_len, msr->txcfg->cache_trans_min);
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "CACHE: Disabled - %s value length=%u, smaller than minlen=%" APR_SIZE_T_FMT, var->name, var->value_len, msr->txcfg->cache_trans_min);
+                }
                 usecache = 0;
             }
             if ((msr->txcfg->cache_trans_max != 0) && (var->value_len > msr->txcfg->cache_trans_max)) {
-                msr_log(msr, 9, "CACHE: Disabled - %s value length=%u, larger than maxlen=%" APR_SIZE_T_FMT, var->name, var->value_len, msr->txcfg->cache_trans_max);
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "CACHE: Disabled - %s value length=%u, larger than maxlen=%" APR_SIZE_T_FMT, var->name, var->value_len, msr->txcfg->cache_trans_max);
+                }
                 usecache = 0;
             }
 
             /* if cache is still enabled, check the VAR for cacheablity */
             if (usecache) {
                 if (var->metadata->is_cacheable == VAR_CACHE) {
-                    msr_log(msr, 9, "CACHE: Enabled");
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "CACHE: Enabled");
+                    }
 
                     /* Fetch cache table for this target */
                     carr = (apr_table_t **)apr_hash_get(msr->tcache, var->name, APR_HASH_KEY_STRING);
@@ -1868,7 +1885,9 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 }
                 else {
                     usecache = 0;
-                    msr_log(msr, 9, "CACHE: %s transformations are not cacheable", var->name);
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "CACHE: %s transformations are not cacheable", var->name);
+                    }
                 }
             }
         }
@@ -1945,7 +1964,9 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                     var->value_len = crec->val_len;
                 }
 
-                msr_log(msr, 9, "T (%d) %s: \"%s\" [cached hits=%d]", crec->changed, crec->path, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "T (%d) %s: \"%s\" [cached hits=%d]", crec->changed, crec->path, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
+                }
 
                 #if !defined(PERFORMANCE_MEASUREMENT)
                 if (msr->txcfg->debuglog_level >= 4)
@@ -2079,7 +2100,9 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                             var->value_len = crec->val_len;
                         }
 
-                        msr_log(msr, 9, "T (%d) %s: \"%s\" [cached hits=%d]", crec->changed, metadata->name, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "T (%d) %s: \"%s\" [cached hits=%d]", crec->changed, metadata->name, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
+                        }
                         continue;
                     }
                 }
@@ -2183,10 +2206,14 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                     cn++;
                     rec = (msre_cache_rec *)ctelts[ri].val;
                     if (rec->changed) {
-                        msr_log(msr, 9, "CACHE: %5d) phase=%d hits=%d %x;%s=\"%s\"", cn, msr->phase, rec->hits, rec->num, rec->path, log_escape_nq_ex(mptmp, rec->val, rec->val_len));
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "CACHE: %5d) phase=%d hits=%d %x;%s=\"%s\"", cn, msr->phase, rec->hits, rec->num, rec->path, log_escape_nq_ex(mptmp, rec->val, rec->val_len));
+                        }
                     }
                     else {
-                        msr_log(msr, 9, "CACHE: %5d) phase=%d hits=%d %x;%s=<no change>", cn, msr->phase, rec->hits, rec->num, rec->path);
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "CACHE: %5d) phase=%d hits=%d %x;%s=<no change>", cn, msr->phase, rec->hits, rec->num, rec->path);
+                        }
                     }
                 }
             }

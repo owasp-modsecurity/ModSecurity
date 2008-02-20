@@ -69,7 +69,7 @@ msre_var *generate_single_var(modsec_rec *msr, msre_var *var, apr_array_header_t
         return rvar;
     }
 
-    /* Copy the value so that we can transform it in piece. */
+    /* Copy the value so that we can transform it in place. */
     rvar->value = apr_pstrndup(mptmp, rvar->value, rvar->value_len);
 
     /* Transform rvar in a loop. */
@@ -127,7 +127,7 @@ apr_table_t *generate_multi_var(modsec_rec *msr, msre_var *var, apr_array_header
     for (j = 0; j < tarr->nelts; j++) {
         rvar = (msre_var *)telts[j].val;
 
-        /* Copy the value so that we can transform it in piece. */
+        /* Copy the value so that we can transform it in place. */
         rvar->value = apr_pstrndup(mptmp, rvar->value, rvar->value_len);
 
         /* Transform rvar in a loop. */
@@ -230,11 +230,13 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
                         part->value_len = var_generated->value_len;
                         part->value = (char *)var_generated->value;
                         *(msc_string **)apr_array_push(arr) = part;
-                        msr_log(msr, 9, "Resolved macro %%{%s%s%s} to \"%s\"",
-                            var_name,
-                            (var_value ? "." : ""),
-                            (var_value ? var_value : ""),
-                            log_escape_ex(mptmp, part->value, part->value_len));
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "Resolved macro %%{%s%s%s} to \"%s\"",
+                                var_name,
+                                (var_value ? "." : ""),
+                                (var_value ? var_value : ""),
+                                log_escape_ex(mptmp, part->value, part->value_len));
+                        }
                     }
                 } else {
                     msr_log(msr, 4, "Failed to resolve macro %%{%s%s%s}: %s",
@@ -1348,8 +1350,10 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
     /* Find the current value. */
     var = (msc_string *)apr_table_get(target_col, var_name);
     if (var == NULL) {
-        msr_log(msr, 9, "Asked to deprecate variable \"%s.%s\", but it does not exist.",
-            log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Asked to deprecate variable \"%s.%s\", but it does not exist.",
+                log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
+        }
         return 0;
     }
     current_value = atoi(var->value);
@@ -1393,10 +1397,12 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
 
         apr_table_set(msr->collections_dirty, col_name, "1");
     } else {
-        msr_log(msr, 9, "Not deprecating variable \"%s.%s\" because the new value (%ld) is "
-            "the same as the old one (%ld) (%" APR_TIME_T_FMT " seconds since last update).",
-            log_escape(msr->mp, col_name), log_escape(msr->mp, var_name), current_value,
-            new_value, (apr_time_t)(current_time - last_update_time));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Not deprecating variable \"%s.%s\" because the new value (%ld) is "
+                "the same as the old one (%ld) (%" APR_TIME_T_FMT " seconds since last update).",
+                log_escape(msr->mp, col_name), log_escape(msr->mp, var_name), current_value,
+                new_value, (apr_time_t)(current_time - last_update_time));
+        }
     }
 
     return 1;

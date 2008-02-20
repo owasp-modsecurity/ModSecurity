@@ -15,9 +15,11 @@
 #include <apr_pools.h>
 
 #define ACMP_FLAG_BYTE               0
-#define ACMP_FLAG_UTF8               0x100
 #define ACMP_FLAG_CASE_SENSITIVE     1
 #define ACMP_FLAG_CASE_INSENSITIVE   0
+#ifdef ACMP_USE_UTF8
+#define ACMP_FLAG_UTF8               0x100
+#endif
 
 /**
  * Opaque struct with parser data
