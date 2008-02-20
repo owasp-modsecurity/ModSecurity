@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -19,7 +19,7 @@
  *
  */
 void msre_engine_op_register(msre_engine *engine, const char *name,
-    FN_OP_PARAM_INIT(fn1), FN_OP_EXECUTE(fn2))
+    fn_op_param_init_t fn1, fn_op_execute_t fn2)
 {
     msre_op_metadata *metadata = (msre_op_metadata *)apr_pcalloc(engine->mp,
         sizeof(msre_op_metadata));
@@ -53,6 +53,17 @@ static int msre_op_unconditionalmatch_execute(modsec_rec *msr, msre_rule *rule,
     return 1;
 }
 
+/* noMatch */
+
+static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
+    msre_var *var, char **error_msg)
+{
+    *error_msg = "No match.";
+
+    /* Never match. */
+    return 0;
+}
+
 /* rx */
 
 static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
@@ -67,7 +78,7 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
     /* Compile pattern */
     regex = msc_pregcomp(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset);
     if (regex == NULL) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (pos %i): %s",
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
             erroffset, errptr);
         return 0;
     }
@@ -135,14 +146,14 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         for(i = 0; i < rc; i++) {
             msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
             if (s == NULL) return -1;
-            s->name = apr_psprintf(msr->mp, "%i", i);
+            s->name = apr_psprintf(msr->mp, "%d", i);
             s->value = apr_pstrmemdup(msr->mp,
                 target + ovector[2*i], ovector[2*i + 1] - ovector[2*i]);
             s->value_len = (ovector[2*i + 1] - ovector[2*i]);
             if ((s->name == NULL)||(s->value == NULL)) return -1;
             apr_table_setn(msr->tx_vars, s->name, (void *)s);
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Adding regex subexpression to TXVARS (%i): %s", i,
+                msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
                     log_escape_nq_ex(msr->mp, s->value, s->value_len));
             }
         }
@@ -150,26 +161,22 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         /* Unset the remaining ones (from previous invocations). */
         for(i = rc; i <= 9; i++) {
             char buf[24];
-            apr_snprintf(buf, sizeof(buf), "%i", i);
+            apr_snprintf(buf, sizeof(buf), "%d", i);
             apr_table_unset(msr->tx_vars, buf);
         }
     }
 
-    /*
-    if ( ((rc == PCRE_ERROR_NOMATCH)&&(rule->op_negated == 1))
-        || ((rc != PCRE_ERROR_NOMATCH)&&(rule->op_negated == 0)) )
-    {
-    */
     if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
-        char *pattern_escaped = log_escape(msr->mp, regex->pattern);
+        /* We no longer escape the pattern here as it is done when logging */
+        char *pattern = apr_pstrdup(msr->mp, regex->pattern);
 
         /* This message will be logged. */
-        if (strlen(pattern_escaped) > 252) {
+        if (strlen(pattern) > 252) {
             *error_msg = apr_psprintf(msr->mp, "Pattern match \"%.252s ...\" at %s.",
-                pattern_escaped, var->name);
+                pattern, var->name);
         } else {
             *error_msg = apr_psprintf(msr->mp, "Pattern match \"%s\" at %s.",
-                pattern_escaped, var->name);
+                pattern, var->name);
         }
 
         return 1;
@@ -182,24 +189,27 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 /* pm */
 
 static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
+    ACMP *p;
+    const char *phrase;
+    const char *next;
+
     if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pm'.");
         return 0; /* ERROR */
     }
-    
-    ACMP *p = acmp_create(0, rule->ruleset->mp);
+
+    p = acmp_create(0, rule->ruleset->mp);
     if (p == NULL) return 0;
 
-    const char *phrase = apr_pstrdup(rule->ruleset->mp, rule->op_param);
-    const char *next = rule->op_param + strlen(rule->op_param);
-    
+    phrase = apr_pstrdup(rule->ruleset->mp, rule->op_param);
+
     /* Loop through phrases */
     /* ENH: Need to allow quoted phrases w/space */
     for (;;) {
-        while((isspace(*phrase) != 0) && (*phrase != '\0')) phrase++;
+        while((apr_isspace(*phrase) != 0) && (*phrase != '\0')) phrase++;
         if (*phrase == '\0') break;
         next = phrase;
-        while((isspace(*next) == 0) && (*next != 0)) next++;
+        while((apr_isspace(*next) == 0) && (*next != 0)) next++;
         acmp_add_pattern(p, phrase, NULL, NULL, next - phrase);
         phrase = next;
     }
@@ -219,18 +229,18 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     const char *rulefile_path;
     apr_status_t rc;
     apr_file_t *fd;
+    ACMP *p;
 
     if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pm'.");
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pmFromFile'.");
         return 0; /* ERROR */
     }
-    
-    ACMP *p = acmp_create(0, rule->ruleset->mp);
+
+    p = acmp_create(0, rule->ruleset->mp);
     if (p == NULL) return 0;
 
     fn = apr_pstrdup(rule->ruleset->mp, rule->op_param);
-    next = fn + strlen(rule->op_param);
-    
+
     /* Get the path of the rule filename to use as a base */
     rulefile_path = apr_pstrndup(rule->ruleset->mp, rule->filename, strlen(rule->filename) - strlen(apr_filepath_name_get(rule->filename)));
 
@@ -246,11 +256,11 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
         int line = 0;
 
         /* Trim whitespace */
-        while((isspace(*fn) != 0) && (*fn != '\0')) fn++;
+        while((apr_isspace(*fn) != 0) && (*fn != '\0')) fn++;
         if (*fn == '\0') break;
         next = fn;
-        while((isspace(*next) == 0) && (*next != '\0')) next++;
-        while((isspace(*next) != 0) && (*next != '\0')) *next++ = '\0';
+        while((apr_isspace(*next) == 0) && (*next != '\0')) next++;
+        while((apr_isspace(*next) != 0) && (*next != '\0')) *(next++) = '\0';
 
         /* Add path of the rule filename for a relative phrase filename */
         filepath = fn;
@@ -277,7 +287,7 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
             rc = apr_file_gets(buf, HUGE_STRING_LEN, fd);
             if (rc == APR_EOF) break;
             if (rc != APR_SUCCESS) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Could read \"%s\" line %d: %s", fn, line, apr_strerror(rc, errstr, 1024));
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Could not read \"%s\" line %d: %s", fn, line, apr_strerror(rc, errstr, 1024));
                 return 0;
             }
 
@@ -308,11 +318,17 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
 static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     const char *match = NULL;
     apr_status_t rc = 0;
-    
+    int capture;
+    ACMPT pt;
+
     /* Nothing to read */
     if ((var->value == NULL) || (var->value_len == 0)) return 0;
 
-    ACMPT pt = {(ACMP *)rule->op_param_data, NULL};
+    /* Are we supposed to capture subexpressions? */
+    capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
+
+    pt.parser = (ACMP *)rule->op_param_data;
+    pt.ptr = NULL;
 
     rc = acmp_process_quick(&pt, &match, var->value, var->value_len);
     if (rc) {
@@ -326,6 +342,33 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             *error_msg = apr_psprintf(msr->mp, "Matched phrase \"%s\" at %s.",
                 match_escaped, var->name);
         }
+
+        /* Handle capture as tx.0=match */
+        if (capture) {
+            int i;
+            msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+
+            if (s == NULL) return -1;
+
+            s->name = "0";
+            s->value = apr_pstrdup(msr->mp, match);
+            if (s->value == NULL) return -1;
+            s->value_len = strlen(s->value);
+            apr_table_setn(msr->tx_vars, s->name, (void *)s);
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Added phrase match to TX.0: %s",
+                    log_escape_nq_ex(msr->mp, s->value, s->value_len));
+            }
+
+            /* Unset the remaining ones (from previous invocations). */
+            for(i = rc; i <= 9; i++) {
+                char buf[2];
+                apr_snprintf(buf, sizeof(buf), "%d", i);
+                apr_table_unset(msr->tx_vars, buf);
+            }
+        }
+
         return 1;
     }
     return rc;
@@ -366,8 +409,16 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
     target = var->value;
     target_length = var->value_len;
 
-    /* These are impossible to match */
-    if ((match_length == 0) || (target_length > match_length)) {
+    /* The empty string always matches */
+    if (target_length == 0) {
+        /* Match. */
+        *error_msg = apr_psprintf(msr->mp, "String match within \"\" at %s.",
+                        var->name);
+        return 1;
+    }
+
+    /* This is impossible to match */
+    if (target_length > match_length) {
         /* No match. */
         return 0;
     }
@@ -375,16 +426,14 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
     /* scan for first character, then compare from there until we
      * have a match or there is no room left in the target
      */
-    msr_log(msr, 9, "match[%d]='%s' target[%d]='%s'", match_length, match, target_length, target);
     i_max = match_length - target_length;
     for (i = 0; i <= i_max; i++) {
         if (match[i] == target[0]) {
-            if (strncmp(target, (match + i), target_length) == 0) {
+            if (memcmp((target + 1), (match + i + 1), (target_length - 1)) == 0) {
                 /* match. */
-                *error_msg = apr_psprintf(msr->mp, "String match %s=\"%s\" within \"%s\".",
-                                var->name,
-                                log_escape_ex(msr->mp, target, target_length),
-                                log_escape_ex(msr->mp, match, match_length));
+                *error_msg = apr_psprintf(msr->mp, "String match within \"%s\" at %s.",
+                                log_escape_ex(msr->mp, match, match_length),
+                                var->name);
                 return 1;
             }
         }
@@ -432,8 +481,15 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         target_length = var->value_len;
     }
 
-    /* These are impossible to match */
-    if ((match_length == 0) || (match_length > target_length)) {
+    /* The empty string always matches */
+    if (match_length == 0) {
+        /* Match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"\" at %s.", var->name);
+        return 1;
+    }
+
+    /* This is impossible to match */
+    if (match_length > target_length) {
         /* No match. */
         return 0;
     }
@@ -443,8 +499,12 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
      */
     i_max = target_length - match_length;
     for (i = 0; i <= i_max; i++) {
+        /* First character matched - avoid func call */
         if (target[i] == match[0]) {
-            if (strncmp(match, (target + i), match_length) == 0) {
+            /* See if remaining matches */
+            if (   (match_length == 1)
+                || (memcmp((match + 1), (target + i + 1), (match_length - 1)) == 0))
+            {
                 /* Match. */
                 *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
                                 log_escape_ex(msr->mp, match, match_length),
@@ -455,6 +515,100 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     }
 
     /* No match. */
+    return 0;
+}
+
+/* containsWord */
+
+static int msre_op_containsWord_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    const char *match = NULL;
+    const char *target;
+    unsigned int match_length;
+    unsigned int target_length = 0;
+    unsigned int i, i_max;
+    int rc = 0;
+
+    str->value = (char *)rule->op_param;
+    str->value_len = strlen(str->value);
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (str->value == NULL) {
+        *error_msg = "Internal Error: match string is null.";
+        return -1;
+    }
+
+    expand_macros(msr, str, rule, msr->mp);
+
+    match = (const char *)str->value;
+    match_length = str->value_len;
+
+    /* If the given target is null run against an empty
+     * string. This is a behaviour consistent with previous
+     * releases.
+     */
+    if (var->value == NULL) {
+        target = "";
+        target_length = 0;
+    } else {
+        target = var->value;
+        target_length = var->value_len;
+    }
+
+    /* The empty string always matches */
+    if (match_length == 0) {
+        /* Match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"\" at %s.", var->name);
+        return 1;
+    }
+
+    /* This is impossible to match */
+    if (match_length > target_length) {
+        /* No match. */
+        return 0;
+    }
+
+    /* scan for first character, then compare from there until we
+     * have a match or there is no room left in the target
+     */
+    i_max = target_length - match_length;
+    for (i = 0; i <= i_max; i++) {
+
+        /* Previous char must have been a start or non-word */
+        if ((i > 0) && (apr_isalnum(target[i-1])||(target[i-1] == '_')))
+            continue;
+
+        /* First character matched - avoid func call */
+        if (target[i] == match[0]) {
+            /* See if remaining matches */
+            if (   (match_length == 1)
+                || (memcmp((match + 1), (target + i + 1), (match_length - 1)) == 0))
+            {
+                /* check boundaries */
+                if (i == i_max) {
+                    /* exact/end word match */
+                    rc = 1;
+                }
+                else if (!(apr_isalnum(target[i + match_length])||(target[i + match_length] == '_'))) {
+                    /* start/mid word match */
+                    rc = 1;
+                }
+            }
+        }
+    }
+
+    if (rc == 1) {
+        /* Maybe a match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
+                        log_escape_ex(msr->mp, match, match_length),
+                        var->name);
+        return 1;
+    }
+
+    /* No match. */
+    *error_msg = NULL;
     return 0;
 }
 
@@ -501,7 +655,7 @@ static int msre_op_streq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var
         return 0;
     }
 
-    if (strncmp(match, target, target_length) == 0) {
+    if (memcmp(match, target, target_length) == 0) {
         /* Match. */
         *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
                         log_escape_ex(msr->mp, match, match_length),
@@ -550,13 +704,20 @@ static int msre_op_beginsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var
         target_length = var->value_len;
     }
 
-    /* These are impossible to match */
-    if ((match_length == 0) || (match_length > target_length)) {
+    /* The empty string always matches */
+    if (match_length == 0) {
+        /* Match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"\" at %s.", var->name);
+        return 1;
+    }
+
+    /* This is impossible to match */
+    if (match_length > target_length) {
         /* No match. */
         return 0;
     }
 
-    if (strncmp(match, target, match_length) == 0) {
+    if (memcmp(match, target, match_length) == 0) {
         /* Match. */
         *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
                         log_escape_ex(msr->mp, match, match_length),
@@ -605,13 +766,20 @@ static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         target_length = var->value_len;
     }
 
-    /* These are impossible to match */
-    if ((match_length == 0) || (match_length > target_length)) {
+    /* The empty string always matches */
+    if (match_length == 0) {
+        /* Match. */
+        *error_msg = apr_psprintf(msr->mp, "String match \"\" at %s.", var->name);
+        return 1;
+    }
+
+    /* This is impossible to match */
+    if (match_length > target_length) {
         /* No match. */
         return 0;
     }
 
-    if (strncmp(match, (target + (target_length - match_length)), match_length) == 0) {
+    if (memcmp(match, (target + (target_length - match_length)), match_length) == 0) {
         /* Match. */
         *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
                         log_escape_ex(msr->mp, match, match_length),
@@ -682,8 +850,6 @@ static int msre_op_m_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, ch
     /* Match. */
     return 1;
 }
-
-#ifdef WITH_LIBXML2
 
 /* validateDTD */
 
@@ -792,7 +958,183 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
     return 0;
 }
 
-#endif
+/* verifyCC */
+
+/**
+ * Luhn Mod-10 Method (ISO 2894/ANSI 4.13)
+ */
+static int luhn_verify(const char *ccnumber, int len) {
+    int sum[2] = { 0, 0 };
+    int odd = 0;
+    int digits = 0;
+    int i;
+
+    /* Weighted lookup table which is just a precalculated (i = index):
+     *   i*2 + (( (i*2) > 9 ) ? -9 : 0)
+     */
+    static int wtable[10] = {0, 2, 4, 6, 8, 1, 3, 5, 7, 9}; /* weight lookup table */
+
+    /* Add up only digits (weighted digits via lookup table)
+     * for both odd and even CC numbers to avoid 2 passes.
+     */
+    for (i = 0; i < len; i++) {
+        if (apr_isdigit(ccnumber[i])) {
+            sum[0] += (!odd ? wtable[ccnumber[i] - '0'] : (ccnumber[i] - '0'));
+            sum[1] += (odd ? wtable[ccnumber[i] - '0'] : (ccnumber[i] - '0'));
+            odd = 1 - odd; /* alternate weights */
+            digits++;
+        }
+    }
+
+    /* No digits extracted */
+    if (digits == 0) return 0;
+
+    /* Do a mod 10 on the sum */
+    sum[odd] %= 10;
+
+    /* If the result is a zero the card is valid. */
+    return sum[odd] ? 0 : 1;
+}
+
+static int msre_op_verifyCC_init(msre_rule *rule, char **error_msg) {
+    const char *errptr = NULL;
+    int erroffset;
+    msc_regex_t *regex;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    /* Compile rule->op_param */
+    regex = msc_pregcomp(rule->ruleset->mp, rule->op_param, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset);
+    if (regex == NULL) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
+            erroffset, errptr);
+        return 0;
+    }
+
+    rule->op_param_data = regex;
+
+    return 1; /* OK */
+}
+
+static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    msc_regex_t *regex = (msc_regex_t *)rule->op_param_data;
+    const char *target;
+    unsigned int target_length;
+    char *my_error_msg = NULL;
+    int ovector[33];
+    int rc;
+    int is_cc = 0;
+    int offset;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (regex == NULL) {
+        *error_msg = "Internal Error: regex data is null.";
+        return -1;
+    }
+
+    memset(ovector, 0, sizeof(ovector));
+
+    /* If the given target is null run against an empty
+     * string. This is a behaviour consistent with previous
+     * releases.
+     */
+    if (var->value == NULL) {
+        target = "";
+        target_length = 0;
+    } else {
+        target = var->value;
+        target_length = var->value_len;
+    }
+
+    for (offset = 0; ((unsigned int)offset < target_length) && (is_cc == 0); offset++) {
+        if (msr->txcfg->debuglog_level >= 9) {
+            if (offset > 0) {
+                msr_log(msr, 9, "Continuing CC# search at target offset %d.", offset);
+            }
+        }
+
+        rc = msc_regexec_ex(regex, target, target_length, offset, PCRE_NOTEMPTY, ovector, 30, &my_error_msg);
+
+        /* If there was no match, then we are done. */
+        if (rc == PCRE_ERROR_NOMATCH) {
+            break;
+        }
+
+        if (rc < -1) {
+            *error_msg = apr_psprintf(msr->mp, "CC# regex execution failed: %s", my_error_msg);
+            return -1;
+        }
+
+        /* Verify a match. */
+        if (rc > 0) {
+            const char *match = target + ovector[0];
+            int length = ovector[1] - ovector[0];
+            int i = 0;
+
+            offset = ovector[2*i];
+
+            /* Check the Luhn using the match string */
+            is_cc = luhn_verify(match, length);
+
+            /* Not a CC number, then try another match where we left off. */
+            if (!is_cc) {
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "CC# Luhn check failed at target offset %d: \"%.*s\"", offset, length, match);
+                }
+
+                continue;
+            }
+
+            /* We have a potential CC number and need to set any captures
+             * and we are done.
+             */
+
+            if (apr_table_get(rule->actionset->actions, "capture")) {
+                for(; i < rc; i++) {
+                    msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+                    if (s == NULL) return -1;
+                    s->name = apr_psprintf(msr->mp, "%d", i);
+                    s->value = apr_pstrmemdup(msr->mp, match, length);
+                    s->value_len = length;
+                    if ((s->name == NULL)||(s->value == NULL)) return -1;
+
+                    apr_table_setn(msr->tx_vars, s->name, (void *)s);
+
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
+                            log_escape_nq_ex(msr->mp, s->value, s->value_len));
+                    }
+                }
+            }
+
+            /* Unset the remaining TX vars (from previous invocations). */
+            for(; i <= 9; i++) {
+                char buf[24];
+                apr_snprintf(buf, sizeof(buf), "%i", i);
+                apr_table_unset(msr->tx_vars, buf);
+            }
+
+            break;
+        }
+    }
+
+    if (is_cc) {
+        /* Match. */
+
+        /* This message will be logged. */
+        *error_msg = apr_psprintf(msr->mp, "CC# match \"%s\" at %s. [offset \"%d\"]",
+            regex->pattern, var->name, offset);
+
+        return 1;
+    }
+
+    /* No match. */
+    return 0;
+}
+
 
 /**
  * Perform geograpical lookups on an IP/Host.
@@ -806,16 +1148,21 @@ static int msre_op_geoLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     msc_string *s = NULL;
     int rc;
 
+    *error_msg = NULL;
+
     if (geo == NULL) {
-        msr_log(msr, 1, "Geo lookup for \"%s\" attempted without a database.  Set SecGeoLookupDb.", geo_host);
+        msr_log(msr, 1, "Geo lookup for \"%s\" attempted without a database.  Set SecGeoLookupDB.", log_escape(msr->mp, geo_host));
         return 0;
     }
 
 
     rc = geo_lookup(msr, &rec, geo_host, error_msg);
     if (rc <= 0) {
+        *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" failed at %s.", log_escape_nq(msr->mp, geo_host), var->name);
         return rc;
     }
+    *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" succeeded at %s.",
+        log_escape_nq(msr->mp, geo_host), var->name);
 
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "GEO: %s={country_code=%s, country_code3=%s, country_name=%s, country_continent=%s, region=%s, city=%s, postal_code=%s, latitude=%f, longitude=%f, dma_code=%d, area_code=%d}",
@@ -835,54 +1182,63 @@ static int msre_op_geoLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "country_code");
+    s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.country_code ? rec.country_code : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "country_code3");
+    s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.country_code3 ? rec.country_code3 : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "region");
+    s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.region ? rec.region : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "city");
+    s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.city ? rec.city : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "postal_code");
+    s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.postal_code ? rec.postal_code : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "latitude");
+    s->name_len = strlen(s->name);
     s->value = apr_psprintf(msr->mp, "%f", rec.latitude);
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "longitude");
+    s->name_len = strlen(s->name);
     s->value = apr_psprintf(msr->mp, "%f", rec.longitude);
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "dma_code");
+    s->name_len = strlen(s->name);
     s->value = apr_psprintf(msr->mp, "%d", rec.dma_code);
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     s->name = apr_pstrdup(msr->mp, "area_code");
+    s->name_len = strlen(s->name);
     s->value = apr_psprintf(msr->mp, "%d", rec.area_code);
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
@@ -910,7 +1266,7 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
     /* Construct the host name we want to resolve. */
     if (sscanf(target, "%d.%d.%d.%d", &h0, &h1, &h2, &h3) == 4) {
         /* IPv4 address */
-        name_to_check = apr_psprintf(msr->mp, "%i.%i.%i.%i.%s", h3, h2, h1, h0, rule->op_param);
+        name_to_check = apr_psprintf(msr->mp, "%d.%d.%d.%d.%s", h3, h2, h1, h0, rule->op_param);
     } else {
         /* Assume the input is a domain name. */
         name_to_check = apr_psprintf(msr->mp, "%s.%s", target, rule->op_param);
@@ -921,53 +1277,112 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
     rc = apr_sockaddr_info_get(&sa, name_to_check,
         APR_UNSPEC/*msr->r->connection->remote_addr->family*/, 0, 0, msr->mp);
     if (rc == APR_SUCCESS) {
-        *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded.",
-            log_escape_nq(msr->mp, name_to_check));
+        *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s.",
+            log_escape_nq(msr->mp, name_to_check), var->name);
         return 1; /* Match. */
     }
 
-    msr_log(msr, 5, "RBL lookup of %s failed.", log_escape_nq(msr->mp, name_to_check));
+    msr_log(msr, 5, "RBL lookup of %s failed at %s.", log_escape_nq(msr->mp, name_to_check), var->name);
 
     /* No match. */
     return 0;
 }
 
 /* inspectFile */
-static int msre_op_inspectFile_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
-    char **error_msg)
-{
-    char *script_output = NULL;
-    char const *argv[5];
-    const char *approver_script = rule->op_param;
-    const char *target_file = apr_pstrmemdup(msr->mp, var->value, var->value_len);
+
+static int msre_op_inspectFile_init(msre_rule *rule, char **error_msg) {
+    char *filename = (char *)rule->op_param;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    msr_log(msr, 4, "Executing %s to inspect %s.", approver_script, target_file);
-
-    argv[0] = approver_script;
-    argv[1] = target_file;
-    argv[2] = NULL;    
-
-    if (apache2_exec(msr, approver_script, (const char **)argv, &script_output) <= 0) {
-        *error_msg = apr_psprintf(msr->mp, "Execution of the approver script \"%s\" failed (invocation failed).",
-            log_escape(msr->mp, approver_script));
+    if ((filename == NULL)||(is_empty_string(filename))) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Operator @inspectFile requires parameter.");
         return -1;
     }
 
-    if (script_output == NULL) {
-        *error_msg = apr_psprintf(msr->mp, "Execution of the approver script \"%s\" failed (no output).",
-            log_escape(msr->mp, approver_script));
-        return -1;
+    filename = resolve_relative_path(rule->ruleset->mp, rule->filename, filename);
+
+    #if defined(WITH_LUA)
+    /* ENH Write & use string_ends(s, e). */
+    if (strlen(rule->op_param) > 4) {
+        char *p = filename + strlen(filename) - 4;
+        if ((p[0] == '.')&&(p[1] == 'l')&&(p[2] == 'u')&&(p[3] == 'a'))
+        {
+            msc_script *script = NULL;
+
+            /* Compile script. */
+            *error_msg = lua_compile(&script, filename, rule->ruleset->mp);
+            if (*error_msg != NULL) return -1;
+
+            rule->op_param_data = script;
+        }
+    }
+    #endif
+
+    if (rule->op_param_data == NULL) {
+        /* ENH Verify the script exists and that we have
+         * the rights to execute it.
+         */
     }
 
-    if (script_output[0] != '1') {
-        *error_msg = apr_psprintf(msr->mp, "File \"%s\" rejected by the approver script \"%s\": %s",
-            log_escape(msr->mp, target_file), log_escape(msr->mp, approver_script),
-            log_escape_nq(msr->mp,  script_output));
-        return 1; /* Match. */
+    return 1;
+}
+
+static int msre_op_inspectFile_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
+    char **error_msg)
+{
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (rule->op_param_data == NULL) {
+        /* Execute externally, as native binary/shell script. */
+        char *script_output = NULL;
+        char const *argv[5];
+        const char *approver_script = rule->op_param;
+        const char *target_file = apr_pstrmemdup(msr->mp, var->value, var->value_len);
+
+        msr_log(msr, 4, "Executing %s to inspect %s.", approver_script, target_file);
+
+        argv[0] = approver_script;
+        argv[1] = target_file;
+        argv[2] = NULL;
+
+        if (apache2_exec(msr, approver_script, (const char **)argv, &script_output) <= 0) {
+            *error_msg = apr_psprintf(msr->mp, "Execution of the approver script \"%s\" failed (invocation failed).",
+                log_escape(msr->mp, approver_script));
+            return -1;
+        }
+
+        if (script_output == NULL) {
+            *error_msg = apr_psprintf(msr->mp, "Execution of the approver script \"%s\" failed (no output).",
+                log_escape(msr->mp, approver_script));
+            return -1;
+        }
+
+        if (script_output[0] != '1') {
+            *error_msg = apr_psprintf(msr->mp, "File \"%s\" rejected by the approver script \"%s\": %s",
+                log_escape(msr->mp, target_file), log_escape(msr->mp, approver_script),
+                log_escape_nq(msr->mp,  script_output));
+            return 1; /* Match. */
+        }
     }
+    #if defined(WITH_LUA)
+    else {
+        /* Execute internally, as Lua script. */
+        char *target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
+        msc_script *script = (msc_script *)rule->op_param_data;
+        int rc;
+
+        rc = lua_execute(script, target, msr, rule, error_msg);
+        if (rc < 0) {
+            /* Error. */
+            return -1;
+        }
+
+        return rc;
+    }
+    #endif
 
     /* No match. */
     return 0;
@@ -1001,7 +1416,7 @@ static int msre_op_validateByteRange_init(msre_rule *rule, char **error_msg) {
             /* Single value. */
             int x = atoi(p);
             if ((x < 0)||(x > 255)) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range value: %i", x);
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range value: %d", x);
                 return 0;
             }
             table[x>>3] = (table[x>>3] | (1 << (x & 0x7)));
@@ -1011,16 +1426,16 @@ static int msre_op_validateByteRange_init(msre_rule *rule, char **error_msg) {
             int end = atoi(s + 1);
 
             if ((start < 0)||(start > 255)) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range start value: %i",
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range start value: %d",
                     start);
                 return 0;
             }
             if ((end < 0)||(end > 255)) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range end value: %i", end);
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range end value: %d", end);
                 return 0;
             }
             if (start > end) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range: %i-%i", start, end);
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid range: %d-%d", start, end);
                 return 0;
             }
 
@@ -1058,7 +1473,7 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
         int x = ((unsigned char *)var->value)[i];
         if (!(table[x >> 3] & (1 << (x & 0x7)))) {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Value %i outside range: %s", x, rule->op_param);
+                msr_log(msr, 9, "Value %d in %s outside range: %s", x, var->name, rule->op_param);
             }
             count++;
         }
@@ -1066,8 +1481,8 @@ static int msre_op_validateByteRange_execute(modsec_rec *msr, msre_rule *rule, m
 
     if (count == 0) return 0; /* Valid - no match. */
 
-    *error_msg = apr_psprintf(msr->mp, "Found %i byte(s) outside range: %s.",
-        count, rule->op_param);
+    *error_msg = apr_psprintf(msr->mp, "Found %d byte(s) in %s outside range: %s.",
+        count, var->name, rule->op_param);
 
     return 1; /* Invalid - match.*/
 }
@@ -1116,21 +1531,22 @@ static int msre_op_validateUrlEncoding_execute(modsec_rec *msr, msre_rule *rule,
     int rc = validate_url_encoding(var->value, var->value_len);
     switch(rc) {
         case 1 :
-            return 0; /* Encoding is valid, no match. */
+            /* Encoding is valid */
+            *error_msg = apr_psprintf(msr->mp, "Valid URL Encoding at %s.", var->name);
             break;
         case -2 :
             *error_msg = apr_psprintf(msr->mp, "Invalid URL Encoding: Non-hexadecimal "
-                "digits used.");
-            return 1; /* Invalid, match. */
+                "digits used at %s.", var->name);
+            return 1; /* Invalid match. */
             break;
         case -3 :
             *error_msg = apr_psprintf(msr->mp, "Invalid URL Encoding: Not enough characters "
-                "at the end of input.");
-            return 1; /* Invalid, match. */
+                "at the end of input at %s.", var->name);
+            return 1; /* Invalid match. */
             break;
         case -1 :
         default :
-            *error_msg = apr_psprintf(msr->mp, "Invalid URL Encoding: Internal Error (rc = %i)", rc);
+            *error_msg = apr_psprintf(msr->mp, "Invalid URL Encoding: Internal Error (rc = %d) at %s", rc, var->name);
             return -1;
             break;
 
@@ -1145,89 +1561,91 @@ static int msre_op_validateUrlEncoding_execute(modsec_rec *msr, msre_rule *rule,
 #define UNICODE_ERROR_CHARACTERS_MISSING    -1
 #define UNICODE_ERROR_INVALID_ENCODING      -2
 #define UNICODE_ERROR_OVERLONG_CHARACTER    -3
+#define UNICODE_ERROR_RESTRICTED_CHARACTER  -4
+#define UNICODE_ERROR_DECODING_ERROR        -5
 
-static int detect_utf8_character(const char *p_read, unsigned int length) {
+/* NOTE: This is over-commented for ease of verification */
+static int detect_utf8_character(const unsigned char *p_read, unsigned int length) {
     int unicode_len = 0;
     unsigned int d = 0;
     unsigned char c;
 
-    if (p_read == NULL) return 0;
+    if (p_read == NULL) return UNICODE_ERROR_DECODING_ERROR;
     c = *p_read;
-    if (c == 0) return 0;
 
-    if ((c & 0xE0) == 0xC0) {
-        /* two byte unicode */
+    /* If first byte begins with binary 0 it is single byte encoding */
+    if ((c & 0x80) == 0) {
+        /* single byte unicode (7 bit ASCII equivilent) has no validation */
+        return 1;
+    }
+    /* If first byte begins with binary 110 it is two byte encoding*/
+    else if ((c & 0xE0) == 0xC0) {
+        /* check we have at least two bytes */
         if (length < 2) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
-        else
-        if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+        /* check second byte starts with binary 10 */
+        else if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
         else {
             unicode_len = 2;
+            /* compute character number */
             d = ((c & 0x1F) << 6) | (*(p_read + 1) & 0x3F);
         }
     }
+    /* If first byte begins with binary 1110 it is three byte encoding */
     else if ((c & 0xF0) == 0xE0) {
-        /* three byte unicode */
+        /* check we have at least three bytes */
         if (length < 3) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
-        else
-        if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+        /* check second byte starts with binary 10 */
+        else if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+        /* check third byte starts with binary 10 */
+        else if (((*(p_read + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
         else {
             unicode_len = 3;
+            /* compute character number */
             d = ((c & 0x0F) << 12) | ((*(p_read + 1) & 0x3F) << 6) | (*(p_read + 2) & 0x3F);
         }
     }
+    /* If first byte begins with binary 11110 it is four byte encoding */
     else if ((c & 0xF8) == 0xF0) {
-        /* four byte unicode */
+        /* restrict characters to UTF-8 range (U+0000 - U+10FFFF)*/
+        if (c >= 0xF5) {
+            return UNICODE_ERROR_RESTRICTED_CHARACTER;
+        }
+        /* check we have at least four bytes */
         if (length < 4) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
-        else
-        if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 3)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+        /* check second byte starts with binary 10 */
+        else if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+        /* check third byte starts with binary 10 */
+        else if (((*(p_read + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
+        /* check forth byte starts with binary 10 */
+        else if (((*(p_read + 3)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
         else {
-            d = ((c & 0x07) << 18) | ((*(p_read + 1) & 0x3F) << 12) | ((*(p_read + 2) & 0x3F) < 6) | (*(p_read + 3) & 0x3F);
             unicode_len = 4;
+            /* compute character number */
+            d = ((c & 0x07) << 18) | ((*(p_read + 1) & 0x3F) << 12) | ((*(p_read + 2) & 0x3F) < 6) | (*(p_read + 3) & 0x3F);
         }
     }
-    else if ((c & 0xFC) == 0xF8) {
-        /* five byte unicode */
-        if (length < 5) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
-        else
-        if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 3)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 4)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else {
-            d = ((c & 0x03) << 24) | ((*(p_read + 1) & 0x3F) << 18) | ((*(p_read + 2) & 0x3F) << 12) | ((*(p_read + 3) & 0x3F) << 6) | (*(p_read + 4) & 0x3F);
-            unicode_len = 5;
-        }
-    }
-    else if ((c & 0xFE) == 0xFC) {
-        /* six byte unicode */
-        if (length < 6) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
-        else
-        if (((*(p_read + 1)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 3)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 4)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else
-        if (((*(p_read + 5)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-        else {
-            d = ((c & 0x01) << 30) | ((*(p_read + 1) & 0x3F) << 24) | ((*(p_read + 2) & 0x3F) << 18) | ((*(p_read + 3) & 0x3F) << 12) | ((*(p_read + 4) & 0x3F) << 6) | (*(p_read + 5) & 0x3F);
-            unicode_len = 6;
-        }
+    /* any other first byte is invalid (RFC 3629) */
+    else {
+        return UNICODE_ERROR_INVALID_ENCODING;
     }
 
-    if ((unicode_len > 1)&&((d & 0x7F) == d)) {
-        unicode_len = UNICODE_ERROR_OVERLONG_CHARACTER;
+    /* invalid UTF-8 character number range (RFC 3629) */
+    if ((d >= 0xD800) && (d <= 0xDFFF)) {
+        return UNICODE_ERROR_RESTRICTED_CHARACTER;
+    }
+
+    /* check for overlong */
+    if ((unicode_len == 4) && (d < 0x010000)) {
+        /* four byte could be represented with less bytes */
+        return UNICODE_ERROR_OVERLONG_CHARACTER;
+    }
+    else if ((unicode_len == 3) && (d < 0x0800)) {
+        /* three byte could be represented with less bytes */
+        return UNICODE_ERROR_OVERLONG_CHARACTER;
+    }
+    else if ((unicode_len == 2) && (d < 0x80)) {
+        /* two byte could be represented with less bytes */
+        return UNICODE_ERROR_OVERLONG_CHARACTER;
     }
 
     return unicode_len;
@@ -1239,27 +1657,50 @@ static int msre_op_validateUtf8Encoding_execute(modsec_rec *msr, msre_rule *rule
     unsigned int i, bytes_left;
 
     bytes_left = var->value_len;
-    for(i = 0; i < var->value_len; i++) {
-        int rc = detect_utf8_character(&var->value[i], bytes_left);
+
+    for(i = 0; i < var->value_len;) {
+        int rc = detect_utf8_character((unsigned char *)&var->value[i], bytes_left);
+
         switch(rc) {
             case UNICODE_ERROR_CHARACTERS_MISSING :
-                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: not enough bytes in "
-                    "character.");
+                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: "
+                    "not enough bytes in character "
+                    "at %s. [offset \"%d\"]", var->name, i);
                 return 1;
                 break;
             case UNICODE_ERROR_INVALID_ENCODING :
-                *error_msg = apr_psprintf(msr->mp, "Invalid Unicode encoding: invalid byte value "
-                    "in character.");
+                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: "
+                    "invalid byte value in character "
+                    "at %s. [offset \"%d\"]", var->name, i);
                 return 1;
                 break;
             case UNICODE_ERROR_OVERLONG_CHARACTER :
-                *error_msg = apr_psprintf(msr->mp, "Invalid Unicode encoding: overlong "
-                    "character detected.");
+                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: "
+                    "overlong character detected "
+                    "at %s. [offset \"%d\"]", var->name, i);
+                return 1;
+                break;
+            case UNICODE_ERROR_RESTRICTED_CHARACTER :
+                *error_msg = apr_psprintf(msr->mp, "Invalid UTF-8 encoding: "
+                    "use of restricted character "
+                    "at %s. [offset \"%d\"]", var->name, i);
+                return 1;
+                break;
+            case UNICODE_ERROR_DECODING_ERROR :
+                *error_msg = apr_psprintf(msr->mp, "Error validating UTF-8 decoding "
+                    "at %s. [offset \"%d\"]", var->name, i);
                 return 1;
                 break;
         }
 
-        bytes_left--;
+        if (rc <= 0) {
+            *error_msg = apr_psprintf(msr->mp, "Internal error during UTF-8 validation "
+                "at %s.", var->name);
+            return 1;
+        }
+
+        i += rc;
+        bytes_left -= rc;
     }
 
     return 0;
@@ -1288,7 +1729,7 @@ static int msre_op_eq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator EQ match: %i.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator EQ matched %d at %s.", right, var->name);
         /* Match. */
         return 1;
     }
@@ -1317,7 +1758,7 @@ static int msre_op_gt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator GT match: %i.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator GT matched %d at %s.", right, var->name);
         /* Match. */
         return 1;
     }
@@ -1335,7 +1776,7 @@ static int msre_op_lt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         /* NULL values do not match anything. */
         return 0;
     }
-    
+
     target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
     if (target == NULL) return -1;
     left = atoi(target);
@@ -1346,7 +1787,7 @@ static int msre_op_lt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator LT match: %i.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator LT matched %d at %s.", right, var->name);
         /* Match. */
         return 1;
     }
@@ -1375,7 +1816,7 @@ static int msre_op_ge_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator GE match: %i.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator GE matched %d at %s.", right, var->name);
         /* Match. */
         return 1;
     }
@@ -1404,7 +1845,7 @@ static int msre_op_le_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
     else {
-        *error_msg = apr_psprintf(msr->mp, "Operator LE match: %i.", right);
+        *error_msg = apr_psprintf(msr->mp, "Operator LE matched %d at %s.", right, var->name);
         /* Match. */
         return 1;
     }
@@ -1421,6 +1862,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "unconditionalMatch",
         NULL,
         msre_op_unconditionalmatch_execute
+    );
+
+    /* noMatch */
+    msre_engine_op_register(engine,
+        "noMatch",
+        NULL,
+        msre_op_nomatch_execute
     );
 
     /* rx */
@@ -1458,6 +1906,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_contains_execute
     );
 
+    /* containsWord */
+    msre_engine_op_register(engine,
+        "containsWord",
+        NULL, /* ENH init function to flag var substitution */
+        msre_op_containsWord_execute
+    );
+
     /* is */
     msre_engine_op_register(engine,
         "streq",
@@ -1486,8 +1941,6 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_m_execute
     );
 
-    #ifdef WITH_LIBXML2
-
     /* validateDTD */
     msre_engine_op_register(engine,
         "validateDTD",
@@ -1502,7 +1955,12 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_validateSchema_execute
     );
 
-    #endif
+    /* verifyCC */
+    msre_engine_op_register(engine,
+        "verifyCC",
+        msre_op_verifyCC_init,
+        msre_op_verifyCC_execute
+    );
 
     /* geoLookup */
     msre_engine_op_register(engine,
@@ -1521,7 +1979,7 @@ void msre_engine_register_default_operators(msre_engine *engine) {
     /* inspectFile */
     msre_engine_op_register(engine,
         "inspectFile",
-        NULL,
+        msre_op_inspectFile_init,
         msre_op_inspectFile_execute
     );
 

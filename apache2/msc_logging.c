@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -8,6 +8,7 @@
  * write to Breach Security, Inc. at support@breach.com.
  *
  */
+#include "re.h"
 #include "msc_logging.h"
 #include "httpd.h"
 #include "apr_strings.h"
@@ -23,22 +24,39 @@ static int sec_auditlog_write(modsec_rec *msr, const char *data, unsigned int le
     apr_size_t nbytes_written, nbytes = len;
     apr_status_t rc;
 
-    if ((msr->new_auditlog_fd == NULL)||(data == NULL)) return -1;
+    /* Do nothing if there's no data. */
+    if (data == NULL) return -1;
 
+    /* Update size counters and the hash calculation. We always do this,
+     * even in cases where write fails. That will make it easier to detect
+     * problems with partial writes.
+     */
+    msr->new_auditlog_size += len;
+    apr_md5_update(&msr->new_auditlog_md5ctx, data, len);
+
+    /* Do not write if we do not have a file descriptor. */
+    if (msr->new_auditlog_fd == NULL) return -1;
+
+    /* Write data to file. */
     rc = apr_file_write_full(msr->new_auditlog_fd, data, nbytes, &nbytes_written);
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Audit log: Failed writing (requested %" APR_SIZE_T_FMT
             " bytes, written %" APR_SIZE_T_FMT ")", nbytes, nbytes_written);
+
+        /* Set to NULL to prevent more than one error message on
+         * out-of-disk-space events and to prevent further attempts
+         * to write to the same file in this request.
+         *
+         * Note that, as we opened the file through the pool mechanism of
+         * the APR, we do not need to close the file here. It will be closed
+         * automatically at the end of the request.
+         */
+        msr->new_auditlog_fd = NULL;
+
         return -1;
     }
 
-    /* Note the following will only take into account the actual
-     * amount of bytes we've written.
-     */
-    msr->new_auditlog_size += nbytes_written;
-    apr_md5_update(&msr->new_auditlog_md5ctx, data, nbytes_written);
-
-    return rc;
+    return 1;
 }
 
 /**
@@ -78,7 +96,7 @@ char *construct_log_vcombinedus(modsec_rec *msr) {
     /* sessionid */
     sessionid = (msr->sessionid == NULL ? "-" : msr->sessionid);
 
-    return apr_psprintf(msr->mp, "%s %s %s %s [%s] \"%s\" %i %" APR_OFF_T_FMT " \"%s\" \"%s\" %s \"%s\"",
+    return apr_psprintf(msr->mp, "%s %s %s %s [%s] \"%s\" %u %" APR_OFF_T_FMT " \"%s\" \"%s\" %s \"%s\"",
         log_escape_nq(msr->mp, msr->hostname), msr->remote_addr, log_escape_nq(msr->mp, remote_user),
         log_escape_nq(msr->mp, local_user), current_logtime(msr->mp),
         ((msr->request_line == NULL) ? "" : log_escape(msr->mp, msr->request_line)),
@@ -149,7 +167,7 @@ char *construct_log_vcombinedus_limited(modsec_rec *msr, int _limit, int *was_li
     limit -= strlen(sessionid);                  /* session id */
 
     if (limit <= 0) {
-        msr_log(msr, 1, "GuardianLog: Atomic pipe write size too small: %i", PIPE_BUF);
+        msr_log(msr, 1, "GuardianLog: Atomic pipe write size too small: %d", PIPE_BUF);
         return NULL;
     }
 
@@ -169,19 +187,19 @@ char *construct_log_vcombinedus_limited(modsec_rec *msr, int _limit, int *was_li
             remote_user[32] = '\0';
         }
         limit -= strlen(remote_user);
-        
+
         if (strlen(local_user) > 32) {
             msr_log(msr, 9, "GuardianLog: Reduced local_user to 32.");
             local_user[32] = '\0';
         }
         limit -= strlen(local_user);
-        
+
         if (strlen(referer) > 64) {
             msr_log(msr, 9, "GuardianLog: Reduced referer to 64.");
             referer[64] = '\0';
         }
         limit -= strlen(referer);
-        
+
         if (strlen(user_agent) > 64) {
             msr_log(msr, 9, "GuardianLog: Reduced user_agent to 64.");
             user_agent[64] = '\0';
@@ -189,21 +207,21 @@ char *construct_log_vcombinedus_limited(modsec_rec *msr, int _limit, int *was_li
         limit -= strlen(user_agent);
 
         if (limit <= 0) {
-            msr_log(msr, 1, "GuardianLog: Atomic pipe write size too small: %i.", PIPE_BUF);
+            msr_log(msr, 1, "GuardianLog: Atomic pipe write size too small: %d.", PIPE_BUF);
             return NULL;
         }
 
         /* use what's left for the request line */
         if ((int)strlen(the_request) > limit) {
             the_request[limit] = '\0';
-            msr_log(msr, 9, "GuardianLog: Reduced the_request to %i bytes.", limit);
+            msr_log(msr, 9, "GuardianLog: Reduced the_request to %d bytes.", limit);
         }
     } else {
         /* Yay! We have enough space! */
         *was_limited = 0;
     }
 
-    return apr_psprintf(msr->mp, "%s %s %s %s [%s] \"%s\" %i %s \"%s\" \"%s\" %s \"%s\"",
+    return apr_psprintf(msr->mp, "%s %s %s %s [%s] \"%s\" %u %s \"%s\" \"%s\" %s \"%s\"",
         hostname, msr->remote_addr, remote_user,
         local_user, current_logtime(msr->mp), the_request,
         msr->response_status, bytes_sent, referer, user_agent,
@@ -217,7 +235,7 @@ char *construct_log_vcombinedus_limited(modsec_rec *msr, int _limit, int *was_li
 int is_valid_parts_specification(char *p) {
     char c, *t = p;
 
-    while((c = *t++) != '\0') {
+    while((c = *(t++)) != '\0') {
         if ((c != AUDITLOG_PART_ENDMARKER)&&((c < AUDITLOG_PART_FIRST)||(c > AUDITLOG_PART_LAST))) {
             return 0;
         }
@@ -284,7 +302,7 @@ static void sanitise_request_line(modsec_rec *msr) {
             j = arg->value_origin_offset;
             while((*p != '\0')&&(j--)) p++;
             if (*p == '\0') {
-                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %i of QUERY_STRING"
+                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %u of QUERY_STRING"
                     "because the request line is too short.",
                     log_escape_ex(msr->mp, arg->name, arg->name_len),
                     arg->value_origin_offset);
@@ -297,7 +315,7 @@ static void sanitise_request_line(modsec_rec *msr) {
                 *p++ = '*';
             }
             if (*p == '\0') {
-                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %i (size %i) "
+                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %u (size %d) "
                     "of QUERY_STRING because the request line is too short.",
                     log_escape_ex(msr->mp, arg->name, arg->name_len),
                     arg->value_origin_offset, arg->value_origin_len);
@@ -308,12 +326,44 @@ static void sanitise_request_line(modsec_rec *msr) {
 }
 
 /**
+ * Output the Producer header.
+ */
+static void sec_auditlog_write_producer_header(modsec_rec *msr) {
+    char **signatures = NULL;
+    char *text = NULL;
+    int i;
+
+    /* Try to write everything in one go. */
+    if (msr->txcfg->component_signatures->nelts == 0) {
+        text = apr_psprintf(msr->mp, "Producer: %s.\n", MODULE_NAME_FULL);
+        sec_auditlog_write(msr, text, strlen(text));
+
+        return;
+    }
+
+    /* Start with the ModSecurity signature. */
+    text = apr_psprintf(msr->mp, "Producer: %s", MODULE_NAME_FULL);
+    sec_auditlog_write(msr, text, strlen(text));
+
+
+    /* Then loop through the components and output individual signatures. */
+    signatures = (char **)msr->txcfg->component_signatures->elts;
+    for(i = 0; i < msr->txcfg->component_signatures->nelts; i++) {
+        text = apr_psprintf(msr->mp, "; %s", (char *)signatures[i]);
+        sec_auditlog_write(msr, text, strlen(text));
+    }
+
+    sec_auditlog_write(msr, ".\n", 2);
+}
+
+/**
  * Produce an audit log entry.
  */
 void sec_audit_logger(modsec_rec *msr) {
     const apr_array_header_t *arr = NULL;
     apr_table_entry_t *te = NULL;
     char *str1 = NULL, *str2 = NULL, *text = NULL;
+    const msre_rule *rule = NULL;
     apr_size_t nbytes, nbytes_written;
     unsigned char md5hash[APR_MD5_DIGESTSIZE];
     int was_limited = 0;
@@ -332,7 +382,7 @@ void sec_audit_logger(modsec_rec *msr) {
         msr_log(msr, 4, "Audit log: Skipping request whose request_line is null.");
         return;
     }
-    
+
     /* Also return silently if we don't have a file descriptor. */
     if (msr->txcfg->auditlog_fd == NULL) {
         msr_log(msr, 4, "Audit log: Skipping request since there is nowhere to write to.");
@@ -361,7 +411,7 @@ void sec_audit_logger(modsec_rec *msr) {
          * writing to but it's not us that's causing the problem
          * and there isn't anything we can do about that.
          *
-         * TODO Actually there is something we can do! We will make
+         * ENH Actually there is something we can do! We will make
          * SecAuditStorageDir mandatory, ask the user to explicitly
          * define the storage location *and* refuse to work if the
          * index and the storage location are in the same folder.
@@ -413,12 +463,12 @@ void sec_audit_logger(modsec_rec *msr) {
 
     /* AUDITLOG_PART_HEADER */
 
-    text = apr_psprintf(msr->mp, "--%s-A--\n", msr->new_auditlog_boundary);
+    text = apr_psprintf(msr->mp, "--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_HEADER);
     sec_auditlog_write(msr, text, strlen(text));
 
     /* Format: time transaction_id remote_addr remote_port local_addr local_port */
 
-    text = apr_psprintf(msr->mp, "[%s] %s %s %i %s %i",
+    text = apr_psprintf(msr->mp, "[%s] %s %s %u %s %u",
         current_logtime(msr->mp), msr->txid, msr->remote_addr, msr->remote_port,
         msr->local_addr, msr->local_port);
     sec_auditlog_write(msr, text, strlen(text));
@@ -427,7 +477,7 @@ void sec_audit_logger(modsec_rec *msr) {
     /* AUDITLOG_PART_REQUEST_HEADERS */
 
     if (strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_REQUEST_HEADERS) != NULL) {
-        text = apr_psprintf(msr->mp, "\n--%s-B--\n", msr->new_auditlog_boundary);
+        text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_REQUEST_HEADERS);
         sec_auditlog_write(msr, text, strlen(text));
 
         sanitise_request_line(msr);
@@ -465,6 +515,7 @@ void sec_audit_logger(modsec_rec *msr) {
             unsigned int offset = 0, last_offset = 0;
             msc_arg *nextarg = NULL;
             int sanitise = 0; /* IMP1 Use constants for "sanitise" values. */
+            char *my_error_msg = NULL;
 
             sorted_args = apr_array_make(msr->mp, 25, sizeof(const msc_arg *));
 
@@ -502,7 +553,7 @@ void sec_audit_logger(modsec_rec *msr) {
                         }
                     }
                 }
-        
+
                 /* If we don't have the next argument that means
                  * we're done here.
                  */
@@ -521,20 +572,20 @@ void sec_audit_logger(modsec_rec *msr) {
              * sanitise data in pieces.
              */
 
-            rc = modsecurity_request_body_retrieve_start(msr);
+            rc = modsecurity_request_body_retrieve_start(msr, &my_error_msg);
             if (rc < 0) {
-                msr_log(msr, 1, "Audit log: Failed retrieving request body.");
+                msr_log(msr, 1, "Audit log: %s", my_error_msg);
             } else {
                 msc_data_chunk *chunk = NULL;
                 unsigned int chunk_offset = 0;
                 unsigned int sanitise_offset = 0;
                 unsigned int sanitise_length = 0;
 
-                text = apr_psprintf(msr->mp, "\n--%s-C--\n", msr->new_auditlog_boundary);
+                text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_REQUEST_BODY);
                 sec_auditlog_write(msr, text, strlen(text));
 
                 for(;;) {
-                    rc = modsecurity_request_body_retrieve(msr, &chunk, -1);
+                    rc = modsecurity_request_body_retrieve(msr, &chunk, -1, &my_error_msg);
                     if (chunk != NULL) {
                         /* Anything greater than 1 means we have more data to sanitise. */
                         while (sanitise > 1) {
@@ -563,7 +614,7 @@ void sec_audit_logger(modsec_rec *msr) {
                                     unsigned int len;  /* amount in this chunk to sanitise */
 
                                     soff = sanitise_offset - chunk_offset;
-                                       
+
                                     if (soff + sanitise_length <= chunk->length) {
                                         /* The entire argument resides in the current chunk. */
                                         len = sanitise_length;
@@ -594,7 +645,13 @@ void sec_audit_logger(modsec_rec *msr) {
                         chunk_offset += chunk->length;
                     }
 
-                    if (rc <= 0) break;
+                    if (rc <= 0) {
+                        break;
+                    }
+                }
+
+                if (rc < 0) {
+                    msr_log(msr, 1, "Audit log: %s", my_error_msg);
                 }
 
                 modsecurity_request_body_retrieve_end(msr);
@@ -612,7 +669,7 @@ void sec_audit_logger(modsec_rec *msr) {
             if (buffer == NULL) {
                 msr_log(msr, 1, "Audit log: Failed to reconstruct request body.");
             } else {
-                text = apr_psprintf(msr->mp, "\n--%s-I--\n", msr->new_auditlog_boundary);
+                text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_FAKE_REQUEST_BODY);
                 sec_auditlog_write(msr, text, strlen(text));
                 sec_auditlog_write(msr, buffer, strlen(buffer));
             }
@@ -622,7 +679,7 @@ void sec_audit_logger(modsec_rec *msr) {
     /* AUDITLOG_PART_A_RESPONSE_HEADERS */
 
     if (strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_A_RESPONSE_HEADERS) != NULL) {
-        text = apr_psprintf(msr->mp, "\n--%s-F--\n", msr->new_auditlog_boundary);
+        text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_A_RESPONSE_HEADERS);
         sec_auditlog_write(msr, text, strlen(text));
 
         /* There are no response headers (or the status line) in HTTP 0.9 */
@@ -631,7 +688,7 @@ void sec_audit_logger(modsec_rec *msr) {
                 text = apr_psprintf(msr->mp, "%s %s\n", msr->response_protocol,
                     msr->status_line);
             } else {
-                text = apr_psprintf(msr->mp, "%s %i\n", msr->response_protocol,
+                text = apr_psprintf(msr->mp, "%s %u\n", msr->response_protocol,
                     msr->response_status);
             }
             sec_auditlog_write(msr, text, strlen(text));
@@ -651,12 +708,12 @@ void sec_audit_logger(modsec_rec *msr) {
             }
         }
     }
-    
+
     /* AUDITLOG_PART_RESPONSE_BODY */
 
     if (strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_RESPONSE_BODY) != NULL) {
         if (msr->resbody_data != NULL) {
-            text = apr_psprintf(msr->mp, "\n--%s-E--\n", msr->new_auditlog_boundary);
+            text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_RESPONSE_BODY);
             sec_auditlog_write(msr, text, strlen(text));
             sec_auditlog_write(msr, msr->resbody_data, msr->resbody_length);
             wrote_response_body = 1;
@@ -668,7 +725,7 @@ void sec_audit_logger(modsec_rec *msr) {
     if (strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_TRAILER) != NULL) {
         apr_time_t now = apr_time_now();
 
-        text = apr_psprintf(msr->mp, "\n--%s-H--\n", msr->new_auditlog_boundary);
+        text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_TRAILER);
         sec_auditlog_write(msr, text, strlen(text));
 
         /* Messages */
@@ -676,7 +733,7 @@ void sec_audit_logger(modsec_rec *msr) {
             text = apr_psprintf(msr->mp, "Message: %s\n", ((char **)msr->alerts->elts)[i]);
             sec_auditlog_write(msr, text, strlen(text));
         }
-    
+
         /* Apache error messages */
         for(i = 0; i < msr->error_messages->nelts; i++) {
             error_message *em = (((error_message**)msr->error_messages->elts)[i]);
@@ -684,10 +741,10 @@ void sec_audit_logger(modsec_rec *msr) {
                 format_error_log_message(msr->mp, em));
             sec_auditlog_write(msr, text, strlen(text));
         }
-        
+
         /* Action */
         if (msr->was_intercepted) {
-            text = apr_psprintf(msr->mp, "Action: Intercepted (phase %i)\n", msr->intercept_phase);
+            text = apr_psprintf(msr->mp, "Action: Intercepted (phase %d)\n", msr->intercept_phase);
             sec_auditlog_write(msr, text, strlen(text));
         }
 
@@ -726,7 +783,7 @@ void sec_audit_logger(modsec_rec *msr) {
         }
 
         sec_auditlog_write(msr, text, strlen(text));
-        
+
         /* Our response body does not contain chunks */
         /* ENH Only write this when the output was chunked. */
         /* ENH Add info when request body was decompressed, dechunked too. */
@@ -734,11 +791,9 @@ void sec_audit_logger(modsec_rec *msr) {
             text = apr_psprintf(msr->mp, "Response-Body-Transformed: Dechunked\n");
             sec_auditlog_write(msr, text, strlen(text));
         }
-        
-        /* Producer */
-        text = apr_psprintf(msr->mp, "Producer: %s\n", MODULE_NAME_FULL);
-        sec_auditlog_write(msr, text, strlen(text));
-        
+
+        sec_auditlog_write_producer_header(msr);
+
         /* Server */
         if (msr->server_software != NULL) {
             text = apr_psprintf(msr->mp, "Server: %s\n", msr->server_software);
@@ -818,10 +873,28 @@ void sec_audit_logger(modsec_rec *msr) {
         }
     }
 
+    /* AUDITLOG_PART_UPLOADS */
+    /* ENH: Implement */
+
+
+    /* AUDITLOG_PART_MATCHEDRULES */
+
+    if (strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_MATCHEDRULES) != NULL) {
+        text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_MATCHEDRULES);
+        sec_auditlog_write(msr, text, strlen(text));
+
+        /* Matched Rules */
+        for(i = 0; i < msr->matched_rules->nelts; i++) {
+            rule = ((msre_rule **)msr->matched_rules->elts)[i];
+            text = apr_psprintf(msr->mp, "%s\n", rule->unparsed);
+            sec_auditlog_write(msr, text, strlen(text));
+        }
+    }
+
 
     /* AUDITLOG_PART_ENDMARKER */
 
-    text = apr_psprintf(msr->mp, "\n--%s-Z--\n", msr->new_auditlog_boundary);
+    text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_ENDMARKER);
     sec_auditlog_write(msr, text, strlen(text));
 
     /* Return here if we were writing to a serial log
@@ -841,7 +914,7 @@ void sec_audit_logger(modsec_rec *msr) {
     }
 
     /* From here on only concurrent-style processing. */
-    
+
     apr_file_close(msr->new_auditlog_fd);
 
     /* Write an entry to the index file */
@@ -849,10 +922,10 @@ void sec_audit_logger(modsec_rec *msr) {
     /* Calculate hash of the entry. */
     apr_md5_final(md5hash, &msr->new_auditlog_md5ctx);
 
-    str2 = apr_psprintf(msr->mp, "%s %i %i md5:%s", msr->new_auditlog_filename, 0,
+    str2 = apr_psprintf(msr->mp, "%s %d %d md5:%s", msr->new_auditlog_filename, 0,
         msr->new_auditlog_size, bytes2hex(msr->mp, md5hash, 16));
     if (str2 == NULL) return;
-    
+
     /* We do not want the index line to be longer than 3980 bytes. */
     limit = 3980;
     was_limited = 0;
@@ -869,7 +942,7 @@ void sec_audit_logger(modsec_rec *msr) {
 
     limit = limit - strlen(str2) - 5;
     if (limit <= 0) {
-        msr_log(msr, 1, "Audit Log: Atomic PIPE write buffer too small: %i", PIPE_BUF);
+        msr_log(msr, 1, "Audit Log: Atomic PIPE write buffer too small: %d", PIPE_BUF);
         return;
     }
 
@@ -885,14 +958,14 @@ void sec_audit_logger(modsec_rec *msr) {
 
     nbytes = strlen(text);
     if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "Audit Log: Writing %d bytes to primary concurrent index", nbytes);
+        msr_log(msr, 9, "Audit Log: Writing %" APR_SIZE_T_FMT " bytes to primary concurrent index", nbytes);
     }
     apr_file_write_full(msr->txcfg->auditlog_fd, text, nbytes, &nbytes_written);
 
     /* Write to the secondary audit log if we have one */
     if (msr->txcfg->auditlog2_fd != NULL) {
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "Audit Log: Writing %d bytes to secondary concurrent index", nbytes);
+            msr_log(msr, 9, "Audit Log: Writing %" APR_SIZE_T_FMT " bytes to secondary concurrent index", nbytes);
         }
         apr_file_write_full(msr->txcfg->auditlog2_fd, text, nbytes, &nbytes_written);
     }

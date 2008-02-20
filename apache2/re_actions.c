@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -14,10 +14,11 @@
 /**
  * Register action with the engine.
  */
-static void msre_engine_action_register(msre_engine *engine, const char *name, unsigned int type,
-    unsigned int argc_min, unsigned int argc_max, unsigned int allow_param_plusminus,
-    unsigned int cardinality, FN_ACTION_VALIDATE(validate), FN_ACTION_INIT(init),
-    FN_ACTION_EXECUTE(execute))
+static void msre_engine_action_register(msre_engine *engine, const char *name,
+    unsigned int type, unsigned int argc_min, unsigned int argc_max,
+    unsigned int allow_param_plusminus, unsigned int cardinality,
+    unsigned int cardinality_group, fn_action_validate_t validate,
+    fn_action_init_t init, fn_action_execute_t execute)
 {
     msre_action_metadata *metadata = (msre_action_metadata *)apr_pcalloc(engine->mp,
         sizeof(msre_action_metadata));
@@ -29,6 +30,7 @@ static void msre_engine_action_register(msre_engine *engine, const char *name, u
     metadata->argc_max = argc_max;
     metadata->allow_param_plusminus = allow_param_plusminus;
     metadata->cardinality = cardinality;
+    metadata->cardinality_group = cardinality_group;
     metadata->validate = validate;
     metadata->init = init;
     metadata->execute = execute;
@@ -39,21 +41,118 @@ static void msre_engine_action_register(msre_engine *engine, const char *name, u
 /**
  * Generates a single variable (from the supplied metadata).
  */
-static msre_var *generate_single_var(modsec_rec *msr, msre_var *var, msre_rule *rule,
-    apr_pool_t *mptmp)
+msre_var *generate_single_var(modsec_rec *msr, msre_var *var, apr_array_header_t *tfn_arr,
+    msre_rule *rule, apr_pool_t *mptmp)
 {
     apr_table_t *vartab = NULL;
     const apr_table_entry_t *te = NULL;
     const apr_array_header_t *arr = NULL;
+    msre_var *rvar = NULL;
+    int i;
 
-    if (var->metadata->generate == NULL) return NULL;
+    /* Sanity check. */
+    if ((var == NULL)||(var->metadata == NULL)||(var->metadata->generate == NULL)) return NULL;
+
     vartab = apr_table_make(mptmp, 16);
     var->metadata->generate(msr, var, rule, vartab, mptmp);
+
     arr = apr_table_elts(vartab);
     if (arr->nelts == 0) return NULL;
-    te = (apr_table_entry_t *)arr->elts;    
+    te = (apr_table_entry_t *)arr->elts;
 
-    return (msre_var *)te[0].val;
+    rvar = (msre_var *)te[0].val;
+
+    /* Return straight away if there were no
+     * transformation functions supplied.
+     */
+    if ((tfn_arr == NULL)||(tfn_arr->nelts == 0)) {
+        return rvar;
+    }
+
+    /* Copy the value so that we can transform it in place. */
+    rvar->value = apr_pstrndup(mptmp, rvar->value, rvar->value_len);
+
+    /* Transform rvar in a loop. */
+    for (i = 0; i < tfn_arr->nelts; i++) {
+        msre_tfn_metadata *tfn = ((msre_tfn_metadata **)tfn_arr->elts)[i];
+        char *rval;
+        int rc;
+        long int rval_len;
+
+        rc = tfn->execute(mptmp, (unsigned char *)rvar->value,
+                    rvar->value_len, &rval, &rval_len);
+
+        rvar->value = rval;
+        rvar->value_len = rval_len;
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "T (%d) %s: \"%s\"", rc, tfn->name,
+                log_escape_nq_ex(mptmp, rvar->value, rvar->value_len));
+        }
+    }
+
+    return rvar;
+}
+
+/**
+ *
+ */
+apr_table_t *generate_multi_var(modsec_rec *msr, msre_var *var, apr_array_header_t *tfn_arr,
+    msre_rule *rule, apr_pool_t *mptmp)
+{
+    const apr_array_header_t *tarr;
+    const apr_table_entry_t *telts;
+    apr_table_t *vartab = NULL, *tvartab = NULL;
+    msre_var *rvar = NULL;
+    int i, j;
+
+    /* Sanity check. */
+    if ((var == NULL)||(var->metadata == NULL)||(var->metadata->generate == NULL)) return NULL;
+
+    /* Generate variables. */
+    vartab = apr_table_make(mptmp, 16);
+    var->metadata->generate(msr, var, rule, vartab, mptmp);
+
+    /* Return straight away if there were no
+     * transformation functions supplied.
+     */
+    if ((tfn_arr == NULL)||(tfn_arr->nelts == 0)) {
+        return vartab;
+    }
+
+    tvartab = apr_table_make(mptmp, 16);
+
+    tarr = apr_table_elts(vartab);
+    telts = (const apr_table_entry_t*)tarr->elts;
+    for (j = 0; j < tarr->nelts; j++) {
+        rvar = (msre_var *)telts[j].val;
+
+        /* Copy the value so that we can transform it in place. */
+        rvar->value = apr_pstrndup(mptmp, rvar->value, rvar->value_len);
+
+        /* Transform rvar in a loop. */
+        for (i = 0; i < tfn_arr->nelts; i++) {
+            msre_tfn_metadata *tfn = ((msre_tfn_metadata **)tfn_arr->elts)[i];
+            char *rval;
+            int rc;
+            long int rval_len;
+
+            rc = tfn->execute(mptmp, (unsigned char *)rvar->value,
+                rvar->value_len, &rval, &rval_len);
+
+            rvar->value = rval;
+            rvar->value_len = rval_len;
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "T (%d) %s: \"%s\"", rc, tfn->name,
+                    log_escape_nq_ex(mptmp, rvar->value, rvar->value_len));
+            }
+        }
+
+        apr_table_addn(tvartab, rvar->name, (void *)rvar);
+    }
+
+    return tvartab;
 }
 
 /**
@@ -102,24 +201,11 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
                         *q = '\0';
                     }
 
-                    /* ENH Do we want to support %{DIGIT} as well? */
-
                     next_text_start = t + 1; /* *t was '}' */
                 } else {
                     next_text_start = t; /* *t was '\0' */
                 }
             }
-/* Removed %0-9 macros as it messes up urlEncoding in the match
- * where having '%0a' will be treated as %{TX.0}a, which is incorrect.
- * */
-#if 0
-            else if ((*(p + 1) >= '0')&&(*(p + 1) <= '9')) {
-                /* Special case for regex captures. */
-                var_name = "TX";
-                var_value = apr_pstrmemdup(mptmp, p + 1, 1);
-                next_text_start = p + 2;
-            }
-#endif
 
             if (var_name != NULL) {
                 char *my_error_msg = NULL;
@@ -137,18 +223,20 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
                 var_resolved = msre_create_var_ex(mptmp, msr->modsecurity->msre, var_name, var_value,
                     msr, &my_error_msg);
                 if (var_resolved != NULL) {
-                    var_generated = generate_single_var(msr, var_resolved, rule, mptmp);
+                    var_generated = generate_single_var(msr, var_resolved, NULL, rule, mptmp);
                     if (var_generated != NULL) {
                         part = (msc_string *)apr_pcalloc(mptmp, sizeof(msc_string));
                         if (part == NULL) return -1;
                         part->value_len = var_generated->value_len;
                         part->value = (char *)var_generated->value;
                         *(msc_string **)apr_array_push(arr) = part;
-                        msr_log(msr, 9, "Resolved macro %%{%s%s%s} to \"%s\"",
-                            var_name,
-                            (var_value ? "." : ""),
-                            (var_value ? var_value : ""),
-                            log_escape_ex(mptmp, part->value, part->value_len));
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "Resolved macro %%{%s%s%s} to \"%s\"",
+                                var_name,
+                                (var_value ? "." : ""),
+                                (var_value ? var_value : ""),
+                                log_escape_ex(mptmp, part->value, part->value_len));
+                        }
                     }
                 } else {
                     msr_log(msr, 4, "Failed to resolve macro %%{%s%s%s}: %s",
@@ -232,6 +320,15 @@ static apr_status_t msre_action_msg_init(msre_engine *engine, msre_actionset *ac
     return 1;
 }
 
+/* logdata */
+
+static apr_status_t msre_action_logdata_init(msre_engine *engine, msre_actionset *actionset,
+    msre_action *action)
+{
+    actionset->logdata = action->param;
+    return 1;
+}
+
 /* severity */
 
 static apr_status_t msre_action_severity_init(msre_engine *engine,
@@ -283,11 +380,21 @@ static apr_status_t msre_action_noauditlog_init(msre_engine *engine, msre_action
     return 1;
 }
 
+/* block */
+static apr_status_t msre_action_block_init(msre_engine *engine, msre_actionset *actionset,
+    msre_action *action)
+{
+    /* Right now we just set a flag and inherit the real disruptive action */
+    actionset->block = 1;
+    return 1;
+}
+
 /* deny */
 static apr_status_t msre_action_deny_init(msre_engine *engine, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->intercept_action = ACTION_DENY;
+    actionset->intercept_action_rec = action;
     return 1;
 }
 
@@ -309,6 +416,7 @@ static apr_status_t msre_action_drop_init(msre_engine *engine, msre_actionset *a
     msre_action *action)
 {
     actionset->intercept_action = ACTION_DROP;
+    actionset->intercept_action_rec = action;
     return 1;
 }
 
@@ -337,6 +445,7 @@ static apr_status_t msre_action_redirect_init(msre_engine *engine, msre_actionse
 {
     actionset->intercept_action = ACTION_REDIRECT;
     actionset->intercept_uri = action->param;
+    actionset->intercept_action_rec = action;
     return 1;
 }
 
@@ -352,7 +461,7 @@ static apr_status_t msre_action_redirect_execute(modsec_rec *msr, apr_pool_t *mp
     expand_macros(msr, var, rule, mptmp);
 
     rule->actionset->intercept_uri = apr_pstrmemdup(msr->mp, var->value, var->value_len);
-    
+
     return 1;
 }
 
@@ -368,6 +477,7 @@ static apr_status_t msre_action_proxy_init(msre_engine *engine, msre_actionset *
 {
     actionset->intercept_action = ACTION_PROXY;
     actionset->intercept_uri = action->param;
+    actionset->intercept_action_rec = action;
     return 1;
 }
 
@@ -383,7 +493,7 @@ static apr_status_t msre_action_proxy_execute(modsec_rec *msr, apr_pool_t *mptmp
     expand_macros(msr, var, rule, mptmp);
 
     rule->actionset->intercept_uri = apr_pstrmemdup(msr->mp, var->value, var->value_len);
-    
+
     return 1;
 }
 
@@ -393,6 +503,7 @@ static apr_status_t msre_action_pass_init(msre_engine *engine, msre_actionset *a
     msre_action *action)
 {
     actionset->intercept_action = ACTION_NONE;
+    actionset->intercept_action_rec = action;
     return 1;
 }
 
@@ -411,13 +522,53 @@ static apr_status_t msre_action_skip_init(msre_engine *engine, msre_actionset *a
     return 1;
 }
 
+/* skipAfter */
+
+static char *msre_action_skipAfter_validate(msre_engine *engine, msre_action *action) {
+    /* ENH Add validation. */
+    return NULL;
+}
+
+static apr_status_t msre_action_skipAfter_init(msre_engine *engine, msre_actionset *actionset,
+    msre_action *action)
+{
+    actionset->skip_after = action->param;
+    return 1;
+}
+
 /* allow */
 
 static apr_status_t msre_action_allow_init(msre_engine *engine, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->intercept_action = ACTION_ALLOW;
+    actionset->intercept_action_rec = action;
+
+    if (action->param != NULL) {
+        if (strcasecmp(action->param, "phase") == 0) {
+            actionset->intercept_action = ACTION_ALLOW_PHASE;
+        } else
+        if (strcasecmp(action->param, "request") == 0) {
+            actionset->intercept_action = ACTION_ALLOW_REQUEST;
+        }
+    }
+
     return 1;
+}
+
+static char *msre_action_allow_validate(msre_engine *engine, msre_action *action) {
+    if (action->param != NULL) {
+        if (strcasecmp(action->param, "phase") == 0) {
+            return NULL;
+        } else
+        if (strcasecmp(action->param, "request") == 0) {
+            return NULL;
+        } else {
+            return apr_psprintf(engine->mp, "Invalid parameter for allow: %s", action->param);
+        }
+    }
+
+    return NULL;
 }
 
 /* phase */
@@ -467,40 +618,44 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
     }
 
     /* Validate value. */
-    if (strcmp(name, "ruleEngine") == 0) {
+    if (strcasecmp(name, "ruleEngine") == 0) {
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
         if (strcasecmp(value, "detectiononly") == 0) return NULL;
         return apr_psprintf(engine->mp, "Invalid setting for ctl name ruleEngine: %s", value);
     } else
-    if (strcmp(name, "requestBodyAccess") == 0) {
+    if (strcasecmp(name, "ruleRemoveById") == 0) {
+        /* ENH nothing yet */
+        return NULL;
+    } else
+    if (strcasecmp(name, "requestBodyAccess") == 0) {
         if (parse_boolean(value) == -1) {
             return apr_psprintf(engine->mp, "Invalid setting for ctl name "
                 " requestBodyAccess: %s", value);
         }
         return NULL;
     } else
-    if (strcmp(name, "requestBodyProcessor") == 0) {
+    if (strcasecmp(name, "requestBodyProcessor") == 0) {
         /* ENH We will accept anything for now but it'd be nice
          * to add a check here that the processor name is a valid one.
          */
         return NULL;
     } else
-    if (strcmp(name, "responseBodyAccess") == 0) {
+    if (strcasecmp(name, "responseBodyAccess") == 0) {
         if (parse_boolean(value) == -1) {
             return apr_psprintf(engine->mp, "Invalid setting for ctl name "
                 " responseBodyAccess: %s", value);
         }
         return NULL;
     } else
-    if (strcmp(name, "auditEngine") == 0) {
+    if (strcasecmp(name, "auditEngine") == 0) {
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
         if (strcasecmp(value, "relevantonly") == 0) return NULL;
         return apr_psprintf(engine->mp, "Invalid setting for ctl name "
             " auditEngine: %s", value);
     } else
-    if (strcmp(name, "auditLogParts") == 0) {
+    if (strcasecmp(name, "auditLogParts") == 0) {
         if ((value[0] == '+')||(value[0] == '-')) {
             if (is_valid_parts_specification(value + 1) != 1) {
             return apr_psprintf(engine->mp, "Invalid setting for ctl name "
@@ -514,12 +669,12 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
         }
         return NULL;
     } else
-    if (strcmp(name, "debugLogLevel") == 0) {
+    if (strcasecmp(name, "debugLogLevel") == 0) {
         if ((atoi(value) >= 0)&&(atoi(value) <= 9)) return NULL;
         return apr_psprintf(engine->mp, "Invalid setting for ctl name "
             "debugLogLevel: %s", value);
     } else
-    if (strcmp(name, "requestBodyLimit") == 0) {
+    if (strcasecmp(name, "requestBodyLimit") == 0) {
         long int limit = strtol(value, NULL, 10);
 
         if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
@@ -529,12 +684,12 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
 
         if (limit > REQUEST_BODY_HARD_LIMIT) {
             return apr_psprintf(engine->mp, "Request size limit cannot exceed "
-                "the hard limit: %li", RESPONSE_BODY_HARD_LIMIT);
+                "the hard limit: %ld", RESPONSE_BODY_HARD_LIMIT);
         }
 
         return NULL;
     } else
-    if (strcmp(name, "responseBodyLimit") == 0) {
+    if (strcasecmp(name, "responseBodyLimit") == 0) {
         long int limit = strtol(value, NULL, 10);
 
         if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
@@ -544,7 +699,7 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
 
         if (limit > RESPONSE_BODY_HARD_LIMIT) {
             return apr_psprintf(engine->mp, "Response size limit cannot exceed "
-                "the hard limit: %li", RESPONSE_BODY_HARD_LIMIT);
+                "the hard limit: %ld", RESPONSE_BODY_HARD_LIMIT);
         }
 
         return NULL;
@@ -572,17 +727,17 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
     if (value == NULL) return -1;
 
     /* Validate value. */
-    if (strcmp(name, "ruleEngine") == 0) {
+    if (strcasecmp(name, "ruleEngine") == 0) {
         if (strcasecmp(value, "on") == 0) {
             msr->txcfg->is_enabled = MODSEC_ENABLED;
             msr->usercfg->is_enabled = MODSEC_ENABLED;
         }
-
+        else
         if (strcasecmp(value, "off") == 0) {
             msr->txcfg->is_enabled = MODSEC_DISABLED;
             msr->usercfg->is_enabled = MODSEC_DISABLED;
         }
-
+        else
         if (strcasecmp(value, "detectiononly") == 0) {
             msr->txcfg->is_enabled = MODSEC_DETECTION_ONLY;
             msr->usercfg->is_enabled = MODSEC_DETECTION_ONLY;
@@ -590,53 +745,57 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
-    if (strcmp(name, "requestBodyAccess") == 0) {
+    if (strcasecmp(name, "ruleRemoveById") == 0) {
+        *(const char **)apr_array_push(msr->removed_rules) = (const char *)apr_pstrdup(msr->mp, value);
+        return 1;
+    } else
+    if (strcasecmp(name, "requestBodyAccess") == 0) {
         int pv = parse_boolean(value);
 
         if (pv == -1) return -1;
         msr->txcfg->reqbody_access = pv;
         msr->usercfg->reqbody_access = pv;
-        msr_log(msr, 4, "Ctl: Set requestBodyAccess to %i.", pv);
+        msr_log(msr, 4, "Ctl: Set requestBodyAccess to %d.", pv);
 
         return 1;
     } else
-    if (strcmp(name, "requestBodyProcessor") == 0) {
+    if (strcasecmp(name, "requestBodyProcessor") == 0) {
         msr->msc_reqbody_processor = value;
         msr_log(msr, 4, "Ctl: Set requestBodyProcessor to %s.", value);
 
         return 1;
     } else
-    if (strcmp(name, "responseBodyAccess") == 0) {
+    if (strcasecmp(name, "responseBodyAccess") == 0) {
         int pv = parse_boolean(value);
 
         if (pv == -1) return -1;
         msr->txcfg->resbody_access = pv;
         msr->usercfg->resbody_access = pv;
-        msr_log(msr, 4, "Ctl: Set responseBodyAccess to %i.", pv);
+        msr_log(msr, 4, "Ctl: Set responseBodyAccess to %d.", pv);
 
         return 1;
     } else
-    if (strcmp(name, "auditEngine") == 0) {
+    if (strcasecmp(name, "auditEngine") == 0) {
         if (strcasecmp(value, "on") == 0) {
             msr->txcfg->auditlog_flag = AUDITLOG_ON;
             msr->usercfg->auditlog_flag = AUDITLOG_ON;
         }
-
+        else
         if (strcasecmp(value, "off") == 0) {
             msr->txcfg->auditlog_flag = AUDITLOG_OFF;
             msr->usercfg->auditlog_flag = AUDITLOG_OFF;
         }
-
+        else
         if (strcasecmp(value, "relevantonly") == 0) {
             msr->txcfg->auditlog_flag = AUDITLOG_RELEVANT;
             msr->usercfg->auditlog_flag = AUDITLOG_RELEVANT;
         }
 
-        msr_log(msr, 4, "Ctl: Set auditEngine to %i.", msr->txcfg->auditlog_flag); // TODO
+        msr_log(msr, 4, "Ctl: Set auditEngine to %d.", msr->txcfg->auditlog_flag); // TODO
 
         return 1;
     } else
-    if (strcmp(name, "auditLogParts") == 0) {
+    if (strcasecmp(name, "auditLogParts") == 0) {
         char *new_value = value;
 
         if (value[0] == '+') {
@@ -656,9 +815,9 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
                 while(*s != '\0') {
                     if (*s != c) {
-                        *d++ = *s++;
+                        *(d++) = *(s++);
                     } else {
-                        (*s)++; /* parens quiet compiler warning */
+                        s++;
                     }
                 }
                 *d = '\0';
@@ -672,14 +831,14 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
-    if (strcmp(name, "debugLogLevel") == 0) {
+    if (strcasecmp(name, "debugLogLevel") == 0) {
         msr->txcfg->debuglog_level = atoi(value);
         msr->usercfg->debuglog_level = atoi(value);
-        msr_log(msr, 4, "Ctl: Set debugLogLevel to %i.", msr->txcfg->debuglog_level);
+        msr_log(msr, 4, "Ctl: Set debugLogLevel to %d.", msr->txcfg->debuglog_level);
 
         return 1;
     } else
-    if (strcmp(name, "requestBodyLimit") == 0) {
+    if (strcasecmp(name, "requestBodyLimit") == 0) {
         long int limit = strtol(value, NULL, 10);
 
         /* ENH Accept only in correct phase warn otherwise. */
@@ -688,7 +847,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
-    if (strcmp(name, "responseBodyLimit") == 0) {
+    if (strcasecmp(name, "responseBodyLimit") == 0) {
         long int limit = strtol(value, NULL, 10);
 
         /* ENH Accept only in correct phase warn otherwise. */
@@ -698,9 +857,10 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         return 1;
     }
     else {
-        /* ENH Should never happen, but log if it does. */
+        /* Should never happen, but log if it does. */
+        msr_log(msr, 1, "Internal Error: Unknown ctl action \"%s\".", name);
         return -1;
-    }    
+    }
 }
 
 /* xmlns */
@@ -760,39 +920,40 @@ static apr_status_t msre_action_sanitiseMatched_execute(modsec_rec *msr, apr_poo
     const apr_array_header_t *tarr;
     const apr_table_entry_t *telts;
     int i, type = 0;
+    msc_string *mvar = msr->matched_var;
 
-    if (msr->matched_var == NULL) return 0;
+    if (mvar->name_len == 0) return 0;
 
     /* IMP1 We need to extract the variable name properly here,
      *      taking into account it may have been escaped.
      */
-    if (strncmp(msr->matched_var, "ARGS:", 5) == 0) {
-        sargname = apr_pstrdup(msr->mp, msr->matched_var + 5);
+    if ((mvar->name_len > 5) && (strncmp(mvar->name, "ARGS:", 5) == 0)) {
+        sargname = apr_pstrdup(msr->mp, mvar->name + 5);
         type = SANITISE_ARG;
     } else
-    if (strncmp(msr->matched_var, "ARGS_NAMES:", 11) == 0) {
-        sargname = apr_pstrdup(msr->mp, msr->matched_var + 11);
+    if ((mvar->name_len > 11) && (strncmp(mvar->name, "ARGS_NAMES:", 11) == 0)) {
+        sargname = apr_pstrdup(msr->mp, mvar->name + 11);
         type = SANITISE_ARG;
     } else
-    if (strncmp(msr->matched_var, "REQUEST_HEADERS:", 16) == 0) {
-        sargname = apr_pstrdup(msr->mp, msr->matched_var + 16);
+    if ((mvar->name_len > 16) && (strncmp(mvar->name, "REQUEST_HEADERS:", 16) == 0)) {
+        sargname = apr_pstrdup(msr->mp, mvar->name + 16);
         type = SANITISE_REQUEST_HEADER;
     } else
-    if (strncmp(msr->matched_var, "REQUEST_HEADERS_NAMES:", 22) == 0) {
-        sargname = apr_pstrdup(msr->mp, msr->matched_var + 22);
+    if ((mvar->name_len > 22) && (strncmp(mvar->name, "REQUEST_HEADERS_NAMES:", 22) == 0)) {
+        sargname = apr_pstrdup(msr->mp, mvar->name + 22);
         type = SANITISE_REQUEST_HEADER;
     } else
-    if (strncmp(msr->matched_var, "RESPONSE_HEADERS:", 17) == 0) {
-        sargname = apr_pstrdup(msr->mp, msr->matched_var + 17);
+    if ((mvar->name_len > 17) && (strncmp(mvar->name, "RESPONSE_HEADERS:", 17) == 0)) {
+        sargname = apr_pstrdup(msr->mp, mvar->name + 17);
         type = SANITISE_RESPONSE_HEADER;
     } else
-    if (strncmp(msr->matched_var, "RESPONSE_HEADERS_NAMES:", 23) == 0) {
-        sargname = apr_pstrdup(msr->mp, msr->matched_var + 23);
+    if ((mvar->name_len > 23) && (strncmp(mvar->name, "RESPONSE_HEADERS_NAMES:", 23) == 0)) {
+        sargname = apr_pstrdup(msr->mp, mvar->name + 23);
         type = SANITISE_RESPONSE_HEADER;
     }
     else {
         msr_log(msr, 3, "sanitiseMatched: Don't know how to handle variable: %s",
-            msr->matched_var);
+            mvar->name);
         return 0;
     }
 
@@ -847,6 +1008,7 @@ static apr_status_t msre_action_setenv_execute(modsec_rec *msr, apr_pool_t *mptm
     char *data = apr_pstrdup(mptmp, action->param);
     char *env_name = NULL, *env_value = NULL;
     char *s = NULL;
+    msc_string *env = NULL;
 
     /* Extract the name and the value. */
     /* IMP1 We have a function for this now, parse_name_eq_value? */
@@ -860,13 +1022,53 @@ static apr_status_t msre_action_setenv_execute(modsec_rec *msr, apr_pool_t *mptm
         *s = '\0';
     }
 
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Setting env enviable: %s=%s", env_name, env_value);
+    }
+
+    /* Expand and escape any macros in the name */
+    env = apr_palloc(msr->mp, sizeof(msc_string));
+    if (env == NULL) {
+        msr_log(msr, 1, "Failed to allocate space to expand name macros");
+        return -1;
+    }
+    env->value = env_name;
+    env->value_len = strlen(env->value);
+    expand_macros(msr, env, rule, mptmp);
+    env_name = log_escape_ex(msr->mp, env->value, env->value_len);
+
     /* Execute the requested action. */
     if (env_name[0] == '!') {
         /* Delete */
         apr_table_unset(msr->r->subprocess_env, env_name + 1);
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Unset env variable \"%s\".", env_name);
+        }
     } else {
         /* Set */
-        apr_table_set(msr->r->subprocess_env, env_name, env_value);
+        char * val_value = NULL;
+        msc_string *val = apr_palloc(msr->mp, sizeof(msc_string));
+        if (val == NULL) {
+            msr_log(msr, 1, "Failed to allocate space to expand value macros");
+            return -1;
+        }
+
+        /* Expand values in value */
+        val->value = env_value;
+        val->value_len = strlen(val->value);
+        expand_macros(msr, val, rule, mptmp);
+
+        /* To be safe, we escape the value as it goes in subprocess_env. */
+        val_value = log_escape_ex(msr->mp, val->value, val->value_len);
+
+        apr_table_set(msr->r->subprocess_env, env_name, val_value);
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Set env variable \"%s\" to \"%s\".",
+                env_name,
+                log_escape(mptmp, val_value));
+        }
     }
 
     return 1;
@@ -881,6 +1083,7 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
     char *s = NULL;
     apr_table_t *target_col = NULL;
     int is_negated = 0;
+    msc_string *var = NULL;
 
     /* Extract the name and the value. */
     /* IMP1 We have a function for this now, parse_name_eq_value? */
@@ -896,6 +1099,22 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
         while ((*var_value != '\0')&&(isspace(*var_value))) var_value++;
     }
 
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Setting variable: %s=%s", var_name, var_value);
+    }
+
+
+    /* Expand and escape any macros in the name */
+    var = apr_palloc(msr->mp, sizeof(msc_string));
+    if (var == NULL) {
+        msr_log(msr, 1, "Failed to allocate space to expand name macros");
+        return -1;
+    }
+    var->value = var_name;
+    var->value_len = strlen(var->value);
+    expand_macros(msr, var, rule, mptmp);
+    var_name = log_escape_ex(msr->mp, var->value, var->value_len);
+
     /* Handle the exclamation mark. */
     if (var_name[0] == '!') {
         var_name = var_name + 1;
@@ -909,8 +1128,9 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
     target_col = msr->tx_vars;
     s = strstr(var_name, ".");
     if (s == NULL) {
-        /* ENH Log warning detected variable name but no collection. */
-        return 0;
+        msr_log(msr, 3, "Asked to set variable \"%s\", but no collection name specified. ",
+            log_escape(msr->mp, var_name));
+         return 0;
     }
     col_name = var_name;
     var_name = s + 1;
@@ -926,7 +1146,7 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
                 log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
             return 0;
         }
-    }        
+    }
 
     if (is_negated) {
         /* Unset variable. */
@@ -934,25 +1154,45 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
         /* ENH Refuse to remove certain variables, e.g. TIMEOUT, internal variables, etc... */
 
         apr_table_unset(target_col, var_name);
-        msr_log(msr, 9, "Unset variable \"%s.%s\".", log_escape(mptmp, col_name),
-            log_escape(mptmp, var_name));
-    } else {
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Unset variable \"%s.%s\".", col_name, var_name);
+        }
+    }
+    else {
         /* Set or change variable. */
 
         if ((var_value[0] == '+')||(var_value[0] == '-')) {
             /* Relative change. */
-            msc_string *var = NULL;
+            msc_string *rec = NULL;
+            msc_string *val = apr_palloc(msr->mp, sizeof(msc_string));
             int value = 0;
 
+            if (val == NULL) {
+                msr_log(msr, 1, "Failed to allocate space to expand value macros");
+                return -1;
+            }
+
             /* Retrieve  variable or generate (if it does not exist). */
-            var = (msc_string *)apr_table_get(target_col, var_name);
-            if (var == NULL) {
-                var = apr_pcalloc(msr->mp, sizeof(msc_string));
-                var->name = apr_pstrdup(msr->mp, var_name);
-                var->name_len = strlen(var->name);
+            rec = (msc_string *)apr_table_get(target_col, var_name);
+            if (rec == NULL) {
+                rec = var; /* use the already allocated space for var */
+                rec->name = apr_pstrdup(msr->mp, var_name);
+                rec->name_len = strlen(rec->name);
                 value = 0;
-            } else {
-                value = atoi(var->value);
+            }
+            else {
+                value = atoi(rec->value);
+            }
+
+            /* Expand values in value */
+            val->value = var_value;
+            val->value_len = strlen(val->value);
+            expand_macros(msr, val, rule, mptmp);
+            var_value = val->value;
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Relative change: %s=%d%s", var_name, value, var_value);
             }
 
             /* Change value. */
@@ -960,20 +1200,19 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
             if (value < 0) value = 0; /* Counters never go below zero. */
 
             /* Put the variable back. */
-            var->value = apr_psprintf(msr->mp, "%i", value);
-            var->value_len = strlen(var->value);
-            apr_table_setn(target_col, var->name, (void *)var);
+            rec->value = apr_psprintf(msr->mp, "%d", value);
+            rec->value_len = strlen(rec->value);
+            apr_table_setn(target_col, rec->name, (void *)rec);
 
-            msr_log(msr, 9, "Set variable \"%s.%s\" to \"%s\".",
-                log_escape(mptmp, col_name),
-                log_escape_ex(mptmp, var->name, var->name_len),
-                log_escape_ex(mptmp, var->value, var->value_len));
-        } else {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Set variable \"%s.%s\" to \"%s\".",
+                    col_name, rec->name,
+                    log_escape_ex(mptmp, rec->value, rec->value_len));
+            }
+        }
+        else {
             /* Absolute change. */
 
-            msc_string *var = NULL;
-
-            var = apr_pcalloc(msr->mp, sizeof(msc_string));
             var->name = apr_pstrdup(msr->mp, var_name);
             var->name_len = strlen(var->name);
             var->value = apr_pstrdup(msr->mp, var_value);
@@ -981,10 +1220,12 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
             expand_macros(msr, var, rule, mptmp);
             apr_table_setn(target_col, var->name, (void *)var);
 
-            msr_log(msr, 9, "Set variable \"%s.%s\" to \"%s\".",
-                log_escape(mptmp, col_name),
-                log_escape_ex(mptmp, var->name, var->name_len),
-                log_escape_ex(mptmp, var->value, var->value_len));
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Set variable \"%s.%s\" to \"%s\".",
+                    log_escape(mptmp, col_name),
+                    log_escape_ex(mptmp, var->name, var->name_len),
+                    log_escape_ex(mptmp, var->value, var->value_len));
+            }
         }
     }
 
@@ -1031,12 +1272,13 @@ static apr_status_t msre_action_expirevar_execute(modsec_rec *msr, apr_pool_t *m
 
         target_col = (apr_table_t *)apr_table_get(msr->collections, col_name);
         if (target_col == NULL) {
-            msr_log(msr, 3, "Could not set variable \"%s.%s\" as the collection does not exist.",
+            msr_log(msr, 3, "Could not expire variable \"%s.%s\" as the collection does not exist.",
                 log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
             return 0;
         }
     } else {
-        /* ENH Log warning detected variable name but no collection. */
+        msr_log(msr, 3, "Asked to expire variable \"%s\", but no collection name specified. ",
+            log_escape(msr->mp, var_name));
         return 0;
     }
 
@@ -1047,7 +1289,7 @@ static apr_status_t msre_action_expirevar_execute(modsec_rec *msr, apr_pool_t *m
     var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     var->name = apr_psprintf(msr->mp, "__expire_%s", var_name);
     var->name_len = strlen(var->name);
-    var->value = apr_psprintf(msr->mp, "%i", (int)(apr_time_sec(msr->request_time)
+    var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)(apr_time_sec(msr->request_time)
         + atoi(var_value)));
     var->value_len = strlen(var->value);
     apr_table_setn(target_col, var->name, (void *)var);
@@ -1069,8 +1311,8 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
     char *s = NULL;
     apr_table_t *target_col = NULL;
     msc_string *var = NULL, *var_last_update_time = NULL;
-    unsigned int last_update_time, current_time;
-    long int current_value, new_value;
+    apr_time_t last_update_time, current_time;
+    long current_value, new_value;
 
     /* Extract the name and the value. */
     /* IMP1 We have a function for this now, parse_name_eq_value? */
@@ -1100,15 +1342,18 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
             return 0;
         }
     } else {
-        /* ENH Log warning detected variable name but no collection. */
+        msr_log(msr, 3, "Asked to deprecate variable \"%s\", but no collection name specified. ",
+            log_escape(msr->mp, var_name));
         return 0;
     }
 
     /* Find the current value. */
     var = (msc_string *)apr_table_get(target_col, var_name);
     if (var == NULL) {
-        msr_log(msr, 9, "Asked to deprecate variable \"%s.%s\" but it does not exist.",
-            log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Asked to deprecate variable \"%s.%s\", but it does not exist.",
+                log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
+        }
         return 0;
     }
     current_value = atoi(var->value);
@@ -1122,7 +1367,7 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
         return 0;
     }
 
-    current_time = (unsigned int)apr_time_sec(apr_time_now());
+    current_time = apr_time_sec(apr_time_now());
     last_update_time = atoi(var_last_update_time->value);
 
     s = strstr(var_value, "/");
@@ -1138,26 +1383,28 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
      * time elapsed since the last update.
      */
     new_value = current_value -
-        ((current_time - last_update_time) * atoi(var_value) / atoi(s));
+        (atol(var_value) * ((current_time - last_update_time) / atol(s)));
     if (new_value < 0) new_value = 0;
 
     /* Only change the value if it differs. */
     if (new_value != current_value) {
-        var->value = apr_psprintf(msr->mp, "%i", (int)new_value);
+        var->value = apr_psprintf(msr->mp, "%ld", new_value);
         var->value_len = strlen(var->value);
 
-        msr_log(msr, 4, "Deprecated variable \"%s.%s\" from %li to %li (%i seconds since "
+        msr_log(msr, 4, "Deprecated variable \"%s.%s\" from %ld to %ld (%" APR_TIME_T_FMT " seconds since "
             "last update).", log_escape(msr->mp, col_name), log_escape(msr->mp, var_name),
-            current_value, new_value, current_time - last_update_time);
+            current_value, new_value, (apr_time_t)(current_time - last_update_time));
 
         apr_table_set(msr->collections_dirty, col_name, "1");
     } else {
-        msr_log(msr, 9, "Not deprecating variable \"%s.%s\" because the new value (%li) is "
-            "the same as the old one (%li) (%i seconds since last update).",
-            log_escape(msr->mp, col_name), log_escape(msr->mp, var_name), current_value,
-            new_value, current_time - last_update_time);
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Not deprecating variable \"%s.%s\" because the new value (%ld) is "
+                "the same as the old one (%ld) (%" APR_TIME_T_FMT " seconds since last update).",
+                log_escape(msr->mp, col_name), log_escape(msr->mp, var_name), current_value,
+                new_value, (apr_time_t)(current_time - last_update_time));
+        }
     }
-    
+
     return 1;
 }
 
@@ -1184,7 +1431,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         msr_log(msr, 4, "Creating collection (name \"%s\", key \"%s\").",
             real_col_name, col_key);
 
-        table = apr_table_make(msr->mp, 24);    
+        table = apr_table_make(msr->mp, 24);
 
         /* IMP1 Is the timeout hard-coded to 3600? */
 
@@ -1192,7 +1439,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
         var->name = "__expire_KEY";
         var->name_len = strlen(var->name);
-        var->value = apr_psprintf(msr->mp, "%i", (int)(apr_time_sec(msr->request_time) + 3600));
+        var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)(apr_time_sec(msr->request_time) + 3600));
         var->value_len = strlen(var->value);
         apr_table_setn(table, var->name, (void *)var);
 
@@ -1208,7 +1455,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var = apr_pcalloc(msr->mp, sizeof(msc_string));
         var->name = "TIMEOUT";
         var->name_len = strlen(var->name);
-        var->value = apr_psprintf(msr->mp, "%i", 3600);
+        var->value = apr_psprintf(msr->mp, "%d", 3600);
         var->value_len = strlen(var->value);
         apr_table_setn(table, var->name, (void *)var);
 
@@ -1240,7 +1487,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var = apr_pcalloc(msr->mp, sizeof(msc_string));
         var->name = "CREATE_TIME";
         var->name_len = strlen(var->name);
-        var->value = apr_psprintf(msr->mp, "%i", (int)apr_time_sec(msr->request_time));
+        var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)apr_time_sec(msr->request_time));
         var->value_len = strlen(var->value);
         apr_table_setn(table, var->name, (void *)var);
 
@@ -1249,6 +1496,14 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var->name = "UPDATE_COUNTER";
         var->name_len = strlen(var->name);
         var->value = "0";
+        var->value_len = strlen(var->value);
+        apr_table_setn(table, var->name, (void *)var);
+
+        /* This is a new collection. */
+        var = apr_pcalloc(msr->mp, sizeof(msc_string));
+        var->name = "IS_NEW";
+        var->name_len = strlen(var->name);
+        var->value = "1";
         var->value_len = strlen(var->value);
         apr_table_setn(table, var->name, (void *)var);
     }
@@ -1274,7 +1529,7 @@ static apr_status_t msre_action_initcol_execute(modsec_rec *msr, apr_pool_t *mpt
     char *data = apr_pstrdup(msr->mp, action->param);
     char *col_name = NULL, *col_key = NULL;
     unsigned int col_key_len;
-    
+
     msc_string *var = NULL;
     char *s = NULL;
 
@@ -1347,15 +1602,53 @@ static apr_status_t msre_action_setuid_execute(modsec_rec *msr, apr_pool_t *mptm
 }
 
 /* exec */
+static char *msre_action_exec_validate(msre_engine *engine, msre_action *action) {
+    #if defined(WITH_LUA)
+    char *filename = (char *)action->param;
+
+    /* TODO Support relative filenames. */
+
+    /* Process Lua scripts internally. */
+    if (strlen(filename) > 4) {
+        char *p = filename + strlen(filename) - 4;
+        if ((p[0] == '.')&&(p[1] == 'l')&&(p[2] == 'u')&&(p[3] == 'a')) {
+            /* It's a Lua script. */
+            msc_script *script = NULL;
+
+            /* Compile script. */
+            char *msg = lua_compile(&script, filename, engine->mp);
+            if (msg != NULL) return msg;
+
+            action->param_data = script;
+        }
+    }
+    #endif
+
+    return NULL;
+}
+
 static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
-    char *script_output = NULL;
+    #if defined(WITH_LUA)
+    if (action->param_data != NULL) { /* Lua */
+        msc_script *script = (msc_script *)action->param_data;
+        char *my_error_msg = NULL;
 
-    int rc = apache2_exec(msr, action->param, NULL, &script_output);
-    if (rc != 1) {
-        msr_log(msr, 1, "Failed to execute: %s", action->param);
-        return 0;
+        if (lua_execute(script, NULL, msr, rule, &my_error_msg) < 0) {
+            msr_log(msr, 1, "%s", my_error_msg);
+            return 0;
+        }
+    } else
+    #endif
+    { /* Execute as shell script. */
+        char *script_output = NULL;
+
+        int rc = apache2_exec(msr, action->param, NULL, &script_output);
+        if (rc != 1) {
+            msr_log(msr, 1, "Failed to execute: %s", action->param);
+            return 0;
+        }
     }
 
     return 1;
@@ -1395,6 +1688,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         msre_action_id_init,
         NULL
@@ -1407,6 +1701,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         msre_action_rev_init,
         NULL
@@ -1419,8 +1714,22 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         msre_action_msg_init,
+        NULL
+    );
+
+    /* logdata */
+    msre_engine_action_register(engine,
+        "logdata",
+        ACTION_METADATA,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
+        NULL,
+        msre_action_logdata_init,
         NULL
     );
 
@@ -1431,6 +1740,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         msre_action_severity_init,
         NULL
@@ -1443,6 +1753,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         msre_action_chain_init,
         NULL
@@ -1455,6 +1766,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_LOG,
         NULL,
         msre_action_log_init,
         NULL
@@ -1467,6 +1779,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_LOG,
         NULL,
         msre_action_nolog_init,
         NULL
@@ -1479,6 +1792,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_AUDITLOG,
         NULL,
         msre_action_auditlog_init,
         NULL
@@ -1491,8 +1805,22 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_AUDITLOG,
         NULL,
         msre_action_noauditlog_init,
+        NULL
+    );
+
+    /* deny */
+    msre_engine_action_register(engine,
+        "block",
+        ACTION_DISRUPTIVE,
+        0, 0,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
+        NULL,
+        msre_action_block_init,
         NULL
     );
 
@@ -1503,6 +1831,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         NULL,
         msre_action_deny_init,
         NULL
@@ -1515,6 +1844,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         msre_action_status_validate,
         msre_action_status_init,
         NULL
@@ -1527,10 +1857,11 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         NULL,
         msre_action_drop_init,
         NULL
-    );    
+    );
 
     /* pause */
     msre_engine_action_register(engine,
@@ -1539,11 +1870,12 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         msre_action_pause_validate,
         msre_action_pause_init,
         NULL
     );
-        
+
     /* redirect */
     msre_engine_action_register(engine,
         "redirect",
@@ -1551,6 +1883,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         msre_action_redirect_validate,
         msre_action_redirect_init,
         msre_action_redirect_execute
@@ -1563,6 +1896,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         msre_action_proxy_validate,
         msre_action_proxy_init,
         msre_action_proxy_execute
@@ -1575,6 +1909,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         NULL,
         msre_action_pass_init,
         NULL
@@ -1587,8 +1922,22 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
         msre_action_skip_validate,
         msre_action_skip_init,
+        NULL
+    );
+
+    /* skipAfter */
+    msre_engine_action_register(engine,
+        "skipAfter",
+        ACTION_DISRUPTIVE,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_DISRUPTIVE,
+        msre_action_skipAfter_validate,
+        msre_action_skipAfter_init,
         NULL
     );
 
@@ -1596,10 +1945,11 @@ void msre_engine_register_default_actions(msre_engine *engine) {
     msre_engine_action_register(engine,
         "allow",
         ACTION_DISRUPTIVE,
-        0, 0,
+        0, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
-        NULL,
+        ACTION_CGROUP_DISRUPTIVE,
+        msre_action_allow_validate,
         msre_action_allow_init,
         NULL
     );
@@ -1611,6 +1961,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         msre_action_phase_validate,
         msre_action_phase_init,
         NULL
@@ -1623,6 +1974,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         ALLOW_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         msre_action_t_validate,
         msre_action_t_init,
         NULL
@@ -1635,6 +1987,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         msre_action_ctl_validate,
         msre_action_ctl_init,
         msre_action_ctl_execute
@@ -1647,6 +2000,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         msre_action_xmlns_validate,
         NULL,
         NULL
@@ -1659,6 +2013,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         NULL
@@ -1671,6 +2026,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_sanitiseArg_execute
@@ -1683,6 +2039,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_sanitiseMatched_execute
@@ -1695,6 +2052,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_sanitiseRequestHeader_execute
@@ -1707,6 +2065,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_sanitiseResponseHeader_execute
@@ -1719,6 +2078,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_setenv_execute
@@ -1731,6 +2091,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_setvar_execute
@@ -1743,6 +2104,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_expirevar_execute
@@ -1755,11 +2117,12 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_deprecatevar_execute
     );
-    
+
     /* initcol */
     msre_engine_action_register(engine,
         "initcol",
@@ -1767,6 +2130,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_initcol_execute
@@ -1779,6 +2143,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_setsid_execute
@@ -1791,6 +2156,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_setuid_execute
@@ -1803,7 +2169,8 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
-        NULL,
+        ACTION_CGROUP_NONE,
+        msre_action_exec_validate,
         NULL,
         msre_action_exec_execute
     );
@@ -1815,6 +2182,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         0, 0,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         NULL
@@ -1827,6 +2195,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         NULL
@@ -1839,6 +2208,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_prepend_execute
@@ -1851,6 +2221,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
         NULL,
         NULL,
         msre_action_append_execute

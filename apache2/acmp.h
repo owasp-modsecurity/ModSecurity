@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -15,9 +15,11 @@
 #include <apr_pools.h>
 
 #define ACMP_FLAG_BYTE               0
-#define ACMP_FLAG_UTF8               0x100
 #define ACMP_FLAG_CASE_SENSITIVE     1
 #define ACMP_FLAG_CASE_INSENSITIVE   0
+#ifdef ACMP_USE_UTF8
+#define ACMP_FLAG_UTF8               0x100
+#endif
 
 /**
  * Opaque struct with parser data
@@ -25,7 +27,7 @@
 typedef struct ACMP ACMP;
 
 /**
- * Used to separate state from the trie for acmp_process_quick function 
+ * Used to separate state from the trie for acmp_process_quick function
  */
 typedef struct {
     ACMP *parser;
@@ -68,13 +70,13 @@ ACMP *acmp_duplicate(ACMP *parser, apr_pool_t *pool);
  *   is supplied
  * len - Length of pattern in characters, if zero string length is used.
  */
-apr_status_t acmp_add_pattern(ACMP *parser, const char *pattern, 
+apr_status_t acmp_add_pattern(ACMP *parser, const char *pattern,
     acmp_callback_t callback, void *data, apr_size_t len);
 
 /**
  * Called to process incoming data stream. You must call acmp_done after sending
  *   last data packet
- *   
+ *
  * data - ptr to incoming data
  * len  - size of data in bytes
  */

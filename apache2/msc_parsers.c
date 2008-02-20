@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -206,6 +206,7 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
     char *value = NULL;
     char *buf;
     int status;
+    int changed;
 
     if (s == NULL) return -1;
     if (inputlength == 0) return 1;
@@ -247,7 +248,7 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
         }
 
         if (status == 0) {
-            arg->name_len = urldecode_nonstrict_inplace_ex((unsigned char *)buf, arg->name_origin_len, invalid_count);
+            arg->name_len = urldecode_nonstrict_inplace_ex((unsigned char *)buf, arg->name_origin_len, invalid_count, &changed);
             arg->name = apr_pstrmemdup(msr->mp, buf, arg->name_len);
 
             if (s[i] == argument_separator) {
@@ -255,14 +256,11 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
                 arg->value_len = 0;
                 arg->value = "";
 
-                apr_table_addn(arguments, arg->name, (void *)arg);
-                msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
-                    arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
-                    log_escape_ex(msr->mp, arg->value, arg->value_len));
+                add_argument(msr, arguments, arg);
 
                 arg = (msc_arg *)apr_pcalloc(msr->mp, sizeof(msc_arg));
                 arg->origin = origin;
-                
+
                 status = 0; /* unchanged */
                 j = 0;
             } else {
@@ -271,13 +269,10 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
             }
         }
         else {
-            arg->value_len = urldecode_nonstrict_inplace_ex((unsigned char *)value, arg->value_origin_len, invalid_count);
+            arg->value_len = urldecode_nonstrict_inplace_ex((unsigned char *)value, arg->value_origin_len, invalid_count, &changed);
             arg->value = apr_pstrmemdup(msr->mp, value, arg->value_len);
 
-            apr_table_addn(arguments, arg->name, (void *)arg);
-            msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
-                arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
-                log_escape_ex(msr->mp, arg->value, arg->value_len));
+            add_argument(msr, arguments, arg);
 
             arg = (msc_arg *)apr_pcalloc(msr->mp, sizeof(msc_arg));
             arg->origin = origin;
@@ -294,12 +289,22 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
         arg->value_len = 0;
         arg->value = "";
 
-        apr_table_addn(arguments, arg->name, (void *)arg);
-        msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
-            arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
-            log_escape_ex(msr->mp, arg->value, arg->value_len));
+        add_argument(msr, arguments, arg);
     }
 
     free(buf);
+
     return 1;
 }
+
+/**
+ *
+ */
+void add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg) {
+    msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
+        arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
+        log_escape_ex(msr->mp, arg->value, arg->value_len));
+
+    apr_table_addn(arguments, log_escape_nq_ex(msr->mp, arg->name, arg->name_len), (void *)arg);
+}
+

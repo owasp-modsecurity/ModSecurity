@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -35,6 +35,10 @@ typedef struct msre_cache_rec msre_cache_rec;
 #include "persist_dbm.h"
 #include "apache2.h"
 
+#if defined(WITH_LUA)
+#include "msc_lua.h"
+#endif
+
 /* Actions, variables, functions and operator functions */
 
 int DSOLOCAL expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t *mptmp);
@@ -63,6 +67,11 @@ int DSOLOCAL msre_parse_generic(apr_pool_t *pool, const char *text, apr_table_t 
 
 int DSOLOCAL rule_id_in_range(int ruleid, const char *range);
 
+msre_var DSOLOCAL *generate_single_var(modsec_rec *msr, msre_var *var, apr_array_header_t *tfn_arr,
+    msre_rule *rule, apr_pool_t *mptmp);
+
+apr_table_t DSOLOCAL *generate_multi_var(modsec_rec *msr, msre_var *var, apr_array_header_t *tfn_arr,
+    msre_rule *rule, apr_pool_t *mptmp);
 
 /* Structures with the corresponding functions */
 
@@ -83,7 +92,7 @@ msre_op_metadata DSOLOCAL *msre_engine_op_resolve(msre_engine *engine, const cha
 struct msre_ruleset {
     apr_pool_t              *mp;
     msre_engine             *engine;
-    
+
     apr_array_header_t      *phase_request_headers;
     apr_array_header_t      *phase_request_body;
     apr_array_header_t      *phase_response_headers;
@@ -99,6 +108,8 @@ msre_ruleset DSOLOCAL *msre_ruleset_create(msre_engine *engine, apr_pool_t *mp);
 
 int DSOLOCAL msre_ruleset_rule_add(msre_ruleset *ruleset, msre_rule *rule, int phase);
 
+msre_rule DSOLOCAL *msre_ruleset_fetch_rule(msre_ruleset *ruleset, const char *id);
+
 int DSOLOCAL msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exception *re);
 
 /*
@@ -109,6 +120,17 @@ int DSOLOCAL msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset
 #define RULE_NO_MATCH           0
 #define RULE_MATCH              1
 
+#define RULE_PH_NONE            0  /* Not a placeholder */
+#define RULE_PH_SKIPAFTER       1  /* Implicit placeholder for skipAfter */
+#define RULE_PH_MARKER          2  /* Explicit placeholder for SecMarker */
+
+#define RULE_TYPE_NORMAL        0  /* SecRule */
+#define RULE_TYPE_ACTION        1  /* SecAction */
+#define RULE_TYPE_MARKER        2  /* SecMarker */
+#if defined(WITH_LUA)
+#define RULE_TYPE_LUA           3  /* SecRuleScript */
+#endif
+
 struct msre_rule {
     apr_array_header_t      *targets;
     const char              *op_name;
@@ -117,18 +139,38 @@ struct msre_rule {
     msre_op_metadata        *op_metadata;
     unsigned int             op_negated;
     msre_actionset          *actionset;
+    const char              *p1;
+    const char              *unparsed;
     const char              *filename;
     int                      line_num;
-    
+    int                      placeholder;
+    int                      type;
+
     msre_ruleset            *ruleset;
     msre_rule               *chain_starter;
+    #if defined(PERFORMANCE_MEASUREMENT)
+    unsigned int             execution_time;
+    unsigned int             trans_time;
+    unsigned int             op_time;
+    #endif
+
+    #if defined(WITH_LUA)
+    /* Compiled Lua script. */
+    msc_script              *script;
+    #endif
 };
 
-msre_rule DSOLOCAL *msre_rule_create(msre_ruleset *ruleset,
+char DSOLOCAL *msre_rule_generate_unparsed(apr_pool_t *pool, const msre_rule *rule, const char *targets, const char *args, const char *actions);
+
+msre_rule DSOLOCAL *msre_rule_create(msre_ruleset *ruleset, int type,
     const char *fn, int line, const char *targets,
     const char *args, const char *actions, char **error_msg);
 
-void DSOLOCAL msre_rule_actionset_init(msre_rule *rule);
+#if defined(WITH_LUA)
+msre_rule DSOLOCAL *msre_rule_lua_create(msre_ruleset *ruleset,
+    const char *fn, int line, const char *script_filename,
+    const char *actions, char **error_msg);
+#endif
 
 apr_status_t DSOLOCAL msre_rule_process(msre_rule *rule, modsec_rec *msr);
 
@@ -141,17 +183,16 @@ apr_status_t DSOLOCAL msre_rule_process(msre_rule *rule, modsec_rec *msr);
 #define PHASE_RESPONSE_BODY     4
 #define PHASE_LOGGING           5
 
-#define FN_OP_PARAM_INIT(X) int (*X)(msre_rule *rule, char **error_msg)
-#define FN_OP_EXECUTE(X)    int (*X)(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg)
-
+typedef int (*fn_op_param_init_t)(msre_rule *rule, char **error_msg);
+typedef int (*fn_op_execute_t)(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg);
 
 struct msre_op_metadata {
     const char              *name;
-    FN_OP_PARAM_INIT        (param_init);
-    FN_OP_EXECUTE           (execute);
+    fn_op_param_init_t       param_init;
+    fn_op_execute_t          execute;
 };
 
-#define FN_TFN_EXECUTE(X)    int (*X)(apr_pool_t *pool, unsigned char *input, long int input_length, char **rval, long int *rval_length)
+typedef int (*fn_tfn_execute_t)(apr_pool_t *pool, unsigned char *input, long int input_length, char **rval, long int *rval_length);
 
 struct msre_tfn_metadata {
     const char              *name;
@@ -167,14 +208,14 @@ struct msre_tfn_metadata {
      *
      * NOTE Strict transformation functions not supported yet.
      */
-    FN_TFN_EXECUTE(execute);    
+    fn_tfn_execute_t execute;
 };
 
 void DSOLOCAL msre_engine_tfn_register(msre_engine *engine, const char *name,
-    FN_TFN_EXECUTE(execute));
+    fn_tfn_execute_t execute);
 
 void DSOLOCAL msre_engine_op_register(msre_engine *engine, const char *name,
-    FN_OP_PARAM_INIT(fn1), FN_OP_EXECUTE(fn2));
+    fn_op_param_init_t fn1, fn_op_execute_t fn2);
 
 void DSOLOCAL msre_engine_register_default_tfns(msre_engine *engine);
 
@@ -189,16 +230,16 @@ msre_tfn_metadata DSOLOCAL *msre_engine_tfn_resolve(msre_engine *engine, const c
 #define VAR_DONT_CACHE  0
 #define VAR_CACHE       1
 
-#define FN_VAR_VALIDATE(X)  char *(*X)(msre_ruleset *ruleset, msre_var *var)
-#define FN_VAR_GENERATE(X)  int (*X)(modsec_rec *msr, msre_var *var, msre_rule *rule, apr_table_t *table, apr_pool_t *mptmp)
+typedef char *(*fn_var_validate_t)(msre_ruleset *ruleset, msre_var *var);
+typedef int (*fn_var_generate_t)(modsec_rec *msr, msre_var *var, msre_rule *rule, apr_table_t *table, apr_pool_t *mptmp);
 
 struct msre_var_metadata {
     const char              *name;
     unsigned int             type;          /* VAR_TYPE_ constants */
     unsigned int             argc_min;
     unsigned int             argc_max;
-    FN_VAR_VALIDATE          (validate);
-    FN_VAR_GENERATE          (generate);
+    fn_var_validate_t        validate;
+    fn_var_generate_t        generate;
     unsigned int             is_cacheable;  /* 0 - no, 1 - yes */
     unsigned int             availability;  /* when does this variable become available? */
 };
@@ -223,6 +264,7 @@ struct msre_actionset {
     const char              *id;
     const char              *rev;
     const char              *msg;
+    const char              *logdata;
     int                      severity;
     int                      phase;
     msre_rule               *rule;
@@ -230,6 +272,7 @@ struct msre_actionset {
     /* Flow */
     int                      is_chained;
     int                      skip_count;
+    const char              *skip_after;
 
     /* Disruptive */
     int                      intercept_action;
@@ -237,14 +280,22 @@ struct msre_actionset {
     int                      intercept_status;
     int                      intercept_pause;
 
+    /* "block" needs parent action to reset it */
+    msre_action             *parent_intercept_action_rec;
+    msre_action             *intercept_action_rec;
+    int                      parent_intercept_action;
+
     /* Other */
     int                      log;
     int                      auditlog;
+    int                      block;
 };
 
-void DSOLOCAL msre_engine_variable_register(msre_engine *engine, const char *name, 
+char DSOLOCAL *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset);
+
+void DSOLOCAL msre_engine_variable_register(msre_engine *engine, const char *name,
     unsigned int type, unsigned int argc_min, unsigned int argc_max,
-    FN_VAR_VALIDATE(validate), FN_VAR_GENERATE(generate),
+    fn_var_validate_t validate, fn_var_generate_t generate,
     unsigned int is_cacheable, unsigned int availability);
 
 msre_actionset DSOLOCAL *msre_actionset_create(msre_engine *engine, const char *text,
@@ -255,11 +306,13 @@ msre_actionset DSOLOCAL *msre_actionset_merge(msre_engine *engine, msre_actionse
 
 msre_actionset DSOLOCAL *msre_actionset_create_default(msre_engine *engine);
 
+void DSOLOCAL msre_actionset_set_defaults(msre_actionset *actionset);
+
 void DSOLOCAL msre_actionset_init(msre_actionset *actionset, msre_rule *rule);
 
-#define FN_ACTION_VALIDATE(X)   char *(*X)(msre_engine *engine, msre_action *action)
-#define FN_ACTION_INIT(X)       apr_status_t (*X)(msre_engine *engine, msre_actionset *actionset, msre_action *action)
-#define FN_ACTION_EXECUTE(X)    apr_status_t (*X)(modsec_rec *msr, apr_pool_t *mptmp, msre_rule *rule, msre_action *action)
+typedef char *(*fn_action_validate_t)(msre_engine *engine, msre_action *action);
+typedef apr_status_t (*fn_action_init_t)(msre_engine *engine, msre_actionset *actionset, msre_action *action);
+typedef apr_status_t (*fn_action_execute_t)(modsec_rec *msr, apr_pool_t *mptmp, msre_rule *rule, msre_action *action);
 
 #define ACTION_DISRUPTIVE       1
 #define ACTION_NON_DISRUPTIVE   2
@@ -272,6 +325,11 @@ void DSOLOCAL msre_actionset_init(msre_actionset *actionset, msre_rule *rule);
 #define ACTION_CARDINALITY_ONE  1
 #define ACTION_CARDINALITY_MANY 2
 
+#define ACTION_CGROUP_NONE       0
+#define ACTION_CGROUP_DISRUPTIVE 1
+#define ACTION_CGROUP_LOG        2
+#define ACTION_CGROUP_AUDITLOG   3
+
 struct msre_action_metadata {
     const char              *name;
     unsigned int             type;
@@ -279,9 +337,10 @@ struct msre_action_metadata {
     unsigned int             argc_max;
     unsigned int             allow_param_plusminus;
     unsigned int             cardinality;
-    FN_ACTION_VALIDATE       (validate);
-    FN_ACTION_INIT           (init);
-    FN_ACTION_EXECUTE        (execute);
+    unsigned int             cardinality_group;
+    fn_action_validate_t     validate;
+    fn_action_init_t         init;
+    fn_action_execute_t      execute;
 };
 
 struct msre_action {
@@ -309,7 +368,8 @@ char DSOLOCAL *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset);
 struct msre_cache_rec {
     int                      hits;
     int                      changed;
-    const char              *key;
+    int                      num;
+    const char              *path;
     const char              *val;
     apr_size_t               val_len;
 };

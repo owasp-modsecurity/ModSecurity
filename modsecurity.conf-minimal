@@ -38,3 +38,22 @@ SecResponseBodyLimit 524288
 SecRule REQBODY_PROCESSOR_ERROR "!@eq 0" \
 "phase:2,t:none,log,deny,msg:'Failed to parse request body.',severity:2"
 
+# By default be strict with what we accept in the multipart/form-data
+# request body. If the rule below proves to be too strict for your
+# environment consider changing it to detection-only. You are encouraged
+# _not_ to remove it altogether.
+SecRule MULTIPART_STRICT_ERROR "!@eq 0" \
+"phase:2,t:none,log,deny,msg:'Multipart request body \
+failed strict validation: \
+PE %{REQBODY_PROCESSOR_ERROR}, \
+BQ %{MULTIPART_BOUNDARY_QUOTED}, \
+BW %{MULTIPART_BOUNDARY_WHITESPACE}, \
+DB %{MULTIPART_DATA_BEFORE}, \
+DA %{MULTIPART_DATA_AFTER}, \
+HF %{MULTIPART_HEADER_FOLDING}, \
+LF %{MULTIPART_LF_LINE}, \
+SM %{MULTIPART_SEMICOLON_MISSING}'"
+
+# Did we see anything that might be a boundary?
+SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
+"phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"

@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -15,6 +15,15 @@
 #include "modsecurity.h"
 #include "msc_parsers.h"
 #include "msc_util.h"
+
+modsec_build_type_rec DSOLOCAL modsec_build_type[] = {
+    { "dev", 1 },     /* Development build */
+    { "rc", 3 },      /* Release Candidate build */
+    { "", 9 },        /* Production build */
+    { "breach", 9 },  /* Breach build */
+    { "trunk", 9 },   /* Trunk build */
+    { NULL, -1 }      /* terminator */
+};
 
 /**
  * Log an alert message to the log, adding the rule metadata at the end.
@@ -136,7 +145,8 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
     apr_table_entry_t *te;
     int collect_garbage = 0;
     int i;
-    
+    char *my_error_msg = NULL;
+
     if (msr == NULL) return APR_SUCCESS;
 
     if (rand() < RAND_MAX/100) {
@@ -162,12 +172,14 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
     /* Multipart processor cleanup. */
     if (msr->mpd != NULL) multipart_cleanup(msr);
 
-    #ifdef WITH_LIBXML2
     /* XML processor cleanup. */
     if (msr->xml != NULL) xml_cleanup(msr);
-    #endif
 
-    modsecurity_request_body_clear(msr);
+    // TODO: Why do we ignore return code here?
+    modsecurity_request_body_clear(msr, &my_error_msg);
+    if (my_error_msg != NULL) {
+        msr_log(msr, 1, "%s", my_error_msg);
+    }
 
     return APR_SUCCESS;
 }
@@ -230,7 +242,7 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
         {
             msr->msc_reqbody_storage = MSC_REQBODY_DISK;
         }
-        
+
         /* In all other cases, try using the memory first
          * but switch over to disk for larger bodies.
          */
@@ -250,8 +262,8 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     if (msr->query_string != NULL) {
         int invalid_count = 0;
 
-        if (parse_arguments(msr, msr->query_string, strlen(msr->query_string), 
-            msr->txcfg->argument_separator, "QUERY_STRING", msr->arguments, 
+        if (parse_arguments(msr, msr->query_string, strlen(msr->query_string),
+            msr->txcfg->argument_separator, "QUERY_STRING", msr->arguments,
             &invalid_count) < 0)
         {
             msr_log(msr, 1, "Initialisation: Error occurred while parsing QUERY_STRING arguments.");
@@ -295,8 +307,20 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     msr->collections_dirty = apr_table_make(msr->mp, 8);
     if (msr->collections_dirty == NULL) return -1;
 
+    /* Other */
     msr->tcache = apr_hash_make(msr->mp);
     if (msr->tcache == NULL) return -1;
+
+    msr->matched_rules = apr_array_make(msr->mp, 16, sizeof(void *));
+    if (msr->matched_rules == NULL) return -1;
+
+    msr->matched_var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    if (msr->matched_var == NULL) return -1;
+
+    msr->highest_severity = 255; /* high, invalid value */
+
+    msr->removed_rules = apr_array_make(msr->mp, 16, sizeof(char *));
+    if (msr->removed_rules == NULL) return -1;
 
     return 1;
 }
@@ -309,19 +333,23 @@ static int is_response_status_relevant(modsec_rec *msr, int status) {
     apr_status_t rc;
     char buf[32];
 
+    /* ENH: Setting is_relevant here will cause an audit even if noauditlog
+     * was set for the last rule that matched.  Is this what we want?
+     */
+
     if ((msr->txcfg->auditlog_relevant_regex == NULL)
         ||(msr->txcfg->auditlog_relevant_regex == NOT_SET_P))
     {
         return 0;
     }
 
-    apr_snprintf(buf, sizeof(buf), "%i", status);
+    apr_snprintf(buf, sizeof(buf), "%d", status);
 
     rc = msc_regexec(msr->txcfg->auditlog_relevant_regex, buf, strlen(buf), &my_error_msg);
     if (rc >= 0) return 1;
     if (rc == PCRE_ERROR_NOMATCH) return 0;
 
-    msr_log(msr, 1, "Regex processing failed (rc %i): %s", rc, my_error_msg);
+    msr_log(msr, 1, "Regex processing failed (rc %d): %s", rc, my_error_msg);
     return 0;
 }
 
@@ -342,7 +370,12 @@ static apr_status_t modsecurity_process_phase_request_headers(modsec_rec *msr) {
  *
  */
 static apr_status_t modsecurity_process_phase_request_body(modsec_rec *msr) {
-    msr_log(msr, 4, "Starting phase REQUEST_BODY.");
+    if ((msr->allow_scope == ACTION_ALLOW_REQUEST)||(msr->allow_scope == ACTION_ALLOW)) {
+        msr_log(msr, 4, "Skipping phase REQUEST_BODY (allow used).");
+        return 0;
+    } else {
+        msr_log(msr, 4, "Starting phase REQUEST_BODY.");
+    }
 
     if (msr->txcfg->ruleset != NULL) {
         return msre_ruleset_process_phase(msr->txcfg->ruleset, msr);
@@ -355,7 +388,12 @@ static apr_status_t modsecurity_process_phase_request_body(modsec_rec *msr) {
  *
  */
 static apr_status_t modsecurity_process_phase_response_headers(modsec_rec *msr) {
-    msr_log(msr, 4, "Starting phase RESPONSE_HEADERS.");
+    if (msr->allow_scope == ACTION_ALLOW) {
+        msr_log(msr, 4, "Skipping phase RESPONSE_HEADERS (allow used).");
+        return 0;
+    } else {
+        msr_log(msr, 4, "Starting phase RESPONSE_HEADERS.");
+    }
 
     if (msr->txcfg->ruleset != NULL) {
         return msre_ruleset_process_phase(msr->txcfg->ruleset, msr);
@@ -368,7 +406,12 @@ static apr_status_t modsecurity_process_phase_response_headers(modsec_rec *msr) 
  *
  */
 static apr_status_t modsecurity_process_phase_response_body(modsec_rec *msr) {
-    msr_log(msr, 4, "Starting phase RESPONSE_BODY.");
+    if (msr->allow_scope == ACTION_ALLOW) {
+        msr_log(msr, 4, "Skipping phase RESPONSE_BODY (allow used).");
+        return 0;
+    } else {
+        msr_log(msr, 4, "Starting phase RESPONSE_BODY.");
+    }
 
     if (msr->txcfg->ruleset != NULL) {
         return msre_ruleset_process_phase(msr->txcfg->ruleset, msr);
@@ -401,7 +444,7 @@ static apr_status_t modsecurity_process_phase_logging(modsec_rec *msr) {
     }
 
     /* Figure out if we want to keep the files (if there are any, of course). */
-    if ((msr->txcfg->upload_keep_files == KEEP_FILES_ON)    
+    if ((msr->txcfg->upload_keep_files == KEEP_FILES_ON)
         || ((msr->txcfg->upload_keep_files == KEEP_FILES_RELEVANT_ONLY)&&(msr->is_relevant)))
     {
         msr->upload_remove_files = 0;
@@ -428,7 +471,7 @@ static apr_status_t modsecurity_process_phase_logging(modsec_rec *msr) {
             break;
 
         default :
-            return HTTP_INTERNAL_SERVER_ERROR;
+            msr_log(msr, 1, "Internal error: Could not determine if auditing is needed, so forcing auditing.");
             break;
     }
 
@@ -465,10 +508,9 @@ apr_status_t modsecurity_process_phase(modsec_rec *msr, int phase) {
             return modsecurity_process_phase_logging(msr);
             break;
         default :
-            msr_log(msr, 1, "Invalid processing phase: %i", msr->phase);
-            return -1;
+            msr_log(msr, 1, "Invalid processing phase: %d", msr->phase);
             break;
     }
 
-    return 0;
+    return -1;
 }

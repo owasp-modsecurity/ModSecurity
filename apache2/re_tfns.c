@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -27,7 +27,7 @@ static int msre_fn_lowercase_execute(apr_pool_t *mptmp, unsigned char *input,
 
     if (rval == NULL) return -1;
     *rval = NULL;
-    
+
     i = 0;
     while(i < input_len) {
         int x = input[i];
@@ -158,13 +158,16 @@ static int msre_fn_compressWhitespace_execute(apr_pool_t *mptmp, unsigned char *
 {
     long int i, j, count;
     int changed = 0;
+    int inwhitespace = 0;
 
     i = j = count = 0;
     while(i < input_len) {
         if (isspace(input[i])||(input[i] == NBSP)) {
-            changed = 1;
+            if (inwhitespace) changed = 1;
+            inwhitespace = 1;
             count++;
         } else {
+            inwhitespace = 0;
             if (count) {
                 input[j] = ' ';
                 count = 0;
@@ -245,10 +248,28 @@ static int msre_fn_replaceComments_execute(apr_pool_t *mptmp, unsigned char *inp
         }
     }
 
+    if (incomment) {
+        input[j++] = ' ';
+    }
+
     *rval = (char *)input;
     *rval_len = j;
 
     return changed;
+}
+
+/* jsDecode */
+
+static int msre_fn_jsDecode_execute(apr_pool_t *mptmp, unsigned char *input,
+    long int input_len, char **rval, long int *rval_len)
+{
+    long int length;
+
+    length = js_decode_nonstrict_inplace(input, input_len);
+    *rval = (char *)input;
+    *rval_len = length;
+
+    return (*rval_len == input_len ? 0 : 1);
 }
 
 /* urlDecode */
@@ -258,12 +279,13 @@ static int msre_fn_urlDecode_execute(apr_pool_t *mptmp, unsigned char *input,
 {
     long int length;
     int invalid_count;
+    int changed;
 
-    length = urldecode_nonstrict_inplace_ex(input, input_len, &invalid_count);
+    length = urldecode_nonstrict_inplace_ex(input, input_len, &invalid_count, &changed);
     *rval = (char *)input;
     *rval_len = length;
-    
-    return (*rval_len == input_len ? 0 : 1);
+
+    return changed;
 }
 
 /* urlDecodeUni */
@@ -272,12 +294,13 @@ static int msre_fn_urlDecodeUni_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
     long int length;
+    int changed;
 
-    length = urldecode_uni_nonstrict_inplace_ex(input, input_len);
+    length = urldecode_uni_nonstrict_inplace_ex(input, input_len, &changed);
     *rval = (char *)input;
     *rval_len = length;
-    
-    return (*rval_len == input_len ? 0 : 1);
+
+    return changed;
 }
 
 /* urlEncode */
@@ -285,10 +308,12 @@ static int msre_fn_urlDecodeUni_execute(apr_pool_t *mptmp, unsigned char *input,
 static int msre_fn_urlEncode_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
-    *rval = url_encode(mptmp, (char *)input, input_len);
+    int changed;
+
+    *rval = url_encode(mptmp, (char *)input, input_len, &changed);
     *rval_len = strlen(*rval);
-    
-    return (*rval_len == input_len ? 0 : 1);
+
+    return changed;
 }
 
 /* base64Encode */
@@ -301,7 +326,7 @@ static int msre_fn_base64Encode_execute(apr_pool_t *mptmp, unsigned char *input,
     apr_base64_encode(*rval, (const char *)input, input_len);
     (*rval_len)--;
 
-    return 1;
+    return *rval_len ? 1 : 0;
 }
 
 /* base64Decode */
@@ -311,10 +336,9 @@ static int msre_fn_base64Decode_execute(apr_pool_t *mptmp, unsigned char *input,
 {
     *rval_len = apr_base64_decode_len((const char *)input); /* returns len with NULL byte included */
     *rval = apr_palloc(mptmp, *rval_len);
-    apr_base64_decode(*rval, (const char *)input);
-    (*rval_len)--;
+    *rval_len = apr_base64_decode(*rval, (const char *)input);
 
-    return 1;
+    return *rval_len ? 1 : 0;
 }
 
 /* length */
@@ -358,7 +382,7 @@ static int msre_fn_sha1_execute(apr_pool_t *mptmp, unsigned char *input,
     *rval_len = APR_SHA1_DIGESTSIZE;
     *rval = apr_pstrmemdup(mptmp, (const char *)digest, APR_SHA1_DIGESTSIZE);
 
-    return 1;    
+    return 1;
 }
 
 /* hexDecode */
@@ -410,10 +434,12 @@ static int msre_fn_escapeSeqDecode_execute(apr_pool_t *mptmp, unsigned char *inp
 static int msre_fn_normalisePath_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
-    *rval_len = normalise_path_inplace(input, input_len, 0);
+    int changed;
+
+    *rval_len = normalise_path_inplace(input, input_len, 0, &changed);
     *rval = (char *)input;
 
-    return (*rval_len == input_len ? 0 : 1);
+    return changed;
 }
 
 /* normalisePathWin */
@@ -421,10 +447,12 @@ static int msre_fn_normalisePath_execute(apr_pool_t *mptmp, unsigned char *input
 static int msre_fn_normalisePathWin_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
-    *rval_len = normalise_path_inplace(input, input_len, 1);
+    int changed;
+
+    *rval_len = normalise_path_inplace(input, input_len, 1, &changed);
     *rval = (char *)input;
 
-    return (*rval_len == input_len ? 0 : 1);
+    return changed;
 }
 
 /* ------------------------------------------------------------------------------ */
@@ -433,7 +461,7 @@ static int msre_fn_normalisePathWin_execute(apr_pool_t *mptmp, unsigned char *in
  * Registers one transformation function with the engine.
  */
 void msre_engine_tfn_register(msre_engine *engine, const char *name,
-    FN_TFN_EXECUTE(execute))
+    fn_tfn_execute_t execute)
 {
     msre_tfn_metadata *metadata = (msre_tfn_metadata *)apr_pcalloc(engine->mp,
         sizeof(msre_tfn_metadata));
@@ -491,7 +519,7 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     msre_engine_tfn_register(engine,
         "hexDecode",
         msre_fn_hexDecode_execute
-    );    
+    );
 
     /* hexEncode */
     msre_engine_tfn_register(engine,
@@ -503,6 +531,12 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     msre_engine_tfn_register(engine,
         "htmlEntityDecode",
         msre_fn_htmlEntityDecode_execute
+    );
+
+    /* jsDecode */
+    msre_engine_tfn_register(engine,
+        "jsDecode",
+        msre_fn_jsDecode_execute
     );
 
     /* length */

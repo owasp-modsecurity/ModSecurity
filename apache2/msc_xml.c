@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -8,8 +8,6 @@
  * write to Breach Security, Inc. at support@breach.com.
  *
  */
-#ifdef WITH_LIBXML2
-
 #include "msc_xml.h"
 
 
@@ -30,14 +28,14 @@ int xml_init(modsec_rec *msr, char **error_msg) {
 static void xml_receive_sax_error(void *data, const char *msg, ...) {
     modsec_rec *msr = (modsec_rec *)data;
     char message[256];
-    
+
     if (msr == NULL) return;
 
-    apr_snprintf(message, sizeof(message), "%s (line %i pos %i)",
+    apr_snprintf(message, sizeof(message), "%s (line %d offset %d)",
         log_escape_nq(msr->mp, msr->xml->parsing_ctx->lastError.message),
         msr->xml->parsing_ctx->lastError.line,
         msr->xml->parsing_ctx->lastError.int2);
-    
+
     msr_log(msr, 5, "XML: Parsing error: %s", message);
 }
 #endif
@@ -109,7 +107,7 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
         /* Clean up everything else. */
         xmlFreeParserCtxt(msr->xml->parsing_ctx);
         msr->xml->parsing_ctx = NULL;
-        msr_log(msr, 4, "XML: Parsing complete (well_formed %i).", msr->xml->well_formed);
+        msr_log(msr, 4, "XML: Parsing complete (well_formed %u).", msr->xml->well_formed);
 
         if (msr->xml->well_formed != 1) {
             *error_msg = apr_psprintf(msr->mp, "XML: Failed parsing document.");
@@ -131,5 +129,3 @@ apr_status_t xml_cleanup(modsec_rec *msr) {
 
     return 1;
 }
-
-#endif

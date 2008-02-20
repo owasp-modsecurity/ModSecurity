@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -24,9 +24,12 @@ struct msc_regex_t {
 };
 
 apr_status_t DSOLOCAL msc_pcre_cleanup(msc_regex_t *regex);
-  
+
 void DSOLOCAL *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
     const char **_errptr, int *_erroffset);
+
+int DSOLOCAL msc_regexec_ex(msc_regex_t *regex, const char *s, unsigned int slen,
+    int startoffset, int options, int *ovector, int ovecsize, char **error_msg);
 
 int DSOLOCAL msc_regexec_capture(msc_regex_t *regex, const char *s,
     unsigned int slen, int *ovector, int ovecsize, char **error_msg);

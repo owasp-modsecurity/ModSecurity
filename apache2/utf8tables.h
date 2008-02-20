@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -47,7 +47,7 @@ static const acmp_utf8_char_t utf8_offsets[6] = {
 #define UTF8_LCASEMAP_LEN 759
 
 /**
- * Table mapping is from PHP's mbstring extension, maps uppercase 
+ * Table mapping is from PHP's mbstring extension, maps uppercase
  */
 static const acmp_utf8_char_t utf8_lcase_map[UTF8_LCASEMAP_LEN * 2] = {
     0x00000061, 0x00000041,

@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -30,13 +30,18 @@ typedef struct msc_string msc_string;
 #define DSOLOCAL
 #endif
 
+/* For GNU C, tell the compiler to check printf like formatters */
+#if (defined(__GNUC__) && !defined(SOLARIS2))
+#define PRINTF_ATTRIBUTE(a,b) __attribute__((format (printf, a, b)))
+#else
+#define PRINTF_ATTRIBUTE(a,b)
+#endif
+
 #include "msc_logging.h"
 #include "msc_multipart.h"
 #include "msc_pcre.h"
 #include "msc_util.h"
-#ifdef WITH_LIBXML2
 #include "msc_xml.h"
-#endif
 #include "msc_geo.h"
 #include "re.h"
 
@@ -49,9 +54,23 @@ typedef struct msc_string msc_string;
 #include "http_log.h"
 #include "http_protocol.h"
 
-#define MODULE_NAME "ModSecurity"
-#define MODULE_RELEASE "2.5.0-dev2"
-#define MODULE_NAME_FULL (MODULE_NAME " v" MODULE_RELEASE " (Apache 2.x)")
+typedef struct modsec_build_type_rec {
+    const char * name;
+    int          val;
+} modsec_build_type_rec;
+extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
+
+#define MODSEC_VERSION_MAJOR       "2"
+#define MODSEC_VERSION_MINOR       "5"
+#define MODSEC_VERSION_MAINT       "0"
+#define MODSEC_VERSION_TYPE        ""
+#define MODSEC_VERSION_RELEASE     ""
+
+#define MODULE_NAME "ModSecurity for Apache"
+#define MODULE_RELEASE \
+  MODSEC_VERSION_MAJOR "." MODSEC_VERSION_MINOR "." MODSEC_VERSION_MAINT \
+  "-" MODSEC_VERSION_TYPE MODSEC_VERSION_RELEASE
+#define MODULE_NAME_FULL MODULE_NAME "/" MODULE_RELEASE " (http://www.modsecurity.org/)"
 
 #define PHASE_REQUEST_HEADERS       1
 #define PHASE_REQUEST_BODY          2
@@ -61,8 +80,8 @@ typedef struct msc_string msc_string;
 #define PHASE_FIRST                 PHASE_REQUEST_HEADERS
 #define PHASE_LAST                  PHASE_LOGGING
 
-#define NOT_SET     -1
-#define NOT_SET_P (void *)-1
+#define NOT_SET                    -1l
+#define NOT_SET_P         ((void *)-1l)
 
 #define CREATEMODE ( APR_UREAD | APR_UWRITE | APR_GREAD )
 #define CREATEMODE_DIR ( APR_UREAD | APR_UWRITE | APR_UEXECUTE | APR_GREAD | APR_GEXECUTE )
@@ -86,8 +105,19 @@ typedef struct msc_string msc_string;
 #define REQUEST_BODY_HARD_LIMIT                 1073741824L
 #define REQUEST_BODY_DEFAULT_INMEMORY_LIMIT     131072
 #define REQUEST_BODY_DEFAULT_LIMIT              134217728
+#define REQUEST_BODY_NO_FILES_DEFAULT_LIMIT     1048576
 #define RESPONSE_BODY_DEFAULT_LIMIT             524288
 #define RESPONSE_BODY_HARD_LIMIT                1073741824L
+
+#define RESPONSE_BODY_LIMIT_ACTION_REJECT       0
+#define RESPONSE_BODY_LIMIT_ACTION_PARTIAL      1
+
+#define SECACTION_TARGETS                       "REQUEST_URI"
+#define SECACTION_ARGS                          "@unconditionalMatch"
+
+#define SECMARKER_TARGETS                       "REQUEST_URI"
+#define SECMARKER_ARGS                          "@noMatch"
+#define SECMARKER_BASE_ACTIONS                  "t:none,pass,id:"
 
 #if !defined(OS2) && !defined(WIN32) && !defined(BEOS) && !defined(NETWARE)
 #include "unixd.h"
@@ -140,10 +170,15 @@ extern DSOLOCAL const command_rec module_directives[];
 #define ACTION_PROXY                    3
 #define ACTION_DROP                     4
 #define ACTION_ALLOW                    5
+#define ACTION_ALLOW_REQUEST            6
+#define ACTION_ALLOW_PHASE              7
 
 #define MODSEC_DISABLED                 0
 #define MODSEC_DETECTION_ONLY           1
 #define MODSEC_ENABLED                  2
+
+#define MODSEC_CACHE_DISABLED           0
+#define MODSEC_CACHE_ENABLED            1
 
 #define MODSEC_OFFLINE                  0
 #define MODSEC_ONLINE                   1
@@ -190,12 +225,13 @@ struct modsec_rec {
     unsigned int         if_started_forwarding;
 
     apr_size_t           reqbody_length;
-    unsigned int         reqbody_status;
 
     apr_bucket_brigade  *of_brigade;
     unsigned int         of_status;
     unsigned int         of_done_reading;
     unsigned int         of_skipping;
+    unsigned int         of_partial;
+    unsigned int         of_is_error;
 
     unsigned int         resbody_status;
     apr_size_t           resbody_length;
@@ -229,7 +265,7 @@ struct modsec_rec {
     const char          *request_protocol;
 
     const char          *hostname;
-    
+
     apr_table_t         *request_headers;
 
     apr_off_t            request_content_length;
@@ -269,7 +305,7 @@ struct modsec_rec {
     unsigned int         msc_reqbody_chunk_offset;   /* offset of the chunk currently in use     */
     msc_data_chunk      *msc_reqbody_chunk_current;  /* current chunk                            */
     char                *msc_reqbody_buffer;
-    
+
     const char          *msc_reqbody_filename;       /* when stored on disk */
     int                  msc_reqbody_fd;
     msc_data_chunk      *msc_reqbody_disk_chunk;
@@ -278,11 +314,11 @@ struct modsec_rec {
     int                  msc_reqbody_error;
     const char          *msc_reqbody_error_msg;
 
+    apr_size_t           msc_reqbody_no_files_length;
+
     multipart_data      *mpd;                        /* MULTIPART processor data structure */
 
-    #ifdef WITH_LIBXML2
     xml_data            *xml;                        /* XML processor data structure       */
-    #endif
 
     /* audit logging */
     char                *new_auditlog_boundary;
@@ -292,6 +328,7 @@ struct modsec_rec {
     apr_md5_ctx_t        new_auditlog_md5ctx;
 
     unsigned int         was_intercepted;
+    unsigned int         rule_was_intercepted;
     unsigned int         intercept_phase;
     msre_actionset      *intercept_actionset;
     const char          *intercept_message;
@@ -302,7 +339,9 @@ struct modsec_rec {
     apr_time_t           time_checkpoint_2;
     apr_time_t           time_checkpoint_3;
 
-    const char          *matched_var;
+    apr_array_header_t  *matched_rules;
+    msc_string          *matched_var;
+    int                  highest_severity;
 
     /* upload */
     int                  upload_extract_files;
@@ -323,6 +362,17 @@ struct modsec_rec {
 
     /* data cache */
     apr_hash_t          *tcache;
+
+    /* removed rules */
+    apr_array_header_t  *removed_rules;
+
+    /* When "allow" is executed the variable below is
+     * updated to contain the scope of the allow action. Set
+     * at 0 by default, it will have ACTION_ALLOW if we are
+     * to allow phases 1-4 and ACTION_ALLOW_REQUEST if we
+     * are to allow phases 1-2 only.
+     */
+    unsigned int         allow_scope;
 };
 
 struct directory_config {
@@ -334,11 +384,13 @@ struct directory_config {
     int                  reqbody_access;
     long int             reqbody_inmemory_limit;
     long int             reqbody_limit;
+    long int             reqbody_no_files_limit;
     int                  resbody_access;
 
     long int             of_limit;
     apr_table_t         *of_mime_types;
     int                  of_mime_types_cleared;
+    int                  of_limit_action;
 
     const char          *debuglog_name;
     int                  debuglog_level;
@@ -385,17 +437,19 @@ struct directory_config {
     /* A regular expression that determines if a response
      * status is treated as relevant.
      */
-    msc_regex_t         *auditlog_relevant_regex;    
+    msc_regex_t         *auditlog_relevant_regex;
 
     /* Upload */
     const char          *tmp_dir;
     const char          *upload_dir;
     int                  upload_keep_files;
     int                  upload_validates_files;
+    int                  upload_filemode;
 
     /* Used only in the configuration phase. */
     msre_rule           *tmp_chain_starter;
     msre_actionset      *tmp_default_actionset;
+    apr_table_t         *tmp_rule_placeholders;
 
     /* Misc */
     const char          *data_dir;
@@ -414,6 +468,19 @@ struct directory_config {
 
     /* Geo Lookup */
     geo_db              *geo;
+
+    /* Cache */
+    int                  cache_trans;
+    apr_size_t           cache_trans_min;
+    apr_size_t           cache_trans_max;
+
+    /* Array to hold signatures of components, which will
+     * appear in the ModSecurity signature in the audit log.
+     */
+    apr_array_header_t  *component_signatures;
+
+    /* Request character encoding. */
+    const char          *request_encoding;
 };
 
 struct error_message {
@@ -474,14 +541,14 @@ apr_status_t DSOLOCAL modsecurity_process_phase(modsec_rec *msr, int phase);
 
 /* Request body functions */
 
-apr_status_t DSOLOCAL modsecurity_request_body_start(modsec_rec *msr);
+apr_status_t DSOLOCAL modsecurity_request_body_start(modsec_rec *msr, char **error_msg);
 
 apr_status_t DSOLOCAL modsecurity_request_body_store(modsec_rec *msr,
-    const char *data, apr_size_t length);
+    const char *data, apr_size_t length, char **error_msg);
 
-apr_status_t DSOLOCAL modsecurity_request_body_end(modsec_rec *msr);
+apr_status_t DSOLOCAL modsecurity_request_body_end(modsec_rec *msr, char **error_msg);
 
-apr_status_t DSOLOCAL modsecurity_request_body_retrieve_start(modsec_rec *msr);
+apr_status_t DSOLOCAL modsecurity_request_body_retrieve_start(modsec_rec *msr, char **error_msg);
 
 apr_status_t DSOLOCAL modsecurity_request_body_retrieve_end(modsec_rec *msr);
 
@@ -490,7 +557,7 @@ apr_status_t DSOLOCAL modsecurity_request_body_retrieve_end(modsec_rec *msr);
  * nbytes will contain the number of bytes stored in the buffer.
  */
 apr_status_t DSOLOCAL modsecurity_request_body_retrieve(modsec_rec *msr, msc_data_chunk **chunk,
-    long int nbytes);
+    long int nbytes, char **error_msg);
 
 void DSOLOCAL msc_add(modsec_rec *msr, int level, msre_actionset *actionset,
     const char *action_message, const char *rule_message);
@@ -498,6 +565,6 @@ void DSOLOCAL msc_add(modsec_rec *msr, int level, msre_actionset *actionset,
 void DSOLOCAL msc_alert(modsec_rec *msr, int level, msre_actionset *actionset, const char *action_message,
     const char *rule_message);
 
-apr_status_t DSOLOCAL modsecurity_request_body_clear(modsec_rec *msr);
+apr_status_t DSOLOCAL modsecurity_request_body_clear(modsec_rec *msr, char **error_msg);
 
 #endif

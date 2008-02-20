@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -16,28 +16,36 @@
 /**
  * Prepare to accept the request body (part 2).
  */
-static apr_status_t modsecurity_request_body_start_init(modsec_rec *msr) {
+static apr_status_t modsecurity_request_body_start_init(modsec_rec *msr, char **error_msg) {
+    *error_msg = NULL;
+
     if(msr->msc_reqbody_storage == MSC_REQBODY_MEMORY) {
         /* Prepare to store request body in memory. */
 
         msr->msc_reqbody_chunks = apr_array_make(msr->msc_reqbody_mp,
             32, sizeof(msc_data_chunk *));
-        if (msr->msc_reqbody_chunks == NULL) return -1;
+        if (msr->msc_reqbody_chunks == NULL) {
+            *error_msg = apr_pstrdup(msr->mp, "Input filter: Failed to prepare in-memory storage.");
+            return -1;
+        }
     } else {
         /* Prepare to store request body on disk. */
 
         msr->msc_reqbody_filename = apr_psprintf(msr->mp, "%s/%s-%s-request_body-XXXXXX",
             msr->txcfg->tmp_dir, current_filetime(msr->mp), msr->txid);
-        if (msr->msc_reqbody_filename == NULL) return -1;
+        if (msr->msc_reqbody_filename == NULL) {
+            *error_msg = apr_pstrdup(msr->mp, "Input filter: Failed to generate an on-disk filename.");
+            return -1;
+        }
 
         msr->msc_reqbody_fd = msc_mkstemp((char *)msr->msc_reqbody_filename);
         if (msr->msc_reqbody_fd < 0) {
-            msr_log(msr, 1, "Input filter: Failed to create temporary file: %s",
+            *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to create temporary file: %s",
                 msr->msc_reqbody_filename);
             return -1;
         }
 
-        msr_log(msr, 4, "Input filter: Created temporary file to store request body: %s", 
+        msr_log(msr, 4, "Input filter: Created temporary file to store request body: %s",
             msr->msc_reqbody_filename);
     }
 
@@ -47,14 +55,15 @@ static apr_status_t modsecurity_request_body_start_init(modsec_rec *msr) {
 /**
  * Prepare to accept the request body (part 1).
  */
-apr_status_t modsecurity_request_body_start(modsec_rec *msr) {
+apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
+    *error_msg = NULL;
     msr->msc_reqbody_length = 0;
 
     /* Create a separate memory pool that will be used
      * to allocate structures from (not data, which is allocated
      * via malloc).
      */
-    apr_pool_create(&msr->msc_reqbody_mp, msr->mp);
+    apr_pool_create(&msr->msc_reqbody_mp, NULL);
 
     /* Initialise request body processors, if any. */
 
@@ -63,43 +72,47 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr) {
 
         if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
             if (multipart_init(msr, &my_error_msg) < 0) {
-                msr_log(msr, 1, "Multipart parser init failed: %s", my_error_msg);
+                *error_msg = apr_psprintf(msr->mp, "Multipart parser init failed: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
+                msr_log(msr, 2, "Multipart parser init failed: %s", my_error_msg);
             }
         }
-        #ifdef WITH_LIBXML2
         else
         if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
             if (xml_init(msr, &my_error_msg) < 0) {
-                msr_log(msr, 1, "XML parser init failed: %s", my_error_msg);
+                *error_msg = apr_psprintf(msr->mp, "XML parser init failed: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
+                msr_log(msr, 2, "Multipart parser init failed: %s", my_error_msg);
             }
         }
-        #endif
         else
         if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
             /* Do nothing, URLENCODED processor does not support streaming yet. */
         }
         else {
-            msr_log(msr, 1, "Unknown request body processor: %s", msr->msc_reqbody_processor);
+            *error_msg = apr_psprintf(msr->mp, "Unknown request body processor: %s", msr->msc_reqbody_processor);
             return -1;
         }
     }
 
-    return modsecurity_request_body_start_init(msr);
+    return modsecurity_request_body_start_init(msr, error_msg);
 }
 
 /**
  * Stores a chunk of request body data to disk.
  */
 static apr_status_t modsecurity_request_body_store_disk(modsec_rec *msr,
-    const char *data, apr_size_t length)
+    const char *data, apr_size_t length, char **error_msg)
 {
-    apr_size_t i = write(msr->msc_reqbody_fd, data, length);
+    apr_size_t i;
+
+    *error_msg = NULL;
+
+    i = write(msr->msc_reqbody_fd, data, length);
     if (i != length) {
-        msr_log(msr, 1, "Input filter: Failed writing %lu bytes to temporary file (rc %lu).", i);
+        *error_msg = apr_psprintf(msr->mp, "Input filter: Failed writing %" APR_SIZE_T_FMT " bytes to temporary file (rc %" APR_SIZE_T_FMT ").", length, i);
         return -1;
     }
 
@@ -110,8 +123,10 @@ static apr_status_t modsecurity_request_body_store_disk(modsec_rec *msr,
  * Stores one chunk of request body data in memory.
  */
 static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
-    const char *data, apr_size_t length)
+    const char *data, apr_size_t length, char **error_msg)
 {
+    *error_msg = NULL;
+
     /* Would storing this chunk mean going over the limit? */
     if ((msr->msc_reqbody_spilltodisk)
         && (msr->msc_reqbody_length + length > (apr_size_t)msr->txcfg->reqbody_inmemory_limit))
@@ -129,14 +144,14 @@ static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
 
         /* Initialise disk storage */
         msr->msc_reqbody_storage = MSC_REQBODY_DISK;
-        if (modsecurity_request_body_start_init(msr) < 0) return -1;
+        if (modsecurity_request_body_start_init(msr, error_msg) < 0) return -1;
 
         /* Write the data we keep in memory */
         chunks = (msc_data_chunk **)msr->msc_reqbody_chunks->elts;
         for(i = 0; i < msr->msc_reqbody_chunks->nelts; i++) {
             disklen += chunks[i]->length;
 
-            if (modsecurity_request_body_store_disk(msr, chunks[i]->data, chunks[i]->length) < 0) {
+            if (modsecurity_request_body_store_disk(msr, chunks[i]->data, chunks[i]->length, error_msg) < 0) {
                 return -1;
             }
 
@@ -152,10 +167,10 @@ static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
         msr->msc_reqbody_chunks = NULL;
         apr_pool_clear(msr->msc_reqbody_mp);
 
-        msr_log(msr, 4, "Input filter: Wrote %lu bytes from memory to disk.", disklen);
+        msr_log(msr, 4, "Input filter: Wrote %u bytes from memory to disk.", disklen);
 
         /* Continue with disk storage from now on */
-        return modsecurity_request_body_store_disk(msr, data, length);
+        return modsecurity_request_body_store_disk(msr, data, length, error_msg);
     }
 
     /* If we're here that means we are not over the
@@ -180,10 +195,16 @@ static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
             if (msr->msc_reqbody_chunk_current == NULL) {
                 msr->msc_reqbody_chunk_current = (msc_data_chunk *)
                     apr_pcalloc(msr->msc_reqbody_mp, sizeof(msc_data_chunk));
-                if (msr->msc_reqbody_chunk_current == NULL) return -1;
+                if (msr->msc_reqbody_chunk_current == NULL) {
+                    *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to allocate %lu bytes for request body chunk.", (unsigned long)sizeof(msc_data_chunk));
+                    return -1;
+                }
 
                 msr->msc_reqbody_chunk_current->data = malloc(CHUNK_CAPACITY);
-                if (msr->msc_reqbody_chunk_current->data == NULL) return -1;
+                if (msr->msc_reqbody_chunk_current->data == NULL) {
+                    *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to allocate %d bytes for request body chunk data.", CHUNK_CAPACITY);
+                    return -1;
+                }
 
                 msr->msc_reqbody_chunk_current->length = 0;
                 msr->msc_reqbody_chunk_current->is_permanent = 1;
@@ -227,8 +248,10 @@ static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
  * Stores one chunk of request body data. Returns -1 on error.
  */
 apr_status_t modsecurity_request_body_store(modsec_rec *msr,
-    const char *data, apr_size_t length)
+    const char *data, apr_size_t length, char **error_msg)
 {
+    *error_msg = NULL;
+
     /* If we have a processor for this request body send
      * data to it first (but only if it did not report an
      * error on previous invocations).
@@ -237,43 +260,61 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
         char *my_error_msg = NULL;
 
         if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
+            /* The per-request data length counter will
+             * be updated by the multipart parser.
+             */
+
+            /* Process data as multipart/form-data. */
             if (multipart_process_chunk(msr, data, length, &my_error_msg) < 0) {
+                *error_msg = apr_psprintf(msr->mp, "Request body processor error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
-                msr_log(msr, 4, "%s", my_error_msg);
+                msr_log(msr, 2, "Request body processor error: %s", my_error_msg);
             }
         }
-        #ifdef WITH_LIBXML2
         else
         if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
+            /* Increase per-request data length counter. */
+            msr->msc_reqbody_no_files_length += length;
+
+            /* Process data as XML. */
             if (xml_process_chunk(msr, data, length, &my_error_msg) < 0) {
+                *error_msg = apr_psprintf(msr->mp, "Request body processor error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
-                msr_log(msr, 4, "%s", my_error_msg);
+                msr_log(msr, 2, "Request body processor error: %s", my_error_msg);
             }
         }
-        #endif
         else
         if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
-            /* Do nothing, URLENCODED processor does not support streaming. */
+            /* Increase per-request data length counter. */
+            msr->msc_reqbody_no_files_length += length;
+
+            /* Do nothing else, URLENCODED processor does not support streaming. */
         }
         else {
-            msr_log(msr, 1, "Unknown request body processor: %s", msr->msc_reqbody_processor);
+            *error_msg = apr_psprintf(msr->mp, "Unknown request body processor: %s",
+                msr->msc_reqbody_processor);
             return -1;
         }
     }
 
+    /* Check that we are not over the request body no files limit. */
+    if (msr->msc_reqbody_no_files_length >= (unsigned long) msr->txcfg->reqbody_no_files_limit) {
+        return -5;
+    }
+
     /* Store data. */
     if (msr->msc_reqbody_storage == MSC_REQBODY_MEMORY) {
-        return modsecurity_request_body_store_memory(msr, data, length);
+        return modsecurity_request_body_store_memory(msr, data, length, error_msg);
     }
     else
     if (msr->msc_reqbody_storage == MSC_REQBODY_DISK) {
-        return modsecurity_request_body_store_disk(msr, data, length);
+        return modsecurity_request_body_store_disk(msr, data, length, error_msg);
     }
 
     /* Should never happen. */
-    msr_log(msr, 1, "Internal Error: Unknown value for msc_reqbody_storage: %i",
+    *error_msg = apr_psprintf(msr->mp, "Internal error, unknown value for msc_reqbody_storage: %u",
         msr->msc_reqbody_storage);
     return -1;
 }
@@ -281,23 +322,28 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
 /**
  *
  */
-static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr) {
+static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, char **error_msg) {
     msc_data_chunk **chunks, *one_chunk;
     char *d;
     int i, sofar;
     int invalid_count = 0;
 
+    *error_msg = NULL;
+
     /* Allocate a buffer large enough to hold the request body. */
 
-    if (msr->msc_reqbody_length + 1 == 0) return -1;
+    if (msr->msc_reqbody_length + 1 == 0) {
+        *error_msg = apr_psprintf(msr->mp, "Internal error, request body length will overflow: %u", msr->msc_reqbody_length);
+        return -1;
+    }
     msr->msc_reqbody_buffer = malloc(msr->msc_reqbody_length + 1);
     if (msr->msc_reqbody_buffer == NULL) {
-        msr_log(msr, 1, "Unable to allocate memory to hold request body. Asked for %lu bytes.",
+        *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body. Asked for %u bytes.",
             msr->msc_reqbody_length + 1);
         return -1;
     }
     msr->msc_reqbody_buffer[msr->msc_reqbody_length] = '\0';
-        
+
     /* Copy the data we keep in chunks into the new buffer. */
 
     sofar = 0;
@@ -309,7 +355,7 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr) {
             d += chunks[i]->length;
             sofar += chunks[i]->length;
         } else {
-            msr_log(msr, 1, "Internal error, request body buffer overflow.");
+            *error_msg = apr_psprintf(msr->mp, "Internal error, request body buffer overflow.");
             return -1;
         }
     }
@@ -325,19 +371,22 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr) {
     /* Create a new array with only one chunk in it. */
 
     msr->msc_reqbody_chunks = apr_array_make(msr->msc_reqbody_mp, 2, sizeof(msc_data_chunk *));
-    if (msr->msc_reqbody_chunks == NULL) return -1;
+    if (msr->msc_reqbody_chunks == NULL) {
+        *error_msg = apr_pstrdup(msr->mp, "Failed to create structure to hold request body.");
+        return -1;
+    }
     one_chunk = (msc_data_chunk *)apr_pcalloc(msr->msc_reqbody_mp, sizeof(msc_data_chunk));
     one_chunk->data = msr->msc_reqbody_buffer;
     one_chunk->length = msr->msc_reqbody_length;
     one_chunk->is_permanent = 1;
     *(const msc_data_chunk **)apr_array_push(msr->msc_reqbody_chunks) = one_chunk;
 
-    /* Parse URL-encoded arguments in the request body. */    
+    /* Parse URL-encoded arguments in the request body. */
 
     if (parse_arguments(msr, msr->msc_reqbody_buffer, msr->msc_reqbody_length,
         msr->txcfg->argument_separator, "BODY", msr->arguments, &invalid_count) < 0)
     {
-        msr_log(msr, 1, "Initialisation: Error occurred while parsing BODY arguments.");
+        *error_msg = apr_pstrdup(msr->mp, "Initialisation: Error occurred while parsing BODY arguments.");
         return -1;
     }
 
@@ -347,7 +396,8 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr) {
 /**
  * Stops receiving the request body.
  */
-apr_status_t modsecurity_request_body_end(modsec_rec *msr) {
+apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
+    *error_msg = NULL;
 
     /* Close open file descriptors, if any. */
     if (msr->msc_reqbody_storage == MSC_REQBODY_DISK) {
@@ -357,31 +407,32 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr) {
         }
     }
 
+    /* Note that we've read the body. */
     msr->msc_reqbody_read = 1;
 
+    /* Finalise body processing. */
     if ((msr->msc_reqbody_processor != NULL)&&(msr->msc_reqbody_error == 0)) {
         char *my_error_msg = NULL;
 
         if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
             if (multipart_complete(msr, &my_error_msg) < 0) {
+                *error_msg = apr_psprintf(msr->mp, "Multipart error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
-                msr_log(msr, 1, "Multipart error: %s", my_error_msg);
                 return -1;
             }
 
             if (multipart_get_arguments(msr, "BODY", msr->arguments) < 0) {
+                *error_msg = apr_psprintf(msr->mp, "Multipart error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = "Error retrieving arguments.";
-                msr_log(msr, 1, "Multipart error: %s", my_error_msg);
                 return -1;
             }
         }
         else
         if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
-            return modsecurity_request_body_end_urlencoded(msr);
+            return modsecurity_request_body_end_urlencoded(msr, error_msg);
         }
-        #ifdef WITH_LIBXML2
         else
         if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
             if (xml_complete(msr, &my_error_msg) < 0) {
@@ -391,8 +442,10 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr) {
                 return -1;
             }
         }
-        #endif
     }
+
+    /* Note the request body no files length. */
+    msr_log(msr, 4, "Reqest body no files length: %" APR_SIZE_T_FMT, msr->msc_reqbody_no_files_length);
 
     return 1;
 }
@@ -400,27 +453,38 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr) {
 /**
  * Prepares to forward the request body.
  */
-apr_status_t modsecurity_request_body_retrieve_start(modsec_rec *msr) {
+apr_status_t modsecurity_request_body_retrieve_start(modsec_rec *msr, char **error_msg) {
+    *error_msg = NULL;
+
     if (msr->msc_reqbody_storage == MSC_REQBODY_MEMORY) {
         msr->msc_reqbody_chunk_position = 0;
         msr->msc_reqbody_chunk_offset = 0;
-        
+
         msr->msc_reqbody_disk_chunk = apr_pcalloc(msr->msc_reqbody_mp, sizeof(msc_data_chunk));
-        if (msr->msc_reqbody_disk_chunk == NULL) return -1;
+        if (msr->msc_reqbody_disk_chunk == NULL) {
+            *error_msg = apr_psprintf(msr->mp, "Failed to allocate %lu bytes for request body disk chunk.", (unsigned long)sizeof(msc_data_chunk));
+            return -1;
+        }
         msr->msc_reqbody_disk_chunk->is_permanent = 1;
     }
     else
     if (msr->msc_reqbody_storage == MSC_REQBODY_DISK) {
         msr->msc_reqbody_disk_chunk = apr_pcalloc(msr->msc_reqbody_mp, sizeof(msc_data_chunk));
-        if (msr->msc_reqbody_disk_chunk == NULL) return -1;
+        if (msr->msc_reqbody_disk_chunk == NULL) {
+            *error_msg = apr_psprintf(msr->mp, "Failed to allocate %lu bytes for request body disk chunk.", (unsigned long)sizeof(msc_data_chunk));
+            return -1;
+        }
 
         msr->msc_reqbody_disk_chunk->is_permanent = 0;
         msr->msc_reqbody_disk_chunk->data = apr_palloc(msr->msc_reqbody_mp, CHUNK_CAPACITY);
-        if (msr->msc_reqbody_disk_chunk->data == NULL) return -1;
+        if (msr->msc_reqbody_disk_chunk->data == NULL) {
+            *error_msg = apr_psprintf(msr->mp, "Failed to allocate %d bytes for request body disk chunk data.", CHUNK_CAPACITY);
+            return -1;
+        }
 
         msr->msc_reqbody_fd = open(msr->msc_reqbody_filename, O_RDONLY | O_BINARY);
         if (msr->msc_reqbody_fd < 0) {
-            msr_log(msr, 1, "Input filter: Failed to open temporary file for reading: %s",
+            *error_msg = apr_psprintf(msr->mp, "Failed to open temporary file for reading: %s",
                 msr->msc_reqbody_filename);
             return -1;
         }
@@ -453,11 +517,16 @@ apr_status_t modsecurity_request_body_retrieve_end(modsec_rec *msr) {
  * a non-negative value in nbytes.
  */
 apr_status_t modsecurity_request_body_retrieve(modsec_rec *msr,
-    msc_data_chunk **chunk, long int nbytes)
+    msc_data_chunk **chunk, long int nbytes, char **error_msg)
 {
     msc_data_chunk **chunks;
 
-    if (chunk == NULL) return -1;
+    *error_msg = NULL;
+
+    if (chunk == NULL) {
+        *error_msg = apr_pstrdup(msr->mp, "Internal error, retrieving request body chunk.");
+        return -1;
+    }
     *chunk = NULL;
 
     if (msr->msc_reqbody_storage == MSC_REQBODY_MEMORY) {
@@ -527,7 +596,7 @@ apr_status_t modsecurity_request_body_retrieve(modsec_rec *msr,
 
         i = read(msr->msc_reqbody_fd, msr->msc_reqbody_disk_chunk->data, my_nbytes);
         if (i < 0) {
-            msr_log(msr, 1, "Input filter: Error reading from temporary file: %s",
+            *error_msg = apr_psprintf(msr->mp, "Input filter: Error reading from temporary file: %s",
                 strerror(errno));
             return -1;
         }
@@ -540,7 +609,8 @@ apr_status_t modsecurity_request_body_retrieve(modsec_rec *msr,
         return 1; /* More data available. */
     }
 
-    msr_log(msr, 1, "Internal error, invalid msc_reqbody_storage value: %i",
+    /* Should never happen. */
+    *error_msg = apr_psprintf(msr->mp, "Internal error, invalid msc_reqbody_storage value: %u",
         msr->msc_reqbody_storage);
 
     return -1;
@@ -549,8 +619,10 @@ apr_status_t modsecurity_request_body_retrieve(modsec_rec *msr,
 /**
  *
  */
-apr_status_t modsecurity_request_body_clear(modsec_rec *msr) {
-    /* Release memory we used to store request body data. */    
+apr_status_t modsecurity_request_body_clear(modsec_rec *msr, char **error_msg) {
+    *error_msg = NULL;
+
+    /* Release memory we used to store request body data. */
     if (msr->msc_reqbody_chunks != NULL) {
         msc_data_chunk **chunks = (msc_data_chunk **)msr->msc_reqbody_chunks->elts;
         int i;
@@ -574,7 +646,7 @@ apr_status_t modsecurity_request_body_clear(modsec_rec *msr) {
             if (msr->txcfg->upload_dir != NULL) {
                 keep_body = 1;
             } else {
-                msr_log(msr, 1, "Input filter: SecUploadDir is undefined, "
+                *error_msg = apr_psprintf(msr->mp, "Input filter: SecUploadDir is undefined, "
                     "unable to store PUT file.");
             }
         }
@@ -589,20 +661,26 @@ apr_status_t modsecurity_request_body_clear(modsec_rec *msr) {
 
                 /* Construct the new filename. */
                 put_basename = file_basename(msr->msc_reqbody_mp, msr->msc_reqbody_filename);
-                if (put_basename == NULL) return -1;
+                if (put_basename == NULL) {
+                    *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to generate basename to PUT file \"%s\"", log_escape(msr->msc_reqbody_mp, msr->msc_reqbody_filename));
+                    return -1;
+                }
                 put_filename = apr_psprintf(msr->msc_reqbody_mp, "%s/%s",
-                    msr->txcfg->upload_dir, put_basename);                    
-                if (put_filename == NULL) return -1;
+                    msr->txcfg->upload_dir, put_basename);
+                if (put_filename == NULL) {
+                    *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to generate filename to PUT file \"%s\"", log_escape(msr->msc_reqbody_mp, msr->msc_reqbody_filename));
+                    return -1;
+                }
 
                 if (apr_file_rename(msr->msc_reqbody_filename, put_filename,
                     msr->msc_reqbody_mp) != APR_SUCCESS)
                 {
-                    msr_log(msr, 1, "Failed to rename file from \"%s\" to \"%s\".",
+                    *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to rename file from \"%s\" to \"%s\".",
                         log_escape(msr->msc_reqbody_mp, msr->msc_reqbody_filename),
                         log_escape(msr->msc_reqbody_mp, put_filename));
                     return -1;
                 } else {
-                    msr_log(msr, 4, "Moved file from \"%s\" to \"%s\".",
+                    msr_log(msr, 4, "Input filter: Moved file from \"%s\" to \"%s\".",
                         log_escape(msr->msc_reqbody_mp, msr->msc_reqbody_filename),
                         log_escape(msr->msc_reqbody_mp, put_filename));
                 }
@@ -611,8 +689,8 @@ apr_status_t modsecurity_request_body_clear(modsec_rec *msr) {
                 if (apr_file_remove(msr->msc_reqbody_filename,
                     msr->msc_reqbody_mp) != APR_SUCCESS)
                 {
-                    msr_log(msr, 1, "Failed to delete temporary file: %s",
-                        msr->msc_reqbody_filename);
+                    *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to delete temporary file: %s",
+                        log_escape(msr->mp, msr->msc_reqbody_filename));
                     return -1;
                 }
 
@@ -624,11 +702,10 @@ apr_status_t modsecurity_request_body_clear(modsec_rec *msr) {
         }
     }
 
-    /* NOTE No need to clear the pool as it has already been destroyed
-     * if (msr->msc_reqbody_mp != NULL) {
-     *    apr_pool_clear(msr->msc_reqbody_mp);
-     * }
-     */
+    if (msr->msc_reqbody_mp != NULL) {
+        apr_pool_destroy(msr->msc_reqbody_mp);
+        msr->msc_reqbody_mp = NULL;
+    }
 
     return 1;
 }

@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -12,6 +12,52 @@
 #include "apache2.h"
 #include "http_core.h"
 #include "util_script.h"
+
+/**
+ * Sends a brigade with an error bucket down the filter chain.
+ */
+apr_status_t send_error_bucket(modsec_rec *msr, ap_filter_t *f, int status) {
+    apr_bucket_brigade *brigade = NULL;
+    apr_bucket *bucket = NULL;
+
+    /* Set the status line explicitly for the error document */
+    f->r->status_line = ap_get_status_line(status);
+
+    /* Force alert log for any errors that are not already marked relevant
+     * to prevent any missing error messages in the code from going
+     * unnoticed.  To prevent this error, all code should either set
+     * is_relevant, or just use msr_log with a level <= 3 prior to
+     * calling this function.
+     */
+    if ((msr != NULL) && (msr->is_relevant == 0)) {
+        msr_log(msr, 1, "Internal error: Issuing \"%s\" for unspecified error.",
+            f->r->status_line);
+    }
+
+    brigade = apr_brigade_create(f->r->pool, f->r->connection->bucket_alloc);
+    if (brigade == NULL) return APR_EGENERAL;
+
+    bucket = ap_bucket_error_create(status, NULL, f->r->pool, f->r->connection->bucket_alloc);
+    if (bucket == NULL) return APR_EGENERAL;
+
+    APR_BRIGADE_INSERT_TAIL(brigade, bucket);
+
+    bucket = apr_bucket_eos_create(f->r->connection->bucket_alloc);
+    if (bucket == NULL) return APR_EGENERAL;
+
+    APR_BRIGADE_INSERT_TAIL(brigade, bucket);
+
+    ap_pass_brigade(f->next, brigade);
+
+    /* NOTE:
+     * It may not matter what we do from the filter as it may be too
+     * late to even generate an error (already sent to client).  Nick Kew
+     * recommends to return APR_EGENERAL in hopes that the handler in control
+     * will notice and do The Right Thing.  So, that is what we do now.
+     */
+
+    return APR_EGENERAL;
+}
 
 /**
  * Execute system command. First line of the output will be returned in
@@ -46,7 +92,7 @@ int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char *
 
     procnew = apr_pcalloc(r->pool, sizeof(*procnew));
     if (procnew == NULL) {
-        msr_log(msr, 1, "Exec: Unable to allocate %i bytes.", sizeof(*procnew));
+        msr_log(msr, 1, "Exec: Unable to allocate %lu bytes.", (unsigned long)sizeof(*procnew));
         return -1;
     }
 
@@ -131,17 +177,17 @@ void record_time_checkpoint(modsec_rec *msr, int checkpoint_no) {
             msr->time_checkpoint_3 = now;
             break;
         default :
-            msr_log(msr, 1, "Internal Error: Unknown checkpoint: %i", checkpoint_no);
+            msr_log(msr, 1, "Internal Error: Unknown checkpoint: %d", checkpoint_no);
             return;
             break;
     }
 
     /* Apache-specific stuff. */
     apr_snprintf(note, 99, "%" APR_TIME_T_FMT, (now - msr->request_time));
-    apr_snprintf(note_name, 99, "mod_security-time%i", checkpoint_no);
+    apr_snprintf(note_name, 99, "mod_security-time%d", checkpoint_no);
     apr_table_set(msr->r->notes, note_name, note);
 
-    msr_log(msr, 4, "Time #%i: %s", checkpoint_no, note);
+    msr_log(msr, 4, "Time #%d: %s", checkpoint_no, note);
 }
 
 /**
@@ -200,9 +246,9 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
 
     /* Construct the message. */
     apr_vsnprintf(str1, sizeof(str1), text, ap);
-    apr_snprintf(str2, sizeof(str2), "[%s] [%s/sid#%lx][rid#%lx][%s][%i] %s\n",
-        current_logtime(msr->mp), ap_get_server_name(r), (unsigned long)(r->server),
-        (unsigned long)r, ((r->uri == NULL) ? "" : log_escape_nq(msr->mp, r->uri)),
+    apr_snprintf(str2, sizeof(str2), "[%s] [%s/sid#%pp][rid#%pp][%s][%d] %s\n",
+        current_logtime(msr->mp), ap_get_server_name(r), (r->server),
+        r, ((r->uri == NULL) ? "" : log_escape_nq(msr->mp, r->uri)),
         level, str1);
 
     /* Write to the debug log. */
@@ -230,10 +276,13 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
 
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
             "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", r->connection->remote_ip, str1,
-            hostname, log_escape(msr->mp, r->unparsed_uri), unique_id);
+            hostname, log_escape(msr->mp, r->uri), unique_id);
 
         /* Add this message to the list. */
         if (msr != NULL) {
+            /* Force relevency if this is an alert */
+            msr->is_relevant++;
+
             *(const char **)apr_array_push(msr->alerts) = apr_pstrdup(msr->mp, str1);
         }
     }
@@ -269,17 +318,17 @@ char *format_error_log_message(apr_pool_t *mp, error_message *em) {
             log_escape(mp, (char *)em->file));
         if (s_file == NULL) return NULL;
     }
-    
+
     if (em->line > 0) {
-        s_line = apr_psprintf(mp, "[line %i] ", em->line);
+        s_line = apr_psprintf(mp, "[line %d] ", em->line);
         if (s_line == NULL) return NULL;
     }
 
-    s_level = apr_psprintf(mp, "[level %i] ", em->level);
+    s_level = apr_psprintf(mp, "[level %d] ", em->level);
     if (s_level == NULL) return NULL;
 
     if (em->status != 0) {
-        s_status = apr_psprintf(mp, "[status %i] ", em->status);
+        s_status = apr_psprintf(mp, "[status %d] ", em->status);
         if (s_status == NULL) return NULL;
     }
 

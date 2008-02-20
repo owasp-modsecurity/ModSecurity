@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -20,7 +20,7 @@ apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
             free(regex->pe);
             regex->pe = NULL;
         }
-        if (regex->re != NULL) {    
+        if (regex->re != NULL) {
             free(regex->re);
             regex->re = NULL;
         }
@@ -34,7 +34,7 @@ apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
  * parameters are optional, but if they are provided and an error
  * occurs they will contain the error message and the offset in
  * the pattern where the offending part of the pattern begins.
- */  
+ */
 void *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
     const char **_errptr, int *_erroffset)
 {
@@ -64,17 +64,31 @@ void *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
 }
 
 /**
+ * Executes regular expression with extended options.
+ * Returns PCRE_ERROR_NOMATCH when there is no match, error code < -1
+ * on errors, and a value > 0 when there is a match.
+ */
+int msc_regexec_ex(msc_regex_t *regex, const char *s, unsigned int slen,
+    int startoffset, int options, int *ovector, int ovecsize, char **error_msg)
+{
+    if (error_msg == NULL) return -1000; /* To differentiate from PCRE as it already uses -1. */
+    *error_msg = NULL;
+
+    return pcre_exec(regex->re, regex->pe, s, slen, startoffset, options, ovector, ovecsize);
+}
+
+/**
  * Executes regular expression, capturing subexpressions in the given
  * vector. Returns PCRE_ERROR_NOMATCH when there is no match, error code < -1
  * on errors, and a value > 0 when there is a match.
- */                              
+ */
 int msc_regexec_capture(msc_regex_t *regex, const char *s, unsigned int slen,
     int *ovector, int ovecsize, char **error_msg)
 {
     if (error_msg == NULL) return -1000; /* To differentiate from PCRE as it already uses -1. */
     *error_msg = NULL;
 
-    return pcre_exec(regex->re, regex->pe, s, slen, 0, 0, ovector, ovecsize);
+    return msc_regexec_ex(regex, s, slen, 0, 0, ovector, ovecsize, error_msg);
 }
 
 /**
@@ -87,7 +101,7 @@ int msc_regexec(msc_regex_t *regex, const char *s, unsigned int slen,
     if (error_msg == NULL) return -1000; /* To differentiate from PCRE as it already uses -1. */
     *error_msg = NULL;
 
-    return msc_regexec_capture(regex, s, slen, NULL, 0, error_msg);
+    return msc_regexec_ex(regex, s, slen, 0, 0, NULL, 0, error_msg);
 }
 
 /**

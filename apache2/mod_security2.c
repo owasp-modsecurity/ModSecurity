@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -15,6 +15,7 @@
 
 #include "modsecurity.h"
 #include "apache2.h"
+#include "http_main.h"
 #include "pdf_protect.h"
 #include "msc_logging.h"
 #include "msc_util.h"
@@ -23,7 +24,6 @@
 /* ModSecurity structure */
 
 msc_engine DSOLOCAL *modsecurity = NULL;
-
 
 /* Global module variables; these are used for the Apache-specific functionality */
 
@@ -53,25 +53,8 @@ int perform_interception(modsec_rec *msr) {
     msre_actionset *actionset = NULL;
     const char *message = NULL;
     const char *phase_text = "";
-    const char *intreq_text = "";
-    int is_initial_req = ap_is_initial_req(msr->r);
     int status = DECLINED;
     int log_level = 1;
-
-    /* Check for an initial request */
-
-    if (is_initial_req != 1) {
-        if (msr->r->main != NULL) {
-            intreq_text = "Sub-Request: ";
-        }
-        else if (msr->r->prev != NULL) {
-            intreq_text = "Internal Redirect: ";
-        }
-        else {
-            intreq_text = "Internal Request: ";
-        }
-    }
-
 
     /* Sanity checks first. */
 
@@ -81,7 +64,7 @@ int perform_interception(modsec_rec *msr) {
     }
 
     if (msr->phase > 4) {
-        msr_log(msr, 1, "Internal Error: Asked to intercept request in phase %i.", msr->phase);
+        msr_log(msr, 1, "Internal Error: Asked to intercept request in phase %d.", msr->phase);
         msr->was_intercepted = 0;
         return DECLINED;
     }
@@ -89,18 +72,18 @@ int perform_interception(modsec_rec *msr) {
     /* OK, we're good to go. */
 
     actionset = msr->intercept_actionset;
-    phase_text = apr_psprintf(msr->mp, " (phase %i)", msr->phase);
+    phase_text = apr_psprintf(msr->mp, " (phase %d)", msr->phase);
 
     /* By default we log at level 1 but we switch to 4
      * if a nolog action was used or this is not the initial request
      * to hide the message.
      */
-    log_level = ((actionset->log != 1) || (is_initial_req != 1)) ? 4 : 1;
+    log_level = (actionset->log != 1) ? 4 : 1;
 
     /* Pause the request first (if configured and the initial request). */
-    if (actionset->intercept_pause && (is_initial_req == 1)) {
+    if (actionset->intercept_pause) {
         msr_log(msr, (log_level > 3 ? log_level : log_level + 1), "Pausing transaction for "
-            "%i msec.", actionset->intercept_pause);
+            "%d msec.", actionset->intercept_pause);
         /* apr_sleep accepts microseconds */
         apr_sleep((apr_interval_time_t)(actionset->intercept_pause * 1000));
     }
@@ -110,14 +93,14 @@ int perform_interception(modsec_rec *msr) {
         case ACTION_DENY :
             if (actionset->intercept_status != 0) {
                 status = actionset->intercept_status;
-                message = apr_psprintf(msr->mp, "%sAccess denied with code %i%s.",
-                    intreq_text, status, phase_text);
+                message = apr_psprintf(msr->mp, "Access denied with code %d%s.",
+                    status, phase_text);
             } else {
                 log_level = 1;
                 status = HTTP_INTERNAL_SERVER_ERROR;
-                message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
-                    "(Internal Error: Invalid status code requested %i).",
-                    intreq_text, phase_text, actionset->intercept_status);
+                message = apr_psprintf(msr->mp, "Access denied with code 500%s "
+                    "(Internal Error: Invalid status code requested %d).",
+                    phase_text, actionset->intercept_status);
             }
             break;
 
@@ -126,25 +109,25 @@ int perform_interception(modsec_rec *msr) {
                 if (ap_find_linked_module("mod_proxy.c") == NULL) {
                     log_level = 1;
                     status = HTTP_INTERNAL_SERVER_ERROR;
-                    message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
+                    message = apr_psprintf(msr->mp, "Access denied with code 500%s "
                         "(Configuration Error: Proxy action to %s requested but mod_proxy not found).",
-                        intreq_text, phase_text,
+                        phase_text,
                         log_escape_nq(msr->mp, actionset->intercept_uri));
                 } else {
                     msr->r->filename = apr_psprintf(msr->mp, "proxy:%s", actionset->intercept_uri);
                     msr->r->proxyreq = PROXYREQ_REVERSE;
                     msr->r->handler = "proxy-server";
                     status = OK;
-                    message = apr_psprintf(msr->mp, "%sAccess denied using proxy to%s %s.",
-                        intreq_text, phase_text,
+                    message = apr_psprintf(msr->mp, "Access denied using proxy to%s %s.",
+                        phase_text,
                         log_escape_nq(msr->mp, actionset->intercept_uri));
                 }
             } else {
                 log_level = 1;
                 status = HTTP_INTERNAL_SERVER_ERROR;
-                message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
+                message = apr_psprintf(msr->mp, "Access denied with code 500%s "
                     "(Configuration Error: Proxy action requested but it does not work in output phases).",
-                    intreq_text, phase_text);
+                    phase_text);
             }
             break;
 
@@ -157,34 +140,34 @@ int perform_interception(modsec_rec *msr) {
                 extern module core_module;
                 apr_socket_t *csd = ap_get_module_config(msr->r->connection->conn_config,
                     &core_module);
-                
+
                 if (csd) {
                     if (apr_socket_close(csd) == APR_SUCCESS) {
                         status = HTTP_FORBIDDEN;
-                        message = apr_psprintf(msr->mp, "%sAccess denied with connection close%s.",
-                            intreq_text, phase_text);
+                        message = apr_psprintf(msr->mp, "Access denied with connection close%s.",
+                            phase_text);
                     } else {
                         log_level = 1;
                         status = HTTP_INTERNAL_SERVER_ERROR;
-                        message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
+                        message = apr_psprintf(msr->mp, "Access denied with code 500%s "
                             "(Error: Connection drop requested but failed to close the "
                             " socket).",
-                            intreq_text, phase_text);
+                            phase_text);
                     }
                 } else {
                     log_level = 1;
                     status = HTTP_INTERNAL_SERVER_ERROR;
-                    message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
+                    message = apr_psprintf(msr->mp, "Access denied with code 500%s "
                         "(Error: Connection drop requested but socket not found.",
-                        intreq_text, phase_text);
+                        phase_text);
                 }
             }
             #else
             log_level = 1;
             status = HTTP_INTERNAL_SERVER_ERROR;
-            message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
+            message = apr_psprintf(msr->mp, "Access denied with code 500%s "
                 "(Error: Connection drop not implemented on this platform).",
-                intreq_text, phase_text);
+                phase_text);
             #endif
             break;
 
@@ -197,25 +180,39 @@ int perform_interception(modsec_rec *msr) {
             } else {
                 status = HTTP_MOVED_TEMPORARILY;
             }
-            message = apr_psprintf(msr->mp, "%sAccess denied with redirection to %s using "
-                "status %i%s.",
-                intreq_text,
+            message = apr_psprintf(msr->mp, "Access denied with redirection to %s using "
+                "status %d%s.",
                 log_escape_nq(msr->mp, actionset->intercept_uri), status,
                 phase_text);
             break;
 
         case ACTION_ALLOW :
             status = DECLINED;
-            message = apr_psprintf(msr->mp, "%sAccess allowed%s.", intreq_text, phase_text);
+            message = apr_psprintf(msr->mp, "Access allowed%s.", phase_text);
             msr->was_intercepted = 0;
+            msr->allow_scope = ACTION_ALLOW;
+            break;
+
+        case ACTION_ALLOW_PHASE :
+            status = DECLINED;
+            message = apr_psprintf(msr->mp, "Access to phase allowed%s.", phase_text);
+            msr->was_intercepted = 0;
+            msr->allow_scope = ACTION_ALLOW_PHASE;
+            break;
+
+        case ACTION_ALLOW_REQUEST :
+            status = DECLINED;
+            message = apr_psprintf(msr->mp, "Access to request allowed%s.", phase_text);
+            msr->was_intercepted = 0;
+            msr->allow_scope = ACTION_ALLOW_REQUEST;
             break;
 
         default :
             log_level = 1;
             status = HTTP_INTERNAL_SERVER_ERROR;
-            message = apr_psprintf(msr->mp, "%sAccess denied with code 500%s "
-                "(Internal Error: invalid interception action %i).",
-                intreq_text, phase_text, actionset->intercept_action);
+            message = apr_psprintf(msr->mp, "Access denied with code 500%s "
+                "(Internal Error: invalid interception action %d).",
+                phase_text, actionset->intercept_action);
             break;
     }
 
@@ -229,13 +226,14 @@ int perform_interception(modsec_rec *msr) {
  * Retrieves a previously stored transaction context by
  * looking at the main request, and the previous requests.
  */
-static modsec_rec *retrieve_tx_context(const request_rec *r) {
+static modsec_rec *retrieve_tx_context(request_rec *r) {
     modsec_rec *msr = NULL;
     request_rec *rx = NULL;
 
     /* Look in the current request first. */
     msr = (modsec_rec *)apr_table_get(r->notes, NOTE_MSR);
     if (msr != NULL) {
+        msr->r = r;
         return msr;
     }
 
@@ -243,6 +241,7 @@ static modsec_rec *retrieve_tx_context(const request_rec *r) {
     if (r->main != NULL) {
         msr = (modsec_rec *)apr_table_get(r->main->notes, NOTE_MSR);
         if (msr != NULL) {
+            msr->r = r;
             return msr;
         }
     }
@@ -252,6 +251,7 @@ static modsec_rec *retrieve_tx_context(const request_rec *r) {
     while(rx != NULL) {
         msr = (modsec_rec *)apr_table_get(rx->notes, NOTE_MSR);
         if (msr != NULL) {
+            msr->r = r;
             return msr;
         }
         rx = rx->prev;
@@ -344,18 +344,21 @@ static modsec_rec *create_tx_context(request_rec *r) {
     msr->request_headers = apr_table_copy(msr->mp, r->headers_in);
     msr->hostname = ap_get_server_name(r);
 
+    msr->msc_rule_mptmp = NULL;
+
     /* Invoke the engine to continue with initialisation */
-    if (modsecurity_tx_init(msr) < 0) return NULL;
+    if (modsecurity_tx_init(msr) < 0) {
+        msr_log(msr, 1, "Failed to initialise transaction (txid %s).", msr->txid);
+        return NULL;
+    }
 
     store_tx_context(msr, r);
 
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Transaction context created (dcfg %x).", msr->dcfg1);
+        msr_log(msr, 4, "Transaction context created (dcfg %pp).", msr->dcfg1);
     }
 
-    msr->msc_rule_mptmp = NULL;
-
-    return msr;    
+    return msr;
 }
 
 
@@ -371,7 +374,8 @@ static apr_status_t change_server_signature(server_rec *s) {
 
     if (new_server_signature == NULL) return 0;
 
-    server_version = (char *)ap_get_server_version();
+    server_version = (char *)apache_get_server_version();
+
     if (server_version == NULL) {
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, s,
             "SecServerSignature: Apache returned null as signature.");
@@ -386,6 +390,18 @@ static apr_status_t change_server_signature(server_rec *s) {
             "SecServerSignature: original signature too short. Please set "
             "ServerTokens to Full.");
         return -1;
+    }
+
+    /* Check that it really changed.  This assumes that what we got was
+     * not a copy and this could change in future versions of Apache.
+     */
+    server_version = (char *)apache_get_server_version();
+    if ((server_version == NULL) || (strcmp(server_version, new_server_signature) != 0)) {
+        ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, s, "SecServerSignature: Failed to change server signature to \"%s\".", new_server_signature);
+        return 0;
+    }
+    else {
+        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, 0, s, "SecServerSignature: Changed server signature to \"%s\".", server_version);
     }
 
     return 1;
@@ -406,12 +422,10 @@ static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_te
     /* Initialise ModSecurity engine */
     modsecurity = modsecurity_create(mp, MODSEC_ONLINE);
     if (modsecurity == NULL) {
-        /* ENH Since s not available, how do we log from here? stderr?
-         * ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-         *    "ModSecurity: Failed to initialise engine.");
-         */
+        ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
+            "ModSecurity: Failed to initialise engine.");
         return HTTP_INTERNAL_SERVER_ERROR;
-    }    
+    }
 
     return OK;
 }
@@ -422,6 +436,10 @@ static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_te
 static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_temp, server_rec *s) {
     void *init_flag = NULL;
     int first_time = 0;
+
+    /* ENH Figure out a way to validate config before we start
+     * - skipafter: need to make sure we found all of our targets
+     */
 
     /* Figure out if we are here for the first time */
     apr_pool_userdata_get(&init_flag, "modsecurity-init-flag", s->process->pool);
@@ -434,7 +452,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
     }
 
     /* Store the original server signature */
-    real_server_signature = apr_pstrdup(mp, ap_get_server_version());
+    real_server_signature = apr_pstrdup(mp, apache_get_server_version());
 
     /* Make some space in the server signature for later */
     if (new_server_signature != NULL) {
@@ -454,7 +472,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
 
         if (first_time == 0) {
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "ModSecurity: chroot checkpoint #2 (pid=%i ppid=%i)", getpid(), getppid());
+                "ModSecurity: chroot checkpoint #2 (pid=%ld ppid=%ld)", (long)getpid(), (long)getppid());
 
             if (chdir(chroot_dir) < 0) {
                 ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, s,
@@ -483,7 +501,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
                 "ModSecurity: chroot successful, path=%s", chroot_dir);
         } else {
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "ModSecurity: chroot checkpoint #1 (pid=%i ppid=%i)", getpid(), getppid());
+                "ModSecurity: chroot checkpoint #1 (pid=%ld ppid=%ld)", (long)getpid(), (long)getppid());
         }
     }
     #endif
@@ -493,13 +511,13 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
 
     /* Log our presence to the error log. */
     if (first_time) {
+        ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
+                "%s configured.", MODULE_NAME_FULL);
+
+        /* If we've changed the server signature make note of the original. */
         if (new_server_signature != NULL) {
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "ModSecurity for Apache %s configured - %s", MODULE_RELEASE, real_server_signature);
-        }
-        else {
-            ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "ModSecurity for Apache %s configured", MODULE_RELEASE);
+                "Original server signature: %s", real_server_signature);
         }
     }
 
@@ -547,7 +565,7 @@ static int hook_request_early(request_rec *r) {
     /* Check request body limit (should only trigger on non-chunked requests). */
     if (msr->request_content_length > msr->txcfg->reqbody_limit) {
         msr_log(msr, 1, "Request body is larger than the "
-                     "configured limit (%lu).", msr->txcfg->reqbody_limit);
+                     "configured limit (%ld).", msr->txcfg->reqbody_limit);
         return HTTP_REQUEST_ENTITY_TOO_LARGE;
     }
 
@@ -569,6 +587,13 @@ static int hook_request_late(request_rec *r) {
     modsec_rec *msr = NULL;
     int rc;
 
+    /* This function needs to run only once per transaction
+     * (i.e. subrequests and redirects are excluded).
+     */
+    if ((r->main != NULL)||(r->prev != NULL)) {
+        return DECLINED;
+    }
+
     /* Find the transaction context and make sure
      * we are supposed to proceed.
      */
@@ -579,25 +604,19 @@ static int hook_request_late(request_rec *r) {
          */
         return DECLINED;
     }
-    msr->r = r;
-    msr->remote_user = r->user;
 
     /* Has this phase been completed already? */
     if (msr->phase_request_body_complete) {
-        if (msr->was_intercepted) {
-            msr_log(msr, 4, "Phase REQUEST_BODY request already intercepted.  Intercepting additional request.");
-            return perform_interception(msr);
-        }
-        if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Phase REQUEST_BODY already complete, skipping.");
-        }
+        msr_log(msr, 1, "Internal Error: Attempted to process the request body more than once.");
         return DECLINED;
     }
     msr->phase_request_body_complete = 1;
 
+    msr->remote_user = r->user;
+
     /* Get the second configuration context. */
     msr->dcfg2 = (directory_config *)ap_get_module_config(r->per_dir_config,
-        &security2_module);    
+        &security2_module);
 
     /* Create a transaction context. */
     msr->txcfg = create_directory_config(msr->mp, NULL);
@@ -629,7 +648,7 @@ static int hook_request_late(request_rec *r) {
     }
 
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Second phase starting (dcfg %x).", msr->dcfg2);
+        msr_log(msr, 4, "Second phase starting (dcfg %pp).", msr->dcfg2);
     }
 
     /* Figure out whether or not to extract multipart files. */
@@ -644,14 +663,22 @@ static int hook_request_late(request_rec *r) {
     if (rc < 0) {
         switch(rc) {
             case -1 :
-                msr_log(msr, 1, "%s", my_error_msg);
+                if (my_error_msg != NULL) {
+                    msr_log(msr, 1, "%s", my_error_msg);
+                }
                 return HTTP_INTERNAL_SERVER_ERROR;
                 break;
             case -4 : /* Timeout. */
+                if (my_error_msg != NULL) {
+                    msr_log(msr, 4, "%s", my_error_msg);
+                }
                 r->connection->keepalive = AP_CONN_CLOSE;
                 return HTTP_REQUEST_TIME_OUT;
                 break;
             case -5 : /* Request body limit reached. */
+                if (my_error_msg != NULL) {
+                    msr_log(msr, 1, "%s", my_error_msg);
+                }
                 r->connection->keepalive = AP_CONN_CLOSE;
                 return HTTP_REQUEST_ENTITY_TOO_LARGE;
                 break;
@@ -667,8 +694,9 @@ static int hook_request_late(request_rec *r) {
     /* Update the request headers. They might have changed after
      * the body was read (trailers).
      */
-    // TODO We still need to keep a copy of the original headers
-    //      to log in the audit log.
+    /* NOTE We still need to keep a copy of the original headers
+     *      to log in the audit log.
+     */
     msr->request_headers = apr_table_copy(msr->mp, r->headers_in);
 
     /* Process phase REQUEST_BODY */
@@ -694,7 +722,24 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
     error_message *em = NULL;
 
     if (r == NULL) return;
-    msr = retrieve_tx_context(r);
+    msr = retrieve_tx_context((request_rec *)r);
+
+    /* Create a context for requests we never had the chance to process */
+    if ((msr == NULL)
+        && ((level & APLOG_LEVELMASK) < APLOG_DEBUG)
+        && apr_table_get(r->subprocess_env, "UNIQUE_ID"))
+    {
+        msr = create_tx_context((request_rec *)r);
+        if (msr->txcfg->debuglog_level >= 9) {
+            if (msr == NULL) {
+                msr_log(msr, 9, "Failed to create context after request failure.");
+            }
+            else {
+                msr_log(msr, 9, "Context created after request failure.");
+            }
+        }
+    }
+
     if (msr == NULL) return;
 
     /* Store the error message for later */
@@ -760,7 +805,7 @@ static void sec_guardian_logger(request_rec *r, request_rec *origr, modsec_rec *
      * The fields SESSION_ID, MODSEC_MESSAGE, and MODSEC_RATING are not used at the moment.
      */
 
-    str2 = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT " %" APR_TIME_T_FMT " \"%s\" %i",
+    str2 = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT " %" APR_TIME_T_FMT " \"%s\" %d",
         duration, apr_time_sec(duration), log_escape(msr->mp, modsec_message), modsec_rating);
     if (str2 == NULL) return;
 
@@ -781,7 +826,7 @@ static void sec_guardian_logger(request_rec *r, request_rec *origr, modsec_rec *
 
     limit = limit - strlen(str2) - 5;
     if (limit <= 0) {
-        msr_log(msr, 1, "Audit Log: Atomic PIPE write buffer too small: %i", PIPE_BUF);
+        msr_log(msr, 1, "Audit Log: Atomic PIPE write buffer too small: %d", PIPE_BUF);
         return;
     }
 
@@ -836,11 +881,11 @@ static int hook_log_transaction(request_rec *r) {
     while ((arr->nelts == 0)&&(r->prev != NULL)) {
         r = r->prev;
         arr = apr_table_elts(r->headers_out);
-    }    
+    }
 
     msr->r = r;
     msr->response_status = r->status;
-    msr->status_line = ((r->status_line != NULL)    
+    msr->status_line = ((r->status_line != NULL)
         ? r->status_line : ap_get_status_line(r->status));
     msr->response_protocol = get_response_protocol(origr);
     msr->response_headers = apr_table_copy(msr->mp, r->headers_out);
@@ -871,9 +916,25 @@ static void hook_insert_filter(request_rec *r) {
     msr = retrieve_tx_context(r);
     if (msr == NULL) return;
 
+    /* Add the input filter, but only if we need it to run. */
+    if (msr->if_status == IF_STATUS_WANTS_TO_RUN) {
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Hook insert_filter: Adding input forwarding filter %s(r %pp).", (((r->main != NULL)||(r->prev != NULL)) ? "for subrequest " : ""), r);
+        }
+
+        ap_add_input_filter("MODSECURITY_IN", msr, r, r->connection);
+    }
+
+    /* The output filters only need to be added only once per transaction
+     * (i.e. subrequests and redirects are excluded).
+     */
+    if ((r->main != NULL)||(r->prev != NULL)) {
+        return;
+    }
+
     /* We always add the PDF XSS protection filter. */
     if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Hook insert_filter: Adding PDF XSS protection output filter (r %x).", r);
+        msr_log(msr, 4, "Hook insert_filter: Adding PDF XSS protection output filter (r %pp).", r);
     }
 
     ap_add_output_filter("PDFP_OUT", msr, r, r->connection);
@@ -883,16 +944,8 @@ static void hook_insert_filter(request_rec *r) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_filter: Processing disabled, skipping.");
         }
+
         return;
-    }
-
-    /* Add the input filter, but only if we need it to run. */
-    if (msr->if_status == IF_STATUS_WANTS_TO_RUN) {
-        if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Hook insert_filter: Adding input forwarding filter (r %x).", r);
-        }
-
-        ap_add_input_filter("MODSECURITY_IN", msr, r, r->connection);
     }
 
     /* We always add the output filter because that's where we need to
@@ -901,14 +954,13 @@ static void hook_insert_filter(request_rec *r) {
      */
     if (msr->of_status != OF_STATUS_COMPLETE) {
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Hook insert_filter: Adding output filter (r %x).", r);
+            msr_log(msr, 4, "Hook insert_filter: Adding output filter (r %pp).", r);
         }
 
         ap_add_output_filter("MODSECURITY_OUT", msr, r, r->connection);
     }
 }
 
-#if 0
 /**
  * Invoked whenever Apache starts processing an error. A chance
  * to insert ourselves into the output filter chain.
@@ -919,25 +971,30 @@ static void hook_insert_error_filter(request_rec *r) {
     /* Find the transaction context and make sure we are
      * supposed to proceed.
      */
-
-    /* TODO Insert filter but make a note that it's the error
-     *      response the filter would be receiving.
-     */
-
     msr = retrieve_tx_context(r);
     if (msr == NULL) return;
 
+    /* Do not run if not enabled. */
     if (msr->txcfg->is_enabled == 0) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_error_filter: Processing disabled, skipping.");
         }
         return;
     }
-    
+
+    /* Do not run if the output filter already completed. This will
+     * happen if we intercept in phase 4.
+     */
     if (msr->of_status != OF_STATUS_COMPLETE) {
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Hook insert_error_filter: Adding output filter (r %x).", r);
+            msr_log(msr, 4, "Hook insert_error_filter: Adding output filter (r %pp).", r);
         }
+
+        /* Make a note that the output we will be receiving is a
+         * result of error processing.
+         */
+        msr->of_is_error = 1;
+
         ap_add_output_filter("MODSECURITY_OUT", msr, r, r->connection);
     } else {
         if (msr->txcfg->debuglog_level >= 4) {
@@ -945,15 +1002,15 @@ static void hook_insert_error_filter(request_rec *r) {
         }
     }
 }
-#endif
 
+#if (!defined(NO_MODSEC_API))
 /**
  * This function is exported for other Apache modules to
  * register new transformation functions.
  */
 static void modsec_register_tfn(const char *name, void *fn) {
     if (modsecurity != NULL) {
-        msre_engine_tfn_register(modsecurity->msre, name, fn);
+        msre_engine_tfn_register(modsecurity->msre, name, (fn_tfn_execute_t)fn);
     }
 }
 
@@ -963,7 +1020,7 @@ static void modsec_register_tfn(const char *name, void *fn) {
  */
 static void modsec_register_operator(const char *name, void *fn_init, void *fn_exec) {
     if (modsecurity != NULL) {
-        msre_engine_op_register(modsecurity->msre, name, fn_init, fn_exec);
+        msre_engine_op_register(modsecurity->msre, name, (fn_op_param_init_t)fn_init, (fn_op_execute_t)fn_exec);
     }
 }
 
@@ -982,6 +1039,7 @@ static void modsec_register_variable(const char *name, unsigned int type,
         fprintf(stderr,"modsecurity is NULL\n");
     }
 }
+#endif
 
 /**
  * Registers module hooks with Apache.
@@ -998,6 +1056,10 @@ static void register_hooks(apr_pool_t *mp) {
         NULL
     };
     static const char *postread_beforeme_list[] = {
+        "mod_rpaf.c",
+        "mod_extract_forwarded2.c",
+        "mod_breach_realip.c",
+        "mod_breach_trans.c",
         "mod_unique_id.c",
         NULL
     };
@@ -1006,10 +1068,15 @@ static void register_hooks(apr_pool_t *mp) {
         NULL
     };
 
+    /* Add the MODSEC_a.b define */
+    *(char **)apr_array_push(ap_server_config_defines) = apr_psprintf(mp, "MODSEC_%s.%s", MODSEC_VERSION_MAJOR, MODSEC_VERSION_MINOR);
+
+#if (!defined(NO_MODSEC_API))
     /* Export optional functions. */
     APR_REGISTER_OPTIONAL_FN(modsec_register_tfn);
     APR_REGISTER_OPTIONAL_FN(modsec_register_operator);
     APR_REGISTER_OPTIONAL_FN(modsec_register_variable);
+#endif
 
     /* Main hooks */
     ap_hook_pre_config(hook_pre_config, NULL, NULL, APR_HOOK_FIRST);
@@ -1020,7 +1087,7 @@ static void register_hooks(apr_pool_t *mp) {
     /* Our own hook to handle RPC transactions (not used at the moment).
      * // ap_hook_handler(hook_handler, NULL, NULL, APR_HOOK_MIDDLE);
      */
-    
+
     /* Transaction processing hooks */
     ap_hook_post_read_request(hook_request_early,
         postread_beforeme_list, postread_afterme_list, APR_HOOK_REALLY_FIRST);
@@ -1033,7 +1100,7 @@ static void register_hooks(apr_pool_t *mp) {
 
     /* Filter hooks */
     ap_hook_insert_filter(hook_insert_filter, NULL, NULL, APR_HOOK_FIRST);
-    /* ap_hook_insert_error_filter(hook_insert_error_filter, NULL, NULL, APR_HOOK_FIRST); */
+    ap_hook_insert_error_filter(hook_insert_error_filter, NULL, NULL, APR_HOOK_FIRST);
 
     ap_register_input_filter("MODSECURITY_IN", input_filter,
         NULL, AP_FTYPE_CONTENT_SET);

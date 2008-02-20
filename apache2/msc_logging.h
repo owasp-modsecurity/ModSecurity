@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -28,7 +28,9 @@
 #define AUDITLOG_PART_A_RESPONSE_BODY       'G'
 #define AUDITLOG_PART_TRAILER               'H'
 #define AUDITLOG_PART_FAKE_REQUEST_BODY     'I'
-#define AUDITLOG_PART_LAST                  'I'
+#define AUDITLOG_PART_UPLOADS               'J'
+#define AUDITLOG_PART_MATCHEDRULES          'K'
+#define AUDITLOG_PART_LAST                  'K'
 #define AUDITLOG_PART_ENDMARKER             'Z'
 
 #include "modsecurity.h"

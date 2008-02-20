@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -16,6 +16,15 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <apr_lib.h>
+
+/* NOTE: Be careful as these can ONLY be used on static values for X.
+ * (i.e. VALID_HEX(c++) will NOT work)
+ */
+#define VALID_HEX(X) (((X >= '0')&&(X <= '9')) || ((X >= 'a')&&(X <= 'f')) || ((X >= 'A')&&(X <= 'F')))
+#define ISODIGIT(X) ((X >= '0')&&(X <= '7'))
+
+
 /**
  *
  */
@@ -28,7 +37,7 @@ int parse_boolean(const char *input) {
     if (strcasecmp(input, "false") == 0) return 0;
     if (strcasecmp(input, "0") == 0) return 0;
 
-    return -1;    
+    return -1;
 }
 
 /**
@@ -58,15 +67,18 @@ int parse_name_eq_value(apr_pool_t *mp, const char *input, char **name, char **v
     *value = apr_pstrdup(mp, p);
     if (*value == NULL) return -1;
 
-    return 1;    
+    return 1;
 }
 
 /**
  *
+ * IMP1 Assumes NUL-terminated
  */
-char *url_encode(apr_pool_t *mp, char *input, unsigned int input_len) {
+char *url_encode(apr_pool_t *mp, char *input, unsigned int input_len, int *changed) {
     char *rval, *d;
     unsigned int i, len;
+
+    *changed = 0;
 
     len = input_len * 3 + 1;
     d = rval = apr_palloc(mp, len);
@@ -79,6 +91,7 @@ char *url_encode(apr_pool_t *mp, char *input, unsigned int input_len) {
 
         if (c == ' ') {
             *d++ = '+';
+            *changed = 1;
         } else
         if ( (c == 42) || ((c >= 48)&&(c <= 57)) || ((c >= 65)&&(c <= 90))
             || ((c >= 97)&&(c <= 122))
@@ -88,11 +101,12 @@ char *url_encode(apr_pool_t *mp, char *input, unsigned int input_len) {
             *d++ = '%';
             c2x(c, (unsigned char *)d);
             d += 2;
+            *changed = 1;
         }
     }
 
     *d = '\0';
-    
+
     return rval;
 }
 
@@ -115,7 +129,7 @@ char *strnurlencat(char *destination, char *source, unsigned int maxlen) {
      */
     while((*s != '\0')&&(maxlen > 0)) {
         unsigned char c = *s;
-        
+
         if (c == ' ') {
             *d++ = '+';
             maxlen--;
@@ -138,12 +152,12 @@ char *strnurlencat(char *destination, char *source, unsigned int maxlen) {
                 maxlen = 0;
             }
         }
-        
+
         s++;
     }
 
     *d++ = '\0';
-    
+
     return destination;
 }
 
@@ -282,13 +296,13 @@ int remove_lf_crlf_inplace(char *text) {
     char *p = text;
     int count = 0;
 
-    if (text == NULL) return -1;    
-    
+    if (text == NULL) return -1;
+
     while(*p != '\0') {
         count++;
         p++;
     }
-    
+
     if (count > 0) {
         if (*(p - 1) == '\n') {
             *(p - 1) = '\0';
@@ -299,7 +313,7 @@ int remove_lf_crlf_inplace(char *text) {
             }
         }
     }
-    
+
     return 1;
 }
 
@@ -450,9 +464,39 @@ char *log_escape_raw(apr_pool_t *mp, const unsigned char *text, unsigned long in
     unsigned long int i, j;
 
     for (i = 0, j = 0; i < text_length; i++, j += 4) {
-        apr_snprintf((char *)ret+j, 5, "\\x%02x", text[i]);
+        ret[j] = '\\';
+        ret[j+1] = 'x';
+        c2x(text[i], ret+j+2);
     }
     ret[text_length * 4] = '\0';
+
+    return (char *)ret;
+}
+
+/**
+ * Transform text to ASCII printable or hex escaped
+ */
+char *log_escape_hex(apr_pool_t *mp, const unsigned char *text, unsigned long int text_length) {
+    unsigned char *ret = apr_palloc(mp, text_length * 4 + 1);
+    unsigned long int i, j;
+
+    for (i = 0, j = 0; i < text_length; i++) {
+        if (  (text[i] == '"')
+            ||(text[i] == '\\')
+            ||(text[i] <= 0x1f)
+            ||(text[i] >= 0x7f))
+        {
+            ret[j] = '\\';
+            ret[j+1] = 'x';
+            c2x(text[i], ret+j+2);
+            j += 4;
+        }
+        else {
+            ret[j] = text[i];
+            j ++;
+        }
+    }
+    ret[j] = '\0';
 
     return (char *)ret;
 }
@@ -536,14 +580,135 @@ char *_log_escape(apr_pool_t *mp, const unsigned char *input, unsigned long int 
     return ret;
 }
 
-#define VALID_HEX(X) (((X >= '0')&&(X <= '9')) || ((X >= 'a')&&(X <= 'f')) || ((X >= 'A')&&(X <= 'F')))
+/**
+ * JavaScript decoding.
+ * IMP1 Assumes NUL-terminated
+ */
+
+int js_decode_nonstrict_inplace(unsigned char *input, long int input_len) {
+    unsigned char *d = (unsigned char *)input;
+    long int i, count;
+
+    if (input == NULL) return -1;
+
+    i = count = 0;
+    while (i < input_len) {
+        if (input[i] == '\\') {
+            /* Character is an escape. */
+
+            if (   (i + 5 < input_len) && (input[i + 1] == 'u')
+                && (VALID_HEX(input[i + 2])) && (VALID_HEX(input[i + 3]))
+                && (VALID_HEX(input[i + 4])) && (VALID_HEX(input[i + 5])) )
+            {
+                /* \uHHHH */
+
+                /* Use only the lower byte. */
+                *d = x2c(&input[i + 4]);
+
+                /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
+                if (   (*d > 0x00) && (*d < 0x5f)
+                    && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
+                    && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
+                {
+                    (*d) += 0x20;
+                }
+
+                d++;
+                count++;
+                i += 6;
+            }
+            else if (   (i + 3 < input_len) && (input[i + 1] == 'x')
+                     && VALID_HEX(input[i + 2]) && VALID_HEX(input[i + 3])) {
+                /* \xHH */
+                *d++ = x2c(&input[i + 2]);
+                count++;
+                i += 4;
+            }
+            else if ((i + 1 < input_len) && ISODIGIT(input[i + 1])) {
+                /* \OOO (only one byte, \000 - \377) */
+                char buf[4];
+                int j = 0;
+
+                while((i + 1 + j < input_len)&&(j < 3)) {
+                    buf[j] = input[i + 1 + j];
+                    j++;
+                    if (!ISODIGIT(input[i + 1 + j])) break;
+                }
+                buf[j] = '\0';
+
+                if (j > 0) {
+                    /* Do not use 3 characters if we will be > 1 byte */
+                    if ((j == 3) && (buf[0] > '3')) {
+                        j = 2;
+                        buf[j] = '\0';
+                    }
+                    *d++ = strtol(buf, NULL, 8);
+                    i += 1 + j;
+                    count++;
+                }
+            }
+            else if (i + 1 < input_len) {
+                /* \C */
+                unsigned char c = input[i + 1];
+                switch(input[i + 1]) {
+                    case 'a' :
+                        c = '\a';
+                        break;
+                    case 'b' :
+                        c = '\b';
+                        break;
+                    case 'f' :
+                        c = '\f';
+                        break;
+                    case 'n' :
+                        c = '\n';
+                        break;
+                    case 'r' :
+                        c = '\r';
+                        break;
+                    case 't' :
+                        c = '\t';
+                        break;
+                    case 'v' :
+                        c = '\v';
+                        break;
+                    /* The remaining (\?,\\,\',\") are just a removal
+                     * of the escape char which is default.
+                     */
+                }
+
+                *d++ = c;
+                i += 2;
+                count++;
+            }
+            else {
+                /* Not enough bytes */
+                while(i < input_len) {
+                    *d++ = input[i++];
+                    count++;
+                }
+            }
+        }
+        else {
+            *d++ = input[i++];
+            count++;
+        }
+    }
+
+    *d = '\0';
+
+    return count;
+}
 
 /**
  *
+ * IMP1 Assumes NUL-terminated
  */
-int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len) {
+int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len, int *changed) {
     unsigned char *d = input;
     long int i, count;
+
+    *changed = 0;
 
     if (input == NULL) return -1;
 
@@ -567,27 +732,24 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
                             && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
                             && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
                         {
-                            *d += 0x20;
+                            (*d) += 0x20;
                         }
 
                         d++;
                         count++;
                         i += 6;
+                        *changed = 1;
                     } else {
-                        /* Invalid data. */
-                        int j;
-
-                        for(j = 0; (j < 6)&&(i < input_len); j++) {
-                            *d++ = input[i++];
-                            count++;
-                        }
+                        /* Invalid data, skip %u. */
+                        *d++ = input[i++];
+                        *d++ = input[i++];
+                        count += 2;
                     }
                 } else {
-                    /* Not enough bytes available (4 data bytes were needed). */
-                    while(i < input_len) {
-                        *d++ = input[i++];
-                        count++;
-                    }
+                    /* Not enough bytes (4 data bytes), skip %u. */
+                    *d++ = input[i++];
+                    *d++ = input[i++];
+                    count += 2;
                 }
             }
             else {
@@ -602,35 +764,20 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
                     char c1 = input[i + 1];
                     char c2 = input[i + 2];
 
-                    /* ENH Use VALID_HEX? */
-                    if ( (((c1 >= '0')&&(c1 <= '9')) || ((c1 >= 'a')&&(c1 <= 'f')) ||
-                          ((c1 >= 'A')&&(c1 <= 'F')))
-                        && (((c2 >= '0')&&(c2 <= '9')) || ((c2 >= 'a')&&(c2 <= 'f')) ||
-                            ((c2 >= 'A')&&(c2 <= 'F'))) )
-                    {
+                    if (VALID_HEX(c1) && VALID_HEX(c2)) {
                         *d++ = x2c(&input[i + 1]);
                         count++;
                         i += 3;
+                        *changed = 1;
                     } else {
-                        /* Not a valid encoding, copy the raw input bytes. */
-                        *d++ = '%';
-                        *d++ = c1;
-                        *d++ = c2;
-                        count += 3;
-                        i += 3;
+                        /* Not a valid encoding, skip this % */
+                        *d++ = input[i++];
+                        count++;
                     }
                 } else {
-                    /* Not enough bytes available. */
-                
-                    *d++ = '%';
+                    /* Not enough bytes available, skip this % */
+                    *d++ = input[i++];
                     count++;
-                    i++;
-
-                    if (i + 1 < input_len) {
-                        *d++ = input[i];
-                        count++;
-                        i++;
-                    }
                 }
             }
         }
@@ -638,6 +785,7 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
             /* Character is not a percent sign. */
             if (input[i] == '+') {
                 *d++ = ' ';
+                *changed = 1;
             } else {
                 *d++ = input[i];
             }
@@ -654,10 +802,13 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len)
 
 /**
  *
+ * IMP1 Assumes NUL-terminated
  */
-int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int *invalid_count) {
+int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int *invalid_count, int *changed) {
     unsigned char *d = (unsigned char *)input;
     long int i, count;
+
+    *changed = 0;
 
     if (input == NULL) return -1;
 
@@ -671,41 +822,29 @@ int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int
                 char c1 = input[i + 1];
                 char c2 = input[i + 2];
 
-                /* ENH Use VALID_HEX? */
-                if ( (((c1 >= '0')&&(c1 <= '9')) || ((c1 >= 'a')&&(c1 <= 'f')) || ((c1 >= 'A')&&(c1 <= 'F')))
-                    && (((c2 >= '0')&&(c2 <= '9')) || ((c2 >= 'a')&&(c2 <= 'f')) || ((c2 >= 'A')&&(c2 <= 'F'))) )
-                {
+                if (VALID_HEX(c1) && VALID_HEX(c2)) {
                     /* Valid encoding - decode it. */
                     *d++ = x2c(&input[i + 1]);
                     count++;
                     i += 3;
+                    *changed = 1;
                 } else {
-                    /* Invalid encoding, just copy the raw bytes. */
-                    *d++ = '%';
-                    *d++ = c1;
-                    *d++ = c2;
-                    count += 3;
-                    i += 3;
-                    (*invalid_count)++; /* parens quiet compiler warning */
+                    /* Not a valid encoding, skip this % */
+                    *d++ = input[i++];
+                    count ++;
+                    (*invalid_count)++;
                 }
             } else {
                 /* Not enough bytes available, copy the raw bytes. */
-                (*invalid_count)++; /* parens quiet compiler warning */
-
-                *d++ = '%';
-                count++;
-                i++;
-
-                if (i + 1 < input_len) {
-                    *d++ = input[i];
-                    count++;
-                    i++;
-                }
+                *d++ = input[i++];
+                count ++;
+                (*invalid_count)++;
             }
         } else {
             /* Character is not a percent sign. */
             if (input[i] == '+') {
                 *d++ = ' ';
+                *changed = 1;
             } else {
                 *d++ = input[i];
             }
@@ -721,13 +860,14 @@ int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int
 
 /**
  *
+ * IMP1 Assumes NUL-terminated
  */
 int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input_len) {
     unsigned char *d = input;
     int i, count;
 
-    if ((input == NULL)||(input_len <= 0)) return 0;    
-    
+    if ((input == NULL)||(input_len <= 0)) return 0;
+
     i = count = 0;
     while((i < input_len)&&(count < input_len)) {
         int z, copy = 1;
@@ -756,7 +896,7 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
                     while((j < input_len)&&(isxdigit(input[j]))) j++;
                     if (j > k) { /* Do we have at least one digit? */
                         /* Decode the entity. */
-                        char *x = apr_pstrmemdup(mp, (const char*)&input[k], j - k);
+                        char *x = apr_pstrmemdup(mp, (const char *)&input[k], j - k);
                         *d++ = (unsigned char)strtol(x, NULL, 16);
                         count++;
 
@@ -774,7 +914,7 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
                     while((j < input_len)&&(isdigit(input[j]))) j++;
                     if (j > k) { /* Do we have at least one digit? */
                         /* Decode the entity. */
-                        char *x = apr_pstrmemdup(mp, (const char*)&input[k], j - k);
+                        char *x = apr_pstrmemdup(mp, (const char *)&input[k], j - k);
                         *d++ = (unsigned char)strtol(x, NULL, 10);
                         count++;
 
@@ -793,9 +933,10 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
                 k = j;
                 while((j < input_len)&&(isalnum(input[j]))) j++;
                 if (j > k) { /* Do we have at least one digit? */
-                    char *x = apr_pstrmemdup(mp, (const char*)&input[k], j - k);
+                    char *x = apr_pstrmemdup(mp, (const char *)&input[k], j - k);
 
                     /* Decode the entity. */
+                    /* ENH What about others? */
                     if (strcasecmp(x, "quot") == 0) *d++ = '"';
                     else
                     if (strcasecmp(x, "amp") == 0) *d++ = '&';
@@ -835,8 +976,10 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
     return count;
 }
 
-#define ISODIGIT(X) ((X >= '0')&&(X <= '7'))
-
+/**
+ *
+ * IMP1 Assumes NUL-terminated
+ */
 int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len) {
     unsigned char *d = input;
     int i, count;
@@ -845,10 +988,6 @@ int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len) {
     while(i < input_len) {
         if ((input[i] == '\\')&&(i + 1 < input_len)) {
             int c = -1;
-        
-            /* ENH Should we handle \c as well?
-             *     See http://www.opengroup.org/onlinepubs/009695399/utilities/printf.html
-             */
 
             switch(input[i + 1]) {
                 case 'a' :
@@ -901,14 +1040,11 @@ int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len) {
                     }
                 }
                 else
-                if (isdigit(input[i + 1])) { /* Octal. */
-                    char buf[10];
-                    int j = 0, l = 3;
+                if (ISODIGIT(input[i + 1])) { /* Octal. */
+                    char buf[4];
+                    int j = 0;
 
-                    /* Up to 4 digits if the first digit is a zero. */
-                    if (input[i + 1] == '0') l = 4;
-
-                    while((i + 1 + j < input_len)&&(j <= l)) {
+                    while((i + 1 + j < input_len)&&(j < 3)) {
                         buf[j] = input[i + 1 + j];
                         j++;
                         if (!ISODIGIT(input[i + 1 + j])) break;
@@ -944,16 +1080,25 @@ int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len) {
     return count;
 }
 
-int normalise_path_inplace(unsigned char *input, int input_len, int win) {
+/**
+ *
+ * IMP1 Assumes NUL-terminated
+ */
+int normalise_path_inplace(unsigned char *input, int input_len, int win, int *changed) {
     unsigned char *d = input;
     int i, count;
+
+    *changed = 0;
 
     i = count = 0;
     while ((i < input_len)&&(count < input_len)) {
         char c = input[i];
 
         /* Convert backslash to forward slash on Windows only. */
-        if ((win)&&(c == '\\')) c = '/';
+        if ((win)&&(c == '\\')) {
+            c = '/';
+            *changed = 1;
+        }
 
         if (c == '/') {
             /* Is there a directory back-reference? Yes, we
@@ -963,6 +1108,8 @@ int normalise_path_inplace(unsigned char *input, int input_len, int win) {
             if ((count >= 5)&&(*(d - 1) == '.')&&(*(d - 2) == '.')&&(*(d - 3) == '/')) {
                 unsigned char *cd = d - 4;
                 int ccount = count - 4;
+
+                *changed = 1;
 
                 /* Go back until we reach the beginning or a forward slash. */
                 while ((ccount > 0)&&(*cd != '/')) {
@@ -980,12 +1127,14 @@ int normalise_path_inplace(unsigned char *input, int input_len, int win) {
                 /* Ignore the last two bytes. */
                 d -= 2;
                 count -= 2;
+                *changed = 1;
             } else
             /* Or are there just multiple occurences of forward slash? */
             if ((count >= 1)&&(*(d - 1) == '/')) {
                 /* Ignore the last one byte. */
                 d--;
                 count--;
+                *changed = 1;
             }
         }
 
@@ -998,4 +1147,47 @@ int normalise_path_inplace(unsigned char *input, int input_len, int win) {
     *d = '\0';
 
     return count;
+}
+
+char *modsec_build(apr_pool_t *mp) {
+    int build_type = 0;
+    int i;
+
+    for (i = 0; modsec_build_type[i].name != NULL; i++) {
+        if (strcmp(MODSEC_VERSION_TYPE, modsec_build_type[i].name) == 0) {
+            build_type = modsec_build_type[i].val;
+            break;
+        }
+    }
+
+    return apr_psprintf(mp, "%02i%02i%02i%1i%02i",
+                            atoi(MODSEC_VERSION_MAJOR),
+                            atoi(MODSEC_VERSION_MINOR),
+                            atoi(MODSEC_VERSION_MAINT),
+                            build_type,
+                            atoi(MODSEC_VERSION_RELEASE));
+}
+
+int is_empty_string(const char *string) {
+    unsigned int i;
+
+    if (string == NULL) return 1;
+
+    for(i = 0; string[i] != '\0'; i++) {
+        if (!isspace(string[i])) {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+char *resolve_relative_path(apr_pool_t *pool, const char *parent_filename, const char *filename) {
+    if (filename == NULL) return NULL;
+    // TODO Support paths on operating systems other than Unix.
+    if (filename[0] == '/') return (char *)filename;
+
+    return apr_pstrcat(pool, apr_pstrndup(pool, parent_filename,
+        strlen(parent_filename) - strlen(apr_filepath_name_get(parent_filename))),
+        filename, NULL);
 }

@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -38,17 +38,17 @@ struct multipart_part {
     /* variables only, variable value */
     char                    *value;
     apr_array_header_t      *value_parts;
-    
+
     /* files only, the content type (where available) */
     char                    *content_type;
 
     /* files only, the name of the temporary file holding data */
     char                    *tmp_file_name;
     int                      tmp_file_fd;
-    unsigned                 tmp_file_size;
+    unsigned int             tmp_file_size;
     /* files only, filename as supplied by the browser */
     char                    *filename;
-    
+
     char                    *last_header_name;
     apr_table_t             *headers;
 
@@ -61,9 +61,10 @@ struct multipart_data {
     apr_array_header_t      *parts;
 
     /* mime boundary used to detect when
-     * parts end and new begin
+     * parts end and begin
      */
     char                    *boundary;
+    int                      boundary_count;
 
     /* internal buffer and other variables
      * used while parsing
@@ -84,7 +85,7 @@ struct multipart_data {
     /* part parsing state; 0 means we are reading
      * headers, 1 means we are collecting data
      */
-    int                     mpp_state;
+    int                      mpp_state;
 
     /* because of the way this parsing algorithm
      * works we hold back the last two bytes of
@@ -93,10 +94,21 @@ struct multipart_data {
      * a boundary; the first byte is an indicator
      * 0 - no content, 1 - two data bytes available
      */
-    char                    reserve[4];
+    char                     reserve[4];
 
-    int                     seen_data;    
-    int                     is_complete;
+    int                      seen_data;
+    int                      is_complete;
+
+    int                      flag_error;
+    int                      flag_data_before;
+    int                      flag_data_after;
+    int                      flag_header_folding;
+    int                      flag_boundary_quoted;
+    int                      flag_lf_line;
+    int                      flag_crlf_line;
+    int                      flag_unmatched_boundary;
+    int                      flag_boundary_whitespace;
+    int                      flag_missing_semicolon;
 };
 
 

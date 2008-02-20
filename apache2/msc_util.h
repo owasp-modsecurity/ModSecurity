@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2007 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
  * You should have received a copy of the licence along with this
  * program (stored in the file "LICENSE"). If the file is missing,
@@ -13,13 +13,13 @@
 
 #include "modsecurity.h"
 
-int DSOLOCAL normalise_path_inplace(unsigned char *input, int len, int win);
+int DSOLOCAL normalise_path_inplace(unsigned char *input, int len, int win, int *changed);
 
 int DSOLOCAL parse_boolean(const char *input);
 
 int DSOLOCAL parse_name_eq_value(apr_pool_t *mp, const char *input, char **name, char **value);
 
-char DSOLOCAL *url_encode(apr_pool_t *mp, char *input, unsigned int input_len);
+char DSOLOCAL *url_encode(apr_pool_t *mp, char *input, unsigned int input_len, int *changed);
 
 char DSOLOCAL *strnurlencat(char *destination, char *source, unsigned int maxlen);
 
@@ -35,7 +35,7 @@ int DSOLOCAL is_token_char(unsigned char c);
 
 int DSOLOCAL remove_lf_crlf_inplace(char *text);
 
-unsigned DSOLOCAL char x2c(unsigned char *what);
+unsigned char DSOLOCAL x2c(unsigned char *what);
 
 char DSOLOCAL *guess_tmp_dir(apr_pool_t *p);
 
@@ -59,17 +59,27 @@ char DSOLOCAL *log_escape_nq_ex(apr_pool_t *p, const char *text, unsigned long i
 
 char DSOLOCAL *log_escape_header_name(apr_pool_t *p, const char *text);
 
-char *log_escape_raw(apr_pool_t *mp, const unsigned char *text, unsigned long int text_length);
+char DSOLOCAL *log_escape_hex(apr_pool_t *mp, const unsigned char *text, unsigned long int text_length);
+
+char DSOLOCAL *log_escape_raw(apr_pool_t *mp, const unsigned char *text, unsigned long int text_length);
 
 char DSOLOCAL *_log_escape(apr_pool_t *p, const unsigned char *input,
     unsigned long int input_length, int escape_quotes, int escape_colon);
 
-int DSOLOCAL urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_length);
+int DSOLOCAL js_decode_nonstrict_inplace(unsigned char *input, long int input_len);
 
-int DSOLOCAL urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_length, int *invalid_count);
+int DSOLOCAL urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_length, int * changed);
+
+int DSOLOCAL urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_length, int *invalid_count, int *changed);
 
 int DSOLOCAL html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int len);
 
 int DSOLOCAL ansi_c_sequences_decode_inplace(unsigned char *input, int len);
+
+char DSOLOCAL *modsec_build(apr_pool_t *mp);
+
+int DSOLOCAL is_empty_string(const char *string);
+
+char DSOLOCAL *resolve_relative_path(apr_pool_t *pool, const char *parent_filename, const char *filename);
 
 #endif
