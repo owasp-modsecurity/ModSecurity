@@ -1,3 +1,11 @@
+27 Feb 2008 - 2.5.1-rc1
+-----------------------
+
+ * Now search /usr/lib64 and /usr/lib32 for lua libs.
+
+ * No longer treat warnings as errors by default (use --enable-strict-compile).
+
+
 19 Feb 2008 - 2.5.0
 -------------------
 
