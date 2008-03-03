@@ -4,7 +4,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.1-rc1 (February 27, 2008)</releaseinfo>
+    <releaseinfo>Version 2.5.1-rc1 (March 03, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -333,6 +333,11 @@
               <listitem>
                 <para>Optionally test with: <literal>make
                 test</literal></para>
+
+                <para>NOTE: This is step is still a bit experimental. If you
+                have problems, please send the full output and error from the
+                build to the support list. Most common issues are related to
+                not finding the required headers and/or libraries.</para>
               </listitem>
 
               <listitem>

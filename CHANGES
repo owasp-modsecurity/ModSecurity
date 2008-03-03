@@ -1,5 +1,7 @@
-27 Feb 2008 - 2.5.1-rc1
+03 Mar 2008 - 2.5.1-rc1
 -----------------------
+
+ * Cleaned up the "make test" target to better locate headers/libraries.
 
  * Now search /usr/lib64 and /usr/lib32 for lua libs.
 
