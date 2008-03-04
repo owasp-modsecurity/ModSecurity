@@ -1120,12 +1120,19 @@ static const char *cmd_default_action(cmd_parms *cmd, void *_dcfg, const char *p
     /* ENH: loop through to check for tags */
     if ((dcfg->tmp_default_actionset->id != NOT_SET_P)
         ||(dcfg->tmp_default_actionset->rev != NOT_SET_P)
-        ||(dcfg->tmp_default_actionset->msg != NOT_SET_P)
-        ||(dcfg->tmp_default_actionset->severity != NOT_SET)
-        ||(dcfg->tmp_default_actionset->logdata != NOT_SET_P))
+        ||(dcfg->tmp_default_actionset->msg != NOT_SET_P))
     {
         return apr_psprintf(cmd->pool, "ModSecurity: SecDefaultAction must not "
             "contain any metadata actions (id, rev, msg, tag, severity, logdata).");
+    }
+    /* These are just a warning for now. */
+    if ((dcfg->tmp_default_actionset->severity != NOT_SET)
+        ||(dcfg->tmp_default_actionset->logdata != NOT_SET_P))
+    {
+        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
+            "ModSecurity: WARNING SecDefaultAction \"%s\" should not "
+            "contain a severity or logdata action (%s:%d).",
+            p1, cmd->directive->filename, cmd->directive->line_num);
     }
 
     /* Must not use chain. */

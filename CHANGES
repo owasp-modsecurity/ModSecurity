@@ -1,5 +1,7 @@
-03 Mar 2008 - 2.5.1-rc1
+04 Mar 2008 - 2.5.1-rc1
 -----------------------
+
+ * Using "severity" in a default action is now just a warning.
 
  * Cleaned up the "make test" target to better locate headers/libraries.
 
