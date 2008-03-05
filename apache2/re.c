@@ -735,6 +735,8 @@ void msre_engine_destroy(msre_engine *engine) {
  * transaction phase.
  */
 #if defined(PERFORMANCE_MEASUREMENT)
+static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_rec *msr);
+
 apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) {
     apr_array_header_t *arr = NULL;
     msre_rule **rules = NULL;
