@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <article>
-  <title><trademark class="trade">ModSecurity</trademark> Reference
+  <title><trademark class="registered">ModSecurity</trademark> Reference
   Manual</title>
 
   <articleinfo>
@@ -17,12 +17,11 @@
   <section id="introduction">
     <title>Introduction</title>
 
-    <para><trademark class="trade">ModSecurity</trademark> is a web
-    application firewall (WAF). With over 70% of attacks now carried out over
-    the web application level, organisations need all the help they can get in
-    making their systems secure. WAFs are deployed to establish an increased
-    external security layer to detect and/or prevent attacks before they reach
-    web applications. <trademark class="trade">ModSecurity</trademark>
+    <para>ModSecurity is a web application firewall (WAF). With over 70% of
+    attacks now carried out over the web application level, organisations need
+    all the help they can get in making their systems secure. WAFs are
+    deployed to establish an increased external security layer to detect
+    and/or prevent attacks before they reach web applications. ModSecurity
     provides protection from a range of attacks against web applications and
     allows for HTTP traffic monitoring and real-time analysis with little or
     no changes to existing infrastructure.</para>
@@ -34,34 +33,32 @@
       useful for marketing analyses, but fall short logging traffic to web
       applications. In particular, most are not capable of logging the request
       bodies. Your adversaries know this, and that is why most attacks are now
-      carried out via POST requests, rendering your systems blind. <trademark
-      class="trade">ModSecurity</trademark> makes full HTTP transaction
-      logging possible, allowing complete requests and responses to be logged.
-      Its logging facilities also allow fine-grained decisions to be made
-      about exactly what is logged and when, ensuring only the relevant data
-      is recorded. As some of the request and/or response may contain
-      sensitive data in certain fields, <trademark
-      class="trade">ModSecurity</trademark> can be configured to mask these
-      fields before they are written to the audit log.</para>
+      carried out via POST requests, rendering your systems blind. ModSecurity
+      makes full HTTP transaction logging possible, allowing complete requests
+      and responses to be logged. Its logging facilities also allow
+      fine-grained decisions to be made about exactly what is logged and when,
+      ensuring only the relevant data is recorded. As some of the request
+      and/or response may contain sensitive data in certain fields,
+      ModSecurity can be configured to mask these fields before they are
+      written to the audit log.</para>
     </section>
 
     <section>
       <title>Real-Time Monitoring and Attack Detection</title>
 
-      <para>In addition to providing logging facilities, <trademark
-      class="trade">ModSecurity</trademark> can monitor the HTTP traffic in
-      real time in order to detect attacks. In this case, <trademark
-      class="trade">ModSecurity</trademark> operates as a web intrusion
-      detection tool, allowing you to react to suspicious events that take
-      place at your web systems.</para>
+      <para>In addition to providing logging facilities, ModSecurity can
+      monitor the HTTP traffic in real time in order to detect attacks. In
+      this case, ModSecurity operates as a web intrusion detection tool,
+      allowing you to react to suspicious events that take place at your web
+      systems.</para>
     </section>
 
     <section>
       <title>Attack Prevention and Just-in-time Patching</title>
 
-      <para><trademark class="trade">ModSecurity</trademark> can also act
-      immediately to prevent attacks from reaching your web applications.
-      There are three commonly used approaches:</para>
+      <para>ModSecurity can also act immediately to prevent attacks from
+      reaching your web applications. There are three commonly used
+      approaches:</para>
 
       <orderedlist continuation="restarts" inheritnum="ignore">
         <listitem>
@@ -83,15 +80,14 @@
 
         <listitem>
           <para>Known weaknesses and vulnerabilities. Its rule language makes
-          <trademark class="trade">ModSecurity</trademark> an ideal external
-          patching tool. External patching (sometimes referred to as Virtual
-          Patching) is about reducing the window of opportunity. Time needed
-          to patch application vulnerabilities often runs to weeks in many
-          organisations. With <trademark
-          class="trade">ModSecurity</trademark>, applications can be patched
-          from the outside, without touching the application source code (and
-          even without any access to it), making your systems secure until a
-          proper patch is applied to the application.</para>
+          ModSecurity an ideal external patching tool. External patching
+          (sometimes referred to as Virtual Patching) is about reducing the
+          window of opportunity. Time needed to patch application
+          vulnerabilities often runs to weeks in many organisations. With
+          ModSecurity, applications can be patched from the outside, without
+          touching the application source code (and even without any access to
+          it), making your systems secure until a proper patch is applied to
+          the application.</para>
         </listitem>
       </orderedlist>
     </section>
@@ -99,36 +95,33 @@
     <section>
       <title>Flexible Rule Engine</title>
 
-      <para>A flexible rule engine sits in the heart of <trademark
-      class="trade">ModSecurity</trademark>. It implements the <trademark
-      class="trade">ModSecurity</trademark> Rule Language, which is a
-      specialised programming language designed to work with HTTP transaction
-      data. The <trademark class="trade">ModSecurity</trademark> Rule Language
-      is designed to be easy to use, yet flexible: common operations are
-      simple while complex operations are possible. Certified <trademark
-      class="trade">ModSecurity</trademark> Rules, included with <trademark
-      class="trade">ModSecurity</trademark>, contain a comprehensive set of
-      rules that implement general-purpose hardening, protocol validation and
-      detection of common web application security issues. Heavily commented,
-      these rules can be used as a learning tool.</para>
+      <para>A flexible rule engine sits in the heart of ModSecurity. It
+      implements the ModSecurity Rule Language, which is a specialised
+      programming language designed to work with HTTP transaction data. The
+      ModSecurity Rule Language is designed to be easy to use, yet flexible:
+      common operations are simple while complex operations are possible.
+      Certified ModSecurity Rules, included with ModSecurity, contain a
+      comprehensive set of rules that implement general-purpose hardening,
+      protocol validation and detection of common web application security
+      issues. Heavily commented, these rules can be used as a learning
+      tool.</para>
     </section>
 
     <section>
       <title>Embedded-mode Deployment</title>
 
-      <para><trademark class="trade">ModSecurity</trademark> is an embeddable
-      web application firewall, which means it can be deployed as part of your
-      existing web server infrastructure provided your web servers are
-      Apache-based. This deployment method has certain advantages:</para>
+      <para>ModSecurity is an embeddable web application firewall, which means
+      it can be deployed as part of your existing web server infrastructure
+      provided your web servers are Apache-based. This deployment method has
+      certain advantages:</para>
 
       <orderedlist continuation="restarts" inheritnum="ignore">
         <listitem>
           <para>No changes to existing network. It only takes a few minutes to
-          add <trademark class="trade">ModSecurity</trademark> to your
-          existing web servers. And because it was designed to be completely
-          passive by default, you are free to deploy it incrementally and only
-          use the features you need. It is equally easy to remove or
-          deactivate it if required.</para>
+          add ModSecurity to your existing web servers. And because it was
+          designed to be completely passive by default, you are free to deploy
+          it incrementally and only use the features you need. It is equally
+          easy to remove or deactivate it if required.</para>
         </listitem>
 
         <listitem>
@@ -139,10 +132,10 @@
 
         <listitem>
           <para>Implicit load balancing and scaling. Because it works embedded
-          in web servers, <trademark class="trade">ModSecurity</trademark>
-          will automatically take advantage of the additional load balancing
-          and scalability features. You will not need to think of load
-          balancing and scaling unless your existing system needs them.</para>
+          in web servers, ModSecurity will automatically take advantage of the
+          additional load balancing and scalability features. You will not
+          need to think of load balancing and scaling unless your existing
+          system needs them.</para>
         </listitem>
 
         <listitem>
@@ -154,9 +147,8 @@
         <listitem>
           <para>No problem with encrypted or compressed content. Many IDS
           systems have difficulties analysing SSL traffic. This is not a
-          problem for <trademark class="trade">ModSecurity</trademark> because
-          it is positioned to work when the traffic is decrypted and
-          decompressed.</para>
+          problem for ModSecurity because it is positioned to work when the
+          traffic is decrypted and decompressed.</para>
         </listitem>
       </orderedlist>
     </section>
@@ -164,32 +156,30 @@
     <section>
       <title>Network-based Deployment</title>
 
-      <para><trademark class="trade">ModSecurity</trademark> works equally
-      well when deployed as part of an Apache-based reverse proxy server, and
-      many of our customers choose to do so. In this scenario, one
-      installation of <trademark class="trade">ModSecurity</trademark> can
-      protect any number of web servers (even the non-Apache ones).</para>
+      <para>ModSecurity works equally well when deployed as part of an
+      Apache-based reverse proxy server, and many of our customers choose to
+      do so. In this scenario, one installation of ModSecurity can protect any
+      number of web servers (even the non-Apache ones).</para>
     </section>
 
     <section>
       <title>Portability</title>
 
-      <para><trademark class="trade">ModSecurity</trademark> is known to work
-      well on a wide range of operating systems. Our customers are
-      successfully running it on Linux, Windows, Solaris, FreeBSD, OpenBSD,
-      NetBSD, AIX, Mac OS X, and HP-UX.</para>
+      <para>ModSecurity is known to work well on a wide range of operating
+      systems. Our customers are successfully running it on Linux, Windows,
+      Solaris, FreeBSD, OpenBSD, NetBSD, AIX, Mac OS X, and HP-UX.</para>
     </section>
 
     <section id="licensing">
       <title>Licensing</title>
 
-      <para><trademark class="trade">ModSecurity</trademark> is available
-      under two licenses. Users can choose to use the software under the terms
-      of the GNU General Public License version 2 (licence text is included
-      with the distribution), as an Open Source / Free Software product. A
-      range of commercial licenses is also available, together with a range of
-      commercial support contracts. For more information on commercial
-      licensing please contact Breach Security.</para>
+      <para>ModSecurity is available under two licenses. Users can choose to
+      use the software under the terms of the GNU General Public License
+      version 2 (licence text is included with the distribution), as an Open
+      Source / Free Software product. A range of commercial licenses is also
+      available, together with a range of commercial support contracts. For
+      more information on commercial licensing please contact Breach
+      Security.</para>
 
       <note>
         <para>ModSecurity, mod_security, and ModSecurity Pro are trademarks or
@@ -199,27 +189,24 @@
   </section>
 
   <section>
-    <title><trademark class="trade">ModSecurity</trademark> Core Rules</title>
+    <title><trademark class="registered">ModSecurity</trademark> Core
+    Rules</title>
 
     <section>
       <title>Overview</title>
 
-      <para><trademark class="trade">ModSecurity</trademark> is a web
-      application firewall engine that provides very little protection on its
-      own. In order to become useful, <trademark
-      class="trade">ModSecurity</trademark> must be configured with rules. In
-      order to enable users to take full advantage of <trademark
-      class="trade">ModSecurity</trademark> out of the box, Breach Security,
-      Inc. is providing a free certified rule set for <trademark
-      class="trade">ModSecurity</trademark> 2.x. Unlike intrusion detection
-      and prevention systems, which rely on signatures specific to known
-      vulnerabilities, the Core Rules provide generic protection from unknown
-      vulnerabilities often found in web applications, which are in most cases
-      custom coded. The Core Rules are heavily commented to allow it to be
-      used as a step-by-step deployment guide for <trademark
-      class="trade">ModSecurity</trademark>. The latest Core Rules can be
-      found at the <trademark class="trade">ModSecurity</trademark> website -
-      <ulink
+      <para>ModSecurity is a web application firewall engine that provides
+      very little protection on its own. In order to become useful,
+      ModSecurity must be configured with rules. In order to enable users to
+      take full advantage of ModSecurity out of the box, Breach Security, Inc.
+      is providing a free certified rule set for ModSecurity 2.x. Unlike
+      intrusion detection and prevention systems, which rely on signatures
+      specific to known vulnerabilities, the Core Rules provide generic
+      protection from unknown vulnerabilities often found in web applications,
+      which are in most cases custom coded. The Core Rules are heavily
+      commented to allow it to be used as a step-by-step deployment guide for
+      ModSecurity. The latest Core Rules can be found at the ModSecurity
+      website - <ulink
       url="http://www.modsecurity.org/projects/rules/">http://www.modsecurity.org/projects/rules/</ulink>.</para>
     </section>
 
@@ -260,13 +247,11 @@
   <section id="installation">
     <title>Installation</title>
 
-    <para><trademark class="trade">ModSecurity</trademark> installation
-    consists of the following steps:</para>
+    <para>ModSecurity installation consists of the following steps:</para>
 
     <orderedlist continuation="restarts" inheritnum="ignore">
       <listitem>
-        <para><trademark class="trade">ModSecurity</trademark> 2.x works with
-        Apache 2.0.x or better.</para>
+        <para>ModSecurity 2.x works with Apache 2.0.x or better.</para>
       </listitem>
 
       <listitem>
@@ -297,8 +282,7 @@
       </listitem>
 
       <listitem>
-        <para>Unpack the <trademark class="trade">ModSecurity</trademark>
-        archive</para>
+        <para>Unpack the ModSecurity archive</para>
       </listitem>
 
       <listitem>
@@ -341,8 +325,7 @@
               </listitem>
 
               <listitem>
-                <para>Optionally build the <trademark
-                class="trade">ModSecurity</trademark> Log Collector with:
+                <para>Optionally build the ModSecurity Log Collector with:
                 <literal>make mlogc</literal></para>
               </listitem>
 
@@ -353,9 +336,8 @@
               </listitem>
 
               <listitem>
-                <para>Install the <trademark
-                class="trade">ModSecurity</trademark> module with:
-                <literal>make install</literal></para>
+                <para>Install the ModSecurity module with: <literal>make
+                install</literal></para>
               </listitem>
             </orderedlist>
           </listitem>
@@ -375,9 +357,8 @@
               </listitem>
 
               <listitem>
-                <para>Install the <trademark
-                class="trade">ModSecurity</trademark> module with:
-                <literal>nmake -f Makefile.win install</literal></para>
+                <para>Install the ModSecurity module with: <literal>nmake -f
+                Makefile.win install</literal></para>
               </listitem>
 
               <listitem>
@@ -397,19 +378,17 @@
         <literal>httpd.conf</literal>)</para>
 
         <para>On UNIX (and Windows if you did not copy the DLLs as stated
-        above) you must load libxml2 and lua5.1 before <trademark
-        class="trade">ModSecurity</trademark> with something like this:</para>
+        above) you must load libxml2 and lua5.1 before ModSecurity with
+        something like this:</para>
 
         <para><programlisting>LoadFile /usr/lib/libxml2.so
 LoadFile /usr/lib/liblua5.1.so</programlisting></para>
 
-        <para>Load the <trademark class="trade">ModSecurity</trademark> module
-        with:<programlisting>LoadModule security2_module modules/mod_security2.so</programlisting></para>
+        <para>Load the ModSecurity module with:<programlisting>LoadModule security2_module modules/mod_security2.so</programlisting></para>
       </listitem>
 
       <listitem>
-        <para>Configure <trademark
-        class="trade">ModSecurity</trademark></para>
+        <para>Configure ModSecurity</para>
       </listitem>
 
       <listitem>
@@ -417,38 +396,35 @@ LoadFile /usr/lib/liblua5.1.so</programlisting></para>
       </listitem>
 
       <listitem>
-        <para>You should now have <trademark
-        class="trade">ModSecurity</trademark> 2.x up and running.</para>
+        <para>You should now have ModSecurity 2.x up and running.</para>
       </listitem>
     </orderedlist>
 
     <note>
       <para>If you have compiled Apache yourself you might experience problems
-      compiling <trademark class="trade">ModSecurity</trademark> against PCRE.
-      This is because Apache bundles PCRE but this library is also typically
-      provided by the operating system. I would expect most (all)
-      vendor-packaged Apache distributions to be configured to use an external
-      PCRE library (so this should not be a problem).</para>
+      compiling ModSecurity against PCRE. This is because Apache bundles PCRE
+      but this library is also typically provided by the operating system. I
+      would expect most (all) vendor-packaged Apache distributions to be
+      configured to use an external PCRE library (so this should not be a
+      problem).</para>
 
       <para>You want to avoid Apache using the bundled PCRE library and
-      <trademark class="trade">ModSecurity</trademark> linking against the one
-      provided by the operating system. The easiest way to do this is to
-      compile Apache against the PCRE library provided by the operating system
-      (or you can compile it against the latest PCRE version you downloaded
-      from the main PCRE distribution site). You can do this at configure time
-      using the<literal moreinfo="none"> --with-pcre</literal> switch. If you
-      are not in a position to recompile Apache, then, to compile <trademark
-      class="trade">ModSecurity</trademark> successfully, you'd still need to
-      have access to the bundled PCRE headers (they are available only in the
-      Apache source code) and change the include path for <trademark
-      class="trade">ModSecurity</trademark> (as you did in step 7 above) to
-      point to them (via the <literal>--with-pcre</literal> <trademark
-      class="trade">ModSecurity</trademark> configure option).</para>
+      ModSecurity linking against the one provided by the operating system.
+      The easiest way to do this is to compile Apache against the PCRE library
+      provided by the operating system (or you can compile it against the
+      latest PCRE version you downloaded from the main PCRE distribution
+      site). You can do this at configure time using the<literal
+      moreinfo="none"> --with-pcre</literal> switch. If you are not in a
+      position to recompile Apache, then, to compile ModSecurity successfully,
+      you'd still need to have access to the bundled PCRE headers (they are
+      available only in the Apache source code) and change the include path
+      for ModSecurity (as you did in step 7 above) to point to them (via the
+      <literal>--with-pcre</literal> ModSecurity configure option).</para>
 
       <para>Do note that if your Apache is using an external PCRE library you
-      can compile <trademark class="trade">ModSecurity</trademark> with
-      <literal moreinfo="none">WITH_PCRE_STUDY</literal> defined,which would
-      possibly give you a slight performance edge in regular expression
+      can compile ModSecurity with <literal
+      moreinfo="none">WITH_PCRE_STUDY</literal> defined,which would possibly
+      give you a slight performance edge in regular expression
       processing.</para>
     </note>
   </section>
@@ -456,10 +432,9 @@ LoadFile /usr/lib/liblua5.1.so</programlisting></para>
   <section id="configuration-directives">
     <title>Configuration Directives</title>
 
-    <para>The following section outlines all of the <trademark
-    class="trade">ModSecurity</trademark> directives. Most of the <trademark
-    class="trade">ModSecurity</trademark> directives can be used inside the
-    various Apache Scope Directives such as <literal>VirtualHost</literal>,
+    <para>The following section outlines all of the ModSecurity directives.
+    Most of the ModSecurity directives can be used inside the various Apache
+    Scope Directives such as <literal>VirtualHost</literal>,
     <literal>Location</literal>, <literal>LocationMatch</literal>,
     <literal>Directory</literal>, etc... There are others, however, that can
     only be used once in the main configuration file. This information is
@@ -473,20 +448,18 @@ LoadFile /usr/lib/liblua5.1.so</programlisting></para>
     rules, you should create a file called -
     <filename>modsecurity_crs_15_customrules.conf</filename> and place it in
     the same directory as the Core rules files. By using this file name, your
-    custom rules will be called up after the standard <trademark
-    class="trade">ModSecurity</trademark> Core rules configuration file but
-    before the other Core rules. This allows your rules to be evaluated first
-    which can be useful if you need to implement specific "allow" rules or to
-    correct any false positives in the Core rules as they are applied to your
-    site.</para>
+    custom rules will be called up after the standard ModSecurity Core rules
+    configuration file but before the other Core rules. This allows your rules
+    to be evaluated first which can be useful if you need to implement
+    specific "allow" rules or to correct any false positives in the Core rules
+    as they are applied to your site.</para>
 
     <note>
       <para>It is highly encouraged that you do not edit the Core rules files
       themselves but rather place all changes (such as
       <literal>SecRuleRemoveByID</literal>, etc...) in your custom rules file.
       This will allow for easier upgrading as newer Core rules are released by
-      Breach Security on the <trademark class="trade">ModSecurity</trademark>
-      website.</para>
+      Breach Security on the ModSecurity website.</para>
     </note>
 
     <section>
@@ -545,8 +518,7 @@ LoadFile /usr/lib/liblua5.1.so</programlisting></para>
 
       <para>This directive is needed if a backend web application is using a
       non-standard argument separator. If this directive is not set properly
-      for each web application, then <trademark
-      class="trade">ModSecurity</trademark> will not be able to parse the
+      for each web application, then ModSecurity will not be able to parse the
       arguments appropriately and the effectiveness of the rule matching will
       be significantly decreased.</para>
     </section>
@@ -633,9 +605,8 @@ SecAuditLogStorageDir logs/audit
       this file will be used as an index, and contain a record of all audit
       log files created. If you are planning to use Concurrent audit logging
       and sending your audit log data off to a remote Console host or
-      commercial <trademark class="trade">ModSecurity</trademark> Management
-      Appliance, then you will need to configure and use the <trademark
-      class="trade">ModSecurity</trademark> Log Collector (mlogc) and use the
+      commercial ModSecurity Management Appliance, then you will need to
+      configure and use the ModSecurity Log Collector (mlogc) and use the
       following format for the audit log:</para>
 
       <para><programlisting format="linespecific">SecAuditLog "|/path/to/mlogc /path/to/mlogc.conf"</programlisting></para>
@@ -687,10 +658,10 @@ SecAuditLogStorageDir logs/audit
 
       <para><emphasis>Version:</emphasis> 2.0.0</para>
 
-      <para><emphasis>Dependencies/Notes:</emphasis> At this time <trademark
-      class="trade">ModSecurity</trademark> does not log response bodies of
-      stock Apache responses (e.g. <literal moreinfo="none">404</literal>), or
-      the <literal moreinfo="none">Server</literal> and <literal
+      <para><emphasis>Dependencies/Notes:</emphasis> At this time ModSecurity
+      does not log response bodies of stock Apache responses (e.g. <literal
+      moreinfo="none">404</literal>), or the <literal
+      moreinfo="none">Server</literal> and <literal
       moreinfo="none">Date</literal> response headers.</para>
 
       <para>Default:<literal moreinfo="none"> ABCFHZ</literal>.</para>
@@ -709,9 +680,8 @@ SecAuditLogStorageDir logs/audit
 
         <listitem>
           <para><literal moreinfo="none">C</literal> - request body (present
-          only if the request body exists and <trademark
-          class="trade">ModSecurity</trademark> is configured to intercept
-          it)</para>
+          only if the request body exists and ModSecurity is configured to
+          intercept it)</para>
         </listitem>
 
         <listitem>
@@ -721,14 +691,13 @@ SecAuditLogStorageDir logs/audit
 
         <listitem>
           <para><literal moreinfo="none">E</literal> - intermediary response
-          body (present only if <trademark
-          class="trade">ModSecurity</trademark> is configured to intercept
+          body (present only if ModSecurity is configured to intercept
           response bodies, and if the audit log engine is configured to record
           it). Intermediary response body is the same as the actual response
-          body unless <trademark class="trade">ModSecurity</trademark>
-          intercepts the intermediary response body, in which case the actual
-          response body will contain the error message (either the Apache
-          default error message, or the ErrorDocument page).</para>
+          body unless ModSecurity intercepts the intermediary response body,
+          in which case the actual response body will contain the error
+          message (either the Apache default error message, or the
+          ErrorDocument page).</para>
         </listitem>
 
         <listitem>
@@ -878,8 +847,7 @@ SecAuditLogStorageDir logs/audit
           <para><literal moreinfo="none">Concurrent</literal> - audit log
           entries will be stored in separate files, one for each transaction.
           Concurrent logging is the mode to use if you are going to send the
-          audit log data off to a remote <trademark
-          class="trade">ModSecurity</trademark> Console host.</para>
+          audit log data off to a remote ModSecurity Console host.</para>
         </listitem>
       </orderedlist>
     </section>
@@ -958,8 +926,7 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis>Version:</emphasis> 2.0.0</para>
 
       <para><emphasis>Dependencies/Notes:</emphasis> The internal chroot
-      functionality provided by <trademark
-      class="trade">ModSecurity</trademark> works great for simple setups. One
+      functionality provided by ModSecurity works great for simple setups. One
       example of a simple setup is Apache serving static files only, or
       running scripts using modules. Some problems you might encounter with
       more complex setups:</para>
@@ -999,7 +966,7 @@ SecAuditLogStorageDir logs/audit
       <title><literal>SecComponentSignature</literal></title>
 
       <para><emphasis>Description</emphasis>: Appends component signature to
-      the <trademark class="trade">ModSecurity</trademark> signature.</para>
+      the ModSecurity signature.</para>
 
       <para><emphasis>Syntax</emphasis>: <literal>SecComponentSignature
       "COMPONENT_NAME/X.Y.Z (COMMENT)"</literal></para>
@@ -1014,11 +981,10 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis>Version</emphasis>: 2.5.0</para>
 
       <para><emphasis>Dependencies/Notes</emphasis>: This directive should be
-      used to make the presence of significant <trademark
-      class="trade">ModSecurity</trademark> components known. The entire
-      signature will be recorded in transaction audit log. It should be used
-      by <trademark class="trade">ModSecurity</trademark> module and rule set
-      writers to make debugging easier.</para>
+      used to make the presence of significant ModSecurity components known.
+      The entire signature will be recorded in transaction audit log. It
+      should be used by ModSecurity module and rule set writers to make
+      debugging easier.</para>
     </section>
 
     <section>
@@ -1102,8 +1068,8 @@ SecAuditLogStorageDir logs/audit
     <section>
       <title><literal>SecDebugLog</literal></title>
 
-      <para><emphasis>Description:</emphasis> Path to the <trademark
-      class="trade">ModSecurity</trademark> debug log file.</para>
+      <para><emphasis>Description:</emphasis> Path to the ModSecurity debug
+      log file.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal moreinfo="none">SecDebugLog
       /path/to/modsec-debug.log</literal></para>
@@ -1269,27 +1235,25 @@ SecAuditLogStorageDir logs/audit
       will defend against clients that send more than 120 requests in a
       minute, or more than 360 requests in five minutes.</para>
 
-      <para>Since 1.9, <trademark class="trade">ModSecurity</trademark>
-      supports a new directive, SecGuardianLog, that is designed to send all
-      access data to another program using the piped logging feature. Since
-      Apache is typically deployed in a multi-process fashion, making
-      information sharing difficult, the idea is to deploy a single external
-      process to observe all requests in a stateful manner, providing
-      additional protection.</para>
+      <para>Since 1.9, ModSecurity supports a new directive, SecGuardianLog,
+      that is designed to send all access data to another program using the
+      piped logging feature. Since Apache is typically deployed in a
+      multi-process fashion, making information sharing difficult, the idea is
+      to deploy a single external process to observe all requests in a
+      stateful manner, providing additional protection.</para>
 
       <para>Development of a state of the art external protection tool will be
-      a focus of subsequent <trademark class="trade">ModSecurity</trademark>
-      releases. However, a fully functional tool is already available as part
-      of the <ulink type="" url="http://www.apachesecurity.net/tools/">Apache
-      httpd tools project</ulink>. The tool is called httpd-guardian and can
-      be used to defend against Denial of Service attacks. It uses the
-      blacklist tool (from the same project) to interact with an
-      iptables-based (Linux) or pf-based (*BSD) firewall, dynamically
-      blacklisting the offending IP addresses. It can also interact with
-      SnortSam (http://www.snortsam.net). Assuming httpd-guardian is already
-      configured (look into the source code for the detailed instructions) you
-      only need to add one line to your Apache configuration to deploy
-      it:</para>
+      a focus of subsequent ModSecurity releases. However, a fully functional
+      tool is already available as part of the <ulink type=""
+      url="http://www.apachesecurity.net/tools/">Apache httpd tools
+      project</ulink>. The tool is called httpd-guardian and can be used to
+      defend against Denial of Service attacks. It uses the blacklist tool
+      (from the same project) to interact with an iptables-based (Linux) or
+      pf-based (*BSD) firewall, dynamically blacklisting the offending IP
+      addresses. It can also interact with SnortSam (http://www.snortsam.net).
+      Assuming httpd-guardian is already configured (look into the source code
+      for the detailed instructions) you only need to add one line to your
+      Apache configuration to deploy it:</para>
 
       <programlisting format="linespecific">SecGuardianLog |/path/to/httpd-guardian</programlisting>
     </section>
@@ -1442,11 +1406,10 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
 
       <para><emphasis>Description:</emphasis> Defines the name of the token.
       The only reason you would want to change the name of the token is if you
-      wanted to hide the fact you are running <trademark
-      class="trade">ModSecurity</trademark>. It's a good reason but it won't
-      really help as the adversary can look into the algorithm used for PDF
-      protection and figure it out anyway. It does raise the bar slightly so
-      go ahead if you want to.</para>
+      wanted to hide the fact you are running ModSecurity. It's a good reason
+      but it won't really help as the adversary can look into the algorithm
+      used for PDF protection and figure it out anyway. It does raise the bar
+      slightly so go ahead if you want to.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
       moreinfo="none">SecPdfProtectTokenName name</literal></para>
@@ -1469,8 +1432,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
       <title><literal>SecRequestBodyAccess</literal></title>
 
       <para><emphasis>Description:</emphasis> Configures whether request
-      bodies will be buffered and processed by <trademark
-      class="trade">ModSecurity</trademark> by default.</para>
+      bodies will be buffered and processed by ModSecurity by default.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
       moreinfo="none">SecRequestBodyAccess On|Off</literal></para>
@@ -1509,8 +1471,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
       <title><literal>SecRequestBodyLimit</literal></title>
 
       <para><emphasis>Description:</emphasis> Configures the maximum request
-      body size <trademark class="trade">ModSecurity</trademark> will accept
-      for buffering.</para>
+      body size ModSecurity will accept for buffering.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
       moreinfo="none">SecRequestBodyLimit NUMBER_IN_BYTES</literal></para>
@@ -1532,16 +1493,16 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
       <title><literal>SecRequestBodyNoFilesLimit</literal></title>
 
       <para><emphasis>Description:</emphasis> Configures the maximum request
-      body size <trademark class="trade">ModSecurity</trademark> will accept
-      for buffering, excluding the size of files being transported in the
-      request. This directive comes handy to further reduce susceptibility to
-      DoS attacks when someone is sending request bodies of very large sizes.
-      Web applications that require file uploads must configure
-      <literal>SecRequestBodyLimit</literal> to a high value. Since large
-      files are streamed to disk file uploads will not increase memory
-      consumption. However, it's still possible for someone to take advantage
-      of a large request body limit and send non-upload requests with large
-      body sizes. This directive eliminates that loophole.</para>
+      body size ModSecurity will accept for buffering, excluding the size of
+      files being transported in the request. This directive comes handy to
+      further reduce susceptibility to DoS attacks when someone is sending
+      request bodies of very large sizes. Web applications that require file
+      uploads must configure <literal>SecRequestBodyLimit</literal> to a high
+      value. Since large files are streamed to disk file uploads will not
+      increase memory consumption. However, it's still possible for someone to
+      take advantage of a large request body limit and send non-upload
+      requests with large body sizes. This directive eliminates that
+      loophole.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
       moreinfo="none">SecRequestBodyNoFilesLimit
@@ -1566,8 +1527,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
       <title><literal>SecRequestBodyInMemoryLimit</literal></title>
 
       <para><emphasis>Description:</emphasis> Configures the maximum request
-      body size <trademark class="trade">ModSecurity</trademark> will store in
-      memory.</para>
+      body size ModSecurity will store in memory.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
       moreinfo="none">SecRequestBodyInMemoryLimit
@@ -1625,21 +1585,21 @@ SecResponseBodyLimit 524288</programlisting>
       <para><emphasis>Description</emphasis>: Controls what happens once a
       response body limit, configured with
       <literal>SecResponseBodyLimit</literal>, is encountered. By default
-      <trademark class="trade">ModSecurity</trademark> will reject a response
-      body that is longer than specified. Some web sites, however, will
-      produce very long responses making it difficult to come up with a
-      reasonable limit. Such sites would have to raise the limit significantly
-      to function properly defying the purpose of having the limit in the
-      first place (to control memory consumption). With the ability to choose
-      what happens once a limit is reached site administrators can choose to
-      inspect only the first part of the response, the part that can fit into
-      the desired limit, and let the rest through. Some could argue that
-      allowing parts of responses to go uninspected is a weakness. This is
-      true in theory but only applies to cases where the attacker controls the
-      output (e.g. can make it arbitrary long). In such cases, however, it is
-      not possible to prevent leakage anyway. The attacker could compress,
-      obfuscate, or even encrypt data before it is sent back, and therefore
-      bypass any monitoring device.</para>
+      ModSecurity will reject a response body that is longer than specified.
+      Some web sites, however, will produce very long responses making it
+      difficult to come up with a reasonable limit. Such sites would have to
+      raise the limit significantly to function properly defying the purpose
+      of having the limit in the first place (to control memory consumption).
+      With the ability to choose what happens once a limit is reached site
+      administrators can choose to inspect only the first part of the
+      response, the part that can fit into the desired limit, and let the rest
+      through. Some could argue that allowing parts of responses to go
+      uninspected is a weakness. This is true in theory but only applies to
+      cases where the attacker controls the output (e.g. can make it arbitrary
+      long). In such cases, however, it is not possible to prevent leakage
+      anyway. The attacker could compress, obfuscate, or even encrypt data
+      before it is sent back, and therefore bypass any monitoring
+      device.</para>
 
       <para><emphasis>Syntax</emphasis>: <literal>SecResponseBodyLimitAction
       Reject|ProcessPartial</literal></para>
@@ -1752,9 +1712,8 @@ SecResponseBodyLimit 524288</programlisting>
       <title><literal>SecRule</literal></title>
 
       <para><emphasis>Description:</emphasis> <literal
-      moreinfo="none">SecRule</literal> is the main <trademark
-      class="trade">ModSecurity</trademark> directive. It is used to analyse
-      data and perform actions based on the results.</para>
+      moreinfo="none">SecRule</literal> is the main ModSecurity directive. It
+      is used to analyse data and perform actions based on the results.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal moreinfo="none">SecRule
       VARIABLES OPERATOR [ACTIONS]</literal></para>
@@ -1813,8 +1772,7 @@ SecResponseBodyLimit 524288</programlisting>
 
         <para>In the simplest possible case you will use a regular expression
         pattern as the second rule parameter. This is what we've done in the
-        examples above. If you do this <trademark
-        class="trade">ModSecurity</trademark> assumes you want to use the
+        examples above. If you do this ModSecurity assumes you want to use the
         <literal moreinfo="none">rx</literal> operator. You can explicitly
         specify the operator you want to use by using <literal
         moreinfo="none">@</literal> as the first character in the second rule
@@ -1877,12 +1835,11 @@ SecResponseBodyLimit 524288</programlisting>
       processing process, before Apache maps request to resource. Virtual host
       context can override phase 1 rules configured in the main server.</para>
 
-      <para>Example: The following example shows where <trademark
-      class="trade">ModSecurity</trademark> may be enabled in the main Apache
-      configuration scope, however you might want to configure your
-      VirtualHosts differently. In the first example, the first VirtualHost is
-      not inheriting the <trademark class="trade">ModSecurity</trademark> main
-      config directives and in the second one it is.</para>
+      <para>Example: The following example shows where ModSecurity may be
+      enabled in the main Apache configuration scope, however you might want
+      to configure your VirtualHosts differently. In the first example, the
+      first VirtualHost is not inheriting the ModSecurity main config
+      directives and in the second one it is.</para>
 
       <programlisting format="linespecific">SecRuleEnine On
 SecDefaultAction log,pass,phase:2
@@ -2017,10 +1974,9 @@ ServerAlias www.app2.com
       rule that executes a Lua script to decide whether to match or not. The
       main difference from <literal>SecRule</literal> is that there are no
       targets nor operators. The script can fetch any variable from the
-      <trademark class="trade">ModSecurity</trademark> context and use any
-      (Lua) operator to test them. The second optional parameter is the list
-      of actions whose meaning is identical to that of
-      <literal>SecRule</literal>.</para>
+      ModSecurity context and use any (Lua) operator to test them. The second
+      optional parameter is the list of actions whose meaning is identical to
+      that of <literal>SecRule</literal>.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal>SecRuleScript
       /path/to/script.lua [ACTIONS]</literal></para>
@@ -2039,9 +1995,8 @@ ServerAlias www.app2.com
 
       <note>
         <para>All Lua scripts are compiled at configuration time and cached in
-        memory. To reload scripts you must reload the entire <trademark
-        class="trade">ModSecurity</trademark> configuration by restarting
-        Apache.</para>
+        memory. To reload scripts you must reload the entire ModSecurity
+        configuration by restarting Apache.</para>
       </note>
 
       <para>Example script:</para>
@@ -2157,9 +2112,8 @@ SecRuleUpdateActionById 12345 "t:compressWhitespace,deny,status:403,msg:'A new m
     <section>
       <title><literal>SecServerSignature</literal></title>
 
-      <para><emphasis>Description:</emphasis> Instructs <trademark
-      class="trade">ModSecurity</trademark> to change the data presented in
-      the "Server:" response header token.</para>
+      <para><emphasis>Description:</emphasis> Instructs ModSecurity to change
+      the data presented in the "Server:" response header token.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
       moreinfo="none">SecServerSignature "WEB SERVER
@@ -2177,11 +2131,10 @@ SecRuleUpdateActionById 12345 "t:compressWhitespace,deny,status:403,msg:'A new m
 
       <para><emphasis>Dependencies/Notes:</emphasis> In order for this
       directive to work, you must set the Apache ServerTokens directive to
-      Full. <trademark class="trade">ModSecurity</trademark> will overwrite
-      the server signature data held in this memory space with the data set in
-      this directive. If ServerTokens is not set to Full, then the memory
-      space is most likely not large enough to hold the new data we are
-      looking to insert.</para>
+      Full. ModSecurity will overwrite the server signature data held in this
+      memory space with the data set in this directive. If ServerTokens is not
+      set to Full, then the memory space is most likely not large enough to
+      hold the new data we are looking to insert.</para>
     </section>
 
     <section>
@@ -2348,20 +2301,18 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}
       <para>In the two examples configurations shown, SecWebAppId is being
       used in conjunction with the Apache VirtualHost directives. What this
       achieves is to create more unique collection names when being hosted on
-      one server. Normally, when setsid is used, <trademark
-      class="trade">ModSecurity</trademark> will create a collection with the
-      name "SESSION" and it will hold the value specified. With using
-      SecWebAppId as shown in the examples, however, the name of the
-      collection would become "App1_SESSION" and "App2_SESSION".</para>
+      one server. Normally, when setsid is used, ModSecurity will create a
+      collection with the name "SESSION" and it will hold the value specified.
+      With using SecWebAppId as shown in the examples, however, the name of
+      the collection would become "App1_SESSION" and "App2_SESSION".</para>
 
       <para>SecWebAppId is relevant in two cases:</para>
 
       <orderedlist continuation="restarts" inheritnum="ignore">
         <listitem>
-          <para>You are logging transactions/alerts to the <trademark
-          class="trade">ModSecurity</trademark> Console and you want to use
-          the web application ID to search only the transactions belonging to
-          that application.</para>
+          <para>You are logging transactions/alerts to the ModSecurity Console
+          and you want to use the web application ID to search only the
+          transactions belonging to that application.</para>
         </listitem>
 
         <listitem>
@@ -2376,8 +2327,8 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}
   <section id="processing-phases">
     <title>Processing Phases</title>
 
-    <para><trademark class="trade">ModSecurity</trademark> 2.x allows rules to
-    be placed in one of the following five phases:</para>
+    <para>ModSecurity 2.x allows rules to be placed in one of the following
+    five phases:</para>
 
     <orderedlist continuation="restarts" inheritnum="ignore">
       <listitem>
@@ -2402,8 +2353,7 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}
     </orderedlist>
 
     <para>Below is a diagram of the standard Apache Request Cycle. In the
-    diagram, the 5 <trademark class="trade">ModSecurity</trademark> processing
-    phases are shown.</para>
+    diagram, the 5 ModSecurity processing phases are shown.</para>
 
     <para><graphic fileref="apache_request_cycle-modsecurity.jpg" scale="150"
     scalefit="" /></para>
@@ -2450,11 +2400,9 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis>phase:1</emphasis>"</programl
       <para>Rules in this phase can not leverage Apache scope directives
       (Directory, Location, LocationMatch, etc...) as the post-read-request
       hook does not have this information yet. The exception here is the
-      VirtualHost directive. If you want to use <trademark
-      class="trade">ModSecurity</trademark> rules inside Apache locations,
-      then they should run in Phase 2. Refer to the Apache Request
-      Cycle/<trademark class="trade">ModSecurity</trademark> Processing Phases
-      diagram.</para>
+      VirtualHost directive. If you want to use ModSecurity rules inside
+      Apache locations, then they should run in Phase 2. Refer to the Apache
+      Request Cycle/ModSecurity Processing Phases diagram.</para>
     </section>
 
     <section>
@@ -2463,8 +2411,8 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis>phase:1</emphasis>"</programl
       <para>This is the general-purpose input analysis phase. Most of the
       application-oriented rules should go here. In this phase you are
       guaranteed to have received the request arguments (provided the request
-      body has been read). <trademark class="trade">ModSecurity</trademark>
-      supports three encoding types for the request body phase:</para>
+      body has been read). ModSecurity supports three encoding types for the
+      request body phase:</para>
 
       <itemizedlist>
         <listitem>
@@ -2520,16 +2468,14 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis>phase:1</emphasis>"</programl
       phase also allows for inspection of other response headers that weren't
       available during phase:3 or phase:4. Note that you must be careful not
       to inherit a disruptive action into a rule in this phase as this is a
-      configuration error in <trademark class="trade">ModSecurity</trademark>
-      2.5.0 and later versions.</para>
+      configuration error in ModSecurity 2.5.0 and later versions.</para>
     </section>
   </section>
 
   <section id="variables">
     <title>Variables</title>
 
-    <para>The following variables are supported in <trademark
-    class="trade">ModSecurity</trademark> 2.x:</para>
+    <para>The following variables are supported in ModSecurity 2.x:</para>
 
     <section>
       <title><literal moreinfo="none">ARGS</literal></title>
@@ -2570,9 +2516,8 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis>phase:1</emphasis>"</programl
         <para>Using <literal>ARGS:p</literal> will not result in any
         invocations against the operator if argument p does not exist.</para>
 
-        <para>In <trademark class="trade">ModSecurity</trademark> 1.X, the
-        <literal>ARGS</literal> variable stood for
-        <literal>QUERY_STRING</literal> + <literal>POST_PAYLOAD</literal>,
+        <para>In ModSecurity 1.X, the <literal>ARGS</literal> variable stood
+        for <literal>QUERY_STRING</literal> + <literal>POST_PAYLOAD</literal>,
         whereas now it expands to individual variables.</para>
       </note>
     </section>
@@ -2827,8 +2772,7 @@ SecRule <emphasis>TX:MYMATCH</emphasis> "@eq ARGS:param" deny</programlisting>
     <section>
       <title><literal moreinfo="none">MODSEC_BUILD</literal></title>
 
-      <para>This variable holds the <trademark
-      class="trade">ModSecurity</trademark> build number. This variable is
+      <para>This variable holds the ModSecurity build number. This variable is
       intended to be used to check the build number prior to using a feature
       that is available only in a certain build. Example:</para>
 
@@ -2891,25 +2835,23 @@ LF %{MULTIPART_LF_LINE}, \
 SM %{MULTIPART_SEMICOLON_MISSING}'"</programlisting>
 
       <para>The <literal>multipart/form-data</literal> parser was upgraded in
-      <trademark class="trade">ModSecurity</trademark> v2.1.3 to actively look
-      for signs of evasion. Many variables (as listed above) were added to
-      expose various facts discovered during the parsing process. The
-      <literal>MULTIPART_STRICT_ERROR</literal> variable is handy to check on
-      all abnormalities at once. The individual variables allow detection to
-      be fine-tuned according to your circumstances in order to reduce the
-      number of false positives. Detailed analysis of various evasion
-      techniques covered will be released as a separated document at a later
-      date.</para>
+      ModSecurity v2.1.3 to actively look for signs of evasion. Many variables
+      (as listed above) were added to expose various facts discovered during
+      the parsing process. The <literal>MULTIPART_STRICT_ERROR</literal>
+      variable is handy to check on all abnormalities at once. The individual
+      variables allow detection to be fine-tuned according to your
+      circumstances in order to reduce the number of false positives. Detailed
+      analysis of various evasion techniques covered will be released as a
+      separated document at a later date.</para>
     </section>
 
     <section>
       <title><literal>MULTIPART_UNMATCHED_BOUNDARY</literal></title>
 
       <para>Set to <literal>1</literal> when, during the parsing phase of a
-      <literal>multipart/request-body</literal>, <trademark
-      class="trade">ModSecurity</trademark> encounters what feels like a
-      boundary but it is not. Such an event may occur when evasion of
-      <trademark class="trade">ModSecurity</trademark> is attempted.</para>
+      <literal>multipart/request-body</literal>, ModSecurity encounters what
+      feels like a boundary but it is not. Such an event may occur when
+      evasion of ModSecurity is attempted.</para>
 
       <para>The best way to use this variable is as in the example
       below:</para>
@@ -3019,11 +2961,11 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
         REQBODY_PROCESSOR_ERROR at the beginning of phase 2. Failure to do so
         will leave the door open for impedance mismatch attacks. It is
         possible, for example, that a payload that cannot be parsed by
-        <trademark class="trade">ModSecurity</trademark> can be successfully
-        parsed by more tolerant parser operating in the application. If your
-        policy dictates blocking then you should reject the request if error
-        is detected. When operating in detection-only mode your rule should
-        alert with high severity when request body processing fails.</para>
+        ModSecurity can be successfully parsed by more tolerant parser
+        operating in the application. If your policy dictates blocking then
+        you should reject the request if error is detected. When operating in
+        detection-only mode your rule should alert with high severity when
+        request body processing fails.</para>
       </note>
     </section>
 
@@ -3221,8 +3163,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       embedded-mode. Headers such as Server, Date, Connection and Content-Type
       are added during a later Apache hook just prior to sending the data to
       the client. This data should be available, however, either during
-      <trademark class="trade">ModSecurity</trademark> phase:5 (logging) or
-      when running in proxy-mode.</para>
+      ModSecurity phase:5 (logging) or when running in proxy-mode.</para>
     </section>
 
     <section>
@@ -3666,22 +3607,19 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
   <section id="transformation-functions">
     <title>Transformation functions</title>
 
-    <para>When <trademark class="trade">ModSecurity</trademark> receives
-    request or response information, it makes a copy of this data and places
-    it into memory. It is on this data in memory that transformation functions
-    are applied. The raw request/response data is never altered.
-    Transformation functions are used to transform a variable before testing
-    it in a rule.</para>
+    <para>When ModSecurity receives request or response information, it makes
+    a copy of this data and places it into memory. It is on this data in
+    memory that transformation functions are applied. The raw request/response
+    data is never altered. Transformation functions are used to transform a
+    variable before testing it in a rule.</para>
 
     <para><emphasis>Note</emphasis></para>
 
     <para>There are no default transformation functions as there were in
-    previous versions of <trademark
-    class="trade">ModSecurity</trademark>.</para>
+    previous versions of ModSecurity.</para>
 
     <para>The following rule will ensure that an attacker does not use mixed
-    case in order to evade the <trademark
-    class="trade">ModSecurity</trademark> rule:</para>
+    case in order to evade the ModSecurity rule:</para>
 
     <para><programlisting format="linespecific">SecRule ARG:p "xp_cmdshell" <emphasis>"t:lowercase"</emphasis></programlisting>
     multiple transformation actions can be used in the same rule, for example
@@ -3825,9 +3763,8 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
       <title><literal><literal>none</literal></literal></title>
 
       <para>This not an actual transformation function but an instruction to
-      <trademark class="trade">ModSecurity</trademark> to remove all
-      transformation functions associated with the current rule and start from
-      scratch.</para>
+      ModSecurity to remove all transformation functions associated with the
+      current rule and start from scratch.</para>
     </section>
 
     <section>
@@ -3943,8 +3880,8 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <orderedlist continuation="restarts" inheritnum="ignore">
       <listitem>
         <para><emphasis>Disruptive actions</emphasis> - are those actions
-        where <trademark class="trade">ModSecurity</trademark> will intercept
-        the data. They can only appear in the first rule in a chain.</para>
+        where ModSecurity will intercept the data. They can only appear in the
+        first rule in a chain.</para>
       </listitem>
 
       <listitem>
@@ -3984,12 +3921,12 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
 
       <programlisting format="linespecific">SecRule REMOTE_ADDR "^192\.168\.1\.100$" nolog,phase:1,<emphasis>allow</emphasis></programlisting>
 
-      <para>Prior to <trademark class="trade">ModSecurity</trademark> 2.5 the
-      <literal>allow</literal> action would only affect the current phase. An
-      <literal>allow</literal> in phase 1 would skip processing the remaining
-      rules in phase 1 but the rules from phase 2 would execute. Starting with
-      v2.5.0 <literal>allow</literal> was enhanced to allow for fine-grained
-      control of what is done. The following rules now apply:</para>
+      <para>Prior to ModSecurity 2.5 the <literal>allow</literal> action would
+      only affect the current phase. An <literal>allow</literal> in phase 1
+      would skip processing the remaining rules in phase 1 but the rules from
+      phase 2 would execute. Starting with v2.5.0 <literal>allow</literal> was
+      enhanced to allow for fine-grained control of what is done. The
+      following rules now apply:</para>
 
       <orderedlist>
         <listitem>
@@ -4085,8 +4022,7 @@ SecAction phase:3,allow</programlisting>
       reverted back to the previous <literal>SecDefaultAction</literal>
       disruptive action.</para>
 
-      <para>In future versions of <trademark
-      class="trade">ModSecurity</trademark>, more control and functionality
+      <para>In future versions of ModSecurity, more control and functionality
       will be added to define "how" to block.</para>
 
       <para>Examples:</para>
@@ -4240,18 +4176,16 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis>ctl:requestBodyProce
       one configuration directive and the usage is identical.</para>
 
       <para>The requestBodyProcessor option allows you to configure the
-      request body processor. By default <trademark
-      class="trade">ModSecurity</trademark> will use the <literal
+      request body processor. By default ModSecurity will use the <literal
       moreinfo="none">URLENCODED</literal> and<literal moreinfo="none">
       MULTIPART</literal> processors to process an <literal
       moreinfo="none">application/x-www-form-urlencoded</literal> and a
       <literal moreinfo="none">multipart/form-data</literal> body,
       respectively. A third processor, XML, is also supported, but it is never
-      used implicitly. Instead you must tell <trademark
-      class="trade">ModSecurity</trademark> to use it by placing a few rules
-      in the<literal moreinfo="none"> REQUEST_HEADERS</literal> processing
-      phase. After the request body was processed as XML you will be able to
-      use the XML-related features to inspect it.</para>
+      used implicitly. Instead you must tell ModSecurity to use it by placing
+      a few rules in the<literal moreinfo="none"> REQUEST_HEADERS</literal>
+      processing phase. After the request body was processed as XML you will
+      be able to use the XML-related features to inspect it.</para>
 
       <para>Request body processors will not interrupt a transaction if an
       error occurs during parsing. Instead they will set variables<literal
@@ -4358,8 +4292,8 @@ SecRule ARGS:p attack log,<emphasis>exec:/usr/local/apache/conf/exec.lua</emphas
         process results in all threads being replicated in the new process.
         Forking can therefore incur larger overhead in multi-threaded
         operation. The script you execute must write something (anything) to
-        stdout. If it doesn't <trademark class="trade">ModSecurity</trademark>
-        will assume execution didn't work.</para>
+        stdout. If it doesn't ModSecurity will assume execution didn't
+        work.</para>
       </note>
     </section>
 
@@ -4532,13 +4466,12 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
       </note>
 
       <note>
-        <para>Please note that <trademark
-        class="trade">ModSecurity</trademark> does not implement atomic
-        updates of persistent variables at this time. Variables are read from
-        storage whenever <literal>initcol</literal> is encountered in the
-        rules and persisted at the end of request processing. On busy servers
-        requests often run in parallel, leading to situations where one
-        request overwrites the changes made by another request. We anticipate
+        <para>Please note that ModSecurity does not implement atomic updates
+        of persistent variables at this time. Variables are read from storage
+        whenever <literal>initcol</literal> is encountered in the rules and
+        persisted at the end of request processing. On busy servers requests
+        often run in parallel, leading to situations where one request
+        overwrites the changes made by another request. We anticipate
         implementing atomic updates of counter values in a future
         version.</para>
       </note>
@@ -4559,7 +4492,7 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
       <para><emphasis>Note</emphasis></para>
 
       <para>This action will log matches to the Apache error log file and the
-      <trademark class="trade">ModSecurity</trademark> audit log.</para>
+      ModSecurity audit log.</para>
     </section>
 
     <section>
@@ -4605,10 +4538,9 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
     <section>
       <title><literal>multiMatch</literal></title>
 
-      <para><emphasis>Description:</emphasis> If enabled <trademark
-      class="trade">ModSecurity</trademark> will perform multiple operator
-      invocations for every target, before and after every anti-evasion
-      transformation is performed.</para>
+      <para><emphasis>Description:</emphasis> If enabled ModSecurity will
+      perform multiple operator invocations for every target, before and after
+      every anti-evasion transformation is performed.</para>
 
       <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
 
@@ -4897,8 +4829,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
 
       <para><emphasis>Note</emphasis></para>
 
-      <para>Severity values in <trademark
-      class="trade">ModSecurity</trademark> follow those of syslog, as
+      <para>Severity values in ModSecurity follow those of syslog, as
       below:</para>
 
       <itemizedlist>
@@ -5289,7 +5220,7 @@ SecRule ARGS:route "!<emphasis>@endsWith %{REQUEST_ADDR}</emphasis>" t:none,deny
       configuration file resides. Also as of v2.5.0, if the filename is
       determined to be a Lua script (based on its extension) the script will
       be processed by the internal engine. As such it will have full access to
-      the <trademark class="trade">ModSecurity</trademark> context.</para>
+      the ModSecurity context.</para>
 
       <para>Example of using an external binary/script:</para>
 
@@ -5418,9 +5349,8 @@ end</programlisting>
       <para><emphasis>Note</emphasis></para>
 
       <para>Regular expressions are handled by the PCRE library (<ulink
-      url="http://www.pcre.org">http://www.pcre.org</ulink>). <trademark
-      class="trade">ModSecurity</trademark> compiles its regular expressions
-      with the following settings:</para>
+      url="http://www.pcre.org">http://www.pcre.org</ulink>). ModSecurity
+      compiles its regular expressions with the following settings:</para>
 
       <orderedlist continuation="restarts" inheritnum="ignore">
         <listitem>
@@ -5483,10 +5413,9 @@ SecRule REQUEST_HEADERS:Ip-Address "!<emphasis>@streq %{TX.1}</emphasis>"</progr
       the parameters are extracted from such request they are checked for a
       valid range.</para>
 
-      <para>validateByteRange is similar to the <trademark
-      class="trade">ModSecurity</trademark> 1.X SecFilterForceByteRange
-      Directive however since it works in a rule context, it has the following
-      differences:</para>
+      <para>validateByteRange is similar to the ModSecurity 1.X
+      SecFilterForceByteRange Directive however since it works in a rule
+      context, it has the following differences:</para>
 
       <itemizedlist>
         <listitem>
@@ -5578,8 +5507,8 @@ SecRule XML "<emphasis>@validateSchema /path/to/apache2/conf/xml.xsd</emphasis>,
       <itemizedlist>
         <listitem>
           <para>Not enough bytes. UTF-8 supports two, three, four, five, and
-          six byte encodings. <trademark class="trade">ModSecurity</trademark>
-          will locate cases when a byte or more is missing.</para>
+          six byte encodings. ModSecurity will locate cases when a byte or
+          more is missing.</para>
         </listitem>
 
         <listitem>
@@ -5636,14 +5565,13 @@ SecRule REQUEST_METHOD "!<emphasis>@within %{tx.allowed_methods}</emphasis>" t:l
   <section>
     <title>Data Formats</title>
 
-    <para>This section documents the various data formats used by <trademark
-    class="trade">ModSecurity</trademark>.</para>
+    <para>This section documents the various data formats used by
+    ModSecurity.</para>
 
     <section>
       <title>Alerts</title>
 
-      <para>Below is an example of a <trademark
-      class="trade">ModSecurity</trademark> alert entry. It is always
+      <para>Below is an example of a ModSecurity alert entry. It is always
       contained on a single line but we've broken it here into multiple lines
       for readability.</para>
 
@@ -5658,10 +5586,10 @@ is not allowed by policy"] [severity "CRITICAL"] [uri "/"] [unique_id
 against "REQUEST_PROTOCOL" required.</programlisting>
 
       <para>The engine message consists of two parts. The first part tells you
-      whether <trademark class="trade">ModSecurity</trademark> acted to
-      interrupt transaction or rule processing. If it did nothing the first
-      part of the message will simply say "Warning". If an action was taken
-      then one of the following messages will be used:</para>
+      whether ModSecurity acted to interrupt transaction or rule processing.
+      If it did nothing the first part of the message will simply say
+      "Warning". If an action was taken then one of the following messages
+      will be used:</para>
 
       <itemizedlist>
         <listitem>
@@ -5905,19 +5833,16 @@ against "REQUEST_PROTOCOL" required.</programlisting>
       <section>
         <title>Alerts in Apache</title>
 
-        <para>Every <trademark class="trade">ModSecurity</trademark> alert
-        conforms to the following format when it appears in the Apache error
-        log:</para>
+        <para>Every ModSecurity alert conforms to the following format when it
+        appears in the Apache error log:</para>
 
-        <programlisting>[Sun Jun 24 10:19:58 2007] [error] [client 192.168.0.1] <trademark
-            class="trade">ModSecurity</trademark>: ALERT_MESSAGE</programlisting>
+        <programlisting>[Sun Jun 24 10:19:58 2007] [error] [client 192.168.0.1]
+            ModSecurity: ALERT_MESSAGE</programlisting>
 
-        <para>The above is a standard Apache error log format. The "<trademark
-        class="trade">ModSecurity</trademark>:" prefix is specific to
-        <trademark class="trade">ModSecurity</trademark>. It is used to allow
-        quick identification of <trademark
-        class="trade">ModSecurity</trademark> alert messages when they appear
-        in the same file next to other Apache messages.</para>
+        <para>The above is a standard Apache error log format. The "
+        ModSecurity:" prefix is specific to ModSecurity. It is used to allow
+        quick identification of ModSecurity alert messages when they appear in
+        the same file next to other Apache messages.</para>
 
         <para>The actual message (<literal>ALERT_MESSAGE</literal> in the
         example above) is in the same format as described in the
@@ -5928,10 +5853,9 @@ against "REQUEST_PROTOCOL" required.</programlisting>
         <title>Alerts in Audit Log</title>
 
         <para>Alerts are transported in the <literal>H</literal> section of
-        the <trademark class="trade">ModSecurity</trademark> Audit Log. Alerts
-        will appear each on a separate line and in the order they were
-        generated by <trademark class="trade">ModSecurity</trademark>. Each
-        line will be in the following format:</para>
+        the ModSecurity Audit Log. Alerts will appear each on a separate line
+        and in the order they were generated by ModSecurity. Each line will be
+        in the following format:</para>
 
         <programlisting>Message: ALERT_MESSAGE</programlisting>
 
@@ -5946,7 +5870,7 @@ Message: Warning. Pattern match "(?:\\b(?:(?:s(?:elect\\b(?:.{1,100}?\\b(?:(?:le
  (?:(?:addextendedpro|sqlexe)c|(?:oacreat|prepar)e|execute(?:sql)?|makewebt ..." at ARGS:c. [id "950001"]
  [msg "SQL Injection Attack. Matched signature: union select"] [severity "CRITICAL"]
 Stopwatch: 1199881676978327 2514 (396 2224 -)
-Producer: <trademark class="trade">ModSecurity</trademark> v2.x.x (Apache 2.x)
+Producer: ModSecurity v2.x.x (Apache 2.x)
 Server: Apache/2.x.x
 
 --c7036611-Z--</programlisting>
@@ -5956,8 +5880,8 @@ Server: Apache/2.x.x
     <section>
       <title>Audit Log</title>
 
-      <para><trademark class="trade">ModSecurity</trademark> records one
-      transaction in a single audit log file. Below is an example:</para>
+      <para>ModSecurity records one transaction in a single audit log file.
+      Below is an example:</para>
 
       <programlisting>--c7036611-A--
 [09/Jan/2008:12:27:56 +0000] OSD4l1BEUOkAAHZ8Y3QAAAAH 209.90.77.54 64995 80.68.80.233 80
@@ -5987,7 +5911,7 @@ Message: Warning. Pattern match "(?:\\b(?:(?:s(?:elect\\b(?:.{1,100}?\\b(?:(?:le
 Apache-Error: [file "/tmp/buildd/apache2-2.x.x/build-tree/apache2/server/core.c"] [line 3505] [level 3]
  File does not exist: /var/www/EvilBoard_0.1a
 Stopwatch: 1199881676978327 2514 (396 2224 -)
-Producer: <trademark class="trade">ModSecurity</trademark> v2.x.x (Apache 2.x)
+Producer: ModSecurity v2.x.x (Apache 2.x)
 Server: Apache/2.x.x
 
 --c7036611-Z--
@@ -6052,17 +5976,15 @@ Server: Apache/2.x.x
       This problem is better known as Impedance Mismatch. It can be exploited
       to evade the security devices.</para>
 
-      <para>While we will continue to enhance <trademark
-      class="trade">ModSecurity</trademark> to deal with various evasion
-      techniques the problem can only be minimized, but never solved. With so
-      many different application backend chances are some will always do
-      something completely unexpected. The only solution is to be aware of the
-      technologies in the backend when writing rules, adapting the rules to
-      remove the mismatch. See the next section for some examples.</para>
+      <para>While we will continue to enhance ModSecurity to deal with various
+      evasion techniques the problem can only be minimized, but never solved.
+      With so many different application backend chances are some will always
+      do something completely unexpected. The only solution is to be aware of
+      the technologies in the backend when writing rules, adapting the rules
+      to remove the mismatch. See the next section for some examples.</para>
 
       <section>
-        <title>PHP Peculiarities for <trademark
-        class="trade">ModSecurity</trademark> Users</title>
+        <title>PHP Peculiarities for ModSecurity Users</title>
 
         <para>When writing rules to protect PHP applications you need to pay
         attention to the following facts:</para>
