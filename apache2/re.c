@@ -1988,6 +1988,8 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                     return -1;
                 }
                 if (rc == RULE_MATCH) {
+                    match_count++;
+
                     /* Return straight away if the transaction
                      * was intercepted - no need to process the remaining
                      * targets.
