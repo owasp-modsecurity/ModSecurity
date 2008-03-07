@@ -735,6 +735,8 @@ void msre_engine_destroy(msre_engine *engine) {
  * transaction phase.
  */
 #if defined(PERFORMANCE_MEASUREMENT)
+static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_rec *msr);
+
 apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) {
     apr_array_header_t *arr = NULL;
     msre_rule **rules = NULL;
@@ -1986,6 +1988,8 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                     return -1;
                 }
                 if (rc == RULE_MATCH) {
+                    match_count++;
+
                     /* Return straight away if the transaction
                      * was intercepted - no need to process the remaining
                      * targets.

@@ -4,7 +4,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.1-rc1 (March 04, 2008)</releaseinfo>
+    <releaseinfo>Version 2.5.1-rc1 (March 07, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -4606,14 +4606,26 @@ SecRule ARGS "attack" <emphasis>multiMatch</emphasis></programlisting>
 
       <para><emphasis>Action Group:</emphasis> Disruptive</para>
 
-      <para>Example:</para>
+      <para>Example1:</para>
 
       <programlisting format="linespecific">SecRule REQUEST_HEADERS:User-Agent "Test" log,<emphasis>pass</emphasis></programlisting>
 
+      <para>When using <emphasis>pass</emphasis> with SecRule with multiple
+      targets, <emphasis>all</emphasis> targets will be processed and
+      <emphasis>all</emphasis> non-disruptive actions will trigger for
+      <emphasis>every</emphasis> match found. In the second example the
+      TX:test target would be incremented by 1 for each matching
+      argument.</para>
+
+      <para>Example2:</para>
+
+      <programlisting format="linespecific">SecRule ARGS "test" log,<emphasis>pass</emphasis>,setvar:TX.test=+1</programlisting>
+
       <para><emphasis>Note</emphasis></para>
 
-      <para>Transaction will not be interrupted but it will be logged (unless
-      logging has been suppressed).</para>
+      <para>The transaction will not be interrupted but a log will be
+      generated for each matching target (unless logging has been
+      suppressed).</para>
     </section>
 
     <section>
