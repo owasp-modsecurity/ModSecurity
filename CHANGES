@@ -1,5 +1,5 @@
-07 Mar 2008 - 2.5.1-rc1
------------------------
+14 Mar 2008 - 2.5.1
+-------------------
 
  * Fixed an issue where a match would not occur if transformation caching
    was enabled.
