@@ -231,6 +231,7 @@ msre_action_metadata *msre_resolve_action(msre_engine *engine, const char *name)
 msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *name, const char *param,
     modsec_rec *msr, char **error_msg)
 {
+    const char *varparam = param;
     msre_var *var = apr_pcalloc(pool, sizeof(msre_var));
     if (var == NULL) return NULL;
 
@@ -251,6 +252,17 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
         var->name = name;
     }
 
+    /* Treat HTTP_* targets as an alias for REQUEST_HEADERS:* */
+    if (   (var->name != NULL)
+        && (strlen(var->name) > 5)
+        && (strncmp("HTTP_", var->name, 5) == 0))
+    {
+        const char *oldname = var->name;
+        var->name = apr_pstrdup(pool, "REQUEST_HEADERS");
+        varparam = apr_pstrdup(pool, oldname + 5);
+    }
+
+
     /* Resolve variable */
     var->metadata = msre_resolve_var(engine, var->name);
     if (var->metadata == NULL) {
@@ -268,7 +280,7 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
     }
 
     /* Check the parameter. */
-    if (param == NULL) {
+    if (varparam == NULL) {
         if (var->metadata->argc_min > 0) {
             *error_msg = apr_psprintf(engine->mp, "Missing mandatory parameter for variable %s.",
                 name);
@@ -283,7 +295,7 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
             return NULL;
         }
 
-        var->param = param;
+        var->param = varparam;
     }
 
     return var;

@@ -1,3 +1,9 @@
+19 Mar 2008 - 2.5.1-breach1
+---------------------------
+
+ * Allow HTTP_* targets as an alias for REQUEST_HEADERS:*.
+
+
 14 Mar 2008 - 2.5.1
 -------------------
 

@@ -1129,10 +1129,11 @@ static const char *cmd_default_action(cmd_parms *cmd, void *_dcfg, const char *p
     if ((dcfg->tmp_default_actionset->severity != NOT_SET)
         ||(dcfg->tmp_default_actionset->logdata != NOT_SET_P))
     {
-        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-            "ModSecurity: WARNING SecDefaultAction \"%s\" should not "
-            "contain a severity or logdata action (%s:%d).",
-            p1, cmd->directive->filename, cmd->directive->line_num);
+        ap_log_perror(APLOG_MARK,
+            APLOG_STARTUP|APLOG_WARNING|APLOG_NOERRNO, 0, cmd->pool,
+            "ModSecurity: WARNING Using \"severity\" or \"logdata\" in "
+            "SecDefaultAction is deprecated (%s:%d).",
+            cmd->directive->filename, cmd->directive->line_num);
     }
 
     /* Must not use chain. */
