@@ -685,6 +685,12 @@ apr_status_t modsecurity_request_body_clear(modsec_rec *msr, char **error_msg) {
                         log_escape(msr->msc_reqbody_mp, put_filename));
                 }
             } else {
+                /* make sure it is closed first */
+                if (msr->msc_reqbody_fd > 0) {
+                    close(msr->msc_reqbody_fd);
+                    msr->msc_reqbody_fd = -1;
+                }
+
                 /* We do not want to keep the request body. */
                 if (apr_file_remove(msr->msc_reqbody_filename,
                     msr->msc_reqbody_mp) != APR_SUCCESS)
