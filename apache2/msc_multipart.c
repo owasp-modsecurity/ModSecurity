@@ -1058,6 +1058,12 @@ apr_status_t multipart_cleanup(modsec_rec *msr) {
         for(i = 0; i < msr->mpd->parts->nelts; i++) {
             if (parts[i]->type == MULTIPART_FILE) {
                 if (parts[i]->tmp_file_name != NULL) {
+                    /* make sure it is closed first */
+                    if (parts[i]->tmp_file_fd > 0) {
+                        close(parts[i]->tmp_file_fd);
+                        parts[i]->tmp_file_fd = -1;
+                    }
+
                     if (unlink(parts[i]->tmp_file_name) < 0) {
                         msr_log(msr, 1, "Multipart: Failed to delete file (part) \"%s\" because %d(%s)",
                             log_escape(msr->mp, parts[i]->tmp_file_name), errno, strerror(errno));
@@ -1078,6 +1084,12 @@ apr_status_t multipart_cleanup(modsec_rec *msr) {
             if ((parts[i]->type == MULTIPART_FILE)&&(parts[i]->tmp_file_size == 0)) {
                 /* Delete empty file. */
                 if (parts[i]->tmp_file_name != NULL) {
+                    /* make sure it is closed first */
+                    if (parts[i]->tmp_file_fd > 0) {
+                        close(parts[i]->tmp_file_fd);
+                        parts[i]->tmp_file_fd = -1;
+                    }
+
                     if (unlink(parts[i]->tmp_file_name) < 0) {
                         msr_log(msr, 1, "Multipart: Failed to delete empty file (part) \"%s\" because %d(%s)",
                             log_escape(msr->mp, parts[i]->tmp_file_name), errno, strerror(errno));
@@ -1091,6 +1103,12 @@ apr_status_t multipart_cleanup(modsec_rec *msr) {
                 if (parts[i]->tmp_file_name != NULL) {
                     const char *new_filename = NULL;
                     const char *new_basename = NULL;
+
+                    /* make sure it is closed first */
+                    if (parts[i]->tmp_file_fd > 0) {
+                        close(parts[i]->tmp_file_fd);
+                        parts[i]->tmp_file_fd = -1;
+                    }
 
                     new_basename = file_basename(msr->mp, parts[i]->tmp_file_name);
                     if (new_basename == NULL) return -1;

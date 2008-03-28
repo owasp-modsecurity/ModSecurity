@@ -219,7 +219,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
             /* Check request body limit (should only trigger on chunked requests). */
             if (msr->reqbody_length + buflen > (apr_size_t)msr->txcfg->reqbody_limit) {
-                *error_msg = apr_psprintf(msr->mp, "Requests body is larger than the "
+                *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
                     "configured limit (%lu).", msr->txcfg->reqbody_limit);
                 return -5;
             }
