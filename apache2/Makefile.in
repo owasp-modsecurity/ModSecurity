@@ -26,6 +26,7 @@ MODSEC_APXS_EXTRA_CFLAGS = @MODSEC_APXS_EXTRA_CFLAGS@
 
 APXS = @APXS@
 APXS_WRAPPER = @APXS_WRAPPER@
+APXS_INCLUDEDIR = @APXS_INCLUDEDIR@
 APXS_INCLUDES = @APXS_INCLUDES@
 APXS_CFLAGS = @APXS_CFLAGS@
 APXS_LDFLAGS = @APXS_LDFLAGS@
@@ -112,7 +113,7 @@ mlogc-static:
 
 ### Experimental Test Framework (*NIX only right now)
 msc_test.lo: msc_test.c
-	$(LIBTOOL) --mode=compile $(CC) $(APXS_CFLAGS) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(CPPFLAGS) $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test.lo -c msc_test.c
+	$(LIBTOOL) --mode=compile $(CC) $(APXS_INCLUDES) $(APXS_CFLAGS) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(CPPFLAGS) $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test.lo -c msc_test.c
 
 msc_test: $(TESTOBJS) msc_test.lo
 	@objs=""; \

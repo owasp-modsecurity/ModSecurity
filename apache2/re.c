@@ -231,6 +231,7 @@ msre_action_metadata *msre_resolve_action(msre_engine *engine, const char *name)
 msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *name, const char *param,
     modsec_rec *msr, char **error_msg)
 {
+    const char *varparam = param;
     msre_var *var = apr_pcalloc(pool, sizeof(msre_var));
     if (var == NULL) return NULL;
 
@@ -251,6 +252,17 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
         var->name = name;
     }
 
+    /* Treat HTTP_* targets as an alias for REQUEST_HEADERS:* */
+    if (   (var->name != NULL)
+        && (strlen(var->name) > 5)
+        && (strncmp("HTTP_", var->name, 5) == 0))
+    {
+        const char *oldname = var->name;
+        var->name = apr_pstrdup(pool, "REQUEST_HEADERS");
+        varparam = apr_pstrdup(pool, oldname + 5);
+    }
+
+
     /* Resolve variable */
     var->metadata = msre_resolve_var(engine, var->name);
     if (var->metadata == NULL) {
@@ -268,7 +280,7 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
     }
 
     /* Check the parameter. */
-    if (param == NULL) {
+    if (varparam == NULL) {
         if (var->metadata->argc_min > 0) {
             *error_msg = apr_psprintf(engine->mp, "Missing mandatory parameter for variable %s.",
                 name);
@@ -283,7 +295,7 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
             return NULL;
         }
 
-        var->param = param;
+        var->param = varparam;
     }
 
     return var;
@@ -735,6 +747,8 @@ void msre_engine_destroy(msre_engine *engine) {
  * transaction phase.
  */
 #if defined(PERFORMANCE_MEASUREMENT)
+static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_rec *msr);
+
 apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) {
     apr_array_header_t *arr = NULL;
     msre_rule **rules = NULL;
@@ -1986,6 +2000,8 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                     return -1;
                 }
                 if (rc == RULE_MATCH) {
+                    match_count++;
+
                     /* Return straight away if the transaction
                      * was intercepted - no need to process the remaining
                      * targets.

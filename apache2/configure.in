@@ -89,10 +89,22 @@ VERSION_OK
     [AC_MSG_NOTICE(httpd is recent enough)],
     [AC_MSG_ERROR(apache is too old, mmn must be at least $HTTPD_WANTED_MMN)])
   fi
-  APXS_INCLUDES="`$APXS -q INCLUDES` `$APXS -q EXTRA_INCLUDES`"
+  APXS_INCLUDEDIR="`$APXS -q INCLUDEDIR`"
+  # Make sure the include dir is used
+  if test -n "$APXS_INCLUDEDIR"; then
+    APXS_INCLUDES="-I${APXS_INCLUDEDIR} `$APXS -q INCLUDES` `$APXS -q EXTRA_INCLUDES`"
+  else
+    APXS_INCLUDES="`$APXS -q INCLUDES` `$APXS -q EXTRA_INCLUDES`"
+  fi
   APXS_CFLAGS="`$APXS -q CFLAGS` `$APXS -q EXTRA_CFLAGS`"
   APXS_LDFLAGS="`$APXS -q LDFLAGS` `$APXS -q EXTRA_LDFLAGS`"
-  APXS_LIBS="`$APXS -q LIBS` `$APXS -q EXTRA_LIBS`"
+  APXS_LIBDIR="`$APXS -q LIBDIR`"
+  # Make sure the lib dir is used
+  if test -n "$APXS_LIBDIR"; then
+    APXS_LIBS="-L{$APXS_LIBDIR} `$APXS -q LIBS` `$APXS -q EXTRA_LIBS`"
+  else
+    APXS_LIBS="`$APXS -q LIBS` `$APXS -q EXTRA_LIBS`"
+  fi
   APXS_LIBTOOL="`$APXS -q LIBTOOL`"
   APXS_CC="`$APXS -q CC`"
 else
@@ -125,6 +137,21 @@ sinclude(build/find_curl.m4)
 
 
 ### Configure Options
+
+# Strict Compile
+AC_ARG_ENABLE(strict-compile,
+              AS_HELP_STRING([--enable-strict-compile],
+                             [Enable strict compilation (warnings are errors).]),
+[
+  if test "$enableval" != "no"; then
+    strict_compile="-Werror"
+  else
+    strict_compile=
+  fi
+],
+[
+  strict_compile=
+])
 
 # DEBUG_CONF
 AC_ARG_ENABLE(debug-conf,
@@ -203,7 +230,7 @@ AC_ARG_ENABLE(modsec-api,
 
 ### Build *EXTRA_CFLAGS vars
 
-EXTRA_CFLAGS="-O2 -g -Wall -Werror"
+EXTRA_CFLAGS="-O2 -g -Wall $strict_compile"
 MODSEC_EXTRA_CFLAGS="$debug_conf $debug_cache $debug_acmp $perf_meas $modsec_api"
 
 APXS_WRAPPER=build/apxs-wrapper
@@ -227,6 +254,7 @@ AC_SUBST(EXTRA_CFLAGS)
 AC_SUBST(MODSEC_EXTRA_CFLAGS)
 AC_SUBST(APXS)
 AC_SUBST(APXS_WRAPPER)
+AC_SUBST(APXS_INCLUDEDIR)
 AC_SUBST(APXS_INCLUDES)
 AC_SUBST(APXS_EXTRA_CFLAGS)
 AC_SUBST(MODSEC_APXS_EXTRA_CFLAGS)

@@ -1,3 +1,24 @@
+19 Mar 2008 - 2.5.1-breach1
+---------------------------
+
+ * Allow HTTP_* targets as an alias for REQUEST_HEADERS:*.
+
+
+14 Mar 2008 - 2.5.1
+-------------------
+
+ * Fixed an issue where a match would not occur if transformation caching
+   was enabled.
+
+ * Using "severity" in a default action is now just a warning.
+
+ * Cleaned up the "make test" target to better locate headers/libraries.
+
+ * Now search /usr/lib64 and /usr/lib32 for lua libs.
+
+ * No longer treat warnings as errors by default (use --enable-strict-compile).
+
+
 19 Feb 2008 - 2.5.0
 -------------------
 

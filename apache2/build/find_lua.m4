@@ -66,12 +66,28 @@ if test "${lua_path}" != "no"; then
                 with_lua_lib="${x}/lib"
                 lua_lib_name="lua5.1"
                 break
+            elif test -e "${x}/lib64/liblua5.1.a"; then
+                with_lua_lib="${x}/lib64"
+                lua_lib_name="lua5.1"
+                break
+            elif test -e "${x}/lib32/liblua5.1.a"; then
+                with_lua_lib="${x}/lib32"
+                lua_lib_name="lua5.1"
+                break
             elif test -e "${x}/liblua.a"; then
                 with_lua_lib="${x}"
                 lua_lib_name="lua"
                 break
             elif test -e "${x}/lib/liblua.a"; then
                 with_lua_lib="${x}/lib"
+                lua_lib_name="lua"
+                break
+            elif test -e "${x}/lib64/liblua.a"; then
+                with_lua_lib="${x}/lib64"
+                lua_lib_name="lua"
+                break
+            elif test -e "${x}/lib32/liblua.a"; then
+                with_lua_lib="${x}/lib32"
                 lua_lib_name="lua"
                 break
             else

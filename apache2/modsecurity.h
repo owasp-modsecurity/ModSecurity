@@ -62,14 +62,17 @@ extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
 
 #define MODSEC_VERSION_MAJOR       "2"
 #define MODSEC_VERSION_MINOR       "5"
-#define MODSEC_VERSION_MAINT       "0"
-#define MODSEC_VERSION_TYPE        ""
-#define MODSEC_VERSION_RELEASE     ""
+#define MODSEC_VERSION_MAINT       "1"
+#define MODSEC_VERSION_TYPE        "-breach"
+#define MODSEC_VERSION_RELEASE     "1"
 
 #define MODULE_NAME "ModSecurity for Apache"
+
+#define MODSEC_VERSION_SUFFIX MODSEC_VERSION_TYPE MODSEC_VERSION_RELEASE
 #define MODULE_RELEASE \
   MODSEC_VERSION_MAJOR "." MODSEC_VERSION_MINOR "." MODSEC_VERSION_MAINT \
-  "-" MODSEC_VERSION_TYPE MODSEC_VERSION_RELEASE
+  MODSEC_VERSION_SUFFIX
+
 #define MODULE_NAME_FULL MODULE_NAME "/" MODULE_RELEASE " (http://www.modsecurity.org/)"
 
 #define PHASE_REQUEST_HEADERS       1
