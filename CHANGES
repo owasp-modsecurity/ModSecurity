@@ -1,7 +1,9 @@
-19 Mar 2008 - 2.5.1-breach1
----------------------------
+28 Mar 2008 - trunk
+-------------------
 
  * Allow HTTP_* targets as an alias for REQUEST_HEADERS:*.
+
+ * Make sure temporary filehandles are closed after a transaction.
 
 
 14 Mar 2008 - 2.5.1
