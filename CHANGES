@@ -1,5 +1,5 @@
-28 Mar 2008 - 2.1.7-rc1
------------------------
+02 Apr 2008 - 2.1.7
+-------------------
 
  * Make sure temporary filehandles are closed after a transaction.
 
