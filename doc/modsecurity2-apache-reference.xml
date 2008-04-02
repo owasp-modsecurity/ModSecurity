@@ -4,7 +4,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.6.0-trunk (March 19, 2008)</releaseinfo>
+    <releaseinfo>Version 2.6.0-trunk (April 02, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -5572,6 +5572,31 @@ SecRule XML "<emphasis>@validateSchema /path/to/apache2/conf/xml.xsd</emphasis>,
 SecAction "pass,setvar:'tx.allowed_methods=get,post,head'"
 SecRule REQUEST_METHOD "!<emphasis>@within %{tx.allowed_methods}</emphasis>" t:lowercase,deny,status:403</programlisting>
     </section>
+  </section>
+
+  <section>
+    <title>Macro Expansion</title>
+
+    <para>Macros allow for using place holders in rules that will be expanded
+    out to their values at runtime. Currently only variable expansion is
+    supported, however more options may be added in future versions of
+    ModSecurity.</para>
+
+    <para>Format:</para>
+
+    <programlisting format="linespecific">%{VARIABLE}
+%{COLLECTION.VARIABLE}</programlisting>
+
+    <para>Macro expansion can be used in actions such as initcol, setsid,
+    setuid, setvar, setenv, logdata. Operators that are evaluated at runtime
+    support expansion and are noted above. Such operators include @beginsWith,
+    @endsWith, @contains, @within and @streq. You cannot use macro expansion
+    for operators that are "compiled" such as @pm, @rx, etc. as these
+    operators have their values fixed at configure time for efficiency.</para>
+
+    <para>Some values you may want to expand include: TX, REMOTE_ADDR, USERID,
+    HIGHEST_SEVERITY, MATCHED_VAR, MATCHED_VAR_NAME, MULTIPART_STRICT_ERROR,
+    RULE, SESSION, USERID, among others.</para>
   </section>
 
   <section>
