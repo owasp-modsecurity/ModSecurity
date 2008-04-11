@@ -1,9 +1,11 @@
-02 Apr 2008 - trunk
+11 Apr 2008 - trunk
 -------------------
 
  * Allow HTTP_* targets as an alias for REQUEST_HEADERS:*.
 
  * Make sure temporary filehandles are closed after a transaction.
+
+ * Fixed issue where the exec action may not be able to execute shell scripts.
 
 
 14 Mar 2008 - 2.5.1
