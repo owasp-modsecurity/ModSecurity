@@ -8,6 +8,22 @@
  * Fixed issue where the exec action may not be able to execute shell scripts.
 
 
+02 Apr 2008 - 2.5.2
+-------------------
+
+ * Allow HTTP_* targets as an alias for REQUEST_HEADERS:*.
+
+ * Make sure temporary filehandles are closed after a transaction.
+
+ * Make sure the apache include directory is included during build.
+
+
+02 Apr 2008 - 2.1.7
+-------------------
+
+ * Make sure temporary filehandles are closed after a transaction.
+
+
 14 Mar 2008 - 2.5.1
 -------------------
 
