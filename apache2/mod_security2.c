@@ -1068,6 +1068,9 @@ static void register_hooks(apr_pool_t *mp) {
         NULL
     };
 
+    /* Add the MODSEC_2.x compatibility defines */
+    *(char **)apr_array_push(ap_server_config_defines) = apr_pstrdup(mp, "MODSEC_2.5");
+
     /* Add the MODSEC_a.b define */
     *(char **)apr_array_push(ap_server_config_defines) = apr_psprintf(mp, "MODSEC_%s.%s", MODSEC_VERSION_MAJOR, MODSEC_VERSION_MINOR);
 
