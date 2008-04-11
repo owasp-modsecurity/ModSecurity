@@ -105,7 +105,6 @@ int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char *
     apr_procattr_io_set(procattr, APR_NO_PIPE, APR_FULL_BLOCK, APR_NO_PIPE);
     apr_procattr_cmdtype_set(procattr, APR_SHELLCMD);
 
-    msr_log(msr, 9, "Exec: %s", log_escape_nq(r->pool, command));
     rc = apr_proc_create(procnew, command, argv, env, procattr, r->pool);
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Exec: Execution failed: %s (%s)", log_escape_nq(r->pool, command),
