@@ -103,7 +103,9 @@ int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char *
     }
 
     apr_procattr_io_set(procattr, APR_NO_PIPE, APR_FULL_BLOCK, APR_NO_PIPE);
+    apr_procattr_cmdtype_set(procattr, APR_SHELLCMD);
 
+    msr_log(msr, 9, "Exec: %s", log_escape_nq(r->pool, command));
     rc = apr_proc_create(procnew, command, argv, env, procattr, r->pool);
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Exec: Execution failed: %s (%s)", log_escape_nq(r->pool, command),
@@ -147,7 +149,8 @@ int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char *
             nbytes = 255;
             while(apr_file_read(script_out, buf, &nbytes) == APR_SUCCESS) nbytes = 255;
         } else {
-            msr_log(msr, 1, "Exec: Execution failed: %s (%s)", log_escape_nq(r->pool, command),
+            msr_log(msr, 1, "Exec: Execution failed while reading output: %s (%s)",
+                log_escape_nq(r->pool, command),
                 get_apr_error(r->pool, rc2));
             return -1;
         }
