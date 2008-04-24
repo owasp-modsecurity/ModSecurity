@@ -1,11 +1,7 @@
-11 Apr 2008 - trunk
+24 Apr 2008 - 2.5.3
 -------------------
 
- * Allow HTTP_* targets as an alias for REQUEST_HEADERS:*.
-
- * Make sure temporary filehandles are closed after a transaction.
-
- * Fixed issue where the exec action may not be able to execute shell scripts.
+ * Macros are now expanded in expirevar and deprecatevar.
 
 
 02 Apr 2008 - 2.5.2

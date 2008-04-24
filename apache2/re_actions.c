@@ -203,6 +203,12 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
 
                     next_text_start = t + 1; /* *t was '}' */
                 } else {
+                    /* Warn about a possiblly forgotten '}' */
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Warning: Possibly unterminated macro: \"%s\"",
+                            log_escape_ex(mptmp, var_start - 2, t - var_start + 2));
+                    }
+
                     next_text_start = t; /* *t was '\0' */
                 }
             }
@@ -1023,7 +1029,7 @@ static apr_status_t msre_action_setenv_execute(modsec_rec *msr, apr_pool_t *mptm
     }
 
     if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "Setting env enviable: %s=%s", env_name, env_value);
+        msr_log(msr, 9, "Setting env variable: %s=%s", env_name, env_value);
     }
 
     /* Expand and escape any macros in the name */
@@ -1259,6 +1265,21 @@ static apr_status_t msre_action_expirevar_execute(modsec_rec *msr, apr_pool_t *m
         *s = '\0';
     }
 
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Expiring variable: %s=%s", var_name, var_value);
+    }
+
+    /* Expand and escape any macros in the name */
+    var = apr_palloc(msr->mp, sizeof(msc_string));
+    if (var == NULL) {
+        msr_log(msr, 1, "Failed to allocate space to expand name macros");
+        return -1;
+    }
+    var->value = var_name;
+    var->value_len = strlen(var->value);
+    expand_macros(msr, var, rule, mptmp);
+    var_name = log_escape_ex(msr->mp, var->value, var->value_len);
+
     /* Choose the collection to work with. */
     s = strstr(var_name, ".");
     if (s != NULL) {
@@ -1289,9 +1310,18 @@ static apr_status_t msre_action_expirevar_execute(modsec_rec *msr, apr_pool_t *m
     var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     var->name = apr_psprintf(msr->mp, "__expire_%s", var_name);
     var->name_len = strlen(var->name);
+
+    /* Expand macros in value */
+    var->value = var_value;
+    var->value_len = strlen(var->value);
+    expand_macros(msr, var, rule, msr->mp);
+    var_value = var->value;
+
+    /* Calculate with the expanded value */
     var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)(apr_time_sec(msr->request_time)
         + atoi(var_value)));
     var->value_len = strlen(var->value);
+
     apr_table_setn(target_col, var->name, (void *)var);
 
     msr_log(msr, 4, "Variable \"%s.%s\" set to expire in %s seconds.", col_name,
@@ -1325,6 +1355,27 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
         var_value = s + 1;
         *s = '\0';
     }
+
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Deprecating variable: %s=%s", var_name, var_value);
+    }
+
+    /* Expand and escape any macros in the name */
+    var = apr_palloc(msr->mp, sizeof(msc_string));
+    if (var == NULL) {
+        msr_log(msr, 1, "Failed to allocate space to expand name macros");
+        return -1;
+    }
+    var->value = var_name;
+    var->value_len = strlen(var->value);
+    expand_macros(msr, var, rule, mptmp);
+    var_name = log_escape_ex(msr->mp, var->value, var->value_len);
+
+    /* Expand macros in value */
+    var->value = var_value;
+    var->value_len = strlen(var->value);
+    expand_macros(msr, var, rule, msr->mp);
+    var_value = var->value;
 
     /* Choose the collection to work with. */
     s = strstr(var_name, ".");
