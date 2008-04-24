@@ -7,6 +7,9 @@
 
  * Fixed crash if a persistent variable name was more than 126 characters.
 
+ * Updated included Core Ruleset to version 1.6.1 which fixes some
+   false negative issues in the migration to using some 2.5 features.
+
 
 02 Apr 2008 - 2.5.2
 -------------------
