@@ -1,3 +1,9 @@
+24 Apr 2008 - 2.5.3
+-------------------
+
+ * Macros are now expanded in expirevar and deprecatevar.
+
+
 02 Apr 2008 - 2.5.2
 -------------------
 
