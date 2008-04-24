@@ -62,7 +62,7 @@ extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
 
 #define MODSEC_VERSION_MAJOR       "2"
 #define MODSEC_VERSION_MINOR       "5"
-#define MODSEC_VERSION_MAINT       "2"
+#define MODSEC_VERSION_MAINT       "3"
 #define MODSEC_VERSION_TYPE        ""
 #define MODSEC_VERSION_RELEASE     ""
 
