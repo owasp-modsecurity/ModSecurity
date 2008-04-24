@@ -5,6 +5,8 @@
 
  * Macros are now expanded in expirevar and deprecatevar.
 
+ * Fixed crash if a persistent variable name was more than 126 characters.
+
 
 02 Apr 2008 - 2.5.2
 -------------------

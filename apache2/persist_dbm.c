@@ -14,7 +14,7 @@
 /**
  *
  */
-static apr_table_t *collection_unpack(modsec_rec *msr, char *blob, unsigned int blob_size,
+static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob, unsigned int blob_size,
     int log_vars)
 {
     apr_table_t *col = NULL;
@@ -30,11 +30,24 @@ static apr_table_t *collection_unpack(modsec_rec *msr, char *blob, unsigned int 
         msc_string *var = apr_pcalloc(msr->mp, sizeof(msc_string));
 
         var->name_len = (blob[blob_offset] << 8) + blob[blob_offset + 1];
-        if (var->name_len == 0) break;
+        if (var->name_len == 0) {
+            /* This should never happen as the length includes the terminating
+             * NUL and should be 1 for ""
+             */
+            msr_log(msr, 4, "Possiblly corrupted database: var name length = 0 at blob offset %u-%u.", blob_offset, blob_offset + 1);
+            break;
+        }
+        else if (var->name_len > 65536) {
+            /* This should never happen as the length is restricted on store
+             * to 65536.
+             */
+            msr_log(msr, 4, "Possiblly corrupted database: var name length > 65536 (0x%04x) at blob offset %u-%u.", var->name_len, blob_offset, blob_offset + 1);
+            break;
+        }
 
         blob_offset += 2;
         if (blob_offset + var->name_len > blob_size) return NULL;
-        var->name = apr_pstrmemdup(msr->mp, blob + blob_offset, var->name_len - 1);
+        var->name = apr_pstrmemdup(msr->mp, (const char *)blob + blob_offset, var->name_len - 1);
         blob_offset += var->name_len;
         var->name_len--;
 
@@ -42,7 +55,7 @@ static apr_table_t *collection_unpack(modsec_rec *msr, char *blob, unsigned int 
         blob_offset += 2;
 
         if (blob_offset + var->value_len > blob_size) return NULL;
-        var->value = apr_pstrmemdup(msr->mp, blob + blob_offset, var->value_len - 1);
+        var->value = apr_pstrmemdup(msr->mp, (const char *)blob + blob_offset, var->value_len - 1);
         blob_offset += var->value_len;
         var->value_len--;
 
@@ -114,7 +127,7 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
      */
 
     /* Transform raw data into a table. */
-    col = collection_unpack(msr, value->dptr, value->dsize, 1);
+    col = collection_unpack(msr, (const unsigned char *)value->dptr, value->dsize, 1);
     if (col == NULL) return NULL;
 
     /* Remove expired variables. */
@@ -489,7 +502,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
             apr_table_t *col = NULL;
             msc_string *var = NULL;
 
-            col = collection_unpack(msr, value.dptr, value.dsize, 0);
+            col = collection_unpack(msr, (const unsigned char *)value.dptr, value.dsize, 0);
             if (col == NULL) {
                 apr_sdbm_close(dbm);
                 return -1;
