@@ -1,4 +1,12 @@
 --------------------------
+Version 1.6.1 - 2008/04/22
+--------------------------
+
+- Fixed a bug where phases and transformations where not specified explicitly
+    in rules. The issue affected a significant number of rules, and we strongly
+		recommend to upgrade.
+
+--------------------------
 Version 1.6.0 - 2008/02/19
 --------------------------
 
