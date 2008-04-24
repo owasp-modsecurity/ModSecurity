@@ -1,6 +1,8 @@
 24 Apr 2008 - 2.5.3
 -------------------
 
+ * Fixed issue where the exec action may not be able to execute shell scripts.
+
  * Macros are now expanded in expirevar and deprecatevar.
 
 
