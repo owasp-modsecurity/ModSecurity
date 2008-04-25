@@ -13,12 +13,13 @@ use File::Basename qw(basename dirname);
 use FileHandle;
 use IPC::Open2 qw(open2);
 
-my @TYPES = qw(tfn op);
+my @TYPES = qw(tfn op action);
 my $TEST = "./msc_test";
 my $SCRIPT = basename($0);
 my $SCRIPTDIR = dirname($0);
 my $PASSED = 0;
 my $TOTAL = 0;
+my $DEBUG = $ENV{MSC_TEST_DEBUG} || 0;
 
 if (defined $ARGV[0]) {
 	runfile(dirname($ARGV[0]), basename($ARGV[0]), $ARGV[1]);
@@ -72,7 +73,7 @@ sub runfile {
 
 		my %t = %{$t || {}};
 		my $id = sprintf("%6d", $n);
-		my $in = $t{input};
+		my $in = (exists($t{input}) and defined($t{input})) ? $t{input} : "";
 		my $out;
 		my $test_in = new FileHandle();
 		my $test_out = new FileHandle();
@@ -86,11 +87,14 @@ sub runfile {
 		elsif ($t{type} eq "op") {
 			$param = escape($t{param});
 		}
+		elsif ($t{type} eq "action") {
+			$param = escape($t{param});
+		}
 		else {
 			quit(1, "Unknown type \"$t{type}\" - should be one of: " . join(",",@TYPES));
 		}
 
-		@test = ($t{type}, $t{name}, $param, (exists($t{ret}) ? ($t{ret}) : ()));
+		@test = ("-t", $t{type}, "-n", $t{name}, "-p", $param, "-D", "$DEBUG", (exists($t{ret}) ? ("-r", $t{ret}) : ()), (exists($t{iterations}) ? ("-I", $t{iterations}) : ()), (exists($t{prerun}) ? ("-P", $t{prerun}) : ()));
 		$teststr = "$TEST " . join(" ", map { "\"$_\"" } @test);
 		$test_pid = open2($test_out, $test_in, $TEST, @test) or quit(1, "Failed to execute test: $teststr\": $!");
 		print $test_in "$in";
@@ -117,7 +121,7 @@ sub runfile {
 			$pass++;
 		}
 
-		msg(sprintf("%s) %s \"%s\": %s%s", $id, $t{type}, $t{name}, ($rc ? "failed" : "passed"), ((defined($out) && $out ne "")? " ($out)" : "")));
+		msg(sprintf("%s) %s \"%s\"%s: %s%s", $id, $t{type}, $t{name}, (exists($t{comment}) ? " $t{comment}" : ""), ($rc ? "failed" : "passed"), ((defined($out) && $out ne "")? " ($out)" : "")));
 		
 	}
 

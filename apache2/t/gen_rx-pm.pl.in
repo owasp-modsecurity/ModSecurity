@@ -1,0 +1,96 @@
+#!@PERL@
+#
+# Generates a test file for comparing @rx and @pm speed.
+#
+use strict;
+use Regexp::Assemble;
+ 
+
+my $MIN = 1;
+my $MAX = 5000;
+my $INC = 250;
+my $ITERATIONS = 10000;
+my $MINSTRLEN = 2;
+my $MAXSTRLEN = 8;
+
+my $last = rndstr();
+my @param = ($last);
+my $i=$MIN;
+while ($i <= $MAX) {
+	my $ra = Regexp::Assemble->new;
+	$ra->add(@param);
+
+	printf (
+		"# rx: %6d\n".
+		"{\n".
+		"  comment => \"%6d item(s)\",\n".
+		"  type => \"op\",\n".
+		"  name => \"rx\",\n".
+		"  param => qr/^(?:%s)\$/,\n".
+		"  input => \"%s\",\n".
+		"  ret => 1,\n".
+		"  iterations => %d,\n".
+		"},\n",
+		$i,
+		$i,
+		join('|', @param),
+		$last,
+		$ITERATIONS,
+	);
+
+	printf (
+		"# rx-optimized: %6d\n".
+		"{\n".
+		"  comment => \"%6d item(s)\",\n".
+		"  type => \"op\",\n".
+		"  name => \"rx\",\n".
+		"  param => qr/^(?:%s)\$/,\n".
+		"  input => \"%s\",\n".
+		"  ret => 1,\n".
+		"  iterations => %d,\n".
+		"},\n",
+		$i,
+		$i,
+		$ra->as_string,
+		$last,
+		$ITERATIONS,
+	);
+
+	printf (
+		"# pm: %6d\n".
+		"{\n".
+		"  comment => \"%6d item(s)\",\n".
+		"  type => \"op\",\n".
+		"  name => \"pm\",\n".
+		"  param => \"%s\",\n".
+		"  input => \"%s\",\n".
+		"  ret => 1,\n".
+		"  iterations => %d,\n".
+		"},\n",
+		$i,
+		$i,
+		join(' ', @param),
+		$last,
+		$ITERATIONS,
+	);
+
+	$i = ($i == 1) ? $INC : $i + $INC;
+
+	while (@param < $i) {
+		unshift @param, rndstr();
+	}
+}
+
+sub rndstr {
+	my @c=('a'..'z','0'..'9','_');
+	my $rndstr;
+  my $max = int(rand($MAXSTRLEN - $MINSTRLEN)) + $MINSTRLEN;
+	foreach (1 .. $max) {
+		$rndstr .= $c[rand @c];
+	}
+	# We need a string that is not in another string for "last"
+	if ($last =~ m/$rndstr/) {
+		$rndstr = rndstr();
+	}
+	return $rndstr;
+}
