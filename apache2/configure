@@ -5730,6 +5730,8 @@ if test -e "$PERL"; then
 
     ac_config_files="$ac_config_files t/gen_rx-pm.pl"
 
+    ac_config_files="$ac_config_files t/csv_rx-pm.pl"
+
 
     # Perl based tools
     ac_config_files="$ac_config_files ../tools/rules-updater.pl"
@@ -6298,6 +6300,7 @@ do
     "build/apxs-wrapper") CONFIG_FILES="$CONFIG_FILES build/apxs-wrapper" ;;
     "t/run-tests.pl") CONFIG_FILES="$CONFIG_FILES t/run-tests.pl" ;;
     "t/gen_rx-pm.pl") CONFIG_FILES="$CONFIG_FILES t/gen_rx-pm.pl" ;;
+    "t/csv_rx-pm.pl") CONFIG_FILES="$CONFIG_FILES t/csv_rx-pm.pl" ;;
     "../tools/rules-updater.pl") CONFIG_FILES="$CONFIG_FILES ../tools/rules-updater.pl" ;;
     "mlogc-src/Makefile") CONFIG_FILES="$CONFIG_FILES mlogc-src/Makefile" ;;
 
@@ -6855,6 +6858,7 @@ echo "$as_me: $ac_file is unchanged" >&6;}
     "build/apxs-wrapper":F) chmod +x build/apxs-wrapper ;;
     "t/run-tests.pl":F) chmod +x t/run-tests.pl ;;
     "t/gen_rx-pm.pl":F) chmod +x t/gen_rx-pm.pl ;;
+    "t/csv_rx-pm.pl":F) chmod +x t/csv_rx-pm.pl ;;
     "../tools/rules-updater.pl":F) chmod +x ../tools/rules-updater.pl ;;
 
   esac
