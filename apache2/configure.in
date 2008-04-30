@@ -276,6 +276,7 @@ AC_CONFIG_FILES([build/apxs-wrapper], [chmod +x build/apxs-wrapper])
 if test -e "$PERL"; then
     AC_CONFIG_FILES([t/run-tests.pl], [chmod +x t/run-tests.pl])
     AC_CONFIG_FILES([t/gen_rx-pm.pl], [chmod +x t/gen_rx-pm.pl])
+    AC_CONFIG_FILES([t/csv_rx-pm.pl], [chmod +x t/csv_rx-pm.pl])
 
     # Perl based tools
     AC_CONFIG_FILES([../tools/rules-updater.pl], [chmod +x ../tools/rules-updater.pl])
