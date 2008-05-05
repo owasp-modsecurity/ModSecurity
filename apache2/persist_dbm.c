@@ -31,17 +31,26 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
 
         var->name_len = (blob[blob_offset] << 8) + blob[blob_offset + 1];
         if (var->name_len == 0) {
-            /* This should never happen as the length includes the terminating
-             * NUL and should be 1 for ""
-             */
-            msr_log(msr, 4, "Possiblly corrupted database: var name length = 0 at blob offset %u-%u.", blob_offset, blob_offset + 1);
+            /* Is the length a name length, or just the end of the blob? */
+            if (blob_offset < blob_size - 2) {
+                /* This should never happen as the name length
+                 * includes the terminating NUL and should be 1 for ""
+                 */
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "BLOB[%d]: %s", blob_offset, log_escape_hex(msr->mp, blob + blob_offset, blob_size - blob_offset));
+                }
+                msr_log(msr, 4, "Possibly corrupted database: var name length = 0 at blob offset %u-%u.", blob_offset, blob_offset + 1);
+            }
             break;
         }
         else if (var->name_len > 65536) {
             /* This should never happen as the length is restricted on store
              * to 65536.
              */
-            msr_log(msr, 4, "Possiblly corrupted database: var name length > 65536 (0x%04x) at blob offset %u-%u.", var->name_len, blob_offset, blob_offset + 1);
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "BLOB[%d]: %s", blob_offset, log_escape_hex(msr->mp, blob + blob_offset, blob_size - blob_offset));
+            }
+            msr_log(msr, 4, "Possibly corrupted database: var name length > 65536 (0x%04x) at blob offset %u-%u.", var->name_len, blob_offset, blob_offset + 1);
             break;
         }
 
