@@ -1939,7 +1939,9 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                     if (strcmp(action->param, "none") == 0) {
                         apr_table_clear(normtab);
                         tfnspath = NULL;
+                        tfnskey = NULL;
                         tfnscount = 0;
+                        last_crec = NULL;
                         last_cached_tfn = 0;
                         continue;
                     }
