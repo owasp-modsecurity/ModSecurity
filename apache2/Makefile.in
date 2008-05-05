@@ -92,7 +92,7 @@ mod_security2.la: $(MOD_SECURITY2_H) *.c
 	for f in $(MOD_SECURITY2); do \
 		src="$$src $$f.c"; \
 	done; \
-	rm -f msc_test; \
+	rm -f msc_test msc_test.o msc_test.lo msc_test.slo; \
 	$(COMPILE_APACHE_MOD) $(APXS_EXTRA_CFLAGS) $(MODSEC_APXS_EXTRA_CFLAGS) $$src
 
 ### MLogC
