@@ -1,4 +1,4 @@
-24 Apr 2008 - 2.5.4
+07 May 2008 - 2.5.4
 -------------------
 
  * Fixed issue where transformation cache was using the SecDefaultAction
