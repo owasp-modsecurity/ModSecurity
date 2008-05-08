@@ -270,11 +270,16 @@
       </listitem>
 
       <listitem>
-        <para>Install the latest version of Lua in the 5.1.x branch, if it
-        isn't already installed on the server.</para>
+        <para>Optionally install the latest version of Lua in the 5.1.x
+        branch, if it isn't already installed on the server and you will be
+        using the new Lua engine.</para>
 
         <para><ulink type=""
         url="http://www.lua.org/download.html">http://www.lua.org/download.html</ulink></para>
+
+        <para>Note that ModSecurity requires the dynamic libraries. These are
+        not built by default in the source distribution, so the binary
+        distribution is recommended.</para>
       </listitem>
 
       <listitem>
