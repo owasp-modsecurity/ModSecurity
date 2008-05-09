@@ -1,3 +1,10 @@
+09 May 2008 - trunk
+-------------------
+
+* Force modules "mod_rpaf-2.0.c" and "mod_custom_header.c" to run before
+  ModSecurity so that the correct IP is used.
+
+
 07 May 2008 - 2.5.4
 -------------------
 
