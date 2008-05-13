@@ -92,7 +92,7 @@ mod_security2.la: $(MOD_SECURITY2_H) *.c
 	for f in $(MOD_SECURITY2); do \
 		src="$$src $$f.c"; \
 	done; \
-	rm -f msc_test; \
+	rm -f msc_test msc_test.o msc_test.lo msc_test.slo; \
 	$(COMPILE_APACHE_MOD) $(APXS_EXTRA_CFLAGS) $(MODSEC_APXS_EXTRA_CFLAGS) $$src
 
 ### MLogC
@@ -117,7 +117,7 @@ msc_test.lo: msc_test.c
 	$(LIBTOOL) --mode=compile $(CC) $(APXS_INCLUDES) $(APXS_CFLAGS) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(CPPFLAGS) $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test.lo -c msc_test.c
 
 msc_test: $(TESTOBJS) $(MOD_SECURITY2_H}) msc_test.lo 
-	@objs=""; \
+	objs=""; \
 	for f in $(MSC_TEST); do \
 		objs="$$objs $$f.lo"; \
 	done; \

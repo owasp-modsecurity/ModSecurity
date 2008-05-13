@@ -25,7 +25,7 @@
 #define RESULT_WRONGSIZE        -3
 #define RESULT_WRONGRET         -4
 
-#define CMDLINE_OPTS             "t:n:p:P:r:I:D:h"
+#define CMDLINE_OPTS             "t:n:p:P:r:I:D:Nh"
 
 /* Types */
 typedef struct tfn_data_t tfn_data_t;
@@ -86,7 +86,10 @@ int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char *
 }
 
 char *get_apr_error(apr_pool_t *p, apr_status_t rc) {
-    return "FAKE APR ERROR";
+    char *text = apr_pcalloc(p, 201);
+    if (text == NULL) return NULL;
+    apr_strerror(rc, text, 200);
+    return text;
 }
 
 void msr_log(modsec_rec *msr, int level, const char *text, ...) {
@@ -108,7 +111,7 @@ void msr_log(modsec_rec *msr, int level, const char *text, ...) {
     if (msr->txcfg->debuglog_fd != NULL) {
         apr_size_t nbytes_written = 0;
         apr_vsnprintf(str1, sizeof(str1), text, ap);
-        apr_snprintf(str2, sizeof(str2), "[%d] [%s] %s\n", level, test_name, str1);
+        apr_snprintf(str2, sizeof(str2), "%lu: [%d] [%s] %s\n", (unsigned long)getpid(), level, test_name, str1);
 
         apr_file_write_full(msr->txcfg->debuglog_fd, str2, strlen(str2), &nbytes_written);
     }
@@ -456,9 +459,10 @@ static void init_msr() {
     g_msr->request_headers = NULL;
     g_msr->hostname = "localhost";
     g_msr->msc_rule_mptmp = g_mp;
-    g_msr->tx_vars = apr_table_make(g_mp, 10);
-    g_msr->collections = apr_table_make(g_mp, 10);
-    g_msr->collections_dirty = apr_table_make(g_mp, 10);
+    g_msr->tx_vars = apr_table_make(g_mp, 1);
+    g_msr->collections_original = apr_table_make(g_mp, 1);
+    g_msr->collections = apr_table_make(g_mp, 1);
+    g_msr->collections_dirty = apr_table_make(g_mp, 1);
 }
 
 /**
@@ -476,7 +480,10 @@ static void usage() {
     fprintf(stderr, "    -r        Function return code (required for some types)\n");
     fprintf(stderr, "    -I        Iterations (default 1)\n");
     fprintf(stderr, "    -D        Debug log level (default 0)\n");
+    fprintf(stderr, "    -N        No input on stdin.\n\n");
     fprintf(stderr, "    -h        This help\n\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "Input is from stdin unless -N is used.\n");
 }
 
 
@@ -499,6 +506,7 @@ int main(int argc, const char * const argv[])
     apr_size_t param_len = 0;
     apr_size_t prerun_len = 0;
     apr_size_t out_len = 0;
+    int noinput = 0;
     int rc = 0;
     int result = 0;
     int ec = 0;
@@ -558,6 +566,9 @@ int main(int argc, const char * const argv[])
                 case 'D':
                     debuglog_level = atoi(val);
                     break;
+                case 'N':
+                    noinput = 1;
+                    break;
                 case 'h':
                     usage();
                     exit(0);
@@ -579,26 +590,28 @@ int main(int argc, const char * const argv[])
     modsecurity = modsecurity_create(g_mp, MODSEC_OFFLINE);
     test_name = apr_psprintf(g_mp, "%s/%s", type, name);
 
-    if (apr_file_open_stdin(&fd, g_mp) != APR_SUCCESS) {
-        fprintf(stderr, "Failed to open stdin\n");
-        exit(1);
-    }
+    if (noinput == 0) {
+        if (apr_file_open_stdin(&fd, g_mp) != APR_SUCCESS) {
+            fprintf(stderr, "Failed to open stdin\n");
+            exit(1);
+        }
 
-    /* Read in the input */
-    nbytes = BUFLEN;
-    memset(buf, 0, nbytes);
-    rc = apr_file_read(fd, buf, &nbytes);
-    if ((rc != APR_EOF) && (rc != APR_SUCCESS)) {
-        fprintf(stderr, "Failed to read data\n");
-        exit(1);
-    }
+        /* Read in the input */
+        nbytes = BUFLEN;
+        memset(buf, 0, nbytes);
+        rc = apr_file_read(fd, buf, &nbytes);
+        if ((rc != APR_EOF) && (rc != APR_SUCCESS)) {
+            fprintf(stderr, "Failed to read data\n");
+            exit(1);
+        }
 
-    if (nbytes < 0) {
-        fprintf(stderr, "Error reading data\n");
-        exit(1);
-    }
+        if (nbytes < 0) {
+            fprintf(stderr, "Error reading data\n");
+            exit(1);
+        }
 
-    apr_file_close(fd);
+        apr_file_close(fd);
+    }
 
     if (strcmp("tfn", type) == 0) {
         ret = returnval ? atoi(returnval) : -8888;
@@ -759,12 +772,9 @@ int main(int argc, const char * const argv[])
             }
 
             if (result != RESULT_SUCCESS) {
-                apr_size_t s0len = nbytes;
-                const char *s0 = escape(buf, &s0len);
-
-                fprintf(stderr, " Test: '@%s %s'\n"
-                                "Input: '%s' len=%" APR_SIZE_T_FMT "\n",
-                                name, param, s0, nbytes);
+                fprintf(stderr, "  Test: '%s:%s'\n"
+                                "Prerun: '%s'\n",
+                                name, param, (prerun ? (const char *)prerun : ""));
                 ec = 1;
             }
 
@@ -773,14 +783,42 @@ int main(int argc, const char * const argv[])
             te = (apr_table_entry_t *)arr->elts;
             for (n = 0; n < arr->nelts; n++) {
                 apr_table_t *col = (apr_table_t *)te[n].val;
+//                apr_table_t *orig_col = NULL;
 
-                msr_log(g_msr, 9, "Found loaded collection: %s", te[n].key);
+                if (g_msr->txcfg->debuglog_level >= 9) {
+                    msr_log(g_msr, 9, "Found loaded collection: %s", te[n].key);
+                }
                 /* Only store those collections that changed. */
                 if (apr_table_get(g_msr->collections_dirty, te[n].key)) {
-                    msr_log(g_msr, 9, "Storing collection: %s", te[n].key);
-                    collection_store(g_msr, col);
+                    int x = collection_store(g_msr, col);
+
+                    if (g_msr->txcfg->debuglog_level >= 9) {
+                        msr_log(g_msr, 9, "Stored collection: %s (%d)", te[n].key, x);
+                    }
                 }
+#if 0
+                /* Re-populate the original values with the new ones. */
+                if ((orig_col = (apr_table_t *)apr_table_get(g_msr->collections_original, te[n].key)) != NULL) {
+                    const apr_array_header_t *orig_arr = apr_table_elts(orig_col);
+                    apr_table_entry_t *orig_te = (apr_table_entry_t *)orig_arr->elts;
+                    int m;
+
+                    for (m = 0; m < orig_arr->nelts; m++) {
+                        msc_string *mstr = (msc_string *)apr_table_get(col, orig_te[m].key);
+
+                        if (g_msr->txcfg->debuglog_level >= 9) {
+                            msr_log(g_msr, 9, "Updating original collection: %s.%s=%s", te[n].key, mstr->name, mstr->value);
+                        }
+                        //apr_table_setn(orig_col, orig_te[m].key, (void *)mstr );
+                        collection_original_setvar(g_msr, te[n].key, mstr);
+
+                        
+                    }
+                }
+#endif
             }
+            apr_table_clear(g_msr->collections_dirty);
+            apr_table_clear(g_msr->collections_original);
         }
         else {
             fprintf(stderr, "Unknown type: \"%s\"\n", type);
