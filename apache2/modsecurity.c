@@ -302,6 +302,8 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     msr->geo_vars = apr_table_make(msr->mp, 8);
     if (msr->geo_vars == NULL) return -1;
 
+    msr->collections_original = apr_table_make(msr->mp, 8);
+    if (msr->collections_original == NULL) return -1;
     msr->collections = apr_table_make(msr->mp, 8);
     if (msr->collections == NULL) return -1;
     msr->collections_dirty = apr_table_make(msr->mp, 8);

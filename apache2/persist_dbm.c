@@ -31,17 +31,26 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
 
         var->name_len = (blob[blob_offset] << 8) + blob[blob_offset + 1];
         if (var->name_len == 0) {
-            /* This should never happen as the length includes the terminating
-             * NUL and should be 1 for ""
-             */
-            msr_log(msr, 4, "Possiblly corrupted database: var name length = 0 at blob offset %u-%u.", blob_offset, blob_offset + 1);
+            /* Is the length a name length, or just the end of the blob? */
+            if (blob_offset < blob_size - 2) {
+                /* This should never happen as the name length
+                 * includes the terminating NUL and should be 1 for ""
+                 */
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "BLOB[%d]: %s", blob_offset, log_escape_hex(msr->mp, blob + blob_offset, blob_size - blob_offset));
+                }
+                msr_log(msr, 4, "Possibly corrupted database: var name length = 0 at blob offset %u-%u.", blob_offset, blob_offset + 1);
+            }
             break;
         }
         else if (var->name_len > 65536) {
             /* This should never happen as the length is restricted on store
              * to 65536.
              */
-            msr_log(msr, 4, "Possiblly corrupted database: var name length > 65536 (0x%04x) at blob offset %u-%u.", var->name_len, blob_offset, blob_offset + 1);
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "BLOB[%d]: %s", blob_offset, log_escape_hex(msr->mp, blob + blob_offset, blob_size - blob_offset));
+            }
+            msr_log(msr, 4, "Possibly corrupted database: var name length > 65536 (0x%04x) at blob offset %u-%u.", var->name_len, blob_offset, blob_offset + 1);
             break;
         }
 
@@ -74,7 +83,7 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
 /**
  *
  */
-apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
+static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec *msr, const char *col_name,
     const char *col_key, int col_key_len)
 {
     char *dbm_filename = NULL;
@@ -100,17 +109,19 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
     key.dptr = (char *)col_key;
     key.dsize = col_key_len + 1;
 
-    rc = apr_sdbm_open(&dbm, dbm_filename, APR_READ | APR_SHARELOCK,
-        CREATEMODE, msr->mp);
-    if (rc != APR_SUCCESS) {
-        return NULL;
+    if (existing_dbm == NULL) {
+        rc = apr_sdbm_open(&dbm, dbm_filename, APR_READ | APR_SHARELOCK,
+            CREATEMODE, msr->mp);
+        if (rc != APR_SUCCESS) {
+            return NULL;
+        }
+    }
+    else {
+        dbm = existing_dbm;
     }
 
     value = (apr_sdbm_datum_t *)apr_pcalloc(msr->mp, sizeof(apr_sdbm_datum_t));
     rc = apr_sdbm_fetch(dbm, value, key);
-
-    apr_sdbm_close(dbm);
-
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Failed to read from DBM file \"%s\": %s", log_escape(msr->mp,
             dbm_filename), get_apr_error(msr->mp, rc));
@@ -129,6 +140,12 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
     /* Transform raw data into a table. */
     col = collection_unpack(msr, (const unsigned char *)value->dptr, value->dsize, 1);
     if (col == NULL) return NULL;
+
+    /* We have to close *after* we use "value" from the fetch or the memory
+     * may be overwritten. */
+    if (existing_dbm == NULL) {
+        apr_sdbm_close(dbm);
+    }
 
     /* Remove expired variables. */
     do {
@@ -168,23 +185,30 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
      * time.
      */
     if (apr_table_get(col, "KEY") == NULL) {
-        rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
-            CREATEMODE, msr->mp);
-        if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "Failed to access DBM file \"%s\": %s",
-                log_escape(msr->mp, dbm_filename), get_apr_error(msr->mp, rc));
-            return NULL;
+        if (existing_dbm == NULL) {
+            rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
+                CREATEMODE, msr->mp);
+            if (rc != APR_SUCCESS) {
+                msr_log(msr, 1, "Failed to access DBM file \"%s\": %s",
+                    log_escape(msr->mp, dbm_filename), get_apr_error(msr->mp, rc));
+                return NULL;
+            }
+        }
+        else {
+            dbm = existing_dbm;
         }
 
         rc = apr_sdbm_delete(dbm, key);
-
-        apr_sdbm_close(dbm);
-
         if (rc != APR_SUCCESS) {
             msr_log(msr, 1, "Failed deleting collection (name \"%s\", "
                 "key \"%s\"): %s", log_escape(msr->mp, col_name),
                 log_escape_ex(msr->mp, col_key, col_key_len), get_apr_error(msr->mp, rc));
             return NULL;
+        }
+
+
+        if (existing_dbm == NULL) {
+            apr_sdbm_close(dbm);
         }
 
         if (expired && (msr->txcfg->debuglog_level >= 9)) {
@@ -245,6 +269,15 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
 /**
  *
  */
+apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
+    const char *col_key, int col_key_len) {
+    return collection_retrieve_ex(NULL, msr, col_name, col_key, col_key_len);
+}
+
+
+/**
+ *
+ */
 int collection_store(modsec_rec *msr, apr_table_t *col) {
     char *dbm_filename = NULL;
     msc_string *var_name = NULL, *var_key = NULL;
@@ -257,6 +290,8 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     const apr_array_header_t *arr;
     apr_table_entry_t *te;
     int i;
+    const apr_table_t *stored_col = NULL;
+    const apr_table_t *orig_col = NULL;
 
     var_name = (msc_string *)apr_table_get(col, "__name");
     if (var_name == NULL) {
@@ -330,13 +365,68 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
      * convert back to table form
      */
 
-    /* Calculate the size first. */
+    rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
+        CREATEMODE, msr->mp);
+    if (rc != APR_SUCCESS) {
+        msr_log(msr, 1, "Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
+            get_apr_error(msr->mp, rc));
+        return -1;
+    }
+
+        /* We only need to lock so we can pull in the stored data again. */
+        rc = apr_sdbm_lock(dbm, APR_FLOCK_EXCLUSIVE);
+        if (rc != APR_SUCCESS) {
+            msr_log(msr, 1, "Failed to exclusivly lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
+                get_apr_error(msr->mp, rc));
+            apr_sdbm_close(dbm);
+            return -1;
+        }
+
+    /* If there is an original value, then we need to create a delta and
+     * apply the delta to the current value */
+    orig_col = (const apr_table_t *)apr_table_get(msr->collections_original, var_name->value);
+    if (orig_col != NULL) {
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Re-retrieving collection prior to store: %s", apr_psprintf(msr->mp, "%.*s", var_name->value_len, var_name->value));
+        }
+
+        stored_col = (const apr_table_t *)collection_retrieve_ex(dbm, msr, var_name->value, var_key->value, var_key->value_len);
+    }
+
+    /* Merge deltas and calculate the size first. */
     blob_size = 3 + 2;
     arr = apr_table_elts(col);
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msc_string *var = (msc_string *)te[i].val;
         int len;
+
+        /* If there is an original value, then we need to apply the delta
+         * to the latest stored value */
+        if (stored_col != NULL) {
+            const msc_string *orig_var = (const msc_string *)apr_table_get(orig_col, var->name);
+            if (orig_var != NULL) {
+                const msc_string *stored_var = (const msc_string *)apr_table_get(stored_col, var->name);
+                if (stored_var != NULL) {
+                    int origval = atoi(orig_var->value);
+                    int ourval = atoi(var->value);
+                    int storedval = atoi(stored_var->value);
+                    int delta = ourval - origval;
+                    int value = storedval + delta;
+
+                    if (value < 0) value = 0; /* Counters never go below zero. */
+
+                    var->value = apr_psprintf(msr->mp, "%d", value);
+                    var->value_len = strlen(var->value);
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Delta applied for %s.%s %d->%d (%d): %d + (%d) = %d [%s,%d]",
+                        log_escape_ex(msr->mp, var_name->value, var_name->value_len),
+                        log_escape_ex(msr->mp, var->name, var->name_len),
+                        origval, ourval, delta, storedval, delta, value, var->value, var->value_len);
+                    }
+                }
+            }
+        }
 
         len = var->name_len + 1;
         if (len >= 65536) len = 65536;
@@ -401,23 +491,16 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     value.dptr = (char *)blob;
     value.dsize = blob_size;
 
-    rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
-        CREATEMODE, msr->mp);
-    if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
-            get_apr_error(msr->mp, rc));
-        return -1;
-    }
-
     rc = apr_sdbm_store(dbm, key, value, APR_SDBM_REPLACE);
-
-    apr_sdbm_close(dbm);
-
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Failed to write to DBM file \"%s\": %s", dbm_filename,
             get_apr_error(msr->mp, rc));
         return -1;
     }
+
+    /* ENH: Do we need to unlock()?  Or will just close() suffice? */
+    apr_sdbm_unlock(dbm);
+    apr_sdbm_close(dbm);
 
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Persisted collection (name \"%s\", key \"%s\").",

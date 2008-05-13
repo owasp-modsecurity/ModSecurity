@@ -351,6 +351,7 @@ struct modsec_rec {
     int                  upload_remove_files;
 
     /* other */
+    apr_table_t         *collections_original;
     apr_table_t         *collections;
     apr_table_t         *collections_dirty;
 

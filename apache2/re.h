@@ -41,6 +41,8 @@ typedef struct msre_cache_rec msre_cache_rec;
 
 /* Actions, variables, functions and operator functions */
 
+apr_status_t DSOLOCAL collection_original_setvar(modsec_rec *msr, const char *col_name, const msc_string *orig_var);
+
 int DSOLOCAL expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t *mptmp);
 
 apr_status_t DSOLOCAL msre_parse_targets(msre_ruleset *ruleset, const char *text,
