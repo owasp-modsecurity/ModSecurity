@@ -5726,7 +5726,9 @@ ac_config_files="$ac_config_files Makefile"
 ac_config_files="$ac_config_files build/apxs-wrapper"
 
 if test -e "$PERL"; then
-    ac_config_files="$ac_config_files t/run-tests.pl"
+    ac_config_files="$ac_config_files t/run-unit-tests.pl"
+
+    ac_config_files="$ac_config_files t/run-regression-tests.pl"
 
     ac_config_files="$ac_config_files t/gen_rx-pm.pl"
 
@@ -6298,7 +6300,8 @@ do
     "mod_security2_config.h") CONFIG_HEADERS="$CONFIG_HEADERS mod_security2_config.h" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "build/apxs-wrapper") CONFIG_FILES="$CONFIG_FILES build/apxs-wrapper" ;;
-    "t/run-tests.pl") CONFIG_FILES="$CONFIG_FILES t/run-tests.pl" ;;
+    "t/run-unit-tests.pl") CONFIG_FILES="$CONFIG_FILES t/run-unit-tests.pl" ;;
+    "t/run-regression-tests.pl") CONFIG_FILES="$CONFIG_FILES t/run-regression-tests.pl" ;;
     "t/gen_rx-pm.pl") CONFIG_FILES="$CONFIG_FILES t/gen_rx-pm.pl" ;;
     "t/csv_rx-pm.pl") CONFIG_FILES="$CONFIG_FILES t/csv_rx-pm.pl" ;;
     "../tools/rules-updater.pl") CONFIG_FILES="$CONFIG_FILES ../tools/rules-updater.pl" ;;
@@ -6856,7 +6859,8 @@ echo "$as_me: $ac_file is unchanged" >&6;}
 
   case $ac_file$ac_mode in
     "build/apxs-wrapper":F) chmod +x build/apxs-wrapper ;;
-    "t/run-tests.pl":F) chmod +x t/run-tests.pl ;;
+    "t/run-unit-tests.pl":F) chmod +x t/run-unit-tests.pl ;;
+    "t/run-regression-tests.pl":F) chmod +x t/run-regression-tests.pl ;;
     "t/gen_rx-pm.pl":F) chmod +x t/gen_rx-pm.pl ;;
     "t/csv_rx-pm.pl":F) chmod +x t/csv_rx-pm.pl ;;
     "../tools/rules-updater.pl":F) chmod +x ../tools/rules-updater.pl ;;

@@ -76,7 +76,7 @@ clean: clean-extras
 	@rm -rf *.la *.lo *.o *.slo .libs msc_test msc-test-debug.log
 
 maintainer-clean: clean
-	@rm -rf Makefile mlogc-src/Makefile t/run-tests.pl config config.log config.status configure mod_security2_config.h ../tools/*.pl autoscan.log configure.scan build/libtool.m4 build/config.guess build/config.sub build/ltmain.sh build/apxs-wrapper
+	@rm -rf Makefile mlogc-src/Makefile t/run-unit-tests.pl t/run-regression-tests.pl config config.log config.status configure mod_security2_config.h ../tools/*.pl autoscan.log configure.scan build/libtool.m4 build/config.guess build/config.sub build/ltmain.sh build/apxs-wrapper
 
 distclean: maintainer-clean
 
@@ -123,8 +123,8 @@ msc_test: $(TESTOBJS) $(MOD_SECURITY2_H}) msc_test.lo
 	done; \
 	$(LIBTOOL) --mode=link $(CC) $$objs -o msc_test msc_test.lo $(LDFLAGS) $(LIBS) $(APR_LINK_LD) $(APU_LINK_LD)
 
-test: t/run-tests.pl msc_test
+test: t/run-unit-tests.pl msc_test
 	@rm -f msc-test-debug.log; \
-	$(PERL) t/run-tests.pl
+	$(PERL) t/run-unit-tests.pl
 
 .PHONY: all install clean-extras clean maintainer-clean distclean install-mods test

@@ -1,0 +1,469 @@
+#!/usr/bin/perl
+#!@PERL@
+#
+# Run regression tests.
+#
+# Syntax: run-regression-tests.pl [options] [file [N]]
+#
+#          All: run-regression-tests.pl
+#	 All in file: run-regression-tests.pl file
+#	 Nth in file: run-regression-tests.pl file N
+#
+use strict;
+use Time::HiRes qw(gettimeofday sleep);
+use POSIX qw(WIFEXITED WEXITSTATUS WIFSIGNALED WTERMSIG);
+use File::Spec qw(rel2abs);
+use File::Basename qw(basename dirname);
+use FileHandle;
+use IPC::Open2 qw(open2);
+use IPC::Open3 qw(open3);
+use Getopt::Std;
+use Data::Dumper;
+use IO::Socket;
+use LWP::UserAgent;
+
+my @TYPES = qw(config target rule);
+my $SCRIPT = basename($0);
+my $SCRIPT_DIR = File::Spec->rel2abs(dirname($0));
+my $REG_DIR = "$SCRIPT_DIR/regression";
+my $SROOT_DIR = "$REG_DIR/server_root";
+my $CONF_DIR = "$SROOT_DIR/conf";
+my $LOGS_DIR = "$SROOT_DIR/logs";
+my $PASSED = 0;
+my $TOTAL = 0;
+my %C = ();
+my %LOG = ();
+my $UA = LWP::UserAgent->new;
+$UA->agent("ModSecurity Regression Tests/1.2.3");
+
+my %opt;
+getopts('A:E:D:C:T:H:a:p:dh', \%opt);
+
+if ($opt{D}) {
+	$Data::Dumper::Indent = 1;
+	$Data::Dumper::Terse = 1;
+	$Data::Dumper::Pad = "";
+	$Data::Dumper::Quotekeys = 0;
+}
+
+sub usage {
+	print stderr <<"EOT";
+@_
+Usage: $SCRIPT [options] [file [N]]
+
+ Options:
+  -A file   Specify ModSecurity audit log to read.
+  -D file   Specify ModSecurity debug log to read.
+  -E file   Specify Apache httpd error log to read.
+  -C file   Specify Apache httpd base conf file to generate/reload.
+  -H path   Specify Apache httpd htdocs path.
+  -S path   Specify Apache httpd server root path.
+  -a file   Specify Apache httpd binary (default: httpd)
+  -p port   Specify Apache httpd port (default: 8088)
+  -d        Enable debugging.
+  -h        This help.
+
+EOT
+
+  exit(1);
+}
+
+usage() if ($opt{h});
+
+### Check startup script
+$opt{a} = "apachectl" unless (defined $opt{a});
+usage("Invalid Apache startup script: $opt{a}\n") unless (-e $opt{a});
+
+### Defaults
+$opt{A} = "$LOGS_DIR/modsec_audit.log" unless (defined $opt{A});
+$opt{D} = "$LOGS_DIR/modsec_debug.log" unless (defined $opt{D});
+$opt{E} = "$LOGS_DIR/error.log" unless (defined $opt{E});
+$opt{C} = "$CONF_DIR/httpd.conf" unless (defined $opt{C});
+$opt{H} = "$SROOT_DIR/htdocs" unless (defined $opt{H});
+$opt{p} = 8088 unless (defined $opt{p});
+
+%ENV = (
+	%ENV,
+	SERVER_ROOT => $opt{S},
+	SERVER_PORT => $opt{p},
+	SERVER_NAME => "localhost",
+	TEST_SERVER_ROOT => $SROOT_DIR,
+	LOGS_DIR => $LOGS_DIR,
+	SCRIPT_DIR => $SCRIPT_DIR,
+	REGRESSION_DIR => $REG_DIR,
+	DIST_ROOT => File::Spec->rel2abs(dirname("$SCRIPT_DIR/../../..")),
+	AUDIT_LOG => $opt{A},
+	DEBUG_LOG => $opt{D},
+	ERROR_LOG => $opt{E},
+	HTTPD_CONF => $opt{C},
+	HTDOCS => $opt{H},
+);
+
+unless (defined $opt{S}) {
+	my $httpd_root = `$opt{a} -V`;
+	($opt{S} = $httpd_root) =~ s/.*-D HTTPD_ROOT="([^"]*)".*/$1/sm;
+}
+
+dbg("OPTIONS: ", \%opt);
+
+msg("Attempting to stop any already running regression tests instances...");
+httpd_stop();
+
+if (defined $ARGV[0]) {
+	runfile(dirname($ARGV[0]), basename($ARGV[0]), $ARGV[1]);
+	done();
+}
+
+for my $type (sort @TYPES) {
+	my $dir = "$SCRIPT_DIR/regression/$type";
+	my @cfg = ();
+
+	# Get test names
+	opendir(DIR, "$dir") or quit(1, "Failed to open \"$dir\": $!");
+	@cfg = grep { /\.t$/ && -f "$dir/$_" } readdir(DIR);
+	closedir(DIR);
+
+	for my $cfg (sort @cfg) {
+		runfile($dir, $cfg);
+	}
+
+}
+done();
+
+
+sub runfile {
+	my($dir, $cfg, $testnum) = @_;
+	my $fn = "$dir/$cfg";
+	my @data = ();
+	my $edata;
+	my @C = ();
+	my @test = ();
+	my $teststr;
+	my $n = 0;
+	my $pass = 0;
+
+	open(CFG, "<$fn") or quit(1, "Failed to open \"$fn\": $!");
+	@data = <CFG>;
+	
+	$edata = q/@C = (/ . join("", @data) . q/)/;
+	eval $edata;
+	quit(1, "Failed to read test data \"$cfg\": $@") if ($@);
+
+	unless (@C) {
+		msg("\nNo tests defined for $fn");
+		return;
+	}
+
+	msg("\nLoaded ".@C." tests from $fn");
+	for my $t (@C) {
+		$n++;
+		next if (defined $testnum and $n != $testnum);
+
+		my $httpd_up = 0;
+		my %t = %{$t || {}};
+		my $id = sprintf("%6d %s", $n);
+		my $out = "";
+		my $rc = 0;
+		my $conf_fn;
+
+		# Startup httpd with optionally included conf.
+		if (exists $t{conf} and defined $t{conf}) {
+			$conf_fn = sprintf "%s/%s_%s_%06d.conf",
+			                   $CONF_DIR, $t{type}, $cfg, $n;
+#			dbg("Writing test config to: $conf_fn");
+			open(CONF, ">$conf_fn") or die "Failed to open conf \"$conf_fn\": $!\n";
+			print CONF (ref $t{conf} eq "CODE" ? &{$t{conf}} : $t{conf});
+			close CONF;
+			$httpd_up = httpd_start("Include $conf_fn") ? 0 : 1;
+		}
+		else {
+			$httpd_up = httpd_start() ? 0 : 1;
+		}
+
+		if ($httpd_up) {
+			# Perform the request
+			if (exists $t{request}) {
+				my $resp = do_request($t{request});
+				if (!$resp) {
+					msg("invalid response");
+					dbg("RESPONSE: ", $resp);
+					$rc = 1;
+				}
+				elsif (exists $t{match_response}{status}) {
+					unless ($resp->code =~ m/$t{match_response}{status}/) {
+						msg("incorrect status code " . $resp->code . ": $t{match_response}{status}");
+						$rc = 1;
+					}
+				}
+			}
+
+			# Search for all log matches
+			if ($rc == 0 and exists $t{match_log} and defined $t{match_log}) {
+				for my $mtype (keys %{ $t{match_log} || {}}) {
+					my $m = $t{match_log}{$mtype};
+					unless (defined log_read_match($mtype, @{$m || []})) {
+						$rc = 1;
+						msg("$mtype log match failed: $m->[0]");
+						last;
+					}
+				}
+			}
+		}
+
+		if ($rc == 0) {
+			$pass++;
+		}
+		else {
+			dbg("Test config: $conf_fn");
+		}
+
+		msg(sprintf("%s) %s%s: %s%s", $id, $t{type}, (exists($t{comment}) ? " - $t{comment}" : ""), ($rc ? "failed" : "passed"), ((defined($out) && $out ne "")? " ($out)" : "")));
+		
+		if ($httpd_up) {
+			$httpd_up = httpd_stop() ? 0 : 1;
+		}
+
+	}
+
+	$TOTAL += $testnum ? 1 : $n;
+	$PASSED += $pass;
+
+	msg(sprintf("Passed: %2d; Failed: %2d", $pass, $testnum ? (1 - $pass) : ($n - $pass)));
+}
+
+sub do_request {
+	my $r = $_[0];
+	
+	# Allow test to execute code
+	if (ref $r eq "CODE") {
+		$r = &$r;
+	}
+
+	if (ref $r eq "HTTP::Request") {
+#		dbg("REQUEST: ", $r);
+		return $UA->request($r);
+	}
+	else {
+		# TODO: send a raw request via IO::Socket and
+		#       return HTTP::Request->parse($response_string)
+	}
+
+	return;
+}
+
+sub log_read_match {
+	my($name, $re, $timeout) = @_;
+	my $t0 = gettimeofday();
+	my($fh,$rbuf) = ($LOG{$name}{fd}, \$LOG{$name}{buf});
+	my $n = length($$rbuf);
+
+	$timeout = 0 unless (defined $timeout);
+
+	do {
+		$n += $fh->sysread($$rbuf, 1024, $n);
+#		dbg("Match \"$re\" in \"$$rbuf\" ($n)");
+		return $@ if ($$rbuf =~ m/$re/m);
+		# TODO: Use select()/poll()
+		sleep 0.1;
+	} while (gettimeofday - $t0 < $timeout);
+
+	return undef;
+}
+
+sub escape {
+	my @new = ();
+	for my $c (split(//, $_[0])) {
+		push @new, ((ord($c) >= 0x20 and ord($c) <= 0x7e) ? $c : sprintf("\\x%02x", ord($c)));
+	}
+	join('', @new);
+}
+
+sub dbg {
+	return unless(@_ and $opt{d});
+	my $out = join "", map {
+		(ref $_ ne "" ? Dumper($_) : $_)
+	} @_;
+	$out =~ s/^/DBG: /s;
+	print STDOUT "$out\n";
+}
+
+sub msg {
+	print STDOUT "@_\n" if (@_);
+}
+
+sub quit {
+	my($ec,$msg) = @_;
+	$ec = 0 unless (defined $_[0]);
+
+	msg("$msg") if (defined $msg);
+
+	msg("Attempting to stop any regression tests instance still running...");
+	httpd_stop();
+
+	exit $ec;
+}
+
+sub done {
+	if ($PASSED != $TOTAL) {
+		quit(1, "\n$PASSED/$TOTAL tests passed.");
+	}
+
+	quit(0, "\nAll tests passed ($TOTAL).");
+}
+
+sub httpd_start {
+	httpd_reset_logs();
+	my @p = (
+		$opt{a},
+		-d => $opt{S},
+		-f => $opt{C},
+		(map { (-c => $_) } ("Listen $opt{p}", @_)),
+		-k => "start",
+	);
+
+	#dbg("EXEC: ", \@p);
+#	dbg("Httpd start");
+
+	my $httpd_out;
+	my $httpd_pid = open3(undef, $httpd_out, undef, @p) or quit(1);
+	my $out = join("\\n", split(/\n/, <$httpd_out>));
+	close $httpd_out;
+	waitpid($httpd_pid, 0);
+
+	if (defined $out and $out ne "") {
+		msg("Httpd start failed with error messages:\n$out");
+		return -1
+	}
+
+	my $rc = $?;
+	if ( WIFEXITED($rc) ) {
+		$rc = WEXITSTATUS($rc);
+#		dbg("Httpd start returned with $rc.");
+	}
+	elsif( WIFSIGNALED($rc) ) {
+		msg("Httpd start failed with signal " . WTERMSIG($rc) . ".");
+		$rc = -1;
+	}
+	else {
+		msg("Httpd start failed with unknown error.");
+		$rc = -1;
+	}
+
+	# Look for startup msg
+	unless (defined log_read_match("error", qr/resuming normal operations/, 10)) {
+		quit(1, "Httpd server failed to start.");
+	}
+
+	return $rc;
+}
+
+sub httpd_stop {
+	httpd_reset_logs();
+	my @p = (
+		$opt{a},
+		-d => $opt{S},
+		-f => $opt{C},
+		(map { (-c => $_) } ("Listen $opt{p}", @_)),
+		-k => "stop",
+	);
+
+	#dbg("EXEC: ", \@p);
+#	dbg("Httpd stop");
+
+	my $httpd_out;
+	my $httpd_pid = open3(undef, $httpd_out, undef, @p) or quit(1);
+	my $out = join("\\n", split(/\n/, <$httpd_out>));
+	close $httpd_out;
+	waitpid($httpd_pid, 0);
+
+	if (defined $out and $out ne "") {
+		msg("Httpd stop failed with error messages:\n$out");
+		return -1
+	}
+
+	my $rc = $?;
+	if ( WIFEXITED($rc) ) {
+		$rc = WEXITSTATUS($rc);
+#		dbg("Httpd stop returned with $rc.");
+	}
+	elsif( WIFSIGNALED($rc) ) {
+		msg("Httpd stop failed with signal " . WTERMSIG($rc) . ".");
+		$rc = -1;
+	}
+	else {
+		msg("Httpd stop failed with unknown error.");
+		$rc = -1;
+	}
+
+	# Look for startup msg
+	unless (defined log_read_match("error", qr/caught SIG[A-Z]+, shutting down/, 10)) {
+		quit(1, "Httpd server failed to shutdown.");
+	}
+
+	return $rc;
+}
+
+sub httpd_reload {
+	httpd_reset_logs();
+	my @p = (
+		$opt{a},
+		-d => $opt{S},
+		-f => $opt{C},
+		(map { (-c => $_) } ("Listen $opt{p}", @_)),
+		-k => "graceful",
+	);
+
+#	dbg("EXEC: ", join(' ', map { "'$_'" } @p));
+#	dbg("Httpd reload");
+
+	my $httpd_out;
+	my $httpd_pid = open3(undef, $httpd_out, undef, @p) or quit(1);
+	my $out = join("\\n", split(/\n/, <$httpd_out>));
+	close $httpd_out;
+	waitpid($httpd_pid, 0);
+
+	if (defined $out and $out ne "") {
+		msg("Httpd reload failed with error messages:\n$out");
+		return -1
+	}
+
+	my $rc = $?;
+	if ( WIFEXITED($rc) ) {
+		$rc = WEXITSTATUS($rc);
+#		dbg("Httpd reload returned with $rc.");
+	}
+	elsif( WIFSIGNALED($rc) ) {
+		msg("Httpd reload failed with signal " . WTERMSIG($rc) . ".");
+		$rc = -1;
+	}
+	else {
+		msg("Httpd reload failed with unknown error.");
+		$rc = -1;
+	}
+
+	# Look for startup msg
+	unless (defined log_read_match("error", qr/resuming normal operations/, 10)) {
+		quit(1, "Httpd server failed to reload.");
+	}
+
+	return $rc;
+}
+
+sub httpd_reset_logs {
+	# Error
+	if (!defined $LOG{error}{fd}) {
+		$LOG{error}{fd} = new FileHandle($opt{E}, O_RDWR|O_CREAT)
+	}
+	$LOG{error}{fd}->blocking(0);
+	$LOG{error}{fd}->sysseek(0, 2);
+	$LOG{error}{buf} = "";
+
+	# Audit
+	if (!defined $LOG{audit}{fd}) {
+		$LOG{audit}{fd} = new FileHandle($opt{A}, O_RDWR|O_CREAT);
+	}
+	$LOG{audit}{fd}->blocking(0);
+	$LOG{audit}{fd}->sysseek(0, 2);
+	$LOG{audit}{buf} = "";
+}
+
