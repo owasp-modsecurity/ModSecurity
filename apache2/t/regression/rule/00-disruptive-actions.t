@@ -1,0 +1,427 @@
+### Pass
+{
+	type => "rule",
+	comment => "pass action in phase:1",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:1,pass"
+		SecAction "phase:1,deny"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Warning. Unconditional match in SecAction/, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "pass action in phase:2",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:2,pass"
+		SecAction "phase:2,deny"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Warning. Unconditional match in SecAction/, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "pass action in phase:3",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:3,pass"
+		SecAction "phase:3,deny"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Warning. Unconditional match in SecAction/, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "pass action in phase:4",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:4,pass"
+		SecAction "phase:4,deny"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Warning. Unconditional match in SecAction/, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+
+### Allow
+{
+	type => "rule",
+	comment => "allow action in phase:1",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:1,allow"
+		SecAction "phase:1,deny"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Access allowed \(phase 1\). Unconditional match in SecAction/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "allow action in phase:2",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:2,allow"
+		SecAction "phase:2,deny"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Access allowed \(phase 2\). Unconditional match in SecAction/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "allow action in phase:3",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:3,allow"
+		SecAction "phase:3,deny"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Access allowed \(phase 3\). Unconditional match in SecAction/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "allow action in phase:4",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:4,allow"
+		SecAction "phase:4,deny"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Access allowed \(phase 4\). Unconditional match in SecAction/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+
+### Deny
+{
+	type => "rule",
+	comment => "deny action in phase:1",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:1,deny"
+	),
+	match_log => {
+		error => [ qr/Access denied with code 403 \(phase 1\). Unconditional match in SecAction./, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "deny action in phase:2",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:2,deny"
+	),
+	match_log => {
+		error => [ qr/Access denied with code 403 \(phase 2\). Unconditional match in SecAction./, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "deny action in phase:3",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:3,deny"
+	),
+	match_log => {
+		error => [ qr/Access denied with code 403 \(phase 3\). Unconditional match in SecAction./, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "deny action in phase:4",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:4,deny"
+	),
+	match_log => {
+		error => [ qr/Access denied with code 403 \(phase 4\). Unconditional match in SecAction./, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+
+### Drop
+{
+	type => "rule",
+	comment => "drop action in phase:1",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:1,drop"
+	),
+	match_log => {
+		error => [ qr/Access denied with connection close \(phase 1\). Unconditional match in SecAction./, 1 ],
+	},
+	match_response => {
+		status => qr/^500$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "drop action in phase:2",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:2,drop"
+	),
+	match_log => {
+		error => [ qr/Access denied with connection close \(phase 2\). Unconditional match in SecAction./, 1 ],
+	},
+	match_response => {
+		status => qr/^500$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "drop action in phase:3",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:3,drop"
+	),
+	match_log => {
+		error => [ qr/Access denied with connection close \(phase 3\). Unconditional match in SecAction./, 1 ],
+	},
+	match_response => {
+		status => qr/^500$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "drop action in phase:4",
+	conf => qq(
+		SecRuleEngine On
+		SecAction "phase:4,drop"
+	),
+	match_log => {
+		error => [ qr/Access denied with connection close \(phase 4\). Unconditional match in SecAction./, 1 ],
+	},
+	match_response => {
+		status => qr/^500$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+
+### Redirect
+{
+	type => "rule",
+	comment => "redirect action in phase:1 (get)",
+	conf => qq(
+		SecRuleEngine On
+		SecRule REQUEST_URI "\@streq /test2.txt" "phase:1,redirect:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Access denied with redirection to .* using status 302 \(phase 1\)/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "redirect action in phase:2 (get)",
+	conf => qq(
+		SecRuleEngine On
+		SecRule REQUEST_URI "\@streq /test2.txt" "phase:2,redirect:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Access denied with redirection to .* using status 302 \(phase 2\)/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "redirect action in phase:3 (get)",
+	conf => qq(
+		SecRuleEngine On
+		SecRule REQUEST_URI "\@streq /test2.txt" "phase:3,redirect:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Access denied with redirection to .* using status 302 \(phase 3\)/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "redirect action in phase:4 (get)",
+	conf => qq(
+		SecRuleEngine On
+		SecRule REQUEST_URI "\@streq /test2.txt" "phase:4,redirect:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Access denied with redirection to .* using status 302 \(phase 4\)/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
+	),
+},
+
+### Proxy
+{
+	type => "rule",
+	comment => "proxy action in phase:1 (get)",
+	conf => qq(
+		SecRuleEngine On
+		SecRule REQUEST_URI "\@streq /test2.txt" "phase:1,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Access denied using proxy to \(phase 1\)/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "proxy action in phase:2 (get)",
+	conf => qq(
+		SecRuleEngine On
+		SecRule REQUEST_URI "\@streq /test2.txt" "phase:2,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Access denied using proxy to \(phase 2\)/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "proxy action in phase:3 (get)",
+	conf => qq(
+		SecRuleEngine On
+		SecRule REQUEST_URI "\@streq /test2.txt" "phase:3,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Access denied with code 500 \(phase 3\) \(Configuration Error: Proxy action requested but it does not work in output phases\)./, 1 ],
+	},
+	match_response => {
+		status => qr/^500$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "proxy action in phase:4 (get)",
+	conf => qq(
+		SecRuleEngine On
+		SecRule REQUEST_URI "\@streq /test2.txt" "phase:4,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Access denied with code 500 \(phase 4\) \(Configuration Error: Proxy action requested but it does not work in output phases\)./, 1 ],
+	},
+	match_response => {
+		status => qr/^500$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
+	),
+},

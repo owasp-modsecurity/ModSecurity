@@ -1,4 +1,3 @@
-#!/usr/bin/perl
 #!@PERL@
 #
 # Run regression tests.
@@ -71,7 +70,7 @@ EOT
 usage() if ($opt{h});
 
 ### Check startup script
-$opt{a} = "apachectl" unless (defined $opt{a});
+$opt{a} = "httpd" unless (defined $opt{a});
 usage("Invalid Apache startup script: $opt{a}\n") unless (-e $opt{a});
 
 ### Defaults
@@ -181,7 +180,7 @@ sub runfile {
 		}
 
 		if ($httpd_up) {
-			# Perform the request
+			# Perform the request and check response
 			if (exists $t{request}) {
 				my $resp = do_request($t{request});
 				if (!$resp) {
@@ -189,21 +188,45 @@ sub runfile {
 					dbg("RESPONSE: ", $resp);
 					$rc = 1;
 				}
-				elsif (exists $t{match_response}{status}) {
-					unless ($resp->code =~ m/$t{match_response}{status}/) {
-						msg("incorrect status code " . $resp->code . ": $t{match_response}{status}");
-						$rc = 1;
+				else {
+					for my $key (keys %{ $t{match_response} || {}}) {
+						my($neg,$mtype) = ($key =~ m/^(-?)(.*)$/);
+						my $m = $t{match_response}{$key};
+						my $match = match_response($mtype, $resp, $m);
+						if ($neg and defined $match) {
+							$rc = 1;
+							msg("response $mtype matched: $m");
+							dbg("$LOG{$mtype}{buf}");
+
+							last;
+						}
+						elsif (!$neg and !defined $match) {
+							$rc = 1;
+							msg("response $mtype no match: $m");
+							dbg("$LOG{$mtype}{buf}");
+							last;
+						}
 					}
 				}
 			}
 
 			# Search for all log matches
 			if ($rc == 0 and exists $t{match_log} and defined $t{match_log}) {
-				for my $mtype (keys %{ $t{match_log} || {}}) {
-					my $m = $t{match_log}{$mtype};
-					unless (defined log_read_match($mtype, @{$m || []})) {
+				for my $key (keys %{ $t{match_log} || {}}) {
+					my($neg,$mtype) = ($key =~ m/^(-?)(.*)$/);
+					my $m = $t{match_log}{$key};
+					my $match = match_log($mtype, @{$m || []});
+					if ($neg and defined $match) {
 						$rc = 1;
-						msg("$mtype log match failed: $m->[0]");
+						msg("$mtype log matched: $m->[0]");
+						dbg("$LOG{$mtype}{buf}");
+
+						last;
+					}
+					elsif (!$neg and !defined $match) {
+						$rc = 1;
+						msg("$mtype log no match: $m->[0]");
+						dbg("$LOG{$mtype}{buf}");
 						last;
 					}
 				}
@@ -251,11 +274,29 @@ sub do_request {
 	return;
 }
 
-sub log_read_match {
+
+sub match_response {
+	my($name, $resp, $re) = @_;
+
+	msg("Warning: Empty regular expression.") if (!defined $re or $re eq "");
+
+	if ($name eq "status") {
+		return $@ if ($resp->code =~ m/$re/m);
+	}
+	elsif ($name eq "content") {
+		return $@ if ($resp->content =~ m/$re/m);
+	}
+
+	return;
+}
+
+sub match_log {
 	my($name, $re, $timeout) = @_;
 	my $t0 = gettimeofday();
 	my($fh,$rbuf) = ($LOG{$name}{fd}, \$LOG{$name}{buf});
 	my $n = length($$rbuf);
+
+	msg("Warning: Empty regular expression.") if (!defined $re or $re eq "");
 
 	$timeout = 0 unless (defined $timeout);
 
@@ -267,7 +308,7 @@ sub log_read_match {
 		sleep 0.1;
 	} while (gettimeofday - $t0 < $timeout);
 
-	return undef;
+	return;
 }
 
 sub escape {
@@ -288,7 +329,11 @@ sub dbg {
 }
 
 sub msg {
-	print STDOUT "@_\n" if (@_);
+	return unless(@_);
+	my $out = join "", map {
+		(ref $_ ne "" ? Dumper($_) : $_)
+	} @_;
+	print STDOUT "$out\n";
 }
 
 sub quit {
@@ -321,7 +366,7 @@ sub httpd_start {
 		-k => "start",
 	);
 
-	#dbg("EXEC: ", \@p);
+#	dbg("EXEC: ", \@p);
 #	dbg("Httpd start");
 
 	my $httpd_out;
@@ -350,7 +395,7 @@ sub httpd_start {
 	}
 
 	# Look for startup msg
-	unless (defined log_read_match("error", qr/resuming normal operations/, 10)) {
+	unless (defined match_log("error", qr/resuming normal operations/, 10)) {
 		quit(1, "Httpd server failed to start.");
 	}
 
@@ -396,7 +441,7 @@ sub httpd_stop {
 	}
 
 	# Look for startup msg
-	unless (defined log_read_match("error", qr/caught SIG[A-Z]+, shutting down/, 10)) {
+	unless (defined match_log("error", qr/caught SIG[A-Z]+, shutting down/, 10)) {
 		quit(1, "Httpd server failed to shutdown.");
 	}
 
@@ -442,7 +487,7 @@ sub httpd_reload {
 	}
 
 	# Look for startup msg
-	unless (defined log_read_match("error", qr/resuming normal operations/, 10)) {
+	unless (defined match_log("error", qr/resuming normal operations/, 10)) {
 		quit(1, "Httpd server failed to reload.");
 	}
 
