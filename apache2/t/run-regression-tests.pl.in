@@ -186,6 +186,13 @@ sub runfile {
 			$httpd_up = httpd_start() ? 0 : 1;
 		}
 
+		# Run any prerun setup
+		if ($rc == 0 and exists $t{prerun} and defined $t{prerun}) {
+			dbg("Executing perl prerun...");
+			$rc = &{$t{prerun}};
+			dbg("Perl prerun returned: $rc");
+		}
+
 		if ($httpd_up) {
 			# Perform the request and check response
 			if (exists $t{request}) {
@@ -215,6 +222,17 @@ sub runfile {
 						}
 					}
 				}
+			}
+			else {
+				msg("Failed to start httpd.");
+				$rc = 1;
+			}
+
+			# Run any arbitrary perl tests
+			if ($rc == 0 and exists $t{test} and defined $t{test}) {
+				dbg("Executing perl test(s)...");
+				$rc = &{$t{test}};
+				dbg("Perl tests returned: $rc");
 			}
 
 			# Search for all log matches
@@ -411,11 +429,6 @@ sub httpd_start {
 	close $httpd_out;
 	waitpid($httpd_pid, 0);
 
-	if (defined $out and $out ne "") {
-		msg("Httpd start failed with error messages:\n$out");
-		return -1
-	}
-
 	my $rc = $?;
 	if ( WIFEXITED($rc) ) {
 		$rc = WEXITSTATUS($rc);
@@ -428,6 +441,11 @@ sub httpd_start {
 	else {
 		msg("Httpd start failed with unknown error.");
 		$rc = -1;
+	}
+
+	if (defined $out and $out ne "") {
+		msg("Httpd start failed with error messages:\n$out");
+		return -1
 	}
 
 	# Look for startup msg

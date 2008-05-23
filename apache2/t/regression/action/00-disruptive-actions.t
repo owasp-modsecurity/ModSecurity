@@ -299,6 +299,7 @@
 	},
 	match_response => {
 		status => qr/^200$/,
+		content => qr/^TEST$/,
 	},
 	request => new HTTP::Request(
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
@@ -316,6 +317,7 @@
 	},
 	match_response => {
 		status => qr/^200$/,
+		content => qr/^TEST$/,
 	},
 	request => new HTTP::Request(
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
@@ -333,6 +335,7 @@
 	},
 	match_response => {
 		status => qr/^200$/,
+		content => qr/^TEST$/,
 	},
 	request => new HTTP::Request(
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
@@ -350,6 +353,7 @@
 	},
 	match_response => {
 		status => qr/^200$/,
+		content => qr/^TEST$/,
 	},
 	request => new HTTP::Request(
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
@@ -369,6 +373,7 @@
 	},
 	match_response => {
 		status => qr/^200$/,
+		content => qr/^TEST$/,
 	},
 	request => new HTTP::Request(
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
@@ -386,6 +391,7 @@
 	},
 	match_response => {
 		status => qr/^200$/,
+		content => qr/^TEST$/,
 	},
 	request => new HTTP::Request(
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
