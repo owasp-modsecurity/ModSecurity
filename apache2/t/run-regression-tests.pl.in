@@ -21,19 +21,23 @@ use Data::Dumper;
 use IO::Socket;
 use LWP::UserAgent;
 
-my @TYPES = qw(config target rule);
+my @TYPES = qw(config action target rule);
 my $SCRIPT = basename($0);
 my $SCRIPT_DIR = File::Spec->rel2abs(dirname($0));
 my $REG_DIR = "$SCRIPT_DIR/regression";
 my $SROOT_DIR = "$REG_DIR/server_root";
 my $CONF_DIR = "$SROOT_DIR/conf";
 my $LOGS_DIR = "$SROOT_DIR/logs";
+my $PID_FILE = "$LOGS_DIR/httpd.pid";
 my $PASSED = 0;
 my $TOTAL = 0;
 my %C = ();
 my %LOG = ();
+my $UA_NAME = "ModSecurity Regression Tests/1.2.3";
 my $UA = LWP::UserAgent->new;
-$UA->agent("ModSecurity Regression Tests/1.2.3");
+$UA->agent($UA_NAME);
+
+$SIG{TERM} = $SIG{INT} = \&handle_interrupt;
 
 my %opt;
 getopts('A:E:D:C:T:H:a:p:dh', \%opt);
@@ -96,6 +100,7 @@ $opt{p} = 8088 unless (defined $opt{p});
 	ERROR_LOG => $opt{E},
 	HTTPD_CONF => $opt{C},
 	HTDOCS => $opt{H},
+	USER_AGENT => $UA_NAME,
 );
 
 unless (defined $opt{S}) {
@@ -105,15 +110,17 @@ unless (defined $opt{S}) {
 
 dbg("OPTIONS: ", \%opt);
 
-msg("Attempting to stop any already running regression tests instances...");
-httpd_stop();
+if (-e "$PID_FILE") {
+	msg("Shutting down previous instance: $PID_FILE");
+	httpd_stop();
+}
 
 if (defined $ARGV[0]) {
 	runfile(dirname($ARGV[0]), basename($ARGV[0]), $ARGV[1]);
 	done();
 }
 
-for my $type (sort @TYPES) {
+for my $type (@TYPES) {
 	my $dir = "$SCRIPT_DIR/regression/$type";
 	my @cfg = ();
 
@@ -196,14 +203,14 @@ sub runfile {
 						if ($neg and defined $match) {
 							$rc = 1;
 							msg("response $mtype matched: $m");
-							dbg("$LOG{$mtype}{buf}");
+							dbg($resp);
 
 							last;
 						}
 						elsif (!$neg and !defined $match) {
 							$rc = 1;
 							msg("response $mtype no match: $m");
-							dbg("$LOG{$mtype}{buf}");
+							dbg($resp);
 							last;
 						}
 					}
@@ -254,6 +261,29 @@ sub runfile {
 	msg(sprintf("Passed: %2d; Failed: %2d", $pass, $testnum ? (1 - $pass) : ($n - $pass)));
 }
 
+sub do_raw_request {
+	my $sock = new IO::Socket::INET(
+		Proto => "tcp",
+		PeerAddr => "localhost",
+		PeerPort => $opt{p},
+	) or msg("Failed to connect to localhost:$opt{p}: $@");
+	return unless ($sock);
+
+	my $r = "@_";
+	$r =~ s/^[^A-Z]+//s;
+	$r =~ s/^[ \t]+//mg;
+	$r =~ s/^\x0a/\x0d\x0a/mg;
+	$r =~ s/([^\x0d])\x0a/$1\x0d\x0a/mg;
+
+	print $sock "$r";
+	$sock->shutdown(1);
+
+	my @resp = <$sock>;
+	$sock->close();
+
+	return HTTP::Response->parse(join("", @resp));
+}
+
 sub do_request {
 	my $r = $_[0];
 	
@@ -267,8 +297,8 @@ sub do_request {
 		return $UA->request($r);
 	}
 	else {
-		# TODO: send a raw request via IO::Socket and
-		#       return HTTP::Request->parse($response_string)
+#		dbg("REQUEST:\n", $r);
+		return do_raw_request($r);
 	}
 
 	return;
@@ -281,10 +311,10 @@ sub match_response {
 	msg("Warning: Empty regular expression.") if (!defined $re or $re eq "");
 
 	if ($name eq "status") {
-		return $@ if ($resp->code =~ m/$re/m);
+		return $& if ($resp->code =~ m/$re/);
 	}
 	elsif ($name eq "content") {
-		return $@ if ($resp->content =~ m/$re/m);
+		return $& if ($resp->content =~ m/$re/m);
 	}
 
 	return;
@@ -303,7 +333,7 @@ sub match_log {
 	do {
 		$n += $fh->sysread($$rbuf, 1024, $n);
 #		dbg("Match \"$re\" in \"$$rbuf\" ($n)");
-		return $@ if ($$rbuf =~ m/$re/m);
+		return $& if ($$rbuf =~ m/$re/m);
 		# TODO: Use select()/poll()
 		sleep 0.1;
 	} while (gettimeofday - $t0 < $timeout);
@@ -324,7 +354,7 @@ sub dbg {
 	my $out = join "", map {
 		(ref $_ ne "" ? Dumper($_) : $_)
 	} @_;
-	$out =~ s/^/DBG: /s;
+	$out =~ s/^/DBG: /m;
 	print STDOUT "$out\n";
 }
 
@@ -336,14 +366,20 @@ sub msg {
 	print STDOUT "$out\n";
 }
 
+sub handle_interrupt {
+	$SIG{TERM} = $SIG{INT} = \&handle_interrupt;
+
+	msg("Interrupted via SIG$_[0].  Shutting down tests...");
+	httpd_stop();
+
+	quit(1);
+}
+
 sub quit {
 	my($ec,$msg) = @_;
 	$ec = 0 unless (defined $_[0]);
 
 	msg("$msg") if (defined $msg);
-
-	msg("Attempting to stop any regression tests instance still running...");
-	httpd_stop();
 
 	exit $ec;
 }
@@ -362,7 +398,7 @@ sub httpd_start {
 		$opt{a},
 		-d => $opt{S},
 		-f => $opt{C},
-		(map { (-c => $_) } ("Listen $opt{p}", @_)),
+		(map { (-c => $_) } ("Listen localhost:$opt{p}", @_)),
 		-k => "start",
 	);
 
@@ -408,7 +444,7 @@ sub httpd_stop {
 		$opt{a},
 		-d => $opt{S},
 		-f => $opt{C},
-		(map { (-c => $_) } ("Listen $opt{p}", @_)),
+		(map { (-c => $_) } ("Listen localhost:$opt{p}", @_)),
 		-k => "stop",
 	);
 
@@ -454,7 +490,7 @@ sub httpd_reload {
 		$opt{a},
 		-d => $opt{S},
 		-f => $opt{C},
-		(map { (-c => $_) } ("Listen $opt{p}", @_)),
+		(map { (-c => $_) } ("Listen localhost:$opt{p}", @_)),
 		-k => "graceful",
 	);
 
@@ -510,5 +546,30 @@ sub httpd_reset_logs {
 	$LOG{audit}{fd}->blocking(0);
 	$LOG{audit}{fd}->sysseek(0, 2);
 	$LOG{audit}{buf} = "";
+
+	# Debug
+	if (!defined $LOG{debug}{fd}) {
+		$LOG{debug}{fd} = new FileHandle($opt{D}, O_RDWR|O_CREAT);
+	}
+	$LOG{debug}{fd}->blocking(0);
+	$LOG{debug}{fd}->sysseek(0, 2);
+	$LOG{debug}{buf} = "";
 }
 
+sub encode_chunked {
+	my($data, $size) = @_;
+	$size = 128 unless ($size);
+	my $chunked = "";
+	
+	my $n = 0;
+	my $bytes = length($data);
+	while ($bytes >= $size) {
+		$chunked .= sprintf "%x\x0d\x0a%s\x0d\x0a", $size, substr($data, $n, $size);
+		$n += $size;
+		$bytes -= $size;
+	}
+	if ($bytes) {
+		$chunked .= sprintf "%x\x0d\x0a%s\x0d\x0a", $bytes, substr($data, $n, $bytes);
+	}
+	$chunked .= "0\x0d\x0a\x0d\x0a"
+}

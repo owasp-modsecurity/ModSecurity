@@ -1,6 +1,6 @@
 ### Pass
 {
-	type => "rule",
+	type => "action",
 	comment => "pass action in phase:1",
 	conf => qq(
 		SecRuleEngine On
@@ -18,7 +18,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "pass action in phase:2",
 	conf => qq(
 		SecRuleEngine On
@@ -36,7 +36,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "pass action in phase:3",
 	conf => qq(
 		SecRuleEngine On
@@ -54,7 +54,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "pass action in phase:4",
 	conf => qq(
 		SecRuleEngine On
@@ -74,7 +74,7 @@
 
 ### Allow
 {
-	type => "rule",
+	type => "action",
 	comment => "allow action in phase:1",
 	conf => qq(
 		SecRuleEngine On
@@ -92,7 +92,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "allow action in phase:2",
 	conf => qq(
 		SecRuleEngine On
@@ -110,7 +110,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "allow action in phase:3",
 	conf => qq(
 		SecRuleEngine On
@@ -128,7 +128,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "allow action in phase:4",
 	conf => qq(
 		SecRuleEngine On
@@ -148,7 +148,7 @@
 
 ### Deny
 {
-	type => "rule",
+	type => "action",
 	comment => "deny action in phase:1",
 	conf => qq(
 		SecRuleEngine On
@@ -165,7 +165,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "deny action in phase:2",
 	conf => qq(
 		SecRuleEngine On
@@ -182,7 +182,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "deny action in phase:3",
 	conf => qq(
 		SecRuleEngine On
@@ -199,7 +199,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "deny action in phase:4",
 	conf => qq(
 		SecRuleEngine On
@@ -218,7 +218,7 @@
 
 ### Drop
 {
-	type => "rule",
+	type => "action",
 	comment => "drop action in phase:1",
 	conf => qq(
 		SecRuleEngine On
@@ -235,7 +235,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "drop action in phase:2",
 	conf => qq(
 		SecRuleEngine On
@@ -252,7 +252,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "drop action in phase:3",
 	conf => qq(
 		SecRuleEngine On
@@ -269,7 +269,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "drop action in phase:4",
 	conf => qq(
 		SecRuleEngine On
@@ -288,7 +288,7 @@
 
 ### Redirect
 {
-	type => "rule",
+	type => "action",
 	comment => "redirect action in phase:1 (get)",
 	conf => qq(
 		SecRuleEngine On
@@ -305,7 +305,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "redirect action in phase:2 (get)",
 	conf => qq(
 		SecRuleEngine On
@@ -322,7 +322,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "redirect action in phase:3 (get)",
 	conf => qq(
 		SecRuleEngine On
@@ -339,7 +339,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "redirect action in phase:4 (get)",
 	conf => qq(
 		SecRuleEngine On
@@ -358,7 +358,7 @@
 
 ### Proxy
 {
-	type => "rule",
+	type => "action",
 	comment => "proxy action in phase:1 (get)",
 	conf => qq(
 		SecRuleEngine On
@@ -375,7 +375,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "proxy action in phase:2 (get)",
 	conf => qq(
 		SecRuleEngine On
@@ -392,7 +392,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "proxy action in phase:3 (get)",
 	conf => qq(
 		SecRuleEngine On
@@ -409,7 +409,7 @@
 	),
 },
 {
-	type => "rule",
+	type => "action",
 	comment => "proxy action in phase:4 (get)",
 	conf => qq(
 		SecRuleEngine On
