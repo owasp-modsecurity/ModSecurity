@@ -1,4 +1,6 @@
-### Pass
+### Tests all of the actions in each phase
+
+# Pass
 {
 	type => "action",
 	comment => "pass action in phase:1",
@@ -72,7 +74,7 @@
 	),
 },
 
-### Allow
+# Allow
 {
 	type => "action",
 	comment => "allow action in phase:1",
@@ -146,7 +148,7 @@
 	),
 },
 
-### Deny
+# Deny
 {
 	type => "action",
 	comment => "deny action in phase:1",
@@ -216,7 +218,7 @@
 	),
 },
 
-### Drop
+# Drop
 {
 	type => "action",
 	comment => "drop action in phase:1",
@@ -286,7 +288,7 @@
 	),
 },
 
-### Redirect
+# Redirect
 {
 	type => "action",
 	comment => "redirect action in phase:1 (get)",
@@ -360,7 +362,7 @@
 	),
 },
 
-### Proxy
+# Proxy
 {
 	type => "action",
 	comment => "proxy action in phase:1 (get)",

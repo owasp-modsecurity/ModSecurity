@@ -1,4 +1,6 @@
 ### SecAudit* directive tests
+
+# SecAuditEngine
 {
 	type => "config",
 	comment => "SecAuditEngine On",
@@ -75,6 +77,84 @@
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 	),
 },
+
+# SecAuditLogType & SecAuditLogStorageDir
+{
+	type => "config",
+	comment => "SecAuditLogType Serial",
+	conf => qq(
+		SecAuditEngine On
+		SecAuditLog $ENV{AUDIT_LOG}
+		SecAuditLogType Serial
+	),
+	match_log => {
+		audit => [ qr/./, 1 ],
+	},
+	match_response => {
+		status => qr/^404$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/bogus",
+	),
+},
+{
+	type => "config",
+	comment => "SecAuditLogType Concurrent",
+	conf => qq(
+		SecAuditEngine On
+		SecAuditLog $ENV{AUDIT_LOG}
+		SecAuditLogType Concurrent
+		SecAuditLogStorageDir "$ENV{LOGS_DIR}/audit"
+	),
+	test => sub {
+		### Perl code to parse the audit log entry and verify
+		### that the concurrent audit log exists and contains
+		### the correct data.
+		###
+		### TODO: Need some API for this :)
+		###
+
+		# Parse log
+		my $alogre = qr/^(?:\S+)\ (?:\S+)\ (?:\S+)\ (?:\S+)\ \[(?:[^:]+):(?:\d+:\d+:\d+)\ (?:[^\]]+)\]\ \"(?:.*)\"\ (?:\d+)\ (?:\S+)\ \"(?:.*)\"\ \"(?:.*)\"\ (\S+)\ \"(?:.*)\"\ (\S+)\ (?:\d+)\ (?:\d+)\ (?:\S+)(?:.*)$/m;
+		my $alog = match_log("audit", $alogre, 1);
+		chomp $alog;
+		my @log = ($alog =~ m/$alogre/);
+		my($id, $fn) = ($log[0], $log[1]);
+		if (!$id or !$fn) {
+			dbg("LOG ENTRY: $alog");
+			die "Failed to parse audit log: $ENV{AUDIT_LOG}\n";
+		}
+
+		# Verify concurrent log exists
+		my $alogdatafn = "$ENV{LOGS_DIR}/audit$fn";
+		if (! -e "$alogdatafn") {
+			die "Audit log does not exist: $alogdatafn\n";
+		}
+
+		# Verify concurrent log contents
+		$LOG{$id}{fd} = new FileHandle($alogdatafn, O_RDONLY);
+		$LOG{$id}{fd}->blocking(0);
+		$LOG{$id}{buf} = "";
+		my $alogdata = match_log($id, qr/^--[^-]+-A--.*$id.*-Z--$/s, 1);
+		if (defined $alogdata) {
+			$LOG{$id}{fd}->close();
+			delete $LOG{$id};
+			return 0;
+		}
+
+		# Error
+		dbg("LOGDATA: \"$alogdata\"");
+		die "Audit log data did not match.\n";
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+
+# SecAuditLogRelevantStatus
 {
 	type => "config",
 	comment => "SecAuditLogRelevantStatus (pos)",
@@ -111,6 +191,8 @@
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 	),
 },
+
+# SecAuditLogParts
 {
 	type => "config",
 	comment => "SecAuditLogParts (minimal)",

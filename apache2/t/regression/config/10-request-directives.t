@@ -1,5 +1,6 @@
+### Tests for directives altering how a request is handled
 
-### SecArgumentSeparator
+# SecArgumentSeparator
 {
 	type => "config",
 	comment => "SecArgumentSeparator (get-pos)",
@@ -85,7 +86,7 @@
 	),
 },
 
-### SecRequestBodyAccess
+# SecRequestBodyAccess
 {
 	type => "config",
 	comment => "SecRequestBodyAccess (pos)",
@@ -133,7 +134,7 @@
 	),
 },
 
-### SecRequestBodyLimit
+# SecRequestBodyLimit
 {
 	type => "config",
 	comment => "SecRequestBodyLimit (equal)",
@@ -179,7 +180,7 @@
 	),
 },
 
-### SecRequestBodyInMemoryLimit
+# SecRequestBodyInMemoryLimit
 {
 	type => "config",
 	comment => "SecRequestBodyInMemoryLimit (equal)",
@@ -249,7 +250,7 @@ Content-Disposition: form-data; name="b"
 -----------------------------69343412719991675451336310646--), 1024),
 },
 
-### SecCookieFormat
+# SecCookieFormat
 {
 	type => "config",
 	comment => "SecCookieFormat (pos)",
