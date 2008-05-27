@@ -684,6 +684,11 @@ APXS_LIBS
 APXS_CFLAGS
 APXS_LIBTOOL
 APXS_CC
+APXS_LIBDIR
+APXS_BINDIR
+APXS_SBINDIR
+APXS_PROGNAME
+APXS_HTTPD
 PCRE_LIBS
 PCRE_CFLAGS
 APR_LIBS
@@ -5071,6 +5076,14 @@ rm -f conftest*
   fi
   APXS_LIBTOOL="`$APXS -q LIBTOOL`"
   APXS_CC="`$APXS -q CC`"
+  APXS_BINDIR="`$APXS -q BINDIR`"
+  APXS_SBINDIR="`$APXS -q SBINDIR`"
+  APXS_PROGNAME="`$APXS -q PROGNAME`"
+  if test "$APXS_SBINDIR" = "/"; then
+    APXS_HTTPD="$APXS_SBINDIR/$APXS_PROGNAME"
+  else
+    APXS_HTTPD="$APXS_SBINDIR/$APXS_PROGNAME"
+  fi
 else
   { { echo "$as_me:$LINENO: error: couldn't find APXS" >&5
 echo "$as_me: error: couldn't find APXS" >&2;}
@@ -5272,6 +5285,11 @@ save_CPPFLAGS=$CPPFLAGS
 CPPFLAGS="$APXS_INCLUDES $CPPFLAGS"
 save_LDFLAGS=$LDFLAGS
 LDFLAGS="$APXS_LDFLAGS $LDFLAGS"
+
+
+
+
+
 
 
 
@@ -6438,6 +6456,11 @@ APXS_LIBS!$APXS_LIBS$ac_delim
 APXS_CFLAGS!$APXS_CFLAGS$ac_delim
 APXS_LIBTOOL!$APXS_LIBTOOL$ac_delim
 APXS_CC!$APXS_CC$ac_delim
+APXS_LIBDIR!$APXS_LIBDIR$ac_delim
+APXS_BINDIR!$APXS_BINDIR$ac_delim
+APXS_SBINDIR!$APXS_SBINDIR$ac_delim
+APXS_PROGNAME!$APXS_PROGNAME$ac_delim
+APXS_HTTPD!$APXS_HTTPD$ac_delim
 PCRE_LIBS!$PCRE_LIBS$ac_delim
 PCRE_CFLAGS!$PCRE_CFLAGS$ac_delim
 APR_LIBS!$APR_LIBS$ac_delim
@@ -6457,7 +6480,7 @@ CURL_CFLAGS!$CURL_CFLAGS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 88; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 93; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

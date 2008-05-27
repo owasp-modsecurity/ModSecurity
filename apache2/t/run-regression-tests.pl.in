@@ -73,8 +73,8 @@ EOT
 
 usage() if ($opt{h});
 
-### Check startup script
-$opt{a} = "httpd" unless (defined $opt{a});
+### Check httpd binary
+$opt{a} = "@APXS_HTTPD@" unless (defined $opt{a});
 usage("Invalid Apache startup script: $opt{a}\n") unless (-e $opt{a});
 
 ### Defaults
@@ -84,6 +84,11 @@ $opt{E} = "$LOGS_DIR/error.log" unless (defined $opt{E});
 $opt{C} = "$CONF_DIR/httpd.conf" unless (defined $opt{C});
 $opt{H} = "$SROOT_DIR/htdocs" unless (defined $opt{H});
 $opt{p} = 8088 unless (defined $opt{p});
+
+unless (defined $opt{S}) {
+	my $httpd_root = `$opt{a} -V`;
+	($opt{S} = $httpd_root) =~ s/.*-D HTTPD_ROOT="([^"]*)".*/$1/sm;
+}
 
 %ENV = (
 	%ENV,
@@ -102,11 +107,6 @@ $opt{p} = 8088 unless (defined $opt{p});
 	HTDOCS => $opt{H},
 	USER_AGENT => $UA_NAME,
 );
-
-unless (defined $opt{S}) {
-	my $httpd_root = `$opt{a} -V`;
-	($opt{S} = $httpd_root) =~ s/.*-D HTTPD_ROOT="([^"]*)".*/$1/sm;
-}
 
 dbg("OPTIONS: ", \%opt);
 
