@@ -3,7 +3,7 @@
 # Pass
 {
 	type => "action",
-	comment => "pass action in phase:1",
+	comment => "pass in phase:1",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:1,pass"
@@ -21,7 +21,7 @@
 },
 {
 	type => "action",
-	comment => "pass action in phase:2",
+	comment => "pass in phase:2",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:2,pass"
@@ -39,7 +39,7 @@
 },
 {
 	type => "action",
-	comment => "pass action in phase:3",
+	comment => "pass in phase:3",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:3,pass"
@@ -57,7 +57,7 @@
 },
 {
 	type => "action",
-	comment => "pass action in phase:4",
+	comment => "pass in phase:4",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:4,pass"
@@ -77,7 +77,7 @@
 # Allow
 {
 	type => "action",
-	comment => "allow action in phase:1",
+	comment => "allow in phase:1",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:1,allow"
@@ -95,7 +95,7 @@
 },
 {
 	type => "action",
-	comment => "allow action in phase:2",
+	comment => "allow in phase:2",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:2,allow"
@@ -113,7 +113,7 @@
 },
 {
 	type => "action",
-	comment => "allow action in phase:3",
+	comment => "allow in phase:3",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:3,allow"
@@ -131,7 +131,7 @@
 },
 {
 	type => "action",
-	comment => "allow action in phase:4",
+	comment => "allow in phase:4",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:4,allow"
@@ -151,7 +151,7 @@
 # Deny
 {
 	type => "action",
-	comment => "deny action in phase:1",
+	comment => "deny in phase:1",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:1,deny"
@@ -168,7 +168,7 @@
 },
 {
 	type => "action",
-	comment => "deny action in phase:2",
+	comment => "deny in phase:2",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:2,deny"
@@ -185,7 +185,7 @@
 },
 {
 	type => "action",
-	comment => "deny action in phase:3",
+	comment => "deny in phase:3",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:3,deny"
@@ -202,7 +202,7 @@
 },
 {
 	type => "action",
-	comment => "deny action in phase:4",
+	comment => "deny in phase:4",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:4,deny"
@@ -221,7 +221,7 @@
 # Drop
 {
 	type => "action",
-	comment => "drop action in phase:1",
+	comment => "drop in phase:1",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:1,drop"
@@ -238,7 +238,7 @@
 },
 {
 	type => "action",
-	comment => "drop action in phase:2",
+	comment => "drop in phase:2",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:2,drop"
@@ -255,7 +255,7 @@
 },
 {
 	type => "action",
-	comment => "drop action in phase:3",
+	comment => "drop in phase:3",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:3,drop"
@@ -272,7 +272,7 @@
 },
 {
 	type => "action",
-	comment => "drop action in phase:4",
+	comment => "drop in phase:4",
 	conf => qq(
 		SecRuleEngine On
 		SecAction "phase:4,drop"
@@ -291,7 +291,7 @@
 # Redirect
 {
 	type => "action",
-	comment => "redirect action in phase:1 (get)",
+	comment => "redirect in phase:1 (get)",
 	conf => qq(
 		SecRuleEngine On
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:1,redirect:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
@@ -309,7 +309,7 @@
 },
 {
 	type => "action",
-	comment => "redirect action in phase:2 (get)",
+	comment => "redirect in phase:2 (get)",
 	conf => qq(
 		SecRuleEngine On
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:2,redirect:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
@@ -327,7 +327,7 @@
 },
 {
 	type => "action",
-	comment => "redirect action in phase:3 (get)",
+	comment => "redirect in phase:3 (get)",
 	conf => qq(
 		SecRuleEngine On
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:3,redirect:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
@@ -345,7 +345,7 @@
 },
 {
 	type => "action",
-	comment => "redirect action in phase:4 (get)",
+	comment => "redirect in phase:4 (get)",
 	conf => qq(
 		SecRuleEngine On
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:4,redirect:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
@@ -365,7 +365,7 @@
 # Proxy
 {
 	type => "action",
-	comment => "proxy action in phase:1 (get)",
+	comment => "proxy in phase:1 (get)",
 	conf => qq(
 		SecRuleEngine On
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:1,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
@@ -383,7 +383,7 @@
 },
 {
 	type => "action",
-	comment => "proxy action in phase:2 (get)",
+	comment => "proxy in phase:2 (get)",
 	conf => qq(
 		SecRuleEngine On
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:2,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
@@ -401,7 +401,7 @@
 },
 {
 	type => "action",
-	comment => "proxy action in phase:3 (get)",
+	comment => "proxy in phase:3 (get)",
 	conf => qq(
 		SecRuleEngine On
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:3,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
@@ -418,7 +418,7 @@
 },
 {
 	type => "action",
-	comment => "proxy action in phase:4 (get)",
+	comment => "proxy in phase:4 (get)",
 	conf => qq(
 		SecRuleEngine On
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:4,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"

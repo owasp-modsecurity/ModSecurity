@@ -1,4 +1,3 @@
-#!/usr/bin/perl
 #!@PERL@
 #
 # Run regression tests.

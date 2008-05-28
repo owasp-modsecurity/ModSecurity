@@ -1,6 +1,30 @@
 ### Tests for directives altering how a response is handled
 
-# SecResponseBodyAccess
+# SecResponseBodyMimeTypesClear
+{
+	type => "config",
+	comment => "SecResponseBodyMimeTypesClear",
+	conf => qq(
+		SecRuleEngine On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeTypesClear
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule RESPONSE_BODY "TEST" "phase:4,deny"
+	),
+	match_log => {
+		-error => [ qr/Access denied/, 1 ],
+		debug => [ qr/Not buffering response body for unconfigured MIME type/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+
+# SecResponseBodyAccess & SecResponseBodyMimeType
 {
 	type => "config",
 	comment => "SecResponseBodyAccess (pos)",
