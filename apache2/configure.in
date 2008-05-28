@@ -39,6 +39,25 @@ AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
 AC_CHECK_FUNCS([atexit fchmod getcwd memset strcasecmp strchr strdup strerror strncasecmp strrchr strstr strtol])
 
+# Some directories
+MSC_BASE_DIR=`pwd`
+MSC_PKGBASE_DIR="$MSC_BASE_DIR/.."
+MSC_TEST_DIR="$MSC_BASE_DIR/t"
+MSC_REGRESSION_DIR="$MSC_TEST_DIR/regression"
+MSC_REGRESSION_SERVERROOT_DIR="$MSC_REGRESSION_DIR/server_root"
+MSC_REGRESSION_CONF_DIR="$MSC_REGRESSION_SERVERROOT_DIR/conf"
+MSC_REGRESSION_LOGS_DIR="$MSC_REGRESSION_SERVERROOT_DIR/logs"
+MSC_REGRESSION_DOCROOT_DIR="$MSC_REGRESSION_SERVERROOT_DIR/htdocs"
+
+AC_SUBST(MSC_BASE_DIR)
+AC_SUBST(MSC_PKGBASE_DIR)
+AC_SUBST(MSC_TEST_DIR)
+AC_SUBST(MSC_REGRESSION_DIR)
+AC_SUBST(MSC_REGRESSION_SERVERROOT_DIR)
+AC_SUBST(MSC_REGRESSION_CONF_DIR)
+AC_SUBST(MSC_REGRESSION_LOGS_DIR)
+AC_SUBST(MSC_REGRESSION_DOCROOT_DIR)
+
 # Find apxs
 AC_MSG_NOTICE(looking for Apache module support via DSO through APXS)
 AC_ARG_WITH(apxs,
@@ -291,6 +310,7 @@ if test -e "$PERL"; then
     AC_CONFIG_FILES([t/run-regression-tests.pl], [chmod +x t/run-regression-tests.pl])
     AC_CONFIG_FILES([t/gen_rx-pm.pl], [chmod +x t/gen_rx-pm.pl])
     AC_CONFIG_FILES([t/csv_rx-pm.pl], [chmod +x t/csv_rx-pm.pl])
+    AC_CONFIG_FILES([t/regression/server_root/conf/httpd.conf])
 
     # Perl based tools
     AC_CONFIG_FILES([../tools/rules-updater.pl], [chmod +x ../tools/rules-updater.pl])

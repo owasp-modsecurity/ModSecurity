@@ -1,8 +1,8 @@
 ### Base configuration for starting Apache httpd
 
 # File locations
-PidFile /home/brectanu/projects/modsec/m2/trunk/apache2/t/regression/server_root/logs/httpd.pid
-ScoreBoardFile /home/brectanu/projects/modsec/m2/trunk/apache2/t/regression/server_root/logs/httpd.scoreboard
+PidFile @MSC_REGRESSION_LOGS_DIR@/httpd.pid
+ScoreBoardFile @MSC_REGRESSION_LOGS_DIR@/httpd.scoreboard
 
 <IfModule !mod_proxy.c>
 	LoadModule proxy_module modules/mod_proxy.so
@@ -13,6 +13,7 @@ ScoreBoardFile /home/brectanu/projects/modsec/m2/trunk/apache2/t/regression/serv
 </IfModule>
 
 <IfDefine !NOMODSEC>
+	# TODO: Need to have these configurable
 	LoadFile /usr/lib/libxml2.so
 	LoadFile /usr/lib/liblua5.1.so
 	LoadModule security2_module modules/mod_security2.so
@@ -21,10 +22,10 @@ ScoreBoardFile /home/brectanu/projects/modsec/m2/trunk/apache2/t/regression/serv
 ServerName localhost
 
 LogLevel debug
-ErrorLog /home/brectanu/projects/modsec/m2/trunk/apache2/t/regression/server_root/logs/error.log
+ErrorLog @MSC_REGRESSION_LOGS_DIR@/error.log
 
-DocumentRoot /home/brectanu/projects/modsec/m2/trunk/apache2/t/regression/server_root/htdocs
-<Directory "/home/brectanu/projects/modsec/m2/trunk/apache2/t/regression/server_root/htdocs">
+DocumentRoot @MSC_REGRESSION_DOCROOT_DIR@
+<Directory "@MSC_REGRESSION_DOCROOT_DIR@">
   Options Indexes FollowSymLinks
   AllowOverride None
 </Directory>

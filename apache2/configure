@@ -671,6 +671,14 @@ PERL
 GREP
 EGREP
 LIBOBJS
+MSC_BASE_DIR
+MSC_PKGBASE_DIR
+MSC_TEST_DIR
+MSC_REGRESSION_DIR
+MSC_REGRESSION_SERVERROOT_DIR
+MSC_REGRESSION_CONF_DIR
+MSC_REGRESSION_LOGS_DIR
+MSC_REGRESSION_DOCROOT_DIR
 EXTRA_CFLAGS
 MODSEC_EXTRA_CFLAGS
 APXS
@@ -4988,6 +4996,25 @@ fi
 done
 
 
+# Some directories
+MSC_BASE_DIR=`pwd`
+MSC_PKGBASE_DIR="$MSC_BASE_DIR/.."
+MSC_TEST_DIR="$MSC_BASE_DIR/t"
+MSC_REGRESSION_DIR="$MSC_TEST_DIR/regression"
+MSC_REGRESSION_SERVERROOT_DIR="$MSC_REGRESSION_DIR/server_root"
+MSC_REGRESSION_CONF_DIR="$MSC_REGRESSION_SERVERROOT_DIR/conf"
+MSC_REGRESSION_LOGS_DIR="$MSC_REGRESSION_SERVERROOT_DIR/logs"
+MSC_REGRESSION_DOCROOT_DIR="$MSC_REGRESSION_SERVERROOT_DIR/htdocs"
+
+
+
+
+
+
+
+
+
+
 # Find apxs
 { echo "$as_me:$LINENO: looking for Apache module support via DSO through APXS" >&5
 echo "$as_me: looking for Apache module support via DSO through APXS" >&6;}
@@ -5752,6 +5779,8 @@ if test -e "$PERL"; then
 
     ac_config_files="$ac_config_files t/csv_rx-pm.pl"
 
+    ac_config_files="$ac_config_files t/regression/server_root/conf/httpd.conf"
+
 
     # Perl based tools
     ac_config_files="$ac_config_files ../tools/rules-updater.pl"
@@ -6322,6 +6351,7 @@ do
     "t/run-regression-tests.pl") CONFIG_FILES="$CONFIG_FILES t/run-regression-tests.pl" ;;
     "t/gen_rx-pm.pl") CONFIG_FILES="$CONFIG_FILES t/gen_rx-pm.pl" ;;
     "t/csv_rx-pm.pl") CONFIG_FILES="$CONFIG_FILES t/csv_rx-pm.pl" ;;
+    "t/regression/server_root/conf/httpd.conf") CONFIG_FILES="$CONFIG_FILES t/regression/server_root/conf/httpd.conf" ;;
     "../tools/rules-updater.pl") CONFIG_FILES="$CONFIG_FILES ../tools/rules-updater.pl" ;;
     "mlogc-src/Makefile") CONFIG_FILES="$CONFIG_FILES mlogc-src/Makefile" ;;
 
@@ -6443,6 +6473,14 @@ PERL!$PERL$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
+MSC_BASE_DIR!$MSC_BASE_DIR$ac_delim
+MSC_PKGBASE_DIR!$MSC_PKGBASE_DIR$ac_delim
+MSC_TEST_DIR!$MSC_TEST_DIR$ac_delim
+MSC_REGRESSION_DIR!$MSC_REGRESSION_DIR$ac_delim
+MSC_REGRESSION_SERVERROOT_DIR!$MSC_REGRESSION_SERVERROOT_DIR$ac_delim
+MSC_REGRESSION_CONF_DIR!$MSC_REGRESSION_CONF_DIR$ac_delim
+MSC_REGRESSION_LOGS_DIR!$MSC_REGRESSION_LOGS_DIR$ac_delim
+MSC_REGRESSION_DOCROOT_DIR!$MSC_REGRESSION_DOCROOT_DIR$ac_delim
 EXTRA_CFLAGS!$EXTRA_CFLAGS$ac_delim
 MODSEC_EXTRA_CFLAGS!$MODSEC_EXTRA_CFLAGS$ac_delim
 APXS!$APXS$ac_delim
@@ -6474,13 +6512,9 @@ APU_LINK_LD!$APU_LINK_LD$ac_delim
 LIBXML_LIBS!$LIBXML_LIBS$ac_delim
 LIBXML_CFLAGS!$LIBXML_CFLAGS$ac_delim
 LUA_LIBS!$LUA_LIBS$ac_delim
-LUA_CFLAGS!$LUA_CFLAGS$ac_delim
-CURL_LIBS!$CURL_LIBS$ac_delim
-CURL_CFLAGS!$CURL_CFLAGS$ac_delim
-LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 93; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
@@ -6499,6 +6533,51 @@ fi
 
 cat >>$CONFIG_STATUS <<_ACEOF
 cat >"\$tmp/subs-1.sed" <<\CEOF$ac_eof
+/@[a-zA-Z_][a-zA-Z_0-9]*@/!b
+_ACEOF
+sed '
+s/[,\\&]/\\&/g; s/@/@|#_!!_#|/g
+s/^/s,@/; s/!/@,|#_!!_#|/
+:n
+t n
+s/'"$ac_delim"'$/,g/; t
+s/$/\\/; p
+N; s/^.*\n//; s/[,\\&]/\\&/g; s/@/@|#_!!_#|/g; b n
+' >>$CONFIG_STATUS <conf$$subs.sed
+rm -f conf$$subs.sed
+cat >>$CONFIG_STATUS <<_ACEOF
+CEOF$ac_eof
+_ACEOF
+
+
+ac_delim='%!_!# '
+for ac_last_try in false false false false false :; do
+  cat >conf$$subs.sed <<_ACEOF
+LUA_CFLAGS!$LUA_CFLAGS$ac_delim
+CURL_LIBS!$CURL_LIBS$ac_delim
+CURL_CFLAGS!$CURL_CFLAGS$ac_delim
+LTLIBOBJS!$LTLIBOBJS$ac_delim
+_ACEOF
+
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 4; then
+    break
+  elif $ac_last_try; then
+    { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
+echo "$as_me: error: could not make $CONFIG_STATUS" >&2;}
+   { (exit 1); exit 1; }; }
+  else
+    ac_delim="$ac_delim!$ac_delim _$ac_delim!! "
+  fi
+done
+
+ac_eof=`sed -n '/^CEOF[0-9]*$/s/CEOF/0/p' conf$$subs.sed`
+if test -n "$ac_eof"; then
+  ac_eof=`echo "$ac_eof" | sort -nru | sed 1q`
+  ac_eof=`expr $ac_eof + 1`
+fi
+
+cat >>$CONFIG_STATUS <<_ACEOF
+cat >"\$tmp/subs-2.sed" <<\CEOF$ac_eof
 /@[a-zA-Z_][a-zA-Z_0-9]*@/!b end
 _ACEOF
 sed '
@@ -6761,7 +6840,7 @@ s&@abs_builddir@&$ac_abs_builddir&;t t
 s&@abs_top_builddir@&$ac_abs_top_builddir&;t t
 s&@INSTALL@&$ac_INSTALL&;t t
 $ac_datarootdir_hack
-" $ac_file_inputs | sed -f "$tmp/subs-1.sed" >$tmp/out
+" $ac_file_inputs | sed -f "$tmp/subs-1.sed" | sed -f "$tmp/subs-2.sed" >$tmp/out
 
 test -z "$ac_datarootdir_hack$ac_datarootdir_seen" &&
   { ac_out=`sed -n '/\${datarootdir}/p' "$tmp/out"`; test -n "$ac_out"; } &&

@@ -107,6 +107,7 @@ unless (defined $opt{S}) {
 	SERVER_PORT => $opt{p},
 	SERVER_NAME => "localhost",
 	TEST_SERVER_ROOT => $SROOT_DIR,
+	CONF_DIR => $CONF_DIR,
 	LOGS_DIR => $LOGS_DIR,
 	SCRIPT_DIR => $SCRIPT_DIR,
 	REGRESSION_DIR => $REG_DIR,
@@ -178,7 +179,7 @@ sub runfile {
 
 		my $httpd_up = 0;
 		my %t = %{$t || {}};
-		my $id = sprintf("%6d %s", $n);
+		my $id = sprintf("%3d", $n);
 		my $out = "";
 		my $rc = 0;
 		my $conf_fn;

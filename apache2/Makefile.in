@@ -127,4 +127,7 @@ test: t/run-unit-tests.pl msc_test
 	@rm -f msc-test-debug.log; \
 	$(PERL) t/run-unit-tests.pl
 
-.PHONY: all install clean-extras clean maintainer-clean distclean install-mods test
+test-regression: t/run-regression-tests.pl
+	@$(PERL) t/run-regression-tests.pl
+
+.PHONY: all install clean-extras clean maintainer-clean distclean install-mods test test-regression

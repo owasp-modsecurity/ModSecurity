@@ -27,9 +27,11 @@
 # SecResponseBodyAccess & SecResponseBodyMimeType
 {
 	type => "config",
-	comment => "SecResponseBodyAccess (pos)",
+	comment => "SecResponseBodyAccess On",
 	conf => qq(
 		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
 		SecResponseBodyAccess On
 		SecResponseBodyMimeType null
 		SecRule RESPONSE_BODY "TEST" "phase:4,deny"
@@ -46,15 +48,18 @@
 },
 {
 	type => "config",
-	comment => "SecResponseBodyAccess (neg)",
+	comment => "SecResponseBodyAccess Off",
 	conf => qq(
 		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
 		SecResponseBodyAccess Off
 		SecResponseBodyMimeType null
 		SecRule RESPONSE_BODY "TEST" "phase:4,deny"
 	),
 	match_log => {
 		-error => [ qr/Access denied/, 1 ],
+		debug => [ qr/Response body buffering is not enabled\./, 1 ],
 	},
 	match_response => {
 		status => qr/^200$/,
