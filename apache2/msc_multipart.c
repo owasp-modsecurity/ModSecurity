@@ -820,18 +820,43 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
 }
 
 /**
- *
+ * Finalise multipart processing. This method is invoked at the end, when it
+ * is clear that there is no more data to be processed.
  */
-int multipart_complete(modsec_rec *msr, char **error_log) {
+int multipart_complete(modsec_rec *msr, char **error_msg) {
     if (msr->mpd == NULL) return 1;
 
     if ((msr->mpd->seen_data != 0)&&(msr->mpd->is_complete == 0)) {
         if (msr->mpd->boundary_count > 0) {
-            *error_log = apr_psprintf(msr->mp, "Multipart: Final boundary missing.");
+            /* Check if we have the final boundary (that we haven't
+             * processed yet) in the buffer.
+             */
+            if (msr->mpd->buf_contains_line) {
+                if ( ((MULTIPART_BUF_SIZE - msr->mpd->bufleft) == (4 + strlen(msr->mpd->boundary)))
+                    && (*(msr->mpd->buf) == '-')&&(*(msr->mpd->buf + 1) == '-')
+                    && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0)
+                    && (*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary)) == '-')
+                    && (*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary) + 1) == '-') )
+                {
+                    /* Looks like the final boundary - process it. */
+                    if (multipart_process_boundary(msr, 1 /* final */, error_msg) < 0) {
+                        msr->mpd->flag_error = 1;
+                        return -1;
+                    }
+
+                    /* The payload is complete after all. */
+                    msr->mpd->is_complete = 1;
+                }
+            }
+
+            if (msr->mpd->is_complete == 0) {
+                *error_msg = apr_psprintf(msr->mp, "Multipart: Final boundary missing.");
+                return -1;
+            }
         } else {
-            *error_log = apr_psprintf(msr->mp, "Multipart: No boundaries found in payload.");
+            *error_msg = apr_psprintf(msr->mp, "Multipart: No boundaries found in payload.");
+            return -1;
         }
-        return -1;
     }
 
     return 1;
