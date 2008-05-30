@@ -72,19 +72,19 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
 
         if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
             if (multipart_init(msr, &my_error_msg) < 0) {
-                *error_msg = apr_psprintf(msr->mp, "Multipart parser init failed: %s", my_error_msg);
+                *error_msg = apr_psprintf(msr->mp, "Multipart parsing error (init): %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
-                msr_log(msr, 2, "Multipart parser init failed: %s", my_error_msg);
+                msr_log(msr, 2, "%s", *error_msg);
             }
         }
         else
         if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
             if (xml_init(msr, &my_error_msg) < 0) {
-                *error_msg = apr_psprintf(msr->mp, "XML parser init failed: %s", my_error_msg);
+                *error_msg = apr_psprintf(msr->mp, "XML parsing error (init): %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
-                msr_log(msr, 2, "Multipart parser init failed: %s", my_error_msg);
+                msr_log(msr, 2, "%s", *error_msg);
             }
         }
         else
@@ -92,7 +92,8 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
             /* Do nothing, URLENCODED processor does not support streaming yet. */
         }
         else {
-            *error_msg = apr_psprintf(msr->mp, "Unknown request body processor: %s", msr->msc_reqbody_processor);
+            *error_msg = apr_psprintf(msr->mp, "Unknown request body processor: %s",
+                msr->msc_reqbody_processor);
             return -1;
         }
     }
@@ -112,7 +113,8 @@ static apr_status_t modsecurity_request_body_store_disk(modsec_rec *msr,
 
     i = write(msr->msc_reqbody_fd, data, length);
     if (i != length) {
-        *error_msg = apr_psprintf(msr->mp, "Input filter: Failed writing %" APR_SIZE_T_FMT " bytes to temporary file (rc %" APR_SIZE_T_FMT ").", length, i);
+        *error_msg = apr_psprintf(msr->mp, "Input filter: Failed writing %" APR_SIZE_T_FMT
+            " bytes to temporary file (rc %" APR_SIZE_T_FMT ").", length, i);
         return -1;
     }
 
@@ -196,13 +198,15 @@ static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
                 msr->msc_reqbody_chunk_current = (msc_data_chunk *)
                     apr_pcalloc(msr->msc_reqbody_mp, sizeof(msc_data_chunk));
                 if (msr->msc_reqbody_chunk_current == NULL) {
-                    *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to allocate %lu bytes for request body chunk.", (unsigned long)sizeof(msc_data_chunk));
+                    *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to allocate %lu bytes "
+                        "for request body chunk.", (unsigned long)sizeof(msc_data_chunk));
                     return -1;
                 }
 
                 msr->msc_reqbody_chunk_current->data = malloc(CHUNK_CAPACITY);
                 if (msr->msc_reqbody_chunk_current->data == NULL) {
-                    *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to allocate %d bytes for request body chunk data.", CHUNK_CAPACITY);
+                    *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to allocate %d bytes "
+                        "for request body chunk data.", CHUNK_CAPACITY);
                     return -1;
                 }
 
@@ -266,10 +270,10 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
 
             /* Process data as multipart/form-data. */
             if (multipart_process_chunk(msr, data, length, &my_error_msg) < 0) {
-                *error_msg = apr_psprintf(msr->mp, "Request body processor error: %s", my_error_msg);
+                *error_msg = apr_psprintf(msr->mp, "Multipart parsing error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
-                msr->msc_reqbody_error_msg = my_error_msg;
-                msr_log(msr, 2, "Request body processor error: %s", my_error_msg);
+                msr->msc_reqbody_error_msg = *error_msg;
+                msr_log(msr, 2, "%s", *error_msg);
             }
         }
         else
@@ -279,10 +283,10 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
 
             /* Process data as XML. */
             if (xml_process_chunk(msr, data, length, &my_error_msg) < 0) {
-                *error_msg = apr_psprintf(msr->mp, "Request body processor error: %s", my_error_msg);
+                *error_msg = apr_psprintf(msr->mp, "XML parsing error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
-                msr->msc_reqbody_error_msg = my_error_msg;
-                msr_log(msr, 2, "Request body processor error: %s", my_error_msg);
+                msr->msc_reqbody_error_msg = *error_msg;
+                msr_log(msr, 2, "%s", *error_msg);
             }
         }
         else
@@ -333,7 +337,8 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, cha
     /* Allocate a buffer large enough to hold the request body. */
 
     if (msr->msc_reqbody_length + 1 == 0) {
-        *error_msg = apr_psprintf(msr->mp, "Internal error, request body length will overflow: %u", msr->msc_reqbody_length);
+        *error_msg = apr_psprintf(msr->mp, "Internal error, request body length will overflow: %u",
+            msr->msc_reqbody_length);
         return -1;
     }
     msr->msc_reqbody_buffer = malloc(msr->msc_reqbody_length + 1);
@@ -416,16 +421,18 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
 
         if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
             if (multipart_complete(msr, &my_error_msg) < 0) {
-                *error_msg = apr_psprintf(msr->mp, "Multipart error: %s", my_error_msg);
+                *error_msg = apr_psprintf(msr->mp, "Multipart parsing error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
-                msr->msc_reqbody_error_msg = my_error_msg;
+                msr->msc_reqbody_error_msg = *error_msg;
+                msr_log(msr, 2, "%s", *error_msg);
                 return -1;
             }
 
             if (multipart_get_arguments(msr, "BODY", msr->arguments) < 0) {
-                *error_msg = apr_psprintf(msr->mp, "Multipart error: %s", my_error_msg);
+                *error_msg = "Multipart parsing error: Failed to retrieve arguments.";
                 msr->msc_reqbody_error = 1;
-                msr->msc_reqbody_error_msg = "Error retrieving arguments.";
+                msr->msc_reqbody_error_msg = *error_msg;
+                msr_log(msr, 2, "%s", *error_msg);
                 return -1;
             }
         }
@@ -436,9 +443,10 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
         else
         if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
             if (xml_complete(msr, &my_error_msg) < 0) {
+                *error_msg = apr_psprintf(msr->mp, "XML parser error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
-                msr->msc_reqbody_error_msg = my_error_msg;
-                msr_log(msr, 4, "%s", my_error_msg);
+                msr->msc_reqbody_error_msg = *error_msg;
+                msr_log(msr, 2, "%s", *error_msg);
                 return -1;
             }
         }
@@ -462,7 +470,8 @@ apr_status_t modsecurity_request_body_retrieve_start(modsec_rec *msr, char **err
 
         msr->msc_reqbody_disk_chunk = apr_pcalloc(msr->msc_reqbody_mp, sizeof(msc_data_chunk));
         if (msr->msc_reqbody_disk_chunk == NULL) {
-            *error_msg = apr_psprintf(msr->mp, "Failed to allocate %lu bytes for request body disk chunk.", (unsigned long)sizeof(msc_data_chunk));
+            *error_msg = apr_psprintf(msr->mp, "Failed to allocate %lu bytes for request body disk chunk.",
+                (unsigned long)sizeof(msc_data_chunk));
             return -1;
         }
         msr->msc_reqbody_disk_chunk->is_permanent = 1;
@@ -471,14 +480,16 @@ apr_status_t modsecurity_request_body_retrieve_start(modsec_rec *msr, char **err
     if (msr->msc_reqbody_storage == MSC_REQBODY_DISK) {
         msr->msc_reqbody_disk_chunk = apr_pcalloc(msr->msc_reqbody_mp, sizeof(msc_data_chunk));
         if (msr->msc_reqbody_disk_chunk == NULL) {
-            *error_msg = apr_psprintf(msr->mp, "Failed to allocate %lu bytes for request body disk chunk.", (unsigned long)sizeof(msc_data_chunk));
+            *error_msg = apr_psprintf(msr->mp, "Failed to allocate %lu bytes for request body disk chunk.",
+                (unsigned long)sizeof(msc_data_chunk));
             return -1;
         }
 
         msr->msc_reqbody_disk_chunk->is_permanent = 0;
         msr->msc_reqbody_disk_chunk->data = apr_palloc(msr->msc_reqbody_mp, CHUNK_CAPACITY);
         if (msr->msc_reqbody_disk_chunk->data == NULL) {
-            *error_msg = apr_psprintf(msr->mp, "Failed to allocate %d bytes for request body disk chunk data.", CHUNK_CAPACITY);
+            *error_msg = apr_psprintf(msr->mp, "Failed to allocate %d bytes for request body disk chunk data.",
+                CHUNK_CAPACITY);
             return -1;
         }
 
