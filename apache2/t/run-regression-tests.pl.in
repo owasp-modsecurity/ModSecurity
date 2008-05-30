@@ -412,7 +412,7 @@ sub match_file {
 	my($neg,$fn) = ($_[0] =~ m/^(-?)(.*)$/);
 	unless (exists $FILE{$fn}) {
 		$FILE{$fn}{fn} = $fn;
-		$FILE{$fn}{fd} = new FileHandle($fn, O_RDWR|O_CREAT);
+		$FILE{$fn}{fd} = new FileHandle($fn, O_RDONLY);
 		$FILE{$fn}{fd}->blocking(0);
 		$FILE{$fn}{buf} = "";
 	}
@@ -659,20 +659,6 @@ sub httpd_reset_fd {
 			$FILE{$fn}{fd} = new FileHandle($fn, O_RDWR|O_CREAT);
 			$FILE{$fn}{fd}->blocking(0);
 			$FILE{$fn}{fd}->sysseek(0, 2);
-			$FILE{$fn}{buf} = "";
-
-		}
-	}
-
-	# Any extras listed in "match_file"
-	if ($t and exists $t->{match_file}) {
-		for my $k (keys %{ $t->{match_file} || {} }) {
-			my($neg,$fn) = ($k =~ m/^(-?)(.*)$/);
-			next if (!$fn or exists $FILE{$fn});
-			#dbg("Opening file: $fn");
-			$FILE{$fn}{fn} = $fn;
-			$FILE{$fn}{fd} = new FileHandle($fn, O_RDWR|O_CREAT);
-			$FILE{$fn}{fd}->blocking(0);
 			$FILE{$fn}{buf} = "";
 
 		}

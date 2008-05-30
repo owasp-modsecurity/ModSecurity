@@ -3,7 +3,6 @@
 ### TODO:
 # SecTmpDir
 # SecUploadKeepFiles
-# SecWebAppId
 # SecChrootDir
 # SecGuardianLog
 
@@ -121,3 +120,29 @@ Upload File
 	),
 },
 
+# SecWebAppId
+{
+	type => "config",
+	comment => "SecWebAppId",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 4
+		SecAuditLog "$ENV{AUDIT_LOG}"
+		SecAuditEngine RelevantOnly
+		SecWebAppId "app-1"
+		SecAction "pass,log,auditlog,id:1"
+	),
+	match_log => {
+		error => [ qr/Warning\. Unconditional match in SecAction\./, 1 ],
+		debug => [ qr/Warning\. Unconditional match in SecAction\./, 1 ],
+		audit => [ qr/^WebApp-Info: "app-1"/m, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
