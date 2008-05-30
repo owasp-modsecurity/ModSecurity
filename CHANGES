@@ -1,6 +1,9 @@
 30 May 2008 - 2.5.5-dev1
 ------------------------
 
+* Handle lack of a new line after the final boundary in a multipart request.
+  This fixes the reported WordPress Flash file uploader problem.
+
 * Fixed issue with multithreaded servers where concurrent XML processing
   could crash the web server (at least under Windows).
 
