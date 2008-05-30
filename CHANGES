@@ -1,6 +1,8 @@
 30 May 2008 - trunk
 -------------------
 
+* Improve request body processing error messages.
+
 * Handle lack of a new line after the final boundary in a multipart request.
   This fixes the reported WordPress Flash file uploader problem.
 
