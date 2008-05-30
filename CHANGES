@@ -1,5 +1,7 @@
-09 May 2008 - trunk
+30 May 2008 - trunk
 -------------------
+
+* Fixed blocking in phase 3.
 
 * Persistent counter updates are now atomic.
 
