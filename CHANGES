@@ -1,6 +1,9 @@
 30 May 2008 - trunk
 -------------------
 
+* Fixed issue with multithreaded servers where concurrent XML processing
+  could crash the web server (at least under Windows).
+
 * Fixed blocking in phase 3.
 
 * Persistent counter updates are now atomic.
