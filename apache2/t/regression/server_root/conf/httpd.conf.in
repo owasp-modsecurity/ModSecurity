@@ -1,8 +1,10 @@
 ### Base configuration for starting Apache httpd
 
-# File locations
-PidFile @MSC_REGRESSION_LOGS_DIR@/httpd.pid
-ScoreBoardFile @MSC_REGRESSION_LOGS_DIR@/httpd.scoreboard
+<IfDefine !CHROOT>
+	# File locations
+	PidFile @MSC_REGRESSION_LOGS_DIR@/httpd.pid
+	ScoreBoardFile @MSC_REGRESSION_LOGS_DIR@/httpd.scoreboard
+</IfDefine>
 
 <IfModule !mod_proxy.c>
 	LoadModule proxy_module modules/mod_proxy.so
@@ -24,9 +26,10 @@ ServerName localhost
 LogLevel debug
 ErrorLog @MSC_REGRESSION_LOGS_DIR@/error.log
 
-DocumentRoot @MSC_REGRESSION_DOCROOT_DIR@
-<Directory "@MSC_REGRESSION_DOCROOT_DIR@">
-  Options Indexes FollowSymLinks
-  AllowOverride None
-</Directory>
-
+<IfDefine !CHROOT>
+	DocumentRoot @MSC_REGRESSION_DOCROOT_DIR@
+	<Directory "@MSC_REGRESSION_DOCROOT_DIR@">
+		Options Indexes FollowSymLinks
+		AllowOverride None
+	</Directory>
+</IfDefine>

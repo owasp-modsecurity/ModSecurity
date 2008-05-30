@@ -132,18 +132,12 @@
 		}
 
 		# Verify concurrent log contents
-		$LOG{$id}{fd} = new FileHandle($alogdatafn, O_RDONLY);
-		$LOG{$id}{fd}->blocking(0);
-		$LOG{$id}{buf} = "";
-		my $alogdata = match_log($id, qr/^--[^-]+-A--.*$id.*-Z--$/s, 1);
-		if (defined $alogdata) {
-			$LOG{$id}{fd}->close();
-			delete $LOG{$id};
+		if (defined match_file($alogdatafn, qr/^--[^-]+-A--.*$id.*-Z--$/s)) {
 			return 0;
 		}
 
 		# Error
-		dbg("LOGDATA: \"$alogdata\"");
+		dbg("LOGDATA: \"$FILE{$alogdatafn}{buf}\"");
 		die "Audit log data did not match.\n";
 	},
 	match_response => {
