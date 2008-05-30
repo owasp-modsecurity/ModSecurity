@@ -4409,77 +4409,12 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
 
       <para><emphasis>Note</emphasis></para>
 
-      <para>Every collection contains several built-in variables that are
-      read-only:</para>
-
-      <orderedlist continuation="restarts" inheritnum="ignore">
-        <listitem>
-          <para><literal moreinfo="none">CREATE_TIME</literal> - date/time of
-          the creation of the collection.</para>
-        </listitem>
-
-        <listitem>
-          <para><literal moreinfo="none">IS_NEW</literal> - set to 1 if the
-          collection is new (not yet persisted) otherwise set to 0.</para>
-        </listitem>
-
-        <listitem>
-          <para><literal moreinfo="none">KEY</literal> - the value of the
-          initcol variable (the client's IP address in the example).</para>
-        </listitem>
-
-        <listitem>
-          <para><literal moreinfo="none">LAST_UPDATE_TIME</literal> -
-          date/time of the last update to the collection.</para>
-        </listitem>
-
-        <listitem>
-          <para><literal moreinfo="none">TIMEOUT</literal> - date/time in
-          seconds when the collection will be updated on disk from memory (if
-          no other updates occur).</para>
-        </listitem>
-
-        <listitem>
-          <para><literal moreinfo="none">UPDATE_COUNTER</literal> - how many
-          times the collection has been updated since creation.</para>
-        </listitem>
-
-        <listitem>
-          <para><literal moreinfo="none">UPDATE_RATE</literal> - is the
-          average rate updates per minute since creation.</para>
-        </listitem>
-      </orderedlist>
-
       <para>Collections are loaded into memory when the initcol action is
-      encountered. The collection in storage will be updated (and the
+      encountered. The collection in storage will be persisted (and the
       appropriate counters increased) <emphasis>only</emphasis> if it was
       changed during transaction processing.</para>
 
-      <note>
-        <para>To create a collection to hold session variables (<literal
-        moreinfo="none">SESSION</literal>) use action <literal
-        moreinfo="none">setsid</literal>. To create a collection to hold user
-        variables (<literal moreinfo="none">USER</literal>) use action
-        <literal moreinfo="none">setuid</literal>.</para>
-      </note>
-
-      <note>
-        <para>At this time it is only possible to have three
-        collections:<literal moreinfo="none"> IP</literal>,<literal
-        moreinfo="none"> SESSION</literal>, and <literal
-        moreinfo="none">USER</literal>.</para>
-      </note>
-
-      <note>
-        <para>Please note that ModSecurity does not implement atomic updates
-        of persistent variables at this time. Variables are read from storage
-        whenever <literal>initcol</literal> is encountered in the rules and
-        persisted at the end of request processing. On busy servers requests
-        often run in parallel, leading to situations where one request
-        overwrites the changes made by another request. We anticipate
-        implementing atomic updates of counter values in a future
-        version.</para>
-      </note>
+      <para>See the "Persistant Storage" section for further details.</para>
     </section>
 
     <section>
@@ -5602,6 +5537,86 @@ SecRule REQUEST_METHOD "!<emphasis>@within %{tx.allowed_methods}</emphasis>" t:l
     <para>Some values you may want to expand include: TX, REMOTE_ADDR, USERID,
     HIGHEST_SEVERITY, MATCHED_VAR, MATCHED_VAR_NAME, MULTIPART_STRICT_ERROR,
     RULE, SESSION, USERID, among others.</para>
+  </section>
+
+  <section>
+    <title>Persistant Storage</title>
+
+    <para>At this time it is only possible to have three collections in which
+    data is stored persistantly (i.e. data available to multiple requests).
+    These are: <literal moreinfo="none">IP</literal>, <literal
+    moreinfo="none"> SESSION</literal> and <literal
+    moreinfo="none">USER</literal>.</para>
+
+    <para>Every collection contains several built-in variables that are
+    available and are read-only unless otherwise specified:</para>
+
+    <orderedlist continuation="restarts" inheritnum="ignore">
+      <listitem>
+        <para><literal moreinfo="none">CREATE_TIME</literal> - date/time of
+        the creation of the collection.</para>
+      </listitem>
+
+      <listitem>
+        <para><literal moreinfo="none">IS_NEW</literal> - set to 1 if the
+        collection is new (not yet persisted) otherwise set to 0.</para>
+      </listitem>
+
+      <listitem>
+        <para><literal moreinfo="none">KEY</literal> - the value of the
+        initcol variable (the client's IP address in the example).</para>
+      </listitem>
+
+      <listitem>
+        <para><literal moreinfo="none">LAST_UPDATE_TIME</literal> - date/time
+        of the last update to the collection.</para>
+      </listitem>
+
+      <listitem>
+        <para><literal moreinfo="none">TIMEOUT</literal> - date/time in
+        seconds when the collection will be updated on disk from memory (if no
+        other updates occur). This variable may be set if you wish to specifiy
+        an explicit expiration time (default is 3600 seconds).</para>
+      </listitem>
+
+      <listitem>
+        <para><literal moreinfo="none">UPDATE_COUNTER</literal> - how many
+        times the collection has been updated since creation.</para>
+      </listitem>
+
+      <listitem>
+        <para><literal moreinfo="none">UPDATE_RATE</literal> - is the average
+        rate updates per minute since creation.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>To create a collection to hold session variables (<literal
+    moreinfo="none">SESSION</literal>) use action <literal
+    moreinfo="none">setsid</literal>. To create a collection to hold user
+    variables (<literal moreinfo="none">USER</literal>) use action <literal
+    moreinfo="none">setuid</literal>. To create a collection to hold client
+    address variables (<literal moreinfo="none">IP</literal>) use action
+    <literal moreinfo="none">initcol</literal>.</para>
+
+    <note>
+      <para>ModSecurity implements atomic updates of persistent variables only
+      for integer variables (counters) at this time. Variables are read from
+      storage whenever <literal>initcol</literal> is encountered in the rules
+      and persisted at the end of request processing. Counters are adjusted by
+      applying a delta generated by re-reading the persisted data just before
+      being persisted. This keeps counter data consistent even if the counter
+      was modified and persisted by another thread/process during the
+      transaction.</para>
+    </note>
+
+    <note>
+      <para>ModSecurity uses a Berkley Database (SDBM) for persistant storage.
+      This type of database is generally limited to storing a maximum of 1008
+      bytes per key. This may be a limitation if you are attempting to store a
+      considerable amount of data in variables for a single key. Some of this
+      limitation is planned to be reduced in a future version of
+      ModSecurity.</para>
+    </note>
   </section>
 
   <section>
