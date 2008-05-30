@@ -15,6 +15,7 @@
 #include "modsecurity.h"
 #include "msc_parsers.h"
 #include "msc_util.h"
+#include "msc_xml.h"
 
 modsec_build_type_rec DSOLOCAL modsec_build_type[] = {
     { "-dev", 1 },     /* Development build */
@@ -121,6 +122,9 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
  * Performs per-child (new process) initialisation.
  */
 void modsecurity_child_init(msc_engine *msce) {
+    /* Need to call this once per process before any other XML calls. */
+    xmlInitParser();
+
     if (msce->auditlog_lock != NULL) {
         apr_status_t rc = apr_global_mutex_child_init(&msce->auditlog_lock, NULL, msce->mp);
         if (rc != APR_SUCCESS) {
