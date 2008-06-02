@@ -4,7 +4,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.6.0-trunk (April 02, 2008)</releaseinfo>
+    <releaseinfo>Version 2.6.0-trunk (June 02, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -1185,7 +1185,7 @@ SecAuditLogStorageDir logs/audit
       <para>The default value is minimal (differing from previous
       versions):</para>
 
-      <programlisting format="linespecific">SecDefaultAction phase:2,log,pass</programlisting>
+      <programlisting format="linespecific">SecDefaultAction phase:2,log,auditlog,pass</programlisting>
 
       <para><emphasis>Note</emphasis></para>
 

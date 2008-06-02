@@ -1,5 +1,8 @@
-30 May 2008 - trunk
+02 Jun 2008 - trunk
 -------------------
+
+* Enable the "auditlog" action by default to help prevent a misconfiguration.
+  The new default is now: "phase:2,log,auditlog,pass"
 
 * Improve request body processing error messages.
 

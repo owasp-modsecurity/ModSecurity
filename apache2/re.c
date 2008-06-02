@@ -659,7 +659,7 @@ msre_actionset *msre_actionset_merge(msre_engine *engine, msre_actionset *parent
 msre_actionset *msre_actionset_create_default(msre_engine *engine) {
     char  *my_error_msg = NULL;
     return msre_actionset_create(engine,
-        "phase:2,log,pass",
+        "phase:2,log,auditlog,pass",
         &my_error_msg);
 }
 
@@ -691,7 +691,7 @@ void msre_actionset_set_defaults(msre_actionset *actionset) {
     if (actionset->intercept_pause == NOT_SET) actionset->intercept_pause = 0;
 
     /* Other */
-    if (actionset->auditlog == NOT_SET) actionset->auditlog = 0;
+    if (actionset->auditlog == NOT_SET) actionset->auditlog = 1;
     if (actionset->log == NOT_SET) actionset->log = 1;
 }
 
