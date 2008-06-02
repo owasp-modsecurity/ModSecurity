@@ -1,6 +1,9 @@
 02 Jun 2008 - 2.5.5-dev1
 ------------------------
 
+* Fixed an issue where an alert was not logged in the error log
+  unless "auditlog" was used.
+
 * Enable the "auditlog" action by default to help prevent a misconfiguration.
   The new default is now: "phase:2,log,auditlog,pass"
 

@@ -1629,9 +1629,18 @@ static void msre_perform_disruptive_actions(modsec_rec *msr, msre_rule *rule,
         || (msr->modsecurity->processing_mode == MODSEC_OFFLINE)
         || (actionset->intercept_action == ACTION_NONE))
     {
-        /* If "no(audit)?log" was used log at a higher level. */
-        msc_alert(msr, ((actionset->log == 0) || (actionset->auditlog == 0) ? 4 : 2), actionset,
-            "Warning.", message);
+        /* If "nolog" was used log at a higher level to prevent an "alert". */
+        int log_level = (actionset->log == 0 ? 4 : 2);
+        msc_alert(msr, log_level, actionset, "Warning.", message);
+
+        /* However, this will mark the txn relevant again if it is <=3,
+         * which will mess up noauditlog.  We need to compensate for this
+         * so that we do not increment twice when auditlog is enabled and
+         * prevent incrementing when auditlog is disabled.
+         */
+        if (log_level <= 3) {
+            msr->is_relevant--;
+        }
         return;
     }
 
