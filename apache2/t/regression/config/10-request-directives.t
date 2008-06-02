@@ -190,7 +190,7 @@
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 		SecRequestBodyLimit 1000
-		SecRequestBodyInMemoryLimit 266
+		SecRequestBodyInMemoryLimit 276
 	),
 	match_log => {
 		-debug => [ qr/Input filter: Request too large to store in memory, switching to disk\./, 1 ],
@@ -198,22 +198,32 @@
 	match_response => {
 		status => qr/^200$/,
 	},
-	request => qq(
-		POST /test.txt HTTP/1.1
-		Host: $ENV{SERVER_NAME}:$ENV{SERVER_PORT}
-		User-Agent: $ENV{USER_AGENT}
-		Content-Type: multipart/form-data; boundary=---------------------------69343412719991675451336310646
-		Transfer-Encoding: chunked
+	request => normalize_raw_request_data(
+		qq(
+			POST /test.txt HTTP/1.1
+			Host: $ENV{SERVER_NAME}:$ENV{SERVER_PORT}
+			User-Agent: $ENV{USER_AGENT}
+			Content-Type: multipart/form-data; boundary=---------------------------69343412719991675451336310646
+			Transfer-Encoding: chunked
 
-	) . encode_chunked(q(-----------------------------69343412719991675451336310646
-Content-Disposition: form-data; name="a"
+		),
+	)
+	.encode_chunked(
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="a"
 
-1
------------------------------69343412719991675451336310646
-Content-Disposition: form-data; name="b"
+				1
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="b"
 
-2
------------------------------69343412719991675451336310646--), 1024),
+				2
+				-----------------------------69343412719991675451336310646--
+			)
+		),
+		1024
+	),
 },
 {
 	type => "config",
@@ -232,22 +242,32 @@ Content-Disposition: form-data; name="b"
 	match_response => {
 		status => qr/^200$/,
 	},
-	request => qq(
-		POST /test.txt HTTP/1.1
-		Host: $ENV{SERVER_NAME}:$ENV{SERVER_PORT}
-		User-Agent: $ENV{USER_AGENT}
-		Content-Type: multipart/form-data; boundary=---------------------------69343412719991675451336310646
-		Transfer-Encoding: chunked
+	request => normalize_raw_request_data(
+		qq(
+			POST /test.txt HTTP/1.1
+			Host: $ENV{SERVER_NAME}:$ENV{SERVER_PORT}
+			User-Agent: $ENV{USER_AGENT}
+			Content-Type: multipart/form-data; boundary=---------------------------69343412719991675451336310646
+			Transfer-Encoding: chunked
 
-	) . encode_chunked(q(-----------------------------69343412719991675451336310646
-Content-Disposition: form-data; name="a"
+		),
+	)
+	.encode_chunked(
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="a"
 
-1
------------------------------69343412719991675451336310646
-Content-Disposition: form-data; name="b"
+				1
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="b"
 
-2
------------------------------69343412719991675451336310646--), 1024),
+				2
+				-----------------------------69343412719991675451336310646--
+			)
+		),
+		1024
+	),
 },
 
 # SecCookieFormat

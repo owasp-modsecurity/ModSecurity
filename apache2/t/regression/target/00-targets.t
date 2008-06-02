@@ -370,7 +370,51 @@
 	),
 },
 
-# TODO: AUTH_TYPE
+# AUTH_TYPE
+#{
+#	type => "target",
+#	comment => "AUTH_TYPE",
+#	conf => qq(
+#		<IfVersion >= 2.2>
+#			<IfModule !mod_authn_file.c>
+#				LoadModule authn_file_module modules/mod_authn_file.so
+#			</IfModule>
+#		</IfVersion>
+##		<IfVersion ~ ^2.0.>
+##			<IfModule !mod_auth.c>
+##				LoadModule auth_module modules/mod_auth.so
+##			</IfModule>
+##		</IfVersion>
+#		<Location />
+#			AuthType Basic
+#			AuthName Test
+#			AuthUserFile "$ENV{CONF_DIR}/htpasswd"
+#			Require user nobody
+#		</Location>
+#		SecRuleEngine On
+#		SecRequestBodyAccess On
+#		SecResponseBodyAccess On
+#		SecResponseBodyMimeType null
+##		SecDebugLog $ENV{DEBUG_LOG}
+##		SecDebugLogLevel 9
+#		SecRule REQUEST_HEADERS:Authorization "Basic (.*)" "phase:2,log,pass,capture,chain"
+#		SecRule TX:1 "nobody:test" "t:none,t:base64Decode,chain"
+#		SecRule AUTH_TYPE "Basic"
+#	),
+#	match_log => {
+#		error => [ qr/Pattern match "Basic" at AUTH_TYPE/s, 1 ],
+#	},
+#	match_response => {
+#		status => qr/^200$/,
+#	},
+#	request => new HTTP::Request(
+#		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+#		[
+#			"Authorization" => "Basic bm9ib2R5OnRlc3Q="
+#		],
+#	),
+#},
+
 # TODO: ENV
 # TODO: FILES
 # TODO: FILES_COMBINED_SIZE

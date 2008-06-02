@@ -21,7 +21,7 @@ use Data::Dumper;
 use IO::Socket;
 use LWP::UserAgent;
 
-my @TYPES = qw(config action target rule);
+my @TYPES = qw(config misc action target rule);
 my $SCRIPT = basename($0);
 my $SCRIPT_DIR = File::Spec->rel2abs(dirname($0));
 my $REG_DIR = "$SCRIPT_DIR/regression";
@@ -324,6 +324,23 @@ sub runfile {
 	msg(sprintf("Passed: %2d; Failed: %2d", $pass, $testnum ? (1 - $pass) : ($n - $pass)));
 }
 
+# Take out any indenting and translate LF -> CRLF
+sub normalize_raw_request_data {
+	my $r = $_[0];
+
+	# Allow for indenting in test file
+	$r =~ s/^[ \t]*\x0d?\x0a//s;
+	my($indention) = ($r =~ m/^([ \t]*)/s); # indention taken from first line
+	$r =~ s/^$indention//mg;
+	$r =~ s/(\x0d?\x0a)[ \t]+$/$1/s;
+
+	# Translate LF to CRLF
+	$r =~ s/^\x0a/\x0d\x0a/mg;
+	$r =~ s/([^\x0d])\x0a/$1\x0d\x0a/mg;
+
+	return $r;
+}
+
 sub do_raw_request {
 	my $sock = new IO::Socket::INET(
 		Proto => "tcp",
@@ -332,15 +349,14 @@ sub do_raw_request {
 	) or msg("Failed to connect to localhost:$opt{p}: $@");
 	return unless ($sock);
 
-	my $r = "@_";
-	$r =~ s/^[^A-Z]+//s;
-	$r =~ s/^[ \t]+//mg;
-	$r =~ s/^\x0a/\x0d\x0a/mg;
-	$r =~ s/([^\x0d])\x0a/$1\x0d\x0a/mg;
+	# Join togeather the request
+	my $r = join("", @_);
 
+	# Write to socket
 	print $sock "$r";
 	$sock->shutdown(1);
 
+	# Read from socket
 	my @resp = <$sock>;
 	$sock->close();
 

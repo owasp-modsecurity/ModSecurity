@@ -135,7 +135,7 @@
 	),
 	match_log => {
 		-error => [ qr/ModSecurity: /, 1 ],
-		# ENH: No message, but should have data.  Is this intended?
+		# No message, but should have data.  This may need changed
 		audit => [ qr/-H--\s+Stopwatch: /s, 1 ],
 	},
 	match_response => {

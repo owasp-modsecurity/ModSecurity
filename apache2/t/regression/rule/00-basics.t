@@ -2,7 +2,7 @@
 
 # SecAction
 {
-	type => "config",
+	type => "rule",
 	comment => "SecAction (override default)",
 	conf => qq(
 		SecRuleEngine On
