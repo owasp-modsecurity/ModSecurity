@@ -2,7 +2,7 @@
 
 # Phase 1 (request headers)
 {
-	type => "rule",
+	type => "misc",
 	comment => "phase 1",
 	conf => qq(
 		SecRuleEngine On
@@ -32,7 +32,7 @@
 
 # Phase 2 (request body)
 {
-	type => "rule",
+	type => "misc",
 	comment => "phase 2",
 	conf => qq(
 		SecRuleEngine On
@@ -62,7 +62,7 @@
 
 # Phase 3 (response headers)
 {
-	type => "rule",
+	type => "misc",
 	comment => "phase 3",
 	conf => qq(
 		SecRuleEngine On
@@ -92,7 +92,7 @@
 
 # Phase 4 (response body)
 {
-	type => "rule",
+	type => "misc",
 	comment => "phase 4",
 	conf => qq(
 		SecRuleEngine On
@@ -121,7 +121,7 @@
 
 # Phase 5 (logging)
 {
-	type => "rule",
+	type => "misc",
 	comment => "phase 5",
 	conf => qq(
 		SecRuleEngine On

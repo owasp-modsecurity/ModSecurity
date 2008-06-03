@@ -6,6 +6,9 @@
 	comment => "pass in phase:1",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
 		SecAction "phase:1,pass"
 		SecAction "phase:1,deny"
 	),
@@ -24,6 +27,9 @@
 	comment => "pass in phase:2",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
 		SecAction "phase:2,pass"
 		SecAction "phase:2,deny"
 	),
@@ -42,6 +48,11 @@
 	comment => "pass in phase:3",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 4
 		SecAction "phase:3,pass"
 		SecAction "phase:3,deny"
 	),
@@ -60,6 +71,11 @@
 	comment => "pass in phase:4",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 4
 		SecAction "phase:4,pass"
 		SecAction "phase:4,deny"
 	),
@@ -80,6 +96,9 @@
 	comment => "allow in phase:1",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
 		SecAction "phase:1,allow"
 		SecAction "phase:1,deny"
 	),
@@ -98,6 +117,9 @@
 	comment => "allow in phase:2",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
 		SecAction "phase:2,allow"
 		SecAction "phase:2,deny"
 	),
@@ -116,6 +138,11 @@
 	comment => "allow in phase:3",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 4
 		SecAction "phase:3,allow"
 		SecAction "phase:3,deny"
 	),
@@ -134,6 +161,11 @@
 	comment => "allow in phase:4",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 4
 		SecAction "phase:4,allow"
 		SecAction "phase:4,deny"
 	),
@@ -154,6 +186,9 @@
 	comment => "deny in phase:1",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
 		SecAction "phase:1,deny"
 	),
 	match_log => {
@@ -171,6 +206,9 @@
 	comment => "deny in phase:2",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
 		SecAction "phase:2,deny"
 	),
 	match_log => {
@@ -188,6 +226,11 @@
 	comment => "deny in phase:3",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 4
 		SecAction "phase:3,deny"
 	),
 	match_log => {
@@ -205,6 +248,11 @@
 	comment => "deny in phase:4",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 4
 		SecAction "phase:4,deny"
 	),
 	match_log => {
@@ -224,6 +272,9 @@
 	comment => "drop in phase:1",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
 		SecAction "phase:1,drop"
 	),
 	match_log => {
@@ -241,6 +292,9 @@
 	comment => "drop in phase:2",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
 		SecAction "phase:2,drop"
 	),
 	match_log => {
@@ -258,6 +312,11 @@
 	comment => "drop in phase:3",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 4
 		SecAction "phase:3,drop"
 	),
 	match_log => {
@@ -275,6 +334,11 @@
 	comment => "drop in phase:4",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 4
 		SecAction "phase:4,drop"
 	),
 	match_log => {
@@ -294,6 +358,9 @@
 	comment => "redirect in phase:1 (get)",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:1,redirect:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
 	),
 	match_log => {
@@ -312,6 +379,9 @@
 	comment => "redirect in phase:2 (get)",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:2,redirect:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
 	),
 	match_log => {
@@ -330,6 +400,11 @@
 	comment => "redirect in phase:3 (get)",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 4
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:3,redirect:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
 	),
 	match_log => {
@@ -348,6 +423,11 @@
 	comment => "redirect in phase:4 (get)",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 4
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:4,redirect:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
 	),
 	match_log => {
@@ -368,6 +448,9 @@
 	comment => "proxy in phase:1 (get)",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:1,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
 	),
 	match_log => {
@@ -386,6 +469,9 @@
 	comment => "proxy in phase:2 (get)",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:2,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
 	),
 	match_log => {
@@ -404,6 +490,11 @@
 	comment => "proxy in phase:3 (get)",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 4
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:3,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
 	),
 	match_log => {
@@ -421,6 +512,11 @@
 	comment => "proxy in phase:4 (get)",
 	conf => qq(
 		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 4
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:4,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt'"
 	),
 	match_log => {
