@@ -1,4 +1,4 @@
-02 Jun 2008 - trunk
+03 Jun 2008 - trunk
 -------------------
 
 * Fixed an issue where an alert was not logged in the error log

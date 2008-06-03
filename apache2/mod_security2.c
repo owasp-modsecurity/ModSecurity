@@ -962,7 +962,6 @@ static void hook_insert_filter(request_rec *r) {
 }
 
 /* NOTE: This is causing and endless loop when blocking in phase:3 */
-#if 0
 /**
  * Invoked whenever Apache starts processing an error. A chance
  * to insert ourselves into the output filter chain.
@@ -975,6 +974,16 @@ static void hook_insert_error_filter(request_rec *r) {
      */
     msr = retrieve_tx_context(r);
     if (msr == NULL) return;
+
+    /* Do not run if we are already running, which may happen
+     * if we intercept in phase 3.
+     */
+    if (msr->of_is_error == 1) {
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Hook insert_error_filter: Already processing.");
+        }
+        return;
+    }
 
     /* Do not run if not enabled. */
     if (msr->txcfg->is_enabled == 0) {
@@ -1004,7 +1013,6 @@ static void hook_insert_error_filter(request_rec *r) {
         }
     }
 }
-#endif
 
 #if (!defined(NO_MODSEC_API))
 /**
@@ -1108,9 +1116,7 @@ static void register_hooks(apr_pool_t *mp) {
 
     /* Filter hooks */
     ap_hook_insert_filter(hook_insert_filter, NULL, NULL, APR_HOOK_FIRST);
-#if 0
     ap_hook_insert_error_filter(hook_insert_error_filter, NULL, NULL, APR_HOOK_FIRST);
-#endif
 
     ap_register_input_filter("MODSECURITY_IN", input_filter,
         NULL, AP_FTYPE_CONTENT_SET);
