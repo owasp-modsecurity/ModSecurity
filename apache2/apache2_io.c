@@ -39,6 +39,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         return APR_EGENERAL;
     }
 
+    /* Make sure we are using the current request */
     msr->r = f->r;
 
     if (msr->phase < PHASE_REQUEST_BODY) {
@@ -678,17 +679,20 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         /* Do we need to process a partial response? */
         if (start_skipping) {
             if (flatten_response_body(msr) < 0) {
+                ap_remove_output_filter(f);
                 return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
             }
 
             /* Process phase RESPONSE_BODY */
             rc = modsecurity_process_phase(msr, PHASE_RESPONSE_BODY);
             if (rc < 0) {
+                ap_remove_output_filter(f);
                 return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
             }
             if (rc > 0) {
                 int status = perform_interception(msr);
                 if (status != DECLINED) { /* DECLINED means we allow-ed the request. */
+                    ap_remove_output_filter(f);
                     return send_error_bucket(msr, f, status);
                 }
             }
@@ -735,16 +739,19 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
      */
     if (msr->phase < PHASE_RESPONSE_BODY) {
         if (flatten_response_body(msr) < 0) {
+            ap_remove_output_filter(f);
             return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
         }
 
         rc = modsecurity_process_phase(msr, PHASE_RESPONSE_BODY);
         if (rc < 0) {
+            ap_remove_output_filter(f);
             return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
         }
         if (rc > 0) {
             int status = perform_interception(msr);
             if (status != DECLINED) { /* DECLINED means we allow-ed the request. */
+                ap_remove_output_filter(f);
                 return send_error_bucket(msr, f, status);
             }
         }

@@ -1,5 +1,5 @@
-02 Jun 2008 - 2.5.5-dev1
-------------------------
+03 Jun 2008 - 2.5.5
+-------------------
 
 * Fixed an issue where an alert was not logged in the error log
   unless "auditlog" was used.
