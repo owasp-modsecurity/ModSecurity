@@ -225,7 +225,6 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     /* Initialise C-T */
     msr->request_content_type = NULL;
     s = apr_table_get(msr->request_headers, "Content-Type");
-    msr_log(msr, 9, "C-T (apache): \"%s\"", s);
     if (s != NULL) msr->request_content_type = s;
 
     /* Decide what to do with the request body. */
