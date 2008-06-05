@@ -826,13 +826,47 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
 int multipart_complete(modsec_rec *msr, char **error_msg) {
     if (msr->mpd == NULL) return 1;
 
+    if (msr->txcfg->debuglog_level >= 4) {
+        if (msr->mpd->flag_data_before) {
+            msr_log(msr, 4, "Multipart: Warning: seen data before first boundary.");
+        }
+
+        if (msr->mpd->flag_data_after) {
+            msr_log(msr, 4, "Multipart: Warning: seen data after last boundary.");
+        }
+
+        if (msr->mpd->flag_boundary_quoted) {
+            msr_log(msr, 4, "Multipart: Warning: boundary was quoted.");
+        }
+
+        if (msr->mpd->flag_boundary_whitespace) {
+            msr_log(msr, 4, "Multipart: Warning: boundary whitespace in C-T header.");
+        }
+
+        if (msr->mpd->flag_header_folding) {
+            msr_log(msr, 4, "Multipart: Warning: header folding used.");
+        }        
+
+        if (msr->mpd->flag_crlf_line) {
+            msr_log(msr, 4, "Multipart: Warning: mixed line endings used (CRLF/LF).");
+        }
+
+        if (msr->mpd->flag_lf_line) {
+            msr_log(msr, 4, "Multipart: Warning: incorrect line endings used (LF).");
+        }
+
+        if (msr->mpd->flag_missing_semicolon) {
+            msr_log(msr, 4, "Multipart: Warning: missing semicolon in C-T header.");
+        }
+    }
+
     if ((msr->mpd->seen_data != 0)&&(msr->mpd->is_complete == 0)) {
         if (msr->mpd->boundary_count > 0) {
             /* Check if we have the final boundary (that we haven't
              * processed yet) in the buffer.
              */
             if (msr->mpd->buf_contains_line) {
-                if ( ((MULTIPART_BUF_SIZE - msr->mpd->bufleft) == (4 + strlen(msr->mpd->boundary)))
+                if ( ((unsigned int)(MULTIPART_BUF_SIZE - msr->mpd->bufleft) == (4 + strlen(msr->mpd->boundary)))
                     && (*(msr->mpd->buf) == '-')&&(*(msr->mpd->buf + 1) == '-')
                     && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0)
                     && (*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary)) == '-')
