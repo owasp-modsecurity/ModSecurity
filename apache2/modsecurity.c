@@ -495,7 +495,7 @@ static apr_status_t modsecurity_process_phase_logging(modsec_rec *msr) {
  * in the modsec_rec structure.
  */
 apr_status_t modsecurity_process_phase(modsec_rec *msr, unsigned int phase) {
-    /* Check if we've should run. */
+    /* Check if we should run. */
     if ((msr->was_intercepted)&&(phase != PHASE_LOGGING)) {
         msr_log(msr, 4, "Skipping phase %i as request was already intercepted.", phase);
         return 0;
