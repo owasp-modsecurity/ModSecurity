@@ -351,6 +351,7 @@ sub do_raw_request {
 
 	# Join togeather the request
 	my $r = join("", @_);
+	dbg($r);
 
 	# Write to socket
 	print $sock "$r";
@@ -374,7 +375,11 @@ sub do_request {
 
 	if (ref $r eq "HTTP::Request") {
 #		dbg("REQUEST: ", $r);
-		return $UA->request($r);
+		my $resp = $UA->request($r);
+		if ($opt{d}) {
+			dbg($resp->request()->as_string());
+		}
+		return $resp
 	}
 	else {
 #		dbg("REQUEST:\n", $r);
@@ -456,7 +461,7 @@ sub dbg {
 	my $out = join "", map {
 		(ref $_ ne "" ? Dumper($_) : $_)
 	} @_;
-	$out =~ s/^/DBG: /m;
+	$out =~ s/^/DBG: /mg;
 	print STDOUT "$out\n";
 }
 

@@ -124,7 +124,10 @@
 },
 {
 	type => "misc",
-	comment => "multipart parser (boundary contains \"BoUnDaRy\")",
+	comment => "multipart parser (boundary contains \"bOuNdArY\")",
+	note => q(
+		KHTML Boundary
+	),
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -145,19 +148,19 @@
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 		[
-			"Content-Type" => "multipart/form-data; boundary=------------------------------------------------BoUnDaRy",
+			"Content-Type" => "multipart/form-data; boundary=--------0xKhTmLbOuNdArY",
 		],
 		normalize_raw_request_data(
 			q(
-				--------------------------------------------------BoUnDaRy
+				----------0xKhTmLbOuNdArY
 				Content-Disposition: form-data; name="a"
 
 				1
-				--------------------------------------------------BoUnDaRy
+				----------0xKhTmLbOuNdArY
 				Content-Disposition: form-data; name="b"
 
 				2
-				--------------------------------------------------BoUnDaRy--
+				----------0xKhTmLbOuNdArY--
 			),
 		),
 	),
