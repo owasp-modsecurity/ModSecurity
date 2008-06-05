@@ -847,11 +847,10 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
             msr_log(msr, 4, "Multipart: Warning: header folding used.");
         }        
 
-        if (msr->mpd->flag_crlf_line) {
+        if (msr->mpd->flag_crlf_line && msr->mpd->flag_lf_line) {
             msr_log(msr, 4, "Multipart: Warning: mixed line endings used (CRLF/LF).");
         }
-
-        if (msr->mpd->flag_lf_line) {
+        else if (msr->mpd->flag_lf_line) {
             msr_log(msr, 4, "Multipart: Warning: incorrect line endings used (LF).");
         }
 
