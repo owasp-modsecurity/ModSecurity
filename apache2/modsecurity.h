@@ -540,7 +540,7 @@ void DSOLOCAL modsecurity_shutdown(msc_engine *msce);
 
 apr_status_t DSOLOCAL modsecurity_tx_init(modsec_rec *msr);
 
-apr_status_t DSOLOCAL modsecurity_process_phase(modsec_rec *msr, int phase);
+apr_status_t DSOLOCAL modsecurity_process_phase(modsec_rec *msr, unsigned int phase);
 
 
 /* Request body functions */

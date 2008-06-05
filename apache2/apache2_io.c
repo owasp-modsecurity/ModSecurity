@@ -510,10 +510,13 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
             ap_remove_output_filter(f);
             return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
         }
+
         if (rc > 0) { /* transaction needs to be interrupted */
             int status = perform_interception(msr);
             if (status != DECLINED) { /* DECLINED means we allow-ed the request. */
                 ap_remove_output_filter(f);
+                msr->of_status = OF_STATUS_COMPLETE;
+                msr->of_status = RESBODY_STATUS_ERROR;
                 return send_error_bucket(msr, f, status);
             }
         }
