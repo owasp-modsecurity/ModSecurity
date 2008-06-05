@@ -1,4 +1,4 @@
-03 Jun 2008 - 2.5.5
+05 Jun 2008 - 2.5.5
 -------------------
 
 * Fixed an issue where an alert was not logged in the error log

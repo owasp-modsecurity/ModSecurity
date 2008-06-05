@@ -225,6 +225,7 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     /* Initialise C-T */
     msr->request_content_type = NULL;
     s = apr_table_get(msr->request_headers, "Content-Type");
+    msr_log(msr, 9, "C-T (apache): \"%s\"", s);
     if (s != NULL) msr->request_content_type = s;
 
     /* Decide what to do with the request body. */
@@ -492,7 +493,20 @@ static apr_status_t modsecurity_process_phase_logging(modsec_rec *msr) {
  * need to be explicitly provided since it's already available
  * in the modsec_rec structure.
  */
-apr_status_t modsecurity_process_phase(modsec_rec *msr, int phase) {
+apr_status_t modsecurity_process_phase(modsec_rec *msr, unsigned int phase) {
+    /* Check if we've should run. */
+    if ((msr->was_intercepted)&&(phase != PHASE_LOGGING)) {
+        msr_log(msr, 4, "Skipping phase %i as request was already intercepted.", phase);
+        return 0;
+    }
+
+    /* Do not process the same phase twice. */
+    if (msr->phase >= phase) {
+        msr_log(msr, 4, "Skipping phase %i because it was previously run (at %i now).",
+            phase, msr->phase);
+        return 0;
+    }
+
     msr->phase = phase;
 
     switch(phase) {
