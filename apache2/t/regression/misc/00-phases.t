@@ -8,7 +8,7 @@
 		SecRuleEngine On
 		SecRequestBodyAccess On
 		SecResponseBodyAccess On
-		SecResponseBodyMimeType null
+		SecResponseBodyMimeType text/plain null
 		SecRule REQUEST_LINE "^POST" "phase:1,pass,log,auditlog"
 		SecRule ARGS "val1" "phase:1,pass,log,auditlog"
 		SecRule RESPONSE_HEADERS:Last-Modified "." "phase:1,pass,log,auditlog"
@@ -38,7 +38,7 @@
 		SecRuleEngine On
 		SecRequestBodyAccess On
 		SecResponseBodyAccess On
-		SecResponseBodyMimeType null
+		SecResponseBodyMimeType text/plain null
 		SecRule REQUEST_LINE "^POST" "phase:2,pass,log,auditlog"
 		SecRule ARGS "val1" "phase:2,pass,log,auditlog"
 		SecRule RESPONSE_HEADERS:Last-Modified "." "phase:2,pass,log,auditlog"
@@ -68,7 +68,7 @@
 		SecRuleEngine On
 		SecRequestBodyAccess On
 		SecResponseBodyAccess On
-		SecResponseBodyMimeType null
+		SecResponseBodyMimeType text/plain null
 		SecRule REQUEST_LINE "^POST" "phase:3,pass,log,auditlog"
 		SecRule ARGS "val1" "phase:3,pass,log,auditlog"
 		SecRule RESPONSE_HEADERS:Last-Modified "." "phase:3,pass,log,auditlog"
@@ -98,7 +98,9 @@
 		SecRuleEngine On
 		SecRequestBodyAccess On
 		SecResponseBodyAccess On
-		SecResponseBodyMimeType null
+		SecResponseBodyMimeType text/plain null
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 9
 		SecRule REQUEST_LINE "^POST" "phase:4,pass,log,auditlog"
 		SecRule ARGS "val1" "phase:4,pass,log,auditlog"
 		SecRule RESPONSE_HEADERS:Last-Modified "." "phase:4,pass,log,auditlog"
@@ -127,7 +129,7 @@
 		SecRuleEngine On
 		SecRequestBodyAccess On
 		SecResponseBodyAccess On
-		SecResponseBodyMimeType null
+		SecResponseBodyMimeType text/plain null
 		SecRule REQUEST_LINE "^POST" "phase:5,pass,log,auditlog"
 		SecRule ARGS "val1" "phase:5,pass,log,auditlog"
 		SecRule RESPONSE_HEADERS:Last-Modified "." "phase:5,pass,log,auditlog"

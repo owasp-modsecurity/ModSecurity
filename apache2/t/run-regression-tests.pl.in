@@ -416,6 +416,11 @@ sub match_log {
 
 	msg("Warning: Empty regular expression.") if (!defined $re or $re eq "");
 
+  unless (defined $fh) {
+    msg("Error: File \"$name\" is not opened for matching.");
+    return;
+  }
+
 	$timeout = 0 unless (defined $timeout);
 
 	do {
@@ -432,10 +437,16 @@ sub match_log {
 sub match_file {
 	my($neg,$fn) = ($_[0] =~ m/^(-?)(.*)$/);
 	unless (exists $FILE{$fn}) {
-		$FILE{$fn}{fn} = $fn;
-		$FILE{$fn}{fd} = new FileHandle($fn, O_RDONLY);
-		$FILE{$fn}{fd}->blocking(0);
-		$FILE{$fn}{buf} = "";
+		eval {
+			$FILE{$fn}{fn} = $fn;
+			$FILE{$fn}{fd} = new FileHandle($fn, O_RDONLY) or die "$!\n";
+			$FILE{$fn}{fd}->blocking(0);
+			$FILE{$fn}{buf} = "";
+		};
+		if ($@) {
+			msg("Warning: Failed to open file \"$fn\": $@");
+			return;
+		}
 	}
 	return match_log($_[0], $_[1]); # timeout makes no sense
 }
@@ -650,38 +661,60 @@ sub httpd_reset_fd {
 	}
 
 	# Error
-	$FILE{error}{fn} = $opt{E};
-	$FILE{error}{fd} = new FileHandle($opt{E}, O_RDWR|O_CREAT);
-	$FILE{error}{fd}->blocking(0);
-	$FILE{error}{fd}->sysseek(0, 2);
-	$FILE{error}{buf} = "";
+	eval {
+		$FILE{error}{fn} = $opt{E};
+		$FILE{error}{fd} = new FileHandle($opt{E}, O_RDWR|O_CREAT) or die "$!\n";
+		$FILE{error}{fd}->blocking(0);
+		$FILE{error}{fd}->sysseek(0, 2);
+		$FILE{error}{buf} = "";
+	};
+	if ($@) {
+		msg("Warning: Failed to open file \"$opt{E}\": $@");
+		return undef;
+	}
 
 	# Audit
-	$FILE{audit}{fn} = $opt{A};
-	$FILE{audit}{fd} = new FileHandle($opt{A}, O_RDWR|O_CREAT);
-	$FILE{audit}{fd}->blocking(0);
-	$FILE{audit}{fd}->sysseek(0, 2);
-	$FILE{audit}{buf} = "";
+	eval {
+		$FILE{audit}{fn} = $opt{A};
+		$FILE{audit}{fd} = new FileHandle($opt{A}, O_RDWR|O_CREAT) or die "$!\n";
+		$FILE{audit}{fd}->blocking(0);
+		$FILE{audit}{fd}->sysseek(0, 2);
+		$FILE{audit}{buf} = "";
+	};
+	if ($@) {
+		msg("Warning: Failed to open file \"$opt{A}\": $@");
+		return undef;
+	}
 
 	# Debug
-	$FILE{debug}{fn} = $opt{D};
-	$FILE{debug}{fd} = new FileHandle($opt{D}, O_RDWR|O_CREAT);
-	$FILE{debug}{fd}->blocking(0);
-	$FILE{debug}{fd}->sysseek(0, 2);
-	$FILE{debug}{buf} = "";
+	eval {
+		$FILE{debug}{fn} = $opt{D};
+		$FILE{debug}{fd} = new FileHandle($opt{D}, O_RDWR|O_CREAT) or die "$!\n";
+		$FILE{debug}{fd}->blocking(0);
+		$FILE{debug}{fd}->sysseek(0, 2);
+		$FILE{debug}{buf} = "";
+	};
+	if ($@) {
+		msg("Warning: Failed to open file \"$opt{D}\": $@");
+		return undef;
+	}
 
 	# Any extras listed in "match_log"
 	if ($t and exists $t->{match_log}) {
 		for my $k (keys %{ $t->{match_log} || {} }) {
 			my($neg,$fn) = ($k =~ m/^(-?)(.*)$/);
 			next if (!$fn or exists $FILE{$fn});
-			#dbg("Opening additional log: $fn");
-			$FILE{$fn}{fn} = $fn;
-			$FILE{$fn}{fd} = new FileHandle($fn, O_RDWR|O_CREAT);
-			$FILE{$fn}{fd}->blocking(0);
-			$FILE{$fn}{fd}->sysseek(0, 2);
-			$FILE{$fn}{buf} = "";
-
+			eval {
+				$FILE{$fn}{fn} = $fn;
+				$FILE{$fn}{fd} = new FileHandle($fn, O_RDWR|O_CREAT) or die "$!\n";
+				$FILE{$fn}{fd}->blocking(0);
+				$FILE{$fn}{fd}->sysseek(0, 2);
+				$FILE{$fn}{buf} = "";
+			};
+			if ($@) {
+				msg("Warning: Failed to open file \"$fn\": $@");
+				return undef;
+			}
 		}
 	}
 }

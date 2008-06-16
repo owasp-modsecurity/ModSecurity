@@ -33,7 +33,7 @@
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecResponseBodyAccess On
-		SecResponseBodyMimeType null
+		SecResponseBodyMimeType text/plain null
 		SecRule RESPONSE_BODY "TEST" "phase:4,deny"
 	),
 	match_log => {
@@ -54,7 +54,7 @@
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecResponseBodyAccess Off
-		SecResponseBodyMimeType null
+		SecResponseBodyMimeType text/plain null
 		SecRule RESPONSE_BODY "TEST" "phase:4,deny"
 	),
 	match_log => {
@@ -76,7 +76,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecResponseBodyAccess On
-		SecResponseBodyMimeType null
+		SecResponseBodyMimeType text/plain null
 		SecResponseBodyLimit 8192
 	),
 	match_log => {
@@ -95,7 +95,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecResponseBodyAccess On
-		SecResponseBodyMimeType null
+		SecResponseBodyMimeType text/plain null
 		SecResponseBodyLimit 9000
 	),
 	match_log => {
@@ -114,7 +114,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecResponseBodyAccess On
-		SecResponseBodyMimeType null
+		SecResponseBodyMimeType text/plain null
 		SecResponseBodyLimit 8000
 	),
 	match_log => {
@@ -135,7 +135,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecResponseBodyAccess On
-		SecResponseBodyMimeType null
+		SecResponseBodyMimeType text/plain null
 		SecResponseBodyLimit 5
 		SecResponseBodyLimitAction Reject
 	),
@@ -155,7 +155,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecResponseBodyAccess On
-		SecResponseBodyMimeType null
+		SecResponseBodyMimeType text/plain null
 		SecResponseBodyLimit 5
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 4
