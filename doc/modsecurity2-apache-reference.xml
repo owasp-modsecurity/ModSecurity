@@ -6019,7 +6019,7 @@ Server: Apache/2.x.x
     <section>
       <title>Impedance Mismatch</title>
 
-      <para>Web application fireballs have a difficult job trying to make
+      <para>Web application firewalls have a difficult job trying to make
       sense of data that passes by, without any knowledge of the application
       and its business logic. The protection they provide comes from having an
       independent layer of security on the outside. Because data validation is
