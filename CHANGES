@@ -1,4 +1,10 @@
-05 Jun 2008 - trunk
+07 Jul 2008 - trunk
+-------------------
+
+* Persistent counter updates are now atomic.
+
+
+05 Jun 2008 - 2.5.5
 -------------------
 
 * Fixed an issue where an alert was not logged in the error log
@@ -16,8 +22,6 @@
   could crash the web server (at least under Windows).
 
 * Fixed blocking in phase 3.
-
-* Persistent counter updates are now atomic.
 
 * Force modules "mod_rpaf-2.0.c" and "mod_custom_header.c" to run before
   ModSecurity so that the correct IP is used.
