@@ -333,6 +333,17 @@ unsigned char x2c(unsigned char *what) {
 }
 
 /**
+ * Converts a single hexadecimal digit into a decimal value.
+ */
+unsigned char xsingle2c(unsigned char *what) {
+    register unsigned char digit;
+
+    digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
+
+    return digit;
+}
+
+/**
  *
  */
 char *guess_tmp_dir(apr_pool_t *p) {
@@ -1190,4 +1201,61 @@ char *resolve_relative_path(apr_pool_t *pool, const char *parent_filename, const
     return apr_pstrcat(pool, apr_pstrndup(pool, parent_filename,
         strlen(parent_filename) - strlen(apr_filepath_name_get(parent_filename))),
         filename, NULL);
+}
+
+/**
+ *
+ * References:
+ *     http://www.w3.org/TR/REC-CSS2/syndata.html#q4
+ *     http://www.unicode.org/roadmaps/
+ */
+int css_decode_inplace(unsigned char *input, long int input_len) {
+    unsigned char *d = (unsigned char *)input;
+    long int i, j, count;
+
+    if (input == NULL) return -1;
+
+    i = count = 0;
+    while (i < input_len) {
+        if (input[i] == '\\') {
+            if (i + 1 < input_len) { /* Is there at least one more byte? */
+                /* We are not going to need the backslash. */
+                i++;
+
+                /* Find out how many hexadecimal characters there are. */
+                j = 0;
+                while ((j < 6)&&(i + j < input_len)&&(VALID_HEX(input[i + j]))) {
+                    j++;
+                }
+
+                /* Do we have at least one hexadecimal character? */
+                if (j > 0) {
+                    if (j == 1) { /* One character. */
+                        *d++ = xsingle2c(&input[i]);
+                    } else { /* Two or more characters/ */
+                        /* For now just use the last two bytes. */
+                        // TODO What do we do if the other bytes are not zeros?
+                        *d++ = x2c(&input[i + j - 2]);
+                    }
+    
+                    /* Move over. */
+                    count++;
+                    i += j;
+                } else {
+                    /* Invalid encoding, but we can't really do anything about it. */
+                }
+            } else {
+                // TODO What do we do with the trailing backslash?
+            }
+        } else {
+            // TODO Not sure if we should remove the new line character here
+            //      (see the specification for more information).
+            *d++ = input[i++];
+            count++;
+        }
+    }
+
+    *d = '\0';
+
+    return count;
 }

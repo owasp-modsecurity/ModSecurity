@@ -4,7 +4,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.6.0-trunk (June 5, 2008)</releaseinfo>
+    <releaseinfo>Version 2.6.0-trunk (July 16, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -3659,9 +3659,22 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <section>
       <title><literal>compressWhitespace</literal></title>
 
-      <para>This function is enabled by default. It converts whitespace
-      characters (32, \f, \t, \n, \r, \v, 160) to spaces (ASCII 32) and then
-      compresses multiple space characters into only one.</para>
+      <para>It converts whitespace characters (32, \f, \t, \n, \r, \v, 160) to
+      spaces (ASCII 32) and then compresses multiple space characters into
+      only one.</para>
+    </section>
+
+    <section>
+      <title>cssDecode</title>
+
+      <para>Decodes CSS-encoded characters, as specified at <ulink
+      url="http://www.w3.org/TR/REC-CSS2/syndata.html">http://www.w3.org/TR/REC-CSS2/syndata.html</ulink>.
+      This function uses only up to two bytes in the decoding process, meaning
+      it is useful to uncover ASCII characters (that wouldn't normally be
+      encoded) encoded using CSS encoding, or to counter evasion which is a
+      combination of a backslash and non-hexadecimal characters (e.g.
+      <literal>ja\vascript</literal> is equivalent to
+      <literal>javascript</literal>).</para>
     </section>
 
     <section>

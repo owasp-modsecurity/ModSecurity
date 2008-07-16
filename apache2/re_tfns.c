@@ -190,6 +190,20 @@ static int msre_fn_compressWhitespace_execute(apr_pool_t *mptmp, unsigned char *
     return changed;
 }
 
+/* cssDecode */
+
+static int msre_fn_cssDecode_execute(apr_pool_t *mptmp, unsigned char *input,
+    long int input_len, char **rval, long int *rval_len)
+{
+    long int length;
+
+    length = css_decode_inplace(input, input_len);
+    *rval = (char *)input;
+    *rval_len = length;
+
+    return (*rval_len == input_len ? 0 : 1);
+}
+
 /* removeWhitespace */
 
 static int msre_fn_removeWhitespace_execute(apr_pool_t *mptmp, unsigned char *input,
@@ -507,6 +521,12 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     msre_engine_tfn_register(engine,
         "compressWhitespace",
         msre_fn_compressWhitespace_execute
+    );
+
+    /* cssDecode */
+    msre_engine_tfn_register(engine,
+        "cssDecode",
+        msre_fn_cssDecode_execute
     );
 
     /* escapeSeqDecode */
