@@ -4,7 +4,6 @@
 # TODO: block
 # TODO: capture
 # TODO: chain
-# TODO: ctl
 # TODO: deprecatevar
 # TODO: exec
 # TODO: expirevar
