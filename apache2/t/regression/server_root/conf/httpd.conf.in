@@ -1,0 +1,35 @@
+### Base configuration for starting Apache httpd
+
+<IfDefine !CHROOT>
+	# File locations
+	PidFile @MSC_REGRESSION_LOGS_DIR@/httpd.pid
+	ScoreBoardFile @MSC_REGRESSION_LOGS_DIR@/httpd.scoreboard
+</IfDefine>
+
+<IfModule !mod_proxy.c>
+	LoadModule proxy_module modules/mod_proxy.so
+	LoadModule proxy_http_module modules/mod_proxy_http.so
+</IfModule>
+<IfModule !mod_unique_id.c>
+	LoadModule unique_id_module modules/mod_unique_id.so
+</IfModule>
+
+<IfDefine !NOMODSEC>
+	# TODO: Need to have these configurable
+	LoadFile /usr/lib/libxml2.so
+	LoadFile /usr/lib/liblua5.1.so
+	LoadModule security2_module modules/mod_security2.so
+</IfDefine>
+
+ServerName localhost
+
+LogLevel debug
+ErrorLog @MSC_REGRESSION_LOGS_DIR@/error.log
+
+<IfDefine !CHROOT>
+	DocumentRoot @MSC_REGRESSION_DOCROOT_DIR@
+	<Directory "@MSC_REGRESSION_DOCROOT_DIR@">
+		Options Indexes FollowSymLinks
+		AllowOverride None
+	</Directory>
+</IfDefine>
