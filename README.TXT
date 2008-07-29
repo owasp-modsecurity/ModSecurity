@@ -6,7 +6,7 @@ the General Public Licence, Version 2 (GPLv2). Please refer to the
 file LICENSE, which contains the complete text of the licence.
 
 Additionally, certain software may be granted further rights via
-a licensing exception.  Please refer to the file LICENSE_EXCEPTION,
+a licensing exception.  Please refer to the file MODSECURITY_LICENSE_EXCEPTION,
 which contains the complete exception.
 
 DOCUMENTATION
