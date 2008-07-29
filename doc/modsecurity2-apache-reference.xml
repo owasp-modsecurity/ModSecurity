@@ -909,7 +909,7 @@ SecAuditLogStorageDir logs/audit
           more than N transformations to be cached. The cache will then be
           disabled. A zero value is interpreted as "unlimited". This option
           may be useful to limit caching for a form with a large number of
-          ARGS.  (default: 1024)</para>
+          ARGS.  (default: 512)</para>
         </listitem>
 
         <listitem>

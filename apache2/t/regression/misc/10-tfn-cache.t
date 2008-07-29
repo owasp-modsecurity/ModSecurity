@@ -166,8 +166,8 @@
 		SecRule ARGS "foobar" "phase:4,t:none,t:removeWhiteSpace,t:lowercase,deny"
 	),
 	match_log => {
-		debug => [ qr/Adding request argument \(BODY\): name "test", value "foobar"/, 15 ],
-		-error => [ qr/segmentation fault/i, 15 ],
+		debug => [ qr/Adding request argument \(BODY\): name "test", value "foobar"/, 60 ],
+		-error => [ qr/segmentation fault/i, 60 ],
 	},
 	match_response => {
 		status => qr/^403$/,

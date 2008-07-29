@@ -366,7 +366,6 @@ struct modsec_rec {
     /* data cache */
     apr_hash_t          *tcache;
     apr_size_t           tcache_items;
-    int                  tcache_limit_warn;
 
     /* removed rules */
     apr_array_header_t  *removed_rules;

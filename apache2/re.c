@@ -2149,9 +2149,15 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                     if ((msr->txcfg->cache_trans_maxitems != 0) &&
                         (msr->tcache_items >= msr->txcfg->cache_trans_maxitems))
                     {
-                        msr_log(msr, 4, "CACHE: Disabled - maxitems=%" APR_SIZE_T_FMT
-                                        " limit reached.",
-                                        msr->txcfg->cache_trans_maxitems);
+                        /* Warn only once if we attempt to go over the cache limit. */
+                        if (msr->tcache_items == msr->txcfg->cache_trans_maxitems) {
+                            msr->tcache_items++;
+                            msr_log(msr, 4, "CACHE: Disabled - phase=%d"
+                                            " maxitems=%" APR_SIZE_T_FMT
+                                            " limit reached.",
+                                            msr->phase,
+                                            msr->txcfg->cache_trans_maxitems);
+                        }
                     }
                     else if (msr->txcfg->cache_trans_incremental ||
                         (tfnsnum == tarr->nelts))

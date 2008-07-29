@@ -314,7 +314,6 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     /* Other */
     msr->tcache = NULL;
     msr->tcache_items = 0;
-    msr->tcache_limit_warn = 0;
 
     msr->matched_rules = apr_array_make(msr->mp, 16, sizeof(void *));
     if (msr->matched_rules == NULL) return -1;

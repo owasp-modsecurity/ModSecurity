@@ -538,7 +538,7 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->cache_trans_incremental == NOT_SET) dcfg->cache_trans_incremental = 0;
     if (dcfg->cache_trans_min == (apr_size_t)NOT_SET) dcfg->cache_trans_min = 32;
     if (dcfg->cache_trans_max == (apr_size_t)NOT_SET) dcfg->cache_trans_max = 1024;
-    if (dcfg->cache_trans_maxitems == (apr_size_t)NOT_SET) dcfg->cache_trans_maxitems = 1024;
+    if (dcfg->cache_trans_maxitems == (apr_size_t)NOT_SET) dcfg->cache_trans_maxitems = 512;
 
     if (dcfg->request_encoding == NOT_SET_P) dcfg->request_encoding = NULL;
 }
