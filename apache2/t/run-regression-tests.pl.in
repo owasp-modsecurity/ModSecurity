@@ -279,6 +279,7 @@ sub runfile {
 
 			# Search for all file matches
 			if ($rc == 0 and exists $t{match_file} and defined $t{match_file}) {
+				sleep 1; # Make sure the file exists
 				for my $key (keys %{ $t{match_file} || {}}) {
 					my($neg,$fn) = ($key =~ m/^(-?)(.*)$/);
 					my $m = $t{match_file}{$key};

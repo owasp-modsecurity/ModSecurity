@@ -23,6 +23,8 @@
 
 ServerName localhost
 
+CoreDumpDirectory @MSC_REGRESSION_SERVERROOT_DIR@/tmp
+
 LogLevel debug
 ErrorLog @MSC_REGRESSION_LOGS_DIR@/error.log
 
