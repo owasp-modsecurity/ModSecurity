@@ -365,6 +365,8 @@ struct modsec_rec {
 
     /* data cache */
     apr_hash_t          *tcache;
+    apr_size_t           tcache_items;
+    int                  tcache_limit_warn;
 
     /* removed rules */
     apr_array_header_t  *removed_rules;
@@ -474,8 +476,10 @@ struct directory_config {
 
     /* Cache */
     int                  cache_trans;
+    int                  cache_trans_incremental;
     apr_size_t           cache_trans_min;
     apr_size_t           cache_trans_max;
+    apr_size_t           cache_trans_maxitems;
 
     /* Array to hold signatures of components, which will
      * appear in the ModSecurity signature in the audit log.

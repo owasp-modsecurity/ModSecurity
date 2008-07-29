@@ -312,8 +312,9 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     if (msr->collections_dirty == NULL) return -1;
 
     /* Other */
-    msr->tcache = apr_hash_make(msr->mp);
-    if (msr->tcache == NULL) return -1;
+    msr->tcache = NULL;
+    msr->tcache_items = 0;
+    msr->tcache_limit_warn = 0;
 
     msr->matched_rules = apr_array_make(msr->mp, 16, sizeof(void *));
     if (msr->matched_rules == NULL) return -1;
@@ -495,18 +496,75 @@ static apr_status_t modsecurity_process_phase_logging(modsec_rec *msr) {
 apr_status_t modsecurity_process_phase(modsec_rec *msr, unsigned int phase) {
     /* Check if we should run. */
     if ((msr->was_intercepted)&&(phase != PHASE_LOGGING)) {
-        msr_log(msr, 4, "Skipping phase %i as request was already intercepted.", phase);
+        msr_log(msr, 4, "Skipping phase %d as request was already intercepted.", phase);
         return 0;
     }
 
     /* Do not process the same phase twice. */
     if (msr->phase >= phase) {
-        msr_log(msr, 4, "Skipping phase %i because it was previously run (at %i now).",
+        msr_log(msr, 4, "Skipping phase %d because it was previously run (at %d now).",
             phase, msr->phase);
         return 0;
     }
 
     msr->phase = phase;
+
+    /* Clear out the transformation cache at the start of each phase */
+    if (msr->txcfg->cache_trans == MODSEC_CACHE_ENABLED) {
+        if (msr->tcache) {
+            apr_hash_index_t *hi;
+            void *dummy;
+            apr_table_t *tab;
+            const void *key;
+            apr_ssize_t klen;
+            #ifdef CACHE_DEBUG
+            apr_pool_t *mptmp = msr->msc_rule_mptmp;
+            const apr_array_header_t *ctarr;
+            const apr_table_entry_t *ctelts;
+            msre_cache_rec *rec;
+            int cn = 0;
+            int ri;
+            #endif
+
+            for (hi = apr_hash_first(msr->mp, msr->tcache); hi; hi = apr_hash_next(hi)) {
+                msre_var *keyvar = NULL;
+
+                apr_hash_this(hi, &key, &klen, &dummy);
+                tab = (apr_table_t *)dummy;
+
+                if (tab == NULL) continue;
+
+                #ifdef CACHE_DEBUG
+                /* Dump the cache out as we clear */
+                keyvar = (msre_var *)key;
+                ctarr = apr_table_elts(tab);
+                ctelts = (const apr_table_entry_t*)ctarr->elts;
+                for (ri = 0; ri < ctarr->nelts; ri++) {
+                    cn++;
+                    rec = (msre_cache_rec *)ctelts[ri].val;
+                    if (rec->changed) {
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "CACHE: %5d) hits=%d key=%pp var=\"%s\" %x;%s=\"%s\" (%pp - %pp)", cn, rec->hits, keyvar, keyvar->name, rec->num, rec->path, log_escape_nq_ex(mptmp, rec->val, rec->val_len), rec->val, rec->val + rec->val_len);
+                        }
+                    }
+                    else {
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "CACHE: %5d) hits=%d key=%pp var=\"%s\" %x;%s=<no change>", cn, rec->hits, keyvar, keyvar->name, rec->num, rec->path);
+                        }
+                    }
+                }
+                #endif
+
+                apr_table_clear(tab);
+                apr_hash_set(msr->tcache, key, klen, NULL);
+            }
+
+            msr_log(msr, 9, "Cleared transformation cache for phase %d", msr->phase);
+        }
+        msr->tcache_items = 0;
+        msr->tcache = apr_hash_make(msr->mp);
+        if (msr->tcache == NULL) return -1;
+    }
 
     switch(phase) {
         case 1 :

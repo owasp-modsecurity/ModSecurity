@@ -1774,7 +1774,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
     apr_pool_t *mptmp = msr->msc_rule_mptmp;
     apr_table_t *tartab = NULL;
     apr_table_t *vartab = NULL;
-    int i, rc, match_count = 0;
+    int i, rc = 0, match_count = 0;
     int invocations = 0;
     int multi_match = 0;
 
@@ -1857,12 +1857,12 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
     for (i = 0; i < arr->nelts; i++) {
         int changed;
         int usecache = 0;
-        apr_table_t **carr = NULL;
         apr_table_t *cachetab = NULL;
         apr_time_t time_before_trans = 0;
+        msre_var *var;
 
         /* Take one target. */
-        msre_var *var = (msre_var *)te[i].val;
+        var = (msre_var *)te[i].val;
 
         /* Is this var cacheable? */
         if (msr->txcfg->cache_trans != MODSEC_CACHE_DISABLED) {
@@ -1889,23 +1889,29 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                         msr_log(msr, 9, "CACHE: Enabled");
                     }
 
+                    #ifdef CACHE_DEBUG
+                    msr_log(msr, 9, "CACHE: Fetching cache entry from hash=%pp: %pp=%s", msr->tcache, var, var->name);
+                    #endif
+
                     /* Fetch cache table for this target */
-                    carr = (apr_table_t **)apr_hash_get(msr->tcache, var->name, APR_HASH_KEY_STRING);
-                    if (carr != NULL) {
-                        cachetab = carr[msr->phase];
+                    cachetab = (apr_table_t *)apr_hash_get(msr->tcache, var, sizeof(msre_var *));
+                    /* Create an empty cache table if this is the first time */
+                    #ifdef CACHE_DEBUG
+                    if (cachetab) {
+                        msr_log(msr, 9, "CACHE: Using cache table %pp", cachetab);
                     }
                     else {
-                        /* Create an array of cache tables (one table per phase) */
-                        carr = (apr_table_t **)apr_pcalloc(msr->mp, (sizeof(apr_table_t *) * (PHASE_LAST + 1)));
-                        if (carr == NULL) return -1;
-                        memset(carr, 0, (sizeof(apr_table_t *) * (PHASE_LAST + 1)));
-                        apr_hash_set(msr->tcache, var->name, APR_HASH_KEY_STRING, carr);
+                    #else
+                    if (cachetab == NULL) {
+                    #endif
+                        cachetab = apr_table_make(msr->mp, 3);
+                        apr_hash_set(msr->tcache, var, sizeof(msre_var *), cachetab);
+
+                        #ifdef CACHE_DEBUG
+                        msr_log(msr, 9, "CACHE: Created a new cache table %pp", cachetab);
+                        #endif
                     }
 
-                    /* Create an empty cache table if this is the first time */
-                    if (cachetab == NULL) {
-                        cachetab = carr[msr->phase] = apr_table_make(msr->mp, 5);
-                    }
                 }
                 else {
                     usecache = 0;
@@ -1936,7 +1942,10 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
             msre_action *action;
             msre_tfn_metadata *metadata;
             apr_table_t *normtab;
+            const char *lastvarval = NULL;
+            apr_size_t lastvarlen = 0;
 
+            changed = 0;
             normtab = apr_table_make(mptmp, 10);
             if (normtab == NULL) return -1;
             tarr = apr_table_elts(rule->actionset->actions);
@@ -1971,6 +1980,10 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                             tfnspath = apr_psprintf(msr->mp, "%s%s%s", (tfnspath?tfnspath:""), (tfnspath?",":""), action->param);
                             tfnskey = apr_psprintf(msr->mp, "%x;%s", tfnscount, tfnspath);
                             crec = (msre_cache_rec *)apr_table_get(cachetab, tfnskey);
+                            #ifdef CACHE_DEBUG
+                            msr_log(msr, 9, "CACHE: %s %s cached=%d", var->name, tfnskey, (crec ? 1 : 0));
+                            #endif
+
                             if (crec != NULL) {
                                 last_crec = crec;
                                 last_cached_tfn = tfnscount;
@@ -1983,7 +1996,9 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
             /* If the last cached tfn is the last in the list
              * then we can stop here and just execute the action immediatly
              */
-            if (usecache && !multi_match && (crec != NULL) && (crec == last_crec)) {
+            if (usecache && !multi_match &&
+                (crec != NULL) && (crec == last_crec))
+            {
                 crec->hits++;
                 if (crec->changed) {
                     var->value = apr_pmemdup(msr->mp, crec->val, crec->val_len);
@@ -1991,7 +2006,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 }
 
                 if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "T (%d) %s: \"%s\" [cached hits=%d]", crec->changed, crec->path, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
+                    msr_log(msr, 9, "T (%d) %s: \"%s\" [fully cached hits=%d]", crec->changed, crec->path, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
                 }
 
                 #if !defined(PERFORMANCE_MEASUREMENT)
@@ -2046,7 +2061,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 tfnspath = last_crec->path;
                 last_crec->hits++;
 
-                if ((changed = last_crec->changed) == 1) {
+                if ((changed = last_crec->changed) > 0) {
                     var->value = apr_pmemdup(msr->mp, last_crec->val, last_crec->val_len);
                     var->value_len = last_crec->val_len;
                 }
@@ -2056,7 +2071,6 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 }
             }
             else {
-                changed = 1;
                 tfnspath = NULL;
                 k = 0;
             }
@@ -2065,13 +2079,14 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
             for (; k < tarr->nelts; k++) {
                 char *rval = NULL;
                 long int rval_length = -1;
+                int tfnchanged = 0;
 
                 /* In multi-match mode we execute the operator
                  * once at the beginning and then once every
                  * time the variable is changed by the transformation
                  * function.
                  */
-                if (multi_match && changed) {
+                if (multi_match && (k == 0 || tfnchanged)) {
                     invocations++;
 
                     #if !defined(PERFORMANCE_MEASUREMENT)
@@ -2109,59 +2124,78 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 action = (msre_action *)telts[k].val;
                 metadata = (msre_tfn_metadata *)action->param_data;
 
-                /* Try to use the cache */
-                if (usecache) {
-                    /* Generate the cache key */
-                    tfnspath = apr_psprintf(msr->mp, "%s%s%s", (tfnspath?tfnspath:""), (tfnspath?",":""), action->param);
-                    tfnskey = apr_psprintf(msr->mp, "%x;%s", (k + 1), tfnspath);
-
-                    /* Try to fetch this transformation from cache */
-                    #ifdef CACHE_DEBUG
-                    msr_log(msr, 9, "CACHE: Fetching %s %s ", var->name, tfnskey);
-                    #endif
-                    crec = (msre_cache_rec *)apr_table_get(cachetab, tfnskey);
-                    if (crec != NULL) {
-                        crec->hits++;
-
-                        if ((changed = crec->changed) == 1) {
-                            var->value = apr_pmemdup(msr->mp, crec->val, crec->val_len);
-                            var->value_len = crec->val_len;
-                        }
-
-                        if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "T (%d) %s: \"%s\" [cached hits=%d]", crec->changed, metadata->name, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
-                        }
-                        continue;
-                    }
-                }
-
-                rc = metadata->execute(mptmp, (unsigned char *)var->value, var->value_len,
+                tfnchanged = metadata->execute(mptmp,
+                    (unsigned char *)var->value, var->value_len,
                     &rval, &rval_length);
-                if (rc < 0) {
+                if (tfnchanged < 0) {
                     return -1;
                 }
 
-                changed = rc;
+                if (tfnchanged) {
+                    changed++;
+                }
 
                 var->value = rval;
                 var->value_len = rval_length;
 
                 /* Cache the transformation */
                 if (usecache) {
-                    /* ENH1: Add flag to vars to tell which ones can change across phases store the rest in a global cache */
-                    crec = (msre_cache_rec *)apr_pcalloc(msr->mp, sizeof(msre_cache_rec));
-                    if (crec == NULL) return -1;
+                    int tfnsnum = k + 1;
 
-                    crec->hits = 0;
-                    crec->changed = changed;
-                    crec->num = k + 1;
-                    crec->path = tfnspath;
-                    crec->val = changed ? apr_pmemdup(msr->mp, var->value, var->value_len) : NULL;
-                    crec->val_len = changed ? var->value_len : 0;
-                    #ifdef CACHE_DEBUG
-                    msr_log(msr, 9, "CACHE: Caching %s=\"%.*s\"", tfnskey, var->value_len, log_escape_nq_ex(mptmp, var->value, var->value_len));
-                    #endif
-                    apr_table_setn(cachetab, tfnskey, (void *)crec);
+                    /* Generate the cache key */
+                    tfnspath = apr_psprintf(msr->mp, "%s%s%s", (tfnspath?tfnspath:""), (tfnspath?",":""), action->param);
+                    tfnskey = apr_psprintf(msr->mp, "%x;%s", tfnsnum, tfnspath);
+
+                    if ((msr->txcfg->cache_trans_maxitems != 0) &&
+                        (msr->tcache_items >= msr->txcfg->cache_trans_maxitems))
+                    {
+                        msr_log(msr, 4, "CACHE: Disabled - maxitems=%" APR_SIZE_T_FMT
+                                        " limit reached.",
+                                        msr->txcfg->cache_trans_maxitems);
+                    }
+                    else if (msr->txcfg->cache_trans_incremental ||
+                        (tfnsnum == tarr->nelts))
+                    {
+                        /* ENH1: Add flag to vars to tell which ones can change across phases store the rest in a global cache */
+                        crec = (msre_cache_rec *)apr_pcalloc(msr->mp, sizeof(msre_cache_rec));
+                        if (crec == NULL) return -1;
+
+                        crec->hits = 0;
+                        crec->changed = changed;
+                        crec->num = k + 1;
+                        crec->path = tfnspath;
+
+                        /* We want to cache a copy if it changed otherwise
+                         * we just want to use a pointer to the last changed value.
+                         */
+                        crec->val = (!lastvarval || tfnchanged) ? apr_pmemdup(msr->mp, var->value, var->value_len) : lastvarval;
+                        crec->val_len = changed ? ((!lastvarval || tfnchanged) ? var->value_len : lastvarlen) : 0;
+
+                        /* Keep track of the last changed var value */
+                        if (tfnchanged) {
+                            lastvarval = crec->val;
+                            lastvarlen = crec->val_len;
+                        }
+
+                        #ifdef CACHE_DEBUG
+                        if (changed) {
+                            msr_log(msr, 9, "CACHE: Caching %s=\"%s\" (%pp)",
+                                            tfnskey,
+                                            log_escape_nq_ex(mptmp,
+                                                             crec->val,
+                                                             crec->val_len),
+                                            var);
+                        }
+                        else {
+                            msr_log(msr, 9, "CACHE: Caching %s=<no change> (%pp)",
+                                            tfnskey,
+                                            var);
+                        }
+                        #endif
+
+                        msr->tcache_items++;
+                        apr_table_setn(cachetab, tfnskey, (void *)crec);
+                    }
                 }
 
                 if (msr->txcfg->debuglog_level >= 9) {
@@ -2210,44 +2244,6 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
         }
     }
 
-    #ifdef CACHE_DEBUG
-    if (msr->txcfg->debuglog_level >= 9) {
-        apr_hash_index_t *hi;
-        void *dummy;
-        apr_table_t **tab;
-        const apr_array_header_t *ctarr;
-        const apr_table_entry_t *ctelts;
-        msre_cache_rec *rec;
-        int cn = 0;
-        int ti, ri;
-
-        for (hi = apr_hash_first(msr->mp, msr->tcache); hi; hi = apr_hash_next(hi)) {
-            apr_hash_this(hi, NULL, NULL, &dummy);
-            tab = (apr_table_t **)dummy;
-            if (tab == NULL) continue;
-
-            for (ti = PHASE_FIRST; ti <= PHASE_LAST; ti++) {
-                if (tab[ti] == NULL) continue;
-                ctarr = apr_table_elts(tab[ti]);
-                ctelts = (const apr_table_entry_t*)ctarr->elts;
-                for (ri = 0; ri < ctarr->nelts; ri++) {
-                    cn++;
-                    rec = (msre_cache_rec *)ctelts[ri].val;
-                    if (rec->changed) {
-                        if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "CACHE: %5d) phase=%d hits=%d %x;%s=\"%s\"", cn, msr->phase, rec->hits, rec->num, rec->path, log_escape_nq_ex(mptmp, rec->val, rec->val_len));
-                        }
-                    }
-                    else {
-                        if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "CACHE: %5d) phase=%d hits=%d %x;%s=<no change>", cn, msr->phase, rec->hits, rec->num, rec->path);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    #endif
 
     return (match_count ? RULE_MATCH : RULE_NO_MATCH);
 }

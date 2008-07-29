@@ -858,10 +858,10 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
-      <title><literal>SecCacheTransformations</literal></title>
+      <title><literal>SecCacheTransformations</literal> (Experimental)</title>
 
       <para><emphasis>Description:</emphasis> Controls caching of
-      transformations.</para>
+      transformations. Caching is off by default.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
       moreinfo="none">SecCacheTransformations On|Off
@@ -899,15 +899,29 @@ SecAuditLogStorageDir logs/audit
 
       <itemizedlist>
         <listitem>
+          <para><literal moreinfo="none">incremental:on|off</literal> -
+          enabling this option will cache every transformation instead of just
+          the final transformation. (default: off)</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">maxitems:N</literal> - do not allow
+          more than N transformations to be cached. The cache will then be
+          disabled. A zero value is interpreted as "unlimited". This option
+          may be useful to limit caching for a form with a large number of
+          ARGS.  (default: 1024)</para>
+        </listitem>
+
+        <listitem>
           <para><literal moreinfo="none">minlen:N</literal> - do not cache the
           transformation if the value's length is less than N bytes. (default:
-          15)</para>
+          32)</para>
         </listitem>
 
         <listitem>
           <para><literal moreinfo="none">maxlen:N</literal> - do not cache the
           transformation if the value's length is more than N bytes. A zero
-          value is interpreted as "unlimited". (default: 0)</para>
+          value is interpreted as "unlimited". (default: 1024)</para>
         </listitem>
       </itemizedlist>
     </section>

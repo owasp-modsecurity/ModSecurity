@@ -1,3 +1,26 @@
+25 Jun 2008 - 2.5.6
+-------------------
+
+* Fixed an issue with transformation cache using the original value
+  when the last transformation in a chain did not modify the value.  This
+  fixes the potential match failure due to a failed transformation.
+
+* Fixed an issue with transformation cache where only the first of duplicate
+  values in a collection was inspected.  This fixes the potential of missing
+  a duplicate target value for inspection.
+
+* Fixed an issue with the transformation cache using too much RAM, potentially
+  crashing Apache with a large number of cache entries.  To better control
+  caching, two new options have been added:
+    maxitems: Max number of items to cache (default 1024)
+    incremental: Whether to cache incrementally (default off)
+
+* Transformation caching is now off by default as it may not be appropriate
+  in all environments.
+
+* Added an experimental regression testing suite.
+
+
 05 Jun 2008 - 2.5.5
 -------------------
 
