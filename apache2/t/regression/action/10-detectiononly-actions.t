@@ -107,7 +107,7 @@
 	match_log => {
 		error => [ qr/ModSecurity: Warning. Unconditional match in SecAction.*ALLOWED/, 1 ],
 		-error => [ qr/Access allowed/, 1 ],
-# TODO: Allow should probably rule stop execution
+# TODO: Allow should probably stop stop execution
 #		-error => [ qr/DENIED/, 1 ],
 	},
 	match_response => {
@@ -131,7 +131,7 @@
 	match_log => {
 		error => [ qr/ModSecurity: Warning. Unconditional match in SecAction.*ALLOWED/, 1 ],
 		-error => [ qr/Access allowed/, 1 ],
-# TODO: Allow should probably rule stop execution
+# TODO: Allow should probably stop rule execution
 #		-error => [ qr/DENIED/, 1 ],
 	},
 	match_response => {
@@ -155,7 +155,7 @@
 	match_log => {
 		error => [ qr/ModSecurity: Warning. Unconditional match in SecAction.*ALLOWED/, 1 ],
 		-error => [ qr/Access allowed/, 1 ],
-# TODO: Allow should probably rule stop execution
+# TODO: Allow should probably stop rule execution
 #		-error => [ qr/DENIED/, 1 ],
 	},
 	match_response => {
@@ -179,7 +179,7 @@
 	match_log => {
 		error => [ qr/ModSecurity: Warning. Unconditional match in SecAction.*ALLOWED/, 1 ],
 		-error => [ qr/Access allowed/, 1 ],
-# TODO: Allow should probably rule stop execution
+# TODO: Allow should probably stop rule execution
 #		-error => [ qr/DENIED/, 1 ],
 	},
 	match_response => {
