@@ -1,5 +1,8 @@
-25 Jun 2008 - 2.5.6
+28 Jul 2008 - 2.5.6
 -------------------
+
+* Transformation caching is now off by default as it may not be appropriate
+  in all environments.
 
 * Fixed an issue with transformation cache using the original value
   when the last transformation in a chain did not modify the value.  This
@@ -15,10 +18,14 @@
     maxitems: Max number of items to cache (default 1024)
     incremental: Whether to cache incrementally (default off)
 
-* Transformation caching is now off by default as it may not be appropriate
-  in all environments.
+* Added an experimental regression testing suite.  The regression suite may
+  be executed via "make test-regression", however it is strongly advised 
+  to only be executed on a non-production machine as it will startup the
+  Apache web server that ModSecurity is compiled against with various
+  configurations in which it will run tests against.
 
-* Added an experimental regression testing suite.
+* Added a licensing exception so that ModSecurity can be used in a derivative
+  work when that derivative is also under an approved open source license.
 
 
 05 Jun 2008 - 2.5.5
