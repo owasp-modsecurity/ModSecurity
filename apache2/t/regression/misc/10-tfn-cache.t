@@ -12,10 +12,10 @@
 		SecCacheTransformations On "minlen:1,maxlen:0"
 
 		# This should cache it
-		SecRule ARGS "WillNotMatch" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,pass,nolog"
+		SecRule ARGS_GET "WillNotMatch" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,pass,nolog"
 
 		# This should use the cached value
-		SecRule ARGS:test "foobar" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,deny"
+		SecRule ARGS_GET:test "foobar" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,deny"
 	),
 	match_log => {
 		debug => [ qr/removeWhiteSpace,lowercase: "foobar" .*cached/, 1 ],
@@ -40,10 +40,10 @@
 		SecCacheTransformations On "minlen:1,maxlen:0,incremental:off,maxitems:0"
 
 		# This should cache it
-		SecRule ARGS "WillNotMatch" "phase:1,t:none,t:removeWhiteSpace,pass,nolog"
+		SecRule ARGS_GET "WillNotMatch" "phase:1,t:none,t:removeWhiteSpace,pass,nolog"
 
 		# This should use the partially cached value
-		SecRule ARGS:test "foobar" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,deny"
+		SecRule ARGS_GET:test "foobar" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,deny"
 	),
 	match_log => {
 		debug => [ qr/removeWhiteSpace: "FooBar" .*partially cached/, 1 ],
@@ -67,10 +67,10 @@
 		SecCacheTransformations On "minlen:1,maxlen:0"
 
 		# This should cache it
-		SecRule ARGS "WillNotMatch" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,pass,nolog"
+		SecRule ARGS_GET "WillNotMatch" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,pass,nolog"
 
 		# This should use the cached value
-		SecRule ARGS:test "foobar" "phase:2,t:none,t:removeWhiteSpace,t:lowercase,deny"
+		SecRule ARGS_GET:test "foobar" "phase:2,t:none,t:removeWhiteSpace,t:lowercase,deny"
 	),
 	match_log => {
 		-debug => [ qr/removeWhiteSpace,lowercase: "foobar" .*cached/, 1 ],
@@ -94,10 +94,10 @@
 		SecCacheTransformations On "minlen:1,maxlen:0"
 
 		# This should cache it
-		SecRule ARGS "WillNotMatch" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,pass,nolog"
+		SecRule ARGS_GET "WillNotMatch" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,pass,nolog"
 
 		# This should use the cached value
-		SecRule ARGS:test "foobar" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,deny"
+		SecRule ARGS_GET:test "foobar" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,deny"
 	),
 	match_log => {
 		debug => [ qr/removeWhiteSpace,lowercase: "foobar" .*cached/, 1 ],
@@ -116,25 +116,32 @@
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
+		SecRequestBodyAccess On
 
 		# We need to make this work no matter what the defaults may change to
 		SecCacheTransformations On "minlen:1,maxlen:0"
 
 		# This should cache it
-		SecRule ARGS "WillNotMatch" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,pass"
+		SecRule ARGS "WillNotMatch" "phase:2,t:none,t:removeWhiteSpace,t:lowercase,pass"
 
-		# This should see cached versions of *both* ARGS
-		SecRule ARGS:test "firstval" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,deny,chain"
+		# This should see cached versions of *both* ARGS_GET
+		SecRule ARGS:test "queryval" "phase:2,t:none,t:removeWhiteSpace,t:lowercase,deny,chain"
+		SecRule ARGS:test "firstval" "t:none,t:removeWhiteSpace,t:lowercase,chain"
 		SecRule ARGS:test "secondval" "t:none,t:removeWhiteSpace,t:lowercase"
 	),
 	match_log => {
-		debug => [ qr/removeWhiteSpace,lowercase: "firstval" .*cached.*removeWhiteSpace,lowercase: "secondval" .*cached/s, 1 ],
+		debug => [ qr/removeWhiteSpace,lowercase: "queryval" .*removeWhiteSpace,lowercase: "firstval" .*cached.*removeWhiteSpace,lowercase: "secondval" .*cached/s, 1 ],
 	},
 	match_response => {
 		status => qr/^403$/,
 	},
 	request => new HTTP::Request(
-		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/index.html?test=First+Val&test=Second+Val",
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/index.html?test=Query+Val",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		#  Args
+		"test=First+Val&test=Second+Val",
 	),
 },
 {
@@ -153,8 +160,7 @@
 		SecResponseBodyLimit 1048576
 
 		# We need to make this work no matter what the defaults may change to
-#		SecCacheTransformations On "minlen:1,maxlen:0"
-		SecCacheTransformations Off
+		SecCacheTransformations On "minlen:1,maxlen:0,maxitems:0"
 
 		# This should cache it in all phases
 		SecRule ARGS "WillNotMatch" "phase:1,t:none,t:removeWhiteSpace,t:lowercase,pass,nolog"
@@ -166,7 +172,7 @@
 		SecRule ARGS "foobar" "phase:4,t:none,t:removeWhiteSpace,t:lowercase,deny"
 	),
 	match_log => {
-		debug => [ qr/Adding request argument \(BODY\): name "test", value "foobar"/, 60 ],
+		debug => [ qr/Adding request argument \(BODY\): name "test", value "Foo Bar"/, 60 ],
 		-error => [ qr/segmentation fault/i, 60 ],
 	},
 	match_response => {
@@ -178,6 +184,6 @@
 			"Content-Type" => "application/x-www-form-urlencoded",
 		],
 		# 1000 Args
-		join("&", map { sprintf "arg%08d=0123456789abcdef+0123456789ABCDEF+0123456789abcdef", $_ } (1 .. 1000))."&test=foobar",
+		join("&", map { sprintf "arg%08d=0123456789abcdef+0123456789ABCDEF+0123456789abcdef", $_ } (1 .. 1000))."&test=Foo+Bar",
 	),
 },

@@ -30,6 +30,10 @@ typedef struct msc_string msc_string;
 #define DSOLOCAL
 #endif
 
+#if defined(DEBUG_MEM)
+/* Nothing Yet */
+#endif
+
 /* For GNU C, tell the compiler to check printf like formatters */
 #if (defined(__GNUC__) && !defined(SOLARIS2))
 #define PRINTF_ATTRIBUTE(a,b) __attribute__((format (printf, a, b)))

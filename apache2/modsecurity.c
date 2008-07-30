@@ -517,17 +517,17 @@ apr_status_t modsecurity_process_phase(modsec_rec *msr, unsigned int phase) {
             const void *key;
             apr_ssize_t klen;
             #ifdef CACHE_DEBUG
-            apr_pool_t *mptmp = msr->msc_rule_mptmp;
+            apr_pool_t *mp = msr->msc_rule_mptmp;
             const apr_array_header_t *ctarr;
             const apr_table_entry_t *ctelts;
             msre_cache_rec *rec;
             int cn = 0;
             int ri;
+            #else
+            apr_pool_t *mp = msr->mp;
             #endif
 
-            for (hi = apr_hash_first(msr->mp, msr->tcache); hi; hi = apr_hash_next(hi)) {
-                msre_var *keyvar = NULL;
-
+            for (hi = apr_hash_first(mp, msr->tcache); hi; hi = apr_hash_next(hi)) {
                 apr_hash_this(hi, &key, &klen, &dummy);
                 tab = (apr_table_t *)dummy;
 
@@ -535,7 +535,6 @@ apr_status_t modsecurity_process_phase(modsec_rec *msr, unsigned int phase) {
 
                 #ifdef CACHE_DEBUG
                 /* Dump the cache out as we clear */
-                keyvar = (msre_var *)key;
                 ctarr = apr_table_elts(tab);
                 ctelts = (const apr_table_entry_t*)ctarr->elts;
                 for (ri = 0; ri < ctarr->nelts; ri++) {
@@ -543,12 +542,12 @@ apr_status_t modsecurity_process_phase(modsec_rec *msr, unsigned int phase) {
                     rec = (msre_cache_rec *)ctelts[ri].val;
                     if (rec->changed) {
                         if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "CACHE: %5d) hits=%d key=%pp var=\"%s\" %x;%s=\"%s\" (%pp - %pp)", cn, rec->hits, keyvar, keyvar->name, rec->num, rec->path, log_escape_nq_ex(mptmp, rec->val, rec->val_len), rec->val, rec->val + rec->val_len);
+                            msr_log(msr, 9, "CACHE: %5d) hits=%d key=%pp %x;%s=\"%s\" (%pp - %pp)", cn, rec->hits, key, rec->num, rec->path, log_escape_nq_ex(mp, rec->val, rec->val_len), rec->val, rec->val + rec->val_len);
                         }
                     }
                     else {
                         if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "CACHE: %5d) hits=%d key=%pp var=\"%s\" %x;%s=<no change>", cn, rec->hits, keyvar, keyvar->name, rec->num, rec->path);
+                            msr_log(msr, 9, "CACHE: %5d) hits=%d key=%pp %x;%s=<no change>", cn, rec->hits, key, rec->num, rec->path);
                         }
                     }
                 }
