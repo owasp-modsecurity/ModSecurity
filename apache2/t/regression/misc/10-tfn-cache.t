@@ -2,7 +2,7 @@
 
 {
 	type => "misc",
-	comment => "tfncache - simple fully cached",
+	comment => "tfncache (simple fully cached)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -30,7 +30,7 @@
 },
 {
 	type => "misc",
-	comment => "tfncache - simple partially cached",
+	comment => "tfncache (simple partially cached)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -57,7 +57,7 @@
 },
 {
 	type => "misc",
-	comment => "tfncache - separate phases",
+	comment => "tfncache (separate phases)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -84,7 +84,7 @@
 },
 {
 	type => "misc",
-	comment => "tfncache - non-modifying tfns cached",
+	comment => "tfncache (non-modifying tfns cached)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -111,7 +111,7 @@
 },
 {
 	type => "misc",
-	comment => "tfncache - unique keys",
+	comment => "tfncache (unique keys)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -146,7 +146,7 @@
 },
 {
 	type => "misc",
-	comment => "tfncache - large cache",
+	comment => "tfncache (large cache)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
@@ -172,7 +172,7 @@
 		SecRule ARGS "foobar" "phase:4,t:none,t:removeWhiteSpace,t:lowercase,deny"
 	),
 	match_log => {
-		debug => [ qr/Adding request argument \(BODY\): name "test", value "Foo Bar"/, 60 ],
+		debug => [ qr/Adding request argument \(BODY\): name "test", value "Foo Bar"/, 60, "Waiting for httpd to process request: "],
 		-error => [ qr/segmentation fault/i, 60 ],
 	},
 	match_response => {
