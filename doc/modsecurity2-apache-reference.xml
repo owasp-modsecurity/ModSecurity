@@ -4,7 +4,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.6 (July 28, 2008)</releaseinfo>
+    <releaseinfo>Version 2.5.6 (July 31, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -858,10 +858,12 @@ SecAuditLogStorageDir logs/audit
     </section>
 
     <section>
-      <title><literal>SecCacheTransformations</literal> (Experimental)</title>
+      <title><literal>SecCacheTransformations</literal>
+      (Deprecated/Experimental)</title>
 
       <para><emphasis>Description:</emphasis> Controls caching of
-      transformations. Caching is off by default.</para>
+      transformations. Caching is off by default starting with 2.5.6, when it
+      was deprecated and downgraded back to experimental.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
       moreinfo="none">SecCacheTransformations On|Off
@@ -909,7 +911,7 @@ SecAuditLogStorageDir logs/audit
           more than N transformations to be cached. The cache will then be
           disabled. A zero value is interpreted as "unlimited". This option
           may be useful to limit caching for a form with a large number of
-          ARGS.  (default: 512)</para>
+          ARGS. (default: 512)</para>
         </listitem>
 
         <listitem>
