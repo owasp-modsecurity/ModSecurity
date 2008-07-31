@@ -8,7 +8,7 @@
   content inspection in some circumstances.
 
 * Fixed an issue with the transformation cache using too much RAM, potentially
-  crashing Apache with a large number of cache entries. To new configuration
+  crashing Apache with a large number of cache entries. Two new configuration
   options have been added to allow for a finer control of caching:
 
     maxitems: Max number of items to cache (default 1024)
@@ -18,7 +18,7 @@
   be executed via "make test-regression", however it is strongly advised 
   to only be executed on a non-production machine as it will startup the
   Apache web server that ModSecurity is compiled against with various
-  configurations in which it will run tests against.
+  configurations in which it will run tests.
 
 * Added a licensing exception so that ModSecurity can be used in a derivative
   work when that derivative is also under an approved open source license.
