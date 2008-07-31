@@ -182,9 +182,9 @@
       Security.</para>
 
       <note>
-        <para>ModSecurity, mod_security, ModSecurity Pro, and
-      ModSecurity Core Rules are trademarks or
-        registered trademarks of Breach Security, Inc.</para>
+        <para>ModSecurity, mod_security, ModSecurity Pro, and ModSecurity Core
+        Rules are trademarks or registered trademarks of Breach Security,
+        Inc.</para>
       </note>
     </section>
   </section>
@@ -1300,7 +1300,8 @@ SecAuditLogStorageDir logs/audit
 
       <para><emphasis>Dependencies/Notes:</emphasis> None</para>
 
-      <para><programlisting format="linespecific">SecRule REQUEST_URI "^/$" "chain,<emphasis>skipAfter:99</emphasis>"
+      <para><programlisting format="linespecific">SecRule REQUEST_URI "^/$" \
+    "chain,t:none,t:urlDecode,t:lowercase,t:normalisePath,<emphasis>skipAfter:99</emphasis>"
 SecRule REMOTE_ADDR "^127\.0\.0\.1$" "chain"
 SecRule REQUEST_HEADERS:User-Agent \
     "^Apache \(internal dummy connection\)$" "t:none"  
@@ -1468,10 +1469,11 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
       <para><emphasis>Version:</emphasis> 2.0.0</para>
 
       <para><emphasis>Dependencies/Notes:</emphasis> This directive is
-      required if you plan to inspect POST_PAYLOADS of requests. This
+      required if you plan to inspect <literal>POST_PAYLOAD</literal>. This
       directive must be used along with the "phase:2" processing phase action
-      and REQUEST_BODY variable/location. If any of these 3 parts are not
-      configured, you will not be able to inspect the request bodies.</para>
+      and <literal>REQUEST_BODY</literal> variable/location. If any of these 3
+      parts are not configured, you will not be able to inspect the request
+      bodies.</para>
 
       <para>Possible values are:</para>
 
@@ -1740,7 +1742,10 @@ SecResponseBodyLimit 524288</programlisting>
       VARIABLES OPERATOR [ACTIONS]</literal></para>
 
       <para><emphasis>Example Usage:</emphasis> <literal
-      moreinfo="none">SecRule REQUEST_URI "attack"</literal></para>
+      moreinfo="none">SecRule REQUEST_URI "attack" \</literal></para>
+
+      <para><literal>
+      "phase:1,t:none,t:urlDecode,t:lowercase,t:normalisePath"</literal></para>
 
       <para><emphasis>Processing Phase:</emphasis> Any</para>
 
@@ -1768,11 +1773,11 @@ SecResponseBodyLimit 524288</programlisting>
         following rule will reject a transaction that has the word<emphasis>
         dirty</emphasis> in the URI:</para>
 
-        <programlisting format="linespecific">SecRule REQUEST_URI dirty</programlisting>
+        <programlisting format="linespecific">SecRule ARGS dirty</programlisting>
 
         <para>Each rule can specify one or more variables:</para>
 
-        <programlisting format="linespecific">SecRule REQUEST_URI|QUERY_STRING dirty</programlisting>
+        <programlisting format="linespecific">SecRule ARGS|REQUEST_HEADERS:User-Agent dirty</programlisting>
 
         <para>There is a third format supported by the selection operator -
         XPath expression. XPath expressions can only used against the special
@@ -1799,7 +1804,7 @@ SecResponseBodyLimit 524288</programlisting>
         moreinfo="none">@</literal> as the first character in the second rule
         parameter:</para>
 
-        <programlisting format="linespecific">SecRule REQUEST_URI "@rx dirty"</programlisting>
+        <programlisting format="linespecific">SecRule ARGS "@rx dirty"</programlisting>
 
         <para>Note how we had to use double quotes to delimit the second rule
         parameter. This is because the second parameter now has a whitespace
@@ -2035,7 +2040,7 @@ function main()
 
     -- Retrieve one variable, applying one transformation function.
     -- The second parameter is a string.
-    local var2 = m.getvar("REQUEST_URI", "normalisePath");
+    local var2 = m.getvar("ARGS", "lowercase");
 
     -- Retrieve one variable, applying several transformation functions.
     -- The second parameter is now a list. You should note that m.getvar()
@@ -2553,7 +2558,8 @@ SecRule REQUEST_HEADERS:Host "!^$" "deny,<emphasis>phase:1</emphasis>"</programl
       prevent buffer overflow issues). Example: Block request if the size of
       the arguments is above 25 characters.</para>
 
-      <programlisting format="linespecific">SecRule REQUEST_FILENAME "^/cgi-bin/login\.php$" "chain,log,deny,phase:2"
+      <programlisting format="linespecific">SecRule REQUEST_FILENAME "^/cgi-bin/login\.php" \
+    "chain,log,deny,phase:2,t:none,t:lowercase,t:normalisePath"
 SecRule <emphasis>ARGS_COMBINED_SIZE</emphasis> "@gt 25"</programlisting>
     </section>
 
@@ -2567,8 +2573,9 @@ SecRule <emphasis>ARGS_COMBINED_SIZE</emphasis> "@gt 25"</programlisting>
       allow 2 argument names - p and a. If any other argument names are
       injected, it will be blocked.</para>
 
-      <programlisting format="linespecific">SecRule REQUEST_FILENAME "/index.php" "chain,log,deny,status:403,phase:2"
-SecRule<emphasis> ARGS_NAMES</emphasis> "!^(p|a)$"</programlisting>
+      <programlisting format="linespecific">SecRule REQUEST_FILENAME "/index.php" \
+    "chain,log,deny,status:403,phase:2,t:none,t:lowercase,t:normalisePath"
+SecRule<emphasis> ARGS_NAMES</emphasis> "!^(p|a)$" "t:none,t:lowercase"</programlisting>
     </section>
 
     <section>
@@ -2621,9 +2628,9 @@ SecRule<emphasis> ARGS_NAMES</emphasis> "!^(p|a)$"</programlisting>
     <section>
       <title><literal moreinfo="none">ENV</literal></title>
 
-      <para>Collection, requires a single parameter (after a colon character).
-      The ENV variable is set with setenv and does not give access to the CGI
-      environment variables. Example:</para>
+      <para>Collection, requires a single parameter (after colon). The
+      <literal>ENV</literal> variable is set with setenv and does not give
+      access to the CGI environment variables. Example:</para>
 
       <programlisting format="linespecific">SecRule REQUEST_FILENAME "printenv" pass,<emphasis>setenv:tag=suspicious</emphasis>
 SecRule <emphasis>ENV:tag</emphasis> "suspicious"</programlisting>
@@ -3004,10 +3011,17 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <title><literal moreinfo="none">REQUEST_BASENAME</literal></title>
 
       <para>This variable holds just the filename part of
-      <literal>REQUEST_FILENAME</literal> (e.g. index.php). Warning: not URL
-      decoded. Example:</para>
+      <literal>REQUEST_FILENAME</literal> (e.g. index.php).</para>
 
-      <programlisting format="linespecific">SecRule <emphasis>REQUEST_BASENAME</emphasis> "^login\.php$"</programlisting>
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis>REQUEST_BASENAME</emphasis> "^login\.php$" phase:2,t:none,t:lowercase</programlisting>
+
+      <note>
+        <para>Please note that anti-evasion transformations are not applied to
+        this variable by default. <literal>REQUEST_BASENAME</literal> will
+        recognise both / and \ as path separators.</para>
+      </note>
     </section>
 
     <section>
@@ -3023,7 +3037,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <para><emphasis>Note</emphasis></para>
 
       <para>This variable is only available if the content type is
-      application/x-www-form-urlencoded.</para>
+      <literal>application/x-www-form-urlencoded</literal>.</para>
     </section>
 
     <section>
@@ -3050,25 +3064,32 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     <section>
       <title><literal moreinfo="none">REQUEST_FILENAME</literal></title>
 
-      <para>This variable holds the relative REQUEST_URI minus the
-      QUERY_STRING part (e.g. /index.php). Example:</para>
+      <para>This variable holds the relative <literal>REQUEST_URI</literal>
+      minus the <literal>QUERY_STRING</literal> part (e.g. /index.php).
+      Example:</para>
 
-      <programlisting format="linespecific">SecRule <emphasis>REQUEST_FILENAME</emphasis> "^/cgi-bin/login\.php$"</programlisting>
+      <programlisting format="linespecific">SecRule <emphasis>REQUEST_FILENAME</emphasis> "^/cgi-bin/login\.php$" phase:2,t:none,t:normalisePath</programlisting>
+
+      <note>
+        <para>Please note that anti-evasion transformations are not used on
+        <literal>REQUEST_FILENAME</literal> by default.</para>
+      </note>
     </section>
 
     <section>
       <title><literal moreinfo="none">REQUEST_HEADERS</literal></title>
 
       <para>This variable can be used as either a collection of all of the
-      Request Headers or can be used to specify individual headers (by using
+      request headers or can be used to specify individual headers (by using
       REQUEST_HEADERS<emphasis>:Header-Name</emphasis>). Example: the first
-      example uses REQUEST_HEADERS as a collection and is applying the
-      validateUrlEncoding operator against all headers.</para>
+      example uses <literal>REQUEST_HEADERS</literal> as a collection and is
+      applying the <literal>validateUrlEncoding</literal> operator against all
+      headers.</para>
 
       <programlisting format="linespecific">SecRule <emphasis>REQUEST_HEADERS</emphasis> "@validateUrlEncoding"</programlisting>
 
-      <para>Example: the second example is targeting only the Host
-      header.</para>
+      <para>Example: the second example is targeting only the
+      <literal>Host</literal> header.</para>
 
       <programlisting format="linespecific">SecRule <emphasis>REQUEST_HEADERS:Host</emphasis> "^[\d\.]+$" \
     "deny,log,status:400,msg:'Host header is a numeric IP address'"</programlisting>
@@ -3077,8 +3098,8 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     <section>
       <title><literal moreinfo="none">REQUEST_HEADERS_NAMES</literal></title>
 
-      <para>This variable is a collection of the names of all of the Request
-      Headers. Example:</para>
+      <para>This variable is a collection of the names of all of the request
+      headers. Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis>REQUEST_HEADERS_NAMES</emphasis> "^x-forwarded-for" \
     "log,deny,status:403,t:lowercase,msg:'Proxy Server Used'"</programlisting>
@@ -3099,9 +3120,10 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     <section>
       <title><literal moreinfo="none">REQUEST_METHOD</literal></title>
 
-      <para>This variable holds the Request Method used by the client.
-      Example: the following example will trigger if the Request Method is
-      either CONNECT or TRACE.</para>
+      <para>This variable holds the request method used by the client.</para>
+
+      <para>The following example will trigger if the request method is either
+      <literal>CONNECT</literal> or TRACE.</para>
 
       <programlisting format="linespecific">SecRule <emphasis>REQUEST_METHOD</emphasis> "^((?:connect|trace))$" t:none,t:lowercase</programlisting>
     </section>
@@ -3109,7 +3131,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     <section>
       <title><literal moreinfo="none">REQUEST_PROTOCOL</literal></title>
 
-      <para>This variable holds the Request Protocol Version information.
+      <para>This variable holds the request protocol version information.
       Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis>REQUEST_PROTOCOL</emphasis> "!^http/(0\.9|1\.0|1\.1)$" t:none,t:lowercase</programlisting>
@@ -3118,31 +3140,45 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     <section>
       <title><literal moreinfo="none">REQUEST_URI</literal></title>
 
-      <para>This variable holds the full URL including the QUERY_STRING data
-      (e.g. /index.php?p=X), however it will never contain a domain name, even
-      if it was provided on the request line. Warning: not URL decoded. It
-      also does not include either the REQUEST_METHOD or the HTTP version
-      info. Example:</para>
+      <para>This variable holds the full URL including the
+      <literal>QUERY_STRING</literal> data (e.g. /index.php?p=X), however it
+      will never contain a domain name, even if it was provided on the request
+      line. It also does not include either the
+      <literal>REQUEST_METHOD</literal> or the HTTP version info.</para>
 
-      <programlisting format="linespecific">SecRule <emphasis>REQUEST_URI</emphasis> "attack"</programlisting>
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule <emphasis>REQUEST_URI</emphasis> "attack" phase:1,t:none,t:urlDecode,t:lowercase,t:normalisePath</programlisting>
+
+      <note>
+        <para>Please note that anti-evasion transformations are not used on
+        <literal>REQUEST_URI</literal> by default.</para>
+      </note>
     </section>
 
     <section>
       <title><literal moreinfo="none">REQUEST_URI_RAW</literal></title>
 
-      <para>Same as REQUEST_URI but will contain the domain name if it was
-      provided on the request line (e.g.
-      http://www.example.com/index.php?p=X). Warning: not URL decoded.
-      Example:</para>
+      <para>Same as <literal>REQUEST_URI</literal> but will contain the domain
+      name if it was provided on the request line (e.g.
+      http://www.example.com/index.php?p=X).</para>
 
-      <programlisting format="linespecific">SecRule<emphasis> REQUEST_URI_RAW</emphasis> "http:/"</programlisting>
+      <para>Example:</para>
+
+      <programlisting format="linespecific">SecRule<emphasis> REQUEST_URI_RAW</emphasis> "http:/" phase:1,t:none,t:urlDecode,t:lowercase,t:normalisePath</programlisting>
+
+      <note>
+        <para>Please note that anti-evasion transformations are not used on
+        <literal>REQUEST_URI_RAW</literal> by default.</para>
+      </note>
     </section>
 
     <section>
       <title><literal moreinfo="none">RESPONSE_BODY</literal></title>
 
-      <para>This variable holds the data for the response payload.
-      Example:</para>
+      <para>This variable holds the data for the response payload.</para>
+
+      <para>Example:</para>
 
       <programlisting format="linespecific">SecRule<emphasis> RESPONSE_BODY</emphasis> "ODBC Error Code"</programlisting>
     </section>
@@ -3377,7 +3413,8 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
 
       <programlisting format="linespecific">SecRule REQUEST_COOKIES:PHPSESSID !^$ chain,nolog,pass
 SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}
-SecRule REQUEST_URI "^/cgi-bin/finger$" "pass,log,setvar:<emphasis>session.score</emphasis>=+10"
+SecRule REQUEST_URI "^/cgi-bin/finger$" \
+    "phase:2,t:none,t:lowercase,t:normalisePath,pass,log,setvar:<emphasis>session.score</emphasis>=+10"
 SecRule<emphasis> SESSION:SCORE</emphasis> "@gt 50" "pass,log,setvar:<emphasis>session.blocked</emphasis>=1"
 SecRule<emphasis> SESSION:BLOCKED</emphasis> "@eq 1" "log,deny,status:403"</programlisting>
     </section>
@@ -4116,9 +4153,11 @@ SecRule TX:1 "(?:(?:a(dmin|nonymous)))"</programlisting>
       <para>Example:</para>
 
       <programlisting format="linespecific"># Refuse to accept POST requests that do
-# not specify request body length 
-SecRule REQUEST_METHOD ^POST$<emphasis> chain</emphasis>
-SecRule REQUEST_HEADER:Content-Length ^$</programlisting>
+# not specify request body length. Do note that
+# this rule should be preceeded by a rule that verifies
+# only valid request methods (e.g. GET, HEAD and POST) are used.
+SecRule REQUEST_METHOD ^POST$<emphasis> chain</emphasis>,t:none
+SecRule REQUEST_HEADER:Content-Length ^$ t:none</programlisting>
 
       <para><emphasis>Note</emphasis></para>
 
@@ -4297,7 +4336,7 @@ SecRule IP:AUTH_ATTEMPT "@gt 25" \
       <programlisting format="linespecific"># The following is going to execute /usr/local/apache/bin/test.sh
 # as a shell script on rule match.
 SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
-    "log,<emphasis>exec:/usr/local/apache/bin/test.sh</emphasis>"
+    "phase:2,t:none,t:lowercase,t:normalisePath,log,<emphasis>exec:/usr/local/apache/bin/test.sh</emphasis>"
 
 # The following is going to process /usr/local/apache/conf/exec.lua
 # internally as a Lua script on rule match.
@@ -4331,7 +4370,8 @@ SecRule ARGS:p attack log,<emphasis>exec:/usr/local/apache/conf/exec.lua</emphas
       <programlisting format="linespecific">SecRule REQUEST_COOKIES:JSESSIONID "!^$" nolog,phase:1,pass,chain
 SecAction setsid:%{REQUEST_COOKIES:JSESSIONID}
 SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
-    "log,allow,setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasis>,phase:1"</programlisting>
+    "phase:2,t:none,t:lowercase,t:normalisePath,log,allow,\
+setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasis>,phase:1"</programlisting>
 
       <para><emphasis>Note</emphasis></para>
 
@@ -4949,7 +4989,8 @@ SecAction <emphasis>setsid:%{REQUEST_COOKIES.PHPSESSID}</emphasis></programlisti
 
       <para>Example:</para>
 
-      <para><programlisting format="linespecific">SecRule REQUEST_URI "^/$" "chain,<emphasis>skip:2</emphasis>"
+      <para><programlisting format="linespecific">SecRule REQUEST_URI "^/$" \
+"phase:2,chain,t:none<emphasis>,skip:2</emphasis>"
 SecRule REMOTE_ADDR "^127\.0\.0\.1$" "chain"
 SecRule REQUEST_HEADERS:User-Agent "^Apache \(internal dummy connection\)$" "t:none"  
 SecRule &amp;REQUEST_HEADERS:Host "@eq 0" \
@@ -4978,7 +5019,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
 
       <para>Example:</para>
 
-      <para><programlisting format="linespecific">SecRule REQUEST_URI "^/$" "chain,<emphasis>skipAfter:960015</emphasis>"
+      <para><programlisting format="linespecific">SecRule REQUEST_URI "^/$" "chain,t:none,<emphasis>skipAfter:960015</emphasis>"
 SecRule REMOTE_ADDR "^127\.0\.0\.1$" "chain"
 SecRule REQUEST_HEADERS:User-Agent "^Apache \(internal dummy connection\)$" "t:none"  
 SecRule &amp;REQUEST_HEADERS:Host "@eq 0" \
@@ -5053,7 +5094,8 @@ SecRule REQUEST_COOKIES:SESSIONID "47414e81cbbef3cf8366e84eeacba091" \
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule REQUEST_FILENAME "\b(?:n(?:map|et|c)|w(?:guest|sh)|cmd(?:32)?|telnet|rcmd|ftp)\.exe\b" \
-    "deny,msg:'System Command Access',id:'950002',<emphasis>tag:'WEB_ATTACK/FILE_INJECTION',tag:'OWASP/A2'</emphasis>,severity:'2'"</programlisting>
+    "t:none,t:lowercase,deny,msg:'System Command Access',id:'950002',<emphasis>\
+tag:'WEB_ATTACK/FILE_INJECTION',tag:'OWASP/A2'</emphasis>,severity:'2'"</programlisting>
 
       <para><emphasis>Note</emphasis></para>
 
