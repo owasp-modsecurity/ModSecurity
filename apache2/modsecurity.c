@@ -567,6 +567,7 @@ apr_status_t modsecurity_process_phase(modsec_rec *msr, unsigned int phase) {
 
             msr_log(msr, 9, "Cleared transformation cache for phase %d", msr->phase);
         }
+
         msr->tcache_items = 0;
         msr->tcache = apr_hash_make(msr->mp);
         if (msr->tcache == NULL) return -1;

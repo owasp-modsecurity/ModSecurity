@@ -1884,6 +1884,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "CACHE: Disabled - &%s is dynamic", var->name);
                 }
+
                 usecache = 0;
             }
             /* Only cache if if the variable is available in this phase */
@@ -1891,6 +1892,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "CACHE: Disabled - %s is not yet available in phase %d (requires phase %d or later)", var->name, msr->phase, var->metadata->availability);
                 }
+
                 usecache = 0;
             }
             /* check the cache options */
@@ -1898,12 +1900,14 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "CACHE: Disabled - %s value length=%u, smaller than minlen=%" APR_SIZE_T_FMT, var->name, var->value_len, msr->txcfg->cache_trans_min);
                 }
+
                 usecache = 0;
             }
             else if ((msr->txcfg->cache_trans_max != 0) && (var->value_len > msr->txcfg->cache_trans_max)) {
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "CACHE: Disabled - %s value length=%u, larger than maxlen=%" APR_SIZE_T_FMT, var->name, var->value_len, msr->txcfg->cache_trans_max);
                 }
+
                 usecache = 0;
             }
 
@@ -1920,6 +1924,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
 
                     /* Fetch cache table for this target */
                     cachetab = (apr_table_t *)apr_hash_get(msr->tcache, var->value, sizeof(var->value));
+
                     /* Create an empty cache table if this is the first time */
                     #ifdef CACHE_DEBUG
                     if (cachetab) {
@@ -1931,10 +1936,10 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                     #endif
                     {
                         /* NOTE: We use the pointer to the var value as a hash
-                         *       key as it is unique.  This pointer *must*
-                         *       remain valid through the entire phase.  If
+                         *       key as it is unique. This pointer *must*
+                         *       remain valid through the entire phase. If
                          *       it does not, then we will not receive a cache
-                         *       hit and just wasted RAM.  So, it is important
+                         *       hit and just wasted RAM. So, it is important
                          *       that any such vars be marked as VAR_DONT_CACHE.
                          *
                          * ENH: Only use pointer for non-scalar vars
@@ -1950,6 +1955,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 }
                 else {
                     usecache = 0;
+
                     if (msr->txcfg->debuglog_level >= 9) {
                         msr_log(msr, 9, "CACHE: %s transformations are not cacheable", var->name);
                     }
@@ -1989,6 +1995,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
             /* Build the final list of transformation functions. */
             for (k = 0; k < tarr->nelts; k++) {
                 action = (msre_action *)telts[k].val;
+
                 if (strcmp(telts[k].key, "t") == 0) {
                     if (strcmp(action->param, "none") == 0) {
                         apr_table_clear(normtab);
@@ -2015,6 +2022,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                             tfnspath = apr_psprintf(mptmp, "%s%s%s", (tfnspath?tfnspath:""), (tfnspath?",":""), action->param);
                             tfnskey = apr_psprintf(mptmp, "%x;%s", tfnscount, tfnspath);
                             crec = (msre_cache_rec *)apr_table_get(cachetab, tfnskey);
+
                             #ifdef CACHE_DEBUG
                             msr_log(msr, 9, "CACHE: %s %s cached=%d", var->name, tfnskey, (crec ? 1 : 0));
                             #endif
@@ -2035,13 +2043,15 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 (crec != NULL) && (crec == last_crec))
             {
                 crec->hits++;
+
                 if (crec->changed) {
                     var->value = apr_pmemdup(mptmp, crec->val, crec->val_len);
                     var->value_len = crec->val_len;
                 }
 
                 if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "T (%d) %s: \"%s\" [fully cached hits=%d]", crec->changed, crec->path, log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
+                    msr_log(msr, 9, "T (%d) %s: \"%s\" [fully cached hits=%d]", crec->changed, crec->path,
+                        log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
                 }
 
                 #if !defined(PERFORMANCE_MEASUREMENT)
@@ -2049,9 +2059,11 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 #endif
                 {
                     apr_time_t t1 = apr_time_now();
+
                     #if defined(PERFORMANCE_MEASUREMENT)
                     rule->trans_time += (t1 - time_before_trans);
                     #endif
+
                     msr_log(msr, 4, "Transformation completed in %" APR_TIME_T_FMT " usec.",
                         (t1 - time_before_trans));
                 }
@@ -2094,7 +2106,8 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 }
 
                 if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "T (%d) %s: \"%s\" [partially cached hits=%d]", last_crec->changed, tfnspath, log_escape_nq_ex(mptmp, var->value, var->value_len), last_crec->hits);
+                    msr_log(msr, 9, "T (%d) %s: \"%s\" [partially cached hits=%d]", last_crec->changed,
+                        tfnspath, log_escape_nq_ex(mptmp, var->value, var->value_len), last_crec->hits);
                 }
             }
             else {
@@ -2179,7 +2192,8 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                     int tfnsnum = k + 1;
 
                     /* Generate the cache key */
-                    tfnspath = apr_psprintf(msr->mp, "%s%s%s", (tfnspath?tfnspath:""), (tfnspath?",":""), action->param);
+                    tfnspath = apr_psprintf(msr->mp, "%s%s%s", (tfnspath ? tfnspath : ""),
+                        (tfnspath ? "," : ""), action->param);
                     tfnskey = apr_psprintf(msr->mp, "%x;%s", tfnsnum, tfnspath);
 
                     if ((msr->txcfg->cache_trans_maxitems != 0) &&
@@ -2236,6 +2250,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                         #endif
 
                         msr->tcache_items++;
+
                         apr_table_setn(cachetab, tfnskey, (void *)crec);
                     }
                 }
