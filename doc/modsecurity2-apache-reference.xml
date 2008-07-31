@@ -182,15 +182,15 @@
       Security.</para>
 
       <note>
-        <para>ModSecurity, mod_security, and ModSecurity Pro are trademarks or
+        <para>ModSecurity, mod_security, ModSecurity Pro, and
+      ModSecurity Core Rules are trademarks or
         registered trademarks of Breach Security, Inc.</para>
       </note>
     </section>
   </section>
 
   <section>
-    <title><trademark class="registered">ModSecurity</trademark> Core
-    Rules</title>
+    <title><trademark>ModSecurity Core Rules</trademark></title>
 
     <section>
       <title>Overview</title>
