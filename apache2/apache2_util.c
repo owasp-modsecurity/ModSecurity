@@ -113,7 +113,10 @@ int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char *
     apr_procattr_io_set(procattr, APR_NO_PIPE, APR_FULL_BLOCK, APR_NO_PIPE);
     apr_procattr_cmdtype_set(procattr, APR_SHELLCMD);
 
-    msr_log(msr, 9, "Exec: %s", log_escape_nq(r->pool, command));
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Exec: %s", log_escape_nq(r->pool, command));
+    }
+
     rc = apr_proc_create(procnew, command, argv, env, procattr, r->pool);
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Exec: Execution failed: %s (%s)", log_escape_nq(r->pool, command),
@@ -148,8 +151,10 @@ int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char *
                 p++;
             }
 
-            msr_log(msr, 4, "Exec: First line from script output: \"%s\"",
-                log_escape(r->pool, buf));
+            if (msr->txcfg->debuglog_level >= 4) {
+                msr_log(msr, 4, "Exec: First line from script output: \"%s\"",
+                    log_escape(r->pool, buf));
+            }
 
             if (output != NULL) *output = apr_pstrdup(r->pool, buf);
 
@@ -198,7 +203,9 @@ void record_time_checkpoint(modsec_rec *msr, int checkpoint_no) {
     apr_snprintf(note_name, 99, "mod_security-time%d", checkpoint_no);
     apr_table_set(msr->r->notes, note_name, note);
 
-    msr_log(msr, 4, "Time #%d: %s", checkpoint_no, note);
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "Time #%d: %s", checkpoint_no, note);
+    }
 }
 
 /**

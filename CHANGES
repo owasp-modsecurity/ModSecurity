@@ -84,6 +84,12 @@
  * Make sure the apache include directory is included during build.
 
 
+02 Apr 2008 - 2.1.7
+-------------------
+
+ * Make sure temporary filehandles are closed after a transaction.
+
+
 14 Mar 2008 - 2.5.1
 -------------------
 
