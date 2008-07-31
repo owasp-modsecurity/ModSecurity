@@ -3712,9 +3712,9 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <section>
       <title><literal>compressWhitespace</literal></title>
 
-      <para>This function is enabled by default. It converts whitespace
-      characters (32, \f, \t, \n, \r, \v, 160) to spaces (ASCII 32) and then
-      compresses multiple space characters into only one.</para>
+      <para>It converts whitespace characters (32, \f, \t, \n, \r, \v, 160) to
+      spaces (ASCII 32) and then compresses multiple space characters into
+      only one.</para>
     </section>
 
     <section>
