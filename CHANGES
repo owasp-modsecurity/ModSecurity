@@ -1,52 +1,57 @@
+31 Jul 2008 - 2.5.7-dev1
+------------------------
+
+
 31 Jul 2008 - 2.5.6
 -------------------
 
-* Transformation caching has been deprecated, and is now off by default. We
-  now advise against using transformation caching in production.
+ * Transformation caching has been deprecated, and is now off by default. We
+   now advise against using transformation caching in production.
 
-* Fixed two separate transformation caching issues that could cause incorrect
-  content inspection in some circumstances.
+ * Fixed two separate transformation caching issues that could cause incorrect
+   content inspection in some circumstances.
 
-* Fixed an issue with the transformation cache using too much RAM, potentially
-  crashing Apache with a large number of cache entries. Two new configuration
-  options have been added to allow for a finer control of caching:
+ * Fixed an issue with the transformation cache using too much RAM, potentially
+   crashing Apache with a large number of cache entries. Two new configuration
+   options have been added to allow for a finer control of caching:
 
-    maxitems: Max number of items to cache (default 1024)
-    incremental: Whether to cache incrementally (default off)
+     maxitems: Max number of items to cache (default 1024)
+     incremental: Whether to cache incrementally (default off)
 
-* Added an experimental regression testing suite. The regression suite may
-  be executed via "make test-regression", however it is strongly advised 
-  to only be executed on a non-production machine as it will startup the
-  Apache web server that ModSecurity is compiled against with various
-  configurations in which it will run tests.
+ * Added an experimental regression testing suite. The regression suite may
+   be executed via "make test-regression", however it is strongly advised 
+   to only be executed on a non-production machine as it will startup the
+   Apache web server that ModSecurity is compiled against with various
+   configurations in which it will run tests.
 
-* Added a licensing exception so that ModSecurity can be used in a derivative
-  work when that derivative is also under an approved open source license.
+ * Added a licensing exception so that ModSecurity can be used in a derivative
+   work when that derivative is also under an approved open source license.
 
-* Updated mlogc to version 1.4.5 which adds a LockFile directive and fixes an
-  issue in which the configuration file may be deleted.
+ * Updated mlogc to version 1.4.5 which adds a LockFile directive and fixes an
+   issue in which the configuration file may be deleted.
+
 
 05 Jun 2008 - 2.5.5
 -------------------
 
-* Fixed an issue where an alert was not logged in the error log
-  unless "auditlog" was used.
+ * Fixed an issue where an alert was not logged in the error log
+   unless "auditlog" was used.
 
-* Enable the "auditlog" action by default to help prevent a misconfiguration.
-  The new default is now: "phase:2,log,auditlog,pass"
+ * Enable the "auditlog" action by default to help prevent a misconfiguration.
+   The new default is now: "phase:2,log,auditlog,pass"
 
-* Improve request body processing error messages.
+ * Improve request body processing error messages.
 
-* Handle lack of a new line after the final boundary in a multipart request.
-  This fixes the reported WordPress Flash file uploader problem.
+ * Handle lack of a new line after the final boundary in a multipart request.
+   This fixes the reported WordPress Flash file uploader problem.
 
-* Fixed issue with multithreaded servers where concurrent XML processing
-  could crash the web server (at least under Windows).
+ * Fixed issue with multithreaded servers where concurrent XML processing
+   could crash the web server (at least under Windows).
 
-* Fixed blocking in phase 3.
+ * Fixed blocking in phase 3.
 
-* Force modules "mod_rpaf-2.0.c" and "mod_custom_header.c" to run before
-  ModSecurity so that the correct IP is used.
+ * Force modules "mod_rpaf-2.0.c" and "mod_custom_header.c" to run before
+   ModSecurity so that the correct IP is used.
 
 
 07 May 2008 - 2.5.4
