@@ -2,10 +2,18 @@
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
  * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
- * You should have received a copy of the licence along with this
- * program (stored in the file "LICENSE"). If the file is missing,
- * or if you have any other questions related to the licence, please
- * write to Breach Security, Inc. at support@breach.com.
+ * This product is released under the terms of the General Public Licence,
+ * version 2 (GPLv2). Please refer to the file LICENSE (included with this
+ * distribution) which contains the complete text of the licence.
+ *
+ * There are special exceptions to the terms and conditions of the GPL
+ * as it is applied to this software. View the full text of the exception in
+ * file MODSECURITY_LICENSING_EXCEPTION in the directory of this software
+ * distribution.
+ *
+ * If any of the files related to licensing are missing or if you have any
+ * other questions related to licensing please contact Breach Security, Inc.
+ * directly using the email address support@breach.com.
  *
  */
 #include <stdlib.h>
@@ -314,8 +322,8 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     if (msr->collections_dirty == NULL) return -1;
 
     /* Other */
-    msr->tcache = apr_hash_make(msr->mp);
-    if (msr->tcache == NULL) return -1;
+    msr->tcache = NULL;
+    msr->tcache_items = 0;
 
     msr->matched_rules = apr_array_make(msr->mp, 16, sizeof(void *));
     if (msr->matched_rules == NULL) return -1;
@@ -497,18 +505,75 @@ static apr_status_t modsecurity_process_phase_logging(modsec_rec *msr) {
 apr_status_t modsecurity_process_phase(modsec_rec *msr, unsigned int phase) {
     /* Check if we should run. */
     if ((msr->was_intercepted)&&(phase != PHASE_LOGGING)) {
-        msr_log(msr, 4, "Skipping phase %i as request was already intercepted.", phase);
+        msr_log(msr, 4, "Skipping phase %d as request was already intercepted.", phase);
         return 0;
     }
 
     /* Do not process the same phase twice. */
     if (msr->phase >= phase) {
-        msr_log(msr, 4, "Skipping phase %i because it was previously run (at %i now).",
+        msr_log(msr, 4, "Skipping phase %d because it was previously run (at %d now).",
             phase, msr->phase);
         return 0;
     }
 
     msr->phase = phase;
+
+    /* Clear out the transformation cache at the start of each phase */
+    if (msr->txcfg->cache_trans == MODSEC_CACHE_ENABLED) {
+        if (msr->tcache) {
+            apr_hash_index_t *hi;
+            void *dummy;
+            apr_table_t *tab;
+            const void *key;
+            apr_ssize_t klen;
+            #ifdef CACHE_DEBUG
+            apr_pool_t *mp = msr->msc_rule_mptmp;
+            const apr_array_header_t *ctarr;
+            const apr_table_entry_t *ctelts;
+            msre_cache_rec *rec;
+            int cn = 0;
+            int ri;
+            #else
+            apr_pool_t *mp = msr->mp;
+            #endif
+
+            for (hi = apr_hash_first(mp, msr->tcache); hi; hi = apr_hash_next(hi)) {
+                apr_hash_this(hi, &key, &klen, &dummy);
+                tab = (apr_table_t *)dummy;
+
+                if (tab == NULL) continue;
+
+                #ifdef CACHE_DEBUG
+                /* Dump the cache out as we clear */
+                ctarr = apr_table_elts(tab);
+                ctelts = (const apr_table_entry_t*)ctarr->elts;
+                for (ri = 0; ri < ctarr->nelts; ri++) {
+                    cn++;
+                    rec = (msre_cache_rec *)ctelts[ri].val;
+                    if (rec->changed) {
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "CACHE: %5d) hits=%d key=%pp %x;%s=\"%s\" (%pp - %pp)", cn, rec->hits, key, rec->num, rec->path, log_escape_nq_ex(mp, rec->val, rec->val_len), rec->val, rec->val + rec->val_len);
+                        }
+                    }
+                    else {
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "CACHE: %5d) hits=%d key=%pp %x;%s=<no change>", cn, rec->hits, key, rec->num, rec->path);
+                        }
+                    }
+                }
+                #endif
+
+                apr_table_clear(tab);
+                apr_hash_set(msr->tcache, key, klen, NULL);
+            }
+
+            msr_log(msr, 9, "Cleared transformation cache for phase %d", msr->phase);
+        }
+
+        msr->tcache_items = 0;
+        msr->tcache = apr_hash_make(msr->mp);
+        if (msr->tcache == NULL) return -1;
+    }
 
     switch(phase) {
         case 1 :

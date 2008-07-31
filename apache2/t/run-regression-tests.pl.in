@@ -35,6 +35,7 @@ my $PID_FILE = "$FILES_DIR/httpd.pid";
 my $HTTPD = q(@APXS_HTTPD@);
 my $PASSED = 0;
 my $TOTAL = 0;
+my $BUFSIZ = 32768;
 my %C = ();
 my %FILE = ();
 my $UA_NAME = "ModSecurity Regression Tests/1.2.3";
@@ -49,9 +50,9 @@ if ($HTTPD eq "\@APXS_HTTPD\@") {
 $SIG{TERM} = $SIG{INT} = \&handle_interrupt;
 
 my %opt;
-getopts('A:E:D:C:T:H:a:p:dh', \%opt);
+getopts('A:E:D:C:T:H:a:p:dvh', \%opt);
 
-if ($opt{D}) {
+if ($opt{d}) {
 	$Data::Dumper::Indent = 1;
 	$Data::Dumper::Terse = 1;
 	$Data::Dumper::Pad = "";
@@ -72,7 +73,8 @@ Usage: $SCRIPT [options] [file [N]]
   -S path   Specify Apache httpd server root path.
   -a file   Specify Apache httpd binary (default: httpd)
   -p port   Specify Apache httpd port (default: 8088)
-  -d        Enable debugging.
+  -v        Enable verbose output (details on failure).
+  -d        Enable debugging output.
   -h        This help.
 
 EOT
@@ -98,6 +100,7 @@ $opt{E} = "$FILES_DIR/error.log" unless (defined $opt{E});
 $opt{C} = "$CONF_DIR/httpd.conf" unless (defined $opt{C});
 $opt{H} = "$SROOT_DIR/htdocs" unless (defined $opt{H});
 $opt{p} = 8088 unless (defined $opt{p});
+$opt{v} = 1 if ($opt{d});
 
 unless (defined $opt{S}) {
 	my $httpd_root = `$HTTPD -V`;
@@ -194,7 +197,7 @@ sub runfile {
 		if (exists $t{conf} and defined $t{conf}) {
 			$conf_fn = sprintf "%s/%s_%s_%06d.conf",
 			                   $CONF_DIR, $t{type}, $cfg, $n;
-#			dbg("Writing test config to: $conf_fn");
+			#dbg("Writing test config to: $conf_fn");
 			open(CONF, ">$conf_fn") or die "Failed to open conf \"$conf_fn\": $!\n";
 			print CONF (ref $t{conf} eq "CODE" ? eval { &{$t{conf}} } : $t{conf});
 			msg("$@") if ($@);
@@ -207,9 +210,9 @@ sub runfile {
 
 		# Run any prerun setup
 		if ($rc == 0 and exists $t{prerun} and defined $t{prerun}) {
-			dbg("Executing perl prerun...");
+			vrb("Executing perl prerun...");
 			$rc = &{$t{prerun}};
-			dbg("Perl prerun returned: $rc");
+			vrb("Perl prerun returned: $rc");
 		}
 
 		if ($httpd_up) {
@@ -218,7 +221,7 @@ sub runfile {
 				my $resp = do_request($t{request});
 				if (!$resp) {
 					msg("invalid response");
-					dbg("RESPONSE: ", $resp);
+					vrb("RESPONSE: ", $resp);
 					$rc = 1;
 				}
 				else {
@@ -229,14 +232,13 @@ sub runfile {
 						if ($neg and defined $match) {
 							$rc = 1;
 							msg("response $mtype matched: $m");
-							dbg($resp);
-
+							vrb($resp);
 							last;
 						}
 						elsif (!$neg and !defined $match) {
 							$rc = 1;
 							msg("response $mtype failed to match: $m");
-							dbg($resp);
+							vrb($resp);
 							last;
 						}
 					}
@@ -245,13 +247,13 @@ sub runfile {
 
 			# Run any arbitrary perl tests
 			if ($rc == 0 and exists $t{test} and defined $t{test}) {
-				#dbg("Executing perl test(s)...");
+				dbg("Executing perl test(s)...");
 				$rc = eval { &{$t{test}} };
 				if (! defined $rc) {
 					msg("Error running test: $@");
 					$rc = -1;
 				}
-				#dbg("Perl tests returned: $rc");
+				dbg("Perl tests returned: $rc");
 			}
 
 			# Search for all log matches
@@ -263,15 +265,11 @@ sub runfile {
 					if ($neg and defined $match) {
 						$rc = 1;
 						msg("$mtype log matched: $m->[0]");
-						msg("Log: $FILE{$mtype}{fn}");
-						dbg(escape("$FILE{$mtype}{buf}"));
 						last;
 					}
 					elsif (!$neg and !defined $match) {
 						$rc = 1;
 						msg("$mtype log failed to match: $m->[0]");
-						msg("Log: $FILE{$mtype}{fn}");
-						dbg(escape("$FILE{$mtype}{buf}"));
 						last;
 					}
 				}
@@ -287,13 +285,11 @@ sub runfile {
 					if ($neg and defined $match) {
 						$rc = 1;
 						msg("$fn file matched: $m");
-						dbg(escape("$FILE{$fn}{buf}"));
 						last;
 					}
 					elsif (!$neg and !defined $match) {
 						$rc = 1;
 						msg("$fn file failed match: $m");
-						dbg(escape("$FILE{$fn}{buf}"));
 						last;
 					}
 				}
@@ -308,7 +304,11 @@ sub runfile {
 			$pass++;
 		}
 		else {
-			dbg("Test config: $conf_fn");
+			vrb("Test Config: $conf_fn");
+			vrb("Debug Log: $FILE{debug}{fn}");
+			dbg(escape("$FILE{debug}{buf}"));
+			vrb("Error Log: $FILE{error}{fn}");
+			dbg(escape("$FILE{error}{buf}"));
 		}
 
 		msg(sprintf("%s) %s%s: %s%s", $id, $t{type}, (exists($t{comment}) ? " - $t{comment}" : ""), ($rc ? "failed" : "passed"), ((defined($out) && $out ne "")? " ($out)" : "")));
@@ -375,15 +375,11 @@ sub do_request {
 	}
 
 	if (ref $r eq "HTTP::Request") {
-#		dbg("REQUEST: ", $r);
 		my $resp = $UA->request($r);
-		if ($opt{d}) {
-			dbg($resp->request()->as_string());
-		}
+		dbg($resp->request()->as_string()) if ($opt{d});
 		return $resp
 	}
 	else {
-#		dbg("REQUEST:\n", $r);
 		return do_raw_request($r);
 	}
 
@@ -409,13 +405,17 @@ sub match_response {
 	return;
 }
 
+sub read_log {
+	my($name, $timeout, $graph) = @_;
+	return match_log($name, undef, $timeout, $graph);
+}
+
 sub match_log {
-	my($name, $re, $timeout) = @_;
+	my($name, $re, $timeout, $graph) = @_;
 	my $t0 = gettimeofday;
 	my($fh,$rbuf) = ($FILE{$name}{fd}, \$FILE{$name}{buf});
 	my $n = length($$rbuf);
-
-	msg("Warning: Empty regular expression.") if (!defined $re or $re eq "");
+	my $rc = undef;
 
   unless (defined $fh) {
     msg("Error: File \"$name\" is not opened for matching.");
@@ -424,15 +424,45 @@ sub match_log {
 
 	$timeout = 0 unless (defined $timeout);
 
-	do {
-		$n += $fh->sysread($$rbuf, 1024, $n);
-#		dbg("Match \"$re\" in $name \"$$rbuf\" ($n)");
-		return $& if ($$rbuf =~ m/$re/m);
-		# TODO: Use select()/poll()
-		sleep 0.1;
-	} while (gettimeofday - $t0 < $timeout);
+	my $i = 0;
+	my $graphed = 0;
+	READ: {
+		do {
+			my $nbytes = $fh->sysread($$rbuf, $BUFSIZ, $n);
+			if (!defined($nbytes)) {
+				msg("Error: Could not read \"$name\" log: $!");
+				last;
+			}
+			elsif (!defined($re) and $nbytes == 0) {
+				last;
+			}
 
-	return;
+			# Remove APR pool debugging
+			$$rbuf =~ s/POOL DEBUG:[^\n]+PALLOC[^\n]+\n//sg;
+
+			$n = length($$rbuf);
+
+			#dbg("Match \"$re\" in $name \"$$rbuf\" ($n)");
+			if ($$rbuf =~ m/$re/m) {
+				$rc = $&;
+				last;
+			}
+			# TODO: Use select()/poll()
+			sleep 0.1 unless ($nbytes == $BUFSIZ);
+			if ($graph and $opt{d}) {
+				$i++;
+				if ($i == 10) {
+					$graphed++;
+					$i=0;
+					print STDERR $graph if ($graphed == 1);
+					print STDERR "."
+				}
+			}
+		} while (gettimeofday - $t0 < $timeout);
+	}
+	print STDERR "\n" if ($graphed);
+
+	return $rc;
 }
 
 sub match_file {
@@ -475,6 +505,11 @@ sub dbg {
 	} @_;
 	$out =~ s/^/DBG: /mg;
 	print STDOUT "$out\n";
+}
+
+sub vrb {
+	return unless(@_ and $opt{v});
+	msg(@_);
 }
 
 sub msg {
@@ -524,14 +559,14 @@ sub httpd_start {
 
 	my $httpd_out;
 	my $httpd_pid = open3(undef, $httpd_out, undef, @p) or quit(1);
-	my $out = join("\\n", split(/\n/, <$httpd_out>));
+	my $out = join("\\n", grep(!/POOL DEBUG/, (<$httpd_out>)));
 	close $httpd_out;
 	waitpid($httpd_pid, 0);
 
 	my $rc = $?;
 	if ( WIFEXITED($rc) ) {
 		$rc = WEXITSTATUS($rc);
-		dbg("Httpd start returned with $rc.") if ($rc);
+		vrb("Httpd start returned with $rc.") if ($rc);
 	}
 	elsif( WIFSIGNALED($rc) ) {
 		msg("Httpd start failed with signal " . WTERMSIG($rc) . ".");
@@ -543,15 +578,15 @@ sub httpd_start {
 	}
 
 	if (defined $out and $out ne "") {
-		dbg(join(" ", map { quote_shell($_) } @p));
+		vrb(join(" ", map { quote_shell($_) } @p));
 		msg("Httpd start failed with error messages:\n$out");
 		return -1
 	}
 
 	# Look for startup msg
-	unless (defined match_log("error", qr/resuming normal operations/, 10)) {
-		dbg(join(" ", map { quote_shell($_) } @p));
-		dbg(match_log("error", qr/(^.*ModSecurity: .*)/sm, 10));
+	unless (defined match_log("error", qr/resuming normal operations/, 60, "Waiting on httpd to start: ")) {
+		vrb(join(" ", map { quote_shell($_) } @p));
+		vrb(match_log("error", qr/(^.*ModSecurity: .*)/sm, 10));
 		msg("Httpd server failed to start.");
 		return -1;
 	}
@@ -571,7 +606,7 @@ sub httpd_stop {
 
 	my $httpd_out;
 	my $httpd_pid = open3(undef, $httpd_out, undef, @p) or quit(1);
-	my $out = join("\\n", split(/\n/, <$httpd_out>));
+	my $out = join("\\n", grep(!/POOL DEBUG/, (<$httpd_out>)));
 	close $httpd_out;
 	waitpid($httpd_pid, 0);
 
@@ -583,7 +618,7 @@ sub httpd_stop {
 	my $rc = $?;
 	if ( WIFEXITED($rc) ) {
 		$rc = WEXITSTATUS($rc);
-		dbg("Httpd stop returned with $rc.") if ($rc);
+		vrb("Httpd stop returned with $rc.") if ($rc);
 	}
 	elsif( WIFSIGNALED($rc) ) {
 		msg("Httpd stop failed with signal " . WTERMSIG($rc) . ".");
@@ -595,8 +630,8 @@ sub httpd_stop {
 	}
 
 	# Look for startup msg
-	unless (defined match_log("error", qr/caught SIG[A-Z]+, shutting down/, 10)) {
-		dbg(join(" ", map { quote_shell($_) } @p));
+	unless (defined match_log("error", qr/caught SIG[A-Z]+, shutting down/, 60, "Waiting on httpd to stop: ")) {
+		vrb(join(" ", map { quote_shell($_) } @p));
 		msg("Httpd server failed to shutdown.");
 		return -1;
 	}
@@ -617,7 +652,7 @@ sub httpd_reload {
 
 	my $httpd_out;
 	my $httpd_pid = open3(undef, $httpd_out, undef, @p) or quit(1);
-	my $out = join("\\n", split(/\n/, <$httpd_out>));
+	my $out = join("\\n", grep(!/POOL DEBUG/, (<$httpd_out>)));
 	close $httpd_out;
 	waitpid($httpd_pid, 0);
 
@@ -629,7 +664,7 @@ sub httpd_reload {
 	my $rc = $?;
 	if ( WIFEXITED($rc) ) {
 		$rc = WEXITSTATUS($rc);
-		dbg("Httpd reload returned with $rc.") if ($rc);
+		vrb("Httpd reload returned with $rc.") if ($rc);
 	}
 	elsif( WIFSIGNALED($rc) ) {
 		msg("Httpd reload failed with signal " . WTERMSIG($rc) . ".");
@@ -641,8 +676,8 @@ sub httpd_reload {
 	}
 
 	# Look for startup msg
-	unless (defined match_log("error", qr/resuming normal operations/, 10)) {
-		dbg(join(" ", map { quote_shell($_) } @p));
+	unless (defined match_log("error", qr/resuming normal operations/, 60, "Waiting on httpd to restart: ")) {
+		vrb(join(" ", map { quote_shell($_) } @p));
 		msg("Httpd server failed to reload.");
 		return -1;
 	}

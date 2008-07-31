@@ -1299,6 +1299,7 @@ Optional Features:
   --enable-debug-conf     Enable debug during configuration.
   --enable-debug-cache    Enable debug for transformation caching.
   --enable-debug-acmp     Enable debugging acmp code.
+  --enable-debug-mem      Enable debug during configuration.
   --enable-performance-measurement
                           Enable performance-measurement stats.
   --disable-modsec-api    Disable the API; compiling against some older Apache
@@ -5257,6 +5258,23 @@ else
 fi
 
 
+# DEBUG_MEM
+# Check whether --enable-debug-mem was given.
+if test "${enable_debug_mem+set}" = set; then
+  enableval=$enable_debug_mem;
+  if test "$enableval" != "no"; then
+    debug_mem="-DDEBUG_MEM"
+  else
+    debug_mem=
+  fi
+
+else
+
+  debug_mem=
+
+fi
+
+
 # PERFORMANCE_MEASUREMENT
 # Check whether --enable-performance-measurement was given.
 if test "${enable_performance_measurement+set}" = set; then
@@ -5293,8 +5311,12 @@ fi
 
 ### Build *EXTRA_CFLAGS vars
 
-EXTRA_CFLAGS="-O2 -g -Wall $strict_compile"
-MODSEC_EXTRA_CFLAGS="$debug_conf $debug_cache $debug_acmp $perf_meas $modsec_api"
+if test -n "$debug_mem"; then
+  EXTRA_CFLAGS="-O0 -g -Wall"
+else
+  EXTRA_CFLAGS="-O2 -g -Wall $strict_compile"
+fi
+MODSEC_EXTRA_CFLAGS="$debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""

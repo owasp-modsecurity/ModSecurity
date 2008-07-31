@@ -2,10 +2,18 @@
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
  * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
- * You should have received a copy of the licence along with this
- * program (stored in the file "LICENSE"). If the file is missing,
- * or if you have any other questions related to the licence, please
- * write to Breach Security, Inc. at support@breach.com.
+ * This product is released under the terms of the General Public Licence,
+ * version 2 (GPLv2). Please refer to the file LICENSE (included with this
+ * distribution) which contains the complete text of the licence.
+ *
+ * There are special exceptions to the terms and conditions of the GPL
+ * as it is applied to this software. View the full text of the exception in
+ * file MODSECURITY_LICENSING_EXCEPTION in the directory of this software
+ * distribution.
+ *
+ * If any of the files related to licensing are missing or if you have any
+ * other questions related to licensing please contact Breach Security, Inc.
+ * directly using the email address support@breach.com.
  *
  */
 #include "msc_parsers.h"
@@ -49,10 +57,18 @@ int parse_cookies_v0(modsec_rec *msr, char *_cookie_header, apr_table_t *cookies
         /* we ignore cookies with empty names */
         if ((attr_name != NULL)&&(strlen(attr_name) != 0)) {
             if (attr_value != NULL) {
-                msr_log(msr, 5, "Adding request cookie: name \"%s\", value \"%s\"", log_escape(msr->mp, attr_name), log_escape(msr->mp, attr_value));
+                if (msr->txcfg->debuglog_level >= 5) {
+                    msr_log(msr, 5, "Adding request cookie: name \"%s\", value \"%s\"",
+                        log_escape(msr->mp, attr_name), log_escape(msr->mp, attr_value));
+                }
+
                 apr_table_add(cookies, attr_name, attr_value);
             } else {
-                msr_log(msr, 5, "Adding request cookie: name \"%s\", value empty", log_escape(msr->mp, attr_name));
+                if (msr->txcfg->debuglog_level >= 5) {
+                    msr_log(msr, 5, "Adding request cookie: name \"%s\", value empty",
+                        log_escape(msr->mp, attr_name));
+                }
+
                 apr_table_add(cookies, attr_name, "");
             }
 
@@ -169,12 +185,18 @@ int parse_cookies_v1(modsec_rec *msr, char *_cookie_header, apr_table_t *cookies
             }
 
             if (attr_value != NULL) {
-                msr_log(msr, 5, "Adding request cookie: name \"%s\", value \"%s\"",
-                    log_escape(msr->mp, attr_name), log_escape(msr->mp, attr_value));
+                if (msr->txcfg->debuglog_level >= 5) {
+                    msr_log(msr, 5, "Adding request cookie: name \"%s\", value \"%s\"",
+                        log_escape(msr->mp, attr_name), log_escape(msr->mp, attr_value));
+                }
+
                 apr_table_add(cookies, attr_name, attr_value);
             } else {
-                msr_log(msr, 5, "Adding request cookie: name \"%s\", value empty",
-                    log_escape(msr->mp, attr_name));
+                if (msr->txcfg->debuglog_level >= 5) {
+                    msr_log(msr, 5, "Adding request cookie: name \"%s\", value empty",
+                        log_escape(msr->mp, attr_name));
+                }
+
                 apr_table_add(cookies, attr_name, "");
             }
 
@@ -301,9 +323,11 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
  *
  */
 void add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg) {
-    msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
-        arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
-        log_escape_ex(msr->mp, arg->value, arg->value_len));
+    if (msr->txcfg->debuglog_level >= 5) {
+        msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
+            arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
+            log_escape_ex(msr->mp, arg->value, arg->value_len));
+    }
 
     apr_table_addn(arguments, log_escape_nq_ex(msr->mp, arg->name, arg->name_len), (void *)arg);
 }

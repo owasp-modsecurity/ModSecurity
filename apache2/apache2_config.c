@@ -2,10 +2,18 @@
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
  * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
- * You should have received a copy of the licence along with this
- * program (stored in the file "LICENSE"). If the file is missing,
- * or if you have any other questions related to the licence, please
- * write to Breach Security, Inc. at support@breach.com.
+ * This product is released under the terms of the General Public Licence,
+ * version 2 (GPLv2). Please refer to the file LICENSE (included with this
+ * distribution) which contains the complete text of the licence.
+ *
+ * There are special exceptions to the terms and conditions of the GPL
+ * as it is applied to this software. View the full text of the exception in
+ * file MODSECURITY_LICENSING_EXCEPTION in the directory of this software
+ * distribution.
+ *
+ * If any of the files related to licensing are missing or if you have any
+ * other questions related to licensing please contact Breach Security, Inc.
+ * directly using the email address support@breach.com.
  *
  */
 #include <limits.h>
@@ -102,8 +110,10 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
 
     /* Cache */
     dcfg->cache_trans = NOT_SET;
+    dcfg->cache_trans_incremental = NOT_SET;
     dcfg->cache_trans_min = NOT_SET;
     dcfg->cache_trans_max = NOT_SET;
+    dcfg->cache_trans_maxitems = NOT_SET;
 
     dcfg->component_signatures = apr_array_make(mp, 16, sizeof(char *));
 
@@ -439,10 +449,14 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     /* Cache */
     merged->cache_trans = (child->cache_trans == NOT_SET
         ? parent->cache_trans : child->cache_trans);
+    merged->cache_trans_incremental = (child->cache_trans_incremental == NOT_SET
+        ? parent->cache_trans_incremental : child->cache_trans_incremental);
     merged->cache_trans_min = (child->cache_trans_min == (apr_size_t)NOT_SET
         ? parent->cache_trans_min : child->cache_trans_min);
     merged->cache_trans_max = (child->cache_trans_max == (apr_size_t)NOT_SET
         ? parent->cache_trans_max : child->cache_trans_max);
+    merged->cache_trans_maxitems = (child->cache_trans_maxitems == (apr_size_t)NOT_SET
+        ? parent->cache_trans_maxitems : child->cache_trans_maxitems);
 
     /* Merge component signatures. */
     merged->component_signatures = apr_array_append(mp, parent->component_signatures,
@@ -528,9 +542,11 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->geo == NOT_SET_P) dcfg->geo = NULL;
 
     /* Cache */
-    if (dcfg->cache_trans == NOT_SET) dcfg->cache_trans = MODSEC_CACHE_ENABLED;
-    if (dcfg->cache_trans_min == (apr_size_t)NOT_SET) dcfg->cache_trans_min = 15;
-    if (dcfg->cache_trans_max == (apr_size_t)NOT_SET) dcfg->cache_trans_max = 0;
+    if (dcfg->cache_trans == NOT_SET) dcfg->cache_trans = MODSEC_CACHE_DISABLED;
+    if (dcfg->cache_trans_incremental == NOT_SET) dcfg->cache_trans_incremental = 0;
+    if (dcfg->cache_trans_min == (apr_size_t)NOT_SET) dcfg->cache_trans_min = 32;
+    if (dcfg->cache_trans_max == (apr_size_t)NOT_SET) dcfg->cache_trans_max = 1024;
+    if (dcfg->cache_trans_maxitems == (apr_size_t)NOT_SET) dcfg->cache_trans_maxitems = 512;
 
     if (dcfg->request_encoding == NOT_SET_P) dcfg->request_encoding = NULL;
 }
@@ -1650,7 +1666,7 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg, const 
 
     /* Process options */
     if (p2 != NULL) {
-        apr_table_t *vartable = apr_table_make(cmd->pool, 10);
+        apr_table_t *vartable = apr_table_make(cmd->pool, 4);
         apr_status_t rc;
         char *error_msg = NULL;
         const char *charval = NULL;
@@ -1664,7 +1680,18 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg, const 
             return apr_psprintf(cmd->pool, "ModSecurity: Unable to parse options for SecCacheTransformations: %s", error_msg);
         }
 
-        /* minval */
+        /* incremental */
+        charval = apr_table_get(vartable, "incremental");
+        if (charval != NULL) {
+            if (strcasecmp(charval, "on") == 0)
+                dcfg->cache_trans_incremental = 1;
+            else if (strcasecmp(charval, "off") == 0)
+                dcfg->cache_trans_incremental = 0;
+            else
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations invalid incremental value: %s", charval);
+        }
+
+        /* minlen */
         charval = apr_table_get(vartable, "minlen");
         if (charval != NULL) {
             intval = apr_atoi64(charval);
@@ -1684,7 +1711,7 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg, const 
             dcfg->cache_trans_min = (apr_size_t)intval;
         }
 
-        /* maxval */
+        /* maxlen */
         charval = apr_table_get(vartable, "maxlen");
         if (charval != NULL) {
             intval = apr_atoi64(charval);
@@ -1706,6 +1733,19 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg, const 
             }
             dcfg->cache_trans_max = (apr_size_t)intval;
 
+        }
+
+        /* maxitems */
+        charval = apr_table_get(vartable, "maxitems");
+        if (charval != NULL) {
+            intval = apr_atoi64(charval);
+            if (errno == ERANGE) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxitems out of range: %s", charval);
+            }
+            if (intval < 0) {
+                return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxitems must be positive: %s", charval);
+            }
+            dcfg->cache_trans_maxitems = (apr_size_t)intval;
         }
     }
 

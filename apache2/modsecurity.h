@@ -2,10 +2,18 @@
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
  * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
- * You should have received a copy of the licence along with this
- * program (stored in the file "LICENSE"). If the file is missing,
- * or if you have any other questions related to the licence, please
- * write to Breach Security, Inc. at support@breach.com.
+ * This product is released under the terms of the General Public Licence,
+ * version 2 (GPLv2). Please refer to the file LICENSE (included with this
+ * distribution) which contains the complete text of the licence.
+ *
+ * There are special exceptions to the terms and conditions of the GPL
+ * as it is applied to this software. View the full text of the exception in
+ * file MODSECURITY_LICENSING_EXCEPTION in the directory of this software
+ * distribution.
+ *
+ * If any of the files related to licensing are missing or if you have any
+ * other questions related to licensing please contact Breach Security, Inc.
+ * directly using the email address support@breach.com.
  *
  */
 #ifndef _MODSECURITY_H_
@@ -28,6 +36,10 @@ typedef struct msc_string msc_string;
 #define DSOLOCAL __attribute__((visibility("hidden")))
 #else
 #define DSOLOCAL
+#endif
+
+#if defined(DEBUG_MEM)
+/* Nothing Yet */
 #endif
 
 /* For GNU C, tell the compiler to check printf like formatters */
@@ -366,6 +378,7 @@ struct modsec_rec {
 
     /* data cache */
     apr_hash_t          *tcache;
+    apr_size_t           tcache_items;
 
     /* removed rules */
     apr_array_header_t  *removed_rules;
@@ -475,8 +488,10 @@ struct directory_config {
 
     /* Cache */
     int                  cache_trans;
+    int                  cache_trans_incremental;
     apr_size_t           cache_trans_min;
     apr_size_t           cache_trans_max;
+    apr_size_t           cache_trans_maxitems;
 
     /* Array to hold signatures of components, which will
      * appear in the ModSecurity signature in the audit log.

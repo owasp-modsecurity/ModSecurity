@@ -225,6 +225,21 @@ AC_ARG_ENABLE(debug-acmp,
   debug_acmp=
 ])
 
+# DEBUG_MEM
+AC_ARG_ENABLE(debug-mem,
+              AS_HELP_STRING([--enable-debug-mem],
+                             [Enable debug during configuration.]),
+[
+  if test "$enableval" != "no"; then
+    debug_mem="-DDEBUG_MEM"
+  else
+    debug_mem=
+  fi
+],
+[
+  debug_mem=
+])
+
 # PERFORMANCE_MEASUREMENT
 AC_ARG_ENABLE(performance-measurement,
               AS_HELP_STRING([--enable-performance-measurement],
@@ -257,8 +272,12 @@ AC_ARG_ENABLE(modsec-api,
 
 ### Build *EXTRA_CFLAGS vars
 
-EXTRA_CFLAGS="-O2 -g -Wall $strict_compile"
-MODSEC_EXTRA_CFLAGS="$debug_conf $debug_cache $debug_acmp $perf_meas $modsec_api"
+if test -n "$debug_mem"; then
+  EXTRA_CFLAGS="-O0 -g -Wall"
+else
+  EXTRA_CFLAGS="-O2 -g -Wall $strict_compile"
+fi
+MODSEC_EXTRA_CFLAGS="$debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""

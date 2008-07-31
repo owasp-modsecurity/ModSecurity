@@ -2,10 +2,18 @@
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
  * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
  *
- * You should have received a copy of the licence along with this
- * program (stored in the file "LICENSE"). If the file is missing,
- * or if you have any other questions related to the licence, please
- * write to Breach Security, Inc. at support@breach.com.
+ * This product is released under the terms of the General Public Licence,
+ * version 2 (GPLv2). Please refer to the file LICENSE (included with this
+ * distribution) which contains the complete text of the licence.
+ *
+ * There are special exceptions to the terms and conditions of the GPL
+ * as it is applied to this software. View the full text of the exception in
+ * file MODSECURITY_LICENSING_EXCEPTION in the directory of this software
+ * distribution.
+ *
+ * If any of the files related to licensing are missing or if you have any
+ * other questions related to licensing please contact Breach Security, Inc.
+ * directly using the email address support@breach.com.
  *
  */
 #include "modsecurity.h"
@@ -105,6 +113,10 @@ int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char *
     apr_procattr_io_set(procattr, APR_NO_PIPE, APR_FULL_BLOCK, APR_NO_PIPE);
     apr_procattr_cmdtype_set(procattr, APR_SHELLCMD);
 
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Exec: %s", log_escape_nq(r->pool, command));
+    }
+
     rc = apr_proc_create(procnew, command, argv, env, procattr, r->pool);
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Exec: Execution failed: %s (%s)", log_escape_nq(r->pool, command),
@@ -139,8 +151,10 @@ int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char *
                 p++;
             }
 
-            msr_log(msr, 4, "Exec: First line from script output: \"%s\"",
-                log_escape(r->pool, buf));
+            if (msr->txcfg->debuglog_level >= 4) {
+                msr_log(msr, 4, "Exec: First line from script output: \"%s\"",
+                    log_escape(r->pool, buf));
+            }
 
             if (output != NULL) *output = apr_pstrdup(r->pool, buf);
 
@@ -189,7 +203,9 @@ void record_time_checkpoint(modsec_rec *msr, int checkpoint_no) {
     apr_snprintf(note_name, 99, "mod_security-time%d", checkpoint_no);
     apr_table_set(msr->r->notes, note_name, note);
 
-    msr_log(msr, 4, "Time #%d: %s", checkpoint_no, note);
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "Time #%d: %s", checkpoint_no, note);
+    }
 }
 
 /**
