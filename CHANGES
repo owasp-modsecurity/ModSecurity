@@ -23,6 +23,8 @@
 * Added a licensing exception so that ModSecurity can be used in a derivative
   work when that derivative is also under an approved open source license.
 
+* Updated mlogc to version 1.4.5 which adds a LockFile directive and fixes an
+  issue in which the configuration file may be deleted.
 
 05 Jun 2008 - 2.5.5
 -------------------
