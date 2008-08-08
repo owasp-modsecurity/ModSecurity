@@ -30,6 +30,7 @@ my $DATA_DIR = "$SROOT_DIR/data";
 my $TEMP_DIR = "$SROOT_DIR/tmp";
 my $UPLOAD_DIR = "$SROOT_DIR/upload";
 my $CONF_DIR = "$SROOT_DIR/conf";
+my $MODULES_DIR = q(@APXS_LIBEXECDIR@);
 my $FILES_DIR = "$SROOT_DIR/logs";
 my $PID_FILE = "$FILES_DIR/httpd.pid";
 my $HTTPD = q(@APXS_HTTPD@);
@@ -45,6 +46,7 @@ $UA->agent($UA_NAME);
 # Hack for testing the script w/o configure
 if ($HTTPD eq "\@APXS_HTTPD\@") {
 	$HTTPD = "/usr/local/apache2/bin/httpd";
+	$MODULES_DIR = "/usr/local/apache2/modules";
 }
 
 $SIG{TERM} = $SIG{INT} = \&handle_interrupt;
@@ -117,6 +119,7 @@ unless (defined $opt{S}) {
 	TEMP_DIR => $TEMP_DIR,
 	UPLOAD_DIR => $UPLOAD_DIR,
 	CONF_DIR => $CONF_DIR,
+	MODULES_DIR => $MODULES_DIR,
 	LOGS_DIR => $FILES_DIR,
 	SCRIPT_DIR => $SCRIPT_DIR,
 	REGRESSION_DIR => $REG_DIR,

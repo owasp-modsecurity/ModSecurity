@@ -696,6 +696,7 @@ APXS_LIBDIR
 APXS_BINDIR
 APXS_SBINDIR
 APXS_PROGNAME
+APXS_LIBEXECDIR
 APXS_HTTPD
 PCRE_LIBS
 PCRE_CFLAGS
@@ -5107,6 +5108,7 @@ rm -f conftest*
   APXS_BINDIR="`$APXS -q BINDIR`"
   APXS_SBINDIR="`$APXS -q SBINDIR`"
   APXS_PROGNAME="`$APXS -q PROGNAME`"
+  APXS_LIBEXECDIR="`$APXS -q LIBEXECDIR`"
   if test "$APXS_SBINDIR" = "/"; then
     APXS_HTTPD="$APXS_SBINDIR/$APXS_PROGNAME"
   else
@@ -5334,6 +5336,7 @@ save_CPPFLAGS=$CPPFLAGS
 CPPFLAGS="$APXS_INCLUDES $CPPFLAGS"
 save_LDFLAGS=$LDFLAGS
 LDFLAGS="$APXS_LDFLAGS $LDFLAGS"
+
 
 
 
@@ -6520,6 +6523,7 @@ APXS_LIBDIR!$APXS_LIBDIR$ac_delim
 APXS_BINDIR!$APXS_BINDIR$ac_delim
 APXS_SBINDIR!$APXS_SBINDIR$ac_delim
 APXS_PROGNAME!$APXS_PROGNAME$ac_delim
+APXS_LIBEXECDIR!$APXS_LIBEXECDIR$ac_delim
 APXS_HTTPD!$APXS_HTTPD$ac_delim
 PCRE_LIBS!$PCRE_LIBS$ac_delim
 PCRE_CFLAGS!$PCRE_CFLAGS$ac_delim
@@ -6533,7 +6537,6 @@ APU_LDFLAGS!$APU_LDFLAGS$ac_delim
 APU_LINK_LD!$APU_LINK_LD$ac_delim
 LIBXML_LIBS!$LIBXML_LIBS$ac_delim
 LIBXML_CFLAGS!$LIBXML_CFLAGS$ac_delim
-LUA_LIBS!$LUA_LIBS$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -6575,13 +6578,14 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+LUA_LIBS!$LUA_LIBS$ac_delim
 LUA_CFLAGS!$LUA_CFLAGS$ac_delim
 CURL_LIBS!$CURL_LIBS$ac_delim
 CURL_CFLAGS!$CURL_CFLAGS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 4; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 5; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

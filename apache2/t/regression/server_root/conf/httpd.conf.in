@@ -7,18 +7,18 @@
 </IfDefine>
 
 <IfModule !mod_proxy.c>
-	LoadModule proxy_module modules/mod_proxy.so
-	LoadModule proxy_http_module modules/mod_proxy_http.so
+	LoadModule proxy_module @APXS_LIBEXECDIR@/mod_proxy.so
+	LoadModule proxy_http_module @APXS_LIBEXECDIR@/mod_proxy_http.so
 </IfModule>
 <IfModule !mod_unique_id.c>
-	LoadModule unique_id_module modules/mod_unique_id.so
+	LoadModule unique_id_module @APXS_LIBEXECDIR@/mod_unique_id.so
 </IfModule>
 
 <IfDefine !NOMODSEC>
 	# TODO: Need to have these configurable
 	LoadFile /usr/lib/libxml2.so
 	LoadFile /usr/lib/liblua5.1.so
-	LoadModule security2_module modules/mod_security2.so
+	LoadModule security2_module @APXS_LIBEXECDIR@/mod_security2.so
 </IfDefine>
 
 ServerName localhost
