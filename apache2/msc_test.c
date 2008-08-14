@@ -33,6 +33,8 @@
 #define RESULT_WRONGSIZE        -3
 #define RESULT_WRONGRET         -4
 
+#define DEFAULT_ACTION           "phase:2,log,auditlog,pass"
+
 #define CMDLINE_OPTS             "t:n:p:P:r:I:D:Nh"
 
 /* Types */
@@ -268,7 +270,7 @@ static int init_op(op_data_t *data, const char *name, const char *param, unsigne
         *errmsg = apr_psprintf(g_mp, "Failed to create ruleset for op \"%s\".", name);
         return -1;
     }
-    data->rule = msre_rule_create(data->ruleset, RULE_TYPE_NORMAL, conf_fn, 1, "UNIT_TEST", args, "t:none,pass,nolog", errmsg);
+    data->rule = msre_rule_create(data->ruleset, RULE_TYPE_NORMAL, conf_fn, 1, "UNIT_TEST", args, DEFAULT_ACTION, errmsg);
     if (data->rule == NULL) {
         *errmsg = apr_psprintf(g_mp, "Failed to create rule for op \"%s\": %s", name, *errmsg);
         return -1;
