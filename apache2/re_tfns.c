@@ -477,6 +477,101 @@ static int msre_fn_normalisePathWin_execute(apr_pool_t *mptmp, unsigned char *in
     return changed;
 }
 
+/* parityEven7bit */
+
+static int msre_fn_parityEven7bit_execute(apr_pool_t *mptmp, unsigned char *input,
+    long int input_len, char **rval, long int *rval_len)
+{
+    long int i;
+    int changed = 0;
+
+    if (rval == NULL) return -1;
+    *rval = NULL;
+
+    i = 0;
+    while(i < input_len) {
+        unsigned int x = input[i];
+
+        input[i] ^= input[i] >> 4;
+        input[i] &= 0xf;
+
+        if ((0x6996 >> input[i]) & 1) {
+            input[i] = x | 0x80;
+        }
+        else {
+            input[i] = x & 0x7f;
+        }
+
+        if (x != input[i]) changed = 1;
+        i++;
+    }
+
+    *rval = (char *)input;
+    *rval_len = input_len;
+
+    return changed;
+}
+
+/* parityZero7bit */
+
+static int msre_fn_parityZero7bit_execute(apr_pool_t *mptmp, unsigned char *input,
+    long int input_len, char **rval, long int *rval_len)
+{
+    long int i;
+    int changed = 0;
+
+    if (rval == NULL) return -1;
+    *rval = NULL;
+
+    i = 0;
+    while(i < input_len) {
+        unsigned char c = input[i];
+        input[i] &= 0x7f;
+        if (c != input[i]) changed = 1;
+        i++;
+    }
+
+    *rval = (char *)input;
+    *rval_len = input_len;
+
+    return changed;
+}
+
+/* parityOdd7bit */
+
+static int msre_fn_parityOdd7bit_execute(apr_pool_t *mptmp, unsigned char *input,
+    long int input_len, char **rval, long int *rval_len)
+{
+    long int i;
+    int changed = 0;
+
+    if (rval == NULL) return -1;
+    *rval = NULL;
+
+    i = 0;
+    while(i < input_len) {
+        unsigned int x = input[i];
+
+        input[i] ^= input[i] >> 4;
+        input[i] &= 0xf;
+
+        if ((0x6996 >> input[i]) & 1) {
+            input[i] = x & 0x7f;
+        }
+        else {
+            input[i] = x | 0x80;
+        }
+
+        if (x != input[i]) changed = 1;
+        i++;
+    }
+
+    *rval = (char *)input;
+    *rval_len = input_len;
+
+    return changed;
+}
+
 /* ------------------------------------------------------------------------------ */
 
 /**
@@ -595,6 +690,24 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     msre_engine_tfn_register(engine,
         "normalisePathWin",
         msre_fn_normalisePathWin_execute
+    );
+
+    /* parityEven7bit */
+    msre_engine_tfn_register(engine,
+        "parityEven7bit",
+        msre_fn_parityEven7bit_execute
+    );
+
+    /* parityZero7bit */
+    msre_engine_tfn_register(engine,
+        "parityZero7bit",
+        msre_fn_parityZero7bit_execute
+    );
+
+    /* parityOdd7bit */
+    msre_engine_tfn_register(engine,
+        "parityOdd7bit",
+        msre_fn_parityOdd7bit_execute
     );
 
     /* removeWhitespace */
