@@ -1226,38 +1226,102 @@ int css_decode_inplace(unsigned char *input, long int input_len) {
     i = count = 0;
     while (i < input_len) {
         if (input[i] == '\\') {
-            if (i + 1 < input_len) { /* Is there at least one more byte? */
-                /* We are not going to need the backslash. */
-                i++;
+            /* Is there at least one more byte? */
+            if (i + 1 < input_len) {
+                i++; /* We are not going to need the backslash. */
 
-                /* Find out how many hexadecimal characters there are. */
+                /* Check for 1-6 hex characters following the backslash */
                 j = 0;
-                while ((j < 6)&&(i + j < input_len)&&(VALID_HEX(input[i + j]))) {
+                while ((j < 6) && (i + j < input_len) &&
+                       (VALID_HEX(input[i + j])))
+                {
                     j++;
                 }
-
-                /* Do we have at least one hexadecimal character? */
                 if (j > 0) {
-                    if (j == 1) { /* One character. */
-                        *d++ = xsingle2c(&input[i]);
-                    } else { /* Two or more characters/ */
-                        /* For now just use the last two bytes. */
-                        // TODO What do we do if the other bytes are not zeros?
-                        *d++ = x2c(&input[i + j - 2]);
+                    int fullcheck = 0;
+
+                    /* For now just use the last two bytes. */
+                    // TODO What do we do if the other bytes are not zeros?
+                    switch (j) {
+                        /* Number of hex characters */
+                        case 1:
+                            *d++ = xsingle2c(&input[i]);
+                            break;
+                        case 2:
+                        case 3:
+                            *d++ = x2c(&input[i + j - 2]);
+                            break;
+                        case 4:
+                            *d = x2c(&input[i + 2]);
+                            fullcheck = 1;
+                            break;
+                        case 5:
+                            *d = x2c(&input[i + 3]);
+
+                            /* Do full check if first byte is 0 */
+                            if (input[i] == '0') {
+                                fullcheck = 1;
+                            }
+                            else {
+                                d++;
+                            }
+                            break;
+                        case 6:
+                            *d = x2c(&input[i + 4]);
+
+                            /* Do full check if first/second bytes are 0 */
+                            if ((input[i] == '0') &&
+                                (input[i + 1] == '0'))
+                            {
+                                fullcheck = 1;
+                            }
+                            else {
+                                d++;
+                            }
+                            break;
+                    }
+
+                    /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
+                    if (fullcheck) {
+                        if (   (*d > 0x00) && (*d < 0x5f)
+                            && ((input[i + j - 3] == 'f') ||
+                                (input[i + j - 3] == 'F'))
+                            && ((input[i + j - 4] == 'f') ||
+                                (input[i + j - 4] == 'F')))
+                        {
+                            (*d) += 0x20;
+                        }
+
+                        d++;
+                    }
+
+                    /* We must ignore a single whitespace after a hex escape */
+                    if ((i + j < input_len) && isspace(input[i + j])) {
+                        j++;
                     }
     
                     /* Move over. */
                     count++;
                     i += j;
-                } else {
-                    /* Invalid encoding, but we can't really do anything about it. */
                 }
-            } else {
-                // TODO What do we do with the trailing backslash?
+
+                /* "\<newline>" must be removed */
+                else if (input[i] == '\n') {
+                    i++;
+                }
+
+                /* Otherwise we just escape the next character */
+                else {
+                    *d++ = input[i++];
+                    count++;
+                }
+            }
+            
+            /* We have a trailing escape */
+            else {
+                i++; /* Do not include it (continuation to nothing) */
             }
         } else {
-            // TODO Not sure if we should remove the new line character here
-            //      (see the specification for more information).
             *d++ = input[i++];
             count++;
         }
