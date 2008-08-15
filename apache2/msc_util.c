@@ -341,6 +341,17 @@ unsigned char x2c(unsigned char *what) {
 }
 
 /**
+ * Converts a single hexadecimal digit into a decimal value.
+ */
+unsigned char xsingle2c(unsigned char *what) {
+    register unsigned char digit;
+
+    digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
+
+    return digit;
+}
+
+/**
  *
  */
 char *guess_tmp_dir(apr_pool_t *p) {
@@ -1198,4 +1209,125 @@ char *resolve_relative_path(apr_pool_t *pool, const char *parent_filename, const
     return apr_pstrcat(pool, apr_pstrndup(pool, parent_filename,
         strlen(parent_filename) - strlen(apr_filepath_name_get(parent_filename))),
         filename, NULL);
+}
+
+/**
+ *
+ * References:
+ *     http://www.w3.org/TR/REC-CSS2/syndata.html#q4
+ *     http://www.unicode.org/roadmaps/
+ */
+int css_decode_inplace(unsigned char *input, long int input_len) {
+    unsigned char *d = (unsigned char *)input;
+    long int i, j, count;
+
+    if (input == NULL) return -1;
+
+    i = count = 0;
+    while (i < input_len) {
+        if (input[i] == '\\') {
+            /* Is there at least one more byte? */
+            if (i + 1 < input_len) {
+                i++; /* We are not going to need the backslash. */
+
+                /* Check for 1-6 hex characters following the backslash */
+                j = 0;
+                while ((j < 6) && (i + j < input_len) &&
+                       (VALID_HEX(input[i + j])))
+                {
+                    j++;
+                }
+                if (j > 0) {
+                    int fullcheck = 0;
+
+                    /* For now just use the last two bytes. */
+                    // TODO What do we do if the other bytes are not zeros?
+                    switch (j) {
+                        /* Number of hex characters */
+                        case 1:
+                            *d++ = xsingle2c(&input[i]);
+                            break;
+                        case 2:
+                        case 3:
+                            *d++ = x2c(&input[i + j - 2]);
+                            break;
+                        case 4:
+                            *d = x2c(&input[i + 2]);
+                            fullcheck = 1;
+                            break;
+                        case 5:
+                            *d = x2c(&input[i + 3]);
+
+                            /* Do full check if first byte is 0 */
+                            if (input[i] == '0') {
+                                fullcheck = 1;
+                            }
+                            else {
+                                d++;
+                            }
+                            break;
+                        case 6:
+                            *d = x2c(&input[i + 4]);
+
+                            /* Do full check if first/second bytes are 0 */
+                            if ((input[i] == '0') &&
+                                (input[i + 1] == '0'))
+                            {
+                                fullcheck = 1;
+                            }
+                            else {
+                                d++;
+                            }
+                            break;
+                    }
+
+                    /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
+                    if (fullcheck) {
+                        if (   (*d > 0x00) && (*d < 0x5f)
+                            && ((input[i + j - 3] == 'f') ||
+                                (input[i + j - 3] == 'F'))
+                            && ((input[i + j - 4] == 'f') ||
+                                (input[i + j - 4] == 'F')))
+                        {
+                            (*d) += 0x20;
+                        }
+
+                        d++;
+                    }
+
+                    /* We must ignore a single whitespace after a hex escape */
+                    if ((i + j < input_len) && isspace(input[i + j])) {
+                        j++;
+                    }
+    
+                    /* Move over. */
+                    count++;
+                    i += j;
+                }
+
+                /* "\<newline>" must be removed */
+                else if (input[i] == '\n') {
+                    i++;
+                }
+
+                /* Otherwise we just escape the next character */
+                else {
+                    *d++ = input[i++];
+                    count++;
+                }
+            }
+            
+            /* We have a trailing escape */
+            else {
+                i++; /* Do not include it (continuation to nothing) */
+            }
+        } else {
+            *d++ = input[i++];
+            count++;
+        }
+    }
+
+    *d = '\0';
+
+    return count;
 }
