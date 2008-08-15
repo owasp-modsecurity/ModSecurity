@@ -4,7 +4,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.7-dev1 (July 31, 2008)</releaseinfo>
+    <releaseinfo>Version 2.5.7-dev1 (August 15, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -3718,6 +3718,19 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     </section>
 
     <section>
+      <title>cssDecode</title>
+
+      <para>Decodes CSS-encoded characters, as specified at <ulink
+      url="http://www.w3.org/TR/REC-CSS2/syndata.html">http://www.w3.org/TR/REC-CSS2/syndata.html</ulink>.
+      This function uses only up to two bytes in the decoding process, meaning
+      it is useful to uncover ASCII characters (that wouldn't normally be
+      encoded) encoded using CSS encoding, or to counter evasion which is a
+      combination of a backslash and non-hexadecimal characters (e.g.
+      <literal>ja\vascript</literal> is equivalent to
+      <literal>javascript</literal>).</para>
+    </section>
+
+    <section>
       <title><literal>escapeSeqDecode</literal></title>
 
       <para>This function decode ANSI C escape sequences:<literal
@@ -3838,6 +3851,28 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
 
       <para>Same as normalisePath, but will first convert backslash characters
       to forward slashes.</para>
+    </section>
+
+    <section>
+      <title><literal>parityEven7bit</literal></title>
+
+      <para>This function calculates even parity of 7-bit data replacing
+      the 8th bit of each target byte with the calculated parity bit.</para>
+    </section>
+
+    <section>
+      <title><literal>parityOdd7bit</literal></title>
+
+      <para>This function calculates odd parity of 7-bit data replacing
+      the 8th bit of each target byte with the calculated parity bit.</para>
+    </section>
+
+    <section>
+      <title><literal>parityZero7bit</literal></title>
+
+      <para>This function calculates zero parity of 7-bit data replacing
+      the 8th bit of each target byte with a zero parity bit which allows
+      inspection of even/odd parity 7bit data as ASCII7 data.</para>
     </section>
 
     <section>
@@ -5456,7 +5491,7 @@ SecRule REQUEST_HEADERS:Ip-Address "!<emphasis>@streq %{TX.1}</emphasis>"</progr
 SecRule REQUEST_HEADERS:Content-Type ^text/xml$ \
     phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML
 SecRule REQBODY_PROCESSOR "!^XML$" nolog,pass,skipAfter:12345
-SecRule XML "<emphasis>@validateDTD /path/to/apache2/conf/xml.dtd</emphasis>,id:12345"</programlisting>
+SecRule XML "<emphasis>@validateDTD /path/to/apache2/conf/xml.dtd</emphasis>" "deny,id:12345"</programlisting>
     </section>
 
     <section>
@@ -5471,7 +5506,7 @@ SecRule XML "<emphasis>@validateDTD /path/to/apache2/conf/xml.dtd</emphasis>,id:
 SecRule REQUEST_HEADERS:Content-Type ^text/xml$ \
     phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML
 SecRule REQBODY_PROCESSOR "!^XML$" nolog,pass,skipAfter:12345
-SecRule XML "<emphasis>@validateSchema /path/to/apache2/conf/xml.xsd</emphasis>,id:12345"</programlisting>
+SecRule XML "<emphasis>@validateSchema /path/to/apache2/conf/xml.xsd</emphasis>" "deny,id:12345"</programlisting>
 
       <para>This operator requires request body to be processed as XML.</para>
     </section>
