@@ -166,7 +166,7 @@
 		SecRequestBodyLimit 5
 	),
 	match_log => {
-		error => [ qr/Request body is larger than the configured limit \(5\)\./, 1 ],
+		error => [ qr/Request body .*is larger than the configured limit \(5\)\./, 1 ],
 	},
 	match_response => {
 		status => qr/^413$/,
