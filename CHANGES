@@ -1,7 +1,15 @@
 31 Jul 2008 - trunk
-=======
+-------------------
 
- * Implement cssDecode.
+ * Allow for disabling request body limit checks in phase:1.
+
+ * Added transformations for processing parity for legacy protocols ported
+   to HTTP(S): t:parityEven7bit, t:parityOdd7bit, t:parityZero7bit
+
+ * Added t:cssDecode transformation to decode CSS escapes.
+
+ * Now log XML parsing/validation warnings and errors to be in the debug log
+   at levels 3 and 4, respectivly.
 
  * Persistent counter updates are now atomic.
 
