@@ -45,6 +45,8 @@ int DSOLOCAL remove_lf_crlf_inplace(char *text);
 
 unsigned char DSOLOCAL x2c(unsigned char *what);
 
+unsigned char DSOLOCAL xsingle2c(unsigned char *what);
+
 char DSOLOCAL *guess_tmp_dir(apr_pool_t *p);
 
 char DSOLOCAL *current_logtime(apr_pool_t *mp);
@@ -89,5 +91,7 @@ char DSOLOCAL *modsec_build(apr_pool_t *mp);
 int DSOLOCAL is_empty_string(const char *string);
 
 char DSOLOCAL *resolve_relative_path(apr_pool_t *pool, const char *parent_filename, const char *filename);
+
+int DSOLOCAL css_decode_inplace(unsigned char *input, long int input_len);
 
 #endif
