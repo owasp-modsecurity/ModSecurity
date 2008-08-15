@@ -128,6 +128,60 @@ void msr_log(modsec_rec *msr, int level, const char *text, ...) {
     va_end(ap);
 }
 
+void msr_log_error(modsec_rec *msr, const char *text, ...) {
+    va_list ap;
+    int level = 3;
+    char str1[1024] = "";
+    char str2[1256] = "";
+
+    if ((msr == NULL) || (level > msr->txcfg->debuglog_level)) {
+        return;
+    }
+    if (msr->txcfg->debuglog_fd == NOT_SET_P) {
+        if (apr_file_open(&msr->txcfg->debuglog_fd, msr->txcfg->debuglog_name, APR_READ|APR_WRITE|APR_CREATE|APR_APPEND|APR_BINARY, APR_OS_DEFAULT, g_mp) != APR_SUCCESS) {
+            fprintf(stderr, "ERROR: failed to create unit test debug log \"%s\".\n", msr->txcfg->debuglog_name);
+            msr->txcfg->debuglog_fd = NULL;
+        }
+    }
+
+    va_start(ap, text);
+    if (msr->txcfg->debuglog_fd != NULL) {
+        apr_size_t nbytes_written = 0;
+        apr_vsnprintf(str1, sizeof(str1), text, ap);
+        apr_snprintf(str2, sizeof(str2), "%lu: [%d] [%s] %s\n", (unsigned long)getpid(), level, test_name, str1);
+
+        apr_file_write_full(msr->txcfg->debuglog_fd, str2, strlen(str2), &nbytes_written);
+    }
+    va_end(ap);
+}
+
+void msr_log_warn(modsec_rec *msr, const char *text, ...) {
+    va_list ap;
+    int level = 4;
+    char str1[1024] = "";
+    char str2[1256] = "";
+
+    if ((msr == NULL) || (level > msr->txcfg->debuglog_level)) {
+        return;
+    }
+    if (msr->txcfg->debuglog_fd == NOT_SET_P) {
+        if (apr_file_open(&msr->txcfg->debuglog_fd, msr->txcfg->debuglog_name, APR_READ|APR_WRITE|APR_CREATE|APR_APPEND|APR_BINARY, APR_OS_DEFAULT, g_mp) != APR_SUCCESS) {
+            fprintf(stderr, "ERROR: failed to create unit test debug log \"%s\".\n", msr->txcfg->debuglog_name);
+            msr->txcfg->debuglog_fd = NULL;
+        }
+    }
+
+    va_start(ap, text);
+    if (msr->txcfg->debuglog_fd != NULL) {
+        apr_size_t nbytes_written = 0;
+        apr_vsnprintf(str1, sizeof(str1), text, ap);
+        apr_snprintf(str2, sizeof(str2), "%lu: [%d] [%s] %s\n", (unsigned long)getpid(), level, test_name, str1);
+
+        apr_file_write_full(msr->txcfg->debuglog_fd, str2, strlen(str2), &nbytes_written);
+    }
+    va_end(ap);
+}
+
 const char *ap_get_remote_host(conn_rec *conn, void *dir_config, int type, int *str_is_ip) {
     return "FAKE-REMOTE-HOST";
 }
