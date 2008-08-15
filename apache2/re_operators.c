@@ -891,6 +891,12 @@ static int msre_op_validateDTD_execute(modsec_rec *msr, msre_rule *rule, msre_va
         return -1;
     }
 
+    /* Send validator errors/warnings to msr_log */
+    /* NOTE: No xmlDtdSetValidErrors()? */
+    cvp->error = (xmlSchemaValidityErrorFunc)msr_log_error;
+    cvp->warning = (xmlSchemaValidityErrorFunc)msr_log_warn;
+    cvp->userData = msr;
+
     if (!xmlValidateDtd(cvp, msr->xml->doc, dtd)) {
         *error_msg = "XML: DTD validation failed.";
         xmlFreeValidCtxt(cvp);
@@ -935,6 +941,9 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
         return -1;
     }
 
+    /* Send parser errors/warnings to msr_log */
+    xmlSchemaSetParserErrors(parserCtx, (xmlSchemaValidityErrorFunc)msr_log_error, (xmlSchemaValidityWarningFunc)msr_log_warn, msr);
+
     schema = xmlSchemaParse(parserCtx);
     if (schema == NULL) {
         *error_msg = apr_psprintf(msr->mp, "XML: Failed to load Schema: %s", rule->op_param);
@@ -949,6 +958,9 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
         xmlSchemaFreeParserCtxt(parserCtx);
         return -1;
     }
+
+    /* Send validator errors/warnings to msr_log */
+    xmlSchemaSetValidErrors(validCtx, (xmlSchemaValidityErrorFunc)msr_log_error, (xmlSchemaValidityWarningFunc)msr_log_warn, msr);
 
     rc = xmlSchemaValidateDoc(validCtx, msr->xml->doc);
     if (rc != 0) {

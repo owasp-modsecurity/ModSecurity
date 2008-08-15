@@ -92,6 +92,10 @@ void DSOLOCAL internal_log(request_rec *r, directory_config *dcfg, modsec_rec *m
 
 void DSOLOCAL msr_log(modsec_rec *msr, int level, const char *text, ...) PRINTF_ATTRIBUTE(3,4);
 
+void DSOLOCAL msr_log_error(modsec_rec *msr, const char *text, ...) PRINTF_ATTRIBUTE(2,3);
+
+void DSOLOCAL msr_log_warn(modsec_rec *msr, const char *text, ...) PRINTF_ATTRIBUTE(2,3);
+
 char DSOLOCAL *format_error_log_message(apr_pool_t *mp, error_message *em);
 
 const DSOLOCAL char *get_response_protocol(request_rec *r);
