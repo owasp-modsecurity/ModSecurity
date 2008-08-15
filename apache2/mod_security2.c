@@ -570,17 +570,19 @@ static int hook_request_early(request_rec *r) {
         return DECLINED;
     }
 
-    /* Check request body limit (should only trigger on non-chunked requests). */
-    if (msr->request_content_length > msr->txcfg->reqbody_limit) {
-        msr_log(msr, 1, "Request body is larger than the "
-                     "configured limit (%ld).", msr->txcfg->reqbody_limit);
-        return HTTP_REQUEST_ENTITY_TOO_LARGE;
-    }
-
     /* Process phase REQUEST_HEADERS */
     rc = DECLINED;
     if (modsecurity_process_phase(msr, PHASE_REQUEST_HEADERS) > 0) {
         rc = perform_interception(msr);
+    }
+
+    if ((msr->txcfg->is_enabled != MODSEC_DISABLED) && (rc == DECLINED)) {
+        /* Check request body limit (non-chunked requests only). */
+        if (msr->request_content_length > msr->txcfg->reqbody_limit) {
+            msr_log(msr, 1, "Request body (Content-Length) is larger than the "
+                         "configured limit (%ld).", msr->txcfg->reqbody_limit);
+            return HTTP_REQUEST_ENTITY_TOO_LARGE;
+        }
     }
 
     return rc;
