@@ -8,6 +8,7 @@ LUA_CONFIG="pkg-config"
 LUA_PKGNAMES="lua5.1 lua5 lua"
 LUA_CFLAGS=""
 LUA_LIBS=""
+LUA_SONAMES="so la sl dll dylib"
 
 AC_DEFUN([CHECK_LUA],
 [dnl
@@ -21,7 +22,7 @@ AC_ARG_WITH(
 if test "${lua_path}" != "no"; then
     dnl # Determine lua lib directory
     if test -z "${lua_path}"; then
-        test_paths="/usr/local /usr"
+        test_paths="/usr /usr/local /opt"
     else
         test_paths="${lua_path}"
     fi
@@ -58,52 +59,87 @@ if test "${lua_path}" != "no"; then
         dnl Hack to just try to find the lib and include
         AC_MSG_CHECKING([for lua install])
         for x in ${test_paths}; do
-            if test -e "${x}/liblua5.1.a"; then
-                with_lua_lib="${x}"
-                lua_lib_name="lua5.1"
+            for y in ${LUA_SONAMES}; do
+                if test -e "${x}/liblua5.1.${y}"; then
+                    with_lua_lib="${x}"
+                    lua_lib_name="lua5.1"
+                    break
+                elif test -e "${x}/lib/liblua5.1.${y}"; then
+                    with_lua_lib="${x}/lib"
+                    lua_lib_name="lua5.1"
+                    break
+                elif test -e "${x}/lib64/liblua5.1.${y}"; then
+                    with_lua_lib="${x}/lib64"
+                    lua_lib_name="lua5.1"
+                    break
+                elif test -e "${x}/lib32/liblua5.1.${y}"; then
+                    with_lua_lib="${x}/lib32"
+                    lua_lib_name="lua5.1"
+                    break
+                elif test -e "${x}/liblua51.${y}"; then
+                    with_lua_lib="${x}"
+                    lua_lib_name="lua51"
+                    break
+                elif test -e "${x}/lib/liblua51.${y}"; then
+                    with_lua_lib="${x}/lib"
+                    lua_lib_name="lua51"
+                    break
+                elif test -e "${x}/lib64/liblua51.${y}"; then
+                    with_lua_lib="${x}/lib64"
+                    lua_lib_name="lua51"
+                    break
+                elif test -e "${x}/lib32/liblua51.${y}"; then
+                    with_lua_lib="${x}/lib32"
+                    lua_lib_name="lua51"
+                    break
+                elif test -e "${x}/liblua.${y}"; then
+                    with_lua_lib="${x}"
+                    lua_lib_name="lua"
+                    break
+                elif test -e "${x}/lib/liblua.${y}"; then
+                    with_lua_lib="${x}/lib"
+                    lua_lib_name="lua"
+                    break
+                elif test -e "${x}/lib64/liblua.${y}"; then
+                    with_lua_lib="${x}/lib64"
+                    lua_lib_name="lua"
+                    break
+                elif test -e "${x}/lib32/liblua.${y}"; then
+                    with_lua_lib="${x}/lib32"
+                    lua_lib_name="lua"
+                    break
+                else
+                    with_lua_lib=""
+                    lua_lib_name=""
+                fi
+            done
+            if test -n "$with_lua_lib"; then
                 break
-            elif test -e "${x}/lib/liblua5.1.a"; then
-                with_lua_lib="${x}/lib"
-                lua_lib_name="lua5.1"
-                break
-            elif test -e "${x}/lib64/liblua5.1.a"; then
-                with_lua_lib="${x}/lib64"
-                lua_lib_name="lua5.1"
-                break
-            elif test -e "${x}/lib32/liblua5.1.a"; then
-                with_lua_lib="${x}/lib32"
-                lua_lib_name="lua5.1"
-                break
-            elif test -e "${x}/liblua.a"; then
-                with_lua_lib="${x}"
-                lua_lib_name="lua"
-                break
-            elif test -e "${x}/lib/liblua.a"; then
-                with_lua_lib="${x}/lib"
-                lua_lib_name="lua"
-                break
-            elif test -e "${x}/lib64/liblua.a"; then
-                with_lua_lib="${x}/lib64"
-                lua_lib_name="lua"
-                break
-            elif test -e "${x}/lib32/liblua.a"; then
-                with_lua_lib="${x}/lib32"
-                lua_lib_name="lua"
-                break
-            else
-                with_lua_lib=""
-                lua_lib_name=""
             fi
         done
         for x in ${test_paths}; do
-            if test -e "${x}/lua.h"; then
-                with_lua_inc="${x}"
-                break
-            elif test -e "${x}/include/lua.h"; then
+            if test -e "${x}/include/lua.h"; then
                 with_lua_inc="${x}/include"
                 break
-            else
-                with_lua_inc=""
+            elif test -e "${x}/lua.h"; then
+                with_lua_inc="${x}"
+                break
+            fi
+
+            dnl # Check some sub-paths as well
+            for lua_pkg_name in ${lua_lib_name} ${LUA_PKGNAMES}; do
+                if test -e "${x}/include/${lua_pkg_name}/lua.h"; then
+                    with_lua_inc="${x}/include"
+                    break
+                elif test -e "${x}/${lua_pkg_name}/lua.h"; then
+                    with_lua_inc="${x}"
+                    break
+                else
+                    with_lua_inc=""
+                fi
+            done
+            if test -n "$with_lua_inc"; then
+                break
             fi
         done
         if test -n "${with_lua_lib}" -a -n "${with_lua_inc}"; then
