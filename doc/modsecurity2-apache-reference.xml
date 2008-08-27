@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 <article>
   <title><trademark class="registered">ModSecurity</trademark> Reference
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.7-dev1 (August 15, 2008)</releaseinfo>
+    <releaseinfo>Version 2.5.7-dev1 (August 27, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -648,8 +650,11 @@ SecAuditLogStorageDir logs/audit
     <section>
       <title><literal>SecAuditLogParts</literal></title>
 
-      <para><emphasis>Description:</emphasis> Defines the path to the main
-      audit log file.</para>
+      <para><emphasis>Description:</emphasis> Defines which part of each
+      transaction are going to be recorded in audit log. Each part is assigned
+      a single letter. If a letter appears in the list then the equivalent
+      part of each transactions will be recorded. See below for the list of
+      all parts.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
       moreinfo="none">SecAuditLogParts PARTS</literal></para>
@@ -1192,21 +1197,31 @@ SecAuditLogStorageDir logs/audit
       <para><emphasis>Version:</emphasis> 2.0.0</para>
 
       <para><emphasis>Dependencies/Notes:</emphasis> Rules following a
-      SecDefaultAction directive will inherit this setting unless a specific
-      action is specified for an individual rule or until another
-      SecDefaultAction is specified. Take special note that in the logging
-      disruptive actions are not allowed, but this can inadvertently be
-      inherited using a disruptive action in SecDefaultAction.</para>
+      <literal>SecDefaultAction</literal> directive will inherit this setting
+      unless a specific action is specified for an individual rule or until
+      another <literal>SecDefaultAction</literal> is specified. Take special
+      note that in the logging disruptive actions are not allowed, but this
+      can inadvertently be inherited using a disruptive action in
+      <literal>SecDefaultAction</literal>.</para>
 
       <para>The default value is minimal (differing from previous
       versions):</para>
 
       <programlisting format="linespecific">SecDefaultAction phase:2,log,auditlog,pass</programlisting>
 
-      <para><emphasis>Note</emphasis></para>
+      <note>
+        <para><literal>SecDefaultAction</literal> must specify a disruptive
+        action and a processing phase and cannot contain metadata
+        actions.</para>
+      </note>
 
-      <para>SecDefaultAction must specify a disruptive action and a processing
-      phase and cannot contain metadata actions.</para>
+      <warning>
+        <para><literal>SecDefaultAction</literal> is <emphasis>not</emphasis>
+        inherited across configuration contexts. (For an example of why this
+        may be a problem for you, read the following ModSecurity Blog entry
+        <ulink
+        url="http://blog.modsecurity.org/2008/07/modsecurity-tri.html">http://blog.modsecurity.org/2008/07/modsecurity-tri.html</ulink>).</para>
+      </warning>
     </section>
 
     <section>
@@ -1283,11 +1298,12 @@ SecAuditLogStorageDir logs/audit
       <title><literal>SecMarker</literal></title>
 
       <para><emphasis>Description:</emphasis> Adds a fixed rule marker in the
-      ruleset to be used as a target in a <emphasis>skipAfter</emphasis>
-      action.</para>
+      ruleset to be used as a target in a <literal>skipAfter</literal> action.
+      A <literal>SecMarker</literal> directive essentially creates a rule that
+      does nothing and whose only purpose it to carry the given ID.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal moreinfo="none">SecMarker
-      id</literal></para>
+      ID</literal></para>
 
       <para><emphasis>Example Usage:</emphasis> <literal
       moreinfo="none">SecMarker 9999</literal></para>
@@ -1309,7 +1325,8 @@ SecRule &amp;REQUEST_HEADERS:Host "@eq 0" \
     "deny,log,status:400,id:08,severity:4,msg:'Missing a Host Header'"
 SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
     "log,deny,log,status:400,id:15,msg:'Request Missing an Accept Header'"
-<emphasis>SecMarker 99</emphasis></programlisting></para>
+<emphasis>
+SecMarker 99</emphasis></programlisting></para>
     </section>
 
     <section>
@@ -1794,21 +1811,84 @@ SecResponseBodyLimit 524288</programlisting>
       </section>
 
       <section>
+        <title>Collections</title>
+
+        <para>A variable can contain one or many pieces of data, depending on
+        the nature of the variable and the way it is used. We've seen examples
+        of both approaches in the previous section. When a variable can
+        contain more than one value we refer to it as a
+        <emphasis>collection</emphasis>.</para>
+
+        <para>Collections are always expanded before a rule is run. For
+        example, the following rule:</para>
+
+        <programlisting>SecRule ARGS dirty</programlisting>
+
+        <para>will be expanded to:</para>
+
+        <programlisting>SecRule ARGS:p dirty
+SecRule ARGS:q dirty</programlisting>
+
+        <para>in a requests that has only two parameters, named
+        <literal>p</literal> and <literal>q</literal>.</para>
+
+        <para>Collections come in several flavours:</para>
+
+        <variablelist>
+          <varlistentry>
+            <term>Read-only</term>
+
+            <listitem>
+              <para>Created at runtime using transaction data. For example:
+              <literal>ARGS</literal> (contains a list of all request
+              parameter values) and <literal>REQUEST_HEADERS</literal>
+              (contains a list of all request header values).</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Transient Read/Write</term>
+
+            <listitem>
+              <para>The <literal>TX</literal> collection is created (empty)
+              for every transaction. Rules can read from it and write to it
+              (using the <literal>setvar</literal> action, for example), but
+              the information stored in this collection will not survive the
+              end of transaction.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Persistent Read/Write</term>
+
+            <listitem>
+              <para>There are several collections that can be written to, but
+              which are persisted to the storage backend. These collections
+              are used to track clients across transactions. Examples of
+              collections that fall into this type are <literal>IP</literal>,
+              <literal>SESSION</literal> and <literal>USER</literal>.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </section>
+
+      <section>
         <title>Operators in rules</title>
 
         <para>In the simplest possible case you will use a regular expression
         pattern as the second rule parameter. This is what we've done in the
         examples above. If you do this ModSecurity assumes you want to use the
-        <literal moreinfo="none">rx</literal> operator. You can explicitly
-        specify the operator you want to use by using <literal
-        moreinfo="none">@</literal> as the first character in the second rule
+        <literal moreinfo="none">rx</literal> (regular expression) operator.
+        You can also explicitly specify the operator you want to use by using
+        <literal moreinfo="none">@</literal>, followed by the name of an
+        operator, at the beginning of the second <literal>SecRule</literal>
         parameter:</para>
 
         <programlisting format="linespecific">SecRule ARGS "@rx dirty"</programlisting>
 
         <para>Note how we had to use double quotes to delimit the second rule
-        parameter. This is because the second parameter now has a whitespace
-        in it. Any number of whitespace characters can follow the name of the
+        parameter. This is because the second parameter now has whitespace in
+        it. Any number of whitespace characters can follow the name of the
         operator. If there are any non-whitespace characters there, they will
         all be treated as a special parameter to the operator. In the case of
         the regular expression operator the special parameter is the pattern
@@ -1818,6 +1898,40 @@ SecResponseBodyLimit 524288</programlisting>
         negate the result returned by the operator:</para>
 
         <programlisting format="linespecific">SecRule &amp;ARGS "!@rx ^0$"</programlisting>
+      </section>
+
+      <section>
+        <title>Operator negation</title>
+
+        <para>Operator results can be negated by using an exclamation mark at
+        the beginning of the second parameter. The following rule matches if
+        the word <literal>dirty</literal> does <emphasis>not</emphasis> appear
+        in the <literal>User-Agent</literal> request header:</para>
+
+        <programlisting>SecRule REQUEST_HEADERS:User-Agent !dirty</programlisting>
+
+        <para>You can use the exclamation mark in combination with any
+        parameter. If you do, the exclamation mark needs to go first, followed
+        by the explicit operator reference. The following rule has the same
+        effect as the previous example:</para>
+
+        <programlisting>SecRule REQUEST_HEADERS:User-Agent "!@rx dirty"</programlisting>
+
+        <para>If you need to use negation in a rule that is going to be
+        applied to several variables then it may not be immediately clear what
+        will happen. Consider the following example:</para>
+
+        <programlisting>SecRule ARGS:p|ARGS:q !dirty</programlisting>
+
+        <para>The above rule is identical to:</para>
+
+        <programlisting>SecRule ARGS:p !dirty
+SecRule ARGS:q !dirty</programlisting>
+
+        <warning>
+          <para>Negation is applied to operations against individual
+          operations, not agains the entire variable list.</para>
+        </warning>
       </section>
 
       <section>
@@ -1897,6 +2011,18 @@ ServerAlias www.app2.com
         <listitem>
           <para><literal moreinfo="none">Off</literal> - do not inherit rules
           from the parent context.</para>
+
+          <note>
+            <para>Configuration contexts are an Apache concept. Directives
+            <literal>&lt;Directory&gt;</literal>,
+            <literal>&lt;Files&gt;</literal>,
+            <literal>&lt;Location&gt;</literal> and
+            <literal>&lt;VirtualHost&gt;</literal> are all used to create
+            configuration contexts. For more information please go to the
+            Apache documentation section <ulink
+            url="http://httpd.apache.org/docs/2.0/sections.html">Configuration
+            Sections</ulink>.</para>
+          </note>
         </listitem>
       </itemizedlist>
     </section>
@@ -3240,7 +3366,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     <section>
       <title><literal moreinfo="none">RESPONSE_PROTOCOL</literal></title>
 
-      <para>This variable holds the HTTP Response Protocol information.
+      <para>This variable holds the HTTP response protocol information.
       Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis>RESPONSE_PROTOCOL</emphasis> "^HTTP\/0\.9"</programlisting>
@@ -3249,7 +3375,7 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
     <section>
       <title><literal moreinfo="none">RESPONSE_STATUS</literal></title>
 
-      <para>This variable holds the HTTP Response Status Code generated by
+      <para>This variable holds the HTTP response status code as generated by
       Apache. Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis>RESPONSE_STATUS</emphasis> "^[45]"</programlisting>
@@ -3581,10 +3707,10 @@ SecRule REQUEST_HEADERS:Transfer-Encoding "!^$"</programlisting>
     <section>
       <title><literal moreinfo="none">XML</literal></title>
 
-      <para>Can be used standalone (as a target for validateDTD and
-      validateSchema) or with an XPath expression parameter (which makes it a
-      valid target for any function that accepts plain text). Example using
-      XPath:</para>
+      <para>Can be used standalone (as a target for
+      <literal>validateDTD</literal> and <literal>validateSchema</literal>) or
+      with an XPath expression parameter (which makes it a valid target for
+      any function that accepts plain text). Example using XPath:</para>
 
       <programlisting format="linespecific">SecDefaultAction log,deny,status:403,phase:2
 SecRule REQUEST_HEADERS:Content-Type ^text/xml$ \
@@ -3713,8 +3839,8 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
       <title><literal>compressWhitespace</literal></title>
 
       <para>It converts whitespace characters (32, \f, \t, \n, \r, \v, 160) to
-      spaces (ASCII 32) and then compresses multiple space characters into
-      only one.</para>
+      spaces (ASCII 32) and then compresses multiple consecutive space
+      characters into one.</para>
     </section>
 
     <section>
@@ -3797,45 +3923,52 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
           moreinfo="none">&amp;gt;</literal></para>
         </listitem>
       </itemizedlist>
+
+      <para>This function will convert any entity into a single byte only,
+      possibly resulting in a loss of information. It is thus useful to
+      uncover bytes that would otherwise not need to be encoded, but it cannot
+      do anything with the characters from the range above 255.</para>
     </section>
 
     <section>
       <title><literal>jsDecode</literal></title>
 
-      <para>Decodes JavaScript escape sequences. If a \uHHHH code is in the
-      range of FF01-FF5E (the full width ASCII codes), then the higher byte is
-      used to detect and adjust the lower byte. Otherwise, only the lower byte
-      will be used and the higher byte zeroed.</para>
+      <para>Decodes JavaScript escape sequences. If a
+      <literal>\uHHHH</literal> code is in the range of
+      <literal>FF01</literal>-<literal>FF5E</literal> (the full width ASCII
+      codes), then the higher byte is used to detect and adjust the lower
+      byte. Otherwise, only the lower byte will be used and the higher byte
+      zeroed.</para>
     </section>
 
     <section>
       <title><literal>length</literal></title>
 
       <para>This function converts the input to its numeric length (count of
-      characters).</para>
+      bytes).</para>
     </section>
 
     <section>
       <title><literal>lowercase</literal></title>
 
-      <para>This function is enabled by default. It converts all characters to
-      lowercase using the current C locale.</para>
+      <para>This function converts all characters to lowercase using the
+      current C locale.</para>
     </section>
 
     <section>
       <title><literal>md5</literal></title>
 
       <para>This function calculates an MD5 hash from input. Note that the
-      computed hash is in a raw binary form and may need encoded to be usable
-      (EX: t:md5,t:hexEncode).</para>
+      computed hash is in a raw binary form and may need encoded into text to
+      be usable (for example: <literal>t:md5,t:hexEncode</literal>).</para>
     </section>
 
     <section>
       <title><literal><literal>none</literal></literal></title>
 
-      <para>This not an actual transformation function but an instruction to
+      <para>Not an actual transformation function, but an instruction to
       ModSecurity to remove all transformation functions associated with the
-      current rule and start from scratch.</para>
+      current rule.</para>
     </section>
 
     <section>
@@ -3843,35 +3976,35 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
 
       <para>This function will remove multiple slashes, self-references and
       directory back-references (except when they are at the beginning of the
-      path).</para>
+      input).</para>
     </section>
 
     <section>
       <title><literal>normalisePathWin</literal></title>
 
-      <para>Same as normalisePath, but will first convert backslash characters
-      to forward slashes.</para>
+      <para>Same as <literal>normalisePath</literal>, but will first convert
+      backslash characters to forward slashes.</para>
     </section>
 
     <section>
       <title><literal>parityEven7bit</literal></title>
 
-      <para>This function calculates even parity of 7-bit data replacing
-      the 8th bit of each target byte with the calculated parity bit.</para>
+      <para>This function calculates even parity of 7-bit data replacing the
+      8th bit of each target byte with the calculated parity bit.</para>
     </section>
 
     <section>
       <title><literal>parityOdd7bit</literal></title>
 
-      <para>This function calculates odd parity of 7-bit data replacing
-      the 8th bit of each target byte with the calculated parity bit.</para>
+      <para>This function calculates odd parity of 7-bit data replacing the
+      8th bit of each target byte with the calculated parity bit.</para>
     </section>
 
     <section>
       <title><literal>parityZero7bit</literal></title>
 
-      <para>This function calculates zero parity of 7-bit data replacing
-      the 8th bit of each target byte with a zero parity bit which allows
+      <para>This function calculates zero parity of 7-bit data replacing the
+      8th bit of each target byte with a zero parity bit which allows
       inspection of even/odd parity 7bit data as ASCII7 data.</para>
     </section>
 
@@ -3884,7 +4017,7 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <section>
       <title><literal>removeWhitespace</literal></title>
 
-      <para>This function removes all whitespace characters.</para>
+      <para>This function removes all whitespace characters from input.</para>
     </section>
 
     <section>
@@ -3921,12 +4054,13 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <section>
       <title><literal>urlDecodeUni</literal></title>
 
-      <para>In addition to decoding %xx like <literal
+      <para>In addition to decoding <literal>%xx</literal> like <literal
       moreinfo="none">urlDecode, urlDecodeUni</literal> also decodes <literal
       moreinfo="none">%uXXXX</literal> encoding. If the code is in the range
-      of FF01-FF5E (the full width ASCII codes), then the higher byte is used
-      to detect and adjust the lower byte. Otherwise, only the lower byte will
-      be used and the higher byte zeroed.</para>
+      of <literal>FF01</literal>-<literal>FF5E</literal> (the full width ASCII
+      codes), then the higher byte is used to detect and adjust the lower
+      byte. Otherwise, only the lower byte will be used and the higher byte
+      zeroed.</para>
     </section>
 
     <section>
@@ -3940,7 +4074,7 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
 
       <para>This function calculates a SHA1 hash from input. Note that the
       computed hash is in a raw binary form and may need encoded to be usable
-      (EX: t:sha1,t:hexEncode).</para>
+      (for example: <literal>t:sha1,t:hexEncode</literal>).</para>
     </section>
 
     <section>
@@ -3970,37 +4104,64 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
 
     <para>Each action belongs to one of five groups:</para>
 
-    <orderedlist continuation="restarts" inheritnum="ignore">
-      <listitem>
-        <para><emphasis>Disruptive actions</emphasis> - are those actions
-        where ModSecurity will intercept the data. They can only appear in the
-        first rule in a chain.</para>
-      </listitem>
+    <variablelist>
+      <varlistentry>
+        <term>Disruptive actions</term>
 
-      <listitem>
-        <para><emphasis>Non-disruptive actions</emphasis> - can appear
-        anywhere.</para>
-      </listitem>
+        <listitem>
+          <para>Cause ModSecurity to do something. In many cases something
+          means block transaction, but not in all. For example, the allow
+          action is classified as a disruptive action, but it does the
+          opposite of blocking. There can only be one disruptive action per
+          rule (if there are multiple disruptive actions present, or
+          inherited, only the last one will take effect), or rule chain (in a
+          chain, a disruptive action can only appear in the first
+          rule).</para>
+        </listitem>
+      </varlistentry>
 
-      <listitem>
-        <para><emphasis>Flow actions</emphasis> - can appear only in the first
-        rule in a chain.</para>
-      </listitem>
+      <varlistentry>
+        <term>Non-disruptive actions</term>
 
-      <listitem>
-        <para><emphasis>Meta-data actions</emphasis>(<literal
-        moreinfo="none">id</literal>,<literal moreinfo="none">
-        rev</literal>,<literal moreinfo="none"> severity</literal>,<literal
-        moreinfo="none"> msg</literal>) - can only appear in the first rule in
-        a chain.</para>
-      </listitem>
+        <listitem>
+          <para>Do something, but that something does not and cannot affect
+          the rule processing flow. Setting a variable, or changing its value
+          is an example of a non-disruptive action. Non-disruptive action can
+          appear in any rule, including each rule belonging to a chain.</para>
+        </listitem>
+      </varlistentry>
 
-      <listitem>
-        <para><emphasis>Data actions</emphasis> - can appear anywhere; these
-        actions are completely passive and only serve to carry data used by
-        other actions.</para>
-      </listitem>
-    </orderedlist>
+      <varlistentry>
+        <term>Flow actions</term>
+
+        <listitem>
+          <para>These actions affect the rule flow (for example
+          <literal>skip</literal> or <literal>skipAfter</literal>).</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>Meta-data actions</term>
+
+        <listitem>
+          <para>Meta-data actions are used to provide more information about
+          rules. Examples include <literal>id</literal>,
+          <literal>rev</literal>, <literal>severity</literal> and
+          <literal>msg</literal>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>Data actions</term>
+
+        <listitem>
+          <para>Not really actions, these are mere containers that hold data
+          used by other actions. For example, the <literal>status</literal>
+          action holds the status that will be used for blocking (if it takes
+          place).</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
 
     <section>
       <title><literal>allow</literal></title>
@@ -4071,7 +4232,7 @@ SecAction phase:3,allow</programlisting>
       response before you make changes to it (e.g. you don't want to inject
       stuff into images).</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para><emphasis>Processing Phases:</emphasis> 3 and 4.</para>
 
@@ -4086,7 +4247,7 @@ SecAction phase:3,allow</programlisting>
       <para><emphasis>Description:</emphasis> Marks the transaction for
       logging in the audit log.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4160,7 +4321,7 @@ SecRuleUpdateActionById 1 "<emphasis>block</emphasis>"</programlisting>
       collection. Up to ten captures will be copied on a successful pattern
       match, each with a name consisting of a digit from 0 to 9.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4194,16 +4355,16 @@ SecRule TX:1 "(?:(?:a(dmin|nonymous)))"</programlisting>
 SecRule REQUEST_METHOD ^POST$<emphasis> chain</emphasis>,t:none
 SecRule REQUEST_HEADER:Content-Length ^$ t:none</programlisting>
 
-      <para><emphasis>Note</emphasis></para>
-
-      <para>In programming language concepts, think of chained rules somewhat
-      similar to AND conditional statements. The actions specified in the
-      first portion of the chained rule will only be triggered if all of the
-      variable checks return positive hits. If one aspect of the chained rule
-      is negative, then the entire rule chain is negative. Also note that
-      disruptive actions, execution phases, metadata actions (id, rev, msg),
-      skip and skipAfter actions can only be specified on by the chain starter
-      rule.</para>
+      <note>
+        <para>In programming language concepts, think of chained rules
+        somewhat similar to AND conditional statements. The actions specified
+        in the first portion of the chained rule will only be triggered if all
+        of the variable checks return positive hits. If one aspect of the
+        chained rule is negative, then the entire rule chain is negative. Also
+        note that disruptive actions, execution phases, metadata actions (id,
+        rev, msg), skip and skipAfter actions can only be specified on by the
+        chain starter rule.</para>
+      </note>
     </section>
 
     <section>
@@ -4212,7 +4373,7 @@ SecRule REQUEST_HEADER:Content-Length ^$ t:none</programlisting>
       <para><emphasis>Description:</emphasis> The ctl action allows
       configuration options to be updated for the transaction.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4364,7 +4525,7 @@ SecRule IP:AUTH_ATTEMPT "@gt 25" \
       <literal>SecRuleScript</literal> documentation for more details on how
       to write Lua scripts.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4378,17 +4539,15 @@ SecRule REQUEST_URI "^/cgi-bin/script\.pl" \
 SecRule ARGS:p attack log,<emphasis>exec:/usr/local/apache/conf/exec.lua</emphasis></programlisting>
 
       <note>
-        <para>This directive does not effect a primary action if it exists.
-        This action will always call script with no parameters, but providing
-        all information in the environment. All the usual CGI environment
-        variables will be there. You can have one binary executed per filter
-        match. Execution will add the header mod_security-executed to the list
-        of request headers. You should be aware that forking a threaded
-        process results in all threads being replicated in the new process.
-        Forking can therefore incur larger overhead in multi-threaded
-        operation. The script you execute must write something (anything) to
-        stdout. If it doesn't ModSecurity will assume execution didn't
-        work.</para>
+        <para>The exec action is executed independently from any disruptive
+        actions. External scripts will always be called with no parameters.
+        Some transaction information will be placed in environment variables.
+        All the usual CGI environment variables will be there. You should be
+        aware that forking a threaded process results in all threads being
+        replicated in the new process. Forking can therefore incur larger
+        overhead in multi-threaded operation. The script you execute must
+        write something (anything) to stdout. If it doesn't ModSecurity will
+        assume execution didn't work.</para>
       </note>
     </section>
 
@@ -4398,7 +4557,7 @@ SecRule ARGS:p attack log,<emphasis>exec:/usr/local/apache/conf/exec.lua</emphas
       <para><emphasis>Description:</emphasis> Configures a collection variable
       to expire after the given time in seconds.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4425,7 +4584,7 @@ setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasi
       <para><emphasis>Description:</emphasis> Assigns a unique ID to the rule
       or chain.</para>
 
-      <para><emphasis>Action Group:</emphasis> Metadata</para>
+      <para><emphasis>Action Group:</emphasis> Meta-data</para>
 
       <para>Example:</para>
 
@@ -4491,7 +4650,7 @@ setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasi
       collection, either by loading data from storage or by creating a new
       collection in memory.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example: The following example initiates IP address
       tracking.</para>
@@ -4514,7 +4673,7 @@ setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasi
       <para><emphasis>Description:</emphasis> Indicates that a successful
       match of the rule needs to be logged.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4529,10 +4688,10 @@ setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasi
     <section>
       <title><literal>logdata</literal></title>
 
-      <para><emphasis>Description:</emphasis> Allows logging a data
-      fragment.</para>
+      <para><emphasis>Description:</emphasis> Allows a data fragment to be
+      logged as part of the alert message.</para>
 
-      <para><emphasis>Action Group:</emphasis> Metadata</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4553,7 +4712,7 @@ setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasi
       <para><emphasis>Description:</emphasis> Assigns a custom message to the
       rule or chain.</para>
 
-      <para><emphasis>Action Group:</emphasis> Metadata</para>
+      <para><emphasis>Action Group:</emphasis> Meta-data</para>
 
       <para>Example:</para>
 
@@ -4573,7 +4732,7 @@ setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasi
       perform multiple operator invocations for every target, before and after
       every anti-evasion transformation is performed.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4595,7 +4754,7 @@ SecRule ARGS "attack" <emphasis>multiMatch</emphasis></programlisting>
       match of the rule should not be used as criteria whether the transaction
       should be logged to the audit log.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4618,7 +4777,7 @@ SecRule ARGS "attack" <emphasis>multiMatch</emphasis></programlisting>
       <para><emphasis>Description:</emphasis> Prevents rule matches from
       appearing in both the error and audit logs.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4665,7 +4824,7 @@ SecRule ARGS "attack" <emphasis>multiMatch</emphasis></programlisting>
       <para><emphasis>Description:</emphasis> Pauses transaction processing
       for the specified number of milliseconds.</para>
 
-      <para><emphasis>Action Group:</emphasis> Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4686,7 +4845,7 @@ SecRule ARGS "attack" <emphasis>multiMatch</emphasis></programlisting>
       <para><emphasis>Description:</emphasis> Places the rule (or the rule
       chain) into one of five available processing phases.</para>
 
-      <para><emphasis>Action Group:</emphasis> Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Meta-data</para>
 
       <para>Example:</para>
 
@@ -4712,7 +4871,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
       response before you make changes to it (e.g. you don't want to inject
       stuff into images).</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para><emphasis>Processing Phases:</emphasis> 3 and 4.</para>
 
@@ -4765,7 +4924,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
 
       <para><emphasis>Description:</emphasis> Specifies rule revision.</para>
 
-      <para><emphasis>Action Group:</emphasis> Metadata</para>
+      <para><emphasis>Action Group:</emphasis> Meta-data</para>
 
       <para>Example:</para>
 
@@ -4786,7 +4945,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
       with an asterisk) a named request argument prior to audit
       logging.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4808,7 +4967,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
       argument, request header, or response header) that caused a rule
       match.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example: This action can be used to sanitise arbitrary transaction
       elements when they match a condition. For example, the example below
@@ -4828,7 +4987,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
       <para><emphasis>Description:</emphasis> Sanitises a named request
       header.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example: This will sanitise the data in the Authorization
       header.</para>
@@ -4846,7 +5005,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
       <para><emphasis>Description:</emphasis> Sanitises a named response
       header.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example: This will sanitise the Set-Cookie data sent to the
       client.</para>
@@ -4864,7 +5023,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
       <para><emphasis>Description:</emphasis> Assigns severity to the rule it
       is placed with.</para>
 
-      <para><emphasis>Action Group:</emphasis> Metadata</para>
+      <para><emphasis>Action Group:</emphasis> Meta-data</para>
 
       <para>Example:</para>
 
@@ -4923,7 +5082,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
       initialises the <literal moreinfo="none">USER</literal>
       collection.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4943,7 +5102,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
       initialises the <literal moreinfo="none">SESSION</literal>
       collection.</para>
 
-      <para><emphasis>Action Group: </emphasis>Non-Disruptive</para>
+      <para><emphasis>Action Group: </emphasis>Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -4970,7 +5129,7 @@ SecAction <emphasis>setsid:%{REQUEST_COOKIES.PHPSESSID}</emphasis></programlisti
       <para><emphasis>Description:</emphasis> Creates, removes, or updates an
       environment variable.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Examples:</para>
 
@@ -4995,7 +5154,7 @@ SecAction <emphasis>setsid:%{REQUEST_COOKIES.PHPSESSID}</emphasis></programlisti
       <para><emphasis>Description:</emphasis> Creates, removes, or updates a
       variable in the specified collection.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Examples:</para>
 
@@ -5020,7 +5179,7 @@ SecAction <emphasis>setsid:%{REQUEST_COOKIES.PHPSESSID}</emphasis></programlisti
       <para><emphasis>Description:</emphasis> Skips one or more rules (or
       chains) on successful match.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Flow</para>
 
       <para>Example:</para>
 
@@ -5047,10 +5206,10 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
       <title><literal>skipAfter</literal></title>
 
       <para><emphasis>Description:</emphasis> Skips rules (or chains) on
-      successful match resuming rule execution after the specified rule id or
-      marker (see SecMarker) is found.</para>
+      successful match resuming rule execution after the specified rule ID or
+      marker (see <literal>SecMarker</literal>) is found.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Flow</para>
 
       <para>Example:</para>
 
@@ -5064,11 +5223,12 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
 
       <para><emphasis>Note</emphasis></para>
 
-      <para>SkipAfter only applies to the current processing phase and not
-      necessarily the order in which the rules appear in the configuration
-      file. If you group rules by processing phases, then skip should work as
-      expected. This action can not be used to skip rules within one chain.
-      Accepts a single parameter denoting the last rule ID to skip.</para>
+      <para><literal>SkipAfter</literal> only applies to the current
+      processing phase and not necessarily the order in which the rules appear
+      in the configuration file. If you group rules by processing phases, then
+      skip should work as expected. This action can not be used to skip rules
+      within one chain. Accepts a single parameter denoting the last rule ID
+      to skip.</para>
     </section>
 
     <section>
@@ -5078,7 +5238,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
       code to use with actions<literal moreinfo="none"> deny</literal>
       and<literal moreinfo="none"> redirect</literal>.</para>
 
-      <para><emphasis>Action Group:</emphasis> Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Data</para>
 
       <para>Example:</para>
 
@@ -5102,7 +5262,7 @@ SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" \
       before they (or the results, rather) are run against the operator
       specified in the rule.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
       <para>Example:</para>
 
@@ -5124,7 +5284,7 @@ SecRule REQUEST_COOKIES:SESSIONID "47414e81cbbef3cf8366e84eeacba091" \
       <para><emphasis>Description:</emphasis> Assigns custom text to a rule or
       chain.</para>
 
-      <para><emphasis>Action Group:</emphasis> Metadata</para>
+      <para><emphasis>Action Group:</emphasis> Meta-data</para>
 
       <para>Example:</para>
 
@@ -5146,12 +5306,13 @@ tag:'WEB_ATTACK/FILE_INJECTION',tag:'OWASP/A2'</emphasis>,severity:'2'"</program
       <para><emphasis>Description:</emphasis> This action should be used
       together with an XPath expression to register a namespace.</para>
 
-      <para><emphasis>Action Group:</emphasis> Non-Disruptive</para>
+      <para><emphasis>Action Group:</emphasis> Data</para>
 
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule REQUEST_HEADERS:Content-Type "text/xml" \
-    phase:1,pass,ctl:requestBodyProcessor=XML,ctl:requestBodyAccess=On,<emphasis>xmlns:xsd="http://www.w3.org/2001/XMLSchema"</emphasis>
+    "phase:1,pass,ctl:requestBodyProcessor=XML,ctl:requestBodyAccess=On,<emphasis> \
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"</emphasis>
 SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny</programlisting>
     </section>
   </section>
@@ -5160,8 +5321,8 @@ SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny</progra
     <title>Operators</title>
 
     <para>A number of operators can be used in rules, as documented below. The
-    operator syntax used the "@" symbol followed by the specific operator
-    name.</para>
+    operator syntax uses the <literal>@</literal> symbol followed by the
+    specific operator name.</para>
 
     <section>
       <title><literal>beginsWith</literal></title>
@@ -5169,7 +5330,7 @@ SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny</progra
       <para><emphasis>Description:</emphasis> This operator is a string
       comparison and returns true if the parameter value is found at the
       beginning of the input. Macro expansion is performed so you may use
-      variable names such as %{TX.1}, etc.</para>
+      variable names such as <literal>%{TX.1}</literal>, etc.</para>
 
       <para>Example:</para>
 
@@ -5482,8 +5643,8 @@ SecRule REQUEST_HEADERS:Ip-Address "!<emphasis>@streq %{TX.1}</emphasis>"</progr
     <section>
       <title><literal>validateDTD</literal></title>
 
-      <para><emphasis>Description:</emphasis> This operator requires the
-      request body to be processed as XML.</para>
+      <para><emphasis>Description:</emphasis> Validates the DOM tree generated
+      by the XML request body processor against the supplied DTD.</para>
 
       <para>Example:</para>
 
@@ -5492,13 +5653,19 @@ SecRule REQUEST_HEADERS:Content-Type ^text/xml$ \
     phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML
 SecRule REQBODY_PROCESSOR "!^XML$" nolog,pass,skipAfter:12345
 SecRule XML "<emphasis>@validateDTD /path/to/apache2/conf/xml.dtd</emphasis>" "deny,id:12345"</programlisting>
+
+      <note>
+        <para>This operator requires request body to be processed as
+        XML.</para>
+      </note>
     </section>
 
     <section>
       <title><literal>validateSchema</literal></title>
 
-      <para><emphasis>Description:</emphasis> This operator requires the
-      request body to be processed as XML.</para>
+      <para><emphasis>Description:</emphasis> Validates the DOM tree generated
+      by the XML request body processor against the supplied XML
+      Schema.</para>
 
       <para>Example:</para>
 
@@ -5508,7 +5675,10 @@ SecRule REQUEST_HEADERS:Content-Type ^text/xml$ \
 SecRule REQBODY_PROCESSOR "!^XML$" nolog,pass,skipAfter:12345
 SecRule XML "<emphasis>@validateSchema /path/to/apache2/conf/xml.xsd</emphasis>" "deny,id:12345"</programlisting>
 
-      <para>This operator requires request body to be processed as XML.</para>
+      <note>
+        <para>This operator requires request body to be processed as
+        XML.</para>
+      </note>
     </section>
 
     <section>
