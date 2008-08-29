@@ -797,7 +797,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         rc = msre_ruleset_process_phase_(ruleset, msr);
     }
 
-    msr_log(msr, 1, "Phase %d: %" APR_TIME_T_FMT " usec", msr->phase, ((apr_time_now() - time1) / 10000));
+    msr_log(msr, 1, "Phase %d: %" APR_TIME_T_FMT " usec (inaccurate)", msr->phase, ((apr_time_now() - time1) / 10000));
 
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
@@ -1704,24 +1704,28 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
             var->value_len));
     }
 
-    #if !defined(PERFORMANCE_MEASUREMENT)
-    if (msr->txcfg->debuglog_level >= 4)
-    #endif
+    #if defined(PERFORMANCE_MEASUREMENT)
+    time_before_op = apr_time_now();
+    #else
+    if (msr->txcfg->debuglog_level >= 4) {
         time_before_op = apr_time_now();
-
+    }
+    #endif
+        
     rc = rule->op_metadata->execute(msr, rule, var, &my_error_msg);
 
-    #if !defined(PERFORMANCE_MEASUREMENT)
-    if (msr->txcfg->debuglog_level >= 4)
-    #endif
+    #if defined(PERFORMANCE_MEASUREMENT)
     {
+        /* Record performance but do not log anything. */
         apr_time_t t1 = apr_time_now();
-        #if defined(PERFORMANCE_MEASUREMENT)
         rule->op_time += (t1 - time_before_op);
-        #endif
-        msr_log(msr, 4, "Operator completed in %" APR_TIME_T_FMT " usec.",
-            (t1 - time_before_op));
     }
+    #else
+    if (msr->txcfg->debuglog_level >= 4) {
+        apr_time_t t1 = apr_time_now();
+        msr_log(msr, 4, "Operator completed in %" APR_TIME_T_FMT " usec.", (t1 - time_before_op));
+    }
+    #endif
 
     if (rc < 0) {
         msr_log(msr, 4, "Operator error: %s", my_error_msg);
@@ -1963,11 +1967,13 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
             }
         }
 
-        #if !defined(PERFORMANCE_MEASUREMENT)
-        if (msr->txcfg->debuglog_level >= 4)
-        #endif
+        #if defined(PERFORMANCE_MEASUREMENT)
+        time_before_trans = apr_time_now();
+        #else
+        if (msr->txcfg->debuglog_level >= 4) {
             time_before_trans = apr_time_now();
-
+        }
+        #endif
 
         /* Transform target. */
         {
@@ -2054,25 +2060,26 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                         log_escape_nq_ex(mptmp, var->value, var->value_len), crec->hits);
                 }
 
-                #if !defined(PERFORMANCE_MEASUREMENT)
-                if (msr->txcfg->debuglog_level >= 4)
-                #endif
+                #if defined(PERFORMANCE_MEASUREMENT) 
                 {
                     apr_time_t t1 = apr_time_now();
-
-                    #if defined(PERFORMANCE_MEASUREMENT)
                     rule->trans_time += (t1 - time_before_trans);
-                    #endif
+                }
+                #else
+                if (msr->txcfg->debuglog_level >= 4) {
+                    apr_time_t t1 = apr_time_now();
 
                     msr_log(msr, 4, "Transformation completed in %" APR_TIME_T_FMT " usec.",
                         (t1 - time_before_trans));
                 }
+                #endif
 
                 rc = execute_operator(var, rule, msr, acting_actionset, mptmp);
 
                 if (rc < 0) {
                     return -1;
                 }
+
                 if (rc == RULE_MATCH) {
                     match_count++;
 
@@ -2084,6 +2091,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                         return RULE_MATCH;
                     }
                 }
+
                 continue; /* next target */
             }
 
@@ -2135,19 +2143,19 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
                 if (multi_match && (k == 0 || tfnchanged)) {
                     invocations++;
 
-                    #if !defined(PERFORMANCE_MEASUREMENT)
-                    if (msr->txcfg->debuglog_level >= 4)
-                    #endif
+                    #if defined(PERFORMANCE_MEASUREMENT)
                     {
                         apr_time_t t1 = apr_time_now();
-
-                        #if defined(PERFORMANCE_MEASUREMENT)
                         rule->trans_time += (t1 - time_before_trans);
-                        #endif
+                    }
+                    #else
+                    if (msr->txcfg->debuglog_level >= 4) {
+                        apr_time_t t1 = apr_time_now();
 
                         msr_log(msr, 4, "Transformation completed in %" APR_TIME_T_FMT " usec.",
                             (t1 - time_before_trans));
                     }
+                    #endif
 
                     rc = execute_operator(var, rule, msr, acting_actionset, mptmp);
 
@@ -2269,19 +2277,19 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
         if (!multi_match || changed) {
             invocations++;
 
-            #if !defined(PERFORMANCE_MEASUREMENT)
-            if (msr->txcfg->debuglog_level >= 4)
-            #endif
+            #if defined(PERFORMANCE_MEASUREMENT)
             {
                 apr_time_t t1 = apr_time_now();
-
-                #if defined(PERFORMANCE_MEASUREMENT)
                 rule->trans_time += (t1 - time_before_trans);
-                #endif
+            }
+            #else
+            if (msr->txcfg->debuglog_level >= 4) {
+                apr_time_t t1 = apr_time_now();
 
                 msr_log(msr, 4, "Transformation completed in %" APR_TIME_T_FMT " usec.",
                     (t1 - time_before_trans));
             }
+            #endif
 
             rc = execute_operator(var, rule, msr, acting_actionset, mptmp);
 
