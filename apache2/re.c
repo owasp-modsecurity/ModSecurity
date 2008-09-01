@@ -755,13 +755,15 @@ void msre_engine_destroy(msre_engine *engine) {
  * transaction phase.
  */
 #if defined(PERFORMANCE_MEASUREMENT)
+
+#define PERFORMANCE_MEASUREMENT_LOOP 1000
+
 static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_rec *msr);
 
 apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) {
     apr_array_header_t *arr = NULL;
     msre_rule **rules = NULL;
     apr_status_t rc;
-    apr_time_t time1;
     int i;
 
     switch (msr->phase) {
@@ -791,22 +793,24 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         rule->execution_time = 0;
     }
 
-    time1 = apr_time_now();
-
-    for (i = 0; i < 10000; i++) {
+    for (i = 0; i < PERFORMANCE_MEASUREMENT_LOOP; i++) {
         rc = msre_ruleset_process_phase_(ruleset, msr);
     }
 
-    msr_log(msr, 1, "Phase %d: %" APR_TIME_T_FMT " usec (inaccurate)", msr->phase, ((apr_time_now() - time1) / 10000));
+    msr_log(msr, 1, "Phase %d", msr->phase);
 
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
         msre_rule *rule = rules[i];
+
+        /* Ignore markers, which are never processed. */
+        if (rule->placeholder == RULE_PH_MARKER) continue;
+
         msr_log(msr, 1, "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"]: %u usec", rule,
             ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
             rule->filename != NULL ? rule->filename : "-",
             rule->line_num,
-            (rule->execution_time / 10000));
+            (rule->execution_time / PERFORMANCE_MEASUREMENT_LOOP));
     }
 
     return rc;
