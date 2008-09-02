@@ -286,7 +286,7 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
     /* Send message levels 1-3 to the Apache error log too. */
     if (level <= 3) {
         char *unique_id = (char *)get_env_var(r, "UNIQUE_ID");
-        char *hostname = (char *)r->hostname;
+        char *hostname = (char *)msr->hostname;
 
         if (unique_id != NULL) {
             unique_id = apr_psprintf(msr->mp, " [unique_id \"%s\"]",
