@@ -343,14 +343,14 @@ static void sec_auditlog_write_producer_header(modsec_rec *msr) {
 
     /* Try to write everything in one go. */
     if (msr->txcfg->component_signatures->nelts == 0) {
-        text = apr_psprintf(msr->mp, "Producer: %s.\n", MODULE_NAME_FULL);
+        text = apr_psprintf(msr->mp, "Producer: %s.\n", MODSEC_MODULE_NAME_FULL);
         sec_auditlog_write(msr, text, strlen(text));
 
         return;
     }
 
     /* Start with the ModSecurity signature. */
-    text = apr_psprintf(msr->mp, "Producer: %s", MODULE_NAME_FULL);
+    text = apr_psprintf(msr->mp, "Producer: %s", MODSEC_MODULE_NAME_FULL);
     sec_auditlog_write(msr, text, strlen(text));
 
 

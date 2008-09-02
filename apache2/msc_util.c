@@ -16,6 +16,7 @@
  * directly using the email address support@breach.com.
  *
  */
+#include "msc_release.h"
 #include "msc_util.h"
 
 #include <ctype.h>
@@ -1169,21 +1170,11 @@ int normalise_path_inplace(unsigned char *input, int input_len, int win, int *ch
 }
 
 char *modsec_build(apr_pool_t *mp) {
-    int build_type = 0;
-    int i;
-
-    for (i = 0; modsec_build_type[i].name != NULL; i++) {
-        if (strcmp(MODSEC_VERSION_TYPE, modsec_build_type[i].name) == 0) {
-            build_type = modsec_build_type[i].val;
-            break;
-        }
-    }
-
     return apr_psprintf(mp, "%02i%02i%02i%1i%02i",
                             atoi(MODSEC_VERSION_MAJOR),
                             atoi(MODSEC_VERSION_MINOR),
                             atoi(MODSEC_VERSION_MAINT),
-                            build_type,
+                            get_modsec_build_type(NULL),
                             atoi(MODSEC_VERSION_RELEASE));
 }
 

@@ -25,15 +25,6 @@
 #include "msc_util.h"
 #include "msc_xml.h"
 
-modsec_build_type_rec DSOLOCAL modsec_build_type[] = {
-    { "-dev", 1 },     /* Development build */
-    { "-rc", 3 },      /* Release Candidate build */
-    { "", 9 },         /* Production build */
-    { "-breach", 9 },  /* Breach build */
-    { "-trunk", 9 },   /* Trunk build */
-    { NULL, -1 }       /* terminator */
-};
-
 /**
  * Log an alert message to the log, adding the rule metadata at the end.
  */

@@ -1,5 +1,7 @@
-31 Jul 2008 - trunk
+02 Sep 2008 - trunk
 -------------------
+
+ * Integrate mlogc source.
 
  * Allow for disabling request body limit checks in phase:1.
 
