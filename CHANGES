@@ -1,5 +1,7 @@
-15 Aug 2008 - 2.5.7-dev1
+02 Sep 2008 - 2.5.7-dev1
 ------------------------
+
+ * Integrate mlogc source.
 
  * Allow for disabling request body limit checks in phase:1.
 

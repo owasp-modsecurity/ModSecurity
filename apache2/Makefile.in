@@ -3,16 +3,16 @@
 MOD_SECURITY2 = mod_security2 apache2_config apache2_io apache2_util \
     re re_operators re_actions re_tfns re_variables \
     msc_logging msc_xml msc_multipart modsecurity msc_parsers msc_util msc_pcre \
-    persist_dbm msc_reqbody pdf_protect msc_geo acmp msc_lua
+    persist_dbm msc_reqbody pdf_protect msc_geo acmp msc_lua msc_release
 
 MSC_TEST = re re_operators re_actions re_tfns re_variables \
     msc_logging msc_xml msc_multipart modsecurity \
     msc_parsers msc_util msc_pcre  persist_dbm \
-    msc_reqbody msc_geo acmp msc_lua
+    msc_reqbody msc_geo acmp msc_lua msc_release
 
 MOD_SECURITY2_H = re.h modsecurity.h msc_logging.h msc_multipart.h msc_parsers.h \
     msc_pcre.h msc_util.h msc_xml.h persist_dbm.h apache2.h pdf_protect.h \
-    msc_geo.h acmp.h utf8tables.h msc_lua.h
+    msc_geo.h acmp.h utf8tables.h msc_lua.h msc_release.h
 
 CC = @APXS_CC@
 LIBTOOL = @APXS_LIBTOOL@
@@ -70,7 +70,7 @@ clean-extras:
 			$(MAKE) -C $$dir clean; \
 		fi; \
 	done
-	@rm -rf ../tools/mlogc ../tools/mlogc-static
+	@rm -rf ../tools/mlogc ../tools/mlogc-batch-load.pl
 
 clean: clean-extras
 	@rm -rf *.la *.lo *.o *.slo .libs msc_test msc-test-debug.log
@@ -99,16 +99,9 @@ mod_security2.la: $(MOD_SECURITY2_H) *.c
 mlogc:
 	@$(MAKE) -C mlogc-src mlogc \
 	&& cp -p mlogc-src/mlogc ../tools \
+	&& cp -p mlogc-src/mlogc-batch-load.pl ../tools \
 	&& echo \
 	&& echo "Successfully built \"mlogc\" in ../tools." \
-	&& echo "See: mlogc-src/INSTALL" \
-	&& echo
-
-mlogc-static:
-	@$(MAKE) -C mlogc-src static \
-	&& cp -p mlogc-src/mlogc ../tools/mlogc-static \
-	&& echo \
-	&& echo "Successfully built \"mlogc-static\" in ../tools." \
 	&& echo "See: mlogc-src/INSTALL" \
 	&& echo
 

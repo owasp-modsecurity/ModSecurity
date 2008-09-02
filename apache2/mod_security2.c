@@ -25,6 +25,7 @@
 #include "apache2.h"
 #include "http_main.h"
 #include "pdf_protect.h"
+
 #include "msc_logging.h"
 #include "msc_util.h"
 
@@ -520,7 +521,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
     /* Log our presence to the error log. */
     if (first_time) {
         ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "%s configured.", MODULE_NAME_FULL);
+                "%s configured.", MODSEC_MODULE_NAME_FULL);
 
         /* If we've changed the server signature make note of the original. */
         if (new_server_signature != NULL) {

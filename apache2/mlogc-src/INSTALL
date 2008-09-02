@@ -1,0 +1,76 @@
+ModSecurity Audit Log Collector (mlogc)
+
+Mlogc is used to connect a ModSecurity sensor to the central
+audit log repository.
+
+To Install:
+===========
+
+  1) Copy the mlogc executable to an appropriate location.
+
+     A good location might be /usr/local/bin, /opt/mlogc/bin, etc.
+
+  2) Create sensor in the central audit log repository. Note the
+     username and the password (SENSOR_USERNAME, SENSOR_PASSWORD).
+     Also note the IP address central repository listens on
+     (CONSOLE_IP_ADDRESS).
+
+  3) Configure the ModSecurity sensor to use mlogc
+
+     # Use ReleventOnly auditing
+     SecAuditEngine RelevantOnly
+
+     # Must use concurrent logging
+     SecAuditLogType Concurrent
+
+     # Send all audit log parts
+     SecAuditLogParts ABIDEFGHZ
+
+     # Use the same /CollectorRoot/LogStorageDir as in mlogc.conf
+     SecAuditLogStorageDir /var/log/mlogc/data
+
+     # Pipe audit log to mlogc with your configuration
+     SecAuditLog "|/usr/local/bin/mlogc /etc/mlogc.conf"
+
+  4) Using the mlogc-default.conf as a template, configure the logger.
+
+     Typically these are the only directives that will need to be modified
+     to conform to your site:
+
+     # Points to the root of the installation. All relative
+     # paths configured in this file will be resolved with the
+     # help of this path (LogStorageDir, TransactionLog, etc.)
+     #
+     # Typically, this will be the parent directory that is configured
+     # in ModSecurity for the SecAuditLogStorageDirectory.  So, if
+     # your SecAuditLogStorageDirectory is set to /var/log/mlogc/data,
+     # then set this to /var/log/mlogc.
+     CollectorRoot       "/var/log/mlogc"
+
+     # ModSecurity Console receiving URI. You can change the host
+     # and the port parts but leave everything else as is.
+     ConsoleURI          https://CONSOLE_IP_ADDRESS:8886/rpc/auditLogReceiver
+
+     # Sensor credentials
+     SensorUsername      "SENSOR_USERNAME"
+     SensorPassword      "SENSOR_PASSWORD"
+
+     # Base directory where the audit logs are stored.  This can be specified
+     # as a path relative to the CollectorRoot, or a full path.  It should
+     # resolve to the same path as ModSecurity's SecAuditLogStorageDirectory.
+     LogStorageDir       "data"
+
+     See the mlogc-default.conf configuration file for details on other
+     configuration directives.
+
+  5) Restart the ModSecurity sensor.
+
+     From now on every audit log generated will go to the repository. Make
+     sure you create an alert. Transactions without alerts will be recorded
+     but not displayed on the home page.
+     
+     To troubleshoot, generate alerts and observe file "mlogc-error.log".
+     
+     If mlogc fails to connect to the server it will pause for a period
+     of time (60 seconds by default) before it will try again.
+

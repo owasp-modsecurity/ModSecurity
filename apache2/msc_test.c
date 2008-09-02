@@ -528,7 +528,7 @@ static void init_msr() {
  * Usage text.
  */
 static void usage() {
-    fprintf(stderr, "ModSecurity Unit Tester v%s\n", MODULE_RELEASE);
+    fprintf(stderr, "ModSecurity Unit Tester v%s\n", MODSEC_VERSION);
     fprintf(stderr, "  Usage: msc_test [options]\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "  Options:\n");

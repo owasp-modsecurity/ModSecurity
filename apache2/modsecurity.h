@@ -32,23 +32,7 @@ typedef struct msc_data_chunk msc_data_chunk;
 typedef struct msc_arg msc_arg;
 typedef struct msc_string msc_string;
 
-#if !(defined(WIN32) || defined(CYGWIN) || defined(NETWARE) || defined(SOLARIS2))
-#define DSOLOCAL __attribute__((visibility("hidden")))
-#else
-#define DSOLOCAL
-#endif
-
-#if defined(DEBUG_MEM)
-/* Nothing Yet */
-#endif
-
-/* For GNU C, tell the compiler to check printf like formatters */
-#if (defined(__GNUC__) && !defined(SOLARIS2))
-#define PRINTF_ATTRIBUTE(a,b) __attribute__((format (printf, a, b)))
-#else
-#define PRINTF_ATTRIBUTE(a,b)
-#endif
-
+#include "msc_release.h"
 #include "msc_logging.h"
 #include "msc_multipart.h"
 #include "msc_pcre.h"
@@ -65,27 +49,6 @@ typedef struct msc_string msc_string;
 #include "http_config.h"
 #include "http_log.h"
 #include "http_protocol.h"
-
-typedef struct modsec_build_type_rec {
-    const char * name;
-    int          val;
-} modsec_build_type_rec;
-extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
-
-#define MODSEC_VERSION_MAJOR       "2"
-#define MODSEC_VERSION_MINOR       "5"
-#define MODSEC_VERSION_MAINT       "7"
-#define MODSEC_VERSION_TYPE        "-dev"
-#define MODSEC_VERSION_RELEASE     "1"
-
-#define MODULE_NAME "ModSecurity for Apache"
-
-#define MODSEC_VERSION_SUFFIX MODSEC_VERSION_TYPE MODSEC_VERSION_RELEASE
-#define MODULE_RELEASE \
-  MODSEC_VERSION_MAJOR "." MODSEC_VERSION_MINOR "." MODSEC_VERSION_MAINT \
-  MODSEC_VERSION_SUFFIX
-
-#define MODULE_NAME_FULL MODULE_NAME "/" MODULE_RELEASE " (http://www.modsecurity.org/)"
 
 #define PHASE_REQUEST_HEADERS       1
 #define PHASE_REQUEST_BODY          2
