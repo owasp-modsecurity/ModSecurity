@@ -458,6 +458,7 @@ static void init_msr() {
     dcfg = (directory_config *)apr_pcalloc(g_mp, sizeof(directory_config));
     dcfg->is_enabled = 0;
     dcfg->reqbody_access = 0;
+    dcfg->reqbody_buffering = 0;
     dcfg->reqbody_inmemory_limit = REQUEST_BODY_DEFAULT_INMEMORY_LIMIT;
     dcfg->reqbody_limit = REQUEST_BODY_DEFAULT_LIMIT;
     dcfg->reqbody_no_files_limit = REQUEST_BODY_NO_FILES_DEFAULT_LIMIT;

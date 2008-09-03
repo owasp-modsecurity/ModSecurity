@@ -713,6 +713,13 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
          */
         return NULL;
     } else
+    if (strcasecmp(name, "requestBodyBuffering") == 0) {
+        if (parse_boolean(value) == -1) {
+            return apr_psprintf(engine->mp, "Invalid setting for ctl name "
+                " requestBodyBuffering: %s", value);
+        }
+        return NULL;
+    } else
     if (strcasecmp(name, "responseBodyAccess") == 0) {
         if (parse_boolean(value) == -1) {
             return apr_psprintf(engine->mp, "Invalid setting for ctl name "
@@ -827,6 +834,16 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (pv == -1) return -1;
         msr->txcfg->reqbody_access = pv;
         msr->usercfg->reqbody_access = pv;
+        msr_log(msr, 4, "Ctl: Set requestBodyAccess to %d.", pv);
+
+        return 1;
+    } else
+    if (strcasecmp(name, "requestBodyBuffering") == 0) {
+        int pv = parse_boolean(value);
+
+        if (pv == -1) return -1;
+        msr->txcfg->reqbody_buffering = pv;
+        msr->usercfg->reqbody_buffering = pv;
         msr_log(msr, 4, "Ctl: Set requestBodyAccess to %d.", pv);
 
         return 1;
