@@ -1,7 +1,10 @@
-02 Sep 2008 - 2.5.7-dev1
+03 Sep 2008 - 2.5.7-dev1
 ------------------------
 
  * Integrate mlogc source.
+
+ * Fixed logging the hostname in the error_log which was logging the
+   request hostname instead of the Apache resolved hostname.
 
  * Allow for disabling request body limit checks in phase:1.
 
