@@ -872,6 +872,12 @@ static int msre_op_validateDTD_execute(modsec_rec *msr, msre_rule *rule, msre_va
     xmlValidCtxtPtr cvp;
     xmlDtdPtr dtd;
 
+    if (msr->msc_reqbody_error) {
+        *error_msg = apr_psprintf(msr->mp, "XML: DTD validation could not proceed"
+            " due to previous processing errors.");
+        return 1;
+    }
+
     if ((msr->xml == NULL)||(msr->xml->doc == NULL)) {
         *error_msg = apr_psprintf(msr->mp, "XML document tree could not be found for "
             "DTD validation.");
@@ -927,6 +933,12 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
     xmlSchemaValidCtxtPtr validCtx;
     xmlSchemaPtr schema;
     int rc;
+
+    if (msr->msc_reqbody_error) {
+        *error_msg = apr_psprintf(msr->mp, "XML: Schema validation could not proceed"
+            " due to previous processing errors.");
+        return 1;
+    }
 
     if ((msr->xml == NULL)||(msr->xml->doc == NULL)) {
         *error_msg = apr_psprintf(msr->mp, "XML document tree could not be found for "
