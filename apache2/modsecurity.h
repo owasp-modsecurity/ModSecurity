@@ -361,6 +361,7 @@ struct directory_config {
 
     int                  is_enabled;
     int                  reqbody_access;
+    int                  reqbody_buffering;
     long int             reqbody_inmemory_limit;
     long int             reqbody_limit;
     long int             reqbody_no_files_limit;

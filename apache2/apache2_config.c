@@ -45,6 +45,7 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     dcfg->is_enabled = NOT_SET;
 
     dcfg->reqbody_access = NOT_SET;
+    dcfg->reqbody_buffering = NOT_SET;
     dcfg->reqbody_inmemory_limit = NOT_SET;
     dcfg->reqbody_limit = NOT_SET;
     dcfg->reqbody_no_files_limit = NOT_SET;
@@ -236,6 +237,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     /* IO parameters */
     merged->reqbody_access = (child->reqbody_access == NOT_SET
         ? parent->reqbody_access : child->reqbody_access);
+    merged->reqbody_buffering = (child->reqbody_buffering == NOT_SET
+        ? parent->reqbody_buffering : child->reqbody_buffering);
     merged->reqbody_inmemory_limit = (child->reqbody_inmemory_limit == NOT_SET
         ? parent->reqbody_inmemory_limit : child->reqbody_inmemory_limit);
     merged->reqbody_limit = (child->reqbody_limit == NOT_SET
@@ -480,6 +483,7 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->is_enabled == NOT_SET) dcfg->is_enabled = 0;
 
     if (dcfg->reqbody_access == NOT_SET) dcfg->reqbody_access = 0;
+    if (dcfg->reqbody_buffering == NOT_SET) dcfg->reqbody_buffering = 0;
     if (dcfg->reqbody_inmemory_limit == NOT_SET)
         dcfg->reqbody_inmemory_limit = REQUEST_BODY_DEFAULT_INMEMORY_LIMIT;
     if (dcfg->reqbody_limit == NOT_SET) dcfg->reqbody_limit = REQUEST_BODY_DEFAULT_LIMIT;

@@ -309,6 +309,9 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
                 msr->msc_reqbody_processor);
             return -1;
         }
+    } else if (msr->txcfg->reqbody_buffering) {
+        /* Increase per-request data length counter if forcing buffering. */
+        msr->msc_reqbody_no_files_length += length;
     }
 
     /* Check that we are not over the request body no files limit. */
@@ -334,7 +337,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
 /**
  *
  */
-static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, char **error_msg) {
+static apr_status_t modsecurity_request_body_end_raw(modsec_rec *msr, char **error_msg) {
     msc_data_chunk **chunks, *one_chunk;
     char *d;
     int i, sofar;
@@ -393,6 +396,22 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, cha
     one_chunk->length = msr->msc_reqbody_length;
     one_chunk->is_permanent = 1;
     *(const msc_data_chunk **)apr_array_push(msr->msc_reqbody_chunks) = one_chunk;
+
+    return 1;
+}
+
+/**
+ *
+ */
+static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, char **error_msg) {
+    int invalid_count = 0;
+
+    *error_msg = NULL;
+
+    /* Create the raw buffer */
+    if (modsecurity_request_body_end_raw(msr, error_msg) != 1) {
+        return -1;
+    }
 
     /* Parse URL-encoded arguments in the request body. */
 
@@ -458,6 +477,9 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
                 return -1;
             }
         }
+    } else if (msr->txcfg->reqbody_buffering) {
+        /* No processing if there is no processor and forcing buffering. */
+        return modsecurity_request_body_end_raw(msr, error_msg);
     }
 
     /* Note the request body no files length. */
