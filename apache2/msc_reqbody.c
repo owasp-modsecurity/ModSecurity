@@ -341,7 +341,6 @@ static apr_status_t modsecurity_request_body_end_raw(modsec_rec *msr, char **err
     msc_data_chunk **chunks, *one_chunk;
     char *d;
     int i, sofar;
-    int invalid_count = 0;
 
     *error_msg = NULL;
 
