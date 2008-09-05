@@ -951,11 +951,12 @@ SecAuditLogStorageDir logs/audit
 
       <para><emphasis>Version:</emphasis> 2.0.0</para>
 
-      <para><emphasis>Dependencies/Notes:</emphasis> The internal chroot
-      functionality provided by ModSecurity works great for simple setups. One
-      example of a simple setup is Apache serving static files only, or
-      running scripts using modules. Some problems you might encounter with
-      more complex setups:</para>
+      <para><emphasis>Dependencies/Notes:</emphasis> This feature is not
+      available on Windows builds. The internal chroot functionality provided
+      by ModSecurity works great for simple setups. One example of a simple
+      setup is Apache serving static files only, or running scripts using
+      modules.builds. Some problems you might encounter with more complex
+      setups:</para>
 
       <orderedlist>
         <listitem>
@@ -2342,7 +2343,8 @@ SecRuleUpdateActionById 12345 "t:compressWhitespace,deny,status:403,msg:'A new m
       <title><literal>SecUploadFileMode</literal></title>
 
       <para><emphasis>Description:</emphasis> Configures the mode
-      (permissions) of any uploaded files using an octal number.</para>
+      (permissions) of any uploaded files using an octal number (as used in
+      chmod).</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
       moreinfo="none">SecUploadFileMode octal_mode|"default"</literal></para>
@@ -2356,12 +2358,14 @@ SecRuleUpdateActionById 12345 "t:compressWhitespace,deny,status:403,msg:'A new m
 
       <para><emphasis>Version:</emphasis> 2.1.6</para>
 
-      <para><emphasis>Dependencies/Notes:</emphasis> The mode is an octal
-      number (as used in chmod). The default mode is for only the account
-      writing the file to have read/write access (0600). Use this directive
-      with caution to avoid exposing potentially sensitive data to
-      unauthorized users. Using the value "default" will revert back to the
-      default setting.</para>
+      <para><emphasis>Dependencies/Notes:</emphasis> This feature is not
+      available on operating systems not supporting octal file modes. The
+      default mode (0600) only grants read/write access to the account
+      writing the file. If access from another account is needed (using clamd
+      is a good example), then this directive may be required.  However, use
+      this directive with caution to avoid exposing potentially sensitive
+      data to unauthorized users. Using the value "default" will revert back
+      to the default setting.</para>
     </section>
 
     <section>
@@ -4458,7 +4462,7 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis>ctl:requestBodyProce
 
       <para>The requestBodyBuffering option allows you to configure the
       request body to be buffered (in memory) even if it is not parsed.  This
-			allows inspection of REQUEST_BODY even when no parser is used.</para>
+      allows inspection of REQUEST_BODY even when no parser is used.</para>
     </section>
 
     <section>
@@ -4515,7 +4519,8 @@ SecRule IP:AUTH_ATTEMPT "@gt 25" \
 
       <para><emphasis>Note</emphasis></para>
 
-      <para>This action is extremely useful when responding to both Brute
+      <para>This action is currently not available on Windows based builds.
+      This action is extremely useful when responding to both Brute
       Force and Denial of Service attacks in that, in both cases, you want to
       minimize both the network bandwidth and the data returned to the client.
       This action causes error message to appear in the log "(9)Bad file
