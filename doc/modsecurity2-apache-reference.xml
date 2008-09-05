@@ -6,7 +6,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.7-dev1 (August 27, 2008)</releaseinfo>
+    <releaseinfo>Version 2.5.7-dev1 (September 5, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -2076,7 +2076,7 @@ ServerAlias www.app2.com
       parent contexts.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
-      moreinfo="none">SecRuleRemoveById RULEID</literal></para>
+      moreinfo="none">SecRuleUpdateActionById RULEID ACTIONLIST</literal></para>
 
       <para><emphasis>Example Usage:</emphasis> <literal
       moreinfo="none">SecRuleRemoveByID 1 2 "9000-9010"</literal></para>
