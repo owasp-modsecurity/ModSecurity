@@ -6,7 +6,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.6.0-trunk (August 27, 2008)</releaseinfo>
+    <releaseinfo>Version 2.6.0-trunk (September 5, 2008)</releaseinfo>
 
     <copyright>
       <year>2004-2008</year>
@@ -2232,7 +2232,7 @@ end</programlisting>
       specified rule.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
-      moreinfo="none">SecRuleRemoveById RULEID ACTIONLIST</literal></para>
+      moreinfo="none">SecRuleUpdateActionById RULEID ACTIONLIST</literal></para>
 
       <para><emphasis>Example Usage:</emphasis> <literal
       moreinfo="none">SecRuleUpdateActionById 12345
