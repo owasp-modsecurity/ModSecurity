@@ -237,7 +237,9 @@ char *get_env_var(request_rec *r, char *name) {
 }
 
 /**
- * Internal log helper function. Use msr_log instead.
+ * Internal log helper function. Use msr_log instead. This function will
+ * correctly handle both the messages that have a newline at the end, and
+ * those that don't.
  */
 void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
     int level, const char *text, va_list ap)
@@ -249,12 +251,15 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
     char str1[1024] = "";
     char str2[1256] = "";
 
-    /* Find the logging FD and look up the logging level in the configuration. */
+    /* Find the logging FD and determine the logging level from configuration. */
     if (dcfg != NULL) {
         if ((dcfg->debuglog_fd != NULL)&&(dcfg->debuglog_fd != NOT_SET_P)) {
             debuglog_fd = dcfg->debuglog_fd;
         }
-        if (dcfg->debuglog_level != NOT_SET) filter_debug_level = dcfg->debuglog_level;
+
+        if (dcfg->debuglog_level != NOT_SET) {
+            filter_debug_level = dcfg->debuglog_level;
+        }
     }
 
     /* Return immediately if we don't have where to write
@@ -265,7 +270,7 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
 
     /* Construct the message (leaving a byte left for a newline if needed). */
     apr_vsnprintf(str1, sizeof(str1), text, ap);
-    str2len = apr_snprintf(str2, sizeof(str2)-1, 
+    str2len = apr_snprintf(str2, sizeof(str2) - 1, 
         "[%s] [%s/sid#%pp][rid#%pp][%s][%d] %s",
         current_logtime(msr->mp), ap_get_server_name(r), (r->server),
         r, ((r->uri == NULL) ? "" : log_escape_nq(msr->mp, r->uri)),
