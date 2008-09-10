@@ -655,10 +655,10 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
          */
         return NULL;
     } else
-    if (strcasecmp(name, "requestBodyBuffering") == 0) {
+    if (strcasecmp(name, "forceRequestBodyVariable") == 0) {
         if (parse_boolean(value) == -1) {
             return apr_psprintf(engine->mp, "Invalid setting for ctl name "
-                " requestBodyBuffering: %s", value);
+                " forceRequestBodyVariable: %s", value);
         }
         return NULL;
     } else
@@ -780,7 +780,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
-    if (strcasecmp(name, "requestBodyBuffering") == 0) {
+    if (strcasecmp(name, "forceRequestBodyVariable") == 0) {
         int pv = parse_boolean(value);
 
         if (pv == -1) return -1;
