@@ -335,7 +335,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
 }
 
 /**
- *
+ * Replace a bunch of chunks holding a request body with a single large chunk.
  */
 static apr_status_t modsecurity_request_body_end_raw(modsec_rec *msr, char **error_msg) {
     msc_data_chunk **chunks, *one_chunk;
@@ -351,12 +351,14 @@ static apr_status_t modsecurity_request_body_end_raw(modsec_rec *msr, char **err
             msr->msc_reqbody_length);
         return -1;
     }
+
     msr->msc_reqbody_buffer = malloc(msr->msc_reqbody_length + 1);
     if (msr->msc_reqbody_buffer == NULL) {
         *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body. Asked for %u bytes.",
             msr->msc_reqbody_length + 1);
         return -1;
     }
+
     msr->msc_reqbody_buffer[msr->msc_reqbody_length] = '\0';
 
     /* Copy the data we keep in chunks into the new buffer. */
@@ -390,6 +392,7 @@ static apr_status_t modsecurity_request_body_end_raw(modsec_rec *msr, char **err
         *error_msg = apr_pstrdup(msr->mp, "Failed to create structure to hold request body.");
         return -1;
     }
+
     one_chunk = (msc_data_chunk *)apr_pcalloc(msr->msc_reqbody_mp, sizeof(msc_data_chunk));
     one_chunk->data = msr->msc_reqbody_buffer;
     one_chunk->length = msr->msc_reqbody_length;
@@ -477,7 +480,7 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
             }
         }
     } else if (msr->txcfg->reqbody_buffering) {
-        /* No processing if there is no processor and forcing buffering. */
+        /* Convert to a single continous buffer, but don't do anything else. */
         return modsecurity_request_body_end_raw(msr, error_msg);
     }
 
