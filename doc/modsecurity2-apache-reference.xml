@@ -4411,7 +4411,7 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis>ctl:requestBodyProce
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">requestBodyBuffering</literal></para>
+          <para><literal moreinfo="none">forceRequestBodyVariable</literal></para>
         </listitem>
 
         <listitem>
@@ -4437,7 +4437,7 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis>ctl:requestBodyProce
 
       <para>With the exception of<literal moreinfo="none">
       requestBodyProcessor</literal> and <literal moreinfo="none">
-      requestBodyBuffering</literal>, each configuration option corresponds to
+      forceRequestBodyVariable</literal>, each configuration option corresponds to
       one configuration directive and the usage is identical.</para>
 
       <para>The requestBodyProcessor option allows you to configure the
@@ -4460,9 +4460,10 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis>ctl:requestBodyProce
       moreinfo="none">REQUEST_BODY</literal> phase and an appropriate action
       taken.</para>
 
-      <para>The requestBodyBuffering option allows you to configure the
-      request body to be buffered (in memory) even if it is not parsed.  This
-      allows inspection of REQUEST_BODY even when no parser is used.</para>
+      <para>The forceRequestBodyVariable option allows you to configure the
+      REQUEST_BODY variable to be set even if the request body was not parsed.
+      This allows inspection of REQUEST_BODY even when no parser is used.
+      </para>
     </section>
 
     <section>

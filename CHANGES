@@ -4,8 +4,8 @@
  * Fixed XML DTD/Schema validation which will now fail after request body
    processing errors, even if the XML parser returns a document tree.
 
- * Added ctl:requestBodyBuffering=on|off which, when enabled, will force
-   the request body to be buffered and allow REQUEST_BODY to be inspected.
+ * Added ctl:forceRequestBodyVariable=on|off which, when enabled, will force
+   the REQUEST_BODY variable to be set and allow it to be inspected.
    Previously the REQUEST_BODY target was only populated if the request body
    was a parsable type (application/x-www-form-urlencoded or
    multipart/form-data) or was forced to be parsed via ctl:requestBodyProcessor.
