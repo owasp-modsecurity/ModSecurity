@@ -1275,6 +1275,10 @@ int css_decode_inplace(unsigned char *input, long int input_len) {
                             break;
 
                         case 6:
+                            /* Use the last two from the end, but request
+                             * a full width check if the number is greater
+                             * or equal to 0xFFFF.
+                             */
                             *d = x2c(&input[i + j - 2]);
 
                             /* Do full check if first/second bytes are 0 */
