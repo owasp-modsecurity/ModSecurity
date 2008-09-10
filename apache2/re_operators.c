@@ -872,16 +872,24 @@ static int msre_op_validateDTD_execute(modsec_rec *msr, msre_rule *rule, msre_va
     xmlValidCtxtPtr cvp;
     xmlDtdPtr dtd;
 
-    if (msr->msc_reqbody_error) {
-        *error_msg = apr_psprintf(msr->mp, "XML: DTD validation could not proceed"
-            " due to previous processing errors.");
+    if ((msr->xml == NULL)||(msr->xml->doc == NULL)) {
+        *error_msg = apr_psprintf(msr->mp,
+            "XML document tree could not be found for DTD validation.");
+        return -1;
+    }
+
+    if (msr->xml->well_formed != 1) {
+        *error_msg = apr_psprintf(msr->mp,
+            "XML: DTD validation failed because content is not well formed.");
         return 1;
     }
 
-    if ((msr->xml == NULL)||(msr->xml->doc == NULL)) {
-        *error_msg = apr_psprintf(msr->mp, "XML document tree could not be found for "
-            "DTD validation.");
-        return -1;
+    /* Make sure there were no other generic processing errors */
+    if (msr->msc_reqbody_error) {
+        *error_msg = apr_psprintf(msr->mp,
+            "XML: DTD validation could not proceed due to previous"
+            " processing errors.");
+        return 1;
     }
 
     dtd = xmlParseDTD(NULL, (const xmlChar *)rule->op_param); /* EHN support relative filenames */
@@ -934,16 +942,24 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
     xmlSchemaPtr schema;
     int rc;
 
-    if (msr->msc_reqbody_error) {
-        *error_msg = apr_psprintf(msr->mp, "XML: Schema validation could not proceed"
-            " due to previous processing errors.");
+    if ((msr->xml == NULL)||(msr->xml->doc == NULL)) {
+        *error_msg = apr_psprintf(msr->mp,
+            "XML document tree could not be found for schema validation.");
+        return -1;
+    }
+
+    if (msr->xml->well_formed != 1) {
+        *error_msg = apr_psprintf(msr->mp,
+            "XML: Schema validation failed because content is not well formed.");
         return 1;
     }
 
-    if ((msr->xml == NULL)||(msr->xml->doc == NULL)) {
-        *error_msg = apr_psprintf(msr->mp, "XML document tree could not be found for "
-            "Schema validation.");
-        return -1;
+    /* Make sure there were no other generic processing errors */
+    if (msr->msc_reqbody_error) {
+        *error_msg = apr_psprintf(msr->mp,
+            "XML: Schema validation could not proceed due to previous"
+            " processing errors.");
+        return 1;
     }
 
     parserCtx = xmlSchemaNewParserCtxt(rule->op_param); /* ENH support relative filenames */
