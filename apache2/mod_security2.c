@@ -577,7 +577,10 @@ static int hook_request_early(request_rec *r) {
         rc = perform_interception(msr);
     }
 
-    if ((msr->txcfg->is_enabled != MODSEC_DISABLED) && (rc == DECLINED)) {
+    if (    (msr->txcfg->is_enabled != MODSEC_DISABLED)
+         && (msr->txcfg->reqbody_access == 1)
+         && (rc == DECLINED))
+    {
         /* Check request body limit (non-chunked requests only). */
         if (msr->request_content_length > msr->txcfg->reqbody_limit) {
             msr_log(msr, 1, "Request body (Content-Length) is larger than the "

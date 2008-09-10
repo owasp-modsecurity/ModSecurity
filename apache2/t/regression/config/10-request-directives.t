@@ -179,6 +179,226 @@
 		"a=1&b=2",
 	),
 },
+{
+	type => "config",
+	comment => "SecRequestBodyLimit (equal - chunked)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimit 276
+	),
+	match_log => {
+		-error => [ qr/Request body is larger than the configured limit/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => normalize_raw_request_data(
+		qq(
+			POST /test.txt HTTP/1.1
+			Host: $ENV{SERVER_NAME}:$ENV{SERVER_PORT}
+			User-Agent: $ENV{USER_AGENT}
+			Content-Type: multipart/form-data; boundary=---------------------------69343412719991675451336310646
+			Transfer-Encoding: chunked
+
+		),
+	)
+	.encode_chunked(
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="a"
+
+				1
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="b"
+
+				2
+				-----------------------------69343412719991675451336310646--
+			)
+		),
+		1024
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimit (greater - chunked)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimit 256
+	),
+	match_log => {
+		error => [ qr/Request body .*is larger than the configured limit \(256\)\./, 1 ],
+	},
+	match_response => {
+		status => qr/^413$/,
+	},
+	request => normalize_raw_request_data(
+		qq(
+			POST /test.txt HTTP/1.1
+			Host: $ENV{SERVER_NAME}:$ENV{SERVER_PORT}
+			User-Agent: $ENV{USER_AGENT}
+			Content-Type: multipart/form-data; boundary=---------------------------69343412719991675451336310646
+			Transfer-Encoding: chunked
+
+		),
+	)
+	.encode_chunked(
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="a"
+
+				1
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="b"
+
+				2
+				-----------------------------69343412719991675451336310646--
+			)
+		),
+		1024
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimit (ctl:ruleEngine=off)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimit 5
+
+		SecAction "phase:1,pass,nolog,ctl:ruleEngine=off"
+		SecRule REQUEST_BODY "." "phase:2,deny"
+	),
+	match_log => {
+		-error => [ qr/Request body .*is larger than the configured limit/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		"a=1&b=2",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimit (ctl:requestBodyAccess=off)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimit 5
+
+		SecAction "phase:1,pass,nolog,ctl:requestBodyAccess=off"
+		SecRule REQUEST_BODY "." "phase:2,deny"
+	),
+	match_log => {
+		-error => [ qr/Request body .*is larger than the configured limit/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		"a=1&b=2",
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimit (ctl:ruleEngine=off - chunked)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimit 256
+
+		SecAction "phase:1,pass,nolog,ctl:ruleEngine=off"
+		SecRule REQUEST_BODY "." "phase:2,deny"
+	),
+	match_log => {
+		-error => [ qr/Request body .*is larger than the configured limit/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => normalize_raw_request_data(
+		qq(
+			POST /test.txt HTTP/1.1
+			Host: $ENV{SERVER_NAME}:$ENV{SERVER_PORT}
+			User-Agent: $ENV{USER_AGENT}
+			Content-Type: multipart/form-data; boundary=---------------------------69343412719991675451336310646
+			Transfer-Encoding: chunked
+
+		),
+	)
+	.encode_chunked(
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="a"
+
+				1
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="b"
+
+				2
+				-----------------------------69343412719991675451336310646--
+			)
+		),
+		1024
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimit (ctl:requestBodyAccess=off - chunked)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimit 256
+
+		SecAction "phase:1,pass,nolog,ctl:requestBodyAccess=off"
+		SecRule REQUEST_BODY "." "phase:2,deny"
+	),
+	match_log => {
+		-error => [ qr/Request body .*is larger than the configured limit \(256\)\./, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => normalize_raw_request_data(
+		qq(
+			POST /test.txt HTTP/1.1
+			Host: $ENV{SERVER_NAME}:$ENV{SERVER_PORT}
+			User-Agent: $ENV{USER_AGENT}
+			Content-Type: multipart/form-data; boundary=---------------------------69343412719991675451336310646
+			Transfer-Encoding: chunked
+
+		),
+	)
+	.encode_chunked(
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="a"
+
+				1
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="b"
+
+				2
+				-----------------------------69343412719991675451336310646--
+			)
+		),
+		1024
+	),
+},
 
 # SecRequestBodyInMemoryLimit
 {
