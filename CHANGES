@@ -1,5 +1,8 @@
-03 Sep 2008 - trunk
+15 Sep 2008 - trunk
 -------------------
+
+ * Worked around mod_jk issue where a 401 response was not including the
+   WWW-Authentication header.
 
  * Fixed XML DTD/Schema validation which will now fail after request body
    processing errors, even if the XML parser returns a document tree.

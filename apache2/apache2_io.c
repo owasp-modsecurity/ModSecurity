@@ -378,6 +378,8 @@ static apr_status_t output_filter_init(modsec_rec *msr, ap_filter_t *f,
             return -1; /* Invalid. */
         }
 
+        msr->response_content_length = len;
+
         if (len == 0) {
             if (msr->txcfg->debuglog_level >= 4) {
                 msr_log(msr, 4, "Output filter: Skipping response since Content-Length is zero.");
@@ -675,6 +677,22 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                         log_escape_nq_ex(msr->mp, msr->content_append, msr->content_append_len));
                 }
             }
+
+            msr->of_done_reading = 1;
+        }
+        /* ENH: Probably need to make the handlers for this workaround
+         * configurable. */
+        else if (   (strcmp("jakarta-servlet", msr->r->handler) == 0)
+            && APR_BUCKET_IS_FLUSH(bucket)
+            && (APR_BUCKET_NEXT(bucket) == APR_BRIGADE_SENTINEL(bb_in))
+            && (msr->resbody_length == msr->response_content_length))
+        {
+            /* A FLUSH sent as the last bucket in the bridade may indicate
+             * the end of the response for certain modules if the bytes
+             * received match the response C-L header.  In this case, the
+             * FLUSH bucket is interpreted as an EOS.
+             */
+            msr_log(msr, 4, "Output filter: Interpreted FLUSH as EOS for handler \"%s\".", msr->r->handler);
 
             msr->of_done_reading = 1;
         }
