@@ -268,6 +268,7 @@ struct modsec_rec {
     const char          *response_protocol;
     apr_table_t         *response_headers;
     unsigned int         response_headers_sent;
+    apr_off_t            response_content_length;
     apr_off_t            bytes_sent;
 
     /* modsecurity request body processing stuff */
