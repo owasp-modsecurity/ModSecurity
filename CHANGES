@@ -8,10 +8,9 @@
    processing errors, even if the XML parser returns a document tree.
 
  * Added ctl:forceRequestBodyVariable=on|off which, when enabled, will force
-   the REQUEST_BODY variable to be set and allow it to be inspected.
-   Previously the REQUEST_BODY target was only populated if the request body
-   was a parsable type (application/x-www-form-urlencoded or
-   multipart/form-data) or was forced to be parsed via ctl:requestBodyProcessor.
+   the REQUEST_BODY variable to be set when a request body processor is not set.
+   Previously the REQUEST_BODY target was only populated by the URLENCODED
+   request body processor.
 
  * Integrated mlogc source.
 
