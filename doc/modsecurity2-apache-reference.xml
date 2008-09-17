@@ -2077,7 +2077,8 @@ ServerAlias www.app2.com
       parent contexts.</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
-      moreinfo="none">SecRuleUpdateActionById RULEID ACTIONLIST</literal></para>
+      moreinfo="none">SecRuleUpdateActionById RULEID
+      ACTIONLIST</literal></para>
 
       <para><emphasis>Example Usage:</emphasis> <literal
       moreinfo="none">SecRuleRemoveByID 1 2 "9000-9010"</literal></para>
@@ -2360,12 +2361,12 @@ SecRuleUpdateActionById 12345 "t:compressWhitespace,deny,status:403,msg:'A new m
 
       <para><emphasis>Dependencies/Notes:</emphasis> This feature is not
       available on operating systems not supporting octal file modes. The
-      default mode (0600) only grants read/write access to the account
-      writing the file. If access from another account is needed (using clamd
-      is a good example), then this directive may be required.  However, use
-      this directive with caution to avoid exposing potentially sensitive
-      data to unauthorized users. Using the value "default" will revert back
-      to the default setting.</para>
+      default mode (0600) only grants read/write access to the account writing
+      the file. If access from another account is needed (using clamd is a
+      good example), then this directive may be required. However, use this
+      directive with caution to avoid exposing potentially sensitive data to
+      unauthorized users. Using the value "default" will revert back to the
+      default setting.</para>
     </section>
 
     <section>
@@ -2488,23 +2489,23 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}
 
     <orderedlist continuation="restarts" inheritnum="ignore">
       <listitem>
-        <para>Request headers (REQUEST_HEADERS)</para>
+        <para>Request headers (<literal>REQUEST_HEADERS</literal>)</para>
       </listitem>
 
       <listitem>
-        <para>Request body (REQUEST_BODY)</para>
+        <para>Request body (<literal>REQUEST_BODY</literal>)</para>
       </listitem>
 
       <listitem>
-        <para>Response headers (RESPONSE_HEADERS)</para>
+        <para>Response headers (<literal>RESPONSE_HEADERS</literal>)</para>
       </listitem>
 
       <listitem>
-        <para>Response body (RESPONSE_BODY)</para>
+        <para>Response body (<literal>RESPONSE_BODY</literal>)</para>
       </listitem>
 
       <listitem>
-        <para>Logging (LOGGING)</para>
+        <para>Logging (<literal>LOGGING</literal>)</para>
       </listitem>
     </orderedlist>
 
@@ -3150,7 +3151,8 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <note>
         <para>Please note that anti-evasion transformations are not applied to
         this variable by default. <literal>REQUEST_BASENAME</literal> will
-        recognise both / and \ as path separators.</para>
+        recognise both <literal>/</literal> and <literal>\</literal> as path
+        separators.</para>
       </note>
     </section>
 
@@ -3158,16 +3160,25 @@ SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"</programlisting>
       <title><literal moreinfo="none">REQUEST_BODY</literal></title>
 
       <para>This variable holds the data in the request body (including
-      POST_PAYLOAD data). REQUEST_BODY should be used if the original order of
-      the arguments is important (ARGS should be used in all other cases).
+      <literal>POST_PAYLOAD</literal> data). <literal>REQUEST_BODY</literal>
+      should be used if the original order of the arguments is important
+      (<literal>ARGS</literal> should be used in all other cases).
       Example:</para>
 
       <programlisting format="linespecific">SecRule <emphasis>REQUEST_BODY</emphasis> "^username=\w{25,}\&amp;password=\w{25,}\&amp;Submit\=login$"</programlisting>
 
-      <para><emphasis>Note</emphasis></para>
-
-      <para>This variable is only available if the content type is
-      <literal>application/x-www-form-urlencoded</literal>.</para>
+      <note>
+        <para>This variable is only available if the
+        <literal>URLENCODED</literal> request body processor parsed a request
+        body. This will occur by default when an
+        <literal>application/x-www-form-urlencoded</literal> is detected, or
+        the <literal>URLENCODED</literal> request body parser is forced. As of
+        2.5.7 it is possible to force the presence of the
+        <literal>REQUEST_BODY</literal> variable, but only when there is no
+        request body processor defined, using the
+        <literal>ctl:forceRequestBodyVariable</literal> option in the
+        <literal>REQUEST_HEADERS</literal> phase.</para>
+      </note>
     </section>
 
     <section>
@@ -4411,7 +4422,8 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis>ctl:requestBodyProce
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">forceRequestBodyVariable</literal></para>
+          <para><literal
+          moreinfo="none">forceRequestBodyVariable</literal></para>
         </listitem>
 
         <listitem>
@@ -4437,20 +4449,22 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis>ctl:requestBodyProce
 
       <para>With the exception of<literal moreinfo="none">
       requestBodyProcessor</literal> and <literal moreinfo="none">
-      forceRequestBodyVariable</literal>, each configuration option corresponds to
-      one configuration directive and the usage is identical.</para>
+      forceRequestBodyVariable</literal>, each configuration option
+      corresponds to one configuration directive and the usage is
+      identical.</para>
 
-      <para>The requestBodyProcessor option allows you to configure the
-      request body processor. By default ModSecurity will use the <literal
-      moreinfo="none">URLENCODED</literal> and<literal moreinfo="none">
-      MULTIPART</literal> processors to process an <literal
+      <para>The <literal>requestBodyProcessor</literal> option allows you to
+      configure the request body processor. By default ModSecurity will use
+      the <literal moreinfo="none">URLENCODED</literal> and<literal
+      moreinfo="none"> MULTIPART</literal> processors to process an <literal
       moreinfo="none">application/x-www-form-urlencoded</literal> and a
-      <literal moreinfo="none">multipart/form-data</literal> body,
-      respectively. A third processor, XML, is also supported, but it is never
-      used implicitly. Instead you must tell ModSecurity to use it by placing
-      a few rules in the<literal moreinfo="none"> REQUEST_HEADERS</literal>
-      processing phase. After the request body was processed as XML you will
-      be able to use the XML-related features to inspect it.</para>
+      <literal moreinfo="none">multipart/form-data</literal> bodies,
+      respectively. A third processor, <literal>XML</literal>, is also
+      supported, but it is never used implicitly. Instead you must tell
+      ModSecurity to use it by placing a few rules in the<literal
+      moreinfo="none"> REQUEST_HEADERS</literal> processing phase. After the
+      request body was processed as XML you will be able to use the
+      XML-related features to inspect it.</para>
 
       <para>Request body processors will not interrupt a transaction if an
       error occurs during parsing. Instead they will set variables<literal
@@ -4460,10 +4474,10 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis>ctl:requestBodyProce
       moreinfo="none">REQUEST_BODY</literal> phase and an appropriate action
       taken.</para>
 
-      <para>The forceRequestBodyVariable option allows you to configure the
-      REQUEST_BODY variable to be set even if the request body was not parsed.
-      This allows inspection of REQUEST_BODY even when no parser is used.
-      </para>
+      <para>The <literal>forceRequestBodyVariable</literal> option allows you
+      to configure the <literal>REQUEST_BODY</literal> variable to be set when
+      there is no request body processor configured. This allows for
+      inspection of request bodies of unknown types.</para>
     </section>
 
     <section>
@@ -4521,10 +4535,10 @@ SecRule IP:AUTH_ATTEMPT "@gt 25" \
       <para><emphasis>Note</emphasis></para>
 
       <para>This action is currently not available on Windows based builds.
-      This action is extremely useful when responding to both Brute
-      Force and Denial of Service attacks in that, in both cases, you want to
-      minimize both the network bandwidth and the data returned to the client.
-      This action causes error message to appear in the log "(9)Bad file
+      This action is extremely useful when responding to both Brute Force and
+      Denial of Service attacks in that, in both cases, you want to minimize
+      both the network bandwidth and the data returned to the client. This
+      action causes error message to appear in the log "(9)Bad file
       descriptor: core_output_filter: writing data to the network"</para>
     </section>
 
