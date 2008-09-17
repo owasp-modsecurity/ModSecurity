@@ -1,8 +1,5 @@
-15 Sep 2008 - 2.5.7-dev1
+17 Sep 2008 - 2.5.7-dev1
 ------------------------
-
- * Worked around mod_jk issue where a 401 response was not including the
-   WWW-Authentication header.
 
  * Fixed XML DTD/Schema validation which will now fail after request body
    processing errors, even if the XML parser returns a document tree.
