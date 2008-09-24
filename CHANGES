@@ -1,5 +1,5 @@
-17 Sep 2008 - 2.5.7-rc1
------------------------
+24 Sep 2008 - 2.5.7
+-------------------
 
  * Fixed XML DTD/Schema validation which will now fail after request body
    processing errors, even if the XML parser returns a document tree.
