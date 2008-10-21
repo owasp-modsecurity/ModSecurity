@@ -567,25 +567,23 @@ apr_status_t modsecurity_process_phase(modsec_rec *msr, unsigned int phase) {
 
         msr->tcache_items = 0;
         msr->tcache = apr_hash_make(msr->mp);
-        if (msr->tcache == NULL) return -1;
+        if (msr->tcache == NULL) {
+            msr_log(msr, 1, "Internal error: Failed to allocate transformation cache for phase %d", msr->phase);
+            return -1;
+        }
     }
 
     switch(phase) {
         case 1 :
             return modsecurity_process_phase_request_headers(msr);
-            break;
         case 2 :
             return modsecurity_process_phase_request_body(msr);
-            break;
         case 3 :
             return modsecurity_process_phase_response_headers(msr);
-            break;
         case 4 :
             return modsecurity_process_phase_response_body(msr);
-            break;
         case 5 :
             return modsecurity_process_phase_logging(msr);
-            break;
         default :
             msr_log(msr, 1, "Invalid processing phase: %d", msr->phase);
             break;
