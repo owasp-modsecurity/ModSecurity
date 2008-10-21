@@ -315,6 +315,15 @@
 
                 <para><literal>./configure
                 --with-apxs=/path/to/httpd-2.x.y/bin/apxs</literal></para>
+
+                <note>
+                  <para>There are certain configure options that are meant for
+                  debugging an other development use. If enabled, these
+                  options can substantially impact performance. These options
+                  include all <literal>--debug-*</literal> options as well as
+                  the <literal>--enable-performance-measurements</literal>
+                  options.</para>
+                </note>
               </listitem>
 
               <listitem>
@@ -325,10 +334,12 @@
                 <para>Optionally test with: <literal>make
                 test</literal></para>
 
-                <para>NOTE: This is step is still a bit experimental. If you
-                have problems, please send the full output and error from the
-                build to the support list. Most common issues are related to
-                not finding the required headers and/or libraries.</para>
+                <note>
+                  <para>This is step is still a bit experimental. If you have
+                  problems, please send the full output and error from the
+                  build to the support list. Most common issues are related to
+                  not finding the required headers and/or libraries.</para>
+                </note>
               </listitem>
 
               <listitem>
