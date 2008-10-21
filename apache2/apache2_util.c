@@ -31,17 +31,6 @@ apr_status_t send_error_bucket(modsec_rec *msr, ap_filter_t *f, int status) {
     /* Set the status line explicitly for the error document */
     f->r->status_line = ap_get_status_line(status);
 
-    /* Force alert log for any errors that are not already marked relevant
-     * to prevent any missing error messages in the code from going
-     * unnoticed.  To prevent this error, all code should either set
-     * is_relevant, or just use msr_log with a level <= 3 prior to
-     * calling this function.
-     */
-    if ((msr != NULL) && (msr->is_relevant == 0)) {
-        msr_log(msr, 1, "Internal error: Issuing \"%s\" for unspecified error.",
-            f->r->status_line);
-    }
-
     brigade = apr_brigade_create(f->r->pool, f->r->connection->bucket_alloc);
     if (brigade == NULL) return APR_EGENERAL;
 
