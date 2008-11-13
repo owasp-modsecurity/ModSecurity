@@ -1993,7 +1993,7 @@ SecRule ARGS:q !dirty</programlisting>
       first VirtualHost is not inheriting the ModSecurity main config
       directives and in the second one it is.</para>
 
-      <programlisting format="linespecific">SecRuleEnine On
+      <programlisting format="linespecific">SecRuleEngine On
 SecDefaultAction log,pass,phase:2
 ...  
 
