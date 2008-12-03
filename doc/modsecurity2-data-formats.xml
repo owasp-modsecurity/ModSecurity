@@ -4,7 +4,7 @@
 <article>
     <title>ModSecurity 2 Data Formats</title>
     <articleinfo>
-        <releaseinfo>Version 2.6.0-trunk (November 27, 2008)</releaseinfo>
+        <releaseinfo>Version 2.6.0-trunk (December 3, 2008)</releaseinfo>
         <copyright>
             <year>2004-2008</year>
             <holder>Breach Security, Inc. (<ulink url="http://www.breach.com"
@@ -482,13 +482,13 @@ Server: Apache/2.x.x
                         <para>Unique transaction ID</para>
                     </listitem>
                     <listitem>
-                        <para>Source IP address (IPv4)</para>
+                        <para>Source IP address (IPv4 or IPv6)</para>
                     </listitem>
                     <listitem>
                         <para>Source port</para>
                     </listitem>
                     <listitem>
-                        <para>Destination IP address (IPv4)</para>
+                        <para>Destination IP address (IPv4 or IPv6)</para>
                     </listitem>
                     <listitem>
                         <para>Destination port</para>
@@ -556,10 +556,13 @@ Server: Apache/2.x.x
                 <title>Response Headers (<literal>F</literal>)</title>
                 <para>This part contains the actual response headers sent to the client. Since
                     ModSecurity 2.x for Apache does not access the raw connection data, it
-                    constructs part F out of the internal Apache data structures that hold the
-                    response headers. Some headers are generated just before they are sent and
-                    ModSecurity is not able to record those. They are the <literal>Date</literal>
-                    and <literal>Server</literal> response headers.</para>
+                    constructs part <literal>F</literal> out of the internal Apache data structures
+                    that hold the response headers.</para>
+                <para>Some headers (the <literal>Date</literal> and <literal>Server</literal>
+                    response headers) are generated just before they are sent and ModSecurity is not
+                    able to record those. You should note than ModSecurity is working as part of a
+                    reverse proxy, the backend web server will have generated these two servers, and
+                    in that case they will be recorded. </para>
             </section>
             <section>
                 <title>Response Body (G)</title>
@@ -776,7 +779,11 @@ Server: Apache/2.x.x
             <section>
                 <title>Matched Rules (<literal>K</literal>)</title>
                 <para>The matched rules part contains a record of all ModSecurity rules that matched
-                    during transaction processing.</para>
+                    during transaction processing. You should note that if a rule that belongs to a
+                    chain matches then the entire chain will be recorded. This is because, even
+                    though the disruptive action may not have executed, other per-rule actions have,
+                    and you will need to see the entire chain in order to understand the
+                    rules.</para>
                 <para>This part is available starting with ModSecurity 2.5.x.</para>
             </section>
             <section>
