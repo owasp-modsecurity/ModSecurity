@@ -66,8 +66,8 @@ install: install-mods
 
 clean-extras:
 	@for dir in mlogc-src; do \
-	  if test -d $$dir; then \
-			$(MAKE) -C $$dir clean; \
+	    if test -d $$dir; then \
+			(cd $$dir && $(MAKE) clean); \
 		fi; \
 	done
 	@rm -rf ../tools/mlogc ../tools/mlogc-batch-load.pl
@@ -97,7 +97,7 @@ mod_security2.la: $(MOD_SECURITY2_H) *.c
 
 ### MLogC
 mlogc:
-	@$(MAKE) -C mlogc-src mlogc \
+	@(cd mlogc-src && $(MAKE) mlogc) \
 	&& cp -p mlogc-src/mlogc ../tools \
 	&& cp -p mlogc-src/mlogc-batch-load.pl ../tools \
 	&& echo \

@@ -1296,6 +1296,7 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-verbose-output Enable more verbose configure output.
   --enable-strict-compile Enable strict compilation (warnings are errors).
   --enable-debug-conf     Enable debug during configuration.
   --enable-debug-cache    Enable debug for transformation caching.
@@ -5017,181 +5018,24 @@ MSC_REGRESSION_DOCROOT_DIR="$MSC_REGRESSION_SERVERROOT_DIR/htdocs"
 
 
 
-# Find apxs
-{ echo "$as_me:$LINENO: looking for Apache module support via DSO through APXS" >&5
-echo "$as_me: looking for Apache module support via DSO through APXS" >&6;}
-
-# Check whether --with-apxs was given.
-if test "${with_apxs+set}" = set; then
-  withval=$with_apxs;
-  if test "$withval" = "yes"; then
-    APXS=apxs
-  else
-    APXS="$withval"
-  fi
-
-fi
-
-
-if test -z "$APXS"; then
-  for i in /usr/local/apache22/bin \
-           /usr/local/apache2/bin \
-           /usr/local/apache/bin \
-           /usr/local/sbin \
-           /usr/local/bin \
-           /usr/sbin \
-           /usr/bin;
-  do
-    if test -f "$i/apxs2"; then
-      APXS="$i/apxs2"
-      break
-    elif test -f "$i/apxs"; then
-      APXS="$i/apxs"
-      break
-    fi
-  done
-fi
-
-# arbitrarily picking the same version subversion looks for, don't know how
-# accurate this really is, but at least it'll force us to have apache2...
-HTTPD_WANTED_MMN=20020903
-
-if test -n "$APXS" -a "$APXS" != "no" -a -x "$APXS" ; then
-  APXS_INCLUDE="`$APXS -q INCLUDEDIR`"
-  if test -r $APXS_INCLUDE/httpd.h; then
-    { echo "$as_me:$LINENO: found apxs at $APXS" >&5
-echo "$as_me: found apxs at $APXS" >&6;}
-    { echo "$as_me:$LINENO: checking httpd version" >&5
-echo "$as_me: checking httpd version" >&6;}
-    cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-#include "$APXS_INCLUDE/ap_mmn.h"
-#if AP_MODULE_MAGIC_AT_LEAST($HTTPD_WANTED_MMN,0)
-VERSION_OK
-#endif
-_ACEOF
-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
-  $EGREP "VERSION_OK" >/dev/null 2>&1; then
-  { echo "$as_me:$LINENO: httpd is recent enough" >&5
-echo "$as_me: httpd is recent enough" >&6;}
-else
-  { { echo "$as_me:$LINENO: error: apache is too old" >&5
-echo "$as_me: error: apache is too old" >&2;}
-   { (exit mmn must be at least $HTTPD_WANTED_MMN); exit mmn must be at least $HTTPD_WANTED_MMN; }; }
-fi
-rm -f conftest*
-
-  fi
-  APXS_INCLUDEDIR="`$APXS -q INCLUDEDIR`"
-  # Make sure the include dir is used
-  if test -n "$APXS_INCLUDEDIR"; then
-    APXS_INCLUDES="-I${APXS_INCLUDEDIR} `$APXS -q INCLUDES` `$APXS -q EXTRA_INCLUDES`"
-  else
-    APXS_INCLUDES="`$APXS -q INCLUDES` `$APXS -q EXTRA_INCLUDES`"
-  fi
-  APXS_CFLAGS="`$APXS -q CFLAGS` `$APXS -q EXTRA_CFLAGS`"
-  APXS_LDFLAGS="`$APXS -q LDFLAGS` `$APXS -q EXTRA_LDFLAGS`"
-  APXS_LIBDIR="`$APXS -q LIBDIR`"
-  # Make sure the lib dir is used
-  if test -n "$APXS_LIBDIR"; then
-    APXS_LIBS="-L{$APXS_LIBDIR} `$APXS -q LIBS` `$APXS -q EXTRA_LIBS`"
-  else
-    APXS_LIBS="`$APXS -q LIBS` `$APXS -q EXTRA_LIBS`"
-  fi
-  APXS_LIBTOOL="`$APXS -q LIBTOOL`"
-  APXS_CC="`$APXS -q CC`"
-  APXS_BINDIR="`$APXS -q BINDIR`"
-  APXS_SBINDIR="`$APXS -q SBINDIR`"
-  APXS_PROGNAME="`$APXS -q PROGNAME`"
-  APXS_LIBEXECDIR="`$APXS -q LIBEXECDIR`"
-  if test "$APXS_SBINDIR" = "/"; then
-    APXS_HTTPD="$APXS_SBINDIR/$APXS_PROGNAME"
-  else
-    APXS_HTTPD="$APXS_SBINDIR/$APXS_PROGNAME"
-  fi
-else
-  { { echo "$as_me:$LINENO: error: couldn't find APXS" >&5
-echo "$as_me: error: couldn't find APXS" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-# Use Apache httpd source srclib as base for pcre, apr and apu config scripts
-
-# Check whether --with-httpd-src was given.
-if test "${with_httpd_src+set}" = set; then
-  withval=$with_httpd_src;
-  if test -n "$withval"; then
-    CPPFLAGS="$CPPFLAGS -I$withval/srclib/pcre"
-    LDFLAGS="$LDFLAGS -L$withval/srclib/pcre"
-    pcre_path="$withval/srclib/pcre"
-    apr_path="$withval/srclib/apr"
-    apu_path="$withval/srclib/apr-util"
-  else
-    { { echo "$as_me:$LINENO: error: --with-httpd-src requires a path" >&5
-echo "$as_me: error: --with-httpd-src requires a path" >&2;}
-   { (exit 1); exit 1; }; }
-  fi
-
-fi
-
-
-# Include M4 macros
-
-PCRE_CONFIG="pcre-config"
-PCRE_CFLAGS=""
-PCRE_LIBS=""
-
-
-
-
-APR_CONFIG=""
-APR_CFLAGS=""
-APR_LDFLAGS=""
-APR_LIBS=""
-APR_LINK_LD=""
-
-
-
-
-APU_CONFIG=""
-APU_CFLAGS=""
-APU_LDFLAGS=""
-APU_LIBS=""
-APU_LINK_LD=""
-
-
-
-
-LIBXML_CONFIG="xml2-config"
-LIBXML_CFLAGS=""
-LIBXML_LIBS=""
-
-
-
-
-LUA_CONFIG="pkg-config"
-LUA_PKGNAMES="lua5.1 lua5 lua"
-LUA_CFLAGS=""
-LUA_LIBS=""
-LUA_SONAMES="so la sl dll dylib"
-
-
-
-
-CURL_CONFIG="curl-config"
-CURL_CFLAGS=""
-CURL_LIBS=""
-
-
-
-
-
 ### Configure Options
+
+# Verbose output
+# Check whether --enable-verbose-output was given.
+if test "${enable_verbose_output+set}" = set; then
+  enableval=$enable_verbose_output;
+  if test "$enableval" != "no"; then
+    verbose_output=1
+  else
+    verbose_output=0
+  fi
+
+else
+
+  verbose_output=0
+
+fi
+
 
 # Strict Compile
 # Check whether --enable-strict-compile was given.
@@ -5310,6 +5154,206 @@ else
   modsec_api=
 
 fi
+
+
+# Find apxs
+{ echo "$as_me:$LINENO: looking for Apache module support via DSO through APXS" >&5
+echo "$as_me: looking for Apache module support via DSO through APXS" >&6;}
+
+# Check whether --with-apxs was given.
+if test "${with_apxs+set}" = set; then
+  withval=$with_apxs;
+  if test "$withval" = "yes"; then
+    APXS=apxs
+  else
+    APXS="$withval"
+  fi
+
+fi
+
+
+if test -z "$APXS"; then
+  for i in /usr/local/apache22/bin \
+           /usr/local/apache2/bin \
+           /usr/local/apache/bin \
+           /usr/local/sbin \
+           /usr/local/bin \
+           /usr/sbin \
+           /usr/bin;
+  do
+    if test -f "$i/apxs2"; then
+      APXS="$i/apxs2"
+      break
+    elif test -f "$i/apxs"; then
+      APXS="$i/apxs"
+      break
+    fi
+  done
+fi
+
+# arbitrarily picking the same version subversion looks for, don't know how
+# accurate this really is, but at least it'll force us to have apache2...
+HTTPD_WANTED_MMN=20020903
+
+if test -n "$APXS" -a "$APXS" != "no" -a -x "$APXS" ; then
+  APXS_INCLUDE="`$APXS -q INCLUDEDIR`"
+  if test -r $APXS_INCLUDE/httpd.h; then
+    { echo "$as_me:$LINENO: found apxs at $APXS" >&5
+echo "$as_me: found apxs at $APXS" >&6;}
+    { echo "$as_me:$LINENO: checking httpd version" >&5
+echo "$as_me: checking httpd version" >&6;}
+    cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include "$APXS_INCLUDE/ap_mmn.h"
+#if AP_MODULE_MAGIC_AT_LEAST($HTTPD_WANTED_MMN,0)
+VERSION_OK
+#endif
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "VERSION_OK" >/dev/null 2>&1; then
+  { echo "$as_me:$LINENO: httpd is recent enough" >&5
+echo "$as_me: httpd is recent enough" >&6;}
+else
+  { { echo "$as_me:$LINENO: error: apache is too old" >&5
+echo "$as_me: error: apache is too old" >&2;}
+   { (exit mmn must be at least $HTTPD_WANTED_MMN); exit mmn must be at least $HTTPD_WANTED_MMN; }; }
+fi
+rm -f conftest*
+
+  fi
+  APXS_INCLUDEDIR="`$APXS -q INCLUDEDIR`"
+  if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: apxs INCLUDEDIR: $APXS_INCLUDEDIR" >&5
+echo "$as_me: apxs INCLUDEDIR: $APXS_INCLUDEDIR" >&6;}; fi
+  # Make sure the include dir is used
+  if test -n "$APXS_INCLUDEDIR"; then
+    APXS_INCLUDES="-I${APXS_INCLUDEDIR} `$APXS -q INCLUDES` `$APXS -q EXTRA_INCLUDES`"
+  else
+    APXS_INCLUDES="`$APXS -q INCLUDES` `$APXS -q EXTRA_INCLUDES`"
+  fi
+  if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: apxs INCLUDES: $APXS_INCLUDES" >&5
+echo "$as_me: apxs INCLUDES: $APXS_INCLUDES" >&6;}; fi
+  APXS_CFLAGS="`$APXS -q CFLAGS` `$APXS -q EXTRA_CFLAGS`"
+  if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: apxs CFLAGS: $APXS_CFLAGS" >&5
+echo "$as_me: apxs CFLAGS: $APXS_CFLAGS" >&6;}; fi
+  APXS_LDFLAGS="`$APXS -q LDFLAGS` `$APXS -q EXTRA_LDFLAGS`"
+  if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: apxs LDFLAGS: $APXS_LDFLAGS" >&5
+echo "$as_me: apxs LDFLAGS: $APXS_LDFLAGS" >&6;}; fi
+  APXS_LIBDIR="`$APXS -q LIBDIR`"
+  if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: apxs LIBDIR: $APXS_LIBDIR" >&5
+echo "$as_me: apxs LIBDIR: $APXS_LIBDIR" >&6;}; fi
+  # Make sure the lib dir is used
+  if test -n "$APXS_LIBDIR"; then
+    APXS_LIBS="-L{$APXS_LIBDIR} `$APXS -q LIBS` `$APXS -q EXTRA_LIBS`"
+  else
+    APXS_LIBS="`$APXS -q LIBS` `$APXS -q EXTRA_LIBS`"
+  fi
+  if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: apxs LIBS: $APXS_LIBS" >&5
+echo "$as_me: apxs LIBS: $APXS_LIBS" >&6;}; fi
+  APXS_LIBTOOL="`$APXS -q LIBTOOL`"
+  if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: apxs LIBTOOL: $APXS_LIBTOOL" >&5
+echo "$as_me: apxs LIBTOOL: $APXS_LIBTOOL" >&6;}; fi
+  APXS_CC="`$APXS -q CC`"
+  if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: apxs CC: $APXS_CC" >&5
+echo "$as_me: apxs CC: $APXS_CC" >&6;}; fi
+  APXS_BINDIR="`$APXS -q BINDIR`"
+  if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: apxs BINDIR: $APXS_BINDIR" >&5
+echo "$as_me: apxs BINDIR: $APXS_BINDIR" >&6;}; fi
+  APXS_SBINDIR="`$APXS -q SBINDIR`"
+  if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: apxs SBINDIR: $APXS_SBINDIR" >&5
+echo "$as_me: apxs SBINDIR: $APXS_SBINDIR" >&6;}; fi
+  APXS_PROGNAME="`$APXS -q PROGNAME`"
+  if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: apxs PROGNAME: $APXS_PROGNAME" >&5
+echo "$as_me: apxs PROGNAME: $APXS_PROGNAME" >&6;}; fi
+  APXS_LIBEXECDIR="`$APXS -q LIBEXECDIR`"
+  if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: apxs LIBEXECDIR: $APXS_LIBEXECDIR" >&5
+echo "$as_me: apxs LIBEXECDIR: $APXS_LIBEXECDIR" >&6;}; fi
+  if test "$APXS_SBINDIR" = "/"; then
+    APXS_HTTPD="$APXS_SBINDIR/$APXS_PROGNAME"
+  else
+    APXS_HTTPD="$APXS_SBINDIR/$APXS_PROGNAME"
+  fi
+  if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: apxs HTTPD: $APXS_HTTPD" >&5
+echo "$as_me: apxs HTTPD: $APXS_HTTPD" >&6;}; fi
+else
+  { { echo "$as_me:$LINENO: error: couldn't find APXS" >&5
+echo "$as_me: error: couldn't find APXS" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+# Use Apache httpd source srclib as base for pcre, apr and apu config scripts
+
+# Check whether --with-httpd-src was given.
+if test "${with_httpd_src+set}" = set; then
+  withval=$with_httpd_src;
+  if test -n "$withval"; then
+    CPPFLAGS="$CPPFLAGS -I$withval/srclib/pcre"
+    LDFLAGS="$LDFLAGS -L$withval/srclib/pcre"
+    pcre_path="$withval/srclib/pcre"
+    apr_path="$withval/srclib/apr"
+    apu_path="$withval/srclib/apr-util"
+  else
+    { { echo "$as_me:$LINENO: error: --with-httpd-src requires a path" >&5
+echo "$as_me: error: --with-httpd-src requires a path" >&2;}
+   { (exit 1); exit 1; }; }
+  fi
+
+fi
+
+
+# Include M4 macros
+
+PCRE_CONFIG="pcre-config"
+PCRE_CFLAGS=""
+PCRE_LIBS=""
+
+
+
+
+APR_CONFIG=""
+APR_CFLAGS=""
+APR_LDFLAGS=""
+APR_LIBS=""
+APR_LINK_LD=""
+
+
+
+
+APU_CONFIG=""
+APU_CFLAGS=""
+APU_LDFLAGS=""
+APU_LIBS=""
+APU_LINK_LD=""
+
+
+
+
+LIBXML_CONFIG="xml2-config"
+LIBXML_CFLAGS=""
+LIBXML_LIBS=""
+
+
+
+
+LUA_CONFIG="pkg-config"
+LUA_PKGNAMES="lua5.1 lua5 lua"
+LUA_CFLAGS=""
+LUA_LIBS=""
+LUA_SONAMES="so la sl dll dylib"
+
+
+
+
+CURL_CONFIG="curl-config"
+CURL_CFLAGS=""
+CURL_LIBS=""
+
+
+
 
 
 ### Build *EXTRA_CFLAGS vars
