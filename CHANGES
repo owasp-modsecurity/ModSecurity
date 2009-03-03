@@ -1,3 +1,11 @@
+07 Oct 2008 - 2.5.8
+-------------------
+
+ * Removed an invalid "Internal error: Issuing "%s" for unspecified error."
+   message that was logged when denying with nolog/noauditlog set and
+   causing the request to be audited.
+ 
+  
 24 Sep 2008 - 2.5.7
 -------------------
 
@@ -27,17 +35,17 @@
 
 31 Jul 2008 - 2.5.6
 -------------------
-
+  
  * Transformation caching has been deprecated, and is now off by default. We
    now advise against using transformation caching in production.
-
+   
  * Fixed two separate transformation caching issues that could cause incorrect
    content inspection in some circumstances.
-
+   
  * Fixed an issue with the transformation cache using too much RAM, potentially
    crashing Apache with a large number of cache entries. Two new configuration
    options have been added to allow for a finer control of caching:
-
+   
      maxitems: Max number of items to cache (default 1024)
      incremental: Whether to cache incrementally (default off)
 
