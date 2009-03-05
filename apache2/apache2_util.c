@@ -240,7 +240,7 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
     char str1[1024] = "";
     char str2[1256] = "";
 
-    /* Find the logging FD and look up the logging level in the configuration. */
+    /* Find the logging FD and determine the logging level from configuration. */
     if (dcfg != NULL) {
         if ((dcfg->debuglog_fd != NULL)&&(dcfg->debuglog_fd != NOT_SET_P)) {
             debuglog_fd = dcfg->debuglog_fd;

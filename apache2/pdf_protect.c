@@ -365,7 +365,6 @@ apr_status_t pdfp_output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
  */
 int pdfp_check(modsec_rec *msr) {
     const char *token = NULL;
-    directory_config *cfg = NULL;
     char *uri = NULL;
     char *p = NULL;
 
@@ -426,10 +425,12 @@ int pdfp_check(modsec_rec *msr) {
 
     /* Ignore request methods other than GET and HEAD if
      * configured to do so.
+     *
+     * TODO: Code here is only GET, not GET|HEAD as comment states
      */
-    if ((msr->r->method_number != M_GET)&&(cfg->pdfp_only_get != 0)) {
+    if ((msr->r->method_number != M_GET)&&(msr->txcfg->pdfp_only_get != 0)) {
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "PdfProtect: Not intercepting a GET/HEAD request "
+            msr_log(msr, 4, "PdfProtect: Not intercepting request "
             "(method=%s/%d).", log_escape_nq(msr->mp, msr->r->method), msr->r->method_number);
         }
 
