@@ -1,5 +1,8 @@
-07 Oct 2008 - 2.5.8
+21 Nov 2008 - 2.5.8
 -------------------
+
+ * Fixed PDF XSS issue where a non-GET request for a PDF file would crash the
+   Apache httpd process.  Discovered by Steve Grubb at Red Hat.
 
  * Removed an invalid "Internal error: Issuing "%s" for unspecified error."
    message that was logged when denying with nolog/noauditlog set and
