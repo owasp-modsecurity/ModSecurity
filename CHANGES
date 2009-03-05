@@ -1,3 +1,10 @@
+05 Mar 2009 - 2.5.9-dev1
+------------------------
+
+ * Cleaned up build, adding an option for verbose configure output and making
+   the mlogc build more portable.
+
+ 
 21 Nov 2008 - 2.5.8
 -------------------
 

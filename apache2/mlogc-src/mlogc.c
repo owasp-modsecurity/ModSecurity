@@ -363,7 +363,7 @@ static void error_log(int level, void *thread, const char *text, ...)
         apr_file_write_full(error_log_fd, msg2, nbytes, &nbytes_written);
     }
     else {
-        fprintf(stderr, msg2);
+        fprintf(stderr, "%s", msg2);
     }
 
     va_end(ap);
@@ -1051,7 +1051,7 @@ static void logc_init()
         /* Pre-configure the handle. */
         curl_easy_setopt(curl, CURLOPT_UPLOAD, TRUE);
         curl_easy_setopt(curl, CURLOPT_PUT, TRUE);
-        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, NULL);
+        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, (char *)NULL);
         curl_easy_setopt(curl, CURLOPT_URL, console_uri);
         curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -1289,7 +1289,7 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
                 curl_easy_setopt(curl, CURLOPT_DEBUGDATA, thread);
                 curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curl_error_buffer);
                 curl_easy_setopt(curl, CURLOPT_USERPWD, credentials);
-                curl_easy_setopt(curl, CURLOPT_WRITEDATA, response_buf);
+                curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *)response_buf);
 
                 headerlist = curl_slist_append(headerlist, "Expect:");
                 headerlist = curl_slist_append(headerlist, hash);
