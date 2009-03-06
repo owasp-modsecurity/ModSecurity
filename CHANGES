@@ -1,5 +1,7 @@
-05 Mar 2009 - 2.5.9-dev1
-------------------------
+05 Mar 2009 - 2.5.9
+-------------------
+
+ * Updated copyright year to 2009.
 
  * Added macro expansion for append/prepend action.
 

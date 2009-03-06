@@ -12,7 +12,7 @@
 </xsl:template>
 
 <xsl:template name="user.footer.navigation">
-    <div class="copyright" align="center">Copyright (C) 2004-2008 <a href="http://www.breach.com">Breach Security</a></div>
+    <div class="copyright" align="center">Copyright (C) 2004-2009 <a href="http://www.breach.com">Breach Security</a></div>
 </xsl:template>
 
 <xsl:template name="article.titlepage.separator">
