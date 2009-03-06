@@ -1,6 +1,5 @@
 ### Test misc actions
 
-# TODO: append
 # TODO: block
 # TODO: capture
 # TODO: chain
@@ -10,7 +9,6 @@
 # TODO: initcol
 # TODO: multiMatch
 # TODO: pause
-# TODO: prepend
 # TODO: sanitiseArg
 # TODO: sanitiseMatched
 # TODO: sanitiseRequestHeader

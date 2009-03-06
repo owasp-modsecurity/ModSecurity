@@ -1,6 +1,8 @@
 05 Mar 2009 - 2.5.9-dev1
 ------------------------
 
+ * Added macro expansion for append/prepend action.
+
  * Fixed race condition in concurrent updates of persistent counters.  Updates
    are now atomic.
 

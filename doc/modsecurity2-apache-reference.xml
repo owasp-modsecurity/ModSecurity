@@ -4270,6 +4270,12 @@ SecAction phase:3,allow</programlisting>
       <para>Example:</para>
 
       <programlisting>SecRule RESPONSE_CONTENT_TYPE "^text/html" "nolog,pass,<emphasis>append:'&lt;hr&gt;Footer'</emphasis>"</programlisting>
+
+      <note>
+        <para>While macro expansion is allowed in the additional content, 
+        you are strongly cautioned against inserting user defined data
+        fields.</para>
+      </note>
     </section>
 
     <section>
@@ -4923,6 +4929,12 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
       <para>Example:</para>
 
       <programlisting>SecRule RESPONSE_CONTENT_TYPE ^text/html "phase:3,nolog,pass,<emphasis>prepend:'Header&lt;br&gt;'</emphasis>"</programlisting>
+
+      <note>
+        <para>While macro expansion is allowed in the additional content, 
+        you are strongly cautioned against inserting user defined data
+        fields.</para>
+      </note>
     </section>
 
     <section>

@@ -1803,8 +1803,18 @@ static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
 static apr_status_t msre_action_prepend_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
-    msr->content_prepend = action->param;
-    msr->content_prepend_len = strlen(action->param);
+    msc_string *var = NULL;
+
+    /* Expand any macros in the text */
+    var = apr_pcalloc(mptmp, sizeof(msc_string));
+    if (var == NULL) return -1;
+    var->value = (char *)action->param;
+    var->value_len = strlen(var->value);
+    expand_macros(msr, var, rule, mptmp);
+
+    /* ENH: Verify we really have to dup the data here. */
+    msr->content_prepend = apr_pstrndup(msr->mp, var->value, var->value_len);
+    msr->content_prepend_len = var->value_len;
 
     return 1;
 }
@@ -1813,8 +1823,18 @@ static apr_status_t msre_action_prepend_execute(modsec_rec *msr, apr_pool_t *mpt
 static apr_status_t msre_action_append_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
-    msr->content_append = action->param;
-    msr->content_append_len = strlen(action->param);
+    msc_string *var = NULL;
+
+    /* Expand any macros in the text */
+    var = apr_pcalloc(mptmp, sizeof(msc_string));
+    if (var == NULL) return -1;
+    var->value = (char *)action->param;
+    var->value_len = strlen(var->value);
+    expand_macros(msr, var, rule, mptmp);
+
+    /* ENH: Verify we really have to dup the data here. */
+    msr->content_append = apr_pstrndup(msr->mp, var->value, var->value_len);
+    msr->content_append_len = var->value_len;
 
     return 1;
 }
