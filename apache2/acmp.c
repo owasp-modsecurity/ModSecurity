@@ -16,6 +16,9 @@
  * directly using the email address support@breach.com.
  *
  */
+
+/* Aho-Corasick Matching  */
+
 #include "acmp.h"
 
 #ifdef ACMP_USE_UTF8

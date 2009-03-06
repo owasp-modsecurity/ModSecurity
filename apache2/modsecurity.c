@@ -311,6 +311,8 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     msr->geo_vars = apr_table_make(msr->mp, 8);
     if (msr->geo_vars == NULL) return -1;
 
+    msr->collections_original = apr_table_make(msr->mp, 8);
+    if (msr->collections_original == NULL) return -1;
     msr->collections = apr_table_make(msr->mp, 8);
     if (msr->collections == NULL) return -1;
     msr->collections_dirty = apr_table_make(msr->mp, 8);
@@ -567,10 +569,7 @@ apr_status_t modsecurity_process_phase(modsec_rec *msr, unsigned int phase) {
 
         msr->tcache_items = 0;
         msr->tcache = apr_hash_make(msr->mp);
-        if (msr->tcache == NULL) {
-            msr_log(msr, 1, "Internal error: Failed to allocate transformation cache for phase %d", msr->phase);
-            return -1;
-        }
+        if (msr->tcache == NULL) return -1;
     }
 
     switch(phase) {

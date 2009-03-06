@@ -307,6 +307,64 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
     return 1;
 }
 
+/**
+ * Record the original collection values to use to calculate deltas.
+ * This can be called multiple times and will not overwrite the first
+ * value that is set.
+ */
+apr_status_t collection_original_setvar(modsec_rec *msr, const char *col_name, const msc_string *orig_var) {
+    apr_table_t *table = NULL;
+    msc_string *var = NULL;
+    const char *var_name = NULL;
+
+    if (orig_var == NULL) {
+        msr_log(msr, 1, "Internal Error: Attempt to record NULL original variable.");
+        return -1;
+    }
+
+    var_name = orig_var->name;
+    table = (apr_table_t *)apr_table_get(msr->collections_original, col_name);
+
+    /* Does the collection exist already? */
+    if (table == NULL) {
+        table = apr_table_make(msr->mp, 24);
+        if (table == NULL) {
+            msr_log(msr, 1, "Failed to allocate space for original collection.");
+            return -1;
+        }
+        apr_table_setn(msr->collections_original, apr_pstrdup(msr->mp, col_name), (void *)table);
+    }
+    else {
+        /* Does the variable exist already? */
+        var = (msc_string *)apr_table_get(table, var_name);
+        if (var != NULL) {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Original collection variable: %s.%s = \"%s\"", col_name, var_name, log_escape_ex(msr->mp, orig_var->value, orig_var->value_len));
+            }
+            return 1;
+        }
+    }
+
+    var = (msc_string *)apr_palloc(msr->mp, sizeof(msc_string));
+    if (var == NULL) {
+        msr_log(msr, 1, "Failed to allocate space for original collection variable.");
+        return -1;
+    }
+
+    /* Copy the original var and add to collection. */
+    var->name = orig_var->name ? apr_pstrmemdup(msr->mp, orig_var->name, orig_var->name_len) : NULL;
+    var->name_len = orig_var->name_len;
+    var->value = orig_var->value ? apr_pstrmemdup(msr->mp, orig_var->value, orig_var->value_len) : NULL;
+    var->value_len = orig_var->value_len;
+    apr_table_setn(table, apr_pstrmemdup(msr->mp, var->name, var->name_len), (void *)var);
+
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Recorded original collection variable: %s.%s = \"%s\"", col_name, var_name, log_escape_ex(msr->mp, var->value, var->value_len));
+    }
+
+    return 0;
+}
+
 /* id */
 
 static apr_status_t msre_action_id_init(msre_engine *engine, msre_actionset *actionset,
@@ -1211,10 +1269,15 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
                 rec->name = apr_pstrdup(msr->mp, var_name);
                 rec->name_len = strlen(rec->name);
                 value = 0;
+                rec->value = apr_psprintf(msr->mp, "%d", value);
+                rec->value_len = strlen(rec->value);
             }
             else {
                 value = atoi(rec->value);
             }
+
+            /* Record the original value before we change it */
+            collection_original_setvar(msr, col_name, rec);
 
             /* Expand values in value */
             val->value = var_value;
@@ -1488,6 +1551,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
     const char *col_name, const char *col_key, unsigned int col_key_len)
 {
     apr_table_t *table = NULL;
+    msc_string *var = NULL;
 
     /* IMP1 Cannot initialise the built-in collections this way. */
 
@@ -1501,13 +1565,12 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
     table = collection_retrieve(msr, real_col_name, col_key, col_key_len);
 
     if (table == NULL) {
-        msc_string *var = NULL;
-
         /* Does not exist yet - create new. */
         msr_log(msr, 4, "Creating collection (name \"%s\", key \"%s\").",
             real_col_name, col_key);
 
         table = apr_table_make(msr->mp, 24);
+        if (table == NULL) return -1;
 
         /* IMP1 Is the timeout hard-coded to 3600? */
 
@@ -1582,6 +1645,12 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var->value = "1";
         var->value_len = strlen(var->value);
         apr_table_setn(table, var->name, (void *)var);
+    }
+
+    /* Record the original counter value before we change it */
+    var = (msc_string *)apr_table_get(table, "UPDATE_COUNTER");
+    if (var != NULL) {
+        collection_original_setvar(msr, col_name, var);
     }
 
     /* Add the collection to the list. */

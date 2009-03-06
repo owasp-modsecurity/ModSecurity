@@ -33,6 +33,8 @@
 #define RESULT_WRONGSIZE        -3
 #define RESULT_WRONGRET         -4
 
+#define DEFAULT_ACTION           "phase:2,log,auditlog,pass"
+
 #define CMDLINE_OPTS             "t:n:p:P:r:I:D:Nh"
 
 /* Types */
@@ -322,7 +324,7 @@ static int init_op(op_data_t *data, const char *name, const char *param, unsigne
         *errmsg = apr_psprintf(g_mp, "Failed to create ruleset for op \"%s\".", name);
         return -1;
     }
-    data->rule = msre_rule_create(data->ruleset, RULE_TYPE_NORMAL, conf_fn, 1, "UNIT_TEST", args, "t:none,pass,nolog", errmsg);
+    data->rule = msre_rule_create(data->ruleset, RULE_TYPE_NORMAL, conf_fn, 1, "UNIT_TEST", args, DEFAULT_ACTION, errmsg);
     if (data->rule == NULL) {
         *errmsg = apr_psprintf(g_mp, "Failed to create rule for op \"%s\": %s", name, *errmsg);
         return -1;
@@ -523,6 +525,9 @@ static void init_msr() {
     g_msr->hostname = "localhost";
     g_msr->msc_rule_mptmp = g_mp;
     g_msr->tx_vars = apr_table_make(g_mp, 1);
+    g_msr->collections_original = apr_table_make(g_mp, 1);
+    g_msr->collections = apr_table_make(g_mp, 1);
+    g_msr->collections_dirty = apr_table_make(g_mp, 1);
 }
 
 /**
@@ -814,6 +819,9 @@ int main(int argc, const char * const argv[])
         }
         else if (strcmp("action", type) == 0) {
             /* Actions */
+            int n;
+            const apr_array_header_t *arr;
+            apr_table_entry_t *te;
 
             rc = test_action(&action_data, &errmsg);
             if (rc < 0) {
@@ -835,6 +843,47 @@ int main(int argc, const char * const argv[])
                 ec = 1;
             }
 
+            /* Store any collections that were initialized and changed */
+            arr = apr_table_elts(g_msr->collections);
+            te = (apr_table_entry_t *)arr->elts;
+            for (n = 0; n < arr->nelts; n++) {
+                apr_table_t *col = (apr_table_t *)te[n].val;
+//                apr_table_t *orig_col = NULL;
+
+                if (g_msr->txcfg->debuglog_level >= 9) {
+                    msr_log(g_msr, 9, "Found loaded collection: %s", te[n].key);
+                }
+                /* Only store those collections that changed. */
+                if (apr_table_get(g_msr->collections_dirty, te[n].key)) {
+                    int x = collection_store(g_msr, col);
+
+                    if (g_msr->txcfg->debuglog_level >= 9) {
+                        msr_log(g_msr, 9, "Stored collection: %s (%d)", te[n].key, x);
+                    }
+                }
+#if 0
+                /* Re-populate the original values with the new ones. */
+                if ((orig_col = (apr_table_t *)apr_table_get(g_msr->collections_original, te[n].key)) != NULL) {
+                    const apr_array_header_t *orig_arr = apr_table_elts(orig_col);
+                    apr_table_entry_t *orig_te = (apr_table_entry_t *)orig_arr->elts;
+                    int m;
+
+                    for (m = 0; m < orig_arr->nelts; m++) {
+                        msc_string *mstr = (msc_string *)apr_table_get(col, orig_te[m].key);
+
+                        if (g_msr->txcfg->debuglog_level >= 9) {
+                            msr_log(g_msr, 9, "Updating original collection: %s.%s=%s", te[n].key, mstr->name, mstr->value);
+                        }
+                        //apr_table_setn(orig_col, orig_te[m].key, (void *)mstr );
+                        collection_original_setvar(g_msr, te[n].key, mstr);
+
+                        
+                    }
+                }
+#endif
+            }
+            apr_table_clear(g_msr->collections_dirty);
+            apr_table_clear(g_msr->collections_original);
         }
         else {
             fprintf(stderr, "Unknown type: \"%s\"\n", type);
