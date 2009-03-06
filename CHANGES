@@ -1,6 +1,9 @@
 05 Mar 2009 - 2.5.9
 -------------------
 
+ * Added ability to specify the config script directly using --with-apr
+   and --with-apu.
+
  * Updated copyright year to 2009.
 
  * Added macro expansion for append/prepend action.
