@@ -5560,9 +5560,9 @@ if test ! -d "${withval}" -a -e "${withval}"; then
     with_apu=`echo ${withval} | sed "s/\/\?${APU_CONFIG}\$//"`
 fi
 
-if test -z "${with_apr}"; then
+if test -z "${with_apu}"; then
         if test -z "${apu_path}"; then
-        test_paths="/usr/local/apr /usr/local /usr"
+        test_paths="/usr/local/apr-util /usr/local/apu /usr/local/apr /usr/local /usr"
     else
         test_paths="${apu_path}"
     fi
