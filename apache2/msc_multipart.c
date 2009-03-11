@@ -310,7 +310,13 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
                 return -1;
             }
 
+            /* extract header name */
             header_name = apr_pstrmemdup(msr->mp, msr->mpd->buf, (data - msr->mpd->buf));
+            if (data == msr->mpd->buf) {
+                *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid part header (header name missing).");
+
+                 return -1;
+            }
 
             /* extract the value value */
             data++;
@@ -548,23 +554,30 @@ static int multipart_process_boundary(modsec_rec *msr, int last_part, char **err
             if (msr->mpd->mpp->value == NULL) return -1;
         }
 
-        /* add the part to the list of parts */
-        *(multipart_part **)apr_array_push(msr->mpd->parts) = msr->mpd->mpp;
-        if (msr->mpd->mpp->type == MULTIPART_FILE) {
-            if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Multipart: Added file part %pp to the list: name \"%s\" "
-                    "file name \"%s\" (offset %u, length %u)",
-                    msr->mpd->mpp, log_escape(msr->mp, msr->mpd->mpp->name),
-                    log_escape(msr->mp, msr->mpd->mpp->filename),
-                    msr->mpd->mpp->offset, msr->mpd->mpp->length);
+        if (msr->mpd->mpp->name) {
+            /* add the part to the list of parts */
+            *(multipart_part **)apr_array_push(msr->mpd->parts) = msr->mpd->mpp;
+            if (msr->mpd->mpp->type == MULTIPART_FILE) {
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Multipart: Added file part %pp to the list: name \"%s\" "
+                        "file name \"%s\" (offset %u, length %u)",
+                        msr->mpd->mpp, log_escape(msr->mp, msr->mpd->mpp->name),
+                        log_escape(msr->mp, msr->mpd->mpp->filename),
+                        msr->mpd->mpp->offset, msr->mpd->mpp->length);
+                }
+            }
+            else {
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Multipart: Added part %pp to the list: name \"%s\" "
+                        "(offset %u, length %u)", msr->mpd->mpp, log_escape(msr->mp, msr->mpd->mpp->name),
+                        msr->mpd->mpp->offset, msr->mpd->mpp->length);
+                }
             }
         }
         else {
-            if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Multipart: Added part %pp to the list: name \"%s\" "
-                    "(offset %u, length %u)", msr->mpd->mpp, log_escape(msr->mp, msr->mpd->mpp->name),
-                    msr->mpd->mpp->offset, msr->mpd->mpp->length);
-            }
+            msr_log(msr, 3, "Multipart: Skipping invalid part %pp (part name missing): "
+                "(offset %u, length %u)", msr->mpd->mpp,
+                msr->mpd->mpp->offset, msr->mpd->mpp->length);
         }
 
         msr->mpd->mpp = NULL;
