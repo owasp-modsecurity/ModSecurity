@@ -30,10 +30,10 @@ if test ! -d "${withval}" -a -e "${withval}"; then
 fi
 
 dnl # Look for the config script
-if test -z "${with_apr}"; then
+if test -z "${with_apu}"; then
     dnl # Determine apu lib directory
     if test -z "${apu_path}"; then
-        test_paths="/usr/local/apr /usr/local /usr"
+        test_paths="/usr/local/apr-util /usr/local/apu /usr/local/apr /usr/local /usr"
     else
         test_paths="${apu_path}"
     fi
