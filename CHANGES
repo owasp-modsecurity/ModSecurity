@@ -1,6 +1,10 @@
 05 Mar 2009 - 2.5.9
 -------------------
 
+ * Fixed parsing multipart content with a missing part header name which
+   would crash Apache.  Discovered by "Internet Security Auditors"
+   (isecauditors.com).
+
  * Added ability to specify the config script directly using --with-apr
    and --with-apu.
 
