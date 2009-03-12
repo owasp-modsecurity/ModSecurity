@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2009 Breach Security, Inc. (http://www.breach.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this

@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2009 Breach Security, Inc. (http://www.breach.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -141,7 +141,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     }
 
     /* ENH Need expiration (and perhaps other metadata) accessible in blob
-     * form so we can determine if we need to convert to a table.  This will
+     * form to determine if converting to a table is needed.  This will
      * save some cycles.
      */
 
@@ -149,8 +149,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     col = collection_unpack(msr, (const unsigned char *)value->dptr, value->dsize, 1);
     if (col == NULL) return NULL;
 
-    /* We have to close *after* we use "value" from the fetch or the memory
-     * may be overwritten. */
+    /* Close after "value" used from fetch or memory may be overwritten. */
     if (existing_dbm == NULL) {
         apr_sdbm_close(dbm);
     }
@@ -189,7 +188,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     /* Delete the collection if the variable "KEY" does not exist.
      *
      * ENH It would probably be more efficient to hold the DBM
-     * open until we determine if it needs deleted than to open a second
+     * open until determined if it needs deleted than to open a second
      * time.
      */
     if (apr_table_get(col, "KEY") == NULL) {
@@ -246,7 +245,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
                 apr_time_t td;
                 counter = atoi(var->value);
 
-                /* UPDATE_RATE is removed on store, so we add it back here */
+                /* UPDATE_RATE is removed on store, so add it back here */
                 var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
                 var->name = "UPDATE_RATE";
                 var->name_len = strlen(var->name);
@@ -381,7 +380,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         return -1;
     }
 
-        /* We only need to lock so we can pull in the stored data again. */
+        /* Only need to lock to pull in the stored data again. */
         rc = apr_sdbm_lock(dbm, APR_FLOCK_EXCLUSIVE);
         if (rc != APR_SUCCESS) {
             msr_log(msr, 1, "Failed to exclusivly lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
@@ -390,7 +389,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
             return -1;
         }
 
-    /* If there is an original value, then we need to create a delta and
+    /* If there is an original value, then create a delta and
      * apply the delta to the current value */
     orig_col = (const apr_table_t *)apr_table_get(msr->collections_original, var_name->value);
     if (orig_col != NULL) {
@@ -409,7 +408,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         msc_string *var = (msc_string *)te[i].val;
         int len;
 
-        /* If there is an original value, then we need to apply the delta
+        /* If there is an original value, then apply the delta
          * to the latest stored value */
         if (stored_col != NULL) {
             const msc_string *orig_var = (const msc_string *)apr_table_get(orig_col, var->name);
@@ -559,8 +558,8 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
         return -1;
     }
 
-    /* No one can write to the file while we're
-     * doing this so let's do it as fast as we can.
+    /* No one can write to the file while doing this so
+     * do it as fast as possible.
      */
     rc = apr_sdbm_firstkey(dbm, &key);
     while(rc == APR_SUCCESS) {

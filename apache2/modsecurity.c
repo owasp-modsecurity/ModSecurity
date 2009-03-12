@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2008 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2009 Breach Security, Inc. (http://www.breach.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -569,10 +569,7 @@ apr_status_t modsecurity_process_phase(modsec_rec *msr, unsigned int phase) {
 
         msr->tcache_items = 0;
         msr->tcache = apr_hash_make(msr->mp);
-        if (msr->tcache == NULL) {
-            msr_log(msr, 1, "Internal error: Failed to allocate transformation cache for phase %d", msr->phase);
-            return -1;
-        }
+        if (msr->tcache == NULL) return -1;
     }
 
     switch(phase) {
