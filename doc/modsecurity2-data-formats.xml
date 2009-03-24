@@ -4,7 +4,7 @@
 <article>
     <title>ModSecurity 2 Data Formats</title>
     <articleinfo>
-        <releaseinfo>Version 2.5.9 (March 5, 2009)</releaseinfo>
+        <releaseinfo>Version 2.5.10-dev1 (March 24, 2009)</releaseinfo>
         <copyright>
             <year>2004-2009</year>
             <holder>Breach Security, Inc. (<ulink url="http://www.breach.com"
@@ -17,7 +17,7 @@
         and products.</para>
     <section>
         <title>Alerts</title>
-        <para>As part of its operations ModSecurity will emit alerts, which are eather
+        <para>As part of its operations ModSecurity will emit alerts, which are either
                 <emphasis>warnings</emphasis> (non-fatal) or <emphasis>errors</emphasis> (fatal,
             usually leading to the interception of the transaction in question). Below is an example
             of a ModSecurity alert entry:</para>
