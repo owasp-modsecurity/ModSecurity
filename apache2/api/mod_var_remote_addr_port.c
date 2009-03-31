@@ -39,40 +39,6 @@ static int var_simple_generate(msre_var *var, apr_table_t *vartab, apr_pool_t *m
     return var_simple_generate_ex(var, vartab, mptmp, value, strlen(value));
 }
 
-/**
- * Validate that a target parameter is valid. We only need to take
- * care of the case when the parameter is a regular expression.
- */
-static char *var_generic_list_validate(msre_ruleset *ruleset, msre_var *var) {
-    /* It's OK if there's no parameter. */
-    if (var->param == NULL) return NULL;
-
-    /* Is it a regular expression? */
-    if ((strlen(var->param) > 2)&&(var->param[0] == '/')
-        &&(var->param[strlen(var->param) - 1] == '/'))
-    { /* Regex. */
-        msc_regex_t *regex = NULL;
-        const char *errptr = NULL;
-        const char *pattern = NULL;
-        int erroffset;
-
-        pattern = apr_pstrmemdup(ruleset->mp, var->param + 1, strlen(var->param + 1) - 1);
-        if (pattern == NULL) return FATAL_ERROR;
-
-        regex = msc_pregcomp(ruleset->mp, pattern, PCRE_DOTALL | PCRE_CASELESS | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset);
-        if (regex == NULL) {
-            return apr_psprintf(ruleset->mp, "Error compiling pattern (pos %i): %s",
-                erroffset, errptr);
-        }
-
-        /* Store the compiled regex for later. */
-        var->param_data = regex;
-    }
-
-    /* Simple string */
-    return NULL;
-}
-
 
 /* -- Module specific code -- */
 
@@ -83,7 +49,6 @@ static int var_remote_addr_port_generate(modsec_rec *msr, msre_var *var, msre_ru
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     const char *value = apr_psprintf(mptmp, "%s:%d", msr->remote_addr, msr->remote_port);
-    msre_var *rvar = NULL;
 
     return var_simple_generate(var, vartab, mptmp, value);
 }
