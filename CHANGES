@@ -1,3 +1,28 @@
+05 Mar 2009 - trunk
+-------------------
+
+
+05 Mar 2009 - 2.5.9
+-------------------
+
+ * Fixed parsing multipart content with a missing part header name which
+   would crash Apache.  Discovered by "Internet Security Auditors"
+   (isecauditors.com).
+
+ * Added ability to specify the config script directly using --with-apr
+   and --with-apu.
+
+ * Updated copyright year to 2009.
+
+ * Added macro expansion for append/prepend action.
+
+ * Fixed race condition in concurrent updates of persistent counters.  Updates
+   are now atomic.
+
+ * Cleaned up build, adding an option for verbose configure output and making
+   the mlogc build more portable.
+
+ 
 21 Nov 2008 - 2.5.8
 -------------------
 
