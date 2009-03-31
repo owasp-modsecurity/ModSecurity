@@ -1,39 +1,76 @@
+Custom ModSecurity Modules
+--------------------------
 
-This directory contains two examples how you can extend
+This directory contains three examples how you can extend
 ModSecurity without having to touch it directly, simply
 by creating custom Apache modules.
 
 NOTE: ModSecurity must be compiled with API support
       to use this feature (do not use -DNO_MODSEC_API).
 
-1)
+
+Building the Example Custom Modules
+-----------------------------------
+
+1) Example custom transformation function module
 
 Module mod_tfn_reverse.c creates a custom transformation
 function "reverse" that reverses the content it receives
 on input.
 
-To compile simply do:
+  # Compile as a normal user
+  apxs -ca mod_tfn_reverse.c
 
-  apxs -cia mod_tfn_reverse.c
+  # Install as superuser
+  sudo apxs -i mod_tfn_reverse.la
 
-2)
+
+2) Example custom operator module
 
 Module mod_op_strstr.c creates a custom operator "strstr"
 that implements fast matching using the Boyer-Moore-Horspool
 algorithm.
 
 Compiling this module is more involved because it requires
-access to ModSecurity structures. For example:
+access to ModSecurity structures.
 
-  apxs -I<MODSECURITY_SOURCE_CODE> -I/usr/include/libxml2 -cia mod_op_strstr.c
+  # Compile as a normal user
+  apxs -I<MODSECURITY_SOURCE_CODE> -I/usr/include/libxml2 \
+       -ca mod_op_strstr.c
 
-3)
+  # Install as superuser
+  sudo apxs -i mod_op_strstr.la
+
+
+3) Example custom target variable module
 
 Module mod_var_remote_addr_port.c creates a custom variable "REMOTE_ADDR_PORT"
 that combines the REMOTE_ADDR and REMOTE_PORT into a.b.c.d:port format.
 
 Compiling this module is more involved because it requires
-access to ModSecurity structures. For example:
+access to ModSecurity structures.
 
-  apxs -I<MODSECURITY_SOURCE_CODE> -cia mod_var_remote_addr_port.c
+  # Compile as a normal user
+  apxs -I<MODSECURITY_SOURCE_CODE> -I/usr/include/libxml2 \
+       -ca mod_var_remote_addr_port.c
+
+  # Install as superuser
+  sudo apxs -i mod_var_remote_addr_port.la
+
+
+Using the Modules
+-----------------
+
+Once the modules are built and installed, you load them like any other Apache module, but they must be loaded *after* the mod_security2.so module.
+
+  # Load ModSecurity
+  LoadModule security2_module modules/mod_security2.so
+
+  # Load ModSecurity custom modules
+  LoadModule tfn_reverse_module modules/mod_tfn_reverse.so
+  LoadModule op_strstr_module modules/mod_op_strstr.so
+  LoadModule var_remote_addr_port_module modules/mod_var_remote_addr_port.so
+
+  # All three custom var/op/tfn used
+  SecRule REMOTE_ADDR_PORT "@strstr 1.2.3.4:5678" "t:reverse"
 

@@ -12,9 +12,6 @@
 #define ALPHABET_SIZE       256
 #define MAX_PATTERN_SIZE    64
 
-APR_DECLARE_OPTIONAL_FN(void, modsec_register_operator,
-    (const char *name, void *fn_init, void *fn_exec));
-
 static void initBoyerMooreHorspool(const char *pattern, int patlength,
     int *bm_badcharacter_array);
 
@@ -53,8 +50,6 @@ static int op_strstr_init(msre_rule *rule, char **error_msg) {
  * Operator execution entry point.
  */
 static int op_strstr_exec(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    char *valuecopy = NULL;
-
     /* Here we need to inspect the contents of the supplied variable. */
 
     /* In a general case it is possible for the value

@@ -7,7 +7,9 @@
 #include "ap_config.h"
 #include "apr_optional.h"
 
+/* Must be declared if modsecurity.h is not included */
 APR_DECLARE_OPTIONAL_FN(void, modsec_register_tfn, (const char *name, void *fn));
+
 
 /**
  * This function will be invoked by
