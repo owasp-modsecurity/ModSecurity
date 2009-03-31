@@ -6,7 +6,7 @@
     <releaseinfo>Version 1.0 / (April 10, 2007)</releaseinfo>
 
     <copyright>
-      <year>2004-2008</year>
+      <year>2004-2009</year>
 
       <holder>Breach Security, Inc. (<ulink
       url="http://www.breach.com">http://www.breach.com</ulink>)</holder>
@@ -181,8 +181,6 @@
                 dynamically for individual requests.</para>
               </listitem>
             </itemizedlist>
-
-            
           </td>
 
           <td>Replace SecFilterEngine with SecRuleEngine. The DynamicOnly mode
@@ -242,8 +240,6 @@
                 </para>
               </listitem>
             </itemizedlist>
-
-            
           </td>
 
           <td>Replace SecFilterDefaultAction with SecDefaultAction.
@@ -525,8 +521,6 @@
                 <para>sha1</para>
               </listitem>
             </itemizedlist>
-
-            
           </td>
 
           <td>In Mod 1.x, the normalization functions were implicit and you

@@ -9,7 +9,7 @@
     <releaseinfo>Version 2.6.0-trunk (March 5, 2009)</releaseinfo>
 
     <copyright>
-      <year>2004-2008</year>
+      <year>2004-2009</year>
 
       <holder>Breach Security, Inc. (<ulink
       url="http://www.breach.com">http://www.breach.com</ulink>)</holder>
@@ -4270,6 +4270,12 @@ SecAction phase:3,allow</programlisting>
       <para>Example:</para>
 
       <programlisting>SecRule RESPONSE_CONTENT_TYPE "^text/html" "nolog,pass,<emphasis>append:'&lt;hr&gt;Footer'</emphasis>"</programlisting>
+
+      <note>
+        <para>While macro expansion is allowed in the additional content, you
+        are strongly cautioned against inserting user defined data
+        fields.</para>
+      </note>
     </section>
 
     <section>
@@ -4923,6 +4929,12 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
       <para>Example:</para>
 
       <programlisting>SecRule RESPONSE_CONTENT_TYPE ^text/html "phase:3,nolog,pass,<emphasis>prepend:'Header&lt;br&gt;'</emphasis>"</programlisting>
+
+      <note>
+        <para>While macro expansion is allowed in the additional content, you
+        are strongly cautioned against inserting user defined data
+        fields.</para>
+      </note>
     </section>
 
     <section>
@@ -5915,15 +5927,6 @@ SecRule REQUEST_METHOD "!<emphasis>@within %{tx.allowed_methods}</emphasis>" t:l
       being persisted. This keeps counter data consistent even if the counter
       was modified and persisted by another thread/process during the
       transaction.</para>
-
-      <para>Please note that ModSecurity does not implement atomic updates of
-      persistent variables at this time. Variables are read from storage
-      whenever <literal>initcol</literal> is encountered in the rules and
-      persisted at the end of request processing. On busy servers requests
-      often run in parallel, leading to situations where one request
-      overwrites the changes made by another request. We anticipate
-      implementing atomic updates of counter values in a future
-      version.</para>
     </note>
 
     <note>
