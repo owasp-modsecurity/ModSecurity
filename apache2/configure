@@ -5896,13 +5896,13 @@ if test -n "${curl_path}"; then
     CURL_CONFIG="${curl_path}/${CURL_CONFIG}"
     { echo "$as_me:$LINENO: result: ${CURL_CONFIG}" >&5
 echo "${ECHO_T}${CURL_CONFIG}" >&6; }
-    CURL_CFLAGS="`${CURL_CONFIG} --includes --cppflags --cflags`"
+    CURL_CFLAGS="`${CURL_CONFIG} --cflags`"
     if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: curl CFLAGS: $CURL_CFLAGS" >&5
 echo "$as_me: curl CFLAGS: $CURL_CFLAGS" >&6;}; fi
     CURL_LIBS="`${CURL_CONFIG} --libs`"
     if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: curl LIBS: $CURL_LIBS" >&5
 echo "$as_me: curl LIBS: $CURL_LIBS" >&6;}; fi
-    CURL_VERSION="`${CURL_CONFIG} --version`"
+    CURL_VERSION=`${CURL_CONFIG} --version | sed 's/^[^0-9][^[:space:]][^[:space:]]*[[:space:]]*//'`
     if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: curl VERSION: $CURL_VERSION" >&5
 echo "$as_me: curl VERSION: $CURL_VERSION" >&6;}; fi
     CFLAGS=$save_CFLAGS
@@ -5910,7 +5910,9 @@ echo "$as_me: curl VERSION: $CURL_VERSION" >&6;}; fi
 
         { echo "$as_me:$LINENO: checking if libcurl is at least v${CURL_MIN_VERSION}" >&5
 echo $ECHO_N "checking if libcurl is at least v${CURL_MIN_VERSION}... $ECHO_C" >&6; }
-    if ${CURL_CONFIG} --checkfor "${CURL_MIN_VERSION}" >/dev/null 2>&1; then
+    curl_min_ver=`echo ${CURL_MIN_VERSION} | awk -F. '{print (\$ 1 * 1000000) + (\$ 2 * 1000) + \$ 3}'`
+    curl_ver=`echo ${CURL_VERSION} | awk -F. '{print (\$ 1 * 1000000) + (\$ 2 * 1000) + \$ 3}'`
+    if test "$curl_min_ver" -le "$curl_ver"; then
         { echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
     else

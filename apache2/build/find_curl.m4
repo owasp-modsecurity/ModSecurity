@@ -48,18 +48,20 @@ done
 if test -n "${curl_path}"; then
     CURL_CONFIG="${curl_path}/${CURL_CONFIG}"
     AC_MSG_RESULT([${CURL_CONFIG}])
-    CURL_CFLAGS="`${CURL_CONFIG} --includes --cppflags --cflags`"
+    CURL_CFLAGS="`${CURL_CONFIG} --cflags`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(curl CFLAGS: $CURL_CFLAGS); fi
     CURL_LIBS="`${CURL_CONFIG} --libs`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(curl LIBS: $CURL_LIBS); fi
-    CURL_VERSION="`${CURL_CONFIG} --version`"
+    CURL_VERSION=`${CURL_CONFIG} --version | sed 's/^[[^0-9]][[^[:space:]]][[^[:space:]]]*[[[:space:]]]*//'`
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(curl VERSION: $CURL_VERSION); fi
     CFLAGS=$save_CFLAGS
     LDFLAGS=$save_LDFLAGS
 
     dnl # Check version is ok
     AC_MSG_CHECKING([if libcurl is at least v${CURL_MIN_VERSION}])
-    if ${CURL_CONFIG} --checkfor "${CURL_MIN_VERSION}" >/dev/null 2>&1; then
+    curl_min_ver=`echo ${CURL_MIN_VERSION} | awk -F. '{print (\$ 1 * 1000000) + (\$ 2 * 1000) + \$ 3}'`
+    curl_ver=`echo ${CURL_VERSION} | awk -F. '{print (\$ 1 * 1000000) + (\$ 2 * 1000) + \$ 3}'`
+    if test "$curl_min_ver" -le "$curl_ver"; then
         AC_MSG_RESULT([yes])
     else
         AC_MSG_RESULT([no])
