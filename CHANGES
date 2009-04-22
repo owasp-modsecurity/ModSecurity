@@ -1,5 +1,7 @@
-05 Mar 2009 - trunk
+22 Apr 2009 - trunk
 -------------------
+
+ * Cleaned up build dependencies and configure options.
 
 
 05 Mar 2009 - 2.5.9

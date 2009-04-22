@@ -1282,7 +1282,16 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
                 response_buf[0] = 0;
                 response_buf[1] = 1;
 
-                error_log(LOG_DEBUG, thread, "File found, activating cURL.");
+                if (finfo.size == 0) {
+                    error_log(LOG_WARNING, thread, "File found (%" APR_SIZE_T_FMT " bytes), skipping.", finfo.size);
+                    take_new = 1;
+                    nodelay = 1;
+                    goto THREAD_CLEANUP;
+                }
+                else {
+                    error_log(LOG_DEBUG, thread, "File found (%" APR_SIZE_T_FMT " bytes), activating cURL.", finfo.size);
+                }
+
 
                 curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
                 curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, curl_debugfunction);

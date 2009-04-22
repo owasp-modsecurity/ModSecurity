@@ -18,46 +18,38 @@ AC_DEFUN([CHECK_APU],
 AC_ARG_WITH(
     apu,
     [AC_HELP_STRING([--with-apu=PATH],[Path to apu prefix or config script])],
-    apu_path="$withval",
-    :)
+    [test_paths="${with_apu}"],
+    [test_paths="/usr/local/libapr-util /usr/local/apr-util /usr/local/libapu /usr/local/apu /usr/local /opt/libapr-util /opt/apr-util /opt/libapu /opt/apu /opt /usr"])
 
-AC_MSG_CHECKING([for libapr-util config script])
+AC_MSG_CHECKING([for libapu config script])
 
-dnl # Determine if the script was specified and use it directly
-if test ! -d "${withval}" -a -e "${withval}"; then
-    APU_CONFIG="`basename $withval`"
-    with_apu=`echo ${withval} | sed "s/\/\?${APU_CONFIG}\$//"`
-fi
-
-dnl # Look for the config script
-if test -z "${with_apu}"; then
-    dnl # Determine apu lib directory
-    if test -z "${apu_path}"; then
-        test_paths="/usr/local/apr-util /usr/local/apu /usr/local/apr /usr/local /usr"
-    else
-        test_paths="${apu_path}"
+for x in ${test_paths}; do
+    dnl # Determine if the script was specified and use it directly
+    if test ! -d "$x" -a -e "$x"; then
+        APU_CONFIG="`basename $x`"
+        apu_path=`echo $x | sed "s/\/\?${APU_CONFIG}\$//"`
+        break
     fi
 
-    for x in ${test_paths}; do
-        for APU_CONFIG in apu-1-mt-config apu-1-config apu-mt-config apu-config; do
-            if test -e "${x}/bin/${APU_CONFIG}"; then
-                with_apu="${x}/bin"
-                break
-            elif test -e "${x}/${APU_CONFIG}"; then
-                with_apu="${x}"
-                break
-            else
-                with_apu=""
-            fi
-        done
-        if test -n "$with_apu"; then
+    dnl # Try known config script names/locations
+    for APU_CONFIG in apu-1-mt-config apu-1-config apu-mt-config apu-config; do
+        if test -e "${x}/bin/${APU_CONFIG}"; then
+            apu_path="${x}/bin"
             break
+        elif test -e "${x}/${APU_CONFIG}"; then
+            apu_path="${x}"
+            break
+        else
+            apu_path=""
         fi
     done
-fi
+    if test -n "$apu_path"; then
+        break
+    fi
+done
 
-if test -n "${with_apu}"; then
-    APU_CONFIG="${with_apu}/${APU_CONFIG}"
+if test -n "${apu_path}"; then
+    APU_CONFIG="${apu_path}/${APU_CONFIG}"
     AC_MSG_RESULT([${APU_CONFIG}])
     APU_CFLAGS="`${APU_CONFIG} --includes`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu CFLAGS: $APU_CFLAGS); fi
@@ -79,10 +71,10 @@ AC_SUBST(APU_LDFLAGS)
 AC_SUBST(APU_LINK_LD)
 
 if test -z "${APU_LIBS}"; then
-  AC_MSG_NOTICE([*** apu library not found.])
-  ifelse([$2], , AC_MSG_ERROR([apu library is required]), $2)
+    AC_MSG_NOTICE([*** apu library not found.])
+    ifelse([$2], , AC_MSG_ERROR([apu library is required]), $2)
 else
-  AC_MSG_NOTICE([using '${APU_LINK_LD}' for apu Library])
-  ifelse([$1], , , $1) 
+    AC_MSG_NOTICE([using '${APU_LIBS}' for apu Library])
+    ifelse([$1], , , $1) 
 fi 
 ])

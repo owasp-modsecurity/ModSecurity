@@ -2,34 +2,26 @@
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.docbook.org/xml/4.4/docbookx.dtd">
 <article>
-  <title>ModSecurity 2 Data Formats</title>
-
-  <articleinfo>
-    <releaseinfo>2.6.0-trunk (March 5, 2009)</releaseinfo>
-
-    <copyright>
-      <year>2004-2009</year>
-
-      <holder>Breach Security, Inc. (<ulink
-      url="http://www.breach.com">http://www.breach.com</ulink>)</holder>
-    </copyright>
-  </articleinfo>
-
-  <para>The purpose of this document is to describe the formats of the
-  ModSecurity alert messages, transaction logs and communication protocols,
-  which would not only allow for a better understanding what ModSecurity does
-  but also for an easy integration with third-party tools and products.</para>
-
-  <section>
-    <title>Alerts</title>
-
-    <para>As part of its operations ModSecurity will emit alerts, which are
-    either <emphasis>warnings</emphasis> (non-fatal) or
-    <emphasis>errors</emphasis> (fatal, usually leading to the interception of
-    the transaction in question). Below is an example of a ModSecurity alert
-    entry:</para>
-
-    <programlisting>Access denied with code 505 (phase 1). Match of "rx
+    <title>ModSecurity 2 Data Formats</title>
+    <articleinfo>
+        <releaseinfo>2.6.0-trunk (April 22, 2009)</releaseinfo>
+        <copyright>
+            <year>2004-2009</year>
+            <holder>Breach Security, Inc. (<ulink url="http://www.breach.com"
+                    >http://www.breach.com</ulink>)</holder>
+        </copyright>
+    </articleinfo>
+    <para>The purpose of this document is to describe the formats of the ModSecurity alert messages,
+        transaction logs and communication protocols, which would not only allow for a better
+        understanding what ModSecurity does but also for an easy integration with third-party tools
+        and products.</para>
+    <section>
+        <title>Alerts</title>
+        <para>As part of its operations ModSecurity will emit alerts, which are either
+                <emphasis>warnings</emphasis> (non-fatal) or <emphasis>errors</emphasis> (fatal,
+            usually leading to the interception of the transaction in question). Below is an example
+            of a ModSecurity alert entry:</para>
+        <programlisting>Access denied with code 505 (phase 1). Match of "rx
   ^HTTP/(0\\\\.9|1\\\\.[01])$" against "REQUEST_PROTOCOL" required.
   [id "960034"] [msg "HTTP protocol version is not allowed by policy"]
   [severity "CRITICAL"] [uri "/"] [unique_id "PQaTTVBEUOkAAFwKXrYAAAAM"]</programlisting>

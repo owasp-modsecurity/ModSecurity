@@ -708,8 +708,8 @@ APU_LIBS
 APU_CFLAGS
 APU_LDFLAGS
 APU_LINK_LD
-LIBXML_LIBS
-LIBXML_CFLAGS
+LIBXML2_LIBS
+LIBXML2_CFLAGS
 LUA_LIBS
 LUA_CFLAGS
 CURL_LIBS
@@ -1311,15 +1311,12 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-apxs=FILE        FILE is the path to apxs; defaults to "apxs".
-  --with-httpd-src=PATH   PATH is to the Apache httpd source tree where srclib
-                          will be used as a base for pcre, apr and apu config
-                          scripts.
-  --with-pcre=PATH        Path to the pcre prefix
+  --with-pcre=PATH        Path to pcre prefix or config script
   --with-apr=PATH         Path to apr prefix or config script
   --with-apu=PATH         Path to apu prefix or config script
-  --with-libxml=PATH      Path to the libxml2 prefix
-  --with-lua=PATH         Path to the lua prefix
-  --with-curl=PATH        Path to the curl prefix
+  --with-xml=PATH         Path to xml prefix or config script
+  --with-lua=PATH         Path to lua prefix or config script
+  --with-curl=PATH        Path to curl prefix or config script
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -5285,29 +5282,9 @@ echo "$as_me: error: couldn't find APXS" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-# Use Apache httpd source srclib as base for pcre, apr and apu config scripts
-
-# Check whether --with-httpd-src was given.
-if test "${with_httpd_src+set}" = set; then
-  withval=$with_httpd_src;
-  if test -n "$withval"; then
-    CPPFLAGS="$CPPFLAGS -I$withval/srclib/pcre"
-    LDFLAGS="$LDFLAGS -L$withval/srclib/pcre"
-    pcre_path="$withval/srclib/pcre"
-    apr_path="$withval/srclib/apr"
-    apu_path="$withval/srclib/apr-util"
-  else
-    { { echo "$as_me:$LINENO: error: --with-httpd-src requires a path" >&5
-echo "$as_me: error: --with-httpd-src requires a path" >&2;}
-   { (exit 1); exit 1; }; }
-  fi
-
-fi
-
-
 # Include M4 macros
 
-PCRE_CONFIG="pcre-config"
+PCRE_CONFIG=""
 PCRE_CFLAGS=""
 PCRE_LIBS=""
 
@@ -5332,25 +5309,27 @@ APU_LINK_LD=""
 
 
 
-LIBXML_CONFIG="xml2-config"
-LIBXML_CFLAGS=""
-LIBXML_LIBS=""
+LIBXML2_CONFIG=""
+LIBXML2_CFLAGS=""
+LIBXML2_LIBS=""
 
 
 
 
-LUA_CONFIG="pkg-config"
-LUA_PKGNAMES="lua5.1 lua5 lua"
+LUA_CONFIG=""
 LUA_CFLAGS=""
 LUA_LIBS=""
+LUA_CONFIG=pkg-config
+LUA_PKGNAMES="lua5.1 lua-5.1 lua_5.1 lua-51 lua_51 lua51 lua5 lua"
 LUA_SONAMES="so la sl dll dylib"
 
 
 
 
-CURL_CONFIG="curl-config"
+CURL_CONFIG=""
 CURL_CFLAGS=""
 CURL_LIBS=""
+CURL_MIN_VERSION="7.15.1"
 
 
 
@@ -5406,37 +5385,56 @@ LDFLAGS="$APXS_LDFLAGS $LDFLAGS"
 
 # Check whether --with-pcre was given.
 if test "${with_pcre+set}" = set; then
-  withval=$with_pcre; pcre_path="$withval"
+  withval=$with_pcre; test_paths="${with_pcre}"
 else
-  :
+  test_paths="/usr/local/libpcre /usr/local/pcre /usr/local /opt/libpcre /opt/pcre /opt /usr"
 fi
 
-
-if test -z "${pcre_path}"; then
-    test_paths="/usr/local /usr"
-else
-    test_paths="${pcre_path}"
-fi
 
 { echo "$as_me:$LINENO: checking for libpcre config script" >&5
 echo $ECHO_N "checking for libpcre config script... $ECHO_C" >&6; }
+
+if test -z "${with_pcre}"; then
+    test_paths="/usr/local/pcre /usr/local /usr"
+else
+    test_paths="${with_pcre}"
+fi
+
 for x in ${test_paths}; do
-    if test -e "${x}/bin/${PCRE_CONFIG}"; then
-        with_pcre="${x}/bin"
+        if test ! -d "$x" -a -e "$x"; then
+        PCRE_CONFIG="`basename $x`"
+        pcre_path=`echo $x | sed "s/\/\?${PCRE_CONFIG}\$//"`
         break
-    elif test -e "${x}/${PCRE_CONFIG}"; then
-        with_pcre="${x}"
+    fi
+
+        for PCRE_CONFIG in pcre-config; do
+        if test -e "${x}/bin/${PCRE_CONFIG}"; then
+            pcre_path="${x}/bin"
+            break
+        elif test -e "${x}/${PCRE_CONFIG}"; then
+            pcre_path="${x}"
+            break
+        else
+            pcre_path=""
+        fi
+    done
+    if test -n "$pcre_path"; then
         break
-    else
-        with_pcre=""
     fi
 done
-if test -n "${with_pcre}"; then
-    PCRE_CONFIG="${with_pcre}/${PCRE_CONFIG}"
+    CFLAGS=$save_CFLAGS
+    LDFLAGS=$save_LDFLAGS
+
+if test -n "${pcre_path}"; then
+    PCRE_CONFIG="${pcre_path}/${PCRE_CONFIG}"
     { echo "$as_me:$LINENO: result: ${PCRE_CONFIG}" >&5
 echo "${ECHO_T}${PCRE_CONFIG}" >&6; }
     PCRE_CFLAGS="`${PCRE_CONFIG} --cflags`"
+    if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: pcre CFLAGS: $PCRE_CFLAGS" >&5
+echo "$as_me: pcre CFLAGS: $PCRE_CFLAGS" >&6;}; fi
     PCRE_LIBS="`${PCRE_CONFIG} --libs`"
+    if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: pcre LIBS: $PCRE_LIBS" >&5
+echo "$as_me: pcre LIBS: $PCRE_LIBS" >&6;}; fi
     CFLAGS=$save_CFLAGS
     LDFLAGS=$save_LDFLAGS
 else
@@ -5448,13 +5446,13 @@ fi
 
 
 if test -z "${PCRE_LIBS}"; then
-  { echo "$as_me:$LINENO: *** pcre library not found." >&5
+    { echo "$as_me:$LINENO: *** pcre library not found." >&5
 echo "$as_me: *** pcre library not found." >&6;}
-  { { echo "$as_me:$LINENO: error: pcre library is required" >&5
+    { { echo "$as_me:$LINENO: error: pcre library is required" >&5
 echo "$as_me: error: pcre library is required" >&2;}
    { (exit 1); exit 1; }; }
 else
-  { echo "$as_me:$LINENO: using '${PCRE_LIBS}' for pcre Library" >&5
+    { echo "$as_me:$LINENO: using '${PCRE_LIBS}' for pcre Library" >&5
 echo "$as_me: using '${PCRE_LIBS}' for pcre Library" >&6;}
 
 fi
@@ -5463,47 +5461,40 @@ fi
 
 # Check whether --with-apr was given.
 if test "${with_apr+set}" = set; then
-  withval=$with_apr; apr_path="${withval}"
+  withval=$with_apr; test_paths="${with_apr}"
 else
-  :
+  test_paths="/usr/local/libapr /usr/local/apr /usr/local /opt/libapr /opt/apr /opt /usr"
 fi
 
 
 { echo "$as_me:$LINENO: checking for libapr config script" >&5
 echo $ECHO_N "checking for libapr config script... $ECHO_C" >&6; }
 
-if test ! -d "${withval}" -a -e "${withval}"; then
-    APR_CONFIG="`basename $withval`"
-    with_apr=`echo ${withval} | sed "s/\/\?${APR_CONFIG}\$//"`
-fi
-
-if test -z "${with_apr}"; then
-        if test -z "${apr_path}"; then
-        test_paths="/usr/local/apr /usr/local /usr"
-    else
-        test_paths="${apr_path}"
+for x in ${test_paths}; do
+        if test ! -d "$x" -a -e "$x"; then
+        APR_CONFIG="`basename $x`"
+        apr_path=`echo $x | sed "s/\/\?${APR_CONFIG}\$//"`
+        break
     fi
 
-    for x in ${test_paths}; do
         for APR_CONFIG in apr-1-mt-config apr-1-config apr-mt-config apr-config; do
-            if test -e "${x}/bin/${APR_CONFIG}"; then
-                with_apr="${x}/bin"
-                break
-            elif test -e "${x}/${APR_CONFIG}"; then
-                with_apr="${x}"
-                break
-            else
-                with_apr=""
-            fi
-        done
-        if test -n "$with_apr"; then
+        if test -e "${x}/bin/${APR_CONFIG}"; then
+            apr_path="${x}/bin"
             break
+        elif test -e "${x}/${APR_CONFIG}"; then
+            apr_path="${x}"
+            break
+        else
+            apr_path=""
         fi
     done
-fi
+    if test -n "$apr_path"; then
+        break
+    fi
+done
 
-if test -n "${with_apr}"; then
-    APR_CONFIG="${with_apr}/${APR_CONFIG}"
+if test -n "${apr_path}"; then
+    APR_CONFIG="${apr_path}/${APR_CONFIG}"
     { echo "$as_me:$LINENO: result: ${APR_CONFIG}" >&5
 echo "${ECHO_T}${APR_CONFIG}" >&6; }
     APR_CFLAGS="`${APR_CONFIG} --includes --cppflags --cflags`"
@@ -5546,47 +5537,40 @@ fi
 
 # Check whether --with-apu was given.
 if test "${with_apu+set}" = set; then
-  withval=$with_apu; apu_path="$withval"
+  withval=$with_apu; test_paths="${with_apu}"
 else
-  :
+  test_paths="/usr/local/libapr-util /usr/local/apr-util /usr/local/libapu /usr/local/apu /usr/local /opt/libapr-util /opt/apr-util /opt/libapu /opt/apu /opt /usr"
 fi
 
 
-{ echo "$as_me:$LINENO: checking for libapr-util config script" >&5
-echo $ECHO_N "checking for libapr-util config script... $ECHO_C" >&6; }
+{ echo "$as_me:$LINENO: checking for libapu config script" >&5
+echo $ECHO_N "checking for libapu config script... $ECHO_C" >&6; }
 
-if test ! -d "${withval}" -a -e "${withval}"; then
-    APU_CONFIG="`basename $withval`"
-    with_apu=`echo ${withval} | sed "s/\/\?${APU_CONFIG}\$//"`
-fi
-
-if test -z "${with_apu}"; then
-        if test -z "${apu_path}"; then
-        test_paths="/usr/local/apr-util /usr/local/apu /usr/local/apr /usr/local /usr"
-    else
-        test_paths="${apu_path}"
+for x in ${test_paths}; do
+        if test ! -d "$x" -a -e "$x"; then
+        APU_CONFIG="`basename $x`"
+        apu_path=`echo $x | sed "s/\/\?${APU_CONFIG}\$//"`
+        break
     fi
 
-    for x in ${test_paths}; do
         for APU_CONFIG in apu-1-mt-config apu-1-config apu-mt-config apu-config; do
-            if test -e "${x}/bin/${APU_CONFIG}"; then
-                with_apu="${x}/bin"
-                break
-            elif test -e "${x}/${APU_CONFIG}"; then
-                with_apu="${x}"
-                break
-            else
-                with_apu=""
-            fi
-        done
-        if test -n "$with_apu"; then
+        if test -e "${x}/bin/${APU_CONFIG}"; then
+            apu_path="${x}/bin"
             break
+        elif test -e "${x}/${APU_CONFIG}"; then
+            apu_path="${x}"
+            break
+        else
+            apu_path=""
         fi
     done
-fi
+    if test -n "$apu_path"; then
+        break
+    fi
+done
 
-if test -n "${with_apu}"; then
-    APU_CONFIG="${with_apu}/${APU_CONFIG}"
+if test -n "${apu_path}"; then
+    APU_CONFIG="${apu_path}/${APU_CONFIG}"
     { echo "$as_me:$LINENO: result: ${APU_CONFIG}" >&5
 echo "${ECHO_T}${APU_CONFIG}" >&6; }
     APU_CFLAGS="`${APU_CONFIG} --includes`"
@@ -5614,49 +5598,65 @@ fi
 
 
 if test -z "${APU_LIBS}"; then
-  { echo "$as_me:$LINENO: *** apu library not found." >&5
+    { echo "$as_me:$LINENO: *** apu library not found." >&5
 echo "$as_me: *** apu library not found." >&6;}
-  { { echo "$as_me:$LINENO: error: apu library is required" >&5
+    { { echo "$as_me:$LINENO: error: apu library is required" >&5
 echo "$as_me: error: apu library is required" >&2;}
    { (exit 1); exit 1; }; }
 else
-  { echo "$as_me:$LINENO: using '${APU_LINK_LD}' for apu Library" >&5
-echo "$as_me: using '${APU_LINK_LD}' for apu Library" >&6;}
+    { echo "$as_me:$LINENO: using '${APU_LIBS}' for apu Library" >&5
+echo "$as_me: using '${APU_LIBS}' for apu Library" >&6;}
 
 fi
 
 
 
-# Check whether --with-libxml was given.
-if test "${with_libxml+set}" = set; then
-  withval=$with_libxml; libxml_path="$withval"
+# Check whether --with-xml was given.
+if test "${with_xml+set}" = set; then
+  withval=$with_xml; test_paths="${with_xml}"
 else
-  :
+  test_paths="/usr/local/libxml2 /usr/local/xml2 /usr/local/xml /usr/local /opt/libxml2 /opt/libxml /opt/xml2 /opt/xml /opt /usr"
 fi
 
-
-if test -z "${libxml_path}"; then
-    test_paths="/usr/local /usr"
-else
-    test_paths="${libxml_path}"
-fi
 
 { echo "$as_me:$LINENO: checking for libxml2 config script" >&5
 echo $ECHO_N "checking for libxml2 config script... $ECHO_C" >&6; }
+
 for x in ${test_paths}; do
-    if test -e "${x}/bin/${LIBXML_CONFIG}"; then
-        with_libxml="${x}/bin"
+        if test ! -d "$x" -a -e "$x"; then
+        LIBXML2_CONFIG="`basename $x`"
+        xml_path=`echo $x | sed "s/\/\?${LIBXML2_CONFIG}\$//"`
         break
-    else
-        with_libxml=""
+    fi
+
+        for LIBXML2_CONFIG in xml2-config xml-2-config xml-config; do
+        if test -e "${x}/bin/${LIBXML2_CONFIG}"; then
+            xml_path="${x}/bin"
+            break
+        elif test -e "${x}/${LIBXML2_CONFIG}"; then
+            xml_path="${x}"
+            break
+        else
+            xml_path=""
+        fi
+    done
+    if test -n "$xml_path"; then
+        break
     fi
 done
-if test -n "${with_libxml}"; then
-    LIBXML_CONFIG="${with_libxml}/${LIBXML_CONFIG}"
-    { echo "$as_me:$LINENO: result: ${LIBXML_CONFIG}" >&5
-echo "${ECHO_T}${LIBXML_CONFIG}" >&6; }
-    LIBXML_CFLAGS="`${LIBXML_CONFIG} --cflags`"
-    LIBXML_LIBS="`${LIBXML_CONFIG} --libs`"
+    CFLAGS=$save_CFLAGS
+    LDFLAGS=$save_LDFLAGS
+
+if test -n "${xml_path}"; then
+    LIBXML2_CONFIG="${xml_path}/${LIBXML2_CONFIG}"
+    { echo "$as_me:$LINENO: result: ${LIBXML2_CONFIG}" >&5
+echo "${ECHO_T}${LIBXML2_CONFIG}" >&6; }
+    LIBXML2_CFLAGS="`${LIBXML2_CONFIG} --cflags`"
+    if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: xml CFLAGS: $LIBXML2_CFLAGS" >&5
+echo "$as_me: xml CFLAGS: $LIBXML2_CFLAGS" >&6;}; fi
+    LIBXML2_LIBS="`${LIBXML2_CONFIG} --libs`"
+    if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: xml LIBS: $LIBXML2_LIBS" >&5
+echo "$as_me: xml LIBS: $LIBXML2_LIBS" >&6;}; fi
     CFLAGS=$save_CFLAGS
     LDFLAGS=$save_LDFLAGS
 else
@@ -5667,15 +5667,15 @@ fi
 
 
 
-if test -z "${LIBXML_LIBS}"; then
-  { echo "$as_me:$LINENO: *** libxml2 library not found." >&5
-echo "$as_me: *** libxml2 library not found." >&6;}
-  { { echo "$as_me:$LINENO: error: libxml2 library is required" >&5
-echo "$as_me: error: libxml2 library is required" >&2;}
+if test -z "${LIBXML2_LIBS}"; then
+    { echo "$as_me:$LINENO: *** xml library not found." >&5
+echo "$as_me: *** xml library not found." >&6;}
+    { { echo "$as_me:$LINENO: error: xml library is required" >&5
+echo "$as_me: error: xml library is required" >&2;}
    { (exit 1); exit 1; }; }
 else
-  { echo "$as_me:$LINENO: using '${LIBXML_LIBS}' for libxml Library" >&5
-echo "$as_me: using '${LIBXML_LIBS}' for libxml Library" >&6;}
+    { echo "$as_me:$LINENO: using '${LIBXML2_LIBS}' for xml Library" >&5
+echo "$as_me: using '${LIBXML2_LIBS}' for xml Library" >&6;}
 
 fi
 
@@ -5683,153 +5683,159 @@ fi
 
 # Check whether --with-lua was given.
 if test "${with_lua+set}" = set; then
-  withval=$with_lua; lua_path="$withval"
+  withval=$with_lua; test_paths="${with_lua}"
 else
-  :
+  test_paths="/usr/local/liblua /usr/local/lua /usr/local /opt/liblua /opt/lua /opt /usr";
 fi
 
 
-if test "${lua_path}" != "no"; then
-        if test -z "${lua_path}"; then
-        test_paths="/usr /usr/local /opt"
-    else
-        test_paths="${lua_path}"
+{ echo "$as_me:$LINENO: checking for liblua config script" >&5
+echo $ECHO_N "checking for liblua config script... $ECHO_C" >&6; }
+
+for x in ${test_paths}; do
+        if test ! -d "$x" -a -e "$x"; then
+        LUA_CONFIG="$x"
+        break
     fi
 
-    { echo "$as_me:$LINENO: checking for pkg-config script for lua library" >&5
-echo $ECHO_N "checking for pkg-config script for lua library... $ECHO_C" >&6; }
-    for x in ${test_paths}; do
-        if test -e "${x}/bin/${LUA_CONFIG}"; then
-            with_lua="${x}/bin"
+        for y in $LUA_CONFIG; do
+        if test -e "${x}/bin/${y}"; then
+            LUA_CONFIG="${x}/bin/${y}"
+            lua_config="${LUA_CONFIG}"
             break
-        else
-            with_lua=""
+        elif test -e "${x}/${y}"; then
+            LUA_CONFIG="${x}/${y}"
+            lua_config="${LUA_CONFIG}"
+            break
         fi
     done
-    if test -n "${with_lua}"; then
-        LUA_CONFIG="${with_lua}/${LUA_CONFIG}"
-        for LUA_PKGNAME in ${LUA_PKGNAMES}; do
-            if ${LUA_CONFIG} --exists ${LUA_PKGNAME}; then
-                break
-            fi
-            LUA_PKGNAME=""
-        done
-        if test -n "$LUA_PKGNAME"; then
-            { echo "$as_me:$LINENO: result: ${LUA_CONFIG} ${LUA_PKGNAME}" >&5
-echo "${ECHO_T}${LUA_CONFIG} ${LUA_PKGNAME}" >&6; }
-            LUA_CFLAGS="`${LUA_CONFIG} ${LUA_PKGNAME} --cflags`"
-            LUA_LIBS="`${LUA_CONFIG} ${LUA_PKGNAME} --libs`"
-            CFLAGS=$save_CFLAGS
-            LDFLAGS=$save_LDFLAGS
-        else
-            { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
+    if test -n "${lua_config}"; then
+        break
+    fi
+done
+
+if test -n "${LUA_CONFIG}"; then
+    LUA_PKGNAME=""
+    for x in ${LUA_PKGNAMES}; do
+        if ${LUA_CONFIG} --exists ${x}; then
+            LUA_PKGNAME="$x"
+            break
         fi
+    done
+fi
+
+if test -n "${LUA_PKGNAME}"; then
+    { echo "$as_me:$LINENO: result: ${LUA_CONFIG}" >&5
+echo "${ECHO_T}${LUA_CONFIG}" >&6; }
+    LUA_CFLAGS="`${LUA_CONFIG} ${LUA_PKGNAME} --cflags`"
+    if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: lua CFLAGS: $LUA_CFLAGS" >&5
+echo "$as_me: lua CFLAGS: $LUA_CFLAGS" >&6;}; fi
+    LUA_LIBS="`${LUA_CONFIG} ${LUA_PKGNAME} --libs`"
+    if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: lua LIBS: $LUA_LIBS" >&5
+echo "$as_me: lua LIBS: $LUA_LIBS" >&6;}; fi
+    CFLAGS=$save_CFLAGS
+    LDFLAGS=$save_LDFLAGS
+else
+    { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+
+        { echo "$as_me:$LINENO: checking for lua install" >&5
+echo $ECHO_N "checking for lua install... $ECHO_C" >&6; }
+    for x in ${test_paths}; do
+        for y in ${LUA_SONAMES}; do
+            if test -e "${x}/liblua5.1.${y}"; then
+                lua_lib_path="${x}"
+                lua_lib_name="lua5.1"
+                break
+            elif test -e "${x}/lib/liblua5.1.${y}"; then
+                lua_lib_path="${x}/lib"
+                lua_lib_name="lua5.1"
+                break
+            elif test -e "${x}/lib64/liblua5.1.${y}"; then
+                lua_lib_path="${x}/lib64"
+                lua_lib_name="lua5.1"
+                break
+            elif test -e "${x}/lib32/liblua5.1.${y}"; then
+                lua_lib_path="${x}/lib32"
+                lua_lib_name="lua5.1"
+                break
+            elif test -e "${x}/liblua51.${y}"; then
+                lua_lib_path="${x}"
+                lua_lib_name="lua51"
+                break
+            elif test -e "${x}/lib/liblua51.${y}"; then
+                lua_lib_path="${x}/lib"
+                lua_lib_name="lua51"
+                break
+            elif test -e "${x}/lib64/liblua51.${y}"; then
+                lua_lib_path="${x}/lib64"
+                lua_lib_name="lua51"
+                break
+            elif test -e "${x}/lib32/liblua51.${y}"; then
+                lua_lib_path="${x}/lib32"
+                lua_lib_name="lua51"
+                break
+            elif test -e "${x}/liblua.${y}"; then
+                lua_lib_path="${x}"
+                lua_lib_name="lua"
+                break
+            elif test -e "${x}/lib/liblua.${y}"; then
+                lua_lib_path="${x}/lib"
+                lua_lib_name="lua"
+                break
+            elif test -e "${x}/lib64/liblua.${y}"; then
+                lua_lib_path="${x}/lib64"
+                lua_lib_name="lua"
+                break
+            elif test -e "${x}/lib32/liblua.${y}"; then
+                lua_lib_path="${x}/lib32"
+                lua_lib_name="lua"
+                break
+            else
+                lua_lib_path=""
+                lua_lib_name=""
+            fi
+        done
+        if test -n "$lua_lib_path"; then
+            break
+        fi
+    done
+    for x in ${test_paths}; do
+        if test -e "${x}/include/lua.h"; then
+            lua_inc_path="${x}/include"
+            break
+        elif test -e "${x}/lua.h"; then
+            lua_inc_path="${x}"
+            break
+        fi
+
+                for lua_pkg_name in ${lua_lib_name} ${LUA_PKGNAMES}; do
+            if test -e "${x}/include/${lua_pkg_name}/lua.h"; then
+                lua_inc_path="${x}/include"
+                break
+            elif test -e "${x}/${lua_pkg_name}/lua.h"; then
+                lua_inc_path="${x}"
+                break
+            else
+                lua_inc_path=""
+            fi
+        done
+        if test -n "$lua_inc_path"; then
+            break
+        fi
+    done
+    if test -n "${lua_lib_path}" -a -n "${lua_inc_path}"; then
+        LUA_CONFIG=""
+        { echo "$as_me:$LINENO: result: ${lua_lib_path} ${lua_inc_path}" >&5
+echo "${ECHO_T}${lua_lib_path} ${lua_inc_path}" >&6; }
+        LUA_CFLAGS="-I${lua_inc_path}"
+        LUA_LIBS="-L${lua_lib_path} -l${lua_lib_name}"
+        CFLAGS=$save_CFLAGS
+        LDFLAGS=$save_LDFLAGS
     else
         { echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
-
-                { echo "$as_me:$LINENO: checking for lua install" >&5
-echo $ECHO_N "checking for lua install... $ECHO_C" >&6; }
-        for x in ${test_paths}; do
-            for y in ${LUA_SONAMES}; do
-                if test -e "${x}/liblua5.1.${y}"; then
-                    with_lua_lib="${x}"
-                    lua_lib_name="lua5.1"
-                    break
-                elif test -e "${x}/lib/liblua5.1.${y}"; then
-                    with_lua_lib="${x}/lib"
-                    lua_lib_name="lua5.1"
-                    break
-                elif test -e "${x}/lib64/liblua5.1.${y}"; then
-                    with_lua_lib="${x}/lib64"
-                    lua_lib_name="lua5.1"
-                    break
-                elif test -e "${x}/lib32/liblua5.1.${y}"; then
-                    with_lua_lib="${x}/lib32"
-                    lua_lib_name="lua5.1"
-                    break
-                elif test -e "${x}/liblua51.${y}"; then
-                    with_lua_lib="${x}"
-                    lua_lib_name="lua51"
-                    break
-                elif test -e "${x}/lib/liblua51.${y}"; then
-                    with_lua_lib="${x}/lib"
-                    lua_lib_name="lua51"
-                    break
-                elif test -e "${x}/lib64/liblua51.${y}"; then
-                    with_lua_lib="${x}/lib64"
-                    lua_lib_name="lua51"
-                    break
-                elif test -e "${x}/lib32/liblua51.${y}"; then
-                    with_lua_lib="${x}/lib32"
-                    lua_lib_name="lua51"
-                    break
-                elif test -e "${x}/liblua.${y}"; then
-                    with_lua_lib="${x}"
-                    lua_lib_name="lua"
-                    break
-                elif test -e "${x}/lib/liblua.${y}"; then
-                    with_lua_lib="${x}/lib"
-                    lua_lib_name="lua"
-                    break
-                elif test -e "${x}/lib64/liblua.${y}"; then
-                    with_lua_lib="${x}/lib64"
-                    lua_lib_name="lua"
-                    break
-                elif test -e "${x}/lib32/liblua.${y}"; then
-                    with_lua_lib="${x}/lib32"
-                    lua_lib_name="lua"
-                    break
-                else
-                    with_lua_lib=""
-                    lua_lib_name=""
-                fi
-            done
-            if test -n "$with_lua_lib"; then
-                break
-            fi
-        done
-        for x in ${test_paths}; do
-            if test -e "${x}/include/lua.h"; then
-                with_lua_inc="${x}/include"
-                break
-            elif test -e "${x}/lua.h"; then
-                with_lua_inc="${x}"
-                break
-            fi
-
-                        for lua_pkg_name in ${lua_lib_name} ${LUA_PKGNAMES}; do
-                if test -e "${x}/include/${lua_pkg_name}/lua.h"; then
-                    with_lua_inc="${x}/include"
-                    break
-                elif test -e "${x}/${lua_pkg_name}/lua.h"; then
-                    with_lua_inc="${x}"
-                    break
-                else
-                    with_lua_inc=""
-                fi
-            done
-            if test -n "$with_lua_inc"; then
-                break
-            fi
-        done
-        if test -n "${with_lua_lib}" -a -n "${with_lua_inc}"; then
-            LUA_CONFIG=""
-            { echo "$as_me:$LINENO: result: ${with_lua_lib} ${with_lua_inc}" >&5
-echo "${ECHO_T}${with_lua_lib} ${with_lua_inc}" >&6; }
-            LUA_CFLAGS="-I${with_lua_inc}"
-            LUA_LIBS="-L${with_lua_lib} -l${lua_lib_name}"
-            CFLAGS=$save_CFLAGS
-            LDFLAGS=$save_LDFLAGS
-        else
-            { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-        fi
     fi
-else
-    { echo "$as_me:$LINENO: not using optional lua library" >&5
-echo "$as_me: not using optional lua library" >&6;}
 fi
 
 if test -n "${LUA_LIBS}"; then
@@ -5839,7 +5845,7 @@ fi
 
 
 
-if test "${lua_path}" != "no"; then
+if test "${with_path}" != "no"; then
     if test -z "${LUA_LIBS}"; then
       { echo "$as_me:$LINENO: optional lua library not found" >&5
 echo "$as_me: optional lua library not found" >&6;}
@@ -5854,36 +5860,68 @@ fi
 
 # Check whether --with-curl was given.
 if test "${with_curl+set}" = set; then
-  withval=$with_curl; curl_path="$withval"
+  withval=$with_curl; test_paths="${with_curl}"
 else
-  :
+  test_paths="/usr/local/libcurl /usr/local/curl /usr/local /opt/libcurl /opt/curl /opt /usr"
 fi
 
-
-if test -z "${curl_path}"; then
-    test_paths="/usr/local /usr"
-else
-    test_paths="${curl_path}"
-fi
 
 { echo "$as_me:$LINENO: checking for libcurl config script" >&5
 echo $ECHO_N "checking for libcurl config script... $ECHO_C" >&6; }
+
 for x in ${test_paths}; do
-    if test -e "${x}/bin/${CURL_CONFIG}"; then
-        with_curl="${x}/bin"
+        if test ! -d "$x" -a -e "$x"; then
+        CURL_CONFIG="`basename $x`"
+        curl_path=`echo $x | sed "s/\/\?${CURL_CONFIG}\$//"`
         break
-    else
-        with_curl=""
+    fi
+
+        for CURL_CONFIG in curl-config; do
+        if test -e "${x}/bin/${CURL_CONFIG}"; then
+            curl_path="${x}/bin"
+            break
+        elif test -e "${x}/${CURL_CONFIG}"; then
+            curl_path="${x}"
+            break
+        else
+            curl_path=""
+        fi
+    done
+    if test -n "$curl_path"; then
+        break
     fi
 done
-if test -n "${with_curl}"; then
-    CURL_CONFIG="${with_curl}/${CURL_CONFIG}"
+
+if test -n "${curl_path}"; then
+    CURL_CONFIG="${curl_path}/${CURL_CONFIG}"
     { echo "$as_me:$LINENO: result: ${CURL_CONFIG}" >&5
 echo "${ECHO_T}${CURL_CONFIG}" >&6; }
     CURL_CFLAGS="`${CURL_CONFIG} --cflags`"
+    if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: curl CFLAGS: $CURL_CFLAGS" >&5
+echo "$as_me: curl CFLAGS: $CURL_CFLAGS" >&6;}; fi
     CURL_LIBS="`${CURL_CONFIG} --libs`"
+    if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: curl LIBS: $CURL_LIBS" >&5
+echo "$as_me: curl LIBS: $CURL_LIBS" >&6;}; fi
+    CURL_VERSION=`${CURL_CONFIG} --version | sed 's/^[^0-9][^[:space:]][^[:space:]]*[[:space:]]*//'`
+    if test "$verbose_output" -eq 1; then { echo "$as_me:$LINENO: curl VERSION: $CURL_VERSION" >&5
+echo "$as_me: curl VERSION: $CURL_VERSION" >&6;}; fi
     CFLAGS=$save_CFLAGS
     LDFLAGS=$save_LDFLAGS
+
+        { echo "$as_me:$LINENO: checking if libcurl is at least v${CURL_MIN_VERSION}" >&5
+echo $ECHO_N "checking if libcurl is at least v${CURL_MIN_VERSION}... $ECHO_C" >&6; }
+    curl_min_ver=`echo ${CURL_MIN_VERSION} | awk -F. '{print (\$ 1 * 1000000) + (\$ 2 * 1000) + \$ 3}'`
+    curl_ver=`echo ${CURL_VERSION} | awk -F. '{print (\$ 1 * 1000000) + (\$ 2 * 1000) + \$ 3}'`
+    if test "$curl_min_ver" -le "$curl_ver"; then
+        { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+    else
+        { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+        { echo "$as_me:$LINENO: NOTE: curl library may be too old: $CURL_VERSION" >&5
+echo "$as_me: NOTE: curl library may be too old: $CURL_VERSION" >&6;}
+    fi
+
 else
     { echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
@@ -6651,8 +6689,8 @@ APU_LIBS!$APU_LIBS$ac_delim
 APU_CFLAGS!$APU_CFLAGS$ac_delim
 APU_LDFLAGS!$APU_LDFLAGS$ac_delim
 APU_LINK_LD!$APU_LINK_LD$ac_delim
-LIBXML_LIBS!$LIBXML_LIBS$ac_delim
-LIBXML_CFLAGS!$LIBXML_CFLAGS$ac_delim
+LIBXML2_LIBS!$LIBXML2_LIBS$ac_delim
+LIBXML2_CFLAGS!$LIBXML2_CFLAGS$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then

@@ -6,7 +6,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.6.0-trunk (March 5, 2009)</releaseinfo>
+    <releaseinfo>Version 2.6.0-trunk (April 22, 2009)</releaseinfo>
 
     <copyright>
       <year>2004-2009</year>
@@ -4548,11 +4548,11 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml nolog,pass,<emphasis>ctl:requestBodyProce
       threshold of more than 25 attempts in 2 minutes, it will DROP subsequent
       connections.</para>
 
-      <programlisting format="linespecific">SecAction initcol:ip=%{REMOTE_ADDR},nolog
+      <programlisting format="linespecific">SecAction phase:1,initcol:ip=%{REMOTE_ADDR},nolog
 SecRule ARGS:login "!^$" \
     nolog,phase:1,setvar:ip.auth_attempt=+1,deprecatevar:ip.auth_attempt=20/120
 SecRule IP:AUTH_ATTEMPT "@gt 25" \
-    log,<emphasis>drop</emphasis>,phase:1,msg:'Possible Brute Force Attack"</programlisting>
+    "log,<emphasis>drop</emphasis>,phase:1,msg:'Possible Brute Force Attack'"</programlisting>
 
       <para><emphasis>Note</emphasis></para>
 

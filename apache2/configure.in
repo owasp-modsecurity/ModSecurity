@@ -274,22 +274,6 @@ else
   AC_MSG_ERROR(couldn't find APXS)
 fi
 
-# Use Apache httpd source srclib as base for pcre, apr and apu config scripts
-AC_ARG_WITH(httpd-src,
-            [AS_HELP_STRING([[--with-httpd-src=PATH]],
-                            [PATH is to the Apache httpd source tree where srclib will be used as a base for pcre, apr and apu config scripts.])],
-[
-  if test -n "$withval"; then
-    CPPFLAGS="$CPPFLAGS -I$withval/srclib/pcre"
-    LDFLAGS="$LDFLAGS -L$withval/srclib/pcre"
-    pcre_path="$withval/srclib/pcre"
-    apr_path="$withval/srclib/apr"
-    apu_path="$withval/srclib/apr-util"
-  else
-    AC_MSG_ERROR(--with-httpd-src requires a path)
-  fi
-])
-
 # Include M4 macros
 sinclude(build/find_pcre.m4)
 sinclude(build/find_apr.m4)
@@ -348,7 +332,7 @@ AC_SUBST(APXS_HTTPD)
 CHECK_PCRE()
 CHECK_APR()
 CHECK_APU()
-CHECK_LIBXML()
+CHECK_LIBXML2()
 CHECK_LUA()
 CHECK_CURL()
 

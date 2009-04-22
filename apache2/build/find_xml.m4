@@ -1,57 +1,72 @@
-dnl Check for XML Libraries
-dnl CHECK_LIBXML(ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND])
+dnl Check for LIBXML2 Libraries
+dnl CHECK_LIBXML2(ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND])
 dnl Sets:
-dnl  LIBXML_CFLAGS
-dnl  LIBXML_LIBS
+dnl  LIBXML2_CFLAGS
+dnl  LIBXML2_LIBS
 
-LIBXML_CONFIG="xml2-config"
-LIBXML_CFLAGS=""
-LIBXML_LIBS=""
+LIBXML2_CONFIG=""
+LIBXML2_CFLAGS=""
+LIBXML2_LIBS=""
 
-AC_DEFUN([CHECK_LIBXML],
+AC_DEFUN([CHECK_LIBXML2],
 [dnl
 
 AC_ARG_WITH(
-    libxml,
-    [AC_HELP_STRING([--with-libxml=PATH],[Path to the libxml2 prefix])],
-    libxml_path="$withval",
-    :)
-
-dnl # Determine xml lib directory
-if test -z "${libxml_path}"; then
-    test_paths="/usr/local /usr"
-else
-    test_paths="${libxml_path}"
-fi
+    xml,
+    [AC_HELP_STRING([--with-xml=PATH],[Path to xml prefix or config script])],
+    [test_paths="${with_xml}"],
+    [test_paths="/usr/local/libxml2 /usr/local/xml2 /usr/local/xml /usr/local /opt/libxml2 /opt/libxml /opt/xml2 /opt/xml /opt /usr"])
 
 AC_MSG_CHECKING([for libxml2 config script])
+
 for x in ${test_paths}; do
-    if test -e "${x}/bin/${LIBXML_CONFIG}"; then
-        with_libxml="${x}/bin"
+    dnl # Determine if the script was specified and use it directly
+    if test ! -d "$x" -a -e "$x"; then
+        LIBXML2_CONFIG="`basename $x`"
+        xml_path=`echo $x | sed "s/\/\?${LIBXML2_CONFIG}\$//"`
         break
-    else
-        with_libxml=""
+    fi
+
+    dnl # Try known config script names/locations
+    for LIBXML2_CONFIG in xml2-config xml-2-config xml-config; do
+        if test -e "${x}/bin/${LIBXML2_CONFIG}"; then
+            xml_path="${x}/bin"
+            break
+        elif test -e "${x}/${LIBXML2_CONFIG}"; then
+            xml_path="${x}"
+            break
+        else
+            xml_path=""
+        fi
+    done
+    if test -n "$xml_path"; then
+        break
     fi
 done
-if test -n "${with_libxml}"; then
-    LIBXML_CONFIG="${with_libxml}/${LIBXML_CONFIG}"
-    AC_MSG_RESULT([${LIBXML_CONFIG}])
-    LIBXML_CFLAGS="`${LIBXML_CONFIG} --cflags`"
-    LIBXML_LIBS="`${LIBXML_CONFIG} --libs`"
+    CFLAGS=$save_CFLAGS
+    LDFLAGS=$save_LDFLAGS
+
+if test -n "${xml_path}"; then
+    LIBXML2_CONFIG="${xml_path}/${LIBXML2_CONFIG}"
+    AC_MSG_RESULT([${LIBXML2_CONFIG}])
+    LIBXML2_CFLAGS="`${LIBXML2_CONFIG} --cflags`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(xml CFLAGS: $LIBXML2_CFLAGS); fi
+    LIBXML2_LIBS="`${LIBXML2_CONFIG} --libs`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(xml LIBS: $LIBXML2_LIBS); fi
     CFLAGS=$save_CFLAGS
     LDFLAGS=$save_LDFLAGS
 else
     AC_MSG_RESULT([no])
 fi
 
-AC_SUBST(LIBXML_LIBS)
-AC_SUBST(LIBXML_CFLAGS)
+AC_SUBST(LIBXML2_LIBS)
+AC_SUBST(LIBXML2_CFLAGS)
 
-if test -z "${LIBXML_LIBS}"; then
-  AC_MSG_NOTICE([*** libxml2 library not found.])
-  ifelse([$2], , AC_MSG_ERROR([libxml2 library is required]), $2)
+if test -z "${LIBXML2_LIBS}"; then
+    AC_MSG_NOTICE([*** xml library not found.])
+    ifelse([$2], , AC_MSG_ERROR([xml library is required]), $2)
 else
-  AC_MSG_NOTICE([using '${LIBXML_LIBS}' for libxml Library])
-  ifelse([$1], , , $1) 
+    AC_MSG_NOTICE([using '${LIBXML2_LIBS}' for xml Library])
+    ifelse([$1], , , $1) 
 fi 
 ])

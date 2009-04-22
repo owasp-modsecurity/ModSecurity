@@ -18,46 +18,38 @@ AC_DEFUN([CHECK_APR],
 AC_ARG_WITH(
     apr,
     [AC_HELP_STRING([--with-apr=PATH],[Path to apr prefix or config script])],
-    apr_path="${withval}",
-    :)
+    [test_paths="${with_apr}"],
+    [test_paths="/usr/local/libapr /usr/local/apr /usr/local /opt/libapr /opt/apr /opt /usr"])
 
 AC_MSG_CHECKING([for libapr config script])
 
-dnl # Determine if the script was specified and use it directly
-if test ! -d "${withval}" -a -e "${withval}"; then
-    APR_CONFIG="`basename $withval`"
-    with_apr=`echo ${withval} | sed "s/\/\?${APR_CONFIG}\$//"`
-fi
-
-dnl # Look for the config script
-if test -z "${with_apr}"; then
-    dnl # Determine apr lib directory
-    if test -z "${apr_path}"; then
-        test_paths="/usr/local/apr /usr/local /usr"
-    else
-        test_paths="${apr_path}"
+for x in ${test_paths}; do
+    dnl # Determine if the script was specified and use it directly
+    if test ! -d "$x" -a -e "$x"; then
+        APR_CONFIG="`basename $x`"
+        apr_path=`echo $x | sed "s/\/\?${APR_CONFIG}\$//"`
+        break
     fi
 
-    for x in ${test_paths}; do
-        for APR_CONFIG in apr-1-mt-config apr-1-config apr-mt-config apr-config; do
-            if test -e "${x}/bin/${APR_CONFIG}"; then
-                with_apr="${x}/bin"
-                break
-            elif test -e "${x}/${APR_CONFIG}"; then
-                with_apr="${x}"
-                break
-            else
-                with_apr=""
-            fi
-        done
-        if test -n "$with_apr"; then
+    dnl # Try known config script names/locations
+    for APR_CONFIG in apr-1-mt-config apr-1-config apr-mt-config apr-config; do
+        if test -e "${x}/bin/${APR_CONFIG}"; then
+            apr_path="${x}/bin"
             break
+        elif test -e "${x}/${APR_CONFIG}"; then
+            apr_path="${x}"
+            break
+        else
+            apr_path=""
         fi
     done
-fi
+    if test -n "$apr_path"; then
+        break
+    fi
+done
 
-if test -n "${with_apr}"; then
-    APR_CONFIG="${with_apr}/${APR_CONFIG}"
+if test -n "${apr_path}"; then
+    APR_CONFIG="${apr_path}/${APR_CONFIG}"
     AC_MSG_RESULT([${APR_CONFIG}])
     APR_CFLAGS="`${APR_CONFIG} --includes --cppflags --cflags`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apr CFLAGS: $APR_CFLAGS); fi
