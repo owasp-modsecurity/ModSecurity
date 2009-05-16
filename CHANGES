@@ -1,6 +1,8 @@
 22 Apr 2009 - trunk
 -------------------
 
+ * Fixed mlogc global mutex locking issue and added more debugging output.
+
  * Cleaned up build dependencies and configure options.
 
 
