@@ -1,6 +1,13 @@
 01 Mar 2009 - 2.5.10-dev
 ------------------------
 
+ * Cleanup some code for portability.
+
+ * AIX does not support hidden visibility with xlc compiler.
+
+ * Allow specifying EXTRA_CFLAGS during configure to override gcc specific
+   values for non-gcc compilers.
+
  * Populate GEO:COUNTRY_NAME and GEO:COUNTRY_CONTINENT as documented.
 
  * Handle a newer geo database more gracefully, avoiding a potential crash for

@@ -81,7 +81,7 @@ AC_ARG_ENABLE(strict-compile,
                              [Enable strict compilation (warnings are errors).]),
 [
   if test "$enableval" != "no"; then
-    strict_compile="-Werror"
+      strict_compile="-std=c99 -Wstrict-overflow=1 -Wextra -Wno-missing-field-initializers -Wshadow -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wno-unused-parameter -Werror"
   else
     strict_compile=
   fi
@@ -285,10 +285,17 @@ sinclude(build/find_curl.m4)
 
 ### Build *EXTRA_CFLAGS vars
 
-if test -n "$debug_mem"; then
-  EXTRA_CFLAGS="-O0 -g -Wall"
+# Allow overriding EXTRA_CFLAGS
+if env | grep "^EXTRA_CFLAGS" > /dev/null 2>&1; then
+  if test -z "$debug_mem"; then
+    EXTRA_CFLAGS="$EXTRA_CFLAGS $strict_compile"
+  fi
 else
-  EXTRA_CFLAGS="-O2 -g -Wall $strict_compile"
+  if test -n "$debug_mem"; then
+    EXTRA_CFLAGS="-O0 -g -Wall"
+  else
+    EXTRA_CFLAGS="-O2 -g -Wall $strict_compile"
+  fi
 fi
 MODSEC_EXTRA_CFLAGS="$debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
 

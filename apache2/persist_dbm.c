@@ -419,17 +419,17 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
                     int ourval = atoi(var->value);
                     int storedval = atoi(stored_var->value);
                     int delta = ourval - origval;
-                    int value = storedval + delta;
+                    int newval = storedval + delta;
 
-                    if (value < 0) value = 0; /* Counters never go below zero. */
+                    if (newval < 0) newval = 0; /* Counters never go below zero. */
 
-                    var->value = apr_psprintf(msr->mp, "%d", value);
+                    var->value = apr_psprintf(msr->mp, "%d", newval);
                     var->value_len = strlen(var->value);
                     if (msr->txcfg->debuglog_level >= 9) {
                         msr_log(msr, 9, "Delta applied for %s.%s %d->%d (%d): %d + (%d) = %d [%s,%d]",
                         log_escape_ex(msr->mp, var_name->value, var_name->value_len),
                         log_escape_ex(msr->mp, var->name, var->name_len),
-                        origval, ourval, delta, storedval, delta, value, var->value, var->value_len);
+                        origval, ourval, delta, storedval, delta, newval, var->value, var->value_len);
                     }
                 }
             }
