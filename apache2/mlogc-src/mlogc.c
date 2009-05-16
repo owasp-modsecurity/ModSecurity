@@ -383,7 +383,11 @@ static void add_entry(const char *data, int start_worker)
     entry->line = strdup(data);
     entry->line_size = strlen(entry->line);
 
-    apr_thread_mutex_lock(mutex);
+    error_log(LOG_DEBUG, NULL, "Queue locking thread mutex.");
+    if (APR_STATUS_IS_EBUSY(apr_thread_mutex_trylock(mutex))) {
+        error_log(LOG_WARNING, NULL, "Queue waiting on thread mutex.");
+        apr_thread_mutex_lock(mutex);
+    }
 
     /* Assign unique ID to this log entry. */
     entry->id = entry_counter++;
@@ -396,6 +400,7 @@ static void add_entry(const char *data, int start_worker)
         create_new_worker(0);
     }
 
+    error_log(LOG_DEBUG, NULL, "Queue unlocking thread mutex.");
     apr_thread_mutex_unlock(mutex);
 }
 
@@ -467,10 +472,11 @@ static void transaction_log_init()
     apr_snprintf(old_queue_path, sizeof(old_queue_path), "%s.old", queue_path);
 
     /* Put a lock in place to ensure exclusivity. */
+    error_log(LOG_DEBUG, NULL, "Transaction initialization locking global mutex.");
     if (APR_STATUS_IS_EBUSY(apr_global_mutex_trylock(gmutex))) {
-        error_log(LOG_WARNING, NULL, "Transaction initialization waiting on mutex");
+        error_log(LOG_WARNING, NULL, "Transaction initialization waiting on global mutex.");
+        apr_global_mutex_lock(gmutex);
     }
-    apr_global_mutex_lock(gmutex);
 
     error_log(LOG_DEBUG, NULL, "Transaction initialization started.");
 
@@ -517,14 +523,16 @@ static void transaction_log_init()
         | APR_APPEND | APR_XTHREAD, APR_OS_DEFAULT, pool) != APR_SUCCESS)
     {
         error_log(LOG_ERROR, NULL, "Failed to open the transaction log: %s\n", transaction_log_path);
+        error_log(LOG_DEBUG, NULL, "Transaction initialization unlocking global mutex.");
         apr_global_mutex_unlock(gmutex);
         logc_shutdown(1);
     }
 
-    /* Unlock */
-    apr_global_mutex_unlock(gmutex);
-
     error_log(LOG_DEBUG, NULL, "Transaction initialization completed.");
+
+    /* Unlock */
+    error_log(LOG_DEBUG, NULL, "Transaction initialization unlocking global mutex.");
+    apr_global_mutex_unlock(gmutex);
 }
 
 
@@ -567,10 +575,11 @@ static void transaction_checkpoint()
     }
 
     /* Put a lock in place to ensure exclusivity. */
+    error_log(LOG_DEBUG, NULL, "Checkpoint locking global mutex.");
     if (APR_STATUS_IS_EBUSY(apr_global_mutex_trylock(gmutex))) {
-        error_log(LOG_WARNING, NULL, "Checkpoint waiting on mutex");
+        error_log(LOG_WARNING, NULL, "Checkpoint waiting on global mutex.");
+        apr_global_mutex_lock(gmutex);
     }
-    apr_global_mutex_lock(gmutex);
 
     error_log(LOG_DEBUG, NULL, "Checkpoint started.");
 
@@ -579,6 +588,7 @@ static void transaction_checkpoint()
         | APR_EXCL | APR_TRUNCATE | APR_FILE_NOCLEANUP, APR_OS_DEFAULT, pool) != APR_SUCCESS)
     {
         error_log(LOG_ERROR, NULL, "Failed to create file: %s", new_queue_path);
+        error_log(LOG_DEBUG, NULL, "Checkpoint unlocking global mutex.");
         apr_global_mutex_unlock(gmutex);
         return;
     }
@@ -617,10 +627,11 @@ static void transaction_checkpoint()
     apr_file_remove(old_queue_path, pool);
     apr_file_trunc(transaction_log_fd, 0);
 
-    /* Unlock and exit. */
-    apr_global_mutex_unlock(gmutex);
-
     error_log(LOG_DEBUG, NULL, "Checkpoint completed.");
+
+    /* Unlock and exit. */
+    error_log(LOG_DEBUG, NULL, "Checkpoint unlocking global mutex.");
+    apr_global_mutex_unlock(gmutex);
 }
 
 
@@ -718,18 +729,17 @@ static void read_configuration()
  */
 static void init_configuration()
 {
+    char errstr[1024];
+    apr_status_t rc = 0;
     const char *s = NULL;
 
+    /* Other values may be based off the collector root. */
     s = apr_table_get(conf, "CollectorRoot");
     if (s != NULL) {
         collector_root = s;
     }
 
-    s = apr_table_get(conf, "CheckpointInterval");
-    if (s != NULL) {
-        checkpoint_interval = atoi(s);
-    }
-
+    /* Error Log */
     s = apr_table_get(conf, "ErrorLog");
     if (s != NULL) {
         error_log_path = file_path(s);
@@ -740,9 +750,45 @@ static void init_configuration()
         error_log_level = atoi(s);
     }
 
+    if ((rc = apr_file_open(&error_log_fd, error_log_path, APR_WRITE | APR_CREATE | APR_APPEND,
+        APR_OS_DEFAULT, pool)) != APR_SUCCESS)
+    {
+        error_log(LOG_ERROR, NULL, "Failed to open the error log %s: %s\n",
+            error_log_path, apr_strerror(rc, errstr, 1024));
+        logc_shutdown(1);
+    }
+
+    error_log(LOG_NOTICE, NULL, "Configuring ModSecurity Audit Log Collector %s.", VERSION);
+
+    /* Startup Delay */
+    s = apr_table_get(conf, "StartupDelay");
+    if (s != NULL) {
+        startup_delay = atoi(s);
+    }
+
+    if ( startup_delay > 0 ) {
+        error_log(LOG_NOTICE, NULL, "Delaying execution for %dms.", startup_delay);
+        apr_sleep(startup_delay * 1000);
+        error_log(LOG_DEBUG, NULL, "Continuing execution after %dms delay.", startup_delay);
+    }
+
+    /* Remaining Configuration */
+
+    error_log(LOG_DEBUG2, NULL, "CollectorRoot=%s", collector_root);
+    error_log(LOG_DEBUG2, NULL, "ErrorLog=%s", error_log_path);
+    error_log(LOG_DEBUG2, NULL, "ErrorLogLevel=%d", error_log_level);
+    error_log(LOG_DEBUG2, NULL, "StartupDelay=%d", startup_delay);
+
+    s = apr_table_get(conf, "CheckpointInterval");
+    if (s != NULL) {
+        checkpoint_interval = atoi(s);
+        error_log(LOG_DEBUG2, NULL, "CheckpointInterval=%d", checkpoint_interval);
+    }
+
     s = apr_table_get(conf, "QueuePath");
     if (s != NULL) {
         queue_path = file_path(s);
+        error_log(LOG_DEBUG2, NULL, "QueuePath=%s", queue_path);
     }
     else {
         error_log(LOG_ERROR, NULL, "QueuePath not defined in the configuration file.");
@@ -752,49 +798,52 @@ static void init_configuration()
     s = apr_table_get(conf, "LockFile");
     if (s != NULL) {
         lockfile = file_path(s);
+        error_log(LOG_DEBUG2, NULL, "LockFile=%s", lockfile);
     }
 
     s = apr_table_get(conf, "ServerErrorTimeout");
     if (s != NULL) {
         server_error_timeout = atoi(s);
-    }
-
-    s = apr_table_get(conf, "StartupDelay");
-    if (s != NULL) {
-        startup_delay = atoi(s);
+        error_log(LOG_DEBUG2, NULL, "ServerErrorTimeout=%d", server_error_timeout);
     }
 
     s = apr_table_get(conf, "TransactionDelay");
     if (s != NULL) {
         transaction_delay = atoi(s);
+        error_log(LOG_DEBUG2, NULL, "TransactionDelay=%d", transaction_delay);
     }
 
     s = apr_table_get(conf, "TransactionLog");
     if (s != NULL) {
         transaction_log_path = file_path(s);
+        error_log(LOG_DEBUG2, NULL, "TransactionLog=%s", transaction_log_path);
     }
 
     s = apr_table_get(conf, "MaxConnections");
     if (s != NULL) {
         int v = atoi(s);
         if (v >= 0) max_connections = v;
+        error_log(LOG_DEBUG2, NULL, "MaxConnections=%d", max_connections);
     }
 
     s = apr_table_get(conf, "KeepAlive");
     if (s != NULL) {
         int v = atoi(s);
         if (v >= 0) keep_alive = v;
+        error_log(LOG_DEBUG2, NULL, "KeepAlive=%d", keep_alive);
     }
 
     s = apr_table_get(conf, "KeepAliveTimeout");
     if (s != NULL) {
         int v = atoi(s);
         if (v >= 0) keep_alive_timeout = v;
+        error_log(LOG_DEBUG2, NULL, "KeepAliveTimeout=%d", keep_alive_timeout);
     }
 
     s = apr_table_get(conf, "LogStorageDir");
     if (s != NULL) {
         log_repository = file_path(s);
+        error_log(LOG_DEBUG2, NULL, "LogStorageDir=%s", log_repository);
     }
     else {
         error_log(LOG_ERROR, NULL, "Missing mandatory parameter LogStorageDir.\n");
@@ -804,6 +853,7 @@ static void init_configuration()
     s = apr_table_get(conf, "ConsoleURI");
     if (s != NULL) {
         console_uri = s;
+        error_log(LOG_DEBUG2, NULL, "ConsoleURI=%s", console_uri);
     }
     else {
         error_log(LOG_ERROR, NULL, "Missing mandatory parameter ConsoleURI.\n");
@@ -813,6 +863,7 @@ static void init_configuration()
     s = apr_table_get(conf, "SensorUsername");
     if (s != NULL) {
         sensor_username = s;
+        error_log(LOG_DEBUG2, NULL, "SensorUsername=%s", sensor_username);
     }
     else {
         error_log(LOG_ERROR, NULL, "Missing mandatory parameter SensorUsername.\n");
@@ -822,6 +873,7 @@ static void init_configuration()
     s = apr_table_get(conf, "SensorPassword");
     if (s != NULL) {
         sensor_password = s;
+        error_log(LOG_DEBUG2, NULL, "SensorPassword=%s", sensor_password);
     }
     else {
         error_log(LOG_ERROR, NULL, "Missing mandatory parameter SensorPassword.\n");
@@ -835,6 +887,7 @@ static void init_configuration()
     else {
         keep_entries = 0;
     }
+    error_log(LOG_DEBUG2, NULL, "KeepEntries=%d", keep_entries);
 }
 
 
@@ -991,24 +1044,6 @@ static void logc_init()
     const char *errptr = NULL;
     int i, erroffset;
 
-    curl_global_init(CURL_GLOBAL_ALL);
-    atexit(logc_cleanup);
-
-    if ((rc = apr_file_open(&error_log_fd, error_log_path, APR_WRITE | APR_CREATE | APR_APPEND,
-        APR_OS_DEFAULT, pool)) != APR_SUCCESS)
-    {
-        error_log(LOG_ERROR, NULL, "Failed to open the error log %s: %s\n",
-            error_log_path, apr_strerror(rc, errstr, 1024));
-        logc_shutdown(1);
-    }
-
-    if ( startup_delay > 0 ) {
-        error_log(LOG_NOTICE, NULL, "ModSecurity Audit Log Collector %s delaying startup for %dms", VERSION, startup_delay);
-        apr_sleep(startup_delay * 1000);
-    }
-
-    error_log(LOG_NOTICE, NULL, "ModSecurity Audit Log Collector %s started.", VERSION);
-
     queue = apr_array_make(pool, 64, sizeof(entry_t *));
     if (queue == NULL) {
         error_log(LOG_ERROR, NULL, MEMALLOC_ERROR_MSG);
@@ -1028,7 +1063,7 @@ static void logc_init()
     }
 
     if ((rc = apr_thread_mutex_create(&mutex, APR_THREAD_MUTEX_UNNESTED, pool)) != APR_SUCCESS) {
-        error_log(LOG_ERROR, NULL, "Failed to create mutex: %s",
+        error_log(LOG_ERROR, NULL, "Failed to create thread mutex: %s",
             apr_strerror(rc, errstr, 1024));
         logc_shutdown(1);
     }
@@ -1197,9 +1232,13 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
 
         /* Get a new entry, but only if we need one. */
         if (take_new) {
-            error_log(LOG_DEBUG, thread, "Locking mutex.");
+            error_log(LOG_DEBUG, thread, "Worker fetch locking thread mutex.");
+            if (APR_STATUS_IS_EBUSY(apr_thread_mutex_trylock(mutex))) {
+                error_log(LOG_WARNING, thread, "Worker fetch waiting on thread mutex.");
+                apr_thread_mutex_lock(mutex);
+            }
 
-            apr_thread_mutex_lock(mutex);
+            error_log(LOG_DEBUG, thread, "Worker fetch started.");
 
             /* Deal with the previous entry. */
             if (entry != NULL) {
@@ -1220,17 +1259,19 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
             /* Get one entry. */
             entryptr = (entry_t **)apr_array_pop(queue);
             if (entryptr == NULL) {
+                error_log(LOG_DEBUG, thread, "Worker fetch unlocking thread mutex.");
                 apr_thread_mutex_unlock(mutex);
                 error_log(LOG_DEBUG, thread, "No more work for this thread, exiting.");
 
                 goto THREAD_SHUTDOWN;
             }
-            else {
-                error_log(LOG_DEBUG, thread, "Got one job.");
-                entry = *entryptr;
-                apr_hash_set(in_progress, &entry->id, sizeof(entry->id), entry);
-            }
 
+            entry = *entryptr;
+            apr_hash_set(in_progress, &entry->id, sizeof(entry->id), entry);
+
+            error_log(LOG_DEBUG, thread, "Worker fetch completed.");
+
+            error_log(LOG_DEBUG, thread, "Worker fetch unlocking thread mutex.");
             apr_thread_mutex_unlock(mutex);
         }
 
@@ -1422,12 +1463,16 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
 
         apr_pool_clear(tpool);
 
-        error_log(LOG_DEBUG, thread, "Loop completed.");
+        error_log(LOG_DEBUG, thread, "Worker processing completed.");
     }
 
     THREAD_SHUTDOWN:
 
-    apr_thread_mutex_lock(mutex);
+    error_log(LOG_DEBUG, thread, "Worker shutdown locking thread mutex.");
+    if (APR_STATUS_IS_EBUSY(apr_thread_mutex_trylock(mutex))) {
+        error_log(LOG_WARNING, thread, "Worker shutdown waiting on thread mutex.");
+        apr_thread_mutex_lock(mutex);
+    }
 
     /* Deal with the previous entry, if any. */
     if (entry != NULL) {
@@ -1451,11 +1496,13 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
     /* No more work, exit. */
     current_workers--;
 
+    error_log(LOG_DEBUG, thread, "Worker shutdown unlocking thread mutex.");
     apr_thread_mutex_unlock(mutex);
 
     apr_pool_destroy(tpool);
 
-    error_log(LOG_DEBUG, thread, "Thread done.");
+    error_log(LOG_DEBUG, thread, "Worker thread completed.");
+
     apr_thread_exit(thread, 0);
 
     return NULL;
@@ -1471,14 +1518,25 @@ static void create_new_worker(int lock)
     apr_thread_t *thread = NULL;
     CURL **curlptr = NULL;
 
-    if (lock) apr_thread_mutex_lock(mutex);
+    if (lock) {
+        error_log(LOG_DEBUG, NULL, "Worker creation locking thread mutex.");
+        if (APR_STATUS_IS_EBUSY(apr_thread_mutex_trylock(mutex))) {
+            error_log(LOG_WARNING, NULL, "Worker creation waiting on thread mutex.");
+            apr_thread_mutex_lock(mutex);
+        }
+    }
+
+    error_log(LOG_DEBUG, NULL, "Worker creation started.");
 
     /* A sanity check: this part executes under lock and
      * we want to make *sure* we don't create more threads
      * than we are allowed.
      */
     if (current_workers >= max_connections) {
-        if (lock) apr_thread_mutex_unlock(mutex);
+        if (lock) {
+            error_log(LOG_DEBUG, NULL, "Worker creation unlocking thread mutex.");
+            apr_thread_mutex_unlock(mutex);
+        }
         return;
     }
 
@@ -1493,20 +1551,31 @@ static void create_new_worker(int lock)
 
         rc = apr_thread_create(&thread, thread_attrs, thread_worker, *curlptr, pool);
         if (rc != APR_SUCCESS) {
-            apr_thread_mutex_unlock(mutex);
-            error_log(LOG_ERROR, thread, "Failed to create new worker thread: %d", rc);
+            if (lock) {
+                error_log(LOG_DEBUG, NULL, "Worker creation unlocking thread mutex.");
+                apr_thread_mutex_unlock(mutex);
+            }
+            error_log(LOG_ERROR, NULL, "Failed to create new worker thread: %d", rc);
             logc_shutdown(1);
         }
 
         current_workers++;
     }
     else {
-        if (lock) apr_thread_mutex_unlock(mutex);
-        error_log(LOG_ERROR, thread, "No more cURL handles (Internal Error).");
+        if (lock) {
+            error_log(LOG_DEBUG, NULL, "Worker creation unlocking thread mutex.");
+            apr_thread_mutex_unlock(mutex);
+        }
+        error_log(LOG_ERROR, NULL, "No more cURL handles (Internal Error).");
         logc_shutdown(1);
     }
 
-    if (lock) apr_thread_mutex_unlock(mutex);
+    error_log(LOG_DEBUG, NULL, "Worker creation completed: %pp", thread);
+
+    if (lock) {
+        error_log(LOG_DEBUG, NULL, "Worker creation unlocking thread mutex.");
+        apr_thread_mutex_unlock(mutex);
+    }
 }
 
 
@@ -1811,6 +1880,9 @@ int main(int argc, const char * const argv[]) {
 
     apr_app_initialize(&argc, &argv, NULL);
     atexit(apr_terminate);
+
+    curl_global_init(CURL_GLOBAL_ALL);
+    atexit(logc_cleanup);
 
     logc_pid = getpid();
     apr_pool_create(&pool, NULL);

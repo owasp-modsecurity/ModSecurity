@@ -1,6 +1,8 @@
 01 Mar 2009 - 2.5.10-dev
 ------------------------
 
+ * Fixed mlogc global mutex locking issue and added more debugging output.
+
  * Cleaned up build dependencies and configure options.
 
 
