@@ -482,31 +482,29 @@
 #		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?host=www.modsecurity.org",
 #	),
 #},
-{
-	type => "target",
-	comment => "GEO (failed lookup)",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-        SecGeoLookupDB GeoLiteCity.dat
-        SecRule REMOTE_ADDR "\@geoLookup" "pass,nolog"
-        SecRule \&GEO "\@eq 0" "deny,status:403,msg:'Failed to lookup IP'"
+#{
+#	type => "target",
+#	comment => "GEO (failed lookup)",
+#	conf => qq(
+#		SecRuleEngine On
+#		SecDebugLog $ENV{DEBUG_LOG}
+#		SecDebugLogLevel 9
+#        SecGeoLookupDB GeoLiteCity.dat
 #		SecRule ARGS:ip "\@geoLookup" "phase:2,log,pass,t:none"
 #		SecRule \&GEO "\@eq 0" "phase:2,log,deny,status:403,t:none"
 #		SecRule ARGS:badip "\@geoLookup" "phase:2,log,pass,t:none"
 #		SecRule \&GEO "!\@eq 0" "phase:2,log,deny,status:403,t:none"
-	),
-	match_log => {
-		-debug => [ qr/Geo lookup for "127\.0\.0\.1" succeeded/si, 1 ],
-	},
-	match_response => {
-		status => qr/^200$/,
-	},
-	request => new HTTP::Request(
-		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?ip=216.75.21.122&badip=127.0.0.1",
-	),
-},
+#	),
+#	match_log => {
+#		-debug => [ qr/Geo lookup for "127\.0\.0\.1" succeeded/si, 1 ],
+#	},
+#	match_response => {
+#		status => qr/^200$/,
+#	},
+#	request => new HTTP::Request(
+#		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?ip=216.75.21.122&badip=127.0.0.1",
+#	),
+#},
 
 # TODO: ENV
 # TODO: FILES
