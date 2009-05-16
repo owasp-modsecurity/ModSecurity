@@ -362,7 +362,7 @@
 		),
 	),
 },
-# Zero length part  name should not crash
+# Zero length part name should not crash
 {
 	type => "misc",
 	comment => "multipart parser (zero length part name)",
@@ -371,16 +371,16 @@
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
-		SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny"
-		SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny"
-		SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny"
+		#SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,status:403"
+		SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,status:403"
+		SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,status:403"
 	),
 	match_log => {
-		debug => [ qr/Adding request argument \(BODY\): name "a", value "1".*Invalid part header \(header name missing\)/s, 1 ],
+		debug => [ qr/name: a.*variable: 1.*Invalid part header \(header name missing\)/s, 1 ],
 		-debug => [ qr/Adding request argument \(BODY\): name "b"/s, 1 ],
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^403$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
