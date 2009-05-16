@@ -362,3 +362,45 @@
 		),
 	),
 },
+# Zero length part  name should not crash
+{
+	type => "misc",
+	comment => "multipart parser (zero length part name)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny"
+		SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny"
+		SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny"
+	),
+	match_log => {
+		debug => [ qr/Adding request argument \(BODY\): name "a", value "1".*Invalid part header \(header name missing\)/s, 1 ],
+		-debug => [ qr/Adding request argument \(BODY\): name "b"/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+		],
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="a"
+
+				1
+				-----------------------------69343412719991675451336310646
+				:
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="b"
+
+				2
+				-----------------------------69343412719991675451336310646--
+			),
+		),
+	),
+},
