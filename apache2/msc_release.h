@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if !(defined(WIN32) || defined(CYGWIN) || defined(NETWARE) || defined(SOLARIS2))
+#if !(defined(_AIX) || defined(WIN32) || defined(CYGWIN) || defined(NETWARE) || defined(SOLARIS2))
 #define DSOLOCAL __attribute__((visibility("hidden")))
 #else
 #define DSOLOCAL

@@ -107,7 +107,7 @@ mlogc:
 
 ### Experimental Test Framework (*NIX only right now)
 msc_test.lo: msc_test.c
-	$(LIBTOOL) --mode=compile $(CC) $(APXS_INCLUDES) $(APXS_CFLAGS) $(EXTRA_CFLAGS) $(MODSEC_EXTRA_CFLAGS) $(CPPFLAGS) $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test.lo -c msc_test.c
+	$(LIBTOOL) --mode=compile $(CC) $(APXS_INCLUDES) $(APXS_CFLAGS) $(CPPFLAGS) $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test.lo -c msc_test.c
 
 msc_test: $(TESTOBJS) $(MOD_SECURITY2_H}) msc_test.lo 
 	objs=""; \

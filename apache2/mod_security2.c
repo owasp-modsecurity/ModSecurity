@@ -1051,7 +1051,7 @@ static void modsec_register_variable(const char *name, unsigned int type,
                                      void *fn_validate, void *fn_generate,
                                      unsigned int is_cacheable, unsigned int availability) {
     if (modsecurity != NULL) {
-        msre_engine_variable_register(modsecurity->msre, name, type, argc_min, argc_max, fn_validate, fn_generate, is_cacheable, availability);
+        msre_engine_variable_register(modsecurity->msre, name, type, argc_min, argc_max, (fn_var_validate_t)fn_validate, (fn_var_generate_t)fn_generate, is_cacheable, availability);
     }
     else {
         fprintf(stderr,"modsecurity is NULL\n");

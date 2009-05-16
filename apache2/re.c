@@ -681,7 +681,7 @@ void msre_actionset_set_defaults(msre_actionset *actionset) {
     if (actionset->msg == NOT_SET_P) actionset->msg = NULL;
     if (actionset->logdata == NOT_SET_P) actionset->logdata = NULL;
     if (actionset->phase == NOT_SET) actionset->phase = 2;
-    if (actionset->severity == -1); /* leave at -1 */
+    if (actionset->severity == -1) {} /* leave at -1 */
     if (actionset->rule == NOT_SET_P) actionset->rule = NULL;
 
     /* Flow */

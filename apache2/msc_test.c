@@ -450,7 +450,8 @@ static int test_action(action_data_t *data, char **errmsg)
 
 
 /* Initialization */
-static void init_msr() {
+static void init_msr(void)
+{
     directory_config *dcfg = NULL;
     request_rec *r = NULL;
     r = (request_rec *)apr_pcalloc(g_mp, sizeof(request_rec));
@@ -533,7 +534,8 @@ static void init_msr() {
 /**
  * Usage text.
  */
-static void usage() {
+static void usage(void)
+{
     fprintf(stderr, "ModSecurity Unit Tester v%s\n", MODSEC_VERSION);
     fprintf(stderr, "  Usage: msc_test [options]\n");
     fprintf(stderr, "\n");
