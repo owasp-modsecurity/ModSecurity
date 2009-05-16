@@ -2282,7 +2282,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
     msre_engine_variable_register(engine,
         "GEO",
         VAR_LIST,
-        1, 1,
+        0, 1,
         var_generic_list_validate,
         var_geo_generate,
         VAR_DONT_CACHE, /* dynamic */

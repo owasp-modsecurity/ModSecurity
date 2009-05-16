@@ -29,6 +29,8 @@
 #define GEO_COUNTRY_DATABASE      1
 #define GEO_CITY_DATABASE_0       6
 #define GEO_CITY_DATABASE_1       2
+#define GEO_COUNTRY_LAST          250
+
 
 typedef struct geo_rec geo_rec;
 typedef struct geo_db geo_db;
