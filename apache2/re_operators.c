@@ -1206,11 +1206,16 @@ static int msre_op_geoLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
     rc = geo_lookup(msr, &rec, geo_host, error_msg);
     if (rc <= 0) {
-        *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" failed at %s.", log_escape_nq(msr->mp, geo_host), var->name);
+        if (! *error_msg) {
+            *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" failed at %s.", log_escape_nq(msr->mp, geo_host), var->name);
+        }
+        apr_table_clear(msr->geo_vars);
         return rc;
     }
-    *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" succeeded at %s.",
-        log_escape_nq(msr->mp, geo_host), var->name);
+    if (! *error_msg) {
+        *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" succeeded at %s.",
+            log_escape_nq(msr->mp, geo_host), var->name);
+    }
 
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "GEO: %s={country_code=%s, country_code3=%s, country_name=%s, country_continent=%s, region=%s, city=%s, postal_code=%s, latitude=%f, longitude=%f, dma_code=%d, area_code=%d}",
@@ -1229,63 +1234,77 @@ static int msre_op_geoLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     }
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-    s->name = apr_pstrdup(msr->mp, "country_code");
+    s->name = apr_pstrdup(msr->mp, "COUNTRY_CODE");
     s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.country_code ? rec.country_code : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-    s->name = apr_pstrdup(msr->mp, "country_code3");
+    s->name = apr_pstrdup(msr->mp, "COUNTRY_CODE3");
     s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.country_code3 ? rec.country_code3 : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-    s->name = apr_pstrdup(msr->mp, "region");
+    s->name = apr_pstrdup(msr->mp, "COUNTRY_NAME");
+    s->name_len = strlen(s->name);
+    s->value = apr_pstrdup(msr->mp, rec.country_name ? rec.country_name : "");
+    s->value_len = strlen(s->value);
+    apr_table_setn(msr->geo_vars, s->name, (void *)s);
+
+    s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    s->name = apr_pstrdup(msr->mp, "COUNTRY_CONTINENT");
+    s->name_len = strlen(s->name);
+    s->value = apr_pstrdup(msr->mp, rec.country_continent ? rec.country_continent : "");
+    s->value_len = strlen(s->value);
+    apr_table_setn(msr->geo_vars, s->name, (void *)s);
+
+    s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    s->name = apr_pstrdup(msr->mp, "REGION");
     s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.region ? rec.region : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-    s->name = apr_pstrdup(msr->mp, "city");
+    s->name = apr_pstrdup(msr->mp, "CITY");
     s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.city ? rec.city : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-    s->name = apr_pstrdup(msr->mp, "postal_code");
+    s->name = apr_pstrdup(msr->mp, "POSTAL_CODE");
     s->name_len = strlen(s->name);
     s->value = apr_pstrdup(msr->mp, rec.postal_code ? rec.postal_code : "");
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-    s->name = apr_pstrdup(msr->mp, "latitude");
+    s->name = apr_pstrdup(msr->mp, "LATITUDE");
     s->name_len = strlen(s->name);
     s->value = apr_psprintf(msr->mp, "%f", rec.latitude);
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-    s->name = apr_pstrdup(msr->mp, "longitude");
+    s->name = apr_pstrdup(msr->mp, "LONGITUDE");
     s->name_len = strlen(s->name);
     s->value = apr_psprintf(msr->mp, "%f", rec.longitude);
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-    s->name = apr_pstrdup(msr->mp, "dma_code");
+    s->name = apr_pstrdup(msr->mp, "DMA_CODE");
     s->name_len = strlen(s->name);
     s->value = apr_psprintf(msr->mp, "%d", rec.dma_code);
     s->value_len = strlen(s->value);
     apr_table_setn(msr->geo_vars, s->name, (void *)s);
 
     s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-    s->name = apr_pstrdup(msr->mp, "area_code");
+    s->name = apr_pstrdup(msr->mp, "AREA_CODE");
     s->name_len = strlen(s->name);
     s->value = apr_psprintf(msr->mp, "%d", rec.area_code);
     s->value_len = strlen(s->value);

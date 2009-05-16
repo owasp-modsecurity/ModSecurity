@@ -415,13 +415,105 @@
 #	),
 #},
 
+## ENH: We cannot include this test as we cannot distribute the database.
+##      Instead we should create a simple test DB of our own.
+## GEO
+#{
+#	type => "target",
+#	comment => "GEO (ip)",
+#	conf => qq(
+#		SecRuleEngine On
+#		SecDebugLog $ENV{DEBUG_LOG}
+#		SecDebugLogLevel 9
+#        SecGeoLookupDB GeoLiteCity.dat
+#		SecRule ARGS:ip "\@geoLookup" "phase:2,log,pass,t:none"
+#		SecRule GEO:COUNTRY_CODE "\@streq US" "phase:2,log,pass,t:none"
+#		SecRule GEO:COUNTRY_CODE3 "\@streq USA" "phase:2,log,pass,t:none"
+#		SecRule GEO:COUNTRY_NAME "\@streq United States" "phase:2,log,pass,t:none"
+#        # ENH: Not in this database?
+#		SecRule GEO:COUNTRY_CONTINENT "\@streq NA" "phase:2,log,pass,t:none"
+#		SecRule GEO:REGION "\@streq CA" "phase:2,log,pass,t:none"
+#		SecRule GEO:CITY "\@streq San Diego" "phase:2,log,pass,t:none"
+#		SecRule GEO:POSTAL_CODE "\@streq 92123" "phase:2,log,pass,t:none"
+#		SecRule GEO:LATITUDE "\@beginsWith 32.8" "phase:2,log,pass,t:none"
+#		SecRule GEO:LONGITUDE "\@beginsWith 117.1" "phase:2,log,pass,t:none"
+#		SecRule GEO:DMA_CODE "\@streq 825" "phase:2,log,pass,t:none"
+#		SecRule GEO:AREA_CODE "\@streq 858" "phase:2,log,pass,t:none"
+#	),
+#	match_log => {
+#		debug => [ qr/Geo lookup for "216.75.21.122" succeeded.*match "US" at GEO:COUNTRY_CODE.*match "USA" at GEO:COUNTRY_CODE3.*match "United States" at GEO:COUNTRY_NAME.*match "NA" at GEO:COUNTRY_CONTINENT.*match "CA" at GEO:REGION.*match "San Diego" at GEO:CITY.*match "92123" at GEO:POSTAL_CODE.*match "32.8" at GEO:LATITUDE.*match "825" at GEO:DMA_CODE.*match "858" at GEO:AREA_CODE/si, 1 ],
+#	},
+#	match_response => {
+#		status => qr/^200$/,
+#	},
+#	request => new HTTP::Request(
+#		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?ip=216.75.21.122",
+#	),
+#},
+#{
+#	type => "target",
+#	comment => "GEO (host)",
+#	conf => qq(
+#		SecRuleEngine On
+#		SecDebugLog $ENV{DEBUG_LOG}
+#		SecDebugLogLevel 9
+#        SecGeoLookupDB GeoLiteCity.dat
+#		SecRule ARGS:host "\@geoLookup" "phase:2,log,pass,t:none"
+#		SecRule GEO:COUNTRY_CODE "\@streq US" "phase:2,log,pass,t:none"
+#		SecRule GEO:COUNTRY_CODE3 "\@streq USA" "phase:2,log,pass,t:none"
+#		SecRule GEO:COUNTRY_NAME "\@streq United States" "phase:2,log,pass,t:none"
+#        # ENH: Not in this database?
+#		SecRule GEO:COUNTRY_CONTINENT "\@streq NA" "phase:2,log,pass,t:none"
+#		SecRule GEO:REGION "\@streq CA" "phase:2,log,pass,t:none"
+#		SecRule GEO:CITY "\@streq San Diego" "phase:2,log,pass,t:none"
+#		SecRule GEO:POSTAL_CODE "\@streq 92123" "phase:2,log,pass,t:none"
+#		SecRule GEO:LATITUDE "\@beginsWith 32.8" "phase:2,log,pass,t:none"
+#		SecRule GEO:LONGITUDE "\@beginsWith 117.1" "phase:2,log,pass,t:none"
+#		SecRule GEO:DMA_CODE "\@streq 825" "phase:2,log,pass,t:none"
+#		SecRule GEO:AREA_CODE "\@streq 858" "phase:2,log,pass,t:none"
+#	),
+#	match_log => {
+#		debug => [ qr/Using address "\d+\.\d+\.\d+\.\d+".*Geo lookup for "www\.modsecurity\.org" succeeded.*match "US" at GEO:COUNTRY_CODE.*match "USA" at GEO:COUNTRY_CODE3.*match "United States" at GEO:COUNTRY_NAME.*match "NA" at GEO:COUNTRY_CONTINENT.*match "CA" at GEO:REGION.*match "San Diego" at GEO:CITY.*match "92123" at GEO:POSTAL_CODE.*match "32.8" at GEO:LATITUDE.*match "825" at GEO:DMA_CODE.*match "858" at GEO:AREA_CODE/si, 1 ],
+#	},
+#	match_response => {
+#		status => qr/^200$/,
+#	},
+#	request => new HTTP::Request(
+#		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?host=www.modsecurity.org",
+#	),
+#},
+{
+	type => "target",
+	comment => "GEO (failed lookup)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+        SecGeoLookupDB GeoLiteCity.dat
+        SecRule REMOTE_ADDR "\@geoLookup" "pass,nolog"
+        SecRule \&GEO "\@eq 0" "deny,status:403,msg:'Failed to lookup IP'"
+#		SecRule ARGS:ip "\@geoLookup" "phase:2,log,pass,t:none"
+#		SecRule \&GEO "\@eq 0" "phase:2,log,deny,status:403,t:none"
+#		SecRule ARGS:badip "\@geoLookup" "phase:2,log,pass,t:none"
+#		SecRule \&GEO "!\@eq 0" "phase:2,log,deny,status:403,t:none"
+	),
+	match_log => {
+		-debug => [ qr/Geo lookup for "127\.0\.0\.1" succeeded/si, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?ip=216.75.21.122&badip=127.0.0.1",
+	),
+},
+
 # TODO: ENV
 # TODO: FILES
 # TODO: FILES_COMBINED_SIZE
 # TODO: FILES_NAMES
 # TODO: FILES_SIZES
 # TODO: FILES_TMPNAMES
-# TODO: GEO
 # TODO: HIGHEST_SEVERITY
 # TODO: MATCHED_VAR
 # TODO: MATCHED_VAR_NAME

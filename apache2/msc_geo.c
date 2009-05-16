@@ -21,7 +21,7 @@
 
 /* -- Lookup Tables -- */
 
-static const char *geo_country_code[] = {
+static const char *geo_country_code[GEO_COUNTRY_LAST + 1] = {
     "--",
     "AP","EU","AD","AE","AF","AG","AI","AL","AM","AN",
     "AO","AQ","AR","AS","AT","AU","AW","AZ","BA","BB",
@@ -50,7 +50,7 @@ static const char *geo_country_code[] = {
     "ZM","ME","ZW","A1","A2","O1","AX","GG","IM","JE"
 };
 
-static const char *geo_country_code3[] = {
+static const char *geo_country_code3[GEO_COUNTRY_LAST + 1] = {
     "--",
     "AP","EU","AND","ARE","AFG","ATG","AIA","ALB","ARM","ANT",
     "AGO","AQ","ARG","ASM","AUT","AUS","ABW","AZE","BIH","BRB",
@@ -79,7 +79,7 @@ static const char *geo_country_code3[] = {
     "ZMB","MNE","ZWE","A1","A2","O1","ALA","GGY","IMN","JEY"
 };
 
-static const char *geo_country_name[] = {
+static const char *geo_country_name[GEO_COUNTRY_LAST + 1] = {
     "N/A",
     "Asia/Pacific Region","Europe","Andorra","United Arab Emirates","Afghanistan","Antigua and Barbuda","Anguilla","Albania","Armenia","Netherlands Antilles",
     "Angola","Antarctica","Argentina","American Samoa","Austria","Australia","Aruba","Azerbaijan","Bosnia and Herzegovina","Barbados",
@@ -108,7 +108,7 @@ static const char *geo_country_name[] = {
     "Zambia","Montenegro","Zimbabwe","Anonymous Proxy","Satellite Provider","Other","Aland Islands","Guernsey","Isle of Man","Jersey"
 };
 
-static const char *geo_country_continent[] = {
+static const char *geo_country_continent[GEO_COUNTRY_LAST + 1] = {
     "--",
     "AS","EU","EU","AS","AS","SA","SA","EU","AS","SA",
     "AF","AN","SA","OC","EU","OC","SA","AS","EU","SA",
@@ -315,11 +315,13 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
     /* NOTE: This only works with ipv4 */
     if ((rc = apr_sockaddr_info_get(&addr, target, APR_INET, 0, 0, msr->mp)) != APR_SUCCESS) {
 
-        *error_msg = apr_psprintf(msr->mp, "Geo lookup of \"%s\" failed: %s", log_escape(msr->mp, target), apr_strerror(rc, errstr, 1024));
+        *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" failed: %s", log_escape(msr->mp, target), apr_strerror(rc, errstr, 1024));
+        msr_log(msr, 4, "%s", *error_msg);
         return 0;
     }
     if ((rc = apr_sockaddr_ip_get(&targetip, addr)) != APR_SUCCESS) {
-        *error_msg = apr_psprintf(msr->mp, "Geo lookup of \"%s\" failed: %s", log_escape(msr->mp, target), apr_strerror(rc, errstr, 1024));
+        *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" failed: %s", log_escape(msr->mp, target), apr_strerror(rc, errstr, 1024));
+        msr_log(msr, 4, "%s", *error_msg);
         return 0;
     };
 
@@ -360,8 +362,9 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
     if (geo->dbtype == GEO_COUNTRY_DATABASE) {
         country = rec_val;
         country -= geo->ctry_offset;
-        if (country <= 0) {
-            *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\".", log_escape(msr->mp, target));
+        if ((country <= 0) || (country > GEO_COUNTRY_LAST)) {
+            *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\" (country %d).", log_escape(msr->mp, target), country);
+            msr_log(msr, 4, "%s", *error_msg);
             return 0;
         }
 
@@ -383,8 +386,9 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         rc = apr_file_read_full(geo->db, &cbuf, sizeof(cbuf), &nbytes);
 
         country = cbuf[0];
-        if (country <= 0) {
-            *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\".", log_escape(msr->mp, target));
+        if ((country <= 0) || (country > GEO_COUNTRY_LAST)) {
+            *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\" (country %d).", log_escape(msr->mp, target), country);
+            msr_log(msr, 4, "%s", *error_msg);
             return 0;
         }
         if (msr->txcfg->debuglog_level >= 9) {
@@ -472,7 +476,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
 
     }
 
-    *error_msg = apr_psprintf(msr->mp, "Geo lookup of \"%s\" succeeded.", log_escape(msr->mp, target));
+    *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" succeeded.", log_escape(msr->mp, target));
     return 1;
 }
 

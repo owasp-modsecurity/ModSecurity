@@ -1,6 +1,13 @@
 22 Apr 2009 - trunk
 -------------------
 
+ * Populate GEO:COUNTRY_NAME and GEO:COUNTRY_CONTINENT as documented.
+
+ * Handle a newer geo database more gracefully, avoiding a potential crash for
+   new countries that ModSecurity is not yet aware.
+
+ * Allow checking &GEO "@eq 0" for a failed @geoLookup.
+
  * Fixed mlogc global mutex locking issue and added more debugging output.
 
  * Cleaned up build dependencies and configure options.

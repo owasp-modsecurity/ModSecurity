@@ -6,7 +6,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.6.0-trunk (April 22, 2009)</releaseinfo>
+    <releaseinfo>Version 2.6.0-trunk (May 15, 2009)</releaseinfo>
 
     <copyright>
       <year>2004-2009</year>
@@ -2837,7 +2837,7 @@ SecRule <emphasis>ENV:tag</emphasis> "suspicious"</programlisting>
       <title><literal moreinfo="none">GEO</literal></title>
 
       <para><literal>GEO</literal> is a collection populated by the <literal
-      moreinfo="none">@geoLookups</literal> operator. It can be used to match
+      moreinfo="none">@geoLookup</literal> operator. It can be used to match
       geographical fields looked up by an IP address or hostname.</para>
 
       <para>Available since 2.2.0.</para>
@@ -2847,7 +2847,7 @@ SecRule <emphasis>ENV:tag</emphasis> "suspicious"</programlisting>
       <itemizedlist>
         <listitem>
           <para><emphasis>COUNTRY_CODE:</emphasis> Two character country code.
-          EX: US, UK, etc.</para>
+          EX: US, GB, etc.</para>
         </listitem>
 
         <listitem>
@@ -2871,24 +2871,28 @@ SecRule <emphasis>ENV:tag</emphasis> "suspicious"</programlisting>
         </listitem>
 
         <listitem>
-          <para><emphasis>CITY:</emphasis> The city name.</para>
+          <para><emphasis>CITY:</emphasis> The city name if supported by the
+          database.</para>
         </listitem>
 
         <listitem>
-          <para><emphasis>POSTAL_CODE:</emphasis> The postal code.</para>
+          <para><emphasis>POSTAL_CODE:</emphasis> The postal code if supported
+          by the database.</para>
         </listitem>
 
         <listitem>
-          <para><emphasis>LATITUDE:</emphasis> The latitude.</para>
+          <para><emphasis>LATITUDE:</emphasis> The latitude if supported by
+          the database.</para>
         </listitem>
 
         <listitem>
-          <para><emphasis>LONGITUDE:</emphasis> The longitude.</para>
+          <para><emphasis>LONGITUDE:</emphasis> The longitude if supported by
+          the database.</para>
         </listitem>
 
         <listitem>
-          <para><emphasis>DMA_CODE:</emphasis> The metropolitan area code. (US
-          only)</para>
+          <para><emphasis>DMA_CODE:</emphasis> The metropolitan area code if
+          supported by the database. (US only)</para>
         </listitem>
 
         <listitem>
@@ -2899,8 +2903,8 @@ SecRule <emphasis>ENV:tag</emphasis> "suspicious"</programlisting>
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecRule REMOTE_ADDR "<emphasis>@geoLookup</emphasis>" "chain,drop,msg:'Non-UK IP address'"
-SecRule GEO:COUNTRY_CODE "!@streq UK"</programlisting>
+      <programlisting format="linespecific">SecRule REMOTE_ADDR "<emphasis>@geoLookup</emphasis>" "chain,drop,msg:'Non-GB IP address'"
+SecRule GEO:COUNTRY_CODE "!@streq GB"</programlisting>
     </section>
 
     <section>
@@ -5457,6 +5461,19 @@ SecRule ARGS:route "!<emphasis>@endsWith %{REQUEST_ADDR}</emphasis>" t:none,deny
       <para>You must provide a database via <literal
       moreinfo="none">SecGeoLookupDb</literal> before this operator can be
       used.</para>
+
+      <note>
+        <para>This operator matches and the action is executed on a <emphasis>
+        successful</emphasis> lookup. For this reason, you probably want to
+        use the <emphasis>pass,nolog</emphasis> actions. This allows for
+        <literal moreinfo="none">setvar</literal> and other non-disruptive
+        actions to be executed on a match. If you wish to block on a failed
+        lookup, then do something like this (look for an empty GEO
+        collection):</para>
+
+        <programlisting format="linespecific">SecRule REMOTE_ADDR "@geoLookup" "pass,nolog"
+SecRule &amp;GEO "@eq 0" "deny,status:403,msg:'Failed to lookup IP'"</programlisting>
+      </note>
 
       <para>See the <literal moreinfo="none">GEO</literal> variable for an
       example and more information on various fields available.</para>
