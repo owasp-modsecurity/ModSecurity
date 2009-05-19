@@ -29,6 +29,7 @@
 #include <apr_thread_proc.h>
 #include <apr_global_mutex.h>
 #include <apr_getopt.h>
+#include <apr_version.h>
 #if APR_HAVE_UNISTD_H
 #include <unistd.h>         /* for getpid() */
 #endif
@@ -77,7 +78,7 @@ do { \
 #define MEMALLOC_ERROR_MSG  "Memory allocation failed!"
 #define VERSION             MODSEC_VERSION
 
-#define CMDLINE_OPTS        "fh"
+#define CMDLINE_OPTS        "fvh"
 
 #define IN                  0
 #define OUT                 1
@@ -460,7 +461,7 @@ static int read_queue_entries(apr_file_t *fd, apr_time_t *queue_time)
  * Initialise the transaction log. This code should be
  * executed only once at startup.
  */
-static void transaction_log_init()
+static void transaction_log_init(void)
 {
     /* ENH: These big enough? */
     char new_queue_path[256];
@@ -555,7 +556,7 @@ static void transaction_log(int direction, const char *entry)
  * Executes a checkpoint, which causes the current queue to be
  * written to a file and the transaction log to be truncated.
  */
-static void transaction_checkpoint()
+static void transaction_checkpoint(void)
 {
     /* ENH: These big enough? */
     char new_queue_path[256];
@@ -688,7 +689,7 @@ static void parse_configuration_line(const char *line, int line_count)
 /**
  * Reads configuration from a file.
  */
-static void read_configuration()
+static void read_configuration(void)
 {
     char linebuf[4096];
     apr_status_t rc;
@@ -727,7 +728,7 @@ static void read_configuration()
 /**
  * Initialize the configuration.
  */
-static void init_configuration()
+static void init_configuration(void)
 {
     char errstr[1024];
     apr_status_t rc = 0;
@@ -894,7 +895,7 @@ static void init_configuration()
 /**
  * Clean-up resources before process shutdown.
  */
-static void logc_cleanup()
+static void logc_cleanup(void)
 {
     curl_global_cleanup();
 }
@@ -1037,7 +1038,7 @@ int curl_debugfunction(CURL *curl, curl_infotype infotype, char *data, size_t da
 /**
  * Initialise the necessary resources and structures.
  */
-static void logc_init()
+static void logc_init(void)
 {
     char errstr[1024];
     apr_status_t rc = 0;
@@ -1679,7 +1680,7 @@ static void * APR_THREAD_FUNC thread_signals(apr_thread_t *thread, void *data)
  * Apache and add them to the queue, sometimes creating
  * new worker threads to handle them.
  */
-static void receive_loop() {
+static void receive_loop(void) {
     apr_file_t *fd_stdin;
     apr_size_t nbytes = PIPE_BUF_SIZE;
     char *buf = apr_palloc(pool, PIPE_BUF_SIZE + 1);
@@ -1818,7 +1819,7 @@ static void receive_loop() {
 /**
  * Creates the management thread.
  */
-static void start_management_thread()
+static void start_management_thread(void)
 {
     apr_thread_t *thread = NULL;
     apr_threadattr_t *thread_attrs;
@@ -1841,7 +1842,7 @@ static void start_management_thread()
 /**
  * Creates a thread to handle all signals
  */
-static void start_signal_thread()
+static void start_signal_thread(void)
 {
     apr_thread_t *thread = NULL;
     apr_threadattr_t *thread_attrs;
@@ -1861,15 +1862,26 @@ static void start_signal_thread()
 /**
  * Usage text.
  */
-static void usage() {
-    fprintf(stderr, "ModSecurity Log Collector v%s\n", VERSION);
-    fprintf(stderr, "  Usage: mlogc [options] /path/to/the/configuration.file\n");
+static void usage(void) {
+    fprintf(stderr, "ModSecurity Log Collector (mlogc) v%s\n", VERSION);
+    fprintf(stderr, "  Usage: mlogc [options] /path/to/the/mlogc.conf\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "  Options:\n");
     fprintf(stderr, "    -f        Force depletion of queue on exit\n");
+    fprintf(stderr, "    -v        Version information\n");
     fprintf(stderr, "    -h        This help\n\n");
 }
 
+/**
+ * Version text.
+ */
+static void version(void) {
+    fprintf(stderr, "ModSecurity Log Collector (mlogc) v%s\n", VERSION);
+    fprintf(stderr, "   APR: compiled=\"%s\"; loaded=\"%s\"\n", APR_VERSION_STRING, apr_version_string());
+    fprintf(stderr, "  PCRE: compiled=\"%d.%d\"; loaded=\"%s\"\n", PCRE_MAJOR, PCRE_MINOR, pcre_version());
+    fprintf(stderr, "  cURL: compiled=\"%s\"; loaded=\"%s\"\n", LIBCURL_VERSION, curl_version());
+    fprintf(stderr, "\n");
+}
 
 /**
  * This is the main entry point.
@@ -1910,6 +1922,9 @@ int main(int argc, const char * const argv[]) {
                 case 'f':
                     opt_force = 1;
                     break;
+                case 'v':
+                    version();
+                    logc_shutdown(0);
                 case 'h':
                     usage();
                     logc_shutdown(0);
