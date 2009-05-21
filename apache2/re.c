@@ -68,9 +68,12 @@ char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actions
     const apr_array_header_t *tarr = NULL;
     const apr_table_entry_t *telts = NULL;
     char *actions = NULL;
+    int chain;
     int i;
 
-    if (actionset == NULL) return apr_pstrdup(pool, "");
+    if (actionset == NULL) return NULL;
+
+    chain = ((actionset->rule != NOT_SET_P) && actionset->rule->chain_starter) ? 1 : 0;
 
     tarr = apr_table_elts(actionset->actions);
     telts = (const apr_table_entry_t*)tarr->elts;
@@ -78,6 +81,22 @@ char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actions
     for (i = 0; i < tarr->nelts; i++) {
         msre_action *action = (msre_action *)telts[i].val;
         int use_quotes = 0;
+
+        if (chain) {
+            /* Skip some actions that are not used in a chain. */
+            if (   (action->metadata->type == ACTION_DISRUPTIVE)
+                || (action->metadata->type == ACTION_METADATA)
+                || (strcmp("log", action->metadata->name) == 0)
+                || (strcmp("auditlog", action->metadata->name) == 0)
+                || (strcmp("nolog", action->metadata->name) == 0)
+                || (strcmp("noauditlog", action->metadata->name) == 0)
+                || (strcmp("severity", action->metadata->name) == 0)
+                || (strcmp("tag", action->metadata->name) == 0)
+                || (strcmp("phase", action->metadata->name) == 0)) 
+            {
+                continue;
+            }
+        }
 
         /* Check if we need any quotes */
         if (action->param != NULL) {
@@ -102,7 +121,7 @@ char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actions
             NULL);
     }
 
-    return (actions == NULL) ? apr_pstrdup(pool, "") : actions;
+    return actions;
 }
 
 /**
