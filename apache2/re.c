@@ -1762,9 +1762,16 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
     else {
         /* Match. */
         if (rc == 0) {
+            char *op_param = log_escape(msr->mp, rule->op_param);
+
+            /* Truncate op parameter. */
+            if (strlen(op_param) > 252) {
+                op_param = apr_psprintf(msr->mp, "%.252s ...", op_param);
+            }
+
             /* Operator did not match so we need to provide a message. */
             my_error_msg = apr_psprintf(msr->mp, "Match of \"%s %s\" against \"%s\" required.",
-                log_escape(msr->mp, rule->op_name), log_escape(msr->mp, rule->op_param),
+                log_escape(msr->mp, rule->op_name), op_param,
                 log_escape(msr->mp, full_varname));
         }
 

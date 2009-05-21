@@ -1,6 +1,9 @@
 20 May 2009 - trunk
 -------------------
 
+ * Truncate long parameters in log message for "Match of ... against ...
+   required" messages.
+
  * Correctly resolve chained rule actions in logs.
 
  * Cleanup some code for portability.
