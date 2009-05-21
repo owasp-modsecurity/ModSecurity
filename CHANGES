@@ -1,5 +1,7 @@
-01 Mar 2009 - 2.5.10-dev
+20 May 2009 - 2.5.10-dev
 ------------------------
+
+ * Correctly resolve chained rule actions in logs.
 
  * Cleanup some code for portability.
 

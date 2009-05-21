@@ -2120,6 +2120,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
     );
 
     /* phase */
+    /* ENH: This should be ACTION_NON_DISRUPTIVE or ACTION_FLOW??? */
     msre_engine_action_register(engine,
         "phase",
         ACTION_DISRUPTIVE,
@@ -2354,6 +2355,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
     );
 
     /* tag */
+    /* ENH: This should be ACTION_METADATA??? */
     msre_engine_action_register(engine,
         "tag",
         ACTION_NON_DISRUPTIVE,
