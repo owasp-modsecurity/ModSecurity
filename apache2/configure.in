@@ -20,7 +20,9 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+AC_PROG_GREP
 AC_PATH_PROGS(PERL, [perl perl5], )
+AC_PATH_PROGS(ENV_CMD, [env], )
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -286,7 +288,7 @@ sinclude(build/find_curl.m4)
 ### Build *EXTRA_CFLAGS vars
 
 # Allow overriding EXTRA_CFLAGS
-if env | grep "^EXTRA_CFLAGS" > /dev/null 2>&1; then
+if $ENV_CMD | $GREP "^EXTRA_CFLAGS" > /dev/null 2>&1; then
   if test -z "$debug_mem"; then
     EXTRA_CFLAGS="$EXTRA_CFLAGS $strict_compile"
   fi

@@ -681,8 +681,9 @@ MSC_PKGBASE_DIR
 MSC_BASE_DIR
 LIBOBJS
 EGREP
-GREP
+ENV_CMD
 PERL
+GREP
 RANLIB
 SET_MAKE
 LN_S
@@ -752,7 +753,7 @@ with_apxs
 with_pcre
 with_apr
 with_apu
-with_xml
+with_libxml
 with_lua
 with_curl
 '
@@ -1405,7 +1406,7 @@ Optional Packages:
   --with-pcre=PATH        Path to pcre prefix or config script
   --with-apr=PATH         Path to apr prefix or config script
   --with-apu=PATH         Path to apu prefix or config script
-  --with-xml=PATH         Path to xml prefix or config script
+  --with-libxml=PATH      Path to libxml2 prefix or config script
   --with-lua=PATH         Path to lua prefix or config script
   --with-curl=PATH        Path to curl prefix or config script
 
@@ -3664,55 +3665,6 @@ else
   RANLIB="$ac_cv_prog_RANLIB"
 fi
 
-for ac_prog in perl perl5
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_path_PERL+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  case $PERL in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_PERL="$PERL" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_PERL="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-PERL=$ac_cv_path_PERL
-if test -n "$PERL"; then
-  { $as_echo "$as_me:$LINENO: result: $PERL" >&5
-$as_echo "$PERL" >&6; }
-else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-  test -n "$PERL" && break
-done
-
-
-# Checks for header files.
-
-
 { $as_echo "$as_me:$LINENO: checking for grep that handles long lines and -e" >&5
 $as_echo_n "checking for grep that handles long lines and -e... " >&6; }
 if test "${ac_cv_path_GREP+set}" = set; then
@@ -3776,6 +3728,100 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_path_GREP" >&5
 $as_echo "$ac_cv_path_GREP" >&6; }
  GREP="$ac_cv_path_GREP"
+
+
+for ac_prog in perl perl5
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_PERL+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  case $PERL in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PERL="$PERL" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_PERL="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+PERL=$ac_cv_path_PERL
+if test -n "$PERL"; then
+  { $as_echo "$as_me:$LINENO: result: $PERL" >&5
+$as_echo "$PERL" >&6; }
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$PERL" && break
+done
+
+for ac_prog in env
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_ENV_CMD+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  case $ENV_CMD in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ENV_CMD="$ENV_CMD" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ENV_CMD="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ENV_CMD=$ac_cv_path_ENV_CMD
+if test -n "$ENV_CMD"; then
+  { $as_echo "$as_me:$LINENO: result: $ENV_CMD" >&5
+$as_echo "$ENV_CMD" >&6; }
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$ENV_CMD" && break
+done
+
+
+# Checks for header files.
 
 
 { $as_echo "$as_me:$LINENO: checking for egrep" >&5
@@ -5535,7 +5581,7 @@ CURL_MIN_VERSION="7.15.1"
 ### Build *EXTRA_CFLAGS vars
 
 # Allow overriding EXTRA_CFLAGS
-if env | grep "^EXTRA_CFLAGS" > /dev/null 2>&1; then
+if $ENV_CMD | $GREP "^EXTRA_CFLAGS" > /dev/null 2>&1; then
   if test -z "$debug_mem"; then
     EXTRA_CFLAGS="$EXTRA_CFLAGS $strict_compile"
   fi
@@ -5815,9 +5861,9 @@ fi
 
 
 
-# Check whether --with-xml was given.
-if test "${with_xml+set}" = set; then
-  withval=$with_xml; test_paths="${with_xml}"
+# Check whether --with-libxml was given.
+if test "${with_libxml+set}" = set; then
+  withval=$with_libxml; test_paths="${with_libxml}"
 else
   test_paths="/usr/local/libxml2 /usr/local/xml2 /usr/local/xml /usr/local /opt/libxml2 /opt/libxml /opt/xml2 /opt/xml /opt /usr"
 fi
@@ -5829,30 +5875,30 @@ $as_echo_n "checking for libxml2 config script... " >&6; }
 for x in ${test_paths}; do
         if test ! -d "$x" -a -e "$x"; then
         LIBXML2_CONFIG="`basename $x`"
-        xml_path=`echo $x | sed "s/\/\?${LIBXML2_CONFIG}\$//"`
+        libxml2_path=`echo $x | sed "s/\/\?${LIBXML2_CONFIG}\$//"`
         break
     fi
 
         for LIBXML2_CONFIG in xml2-config xml-2-config xml-config; do
         if test -e "${x}/bin/${LIBXML2_CONFIG}"; then
-            xml_path="${x}/bin"
+            libxml2_path="${x}/bin"
             break
         elif test -e "${x}/${LIBXML2_CONFIG}"; then
-            xml_path="${x}"
+            libxml2_path="${x}"
             break
         else
-            xml_path=""
+            libxml2_path=""
         fi
     done
-    if test -n "$xml_path"; then
+    if test -n "$libxml2_path"; then
         break
     fi
 done
     CFLAGS=$save_CFLAGS
     LDFLAGS=$save_LDFLAGS
 
-if test -n "${xml_path}"; then
-    LIBXML2_CONFIG="${xml_path}/${LIBXML2_CONFIG}"
+if test -n "${libxml2_path}"; then
+    LIBXML2_CONFIG="${libxml2_path}/${LIBXML2_CONFIG}"
     { $as_echo "$as_me:$LINENO: result: ${LIBXML2_CONFIG}" >&5
 $as_echo "${LIBXML2_CONFIG}" >&6; }
     LIBXML2_CFLAGS="`${LIBXML2_CONFIG} --cflags`"
@@ -5874,12 +5920,12 @@ fi
 if test -z "${LIBXML2_LIBS}"; then
     { $as_echo "$as_me:$LINENO: *** xml library not found." >&5
 $as_echo "$as_me: *** xml library not found." >&6;}
-    { { $as_echo "$as_me:$LINENO: error: xml library is required" >&5
-$as_echo "$as_me: error: xml library is required" >&2;}
+    { { $as_echo "$as_me:$LINENO: error: libxml2 is required" >&5
+$as_echo "$as_me: error: libxml2 is required" >&2;}
    { (exit 1); exit 1; }; }
 else
-    { $as_echo "$as_me:$LINENO: using '${LIBXML2_LIBS}' for xml Library" >&5
-$as_echo "$as_me: using '${LIBXML2_LIBS}' for xml Library" >&6;}
+    { $as_echo "$as_me:$LINENO: using '${LIBXML2_LIBS}' for libxml2" >&5
+$as_echo "$as_me: using '${LIBXML2_LIBS}' for libxml2" >&6;}
 
 fi
 
