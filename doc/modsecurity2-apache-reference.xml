@@ -6,7 +6,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.10-dev1 (May 15, 2009)</releaseinfo>
+    <releaseinfo>Version 2.5.10-dev1 (May 29, 2009)</releaseinfo>
 
     <copyright>
       <year>2004-2009</year>
@@ -5555,7 +5555,7 @@ end</programlisting>
       <para><emphasis>Description:</emphasis> Phrase Match operator. This
       operator uses a set based matching engine (Aho-Corasick) for faster
       matches of keyword lists. It will match any one of its arguments
-      anywhere in the target value.</para>
+      anywhere in the target value. The match is case insensitive.</para>
 
       <para>Example:</para>
 

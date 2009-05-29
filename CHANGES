@@ -1,5 +1,7 @@
-20 May 2009 - 2.5.10-dev
+29 May 2009 - 2.5.10-dev
 ------------------------
+
+ * Fixed @pm/@pmFromFile case insensitivity.
 
  * Truncate long parameters in log message for "Match of ... against ...
    required" messages.
