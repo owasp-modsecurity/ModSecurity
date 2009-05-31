@@ -782,6 +782,9 @@ apr_status_t acmp_process_quick(ACMPT *acmpt, const char **match, const char *da
 
     while (data < end) {
         acmp_utf8_char_t letter = (unsigned char)*data++;
+
+        if (parser->is_case_sensitive == 0) letter = utf8_lcase(letter);
+
         go_to = NULL;
         while (go_to == NULL) {
             go_to = acmp_goto(node, letter);

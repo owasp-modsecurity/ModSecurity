@@ -1,5 +1,10 @@
-20 May 2009 - trunk
+31 May 2009 - trunk
 -------------------
+
+ * Removed extra newline from audit log message line when logging XML errors.
+   This was causing problems parsing audit logs.
+
+ * Fixed @pm/@pmFromFile case insensitivity.
 
  * Truncate long parameters in log message for "Match of ... against ...
    required" messages.
