@@ -1,5 +1,8 @@
-29 May 2009 - 2.5.10-dev
+31 May 2009 - 2.5.10-dev
 ------------------------
+
+ * Removed extra newline from audit log message line when logging XML errors.
+   This was causing problems parsing audit logs.
 
  * Fixed @pm/@pmFromFile case insensitivity.
 

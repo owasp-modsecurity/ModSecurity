@@ -48,6 +48,55 @@
 		),
 	),
 },
+# Failed attribute value
+{
+	type => "rule",
+	comment => "validateSchema (validate attribute value failed)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecAuditEngine RelevantOnly
+		SecAuditLog "$ENV{AUDIT_LOG}"
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\
+		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345
+		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" \\
+		        "phase:2,deny,log,auditlog,id:12345"
+	),
+	match_log => {
+		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 1\).*Target value: "\[XML document tree\]".*'badval' is not a valid value of the local atomic type.*Schema validation failed/s, 1 ],
+		-debug => [ qr/Successfully validated payload against Schema|\n\r?\n/, 1 ],
+		audit => [ qr/^Message: Element.*'badval' is not a valid value of the local atomic type\.\nMessage:/m, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "text/xml",
+		],
+		normalize_raw_request_data(
+			q(
+				<?xml version="1.0" encoding="utf-8"?>
+				<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+				xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+				xmlns:tns="http://www.bluebank.example.com/axis/getBalance.jws"
+				xmlns:types="http://www.bluebank.example.com/axis/getBalance.jws/encodedTypes"
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+						<soap:Body soap:mustUnderstand="badval" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+								<q1:getInput xmlns:q1="http://DefaultNamespace">
+										<id xsi:type="xsd:string">12123</id>
+								</q1:getInput>
+						</soap:Body>
+				</soap:Envelope>
+			),
+		),
+	),
+},
 # Failed validation
 {
 	type => "rule",
@@ -57,6 +106,8 @@
 		SecRequestBodyAccess On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
+		SecAuditEngine RelevantOnly
+		SecAuditLog "$ENV{AUDIT_LOG}"
 		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\
 		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345
@@ -67,6 +118,7 @@
 		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 1\).*Target value: "\[XML document tree\]".*element is not expected/s, 1 ],
 		-debug => [ qr/XML parser error|Failed to load/, 1 ],
 		-error => [ qr/XML parser error|Failed to load/, 1 ],
+		audit => [ qr/^Message: Element.*This element is not expected.*\nMessage:/m, 1 ],
 	},
 	match_response => {
 		status => qr/^403$/,
@@ -104,6 +156,8 @@
 		SecRequestBodyAccess On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
+		SecAuditEngine RelevantOnly
+		SecAuditLog "$ENV{AUDIT_LOG}"
 		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\
 		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345
@@ -114,6 +168,7 @@
 		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 0\).*XML parser error.*validation failed because content is not well formed/s, 1 ],
 		-debug => [ qr/Failed to load|Successfully validated/, 1 ],
 		-error => [ qr/Failed to load|Successfully validated/, 1 ],
+		audit => [ qr/^Message: .*Failed parsing document.*\nMessage:/m, 1 ],
 	},
 	match_response => {
 		status => qr/^403$/,
@@ -151,6 +206,8 @@
 		SecRequestBodyAccess On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
+		SecAuditEngine RelevantOnly
+		SecAuditLog "$ENV{AUDIT_LOG}"
 		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\
 		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345
@@ -159,6 +216,7 @@
 	),
 	match_log => {
 		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 1\).*Target value: "\[XML document tree\]".*Failed to parse the XML resource.*Failed to load Schema/s, 1 ],
+		audit => [ qr/^Message: .*Failed to parse the XML resource.*\nMessage: Rule processing failed/m, 1 ],
 	},
 	match_response => {
 		status => qr/^200$/,

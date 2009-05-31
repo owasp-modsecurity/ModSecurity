@@ -236,7 +236,6 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
     apr_size_t nbytes, nbytes_written;
     apr_file_t *debuglog_fd = NULL;
     int filter_debug_level = 0;
-    int str2len;
     char str1[1024] = "";
     char str2[1256] = "";
 
@@ -257,19 +256,15 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
      */
     if ((level > 3)&&( (debuglog_fd == NULL) || (level > filter_debug_level) )) return;
 
-    /* Construct the message (leaving a byte left for a newline if needed). */
+    /* Construct the message. */
     apr_vsnprintf(str1, sizeof(str1), text, ap);
-    str2len = apr_snprintf(str2, sizeof(str2) - 1, 
-        "[%s] [%s/sid#%pp][rid#%pp][%s][%d] %s",
+
+    /* Construct the log entry. */
+    apr_snprintf(str2, sizeof(str2), 
+        "[%s] [%s/sid#%pp][rid#%pp][%s][%d] %s\n",
         current_logtime(msr->mp), ap_get_server_name(r), (r->server),
         r, ((r->uri == NULL) ? "" : log_escape_nq(msr->mp, r->uri)),
         level, str1);
-
-    /* Add a newline if there is not one already (needed for msr_log_*) */
-    if (str2[str2len - 1] != '\n') {
-        str2[str2len] = '\n';
-        str2[str2len + 1] = '\0';
-    }
 
     /* Write to the debug log. */
     if ((debuglog_fd != NULL)&&(level <= filter_debug_level)) {
@@ -326,27 +321,59 @@ void msr_log(modsec_rec *msr, int level, const char *text, ...) {
 /**
  * Logs one message at level 3 to the debug log and to the
  * Apache error log. This is intended for error callbacks.
+ *
+ * The 'text' will first be escaped.
  */
 void msr_log_error(modsec_rec *msr, const char *text, ...) {
-    const char *str = text;
     va_list ap;
+    int len;
+    char *str;
 
+    /* Generate the string. */
     va_start(ap, text);
-    internal_log(msr->r, msr->txcfg, msr, 3, str, ap);
+    str = apr_pvsprintf(msr->mp, text, ap);
     va_end(ap);
+
+    /* Strip line ending. */
+    len = strlen(str);
+    if (len && str[len - 1] == '\n') {
+        str[len - 1] = '\0';
+    }
+    if (len > 1 && str[len - 2] == '\r') {
+        str[len - 1] = '\0';
+    }
+
+    /* Log the escaped string. */
+    internal_log(msr->r, msr->txcfg, msr, 3, log_escape_nq(msr->mp,str), NULL);
 }
 
 /**
  * Logs one message at level 4 to the debug log and to the
  * Apache error log. This is intended for warning callbacks.
+ *
+ * The 'text' will first be escaped.
  */
 void msr_log_warn(modsec_rec *msr, const char *text, ...) {
-    const char *str = text;
     va_list ap;
+    int len;
+    char *str;
 
+    /* Generate the string. */
     va_start(ap, text);
-    internal_log(msr->r, msr->txcfg, msr, 4, str, ap);
+    str = apr_pvsprintf(msr->mp, text, ap);
     va_end(ap);
+
+    /* Strip line ending. */
+    len = strlen(str);
+    if (len && str[len - 1] == '\n') {
+        str[len - 1] = '\0';
+    }
+    if (len > 1 && str[len - 2] == '\r') {
+        str[len - 1] = '\0';
+    }
+
+    /* Log the escaped string. */
+    internal_log(msr->r, msr->txcfg, msr, 4, log_escape_nq(msr->mp,str), NULL);
 }
 
 
