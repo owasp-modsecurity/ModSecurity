@@ -1156,6 +1156,8 @@ static void keep_entries_hack(apr_pool_t *mp, apr_thread_t *thread, const char *
         return;
     }
 
+    error_log(LOG_DEBUG, thread, "STAT \"%s\" {uid=%d; gid=%d; size=%" APR_OFF_T_FMT "; csize=%" APR_OFF_T_FMT "; atime=%" APR_TIME_T_FMT "; ctime=%" APR_TIME_T_FMT "; mtime=%" APR_TIME_T_FMT "}", fn, finfo.user, finfo.group, finfo.size, finfo.csize, finfo.atime, finfo.ctime, finfo.mtime);
+
     if (finfo.mtime != KEEP_ENTRIES_REMOVE_TIME) {
         error_log(LOG_DEBUG2, thread, "Set mtime: %s", fn);
         if ((rc = apr_file_mtime_set(fn, (apr_time_t)KEEP_ENTRIES_REMOVE_TIME, mp)) != APR_SUCCESS) {
@@ -1319,6 +1321,8 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
                 FILE *hd_src;
                 char response_buf[STATUSBUF_SIZE];
                 CURLcode res;
+
+                error_log(LOG_DEBUG, thread, "STAT \"%s\" {uid=%d; gid=%d; size=%" APR_OFF_T_FMT "; csize=%" APR_OFF_T_FMT "; atime=%" APR_TIME_T_FMT "; ctime=%" APR_TIME_T_FMT "; mtime=%" APR_TIME_T_FMT "}", auditlogentry, finfo.user, finfo.group, finfo.size, finfo.csize, finfo.atime, finfo.ctime, finfo.mtime);
 
                 /* Initialize the respone buffer with a hidden value */
                 response_buf[0] = 0;
