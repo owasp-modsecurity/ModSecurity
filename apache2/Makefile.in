@@ -73,12 +73,13 @@ clean-extras:
 	@rm -rf ../tools/mlogc ../tools/mlogc-batch-load.pl
 
 clean: clean-extras
-	@rm -rf *.la *.lo *.o *.slo .libs msc_test msc-test-debug.log
+	@rm -rf *.la *.lo *.loT *.o *.slo .libs msc_test msc-test-debug.log
 
-maintainer-clean: clean
-	@rm -rf Makefile mlogc-src/Makefile t/run-unit-tests.pl t/run-regression-tests.pl t/gen_rx-pm.pl t/csv_rx-pm.pl t/run-tests.pl t/regression/server_root/conf/httpd.conf t/regression/server_root/conf/config_*.t_*.conf config config.log config.status configure mod_security2_config.h ../tools/*.pl autoscan.log configure.scan build/libtool.m4 build/config.guess build/config.sub build/ltmain.sh build/apxs-wrapper
+distclean: clean
+	@rm -rf Makefile mlogc-src/Makefile mlogc-src/mlogc-batch-load.pl ../tools/*.pl t/run-unit-tests.pl t/run-regression-tests.pl t/gen_rx-pm.pl t/csv_rx-pm.pl t/run-tests.pl t/regression/server_root/conf/httpd.conf t/regression/server_root/conf/*.t_*.conf t/regression/server_root/tmp/* t/regression/server_root/logs/*.log t/regression/server_root/logs/audit/* t/regression/server_root/upload/* t/regression/server_root/data/* config config.log config.status build/apxs-wrapper
 
-distclean: maintainer-clean
+maintainer-clean: distclean
+	@rm -rf config config.log config.status configure mod_security2_config.h autoscan.log configure.scan build/libtool.m4 build/config.guess build/config.sub build/ltmain.sh
 
 install-mods: mod_security2.la
 	$(INSTALL_MOD_SHARED) mod_security2.la
