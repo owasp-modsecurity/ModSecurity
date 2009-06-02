@@ -6,7 +6,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.10-dev1 (May 29, 2009)</releaseinfo>
+    <releaseinfo>Version 2.5.10-dev1 (June 2, 2009)</releaseinfo>
 
     <copyright>
       <year>2004-2009</year>
@@ -2836,11 +2836,12 @@ SecRule <emphasis>ENV:tag</emphasis> "suspicious"</programlisting>
     <section>
       <title><literal moreinfo="none">GEO</literal></title>
 
-      <para><literal>GEO</literal> is a collection populated by the <literal
-      moreinfo="none">@geoLookup</literal> operator. It can be used to match
-      geographical fields looked up by an IP address or hostname.</para>
+      <para><literal>GEO</literal> is a collection populated by the results of
+      the last <literal moreinfo="none">@geoLookup</literal> operator. The
+      collection can be used to match geographical fields looked from an IP
+      address or hostname.</para>
 
-      <para>Available since 2.2.0.</para>
+      <para>Available since ModSecurity 2.5.0.</para>
 
       <para>Fields:</para>
 
@@ -2903,7 +2904,9 @@ SecRule <emphasis>ENV:tag</emphasis> "suspicious"</programlisting>
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecRule REMOTE_ADDR "<emphasis>@geoLookup</emphasis>" "chain,drop,msg:'Non-GB IP address'"
+      <programlisting format="linespecific">SecGeoLookupDb /usr/local/geo/data/GeoLiteCity.dat
+...
+SecRule REMOTE_ADDR "<emphasis>@geoLookup</emphasis>" "chain,drop,msg:'Non-GB IP address'"
 SecRule GEO:COUNTRY_CODE "!@streq GB"</programlisting>
     </section>
 
@@ -5455,8 +5458,9 @@ SecRule ARGS:route "!<emphasis>@endsWith %{REQUEST_ADDR}</emphasis>" t:none,deny
       <title><literal>geoLookup</literal></title>
 
       <para><emphasis>Description:</emphasis> This operator looks up various
-      data fields from an IP address or hostname. The results will be captured
-      in the <literal moreinfo="none">GEO</literal> collection.</para>
+      data fields from an IP address or hostname in the target data. The
+      results will be captured in the <literal moreinfo="none">GEO</literal>
+      collection.</para>
 
       <para>You must provide a database via <literal
       moreinfo="none">SecGeoLookupDb</literal> before this operator can be
@@ -5471,7 +5475,9 @@ SecRule ARGS:route "!<emphasis>@endsWith %{REQUEST_ADDR}</emphasis>" t:none,deny
         lookup, then do something like this (look for an empty GEO
         collection):</para>
 
-        <programlisting format="linespecific">SecRule REMOTE_ADDR "@geoLookup" "pass,nolog"
+        <programlisting format="linespecific">SecGeoLookupDb /usr/local/geo/data/GeoLiteCity.dat
+...
+SecRule REMOTE_ADDR "@geoLookup" "pass,nolog"
 SecRule &amp;GEO "@eq 0" "deny,status:403,msg:'Failed to lookup IP'"</programlisting>
       </note>
 
