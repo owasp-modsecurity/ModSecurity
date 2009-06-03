@@ -226,12 +226,12 @@ char *get_env_var(request_rec *r, char *name) {
 }
 
 /**
- * Internal log helper function. Use msr_log instead. This function will
- * correctly handle both the messages that have a newline at the end, and
- * those that don't.
+ * Extended internal log helper function. Use msr_log instead. If fixup is
+ * true, the message will be stripped of any trailing newline and any
+ * required bytes will be escaped.
  */
-void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
-    int level, const char *text, va_list ap)
+void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *msr,
+    int level, int fixup, const char *text, va_list ap)
 {
     apr_size_t nbytes, nbytes_written;
     apr_file_t *debuglog_fd = NULL;
@@ -258,13 +258,24 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
 
     /* Construct the message. */
     apr_vsnprintf(str1, sizeof(str1), text, ap);
+    if (fixup) {
+        int len = strlen(str1);
+
+        /* Strip line ending. */
+        if (len && str1[len - 1] == '\n') {
+            str1[len - 1] = '\0';
+        }
+        if (len > 1 && str1[len - 2] == '\r') {
+            str1[len - 2] = '\0';
+        }
+    }
 
     /* Construct the log entry. */
     apr_snprintf(str2, sizeof(str2), 
         "[%s] [%s/sid#%pp][rid#%pp][%s][%d] %s\n",
         current_logtime(msr->mp), ap_get_server_name(r), (r->server),
         r, ((r->uri == NULL) ? "" : log_escape_nq(msr->mp, r->uri)),
-        level, str1);
+        level, (fixup ? log_escape_nq(msr->mp, str1) : str1));
 
     /* Write to the debug log. */
     if ((debuglog_fd != NULL)&&(level <= filter_debug_level)) {
@@ -272,7 +283,8 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
         apr_file_write_full(debuglog_fd, str2, nbytes, &nbytes_written);
     }
 
-    /* Send message levels 1-3 to the Apache error log too. */
+    /* Send message levels 1-3 to the Apache error log and 
+     * add it to the message list in the audit log. */
     if (level <= 3) {
         char *unique_id = (char *)get_env_var(r, "UNIQUE_ID");
         char *hostname = (char *)msr->hostname;
@@ -306,6 +318,15 @@ void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
 }
 
 /**
+ * Internal log helper function. Use msr_log instead.
+ */
+void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
+    int level, const char *text, va_list ap)
+{
+    internal_log_ex(r, dcfg, msr, level, 0, text, ap);
+}
+
+/**
  * Logs one message at the given level to the debug log (and to the
  * Apache error log if the message is important enough.
  */
@@ -313,7 +334,7 @@ void msr_log(modsec_rec *msr, int level, const char *text, ...) {
     va_list ap;
 
     va_start(ap, text);
-    internal_log(msr->r, msr->txcfg, msr, level, text, ap);
+    internal_log_ex(msr->r, msr->txcfg, msr, level, 0, text, ap);
     va_end(ap);
 }
 
@@ -321,30 +342,13 @@ void msr_log(modsec_rec *msr, int level, const char *text, ...) {
 /**
  * Logs one message at level 3 to the debug log and to the
  * Apache error log. This is intended for error callbacks.
- *
- * The 'text' will first be escaped.
  */
 void msr_log_error(modsec_rec *msr, const char *text, ...) {
     va_list ap;
-    int len;
-    char *str;
 
-    /* Generate the string. */
     va_start(ap, text);
-    str = apr_pvsprintf(msr->mp, text, ap);
+    internal_log_ex(msr->r, msr->txcfg, msr, 3, 1, text, ap);
     va_end(ap);
-
-    /* Strip line ending. */
-    len = strlen(str);
-    if (len && str[len - 1] == '\n') {
-        str[len - 1] = '\0';
-    }
-    if (len > 1 && str[len - 2] == '\r') {
-        str[len - 1] = '\0';
-    }
-
-    /* Log the escaped string. */
-    internal_log(msr->r, msr->txcfg, msr, 3, log_escape_nq(msr->mp,str), NULL);
 }
 
 /**
@@ -355,25 +359,10 @@ void msr_log_error(modsec_rec *msr, const char *text, ...) {
  */
 void msr_log_warn(modsec_rec *msr, const char *text, ...) {
     va_list ap;
-    int len;
-    char *str;
 
-    /* Generate the string. */
     va_start(ap, text);
-    str = apr_pvsprintf(msr->mp, text, ap);
+    internal_log_ex(msr->r, msr->txcfg, msr, 4, 1, text, ap);
     va_end(ap);
-
-    /* Strip line ending. */
-    len = strlen(str);
-    if (len && str[len - 1] == '\n') {
-        str[len - 1] = '\0';
-    }
-    if (len > 1 && str[len - 2] == '\r') {
-        str[len - 1] = '\0';
-    }
-
-    /* Log the escaped string. */
-    internal_log(msr->r, msr->txcfg, msr, 4, log_escape_nq(msr->mp,str), NULL);
 }
 
 
