@@ -1086,7 +1086,6 @@ static void logc_init(void)
 
         /* Pre-configure the handle. */
         curl_easy_setopt(curl, CURLOPT_UPLOAD, TRUE);
-        curl_easy_setopt(curl, CURLOPT_PUT, TRUE);
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, (char *)NULL);
         curl_easy_setopt(curl, CURLOPT_URL, console_uri);
         curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
@@ -1361,7 +1360,6 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
 
                 curl_easy_setopt(curl, CURLOPT_READDATA, hd_src);
                 curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, finfo.size);
-                curl_easy_setopt(curl, CURLOPT_INFILESIZE, finfo.size);
 #if 0
                 mandatory on win32?
                 curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
