@@ -1,5 +1,8 @@
-31 May 2009 - 2.5.10-dev
+15 Jun 2009 - 2.5.10-dev
 ------------------------
+
+ * Fixed mlogc issue seen on big endian machines where content type
+   could be listed as zero.
 
  * Removed extra newline from audit log message line when logging XML errors.
    This was causing problems parsing audit logs.
