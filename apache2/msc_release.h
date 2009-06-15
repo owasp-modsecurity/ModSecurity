@@ -22,8 +22,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* ENH: Clean this mess up */
-#if !(defined(_AIX) || defined(WIN32) || defined(CYGWIN) || defined(NETWARE) || defined(SOLARIS2) || defined(__osf1__))
+/* ENH: Clean this mess up by detecting this is possible */
+#if !(defined(_AIX) || defined(WIN32) || defined(CYGWIN) || defined(NETWARE) || defined(SOLARIS2) || defined(OSF1))
 #define DSOLOCAL __attribute__((visibility("hidden")))
 #else
 #define DSOLOCAL

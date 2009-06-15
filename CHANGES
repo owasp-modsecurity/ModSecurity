@@ -1,5 +1,8 @@
-31 May 2009 - trunk
+15 Jun 2009 - trunk
 -------------------
+
+ * Fixed mlogc issue seen on big endian machines where content type
+   could be listed as zero.
 
  * Removed extra newline from audit log message line when logging XML errors.
    This was causing problems parsing audit logs.

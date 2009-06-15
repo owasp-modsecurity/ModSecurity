@@ -1086,7 +1086,6 @@ static void logc_init(void)
 
         /* Pre-configure the handle. */
         curl_easy_setopt(curl, CURLOPT_UPLOAD, TRUE);
-        curl_easy_setopt(curl, CURLOPT_PUT, TRUE);
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, (char *)NULL);
         curl_easy_setopt(curl, CURLOPT_URL, console_uri);
         curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
@@ -1155,6 +1154,8 @@ static void keep_entries_hack(apr_pool_t *mp, apr_thread_t *thread, const char *
         apr_file_close(f);
         return;
     }
+
+    error_log(LOG_DEBUG, thread, "STAT \"%s\" {uid=%d; gid=%d; size=%" APR_OFF_T_FMT "; csize=%" APR_OFF_T_FMT "; atime=%" APR_TIME_T_FMT "; ctime=%" APR_TIME_T_FMT "; mtime=%" APR_TIME_T_FMT "}", fn, finfo.user, finfo.group, finfo.size, finfo.csize, finfo.atime, finfo.ctime, finfo.mtime);
 
     if (finfo.mtime != KEEP_ENTRIES_REMOVE_TIME) {
         error_log(LOG_DEBUG2, thread, "Set mtime: %s", fn);
@@ -1320,6 +1321,8 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
                 char response_buf[STATUSBUF_SIZE];
                 CURLcode res;
 
+                error_log(LOG_DEBUG, thread, "STAT \"%s\" {uid=%d; gid=%d; size=%" APR_OFF_T_FMT "; csize=%" APR_OFF_T_FMT "; atime=%" APR_TIME_T_FMT "; ctime=%" APR_TIME_T_FMT "; mtime=%" APR_TIME_T_FMT "}", auditlogentry, finfo.user, finfo.group, finfo.size, finfo.csize, finfo.atime, finfo.ctime, finfo.mtime);
+
                 /* Initialize the respone buffer with a hidden value */
                 response_buf[0] = 0;
                 response_buf[1] = 1;
@@ -1357,7 +1360,6 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
 
                 curl_easy_setopt(curl, CURLOPT_READDATA, hd_src);
                 curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, finfo.size);
-                curl_easy_setopt(curl, CURLOPT_INFILESIZE, finfo.size);
 #if 0
                 mandatory on win32?
                 curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
