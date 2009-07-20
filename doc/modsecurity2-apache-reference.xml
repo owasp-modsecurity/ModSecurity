@@ -6,7 +6,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.10-dev1 (June 2, 2009)</releaseinfo>
+    <releaseinfo>Version 2.5.10-dev1 (July 20, 2009)</releaseinfo>
 
     <copyright>
       <year>2004-2009</year>
@@ -3843,14 +3843,14 @@ SecRule <emphasis>XML:/xq:employees/employee/name/text()</emphasis> Fred \
     <para>The following rule will ensure that an attacker does not use mixed
     case in order to evade the ModSecurity rule:</para>
 
-    <para><programlisting format="linespecific">SecRule ARG:p "xp_cmdshell" <emphasis>"t:lowercase"</emphasis></programlisting>
+    <para><programlisting format="linespecific">SecRule ARGS:p "xp_cmdshell" <emphasis>"t:lowercase"</emphasis></programlisting>
     multiple transformation actions can be used in the same rule, for example
     the following rule also ensures that an attacker does not use URL encoding
     (%xx encoding) for evasion. Note the order of the transformation
     functions, which ensures that a URL encoded letter is first decoded and
     than translated to lower case.</para>
 
-    <para><programlisting format="linespecific">SecRule ARG:p "xp_cmdshell" <emphasis>"t:urlDecode,t:lowercase"</emphasis></programlisting></para>
+    <para><programlisting format="linespecific">SecRule ARGS:p "xp_cmdshell" <emphasis>"t:urlDecode,t:lowercase"</emphasis></programlisting></para>
 
     <para>One can use the SecDefaultAction command to ensure the translation
     occurs for every rule until the next. Note that transformation actions are
@@ -4397,7 +4397,7 @@ SecRule TX:1 "(?:(?:a(dmin|nonymous)))"</programlisting>
 # this rule should be preceeded by a rule that verifies
 # only valid request methods (e.g. GET, HEAD and POST) are used.
 SecRule REQUEST_METHOD ^POST$<emphasis> chain</emphasis>,t:none
-SecRule REQUEST_HEADER:Content-Length ^$ t:none</programlisting>
+SecRule REQUEST_HEADERS:Content-Length ^$ t:none</programlisting>
 
       <note>
         <para>In programming language concepts, think of chained rules
@@ -5685,7 +5685,7 @@ SecRule REQUEST_HEADERS:Ip-Address "!<emphasis>@streq %{TX.1}</emphasis>"</progr
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecRule ARG:text "<emphasis>@validateByteRange</emphasis> 10, 13, 32-126"</programlisting>
+      <programlisting format="linespecific">SecRule ARGS:text "<emphasis>@validateByteRange</emphasis> 10, 13, 32-126"</programlisting>
 
       <para><emphasis>Note</emphasis></para>
 
