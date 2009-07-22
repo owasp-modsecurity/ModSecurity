@@ -1027,8 +1027,24 @@ int curl_debugfunction(CURL *curl, curl_infotype infotype, char *data, size_t da
         }
     }
 
-    if (infotype == CURLINFO_TEXT) {
-        error_log(LOG_DEBUG, ourdata, "CURL: %s", _log_escape(data, effectivelen));
+    if (error_log_level >= LOG_DEBUG) {
+        if (infotype == CURLINFO_TEXT) {
+            error_log(LOG_DEBUG, ourdata, "CURL: %s", _log_escape(data, effectivelen));
+        }
+    }
+    if (error_log_level >= LOG_DEBUG2) {
+        if (infotype == CURLINFO_HEADER_IN) {
+            error_log(LOG_DEBUG2, ourdata, "CURL: HEADER_IN %s", _log_escape(data, effectivelen));
+        }
+        else if (infotype == CURLINFO_HEADER_OUT) {
+            error_log(LOG_DEBUG2, ourdata, "CURL: HEADER_OUT %s", _log_escape(data, effectivelen));
+        }
+        else if (infotype == CURLINFO_DATA_IN) {
+            error_log(LOG_DEBUG2, ourdata, "CURL: DATA_IN %s", _log_escape(data, effectivelen));
+        }
+        else if (infotype == CURLINFO_DATA_OUT) {
+            error_log(LOG_DEBUG2, ourdata, "CURL: DATA_OUT %s", _log_escape(data, effectivelen));
+        }
     }
 
     return 0;
@@ -1091,6 +1107,8 @@ static void logc_init(void)
         curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+        /* SSLv3 works better overall as some servers have issues with TLS */
+        curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_SSLv3);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 15);
         curl_easy_setopt(curl, CURLOPT_NOSIGNAL, TRUE);
         curl_easy_setopt(curl, CURLOPT_HEADER, TRUE);
