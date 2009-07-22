@@ -1,5 +1,8 @@
-15 Jun 2009 - 2.5.10-dev
-------------------------
+22 July 2009 - 2.5.10-dev1
+--------------------------
+
+ * Forced mlogc to use SSLv3 to avoid some potential auto negotiation
+   issues with some libcurl versions.
 
  * Fixed mlogc issue seen on big endian machines where content type
    could be listed as zero.
