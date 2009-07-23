@@ -1,5 +1,9 @@
-22 July 2009 - 2.5.10-dev1
+23 July 2009 - 2.5.10-dev1
 --------------------------
+
+ * Using nolog,auditlog will now log the "Message:" line to the auditlog, but
+   nothing to the error log.  Prior versions dropped the "Message:" line from
+   both logs.  To do this now, just use "nolog" or "nolog,noauditlog".
 
  * Forced mlogc to use SSLv3 to avoid some potential auto negotiation
    issues with some libcurl versions.

@@ -1660,8 +1660,22 @@ static void msre_perform_disruptive_actions(modsec_rec *msr, msre_rule *rule,
         || (msr->modsecurity->processing_mode == MODSEC_OFFLINE)
         || (actionset->intercept_action == ACTION_NONE))
     {
+        int log_level;
+
         /* If "nolog" was used log at a higher level to prevent an "alert". */
-        int log_level = (actionset->log == 0 ? 4 : 2);
+        if (actionset->log == 0) {
+            log_level = 4;
+
+            /* But, if "auditlog" is enabled, then still add the message. */
+            if (actionset->auditlog != 0) {
+                *(const char **)apr_array_push(msr->alerts) = msc_alert_message(msr, actionset, NULL, message);
+            }
+
+        }
+        else {
+            log_level = 2;
+        }
+
         msc_alert(msr, log_level, actionset, "Warning.", message);
 
         /* However, this will mark the txn relevant again if it is <= 3,
