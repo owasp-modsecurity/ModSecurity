@@ -1,5 +1,14 @@
-15 Jun 2009 - trunk
--------------------
+23 July 2009 - trunk
+--------------------
+
+ * Allow mlogc to periodically flush memory pools.
+
+ * Using nolog,auditlog will now log the "Message:" line to the auditlog, but
+   nothing to the error log.  Prior versions dropped the "Message:" line from
+   both logs.  To do this now, just use "nolog" or "nolog,noauditlog".
+
+ * Forced mlogc to use SSLv3 to avoid some potential auto negotiation
+   issues with some libcurl versions.
 
  * Fixed mlogc issue seen on big endian machines where content type
    could be listed as zero.
