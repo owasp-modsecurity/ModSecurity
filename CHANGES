@@ -1,6 +1,8 @@
 23 July 2009 - 2.5.10-dev1
 --------------------------
 
+ * Allow mlogc to periodically flush memory pools.
+
  * Using nolog,auditlog will now log the "Message:" line to the auditlog, but
    nothing to the error log.  Prior versions dropped the "Message:" line from
    both logs.  To do this now, just use "nolog" or "nolog,noauditlog".
