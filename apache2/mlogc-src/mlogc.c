@@ -151,6 +151,7 @@ int                          keep_entries = 0;
 const char                  *log_repository = NULL;
 void                        *logline_regex = NULL;
 int                          max_connections = 10;
+int                          max_worker_requests = 1000;
 apr_global_mutex_t          *gmutex = NULL;
 apr_thread_mutex_t          *mutex = NULL;
 apr_pool_t                  *pool = NULL;
@@ -835,6 +836,13 @@ static void init_configuration(void)
         error_log(LOG_DEBUG2, NULL, "MaxConnections=%d", max_connections);
     }
 
+    s = apr_table_get(conf, "MaxWorkerRequests");
+    if (s != NULL) {
+        int v = atoi(s);
+        if (v >= 0) max_worker_requests = v;
+        error_log(LOG_DEBUG2, NULL, "MaxWorkerRequests=%d", max_worker_requests);
+    }
+
     s = apr_table_get(conf, "KeepAlive");
     if (s != NULL) {
         int v = atoi(s);
@@ -1221,6 +1229,7 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
     apr_pool_t *tpool;
     struct curl_slist *headerlist = NULL;
     char curl_error_buffer[CURL_ERROR_SIZE] = "";
+    int num_requests = 0;
 
     /* There is no need to do the sleep if this was an invalid entry
      * as the sleep is just to protect flooding the console server
@@ -1310,6 +1319,11 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
 
         error_log(LOG_DEBUG, thread, "Processing entry.");
         take_new = 0;
+
+        /* Keep track of requests processed if we need to */
+        if (max_worker_requests > 0) {
+            num_requests++;
+        }
 
         rc = pcre_exec(logline_regex, NULL, entry->line, entry->line_size, 0, 0,
             capturevector, CAPTUREVECTORSIZE);
@@ -1478,6 +1492,15 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
                 error_log(LOG_WARNING, thread, "Invalid entry (file not found %d): %s", rc, auditlogentry);
                 take_new = 1;
                 nodelay = 1;
+            }
+
+            /* If we are tracking num_requests, then shutdown if we are
+             * over our threshold.
+             */
+            if (num_requests && (num_requests >= max_worker_requests)) {
+                error_log(LOG_NOTICE, thread, "Reached max requests (%d) for this worker, exiting.", max_worker_requests);
+
+                goto THREAD_SHUTDOWN;
             }
         }
 

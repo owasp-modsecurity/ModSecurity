@@ -3,7 +3,7 @@
 ModSecurity Core Rule Set
 ==============================
 
-(c) 2006-2007 Breach Secuiry Inc.
+(c) 2006-2009 Breach Secuiry Inc.
 
 The ModSecurity Core Rule Set is provided to you under the terms and 
 conditions of GPL version 2
@@ -33,10 +33,12 @@ Rule Set is heavily commented to allow it to be used as a step-by-step
 deployment guide for ModSecurity.
 
 For more information refer to the Core Rule Set page at
-http://www.modsecurity.org/
+http://www.owasp.org/index.php/Category:OWASP_ModSecurity_Core_Rule_Set_Project
 
-
-
+Core Rules Mail-list - 
+Suscribe here: https://lists.owasp.org/mailman/listinfo/owasp-modsecurity-core-rule-set
+Archive: https://lists.owasp.org/pipermail/owasp-modsecurity-core-rule-set/
+  
 Core Rule Set Structure & Usage
 ====================================
 
@@ -46,10 +48,15 @@ To activate the rules for your web server installation:
      Additionally you may want to edit modsecurity_crs_30_http_policy.conf
      which enforces an application specific HTTP protocol usage.
 
+     Should also update the appropriate anomaly scoring level in the
+     modsecurity_crs_49_enforcement.conf and modsecurity_crs_60_correlation.conf
+     files.  This will determine when you log and block events.
+
   2) Add the following line to your httpd.conf (assuming
      you've placed the rule files into conf/modsecurity/):
 
      Include conf/modsecurity/*.conf
+     Include conf/modsecurity/base_rules/*conf
 
   3) Restart web server.
 
