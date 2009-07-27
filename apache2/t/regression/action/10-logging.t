@@ -134,9 +134,7 @@
 		SecAction "phase:1,pass,nolog,auditlog"
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
-		# No message, but should have data.  This may need changed
-		audit => [ qr/-H--\s+Stopwatch: /s, 1 ],
+		audit => [ qr/-H--\s+Message: .*Stopwatch: /s, 1 ],
 	},
 	match_response => {
 		status => qr/^200$/,
