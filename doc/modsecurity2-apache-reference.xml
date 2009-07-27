@@ -249,11 +249,12 @@
   <section id="installation">
     <title>Installation</title>
 
-    <para>ModSecurity installation consists of the following steps:</para>
+    <para>ModSecurity installation requirements:</para>
 
     <orderedlist continuation="restarts" inheritnum="ignore">
       <listitem>
-        <para>ModSecurity 2.x works with Apache 2.0.x or better.</para>
+        <para>ModSecurity 2.x works only with Apache 2.0.x or higher. Version
+        2.2.x is highly recommended.</para>
       </listitem>
 
       <listitem>
@@ -264,17 +265,31 @@
       </listitem>
 
       <listitem>
-        <para>Install the latest version of libxml2, if it isn't already
-        installed on the server.</para>
+        <para>libapr and libapr-util</para>
+
+        <para><ulink type=""
+        url="http://apr.apache.org/">http://apr.apache.org/</ulink></para>
+      </listitem>
+
+      <listitem>
+        <para>libpcre</para>
+
+        <para><ulink type=""
+        url="http://www.pcre.org/">http://www.pcre.org/</ulink></para>
+      </listitem>
+
+      <listitem>
+        <para>libxml2</para>
 
         <para><ulink type=""
         url="http://xmlsoft.org/downloads.html">http://xmlsoft.org/downloads.html</ulink></para>
       </listitem>
 
       <listitem>
-        <para>Optionally install the latest version of Lua in the 5.1.x
-        branch, if it isn't already installed on the server and you will be
-        using the new Lua engine.</para>
+        <para>liblua v5.1.x</para>
+
+        <para>This library is optional and only needed if you will be using
+        the new Lua engine.</para>
 
         <para><ulink type=""
         url="http://www.lua.org/download.html">http://www.lua.org/download.html</ulink></para>
@@ -284,6 +299,21 @@
         distribution is recommended.</para>
       </listitem>
 
+      <listitem>
+        <para>libcurl v7.15.1 or higher</para>
+
+        <para>If you will be using the ModSecurity Log Collector (mlogc) to
+        send audit logs to a central repository, then you will also need the
+        curl library.</para>
+
+        <para><ulink type=""
+        url="http://curl.haxx.se/libcurl/">http://curl.haxx.se/libcurl/</ulink></para>
+      </listitem>
+    </orderedlist>
+
+    <para>ModSecurity installation consists of the following steps:</para>
+
+    <orderedlist continuation="restarts" inheritnum="ignore">
       <listitem>
         <para>Stop Apache httpd</para>
       </listitem>
@@ -444,6 +474,16 @@ LoadFile /usr/lib/liblua5.1.so</programlisting></para>
       moreinfo="none">WITH_PCRE_STUDY</literal> defined,which would possibly
       give you a slight performance edge in regular expression
       processing.</para>
+
+      <para>Non-gcc compilers may have problems running out-of-the-box as the
+      current build system was designed around the gcc compiler and some
+      compiler/linker flags may differ. To use a non-gcc compiler you may need
+      some manual Makefile tweaks if issues cannot be solved by exporting
+      custom CFLAGS and CPPFLAGS environment variables.</para>
+
+      <para>If you are upgrading from ModSecurity 1.x, please refer to the
+      migration matrix at <ulink type=""
+      url="http://www.modsecurity.org/documentation/ModSecurity-Migration-Matrix.pdf">http://www.modsecurity.org/documentation/ModSecurity-Migration-Matrix.pdf</ulink></para>
     </note>
   </section>
 
