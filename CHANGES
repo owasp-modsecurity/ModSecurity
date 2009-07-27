@@ -1,4 +1,4 @@
-23 July 2009 - 2.5.10-dev1
+27 July 2009 - 2.5.10-dev1
 --------------------------
 
  * Allow mlogc to periodically flush memory pools.
