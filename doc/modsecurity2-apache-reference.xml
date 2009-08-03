@@ -6,7 +6,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.10-dev1 (July 27, 2009)</releaseinfo>
+    <releaseinfo>Version 2.5.10 (Aug 3, 2009)</releaseinfo>
 
     <copyright>
       <year>2004-2009</year>
@@ -533,7 +533,7 @@ LoadFile /usr/lib/liblua5.1.so</programlisting></para>
 
       <para><emphasis>Example Usage:</emphasis> <literal
       moreinfo="none">SecAction
-      nolog,initcol:RESOURCE=%{REQUEST_FILENAME}</literal></para>
+      nolog,phase:1,initcol:RESOURCE=%{REQUEST_FILENAME}</literal></para>
 
       <para><emphasis>Processing Phase:</emphasis> Any</para>
 
@@ -4753,9 +4753,13 @@ setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasi
       <para>Example: The following example initiates IP address
       tracking.</para>
 
-      <programlisting format="linespecific">SecAction<emphasis> initcol:ip=%{REMOTE_ADDR}</emphasis>,nolog</programlisting>
+      <programlisting format="linespecific">SecAction <emphasis>phase:1,initcol:ip=%{REMOTE_ADDR}</emphasis>,nolog</programlisting>
 
       <para><emphasis>Note</emphasis></para>
+
+      <para>Normally you will want to use <emphasis>phase:1</emphasis>
+      along with <emphasis>initcol</emphasis> so that the collection is
+      available in all phases.</para>
 
       <para>Collections are loaded into memory when the initcol action is
       encountered. The collection in storage will be persisted (and the
@@ -4775,7 +4779,7 @@ setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasi
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecAction initcol:ip=%{REMOTE_ADDR},<emphasis>log</emphasis></programlisting>
+      <programlisting format="linespecific">SecAction phase:1,initcol:ip=%{REMOTE_ADDR},<emphasis>log</emphasis></programlisting>
 
       <para><emphasis>Note</emphasis></para>
 
