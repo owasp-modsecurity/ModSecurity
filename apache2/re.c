@@ -1188,8 +1188,9 @@ static msre_rule * msre_ruleset_fetch_phase_rule(const msre_ruleset *ruleset, co
     for (i = 0; i < phase_arr->nelts; i++) {
         msre_rule *rule = (msre_rule *)rules[i];
 
+        /* Rule with an action, not a sub-rule (chain) and a matching id */
         if (  (rule->actionset != NULL)
-           && !rule->actionset->is_chained
+           && (!rule->actionset->is_chained || !rule->chain_starter)
            && (rule->actionset->id != NULL)
            && (strcmp(rule->actionset->id, id) == 0))
         {

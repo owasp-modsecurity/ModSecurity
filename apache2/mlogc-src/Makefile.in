@@ -10,7 +10,7 @@ srclibdir = $(srcdir)/srclib
 MLOGC_VERSION = `grep '^\#define *VERSION ' mlogc.c | sed 's/.*VERSION *"\([^"]*\)"/\1/'`
 
 APR_FLAGS = @APR_CFLAGS@
-APR_LIBS = @APR_LINK_LD@
+APR_LIBS = @APR_LINK_LD@ @APR_LIBS@
 
 CURL_FLAGS = @CURL_CFLAGS@
 CURL_LIBS = @CURL_LIBS@
