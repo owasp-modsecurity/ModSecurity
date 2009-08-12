@@ -1,6 +1,10 @@
 03 Aug 2009 - 2.5.10
 --------------------
 
+ * Fixed crash on configuration if SecMarker is used before any rules.
+
+ * Fixed SecRuleUpdateActionById so that it will work on chain starters.
+
  * Cleanup build system for mlogc.
 
  * Allow mlogc to periodically flush memory pools.

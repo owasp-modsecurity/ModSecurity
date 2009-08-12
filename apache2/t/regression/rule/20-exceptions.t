@@ -1,10 +1,8 @@
 ### Tests for rule exceptions
 
-# SecRuleRemoveByMsg
-
 # SecRuleRemoveById
 {
-	type => "config",
+	type => "rule",
 	comment => "SecRuleRemoveById (single)",
 	conf => qq(
 		SecRuleEngine On
@@ -27,7 +25,7 @@
 	),
 },
 {
-	type => "config",
+	type => "rule",
 	comment => "SecRuleRemoveById (multiple)",
 	conf => qq(
 		SecRuleEngine On
@@ -52,7 +50,7 @@
 	),
 },
 {
-	type => "config",
+	type => "rule",
 	comment => "SecRuleRemoveById (range)",
 	conf => qq(
 		SecRuleEngine On
@@ -77,7 +75,7 @@
 	),
 },
 {
-	type => "config",
+	type => "rule",
 	comment => "SecRuleRemoveById (multiple + range)",
 	conf => qq(
 		SecRuleEngine On
@@ -105,7 +103,7 @@
 
 # SecRuleRemoveByMsg
 {
-	type => "config",
+	type => "rule",
 	comment => "SecRuleRemoveByMsg",
 	conf => qq(
 		SecRuleEngine On
@@ -125,5 +123,54 @@
 	},
 	request => new HTTP::Request(
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+
+# SecRuleUpdateActionById
+{
+	type => "rule",
+	comment => "SecRuleUpdateActionById",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1,msg:'testing rule'"
+		SecRuleUpdateActionById 1 "pass,nolog"
+	),
+	match_log => {
+		-error => [ qr/ModSecurity: /, 1 ],
+		-audit => [ qr/./, 1 ],
+		debug => [ qr/id:1,.*,pass,nolog/, 1 ],
+		-debug => [ qr/Access denied/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "SecRuleUpdateActionById (chain)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1,msg:'testing rule',chain"
+        SecRule ARGS "bar"
+		SecRuleUpdateActionById 1 "pass,nolog"
+	),
+	match_log => {
+		-error => [ qr/ModSecurity: /, 1 ],
+		-audit => [ qr/./, 1 ],
+		debug => [ qr/id:1,.*,pass,nolog/, 1 ],
+		-debug => [ qr/Access denied/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?foo=bar",
 	),
 },

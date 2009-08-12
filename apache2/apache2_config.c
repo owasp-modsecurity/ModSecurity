@@ -565,6 +565,11 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
     msre_rule *rule = NULL;
     extern msc_engine *modsecurity;
 
+    #ifdef DEBUG_CONF
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
+        "Rule: type=%d p1='%s' p2='%s' p3='%s'", type, p1, p2, p3);
+    #endif
+
     /* Create a ruleset if one does not exist. */
     if ((dcfg->ruleset == NULL)||(dcfg->ruleset == NOT_SET_P)) {
         dcfg->ruleset = msre_ruleset_create(modsecurity->msre, cmd->pool);
@@ -698,7 +703,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 
     #ifdef DEBUG_CONF
     ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
-        "Adding rule %pp id=\"%s\".", rule, (rule->actionset->id == NOT_SET_P
+        "Adding rule %pp phase=%d id=\"%s\".", rule, rule->actionset->phase, (rule->actionset->id == NOT_SET_P
         ? "(none)" : rule->actionset->id));
     #endif
 
@@ -749,6 +754,11 @@ static const char *add_marker(cmd_parms *cmd, directory_config *dcfg, const char
     extern msc_engine *modsecurity;
     int p;
 
+    #ifdef DEBUG_CONF
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
+        "Rule: type=%d p1='%s' p2='%s' p3='%s'", RULE_TYPE_MARKER, p1, p2, p3);
+    #endif
+
     /* Create a ruleset if one does not exist. */
     if ((dcfg->ruleset == NULL)||(dcfg->ruleset == NOT_SET_P)) {
         dcfg->ruleset = msre_ruleset_create(modsecurity->msre, cmd->pool);
@@ -766,13 +776,21 @@ static const char *add_marker(cmd_parms *cmd, directory_config *dcfg, const char
 
     /* Add placeholder to each phase */
     for (p = PHASE_FIRST; p <= PHASE_LAST; p++) {
+        #ifdef DEBUG_CONF
+        ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
+            "Adding marker %pp phase=%d id=\"%s\".", rule, p, (rule->actionset->id == NOT_SET_P
+            ? "(none)" : rule->actionset->id));
+        #endif
+
         if (msre_ruleset_rule_add(dcfg->ruleset, rule, p) < 0) {
             return "Internal Error: Failed to add marker to the ruleset.";
         }
     }
 
     /* No longer need to search for the ID */
-    apr_table_unset(dcfg->tmp_rule_placeholders, rule->actionset->id);
+    if (dcfg->tmp_rule_placeholders != NULL) {
+        apr_table_unset(dcfg->tmp_rule_placeholders, rule->actionset->id);
+    }
 
     return NULL;
 }
