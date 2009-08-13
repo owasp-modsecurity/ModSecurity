@@ -5800,8 +5800,8 @@ fi
 
 for x in ${test_paths}; do
         if test ! -d "$x" -a -e "$x"; then
-        PCRE_CONFIG="`basename $x`"
-        pcre_path=`echo $x | sed "s/\/\?${PCRE_CONFIG}\$//"`
+        PCRE_CONFIG=$x
+        pcre_path="no"
         break
     fi
 
@@ -5824,7 +5824,9 @@ done
     LDFLAGS=$save_LDFLAGS
 
 if test -n "${pcre_path}"; then
-    PCRE_CONFIG="${pcre_path}/${PCRE_CONFIG}"
+    if test "${pcre_path}" != "no"; then
+        PCRE_CONFIG="${pcre_path}/${PCRE_CONFIG}"
+    fi
     { $as_echo "$as_me:$LINENO: result: ${PCRE_CONFIG}" >&5
 $as_echo "${PCRE_CONFIG}" >&6; }
     PCRE_CFLAGS="`${PCRE_CONFIG} --cflags`"
@@ -5870,12 +5872,12 @@ $as_echo_n "checking for libapr config script... " >&6; }
 
 for x in ${test_paths}; do
         if test ! -d "$x" -a -e "$x"; then
-        APR_CONFIG="`basename $x`"
-        apr_path=`echo $x | sed "s/\/\?${APR_CONFIG}\$//"`
+        APR_CONFIG=$x
+        apr_path=no
         break
     fi
 
-        for APR_CONFIG in apr-1-mt-config apr-1-config apr-mt-config apr-config; do
+        for APR_CONFIG in apr-1-mt-config apr-1-config apr-config-1 apr-mt-config-1 apr-mt-config apr-config; do
         if test -e "${x}/bin/${APR_CONFIG}"; then
             apr_path="${x}/bin"
             break
@@ -5892,7 +5894,9 @@ for x in ${test_paths}; do
 done
 
 if test -n "${apr_path}"; then
-    APR_CONFIG="${apr_path}/${APR_CONFIG}"
+    if test "${apr_path}" != "no"; then
+        APR_CONFIG="${apr_path}/${APR_CONFIG}"
+    fi
     { $as_echo "$as_me:$LINENO: result: ${APR_CONFIG}" >&5
 $as_echo "${APR_CONFIG}" >&6; }
     APR_CFLAGS="`${APR_CONFIG} --includes --cppflags --cflags`"
@@ -5947,11 +5951,11 @@ $as_echo_n "checking for libapu config script... " >&6; }
 for x in ${test_paths}; do
         if test ! -d "$x" -a -e "$x"; then
         APU_CONFIG="`basename $x`"
-        apu_path=`echo $x | sed "s/\/\?${APU_CONFIG}\$//"`
+        apu_path="no"
         break
     fi
 
-        for APU_CONFIG in apu-1-mt-config apu-1-config apu-mt-config apu-config; do
+        for APU_CONFIG in apu-1-mt-config apu-1-config apu-config-1 apu-mt-config-1 apu-mt-config apu-config; do
         if test -e "${x}/bin/${APU_CONFIG}"; then
             apu_path="${x}/bin"
             break
@@ -5968,7 +5972,9 @@ for x in ${test_paths}; do
 done
 
 if test -n "${apu_path}"; then
-    APU_CONFIG="${apu_path}/${APU_CONFIG}"
+    if test "${apu_path}" != "no"; then
+        APU_CONFIG="${apu_path}/${APU_CONFIG}"
+    fi
     { $as_echo "$as_me:$LINENO: result: ${APU_CONFIG}" >&5
 $as_echo "${APU_CONFIG}" >&6; }
     APU_CFLAGS="`${APU_CONFIG} --includes`"
@@ -6022,8 +6028,8 @@ $as_echo_n "checking for libxml2 config script... " >&6; }
 
 for x in ${test_paths}; do
         if test ! -d "$x" -a -e "$x"; then
-        LIBXML2_CONFIG="`basename $x`"
-        libxml2_path=`echo $x | sed "s/\/\?${LIBXML2_CONFIG}\$//"`
+        LIBXML2_CONFIG=$x
+        libxml2_path="no"
         break
     fi
 
@@ -6046,7 +6052,9 @@ done
     LDFLAGS=$save_LDFLAGS
 
 if test -n "${libxml2_path}"; then
-    LIBXML2_CONFIG="${libxml2_path}/${LIBXML2_CONFIG}"
+    if test "${libxml2_path}" != "no"; then
+        LIBXML2_CONFIG="${libxml2_path}/${LIBXML2_CONFIG}"
+    fi
     { $as_echo "$as_me:$LINENO: result: ${LIBXML2_CONFIG}" >&5
 $as_echo "${LIBXML2_CONFIG}" >&6; }
     LIBXML2_CFLAGS="`${LIBXML2_CONFIG} --cflags`"
@@ -6269,8 +6277,8 @@ $as_echo_n "checking for libcurl config script... " >&6; }
 
 for x in ${test_paths}; do
         if test ! -d "$x" -a -e "$x"; then
-        CURL_CONFIG="`basename $x`"
-        curl_path=`echo $x | sed "s/\/\?${CURL_CONFIG}\$//"`
+        CURL_CONFIG=$x
+        curl_path="no"
         break
     fi
 
@@ -6291,7 +6299,9 @@ for x in ${test_paths}; do
 done
 
 if test -n "${curl_path}"; then
-    CURL_CONFIG="${curl_path}/${CURL_CONFIG}"
+    if test "${curl_path}" != "no"; then
+        CURL_CONFIG="${curl_path}/${CURL_CONFIG}"
+    fi
     { $as_echo "$as_me:$LINENO: result: ${CURL_CONFIG}" >&5
 $as_echo "${CURL_CONFIG}" >&6; }
     CURL_CFLAGS="`${CURL_CONFIG} --cflags`"

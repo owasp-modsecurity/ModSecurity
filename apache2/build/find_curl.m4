@@ -23,8 +23,8 @@ AC_MSG_CHECKING([for libcurl config script])
 for x in ${test_paths}; do
     dnl # Determine if the script was specified and use it directly
     if test ! -d "$x" -a -e "$x"; then
-        CURL_CONFIG="`basename $x`"
-        curl_path=`echo $x | sed "s/\/\?${CURL_CONFIG}\$//"`
+        CURL_CONFIG=$x
+        curl_path="no"
         break
     fi
 
@@ -46,7 +46,9 @@ for x in ${test_paths}; do
 done
 
 if test -n "${curl_path}"; then
-    CURL_CONFIG="${curl_path}/${CURL_CONFIG}"
+    if test "${curl_path}" != "no"; then
+        CURL_CONFIG="${curl_path}/${CURL_CONFIG}"
+    fi
     AC_MSG_RESULT([${CURL_CONFIG}])
     CURL_CFLAGS="`${CURL_CONFIG} --cflags`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(curl CFLAGS: $CURL_CFLAGS); fi

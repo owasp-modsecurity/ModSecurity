@@ -27,12 +27,12 @@ for x in ${test_paths}; do
     dnl # Determine if the script was specified and use it directly
     if test ! -d "$x" -a -e "$x"; then
         APU_CONFIG="`basename $x`"
-        apu_path=`echo $x | sed "s/\/\?${APU_CONFIG}\$//"`
+        apu_path="no"
         break
     fi
 
     dnl # Try known config script names/locations
-    for APU_CONFIG in apu-1-mt-config apu-1-config apu-mt-config apu-config; do
+    for APU_CONFIG in apu-1-mt-config apu-1-config apu-config-1 apu-mt-config-1 apu-mt-config apu-config; do
         if test -e "${x}/bin/${APU_CONFIG}"; then
             apu_path="${x}/bin"
             break
@@ -49,7 +49,9 @@ for x in ${test_paths}; do
 done
 
 if test -n "${apu_path}"; then
-    APU_CONFIG="${apu_path}/${APU_CONFIG}"
+    if test "${apu_path}" != "no"; then
+        APU_CONFIG="${apu_path}/${APU_CONFIG}"
+    fi
     AC_MSG_RESULT([${APU_CONFIG}])
     APU_CFLAGS="`${APU_CONFIG} --includes`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu CFLAGS: $APU_CFLAGS); fi

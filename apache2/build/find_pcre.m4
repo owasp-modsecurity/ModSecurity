@@ -29,8 +29,8 @@ fi
 for x in ${test_paths}; do
     dnl # Determine if the script was specified and use it directly
     if test ! -d "$x" -a -e "$x"; then
-        PCRE_CONFIG="`basename $x`"
-        pcre_path=`echo $x | sed "s/\/\?${PCRE_CONFIG}\$//"`
+        PCRE_CONFIG=$x
+        pcre_path="no"
         break
     fi
 
@@ -54,7 +54,9 @@ done
     LDFLAGS=$save_LDFLAGS
 
 if test -n "${pcre_path}"; then
-    PCRE_CONFIG="${pcre_path}/${PCRE_CONFIG}"
+    if test "${pcre_path}" != "no"; then
+        PCRE_CONFIG="${pcre_path}/${PCRE_CONFIG}"
+    fi
     AC_MSG_RESULT([${PCRE_CONFIG}])
     PCRE_CFLAGS="`${PCRE_CONFIG} --cflags`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(pcre CFLAGS: $PCRE_CFLAGS); fi

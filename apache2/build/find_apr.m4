@@ -26,13 +26,13 @@ AC_MSG_CHECKING([for libapr config script])
 for x in ${test_paths}; do
     dnl # Determine if the script was specified and use it directly
     if test ! -d "$x" -a -e "$x"; then
-        APR_CONFIG="`basename $x`"
-        apr_path=`echo $x | sed "s/\/\?${APR_CONFIG}\$//"`
+        APR_CONFIG=$x
+        apr_path=no
         break
     fi
 
     dnl # Try known config script names/locations
-    for APR_CONFIG in apr-1-mt-config apr-1-config apr-mt-config apr-config; do
+    for APR_CONFIG in apr-1-mt-config apr-1-config apr-config-1 apr-mt-config-1 apr-mt-config apr-config; do
         if test -e "${x}/bin/${APR_CONFIG}"; then
             apr_path="${x}/bin"
             break
@@ -49,7 +49,9 @@ for x in ${test_paths}; do
 done
 
 if test -n "${apr_path}"; then
-    APR_CONFIG="${apr_path}/${APR_CONFIG}"
+    if test "${apr_path}" != "no"; then
+        APR_CONFIG="${apr_path}/${APR_CONFIG}"
+    fi
     AC_MSG_RESULT([${APR_CONFIG}])
     APR_CFLAGS="`${APR_CONFIG} --includes --cppflags --cflags`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apr CFLAGS: $APR_CFLAGS); fi

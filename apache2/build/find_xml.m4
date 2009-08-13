@@ -22,8 +22,8 @@ AC_MSG_CHECKING([for libxml2 config script])
 for x in ${test_paths}; do
     dnl # Determine if the script was specified and use it directly
     if test ! -d "$x" -a -e "$x"; then
-        LIBXML2_CONFIG="`basename $x`"
-        libxml2_path=`echo $x | sed "s/\/\?${LIBXML2_CONFIG}\$//"`
+        LIBXML2_CONFIG=$x
+        libxml2_path="no"
         break
     fi
 
@@ -47,7 +47,9 @@ done
     LDFLAGS=$save_LDFLAGS
 
 if test -n "${libxml2_path}"; then
-    LIBXML2_CONFIG="${libxml2_path}/${LIBXML2_CONFIG}"
+    if test "${libxml2_path}" != "no"; then
+        LIBXML2_CONFIG="${libxml2_path}/${LIBXML2_CONFIG}"
+    fi
     AC_MSG_RESULT([${LIBXML2_CONFIG}])
     LIBXML2_CFLAGS="`${LIBXML2_CONFIG} --cflags`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(xml CFLAGS: $LIBXML2_CFLAGS); fi
