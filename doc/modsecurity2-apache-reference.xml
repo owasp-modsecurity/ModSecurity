@@ -6,7 +6,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.10-dev2 (Aug 12, 2009)</releaseinfo>
+    <releaseinfo>Version 2.5.10-dev3 (Aug 24, 2009)</releaseinfo>
 
     <copyright>
       <year>2004-2009</year>
@@ -696,6 +696,79 @@ SecAuditLogStorageDir logs/audit
       replicating the main audit log index file when concurrent audit logging
       is used. It will <emphasis>not</emphasis> be used for non-concurrent
       audit logging.</para>
+    </section>
+
+    <section>
+      <title><literal>SecAuditLogDirMode</literal></title>
+
+      <para><emphasis>Description:</emphasis> Configures the mode
+      (permissions) of any directories created for concurrent audit logs using
+      an octal mode (as used in chmod). See <literal
+      moreinfo="none">SecAuditLogFileMode</literal> for controlling the mode
+      of audit log files.</para>
+
+      <para><emphasis>Syntax:</emphasis> <literal
+      moreinfo="none">SecAuditLogDirMode octal_mode|"default"</literal></para>
+
+      <para><emphasis>Example Usage:</emphasis> <literal
+      moreinfo="none">SecAuditLogDirMode 02750</literal></para>
+
+      <para><emphasis>Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis>Scope:</emphasis> Any</para>
+
+      <para><emphasis>Version:</emphasis> 2.5.10</para>
+
+      <para><emphasis>Dependencies/Notes:</emphasis> This feature is not
+      available on operating systems not supporting octal file modes. The
+      default mode (0600) only grants read/write access to the account writing
+      the file. If access from another account is needed (using mpm-itk is a
+      good example), then this directive may be required. However, use this
+      directive with caution to avoid exposing potentially sensitive data to
+      unauthorized users. Using the value "default" will revert back to the
+      default setting.</para>
+
+      <note>
+        <para>The process umask may still limit the mode if it is being more
+        restrictive than the mode set using this directive.</para>
+      </note>
+    </section>
+
+    <section>
+      <title><literal>SecAuditLogFileMode</literal></title>
+
+      <para><emphasis>Description:</emphasis> Configures the mode
+      (permissions) of any files created for concurrent audit logs using an
+      octal mode (as used in chmod). See <literal
+      moreinfo="none">SecAuditLogDirMode</literal> for controlling the mode of
+      created audit log directories.</para>
+
+      <para><emphasis>Syntax:</emphasis> <literal
+      moreinfo="none">SecAuditLogFileMode
+      octal_mode|"default"</literal></para>
+
+      <para><emphasis>Example Usage:</emphasis> <literal
+      moreinfo="none">SecAuditLogFileMode 00640</literal></para>
+
+      <para><emphasis>Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis>Scope:</emphasis> Any</para>
+
+      <para><emphasis>Version:</emphasis> 2.5.10</para>
+
+      <para><emphasis>Dependencies/Notes:</emphasis> This feature is not
+      available on operating systems not supporting octal file modes. The
+      default mode (0600) only grants read/write access to the account writing
+      the file. If access from another account is needed (using mpm-itk is a
+      good example), then this directive may be required. However, use this
+      directive with caution to avoid exposing potentially sensitive data to
+      unauthorized users. Using the value "default" will revert back to the
+      default setting.</para>
+
+      <note>
+        <para>The process umask may still limit the mode if it is being more
+        restrictive than the mode set using this directive.</para>
+      </note>
     </section>
 
     <section>
@@ -2400,7 +2473,7 @@ SecRuleUpdateActionById 12345 "t:compressWhitespace,deny,status:403,msg:'A new m
       <title><literal>SecUploadFileMode</literal></title>
 
       <para><emphasis>Description:</emphasis> Configures the mode
-      (permissions) of any uploaded files using an octal number (as used in
+      (permissions) of any uploaded files using an octal mode (as used in
       chmod).</para>
 
       <para><emphasis>Syntax:</emphasis> <literal
@@ -2423,6 +2496,11 @@ SecRuleUpdateActionById 12345 "t:compressWhitespace,deny,status:403,msg:'A new m
       directive with caution to avoid exposing potentially sensitive data to
       unauthorized users. Using the value "default" will revert back to the
       default setting.</para>
+
+      <note>
+        <para>The process umask may still limit the mode if it is being more
+        restrictive than the mode set using this directive.</para>
+      </note>
     </section>
 
     <section>
@@ -4757,9 +4835,9 @@ setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasi
 
       <para><emphasis>Note</emphasis></para>
 
-      <para>Normally you will want to use <emphasis>phase:1</emphasis>
-      along with <emphasis>initcol</emphasis> so that the collection is
-      available in all phases.</para>
+      <para>Normally you will want to use <emphasis>phase:1</emphasis> along
+      with <emphasis>initcol</emphasis> so that the collection is available in
+      all phases.</para>
 
       <para>Collections are loaded into memory when the initcol action is
       encountered. The collection in storage will be persisted (and the

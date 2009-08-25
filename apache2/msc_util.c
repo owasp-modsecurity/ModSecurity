@@ -418,15 +418,22 @@ char *current_filetime(apr_pool_t *mp) {
 /**
  *
  */
-int msc_mkstemp(char *template) {
+int msc_mkstemp_ex(char *template, mode_t mode) {
     /* ENH Use apr_file_mktemp instead. */
 
     #if !(defined(WIN32)||defined(NETWARE))
     return mkstemp(template);
     #else
     if (mktemp(template) == NULL) return -1;
-    return open(template, O_WRONLY | O_APPEND | O_CREAT | O_BINARY, CREATEMODE_UNISTD);
+    return open(template, O_WRONLY | O_APPEND | O_CREAT | O_BINARY, mode);
     #endif
+}
+
+/**
+ *
+ */
+int msc_mkstemp(char *template) {
+    return msc_mkstemp_ex(template, CREATEMODE_UNISTD);
 }
 
 /**
@@ -1351,3 +1358,26 @@ int css_decode_inplace(unsigned char *input, long int input_len) {
 
     return count;
 }
+
+/**
+ * Translate UNIX octal umask/mode to APR apr_fileperms_t
+ */
+apr_fileperms_t mode2fileperms(mode_t mode) {
+    apr_fileperms_t perms = 0;
+
+    if (mode & S_IXOTH) perms |= APR_WEXECUTE;
+    if (mode & S_IWOTH) perms |= APR_WWRITE;
+    if (mode & S_IROTH) perms |= APR_WREAD;
+    if (mode & S_IXGRP) perms |= APR_GEXECUTE;
+    if (mode & S_IWGRP) perms |= APR_GWRITE;
+    if (mode & S_IRGRP) perms |= APR_GREAD;
+    if (mode & S_IXUSR) perms |= APR_UEXECUTE;
+    if (mode & S_IWUSR) perms |= APR_UWRITE;
+    if (mode & S_IRUSR) perms |= APR_UREAD;
+    if (mode & S_ISVTX) perms |= APR_WSTICKY;
+    if (mode & S_ISGID) perms |= APR_GSETID;
+    if (mode & S_ISUID) perms |= APR_USETID;
+
+    return perms;
+}
+

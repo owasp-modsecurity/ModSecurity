@@ -1,5 +1,10 @@
-12 Aug 2009 - 2.5.10-dev3
+24 Aug 2009 - 2.5.10-dev3
 -------------------------
+
+ * Added SecAuditLogDirMode and SecAuditLogFileMode to allow fine tuning
+   auditlog permissions (especially with mpm-itk).
+
+ * Cleaned up SecUploadFileMode implementation.
 
  * Cleanup build scripts.
 

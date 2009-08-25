@@ -19,6 +19,9 @@
 #ifndef _UTIL_H_
 #define _UTIL_H_
 
+#include <sys/types.h>
+#include <apr_file_info.h>
+
 #include "modsecurity.h"
 
 int DSOLOCAL normalise_path_inplace(unsigned char *input, int len, int win, int *changed);
@@ -52,6 +55,8 @@ char DSOLOCAL *guess_tmp_dir(apr_pool_t *p);
 char DSOLOCAL *current_logtime(apr_pool_t *mp);
 
 char DSOLOCAL *current_filetime(apr_pool_t *mp);
+
+int DSOLOCAL msc_mkstemp_ex(char *template, mode_t mode);
 
 int DSOLOCAL msc_mkstemp(char *template);
 
@@ -93,5 +98,7 @@ int DSOLOCAL is_empty_string(const char *string);
 char DSOLOCAL *resolve_relative_path(apr_pool_t *pool, const char *parent_filename, const char *filename);
 
 int DSOLOCAL css_decode_inplace(unsigned char *input, long int input_len);
+
+apr_fileperms_t DSOLOCAL mode2fileperms(mode_t mode);
 
 #endif
