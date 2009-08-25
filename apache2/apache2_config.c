@@ -20,6 +20,7 @@
 
 #include "modsecurity.h"
 #include "msc_logging.h"
+#include "msc_util.h"
 #include "pdf_protect.h"
 #include "http_log.h"
 
@@ -69,6 +70,8 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
     /* audit log variables */
     dcfg->auditlog_flag = NOT_SET;
     dcfg->auditlog_type = NOT_SET;
+    dcfg->auditlog_dirperms = NOT_SET;
+    dcfg->auditlog_fileperms = NOT_SET;
     dcfg->auditlog_name = NOT_SET_P;
     dcfg->auditlog2_name = NOT_SET_P;
     dcfg->auditlog_fd = NOT_SET_P;
@@ -388,6 +391,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
         ? parent->auditlog_flag : child->auditlog_flag);
     merged->auditlog_type = (child->auditlog_type == NOT_SET
         ? parent->auditlog_type : child->auditlog_type);
+    merged->auditlog_dirperms = (child->auditlog_dirperms == NOT_SET
+        ? parent->auditlog_dirperms : child->auditlog_dirperms);
+    merged->auditlog_fileperms = (child->auditlog_fileperms == NOT_SET
+        ? parent->auditlog_fileperms : child->auditlog_fileperms);
     if (child->auditlog_fd != NOT_SET_P) {
         merged->auditlog_fd = child->auditlog_fd;
         merged->auditlog_name = child->auditlog_name;
@@ -512,6 +519,8 @@ void init_directory_config(directory_config *dcfg) {
     /* audit log variables */
     if (dcfg->auditlog_flag == NOT_SET) dcfg->auditlog_flag = 0;
     if (dcfg->auditlog_type == NOT_SET) dcfg->auditlog_type = AUDITLOG_SERIAL;
+    if (dcfg->auditlog_dirperms == NOT_SET) dcfg->auditlog_dirperms = CREATEMODE_DIR;
+    if (dcfg->auditlog_fileperms == NOT_SET) dcfg->auditlog_fileperms = CREATEMODE;
     if (dcfg->auditlog_fd == NOT_SET_P) dcfg->auditlog_fd = NULL;
     if (dcfg->auditlog2_fd == NOT_SET_P) dcfg->auditlog2_fd = NULL;
     if (dcfg->auditlog_name == NOT_SET_P) dcfg->auditlog_name = NULL;
@@ -525,7 +534,7 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->upload_dir == NOT_SET_P) dcfg->upload_dir = NULL;
     if (dcfg->upload_keep_files == NOT_SET) dcfg->upload_keep_files = KEEP_FILES_OFF;
     if (dcfg->upload_validates_files == NOT_SET) dcfg->upload_validates_files = 0;
-    if (dcfg->upload_filemode == NOT_SET) dcfg->upload_filemode = 0600;
+    if (dcfg->upload_filemode == NOT_SET) dcfg->upload_filemode = mode2fileperms(0600);
 
     /* Misc */
     if (dcfg->data_dir == NOT_SET_P) dcfg->data_dir = NULL;
@@ -1022,6 +1031,46 @@ static const char *cmd_audit_log_type(cmd_parms *cmd, void *_dcfg, const char *p
     else
     return (const char *)apr_psprintf(cmd->pool,
         "ModSecurity: Unrecognised parameter value for SecAuditLogType: %s", p1);
+
+    return NULL;
+}
+
+static const char *cmd_audit_log_dirmode(cmd_parms *cmd, void *_dcfg, const char *p1) {
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "default") == 0) {
+        dcfg->auditlog_dirperms = NOT_SET;
+    }
+    else {
+        long int mode = strtol(p1, NULL, 8); /* expects octal mode */
+        if ((mode == LONG_MAX)||(mode == LONG_MIN)||(mode <= 0)||(mode > 07777)) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecAuditLogDirMode: %s", p1);
+        }
+
+        dcfg->auditlog_dirperms = mode2fileperms((mode_t)mode);
+    }
+
+    return NULL;
+}
+
+static const char *cmd_audit_log_filemode(cmd_parms *cmd, void *_dcfg, const char *p1) {
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "default") == 0) {
+        dcfg->auditlog_fileperms = NOT_SET;
+    }
+    else {
+        long int mode = strtol(p1, NULL, 8); /* expects octal mode */
+        if ((mode == LONG_MAX)||(mode == LONG_MIN)||(mode <= 0)||(mode > 07777)) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecAuditLogFileMode: %s", p1);
+        }
+
+        dcfg->auditlog_fileperms = mode2fileperms((mode_t)mode);
+    }
 
     return NULL;
 }
@@ -1541,7 +1590,7 @@ static const char *cmd_upload_filemode(cmd_parms *cmd, void *_dcfg, const char *
     }
     else {
         long int mode = strtol(p1, NULL, 8); /* expects octal mode */
-        if ((mode == LONG_MAX)||(mode == LONG_MIN)||(mode <= 0)||(mode > 0777)) {
+        if ((mode == LONG_MAX)||(mode == LONG_MIN)||(mode <= 0)||(mode > 07777)) {
             return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecUploadFileMode: %s", p1);
         }
 
@@ -1852,6 +1901,22 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "path to the audit log storage area; absolute, or relative to the root of the server"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecAuditLogDirMode",
+        cmd_audit_log_dirmode,
+        NULL,
+        CMD_SCOPE_ANY,
+        "octal permissions mode for concurrent audit log directories"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecAuditLogFileMode",
+        cmd_audit_log_filemode,
+        NULL,
+        CMD_SCOPE_ANY,
+        "octal permissions mode for concurrent audit log files"
     ),
 
     AP_INIT_TAKE12 (

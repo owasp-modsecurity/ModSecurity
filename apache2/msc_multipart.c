@@ -396,7 +396,7 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
                 /* construct temporary file name */
                 msr->mpd->mpp->tmp_file_name = apr_psprintf(msr->mp, "%s/%s-%s-file-XXXXXX",
                     msr->txcfg->tmp_dir, current_filetime(msr->mp), msr->txid);
-                msr->mpd->mpp->tmp_file_fd = msc_mkstemp(msr->mpd->mpp->tmp_file_name);
+                msr->mpd->mpp->tmp_file_fd = msc_mkstemp_ex(msr->mpd->mpp->tmp_file_name, msr->txcfg->upload_filemode);
 
                 /* do we have an opened file? */
                 if (msr->mpd->mpp->tmp_file_fd < 0) {
@@ -409,21 +409,6 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
                     msr_log(msr, 4, "Multipart: Created temporary file: %s",
                         log_escape_nq(msr->mp, msr->mpd->mpp->tmp_file_name));
                 }
-
-                #ifdef HAVE_FCHMOD
-                if (msr->txcfg->debuglog_level >= 9) {
-                    msr_log(msr, 9, "Multipart: Changing file mode to %04o: %s", msr->txcfg->upload_filemode, log_escape_nq(msr->mp, msr->mpd->mpp->tmp_file_name));
-                }
-                if (fchmod(msr->mpd->mpp->tmp_file_fd, msr->txcfg->upload_filemode) < 0) {
-
-                    char errbuf[256];
-                    if (msr->txcfg->debuglog_level >= 3) {
-                        msr_log(msr, 3, "Multipart: Could not change mode on \"%s\" (%d): %s",
-                            log_escape_nq(msr->mp, msr->mpd->mpp->tmp_file_name),
-                            errno, apr_strerror(APR_FROM_OS_ERROR(errno), errbuf, 256));
-                    }
-                }
-                #endif
             }
 
             /* write the reserve first */

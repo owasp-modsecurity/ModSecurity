@@ -1,5 +1,12 @@
-12 Aug 2009 - trunk
+24 Aug 2009 - trunk
 -------------------
+
+ * Added SecAuditLogDirMode and SecAuditLogFileMode to allow fine tuning
+   auditlog permissions (especially with mpm-itk).
+
+ * Cleaned up SecUploadFileMode implementation.
+
+ * Cleanup build scripts.
 
  * Fixed crash on configuration if SecMarker is used before any rules.
 

@@ -103,5 +103,6 @@ char DSOLOCAL *format_error_log_message(apr_pool_t *mp, error_message *em);
 
 const DSOLOCAL char *get_response_protocol(request_rec *r);
 
+
 #endif
 

@@ -392,6 +392,10 @@ struct directory_config {
     /* AUDITLOG_SERIAL (single file) or AUDITLOG_CONCURRENT (multiple files) */
     int                  auditlog_type;
 
+    /* Mode for audit log directories and files */
+    apr_fileperms_t      auditlog_dirperms;
+    apr_fileperms_t      auditlog_fileperms;
+
     /* The name of the audit log file (for the old type), or the
      * name of the index file (for the new audit log type)
      */
@@ -425,7 +429,7 @@ struct directory_config {
     const char          *upload_dir;
     int                  upload_keep_files;
     int                  upload_validates_files;
-    int                  upload_filemode;
+    int                  upload_filemode; /* int only so NOT_SET works */
 
     /* Used only in the configuration phase. */
     msre_rule           *tmp_chain_starter;

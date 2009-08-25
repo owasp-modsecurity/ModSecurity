@@ -14,7 +14,6 @@ AC_CONFIG_AUX_DIR([build])
 
 # Checks for programs.
 AC_PROG_AWK
-AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
@@ -27,7 +26,7 @@ AC_PATH_PROGS(ENV_CMD, [env printenv], )
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([fcntl.h limits.h stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([fcntl.h limits.h stdlib.h string.h unistd.h sys/types.h sys/stat.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -41,7 +40,7 @@ AC_TYPE_UINT8_T
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
-AC_CHECK_FUNCS([atexit fchmod getcwd memmove memset strcasecmp strchr strdup strerror strncasecmp strrchr strstr strtol])
+AC_CHECK_FUNCS([atexit getcwd memmove memset strcasecmp strchr strdup strerror strncasecmp strrchr strstr strtol])
 
 # Some directories
 MSC_BASE_DIR=`pwd`

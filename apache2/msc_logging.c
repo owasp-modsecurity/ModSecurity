@@ -16,6 +16,9 @@
  * directly using the email address support@breach.com.
  *
  */
+#include <sys/stat.h>
+
+#include "mod_security2_config.h"
 #include "re.h"
 #include "msc_logging.h"
 #include "httpd.h"
@@ -443,7 +446,7 @@ void sec_audit_logger(modsec_rec *msr) {
          * we could cache the time we last checked and don't check if we know
          * the folder is there.
          */
-        rc = apr_dir_make_recursive(entry_basename, CREATEMODE_DIR, msr->mp);
+        rc = apr_dir_make_recursive(entry_basename, msr->txcfg->auditlog_dirperms, msr->mp);
         if (rc != APR_SUCCESS) {
             msr_log(msr, 1, "Audit log: Failed to create subdirectories: %s (%s)",
                 entry_basename, get_apr_error(msr->mp, rc));
@@ -452,7 +455,7 @@ void sec_audit_logger(modsec_rec *msr) {
 
         rc = apr_file_open(&msr->new_auditlog_fd, entry_filename,
             APR_WRITE | APR_TRUNCATE | APR_CREATE | APR_BINARY | APR_FILE_NOCLEANUP,
-            CREATEMODE, msr->mp);
+            msr->txcfg->auditlog_fileperms, msr->mp);
         if (rc != APR_SUCCESS) {
             msr_log(msr, 1, "Audit log: Failed to create file: %s (%s)",
                 entry_filename, get_apr_error(msr->mp, rc));
