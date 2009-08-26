@@ -1,7 +1,8 @@
 <?xml version='1.0'?> 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-<xsl:import href="/opt/docbook/xsl/html/chunk.xsl"/>
+<!--xsl:import href="/opt/docbook/xsl/html/chunk.xsl"/-->
+<xsl:import href="/usr/share/xml/docbook/stylesheet/nwalsh/html/chunk.xsl"/>
 
 <xsl:param name="chunk.first.sections" select="1"/>
 <xsl:param name="use.id.as.filename" select="1"/>
