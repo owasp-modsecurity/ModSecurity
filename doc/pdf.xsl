@@ -5,7 +5,8 @@
     version="1.0"
 >
 
-<xsl:import href="/opt/docbook/xsl/fo/docbook.xsl"/>
+<!--xsl:import href="/opt/docbook/xsl/fo/docbook.xsl"/-->
+<xsl:import href="/usr/share/xml/docbook/stylesheet/nwalsh/fo/docbook.xsl"/>
 
 <xsl:param name="paper.type" select="A4"/>
 
@@ -15,7 +16,7 @@
 <xsl:param name="section.label.include.component.label" select="1"/>
 -->
 
-<xsl:param name="fop.extensions" select="1"/>
+<xsl:param name="fop1.extensions" select="1"/>
 <xsl:param name="title.margin.left">0pt</xsl:param>
 <xsl:param name="body.font.master">11</xsl:param>
 <xsl:param name="line-height">1.5</xsl:param>
