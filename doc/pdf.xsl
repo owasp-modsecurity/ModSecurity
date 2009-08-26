@@ -159,7 +159,7 @@
 
 <xsl:template name="article.titlepage.before.recto">
   <fo:block>&#8203;
-    <fo:external-graphic width="8cm" src="url(modsecurity-logo.png)"/>
+    <fo:external-graphic content-width="8cm" src="url(modsecurity-logo.png)"/>
   </fo:block>
 </xsl:template>
 

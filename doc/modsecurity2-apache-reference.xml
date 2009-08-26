@@ -2646,7 +2646,8 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}
     <para>Below is a diagram of the standard Apache Request Cycle. In the
     diagram, the 5 ModSecurity processing phases are shown.</para>
 
-    <para><graphic fileref="apache_request_cycle-modsecurity.jpg" scale="150"
+    <para><graphic contentwidth="5.5in"
+    fileref="apache_request_cycle-modsecurity.jpg" role="" scale=""
     scalefit="" /></para>
 
     <para>In order to select the phase a rule executes during, use the phase
