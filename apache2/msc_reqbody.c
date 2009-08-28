@@ -485,7 +485,7 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
     }
 
     /* Note the request body no files length. */
-    msr_log(msr, 4, "Reqest body no files length: %" APR_SIZE_T_FMT, msr->msc_reqbody_no_files_length);
+    msr_log(msr, 4, "Request body no files length: %" APR_SIZE_T_FMT, msr->msc_reqbody_no_files_length);
 
     return 1;
 }
