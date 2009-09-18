@@ -6,7 +6,7 @@
  * Added SecAuditLogDirMode and SecAuditLogFileMode to allow fine tuning
    auditlog permissions (especially with mpm-itk).
 
- * Cleaned up SecUploadFileMode implementation.
+ * Cleanup SecUploadFileMode implementation.
 
  * Cleanup build scripts.
 
