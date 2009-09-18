@@ -1,5 +1,7 @@
-26 Aug 2009 - 2.5.10
+18 Sep 2009 - 2.5.10
 --------------------
+
+ * Cleanup mlogc so that it builds on Windows.
 
  * Added more detailed messages to replace "Unknown error" in filters.
 

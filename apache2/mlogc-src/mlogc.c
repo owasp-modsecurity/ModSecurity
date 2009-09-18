@@ -80,8 +80,8 @@ do { \
 
 #define CMDLINE_OPTS        "fvh"
 
-#define IN                  0
-#define OUT                 1
+#define TXIN            0
+#define TXOUT           1
 
 #define STATUSBUF_SIZE      256
 
@@ -549,7 +549,7 @@ static void transaction_log(int direction, const char *entry)
     char msg[8196] = "";
 
     apr_snprintf(msg, sizeof(msg), "%u %s: %s\n", (unsigned int)apr_time_sec(apr_time_now()),
-        (direction == IN ? "IN" : "OUT"), entry);
+        (direction == TXIN ? "IN" : "OUT"), entry);
     nbytes = strlen(msg);
     apr_file_write_full(transaction_log_fd, msg, nbytes, &nbytes_written);
 }
@@ -954,25 +954,30 @@ static void logc_shutdown(int rc)
 static int handle_signals(int signum)
 {
     switch (signum) {
-    case SIGHUP:
-        error_log(LOG_NOTICE, NULL, "Caught SIGHUP, ignored.");
-        /* ENH: reload config? */
-        return 0;
     case SIGINT:
         error_log(LOG_NOTICE, NULL, "Caught SIGINT, shutting down.");
         logc_shutdown(0);
     case SIGTERM:
         error_log(LOG_NOTICE, NULL, "Caught SIGTERM, shutting down.");
         logc_shutdown(0);
+#ifndef WIN32
+    case SIGHUP:
+        error_log(LOG_NOTICE, NULL, "Caught SIGHUP, ignored.");
+        /* ENH: reload config? */
+        return 0;
     case SIGALRM:
         error_log(LOG_DEBUG, NULL, "Caught SIGALRM, ignored.");
         return 0;
     case SIGTSTP:
         error_log(LOG_DEBUG, NULL, "Caught SIGTSTP, ignored.");
         return 0;
+#endif /* WIN32 */
     }
-
+#ifndef WIN32
     error_log(LOG_NOTICE, NULL, "Caught unexpected signal %d: %s", signum, apr_signal_description_get(signum));
+#else
+    error_log(LOG_NOTICE, NULL, "Caught unexpected signal %d", signum);
+#endif /* WIN32 */
     logc_shutdown(1);
 
     return 0; /* should never reach */
@@ -1283,7 +1288,7 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
             /* Deal with the previous entry. */
             if (entry != NULL) {
                 error_log(LOG_DEBUG, thread, "Removing previous entry from storage.");
-                transaction_log(OUT, entry->line);
+                transaction_log(TXOUT, entry->line);
 
                 /* Remove previous entry from storage. */
                 apr_hash_set(in_progress, &entry->id, sizeof(entry->id), NULL);
@@ -1539,7 +1544,7 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
             *(entry_t **)apr_array_push(queue) = entry;
         }
         else {
-            transaction_log(OUT, entry->line);
+            transaction_log(TXOUT, entry->line);
             free((void *)entry->line);
             free(entry);
         }
@@ -1723,7 +1728,7 @@ static void * APR_THREAD_FUNC thread_manager(apr_thread_t *thread, void *data)
     return NULL;
 }
 
-
+#ifndef WIN32
 /**
  * Thread to handle all signals
  */
@@ -1740,7 +1745,7 @@ static void * APR_THREAD_FUNC thread_signals(apr_thread_t *thread, void *data)
 
     return NULL;
 }
-
+#endif /* WIN32 */
 
 /**
  * The main loop where we receive log entries from
@@ -1825,7 +1830,7 @@ static void receive_loop(void) {
                     drop_next = 0;
                 }
                 else {
-                    transaction_log(IN, buf + evnt);
+                    transaction_log(TXIN, buf + evnt);
                     error_log(LOG_DEBUG2, NULL, "Received audit log entry (count %lu queue %d workers %d): %s",
                         entry_counter, queue->nelts, current_workers, _log_escape(tmp_pool, (buf + evnt), strlen(buf + evnt)));
                     add_entry(buf + evnt, 1);
@@ -1921,7 +1926,7 @@ static void start_management_thread(void)
         logc_shutdown(1);
     }
 }
-
+#ifndef WIN32
 /**
  * Creates a thread to handle all signals
  */
@@ -1941,6 +1946,7 @@ static void start_signal_thread(void)
         logc_shutdown(1);
     }
 }
+#endif /* WIN32 */
 
 /**
  * Usage text.
@@ -1982,7 +1988,13 @@ int main(int argc, const char * const argv[]) {
     logc_pid = getpid();
     apr_pool_create(&pool, NULL);
     apr_pool_create(&recv_pool, NULL);
+	
+#ifndef WIN32
     apr_setup_signal_thread();
+#else
+	apr_signal(SIGINT, handle_signals);
+	apr_signal(SIGTERM, handle_signals);
+#endif /* WIN32 */
 
     if (argc < 2) {
         usage();
@@ -2034,7 +2046,9 @@ int main(int argc, const char * const argv[]) {
     server_error = 0;
 
     start_management_thread();
+#ifndef WIN32
     start_signal_thread();
+#endif /* WIN32 */
 
     /* Process stdin until EOF */
     receive_loop();
