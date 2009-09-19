@@ -56,7 +56,7 @@ char DSOLOCAL *current_logtime(apr_pool_t *mp);
 
 char DSOLOCAL *current_filetime(apr_pool_t *mp);
 
-int DSOLOCAL msc_mkstemp_ex(char *template, mode_t mode);
+int DSOLOCAL msc_mkstemp_ex(char *template, int mode);
 
 int DSOLOCAL msc_mkstemp(char *template);
 
@@ -99,6 +99,6 @@ char DSOLOCAL *resolve_relative_path(apr_pool_t *pool, const char *parent_filena
 
 int DSOLOCAL css_decode_inplace(unsigned char *input, long int input_len);
 
-apr_fileperms_t DSOLOCAL mode2fileperms(mode_t mode);
+apr_fileperms_t DSOLOCAL mode2fileperms(int mode);
 
 #endif

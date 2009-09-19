@@ -418,7 +418,7 @@ char *current_filetime(apr_pool_t *mp) {
 /**
  *
  */
-int msc_mkstemp_ex(char *template, mode_t mode) {
+int msc_mkstemp_ex(char *template, int mode) {
     /* ENH Use apr_file_mktemp instead. */
 
     #if !(defined(WIN32)||defined(NETWARE))
@@ -1362,7 +1362,7 @@ int css_decode_inplace(unsigned char *input, long int input_len) {
 /**
  * Translate UNIX octal umask/mode to APR apr_fileperms_t
  */
-apr_fileperms_t mode2fileperms(mode_t mode) {
+apr_fileperms_t mode2fileperms(int mode) {
     apr_fileperms_t perms = 0;
 
     if (mode & S_IXOTH) perms |= APR_WEXECUTE;
