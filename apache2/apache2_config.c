@@ -1049,7 +1049,7 @@ static const char *cmd_audit_log_dirmode(cmd_parms *cmd, void *_dcfg, const char
             return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecAuditLogDirMode: %s", p1);
         }
 
-        dcfg->auditlog_dirperms = mode2fileperms((mode_t)mode);
+        dcfg->auditlog_dirperms = mode2fileperms(mode);
     }
 
     return NULL;
@@ -1069,7 +1069,7 @@ static const char *cmd_audit_log_filemode(cmd_parms *cmd, void *_dcfg, const cha
             return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecAuditLogFileMode: %s", p1);
         }
 
-        dcfg->auditlog_fileperms = mode2fileperms((mode_t)mode);
+        dcfg->auditlog_fileperms = mode2fileperms(mode);
     }
 
     return NULL;
