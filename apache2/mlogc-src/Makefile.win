@@ -14,7 +14,7 @@ CURL = C:\work\libcurl-7.19.3-win32-ssl-msvc
 LIBS = $(BASE)\lib\libapr-1.lib \
        $(BASE)\lib\libaprutil-1.lib \
        $(PCRE)\lib\pcre.lib \
-	   $(CURL)\lib\Release\curllib.lib \
+       $(CURL)\lib\Release\curllib.lib \
        wsock32.lib
 
 ###########################################################################
@@ -24,7 +24,7 @@ CC = cL
 
 MT = mt
 
-DEFS = /nologo /O2 /W3 -DWIN32 -DWINNT -Dinline=APR_INLINE
+DEFS = /nologo /O2 /W3 -DWIN32 -DWINNT -Dinline=APR_INLINE -D_CONSOLE
 
 EXE = mlogc.exe
 
@@ -48,7 +48,7 @@ all: $(EXE)
 	$(CC) $(CFLAGS) -c $< -Fo$@
 
 $(EXE): $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) /link
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) /link /NODEFAULTLIB:MSVCRT.lib /subsystem:console
 
 install: $(EXE)
 	copy $(EXE) $(BASE)\bin
