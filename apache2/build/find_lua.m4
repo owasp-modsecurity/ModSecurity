@@ -25,7 +25,7 @@ AC_MSG_CHECKING([for liblua config script])
 for x in ${test_paths}; do
     dnl # Determine if the script was specified and use it directly
     if test ! -d "$x" -a -e "$x"; then
-        LUA_CONFIG="$x"
+        LUA_CONFIG=$x
         break
     fi
 

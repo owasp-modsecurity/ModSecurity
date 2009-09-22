@@ -5571,7 +5571,7 @@ $as_echo_n "checking for libapu config script... " >&6; }
 
 for x in ${test_paths}; do
         if test ! -d "$x" -a -e "$x"; then
-        APU_CONFIG="`basename $x`"
+        APU_CONFIG=$x
         apu_path="no"
         break
     fi
@@ -5721,7 +5721,7 @@ $as_echo_n "checking for liblua config script... " >&6; }
 
 for x in ${test_paths}; do
         if test ! -d "$x" -a -e "$x"; then
-        LUA_CONFIG="$x"
+        LUA_CONFIG=$x
         break
     fi
 

@@ -26,7 +26,7 @@ AC_MSG_CHECKING([for libapu config script])
 for x in ${test_paths}; do
     dnl # Determine if the script was specified and use it directly
     if test ! -d "$x" -a -e "$x"; then
-        APU_CONFIG="`basename $x`"
+        APU_CONFIG=$x
         apu_path="no"
         break
     fi
