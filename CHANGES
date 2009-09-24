@@ -1,10 +1,17 @@
-24 Aug 2009 - trunk
+18 Sep 2009 - trunk
 -------------------
+
+18 Sep 2009 - 2.5.10
+--------------------
+
+ * Cleanup mlogc so that it builds on Windows.
+
+ * Added more detailed messages to replace "Unknown error" in filters.
 
  * Added SecAuditLogDirMode and SecAuditLogFileMode to allow fine tuning
    auditlog permissions (especially with mpm-itk).
 
- * Cleaned up SecUploadFileMode implementation.
+ * Cleanup SecUploadFileMode implementation.
 
  * Cleanup build scripts.
 

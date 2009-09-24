@@ -16,6 +16,8 @@
  * directly using the email address support@breach.com.
  *
  */
+#include <util_filter.h>
+
 #include "modsecurity.h"
 #include "apache2.h"
 
@@ -182,14 +184,14 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
         rc = ap_get_brigade(r->input_filters, bb_in, AP_MODE_READBYTES, APR_BLOCK_READ, HUGE_STRING_LEN);
         if (rc != APR_SUCCESS) {
-            /* NOTE Apache returns -3 here when the request is too large
-             *      and APR_EGENERAL when the client disconnects.
+            /* NOTE Apache returns AP_FILTER_ERROR here when the request is
+             *      too large and APR_EGENERAL when the client disconnects.
              */
             switch(rc) {
                 case APR_TIMEUP :
                     *error_msg = apr_psprintf(msr->mp, "Error reading request body: %s", get_apr_error(msr->mp, rc));
                     return -4;
-                case -3 :
+                case AP_FILTER_ERROR :
                     *error_msg = apr_psprintf(msr->mp, "Error reading request body: HTTP Error 413 - Request entity too large. (Most likely.)");
                     return -3;
                 case APR_EGENERAL :
@@ -417,8 +419,22 @@ static apr_status_t send_of_brigade(modsec_rec *msr, ap_filter_t *f) {
         }
 
         if (msr->txcfg->debuglog_level >= log_level) {
-            msr_log(msr, log_level, "Output filter: Error while forwarding response data (%d): %s",
-                rc, get_apr_error(msr->mp, rc));
+            switch(rc) {
+                case AP_NOBODY_WROTE :
+                    msr_log(msr, log_level, "Output filter: Error while forwarding response data (%d): No data", rc);
+                    break;
+                case AP_FILTER_ERROR :
+                    /* Look like this is caused by the error
+                     * already being handled, so we should ignore it
+                     *
+                    msr_log(msr, log_level, "Output filter: Error while forwarding response data (%d): Filter error", rc);
+                     */
+                    break;
+                default :
+                    msr_log(msr, log_level, "Output filter: Error while forwarding response data (%d): %s",
+                        rc, get_apr_error(msr->mp, rc));
+                    break;
+            }
         }
 
         return rc;

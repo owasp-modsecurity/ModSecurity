@@ -27,12 +27,28 @@
 
 #include <apr_lib.h>
 
-/* NOTE: Be careful as these can ONLY be used on static values for X.
+/**
+ * NOTE: Be careful as these can ONLY be used on static values for X.
  * (i.e. VALID_HEX(c++) will NOT work)
  */
 #define VALID_HEX(X) (((X >= '0')&&(X <= '9')) || ((X >= 'a')&&(X <= 'f')) || ((X >= 'A')&&(X <= 'F')))
 #define ISODIGIT(X) ((X >= '0')&&(X <= '7'))
 
+#if (defined(WIN32) || defined(NETWARE))
+/** Windows does not define all the octal modes */
+#define S_IXOTH 00001
+#define S_IWOTH 00002
+#define S_IROTH 00004
+#define S_IXGRP 00010
+#define S_IWGRP 00020
+#define S_IRGRP 00040
+#define S_IXUSR 00100
+#define S_IWUSR 00200
+#define S_IRUSR 00400
+#define S_ISVTX 01000
+#define S_ISGID 02000
+#define S_ISUID 04000
+#endif /* defined(WIN32 || NETWARE) */
 
 /**
  *
@@ -418,7 +434,7 @@ char *current_filetime(apr_pool_t *mp) {
 /**
  *
  */
-int msc_mkstemp_ex(char *template, mode_t mode) {
+int msc_mkstemp_ex(char *template, int mode) {
     /* ENH Use apr_file_mktemp instead. */
 
     #if !(defined(WIN32)||defined(NETWARE))
@@ -669,7 +685,7 @@ int js_decode_nonstrict_inplace(unsigned char *input, long int input_len) {
                         j = 2;
                         buf[j] = '\0';
                     }
-                    *d++ = strtol(buf, NULL, 8);
+                    *d++ = (unsigned char)strtol(buf, NULL, 8);
                     i += 1 + j;
                     count++;
                 }
@@ -1362,7 +1378,7 @@ int css_decode_inplace(unsigned char *input, long int input_len) {
 /**
  * Translate UNIX octal umask/mode to APR apr_fileperms_t
  */
-apr_fileperms_t mode2fileperms(mode_t mode) {
+apr_fileperms_t mode2fileperms(int mode) {
     apr_fileperms_t perms = 0;
 
     if (mode & S_IXOTH) perms |= APR_WEXECUTE;
