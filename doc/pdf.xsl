@@ -5,8 +5,8 @@
     version="1.0"
 >
 
-<!--xsl:import href="/opt/docbook/xsl/fo/docbook.xsl"/-->
-<xsl:import href="/usr/share/xml/docbook/stylesheet/nwalsh/fo/docbook.xsl"/>
+<xsl:import href="/opt/docbook/xsl/fo/docbook.xsl"/>
+<!--xsl:import href="/usr/share/xml/docbook/stylesheet/nwalsh/fo/docbook.xsl"/-->
 
 <xsl:param name="paper.type" select="A4"/>
 
