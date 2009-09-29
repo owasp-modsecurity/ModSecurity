@@ -1279,7 +1279,7 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
         if (take_new) {
             error_log(LOG_DEBUG, thread, "Worker fetch locking thread mutex.");
             if (APR_STATUS_IS_EBUSY(apr_thread_mutex_trylock(mutex))) {
-                error_log(LOG_WARNING, thread, "Worker fetch waiting on thread mutex.");
+                error_log(LOG_DEBUG, thread, "Worker fetch waiting on thread mutex.");
                 apr_thread_mutex_lock(mutex);
             }
 
