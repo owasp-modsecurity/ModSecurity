@@ -63,6 +63,21 @@ AC_SUBST(MSC_REGRESSION_DOCROOT_DIR)
 
 ### Configure Options
 
+# Ignore configure errors
+AC_ARG_ENABLE(errors,
+              AS_HELP_STRING([--disable-errors],
+                             [Disable errors during configure.]),
+[
+  if test "$enableval" != "no"; then
+    report_errors=1
+  else
+    report_errors=0
+  fi
+],
+[
+  report_errors=1
+])
+
 # Verbose output
 AC_ARG_ENABLE(verbose-output,
               AS_HELP_STRING([--enable-verbose-output],
@@ -84,7 +99,7 @@ AC_ARG_ENABLE(strict-compile,
                              [Enable strict compilation (warnings are errors).]),
 [
   if test "$enableval" != "no"; then
-      strict_compile="-std=c99 -Wstrict-overflow=1 -Wextra -Wno-missing-field-initializers -Wshadow -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wno-unused-parameter -Werror"
+    strict_compile="-std=c99 -Wstrict-overflow=1 -Wextra -Wno-missing-field-initializers -Wshadow -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wno-unused-parameter -Wformat -Wformat-security -Werror -fstack-protector -D_FORTIFY_SOURCE=2"
   else
     strict_compile=
   fi
@@ -231,7 +246,13 @@ if test -n "$APXS" -a "$APXS" != "no" -a -x "$APXS" ; then
 VERSION_OK
 #endif],
     [AC_MSG_NOTICE(httpd is recent enough)],
-    [AC_MSG_ERROR(apache is too old, mmn must be at least $HTTPD_WANTED_MMN)])
+    [
+     if test "$report_errors" -eq 1; then
+       AC_MSG_ERROR(apache is too old, mmn must be at least $HTTPD_WANTED_MMN)
+     else
+       AC_MSG_NOTICE(apache is too old, mmn must be at least $HTTPD_WANTED_MMN)
+     fi
+    ])
   fi
   APXS_INCLUDEDIR="`$APXS -q INCLUDEDIR`"
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs INCLUDEDIR: $APXS_INCLUDEDIR); fi
@@ -274,7 +295,11 @@ VERSION_OK
   fi
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs HTTPD: $APXS_HTTPD); fi
 else
-  AC_MSG_ERROR(couldn't find APXS)
+  if test "$report_errors" -eq 1; then
+    AC_MSG_ERROR(couldn't find APXS)
+  else
+    AC_MSG_NOTICE(couldn't find APXS)
+  fi
 fi
 
 # Include M4 macros

@@ -1,8 +1,8 @@
 <?xml version='1.0'?> 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-<!--xsl:import href="/opt/docbook/xsl/html/onechunk.xsl"/-->
-<xsl:import href="/usr/share/xml/docbook/stylesheet/nwalsh/html/onechunk.xsl"/>
+<xsl:import href="/opt/docbook/xsl/html/onechunk.xsl"/>
+<!--xsl:import href="/usr/share/xml/docbook/stylesheet/nwalsh/html/onechunk.xsl"/-->
 
 <xsl:template name="user.header.navigation">
     <div style="background:#F5F5F5;width:100%;border-top:1px solid #DDDDDD;border-bottom:1px solid #DDDDDD"><table cellpadding="0" cellspacing="0" width="100%"><tr><td><a href="http://www.modsecurity.org"><img border="0" alt="ModSecurity" height="36" width="120" src="modsecurity.gif" style="margin:4px"/></a></td><td align="right"><a href="http://www.breach.com"><img border="0" width="100" height="36" src="breach-logo-small.gif" style="margin:6px"/></a></td></tr></table></div>	

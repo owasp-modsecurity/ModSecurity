@@ -739,6 +739,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+enable_errors
 enable_verbose_output
 enable_strict_compile
 enable_debug_conf
@@ -1383,6 +1384,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --disable-errors        Disable errors during configure.
   --enable-verbose-output Enable more verbose configure output.
   --enable-strict-compile Enable strict compilation (warnings are errors).
   --enable-debug-conf     Enable debug during configuration.
@@ -5029,6 +5031,23 @@ MSC_REGRESSION_DOCROOT_DIR="$MSC_REGRESSION_SERVERROOT_DIR/htdocs"
 
 ### Configure Options
 
+# Ignore configure errors
+# Check whether --enable-errors was given.
+if test "${enable_errors+set}" = set; then
+  enableval=$enable_errors;
+  if test "$enableval" != "no"; then
+    report_errors=1
+  else
+    report_errors=0
+  fi
+
+else
+
+  report_errors=1
+
+fi
+
+
 # Verbose output
 # Check whether --enable-verbose-output was given.
 if test "${enable_verbose_output+set}" = set; then
@@ -5051,7 +5070,7 @@ fi
 if test "${enable_strict_compile+set}" = set; then
   enableval=$enable_strict_compile;
   if test "$enableval" != "no"; then
-      strict_compile="-std=c99 -Wstrict-overflow=1 -Wextra -Wno-missing-field-initializers -Wshadow -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wno-unused-parameter -Werror"
+    strict_compile="-std=c99 -Wstrict-overflow=1 -Wextra -Wno-missing-field-initializers -Wshadow -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wno-unused-parameter -Wformat -Wformat-security -Werror -fstack-protector -D_FORTIFY_SOURCE=2"
   else
     strict_compile=
   fi
@@ -5228,9 +5247,16 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
   { $as_echo "$as_me:$LINENO: httpd is recent enough" >&5
 $as_echo "$as_me: httpd is recent enough" >&6;}
 else
-  { { $as_echo "$as_me:$LINENO: error: apache is too old" >&5
+
+     if test "$report_errors" -eq 1; then
+       { { $as_echo "$as_me:$LINENO: error: apache is too old" >&5
 $as_echo "$as_me: error: apache is too old" >&2;}
    { (exit mmn must be at least $HTTPD_WANTED_MMN); exit mmn must be at least $HTTPD_WANTED_MMN; }; }
+     else
+       { $as_echo "$as_me:$LINENO: apache is too old" >&5
+$as_echo "$as_me: apache is too old" >&mmn must be at least $HTTPD_WANTED_MMN;}
+     fi
+
 fi
 rm -f conftest*
 
@@ -5289,9 +5315,14 @@ $as_echo "$as_me: apxs LIBEXECDIR: $APXS_LIBEXECDIR" >&6;}; fi
   if test "$verbose_output" -eq 1; then { $as_echo "$as_me:$LINENO: apxs HTTPD: $APXS_HTTPD" >&5
 $as_echo "$as_me: apxs HTTPD: $APXS_HTTPD" >&6;}; fi
 else
-  { { $as_echo "$as_me:$LINENO: error: couldn't find APXS" >&5
+  if test "$report_errors" -eq 1; then
+    { { $as_echo "$as_me:$LINENO: error: couldn't find APXS" >&5
 $as_echo "$as_me: error: couldn't find APXS" >&2;}
    { (exit 1); exit 1; }; }
+  else
+    { $as_echo "$as_me:$LINENO: couldn't find APXS" >&5
+$as_echo "$as_me: couldn't find APXS" >&6;}
+  fi
 fi
 
 # Include M4 macros
