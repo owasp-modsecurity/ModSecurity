@@ -59,12 +59,14 @@ static const char* dump_reader(lua_State* L, void* user_data, size_t* size) {
 static int dump_writer(lua_State *L, const void* data, size_t len, void* user_data) {
     msc_lua_dumpw_t *dump = (msc_lua_dumpw_t *)user_data;
     msc_script_part *part;
+    void *part_data;
 
     /* Allocate new part, copy the data into it. */
+    part_data = apr_palloc(dump->pool, len);
+    memcpy(part_data, data, len);
     part = apr_palloc(dump->pool, sizeof(msc_script_part));
-    part->data = apr_palloc(dump->pool, len);
+    part->data = part_data;
     part->len = len;
-    memcpy((void *)part->data, data, len);
 
     /* Then add it to the list of parsts. */
     *(const msc_script_part **)apr_array_push(dump->parts) = part;
