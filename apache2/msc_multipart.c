@@ -1279,7 +1279,7 @@ int multipart_get_arguments(modsec_rec *msr, char *origin, apr_table_t *argument
 /**
  *
  */
-char *multipart_reconstruct_urlencoded_body_sanitise(modsec_rec *msr) {
+char *multipart_reconstruct_urlencoded_body_sanitize(modsec_rec *msr) {
     multipart_part **parts;
     char *body;
     unsigned int body_len;
@@ -1317,7 +1317,7 @@ char *multipart_reconstruct_urlencoded_body_sanitise(modsec_rec *msr) {
              * in the memory.
              */
             if (msr->phase >= PHASE_LOGGING) {
-                if (apr_table_get(msr->arguments_to_sanitise, parts[i]->name) != NULL) {
+                if (apr_table_get(msr->arguments_to_sanitize, parts[i]->name) != NULL) {
                     memset(parts[i]->value, '*', strlen(parts[i]->value));
                 }
             }

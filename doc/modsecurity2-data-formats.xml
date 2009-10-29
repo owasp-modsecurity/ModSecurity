@@ -347,7 +347,7 @@
 
       <para>ModSecurity alerts will always contain text fragments that were
       taken from configuration or the transaction. Such text fragments escaped
-      before they are user in messages, in order to sanitise the potentially
+      before they are user in messages, in order to sanitize the potentially
       dangerous characters. They are also sometimes surrounded using double
       quotes. The escaping algorithm is as follows:<orderedlist>
           <listitem>
@@ -856,7 +856,7 @@ Server: Apache/2.x.x
           <title>Sanitised-Args</title>
 
           <para>The <literal>Sanitised-Args</literal> header contains a list
-          of arguments that were sanitised (each byte of their content
+          of arguments that were sanitized (each byte of their content
           replaced with an asterisk) before logging. For example:</para>
 
           <programlisting>Sanitised-Args: "old_password", "new_password", "new_password_repeat".</programlisting>
@@ -866,7 +866,7 @@ Server: Apache/2.x.x
           <title>Sanitised-Request-Headers</title>
 
           <para>The <literal>Sanitised-Request-Headers</literal> header
-          contains a list of request headers that were sanitised before
+          contains a list of request headers that were sanitized before
           logging. For example:</para>
 
           <programlisting>Sanitised-Request-Headers: "Authentication".</programlisting>
@@ -876,7 +876,7 @@ Server: Apache/2.x.x
           <title>Sanitised-Response-Headers</title>
 
           <para>The <literal>Sanitised-Response-Headers</literal> header
-          contains a list of response headers that were sanitised before
+          contains a list of response headers that were sanitized before
           logging. For example:</para>
 
           <programlisting>Sanitised-Response-Headers: "My-Custom-Header".</programlisting>

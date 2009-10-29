@@ -250,9 +250,9 @@ struct modsec_rec {
     const char          *request_content_type;
 
     apr_table_t         *arguments;
-    apr_table_t         *arguments_to_sanitise;
-    apr_table_t         *request_headers_to_sanitise;
-    apr_table_t         *response_headers_to_sanitise;
+    apr_table_t         *arguments_to_sanitize;
+    apr_table_t         *request_headers_to_sanitize;
+    apr_table_t         *response_headers_to_sanitize;
     apr_table_t         *request_cookies;
 
     unsigned int         is_relevant;

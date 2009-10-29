@@ -133,6 +133,6 @@ apr_status_t DSOLOCAL multipart_cleanup(modsec_rec *msr);
 
 int DSOLOCAL multipart_get_arguments(modsec_rec *msr, char *origin, apr_table_t *arguments);
 
-char DSOLOCAL *multipart_reconstruct_urlencoded_body_sanitise(modsec_rec *msr);
+char DSOLOCAL *multipart_reconstruct_urlencoded_body_sanitize(modsec_rec *msr);
 
 #endif

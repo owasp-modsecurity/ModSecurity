@@ -287,7 +287,7 @@ static char *create_auditlog_boundary(request_rec *r) {
  * Sanitises the request line by removing the parameters
  * that have been marked as sensitive.
  */
-static void sanitise_request_line(modsec_rec *msr) {
+static void sanitize_request_line(modsec_rec *msr) {
     const apr_array_header_t *tarr;
     const apr_table_entry_t *telts;
     int i;
@@ -299,7 +299,7 @@ static void sanitise_request_line(modsec_rec *msr) {
     qspos++;
 
     /* Loop through the list of sensitive parameters. */
-    tarr = apr_table_elts(msr->arguments_to_sanitise);
+    tarr = apr_table_elts(msr->arguments_to_sanitize);
     telts = (const apr_table_entry_t*)tarr->elts;
     for (i = 0; i < tarr->nelts; i++) {
         msc_arg *arg = (msc_arg *)telts[i].val;
@@ -313,7 +313,7 @@ static void sanitise_request_line(modsec_rec *msr) {
             j = arg->value_origin_offset;
             while((*p != '\0')&&(j--)) p++;
             if (*p == '\0') {
-                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %u of QUERY_STRING"
+                msr_log(msr, 1, "Unable to sanitize variable \"%s\" at offset %u of QUERY_STRING"
                     "because the request line is too short.",
                     log_escape_ex(msr->mp, arg->name, arg->name_len),
                     arg->value_origin_offset);
@@ -326,7 +326,7 @@ static void sanitise_request_line(modsec_rec *msr) {
                 *p++ = '*';
             }
             if (*p == '\0') {
-                msr_log(msr, 1, "Unable to sanitise variable \"%s\" at offset %u (size %d) "
+                msr_log(msr, 1, "Unable to sanitize variable \"%s\" at offset %u (size %d) "
                     "of QUERY_STRING because the request line is too short.",
                     log_escape_ex(msr->mp, arg->name, arg->name_len),
                     arg->value_origin_offset, arg->value_origin_len);
@@ -491,7 +491,7 @@ void sec_audit_logger(modsec_rec *msr) {
         text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_REQUEST_HEADERS);
         sec_auditlog_write(msr, text, strlen(text));
 
-        sanitise_request_line(msr);
+        sanitize_request_line(msr);
 
         sec_auditlog_write(msr, msr->request_line, strlen(msr->request_line));
         sec_auditlog_write(msr, "\n", 1);
@@ -500,9 +500,9 @@ void sec_audit_logger(modsec_rec *msr) {
         te = (apr_table_entry_t *)arr->elts;
         for (i = 0; i < arr->nelts; i++) {
             text = apr_psprintf(msr->mp, "%s: %s\n", te[i].key, te[i].val);
-            /* Do we need to sanitise this request header? */
-            if (apr_table_get(msr->request_headers_to_sanitise, te[i].key) != NULL) {
-                /* Yes, sanitise it. */
+            /* Do we need to sanitize this request header? */
+            if (apr_table_get(msr->request_headers_to_sanitize, te[i].key) != NULL) {
+                /* Yes, sanitize it. */
                 memset(text + strlen(te[i].key) + 2, '*', strlen(te[i].val));
             }
             sec_auditlog_write(msr, text, strlen(text));
@@ -525,17 +525,17 @@ void sec_audit_logger(modsec_rec *msr) {
             apr_array_header_t *sorted_args;
             unsigned int offset = 0, last_offset = 0;
             msc_arg *nextarg = NULL;
-            int sanitise = 0; /* IMP1 Use constants for "sanitise" values. */
+            int sanitize = 0; /* IMP1 Use constants for "sanitize" values. */
             char *my_error_msg = NULL;
 
             sorted_args = apr_array_make(msr->mp, 25, sizeof(const msc_arg *));
 
             /* First we need to sort the arguments that need to be
-             * sanitised in descending order (we are using a stack structure
+             * sanitized in descending order (we are using a stack structure
              * to store then so the order will be ascending when we start
              * popping them out). This is because we will
              * be reading the request body sequentially and must
-             * sanitise it as we go.
+             * sanitize it as we go.
              */
 
             for(;;) {
@@ -544,7 +544,7 @@ void sec_audit_logger(modsec_rec *msr) {
                 /* Find the next largest offset (excluding
                  * the ones we've used up already).
                  */
-                tarr = apr_table_elts(msr->arguments_to_sanitise);
+                tarr = apr_table_elts(msr->arguments_to_sanitize);
                 telts = (const apr_table_entry_t*)tarr->elts;
                 for(i = 0; i < tarr->nelts; i++) {
                     msc_arg *arg = (msc_arg *)telts[i].val;
@@ -570,7 +570,7 @@ void sec_audit_logger(modsec_rec *msr) {
                  */
                 if (nextarg == NULL) break;
 
-                sanitise = 2; /* Means time to pop the next argument out. */
+                sanitize = 2; /* Means time to pop the next argument out. */
                 last_offset = offset;
                 offset = 0;
                 { /* IMP1 Fix this ugly bit here. */
@@ -580,7 +580,7 @@ void sec_audit_logger(modsec_rec *msr) {
             }
 
             /* Now start retrieving the body chunk by chunk and
-             * sanitise data in pieces.
+             * sanitize data in pieces.
              */
 
             rc = modsecurity_request_body_retrieve_start(msr, &my_error_msg);
@@ -589,8 +589,8 @@ void sec_audit_logger(modsec_rec *msr) {
             } else {
                 msc_data_chunk *chunk = NULL;
                 unsigned int chunk_offset = 0;
-                unsigned int sanitise_offset = 0;
-                unsigned int sanitise_length = 0;
+                unsigned int sanitize_offset = 0;
+                unsigned int sanitize_length = 0;
 
                 text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_REQUEST_BODY);
                 sec_auditlog_write(msr, text, strlen(text));
@@ -598,46 +598,46 @@ void sec_audit_logger(modsec_rec *msr) {
                 for(;;) {
                     rc = modsecurity_request_body_retrieve(msr, &chunk, -1, &my_error_msg);
                     if (chunk != NULL) {
-                        /* Anything greater than 1 means we have more data to sanitise. */
-                        while (sanitise > 1) {
+                        /* Anything greater than 1 means we have more data to sanitize. */
+                        while (sanitize > 1) {
                             msc_arg **arg = NULL;
 
-                            if (sanitise == 2) {
+                            if (sanitize == 2) {
                                 /* Get the next argument from the stack. */
                                 arg = (msc_arg **)apr_array_pop(sorted_args);
-                                if (arg == NULL) sanitise = 0; /* We're done sanitising. */
+                                if (arg == NULL) sanitize = 0; /* We're done sanitising. */
                                 else {
                                     /* Continue with sanitation to process the
                                      * retrieved argument.
                                      */
-                                    sanitise = 1;
-                                    sanitise_offset = (*arg)->value_origin_offset;
-                                    sanitise_length = (*arg)->value_origin_len;
+                                    sanitize = 1;
+                                    sanitize_offset = (*arg)->value_origin_offset;
+                                    sanitize_length = (*arg)->value_origin_len;
                                 }
                             }
 
-                            if (sanitise) {
-                                /* Check if the data we want to sanitise is
+                            if (sanitize) {
+                                /* Check if the data we want to sanitize is
                                  * stored in the current chunk.
                                  */
-                                if (chunk_offset + chunk->length > sanitise_offset) {
+                                if (chunk_offset + chunk->length > sanitize_offset) {
                                     unsigned int soff; /* data offset within chunk */
-                                    unsigned int len;  /* amount in this chunk to sanitise */
+                                    unsigned int len;  /* amount in this chunk to sanitize */
 
-                                    soff = sanitise_offset - chunk_offset;
+                                    soff = sanitize_offset - chunk_offset;
 
-                                    if (soff + sanitise_length <= chunk->length) {
+                                    if (soff + sanitize_length <= chunk->length) {
                                         /* The entire argument resides in the current chunk. */
-                                        len = sanitise_length;
-                                        sanitise = 2; /* Get another parameter to sanitise. */
+                                        len = sanitize_length;
+                                        sanitize = 2; /* Get another parameter to sanitize. */
                                     } else {
                                         /* Some work to do here but we'll need to seek
                                          * another chunk.
                                          */
                                         len = chunk->length - soff;
-                                        sanitise_offset += len;
-                                        sanitise_length -= len;
-                                        sanitise = 1; /* It's OK to go to the next chunk. */
+                                        sanitize_offset += len;
+                                        sanitize_length -= len;
+                                        sanitize = 1; /* It's OK to go to the next chunk. */
                                     }
 
                                     /* Yes, we actually write over the original data.
@@ -650,7 +650,7 @@ void sec_audit_logger(modsec_rec *msr) {
                             }
                         }
 
-                        /* Write the sanitised chunk to the log
+                        /* Write the sanitized chunk to the log
                          * and advance to the next chunk. */
                         sec_auditlog_write(msr, chunk->data, chunk->length);
                         chunk_offset += chunk->length;
@@ -676,7 +676,7 @@ void sec_audit_logger(modsec_rec *msr) {
         if ((msr->msc_reqbody_read)&&(msr->mpd != NULL)) {
             char *buffer = NULL;
 
-            buffer = multipart_reconstruct_urlencoded_body_sanitise(msr);
+            buffer = multipart_reconstruct_urlencoded_body_sanitize(msr);
             if (buffer == NULL) {
                 msr_log(msr, 1, "Audit log: Failed to reconstruct request body.");
             } else {
@@ -710,9 +710,9 @@ void sec_audit_logger(modsec_rec *msr) {
             te = (apr_table_entry_t *)arr->elts;
             for (i = 0; i < arr->nelts; i++) {
                 text = apr_psprintf(msr->mp, "%s: %s\n", te[i].key, te[i].val);
-                /* Do we need to sanitise this response header? */
-                if (apr_table_get(msr->response_headers_to_sanitise, te[i].key) != NULL) {
-                    /* Yes, sanitise it. */
+                /* Do we need to sanitize this response header? */
+                if (apr_table_get(msr->response_headers_to_sanitize, te[i].key) != NULL) {
+                    /* Yes, sanitize it. */
                     memset(text + strlen(te[i].key) + 2, '*', strlen(te[i].val));
                 }
                 sec_auditlog_write(msr, text, strlen(text));
@@ -816,7 +816,7 @@ void sec_audit_logger(modsec_rec *msr) {
             const apr_array_header_t *tarr;
             const apr_table_entry_t *telts;
 
-            tarr = apr_table_elts(msr->arguments_to_sanitise);
+            tarr = apr_table_elts(msr->arguments_to_sanitize);
             telts = (const apr_table_entry_t*)tarr->elts;
 
             if (tarr->nelts > 0) {
@@ -837,7 +837,7 @@ void sec_audit_logger(modsec_rec *msr) {
             const apr_array_header_t *tarr;
             const apr_table_entry_t *telts;
 
-            tarr = apr_table_elts(msr->request_headers_to_sanitise);
+            tarr = apr_table_elts(msr->request_headers_to_sanitize);
             telts = (const apr_table_entry_t*)tarr->elts;
 
             if (tarr->nelts > 0) {
@@ -857,7 +857,7 @@ void sec_audit_logger(modsec_rec *msr) {
             const apr_array_header_t *tarr;
             const apr_table_entry_t *telts;
 
-            tarr = apr_table_elts(msr->response_headers_to_sanitise);
+            tarr = apr_table_elts(msr->response_headers_to_sanitize);
             telts = (const apr_table_entry_t*)tarr->elts;
 
             if (tarr->nelts > 0) {

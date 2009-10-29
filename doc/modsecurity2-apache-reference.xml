@@ -5126,7 +5126,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
     </section>
 
     <section>
-      <title><literal>sanitiseArg</literal></title>
+      <title><literal>sanitizeArg</literal></title>
 
       <para><emphasis>Description:</emphasis> Sanitises (replaces each byte
       with an asterisk) a named request argument prior to audit
@@ -5136,7 +5136,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
 
       <para>Example:</para>
 
-      <programlisting format="linespecific">SecAction nolog,phase:2,<emphasis>sanitiseArg:password</emphasis></programlisting>
+      <programlisting format="linespecific">SecAction nolog,phase:2,<emphasis>sanitizeArg:password</emphasis></programlisting>
 
       <para><emphasis>Note</emphasis></para>
 
@@ -5148,7 +5148,7 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
     </section>
 
     <section>
-      <title><literal>sanitiseMatched</literal></title>
+      <title><literal>sanitizeMatched</literal></title>
 
       <para><emphasis>Description:</emphasis> Sanitises the variable (request
       argument, request header, or response header) that caused a rule
@@ -5156,52 +5156,52 @@ SecRule REQUEST_HEADERS:User-Agent "Test" log,deny,status:403</programlisting>
 
       <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
-      <para>Example: This action can be used to sanitise arbitrary transaction
+      <para>Example: This action can be used to sanitize arbitrary transaction
       elements when they match a condition. For example, the example below
-      will sanitise any argument that contains the word<emphasis>
+      will sanitize any argument that contains the word<emphasis>
       password</emphasis> in the name.</para>
 
-      <programlisting format="linespecific">SecRule ARGS_NAMES password nolog,pass,<emphasis>sanitiseMatched</emphasis></programlisting>
+      <programlisting format="linespecific">SecRule ARGS_NAMES password nolog,pass,<emphasis>sanitizeMatched</emphasis></programlisting>
 
       <para><emphasis>Note</emphasis></para>
 
-      <para>Same note as sanitiseArg.</para>
+      <para>Same note as sanitizeArg.</para>
     </section>
 
     <section>
-      <title><literal>sanitiseRequestHeader</literal></title>
+      <title><literal>sanitizeRequestHeader</literal></title>
 
       <para><emphasis>Description:</emphasis> Sanitises a named request
       header.</para>
 
       <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
-      <para>Example: This will sanitise the data in the Authorization
+      <para>Example: This will sanitize the data in the Authorization
       header.</para>
 
-      <programlisting format="linespecific">SecAction log,phase:1,<emphasis>sanitiseRequestHeader:Authorization</emphasis></programlisting>
+      <programlisting format="linespecific">SecAction log,phase:1,<emphasis>sanitizeRequestHeader:Authorization</emphasis></programlisting>
 
       <para><emphasis>Note</emphasis></para>
 
-      <para>Same note as sanitiseArg.</para>
+      <para>Same note as sanitizeArg.</para>
     </section>
 
     <section>
-      <title><literal>sanitiseResponseHeader</literal></title>
+      <title><literal>sanitizeResponseHeader</literal></title>
 
       <para><emphasis>Description:</emphasis> Sanitises a named response
       header.</para>
 
       <para><emphasis>Action Group:</emphasis> Non-disruptive</para>
 
-      <para>Example: This will sanitise the Set-Cookie data sent to the
+      <para>Example: This will sanitize the Set-Cookie data sent to the
       client.</para>
 
-      <programlisting format="linespecific">SecAction log,phase:3,<emphasis>sanitiseResponseHeader:Set-Cookie</emphasis></programlisting>
+      <programlisting format="linespecific">SecAction log,phase:3,<emphasis>sanitizeResponseHeader:Set-Cookie</emphasis></programlisting>
 
       <para><emphasis>Note</emphasis></para>
 
-      <para>Same note as sanitiseArg.</para>
+      <para>Same note as sanitizeArg.</para>
     </section>
 
     <section>
@@ -5958,7 +5958,7 @@ SecRule XML "<emphasis>@validateSchema /path/to/apache2/conf/xml.xsd</emphasis>"
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule ARGS "<emphasis>@verifyCC \d{13,16}</emphasis>" \
-              "phase:2,sanitiseMatched,log,auditlog,pass,msg:'Potential credit card number'"</programlisting>
+              "phase:2,sanitizeMatched,log,auditlog,pass,msg:'Potential credit card number'"</programlisting>
     </section>
 
     <section>

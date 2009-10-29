@@ -973,8 +973,8 @@ static char *msre_action_xmlns_validate(msre_engine *engine, msre_action *action
     return NULL;
 }
 
-/* sanitiseArg */
-static apr_status_t msre_action_sanitiseArg_execute(modsec_rec *msr, apr_pool_t *mptmp,
+/* sanitizeArg */
+static apr_status_t msre_action_sanitizeArg_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
     const char *sargname = NULL;
@@ -990,7 +990,7 @@ static apr_status_t msre_action_sanitiseArg_execute(modsec_rec *msr, apr_pool_t 
         msc_arg *arg = (msc_arg *)telts[i].val;
 
         if (strcasecmp(sargname, arg->name) == 0) {
-            apr_table_addn(msr->arguments_to_sanitise, arg->name, (void *)arg);
+            apr_table_addn(msr->arguments_to_sanitize, arg->name, (void *)arg);
         }
     }
 
@@ -1001,8 +1001,8 @@ static apr_status_t msre_action_sanitiseArg_execute(modsec_rec *msr, apr_pool_t 
 #define SANITISE_REQUEST_HEADER     2
 #define SANITISE_RESPONSE_HEADER    3
 
-/* sanitiseMatched */
-static apr_status_t msre_action_sanitiseMatched_execute(modsec_rec *msr, apr_pool_t *mptmp,
+/* sanitizeMatched */
+static apr_status_t msre_action_sanitizeMatched_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
     const char *sargname = NULL;
@@ -1041,7 +1041,7 @@ static apr_status_t msre_action_sanitiseMatched_execute(modsec_rec *msr, apr_poo
         type = SANITISE_RESPONSE_HEADER;
     }
     else {
-        msr_log(msr, 3, "sanitiseMatched: Don't know how to handle variable: %s",
+        msr_log(msr, 3, "sanitizeMatched: Don't know how to handle variable: %s",
             mvar->name);
         return 0;
     }
@@ -1053,17 +1053,17 @@ static apr_status_t msre_action_sanitiseMatched_execute(modsec_rec *msr, apr_poo
             for (i = 0; i < tarr->nelts; i++) {
                 msc_arg *arg = (msc_arg *)telts[i].val;
                 if (strcasecmp(sargname, arg->name) == 0) {
-                    apr_table_addn(msr->arguments_to_sanitise, arg->name, (void *)arg);
+                    apr_table_addn(msr->arguments_to_sanitize, arg->name, (void *)arg);
                 }
             }
             break;
 
         case SANITISE_REQUEST_HEADER :
-            apr_table_set(msr->request_headers_to_sanitise, sargname, "1");
+            apr_table_set(msr->request_headers_to_sanitize, sargname, "1");
             break;
 
         case SANITISE_RESPONSE_HEADER :
-            apr_table_set(msr->response_headers_to_sanitise, sargname, "1");
+            apr_table_set(msr->response_headers_to_sanitize, sargname, "1");
             break;
 
         default :
@@ -1074,19 +1074,19 @@ static apr_status_t msre_action_sanitiseMatched_execute(modsec_rec *msr, apr_poo
     return 1;
 }
 
-/* sanitiseRequestHeader */
-static apr_status_t msre_action_sanitiseRequestHeader_execute(modsec_rec *msr, apr_pool_t *mptmp,
+/* sanitizeRequestHeader */
+static apr_status_t msre_action_sanitizeRequestHeader_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
-    apr_table_set(msr->request_headers_to_sanitise, action->param, "1");
+    apr_table_set(msr->request_headers_to_sanitize, action->param, "1");
     return 1;
 }
 
-/* sanitiseResponseHeader */
-static apr_status_t msre_action_sanitiseResponseHeader_execute(modsec_rec *msr, apr_pool_t *mptmp,
+/* sanitizeResponseHeader */
+static apr_status_t msre_action_sanitizeResponseHeader_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
-    apr_table_set(msr->response_headers_to_sanitise, action->param, "1");
+    apr_table_set(msr->response_headers_to_sanitize, action->param, "1");
     return 1;
 }
 
@@ -2195,7 +2195,20 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         ACTION_CGROUP_NONE,
         NULL,
         NULL,
-        msre_action_sanitiseArg_execute
+        msre_action_sanitizeArg_execute
+    );
+    
+    /* sanitizeArg */
+    msre_engine_action_register(engine,
+        "sanitizeArg",
+        ACTION_NON_DISRUPTIVE,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
+        NULL,
+        NULL,
+        msre_action_sanitizeArg_execute
     );
 
     /* sanitiseMatched */
@@ -2208,7 +2221,20 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         ACTION_CGROUP_NONE,
         NULL,
         NULL,
-        msre_action_sanitiseMatched_execute
+        msre_action_sanitizeMatched_execute
+    );
+    
+    /* sanitizeMatched */
+    msre_engine_action_register(engine,
+        "sanitizeMatched",
+        ACTION_NON_DISRUPTIVE,
+        0, 0,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
+        NULL,
+        NULL,
+        msre_action_sanitizeMatched_execute
     );
 
     /* sanitiseRequestHeader */
@@ -2221,7 +2247,20 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         ACTION_CGROUP_NONE,
         NULL,
         NULL,
-        msre_action_sanitiseRequestHeader_execute
+        msre_action_sanitizeRequestHeader_execute
+    );
+    
+    /* sanitizeRequestHeader */
+    msre_engine_action_register(engine,
+        "sanitizeRequestHeader",
+        ACTION_NON_DISRUPTIVE,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
+        NULL,
+        NULL,
+        msre_action_sanitizeRequestHeader_execute
     );
 
     /* sanitiseResponseHeader */
@@ -2234,7 +2273,20 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         ACTION_CGROUP_NONE,
         NULL,
         NULL,
-        msre_action_sanitiseResponseHeader_execute
+        msre_action_sanitizeResponseHeader_execute
+    );
+    
+    /* sanitizeResponseHeader */
+    msre_engine_action_register(engine,
+        "sanitizeResponseHeader",
+        ACTION_NON_DISRUPTIVE,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
+        NULL,
+        NULL,
+        msre_action_sanitizeResponseHeader_execute
     );
 
     /* setenv */

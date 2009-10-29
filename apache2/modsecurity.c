@@ -297,12 +297,12 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
         }
     }
 
-    msr->arguments_to_sanitise = apr_table_make(msr->mp, 16);
-    if (msr->arguments_to_sanitise == NULL) return -1;
-    msr->request_headers_to_sanitise = apr_table_make(msr->mp, 16);
-    if (msr->request_headers_to_sanitise == NULL) return -1;
-    msr->response_headers_to_sanitise = apr_table_make(msr->mp, 16);
-    if (msr->response_headers_to_sanitise == NULL) return -1;
+    msr->arguments_to_sanitize = apr_table_make(msr->mp, 16);
+    if (msr->arguments_to_sanitize == NULL) return -1;
+    msr->request_headers_to_sanitize = apr_table_make(msr->mp, 16);
+    if (msr->request_headers_to_sanitize == NULL) return -1;
+    msr->response_headers_to_sanitize = apr_table_make(msr->mp, 16);
+    if (msr->response_headers_to_sanitize == NULL) return -1;
 
     /* Initialise cookies */
     msr->request_cookies = apr_table_make(msr->mp, 16);
