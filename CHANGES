@@ -1,3 +1,11 @@
+02 Nov 2009 - 2.5.11
+--------------------
+
+ * Moved output filter to run before other stock filters (mod_deflate,
+   mod_cache, mod_expires, mod_filter) to avoid analyzing modified data
+   in the response.  Patch originally submitted by Ivan Ristic.
+
+
 18 Sep 2009 - 2.5.10
 --------------------
 

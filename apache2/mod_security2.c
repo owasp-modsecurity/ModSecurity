@@ -1126,8 +1126,18 @@ static void register_hooks(apr_pool_t *mp) {
 
     ap_register_input_filter("MODSECURITY_IN", input_filter,
         NULL, AP_FTYPE_CONTENT_SET);
+
+    /* Ensure that the output filter runs before other modules so that
+     * we get a request that has a better chance of not being modified:
+     *
+     * Currently:
+     *   mod_expires = -2
+     *   mod_cache   = -1
+     *   mod_deflate = -1
+     *   mod_headers =  0
+     */
     ap_register_output_filter("MODSECURITY_OUT", output_filter,
-        NULL, AP_FTYPE_CONTENT_SET);
+        NULL, AP_FTYPE_CONTENT_SET - 3);
 
     ap_register_output_filter("PDFP_OUT", pdfp_output_filter,
         NULL, AP_FTYPE_CONTENT_SET);
