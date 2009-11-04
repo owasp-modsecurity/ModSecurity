@@ -1,6 +1,12 @@
 03 Nov 2009 - 2.5.11
 --------------------
 
+ * Added warning during configure if libcurl is found linked against
+   gnutls for SSL.  The openssl lib is recommended as gnutls has
+   proven to cause issues with mutexes and may crash.
+
+ * Cleanup some mlogc (over)logging.
+
  * Do not log output filter errors in the error log.
 
  * Moved output filter to run before other stock filters (mod_deflate,
