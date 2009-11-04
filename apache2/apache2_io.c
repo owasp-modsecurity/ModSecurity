@@ -407,16 +407,10 @@ static apr_status_t send_of_brigade(modsec_rec *msr, ap_filter_t *f) {
 
     rc = ap_pass_brigade(f->next, msr->of_brigade);
     if (rc != APR_SUCCESS) {
-        int log_level = 1;
-
-        if (APR_STATUS_IS_ECONNRESET(rc)) {
-            /* Message "Connection reset by peer" is common and not a sign
-             * of something unusual. Hence we don't want to make a big deal
-             * about it, logging at NOTICE level. Everything else we log
-             * at ERROR level.
-             */
-             log_level = 3;
-        }
+        /* TODO: These need to move to flags in 2.6.  For now log them
+         * at level 4 so that they are not confusing users.
+         */
+        int log_level = 4;
 
         if (msr->txcfg->debuglog_level >= log_level) {
             switch(rc) {
