@@ -1,5 +1,8 @@
-03 Nov 2009 - 2.5.11
+04 Nov 2009 - 2.5.11
 --------------------
+
+ * Cleanup persistence database locking code which could deadlock
+   under high stress.
 
  * Added warning during configure if libcurl is found linked against
    gnutls for SSL.  The openssl lib is recommended as gnutls has
