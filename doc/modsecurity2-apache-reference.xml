@@ -6,7 +6,7 @@
   Manual</title>
 
   <articleinfo>
-    <releaseinfo>Version 2.5.10 (Sep 18, 2009)</releaseinfo>
+    <releaseinfo>Version 2.5.11 (Nov 4, 2009)</releaseinfo>
 
     <copyright>
       <year>2004-2009</year>
@@ -308,6 +308,12 @@
 
         <para><ulink type=""
         url="http://curl.haxx.se/libcurl/">http://curl.haxx.se/libcurl/</ulink></para>
+        <note>
+          <para>Many have had issues with libcurl linked with the GnuTLS
+          library for SSL/TLS support.  It is recommended that the
+          openssl library be used for SSL/TLS support in libcurl.</para>
+        </note>
+
       </listitem>
     </orderedlist>
 
@@ -3111,7 +3117,8 @@ SecRule ARGS "@pm some key words" id:12345,deny,status:500</programlisting>
       <literal>MULTIPART_DATA_AFTER</literal>,
       <literal>MULTIPART_HEADER_FOLDING</literal>,
       <literal>MULTIPART_LF_LINE</literal>,
-      <literal>MULTIPART_SEMICOLON_MISSING</literal>. Each of these variables
+      <literal>MULTIPART_SEMICOLON_MISSING</literal>
+      <literal>MULTIPART_INVALID_QUOTING</literal>. Each of these variables
       covers one unusual (although sometimes legal) aspect of the request body
       in <literal>multipart/form-data format</literal>. Your policies should
       <emphasis>always</emphasis> contain a rule to check either this variable
@@ -3133,7 +3140,8 @@ DB %{MULTIPART_DATA_BEFORE}, \
 DA %{MULTIPART_DATA_AFTER}, \
 HF %{MULTIPART_HEADER_FOLDING}, \
 LF %{MULTIPART_LF_LINE}, \
-SM %{MULTIPART_SEMICOLON_MISSING}'"</programlisting>
+SM %{MULTIPART_SEMICOLON_MISSING}, \
+IQ %{MULTIPART_INVALID_QUOTING}'"</programlisting>
 
       <para>The <literal>multipart/form-data</literal> parser was upgraded in
       ModSecurity v2.1.3 to actively look for signs of evasion. Many variables

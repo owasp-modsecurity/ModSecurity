@@ -404,3 +404,84 @@
 		),
 	),
 },
+# Data following final boundary should set flag
+{
+	type => "misc",
+	comment => "multipart parser (data after final boundary)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		#SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,status:403"
+		SecRule MULTIPART_DATA_AFTER "\@eq 1" "phase:2,deny,status:403"
+		SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,status:403"
+	),
+	match_log => {
+		debug => [ qr/name: a.*variable: 1.*Ignoring data after last boundary/s, 1 ],
+		-debug => [ qr/Adding request argument \(BODY\): name "b"/s, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+		],
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="a"
+				
+				1
+				-----------------------------69343412719991675451336310646--
+                -----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="b"
+				
+				2
+				-----------------------------69343412719991675451336310646--
+			),
+		),
+	),
+},
+# Single quoted data is invalid
+{
+	type => "misc",
+	comment => "multipart parser (C-D uses single quotes)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		#SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,status:403"
+		SecRule MULTIPART_INVALID_QUOTING "\@eq 1" "chain,phase:2,deny,status:403"
+		SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,status:403"
+	),
+	match_log => {
+		debug => [ qr/name: a.*variable: 1.*Duplicate Content-Disposition name/s, 1 ],
+		-debug => [ qr/Adding request argument \(BODY\): name "b/s, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "multipart/form-data; boundary=---------------------------69343412719991675451336310646",
+		],
+		normalize_raw_request_data(
+			q(
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name="a"
+                
+                1
+                -----------------------------69343412719991675451336310646
+                Content-Disposition: form-data; name=';filename="dummy';name=b;"
+                
+                2
+                -----------------------------69343412719991675451336310646--
+			),
+		),
+	),
+},

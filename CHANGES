@@ -1,8 +1,13 @@
 04 Nov 2009 - 2.5.11
 --------------------
 
- * Cleanup persistence database locking code which could deadlock
-   under high stress.
+ * Added a new multipart flag, MULTIPART_INVALID_QUOTING, which will be
+   set true if any invalid quoting is found during multipart parsing.
+
+ * Fixed parsing quoted strings in multipart Content-Disposition headers.
+   Discovered by Stefan Esser.
+
+ * Cleanup persistence database locking code.
 
  * Added warning during configure if libcurl is found linked against
    gnutls for SSL.  The openssl lib is recommended as gnutls has

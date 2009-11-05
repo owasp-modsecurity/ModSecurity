@@ -714,11 +714,10 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
         return NULL;
     } else
     if (strcasecmp(name, "forceRequestBodyVariable") == 0) {
-        if (parse_boolean(value) == -1) {
-            return apr_psprintf(engine->mp, "Invalid setting for ctl name "
-                " forceRequestBodyVariable: %s", value);
-        }
-        return NULL;
+        if (strcasecmp(value, "on") == 0) return NULL;
+        if (strcasecmp(value, "off") == 0) return NULL;
+        return apr_psprintf(engine->mp, "Invalid setting for ctl name "
+            " forceRequestBodyVariable: %s", value);
     } else
     if (strcasecmp(name, "responseBodyAccess") == 0) {
         if (parse_boolean(value) == -1) {
@@ -839,12 +838,17 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         return 1;
     } else
     if (strcasecmp(name, "forceRequestBodyVariable") == 0) {
-        int pv = parse_boolean(value);
+        if (strcasecmp(value, "on") == 0) {
+            msr->txcfg->reqbody_buffering = REQUEST_BODY_FORCEBUF_ON;
+            msr->usercfg->reqbody_buffering = REQUEST_BODY_FORCEBUF_ON;
+        }
+        else
+        if (strcasecmp(value, "off") == 0) {
+            msr->txcfg->reqbody_buffering = REQUEST_BODY_FORCEBUF_OFF;
+            msr->usercfg->reqbody_buffering = REQUEST_BODY_FORCEBUF_OFF;
+        }
 
-        if (pv == -1) return -1;
-        msr->txcfg->reqbody_buffering = pv;
-        msr->usercfg->reqbody_buffering = pv;
-        msr_log(msr, 4, "Ctl: Set requestBodyAccess to %d.", pv);
+        msr_log(msr, 4, "Ctl: Set requestBodyAccess to %d.", msr->txcfg->reqbody_buffering);
 
         return 1;
     } else
@@ -880,7 +884,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
             msr->usercfg->auditlog_flag = AUDITLOG_RELEVANT;
         }
 
-        msr_log(msr, 4, "Ctl: Set auditEngine to %d.", msr->txcfg->auditlog_flag); // TODO
+        msr_log(msr, 4, "Ctl: Set auditEngine to %d.", msr->txcfg->auditlog_flag);
 
         return 1;
     } else

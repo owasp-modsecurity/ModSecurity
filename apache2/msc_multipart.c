@@ -45,7 +45,7 @@ static char *multipart_construct_filename(modsec_rec *msr) {
      */
     p = filename = apr_pstrdup(msr->mp, q);
     while((c = *p) != 0) {
-        if (!( isalnum(c)||(c == '.') )) *p = '_';
+        if (!( isalnum(c) || (c == '.') )) *p = '_';
         p++;
     }
 
@@ -67,7 +67,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
     /* see if there are any other parts to parse */
 
     p = c_d_value + 9;
-    while((*p == '\t')||(*p == ' ')) p++;
+    while((*p == '\t') || (*p == ' ')) p++;
     if (*p == '\0') return 1; /* this is OK */
 
     if (*p != ';') return -2;
@@ -79,26 +79,35 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
         char *name = NULL, *value = NULL, *start = NULL;
 
         /* go over the whitespace */
-        while((*p == '\t')||(*p == ' ')) p++;
+        while((*p == '\t') || (*p == ' ')) p++;
         if (*p == '\0') return -3;
 
         start = p;
-        while((*p != '\0')&&(*p != '=')&&(*p != '\t')&&(*p != ' ')) p++;
+        while((*p != '\0') && (*p != '=') && (*p != '\t') && (*p != ' ')) p++;
         if (*p == '\0') return -4;
 
         name = apr_pstrmemdup(msr->mp, start, (p - start));
 
-        while((*p == '\t')||(*p == ' ')) p++;
+        while((*p == '\t') || (*p == ' ')) p++;
         if (*p == '\0') return -5;
 
         if (*p != '=') return -13;
         p++;
 
-        while((*p == '\t')||(*p == ' ')) p++;
+        while((*p == '\t') || (*p == ' ')) p++;
         if (*p == '\0') return -6;
 
-        if (*p == '"') {
+        /* Accept both quotes as some backends will accept them, but
+         * technically "'" is invalid and so flag_invalid_quoting is
+         * set so the user can deal with it in the rules if they so wish.
+         */
+        if ((*p == '"') || (*p == '\'')) {
             /* quoted */
+            char quote = *p;
+
+            if (quote == '\'') {
+                msr->mpd->flag_invalid_quoting = 1;
+            }
 
             p++;
             if (*p == '\0') return -7;
@@ -113,8 +122,8 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                         /* improper escaping */
                         return -8;
                     }
-                    /* only " and \ can be escaped */
-                    if ((*(p + 1) == '"')||(*(p + 1) == '\\')) {
+                    /* only quote and \ can be escaped */
+                    if ((*(p + 1) == quote) || (*(p + 1) == '\\')) {
                         p++;
                     }
                     else {
@@ -128,8 +137,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                          */
                     }
                 }
-                else
-                if (*p == '"') {
+                else if (*p == quote) {
                     *t = '\0';
                     break;
                 }
@@ -144,14 +152,18 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
             /* not quoted */
 
             start = p;
-            while((*p != '\0')&&(is_token_char(*p))) p++;
+            while((*p != '\0') && (is_token_char(*p))) p++;
             value = apr_pstrmemdup(msr->mp, start, (p - start));
         }
 
         /* evaluate part */
 
         if (strcmp(name, "name") == 0) {
-            if (msr->mpd->mpp->name != NULL) return -14;
+            if (msr->mpd->mpp->name != NULL) {
+                msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition name: %s",
+                    log_escape_nq(msr->mp, value));
+                return -14;
+            }
             msr->mpd->mpp->name = value;
 
             if (msr->txcfg->debuglog_level >= 9) {
@@ -161,7 +173,11 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
         }
         else
         if (strcmp(name, "filename") == 0) {
-            if (msr->mpd->mpp->filename != NULL) return -15;
+            if (msr->mpd->mpp->filename != NULL) {
+                msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename: %s",
+                    log_escape_nq(msr->mp, value));
+                return -15;
+            }
             msr->mpd->mpp->filename = value;
 
             if (msr->txcfg->debuglog_level >= 9) {
@@ -172,7 +188,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
         else return -11;
 
         if (*p != '\0') {
-            while((*p == '\t')||(*p == ' ')) p++;
+            while((*p == '\t') || (*p == ' ')) p++;
             /* the next character must be a zero or a semi-colon */
             if (*p == '\0') return 1; /* this is OK */
             if (*p != ';') return -12;
@@ -263,7 +279,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
     } else {
         /* Header line. */
 
-        if ((msr->mpd->buf[0] == '\t')||(msr->mpd->buf[0] == ' ')) {
+        if ((msr->mpd->buf[0] == '\t') || (msr->mpd->buf[0] == ' ')) {
             char *header_value, *new_value, *data;
 
             /* header folding, add data to the header we are building */
@@ -277,7 +293,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
 
             /* locate the beginning of data */
             data = msr->mpd->buf;
-            while((*data == '\t')||(*data == ' ')) data++;
+            while((*data == '\t') || (*data == ' ')) data++;
 
             new_value = apr_pstrdup(msr->mp, data);
             remove_lf_crlf_inplace(new_value);
@@ -303,7 +319,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
             /* new header */
 
             data = msr->mpd->buf;
-            while((*data != ':')&&(*data != '\0')) data++;
+            while((*data != ':') && (*data != '\0')) data++;
             if (*data == '\0') {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid part header (colon missing): %s.",
                     log_escape_nq(msr->mp, msr->mpd->buf));
@@ -320,7 +336,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
 
             /* extract the value value */
             data++;
-            while((*data == '\t')||(*data == ' ')) data++;
+            while((*data == '\t') || (*data == ' ')) data++;
             header_value = apr_pstrdup(msr->mp, data);
             remove_lf_crlf_inplace(header_value);
 
@@ -713,7 +729,7 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
         /* Check for extra characters before the boundary. */
         for (p = (char *)(msr->request_content_type + 19); p < msr->mpd->boundary; p++) {
             if (!isspace(*p)) {
-                if ((seen_semicolon == 0)&&(*p == ';')) {
+                if ((seen_semicolon == 0) && (*p == ';')) {
                     seen_semicolon = 1; /* It is OK to have one semicolon. */
                 } else {
                     msr->mpd->flag_error = 1;
@@ -761,7 +777,7 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
         }
 
         /* Is the boundary quoted? */
-        if ((len >= 2)&&(*b == '"')&&(*(b + len - 1) == '"')) {
+        if ((len >= 2) && (*b == '"') && (*(b + len - 1) == '"')) {
             /* Quoted. */
             msr->mpd->boundary = apr_pstrndup(msr->mp, b + 1, len - 2);
             if (msr->mpd->boundary == NULL) return -1;
@@ -771,7 +787,7 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
 
             /* Test for partial quoting. */
             if (   (*b == '"')
-                || ((len >= 2)&&(*(b + len - 1) == '"')) )
+                || ((len >= 2) && (*(b + len - 1) == '"')) )
             {
                 msr->mpd->flag_error = 1;
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary in C-T (quote).");
@@ -865,14 +881,15 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
         }
     }
 
-    if ((msr->mpd->seen_data != 0)&&(msr->mpd->is_complete == 0)) {
+    if ((msr->mpd->seen_data != 0) && (msr->mpd->is_complete == 0)) {
         if (msr->mpd->boundary_count > 0) {
             /* Check if we have the final boundary (that we haven't
              * processed yet) in the buffer.
              */
             if (msr->mpd->buf_contains_line) {
                 if ( ((unsigned int)(MULTIPART_BUF_SIZE - msr->mpd->bufleft) == (4 + strlen(msr->mpd->boundary)))
-                    && (*(msr->mpd->buf) == '-')&&(*(msr->mpd->buf + 1) == '-')
+                    && (*(msr->mpd->buf) == '-')
+                    && (*(msr->mpd->buf + 1) == '-')
                     && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0)
                     && (*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary)) == '-')
                     && (*(msr->mpd->buf + 2 + strlen(msr->mpd->boundary) + 1) == '-') )
@@ -939,7 +956,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
         char c = *inptr;
         int process_buffer = 0;
 
-        if ((c == '\r')&&(msr->mpd->bufleft == 1)) {
+        if ((c == '\r') && (msr->mpd->bufleft == 1)) {
             /* we don't want to take \r as the last byte in the buffer */
             process_buffer = 1;
         } else {
@@ -954,25 +971,26 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
         /* until we either reach the end of the line
          * or the end of our internal buffer
          */
-        if ((c == '\n')||(msr->mpd->bufleft == 0)||(process_buffer)) {
+        if ((c == '\n') || (msr->mpd->bufleft == 0) || (process_buffer)) {
             int processed_as_boundary = 0;
 
             *(msr->mpd->bufptr) = 0;
 
             /* Do we have something that looks like a boundary? */
-            if (msr->mpd->buf_contains_line
+            if (   msr->mpd->buf_contains_line
                 && (strlen(msr->mpd->buf) > 3)
-                && (((*(msr->mpd->buf) == '-'))&&(*(msr->mpd->buf + 1) == '-')) )
+                && (*(msr->mpd->buf) == '-')
+                && (*(msr->mpd->buf + 1) == '-') )
             {
                 /* Does it match our boundary? */
-                if ((strlen(msr->mpd->buf) >= strlen(msr->mpd->boundary) + 2)
+                if (   (strlen(msr->mpd->buf) >= strlen(msr->mpd->boundary) + 2)
                     && (strncmp(msr->mpd->buf + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0) )
                 {
                     char *boundary_end = msr->mpd->buf + 2 + strlen(msr->mpd->boundary);
                     int is_final = 0;
 
                     /* Is this the final boundary? */
-                    if ((*boundary_end == '-')&&(*(boundary_end + 1)== '-')) {
+                    if ((*boundary_end == '-') && (*(boundary_end + 1)== '-')) {
                         is_final = 1;
                         boundary_end += 2;
 
@@ -1057,7 +1075,8 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                     char *p = msr->mpd->buf;
 
                     for(i = 0; i < len; i++) {
-                        if ((p[i] == '-')&&(i + 1 < len)&&(p[i + 1] == '-')) {
+                        if ((p[i] == '-') && (i + 1 < len) && (p[i + 1] == '-'))
+                        {
                             if (strncmp(p + i + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0) {
                                 msr->mpd->flag_unmatched_boundary = 1;
                                 break;
@@ -1077,7 +1096,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                     }
                 } else {
                     if (msr->mpd->mpp_state == 0) {
-                        if ((msr->mpd->bufleft == 0)||(process_buffer)) {
+                        if ((msr->mpd->bufleft == 0) || (process_buffer)) {
                             /* part header lines must be shorter than
                              * MULTIPART_BUF_SIZE bytes
                              */
@@ -1115,7 +1134,7 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
             msr->mpd->buf_contains_line = (c == 0x0a) ? 1 : 0;
         }
 
-        if ((msr->mpd->is_complete)&&(inleft != 0)) {
+        if ((msr->mpd->is_complete) && (inleft != 0)) {
             msr->mpd->flag_data_after = 1;
 
             if (msr->txcfg->debuglog_level >= 4) {
@@ -1189,7 +1208,9 @@ apr_status_t multipart_cleanup(modsec_rec *msr) {
 
         parts = (multipart_part **)msr->mpd->parts->elts;
         for(i = 0; i < msr->mpd->parts->nelts; i++) {
-            if ((parts[i]->type == MULTIPART_FILE)&&(parts[i]->tmp_file_size == 0)) {
+            if (    (parts[i]->type == MULTIPART_FILE)
+                 && (parts[i]->tmp_file_size == 0))
+            {
                 /* Delete empty file. */
                 if (parts[i]->tmp_file_name != NULL) {
                     /* make sure it is closed first */
@@ -1300,7 +1321,7 @@ char *multipart_reconstruct_urlencoded_body_sanitise(modsec_rec *msr) {
 
     /* allocate the buffer */
     body = apr_palloc(msr->mp, body_len + 1);
-    if ((body == NULL)||(body_len + 1 == 0)) return NULL;
+    if ((body == NULL) || (body_len + 1 == 0)) return NULL;
     *body = 0;
 
     parts = (multipart_part **)msr->mpd->parts->elts;

@@ -490,7 +490,7 @@ void init_directory_config(directory_config *dcfg) {
     if (dcfg->is_enabled == NOT_SET) dcfg->is_enabled = 0;
 
     if (dcfg->reqbody_access == NOT_SET) dcfg->reqbody_access = 0;
-    if (dcfg->reqbody_buffering == NOT_SET) dcfg->reqbody_buffering = 0;
+    if (dcfg->reqbody_buffering == NOT_SET) dcfg->reqbody_buffering = REQUEST_BODY_FORCEBUF_OFF;
     if (dcfg->reqbody_inmemory_limit == NOT_SET)
         dcfg->reqbody_inmemory_limit = REQUEST_BODY_DEFAULT_INMEMORY_LIMIT;
     if (dcfg->reqbody_limit == NOT_SET) dcfg->reqbody_limit = REQUEST_BODY_DEFAULT_LIMIT;

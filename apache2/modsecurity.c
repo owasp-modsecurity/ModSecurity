@@ -277,7 +277,7 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     }
 
     /* Check if we are forcing buffering, then use memory only. */
-    if (msr->txcfg->reqbody_buffering) {
+    if (msr->txcfg->reqbody_buffering != REQUEST_BODY_FORCEBUF_OFF) {
         msr->msc_reqbody_storage = MSC_REQBODY_MEMORY;
         msr->msc_reqbody_spilltodisk = 0;
     }
