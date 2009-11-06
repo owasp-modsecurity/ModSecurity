@@ -245,11 +245,11 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
                         part->value = (char *)var_generated->value;
                         *(msc_string **)apr_array_push(arr) = part;
                         if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "Resolved macro %%{%s%s%s} to \"%s\"",
+                            msr_log(msr, 9, "Resolved macro %%{%s%s%s} to: %s",
                                 var_name,
                                 (var_value ? "." : ""),
                                 (var_value ? var_value : ""),
-                                log_escape_ex(mptmp, part->value, part->value_len));
+                                log_escape_nq_ex(mptmp, part->value, part->value_len));
                         }
                     }
                 } else {
@@ -1128,7 +1128,7 @@ static apr_status_t msre_action_setenv_execute(modsec_rec *msr, apr_pool_t *mptm
     env->value = env_name;
     env->value_len = strlen(env->value);
     expand_macros(msr, env, rule, mptmp);
-    env_name = log_escape_ex(msr->mp, env->value, env->value_len);
+    env_name = log_escape_nq_ex(msr->mp, env->value, env->value_len);
 
     /* Execute the requested action. */
     if (env_name[0] == '!') {
@@ -1152,15 +1152,15 @@ static apr_status_t msre_action_setenv_execute(modsec_rec *msr, apr_pool_t *mptm
         val->value_len = strlen(val->value);
         expand_macros(msr, val, rule, mptmp);
 
-        /* To be safe, we escape the value as it goes in subprocess_env. */
-        val_value = log_escape_ex(msr->mp, val->value, val->value_len);
+        /* To be safe, we escape NULs as it goes in subprocess_env. */
+        val_value = log_escape_nul(msr->mp, (const unsigned char *)val->value, val->value_len);
 
         apr_table_set(msr->r->subprocess_env, env_name, val_value);
 
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "Set env variable \"%s\" to \"%s\".",
+            msr_log(msr, 9, "Set env variable \"%s\" to: %s",
                 env_name,
-                log_escape(mptmp, val_value));
+                log_escape_nq(mptmp, val_value));
         }
     }
 
@@ -1206,7 +1206,7 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
     var->value = var_name;
     var->value_len = strlen(var->value);
     expand_macros(msr, var, rule, mptmp);
-    var_name = log_escape_ex(msr->mp, var->value, var->value_len);
+    var_name = log_escape_nq_ex(msr->mp, var->value, var->value_len);
 
     /* Handle the exclamation mark. */
     if (var_name[0] == '!') {
@@ -1370,7 +1370,7 @@ static apr_status_t msre_action_expirevar_execute(modsec_rec *msr, apr_pool_t *m
     var->value = var_name;
     var->value_len = strlen(var->value);
     expand_macros(msr, var, rule, mptmp);
-    var_name = log_escape_ex(msr->mp, var->value, var->value_len);
+    var_name = log_escape_nq_ex(msr->mp, var->value, var->value_len);
 
     /* Choose the collection to work with. */
     s = strstr(var_name, ".");
@@ -1461,7 +1461,7 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
     var->value = var_name;
     var->value_len = strlen(var->value);
     expand_macros(msr, var, rule, mptmp);
-    var_name = log_escape_ex(msr->mp, var->value, var->value_len);
+    var_name = log_escape_nq_ex(msr->mp, var->value, var->value_len);
 
     /* Expand macros in value */
     var->value = var_value;
