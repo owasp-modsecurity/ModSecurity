@@ -309,7 +309,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
                 msr->msc_reqbody_processor);
             return -1;
         }
-    } else if (msr->txcfg->reqbody_buffering) {
+    } else if (msr->txcfg->reqbody_buffering != REQUEST_BODY_FORCEBUF_OFF) {
         /* Increase per-request data length counter if forcing buffering. */
         msr->msc_reqbody_no_files_length += length;
     }
@@ -479,7 +479,7 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
                 return -1;
             }
         }
-    } else if (msr->txcfg->reqbody_buffering) {
+    } else if (msr->txcfg->reqbody_buffering != REQUEST_BODY_FORCEBUF_OFF) {
         /* Convert to a single continous buffer, but don't do anything else. */
         return modsecurity_request_body_end_raw(msr, error_msg);
     }

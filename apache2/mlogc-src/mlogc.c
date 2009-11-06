@@ -389,7 +389,7 @@ static void add_entry(const char *data, int start_worker)
 
     error_log(LOG_DEBUG, NULL, "Queue locking thread mutex.");
     if (APR_STATUS_IS_EBUSY(apr_thread_mutex_trylock(mutex))) {
-        error_log(LOG_WARNING, NULL, "Queue waiting on thread mutex.");
+        error_log(LOG_DEBUG, NULL, "Queue waiting on thread mutex.");
         apr_thread_mutex_lock(mutex);
     }
 
@@ -478,7 +478,7 @@ static void transaction_log_init(void)
     /* Put a lock in place to ensure exclusivity. */
     error_log(LOG_DEBUG, NULL, "Transaction initialization locking global mutex.");
     if (APR_STATUS_IS_EBUSY(apr_global_mutex_trylock(gmutex))) {
-        error_log(LOG_WARNING, NULL, "Transaction initialization waiting on global mutex.");
+        error_log(LOG_DEBUG, NULL, "Transaction initialization waiting on global mutex.");
         apr_global_mutex_lock(gmutex);
     }
 
@@ -582,7 +582,7 @@ static void transaction_checkpoint(void)
     /* Put a lock in place to ensure exclusivity. */
     error_log(LOG_DEBUG, NULL, "Checkpoint locking global mutex.");
     if (APR_STATUS_IS_EBUSY(apr_global_mutex_trylock(gmutex))) {
-        error_log(LOG_WARNING, NULL, "Checkpoint waiting on global mutex.");
+        error_log(LOG_DEBUG, NULL, "Checkpoint waiting on global mutex.");
         apr_global_mutex_lock(gmutex);
     }
 
@@ -1532,7 +1532,7 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
 
     error_log(LOG_DEBUG, thread, "Worker shutdown locking thread mutex.");
     if (APR_STATUS_IS_EBUSY(apr_thread_mutex_trylock(mutex))) {
-        error_log(LOG_WARNING, thread, "Worker shutdown waiting on thread mutex.");
+        error_log(LOG_DEBUG, thread, "Worker shutdown waiting on thread mutex.");
         apr_thread_mutex_lock(mutex);
     }
 
@@ -1583,7 +1583,7 @@ static void create_new_worker(int lock)
     if (lock) {
         error_log(LOG_DEBUG, NULL, "Worker creation locking thread mutex.");
         if (APR_STATUS_IS_EBUSY(apr_thread_mutex_trylock(mutex))) {
-            error_log(LOG_WARNING, NULL, "Worker creation waiting on thread mutex.");
+            error_log(LOG_DEBUG, NULL, "Worker creation waiting on thread mutex.");
             apr_thread_mutex_lock(mutex);
         }
     }

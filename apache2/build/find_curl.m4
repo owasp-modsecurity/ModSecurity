@@ -70,12 +70,25 @@ if test -n "${curl_path}"; then
         AC_MSG_NOTICE([NOTE: curl library may be too old: $CURL_VERSION])
     fi
 
+    dnl # Check/warn if GnuTLS is used
+    AC_MSG_CHECKING([if libcurl is linked with gnutls])
+    curl_uses_gnutls=`echo ${CURL_LIBS} | grep gnutls | wc -l`
+    if test "$curl_uses_gnutls" -ne 0; then
+        AC_MSG_RESULT([yes])
+        AC_MSG_NOTICE([NOTE: curl linked with gnutls may be buggy, openssl recommended])
+        CURL_USES_GNUTLS=yes
+    else
+        AC_MSG_RESULT([no])
+        CURL_USES_GNUTLS=no
+    fi
+
 else
     AC_MSG_RESULT([no])
 fi
 
 AC_SUBST(CURL_LIBS)
 AC_SUBST(CURL_CFLAGS)
+AC_SUBST(CURL_USES_GNUTLS)
 
 if test -z "${CURL_LIBS}"; then
   AC_MSG_NOTICE([*** curl library not found.])

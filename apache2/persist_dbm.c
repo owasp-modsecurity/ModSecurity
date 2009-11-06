@@ -98,7 +98,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     apr_status_t rc;
     apr_sdbm_datum_t key;
     apr_sdbm_datum_t *value = NULL;
-    apr_sdbm_t *dbm;
+    apr_sdbm_t *dbm = NULL;
     apr_table_t *col = NULL;
     const apr_array_header_t *arr;
     apr_table_entry_t *te;
@@ -109,7 +109,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
         msr_log(msr, 1, "Unable to retrieve collection (name \"%s\", key \"%s\"). Use "
             "SecDataDir to define data directory first.", log_escape(msr->mp, col_name),
             log_escape_ex(msr->mp, col_key, col_key_len));
-        return NULL;
+        goto cleanup;
     }
 
     dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);
@@ -121,7 +121,8 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
         rc = apr_sdbm_open(&dbm, dbm_filename, APR_READ | APR_SHARELOCK,
             CREATEMODE, msr->mp);
         if (rc != APR_SUCCESS) {
-            return NULL;
+            dbm = NULL;
+            goto cleanup;
         }
     }
     else {
@@ -133,11 +134,11 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Failed to read from DBM file \"%s\": %s", log_escape(msr->mp,
             dbm_filename), get_apr_error(msr->mp, rc));
-        return NULL;
+        goto cleanup;
     }
 
     if (value->dptr == NULL) { /* Key not found in DBM file. */
-        return NULL;
+        goto cleanup;
     }
 
     /* ENH Need expiration (and perhaps other metadata) accessible in blob
@@ -147,11 +148,14 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
 
     /* Transform raw data into a table. */
     col = collection_unpack(msr, (const unsigned char *)value->dptr, value->dsize, 1);
-    if (col == NULL) return NULL;
+    if (col == NULL) {
+        goto cleanup;
+    }
 
     /* Close after "value" used from fetch or memory may be overwritten. */
     if (existing_dbm == NULL) {
         apr_sdbm_close(dbm);
+        dbm = NULL;
     }
 
     /* Remove expired variables. */
@@ -198,7 +202,8 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
             if (rc != APR_SUCCESS) {
                 msr_log(msr, 1, "Failed to access DBM file \"%s\": %s",
                     log_escape(msr->mp, dbm_filename), get_apr_error(msr->mp, rc));
-                return NULL;
+                dbm = NULL;
+                goto cleanup;
             }
         }
         else {
@@ -210,12 +215,13 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
             msr_log(msr, 1, "Failed deleting collection (name \"%s\", "
                 "key \"%s\"): %s", log_escape(msr->mp, col_name),
                 log_escape_ex(msr->mp, col_key, col_key_len), get_apr_error(msr->mp, rc));
-            return NULL;
+            goto cleanup;
         }
 
 
         if (existing_dbm == NULL) {
             apr_sdbm_close(dbm);
+            dbm = NULL;
         }
 
         if (expired && (msr->txcfg->debuglog_level >= 9)) {
@@ -225,7 +231,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
             msr_log(msr, 4, "Deleted collection (name \"%s\", key \"%s\").",
                 log_escape(msr->mp, col_name), log_escape_ex(msr->mp, col_key, col_key_len));
         }
-        return NULL;
+        goto cleanup;
     }
 
     /* Update UPDATE_RATE */
@@ -270,7 +276,23 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
                 log_escape(msr->mp, col_name), log_escape_ex(msr->mp, col_key, col_key_len));
     }
 
+    if ((existing_dbm == NULL) && dbm) {
+        /* Should not ever get here */
+        msr_log(msr, 1, "Internal Error: Collection remained open (name \"%s\", key \"%s\").",
+                log_escape(msr->mp, col_name), log_escape_ex(msr->mp, col_key, col_key_len));
+
+        apr_sdbm_close(dbm);
+    }
+
     return col;
+
+cleanup:
+
+    if ((existing_dbm == NULL) && dbm) {
+        apr_sdbm_close(dbm);
+    }
+
+    return NULL;
 }
 
 /**
@@ -293,7 +315,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     apr_status_t rc;
     apr_sdbm_datum_t key;
     apr_sdbm_datum_t value;
-    apr_sdbm_t *dbm;
+    apr_sdbm_t *dbm = NULL;
     const apr_array_header_t *arr;
     apr_table_entry_t *te;
     int i;
@@ -302,21 +324,22 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 
     var_name = (msc_string *)apr_table_get(col, "__name");
     if (var_name == NULL) {
-        return -1;
+        goto error;
     }
 
     var_key = (msc_string *)apr_table_get(col, "__key");
     if (var_key == NULL) {
-        return -1;
+        goto error;
     }
 
     if (msr->txcfg->data_dir == NULL) {
         msr_log(msr, 1, "Unable to store collection (name \"%s\", key \"%s\"). Use "
             "SecDataDir to define data directory first.",
             log_escape_ex(msr->mp, var_name->value, var_name->value_len), log_escape_ex(msr->mp, var_key->value, var_key->value_len));
-        return -1;
+        goto error;
     }
 
+    // ENH: lowercase the var name in the filename
     dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);
 
     /* Delete IS_NEW on store. */
@@ -377,17 +400,17 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
             get_apr_error(msr->mp, rc));
-        return -1;
+        dbm = NULL;
+        goto error;
     }
 
-        /* Only need to lock to pull in the stored data again. */
-        rc = apr_sdbm_lock(dbm, APR_FLOCK_EXCLUSIVE);
-        if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "Failed to exclusivly lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
-                get_apr_error(msr->mp, rc));
-            apr_sdbm_close(dbm);
-            return -1;
-        }
+    /* Need to lock to pull in the stored data again and apply deltas. */
+    rc = apr_sdbm_lock(dbm, APR_FLOCK_EXCLUSIVE);
+    if (rc != APR_SUCCESS) {
+        msr_log(msr, 1, "Failed to exclusivly lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
+            get_apr_error(msr->mp, rc));
+        goto error;
+    }
 
     /* If there is an original value, then create a delta and
      * apply the delta to the current value */
@@ -447,7 +470,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     /* Now generate the binary object. */
     blob = apr_pcalloc(msr->mp, blob_size);
     if (blob == NULL) {
-        return -1;
+        goto error;
     }
 
     blob[0] = 0x49;
@@ -490,8 +513,6 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     blob[blob_offset + 1] = 0;
 
     /* And, finally, store it. */
-    dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);
-
     key.dptr = var_key->value;
     key.dsize = var_key->value_len + 1;
 
@@ -502,11 +523,9 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Failed to write to DBM file \"%s\": %s", dbm_filename,
             get_apr_error(msr->mp, rc));
-        return -1;
+        goto error;
     }
 
-    /* ENH: Do we need to unlock()?  Or will just close() suffice? */
-    apr_sdbm_unlock(dbm);
     apr_sdbm_close(dbm);
 
     if (msr->txcfg->debuglog_level >= 4) {
@@ -515,6 +534,14 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     }
 
     return 0;
+
+error:
+
+    if (dbm) {
+        apr_sdbm_close(dbm);
+    }
+
+    return -1;
 }
 
 /**
@@ -523,19 +550,19 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     char *dbm_filename = NULL;
     apr_sdbm_datum_t key, value;
-    apr_sdbm_t *dbm;
+    apr_sdbm_t *dbm = NULL;
     apr_status_t rc;
     apr_array_header_t *keys_arr;
     char **keys;
-    int i;
     apr_time_t now = apr_time_sec(msr->request_time);
+    int i;
 
     if (msr->txcfg->data_dir == NULL) {
         /* The user has been warned about this problem enough times already by now.
          * msr_log(msr, 1, "Unable to access collection file (name \"%s\"). Use SecDataDir to "
          *     "define data directory first.", log_escape(msr->mp, col_name));
          */
-        return -1;
+        goto error;
     }
 
     dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);
@@ -545,7 +572,8 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
             get_apr_error(msr->mp, rc));
-        return -1;
+        dbm = NULL;
+        goto error;
     }
 
     /* First get a list of all keys. */
@@ -554,8 +582,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Failed to lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
             get_apr_error(msr->mp, rc));
-        apr_sdbm_close(dbm);
-        return -1;
+        goto error;
     }
 
     /* No one can write to the file while doing this so
@@ -584,8 +611,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
         if (rc != APR_SUCCESS) {
             msr_log(msr, 1, "Failed reading DBM file \"%s\": %s",
                 log_escape(msr->mp, dbm_filename), get_apr_error(msr->mp, rc));
-            apr_sdbm_close(dbm);
-            return -1;
+            goto error;
         }
 
         if (value.dptr != NULL) {
@@ -594,8 +620,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
 
             col = collection_unpack(msr, (const unsigned char *)value.dptr, value.dsize, 0);
             if (col == NULL) {
-                apr_sdbm_close(dbm);
-                return -1;
+                goto error;
             }
 
             var = (msc_string *)apr_table_get(col, "__expire_KEY");
@@ -618,8 +643,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
                         msr_log(msr, 1, "Failed deleting collection (name \"%s\", "
                             "key \"%s\"): %s", log_escape(msr->mp, col_name),
                             log_escape_ex(msr->mp, key.dptr, key.dsize - 1), get_apr_error(msr->mp, rc));
-                        apr_sdbm_close(dbm);
-                        return -1;
+                        goto error;
                     }
                     if (msr->txcfg->debuglog_level >= 4) {
                         msr_log(msr, 4, "Removed stale collection (name \"%s\", "
@@ -636,4 +660,12 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     apr_sdbm_close(dbm);
 
     return 1;
+
+error:
+
+    if (dbm) {
+        apr_sdbm_close(dbm);
+    }
+
+    return -1;
 }
