@@ -1,8 +1,12 @@
-04 Nov 2009 - 2.5.11
---------------------
+06 Nov 2009 - 2.5.x
+-------------------
 
  * Do not escape quotes in macro resolution and only escape NUL in setenv
    values.
+
+
+04 Nov 2009 - 2.5.11
+--------------------
 
  * Added a new multipart flag, MULTIPART_INVALID_QUOTING, which will be
    set true if any invalid quoting is found during multipart parsing.
