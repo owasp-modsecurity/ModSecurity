@@ -544,11 +544,12 @@ static void hook_child_init(apr_pool_t *mp, server_rec *s) {
 
 /**
  * Initial request processing, executed immediatelly after
- * Apache receives the request headers.
+ * Apache receives the request headers. This function wil create
+ * a transaction context.
  */
 static int hook_request_early(request_rec *r) {
     modsec_rec *msr = NULL;
-    int rc;
+    int rc = DECLINED;
 
     /* This function needs to run only once per transaction
      * (i.e. subrequests and redirects are excluded).
@@ -563,31 +564,19 @@ static int hook_request_early(request_rec *r) {
     msr = create_tx_context(r);
     if (msr == NULL) return DECLINED;
 
+    #if 0
+    /* NOTE This check is not currently needed, but it may be needed in the
+     *      future when we add another early phase.
+     */
+    
     /* Are we allowed to continue? */
     if (msr->txcfg->is_enabled == MODSEC_DISABLED) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Processing disabled, skipping (hook request_early).");
         }
         return DECLINED;
-    }
-
-    /* Process phase REQUEST_HEADERS */
-    rc = DECLINED;
-    if (modsecurity_process_phase(msr, PHASE_REQUEST_HEADERS) > 0) {
-        rc = perform_interception(msr);
-    }
-
-    if (    (msr->txcfg->is_enabled != MODSEC_DISABLED)
-         && (msr->txcfg->reqbody_access == 1)
-         && (rc == DECLINED))
-    {
-        /* Check request body limit (non-chunked requests only). */
-        if (msr->request_content_length > msr->txcfg->reqbody_limit) {
-            msr_log(msr, 1, "Request body (Content-Length) is larger than the "
-                         "configured limit (%ld).", msr->txcfg->reqbody_limit);
-            return HTTP_REQUEST_ENTITY_TOO_LARGE;
-        }
-    }
+    }    
+    #endif
 
     return rc;
 }
@@ -658,12 +647,50 @@ static int hook_request_late(request_rec *r) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Processing disabled, skipping (hook request_late).");
         }
+        
         return DECLINED;
     }
 
+    /* Phase 1 */    
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "First phase starting (dcfg %pp).", msr->dcfg2);
+    }
+    
+    /* Process phase REQUEST_HEADERS */
+    if (modsecurity_process_phase(msr, PHASE_REQUEST_HEADERS) > 0) {
+        /* There was a match; see if we need to intercept. */
+        rc = perform_interception(msr);
+        if (rc != DECLINED) {
+            /* Intercepted */
+            return rc;
+        }      
+    }
+
+    /* The rule engine could have been disabled in phase 1. */    
+    if (msr->txcfg->is_enabled == MODSEC_DISABLED) {
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Skipping phase 2 as the rule engine was disabled by a rule in phase 1.");
+        }
+        
+        return DECLINED;
+    }
+    
+    /* Phase 2 */
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Second phase starting (dcfg %pp).", msr->dcfg2);
     }
+
+    /* Check that the request body is not too long, but only
+     * if configuration allows for request body access.
+     */
+    if (msr->txcfg->reqbody_access == 1) {
+        /* Check request body limit (non-chunked requests only). */
+        if (msr->request_content_length > msr->txcfg->reqbody_limit) {
+            msr_log(msr, 1, "Request body (Content-Length) is larger than the "
+                         "configured limit (%ld).", msr->txcfg->reqbody_limit);
+            return HTTP_REQUEST_ENTITY_TOO_LARGE;
+        }
+    }    
 
     /* Figure out whether or not to extract multipart files. */
     if ((msr->txcfg->upload_keep_files != KEEP_FILES_OFF) /* user might want to keep them */
@@ -707,9 +734,12 @@ static int hook_request_late(request_rec *r) {
 
     /* Update the request headers. They might have changed after
      * the body was read (trailers).
-     */
-    /* NOTE We still need to keep a copy of the original headers
-     *      to log in the audit log.
+     *
+     * TODO We might still want to hold onto the original headers
+     *      so that we can log them. Keeping them is probably not
+     *      going to increase our memory requirements (because all
+     *      headers are allocated from the request memory pool
+     *      anyway).
      */
     msr->request_headers = apr_table_copy(msr->mp, r->headers_in);
 
