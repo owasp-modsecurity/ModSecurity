@@ -1,6 +1,9 @@
 21 Oct 2009 - trunk
 -------------------
 
+ * Do not escape quotes in macro resolution and only escape NUL in setenv
+   values.
+
  * Cleanup build files that were from the Apache source.
 
 

@@ -516,6 +516,27 @@ char *log_escape_raw(apr_pool_t *mp, const unsigned char *text, unsigned long in
     return (char *)ret;
 }
 
+char *log_escape_nul(apr_pool_t *mp, const unsigned char *text, unsigned long int text_length) {
+    unsigned char *ret = apr_palloc(mp, text_length * 4 + 1);
+    unsigned long int i, j;
+
+    for (i = 0, j = 0; i < text_length; i++) {
+        if (text[i] == '\0') {
+            ret[j] = '\\';
+            ret[j+1] = 'x';
+            c2x(text[i], ret+j+2);
+            j += 4;
+        }
+        else {
+            ret[j] = text[i];
+            j++;
+        }
+    }
+    ret[j] = '\0';
+
+    return (char *)ret;
+}
+
 /**
  * Transform text to ASCII printable or hex escaped
  */
