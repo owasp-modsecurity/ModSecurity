@@ -271,7 +271,7 @@ VERSION_OK
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs LIBDIR: $APXS_LIBDIR); fi
   # Make sure the lib dir is used
   if test -n "$APXS_LIBDIR"; then
-    APXS_LIBS="-L{$APXS_LIBDIR} `$APXS -q LIBS` `$APXS -q EXTRA_LIBS`"
+    APXS_LIBS="-L${APXS_LIBDIR} `$APXS -q LIBS` `$APXS -q EXTRA_LIBS`"
   else
     APXS_LIBS="`$APXS -q LIBS` `$APXS -q EXTRA_LIBS`"
   fi
