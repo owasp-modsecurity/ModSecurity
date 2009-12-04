@@ -253,11 +253,13 @@ int expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t 
                         }
                     }
                 } else {
-                    msr_log(msr, 4, "Failed to resolve macro %%{%s%s%s}: %s",
-                        var_name,
-                        (var_value ? "." : ""),
-                        (var_value ? var_value : ""),
-                        my_error_msg);
+                    if (msr->txcfg->debuglog_level >= 4) {
+                        msr_log(msr, 4, "Failed to resolve macro %%{%s%s%s}: %s",
+                            var_name,
+                            (var_value ? "." : ""),
+                            (var_value ? var_value : ""),
+                            my_error_msg);
+                    }
                 }
             } else {
                 /* We could not identify a valid macro so add it as text. */
@@ -339,8 +341,10 @@ apr_status_t collection_original_setvar(modsec_rec *msr, const char *col_name, c
         var = (msc_string *)apr_table_get(table, var_name);
         if (var != NULL) {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Original collection variable: %s.%s = \"%s\"", col_name, var_name, log_escape_ex(msr->mp, orig_var->value, orig_var->value_len));
+                msr_log(msr, 9, "Original collection variable: %s.%s = \"%s\"", col_name, var_name,
+                    log_escape_ex(msr->mp, orig_var->value, orig_var->value_len));
             }
+            
             return 1;
         }
     }
@@ -359,7 +363,8 @@ apr_status_t collection_original_setvar(modsec_rec *msr, const char *col_name, c
     apr_table_setn(table, apr_pstrmemdup(msr->mp, var->name, var->name_len), (void *)var);
 
     if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "Recorded original collection variable: %s.%s = \"%s\"", col_name, var_name, log_escape_ex(msr->mp, var->value, var->value_len));
+        msr_log(msr, 9, "Recorded original collection variable: %s.%s = \"%s\"", col_name, var_name,
+            log_escape_ex(msr->mp, var->value, var->value_len));
     }
 
     return 0;
@@ -820,11 +825,20 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
             msr->txcfg->is_enabled = MODSEC_DETECTION_ONLY;
             msr->usercfg->is_enabled = MODSEC_DETECTION_ONLY;
         }
+        
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Set ruleEngine to %s.", value);
+        }
 
         return 1;
     } else
     if (strcasecmp(name, "ruleRemoveById") == 0) {
         *(const char **)apr_array_push(msr->removed_rules) = (const char *)apr_pstrdup(msr->mp, value);
+        
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Removed rule %s.", value);
+        }
+        
         return 1;
     } else
     if (strcasecmp(name, "requestBodyAccess") == 0) {
@@ -833,7 +847,10 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (pv == -1) return -1;
         msr->txcfg->reqbody_access = pv;
         msr->usercfg->reqbody_access = pv;
-        msr_log(msr, 4, "Ctl: Set requestBodyAccess to %d.", pv);
+        
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Set requestBodyAccess to %d.", pv);
+        }
 
         return 1;
     } else
@@ -848,13 +865,18 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
             msr->usercfg->reqbody_buffering = REQUEST_BODY_FORCEBUF_OFF;
         }
 
-        msr_log(msr, 4, "Ctl: Set requestBodyAccess to %d.", msr->txcfg->reqbody_buffering);
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Set requestBodyAccess to %d.", msr->txcfg->reqbody_buffering);
+        }
 
         return 1;
     } else
     if (strcasecmp(name, "requestBodyProcessor") == 0) {
         msr->msc_reqbody_processor = value;
-        msr_log(msr, 4, "Ctl: Set requestBodyProcessor to %s.", value);
+        
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Set requestBodyProcessor to %s.", value);
+        }
 
         return 1;
     } else
@@ -864,7 +886,10 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (pv == -1) return -1;
         msr->txcfg->resbody_access = pv;
         msr->usercfg->resbody_access = pv;
-        msr_log(msr, 4, "Ctl: Set responseBodyAccess to %d.", pv);
+        
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Set responseBodyAccess to %d.", pv);
+        }
 
         return 1;
     } else
@@ -884,7 +909,9 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
             msr->usercfg->auditlog_flag = AUDITLOG_RELEVANT;
         }
 
-        msr_log(msr, 4, "Ctl: Set auditEngine to %d.", msr->txcfg->auditlog_flag);
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Set auditEngine to %d.", msr->txcfg->auditlog_flag);
+        }
 
         return 1;
     } else
@@ -920,14 +947,20 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         /* Set the new value. */
         msr->txcfg->auditlog_parts = new_value;
         msr->usercfg->auditlog_parts = new_value;
-        msr_log(msr, 4, "Ctl: Set auditLogParts to %s.", msr->txcfg->auditlog_parts);
+        
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Set auditLogParts to %s.", msr->txcfg->auditlog_parts);
+        }
 
         return 1;
     } else
     if (strcasecmp(name, "debugLogLevel") == 0) {
         msr->txcfg->debuglog_level = atoi(value);
         msr->usercfg->debuglog_level = atoi(value);
-        msr_log(msr, 4, "Ctl: Set debugLogLevel to %d.", msr->txcfg->debuglog_level);
+        
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Set debugLogLevel to %d.", msr->txcfg->debuglog_level);
+        }
 
         return 1;
     } else
@@ -937,6 +970,10 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         /* ENH Accept only in correct phase warn otherwise. */
         msr->txcfg->reqbody_limit = limit;
         msr->usercfg->reqbody_limit = limit;
+        
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Set requestBodyLimit to %ld.", limit);
+        }
 
         return 1;
     } else
@@ -946,6 +983,10 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         /* ENH Accept only in correct phase warn otherwise. */
         msr->txcfg->of_limit = limit;
         msr->usercfg->of_limit = limit;
+        
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Set responseBodyLimit to %ld.", limit);
+        }
 
         return 1;
     }
@@ -1045,8 +1086,11 @@ static apr_status_t msre_action_sanitizeMatched_execute(modsec_rec *msr, apr_poo
         type = SANITISE_RESPONSE_HEADER;
     }
     else {
-        msr_log(msr, 3, "sanitizeMatched: Don't know how to handle variable: %s",
-            mvar->name);
+        if (msr->txcfg->debuglog_level >= 3) {
+            msr_log(msr, 3, "sanitizeMatched: Don't know how to handle variable: %s",
+                mvar->name);
+        }
+        
         return 0;
     }
 
@@ -1221,10 +1265,14 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
     target_col = msr->tx_vars;
     s = strstr(var_name, ".");
     if (s == NULL) {
-        msr_log(msr, 3, "Asked to set variable \"%s\", but no collection name specified. ",
-            log_escape(msr->mp, var_name));
-         return 0;
+        if (msr->txcfg->debuglog_level >= 3) {
+            msr_log(msr, 3, "Asked to set variable \"%s\", but no collection name specified. ",
+                log_escape(msr->mp, var_name));
+        }
+        
+        return 0;
     }
+    
     col_name = var_name;
     var_name = s + 1;
     *s = '\0';
@@ -1235,8 +1283,11 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
     } else {
         target_col = (apr_table_t *)apr_table_get(msr->collections, col_name);
         if (target_col == NULL) {
-            msr_log(msr, 3, "Could not set variable \"%s.%s\" as the collection does not exist.",
-                log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
+            if (msr->txcfg->debuglog_level >= 3) {
+                msr_log(msr, 3, "Could not set variable \"%s.%s\" as the collection does not exist.",
+                    log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
+            }
+            
             return 0;
         }
     }
@@ -1385,13 +1436,19 @@ static apr_status_t msre_action_expirevar_execute(modsec_rec *msr, apr_pool_t *m
 
         target_col = (apr_table_t *)apr_table_get(msr->collections, col_name);
         if (target_col == NULL) {
-            msr_log(msr, 3, "Could not expire variable \"%s.%s\" as the collection does not exist.",
-                log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
+            if (msr->txcfg->debuglog_level >= 3) {
+                msr_log(msr, 3, "Could not expire variable \"%s.%s\" as the collection does not exist.",
+                    log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
+            }
+            
             return 0;
         }
     } else {
-        msr_log(msr, 3, "Asked to expire variable \"%s\", but no collection name specified. ",
-            log_escape(msr->mp, var_name));
+        if (msr->txcfg->debuglog_level >= 3) {
+            msr_log(msr, 3, "Asked to expire variable \"%s\", but no collection name specified. ",
+                log_escape(msr->mp, var_name));
+        }
+        
         return 0;
     }
 
@@ -1416,8 +1473,10 @@ static apr_status_t msre_action_expirevar_execute(modsec_rec *msr, apr_pool_t *m
 
     apr_table_setn(target_col, var->name, (void *)var);
 
-    msr_log(msr, 4, "Variable \"%s.%s\" set to expire in %s seconds.", col_name,
-        var_name, var_value);
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "Variable \"%s.%s\" set to expire in %s seconds.", col_name,
+           var_name, var_value);
+    }
 
     apr_table_set(msr->collections_dirty, col_name, "1");
 
@@ -1480,13 +1539,19 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
 
         target_col = (apr_table_t *)apr_table_get(msr->collections, col_name);
         if (target_col == NULL) {
-            msr_log(msr, 3, "Could not deprecate variable \"%s.%s\" as the collection does "
-                "not exist.", log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
+            if (msr->txcfg->debuglog_level >= 3) {
+                msr_log(msr, 3, "Could not deprecate variable \"%s.%s\" as the collection does "
+                    "not exist.", log_escape(msr->mp, col_name), log_escape(msr->mp, var_name));
+            }
+            
             return 0;
         }
     } else {
-        msr_log(msr, 3, "Asked to deprecate variable \"%s\", but no collection name specified. ",
-            log_escape(msr->mp, var_name));
+        if (msr->txcfg->debuglog_level >= 3) {
+            msr_log(msr, 3, "Asked to deprecate variable \"%s\", but no collection name specified. ",
+                log_escape(msr->mp, var_name));
+        }
+        
         return 0;
     }
 
@@ -1534,9 +1599,11 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
         var->value = apr_psprintf(msr->mp, "%ld", new_value);
         var->value_len = strlen(var->value);
 
-        msr_log(msr, 4, "Deprecated variable \"%s.%s\" from %ld to %ld (%" APR_TIME_T_FMT " seconds since "
-            "last update).", log_escape(msr->mp, col_name), log_escape(msr->mp, var_name),
-            current_value, new_value, (apr_time_t)(current_time - last_update_time));
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Deprecated variable \"%s.%s\" from %ld to %ld (%" APR_TIME_T_FMT " seconds since "
+                "last update).", log_escape(msr->mp, col_name), log_escape(msr->mp, var_name),
+                current_value, new_value, (apr_time_t)(current_time - last_update_time));
+        }
 
         apr_table_set(msr->collections_dirty, col_name, "1");
     } else {
@@ -1570,8 +1637,11 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
 
     if (table == NULL) {
         /* Does not exist yet - create new. */
-        msr_log(msr, 4, "Creating collection (name \"%s\", key \"%s\").",
-            real_col_name, col_key);
+        
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Creating collection (name \"%s\", key \"%s\").",
+               real_col_name, col_key);
+        }
 
         table = apr_table_make(msr->mp, 24);
         if (table == NULL) return -1;
@@ -1660,12 +1730,14 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
     /* Add the collection to the list. */
     apr_table_setn(msr->collections, apr_pstrdup(msr->mp, col_name), (void *)table);
 
-    if (strcmp(col_name, real_col_name) != 0) {
-        msr_log(msr, 4, "Added collection \"%s\" to the list as \"%s\".",
-            log_escape(msr->mp, real_col_name), log_escape(msr->mp, col_name));
-    } else {
-        msr_log(msr, 4, "Added collection \"%s\" to the list.",
-            log_escape(msr->mp, real_col_name));
+    if (msr->txcfg->debuglog_level >= 4) {
+        if (strcmp(col_name, real_col_name) != 0) {
+            msr_log(msr, 4, "Added collection \"%s\" to the list as \"%s\".",
+                log_escape(msr->mp, real_col_name), log_escape(msr->mp, col_name));
+        } else {
+            msr_log(msr, 4, "Added collection \"%s\" to the list.",
+                log_escape(msr->mp, real_col_name));
+        }
     }
 
     return 1;
