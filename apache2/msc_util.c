@@ -1148,7 +1148,7 @@ int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len) {
  *
  * IMP1 Assumes NUL-terminated
  */
-int normalise_path_inplace(unsigned char *input, int input_len, int win, int *changed) {
+int normalize_path_inplace(unsigned char *input, int input_len, int win, int *changed) {
     unsigned char *d = input;
     int i, count;
 

@@ -451,27 +451,27 @@ static int msre_fn_escapeSeqDecode_execute(apr_pool_t *mptmp, unsigned char *inp
     return (*rval_len == input_len ? 0 : 1);
 }
 
-/* normalisePath */
+/* normalizePath */
 
-static int msre_fn_normalisePath_execute(apr_pool_t *mptmp, unsigned char *input,
+static int msre_fn_normalizePath_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
     int changed;
 
-    *rval_len = normalise_path_inplace(input, input_len, 0, &changed);
+    *rval_len = normalize_path_inplace(input, input_len, 0, &changed);
     *rval = (char *)input;
 
     return changed;
 }
 
-/* normalisePathWin */
+/* normalizePathWin */
 
-static int msre_fn_normalisePathWin_execute(apr_pool_t *mptmp, unsigned char *input,
+static int msre_fn_normalizePathWin_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
     int changed;
 
-    *rval_len = normalise_path_inplace(input, input_len, 1, &changed);
+    *rval_len = normalize_path_inplace(input, input_len, 1, &changed);
     *rval = (char *)input;
 
     return changed;
@@ -683,13 +683,25 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     /* normalisePath */
     msre_engine_tfn_register(engine,
         "normalisePath",
-        msre_fn_normalisePath_execute
+        msre_fn_normalizePath_execute
+    );
+    
+    /* normalizePath */
+    msre_engine_tfn_register(engine,
+        "normalizePath",
+        msre_fn_normalizePath_execute
     );
 
     /* normalisePathWin */
     msre_engine_tfn_register(engine,
         "normalisePathWin",
-        msre_fn_normalisePathWin_execute
+        msre_fn_normalizePathWin_execute
+    );
+    
+    /* normalizePathWin */
+    msre_engine_tfn_register(engine,
+        "normalizePathWin",
+        msre_fn_normalizePathWin_execute
     );
 
     /* parityEven7bit */

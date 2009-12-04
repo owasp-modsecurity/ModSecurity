@@ -24,7 +24,7 @@
 
 #include "modsecurity.h"
 
-int DSOLOCAL normalise_path_inplace(unsigned char *input, int len, int win, int *changed);
+int DSOLOCAL normalize_path_inplace(unsigned char *input, int len, int win, int *changed);
 
 int DSOLOCAL parse_boolean(const char *input);
 
