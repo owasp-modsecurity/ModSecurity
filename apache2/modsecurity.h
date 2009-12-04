@@ -446,14 +446,6 @@ struct directory_config {
     /* Content injection. */
     int                  content_injection_enabled;
 
-    /* PDF XSS Protection. */
-    int                  pdfp_enabled;
-    const char          *pdfp_secret;
-    int                  pdfp_timeout;
-    const char          *pdfp_token_name;
-    int                  pdfp_only_get;
-    int                  pdfp_method;
-
     /* Geo Lookup */
     geo_db              *geo;
 

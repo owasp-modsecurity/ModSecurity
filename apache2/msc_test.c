@@ -21,7 +21,6 @@
 
 #include "modsecurity.h"
 #include "re.h"
-#include "pdf_protect.h"
 
 #define ISHEX(X) (((X >= '0')&&(X <= '9')) || ((X >= 'a')&&(X <= 'f')) || ((X >= 'A')&&(X <= 'F')))
 
@@ -488,12 +487,6 @@ static void init_msr(void)
     dcfg->data_dir = ".";
     dcfg->webappid = "default";
     dcfg->content_injection_enabled = 0;
-    dcfg->pdfp_enabled = 0;
-    dcfg->pdfp_secret = NULL;
-    dcfg->pdfp_timeout = 10;
-    dcfg->pdfp_token_name = "PDFPTOKEN";
-    dcfg->pdfp_only_get = 1;
-    dcfg->pdfp_method = PDF_PROTECT_METHOD_TOKEN_REDIRECTION;
     dcfg->geo = NULL;
     dcfg->cache_trans = MODSEC_CACHE_ENABLED;
     dcfg->cache_trans_min = 15;

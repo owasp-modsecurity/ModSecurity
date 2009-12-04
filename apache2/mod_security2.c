@@ -24,7 +24,6 @@
 #include "modsecurity.h"
 #include "apache2.h"
 #include "http_main.h"
-#include "pdf_protect.h"
 
 #include "msc_logging.h"
 #include "msc_util.h"
@@ -634,15 +633,6 @@ static int hook_request_late(request_rec *r) {
 
     init_directory_config(msr->txcfg);
 
-    /* Perform the PDF tests now. */
-    rc = pdfp_check(msr);
-    if (rc > 0) {
-        /* The PDF protection module has decided it needs to
-         * redirect the current transaction. So we let it do that.
-         */
-        return rc;
-    }
-
     if (msr->txcfg->is_enabled == 0) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Processing disabled, skipping (hook request_late).");
@@ -1171,9 +1161,6 @@ static void register_hooks(apr_pool_t *mp) {
      */
     ap_register_output_filter("MODSECURITY_OUT", output_filter,
         NULL, AP_FTYPE_CONTENT_SET - 3);
-
-    ap_register_output_filter("PDFP_OUT", pdfp_output_filter,
-        NULL, AP_FTYPE_CONTENT_SET);
 }
 
 /* Defined in apache2_config.c */

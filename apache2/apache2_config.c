@@ -21,7 +21,6 @@
 #include "modsecurity.h"
 #include "msc_logging.h"
 #include "msc_util.h"
-#include "pdf_protect.h"
 #include "http_log.h"
 
 #if defined(WITH_LUA)
@@ -100,14 +99,6 @@ void *create_directory_config(apr_pool_t *mp, char *path) {
 
     /* Content injection. */
     dcfg->content_injection_enabled = NOT_SET;
-
-    /* PDF XSS protection. */
-    dcfg->pdfp_enabled = NOT_SET;
-    dcfg->pdfp_secret = NOT_SET_P;
-    dcfg->pdfp_timeout = NOT_SET;
-    dcfg->pdfp_token_name = NOT_SET_P;
-    dcfg->pdfp_only_get = NOT_SET;
-    dcfg->pdfp_method = NOT_SET;
 
     /* Geo Lookups */
     dcfg->geo = NOT_SET_P;
@@ -438,20 +429,6 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child) {
     merged->content_injection_enabled = (child->content_injection_enabled == NOT_SET
         ? parent->content_injection_enabled : child->content_injection_enabled);
 
-    /* PDF XSS protection. */
-    merged->pdfp_enabled = (child->pdfp_enabled == NOT_SET
-        ? parent->pdfp_enabled : child->pdfp_enabled);
-    merged->pdfp_secret = (child->pdfp_secret == NOT_SET_P
-        ? parent->pdfp_secret : child->pdfp_secret);
-    merged->pdfp_timeout = (child->pdfp_timeout == NOT_SET
-        ? parent->pdfp_timeout : child->pdfp_timeout);
-    merged->pdfp_token_name = (child->pdfp_token_name == NOT_SET_P
-        ? parent->pdfp_token_name : child->pdfp_token_name);
-    merged->pdfp_only_get = (child->pdfp_only_get == NOT_SET
-        ? parent->pdfp_only_get : child->pdfp_only_get);
-    merged->pdfp_method = (child->pdfp_method == NOT_SET
-        ? parent->pdfp_method : child->pdfp_method);
-
     /* Geo Lookup */
     merged->geo = (child->geo == NOT_SET_P
         ? parent->geo : child->geo);
@@ -542,14 +519,6 @@ void init_directory_config(directory_config *dcfg) {
 
     /* Content injection. */
     if (dcfg->content_injection_enabled == NOT_SET) dcfg->content_injection_enabled = 0;
-
-    /* PDF XSS protection. */
-    if (dcfg->pdfp_enabled == NOT_SET) dcfg->pdfp_enabled = 0;
-    if (dcfg->pdfp_secret == NOT_SET_P) dcfg->pdfp_secret = NULL;
-    if (dcfg->pdfp_timeout == NOT_SET) dcfg->pdfp_timeout = 10;
-    if (dcfg->pdfp_token_name == NOT_SET_P) dcfg->pdfp_token_name = "PDFPTOKEN";
-    if (dcfg->pdfp_only_get == NOT_SET) dcfg->pdfp_only_get = 1;
-    if (dcfg->pdfp_method == NOT_SET) dcfg->pdfp_method = PDF_PROTECT_METHOD_TOKEN_REDIRECTION;
 
     /* Geo Lookup */
     if (dcfg->geo == NOT_SET_P) dcfg->geo = NULL;
@@ -1629,80 +1598,6 @@ static const char *cmd_web_app_id(cmd_parms *cmd, void *_dcfg, const char *p1) {
     return NULL;
 }
 
-/* -- PDF Protection configuration -- */
-
-static const char *cmd_pdf_protect(cmd_parms *cmd, void *_dcfg, int flag) {
-    directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
-    dcfg->pdfp_enabled = flag;
-
-    return NULL;
-}
-
-static const char *cmd_pdf_protect_secret(cmd_parms *cmd, void *_dcfg,
-    const char *p1)
-{
-    directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
-    dcfg->pdfp_secret = p1;
-
-    return NULL;
-}
-
-static const char *cmd_pdf_protect_timeout(cmd_parms *cmd, void *_dcfg,
-    const char *p1)
-{
-    directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
-    dcfg->pdfp_timeout = atoi(p1);
-
-    return NULL;
-}
-
-static const char *cmd_pdf_protect_token_name(cmd_parms *cmd, void *_dcfg,
-    const char *p1)
-{
-    directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
-    dcfg->pdfp_token_name = p1;
-
-    return NULL;
-}
-
-static const char *cmd_pdf_protect_intercept_get_only(cmd_parms *cmd, void *_dcfg,
-    int flag)
-{
-    directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
-    dcfg->pdfp_only_get = flag;
-
-    return NULL;
-}
-
-static const char *cmd_pdf_protect_method(cmd_parms *cmd, void *_dcfg,
-    const char *p1)
-{
-    directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
-    if (strcasecmp(p1, "TokenRedirection") == 0) {
-        dcfg->pdfp_method = PDF_PROTECT_METHOD_TOKEN_REDIRECTION;
-    } else
-    if (strcasecmp(p1, "ForcedDownload") == 0) {
-        dcfg->pdfp_method = PDF_PROTECT_METHOD_FORCED_DOWNLOAD;
-    } else {
-        return (const char *)apr_psprintf(cmd->pool,
-            "ModSecurity: Unrecognised parameter value for SecPdfProtectMethod: %s", p1);
-    }
-
-    return NULL;
-}
-
 /* -- Geo Lookup configuration -- */
 
 static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
@@ -2014,54 +1909,6 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "marker for a skipAfter target"
-    ),
-
-    AP_INIT_FLAG (
-        "SecPdfProtect",
-        cmd_pdf_protect,
-        NULL,
-        RSRC_CONF,
-        "enable PDF protection module."
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecPdfProtectSecret",
-        cmd_pdf_protect_secret,
-        NULL,
-        RSRC_CONF,
-        "secret that will be used to construct protection tokens."
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecPdfProtectTimeout",
-        cmd_pdf_protect_timeout,
-        NULL,
-        RSRC_CONF,
-        "duration for which protection tokens will be valid."
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecPdfProtectTokenName",
-        cmd_pdf_protect_token_name,
-        NULL,
-        RSRC_CONF,
-        "name of the protection token. The name 'PDFTOKEN' is used by default."
-    ),
-
-    AP_INIT_FLAG (
-        "SecPdfProtectInterceptGETOnly",
-        cmd_pdf_protect_intercept_get_only,
-        NULL,
-        RSRC_CONF,
-        "whether or not to intercept only GET and HEAD requess. Defaults to true."
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecPdfProtectMethod",
-        cmd_pdf_protect_method,
-        NULL,
-        RSRC_CONF,
-        "protection method to use. Can be 'TokenRedirection' (default) or 'ForcedDownload'"
     ),
 
     AP_INIT_TAKE1 (
