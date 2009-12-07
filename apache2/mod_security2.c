@@ -548,7 +548,6 @@ static void hook_child_init(apr_pool_t *mp, server_rec *s) {
  */
 static int hook_request_early(request_rec *r) {
     modsec_rec *msr = NULL;
-    int rc = DECLINED;
 
     /* This function needs to run only once per transaction
      * (i.e. subrequests and redirects are excluded).
@@ -573,11 +572,12 @@ static int hook_request_early(request_rec *r) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Processing disabled, skipping (hook request_early).");
         }
+        
         return DECLINED;
     }    
     #endif
 
-    return rc;
+    return DECLINED;
 }
 
 /**
@@ -612,8 +612,8 @@ static int hook_request_late(request_rec *r) {
         msr_log(msr, 1, "Internal Error: Attempted to process the request body more than once.");
         return DECLINED;
     }
+    
     msr->phase_request_body_complete = 1;
-
     msr->remote_user = r->user;
 
     /* Get the second configuration context. */
@@ -682,7 +682,7 @@ static int hook_request_late(request_rec *r) {
         }
     }    
 
-    /* Figure out whether or not to extract multipart files. */
+    /* Figure out whether to extract multipart files. */
     if ((msr->txcfg->upload_keep_files != KEEP_FILES_OFF) /* user might want to keep them */
         || (msr->txcfg->upload_validates_files)) /* user might want to validate them */
     {
