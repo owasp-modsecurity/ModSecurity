@@ -152,27 +152,35 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     if (capture && rc > 0) {
         int i;
 
+        /* Unset any of the previously set capture variables. */        
+        apr_table_unset(msr->tx_vars, "0");
+        apr_table_unset(msr->tx_vars, "1");
+        apr_table_unset(msr->tx_vars, "2");
+        apr_table_unset(msr->tx_vars, "3");
+        apr_table_unset(msr->tx_vars, "4");
+        apr_table_unset(msr->tx_vars, "5");
+        apr_table_unset(msr->tx_vars, "6");
+        apr_table_unset(msr->tx_vars, "7");
+        apr_table_unset(msr->tx_vars, "8");
+        apr_table_unset(msr->tx_vars, "9");
+
         /* Use the available captures. */
         for(i = 0; i < rc; i++) {
             msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
             if (s == NULL) return -1;
+            
             s->name = apr_psprintf(msr->mp, "%d", i);
             s->value = apr_pstrmemdup(msr->mp,
-                target + ovector[2*i], ovector[2*i + 1] - ovector[2*i]);
-            s->value_len = (ovector[2*i + 1] - ovector[2*i]);
+                target + ovector[2 * i], ovector[2 * i + 1] - ovector[2 * i]);
+            s->value_len = (ovector[2 * i + 1] - ovector[2 * i]);
             if ((s->name == NULL)||(s->value == NULL)) return -1;
-            apr_table_setn(msr->tx_vars, s->name, (void *)s);
+            
+            apr_table_addn(msr->tx_vars, s->name, (void *)s);
+            
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
                     log_escape_nq_ex(msr->mp, s->value, s->value_len));
             }
-        }
-
-        /* Unset the remaining ones (from previous invocations). */
-        for(i = rc; i <= 9; i++) {
-            char buf[24];
-            apr_snprintf(buf, sizeof(buf), "%d", i);
-            apr_table_unset(msr->tx_vars, buf);
         }
     }
 
