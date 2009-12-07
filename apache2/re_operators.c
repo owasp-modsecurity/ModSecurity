@@ -132,8 +132,10 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     if (msr->txcfg->debuglog_level >= 6) {
         int capcount = 0;
         rc = msc_fullinfo(regex, PCRE_INFO_CAPTURECOUNT, &capcount);
-        if ((capture == 0) && (capcount > 0)) {
-            msr_log(msr, 6, "Ignoring regex captures since \"capture\" action is not enabled.");
+        if (msr->txcfg->debuglog_level >= 6) {        
+            if ((capture == 0) && (capcount > 0)) {
+                msr_log(msr, 6, "Ignoring regex captures since \"capture\" action is not enabled.");
+            }
         }
     }
 
@@ -918,7 +920,9 @@ static int msre_op_validateDTD_execute(modsec_rec *msr, msre_rule *rule, msre_va
         return 1; /* No match. */
     }
 
-    msr_log(msr, 4, "XML: Successfully validated payload against DTD: %s", rule->op_param);
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "XML: Successfully validated payload against DTD: %s", rule->op_param);
+    }
 
     xmlFreeValidCtxt(cvp);
     xmlFreeDtd(dtd);
@@ -998,7 +1002,9 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
         return 1; /* No match. */
     }
 
-    msr_log(msr, 4, "XML: Successfully validated payload against Schema: %s", rule->op_param);
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "XML: Successfully validated payload against Schema: %s", rule->op_param);
+    }
 
     xmlSchemaFree(schema);
     xmlSchemaFreeValidCtxt(validCtx);
@@ -1349,7 +1355,9 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
         return 1; /* Match. */
     }
 
-    msr_log(msr, 5, "RBL lookup of %s failed at %s.", log_escape_nq(msr->mp, name_to_check), var->name);
+    if (msr->txcfg->debuglog_level >= 5) {
+        msr_log(msr, 5, "RBL lookup of %s failed at %s.", log_escape_nq(msr->mp, name_to_check), var->name);
+    }
 
     /* No match. */
     return 0;
@@ -1409,7 +1417,9 @@ static int msre_op_inspectFile_execute(modsec_rec *msr, msre_rule *rule, msre_va
         const char *approver_script = rule->op_param;
         const char *target_file = apr_pstrmemdup(msr->mp, var->value, var->value_len);
 
-        msr_log(msr, 4, "Executing %s to inspect %s.", approver_script, target_file);
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Executing %s to inspect %s.", approver_script, target_file);
+        }
 
         argv[0] = approver_script;
         argv[1] = target_file;
