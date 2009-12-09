@@ -967,13 +967,6 @@ static void hook_insert_filter(request_rec *r) {
         return;
     }
 
-    /* We always add the PDF XSS protection filter. */
-    if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Hook insert_filter: Adding PDF XSS protection output filter (r %pp).", r);
-    }
-
-    ap_add_output_filter("PDFP_OUT", msr, r, r->connection);
-
     /* Only proceed to add the second filter if the engine is enabled. */
     if (msr->txcfg->is_enabled == 0) {
         if (msr->txcfg->debuglog_level >= 4) {
