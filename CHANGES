@@ -1,5 +1,24 @@
-21 Oct 2009 - trunk
+
+12 Dec 2009 - trunk
 -------------------
+
+ * Added the URLENCODED_ERROR flag, which is raised whenever invalid URL
+   encoding is encountered in the query string or in the request body
+   (but only if URLENCODED request body processor is used). [Ivan Ristic]
+
+ * Removed the obsolete PDF UXSS functionality. [Ivan Ristic]
+
+ * Renamed normalisePath to normalizePath and normalisePathWin to
+   normalizePathWin. Kept the previous names for backward compatibility.
+   [Ivan Ristic]
+
+ * Moved phase 1 to be run in the same Apache hook as phase 2. This means
+   that you can now have phase 1 rules in <Location> tags and, more
+   importantly, override server configuration in <Location> and others.
+   [Ivan Ristic]
+
+ * Renamed the sanitise family of actiont to sanitize. Kept the old variants
+   for backward compatibility. [Ivan Ristic]
 
  * Do not escape quotes in macro resolution and only escape NUL in setenv
    values.
@@ -28,7 +47,7 @@
 
  * Moved output filter to run before other stock filters (mod_deflate,
    mod_cache, mod_expires, mod_filter) to avoid analyzing modified data
-   in the response.  Patch originally submitted by Ivan Ristic.
+   in the response. Patch originally submitted by Ivan Ristic.
 
 
 18 Sep 2009 - 2.5.10
