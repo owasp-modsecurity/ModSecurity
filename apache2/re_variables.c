@@ -1414,6 +1414,18 @@ static int var_multipart_unmatched_boundary_generate(modsec_rec *msr, msre_var *
     }
 }
 
+/* URLENCODED_ERROR */
+
+static int var_urlencoded_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if (msr->urlencoded_error) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
 /* TIME */
 
 static int var_time_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -2971,6 +2983,17 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         var_status_line_generate,
         VAR_CACHE,
         PHASE_RESPONSE_HEADERS
+    );
+    
+    /* URLENCODED_ERROR */
+    msre_engine_variable_register(engine,
+        "URLENCODED_ERROR",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_urlencoded_error_generate,
+        VAR_DONT_CACHE, /* flag */
+        PHASE_REQUEST_HEADERS
     );
 
     /* USER */

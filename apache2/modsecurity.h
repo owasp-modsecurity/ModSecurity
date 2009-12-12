@@ -257,6 +257,8 @@ struct modsec_rec {
     apr_table_t         *request_headers_to_sanitize;
     apr_table_t         *response_headers_to_sanitize;
     apr_table_t         *request_cookies;
+    
+    unsigned int	urlencoded_error;
 
     unsigned int         is_relevant;
 

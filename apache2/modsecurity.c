@@ -295,6 +295,10 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
             msr_log(msr, 1, "Initialisation: Error occurred while parsing QUERY_STRING arguments.");
             return -1;
         }
+        
+        if (invalid_count) {
+            msr->urlencoded_error = 1;
+        }
     }
 
     msr->arguments_to_sanitize = apr_table_make(msr->mp, 16);

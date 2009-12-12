@@ -423,6 +423,10 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, cha
         *error_msg = apr_pstrdup(msr->mp, "Initialisation: Error occurred while parsing BODY arguments.");
         return -1;
     }
+    
+    if (invalid_count) {
+        msr->urlencoded_error = 1;
+    }
 
     return 1;
 }
