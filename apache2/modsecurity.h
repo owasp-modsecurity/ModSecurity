@@ -93,10 +93,10 @@ typedef struct msc_string msc_string;
 #define REQUEST_BODY_FORCEBUF_OFF               0
 #define REQUEST_BODY_FORCEBUF_ON                1
 
-#define SECACTION_TARGETS                       "REQUEST_URI"
+#define SECACTION_TARGETS                       "REMOTE_ADDR"
 #define SECACTION_ARGS                          "@unconditionalMatch"
 
-#define SECMARKER_TARGETS                       "REQUEST_URI"
+#define SECMARKER_TARGETS                       "REMOTE_ADDR"
 #define SECMARKER_ARGS                          "@noMatch"
 #define SECMARKER_BASE_ACTIONS                  "t:none,pass,id:"
 
