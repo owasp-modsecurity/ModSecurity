@@ -1,6 +1,9 @@
 06 Nov 2009 - 2.5.x
 -------------------
 
+ * Fixed SecAction not working when CONNECT request method is used
+   (MODSEC-110). [Ivan Ristic]
+
  * Do not escape quotes in macro resolution and only escape NUL in setenv
    values.
 
