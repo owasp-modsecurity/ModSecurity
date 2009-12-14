@@ -2,23 +2,29 @@
 12 Dec 2009 - trunk
 -------------------
 
+ * Fixed SecAction not working when CONNECT request method is used
+   (MODSEC-110). [Ivan Ristic]
+
  * Added the URLENCODED_ERROR flag, which is raised whenever invalid URL
    encoding is encountered in the query string or in the request body
-   (but only if URLENCODED request body processor is used). [Ivan Ristic]
+   (but only if URLENCODED request body processor is used). (MODSEC-111)
+   [Ivan Ristic]
 
- * Removed the obsolete PDF UXSS functionality. [Ivan Ristic]
+ * Removed the obsolete PDF UXSS functionality. (MODSEC-96) [Ivan Ristic]
 
  * Renamed normalisePath to normalizePath and normalisePathWin to
    normalizePathWin. Kept the previous names for backward compatibility.
-   [Ivan Ristic]
+   (MODSEC-103) [Ivan Ristic]
 
  * Moved phase 1 to be run in the same Apache hook as phase 2. This means
    that you can now have phase 1 rules in <Location> tags and, more
    importantly, override server configuration in <Location> and others.
-   [Ivan Ristic]
+   (MODSEC-98) [Ivan Ristic]
 
  * Renamed the sanitise family of actiont to sanitize. Kept the old variants
-   for backward compatibility. [Ivan Ristic]
+   for backward compatibility. (MODSEC-95) [Ivan Ristic]
+
+ * Improve the logging of the ctl action. (MODSEC-99) [Ivan Ristic]
 
  * Do not escape quotes in macro resolution and only escape NUL in setenv
    values.
