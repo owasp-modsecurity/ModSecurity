@@ -3253,8 +3253,12 @@ setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasi
               url="http://projects.otaku42.de/wiki/ScallyWhack">ScallyWhack</ulink>.</para>
         </listitem>
         <listitem>
-          <para>430,000-899,999; unused (available for reservation).</para>
+          <para>430,000-699,999; unused (available for reservation).</para>
         </listitem>
+        <listitem>
+            <para>700,000-799,999; reserved for Ivan Ristic.</para>
+        </listitem>
+
         <listitem>
           <para>900,000-999,999; reserved for the <ulink
               url="http://www.modsecurity.org/projects/rules/">Core Rules</ulink> project.</para>

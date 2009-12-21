@@ -2,6 +2,8 @@
 12 Dec 2009 - trunk
 -------------------
 
+ * Reserved 700,000-799,999 IDs for Ivan Ristic.
+
  * Fixed SecAction not working when CONNECT request method is used
    (MODSEC-110). [Ivan Ristic]
 
