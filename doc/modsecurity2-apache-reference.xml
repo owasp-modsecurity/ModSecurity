@@ -4812,7 +4812,11 @@ setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasi
         </listitem>
 
         <listitem>
-          <para>430,000-899,999; unused (available for reservation).</para>
+          <para>430,000-699,999; unused (available for reservation).</para>
+        </listitem>
+
+        <listitem>
+            <para>700,000-799,999; reserved for Ivan Ristic.</para>
         </listitem>
 
         <listitem>
