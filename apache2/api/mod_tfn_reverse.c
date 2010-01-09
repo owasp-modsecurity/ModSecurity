@@ -7,9 +7,7 @@
 #include "ap_config.h"
 #include "apr_optional.h"
 
-/* Must be declared if modsecurity.h is not included */
-APR_DECLARE_OPTIONAL_FN(void, modsec_register_tfn, (const char *name, void *fn));
-
+#include "modsecurity.h"
 
 /**
  * This function will be invoked by
@@ -66,6 +64,9 @@ static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_te
          * name "reverse".
          */
         fn("reverse", (void *)reverse);
+    } else {
+        ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, NULL,
+            "mod_tfn_reverse: Unable to find modsec_register_tfn.");
     }
 
     return OK;

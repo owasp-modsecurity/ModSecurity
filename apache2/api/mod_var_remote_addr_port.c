@@ -7,7 +7,7 @@
 #include "ap_config.h"
 #include "apr_optional.h"
 
-#include "re.h"
+#include "modsecurity.h"
 
 /* -- Generic generators/validators from re_variables.c -- */
 
@@ -77,6 +77,9 @@ static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_te
             VAR_DONT_CACHE,
             PHASE_REQUEST_HEADERS
         );
+    }  else {
+        ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, NULL,
+            "mod_var_remote_addr_port: Unable to find modsec_register_variable.");
     }
 
     return OK;

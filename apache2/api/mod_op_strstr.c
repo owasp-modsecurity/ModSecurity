@@ -87,6 +87,9 @@ static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_te
          * name "reverse".
          */
         fn("strstr", (void *)op_strstr_init, (void *)op_strstr_exec);
+    } else {
+        ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, NULL,
+            "mod_op_strstr: Unable to find modsec_register_operator.");
     }
 
     return OK;

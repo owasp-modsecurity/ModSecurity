@@ -6,7 +6,8 @@ ModSecurity without having to touch it directly, simply
 by creating custom Apache modules.
 
 NOTE: ModSecurity must be compiled with API support
-      to use this feature (do not use -DNO_MODSEC_API).
+      to use this feature (the API is enabled by default,
+      but it will have been disabled if you used -DNO_MODSEC_API).
 
 
 Building the Example Custom Modules
@@ -18,8 +19,9 @@ Module mod_tfn_reverse.c creates a custom transformation
 function "reverse" that reverses the content it receives
 on input.
 
-  # Compile as a normal user
-  apxs -ca mod_tfn_reverse.c
+# Compile as a normal user
+  apxs -I<MODSECURITY_SOURCE_CODE> -I/usr/include/libxml2 \
+       -ca mod_tfn_reverse.c
 
   # Install as superuser
   sudo apxs -i mod_tfn_reverse.la
@@ -30,9 +32,6 @@ on input.
 Module mod_op_strstr.c creates a custom operator "strstr"
 that implements fast matching using the Boyer-Moore-Horspool
 algorithm.
-
-Compiling this module is more involved because it requires
-access to ModSecurity structures.
 
   # Compile as a normal user
   apxs -I<MODSECURITY_SOURCE_CODE> -I/usr/include/libxml2 \
@@ -46,9 +45,6 @@ access to ModSecurity structures.
 
 Module mod_var_remote_addr_port.c creates a custom variable "REMOTE_ADDR_PORT"
 that combines the REMOTE_ADDR and REMOTE_PORT into a.b.c.d:port format.
-
-Compiling this module is more involved because it requires
-access to ModSecurity structures.
 
   # Compile as a normal user
   apxs -I<MODSECURITY_SOURCE_CODE> -I/usr/include/libxml2 \
