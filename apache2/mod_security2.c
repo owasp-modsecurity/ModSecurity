@@ -1081,11 +1081,13 @@ static void register_hooks(apr_pool_t *mp) {
         "mod_ssl.c",
         NULL
     };
+    
     static const char *postconfig_afterme_list[] = {
         "mod_fcgid.c",
         "mod_cgid.c",
         NULL
     };
+    
     static const char *postread_beforeme_list[] = {
         "mod_rpaf.c",
         "mod_rpaf-2.0.c",
@@ -1096,8 +1098,14 @@ static void register_hooks(apr_pool_t *mp) {
         "mod_unique_id.c",
         NULL
     };
+    
     static const char *postread_afterme_list[] = {
         "mod_log_forensic.c",
+        NULL
+    };
+    
+    static const char *transaction_beforeme_list[] = {
+        "mod_log_config.c",
         NULL
     };
 
@@ -1132,7 +1140,7 @@ static void register_hooks(apr_pool_t *mp) {
 
     /* Logging */
     ap_hook_error_log(hook_error_log, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_log_transaction(hook_log_transaction, NULL, NULL, APR_HOOK_MIDDLE);
+    ap_hook_log_transaction(hook_log_transaction, transaction_beforeme_list, NULL, APR_HOOK_MIDDLE);
 
     /* Filter hooks */
     ap_hook_insert_filter(hook_insert_filter, NULL, NULL, APR_HOOK_FIRST);
