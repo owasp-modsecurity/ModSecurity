@@ -1,6 +1,11 @@
 
-12 Dec 2009 - trunk
+26 Jan 2010 - trunk
 -------------------
+
+ * Adjusted phase 5 to execute just prior to mod_log_config. This should
+   allow phase 5 rules to to implement conditional logging, as well as
+   pave support for allowing access to all ModSecurity variables from
+   mog_log_config. [Ivan Ristic]
 
  * Reserved 700,000-799,999 IDs for Ivan Ristic.
 
