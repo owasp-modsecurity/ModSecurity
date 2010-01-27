@@ -1426,6 +1426,23 @@ static int var_urlencoded_error_generate(modsec_rec *msr, msre_var *var, msre_ru
     }
 }
 
+/* DURATION */
+
+static int var_duration_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    msre_var *rvar = NULL;
+
+    rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    rvar->value = apr_psprintf(mptmp, "%" APR_TIME_T_FMT,
+        (apr_time_msec(apr_time_now() - msr->r->request_time)));
+    rvar->value_len = strlen(rvar->value);
+    
+    apr_table_addn(vartab, rvar->name, (void *)rvar);
+
+    return 1;
+}
+
 /* TIME */
 
 static int var_time_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -3016,6 +3033,17 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         var_userid_generate,
         VAR_DONT_CACHE, /* dynamic */
         PHASE_RESPONSE_HEADERS
+    );
+    
+    /* DURATION */
+    msre_engine_variable_register(engine,
+        "DURATION",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_duration_generate,
+        VAR_DONT_CACHE, /* dynamic */
+        PHASE_REQUEST_HEADERS
     );
 
     /* TIME */

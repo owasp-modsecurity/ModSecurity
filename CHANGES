@@ -1,6 +1,9 @@
 
-26 Jan 2010 - trunk
+27 Jan 2010 - trunk
 -------------------
+
+ * Added DURATION, which contains the time ellapsed since the beginning
+   of the current transaction, in milliseconds. [Ivan Ristic]
 
  * Adjusted phase 5 to execute just prior to mod_log_config. This should
    allow phase 5 rules to to implement conditional logging, as well as
