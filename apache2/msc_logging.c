@@ -771,16 +771,14 @@ void sec_audit_logger(modsec_rec *msr) {
         sec_auditlog_write(msr, text, strlen(text));        
         
         /* Stopwatch2 */
-        
-        text = apr_psprintf(msr->mp, "Stopwatch2: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT
-          "; p1=%" APR_TIME_T_FMT ", p2=%" APR_TIME_T_FMT ", p3=%" APR_TIME_T_FMT
-          ", p4=%" APR_TIME_T_FMT ", p5=%" APR_TIME_T_FMT ", s=%" APR_TIME_T_FMT
-          ", l=%" APR_TIME_T_FMT "\n", msr->request_time, (now - msr->request_time),
-          msr->time_phase1, msr->time_phase2, msr->time_phase3, msr->time_phase4,
-          msr->time_phase5, msr->time_storage_read + msr->time_storage_write,
-          msr->time_logging);
+        {
+            char *perf_all = format_all_performance_variables(msr, msr->mp);
+                    
+            text = apr_psprintf(msr->mp, "Stopwatch2: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT
+                "; %s\n", msr->request_time, (now - msr->request_time), perf_all);
           
-        sec_auditlog_write(msr, text, strlen(text));
+            sec_auditlog_write(msr, text, strlen(text));
+        }
 
         /* Our response body does not contain chunks */
         /* ENH Only write this when the output was chunked. */

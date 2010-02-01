@@ -105,4 +105,6 @@ apr_fileperms_t DSOLOCAL mode2fileperms(int mode);
 
 char DSOLOCAL *construct_single_var(modsec_rec *msr, char *name);
 
+char DSOLOCAL *format_all_performance_variables(modsec_rec *msr, apr_pool_t *mp);
+
 #endif
