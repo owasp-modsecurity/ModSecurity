@@ -323,7 +323,8 @@ struct modsec_rec {
     apr_time_t		 time_phase3;
     apr_time_t		 time_phase4;
     apr_time_t		 time_phase5;
-    apr_time_t		 time_persistence;
+    apr_time_t		 time_storage_read;
+    apr_time_t		 time_storage_write;
     apr_time_t		 time_logging;
     
     apr_array_header_t  *matched_rules;

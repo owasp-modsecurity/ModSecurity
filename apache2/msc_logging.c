@@ -777,7 +777,8 @@ void sec_audit_logger(modsec_rec *msr) {
           ", p4=%" APR_TIME_T_FMT ", p5=%" APR_TIME_T_FMT ", s=%" APR_TIME_T_FMT
           ", l=%" APR_TIME_T_FMT "\n", msr->request_time, (now - msr->request_time),
           msr->time_phase1, msr->time_phase2, msr->time_phase3, msr->time_phase4,
-          msr->time_phase5, msr->time_persistence, msr->time_logging);
+          msr->time_phase5, msr->time_storage_read + msr->time_storage_write,
+          msr->time_logging);
           
         sec_auditlog_write(msr, text, strlen(text));
 

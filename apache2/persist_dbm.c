@@ -311,7 +311,7 @@ apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
     
     rtable = collection_retrieve_ex(NULL, msr, col_name, col_key, col_key_len);
     
-    msr->time_persistence += apr_time_now() - time_before;
+    msr->time_storage_read += apr_time_now() - time_before;
     
     return rtable;
 }

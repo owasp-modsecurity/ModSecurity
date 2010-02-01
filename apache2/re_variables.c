@@ -1427,6 +1427,88 @@ static int var_urlencoded_error_generate(modsec_rec *msr, msre_var *var, msre_ru
     }
 }
 
+static int generate_performance_variable(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp, apr_time_t value)
+{
+    msre_var *rvar = NULL;
+
+    rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+    rvar->value = apr_psprintf(mptmp, "%" APR_TIME_T_FMT, value);
+    rvar->value_len = strlen(rvar->value);
+    
+    apr_table_addn(vartab, rvar->name, (void *)rvar);
+
+    return 1;
+}
+
+/* PERF_COMBINED */
+
+static int var_perf_combined_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    apr_time_t value = msr->time_phase1 + msr->time_phase2 + msr->time_phase3 + msr->time_phase4
+        + msr->time_phase5 + msr->time_storage_write /* time_storage_read is already
+        included in phases */ + msr->time_logging;
+    
+    return generate_performance_variable(msr, var, rule, vartab, mptmp, value);
+}
+
+/* PERF_PHASE1 */
+
+static int var_perf_phase1_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_phase1);
+}
+
+/* PERF_PHASE2 */
+
+static int var_perf_phase2_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_phase2);
+}
+
+/* PERF_PHASE3 */
+
+static int var_perf_phase3_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_phase3);
+}
+
+/* PERF_PHASE4 */
+
+static int var_perf_phase4_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_phase4);
+}
+
+/* PERF_PHASE5 */
+
+static int var_perf_phase5_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_phase5);
+}
+
+/* PERF_STORAGE */
+
+static int var_perf_storage_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_storage_read + msr->time_storage_write);
+}
+
+/* PERF_LOGGING */
+
+static int var_perf_logging_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_logging);
+}
+
 /* DURATION */
 
 static int var_duration_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -3034,6 +3116,94 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         var_userid_generate,
         VAR_DONT_CACHE, /* dynamic */
         PHASE_RESPONSE_HEADERS
+    );
+    
+    /* PERF_COMBINED */
+    msre_engine_variable_register(engine,
+        "PERF_COMBINED",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_perf_combined_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+    
+    /* PERF_LOGGING */
+    msre_engine_variable_register(engine,
+        "PERF_LOGGING",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_perf_logging_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+    
+    /* PERF_PHASE1 */
+    msre_engine_variable_register(engine,
+        "PERF_PHASE1",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_perf_phase1_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+    
+    /* PERF_PHASE2 */
+    msre_engine_variable_register(engine,
+        "PERF_PHASE2",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_perf_phase2_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+    
+    /* PERF_PHASE3 */
+    msre_engine_variable_register(engine,
+        "PERF_PHASE3",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_perf_phase3_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+    
+    /* PERF_PHASE4 */
+    msre_engine_variable_register(engine,
+        "PERF_PHASE4",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_perf_phase4_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+    
+    /* PERF_PHASE5 */
+    msre_engine_variable_register(engine,
+        "PERF_PHASE5",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_perf_phase5_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+    
+    /* PERF_STORAGE */
+    msre_engine_variable_register(engine,
+        "PERF_STORAGE",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_perf_storage_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
     );
     
     /* DURATION */

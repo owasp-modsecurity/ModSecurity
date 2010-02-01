@@ -193,7 +193,7 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
         }
     }
     
-    msr->time_persistence += apr_time_now() - time_before;
+    msr->time_storage_write += apr_time_now() - time_before;
 
     /* Multipart processor cleanup. */
     if (msr->mpd != NULL) multipart_cleanup(msr);
