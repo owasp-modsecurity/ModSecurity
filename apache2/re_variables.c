@@ -1434,7 +1434,7 @@ apr_time_t calculate_perf_combined(modsec_rec *msr) {
 }
 
 char *format_all_performance_variables(modsec_rec *msr, apr_pool_t *mp) {
-    return apr_psprintf(mp, "total=%" APR_TIME_T_FMT ", p1=%" APR_TIME_T_FMT
+    return apr_psprintf(mp, "combined=%" APR_TIME_T_FMT ", p1=%" APR_TIME_T_FMT
         ", p2=%" APR_TIME_T_FMT ", p3=%" APR_TIME_T_FMT ", p4=%" APR_TIME_T_FMT
         ", p5=%" APR_TIME_T_FMT ", sr=%" APR_TIME_T_FMT ", sw=%" APR_TIME_T_FMT
         ", l=%" APR_TIME_T_FMT, calculate_perf_combined(msr), msr->time_phase1,
