@@ -1899,8 +1899,11 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
             for(i = 1; i < arr->nelts; i++) {
                 expnames = apr_psprintf(mptmp, "%s|%s", expnames, ((msre_var *)te[i].val)->name);
             }
-            if (strcmp(rule->p1, expnames) != 0) {
-                msr_log(msr, 4, "Expanded \"%s\" to \"%s\".", rule->p1, expnames);
+            
+            if (msr->txcfg->debuglog_level >= 4) {
+                if (strcmp(rule->p1, expnames) != 0) {
+                    msr_log(msr, 4, "Expanded \"%s\" to \"%s\".", rule->p1, expnames);
+                }
             }
         }
     }
