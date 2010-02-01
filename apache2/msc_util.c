@@ -1418,3 +1418,32 @@ apr_fileperms_t mode2fileperms(int mode) {
     return perms;
 }
 
+/**
+ * Generate a single variable.
+ */
+char *construct_single_var(modsec_rec *msr, char *name) {
+    char *varname = NULL;
+    char *param = NULL;
+    msre_var *var = NULL;
+    msre_var *vx = NULL;
+    char *my_error_msg = NULL;
+
+    /* Extract variable name and its parameter from the script. */
+    varname = apr_pstrdup(msr->mp, name);
+    param = strchr(varname, '.');
+    if (param != NULL) {
+        *param = '\0';
+        param++;
+    }
+
+    /* Resolve variable. */
+    var = msre_create_var_ex(msr->mp, msr->modsecurity->msre,
+        varname, param, msr, &my_error_msg);
+    if (var == NULL) return NULL;
+
+    /* Generate variable. */
+    vx = generate_single_var(msr, var, NULL, NULL, msr->msc_rule_mptmp);
+    if (vx == NULL) return NULL;
+
+    return (char *)vx->value;
+}

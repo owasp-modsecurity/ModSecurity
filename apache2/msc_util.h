@@ -103,4 +103,6 @@ int DSOLOCAL css_decode_inplace(unsigned char *input, long int input_len);
 
 apr_fileperms_t DSOLOCAL mode2fileperms(int mode);
 
+char DSOLOCAL *construct_single_var(modsec_rec *msr, char *name);
+
 #endif

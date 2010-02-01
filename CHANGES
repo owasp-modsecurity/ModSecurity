@@ -2,6 +2,9 @@
 1 Feb 2010 - trunk
 -------------------
 
+ * Integrate with mod_log_config using the %{VARNAME}m format string.
+   (MODSEC-108) [Ivan Ristic]
+
  * Replaced the previous time-measuring mechanism with a new one, which
    provides the following information: request time, request duration,
    phase duration (for all 5 phases), time spent dealing with persistent

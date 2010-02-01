@@ -400,6 +400,7 @@ static int var_rule_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     msre_actionset *actionset = NULL;
 
     if (rule == NULL) return 0;
+    
     actionset = rule->actionset;
     if (rule->chain_starter != NULL) actionset = rule->chain_starter->actionset;
 

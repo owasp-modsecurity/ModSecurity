@@ -25,6 +25,9 @@
 #include "apache2.h"
 #include "http_main.h"
 
+#include "apr_optional.h"
+#include "mod_log_config.h"
+
 #include "msc_logging.h"
 #include "msc_util.h"
 
@@ -424,15 +427,36 @@ static apr_status_t module_cleanup(void *data) {
 }
 
 /**
+ * Generate a single variable for use with mod_log_config.
+ */
+static const char *modsec_var_log_handler(request_rec *r, char *name) {
+    modsec_rec *msr = NULL;
+    
+    if (name == NULL) return NULL;
+    
+    msr = retrieve_tx_context(r);
+    if (msr == NULL) return NULL;
+    
+    return construct_single_var(msr, name);
+}
+
+/**
  * Pre-configuration initialisation hook.
  */
 static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_temp) {
+    static APR_OPTIONAL_FN_TYPE(ap_register_log_handler) *log_pfn_register;
+    
     /* Initialise ModSecurity engine */
     modsecurity = modsecurity_create(mp, MODSEC_ONLINE);
     if (modsecurity == NULL) {
         ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
             "ModSecurity: Failed to initialise engine.");
         return HTTP_INTERNAL_SERVER_ERROR;
+    }
+    
+    log_pfn_register = APR_RETRIEVE_OPTIONAL_FN(ap_register_log_handler);
+    if (log_pfn_register) {
+        log_pfn_register(mp, "m", modsec_var_log_handler, 0);
     }
 
     return OK;
@@ -1104,6 +1128,8 @@ static void register_hooks(apr_pool_t *mp) {
         "mod_log_config.c",
         NULL
     };
+    
+    
 
     /* Add the MODSEC_2.x compatibility defines */
     *(char **)apr_array_push(ap_server_config_defines) = apr_pstrdup(mp, "MODSEC_2.5");
