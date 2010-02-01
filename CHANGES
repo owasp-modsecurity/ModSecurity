@@ -1,6 +1,14 @@
 
-27 Jan 2010 - trunk
+1 Feb 2010 - trunk
 -------------------
+
+ * Replaced the previous time-measuring mechanism with a new one, which
+   provides the following information: request time, request duration,
+   phase duration (for all 5 phases), time spent dealing with persistent
+   storage, and time spent on audit logging. The new information is now
+   available in the Stopwatch2 audit log header. The Stopwatch header
+   remains for backward compatiblity, although it now only includes
+   the request time and request duration values. [Ivan Ristic]
 
  * Added DURATION, which contains the time ellapsed since the beginning
    of the current transaction, in milliseconds. [Ivan Ristic]

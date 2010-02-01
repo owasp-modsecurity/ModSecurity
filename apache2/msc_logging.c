@@ -764,35 +764,21 @@ void sec_audit_logger(modsec_rec *msr) {
             text = apr_psprintf(msr->mp, "Apache-Handler: %s\n", msr->r->handler);
             sec_auditlog_write(msr, text, strlen(text));
         }
-
-        /* Processing times */
-        if (msr->time_checkpoint_1 == 0) {
-            text = apr_psprintf(msr->mp, "Stopwatch: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT
-                " (- - -)\n", (msr->request_time), (now - msr->request_time));
-        } else {
-            char sw_str2[101] = "-";
-            char sw_str3[101] = "-";
-
-            if (msr->time_checkpoint_2 != 0) {
-                apr_snprintf(sw_str2, sizeof(sw_str2), "%" APR_TIME_T_FMT,
-                    (msr->time_checkpoint_2 - msr->request_time));
-            }
-
-            if (msr->time_checkpoint_3 != 0) {
-                apr_snprintf(sw_str3, sizeof(sw_str3), "%" APR_TIME_T_FMT,
-                    (msr->time_checkpoint_3 - msr->request_time));
-            }
-
-            text = apr_psprintf(msr->mp, "Stopwatch: %" APR_TIME_T_FMT
-                " %" APR_TIME_T_FMT " (%" APR_TIME_T_FMT
-                "%s %s %s)\n",
-                (msr->request_time), (now - msr->request_time),
-                (msr->time_checkpoint_1 - msr->request_time),
-                ((msr->msc_reqbody_read == 0) ? "" : "*"),
-                sw_str2, sw_str3
-                );
-        }
-
+        
+        /* Stopwatch; left in for compatibility reasons */
+        text = apr_psprintf(msr->mp, "Stopwatch: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT " (- - -)\n",
+            msr->request_time, (now - msr->request_time));
+        sec_auditlog_write(msr, text, strlen(text));        
+        
+        /* Stopwatch2 */
+        
+        text = apr_psprintf(msr->mp, "Stopwatch2: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT
+          "; p1=%" APR_TIME_T_FMT ", p2=%" APR_TIME_T_FMT ", p3=%" APR_TIME_T_FMT
+          ", p4=%" APR_TIME_T_FMT ", p5=%" APR_TIME_T_FMT ", s=%" APR_TIME_T_FMT
+          ", l=%" APR_TIME_T_FMT "\n", msr->request_time, (now - msr->request_time),
+          msr->time_phase1, msr->time_phase2, msr->time_phase3, msr->time_phase4,
+          msr->time_phase5, msr->time_persistence, msr->time_logging);
+          
         sec_auditlog_write(msr, text, strlen(text));
 
         /* Our response body does not contain chunks */

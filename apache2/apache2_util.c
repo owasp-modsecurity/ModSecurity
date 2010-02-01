@@ -164,40 +164,6 @@ int apache2_exec(modsec_rec *msr, const char *command, const char **argv, char *
 }
 
 /**
- * Record the current time and store for later.
- */
-void record_time_checkpoint(modsec_rec *msr, int checkpoint_no) {
-    char note[100], note_name[100];
-    apr_time_t now;
-
-    now = apr_time_now();
-    switch(checkpoint_no) {
-        case 1 :
-            msr->time_checkpoint_1 = now;
-            break;
-        case 2 :
-            msr->time_checkpoint_2 = now;
-            break;
-        case 3 :
-            msr->time_checkpoint_3 = now;
-            break;
-        default :
-            msr_log(msr, 1, "Internal Error: Unknown checkpoint: %d", checkpoint_no);
-            return;
-            break;
-    }
-
-    /* Apache-specific stuff. */
-    apr_snprintf(note, 99, "%" APR_TIME_T_FMT, (now - msr->request_time));
-    apr_snprintf(note_name, 99, "mod_security-time%d", checkpoint_no);
-    apr_table_set(msr->r->notes, note_name, note);
-
-    if (msr->txcfg->debuglog_level >= 4) {
-        msr_log(msr, 4, "Time #%d: %s", checkpoint_no, note);
-    }
-}
-
-/**
  * Returns a new string that contains the error
  * message for the given return code.
  */

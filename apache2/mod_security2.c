@@ -734,14 +734,10 @@ static int hook_request_late(request_rec *r) {
     msr->request_headers = apr_table_copy(msr->mp, r->headers_in);
 
     /* Process phase REQUEST_BODY */
-    record_time_checkpoint(msr, 1);
-
     rc = DECLINED;
     if (modsecurity_process_phase(msr, PHASE_REQUEST_BODY) > 0) {
         rc = perform_interception(msr);
     }
-
-    record_time_checkpoint(msr, 2);
 
     return rc;
 }

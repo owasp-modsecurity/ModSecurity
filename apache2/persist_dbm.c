@@ -174,15 +174,19 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
                     if (strcmp(key_to_expire, "__expire_KEY") == 0) {
                         expired = 1;
                     }
+                    
                     if (msr->txcfg->debuglog_level >= 9) {
                         msr_log(msr, 9, "Removing key \"%s\" from collection.", key_to_expire + 9);
                         msr_log(msr, 9, "Removing key \"%s\" from collection.", key_to_expire);
                     }
+                    
                     apr_table_unset(col, key_to_expire + 9);
                     apr_table_unset(col, key_to_expire);
+                    
                     if (msr->txcfg->debuglog_level >= 4) {
                         msr_log(msr, 4, "Removed expired variable \"%s\".", key_to_expire + 9);
                     }
+                    
                     break;
                 }
             }
@@ -225,7 +229,8 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
         }
 
         if (expired && (msr->txcfg->debuglog_level >= 9)) {
-            msr_log(msr, 9, "Collection expired (name \"%s\", key \"%s\").", col_name, log_escape_ex(msr->mp, col_key, col_key_len));
+            msr_log(msr, 9, "Collection expired (name \"%s\", key \"%s\").", col_name,
+                log_escape_ex(msr->mp, col_key, col_key_len));
         }
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Deleted collection (name \"%s\", key \"%s\").",
@@ -273,13 +278,13 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
 
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Retrieved collection (name \"%s\", key \"%s\").",
-                log_escape(msr->mp, col_name), log_escape_ex(msr->mp, col_key, col_key_len));
+            log_escape(msr->mp, col_name), log_escape_ex(msr->mp, col_key, col_key_len));
     }
 
     if ((existing_dbm == NULL) && dbm) {
         /* Should not ever get here */
         msr_log(msr, 1, "Internal Error: Collection remained open (name \"%s\", key \"%s\").",
-                log_escape(msr->mp, col_name), log_escape_ex(msr->mp, col_key, col_key_len));
+            log_escape(msr->mp, col_name), log_escape_ex(msr->mp, col_key, col_key_len));
 
         apr_sdbm_close(dbm);
     }
@@ -299,10 +304,17 @@ cleanup:
  *
  */
 apr_table_t *collection_retrieve(modsec_rec *msr, const char *col_name,
-    const char *col_key, int col_key_len) {
-    return collection_retrieve_ex(NULL, msr, col_name, col_key, col_key_len);
+    const char *col_key, int col_key_len)
+{
+    apr_time_t time_before = apr_time_now();
+    apr_table_t *rtable = NULL;
+    
+    rtable = collection_retrieve_ex(NULL, msr, col_name, col_key, col_key_len);
+    
+    msr->time_persistence += apr_time_now() - time_before;
+    
+    return rtable;
 }
-
 
 /**
  *
@@ -334,8 +346,8 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 
     if (msr->txcfg->data_dir == NULL) {
         msr_log(msr, 1, "Unable to store collection (name \"%s\", key \"%s\"). Use "
-            "SecDataDir to define data directory first.",
-            log_escape_ex(msr->mp, var_name->value, var_name->value_len), log_escape_ex(msr->mp, var_key->value, var_key->value_len));
+            "SecDataDir to define data directory first.", log_escape_ex(msr->mp, var_name->value, var_name->value_len),
+            log_escape_ex(msr->mp, var_key->value, var_key->value_len));
         goto error;
     }
 
@@ -417,7 +429,8 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     orig_col = (const apr_table_t *)apr_table_get(msr->collections_original, var_name->value);
     if (orig_col != NULL) {
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "Re-retrieving collection prior to store: %s", apr_psprintf(msr->mp, "%.*s", var_name->value_len, var_name->value));
+            msr_log(msr, 9, "Re-retrieving collection prior to store: %s",
+                apr_psprintf(msr->mp, "%.*s", var_name->value_len, var_name->value));
         }
 
         stored_col = (const apr_table_t *)collection_retrieve_ex(dbm, msr, var_name->value, var_key->value, var_key->value_len);
@@ -448,6 +461,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 
                     var->value = apr_psprintf(msr->mp, "%d", newval);
                     var->value_len = strlen(var->value);
+                    
                     if (msr->txcfg->debuglog_level >= 9) {
                         msr_log(msr, 9, "Delta applied for %s.%s %d->%d (%d): %d + (%d) = %d [%s,%d]",
                         log_escape_ex(msr->mp, var_name->value, var_name->value_len),
@@ -530,7 +544,8 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Persisted collection (name \"%s\", key \"%s\").",
-            log_escape_ex(msr->mp, var_name->value, var_name->value_len), log_escape_ex(msr->mp, var_key->value, var_key->value_len));
+            log_escape_ex(msr->mp, var_name->value, var_name->value_len),
+            log_escape_ex(msr->mp, var_key->value, var_key->value_len));
     }
 
     return 0;
@@ -645,10 +660,11 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
                             log_escape_ex(msr->mp, key.dptr, key.dsize - 1), get_apr_error(msr->mp, rc));
                         goto error;
                     }
+                    
                     if (msr->txcfg->debuglog_level >= 4) {
                         msr_log(msr, 4, "Removed stale collection (name \"%s\", "
-                                "key \"%s\").", log_escape(msr->mp, col_name),
-                                log_escape_ex(msr->mp, key.dptr, key.dsize - 1));
+                            "key \"%s\").", log_escape(msr->mp, col_name),
+                            log_escape_ex(msr->mp, key.dptr, key.dsize - 1));
                     }
                 }
             }

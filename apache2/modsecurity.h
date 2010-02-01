@@ -318,10 +318,14 @@ struct modsec_rec {
 
     /* performance measurement */
     apr_time_t           request_time;
-    apr_time_t           time_checkpoint_1;
-    apr_time_t           time_checkpoint_2;
-    apr_time_t           time_checkpoint_3;
-
+    apr_time_t		 time_phase1;
+    apr_time_t		 time_phase2;
+    apr_time_t		 time_phase3;
+    apr_time_t		 time_phase4;
+    apr_time_t		 time_phase5;
+    apr_time_t		 time_persistence;
+    apr_time_t		 time_logging;
+    
     apr_array_header_t  *matched_rules;
     msc_string          *matched_var;
     int                  highest_severity;

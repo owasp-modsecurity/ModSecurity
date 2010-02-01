@@ -782,8 +782,6 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
      * (full-buffering only).
      */
     if ((msr->of_skipping == 0)&&(!msr->of_partial)) {
-        record_time_checkpoint(msr, 3);
-
         prepend_content_to_of_brigade(msr, f);
 
         /* Inject content into response (append & buffering). */
