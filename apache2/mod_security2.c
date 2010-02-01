@@ -1124,7 +1124,7 @@ static void register_hooks(apr_pool_t *mp) {
         NULL
     };
     
-    static const char *transaction_beforeme_list[] = {
+    static const char *transaction_afterme_list[] = {
         "mod_log_config.c",
         NULL
     };
@@ -1162,7 +1162,7 @@ static void register_hooks(apr_pool_t *mp) {
 
     /* Logging */
     ap_hook_error_log(hook_error_log, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_log_transaction(hook_log_transaction, transaction_beforeme_list, NULL, APR_HOOK_MIDDLE);
+    ap_hook_log_transaction(hook_log_transaction, NULL, transaction_afterme_list, APR_HOOK_MIDDLE);
 
     /* Filter hooks */
     ap_hook_insert_filter(hook_insert_filter, NULL, NULL, APR_HOOK_FIRST);
