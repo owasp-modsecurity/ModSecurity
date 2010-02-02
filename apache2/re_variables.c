@@ -1765,6 +1765,15 @@ static int var_request_body_generate(modsec_rec *msr, msre_var *var, msre_rule *
     return 0;
 }
 
+/* REQUEST_BODY_LENGTH */
+
+static int var_request_body_length_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    char *value = apr_psprintf(mptmp, "%d", msr->msc_reqbody_length);
+    return var_simple_generate(var, vartab, mptmp, value);
+}
+
 /* REQUEST_COOKIES */
 
 static int var_request_cookies_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -2775,6 +2784,17 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         0, 0,
         NULL,
         var_request_body_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+    
+    /* REQUEST_BODY_LENGTH */
+    msre_engine_variable_register(engine,
+        "REQUEST_BODY_LENGTH",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_request_body_length_generate,
         VAR_CACHE,
         PHASE_REQUEST_BODY
     );

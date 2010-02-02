@@ -1,6 +1,9 @@
 
-1 Feb 2010 - trunk
+2 Feb 2010 - trunk
 -------------------
+
+ * Add REQUEST_BODY_LENGTH, which contains the number of request body
+   bytes read. [Ivan Ristic]
 
  * Integrate with mod_log_config using the %{VARNAME}M format string.
    (MODSEC-108) [Ivan Ristic]
