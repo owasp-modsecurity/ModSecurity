@@ -2,7 +2,7 @@
 1 Feb 2010 - trunk
 -------------------
 
- * Integrate with mod_log_config using the %{VARNAME}m format string.
+ * Integrate with mod_log_config using the %{VARNAME}M format string.
    (MODSEC-108) [Ivan Ristic]
 
  * Replaced the previous time-measuring mechanism with a new one, which

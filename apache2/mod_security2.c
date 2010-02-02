@@ -456,7 +456,7 @@ static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_te
     
     log_pfn_register = APR_RETRIEVE_OPTIONAL_FN(ap_register_log_handler);
     if (log_pfn_register) {
-        log_pfn_register(mp, "m", modsec_var_log_handler, 0);
+        log_pfn_register(mp, "M", modsec_var_log_handler, 0);
     }
 
     return OK;
