@@ -160,15 +160,11 @@ void modsecurity_shutdown(msc_engine *msce) {
 /**
  *
  */
-static apr_status_t modsecurity_tx_cleanup(void *data) {
-    modsec_rec *msr = (modsec_rec *)data;
+static void modsecurity_persist_data(modsec_rec *msr) {
     const apr_array_header_t *arr;
     apr_table_entry_t *te;
-    char *my_error_msg = NULL;
     apr_time_t time_before, time_after;
     int i;
-
-    if (msr == NULL) return APR_SUCCESS;
 
     time_before = apr_time_now();
 
@@ -188,6 +184,11 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
     
     msr->time_storage_write += time_after - time_before;
     
+    if (msr->txcfg->debuglog_level >= 3) {
+        msr_log(msr, 3, "Recording persistent data took %" APR_TIME_T_FMT
+            " microseconds.", msr->time_gc);
+    }   
+    
     /* Remove stale collections. */
     if (rand() < RAND_MAX/100) {
         arr = apr_table_elts(msr->collections);
@@ -203,6 +204,16 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
                 " microseconds.", msr->time_gc);
         }   
     }
+}
+
+/**
+ *
+ */
+static apr_status_t modsecurity_tx_cleanup(void *data) {
+    modsec_rec *msr = (modsec_rec *)data;
+    char *my_error_msg = NULL;
+    
+    if (msr == NULL) return APR_SUCCESS;    
 
     /* Multipart processor cleanup. */
     if (msr->mpd != NULL) multipart_cleanup(msr);
@@ -529,6 +540,8 @@ static apr_status_t modsecurity_process_phase_logging(modsec_rec *msr) {
         msre_ruleset_process_phase(msr->txcfg->ruleset, msr);
     }
     
+    modsecurity_persist_data(msr);
+    
     time_after = apr_time_now();
     msr->time_phase5 = time_after - time_before;
 
@@ -590,7 +603,7 @@ static apr_status_t modsecurity_process_phase_logging(modsec_rec *msr) {
 
     sec_audit_logger(msr);
     
-    msr->time_logging = apr_time_now() - time_after;
+    msr->time_logging = apr_time_now() - time_after;    
 
     return 0;
 }
