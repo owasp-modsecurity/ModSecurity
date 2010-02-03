@@ -5576,6 +5576,9 @@ SecRule ARGS:route "!<emphasis>@endsWith %{REQUEST_ADDR}</emphasis>" t:none,deny
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@eq</emphasis> 15"</programlisting>
+
+      <para>Macro expansion is performed so you may use variable names such
+          as <literal>%{TX.1}</literal>, etc.</para>
     </section>
 
     <section>
@@ -5587,6 +5590,8 @@ SecRule ARGS:route "!<emphasis>@endsWith %{REQUEST_ADDR}</emphasis>" t:none,deny
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@ge</emphasis> 15"</programlisting>
+
+      <para>Macro expansion is performed so you may use variable names such
     </section>
 
     <section>
@@ -5629,6 +5634,8 @@ SecRule &amp;GEO "@eq 0" "deny,status:403,msg:'Failed to lookup IP'"</programlis
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@gt</emphasis> 15"</programlisting>
+
+      <para>Macro expansion is performed so you may use variable names such
     </section>
 
     <section>
@@ -5677,6 +5684,8 @@ end</programlisting>
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@le</emphasis> 15"</programlisting>
+
+      <para>Macro expansion is performed so you may use variable names such
     </section>
 
     <section>
@@ -5688,6 +5697,8 @@ end</programlisting>
       <para>Example:</para>
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@lt</emphasis> 15"</programlisting>
+
+      <para>Macro expansion is performed so you may use variable names such
     </section>
 
     <section>

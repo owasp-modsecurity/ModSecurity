@@ -1778,18 +1778,27 @@ static int msre_op_validateUtf8Encoding_execute(modsec_rec *msr, msre_rule *rule
 static int msre_op_eq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg)
 {
+    msc_string str;
     int left, right;
     char *target = NULL;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
 
     if ((var->value == NULL)||(rule->op_param == NULL)) {
         /* NULL values do not match anything. */
         return 0;
     }
 
+    str.value = (char *)rule->op_param;
+    str.value_len = strlen(str.value);
+
+    expand_macros(msr, &str, rule, msr->mp);
+
     target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
     if (target == NULL) return -1;
     left = atoi(target);
-    right = atoi(rule->op_param);
+    right = atoi(str.value);
 
     if (left != right) {
         /* No match. */
@@ -1807,6 +1816,7 @@ static int msre_op_eq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 static int msre_op_gt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg)
 {
+    msc_string str;
     int left, right;
     char *target = NULL;
 
@@ -1815,10 +1825,23 @@ static int msre_op_gt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
 
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if ((var->value == NULL)||(rule->op_param == NULL)) {
+        /* NULL values do not match anything. */
+        return 0;
+    }
+
+    str.value = (char *)rule->op_param;
+    str.value_len = strlen(str.value);
+
+    expand_macros(msr, &str, rule, msr->mp);
+
     target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
     if (target == NULL) return -1;
     left = atoi(target);
-    right = atoi(rule->op_param);
+    right = atoi(str.value);
 
     if (left <= right) {
         /* No match. */
@@ -1836,6 +1859,7 @@ static int msre_op_gt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 static int msre_op_lt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg)
 {
+    msc_string str;
     int left, right;
     char *target = NULL;
 
@@ -1844,10 +1868,23 @@ static int msre_op_lt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
 
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if ((var->value == NULL)||(rule->op_param == NULL)) {
+        /* NULL values do not match anything. */
+        return 0;
+    }
+
+    str.value = (char *)rule->op_param;
+    str.value_len = strlen(str.value);
+
+    expand_macros(msr, &str, rule, msr->mp);
+
     target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
     if (target == NULL) return -1;
     left = atoi(target);
-    right = atoi(rule->op_param);
+    right = atoi(str.value);
 
     if (left >= right) {
         /* No match. */
@@ -1865,6 +1902,7 @@ static int msre_op_lt_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 static int msre_op_ge_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg)
 {
+    msc_string str;
     int left, right;
     char *target = NULL;
 
@@ -1873,10 +1911,23 @@ static int msre_op_ge_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
 
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if ((var->value == NULL)||(rule->op_param == NULL)) {
+        /* NULL values do not match anything. */
+        return 0;
+    }
+
+    str.value = (char *)rule->op_param;
+    str.value_len = strlen(str.value);
+
+    expand_macros(msr, &str, rule, msr->mp);
+
     target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
     if (target == NULL) return -1;
     left = atoi(target);
-    right = atoi(rule->op_param);
+    right = atoi(str.value);
 
     if (left < right) {
         /* No match. */
@@ -1894,6 +1945,7 @@ static int msre_op_ge_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 static int msre_op_le_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg)
 {
+    msc_string str;
     int left, right;
     char *target = NULL;
 
@@ -1902,10 +1954,23 @@ static int msre_op_le_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return 0;
     }
 
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if ((var->value == NULL)||(rule->op_param == NULL)) {
+        /* NULL values do not match anything. */
+        return 0;
+    }
+
+    str.value = (char *)rule->op_param;
+    str.value_len = strlen(str.value);
+
+    expand_macros(msr, &str, rule, msr->mp);
+
     target = apr_pstrmemdup(msr->mp, var->value, var->value_len);
     if (target == NULL) return -1;
     left = atoi(target);
-    right = atoi(rule->op_param);
+    right = atoi(str.value);
 
     if (left > right) {
         /* No match. */
@@ -1918,7 +1983,7 @@ static int msre_op_le_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     }
 }
 
-/* ------------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 
 /**
  *
