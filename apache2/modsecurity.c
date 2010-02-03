@@ -164,17 +164,12 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
     modsec_rec *msr = (modsec_rec *)data;
     const apr_array_header_t *arr;
     apr_table_entry_t *te;
-    int collect_garbage = 0;
-    int i;
     char *my_error_msg = NULL;
-    apr_time_t time_before, duration;
+    apr_time_t time_before, time_after;
+    int i;
 
     if (msr == NULL) return APR_SUCCESS;
 
-    if (rand() < RAND_MAX/100) {
-        collect_garbage = 1;
-    }
-    
     time_before = apr_time_now();
 
     /* Collections, store & remove stale. */
@@ -187,17 +182,26 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
         if (apr_table_get(msr->collections_dirty, te[i].key)) {
             collection_store(msr, col);
         }
-
-        if (collect_garbage) {
-            collections_remove_stale(msr, te[i].key);
-        }
     }
 
-    duration = apr_time_now() - time_before;
-    msr->time_storage_write += duration;
+    time_after = apr_time_now();
     
-    if (msr->txcfg->debuglog_level >= 3) {
-        msr_log(msr, 3, "Garbage collection took %" APR_TIME_T_FMT " microseconds.", duration);
+    msr->time_storage_write += time_after - time_before;
+    
+    /* Remove stale collections. */
+    if (rand() < RAND_MAX/100) {
+        arr = apr_table_elts(msr->collections);
+        te = (apr_table_entry_t *)arr->elts;
+        for (i = 0; i < arr->nelts; i++) {
+            collections_remove_stale(msr, te[i].key);
+        }
+        
+        msr->time_gc = apr_time_now() - time_after;
+        
+        if (msr->txcfg->debuglog_level >= 3) {
+            msr_log(msr, 3, "Garbage collection took %" APR_TIME_T_FMT
+                " microseconds.", msr->time_gc);
+        }   
     }
 
     /* Multipart processor cleanup. */

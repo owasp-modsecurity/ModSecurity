@@ -326,6 +326,7 @@ struct modsec_rec {
     apr_time_t		 time_storage_read;
     apr_time_t		 time_storage_write;
     apr_time_t		 time_logging;
+    apr_time_t		 time_gc;
     
     apr_array_header_t  *matched_rules;
     msc_string          *matched_var;
