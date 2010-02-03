@@ -775,7 +775,7 @@ void msre_engine_destroy(msre_engine *engine) {
  */
 #if defined(PERFORMANCE_MEASUREMENT)
 
-#define PERFORMANCE_MEASUREMENT_LOOP 1000
+#define PERFORMANCE_MEASUREMENT_LOOP 5000
 
 static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_rec *msr);
 

@@ -167,7 +167,7 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
     int collect_garbage = 0;
     int i;
     char *my_error_msg = NULL;
-    apr_time_t time_before;
+    apr_time_t time_before, duration;
 
     if (msr == NULL) return APR_SUCCESS;
 
@@ -192,8 +192,13 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
             collections_remove_stale(msr, te[i].key);
         }
     }
+
+    duration = apr_time_now() - time_before;
+    msr->time_storage_write += duration;
     
-    msr->time_storage_write += apr_time_now() - time_before;
+    if (msr->txcfg->debuglog_level >= 3) {
+        msr_log(msr, 3, "Garbage collection took %" APR_TIME_T_FMT " microseconds.", duration);
+    }
 
     /* Multipart processor cleanup. */
     if (msr->mpd != NULL) multipart_cleanup(msr);
