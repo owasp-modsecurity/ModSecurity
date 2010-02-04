@@ -184,8 +184,8 @@ static void modsecurity_persist_data(modsec_rec *msr) {
     
     msr->time_storage_write += time_after - time_before;
     
-    if (msr->txcfg->debuglog_level >= 3) {
-        msr_log(msr, 3, "Recording persistent data took %" APR_TIME_T_FMT
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "Recording persistent data took %" APR_TIME_T_FMT
             " microseconds.", msr->time_gc);
     }   
     
@@ -199,8 +199,8 @@ static void modsecurity_persist_data(modsec_rec *msr) {
         
         msr->time_gc = apr_time_now() - time_after;
         
-        if (msr->txcfg->debuglog_level >= 3) {
-            msr_log(msr, 3, "Garbage collection took %" APR_TIME_T_FMT
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Garbage collection took %" APR_TIME_T_FMT
                 " microseconds.", msr->time_gc);
         }   
     }
