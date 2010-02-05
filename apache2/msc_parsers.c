@@ -22,7 +22,9 @@
 /**
  *
  */
-int parse_cookies_v0(modsec_rec *msr, char *_cookie_header, apr_table_t *cookies) {
+int parse_cookies_v0(modsec_rec *msr, char *_cookie_header,
+                     apr_table_t *cookies)
+{
     char *attr_name = NULL, *attr_value = NULL;
     char *cookie_header;
     char *saveptr = NULL;
@@ -85,13 +87,21 @@ int parse_cookies_v0(modsec_rec *msr, char *_cookie_header, apr_table_t *cookies
 /**
  *
  */
-int parse_cookies_v1(modsec_rec *msr, char *_cookie_header, apr_table_t *cookies) {
+int parse_cookies_v1(modsec_rec *msr, char *_cookie_header,
+                     apr_table_t *cookies)
+{
     char *attr_name = NULL, *attr_value = NULL, *p = NULL;
     char *prev_attr_name = NULL;
     char *cookie_header = NULL;
     int cookie_count = 0;
 
     if (_cookie_header == NULL) return -1;
+    // XXX Should it not match _v0 parser?
+    //if (_cookie_header == NULL) {
+    //    msr_log(msr, 1, "Cookie parser: Received null for argument.");
+    //    return -1;
+    //}
+
     cookie_header = strdup(_cookie_header);
     if (cookie_header == NULL) return -1;
 
@@ -213,6 +223,7 @@ int parse_cookies_v1(modsec_rec *msr, char *_cookie_header, apr_table_t *cookies
         while( (*p != 0)&&( (*p == ',')||(*p == ';')||(isspace(*p)) ) ) p++;
     }
 
+    free(cookie_header);
     return cookie_count;
 }
 
@@ -322,7 +333,8 @@ int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
 /**
  *
  */
-void add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg) {
+void add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg)
+{
     if (msr->txcfg->debuglog_level >= 5) {
         msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
             arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),

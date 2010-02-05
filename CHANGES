@@ -1,6 +1,8 @@
 14 Jan 2010 - 2.5.12
 --------------------
 
+ * Fixed memory leak in v1 cookie parser.  Reported by Sogeti/ESEC R&D.
+
  * Now support macro expansion in numeric operators (@eq, @ge, @lt, etc.)
 
  * Update copyright to 2010.
