@@ -1050,8 +1050,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                 }
             }
         }
-        else
-        if (rc == RULE_MATCH) {
+        else if (rc == RULE_MATCH) {
             if (msr->rule_was_intercepted) {
                 /* If the transaction was intercepted by this rule we will
                  * go back. Do note that we are relying on the

@@ -308,12 +308,12 @@
 
         <para><ulink type=""
         url="http://curl.haxx.se/libcurl/">http://curl.haxx.se/libcurl/</ulink></para>
+
         <note>
           <para>Many have had issues with libcurl linked with the GnuTLS
-          library for SSL/TLS support.  It is recommended that the
-          openssl library be used for SSL/TLS support in libcurl.</para>
+          library for SSL/TLS support. It is recommended that the openssl
+          library be used for SSL/TLS support in libcurl.</para>
         </note>
-
       </listitem>
     </orderedlist>
 
@@ -4888,7 +4888,7 @@ setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasi
         </listitem>
 
         <listitem>
-            <para>700,000-799,999; reserved for Ivan Ristic.</para>
+          <para>700,000-799,999; reserved for Ivan Ristic.</para>
         </listitem>
 
         <listitem>
