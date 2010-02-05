@@ -1,5 +1,4 @@
-
-2 Feb 2010 - trunk
+04 Feb 2010 - trunk
 -------------------
 
  * Add REQUEST_BODY_LENGTH, which contains the number of request body
@@ -26,6 +25,51 @@
    allow phase 5 rules to to implement conditional logging, as well as
    pave support for allowing access to all ModSecurity variables from
    mog_log_config. [Ivan Ristic]
+
+
+04 Feb 2010 - 2.5.12
+--------------------
+
+ * Fixed SecUploadFileMode to set the correct mode.
+
+ * Fixed nolog,auditlog/noauditlog/nolog controls for disruptive actions.
+
+ * Added additional file info definitions introduced in APR 0.9.5 so that
+   build will work with older APRs (IBM HTTP Server v6).
+
+ * Added SecUploadFileLimit to limit the number of uploaded file parts that
+   will be processed in a multipart POST.  The default is 100.
+
+ * Fixed path normalization to better handle backreferences that extend
+   above root directories.  Reported by Sogeti/ESEC R&D.
+
+ * Trim whitespace around phrases used with @pmFromFile and allow
+   for both LF and CRLF terminated lines.
+
+ * Allow for more robust parsing for multipart header folding.  Reported
+   by Sogeti/ESEC R&D.
+
+ * Fixed failure to match internally set TX variables with regex
+   (TX:/.../) syntax.
+ 
+ * Fixed failure to log full internal TX variable names and populate
+   MATCHED_VAR* vars.
+
+ * Enabled PCRE "studying" by default.  This is now a configure-time option.
+
+ * Added PCRE match limits (SecPcreMatchLimit/SecPcreMatchLimitRecursion) to
+   aide in REDoS type attacks.  A rule that goes over the limits will set
+   TX:MSC_PCRE_LIMITS_EXCEEDED.  It is intended that the next major release
+   of ModSecurity (2.6.x) will move these flags to a dedicated collection.
+
+ * Reduced default PCRE match limits reducing impact of REDoS on poorly
+   written regex rules.  Reported by Sogeti/ESEC R&D.
+
+ * Fixed memory leak in v1 cookie parser.  Reported by Sogeti/ESEC R&D.
+
+ * Now support macro expansion in numeric operators (@eq, @ge, @lt, etc.)
+
+ * Update copyright to 2010.
 
  * Reserved 700,000-799,999 IDs for Ivan Ristic.
 

@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2009 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -38,17 +38,21 @@ apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
 }
 
 /**
- * Compiles the provided regular expression pattern. The last two
+ * Compiles the provided regular expression pattern. The _err*
  * parameters are optional, but if they are provided and an error
  * occurs they will contain the error message and the offset in
- * the pattern where the offending part of the pattern begins.
+ * the pattern where the offending part of the pattern begins. The
+ * match_limit* parameters are optional and if >0, then will set
+ * match limits.
  */
-void *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
-    const char **_errptr, int *_erroffset)
+void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
+                      const char **_errptr, int *_erroffset,
+                      int match_limit, int match_limit_recursion)
 {
     const char *errptr = NULL;
     int erroffset;
     msc_regex_t *regex;
+    pcre_extra *pe = NULL;
 
     regex = apr_pcalloc(pool, sizeof(msc_regex_t));
     if (regex == NULL) return NULL;
@@ -62,13 +66,72 @@ void *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
     if (regex->re == NULL) return NULL;
 
     #ifdef WITH_PCRE_STUDY
-    regex->pe = pcre_study(regex->re, 0, &errptr);
+    pe = pcre_study(regex->re, 0, &errptr);
     #endif
+
+    /* Setup the pcre_extra record if pcre_study did not already do it */
+    if (pe == NULL) {
+        pe = malloc(sizeof(pcre_extra));
+        if (pe == NULL) {
+            return NULL;
+        }
+        memset(pe, 0, sizeof(pcre_extra));
+    }
+
+#ifdef PCRE_EXTRA_MATCH_LIMIT
+    /* If match limit is available, then use it */
+
+    /* Use ModSecurity runtime defaults */
+    if (match_limit > 0) {
+        pe->match_limit = match_limit;
+        pe->flags |= PCRE_EXTRA_MATCH_LIMIT;
+    }
+#ifdef MODSEC_PCRE_MATCH_LIMIT
+    /* Default to ModSecurity compiled defaults */
+    else {
+        pe->match_limit = MODSEC_PCRE_MATCH_LIMIT;
+        pe->flags |= PCRE_EXTRA_MATCH_LIMIT;
+    }
+#endif /* MODSEC_PCRE_MATCH_LIMIT */
+#else
+#warning This PCRE version does not support match limits!  Upgrade to at least PCRE v6.5.
+#endif /* PCRE_EXTRA_MATCH_LIMIT */
+
+#ifdef PCRE_EXTRA_MATCH_LIMIT_RECURSION
+    /* If match limit recursion is available, then use it */
+
+    /* Use ModSecurity runtime defaults */
+    if (match_limit_recursion > 0) {
+        pe->match_limit_recursion = match_limit_recursion;
+        pe->flags |= PCRE_EXTRA_MATCH_LIMIT_RECURSION;
+    }
+#ifdef MODSEC_PCRE_MATCH_LIMIT_RECURSION
+    /* Default to ModSecurity compiled defaults */
+    else {
+        pe->match_limit_recursion = MODSEC_PCRE_MATCH_LIMIT_RECURSION;
+        pe->flags |= PCRE_EXTRA_MATCH_LIMIT_RECURSION;
+    }
+#endif /* MODSEC_PCRE_MATCH_LIMIT_RECURSION */
+#else
+#warning This PCRE version does not support match recursion limits!  Upgrade to at least PCRE v6.5.
+#endif /* PCRE_EXTRA_MATCH_LIMIT_RECURSION */
+
+    regex->pe = pe;
 
     apr_pool_cleanup_register(pool, (void *)regex,
         (apr_status_t (*)(void *))msc_pcre_cleanup, apr_pool_cleanup_null);
 
     return regex;
+}
+
+/**
+ * Compiles the provided regular expression pattern.  Calls msc_pregcomp_ex()
+ * with default limits.
+ */
+void *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
+                   const char **_errptr, int *_erroffset)
+{
+    return msc_pregcomp_ex(pool, pattern, options, _errptr, _erroffset, 0, 0);
 }
 
 /**
@@ -119,3 +182,4 @@ int msc_fullinfo(msc_regex_t *regex, int what, void *where)
 {
     return pcre_fullinfo(regex->re, regex->pe, what, where);
 }
+

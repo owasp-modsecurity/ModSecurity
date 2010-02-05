@@ -4,9 +4,9 @@
 <article>
   <title><trademark class="registered">ModSecurity</trademark> Reference Manual</title>
   <articleinfo>
-    <releaseinfo>Version 2.6.0-trunk (Nov 12, 2009)</releaseinfo>
+    <releaseinfo>Version 2.6.0-trunk (Feb 3, 2009)</releaseinfo>
     <copyright>
-      <year>2004-2009</year>
+      <year>2004-2010</year>
       <holder>Breach Security, Inc. (<ulink url="http://www.breach.com"
           >http://www.breach.com</ulink>)</holder>
     </copyright>
@@ -218,10 +218,11 @@
           central repository, then you will also need the curl library.</para>
         <para><ulink type="" url="http://curl.haxx.se/libcurl/"
           >http://curl.haxx.se/libcurl/</ulink></para>
+
         <note>
-          <para>Many have had issues with libcurl linked with the GnuTLS library for SSL/TLS
-            support. It is recommended that the openssl library be used for SSL/TLS support in
-            libcurl.</para>
+          <para>Many have had issues with libcurl linked with the GnuTLS
+          library for SSL/TLS support. It is recommended that the openssl
+          library be used for SSL/TLS support in libcurl.</para>
         </note>
       </listitem>
     </orderedlist>
@@ -1000,6 +1001,61 @@ SecMarker 99</emphasis></programlisting>
       </para>
     </section>
     <section>
+      <title><literal>SecPcreMatchLimit</literal></title>
+
+      <para><emphasis>Description:</emphasis>Sets the the match limit in the
+      PCRE library. See the pcre_extra field in the pcreapi man page.</para>
+
+      <para><emphasis>Syntax:</emphasis> <literal
+      moreinfo="none">SecPcreMatchLimit value</literal></para>
+
+      <para><emphasis>Example Usage:</emphasis> <literal
+      moreinfo="none">SecPcreMatchLimit 1500</literal></para>
+
+      <para><emphasis>Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis>Scope:</emphasis> Global</para>
+
+      <para><emphasis>Version:</emphasis> 2.5.12</para>
+
+      <para><emphasis>Dependencies/Notes:</emphasis> Default is set at compile
+      (1500 by default)</para>
+
+      <para>The <literal>--enable-pcre-match-limit=val</literal> configure
+      option will set a custom default and the
+      <literal>--disable-pcre-match-limit</literal> option will resort to the
+      compiled PCRE library default.</para>
+    </section>
+
+    <section>
+      <title><literal>SecPcreMatchLimitRecursion</literal></title>
+
+      <para><emphasis>Description:</emphasis>Sets the the match limit
+      recursion in the PCRE library. See the pcre_extra field in the pcreapi
+      man page.</para>
+
+      <para><emphasis>Syntax:</emphasis> <literal
+      moreinfo="none">SecPcreMatchLimitRecursion value</literal></para>
+
+      <para><emphasis>Example Usage:</emphasis> <literal
+      moreinfo="none">SecPcreMatchLimitRecursion 1500</literal></para>
+
+      <para><emphasis>Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis>Scope:</emphasis> Global</para>
+
+      <para><emphasis>Version:</emphasis> 2.5.12</para>
+
+      <para><emphasis>Dependencies/Notes:</emphasis> Default is set at compile
+      (1500 by default)</para>
+
+      <para>The <literal>--enable-pcre-match-limit-recursion=val</literal>
+      configure option will set a custom default and the
+      <literal>--disable-pcre-match-limit-recursion</literal> option will
+      resort to the compiled PCRE library default.</para>
+    </section>
+
+    <section>
       <title><literal>SecPdfProtect</literal></title>
       <para><emphasis>Description:</emphasis> Enables the PDF XSS protection functionality. Once
         enabled access to PDF files is tracked. Direct access attempts are redirected to links that
@@ -1671,6 +1727,42 @@ SecRuleUpdateActionById 12345 "t:compressWhitespace,deny,status:403,msg:'A new m
         directive is used with <literal>SecUploadKeepFiles</literal>.</para>
     </section>
     <section>
+      <title><literal>SecUploadFileLimit</literal></title>
+
+      <para><emphasis>Description:</emphasis> Configures the maximum number of
+      file uploads processed in a multipart POST.</para>
+
+      <para><emphasis>Syntax:</emphasis> <literal
+      moreinfo="none">SecUploadFileLimit number</literal></para>
+
+      <para><emphasis>Example Usage:</emphasis> <literal
+      moreinfo="none">SecUploadFileLimit 10</literal></para>
+
+      <para><emphasis>Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis>Scope:</emphasis> Any</para>
+
+      <para><emphasis>Version:</emphasis> 2.5.12</para>
+
+      <para><emphasis>Dependencies/Notes:</emphasis> The default is set to 100
+      files, but you are encouraged to reduce this value. Any file over the
+      limit will not be extracted and the <literal
+      moreinfo="none">MULTIPART_FILE_LIMIT_EXCEEDED</literal> and <literal
+      moreinfo="none">MULTIPART_STRICT_ERROR</literal> flags will be set. To
+      prevent bypassing any file checks, you must check for one of these
+      flags.</para>
+
+      <note>
+        <para>If the limit is exceeded, the part name and file name will still
+        be recorded in <literal moreinfo="none">FILES_NAME</literal> and
+        <literal moreinfo="none">FILES</literal>, the file size will be
+        recorded in <literal moreinfo="none">FILES_SIZES</literal>, but there
+        will be no record in <literal moreinfo="none">FILES_TMPNAMES</literal>
+        as a temporary file was not created.</para>
+      </note>
+    </section>
+
+    <section>
       <title><literal>SecUploadFileMode</literal></title>
       <para><emphasis>Description:</emphasis> Configures the mode (permissions) of any uploaded
         files using an octal mode (as used in chmod).</para>
@@ -2111,19 +2203,30 @@ SecRule ARGS "@pm some key words" id:12345,deny,status:500</programlisting>
     </section>
     <section>
       <title><literal>MULTIPART_STRICT_ERROR</literal></title>
-      <para><literal>MULTIPART_STRICT_ERROR</literal> will be set to <literal>1</literal> when any
-        of the following variables is also set to <literal>1</literal>: <literal
-          >REQBODY_PROCESSOR_ERROR</literal>, <literal>MULTIPART_BOUNDARY_QUOTED</literal>, <literal
-          >MULTIPART_BOUNDARY_WHITESPACE</literal>, <literal>MULTIPART_DATA_BEFORE</literal>,
-          <literal>MULTIPART_DATA_AFTER</literal>, <literal>MULTIPART_HEADER_FOLDING</literal>,
-          <literal>MULTIPART_LF_LINE</literal>, <literal>MULTIPART_SEMICOLON_MISSING</literal>
-        <literal>MULTIPART_INVALID_QUOTING</literal>. Each of these variables covers one unusual
-        (although sometimes legal) aspect of the request body in <literal>multipart/form-data
-          format</literal>. Your policies should <emphasis>always</emphasis> contain a rule to check
-        either this variable (easier) or one or more individual variables (if you know exactly what
-        you want to accomplish). Depending on the rate of false positives and your default policy
-        you should decide whether to block or just warn when the rule is triggered.</para>
-      <para>The best way to use this variable is as in the example below:</para>
+      <para><literal>MULTIPART_STRICT_ERROR</literal> will be set to
+      <literal>1</literal> when any of the following variables is also set to
+      <literal>1</literal>: <literal>REQBODY_PROCESSOR_ERROR</literal>,
+      <literal>MULTIPART_BOUNDARY_QUOTED</literal>,
+      <literal>MULTIPART_BOUNDARY_WHITESPACE</literal>,
+      <literal>MULTIPART_DATA_BEFORE</literal>,
+      <literal>MULTIPART_DATA_AFTER</literal>,
+      <literal>MULTIPART_HEADER_FOLDING</literal>,
+      <literal>MULTIPART_LF_LINE</literal>,
+      <literal>MULTIPART_SEMICOLON_MISSING</literal>
+      <literal>MULTIPART_INVALID_QUOTING</literal>
+      <literal>MULTIPART_INVALID_HEADER_FOLDING</literal>
+      <literal>MULTIPART_FILE_LIMIT_EXCEEDED</literal>. Each of these
+      variables covers one unusual (although sometimes legal) aspect of the
+      request body in <literal>multipart/form-data format</literal>. Your
+      policies should <emphasis>always</emphasis> contain a rule to check
+      either this variable (easier) or one or more individual variables (if
+      you know exactly what you want to accomplish). Depending on the rate of
+      false positives and your default policy you should decide whether to
+      block or just warn when the rule is triggered.</para>
+
+      <para>The best way to use this variable is as in the example
+      below:</para>
+
       <programlisting>SecRule MULTIPART_STRICT_ERROR "!@eq 0" \
 "phase:2,t:none,log,deny,msg:'Multipart request body \
 failed strict validation: \
@@ -2135,7 +2238,9 @@ DA %{MULTIPART_DATA_AFTER}, \
 HF %{MULTIPART_HEADER_FOLDING}, \
 LF %{MULTIPART_LF_LINE}, \
 SM %{MULTIPART_SEMICOLON_MISSING}, \
-IQ %{MULTIPART_INVALID_QUOTING}'"</programlisting>
+IQ %{MULTIPART_INVALID_QUOTING}, \
+IQ %{MULTIPART_INVALID_HEADER_FOLDING}, \
+FE %{MULTIPART_FILE_LIMIT_EXCEEDED}'"</programlisting>
       <para>The <literal>multipart/form-data</literal> parser was upgraded in ModSecurity v2.1.3 to
         actively look for signs of evasion. Many variables (as listed above) were added to expose
         various facts discovered during the parsing process. The <literal
@@ -2569,6 +2674,21 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
           <para><literal moreinfo="none">TX:1-TX:9</literal> - The captured subexpression value when
             using the <literal moreinfo="none">@rx</literal> operator with capturing parens and the
               <literal moreinfo="none">capture</literal> action.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">TX:MSC_.*</literal> - ModSecurity
+          processing flags.</para>
+
+          <itemizedlist>
+            <listitem>
+              <para><literal
+              moreinfo="none">MSC_PCRE_LIMITS_EXCEEDED</literal> - Set
+              non-zero if PCRE match limits are exceeded. See <literal
+              moreinfo="none">SecPcreMatchLimit</literal> and <literal
+              moreinfo="none">SecPcreMatchLimitRecursion</literal>.</para>
+            </listitem>
+          </itemizedlist>
         </listitem>
       </itemizedlist>
       <programlisting format="linespecific">SecRule WEBSERVER_ERROR_LOG "does not exist" "phase:5,pass,<emphasis>setvar:tx.score=+5</emphasis>"
@@ -3256,7 +3376,7 @@ setvar:session.suspicious=1,<emphasis>expirevar:session.suspicious=3600</emphasi
           <para>430,000-699,999; unused (available for reservation).</para>
         </listitem>
         <listitem>
-            <para>700,000-799,999; reserved for Ivan Ristic.</para>
+          <para>700,000-799,999; reserved for Ivan Ristic.</para>
         </listitem>
 
         <listitem>
@@ -3731,6 +3851,9 @@ SecRule ARGS:route "!<emphasis>@endsWith %{REQUEST_ADDR}</emphasis>" t:none,deny
         "equal to."</para>
       <para>Example:</para>
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@eq</emphasis> 15"</programlisting>
+
+      <para>Macro expansion is performed so you may use variable names such as
+      <literal>%{TX.1}</literal>, etc.</para>
     </section>
     <section>
       <title><literal>ge</literal></title>
@@ -3738,6 +3861,9 @@ SecRule ARGS:route "!<emphasis>@endsWith %{REQUEST_ADDR}</emphasis>" t:none,deny
         "greater than or equal to."</para>
       <para>Example:</para>
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@ge</emphasis> 15"</programlisting>
+
+      <para>Macro expansion is performed so you may use variable names such as
+      <literal>%{TX.1}</literal>, etc.</para>
     </section>
     <section>
       <title><literal>geoLookup</literal></title>
@@ -3766,6 +3892,9 @@ SecRule &amp;GEO "@eq 0" "deny,status:403,msg:'Failed to lookup IP'"</programlis
         "greater than."</para>
       <para>Example:</para>
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@gt</emphasis> 15"</programlisting>
+
+      <para>Macro expansion is performed so you may use variable names such as
+      <literal>%{TX.1}</literal>, etc.</para>
     </section>
     <section>
       <title><literal>inspectFile</literal></title>
@@ -3800,6 +3929,9 @@ end</programlisting>
         "less than or equal to."</para>
       <para>Example:</para>
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@le</emphasis> 15"</programlisting>
+
+      <para>Macro expansion is performed so you may use variable names such as
+      <literal>%{TX.1}</literal>, etc.</para>
     </section>
     <section>
       <title><literal>lt</literal></title>
@@ -3807,6 +3939,9 @@ end</programlisting>
         "less than."</para>
       <para>Example:</para>
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@lt</emphasis> 15"</programlisting>
+
+      <para>Macro expansion is performed so you may use variable names such as
+      <literal>%{TX.1}</literal>, etc.</para>
     </section>
     <section>
       <title><literal>pm</literal></title>
@@ -3827,14 +3962,33 @@ end</programlisting>
       <para>Notes:</para>
       <orderedlist continuation="restarts" inheritnum="ignore">
         <listitem>
-          <para>The contents of the files should be one phrase per line. End of line markers will be
-            stripped from the phrases, however, whitespace will not be trimmed from phrases in the
-            file. Empty lines and comment lines (beginning with a '#') are ignored.</para>
+          <para>The contents of the files should be one phrase per line. End
+          of line markers will be stripped from the phrases (LF and CRLF), and
+          whitespace is trimmed from both sides of the phrases. Empty lines
+          and comment lines (beginning with a '#') are ignored.</para>
         </listitem>
         <listitem>
           <para>To allow easier inclusion of phrase files with rulesets, relative paths may be used
             to the phrase files. In this case, the path of the file containing the rule is prepended
             to the phrase file path.</para>
+        </listitem>
+
+        <listitem>
+          <para>To allow easier matching of whole IP addresses, you can add
+          boundary characters to the phrases. For example, use "/1.2.3.4/"
+          instead of "1.2.3.4". You can then insert these characters into the
+          target prior to a match:</para>
+
+          <programlisting format="linespecific">SecAction "phase:1,pass,nolog,setvar:tx.remote_addr=/%{REMOTE_ADDR}/"
+SecRule TX:REMOTE_ADDR "<emphasis>@pmFromFile ip-blacklist.txt</emphasis>" "deny,status:403
+
+# ip-blacklist.txt contents:
+# NOTE: All IPs must be prefixed/suffixed with "/" as the rules
+#       will add in this character as a boundary to ensure
+#       the entire IP is matched.
+# SecAction "phase:1,pass,nolog,setvar:tx.remote_addr='/%{REMOTE_ADDR}/'"
+/1.2.3.4/
+/5.6.7.8/</programlisting>
         </listitem>
       </orderedlist>
       <para>Example:</para>

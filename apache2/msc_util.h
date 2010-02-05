@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2009 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -21,6 +21,13 @@
 
 #include <sys/types.h>
 #include <apr_file_info.h>
+
+#ifndef APR_WSTICKY
+/* Add extra flags added to APR in 0.9.5 */
+#define APR_USETID      0x8000 /**< Set user id */
+#define APR_GSETID      0x4000 /**< Set group id */
+#define APR_WSTICKY     0x2000 /**< Sticky bit */
+#endif
 
 #include "modsecurity.h"
 

@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2009 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -22,6 +22,17 @@
 typedef struct msc_regex_t msc_regex_t;
 
 #include "pcre.h"
+
+#ifndef PCRE_ERROR_MATCHLIMIT
+/* Define for compile, but not valid in this version of PCRE. */
+#define PCRE_ERROR_MATCHLIMIT (-8)
+#endif /* PCRE_ERROR_MATCHLIMIT */
+
+#ifndef PCRE_ERROR_RECURSIONLIMIT
+/* Define for compile, but not valid in this version of PCRE. */
+#define PCRE_ERROR_RECURSIONLIMIT (-21)
+#endif /* PCRE_ERROR_RECURSIONLIMIT */
+
 #include "apr_general.h"
 #include "modsecurity.h"
 
@@ -33,17 +44,23 @@ struct msc_regex_t {
 
 apr_status_t DSOLOCAL msc_pcre_cleanup(msc_regex_t *regex);
 
-void DSOLOCAL *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
-    const char **_errptr, int *_erroffset);
+void DSOLOCAL *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
+                               const char **_errptr, int *_erroffset,
+                               int match_limit, int match_limit_recursion);
 
-int DSOLOCAL msc_regexec_ex(msc_regex_t *regex, const char *s, unsigned int slen,
-    int startoffset, int options, int *ovector, int ovecsize, char **error_msg);
+void DSOLOCAL *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
+                            const char **_errptr, int *_erroffset);
+
+int DSOLOCAL msc_regexec_ex(msc_regex_t *regex, const char *s,
+                            unsigned int slen, int startoffset, int options,
+                            int *ovector, int ovecsize, char **error_msg);
 
 int DSOLOCAL msc_regexec_capture(msc_regex_t *regex, const char *s,
-    unsigned int slen, int *ovector, int ovecsize, char **error_msg);
+                                 unsigned int slen, int *ovector,
+                                 int ovecsize, char **error_msg);
 
-int DSOLOCAL msc_regexec(msc_regex_t *regex, const char *s, unsigned int slen,
-    char **error_msg);
+int DSOLOCAL msc_regexec(msc_regex_t *regex, const char *s,
+                         unsigned int slen, char **error_msg);
 
 int DSOLOCAL msc_fullinfo(msc_regex_t *regex, int what, void *where);
 

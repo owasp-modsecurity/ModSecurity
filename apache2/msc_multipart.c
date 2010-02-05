@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2009 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -279,11 +279,19 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
     } else {
         /* Header line. */
 
-        if ((msr->mpd->buf[0] == '\t') || (msr->mpd->buf[0] == ' ')) {
+        if (isspace(msr->mpd->buf[0])) {
             char *header_value, *new_value, *data;
 
             /* header folding, add data to the header we are building */
             msr->mpd->flag_header_folding = 1;
+
+            /* RFC-2557 states header folding is SP / HTAB, but PHP and
+             * perhaps others will take any whitespace.  So, we accept,
+             * but with a flag set.
+             */
+            if ((msr->mpd->buf[0] != '\t') && (msr->mpd->buf[0] != ' ')) {
+                msr->mpd->flag_invalid_header_folding = 1;
+            }
 
             if (msr->mpd->mpp->last_header_name == NULL) {
                 /* we are not building a header at this moment */
@@ -293,7 +301,15 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
 
             /* locate the beginning of data */
             data = msr->mpd->buf;
-            while((*data == '\t') || (*data == ' ')) data++;
+            while(isspace(*data)) {
+                /* Flag invalid header folding if an invalid RFC-2557 character is used anywhere
+                 * in the folding prefix.
+                 */
+                if ((*data != '\t') && (*data != ' ')) {
+                    msr->mpd->flag_invalid_header_folding = 1;
+                }
+                data++;
+            }
 
             new_value = apr_pstrdup(msr->mp, data);
             remove_lf_crlf_inplace(new_value);
@@ -397,16 +413,32 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
 
     /* add data to the part we are building */
     if (msr->mpd->mpp->type == MULTIPART_FILE) {
+        int extract = msr->upload_extract_files;
 
         /* remember where we started */
         if (msr->mpd->mpp->length == 0) {
             msr->mpd->mpp->offset = msr->mpd->buf_offset;
         }
 
+        /* check if the file limit has been reached */
+        if (extract && (msr->mpd->nfiles >= msr->txcfg->upload_file_limit)) {
+            if (msr->mpd->flag_file_limit_exceeded == 0) {
+                *error_msg = apr_psprintf(msr->mp,
+                            "Multipart: Upload file limit exceeded "
+                            "SecUploadFileLimit %d.",
+                            msr->txcfg->upload_file_limit);
+                msr_log(msr, 3, "%s", *error_msg);
+
+                msr->mpd->flag_file_limit_exceeded = 1;
+            }
+
+            extract = 0;
+        }
+
         /* only store individual files on disk if we are going
          * to keep them or if we need to have them approved later
          */
-        if (msr->upload_extract_files) {
+        if (extract) {
             /* first create a temporary file if we don't have it already */
             if (msr->mpd->mpp->tmp_file_fd == 0) {
                 /* construct temporary file name */
@@ -421,8 +453,14 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
                     return -1;
                 }
 
+                /* keep track of the files count */
+                msr->mpd->nfiles++;
+
                 if (msr->txcfg->debuglog_level >= 4) {
-                    msr_log(msr, 4, "Multipart: Created temporary file: %s",
+                    msr_log(msr, 4,
+                        "Multipart: Created temporary file %d (mode %04o): %s",
+                        msr->mpd->nfiles,
+                        (unsigned int)msr->txcfg->upload_filemode,
                         log_escape_nq(msr->mp, msr->mpd->mpp->tmp_file_name));
                 }
             }
@@ -879,6 +917,14 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
         if (msr->mpd->flag_missing_semicolon) {
             msr_log(msr, 4, "Multipart: Warning: missing semicolon in C-T header.");
         }
+
+        if (msr->mpd->flag_invalid_quoting) {
+            msr_log(msr, 4, "Multipart: Warning: invalid quoting used.");
+        }
+
+        if (msr->mpd->flag_invalid_header_folding) {
+            msr_log(msr, 4, "Multipart: Warning: invalid header folding used.");
+        }        
     }
 
     if ((msr->mpd->seen_data != 0) && (msr->mpd->is_complete == 0)) {

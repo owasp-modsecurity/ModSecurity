@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2009 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -126,6 +126,10 @@ extern DSOLOCAL char *chroot_dir;
 extern module AP_MODULE_DECLARE_DATA security2_module;
 
 extern DSOLOCAL const command_rec module_directives[];
+
+extern DSOLOCAL unsigned long int msc_pcre_match_limit;
+
+extern DSOLOCAL unsigned long int msc_pcre_match_limit_recursion;
 
 #define RESBODY_STATUS_NOT_READ         0   /* we were not configured to read the body */
 #define RESBODY_STATUS_ERROR            1   /* error occured while we were reading the body */
@@ -335,6 +339,7 @@ struct modsec_rec {
     /* upload */
     int                  upload_extract_files;
     int                  upload_remove_files;
+    int                  upload_files_count;
 
     /* other */
     apr_table_t         *collections_original;
@@ -441,6 +446,7 @@ struct directory_config {
     int                  upload_keep_files;
     int                  upload_validates_files;
     int                  upload_filemode; /* int only so NOT_SET works */
+    int                  upload_file_limit;
 
     /* Used only in the configuration phase. */
     msre_rule           *tmp_chain_starter;

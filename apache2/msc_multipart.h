@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2009 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -68,6 +68,9 @@ struct multipart_data {
     /* this array keeps parts */
     apr_array_header_t      *parts;
 
+    /* Number of parts that are files */
+    int                      nfiles;
+
     /* mime boundary used to detect when
      * parts end and begin
      */
@@ -118,6 +121,8 @@ struct multipart_data {
     int                      flag_boundary_whitespace;
     int                      flag_missing_semicolon;
     int                      flag_invalid_quoting;
+    int                      flag_invalid_header_folding;
+    int                      flag_file_limit_exceeded;
 };
 
 

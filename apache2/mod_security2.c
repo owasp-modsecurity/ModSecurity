@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2009 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -52,6 +52,9 @@ apr_file_t DSOLOCAL *guardianlog_fd = NULL;
 
 char DSOLOCAL *guardianlog_condition = NULL;
 
+unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
+
+unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
 /* -- Miscellaneous functions -- */
 
@@ -227,8 +230,23 @@ int perform_interception(modsec_rec *msr) {
             break;
     }
 
+    /* If the level is not high enough to add an alert message, but "auditlog"
+     * is enabled, then still add the message. */
+    if ((log_level > 3) && (actionset->auditlog != 0)) {
+        *(const char **)apr_array_push(msr->alerts) = msc_alert_message(msr, actionset, NULL, message);
+    }
+
     /* Log the message now. */
     msc_alert(msr, log_level, actionset, message, msr->intercept_message);
+
+    /* However, this will mark the txn relevant again if it is <= 3,
+     * which will mess up noauditlog.  We need to compensate for this
+     * so that we do not increment twice when auditlog is enabled and
+     * prevent incrementing when auditlog is disabled.
+     */
+    if ((actionset->auditlog == 0) && (log_level <= 3)) {
+        msr->is_relevant--;
+    }
 
     return status;
 }

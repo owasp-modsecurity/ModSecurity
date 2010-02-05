@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2009 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -1050,8 +1050,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                 }
             }
         }
-        else
-        if (rc == RULE_MATCH) {
+        else if (rc == RULE_MATCH) {
             if (msr->rule_was_intercepted) {
                 /* If the transaction was intercepted by this rule we will
                  * go back. Do note that we are relying on the

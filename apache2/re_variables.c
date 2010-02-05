@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2009 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -1379,6 +1379,30 @@ static int var_multipart_invalid_quoting_generate(modsec_rec *msr, msre_var *var
     }
 }
 
+/* MULTIPART_INVALID_HEADER_FOLDING */
+
+static int var_multipart_invalid_header_folding_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if ((msr->mpd != NULL)&&(msr->mpd->flag_invalid_header_folding != 0)) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
+/* MULTIPART_FILE_LIMIT_EXCEEDED */
+
+static int var_multipart_file_limit_exceeded_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if ((msr->mpd != NULL)&&(msr->mpd->flag_file_limit_exceeded != 0)) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
 /* MULTIPART_STRICT_ERROR */
 
 static int var_multipart_strict_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -1395,6 +1419,8 @@ static int var_multipart_strict_error_generate(modsec_rec *msr, msre_var *var, m
             ||(msr->mpd->flag_lf_line != 0)
             ||(msr->mpd->flag_missing_semicolon != 0)
             ||(msr->mpd->flag_invalid_quoting != 0)
+            ||(msr->mpd->flag_invalid_header_folding != 0)
+            ||(msr->mpd->flag_file_limit_exceeded != 0)
         ) {
             return var_simple_generate(var, vartab, mptmp, "1");
         }
@@ -2639,6 +2665,28 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         0, 0,
         NULL,
         var_multipart_invalid_quoting_generate,
+        VAR_DONT_CACHE, /* flag */
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_INVALID_HEADER_FOLDING */
+    msre_engine_variable_register(engine,
+        "MULTIPART_INVALID_HEADER_FOLDING",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_invalid_header_folding_generate,
+        VAR_DONT_CACHE, /* flag */
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_FILE_LIMIT_EXCEEDED */
+    msre_engine_variable_register(engine,
+        "MULTIPART_FILE_LIMIT_EXCEEDED",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_file_limit_exceeded_generate,
         VAR_DONT_CACHE, /* flag */
         PHASE_REQUEST_BODY
     );
