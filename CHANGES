@@ -1,6 +1,9 @@
 18 Jan 2010 - 2.5.12
 --------------------
 
+ * Trim whitespace around phrases used with @pmFromFile and allow
+   for both LF and CRLF terminated lines.
+
  * Allow for more robust parsing for multipart header folding.  Reported
    by Sogeti/ESEC R&D.
 

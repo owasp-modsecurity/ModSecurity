@@ -5804,8 +5804,8 @@ end</programlisting>
       <orderedlist continuation="restarts" inheritnum="ignore">
         <listitem>
           <para>The contents of the files should be one phrase per line. End
-          of line markers will be stripped from the phrases, however,
-          whitespace will not be trimmed from phrases in the file. Empty lines
+          of line markers will be stripped from the phrases (LF and CRLF), and
+          whitespace is trimmed from both sides of the phrases. Empty lines
           and comment lines (beginning with a '#') are ignored.</para>
         </listitem>
 
@@ -5814,6 +5814,24 @@ end</programlisting>
           relative paths may be used to the phrase files. In this case, the
           path of the file containing the rule is prepended to the phrase file
           path.</para>
+        </listitem>
+
+        <listitem>
+          <para>To allow easier matching of whole IP addresses, you can add
+          boundary characters to the phrases. For example, use "/1.2.3.4/"
+          instead of "1.2.3.4". You can then insert these characters into the
+          target prior to a match:</para>
+
+          <programlisting format="linespecific">SecAction "phase:1,pass,nolog,setvar:tx.remote_addr=/%{REMOTE_ADDR}/"
+SecRule TX:REMOTE_ADDR "<emphasis>@pmFromFile ip-blacklist.txt</emphasis>" "deny,status:403
+
+# ip-blacklist.txt contents:
+# NOTE: All IPs must be prefixed/suffixed with "/" as the rules
+#       will add in this character as a boundary to ensure
+#       the entire IP is matched.
+# SecAction "phase:1,pass,nolog,setvar:tx.remote_addr='/%{REMOTE_ADDR}/'"
+/1.2.3.4/
+/5.6.7.8/</programlisting>
         </listitem>
       </orderedlist>
 

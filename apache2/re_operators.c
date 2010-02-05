@@ -255,7 +255,8 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     char buf[HUGE_STRING_LEN + 1];
     char *fn;
     char *next;
-    char *ptr;
+    char *start;
+    char *end;
     const char *rulefile_path;
     apr_status_t rc;
     apr_file_t *fd;
@@ -301,7 +302,7 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
         }
 
         /* Open file and read */
-        rc = apr_file_open(&fd, fn, APR_READ | APR_FILE_NOCLEANUP, 0, rule->ruleset->mp);
+        rc = apr_file_open(&fd, fn, APR_READ | APR_BUFFERED | APR_FILE_NOCLEANUP, 0, rule->ruleset->mp);
         if (rc != APR_SUCCESS) {
             *error_msg = apr_psprintf(rule->ruleset->mp, "Could not open phrase file \"%s\": %s", fn, apr_strerror(rc, errstr, 1024));
             return 0;
@@ -321,21 +322,24 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
                 return 0;
             }
 
-            /* Remove newline */
-            ptr = buf;
-            while(*ptr != '\0') ptr++;
-            if ((ptr > buf) && (*(ptr - 1) == '\n')) *(ptr - 1) = '\0';
+            /* Trim Whitespace */
+            start = buf;
+            while ((apr_isspace(*start) != 0) && (*start != '\0')) start++;
+            end = buf + strlen(buf);
+            if (end > start) end--;
+            while ((end > start) && (apr_isspace(*end) != 0)) end--;
+            if (end > start) {
+                *(++end) = '\0';
+            }
 
             /* Ignore empty lines and comments */
-            ptr = buf;
-            while((*ptr != '\0') && apr_isspace(*ptr)) ptr++;
-            if ((*ptr == '\0') || (*ptr == '#')) continue;
+            if ((start == end) || (*start == '#')) continue;
 
             #ifdef DEBUG_CONF
             fprintf(stderr, "Adding phrase file pattern: \"%s\"\n", buf);
             #endif
 
-            acmp_add_pattern(p, buf, NULL, NULL, strlen(buf));
+            acmp_add_pattern(p, start, NULL, NULL, (end - start));
         }
         fn = next;
     }
