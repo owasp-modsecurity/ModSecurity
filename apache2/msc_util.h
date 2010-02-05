@@ -22,6 +22,13 @@
 #include <sys/types.h>
 #include <apr_file_info.h>
 
+#ifndef APR_WSTICKY
+/* Add extra flags added to APR in 0.9.5 */
+#define APR_USETID      0x8000 /**< Set user id */
+#define APR_GSETID      0x4000 /**< Set group id */
+#define APR_WSTICKY     0x2000 /**< Sticky bit */
+#endif
+
 #include "modsecurity.h"
 
 int DSOLOCAL normalise_path_inplace(unsigned char *input, int len, int win, int *changed);

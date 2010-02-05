@@ -1,5 +1,8 @@
-28 Jan 2010 - 2.5.12
+03 Feb 2010 - 2.5.12
 --------------------
+
+ * Added additional file info definitions introduced in APR 0.9.5 so that
+   build will work with older APRs (IBM HTTP Server v6).
 
  * Added SecUploadFileLimit to limit the number of uploaded file parts that
    will be processed in a multipart POST.  The default is 100.
