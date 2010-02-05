@@ -457,8 +457,10 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
                 msr->mpd->nfiles++;
 
                 if (msr->txcfg->debuglog_level >= 4) {
-                    msr_log(msr, 4, "Multipart: Created temporary file %d: %s",
+                    msr_log(msr, 4,
+                        "Multipart: Created temporary file %d (mode %04o): %s",
                         msr->mpd->nfiles,
+                        (unsigned int)msr->txcfg->upload_filemode,
                         log_escape_nq(msr->mp, msr->mpd->mpp->tmp_file_name));
                 }
             }

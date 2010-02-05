@@ -543,7 +543,7 @@ void init_directory_config(directory_config *dcfg)
     if (dcfg->upload_dir == NOT_SET_P) dcfg->upload_dir = NULL;
     if (dcfg->upload_keep_files == NOT_SET) dcfg->upload_keep_files = KEEP_FILES_OFF;
     if (dcfg->upload_validates_files == NOT_SET) dcfg->upload_validates_files = 0;
-    if (dcfg->upload_filemode == NOT_SET) dcfg->upload_filemode = mode2fileperms(0600);
+    if (dcfg->upload_filemode == NOT_SET) dcfg->upload_filemode = 0600;
     if (dcfg->upload_file_limit == NOT_SET) dcfg->upload_file_limit = 100;
 
     /* Misc */

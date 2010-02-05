@@ -16,14 +16,15 @@
  * directly using the email address support@breach.com.
  *
  */
-#include "msc_release.h"
-#include "msc_util.h"
-
 #include <ctype.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#include "mod_security2_config.h"
+#include "msc_release.h"
+#include "msc_util.h"
 
 #include <apr_lib.h>
 
@@ -435,14 +436,25 @@ char *current_filetime(apr_pool_t *mp) {
  *
  */
 int msc_mkstemp_ex(char *template, int mode) {
+    int fd = -1;
+
     /* ENH Use apr_file_mktemp instead. */
 
-    #if !(defined(WIN32)||defined(NETWARE))
-    return mkstemp(template);
-    #else
+#if !(defined(WIN32)||defined(NETWARE))
+    fd = mkstemp(template);
+#ifdef HAVE_FCHMOD
+    if ((fd != -1) && (mode != 0)) {
+        if (fchmod(fd, mode) == -1) {
+            return -1;
+        }
+    }
+#endif /* HAVE_FCHMOD */
+#else
     if (mktemp(template) == NULL) return -1;
-    return open(template, O_WRONLY | O_APPEND | O_CREAT | O_BINARY, mode);
-    #endif
+    fd = open(template, O_WRONLY | O_APPEND | O_CREAT | O_BINARY, mode);
+#endif /* !(defined(WIN32)||defined(NETWARE)) */
+
+    return fd;
 }
 
 /**

@@ -1,6 +1,8 @@
 04 Feb 2010 - 2.5.12
 --------------------
 
+ * Fixed SecUploadFileMode to set the correct mode.
+
  * Fixed nolog,auditlog/noauditlog/nolog controls for disruptive actions.
 
  * Added additional file info definitions introduced in APR 0.9.5 so that
