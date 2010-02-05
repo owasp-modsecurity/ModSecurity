@@ -4,6 +4,10 @@ SecRuleEngine On
 SecRequestBodyAccess On
 SecResponseBodyAccess Off
 
+# PCRE Tuning
+SecPcreMatchLimit 1000
+SecPcreMatchLimitRecursion 1000
+
 # Handling of file uploads
 # TODO Choose a folder private to Apache.
 # SecUploadDir /opt/apache-frontend/tmp/

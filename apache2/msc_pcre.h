@@ -33,17 +33,23 @@ struct msc_regex_t {
 
 apr_status_t DSOLOCAL msc_pcre_cleanup(msc_regex_t *regex);
 
-void DSOLOCAL *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
-    const char **_errptr, int *_erroffset);
+void DSOLOCAL *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
+                               const char **_errptr, int *_erroffset,
+                               int match_limit, int match_limit_recursion);
 
-int DSOLOCAL msc_regexec_ex(msc_regex_t *regex, const char *s, unsigned int slen,
-    int startoffset, int options, int *ovector, int ovecsize, char **error_msg);
+void DSOLOCAL *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
+                            const char **_errptr, int *_erroffset);
+
+int DSOLOCAL msc_regexec_ex(msc_regex_t *regex, const char *s,
+                            unsigned int slen, int startoffset, int options,
+                            int *ovector, int ovecsize, char **error_msg);
 
 int DSOLOCAL msc_regexec_capture(msc_regex_t *regex, const char *s,
-    unsigned int slen, int *ovector, int ovecsize, char **error_msg);
+                                 unsigned int slen, int *ovector,
+                                 int ovecsize, char **error_msg);
 
-int DSOLOCAL msc_regexec(msc_regex_t *regex, const char *s, unsigned int slen,
-    char **error_msg);
+int DSOLOCAL msc_regexec(msc_regex_t *regex, const char *s,
+                         unsigned int slen, char **error_msg);
 
 int DSOLOCAL msc_fullinfo(msc_regex_t *regex, int what, void *where);
 

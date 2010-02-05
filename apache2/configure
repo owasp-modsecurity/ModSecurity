@@ -694,6 +694,9 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+enable_pcre_study
+enable_pcre_match_limit
+enable_pcre_match_limit_recursion
 enable_errors
 enable_verbose_output
 enable_strict_compile
@@ -1328,6 +1331,12 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-pcre-study     Enable PCRE regex studying during configure.
+  --enable-pcre-match-limit
+                          Enable PCRE regex match limit during configure.
+  --enable-pcre-match-limit-recursion
+                          Enable PCRE regex match limit recursion during
+                          configure.
   --disable-errors        Disable errors during configure.
   --enable-verbose-output Enable more verbose configure output.
   --enable-strict-compile Enable strict compilation (warnings are errors).
@@ -4221,6 +4230,62 @@ MSC_REGRESSION_DOCROOT_DIR="$MSC_REGRESSION_SERVERROOT_DIR/htdocs"
 
 ### Configure Options
 
+# Add PCRE Studying
+
+# Check whether --enable-pcre-study was given.
+if test "${enable_pcre_study+set}" = set; then :
+  enableval=$enable_pcre_study;
+  if test "$enableval" != "no"; then
+    pcre_study='-DWITH_PCRE_STUDY'
+  else
+    pcre_study=''
+  fi
+
+else
+
+  pcre_study='-DWITH_PCRE_STUDY'
+
+fi
+
+
+# Limit PCRE matching
+# Check whether --enable-pcre-match-limit was given.
+if test "${enable_pcre_match_limit+set}" = set; then :
+  enableval=$enable_pcre_match_limit;
+  if test "$enableval" = "yes"; then
+    as_fn_error "PCRE match limits require a numeric value" "$LINENO" 5
+  elif test "$enableval" = "no"; then
+    pcre_match_limit=''
+  else
+    pcre_match_limit="-DMODSEC_PCRE_MATCH_LIMIT=$enableval"
+  fi
+
+else
+
+  pcre_match_limit='-DMODSEC_PCRE_MATCH_LIMIT=1500'
+
+fi
+
+
+# Limit PCRE matching recursion
+# Check whether --enable-pcre-match-limit-recursion was given.
+if test "${enable_pcre_match_limit_recursion+set}" = set; then :
+  enableval=$enable_pcre_match_limit_recursion;
+  if test "$enableval" = "yes"; then
+    as_fn_error "PCRE match limits require a numeric value" "$LINENO" 5
+  elif test "$enableval" = "no"; then
+    pcre_match_limit_recursion=''
+  else
+    pcre_match_limit_recursion="-DMODSEC_PCRE_MATCH_LIMIT_RECURSION=$enableval"
+  fi
+
+else
+
+  pcre_match_limit_recursion='-DMODSEC_PCRE_MATCH_LIMIT_RECURSION=1500'
+
+fi
+
+
 # Ignore configure errors
 # Check whether --enable-errors was given.
 if test "${enable_errors+set}" = set; then :
@@ -4575,7 +4640,7 @@ else
     EXTRA_CFLAGS="-O2 -g -Wall $strict_compile"
   fi
 fi
-MODSEC_EXTRA_CFLAGS="$debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""

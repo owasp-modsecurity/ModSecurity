@@ -63,6 +63,56 @@ AC_SUBST(MSC_REGRESSION_DOCROOT_DIR)
 
 ### Configure Options
 
+# Add PCRE Studying
+
+AC_ARG_ENABLE(pcre-study,
+              AS_HELP_STRING([--enable-pcre-study],
+                             [Enable PCRE regex studying during configure.]),
+[
+  if test "$enableval" != "no"; then
+    pcre_study='-DWITH_PCRE_STUDY'
+  else
+    pcre_study=''
+  fi
+],
+[
+  pcre_study='-DWITH_PCRE_STUDY'
+])
+
+# Limit PCRE matching
+AC_ARG_ENABLE(pcre-match-limit,
+              AS_HELP_STRING([--enable-pcre-match-limit],
+                             [Enable PCRE regex match limit during configure.]),
+[
+  if test "$enableval" = "yes"; then
+    AC_MSG_ERROR([PCRE match limits require a numeric value])
+  elif test "$enableval" = "no"; then
+    pcre_match_limit=''
+  else
+    pcre_match_limit="-DMODSEC_PCRE_MATCH_LIMIT=$enableval"
+  fi
+],
+[
+  pcre_match_limit='-DMODSEC_PCRE_MATCH_LIMIT=1500'
+])
+
+# Limit PCRE matching recursion
+AC_ARG_ENABLE(pcre-match-limit-recursion,
+              AS_HELP_STRING([--enable-pcre-match-limit-recursion],
+                             [Enable PCRE regex match limit recursion during configure.]),
+[
+  if test "$enableval" = "yes"; then
+    AC_MSG_ERROR([PCRE match limits require a numeric value])
+  elif test "$enableval" = "no"; then
+    pcre_match_limit_recursion=''
+  else
+    pcre_match_limit_recursion="-DMODSEC_PCRE_MATCH_LIMIT_RECURSION=$enableval"
+  fi
+],
+[
+  pcre_match_limit_recursion='-DMODSEC_PCRE_MATCH_LIMIT_RECURSION=1500'
+])
+
 # Ignore configure errors
 AC_ARG_ENABLE(errors,
               AS_HELP_STRING([--disable-errors],
@@ -325,7 +375,7 @@ else
     EXTRA_CFLAGS="-O2 -g -Wall $strict_compile"
   fi
 fi
-MODSEC_EXTRA_CFLAGS="$debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""

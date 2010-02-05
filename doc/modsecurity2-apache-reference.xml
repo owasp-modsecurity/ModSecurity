@@ -1466,6 +1466,61 @@ SecMarker 99</emphasis></programlisting></para>
     </section>
 
     <section>
+      <title><literal>SecPcreMatchLimit</literal></title>
+
+      <para><emphasis>Description:</emphasis>Sets the the match limit in the
+      PCRE library. See the pcre_extra field in the pcreapi man page.</para>
+
+      <para><emphasis>Syntax:</emphasis> <literal
+      moreinfo="none">SecPcreMatchLimit value</literal></para>
+
+      <para><emphasis>Example Usage:</emphasis> <literal
+      moreinfo="none">SecPcreMatchLimit 1500</literal></para>
+
+      <para><emphasis>Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis>Scope:</emphasis> Global</para>
+
+      <para><emphasis>Version:</emphasis> 2.5.12</para>
+
+      <para><emphasis>Dependencies/Notes:</emphasis> Default is set at compile
+      (1500 by default)</para>
+
+      <para>The <literal>--enable-pcre-match-limit=val</literal> configure
+      option will set a custom default and the
+      <literal>--disable-pcre-match-limit</literal> option will resort to the
+      compiled PCRE library default.</para>
+    </section>
+
+    <section>
+      <title><literal>SecPcreMatchLimitRecursion</literal></title>
+
+      <para><emphasis>Description:</emphasis>Sets the the match limit
+      recursion in the PCRE library. See the pcre_extra field in the pcreapi
+      man page.</para>
+
+      <para><emphasis>Syntax:</emphasis> <literal
+      moreinfo="none">SecPcreMatchLimitRecursion value</literal></para>
+
+      <para><emphasis>Example Usage:</emphasis> <literal
+      moreinfo="none">SecPcreMatchLimitRecursion 1500</literal></para>
+
+      <para><emphasis>Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis>Scope:</emphasis> Global</para>
+
+      <para><emphasis>Version:</emphasis> 2.5.12</para>
+
+      <para><emphasis>Dependencies/Notes:</emphasis> Default is set at compile
+      (1500 by default)</para>
+
+      <para>The <literal>--enable-pcre-match-limit-recursion=val</literal>
+      configure option will set a custom default and the
+      <literal>--disable-pcre-match-limit-recursion</literal> option will
+      resort to the compiled PCRE library default.</para>
+    </section>
+
+    <section>
       <title><literal>SecPdfProtect</literal></title>
 
       <para><emphasis>Description:</emphasis> Enables the PDF XSS protection
@@ -3832,6 +3887,21 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
           subexpression value when using the <literal
           moreinfo="none">@rx</literal> operator with capturing parens and the
           <literal moreinfo="none">capture</literal> action.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal moreinfo="none">TX:MSC_.*</literal> - ModSecurity
+          processing flags.</para>
+
+          <itemizedlist>
+            <listitem>
+              <para><literal
+              moreinfo="none">MSC_PCRE_LIMITS_EXCEEDED</literal> - Set
+              non-zero if PCRE match limits are exceeded. See <literal
+              moreinfo="none">SecPcreMatchLimit</literal> and <literal
+              moreinfo="none">SecPcreMatchLimitRecursion</literal>.</para>
+            </listitem>
+          </itemizedlist>
         </listitem>
       </itemizedlist>
 

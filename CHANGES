@@ -1,6 +1,16 @@
 14 Jan 2010 - 2.5.12
 --------------------
 
+ * Enabled PCRE "studying" by default.  This is now a configure-time option.
+
+ * Added PCRE match limits (SecPcreMatchLimit/SecPcreMatchLimitRecursion) to
+   aide in REDoS type attacks.  A rule that goes over the limits will set
+   TX:MSC_PCRE_LIMITS_EXCEEDED.  It is intended that the next major release
+   of ModSecurity (2.6.x) will move these flags to a dedicated collection.
+
+ * Reduced default PCRE match limits reducing impact of REDoS on poorly
+   written regex rules.  Reported by Sogeti/ESEC R&D.
+
  * Fixed memory leak in v1 cookie parser.  Reported by Sogeti/ESEC R&D.
 
  * Now support macro expansion in numeric operators (@eq, @ge, @lt, etc.)

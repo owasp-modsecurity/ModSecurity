@@ -127,6 +127,10 @@ extern module AP_MODULE_DECLARE_DATA security2_module;
 
 extern DSOLOCAL const command_rec module_directives[];
 
+extern DSOLOCAL unsigned long int msc_pcre_match_limit;
+
+extern DSOLOCAL unsigned long int msc_pcre_match_limit_recursion;
+
 #define RESBODY_STATUS_NOT_READ         0   /* we were not configured to read the body */
 #define RESBODY_STATUS_ERROR            1   /* error occured while we were reading the body */
 #define RESBODY_STATUS_PARTIAL          2   /* partial body content available in the brigade */

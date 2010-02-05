@@ -50,6 +50,9 @@ apr_file_t DSOLOCAL *guardianlog_fd = NULL;
 
 char DSOLOCAL *guardianlog_condition = NULL;
 
+unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
+
+unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
 /* -- Miscellaneous functions -- */
 

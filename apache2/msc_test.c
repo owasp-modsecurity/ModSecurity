@@ -80,7 +80,8 @@ static apr_pool_t *g_mp = NULL;
 static modsec_rec *g_msr = NULL;
 static unsigned char buf[BUFLEN];
 msc_engine *modsecurity = NULL;
-
+unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
+unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
 /* Stubs */
 char *format_error_log_message(apr_pool_t *mp, error_message *em) {
@@ -772,7 +773,7 @@ int main(int argc, const char * const argv[])
                 result = RESULT_WRONGRET;
             }
             else if (param_len != out_len) {
-                fprintf(stderr, "Lenth %" APR_SIZE_T_FMT " (expected %" APR_SIZE_T_FMT ")\n", out_len, param_len);
+                fprintf(stderr, "Length %" APR_SIZE_T_FMT " (expected %" APR_SIZE_T_FMT ")\n", out_len, param_len);
                 result = RESULT_WRONGSIZE;
             }
             else {

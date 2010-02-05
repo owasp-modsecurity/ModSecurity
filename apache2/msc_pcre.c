@@ -38,17 +38,21 @@ apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
 }
 
 /**
- * Compiles the provided regular expression pattern. The last two
+ * Compiles the provided regular expression pattern. The _err*
  * parameters are optional, but if they are provided and an error
  * occurs they will contain the error message and the offset in
- * the pattern where the offending part of the pattern begins.
+ * the pattern where the offending part of the pattern begins. The
+ * match_limit* parameters are optional and if >0, then will set
+ * match limits.
  */
-void *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
-    const char **_errptr, int *_erroffset)
+void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
+                      const char **_errptr, int *_erroffset,
+                      int match_limit, int match_limit_recursion)
 {
     const char *errptr = NULL;
     int erroffset;
     msc_regex_t *regex;
+    pcre_extra *pe = NULL;
 
     regex = apr_pcalloc(pool, sizeof(msc_regex_t));
     if (regex == NULL) return NULL;
@@ -62,13 +66,57 @@ void *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
     if (regex->re == NULL) return NULL;
 
     #ifdef WITH_PCRE_STUDY
-    regex->pe = pcre_study(regex->re, 0, &errptr);
+    pe = pcre_study(regex->re, 0, &errptr);
     #endif
+
+    /* Setup the pcre_extra record if pcre_study did not already do it */
+    if (pe == NULL) {
+        pe = malloc(sizeof(pcre_extra));
+        if (pe == NULL) {
+            return NULL;
+        }
+        memset(pe, 0, sizeof(pcre_extra));
+    }
+
+    /* Set some PCRE limits */
+    if (match_limit > 0) {
+        pe->match_limit = match_limit;
+        pe->flags |= PCRE_EXTRA_MATCH_LIMIT;
+    }
+#ifdef MODSEC_PCRE_MATCH_LIMIT
+    else {
+        pe->match_limit = MODSEC_PCRE_MATCH_LIMIT;
+        pe->flags |= PCRE_EXTRA_MATCH_LIMIT;
+    }
+#endif
+
+    if (match_limit_recursion > 0) {
+        pe->match_limit_recursion = match_limit_recursion;
+        pe->flags |= PCRE_EXTRA_MATCH_LIMIT_RECURSION;
+    }
+#ifdef MODSEC_PCRE_MATCH_LIMIT_RECURSION
+    else {
+        pe->match_limit_recursion = MODSEC_PCRE_MATCH_LIMIT_RECURSION;
+        pe->flags |= PCRE_EXTRA_MATCH_LIMIT_RECURSION;
+    }
+#endif
+
+    regex->pe = pe;
 
     apr_pool_cleanup_register(pool, (void *)regex,
         (apr_status_t (*)(void *))msc_pcre_cleanup, apr_pool_cleanup_null);
 
     return regex;
+}
+
+/**
+ * Compiles the provided regular expression pattern.  Calls msc_pregcomp_ex()
+ * with default limits.
+ */
+void *msc_pregcomp(apr_pool_t *pool, const char *pattern, int options,
+                   const char **_errptr, int *_erroffset)
+{
+    return msc_pregcomp_ex(pool, pattern, options, _errptr, _erroffset, 0, 0);
 }
 
 /**
@@ -119,3 +167,4 @@ int msc_fullinfo(msc_regex_t *regex, int what, void *where)
 {
     return pcre_fullinfo(regex->re, regex->pe, what, where);
 }
+
