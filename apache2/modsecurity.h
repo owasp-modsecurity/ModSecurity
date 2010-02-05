@@ -331,6 +331,7 @@ struct modsec_rec {
     /* upload */
     int                  upload_extract_files;
     int                  upload_remove_files;
+    int                  upload_files_count;
 
     /* other */
     apr_table_t         *collections_original;
@@ -437,6 +438,7 @@ struct directory_config {
     int                  upload_keep_files;
     int                  upload_validates_files;
     int                  upload_filemode; /* int only so NOT_SET works */
+    int                  upload_file_limit;
 
     /* Used only in the configuration phase. */
     msre_rule           *tmp_chain_starter;

@@ -413,16 +413,32 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
 
     /* add data to the part we are building */
     if (msr->mpd->mpp->type == MULTIPART_FILE) {
+        int extract = msr->upload_extract_files;
 
         /* remember where we started */
         if (msr->mpd->mpp->length == 0) {
             msr->mpd->mpp->offset = msr->mpd->buf_offset;
         }
 
+        /* check if the file limit has been reached */
+        if (extract && (msr->mpd->nfiles >= msr->txcfg->upload_file_limit)) {
+            if (msr->mpd->flag_file_limit_exceeded == 0) {
+                *error_msg = apr_psprintf(msr->mp,
+                            "Multipart: Upload file limit exceeded "
+                            "SecUploadFileLimit %d.",
+                            msr->txcfg->upload_file_limit);
+                msr_log(msr, 3, "%s", *error_msg);
+
+                msr->mpd->flag_file_limit_exceeded = 1;
+            }
+
+            extract = 0;
+        }
+
         /* only store individual files on disk if we are going
          * to keep them or if we need to have them approved later
          */
-        if (msr->upload_extract_files) {
+        if (extract) {
             /* first create a temporary file if we don't have it already */
             if (msr->mpd->mpp->tmp_file_fd == 0) {
                 /* construct temporary file name */
@@ -437,8 +453,12 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
                     return -1;
                 }
 
+                /* keep track of the files count */
+                msr->mpd->nfiles++;
+
                 if (msr->txcfg->debuglog_level >= 4) {
-                    msr_log(msr, 4, "Multipart: Created temporary file: %s",
+                    msr_log(msr, 4, "Multipart: Created temporary file %d: %s",
+                        msr->mpd->nfiles,
                         log_escape_nq(msr->mp, msr->mpd->mpp->tmp_file_name));
                 }
             }

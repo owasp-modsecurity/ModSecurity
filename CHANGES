@@ -1,5 +1,8 @@
-25 Jan 2010 - 2.5.12
+28 Jan 2010 - 2.5.12
 --------------------
+
+ * Added SecUploadFileLimit to limit the number of uploaded file parts that
+   will be processed in a multipart POST.  The default is 100.
 
  * Fixed path normalization to better handle backreferences that extend
    above root directories.  Reported by Sogeti/ESEC R&D.

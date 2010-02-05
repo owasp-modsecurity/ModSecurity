@@ -12,6 +12,7 @@ SecPcreMatchLimitRecursion 1000
 # TODO Choose a folder private to Apache.
 # SecUploadDir /opt/apache-frontend/tmp/
 SecUploadKeepFiles Off
+SecUploadFileLimit 10
 
 # Debug log
 SecDebugLog logs/modsec_debug.log
@@ -58,7 +59,8 @@ HF %{MULTIPART_HEADER_FOLDING}, \
 LF %{MULTIPART_LF_LINE}, \
 SM %{MULTIPART_SEMICOLON_MISSING}, \
 IQ %{MULTIPART_INVALID_QUOTING}, \
-IH %{MULTIPART_INVALID_HEADER_FOLDING}'"
+IH %{MULTIPART_INVALID_HEADER_FOLDING}, \
+IH %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 
 # Did we see anything that might be a boundary?
 SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \

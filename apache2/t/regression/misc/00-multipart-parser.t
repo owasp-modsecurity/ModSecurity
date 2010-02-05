@@ -1737,3 +1737,80 @@
         ),
     ),
 },
+
+# File limits
+{
+    type => "misc",
+    comment => "multipart parser (normal)",
+    conf => qq(
+        SecRuleEngine On
+        SecDebugLog $ENV{DEBUG_LOG}
+        SecDebugLogLevel 9
+        SecRequestBodyAccess On
+        SecTmpDir "$ENV{TEMP_DIR}"
+        SecUploadDir "$ENV{UPLOAD_DIR}"
+        SecUploadKeepFiles On
+        SecUploadFileLimit 2
+
+        # These should be set
+        SecRule MULTIPART_STRICT_ERROR "!\@eq 1" "phase:2,deny"
+        SecRule MULTIPART_FILE_LIMIT_EXCEEDED "!\@eq 1" "phase:2,deny"
+
+        # This should not be set
+        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny"
+
+        # Theses should still be accurate
+        SecRule &FILES "!\@eq 3" "phase:2,deny"
+        SecRule &FILES_NAMES "!\@eq 3" "phase:2,deny"
+        SecRule &FILES_SIZES "!\@eq 3" "phase:2,deny"
+        SecRule FILES_SIZES:/^image/ "\@eq 0" "phase:2,deny"
+
+        # This should be the SecUploadFileLimit
+        SecRule &FILES_TMPNAMES "!\@eq 2" "phase:2,deny"
+    ),
+    match_log => {
+        debug => [ qr/Multipart: Upload file limit exceeded.*name: test.*variable: This is test data/s, 1 ],
+    },
+    match_response => {
+        status => qr/^200$/,
+    },
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [
+            "Content-Type" => q(multipart/form-data; boundary=0000),
+        ],
+        normalize_raw_request_data(
+            q(
+                --0000
+                Content-Disposition: form-data; name="name"
+                
+                Brian Rectanus
+                --0000
+                Content-Disposition: form-data; name="email"
+                
+                brian.rectanus@breach.com
+                --0000
+                Content-Disposition: form-data; name="image1"; filename="image1.jpg"
+                Content-Type: image/jpeg
+                
+                BINARYDATA1
+                --0000
+                Content-Disposition: form-data; name="image2"; filename="image2.jpg"
+                Content-Type: image/jpeg
+                
+                BINARYDATA2
+                --0000
+                Content-Disposition: form-data; name="image3"; filename="image3.jpg"
+                Content-Type: image/jpeg
+                
+                BINARYDATA3
+                --0000
+                Content-Disposition: form-data; name="test"
+                
+                This is test data.
+                --0000--
+            ),
+        ),
+    ),
+},
+

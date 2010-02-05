@@ -2531,6 +2531,42 @@ SecRuleUpdateActionById 12345 "t:compressWhitespace,deny,status:403,msg:'A new m
     </section>
 
     <section>
+      <title><literal>SecUploadFileLimit</literal></title>
+
+      <para><emphasis>Description:</emphasis> Configures the maximum number of
+      file uploads processed in a multipart POST.</para>
+
+      <para><emphasis>Syntax:</emphasis> <literal
+      moreinfo="none">SecUploadFileLimit number</literal></para>
+
+      <para><emphasis>Example Usage:</emphasis> <literal
+      moreinfo="none">SecUploadFileLimit 10</literal></para>
+
+      <para><emphasis>Processing Phase:</emphasis> N/A</para>
+
+      <para><emphasis>Scope:</emphasis> Any</para>
+
+      <para><emphasis>Version:</emphasis> 2.5.12</para>
+
+      <para><emphasis>Dependencies/Notes:</emphasis> The default is set to 100
+      files, but you are encouraged to reduce this value. Any file over the
+      limit will not be extracted and the <literal
+      moreinfo="none">MULTIPART_FILE_LIMIT_EXCEEDED</literal> and <literal
+      moreinfo="none">MULTIPART_STRICT_ERROR</literal> flags will be set. To
+      prevent bypassing any file checks, you must check for one of these
+      flags.</para>
+
+      <note>
+        <para>If the limit is exceeded, the part name and file name will still
+        be recorded in <literal moreinfo="none">FILES_NAME</literal> and
+        <literal moreinfo="none">FILES</literal>, the file size will be
+        recorded in <literal moreinfo="none">FILES_SIZES</literal>, but there
+        will be no record in <literal moreinfo="none">FILES_TMPNAMES</literal>
+        as a temporary file was not created.</para>
+      </note>
+    </section>
+
+    <section>
       <title><literal>SecUploadFileMode</literal></title>
 
       <para><emphasis>Description:</emphasis> Configures the mode
@@ -3174,7 +3210,8 @@ SecRule ARGS "@pm some key words" id:12345,deny,status:500</programlisting>
       <literal>MULTIPART_LF_LINE</literal>,
       <literal>MULTIPART_SEMICOLON_MISSING</literal>
       <literal>MULTIPART_INVALID_QUOTING</literal>
-      <literal>MULTIPART_INVALID_HEADER_FOLDING</literal>. Each of these
+      <literal>MULTIPART_INVALID_HEADER_FOLDING</literal>
+      <literal>MULTIPART_FILE_LIMIT_EXCEEDED</literal>. Each of these
       variables covers one unusual (although sometimes legal) aspect of the
       request body in <literal>multipart/form-data format</literal>. Your
       policies should <emphasis>always</emphasis> contain a rule to check
@@ -3198,7 +3235,8 @@ HF %{MULTIPART_HEADER_FOLDING}, \
 LF %{MULTIPART_LF_LINE}, \
 SM %{MULTIPART_SEMICOLON_MISSING}, \
 IQ %{MULTIPART_INVALID_QUOTING}, \
-IQ %{MULTIPART_INVALID_HEADER_FOLDING}'"</programlisting>
+IQ %{MULTIPART_INVALID_HEADER_FOLDING}, \
+FE %{MULTIPART_FILE_LIMIT_EXCEEDED}'"</programlisting>
 
       <para>The <literal>multipart/form-data</literal> parser was upgraded in
       ModSecurity v2.1.3 to actively look for signs of evasion. Many variables

@@ -89,6 +89,7 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->upload_keep_files = NOT_SET;
     dcfg->upload_validates_files = NOT_SET;
     dcfg->upload_filemode = NOT_SET;
+    dcfg->upload_file_limit = NOT_SET;
 
     /* These are only used during the configuration process. */
     dcfg->tmp_chain_starter = NULL;
@@ -432,6 +433,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
         ? parent->upload_validates_files : child->upload_validates_files);
     merged->upload_filemode = (child->upload_filemode == NOT_SET
         ? parent->upload_filemode : child->upload_filemode);
+    merged->upload_file_limit = (child->upload_file_limit == NOT_SET
+        ? parent->upload_file_limit : child->upload_file_limit);
 
     /* Misc */
     merged->data_dir = (child->data_dir == NOT_SET_P
@@ -541,6 +544,7 @@ void init_directory_config(directory_config *dcfg)
     if (dcfg->upload_keep_files == NOT_SET) dcfg->upload_keep_files = KEEP_FILES_OFF;
     if (dcfg->upload_validates_files == NOT_SET) dcfg->upload_validates_files = 0;
     if (dcfg->upload_filemode == NOT_SET) dcfg->upload_filemode = mode2fileperms(0600);
+    if (dcfg->upload_file_limit == NOT_SET) dcfg->upload_file_limit = 100;
 
     /* Misc */
     if (dcfg->data_dir == NOT_SET_P) dcfg->data_dir = NULL;
@@ -1622,6 +1626,23 @@ static const char *cmd_upload_dir(cmd_parms *cmd, void *_dcfg, const char *p1)
     return NULL;
 }
 
+static const char *cmd_upload_file_limit(cmd_parms *cmd, void *_dcfg,
+                                         const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "default") == 0) {
+        dcfg->upload_file_limit = NOT_SET;
+    }
+    else {
+        dcfg->upload_file_limit = atoi(p1);
+    }
+
+    return NULL;
+}
+
 static const char *cmd_upload_filemode(cmd_parms *cmd, void *_dcfg,
                                        const char *p1)
 {
@@ -2331,6 +2352,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "path to the file upload area"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecUploadFileLimit",
+        cmd_upload_file_limit,
+        NULL,
+        CMD_SCOPE_ANY,
+        "limit the number of uploaded files processed"
     ),
 
     AP_INIT_TAKE1 (
