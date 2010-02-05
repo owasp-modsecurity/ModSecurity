@@ -65,3 +65,12 @@ IH %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 # Did we see anything that might be a boundary?
 SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
 "phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
+
+# Some internal errors will set flags in TX and we will need to look for these.
+# All of these are prefixed with "MSC_".  The following flags currently exist:
+#
+# MSC_PCRE_LIMITS_EXCEEDED: PCRE match limits were exceeded.
+#
+SecRule TX:/^MSC_/ "!@streq 0" \
+        "phase:2,t:none,deny,msg:'ModSecurity internal error flagged: %{MATCHED_VAR_NAME}'"
+
