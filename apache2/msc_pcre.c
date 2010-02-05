@@ -78,28 +78,43 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
         memset(pe, 0, sizeof(pcre_extra));
     }
 
-    /* Set some PCRE limits */
+#ifdef PCRE_EXTRA_MATCH_LIMIT
+    /* If match limit is available, then use it */
+
+    /* Use ModSecurity runtime defaults */
     if (match_limit > 0) {
         pe->match_limit = match_limit;
         pe->flags |= PCRE_EXTRA_MATCH_LIMIT;
     }
 #ifdef MODSEC_PCRE_MATCH_LIMIT
+    /* Default to ModSecurity compiled defaults */
     else {
         pe->match_limit = MODSEC_PCRE_MATCH_LIMIT;
         pe->flags |= PCRE_EXTRA_MATCH_LIMIT;
     }
-#endif
+#endif /* MODSEC_PCRE_MATCH_LIMIT */
+#else
+#warning This PCRE version does not support match limits!  Upgrade to at least PCRE v6.5.
+#endif /* PCRE_EXTRA_MATCH_LIMIT */
 
+#ifdef PCRE_EXTRA_MATCH_LIMIT_RECURSION
+    /* If match limit recursion is available, then use it */
+
+    /* Use ModSecurity runtime defaults */
     if (match_limit_recursion > 0) {
         pe->match_limit_recursion = match_limit_recursion;
         pe->flags |= PCRE_EXTRA_MATCH_LIMIT_RECURSION;
     }
 #ifdef MODSEC_PCRE_MATCH_LIMIT_RECURSION
+    /* Default to ModSecurity compiled defaults */
     else {
         pe->match_limit_recursion = MODSEC_PCRE_MATCH_LIMIT_RECURSION;
         pe->flags |= PCRE_EXTRA_MATCH_LIMIT_RECURSION;
     }
-#endif
+#endif /* MODSEC_PCRE_MATCH_LIMIT_RECURSION */
+#else
+#warning This PCRE version does not support match recursion limits!  Upgrade to at least PCRE v6.5.
+#endif /* PCRE_EXTRA_MATCH_LIMIT_RECURSION */
 
     regex->pe = pe;
 

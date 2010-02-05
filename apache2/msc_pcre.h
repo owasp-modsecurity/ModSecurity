@@ -22,6 +22,17 @@
 typedef struct msc_regex_t msc_regex_t;
 
 #include "pcre.h"
+
+#ifndef PCRE_ERROR_MATCHLIMIT
+/* Define for compile, but not valid in this version of PCRE. */
+#define PCRE_ERROR_MATCHLIMIT (-8)
+#endif /* PCRE_ERROR_MATCHLIMIT */
+
+#ifndef PCRE_ERROR_RECURSIONLIMIT
+/* Define for compile, but not valid in this version of PCRE. */
+#define PCRE_ERROR_RECURSIONLIMIT (-21)
+#endif /* PCRE_ERROR_RECURSIONLIMIT */
+
 #include "apr_general.h"
 #include "modsecurity.h"
 
