@@ -27,6 +27,13 @@
 {
 	type => "tfn",
 	name => "normalisePathWin",
+	input => "x",
+	output => "x",
+	ret => 0,
+},
+{
+	type => "tfn",
+	name => "normalisePathWin",
 	input => ".",
 	output => "",
 	ret => 1,

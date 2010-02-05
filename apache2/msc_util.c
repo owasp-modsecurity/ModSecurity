@@ -1172,10 +1172,8 @@ int normalise_path_inplace(unsigned char *input, int input_len, int win, int *ch
 
     *changed = 0;
 
-    /* Need more than one character to normalize */
-    if (input_len < 1) {
-        return ldst;
-    }
+    /* Need at least one byte to normalize */
+    if (input_len <= 0) return 0;
 
     /*
      * ENH: Deal with UNC and drive letters?
