@@ -3174,14 +3174,14 @@ SecRule ARGS "@pm some key words" id:12345,deny,status:500</programlisting>
       <literal>MULTIPART_LF_LINE</literal>,
       <literal>MULTIPART_SEMICOLON_MISSING</literal>
       <literal>MULTIPART_INVALID_QUOTING</literal>
-      <literal>MULTIPART_INVALID_HEADER_FOLDING</literal>. Each of these variables
-      covers one unusual (although sometimes legal) aspect of the request body
-      in <literal>multipart/form-data format</literal>. Your policies should
-      <emphasis>always</emphasis> contain a rule to check either this variable
-      (easier) or one or more individual variables (if you know exactly what
-      you want to accomplish). Depending on the rate of false positives and
-      your default policy you should decide whether to block or just warn when
-      the rule is triggered.</para>
+      <literal>MULTIPART_INVALID_HEADER_FOLDING</literal>. Each of these
+      variables covers one unusual (although sometimes legal) aspect of the
+      request body in <literal>multipart/form-data format</literal>. Your
+      policies should <emphasis>always</emphasis> contain a rule to check
+      either this variable (easier) or one or more individual variables (if
+      you know exactly what you want to accomplish). Depending on the rate of
+      false positives and your default policy you should decide whether to
+      block or just warn when the rule is triggered.</para>
 
       <para>The best way to use this variable is as in the example
       below:</para>
@@ -5649,8 +5649,8 @@ SecRule ARGS:route "!<emphasis>@endsWith %{REQUEST_ADDR}</emphasis>" t:none,deny
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@eq</emphasis> 15"</programlisting>
 
-      <para>Macro expansion is performed so you may use variable names such
-          as <literal>%{TX.1}</literal>, etc.</para>
+      <para>Macro expansion is performed so you may use variable names such as
+      <literal>%{TX.1}</literal>, etc.</para>
     </section>
 
     <section>
@@ -5663,7 +5663,8 @@ SecRule ARGS:route "!<emphasis>@endsWith %{REQUEST_ADDR}</emphasis>" t:none,deny
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@ge</emphasis> 15"</programlisting>
 
-      <para>Macro expansion is performed so you may use variable names such
+      <para>Macro expansion is performed so you may use variable names such as
+      <literal>%{TX.1}</literal>, etc.</para>
     </section>
 
     <section>
@@ -5707,7 +5708,8 @@ SecRule &amp;GEO "@eq 0" "deny,status:403,msg:'Failed to lookup IP'"</programlis
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@gt</emphasis> 15"</programlisting>
 
-      <para>Macro expansion is performed so you may use variable names such
+      <para>Macro expansion is performed so you may use variable names such as
+      <literal>%{TX.1}</literal>, etc.</para>
     </section>
 
     <section>
@@ -5757,7 +5759,8 @@ end</programlisting>
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@le</emphasis> 15"</programlisting>
 
-      <para>Macro expansion is performed so you may use variable names such
+      <para>Macro expansion is performed so you may use variable names such as
+      <literal>%{TX.1}</literal>, etc.</para>
     </section>
 
     <section>
@@ -5770,7 +5773,8 @@ end</programlisting>
 
       <programlisting format="linespecific">SecRule &amp;REQUEST_HEADERS_NAMES "<emphasis>@lt</emphasis> 15"</programlisting>
 
-      <para>Macro expansion is performed so you may use variable names such
+      <para>Macro expansion is performed so you may use variable names such as
+      <literal>%{TX.1}</literal>, etc.</para>
     </section>
 
     <section>
