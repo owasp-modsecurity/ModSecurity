@@ -96,7 +96,7 @@
 		return 1;
 	},
 	match_log => {
-		debug => [ qr/Created temporary file: $ENV{TEMP_DIR}/, 1 ],
+		debug => [ qr/Created temporary file.*$ENV{TEMP_DIR}/, 1 ],
 		-debug => [ qr/Failed to /, 1 ],
 	},
 	match_response => {

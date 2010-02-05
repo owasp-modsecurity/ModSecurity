@@ -420,16 +420,15 @@
         SecDebugLog $ENV{DEBUG_LOG}
         SecDebugLogLevel 9
         SecRequestBodyAccess On
-        #SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,status:403"
-        SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,status:403"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,status:403"
+        SecRule MULTIPART_STRICT_ERROR "!\@eq 1" "phase:2,deny"
+        SecRule REQBODY_PROCESSOR_ERROR "!\@eq 1" "phase:2,deny"
     ),
     match_log => {
         debug => [ qr/name: a.*variable: 1.*Invalid part header \(header name missing\)/s, 1 ],
         -debug => [ qr/Adding request argument \(BODY\): name "b"/s, 1 ],
     },
     match_response => {
-        status => qr/^403$/,
+        status => qr/^200$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -707,16 +706,16 @@
         SecDebugLog $ENV{DEBUG_LOG}
         SecDebugLogLevel 9
         SecRequestBodyAccess On
-        #SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,status:403"
-        SecRule MULTIPART_INVALID_QUOTING "\@eq 1" "chain,phase:2,deny,status:403"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1"
+        SecRule MULTIPART_STRICT_ERROR "!\@eq 1" "phase:2,deny"
+        SecRule MULTIPART_INVALID_QUOTING "!\@eq 1" "phase:2,deny"
+        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "chain,phase:2,deny"
     ),
     match_log => {
         debug => [ qr/name: a.*variable: 1.*Duplicate Content-Disposition name/s, 1 ],
         -debug => [ qr/Adding request argument \(BODY\): name "b/s, 1 ],
     },
     match_response => {
-        status => qr/^403$/,
+        status => qr/^200$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
