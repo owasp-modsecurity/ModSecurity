@@ -228,8 +228,23 @@ int perform_interception(modsec_rec *msr) {
             break;
     }
 
+    /* If the level is not high enough to add an alert message, but "auditlog"
+     * is enabled, then still add the message. */
+    if ((log_level > 3) && (actionset->auditlog != 0)) {
+        *(const char **)apr_array_push(msr->alerts) = msc_alert_message(msr, actionset, NULL, message);
+    }
+
     /* Log the message now. */
     msc_alert(msr, log_level, actionset, message, msr->intercept_message);
+
+    /* However, this will mark the txn relevant again if it is <= 3,
+     * which will mess up noauditlog.  We need to compensate for this
+     * so that we do not increment twice when auditlog is enabled and
+     * prevent incrementing when auditlog is disabled.
+     */
+    if ((actionset->auditlog == 0) && (log_level <= 3)) {
+        msr->is_relevant--;
+    }
 
     return status;
 }
