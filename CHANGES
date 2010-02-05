@@ -1,5 +1,8 @@
-14 Jan 2010 - 2.5.12
+18 Jan 2010 - 2.5.12
 --------------------
+
+ * Allow for more robust parsing for multipart header folding.  Reported
+   by Sogeti/ESEC R&D.
 
  * Fixed failure to match internally set TX variables with regex
    (TX:/.../) syntax.
