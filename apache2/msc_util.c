@@ -1149,68 +1149,177 @@ int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len) {
  * IMP1 Assumes NUL-terminated
  */
 int normalise_path_inplace(unsigned char *input, int input_len, int win, int *changed) {
-    unsigned char *d = input;
-    int i, count;
+    unsigned char *src;
+    unsigned char *dst;
+    unsigned char *end;
+    int ldst = 0;
+    int hitroot = 0;
+    int done = 0;
+    int relative;
+    int trailing;
 
     *changed = 0;
 
-    i = count = 0;
-    while ((i < input_len)&&(count < input_len)) {
-        char c = input[i];
+    /* Need more than one character to normalize */
+    if (input_len < 1) {
+        return ldst;
+    }
 
+    /*
+     * ENH: Deal with UNC and drive letters?
+     */
+
+    src = dst = input;
+    end = input + (input_len - 1);
+    ldst = 1;
+
+    relative = ((*input == '/') || (win && (*input == '\\'))) ? 0 : 1;
+    trailing = ((*end == '/') || (win && (*end == '\\'))) ? 1 : 0;
+
+
+    while (!done && (src <= end) && (dst <= end)) {
         /* Convert backslash to forward slash on Windows only. */
-        if ((win)&&(c == '\\')) {
-            c = '/';
-            *changed = 1;
-        }
-
-        if (c == '/') {
-            /* Is there a directory back-reference? Yes, we
-             * require at least 5 prior bytes here. That's on
-             * purpose.
-             */
-            if ((count >= 5)&&(*(d - 1) == '.')&&(*(d - 2) == '.')&&(*(d - 3) == '/')) {
-                unsigned char *cd = d - 4;
-                int ccount = count - 4;
-
+        if (win) {
+            if (*src == '\\') {
+                *src = '/';
                 *changed = 1;
-
-                /* Go back until we reach the beginning or a forward slash. */
-                while ((ccount > 0)&&(*cd != '/')) {
-                    ccount--;
-                    cd--;
-                }
-
-                if (*cd == '/') {
-                    d = cd;
-                    count = ccount;
-                }
-            } else
-            /* Is there a directory self-reference? */
-            if ((count >= 2)&&(*(d - 1) == '.')&&(*(d - 2) == '/')) {
-                /* Ignore the last two bytes. */
-                d -= 2;
-                count -= 2;
-                *changed = 1;
-            } else
-            /* Or are there just multiple occurences of forward slash? */
-            if ((count >= 1)&&(*(d - 1) == '/')) {
-                /* Ignore the last one byte. */
-                d--;
-                count--;
+            }
+            if ((src < end) && (*(src + 1) == '\\')) {
+                *(src + 1) = '/';
                 *changed = 1;
             }
         }
 
-        /* Copy the byte over. */
-        *d++ = c;
-        count++;
-        i++;
+        /* Always normalize at the end of the input. */
+        if (src == end) {
+            done = 1;
+        }
+
+        /* Skip normalization if this is NOT the end of the path segment. */
+        else if (*(src + 1) != '/') {
+            goto copy; /* Skip normalization. */
+        }
+
+        /*** Normalize the path segment. ***/
+
+        /* Could it be an empty path segment? */
+        if ((src != end) && *src == '/') {
+            /* Ignore */
+            *changed = 1;
+            goto copy; /* Copy will take care of this. */
+        }
+
+        /* Could it be a back or self reference? */
+        else if (*src == '.') {
+
+            /* Back-reference? */
+            if ((dst > input) && (*(dst - 1) == '.')) {
+                /* If a relative path and either our normalization has
+                 * already hit the rootdir, or this is a backref with no
+                 * previous path segment, then mark that the rootdir was hit
+                 * and just copy the backref as no normilization is possible.
+                 */
+                if (relative && (hitroot || ((dst - 2) <= input))) {
+                    hitroot = 1;
+
+                    goto copy; /* Skip normalization. */
+                }
+
+                /* Remove backreference and the previous path segment. */
+                dst -= 3;
+                while ((dst > input) && (*dst != '/')) {
+                    dst--;
+                }
+
+                /* But do not allow going above rootdir. */
+                if (dst <= input) {
+                    hitroot = 1;
+                    dst = input;
+
+                    /* Need to leave the root slash if this
+                     * is not a relative path and the end was reached
+                     * on a backreference.
+                     */
+                    if (!relative && (src == end)) {
+                        dst++;
+                    }
+                }
+
+                if (done) goto length; /* Skip the copy. */
+                src++;
+
+                *changed = 1;
+            }
+
+            /* Relative Self-reference? */
+            else if (dst == input) {
+                *changed = 1;
+
+                /* Ignore. */
+
+                if (done) goto length; /* Skip the copy. */
+                src++;
+            }
+
+            /* Self-reference? */
+            else if (*(dst - 1) == '/') {
+                *changed = 1;
+
+                /* Ignore. */
+
+                if (done) goto length; /* Skip the copy. */
+                dst--;
+                src++;
+            }
+        }
+
+        /* Found a regular path segment. */
+        else if (dst > input) {
+            hitroot = 0;
+        }
+
+copy:
+        /*** Copy the byte if required. ***/
+
+        /* Skip to the last forward slash when multiple are used. */
+        if (*src == '/') {
+            unsigned char *oldsrc = src;
+
+            while (   (src < end)
+                   && ((*(src + 1) == '/') || (win && (*(src + 1) == '\\'))) )
+            {
+                src++;
+            }
+            if (oldsrc != src) *changed = 1;
+
+            /* Do not copy the forward slash to the root
+             * if it is not a relative path.  Instead
+             * move over the slash to the next segment.
+             */
+            if (relative && (dst == input)) {
+                src++;
+                goto length; /* Skip the copy */
+            }
+        }
+
+        *(dst++) = *(src++);
+
+length:
+        ldst = (dst - input);
     }
 
-    *d = '\0';
+    /* Make sure that there is not a trailing slash in the
+     * normalized form if there was not one in the original form.
+     */
+    if (!trailing && (dst > input) && *(dst - 1) == '/') {
+        ldst--;
+        dst--;
+    }
 
-    return count;
+    /* Always NUL terminate */
+    *dst = '\0';
+
+    return ldst;
 }
 
 char *modsec_build(apr_pool_t *mp) {

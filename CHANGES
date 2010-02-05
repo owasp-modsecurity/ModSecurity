@@ -1,5 +1,8 @@
-18 Jan 2010 - 2.5.12
+25 Jan 2010 - 2.5.12
 --------------------
+
+ * Fixed path normalization to better handle backreferences that extend
+   above root directories.  Reported by Sogeti/ESEC R&D.
 
  * Trim whitespace around phrases used with @pmFromFile and allow
    for both LF and CRLF terminated lines.
