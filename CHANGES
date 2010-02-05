@@ -1,6 +1,12 @@
 14 Jan 2010 - 2.5.12
 --------------------
 
+ * Fixed failure to match internally set TX variables with regex
+   (TX:/.../) syntax.
+ 
+ * Fixed failure to log full internal TX variable names and populate
+   MATCHED_VAR* vars.
+
  * Enabled PCRE "studying" by default.  This is now a configure-time option.
 
  * Added PCRE match limits (SecPcreMatchLimit/SecPcreMatchLimitRecursion) to

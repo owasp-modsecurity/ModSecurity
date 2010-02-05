@@ -176,6 +176,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
             if (s == NULL) return -1;
             s->name = apr_psprintf(msr->mp, "%d", i);
+            s->name_len = strlen(s->name);
             s->value = apr_pstrmemdup(msr->mp,
                 target + ovector[2*i], ovector[2*i + 1] - ovector[2*i]);
             s->value_len = (ovector[2*i + 1] - ovector[2*i]);
@@ -380,6 +381,7 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             if (s == NULL) return -1;
 
             s->name = "0";
+            s->name_len = strlen(s->name);
             s->value = apr_pstrdup(msr->mp, match);
             if (s->value == NULL) return -1;
             s->value_len = strlen(s->value);
@@ -1166,6 +1168,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
                     msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
                     if (s == NULL) return -1;
                     s->name = apr_psprintf(msr->mp, "%d", i);
+                    s->name_len = strlen(s->name);
                     s->value = apr_pstrmemdup(msr->mp, match, length);
                     s->value_len = length;
                     if ((s->name == NULL)||(s->value == NULL)) return -1;
