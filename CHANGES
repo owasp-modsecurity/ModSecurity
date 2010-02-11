@@ -17,8 +17,8 @@
    remains for backward compatiblity, although it now only includes
    the request time and request duration values. Added the following
    variables: PERF_COMBINED, PERF_PHASE1, PERF_PHASE2, PERF_PHASE3,
-   PERF_PHASE4, PERF_PHASE5, PERF_STORAGE, PERF_LOGGING, PERF_GC.
-   [Ivan Ristic]
+   PERF_PHASE4, PERF_PHASE5, PERF_SREAD, PERF_SWRITE, PERF_LOGGING,
+   PERF_GC. [Ivan Ristic]
 
  * Added DURATION, which contains the time ellapsed since the beginning
    of the current transaction, in milliseconds. [Ivan Ristic]
