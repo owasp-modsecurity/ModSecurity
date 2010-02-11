@@ -1,6 +1,8 @@
 05 Feb 2010 - 2.5.13-dev1
 -------------------------
 
+ * Fix some portability issues on Windows.
+
 
 04 Feb 2010 - 2.5.12
 --------------------
