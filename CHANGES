@@ -1,5 +1,7 @@
-04 Feb 2010 - trunk
+11 Feb 2010 - trunk
 -------------------
+
+ * Fix some portability issues on Windows.
 
  * Add REQUEST_BODY_LENGTH, which contains the number of request body
    bytes read. [Ivan Ristic]

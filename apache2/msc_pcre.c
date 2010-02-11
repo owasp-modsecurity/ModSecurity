@@ -94,7 +94,7 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
     }
 #endif /* MODSEC_PCRE_MATCH_LIMIT */
 #else
-#warning This PCRE version does not support match limits!  Upgrade to at least PCRE v6.5.
+#pragma message ( "This PCRE version does not support match limits!  Upgrade to at least PCRE v6.5." )
 #endif /* PCRE_EXTRA_MATCH_LIMIT */
 
 #ifdef PCRE_EXTRA_MATCH_LIMIT_RECURSION
@@ -113,7 +113,7 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
     }
 #endif /* MODSEC_PCRE_MATCH_LIMIT_RECURSION */
 #else
-#warning This PCRE version does not support match recursion limits!  Upgrade to at least PCRE v6.5.
+#pragma message ( "This PCRE version does not support match recursion limits!  Upgrade to at least PCRE v6.5." )
 #endif /* PCRE_EXTRA_MATCH_LIMIT_RECURSION */
 
     regex->pe = pe;

@@ -4,7 +4,7 @@
 <article>
   <title><trademark class="registered">ModSecurity</trademark> Reference Manual</title>
   <articleinfo>
-    <releaseinfo>Version 2.6.0-trunk (Feb 3, 2009)</releaseinfo>
+    <releaseinfo>Version 2.6.0-trunk (Feb 11, 2009)</releaseinfo>
     <copyright>
       <year>2004-2010</year>
       <holder>Breach Security, Inc. (<ulink url="http://www.breach.com"
@@ -1019,12 +1019,27 @@ SecMarker 99</emphasis></programlisting>
       <para><emphasis>Version:</emphasis> 2.5.12</para>
 
       <para><emphasis>Dependencies/Notes:</emphasis> Default is set at compile
-      (1500 by default)</para>
+      (1500 by default). See also
+      <literal>SecPcreMatchLimitRecursion</literal></para>
 
-      <para>The <literal>--enable-pcre-match-limit=val</literal> configure
-      option will set a custom default and the
-      <literal>--disable-pcre-match-limit</literal> option will resort to the
-      compiled PCRE library default.</para>
+      <para>If the limits are exceeded this will be logged at level 3 in the
+      debug log, added as a Message line in the audit log and the <literal
+      moreinfo="none">TX:MSC_PCRE_LIMITS_EXCEEDED</literal> flag will be set
+      to a non-zero value. To prevent bypass, you should write a rule to check
+      for the existance of the <literal
+      moreinfo="none">TX:MSC_PCRE_LIMITS_EXCEEDED</literal> flag.</para>
+
+      <programlisting>SecPcreMatchLimit 100
+SecPcreMatchLimitRecursion 100
+  ...
+SecRule TX:/^MSC_/ "!@eq 0" "phase:5,pass,log,auditlog,msg:'Potential REDoS'"</programlisting>
+
+      <note>
+        <para>The <literal>--enable-pcre-match-limit=val</literal> configure
+        option will set a custom default and the
+        <literal>--disable-pcre-match-limit</literal> option will resort to
+        the compiled PCRE library default.</para>
+      </note>
     </section>
 
     <section>
@@ -1047,12 +1062,26 @@ SecMarker 99</emphasis></programlisting>
       <para><emphasis>Version:</emphasis> 2.5.12</para>
 
       <para><emphasis>Dependencies/Notes:</emphasis> Default is set at compile
-      (1500 by default)</para>
+      (1500 by default). See also <literal>SecPcreMatchLimit</literal></para>
 
-      <para>The <literal>--enable-pcre-match-limit-recursion=val</literal>
-      configure option will set a custom default and the
-      <literal>--disable-pcre-match-limit-recursion</literal> option will
-      resort to the compiled PCRE library default.</para>
+      <para>If the limits are exceeded this will be logged at level 3 in the
+      debug log, added as a Message line in the audit log and the <literal
+      moreinfo="none">TX:MSC_PCRE_LIMITS_EXCEEDED</literal> flag will be set
+      to a non-zero value. To prevent bypass, you should write a rule to check
+      for the existance of the <literal
+      moreinfo="none">TX:MSC_PCRE_LIMITS_EXCEEDED</literal> flag.</para>
+
+      <programlisting>SecPcreMatchLimit 100
+SecPcreMatchLimitRecursion 100
+  ...
+SecRule TX:/^MSC_/ "!@eq 0" "phase:5,pass,log,auditlog,msg:'Potential REDoS'"</programlisting>
+
+      <note>
+        <para>The <literal>--enable-pcre-match-limit-recursion=val</literal>
+        configure option will set a custom default and the
+        <literal>--disable-pcre-match-limit-recursion</literal> option will
+        resort to the compiled PCRE library default.</para>
+      </note>
     </section>
 
     <section>
@@ -2677,7 +2706,7 @@ SecAction setsid:%{REQUEST_COOKIES.PHPSESSID}</programlisting>
         </listitem>
 
         <listitem>
-          <para><literal moreinfo="none">TX:MSC_.*</literal> - ModSecurity
+          <para><literal moreinfo="none">TX:MSC_*</literal> - ModSecurity
           processing flags.</para>
 
           <itemizedlist>
