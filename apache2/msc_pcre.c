@@ -29,7 +29,7 @@ apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
             regex->pe = NULL;
         }
         if (regex->re != NULL) {
-            free(regex->re);
+            pcre_free(regex->re);
             regex->re = NULL;
         }
     }

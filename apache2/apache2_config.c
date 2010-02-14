@@ -922,7 +922,7 @@ static const char *cmd_audit_log(cmd_parms *cmd, void *_dcfg, const char *p1)
     dcfg->auditlog_name = (char *)p1;
 
     if (dcfg->auditlog_name[0] == '|') {
-        const char *pipe_name = ap_server_root_relative(cmd->pool, dcfg->auditlog_name + 1);
+        const char *pipe_name = dcfg->auditlog_name + 1;
         piped_log *pipe_log;
 
         pipe_log = ap_open_piped_log(cmd->pool, pipe_name);
