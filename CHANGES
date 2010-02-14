@@ -1,5 +1,7 @@
-05 Feb 2010 - 2.5.13-dev1
+14 Feb 2010 - 2.5.13-dev1
 -------------------------
+
+ * Fix memory leak freeing regex.  Discovered by Tom Donovan.
 
  * Fix some portability issues on Windows.
 
