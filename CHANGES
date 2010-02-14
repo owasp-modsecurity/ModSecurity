@@ -1,6 +1,8 @@
 14 Feb 2010 - 2.5.13-dev1
 -------------------------
 
+ * Cleaned up some mlogc code and debugging output.
+
  * Remove the ability to use a relative path to a piped audit logger
    (i.e. mlogc) as Apache does not support it in their piped loggers
    and it was breaking Windows and probably other platforms that
