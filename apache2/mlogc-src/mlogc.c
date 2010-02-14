@@ -983,6 +983,15 @@ static int handle_signals(int signum)
     return 0; /* should never reach */
 }
 
+#ifdef WIN32
+/**
+ * This function is invoked by Curl to read the source file on Windows
+ */
+static size_t curl_read_callback(void *ptr, size_t size, size_t nmemb, void *stream)
+{
+        return fread(ptr, size, nmemb, (FILE *)stream);
+}
+#endif
 
 /**
  * This function is invoked by Curl to read the response
@@ -1410,9 +1419,10 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
 
                 curl_easy_setopt(curl, CURLOPT_READDATA, hd_src);
                 curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, finfo.size);
-#if 0
-                mandatory on win32?
-                curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
+
+#ifdef WIN32
+                /* Mandatory on win32 */
+                curl_easy_setopt(curl, CURLOPT_READFUNCTION, curl_read_callback);
 #endif
 
                 res = curl_easy_perform(curl);
