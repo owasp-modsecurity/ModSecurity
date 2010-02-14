@@ -673,6 +673,13 @@ SecAuditLogStorageDir logs/audit
       configure and use the ModSecurity Log Collector (mlogc) and use the
       following format for the audit log:</para>
 
+      <note>
+        <para>Prior to 2.5.13 you may have been able to use a relative path to
+        a piped logger command, but this was broken on some platforms and the
+        feature was removed in 2.5.13 to make the platforms more
+        consitent.</para>
+      </note>
+
       <para><programlisting format="linespecific">SecAuditLog "|/path/to/mlogc /path/to/mlogc.conf"</programlisting></para>
     </section>
 
