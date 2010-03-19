@@ -512,6 +512,22 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         msr_log(msr, 9, "Output filter: Receiving output (f %pp, r %pp).", f, f->r);
     }
 
+    /* Put back the Accept-Encoding and TE request headers
+     * if they were removed from the request.
+     */
+    if (msr->txcfg->disable_backend_compression) {
+        char *ae = (char *)apr_table_get(msr->request_headers, "Accept-Encoding");
+        char *te = (char *)apr_table_get(msr->request_headers, "TE");
+
+        if ((ae != NULL)&&(apr_table_get(f->r->headers_in, "Accept-Encoding") == NULL)) {
+            apr_table_add(f->r->headers_in, "Accept-Encoding", ae);
+        }        
+        
+        if ((te != NULL)&&(apr_table_get(f->r->headers_in, "TE") == NULL)) {
+            apr_table_add(f->r->headers_in, "TE", te);
+        }        
+    }
+
     /* Initialise on first invocation */
     if (msr->of_status == OF_STATUS_NOT_STARTED) {
         /* Update our context from the request structure. */

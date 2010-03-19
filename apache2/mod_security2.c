@@ -781,6 +781,14 @@ static int hook_request_late(request_rec *r) {
         rc = perform_interception(msr);
     }
 
+    /* Remove the compression ability indications the client set,
+     * but only if we need to disable backend compression.
+     */    
+    if (msr->txcfg->disable_backend_compression) {
+        apr_table_unset(r->headers_in, "Accept-Encoding");
+        apr_table_unset(r->headers_in, "TE");
+    }
+
     return rc;
 }
 

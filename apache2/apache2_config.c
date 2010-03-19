@@ -115,6 +115,8 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->component_signatures = apr_array_make(mp, 16, sizeof(char *));
 
     dcfg->request_encoding = NOT_SET_P;
+    
+    dcfg->disable_backend_compression = NOT_SET;
 
     return dcfg;
 }
@@ -459,6 +461,9 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
 
     merged->request_encoding = (child->request_encoding == NOT_SET_P
         ? parent->request_encoding : child->request_encoding);
+        
+    merged->disable_backend_compression = (child->disable_backend_compression == NOT_SET
+        ? parent->disable_backend_compression : child->disable_backend_compression);
 
     return merged;
 }
@@ -542,6 +547,7 @@ void init_directory_config(directory_config *dcfg)
 
     if (dcfg->request_encoding == NOT_SET_P) dcfg->request_encoding = NULL;
 
+    if (dcfg->disable_backend_compression == NOT_SET) dcfg->disable_backend_compression = 0;
 }
 
 /**
@@ -1252,6 +1258,14 @@ static const char *cmd_default_action(cmd_parms *cmd, void *_dcfg,
             "contain a skipAfter action.");
     }
 
+    return NULL;
+}
+
+static const char *cmd_disable_backend_compression(cmd_parms *cmd, void *_dcfg, int flag)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+    dcfg->disable_backend_compression = flag;
     return NULL;
 }
 
@@ -1996,6 +2010,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "default action list"
+    ),
+    
+    AP_INIT_FLAG (
+        "SecDisableBackendCompression",
+        cmd_disable_backend_compression,
+        NULL,
+        CMD_SCOPE_ANY,
+        "When set to On, removes the compression headers from the backend requests."
     ),
 
     AP_INIT_TAKE1 (

@@ -1,7 +1,11 @@
-14 Feb 2010 - trunk
+19 Mar 2010 - trunk
 -------------------
 
- * Add REQUEST_BODY_LENGTH, which contains the number of request body
+ * Added SecDisableBackendCompression, which disabled backend compression
+   while keeping the frontend compression enabled (assuming mod_deflate
+   in installed and configured in the proxy). [Ivan Ristic]
+
+ * Added REQUEST_BODY_LENGTH, which contains the number of request body
    bytes read. [Ivan Ristic]
 
  * Integrate with mod_log_config using the %{VARNAME}M format string.

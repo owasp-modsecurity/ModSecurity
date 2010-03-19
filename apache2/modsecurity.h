@@ -477,6 +477,8 @@ struct directory_config {
 
     /* Request character encoding. */
     const char          *request_encoding;
+    
+    int disable_backend_compression;
 };
 
 struct error_message {
