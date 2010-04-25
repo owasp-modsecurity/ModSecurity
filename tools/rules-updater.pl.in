@@ -48,13 +48,13 @@ else {
 
 my @fetched = ();
 my %opt = ();
-getopts('c:r:p:s:v:t:e:f:EuS:D:R:U:F:ldh', \%opt);
+getopts('c:r:p:s:v:t:e:f:EuS:D:R:U:F:L:ldh', \%opt);
 
 usage(1) if(defined $opt{h});
 usage(1) if(@ARGV > 1);
 
 # Make sure we have an action
-if (! grep { defined } @opt{qw(S D R U F l)}) {
+if (! grep { defined } @opt{qw(S D R U F L l)}) {
 	usage(1, "Action required.");
 }
 
@@ -344,13 +344,14 @@ sub ruleset_unpack {
 }
 
 sub ruleset_fetch_latest {
-	my($repo, $type) = @_;
+	my($repo, @type) = @_;
 	my @versions = ruleset_available_versions($repo);
 	my $verre = defined($opt{v}) ? qr/^$opt{v}/ : qr/^/;
 	my $typere = undef;
 	
 	# Figure out what to look for
-	if (defined($type) and $type ne "") {
+	if (@type == 1 and $type[0] ne "") {
+        my $type = $type[0];
 		if ($type eq "UNSTABLE") {
 			$typere = qr/\d-\D+\d+$/;
 		}
@@ -358,9 +359,32 @@ sub ruleset_fetch_latest {
 			$typere = qr/\d-$type\d+$/;
 		}
 	}
-	elsif (defined($type)) {
-		qr/\.\d+$/;
-	}
+	elsif (@type > 1) {
+        my $type;
+        for (@type) {
+            if ($_ eq "") {
+                $type .= ($type?"|":"").qr/\.\d+$/;
+            }
+            elsif ($_ eq "UNSTABLE") {
+                $type .= ($type?"|":"").qr/\d-\D+\d+$/;
+            }
+            else {
+                $type .= ($type?"|":"").qr/\d-$_\d+$/;
+            }
+        }
+
+        $typere = qr/$type/;
+    }
+    else {
+		$typere = qr/\.\d+$/;
+    }
+
+    if ($opt{d}) {
+        print STDERR "REPO: $repo\n";
+        print STDERR "TYPES: ".join(", ", @type)."\n";
+        print STDERR "VERSIONS: ".join(", ", @versions)."\n";
+        print STDERR "REGEX: version=$opt{v} type=$typere\n";
+    }
 
 	while (@versions) {
 		my $last = pop(@versions);
@@ -373,7 +397,7 @@ sub ruleset_fetch_latest {
 		}
 	}
 
-	die "No $type ruleset found.\n";
+	die "No '".join("' or '", @type)."' ruleset found.\n";
 }
 
 sub notify_email {
@@ -437,6 +461,8 @@ elsif (defined($opt{D})) { ruleset_fetch_latest($opt{D}, "dev") }
 elsif (defined($opt{R})) { ruleset_fetch_latest($opt{R}, "rc") }
 # Latest unstable
 elsif (defined($opt{U})) { ruleset_fetch_latest($opt{U}, "UNSTABLE") }
+# Latest release candidate or stable
+elsif (defined($opt{L})) { ruleset_fetch_latest($opt{R}, "rc", "") }
 # Latest (any type)
 elsif (defined($opt{F})) { ruleset_fetch_latest($opt{F}, undef) }
 
