@@ -5,8 +5,11 @@ dnl  LUA_CFLAGS
 dnl  LUA_LIBS
 
 LUA_CONFIG=""
+LUA_VERSION=""
 LUA_CFLAGS=""
-LUA_LIBS=""
+LUA_CPPFLAGS=""
+LUA_LDADD=""
+LUA_LDFLAGS=""
 LUA_CONFIG=pkg-config
 LUA_PKGNAMES="lua5.1 lua-5.1 lua_5.1 lua-51 lua_51 lua51 lua5 lua"
 LUA_SONAMES="so la sl dll dylib"
@@ -59,12 +62,16 @@ fi
 
 if test -n "${LUA_PKGNAME}"; then
     AC_MSG_RESULT([${LUA_CONFIG}])
-    LUA_CFLAGS="`${LUA_CONFIG} ${LUA_PKGNAME} --cflags`"
+    LUA_VERSION="`${LUA_CONFIG} ${LUA_PKGNAME} --modversion`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(lua VERSION: $LUA_VERSION); fi
+    LUA_CFLAGS="`${LUA_CONFIG} ${LUA_PKGNAME} --cflags-only-I`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(lua CFLAGS: $LUA_CFLAGS); fi
-    LUA_LIBS="`${LUA_CONFIG} ${LUA_PKGNAME} --libs`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(lua LIBS: $LUA_LIBS); fi
-    CFLAGS=$save_CFLAGS
-    LDFLAGS=$save_LDFLAGS
+    LUA_CPPFLAGS="`${LUA_CONFIG} ${LUA_PKGNAME} --cflags-only-other`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(lua CPPFLAGS: $LUA_CPPFLAGS); fi
+    LUA_LDADD="`${LUA_CONFIG} ${LUA_PKGNAME} --libs-only-l`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(lua LDADD: $LUA_LDADD); fi
+    LUA_LDFLAGS="`${LUA_CONFIG} ${LUA_PKGNAME} --libs-only-L --libs-only-other`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(lua LDFLAGS: $LUA_LDFLAGS); fi
 else
     AC_MSG_RESULT([no])
 
@@ -157,27 +164,29 @@ else
     if test -n "${lua_lib_path}" -a -n "${lua_inc_path}"; then
         LUA_CONFIG=""
         AC_MSG_RESULT([${lua_lib_path} ${lua_inc_path}])
+        LUA_VERSION="5.1"
         LUA_CFLAGS="-I${lua_inc_path}"
-        LUA_LIBS="-L${lua_lib_path} -l${lua_lib_name}"
-        CFLAGS=$save_CFLAGS
-        LDFLAGS=$save_LDFLAGS
+        LUA_LDADD="-l${lua_lib_name}"
+        LUA_LDFLAGS="-L${lua_lib_path}"
     else
         AC_MSG_RESULT([no])
     fi
 fi
 
 if test -n "${LUA_LIBS}"; then
-    LUA_CFLAGS="-DWITH_LUA ${LUA_CFLAGS}"
+    LUA_CPPFLAGS="-DWITH_LUA"
 fi
 
-AC_SUBST(LUA_LIBS)
 AC_SUBST(LUA_CFLAGS)
+AC_SUBST(LUA_CPPFLAGS)
+AC_SUBST(LUA_LDADD)
+AC_SUBST(LUA_LDFLAGS)
 
 if test "${with_path}" != "no"; then
-    if test -z "${LUA_LIBS}"; then
+    if test -z "${LUA_VERSION}"; then
       ifelse([$2], , AC_MSG_NOTICE([optional lua library not found]), $2)
     else
-      AC_MSG_NOTICE([using '${LUA_LIBS}' for lua Library])
+      AC_MSG_NOTICE([using lua v${LUA_VERSION}])
       ifelse([$1], , , $1) 
     fi 
 fi

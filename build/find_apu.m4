@@ -9,8 +9,7 @@ dnl  APU_LINK_LD
 APU_CONFIG=""
 APU_CFLAGS=""
 APU_LDFLAGS=""
-APU_LIBS=""
-APU_LINK_LD=""
+APU_LDADD=""
 
 AC_DEFUN([CHECK_APU],
 [dnl
@@ -53,30 +52,29 @@ if test -n "${apu_path}"; then
         APU_CONFIG="${apu_path}/${APU_CONFIG}"
     fi
     AC_MSG_RESULT([${APU_CONFIG}])
+    APU_VERSION="`${APU_CONFIG} --version`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu VERSION: $APU_VERSION); fi
     APU_CFLAGS="`${APU_CONFIG} --includes`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu CFLAGS: $APU_CFLAGS); fi
-    APU_LDFLAGS="`${APU_CONFIG} --ldflags`"
+    APU_LDFLAGS="`${APU_CONFIG} --libs`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu LDFLAGS: $APU_LDFLAGS); fi
-    APU_LIBS="`${APU_CONFIG} --libs`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu LIBS: $APU_LIBS); fi
-    APU_LINK_LD="`${APU_CONFIG} --link-ld`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu LINK_LD: $APU_LINK_LD); fi
-    CFLAGS=$save_CFLAGS
-    LDFLAGS=$save_LDFLAGS
+    APU_LDADD="`${APU_CONFIG} --link-libtool`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu LDADD: $APU_LDADD); fi
 else
     AC_MSG_RESULT([no])
 fi
 
-AC_SUBST(APU_LIBS)
+AC_SUBST(APU_CONFIG)
+AC_SUBST(APU_VERSION)
 AC_SUBST(APU_CFLAGS)
 AC_SUBST(APU_LDFLAGS)
-AC_SUBST(APU_LINK_LD)
+AC_SUBST(APU_LDADD)
 
-if test -z "${APU_LIBS}"; then
+if test -z "${APU_VERSION}"; then
     AC_MSG_NOTICE([*** apu library not found.])
     ifelse([$2], , AC_MSG_ERROR([apu library is required]), $2)
 else
-    AC_MSG_NOTICE([using '${APU_LIBS}' for apu Library])
+    AC_MSG_NOTICE([using apu v${APU_VERSION}])
     ifelse([$1], , , $1) 
 fi 
 ])

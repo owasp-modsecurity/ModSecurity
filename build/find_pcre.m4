@@ -5,8 +5,11 @@ dnl  PCRE_CFLAGS
 dnl  PCRE_LIBS
 
 PCRE_CONFIG=""
+PCRE_VERSION=""
+PCRE_CPPFLAGS=""
 PCRE_CFLAGS=""
-PCRE_LIBS=""
+PCRE_LDFLAGS=""
+PCRE_LDADD=""
 
 AC_DEFUN([CHECK_PCRE],
 [dnl
@@ -58,24 +61,28 @@ if test -n "${pcre_path}"; then
         PCRE_CONFIG="${pcre_path}/${PCRE_CONFIG}"
     fi
     AC_MSG_RESULT([${PCRE_CONFIG}])
+    PCRE_VERSION="`${PCRE_CONFIG} --version`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(pcre VERSION: $PCRE_VERSION); fi
     PCRE_CFLAGS="`${PCRE_CONFIG} --cflags`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(pcre CFLAGS: $PCRE_CFLAGS); fi
-    PCRE_LIBS="`${PCRE_CONFIG} --libs`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(pcre LIBS: $PCRE_LIBS); fi
-    CFLAGS=$save_CFLAGS
-    LDFLAGS=$save_LDFLAGS
+    PCRE_LDADD="`${PCRE_CONFIG} --libs`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(pcre LDADD: $PCRE_LDADD); fi
 else
     AC_MSG_RESULT([no])
 fi
 
-AC_SUBST(PCRE_LIBS)
+AC_SUBST(PCRE_CONFIG)
+AC_SUBST(PCRE_VERSION)
+AC_SUBST(PCRE_CPPFLAGS)
 AC_SUBST(PCRE_CFLAGS)
+AC_SUBST(PCRE_LDFLAGS)
+AC_SUBST(PCRE_LDADD)
 
-if test -z "${PCRE_LIBS}"; then
+if test -z "${PCRE_VERSION}"; then
     AC_MSG_NOTICE([*** pcre library not found.])
     ifelse([$2], , AC_MSG_ERROR([pcre library is required]), $2)
 else
-    AC_MSG_NOTICE([using '${PCRE_LIBS}' for pcre Library])
+    AC_MSG_NOTICE([using pcre v${PCRE_VERSION}])
     ifelse([$1], , , $1) 
 fi 
 ])

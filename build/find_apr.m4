@@ -8,9 +8,9 @@ dnl  APR_LINK_LD
 
 APR_CONFIG=""
 APR_CFLAGS=""
+APR_CPPFLAGS=""
 APR_LDFLAGS=""
-APR_LIBS=""
-APR_LINK_LD=""
+APR_LDADD=""
 
 AC_DEFUN([CHECK_APR],
 [dnl
@@ -53,30 +53,32 @@ if test -n "${apr_path}"; then
         APR_CONFIG="${apr_path}/${APR_CONFIG}"
     fi
     AC_MSG_RESULT([${APR_CONFIG}])
-    APR_CFLAGS="`${APR_CONFIG} --includes --cppflags --cflags`"
+    APR_VERSION="`${APR_CONFIG} --version`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apr VERSION: $APR_VERSION); fi
+    APR_CFLAGS="`${APR_CONFIG} --includes`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apr CFLAGS: $APR_CFLAGS); fi
-    APR_LDFLAGS="`${APR_CONFIG} --ldflags`"
+    APR_CPPFLAGS="`${APR_CONFIG} --cppflags`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apr CPPFLAGS: $APR_CPPFLAGS); fi
+    APR_LDFLAGS="`${APR_CONFIG} --libs`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apr LDFLAGS: $APR_LDFLAGS); fi
-    APR_LIBS="`${APR_CONFIG} --libs`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apr LIBS: $APR_LIBS); fi
-    APR_LINK_LD="`${APR_CONFIG} --link-ld`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apr LINK_LD: $APR_LINK_LD); fi
-    CFLAGS=$save_CFLAGS
-    LDFLAGS=$save_LDFLAGS
+    APR_LDADD="`${APR_CONFIG} --link-libtool`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apr LDADD: $APR_LDADD); fi
 else
     AC_MSG_RESULT([no])
 fi
 
-AC_SUBST(APR_LIBS)
+AC_SUBST(APR_CONFIG)
+AC_SUBST(APR_VERSION)
 AC_SUBST(APR_CFLAGS)
+AC_SUBST(APR_CPPFLAGS)
 AC_SUBST(APR_LDFLAGS)
-AC_SUBST(APR_LINK_LD)
+AC_SUBST(APR_LDADD)
 
-if test -z "${APR_LIBS}"; then
+if test -z "${APR_VERSION}"; then
     AC_MSG_NOTICE([*** apr library not found.])
     ifelse([$2], , AC_MSG_ERROR([apr library is required]), $2)
 else
-    AC_MSG_NOTICE([using '${APR_LIBS}' for apr Library])
+    AC_MSG_NOTICE([using apr v${APR_VERSION}])
     ifelse([$1], , , $1) 
 fi 
 ])

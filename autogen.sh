@@ -2,5 +2,6 @@
 
 rm -rf autom4te.cache
 
-#automake --add-missing --copy
+automake --add-missing --copy --foreign
 autoreconf --install
+autoheader

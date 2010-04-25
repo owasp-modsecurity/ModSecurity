@@ -5,8 +5,11 @@ dnl  LIBXML2_CFLAGS
 dnl  LIBXML2_LIBS
 
 LIBXML2_CONFIG=""
+LIBXML2_VERSION=""
 LIBXML2_CFLAGS=""
-LIBXML2_LIBS=""
+LIBXML2_CPPFLAGS=""
+LIBXML2_LDADD=""
+LIBXML2_LDFLAGS=""
 
 AC_DEFUN([CHECK_LIBXML2],
 [dnl
@@ -51,24 +54,28 @@ if test -n "${libxml2_path}"; then
         LIBXML2_CONFIG="${libxml2_path}/${LIBXML2_CONFIG}"
     fi
     AC_MSG_RESULT([${LIBXML2_CONFIG}])
+    LIBXML2_VERSION="`${LIBXML2_CONFIG} --version`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(xml VERSION: $LIBXML2_VERSION); fi
     LIBXML2_CFLAGS="`${LIBXML2_CONFIG} --cflags`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(xml CFLAGS: $LIBXML2_CFLAGS); fi
-    LIBXML2_LIBS="`${LIBXML2_CONFIG} --libs`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(xml LIBS: $LIBXML2_LIBS); fi
-    CFLAGS=$save_CFLAGS
-    LDFLAGS=$save_LDFLAGS
+    LIBXML2_LDADD="`${LIBXML2_CONFIG} --libs`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(xml LDADD: $LIBXML2_LDADD); fi
 else
     AC_MSG_RESULT([no])
 fi
 
-AC_SUBST(LIBXML2_LIBS)
+AC_SUBST(LIBXML2_CONFIG)
+AC_SUBST(LIBXML2_VERSION)
 AC_SUBST(LIBXML2_CFLAGS)
+AC_SUBST(LIBXML2_CPPFLAGS)
+AC_SUBST(LIBXML2_LDADD)
+AC_SUBST(LIBXML2_LDFLAGS)
 
-if test -z "${LIBXML2_LIBS}"; then
+if test -z "${LIBXML2_VERSION}"; then
     AC_MSG_NOTICE([*** xml library not found.])
     ifelse([$2], , AC_MSG_ERROR([libxml2 is required]), $2)
 else
-    AC_MSG_NOTICE([using '${LIBXML2_LIBS}' for libxml2])
+    AC_MSG_NOTICE([using libxml2 v${LIBXML2_VERSION}])
     ifelse([$1], , , $1) 
 fi 
 ])

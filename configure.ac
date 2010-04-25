@@ -1,16 +1,22 @@
 dnl
 dnl Autoconf configuration for ModSecurity
 dnl
-dnl     Use ./buildconf to produce a configure script
+dnl     Use ./autogen.sh to produce a configure script
 dnl
 
 AC_PREREQ(2.63)
 
-AC_INIT
-dnl AC_INIT(ModSecurity, 2.5, mod-security-users@lists.sourceforge.net, modsecurity-apache)
-AC_CONFIG_SRCDIR([mod_security2.c])
-AC_CONFIG_HEADER([mod_security2_config.h])
+AC_INIT([modsecurity], [2.5], [support@modsecurity.org])
+
+AC_CONFIG_MACRO_DIR([acinclude])
+AC_CONFIG_SRCDIR([LICENSE])
+AC_CONFIG_HEADERS([modsecurity_config.h])
 AC_CONFIG_AUX_DIR([build])
+
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+
+LT_PREREQ([2.2])
+LT_INIT([dlopen])
 
 # Checks for programs.
 AC_PROG_AWK
@@ -19,7 +25,6 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 AC_PROG_GREP
 AC_PATH_PROGS(PERL, [perl perl5], )
 AC_PATH_PROGS(ENV_CMD, [env printenv], )
@@ -62,6 +67,67 @@ AC_SUBST(MSC_REGRESSION_LOGS_DIR)
 AC_SUBST(MSC_REGRESSION_DOCROOT_DIR)
 
 ### Configure Options
+
+TOPLEVEL_SUBDIRS="tools"
+
+# Apache2 Module
+AC_ARG_ENABLE(apache2-module,
+              AS_HELP_STRING([--disable-apache2-module],
+                             [Disable building Apache2 module.]),
+[
+  if test "$enableval" != "no"; then
+    build_apache2_module=1
+  else
+    build_apache2_module=0
+  fi
+],
+[
+  build_apache2_module=1
+])
+AM_CONDITIONAL([BUILD_APACHE2_MODULE], [test "$build_apache2_module" -eq 1])
+if test "$build_apache2_module" -eq 1; then
+  TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS apache2"
+fi
+
+
+# Mlogc
+AC_ARG_ENABLE(mlogc,
+              AS_HELP_STRING([--disable-mlogc],
+                             [Disable building mlogc.]),
+[
+  if test "$enableval" != "no"; then
+    build_mlogc=1
+  else
+    build_mlogc=0
+  fi
+],
+[
+  build_mlogc=1
+])
+AM_CONDITIONAL([BUILD_MLOGC], [test "$build_mlogc" -eq 1])
+if test "$build_mlogc" -eq 1; then
+  TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS mlogc"
+fi
+
+# Documentation
+AC_ARG_ENABLE(docs,
+              AS_HELP_STRING([--enable-docs],
+                             [Enable building documentation.]),
+[
+  if test "$enableval" != "no"; then
+    build_docs=1
+  else
+    build_docs=0
+  fi
+],
+[
+  build_docs=0
+])
+AM_CONDITIONAL([BUILD_DOCS], [test "$build_docs" -eq 1])
+if test "$build_docs" -eq 1; then
+    TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS docs"
+fi
+
 
 # Add PCRE Studying
 
@@ -313,9 +379,9 @@ VERSION_OK
     APXS_INCLUDES="`$APXS -q INCLUDES` `$APXS -q EXTRA_INCLUDES`"
   fi
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs INCLUDES: $APXS_INCLUDES); fi
-  APXS_CFLAGS="`$APXS -q CFLAGS` `$APXS -q EXTRA_CFLAGS`"
+  APXS_CFLAGS=-I`$APXS -q INCLUDEDIR`
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs CFLAGS: $APXS_CFLAGS); fi
-  APXS_LDFLAGS="`$APXS -q LDFLAGS` `$APXS -q EXTRA_LDFLAGS`"
+  APXS_LDFLAGS=
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs LDFLAGS: $APXS_LDFLAGS); fi
   APXS_LIBDIR="`$APXS -q LIBDIR`"
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs LIBDIR: $APXS_LIBDIR); fi
@@ -338,6 +404,8 @@ VERSION_OK
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs PROGNAME: $APXS_PROGNAME); fi
   APXS_LIBEXECDIR="`$APXS -q LIBEXECDIR`"
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs LIBEXECDIR: $APXS_LIBEXECDIR); fi
+  APXS_MODULES=$APXS_LIBEXECDIR
+  if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs MODULES: $APXS_MODULES); fi
   if test "$APXS_SBINDIR" = "/"; then
     APXS_HTTPD="$APXS_SBINDIR/$APXS_PROGNAME"
   else
@@ -389,11 +457,7 @@ done;
 
 ### Substitute the vars
 
-save_CPPFLAGS=$CPPFLAGS
-CPPFLAGS="$APXS_INCLUDES $CPPFLAGS"
-save_LDFLAGS=$LDFLAGS
-LDFLAGS="$APXS_LDFLAGS $LDFLAGS"
-
+AC_SUBST(TOPLEVEL_SUBDIRS)
 AC_SUBST(EXTRA_CFLAGS)
 AC_SUBST(MODSEC_EXTRA_CFLAGS)
 AC_SUBST(APXS)
@@ -412,30 +476,41 @@ AC_SUBST(APXS_BINDIR)
 AC_SUBST(APXS_SBINDIR)
 AC_SUBST(APXS_PROGNAME)
 AC_SUBST(APXS_LIBEXECDIR)
+AC_SUBST(APXS_MODULES)
 AC_SUBST(APXS_HTTPD)
 
 CHECK_PCRE()
+if test "$build_apache2_module" -ne 0 -o "$build_mlogc" -ne 0; then
 CHECK_APR()
 CHECK_APU()
+fi
 CHECK_LIBXML2()
 CHECK_LUA()
+if test "$build_mlogc" -ne 0; then
 CHECK_CURL()
+fi
 
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([tools/Makefile])
+if test "$build_apache2_module" -ne 0; then
+AC_CONFIG_FILES([apache2/Makefile])
+fi
 AC_CONFIG_FILES([build/apxs-wrapper], [chmod +x build/apxs-wrapper])
 if test -e "$PERL"; then
-    AC_CONFIG_FILES([mlogc-src/mlogc-batch-load.pl], [chmod +x mlogc-src/mlogc-batch-load.pl])
-    AC_CONFIG_FILES([t/run-unit-tests.pl], [chmod +x t/run-unit-tests.pl])
-    AC_CONFIG_FILES([t/run-regression-tests.pl], [chmod +x t/run-regression-tests.pl])
-    AC_CONFIG_FILES([t/gen_rx-pm.pl], [chmod +x t/gen_rx-pm.pl])
-    AC_CONFIG_FILES([t/csv_rx-pm.pl], [chmod +x t/csv_rx-pm.pl])
-    AC_CONFIG_FILES([t/regression/server_root/conf/httpd.conf])
+    if test "$build_mlogc" -ne 0; then
+        AC_CONFIG_FILES([mlogc/mlogc-batch-load.pl], [chmod +x mlogc/mlogc-batch-load.pl])
+    fi
+    AC_CONFIG_FILES([tests/run-unit-tests.pl], [chmod +x tests/run-unit-tests.pl])
+    AC_CONFIG_FILES([tests/run-regression-tests.pl], [chmod +x tests/run-regression-tests.pl])
+    AC_CONFIG_FILES([tests/gen_rx-pm.pl], [chmod +x tests/gen_rx-pm.pl])
+    AC_CONFIG_FILES([tests/csv_rx-pm.pl], [chmod +x tests/csv_rx-pm.pl])
+    AC_CONFIG_FILES([tests/regression/server_root/conf/httpd.conf])
 
     # Perl based tools
-    AC_CONFIG_FILES([../tools/rules-updater.pl], [chmod +x ../tools/rules-updater.pl])
+    AC_CONFIG_FILES([tools/rules-updater.pl], [chmod +x tools/rules-updater.pl])
 fi
-if test -e "mlogc-src/Makefile.in"; then
-    AC_CONFIG_FILES([mlogc-src/Makefile])
+if test "$build_mlogc" -ne 0; then
+    AC_CONFIG_FILES([mlogc/Makefile])
 fi
 
 AC_OUTPUT
