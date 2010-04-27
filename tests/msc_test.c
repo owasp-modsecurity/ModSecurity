@@ -295,7 +295,7 @@ static int init_op(op_data_t *data, const char *name, const char *param, unsigne
     data->input = input;
     data->input_len = input_len;
 
-    if ( apr_filepath_merge(&conf_fn, NULL, "t/unit-test.conf", APR_FILEPATH_TRUENAME, g_mp) != APR_SUCCESS) {
+    if ( apr_filepath_merge(&conf_fn, NULL, "unit-test.conf", APR_FILEPATH_TRUENAME, g_mp) != APR_SUCCESS) {
         *errmsg = apr_psprintf(g_mp, "Failed to build a conf filename.");
         return -1;
     }
@@ -388,7 +388,7 @@ static int init_action(action_data_t *data, const char *name, const char *param,
         return -1;
     }
 
-    if ( apr_filepath_merge(&conf_fn, NULL, "t/unit-test.conf", APR_FILEPATH_TRUENAME, g_mp) != APR_SUCCESS) {
+    if ( apr_filepath_merge(&conf_fn, NULL, "unit-test.conf", APR_FILEPATH_TRUENAME, g_mp) != APR_SUCCESS) {
         *errmsg = apr_psprintf(g_mp, "Failed to build a conf filename.");
         return -1;
     }

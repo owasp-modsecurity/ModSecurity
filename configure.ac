@@ -50,7 +50,7 @@ AC_CHECK_FUNCS([atexit getcwd memmove memset strcasecmp strchr strdup strerror s
 # Some directories
 MSC_BASE_DIR=`pwd`
 MSC_PKGBASE_DIR="$MSC_BASE_DIR/.."
-MSC_TEST_DIR="$MSC_BASE_DIR/t"
+MSC_TEST_DIR="$MSC_BASE_DIR/tests"
 MSC_REGRESSION_DIR="$MSC_TEST_DIR/regression"
 MSC_REGRESSION_SERVERROOT_DIR="$MSC_REGRESSION_DIR/server_root"
 MSC_REGRESSION_CONF_DIR="$MSC_REGRESSION_SERVERROOT_DIR/conf"
@@ -486,6 +486,9 @@ CHECK_APU()
 fi
 CHECK_LIBXML2()
 CHECK_LUA()
+if test -n "$LUA_VERSION"; then
+    LUA_CFLAGS="-DWITH_LUA $LUA_CFLAGS"
+fi
 if test "$build_mlogc" -ne 0; then
 CHECK_CURL()
 fi
@@ -512,5 +515,6 @@ fi
 if test "$build_mlogc" -ne 0; then
     AC_CONFIG_FILES([mlogc/Makefile])
 fi
+AC_CONFIG_FILES([tests/Makefile])
 
 AC_OUTPUT

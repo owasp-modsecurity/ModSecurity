@@ -38,13 +38,9 @@ host_triplet = @host@
 DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/modsecurity_config.h.in \
 	$(top_srcdir)/build/apxs-wrapper.in $(top_srcdir)/configure \
-	$(top_srcdir)/tests/csv_rx-pm.pl.in \
-	$(top_srcdir)/tests/gen_rx-pm.pl.in \
 	$(top_srcdir)/tests/regression/server_root/conf/httpd.conf.in \
-	$(top_srcdir)/tests/run-regression-tests.pl.in \
-	$(top_srcdir)/tests/run-unit-tests.pl.in build/compile \
-	build/config.guess build/config.sub build/depcomp \
-	build/install-sh build/ltmain.sh build/missing
+	build/compile build/config.guess build/config.sub \
+	build/depcomp build/install-sh build/ltmain.sh build/missing
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude/libtool.m4 \
@@ -64,9 +60,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = modsecurity_config.h
-CONFIG_CLEAN_FILES = build/apxs-wrapper tests/run-unit-tests.pl \
-	tests/run-regression-tests.pl tests/gen_rx-pm.pl \
-	tests/csv_rx-pm.pl \
+CONFIG_CLEAN_FILES = build/apxs-wrapper \
 	tests/regression/server_root/conf/httpd.conf
 SOURCES =
 DIST_SOURCES =
@@ -178,9 +172,11 @@ LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 LUA_CFLAGS = @LUA_CFLAGS@
+LUA_CONFIG = @LUA_CONFIG@
 LUA_CPPFLAGS = @LUA_CPPFLAGS@
 LUA_LDADD = @LUA_LDADD@
 LUA_LDFLAGS = @LUA_LDFLAGS@
+LUA_VERSION = @LUA_VERSION@
 MAKEINFO = @MAKEINFO@
 MODSEC_APXS_EXTRA_CFLAGS = @MODSEC_APXS_EXTRA_CFLAGS@
 MODSEC_EXTRA_CFLAGS = @MODSEC_EXTRA_CFLAGS@
@@ -266,7 +262,7 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 ACLOCAL_AMFLAGS = -I acinclude
-SUBDIRS = @TOPLEVEL_SUBDIRS@
+SUBDIRS = @TOPLEVEL_SUBDIRS@ tests
 all: modsecurity_config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -322,14 +318,6 @@ $(srcdir)/modsecurity_config.h.in:  $(am__configure_deps)
 distclean-hdr:
 	-rm -f modsecurity_config.h stamp-h1
 build/apxs-wrapper: $(top_builddir)/config.status $(top_srcdir)/build/apxs-wrapper.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-tests/run-unit-tests.pl: $(top_builddir)/config.status $(top_srcdir)/tests/run-unit-tests.pl.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-tests/run-regression-tests.pl: $(top_builddir)/config.status $(top_srcdir)/tests/run-regression-tests.pl.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-tests/gen_rx-pm.pl: $(top_builddir)/config.status $(top_srcdir)/tests/gen_rx-pm.pl.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-tests/csv_rx-pm.pl: $(top_builddir)/config.status $(top_srcdir)/tests/csv_rx-pm.pl.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 tests/regression/server_root/conf/httpd.conf: $(top_builddir)/config.status $(top_srcdir)/tests/regression/server_root/conf/httpd.conf.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -714,6 +702,14 @@ uninstall-info: uninstall-info-recursive
 	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
 	tags tags-recursive uninstall uninstall-am uninstall-info-am
 
+
+# Alias for "check"
+test: check
+
+test-regression:
+	(cd tests && $(MAKE) test-regression)
+
+.PHONY: test
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -1,127 +1,39 @@
-# Makefile for ModSecurity
+check_PROGRAMS = msc_test
+msc_test_SOURCES = msc_test.c \
+                   $(top_srcdir)/apache2/re.c \
+                   $(top_srcdir)/apache2/re_operators.c \
+                   $(top_srcdir)/apache2/re_actions.c \
+                   $(top_srcdir)/apache2/re_tfns.c \
+                   $(top_srcdir)/apache2/re_variables.c \
+                   $(top_srcdir)/apache2/msc_logging.c \
+                   $(top_srcdir)/apache2/msc_xml.c \
+                   $(top_srcdir)/apache2/msc_multipart.c \
+                   $(top_srcdir)/apache2/modsecurity.c \
+                   $(top_srcdir)/apache2/msc_parsers.c \
+                   $(top_srcdir)/apache2/msc_util.c \
+                   $(top_srcdir)/apache2/msc_pcre.c \
+                   $(top_srcdir)/apache2/persist_dbm.c \
+                   $(top_srcdir)/apache2/msc_reqbody.c \
+                   $(top_srcdir)/apache2/msc_geo.c \
+                   $(top_srcdir)/apache2/acmp.c \
+                   $(top_srcdir)/apache2/msc_lua.c \
+                   $(top_srcdir)/apache2/msc_release.c
+msc_test_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
+                  @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @LUA_CFLAGS@
+msc_test_CPPFLAGS = -I$(top_srcdir)/apache2 \
+                    @APR_CPPFLAGS@ @LIBXML2_CPPFLAGS@ \
+                    @PCRE_CPPFLAGS@ @LUA_CPPFLAGS@
+msc_test_LDADD = @APR_LDADD@ @APU_LDADD@ \
+                 @PCRE_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@
+msc_test_LDFLAGS = @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
+                   @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 
-MOD_SECURITY2 = mod_security2 apache2_config apache2_io apache2_util \
-    re re_operators re_actions re_tfns re_variables \
-    msc_logging msc_xml msc_multipart modsecurity msc_parsers msc_util msc_pcre \
-    persist_dbm msc_reqbody msc_geo acmp msc_lua msc_release
+check_SCRIPTS = run-unit-tests.pl
+TESTS = $(check_SCRIPTS)
 
-MSC_TEST = re re_operators re_actions re_tfns re_variables \
-    msc_logging msc_xml msc_multipart modsecurity \
-    msc_parsers msc_util msc_pcre  persist_dbm \
-    msc_reqbody msc_geo acmp msc_lua msc_release
+test: check
 
-MOD_SECURITY2_H = re.h modsecurity.h msc_logging.h msc_multipart.h msc_parsers.h \
-    msc_pcre.h msc_util.h msc_xml.h persist_dbm.h apache2.h \
-    msc_geo.h acmp.h utf8tables.h msc_lua.h msc_release.h
+test-regression: run-regression-tests.pl
+	$(PERL) run-regression-tests.pl
 
-CC = @APXS_CC@
-LIBTOOL = @APXS_LIBTOOL@
-PERL = @PERL@
-EXTRA_CFLAGS = @EXTRA_CFLAGS@
-MODSEC_EXTRA_CFLAGS = @MODSEC_EXTRA_CFLAGS@
-
-### Note: must be in APXS format: -Wc,-flag
-APXS_EXTRA_CFLAGS = @APXS_EXTRA_CFLAGS@
-MODSEC_APXS_EXTRA_CFLAGS = @MODSEC_APXS_EXTRA_CFLAGS@
-
-APXS = @APXS@
-APXS_WRAPPER = @APXS_WRAPPER@
-APXS_INCLUDEDIR = @APXS_INCLUDEDIR@
-APXS_INCLUDES = @APXS_INCLUDES@
-APXS_CFLAGS = @APXS_CFLAGS@
-APXS_LDFLAGS = @APXS_LDFLAGS@
-APXS_LIBS = @APXS_LIBS@
-
-PCRE_CFLAGS = @PCRE_CFLAGS@
-PCRE_LIBS = @PCRE_LIBS@
-
-LUA_CFLAGS = @LUA_CFLAGS@
-LUA_LIBS = @LUA_LIBS@
-
-LIBXML2_CFLAGS = @LIBXML2_CFLAGS@
-LIBXML2_LIBS = @LIBXML2_LIBS@
-
-APR_CFLAGS = @APR_CFLAGS@
-APR_LDFLAGS = @APR_LDFLAGS@
-APR_LIBS = @APR_LIBS@
-APR_LINK_LD = @APR_LINK_LD@
-
-APU_CFLAGS = @APU_CFLAGS@
-APU_LDFLAGS = @APU_LDFLAGS@
-APU_LIBS = @APU_LIBS@
-APU_LINK_LD = @APU_LINK_LD@
-
-CPPFLAGS = @CPPFLAGS@ $(PCRE_CFLAGS) $(LIBXML2_CFLAGS) $(LUA_CFLAGS) 
-LIBS = @LIBS@ $(PCRE_LIBS) $(LIBXML2_LIBS) $(LUA_LIBS)
-LDFLAGS = @LDFLAGS@
-CFLAGS = @CFLAGS@
-
-COMPILE_APACHE_MOD = $(APXS_WRAPPER) -c $(CPPFLAGS) $(LDFLAGS) $(LIBS)
-
-INSTALL_MOD_SHARED = $(APXS_WRAPPER) -i
-
-all: mod_security2.la
-
-install: install-mods
-
-clean-extras:
-	@for dir in mlogc-src; do \
-	    if test -d $$dir; then \
-			(cd $$dir && $(MAKE) clean); \
-		fi; \
-	done
-	@rm -rf ../tools/mlogc ../tools/mlogc-batch-load.pl
-
-clean: clean-extras
-	@rm -rf *.la *.lo *.loT *.o *.slo .libs msc_test msc-test-debug.log
-
-distclean: clean
-	@rm -rf Makefile mlogc-src/Makefile mlogc-src/mlogc-batch-load.pl ../tools/*.pl t/run-unit-tests.pl t/run-regression-tests.pl t/gen_rx-pm.pl t/csv_rx-pm.pl t/run-tests.pl t/regression/server_root/conf/httpd.conf t/regression/server_root/conf/*.t_*.conf t/regression/server_root/tmp/* t/regression/server_root/logs/*.log t/regression/server_root/logs/audit/* t/regression/server_root/upload/* t/regression/server_root/data/* config config.log config.status build/apxs-wrapper
-
-maintainer-clean: distclean
-	@rm -rf config config.log config.status configure mod_security2_config.h autoscan.log configure.scan build/libtool.m4 build/config.guess build/config.sub build/ltmain.sh
-
-install-mods: mod_security2.la
-	$(INSTALL_MOD_SHARED) mod_security2.la
-
-${MOD_SECURITY2:=.slo}: $(MOD_SECURITY2_H)
-${MOD_SECURITY2:=.lo}: $(MOD_SECURITY2_H)
-${MOD_SECURITY2:=.o}: $(MOD_SECURITY2_H})
-
-mod_security2.la: $(MOD_SECURITY2_H) *.c
-	@src=""; \
-	for f in $(MOD_SECURITY2); do \
-		src="$$src $$f.c"; \
-	done; \
-	rm -f msc_test msc_test.o msc_test.lo msc_test.slo; \
-	$(COMPILE_APACHE_MOD) $(APXS_EXTRA_CFLAGS) $(MODSEC_APXS_EXTRA_CFLAGS) $$src
-
-### MLogC
-mlogc:
-	@(cd mlogc-src && $(MAKE) mlogc) \
-	&& cp -p mlogc-src/mlogc ../tools \
-	&& cp -p mlogc-src/mlogc-batch-load.pl ../tools \
-	&& echo \
-	&& echo "Successfully built \"mlogc\" in ../tools." \
-	&& echo "See: mlogc-src/INSTALL" \
-	&& echo
-
-### Experimental Test Framework (*NIX only right now)
-msc_test.lo: msc_test.c
-	$(LIBTOOL) --mode=compile $(CC) $(APXS_INCLUDES) $(APXS_CFLAGS) $(CPPFLAGS) $(APR_CFLAGS) $(APU_CFLAGS) -o msc_test.lo -c msc_test.c
-
-msc_test: $(TESTOBJS) $(MOD_SECURITY2_H}) msc_test.lo 
-	objs=""; \
-	for f in $(MSC_TEST); do \
-		objs="$$objs $$f.lo"; \
-	done; \
-	$(LIBTOOL) --mode=link $(CC) $$objs -o msc_test msc_test.lo $(LDFLAGS) $(LIBS) $(APR_LINK_LD) $(APU_LINK_LD)
-
-test: t/run-unit-tests.pl msc_test
-	@rm -f msc-test-debug.log; \
-	$(PERL) t/run-unit-tests.pl
-
-test-regression: t/run-regression-tests.pl
-	@$(PERL) t/run-regression-tests.pl
-
-.PHONY: all install clean-extras clean maintainer-clean distclean install-mods test test-regression
+.PHONY: test test-regression

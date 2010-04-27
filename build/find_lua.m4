@@ -169,6 +169,7 @@ else
         LUA_LDADD="-l${lua_lib_name}"
         LUA_LDFLAGS="-L${lua_lib_path}"
     else
+        LUA_VERSION=""
         AC_MSG_RESULT([no])
     fi
 fi
@@ -177,6 +178,8 @@ if test -n "${LUA_LIBS}"; then
     LUA_CPPFLAGS="-DWITH_LUA"
 fi
 
+AC_SUBST(LUA_CONFIG)
+AC_SUBST(LUA_VERSION)
 AC_SUBST(LUA_CFLAGS)
 AC_SUBST(LUA_CPPFLAGS)
 AC_SUBST(LUA_LDADD)
