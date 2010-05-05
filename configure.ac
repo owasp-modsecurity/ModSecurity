@@ -90,6 +90,26 @@ if test "$build_apache2_module" -eq 1; then
 fi
 
 
+# Extensions
+AC_ARG_ENABLE(extentions,
+              AS_HELP_STRING([--enable-extentions],
+                             [Enable building extension.]),
+[
+  if test "$enableval" != "no"; then
+    build_extentions=1
+  else
+    build_extentions=0
+  fi
+],
+[
+  build_extentions=0
+])
+AM_CONDITIONAL([BUILD_extentions], [test "$build_extentions" -eq 1])
+if test "$build_extentions" -eq 1; then
+  TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS ext"
+fi
+
+
 # Mlogc
 AC_ARG_ENABLE(mlogc,
               AS_HELP_STRING([--disable-mlogc],
@@ -497,6 +517,9 @@ AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([tools/Makefile])
 if test "$build_apache2_module" -ne 0; then
 AC_CONFIG_FILES([apache2/Makefile])
+fi
+if test "$build_extentions" -ne 0; then
+AC_CONFIG_FILES([ext/Makefile])
 fi
 AC_CONFIG_FILES([build/apxs-wrapper], [chmod +x build/apxs-wrapper])
 if test -e "$PERL"; then
