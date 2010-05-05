@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <limits.h>
 
 typedef struct rule_exception rule_exception;
@@ -369,6 +370,9 @@ struct modsec_rec {
      * are to allow phases 1-2 only.
      */
     unsigned int         allow_scope;
+
+    /* Generic request body processor context to be used by custom parsers. */
+    void                *reqbody_processor_ctx;
 };
 
 struct directory_config {

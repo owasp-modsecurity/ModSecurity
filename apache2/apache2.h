@@ -38,6 +38,7 @@ APR_DECLARE_OPTIONAL_FN(void, modsec_register_variable,
      unsigned int argc_min, unsigned int argc_max,
      void *fn_validate, void *fn_generate,
      unsigned int is_cacheable, unsigned int availability));
+APR_DECLARE_OPTIONAL_FN(void, modsec_register_reqbody_processor, (const char *name, void *fn_init, void *fn_process, void *fn_complete));
 #endif
 
 /* ap_get_server_version() is gone in 2.3.0.

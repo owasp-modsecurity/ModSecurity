@@ -34,6 +34,7 @@ typedef struct msre_tfn_metadata msre_tfn_metadata;
 typedef struct msre_actionset msre_actionset;
 typedef struct msre_action_metadata msre_action_metadata;
 typedef struct msre_action msre_action;
+typedef struct msre_reqbody_processor_metadata msre_reqbody_processor_metadata;
 typedef struct msre_cache_rec msre_cache_rec;
 
 #include "apr_general.h"
@@ -63,6 +64,10 @@ msre_var_metadata DSOLOCAL *msre_resolve_var(msre_engine *engine, const char *na
 
 msre_action_metadata DSOLOCAL *msre_resolve_action(msre_engine *engine, const char *name);
 
+msre_reqbody_processor_metadata DSOLOCAL *msre_resolve_reqbody_processor(
+                                                            msre_engine *engine,
+                                                            const char *name);
+
 msre_var DSOLOCAL *msre_create_var(msre_ruleset *ruleset, const char *name, const char *param,
     modsec_rec *msr, char **error_msg);
 
@@ -91,6 +96,7 @@ struct msre_engine {
     apr_table_t             *operators;
     apr_table_t             *actions;
     apr_table_t             *tfns;
+    apr_table_t             *reqbody_processors;
 };
 
 msre_engine DSOLOCAL *msre_engine_create(apr_pool_t *parent_pool);
@@ -358,6 +364,21 @@ struct msre_action {
     const char              *param;
     const void              *param_data;
     unsigned int             param_plusminus; /* ABSOLUTE_VALUE, POSITIVE_VALUE, NEGATIVE_VALUE */
+};
+
+void DSOLOCAL msre_engine_reqbody_processor_register(msre_engine *engine,
+    const char *name, void *fn_init, void *fn_process, void *fn_complete);
+
+typedef int (*fn_reqbody_processor_init_t)(modsec_rec *msr, char **error_msg);
+typedef int (*fn_reqbody_processor_process_t)(modsec_rec *msr, const char *buf,
+            unsigned int size, char **error_msg);
+typedef int (*fn_reqbody_processor_complete_t)(modsec_rec *msr, char **error_msg);
+
+struct msre_reqbody_processor_metadata {
+    const char                       *name;
+    fn_reqbody_processor_init_t       init;
+    fn_reqbody_processor_process_t    process;
+    fn_reqbody_processor_complete_t   complete;
 };
 
 /* -- MSRE Function Prototypes ---------------------------------------------- */

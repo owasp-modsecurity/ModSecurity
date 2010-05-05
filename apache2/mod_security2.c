@@ -1116,6 +1116,25 @@ static void modsec_register_variable(const char *name, unsigned int type,
         fprintf(stderr,"modsecurity is NULL\n");
     }
 }
+
+/**
+ * This function is exported for other Apache modules to
+ * register new request body processors.
+ */
+static void modsec_register_reqbody_processor(const char *name,
+                                              void *fn_init,
+                                              void *fn_process,
+                                              void *fn_complete)
+{
+    if (modsecurity != NULL) {
+
+        msre_engine_reqbody_processor_register(modsecurity->msre, name,
+                (fn_reqbody_processor_init_t)fn_init,
+                (fn_reqbody_processor_init_t)fn_process,
+                (fn_reqbody_processor_init_t)fn_complete);
+    }
+}
+
 #endif
 
 /**
@@ -1168,6 +1187,7 @@ static void register_hooks(apr_pool_t *mp) {
     APR_REGISTER_OPTIONAL_FN(modsec_register_tfn);
     APR_REGISTER_OPTIONAL_FN(modsec_register_operator);
     APR_REGISTER_OPTIONAL_FN(modsec_register_variable);
+    APR_REGISTER_OPTIONAL_FN(modsec_register_reqbody_processor);
 #endif
 
     /* Main hooks */

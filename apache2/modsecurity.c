@@ -103,6 +103,7 @@ msc_engine *modsecurity_create(apr_pool_t *mp, int processing_mode) {
     msre_engine_register_default_operators(msce->msre);
     msre_engine_register_default_tfns(msce->msre);
     msre_engine_register_default_actions(msce->msre);
+    // TODO: msre_engine_register_default_reqbody_processors(msce->msre);
 
     return msce;
 }

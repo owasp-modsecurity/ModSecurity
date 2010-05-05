@@ -240,15 +240,27 @@ apr_status_t msre_parse_actions(msre_engine *engine, msre_actionset *actionset,
 /**
  * Locates variable metadata given the variable name.
  */
-msre_var_metadata *msre_resolve_var(msre_engine *engine, const char *name) {
+msre_var_metadata *msre_resolve_var(msre_engine *engine, const char *name)
+{
     return (msre_var_metadata *)apr_table_get(engine->variables, name);
 }
 
 /**
  * Locates action metadata given the action name.
  */
-msre_action_metadata *msre_resolve_action(msre_engine *engine, const char *name) {
+msre_action_metadata *msre_resolve_action(msre_engine *engine, const char *name)
+{
     return (msre_action_metadata *)apr_table_get(engine->actions, name);
+}
+
+/**
+ * Locates request body processor metadata given the processor name.
+ */
+msre_reqbody_processor_metadata *msre_resolve_reqbody_processor(
+                                                            msre_engine *engine,
+                                                            const char *name)
+{
+    return (msre_reqbody_processor_metadata *)apr_table_get(engine->reqbody_processors, name);
 }
 
 /**
@@ -738,14 +750,16 @@ msre_engine *msre_engine_create(apr_pool_t *parent_pool) {
     engine = apr_pcalloc(mp, sizeof(msre_engine));
     if (engine == NULL) return NULL;
     engine->mp = mp;
-    engine->tfns = apr_table_make(mp, 25);
+    engine->tfns = apr_table_make(mp, 50);
     if (engine->tfns == NULL) return NULL;
     engine->operators = apr_table_make(mp, 25);
     if (engine->operators == NULL) return NULL;
-    engine->variables = apr_table_make(mp, 25);
+    engine->variables = apr_table_make(mp, 100);
     if (engine->variables == NULL) return NULL;
-    engine->actions = apr_table_make(mp, 25);
+    engine->actions = apr_table_make(mp, 50);
     if (engine->actions == NULL) return NULL;
+    engine->reqbody_processors = apr_table_make(mp, 10);
+    if (engine->reqbody_processors == NULL) return NULL;
 
     return engine;
 }

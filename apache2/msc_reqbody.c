@@ -17,9 +17,29 @@
  *
  */
 #include "modsecurity.h"
+#include "re.h"
 #include "msc_parsers.h"
 
 #define CHUNK_CAPACITY 8192
+
+
+/**
+ *
+ */
+void msre_engine_reqbody_processor_register(msre_engine *engine,
+    const char *name, void *fn_init, void *fn_process, void *fn_complete)
+{
+    msre_reqbody_processor_metadata *metadata = 
+        (msre_reqbody_processor_metadata *)apr_pcalloc(engine->mp,
+            sizeof(msre_reqbody_processor_metadata));
+    if (metadata == NULL) return;
+
+    metadata->name = name;
+    metadata->init = fn_init;
+    metadata->process = fn_process;
+    metadata->complete = fn_complete;
+    apr_table_setn(engine->reqbody_processors, name, (void *)metadata);
+}
 
 /**
  * Prepare to accept the request body (part 2).
@@ -77,8 +97,25 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
 
     if (msr->msc_reqbody_processor != NULL) {
         char *my_error_msg = NULL;
+        msre_reqbody_processor_metadata *metadata =
+            (msre_reqbody_processor_metadata *)apr_table_get(msr->modsecurity->msre->reqbody_processors, msr->msc_reqbody_processor);
+        
 
-        if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
+        if (metadata != NULL) {
+            if (   (metadata->init != NULL)
+                && (metadata->init(msr, &my_error_msg) < 0))
+            {
+                *error_msg = apr_psprintf(msr->mp,
+                                          "%s parsing error (init): %s",
+                                          msr->msc_reqbody_processor,
+                                          my_error_msg);
+                msr->msc_reqbody_error = 1;
+                msr->msc_reqbody_error_msg = my_error_msg;
+                msr_log(msr, 2, "%s", *error_msg);
+            }
+        }
+        // TODO: All these below need to be registered in the same way as above
+        else if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
             if (multipart_init(msr, &my_error_msg) < 0) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart parsing error (init): %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
@@ -86,8 +123,7 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
                 msr_log(msr, 2, "%s", *error_msg);
             }
         }
-        else
-        if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
+        else if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
             if (xml_init(msr, &my_error_msg) < 0) {
                 *error_msg = apr_psprintf(msr->mp, "XML parsing error (init): %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
@@ -95,8 +131,7 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
                 msr_log(msr, 2, "%s", *error_msg);
             }
         }
-        else
-        if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
+        else if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
             /* Do nothing, URLENCODED processor does not support streaming yet. */
         }
         else {
@@ -268,10 +303,27 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
      * data to it first (but only if it did not report an
      * error on previous invocations).
      */
-    if ((msr->msc_reqbody_processor != NULL)&&(msr->msc_reqbody_error == 0)) {
+    if ((msr->msc_reqbody_processor != NULL) && (msr->msc_reqbody_error == 0)) {
         char *my_error_msg = NULL;
+        msre_reqbody_processor_metadata *metadata =
+            (msre_reqbody_processor_metadata *)apr_table_get(msr->modsecurity->msre->reqbody_processors, msr->msc_reqbody_processor);
+        
 
-        if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
+        if (metadata != NULL) {
+            if (   (metadata->process != NULL)
+                && (metadata->process(msr, data, length, &my_error_msg) < 0))
+            {
+                *error_msg = apr_psprintf(msr->mp,
+                                          "%s parsing error: %s",
+                                          msr->msc_reqbody_processor,
+                                          my_error_msg);
+                msr->msc_reqbody_error = 1;
+                msr->msc_reqbody_error_msg = my_error_msg;
+                msr_log(msr, 2, "%s", *error_msg);
+            }
+        }
+        // TODO: All these below need to be registered in the same way as above
+        else if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
             /* The per-request data length counter will
              * be updated by the multipart parser.
              */
@@ -284,8 +336,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
                 msr_log(msr, 2, "%s", *error_msg);
             }
         }
-        else
-        if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
+        else if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
             /* Increase per-request data length counter. */
             msr->msc_reqbody_no_files_length += length;
 
@@ -297,8 +348,7 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
                 msr_log(msr, 2, "%s", *error_msg);
             }
         }
-        else
-        if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
+        else if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
             /* Increase per-request data length counter. */
             msr->msc_reqbody_no_files_length += length;
 
@@ -449,10 +499,27 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
     msr->msc_reqbody_read = 1;
 
     /* Finalise body processing. */
-    if ((msr->msc_reqbody_processor != NULL)&&(msr->msc_reqbody_error == 0)) {
+    if ((msr->msc_reqbody_processor != NULL) && (msr->msc_reqbody_error == 0)) {
         char *my_error_msg = NULL;
+        msre_reqbody_processor_metadata *metadata =
+            (msre_reqbody_processor_metadata *)apr_table_get(msr->modsecurity->msre->reqbody_processors, msr->msc_reqbody_processor);
+        
 
-        if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
+        if (metadata != NULL) {
+            if (   (metadata->complete != NULL)
+                && (metadata->complete(msr, &my_error_msg) < 0))
+            {
+                *error_msg = apr_psprintf(msr->mp,
+                                          "%s parsing error (complete): %s",
+                                          msr->msc_reqbody_processor,
+                                          my_error_msg);
+                msr->msc_reqbody_error = 1;
+                msr->msc_reqbody_error_msg = my_error_msg;
+                msr_log(msr, 2, "%s", *error_msg);
+            }
+        }
+        // TODO: All these below need to be registered in the same way as above
+        else if (strcmp(msr->msc_reqbody_processor, "MULTIPART") == 0) {
             if (multipart_complete(msr, &my_error_msg) < 0) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart parsing error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
@@ -469,12 +536,10 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
                 return -1;
             }
         }
-        else
-        if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
+        else if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
             return modsecurity_request_body_end_urlencoded(msr, error_msg);
         }
-        else
-        if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
+        else if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
             if (xml_complete(msr, &my_error_msg) < 0) {
                 *error_msg = apr_psprintf(msr->mp, "XML parser error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;

@@ -54,6 +54,23 @@ that combines the REMOTE_ADDR and REMOTE_PORT into a.b.c.d:port format.
   sudo apxs -i mod_var_remote_addr_port.la
 
 
+3) Example custom request body parser module
+
+Module mod_reqbody_example.c creates a custom request body parser named
+"EXAMPLE".  It does noting in particular, but shows the basic structure
+of such a module.
+
+  # Compile as a normal user
+  apxs -I<MODSECURITY_SOURCE_CODE> -I/usr/include/libxml2 \
+       -ca mod_reqbody_example.c
+
+  # Install as superuser
+  sudo apxs -i mod_var_remote_addr_port.la
+
+  # Write a phase 1 rule to set the parser
+  SecAction "phase:1,pass,nolog,ctl:requestBodyProcessor=EXAMPLE"
+
+
 Using the Modules
 -----------------
 
