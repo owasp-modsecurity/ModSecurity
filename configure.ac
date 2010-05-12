@@ -12,6 +12,7 @@ AC_CONFIG_MACRO_DIR([acinclude])
 AC_CONFIG_SRCDIR([LICENSE])
 AC_CONFIG_HEADERS([modsecurity_config.h])
 AC_CONFIG_AUX_DIR([build])
+AC_PREFIX_DEFAULT([/usr/local/modsecurity])
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
