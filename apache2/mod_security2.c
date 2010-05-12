@@ -1157,6 +1157,7 @@ static void register_hooks(apr_pool_t *mp) {
         "mod_rpaf.c",
         "mod_rpaf-2.0.c",
         "mod_extract_forwarded2.c",
+        "mod_remoteip.c",
         "mod_custom_header.c",
         "mod_breach_realip.c",
         "mod_breach_trans.c",
