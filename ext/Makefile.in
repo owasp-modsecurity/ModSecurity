@@ -14,12 +14,10 @@
 
 @SET_MAKE@
 
-
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
-pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
 top_builddir = ..
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
@@ -37,10 +35,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = mlogc$(EXEEXT)
-subdir = mlogc
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/mlogc-batch-load.pl.in INSTALL
+subdir = ext
+DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude/libtool.m4 \
 	$(top_srcdir)/acinclude/ltoptions.m4 \
@@ -57,15 +53,32 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/modsecurity_config.h
-CONFIG_CLEAN_FILES = mlogc-batch-load.pl
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
-binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
-PROGRAMS = $(bin_PROGRAMS)
-am_mlogc_OBJECTS = mlogc-mlogc.$(OBJEXT)
-mlogc_OBJECTS = $(am_mlogc_OBJECTS)
-mlogc_DEPENDENCIES =
-binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
-SCRIPTS = $(bin_SCRIPTS)
+CONFIG_CLEAN_FILES =
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(pkglibdir)"
+pkglibLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(pkglib_LTLIBRARIES)
+am__DEPENDENCIES_1 =
+mod_op_strstr_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_mod_op_strstr_la_OBJECTS = mod_op_strstr_la-mod_op_strstr.lo
+mod_op_strstr_la_OBJECTS = $(am_mod_op_strstr_la_OBJECTS)
+mod_reqbody_example_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_mod_reqbody_example_la_OBJECTS =  \
+	mod_reqbody_example_la-mod_reqbody_example.lo
+mod_reqbody_example_la_OBJECTS = $(am_mod_reqbody_example_la_OBJECTS)
+mod_tfn_reverse_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_mod_tfn_reverse_la_OBJECTS = mod_tfn_reverse_la-mod_tfn_reverse.lo
+mod_tfn_reverse_la_OBJECTS = $(am_mod_tfn_reverse_la_OBJECTS)
+mod_var_remote_addr_port_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_mod_var_remote_addr_port_la_OBJECTS =  \
+	mod_var_remote_addr_port_la-mod_var_remote_addr_port.lo
+mod_var_remote_addr_port_la_OBJECTS =  \
+	$(am_mod_var_remote_addr_port_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/build/depcomp
 am__depfiles_maybe = depfiles
@@ -77,11 +90,18 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(mlogc_SOURCES)
-DIST_SOURCES = $(mlogc_SOURCES)
+SOURCES = $(mod_op_strstr_la_SOURCES) \
+	$(mod_reqbody_example_la_SOURCES) \
+	$(mod_tfn_reverse_la_SOURCES) \
+	$(mod_var_remote_addr_port_la_SOURCES)
+DIST_SOURCES = $(mod_op_strstr_la_SOURCES) \
+	$(mod_reqbody_example_la_SOURCES) \
+	$(mod_tfn_reverse_la_SOURCES) \
+	$(mod_var_remote_addr_port_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+pkglibdir = $(prefix)/lib
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
@@ -263,12 +283,41 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-bin_SCRIPTS = mlogc-batch-load.pl
-mlogc_SOURCES = mlogc.c
-mlogc_CPPFLAGS = @APR_CPPFLAGS@ @PCRE_CPPFLAGS@ @CURL_CPPFLAGS@
-mlogc_CFLAGS = @APR_CFLAGS@ @PCRE_CFLAGS@ @CURL_CFLAGS@
-mlogc_LDFLAGS = @APR_LDFLAGS@ @PCRE_LDFLAGS@ @CURL_LDFLAGS@
-mlogc_LDADD = @APR_LDADD@ @PCRE_LDADD@ @CURL_LDADD@
+EXT_CFLAGS = -I../apache2 \
+			 @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
+			 @LIBXML2_CFLAGS@ @LUA_CFLAGS@
+
+EXT_CPPFLAGS = @APR_CPPFLAGS@ @LIBXML2_CPPFLAGS@ @LUA_CPPFLAGS@
+EXT_LIBADD = @APR_LDADD@ @APU_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@
+EXT_LDFLAGS = -no-undefined -module -avoid-version \
+			  @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
+			  @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+
+pkglib_LTLIBRARIES = mod_op_strstr.la \
+					 mod_tfn_reverse.la \
+					 mod_var_remote_addr_port.la \
+					 mod_reqbody_example.la
+
+mod_op_strstr_la_SOURCES = mod_op_strstr.c
+mod_op_strstr_la_CFLAGS = $(EXT_CFLAGS)
+mod_op_strstr_la_CPPFLAGS = $(EXT_CPPFLAGS)
+mod_op_strstr_la_LIBADD = $(EXT_LIBADD)
+mod_op_strstr_la_LDFLAGS = $(EXT_LDFLAGS)
+mod_tfn_reverse_la_SOURCES = mod_tfn_reverse.c
+mod_tfn_reverse_la_CFLAGS = $(EXT_CFLAGS)
+mod_tfn_reverse_la_CPPFLAGS = $(EXT_CPPFLAGS)
+mod_tfn_reverse_la_LIBADD = $(EXT_LIBADD)
+mod_tfn_reverse_la_LDFLAGS = $(EXT_LDFLAGS)
+mod_var_remote_addr_port_la_SOURCES = mod_var_remote_addr_port.c
+mod_var_remote_addr_port_la_CFLAGS = $(EXT_CFLAGS)
+mod_var_remote_addr_port_la_CPPFLAGS = $(EXT_CPPFLAGS)
+mod_var_remote_addr_port_la_LIBADD = $(EXT_LIBADD)
+mod_var_remote_addr_port_la_LDFLAGS = $(EXT_LDFLAGS)
+mod_reqbody_example_la_SOURCES = mod_reqbody_example.c
+mod_reqbody_example_la_CFLAGS = $(EXT_CFLAGS)
+mod_reqbody_example_la_CPPFLAGS = $(EXT_CPPFLAGS)
+mod_reqbody_example_la_LIBADD = $(EXT_LIBADD)
+mod_reqbody_example_la_LDFLAGS = $(EXT_LDFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -282,9 +331,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  mlogc/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  ext/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  mlogc/Makefile
+	  $(AUTOMAKE) --foreign  ext/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -302,58 +351,41 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-mlogc-batch-load.pl: $(top_builddir)/config.status $(srcdir)/mlogc-batch-load.pl.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-install-binPROGRAMS: $(bin_PROGRAMS)
+install-pkglibLTLIBRARIES: $(pkglib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
-	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  if test -f $$p \
-	     || test -f $$p1 \
-	  ; then \
-	    f=`echo "$$p1" | sed 's,^.*/,,;$(transform);s/$$/$(EXEEXT)/'`; \
-	   echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) '$$p' '$(DESTDIR)$(bindir)/$$f'"; \
-	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(bindir)/$$f" || exit 1; \
+	test -z "$(pkglibdir)" || $(mkdir_p) "$(DESTDIR)$(pkglibdir)"
+	@list='$(pkglib_LTLIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    f=$(am__strip_dir) \
+	    echo " $(LIBTOOL) --mode=install $(pkglibLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(pkglibdir)/$$f'"; \
+	    $(LIBTOOL) --mode=install $(pkglibLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(pkglibdir)/$$f"; \
 	  else :; fi; \
 	done
 
-uninstall-binPROGRAMS:
+uninstall-pkglibLTLIBRARIES:
 	@$(NORMAL_UNINSTALL)
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  f=`echo "$$p" | sed 's,^.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
-	  echo " rm -f '$(DESTDIR)$(bindir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(bindir)/$$f"; \
+	@set -x; list='$(pkglib_LTLIBRARIES)'; for p in $$list; do \
+	  p=$(am__strip_dir) \
+	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(pkglibdir)/$$p'"; \
+	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(pkglibdir)/$$p"; \
 	done
 
-clean-binPROGRAMS:
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  echo " rm -f $$p $$f"; \
-	  rm -f $$p $$f ; \
+clean-pkglibLTLIBRARIES:
+	-test -z "$(pkglib_LTLIBRARIES)" || rm -f $(pkglib_LTLIBRARIES)
+	@list='$(pkglib_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
 	done
-mlogc$(EXEEXT): $(mlogc_OBJECTS) $(mlogc_DEPENDENCIES) 
-	@rm -f mlogc$(EXEEXT)
-	$(LINK) $(mlogc_LDFLAGS) $(mlogc_OBJECTS) $(mlogc_LDADD) $(LIBS)
-install-binSCRIPTS: $(bin_SCRIPTS)
-	@$(NORMAL_INSTALL)
-	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
-	@list='$(bin_SCRIPTS)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  if test -f $$d$$p; then \
-	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
-	    echo " $(binSCRIPT_INSTALL) '$$d$$p' '$(DESTDIR)$(bindir)/$$f'"; \
-	    $(binSCRIPT_INSTALL) "$$d$$p" "$(DESTDIR)$(bindir)/$$f"; \
-	  else :; fi; \
-	done
-
-uninstall-binSCRIPTS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(bin_SCRIPTS)'; for p in $$list; do \
-	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
-	  echo " rm -f '$(DESTDIR)$(bindir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(bindir)/$$f"; \
-	done
+mod_op_strstr.la: $(mod_op_strstr_la_OBJECTS) $(mod_op_strstr_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(mod_op_strstr_la_LDFLAGS) $(mod_op_strstr_la_OBJECTS) $(mod_op_strstr_la_LIBADD) $(LIBS)
+mod_reqbody_example.la: $(mod_reqbody_example_la_OBJECTS) $(mod_reqbody_example_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(mod_reqbody_example_la_LDFLAGS) $(mod_reqbody_example_la_OBJECTS) $(mod_reqbody_example_la_LIBADD) $(LIBS)
+mod_tfn_reverse.la: $(mod_tfn_reverse_la_OBJECTS) $(mod_tfn_reverse_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(mod_tfn_reverse_la_LDFLAGS) $(mod_tfn_reverse_la_OBJECTS) $(mod_tfn_reverse_la_LIBADD) $(LIBS)
+mod_var_remote_addr_port.la: $(mod_var_remote_addr_port_la_OBJECTS) $(mod_var_remote_addr_port_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(mod_var_remote_addr_port_la_LDFLAGS) $(mod_var_remote_addr_port_la_OBJECTS) $(mod_var_remote_addr_port_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -361,7 +393,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mlogc-mlogc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_op_strstr_la-mod_op_strstr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_reqbody_example_la-mod_reqbody_example.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_tfn_reverse_la-mod_tfn_reverse.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_var_remote_addr_port_la-mod_var_remote_addr_port.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -384,19 +419,33 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-mlogc-mlogc.o: mlogc.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mlogc_CPPFLAGS) $(CPPFLAGS) $(mlogc_CFLAGS) $(CFLAGS) -MT mlogc-mlogc.o -MD -MP -MF "$(DEPDIR)/mlogc-mlogc.Tpo" -c -o mlogc-mlogc.o `test -f 'mlogc.c' || echo '$(srcdir)/'`mlogc.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/mlogc-mlogc.Tpo" "$(DEPDIR)/mlogc-mlogc.Po"; else rm -f "$(DEPDIR)/mlogc-mlogc.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mlogc.c' object='mlogc-mlogc.o' libtool=no @AMDEPBACKSLASH@
+mod_op_strstr_la-mod_op_strstr.lo: mod_op_strstr.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_op_strstr_la_CPPFLAGS) $(CPPFLAGS) $(mod_op_strstr_la_CFLAGS) $(CFLAGS) -MT mod_op_strstr_la-mod_op_strstr.lo -MD -MP -MF "$(DEPDIR)/mod_op_strstr_la-mod_op_strstr.Tpo" -c -o mod_op_strstr_la-mod_op_strstr.lo `test -f 'mod_op_strstr.c' || echo '$(srcdir)/'`mod_op_strstr.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/mod_op_strstr_la-mod_op_strstr.Tpo" "$(DEPDIR)/mod_op_strstr_la-mod_op_strstr.Plo"; else rm -f "$(DEPDIR)/mod_op_strstr_la-mod_op_strstr.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mod_op_strstr.c' object='mod_op_strstr_la-mod_op_strstr.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mlogc_CPPFLAGS) $(CPPFLAGS) $(mlogc_CFLAGS) $(CFLAGS) -c -o mlogc-mlogc.o `test -f 'mlogc.c' || echo '$(srcdir)/'`mlogc.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_op_strstr_la_CPPFLAGS) $(CPPFLAGS) $(mod_op_strstr_la_CFLAGS) $(CFLAGS) -c -o mod_op_strstr_la-mod_op_strstr.lo `test -f 'mod_op_strstr.c' || echo '$(srcdir)/'`mod_op_strstr.c
 
-mlogc-mlogc.obj: mlogc.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mlogc_CPPFLAGS) $(CPPFLAGS) $(mlogc_CFLAGS) $(CFLAGS) -MT mlogc-mlogc.obj -MD -MP -MF "$(DEPDIR)/mlogc-mlogc.Tpo" -c -o mlogc-mlogc.obj `if test -f 'mlogc.c'; then $(CYGPATH_W) 'mlogc.c'; else $(CYGPATH_W) '$(srcdir)/mlogc.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/mlogc-mlogc.Tpo" "$(DEPDIR)/mlogc-mlogc.Po"; else rm -f "$(DEPDIR)/mlogc-mlogc.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mlogc.c' object='mlogc-mlogc.obj' libtool=no @AMDEPBACKSLASH@
+mod_reqbody_example_la-mod_reqbody_example.lo: mod_reqbody_example.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_reqbody_example_la_CPPFLAGS) $(CPPFLAGS) $(mod_reqbody_example_la_CFLAGS) $(CFLAGS) -MT mod_reqbody_example_la-mod_reqbody_example.lo -MD -MP -MF "$(DEPDIR)/mod_reqbody_example_la-mod_reqbody_example.Tpo" -c -o mod_reqbody_example_la-mod_reqbody_example.lo `test -f 'mod_reqbody_example.c' || echo '$(srcdir)/'`mod_reqbody_example.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/mod_reqbody_example_la-mod_reqbody_example.Tpo" "$(DEPDIR)/mod_reqbody_example_la-mod_reqbody_example.Plo"; else rm -f "$(DEPDIR)/mod_reqbody_example_la-mod_reqbody_example.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mod_reqbody_example.c' object='mod_reqbody_example_la-mod_reqbody_example.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mlogc_CPPFLAGS) $(CPPFLAGS) $(mlogc_CFLAGS) $(CFLAGS) -c -o mlogc-mlogc.obj `if test -f 'mlogc.c'; then $(CYGPATH_W) 'mlogc.c'; else $(CYGPATH_W) '$(srcdir)/mlogc.c'; fi`
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_reqbody_example_la_CPPFLAGS) $(CPPFLAGS) $(mod_reqbody_example_la_CFLAGS) $(CFLAGS) -c -o mod_reqbody_example_la-mod_reqbody_example.lo `test -f 'mod_reqbody_example.c' || echo '$(srcdir)/'`mod_reqbody_example.c
+
+mod_tfn_reverse_la-mod_tfn_reverse.lo: mod_tfn_reverse.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_tfn_reverse_la_CPPFLAGS) $(CPPFLAGS) $(mod_tfn_reverse_la_CFLAGS) $(CFLAGS) -MT mod_tfn_reverse_la-mod_tfn_reverse.lo -MD -MP -MF "$(DEPDIR)/mod_tfn_reverse_la-mod_tfn_reverse.Tpo" -c -o mod_tfn_reverse_la-mod_tfn_reverse.lo `test -f 'mod_tfn_reverse.c' || echo '$(srcdir)/'`mod_tfn_reverse.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/mod_tfn_reverse_la-mod_tfn_reverse.Tpo" "$(DEPDIR)/mod_tfn_reverse_la-mod_tfn_reverse.Plo"; else rm -f "$(DEPDIR)/mod_tfn_reverse_la-mod_tfn_reverse.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mod_tfn_reverse.c' object='mod_tfn_reverse_la-mod_tfn_reverse.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_tfn_reverse_la_CPPFLAGS) $(CPPFLAGS) $(mod_tfn_reverse_la_CFLAGS) $(CFLAGS) -c -o mod_tfn_reverse_la-mod_tfn_reverse.lo `test -f 'mod_tfn_reverse.c' || echo '$(srcdir)/'`mod_tfn_reverse.c
+
+mod_var_remote_addr_port_la-mod_var_remote_addr_port.lo: mod_var_remote_addr_port.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_var_remote_addr_port_la_CPPFLAGS) $(CPPFLAGS) $(mod_var_remote_addr_port_la_CFLAGS) $(CFLAGS) -MT mod_var_remote_addr_port_la-mod_var_remote_addr_port.lo -MD -MP -MF "$(DEPDIR)/mod_var_remote_addr_port_la-mod_var_remote_addr_port.Tpo" -c -o mod_var_remote_addr_port_la-mod_var_remote_addr_port.lo `test -f 'mod_var_remote_addr_port.c' || echo '$(srcdir)/'`mod_var_remote_addr_port.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/mod_var_remote_addr_port_la-mod_var_remote_addr_port.Tpo" "$(DEPDIR)/mod_var_remote_addr_port_la-mod_var_remote_addr_port.Plo"; else rm -f "$(DEPDIR)/mod_var_remote_addr_port_la-mod_var_remote_addr_port.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mod_var_remote_addr_port.c' object='mod_var_remote_addr_port_la-mod_var_remote_addr_port.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_var_remote_addr_port_la_CPPFLAGS) $(CPPFLAGS) $(mod_var_remote_addr_port_la_CFLAGS) $(CFLAGS) -c -o mod_var_remote_addr_port_la-mod_var_remote_addr_port.lo `test -f 'mod_var_remote_addr_port.c' || echo '$(srcdir)/'`mod_var_remote_addr_port.c
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -485,9 +534,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS) $(SCRIPTS)
+all-am: Makefile $(LTLIBRARIES)
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"; do \
+	for dir in "$(DESTDIR)$(pkglibdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -516,7 +565,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
+clean-am: clean-generic clean-libtool clean-pkglibLTLIBRARIES \
+	mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -536,7 +586,9 @@ info-am:
 
 install-data-am:
 
-install-exec-am: install-binPROGRAMS install-binSCRIPTS
+install-exec-am: install-pkglibLTLIBRARIES
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
 
 install-info: install-info-am
 
@@ -562,22 +614,29 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
-	uninstall-info-am
+uninstall-am: uninstall-info-am uninstall-pkglibLTLIBRARIES
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libtool ctags distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-binSCRIPTS install-data \
-	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
+	clean-libtool clean-pkglibLTLIBRARIES ctags distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-exec \
+	install-exec-am install-exec-hook install-info install-info-am \
+	install-man install-pkglibLTLIBRARIES install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-binSCRIPTS uninstall-info-am
+	tags uninstall uninstall-am uninstall-info-am \
+	uninstall-pkglibLTLIBRARIES
 
+
+install-exec-hook: $(pkglib_LTLIBRARIES)
+	@echo "Removing unused static libraries..."; \
+	for m in $(pkglib_LTLIBRARIES); do \
+	  base=`echo $$m | sed 's/\..*//'`; \
+	  rm -f $(DESTDIR)$(pkglibdir)/$$base.*a; \
+	  cp -p $(DESTDIR)$(pkglibdir)/$$base.so $(APXS_MODULES); \
+	done
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
