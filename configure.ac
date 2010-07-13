@@ -130,6 +130,25 @@ if test "$build_mlogc" -eq 1; then
   TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS mlogc"
 fi
 
+# Audit Log Parser v2 (ALP2)
+AC_ARG_ENABLE(alp2,
+              AS_HELP_STRING([--enable-alp2],
+                             [Enable building audit log parser lib.]),
+[
+  if test "$enableval" != "no"; then
+    build_alp2=1
+  else
+    build_alp2=0
+  fi
+],
+[
+  build_alp2=0
+])
+AM_CONDITIONAL([BUILD_ALP2], [test "$build_alp2" -eq 1])
+if test "$build_alp2" -eq 1; then
+  TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS alp2"
+fi
+
 # Documentation
 AC_ARG_ENABLE(docs,
               AS_HELP_STRING([--enable-docs],
@@ -516,6 +535,9 @@ fi
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([tools/Makefile])
+if test "$build_alp2" -ne 0; then
+AC_CONFIG_FILES([alp2/Makefile])
+fi
 if test "$build_apache2_module" -ne 0; then
 AC_CONFIG_FILES([apache2/Makefile])
 fi
