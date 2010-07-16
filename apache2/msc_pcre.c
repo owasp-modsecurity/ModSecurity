@@ -65,9 +65,8 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
     }
     if (regex->re == NULL) return NULL;
 
-    #ifdef WITH_PCRE_STUDY
+#ifdef WITH_PCRE_STUDY
     pe = pcre_study(regex->re, 0, &errptr);
-    #endif
 
     /* Setup the pcre_extra record if pcre_study did not already do it */
     if (pe == NULL) {
@@ -77,6 +76,7 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
         }
         memset(pe, 0, sizeof(pcre_extra));
     }
+#endif
 
 #ifdef PCRE_EXTRA_MATCH_LIMIT
     /* If match limit is available, then use it */
@@ -94,7 +94,9 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
     }
 #endif /* MODSEC_PCRE_MATCH_LIMIT */
 #else
+#ifdef MODSEC_PCRE_MATCH_LIMIT
 #pragma message ( "This PCRE version does not support match limits!  Upgrade to at least PCRE v6.5." )
+#endif /* MODSEC_PCRE_MATCH_LIMIT */
 #endif /* PCRE_EXTRA_MATCH_LIMIT */
 
 #ifdef PCRE_EXTRA_MATCH_LIMIT_RECURSION
@@ -113,7 +115,9 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
     }
 #endif /* MODSEC_PCRE_MATCH_LIMIT_RECURSION */
 #else
+#ifdef MODSEC_PCRE_MATCH_LIMIT_RECURSION
 #pragma message ( "This PCRE version does not support match recursion limits!  Upgrade to at least PCRE v6.5." )
+#endif /* MODSEC_PCRE_MATCH_LIMIT_RECURSION */
 #endif /* PCRE_EXTRA_MATCH_LIMIT_RECURSION */
 
     regex->pe = pe;
