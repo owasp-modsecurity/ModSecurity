@@ -2049,6 +2049,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
             apr_table_t *normtab;
             const char *lastvarval = NULL;
             apr_size_t lastvarlen = 0;
+            int tfnchanged = 0;
 
             changed = 0;
             normtab = apr_table_make(mptmp, 10);
@@ -2191,7 +2192,6 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
             for (; k < tarr->nelts; k++) {
                 char *rval = NULL;
                 long int rval_length = -1;
-                int tfnchanged = 0;
 
                 /* In multi-match mode we execute the operator
                  * once at the beginning and then once every
