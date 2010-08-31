@@ -16,13 +16,14 @@
  * directly using the email address support@breach.com.
  *
  */
+#include "modsecurity_config.h"
+
 #include <ctype.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "mod_security2_config.h"
 #include "msc_release.h"
 #include "msc_util.h"
 
