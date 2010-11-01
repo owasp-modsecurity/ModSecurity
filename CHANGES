@@ -1,4 +1,4 @@
-25 Nov 2010 - 2.5.13
+04 Nov 2010 - 2.5.13-dev2
 --------------------
 
  * Fixed Geo lookup concurrent connections bug
@@ -7,18 +7,26 @@
 
  * Added new setvar Lua API to be used into Lua scripts
 
- * Updated licenses files
-
  * Added PCRE messages indicates each rule that exceed match limits
-
- * Fixed memory leaks into msc_pcre.c releasing data with pcre_free()
-   Thanks to Tom Donovan
-
- * Fixed libcurl callback read mlogic.conf file on Windows.
-   Thanks to Tom Donovan
 
  * Added new Base64 transformation function called base64DecodeEx, which
    can decode base64 data skipping special characters.
+
+
+14 Feb 2010 - 2.5.13-dev1
+-------------------------
+
+ * Cleaned up some mlogc code and debugging output.
+
+ * Remove the ability to use a relative path to a piped audit logger
+   (i.e. mlogc) as Apache does not support it in their piped loggers
+   and it was breaking Windows and probably other platforms that
+   use spaces in filesystem paths.  Discovered by Tom Donovan.
+
+ * Fix memory leak freeing regex.  Discovered by Tom Donovan.
+
+ * Fix some portability issues on Windows.
+
 
 04 Feb 2010 - 2.5.12
 --------------------
@@ -774,4 +782,3 @@
 -------------------
 
  * First stable 2.x release.
-
