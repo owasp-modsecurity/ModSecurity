@@ -32,6 +32,12 @@ typedef struct {
     int index;
 } msc_lua_dumpr_t;
 
+typedef struct {
+    size_t buffer_size;
+    char data[1];
+} VarBuffer;
+
+
 /**
  *
  */
@@ -337,10 +343,83 @@ static int l_getvars(lua_State *L) {
     return 1;
 }
 
+/*
+* \brief Function used to get user input via script
+*
+* \param L Pointer to Lua state
+* \param size buffer size
+*
+* \retval NULL On failure
+* \retval data On Success
+*/
+static char *get_varbuffer (lua_State *L, size_t size) {
+    VarBuffer *var_chunk = NULL;
+
+    lua_getfield(L, LUA_REGISTRYINDEX, "_buffer");
+    var_chunk = (VarBuffer *) lua_touserdata(L, -1);
+
+    if (var_chunk == NULL || var_chunk->buffer_size < size) {
+        var_chunk = (VarBuffer *) lua_newuserdata(L, sizeof(VarBuffer) + size);
+        var_chunk->buffer_size = size;
+        lua_setfield(L, LUA_REGISTRYINDEX, "_buffer");
+    }
+
+    lua_pop(L, 1);
+    return var_chunk->data;
+}
+
+/*
+* \brief New setvar function for Lua API. Users can put back
+* data in modsecurity core via new variables
+*
+* \param L Pointer to Lua state
+*
+* \retval -1 On failure
+* \retval 0 On Collection failure
+* \retval 1 On Success
+*/
+static int l_setvar(lua_State *L) {
+    modsec_rec *msr = NULL;
+    msre_rule *rule = NULL;
+    char *var_value = NULL;
+    char *var_name = NULL;
+    size_t size;
+    int nargs = lua_gettop(L);
+
+    lua_getglobal(L, "__msr");
+    msr = (modsec_rec *)lua_topointer(L, -1);
+
+    lua_getglobal(L, "__rule");
+    rule = (msre_rule *)lua_topointer(L, -1);
+
+    if(nargs != 2)  {
+        msr_log(msr, 8, "m.setvar: Failed m.setvar funtion must has 2 arguments");
+        return -1;
+    }
+
+    //const char *var_value = luaL_checkstring (L, 2);
+    //const char *var_name = luaL_checkstring (L, 1);
+
+    const char *setvar_value = lua_tolstring(L, 2, &size);
+    var_value = get_varbuffer(L, size);
+
+    if(var_value != NULL && setvar_value != NULL)
+        strncpy(var_value, setvar_value, size + 1);
+
+    const char *setvar_name = lua_tolstring(L, 1, &size);
+    var_name = get_varbuffer(L, size);
+
+    if(var_name != NULL && setvar_name != NULL)
+        strncpy(var_name, setvar_name, size + 1);
+
+    return msre_action_setvar_execute(msr,msr->msc_rule_mptmp,rule,var_name,var_value);
+}
+
 static const struct luaL_Reg mylib[] = {
     { "log", l_log },
     { "getvar", l_getvar },
     { "getvars", l_getvars },
+    { "setvar", l_setvar },
     { NULL, NULL }
 };
 

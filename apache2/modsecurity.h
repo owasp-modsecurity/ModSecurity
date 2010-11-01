@@ -490,6 +490,7 @@ struct error_message {
 struct msc_engine {
     apr_pool_t              *mp;
     apr_global_mutex_t      *auditlog_lock;
+    apr_global_mutex_t      *geo_lock;
     msre_engine             *msre;
     unsigned int             processing_mode;
 };

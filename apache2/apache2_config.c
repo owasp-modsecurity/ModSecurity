@@ -630,6 +630,12 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
                 "be specified by chain starter rules.");
         }
 
+        /* Must NOT specify a skipafter action. */
+        if (rule->actionset->skip_after != NOT_SET_P) {
+            return apr_psprintf(cmd->pool, "ModSecurity: SkipAfter actions can only "
+                "be specified by chain starter rules.");
+        }
+
         /* Must NOT specify a phase. */
         if (rule->actionset->phase != NOT_SET) {
             return apr_psprintf(cmd->pool, "ModSecurity: Execution phases can only be "

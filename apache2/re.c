@@ -843,7 +843,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     msre_rule **rules;
     apr_status_t rc;
     const char *skip_after = NULL;
-    int i, mode, skip;
+    int i, mode, skip, skipped;
 
     /* First determine which set of rules we need to use. */
     switch (msr->phase) {
@@ -873,6 +873,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
 
     /* Loop through the rules in the selected set. */
     skip = 0;
+    skipped = 0;
     mode = NEXT_RULE;
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
@@ -900,6 +901,18 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
 
                     }
                 }
+
+                msre_rule *last_rule = rules[i-1];
+
+                if(last_rule->actionset->is_chained) {
+                    mode = NEXT_RULE;
+                    skipped = 1;
+                    --i;
+                } else {
+                    mode = SKIP_RULES;
+                    skipped = 0;
+                }
+
                 continue;
             }
             if (msr->txcfg->debuglog_level >= 9) {
@@ -1071,6 +1084,11 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                     msr_log(msr, 9, "Skipping after rule %pp id=\"%s\" -> mode SKIP_RULES.", rule, skip_after);
                 }
 
+                continue;
+            }
+
+            if(skipped == 1)    {
+                mode = SKIP_RULES;
                 continue;
             }
 

@@ -153,9 +153,13 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
         *error_msg = apr_psprintf(msr->mp,
-                                  "Rule execution error - "
+                                  "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
+                                  "Execution error - "
                                   "PCRE limits exceeded (%d): %s",
-                                  rc, my_error_msg);
+                                  rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                                  rule->filename != NULL ? rule->filename : "-",
+                                  rule->line_num,rc, my_error_msg);
+
 
         msr_log(msr, 3, "%s.", *error_msg);
 

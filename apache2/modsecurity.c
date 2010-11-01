@@ -131,6 +131,18 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     }
     #endif
 
+    rc = apr_global_mutex_create(&msce->geo_lock, NULL, APR_LOCK_DEFAULT, mp);
+    if (rc != APR_SUCCESS) {
+        return -1;
+    }
+
+    #ifdef __SET_MUTEX_PERMS
+    rc = unixd_set_global_mutex_perms(msce->geo_lock);
+    if (rc != APR_SUCCESS) {
+        return -1;
+    }
+    #endif
+
     return 1;
 }
 
@@ -147,6 +159,14 @@ void modsecurity_child_init(msc_engine *msce) {
             // ap_log_error(APLOG_MARK, APLOG_ERR, rs, s, "Failed to child-init auditlog mutex");
         }
     }
+
+    if (msce->geo_lock != NULL) {
+        apr_status_t rc = apr_global_mutex_child_init(&msce->geo_lock, NULL, msce->mp);
+        if (rc != APR_SUCCESS) {
+            // ap_log_error(APLOG_MARK, APLOG_ERR, rs, s, "Failed to child-init geo mutex");
+        }
+    }
+
 }
 
 /**

@@ -1168,34 +1168,18 @@ static apr_status_t msre_action_setenv_execute(modsec_rec *msr, apr_pool_t *mptm
 }
 
 /* setvar */
-static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
-    msre_rule *rule, msre_action *action)
+apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
+    msre_rule *rule, char *var_name, char *var_value)
 {
-    char *data = apr_pstrdup(mptmp, action->param);
-    char *col_name = NULL, *var_name = NULL, *var_value = NULL;
+    char *col_name = NULL;
     char *s = NULL;
     apr_table_t *target_col = NULL;
     int is_negated = 0;
     msc_string *var = NULL;
 
-    /* Extract the name and the value. */
-    /* IMP1 We have a function for this now, parse_name_eq_value? */
-    s = strstr(data, "=");
-    if (s == NULL) {
-        var_name = data;
-        var_value = "1";
-    } else {
-        var_name = data;
-        var_value = s + 1;
-        *s = '\0';
-
-        while ((*var_value != '\0')&&(isspace(*var_value))) var_value++;
-    }
-
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "Setting variable: %s=%s", var_name, var_value);
     }
-
 
     /* Expand and escape any macros in the name */
     var = apr_palloc(msr->mp, sizeof(msc_string));
@@ -1334,6 +1318,43 @@ static apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptm
 
     return 1;
 }
+
+/*
+* \brief Parse fuction for setvar input
+*
+* \param msr Pointer to the engine
+* \param mptmp Pointer to the pool
+* \param rule Pointer to rule struct
+* \param action input data
+*
+* \retval -1 On failure
+* \retval 0 On Collection failure
+* \retval 1 On Success
+*/
+static apr_status_t msre_action_setvar_parse(modsec_rec *msr, apr_pool_t *mptmp,
+    msre_rule *rule, msre_action *action)
+{
+    char *data = apr_pstrdup(mptmp, action->param);
+    char *var_name = NULL, *var_value = NULL;
+    char *s = NULL;
+
+    /* Extract the name and the value. */
+    /* IMP1 We have a function for this now, parse_name_eq_value? */
+    s = strstr(data, "=");
+    if (s == NULL) {
+        var_name = data;
+        var_value = "1";
+    } else {
+        var_name = data;
+        var_value = s + 1;
+        *s = '\0';
+
+        while ((*var_value != '\0')&&(isspace(*var_value))) var_value++;
+    }
+
+    return msre_action_setvar_execute(msr,mptmp,rule,var_name,var_value);
+}
+
 
 /* expirevar */
 static apr_status_t msre_action_expirevar_execute(modsec_rec *msr, apr_pool_t *mptmp,
@@ -2264,7 +2285,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         ACTION_CGROUP_NONE,
         NULL,
         NULL,
-        msre_action_setvar_execute
+        msre_action_setvar_parse
     );
 
     /* expirevar */
