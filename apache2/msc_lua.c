@@ -32,12 +32,6 @@ typedef struct {
     int index;
 } msc_lua_dumpr_t;
 
-typedef struct {
-    size_t buffer_size;
-    char data[1];
-} VarBuffer;
-
-
 /**
  *
  */
@@ -106,7 +100,7 @@ char *lua_compile(msc_script **script, const char *filename, apr_pool_t *pool) {
     /* Find script. */
     if (luaL_loadfile(L, filename)) {
         return apr_psprintf(pool, "ModSecurity: Failed to compile script %s: %s",
-            filename, lua_tostring(L, -1));
+                filename, lua_tostring(L, -1));
     }
 
     /* Dump the script into binary form. */
@@ -240,7 +234,7 @@ static int l_getvar(lua_State *L) {
 
     /* Resolve variable. */
     var = msre_create_var_ex(msr->msc_rule_mptmp, msr->modsecurity->msre,
-        varname, param, msr, &my_error_msg);
+            varname, param, msr, &my_error_msg);
 
     if (var == NULL) {
         msr_log(msr, 1, "%s", my_error_msg);
@@ -309,7 +303,7 @@ static int l_getvars(lua_State *L) {
 
     /* Resolve variable. */
     vartemplate = msre_create_var_ex(msr->msc_rule_mptmp, msr->modsecurity->msre,
-        varname, param, msr, &my_error_msg);
+            varname, param, msr, &my_error_msg);
 
     if (vartemplate == NULL) {
         msr_log(msr, 1, "%s", my_error_msg);
@@ -344,31 +338,6 @@ static int l_getvars(lua_State *L) {
 }
 
 /*
-* \brief Function used to get user input via script
-*
-* \param L Pointer to Lua state
-* \param size buffer size
-*
-* \retval NULL On failure
-* \retval data On Success
-*/
-static char *get_varbuffer (lua_State *L, size_t size) {
-    VarBuffer *var_chunk = NULL;
-
-    lua_getfield(L, LUA_REGISTRYINDEX, "_buffer");
-    var_chunk = (VarBuffer *) lua_touserdata(L, -1);
-
-    if (var_chunk == NULL || var_chunk->buffer_size < size) {
-        var_chunk = (VarBuffer *) lua_newuserdata(L, sizeof(VarBuffer) + size);
-        var_chunk->buffer_size = size;
-        lua_setfield(L, LUA_REGISTRYINDEX, "_buffer");
-    }
-
-    lua_pop(L, 1);
-    return var_chunk->data;
-}
-
-/*
 * \brief New setvar function for Lua API. Users can put back
 * data in modsecurity core via new variables
 *
@@ -381,10 +350,10 @@ static char *get_varbuffer (lua_State *L, size_t size) {
 static int l_setvar(lua_State *L) {
     modsec_rec *msr = NULL;
     msre_rule *rule = NULL;
-    char *var_value = NULL;
-    char *var_name = NULL;
-    size_t size;
+    const char *var_value = NULL;
+    const char *var_name = NULL;
     int nargs = lua_gettop(L);
+    char *chr = NULL;
 
     lua_getglobal(L, "__msr");
     msr = (modsec_rec *)lua_topointer(L, -1);
@@ -397,22 +366,22 @@ static int l_setvar(lua_State *L) {
         return -1;
     }
 
-    //const char *var_value = luaL_checkstring (L, 2);
-    //const char *var_name = luaL_checkstring (L, 1);
+    var_value = luaL_checkstring (L, 2);
+    var_name = luaL_checkstring (L, 1);
 
-    const char *setvar_value = lua_tolstring(L, 2, &size);
-    var_value = get_varbuffer(L, size);
+    lua_pop(L,2);
 
-    if(var_value != NULL && setvar_value != NULL)
-        strncpy(var_value, setvar_value, size + 1);
+    if(var_value == NULL || var_name == NULL)
+        return -1;
 
-    const char *setvar_name = lua_tolstring(L, 1, &size);
-    var_name = get_varbuffer(L, size);
+    chr = strchr((char *)var_name,0x2e);
 
-    if(var_name != NULL && setvar_name != NULL)
-        strncpy(var_name, setvar_name, size + 1);
+    if(chr == NULL) {
+        msr_log(msr, 8, "m.setvar: Must specify a collection using dot character - ie m.setvar(tx.myvar,mydata)");
+        return -1;
+    }
 
-    return msre_action_setvar_execute(msr,msr->msc_rule_mptmp,rule,var_name,var_value);
+    return msre_action_setvar_execute(msr,msr->msc_rule_mptmp,rule,(char *)var_name,(char *)var_value);
 }
 
 static const struct luaL_Reg mylib[] = {
@@ -455,15 +424,22 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
         lua_setglobal(L, "__rule");
     }
 
+    //lua_pushcfunction(L, l_setvar);
+    //lua_setglobal(L, "mysetvar");
+
     /* Register functions. */
     luaL_register(L, "m", mylib);
 
     rc = lua_restore(L, script);
     if (rc) {
         *error_msg = apr_psprintf(msr->mp, "Lua: Failed to restore script with %i.", rc);
+
+        if (msr->txcfg->debuglog_level >= 8) {
+            msr_log(msr, 8, "Lua: Failed to restore script with: %d",rc);
+        }
+
         return -1;
     }
-
     /* Execute the chunk so that the functions are defined. */
     lua_pcall(L, 0, 0, 0);
 
@@ -476,7 +452,13 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
     }
 
     if (lua_pcall(L, ((param != NULL) ? 1 : 0), 1, 0)) {
+
         *error_msg = apr_psprintf(msr->mp, "Lua: Script execution failed: %s", lua_tostring(L, -1));
+
+        if (msr->txcfg->debuglog_level >= 8) {
+            msr_log(msr, 8, "Lua: Script execution failed: %s", lua_tostring(L, -1));
+        }
+
         return -1;
     }
 
@@ -493,7 +475,7 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
     /* Returns status code to caller. */
     if (msr->txcfg->debuglog_level >= 8) {
         msr_log(msr, 8, "Lua: Script completed in %" APR_TIME_T_FMT " usec, returning: %s.",
-            (apr_time_now() - time_before), *error_msg);
+                (apr_time_now() - time_before), *error_msg);
     }
 
     return ((*error_msg != NULL) ? RULE_MATCH : RULE_NO_MATCH);
