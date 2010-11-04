@@ -48,7 +48,6 @@ static const short b64_reverse_t[256] = {
   -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2
 };
 
-
 /* lowercase */
 
 static int msre_fn_lowercase_execute(apr_pool_t *mptmp, unsigned char *input,
@@ -597,73 +596,6 @@ static int msre_fn_parityOdd7bit_execute(apr_pool_t *mptmp, unsigned char *input
 }
 
 /*
-* \brief Decode Base64 data with special chars
-*
-* \param plain_text Pointer to plain text data
-* \param input Pointer to input data
-* \param input_len Input data length
-*
-* \retval 0 On failure
-* \retval string length On Success
-*/
-int decode_base64_ext(char *plain_text, const char *input, int input_len)
-{
-    const char *encoded = input;
-    int i = 0, j = 0, k = 0;
-    int ch = 0;
-
-    while ((ch = *encoded++) != '\0' && input_len-- > 0) {
-        if (ch == b64_pad) {
-            if (*encoded != '=' && (i % 4) == 1) {
-                return 0;
-            }
-            continue;
-        }
-
-        ch = b64_reverse_t[ch];
-        if (ch < 0 || ch == -1) {
-            continue;
-        } else if (ch == -2) {
-            return 0;
-        }
-
-        switch(i % 4) {
-            case 0:
-                plain_text[j] = ch << 2;
-                break;
-            case 1:
-                plain_text[j++] |= ch >> 4;
-                plain_text[j] = (ch & 0x0f) << 4;
-                break;
-            case 2:
-                plain_text[j++] |= ch >>2;
-                plain_text[j] = (ch & 0x03) << 6;
-                break;
-            case 3:
-                plain_text[j++] |= ch;
-                break;
-        }
-        i++;
-    }
-
-    k = j;
-    if (ch == b64_pad) {
-        switch(i % 4) {
-            case 1:
-                return 0;
-            case 2:
-                k++;
-            case 3:
-                plain_text[k] = 0;
-        }
-    }
-
-    plain_text[j] = '\0';
-
-    return j;
-}
-
-/*
 * \brief Base64 transformation function based on RFC2045
 *
 * \param mptmp Pointer to resource poil
@@ -683,7 +615,6 @@ static int msre_fn_decodeBase64Ext_execute(apr_pool_t *mptmp, unsigned char *inp
 
     return *rval_len ? 1 : 0;
 }
-
 
 /* ------------------------------------------------------------------------------ */
 
@@ -894,5 +825,4 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
         "decodeBase64Ext",
         msre_fn_decodeBase64Ext_execute
     );
-
 }

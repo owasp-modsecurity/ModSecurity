@@ -90,6 +90,8 @@ char DSOLOCAL *log_escape_nul(apr_pool_t *mp, const unsigned char *text, unsigne
 char DSOLOCAL *_log_escape(apr_pool_t *p, const unsigned char *input,
     unsigned long int input_length, int escape_quotes, int escape_colon);
 
+int DSOLOCAL decode_base64_ext(char *plain_text, const char *input, int input_len);
+
 int DSOLOCAL js_decode_nonstrict_inplace(unsigned char *input, long int input_len);
 
 int DSOLOCAL urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_length, int * changed);

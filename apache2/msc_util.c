@@ -51,6 +51,29 @@
 #define S_ISUID 04000
 #endif /* defined(WIN32 || NETWARE) */
 
+/* Base64 tables used in decodeBase64Ext */
+static const char b64_pad = '=';
+
+static const short b64_reverse_t[256] = {
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -1, -2, -2, -1, -2, -2,
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+  -1, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, 62, -2, -2, -2, 63,
+  52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -2, -2, -2, -2, -2, -2,
+  -2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+  15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -2, -2, -2, -2, -2,
+  -2, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+  41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -2, -2, -2, -2, -2,
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2
+};
+
+
 /**
  *
  */
@@ -65,6 +88,72 @@ int parse_boolean(const char *input) {
 
     return -1;
 }
+
+/* \brief Decode Base64 data with special chars
+*
+* \param plain_text Pointer to plain text data
+* \param input Pointer to input data
+* \param input_len Input data length
+*
+* \retval 0 On failure
+* \retval string length On Success
+*/
+int decode_base64_ext(char *plain_text, const char *input, int input_len)
+{
+    const char *encoded = input;
+    int i = 0, j = 0, k = 0;
+    int ch = 0;
+
+    while ((ch = *encoded++) != '\0' && input_len-- > 0) {
+        if (ch == b64_pad) {
+            if (*encoded != '=' && (i % 4) == 1) {
+                return 0;
+            }
+            continue;
+        }
+
+        ch = b64_reverse_t[ch];
+        if (ch < 0 || ch == -1) {
+            continue;
+        } else if (ch == -2) {
+            return 0;
+        }
+        switch(i % 4) {
+            case 0:
+                plain_text[j] = ch << 2;
+                break;
+            case 1:
+                plain_text[j++] |= ch >> 4;
+                plain_text[j] = (ch & 0x0f) << 4;
+                break;
+            case 2:
+                plain_text[j++] |= ch >>2;
+                plain_text[j] = (ch & 0x03) << 6;
+                break;
+            case 3:
+                plain_text[j++] |= ch;
+                break;
+        }
+        i++;
+    }
+
+    k = j;
+    if (ch == b64_pad) {
+        switch(i % 4) {
+            case 1:
+                return 0;
+            case 2:
+                k++;
+            case 3:
+                plain_text[k] = 0;
+        }
+    }
+
+    plain_text[j] = '\0';
+
+    return j;
+}
+
 
 /**
  * Parses a string that contains a name-value pair in the form "name=value".
