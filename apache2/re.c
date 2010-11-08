@@ -843,7 +843,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     msre_rule **rules;
     apr_status_t rc;
     const char *skip_after = NULL;
-    int i, mode, skip, skipped;
+    int i, mode, skip, skipped, saw_starter;
 
     /* First determine which set of rules we need to use. */
     switch (msr->phase) {
@@ -874,6 +874,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     /* Loop through the rules in the selected set. */
     skip = 0;
     skipped = 0;
+    saw_starter = 0;
     mode = NEXT_RULE;
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
@@ -888,33 +889,27 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         /* SKIP_RULES is used to skip all rules until we hit a placeholder
          * with the specified rule ID and then resume execution after that.
          */
+
         if (mode == SKIP_RULES) {
             /* Go to the next rule if we have not yet hit the skip_after ID */
+
             if ((rule->placeholder == RULE_PH_NONE) || (rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0)) {
-                if (msr->txcfg->debuglog_level >= 9) {
-                    if (rule->chain_starter != NULL) {
-                        msr_log(msr, 9, "Skipping chain rule %pp id=\"%s\" until after id=\"%s\"", rule, (rule->chain_starter->actionset->id ? rule->chain_starter->actionset->id : "(none)"), skip_after);
-
-                    }
-                    else {
-                        msr_log(msr, 9, "Skipping rule %pp id=\"%s\" until after id=\"%s\"", rule, (rule->actionset->id ? rule->actionset->id : "(none)"), skip_after);
-
-                    }
-                }
 
                 msre_rule *last_rule = rules[i-1];
 
-                if(last_rule->actionset->is_chained) {
+                if(last_rule->actionset->is_chained && (saw_starter == 1)) {
                     mode = NEXT_RULE;
                     skipped = 1;
                     --i;
                 } else {
                     mode = SKIP_RULES;
                     skipped = 0;
+                    saw_starter = 0;
                 }
 
                 continue;
             }
+
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Found rule %pp id=\"%s\".", rule, skip_after);
             }
@@ -1079,6 +1074,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             if (rule->actionset->skip_after != NULL) {
                 skip_after = rule->actionset->skip_after;
                 mode = SKIP_RULES;
+                saw_starter = 1;
 
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "Skipping after rule %pp id=\"%s\" -> mode SKIP_RULES.", rule, skip_after);
@@ -1100,6 +1096,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Match -> mode NEXT_RULE.");
             }
+
 
             /* ...unless we need to skip, in which case we
              * determine how many rules/chains we need to
@@ -2053,7 +2050,6 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
             apr_table_t *normtab;
             const char *lastvarval = NULL;
             apr_size_t lastvarlen = 0;
-            int tfnchanged = 0;
 
             changed = 0;
             normtab = apr_table_make(mptmp, 10);
@@ -2196,6 +2192,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
             for (; k < tarr->nelts; k++) {
                 char *rval = NULL;
                 long int rval_length = -1;
+                int tfnchanged = 0;
 
                 /* In multi-match mode we execute the operator
                  * once at the beginning and then once every
