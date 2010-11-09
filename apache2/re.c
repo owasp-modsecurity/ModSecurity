@@ -905,7 +905,10 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                     mode = SKIP_RULES;
                     skipped = 0;
                     saw_starter = 0;
-                }
+
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Current rule is id=\"%s\". Trying to find the SecMarker=\"%s\".",rule->actionset->id,skip_after);
+                    }
 
                 continue;
             }
@@ -919,6 +922,8 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                 msr_log(msr, 4, "Continuing execution after rule id=\"%s\".", skip_after);
             }
 
+            skipper = 0;
+            saw_starter = 0;
             skip_after = NULL;
             mode = NEXT_RULE;
             continue;
@@ -998,6 +1003,8 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                         mode = NEXT_CHAIN;
                     }
 
+                    skipped = 0;
+                    saw_starter = 0;
                     continue;
                 }
         }
@@ -1057,6 +1064,9 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                     msr_log(msr, 9, "No match, not chained -> mode NEXT_RULE.");
                 }
             }
+
+            skipped = 0;
+            saw_starter = 0;
         }
         else if (rc == RULE_MATCH) {
             if (msr->rule_was_intercepted) {
