@@ -892,7 +892,6 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
 
         if (mode == SKIP_RULES) {
             /* Go to the next rule if we have not yet hit the skip_after ID */
-
             if ((rule->placeholder == RULE_PH_NONE) || (rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0)) {
 
                 msre_rule *last_rule = rules[i-1];
@@ -907,8 +906,10 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                     saw_starter = 0;
 
                     if (msr->txcfg->debuglog_level >= 9) {
-                        msr_log(msr, 9, "Current rule is id=\"%s\". Trying to find the SecMarker=\"%s\".",rule->actionset->id,skip_after);
+                        msr_log(msr, 9, "Current rule is id=\"%s\" [chained %d] is trying to find the SecMarker=\"%s\" [stater %d]",rule->actionset->id,last_rule->actionset->is_chained,skip_after,saw_starter);
                     }
+
+                }
 
                 continue;
             }
@@ -922,8 +923,8 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                 msr_log(msr, 4, "Continuing execution after rule id=\"%s\".", skip_after);
             }
 
-            skipped = 0;
             saw_starter = 0;
+            skipped = 0;
             skip_after = NULL;
             mode = NEXT_RULE;
             continue;
