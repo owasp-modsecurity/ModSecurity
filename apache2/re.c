@@ -922,7 +922,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                 msr_log(msr, 4, "Continuing execution after rule id=\"%s\".", skip_after);
             }
 
-            skipper = 0;
+            skipped = 0;
             saw_starter = 0;
             skip_after = NULL;
             mode = NEXT_RULE;
