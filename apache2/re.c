@@ -1079,6 +1079,25 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "Match, intercepted -> returning.");
                 }
+
+                msre_rule *last_rule = rules[i-1];
+
+                if(last_rule != NULL && last_rule->actionset->is_chained) {
+
+                    int st = 0;
+
+                    for(st=i;st>=0;st--)  {
+
+                        msre_rule *rule_starter = rules[st];
+
+                        if(rule_starter != NULL && rule_starter->chain_starter != NULL)    {
+                            msr->intercept_actionset->intercept_uri = rule_starter->actionset->intercept_uri;
+                            break;
+                        }
+                    }
+
+                }
+
                 return 1;
             }
 
