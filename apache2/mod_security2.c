@@ -20,6 +20,7 @@
 
 #include "http_core.h"
 #include "http_request.h"
+#include "http_connection.h"
 
 #include "modsecurity.h"
 #include "apache2.h"
@@ -29,6 +30,8 @@
 #include "msc_logging.h"
 #include "msc_util.h"
 
+#include "ap_mpm.h"
+#include "scoreboard.h"
 
 /* ModSecurity structure */
 
@@ -1083,7 +1086,6 @@ static int hook_connection_early(conn_rec *conn)
     sb_handle *sb = conn->sbh;
     int i, j;
     int ip_count = 0;
-    int limit = 0;
     worker_score *ws_record = NULL;
 
     if(sb != NULL && conn_read_state_limit > 0)   {
