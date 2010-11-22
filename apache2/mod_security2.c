@@ -54,6 +54,15 @@ unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
 
 unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
+unsigned long int DSOLOCAL conn_read_state_limit = 0;
+
+static int server_limit, thread_limit;
+
+typedef struct {
+    int child_num;
+    int thread_num;
+} sb_handle;
+
 /* -- Miscellaneous functions -- */
 
 /**
@@ -1060,6 +1069,61 @@ static void modsec_register_operator(const char *name, void *fn_init, void *fn_e
     }
 }
 
+/*
+* \brief Connetion hook to limit the number of
+* connections in BUSY state
+*
+* \param conn Pointer to connection struct
+*
+* \retval DECLINED On failure
+* \retval OK On Success
+*/
+static int hook_connection_early(conn_rec *conn)
+{
+    sb_handle *sb = conn->sbh;
+    int i, j;
+    int ip_count = 0;
+    int limit = 0;
+    worker_score *ws_record = NULL;
+
+    if(sb != NULL && conn_read_state_limit > 0)   {
+
+        ws_record = &ap_scoreboard_image->servers[sb->child_num][sb->thread_num];
+        if(ws_record == NULL)
+            return DECLINED;
+
+        apr_cpystrn(ws_record->client, conn->remote_ip, sizeof(ws_record->client));
+
+        for (i = 0; i < server_limit; ++i) {
+            for (j = 0; j < thread_limit; ++j) {
+
+                ws_record = ap_get_scoreboard_worker(i, j);
+
+                if(ws_record == NULL)
+                    return DECLINED;
+
+                switch (ws_record->status) {
+                    case SERVER_BUSY_READ:
+                        if (strcmp(conn->remote_ip, ws_record->client) == 0)
+                            ip_count++;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        if (ip_count > conn_read_state_limit) {
+            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many connections [%d] of %ld allowed in READ state from %s - Possible DoS Consumption Attack [Rejected]", ip_count,conn_read_state_limit,conn->remote_ip);
+            return OK;
+        } else {
+            return DECLINED;
+        }
+    }
+
+    return DECLINED;
+}
+
 /**
  * This function is exported for other Apache modules to
  * register new variables.
@@ -1117,6 +1181,10 @@ static void register_hooks(apr_pool_t *mp) {
     APR_REGISTER_OPTIONAL_FN(modsec_register_variable);
 #endif
 
+    /* For connection level hook */
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &thread_limit);
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &server_limit);
+
     /* Main hooks */
     ap_hook_pre_config(hook_pre_config, NULL, NULL, APR_HOOK_FIRST);
     ap_hook_post_config(hook_post_config, postconfig_beforeme_list,
@@ -1126,6 +1194,9 @@ static void register_hooks(apr_pool_t *mp) {
     /* Our own hook to handle RPC transactions (not used at the moment).
      * // ap_hook_handler(hook_handler, NULL, NULL, APR_HOOK_MIDDLE);
      */
+
+    /* Connection processing hooks */
+    ap_hook_process_connection(hook_connection_early, NULL, NULL, APR_HOOK_FIRST);
 
     /* Transaction processing hooks */
     ap_hook_post_read_request(hook_request_early,

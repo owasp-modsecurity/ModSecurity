@@ -1,3 +1,10 @@
+22 Nov 2010 - 2.5.13-dev3
+
+ * Add SecReadStateLimit to limit the number of BUSY connections
+
+ * Fixed redirect action was not expanding macros in chained rules
+
+
 04 Nov 2010 - 2.5.13-dev2
 --------------------
 

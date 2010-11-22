@@ -1343,6 +1343,34 @@ static const char *cmd_guardian_log(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
+/*
+* \brief Add SecReadStateLimit configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On failure
+* \retval apr_psprintf On Success
+*/
+static const char *cmd_conn_read_state_limit(cmd_parms *cmd, void *_dcfg,
+                                                   const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    long int limit;
+
+    if (dcfg == NULL) return NULL;
+
+    limit = strtol(p1, NULL, 10);
+    if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecReadStateLimit: %s", p1);
+    }
+
+    conn_read_state_limit = limit;
+
+    return NULL;
+}
+
 static const char *cmd_request_body_inmemory_limit(cmd_parms *cmd, void *_dcfg,
                                                    const char *p1)
 {
@@ -2206,6 +2234,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "On or Off"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecReadStateLimit",
+        cmd_conn_read_state_limit,
+        NULL,
+        CMD_SCOPE_ANY,
+        "maximum number of server in busy state"
     ),
 
     AP_INIT_TAKE1 (
