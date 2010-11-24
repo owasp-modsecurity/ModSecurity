@@ -1,6 +1,6 @@
 22 Nov 2010 - 2.5.13-dev3
 
- * Add SecReadStateLimit to limit the number of BUSY connections
+ * Add SecReadStateLimit to limit the number threads in BUSY connections per ip address
 
  * Fixed redirect action was not expanding macros in chained rules
 
