@@ -2241,7 +2241,7 @@ const command_rec module_directives[] = {
         cmd_conn_read_state_limit,
         NULL,
         CMD_SCOPE_ANY,
-        "maximum number of server in busy state"
+        "maximum number of threads in READ_BUSY state per ip address"
     ),
 
     AP_INIT_TAKE1 (
