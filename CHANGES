@@ -1,12 +1,12 @@
 22 Nov 2010 - 2.5.13-dev3
+-------------------------
 
- * Add SecReadStateLimit to limit the number threads in BUSY connections per ip address
+ * Add SecReadStateLimit to limit the number of concurrent threads in BUSY connections per ip address
 
  * Fixed redirect action was not expanding macros in chained rules
 
-
 04 Nov 2010 - 2.5.13-dev2
---------------------
+-------------------------
 
  * Fixed Geo lookup concurrent connections bug
 

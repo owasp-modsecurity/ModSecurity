@@ -7,8 +7,8 @@
         <releaseinfo>Version 2.5.10-dev1 (March 24, 2009)</releaseinfo>
         <copyright>
             <year>2004-2010</year>
-            <holder>Breach Security, Inc. (<ulink url="http://www.breach.com"
-                    >http://www.breach.com</ulink>)</holder>
+            <holder>Trustwave Holdings, Inc. (<ulink url="http://www.trustwave.com"
+                    >http://www.trustwave.com</ulink>)</holder>
         </copyright>
     </articleinfo>
     <para>The purpose of this document is to describe the formats of the ModSecurity alert messages,

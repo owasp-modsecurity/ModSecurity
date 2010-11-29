@@ -11,8 +11,8 @@
     <copyright>
       <year>2004-2010</year>
 
-      <holder>Breach Security, Inc. (<ulink
-      url="http://www.breach.com">http://www.breach.com</ulink>)</holder>
+      <holder>Trustwave Holdings, Inc. (<ulink
+      url="http://www.trustwave.com">http://www.trustwave.com</ulink>)</holder>
     </copyright>
   </articleinfo>
 
@@ -180,12 +180,12 @@
       version 2 (licence text is included with the distribution), as an Open
       Source / Free Software product. A range of commercial licenses is also
       available, together with a range of commercial support contracts. For
-      more information on commercial licensing please contact Breach
+      more information on commercial licensing please contact Trustwave Holdings
       Security.</para>
 
       <note>
         <para>ModSecurity, mod_security, ModSecurity Pro, and ModSecurity Core
-        Rules are trademarks or registered trademarks of Breach Security,
+        Rules are trademarks or registered trademarks of Trustwave Holdings,
         Inc.</para>
       </note>
     </section>
@@ -200,7 +200,7 @@
       <para>ModSecurity is a web application firewall engine that provides
       very little protection on its own. In order to become useful,
       ModSecurity must be configured with rules. In order to enable users to
-      take full advantage of ModSecurity out of the box, Breach Security, Inc.
+      take full advantage of ModSecurity out of the box, Trustwave Holdings, Inc.
       is providing a free certified rule set for ModSecurity 2.x. Unlike
       intrusion detection and prevention systems, which rely on signatures
       specific to known vulnerabilities, the Core Rules provide generic
@@ -523,7 +523,7 @@ LoadFile /usr/lib/liblua5.1.so</programlisting></para>
       themselves but rather place all changes (such as
       <literal>SecRuleRemoveByID</literal>, etc...) in your custom rules file.
       This will allow for easier upgrading as newer Core rules are released by
-      Breach Security on the ModSecurity website.</para>
+      Trustwave Holdings on the ModSecurity website.</para>
     </note>
 
     <section>
@@ -1488,7 +1488,7 @@ SecMarker 99</emphasis></programlisting></para>
 
       <para><emphasis>Scope:</emphasis> Global</para>
 
-      <para><emphasis>Version:</emphasis> 2.5.12</para>
+      <para><emphasis>Version:</emphasis> 2.5.13</para>
 
       <para><emphasis>Dependencies/Notes:</emphasis> Default is set at compile
       (1500 by default). See also
@@ -1531,7 +1531,7 @@ SecRule TX:/^MSC_/ "!@eq 0" "phase:5,pass,log,auditlog,msg:'Potential REDoS'"</p
 
       <para><emphasis>Scope:</emphasis> Global</para>
 
-      <para><emphasis>Version:</emphasis> 2.5.12</para>
+      <para><emphasis>Version:</emphasis> 2.5.13</para>
 
       <para><emphasis>Dependencies/Notes:</emphasis> Default is set at compile
       (1500 by default). See also <literal>SecPcreMatchLimit</literal></para>
@@ -2582,7 +2582,7 @@ SecRuleUpdateActionById 12345 "t:compressWhitespace,deny,status:403,msg:'A new m
 
       <para><emphasis>Scope:</emphasis> Any</para>
 
-      <para><emphasis>Version:</emphasis> 2.5.12</para>
+      <para><emphasis>Version:</emphasis> 2.5.13</para>
 
       <para><emphasis>Dependencies/Notes:</emphasis> The default is set to 100
       files, but you are encouraged to reduce this value. Any file over the

@@ -2,7 +2,7 @@
 Build notes for Windows from Tom Donovan
 ============================================================
 These are the raw build notes from Tom Donovan for building
-ModSecurity 2.5.12 with Apache httpd 2.2.14 on Windows. Some
+ModSecurity 2.5.13 with Apache httpd 2.2.14 on Windows. Some
 day these should be incorporated into the official docs, but
 there has not yet been time, so they are included here in 
 their raw format for now.
@@ -77,9 +77,9 @@ BUILD CURL-7.20.0
 
     NMAKE
 
-BUILD MOD_SECURITY-2.5.12
+BUILD MOD_SECURITY-2.5.13
 
-    Edited the top of C:\work\mod_security-2.5.12\apache2\Makefile.win and set my local paths
+    Edited the top of C:\work\mod_security-2.5.13\apache2\Makefile.win and set my local paths
     (note that pcre.lib is not in $(PCRE)\LibR as it is in the original Makefile.win )
 
             # Path to Apache httpd installation
@@ -99,12 +99,12 @@ BUILD MOD_SECURITY-2.5.12
                    $(LUA)\lua5.1.lib \
                    wsock32.lib
 
-    CD C:\work\mod_security-2.5.12\apache2
+    CD C:\work\mod_security-2.5.13\apache2
     NMAKE -f Makefile.win
 
-BUILD MOD_SECURITY-2.5.12 MLOGC program
+BUILD MOD_SECURITY-2.5.13 MLOGC program
 
-    Edited the top of C:\work\mod_security-2.5.12\apache2\mlogc-src\Makefile.win and set my local paths
+    Edited the top of C:\work\mod_security-2.5.13\apache2\mlogc-src\Makefile.win and set my local paths
 
             # Path to Apache httpd installation
             BASE = C:\Apache2214
@@ -121,7 +121,7 @@ BUILD MOD_SECURITY-2.5.12 MLOGC program
                    wsock32.lib
 
 
-    CD  C:\work\mod_security-2.5.12\apache2\mlogc-src
+    CD  C:\work\mod_security-2.5.13\apache2\mlogc-src
     NMAKE -f Makefile.win
 
 INSTALL AND RUN
@@ -131,11 +131,11 @@ INSTALL AND RUN
         C:\work\lua-5.1.4\src\lua5.1.dll
         C:\work\libxml2-2.7.6\win32\bin.msvc\libxml2.dll
         C:\work\curl-7.20.0\libcurl.dll
-        C:\work\mod_security-2.5.12\apache2\mlogc-src\mlogc.exe
+        C:\work\mod_security-2.5.13\apache2\mlogc-src\mlogc.exe
 
     Copied this one file to C:\Apache2214\modules:
 
-        C:\work\mod_security-2.5.12\apache2\mod_security2.so
+        C:\work\mod_security-2.5.13\apache2\mod_security2.so
 
     You could also copy C:\work\curl-7.20.0\\curl.exe to C:\Apache2214\bin, if you want to use the cURL command-line.
 

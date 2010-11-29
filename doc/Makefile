@@ -30,7 +30,7 @@ html-multipage/index.html: modsecurity2-apache-reference.xml
 	$(XALAN) -q -xsl html-chunked.xsl -in modsecurity2-apache-reference.xml -param base.dir html-multipage/; \
 	cp modsecurity-reference.css html-multipage/; \
 	cp modsecurity.gif html-multipage/; \
-	cp breach-logo-small.gif html-multipage/; \
+	cp trustwave-logo-small.gif html-multipage/; \
 	cp apache_request_cycle-modsecurity.jpg html-multipage/
 
 index.html: main-index.html
