@@ -843,6 +843,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     msre_rule **rules;
     apr_status_t rc;
     const char *skip_after = NULL;
+    msre_rule *last_rule = NULL;
     int i, mode, skip, skipped, saw_starter;
 
     /* First determine which set of rules we need to use. */
@@ -894,7 +895,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             /* Go to the next rule if we have not yet hit the skip_after ID */
             if ((rule->placeholder == RULE_PH_NONE) || (rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0)) {
 
-                msre_rule *last_rule = rules[i-1];
+                last_rule = rules[i-1];
 
                 if(last_rule->actionset->is_chained && (saw_starter == 1)) {
                     mode = NEXT_RULE;
@@ -1080,7 +1081,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                     msr_log(msr, 9, "Match, intercepted -> returning.");
                 }
 
-                msre_rule *last_rule = rules[i-1];
+                last_rule = rules[i-1];
 
                 if(last_rule != NULL && last_rule->actionset->is_chained) {
 
