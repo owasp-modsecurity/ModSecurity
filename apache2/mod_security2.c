@@ -1085,7 +1085,7 @@ static int hook_connection_early(conn_rec *conn)
 {
     sb_handle *sb = conn->sbh;
     int i, j;
-    int ip_count = 0;
+    unsigned long int ip_count = 0;
     worker_score *ws_record = NULL;
 
     if(sb != NULL && conn_read_state_limit > 0)   {
@@ -1116,7 +1116,7 @@ static int hook_connection_early(conn_rec *conn)
         }
 
         if (ip_count > conn_read_state_limit) {
-            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%d] of %ld allowed in READ state from %s - Possible DoS Consumption Attack [Rejected]", ip_count,conn_read_state_limit,conn->remote_ip);
+            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in READ state from %s - Possible DoS Consumption Attack [Rejected]", ip_count,conn_read_state_limit,conn->remote_ip);
             return OK;
         } else {
             return DECLINED;
