@@ -895,9 +895,12 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             /* Go to the next rule if we have not yet hit the skip_after ID */
             if ((rule->placeholder == RULE_PH_NONE) || (rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0)) {
 
-                last_rule = rules[i-1];
+                if((i-1) >= 0)
+                    last_rule = rules[i-1];
+                else
+                    last_rule = rules[0];
 
-                if(last_rule->actionset->is_chained && (saw_starter == 1)) {
+                if((last_rule != NULL) && (last_rule->actionset != NULL ) && last_rule->actionset->is_chained && (saw_starter == 1)) {
                     mode = NEXT_RULE;
                     skipped = 1;
                     --i;
@@ -907,6 +910,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                     saw_starter = 0;
 
                     if (msr->txcfg->debuglog_level >= 9) {
+                        if(last_rule != NULL)
                         msr_log(msr, 9, "Current rule is id=\"%s\" [chained %d] is trying to find the SecMarker=\"%s\" [stater %d]",rule->actionset->id,last_rule->actionset->is_chained,skip_after,saw_starter);
                     }
 
@@ -1081,9 +1085,12 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                     msr_log(msr, 9, "Match, intercepted -> returning.");
                 }
 
-                last_rule = rules[i-1];
+                if((i-1) >= 0)
+                    last_rule = rules[i-1];
+                else
+                    last_rule = rules[0];
 
-                if(last_rule != NULL && last_rule->actionset->is_chained) {
+                if((last_rule != NULL) && (last_rule->actionset != NULL) && last_rule->actionset->is_chained) {
 
                     int st = 0;
 
@@ -1091,7 +1098,8 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
 
                         msre_rule *rule_starter = rules[st];
 
-                        if(rule_starter != NULL && rule_starter->chain_starter != NULL)    {
+                        if((rule_starter != NULL) && (rule_starter->chain_starter != NULL))    {
+                            if((msr != NULL) && (msr->intercept_actionset != NULL) && (rule_starter->actionset != NULL))
                             msr->intercept_actionset->intercept_uri = rule_starter->actionset->intercept_uri;
                             break;
                         }
