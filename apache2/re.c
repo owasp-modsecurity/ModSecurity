@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -857,7 +857,9 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
     msre_rule **rules;
     apr_status_t rc;
     const char *skip_after = NULL;
-    int i, mode, skip;
+    msre_rule *last_rule = NULL;
+    msre_rule *rule_starter = NULL;
+    int i, mode, skip, skipped, saw_starter;
 
     /* First determine which set of rules we need to use. */
     switch (msr->phase) {
@@ -887,6 +889,8 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
 
     /* Loop through the rules in the selected set. */
     skip = 0;
+    skipped = 0;
+    saw_starter = 0;
     mode = NEXT_RULE;
     rules = (msre_rule **)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
@@ -903,19 +907,32 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
          */
         if (mode == SKIP_RULES) {
             /* Go to the next rule if we have not yet hit the skip_after ID */
+
             if ((rule->placeholder == RULE_PH_NONE) || (rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0)) {
-                if (msr->txcfg->debuglog_level >= 9) {
-                    if (rule->chain_starter != NULL) {
-                        msr_log(msr, 9, "Skipping chain rule %pp id=\"%s\" until after id=\"%s\"", rule, (rule->chain_starter->actionset->id ? rule->chain_starter->actionset->id : "(none)"), skip_after);
 
-                    }
-                    else {
-                        msr_log(msr, 9, "Skipping rule %pp id=\"%s\" until after id=\"%s\"", rule, (rule->actionset->id ? rule->actionset->id : "(none)"), skip_after);
+                if(i-1 >=0)
+                    last_rule = rules[i-1];
+                else
+                    last_rule = rules[0];
 
+                if((last_rule != NULL) && (last_rule->actionset != NULL) && last_rule->actionset->is_chained && (saw_starter == 1)) {
+                    mode = NEXT_RULE;
+                    skipped = 1;
+                    --i;
+                } else {
+                    mode = SKIP_RULES;
+                    skipped = 0;
+                    saw_starter = 0;
+
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Current rule is id=\"%s\" [chained %d] is trying to find the SecMarker=\"%s\" [stater %d]",rule->actionset->id,last_rule->actionset->is_chained,skip_after,saw_starter);
                     }
+
                 }
+
                 continue;
             }
+
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Found rule %pp id=\"%s\".", rule, skip_after);
             }
@@ -925,6 +942,8 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                 msr_log(msr, 4, "Continuing execution after rule id=\"%s\".", skip_after);
             }
 
+            saw_starter = 0;
+            skipped = 0;
             skip_after = NULL;
             mode = NEXT_RULE;
             continue;
@@ -1004,6 +1023,8 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                         mode = NEXT_CHAIN;
                     }
 
+                    skipped = 0;
+                    saw_starter = 0;
                     continue;
                 }
         }
@@ -1063,6 +1084,9 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                     msr_log(msr, 9, "No match, not chained -> mode NEXT_RULE.");
                 }
             }
+
+            skipped = 0;
+            saw_starter = 0;
         }
         else if (rc == RULE_MATCH) {
             if (msr->rule_was_intercepted) {
@@ -1074,17 +1098,46 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "Match, intercepted -> returning.");
                 }
+
+                if(i-1 >= 0)
+                    last_rule = rules[i-1];
+                else
+                    last_rule = rules[0];
+
+                if((last_rule != NULL) && (last_rule->actionset != NULL) && last_rule->actionset->is_chained) {
+
+                    int st = 0;
+
+                    for(st=i;st>=0;st--)  {
+
+                        rule_starter = rules[st];
+
+                        if(rule_starter != NULL && rule_starter->chain_starter != NULL)    {
+                            if((msr != NULL) && (msr->intercept_actionset != NULL) && (rule_starter->actionset != NULL))
+                                msr->intercept_actionset->intercept_uri = rule_starter->actionset->intercept_uri;
+                            break;
+                        }
+                    }
+
+                }
+
                 return 1;
             }
 
             if (rule->actionset->skip_after != NULL) {
                 skip_after = rule->actionset->skip_after;
                 mode = SKIP_RULES;
+                saw_starter = 1;
 
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "Skipping after rule %pp id=\"%s\" -> mode SKIP_RULES.", rule, skip_after);
                 }
 
+                continue;
+            }
+
+            if(skipped == 1)    {
+                mode = SKIP_RULES;
                 continue;
             }
 

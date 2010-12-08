@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -602,6 +602,12 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         /* Must NOT specify a disruptive action. */
         if (rule->actionset->intercept_action != NOT_SET) {
             return apr_psprintf(cmd->pool, "ModSecurity: Disruptive actions can only "
+                "be specified by chain starter rules.");
+        }
+
+        /* Must NOT specify a skipafter action. */
+        if (rule->actionset->skip_after != NOT_SET_P) {
+            return apr_psprintf(cmd->pool, "ModSecurity: SkipAfter actions can only "
                 "be specified by chain starter rules.");
         }
 

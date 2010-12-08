@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -12,8 +12,8 @@
  * distribution.
  *
  * If any of the files related to licensing are missing or if you have any
- * other questions related to licensing please contact Breach Security, Inc.
- * directly using the email address support@breach.com.
+ * other questions related to licensing please contact Trustwave Holdings, Inc.
+ * directly using the email address support@trustwave.com.
  *
  */
 #include "re.h"
@@ -155,9 +155,12 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
         *error_msg = apr_psprintf(msr->mp,
-                                  "Rule execution error - "
+                                  "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
+                                  "Execution error - "
                                   "PCRE limits exceeded (%d): %s",
-                                  rc, my_error_msg);
+                                  rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                                  rule->filename != NULL ? rule->filename : "-",
+                                  rule->line_num,rc, my_error_msg);
 
         msr_log(msr, 3, "%s.", *error_msg);
 

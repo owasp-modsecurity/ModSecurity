@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -12,8 +12,8 @@
  * distribution.
  *
  * If any of the files related to licensing are missing or if you have any
- * other questions related to licensing please contact Breach Security, Inc.
- * directly using the email address support@breach.com.
+ * other questions related to licensing please contact Trustwave Holdings, Inc.
+ * directly using the email address support@trustwave.com.
  *
  */
 #include "msc_geo.h"
@@ -287,6 +287,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
     apr_size_t nbytes;
     unsigned int rec_val = 0;
     apr_off_t seekto = 0;
+    apr_status_t ret;
     int rc;
     int country = 0;
     int level;
@@ -332,6 +333,12 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         msr_log(msr, 9, "GEO: Using address \"%s\" (0x%08lx).", targetip, ipnum);
     }
 
+    ret = apr_global_mutex_lock(msr->modsecurity->geo_lock);
+    if (ret != APR_SUCCESS) {
+        msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
+                get_apr_error(msr->mp, ret));
+    }
+
     for (level = 31; level >= 0; level--) {
         /* Read the record */
         seekto = 2 * reclen * rec_val;
@@ -365,6 +372,13 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         if ((country <= 0) || (country > GEO_COUNTRY_LAST)) {
             *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\" (country %d).", log_escape(msr->mp, target), country);
             msr_log(msr, 4, "%s", *error_msg);
+
+            ret = apr_global_mutex_unlock(msr->modsecurity->geo_lock);
+            if (ret != APR_SUCCESS) {
+                msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
+                        get_apr_error(msr->mp, ret));
+            }
+
             return 0;
         }
 
@@ -389,6 +403,13 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         if ((country <= 0) || (country > GEO_COUNTRY_LAST)) {
             *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\" (country %d).", log_escape(msr->mp, target), country);
             msr_log(msr, 4, "%s", *error_msg);
+
+            ret = apr_global_mutex_unlock(msr->modsecurity->geo_lock);
+            if (ret != APR_SUCCESS) {
+                msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
+                        get_apr_error(msr->mp, ret));
+            }
+
             return 0;
         }
         if (msr->txcfg->debuglog_level >= 9) {
@@ -477,6 +498,13 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
     }
 
     *error_msg = apr_psprintf(msr->mp, "Geo lookup for \"%s\" succeeded.", log_escape(msr->mp, target));
+
+    ret = apr_global_mutex_unlock(msr->modsecurity->geo_lock);
+    if (ret != APR_SUCCESS) {
+        msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
+                get_apr_error(msr->mp, ret));
+    }
+
     return 1;
 }
 

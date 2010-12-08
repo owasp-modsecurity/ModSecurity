@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -12,8 +12,8 @@
  * distribution.
  *
  * If any of the files related to licensing are missing or if you have any
- * other questions related to licensing please contact Breach Security, Inc.
- * directly using the email address support@breach.com.
+ * other questions related to licensing please contact Trustwave Holdings, Inc.
+ * directly using the email address support@trustwave.com.
  *
  */
 #ifndef _MODSECURITY_H_
@@ -131,6 +131,8 @@ extern DSOLOCAL const command_rec module_directives[];
 extern DSOLOCAL unsigned long int msc_pcre_match_limit;
 
 extern DSOLOCAL unsigned long int msc_pcre_match_limit_recursion;
+
+extern DSOLOCAL unsigned long int conn_read_state_limit;
 
 #define RESBODY_STATUS_NOT_READ         0   /* we were not configured to read the body */
 #define RESBODY_STATUS_ERROR            1   /* error occured while we were reading the body */
@@ -496,6 +498,7 @@ struct error_message {
 struct msc_engine {
     apr_pool_t              *mp;
     apr_global_mutex_t      *auditlog_lock;
+    apr_global_mutex_t      *geo_lock;
     msre_engine             *msre;
     unsigned int             processing_mode;
 };

@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2009 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2009 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -12,8 +12,8 @@
  * distribution.
  *
  * If any of the files related to licensing are missing or if you have any
- * other questions related to licensing please contact Breach Security, Inc.
- * directly using the email address support@breach.com.
+ * other questions related to licensing please contact Trustwave Holdings, Inc.
+ * directly using the email address support@trustwave.com.
  *
  */
 
@@ -1522,7 +1522,7 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
 
                 if (finfo.size == 0) {
                     error_log(LOG_WARNING, thread,
-                              "File found (%" APR_SIZE_T_FMT
+                              "File found (%" APR_OFF_T_FMT
                               " bytes), skipping.", finfo.size);
                     take_new = 1;
                     nodelay = 1;
@@ -1530,7 +1530,7 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
                 }
                 else {
                     error_log(LOG_DEBUG, thread,
-                              "File found (%" APR_SIZE_T_FMT
+                              "File found (%" APR_OFF_T_FMT
                               " bytes), activating cURL.", finfo.size);
                 }
 

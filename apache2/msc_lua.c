@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2010 Breach Security, Inc. (http://www.breach.com/)
+ * Copyright (c) 2004-2010 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -12,8 +12,8 @@
  * distribution.
  *
  * If any of the files related to licensing are missing or if you have any
- * other questions related to licensing please contact Breach Security, Inc.
- * directly using the email address support@breach.com.
+ * other questions related to licensing please contact Trustwave Holdings, Inc.
+ * directly using the email address support@trustwave.com.
  *
  */
 #if defined(WITH_LUA)
@@ -337,10 +337,57 @@ static int l_getvars(lua_State *L) {
     return 1;
 }
 
+/*
+* \brief New setvar function for Lua API. Users can put back
+* data in modsecurity core via new variables
+*
+* \param L Pointer to Lua state
+*
+* \retval -1 On failure
+* \retval 0 On Collection failure
+* \retval 1 On Success
+*/
+static int l_setvar(lua_State *L) {
+    modsec_rec *msr = NULL;
+    msre_rule *rule = NULL;
+    const char *var_value = NULL;
+    const char *var_name = NULL;
+    int nargs = lua_gettop(L);
+    char *chr = NULL;
+
+    lua_getglobal(L, "__msr");
+    msr = (modsec_rec *)lua_topointer(L, -1);
+
+    lua_getglobal(L, "__rule");
+    rule = (msre_rule *)lua_topointer(L, -1);
+
+    if(nargs != 2)  {
+        msr_log(msr, 8, "m.setvar: Failed m.setvar funtion must has 2 arguments");
+        return -1;
+    }
+    var_value = luaL_checkstring (L, 2);
+    var_name = luaL_checkstring (L, 1);
+
+    lua_pop(L,2);
+
+    if(var_value == NULL || var_name == NULL)
+        return -1;
+
+    chr = strchr((char *)var_name,0x2e);
+
+    if(chr == NULL) {
+        msr_log(msr, 8, "m.setvar: Must specify a collection using dot character - ie m.setvar(tx.myvar,mydata)");
+        return -1;
+    }
+
+    return msre_action_setvar_execute(msr,msr->msc_rule_mptmp,rule,(char *)var_name,(char *)var_value);
+}
+
 static const struct luaL_Reg mylib[] = {
     { "log", l_log },
     { "getvar", l_getvar },
     { "getvars", l_getvars },
+    { "setvar", l_setvar },
     { NULL, NULL }
 };
 
