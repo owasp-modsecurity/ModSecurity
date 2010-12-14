@@ -276,7 +276,7 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     ACMP *p;
 
     if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pmFromFile'.");
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pmFromFile/pmf'.");
         return 0; /* ERROR */
     }
 
@@ -2069,6 +2069,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
     /* pmFromFile */
     msre_engine_op_register(engine,
         "pmFromFile",
+        msre_op_pmFromFile_param_init,
+        msre_op_pm_execute
+    );
+
+    /* pmf */
+    msre_engine_op_register(engine,
+        "pmf",
         msre_op_pmFromFile_param_init,
         msre_op_pm_execute
     );
