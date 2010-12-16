@@ -46,6 +46,7 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->is_enabled = NOT_SET;
 
     dcfg->reqbody_access = NOT_SET;
+    dcfg->reqintercept_oe = NOT_SET;
     dcfg->reqbody_buffering = NOT_SET;
     dcfg->reqbody_inmemory_limit = NOT_SET;
     dcfg->reqbody_limit = NOT_SET;
@@ -254,6 +255,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
         ? parent->of_limit : child->of_limit);
     merged->of_limit_action = (child->of_limit_action == NOT_SET
         ? parent->of_limit_action : child->of_limit_action);
+    merged->reqintercept_oe = (child->reqintercept_oe == NOT_SET
+        ? parent->reqintercept_oe : child->reqintercept_oe);
 
     if (child->of_mime_types != NOT_SET_P) {
         /* Child added to the table */
@@ -481,6 +484,7 @@ void init_directory_config(directory_config *dcfg)
     if (dcfg->is_enabled == NOT_SET) dcfg->is_enabled = 0;
 
     if (dcfg->reqbody_access == NOT_SET) dcfg->reqbody_access = 0;
+    if (dcfg->reqintercept_oe == NOT_SET) dcfg->reqintercept_oe = 0;
     if (dcfg->reqbody_buffering == NOT_SET) dcfg->reqbody_buffering = REQUEST_BODY_FORCEBUF_OFF;
     if (dcfg->reqbody_inmemory_limit == NOT_SET)
         dcfg->reqbody_inmemory_limit = REQUEST_BODY_DEFAULT_INMEMORY_LIMIT;
@@ -1395,6 +1399,22 @@ static const char *cmd_request_body_access(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
+static const char *cmd_request_intercept_on_error(cmd_parms *cmd, void *_dcfg,
+                                           const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "on") == 0) dcfg->reqintercept_oe = 1;
+    else
+    if (strcasecmp(p1, "off") == 0) dcfg->reqintercept_oe = 0;
+    else
+    return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecInterceptOnError: %s", p1);
+
+    return NULL;
+}
+
+
 static const char *cmd_request_encoding(cmd_parms *cmd, void *_dcfg,
                                         const char *p1)
 {
@@ -2069,6 +2089,14 @@ const command_rec module_directives[] = {
     AP_INIT_TAKE1 (
         "SecRequestBodyAccess",
         cmd_request_body_access,
+        NULL,
+        CMD_SCOPE_ANY,
+        "On or Off"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecInterceptOnError",
+        cmd_request_intercept_on_error,
         NULL,
         CMD_SCOPE_ANY,
         "On or Off"

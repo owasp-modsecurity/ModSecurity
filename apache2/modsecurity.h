@@ -384,6 +384,7 @@ struct directory_config {
 
     int                  is_enabled;
     int                  reqbody_access;
+    int                  reqintercept_oe;
     int                  reqbody_buffering;
     long int             reqbody_inmemory_limit;
     long int             reqbody_limit;

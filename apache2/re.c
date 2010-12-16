@@ -1173,7 +1173,31 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         }
         else if (rc < 0) {
             msr_log(msr, 1, "Rule processing failed.");
-            return -1;
+
+            if (msr->txcfg->reqintercept_oe == 1)   {
+                return -1;
+            } else  {
+                if (rule->actionset->is_chained) {
+                    /* If the current rule is part of a chain then
+                     * we need to skip over all the rules in the chain.
+                     */
+                    mode = NEXT_CHAIN;
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Ruled failed, chained -> mode NEXT_CHAIN.");
+                    }
+                } else {
+                    /* This rule is not part of a chain so we simply
+                     * move to the next rule.
+                     */
+                    mode = NEXT_RULE;
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Rule failed, not chained -> mode NEXT_RULE.");
+                    }
+                }
+
+                skipped = 0;
+                saw_starter = 0;
+            }
         }
         else {
             msr_log(msr, 1, "Rule processing failed with unknown return code: %d.", rc);
