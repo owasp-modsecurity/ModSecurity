@@ -276,7 +276,7 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     ACMP *p;
 
     if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pmFromFile/pmf'.");
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pmFromFile'.");
         return 0; /* ERROR */
     }
 
@@ -1228,6 +1228,244 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     return 0;
 }
 
+/*
+* \brief Check for a valid SSN
+*
+* \param ssnumber Pointer to ssn
+* \param len ssn length
+* \param rule Pointer to the rule
+*
+* \retval 0 On Invalid SSN
+* \retval 1 On Valid SSN
+*/
+static int ssn_verify(const char *ssnumber, int len, msre_rule *rule) {
+    int i;
+    int num[9];
+    int digits = 0;
+    int area, serial, grp;
+    int sequencial = 0;
+    int repetitions = 0;
+    int progression = 0;
+    char *str_area;
+    char *str_grp;
+    char *str_serial;
+
+    for (i = 0; i < len; i++) {
+        if (apr_isdigit(ssnumber[i])) {
+                num[i] = intval(ssnumber[i]);
+                digits++;
+        }
+    }
+
+    /* Not a valid number */
+    if (digits != 9)
+        goto invalid;
+
+    digits = 0;
+
+    for (i=0; i < len-1; i++)   {
+        progression = (num[i] - (num[i+1]-1));
+        repetitions = (num[i] - num[i+1]);
+
+        if (repetitions != 0 )
+            sequencial = 1;
+
+        if (progression == 0)
+            digits++;
+    }
+
+    /* We are blocking when all numbers were repeated */
+    if (sequencial == 0)
+        goto invalid;
+
+    if (digits == 8)
+        goto invalid;
+
+    str_area = apr_psprintf(rule->ruleset->mp,"%d%d%d",num[0],num[1],num[2]);
+    str_grp = apr_psprintf(rule->ruleset->mp,"%d%d",num[3],num[4]);
+    str_serial = apr_psprintf(rule->ruleset->mp,"%d%d%d%d",num[5],num[6],num[7],num[8]);
+
+    if(str_area == NULL || str_grp == NULL || str_serial == NULL)
+        goto invalid;
+
+    area = atoi(str_area);
+    grp = atoi(str_grp);
+    serial = atoi(str_serial);
+
+    /* Cannot has seroed fields */
+    if (area == 0 || serial == 0 || grp == 0)
+        goto invalid;
+
+    /* More tests */
+    if (area >= 740 || area == 666)
+        goto invalid;
+
+    return 1;
+
+invalid:
+    return 0;
+}
+
+/*
+* \brief Init function to SSN operator
+*
+* \param rule Pointer to the rule
+* \param error_msg Pointer to error msg
+*
+* \retval 0 On Failure
+* \retval 1 On Success
+*/
+static int msre_op_verifySSN_init(msre_rule *rule, char **error_msg) {
+    const char *errptr = NULL;
+    int erroffset;
+    msc_regex_t *regex;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    /* Compile rule->op_param */
+    regex = msc_pregcomp_ex(rule->ruleset->mp, rule->op_param, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+    if (regex == NULL) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
+            erroffset, errptr);
+        return 0;
+    }
+
+    rule->op_param_data = regex;
+
+    return 1; /* OK */
+}
+
+/*
+* \brief Execution function to SSN operator
+*
+* \param msr Pointer internal modsec request structure
+* \param rule Pointer to the rule
+* \param var Pointer to variable structure
+* \param error_msg Pointer to error msg
+*
+* \retval -1 On Failure
+* \retval 1 On Match
+* \retval 0 On No Match
+*/
+static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    msc_regex_t *regex = (msc_regex_t *)rule->op_param_data;
+    const char *target;
+    unsigned int target_length;
+    char *my_error_msg = NULL;
+    int ovector[33];
+    int rc;
+    int is_ssn = 0;
+    int offset;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (regex == NULL) {
+        *error_msg = "Internal Error: regex data is null.";
+        return -1;
+    }
+
+    memset(ovector, 0, sizeof(ovector));
+
+    /* If the given target is null run against an empty
+     * string. This is a behaviour consistent with previous
+     * releases.
+     */
+    if (var->value == NULL) {
+        target = "";
+        target_length = 0;
+    } else {
+        target = var->value;
+        target_length = var->value_len;
+    }
+
+    for (offset = 0; ((unsigned int)offset < target_length) && (is_ssn == 0); offset++) {
+        if (msr->txcfg->debuglog_level >= 9) {
+            if (offset > 0) {
+                msr_log(msr, 9, "Continuing SSN# search at target offset %d.", offset);
+            }
+        }
+
+        rc = msc_regexec_ex(regex, target, target_length, offset, PCRE_NOTEMPTY, ovector, 30, &my_error_msg);
+
+        /* If there was no match, then we are done. */
+        if (rc == PCRE_ERROR_NOMATCH) {
+            break;
+        }
+
+        if (rc < -1) {
+            *error_msg = apr_psprintf(msr->mp, "SSN# regex execution failed: %s", my_error_msg);
+            return -1;
+        }
+
+        /* Verify a match. */
+        if (rc > 0) {
+            const char *match = target + ovector[0];
+            int length = ovector[1] - ovector[0];
+            int i = 0;
+
+            offset = ovector[2*i];
+
+            /* Check SSN using the match string */
+            is_ssn = ssn_verify(match, length, rule);
+
+            /* Not a SSN number, then try another match where we left off. */
+            if (!is_ssn) {
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "SSN# check failed at target offset %d: \"%.*s\"", offset, length, match);
+                }
+
+                continue;
+            }
+
+            /* We have a potential SSN number and need to set any captures
+             * and we are done.
+             */
+
+            if (apr_table_get(rule->actionset->actions, "capture")) {
+                for(; i < rc; i++) {
+                    msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+                    if (s == NULL) return -1;
+                    s->name = apr_psprintf(msr->mp, "%d", i);
+                    s->name_len = strlen(s->name);
+                    s->value = apr_pstrmemdup(msr->mp, match, length);
+                    s->value_len = length;
+                    if ((s->name == NULL)||(s->value == NULL)) return -1;
+
+                    apr_table_setn(msr->tx_vars, s->name, (void *)s);
+
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
+                            log_escape_nq_ex(msr->mp, s->value, s->value_len));
+                    }
+                }
+            }
+
+            /* Unset the remaining TX vars (from previous invocations). */
+            for(; i <= 9; i++) {
+                char buf[24];
+                apr_snprintf(buf, sizeof(buf), "%i", i);
+                apr_table_unset(msr->tx_vars, buf);
+            }
+
+            break;
+        }
+    }
+
+    if (is_ssn) {
+        /* Match. */
+
+        /* This message will be logged. */
+        *error_msg = apr_psprintf(msr->mp, "SSN# match \"%s\" at %s. [offset \"%d\"]",
+            regex->pattern, var->name, offset);
+
+        return 1;
+    }
+
+    /* No match. */
+    return 0;
+}
 
 /**
  * Perform geograpical lookups on an IP/Host.
@@ -2148,6 +2386,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "verifyCC",
         msre_op_verifyCC_init,
         msre_op_verifyCC_execute
+    );
+
+    /* verifySSN */
+    msre_engine_op_register(engine,
+        "verifySSN",
+        msre_op_verifySSN_init,
+        msre_op_verifySSN_execute
     );
 
     /* geoLookup */
