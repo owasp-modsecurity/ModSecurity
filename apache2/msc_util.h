@@ -92,6 +92,8 @@ char DSOLOCAL *_log_escape(apr_pool_t *p, const unsigned char *input,
 
 int DSOLOCAL decode_base64_ext(char *plain_text, const char *input, int input_len);
 
+int DSOLOCAL convert_to_int(const char c);
+
 int DSOLOCAL js_decode_nonstrict_inplace(unsigned char *input, long int input_len);
 
 int DSOLOCAL urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_length, int * changed);

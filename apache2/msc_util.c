@@ -154,6 +154,25 @@ int decode_base64_ext(char *plain_text, const char *input, int input_len)
     return j;
 }
 
+/* \brief Convert const char to int
+*
+* \param c number string
+*
+* \retval n The converted number
+*/
+int convert_to_int(const char c)
+{
+   int n;
+   if ((c>='0') && (c<='9'))
+      n = c - '0';
+   else if ((c>='A') && (c<='F'))
+      n = c - 'A' + 10;
+   else if ((c>='a') && (c<='f'))
+      n = c - 'a' + 10;
+   else
+      n = 0;
+   return n;
+}
 
 /**
  * Parses a string that contains a name-value pair in the form "name=value".

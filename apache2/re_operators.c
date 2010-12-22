@@ -1252,7 +1252,7 @@ static int ssn_verify(const char *ssnumber, int len, msre_rule *rule) {
 
     for (i = 0; i < len; i++) {
         if (apr_isdigit(ssnumber[i])) {
-                num[i] = intval(ssnumber[i]);
+                num[i] = convert_to_int(ssnumber[i]);
                 digits++;
         }
     }
