@@ -391,6 +391,7 @@ static apr_status_t output_filter_init(modsec_rec *msr, ap_filter_t *f,
         if (len > msr->txcfg->of_limit) {
             msr_log(msr, 1, "Output filter: Content-Length (%s) over the limit (%ld).",
                 log_escape_nq(r->pool, (char *)s_content_length), msr->txcfg->of_limit);
+            msr->outbound_error = 1;
             return -2; /* Over the limit. */
         }
     }
@@ -521,11 +522,11 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
         if ((ae != NULL)&&(apr_table_get(f->r->headers_in, "Accept-Encoding") == NULL)) {
             apr_table_add(f->r->headers_in, "Accept-Encoding", ae);
-        }        
-        
+        }
+
         if ((te != NULL)&&(apr_table_get(f->r->headers_in, "TE") == NULL)) {
             apr_table_add(f->r->headers_in, "TE", te);
-        }        
+        }
     }
 
     /* Initialise on first invocation */
@@ -555,6 +556,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
             }
         }
 
+        msr->outbound_error = 0;
         /* Decide whether to observe the response body. */
         rc = output_filter_init(msr, f, bb_in);
         switch(rc) {
@@ -657,6 +659,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                  * ready to accept. We need to decide what we want to do
                  * about it.
                  */
+                msr->outbound_error = 1;
                 if (msr->txcfg->of_limit_action == RESPONSE_BODY_LIMIT_ACTION_REJECT) {
                     /* Reject response. */
                     msr_log(msr, 1, "Output filter: Response body too large (over limit of %ld, "

@@ -94,6 +94,9 @@ typedef struct msc_string msc_string;
 #define REQUEST_BODY_FORCEBUF_OFF               0
 #define REQUEST_BODY_FORCEBUF_ON                1
 
+#define REQUEST_BODY_LIMIT_ACTION_REJECT       0
+#define REQUEST_BODY_LIMIT_ACTION_PARTIAL      1
+
 #define SECACTION_TARGETS                       "REMOTE_ADDR"
 #define SECACTION_ARGS                          "@unconditionalMatch"
 
@@ -264,8 +267,10 @@ struct modsec_rec {
     apr_table_t         *request_headers_to_sanitize;
     apr_table_t         *response_headers_to_sanitize;
     apr_table_t         *request_cookies;
-    
-    unsigned int	urlencoded_error;
+
+    unsigned int        urlencoded_error;
+    unsigned int        inbound_error;
+    unsigned int        outbound_error;
 
     unsigned int         is_relevant;
 
@@ -395,6 +400,7 @@ struct directory_config {
     apr_table_t         *of_mime_types;
     int                  of_mime_types_cleared;
     int                  of_limit_action;
+    int                  if_limit_action;
 
     const char          *debuglog_name;
     int                  debuglog_level;

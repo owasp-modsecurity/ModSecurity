@@ -726,14 +726,18 @@ static int hook_request_late(request_rec *r) {
     /* Check that the request body is not too long, but only
      * if configuration allows for request body access.
      */
+    msr->inbound_error = 0;
     if (msr->txcfg->reqbody_access == 1) {
         /* Check request body limit (non-chunked requests only). */
         if (msr->request_content_length > msr->txcfg->reqbody_limit) {
             msr_log(msr, 1, "Request body (Content-Length) is larger than the "
                          "configured limit (%ld).", msr->txcfg->reqbody_limit);
-            return HTTP_REQUEST_ENTITY_TOO_LARGE;
+            msr->inbound_error = 1;
+
+            if(msr->txcfg->if_limit_action == RESPONSE_BODY_LIMIT_ACTION_REJECT)
+                return HTTP_REQUEST_ENTITY_TOO_LARGE;
         }
-    }    
+    }
 
     /* Figure out whether to extract multipart files. */
     if ((msr->txcfg->upload_keep_files != KEEP_FILES_OFF) /* user might want to keep them */
@@ -763,8 +767,11 @@ static int hook_request_late(request_rec *r) {
                 if (my_error_msg != NULL) {
                     msr_log(msr, 1, "%s", my_error_msg);
                 }
-                r->connection->keepalive = AP_CONN_CLOSE;
-                return HTTP_REQUEST_ENTITY_TOO_LARGE;
+                msr->inbound_error = 1;
+                if(msr->txcfg->if_limit_action == RESPONSE_BODY_LIMIT_ACTION_REJECT)    {
+                    r->connection->keepalive = AP_CONN_CLOSE;
+                    return HTTP_REQUEST_ENTITY_TOO_LARGE;
+                }
                 break;
             default :
                 /* allow through */

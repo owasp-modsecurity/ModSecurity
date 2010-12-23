@@ -58,6 +58,7 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->debuglog_fd = NOT_SET_P;
 
     dcfg->of_limit = NOT_SET;
+    dcfg->if_limit_action = NOT_SET;
     dcfg->of_limit_action = NOT_SET;
     dcfg->of_mime_types = NOT_SET_P;
     dcfg->of_mime_types_cleared = NOT_SET;
@@ -253,6 +254,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
 
     merged->of_limit = (child->of_limit == NOT_SET
         ? parent->of_limit : child->of_limit);
+    merged->if_limit_action = (child->if_limit_action == NOT_SET
+        ? parent->if_limit_action : child->if_limit_action);
     merged->of_limit_action = (child->of_limit_action == NOT_SET
         ? parent->of_limit_action : child->of_limit_action);
     merged->reqintercept_oe = (child->reqintercept_oe == NOT_SET
@@ -492,6 +495,7 @@ void init_directory_config(directory_config *dcfg)
     if (dcfg->reqbody_no_files_limit == NOT_SET) dcfg->reqbody_no_files_limit = REQUEST_BODY_NO_FILES_DEFAULT_LIMIT;
     if (dcfg->resbody_access == NOT_SET) dcfg->resbody_access = 0;
     if (dcfg->of_limit == NOT_SET) dcfg->of_limit = RESPONSE_BODY_DEFAULT_LIMIT;
+    if (dcfg->if_limit_action == NOT_SET) dcfg->if_limit_action = REQUEST_BODY_LIMIT_ACTION_REJECT;
     if (dcfg->of_limit_action == NOT_SET) dcfg->of_limit_action = RESPONSE_BODY_LIMIT_ACTION_REJECT;
 
     if (dcfg->of_mime_types == NOT_SET_P) {
@@ -1469,11 +1473,36 @@ static const char *cmd_response_body_limit_action(cmd_parms *cmd, void *_dcfg,
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
 
+    if (dcfg->is_enabled == MODSEC_DETECTION_ONLY)  {
+        dcfg->of_limit_action = RESPONSE_BODY_LIMIT_ACTION_PARTIAL;
+        return NULL;
+    }
+
     if (strcasecmp(p1, "ProcessPartial") == 0) dcfg->of_limit_action = RESPONSE_BODY_LIMIT_ACTION_PARTIAL;
     else
     if (strcasecmp(p1, "Reject") == 0) dcfg->of_limit_action = RESPONSE_BODY_LIMIT_ACTION_REJECT;
     else
     return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecResponseBodyLimitAction: %s", p1);
+
+    return NULL;
+}
+
+static const char *cmd_resquest_body_limit_action(cmd_parms *cmd, void *_dcfg,
+                                                  const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+
+    if (dcfg->is_enabled == MODSEC_DETECTION_ONLY)  {
+        dcfg->if_limit_action = REQUEST_BODY_LIMIT_ACTION_PARTIAL;
+        return NULL;
+    }
+
+    if (strcasecmp(p1, "On") == 0) dcfg->if_limit_action = RESPONSE_BODY_LIMIT_ACTION_PARTIAL;
+    else
+    if (strcasecmp(p1, "Off") == 0) dcfg->if_limit_action = REQUEST_BODY_LIMIT_ACTION_REJECT;
+    else
+    return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRequestBodyProcessPartial: %s", p1);
 
     return NULL;
 }
@@ -1526,8 +1555,10 @@ static const char *cmd_rule_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
     else
     if (strcasecmp(p1, "off") == 0) dcfg->is_enabled = MODSEC_DISABLED;
     else
-    if (strcasecmp(p1, "detectiononly") == 0) dcfg->is_enabled = MODSEC_DETECTION_ONLY;
-    else
+    if (strcasecmp(p1, "detectiononly") == 0) {
+        dcfg->is_enabled = MODSEC_DETECTION_ONLY;
+        dcfg->of_limit_action = RESPONSE_BODY_LIMIT_ACTION_PARTIAL;
+    } else
     return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRuleEngine: %s", p1);
 
     return NULL;
@@ -2156,6 +2187,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "what happens when the response body limit is reached"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecRequestBodyProcessPartial",
+        cmd_resquest_body_limit_action,
+        NULL,
+        CMD_SCOPE_ANY,
+        "what happens when the request body limit is reached"
     ),
 
     AP_INIT_ITERATE (

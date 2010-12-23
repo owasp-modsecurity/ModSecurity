@@ -1453,6 +1453,30 @@ static int var_urlencoded_error_generate(modsec_rec *msr, msre_var *var, msre_ru
     }
 }
 
+/* INBOUND_DATA_ERROR */
+
+static int var_inbound_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if (msr->inbound_error) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
+/* OUTBOUND_DATA_ERROR */
+
+static int var_outbound_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if (msr->outbound_error) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
 apr_time_t calculate_perf_combined(modsec_rec *msr) {
     return msr->time_phase1 + msr->time_phase2 + msr->time_phase3 + msr->time_phase4
         + msr->time_phase5 + msr->time_storage_write /* time_storage_read is already
@@ -3196,7 +3220,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_CACHE,
         PHASE_RESPONSE_HEADERS
     );
-    
+
     /* URLENCODED_ERROR */
     msre_engine_variable_register(engine,
         "URLENCODED_ERROR",
@@ -3206,6 +3230,28 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         var_urlencoded_error_generate,
         VAR_DONT_CACHE, /* flag */
         PHASE_REQUEST_HEADERS
+    );
+
+    /* INBOUND_DATA_ERROR */
+    msre_engine_variable_register(engine,
+        "INBOUND_DATA_ERROR",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_inbound_error_generate,
+        VAR_DONT_CACHE, /* flag */
+        PHASE_REQUEST_BODY
+    );
+
+    /* OUTBOUND_DATA_ERROR */
+    msre_engine_variable_register(engine,
+        "OUTBOUND_DATA_ERROR",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_outbound_error_generate,
+        VAR_DONT_CACHE, /* flag */
+        PHASE_RESPONSE_BODY
     );
 
     /* USER */
