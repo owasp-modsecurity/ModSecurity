@@ -1,0 +1,6 @@
+These tools are built during the ModSecurity configure process run under the
+apache2 directory.  To use them you will first need to run configure under
+the apache2 directory:
+
+./configure [any options]
+

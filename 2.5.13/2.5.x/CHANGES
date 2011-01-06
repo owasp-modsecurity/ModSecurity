@@ -1,0 +1,791 @@
+22 Nov 2010 - 2.5.13-dev3
+-------------------------
+
+ * Add SecReadStateLimit to limit the number of concurrent threads in BUSY connections per ip address
+
+ * Fixed redirect action was not expanding macros in chained rules
+
+04 Nov 2010 - 2.5.13-dev2
+-------------------------
+
+ * Fixed Geo lookup concurrent connections bug
+
+ * Fixed Skip/SkipAfter chain bug
+
+ * Added new setvar Lua API to be used into Lua scripts
+
+ * Added PCRE messages indicates each rule that exceed match limits
+
+ * Added new Base64 transformation function called base64DecodeEx, which
+   can decode base64 data skipping special characters.
+
+
+14 Feb 2010 - 2.5.13-dev1
+-------------------------
+
+ * Cleaned up some mlogc code and debugging output.
+
+ * Remove the ability to use a relative path to a piped audit logger
+   (i.e. mlogc) as Apache does not support it in their piped loggers
+   and it was breaking Windows and probably other platforms that
+   use spaces in filesystem paths.  Discovered by Tom Donovan.
+
+ * Fix memory leak freeing regex.  Discovered by Tom Donovan.
+
+ * Fix some portability issues on Windows.
+
+
+04 Feb 2010 - 2.5.12
+--------------------
+
+ * Fixed SecUploadFileMode to set the correct mode.
+
+ * Fixed nolog,auditlog/noauditlog/nolog controls for disruptive actions.
+
+ * Added additional file info definitions introduced in APR 0.9.5 so that
+   build will work with older APRs (IBM HTTP Server v6).
+
+ * Added SecUploadFileLimit to limit the number of uploaded file parts that
+   will be processed in a multipart POST.  The default is 100.
+
+ * Fixed path normalization to better handle backreferences that extend
+   above root directories.  Reported by Sogeti/ESEC R&D.
+
+ * Trim whitespace around phrases used with @pmFromFile and allow
+   for both LF and CRLF terminated lines.
+
+ * Allow for more robust parsing for multipart header folding.  Reported
+   by Sogeti/ESEC R&D.
+
+ * Fixed failure to match internally set TX variables with regex
+   (TX:/.../) syntax.
+ 
+ * Fixed failure to log full internal TX variable names and populate
+   MATCHED_VAR* vars.
+
+ * Enabled PCRE "studying" by default.  This is now a configure-time option.
+
+ * Added PCRE match limits (SecPcreMatchLimit/SecPcreMatchLimitRecursion) to
+   aide in REDoS type attacks.  A rule that goes over the limits will set
+   TX:MSC_PCRE_LIMITS_EXCEEDED.  It is intended that the next major release
+   of ModSecurity (2.6.x) will move these flags to a dedicated collection.
+
+ * Reduced default PCRE match limits reducing impact of REDoS on poorly
+   written regex rules.  Reported by Sogeti/ESEC R&D.
+
+ * Fixed memory leak in v1 cookie parser.  Reported by Sogeti/ESEC R&D.
+
+ * Now support macro expansion in numeric operators (@eq, @ge, @lt, etc.)
+
+ * Update copyright to 2010.
+
+ * Reserved 700,000-799,999 IDs for Ivan Ristic.
+
+ * Fixed SecAction not working when CONNECT request method is used
+   (MODSEC-110). [Ivan Ristic]
+
+ * Do not escape quotes in macro resolution and only escape NUL in setenv
+   values.
+
+
+04 Nov 2009 - 2.5.11
+--------------------
+
+ * Added a new multipart flag, MULTIPART_INVALID_QUOTING, which will be
+   set true if any invalid quoting is found during multipart parsing.
+
+ * Fixed parsing quoted strings in multipart Content-Disposition headers.
+   Discovered by Stefan Esser.
+
+ * Cleanup persistence database locking code.
+
+ * Added warning during configure if libcurl is found linked against
+   gnutls for SSL.  The openssl lib is recommended as gnutls has
+   proven to cause issues with mutexes and may crash.
+
+ * Cleanup some mlogc (over)logging.
+
+ * Do not log output filter errors in the error log.
+
+ * Moved output filter to run before other stock filters (mod_deflate,
+   mod_cache, mod_expires, mod_filter) to avoid analyzing modified data
+   in the response.  Patch originally submitted by Ivan Ristic.
+
+
+18 Sep 2009 - 2.5.10
+--------------------
+
+ * Cleanup mlogc so that it builds on Windows.
+
+ * Added more detailed messages to replace "Unknown error" in filters.
+
+ * Added SecAuditLogDirMode and SecAuditLogFileMode to allow fine tuning
+   auditlog permissions (especially with mpm-itk).
+
+ * Cleanup SecUploadFileMode implementation.
+
+ * Cleanup build scripts.
+
+ * Fixed crash on configuration if SecMarker is used before any rules.
+
+ * Fixed SecRuleUpdateActionById so that it will work on chain starters.
+
+ * Cleanup build system for mlogc.
+
+ * Allow mlogc to periodically flush memory pools.
+
+ * Using nolog,auditlog will now log the "Message:" line to the auditlog, but
+   nothing to the error log.  Prior versions dropped the "Message:" line from
+   both logs.  To do this now, just use "nolog" or "nolog,noauditlog".
+
+ * Forced mlogc to use SSLv3 to avoid some potential auto negotiation
+   issues with some libcurl versions.
+
+ * Fixed mlogc issue seen on big endian machines where content type
+   could be listed as zero.
+
+ * Removed extra newline from audit log message line when logging XML errors.
+   This was causing problems parsing audit logs.
+
+ * Fixed @pm/@pmFromFile case insensitivity.
+
+ * Truncate long parameters in log message for "Match of ... against ...
+   required" messages.
+
+ * Correctly resolve chained rule actions in logs.
+
+ * Cleanup some code for portability.
+
+ * AIX does not support hidden visibility with xlc compiler.
+
+ * Allow specifying EXTRA_CFLAGS during configure to override gcc specific
+   values for non-gcc compilers.
+
+ * Populate GEO:COUNTRY_NAME and GEO:COUNTRY_CONTINENT as documented.
+
+ * Handle a newer geo database more gracefully, avoiding a potential crash for
+   new countries that ModSecurity is not yet aware.
+
+ * Allow checking &GEO "@eq 0" for a failed @geoLookup.
+
+ * Fixed mlogc global mutex locking issue and added more debugging output.
+
+ * Cleaned up build dependencies and configure options.
+
+
+05 Mar 2009 - 2.5.9
+-------------------
+
+ * Fixed parsing multipart content with a missing part header name which
+   would crash Apache.  Discovered by "Internet Security Auditors"
+   (isecauditors.com).
+
+ * Added ability to specify the config script directly using --with-apr
+   and --with-apu.
+
+ * Updated copyright year to 2009.
+
+ * Added macro expansion for append/prepend action.
+
+ * Fixed race condition in concurrent updates of persistent counters.  Updates
+   are now atomic.
+
+ * Cleaned up build, adding an option for verbose configure output and making
+   the mlogc build more portable.
+
+ 
+21 Nov 2008 - 2.5.8
+-------------------
+
+ * Fixed PDF XSS issue where a non-GET request for a PDF file would crash the
+   Apache httpd process.  Discovered by Steve Grubb at Red Hat.
+
+ * Removed an invalid "Internal error: Issuing "%s" for unspecified error."
+   message that was logged when denying with nolog/noauditlog set and
+   causing the request to be audited.
+ 
+  
+24 Sep 2008 - 2.5.7
+-------------------
+
+ * Fixed XML DTD/Schema validation which will now fail after request body
+   processing errors, even if the XML parser returns a document tree.
+
+ * Added ctl:forceRequestBodyVariable=on|off which, when enabled, will force
+   the REQUEST_BODY variable to be set when a request body processor is not set.
+   Previously the REQUEST_BODY target was only populated by the URLENCODED
+   request body processor.
+
+ * Integrated mlogc source.
+
+ * Fixed logging the hostname in the error_log which was logging the
+   request hostname instead of the Apache resolved hostname.
+
+ * Allow for disabling request body limit checks in phase:1.
+
+ * Added transformations for processing parity for legacy protocols ported
+   to HTTP(S): t:parityEven7bit, t:parityOdd7bit, t:parityZero7bit
+
+ * Added t:cssDecode transformation to decode CSS escapes.
+
+ * Now log XML parsing/validation warnings and errors to be in the debug log
+   at levels 3 and 4, respectivly.
+
+
+31 Jul 2008 - 2.5.6
+-------------------
+  
+ * Transformation caching has been deprecated, and is now off by default. We
+   now advise against using transformation caching in production.
+   
+ * Fixed two separate transformation caching issues that could cause incorrect
+   content inspection in some circumstances.
+   
+ * Fixed an issue with the transformation cache using too much RAM, potentially
+   crashing Apache with a large number of cache entries. Two new configuration
+   options have been added to allow for a finer control of caching:
+   
+     maxitems: Max number of items to cache (default 1024)
+     incremental: Whether to cache incrementally (default off)
+
+ * Added an experimental regression testing suite. The regression suite may
+   be executed via "make test-regression", however it is strongly advised 
+   to only be executed on a non-production machine as it will startup the
+   Apache web server that ModSecurity is compiled against with various
+   configurations in which it will run tests.
+
+ * Added a licensing exception so that ModSecurity can be used in a derivative
+   work when that derivative is also under an approved open source license.
+
+ * Updated mlogc to version 1.4.5 which adds a LockFile directive and fixes an
+   issue in which the configuration file may be deleted.
+
+
+05 Jun 2008 - 2.5.5
+-------------------
+
+ * Fixed an issue where an alert was not logged in the error log
+   unless "auditlog" was used.
+
+ * Enable the "auditlog" action by default to help prevent a misconfiguration.
+   The new default is now: "phase:2,log,auditlog,pass"
+
+ * Improve request body processing error messages.
+
+ * Handle lack of a new line after the final boundary in a multipart request.
+   This fixes the reported WordPress Flash file uploader problem.
+
+ * Fixed issue with multithreaded servers where concurrent XML processing
+   could crash the web server (at least under Windows).
+
+ * Fixed blocking in phase 3.
+
+ * Force modules "mod_rpaf-2.0.c" and "mod_custom_header.c" to run before
+   ModSecurity so that the correct IP is used.
+
+
+07 May 2008 - 2.5.4
+-------------------
+
+ * Fixed issue where transformation cache was using the SecDefaultAction
+   value even when t:none was used within a rule.
+
+
+24 Apr 2008 - 2.5.3
+-------------------
+
+ * Fixed issue where the exec action may not be able to execute shell scripts.
+
+ * Macros are now expanded in expirevar and deprecatevar.
+
+ * Fixed crash if a persistent variable name was more than 126 characters.
+
+ * Updated included Core Ruleset to version 1.6.1 which fixes some
+   false negative issues in the migration to using some 2.5 features.
+
+
+02 Apr 2008 - 2.5.2
+-------------------
+
+ * Allow HTTP_* targets as an alias for REQUEST_HEADERS:*.
+
+ * Make sure temporary filehandles are closed after a transaction.
+
+ * Make sure the apache include directory is included during build.
+
+
+02 Apr 2008 - 2.1.7
+-------------------
+
+ * Make sure temporary filehandles are closed after a transaction.
+
+
+14 Mar 2008 - 2.5.1
+-------------------
+
+ * Fixed an issue where a match would not occur if transformation caching
+   was enabled.
+
+ * Using "severity" in a default action is now just a warning.
+
+ * Cleaned up the "make test" target to better locate headers/libraries.
+
+ * Now search /usr/lib64 and /usr/lib32 for lua libs.
+
+ * No longer treat warnings as errors by default (use --enable-strict-compile).
+
+
+19 Feb 2008 - 2.5.0
+-------------------
+
+ * Updated included Core Ruleset to version 1.6.0 which uses 2.5 features.
+
+ * Cleaned up and clarified some documentation.
+
+ * Updated code to be more portable so it builds with MS VC++.
+
+ * Added unit tests for most operators and transformations.
+
+ * Fixed crash on startup when ENV is improperly used without a parameter.
+
+ * Allow macro resolution in setenv action.
+
+ * The default action is now a minimal "phase:2,log,pass" with no default
+   transformations performed.
+
+ * Implemented SecUploadFileMode to allow setting the mode for uploaded files.
+
+ * Implemented "block" action.
+
+ * Implemented SecRuleUpdateActionById.
+
+ * Fixed removal of phase 5 rules via SecRuleRemoveBy* directives.
+
+ * No longer log the query portion of the URI in the error log as
+   it may contain sensitive data.
+
+ * Build is now 'configure' based: ./configure && make && make install
+
+ * Added support for Lua scripting in the following ways: SecRuleScript
+   can be used to specify a script to execute as a rule, the exec
+   action processes Lua scripts internally, as does the @inspectFile
+   operator. Refer to the documentation for more details.
+
+ * Changed how allow works. Used on its own it now allows phases 1-4. Used
+   with parameter "phase" (e.g. SecAction allow:phase) it only affects
+   the current phase. Used with parameter "request" it allows phases
+   1-2.
+
+ * Fixed issue where only the first phase 5 rule would run when the
+   request was intercepted in an earlier phase.
+
+ * Stricter configuration parsing.  Disruptive actions, meta actions and
+   phases are no longer allowed in a chained rule.  Disruptive actions,
+   are no longer allowed in a logging phase (phase 5) rule, including
+   inheriting from SecDefaultAction.
+
+ * More efficient collection persistance.
+
+ * Fixed t:escapeSeqDecode to better follow ANSI C escapes.
+
+ * Added t:jsDecode to decode JavScript escape sequences.
+
+ * Added IS_NEW built-in collection variables.
+
+ * New audit log part 'K' logs all matching rules.
+
+ * Implemented SecRequestBodyNoFilesLimit.
+
+ * Enhance handling of the case where we run out of disk space while
+   writing to audit log entry.
+
+ * Added SecComponentSignature to allow other components the ability
+   to append to the logged signature.
+
+ * Added skipAfter:<id> action to allow skipping all rules until a rule
+   with a specified ID is reached.  Rule execution then continues after
+   the specified rule.
+
+ * Added SecMarker <id> directive to allow a fixed target for skipAfter.
+
+ * Added ctl:ruleRemoveById action to allow rule removal on a match.
+
+ * Added a @containsWord operator that will match a given string anywhere in
+   the target value, but only on word boundaries.
+
+ * Added a MATCHED_VAR_NAME variable to store the last matched variable name
+   so that it can be more easily used by rules.
+
+ * Added a MATCHED_VAR variable to store the last matched variable value
+   so that it can be more easily used by rules.
+
+ * Fixed expansion of macros when using relative changes with setvar.  In
+   addition, added support for expanding macros in the variable name.
+
+ * Situations where ModSecurity will intercept, generate an error or log
+   a level 1-3 message to the debug log are now marked as 'relevant' and may
+   generate an audit log entry.
+
+ * Fixed deprecatevar:var=N/S action so that it decrements N every S seconds
+   as documented instead of decrementing by a rate.
+
+ * Enable ModSecurity to look at partial response bodies. In previous
+   versions, ModSecurity would respond with status code 500 when the
+   response body was too long. Now, if SecResponseBodyLimitAction is
+   set to "ProcessPartial", it will process the part of the response
+   body received up until that point but send the rest without buffering.
+
+ * ModSecurity will now process phases 3 and 4 even when request processing
+   is interrupted (either by Apache - e.g. by responding with 400, 401
+   or 403, or by ModSecurity itself).
+
+ * Fixed the base64decode transformation function to not return extra
+   characters at the end.
+
+ * Return from the output filter with an error in addition to setting
+   up the HTTP error status in the output data.
+
+ * Used new Apache API calls to get the server version/banner when available.
+
+ * Added "logdata" meta action to allow logging of raw transaction data.
+
+ * Added TX_SEVERITY that keeps track of the highest severity
+   for any matched rules so far.
+
+ * Added ARGS_GET, ARGS_POST, ARGS_GET_NAMES, ARGS_POST_NAMES variables to
+   allow seperation of GET and POST arguments.
+
+ * Added an Apache define (MODSEC_2.5) so that you can conditionally include
+   directives based on the ModSecurity major/minor versions with IfDefine.
+
+ * Added MODSEC_BUILD variable that contains the numeric build value based
+   on the ModSecurity version.
+
+ * Enhanced debug logging by displaying more data on rule execution.  All
+   invoked rules are now logged in the debug log at level 5.
+
+ * Stricter validation for @validateUtf8Encoding.
+
+ * No longer process Apache internal subrequests.
+
+ * Fixed warnings on Solaris and/or 64bit builds.
+
+ * Added @within string comparison operator with support for macro expansion.
+
+ * Do not trigger "pause" action for internal requests.
+
+ * Added matching rule filename and line number to audit log.
+
+ * Added new phrase matching operators, @pm and @pmFromFile.  These use
+   an alternate set based matching engine (Aho-Corasick) to perform faster
+   phrase type matches such as black/white lists, spam keywords, etc.
+
+ * Allow caching transformations per-request/phase so they are not repeated.
+
+ * Added Solaris and Cygwin to the list of platforms not supporting the hidden
+   visibility attribute.
+
+ * Fixed decoding full-width unicode in t:urlDecodeUni.
+
+ * Add SecGeoLookupDB, @geoLookups and GEO collection to support
+   geographical lookups by IP/host.
+
+ * Do not try to intercept a request after a failed rule.  This fixes the
+   issue associated with an "Internal Error: Asked to intercept request
+   but was_intercepted is zero" error message.
+
+ * Removed extraneous exported symbols.
+
+ * Merged the PDF XSS protection functionality into ModSecurity.
+
+ * Exported API for registering custom variables.  Example in api directory.
+
+ * Added experimental support for content injection. Directive
+   SecContentInjection (On|Off) controls whether injection is taking place.
+   Actions "prepend" and "append" inject content when executed. Do note that
+   it is your responsibility to make sure the response is of the appropriate
+   content type (e.g. HTML, plain text, etc).
+
+ * Added string comparison operators with support for macro expansion:
+   @contains, @streq, @beginsWith and @endsWith.
+
+ * Enhanced debug log output to log macro expansion, quote values and
+   correctly display values that contained NULs.
+
+ * Removed support for %0 - %9 capture macros as they were incorrectly
+   expanding url encoded values.  Use %{TX.0} - %{TX.9} instead.
+
+ * Added t:length to transform a value to its character length.
+
+ * Added t:trimLeft, t:trimRight, t:trim to remove whitespace
+   from a value on the left, right or both.
+
+ * Added SecAuditLog2 directive to allow redundent concurrent audit log
+   index files.  This will allow sending audit data to two consoles, etc.
+
+ * Removed CGI style HTTP_* variables in favor of REQUEST_HEADERS:Header-Name.
+
+ * Store filename/line for each rule and display it and the ID (if available)
+   in the debug log when invoking a rule.  Thanks to Christian Bockermann
+   for the idea.
+
+ * Do not log 'allow' action as intercepted in the debug log.
+
+ * Fixed some collection variable names not printing with the parameter
+   and/or counting operator in the debug log.
+
+
+19 Feb 2008 - 2.1.6
+-------------------
+
+ * Fixed crash on startup when ENV is improperly used without a parameter.
+
+ * Allow macro resolution in setenv action.
+
+ * Implemented SecUploadFileMode to allow setting the mode for uploaded files.
+
+ * No longer log the query portion of the URI in the error log as
+   it may contain sensitive data.
+
+
+10 Jan 2008 - 2.1.5
+-------------------
+
+ * Updated included Core Ruleset to version 1.5.1.
+
+ * Phase 5 rules can now be removed via SecRuleRemoveBy* directives.
+
+ * Fixed issue where only the first phase 5 rule would run when the
+   request was intercepted in an earlier phase.
+
+ * Fixed configuration parsing so that disruptive actions, meta actions
+   and phases are not allowed in a chained rule (as originally intended).
+
+ * Fixed t:escapeSeqDecode to better follow ANSI C escapes.
+
+
+27 Nov 2007 - 2.1.4
+-------------------
+
+ * Updated included Core Ruleset to version 1.5 and noted in the docs that
+   XML support is required to use the rules without modification.
+
+ * Fixed an evasion FP, mistaking a multipart non-boundary for a boundary.
+
+ * Fixed multiple warnings on Solaris and/or 64bit builds.
+
+ * Do not process subrequests in phase 2-4, but do hand off the request data.
+
+ * Fixed a blocking FP in the multipart parser, which affected Safari.
+
+
+11 Sep 2007 - 2.1.3
+-------------------
+
+ * Updated multipart parsing code adding variables to allow checking
+   for various parsing issues (request body abnormalities).
+
+ * Allow mod_rpaf and mod_extract_forwarded2 to work before ModSecurity.
+
+ * Quiet some compiler warnings.
+
+ * Do not block internal ErrorDocument requests after blocking request.
+
+ * Added ability to compile without an external API (use -DNO_MODSEC_API).
+
+
+27 Jul 2007 - 2.1.2
+-------------------
+
+ * Cleaned up and clarified some documentation.
+
+ * Update included core rules to latest version (1.4.3).
+
+ * Enhanced ability to alert/audit failed requests.
+
+ * Do not trigger "pause" action for internal requests.
+
+ * Fixed issue with requests that use internal requests.  These had the
+   potential to be intercepted incorrectly when other Apache httpd modules
+   that used internal requests were used with mod_security.
+
+ * Added Solaris and Cygwin to the list of platforms not supporting the hidden
+   visibility attribute.
+
+ * Fixed decoding full-width unicode in t:urlDecodeUni.
+
+ * Lessen some overhead of debugging messages and calculations.
+
+ * Do not try to intercept a request after a failed rule.  This fixes the
+   issue associated with an "Internal Error: Asked to intercept request
+   but was_intercepted is zero" error message.
+
+ * Added SecAuditLog2 directive to allow redundent concurrent audit log
+   index files.  This will allow sending audit data to two consoles, etc.
+
+ * Small performance improvement in memory management for rule execution.
+
+
+11 Apr 2007 - 2.1.1
+-------------------
+
+ * Add the PCRE_DOLLAR_ENDONLY option when compiling regular expression
+   for the @rx operator and variables.
+ 
+ * Really set PCRE_DOTALL option when compiling the regular expression
+   for the @rx operator as the docs state.
+ 
+ * Fixed potential memory corruption when expanding macros.
+
+ * Fixed error when a collection was retrieved from storage in the same second
+   as creation by setting the rate to zero.
+
+ * Fixed ASCIIZ (NUL) parsing for application/x-www-form-urlencoded forms.
+
+ * Fixed the faulty REQUEST_FILENAME variable, which used to change
+   the internal Apache structures by mistake.
+
+ * Updates to quiet some compiler warnings.
+
+ * Fixed some casting issues for compiling on NetWare (patch from Guenter Knauf).
+
+
+23 Feb 2007 - 2.1.0
+-------------------
+
+ * Removed the "Connection reset by peer" message, which has nothing
+   to do with us. Actually the message was downgraded from ERROR to
+   NOTICE so it will still appear in the debug log.
+
+ * Removed the (harmless) message mentioning LAST_UPDATE_TIME missing.
+
+ * It was not possible to remove a rule placed in phase 4 using
+   SecRuleRemoveById or SecRuleRemoveByMsg. Fixed.
+
+ * Fixed a problem with incorrectly setting requestBodyProcessor using
+   the ctl action.
+
+ * Bundled Core Rules 2.1-1.3.2b4.
+
+ * Updates to the reference manual.
+
+ * Reversed the return values of @validateDTD and @validateSchema, to
+   make them consistent with other operators.
+
+ * Added a few helpful debug messages in the XML validation area.
+
+ * Updates to the reference manual.
+
+ * Fixed the validateByteRange operator.
+
+ * Default value for the status action is now 403 (as it was supposed to
+   be but it was effectively 500).
+
+ * Rule exceptions (removing using an ID range or an regular expression)
+   is now applied to the current context too. (Previously it only worked
+   on rules that are inherited from the parent context.)
+
+ * Fix of a bug with expired variables.
+
+ * Fixed regular expression variable selectors for many collections.
+
+ * Performance improvements - up to two times for real-life work loads!
+
+ * Memory consumption improvements (not measured but significant).
+
+ * The allow action did not work in phases 3 and 4. Fixed.
+
+ * Unlocked collections GLOBAL and RESOURCE.
+
+ * Added support for variable expansion in the msg action.
+
+ * New feature: It is now possible to make relative changes to the
+   audit log parts with the ctl action. For example: "ctl:auditLogParts=+E".
+
+ * New feature: "tag" action. To be used for event categorisation.
+
+ * XML parser was not reporting errors that occured at the end
+   of XML payload.
+
+ * Files were not extracted from request if SecUploadKeepFiles was
+   Off. Fixed.
+
+ * Regular expressions that are too long are truncated to 256
+   characters before used in error messages. (In order to keep
+   the error messages in the log at a reasonable size.)
+
+ * Fixed the sha1 transformation function.
+
+ * Fixed the skip action.
+
+ * Fixed REQUEST_PROTOCOL, REMOTE_USER, and AUTH_TYPE.
+
+ * SecRuleEngine did not work in child configuration contexts
+   (e.g. <Location>).
+
+ * Fixed base64Decode and base64Encode.
+
+
+15 Nov 2006 - 2.0.4
+-------------------
+
+ * Fixed the "deprecatevar" action.
+
+ * Decreasing variable values did not work.
+
+ * Made "nolog" do what it is supposed to do - cause a rule match to
+   not be logged. Also "nolog" now implies "noauditlog" but it's
+   possible to follow "nolog" with "auditlog" and have the match
+   not logged to the error log but logged to the auditlog. (Not
+   something that strikes me as useful but it's possible.)
+
+ * Relative paths given to SecDataDir will now be treated as relative
+   to the Apache server root.
+
+ * Added checks to make sure only correct actions are specified in
+   SecDefaultAction (some actions are required, some don't make any
+   sense) and in rules that are not chain starters (same). This should
+   make the unhelpful "Internal Error: Failed to add rule to the ruleset"
+   message go away.
+
+ * Fixed the problem when "SecRuleInheritance Off" is used in a context
+   with no rules defined.
+
+ * Fixed a problem of lost input (request body) data on some redirections,
+   for example when mod_rewrite is used.
+
+
+26 Oct 2006 - 2.0.3
+-------------------
+
+ * Fixed a memory leak (all platforms) and a concurrency control
+   problem that could cause a crash (multithreaded platforms only).
+
+ * Fixed a SecAuditLogRelevantStatus problem, which would not work
+   properly unless the regular expression contained a subexpression.
+
+
+19 Oct 2006 - 2.0.2
+-------------------
+
+ * Fixed incorrect permissions on the global mutex, which prevented
+   the mutex from working properly.
+
+ * Fixed incorrect actionset merging where the status was copied from
+   the child actionset even though it was not defined.
+
+ * Fixed missing metadata information (in the logs) for warnings.
+
+
+16 Oct 2006 - 2.0.1
+-------------------
+
+ * Rules that used operator negation did not work. Fixed.
+
+ * Fixed bug that prevented invalid regular expressions from being reported.
+
+
+16 Oct 2006 - 2.0.0
+-------------------
+
+ * First stable 2.x release.

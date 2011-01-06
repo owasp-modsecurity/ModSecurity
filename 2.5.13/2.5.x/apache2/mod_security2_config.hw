@@ -1,0 +1,1 @@
+/* This file is left empty for building on Windows. */

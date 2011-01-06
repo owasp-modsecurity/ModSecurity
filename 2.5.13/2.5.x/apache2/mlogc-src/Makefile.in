@@ -1,0 +1,70 @@
+# Generated Makefile for ModSecurity Log Collector (mlogc)
+
+CC = @CC@
+EXTRA_CFLAGS = @EXTRA_CFLAGS@
+
+srcdir = .
+modsecsrcdir = $(srcdir)/..
+srclibdir = $(srcdir)/srclib
+
+MLOGC_VERSION = `grep '^\#define *VERSION ' mlogc.c | sed 's/.*VERSION *"\([^"]*\)"/\1/'`
+
+APR_FLAGS = @APR_CFLAGS@
+APR_LIBS = @APR_LINK_LD@ @APR_LIBS@
+
+CURL_FLAGS = @CURL_CFLAGS@
+CURL_LIBS = @CURL_LIBS@
+
+PCRE_FLAGS = @PCRE_CFLAGS@
+PCRE_LIBS = @PCRE_LIBS@
+
+APR_S_FLAGS = `$(srclibdir)/install/apr/bin/apr-1-config --includes --cppflags --cflags`
+APR_S_LIBS = `$(srclibdir)/install/apr/bin/apr-1-config --link-ld`
+
+CURL_S_FLAGS = `$(srclibdir)/install/curl/bin/curl-config --cflags`
+CURL_S_LIBS = `$(srclibdir)/install/curl/bin/curl-config --libs`
+
+PCRE_S_FLAGS = `$(srclibdir)/install/pcre/bin/pcre-config --cflags`
+PCRE_S_LIBS = `$(srclibdir)/install/pcre/bin/pcre-config --libs`
+
+all: mlogc
+
+mlogc: mlogc.c
+	@echo; \
+	echo "Building dynamically linked mlogc..."; \
+	$(CC) $(CFLAGS) -o mlogc mlogc.c \
+	-I$(modsecsrcdir) \
+	$(APR_FLAGS) $(CURL_FLAGS) $(PCRE_FLAGS) \
+	$(APR_LIBS) $(CURL_LIBS) $(PCRE_LIBS); \
+	chmod 755 mlogc; \
+	echo; \
+	echo "Build finished.  Please follow the INSTALL instructions to complete the install."; \
+	echo
+
+.archives-ok:
+	@if [ -n "$(MLOGC_NOVERIFY)" -a "$(MLOGC_NOVERIFY)" = "1" ]; then \
+		touch .archives-ok; \
+	else \
+		$(srclibdir)/archives.sh && touch .archives-ok; \
+	fi
+
+.support-libs-ok:
+	$(srclibdir)/build.sh && touch .support-libs-ok
+
+archives: .archives-ok
+
+support-libs: .support-libs-ok
+
+clean-build:
+	@rm -rf $(srclibdir)/build
+
+clean-install:
+	@rm -rf $(srclibdir)/install
+
+clean-mlogc:
+	@rm -rf core mlogc *~ *.o *.so *.lo *.la *.slo
+
+distclean: clean
+
+clean: clean-build clean-install clean-mlogc
+
