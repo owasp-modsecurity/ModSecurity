@@ -409,9 +409,9 @@ static apr_status_t send_of_brigade(modsec_rec *msr, ap_filter_t *f) {
     rc = ap_pass_brigade(f->next, msr->of_brigade);
     if (rc != APR_SUCCESS) {
         /* TODO: These need to move to flags in 2.6.  For now log them
-         * at level 4 so that they are not confusing users.
+         * at level 3 so that they are not confusing users.
          */
-        int log_level = 4;
+        int log_level = 3;
 
         if (msr->txcfg->debuglog_level >= log_level) {
             switch(rc) {
