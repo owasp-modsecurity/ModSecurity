@@ -369,6 +369,90 @@ static void sec_auditlog_write_producer_header(modsec_rec *msr) {
     sec_auditlog_write(msr, ".\n", 2);
 }
 
+/*
+* \brief This function will returns the next chain node
+*
+* \param current Pointer to current chined rule
+* \param msr Pointer to modsec_rec
+*
+* \retval NULL On failure
+* \retval next_rule On Success
+*/
+msre_rule *return_chained_rule(const msre_rule *current, modsec_rec *msr)   {
+    apr_array_header_t *arr = NULL;
+    msre_rule **rules = NULL;
+    msre_rule *rule = NULL, *next_rule = NULL;
+    int i;
+    int phase;
+
+    if (current == NULL || current->actionset == NULL || current->ruleset == NULL)
+        return NULL;
+
+    phase = current->actionset->phase;
+
+    switch (phase) {
+        case PHASE_REQUEST_HEADERS :
+            arr = current->ruleset->phase_request_headers;
+            break;
+        case PHASE_REQUEST_BODY :
+            arr = current->ruleset->phase_request_body;
+            break;
+        case PHASE_RESPONSE_HEADERS :
+            arr = current->ruleset->phase_response_headers;
+            break;
+        case PHASE_RESPONSE_BODY :
+            arr = current->ruleset->phase_response_body;
+            break;
+        case PHASE_LOGGING :
+            arr = current->ruleset->phase_logging;
+            break;
+        default :
+            msr_log(msr, 1, "Logging: Invalid phase %d",phase);
+            return NULL;
+    }
+
+    rules = (msre_rule **)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        rule = rules[i];
+        if (rule != NULL)    {
+            if (strcmp(current->unparsed,rule->unparsed) == 0) {
+                if (i < arr->nelts -1)   {
+                    next_rule = rules[i+1];
+                } else  {
+                    next_rule = rules[i];
+                }
+
+                return next_rule;
+            }
+        }
+    }
+
+    return NULL;
+}
+
+/*
+* \brief This function will check if a chained rule
+* appears into matched array.
+*
+* \param msr Pointer to modsec_rec
+* \param next_rule Pointer to chained rule
+*
+* \retval 0 On failure
+* \retval 1 On Success
+*/
+int chained_is_matched(modsec_rec *msr, const msre_rule *next_rule) {
+    int i = 0;
+    const msre_rule *rule = NULL;
+
+    for (i = 0; i < msr->matched_rules->nelts; i++) {
+        rule = ((msre_rule **)msr->matched_rules->elts)[i];
+        if (rule != NULL && (strcmp(rule->unparsed,next_rule->unparsed) == 0))
+            return 1;
+    }
+
+    return 0;
+}
+
 /**
  * Produce an audit log entry.
  */
@@ -376,10 +460,11 @@ void sec_audit_logger(modsec_rec *msr) {
     const apr_array_header_t *arr = NULL;
     apr_table_entry_t *te = NULL;
     char *str1 = NULL, *str2 = NULL, *text = NULL;
-    const msre_rule *rule = NULL;
+    const msre_rule *rule = NULL, *next_rule = NULL;
     apr_size_t nbytes, nbytes_written;
     unsigned char md5hash[APR_MD5_DIGESTSIZE];
     int was_limited = 0;
+    int present = 0;
     int wrote_response_body = 0;
     char *entry_filename, *entry_basename;
     apr_status_t rc;
@@ -884,11 +969,36 @@ void sec_audit_logger(modsec_rec *msr) {
         /* Matched Rules */
         for(i = 0; i < msr->matched_rules->nelts; i++) {
             rule = ((msre_rule **)msr->matched_rules->elts)[i];
-            text = apr_psprintf(msr->mp, "%s\n", rule->unparsed);
-            sec_auditlog_write(msr, text, strlen(text));
+            if (rule != NULL && rule->actionset != NULL && rule->actionset->is_chained) {
+                text = apr_psprintf(msr->mp, "Chain Starter [Match]: %s\n", rule->unparsed);
+                sec_auditlog_write(msr, text, strlen(text));
+                do {
+                    if (rule->ruleset != NULL)   {
+
+                        next_rule = return_chained_rule(rule,msr);
+
+                        if (next_rule != NULL)  {
+
+                            present = chained_is_matched(msr,next_rule);
+
+                            if (present == 0)   {
+                                text = apr_psprintf(msr->mp, "Chain node [No Match]: %s\n",next_rule->unparsed);
+                            } else  {
+                                text = apr_psprintf(msr->mp, "Chain node [Match]: %s\n",next_rule->unparsed);
+                                i++;
+                            }
+
+                            sec_auditlog_write(msr, text, strlen(text));
+                        }
+                    }
+                    rule = next_rule;
+                } while (rule != NULL && rule->actionset != NULL && rule->actionset->is_chained);
+            } else  {
+                text = apr_psprintf(msr->mp, "Rule [Match]: %s\n", rule->unparsed);
+                sec_auditlog_write(msr, text, strlen(text));
+            }
         }
     }
-
 
     /* AUDITLOG_PART_ENDMARKER */
 
