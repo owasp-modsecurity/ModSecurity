@@ -575,6 +575,9 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
                 "%s configured.", MODSEC_MODULE_NAME_FULL);
 
+        /* show libraries informations */
+        version(mp);
+
         /* If we've changed the server signature make note of the original. */
         if (new_server_signature != NULL) {
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
