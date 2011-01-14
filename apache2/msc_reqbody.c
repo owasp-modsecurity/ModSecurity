@@ -524,7 +524,9 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart parsing error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = *error_msg;
-                msr_log(msr, 2, "%s", *error_msg);
+                if (msr->txcfg->debuglog_level >= 4) {
+                    msr_log(msr, 4, "%s", *error_msg);
+                }
                 return -1;
             }
 

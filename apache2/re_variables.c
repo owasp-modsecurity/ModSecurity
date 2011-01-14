@@ -2825,7 +2825,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_REQUEST_HEADERS
     );
 
-    /* REQBODY_PROCESSOR_ERROR */
+    /* REQBODY_PROCESSOR_ERROR - Deprecated */
     msre_engine_variable_register(engine,
         "REQBODY_PROCESSOR_ERROR",
         VAR_SIMPLE,
@@ -2836,9 +2836,31 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_REQUEST_BODY
     );
 
-    /* REQBODY_PROCESSOR_ERROR_MSG */
+    /* REQBODY_PROCESSOR_ERROR_MSG - Deprecated */
     msre_engine_variable_register(engine,
         "REQBODY_PROCESSOR_ERROR_MSG",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_reqbody_processor_error_msg_generate,
+        VAR_DONT_CACHE, /* dynamic */
+        PHASE_REQUEST_BODY
+    );
+
+    /* REQBODY_ERROR */
+    msre_engine_variable_register(engine,
+        "REQBODY_ERROR",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_reqbody_processor_error_generate,
+        VAR_DONT_CACHE, /* dynamic */
+        PHASE_REQUEST_BODY
+    );
+
+    /* REQBODY_ERROR_MSG */
+    msre_engine_variable_register(engine,
+        "REQBODY_ERROR_MSG",
         VAR_SIMPLE,
         0, 0,
         NULL,
