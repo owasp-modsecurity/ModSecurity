@@ -137,6 +137,71 @@ static const char *geo_country_continent[GEO_COUNTRY_LAST + 1] = {
     "AF","EU","AF","--","--","--","EU","EU","EU","EU"
 };
 
+typedef enum {
+GEOIP_COUNTRY_EDITION     = 1,
+GEOIP_REGION_EDITION_REV0 = 7,
+GEOIP_CITY_EDITION_REV0   = 6,
+GEOIP_ORG_EDITION         = 5,
+GEOIP_ISP_EDITION         = 4,
+GEOIP_CITY_EDITION_REV1   = 2,
+GEOIP_REGION_EDITION_REV1 = 3,
+GEOIP_PROXY_EDITION       = 8,
+GEOIP_ASNUM_EDITION       = 9,
+GEOIP_NETSPEED_EDITION    = 10,
+GEOIP_DOMAIN_EDITION      = 11
+} GeoIPDBTypes;
+
+static void create_segments(geo_db *geo) {
+    int i, j;
+    unsigned char delim[3];
+    unsigned char buf[GEO_SEGMENT_RECORD_LENGTH];
+    apr_size_t nbytes;
+    apr_status_t rc;
+    apr_off_t offset;
+
+    geo->ctry_offset = 0;
+
+    geo->dbtype = GEOIP_COUNTRY_EDITION;
+    offset = -3l;
+    apr_file_seek(geo->db, APR_END, &offset);
+
+    for (i = 0; i < GEO_STRUCT_INFO_MAX_SIZE; i++) {
+
+        rc = apr_file_read_full(geo->db, &delim, 3, &nbytes);
+
+        if (delim[0] == 255 && delim[1] == 255 && delim[2] == 255) {
+            rc = apr_file_read_full(geo->db, &geo->dbtype, 1, &nbytes);
+            if (geo->dbtype >= 106) {
+                geo->dbtype -= 105;
+            }
+
+            if (geo->dbtype == GEOIP_REGION_EDITION_REV0) {
+                geo->ctry_offset = GEO_STATE_BEGIN_REV0;
+            } else if (geo->dbtype == GEOIP_REGION_EDITION_REV1) {
+                geo->ctry_offset = GEO_STATE_BEGIN_REV1;
+            } else if (geo->dbtype == GEOIP_CITY_EDITION_REV0 ||
+                                 geo->dbtype == GEOIP_CITY_EDITION_REV1 ||
+                                 geo->dbtype == GEOIP_ORG_EDITION ||
+                                 geo->dbtype == GEOIP_ISP_EDITION ||
+                                 geo->dbtype == GEOIP_ASNUM_EDITION) {
+                geo->ctry_offset = 0;
+                rc = apr_file_read_full(geo->db, &buf, GEO_SEGMENT_RECORD_LENGTH, &nbytes);
+                for (j = 0; j < GEO_SEGMENT_RECORD_LENGTH; j++) {
+                    geo->ctry_offset += (buf[j] << (j * 8));
+                }
+            }
+            break;
+        } else {
+            offset = -4l;
+            apr_file_seek(geo->db, APR_CUR, &offset);
+        }
+    }
+    if (geo->dbtype == GEOIP_COUNTRY_EDITION ||
+            geo->dbtype == GEOIP_PROXY_EDITION ||
+            geo->dbtype == GEOIP_NETSPEED_EDITION) {
+        geo->ctry_offset = GEO_COUNTRY_BEGIN;
+    }
+}
 
 static int db_open(directory_config *dcfg, char **error_msg)
 {
@@ -158,81 +223,7 @@ static int db_open(directory_config *dcfg, char **error_msg)
         return 0;
     }
 
-    offset = -3;
-    apr_file_seek(geo->db, APR_END, &offset);
-    /* TODO check offset */
-
-    /* Defaults */
-    geo->dbtype = GEO_COUNTRY_DATABASE;
-    geo->ctry_offset = GEO_COUNTRY_OFFSET;
-
-    for (i = 0; i < GEO_STRUCT_INFO_MAX_SIZE; i++) {
-        memset(buf, 0, 3);
-        rc = apr_file_read_full(geo->db, &buf, 3, &nbytes);
-        #ifdef DEBUG_CONF
-        fprintf(stderr, "GEO: read 0x%02x%02x%02x\n", buf[0], buf[1], buf[2]);
-        #endif
-        if ((rc != APR_SUCCESS) || (nbytes != 3)) {
-            *error_msg = apr_psprintf(mp, "Could not read from geo database \"%s\" (%" APR_SIZE_T_FMT "/3 bytes read): %s", geo->dbfn, nbytes, apr_strerror(rc, errstr, 1024));
-            return -1;
-        }
-        if ((buf[0] == 0xff) && (buf[1] == 0xff) && (buf[2] == 0xff)) {
-            #ifdef DEBUG_CONF
-            fprintf(stderr, "GEO: Found DB info marker at offset 0x%08x\n", (unsigned int)offset);
-            #endif
-            memset(buf, 0, 3);
-            rc = apr_file_read_full(geo->db, &buf, 1, &nbytes);
-            /* TODO: check rc */
-            geo->dbtype = (int)buf[0];
-
-            /* Backwards compat */
-            if (geo->dbtype >= 106) {
-                geo->dbtype -= 105;
-            }
-            #ifdef DEBUG_CONF
-            fprintf(stderr, "GEO: DB type %d\n", geo->dbtype);
-            #endif
-
-            /* If a cities DB, then get country offset */
-            if ((geo->dbtype == GEO_CITY_DATABASE_0) || (geo->dbtype == GEO_CITY_DATABASE_1)) {
-                memset(buf, 0, 3);
-                rc = apr_file_read_full(geo->db, &buf, 3, &nbytes);
-                if ((rc != APR_SUCCESS) || (nbytes != 3)) {
-                    *error_msg = apr_psprintf(mp, "Could not read geo database \"%s\" country offset (%" APR_SIZE_T_FMT "/3 bytes read): %s", geo->dbfn, nbytes, apr_strerror(rc, errstr, 1024));
-                    return -1;
-                }
-                #ifdef DEBUG_CONF
-                fprintf(stderr, "GEO: read 0x%02x%02x%02x\n", buf[0], buf[1], buf[2]);
-                #endif
-                geo->ctry_offset = 0;
-                for (j = 0; j < 3; j++) {
-                    geo->ctry_offset += (buf[j] << (j * 8));
-                }
-            }
-
-            #ifdef DEBUG_CONF
-            fprintf(stderr, "GEO: Country offset 0x%08x\n", geo->ctry_offset);
-            #endif
-
-            return 1;
-        }
-        /* Backup a byte from where we started */
-        offset = -4;
-        apr_file_seek(geo->db, APR_CUR, &offset);
-        #ifdef DEBUG_CONF
-        fprintf(stderr, "GEO: DB offset 0x%08x\n", (unsigned int)offset);
-        #endif
-    }
-
-    if (geo->dbtype != GEO_COUNTRY_DATABASE) {
-        *error_msg = apr_psprintf(mp, "Unknown database format");
-        return 0;
-    }
-
-    #ifdef DEBUG_CONF
-    fprintf(stderr, "GEO: DB type %d\n", geo->dbtype);
-    #endif
-
+    create_segments(geo);
     return 1;
 }
 
@@ -293,6 +284,9 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
     int level;
     double dtmp;
     int itmp;
+    const unsigned char * p;
+    unsigned int x;
+    int j;
 
     *error_msg = NULL;
 
@@ -330,7 +324,7 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
     ipnum = ntohl(addr->sa.sin.sin_addr.s_addr);
 
     if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "GEO: Using address \"%s\" (0x%08lx).", targetip, ipnum);
+        msr_log(msr, 9, "GEO: Using address \"%s\" (0x%08lx). %lu", targetip, ipnum, ipnum);
     }
 
     ret = apr_global_mutex_lock(msr->modsecurity->geo_lock);
@@ -349,21 +343,60 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         /* NOTE: This is hard-coded for size 3 records */
         /* Left */
         if ((ipnum & (1 << level)) == 0) {
-            rec_val = buf[0] +
-                     (buf[1] <<  8) +
-                     (buf[2] << 16);
+            //rec_val = buf[0] +
+            //         (buf[1] <<  8) +
+            //         (buf[2] << 16);
+            rec_val =   (buf[3*0 + 0] << (0*8)) +
+                        (buf[3*0 + 1] << (1*8)) +
+                        (buf[3*0 + 2] << (2*8));
+            /*j = 3;
+            p = &buf[2*j];
+            x = 0;
+                do {
+                x <<= 8;
+                x += *(--p);
+                } while ( --j );
+            rec_val = x;
+            */
         }
         /* Right */
         else {
-            rec_val = buf[3] +
-                     (buf[4] <<  8) +
-                     (buf[5] << 16);
+            //rec_val = buf[3] +
+            //         (buf[4] <<  8) +
+            //         (buf[5] << 16);
+            rec_val =   (buf[3*1 + 0] << (0*8)) +
+                        (buf[3*1 + 1] << (1*8)) +
+                        (buf[3*1 + 2] << (2*8));
+
+            /*j = 3;
+            p = &buf[1*j];
+            x = 0;
+                do {
+                x <<= 8;
+                x += *(--p);
+                } while ( --j );
+
+            rec_val  = x;
+            */
         }
 
         /* If we are past the country offset, then we are done */
         if (rec_val >= geo->ctry_offset) {
             break;
         }
+    }
+
+    if (rec_val == geo->ctry_offset) {
+        *error_msg = apr_psprintf(msr->mp, "No geo data for \"%s\").", log_escape(msr->mp, target));
+        msr_log(msr, 4, "%s", *error_msg);
+
+        ret = apr_global_mutex_unlock(msr->modsecurity->geo_lock);
+        if (ret != APR_SUCCESS) {
+            msr_log(msr, 1, "Geo Lookup: Failed to lock proc mutex: %s",
+                    get_apr_error(msr->mp, ret));
+        }
+
+        return 0;
     }
 
     if (geo->dbtype == GEO_COUNTRY_DATABASE) {

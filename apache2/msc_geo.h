@@ -30,6 +30,10 @@
 #define GEO_CITY_DATABASE_0       6
 #define GEO_CITY_DATABASE_1       2
 #define GEO_COUNTRY_LAST          250
+#define GEO_SEGMENT_RECORD_LENGTH 3
+#define GEO_STATE_BEGIN_REV0      16700000
+#define GEO_STATE_BEGIN_REV1      16000000
+#define GEO_COUNTRY_BEGIN         16776960
 
 
 typedef struct geo_rec geo_rec;
