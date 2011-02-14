@@ -2149,6 +2149,32 @@ static int var_path_info_generate(modsec_rec *msr, msre_var *var, msre_rule *rul
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
+/* STREAM_OUTPUT_BODY */
+
+static int var_stream_output_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if (msr->stream_output_data != NULL) {
+        return var_simple_generate_ex(var, vartab, mptmp,
+            msr->stream_output_data, msr->stream_output_length);
+    }
+
+    return 0;
+}
+
+/* STREAM_INPUT_BODY */
+
+static int var_stream_input_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    if (msr->stream_input_data != NULL) {
+        return var_simple_generate_ex(var, vartab, mptmp,
+            msr->stream_input_data, msr->stream_input_length);
+    }
+
+    return 0;
+}
+
 /* RESPONSE_BODY */
 
 static int var_response_body_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -2890,7 +2916,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_CACHE,
         PHASE_REQUEST_BODY
     );
-    
+
     /* REQUEST_BODY_LENGTH */
     msre_engine_variable_register(engine,
         "REQUEST_BODY_LENGTH",
@@ -3011,6 +3037,29 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_CACHE,
         PHASE_REQUEST_HEADERS
     );
+
+    /* STREAM_OUTPUT_BODY */
+    msre_engine_variable_register(engine,
+        "STREAM_OUTPUT_BODY",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_stream_output_generate,
+        VAR_CACHE,
+        PHASE_RESPONSE_BODY
+    );
+
+    /* STREAM_INPUT_BODY */
+    msre_engine_variable_register(engine,
+        "STREAM_INPUT_BODY",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_stream_input_generate,
+        VAR_CACHE,
+        PHASE_FIRST
+    );
+
 
     /* RESPONSE_BODY */
     msre_engine_variable_register(engine,

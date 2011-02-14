@@ -104,6 +104,10 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     /* Content injection. */
     dcfg->content_injection_enabled = NOT_SET;
 
+    /* Stream inspection */
+    dcfg->stream_inbody_inspection = NOT_SET;
+    dcfg->stream_outbody_inspection = NOT_SET;
+
     /* Geo Lookups */
     dcfg->geo = NOT_SET_P;
 
@@ -445,6 +449,12 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->content_injection_enabled = (child->content_injection_enabled == NOT_SET
         ? parent->content_injection_enabled : child->content_injection_enabled);
 
+    /* Stream inspection */
+    merged->stream_inbody_inspection = (child->stream_inbody_inspection == NOT_SET
+        ? parent->stream_inbody_inspection : child->stream_inbody_inspection);
+    merged->stream_outbody_inspection = (child->stream_outbody_inspection == NOT_SET
+        ? parent->stream_outbody_inspection : child->stream_outbody_inspection);
+
     /* Geo Lookup */
     merged->geo = (child->geo == NOT_SET_P
         ? parent->geo : child->geo);
@@ -542,6 +552,10 @@ void init_directory_config(directory_config *dcfg)
 
     /* Content injection. */
     if (dcfg->content_injection_enabled == NOT_SET) dcfg->content_injection_enabled = 0;
+
+    /* Stream inspection */
+    if (dcfg->stream_inbody_inspection == NOT_SET) dcfg->stream_inbody_inspection = 0;
+    if (dcfg->stream_outbody_inspection == NOT_SET) dcfg->stream_outbody_inspection = 0;
 
     /* Geo Lookup */
     if (dcfg->geo == NOT_SET_P) dcfg->geo = NULL;
@@ -1334,6 +1348,72 @@ static const char *cmd_guardian_log(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
+/*
+* \brief Add StreamInBodyInspection configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On failure
+* \retval apr_psprintf On Success
+*/
+static const char *cmd_stream_inbody_inspection(cmd_parms *cmd, void *_dcfg, int flag)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+    dcfg->stream_inbody_inspection = flag;
+    return NULL;
+}
+
+
+/*
+* \brief Add StreamOutBodyInspection configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On failure
+* \retval apr_psprintf On Success
+*/
+static const char *cmd_stream_outbody_inspection(cmd_parms *cmd, void *_dcfg, int flag)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+    dcfg->stream_outbody_inspection = flag;
+    return NULL;
+}
+
+/*
+* \brief Add SecReadStateLimit configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On failure
+* \retval apr_psprintf On Success
+*/
+static const char *cmd_conn_read_state_limit(cmd_parms *cmd, void *_dcfg,
+        const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    long int limit;
+
+    if (dcfg == NULL) return NULL;
+
+    limit = strtol(p1, NULL, 10);
+    if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecReadStateLimit: %s", p1);
+    }
+
+    conn_read_state_limit = limit;
+
+    return NULL;
+}
+
+
 static const char *cmd_request_body_inmemory_limit(cmd_parms *cmd, void *_dcfg,
                                                    const char *p1)
 {
@@ -2029,6 +2109,22 @@ const command_rec module_directives[] = {
         "On or Off"
     ),
 
+    AP_INIT_FLAG (
+        "StreamOutBodyInspection",
+        cmd_stream_outbody_inspection,
+        NULL,
+        CMD_SCOPE_ANY,
+        "On or Off"
+    ),
+
+    AP_INIT_FLAG (
+        "StreamInBodyInspection",
+        cmd_stream_inbody_inspection,
+        NULL,
+        CMD_SCOPE_ANY,
+        "On or Off"
+    ),
+
     AP_INIT_TAKE1 (
         "SecCookieFormat",
         cmd_cookie_format,
@@ -2132,6 +2228,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "On or Off"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecReadStateLimit",
+        cmd_conn_read_state_limit,
+        NULL,
+        CMD_SCOPE_ANY,
+        "maximum number of threads in READ_BUSY state per ip address"
     ),
 
     AP_INIT_TAKE1 (

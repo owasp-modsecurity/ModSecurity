@@ -32,6 +32,7 @@ typedef struct msc_engine msc_engine;
 typedef struct msc_data_chunk msc_data_chunk;
 typedef struct msc_arg msc_arg;
 typedef struct msc_string msc_string;
+typedef struct msc_parm msc_parm;
 
 #include "msc_release.h"
 #include "msc_logging.h"
@@ -229,6 +230,11 @@ struct modsec_rec {
     char                *resbody_data;
     unsigned int         resbody_contains_html;
 
+    apr_size_t           stream_input_length;
+    char                *stream_input_data;
+    apr_size_t           stream_output_length;
+    char                *stream_output_data;
+
     apr_array_header_t  *error_messages;
     apr_array_header_t  *alerts;
 
@@ -267,6 +273,7 @@ struct modsec_rec {
     apr_table_t         *request_headers_to_sanitize;
     apr_table_t         *response_headers_to_sanitize;
     apr_table_t         *request_cookies;
+    apr_table_t         *pattern_to_sanitize;
 
     unsigned int        urlencoded_error;
     unsigned int        inbound_error;
@@ -473,6 +480,10 @@ struct directory_config {
     /* Content injection. */
     int                  content_injection_enabled;
 
+    /* Stream Inspection */
+    int                 stream_inbody_inspection;
+    int                 stream_outbody_inspection;
+
     /* Geo Lookup */
     geo_db              *geo;
 
@@ -535,6 +546,11 @@ struct msc_string {
     unsigned int             value_len;
 };
 
+struct msc_parm {
+    char                    *value;
+    unsigned int            pad_1;
+    unsigned int            pad_2;
+};
 
 /* Engine functions */
 

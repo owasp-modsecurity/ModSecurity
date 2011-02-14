@@ -343,7 +343,7 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
             msr_log(msr, 1, "Initialisation: Error occurred while parsing QUERY_STRING arguments.");
             return -1;
         }
-        
+
         if (invalid_count) {
             msr->urlencoded_error = 1;
         }
@@ -355,6 +355,8 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     if (msr->request_headers_to_sanitize == NULL) return -1;
     msr->response_headers_to_sanitize = apr_table_make(msr->mp, 16);
     if (msr->response_headers_to_sanitize == NULL) return -1;
+    msr->pattern_to_sanitize = apr_table_make(msr->mp, 32);
+    if (msr->pattern_to_sanitize == NULL) return -1;
 
     /* Initialise cookies */
     msr->request_cookies = apr_table_make(msr->mp, 16);
@@ -542,6 +544,7 @@ static apr_status_t modsecurity_process_phase_response_body(modsec_rec *msr) {
     }
     
     msr->time_phase4 = apr_time_now() - time_before;
+
 
     return rc;
 }

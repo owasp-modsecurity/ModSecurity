@@ -460,12 +460,12 @@ static apr_status_t module_cleanup(void *data) {
  */
 static const char *modsec_var_log_handler(request_rec *r, char *name) {
     modsec_rec *msr = NULL;
-    
+
     if (name == NULL) return NULL;
-    
+
     msr = retrieve_tx_context(r);
     if (msr == NULL) return NULL;
-    
+
     return construct_single_var(msr, name);
 }
 
@@ -474,7 +474,7 @@ static const char *modsec_var_log_handler(request_rec *r, char *name) {
  */
 static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_temp) {
     static APR_OPTIONAL_FN_TYPE(ap_register_log_handler) *log_pfn_register;
-    
+
     /* Initialise ModSecurity engine */
     modsecurity = modsecurity_create(mp, MODSEC_ONLINE);
     if (modsecurity == NULL) {
@@ -482,7 +482,7 @@ static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_te
             "ModSecurity: Failed to initialise engine.");
         return HTTP_INTERNAL_SERVER_ERROR;
     }
-    
+
     log_pfn_register = APR_RETRIEVE_OPTIONAL_FN(ap_register_log_handler);
     if (log_pfn_register) {
         log_pfn_register(mp, "M", modsec_var_log_handler, 0);
@@ -575,7 +575,6 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
                 "%s configured.", MODSEC_MODULE_NAME_FULL);
 
-        /* show libraries informations */
         version(mp);
 
         /* If we've changed the server signature make note of the original. */
@@ -622,13 +621,13 @@ static int hook_request_early(request_rec *r) {
     /* NOTE This check is not currently needed, but it may be needed in the
      *      future when we add another early phase.
      */
-    
+
     /* Are we allowed to continue? */
     if (msr->txcfg->is_enabled == MODSEC_DISABLED) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Processing disabled, skipping (hook request_early).");
         }
-        
+
         return DECLINED;
     }    
     #endif
@@ -668,7 +667,7 @@ static int hook_request_late(request_rec *r) {
         msr_log(msr, 1, "Internal Error: Attempted to process the request body more than once.");
         return DECLINED;
     }
-    
+
     msr->phase_request_body_complete = 1;
     msr->remote_user = r->user;
 
@@ -693,15 +692,15 @@ static int hook_request_late(request_rec *r) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Processing disabled, skipping (hook request_late).");
         }
-        
+
         return DECLINED;
     }
 
-    /* Phase 1 */    
+    /* Phase 1 */
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "First phase starting (dcfg %pp).", msr->dcfg2);
     }
-    
+
     /* Process phase REQUEST_HEADERS */
     if (modsecurity_process_phase(msr, PHASE_REQUEST_HEADERS) > 0) {
         /* There was a match; see if we need to intercept. */
@@ -709,18 +708,18 @@ static int hook_request_late(request_rec *r) {
         if (rc != DECLINED) {
             /* Intercepted */
             return rc;
-        }      
+        }
     }
 
-    /* The rule engine could have been disabled in phase 1. */    
+    /* The rule engine could have been disabled in phase 1. */
     if (msr->txcfg->is_enabled == MODSEC_DISABLED) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Skipping phase 2 as the rule engine was disabled by a rule in phase 1.");
         }
-        
+
         return DECLINED;
     }
-    
+
     /* Phase 2 */
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Second phase starting (dcfg %pp).", msr->dcfg2);
@@ -802,9 +801,16 @@ static int hook_request_late(request_rec *r) {
         rc = perform_interception(msr);
     }
 
+    if(msr->txcfg->stream_inbody_inspection && msr->msc_reqbody_read)    {
+        const char *clen = NULL;
+        clen = apr_psprintf(msr->mp,"%d",msr->stream_input_length);
+        if(clen)
+            apr_table_setn(r->headers_in, "Content-Length",clen);
+    }
+
     /* Remove the compression ability indications the client set,
      * but only if we need to disable backend compression.
-     */    
+     */
     if (msr->txcfg->disable_backend_compression) {
         apr_table_unset(r->headers_in, "Accept-Encoding");
         apr_table_unset(r->headers_in, "TE");
@@ -1221,13 +1227,13 @@ static void register_hooks(apr_pool_t *mp) {
         "mod_ssl.c",
         NULL
     };
-    
+
     static const char *postconfig_afterme_list[] = {
         "mod_fcgid.c",
         "mod_cgid.c",
         NULL
     };
-    
+
     static const char *postread_beforeme_list[] = {
         "mod_rpaf.c",
         "mod_rpaf-2.0.c",
@@ -1239,18 +1245,16 @@ static void register_hooks(apr_pool_t *mp) {
         "mod_unique_id.c",
         NULL
     };
-    
+
     static const char *postread_afterme_list[] = {
         "mod_log_forensic.c",
         NULL
     };
-    
+
     static const char *transaction_afterme_list[] = {
         "mod_log_config.c",
         NULL
     };
-    
-    
 
     /* Add the MODSEC_2.x compatibility defines */
     *(char **)apr_array_push(ap_server_config_defines) = apr_pstrdup(mp, "MODSEC_2.5");
@@ -1311,8 +1315,10 @@ static void register_hooks(apr_pool_t *mp) {
      *   mod_deflate = -1
      *   mod_headers =  0
      */
+
     ap_register_output_filter("MODSECURITY_OUT", output_filter,
         NULL, AP_FTYPE_CONTENT_SET - 3);
+
 }
 
 /* Defined in apache2_config.c */

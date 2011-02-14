@@ -343,15 +343,41 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
         /* NOTE: This is hard-coded for size 3 records */
         /* Left */
         if ((ipnum & (1 << level)) == 0) {
+            //rec_val = buf[0] +
+            //         (buf[1] <<  8) +
+            //         (buf[2] << 16);
             rec_val =   (buf[3*0 + 0] << (0*8)) +
                         (buf[3*0 + 1] << (1*8)) +
                         (buf[3*0 + 2] << (2*8));
+            /*j = 3;
+            p = &buf[2*j];
+            x = 0;
+                do {
+                x <<= 8;
+                x += *(--p);
+                } while ( --j );
+            rec_val = x;
+            */
         }
         /* Right */
         else {
+            //rec_val = buf[3] +
+            //         (buf[4] <<  8) +
+            //         (buf[5] << 16);
             rec_val =   (buf[3*1 + 0] << (0*8)) +
                         (buf[3*1 + 1] << (1*8)) +
                         (buf[3*1 + 2] << (2*8));
+
+            /*j = 3;
+            p = &buf[1*j];
+            x = 0;
+                do {
+                x <<= 8;
+                x += *(--p);
+                } while ( --j );
+
+            rec_val  = x;
+            */
         }
 
         /* If we are past the country offset, then we are done */

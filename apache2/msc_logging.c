@@ -326,10 +326,16 @@ static char *create_auditlog_boundary(request_rec *r) {
  * that have been marked as sensitive.
  */
 static void sanitize_request_line(modsec_rec *msr) {
-    const apr_array_header_t *tarr;
-    const apr_table_entry_t *telts;
-    int i;
+    const apr_array_header_t *tarr = NULL;
+    const apr_table_entry_t *telts = NULL;
+    const apr_array_header_t *tarr_pattern = NULL;
+    const apr_table_entry_t *telts_pattern = NULL;
+    msc_parm *mparm = NULL;
+    int i, k;
     char *qspos;
+    char *buf = NULL;
+    int sanitized_partial = 0;
+    int sanitize_matched = 0;
 
     /* Locate the query string. */
     qspos = strstr(msr->request_line, "?");
@@ -343,8 +349,9 @@ static void sanitize_request_line(modsec_rec *msr) {
         msc_arg *arg = (msc_arg *)telts[i].val;
         /* Only look at the parameters that appeared in the query string. */
         if (strcmp(arg->origin, "QUERY_STRING") == 0) {
+            char *pat = NULL;
             char *p;
-            int j;
+            int j, arg_min, arg_max;
 
             /* Go to the beginning of the parameter. */
             p = qspos;
@@ -352,23 +359,65 @@ static void sanitize_request_line(modsec_rec *msr) {
             while((*p != '\0')&&(j--)) p++;
             if (*p == '\0') {
                 msr_log(msr, 1, "Unable to sanitize variable \"%s\" at offset %u of QUERY_STRING"
-                    "because the request line is too short.",
-                    log_escape_ex(msr->mp, arg->name, arg->name_len),
-                    arg->value_origin_offset);
+                        "because the request line is too short.",
+                        log_escape_ex(msr->mp, arg->name, arg->name_len),
+                        arg->value_origin_offset);
                 continue;
             }
 
-            /* Write over the value. */
-            j = arg->value_origin_len;
-            while((*p != '\0')&&(j--)) {
-                *p++ = '*';
+            tarr_pattern = apr_table_elts(msr->pattern_to_sanitize);
+            telts_pattern = (const apr_table_entry_t*)tarr_pattern->elts;
+
+            sanitized_partial = 0;
+            sanitize_matched = 0;
+            buf = apr_psprintf(msr->mp, "%s",p);
+            for ( k = 0; k < tarr_pattern->nelts; k++)  {
+                if(strncmp(telts_pattern[k].key,arg->name,strlen(arg->name)) ==0 ) {
+                    mparm = (msc_parm *)telts_pattern[k].val;
+                    pat = strstr(buf,mparm->value);
+                    if(mparm->pad_1 == -1)
+                        sanitize_matched = 1;
+
+                    if (pat != NULL) {
+                        j = strlen(mparm->value);
+                        arg_min = j;
+                        arg_max = 1;
+                        while((*pat != '\0')&&(j--)) {
+                            if(arg_max > mparm->pad_2)  {
+                                int off = (strlen(mparm->value) - arg_max);
+                                int pos = (mparm->pad_1-1);
+                                if(off > pos)    {
+                                    *pat = '*';
+                                }
+                            }
+                            arg_max++;
+                            arg_min--;
+                            *pat++;
+                        }
+                    }
+                    sanitized_partial = 1;
+                }
             }
-            if (*p == '\0') {
-                msr_log(msr, 1, "Unable to sanitize variable \"%s\" at offset %u (size %d) "
-                    "of QUERY_STRING because the request line is too short.",
-                    log_escape_ex(msr->mp, arg->name, arg->name_len),
-                    arg->value_origin_offset, arg->value_origin_len);
+
+            if(sanitized_partial == 1 && sanitize_matched == 0)  {
+                while(*buf != '\0') {
+                    *p++ = *buf++;
+                }
                 continue;
+            } else {
+                /* Write over the value. */
+                j = arg->value_origin_len;
+                while((*p != '\0')&&(j--)) {
+                    *p++ = '*';
+                }
+
+                if (*p == '\0') {
+                    msr_log(msr, 1, "Unable to sanitize variable \"%s\" at offset %u (size %d) "
+                            "of QUERY_STRING because the request line is too short.",
+                            log_escape_ex(msr->mp, arg->name, arg->name_len),
+                            arg->value_origin_offset, arg->value_origin_len);
+                    continue;
+                }
             }
         }
     }
@@ -451,7 +500,7 @@ msre_rule *return_chained_rule(const msre_rule *current, modsec_rec *msr)   {
     for (i = 0; i < arr->nelts; i++) {
         rule = rules[i];
         if (rule != NULL)    {
-            if (strcmp(current->unparsed,rule->unparsed) == 0) {
+            if (strncmp(current->unparsed,rule->unparsed,strlen(rule->unparsed)) == 0) {
                 if (i < arr->nelts -1)   {
                     next_rule = rules[i+1];
                 } else  {
@@ -482,7 +531,7 @@ int chained_is_matched(modsec_rec *msr, const msre_rule *next_rule) {
 
     for (i = 0; i < msr->matched_rules->nelts; i++) {
         rule = ((msre_rule **)msr->matched_rules->elts)[i];
-        if (rule != NULL && (strcmp(rule->unparsed,next_rule->unparsed) == 0))
+        if (rule != NULL && (strncmp(rule->unparsed,next_rule->unparsed,strlen(next_rule->unparsed)) == 0))
             return 1;
     }
 
@@ -495,6 +544,8 @@ int chained_is_matched(modsec_rec *msr, const msre_rule *next_rule) {
 void sec_audit_logger(modsec_rec *msr) {
     const apr_array_header_t *arr = NULL;
     apr_table_entry_t *te = NULL;
+    const apr_array_header_t *tarr_pattern = NULL;
+    const apr_table_entry_t *telts_pattern = NULL;
     char *str1 = NULL, *str2 = NULL, *text = NULL;
     const msre_rule *rule = NULL, *next_rule = NULL;
     apr_size_t nbytes, nbytes_written;
@@ -504,7 +555,10 @@ void sec_audit_logger(modsec_rec *msr) {
     int wrote_response_body = 0;
     char *entry_filename, *entry_basename;
     apr_status_t rc;
-    int i, limit;
+    int i, limit, k, sanitized_partial, j;
+    char *buf = NULL, *pat = NULL;
+    msc_parm *mparm = NULL;
+    int arg_min, arg_max, sanitize_matched;
 
     /* the boundary is used by both audit log types */
     msr->new_auditlog_boundary = create_auditlog_boundary(msr->r);
@@ -621,12 +675,49 @@ void sec_audit_logger(modsec_rec *msr) {
 
         arr = apr_table_elts(msr->request_headers);
         te = (apr_table_entry_t *)arr->elts;
+
+        tarr_pattern = apr_table_elts(msr->pattern_to_sanitize);
+        telts_pattern = (const apr_table_entry_t*)tarr_pattern->elts;
+
         for (i = 0; i < arr->nelts; i++) {
+            sanitized_partial = 0;
+            sanitize_matched = 0;
             text = apr_psprintf(msr->mp, "%s: %s\n", te[i].key, te[i].val);
-            /* Do we need to sanitize this request header? */
             if (apr_table_get(msr->request_headers_to_sanitize, te[i].key) != NULL) {
-                /* Yes, sanitize it. */
-                memset(text + strlen(te[i].key) + 2, '*', strlen(te[i].val));
+                buf = apr_psprintf(msr->mp, "%s",text+strlen(te[i].key)+2);
+
+                for ( k = 0; k < tarr_pattern->nelts; k++)  {
+                    if(strncmp(telts_pattern[k].key,te[i].key,strlen(te[i].key)) ==0 ) {
+                        mparm = (msc_parm *)telts_pattern[k].val;
+                        if(mparm->pad_1 == -1)
+                            sanitize_matched = 1;
+                        pat = strstr(buf,mparm->value);
+                        if (pat != NULL)    {
+                            j = strlen(mparm->value);
+                            arg_min = j;
+                            arg_max = 1;
+                            while((*pat != '\0')&&(j--)) {
+                                if(arg_max > mparm->pad_2)  {
+                                    int off = strlen(mparm->value) - arg_max;
+                                    int pos = mparm->pad_1-1;
+                                    if(off > pos)    {
+                                        *pat = '*';
+                                    }
+                                }
+                                arg_max++;
+                                arg_min--;
+                                *pat++;
+                            }
+                            sanitized_partial = 1;
+                        }
+                    }
+                }
+
+                if(sanitized_partial == 1 && sanitize_matched == 0)  {
+                    text = apr_psprintf(msr->mp, "%s: %s\n", te[i].key, buf);
+                } else {
+                    memset(text + strlen(te[i].key) + 2, '*', strlen(te[i].val));
+                }
             }
             sec_auditlog_write(msr, text, strlen(text));
         }
@@ -820,10 +911,10 @@ void sec_audit_logger(modsec_rec *msr) {
         if (msr->response_headers_sent) {
             if (msr->status_line != NULL) {
                 text = apr_psprintf(msr->mp, "%s %s\n", msr->response_protocol,
-                    msr->status_line);
+                        msr->status_line);
             } else {
                 text = apr_psprintf(msr->mp, "%s %u\n", msr->response_protocol,
-                    msr->response_status);
+                        msr->response_status);
             }
             sec_auditlog_write(msr, text, strlen(text));
 
@@ -831,17 +922,56 @@ void sec_audit_logger(modsec_rec *msr) {
 
             arr = apr_table_elts(msr->response_headers);
             te = (apr_table_entry_t *)arr->elts;
+
+            tarr_pattern = apr_table_elts(msr->pattern_to_sanitize);
+            telts_pattern = (const apr_table_entry_t*)tarr_pattern->elts;
+
             for (i = 0; i < arr->nelts; i++) {
+                sanitized_partial = 0;
+                sanitize_matched = 0;
                 text = apr_psprintf(msr->mp, "%s: %s\n", te[i].key, te[i].val);
-                /* Do we need to sanitize this response header? */
                 if (apr_table_get(msr->response_headers_to_sanitize, te[i].key) != NULL) {
-                    /* Yes, sanitize it. */
-                    memset(text + strlen(te[i].key) + 2, '*', strlen(te[i].val));
+                    buf = apr_psprintf(msr->mp, "%s",text+strlen(te[i].key)+2);
+
+                    for ( k = 0; k < tarr_pattern->nelts; k++)  {
+                        if(strncmp(telts_pattern[k].key,te[i].key,strlen(te[i].key)) ==0 ) {
+                            mparm = (msc_parm *)telts_pattern[k].val;
+                            if(mparm->pad_1 == -1)
+                                sanitize_matched = 1;
+                            pat = strstr(buf,mparm->value);
+                            if (pat != NULL)    {
+                                j = strlen(mparm->value);
+                                arg_min = j;
+                                arg_max = 1;
+                                while((*pat != '\0')&&(j--)) {
+                                    if(arg_max > mparm->pad_2)  {
+                                        int off = strlen(mparm->value) - arg_max;
+                                        int pos = mparm->pad_1-1;
+                                        if(off > pos)    {
+                                            *pat = '*';
+                                        }
+                                    }
+                                    arg_max++;
+                                    arg_min--;
+                                    *pat++;
+                                }
+                                sanitized_partial = 1;
+                            }
+                        }
+                    }
+
+                    if(sanitized_partial == 1 && sanitize_matched == 0)  {
+                        text = apr_psprintf(msr->mp, "%s: %s\n", te[i].key, buf);
+                    } else {
+                        memset(text + strlen(te[i].key) + 2, '*', strlen(te[i].val));
+                    }
                 }
                 sec_auditlog_write(msr, text, strlen(text));
             }
         }
     }
+
+    apr_table_clear(msr->pattern_to_sanitize);
 
     /* AUDITLOG_PART_RESPONSE_BODY */
 
@@ -887,19 +1017,19 @@ void sec_audit_logger(modsec_rec *msr) {
             text = apr_psprintf(msr->mp, "Apache-Handler: %s\n", msr->r->handler);
             sec_auditlog_write(msr, text, strlen(text));
         }
-        
+
         /* Stopwatch; left in for compatibility reasons */
         text = apr_psprintf(msr->mp, "Stopwatch: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT " (- - -)\n",
             msr->request_time, (now - msr->request_time));
-        sec_auditlog_write(msr, text, strlen(text));        
-        
+        sec_auditlog_write(msr, text, strlen(text));
+
         /* Stopwatch2 */
         {
             char *perf_all = format_all_performance_variables(msr, msr->mp);
-                    
+
             text = apr_psprintf(msr->mp, "Stopwatch2: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT
                 "; %s\n", msr->request_time, (now - msr->request_time), perf_all);
-          
+
             sec_auditlog_write(msr, text, strlen(text));
         }
 

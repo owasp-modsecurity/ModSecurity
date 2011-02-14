@@ -22,6 +22,7 @@
 #include "apr_lib.h"
 #include "apr_strmatch.h"
 #include "acmp.h"
+#include <regex.h>
 
 /**
  *
@@ -72,6 +73,162 @@ static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
     return 0;
 }
 
+/* rsub */
+
+static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
+    const char *errptr = NULL;
+    int erroffset;
+    ap_regex_t *regex;
+    const char *pattern = NULL;
+    const char *line = NULL;
+    char *reg_pattern = NULL;
+    char *replace = NULL;
+    char *flags = NULL;
+    char *data;
+    char delim;
+    int ignore_case = 0;
+
+    line = rule->op_param;
+
+    if (apr_tolower(*line) != 's') {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error rsub operator format, must be s/// pattern",
+                erroffset, errptr);
+        return 0;
+    }
+
+    data = apr_pstrdup(rule->ruleset->mp, line);
+    delim = *++data;
+    if (delim)
+        reg_pattern = ++data;
+    if (reg_pattern) {
+        if (*data != delim) {
+            while (*++data && *data != delim);
+        }
+        if (*data) {
+            *data = '\0';
+            replace = ++data;
+        }
+    }
+    if (replace) {
+        if (*data != delim) {
+            while (*++data && *data != delim);
+        }
+        if (*data) {
+            *data = '\0';
+            flags = ++data;
+        }
+    }
+
+    if (!delim || !reg_pattern || !*reg_pattern || !replace) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error rsub operator format - must be s/regex/str/[flags]",
+                erroffset, errptr);
+        return 0;
+    }
+
+    if (flags) {
+        while (*flags) {
+            delim = apr_tolower(*flags);
+            if (delim == 'i')
+                ignore_case = 1;
+            else
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Regex flag not supported",
+                        erroffset, errptr);
+            flags++;
+        }
+    }
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    pattern = apr_pstrdup(rule->ruleset->mp, reg_pattern);
+    rule->sub_str = apr_pstrdup(rule->ruleset->mp, replace);
+
+    regex = ap_pregcomp(rule->ruleset->mp, pattern, AP_REG_EXTENDED |
+            (ignore_case ? AP_REG_ICASE : 0));
+
+    rule->sub_regex = regex;
+    return 1; /* OK */
+}
+
+static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    ap_regex_t *regex = rule->sub_regex;
+    char *offset = NULL;
+    int sub = 0, so = 0, p_len = 0;
+    char *replace = NULL;
+    char *data = NULL;
+    int size = var->value_len;
+    int output_body = 0, input_body = 0, count = 0;
+    ap_regmatch_t pmatch[AP_MAX_REG_MATCH];
+
+
+    if(strcmp(var->name,"STREAM_OUTPUT_BODY") == 0 )  {
+        output_body = 1;
+    } else if(strcmp(var->name,"STREAM_INPUT_BODY") == 0 )  {
+        input_body = 1;
+    } else  {
+        msr_log(msr,9,"Operator rsub only works with STREAM_* variables");
+        return -1;
+    }
+
+    replace = apr_pstrdup(rule->ruleset->mp, rule->sub_str);;
+    data = apr_pcalloc(msr->mp, var->value_len+(AP_MAX_REG_MATCH*strlen(replace))+1);
+
+    if(replace == NULL || data == NULL)
+        return 0;
+
+    memcpy(data,var->value,var->value_len);
+    size += (AP_MAX_REG_MATCH*strlen(replace)+2);
+
+    if (ap_regexec(rule->sub_regex,  data ,AP_MAX_REG_MATCH, pmatch, 0)) return 0;
+
+    for (offset = replace; *offset; offset++)
+        if (*offset == '\\' && *(offset + 1) > '0' && *(offset + 1) <= '9') {
+            so = pmatch [*(offset + 1) - 48].rm_so;
+            p_len = pmatch [*(offset + 1) - 48].rm_eo - so;
+            if (so < 0 || strlen (replace) + p_len - 1 > size) return 0;
+            memmove (offset + p_len, offset + 2, strlen (offset) - 1);
+            memmove (offset, data + so, p_len);
+            offset = offset + p_len - 2;
+        }
+
+    sub = pmatch [1].rm_so;
+
+    for (offset = data; !ap_regexec(rule->sub_regex,  offset, 1, pmatch, 0); ) {
+        p_len = pmatch [0].rm_eo - pmatch [0].rm_so;
+        count++;
+        offset += pmatch [0].rm_so;
+        if (var->value_len - p_len + strlen(replace) + 1 > size) return 0;
+        memmove (offset + strlen (replace), offset + p_len, strlen (offset) - p_len + 1);
+        memmove (offset, replace, strlen (replace));
+        offset += strlen (replace);
+        if (sub >= 0) break;
+    }
+
+    size -= ((AP_MAX_REG_MATCH - count)*(strlen(replace)) + ((strlen(replace) - p_len)*(count+AP_MAX_REG_MATCH) - (AP_MAX_REG_MATCH+4)));
+
+    if(msr->stream_output_data != NULL && output_body == 1) {
+        msr->stream_output_data = (char *)realloc(msr->stream_output_data,size);
+        msr->stream_output_length = size;
+        if (msr->stream_output_data != NULL)    {
+            memset(msr->stream_output_data,0,size);
+            memcpy(msr->stream_output_data,data,size);
+            msr->stream_output_data[msr->stream_output_length] = '\0';
+        }
+    }
+
+    if(msr->stream_input_data != NULL && input_body == 1) {
+        msr->stream_input_data = (char *)realloc(msr->stream_input_data,size);
+        msr->stream_input_length = size;
+        if (msr->stream_input_data != NULL) {
+            memset(msr->stream_input_data,0,size);
+            memcpy(msr->stream_input_data,data,size);
+            msr->stream_input_data[msr->stream_input_length] = '\0';
+        }
+    }
+
+    return 1;
+}
+
 /* rx */
 
 static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
@@ -103,7 +260,12 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     char *my_error_msg = NULL;
     int ovector[33];
     int capture = 0;
+    int matched_bytes = 0;
+    int matched = 0;
     int rc;
+    char *qspos = NULL;
+    const char *parm = NULL;
+    msc_parm *mparm = NULL;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -127,12 +289,14 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
     /* Are we supposed to capture subexpressions? */
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
+    matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
+    matched = apr_table_get(rule->actionset->actions, "sanitizeMatched") ? 1 : 0;
 
     /* Show when the regex captures but "capture" is not set */
     if (msr->txcfg->debuglog_level >= 6) {
         int capcount = 0;
         rc = msc_fullinfo(regex, PCRE_INFO_CAPTURECOUNT, &capcount);
-        if (msr->txcfg->debuglog_level >= 6) {        
+        if (msr->txcfg->debuglog_level >= 6) {
             if ((capture == 0) && (capcount > 0)) {
                 msr_log(msr, 6, "Ignoring regex captures since \"capture\" action is not enabled.");
             }
@@ -192,16 +356,39 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         for(i = 0; i < rc; i++) {
             msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
             if (s == NULL) return -1;
-            
             s->name = apr_psprintf(msr->mp, "%d", i);
             s->name_len = strlen(s->name);
             s->value = apr_pstrmemdup(msr->mp,
                 target + ovector[2 * i], ovector[2 * i + 1] - ovector[2 * i]);
+
             s->value_len = (ovector[2 * i + 1] - ovector[2 * i]);
             if ((s->name == NULL)||(s->value == NULL)) return -1;
-            
+
             apr_table_addn(msr->tx_vars, s->name, (void *)s);
-            
+
+            if(((matched == 1) || (matched_bytes == 1)) && (var != NULL) && (var->name != NULL))    {
+                qspos = apr_psprintf(msr->mp, "%s", var->name);
+                parm = strstr(qspos, ":");
+                if (parm != NULL)   {
+                    parm++;
+                    mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                    if (mparm == NULL)
+                    continue;
+
+                    mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                    mparm->pad_1 = rule->actionset->arg_min;
+                    mparm->pad_2 = rule->actionset->arg_max;
+                    apr_table_addn(msr->pattern_to_sanitize, parm, (void *)mparm);
+                } else  {
+                    mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                    if (mparm == NULL)
+                    continue;
+
+                    mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                    apr_table_addn(msr->pattern_to_sanitize, qspos, (void *)mparm);
+                }
+            }
+
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
                     log_escape_nq_ex(msr->mp, s->value, s->value_len));
@@ -2288,6 +2475,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "noMatch",
         NULL,
         msre_op_nomatch_execute
+    );
+
+    /* rsub */
+    msre_engine_op_register(engine,
+        "rsub",
+        msre_op_rsub_param_init,
+        msre_op_rsub_execute
     );
 
     /* rx */

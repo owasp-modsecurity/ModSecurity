@@ -18,6 +18,9 @@
  */
 #include "re.h"
 #include <ctype.h>
+#include "apr_lib.h"
+#include "apr_strmatch.h"
+
 
 /**
  * Register action with the engine.
@@ -344,7 +347,6 @@ apr_status_t collection_original_setvar(modsec_rec *msr, const char *col_name, c
                 msr_log(msr, 9, "Original collection variable: %s.%s = \"%s\"", col_name, var_name,
                     log_escape_ex(msr->mp, orig_var->value, orig_var->value_len));
             }
-            
             return 1;
         }
     }
@@ -403,6 +405,34 @@ static apr_status_t msre_action_logdata_init(msre_engine *engine, msre_actionset
     msre_action *action)
 {
     actionset->logdata = action->param;
+    return 1;
+}
+
+/* SanitizeMatchedBytes init */
+
+static apr_status_t msre_action_sanitizeMatchedBytes_init(msre_engine *engine,
+        msre_actionset *actionset, msre_action *action)
+{
+    char *parse_parm = NULL;
+    char *ac_param = NULL;
+    char *savedptr = NULL;
+    int arg_min = 0;
+    int arg_max = 0;
+
+    if (action->param != NULL && strlen(action->param) == 3)   {
+
+        ac_param = apr_pstrdup(engine->mp, action->param);
+        parse_parm = apr_strtok(ac_param,"/",&savedptr);
+
+        if(apr_isdigit(*parse_parm) && apr_isdigit(*savedptr))    {
+            arg_max = atoi(parse_parm);
+            arg_min = atoi(savedptr);
+        }
+    }
+
+    actionset->arg_min = arg_min;
+    actionset->arg_max = arg_max;
+
     return 1;
 }
 
@@ -1053,7 +1083,9 @@ static apr_status_t msre_action_sanitizeMatched_execute(modsec_rec *msr, apr_poo
     const char *sargname = NULL;
     const apr_array_header_t *tarr;
     const apr_table_entry_t *telts;
-    int i, type = 0;
+    const apr_array_header_t *tarr_pattern;
+    const apr_table_entry_t *telts_pattern;
+    int i, type = 0, k;
     msc_string *mvar = msr->matched_var;
 
     if (mvar->name_len == 0) return 0;
@@ -1090,7 +1122,6 @@ static apr_status_t msre_action_sanitizeMatched_execute(modsec_rec *msr, apr_poo
             msr_log(msr, 3, "sanitizeMatched: Don't know how to handle variable: %s",
                 mvar->name);
         }
-        
         return 0;
     }
 
@@ -2293,7 +2324,20 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         NULL,
         msre_action_sanitizeArg_execute
     );
-    
+
+    /* sanitiseMatchedBytes */
+    msre_engine_action_register(engine,
+        "sanitizeMatchedBytes",
+        ACTION_NON_DISRUPTIVE,
+        0, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
+        NULL,
+        msre_action_sanitizeMatchedBytes_init,
+        msre_action_sanitizeMatched_execute
+    );
+
     /* sanitizeArg */
     msre_engine_action_register(engine,
         "sanitizeArg",
@@ -2319,7 +2363,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         NULL,
         msre_action_sanitizeMatched_execute
     );
-    
+
     /* sanitizeMatched */
     msre_engine_action_register(engine,
         "sanitizeMatched",

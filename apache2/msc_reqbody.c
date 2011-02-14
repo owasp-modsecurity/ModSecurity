@@ -307,7 +307,6 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
         char *my_error_msg = NULL;
         msre_reqbody_processor_metadata *metadata =
             (msre_reqbody_processor_metadata *)apr_table_get(msr->modsecurity->msre->reqbody_processors, msr->msc_reqbody_processor);
-        
 
         if (metadata != NULL) {
             if (   (metadata->process != NULL)
@@ -382,6 +381,51 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
     *error_msg = apr_psprintf(msr->mp, "Internal error, unknown value for msc_reqbody_storage: %u",
         msr->msc_reqbody_storage);
     return -1;
+}
+
+static apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, char **error_msg) {
+    msc_data_chunk **chunks;
+    char *d;
+    int i, sofar;
+
+    *error_msg = NULL;
+
+    /* Allocate a buffer large enough to hold the request body. */
+
+    if (msr->msc_reqbody_length + 1 == 0) {
+        *error_msg = apr_psprintf(msr->mp, "Internal error, request body length will overflow the stream buffer: %u",
+            msr->msc_reqbody_length);
+        return -1;
+    }
+
+    msr->stream_input_length = msr->msc_reqbody_length;
+
+    msr->stream_input_data = malloc(msr->stream_input_length + 1);
+    if (msr->stream_input_data== NULL) {
+        *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body on stream. Asked for %u bytes.",
+            msr->stream_input_length + 1);
+        return -1;
+    }
+
+    msr->stream_input_data[msr->stream_input_length] = '\0';
+
+    /* Copy the data we keep in chunks into the new buffer. */
+
+    sofar = 0;
+    d = msr->stream_input_data;
+    chunks = (msc_data_chunk **)msr->msc_reqbody_chunks->elts;
+    for(i = 0; i < msr->msc_reqbody_chunks->nelts; i++) {
+        if (sofar + chunks[i]->length <= msr->stream_input_length) {
+            memcpy(d, chunks[i]->data, chunks[i]->length);
+            d += chunks[i]->length;
+            sofar += chunks[i]->length;
+        } else {
+            *error_msg = apr_psprintf(msr->mp, "Internal error, request body buffer overflow.");
+            return -1;
+        }
+    }
+
+    return 1;
 }
 
 /**
@@ -473,7 +517,7 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, cha
         *error_msg = apr_pstrdup(msr->mp, "Initialisation: Error occurred while parsing BODY arguments.");
         return -1;
     }
-    
+
     if (invalid_count) {
         msr->urlencoded_error = 1;
     }
@@ -498,12 +542,14 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
     /* Note that we've read the body. */
     msr->msc_reqbody_read = 1;
 
+    if (msr->txcfg->stream_inbody_inspection)
+        modsecurity_request_body_to_stream(msr, error_msg);
+
     /* Finalise body processing. */
     if ((msr->msc_reqbody_processor != NULL) && (msr->msc_reqbody_error == 0)) {
         char *my_error_msg = NULL;
         msre_reqbody_processor_metadata *metadata =
             (msre_reqbody_processor_metadata *)apr_table_get(msr->modsecurity->msre->reqbody_processors, msr->msc_reqbody_processor);
-        
 
         if (metadata != NULL) {
             if (   (metadata->complete != NULL)

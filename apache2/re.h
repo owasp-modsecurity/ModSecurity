@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #ifndef _MSC_RE_H_
 #define _MSC_RE_H_
 
@@ -174,6 +175,9 @@ struct msre_rule {
     /* Compiled Lua script. */
     msc_script              *script;
     #endif
+
+    ap_regex_t              *sub_regex;
+    char                    *sub_str;
 };
 
 char DSOLOCAL *msre_rule_generate_unparsed(apr_pool_t *pool, const msre_rule *rule, const char *targets, const char *args, const char *actions);
@@ -284,6 +288,8 @@ struct msre_actionset {
     int                      severity;
     int                      phase;
     msre_rule               *rule;
+    int                     arg_min;
+    int                     arg_max;
 
     /* Flow */
     int                      is_chained;

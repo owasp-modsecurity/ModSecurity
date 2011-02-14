@@ -21,7 +21,6 @@
 #include "modsecurity.h"
 #include "apache2.h"
 
-
 /* -- Input filter -- */
 
 #if 0
@@ -89,7 +88,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         return APR_EGENERAL;
     }
 
-    if (chunk) {
+    if (chunk && !msr->txcfg->stream_inbody_inspection) {
         /* Copy the data we received in the chunk */
         bucket = apr_bucket_heap_create(chunk->data, chunk->length, NULL,
             f->r->connection->bucket_alloc);
@@ -117,6 +116,22 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Input filter: Forwarded %" APR_SIZE_T_FMT " bytes.", chunk->length);
         }
+    } else if (msr->stream_input_data != NULL) {
+
+        bucket = apr_bucket_heap_create(msr->stream_input_data, msr->stream_input_length, NULL,
+                f->r->connection->bucket_alloc);
+
+        if (bucket == NULL) return APR_EGENERAL;
+        APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
+
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Input stream filter: Forwarded %" APR_SIZE_T_FMT " bytes.", msr->msc_reqbody_disk_chunk->length);
+        }
+    }
+
+    if(msr->txcfg->stream_inbody_inspection && msr->stream_input_data != NULL) {
+        free(msr->stream_input_data);
+        msr->stream_input_data = NULL;
     }
 
     if (rc == 0) {
@@ -259,7 +274,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Input filter: Completed receiving request body (length %" APR_SIZE_T_FMT ").",
-            msr->reqbody_length);
+                msr->reqbody_length);
     }
 
     msr->if_status = IF_STATUS_WANTS_TO_RUN;
@@ -409,9 +424,9 @@ static apr_status_t send_of_brigade(modsec_rec *msr, ap_filter_t *f) {
     rc = ap_pass_brigade(f->next, msr->of_brigade);
     if (rc != APR_SUCCESS) {
         /* TODO: These need to move to flags in 2.6.  For now log them
-         * at level 3 so that they are not confusing users.
+         * at level 4 so that they are not confusing users.
          */
-        int log_level = 3;
+        int log_level = 4;
 
         if (msr->txcfg->debuglog_level >= log_level) {
             switch(rc) {
@@ -436,6 +451,34 @@ static apr_status_t send_of_brigade(modsec_rec *msr, ap_filter_t *f) {
     }
 
     return APR_SUCCESS;
+}
+
+static void inject_content_to_of_brigade(modsec_rec *msr, ap_filter_t *f) {
+    apr_bucket *b;
+
+    if (msr->txcfg->content_injection_enabled && msr->stream_output_data != NULL) {
+        apr_bucket *bucket_ci = NULL;
+        apr_bucket *bucket_eos = NULL;
+
+        bucket_ci = apr_bucket_heap_create(msr->stream_output_data,
+                msr->stream_output_length, NULL, f->r->connection->bucket_alloc);
+
+        for (b = APR_BRIGADE_FIRST(msr->of_brigade); b != APR_BRIGADE_SENTINEL(msr->of_brigade); b = APR_BUCKET_NEXT(b))  {
+            if(!APR_BUCKET_IS_METADATA(b))
+                apr_bucket_delete(b);
+        }
+
+        APR_BRIGADE_INSERT_HEAD(msr->of_brigade, bucket_ci);
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Content Injection: Data reinjected bytes [%d]",msr->stream_output_length);
+        }
+    }
+
+    if(msr->stream_output_data != NULL) {
+        free(msr->stream_output_data);
+        msr->stream_output_data = NULL;
+    }
 }
 
 /**
@@ -485,6 +528,19 @@ static int flatten_response_body(modsec_rec *msr) {
 
     msr->resbody_data[msr->resbody_length] = '\0';
     msr->resbody_status = RESBODY_STATUS_READ;
+
+    if (msr->txcfg->stream_outbody_inspection)  {
+    msr->stream_output_data = (char *)malloc(msr->resbody_length+1);
+    msr->stream_output_length = msr->resbody_length+1;
+
+    if (msr->stream_output_data == NULL) {
+        msr_log(msr, 1, "Output filter: Stream Response body data memory allocation failed. Asked for: %" APR_SIZE_T_FMT,
+            msr->stream_output_length + 1);
+        return -1;
+    }
+
+    apr_cpystrn(msr->stream_output_data,msr->resbody_data,msr->stream_output_length);
+    }
 
     return 1;
 }
@@ -801,6 +857,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
      * (full-buffering only).
      */
     if ((msr->of_skipping == 0)&&(!msr->of_partial)) {
+        inject_content_to_of_brigade(msr,f);
         prepend_content_to_of_brigade(msr, f);
 
         /* Inject content into response (append & buffering). */

@@ -580,6 +580,8 @@ msre_actionset *msre_actionset_create(msre_engine *engine, const char *text,
     actionset->phase = NOT_SET;
     actionset->severity = -1;
     actionset->rule = NOT_SET_P;
+    actionset->arg_max = -1;
+    actionset->arg_min = -1;
 
     /* Flow */
     actionset->is_chained = NOT_SET;
@@ -660,6 +662,8 @@ msre_actionset *msre_actionset_merge(msre_engine *engine, msre_actionset *parent
     if (child->severity != NOT_SET) merged->severity = child->severity;
     if (child->phase != NOT_SET) merged->phase = child->phase;
     if (child->rule != NOT_SET_P) merged->rule = child->rule;
+    if (child->arg_min != NOT_SET) merged->arg_min = child->arg_min;
+    if (child->arg_max != NOT_SET) merged->arg_max = child->arg_max;
 
     /* Flow */
     merged->is_chained = child->is_chained;
@@ -714,6 +718,8 @@ void msre_actionset_set_defaults(msre_actionset *actionset) {
     if (actionset->phase == NOT_SET) actionset->phase = 2;
     if (actionset->severity == -1) {} /* leave at -1 */
     if (actionset->rule == NOT_SET_P) actionset->rule = NULL;
+    if (actionset->arg_max == NOT_SET) actionset->arg_max = -1;
+    if (actionset->arg_min == NOT_SET) actionset->arg_min = -1;
 
     /* Flow */
     if (actionset->is_chained == NOT_SET) actionset->is_chained = 0;
@@ -1839,7 +1845,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         time_before_op = apr_time_now();
     }
     #endif
-        
+
     rc = rule->op_metadata->execute(msr, rule, var, &my_error_msg);
 
     #if defined(PERFORMANCE_MEASUREMENT)
