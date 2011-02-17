@@ -24,6 +24,9 @@
 #include "acmp.h"
 #include <regex.h>
 
+#define PARSE_REGEX_IP "([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)(?:(\\/[0-9]+))?|([0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+)(?:(\\/[0-9]+))?"
+#define MAX_SUBSTRINGS 30
+
 /**
  *
  */
@@ -70,6 +73,334 @@ static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
     *error_msg = "No match.";
 
     /* Never match. */
+    return 0;
+}
+
+/* ipmatch */
+
+static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
+    const char *errptr = NULL;
+    int erroffset;
+    char *data = NULL;
+    const char *str = NULL;
+    char *saved = NULL;
+    static pcre *parse_regex;
+    static pcre_extra *parse_regex_study;
+    const char *eb;
+    int opts = 0;
+    int eo, i, res = 0, j = 0;
+    int ret = 0;
+    int ov[MAX_SUBSTRINGS];
+    const char *str_ptr = NULL;
+    const char *mask = NULL;
+    const char *type = NULL;
+    int ipv = 0;
+    struct in_addr addr,netmask;
+    struct sockaddr_in6 sa;
+    struct sockaddr_in6 mask6;
+    msre_ipmatch *ipdata = NULL, *curr_ipmatch = NULL;
+    unsigned long ipmask = 0, network = 0, hostmask = 0, broadcast = 0;
+    int maskbits = 0;
+
+    parse_regex = pcre_compile(PARSE_REGEX_IP, opts, &eb, &eo, NULL);
+
+    if(parse_regex == NULL) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling ipmatch operator regex",
+                erroffset, errptr);
+        return 0;
+    }
+
+    parse_regex_study = pcre_study(parse_regex, 0, &eb);
+    if(eb != NULL)  {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_study",
+                erroffset, errptr);
+        if(parse_regex != NULL) pcre_free(parse_regex);
+        return 0;
+    }
+
+    data = apr_pstrdup(rule->ruleset->mp, rule->op_param);
+
+    if(strlen(data) < 7)    {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Size is too small. Must enter at least an ip address",
+                erroffset, errptr);
+        if(parse_regex != NULL) pcre_free(parse_regex);
+        return 0;
+
+    }
+
+    str = apr_strtok(data,",",&saved);
+
+    while( str != NULL)  {
+
+        ret = pcre_exec(parse_regex, parse_regex_study, str, strlen(str),
+                0, 0, ov, MAX_SUBSTRINGS);
+        if (ret < 1) {
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_exec",
+                    erroffset, errptr);
+            if(parse_regex != NULL) pcre_free(parse_regex);
+            return 0;
+        }
+
+        for (i = 0; i < (ret - 1); i++) {
+
+            res = pcre_get_substring((char *)str, ov, MAX_SUBSTRINGS,i + 1,
+                    &str_ptr);
+            if (res < 0) {
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_get_substring",
+                        erroffset, errptr);
+                if(parse_regex != NULL) pcre_free(parse_regex);
+                return 0;
+            }
+
+            if(strlen(str_ptr) > 0) {
+
+                type = strchr(str_ptr,':');
+
+                if(type != NULL)
+                    ipv = 6;
+
+                type = strchr(str_ptr,'.');
+
+                if(type != NULL)
+                    ipv = 4;
+
+                mask = strchr(str_ptr,'/');
+
+                if(mask == NULL)    {
+                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "IP %s",str_ptr);
+
+                    if(ipv == 4)    {
+                        if (!inet_aton(str_ptr,&addr)) {
+                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
+                                    erroffset, errptr);
+                            if(parse_regex != NULL) pcre_free(parse_regex);
+                            return 0;
+                        }
+
+                        network = ntohl(addr.s_addr) -1;
+                        broadcast = ntohl(addr.s_addr) + 1;
+                    } else if (ipv == 6)    {
+                        if (inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr)) != 1) {
+                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
+                                    erroffset, errptr);
+                            if(parse_regex != NULL) pcre_free(parse_regex);
+                            return 0;
+                        }
+
+                        j = 0;
+
+                        maskbits = 128;
+
+                        while (maskbits >= 8) {
+                            mask6.sin6_addr.s6_addr[j++] = 0xff;
+                            maskbits -= 8;
+                        }
+                        while (maskbits-- > 0) {
+                            mask6.sin6_addr.s6_addr[j] >>= 1;
+                            mask6.sin6_addr.s6_addr[j] |= 0x80;
+                        }
+                        j++;
+                        while (j < 16) {
+                            mask6.sin6_addr.s6_addr[j++] = 0;
+                        }
+
+
+                        for (j = 0; j < 4; j++)
+                            sa.sin6_addr.s6_addr32[j]  &= mask6.sin6_addr.s6_addr32[j];
+
+                    }
+
+                } else  {
+                    *mask++;
+                    maskbits = atoi(mask);
+                    network = 0;
+                    broadcast = 0;
+
+                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "MASK %d",maskbits);
+
+                    if(ipv == 4)    {
+                        if(maskbits >= 1 && maskbits <= 30) {
+                            ipmask = 0;
+                            for (j=0 ; j<maskbits; j++ )
+                                ipmask |= 1<<(31-j);
+                            netmask.s_addr = htonl(ipmask);
+
+                            hostmask = ~ntohl(netmask.s_addr);
+                            broadcast = network | hostmask;
+
+                            network = ntohl(addr.s_addr) & ntohl(netmask.s_addr);
+                        }
+                    } else if (ipv == 6)    {
+
+                        if (inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr)) != 1) {
+                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
+                                    erroffset, errptr);
+                            if(parse_regex != NULL) pcre_free(parse_regex);
+                            return 0;
+                        }
+
+                        j = 0;
+
+                        if(maskbits >= 1 && maskbits <= 128)    {
+
+                            while (maskbits >= 8) {
+                                mask6.sin6_addr.s6_addr[j++] = 0xff;
+                                maskbits -= 8;
+                            }
+                            while (maskbits-- > 0) {
+                                mask6.sin6_addr.s6_addr[j] >>= 1;
+                                mask6.sin6_addr.s6_addr[j] |= 0x80;
+                            }
+                            j++;
+                            while (j < 16) {
+                                mask6.sin6_addr.s6_addr[j++] = 0;
+                            }
+
+
+                            for (j = 0; j < 4; j++)
+                                sa.sin6_addr.s6_addr32[j]  &= mask6.sin6_addr.s6_addr32[j];
+
+                        }
+                    }
+                }
+
+            }
+
+        }
+
+        if(rule->ip_op == NULL) {
+            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "AQUI %lu",network+1);
+            rule->ip_op = apr_pcalloc(rule->ruleset->mp, sizeof(msre_ipmatch));
+
+            if(rule->ip_op != NULL) {
+
+                if(ipv == 4)    {
+                    rule->ip_op->start = network+1;
+                    rule->ip_op->type = 4;
+                    if(mask == NULL)
+                        rule->ip_op->end = rule->ip_op->start;
+                    else
+                        rule->ip_op->end = rule->ip_op->start + broadcast - 2;
+
+                    rule->ip_op->netaddr = NULL;
+                    rule->ip_op->maskaddr = NULL;
+                } else if (ipv == 6)    {
+                    rule->ip_op->type = 6;
+                    rule->ip_op->start = rule->ip_op->end = 0;
+                    rule->ip_op->netaddr = &sa;
+                    rule->ip_op->maskaddr = &mask6;
+                }
+                rule->ip_op->next = NULL;
+            } else  {
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating list for ip match",
+                        erroffset, errptr);
+                if(parse_regex != NULL) pcre_free(parse_regex);
+                return 0;
+            }
+        } else  {
+            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "AQUI 2 %lu",network+1);
+            ipdata = apr_pcalloc(rule->ruleset->mp, sizeof(msre_ipmatch));
+
+            if(ipdata != NULL)  {
+
+                curr_ipmatch = rule->ip_op;
+
+                while (curr_ipmatch->next != NULL)    {
+                    curr_ipmatch = curr_ipmatch->next;
+                }
+
+                if(ipv == 4)    {
+                    ipdata->type = 4;
+                    ipdata->start = network+1;
+                    if(mask == NULL)
+                        ipdata->end = ipdata->start;
+                    else
+                        ipdata->end = ipdata->start + broadcast - 2;
+
+                    ipdata->netaddr = NULL;
+                    ipdata->maskaddr = NULL;
+                } else if (ipv == 6)    {
+                    ipdata->type = 6;
+                    ipdata->start = ipdata->end = 0;
+                    ipdata->netaddr = &sa;
+                    ipdata->maskaddr = &mask6;
+                }
+
+                curr_ipmatch->next = ipdata;
+
+            } else  {
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating memory for ip data",
+                        erroffset, errptr);
+            }
+        }
+
+        str = apr_strtok(NULL,",",&saved);
+    }
+
+    return 1;
+}
+
+static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    const char *errptr = NULL;
+    int erroffset;
+    struct in_addr addr;
+    struct sockaddr_in6 sa;
+    unsigned long ipaddr;
+    int i;
+    msre_ipmatch *ipdata = rule->ip_op;
+
+    if(var == NULL || (strcmp(var->name,"REMOTE_ADDR") != 0 ))  {
+        msr_log(msr,9,"Operator ipmatch only works with REMOTE_ADDR variable");
+        return -1;
+    }
+
+    if(ipdata == NULL) {
+        msr_log(msr,9,"Ipmatch operator struct is NULL");
+        return -1;
+    }
+
+    if (!inet_aton(var->value,&addr)) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
+                erroffset, errptr);
+        return -1;
+    }
+
+    ipaddr = ntohl(addr.s_addr) -1;
+
+    for (; ipdata != NULL; ipdata = ipdata->next) {
+        if(ipdata->type == 4)   {
+
+            if (!inet_aton(var->value,&addr)) {
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
+                        erroffset, errptr);
+                return -1;
+            }
+
+            ipaddr = ntohl(addr.s_addr) -1;
+
+            if( ipaddr >= ipdata->start && ipaddr <= ipdata->end)
+                return 1;
+
+        } else if (ipdata->type == 6)   {
+            if (inet_pton(AF_INET6, var->value, &(sa.sin6_addr)) != 1)  {
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip6 address",
+                        erroffset, errptr);
+                return -1;
+            }
+
+            if(ipdata->netaddr != NULL && ipdata->maskaddr != NULL) {
+
+                for (i = 0; i < 16; i++)
+                {
+                    if (((sa.sin6_addr.s6_addr[i] ^ ipdata->netaddr->sin6_addr.s6_addr[i]) &
+                                ipdata->netaddr->sin6_addr.s6_addr[i]) == 0)
+                        return 1;
+                }
+            }
+
+        }
+    }
+
     return 0;
 }
 
@@ -244,7 +575,7 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
     regex = msc_pregcomp_ex(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
     if (regex == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
-            erroffset, errptr);
+                erroffset, errptr);
         return 0;
     }
 
@@ -319,12 +650,12 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
         *error_msg = apr_psprintf(msr->mp,
-                                  "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
-                                  "Execution error - "
-                                  "PCRE limits exceeded (%d): %s",
-                                  rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
-                                  rule->filename != NULL ? rule->filename : "-",
-                                  rule->line_num,rc, my_error_msg);
+                "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
+                "Execution error - "
+                "PCRE limits exceeded (%d): %s",
+                rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                rule->filename != NULL ? rule->filename : "-",
+                rule->line_num,rc, my_error_msg);
 
         msr_log(msr, 3, "%s.", *error_msg);
 
@@ -332,7 +663,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     }
     else if (rc < -1) {
         *error_msg = apr_psprintf(msr->mp, "Regex execution failed (%d): %s",
-                                  rc, my_error_msg);
+                rc, my_error_msg);
         return -1;
     }
 
@@ -359,7 +690,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             s->name = apr_psprintf(msr->mp, "%d", i);
             s->name_len = strlen(s->name);
             s->value = apr_pstrmemdup(msr->mp,
-                target + ovector[2 * i], ovector[2 * i + 1] - ovector[2 * i]);
+                    target + ovector[2 * i], ovector[2 * i + 1] - ovector[2 * i]);
 
             s->value_len = (ovector[2 * i + 1] - ovector[2 * i]);
             if ((s->name == NULL)||(s->value == NULL)) return -1;
@@ -373,7 +704,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
                     parm++;
                     mparm = apr_palloc(msr->mp, sizeof(msc_parm));
                     if (mparm == NULL)
-                    continue;
+                        continue;
 
                     mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
                     mparm->pad_1 = rule->actionset->arg_min;
@@ -382,7 +713,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
                 } else  {
                     mparm = apr_palloc(msr->mp, sizeof(msc_parm));
                     if (mparm == NULL)
-                    continue;
+                        continue;
 
                     mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
                     apr_table_addn(msr->pattern_to_sanitize, qspos, (void *)mparm);
@@ -391,7 +722,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
-                    log_escape_nq_ex(msr->mp, s->value, s->value_len));
+                        log_escape_nq_ex(msr->mp, s->value, s->value_len));
             }
         }
     }
@@ -403,10 +734,10 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         /* This message will be logged. */
         if (strlen(pattern) > 252) {
             *error_msg = apr_psprintf(msr->mp, "Pattern match \"%.252s ...\" at %s.",
-                pattern, var->name);
+                    pattern, var->name);
         } else {
             *error_msg = apr_psprintf(msr->mp, "Pattern match \"%s\" at %s.",
-                pattern, var->name);
+                    pattern, var->name);
         }
 
         return 1;
@@ -475,9 +806,9 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     /* Get the path of the rule filename to use as a base */
     rulefile_path = apr_pstrndup(rule->ruleset->mp, rule->filename, strlen(rule->filename) - strlen(apr_filepath_name_get(rule->filename)));
 
-    #ifdef DEBUG_CONF
+#ifdef DEBUG_CONF
     fprintf(stderr, "Rulefile path: \"%s\"\n", rulefile_path);
-    #endif
+#endif
 
     /* Loop through filenames */
     /* ENH: Need to allow quoted filenames w/space */
@@ -508,9 +839,9 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
             return 0;
         }
 
-        #ifdef DEBUG_CONF
+#ifdef DEBUG_CONF
         fprintf(stderr, "Loading phrase file: \"%s\"\n", fn);
-        #endif
+#endif
 
         /* Read one pattern per line skipping empty/commented */
         for(;;) {
@@ -535,9 +866,9 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
             /* Ignore empty lines and comments */
             if ((start == end) || (*start == '#')) continue;
 
-            #ifdef DEBUG_CONF
+#ifdef DEBUG_CONF
             fprintf(stderr, "Adding phrase file pattern: \"%s\"\n", buf);
-            #endif
+#endif
 
             acmp_add_pattern(p, start, NULL, NULL, (end - start));
         }
@@ -571,10 +902,10 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
         /* This message will be logged. */
         if (strlen(match_escaped) > 252) {
             *error_msg = apr_psprintf(msr->mp, "Matched phrase \"%.252s ...\" at %s.",
-                match_escaped, var->name);
+                    match_escaped, var->name);
         } else {
             *error_msg = apr_psprintf(msr->mp, "Matched phrase \"%s\" at %s.",
-                match_escaped, var->name);
+                    match_escaped, var->name);
         }
 
         /* Handle capture as tx.0=match */
@@ -593,7 +924,7 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Added phrase match to TX.0: %s",
-                    log_escape_nq_ex(msr->mp, s->value, s->value_len));
+                        log_escape_nq_ex(msr->mp, s->value, s->value_len));
             }
 
             /* Unset the remaining ones (from previous invocations). */
@@ -648,7 +979,7 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
     if (target_length == 0) {
         /* Match. */
         *error_msg = apr_psprintf(msr->mp, "String match within \"\" at %s.",
-                        var->name);
+                var->name);
         return 1;
     }
 
@@ -667,8 +998,8 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
             if (memcmp((target + 1), (match + i + 1), (target_length - 1)) == 0) {
                 /* match. */
                 *error_msg = apr_psprintf(msr->mp, "String match within \"%s\" at %s.",
-                                log_escape_ex(msr->mp, match, match_length),
-                                var->name);
+                        log_escape_ex(msr->mp, match, match_length),
+                        var->name);
                 return 1;
             }
         }
@@ -738,12 +1069,12 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
         if (target[i] == match[0]) {
             /* See if remaining matches */
             if (   (match_length == 1)
-                || (memcmp((match + 1), (target + i + 1), (match_length - 1)) == 0))
+                    || (memcmp((match + 1), (target + i + 1), (match_length - 1)) == 0))
             {
                 /* Match. */
                 *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
-                                log_escape_ex(msr->mp, match, match_length),
-                                var->name);
+                        log_escape_ex(msr->mp, match, match_length),
+                        var->name);
                 return 1;
             }
         }
@@ -819,7 +1150,7 @@ static int msre_op_containsWord_execute(modsec_rec *msr, msre_rule *rule, msre_v
         if (target[i] == match[0]) {
             /* See if remaining matches */
             if (   (match_length == 1)
-                || (memcmp((match + 1), (target + i + 1), (match_length - 1)) == 0))
+                    || (memcmp((match + 1), (target + i + 1), (match_length - 1)) == 0))
             {
                 /* check boundaries */
                 if (i == i_max) {
@@ -837,8 +1168,8 @@ static int msre_op_containsWord_execute(modsec_rec *msr, msre_rule *rule, msre_v
     if (rc == 1) {
         /* Maybe a match. */
         *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
-                        log_escape_ex(msr->mp, match, match_length),
-                        var->name);
+                log_escape_ex(msr->mp, match, match_length),
+                var->name);
         return 1;
     }
 
@@ -893,8 +1224,8 @@ static int msre_op_streq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var
     if (memcmp(match, target, target_length) == 0) {
         /* Match. */
         *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
-                        log_escape_ex(msr->mp, match, match_length),
-                        var->name);
+                log_escape_ex(msr->mp, match, match_length),
+                var->name);
         return 1;
     }
 
@@ -955,8 +1286,8 @@ static int msre_op_beginsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var
     if (memcmp(match, target, match_length) == 0) {
         /* Match. */
         *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
-                        log_escape_ex(msr->mp, match, match_length),
-                        var->name);
+                log_escape_ex(msr->mp, match, match_length),
+                var->name);
         return 1;
     }
 
@@ -1017,8 +1348,8 @@ static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     if (memcmp(match, (target + (target_length - match_length)), match_length) == 0) {
         /* Match. */
         *error_msg = apr_psprintf(msr->mp, "String match \"%s\" at %s.",
-                        log_escape_ex(msr->mp, match, match_length),
-                        var->name);
+                log_escape_ex(msr->mp, match, match_length),
+                var->name);
         return 1;
     }
 
@@ -2475,6 +2806,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "noMatch",
         NULL,
         msre_op_nomatch_execute
+    );
+
+    /* ipmatch */
+    msre_engine_op_register(engine,
+        "ipmatch",
+        msre_op_ipmatch_param_init,
+        msre_op_ipmatch_execute
     );
 
     /* rsub */

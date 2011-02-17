@@ -24,6 +24,7 @@
 #define POSITIVE_VALUE 1
 #define NEGATIVE_VALUE 2
 
+typedef struct ipmatch msre_ipmatch;
 typedef struct msre_engine msre_engine;
 typedef struct msre_ruleset msre_ruleset;
 typedef struct msre_ruleset_internal msre_ruleset_internal;
@@ -148,6 +149,15 @@ int DSOLOCAL msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset
 #define RULE_TYPE_LUA           3  /* SecRuleScript */
 #endif
 
+struct ipmatch  {
+    unsigned long    start;
+    unsigned long    end;
+    int              type;
+    struct sockaddr_in6 *netaddr;
+    struct sockaddr_in6 *maskaddr;
+    struct  ipmatch *next;
+};
+
 struct msre_rule {
     apr_array_header_t      *targets;
     const char              *op_name;
@@ -178,6 +188,8 @@ struct msre_rule {
 
     ap_regex_t              *sub_regex;
     char                    *sub_str;
+
+    msre_ipmatch            *ip_op;
 };
 
 char DSOLOCAL *msre_rule_generate_unparsed(apr_pool_t *pool, const msre_rule *rule, const char *targets, const char *args, const char *actions);
