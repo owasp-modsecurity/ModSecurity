@@ -179,12 +179,8 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                         network = ntohl(addr.s_addr) -1;
                         broadcast = ntohl(addr.s_addr) + 1;
                     } else if (ipv == 6)    {
-                        if (inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr)) != 1) {
-                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
-                                    erroffset, errptr);
-                            if(parse_regex != NULL) pcre_free(parse_regex);
-                            return 0;
-                        }
+
+                        inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr));
 
                         j = 0;
 
@@ -229,12 +225,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                         }
                     } else if (ipv == 6)    {
 
-                        if (inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr)) != 1) {
-                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
-                                    erroffset, errptr);
-                            if(parse_regex != NULL) pcre_free(parse_regex);
-                            return 0;
-                        }
+                        inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr));
 
                         j = 0;
 
@@ -341,7 +332,8 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
     struct in_addr addr;
     struct sockaddr_in6 sa;
     unsigned long ipaddr;
-    int i;
+    int i, ipv = 0;
+    const char *type = NULL;
     msre_ipmatch *ipdata = rule->ip_op;
 
     if(var == NULL || (strcmp(var->name,"REMOTE_ADDR") != 0 ))  {
@@ -354,16 +346,16 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
         return -1;
     }
 
-    if (!inet_aton(var->value,&addr)) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
-                erroffset, errptr);
-        return -1;
-    }
+    type = strchr(var->value,':');
+    if(type != NULL);
+        ipv = 6;
 
-    ipaddr = ntohl(addr.s_addr) -1;
+    type = strchr(var->value,'.');
+    if(type != NULL);
+        ipv = 4;
 
     for (; ipdata != NULL; ipdata = ipdata->next) {
-        if(ipdata->type == 4)   {
+        if((ipdata->type == 4) && (ipv == 4))   {
 
             if (!inet_aton(var->value,&addr)) {
                 *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
@@ -376,12 +368,8 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
             if( ipaddr >= ipdata->start && ipaddr <= ipdata->end)
                 return 1;
 
-        } else if (ipdata->type == 6)   {
-            if (inet_pton(AF_INET6, var->value, &(sa.sin6_addr)) != 1)  {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip6 address",
-                        erroffset, errptr);
-                return -1;
-            }
+        } else if ((ipdata->type == 6) && (ipv == 6))   {
+            inet_pton(AF_INET6, var->value, &(sa.sin6_addr));
 
             if(ipdata->netaddr != NULL && ipdata->maskaddr != NULL) {
 
