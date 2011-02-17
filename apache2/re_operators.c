@@ -347,11 +347,11 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
     }
 
     type = strchr(var->value,':');
-    if(type != NULL);
+    if(type != NULL)
         ipv = 6;
 
     type = strchr(var->value,'.');
-    if(type != NULL);
+    if(type != NULL)
         ipv = 4;
 
     for (; ipdata != NULL; ipdata = ipdata->next) {
