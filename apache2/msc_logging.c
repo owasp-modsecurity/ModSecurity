@@ -58,8 +58,10 @@ void version(apr_pool_t *mp) {
     }
 
     /* Lua version function was removed in current 5.1. Need to check in future versions if it's back */
+#if defined(WITH_LUA)
     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
             "ModSecurity: LUA compiled version=\"%s\"",LUA_VERSION);
+#endif /* WITH_LUA */
 
     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
             "ModSecurity: LIBXML compiled version=\"%s\"",LIBXML_DOTTED_VERSION);
