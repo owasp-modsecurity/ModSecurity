@@ -76,7 +76,7 @@ static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
     return 0;
 }
 
-/* ipmatch */
+/* ipMatch */
 
 static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
@@ -105,14 +105,14 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     parse_regex = pcre_compile(PARSE_REGEX_IP, opts, &eb, &eo, NULL);
 
     if(parse_regex == NULL) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling ipmatch operator regex",
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling ipMatch operator regex",
                 erroffset, errptr);
         return 0;
     }
 
     parse_regex_study = pcre_study(parse_regex, 0, &eb);
     if(eb != NULL)  {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_study",
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipMatch operator: pcre_study",
                 erroffset, errptr);
         if(parse_regex != NULL) pcre_free(parse_regex);
         return 0;
@@ -135,7 +135,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
         ret = pcre_exec(parse_regex, parse_regex_study, str, strlen(str),
                 0, 0, ov, MAX_SUBSTRINGS);
         if (ret < 1) {
-            *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_exec",
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipMatch operator: pcre_exec",
                     erroffset, errptr);
             if(parse_regex != NULL) pcre_free(parse_regex);
             return 0;
@@ -146,7 +146,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
             res = pcre_get_substring((char *)str, ov, MAX_SUBSTRINGS,i + 1,
                     &str_ptr);
             if (res < 0) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_get_substring",
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipMatch operator: pcre_get_substring",
                         erroffset, errptr);
                 if(parse_regex != NULL) pcre_free(parse_regex);
                 return 0;
@@ -337,7 +337,7 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
     msre_ipmatch *ipdata = rule->ip_op;
 
     if(var == NULL || (strcmp(var->name,"REMOTE_ADDR") != 0 ))  {
-        msr_log(msr,9,"Operator ipmatch only works with REMOTE_ADDR variable");
+        msr_log(msr,9,"Operator ipMatch only works with REMOTE_ADDR variable");
         return -1;
     }
 
@@ -2791,9 +2791,9 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_nomatch_execute
     );
 
-    /* ipmatch */
+    /* ipMatch */
     msre_engine_op_register(engine,
-        "ipmatch",
+        "ipMatch",
         msre_op_ipmatch_param_init,
         msre_op_ipmatch_execute
     );
