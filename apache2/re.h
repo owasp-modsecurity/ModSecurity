@@ -45,12 +45,14 @@ typedef struct msre_cache_rec msre_cache_rec;
 #include "msc_pcre.h"
 #include "persist_dbm.h"
 #include "apache2.h"
+#include "http_config.h"
 
 #if defined(WITH_LUA)
 #include "msc_lua.h"
 #endif
 
 /* Actions, variables, functions and operator functions */
+char DSOLOCAL *update_rule_target(cmd_parms *cmd, directory_config *dcfg, msre_ruleset *rset, const char *p1, const char *p2, const char *p3);
 
 apr_status_t DSOLOCAL collection_original_setvar(modsec_rec *msr, const char *col_name, const msc_string *orig_var);
 
@@ -277,10 +279,10 @@ struct msre_var_metadata {
 };
 
 struct msre_var {
-    const char              *name;
+    char                    *name;
     const char              *value;
     unsigned int             value_len;
-    const char              *param;
+    char                    *param;
     const void              *param_data;
     msre_var_metadata       *metadata;
     msc_regex_t             *param_regex;
@@ -326,6 +328,8 @@ struct msre_actionset {
 };
 
 char DSOLOCAL *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset);
+
+char DSOLOCAL *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule);
 
 void DSOLOCAL msre_engine_variable_register(msre_engine *engine, const char *name,
     unsigned int type, unsigned int argc_min, unsigned int argc_max,
@@ -410,7 +414,6 @@ apr_status_t DSOLOCAL msre_parse_vars(msre_ruleset *ruleset, const char *text,
     apr_array_header_t *arr, char **error_msg);
 
 char DSOLOCAL *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset);
-
 
 /* -- Data Cache -- */
 

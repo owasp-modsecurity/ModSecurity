@@ -121,7 +121,6 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->component_signatures = apr_array_make(mp, 16, sizeof(char *));
 
     dcfg->request_encoding = NOT_SET_P;
-    
     dcfg->disable_backend_compression = NOT_SET;
 
     return dcfg;
@@ -477,7 +476,7 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
 
     merged->request_encoding = (child->request_encoding == NOT_SET_P
         ? parent->request_encoding : child->request_encoding);
-        
+
     merged->disable_backend_compression = (child->disable_backend_compression == NOT_SET
         ? parent->disable_backend_compression : child->disable_backend_compression);
 
@@ -905,6 +904,156 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
     return NULL;
 }
 
+char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
+        msre_ruleset *rset, const char *p1, const char *p2, const char *p3)
+{
+    msre_var **targets = NULL;
+    msre_rule *rule = NULL;
+    msre_ruleset *ruleset = NULL;
+    const char *curr_targets = NULL;
+    char *my_error_msg = NULL;
+    char *p = NULL;
+    char *savedptr = NULL;
+    char *target_list = NULL;
+    char *replace = NULL;
+    int is_negated = 0;
+    int is_counting = 0;
+    int name_len = 0;
+    int value_len = 0;
+    char *name = NULL, *value = NULL;
+    char *opt = NULL;
+    char *param = NULL;
+    int i, rc, match = 0;
+
+    if(p1 == NULL || p2 == NULL || (dcfg == NULL && rset == NULL))  {
+        return NULL;
+    }
+
+    if(dcfg != NULL)
+        ruleset = dcfg->ruleset;
+    else if (rset != NULL)
+        ruleset = rset;
+
+    /* Get the ruleset if one exists */
+    if ((ruleset == NULL)||(ruleset == NOT_SET_P)) {
+        return NULL;
+    }
+
+    rule = msre_ruleset_fetch_rule(ruleset, p1);
+    if (rule == NULL) {
+        if (cmd != NULL)    {
+            ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
+                    "Update rule id=\"%s\" with targets \"%s\" failed: Rule not found.", p1, p2);
+        }
+        return NULL;
+    }
+
+    target_list = strdup(p2);
+    if(target_list == NULL)
+        return NULL;
+
+    if(p3 != NULL)  {
+        replace = strdup(p3);
+        if(replace == NULL) {
+            free(target_list);
+            return NULL;
+        }
+    }
+
+    if(replace != NULL) {
+
+        opt = strchr(replace,'!');
+
+        if(opt != NULL)  {
+            *opt = '\0';
+            opt++;
+            param = opt;
+            is_negated = 1;
+        } else if ((opt = strchr(replace,'&')) != NULL)  {
+            *opt = '\0';
+            opt++;
+            param = opt;
+            is_counting = 1;
+        } else  {
+            param = replace;
+        }
+
+        opt = strchr(param,':');
+
+        if(opt != NULL) {
+            name = apr_strtok(param,":",&value);
+            if(strchr(value,':') != NULL)   {
+                goto end;
+            }
+        } else {
+            name = param;
+        }
+
+        name_len = strlen(name);
+
+        if(value != NULL)
+            value_len = strlen(value);
+
+        targets = (msre_var **)rule->targets->elts;
+        // TODO need a good way to remove the element from array, maybe change array by tables or rings
+        for (i = 0; i < rule->targets->nelts; i++) {
+            if((strncasecmp(targets[i]->name,name,name_len) == 0) &&
+                    (targets[i]->is_negated == is_negated) &&
+                    (targets[i]->is_counting == is_counting))    {
+
+                if(value != NULL && targets[i]->param != NULL)  {
+                    if(strncasecmp(targets[i]->param,value,value_len) == 0) {
+                        memset(targets[i]->name,0,strlen(targets[i]->name));
+                        memset(targets[i]->param,0,strlen(targets[i]->param));
+                        match = 1;
+                    }
+                } else if (value == NULL && targets[i]->param == NULL){
+                    memset(targets[i]->name,0,strlen(targets[i]->name));
+                    match = 1;
+                } else
+                    continue;
+
+            }
+        }
+    }
+
+    p = apr_strtok(target_list, ",", &savedptr);
+
+    while(p != NULL) {
+
+        if(replace != NULL) {
+            if(match == 1)  {
+                rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
+                if (rc < 0) {
+                    goto end;
+                }
+            } else  {
+                goto end;
+            }
+        } else {
+
+            rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
+            if (rc < 0) {
+                goto end;
+            }
+
+        }
+
+        p = apr_strtok(NULL,",",&savedptr);
+    }
+
+    curr_targets = msre_generate_target_string(ruleset->mp, rule);
+
+    rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, curr_targets, NULL, NULL);
+
+end:
+    if(target_list != NULL)
+        free(target_list);
+    if(replace != NULL)
+        free(replace);
+    return NULL;
+}
+
 /* -- Configuration directives -- */
 
 static const char *cmd_action(cmd_parms *cmd, void *_dcfg, const char *p1)
@@ -920,7 +1069,7 @@ static const char *cmd_marker(cmd_parms *cmd, void *_dcfg, const char *p1)
 }
 
 static const char *cmd_argument_separator(cmd_parms *cmd, void *_dcfg,
-                                          const char *p1)
+        const char *p1)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
 
@@ -939,12 +1088,12 @@ static const char *cmd_audit_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 
     if (strcasecmp(p1, "On") == 0) dcfg->auditlog_flag = AUDITLOG_ON;
     else
-    if (strcasecmp(p1, "Off") == 0) dcfg->auditlog_flag = AUDITLOG_OFF;
-    else
-    if (strcasecmp(p1, "RelevantOnly") == 0) dcfg->auditlog_flag = AUDITLOG_RELEVANT;
-    else
-    return (const char *)apr_psprintf(cmd->pool,
-        "ModSecurity: Unrecognised parameter value for SecAuditEngine: %s", p1);
+        if (strcasecmp(p1, "Off") == 0) dcfg->auditlog_flag = AUDITLOG_OFF;
+        else
+            if (strcasecmp(p1, "RelevantOnly") == 0) dcfg->auditlog_flag = AUDITLOG_RELEVANT;
+            else
+                return (const char *)apr_psprintf(cmd->pool,
+                        "ModSecurity: Unrecognised parameter value for SecAuditEngine: %s", p1);
 
     return NULL;
 }
@@ -962,7 +1111,7 @@ static const char *cmd_audit_log(cmd_parms *cmd, void *_dcfg, const char *p1)
         pipe_log = ap_open_piped_log(cmd->pool, pipe_name);
         if (pipe_log == NULL) {
             return apr_psprintf(cmd->pool, "ModSecurity: Failed to open the audit log pipe: %s",
-                pipe_name);
+                    pipe_name);
         }
         dcfg->auditlog_fd = ap_piped_log_write_fd(pipe_log);
     }
@@ -971,12 +1120,12 @@ static const char *cmd_audit_log(cmd_parms *cmd, void *_dcfg, const char *p1)
         apr_status_t rc;
 
         rc = apr_file_open(&dcfg->auditlog_fd, file_name,
-            APR_WRITE | APR_APPEND | APR_CREATE | APR_BINARY,
-            CREATEMODE, cmd->pool);
+                APR_WRITE | APR_APPEND | APR_CREATE | APR_BINARY,
+                CREATEMODE, cmd->pool);
 
         if (rc != APR_SUCCESS) {
             return apr_psprintf(cmd->pool, "ModSecurity: Failed to open the audit log file: %s",
-                file_name);
+                    file_name);
         }
     }
 
@@ -1000,7 +1149,7 @@ static const char *cmd_audit_log2(cmd_parms *cmd, void *_dcfg, const char *p1)
         pipe_log = ap_open_piped_log(cmd->pool, pipe_name);
         if (pipe_log == NULL) {
             return apr_psprintf(cmd->pool, "ModSecurity: Failed to open the secondary audit log pipe: %s",
-                pipe_name);
+                    pipe_name);
         }
         dcfg->auditlog2_fd = ap_piped_log_write_fd(pipe_log);
     }
@@ -1009,12 +1158,12 @@ static const char *cmd_audit_log2(cmd_parms *cmd, void *_dcfg, const char *p1)
         apr_status_t rc;
 
         rc = apr_file_open(&dcfg->auditlog2_fd, file_name,
-            APR_WRITE | APR_APPEND | APR_CREATE | APR_BINARY,
-            CREATEMODE, cmd->pool);
+                APR_WRITE | APR_APPEND | APR_CREATE | APR_BINARY,
+                CREATEMODE, cmd->pool);
 
         if (rc != APR_SUCCESS) {
             return apr_psprintf(cmd->pool, "ModSecurity: Failed to open the secondary audit log file: %s",
-                file_name);
+                    file_name);
         }
     }
 
@@ -1022,7 +1171,7 @@ static const char *cmd_audit_log2(cmd_parms *cmd, void *_dcfg, const char *p1)
 }
 
 static const char *cmd_audit_log_parts(cmd_parms *cmd, void *_dcfg,
-                                       const char *p1)
+        const char *p1)
 {
     directory_config *dcfg = _dcfg;
 
@@ -1035,7 +1184,7 @@ static const char *cmd_audit_log_parts(cmd_parms *cmd, void *_dcfg,
 }
 
 static const char *cmd_audit_log_relevant_status(cmd_parms *cmd, void *_dcfg,
-                                                 const char *p1)
+        const char *p1)
 {
     directory_config *dcfg = _dcfg;
 
@@ -1048,22 +1197,22 @@ static const char *cmd_audit_log_relevant_status(cmd_parms *cmd, void *_dcfg,
 }
 
 static const char *cmd_audit_log_type(cmd_parms *cmd, void *_dcfg,
-                                      const char *p1)
+        const char *p1)
 {
     directory_config *dcfg = _dcfg;
 
     if (strcasecmp(p1, "Serial") == 0) dcfg->auditlog_type = AUDITLOG_SERIAL;
     else
-    if (strcasecmp(p1, "Concurrent") == 0) dcfg->auditlog_type = AUDITLOG_CONCURRENT;
-    else
-    return (const char *)apr_psprintf(cmd->pool,
-        "ModSecurity: Unrecognised parameter value for SecAuditLogType: %s", p1);
+        if (strcasecmp(p1, "Concurrent") == 0) dcfg->auditlog_type = AUDITLOG_CONCURRENT;
+        else
+            return (const char *)apr_psprintf(cmd->pool,
+                    "ModSecurity: Unrecognised parameter value for SecAuditLogType: %s", p1);
 
     return NULL;
 }
 
 static const char *cmd_audit_log_dirmode(cmd_parms *cmd, void *_dcfg,
-                                         const char *p1)
+        const char *p1)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
 
@@ -1085,7 +1234,7 @@ static const char *cmd_audit_log_dirmode(cmd_parms *cmd, void *_dcfg,
 }
 
 static const char *cmd_audit_log_filemode(cmd_parms *cmd, void *_dcfg,
-                                          const char *p1)
+        const char *p1)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
 
@@ -1620,8 +1769,25 @@ static const char *cmd_response_body_mime_types_clear(cmd_parms *cmd,
     return NULL;
 }
 
+/*
+* \brief Add SecRuleUpdateTargetById
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+* \param p2 Pointer to configuration option
+* \param p3 Pointer to configuration option
+*
+* \retval NULL On failure|Success
+*/
+static const char *cmd_rule_update_target_by_id(cmd_parms *cmd, void *_dcfg,
+        const char *p1, const char *p2, const char *p3)
+{
+    return update_rule_target(cmd, (directory_config *)_dcfg, NULL, p1, p2, p3);
+}
+
 static const char *cmd_rule(cmd_parms *cmd, void *_dcfg,
-                            const char *p1, const char *p2, const char *p3)
+        const char *p1, const char *p2, const char *p3)
 {
     return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_NORMAL, p1, p2, p3);
 }
@@ -2372,6 +2538,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "updated action list"
+    ),
+
+    AP_INIT_TAKE23 (
+        "SecRuleUpdateTargetById",
+        cmd_rule_update_target_by_id,
+        NULL,
+        CMD_SCOPE_ANY,
+        "updated target list"
     ),
 
     AP_INIT_TAKE1 (

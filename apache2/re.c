@@ -60,11 +60,35 @@ static void msre_actionset_cardinality_fixup(msre_actionset *actionset, msre_act
     }
 }
 
+char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule)  {
+
+    char *target_str = NULL;
+    msre_var **targets = NULL;
+    int i = 0, count = 0;
+
+    targets = (msre_var **)rule->targets->elts;
+
+    for (i = 0; i < rule->targets->nelts; i++) {
+
+        if(targets[i]->name != NULL && strlen(targets[i]->name) > 0)    {
+        target_str = apr_pstrcat(pool,
+                (target_str == NULL) ? "" : apr_psprintf(pool, "%s|", target_str),
+                (targets[i]->is_negated == 0) ? "" : "!",
+                (targets[i]->is_counting == 0) ? "" : "&",
+                (targets[i]->name == NULL) ? "" : targets[i]->name,
+                (targets[i]->param == NULL) ? "" : apr_psprintf(pool, ":%s", targets[i]->param),
+                NULL);
+        }
+
+    }
+
+    return target_str;
+}
+
 /**
  * Generate an action string from an actionset.
  */
-char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)
-{
+char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)  {
     const apr_array_header_t *tarr = NULL;
     const apr_table_entry_t *telts = NULL;
     char *actions = NULL;
@@ -268,7 +292,7 @@ msre_reqbody_processor_metadata *msre_resolve_reqbody_processor(
  * and an (optional) parameter.
  */
 msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *name, const char *param,
-    modsec_rec *msr, char **error_msg)
+        modsec_rec *msr, char **error_msg)
 {
     const char *varparam = param;
     msre_var *var = apr_pcalloc(pool, sizeof(msre_var));
@@ -280,21 +304,21 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
     /* Handle negation and member counting */
     if (name[0] == '!') {
         var->is_negated = 1;
-        var->name = name + 1;
+        var->name = (char *)name + 1;
     }
     else
-    if (name[0] == '&') {
-        var->is_counting = 1;
-        var->name = name + 1;
-    }
-    else {
-        var->name = name;
-    }
+        if (name[0] == '&') {
+            var->is_counting = 1;
+            var->name = (char *)name + 1;
+        }
+        else {
+            var->name = (char *)name;
+        }
 
     /* Treat HTTP_* targets as an alias for REQUEST_HEADERS:* */
     if (   (var->name != NULL)
-        && (strlen(var->name) > 5)
-        && (strncmp("HTTP_", var->name, 5) == 0))
+            && (strlen(var->name) > 5)
+            && (strncmp("HTTP_", var->name, 5) == 0))
     {
         const char *oldname = var->name;
         var->name = apr_pstrdup(pool, "REQUEST_HEADERS");
@@ -313,7 +337,7 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
     if (var->is_counting) {
         if (var->metadata->type == VAR_SIMPLE) {
             *error_msg = apr_psprintf(engine->mp, "The & modificator does not apply to "
-                "non-collection variables.");
+                    "non-collection variables.");
             return NULL;
         }
     }
@@ -322,7 +346,7 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
     if (varparam == NULL) {
         if (var->metadata->argc_min > 0) {
             *error_msg = apr_psprintf(engine->mp, "Missing mandatory parameter for variable %s.",
-                name);
+                    name);
             return NULL;
         }
     } else { /* Parameter present */
@@ -330,11 +354,12 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
         /* Do we allow a parameter? */
         if (var->metadata->argc_max == 0) {
             *error_msg = apr_psprintf(engine->mp, "Variable %s does not support parameters.",
-                name);
+                    name);
             return NULL;
         }
 
-        var->param = varparam;
+        var->param = (char *)varparam;
+
     }
 
     return var;
@@ -347,7 +372,7 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
  *       per-request
  */
 msre_var *msre_create_var(msre_ruleset *ruleset, const char *name, const char *param,
-    modsec_rec *msr, char **error_msg)
+        modsec_rec *msr, char **error_msg)
 {
     msre_var *var = msre_create_var_ex(ruleset->engine->mp, ruleset->engine, name, param, msr, error_msg);
     if (var == NULL) return NULL;

@@ -816,14 +816,25 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
         }
 
         return NULL;
-    }
-    else {
-        return apr_psprintf(engine->mp, "Invalid ctl name setting: %s", name);
-    }
+    } else
+        if  (strcasecmp(name, "ruleUpdateTargetById") == 0) {
+                char *parm = NULL;
+                char *savedptr = NULL;
+
+                parm = apr_strtok(value,";",&savedptr);
+
+                if(parm == NULL && savedptr == NULL)
+                    return apr_psprintf(engine->mp, "ruleUpdateTargetById must has at least id;append_value");
+
+                return NULL;
+        }
+        else {
+            return apr_psprintf(engine->mp, "Invalid ctl name setting: %s", name);
+        }
 }
 
 static apr_status_t msre_action_ctl_init(msre_engine *engine, msre_actionset *actionset,
-    msre_action *action)
+        msre_action *action)
 {
     /* Do nothing. */
     return 1;
@@ -855,7 +866,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
             msr->txcfg->is_enabled = MODSEC_DETECTION_ONLY;
             msr->usercfg->is_enabled = MODSEC_DETECTION_ONLY;
         }
-        
+
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Set ruleEngine to %s.", value);
         }
@@ -864,11 +875,11 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
     } else
     if (strcasecmp(name, "ruleRemoveById") == 0) {
         *(const char **)apr_array_push(msr->removed_rules) = (const char *)apr_pstrdup(msr->mp, value);
-        
+
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Removed rule %s.", value);
         }
-        
+
         return 1;
     } else
     if (strcasecmp(name, "requestBodyAccess") == 0) {
@@ -877,7 +888,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (pv == -1) return -1;
         msr->txcfg->reqbody_access = pv;
         msr->usercfg->reqbody_access = pv;
-        
+
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Set requestBodyAccess to %d.", pv);
         }
@@ -903,7 +914,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
     } else
     if (strcasecmp(name, "requestBodyProcessor") == 0) {
         msr->msc_reqbody_processor = value;
-        
+
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Set requestBodyProcessor to %s.", value);
         }
@@ -916,7 +927,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (pv == -1) return -1;
         msr->txcfg->resbody_access = pv;
         msr->usercfg->resbody_access = pv;
-        
+
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Set responseBodyAccess to %d.", pv);
         }
@@ -977,7 +988,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         /* Set the new value. */
         msr->txcfg->auditlog_parts = new_value;
         msr->usercfg->auditlog_parts = new_value;
-        
+
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Set auditLogParts to %s.", msr->txcfg->auditlog_parts);
         }
@@ -987,7 +998,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
     if (strcasecmp(name, "debugLogLevel") == 0) {
         msr->txcfg->debuglog_level = atoi(value);
         msr->usercfg->debuglog_level = atoi(value);
-        
+
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Set debugLogLevel to %d.", msr->txcfg->debuglog_level);
         }
@@ -1000,7 +1011,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         /* ENH Accept only in correct phase warn otherwise. */
         msr->txcfg->reqbody_limit = limit;
         msr->usercfg->reqbody_limit = limit;
-        
+
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Set requestBodyLimit to %ld.", limit);
         }
@@ -1013,10 +1024,28 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         /* ENH Accept only in correct phase warn otherwise. */
         msr->txcfg->of_limit = limit;
         msr->usercfg->of_limit = limit;
-        
+
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Set responseBodyLimit to %ld.", limit);
         }
+
+        return 1;
+    } else
+    if (strcasecmp(name, "ruleUpdateTargetById") == 0)  {
+        char *p1 = NULL, *p2 = NULL, *p3 = NULL;
+        char *savedptr = NULL;
+
+        p1 = apr_strtok(value,";",&savedptr);
+
+        p2 = apr_strtok(NULL,";",&savedptr);
+
+        p3 = apr_strtok(NULL,";",&savedptr);
+
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: ruleUpdateTargetById id=%s append=%s replace=%s", p1, p2, p3);
+        }
+
+        update_rule_target(NULL, NULL, rule->ruleset, p1, p2, p3);
 
         return 1;
     }
