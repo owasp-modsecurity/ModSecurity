@@ -76,7 +76,7 @@ static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
     return 0;
 }
 
-/* ipMatch */
+/* ipmatch */
 
 static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
@@ -105,14 +105,14 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     parse_regex = pcre_compile(PARSE_REGEX_IP, opts, &eb, &eo, NULL);
 
     if(parse_regex == NULL) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling ipMatch operator regex",
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling ipmatch operator regex",
                 erroffset, errptr);
         return 0;
     }
 
     parse_regex_study = pcre_study(parse_regex, 0, &eb);
     if(eb != NULL)  {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipMatch operator: pcre_study",
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_study",
                 erroffset, errptr);
         if(parse_regex != NULL) pcre_free(parse_regex);
         return 0;
@@ -135,7 +135,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
         ret = pcre_exec(parse_regex, parse_regex_study, str, strlen(str),
                 0, 0, ov, MAX_SUBSTRINGS);
         if (ret < 1) {
-            *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipMatch operator: pcre_exec",
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_exec",
                     erroffset, errptr);
             if(parse_regex != NULL) pcre_free(parse_regex);
             return 0;
@@ -146,7 +146,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
             res = pcre_get_substring((char *)str, ov, MAX_SUBSTRINGS,i + 1,
                     &str_ptr);
             if (res < 0) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipMatch operator: pcre_get_substring",
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_get_substring",
                         erroffset, errptr);
                 if(parse_regex != NULL) pcre_free(parse_regex);
                 return 0;
@@ -167,6 +167,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                 mask = strchr(str_ptr,'/');
 
                 if(mask == NULL)    {
+                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "IP %s",str_ptr);
 
                     if(ipv == 4)    {
                         if (!inet_aton(str_ptr,&addr)) {
@@ -179,29 +180,33 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                         network = ntohl(addr.s_addr) -1;
                         broadcast = ntohl(addr.s_addr) + 1;
                     } else if (ipv == 6)    {
-
-                        inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr));
+                        if (inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr)) != 1) {
+                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
+                                    erroffset, errptr);
+                            if(parse_regex != NULL) pcre_free(parse_regex);
+                            return 0;
+                        }
 
                         j = 0;
 
                         maskbits = 128;
 
                         while (maskbits >= 8) {
-                            mask6.sin6_addr.s6_addr[j++] = 0xff;
+                            mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0xff;
                             maskbits -= 8;
                         }
                         while (maskbits-- > 0) {
-                            mask6.sin6_addr.s6_addr[j] >>= 1;
-                            mask6.sin6_addr.s6_addr[j] |= 0x80;
+                            mask6.sin6_addr.__in6_u.__u6_addr8[j] >>= 1;
+                            mask6.sin6_addr.__in6_u.__u6_addr8[j] |= 0x80;
                         }
                         j++;
                         while (j < 16) {
-                            mask6.sin6_addr.s6_addr[j++] = 0;
+                            mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0;
                         }
 
 
                         for (j = 0; j < 4; j++)
-                            sa.sin6_addr.s6_addr32[j]  &= mask6.sin6_addr.s6_addr32[j];
+                            sa.sin6_addr.__in6_u.__u6_addr32[j]  &= mask6.sin6_addr.__in6_u.__u6_addr32[j];
 
                     }
 
@@ -210,6 +215,8 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                     maskbits = atoi(mask);
                     network = 0;
                     broadcast = 0;
+
+                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "MASK %d",maskbits);
 
                     if(ipv == 4)    {
                         if(maskbits >= 1 && maskbits <= 30) {
@@ -225,28 +232,33 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                         }
                     } else if (ipv == 6)    {
 
-                        inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr));
+                        if (inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr)) != 1) {
+                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
+                                    erroffset, errptr);
+                            if(parse_regex != NULL) pcre_free(parse_regex);
+                            return 0;
+                        }
 
                         j = 0;
 
                         if(maskbits >= 1 && maskbits <= 128)    {
 
                             while (maskbits >= 8) {
-                                mask6.sin6_addr.s6_addr[j++] = 0xff;
+                                mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0xff;
                                 maskbits -= 8;
                             }
                             while (maskbits-- > 0) {
-                                mask6.sin6_addr.s6_addr[j] >>= 1;
-                                mask6.sin6_addr.s6_addr[j] |= 0x80;
+                                mask6.sin6_addr.__in6_u.__u6_addr8[j] >>= 1;
+                                mask6.sin6_addr.__in6_u.__u6_addr8[j] |= 0x80;
                             }
                             j++;
                             while (j < 16) {
-                                mask6.sin6_addr.s6_addr[j++] = 0;
+                                mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0;
                             }
 
 
                             for (j = 0; j < 4; j++)
-                                sa.sin6_addr.s6_addr32[j]  &= mask6.sin6_addr.s6_addr32[j];
+                                sa.sin6_addr.__in6_u.__u6_addr32[j]  &= mask6.sin6_addr.__in6_u.__u6_addr32[j];
 
                         }
                     }
@@ -257,6 +269,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
         }
 
         if(rule->ip_op == NULL) {
+            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "AQUI %lu",network+1);
             rule->ip_op = apr_pcalloc(rule->ruleset->mp, sizeof(msre_ipmatch));
 
             if(rule->ip_op != NULL) {
@@ -285,6 +298,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                 return 0;
             }
         } else  {
+            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "AQUI 2 %lu",network+1);
             ipdata = apr_pcalloc(rule->ruleset->mp, sizeof(msre_ipmatch));
 
             if(ipdata != NULL)  {
@@ -332,12 +346,11 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
     struct in_addr addr;
     struct sockaddr_in6 sa;
     unsigned long ipaddr;
-    int i, ipv = 0;
-    const char *type = NULL;
+    int i;
     msre_ipmatch *ipdata = rule->ip_op;
 
     if(var == NULL || (strcmp(var->name,"REMOTE_ADDR") != 0 ))  {
-        msr_log(msr,9,"Operator ipMatch only works with REMOTE_ADDR variable");
+        msr_log(msr,9,"Operator ipmatch only works with REMOTE_ADDR variable");
         return -1;
     }
 
@@ -346,16 +359,16 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
         return -1;
     }
 
-    type = strchr(var->value,':');
-    if(type != NULL)
-        ipv = 6;
+    if (!inet_aton(var->value,&addr)) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
+                erroffset, errptr);
+        return -1;
+    }
 
-    type = strchr(var->value,'.');
-    if(type != NULL)
-        ipv = 4;
+    ipaddr = ntohl(addr.s_addr) -1;
 
     for (; ipdata != NULL; ipdata = ipdata->next) {
-        if((ipdata->type == 4) && (ipv == 4))   {
+        if(ipdata->type == 4)   {
 
             if (!inet_aton(var->value,&addr)) {
                 *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
@@ -368,15 +381,19 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
             if( ipaddr >= ipdata->start && ipaddr <= ipdata->end)
                 return 1;
 
-        } else if ((ipdata->type == 6) && (ipv == 6))   {
-            inet_pton(AF_INET6, var->value, &(sa.sin6_addr));
+        } else if (ipdata->type == 6)   {
+            if (inet_pton(AF_INET6, var->value, &(sa.sin6_addr)) != 1)  {
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip6 address",
+                        erroffset, errptr);
+                return -1;
+            }
 
             if(ipdata->netaddr != NULL && ipdata->maskaddr != NULL) {
 
                 for (i = 0; i < 16; i++)
                 {
-                    if (((sa.sin6_addr.s6_addr[i] ^ ipdata->netaddr->sin6_addr.s6_addr[i]) &
-                                ipdata->netaddr->sin6_addr.s6_addr[i]) == 0)
+                    if (((sa.sin6_addr.__in6_u.__u6_addr8[i] ^ ipdata->netaddr->sin6_addr.__in6_u.__u6_addr8[i]) &
+                                ipdata->netaddr->sin6_addr.__in6_u.__u6_addr8[i]) == 0)
                         return 1;
                 }
             }
@@ -2791,9 +2808,9 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_nomatch_execute
     );
 
-    /* ipMatch */
+    /* ipmatch */
     msre_engine_op_register(engine,
-        "ipMatch",
+        "ipmatch",
         msre_op_ipmatch_param_init,
         msre_op_ipmatch_execute
     );
