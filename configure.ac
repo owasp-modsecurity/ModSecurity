@@ -75,12 +75,12 @@ AC_CANONICAL_HOST
 CANONICAL_HOST=$host
 
 #AH_TEMPLATE([AIX],     [Define if the operating system is AIX])
-#AH_TEMPLATE([LINUX],   [Define if the operating system is LINUX])
+AH_TEMPLATE([LINUX],   [Define if the operating system is LINUX])
 #AH_TEMPLATE([IRIX],    [Define if the operating system is IRIX])
-#AH_TEMPLATE([SOLARIS], [Define if the operating system is SOLARIS])
+AH_TEMPLATE([SOLARIS], [Define if the operating system is SOLARIS])
 #AH_TEMPLATE([HPUX],    [Define if the operating system is HPUX])
 AH_TEMPLATE([MACOSX],  [Define if the operating system is Macintosh OSX])
-#AH_TEMPLATE([FREEBSD], [Define if the operating system is FREEBSD])
+AH_TEMPLATE([FREEBSD], [Define if the operating system is FREEBSD])
 #AH_TEMPLATE([TRU64],   [Define if the operating system is TRU64])
 
 
@@ -89,6 +89,26 @@ case $host in
     echo "Checking plataform... Identified as Macintosh OS X"
     macos=true
     ;;
+  *-*-linux*)
+    echo "Checking plataform... Identified as Linux"
+    linuxos=true
+    ;;
+  *-*-solaris*)
+    echo "Checking plataform... Identified as Solaris"
+    solarisos=true
+    ;;
+  *-*-freebsd*)
+    echo "Checking plataform... Identified as FreeBSD"
+    freebsdos=true
+    ;;
+  *-*-netbsd*)
+    echo "Checking plataform... Identified as FreeBSD"
+    netbsdos=true
+    ;;
+  *-*-openbsd*)
+    echo "Checking plataform... Identified as FreeBSD"
+    openbsdos=true
+    ;;
        *)
     echo "Unknown CANONICAL_HOST $host"
     exit
@@ -96,6 +116,11 @@ case $host in
 esac
 
 AM_CONDITIONAL([MACOSX], [test x$macos = xtrue])
+AM_CONDITIONAL([LINUX], [test x$linuxos = xtrue])
+AM_CONDITIONAL([SOLARIS], [test x$solarisos = xtrue])
+AM_CONDITIONAL([FREEBSD], [test x$freebsdos = xtrue])
+AM_CONDITIONAL([OPENBSD], [test x$openbsdos = xtrue])
+AM_CONDITIONAL([NETBSD], [test x$netbsdos = xtrue])
 
 #Subdirs
 TOPLEVEL_SUBDIRS="tools"
