@@ -78,6 +78,7 @@ static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
 
 /* ipmatch */
 
+#if !defined(WIN32) || !defined(WINNT)
 static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
@@ -469,6 +470,7 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
 
     return 0;
 }
+#endif /* WIN32 | WINNT */
 
 /* rsub */
 
@@ -2874,12 +2876,14 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_nomatch_execute
     );
 
+#if !defined(WIN32) || !defined(WINNT)
     /* ipmatch */
     msre_engine_op_register(engine,
         "ipmatch",
         msre_op_ipmatch_param_init,
         msre_op_ipmatch_execute
     );
+#endif /* WIN32 | WINNT */
 
     /* rsub */
     msre_engine_op_register(engine,
