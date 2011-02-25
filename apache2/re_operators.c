@@ -192,21 +192,50 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                         maskbits = 128;
 
                         while (maskbits >= 8) {
+#ifdef LINUX
                             mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0xff;
+#elif SOLARIS2
+                            mask6.sin6_addr.u6_addr.u6_addr8[j++] = 0xff;
+#else
+                            mask6.sin6_addr.__u6_addr.__u6_addr8[j++] = 0xff;
+#endif
                             maskbits -= 8;
                         }
+
                         while (maskbits-- > 0) {
+#ifdef LINUX
                             mask6.sin6_addr.__in6_u.__u6_addr8[j] >>= 1;
                             mask6.sin6_addr.__in6_u.__u6_addr8[j] |= 0x80;
+#elif SOLARIS2
+                            mask6.sin6_addr.u_addr.u6_addr8[j] >>= 1;
+                            mask6.sin6_addr.u_addr.u6_addr8[j] |= 0x80;
+#else
+                            mask6.sin6_addr.__u6_addr.__u6_addr8[j] >>= 1;
+                            mask6.sin6_addr.__u6_addr.__u6_addr8[j] |= 0x80;
+#endif
                         }
+
                         j++;
-                        while (j < 16) {
+
+                       while (j < 16) {
+#ifdef LINUX
                             mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0;
+#elif SOLARIS2
+                            mask6.sin6_addr.u_addr.u6_addr8[j++] = 0;
+#else
+                            mask6.sin6_addr.__u6_addr.__u6_addr8[j++] = 0;
+#endif
                         }
 
-
-                        for (j = 0; j < 4; j++)
+                        for (j = 0; j < 4; j++) {
+#ifdef LINUX
                             sa.sin6_addr.__in6_u.__u6_addr32[j]  &= mask6.sin6_addr.__in6_u.__u6_addr32[j];
+#elif SOLARIS2
+                            sa.sin6_addr.u6_addr.u6_addr32[j]  &= mask6.sin6_addr.u6_addr.u6_addr32[j];
+#else
+                            sa.sin6_addr.__u6_addr.__u6_addr32[j]  &= mask6.sin6_addr.__u6_addr.__u6_addr32[j];
+#endif
+                        }
 
                     }
 
@@ -244,21 +273,50 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                         if(maskbits >= 1 && maskbits <= 128)    {
 
                             while (maskbits >= 8) {
+#ifdef LINUX
                                 mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0xff;
+#elif SOLARIS2
+                                mask6.sin6_addr.u6_addr.u6_addr8[j++] = 0xff;
+#else
+                                mask6.sin6_addr.__u6_addr.__u6_addr8[j++] = 0xff;
+#endif
                                 maskbits -= 8;
                             }
                             while (maskbits-- > 0) {
+#ifdef LINUX
                                 mask6.sin6_addr.__in6_u.__u6_addr8[j] >>= 1;
                                 mask6.sin6_addr.__in6_u.__u6_addr8[j] |= 0x80;
+#elif SOLARIS2
+                                mask6.sin6_addr.u6_addr.u6_addr8[j] >>= 1;
+                                mask6.sin6_addr.u6_addr.u6_addr8[j] |= 0x80;
+#else
+                                mask6.sin6_addr.__u6_addr.__u6_addr8[j] >>= 1;
+                                mask6.sin6_addr.__u6_addr.__u6_addr8[j] |= 0x80;
+#endif
                             }
+
                             j++;
-                            while (j < 16) {
+
+                           while (j < 16) {
+#ifdef LINUX
                                 mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0;
+#elif SOLARIS2
+                                mask6.sin6_addr.u6_addr.u6_addr8[j++] = 0;
+#else
+                                mask6.sin6_addr.__u6_addr.__u6_addr8[j++] = 0;
+#endif
                             }
 
 
-                            for (j = 0; j < 4; j++)
+                            for (j = 0; j < 4; j++) {
+#ifdef LINUX
                                 sa.sin6_addr.__in6_u.__u6_addr32[j]  &= mask6.sin6_addr.__in6_u.__u6_addr32[j];
+#elif SOLARIS2
+                                sa.sin6_addr.u6_addr.u6_addr32[j]  &= mask6.sin6_addr.u6_addr.u6_addr32[j];
+#else
+                                sa.sin6_addr.__u6_addr.__u6_addr32[j]  &= mask6.sin6_addr.__u6_addr.__u6_addr32[j];
+#endif
+                            }
 
                         }
                     }
@@ -392,8 +450,16 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
 
                 for (i = 0; i < 16; i++)
                 {
+#ifdef LINUX
                     if (((sa.sin6_addr.__in6_u.__u6_addr8[i] ^ ipdata->netaddr->sin6_addr.__in6_u.__u6_addr8[i]) &
                                 ipdata->netaddr->sin6_addr.__in6_u.__u6_addr8[i]) == 0)
+#elif SOLARIS2
+                    if (((sa.sin6_addr.u6_addr.u6_addr8[i] ^ ipdata->netaddr->sin6_addr.u6_addr.u6_addr8[i]) &
+                                ipdata->netaddr->sin6_addr.__u6_addr.__u6_addr8[i]) == 0)
+#else
+                    if (((sa.sin6_addr.__u6_addr.__u6_addr8[i] ^ ipdata->netaddr->sin6_addr.__u6_addr.__u6_addr8[i]) &
+                                ipdata->netaddr->sin6_addr.__u6_addr.__u6_addr8[i]) == 0)
+#endif
                         return 1;
                 }
             }
