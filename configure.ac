@@ -69,6 +69,35 @@ AC_SUBST(MSC_REGRESSION_DOCROOT_DIR)
 
 ### Configure Options
 
+#OS type
+
+AC_CANONICAL_HOST
+CANONICAL_HOST=$host
+
+#AH_TEMPLATE([AIX],     [Define if the operating system is AIX])
+#AH_TEMPLATE([LINUX],   [Define if the operating system is LINUX])
+#AH_TEMPLATE([IRIX],    [Define if the operating system is IRIX])
+#AH_TEMPLATE([SOLARIS], [Define if the operating system is SOLARIS])
+#AH_TEMPLATE([HPUX],    [Define if the operating system is HPUX])
+AH_TEMPLATE([MACOSX],  [Define if the operating system is Macintosh OSX])
+#AH_TEMPLATE([FREEBSD], [Define if the operating system is FREEBSD])
+#AH_TEMPLATE([TRU64],   [Define if the operating system is TRU64])
+
+
+case $host in
+  *-*-darwin*)
+    echo "Checking plataform... Identified as Macintosh OS X"
+    macos=true
+    ;;
+       *)
+    echo "Unknown CANONICAL_HOST $host"
+    exit
+    ;;
+esac
+
+AM_CONDITIONAL([MACOSX], [test x$macos = xtrue])
+
+#Subdirs
 TOPLEVEL_SUBDIRS="tools"
 
 # Apache2 Module
