@@ -1727,11 +1727,11 @@ static const char *cmd_resquest_body_limit_action(cmd_parms *cmd, void *_dcfg,
         return NULL;
     }
 
-    if (strcasecmp(p1, "On") == 0) dcfg->if_limit_action = RESPONSE_BODY_LIMIT_ACTION_PARTIAL;
+    if (strcasecmp(p1, "ProcessPartial") == 0) dcfg->if_limit_action = RESPONSE_BODY_LIMIT_ACTION_PARTIAL;
     else
-    if (strcasecmp(p1, "Off") == 0) dcfg->if_limit_action = REQUEST_BODY_LIMIT_ACTION_REJECT;
+    if (strcasecmp(p1, "Reject") == 0) dcfg->if_limit_action = REQUEST_BODY_LIMIT_ACTION_REJECT;
     else
-    return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRequestBodyProcessPartial: %s", p1);
+    return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRequestBodyLimitAction: %s", p1);
 
     return NULL;
 }
@@ -2461,7 +2461,7 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_TAKE1 (
-        "SecRequestBodyProcessPartial",
+        "SecRequestBodyLimitAction",
         cmd_resquest_body_limit_action,
         NULL,
         CMD_SCOPE_ANY,
