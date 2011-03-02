@@ -775,6 +775,13 @@ static int hook_request_late(request_rec *r) {
                     return HTTP_REQUEST_ENTITY_TOO_LARGE;
                 }
                 break;
+            case -6 : /* EOF when reading request body. */
+                if (my_error_msg != NULL) {
+                    msr_log(msr, 4, "%s", my_error_msg);
+                }
+                r->connection->keepalive = AP_CONN_CLOSE;
+                return HTTP_BAD_REQUEST;
+                break;
             default :
                 /* allow through */
                 break;
