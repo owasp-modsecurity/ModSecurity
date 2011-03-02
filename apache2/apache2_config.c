@@ -1498,7 +1498,7 @@ static const char *cmd_guardian_log(cmd_parms *cmd, void *_dcfg,
 }
 
 /*
-* \brief Add StreamInBodyInspection configuration option
+* \brief Add SecStreamInBodyInspection configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
@@ -1517,7 +1517,7 @@ static const char *cmd_stream_inbody_inspection(cmd_parms *cmd, void *_dcfg, int
 
 
 /*
-* \brief Add StreamOutBodyInspection configuration option
+* \brief Add SecStreamOutBodyInspection configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
@@ -2276,7 +2276,7 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_FLAG (
-        "StreamOutBodyInspection",
+        "SecStreamOutBodyInspection",
         cmd_stream_outbody_inspection,
         NULL,
         CMD_SCOPE_ANY,
@@ -2284,7 +2284,7 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_FLAG (
-        "StreamInBodyInspection",
+        "SecStreamInBodyInspection",
         cmd_stream_inbody_inspection,
         NULL,
         CMD_SCOPE_ANY,
