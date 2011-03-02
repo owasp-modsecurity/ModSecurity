@@ -168,7 +168,6 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                 mask = strchr(str_ptr,'/');
 
                 if(mask == NULL)    {
-                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "IP %s",str_ptr);
 
                     if(ipv == 4)    {
                         if (!inet_aton(str_ptr,&addr)) {
@@ -245,8 +244,6 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                     maskbits = atoi(mask);
                     network = 0;
                     broadcast = 0;
-
-                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "MASK %d",maskbits);
 
                     if(ipv == 4)    {
                         if(maskbits >= 1 && maskbits <= 30) {
@@ -328,7 +325,6 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
         }
 
         if(rule->ip_op == NULL) {
-            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "AQUI %lu",network+1);
             rule->ip_op = apr_pcalloc(rule->ruleset->mp, sizeof(msre_ipmatch));
 
             if(rule->ip_op != NULL) {
@@ -357,7 +353,6 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                 return 0;
             }
         } else  {
-            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "AQUI 2 %lu",network+1);
             ipdata = apr_pcalloc(rule->ruleset->mp, sizeof(msre_ipmatch));
 
             if(ipdata != NULL)  {
@@ -408,8 +403,8 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
     int i;
     msre_ipmatch *ipdata = rule->ip_op;
 
-    if(var == NULL || (strcmp(var->name,"REMOTE_ADDR") != 0 ))  {
-        msr_log(msr,9,"Operator ipmatch only works with REMOTE_ADDR variable");
+    if(var == NULL || (strcmp(var->name,"REMOTE_ADDR") != 0 ) || (strcmp(var->name,"SERVER_ADDR") != 0 ))  {
+        msr_log(msr,9,"Operator ipmatch only works with REMOTE_ADDR and SERVER_ADDR variable");
         return -1;
     }
 
