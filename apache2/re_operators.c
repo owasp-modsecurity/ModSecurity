@@ -1810,15 +1810,265 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
 }
 
 /*
-* \brief Check for a valid SSN
+ * \brief Check for a valid CPF
+ *
+ * \param cpfnumber Pointer to cpf
+ * \param len cpf length
+ * \param rule Pointer to the rule
+ *
+ * \retval 0 On Invalid CPF
+ * \retval 1 On Valid CPF
+ */
+static int cpf_verify(const char *cpfnumber, int len, msre_rule *rule) {
+
+    int factor, part_1, part_2, var_len = len;
+    int sum = 0, i = 0, cpf_len = 11;
+    int cpf[11];
+    char s_cpf[11];
+    char bad_cpf[11][11] = { "00000000000",
+        "01234567890",
+        "11111111111",
+        "22222222222",
+        "33333333333",
+        "44444444444",
+        "55555555555",
+        "66666666666",
+        "77777777777",
+        "88888888888",
+        "99999999999"};
+
+    while((*cpfnumber != '\0') && ( var_len >= 0))  {
+
+        if(*cpfnumber != '-' || *cpfnumber != '.') {
+            if(i < cpf_len && isdigit(*cpfnumber))  {
+                s_cpf[i] = *cpfnumber;
+                cpf[i] = convert_to_int(*cpfnumber);
+                i++;
+            }
+        }
+        cpfnumber++;
+        var_len--;
+    }
+
+
+    if (strlen(s_cpf) != cpf_len || i != cpf_len-1)
+        return 0;
+    else {
+        for(i = 0; i< cpf_len; i++)   {
+            if(strncmp(s_cpf,bad_cpf[i],cpf_len) == 0)    {
+                return 0;
+            }
+        }
+    }
+
+    part_1 = convert_to_int(s_cpf[cpf_len-2]);
+    part_2 = convert_to_int(s_cpf[cpf_len-1]);
+
+    int c = cpf_len;
+
+    for(i = 0; i < 9; i++) {
+        sum += (cpf[i] * --c);
+    }
+
+    factor = (sum % cpf_len);
+
+    if(factor < 2) {
+        cpf[9] = 0;
+    } else {
+        cpf[9] = cpf_len-factor;
+    }
+
+    sum = 0;
+    c = cpf_len;
+
+    for(i = 0;i < 10; i++)
+        sum += (cpf[i] * c--);
+
+    factor = (sum % cpf_len);
+
+    if(factor < 2) {
+        cpf[10] = 0;
+    } else {
+        cpf[10] = cpf_len-factor;
+    }
+
+    if(part_1 == cpf[9] && part_2 == cpf[10])
+        return 1;
+
+    return 0;
+}
+
+/*
+* \brief Init function to CPF operator
 *
-* \param ssnumber Pointer to ssn
-* \param len ssn length
 * \param rule Pointer to the rule
+* \param error_msg Pointer to error msg
 *
-* \retval 0 On Invalid SSN
-* \retval 1 On Valid SSN
+* \retval 0 On Failure
+* \retval 1 On Success
 */
+static int msre_op_verifyCPF_init(msre_rule *rule, char **error_msg) {
+    const char *errptr = NULL;
+    int erroffset;
+    msc_regex_t *regex;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    /* Compile rule->op_param */
+    regex = msc_pregcomp_ex(rule->ruleset->mp, rule->op_param, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+    if (regex == NULL) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
+            erroffset, errptr);
+        return 0;
+    }
+
+    rule->op_param_data = regex;
+
+    return 1; /* OK */
+}
+
+/*
+* \brief Execution function to CPF operator
+*
+* \param msr Pointer internal modsec request structure
+* \param rule Pointer to the rule
+* \param var Pointer to variable structure
+* \param error_msg Pointer to error msg
+*
+* \retval -1 On Failure
+* \retval 1 On Match
+* \retval 0 On No Match
+*/
+static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    msc_regex_t *regex = (msc_regex_t *)rule->op_param_data;
+    const char *target;
+    unsigned int target_length;
+    char *my_error_msg = NULL;
+    int ovector[33];
+    int rc;
+    int is_cpf = 0;
+    int offset;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (regex == NULL) {
+        *error_msg = "Internal Error: regex data is null.";
+        return -1;
+    }
+
+    memset(ovector, 0, sizeof(ovector));
+
+    /* If the given target is null run against an empty
+     * string. This is a behaviour consistent with previous
+     * releases.
+     */
+    if (var->value == NULL) {
+        target = "";
+        target_length = 0;
+    } else {
+        target = var->value;
+        target_length = var->value_len;
+    }
+
+    for (offset = 0; ((unsigned int)offset < target_length) && (is_cpf == 0); offset++) {
+        if (msr->txcfg->debuglog_level >= 9) {
+            if (offset > 0) {
+                msr_log(msr, 9, "Continuing CPF# search at target offset %d.", offset);
+            }
+        }
+
+        rc = msc_regexec_ex(regex, target, target_length, offset, PCRE_NOTEMPTY, ovector, 30, &my_error_msg);
+
+        /* If there was no match, then we are done. */
+        if (rc == PCRE_ERROR_NOMATCH) {
+            break;
+        }
+
+        if (rc < -1) {
+            *error_msg = apr_psprintf(msr->mp, "CPF# regex execution failed: %s", my_error_msg);
+            return -1;
+        }
+
+        /* Verify a match. */
+        if (rc > 0) {
+            const char *match = target + ovector[0];
+            int length = ovector[1] - ovector[0];
+            int i = 0;
+
+            offset = ovector[2*i];
+
+            /* Check CPF using the match string */
+            is_cpf = cpf_verify(match, length, rule);
+
+            /* Not a CPF number, then try another match where we left off. */
+            if (!is_cpf) {
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "CPF# check failed at target offset %d: \"%.*s\"", offset, length, match);
+                }
+
+                continue;
+            }
+
+            /* We have a potential CPF number and need to set any captures
+             * and we are done.
+             */
+
+            if (apr_table_get(rule->actionset->actions, "capture")) {
+                for(; i < rc; i++) {
+                    msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+                    if (s == NULL) return -1;
+                    s->name = apr_psprintf(msr->mp, "%d", i);
+                    s->name_len = strlen(s->name);
+                    s->value = apr_pstrmemdup(msr->mp, match, length);
+                    s->value_len = length;
+                    if ((s->name == NULL)||(s->value == NULL)) return -1;
+
+                    apr_table_setn(msr->tx_vars, s->name, (void *)s);
+
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
+                            log_escape_nq_ex(msr->mp, s->value, s->value_len));
+                    }
+                }
+            }
+
+            /* Unset the remaining TX vars (from previous invocations). */
+            for(; i <= 9; i++) {
+                char buf[24];
+                apr_snprintf(buf, sizeof(buf), "%i", i);
+                apr_table_unset(msr->tx_vars, buf);
+            }
+
+            break;
+        }
+    }
+
+    if (is_cpf) {
+        /* Match. */
+
+        /* This message will be logged. */
+        *error_msg = apr_psprintf(msr->mp, "CPF# match \"%s\" at %s. [offset \"%d\"]",
+            regex->pattern, var->name, offset);
+
+        return 1;
+    }
+
+    /* No match. */
+    return 0;
+}
+
+/*
+ * \brief Check for a valid SSN
+ *
+ * \param ssnumber Pointer to ssn
+ * \param len ssn length
+ * \param rule Pointer to the rule
+ *
+ * \retval 0 On Invalid SSN
+ * \retval 1 On Valid SSN
+ */
 static int ssn_verify(const char *ssnumber, int len, msre_rule *rule) {
     int i;
     int num[9];
@@ -2983,6 +3233,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "verifyCC",
         msre_op_verifyCC_init,
         msre_op_verifyCC_execute
+    );
+
+    /* verifyCPF */
+    msre_engine_op_register(engine,
+        "verifyCPF",
+        msre_op_verifyCPF_init,
+        msre_op_verifyCPF_execute
     );
 
     /* verifySSN */
