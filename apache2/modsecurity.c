@@ -24,6 +24,7 @@
 #include "msc_parsers.h"
 #include "msc_util.h"
 #include "msc_xml.h"
+#include "apr_version.h"
 
 /**
  * Format an alert message.
@@ -124,26 +125,34 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
         return -1;
     }
 
-    #ifdef __SET_MUTEX_PERMS
+#ifdef __SET_MUTEX_PERMS
+#if APR_MAJOR_VERSION > 1
+    rc = ap_unixd_set_global_mutex_perms(msce->auditlog_lock);
+#else
     rc = unixd_set_global_mutex_perms(msce->auditlog_lock);
+#endif
     if (rc != APR_SUCCESS) {
         // ap_log_error(APLOG_MARK, APLOG_ERR, rc, s, "mod_security: Could not set permissions on modsec_auditlog_lock; check User and Group directives");
         // return HTTP_INTERNAL_SERVER_ERROR;
         return -1;
     }
-    #endif
+#endif /* SET_MUTEX_PERMS */
 
     rc = apr_global_mutex_create(&msce->geo_lock, NULL, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {
         return -1;
     }
 
-    #ifdef __SET_MUTEX_PERMS
+#ifdef __SET_MUTEX_PERMS
+#if APR_MAJOR_VERSION > 1
+    rc = ap_unixd_set_global_mutex_perms(msce->geo_lock);
+#else
     rc = unixd_set_global_mutex_perms(msce->geo_lock);
+#endif
     if (rc != APR_SUCCESS) {
         return -1;
     }
-    #endif
+#endif /* SET_MUTEX_PERMS */
 
 
     return 1;

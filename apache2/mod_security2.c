@@ -34,6 +34,8 @@
 #include "ap_mpm.h"
 #include "scoreboard.h"
 
+#include "apr_version.h"
+
 /* ModSecurity structure */
 
 msc_engine DSOLOCAL *modsecurity = NULL;
@@ -829,8 +831,13 @@ static int hook_request_late(request_rec *r) {
 /**
  * Invoked every time Apache has something to write to the error log.
  */
+#if APR_MAJOR_VERSION > 1
+static void hook_error_log(const char *file, int line, int module_index, int level, apr_status_t status,
+        const server_rec *s, const request_rec *r, apr_pool_t *mp, const char *fmt)
+#else
 static void hook_error_log(const char *file, int line, int level, apr_status_t status,
-    const server_rec *s, const request_rec *r, apr_pool_t *mp, const char *fmt)
+        const server_rec *s, const request_rec *r, apr_pool_t *mp, const char *fmt)
+#endif
 {
     modsec_rec *msr = NULL;
     error_message *em = NULL;
@@ -1150,6 +1157,9 @@ static int hook_connection_early(conn_rec *conn)
     int i, j;
     unsigned long int ip_count = 0;
     worker_score *ws_record = NULL;
+#if APR_MAJOR_VERSION > 1
+    ap_sb_handle_t *sbh = NULL;
+#endif
 
     if(sb != NULL && conn_read_state_limit > 0)   {
 
@@ -1161,7 +1171,16 @@ static int hook_connection_early(conn_rec *conn)
         for (i = 0; i < server_limit; ++i) {
             for (j = 0; j < thread_limit; ++j) {
 
+#if APR_MAJOR_VERSION > 1
+                sbh = conn->sbh;
+                if (sbh == NULL)        {
+                    return DECLINED;
+                }
+
+                ws_record = ap_get_scoreboard_worker(sbh);
+#else
                 ws_record = ap_get_scoreboard_worker(i, j);
+#endif
 
                 if(ws_record == NULL)
                     return DECLINED;
@@ -1194,9 +1213,9 @@ static int hook_connection_early(conn_rec *conn)
  * register new variables.
  */
 static void modsec_register_variable(const char *name, unsigned int type,
-                                     unsigned int argc_min, unsigned int argc_max,
-                                     void *fn_validate, void *fn_generate,
-                                     unsigned int is_cacheable, unsigned int availability) {
+        unsigned int argc_min, unsigned int argc_max,
+        void *fn_validate, void *fn_generate,
+        unsigned int is_cacheable, unsigned int availability) {
     if (modsecurity != NULL) {
         msre_engine_variable_register(modsecurity->msre, name, type, argc_min, argc_max, (fn_var_validate_t)fn_validate, (fn_var_generate_t)fn_generate, is_cacheable, availability);
     }
@@ -1210,9 +1229,9 @@ static void modsec_register_variable(const char *name, unsigned int type,
  * register new request body processors.
  */
 static void modsec_register_reqbody_processor(const char *name,
-                                              void *fn_init,
-                                              void *fn_process,
-                                              void *fn_complete)
+        void *fn_init,
+        void *fn_process,
+        void *fn_complete)
 {
     if (modsecurity != NULL) {
 
