@@ -626,7 +626,7 @@ void sec_audit_logger(modsec_rec *msr) {
          * the folder is there.
          */
         rc = apr_dir_make_recursive(entry_basename, msr->txcfg->auditlog_dirperms, msr->mp);
-        if (rc != APR_SUCCESS) {
+        if ((rc != APR_SUCCESS) && (rc != APR_EEXIST)) {
             msr_log(msr, 1, "Audit log: Failed to create subdirectories: %s (%s)",
                 entry_basename, get_apr_error(msr->mp, rc));
             return;
