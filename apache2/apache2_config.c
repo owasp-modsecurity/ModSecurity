@@ -2367,11 +2367,11 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_TAKE1 (
-        "SecGsbMalLookupDB",
+        "SecGsbLookupDB",
         cmd_gsb_mal_lookup_db,
         NULL,
         RSRC_CONF,
-        "database google safe browsing (malware)."
+        "database google safe browsing"
     ),
 
     AP_INIT_TAKE1 (
