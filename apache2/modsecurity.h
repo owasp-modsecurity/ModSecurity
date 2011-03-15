@@ -41,6 +41,7 @@ typedef struct msc_parm msc_parm;
 #include "msc_util.h"
 #include "msc_xml.h"
 #include "msc_geo.h"
+#include "msc_gsb.h"
 #include "re.h"
 
 #include "ap_config.h"
@@ -486,6 +487,9 @@ struct directory_config {
 
     /* Geo Lookup */
     geo_db              *geo;
+
+    /* Gsb Lookup */
+    gsb_db              *gsb;
 
     /* Cache */
     int                  cache_trans;

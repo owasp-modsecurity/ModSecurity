@@ -1,5 +1,8 @@
 /* modsecurity_config_auto.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define if the operating system is FREEBSD */
+#undef FREEBSD
+
 /* Define to 1 if you have the `atexit' function. */
 #undef HAVE_ATEXIT
 
@@ -79,9 +82,15 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define if the operating system is LINUX */
+#undef LINUX
+
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #undef LT_OBJDIR
+
+/* Define if the operating system is Macintosh OSX */
+#undef MACOSX
 
 /* Name of package */
 #undef PACKAGE
@@ -103,6 +112,9 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* Define if the operating system is SOLARIS */
+#undef SOLARIS
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

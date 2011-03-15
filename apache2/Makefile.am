@@ -11,7 +11,7 @@ mod_security2_la_SOURCES = mod_security2.c \
                            re_variables.c msc_logging.c msc_xml.c \
                            msc_multipart.c modsecurity.c msc_parsers.c \
                            msc_util.c msc_pcre.c persist_dbm.c msc_reqbody.c \
-                           msc_geo.c acmp.c msc_lua.c msc_release.c
+                           msc_geo.c msc_gsb.c acmp.c msc_lua.c msc_release.c
 
 mod_security2_la_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
                           @LIBXML2_CFLAGS@ @LUA_CFLAGS@

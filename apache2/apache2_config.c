@@ -111,6 +111,9 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     /* Geo Lookups */
     dcfg->geo = NOT_SET_P;
 
+    /* Gsb Lookups */
+    dcfg->gsb = NOT_SET_P;
+
     /* Cache */
     dcfg->cache_trans = NOT_SET;
     dcfg->cache_trans_incremental = NOT_SET;
@@ -458,6 +461,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->geo = (child->geo == NOT_SET_P
         ? parent->geo : child->geo);
 
+    /* Gsb Lookup */
+    merged->gsb = (child->gsb == NOT_SET_P
+        ? parent->gsb : child->gsb);
+
     /* Cache */
     merged->cache_trans = (child->cache_trans == NOT_SET
         ? parent->cache_trans : child->cache_trans);
@@ -558,6 +565,9 @@ void init_directory_config(directory_config *dcfg)
 
     /* Geo Lookup */
     if (dcfg->geo == NOT_SET_P) dcfg->geo = NULL;
+
+    /* Gsb Lookup */
+    if (dcfg->gsb == NOT_SET_P) dcfg->gsb = NULL;
 
     /* Cache */
     if (dcfg->cache_trans == NOT_SET) dcfg->cache_trans = MODSEC_CACHE_DISABLED;
@@ -2042,6 +2052,22 @@ static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
+/* Google safe browsing */
+
+static const char *cmd_gsb_mal_lookup_db(cmd_parms *cmd, void *_dcfg,
+                                     const char *p1)
+{
+    const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
+    char *error_msg;
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+
+    if (gsb_mal_init(dcfg, filename, &error_msg) <= 0) {
+        return error_msg;
+    }
+
+    return NULL;
+}
 
 /* -- Cache -- */
 
@@ -2331,13 +2357,21 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "default action list"
     ),
-    
+
     AP_INIT_FLAG (
         "SecDisableBackendCompression",
         cmd_disable_backend_compression,
         NULL,
         CMD_SCOPE_ANY,
         "When set to On, removes the compression headers from the backend requests."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecGsbMalLookupDB",
+        cmd_gsb_mal_lookup_db,
+        NULL,
+        RSRC_CONF,
+        "database google safe browsing (malware)."
     ),
 
     AP_INIT_TAKE1 (

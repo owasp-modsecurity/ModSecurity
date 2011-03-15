@@ -154,7 +154,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         }
     }
 
-    return APR_SUCCESS;
+    return ap_get_brigade(f->next, bb_out, mode, block, nbytes);
 }
 
 /**

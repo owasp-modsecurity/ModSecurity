@@ -1003,6 +1003,182 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     return rc;
 }
 
+/* gsbLookup */
+
+static int verify_gsb(gsb_db *gsb, msre_rule *rule, const char *match, unsigned int match_length) {
+    apr_md5_ctx_t ctx;
+    apr_status_t rc;
+    unsigned char digest[APR_MD5_DIGESTSIZE];
+    const char *hash = NULL;
+    const char *search = NULL;
+
+    memset(digest, 0, sizeof(digest));
+
+    apr_md5_init(&ctx);
+
+    if ((rc = apr_md5_update(&ctx, match, match_length)) != APR_SUCCESS)
+        return -1;
+
+    apr_md5_final(digest, &ctx);
+
+    hash = apr_psprintf(rule->ruleset->mp, "%s", bytes2hex(rule->ruleset->mp, digest, 16));
+
+    if ((hash != NULL) && (gsb->gsb_table != NULL))   {
+        search = apr_table_get(gsb->gsb_table, hash);
+
+        if (search != NULL)
+            return 1;
+    }
+
+    return 0;
+}
+
+static int msre_op_gsbLookup_param_init(msre_rule *rule, char **error_msg) {
+    const char *errptr = NULL;
+    int erroffset;
+    msc_regex_t *regex;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    /* Compile rule->op_param */
+    regex = msc_pregcomp_ex(rule->ruleset->mp, rule->op_param, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+
+    if (regex == NULL) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
+            erroffset, errptr);
+        return 0;
+    }
+
+    rule->op_param_data = regex;
+
+    return 1; /* OK */
+}
+
+static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    msc_regex_t *regex = (msc_regex_t *)rule->op_param_data;
+    char *my_error_msg = NULL;
+    int ovector[33];
+    int offset = 0;
+    gsb_db *gsb = msr->txcfg->gsb;
+    const char *match = NULL;
+    unsigned int match_length;
+    unsigned int canon_length;
+    unsigned int base_length;
+    int rv, i, ret;
+    char *data = NULL;
+    unsigned int size = var->value_len;
+    char *base = NULL, *canon = NULL, *savedptr = NULL;
+    char *str = NULL, *entire = NULL;
+
+    if(regex == NULL)    {
+        if (msr->txcfg->debuglog_level >= 8) {
+            msr_log(msr, 8, "GSB: regex is null");
+        }
+        return -1;
+    }
+
+    if(gsb == NULL)    {
+        if (msr->txcfg->debuglog_level >= 8) {
+            msr_log(msr, 8, "GSB: gsb is null");
+        }
+        return -1;
+    }
+
+    data = apr_pcalloc(msr->mp, var->value_len+1);
+
+    if(data == NULL)    {
+        if (msr->txcfg->debuglog_level >= 8) {
+            msr_log(msr, 8, "GSB: Fail to alloc memory for input data");
+        }
+        return -1;
+    }
+
+    memcpy(data,var->value,var->value_len);
+
+    while (offset < size && (rv = msc_regexec_ex(regex, data, size, offset, PCRE_NOTEMPTY, ovector, 30, &my_error_msg)) >= 0)
+    {
+        for(i = 0; i < rv; ++i)
+        {
+            match = apr_psprintf(rule->ruleset->mp, "%.*s", ovector[2*i+1] - ovector[2*i], data + ovector[2*i]);
+
+            if (match == NULL)  {
+
+                if (msr->txcfg->debuglog_level >= 8) {
+                    msr_log(msr, 8, "GSB: Fail to alloc memory for match string");
+                }
+
+                return -1;
+            }
+
+            match_length = strlen(match);
+
+            if((strstr(match,"http") == NULL) && (match_length > 0) && (strchr(match,'.')))    {
+
+                /* full url */
+                if (msr->txcfg->debuglog_level >= 4) {
+                    msr_log(msr, 4, "GSB: Successfully extracted url: %s", match);
+                }
+
+                ret = verify_gsb(gsb, rule, match, match_length);
+
+                if(ret > 0)
+                    return 1;
+
+                /* append / in the end of full url */
+                if ((match[match_length -1] != '/') && (strchr(match,'?') == NULL))    {
+
+                    canon = apr_psprintf(rule->ruleset->mp, "%s/", match);
+                    if (canon != NULL)  {
+
+                        if (msr->txcfg->debuglog_level >= 4) {
+                            msr_log(msr, 4, "GSB: Canonicalize url #1: %s", canon);
+                        }
+
+                        canon_length = strlen(canon);
+                        ret = verify_gsb(gsb, rule, canon, canon_length);
+
+                        if(ret > 0)
+                            return 1;
+                    }
+                }
+
+                str = apr_pstrdup(rule->ruleset->mp,match);
+
+                /* base url */
+                if (str != NULL)    {
+
+                    base = apr_strtok(str,"/",&savedptr);
+
+                    if (base != NULL && (strlen(match) != (strlen(base)+1)))   {
+
+                        canon = apr_psprintf(rule->ruleset->mp, "%s/", base);
+
+                        if (canon != NULL)  {
+
+                            if (msr->txcfg->debuglog_level >= 4) {
+                                msr_log(msr, 4, "GSB: Canonicalize url #2: %s", canon);
+                            }
+
+                            canon_length = strlen(canon);
+                            ret = verify_gsb(gsb, rule, canon, canon_length);
+
+                            if(ret > 0)
+                                return 1;
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+        offset = ovector[1];
+    }
+
+    return 0;
+}
+
 /* within */
 
 static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
@@ -3254,6 +3430,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "geoLookup",
         NULL,
         msre_op_geoLookup_execute
+    );
+
+    /* gsbLookup */
+    msre_engine_op_register(engine,
+        "gsbLookup",
+        msre_op_gsbLookup_param_init,
+        msre_op_gsbLookup_execute
     );
 
     /* rbl */
