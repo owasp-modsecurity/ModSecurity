@@ -1127,6 +1127,10 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                 if(ret > 0) {
                     set_match_to_tx(msr, capture, match);
+                    if (! *error_msg) {
+                        *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
+                                log_escape_nq(msr->mp, match));
+                    }
                     return 1;
                 }
 
@@ -1145,6 +1149,10 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                         if(ret > 0) {
                             set_match_to_tx(msr, capture, canon);
+                            if (! *error_msg) {
+                                *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
+                                        log_escape_nq(msr->mp, canon));
+                            }
                             return 1;
                         }
                     }
@@ -1172,6 +1180,10 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                             if(ret > 0) {
                                 set_match_to_tx(msr, capture, canon);
+                                if (! *error_msg) {
+                                    *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
+                                            log_escape_nq(msr->mp, canon));
+                                }
                                 return 1;
                             }
                         }
@@ -1985,7 +1997,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
 
         /* This message will be logged. */
         *error_msg = apr_psprintf(msr->mp, "CC# match \"%s\" at %s. [offset \"%d\"]",
-            regex->pattern, var->name, offset);
+                regex->pattern, var->name, offset);
 
         return 1;
     }
