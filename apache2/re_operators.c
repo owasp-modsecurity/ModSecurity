@@ -1005,6 +1005,37 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
 /* gsbLookup */
 
+static int set_gsb_to_tx(modsec_rec *msr, int capture, const char *match)  {
+
+    if (capture) {
+        int i;
+        msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+
+        if (s == NULL) return -1;
+
+        s->name = "0";
+        s->name_len = strlen(s->name);
+        s->value = apr_pstrdup(msr->mp, match);
+        if (s->value == NULL) return -1;
+        s->value_len = strlen(s->value);
+        apr_table_setn(msr->tx_vars, s->name, (void *)s);
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Added phrase match to TX.0: %s",
+                    log_escape_nq_ex(msr->mp, s->value, s->value_len));
+        }
+
+        /* Unset the remaining ones (from previous invocations). */
+        for(i = 1; i <= 9; i++) {
+            char buf[2];
+            apr_snprintf(buf, sizeof(buf), "%d", i);
+            apr_table_unset(msr->tx_vars, buf);
+        }
+    }
+
+    return 0;
+}
+
 static int verify_gsb(gsb_db *gsb, msre_rule *rule, const char *match, unsigned int match_length) {
     apr_md5_ctx_t ctx;
     apr_status_t rc;
@@ -1046,7 +1077,7 @@ static int msre_op_gsbLookup_param_init(msre_rule *rule, char **error_msg) {
 
     if (regex == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
-            erroffset, errptr);
+                erroffset, errptr);
         return 0;
     }
 
@@ -1070,6 +1101,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     unsigned int size = var->value_len;
     char *base = NULL, *canon = NULL, *savedptr = NULL;
     char *str = NULL, *entire = NULL;
+    int capture;
 
     if(regex == NULL)    {
         if (msr->txcfg->debuglog_level >= 8) {
@@ -1093,6 +1125,8 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
         }
         return -1;
     }
+
+    capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     memcpy(data,var->value,var->value_len);
 
@@ -1122,8 +1156,10 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                 ret = verify_gsb(gsb, rule, match, match_length);
 
-                if(ret > 0)
+                if(ret > 0) {
+                    set_gsb_to_tx(msr, capture, match);
                     return 1;
+                }
 
                 /* append / in the end of full url */
                 if ((match[match_length -1] != '/') && (strchr(match,'?') == NULL))    {
@@ -1138,8 +1174,10 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                         canon_length = strlen(canon);
                         ret = verify_gsb(gsb, rule, canon, canon_length);
 
-                        if(ret > 0)
+                        if(ret > 0) {
+                            set_gsb_to_tx(msr, capture, canon);
                             return 1;
+                        }
                     }
                 }
 
@@ -1163,8 +1201,10 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                             canon_length = strlen(canon);
                             ret = verify_gsb(gsb, rule, canon, canon_length);
 
-                            if(ret > 0)
+                            if(ret > 0) {
+                                set_gsb_to_tx(msr, capture, canon);
                                 return 1;
+                            }
                         }
 
                     }
@@ -1650,7 +1690,7 @@ static int msre_op_m_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, ch
     }
 
     *error_msg = apr_psprintf(msr->mp, "Pattern match \"%s\" at %s.",
-        log_escape(msr->mp, rule->op_param), var->name);
+            log_escape(msr->mp, rule->op_param), var->name);
 
     /* Match. */
     return 1;
@@ -1664,28 +1704,28 @@ static int msre_op_validateDTD_init(msre_rule *rule, char **error_msg) {
 }
 
 static int msre_op_validateDTD_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
-    char **error_msg)
+        char **error_msg)
 {
     xmlValidCtxtPtr cvp;
     xmlDtdPtr dtd;
 
     if ((msr->xml == NULL)||(msr->xml->doc == NULL)) {
         *error_msg = apr_psprintf(msr->mp,
-            "XML document tree could not be found for DTD validation.");
+                "XML document tree could not be found for DTD validation.");
         return -1;
     }
 
     if (msr->xml->well_formed != 1) {
         *error_msg = apr_psprintf(msr->mp,
-            "XML: DTD validation failed because content is not well formed.");
+                "XML: DTD validation failed because content is not well formed.");
         return 1;
     }
 
     /* Make sure there were no other generic processing errors */
     if (msr->msc_reqbody_error) {
         *error_msg = apr_psprintf(msr->mp,
-            "XML: DTD validation could not proceed due to previous"
-            " processing errors.");
+                "XML: DTD validation could not proceed due to previous"
+                " processing errors.");
         return 1;
     }
 
@@ -1734,7 +1774,7 @@ static int msre_op_validateSchema_init(msre_rule *rule, char **error_msg) {
 }
 
 static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
-    char **error_msg)
+        char **error_msg)
 {
     xmlSchemaParserCtxtPtr parserCtx;
     xmlSchemaValidCtxtPtr validCtx;
@@ -1743,28 +1783,28 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
 
     if ((msr->xml == NULL)||(msr->xml->doc == NULL)) {
         *error_msg = apr_psprintf(msr->mp,
-            "XML document tree could not be found for schema validation.");
+                "XML document tree could not be found for schema validation.");
         return -1;
     }
 
     if (msr->xml->well_formed != 1) {
         *error_msg = apr_psprintf(msr->mp,
-            "XML: Schema validation failed because content is not well formed.");
+                "XML: Schema validation failed because content is not well formed.");
         return 1;
     }
 
     /* Make sure there were no other generic processing errors */
     if (msr->msc_reqbody_error) {
         *error_msg = apr_psprintf(msr->mp,
-            "XML: Schema validation could not proceed due to previous"
-            " processing errors.");
+                "XML: Schema validation could not proceed due to previous"
+                " processing errors.");
         return 1;
     }
 
     parserCtx = xmlSchemaNewParserCtxt(rule->op_param); /* ENH support relative filenames */
     if (parserCtx == NULL) {
         *error_msg = apr_psprintf(msr->mp, "XML: Failed to load Schema from file: %s",
-            rule->op_param);
+                rule->op_param);
         return -1;
     }
 
@@ -1857,7 +1897,7 @@ static int msre_op_verifyCC_init(msre_rule *rule, char **error_msg) {
     regex = msc_pregcomp_ex(rule->ruleset->mp, rule->op_param, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
     if (regex == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
-            erroffset, errptr);
+                erroffset, errptr);
         return 0;
     }
 
@@ -1955,7 +1995,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
 
                     if (msr->txcfg->debuglog_level >= 9) {
                         msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
-                            log_escape_nq_ex(msr->mp, s->value, s->value_len));
+                                log_escape_nq_ex(msr->mp, s->value, s->value_len));
                     }
                 }
             }
