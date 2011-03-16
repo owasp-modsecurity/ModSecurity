@@ -174,6 +174,46 @@ int convert_to_int(const char c)
    return n;
 }
 
+/* \brief Set a match to tx.0
+*
+* \param msr
+* \param capture
+* \param match
+*
+* \retval 0 On Sucess|Fail
+*/
+int set_match_to_tx(modsec_rec *msr, int capture, const char *match)  {
+
+    if (capture) {
+        int i;
+        msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+
+        if (s == NULL) return -1;
+
+        s->name = "0";
+        s->name_len = strlen(s->name);
+        s->value = apr_pstrdup(msr->mp, match);
+        if (s->value == NULL) return -1;
+        s->value_len = strlen(s->value);
+        apr_table_setn(msr->tx_vars, s->name, (void *)s);
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "Added phrase match to TX.0: %s",
+                    log_escape_nq_ex(msr->mp, s->value, s->value_len));
+        }
+
+        /* Unset the remaining ones (from previous invocations). */
+        for(i = 1; i <= 9; i++) {
+            char buf[2];
+            apr_snprintf(buf, sizeof(buf), "%d", i);
+            apr_table_unset(msr->tx_vars, buf);
+        }
+    }
+
+    return 0;
+}
+
+
 /**
  * Parses a string that contains a name-value pair in the form "name=value".
  * IMP1 It does not check for whitespace between tokens.

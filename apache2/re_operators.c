@@ -1005,37 +1005,6 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
 /* gsbLookup */
 
-static int set_gsb_to_tx(modsec_rec *msr, int capture, const char *match)  {
-
-    if (capture) {
-        int i;
-        msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-
-        if (s == NULL) return -1;
-
-        s->name = "0";
-        s->name_len = strlen(s->name);
-        s->value = apr_pstrdup(msr->mp, match);
-        if (s->value == NULL) return -1;
-        s->value_len = strlen(s->value);
-        apr_table_setn(msr->tx_vars, s->name, (void *)s);
-
-        if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "Added phrase match to TX.0: %s",
-                    log_escape_nq_ex(msr->mp, s->value, s->value_len));
-        }
-
-        /* Unset the remaining ones (from previous invocations). */
-        for(i = 1; i <= 9; i++) {
-            char buf[2];
-            apr_snprintf(buf, sizeof(buf), "%d", i);
-            apr_table_unset(msr->tx_vars, buf);
-        }
-    }
-
-    return 0;
-}
-
 static int verify_gsb(gsb_db *gsb, msre_rule *rule, const char *match, unsigned int match_length) {
     apr_md5_ctx_t ctx;
     apr_status_t rc;
@@ -1157,7 +1126,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                 ret = verify_gsb(gsb, rule, match, match_length);
 
                 if(ret > 0) {
-                    set_gsb_to_tx(msr, capture, match);
+                    set_match_to_tx(msr, capture, match);
                     return 1;
                 }
 
@@ -1175,7 +1144,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                         ret = verify_gsb(gsb, rule, canon, canon_length);
 
                         if(ret > 0) {
-                            set_gsb_to_tx(msr, capture, canon);
+                            set_match_to_tx(msr, capture, canon);
                             return 1;
                         }
                     }
@@ -1202,7 +1171,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                             ret = verify_gsb(gsb, rule, canon, canon_length);
 
                             if(ret > 0) {
-                                set_gsb_to_tx(msr, capture, canon);
+                                set_match_to_tx(msr, capture, canon);
                                 return 1;
                             }
                         }
