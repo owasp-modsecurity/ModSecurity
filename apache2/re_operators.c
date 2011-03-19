@@ -595,7 +595,6 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         memmove (offset + strlen (replace), offset + p_len, strlen (offset) - p_len + 1);
         memmove (offset, replace, strlen (replace));
         offset += strlen (replace);
-        if (sub >= 0) break;
     }
 
     size -= ((AP_MAX_REG_MATCH - count)*(strlen(replace)) + ((strlen(replace) - p_len)*(count+AP_MAX_REG_MATCH) - (AP_MAX_REG_MATCH+4)));
