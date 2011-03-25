@@ -436,11 +436,6 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    if(var == NULL || (strcmp(var->name,"REMOTE_ADDR") != 0 ) || (strcmp(var->name,"SERVER_ADDR") != 0 ))  {
-        *error_msg = "Internal Error: Operator ipmatch only works with REMOTE_ADDR and SERVER_ADDR variable.";
-        return 0;
-    }
-
     if(ipdata == NULL) {
         *error_msg = "Internal Error: ipmatch is null.";
         return -1;
