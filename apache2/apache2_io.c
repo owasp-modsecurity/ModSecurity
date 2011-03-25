@@ -128,11 +128,12 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Input stream filter: Forwarded %" APR_SIZE_T_FMT " bytes.", msr->msc_reqbody_disk_chunk->length);
         }
-    }
 
-    if(msr->txcfg->stream_inbody_inspection && msr->stream_input_data != NULL) {
-        free(msr->stream_input_data);
-        msr->stream_input_data = NULL;
+        if(msr->txcfg->stream_inbody_inspection && msr->stream_input_data != NULL) {
+            free(msr->stream_input_data);
+            msr->stream_input_data = NULL;
+        }
+
     }
 
     if (rc == 0) {
@@ -477,11 +478,12 @@ static void inject_content_to_of_brigade(modsec_rec *msr, ap_filter_t *f) {
         if (msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "Content Injection: Data reinjected bytes [%d]",msr->stream_output_length);
         }
-    }
 
-    if(msr->stream_output_data != NULL) {
-        free(msr->stream_output_data);
-        msr->stream_output_data = NULL;
+        if(msr->stream_output_data != NULL) {
+            free(msr->stream_output_data);
+            msr->stream_output_data = NULL;
+        }
+
     }
 }
 
@@ -493,12 +495,12 @@ static void prepend_content_to_of_brigade(modsec_rec *msr, ap_filter_t *f) {
         apr_bucket *bucket_ci = NULL;
 
         bucket_ci = apr_bucket_heap_create(msr->content_prepend,
-        msr->content_prepend_len, NULL, f->r->connection->bucket_alloc);
-            APR_BRIGADE_INSERT_HEAD(msr->of_brigade, bucket_ci);
+                msr->content_prepend_len, NULL, f->r->connection->bucket_alloc);
+        APR_BRIGADE_INSERT_HEAD(msr->of_brigade, bucket_ci);
 
         if (msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "Content Injection (b): Added content to top: %s",
-                log_escape_nq_ex(msr->mp, msr->content_prepend, msr->content_prepend_len));
+                    log_escape_nq_ex(msr->mp, msr->content_prepend, msr->content_prepend_len));
         }
     }
 }
