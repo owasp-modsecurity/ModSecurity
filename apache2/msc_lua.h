@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #if defined(WITH_LUA)
 
 #ifndef _MSC_LUA_H_

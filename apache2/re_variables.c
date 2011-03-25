@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #include "http_core.h"
 
 #include "modsecurity.h"
@@ -455,6 +456,18 @@ static int var_request_uri_raw_generate(modsec_rec *msr, msre_var *var, msre_rul
 {
     return var_simple_generate(var, vartab, mptmp, msr->r->unparsed_uri);
 }
+
+/* UNIQUE_ID */
+
+static int var_uniqueid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    char *value = get_env_var(msr->r, "UNIQUE_ID");
+    if (value != NULL) {
+        return var_simple_generate(var, vartab, mptmp, value);
+    }
+}
+
 
 /* REQUEST_URI */
 
@@ -1833,6 +1846,107 @@ static int var_request_body_length_generate(modsec_rec *msr, msre_var *var, msre
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
+/* MATCHED_VARS_NAMES */
+
+static int var_matched_vars_names_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    const apr_array_header_t *arr = NULL;
+    const apr_table_entry_t *te = NULL;
+    int i, count = 0;
+
+    arr = apr_table_elts(msr->matched_vars);
+    te = (apr_table_entry_t *)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        int match = 0;
+        msc_string *str = (msc_string *)te[i].val;
+
+        /* Figure out if we want to include this variable. */
+        if (var->param == NULL) match = 1;
+        else {
+            if (var->param_data != NULL) { /* Regex. */
+                char *my_error_msg = NULL;
+                if (!(msc_regexec((msc_regex_t *)var->param_data, str->name,
+                    strlen(str->name), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+            } else { /* Simple comparison. */
+                if (strcasecmp(str->name, var->param) == 0) match = 1;
+            }
+        }
+
+        /* If we had a match add this argument to the collection. */
+        if (match && (strncmp(str->name,"MATCHED_VARS:",13) != 0) && (strncmp(str->name,"MATCHED_VARS_NAMES:",19))) {
+
+            msre_var *rvar = apr_palloc(mptmp, sizeof(msre_var));
+
+            rvar->value = apr_pstrndup(mptmp, str->name, strlen(str->name));
+            rvar->value_len = strlen(rvar->value);
+            rvar->name = apr_psprintf(mptmp, "MATCHED_VARS_NAMES:%s",
+                log_escape_nq(mptmp, str->name));
+
+            apr_table_setn(vartab, rvar->name, (void *)rvar);
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Set variable \"%s\" value \"%s\" size %d to collection.", rvar->name, rvar->value, rvar->value_len);
+            }
+
+            count++;
+        }
+    }
+
+    return count;
+}
+
+/* MATCHED_VARS */
+
+static int var_matched_vars_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    const apr_array_header_t *arr = NULL;
+    const apr_table_entry_t *te = NULL;
+    int i, count = 0;
+
+    arr = apr_table_elts(msr->matched_vars);
+    te = (apr_table_entry_t *)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        int match = 0;
+        msc_string *str = (msc_string *)te[i].val;
+
+        /* Figure out if we want to include this variable. */
+        if (var->param == NULL) match = 1;
+        else {
+            if (var->param_data != NULL) { /* Regex. */
+                char *my_error_msg = NULL;
+                if (!(msc_regexec((msc_regex_t *)var->param_data, str->name,
+                    strlen(str->name), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+            } else { /* Simple comparison. */
+                if (strcasecmp(str->name, var->param) == 0) match = 1;
+            }
+        }
+
+        /* If we had a match add this argument to the collection. */
+        if (match && (strncmp(str->name,"MATCHED_VARS:",13) != 0) && (strncmp(str->name,"MATCHED_VARS_NAMES:",19))) {
+
+            //msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            msre_var *rvar = apr_palloc(mptmp, sizeof(msre_var));
+
+            rvar->value = apr_pstrndup(mptmp, str->value, str->value_len);
+            rvar->value_len = str->value_len;
+            rvar->name = apr_psprintf(mptmp, "MATCHED_VARS:%s",
+                log_escape_nq(mptmp, str->name));
+
+            apr_table_setn(vartab, rvar->name, (void *)rvar);
+
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Set variable \"%s\" value \"%s\" size %d to collection.", rvar->name, rvar->value, rvar->value_len);
+            }
+
+            count++;
+        }
+    }
+
+    return count;
+}
+
 /* REQUEST_COOKIES */
 
 static int var_request_cookies_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -1863,7 +1977,7 @@ static int var_request_cookies_generate(modsec_rec *msr, msre_var *var, msre_rul
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
 
-            rvar->value = te[i].val;
+            rvar->value = te[i].key;
             rvar->value_len = strlen(rvar->value);
             rvar->name = apr_psprintf(mptmp, "REQUEST_COOKIES:%s",
                 log_escape_nq(mptmp, te[i].key));
@@ -2928,6 +3042,28 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_REQUEST_BODY
     );
 
+    /* MATCHED_VARS_NAMES */
+    msre_engine_variable_register(engine,
+        "MATCHED_VARS_NAMES",
+        VAR_LIST,
+        0, 1,
+        var_generic_list_validate,
+        var_matched_vars_names_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
+    /* MATCHED_VARS */
+    msre_engine_variable_register(engine,
+        "MATCHED_VARS",
+        VAR_LIST,
+        0, 1,
+        var_generic_list_validate,
+        var_matched_vars_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
     /* REQUEST_COOKIES */
     msre_engine_variable_register(engine,
         "REQUEST_COOKIES",
@@ -3037,6 +3173,18 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_CACHE,
         PHASE_REQUEST_HEADERS
     );
+
+    /* UNIQUE_ID */
+    msre_engine_variable_register(engine,
+        "UNIQUE_ID",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_uniqueid_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
 
     /* STREAM_OUTPUT_BODY */
     msre_engine_variable_register(engine,

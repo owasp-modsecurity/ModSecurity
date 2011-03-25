@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #ifndef _MODSECURITY_H_
 #define _MODSECURITY_H_
 
@@ -385,6 +386,9 @@ struct modsec_rec {
      * are to allow phases 1-2 only.
      */
     unsigned int         allow_scope;
+
+    /* matched vars */
+    apr_table_t         *matched_vars;
 
     /* Generic request body processor context to be used by custom parsers. */
     void                *reqbody_processor_ctx;

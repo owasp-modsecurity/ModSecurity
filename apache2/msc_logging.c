@@ -17,8 +17,7 @@
  *
  */
 
-#include "modsecurity_config.h"
-
+#include "modsecurity.h"
 #include <sys/stat.h>
 
 #include "re.h"
@@ -1125,8 +1124,27 @@ void sec_audit_logger(modsec_rec *msr) {
     }
 
     /* AUDITLOG_PART_UPLOADS */
-    /* ENH: Implement */
+    if ((strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_UPLOADS) != NULL) && (msr->mpd != NULL)) {
+        text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_UPLOADS);
+        sec_auditlog_write(msr, text, strlen(text));
 
+        multipart_part **parts = NULL;
+        unsigned int total_size = 0;
+        int cfiles = 0;
+
+        parts = (multipart_part **)msr->mpd->parts->elts;
+        for(cfiles = 0; cfiles < msr->mpd->parts->nelts; cfiles++) {
+            if (parts[cfiles]->type == MULTIPART_FILE) {
+                if(parts[cfiles]->filename != NULL) {
+                    text = apr_psprintf(msr->mp, "#%d Filename: %s - Size: %u - ContentType: %s\n", cfiles, log_escape_nq(msr->mp, parts[cfiles]->filename), parts[cfiles]->tmp_file_size, log_escape_nq(msr->mp, parts[cfiles]->content_type ? parts[cfiles]->content_type : "<Unknown ContentType>"));
+                    sec_auditlog_write(msr, text, strlen(text));
+                    total_size += parts[cfiles]->tmp_file_size;
+                }
+            }
+        }
+        text = apr_psprintf(msr->mp, "Total upload size: %u\n", total_size);
+        sec_auditlog_write(msr, text, strlen(text));
+    }
 
     /* AUDITLOG_PART_MATCHEDRULES */
 

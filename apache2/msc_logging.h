@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #ifndef _MSC_LOGGING_H_
 #define _MSC_LOGGING_H_
 

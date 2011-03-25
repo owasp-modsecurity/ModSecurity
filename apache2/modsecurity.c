@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #include <stdlib.h>
 
 #include "apr_global_mutex.h"
@@ -371,6 +372,11 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     msr->request_cookies = apr_table_make(msr->mp, 16);
     if (msr->request_cookies == NULL) return -1;
 
+    /* Initialize matched vars */
+    msr->matched_vars = apr_table_make(msr->mp, 8);
+    if (msr->matched_vars == NULL) return -1;
+    apr_table_clear(msr->matched_vars);
+
     /* Locate the cookie headers and parse them */
     arr = apr_table_elts(msr->request_headers);
     te = (apr_table_entry_t *)arr->elts;
@@ -473,6 +479,7 @@ static apr_status_t modsecurity_process_phase_request_headers(modsec_rec *msr) {
 static apr_status_t modsecurity_process_phase_request_body(modsec_rec *msr) {
     apr_time_t time_before;
     apr_status_t rc = 0;
+
     
     if ((msr->allow_scope == ACTION_ALLOW_REQUEST)||(msr->allow_scope == ACTION_ALLOW)) {
         if (msr->txcfg->debuglog_level >= 4) {

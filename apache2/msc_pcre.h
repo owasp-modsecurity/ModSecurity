@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #ifndef _MSC_PCRE_H_
 #define _MSC_PCRE_H_
 

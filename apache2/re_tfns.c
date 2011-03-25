@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #include <ctype.h>
 
 #include "apr_md5.h"
@@ -24,6 +25,57 @@
 
 #include "re.h"
 #include "msc_util.h"
+
+/* cmdline */
+
+static int msre_fn_cmdline_execute(apr_pool_t *mptmp, unsigned char *input,
+        long int input_len, char **rval, long int *rval_len)
+{
+    int space = 0;
+    unsigned char *s = input;
+
+    if (rval == NULL) return -1;
+
+    *rval = (char *)input;
+    /* Check characters */
+    for ( ; *input; input++ ) {
+        switch(*input) {
+            /* remove some characters */
+            case '"':
+            case '\'':
+            case '\\':
+            case '^':
+                continue;
+                /* replace some characters to space (only one) */
+            case ' ':
+            case ',':
+            case ';':
+            case '\t':
+            case '\r':
+            case '\n':
+                if (!space) {
+                    *s++ = ' ';
+                    space++;
+                }
+                break;
+            case '/':
+            case '(':
+                /* remove space before / or ( */
+                if (space) s--;
+                space = 0;
+                *s++ = *input;
+                break;
+                /* copy normal characters */
+            default :
+                *s++ = tolower(*input);
+                space = 0;
+        }
+    }
+
+    *s = 0;
+    *rval_len = strlen(*rval);
+    return 1;
+}
 
 /* lowercase */
 
@@ -784,6 +836,11 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     msre_engine_tfn_register(engine,
         "trimLeft",
         msre_fn_trimLeft_execute
+    );
+
+    msre_engine_tfn_register(engine,
+        "cmdline",
+        msre_fn_cmdline_execute
     );
 
     /* trimRight */

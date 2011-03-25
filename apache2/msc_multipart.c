@@ -16,8 +16,8 @@
  * directly using the email address support@trustwave.com.
  *
  */
-#include "modsecurity_config.h"
 
+#include "modsecurity.h"
 #include <ctype.h>
 #include <sys/stat.h>
 

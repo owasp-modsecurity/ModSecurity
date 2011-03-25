@@ -190,6 +190,8 @@ struct msre_rule {
 
     ap_regex_t              *sub_regex;
     char                    *sub_str;
+    char                    *re_str;
+    int                     re_precomp;
 
     msre_ipmatch            *ip_op;
 };

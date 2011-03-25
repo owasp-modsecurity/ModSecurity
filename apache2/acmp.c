@@ -42,9 +42,9 @@
  * Data structures for acmp parser
  */
 
- /**
-  * One node in trie
-  */
+/**
+ * One node in trie
+ */
 typedef struct acmp_node_t acmp_node_t;
 typedef struct acmp_btree_node_t acmp_btree_node_t;
 struct acmp_node_t {
@@ -79,9 +79,9 @@ struct acmp_btree_node_t {
  * Data related to parser, not to individual nodes
  */
 struct ACMP {
-    #ifdef ACMP_USE_UTF8
+#ifdef ACMP_USE_UTF8
     int is_utf8;
-    #endif
+#endif
     int is_case_sensitive;
     apr_pool_t *parent_pool;
     apr_pool_t *pool;
@@ -188,11 +188,11 @@ static long utf8_lcase(acmp_utf8_char_t ucs_code) {
  * Returns length of given string for parser's encoding
  */
 static size_t acmp_strlen(ACMP *parser, const char *str) {
-    #ifdef ACMP_USE_UTF8
+#ifdef ACMP_USE_UTF8
     return (parser->is_utf8 == 0) ? strlen(str) : utf8_strlen(str);
-    #else
+#else
     return strlen(str);
-    #endif
+#endif
 }
 
 /**
@@ -205,14 +205,14 @@ static void acmp_strtoucs(ACMP *parser, const char *str, acmp_utf8_char_t *ucs_c
     int i;
     const char *c = str;
 
-    #ifdef ACMP_USE_UTF8
+#ifdef ACMP_USE_UTF8
     if (parser->is_utf8) {
         for (i = 0; i < len; i++) {
             *(ucs_chars++) = utf8_decodechar(c);
             c += utf8_seq_len(c);
         }
     } else
-    #endif
+#endif
     {
         for (i = 0; i < len; i++) {
             *(ucs_chars++) = *(c++);
@@ -341,7 +341,7 @@ static void acmp_connect_other_matches(ACMP *parser, acmp_node_t *node) {
  * Adds leaves to binary tree, working from sorted array of keyword tree nodes
  */
 static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
-    int pos, int lb, int rb, apr_pool_t *pool) {
+        int pos, int lb, int rb, apr_pool_t *pool) {
 
     int left = 0, right = 0;
     if ((pos - lb) > 1) {
@@ -350,9 +350,9 @@ static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
         /* ENH: Check alloc succeded */
         node->left->node = nodes[left];
         node->left->letter = nodes[left]->letter;
-        #ifdef DEBUG_ACMP
+#ifdef DEBUG_ACMP
         fprintf(stderr, "%lc ->left %lc\n", (wint_t)node->node->letter, (wint_t)node->left->node->letter);
-        #endif
+#endif
     }
     if ((rb - pos) > 1) {
         right = pos + (rb - pos) / 2;
@@ -360,9 +360,9 @@ static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
         /* ENH: Check alloc succeded */
         node->right->node = nodes[right];
         node->right->letter = nodes[right]->letter;
-        #ifdef DEBUG_ACMP
+#ifdef DEBUG_ACMP
         fprintf(stderr, "%lc ->right %lc\n", (wint_t)node->node->letter, (wint_t)node->right->node->letter);
-        #endif
+#endif
     }
     if (node->right != NULL) {
         acmp_add_btree_leaves(node->right, nodes, right, pos, rb, pool);
@@ -436,9 +436,9 @@ static apr_status_t acmp_connect_fail_branches(ACMP *parser) {
     for (child = parser->root_node->child; child != NULL; child = child->sibling) {
         child->fail = parser->root_node;
         *(acmp_node_t **)apr_array_push(arr) = child;
-        #ifdef DEBUG_ACMP
+#ifdef DEBUG_ACMP
         fprintf(stderr, "fail direction: *%s* => *%s*\n", child->text, child->fail->text);
-        #endif
+#endif
     }
 
     for (;;) {
@@ -449,9 +449,9 @@ static apr_status_t acmp_connect_fail_branches(ACMP *parser) {
                 goto_node = acmp_child_for_code(node->parent->fail, node->letter);
                 node->fail = (goto_node != NULL) ? goto_node : parser->root_node;
             }
-            #ifdef DEBUG_ACMP
+#ifdef DEBUG_ACMP
             fprintf(stderr, "fail direction: *%s* => *%s*\n", node->text, node->fail->text);
-            #endif
+#endif
             child = node->child;
             while (child != NULL) {
                 *(acmp_node_t **)apr_array_push(arr2) = child;
@@ -486,8 +486,8 @@ static void acmp_clear_hit_count_recursive(acmp_node_t *node) {
 static void acmp_found(ACMP *parser, acmp_node_t *node) {
     if (node->callback) {
         node->callback(parser, node->callback_data,
-            parser->bp_buffer[(parser->char_pos - node->depth - 1) % parser->bp_buff_len],
-            parser->char_pos - node->depth - 1);
+                parser->bp_buffer[(parser->char_pos - node->depth - 1) % parser->bp_buff_len],
+                parser->char_pos - node->depth - 1);
     }
     node->hit_count++;
     parser->hit_count++;
@@ -516,9 +516,9 @@ ACMP *acmp_create(int flags, apr_pool_t *pool) {
     /* ENH: Check alloc succeded */
     parser->pool = p;
     parser->parent_pool = pool;
-    #ifdef ACMP_USE_UTF8
+#ifdef ACMP_USE_UTF8
     parser->is_utf8 = (flags & ACMP_FLAG_UTF8) == 0 ? 0 : 1;
-    #endif
+#endif
     parser->is_case_sensitive = (flags & ACMP_FLAG_CASE_SENSITIVE) == 0 ? 0 : 1;
     parser->root_node = apr_pcalloc(p, sizeof(acmp_node_t));
     /* ENH: Check alloc succeded */
@@ -554,9 +554,9 @@ ACMP *acmp_duplicate(ACMP *parser, apr_pool_t *pool) {
     /* ENH: Check alloc succeded */
     new_parser->pool = p;
     new_parser->parent_pool = pool;
-    #ifdef ACMP_USE_UTF8
+#ifdef ACMP_USE_UTF8
     new_parser->is_utf8 = parser->is_utf8;
-    #endif
+#endif
     new_parser->is_case_sensitive = parser->is_case_sensitive;
     new_parser->root_node = apr_pcalloc(p, sizeof(acmp_node_t));
     /* ENH: Check alloc succeded */
@@ -596,7 +596,7 @@ apr_status_t acmp_prepare(ACMP *parser) {
  * len - Length of pattern in characters, if zero string length is used.
  */
 apr_status_t acmp_add_pattern(ACMP *parser, const char *pattern,
-    acmp_callback_t callback, void *data, apr_size_t len)
+        acmp_callback_t callback, void *data, apr_size_t len)
 {
     size_t length, i, j;
     acmp_utf8_char_t *ucs_chars;
@@ -654,9 +654,9 @@ apr_status_t acmp_add_pattern(ACMP *parser, const char *pattern,
  */
 apr_status_t acmp_process(ACMP *parser, const char *data, apr_size_t len) {
     acmp_node_t *node, *go_to;
-    #ifdef ACMP_USE_UTF8
+#ifdef ACMP_USE_UTF8
     apr_size_t seq_length;
-    #endif
+#endif
     const char *end;
 
     if (parser->is_failtree_done == 0) acmp_prepare(parser);
@@ -668,7 +668,7 @@ apr_status_t acmp_process(ACMP *parser, const char *data, apr_size_t len) {
         acmp_utf8_char_t letter;
 
         parser->bp_buffer[parser->char_pos % parser->bp_buff_len] = parser->byte_pos;
-        #ifdef ACMP_USE_UTF8
+#ifdef ACMP_USE_UTF8
         if (parser->is_utf8) {
             if (parser->u8buff_len > 0) {
                 /* Resuming partial utf-8 sequence */
@@ -697,7 +697,7 @@ apr_status_t acmp_process(ACMP *parser, const char *data, apr_size_t len) {
                 }
             }
         } else
-        #endif
+#endif
         {
             letter = *data++;
             parser->byte_pos++;

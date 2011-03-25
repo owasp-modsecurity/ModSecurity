@@ -12,10 +12,11 @@
  * distribution.
  *
  * If any of the files related to licensing are missing or if you have any
- * other questions related to licensing please contact Breach Security, Inc.
- * directly using the email address support@breach.com.
+ * other questions related to licensing please contact Trustwave Holdings, Inc.
+ * directly using the email address support@trustwave.com.
  *
  */
+
 #include <limits.h>
 
 #include "modsecurity.h"

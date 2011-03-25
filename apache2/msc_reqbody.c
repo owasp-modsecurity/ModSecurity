@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #include "modsecurity.h"
 #include "re.h"
 #include "msc_parsers.h"
@@ -400,7 +401,7 @@ static apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, char **e
 
     msr->stream_input_length = msr->msc_reqbody_length;
 
-    msr->stream_input_data = malloc(msr->stream_input_length + 1);
+    msr->stream_input_data = (char *)calloc(sizeof(char), msr->stream_input_length + 1);
     if (msr->stream_input_data== NULL) {
         *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body on stream. Asked for %u bytes.",
             msr->stream_input_length + 1);

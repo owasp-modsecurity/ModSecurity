@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #include <util_filter.h>
 
 #include "modsecurity.h"
@@ -518,14 +519,14 @@ static int flatten_response_body(modsec_rec *msr) {
     msr->resbody_data = apr_palloc(msr->mp, msr->resbody_length + 1);
     if (msr->resbody_data == NULL) {
         msr_log(msr, 1, "Output filter: Response body data memory allocation failed. Asked for: %" APR_SIZE_T_FMT,
-            msr->resbody_length + 1);
+                msr->resbody_length + 1);
         return -1;
     }
 
     rc = apr_brigade_flatten(msr->of_brigade, msr->resbody_data, &msr->resbody_length);
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Output filter: Failed to flatten brigade (%d): %s", rc,
-            get_apr_error(msr->mp, rc));
+                get_apr_error(msr->mp, rc));
         return -1;
     }
 
@@ -533,16 +534,16 @@ static int flatten_response_body(modsec_rec *msr) {
     msr->resbody_status = RESBODY_STATUS_READ;
 
     if (msr->txcfg->stream_outbody_inspection)  {
-    msr->stream_output_data = (char *)malloc(msr->resbody_length+1);
-    msr->stream_output_length = msr->resbody_length+1;
+        msr->stream_output_data = (char *)calloc(sizeof(char),msr->resbody_length+1);
+        msr->stream_output_length = msr->resbody_length+1;
 
-    if (msr->stream_output_data == NULL) {
-        msr_log(msr, 1, "Output filter: Stream Response body data memory allocation failed. Asked for: %" APR_SIZE_T_FMT,
-            msr->stream_output_length + 1);
-        return -1;
-    }
+        if (msr->stream_output_data == NULL) {
+            msr_log(msr, 1, "Output filter: Stream Response body data memory allocation failed. Asked for: %" APR_SIZE_T_FMT,
+                    msr->stream_output_length + 1);
+            return -1;
+        }
 
-    apr_cpystrn(msr->stream_output_data,msr->resbody_data,msr->stream_output_length);
+        apr_cpystrn(msr->stream_output_data,msr->resbody_data,msr->stream_output_length);
     }
 
     return 1;

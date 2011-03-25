@@ -16,13 +16,19 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #include "re.h"
 #include "msc_pcre.h"
 #include "msc_geo.h"
 #include "apr_lib.h"
 #include "apr_strmatch.h"
 #include "acmp.h"
+#if defined(WIN32) || defined(WINNT)
+#include "pcre.h"
+#else
 #include <regex.h>
+#endif
+
 
 #define PARSE_REGEX_IP "([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)(?:(\\/[0-9]+))?|([0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+)(?:(\\/[0-9]+))?"
 #define MAX_SUBSTRINGS 30
@@ -79,6 +85,15 @@ static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
 /* ipmatch */
 
 #if !defined(WIN32) || !defined(WINNT)
+/*
+* \brief Init function to ipmatch operator
+*
+* \param rule Pointer to the rule
+* \param error_msg Pointer to error msg
+*
+* \retval 1 On Success
+* \retval 0 On Fail
+*/
 static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
@@ -102,6 +117,9 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     msre_ipmatch *ipdata = NULL, *curr_ipmatch = NULL;
     unsigned long ipmask = 0, network = 0, hostmask = 0, broadcast = 0;
     int maskbits = 0;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
 
     parse_regex = pcre_compile(PARSE_REGEX_IP, opts, &eb, &eo, NULL);
 
@@ -394,6 +412,18 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     return 1;
 }
 
+/*
+* \brief Execution function to ipmatch operator
+*
+* \param msr Pointer internal modsec request structure
+* \param rule Pointer to the rule
+* \param var Pointer to variable structure
+* \param error_msg Pointer to error msg
+*
+* \retval -1 On Failure
+* \retval 1 On Match
+* \retval 0 On No Match
+*/
 static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
@@ -403,13 +433,16 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
     int i;
     msre_ipmatch *ipdata = rule->ip_op;
 
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
     if(var == NULL || (strcmp(var->name,"REMOTE_ADDR") != 0 ) || (strcmp(var->name,"SERVER_ADDR") != 0 ))  {
-        msr_log(msr,9,"Operator ipmatch only works with REMOTE_ADDR and SERVER_ADDR variable");
-        return -1;
+        *error_msg = "Internal Error: Operator ipmatch only works with REMOTE_ADDR and SERVER_ADDR variable.";
+        return 0;
     }
 
     if(ipdata == NULL) {
-        msr_log(msr,9,"Ipmatch operator struct is NULL");
+        *error_msg = "Internal Error: ipmatch is null.";
         return -1;
     }
 
@@ -469,6 +502,36 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
 
 /* rsub */
 
+static char *remove_escape(msre_rule *rule, char *str, int len)  {
+    char *parm = apr_palloc(rule->ruleset->mp, len);;
+    char *ret = parm;
+
+    for(;*str!='\0';str++)    {
+        if(*str != '\\')    {
+            *parm++ = *str;
+        } else {
+            str++;
+            if(*str != '/') {
+                str--;
+                *parm++ = *str;
+            } else {
+                *parm++ = *str;
+            }
+        }
+    }
+
+    return ret;
+}
+
+/*
+ * \brief Init function to rsub operator
+ *
+ * \param rule Pointer to the rule
+ * \param error_msg Pointer to error msg
+ *
+ * \retval 1 On Success
+ * \retval 0 On Fail
+ */
 static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
@@ -477,15 +540,20 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     const char *line = NULL;
     char *reg_pattern = NULL;
     char *replace = NULL;
+    char *e_pattern = NULL;
+    char *e_replace = NULL;
     char *flags = NULL;
-    char *data;
+    char *data = NULL;
     char delim;
     int ignore_case = 0;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
 
     line = rule->op_param;
 
     if (apr_tolower(*line) != 's') {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error rsub operator format, must be s/// pattern",
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error rsub operator format, must be s/ pattern",
                 erroffset, errptr);
         return 0;
     }
@@ -495,29 +563,58 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     if (delim)
         reg_pattern = ++data;
     if (reg_pattern) {
+
         if (*data != delim) {
-            while (*++data && *data != delim);
+            for(;*data != '\0' ;data++)  {
+                if(*data == delim)   {
+                    data--;
+                    if(*data == '\\')   {
+                        data++;
+                        continue;
+                    }
+                    break;
+                }
+            }
         }
+
         if (*data) {
-            *data = '\0';
-            replace = ++data;
+            *++data = '\0';
+            ++data;
+            replace = data;
         }
-    }
-    if (replace) {
-        if (*data != delim) {
-            while (*++data && *data != delim);
-        }
-        if (*data) {
-            *data = '\0';
-            flags = ++data;
-        }
+
     }
 
-    if (!delim || !reg_pattern || !*reg_pattern || !replace) {
+    if (replace) {
+
+        if (*data != delim) {
+            for(;*data != '\0' ;data++)  {
+                if(*data == delim)   {
+                    data--;
+                    if(*data == '\\')   {
+                        data++;
+                        continue;
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (*data) {
+            *++data = '\0';
+            flags = ++data;
+        }
+
+    }
+
+    if (!delim || !reg_pattern || !replace) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error rsub operator format - must be s/regex/str/[flags]",
                 erroffset, errptr);
-        return 0;
+        return -1;
     }
+
+    e_pattern = remove_escape(rule, reg_pattern, strlen(reg_pattern));
+    e_replace = remove_escape(rule, replace, strlen(replace));
 
     if (flags) {
         while (*flags) {
@@ -531,21 +628,37 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
         }
     }
 
-    if (error_msg == NULL) return -1;
-    *error_msg = NULL;
+    pattern = apr_pstrdup(rule->ruleset->mp, e_pattern);
+    rule->sub_str = apr_pstrdup(rule->ruleset->mp, e_replace);
 
-    pattern = apr_pstrdup(rule->ruleset->mp, reg_pattern);
-    rule->sub_str = apr_pstrdup(rule->ruleset->mp, replace);
+    if(strstr(pattern,"%{") == NULL)    {
+        regex = ap_pregcomp(rule->ruleset->mp, pattern, AP_REG_EXTENDED |
+                (ignore_case ? AP_REG_ICASE : 0));
+        rule->sub_regex = regex;
+    } else {
+        rule->re_precomp = 1;
+        rule->re_str = apr_pstrdup(rule->ruleset->mp, reg_pattern);
+        rule->sub_regex = NULL;
+    }
 
-    regex = ap_pregcomp(rule->ruleset->mp, pattern, AP_REG_EXTENDED |
-            (ignore_case ? AP_REG_ICASE : 0));
-
-    rule->sub_regex = regex;
     return 1; /* OK */
 }
 
+/*
+* \brief Execution function to rsub operator
+*
+* \param msr Pointer internal modsec request structure
+* \param rule Pointer to the rule
+* \param var Pointer to variable structure
+* \param error_msg Pointer to error msg
+*
+* \retval -1 On Failure
+* \retval 1 On Match
+* \retval 0 On No Match
+*/
 static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    ap_regex_t *regex = rule->sub_regex;
+    msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    msc_string *re_pattern = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     char *offset = NULL;
     int sub = 0, so = 0, p_len = 0;
     char *replace = NULL;
@@ -554,6 +667,8 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     int output_body = 0, input_body = 0, count = 0;
     ap_regmatch_t pmatch[AP_MAX_REG_MATCH];
 
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
 
     if(strcmp(var->name,"STREAM_OUTPUT_BODY") == 0 )  {
         output_body = 1;
@@ -564,11 +679,37 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return -1;
     }
 
-    replace = apr_pstrdup(rule->ruleset->mp, rule->sub_str);;
+    if(rule->re_precomp == 1)    {
+        re_pattern->value = (char *)rule->re_str;
+        re_pattern->value_len = strlen(re_pattern->value);
+
+        expand_macros(msr, re_pattern, rule, msr->mp);
+
+        if(strlen(re_pattern->value) > 0)
+            rule->sub_regex = ap_pregcomp(rule->ruleset->mp, re_pattern->value, AP_REG_EXTENDED);
+        else
+            rule->sub_regex = NULL;
+
+        rule->re_precomp = 0;
+    }
+
+    if(rule->sub_regex == NULL)   {
+        *error_msg = "Internal Error: regex data is null.";
+        return -1;
+    }
+
+    str->value = (char *)rule->sub_str;
+    str->value_len = strlen(str->value);
+
+    expand_macros(msr, str, rule, msr->mp);
+
+    replace = apr_pstrdup(rule->ruleset->mp, str->value);
     data = apr_pcalloc(msr->mp, var->value_len+(AP_MAX_REG_MATCH*strlen(replace))+1);
 
-    if(replace == NULL || data == NULL)
-        return 0;
+    if(replace == NULL || data == NULL) {
+        *error_msg = "Internal Error: cannot allocate memory";
+        return -1;
+    }
 
     memcpy(data,var->value,var->value_len);
     size += (AP_MAX_REG_MATCH*strlen(replace)+2);
@@ -585,7 +726,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
             offset = offset + p_len - 2;
         }
 
-    sub = pmatch [1].rm_so;
+    sub = -1;
 
     for (offset = data; !ap_regexec(rule->sub_regex,  offset, 1, pmatch, 0); ) {
         p_len = pmatch [0].rm_eo - pmatch [0].rm_so;
@@ -595,6 +736,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         memmove (offset + strlen (replace), offset + p_len, strlen (offset) - p_len + 1);
         memmove (offset, replace, strlen (replace));
         offset += strlen (replace);
+        if (sub >= 0) break;
     }
 
     size -= ((AP_MAX_REG_MATCH - count)*(strlen(replace)) + ((strlen(replace) - p_len)*(count+AP_MAX_REG_MATCH) - (AP_MAX_REG_MATCH+4)));
@@ -791,7 +933,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
     if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
         /* We no longer escape the pattern here as it is done when logging */
-        char *pattern = apr_pstrdup(msr->mp, regex->pattern);
+        char *pattern = apr_pstrdup(msr->mp, log_escape(msr->mp, regex->pattern ? regex->pattern : "<Unknown Match>"));
 
         /* This message will be logged. */
         if (strlen(pattern) > 252) {
@@ -1004,6 +1146,17 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
 /* gsbLookup */
 
+/*
+* \brief Verify function to gsbLookup operator
+*
+* \param rule Pointer to the rule
+* \param match Pointer to input data
+* \param match_length Input size
+*
+* \retval -1 On Failure
+* \retval 1 On Match
+* \retval 0 On No Match
+*/
 static int verify_gsb(gsb_db *gsb, msre_rule *rule, const char *match, unsigned int match_length) {
     apr_md5_ctx_t ctx;
     apr_status_t rc;
@@ -1032,6 +1185,15 @@ static int verify_gsb(gsb_db *gsb, msre_rule *rule, const char *match, unsigned 
     return 0;
 }
 
+/*
+* \brief Init function to gsbLookup operator
+*
+* \param rule Pointer to the rule
+* \param error_msg Pointer to error msg
+*
+* \retval 1 On Success
+* \retval 0 On Fail
+*/
 static int msre_op_gsbLookup_param_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
@@ -1054,6 +1216,18 @@ static int msre_op_gsbLookup_param_init(msre_rule *rule, char **error_msg) {
     return 1; /* OK */
 }
 
+/*
+* \brief Execution function to gsbLookup operator
+*
+* \param msr Pointer internal modsec request structure
+* \param rule Pointer to the rule
+* \param var Pointer to variable structure
+* \param error_msg Pointer to error msg
+*
+* \retval -1 On Failure
+* \retval 1 On Match
+* \retval 0 On No Match
+*/
 static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     msc_regex_t *regex = (msc_regex_t *)rule->op_param_data;
     char *my_error_msg = NULL;
@@ -1071,26 +1245,23 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     char *str = NULL, *entire = NULL;
     int capture;
 
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
     if(regex == NULL)    {
-        if (msr->txcfg->debuglog_level >= 8) {
-            msr_log(msr, 8, "GSB: regex is null");
-        }
+        *error_msg = "Internal Error: regex data is null.";
         return -1;
     }
 
     if(gsb == NULL)    {
-        if (msr->txcfg->debuglog_level >= 8) {
-            msr_log(msr, 8, "GSB: gsb is null");
-        }
+        *error_msg = "Internal Error: gsb data is null.";
         return -1;
     }
 
     data = apr_pcalloc(msr->mp, var->value_len+1);
 
     if(data == NULL)    {
-        if (msr->txcfg->debuglog_level >= 8) {
-            msr_log(msr, 8, "GSB: Fail to alloc memory for input data");
-        }
+        *error_msg = "Internal Error: cannot allocate memory for data.";
         return -1;
     }
 
@@ -1105,11 +1276,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
             match = apr_psprintf(rule->ruleset->mp, "%.*s", ovector[2*i+1] - ovector[2*i], data + ovector[2*i]);
 
             if (match == NULL)  {
-
-                if (msr->txcfg->debuglog_level >= 8) {
-                    msr_log(msr, 8, "GSB: Fail to alloc memory for match string");
-                }
-
+                *error_msg = "Internal Error: cannot allocate memory for match.";
                 return -1;
             }
 
@@ -1147,7 +1314,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                         ret = verify_gsb(gsb, rule, canon, canon_length);
 
                         if(ret > 0) {
-                            set_match_to_tx(msr, capture, canon);
+                            set_match_to_tx(msr, capture, match);
                             if (! *error_msg) {
                                 *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
                                         log_escape_nq(msr->mp, canon));
@@ -2018,7 +2185,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
 static int cpf_verify(const char *cpfnumber, int len, msre_rule *rule) {
 
     int factor, part_1, part_2, var_len = len;
-    int sum = 0, i = 0, cpf_len = 11;
+    int sum = 0, i = 0, cpf_len = 11, c;
     int cpf[11];
     char s_cpf[11];
     char bad_cpf[11][11] = { "00000000000",
@@ -2060,7 +2227,7 @@ static int cpf_verify(const char *cpfnumber, int len, msre_rule *rule) {
     part_1 = convert_to_int(s_cpf[cpf_len-2]);
     part_2 = convert_to_int(s_cpf[cpf_len-1]);
 
-    int c = cpf_len;
+    c = cpf_len;
 
     for(i = 0; i < 9; i++) {
         sum += (cpf[i] * --c);

@@ -1,6 +1,6 @@
 /*
  * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2008 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+ * Copyright (c) 2004-2010 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
  * This product is released under the terms of the General Public Licence,
  * version 2 (GPLv2). Please refer to the file LICENSE (included with this
@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #include "re.h"
 #include <ctype.h>
 #include "apr_lib.h"
@@ -568,6 +569,34 @@ static apr_status_t msre_action_redirect_execute(modsec_rec *msr, apr_pool_t *mp
     expand_macros(msr, var, rule, mptmp);
 
     rule->actionset->intercept_uri = apr_pstrmemdup(msr->mp, var->value, var->value_len);
+
+    return 1;
+}
+
+/* tag */
+
+/*
+* \brief Execution function to tag action
+*
+* \param msr Pointer internal modsec request structure
+* \param mptmp Pointer to memory pool
+* \param rule Pointer to the rule
+* \param action Pointer to action structure
+*
+* \retval 1 On Success
+*/
+static apr_status_t msre_action_tag_execute(modsec_rec *msr, apr_pool_t *mptmp,
+    msre_rule *rule, msre_action *action)
+{
+    msc_string *var = NULL;
+
+    var = apr_pcalloc(mptmp, sizeof(msc_string));
+    if (var == NULL) return -1;
+    var->value = (char *)action->param;
+    var->value_len = strlen(var->value);
+    expand_macros(msr, var, rule, mptmp);
+
+    action->param = apr_pstrmemdup(msr->mp, var->value, var->value_len);
 
     return 1;
 }
@@ -2356,6 +2385,19 @@ void msre_engine_register_default_actions(msre_engine *engine) {
 
     /* sanitiseMatchedBytes */
     msre_engine_action_register(engine,
+        "sanitiseMatchedBytes",
+        ACTION_NON_DISRUPTIVE,
+        0, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_MANY,
+        ACTION_CGROUP_NONE,
+        NULL,
+        msre_action_sanitizeMatchedBytes_init,
+        msre_action_sanitizeMatched_execute
+    );
+
+    /* sanitizeMatchedBytes */
+    msre_engine_action_register(engine,
         "sanitizeMatchedBytes",
         ACTION_NON_DISRUPTIVE,
         0, 1,
@@ -2586,7 +2628,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         ACTION_CGROUP_NONE,
         NULL,
         NULL,
-        NULL
+        msre_action_tag_execute
     );
 
     /* prepend */

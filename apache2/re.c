@@ -12,10 +12,11 @@
  * distribution.
  *
  * If any of the files related to licensing are missing or if you have any
- * other questions related to licensing please contact Breach Security, Inc.
- * directly using the email address support@breach.com.
+ * other questions related to licensing please contact Trustwave Holdings, Inc.
+ * directly using the email address support@trustwave.com.
  *
  */
+
 #include <ctype.h>
 
 #include "re.h"
@@ -918,6 +919,8 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         msr_log(msr, 9, "This phase consists of %d rule(s).", arr->nelts);
     }
 
+    apr_table_clear(msr->matched_vars);
+
     /* Loop through the rules in the selected set. */
     skip = 0;
     skipped = 0;
@@ -1116,6 +1119,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                 }
             }
 
+            apr_table_clear(msr->matched_vars);
             skipped = 0;
             saw_starter = 0;
         }
@@ -1152,6 +1156,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
 
                 }
 
+                apr_table_clear(msr->matched_vars);
                 return 1;
             }
 
@@ -1205,7 +1210,9 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         else if (rc < 0) {
             msr_log(msr, 1, "Rule processing failed.");
 
+
             if (msr->txcfg->reqintercept_oe == 1)   {
+                apr_table_clear(msr->matched_vars);
                 return -1;
             } else  {
                 if (rule->actionset->is_chained) {
@@ -1226,18 +1233,20 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
                     }
                 }
 
+                apr_table_clear(msr->matched_vars);
                 skipped = 0;
                 saw_starter = 0;
             }
         }
         else {
             msr_log(msr, 1, "Rule processing failed with unknown return code: %d.", rc);
+            apr_table_clear(msr->matched_vars);
             return -1;
         }
     }
 
     /* ENH warn if chained rules are missing. */
-
+    apr_table_clear(msr->matched_vars);
     return 0;
 }
 
@@ -1831,6 +1840,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
     apr_time_t time_before_op = 0;
     char *my_error_msg = NULL;
     const char *full_varname = NULL;
+    char *parm = NULL;
     int rc;
 
     /* determine the full var name if not already resolved
@@ -1919,6 +1929,32 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         msr->matched_var->name_len = strlen(msr->matched_var->name);
         msr->matched_var->value = apr_pmemdup(msr->mp, var->value, var->value_len);
         msr->matched_var->value_len = var->value_len;
+
+        parm = strchr(msr->matched_var->name,':');
+
+        if(parm)    {
+            parm++;
+
+            msc_string *mvar = apr_palloc(msr->mp, sizeof(msc_string));
+            mvar->name = apr_pstrdup(msr->mp, parm);
+            mvar->name_len = strlen(mvar->name);
+            mvar->value = apr_pmemdup(msr->mp, var->value, var->value_len);
+            mvar->value_len = var->value_len;
+
+            apr_table_unset(msr->matched_vars, parm);
+            apr_table_setn(msr->matched_vars, parm, (void *)mvar);
+
+        } else {
+
+            msc_string *mvar = apr_palloc(msr->mp, sizeof(msc_string));
+            mvar->name = apr_pstrdup(msr->mp, var->name);
+            mvar->name_len = strlen(mvar->name);
+            mvar->value = apr_pmemdup(msr->mp, var->value, var->value_len);
+            mvar->value_len = var->value_len;
+
+            apr_table_unset(msr->matched_vars, mvar->name);
+            apr_table_setn(msr->matched_vars, mvar->name, (void *)mvar);
+        }
 
         /* Keep track of the highest severity matched so far */
         if ((acting_actionset->severity > 0) && (acting_actionset->severity < msr->highest_severity))

@@ -16,6 +16,8 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
+
 #ifndef UTF8TABLES_H_
 #define UTF8TABLES_H_
 

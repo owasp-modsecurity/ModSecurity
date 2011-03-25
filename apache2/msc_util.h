@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #ifndef _UTIL_H_
 #define _UTIL_H_
 

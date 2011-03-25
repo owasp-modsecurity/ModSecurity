@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #include <limits.h>
 
 #include "http_core.h"
@@ -24,6 +25,7 @@
 #include "modsecurity.h"
 #include "apache2.h"
 #include "http_main.h"
+#include "http_connection.h"
 
 #include "apr_optional.h"
 #include "mod_log_config.h"

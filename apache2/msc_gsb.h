@@ -16,6 +16,7 @@
  * directly using the email address support@trustwave.com.
  *
  */
+
 #ifndef _MSC_GSB_H_
 #define _MSC_GSB_H_
 
@@ -31,7 +32,5 @@ struct gsb_db {
 };
 
 int DSOLOCAL gsb_mal_init(directory_config *dcfg, const char *dbfn, char **error_msg);
-
-//int DSOLOCAL gsb_mal_lookup(modsec_rec *msr, const char *target, char **error_msg);
 
 #endif
