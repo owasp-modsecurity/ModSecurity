@@ -130,10 +130,12 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         }
     }
 
+    /* TODO Need to see if we need to free 
     if(msr->txcfg->stream_inbody_inspection && msr->stream_input_data != NULL) {
         free(msr->stream_input_data);
         msr->stream_input_data = NULL;
     }
+    */
 
     if (rc == 0) {
         modsecurity_request_body_retrieve_end(msr);
@@ -479,10 +481,12 @@ static void inject_content_to_of_brigade(modsec_rec *msr, ap_filter_t *f) {
         }
     }
 
+    /* TODO Need to see if we need to free
     if(msr->stream_output_data != NULL) {
         free(msr->stream_output_data);
         msr->stream_output_data = NULL;
     }
+    */
 }
 
 /**
