@@ -759,6 +759,10 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         }
     }
 
+    if (! *error_msg) {
+        *error_msg = apr_psprintf(msr->mp, "Operator rsub succeeded.");
+    }
+
     return 1;
 }
 
