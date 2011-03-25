@@ -609,8 +609,8 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
         return -1;
     }
 
-    e_pattern = remove_escape(rule, reg_pattern, strlen(reg_pattern));
     e_replace = remove_escape(rule, replace, strlen(replace));
+    rule->sub_str = apr_pstrmemdup(rule->ruleset->mp, e_replace, strlen(e_replace));
 
     if (flags) {
         while (*flags) {
@@ -624,8 +624,8 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
         }
     }
 
+    e_pattern = remove_escape(rule, reg_pattern, strlen(reg_pattern));
     pattern = apr_pstrndup(rule->ruleset->mp, e_pattern, strlen(e_pattern));
-    rule->sub_str = apr_pstrndup(rule->ruleset->mp, e_replace, strlen(e_replace));
 
     if(strstr(pattern,"%{") == NULL)    {
         regex = ap_pregcomp(rule->ruleset->mp, pattern, AP_REG_EXTENDED |
