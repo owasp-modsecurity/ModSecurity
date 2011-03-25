@@ -520,6 +520,7 @@ static char *remove_escape(msre_rule *rule, char *str, int len)  {
         }
     }
 
+    *parm = '\0';
     return ret;
 }
 
@@ -628,8 +629,8 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
         }
     }
 
-    pattern = apr_pstrdup(rule->ruleset->mp, e_pattern);
-    rule->sub_str = apr_pstrdup(rule->ruleset->mp, e_replace);
+    pattern = apr_pstrndup(rule->ruleset->mp, e_pattern, strlen(e_pattern));
+    rule->sub_str = apr_pstrndup(rule->ruleset->mp, e_replace, strlen(e_replace));
 
     if(strstr(pattern,"%{") == NULL)    {
         regex = ap_pregcomp(rule->ruleset->mp, pattern, AP_REG_EXTENDED |
@@ -637,7 +638,7 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
         rule->sub_regex = regex;
     } else {
         rule->re_precomp = 1;
-        rule->re_str = apr_pstrdup(rule->ruleset->mp, reg_pattern);
+        rule->re_str = apr_pstrndup(rule->ruleset->mp, pattern, strlen(pattern));
         rule->sub_regex = NULL;
     }
 
@@ -680,13 +681,13 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     }
 
     if(rule->re_precomp == 1)    {
-        re_pattern->value = (char *)rule->re_str;
+        re_pattern->value = apr_pstrndup(msr->mp, rule->re_str, strlen(rule->re_str));
         re_pattern->value_len = strlen(re_pattern->value);
 
         expand_macros(msr, re_pattern, rule, msr->mp);
 
         if(strlen(re_pattern->value) > 0)
-            rule->sub_regex = ap_pregcomp(rule->ruleset->mp, re_pattern->value, AP_REG_EXTENDED);
+            rule->sub_regex = ap_pregcomp(msr->mp, re_pattern->value, AP_REG_EXTENDED);
         else
             rule->sub_regex = NULL;
 
@@ -698,12 +699,13 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return -1;
     }
 
-    str->value = (char *)rule->sub_str;
+    str->value = apr_pstrndup(msr->mp, rule->sub_str, strlen(rule->sub_str));
     str->value_len = strlen(str->value);
 
+    if(strstr(rule->sub_str,"%{") != NULL)
     expand_macros(msr, str, rule, msr->mp);
 
-    replace = apr_pstrdup(rule->ruleset->mp, str->value);
+    replace = apr_pstrndup(msr->mp, str->value, str->value_len);
     data = apr_pcalloc(msr->mp, var->value_len+(AP_MAX_REG_MATCH*strlen(replace))+1);
 
     if(replace == NULL || data == NULL) {
@@ -712,6 +714,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     }
 
     memcpy(data,var->value,var->value_len);
+
     size += (AP_MAX_REG_MATCH*strlen(replace)+2);
 
     if (ap_regexec(rule->sub_regex,  data ,AP_MAX_REG_MATCH, pmatch, 0)) return 0;
@@ -739,7 +742,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         if (sub >= 0) break;
     }
 
-    size -= ((AP_MAX_REG_MATCH - count)*(strlen(replace)) + ((strlen(replace) - p_len)*(count+AP_MAX_REG_MATCH) - (AP_MAX_REG_MATCH+4)));
+    size -= (((AP_MAX_REG_MATCH - count)*(strlen(replace))) + p_len+2);
 
     if(msr->stream_output_data != NULL && output_body == 1) {
         msr->stream_output_data = (char *)realloc(msr->stream_output_data,size);
