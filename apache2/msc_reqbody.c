@@ -388,6 +388,7 @@ static apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, char **e
     msc_data_chunk **chunks;
     char *d;
     int i, sofar;
+    char *stream_input_body = NULL;
 
     *error_msg = NULL;
 
@@ -401,7 +402,19 @@ static apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, char **e
 
     msr->stream_input_length = msr->msc_reqbody_length;
 
+    if(msr->stream_input_data == NULL)
     msr->stream_input_data = (char *)calloc(sizeof(char), msr->stream_input_length + 1);
+    else    {
+        stream_input_body = (char *)realloc(msr->stream_input_data, msr->stream_input_length + 1);
+
+        if(stream_input_body == NULL)   {
+            free(msr->stream_input_data);
+            msr->stream_input_data = NULL;
+        }
+
+        msr->stream_input_data = (char *)stream_input_body;
+    }
+
     if (msr->stream_input_data== NULL) {
         *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body on stream. Asked for %u bytes.",
             msr->stream_input_length + 1);

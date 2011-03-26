@@ -129,11 +129,6 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
             msr_log(msr, 4, "Input stream filter: Forwarded %" APR_SIZE_T_FMT " bytes.", msr->msc_reqbody_disk_chunk->length);
         }
 
-        if(msr->txcfg->stream_inbody_inspection && msr->stream_input_data != NULL) {
-            free(msr->stream_input_data);
-            msr->stream_input_data = NULL;
-        }
-
     }
 
     if (rc == 0) {
@@ -479,11 +474,6 @@ static void inject_content_to_of_brigade(modsec_rec *msr, ap_filter_t *f) {
             msr_log(msr, 9, "Content Injection: Data reinjected bytes [%d]",msr->stream_output_length);
         }
 
-        if(msr->stream_output_data != NULL) {
-            free(msr->stream_output_data);
-            msr->stream_output_data = NULL;
-        }
-
     }
 }
 
@@ -536,8 +526,26 @@ static int flatten_response_body(modsec_rec *msr) {
     msr->resbody_status = RESBODY_STATUS_READ;
 
     if (msr->txcfg->stream_outbody_inspection)  {
-        msr->stream_output_data = (char *)calloc(sizeof(char),msr->resbody_length+1);
-        msr->stream_output_length = msr->resbody_length+1;
+
+        char *stream_output_body = NULL;
+
+        if(msr->stream_output_data == NULL)
+            msr->stream_output_data = (char *)malloc(msr->resbody_length+1);
+        else    {
+            stream_output_body = (char *)realloc(msr->stream_output_data, msr->resbody_length+1);
+
+            if(stream_output_body == NULL)  {
+                free(msr->stream_output_data);
+                msr->stream_output_data = NULL;
+                msr_log(msr, 1, "Output filter: Stream Response body data memory allocation failed. Asked for: %" APR_SIZE_T_FMT,
+                    msr->stream_output_length + 1);
+                return -1;
+            }
+
+            msr->stream_output_data = (char *)stream_output_body;
+        }
+
+        msr->stream_output_length = msr->resbody_length;
 
         if (msr->stream_output_data == NULL) {
             msr_log(msr, 1, "Output filter: Stream Response body data memory allocation failed. Asked for: %" APR_SIZE_T_FMT,

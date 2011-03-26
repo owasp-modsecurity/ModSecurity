@@ -686,7 +686,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         else
             rule->sub_regex = NULL;
 
-        rule->re_precomp = 0;
+        //rule->re_precomp = 0;
     }
 
     if(rule->sub_regex == NULL)   {
@@ -707,6 +707,9 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         *error_msg = "Internal Error: cannot allocate memory";
         return -1;
     }
+
+    msr_log(msr,9,"Replace %s\n",replace);
+    msr_log(msr,9,"Pattern %s\n",re_pattern->value);
 
     memcpy(data,var->value,var->value_len);
 
@@ -739,24 +742,42 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 
     size -= (((AP_MAX_REG_MATCH - count)*(strlen(replace))) + p_len+2);
 
+    var->value_len = size;
+
     if(msr->stream_output_data != NULL && output_body == 1) {
-        msr->stream_output_data = (char *)realloc(msr->stream_output_data,size);
+
+        char *stream_output_data = NULL;
+
+        stream_output_data = (char *)realloc(msr->stream_output_data, size+1);
         msr->stream_output_length = size;
-        if (msr->stream_output_data != NULL)    {
-            memset(msr->stream_output_data,0,size);
-            memcpy(msr->stream_output_data,data,size);
-            msr->stream_output_data[msr->stream_output_length] = '\0';
+
+        if(stream_output_data == NULL)  {
+           free (msr->stream_output_data);
+           msr->stream_output_data = NULL;
+           return -1;
         }
+
+        msr->stream_output_data = (char *)stream_output_data;
+        if(msr->stream_output_data != NULL)
+        apr_cpystrn(msr->stream_output_data, data, size);
+
     }
 
     if(msr->stream_input_data != NULL && input_body == 1) {
-        msr->stream_input_data = (char *)realloc(msr->stream_input_data,size);
+        char *stream_input_data = NULL;
+
+        stream_input_data = (char *)realloc(msr->stream_input_data, size+1);
         msr->stream_input_length = size;
-        if (msr->stream_input_data != NULL) {
-            memset(msr->stream_input_data,0,size);
-            memcpy(msr->stream_input_data,data,size);
-            msr->stream_input_data[msr->stream_input_length] = '\0';
+
+        if(stream_input_data == NULL)  {
+           free (msr->stream_input_data);
+           msr->stream_input_data = NULL;
+           return -1;
         }
+
+        msr->stream_input_data = (char *)stream_input_data;
+        if(msr->stream_input_data != NULL)
+        apr_cpystrn(msr->stream_input_data, data, size);
     }
 
     if (! *error_msg) {
