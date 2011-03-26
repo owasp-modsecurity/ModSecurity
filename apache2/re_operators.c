@@ -708,9 +708,6 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         return -1;
     }
 
-    msr_log(msr,9,"Replace %s\n",replace);
-    msr_log(msr,9,"Pattern %s\n",re_pattern->value);
-
     memcpy(data,var->value,var->value_len);
 
     size += (AP_MAX_REG_MATCH*strlen(replace)+2);
