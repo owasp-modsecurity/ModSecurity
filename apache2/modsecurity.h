@@ -187,6 +187,7 @@ extern DSOLOCAL unsigned long int conn_read_state_limit;
 #define RULE_EXCEPTION_IMPORT_MSG       2
 #define RULE_EXCEPTION_REMOVE_ID        3
 #define RULE_EXCEPTION_REMOVE_MSG       4
+#define RULE_EXCEPTION_REMOVE_TAG       5
 
 #define NBSP                            160
 
@@ -378,6 +379,7 @@ struct modsec_rec {
 
     /* removed rules */
     apr_array_header_t  *removed_rules;
+    apr_array_header_t  *removed_rules_tag;
 
     /* When "allow" is executed the variable below is
      * updated to contain the scope of the allow action. Set

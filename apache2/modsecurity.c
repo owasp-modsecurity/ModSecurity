@@ -419,6 +419,9 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     msr->removed_rules = apr_array_make(msr->mp, 16, sizeof(char *));
     if (msr->removed_rules == NULL) return -1;
 
+    msr->removed_rules_tag = apr_array_make(msr->mp, 16, sizeof(char *));
+    if (msr->removed_rules_tag == NULL) return -1;
+
     return 1;
 }
 

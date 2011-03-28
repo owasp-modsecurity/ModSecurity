@@ -764,6 +764,10 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
         /* ENH nothing yet */
         return NULL;
     } else
+    if (strcasecmp(name, "ruleRemoveByTag") == 0) {
+        /* ENH nothing yet */
+        return NULL;
+    } else
     if (strcasecmp(name, "requestBodyAccess") == 0) {
         if (parse_boolean(value) == -1) {
             return apr_psprintf(engine->mp, "Invalid setting for ctl name "
@@ -906,7 +910,16 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         *(const char **)apr_array_push(msr->removed_rules) = (const char *)apr_pstrdup(msr->mp, value);
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Ctl: Removed rule %s.", value);
+            msr_log(msr, 4, "Ctl: Removed rule by id : %s.", value);
+        }
+
+        return 1;
+    } else
+    if (strcasecmp(name, "ruleRemoveByTag") == 0) {
+        *(const char **)apr_array_push(msr->removed_rules_tag) = (const char *)apr_pstrdup(msr->mp, value);
+
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Removed rule by tag : %s.", value);
         }
 
         return 1;

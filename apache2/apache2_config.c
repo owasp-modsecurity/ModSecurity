@@ -167,18 +167,40 @@ static void copy_rules_phase(apr_pool_t *mp,
                             char *my_error_msg = NULL;
 
                             int rc = msc_regexec(exceptions[j]->param_data,
-                                rule->actionset->msg, strlen(rule->actionset->msg),
-                                &my_error_msg);
+                                    rule->actionset->msg, strlen(rule->actionset->msg),
+                                    &my_error_msg);
                             if (rc >= 0) copy--;
+                        }
+                        break;
+                    case RULE_EXCEPTION_REMOVE_TAG :
+                        if ((rule->actionset != NULL)&&(apr_is_empty_table(rule->actionset->actions) == 0)) {
+                            char *my_error_msg = NULL;
+                            const apr_array_header_t *tarr = NULL;
+                            const apr_table_entry_t *telts = NULL;
+                            int i;
+
+                            tarr = apr_table_elts(rule->actionset->actions);
+                            telts = (const apr_table_entry_t*)tarr->elts;
+
+                            for (i = 0; i < tarr->nelts; i++) {
+                                msre_action *action = (msre_action *)telts[i].val;
+                                if(strcmp("tag", action->metadata->name) == 0)  {
+
+                                    int rc = msc_regexec(exceptions[j]->param_data,
+                                            action->param, strlen(action->param),
+                                            &my_error_msg);
+                                    if (rc >= 0) copy--;
+                                }
+                            }
                         }
                         break;
                 }
             }
 
             if (copy > 0) {
-                #ifdef DEBUG_CONF
+#ifdef DEBUG_CONF
                 ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy rule %pp [id \"%s\"]", rule, rule->actionset->id);
-                #endif
+#endif
 
                 /* Copy the rule. */
                 *(msre_rule **)apr_array_push(child_phase_arr) = rule;
@@ -188,9 +210,9 @@ static void copy_rules_phase(apr_pool_t *mp,
             }
         } else {
             if (mode == 2) {
-                #ifdef DEBUG_CONF
+#ifdef DEBUG_CONF
                 ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, mp, "Copy chain %pp for rule %pp [id \"%s\"]", rule, rule->chain_starter, rule->chain_starter->actionset->id);
-                #endif
+#endif
 
                 /* Copy the rule (it belongs to the chain we want to include. */
                 *(msre_rule **)apr_array_push(child_phase_arr) = rule;
@@ -1859,6 +1881,31 @@ static const char *cmd_rule_remove_by_id(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
+static const char *cmd_rule_remove_by_tag(cmd_parms *cmd, void *_dcfg,
+                                          const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
+    if (dcfg == NULL) return NULL;
+
+    re->type = RULE_EXCEPTION_REMOVE_TAG;
+    re->param = p1;
+    re->param_data = msc_pregcomp(cmd->pool, p1, 0, NULL, NULL);
+    if (re->param_data == NULL) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid regular expression: %s", p1);
+    }
+    *(rule_exception **)apr_array_push(dcfg->rule_exceptions) = re;
+
+    /* Remove the corresponding rules from the context straight away. */
+    msre_ruleset_rule_remove_with_exception(dcfg->ruleset, re);
+
+    #ifdef DEBUG_CONF
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool, "Added exception %pp (%d %s) to dcfg %pp.", re, re->type, re->param, dcfg);
+    #endif
+
+    return NULL;
+}
+
 static const char *cmd_rule_remove_by_msg(cmd_parms *cmd, void *_dcfg,
                                           const char *p1)
 {
@@ -2557,6 +2604,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "rule ID for removal"
+    ),
+
+    AP_INIT_ITERATE (
+        "SecRuleRemoveByTag",
+        cmd_rule_remove_by_tag,
+        NULL,
+        CMD_SCOPE_ANY,
+        "rule tag for removal"
     ),
 
     AP_INIT_ITERATE (
