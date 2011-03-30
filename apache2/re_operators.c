@@ -1,21 +1,16 @@
 /*
- * ModSecurity for Apache 2.x, http://www.modsecurity.org/
- * Copyright (c) 2004-2010 Trustwave Holdings, Inc. (http://www.trustwave.com/)
- *
- * This product is released under the terms of the General Public Licence,
- * version 2 (GPLv2). Please refer to the file LICENSE (included with this
- * distribution) which contains the complete text of the licence.
- *
- * There are special exceptions to the terms and conditions of the GPL
- * as it is applied to this software. View the full text of the exception in
- * file MODSECURITY_LICENSING_EXCEPTION in the directory of this software
- * distribution.
- *
- * If any of the files related to licensing are missing or if you have any
- * other questions related to licensing please contact Trustwave Holdings, Inc.
- * directly using the email address support@trustwave.com.
- *
- */
+* ModSecurity for Apache 2.x, http://www.modsecurity.org/
+* Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+*
+* You may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* If any of the files related to licensing are missing or if you have any
+* other questions related to licensing please contact Trustwave Holdings, Inc.
+* directly using the email address security@modsecurity.org.
+*/
 
 #include "re.h"
 #include "msc_pcre.h"
@@ -973,20 +968,134 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
 /* pm */
 
+static char *parse_pm_content(const char *op_parm, unsigned short int op_len, msre_rule *rule, char **error_msg)  {
+    char *parm = NULL;
+    char *content = NULL;
+    unsigned short int offset = 0;
+    char converted = 0;
+    int i, x;
+    unsigned char bin = 0, esc = 0, bin_offset = 0;
+    unsigned char bin_parm[3], c = 0;
+    char *processed = NULL;
+
+    content = apr_pstrdup(rule->ruleset->mp, op_parm);
+
+    if (content == NULL) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating memory for pattern matching content.");
+        return NULL;
+    }
+
+    while (offset < op_len && apr_isspace(content[offset])) {
+        offset++;
+    };
+
+    op_len = strlen(content);
+
+    if (content[offset] == '\"' && content[op_len-1] == '\"') {
+        parm = apr_pstrdup(rule->ruleset->mp, content + offset + 1);
+        if (parm  == NULL) {
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating memory for pattern matching content.");
+            return NULL;
+        }
+        parm[op_len - offset - 2] = '\0';
+    } else {
+        parm = apr_pstrdup(rule->ruleset->mp, content + offset);
+        if (parm == NULL) {
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating memory for pattern matching content.");
+            return NULL;
+        }
+    }
+
+    op_len = strlen(parm);
+
+    if (op_len == 0)   {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Content length is 0.");
+        return NULL;
+    }
+
+
+    for (i = 0, x = 0; i < op_len; i++) {
+        if (parm[i] == '|') {
+            if (bin) {
+                bin = 0;
+            } else {
+                bin = 1;
+            }
+        } else if(!esc && parm[i] == '\\') {
+            esc = 1;
+        } else {
+            if (bin) {
+                if (apr_isdigit(parm[i]) ||
+                        parm[i] == 'A' || parm[i] == 'a' ||
+                        parm[i] == 'B' || parm[i] == 'b' ||
+                        parm[i] == 'C' || parm[i] == 'c' ||
+                        parm[i] == 'D' || parm[i] == 'd' ||
+                        parm[i] == 'E' || parm[i] == 'e' ||
+                        parm[i] == 'F' || parm[i] == 'f')
+                {
+                    bin_parm[bin_offset] = (char)parm[i];
+                    bin_offset++;
+                    if (bin_offset == 2) {
+                        c = strtol((char *)bin_parm, (char **) NULL, 16) & 0xFF;
+                        bin_offset = 0;
+                        parm[x] = c;
+                        x++;
+                        converted = 1;
+                    }
+                } else if (parm[i] == ' ') {
+                }
+            } else if (esc) {
+                if (parm[i] == ':' ||
+                        parm[i] == ';' ||
+                        parm[i] == '\\' ||
+                        parm[i] == '\"')
+                {
+                    parm[x] = parm[i];
+                    x++;
+                } else {
+                    *error_msg = apr_psprintf(rule->ruleset->mp, "Unsupported escape sequence.");
+                    return NULL;
+                }
+                esc = 0;
+                converted = 1;
+            } else {
+                parm[x] = parm[i];
+                x++;
+            }
+        }
+    }
+
+    if (converted) {
+        op_len = x;
+    }
+
+    processed = apr_pstrmemdup(rule->ruleset->mp, parm, op_len);
+
+    if (processed == NULL) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating memory for pattern matching content.");
+        return NULL;
+    }
+
+    return processed;
+}
+
 static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
     ACMP *p;
     const char *phrase;
     const char *next;
+    unsigned short int op_len;
 
     if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'pm'.");
         return 0; /* ERROR */
     }
 
+    op_len = strlen(rule->op_param);
+
     p = acmp_create(0, rule->ruleset->mp);
     if (p == NULL) return 0;
 
-    phrase = apr_pstrdup(rule->ruleset->mp, rule->op_param);
+    phrase = apr_pstrdup(rule->ruleset->mp, parse_pm_content(rule->op_param, op_len, rule, error_msg));
 
     /* Loop through phrases */
     /* ENH: Need to allow quoted phrases w/space */
@@ -1013,6 +1122,8 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     char *start;
     char *end;
     const char *rulefile_path;
+    char *processed = NULL;
+    unsigned short int op_len;
     apr_status_t rc;
     apr_file_t *fd;
     ACMP *p;
@@ -1077,10 +1188,14 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
                 return 0;
             }
 
+            op_len = strlen(buf);
+            processed = apr_pstrdup(rule->ruleset->mp, parse_pm_content(buf, op_len, rule, error_msg));
+
             /* Trim Whitespace */
-            start = buf;
+            start = processed;
             while ((apr_isspace(*start) != 0) && (*start != '\0')) start++;
-            end = buf + strlen(buf);
+            end = processed + strlen(processed);
+            //end = buf + strlen(buf);
             if (end > start) end--;
             while ((end > start) && (apr_isspace(*end) != 0)) end--;
             if (end > start) {
@@ -1803,17 +1918,20 @@ static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     return 0;
 }
 
-/* m */
+/* strmatch */
 
-static int msre_op_m_param_init(msre_rule *rule, char **error_msg) {
+static int msre_op_strmatch_param_init(msre_rule *rule, char **error_msg) {
     const apr_strmatch_pattern *compiled_pattern;
     const char *pattern = rule->op_param;
+    unsigned short int op_len;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
+    op_len = strlen(pattern);
+
     /* Compile pattern */
-    compiled_pattern = apr_strmatch_precompile(rule->ruleset->mp, pattern, 1);
+    compiled_pattern = apr_strmatch_precompile(rule->ruleset->mp, parse_pm_content(pattern, op_len, rule, error_msg), 1);
     if (compiled_pattern == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern: %s", pattern);
         return 0;
@@ -1824,7 +1942,7 @@ static int msre_op_m_param_init(msre_rule *rule, char **error_msg) {
     return 1; /* OK */
 }
 
-static int msre_op_m_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+static int msre_op_strmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     apr_strmatch_pattern *compiled_pattern = (apr_strmatch_pattern *)rule->op_param_data;
     const char *target;
     unsigned int target_length;
@@ -3590,11 +3708,11 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_endsWith_execute
     );
 
-    /* m */
+    /* strmatch */
     msre_engine_op_register(engine,
-        "m",
-        msre_op_m_param_init,
-        msre_op_m_execute
+        "strmatch",
+        msre_op_strmatch_param_init,
+        msre_op_strmatch_execute
     );
 
     /* validateDTD */

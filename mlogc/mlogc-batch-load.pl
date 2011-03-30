@@ -1,4 +1,4 @@
-#!@PERL@
+#!/usr/bin/perl
 #
 # ModSecurity for Apache 2.x, http://www.modsecurity.org/
 # Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)

@@ -1,14 +1,14 @@
 ModSecurity for Apache 2.x, http://www.modsecurity.org/
-Copyright (c) 2004-2010 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 
-ModSecurity for Apache is an open source product, released under terms of
-the General Public Licence, Version 2 (GPLv2). Please refer to the
-file LICENSE, which contains the complete text of the licence.
+You may not use this file except in compliance with
+the License.  You may obtain a copy of the License at
 
-There are special exceptions to the terms and conditions of the GPL
-as it is applied to this software. View the full text of the exception in
-file MODSECURITY_LICENSING_EXCEPTION in the directory of this software
-distribution.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+If any of the files related to licensing are missing or if you have any
+other questions related to licensing please contact Trustwave Holdings, Inc.
+directly using the email address security@modsecurity.org.
 
 
 DOCUMENTATION
