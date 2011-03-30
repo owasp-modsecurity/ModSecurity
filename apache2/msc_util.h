@@ -92,7 +92,7 @@ int DSOLOCAL decode_base64_ext(char *plain_text, const char *input, int input_le
 
 int DSOLOCAL convert_to_int(const char c);
 
-int DSOLOCAL set_match_to_tx(modsec_rec *msr, int capture, const char *match);
+int DSOLOCAL set_match_to_tx(modsec_rec *msr, int capture, const char *match, int tx_n);
 
 int DSOLOCAL js_decode_nonstrict_inplace(unsigned char *input, long int input_len);
 

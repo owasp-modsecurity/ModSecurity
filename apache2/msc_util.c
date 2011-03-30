@@ -192,15 +192,16 @@ int convert_to_int(const char c)
    return n;
 }
 
-/* \brief Set a match to tx.0
+/* \brief Set a match to tx.N
 *
-* \param msr
-* \param capture
-* \param match
+* \param msr Pointer to modsec resource
+* \param capture If ON match will be saved
+* \param match Pointer to captured string
+ *\parm tx_n The tx number to save the data
 *
 * \retval 0 On Sucess|Fail
 */
-int set_match_to_tx(modsec_rec *msr, int capture, const char *match)  {
+int set_match_to_tx(modsec_rec *msr, int capture, const char *match, int tx_n)  {
 
     if (capture) {
         int i;
@@ -208,7 +209,7 @@ int set_match_to_tx(modsec_rec *msr, int capture, const char *match)  {
 
         if (s == NULL) return -1;
 
-        s->name = "0";
+        s->name = apr_psprintf(msr->mp,"%d", tx_n);
         s->name_len = strlen(s->name);
         s->value = apr_pstrdup(msr->mp, match);
         if (s->value == NULL) return -1;
@@ -216,16 +217,17 @@ int set_match_to_tx(modsec_rec *msr, int capture, const char *match)  {
         apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "Added phrase match to TX.0: %s",
-                    log_escape_nq_ex(msr->mp, s->value, s->value_len));
+            msr_log(msr, 9, "Added phrase match to TX.%d: %s",
+                    tx_n, log_escape_nq_ex(msr->mp, s->value, s->value_len));
         }
 
-        /* Unset the remaining ones (from previous invocations). */
-        for(i = 1; i <= 9; i++) {
+        /*
+        for(i = 0; i <= 9; i++) {
             char buf[2];
             apr_snprintf(buf, sizeof(buf), "%d", i);
             apr_table_unset(msr->tx_vars, buf);
         }
+        */
     }
 
     return 0;
