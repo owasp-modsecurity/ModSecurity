@@ -69,6 +69,29 @@ static const short b64_reverse_t[256] = {
   -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2
 };
 
+/* \brief Remove escape char
+*
+* \param mptmp Pointer to the pool
+* \param input Pointer to input string
+* \param input_len Input data length
+*
+* \retval string On Success
+*/
+char *remove_escape(apr_pool_t *mptmp, const char *input, int input_len)  {
+    char *parm = apr_palloc(mptmp, input_len);;
+    char *ret = parm;
+    int len = input_len;
+
+    for(; *input !='\0' && len >=0; input++, len--)    {
+        if(*input != '\\')    {
+            *parm++ = *input;
+        }
+    }
+
+    *parm = '\0';
+    return ret;
+}
+
 /**
  *
  */

@@ -1415,6 +1415,8 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                 return -1;
             }
 
+            match = remove_escape(rule->ruleset->mp, match, strlen(match));
+
             match_length = strlen(match);
 
             if((strstr(match,"http") == NULL) && (match_length > 0) && (strchr(match,'.')))    {

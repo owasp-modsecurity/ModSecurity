@@ -31,6 +31,8 @@ int DSOLOCAL normalize_path_inplace(unsigned char *input, int len, int win, int 
 
 int DSOLOCAL parse_boolean(const char *input);
 
+char DSOLOCAL *remove_escape(apr_pool_t *mptmp, const char *input, int input_len);
+
 int DSOLOCAL parse_name_eq_value(apr_pool_t *mp, const char *input, char **name, char **value);
 
 char DSOLOCAL *url_encode(apr_pool_t *mp, char *input, unsigned int input_len, int *changed);
