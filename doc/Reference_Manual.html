@@ -20,15 +20,15 @@ href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special
 Atom Feed" 
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:RecentChanges&amp;feed=atom">
 		<title>SourceForge.net: Reference Manual - mod-security</title>
-		<link rel="stylesheet" href="Reference_Manual_files/commonPrint.css" 
+		<link rel="stylesheet" href="Reference_manual_files/commonPrint.css" 
 type="text/css">
-		<link rel="stylesheet" href="Reference_Manual_files/index_003.css" 
+		<link rel="stylesheet" href="Reference_manual_files/index_003.css" 
 type="text/css">
-		<link rel="stylesheet" href="Reference_Manual_files/index.css" 
+		<link rel="stylesheet" href="Reference_manual_files/index.css" 
 type="text/css">
-		<link rel="stylesheet" href="Reference_Manual_files/index_004.css" 
+		<link rel="stylesheet" href="Reference_manual_files/index_004.css" 
 type="text/css">
-		<link rel="stylesheet" href="Reference_Manual_files/index_002.css" 
+		<link rel="stylesheet" href="Reference_manual_files/index_002.css" 
 type="text/css">
 		<!--[if lt IE 7]><script type="text/javascript" src="/apps/mediawiki/mod-security/skins/common/IEFixes.js?207"></script>
 		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
@@ -55,7 +55,7 @@ type="text/css">
 		var wgUserLanguage = "en";
 		var wgContentLanguage = "en";
 		var wgBreakFrames = false;
-		var wgCurRevisionId = 373;
+		var wgCurRevisionId = 374;
 		var wgVersion = "1.15.1";
 		var wgEnableAPI = true;
 		var wgEnableWriteAPI = true;
@@ -65,10 +65,10 @@ type="text/css">
 		var wgRestrictionMove = [];
 		/*]]>*/</script>
 
-		<script type="text/javascript" src="Reference_Manual_files/wikibits.js"><!-- wikibits js --></script>
+		<script type="text/javascript" src="Reference_manual_files/wikibits.js"><!-- wikibits js --></script>
 		<!-- Head Scripts -->
-		<script type="text/javascript" src="Reference_Manual_files/ajax.js"></script>
-		<script type="text/javascript" src="Reference_Manual_files/index.php"><!-- site js --></script>
+		<script type="text/javascript" src="Reference_manual_files/ajax.js"></script>
+		<script type="text/javascript" src="Reference_manual_files/index.php"><!-- site js --></script>
 	
 
 </head><body class="mediawiki ltr ns-0 ns-subject page-Reference_Manual 
@@ -912,12 +912,10 @@ Solaris, FreeBSD, OpenBSD, NetBSD, AIX, Mac OS X, and HP-UX.
 </p>
 <a name="Licensing" id="Licensing"></a><h2> <span class="mw-headline"> 
 Licensing </span></h2>
-<p>ModSecurity is available under two licenses. Users can choose to use 
-the software under the terms of the GNU General Public License version 2
- (licence text is included with the distribution), as an Open Source / 
-Free Software product. A range of commercial licenses is also available,
- together with a range of commercial support contracts. For more 
-information on commercial licensing please contact Trustwave.
+<p>ModSecurity is available under the Apache Software License v2 <a 
+href="http://www.apache.org/licenses/LICENSE-2.0.txt" class="external 
+autonumber" title="http://www.apache.org/licenses/LICENSE-2.0.txt" 
+rel="nofollow">[1]</a>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> ModSecurity, mod_security, ModSecurity Pro,
  and ModSecurity Core Rules are trademarks or registered trademarks of 
@@ -1656,7 +1654,7 @@ used for geolocation lookups.
 </p><p>ModSecurity relies on the free geolocation databases (GeoLite 
 City and GeoLite Country) that can be obtained from MaxMind <a 
 href="http://www.maxmind.com/" class="external autonumber" 
-title="http://www.maxmind.com" rel="nofollow">[1]</a>.
+title="http://www.maxmind.com" rel="nofollow">[2]</a>.
 </p>
 <a name="SecGsbLookupDb" id="SecGsbLookupDb"></a><h2> <span 
 class="mw-headline"> SecGsbLookupDb </span></h2>
@@ -1671,7 +1669,7 @@ used for Google Safe Browsing (GSB) lookups.
  can be obtained from the Google GSB API <a 
 href="http://code.google.com/apis/safebrowsing/" class="external 
 autonumber" title="http://code.google.com/apis/safebrowsing/" 
-rel="nofollow">[2]</a>.
+rel="nofollow">[3]</a>.
 </p>
 <dl><dt> Note&nbsp;</dt><dd> After registering and obtaining a Safe 
 Browsing API key, you can automatically download the GSB using a tool 
@@ -1702,13 +1700,13 @@ httpd-guardian, which is part of the Apache httpd tools project <a
 href="http://apache-tools.cvs.sourceforge.net/viewvc/apache-tools/apache-tools/"
  class="external autonumber" 
 title="http://apache-tools.cvs.sourceforge.net/viewvc/apache-tools/apache-tools/"
- rel="nofollow">[3]</a>. The httpd-guardian tool is designed to defend 
+ rel="nofollow">[4]</a>. The httpd-guardian tool is designed to defend 
 against denial of service attacks. It uses the blacklist tool (from the 
 same project) to interact with an iptables-based (on a Linux system) or 
 pf-based (on a BSD system) firewall, dynamically blacklisting the 
 offending IP addresses. It can also interact with SnortSam <a 
 href="http://www.snortsam.net/" class="external autonumber" 
-title="http://www.snortsam.net" rel="nofollow">[4]</a>. Assuming 
+title="http://www.snortsam.net" rel="nofollow">[5]</a>. Assuming 
 httpd-guardian is already configured (look into the source code for the 
 detailed instructions), you only need to add one line to your Apache 
 configuration to deploy it:
@@ -2106,7 +2104,7 @@ For more information, please go to the Apache documentation, under
 Configuration Sections <a 
 href="http://httpd.apache.org/docs/2.0/sections.html" class="external 
 autonumber" title="http://httpd.apache.org/docs/2.0/sections.html" 
-rel="nofollow">[5]</a>. This directive does not affect how configuration
+rel="nofollow">[6]</a>. This directive does not affect how configuration
  options are inherited.
 </dd></dl>
 <a name="SecRuleEngine" id="SecRuleEngine"></a><h2> <span 
@@ -2554,7 +2552,7 @@ diagram, the 5 ModSecurity processing phases are shown.
 </p><p><a 
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=File:Apache_request_cycle-modsecurity.jpg"
  class="image" title="Apache request cycle-modsecurity.jpg"><img alt="" 
-src="Reference_Manual_files/600px-Apache_request_cycle-modsecurity.jpg" 
+src="Reference_manual_files/600px-Apache_request_cycle-modsecurity.jpg" 
 height="459" width="600" border="0"></a>
 </p><p>In order to select the phase a rule executes during, use the 
 phase action either directly in the rule or in using the 
@@ -3492,7 +3490,7 @@ UNIQUE_ID </span></h2>
 href="http://httpd.apache.org/docs/2.2/mod/mod_unique_id.html" 
 class="external autonumber" 
 title="http://httpd.apache.org/docs/2.2/mod/mod_unique_id.html" 
-rel="nofollow">[6]</a>.  This module provides a magic token for each 
+rel="nofollow">[7]</a>.  This module provides a magic token for each 
 request which is guaranteed to be unique across "all" requests under 
 very specific conditions. The unique identifier is even unique across 
 multiple machines in a properly configured cluster of machines. The 
@@ -3659,7 +3657,7 @@ cmdLine </span></h2>
 <dl><dt> Note&nbsp;</dt><dd> This is a community contribution developed 
 by Marc Stern <a href="http://www.linkedin.com/in/marcstern" 
 class="external autonumber" title="http://www.linkedin.com/in/marcstern"
- rel="nofollow">[7]</a>
+ rel="nofollow">[8]</a>
 </dd></dl>
 <p>In Windows and Unix, commands may be escaped by different means, such
  as:
@@ -4204,7 +4202,7 @@ modsecurity.org
 </li><li>420,000–429,999: reserved for ScallyWhack <a 
 href="http://projects.otaku42.de/wiki/Scally-Whack" class="external 
 autonumber" title="http://projects.otaku42.de/wiki/Scally-Whack" 
-rel="nofollow">[8]</a>
+rel="nofollow">[9]</a>
 </li><li>430,000–699,999: unused (available for reservation)
 </li><li>700,000–799,999: reserved for Ivan Ristic
 </li><li>900,000–999,999: reserved for the OWASP ModSecurity Core Rule 
@@ -4212,7 +4210,7 @@ Set <a
 href="http://www.owasp.org/index.php/Category:OWASP_ModSecurity_Core_Rule_Set_Project"
  class="external autonumber" 
 title="http://www.owasp.org/index.php/Category:OWASP_ModSecurity_Core_Rule_Set_Project"
- rel="nofollow">[9]</a> project
+ rel="nofollow">[10]</a> project
 </li><li>1,000,000-1,999,999: unused (available for reservation)
 </li><li>2,000,000-2,999,999: reserved for rules from Trustwave's 
 SpiderLabs Research team
@@ -4847,7 +4845,7 @@ script in the /util directory called runav.pl <a
 href="http://mod-security.svn.sourceforge.net/viewvc/mod-security/crs/trunk/util/"
  class="external autonumber" 
 title="http://mod-security.svn.sourceforge.net/viewvc/mod-security/crs/trunk/util/"
- rel="nofollow">[10]</a> that allows the file approval mechanism to 
+ rel="nofollow">[11]</a> that allows the file approval mechanism to 
 integrate with the ClamAV virus scanner. This is especially handy to 
 prevent viruses and exploits from entering the web server through file 
 upload.
@@ -5079,7 +5077,7 @@ SecRule STREAM_OUTPUT_BODY "@rsub s/&lt;!--.*?--&gt;//" "phase:4,t:none,nolog,pa
 </pre>
 <p>Regular expressions are handled by the PCRE library <a 
 href="http://www.pcre.org/" class="external autonumber" 
-title="http://www.pcre.org" rel="nofollow">[11]</a>. ModSecurity 
+title="http://www.pcre.org" rel="nofollow">[12]</a>. ModSecurity 
 compiles its regular expressions with the following settings:
 </p>
 <ol><li>The entire input is treated as a single line, even when there 
@@ -5115,7 +5113,7 @@ SecRule REQUEST_HEADERS:User-Agent "(?i)nikto"
 </pre>
 <p>Regular expressions are handled by the PCRE library <a 
 href="http://www.pcre.org/" class="external autonumber" 
-title="http://www.pcre.org" rel="nofollow">[12]</a>. ModSecurity 
+title="http://www.pcre.org" rel="nofollow">[13]</a>. ModSecurity 
 compiles its regular expressions with the following settings:
 </p>
 <ol><li>The entire input is treated as a single line, even when there 
@@ -5652,7 +5650,7 @@ Template argument size: 0/2097152 bytes
 Expensive parser function count: 0/100
 -->
 
-<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20110329193038 -->
+<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20110330153902 -->
 <div class="printfooter">
 Retrieved from "<a 
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual">http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual</a>"</div>
@@ -5762,7 +5760,7 @@ pages</a></li>
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;printable=yes&amp;printable=yes"
  rel="alternate" title="Printable version of this page [alt-shift-p]" 
 accesskey="p">Printable version</a></li>				<li id="t-permalink"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=373"
+href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=374"
  title="Permanent link to this revision of the page">Permanent link</a></li>
 			</ul>
 		</div>
@@ -5771,18 +5769,18 @@ href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Referen
 			<div class="visualClear"></div>
 			<div id="footer">
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img 
-src="Reference_Manual_files/poweredby_mediawiki_88x31.png" alt="Powered 
+src="Reference_manual_files/poweredby_mediawiki_88x31.png" alt="Powered 
 by MediaWiki"></a></div>
 			<ul id="f-list">
-					<li id="lastmod"> This page was last modified on 29 March 2011, at 
-19:13.</li>
-					<li id="viewcount">This page has been accessed 3,293 times.</li>
+					<li id="lastmod"> This page was last modified on 30 March 2011, at 
+15:36.</li>
+					<li id="viewcount">This page has been accessed 3,323 times.</li>
 			</ul>
 		</div>
 </div>
 
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
-<!-- Served in 0.179 secs. -->
+<!-- Served in 1.181 secs. -->
     
     
     <script type="text/javascript">
