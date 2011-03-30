@@ -492,7 +492,7 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
 
 /* rsub */
 
-static char *remove_escape(msre_rule *rule, char *str, int len)  {
+static char *param_remove_escape(msre_rule *rule, char *str, int len)  {
     char *parm = apr_palloc(rule->ruleset->mp, len);;
     char *ret = parm;
 
@@ -604,7 +604,7 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
         return -1;
     }
 
-    e_replace = remove_escape(rule, replace, strlen(replace));
+    e_replace = param_remove_escape(rule, replace, strlen(replace));
     rule->sub_str = apr_pstrmemdup(rule->ruleset->mp, e_replace, strlen(e_replace));
 
     if (flags) {
@@ -619,7 +619,7 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
         }
     }
 
-    e_pattern = remove_escape(rule, reg_pattern, strlen(reg_pattern));
+    e_pattern = param_remove_escape(rule, reg_pattern, strlen(reg_pattern));
     pattern = apr_pstrndup(rule->ruleset->mp, e_pattern, strlen(e_pattern));
 
     if(strstr(pattern,"%{") == NULL)    {
