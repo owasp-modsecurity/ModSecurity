@@ -1107,6 +1107,9 @@ static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
 
     phrase = apr_pstrdup(rule->ruleset->mp, parse_pm_content(rule->op_param, op_len, rule, error_msg));
 
+    if(phrase == NULL)
+        phrase = apr_pstrdup(rule->ruleset->mp, rule->op_param);
+
     /* Loop through phrases */
     /* ENH: Need to allow quoted phrases w/space */
     for (;;) {
@@ -1202,9 +1205,15 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
             processed = apr_pstrdup(rule->ruleset->mp, parse_pm_content(buf, op_len, rule, error_msg));
 
             /* Trim Whitespace */
-            start = processed;
+            if(processed != NULL)
+                start = processed;
+            else
+                start = buf;
             while ((apr_isspace(*start) != 0) && (*start != '\0')) start++;
-            end = processed + strlen(processed);
+            if(processed != NULL)
+                end = processed + strlen(processed);
+            else
+                end = buf + strlen(buf);
             //end = buf + strlen(buf);
             if (end > start) end--;
             while ((end > start) && (apr_isspace(*end) != 0)) end--;
