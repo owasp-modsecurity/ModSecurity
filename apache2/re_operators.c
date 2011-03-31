@@ -686,7 +686,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 
     if(rule->sub_regex == NULL)   {
         *error_msg = "Internal Error: regex data is null.";
-        return -1;
+        return 0;
     }
 
     str->value = apr_pstrndup(msr->mp, rule->sub_str, strlen(rule->sub_str));
