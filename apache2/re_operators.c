@@ -671,7 +671,6 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         msr_log(msr,9,"Operator rsub only works with STREAM_* variables");
         return -1;
     }
-
     if(rule->re_precomp == 1)    {
         re_pattern->value = apr_pstrndup(msr->mp, rule->re_str, strlen(rule->re_str));
         re_pattern->value_len = strlen(re_pattern->value);
@@ -679,8 +678,15 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         expand_macros(msr, re_pattern, rule, msr->mp);
 
         if(strlen(re_pattern->value) > 0)   {
-            pattern = log_escape_re(msr->mp, re_pattern->value);
-            rule->sub_regex = ap_pregcomp(msr->mp, pattern, AP_REG_EXTENDED);
+            if(rule->escape_re == 1)    {
+                pattern = log_escape_re(msr->mp, re_pattern->value);
+                if (msr->txcfg->debuglog_level >= 6) {
+                    msr_log(msr, 6, "Escaping pattern [%s]",pattern);
+                }
+                rule->sub_regex = ap_pregcomp(msr->mp, pattern, AP_REG_EXTENDED);
+            } else  {
+                rule->sub_regex = ap_pregcomp(msr->mp, re_pattern->value, AP_REG_EXTENDED);
+            }
         }
         else    {
             rule->sub_regex = NULL;
