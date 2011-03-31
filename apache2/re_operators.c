@@ -1209,12 +1209,12 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
                 start = processed;
             else
                 start = buf;
+
             while ((apr_isspace(*start) != 0) && (*start != '\0')) start++;
             if(processed != NULL)
                 end = processed + strlen(processed);
             else
                 end = buf + strlen(buf);
-            //end = buf + strlen(buf);
             if (end > start) end--;
             while ((end > start) && (apr_isspace(*end) != 0)) end--;
             if (end > start) {
@@ -1223,10 +1223,6 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
 
             /* Ignore empty lines and comments */
             if ((start == end) || (*start == '#')) continue;
-
-#ifdef DEBUG_CONF
-            fprintf(stderr, "Adding phrase file pattern: \"%s\"\n", buf);
-#endif
 
             acmp_add_pattern(p, start, NULL, NULL, (end - start));
         }
