@@ -187,6 +187,7 @@ struct msre_rule {
     char                    *sub_str;
     char                    *re_str;
     int                     re_precomp;
+    int                     escape_re;
 
     msre_ipmatch            *ip_op;
 };

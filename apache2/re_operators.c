@@ -612,6 +612,8 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
             delim = apr_tolower(*flags);
             if (delim == 'i')
                 ignore_case = 1;
+            else if (delim == 'd')
+                rule->escape_re = 1;
             else
                 *error_msg = apr_psprintf(rule->ruleset->mp, "Regex flag not supported",
                         erroffset, errptr);
@@ -653,7 +655,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char *offset = NULL;
     int sub = 0, so = 0, p_len = 0;
     char *replace = NULL;
-    char *data = NULL;
+    char *data = NULL, *pattern = NULL;
     int size = var->value_len;
     int output_body = 0, input_body = 0, count = 0;
     ap_regmatch_t pmatch[AP_MAX_REG_MATCH];
@@ -676,12 +678,14 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 
         expand_macros(msr, re_pattern, rule, msr->mp);
 
-        if(strlen(re_pattern->value) > 0)
-            rule->sub_regex = ap_pregcomp(msr->mp, re_pattern->value, AP_REG_EXTENDED);
-        else
+        if(strlen(re_pattern->value) > 0)   {
+            pattern = log_escape_re(msr->mp, re_pattern->value);
+            rule->sub_regex = ap_pregcomp(msr->mp, pattern, AP_REG_EXTENDED);
+        }
+        else    {
             rule->sub_regex = NULL;
+        }
 
-        //rule->re_precomp = 0;
     }
 
     if(rule->sub_regex == NULL)   {
@@ -1384,13 +1388,13 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     *error_msg = NULL;
 
     if(regex == NULL)    {
-        *error_msg = "Internal Error: regex data is null.";
-        return -1;
+        *error_msg = "Internal Error: regex is null.";
+        return 0;
     }
 
     if(gsb == NULL)    {
-        *error_msg = "Internal Error: gsb data is null.";
-        return -1;
+        *error_msg = "Internal Error: gsb database is null.";
+        return 0;
     }
 
     data = apr_pcalloc(msr->mp, var->value_len+1);
@@ -2948,13 +2952,17 @@ static int msre_op_geoLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
 static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     unsigned int h0, h1, h2, h3;
+    unsigned int high8bits = 0;
     char *name_to_check = NULL;
     char *target = NULL;
     apr_sockaddr_t *sa = NULL;
     apr_status_t rc;
+    int capture = 0;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
+
+    capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     /* ENH Add IPv6 support. */
 
@@ -2964,7 +2972,8 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
     /* Construct the host name we want to resolve. */
     if (sscanf(target, "%d.%d.%d.%d", &h0, &h1, &h2, &h3) == 4) {
         /* IPv4 address */
-        name_to_check = apr_psprintf(msr->mp, "%d.%d.%d.%d.%s", h3, h2, h1, h0, rule->op_param);
+        //name_to_check = apr_psprintf(msr->mp, "%d.%d.%d.%d.%s", h3, h2, h1, h0, rule->op_param);
+        name_to_check = apr_psprintf(msr->mp, "2.0.0.127.%s", rule->op_param);
     } else {
         /* Assume the input is a domain name. */
         name_to_check = apr_psprintf(msr->mp, "%s.%s", target, rule->op_param);
@@ -2975,8 +2984,73 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
     rc = apr_sockaddr_info_get(&sa, name_to_check,
         APR_UNSPEC/*msr->r->connection->remote_addr->family*/, 0, 0, msr->mp);
     if (rc == APR_SUCCESS) {
-        *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s.",
-            log_escape_nq(msr->mp, name_to_check), var->name);
+
+        high8bits = sa->sa.sin.sin_addr.s_addr >> 24;
+
+        /* multi.uribl.com */
+
+        if(strstr(rule->op_param,"uribl.com"))  {
+
+            switch(high8bits)   {
+                case 2:
+                    *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s (BLACK).",
+                            log_escape_nq(msr->mp, name_to_check), var->name);
+                    break;
+                case 4:
+                    *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s (GREY).",
+                            log_escape_nq(msr->mp, name_to_check), var->name);
+                    break;
+                case 8:
+                    *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s (RED).",
+                            log_escape_nq(msr->mp, name_to_check), var->name);
+                    break;
+                case 14:
+                    *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s (BLACK,GREY,RED).",
+                            log_escape_nq(msr->mp, name_to_check), var->name);
+                    break;
+                case 255:
+                    *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s (DNS IS BLOCKED).",
+                            log_escape_nq(msr->mp, name_to_check), var->name);
+                    break;
+                default:
+                    *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s.",
+                            log_escape_nq(msr->mp, name_to_check), var->name);
+                    break;
+            }
+
+        } else
+            if(strstr(rule->op_param,"spamhaus.org"))  {
+
+                switch(high8bits)   {
+                    case 2:
+                    case 3:
+                        *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s (Static UBE sources).",
+                                log_escape_nq(msr->mp, name_to_check), var->name);
+                        break;
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                        *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s (Illegal 3rd party exploits).",
+                                log_escape_nq(msr->mp, name_to_check), var->name);
+                        break;
+                    case 10:
+                    case 11:
+                        *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s (Delivering unauthenticated SMTP email).",
+                                log_escape_nq(msr->mp, name_to_check), var->name);
+                        break;
+                    default:
+                        *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s.",
+                                log_escape_nq(msr->mp, name_to_check), var->name);
+                        break;
+                }
+
+            } else  {
+                *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s.",
+                        log_escape_nq(msr->mp, name_to_check), var->name);
+
+            }
+
         return 1; /* Match. */
     }
 
@@ -3003,7 +3077,7 @@ static int msre_op_inspectFile_init(msre_rule *rule, char **error_msg) {
 
     filename = resolve_relative_path(rule->ruleset->mp, rule->filename, filename);
 
-    #if defined(WITH_LUA)
+#if defined(WITH_LUA)
     /* ENH Write & use string_ends(s, e). */
     if (strlen(rule->op_param) > 4) {
         char *p = filename + strlen(filename) - 4;

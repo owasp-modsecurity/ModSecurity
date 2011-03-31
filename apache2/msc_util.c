@@ -662,24 +662,28 @@ unsigned char *c2x(unsigned what, unsigned char *where) {
     return where;
 }
 
+char *log_escape_re(apr_pool_t *mp, const char *text) {
+    return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 1, 1, 1);
+}
+
 char *log_escape(apr_pool_t *mp, const char *text) {
-    return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 1, 0);
+    return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 1, 0, 0);
 }
 
 char *log_escape_nq(apr_pool_t *mp, const char *text) {
-    return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 0, 0);
+    return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 0, 0, 0);
 }
 
 char *log_escape_ex(apr_pool_t *mp, const char *text, unsigned long int text_length) {
-    return _log_escape(mp, (const unsigned char *)text, text_length, 1, 0);
+    return _log_escape(mp, (const unsigned char *)text, text_length, 1, 0, 0);
 }
 
 char *log_escape_nq_ex(apr_pool_t *mp, const char *text, unsigned long int text_length) {
-    return _log_escape(mp, (const unsigned char *)text, text_length, 0, 0);
+    return _log_escape(mp, (const unsigned char *)text, text_length, 0, 0, 0);
 }
 
 char *log_escape_header_name(apr_pool_t *mp, const char *text) {
-    return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 0, 1);
+    return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 0, 1, 0);
 }
 
 char *log_escape_raw(apr_pool_t *mp, const unsigned char *text, unsigned long int text_length) {
@@ -749,7 +753,7 @@ char *log_escape_hex(apr_pool_t *mp, const unsigned char *text, unsigned long in
  * Transform input into a form safe for logging.
  */
 char *_log_escape(apr_pool_t *mp, const unsigned char *input, unsigned long int input_len,
-    int escape_quotes, int escape_colon)
+    int escape_quotes, int escape_colon, int escape_re)
 {
     unsigned char *d = NULL;
     char *ret = NULL;
@@ -776,6 +780,62 @@ char *_log_escape(apr_pool_t *mp, const unsigned char *input, unsigned long int 
                 if (escape_quotes) {
                     *d++ = '\\';
                     *d++ = '"';
+                } else {
+                    *d++ = input[i];
+                }
+                break;
+            case '+' :
+                if (escape_re) {
+                    *d++ = '\\';
+                    *d++ = '+';
+                } else {
+                    *d++ = input[i];
+                }
+                break;
+            case '.' :
+                if (escape_re) {
+                    *d++ = '\\';
+                    *d++ = '.';
+                } else {
+                    *d++ = input[i];
+                }
+                break;
+            case ']' :
+                if (escape_re) {
+                    *d++ = '\\';
+                    *d++ = ']';
+                } else {
+                    *d++ = input[i];
+                }
+                break;
+            case '[' :
+                if (escape_re) {
+                    *d++ = '\\';
+                    *d++ = '[';
+                } else {
+                    *d++ = input[i];
+                }
+                break;
+            case '(' :
+                if (escape_re) {
+                    *d++ = '\\';
+                    *d++ = '(';
+                } else {
+                    *d++ = input[i];
+                }
+                break;
+            case ')' :
+                if (escape_re) {
+                    *d++ = '\\';
+                    *d++ = ')';
+                } else {
+                    *d++ = input[i];
+                }
+                break;
+            case '/' :
+                if (escape_re) {
+                    *d++ = '\\';
+                    *d++ = '/';
                 } else {
                     *d++ = input[i];
                 }
