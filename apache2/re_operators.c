@@ -1496,7 +1496,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                             ret = verify_gsb(gsb, rule, canon, canon_length);
 
                             if(ret > 0) {
-                                set_match_to_tx(msr, capture, canon, 0);
+                                set_match_to_tx(msr, capture, base, 0);
                                 if (! *error_msg) {
                                     *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
                                             log_escape_nq(msr->mp, canon));
