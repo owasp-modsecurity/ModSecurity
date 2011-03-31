@@ -2972,8 +2972,7 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
     /* Construct the host name we want to resolve. */
     if (sscanf(target, "%d.%d.%d.%d", &h0, &h1, &h2, &h3) == 4) {
         /* IPv4 address */
-        //name_to_check = apr_psprintf(msr->mp, "%d.%d.%d.%d.%s", h3, h2, h1, h0, rule->op_param);
-        name_to_check = apr_psprintf(msr->mp, "2.0.0.127.%s", rule->op_param);
+        name_to_check = apr_psprintf(msr->mp, "%d.%d.%d.%d.%s", h3, h2, h1, h0, rule->op_param);
     } else {
         /* Assume the input is a domain name. */
         name_to_check = apr_psprintf(msr->mp, "%s.%s", target, rule->op_param);
@@ -3018,6 +3017,8 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
                     break;
             }
 
+            set_match_to_tx(msr, capture, *error_msg, 0);
+
         } else
             if(strstr(rule->op_param,"spamhaus.org"))  {
 
@@ -3045,9 +3046,13 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
                         break;
                 }
 
+            set_match_to_tx(msr, capture, *error_msg, 0);
+
             } else  {
                 *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s.",
                         log_escape_nq(msr->mp, name_to_check), var->name);
+
+            set_match_to_tx(msr, capture, *error_msg, 0);
 
             }
 
