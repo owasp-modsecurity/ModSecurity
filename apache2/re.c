@@ -1090,6 +1090,14 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             }
         }
 
+        if(msr->txcfg->is_enabled == MODSEC_DISABLED)   {
+            saw_starter = 0;
+            skipped = 0;
+            skip_after = NULL;
+            mode = NEXT_RULE;
+            continue;
+        }
+
         if (msr->txcfg->debuglog_level >= 4) {
             apr_pool_t *p = msr->mp;
             const char *fn = NULL;
@@ -1116,14 +1124,6 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
 #if defined(PERFORMANCE_MEASUREMENT)
         time1 = apr_time_now();
 #endif
-
-        if(msr->txcfg->is_enabled == MODSEC_DISABLED)   {
-            saw_starter = 0;
-            skipped = 0;
-            skip_after = NULL;
-            mode = NEXT_RULE;
-            continue;
-        }
 
         rc = msre_rule_process(rule, msr);
 
