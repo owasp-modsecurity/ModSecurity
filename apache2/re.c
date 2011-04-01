@@ -1117,6 +1117,14 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         time1 = apr_time_now();
 #endif
 
+        if(msr->txcfg->is_enabled == MODSEC_DISABLED)   {
+            saw_starter = 0;
+            skipped = 0;
+            skip_after = NULL;
+            mode = NEXT_RULE;
+            continue;
+        }
+
         rc = msre_rule_process(rule, msr);
 
 #if defined(PERFORMANCE_MEASUREMENT)
