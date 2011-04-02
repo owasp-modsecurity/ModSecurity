@@ -1120,12 +1120,12 @@ void sec_audit_logger(modsec_rec *msr) {
 
     /* AUDITLOG_PART_UPLOADS */
     if ((strchr(msr->txcfg->auditlog_parts, AUDITLOG_PART_UPLOADS) != NULL) && (msr->mpd != NULL)) {
-        text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_UPLOADS);
-        sec_auditlog_write(msr, text, strlen(text));
-
         multipart_part **parts = NULL;
         unsigned int total_size = 0;
         int cfiles = 0;
+
+        text = apr_psprintf(msr->mp, "\n--%s-%c--\n", msr->new_auditlog_boundary, AUDITLOG_PART_UPLOADS);
+        sec_auditlog_write(msr, text, strlen(text));
 
         parts = (multipart_part **)msr->mpd->parts->elts;
         for(cfiles = 0; cfiles < msr->mpd->parts->nelts; cfiles++) {

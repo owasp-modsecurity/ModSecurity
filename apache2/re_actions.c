@@ -584,6 +584,10 @@ static apr_status_t msre_action_tag_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
     msc_string *var = NULL;
+    msre_action *action = NULL;
+    const apr_array_header_t *tarr = NULL;
+    const apr_table_entry_t *telts = NULL;
+    int act;
 
     var = apr_pcalloc(mptmp, sizeof(msc_string));
     if (var == NULL) return -1;
@@ -591,9 +595,19 @@ static apr_status_t msre_action_tag_execute(modsec_rec *msr, apr_pool_t *mptmp,
     var->value_len = strlen(var->value);
     expand_macros(msr, var, rule, mptmp);
 
-    action->param = apr_pstrmemdup(msr->mp, var->value, var->value_len);
+    tarr = apr_table_elts(rule->actionset->actions);
+    telts = (const apr_table_entry_t*)tarr->elts;
 
-    return 1;
+    for (act = 0; act < tarr->nelts; act++) {
+        action = (msre_action *)telts[act].val;
+        if((action != NULL) && (action->metadata != NULL) && (strcmp("tag", action->metadata->name) == 0))  {
+            action->param = apr_pstrmemdup(msr->mp, var->value, var->value_len);
+            return 1;
+        }
+    }
+
+
+    return 0;
 }
 
 /* proxy */
@@ -604,7 +618,7 @@ static char *msre_action_proxy_validate(msre_engine *engine, msre_action *action
 }
 
 static apr_status_t msre_action_proxy_init(msre_engine *engine, msre_actionset *actionset,
-    msre_action *action)
+        msre_action *action)
 {
     actionset->intercept_action = ACTION_PROXY;
     actionset->intercept_uri = action->param;
@@ -613,7 +627,7 @@ static apr_status_t msre_action_proxy_init(msre_engine *engine, msre_actionset *
 }
 
 static apr_status_t msre_action_proxy_execute(modsec_rec *msr, apr_pool_t *mptmp,
-    msre_rule *rule, msre_action *action)
+        msre_rule *rule, msre_action *action)
 {
     msc_string *var = NULL;
 
@@ -631,7 +645,7 @@ static apr_status_t msre_action_proxy_execute(modsec_rec *msr, apr_pool_t *mptmp
 /* pass */
 
 static apr_status_t msre_action_pass_init(msre_engine *engine, msre_actionset *actionset,
-    msre_action *action)
+        msre_action *action)
 {
     actionset->intercept_action = ACTION_NONE;
     actionset->intercept_action_rec = action;
@@ -646,7 +660,7 @@ static char *msre_action_skip_validate(msre_engine *engine, msre_action *action)
 }
 
 static apr_status_t msre_action_skip_init(msre_engine *engine, msre_actionset *actionset,
-    msre_action *action)
+        msre_action *action)
 {
     actionset->skip_count = atoi(action->param);
     if (actionset->skip_count <= 0) actionset->skip_count = 1;
@@ -661,7 +675,7 @@ static char *msre_action_skipAfter_validate(msre_engine *engine, msre_action *ac
 }
 
 static apr_status_t msre_action_skipAfter_init(msre_engine *engine, msre_actionset *actionset,
-    msre_action *action)
+        msre_action *action)
 {
     actionset->skip_after = action->param;
     return 1;
@@ -1149,9 +1163,7 @@ static apr_status_t msre_action_sanitizeMatched_execute(modsec_rec *msr, apr_poo
     const char *sargname = NULL;
     const apr_array_header_t *tarr;
     const apr_table_entry_t *telts;
-    const apr_array_header_t *tarr_pattern;
-    const apr_table_entry_t *telts_pattern;
-    int i, type = 0, k;
+    int i, type = 0;
     msc_string *mvar = msr->matched_var;
 
     if (mvar->name_len == 0) return 0;
@@ -2626,10 +2638,9 @@ void msre_engine_register_default_actions(msre_engine *engine) {
     );
 
     /* tag */
-    /* ENH: This should be ACTION_METADATA??? */
     msre_engine_action_register(engine,
         "tag",
-        ACTION_NON_DISRUPTIVE,
+        ACTION_METADATA,
         1, 1,
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_MANY,

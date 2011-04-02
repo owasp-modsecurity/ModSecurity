@@ -1993,9 +1993,11 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         parm = strchr(msr->matched_var->name,':');
 
         if(parm)    {
+            msc_string *mvar = NULL;
+
             parm++;
 
-            msc_string *mvar = apr_palloc(msr->mp, sizeof(msc_string));
+            mvar = apr_palloc(msr->mp, sizeof(msc_string));
             mvar->name = apr_pstrdup(msr->mp, parm);
             mvar->name_len = strlen(mvar->name);
             mvar->value = apr_pmemdup(msr->mp, var->value, var->value_len);

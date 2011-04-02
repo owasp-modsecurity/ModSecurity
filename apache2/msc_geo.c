@@ -205,10 +205,6 @@ static int db_open(directory_config *dcfg, char **error_msg)
     apr_pool_t *mp = dcfg->mp;
     geo_db *geo = dcfg->geo;
     apr_status_t rc;
-    apr_size_t nbytes;
-    apr_off_t offset;
-    unsigned char buf[3];
-    int i, j;
 
     #ifdef DEBUG_CONF
     fprintf(stderr, "GEO: Initializing geo DB \"%s\".\n", geo->dbfn);
@@ -280,9 +276,6 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
     int level;
     double dtmp;
     int itmp;
-    const unsigned char * p;
-    unsigned int x;
-    int j;
 
     *error_msg = NULL;
 

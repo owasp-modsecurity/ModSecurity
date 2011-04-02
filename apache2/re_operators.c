@@ -18,12 +18,9 @@
 #include "apr_lib.h"
 #include "apr_strmatch.h"
 #include "acmp.h"
-#if defined(WIN32) || defined(WINNT)
-#include "pcre.h"
-#else
+#if !defined(WIN32) && !defined(WINNT)
 #include <regex.h>
 #endif
-
 
 #define PARSE_REGEX_IP "([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)(?:(\\/[0-9]+))?|([0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+)(?:(\\/[0-9]+))?"
 #define MAX_SUBSTRINGS 30
@@ -79,7 +76,6 @@ static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
 
 /* ipmatch */
 
-#if !defined(WIN32) || !defined(WINNT)
 /*
 * \brief Init function to ipmatch operator
 *
@@ -91,7 +87,7 @@ static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
 */
 static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
-    int erroffset;
+    int erroffset = 0;
     char *data = NULL;
     const char *str = NULL;
     char *saved = NULL;
@@ -207,6 +203,8 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                         while (maskbits >= 8) {
 #ifdef LINUX
                             mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0xff;
+#elif defined(WIN32) || defined(WINNT)
+                            mask6.sin6_addr.s6_addr[j++] = 0xff;
 #elif SOLARIS2
                             mask6.sin6_addr._S6_un._S6_u8[j++] = 0xff;
 #else
@@ -219,6 +217,9 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
 #ifdef LINUX
                             mask6.sin6_addr.__in6_u.__u6_addr8[j] >>= 1;
                             mask6.sin6_addr.__in6_u.__u6_addr8[j] |= 0x80;
+#elif defined(WIN32) || defined(WINNT)
+                            mask6.sin6_addr.s6_addr[j] >>= 1;
+                            mask6.sin6_addr.s6_addr[j] |= 0x80;
 #elif SOLARIS2
                             mask6.sin6_addr._S6_un._S6_u8[j] >>= 1;
                             mask6.sin6_addr._S6_un._S6_u8[j] |= 0x80;
@@ -233,6 +234,8 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                        while (j < 16) {
 #ifdef LINUX
                             mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0;
+#elif defined(WIN32) || defined(WINNT)
+                            mask6.sin6_addr.s6_addr[j++] = 0;
 #elif SOLARIS2
                             mask6.sin6_addr._S6_un._S6_u8[j++] = 0;
 #else
@@ -243,6 +246,9 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                         for (j = 0; j < 4; j++) {
 #ifdef LINUX
                             sa.sin6_addr.__in6_u.__u6_addr32[j]  &= mask6.sin6_addr.__in6_u.__u6_addr32[j];
+#elif defined(WIN32) || defined(WINNT)
+                            sa.sin6_addr.s6_words[j*2]  &= mask6.sin6_addr.s6_words[j*2] ;
+                            sa.sin6_addr.s6_words[j*2+1]  &= mask6.sin6_addr.s6_words[j*2+1] ;
 #elif SOLARIS2
                             sa.sin6_addr._S6_un.u6__S6_u32[j]  &= mask6.sin6_addr._S6_un._S6_u32[j];
 #else
@@ -286,6 +292,8 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                             while (maskbits >= 8) {
 #ifdef LINUX
                                 mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0xff;
+#elif defined(WIN32) || defined(WINNT)
+                                mask6.sin6_addr.s6_addr[j++] = 0xff;
 #elif SOLARIS2
                                 mask6.sin6_addr._S6_un._S6_u8[j++] = 0xff;
 #else
@@ -297,6 +305,9 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
 #ifdef LINUX
                                 mask6.sin6_addr.__in6_u.__u6_addr8[j] >>= 1;
                                 mask6.sin6_addr.__in6_u.__u6_addr8[j] |= 0x80;
+#elif defined(WIN32) || defined(WINNT)
+                                mask6.sin6_addr.s6_addr[j] >>= 1;
+                                mask6.sin6_addr.s6_addr[j] |= 0x80;
 #elif SOLARIS2
                                 mask6.sin6_addr._S6_un._S6_u8[j] >>= 1;
                                 mask6.sin6_addr._S6_un._S6_u8[j] |= 0x80;
@@ -311,6 +322,8 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                            while (j < 16) {
 #ifdef LINUX
                                 mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0;
+#elif defined(WIN32) || defined(WINNT)
+                                mask6.sin6_addr.s6_addr[j++] = 0;
 #elif SOLARIS2
                                 mask6.sin6_addr._S6_un._S6_u8[j++] = 0;
 #else
@@ -322,6 +335,9 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                             for (j = 0; j < 4; j++) {
 #ifdef LINUX
                                 sa.sin6_addr.__in6_u.__u6_addr32[j]  &= mask6.sin6_addr.__in6_u.__u6_addr32[j];
+#elif defined(WIN32) || defined(WINNT)
+                                sa.sin6_addr.s6_words[j*2]  &= mask6.sin6_addr.s6_words[j*2] ;
+                                sa.sin6_addr.s6_words[j*2+1]  &= mask6.sin6_addr.s6_words[j*2+1] ;
 #elif SOLARIS2
                                 sa.sin6_addr._S6_un._S6_u32[j]  &= mask6.sin6_addr._S6_un._S6_u32[j];
 #else
@@ -421,7 +437,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
 */
 static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     const char *errptr = NULL;
-    int erroffset;
+    int erroffset=0;
     struct in_addr addr;
     struct sockaddr_in6 sa;
     unsigned long ipaddr;
@@ -472,6 +488,9 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
 #ifdef LINUX
                     if (((sa.sin6_addr.__in6_u.__u6_addr8[i] ^ ipdata->netaddr->sin6_addr.__in6_u.__u6_addr8[i]) &
                                 ipdata->netaddr->sin6_addr.__in6_u.__u6_addr8[i]) == 0)
+#elif defined(WIN32) || defined(WINNT)
+                    if (((sa.sin6_addr.s6_addr[i] ^ ipdata->netaddr->sin6_addr.s6_addr[i]) &
+                                ipdata->netaddr->sin6_addr.s6_addr[i]) == 0)
 #elif SOLARIS2
                     if (((sa.sin6_addr._S6_un._S6_u8[i] ^ ipdata->netaddr->sin6_addr._S6_un._S6_u8[i]) &
                                 ipdata->netaddr->sin6_addr._S6_un._S6_u8[i]) == 0)
@@ -488,12 +507,11 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
 
     return 0;
 }
-#endif /* WIN32 | WINNT */
 
 /* rsub */
 
 static char *param_remove_escape(msre_rule *rule, char *str, int len)  {
-    char *parm = apr_palloc(rule->ruleset->mp, len);;
+    char *parm = apr_palloc(rule->ruleset->mp, len);
     char *ret = parm;
 
     for(;*str!='\0';str++)    {
@@ -525,7 +543,7 @@ static char *param_remove_escape(msre_rule *rule, char *str, int len)  {
  */
 static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
-    int erroffset;
+    int erroffset = 0;
     ap_regex_t *regex;
     const char *pattern = NULL;
     const char *line = NULL;
@@ -1387,7 +1405,6 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     const char *match = NULL;
     unsigned int match_length;
     unsigned int canon_length;
-    unsigned int base_length;
     int rv, i, ret;
     char *data = NULL;
     unsigned int size = var->value_len;
@@ -3728,14 +3745,12 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_nomatch_execute
     );
 
-#if !defined(WIN32) || !defined(WINNT)
     /* ipmatch */
     msre_engine_op_register(engine,
         "ipmatch",
         msre_op_ipmatch_param_init,
         msre_op_ipmatch_execute
     );
-#endif /* WIN32 | WINNT */
 
     /* rsub */
     msre_engine_op_register(engine,

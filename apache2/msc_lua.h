@@ -42,6 +42,8 @@ char DSOLOCAL *lua_compile(msc_script **script, const char *filename, apr_pool_t
 
 int DSOLOCAL lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rule, char **error_msg);
 
+apr_status_t DSOLOCAL  msre_action_setvar_execute(modsec_rec *r, apr_pool_t *, msre_rule *, char *, char *);
+
 #endif
 
 #endif /* WITH_LUA */
