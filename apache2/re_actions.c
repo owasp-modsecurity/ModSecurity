@@ -584,7 +584,7 @@ static apr_status_t msre_action_tag_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
     msc_string *var = NULL;
-    msre_action *action = NULL;
+    msre_action *action_tag = NULL;
     const apr_array_header_t *tarr = NULL;
     const apr_table_entry_t *telts = NULL;
     int act;
@@ -599,13 +599,12 @@ static apr_status_t msre_action_tag_execute(modsec_rec *msr, apr_pool_t *mptmp,
     telts = (const apr_table_entry_t*)tarr->elts;
 
     for (act = 0; act < tarr->nelts; act++) {
-        action = (msre_action *)telts[act].val;
-        if((action != NULL) && (action->metadata != NULL) && (strcmp("tag", action->metadata->name) == 0))  {
-            action->param = apr_pstrmemdup(msr->mp, var->value, var->value_len);
+        action_tag = (msre_action *)telts[act].val;
+        if((action_tag != NULL) && (action_tag->metadata != NULL) && (strcmp("tag", action_tag->metadata->name) == 0))  {
+            action_tag->param = apr_pstrmemdup(msr->mp, var->value, var->value_len);
             return 1;
         }
     }
-
 
     return 0;
 }
