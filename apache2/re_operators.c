@@ -18,6 +18,7 @@
 #include "apr_lib.h"
 #include "apr_strmatch.h"
 #include "acmp.h"
+#include "msc_util.h"
 #if !defined(WIN32) && !defined(WINNT)
 #include <regex.h>
 #endif
