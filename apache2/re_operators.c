@@ -443,8 +443,6 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
         return -1;
     }
 
-    ipaddr = ntohl(addr.s_addr) -1;
-
     for (; ipdata != NULL; ipdata = ipdata->next) {
         if(ipdata->type == 4)   {
 
@@ -453,9 +451,9 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
                 return -1;
             }
 
-            ipaddr = ntohl(addr.s_addr) -1;
+            ipaddr = ntohl(addr.s_addr);
 
-            if( ipaddr >= ipdata->start && ipaddr <= ipdata->end)
+            if( (ipaddr >= ipdata->start) && (ipaddr <= ipdata->end))
                 return 1;
 
         } else if (ipdata->type == 6)   {
