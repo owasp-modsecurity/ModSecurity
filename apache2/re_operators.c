@@ -102,7 +102,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     const char *mask = NULL;
     const char *type = NULL;
     int ipv = 0;
-    struct in_addr addr,netmask;
+    struct in_addr addr, netmask;
     struct sockaddr_in6 sa;
     struct sockaddr_in6 mask6;
     msre_ipmatch *ipdata = NULL, *curr_ipmatch = NULL;
