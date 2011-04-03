@@ -568,35 +568,6 @@ static apr_status_t msre_action_redirect_execute(modsec_rec *msr, apr_pool_t *mp
     return 1;
 }
 
-/* tag */
-
-/*
-* \brief Execution function to tag action
-*
-* \param msr Pointer internal modsec request structure
-* \param mptmp Pointer to memory pool
-* \param rule Pointer to the rule
-* \param action Pointer to action structure
-*
-* \retval 1 On Success
-*/
-static apr_status_t msre_action_tag_execute(modsec_rec *msr, apr_pool_t *mptmp,
-    msre_rule *rule, msre_action *action)
-{
-    msc_string *var = NULL;
-
-    var = apr_pcalloc(mptmp, sizeof(msc_string));
-    if (var == NULL) return -1;
-    var->value = (char *)action->param;
-    var->value_len = strlen(var->value);
-    expand_macros(msr, var, rule, mptmp);
-
-    if(rule->actionset != NULL)
-    rule->actionset->tag = apr_pstrmemdup(msr->mp, var->value, var->value);
-
-    return 0;
-}
-
 /* proxy */
 
 static char *msre_action_proxy_validate(msre_engine *engine, msre_action *action) {
@@ -2634,7 +2605,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         ACTION_CGROUP_NONE,
         NULL,
         NULL,
-        msre_action_tag_execute
+        NULL,
     );
 
     /* prepend */
