@@ -2605,7 +2605,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         ACTION_CGROUP_NONE,
         NULL,
         NULL,
-        NULL,
+        NULL
     );
 
     /* prepend */
