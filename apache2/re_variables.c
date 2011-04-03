@@ -461,6 +461,8 @@ static int var_uniqueid_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
     if (value != NULL) {
         return var_simple_generate(var, vartab, mptmp, value);
     }
+
+    return 0;
 }
 
 
