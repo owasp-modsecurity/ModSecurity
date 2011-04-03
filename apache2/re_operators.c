@@ -20,8 +20,9 @@
 #include "apr_strmatch.h"
 #include "acmp.h"
 #include "msc_util.h"
-#if !defined(WIN32) && !defined(WINNT)
+#if !defined(WIN32) || !defined(WINNT)
 #include <regex.h>
+#include <arpa/inet.h>
 #endif
 
 #define PARSE_REGEX_IP "([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)(?:(\\/[0-9]+))?|([0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+\\:[0-9a-f]+)(?:(\\/[0-9]+))?"
