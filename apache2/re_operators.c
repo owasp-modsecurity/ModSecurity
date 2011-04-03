@@ -15,6 +15,7 @@
 #include "re.h"
 #include "msc_pcre.h"
 #include "msc_geo.h"
+#include "msc_gsb.h"
 #include "apr_lib.h"
 #include "apr_strmatch.h"
 #include "acmp.h"
