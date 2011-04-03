@@ -121,11 +121,11 @@ char DSOLOCAL *construct_single_var(modsec_rec *msr, char *name);
 char DSOLOCAL *format_all_performance_variables(modsec_rec *msr, apr_pool_t *mp);
 
 #if defined(WIN32) || defined(WINNT)
-int DSLOCAL inet_aton(const char *cp, struct in_addr *inp);
+int DSOLOCAL inet_aton(const char *cp, struct in_addr *inp);
 
 #if !defined(NTDDI_VERSION) || NTDDI_VERSION < NTDDI_VISTA
 int DSOLOCAL inet_pton(int family, const char *cp, struct in6_addr *addr);
 #endif /* NTDDI_VERSION */
-#endif /* WIND32 */
+#endif /* WIN32 */
 
 #endif
