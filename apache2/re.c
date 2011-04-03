@@ -60,7 +60,7 @@ char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule)  {
 
     char *target_str = NULL;
     msre_var **targets = NULL;
-    int i = 0, count = 0;
+    int i = 0;
 
     targets = (msre_var **)rule->targets->elts;
 

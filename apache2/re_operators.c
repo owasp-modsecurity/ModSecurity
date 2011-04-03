@@ -86,8 +86,6 @@ static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
 * \retval 0 On Fail
 */
 static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
-    const char *errptr = NULL;
-    int erroffset = 0;
     char *data = NULL;
     const char *str = NULL;
     char *saved = NULL;
@@ -115,15 +113,13 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     parse_regex = pcre_compile(PARSE_REGEX_IP, opts, &eb, &eo, NULL);
 
     if(parse_regex == NULL) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling ipmatch operator regex",
-                erroffset, errptr);
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling ipmatch operator regex");
         return 0;
     }
 
     parse_regex_study = pcre_study(parse_regex, 0, &eb);
     if(eb != NULL)  {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_study",
-                erroffset, errptr);
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_study");
         if(parse_regex != NULL) pcre_free(parse_regex);
         return 0;
     }
@@ -131,8 +127,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     data = apr_pstrdup(rule->ruleset->mp, rule->op_param);
 
     if(strlen(data) < 7)    {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Size is too small. Must enter at least an ip address",
-                erroffset, errptr);
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Size is too small. Must enter at least an ip address");
         if(parse_regex != NULL) pcre_free(parse_regex);
         return 0;
 
@@ -145,8 +140,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
         ret = pcre_exec(parse_regex, parse_regex_study, str, strlen(str),
                 0, 0, ov, MAX_SUBSTRINGS);
         if (ret < 1) {
-            *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_exec",
-                    erroffset, errptr);
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_exec");
             if(parse_regex != NULL) pcre_free(parse_regex);
             return 0;
         }
@@ -156,8 +150,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
             res = pcre_get_substring((char *)str, ov, MAX_SUBSTRINGS,i + 1,
                     &str_ptr);
             if (res < 0) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_get_substring",
-                        erroffset, errptr);
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_get_substring");
                 if(parse_regex != NULL) pcre_free(parse_regex);
                 return 0;
             }
@@ -180,8 +173,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
 
                     if(ipv == 4)    {
                         if (!inet_aton(str_ptr,&addr)) {
-                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
-                                    erroffset, errptr);
+                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address");
                             if(parse_regex != NULL) pcre_free(parse_regex);
                             return 0;
                         }
@@ -190,8 +182,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                         broadcast = ntohl(addr.s_addr) + 1;
                     } else if (ipv == 6)    {
                         if (inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr)) != 1) {
-                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
-                                    erroffset, errptr);
+                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address");
                             if(parse_regex != NULL) pcre_free(parse_regex);
                             return 0;
                         }
@@ -259,7 +250,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                     }
 
                 } else  {
-                    *mask++;
+                    mask++;
                     maskbits = atoi(mask);
                     network = 0;
                     broadcast = 0;
@@ -279,8 +270,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                     } else if (ipv == 6)    {
 
                         if (inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr)) != 1) {
-                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
-                                    erroffset, errptr);
+                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address");
                             if(parse_regex != NULL) pcre_free(parse_regex);
                             return 0;
                         }
@@ -376,8 +366,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                 }
                 rule->ip_op->next = NULL;
             } else  {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating list for ip match",
-                        erroffset, errptr);
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating list for ip match");
                 if(parse_regex != NULL) pcre_free(parse_regex);
                 return 0;
             }
@@ -412,8 +401,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                 curr_ipmatch->next = ipdata;
 
             } else  {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating memory for ip data",
-                        erroffset, errptr);
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating memory for ip data");
             }
         }
 
@@ -436,8 +424,6 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
 * \retval 0 On No Match
 */
 static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    const char *errptr = NULL;
-    int erroffset=0;
     struct in_addr addr;
     struct sockaddr_in6 sa;
     unsigned long ipaddr;
@@ -453,8 +439,7 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
     }
 
     if (!inet_aton(var->value,&addr)) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
-                erroffset, errptr);
+        *error_msg = apr_psprintf(msr->mp, "Invalid ip address");
         return -1;
     }
 
@@ -464,8 +449,7 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
         if(ipdata->type == 4)   {
 
             if (!inet_aton(var->value,&addr)) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address",
-                        erroffset, errptr);
+                *error_msg = apr_psprintf(msr->mp, "Invalid ip address");
                 return -1;
             }
 
@@ -476,8 +460,7 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
 
         } else if (ipdata->type == 6)   {
             if (inet_pton(AF_INET6, var->value, &(sa.sin6_addr)) != 1)  {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip6 address",
-                        erroffset, errptr);
+                *error_msg = apr_psprintf(msr->mp, "Invalid ip6 address");
                 return -1;
             }
 
@@ -542,8 +525,6 @@ static char *param_remove_escape(msre_rule *rule, char *str, int len)  {
  * \retval 0 On Fail
  */
 static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
-    const char *errptr = NULL;
-    int erroffset = 0;
     ap_regex_t *regex;
     const char *pattern = NULL;
     const char *line = NULL;
@@ -562,8 +543,7 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     line = rule->op_param;
 
     if (apr_tolower(*line) != 's') {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error rsub operator format, must be s/ pattern",
-                erroffset, errptr);
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error rsub operator format, must be s/ pattern");
         return 0;
     }
 
@@ -617,8 +597,7 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     }
 
     if (!delim || !reg_pattern || !replace) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error rsub operator format - must be s/regex/str/[flags]",
-                erroffset, errptr);
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error rsub operator format - must be s/regex/str/[flags]");
         return -1;
     }
 
@@ -633,8 +612,7 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
             else if (delim == 'd')
                 rule->escape_re = 1;
             else
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Regex flag not supported",
-                        erroffset, errptr);
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Regex flag not supported");
             flags++;
         }
     }
@@ -1317,7 +1295,7 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 /*
 * \brief Verify function to gsbLookup operator
 *
-* \param rule Pointer to the rule
+* \param msr Pointer to the modsec resource
 * \param match Pointer to input data
 * \param match_length Input size
 *
@@ -1325,7 +1303,7 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 * \retval 1 On Match
 * \retval 0 On No Match
 */
-static int verify_gsb(gsb_db *gsb, msre_rule *rule, const char *match, unsigned int match_length) {
+static int verify_gsb(gsb_db *gsb, modsec_rec *msr, const char *match, unsigned int match_length) {
     apr_md5_ctx_t ctx;
     apr_status_t rc;
     unsigned char digest[APR_MD5_DIGESTSIZE];
@@ -1341,7 +1319,7 @@ static int verify_gsb(gsb_db *gsb, msre_rule *rule, const char *match, unsigned 
 
     apr_md5_final(digest, &ctx);
 
-    hash = apr_psprintf(rule->ruleset->mp, "%s", bytes2hex(rule->ruleset->mp, digest, 16));
+    hash = apr_psprintf(msr->mp, "%s", bytes2hex(msr->mp, digest, 16));
 
     if ((hash != NULL) && (gsb->gsb_table != NULL))   {
         search = apr_table_get(gsb->gsb_table, hash);
@@ -1409,7 +1387,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     char *data = NULL;
     unsigned int size = var->value_len;
     char *base = NULL, *canon = NULL, *savedptr = NULL;
-    char *str = NULL, *entire = NULL;
+    char *str = NULL;
     int capture;
 
     if (error_msg == NULL) return -1;
@@ -1440,14 +1418,14 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     {
         for(i = 0; i < rv; ++i)
         {
-            match = apr_psprintf(rule->ruleset->mp, "%.*s", ovector[2*i+1] - ovector[2*i], data + ovector[2*i]);
+            match = apr_psprintf(msr->mp, "%.*s", ovector[2*i+1] - ovector[2*i], data + ovector[2*i]);
 
             if (match == NULL)  {
                 *error_msg = "Internal Error: cannot allocate memory for match.";
                 return -1;
             }
 
-            match = remove_escape(rule->ruleset->mp, match, strlen(match));
+            match = remove_escape(msr->mp, match, strlen(match));
 
             match_length = strlen(match);
 
@@ -1458,7 +1436,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                     msr_log(msr, 4, "GSB: Successfully extracted url: %s", match);
                 }
 
-                ret = verify_gsb(gsb, rule, match, match_length);
+                ret = verify_gsb(gsb, msr, match, match_length);
 
                 if(ret > 0) {
                     set_match_to_tx(msr, capture, match, 0);
@@ -1479,7 +1457,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                 /* append / in the end of full url */
                 if ((match[match_length -1] != '/') && (strchr(match,'?') == NULL))    {
 
-                    canon = apr_psprintf(rule->ruleset->mp, "%s/", match);
+                    canon = apr_psprintf(msr->mp, "%s/", match);
                     if (canon != NULL)  {
 
                         if (msr->txcfg->debuglog_level >= 4) {
@@ -1487,7 +1465,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                         }
 
                         canon_length = strlen(canon);
-                        ret = verify_gsb(gsb, rule, canon, canon_length);
+                        ret = verify_gsb(gsb, msr, canon, canon_length);
 
                         if(ret > 0) {
                             set_match_to_tx(msr, capture, match, 0);
@@ -1496,7 +1474,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                         log_escape_nq(msr->mp, canon));
                             }
 
-                            str = apr_pstrdup(rule->ruleset->mp,match);
+                            str = apr_pstrdup(msr->mp,match);
 
                             base = apr_strtok(str,"/",&savedptr);
                             if(base != NULL)
@@ -1507,7 +1485,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                     }
                 }
 
-                str = apr_pstrdup(rule->ruleset->mp,match);
+                str = apr_pstrdup(msr->mp,match);
 
                 /* base url */
                 if (str != NULL)    {
@@ -1516,7 +1494,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                     if (base != NULL && (strlen(match) != (strlen(base)+1)))   {
 
-                        canon = apr_psprintf(rule->ruleset->mp, "%s/", base);
+                        canon = apr_psprintf(msr->mp, "%s/", base);
 
                         if (canon != NULL)  {
 
@@ -1525,7 +1503,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                             }
 
                             canon_length = strlen(canon);
-                            ret = verify_gsb(gsb, rule, canon, canon_length);
+                            ret = verify_gsb(gsb, msr, canon, canon_length);
 
                             if(ret > 0) {
                                 set_match_to_tx(msr, capture, base, 0);
@@ -2363,12 +2341,11 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
  *
  * \param cpfnumber Pointer to cpf
  * \param len cpf length
- * \param rule Pointer to the rule
  *
  * \retval 0 On Invalid CPF
  * \retval 1 On Valid CPF
  */
-static int cpf_verify(const char *cpfnumber, int len, msre_rule *rule) {
+static int cpf_verify(const char *cpfnumber, int len) {
 
     int factor, part_1, part_2, var_len = len;
     int sum = 0, i = 0, cpf_len = 11, c;
@@ -2549,7 +2526,7 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
             offset = ovector[2*i];
 
             /* Check CPF using the match string */
-            is_cpf = cpf_verify(match, length, rule);
+            is_cpf = cpf_verify(match, length);
 
             /* Not a CPF number, then try another match where we left off. */
             if (!is_cpf) {
@@ -2611,14 +2588,14 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 /*
  * \brief Check for a valid SSN
  *
+ * \param msr Pointer to the modsec resource
  * \param ssnumber Pointer to ssn
  * \param len ssn length
- * \param rule Pointer to the rule
  *
  * \retval 0 On Invalid SSN
  * \retval 1 On Valid SSN
  */
-static int ssn_verify(const char *ssnumber, int len, msre_rule *rule) {
+static int ssn_verify(modsec_rec *msr, const char *ssnumber, int len) {
     int i;
     int num[9];
     int digits = 0;
@@ -2661,9 +2638,9 @@ static int ssn_verify(const char *ssnumber, int len, msre_rule *rule) {
     if (digits == 8)
         goto invalid;
 
-    str_area = apr_psprintf(rule->ruleset->mp,"%d%d%d",num[0],num[1],num[2]);
-    str_grp = apr_psprintf(rule->ruleset->mp,"%d%d",num[3],num[4]);
-    str_serial = apr_psprintf(rule->ruleset->mp,"%d%d%d%d",num[5],num[6],num[7],num[8]);
+    str_area = apr_psprintf(msr->mp,"%d%d%d",num[0],num[1],num[2]);
+    str_grp = apr_psprintf(msr->mp,"%d%d",num[3],num[4]);
+    str_serial = apr_psprintf(msr->mp,"%d%d%d%d",num[5],num[6],num[7],num[8]);
 
     if(str_area == NULL || str_grp == NULL || str_serial == NULL)
         goto invalid;
@@ -2788,7 +2765,7 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
             offset = ovector[2*i];
 
             /* Check SSN using the match string */
-            is_ssn = ssn_verify(match, length, rule);
+            is_ssn = ssn_verify(msr, match, length);
 
             /* Not a SSN number, then try another match where we left off. */
             if (!is_ssn) {

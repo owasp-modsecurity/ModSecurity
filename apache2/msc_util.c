@@ -75,6 +75,7 @@ int inet_aton(const char *cp, struct in_addr *inp) {
     inp->s_addr = inet_addr(cp);
     return (inp->s_addr == 0);
 }
+
 /* Windows versions before Vista do not have inet_pton */
 #if  !defined(NTDDI_VERSION) || NTDDI_VERSION < NTDDI_VISTA
 int inet_pton(int family, const char *cp, struct in6_addr *addr) {
@@ -97,7 +98,7 @@ int inet_pton(int family, const char *cp, struct in6_addr *addr) {
 }
 
 #endif /* NTDDI_VERSION */
-#endif /* WIN32 || WINNT */
+#endif /* WIN32 */
 
 
 /* \brief Remove escape char

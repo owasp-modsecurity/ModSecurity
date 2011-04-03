@@ -388,7 +388,7 @@ static void sanitize_request_line(modsec_rec *msr) {
                             }
                             arg_max++;
                             arg_min--;
-                            *pat++;
+                            pat++;
                         }
                     }
                     sanitized_partial = 1;
@@ -702,7 +702,7 @@ void sec_audit_logger(modsec_rec *msr) {
                                 }
                                 arg_max++;
                                 arg_min--;
-                                *pat++;
+                                pat++;
                             }
                             sanitized_partial = 1;
                         }
@@ -949,7 +949,7 @@ void sec_audit_logger(modsec_rec *msr) {
                                     }
                                     arg_max++;
                                     arg_min--;
-                                    *pat++;
+                                    pat++;
                                 }
                                 sanitized_partial = 1;
                             }

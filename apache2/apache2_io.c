@@ -453,7 +453,6 @@ static void inject_content_to_of_brigade(modsec_rec *msr, ap_filter_t *f) {
 
     if (msr->txcfg->content_injection_enabled && msr->stream_output_data != NULL) {
         apr_bucket *bucket_ci = NULL;
-        apr_bucket *bucket_eos = NULL;
 
         bucket_ci = apr_bucket_heap_create(msr->stream_output_data,
                 msr->stream_output_length, NULL, f->r->connection->bucket_alloc);
