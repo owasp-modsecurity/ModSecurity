@@ -597,6 +597,7 @@ msre_actionset *msre_actionset_create(msre_engine *engine, const char *text,
     actionset->id = NOT_SET_P;
     actionset->rev = NOT_SET_P;
     actionset->msg = NOT_SET_P;
+    actionset->tag = NOT_SET_P;
     actionset->logdata = NOT_SET_P;
     actionset->phase = NOT_SET;
     actionset->severity = -1;
@@ -679,6 +680,7 @@ msre_actionset *msre_actionset_merge(msre_engine *engine, msre_actionset *parent
     if (child->id != NOT_SET_P) merged->id = child->id;
     if (child->rev != NOT_SET_P) merged->rev = child->rev;
     if (child->msg != NOT_SET_P) merged->msg = child->msg;
+    if (child->tag != NOT_SET_P) merged->tag = child->tag;
     if (child->logdata != NOT_SET_P) merged->logdata = child->logdata;
     if (child->severity != NOT_SET) merged->severity = child->severity;
     if (child->phase != NOT_SET) merged->phase = child->phase;
@@ -735,6 +737,7 @@ void msre_actionset_set_defaults(msre_actionset *actionset) {
     if (actionset->id == NOT_SET_P) actionset->id = NULL;
     if (actionset->rev == NOT_SET_P) actionset->rev = NULL;
     if (actionset->msg == NOT_SET_P) actionset->msg = NULL;
+    if (actionset->tag == NOT_SET_P) actionset->tag = NULL;
     if (actionset->logdata == NOT_SET_P) actionset->logdata = NULL;
     if (actionset->phase == NOT_SET) actionset->phase = 2;
     if (actionset->severity == -1) {} /* leave at -1 */
@@ -1436,26 +1439,14 @@ static int msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset, 
 
                         break;
                     case RULE_EXCEPTION_REMOVE_TAG :
-                        if ((rule->actionset != NULL)&&(apr_is_empty_table(rule->actionset->actions) == 0)) {
+                        if ((rule->actionset != NULL)&&(rule->actionset->tag != NULL)) {
                             char *my_error_msg = NULL;
-                            const apr_array_header_t *tarr = NULL;
-                            const apr_table_entry_t *telts = NULL;
-                            int act;
 
-                            tarr = apr_table_elts(rule->actionset->actions);
-                            telts = (const apr_table_entry_t*)tarr->elts;
-
-                            for (act = 0; act < tarr->nelts; act++) {
-                                msre_action *action = (msre_action *)telts[act].val;
-                                if((action != NULL) && (action->metadata != NULL) && (strcmp("tag", action->metadata->name) == 0))  {
-
-                                    int rc = msc_regexec(re->param_data,
-                                            action->param, strlen(action->param),
-                                            &my_error_msg);
-                                    if (rc >= 0)    {
-                                        remove_rule = 1;
-                                    }
-                                }
+                            int rc = msc_regexec(re->param_data,
+                                    rule->actionset->tag, strlen(rule->actionset->tag),
+                                    &my_error_msg);
+                            if (rc >= 0) {
+                                remove_rule = 1;
                             }
                         }
 
@@ -1594,8 +1585,15 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
     for (k = 0; k < tarr->nelts; k++) {
         msre_action *action = (msre_action *)telts[k].val;
         if (strcmp(telts[k].key, "tag") == 0) {
+            /* Expand variables in the tag argument. */
+            msc_string *var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+
+            var->value = (char *)action->param;
+            var->value_len = strlen(action->param);
+            expand_macros(msr, var, NULL, msr->mp);
+
             tags = apr_psprintf(msr->mp, "%s [tag \"%s\"]", tags,
-                    log_escape(msr->mp, action->param));
+               log_escape(msr->mp, var->value));
         }
     }
 
