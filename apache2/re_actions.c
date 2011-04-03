@@ -592,7 +592,7 @@ static apr_status_t msre_action_tag_execute(modsec_rec *msr, apr_pool_t *mptmp,
     expand_macros(msr, var, rule, mptmp);
 
     if(rule->actionset != NULL)
-    rule->actionset->tag = var->value;
+    rule->actionset->tag = apr_pstrmemdup(msr->mp, var->value, var->value);
 
     return 0;
 }
