@@ -244,7 +244,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
                             sa.sin6_addr.s6_words[j*2]  &= mask6.sin6_addr.s6_words[j*2] ;
                             sa.sin6_addr.s6_words[j*2+1]  &= mask6.sin6_addr.s6_words[j*2+1] ;
 #elif SOLARIS2
-                            sa.sin6_addr._S6_un.u6__S6_u32[j]  &= mask6.sin6_addr._S6_un._S6_u32[j];
+                            sa.sin6_addr._S6_un._S6_u32[j]  &= mask6.sin6_addr._S6_un._S6_u32[j];
 #else
                             sa.sin6_addr.__u6_addr.__u6_addr32[j]  &= mask6.sin6_addr.__u6_addr.__u6_addr32[j];
 #endif
