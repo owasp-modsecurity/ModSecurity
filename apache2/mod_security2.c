@@ -735,7 +735,7 @@ static int hook_request_late(request_rec *r) {
                          "configured limit (%ld).", msr->txcfg->reqbody_limit);
             msr->inbound_error = 1;
 
-            if(msr->txcfg->if_limit_action == RESPONSE_BODY_LIMIT_ACTION_REJECT)
+            if(msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)
                 return HTTP_REQUEST_ENTITY_TOO_LARGE;
         }
     }
