@@ -865,6 +865,10 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (strcasecmp(value, "detectiononly") == 0) {
             msr->txcfg->is_enabled = MODSEC_DETECTION_ONLY;
             msr->usercfg->is_enabled = MODSEC_DETECTION_ONLY;
+            msr->txcfg->if_limit_action = REQUEST_BODY_LIMIT_ACTION_PARTIAL;
+            msr->usercfg->if_limit_action = REQUEST_BODY_LIMIT_ACTION_PARTIAL;
+            msr->txcfg->of_limit_action = REQUEST_BODY_LIMIT_ACTION_PARTIAL;
+            msr->usercfg->of_limit_action = REQUEST_BODY_LIMIT_ACTION_PARTIAL;
         }
 
         if (msr->txcfg->debuglog_level >= 4) {
