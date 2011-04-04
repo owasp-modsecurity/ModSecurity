@@ -736,7 +736,7 @@ static int hook_request_late(request_rec *r) {
 
             if(msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT) {
                 msr_log(msr, 1, "Request body (Content-Length) is larger than the "
-                         "configured limit (%ld). Deny with status (%d)", msr->txcfg->reqbody_limit, r->status);
+                         "configured limit (%ld). Deny with status (%d)", msr->txcfg->reqbody_limit, HTTP_REQUEST_ENTITY_TOO_LARGE);
                 return HTTP_REQUEST_ENTITY_TOO_LARGE;
             } else {
                 msr_log(msr, 1, "Request body (Content-Length) is larger than the "
