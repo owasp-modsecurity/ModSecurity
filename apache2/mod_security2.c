@@ -770,13 +770,17 @@ static int hook_request_late(request_rec *r) {
                 return HTTP_REQUEST_TIME_OUT;
                 break;
             case -5 : /* Request body limit reached. */
-                if (my_error_msg != NULL) {
-                    msr_log(msr, 1, "%s", my_error_msg);
-                }
                 msr->inbound_error = 1;
-                if(msr->txcfg->if_limit_action == RESPONSE_BODY_LIMIT_ACTION_REJECT)    {
+                if(msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)    {
                     r->connection->keepalive = AP_CONN_CLOSE;
+                    if (my_error_msg != NULL) {
+                        msr_log(msr, 1, "%s. Deny with code (%d)", my_error_msg, HTTP_REQUEST_ENTITY_TOO_LARGE);
+                    }
                     return HTTP_REQUEST_ENTITY_TOO_LARGE;
+                } else  {
+                    if (my_error_msg != NULL) {
+                        msr_log(msr, 1, "%s", my_error_msg);
+                    }
                 }
                 break;
             case -6 : /* EOF when reading request body. */
