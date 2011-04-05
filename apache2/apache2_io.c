@@ -240,6 +240,10 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                         "configured limit (%ld).", msr->txcfg->reqbody_limit);
                 if(msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)
                     return -5;
+
+                seen_eos = 1;
+
+                buflen = (msr->txcfg->reqbody_limit - msr->reqbody_length);
             }
 
             if (buflen != 0) {

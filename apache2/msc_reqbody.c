@@ -482,11 +482,6 @@ static apr_status_t modsecurity_request_body_end_raw(modsec_rec *msr, char **err
     }
 
 
-    if((msr->msc_reqbody_length >= msr->txcfg->reqbody_limit) && (msr->txcfg->if_limit_action != REQUEST_BODY_LIMIT_ACTION_REJECT)) {
-        msr->msc_reqbody_buffer[msr->txcfg->reqbody_limit] = '\0';
-        msr->msc_reqbody_length = msr->txcfg->reqbody_limit;
-    }
-
     /* Now free the memory used by the chunks. */
 
     chunks = (msc_data_chunk **)msr->msc_reqbody_chunks->elts;
