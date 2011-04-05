@@ -742,9 +742,11 @@ static int hook_request_late(request_rec *r) {
                 msr_log(msr, 1, "Request body (Content-Length) is larger than the "
                         "configured limit (%ld).", msr->txcfg->reqbody_limit);
             } else if ((msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)){
+                msr_log(msr, 1, "Request body (Content-Length) is larger than the "
+                        "configured limit (%ld).", msr->txcfg->reqbody_limit);
                 msr->inbound_error = 1;
             } else  {
-                msr_log(msr, 1, "A Request body (Content-Length) is larger than the "
+                msr_log(msr, 1, "Request body (Content-Length) is larger than the "
                         "configured limit (%ld).", msr->txcfg->reqbody_limit);
                 msr->inbound_error = 1;
             }

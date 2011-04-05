@@ -255,7 +255,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
                 } else  {
 
-                    *error_msg = apr_psprintf(msr->mp, "A Request body is larger than the "
+                    *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
                             "configured limit (%ld).", msr->txcfg->reqbody_limit);
 
                     return -5;
