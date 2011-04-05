@@ -236,27 +236,57 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
             /* Check request body limit (should only trigger on chunked requests). */
             if (msr->reqbody_length + buflen > (apr_size_t)msr->txcfg->reqbody_limit) {
-                *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
-                        "configured limit (%ld).", msr->txcfg->reqbody_limit);
-                if(msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)
+                if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)) {
+                    *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
+                            "configured limit (%ld).", msr->txcfg->reqbody_limit);
                     return -5;
+                } else if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)) {
 
-                seen_eos = 1;
+                    *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
+                            "configured limit (%ld).", msr->txcfg->reqbody_limit);
 
-                buflen = (msr->txcfg->reqbody_limit - msr->reqbody_length);
+                    seen_eos = 1;
+                    buflen = (msr->txcfg->reqbody_limit - msr->reqbody_length);
+
+                } else if ((msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)){
+
+                    seen_eos = 1;
+                    buflen = (msr->txcfg->reqbody_limit - msr->reqbody_length);
+
+                } else  {
+
+                    *error_msg = apr_psprintf(msr->mp, "A Request body is larger than the "
+                            "configured limit (%ld).", msr->txcfg->reqbody_limit);
+
+                    return -5;
+                }
             }
 
             if (buflen != 0) {
                 int rcbs = modsecurity_request_body_store(msr, buf, buflen, error_msg);
                 if (rcbs < 0) {
                     if (rcbs == -5) {
-                        *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
-                                "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
-                        if(msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)
+                        if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)) {
+                            *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
+                                    "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
                             return -5;
+                        } else if ((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)) {
+                            *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
+                                    "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
+
+                        } else if ((msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)) {
+                            *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
+                                    "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
+                        } else {
+                            *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
+                                    "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
+                            return -5;
+                        }
                     }
 
-                    if(msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)
+                    if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT))
+                        return -1;
+                    if((msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT))
                         return -1;
                 }
 

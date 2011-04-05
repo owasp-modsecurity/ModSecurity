@@ -732,22 +732,28 @@ static int hook_request_late(request_rec *r) {
         /* Check request body limit (non-chunked requests only). */
         if (msr->request_content_length > msr->txcfg->reqbody_limit) {
 
-            msr->inbound_error = 1;
-
-            if(msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT) {
+            if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)) {
+                msr->inbound_error = 1;
                 msr_log(msr, 1, "Request body (Content-Length) is larger than the "
-                         "configured limit (%ld). Deny with status (%d)", msr->txcfg->reqbody_limit, HTTP_REQUEST_ENTITY_TOO_LARGE);
+                        "configured limit (%ld). Deny with status (%d)", msr->txcfg->reqbody_limit, HTTP_REQUEST_ENTITY_TOO_LARGE);
                 return HTTP_REQUEST_ENTITY_TOO_LARGE;
-            } else {
+            } else if ((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)){
+                msr->inbound_error = 1;
                 msr_log(msr, 1, "Request body (Content-Length) is larger than the "
-                         "configured limit (%ld).", msr->txcfg->reqbody_limit);
+                        "configured limit (%ld).", msr->txcfg->reqbody_limit);
+            } else if ((msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)){
+                msr->inbound_error = 1;
+            } else  {
+                msr_log(msr, 1, "A Request body (Content-Length) is larger than the "
+                        "configured limit (%ld).", msr->txcfg->reqbody_limit);
+                msr->inbound_error = 1;
             }
         }
     }
 
     /* Figure out whether to extract multipart files. */
     if ((msr->txcfg->upload_keep_files != KEEP_FILES_OFF) /* user might want to keep them */
-        || (msr->txcfg->upload_validates_files)) /* user might want to validate them */
+            || (msr->txcfg->upload_validates_files)) /* user might want to validate them */
     {
         msr->upload_extract_files = 1;
         msr->upload_remove_files = 1;
@@ -771,7 +777,7 @@ static int hook_request_late(request_rec *r) {
                 break;
             case -5 : /* Request body limit reached. */
                 msr->inbound_error = 1;
-                if(msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)    {
+                if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT))    {
                     r->connection->keepalive = AP_CONN_CLOSE;
                     if (my_error_msg != NULL) {
                         msr_log(msr, 1, "%s. Deny with code (%d)", my_error_msg, HTTP_REQUEST_ENTITY_TOO_LARGE);
