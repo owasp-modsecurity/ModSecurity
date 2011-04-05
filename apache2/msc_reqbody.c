@@ -361,7 +361,6 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
 
     /* Check that we are not over the request body no files limit. */
     if (msr->msc_reqbody_no_files_length >= (unsigned long) msr->txcfg->reqbody_no_files_limit) {
-        if(msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)
             return -5;
     }
 
