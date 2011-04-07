@@ -22,7 +22,33 @@ if MACOSX
 mod_security2_la_LDFLAGS = -module -avoid-version \
                            @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
                            @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
-else
+endif
+
+if SOLARIS
+mod_security2_la_LDFLAGS = -module -avoid-version \
+                           @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
+                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+endif
+
+if LINUX
+mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
+                           @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
+                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+endif
+
+if FREEBSD
+mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
+                           @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
+                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+endif
+
+if OPENBSD
+mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
+                           @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
+                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+endif
+
+if NETBSD
 mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
                            @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
                            @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@

@@ -311,13 +311,29 @@ mod_security2_la_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
 
 mod_security2_la_CPPFLAGS = @APR_CPPFLAGS@ @LIBXML2_CPPFLAGS@ @LUA_CPPFLAGS@
 mod_security2_la_LIBADD = @APR_LDADD@ @APU_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@
-@MACOSX_FALSE@mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
-@MACOSX_FALSE@                           @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
-@MACOSX_FALSE@                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+@FREEBSD_TRUE@mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
+@FREEBSD_TRUE@                           @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
+@FREEBSD_TRUE@                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+
+@LINUX_TRUE@mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
+@LINUX_TRUE@                           @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
+@LINUX_TRUE@                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 
 @MACOSX_TRUE@mod_security2_la_LDFLAGS = -module -avoid-version \
 @MACOSX_TRUE@                           @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
 @MACOSX_TRUE@                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+
+@NETBSD_TRUE@mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
+@NETBSD_TRUE@                           @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
+@NETBSD_TRUE@                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+
+@OPENBSD_TRUE@mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
+@OPENBSD_TRUE@                           @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
+@OPENBSD_TRUE@                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+
+@SOLARIS_TRUE@mod_security2_la_LDFLAGS = -module -avoid-version \
+@SOLARIS_TRUE@                           @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
+@SOLARIS_TRUE@                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 
 all: all-am
 

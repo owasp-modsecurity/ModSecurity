@@ -76,12 +76,12 @@ CANONICAL_HOST=$host
 
 #AH_TEMPLATE([AIX],     [Define if the operating system is AIX])
 AH_TEMPLATE([LINUX],   [Define if the operating system is LINUX])
-#AH_TEMPLATE([IRIX],    [Define if the operating system is IRIX])
+AH_TEMPLATE([OPENBSD],    [Define if the operating system is OpenBSD])
 AH_TEMPLATE([SOLARIS], [Define if the operating system is SOLARIS])
 #AH_TEMPLATE([HPUX],    [Define if the operating system is HPUX])
 AH_TEMPLATE([MACOSX],  [Define if the operating system is Macintosh OSX])
 AH_TEMPLATE([FREEBSD], [Define if the operating system is FREEBSD])
-#AH_TEMPLATE([TRU64],   [Define if the operating system is TRU64])
+AH_TEMPLATE([NETBSD],   [Define if the operating system is NetBSD])
 
 
 case $host in
