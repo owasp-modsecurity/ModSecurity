@@ -863,6 +863,14 @@ char *_log_escape(apr_pool_t *mp, const unsigned char *input, unsigned long int 
                     *d++ = input[i];
                 }
                 break;
+            case '?' :
+                if (escape_re) {
+                    *d++ = '\\';
+                    *d++ = '?';
+                } else {
+                    *d++ = input[i];
+                }
+                break;
             case '/' :
                 if (escape_re) {
                     *d++ = '\\';
