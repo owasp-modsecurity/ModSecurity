@@ -93,6 +93,12 @@
 /* Define if the operating system is Macintosh OSX */
 /* #undef MACOSX */
 
+/* Define if the operating system is NetBSD */
+/* #undef NETBSD */
+
+/* Define if the operating system is OpenBSD */
+/* #undef OPENBSD */
+
 /* Name of package */
 #define PACKAGE "modsecurity"
 
