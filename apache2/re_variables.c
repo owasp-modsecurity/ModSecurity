@@ -1974,7 +1974,7 @@ static int var_request_cookies_generate(modsec_rec *msr, msre_var *var, msre_rul
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
 
-            rvar->value = te[i].key;
+            rvar->value = te[i].val;
             rvar->value_len = strlen(rvar->value);
             rvar->name = apr_psprintf(mptmp, "REQUEST_COOKIES:%s",
                 log_escape_nq(mptmp, te[i].key));
