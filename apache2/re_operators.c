@@ -456,8 +456,10 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
 
             ipaddr = ntohl(addr.s_addr);
 
-            if( (ipaddr >= ipdata->start) && (ipaddr <= ipdata->end))
+            if( (ipaddr >= ipdata->start) && (ipaddr <= ipdata->end))   {
+                *error_msg = apr_psprintf(msr->mp, "IPmatch \"%s\" matched at %s.", var->value, var->name);
                 return 1;
+            }
 
         } else if (ipdata->type == 6)   {
             if (inet_pton(AF_INET6, var->value, &(sa.sin6_addr)) != 1)  {
@@ -471,18 +473,29 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
                 {
 #ifdef LINUX
                     if (((sa.sin6_addr.__in6_u.__u6_addr8[i] ^ ipdata->netaddr->sin6_addr.__in6_u.__u6_addr8[i]) &
-                                ipdata->netaddr->sin6_addr.__in6_u.__u6_addr8[i]) == 0)
+                                ipdata->netaddr->sin6_addr.__in6_u.__u6_addr8[i]) == 0) {
+                        *error_msg = apr_psprintf(msr->mp, "IPmatch \"%s\" matched at %s.", var->value, var->name);
+                        return 1;
+                    }
 #elif defined(WIN32) || defined(WINNT)
                     if (((sa.sin6_addr.s6_addr[i] ^ ipdata->netaddr->sin6_addr.s6_addr[i]) &
-                                ipdata->netaddr->sin6_addr.s6_addr[i]) == 0)
+                                ipdata->netaddr->sin6_addr.s6_addr[i]) == 0)    {
+                        *error_msg = apr_psprintf(msr->mp, "IPmatch \"%s\" matched at %s.", var->value, var->name);
+                        return 1;
+                    }
 #elif SOLARIS2
                     if (((sa.sin6_addr._S6_un._S6_u8[i] ^ ipdata->netaddr->sin6_addr._S6_un._S6_u8[i]) &
-                                ipdata->netaddr->sin6_addr._S6_un._S6_u8[i]) == 0)
+                                ipdata->netaddr->sin6_addr._S6_un._S6_u8[i]) == 0)  {
+                        *error_msg = apr_psprintf(msr->mp, "IPmatch \"%s\" matched at %s.", var->value, var->name);
+                        return 1;
+                    }
 #else
                     if (((sa.sin6_addr.__u6_addr.__u6_addr8[i] ^ ipdata->netaddr->sin6_addr.__u6_addr.__u6_addr8[i]) &
-                                ipdata->netaddr->sin6_addr.__u6_addr.__u6_addr8[i]) == 0)
-#endif
+                                ipdata->netaddr->sin6_addr.__u6_addr.__u6_addr8[i]) == 0)   {
+                        *error_msg = apr_psprintf(msr->mp, "IPmatch \"%s\" matched at %s.", var->value, var->name);
                         return 1;
+                    }
+#endif
                 }
             }
 
