@@ -588,8 +588,7 @@ static int flatten_response_body(modsec_rec *msr) {
         }
 
         memset(msr->stream_output_data, 0, msr->stream_output_length+1);
-
-        apr_cpystrn(msr->stream_output_data,msr->resbody_data,msr->stream_output_length);
+        strncpy(msr->stream_output_data, msr->resbody_data, msr->stream_output_length);
         msr->stream_output_data[msr->stream_output_length] = '\0';
     }
 
