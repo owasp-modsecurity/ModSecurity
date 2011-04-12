@@ -1392,7 +1392,7 @@ msre_rule * msre_ruleset_fetch_rule(msre_ruleset *ruleset, const char *id, int o
     rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_request_headers, offset);
     if (rule != NULL) return rule;
 
-    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_request_body, ofsset);
+    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_request_body, offset);
     if (rule != NULL) return rule;
 
     rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_response_headers, offset);
