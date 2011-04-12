@@ -25,42 +25,6 @@
 #include "apr_version.h"
 #include <libxml/xmlversion.h>
 
-/*
-* \brief Print informations from used libraries
-*
-* \param mp Pointer to memory pool
-*/
-void version(apr_pool_t *mp) {
-    char *pcre_vrs = NULL;
-
-    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-            "ModSecurity: APR compiled version=\"%s\"; "
-            "loaded version=\"%s\"", APR_VERSION_STRING, apr_version_string());
-
-    if (strstr(apr_version_string(),APR_VERSION_STRING) == NULL)    {
-        ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Loaded APR do not match with compiled!");
-    }
-
-    pcre_vrs = apr_psprintf(mp,"%d.%d", PCRE_MAJOR, PCRE_MINOR);
-
-    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-            "ModSecurity: PCRE compiled version=\"%s\"; "
-            "loaded version=\"%s\"", pcre_vrs, pcre_version());
-
-    if (strstr(pcre_version(),pcre_vrs) == NULL)    {
-        ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Loaded PCRE do not match with compiled!");
-    }
-
-    /* Lua version function was removed in current 5.1. Need to check in future versions if it's back */
-#if defined(WITH_LUA)
-    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-            "ModSecurity: LUA compiled version=\"%s\"",LUA_VERSION);
-#endif /* WITH_LUA */
-
-    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-            "ModSecurity: LIBXML compiled version=\"%s\"",LIBXML_DOTTED_VERSION);
-}
-
 /**
  * Write the supplied data to the audit log (if the FD is ready), update
  * the size counters, update the hash context.

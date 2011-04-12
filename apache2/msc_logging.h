@@ -48,6 +48,4 @@ char DSOLOCAL *construct_log_vcombinedus_limited(modsec_rec *msr, int _limit, in
 
 void DSOLOCAL sec_audit_logger(modsec_rec *msr);
 
-void DSOLOCAL version(apr_pool_t *mp);
-
 #endif
