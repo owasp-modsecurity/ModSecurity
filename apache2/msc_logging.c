@@ -460,7 +460,7 @@ msre_rule *return_chained_rule(const msre_rule *current, modsec_rec *msr)   {
     for (i = 0; i < arr->nelts; i++) {
         rule = rules[i];
         if (rule != NULL)    {
-            if (strncmp(current->unparsed,rule->unparsed,strlen(rule->unparsed)) == 0) {
+            if (strncmp(current->unparsed,rule->unparsed,strlen(current->unparsed)) == 0) {
                 if (i < arr->nelts -1)   {
                     next_rule = rules[i+1];
                 } else  {
@@ -491,7 +491,7 @@ int chained_is_matched(modsec_rec *msr, const msre_rule *next_rule) {
 
     for (i = 0; i < msr->matched_rules->nelts; i++) {
         rule = ((msre_rule **)msr->matched_rules->elts)[i];
-        if (rule != NULL && (strncmp(rule->unparsed,next_rule->unparsed,strlen(next_rule->unparsed)) == 0))
+        if (rule != NULL && (strncmp(rule->unparsed,next_rule->unparsed,strlen(rule->unparsed)) == 0))
             return 1;
     }
 
