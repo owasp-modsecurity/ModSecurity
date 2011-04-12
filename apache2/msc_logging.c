@@ -461,10 +461,24 @@ msre_rule *return_chained_rule(const msre_rule *current, modsec_rec *msr)   {
         rule = rules[i];
         if (rule != NULL)    {
             if (strncmp(current->unparsed,rule->unparsed,strlen(current->unparsed)) == 0) {
+
                 if (i < arr->nelts -1)   {
                     next_rule = rules[i+1];
                 } else  {
                     next_rule = rules[i];
+                }
+
+                if (next_rule == NULL || next_rule->chain_starter == NULL)
+                    return NULL;
+
+                if(current->chain_starter == NULL && next_rule->chain_starter != NULL)  {
+                    if (strncmp(current->unparsed, next_rule->chain_starter->unparsed, strlen(current->unparsed)) != 0)
+                        return NULL;
+                }
+
+                if(current->chain_starter != NULL && next_rule->chain_starter != NULL)  {
+                    if (strncmp(current->chain_starter->unparsed, rule->chain_starter->unparsed, strlen(current->chain_starter->unparsed)) != 0)
+                        return NULL;
                 }
 
                 if (msr->txcfg->debuglog_level >= 9) {
