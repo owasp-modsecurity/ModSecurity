@@ -92,7 +92,7 @@ int gsb_mal_init(directory_config *dcfg, const char *dbfn, char **error_msg)
     if ((dcfg->gsb == NULL) || (dcfg->gsb == NOT_SET_P)) {
         dcfg->gsb = apr_pcalloc(dcfg->mp, sizeof(gsb_db));
         if (dcfg->gsb == NULL)  {
-            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "GSB 0 : %p",dcfg->gsb);
+            return -1;
         }
     }
 

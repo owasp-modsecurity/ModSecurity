@@ -538,6 +538,7 @@ static char *param_remove_escape(msre_rule *rule, char *str, int len)  {
  * \retval 1 On Success
  * \retval 0 On Fail
  */
+#if !defined(MSC_TEST)
 static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     ap_regex_t *regex;
     const char *pattern = NULL;
@@ -798,6 +799,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 
     return 1;
 }
+#endif /* MSC_TEST */
 
 /* rx */
 
@@ -3744,11 +3746,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
     );
 
     /* rsub */
+#if !defined(MSC_TEST)
     msre_engine_op_register(engine,
         "rsub",
         msre_op_rsub_param_init,
         msre_op_rsub_execute
     );
+#endif /* MSC_TEST */
 
     /* rx */
     msre_engine_op_register(engine,
