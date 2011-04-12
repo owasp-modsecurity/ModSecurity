@@ -467,6 +467,10 @@ msre_rule *return_chained_rule(const msre_rule *current, modsec_rec *msr)   {
                     next_rule = rules[i];
                 }
 
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Logging [K]: Found chained rule: \"%s\" and next node: \"%s\".", log_escape(msr->mp, current->unparsed), next_rule == NULL ? "-" : log_escape(msr->mp, next_rule->unparsed));
+                }
+
                 return next_rule;
             }
         }
@@ -491,8 +495,16 @@ int chained_is_matched(modsec_rec *msr, const msre_rule *next_rule) {
 
     for (i = 0; i < msr->matched_rules->nelts; i++) {
         rule = ((msre_rule **)msr->matched_rules->elts)[i];
-        if (rule != NULL && (strncmp(rule->unparsed,next_rule->unparsed,strlen(rule->unparsed)) == 0))
+        if (rule != NULL && (strncmp(rule->unparsed,next_rule->unparsed,strlen(rule->unparsed)) == 0))  {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Logging [K]: Chained rule: \"%s\" matched.", log_escape(msr->mp, rule->unparsed));
+            }
             return 1;
+        }
+    }
+
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Logging [K]: Chained rule: \"%s\" did not match.", log_escape(msr->mp, rule->unparsed));
     }
 
     return 0;
