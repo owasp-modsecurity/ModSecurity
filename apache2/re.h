@@ -123,7 +123,7 @@ msre_ruleset DSOLOCAL *msre_ruleset_create(msre_engine *engine, apr_pool_t *mp);
 
 int DSOLOCAL msre_ruleset_rule_add(msre_ruleset *ruleset, msre_rule *rule, int phase);
 
-msre_rule DSOLOCAL *msre_ruleset_fetch_rule(msre_ruleset *ruleset, const char *id);
+msre_rule DSOLOCAL *msre_ruleset_fetch_rule(msre_ruleset *ruleset, const char *id, int offset);
 
 int DSOLOCAL msre_ruleset_rule_remove_with_exception(msre_ruleset *ruleset, rule_exception *re);
 

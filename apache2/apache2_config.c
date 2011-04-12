@@ -849,7 +849,7 @@ static const char *add_marker(cmd_parms *cmd, directory_config *dcfg,
  *
  */
 static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
-                                      const char *p1, const char *p2)
+                                      const char *p1, const char *p2, int offset)
 {
     char *my_error_msg = NULL;
     msre_rule *rule = NULL;
@@ -868,7 +868,7 @@ static const char *update_rule_action(cmd_parms *cmd, directory_config *dcfg,
     #endif
 
     /* Fetch the rule */
-    rule = msre_ruleset_fetch_rule(ruleset, p1);
+    rule = msre_ruleset_fetch_rule(ruleset, p1, offset);
     if (rule == NULL) {
         #ifdef DEBUG_CONF
         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
@@ -940,18 +940,14 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
     msre_ruleset *ruleset = NULL;
     const char *curr_targets = NULL;
     char *my_error_msg = NULL;
-    char *p = NULL;
-    char *savedptr = NULL;
-    char *target_list = NULL;
-    char *replace = NULL;
-    int is_negated = 0;
-    int is_counting = 0;
-    int name_len = 0;
-    int value_len = 0;
+    char *p = NULL, *savedptr = NULL;
+    char *target_list = NULL, *replace = NULL;
+    int is_negated = 0, is_counting = 0;
+    int name_len = 0, value_len = 0;
     char *name = NULL, *value = NULL;
-    char *opt = NULL;
-    char *param = NULL;
+    char *opt = NULL, *param = NULL;
     int i, rc, match = 0;
+    int offset = 0;
 
     if(p1 == NULL || p2 == NULL || (dcfg == NULL && rset == NULL))  {
         return NULL;
@@ -967,7 +963,7 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
         return NULL;
     }
 
-    rule = msre_ruleset_fetch_rule(ruleset, p1);
+    rule = msre_ruleset_fetch_rule(ruleset, p1, offset);
     if (rule == NULL) {
         if (cmd != NULL)    {
             ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
@@ -1927,9 +1923,25 @@ static const char *cmd_rule_remove_by_msg(cmd_parms *cmd, void *_dcfg,
 }
 
 static const char *cmd_rule_update_action_by_id(cmd_parms *cmd, void *_dcfg,
-                                                const char *p1, const char *p2)
+        const char *p1, const char *p2)
 {
-    return update_rule_action(cmd, (directory_config *)_dcfg, p1, p2);
+    int offset = 0, rule_id = atoi(p1);
+    char *opt = strchr(p1,':');
+    char *savedptr = NULL;
+    char *param = apr_pstrdup(cmd->pool, p1);
+
+    if ((rule_id == LONG_MAX)||(rule_id == LONG_MIN)||(rule_id <= 0)) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for ID for update action: %s", p1);
+    }
+
+    if(opt != NULL) {
+        opt++;
+        offset = atoi(opt);
+        opt = apr_strtok(param,":", &savedptr);
+        return update_rule_action(cmd, (directory_config *)_dcfg, (const char *)opt, p2, offset);
+    }
+
+    return update_rule_action(cmd, (directory_config *)_dcfg, p1, p2, offset);
 }
 
 static const char *cmd_server_signature(cmd_parms *cmd, void *_dcfg,

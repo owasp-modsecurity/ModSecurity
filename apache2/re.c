@@ -1351,7 +1351,7 @@ int msre_ruleset_rule_add(msre_ruleset *ruleset, msre_rule *rule, int phase) {
 }
 
 static msre_rule * msre_ruleset_fetch_phase_rule(const msre_ruleset *ruleset, const char *id,
-        const apr_array_header_t *phase_arr)
+        const apr_array_header_t *phase_arr, int offset)
 {
     msre_rule **rules = (msre_rule **)phase_arr->elts;
     int i;
@@ -1366,7 +1366,15 @@ static msre_rule * msre_ruleset_fetch_phase_rule(const msre_ruleset *ruleset, co
                 && (strcmp(rule->actionset->id, id) == 0))
         {
             /* Return rule that matched unless it is a placeholder */
-            return (rule->placeholder == RULE_PH_NONE) ? rule : NULL;
+            if(offset == 0) {
+                return (rule->placeholder == RULE_PH_NONE) ? rule : NULL;
+            }
+            else    {
+                if (i+offset < phase_arr->nelts)    {
+                    msre_rule *rule_off = (msre_rule *)rules[i+offset];
+                    return (rule_off->placeholder == RULE_PH_NONE) ? rule_off : NULL;
+                }
+            }
         }
     }
 
@@ -1376,24 +1384,24 @@ static msre_rule * msre_ruleset_fetch_phase_rule(const msre_ruleset *ruleset, co
 /**
  * Fetches rule from the ruleset all rules that match the given exception.
  */
-msre_rule * msre_ruleset_fetch_rule(msre_ruleset *ruleset, const char *id) {
+msre_rule * msre_ruleset_fetch_rule(msre_ruleset *ruleset, const char *id, int offset) {
     msre_rule *rule = NULL;
 
     if (ruleset == NULL) return NULL;
 
-    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_request_headers);
+    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_request_headers, offset);
     if (rule != NULL) return rule;
 
-    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_request_body);
+    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_request_body, ofsset);
     if (rule != NULL) return rule;
 
-    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_response_headers);
+    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_response_headers, offset);
     if (rule != NULL) return rule;
 
-    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_response_body);
+    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_response_body, offset);
     if (rule != NULL) return rule;
 
-    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_logging);
+    rule = msre_ruleset_fetch_phase_rule(ruleset, id, ruleset->phase_logging, offset);
 
     return rule;
 }
