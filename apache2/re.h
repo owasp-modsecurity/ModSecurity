@@ -147,11 +147,8 @@ int DSOLOCAL msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset
 #endif
 
 struct msre_ipmatch  {
-    unsigned long    start;
-    unsigned long    end;
-    int              type;
-    struct sockaddr_in6 *netaddr;
-    struct sockaddr_in6 *maskaddr;
+    apr_ipsubnet_t *ipsubnet;
+    const char * address;
     struct  msre_ipmatch *next;
 };
 

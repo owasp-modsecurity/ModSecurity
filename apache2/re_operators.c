@@ -89,324 +89,44 @@ static int msre_op_nomatch_execute(modsec_rec *msr, msre_rule *rule,
 * \retval 0 On Fail
 */
 static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
-    char *data = NULL;
-    const char *str = NULL;
+    apr_status_t rv;
+    char *str = NULL;
     char *saved = NULL;
-    static pcre *parse_regex;
-    static pcre_extra *parse_regex_study;
-    const char *eb;
-    int opts = 0;
-    int eo, i, res = 0, j = 0;
-    int ret = 0;
-    int ov[MAX_SUBSTRINGS];
-    const char *str_ptr = NULL;
-    const char *mask = NULL;
-    const char *type = NULL;
-    int ipv = 0;
-    struct in_addr addr, netmask;
-    struct sockaddr_in6 sa;
-    struct sockaddr_in6 mask6;
-    msre_ipmatch *ipdata = NULL, *curr_ipmatch = NULL;
-    unsigned long ipmask = 0, network = 0, hostmask = 0, broadcast = 0;
-    int maskbits = 0;
+    msre_ipmatch *current;
+    msre_ipmatch **last = &rule->ip_op;
 
-    if (error_msg == NULL) return -1;
-    *error_msg = NULL;
+    if (error_msg == NULL)
+        return -1;
+    else
+        *error_msg = NULL;
 
-    parse_regex = pcre_compile(PARSE_REGEX_IP, opts, &eb, &eo, NULL);
-
-    if(parse_regex == NULL) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling ipmatch operator regex");
-        return 0;
-    }
-
-    parse_regex_study = pcre_study(parse_regex, 0, &eb);
-    if(eb != NULL)  {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_study");
-        if(parse_regex != NULL) pcre_free(parse_regex);
-        return 0;
-    }
-
-    data = apr_pstrdup(rule->ruleset->mp, rule->op_param);
-
-    if(strlen(data) < 7)    {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Size is too small. Must enter at least an ip address");
-        if(parse_regex != NULL) pcre_free(parse_regex);
-        return 0;
-
-    }
-
-    str = apr_strtok(data,",",&saved);
-
+    str = apr_strtok( (char *)rule->op_param, "," ,&saved);
     while( str != NULL)  {
+        const char *ipstr, *mask, *sep;
 
-        ret = pcre_exec(parse_regex, parse_regex_study, str, strlen(str),
-                0, 0, ov, MAX_SUBSTRINGS);
-        if (ret < 1) {
-            *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_exec");
-            if(parse_regex != NULL) pcre_free(parse_regex);
-            return 0;
+        /* get the IP address and mask strings */
+        sep = strchr(str, '/');
+        if (sep) {
+            ipstr = apr_pstrndup(rule->ruleset->mp, str, (sep - str) );
+            mask  = apr_pstrdup(rule->ruleset->mp, (sep + 1) );
         }
-
-        for (i = 0; i < (ret - 1); i++) {
-
-            res = pcre_get_substring((char *)str, ov, MAX_SUBSTRINGS,i + 1,
-                    &str_ptr);
-            if (res < 0) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Error ipmatch operator: pcre_get_substring");
-                if(parse_regex != NULL) pcre_free(parse_regex);
-                return 0;
-            }
-
-            if(strlen(str_ptr) > 0) {
-
-                type = strchr(str_ptr,':');
-
-                if(type != NULL)
-                    ipv = 6;
-
-                type = strchr(str_ptr,'.');
-
-                if(type != NULL)
-                    ipv = 4;
-
-                mask = strchr(str_ptr,'/');
-
-                if(mask == NULL)    {
-
-                    if(ipv == 4)    {
-                        if (!inet_aton(str_ptr,&addr)) {
-                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address");
-                            if(parse_regex != NULL) pcre_free(parse_regex);
-                            return 0;
-                        }
-
-                        network = ntohl(addr.s_addr) -1;
-                        broadcast = ntohl(addr.s_addr) + 1;
-                    } else if (ipv == 6)    {
-                        if (inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr)) != 1) {
-                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address");
-                            if(parse_regex != NULL) pcre_free(parse_regex);
-                            return 0;
-                        }
-
-                        j = 0;
-
-                        maskbits = 128;
-
-                        while (maskbits >= 8) {
-#ifdef LINUX
-                            mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0xff;
-#elif defined(WIN32) || defined(WINNT)
-                            mask6.sin6_addr.s6_addr[j++] = 0xff;
-#elif SOLARIS2
-                            mask6.sin6_addr._S6_un._S6_u8[j++] = 0xff;
-#else
-                            mask6.sin6_addr.__u6_addr.__u6_addr8[j++] = 0xff;
-#endif
-                            maskbits -= 8;
-                        }
-
-                        while (maskbits-- > 0) {
-#ifdef LINUX
-                            mask6.sin6_addr.__in6_u.__u6_addr8[j] >>= 1;
-                            mask6.sin6_addr.__in6_u.__u6_addr8[j] |= 0x80;
-#elif defined(WIN32) || defined(WINNT)
-                            mask6.sin6_addr.s6_addr[j] >>= 1;
-                            mask6.sin6_addr.s6_addr[j] |= 0x80;
-#elif SOLARIS2
-                            mask6.sin6_addr._S6_un._S6_u8[j] >>= 1;
-                            mask6.sin6_addr._S6_un._S6_u8[j] |= 0x80;
-#else
-                            mask6.sin6_addr.__u6_addr.__u6_addr8[j] >>= 1;
-                            mask6.sin6_addr.__u6_addr.__u6_addr8[j] |= 0x80;
-#endif
-                        }
-
-                        j++;
-
-                       while (j < 16) {
-#ifdef LINUX
-                            mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0;
-#elif defined(WIN32) || defined(WINNT)
-                            mask6.sin6_addr.s6_addr[j++] = 0;
-#elif SOLARIS2
-                            mask6.sin6_addr._S6_un._S6_u8[j++] = 0;
-#else
-                            mask6.sin6_addr.__u6_addr.__u6_addr8[j++] = 0;
-#endif
-                        }
-
-                        for (j = 0; j < 4; j++) {
-#ifdef LINUX
-                            sa.sin6_addr.__in6_u.__u6_addr32[j]  &= mask6.sin6_addr.__in6_u.__u6_addr32[j];
-#elif defined(WIN32) || defined(WINNT)
-                            sa.sin6_addr.s6_words[j*2]  &= mask6.sin6_addr.s6_words[j*2] ;
-                            sa.sin6_addr.s6_words[j*2+1]  &= mask6.sin6_addr.s6_words[j*2+1] ;
-#elif SOLARIS2
-                            sa.sin6_addr._S6_un._S6_u32[j]  &= mask6.sin6_addr._S6_un._S6_u32[j];
-#else
-                            sa.sin6_addr.__u6_addr.__u6_addr32[j]  &= mask6.sin6_addr.__u6_addr.__u6_addr32[j];
-#endif
-                        }
-
-                    }
-
-                } else  {
-                    mask++;
-                    maskbits = atoi(mask);
-                    network = 0;
-                    broadcast = 0;
-
-                    if(ipv == 4)    {
-                        if(maskbits >= 1 && maskbits <= 30) {
-                            ipmask = 0;
-                            for (j=0 ; j<maskbits; j++ )
-                                ipmask |= 1<<(31-j);
-                            netmask.s_addr = htonl(ipmask);
-
-                            hostmask = ~ntohl(netmask.s_addr);
-                            broadcast = network | hostmask;
-
-                            network = ntohl(addr.s_addr) & ntohl(netmask.s_addr);
-                        }
-                    } else if (ipv == 6)    {
-
-                        if (inet_pton(AF_INET6, str_ptr, &(sa.sin6_addr)) != 1) {
-                            *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid ip address");
-                            if(parse_regex != NULL) pcre_free(parse_regex);
-                            return 0;
-                        }
-
-                        j = 0;
-
-                        if(maskbits >= 1 && maskbits <= 128)    {
-
-                            while (maskbits >= 8) {
-#ifdef LINUX
-                                mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0xff;
-#elif defined(WIN32) || defined(WINNT)
-                                mask6.sin6_addr.s6_addr[j++] = 0xff;
-#elif SOLARIS2
-                                mask6.sin6_addr._S6_un._S6_u8[j++] = 0xff;
-#else
-                                mask6.sin6_addr.__u6_addr.__u6_addr8[j++] = 0xff;
-#endif
-                                maskbits -= 8;
-                            }
-                            while (maskbits-- > 0) {
-#ifdef LINUX
-                                mask6.sin6_addr.__in6_u.__u6_addr8[j] >>= 1;
-                                mask6.sin6_addr.__in6_u.__u6_addr8[j] |= 0x80;
-#elif defined(WIN32) || defined(WINNT)
-                                mask6.sin6_addr.s6_addr[j] >>= 1;
-                                mask6.sin6_addr.s6_addr[j] |= 0x80;
-#elif SOLARIS2
-                                mask6.sin6_addr._S6_un._S6_u8[j] >>= 1;
-                                mask6.sin6_addr._S6_un._S6_u8[j] |= 0x80;
-#else
-                                mask6.sin6_addr.__u6_addr.__u6_addr8[j] >>= 1;
-                                mask6.sin6_addr.__u6_addr.__u6_addr8[j] |= 0x80;
-#endif
-                            }
-
-                            j++;
-
-                           while (j < 16) {
-#ifdef LINUX
-                                mask6.sin6_addr.__in6_u.__u6_addr8[j++] = 0;
-#elif defined(WIN32) || defined(WINNT)
-                                mask6.sin6_addr.s6_addr[j++] = 0;
-#elif SOLARIS2
-                                mask6.sin6_addr._S6_un._S6_u8[j++] = 0;
-#else
-                                mask6.sin6_addr.__u6_addr.__u6_addr8[j++] = 0;
-#endif
-                            }
-
-
-                            for (j = 0; j < 4; j++) {
-#ifdef LINUX
-                                sa.sin6_addr.__in6_u.__u6_addr32[j]  &= mask6.sin6_addr.__in6_u.__u6_addr32[j];
-#elif defined(WIN32) || defined(WINNT)
-                                sa.sin6_addr.s6_words[j*2]  &= mask6.sin6_addr.s6_words[j*2] ;
-                                sa.sin6_addr.s6_words[j*2+1]  &= mask6.sin6_addr.s6_words[j*2+1] ;
-#elif SOLARIS2
-                                sa.sin6_addr._S6_un._S6_u32[j]  &= mask6.sin6_addr._S6_un._S6_u32[j];
-#else
-                                sa.sin6_addr.__u6_addr.__u6_addr32[j]  &= mask6.sin6_addr.__u6_addr.__u6_addr32[j];
-#endif
-                            }
-
-                        }
-                    }
-                }
-
-            }
-
+        else {
+            ipstr = apr_pstrdup(rule->ruleset->mp, str);
+            mask = NULL;
         }
-
-        if(rule->ip_op == NULL) {
-            rule->ip_op = apr_pcalloc(rule->ruleset->mp, sizeof(msre_ipmatch));
-
-            if(rule->ip_op != NULL) {
-
-                if(ipv == 4)    {
-                    rule->ip_op->start = network+1;
-                    rule->ip_op->type = 4;
-                    if(mask == NULL)
-                        rule->ip_op->end = rule->ip_op->start;
-                    else
-                        rule->ip_op->end = rule->ip_op->start + broadcast - 2;
-
-                    rule->ip_op->netaddr = NULL;
-                    rule->ip_op->maskaddr = NULL;
-                } else if (ipv == 6)    {
-                    rule->ip_op->type = 6;
-                    rule->ip_op->start = rule->ip_op->end = 0;
-                    rule->ip_op->netaddr = &sa;
-                    rule->ip_op->maskaddr = &mask6;
-                }
-                rule->ip_op->next = NULL;
-            } else  {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating list for ip match");
-                if(parse_regex != NULL) pcre_free(parse_regex);
-                return 0;
-            }
-        } else  {
-            ipdata = apr_pcalloc(rule->ruleset->mp, sizeof(msre_ipmatch));
-
-            if(ipdata != NULL)  {
-
-                curr_ipmatch = rule->ip_op;
-
-                while (curr_ipmatch->next != NULL)    {
-                    curr_ipmatch = curr_ipmatch->next;
-                }
-
-                if(ipv == 4)    {
-                    ipdata->type = 4;
-                    ipdata->start = network+1;
-                    if(mask == NULL)
-                        ipdata->end = ipdata->start;
-                    else
-                        ipdata->end = ipdata->start + broadcast - 2;
-
-                    ipdata->netaddr = NULL;
-                    ipdata->maskaddr = NULL;
-                } else if (ipv == 6)    {
-                    ipdata->type = 6;
-                    ipdata->start = ipdata->end = 0;
-                    ipdata->netaddr = &sa;
-                    ipdata->maskaddr = &mask6;
-                }
-
-                curr_ipmatch->next = ipdata;
-
-            } else  {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating memory for ip data");
-            }
+        /* create a new msre_ipmatch containing a new apr_ipsubnet_t*, and add it to the linked list */
+        current = apr_pcalloc(rule->ruleset->mp, sizeof(msre_ipmatch));
+        rv = apr_ipsubnet_create(&current->ipsubnet, ipstr, mask, rule->ruleset->mp);
+        if ( rv != APR_SUCCESS ) {
+            char msgbuf[120];
+            apr_strerror(rv, msgbuf, sizeof msgbuf);
+            *error_msg = apr_pstrcat(rule->ruleset->mp, "Error: ", msgbuf, NULL);
+            return -1;
         }
+        current->address = str;
+        current->next = NULL;
+        *last = current;
+        last = &current->next;
 
         str = apr_strtok(NULL,",",&saved);
     }
@@ -427,82 +147,35 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
 * \retval 0 On No Match
 */
 static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    struct in_addr addr;
-    struct sockaddr_in6 sa;
-    unsigned long ipaddr;
-    int i;
-    msre_ipmatch *ipdata = rule->ip_op;
+    msre_ipmatch *current = rule->ip_op;
+    apr_sockaddr_t *sa;
 
-    if (error_msg == NULL) return -1;
-    *error_msg = NULL;
+    if (error_msg == NULL)
+        return -1;
+    else
+        *error_msg = NULL;
 
-    if(ipdata == NULL) {
-        *error_msg = "Internal Error: ipmatch is null.";
+    if(current == NULL) {
+        *error_msg = "Internal Error: ipmatch value is null.";
         return -1;
     }
 
-    if (!inet_aton(var->value,&addr)) {
-        *error_msg = apr_psprintf(msr->mp, "Invalid ip address");
+    /* create an apr_sockaddr_t for the value string */
+    if ( apr_sockaddr_info_get(&sa, var->value, APR_UNSPEC, 0, 0, msr->mp) != APR_SUCCESS ) {
+       *error_msg = "Internal Error: Invalid REMOTE_ADDR address";
         return -1;
     }
 
-    for (; ipdata != NULL; ipdata = ipdata->next) {
-        if(ipdata->type == 4)   {
-
-            if (!inet_aton(var->value,&addr)) {
-                *error_msg = apr_psprintf(msr->mp, "Invalid ip address");
-                return -1;
-            }
-
-            ipaddr = ntohl(addr.s_addr);
-
-            if( (ipaddr >= ipdata->start) && (ipaddr <= ipdata->end))   {
-                *error_msg = apr_psprintf(msr->mp, "IPmatch \"%s\" matched at %s.", var->value, var->name);
-                return 1;
-            }
-
-        } else if (ipdata->type == 6)   {
-            if (inet_pton(AF_INET6, var->value, &(sa.sin6_addr)) != 1)  {
-                *error_msg = apr_psprintf(msr->mp, "Invalid ip6 address");
-                return -1;
-            }
-
-            if(ipdata->netaddr != NULL && ipdata->maskaddr != NULL) {
-
-                for (i = 0; i < 16; i++)
-                {
-#ifdef LINUX
-                    if (((sa.sin6_addr.__in6_u.__u6_addr8[i] ^ ipdata->netaddr->sin6_addr.__in6_u.__u6_addr8[i]) &
-                                ipdata->netaddr->sin6_addr.__in6_u.__u6_addr8[i]) == 0) {
-                        *error_msg = apr_psprintf(msr->mp, "IPmatch \"%s\" matched at %s.", var->value, var->name);
-                        return 1;
-                    }
-#elif defined(WIN32) || defined(WINNT)
-                    if (((sa.sin6_addr.s6_addr[i] ^ ipdata->netaddr->sin6_addr.s6_addr[i]) &
-                                ipdata->netaddr->sin6_addr.s6_addr[i]) == 0)    {
-                        *error_msg = apr_psprintf(msr->mp, "IPmatch \"%s\" matched at %s.", var->value, var->name);
-                        return 1;
-                    }
-#elif SOLARIS2
-                    if (((sa.sin6_addr._S6_un._S6_u8[i] ^ ipdata->netaddr->sin6_addr._S6_un._S6_u8[i]) &
-                                ipdata->netaddr->sin6_addr._S6_un._S6_u8[i]) == 0)  {
-                        *error_msg = apr_psprintf(msr->mp, "IPmatch \"%s\" matched at %s.", var->value, var->name);
-                        return 1;
-                    }
-#else
-                    if (((sa.sin6_addr.__u6_addr.__u6_addr8[i] ^ ipdata->netaddr->sin6_addr.__u6_addr.__u6_addr8[i]) &
-                                ipdata->netaddr->sin6_addr.__u6_addr.__u6_addr8[i]) == 0)   {
-                        *error_msg = apr_psprintf(msr->mp, "IPmatch \"%s\" matched at %s.", var->value, var->name);
-                        return 1;
-                    }
-#endif
-                }
-            }
-
+    /* look through the linked list for a match */
+    while (current) {
+        if (apr_ipsubnet_test(current->ipsubnet, sa)) {
+            *error_msg = apr_psprintf(msr->mp, "IPmatch \"%s\" matched \"%s\" at %s.", var->value, current->address, var->name);
+            return 1;
         }
+        current = current->next;
     }
 
-    return 0;
+   return 0;
 }
 
 /* rsub */
@@ -912,7 +585,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     if (capture && rc > 0) {
         int i;
 
-        /* Unset any of the previously set capture variables. */        
+        /* Unset any of the previously set capture variables. */
         apr_table_unset(msr->tx_vars, "0");
         apr_table_unset(msr->tx_vars, "1");
         apr_table_unset(msr->tx_vars, "2");

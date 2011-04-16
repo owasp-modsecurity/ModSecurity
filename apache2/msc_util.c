@@ -69,38 +69,6 @@ static const short b64_reverse_t[256] = {
   -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2
 };
 
-#if defined(WIN32) || defined(WINNT)
-/* Windows does not have inet_aton */
-int inet_aton(const char *cp, struct in_addr *inp) {
-    inp->s_addr = inet_addr(cp);
-    return (inp->s_addr == 0);
-}
-
-/* Windows versions before Vista do not have inet_pton */
-#if  !defined(NTDDI_VERSION) || NTDDI_VERSION < NTDDI_VISTA
-int inet_pton(int family, const char *cp, struct in6_addr *addr) {
-    struct addrinfo hints;
-    PADDRINFOA ppResult;
-
-    ZeroMemory( &hints, sizeof(hints) );
-    hints.ai_flags = AI_NUMERICHOST;
-    hints.ai_family = AF_INET6;
-    if (getaddrinfo(cp, NULL, &hints, &ppResult) == 0) {
-        while (ppResult) {
-            if (ppResult->ai_family == AF_INET6) {
-                memcpy(addr, ppResult->ai_addr, ppResult->ai_addrlen);
-                return 1;
-            }
-            ppResult = ppResult->ai_next;
-        }
-    }
-    return -1;
-}
-
-#endif /* NTDDI_VERSION */
-#endif /* WIN32 */
-
-
 /* \brief Remove escape char
 *
 * \param mptmp Pointer to the pool
