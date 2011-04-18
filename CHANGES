@@ -1,3 +1,68 @@
+18 Apr 2011 - 2.6.0-rc1
+-------------------
+
+ * Replaced previous GPLv2 Licento to Apachev2.
+
+ * Added Google Safe Browsing lookups operator and directive. It should be
+   used to extract and lookup urls from http packets.
+
+ * Added Data Modification operator. It must be used with STREAM_* variables
+   to replace/add/edit any data from http bodies.
+
+ * Added STREAM_OUPUT_BODY and STREAM_INPUT_BODY variables to work with data
+   modification operators.
+
+ * Added fast ip address operator. It supports partial ip address, cidr for
+   IPv4 and IPv6. Thanks Tom Donovan.
+
+ * Added new sensitive data tracking verifyCPF and verifySSN.
+
+ * Added MATCHED_VARS and MATCHED_VARS_NAMES. It is similiar to MATCHED_VAR,
+   but now we should see all matched variables.
+
+ * Added UNIQUE_ID variable. It holds the data created my mod_unique_id.
+
+ * Added new tranformation cmdline. Thanks Mark Stern.
+
+ * Added new exception handling operators and directives. It should help users
+   reduce FN and FPs. The directives SecRuleUpdateTargetById, SecRuleRemoveByTag
+   and its ctl actions were included.
+
+ * Added SecStreamOutBodyInspection and SecStreamInBodyInspection to enable STREAM_*
+   variables.
+
+ * Added SecGsbLookupDB used to load Google Safe Browsing malware databse into
+   memory.
+
+ * Added the directive SecInterceptOnError to control what to do if a rule returns
+   values less than zero.
+
+ * Improvements in DetectionOnly engine mode. Also added SecRequestBodyLimitAction
+   to control what to do if the engine receive a http request over a hard limit.
+   Note that there is now many combinations with SecRuleEngine and the limit action
+   directives for response and request data. Please see the reference manual.
+
+ * Improvements under RBL operator. It now will parse return code values for some
+   RBL lists.
+
+ * Added new Log Part J. It should log some informations about uploaded files.
+
+ * Added new sanitizeMatchedBytes action. It will give more flexibilty for user to sanitize
+   logged data, also improving peformance when sanitize big amount of data.
+
+ * Improvements on Logging phase. It is possible now see full chains, distinguish between
+   simple rules, chain starters and chain nodes.
+
+ * Improvements on AutoTools usage.
+
+ * Improvements on pattern matching operators, pmf, pm and strmatch now supports more flexible
+   input data allowing any kind of special char.
+
+ * Improvements on SecRuleUpdateActionById to update chain nodes.
+
+ * Many bugs were fixed. Please see the ModSecurity Jira for more details
+
+
 19 Mar 2010 - trunk
 -------------------
 

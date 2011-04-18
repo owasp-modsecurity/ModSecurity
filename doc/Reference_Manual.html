@@ -20,15 +20,15 @@ href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special
 Atom Feed" 
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:RecentChanges&amp;feed=atom">
 		<title>SourceForge.net: Reference Manual - mod-security</title>
-		<link rel="stylesheet" href="Reference_manual_files/commonPrint.css" 
+		<link rel="stylesheet" href="Reference_Manual_files/commonPrint.css" 
 type="text/css">
-		<link rel="stylesheet" href="Reference_manual_files/index_003.css" 
+		<link rel="stylesheet" href="Reference_Manual_files/index_003.css" 
 type="text/css">
-		<link rel="stylesheet" href="Reference_manual_files/index.css" 
+		<link rel="stylesheet" href="Reference_Manual_files/index.css" 
 type="text/css">
-		<link rel="stylesheet" href="Reference_manual_files/index_004.css" 
+		<link rel="stylesheet" href="Reference_Manual_files/index_004.css" 
 type="text/css">
-		<link rel="stylesheet" href="Reference_manual_files/index_002.css" 
+		<link rel="stylesheet" href="Reference_Manual_files/index_002.css" 
 type="text/css">
 		<!--[if lt IE 7]><script type="text/javascript" src="/apps/mediawiki/mod-security/skins/common/IEFixes.js?207"></script>
 		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
@@ -55,7 +55,7 @@ type="text/css">
 		var wgUserLanguage = "en";
 		var wgContentLanguage = "en";
 		var wgBreakFrames = false;
-		var wgCurRevisionId = 374;
+		var wgCurRevisionId = 410;
 		var wgVersion = "1.15.1";
 		var wgEnableAPI = true;
 		var wgEnableWriteAPI = true;
@@ -65,10 +65,10 @@ type="text/css">
 		var wgRestrictionMove = [];
 		/*]]>*/</script>
 
-		<script type="text/javascript" src="Reference_manual_files/wikibits.js"><!-- wikibits js --></script>
+		<script type="text/javascript" src="Reference_Manual_files/wikibits.js"><!-- wikibits js --></script>
 		<!-- Head Scripts -->
-		<script type="text/javascript" src="Reference_manual_files/ajax.js"></script>
-		<script type="text/javascript" src="Reference_manual_files/index.php"><!-- site js --></script>
+		<script type="text/javascript" src="Reference_Manual_files/ajax.js"></script>
+		<script type="text/javascript" src="Reference_Manual_files/index.php"><!-- site js --></script>
 	
 
 </head><body class="mediawiki ltr ns-0 ns-subject page-Reference_Manual 
@@ -381,161 +381,163 @@ class="tocnumber">8.12</span> <span class="toctext">FILES_COMBINED_SIZE</span></
  <span class="toctext">GEO</span></a></li>
 <li class="toclevel-2"><a href="#HIGHEST_SEVERITY"><span 
 class="tocnumber">8.17</span> <span class="toctext">HIGHEST_SEVERITY</span></a></li>
-<li class="toclevel-2"><a href="#MATCHED_VAR"><span class="tocnumber">8.18</span>
+<li class="toclevel-2"><a href="#INBOUND_ERROR_DATA"><span 
+class="tocnumber">8.18</span> <span class="toctext">INBOUND_ERROR_DATA</span></a></li>
+<li class="toclevel-2"><a href="#MATCHED_VAR"><span class="tocnumber">8.19</span>
  <span class="toctext">MATCHED_VAR</span></a></li>
-<li class="toclevel-2"><a href="#MATCHED_VARS"><span class="tocnumber">8.19</span>
+<li class="toclevel-2"><a href="#MATCHED_VARS"><span class="tocnumber">8.20</span>
  <span class="toctext">MATCHED_VARS</span></a></li>
 <li class="toclevel-2"><a href="#MATCHED_VAR_NAME"><span 
-class="tocnumber">8.20</span> <span class="toctext">MATCHED_VAR_NAME</span></a></li>
+class="tocnumber">8.21</span> <span class="toctext">MATCHED_VAR_NAME</span></a></li>
 <li class="toclevel-2"><a href="#MATCHED_VARS_NAMES"><span 
-class="tocnumber">8.21</span> <span class="toctext">MATCHED_VARS_NAMES</span></a></li>
-<li class="toclevel-2"><a href="#MODSEC_BUILD"><span class="tocnumber">8.22</span>
+class="tocnumber">8.22</span> <span class="toctext">MATCHED_VARS_NAMES</span></a></li>
+<li class="toclevel-2"><a href="#MODSEC_BUILD"><span class="tocnumber">8.23</span>
  <span class="toctext">MODSEC_BUILD</span></a></li>
 <li class="toclevel-2"><a href="#MULTIPART_CRLF_LF_LINES"><span 
-class="tocnumber">8.23</span> <span class="toctext">MULTIPART_CRLF_LF_LINES</span></a></li>
+class="tocnumber">8.24</span> <span class="toctext">MULTIPART_CRLF_LF_LINES</span></a></li>
 <li class="toclevel-2"><a href="#MULTIPART_STRICT_ERROR"><span 
-class="tocnumber">8.24</span> <span class="toctext">MULTIPART_STRICT_ERROR</span></a></li>
+class="tocnumber">8.25</span> <span class="toctext">MULTIPART_STRICT_ERROR</span></a></li>
 <li class="toclevel-2"><a href="#MULTIPART_UNMATCHED_BOUNDARY"><span 
-class="tocnumber">8.25</span> <span class="toctext">MULTIPART_UNMATCHED_BOUNDARY</span></a></li>
-<li class="toclevel-2"><a href="#PATH_INFO"><span class="tocnumber">8.26</span>
+class="tocnumber">8.26</span> <span class="toctext">MULTIPART_UNMATCHED_BOUNDARY</span></a></li>
+<li class="toclevel-2"><a href="#PATH_INFO"><span class="tocnumber">8.27</span>
  <span class="toctext">PATH_INFO</span></a></li>
-<li class="toclevel-2"><a href="#PERF_COMBINED"><span class="tocnumber">8.27</span>
+<li class="toclevel-2"><a href="#PERF_COMBINED"><span class="tocnumber">8.28</span>
  <span class="toctext">PERF_COMBINED</span></a></li>
-<li class="toclevel-2"><a href="#PERF_GC"><span class="tocnumber">8.28</span>
+<li class="toclevel-2"><a href="#PERF_GC"><span class="tocnumber">8.29</span>
  <span class="toctext">PERF_GC</span></a></li>
-<li class="toclevel-2"><a href="#PERF_LOGGING"><span class="tocnumber">8.29</span>
+<li class="toclevel-2"><a href="#PERF_LOGGING"><span class="tocnumber">8.30</span>
  <span class="toctext">PERF_LOGGING</span></a></li>
-<li class="toclevel-2"><a href="#PERF_PHASE1"><span class="tocnumber">8.30</span>
+<li class="toclevel-2"><a href="#PERF_PHASE1"><span class="tocnumber">8.31</span>
  <span class="toctext">PERF_PHASE1</span></a></li>
-<li class="toclevel-2"><a href="#PERF_PHASE2"><span class="tocnumber">8.31</span>
+<li class="toclevel-2"><a href="#PERF_PHASE2"><span class="tocnumber">8.32</span>
  <span class="toctext">PERF_PHASE2</span></a></li>
-<li class="toclevel-2"><a href="#PERF_PHASE3"><span class="tocnumber">8.32</span>
+<li class="toclevel-2"><a href="#PERF_PHASE3"><span class="tocnumber">8.33</span>
  <span class="toctext">PERF_PHASE3</span></a></li>
-<li class="toclevel-2"><a href="#PERF_PHASE4"><span class="tocnumber">8.33</span>
+<li class="toclevel-2"><a href="#PERF_PHASE4"><span class="tocnumber">8.34</span>
  <span class="toctext">PERF_PHASE4</span></a></li>
-<li class="toclevel-2"><a href="#PERF_PHASE5"><span class="tocnumber">8.34</span>
+<li class="toclevel-2"><a href="#PERF_PHASE5"><span class="tocnumber">8.35</span>
  <span class="toctext">PERF_PHASE5</span></a></li>
-<li class="toclevel-2"><a href="#PERF_SREAD"><span class="tocnumber">8.35</span>
+<li class="toclevel-2"><a href="#PERF_SREAD"><span class="tocnumber">8.36</span>
  <span class="toctext">PERF_SREAD</span></a></li>
-<li class="toclevel-2"><a href="#PERF_SWRITE"><span class="tocnumber">8.36</span>
+<li class="toclevel-2"><a href="#PERF_SWRITE"><span class="tocnumber">8.37</span>
  <span class="toctext">PERF_SWRITE</span></a></li>
-<li class="toclevel-2"><a href="#QUERY_STRING"><span class="tocnumber">8.37</span>
+<li class="toclevel-2"><a href="#QUERY_STRING"><span class="tocnumber">8.38</span>
  <span class="toctext">QUERY_STRING</span></a></li>
-<li class="toclevel-2"><a href="#REMOTE_ADDR"><span class="tocnumber">8.38</span>
+<li class="toclevel-2"><a href="#REMOTE_ADDR"><span class="tocnumber">8.39</span>
  <span class="toctext">REMOTE_ADDR</span></a></li>
-<li class="toclevel-2"><a href="#REMOTE_HOST"><span class="tocnumber">8.39</span>
+<li class="toclevel-2"><a href="#REMOTE_HOST"><span class="tocnumber">8.40</span>
  <span class="toctext">REMOTE_HOST</span></a></li>
-<li class="toclevel-2"><a href="#REMOTE_PORT"><span class="tocnumber">8.40</span>
+<li class="toclevel-2"><a href="#REMOTE_PORT"><span class="tocnumber">8.41</span>
  <span class="toctext">REMOTE_PORT</span></a></li>
-<li class="toclevel-2"><a href="#REMOTE_USER"><span class="tocnumber">8.41</span>
+<li class="toclevel-2"><a href="#REMOTE_USER"><span class="tocnumber">8.42</span>
  <span class="toctext">REMOTE_USER</span></a></li>
+<li class="toclevel-2"><a href="#REQBODY_ERROR"><span class="tocnumber">8.43</span>
+ <span class="toctext">REQBODY_ERROR</span></a></li>
+<li class="toclevel-2"><a href="#REQBODY_ERROR_MSG"><span 
+class="tocnumber">8.44</span> <span class="toctext">REQBODY_ERROR_MSG</span></a></li>
 <li class="toclevel-2"><a href="#REQBODY_PROCESSOR"><span 
-class="tocnumber">8.42</span> <span class="toctext">REQBODY_PROCESSOR</span></a></li>
-<li class="toclevel-2"><a href="#REQBODY_PROCESSOR_ERROR"><span 
-class="tocnumber">8.43</span> <span class="toctext">REQBODY_PROCESSOR_ERROR</span></a></li>
-<li class="toclevel-2"><a href="#REQBODY_PROCESSOR_ERROR_MSG"><span 
-class="tocnumber">8.44</span> <span class="toctext">REQBODY_PROCESSOR_ERROR_MSG</span></a></li>
+class="tocnumber">8.45</span> <span class="toctext">REQBODY_PROCESSOR</span></a></li>
 <li class="toclevel-2"><a href="#REQUEST_BASENAME"><span 
-class="tocnumber">8.45</span> <span class="toctext">REQUEST_BASENAME</span></a></li>
-<li class="toclevel-2"><a href="#REQUEST_BODY"><span class="tocnumber">8.46</span>
+class="tocnumber">8.46</span> <span class="toctext">REQUEST_BASENAME</span></a></li>
+<li class="toclevel-2"><a href="#REQUEST_BODY"><span class="tocnumber">8.47</span>
  <span class="toctext">REQUEST_BODY</span></a></li>
 <li class="toclevel-2"><a href="#REQUEST_BODY_LENGTH"><span 
-class="tocnumber">8.47</span> <span class="toctext">REQUEST_BODY_LENGTH</span></a></li>
+class="tocnumber">8.48</span> <span class="toctext">REQUEST_BODY_LENGTH</span></a></li>
 <li class="toclevel-2"><a href="#REQUEST_COOKIES"><span 
-class="tocnumber">8.48</span> <span class="toctext">REQUEST_COOKIES</span></a></li>
+class="tocnumber">8.49</span> <span class="toctext">REQUEST_COOKIES</span></a></li>
 <li class="toclevel-2"><a href="#REQUEST_COOKIES_NAMES"><span 
-class="tocnumber">8.49</span> <span class="toctext">REQUEST_COOKIES_NAMES</span></a></li>
+class="tocnumber">8.50</span> <span class="toctext">REQUEST_COOKIES_NAMES</span></a></li>
 <li class="toclevel-2"><a href="#REQUEST_FILENAME"><span 
-class="tocnumber">8.50</span> <span class="toctext">REQUEST_FILENAME</span></a></li>
+class="tocnumber">8.51</span> <span class="toctext">REQUEST_FILENAME</span></a></li>
 <li class="toclevel-2"><a href="#REQUEST_HEADERS"><span 
-class="tocnumber">8.51</span> <span class="toctext">REQUEST_HEADERS</span></a></li>
+class="tocnumber">8.52</span> <span class="toctext">REQUEST_HEADERS</span></a></li>
 <li class="toclevel-2"><a href="#REQUEST_HEADERS_NAMES"><span 
-class="tocnumber">8.52</span> <span class="toctext">REQUEST_HEADERS_NAMES</span></a></li>
-<li class="toclevel-2"><a href="#REQUEST_LINE"><span class="tocnumber">8.53</span>
+class="tocnumber">8.53</span> <span class="toctext">REQUEST_HEADERS_NAMES</span></a></li>
+<li class="toclevel-2"><a href="#REQUEST_LINE"><span class="tocnumber">8.54</span>
  <span class="toctext">REQUEST_LINE</span></a></li>
-<li class="toclevel-2"><a href="#REQUEST_METHOD"><span class="tocnumber">8.54</span>
+<li class="toclevel-2"><a href="#REQUEST_METHOD"><span class="tocnumber">8.55</span>
  <span class="toctext">REQUEST_METHOD</span></a></li>
 <li class="toclevel-2"><a href="#REQUEST_PROTOCOL"><span 
-class="tocnumber">8.55</span> <span class="toctext">REQUEST_PROTOCOL</span></a></li>
-<li class="toclevel-2"><a href="#REQUEST_URI"><span class="tocnumber">8.56</span>
+class="tocnumber">8.56</span> <span class="toctext">REQUEST_PROTOCOL</span></a></li>
+<li class="toclevel-2"><a href="#REQUEST_URI"><span class="tocnumber">8.57</span>
  <span class="toctext">REQUEST_URI</span></a></li>
 <li class="toclevel-2"><a href="#REQUEST_URI_RAW"><span 
-class="tocnumber">8.57</span> <span class="toctext">REQUEST_URI_RAW</span></a></li>
-<li class="toclevel-2"><a href="#RESPONSE_BODY"><span class="tocnumber">8.58</span>
+class="tocnumber">8.58</span> <span class="toctext">REQUEST_URI_RAW</span></a></li>
+<li class="toclevel-2"><a href="#RESPONSE_BODY"><span class="tocnumber">8.59</span>
  <span class="toctext">RESPONSE_BODY</span></a></li>
 <li class="toclevel-2"><a href="#RESPONSE_CONTENT_LENGTH"><span 
-class="tocnumber">8.59</span> <span class="toctext">RESPONSE_CONTENT_LENGTH</span></a></li>
+class="tocnumber">8.60</span> <span class="toctext">RESPONSE_CONTENT_LENGTH</span></a></li>
 <li class="toclevel-2"><a href="#RESPONSE_CONTENT_TYPE"><span 
-class="tocnumber">8.60</span> <span class="toctext">RESPONSE_CONTENT_TYPE</span></a></li>
+class="tocnumber">8.61</span> <span class="toctext">RESPONSE_CONTENT_TYPE</span></a></li>
 <li class="toclevel-2"><a href="#RESPONSE_HEADERS"><span 
-class="tocnumber">8.61</span> <span class="toctext">RESPONSE_HEADERS</span></a></li>
+class="tocnumber">8.62</span> <span class="toctext">RESPONSE_HEADERS</span></a></li>
 <li class="toclevel-2"><a href="#RESPONSE_HEADERS_NAMES"><span 
-class="tocnumber">8.62</span> <span class="toctext">RESPONSE_HEADERS_NAMES</span></a></li>
+class="tocnumber">8.63</span> <span class="toctext">RESPONSE_HEADERS_NAMES</span></a></li>
 <li class="toclevel-2"><a href="#RESPONSE_PROTOCOL"><span 
-class="tocnumber">8.63</span> <span class="toctext">RESPONSE_PROTOCOL</span></a></li>
+class="tocnumber">8.64</span> <span class="toctext">RESPONSE_PROTOCOL</span></a></li>
 <li class="toclevel-2"><a href="#RESPONSE_STATUS"><span 
-class="tocnumber">8.64</span> <span class="toctext">RESPONSE_STATUS</span></a></li>
-<li class="toclevel-2"><a href="#RULE"><span class="tocnumber">8.65</span>
+class="tocnumber">8.65</span> <span class="toctext">RESPONSE_STATUS</span></a></li>
+<li class="toclevel-2"><a href="#RULE"><span class="tocnumber">8.66</span>
  <span class="toctext">RULE</span></a></li>
 <li class="toclevel-2"><a href="#SCRIPT_BASENAME"><span 
-class="tocnumber">8.66</span> <span class="toctext">SCRIPT_BASENAME</span></a></li>
+class="tocnumber">8.67</span> <span class="toctext">SCRIPT_BASENAME</span></a></li>
 <li class="toclevel-2"><a href="#SCRIPT_FILENAME"><span 
-class="tocnumber">8.67</span> <span class="toctext">SCRIPT_FILENAME</span></a></li>
-<li class="toclevel-2"><a href="#SCRIPT_GID"><span class="tocnumber">8.68</span>
+class="tocnumber">8.68</span> <span class="toctext">SCRIPT_FILENAME</span></a></li>
+<li class="toclevel-2"><a href="#SCRIPT_GID"><span class="tocnumber">8.69</span>
  <span class="toctext">SCRIPT_GID</span></a></li>
 <li class="toclevel-2"><a href="#SCRIPT_GROUPNAME"><span 
-class="tocnumber">8.69</span> <span class="toctext">SCRIPT_GROUPNAME</span></a></li>
-<li class="toclevel-2"><a href="#SCRIPT_MODE"><span class="tocnumber">8.70</span>
+class="tocnumber">8.70</span> <span class="toctext">SCRIPT_GROUPNAME</span></a></li>
+<li class="toclevel-2"><a href="#SCRIPT_MODE"><span class="tocnumber">8.71</span>
  <span class="toctext">SCRIPT_MODE</span></a></li>
-<li class="toclevel-2"><a href="#SCRIPT_UID"><span class="tocnumber">8.71</span>
+<li class="toclevel-2"><a href="#SCRIPT_UID"><span class="tocnumber">8.72</span>
  <span class="toctext">SCRIPT_UID</span></a></li>
 <li class="toclevel-2"><a href="#SCRIPT_USERNAME"><span 
-class="tocnumber">8.72</span> <span class="toctext">SCRIPT_USERNAME</span></a></li>
-<li class="toclevel-2"><a href="#SERVER_ADDR"><span class="tocnumber">8.73</span>
+class="tocnumber">8.73</span> <span class="toctext">SCRIPT_USERNAME</span></a></li>
+<li class="toclevel-2"><a href="#SERVER_ADDR"><span class="tocnumber">8.74</span>
  <span class="toctext">SERVER_ADDR</span></a></li>
-<li class="toclevel-2"><a href="#SERVER_NAME"><span class="tocnumber">8.74</span>
+<li class="toclevel-2"><a href="#SERVER_NAME"><span class="tocnumber">8.75</span>
  <span class="toctext">SERVER_NAME</span></a></li>
-<li class="toclevel-2"><a href="#SERVER_PORT"><span class="tocnumber">8.75</span>
+<li class="toclevel-2"><a href="#SERVER_PORT"><span class="tocnumber">8.76</span>
  <span class="toctext">SERVER_PORT</span></a></li>
-<li class="toclevel-2"><a href="#SESSION"><span class="tocnumber">8.76</span>
+<li class="toclevel-2"><a href="#SESSION"><span class="tocnumber">8.77</span>
  <span class="toctext">SESSION</span></a></li>
-<li class="toclevel-2"><a href="#SESSIONID"><span class="tocnumber">8.77</span>
+<li class="toclevel-2"><a href="#SESSIONID"><span class="tocnumber">8.78</span>
  <span class="toctext">SESSIONID</span></a></li>
 <li class="toclevel-2"><a href="#STREAM_INPUT_BODY"><span 
-class="tocnumber">8.78</span> <span class="toctext">STREAM_INPUT_BODY</span></a></li>
+class="tocnumber">8.79</span> <span class="toctext">STREAM_INPUT_BODY</span></a></li>
 <li class="toclevel-2"><a href="#STREAM_OUTPUT_BODY"><span 
-class="tocnumber">8.79</span> <span class="toctext">STREAM_OUTPUT_BODY</span></a></li>
-<li class="toclevel-2"><a href="#TIME"><span class="tocnumber">8.80</span>
+class="tocnumber">8.80</span> <span class="toctext">STREAM_OUTPUT_BODY</span></a></li>
+<li class="toclevel-2"><a href="#TIME"><span class="tocnumber">8.81</span>
  <span class="toctext">TIME</span></a></li>
-<li class="toclevel-2"><a href="#TIME_DAY"><span class="tocnumber">8.81</span>
+<li class="toclevel-2"><a href="#TIME_DAY"><span class="tocnumber">8.82</span>
  <span class="toctext">TIME_DAY</span></a></li>
-<li class="toclevel-2"><a href="#TIME_EPOCH"><span class="tocnumber">8.82</span>
+<li class="toclevel-2"><a href="#TIME_EPOCH"><span class="tocnumber">8.83</span>
  <span class="toctext">TIME_EPOCH</span></a></li>
-<li class="toclevel-2"><a href="#TIME_HOUR"><span class="tocnumber">8.83</span>
+<li class="toclevel-2"><a href="#TIME_HOUR"><span class="tocnumber">8.84</span>
  <span class="toctext">TIME_HOUR</span></a></li>
-<li class="toclevel-2"><a href="#TIME_MIN"><span class="tocnumber">8.84</span>
+<li class="toclevel-2"><a href="#TIME_MIN"><span class="tocnumber">8.85</span>
  <span class="toctext">TIME_MIN</span></a></li>
-<li class="toclevel-2"><a href="#TIME_MON"><span class="tocnumber">8.85</span>
+<li class="toclevel-2"><a href="#TIME_MON"><span class="tocnumber">8.86</span>
  <span class="toctext">TIME_MON</span></a></li>
-<li class="toclevel-2"><a href="#TIME_SEC"><span class="tocnumber">8.86</span>
+<li class="toclevel-2"><a href="#TIME_SEC"><span class="tocnumber">8.87</span>
  <span class="toctext">TIME_SEC</span></a></li>
-<li class="toclevel-2"><a href="#TIME_WDAY"><span class="tocnumber">8.87</span>
+<li class="toclevel-2"><a href="#TIME_WDAY"><span class="tocnumber">8.88</span>
  <span class="toctext">TIME_WDAY</span></a></li>
-<li class="toclevel-2"><a href="#TIME_YEAR"><span class="tocnumber">8.88</span>
+<li class="toclevel-2"><a href="#TIME_YEAR"><span class="tocnumber">8.89</span>
  <span class="toctext">TIME_YEAR</span></a></li>
-<li class="toclevel-2"><a href="#TX"><span class="tocnumber">8.89</span>
+<li class="toclevel-2"><a href="#TX"><span class="tocnumber">8.90</span>
  <span class="toctext">TX</span></a></li>
-<li class="toclevel-2"><a href="#UNIQUE_ID"><span class="tocnumber">8.90</span>
+<li class="toclevel-2"><a href="#UNIQUE_ID"><span class="tocnumber">8.91</span>
  <span class="toctext">UNIQUE_ID</span></a></li>
 <li class="toclevel-2"><a href="#URLENCODED_ERROR"><span 
-class="tocnumber">8.91</span> <span class="toctext">URLENCODED_ERROR</span></a></li>
-<li class="toclevel-2"><a href="#USERID"><span class="tocnumber">8.92</span>
+class="tocnumber">8.92</span> <span class="toctext">URLENCODED_ERROR</span></a></li>
+<li class="toclevel-2"><a href="#USERID"><span class="tocnumber">8.93</span>
  <span class="toctext">USERID</span></a></li>
-<li class="toclevel-2"><a href="#WEBAPPID"><span class="tocnumber">8.93</span>
+<li class="toclevel-2"><a href="#WEBAPPID"><span class="tocnumber">8.94</span>
  <span class="toctext">WEBAPPID</span></a></li>
 <li class="toclevel-2"><a href="#WEBSERVER_ERROR_LOG"><span 
-class="tocnumber">8.94</span> <span class="toctext">WEBSERVER_ERROR_LOG</span></a></li>
-<li class="toclevel-2"><a href="#XML"><span class="tocnumber">8.95</span>
+class="tocnumber">8.95</span> <span class="toctext">WEBSERVER_ERROR_LOG</span></a></li>
+<li class="toclevel-2"><a href="#XML"><span class="tocnumber">8.96</span>
  <span class="toctext">XML</span></a></li>
 </ul>
 </li>
@@ -725,22 +727,22 @@ class="tocnumber">10.32</span> <span class="toctext">sanitiseResponseHeader</spa
  <span class="toctext">le</span></a></li>
 <li class="toclevel-2"><a href="#lt"><span class="tocnumber">11.12</span>
  <span class="toctext">lt</span></a></li>
-<li class="toclevel-2"><a href="#strmatch"><span class="tocnumber">11.13</span>
- <span class="toctext">strmatch</span></a></li>
-<li class="toclevel-2"><a href="#pm"><span class="tocnumber">11.14</span>
+<li class="toclevel-2"><a href="#pm"><span class="tocnumber">11.13</span>
  <span class="toctext">pm</span></a></li>
-<li class="toclevel-2"><a href="#pmf"><span class="tocnumber">11.15</span>
+<li class="toclevel-2"><a href="#pmf"><span class="tocnumber">11.14</span>
  <span class="toctext">pmf</span></a></li>
-<li class="toclevel-2"><a href="#pmFromFile"><span class="tocnumber">11.16</span>
+<li class="toclevel-2"><a href="#pmFromFile"><span class="tocnumber">11.15</span>
  <span class="toctext">pmFromFile</span></a></li>
-<li class="toclevel-2"><a href="#rbl"><span class="tocnumber">11.17</span>
+<li class="toclevel-2"><a href="#rbl"><span class="tocnumber">11.16</span>
  <span class="toctext">rbl</span></a></li>
-<li class="toclevel-2"><a href="#rsub"><span class="tocnumber">11.18</span>
+<li class="toclevel-2"><a href="#rsub"><span class="tocnumber">11.17</span>
  <span class="toctext">rsub</span></a></li>
-<li class="toclevel-2"><a href="#rx"><span class="tocnumber">11.19</span>
+<li class="toclevel-2"><a href="#rx"><span class="tocnumber">11.18</span>
  <span class="toctext">rx</span></a></li>
-<li class="toclevel-2"><a href="#streq"><span class="tocnumber">11.20</span>
+<li class="toclevel-2"><a href="#streq"><span class="tocnumber">11.19</span>
  <span class="toctext">streq</span></a></li>
+<li class="toclevel-2"><a href="#strmatch"><span class="tocnumber">11.20</span>
+ <span class="toctext">strmatch</span></a></li>
 <li class="toclevel-2"><a href="#validateByteRange"><span 
 class="tocnumber">11.21</span> <span class="toctext">validateByteRange</span></a></li>
 <li class="toclevel-2"><a href="#validateDTD"><span class="tocnumber">11.22</span>
@@ -1042,8 +1044,20 @@ need to execute the following command:
 </pre>
 <p><b>svn</b>
 </p>
-<pre>svn co https://mod-security.svn.sourceforge.net/svnroot/mod-security/m2/trunk modisecurity
+<pre>svn co https://mod-security.svn.sourceforge.net/svnroot/mod-security/m2/trunk modsecurity
 </pre>
+<p>For v2.6.0 and above, the installation process has changed.  Follow 
+these steps:
+</p>
+<ol><li>cd into the directory - <code>$cd modsecurity</code>
+</li><li>Run autogen.sh script - <code>$./autogen.sh</code>
+</li><li>Run configure script - <code>$./configure</code>
+</li><li>Run make - <code>$make</code>
+</li><li>Run make install - <code>$make install</code>
+</li><li>Copy the new mod_security2.so file into the proper Apache 
+modules directory - <code>$cp 
+/usr/local/modsecurity/lib/mod_security2.so /usr/local/apache/modules/</code>
+</li></ol>
 <a name="Stable_Release_Download" id="Stable_Release_Download"></a><h2> <span
  class="mw-headline"> Stable Release Download </span></h2>
 <p>To download the stable release go to <a 
@@ -1084,7 +1098,7 @@ options.
 <pre>make</pre>
 <p>Optionally test with: 
 </p>
-<pre>make test</pre>
+<pre>make CFLAGS=-DMSC_TEST test</pre>
 <dl><dt> Note&nbsp;</dt><dd> This is step is still a bit experimental. 
 If you have problems, please send the full output and error from the 
 build to the support list. Most common issues are related to not finding
@@ -1107,6 +1121,9 @@ Copy the libxml2.dll and lua5.1.dll to the Apache bin directory.
 Alternatively you can follow the step below for using LoadFile to load 
 these libraries.
 </p>
+<dl><dt> Note&nbsp;</dt><dd> Users should follow the steps present in 
+README_WINDOWS.txt into ModSecurity tarball.
+</dd></dl>
 <a 
 name="Edit_the_main_Apache_httpd_config_file_.28usually_httpd.conf.29" 
 id="Edit_the_main_Apache_httpd_config_file_.28usually_httpd.conf.29"></a><h3>
@@ -1277,7 +1294,8 @@ deploy the ModSecurity Log Collector (mlogc), like this:
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> This audit log file is opened on startup 
 when the server typically still runs as root. You should not allow 
-non-root users to have write privileges for this file or for the
+non-root users to have write privileges for this file or for the 
+directory.
 </dd></dl>
 <a name="SecAuditLog2" id="SecAuditLog2"></a><h2> <span 
 class="mw-headline"> SecAuditLog2 </span></h2>
@@ -1542,6 +1560,10 @@ and prepend.
  no matter what the rules want to do. It is not necessary to have 
 response body buffering enabled in order to use content injection.
 </p>
+<dl><dt> Note&nbsp;</dt><dd> This directive must ben enabled if you want
+ to use @rsub + the STREAM_ variables to manipulate live transactional 
+data.
+</dd></dl>
 <a name="SecCookieFormat" id="SecCookieFormat"></a><h2> <span 
 class="mw-headline"> SecCookieFormat </span></h2>
 <p><b>Description:</b> Selects the cookie format that will be used in 
@@ -2285,11 +2307,12 @@ programming interface is appreciated.
 <a name="SecRuleUpdateActionById" id="SecRuleUpdateActionById"></a><h2> <span
  class="mw-headline"> SecRuleUpdateActionById </span></h2>
 <p><b>Description:</b> Updates the action list of the specified rule.
-</p><p><b>Syntax:</b> <code>SecRuleUpdateActionById RULEID ACTIONLIST</code>
+</p><p><b>Syntax:</b> <code>SecRuleUpdateActionById RULEID[:offset] 
+ACTIONLIST</code>
 </p><p><b>Example Usage:</b> <code>SecRuleUpdateActionById 12345 
 "deny,status:403"</code>
 </p><p><b>Scope:</b> Any
-</p><p><b>Version:</b> 2.5.0
+</p><p><b>Version:</b> 2.6.0
 </p><p>This directive will overwrite the action list of the specified 
 rule with the actions provided in the second parameter. It has two 
 limitations: it cannot be used to change the ID or phase of a rule. Only
@@ -2392,7 +2415,7 @@ insert.
 <a name="SecStreamInBodyInspection" id="SecStreamInBodyInspection"></a><h2>
  <span class="mw-headline"> SecStreamInBodyInspection </span></h2>
 <p><b>Description:</b> Configures the ability to use stream inspection 
-(Apache connection level filter) for inbound request data.
+for inbound request data.
 </p><p><b>Syntax:</b> <code>SecStreamInBodyInspection On|Off</code>
 </p><p><b>Example Usage:</b> <code>SecStreamInBodyInspection On</code>
 </p><p><b>Scope:</b> Any
@@ -2408,8 +2431,8 @@ REQUEST_HEADER data.
 </dd></dl>
 <a name="SecStreamOutBodyInspection" id="SecStreamOutBodyInspection"></a><h2>
  <span class="mw-headline"> SecStreamOutBodyInspection </span></h2>
-<p><b>Description:</b> Configures the ability to use stream inspection  
-(Apache connection level filter) for outbound request data.
+<p><b>Description:</b> Configures the ability to use stream inspection 
+for outbound request data.
 </p><p><b>Syntax:</b> <code>SecStreamOutBodyInspection On|Off</code>
 </p><p><b>Example Usage:</b> <code>SecStreamOutBodyInspection On</code>
 </p><p><b>Scope:</b> Any
@@ -2552,7 +2575,7 @@ diagram, the 5 ModSecurity processing phases are shown.
 </p><p><a 
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=File:Apache_request_cycle-modsecurity.jpg"
  class="image" title="Apache request cycle-modsecurity.jpg"><img alt="" 
-src="Reference_manual_files/600px-Apache_request_cycle-modsecurity.jpg" 
+src="Reference_Manual_files/600px-Apache_request_cycle-modsecurity.jpg" 
 height="459" width="600" border="0"></a>
 </p><p>In order to select the phase a rule executes during, use the 
 phase action either directly in the rule or in using the 
@@ -2827,12 +2850,24 @@ class="mw-headline"> HIGHEST_SEVERITY </span></h2>
 matched so far. Severities are numeric values and thus can be used with 
 comparison operators such as @lt, and so on. A value of 255 indicates 
 that no severity has been set.
-</p><p><code>SecRule HIGHEST_SEVERITY "@le 2" \ 
+</p><p><code>SecRule HIGHEST_SEVERITY "@le 2" 
 "phase:2,deny,status:500,msg:'severity&nbsp;%{HIGHEST_SEVERITY}'"</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> Higher severities have a lower numeric 
 value.
 </dd></dl>
+<a name="INBOUND_ERROR_DATA" id="INBOUND_ERROR_DATA"></a><h2> <span 
+class="mw-headline"> INBOUND_ERROR_DATA </span></h2>
+<p>This variable will be set to 1 when the request body size is above 
+the setting configured by SecRequestBodyLimit directive.  Your policies 
+should always contain a rule to check this variable.  Depending on the 
+rate of false positives and your default policy you should decide 
+whether to block or just warn when the rule is triggered.
+</p><p>The best way to use this variable is as in the example below:
+</p><p><code>SecRule INBOUND_ERROR_DATA "@eq 1" 
+"phase:1,t:none,log,pass,msg:'Request Body Larger than 
+SecRequestBodyLimit Setting'"</code>
+</p>
 <a name="MATCHED_VAR" id="MATCHED_VAR"></a><h2> <span 
 class="mw-headline"> MATCHED_VAR </span></h2>
 <p>This variable holds the value of the most-recently matched variable. 
@@ -3055,22 +3090,14 @@ information will not be available if the authentication is
 </dd></dl>
 <p>handled in the backend web server.
 </p>
-<a name="REQBODY_PROCESSOR" id="REQBODY_PROCESSOR"></a><h2> <span 
-class="mw-headline"> REQBODY_PROCESSOR </span></h2>
-<p>Contains the name of the currently used request body processor. The 
-possible values are URLENCODED, MULTIPART, and XML.
-</p>
-<pre>SecRule REQBODY_PROCESSOR "^XML$ chain 
-  SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"
-</pre>
-<a name="REQBODY_PROCESSOR_ERROR" id="REQBODY_PROCESSOR_ERROR"></a><h2> <span
- class="mw-headline"> REQBODY_PROCESSOR_ERROR </span></h2>
+<a name="REQBODY_ERROR" id="REQBODY_ERROR"></a><h2> <span 
+class="mw-headline"> REQBODY_ERROR </span></h2>
 <p>Contains the status of the request body processor used for request 
 body parsing. The values can be 0 (no error) or 1 (error). This variable
  will be set by request body processors (typically the 
 multipart/request-data parser or the XML parser) when they fail to do 
 their work.
-</p><p><code>SecRule REQBODY_PROCESSOR_ERROR "@eq 1" deny,phase:2 </code>
+</p><p><code>SecRule REQBODY_ERROR "@eq 1" deny,phase:2 </code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> Your policies must have a rule to check for
  request body processor errors at the very beginning of phase 2. Failure
@@ -3082,12 +3109,20 @@ reject the request if error is detected. When operating in
 detection-only mode, your rule should alert with high severity when 
 request body processing fails.
 </dd></dl>
-<a name="REQBODY_PROCESSOR_ERROR_MSG" id="REQBODY_PROCESSOR_ERROR_MSG"></a><h2>
- <span class="mw-headline"> REQBODY_PROCESSOR_ERROR_MSG </span></h2>
+<a name="REQBODY_ERROR_MSG" id="REQBODY_ERROR_MSG"></a><h2> <span 
+class="mw-headline"> REQBODY_ERROR_MSG </span></h2>
 <p>If there’s been an error during request body parsing, the variable 
 will contain the following error message:
-</p><p><code>SecRule REQBODY_PROCESSOR_ERROR_MSG "failed to parse"</code>
+</p><p><code>SecRule REQBODY_ERROR_MSG "failed to parse"</code>
 </p>
+<a name="REQBODY_PROCESSOR" id="REQBODY_PROCESSOR"></a><h2> <span 
+class="mw-headline"> REQBODY_PROCESSOR </span></h2>
+<p>Contains the name of the currently used request body processor. The 
+possible values are URLENCODED, MULTIPART, and XML.
+</p>
+<pre>SecRule REQBODY_PROCESSOR "^XML$ chain 
+  SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"
+</pre>
 <a name="REQUEST_BASENAME" id="REQUEST_BASENAME"></a><h2> <span 
 class="mw-headline"> REQUEST_BASENAME </span></h2>
 <p>This variable holds just the filename part of REQUEST_FILENAME (e.g.,
@@ -3377,9 +3412,8 @@ SESSIONID </span></h2>
 </p>
 <a name="STREAM_INPUT_BODY" id="STREAM_INPUT_BODY"></a><h2> <span 
 class="mw-headline"> STREAM_INPUT_BODY </span></h2>
-<p>This variable is created by a Connection-Level Filter hook in Apache 
-and give access to the raw request body content.  This variable is best 
-used for two use-cases:
+<p>This variable give access to the raw request body content.  This 
+variable is best used for two use-cases:
 </p>
 <ol><li>For fast pattern matching - using @pm/@pmf to prequalify large 
 text strings against the data.  This is more performant vs. using 
@@ -3394,9 +3428,8 @@ SecStreamInBodyInspection directive
 </dd></dl>
 <a name="STREAM_OUTPUT_BODY" id="STREAM_OUTPUT_BODY"></a><h2> <span 
 class="mw-headline"> STREAM_OUTPUT_BODY </span></h2>
-<p>This variable is created by a Connection-Level Filter hook in Apache 
-and give access to the raw response body content.  This variable is best
- used for two use-cases:
+<p>This variable give access to the raw response body content.  This 
+variable is best used for two use-cases:
 </p>
 <ol><li>For fast pattern matching - using @pm/@pmf to prequalify large 
 text strings against the data.  This is more performant vs. using 
@@ -4943,8 +4976,6 @@ ipMatch </span></h2>
 </p>
 <pre>SecRule REMOTE_ADDR "@ipMatch 192.168.1.100,192.168.1.50,10.10.50.0/24"
 </pre>
-<dl><dt> Note&nbsp;</dt><dd> Does not work under Windows OS
-</dd></dl>
 <a name="le" id="le"></a><h2> <span class="mw-headline"> le </span></h2>
 <p><b>Description:</b> Performs numerical comparison and returns true if
  the input value is less than or equal to the operator parameter. Macro 
@@ -4962,18 +4993,6 @@ SecRule &amp;REQUEST_HEADERS_NAMES "@le 15"
 </p>
 <pre># Detect fewer than 15 headers in a request 
 SecRule &amp;REQUEST_HEADERS_NAMES "@lt 15"
-</pre>
-<a name="strmatch" id="strmatch"></a><h2> <span class="mw-headline"> 
-strmatch </span></h2>
-<p><b>Description:</b> Performs a string match of the provided word 
-against the desired input value. The operator uses the  pattern matching
- Boyer-Moore-Horspool algorithm, which means that it is a single pattern
- matching operator. This operator performs much better than a regular 
-expression.
-</p><p><b>Example:</b>
-</p>
-<pre># Detect suspicious client by looking at the user agent identification 
-SecRule REQUEST_HEADERS:User-Agent "@strmatch WebZIP"
 </pre>
 <a name="pm" id="pm"></a><h2> <span class="mw-headline"> pm </span></h2>
 <p><b>Description:</b> Performs a case-insensitive match of the provided
@@ -5067,14 +5086,18 @@ setvar:tx.%{rule.id}-AUTOMATION/MALICIOUS-%{matched_var_name}=%{matched_var},set
 <a name="rsub" id="rsub"></a><h2> <span class="mw-headline"> rsub </span></h2>
 <p><b>Description</b>: Performs regular expression data substitution 
 when applied to either the STREAM_INPUT_BODY or STREAM_OUTPUT_BODY 
-variables. This operator also supports macro expasion.
-</p><p><b>Syntax:</b> <code>@rsub s/regex/str/[i]</code>
+variables. This operator also supports macro expansion.
+</p><p><b>Syntax:</b> <code>@rsub s/regex/str/[id]</code>
 </p><p><b>Examples:</b>
 Removing HTML Comments from response bodies:
 </p>
 <pre>SecStreamOutBodyInspection On
-SecRule STREAM_OUTPUT_BODY "@rsub s/&lt;!--.*?--&gt;//" "phase:4,t:none,nolog,pass"
+SecRule STREAM_OUTPUT_BODY "@rsub s/&lt;!--.*?--&gt;/ /" "phase:4,t:none,nolog,pass"
 </pre>
+<dl><dt> Note&nbsp;</dt><dd> If you plan to manipulate live data by 
+using @rsub with the STREAM_ variables, you must also enable 
+SecContentInjection directive.
+</dd></dl>
 <p>Regular expressions are handled by the PCRE library <a 
 href="http://www.pcre.org/" class="external autonumber" 
 title="http://www.pcre.org" rel="nofollow">[12]</a>. ModSecurity 
@@ -5086,7 +5109,9 @@ are newline characters present.
 case-insensitive matching, you can either use the lowercase 
 transformation function or force case-insensitive matching by prefixing 
 the regular expression pattern with the (?i) modifier (a PCRE feature; 
-you will find many similar features in the PCRE documentation).
+you will find many similar features in the PCRE documentation). Also a 
+flag [d] should be used if you want to escape the regex string chars 
+when use macro expansion.
 </li><li>The PCRE_DOTALL and PCRE_DOLLAR_ENDONLY flags are set during 
 compilation, meaning that a single dot will match any character, 
 including the newlines, and a $ end anchor will not match a trailing 
@@ -5140,6 +5165,18 @@ is performed on the parameter string before comparison.
 </p>
 <pre># Detect request parameters "foo" that do not # contain "bar", exactly. 
 SecRule ARGS:foo "!@streq bar"
+</pre>
+<a name="strmatch" id="strmatch"></a><h2> <span class="mw-headline"> 
+strmatch </span></h2>
+<p><b>Description:</b> Performs a string match of the provided word 
+against the desired input value. The operator uses the  pattern matching
+ Boyer-Moore-Horspool algorithm, which means that it is a single pattern
+ matching operator. This operator performs much better than a regular 
+expression.
+</p><p><b>Example:</b>
+</p>
+<pre># Detect suspicious client by looking at the user agent identification 
+SecRule REQUEST_HEADERS:User-Agent "@strmatch WebZIP"
 </pre>
 <a name="validateByteRange" id="validateByteRange"></a><h2> <span 
 class="mw-headline"> validateByteRange </span></h2>
@@ -5473,6 +5510,14 @@ SecRuleEngine DetectionOnly
 #
 SecRequestBodyAccess On
 
+
+# Enable XML request body parser.
+# Initiate XML Processor in case of xml content-type
+#
+SecRule REQUEST_HEADERS:Content-Type "text/xml" \
+     "phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+
+
 # Maximum request body size we will accept for buffering. If you support
 # file uploads then the value given on the first line has to be as large
 # as the largest file you are willing to accept. The second value refers
@@ -5488,13 +5533,20 @@ SecRequestBodyNoFilesLimit 131072
 #
 SecRequestBodyInMemoryLimit 131072
 
+# What do do if the request body size is above our configured limit.
+# Keep in mind that this setting will automatically be set to ProcessPartial
+# when SecRuleEngine is set to DetectionOnly mode in order to minimize
+# disruptions when initially deploying ModSecurity.
+#
+SecRequestBodyLimitAction Reject
+
 # Verify that we've correctly processed the request body.
 # As a rule of thumb, when failing to process a request body
 # you should reject the request (when deployed in blocking mode)
 # or log a high-severity alert (when deployed in detection-only mode).
 #
-SecRule REQBODY_PROCESSOR_ERROR "!@eq 0" \
-"phase:2,t:none,log,deny,msg:'Failed to parse request body.',severity:2"
+SecRule REQBODY_ERROR "!@eq 0" \
+"phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
 
 # By default be strict with what we accept in the multipart/form-data
 # request body. If the rule below proves to be too strict for your
@@ -5502,7 +5554,7 @@ SecRule REQBODY_PROCESSOR_ERROR "!@eq 0" \
 # _not_ to remove it altogether.
 #
 SecRule MULTIPART_STRICT_ERROR "!@eq 0" \
-"phase:2,t:none,log,deny,msg:'Multipart request body \
+"phase:2,t:none,log,deny,status:44,msg:'Multipart request body \
 failed strict validation: \
 PE&nbsp;%{REQBODY_PROCESSOR_ERROR}, \
 BQ&nbsp;%{MULTIPART_BOUNDARY_QUOTED}, \
@@ -5519,7 +5571,7 @@ IH&nbsp;%{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 # Did we see anything that might be a boundary?
 #
 SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
-"phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
+"phase:2,t:none,log,deny,status:44,msg:'Multipart parser detected a possible unmatched boundary.'"
 
 # PCRE Tuning
 # We want to avoid a potential RegEx DoS condition
@@ -5538,17 +5590,20 @@ SecRule TX:/^MSC_/ "!@streq 0" \
 
 # -- Response body handling --------------------------------------------------
 
-# Allow ModSecurity to access response bodies. We leave this disabled
-# because most deployments want to focus on the incoming threats, and
-# leaving this off reduces memory consumption.
+# Allow ModSecurity to access response bodies. 
+# You should have this directive enabled in order to identify errors
+# and data leakage issues.
+# 
+# Do keep in mind that enabling this directive does increases both
+# memory consumption and response latency.
 #
-SecResponseBodyAccess Off
+SecResponseBodyAccess On
 
 # Which response MIME types do you want to inspect? You should adjust the
 # configuration below to catch documents but avoid static files
 # (e.g., images and archives).
 #
-SecResponseBodyMimeType text/plain text/html
+SecResponseBodyMimeType text/plain text/html text/xml
 
 # Buffer response bodies of up to 512 KB in length.
 SecResponseBodyLimit 524288
@@ -5564,16 +5619,17 @@ SecResponseBodyLimitAction ProcessPartial
 
 # The location where ModSecurity stores temporary files (for example, when
 # it needs to handle a file upload that is larger than the configured limit).
-# If you don't specify a location here your system's default will be used
-# (normally /tmp), but that's less than ideal. It is recommended that you
-# specify a location that's private.
+# 
+# This default setting is chosen due to all systems have /tmp available however, 
+# this is less than ideal. It is recommended that you specify a location that's private.
 #
-SecTmpDir /opt/modsecurity/var/tmp/
+SecTmpDir /tmp/
 
-# The location where ModSecurity will keep its persistent data. This,
-# too, needs to be a place that other users can't access.
+# The location where ModSecurity will keep its persistent data.  This default setting 
+# is chosen due to all systems have /tmp available however, it
+# too should be updated to a place that other users can't access.
 #
-SecDataDir /opt/modsecurity/var/data/
+SecDataDir /tmp/
 
 
 # -- File uploads handling configuration -------------------------------------
@@ -5582,19 +5638,19 @@ SecDataDir /opt/modsecurity/var/data/
 # location must be private to ModSecurity. You don't want other users on
 # the server to access the files, do you?
 #
-SecUploadDir /opt/modsecurity/var/upload/
+#SecUploadDir /opt/modsecurity/var/upload/
 
 # By default, only keep the files that were determined to be unusual
 # in some way (by an external inspection script). For this to work you
 # will also need at least one file inspection rule.
 #
-SecUploadKeepFiles RelevantOnly
+#SecUploadKeepFiles RelevantOnly
 
 # Uploaded files are by default created with permissions that do not allow
 # any other user to access them. You may need to relax that if you want to
 # interface ModSecurity to an external program (e.g., an anti-virus).
 #
-SecUploadFileMode 0600
+#SecUploadFileMode 0600
 
 
 # -- Debug log configuration -------------------------------------------------
@@ -5602,34 +5658,35 @@ SecUploadFileMode 0600
 # The default debug log configuration is to duplicate the error, warning
 # and notice messages from the error log.
 #
-SecDebugLog /opt/modsecurity/var/log/debug.log
-SecDebugLogLevel 3
+#SecDebugLog /opt/modsecurity/var/log/debug.log
+#SecDebugLogLevel 3
 
 
 # -- Audit log configuration -------------------------------------------------
 
 # Log the transactions that are marked by a rule, as well as those that
-# trigger a server error (determined by a 5xx response status code).
+# trigger a server error (determined by a 5xx or 4xx, excluding 404,  
+# level response status codes).
 #
 SecAuditEngine RelevantOnly
 SecAuditLogRelevantStatus "^(?:5|4(?!04))"
 
 # Log everything we know about a transaction.
-SecAuditLogParts ABCDEFHKZ
+SecAuditLogParts ABIJDEFHKZ
 
 # Use a single file for logging. This is much easier to look at, but
 # assumes that you will use the audit log only ocassionally.
 #
 SecAuditLogType Serial
-SecAuditLog /opt/modsecurity/var/log/audit.log
+SecAuditLog /var/log/modsec_audit.log
 
 # Specify the path for concurrent audit logging.
-SecAuditLogStorageDir /opt/modsecurity/var/audit/
+#SecAuditLogStorageDir /opt/modsecurity/var/audit/
 
 
 # -- Miscellaneous -----------------------------------------------------------
 
-# Use the most commonly used application/x-www-form-urlencded parameter
+# Use the most commonly used application/x-www-form-urlencoded parameter
 # separator. There's probably only one application somewhere that uses
 # something else so don't expect to change this value.
 #
@@ -5644,13 +5701,13 @@ SecCookieFormat 0
 
 <!-- 
 NewPP limit report
-Preprocessor node count: 711/1000000
+Preprocessor node count: 712/1000000
 Post-expand include size: 0/2097152 bytes
 Template argument size: 0/2097152 bytes
 Expensive parser function count: 0/100
 -->
 
-<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20110330153902 -->
+<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20110418141641 -->
 <div class="printfooter">
 Retrieved from "<a 
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual">http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual</a>"</div>
@@ -5760,7 +5817,7 @@ pages</a></li>
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;printable=yes&amp;printable=yes"
  rel="alternate" title="Printable version of this page [alt-shift-p]" 
 accesskey="p">Printable version</a></li>				<li id="t-permalink"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=374"
+href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=410"
  title="Permanent link to this revision of the page">Permanent link</a></li>
 			</ul>
 		</div>
@@ -5769,18 +5826,18 @@ href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Referen
 			<div class="visualClear"></div>
 			<div id="footer">
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img 
-src="Reference_manual_files/poweredby_mediawiki_88x31.png" alt="Powered 
+src="Reference_Manual_files/poweredby_mediawiki_88x31.png" alt="Powered 
 by MediaWiki"></a></div>
 			<ul id="f-list">
-					<li id="lastmod"> This page was last modified on 30 March 2011, at 
-15:36.</li>
-					<li id="viewcount">This page has been accessed 3,323 times.</li>
+					<li id="lastmod"> This page was last modified on 18 April 2011, at 
+14:15.</li>
+					<li id="viewcount">This page has been accessed 8,604 times.</li>
 			</ul>
 		</div>
 </div>
 
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
-<!-- Served in 1.181 secs. -->
+<!-- Served in 0.183 secs. -->
     
     
     <script type="text/javascript">
