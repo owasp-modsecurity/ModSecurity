@@ -19,10 +19,15 @@ AC_DEFUN([CHECK_LUA],
 
 AC_ARG_WITH(
     lua,
-    [AC_HELP_STRING([--with-lua=PATH],[Path to lua prefix or config script])],
-    [test_paths="${with_lua}"],
-    [test_paths="/usr/local/liblua /usr/local/lua /usr/local /opt/liblua /opt/lua /opt /usr"; ])
+    [AC_HELP_STRING([--with-lua=PATH],[Path to lua prefix or config script])]
+    ,, with_lua=yes)
 
+AS_CASE(["${with_lua}"],
+  [no], [test_paths=],
+  [yes], [test_paths="/usr/local/liblua /usr/local/lua /usr/local /opt/liblua /opt/lua /opt /usr"],
+  [test_paths="${with_lua}"])
+
+AS_IF([test "x${test_paths}" != "x"], [
 AC_MSG_CHECKING([for liblua config script])
 
 for x in ${test_paths}; do
@@ -177,6 +182,7 @@ fi
 if test -n "${LUA_LIBS}"; then
     LUA_CPPFLAGS="-DWITH_LUA"
 fi
+])
 
 AC_SUBST(LUA_CONFIG)
 AC_SUBST(LUA_VERSION)
@@ -185,12 +191,10 @@ AC_SUBST(LUA_CPPFLAGS)
 AC_SUBST(LUA_LDADD)
 AC_SUBST(LUA_LDFLAGS)
 
-if test "${with_path}" != "no"; then
     if test -z "${LUA_VERSION}"; then
       ifelse([$2], , AC_MSG_NOTICE([optional lua library not found]), $2)
     else
       AC_MSG_NOTICE([using lua v${LUA_VERSION}])
       ifelse([$1], , , $1) 
     fi 
-fi
 ])
