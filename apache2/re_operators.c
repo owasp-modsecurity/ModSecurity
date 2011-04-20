@@ -428,8 +428,6 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 
     size -= (((AP_MAX_REG_MATCH - count)*(strlen(replace))) + p_len+2);
 
-    var->value_len = size;
-
     if(msr->stream_output_data != NULL && output_body == 1) {
 
         char *stream_output_data = NULL;
@@ -443,6 +441,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
            return -1;
         }
 
+        var->value_len = size;
         msr->stream_output_data = (char *)stream_output_data;
         if(msr->stream_output_data != NULL)
         apr_cpystrn(msr->stream_output_data, data, size);
@@ -461,6 +460,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
            return -1;
         }
 
+        var->value_len = size;
         msr->stream_input_data = (char *)stream_input_data;
         if(msr->stream_input_data != NULL)
         apr_cpystrn(msr->stream_input_data, data, size);
