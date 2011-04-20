@@ -1861,7 +1861,7 @@ static int luhn_verify(const char *ccnumber, int len) {
     /* Weighted lookup table which is just a precalculated (i = index):
      *   i*2 + (( (i*2) > 9 ) ? -9 : 0)
      */
-    static int wtable[10] = {0, 2, 4, 6, 8, 1, 3, 5, 7, 9}; /* weight lookup table */
+    static const int wtable[10] = {0, 2, 4, 6, 8, 1, 3, 5, 7, 9}; /* weight lookup table */
 
     /* Add up only digits (weighted digits via lookup table)
      * for both odd and even CC numbers to avoid 2 passes.

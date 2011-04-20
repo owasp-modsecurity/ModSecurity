@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -I acinclude
+ACLOCAL_AMFLAGS = -I build
 SUBDIRS = @TOPLEVEL_SUBDIRS@ tests
 
 # Alias for "check"

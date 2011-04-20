@@ -8,7 +8,7 @@ AC_PREREQ(2.63)
 
 AC_INIT([modsecurity], [2.6], [support@modsecurity.org])
 
-AC_CONFIG_MACRO_DIR([acinclude])
+AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_SRCDIR([LICENSE])
 AC_CONFIG_HEADERS([modsecurity_config_auto.h])
 AC_CONFIG_AUX_DIR([build])
@@ -513,15 +513,6 @@ else
     AC_MSG_NOTICE(couldn't find APXS)
   fi
 fi
-
-# Include M4 macros
-sinclude(build/find_pcre.m4)
-sinclude(build/find_apr.m4)
-sinclude(build/find_apu.m4)
-sinclude(build/find_xml.m4)
-sinclude(build/find_lua.m4)
-sinclude(build/find_curl.m4)
-
 
 ### Build *EXTRA_CFLAGS vars
 

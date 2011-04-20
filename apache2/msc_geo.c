@@ -17,7 +17,7 @@
 
 /* -- Lookup Tables -- */
 
-static const char *geo_country_code[GEO_COUNTRY_LAST + 1] = {
+static const char geo_country_code[GEO_COUNTRY_LAST + 1][4] = {
     "--",
     "AP","EU","AD","AE","AF","AG","AI","AL","AM","AN",
     "AO","AQ","AR","AS","AT","AU","AW","AZ","BA","BB",
@@ -46,7 +46,7 @@ static const char *geo_country_code[GEO_COUNTRY_LAST + 1] = {
     "ZM","ME","ZW","A1","A2","O1","AX","GG","IM","JE"
 };
 
-static const char *geo_country_code3[GEO_COUNTRY_LAST + 1] = {
+static const char geo_country_code3[GEO_COUNTRY_LAST + 1][4] = {
     "--",
     "AP","EU","AND","ARE","AFG","ATG","AIA","ALB","ARM","ANT",
     "AGO","AQ","ARG","ASM","AUT","AUS","ABW","AZE","BIH","BRB",
@@ -75,7 +75,7 @@ static const char *geo_country_code3[GEO_COUNTRY_LAST + 1] = {
     "ZMB","MNE","ZWE","A1","A2","O1","ALA","GGY","IMN","JEY"
 };
 
-static const char *geo_country_name[GEO_COUNTRY_LAST + 1] = {
+static const char *const geo_country_name[GEO_COUNTRY_LAST + 1] = {
     "N/A",
     "Asia/Pacific Region","Europe","Andorra","United Arab Emirates","Afghanistan","Antigua and Barbuda","Anguilla","Albania","Armenia","Netherlands Antilles",
     "Angola","Antarctica","Argentina","American Samoa","Austria","Australia","Aruba","Azerbaijan","Bosnia and Herzegovina","Barbados",
@@ -104,7 +104,7 @@ static const char *geo_country_name[GEO_COUNTRY_LAST + 1] = {
     "Zambia","Montenegro","Zimbabwe","Anonymous Proxy","Satellite Provider","Other","Aland Islands","Guernsey","Isle of Man","Jersey"
 };
 
-static const char *geo_country_continent[GEO_COUNTRY_LAST + 1] = {
+static const char geo_country_continent[GEO_COUNTRY_LAST + 1][4] = {
     "--",
     "AS","EU","EU","AS","AS","SA","SA","EU","AS","SA",
     "AF","AN","SA","OC","EU","OC","SA","AS","EU","SA",
