@@ -631,7 +631,7 @@ static int msre_fn_parityOdd7bit_execute(apr_pool_t *mptmp, unsigned char *input
 * \retval 0 On failure
 * \retval 1 On Success
 */
-static int msre_fn_decodeBase64Ext_execute(apr_pool_t *mptmp, unsigned char *input, long int input_len, char **rval, long int *rval_len)
+static int msre_fn_base64DecodeExt_execute(apr_pool_t *mptmp, unsigned char *input, long int input_len, char **rval, long int *rval_len)
 {
     *rval_len = input_len;
     *rval = apr_palloc(mptmp, *rval_len);
@@ -862,10 +862,10 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
         msre_fn_urlEncode_execute
     );
 
-    /* decodeBase64Ext */
+    /* base64DecodeExt */
     msre_engine_tfn_register(engine,
-        "decodeBase64Ext",
-        msre_fn_decodeBase64Ext_execute
+        "base64DecodeExt",
+        msre_fn_base64DecodeExt_execute
     );
 
 }
