@@ -434,7 +434,7 @@ int hex2bytes_inplace(unsigned char *data, int len) {
  * representation.
  */
 char *bytes2hex(apr_pool_t *pool, unsigned char *data, int len) {
-    static unsigned char b2hex[] = "0123456789abcdef";
+    static const unsigned char b2hex[] = "0123456789abcdef";
     char *hex = NULL;
     int i, j;
 
