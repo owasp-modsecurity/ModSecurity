@@ -47,7 +47,7 @@
 #define S_ISUID 04000
 #endif /* defined(WIN32 || NETWARE) */
 
-/* Base64 tables used in decodeBase64Ext */
+/* Base64 tables used in base64DecodeExt */
 static const char b64_pad = '=';
 
 static const short b64_reverse_t[256] = {
