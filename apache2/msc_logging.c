@@ -1129,7 +1129,7 @@ void sec_audit_logger(modsec_rec *msr) {
         /* Matched Rules */
         for(i = 0; i < msr->matched_rules->nelts; i++) {
             rule = ((msre_rule **)msr->matched_rules->elts)[i];
-            if (rule != NULL && rule->actionset != NULL && rule->actionset->is_chained) {
+            if ((rule != NULL) && (rule->actionset != NULL) && rule->actionset->is_chained && (rule->chain_starter == NULL)) {
                 text = apr_psprintf(msr->mp, "Chain Starter [Match]: %s\n", rule->unparsed);
                 sec_auditlog_write(msr, text, strlen(text));
                 do {
@@ -1153,9 +1153,13 @@ void sec_audit_logger(modsec_rec *msr) {
                     }
                     rule = next_rule;
                 } while (rule != NULL && rule->actionset != NULL && rule->actionset->is_chained);
-            } else  {
-                text = apr_psprintf(msr->mp, "Rule [Match]: %s\n", rule->unparsed);
+                text = apr_psprintf(msr->mp, "\n");
                 sec_auditlog_write(msr, text, strlen(text));
+            } else  {
+                if ((rule != NULL) && (rule->actionset != NULL) && !rule->actionset->is_chained && (rule->chain_starter == NULL)) {
+                    text = apr_psprintf(msr->mp, "Rule [Match]: %s\n\n", rule->unparsed);
+                    sec_auditlog_write(msr, text, strlen(text));
+                }
             }
         }
     }
@@ -1175,7 +1179,7 @@ void sec_audit_logger(modsec_rec *msr) {
         rc = apr_global_mutex_unlock(msr->modsecurity->auditlog_lock);
         if (rc != APR_SUCCESS) {
             msr_log(msr, 1, "Audit log: Failed to unlock global mutex: %s",
-                get_apr_error(msr->mp, rc));
+                    get_apr_error(msr->mp, rc));
         }
 
         return;
@@ -1191,7 +1195,7 @@ void sec_audit_logger(modsec_rec *msr) {
     apr_md5_final(md5hash, &msr->new_auditlog_md5ctx);
 
     str2 = apr_psprintf(msr->mp, "%s %d %d md5:%s", msr->new_auditlog_filename, 0,
-        msr->new_auditlog_size, bytes2hex(msr->mp, md5hash, 16));
+            msr->new_auditlog_size, bytes2hex(msr->mp, md5hash, 16));
     if (str2 == NULL) return;
 
     /* We do not want the index line to be longer than 3980 bytes. */

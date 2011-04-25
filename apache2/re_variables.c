@@ -1878,7 +1878,17 @@ static int var_matched_vars_names_generate(modsec_rec *msr, msre_var *var, msre_
             rvar->value = apr_pstrndup(mptmp, str->name, strlen(str->name));
             rvar->value_len = strlen(rvar->value);
             rvar->name = apr_psprintf(mptmp, "MATCHED_VARS_NAMES:%s",
-                log_escape_nq(mptmp, str->name));
+                    log_escape_nq(mptmp, str->name));
+
+            if(var->is_counting == 0)
+                rvar->is_counting = 0;
+            else
+                rvar->is_counting = 1;
+
+            if(var->is_negated == 0)
+                rvar->is_negated = 0;
+            else
+                rvar->is_negated = 1;
 
             apr_table_setn(vartab, rvar->name, (void *)rvar);
 
@@ -1896,7 +1906,7 @@ static int var_matched_vars_names_generate(modsec_rec *msr, msre_var *var, msre_
 /* MATCHED_VARS */
 
 static int var_matched_vars_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
-    apr_table_t *vartab, apr_pool_t *mptmp)
+        apr_table_t *vartab, apr_pool_t *mptmp)
 {
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
@@ -1914,7 +1924,7 @@ static int var_matched_vars_generate(modsec_rec *msr, msre_var *var, msre_rule *
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
                 if (!(msc_regexec((msc_regex_t *)var->param_data, str->name,
-                    strlen(str->name), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                                strlen(str->name), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(str->name, var->param) == 0) match = 1;
             }
@@ -1923,13 +1933,22 @@ static int var_matched_vars_generate(modsec_rec *msr, msre_var *var, msre_rule *
         /* If we had a match add this argument to the collection. */
         if (match && (strncmp(str->name,"MATCHED_VARS:",13) != 0) && (strncmp(str->name,"MATCHED_VARS_NAMES:",19))) {
 
-            //msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
             msre_var *rvar = apr_palloc(mptmp, sizeof(msre_var));
 
             rvar->value = apr_pstrndup(mptmp, str->value, str->value_len);
             rvar->value_len = str->value_len;
             rvar->name = apr_psprintf(mptmp, "MATCHED_VARS:%s",
-                log_escape_nq(mptmp, str->name));
+                    log_escape_nq(mptmp, str->name));
+
+            if(var->is_counting == 0)
+                rvar->is_counting = 0;
+            else
+                rvar->is_counting = 1;
+
+            if(var->is_negated == 0)
+                rvar->is_negated = 0;
+            else
+                rvar->is_negated = 1;
 
             apr_table_setn(vartab, rvar->name, (void *)rvar);
 
@@ -1947,7 +1966,7 @@ static int var_matched_vars_generate(modsec_rec *msr, msre_var *var, msre_rule *
 /* REQUEST_COOKIES */
 
 static int var_request_cookies_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
-    apr_table_t *vartab, apr_pool_t *mptmp)
+        apr_table_t *vartab, apr_pool_t *mptmp)
 {
     const apr_array_header_t *arr = NULL;
     const apr_table_entry_t *te = NULL;
@@ -1964,7 +1983,7 @@ static int var_request_cookies_generate(modsec_rec *msr, msre_var *var, msre_rul
             if (var->param_data != NULL) { /* Regex. */
                 char *my_error_msg = NULL;
                 if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
-                    strlen(te[i].key), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+                                strlen(te[i].key), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
             } else { /* Simple comparison. */
                 if (strcasecmp(te[i].key, var->param) == 0) match = 1;
             }
