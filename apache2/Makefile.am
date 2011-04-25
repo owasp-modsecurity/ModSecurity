@@ -18,6 +18,18 @@ mod_security2_la_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
 mod_security2_la_CPPFLAGS = @APR_CPPFLAGS@ @LIBXML2_CPPFLAGS@ @LUA_CPPFLAGS@
 mod_security2_la_LIBADD = @APR_LDADD@ @APU_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@
 
+if AIX
+mod_security2_la_LDFLAGS = -module -avoid-version \
+                           @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
+                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+endif
+
+if HPUX
+mod_security2_la_LDFLAGS = -module -avoid-version \
+                           @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
+                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+endif
+
 if MACOSX
 mod_security2_la_LDFLAGS = -module -avoid-version \
                            @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
