@@ -74,17 +74,25 @@ AC_SUBST(MSC_REGRESSION_DOCROOT_DIR)
 AC_CANONICAL_HOST
 CANONICAL_HOST=$host
 
-#AH_TEMPLATE([AIX],     [Define if the operating system is AIX])
+AH_TEMPLATE([AIX],     [Define if the operating system is AIX])
 AH_TEMPLATE([LINUX],   [Define if the operating system is LINUX])
-AH_TEMPLATE([OPENBSD],    [Define if the operating system is OpenBSD])
+AH_TEMPLATE([OPENBSD], [Define if the operating system is OpenBSD])
 AH_TEMPLATE([SOLARIS], [Define if the operating system is SOLARIS])
-#AH_TEMPLATE([HPUX],    [Define if the operating system is HPUX])
+AH_TEMPLATE([HPUX],    [Define if the operating system is HPUX])
 AH_TEMPLATE([MACOSX],  [Define if the operating system is Macintosh OSX])
 AH_TEMPLATE([FREEBSD], [Define if the operating system is FREEBSD])
-AH_TEMPLATE([NETBSD],   [Define if the operating system is NetBSD])
+AH_TEMPLATE([NETBSD],  [Define if the operating system is NetBSD])
 
 
 case $host in
+  *-*-aix*)
+    echo "Checking plataform... Identified as AIX"
+    aixos=true
+    ;;
+  *-*-hpux*)
+    echo "Checking plataform... Identified as HPUX"
+    hpuxos=true
+    ;;
   *-*-darwin*)
     echo "Checking plataform... Identified as Macintosh OS X"
     macos=true
@@ -115,6 +123,8 @@ case $host in
     ;;
 esac
 
+AM_CONDITIONAL([AIX], [test x$aixos = xtrue])
+AM_CONDITIONAL([HPUX], [test x$hpuxos = xtrue])
 AM_CONDITIONAL([MACOSX], [test x$macos = xtrue])
 AM_CONDITIONAL([LINUX], [test x$linuxos = xtrue])
 AM_CONDITIONAL([SOLARIS], [test x$solarisos = xtrue])
