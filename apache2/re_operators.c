@@ -995,7 +995,7 @@ const char *gsb_reduce_char(modsec_rec *msr, const char *domain) {
     char *ptr = apr_pstrdup(msr->mp, domain);
     char *data = NULL;
     char *reduced = NULL;
-    int skip = 0, len = 0;
+    int skip = 0;
 
 
     if(ptr == NULL)
@@ -1136,7 +1136,6 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     gsb_db *gsb = msr->txcfg->gsb;
     const char *match = NULL;
     unsigned int match_length;
-    unsigned int domain_length;
     int rv, i, ret, count_slash;
     unsigned int size = var->value_len;
     char *base = NULL, *domain = NULL, *savedptr = NULL;
@@ -1210,7 +1209,83 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                     return 1;
                 }
 
-                str = apr_pstrdup(msr->mp, match);
+                /* Parsing full url */
+
+                domain = apr_pstrdup(rule->ruleset->mp, match);
+
+                domain_len = strlen(domain);
+
+                if(*domain != '/')  {
+
+                    if(domain[domain_len-1] == '.')
+                        domain[domain_len-1] = '\0';
+                    if(domain[domain_len-1] == '/' && domain[domain_len-2] == '.')    {
+                        domain[domain_len-2] = '/';
+                        domain[domain_len-1] = '\0';
+                    }
+
+                    dot = strchr(domain,'.');
+                    if(dot != NULL) {
+                        canon = apr_pstrdup(rule->ruleset->mp, domain);
+
+                        ret = verify_gsb(gsb, msr, canon, strlen(canon));
+
+                        if(ret > 0) {
+                            set_match_to_tx(msr, capture, canon, 0);
+                            if (! *error_msg) {
+                                *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
+                                        log_escape_nq(msr->mp, canon));
+                            }
+
+                            return 1;
+                        }
+
+
+                        base = apr_strtok(canon,"?",&savedptr);
+
+                        if(base != NULL)   {
+                            ret = verify_gsb(gsb, msr, base, strlen(base));
+
+                            if(ret > 0) {
+                                set_match_to_tx(msr, capture, base, 0);
+                                if (! *error_msg) {
+                                    *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
+                                            log_escape_nq(msr->mp, base));
+                                }
+                                return 1;
+                            }
+
+                        }
+
+                        url = apr_palloc(rule->ruleset->mp, strlen(canon));
+                        count_slash = 0;
+
+                        while(*canon != '\0') {
+                            switch (*canon)   {
+                                case '/':
+                                    ptr = apr_psprintf(rule->ruleset->mp,"%s/",url);
+                                    ret = verify_gsb(gsb, msr, ptr, strlen(ptr));
+                                    if(ret > 0) {
+                                        set_match_to_tx(msr, capture, ptr, 0);
+                                        if (! *error_msg) {
+                                            *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
+                                                    log_escape_nq(msr->mp, ptr));
+                                        }
+                                        return 1;
+                                    }
+
+                                    break;
+                            }
+                            url[count_slash] = *canon;
+                            count_slash++;
+                            canon++;
+                        }
+                    }
+                }
+
+                /* Do the same for subdomains */
+
+                str = apr_pstrdup(rule->ruleset->mp, match);
 
                 while (*str != '\0')   {
 
@@ -1230,7 +1305,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                                 dot = strchr(domain,'.');
                                 if(dot != NULL) {
-                                    canon = apr_pstrdup(msr->mp, domain);
+                                    canon = apr_pstrdup(rule->ruleset->mp, domain);
 
                                     ret = verify_gsb(gsb, msr, canon, strlen(canon));
 
@@ -1261,13 +1336,13 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                                     }
 
-                                    url = apr_palloc(msr->mp, strlen(canon));
+                                    url = apr_palloc(rule->ruleset->mp, strlen(canon));
                                     count_slash = 0;
 
                                     while(*canon != '\0') {
                                         switch (*canon)   {
                                             case '/':
-                                                ptr = apr_psprintf(msr->mp,"%s/",url);
+                                                ptr = apr_psprintf(rule->ruleset->mp,"%s/",url);
                                                 ret = verify_gsb(gsb, msr, ptr, strlen(ptr));
                                                 if(ret > 0) {
                                                     set_match_to_tx(msr, capture, ptr, 0);
