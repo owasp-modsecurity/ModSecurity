@@ -1136,13 +1136,13 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     gsb_db *gsb = msr->txcfg->gsb;
     const char *match = NULL;
     unsigned int match_length;
-    unsigned int canon_length;
-    int rv, i, ret;
-    char *data = NULL;
+    unsigned int domain_length;
+    int rv, i, ret, count_slash;
     unsigned int size = var->value_len;
-    char *base = NULL, *canon = NULL, *savedptr = NULL;
-    char *str = NULL;
-    int capture;
+    char *base = NULL, *domain = NULL, *savedptr = NULL;
+    char *str = NULL, *canon = NULL, *dot = NULL;
+    char *data = NULL, *ptr = NULL, *url = NULL;
+    int capture, domain_len;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -1210,119 +1210,90 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                     return 1;
                 }
 
-                /* append / in the end of full url */
-                if ((match[match_length -1] != '/') && (strchr(match,'?') == NULL))    {
+                str = apr_pstrdup(msr->mp, match);
 
-                    canon = apr_psprintf(msr->mp, "%s/", match);
-                    if (canon != NULL)  {
+                while (*str != '\0')   {
 
-                        if (msr->txcfg->debuglog_level >= 4) {
-                            msr_log(msr, 4, "GSB: Canonicalize url #1: %s", canon);
-                        }
+                    switch(*str) {
+                        case '.':
+                            domain++;
+                            domain_len = strlen(domain);
 
-                        canon_length = strlen(canon);
-                        ret = verify_gsb(gsb, msr, canon, canon_length);
+                            if(*domain != '/')  {
 
-                        if(ret > 0) {
-                            set_match_to_tx(msr, capture, match, 0);
-                            if (! *error_msg) {
-                                *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
-                                        log_escape_nq(msr->mp, canon));
-                            }
-
-                            str = apr_pstrdup(msr->mp,match);
-
-                            base = apr_strtok(str,"/",&savedptr);
-                            if(base != NULL)
-                                set_match_to_tx(msr, capture, base, 1);
-
-                            return 1;
-                        }
-                    }
-                }
-
-                str = apr_pstrdup(msr->mp,match);
-
-                /* base url */
-                if (str != NULL)    {
-
-                    base = apr_strtok(str,"/",&savedptr);
-
-                    if (base != NULL && (strlen(match) != (strlen(base)+1)))   {
-
-                        canon = apr_psprintf(msr->mp, "%s/", base);
-
-                        if (canon != NULL)  {
-
-                            char *domain = NULL;
-                            int domain_len = 0;
-                            char *p = canon, *dot = NULL;
-
-                            if (msr->txcfg->debuglog_level >= 4) {
-                                msr_log(msr, 4, "GSB: Canonicalize url #2: %s", canon);
-                            }
-
-                            canon_length = strlen(canon);
-                            ret = verify_gsb(gsb, msr, canon, canon_length);
-
-                            if(ret > 0) {
-                                set_match_to_tx(msr, capture, base, 0);
-                                if (! *error_msg) {
-                                    *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
-                                            log_escape_nq(msr->mp, canon));
+                                if(domain[domain_len-1] == '.')
+                                    domain[domain_len-1] = '\0';
+                                if(domain[domain_len-1] == '/' && domain[domain_len-2] == '.')    {
+                                    domain[domain_len-2] = '/';
+                                    domain[domain_len-1] = '\0';
                                 }
-                                return 1;
-                            }
 
-                            while (*p != '\0')   {
+                                dot = strchr(domain,'.');
+                                if(dot != NULL) {
+                                    canon = apr_pstrdup(msr->mp, domain);
 
-                                switch(*p) {
-                                    case '.':
-                                        domain++;
-                                        domain_len = strlen(domain);
+                                    ret = verify_gsb(gsb, msr, canon, strlen(canon));
 
-                                        if(domain_len < 2)
-                                            break;
+                                    if(ret > 0) {
+                                        set_match_to_tx(msr, capture, canon, 0);
+                                        if (! *error_msg) {
+                                            *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
+                                                    log_escape_nq(msr->mp, canon));
+                                        }
 
-                                        if(*domain != '/')  {
-                                            if(domain[domain_len-1] == '.')
-                                                domain[domain_len-1] = '\0';
-                                            if(domain[domain_len-1] == '/' && domain[domain_len-2] == '.')    {
-                                                domain[domain_len-2] = '/';
-                                                domain[domain_len-1] = '\0';
+                                        return 1;
+                                    }
+
+
+                                    base = apr_strtok(canon,"?",&savedptr);
+
+                                    if(base != NULL)   {
+                                        ret = verify_gsb(gsb, msr, base, strlen(base));
+
+                                        if(ret > 0) {
+                                            set_match_to_tx(msr, capture, base, 0);
+                                            if (! *error_msg) {
+                                                *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
+                                                        log_escape_nq(msr->mp, base));
                                             }
+                                            return 1;
+                                        }
 
-                                            dot = strchr(domain,'.');
+                                    }
 
-                                            if(dot != NULL) {
-                                                canon_length = strlen(domain);
-                                                ret = verify_gsb(gsb, msr, domain, canon_length);
+                                    url = apr_palloc(msr->mp, strlen(canon));
+                                    count_slash = 0;
 
+                                    while(*canon != '\0') {
+                                        switch (*canon)   {
+                                            case '/':
+                                                ptr = apr_psprintf(msr->mp,"%s/",url);
+                                                ret = verify_gsb(gsb, msr, ptr, strlen(ptr));
                                                 if(ret > 0) {
-                                                    set_match_to_tx(msr, capture, domain, 0);
+                                                    set_match_to_tx(msr, capture, ptr, 0);
                                                     if (! *error_msg) {
                                                         *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
-                                                                log_escape_nq(msr->mp, domain));
+                                                                log_escape_nq(msr->mp, ptr));
                                                     }
                                                     return 1;
                                                 }
 
-                                            }
-
+                                                break;
                                         }
-                                        break;
+                                        url[count_slash] = *canon;
+                                        count_slash++;
+                                        canon++;
+                                    }
                                 }
-
-                                domain = p;
-                                domain++;
-                                p++;
                             }
-
-                        }
-
+                            break;
                     }
 
+                    domain = str;
+                    domain++;
+                    str++;
                 }
+
             }
         }
 
