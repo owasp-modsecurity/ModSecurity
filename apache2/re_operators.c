@@ -982,16 +982,74 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 /* gsbLookup */
 
 /*
-* \brief Verify function to gsbLookup operator
-*
-* \param msr Pointer to the modsec resource
-* \param match Pointer to input data
-* \param match_length Input size
-*
-* \retval -1 On Failure
-* \retval 1 On Match
-* \retval 0 On No Match
-*/
+ * \brief Reduce doble dot to single dot
+ *
+ * \param msr Pointer to the modsec resource
+ * \param domain Input data
+ *
+ * \retval domain On Failure
+ * \retval reduced On Success
+ */
+const char *gsb_reduce_char(modsec_rec *msr, const char *domain) {
+
+    char *ptr = apr_pstrdup(msr->mp, domain);
+    char *data = NULL;
+    char *reduced = NULL;
+    int skip = 0, len = 0;
+
+
+    if(ptr == NULL)
+        return domain;
+
+    data = apr_pcalloc(msr->mp, strlen(ptr));
+
+    if(data == NULL)
+        return domain;
+
+    reduced = data;
+
+    while(*ptr != '\0') {
+
+        switch(*ptr)    {
+            case '.':
+                ptr++;
+                if(*ptr == '.')
+                    skip = 1;
+
+                ptr--;
+                break;
+        }
+
+        if(skip == 0)   {
+            *data = *ptr;
+            data++;
+        }
+        ptr++;
+        skip = 0;
+    }
+
+    *data = '\0'; --data;
+
+    if(*data == '.')
+        *data = '\0';
+    else
+        ++data;
+
+    return reduced;
+}
+
+
+/*
+ * \brief Verify function to gsbLookup operator
+ *
+ * \param msr Pointer to the modsec resource
+ * \param match Pointer to input data
+ * \param match_length Input size
+ *
+ * \retval -1 On Failure
+ * \retval 1 On Match
+ * \retval 0 On No Match
+ */
 static int verify_gsb(gsb_db *gsb, modsec_rec *msr, const char *match, unsigned int match_length) {
     apr_md5_ctx_t ctx;
     apr_status_t rc;
@@ -1021,14 +1079,14 @@ static int verify_gsb(gsb_db *gsb, modsec_rec *msr, const char *match, unsigned 
 }
 
 /*
-* \brief Init function to gsbLookup operator
-*
-* \param rule Pointer to the rule
-* \param error_msg Pointer to error msg
-*
-* \retval 1 On Success
-* \retval 0 On Fail
-*/
+ * \brief Init function to gsbLookup operator
+ *
+ * \param rule Pointer to the rule
+ * \param error_msg Pointer to error msg
+ *
+ * \retval 1 On Success
+ * \retval 0 On Fail
+ */
 static int msre_op_gsbLookup_param_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
@@ -1052,17 +1110,17 @@ static int msre_op_gsbLookup_param_init(msre_rule *rule, char **error_msg) {
 }
 
 /*
-* \brief Execution function to gsbLookup operator
-*
-* \param msr Pointer internal modsec request structure
-* \param rule Pointer to the rule
-* \param var Pointer to variable structure
-* \param error_msg Pointer to error msg
-*
-* \retval -1 On Failure
-* \retval 1 On Match
-* \retval 0 On No Match
-*/
+ * \brief Execution function to gsbLookup operator
+ *
+ * \param msr Pointer internal modsec request structure
+ * \param rule Pointer to the rule
+ * \param var Pointer to variable structure
+ * \param error_msg Pointer to error msg
+ *
+ * \retval -1 On Failure
+ * \retval 1 On Match
+ * \retval 0 On No Match
+ */
 static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     msc_regex_t *regex = (msc_regex_t *)rule->op_param_data;
     char *my_error_msg = NULL;
@@ -1115,6 +1173,8 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
             }
 
             match = remove_escape(msr->mp, match, strlen(match));
+
+            match = gsb_reduce_char(msr, match);
 
             match_length = strlen(match);
 
@@ -1187,6 +1247,10 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                         if (canon != NULL)  {
 
+                            char *domain = NULL;
+                            int domain_len = 0;
+                            char *p = canon, *dot = NULL;
+
                             if (msr->txcfg->debuglog_level >= 4) {
                                 msr_log(msr, 4, "GSB: Canonicalize url #2: %s", canon);
                             }
@@ -1202,6 +1266,51 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                 }
                                 return 1;
                             }
+
+                            while (*p != '\0')   {
+
+                                switch(*p) {
+                                    case '.':
+                                        domain++;
+                                        domain_len = strlen(domain);
+
+                                        if(domain_len < 2)
+                                            break;
+
+                                        if(*domain != '/')  {
+                                            if(domain[domain_len-1] == '.')
+                                                domain[domain_len-1] = '\0';
+                                            if(domain[domain_len-1] == '/' && domain[domain_len-2] == '.')    {
+                                                domain[domain_len-2] = '/';
+                                                domain[domain_len-1] = '\0';
+                                            }
+
+                                            dot = strchr(domain,'.');
+
+                                            if(dot != NULL) {
+                                                canon_length = strlen(domain);
+                                                ret = verify_gsb(gsb, msr, domain, canon_length);
+
+                                                if(ret > 0) {
+                                                    set_match_to_tx(msr, capture, domain, 0);
+                                                    if (! *error_msg) {
+                                                        *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
+                                                                log_escape_nq(msr->mp, domain));
+                                                    }
+                                                    return 1;
+                                                }
+
+                                            }
+
+                                        }
+                                        break;
+                                }
+
+                                domain = p;
+                                domain++;
+                                p++;
+                            }
+
                         }
 
                     }
@@ -2114,14 +2223,14 @@ static int cpf_verify(const char *cpfnumber, int len) {
 }
 
 /*
-* \brief Init function to CPF operator
-*
-* \param rule Pointer to the rule
-* \param error_msg Pointer to error msg
-*
-* \retval 0 On Failure
-* \retval 1 On Success
-*/
+ * \brief Init function to CPF operator
+ *
+ * \param rule Pointer to the rule
+ * \param error_msg Pointer to error msg
+ *
+ * \retval 0 On Failure
+ * \retval 1 On Success
+ */
 static int msre_op_verifyCPF_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
@@ -2134,7 +2243,7 @@ static int msre_op_verifyCPF_init(msre_rule *rule, char **error_msg) {
     regex = msc_pregcomp_ex(rule->ruleset->mp, rule->op_param, PCRE_DOTALL | PCRE_MULTILINE, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
     if (regex == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
-            erroffset, errptr);
+                erroffset, errptr);
         return 0;
     }
 
@@ -2144,17 +2253,17 @@ static int msre_op_verifyCPF_init(msre_rule *rule, char **error_msg) {
 }
 
 /*
-* \brief Execution function to CPF operator
-*
-* \param msr Pointer internal modsec request structure
-* \param rule Pointer to the rule
-* \param var Pointer to variable structure
-* \param error_msg Pointer to error msg
-*
-* \retval -1 On Failure
-* \retval 1 On Match
-* \retval 0 On No Match
-*/
+ * \brief Execution function to CPF operator
+ *
+ * \param msr Pointer internal modsec request structure
+ * \param rule Pointer to the rule
+ * \param var Pointer to variable structure
+ * \param error_msg Pointer to error msg
+ *
+ * \retval -1 On Failure
+ * \retval 1 On Match
+ * \retval 0 On No Match
+ */
 static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     msc_regex_t *regex = (msc_regex_t *)rule->op_param_data;
     const char *target;
