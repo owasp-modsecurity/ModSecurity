@@ -1136,12 +1136,14 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     gsb_db *gsb = msr->txcfg->gsb;
     const char *match = NULL;
     unsigned int match_length;
-    int rv, i, ret, count_slash;
+    int rv, i, ret, count_slash, j;
     unsigned int size = var->value_len;
     char *base = NULL, *domain = NULL, *savedptr = NULL;
     char *str = NULL, *canon = NULL, *dot = NULL;
     char *data = NULL, *ptr = NULL, *url = NULL;
     int capture, domain_len;
+    int d_pos = -1;
+    int s_pos = -1;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -1285,6 +1287,14 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
                 /* Do the same for subdomains */
 
+                for(j=0; j<strlen(match); j++)    {
+                    if(match[j] == '/')    {
+                        s_pos = j;
+                        break;
+                    }
+                }
+
+
                 str = apr_pstrdup(rule->ruleset->mp, match);
 
                 while (*str != '\0')   {
@@ -1293,6 +1303,11 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                         case '.':
                             domain++;
                             domain_len = strlen(domain);
+
+                            d_pos = strchr(domain,'.') - domain;
+
+                            if(s_pos >= 0 && d_pos >= 0 && d_pos > s_pos)
+                                break;
 
                             if(*domain != '/')  {
 
