@@ -1792,11 +1792,9 @@ static int var_time_epoch_generate(modsec_rec *msr, msre_var *var, msre_rule *ru
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     msre_var *rvar = NULL;
-    struct tm *tm;
     time_t tc;
 
     tc = time(NULL);
-    tm = localtime(&tc);
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
     rvar->value = apr_psprintf(mptmp, "%ld", (long)tc);
     rvar->value_len = strlen(rvar->value);
