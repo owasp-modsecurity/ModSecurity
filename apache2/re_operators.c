@@ -1018,6 +1018,13 @@ const char *gsb_reduce_char(modsec_rec *msr, const char *domain) {
 
                 ptr--;
                 break;
+            case '/':
+                ptr++;
+                if(*ptr == '/')
+                    skip = 1;
+
+                ptr--;
+                break;
         }
 
         if(skip == 0)   {
