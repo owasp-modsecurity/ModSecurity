@@ -1187,6 +1187,8 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
 
             match_length = strlen(match);
 
+            strtolower_inplace((unsigned char *)match);
+
             if((strstr(match,"http") == NULL) && (match_length > 0) && (strchr(match,'.')))    {
 
                 /* full url */
