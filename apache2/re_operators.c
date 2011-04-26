@@ -1136,6 +1136,7 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     gsb_db *gsb = msr->txcfg->gsb;
     const char *match = NULL;
     unsigned int match_length;
+    unsigned int canon_length;
     int rv, i, ret, count_slash, j;
     unsigned int size = var->value_len;
     char *base = NULL, *domain = NULL, *savedptr = NULL;
@@ -1209,6 +1210,27 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                         set_match_to_tx(msr, capture, base, 1);
 
                     return 1;
+                }
+
+                /* append / in the end of full url */
+                if ((match[match_length -1] != '/') && (strchr(match,'?') == NULL))    {
+
+                    canon = apr_psprintf(rule->ruleset->mp, "%s/", match);
+                    if (canon != NULL)  {
+
+                        canon_length = strlen(canon);
+                        ret = verify_gsb(gsb, msr, canon, canon_length);
+
+                        if(ret > 0) {
+                            set_match_to_tx(msr, capture, match, 0);
+                            if (! *error_msg) {
+                                *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
+                                        log_escape_nq(msr->mp, canon));
+                            }
+
+                            return 1;
+                        }
+                    }
                 }
 
                 /* Parsing full url */
