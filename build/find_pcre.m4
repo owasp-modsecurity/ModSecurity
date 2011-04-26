@@ -53,8 +53,6 @@ for x in ${test_paths}; do
         break
     fi
 done
-    CFLAGS=$save_CFLAGS
-    LDFLAGS=$save_LDFLAGS
 
 if test -n "${pcre_path}"; then
     if test "${pcre_path}" != "no"; then
