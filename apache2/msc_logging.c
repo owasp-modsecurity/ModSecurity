@@ -69,51 +69,6 @@ static int sec_auditlog_write(modsec_rec *msr, const char *data, unsigned int le
 }
 
 /**
- * Construct a log line in the vcombinedus format (see below).
- */
-char *construct_log_vcombinedus(modsec_rec *msr) {
-    const char *local_user, *remote_user;
-    const char *referer, *user_agent, *uniqueid;
-    const char *sessionid;
-
-    /* remote log name */
-    if (msr->remote_user == NULL) remote_user = "-";
-    else remote_user = msr->remote_user;
-
-    /* authenticated user */
-    if (msr->local_user == NULL) local_user = "-";
-    else local_user = msr->local_user;
-
-    /* unique id */
-    uniqueid = msr->txid;
-    if (uniqueid == NULL) uniqueid = "-";
-
-    /* referer */
-    referer = "-";
-    /* Logging Referer is a waste of space.
-    referer = (char *)apr_table_get(msr->request_headers, "Referer");
-    if (referer == NULL) referer = "-";
-    */
-
-    /* user agent */
-    user_agent = "-";
-    /* Logging User-Agent is a waste of space too.
-    user_agent = (char *)apr_table_get(msr->request_headers, "User-Agent");
-    if (user_agent == NULL) user_agent = "-";
-    */
-
-    /* sessionid */
-    sessionid = (msr->sessionid == NULL ? "-" : msr->sessionid);
-
-    return apr_psprintf(msr->mp, "%s %s %s %s [%s] \"%s\" %u %" APR_OFF_T_FMT " \"%s\" \"%s\" %s \"%s\"",
-        log_escape_nq(msr->mp, msr->hostname), msr->remote_addr, log_escape_nq(msr->mp, remote_user),
-        log_escape_nq(msr->mp, local_user), current_logtime(msr->mp),
-        ((msr->request_line == NULL) ? "" : log_escape(msr->mp, msr->request_line)),
-        msr->response_status, msr->bytes_sent, log_escape(msr->mp, referer),
-        log_escape(msr->mp, user_agent), log_escape(msr->mp, uniqueid), sessionid);
-}
-
-/**
  * Constructs a log line in vcombined log format trying to truncate
  * some of the fields to make the log line shorter than _limit bytes.
  */
@@ -423,7 +378,7 @@ static void sec_auditlog_write_producer_header(modsec_rec *msr) {
 * \retval NULL On failure
 * \retval next_rule On Success
 */
-msre_rule *return_chained_rule(const msre_rule *current, modsec_rec *msr)   {
+static msre_rule *return_chained_rule(const msre_rule *current, modsec_rec *msr)   {
     apr_array_header_t *arr = NULL;
     msre_rule **rules = NULL;
     msre_rule *rule = NULL, *next_rule = NULL;
@@ -499,7 +454,7 @@ msre_rule *return_chained_rule(const msre_rule *current, modsec_rec *msr)   {
 * \retval 0 On failure
 * \retval 1 On Success
 */
-int chained_is_matched(modsec_rec *msr, const msre_rule *next_rule) {
+static int chained_is_matched(modsec_rec *msr, const msre_rule *next_rule) {
     int i = 0;
     const msre_rule *rule = NULL;
 
@@ -1110,13 +1065,13 @@ void sec_audit_logger(modsec_rec *msr) {
         for(cfiles = 0; cfiles < msr->mpd->parts->nelts; cfiles++) {
             if (parts[cfiles]->type == MULTIPART_FILE) {
                 if(parts[cfiles]->filename != NULL) {
-                    text = apr_psprintf(msr->mp, "#%d Filename: %s - Size: %u - ContentType: %s\n", cfiles, log_escape_nq(msr->mp, parts[cfiles]->filename), parts[cfiles]->tmp_file_size, log_escape_nq(msr->mp, parts[cfiles]->content_type ? parts[cfiles]->content_type : "<Unknown ContentType>"));
+                    text = apr_psprintf(msr->mp, "%d,%u,\"%s\",\"%s\"\n", cfiles+1, parts[cfiles]->tmp_file_size, log_escape_nq(msr->mp, parts[cfiles]->filename), log_escape_nq(msr->mp, parts[cfiles]->content_type ? parts[cfiles]->content_type : "<Unknown ContentType>"));
                     sec_auditlog_write(msr, text, strlen(text));
                     total_size += parts[cfiles]->tmp_file_size;
                 }
             }
         }
-        text = apr_psprintf(msr->mp, "Total upload size: %u\n", total_size);
+        text = apr_psprintf(msr->mp, "Total,%u\n", total_size);
         sec_auditlog_write(msr, text, strlen(text));
     }
 

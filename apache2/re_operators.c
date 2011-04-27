@@ -92,6 +92,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     apr_status_t rv;
     char *str = NULL;
     char *saved = NULL;
+    char *param = NULL;
     msre_ipmatch *current;
     msre_ipmatch **last = &rule->ip_op;
 
@@ -100,7 +101,9 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     else
         *error_msg = NULL;
 
-    str = apr_strtok( (char *)rule->op_param, "," ,&saved);
+    param = apr_pstrdup(rule->ruleset->mp, rule->op_param);
+
+    str = apr_strtok(param, ",", &saved);
     while( str != NULL)  {
         const char *ipstr, *mask, *sep;
 
@@ -128,7 +131,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
         *last = current;
         last = &current->next;
 
-        str = apr_strtok(NULL,",",&saved);
+        str = apr_strtok(NULL, ",",&saved);
     }
 
     return 1;
@@ -156,14 +159,14 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
         *error_msg = NULL;
 
     if(current == NULL) {
-        *error_msg = "Internal Error: ipmatch value is null.";
-        return -1;
+        msr_log(msr, 1, "ipMatch Internal Error: ipmatch value is null.");
+        return 0;
     }
 
     /* create an apr_sockaddr_t for the value string */
     if ( apr_sockaddr_info_get(&sa, var->value, APR_UNSPEC, 0, 0, msr->mp) != APR_SUCCESS ) {
-       *error_msg = "Internal Error: Invalid REMOTE_ADDR address";
-        return -1;
+        msr_log(msr, 1, "ipMatch Internal Error: Invalid ip address.");
+        return 0;
     }
 
     /* look through the linked list for a match */
@@ -982,6 +985,44 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 /* gsbLookup */
 
 /*
+ * \brief Reduce /./ to /
+ *
+ * \param pool Pointer to the memory pool
+ * \param domain Input data
+ *
+ * \retval domain On Failure
+ * \retval url On Success
+ */
+static const char *gsb_replace_tpath(apr_pool_t *pool, const char *domain, int len)    {
+
+    char *pos = NULL, *data = NULL;
+    char *url = NULL;
+    int match = 0;
+
+    url = apr_palloc(pool, len + 1);
+    data = apr_palloc(pool, len + 1);
+
+    memset(data, 0, len+1);
+    memset(url, 0, len+1);
+
+    memcpy(url, domain, len);
+
+    while(( pos = strstr(url , "/./" )) != NULL) {
+        match = 1;
+        data[0] = '\0';
+        strncat(data, url, pos - url);
+        strcat(data , "/");
+        strcat(data ,pos + strlen("/./"));
+        strncpy(url , data, len);
+    }
+
+    if(match == 0)
+        return domain;
+
+    return url;
+}
+
+/*
  * \brief Reduce doble dot to single dot
  *
  * \param msr Pointer to the modsec resource
@@ -990,9 +1031,9 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
  * \retval domain On Failure
  * \retval reduced On Success
  */
-const char *gsb_reduce_char(modsec_rec *msr, const char *domain) {
+static const char *gsb_reduce_char(apr_pool_t *pool, const char *domain) {
 
-    char *ptr = apr_pstrdup(msr->mp, domain);
+    char *ptr = apr_pstrdup(pool, domain);
     char *data = NULL;
     char *reduced = NULL;
     int skip = 0;
@@ -1001,7 +1042,7 @@ const char *gsb_reduce_char(modsec_rec *msr, const char *domain) {
     if(ptr == NULL)
         return domain;
 
-    data = apr_pcalloc(msr->mp, strlen(ptr));
+    data = apr_pcalloc(pool, strlen(ptr));
 
     if(data == NULL)
         return domain;
@@ -1155,11 +1196,11 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     }
 
     if(gsb == NULL)    {
-        *error_msg = "Internal Error: gsb database is null.";
+        msr_log(msr, 1, "GSB lookup failed without a database.  Set SecGsbLookupDB.");
         return 0;
     }
 
-    data = apr_pcalloc(msr->mp, var->value_len+1);
+    data = apr_pcalloc(rule->ruleset->mp, var->value_len+1);
 
     if(data == NULL)    {
         *error_msg = "Internal Error: cannot allocate memory for data.";
@@ -1174,16 +1215,18 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     {
         for(i = 0; i < rv; ++i)
         {
-            match = apr_psprintf(msr->mp, "%.*s", ovector[2*i+1] - ovector[2*i], data + ovector[2*i]);
+            match = apr_psprintf(rule->ruleset->mp, "%.*s", ovector[2*i+1] - ovector[2*i], data + ovector[2*i]);
 
             if (match == NULL)  {
                 *error_msg = "Internal Error: cannot allocate memory for match.";
                 return -1;
             }
 
-            match = remove_escape(msr->mp, match, strlen(match));
+            match = remove_escape(rule->ruleset->mp, match, strlen(match));
 
-            match = gsb_reduce_char(msr, match);
+            match = gsb_replace_tpath(rule->ruleset->mp, match, strlen(match));
+
+            match = gsb_reduce_char(rule->ruleset->mp, match);
 
             match_length = strlen(match);
 

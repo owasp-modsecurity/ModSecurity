@@ -53,28 +53,10 @@ apr_status_t DSOLOCAL collection_original_setvar(modsec_rec *msr, const char *co
 
 int DSOLOCAL expand_macros(modsec_rec *msr, msc_string *var, msre_rule *rule, apr_pool_t *mptmp);
 
-apr_status_t DSOLOCAL msre_parse_targets(msre_ruleset *ruleset, const char *text,
-    apr_array_header_t *arr, char **error_msg);
-
-apr_status_t DSOLOCAL msre_parse_actions(msre_engine *engine, msre_actionset *actionset,
-    const char *text, char **error_msg);
-
 msre_var_metadata DSOLOCAL *msre_resolve_var(msre_engine *engine, const char *name);
-
-msre_action_metadata DSOLOCAL *msre_resolve_action(msre_engine *engine, const char *name);
-
-msre_reqbody_processor_metadata DSOLOCAL *msre_resolve_reqbody_processor(
-                                                            msre_engine *engine,
-                                                            const char *name);
-
-msre_var DSOLOCAL *msre_create_var(msre_ruleset *ruleset, const char *name, const char *param,
-    modsec_rec *msr, char **error_msg);
 
 msre_var DSOLOCAL *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *name, const char *param,
     modsec_rec *msr, char **error_msg);
-
-msre_action DSOLOCAL *msre_create_action(msre_engine *engine, const char *name,
-    const char *param, char **error_msg);
 
 int DSOLOCAL msre_parse_generic(apr_pool_t *pool, const char *text, apr_table_t *vartable,
     char **error_msg);
@@ -84,8 +66,10 @@ int DSOLOCAL rule_id_in_range(int ruleid, const char *range);
 msre_var DSOLOCAL *generate_single_var(modsec_rec *msr, msre_var *var, apr_array_header_t *tfn_arr,
     msre_rule *rule, apr_pool_t *mptmp);
 
+#if defined(WITH_LUA)
 apr_table_t DSOLOCAL *generate_multi_var(modsec_rec *msr, msre_var *var, apr_array_header_t *tfn_arr,
     msre_rule *rule, apr_pool_t *mptmp);
+#endif
 
 /* Structures with the corresponding functions */
 
@@ -200,8 +184,6 @@ msre_rule DSOLOCAL *msre_rule_lua_create(msre_ruleset *ruleset,
     const char *fn, int line, const char *script_filename,
     const char *actions, char **error_msg);
 #endif
-
-apr_status_t DSOLOCAL msre_rule_process(msre_rule *rule, modsec_rec *msr);
 
 #define VAR_SIMPLE              0    /* REQUEST_URI */
 #define VAR_LIST                1
@@ -321,10 +303,6 @@ struct msre_actionset {
     int                      auditlog;
     int                      block;
 };
-
-char DSOLOCAL *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset);
-
-char DSOLOCAL *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule);
 
 void DSOLOCAL msre_engine_variable_register(msre_engine *engine, const char *name,
     unsigned int type, unsigned int argc_min, unsigned int argc_max,

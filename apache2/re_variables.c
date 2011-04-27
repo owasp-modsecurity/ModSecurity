@@ -1487,7 +1487,7 @@ static int var_outbound_error_generate(modsec_rec *msr, msre_var *var, msre_rule
     }
 }
 
-apr_time_t calculate_perf_combined(modsec_rec *msr) {
+static apr_time_t calculate_perf_combined(modsec_rec *msr) {
     return msr->time_phase1 + msr->time_phase2 + msr->time_phase3 + msr->time_phase4
         + msr->time_phase5 + msr->time_storage_write /* time_storage_read is already
         included in phases */ + msr->time_logging + msr->time_gc;

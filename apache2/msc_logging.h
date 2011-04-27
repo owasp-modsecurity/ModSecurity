@@ -42,8 +42,6 @@
 
 int DSOLOCAL is_valid_parts_specification(char *p);
 
-char DSOLOCAL *construct_log_vcombinedus(modsec_rec *msr);
-
 char DSOLOCAL *construct_log_vcombinedus_limited(modsec_rec *msr, int _limit, int *was_limited);
 
 void DSOLOCAL sec_audit_logger(modsec_rec *msr);
