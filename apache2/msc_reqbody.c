@@ -411,7 +411,7 @@ static apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, char **e
     }
 
     if (msr->stream_input_data== NULL) {
-        *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body on stream. Asked for %u bytes.",
+        *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body on stream. Asked for %" APR_SIZE_T_FMT " bytes.",
             msr->stream_input_length + 1);
         return -1;
     }
