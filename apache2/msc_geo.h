@@ -67,6 +67,4 @@ int DSOLOCAL geo_init(directory_config *dcfg, const char *dbfn, char **error_msg
 
 int DSOLOCAL geo_lookup(modsec_rec *msr, geo_rec *rec, const char *target, char **error_msg);
 
-apr_status_t DSOLOCAL geo_cleanup(modsec_rec *msr);
-
 #endif

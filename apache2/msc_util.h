@@ -51,10 +51,6 @@ int DSOLOCAL is_token_char(unsigned char c);
 
 int DSOLOCAL remove_lf_crlf_inplace(char *text);
 
-unsigned char DSOLOCAL x2c(unsigned char *what);
-
-unsigned char DSOLOCAL xsingle2c(unsigned char *what);
-
 char DSOLOCAL *guess_tmp_dir(apr_pool_t *p);
 
 char DSOLOCAL *current_logtime(apr_pool_t *mp);
@@ -67,8 +63,6 @@ int DSOLOCAL msc_mkstemp(char *template);
 
 char DSOLOCAL *strtolower_inplace(unsigned char *str);
 
-unsigned char DSOLOCAL *c2x(unsigned what, unsigned char *where);
-
 char DSOLOCAL *log_escape_re(apr_pool_t *p, const char *text);
 
 char DSOLOCAL *log_escape(apr_pool_t *p, const char *text);
@@ -79,16 +73,11 @@ char DSOLOCAL *log_escape_ex(apr_pool_t *p, const char *text, unsigned long int 
 
 char DSOLOCAL *log_escape_nq_ex(apr_pool_t *p, const char *text, unsigned long int text_length);
 
-char DSOLOCAL *log_escape_header_name(apr_pool_t *p, const char *text);
-
 char DSOLOCAL *log_escape_hex(apr_pool_t *mp, const unsigned char *text, unsigned long int text_length);
 
 char DSOLOCAL *log_escape_raw(apr_pool_t *mp, const unsigned char *text, unsigned long int text_length);
 
 char DSOLOCAL *log_escape_nul(apr_pool_t *mp, const unsigned char *text, unsigned long int text_length);
-
-char DSOLOCAL *_log_escape(apr_pool_t *p, const unsigned char *input,
-    unsigned long int input_length, int escape_quotes, int escape_colon, int escape_re);
 
 int DSOLOCAL decode_base64_ext(char *plain_text, const char *input, int input_len);
 

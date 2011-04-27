@@ -192,7 +192,7 @@ char *get_env_var(request_rec *r, char *name) {
  * true, the message will be stripped of any trailing newline and any
  * required bytes will be escaped.
  */
-void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *msr,
+static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *msr,
     int level, int fixup, const char *text, va_list ap)
 {
     apr_size_t nbytes, nbytes_written;
@@ -277,15 +277,6 @@ void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *msr,
     }
 
     return;
-}
-
-/**
- * Internal log helper function. Use msr_log instead.
- */
-void internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
-    int level, const char *text, va_list ap)
-{
-    internal_log_ex(r, dcfg, msr, level, 0, text, ap);
 }
 
 /**

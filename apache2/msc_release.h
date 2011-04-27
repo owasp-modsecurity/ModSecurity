@@ -36,17 +36,11 @@
 #define PRINTF_ATTRIBUTE(a,b)
 #endif
 
-typedef struct modsec_build_type_rec {
-    const char * name;
-    int          val;
-} modsec_build_type_rec;
-extern DSOLOCAL modsec_build_type_rec modsec_build_type[];
-
 #define MODSEC_VERSION_MAJOR       "2"
-#define MODSEC_VERSION_MINOR       "7"
+#define MODSEC_VERSION_MINOR       "6"
 #define MODSEC_VERSION_MAINT       "0"
-#define MODSEC_VERSION_TYPE        "-trunk"
-#define MODSEC_VERSION_RELEASE     ""
+#define MODSEC_VERSION_TYPE        "-rc"
+#define MODSEC_VERSION_RELEASE     "2"
 
 #define MODSEC_VERSION_SUFFIX MODSEC_VERSION_TYPE MODSEC_VERSION_RELEASE
 

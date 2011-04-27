@@ -152,7 +152,6 @@ static void create_segments(geo_db *geo) {
     unsigned char delim[3];
     unsigned char buf[GEO_SEGMENT_RECORD_LENGTH];
     apr_size_t nbytes;
-    apr_status_t rc;
     apr_off_t offset;
 
     geo->ctry_offset = 0;
@@ -163,10 +162,10 @@ static void create_segments(geo_db *geo) {
 
     for (i = 0; i < GEO_STRUCT_INFO_MAX_SIZE; i++) {
 
-        rc = apr_file_read_full(geo->db, &delim, 3, &nbytes);
+        apr_file_read_full(geo->db, &delim, 3, &nbytes);
 
         if (delim[0] == 255 && delim[1] == 255 && delim[2] == 255) {
-            rc = apr_file_read_full(geo->db, &geo->dbtype, 1, &nbytes);
+            apr_file_read_full(geo->db, &geo->dbtype, 1, &nbytes);
             if (geo->dbtype >= 106) {
                 geo->dbtype -= 105;
             }
@@ -181,7 +180,7 @@ static void create_segments(geo_db *geo) {
                                  geo->dbtype == GEOIP_ISP_EDITION ||
                                  geo->dbtype == GEOIP_ASNUM_EDITION) {
                 geo->ctry_offset = 0;
-                rc = apr_file_read_full(geo->db, &buf, GEO_SEGMENT_RECORD_LENGTH, &nbytes);
+                apr_file_read_full(geo->db, &buf, GEO_SEGMENT_RECORD_LENGTH, &nbytes);
                 for (j = 0; j < GEO_SEGMENT_RECORD_LENGTH; j++) {
                     geo->ctry_offset += (buf[j] << (j * 8));
                 }
@@ -528,14 +527,6 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
     }
 
     return 1;
-}
-
-/**
- * Frees the resources used for Geo lookups
- */
-apr_status_t geo_cleanup(modsec_rec *msr)
-{
-    return APR_SUCCESS;
 }
 
 

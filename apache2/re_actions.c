@@ -101,6 +101,7 @@ msre_var *generate_single_var(modsec_rec *msr, msre_var *var, apr_array_header_t
     return rvar;
 }
 
+#if defined(WITH_LUA)
 /**
  *
  */
@@ -161,6 +162,7 @@ apr_table_t *generate_multi_var(modsec_rec *msr, msre_var *var, apr_array_header
 
     return tvartab;
 }
+#endif
 
 /**
  * Expands macros ("%{NAME}" entities) if present

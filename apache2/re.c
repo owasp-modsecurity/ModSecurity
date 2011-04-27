@@ -32,6 +32,15 @@ static const char *const severities[] = {
     NULL,
 };
 
+static apr_status_t msre_parse_targets(msre_ruleset *ruleset, const char *text,
+    apr_array_header_t *arr, char **error_msg);
+static char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule);
+static msre_var *msre_create_var(msre_ruleset *ruleset, const char *name, const char *param,
+    modsec_rec *msr, char **error_msg);
+static msre_action *msre_create_action(msre_engine *engine, const char *name,
+    const char *param, char **error_msg);
+static apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr);
+
 /* -- Actions, variables, functions and operator functions ----------------- */
 
 char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
@@ -197,7 +206,7 @@ static void msre_actionset_cardinality_fixup(msre_actionset *actionset, msre_act
     }
 }
 
-char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule)  {
+static char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule)  {
 
     char *target_str = NULL;
     msre_var **targets = NULL;
@@ -225,7 +234,7 @@ char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule)  {
 /**
  * Generate an action string from an actionset.
  */
-char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)  {
+static char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_actionset *actionset)  {
     const apr_array_header_t *tarr = NULL;
     const apr_table_entry_t *telts = NULL;
     char *actions = NULL;
@@ -322,7 +331,7 @@ static void msre_actionset_action_add(msre_actionset *actionset, msre_action *ac
  * Creates msre_var instances (rule variables) out of the
  * given text string and places them into the supplied table.
  */
-apr_status_t msre_parse_targets(msre_ruleset *ruleset, const char *text,
+static apr_status_t msre_parse_targets(msre_ruleset *ruleset, const char *text,
     apr_array_header_t *arr, char **error_msg)
 {
     const apr_array_header_t *tarr;
@@ -358,7 +367,7 @@ apr_status_t msre_parse_targets(msre_ruleset *ruleset, const char *text,
  * Creates msre_action instances by parsing the given string, placing
  * them into the supplied array.
  */
-apr_status_t msre_parse_actions(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_parse_actions(msre_engine *engine, msre_actionset *actionset,
     const char *text, char **error_msg)
 {
     const apr_array_header_t *tarr;
@@ -409,19 +418,9 @@ msre_var_metadata *msre_resolve_var(msre_engine *engine, const char *name)
 /**
  * Locates action metadata given the action name.
  */
-msre_action_metadata *msre_resolve_action(msre_engine *engine, const char *name)
+static msre_action_metadata *msre_resolve_action(msre_engine *engine, const char *name)
 {
     return (msre_action_metadata *)apr_table_get(engine->actions, name);
-}
-
-/**
- * Locates request body processor metadata given the processor name.
- */
-msre_reqbody_processor_metadata *msre_resolve_reqbody_processor(
-                                                            msre_engine *engine,
-                                                            const char *name)
-{
-    return (msre_reqbody_processor_metadata *)apr_table_get(engine->reqbody_processors, name);
 }
 
 /**
@@ -508,7 +507,7 @@ msre_var *msre_create_var_ex(apr_pool_t *pool, msre_engine *engine, const char *
  * NOTE: this allocates out of the global pool and should not be used
  *       per-request
  */
-msre_var *msre_create_var(msre_ruleset *ruleset, const char *name, const char *param,
+static msre_var *msre_create_var(msre_ruleset *ruleset, const char *name, const char *param,
         modsec_rec *msr, char **error_msg)
 {
     msre_var *var = msre_create_var_ex(ruleset->engine->mp, ruleset->engine, name, param, msr, error_msg);
@@ -930,15 +929,6 @@ msre_engine *msre_engine_create(apr_pool_t *parent_pool) {
     if (engine->reqbody_processors == NULL) return NULL;
 
     return engine;
-}
-
-/**
- * Destroys an engine instance, releasing the consumed memory.
- */
-void msre_engine_destroy(msre_engine *engine) {
-    /* Destroyed automatically by the parent pool.
-     * apr_pool_destroy(engine->mp);
-     */
 }
 
 
@@ -2781,7 +2771,7 @@ static apr_status_t msre_rule_process_lua(msre_rule *rule, modsec_rec *msr) {
 /**
  *
  */
-apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
+static apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
     /* Use a fresh memory sub-pool for processing each rule */
     if (msr->msc_rule_mptmp == NULL) {
         if (apr_pool_create(&msr->msc_rule_mptmp, msr->mp) != APR_SUCCESS) {

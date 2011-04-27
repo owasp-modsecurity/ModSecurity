@@ -41,11 +41,9 @@ msc_engine DSOLOCAL *modsecurity = NULL;
 
 char DSOLOCAL *chroot_dir = NULL;
 
-unsigned int DSOLOCAL chroot_completed = 0;
-
 char DSOLOCAL *new_server_signature = NULL;
 
-char DSOLOCAL *real_server_signature = NULL;
+static char *real_server_signature = NULL;
 
 char DSOLOCAL *guardianlog_name = NULL;
 
@@ -73,7 +71,7 @@ typedef struct {
 *
 * \param mp Pointer to memory pool
 */
-void version(apr_pool_t *mp) {
+static void version(apr_pool_t *mp) {
     char *pcre_vrs = NULL;
 
     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
@@ -591,8 +589,6 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
                     errno, strerror(errno));
                 exit(1);
             }
-
-            chroot_completed = 1;
 
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
                 "ModSecurity: chroot successful, path=%s", chroot_dir);
@@ -1297,19 +1293,19 @@ static void modsec_register_reqbody_processor(const char *name,
  * Registers module hooks with Apache.
  */
 static void register_hooks(apr_pool_t *mp) {
-    static const char *postconfig_beforeme_list[] = {
+    static const char *const postconfig_beforeme_list[] = {
         "mod_unique_id.c",
         "mod_ssl.c",
         NULL
     };
 
-    static const char *postconfig_afterme_list[] = {
+    static const char *const postconfig_afterme_list[] = {
         "mod_fcgid.c",
         "mod_cgid.c",
         NULL
     };
 
-    static const char *postread_beforeme_list[] = {
+    static const char *const postread_beforeme_list[] = {
         "mod_rpaf.c",
         "mod_rpaf-2.0.c",
         "mod_extract_forwarded2.c",
@@ -1321,12 +1317,12 @@ static void register_hooks(apr_pool_t *mp) {
         NULL
     };
 
-    static const char *postread_afterme_list[] = {
+    static const char *const postread_afterme_list[] = {
         "mod_log_forensic.c",
         NULL
     };
 
-    static const char *transaction_afterme_list[] = {
+    static const char *const transaction_afterme_list[] = {
         "mod_log_config.c",
         NULL
     };

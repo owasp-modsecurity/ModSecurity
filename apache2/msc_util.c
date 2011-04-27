@@ -47,7 +47,7 @@
 #define S_ISUID 04000
 #endif /* defined(WIN32 || NETWARE) */
 
-/* Base64 tables used in base64DecodeExt */
+/* Base64 tables used in decodeBase64Ext */
 static const char b64_pad = '=';
 
 static const short b64_reverse_t[256] = {
@@ -68,6 +68,10 @@ static const short b64_reverse_t[256] = {
   -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
   -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2
 };
+
+static unsigned char *c2x(unsigned what, unsigned char *where);
+static unsigned char x2c(unsigned char *what);
+static unsigned char xsingle2c(unsigned char *what);
 
 /* \brief Remove escape char
 *
@@ -515,7 +519,7 @@ int remove_lf_crlf_inplace(char *text) {
  * into a proper byte. Handles uppercase and lowercase letters
  * but does not check for overflows.
  */
-unsigned char x2c(unsigned char *what) {
+static unsigned char x2c(unsigned char *what) {
     register unsigned char digit;
 
     digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
@@ -528,7 +532,7 @@ unsigned char x2c(unsigned char *what) {
 /**
  * Converts a single hexadecimal digit into a decimal value.
  */
-unsigned char xsingle2c(unsigned char *what) {
+static unsigned char xsingle2c(unsigned char *what) {
     register unsigned char digit;
 
     digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
@@ -651,7 +655,7 @@ char *strtolower_inplace(unsigned char *str) {
  * Converts a single byte into its hexadecimal representation.
  * Will overwrite two bytes at the destination.
  */
-unsigned char *c2x(unsigned what, unsigned char *where) {
+static unsigned char *c2x(unsigned what, unsigned char *where) {
     static const char c2x_table[] = "0123456789abcdef";
 
     what = what & 0xff;
@@ -660,6 +664,9 @@ unsigned char *c2x(unsigned what, unsigned char *where) {
 
     return where;
 }
+
+static char *_log_escape(apr_pool_t *p, const unsigned char *input,
+    unsigned long int input_length, int escape_quotes, int escape_colon, int escape_re);
 
 char *log_escape_re(apr_pool_t *mp, const char *text) {
     return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 1, 1, 1);
@@ -679,10 +686,6 @@ char *log_escape_ex(apr_pool_t *mp, const char *text, unsigned long int text_len
 
 char *log_escape_nq_ex(apr_pool_t *mp, const char *text, unsigned long int text_length) {
     return _log_escape(mp, (const unsigned char *)text, text_length, 0, 0, 0);
-}
-
-char *log_escape_header_name(apr_pool_t *mp, const char *text) {
-    return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 0, 1, 0);
 }
 
 char *log_escape_raw(apr_pool_t *mp, const unsigned char *text, unsigned long int text_length) {
@@ -751,7 +754,7 @@ char *log_escape_hex(apr_pool_t *mp, const unsigned char *text, unsigned long in
 /**
  * Transform input into a form safe for logging.
  */
-char *_log_escape(apr_pool_t *mp, const unsigned char *input, unsigned long int input_len,
+static char *_log_escape(apr_pool_t *mp, const unsigned char *input, unsigned long int input_len,
     int escape_quotes, int escape_colon, int escape_re)
 {
     unsigned char *d = NULL;

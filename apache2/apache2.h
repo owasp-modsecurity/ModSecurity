@@ -84,12 +84,6 @@ char DSOLOCAL *get_apr_error(apr_pool_t *p, apr_status_t rc);
 
 char DSOLOCAL *get_env_var(request_rec *r, char *name);
 
-void DSOLOCAL internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *msr,
-    int level, int fixup, const char *text, va_list ap);
-
-void DSOLOCAL internal_log(request_rec *r, directory_config *dcfg, modsec_rec *msr,
-    int level, const char *text, va_list ap);
-
 void DSOLOCAL msr_log(modsec_rec *msr, int level, const char *text, ...) PRINTF_ATTRIBUTE(3,4);
 
 void DSOLOCAL msr_log_error(modsec_rec *msr, const char *text, ...) PRINTF_ATTRIBUTE(2,3);

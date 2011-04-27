@@ -14,20 +14,22 @@
 
 #include "msc_release.h"
 
-modsec_build_type_rec modsec_build_type[] = {
+static const struct modsec_build_type_rec {
+    char name[12]; /* pads at 16 bytes with val */
+    int  val;
+} modsec_build_type[] = {
     { "-dev", 1 },     /* Development build */
     { "-rc", 3 },      /* Release Candidate build */
     { "", 9 },         /* Production build */
     { "-tw", 9 },      /* Truswave Holdings build */
-    { "-trunk", 9 },   /* Trunk build */
-    { NULL, -1 }       /* terminator */
+    { "-trunk", 9 }    /* Trunk build */
 };
 
 int get_modsec_build_type(const char *name)
 {
-    int i;
+    size_t i;
 
-    for (i = 0; modsec_build_type[i].name != NULL; i++) {
+    for (i = 0; i < sizeof(modsec_build_type)/sizeof(modsec_build_type[0]); i++) {
         if (strcmp(((name == NULL) ? MODSEC_VERSION_TYPE : name), modsec_build_type[i].name) == 0) {
             return modsec_build_type[i].val;
         }
