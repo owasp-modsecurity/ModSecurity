@@ -505,7 +505,7 @@ static void inject_content_to_of_brigade(modsec_rec *msr, ap_filter_t *f) {
         APR_BRIGADE_INSERT_HEAD(msr->of_brigade, bucket_ci);
 
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "Content Injection: Data reinjected bytes [%d]",msr->stream_output_length);
+            msr_log(msr, 9, "Content Injection: Data reinjected bytes [%"APR_SIZE_T_FMT"]",msr->stream_output_length);
         }
 
     }

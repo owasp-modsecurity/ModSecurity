@@ -859,7 +859,7 @@ static int hook_request_late(request_rec *r) {
 
     if(msr->txcfg->stream_inbody_inspection && msr->msc_reqbody_read)    {
         const char *clen = NULL;
-        clen = apr_psprintf(msr->mp,"%d",msr->stream_input_length);
+        clen = apr_psprintf(msr->mp,"%"APR_SIZE_T_FMT,msr->stream_input_length);
         if(clen)
             apr_table_setn(r->headers_in, "Content-Length",clen);
     }
