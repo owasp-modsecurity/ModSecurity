@@ -580,6 +580,8 @@ apr_status_t DSOLOCAL modsecurity_request_body_store(modsec_rec *msr,
 
 apr_status_t DSOLOCAL modsecurity_request_body_end(modsec_rec *msr, char **error_msg);
 
+apr_status_t DSOLOCAL modsecurity_request_body_to_stream(modsec_rec *msr, const char *buffer, int buflen, char **error_msg);
+
 apr_status_t DSOLOCAL modsecurity_request_body_retrieve_start(modsec_rec *msr, char **error_msg);
 
 apr_status_t DSOLOCAL modsecurity_request_body_retrieve_end(modsec_rec *msr);
