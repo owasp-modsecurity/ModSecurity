@@ -418,6 +418,9 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
         return -1;
     }
 
+    memset(msr->stream_input_data, 0, msr->stream_input_length+1);
+    msr->stream_input_data[msr->stream_input_length] = '\0';
+
     if(first_pkt)   {
         memcpy(msr->stream_input_data, buffer, msr->stream_input_length);
     } else {
