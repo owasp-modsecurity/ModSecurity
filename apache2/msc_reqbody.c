@@ -82,6 +82,7 @@ static apr_status_t modsecurity_request_body_start_init(modsec_rec *msr, char **
 apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
     *error_msg = NULL;
     msr->msc_reqbody_length = 0;
+    msr->stream_input_length = 0;
 
     /* Create a separate memory pool that will be used
      * to allocate structures from (not data, which is allocated
@@ -95,7 +96,6 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
         char *my_error_msg = NULL;
         msre_reqbody_processor_metadata *metadata =
             (msre_reqbody_processor_metadata *)apr_table_get(msr->modsecurity->msre->reqbody_processors, msr->msc_reqbody_processor);
-        
 
         if (metadata != NULL) {
             if (   (metadata->init != NULL)
@@ -379,27 +379,25 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
     return -1;
 }
 
-static apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, char **error_msg) {
-    msc_data_chunk **chunks;
-    char *d;
-    int i, sofar;
+apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buffer, int buflen, char **error_msg) {
     char *stream_input_body = NULL;
+    char *data = NULL;
+    int first_pkt = 0;
 
-    *error_msg = NULL;
-
-    /* Allocate a buffer large enough to hold the request body. */
-
-    if (msr->msc_reqbody_length + 1 == 0) {
-        *error_msg = apr_psprintf(msr->mp, "Internal error, request body length will overflow the stream buffer: %u",
-            msr->msc_reqbody_length);
-        return -1;
+    if(msr->stream_input_data == NULL)  {
+        msr->stream_input_data = (char *)calloc(sizeof(char), msr->stream_input_length + 1);
+        first_pkt = 1;
     }
-
-    msr->stream_input_length = msr->msc_reqbody_length;
-
-    if(msr->stream_input_data == NULL)
-    msr->stream_input_data = (char *)calloc(sizeof(char), msr->stream_input_length + 1);
     else    {
+
+        data = (char *)malloc(msr->stream_input_length + 1 - buflen);
+
+        if(data == NULL)
+            return -1;
+
+        memset(data, 0, msr->stream_input_length + 1 - buflen);
+        memcpy(data, msr->stream_input_data, msr->stream_input_length - buflen);
+
         stream_input_body = (char *)realloc(msr->stream_input_data, msr->stream_input_length + 1);
 
         if(stream_input_body == NULL)   {
@@ -411,32 +409,29 @@ static apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, char **e
     }
 
     if (msr->stream_input_data== NULL) {
+        if(data)    {
+            free(data);
+            data = NULL;
+        }
         *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body on stream. Asked for %" APR_SIZE_T_FMT " bytes.",
-            msr->stream_input_length + 1);
+                msr->stream_input_length + 1);
         return -1;
     }
 
-    msr->stream_input_data[msr->stream_input_length] = '\0';
+    if(first_pkt)   {
+        memcpy(msr->stream_input_data, buffer, msr->stream_input_length);
+    } else {
+        memcpy(msr->stream_input_data, data, msr->stream_input_length - buflen);
+        memcpy(msr->stream_input_data+(msr->stream_input_length - buflen), buffer, buflen);
+    }
 
-    /* Copy the data we keep in chunks into the new buffer. */
-
-    sofar = 0;
-    d = msr->stream_input_data;
-    chunks = (msc_data_chunk **)msr->msc_reqbody_chunks->elts;
-    for(i = 0; i < msr->msc_reqbody_chunks->nelts; i++) {
-        if (sofar + chunks[i]->length <= msr->stream_input_length) {
-            memcpy(d, chunks[i]->data, chunks[i]->length);
-            d += chunks[i]->length;
-            sofar += chunks[i]->length;
-        } else {
-            *error_msg = apr_psprintf(msr->mp, "Internal error, request body buffer overflow.");
-            return -1;
-        }
+    if(data)    {
+        free(data);
+        data = NULL;
     }
 
     return 1;
 }
-
 /**
  * Replace a bunch of chunks holding a request body with a single large chunk.
  */
@@ -551,9 +546,6 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
 
     /* Note that we've read the body. */
     msr->msc_reqbody_read = 1;
-
-    if (msr->txcfg->stream_inbody_inspection)
-        modsecurity_request_body_to_stream(msr, error_msg);
 
     /* Finalise body processing. */
     if ((msr->msc_reqbody_processor != NULL) && (msr->msc_reqbody_error == 0)) {
