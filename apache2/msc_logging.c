@@ -1085,7 +1085,7 @@ void sec_audit_logger(modsec_rec *msr) {
         for(i = 0; i < msr->matched_rules->nelts; i++) {
             rule = ((msre_rule **)msr->matched_rules->elts)[i];
             if ((rule != NULL) && (rule->actionset != NULL) && rule->actionset->is_chained && (rule->chain_starter == NULL)) {
-                text = apr_psprintf(msr->mp, "Chain Starter [Match]: %s\n", rule->unparsed);
+                text = apr_psprintf(msr->mp, "%s\n", rule->unparsed);
                 sec_auditlog_write(msr, text, strlen(text));
                 do {
                     if (rule->ruleset != NULL)   {
@@ -1097,9 +1097,9 @@ void sec_audit_logger(modsec_rec *msr) {
                             present = chained_is_matched(msr,next_rule);
 
                             if (present == 0)   {
-                                text = apr_psprintf(msr->mp, "Chain node [No Match]: %s\n",next_rule->unparsed);
+                                text = apr_psprintf(msr->mp, "#%s\n",next_rule->unparsed);
                             } else  {
-                                text = apr_psprintf(msr->mp, "Chain node [Match]: %s\n",next_rule->unparsed);
+                                text = apr_psprintf(msr->mp, "%s\n",next_rule->unparsed);
                                 i++;
                             }
 
@@ -1112,7 +1112,7 @@ void sec_audit_logger(modsec_rec *msr) {
                 sec_auditlog_write(msr, text, strlen(text));
             } else  {
                 if ((rule != NULL) && (rule->actionset != NULL) && !rule->actionset->is_chained && (rule->chain_starter == NULL)) {
-                    text = apr_psprintf(msr->mp, "Rule [Match]: %s\n\n", rule->unparsed);
+                    text = apr_psprintf(msr->mp, "%s\n\n", rule->unparsed);
                     sec_auditlog_write(msr, text, strlen(text));
                 }
             }
