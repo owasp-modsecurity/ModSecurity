@@ -1,7 +1,27 @@
+2 May 2011 - 2.6.0-rc2
+-------------------
+
+ * Added code optimizations - thanks Diego Elio.
+
+ * Added support to AIX and HPUX in the build system (untested).
+
+ * Renamed decodeBase64Ext to base64DecodeExt.
+
+ * Build system improvements - thanks Diego Elio.
+
+ * Improvements on gsblookup parser.
+
+ * Fixed input filter bug when upload files and SecStreamInBodyInspect is enabled.
+
+ * Logging improvements and bug fix.
+
+ * Remove extra useless files when make clean and maintainer-clean
+
+
 18 Apr 2011 - 2.6.0-rc1
 -------------------
 
- * Replaced previous GPLv2 Licento to Apachev2.
+ * Replaced previous GPLv2 License to Apachev2.
 
  * Added Google Safe Browsing lookups operator and directive. It should be
    used to extract and lookup urls from http packets.
