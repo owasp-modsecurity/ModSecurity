@@ -84,8 +84,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         return APR_EGENERAL;
     }
 
-    //if (chunk && !msr->txcfg->stream_inbody_-nspection) {
-    if (chunk) {
+    if (chunk && !msr->txcfg->stream_inbody_inspection) {
         /* Copy the data we received in the chunk */
         bucket = apr_bucket_heap_create(chunk->data, chunk->length, NULL,
             f->r->connection->bucket_alloc);
@@ -113,7 +112,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Input filter: Forwarded %" APR_SIZE_T_FMT " bytes.", chunk->length);
         }
-    } /*else if (msr->stream_input_data != NULL) {
+    } else if (msr->stream_input_data != NULL) {
 
         bucket = apr_bucket_heap_create(msr->stream_input_data, msr->stream_input_length, NULL,
                 f->r->connection->bucket_alloc);
@@ -126,7 +125,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         }
 
     }
-*/
+
     if (rc == 0) {
         modsecurity_request_body_retrieve_end(msr);
 
@@ -268,6 +267,8 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                 modsecurity_request_body_to_stream(msr, buf, buflen, error_msg);
             }
 
+            msr->reqbody_length += buflen;
+
             if (buflen != 0) {
                 int rcbs = modsecurity_request_body_store(msr, buf, buflen, error_msg);
                 if (rcbs < 0) {
@@ -299,7 +300,6 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                         return -1;
                 }
 
-                msr->reqbody_length += buflen;
             }
 
             if (APR_BUCKET_IS_EOS(bucket)) {

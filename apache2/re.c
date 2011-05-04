@@ -1106,6 +1106,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             skipped = 0;
             skip_after = NULL;
             mode = NEXT_RULE;
+            apr_table_clear(msr->matched_vars);
             continue;
         }
 
@@ -1125,6 +1126,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             }
 
             /* Go to the next rule. */
+            apr_table_clear(msr->matched_vars);
             continue;
         }
 
@@ -1147,6 +1149,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             }
 
             /* Go to the next rule. */
+            apr_table_clear(msr->matched_vars);
             continue;
         }
 
@@ -1223,6 +1226,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
 
                 skipped = 0;
                 saw_starter = 0;
+                apr_table_clear(msr->matched_vars);
                 continue;
             }
         }
@@ -1232,6 +1236,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
             skipped = 0;
             skip_after = NULL;
             mode = NEXT_RULE;
+            apr_table_clear(msr->matched_vars);
             continue;
         }
 
@@ -1363,6 +1368,7 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
              * skip and configure the counter accordingly.
              */
             if (rule->actionset->is_chained == 0) {
+                apr_table_clear(msr->matched_vars);
                 if (rule->chain_starter != NULL) {
                     if (rule->chain_starter->actionset->skip_count > 0) {
                         skip = rule->chain_starter->actionset->skip_count;
