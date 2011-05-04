@@ -121,7 +121,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Input stream filter: Forwarded %" APR_SIZE_T_FMT " bytes.", msr->msc_reqbody_disk_chunk->length);
+            msr_log(msr, 4, "Input stream filter: Forwarded %" APR_SIZE_T_FMT " bytes.", msr->stream_input_length);
         }
 
     }
