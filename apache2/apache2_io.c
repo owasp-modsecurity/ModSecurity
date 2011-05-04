@@ -267,6 +267,8 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                 modsecurity_request_body_to_stream(msr, buf, buflen, error_msg);
             }
 
+            msr->reqbody_length += buflen;
+
             if (buflen != 0) {
                 int rcbs = modsecurity_request_body_store(msr, buf, buflen, error_msg);
                 if (rcbs < 0) {
@@ -298,7 +300,6 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                         return -1;
                 }
 
-                msr->reqbody_length += buflen;
             }
 
             if (APR_BUCKET_IS_EOS(bucket)) {
