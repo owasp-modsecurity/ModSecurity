@@ -57,6 +57,8 @@ unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
 unsigned long int DSOLOCAL conn_read_state_limit = 0;
 
+unsigned long int DSOLOCAL conn_write_state_limit = 0;
+
 static int server_limit, thread_limit;
 
 typedef struct {
@@ -1200,13 +1202,13 @@ static int hook_connection_early(conn_rec *conn)
 {
     sb_handle *sb = conn->sbh;
     int i, j;
-    unsigned long int ip_count = 0;
+    unsigned long int ip_count = 0, ip_count_w = 0;
     worker_score *ws_record = NULL;
 #if APR_MAJOR_VERSION > 1
     ap_sb_handle_t *sbh = NULL;
 #endif
 
-    if(sb != NULL && conn_read_state_limit > 0)   {
+    if(sb != NULL && (conn_read_state_limit > 0 || conn_write_state_limit > 0))   {
 
         ws_record = &ap_scoreboard_image->servers[sb->child_num][sb->thread_num];
         if(ws_record == NULL)
@@ -1235,14 +1237,21 @@ static int hook_connection_early(conn_rec *conn)
                         if (strcmp(conn->remote_ip, ws_record->client) == 0)
                             ip_count++;
                         break;
+                    case SERVER_BUSY_WRITE:
+                        if (strcmp(conn->remote_ip, ws_record->client) == 0)
+                            ip_count_w++;
+                        break;
                     default:
                         break;
                 }
             }
         }
 
-        if (ip_count > conn_read_state_limit) {
+        if ((conn_read_state_limit > 0) && (ip_count > conn_read_state_limit)) {
             ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in READ state from %s - Possible DoS Consumption Attack [Rejected]", ip_count,conn_read_state_limit,conn->remote_ip);
+            return OK;
+        } else if ((conn_write_state_limit > 0) && (ip_count_w > conn_write_state_limit)) {
+            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in WRITE state from %s - Possible DoS Consumption Attack [Rejected]", ip_count_w,conn_write_state_limit,conn->remote_ip);
             return OK;
         } else {
             return DECLINED;
