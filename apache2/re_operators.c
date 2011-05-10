@@ -1270,6 +1270,12 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                         log_escape_nq(msr->mp, canon));
                             }
 
+                            str = apr_pstrdup(rule->ruleset->mp,match);
+
+                            base = apr_strtok(str,"/",&savedptr);
+                            if(base != NULL)
+                                set_match_to_tx(msr, capture, base, 1);
+
                             return 1;
                         }
                     }
@@ -1303,6 +1309,12 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                         log_escape_nq(msr->mp, canon));
                             }
 
+                            str = apr_pstrdup(rule->ruleset->mp,match);
+
+                            base = apr_strtok(str,"/",&savedptr);
+                            if(base != NULL)
+                                set_match_to_tx(msr, capture, base, 1);
+
                             return 1;
                         }
 
@@ -1318,6 +1330,13 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                     *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
                                             log_escape_nq(msr->mp, base));
                                 }
+
+                                str = apr_pstrdup(rule->ruleset->mp,match);
+
+                                base = apr_strtok(str,"/",&savedptr);
+                                if(base != NULL)
+                                    set_match_to_tx(msr, capture, base, 1);
+
                                 return 1;
                             }
 
@@ -1337,6 +1356,12 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                             *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
                                                     log_escape_nq(msr->mp, ptr));
                                         }
+
+                                        str = apr_pstrdup(rule->ruleset->mp,match);
+
+                                        base = apr_strtok(str,"/",&savedptr);
+                                        if(base != NULL)
+                                            set_match_to_tx(msr, capture, base, 1);
                                         return 1;
                                     }
 
@@ -1394,7 +1419,11 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                             *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
                                                     log_escape_nq(msr->mp, canon));
                                         }
+                                        str = apr_pstrdup(rule->ruleset->mp,match);
 
+                                        base = apr_strtok(str,"/",&savedptr);
+                                        if(base != NULL)
+                                            set_match_to_tx(msr, capture, base, 1);
                                         return 1;
                                     }
 
@@ -1410,6 +1439,11 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                                 *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
                                                         log_escape_nq(msr->mp, base));
                                             }
+                                            str = apr_pstrdup(rule->ruleset->mp,match);
+
+                                            base = apr_strtok(str,"/",&savedptr);
+                                            if(base != NULL)
+                                                set_match_to_tx(msr, capture, base, 1);
                                             return 1;
                                         }
 
@@ -1429,6 +1463,11 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                                                         *error_msg = apr_psprintf(msr->mp, "Gsb lookup for \"%s\" succeeded.",
                                                                 log_escape_nq(msr->mp, ptr));
                                                     }
+                                                    str = apr_pstrdup(rule->ruleset->mp,match);
+
+                                                    base = apr_strtok(str,"/",&savedptr);
+                                                    if(base != NULL)
+                                                        set_match_to_tx(msr, capture, base, 1);
                                                     return 1;
                                                 }
 
