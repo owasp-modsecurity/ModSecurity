@@ -2142,37 +2142,40 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         *(const msre_rule **)apr_array_push(msr->matched_rules) = rule;
 
         /* Save the last matched var data */
-        msr->matched_var->name = apr_pstrdup(msr->mp, var->name);
-        msr->matched_var->name_len = strlen(msr->matched_var->name);
-        msr->matched_var->value = apr_pmemdup(msr->mp, var->value, var->value_len);
-        msr->matched_var->value_len = var->value_len;
+        if(var != NULL && var->value_len > 0)   {
+            msr->matched_var->name = apr_pstrdup(msr->mp, var->name);
+            msr->matched_var->name_len = strlen(msr->matched_var->name);
+            msr->matched_var->value = apr_pmemdup(msr->mp, var->value, var->value_len);
+            msr->matched_var->value_len = var->value_len;
 
-        parm = strchr(msr->matched_var->name,':');
+            parm = strchr(msr->matched_var->name,':');
 
-        if(parm)    {
-            msc_string *mvar = NULL;
+            if(parm)    {
+                msc_string *mvar = NULL;
 
-            parm++;
+                parm++;
 
-            mvar = apr_palloc(msr->mp, sizeof(msc_string));
-            mvar->name = apr_pstrdup(msr->mp, parm);
-            mvar->name_len = strlen(mvar->name);
-            mvar->value = apr_pmemdup(msr->mp, var->value, var->value_len);
-            mvar->value_len = var->value_len;
+                mvar = apr_palloc(msr->mp, sizeof(msc_string));
+                mvar->name = apr_pstrdup(msr->mp, parm);
+                mvar->name_len = strlen(mvar->name);
+                mvar->value = apr_pmemdup(msr->mp, var->value, var->value_len);
+                mvar->value_len = var->value_len;
 
-            apr_table_unset(msr->matched_vars, parm);
-            apr_table_setn(msr->matched_vars, parm, (void *)mvar);
+                apr_table_unset(msr->matched_vars, parm);
+                apr_table_setn(msr->matched_vars, parm, (void *)mvar);
 
-        } else {
+            } else {
 
-            msc_string *mvar = apr_palloc(msr->mp, sizeof(msc_string));
-            mvar->name = apr_pstrdup(msr->mp, var->name);
-            mvar->name_len = strlen(mvar->name);
-            mvar->value = apr_pmemdup(msr->mp, var->value, var->value_len);
-            mvar->value_len = var->value_len;
+                msc_string *mvar = apr_palloc(msr->mp, sizeof(msc_string));
+                mvar->name = apr_pstrdup(msr->mp, var->name);
+                mvar->name_len = strlen(mvar->name);
+                mvar->value = apr_pmemdup(msr->mp, var->value, var->value_len);
+                mvar->value_len = var->value_len;
 
-            apr_table_unset(msr->matched_vars, mvar->name);
-            apr_table_setn(msr->matched_vars, mvar->name, (void *)mvar);
+                apr_table_unset(msr->matched_vars, mvar->name);
+                apr_table_setn(msr->matched_vars, mvar->name, (void *)mvar);
+            }
+
         }
 
         /* Keep track of the highest severity matched so far */
