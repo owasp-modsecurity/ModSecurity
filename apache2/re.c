@@ -2142,7 +2142,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         *(const msre_rule **)apr_array_push(msr->matched_rules) = rule;
 
         /* Save the last matched var data */
-        if(var != NULL && var->value_len > 0)   {
+        if(var != NULL && msr != NULL)   {
             msr->matched_var->name = apr_pstrdup(msr->mp, var->name);
             msr->matched_var->name_len = strlen(msr->matched_var->name);
             msr->matched_var->value = apr_pmemdup(msr->mp, var->value, var->value_len);
