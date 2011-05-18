@@ -880,7 +880,7 @@ static int hook_request_late(request_rec *r) {
 /**
  * Invoked every time Apache has something to write to the error log.
  */
-#if APR_MAJOR_VERSION > 1
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
 static void hook_error_log(const char *file, int line, int module_index, int level, apr_status_t status,
         const server_rec *s, const request_rec *r, apr_pool_t *mp, const char *fmt)
 #else
@@ -1204,7 +1204,7 @@ static int hook_connection_early(conn_rec *conn)
     int i, j;
     unsigned long int ip_count = 0, ip_count_w = 0;
     worker_score *ws_record = NULL;
-#if APR_MAJOR_VERSION > 1
+#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
     ap_sb_handle_t *sbh = NULL;
 #endif
 
@@ -1218,7 +1218,7 @@ static int hook_connection_early(conn_rec *conn)
         for (i = 0; i < server_limit; ++i) {
             for (j = 0; j < thread_limit; ++j) {
 
-#if APR_MAJOR_VERSION > 1
+#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                 sbh = conn->sbh;
                 if (sbh == NULL)        {
                     return DECLINED;

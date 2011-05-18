@@ -122,7 +122,7 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     }
 
 #ifdef __SET_MUTEX_PERMS
-#if APR_MAJOR_VERSION > 1
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
     rc = ap_unixd_set_global_mutex_perms(msce->auditlog_lock);
 #else
     rc = unixd_set_global_mutex_perms(msce->auditlog_lock);
@@ -140,7 +140,7 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     }
 
 #ifdef __SET_MUTEX_PERMS
-#if APR_MAJOR_VERSION > 1
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
     rc = ap_unixd_set_global_mutex_perms(msce->geo_lock);
 #else
     rc = unixd_set_global_mutex_perms(msce->geo_lock);
