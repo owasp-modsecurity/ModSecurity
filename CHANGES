@@ -1,3 +1,13 @@
+18 May 2011 - 2.6.0
+-------------------
+
+ * Added SecWriteStateLimit for Slow Post DoS mitigation.
+
+ * Fix problem when buffering in input filter.
+
+ * Fix memory leak when use MATCHED_VAR_NAMES.
+
+
 2 May 2011 - 2.6.0-rc2
 -------------------
 
