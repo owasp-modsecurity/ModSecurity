@@ -10,7 +10,7 @@ AC_INIT([modsecurity], [2.6], [support@modsecurity.org])
 
 AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_SRCDIR([LICENSE])
-AC_CONFIG_HEADERS([modsecurity_config_auto.h])
+AC_CONFIG_HEADERS([apache2/modsecurity_config_auto.h])
 AC_CONFIG_AUX_DIR([build])
 AC_PREFIX_DEFAULT([/usr/local/modsecurity])
 
