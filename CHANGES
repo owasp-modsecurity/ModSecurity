@@ -52,7 +52,7 @@
 
  * Added UNIQUE_ID variable. It holds the data created my mod_unique_id.
 
- * Added new tranformation cmdline. Thanks Mark Stern.
+ * Added new tranformation cmdline. Thanks Marc Stern.
 
  * Added new exception handling operators and directives. It should help users
    reduce FN and FPs. The directives SecRuleUpdateTargetById, SecRuleRemoveByTag
