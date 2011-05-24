@@ -23,6 +23,7 @@
 #include "msc_util.h"
 
 #include <apr_lib.h>
+#include "modsecurity_config.h"
 
 /**
  * NOTE: Be careful as these can ONLY be used on static values for X.
