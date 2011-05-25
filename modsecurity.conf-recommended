@@ -177,7 +177,7 @@ SecAuditEngine RelevantOnly
 SecAuditLogRelevantStatus "^(?:5|4(?!04))"
 
 # Log everything we know about a transaction.
-SecAuditLogParts ABIJDEFHKZ
+SecAuditLogParts ABIJDEFHZ
 
 # Use a single file for logging. This is much easier to look at, but
 # assumes that you will use the audit log only ocassionally.
