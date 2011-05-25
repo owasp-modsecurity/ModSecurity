@@ -36,7 +36,7 @@ static int gsb_mal_create(directory_config *dcfg, char **error_msg)
         return 0;
     }
 
-    buf = apr_palloc(dcfg->mp, finfo.size+1);
+    buf = (char *)malloc(finfo.size+1);
 
     if (buf == NULL)   {
         *error_msg = apr_psprintf(mp, "Could not alloc memory for gsb data");
@@ -45,10 +45,12 @@ static int gsb_mal_create(directory_config *dcfg, char **error_msg)
 
     rc = apr_file_read_full(gsb->db, buf, finfo.size, &nbytes);
 
-    gsb->gsb_table = apr_table_make(dcfg->mp, 16);
+    gsb->gsb_table = apr_hash_make(dcfg->mp);
 
     if (gsb->gsb_table == NULL)   {
         *error_msg = apr_psprintf(mp, "Could not alloc memory for gsb table");
+        free(buf);
+        buf = NULL;
         return 0;
     }
 
@@ -61,7 +63,7 @@ static int gsb_mal_create(directory_config *dcfg, char **error_msg)
         if(op != NULL)   {
             char *hash = ++op;
             if(strlen(hash) == 32)
-            apr_table_setn(gsb->gsb_table,hash,"malware");
+            apr_hash_set(gsb->gsb_table, hash, APR_HASH_KEY_STRING, "malware");
         }
 
         op = strchr(p,'-');
@@ -69,13 +71,16 @@ static int gsb_mal_create(directory_config *dcfg, char **error_msg)
         if(op != NULL)   {
             char *hash = ++op;
             if(strlen(hash) == 32)
-            apr_table_unset(gsb->gsb_table,hash);
+            apr_hash_set(gsb->gsb_table, hash, APR_HASH_KEY_STRING, NULL);
         }
 
         p = apr_strtok(NULL,"\t",&savedptr);
     }
 
     apr_file_close(gsb->db);
+
+    free(buf);
+    buf = NULL;
 
     return 1;
 }
