@@ -19,13 +19,14 @@ typedef struct gsb_db gsb_db;
 
 #include <apr_file_io.h>
 #include "modsecurity.h"
+#include "apr_hash.h"
 
 struct gsb_db {
     apr_file_t *db;
     const char *dbfn;
-    apr_table_t *gsb_table;
+    apr_hash_t *gsb_table;
 };
 
-int DSOLOCAL gsb_mal_init(directory_config *dcfg, const char *dbfn, char **error_msg);
+int DSOLOCAL gsb_db_init(directory_config *dcfg, const char *dbfn, char **error_msg);
 
 #endif

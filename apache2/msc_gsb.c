@@ -14,7 +14,7 @@
 
 #include "msc_gsb.h"
 
-static int gsb_mal_create(directory_config *dcfg, char **error_msg)
+static int gsb_db_create(directory_config *dcfg, char **error_msg)
 {
     char errstr[1024];
     apr_pool_t *mp = dcfg->mp;
@@ -89,7 +89,7 @@ static int gsb_mal_create(directory_config *dcfg, char **error_msg)
 /**
  * Initialise Gsb malware data structure
  */
-int gsb_mal_init(directory_config *dcfg, const char *dbfn, char **error_msg)
+int gsb_db_init(directory_config *dcfg, const char *dbfn, char **error_msg)
 {
 
     *error_msg = NULL;
@@ -104,6 +104,6 @@ int gsb_mal_init(directory_config *dcfg, const char *dbfn, char **error_msg)
     dcfg->gsb->db = NULL;
     dcfg->gsb->dbfn = apr_pstrdup(dcfg->mp, dbfn);
 
-    return gsb_mal_create(dcfg, error_msg);
+    return gsb_db_create(dcfg, error_msg);
 }
 
