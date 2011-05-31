@@ -1114,7 +1114,7 @@ static int verify_gsb(gsb_db *gsb, modsec_rec *msr, const char *match, unsigned 
     hash = apr_psprintf(msr->mp, "%s", bytes2hex(msr->mp, digest, 16));
 
     if ((hash != NULL) && (gsb->gsb_table != NULL))   {
-        search = apr_table_get(gsb->gsb_table, hash);
+        search = apr_hash_get(gsb->gsb_table, hash, APR_HASH_KEY_STRING);
 
         if (search != NULL)
             return 1;
