@@ -1991,7 +1991,7 @@ static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
 
 /* Google safe browsing */
 
-static const char *cmd_gsb_mal_lookup_db(cmd_parms *cmd, void *_dcfg,
+static const char *cmd_gsb_lookup_db(cmd_parms *cmd, void *_dcfg,
                                      const char *p1)
 {
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
@@ -1999,7 +1999,7 @@ static const char *cmd_gsb_mal_lookup_db(cmd_parms *cmd, void *_dcfg,
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
 
-    if (gsb_mal_init(dcfg, filename, &error_msg) <= 0) {
+    if (gsb_db_init(dcfg, filename, &error_msg) <= 0) {
         return error_msg;
     }
 
@@ -2305,7 +2305,7 @@ const command_rec module_directives[] = {
 
     AP_INIT_TAKE1 (
         "SecGsbLookupDB",
-        cmd_gsb_mal_lookup_db,
+        cmd_gsb_lookup_db,
         NULL,
         RSRC_CONF,
         "database google safe browsing"
