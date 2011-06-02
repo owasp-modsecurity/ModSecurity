@@ -33,6 +33,7 @@ static int gsb_db_create(directory_config *dcfg, char **error_msg)
 
     if ((rc = apr_file_info_get(&finfo, wanted, gsb->db)) != APR_SUCCESS)  {
         *error_msg = apr_psprintf(mp, "Could not cannot get gsb malware file information \"%s\": %s", gsb->dbfn, apr_strerror(rc, errstr, 1024));
+        apr_file_close(gsb->db);
         return 0;
     }
 
@@ -40,6 +41,7 @@ static int gsb_db_create(directory_config *dcfg, char **error_msg)
 
     if (buf == NULL)   {
         *error_msg = apr_psprintf(mp, "Could not alloc memory for gsb data");
+        apr_file_close(gsb->db);
         return 0;
     }
 
@@ -51,6 +53,7 @@ static int gsb_db_create(directory_config *dcfg, char **error_msg)
         *error_msg = apr_psprintf(mp, "Could not alloc memory for gsb table");
         free(buf);
         buf = NULL;
+        apr_file_close(gsb->db);
         return 0;
     }
 

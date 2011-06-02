@@ -38,6 +38,7 @@ typedef struct msc_parm msc_parm;
 #include "msc_xml.h"
 #include "msc_geo.h"
 #include "msc_gsb.h"
+#include "msc_unicode.h"
 #include "re.h"
 
 #include "ap_config.h"
@@ -135,6 +136,10 @@ extern DSOLOCAL unsigned long int msc_pcre_match_limit_recursion;
 extern DSOLOCAL unsigned long int conn_read_state_limit;
 
 extern DSOLOCAL unsigned long int conn_write_state_limit;
+
+extern DSOLOCAL unsigned long int unicode_codepage;
+
+extern DSOLOCAL int *unicode_map_table;
 
 #define RESBODY_STATUS_NOT_READ         0   /* we were not configured to read the body */
 #define RESBODY_STATUS_ERROR            1   /* error occured while we were reading the body */
@@ -492,6 +497,9 @@ struct directory_config {
 
     /* Gsb Lookup */
     gsb_db              *gsb;
+
+    /* Unicode map */
+    unicode_map         *u_map;
 
     /* Cache */
     int                  cache_trans;

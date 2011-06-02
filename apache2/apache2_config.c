@@ -110,6 +110,9 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     /* Gsb Lookups */
     dcfg->gsb = NOT_SET_P;
 
+    /* Unicode Map */
+    dcfg->u_map = NOT_SET_P;
+
     /* Cache */
     dcfg->cache_trans = NOT_SET;
     dcfg->cache_trans_incremental = NOT_SET;
@@ -483,6 +486,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->gsb = (child->gsb == NOT_SET_P
         ? parent->gsb : child->gsb);
 
+    /* Unicode Map */
+    merged->u_map = (child->u_map == NOT_SET_P
+        ? parent->u_map : child->u_map);
+
     /* Cache */
     merged->cache_trans = (child->cache_trans == NOT_SET
         ? parent->cache_trans : child->cache_trans);
@@ -586,6 +593,9 @@ void init_directory_config(directory_config *dcfg)
 
     /* Gsb Lookup */
     if (dcfg->gsb == NOT_SET_P) dcfg->gsb = NULL;
+
+    /* Unicode Map */
+    if (dcfg->u_map == NOT_SET_P) dcfg->u_map = NULL;
 
     /* Cache */
     if (dcfg->cache_trans == NOT_SET) dcfg->cache_trans = MODSEC_CACHE_DISABLED;
@@ -1989,6 +1999,41 @@ static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
+/* Unicode CodePage */
+
+static const char *cmd_unicode_codepage(cmd_parms *cmd,
+                                        void *_dcfg, const char *p1)
+{
+    long val;
+
+    val = atol(p1);
+    if (val <= 0) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid setting for "
+                                       "SecUnicodeCodePage: %s", p1);
+    }
+
+    unicode_codepage = (unsigned long int)val;
+
+    return NULL;
+}
+
+/* Unicode Map */
+
+static const char *cmd_unicode_map(cmd_parms *cmd, void *_dcfg,
+                                     const char *p1)
+{
+    const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
+    char *error_msg;
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+
+    if (unicode_map_init(dcfg, filename, &error_msg) <= 0) {
+        return error_msg;
+    }
+
+    return NULL;
+}
+
 /* Google safe browsing */
 
 static const char *cmd_gsb_lookup_db(cmd_parms *cmd, void *_dcfg,
@@ -2309,6 +2354,22 @@ const command_rec module_directives[] = {
         NULL,
         RSRC_CONF,
         "database google safe browsing"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecUnicodeCodePage",
+        cmd_unicode_codepage,
+        NULL,
+        CMD_SCOPE_MAIN,
+        "Unicode CodePage"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecUnicodeMapFile",
+        cmd_unicode_map,
+        NULL,
+        CMD_SCOPE_MAIN,
+        "Unicode Map file"
     ),
 
     AP_INIT_TAKE1 (

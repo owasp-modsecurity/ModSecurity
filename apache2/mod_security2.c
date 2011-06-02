@@ -51,6 +51,8 @@ apr_file_t DSOLOCAL *guardianlog_fd = NULL;
 
 char DSOLOCAL *guardianlog_condition = NULL;
 
+unsigned long int DSOLOCAL unicode_codepage = 0;
+
 unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
 
 unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
@@ -58,6 +60,8 @@ unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 unsigned long int DSOLOCAL conn_read_state_limit = 0;
 
 unsigned long int DSOLOCAL conn_write_state_limit = 0;
+
+int DSOLOCAL *unicode_map_table = NULL;
 
 static int server_limit, thread_limit;
 
