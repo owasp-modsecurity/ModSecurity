@@ -18,6 +18,7 @@
 #include "apr_sha1.h"
 #include "apr_base64.h"
 
+#include "msc_unicode.h"
 #include "re.h"
 #include "msc_util.h"
 

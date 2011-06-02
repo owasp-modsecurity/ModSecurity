@@ -75,13 +75,13 @@ static unsigned char x2c(unsigned char *what);
 static unsigned char xsingle2c(unsigned char *what);
 
 /* \brief Remove escape char
-*
-* \param mptmp Pointer to the pool
-* \param input Pointer to input string
-* \param input_len Input data length
-*
-* \retval string On Success
-*/
+ *
+ * \param mptmp Pointer to the pool
+ * \param input Pointer to input string
+ * \param input_len Input data length
+ *
+ * \retval string On Success
+ */
 char *remove_escape(apr_pool_t *mptmp, const char *input, int input_len)  {
     char *parm = apr_palloc(mptmp, input_len);
     char *ret = parm;
@@ -113,14 +113,14 @@ int parse_boolean(const char *input) {
 }
 
 /* \brief Decode Base64 data with special chars
-*
-* \param plain_text Pointer to plain text data
-* \param input Pointer to input data
-* \param input_len Input data length
-*
-* \retval 0 On failure
-* \retval string length On Success
-*/
+ *
+ * \param plain_text Pointer to plain text data
+ * \param input Pointer to input data
+ * \param input_len Input data length
+ *
+ * \retval 0 On failure
+ * \retval string length On Success
+ */
 int decode_base64_ext(char *plain_text, const char *input, int input_len)
 {
     const char *encoded = input;
@@ -178,34 +178,34 @@ int decode_base64_ext(char *plain_text, const char *input, int input_len)
 }
 
 /* \brief Convert const char to int
-*
-* \param c number string
-*
-* \retval n The converted number
-*/
+ *
+ * \param c number string
+ *
+ * \retval n The converted number
+ */
 int convert_to_int(const char c)
 {
-   int n;
-   if ((c>='0') && (c<='9'))
-      n = c - '0';
-   else if ((c>='A') && (c<='F'))
-      n = c - 'A' + 10;
-   else if ((c>='a') && (c<='f'))
-      n = c - 'a' + 10;
-   else
-      n = 0;
-   return n;
+    int n;
+    if ((c>='0') && (c<='9'))
+        n = c - '0';
+    else if ((c>='A') && (c<='F'))
+        n = c - 'A' + 10;
+    else if ((c>='a') && (c<='f'))
+        n = c - 'a' + 10;
+    else
+        n = 0;
+    return n;
 }
 
 /* \brief Set a match to tx.N
-*
-* \param msr Pointer to modsec resource
-* \param capture If ON match will be saved
-* \param match Pointer to captured string
+ *
+ * \param msr Pointer to modsec resource
+ * \param capture If ON match will be saved
+ * \param match Pointer to captured string
  *\parm tx_n The tx number to save the data
-*
-* \retval 0 On Sucess|Fail
-*/
+ *
+ * \retval 0 On Sucess|Fail
+ */
 int set_match_to_tx(modsec_rec *msr, int capture, const char *match, int tx_n)  {
 
     if (capture) {
@@ -226,12 +226,12 @@ int set_match_to_tx(modsec_rec *msr, int capture, const char *match, int tx_n)  
         }
 
         /*
-        for(i = 0; i <= 9; i++) {
-            char buf[2];
-            apr_snprintf(buf, sizeof(buf), "%d", i);
-            apr_table_unset(msr->tx_vars, buf);
-        }
-        */
+           for(i = 0; i <= 9; i++) {
+           char buf[2];
+           apr_snprintf(buf, sizeof(buf), "%d", i);
+           apr_table_unset(msr->tx_vars, buf);
+           }
+         */
     }
 
     return 0;
@@ -291,16 +291,16 @@ char *url_encode(apr_pool_t *mp, char *input, unsigned int input_len, int *chang
             *d++ = '+';
             *changed = 1;
         } else
-        if ( (c == 42) || ((c >= 48)&&(c <= 57)) || ((c >= 65)&&(c <= 90))
-            || ((c >= 97)&&(c <= 122))
-        ) {
-            *d++ = c;
-        } else {
-            *d++ = '%';
-            c2x(c, (unsigned char *)d);
-            d += 2;
-            *changed = 1;
-        }
+            if ( (c == 42) || ((c >= 48)&&(c <= 57)) || ((c >= 65)&&(c <= 90))
+                    || ((c >= 97)&&(c <= 122))
+               ) {
+                *d++ = c;
+            } else {
+                *d++ = '%';
+                c2x(c, (unsigned char *)d);
+                d += 2;
+                *changed = 1;
+            }
     }
 
     *d = '\0';
@@ -332,24 +332,24 @@ char *strnurlencat(char *destination, char *source, unsigned int maxlen) {
             *d++ = '+';
             maxlen--;
         } else
-        if ( (c == 42) || ((c >= 48)&&(c <= 57)) || ((c >= 65)&&(c <= 90))
-            || ((c >= 97)&&(c <= 122))
-        ) {
-            *d++ = c;
-            maxlen--;
-        } else {
-            if (maxlen >= 3) {
-                *d++ = '%';
-                c2x(c, (unsigned char *)d);
-                d += 2;
-                maxlen -= 3;
+            if ( (c == 42) || ((c >= 48)&&(c <= 57)) || ((c >= 65)&&(c <= 90))
+                    || ((c >= 97)&&(c <= 122))
+               ) {
+                *d++ = c;
+                maxlen--;
             } else {
-                /* If there's not enough room for the encoded
-                 * byte we ignore it.
-                 */
-                maxlen = 0;
+                if (maxlen >= 3) {
+                    *d++ = '%';
+                    c2x(c, (unsigned char *)d);
+                    d += 2;
+                    maxlen -= 3;
+                } else {
+                    /* If there's not enough room for the encoded
+                     * byte we ignore it.
+                     */
+                    maxlen = 0;
+                }
             }
-        }
 
         s++;
     }
@@ -549,11 +549,11 @@ char *guess_tmp_dir(apr_pool_t *p) {
 
     /* ENH Use apr_temp_dir_get instead. */
 
-    #ifdef WIN32
+#ifdef WIN32
     filename = apr_pcalloc(p, 256);
     if (filename == NULL) return "";
     if (GetTempPath(255, filename) != 0) return filename;
-    #endif
+#endif
 
     filename = getenv("TMPDIR");
     if (filename != NULL) return filename;
@@ -564,13 +564,13 @@ char *guess_tmp_dir(apr_pool_t *p) {
     filename = getenv("TMP");
     if (filename != NULL) return filename;
 
-    #if defined NETWARE
+#if defined NETWARE
     return("sys:/tmp/");
-    #elif defined WIN32
+#elif defined WIN32
     return("");
-    #else
+#else
     return("/tmp/");
-    #endif
+#endif
 }
 
 /**
@@ -585,8 +585,8 @@ char *current_logtime(apr_pool_t *mp) {
 
     apr_strftime(tstr, &len, 80, "%d/%b/%Y:%H:%M:%S ", &t);
     apr_snprintf(tstr + strlen(tstr), 80 - strlen(tstr), "%c%.2d%.2d",
-        t.tm_gmtoff < 0 ? '-' : '+',
-        t.tm_gmtoff / (60 * 60), t.tm_gmtoff % (60 * 60));
+            t.tm_gmtoff < 0 ? '-' : '+',
+            t.tm_gmtoff / (60 * 60), t.tm_gmtoff % (60 * 60));
     return apr_pstrdup(mp, tstr);
 }
 
@@ -667,7 +667,7 @@ static unsigned char *c2x(unsigned what, unsigned char *where) {
 }
 
 static char *_log_escape(apr_pool_t *p, const unsigned char *input,
-    unsigned long int input_length, int escape_quotes, int escape_colon, int escape_re);
+        unsigned long int input_length, int escape_quotes, int escape_colon, int escape_re);
 
 char *log_escape_re(apr_pool_t *mp, const char *text) {
     return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 1, 1, 1);
@@ -733,9 +733,9 @@ char *log_escape_hex(apr_pool_t *mp, const unsigned char *text, unsigned long in
 
     for (i = 0, j = 0; i < text_length; i++) {
         if (  (text[i] == '"')
-            ||(text[i] == '\\')
-            ||(text[i] <= 0x1f)
-            ||(text[i] >= 0x7f))
+                ||(text[i] == '\\')
+                ||(text[i] <= 0x1f)
+                ||(text[i] >= 0x7f))
         {
             ret[j] = '\\';
             ret[j+1] = 'x';
@@ -756,7 +756,7 @@ char *log_escape_hex(apr_pool_t *mp, const unsigned char *text, unsigned long in
  * Transform input into a form safe for logging.
  */
 static char *_log_escape(apr_pool_t *mp, const unsigned char *input, unsigned long int input_len,
-    int escape_quotes, int escape_colon, int escape_re)
+        int escape_quotes, int escape_colon, int escape_re)
 {
     unsigned char *d = NULL;
     char *ret = NULL;
@@ -912,8 +912,8 @@ int js_decode_nonstrict_inplace(unsigned char *input, long int input_len) {
             /* Character is an escape. */
 
             if (   (i + 5 < input_len) && (input[i + 1] == 'u')
-                && (VALID_HEX(input[i + 2])) && (VALID_HEX(input[i + 3]))
-                && (VALID_HEX(input[i + 4])) && (VALID_HEX(input[i + 5])) )
+                    && (VALID_HEX(input[i + 2])) && (VALID_HEX(input[i + 3]))
+                    && (VALID_HEX(input[i + 4])) && (VALID_HEX(input[i + 5])) )
             {
                 /* \uHHHH */
 
@@ -922,8 +922,8 @@ int js_decode_nonstrict_inplace(unsigned char *input, long int input_len) {
 
                 /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
                 if (   (*d > 0x00) && (*d < 0x5f)
-                    && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
-                    && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
+                        && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
+                        && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
                 {
                     (*d) += 0x20;
                 }
@@ -933,7 +933,7 @@ int js_decode_nonstrict_inplace(unsigned char *input, long int input_len) {
                 i += 6;
             }
             else if (   (i + 3 < input_len) && (input[i + 1] == 'x')
-                     && VALID_HEX(input[i + 2]) && VALID_HEX(input[i + 3])) {
+                    && VALID_HEX(input[i + 2]) && VALID_HEX(input[i + 3])) {
                 /* \xHH */
                 *d++ = x2c(&input[i + 2]);
                 count++;
@@ -987,9 +987,9 @@ int js_decode_nonstrict_inplace(unsigned char *input, long int input_len) {
                     case 'v' :
                         c = '\v';
                         break;
-                    /* The remaining (\?,\\,\',\") are just a removal
-                     * of the escape char which is default.
-                     */
+                        /* The remaining (\?,\\,\',\") are just a removal
+                         * of the escape char which is default.
+                         */
                 }
 
                 *d++ = c;
@@ -1021,7 +1021,8 @@ int js_decode_nonstrict_inplace(unsigned char *input, long int input_len) {
  */
 int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len, int *changed) {
     unsigned char *d = input;
-    long int i, count;
+    long int i, count, fact, j, xv;
+    unsigned int Code, hmap = -1;
 
     *changed = 0;
 
@@ -1037,19 +1038,47 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len,
                 if (i + 5 < input_len) {
                     /* We have at least 4 data bytes. */
                     if (  (VALID_HEX(input[i + 2]))&&(VALID_HEX(input[i + 3]))
-                        &&(VALID_HEX(input[i + 4]))&&(VALID_HEX(input[i + 5])) )
+                            &&(VALID_HEX(input[i + 4]))&&(VALID_HEX(input[i + 5])) )
                     {
-                        /* We first make use of the lower byte here, ignoring the higher byte. */
-                        *d = x2c(&input[i + 4]);
 
-                        /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
-                        if (   (*d > 0x00) && (*d < 0x5f)
-                            && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
-                            && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
-                        {
-                            (*d) += 0x20;
+                        Code = 0;
+                        fact = 1;
+
+                        if (unicode_map_table != NULL && unicode_codepage > 0)  {
+
+                            for(j=5; j>=2; j--)   {
+                                if (isxdigit((input[i+j])))  {
+                                    if ((input[i+j])>=97)    {
+                                        xv = ( (input[i+j]) - 97) + 10;
+                                    } else if ( (input[i+j]) >= 65)  {
+                                        xv = ((input[i+j]) - 65) + 10;
+                                    } else {
+                                        xv = (input[i+j]) - 48;
+                                    }
+                                    Code += (xv * fact);
+                                    fact *= 16;
+                                }
+                            }
+
+                            if(Code >= 0 && Code <= 65535)  {
+                                hmap = unicode_map_table[Code];
+                            }
                         }
 
+                        if(hmap != -1)  {
+                            *d = hmap;
+                        } else {
+                            /* We first make use of the lower byte here, ignoring the higher byte. */
+                            *d = x2c(&input[i + 4]);
+
+                            /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
+                            if (   (*d > 0x00) && (*d < 0x5f)
+                                    && ((input[i + 2] == 'f') || (input[i + 2] == 'F'))
+                                    && ((input[i + 3] == 'f') || (input[i + 3] == 'F')))
+                            {
+                                (*d) += 0x20;
+                            }
+                        }
                         d++;
                         count++;
                         i += 6;
@@ -1254,18 +1283,18 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
                     /* ENH What about others? */
                     if (strcasecmp(x, "quot") == 0) *d++ = '"';
                     else
-                    if (strcasecmp(x, "amp") == 0) *d++ = '&';
-                    else
-                    if (strcasecmp(x, "lt") == 0) *d++ = '<';
-                    else
-                    if (strcasecmp(x, "gt") == 0) *d++ = '>';
-                    else
-                    if (strcasecmp(x, "nbsp") == 0) *d++ = NBSP;
-                    else {
-                        /* We do no want to convert this entity, copy the raw data over. */
-                        copy = j - k + 1;
-                        goto HTML_ENT_OUT;
-                    }
+                        if (strcasecmp(x, "amp") == 0) *d++ = '&';
+                        else
+                            if (strcasecmp(x, "lt") == 0) *d++ = '<';
+                            else
+                                if (strcasecmp(x, "gt") == 0) *d++ = '>';
+                                else
+                                    if (strcasecmp(x, "nbsp") == 0) *d++ = NBSP;
+                                    else {
+                                        /* We do no want to convert this entity, copy the raw data over. */
+                                        copy = j - k + 1;
+                                        goto HTML_ENT_OUT;
+                                    }
 
                     count++;
 
@@ -1278,7 +1307,7 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
             }
         }
 
-        HTML_ENT_OUT:
+HTML_ENT_OUT:
 
         for(z = 0; ((z < copy) && (count < input_len)); z++) {
             *d++ = input[i++];
@@ -1355,22 +1384,22 @@ int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len) {
                     }
                 }
                 else
-                if (ISODIGIT(input[i + 1])) { /* Octal. */
-                    char buf[4];
-                    int j = 0;
+                    if (ISODIGIT(input[i + 1])) { /* Octal. */
+                        char buf[4];
+                        int j = 0;
 
-                    while((i + 1 + j < input_len)&&(j < 3)) {
-                        buf[j] = input[i + 1 + j];
-                        j++;
-                        if (!ISODIGIT(input[i + 1 + j])) break;
-                    }
-                    buf[j] = '\0';
+                        while((i + 1 + j < input_len)&&(j < 3)) {
+                            buf[j] = input[i + 1 + j];
+                            j++;
+                            if (!ISODIGIT(input[i + 1 + j])) break;
+                        }
+                        buf[j] = '\0';
 
-                    if (j > 0) {
-                        c = strtol(buf, NULL, 8);
-                        i += 1 + j;
+                        if (j > 0) {
+                            c = strtol(buf, NULL, 8);
+                            i += 1 + j;
+                        }
                     }
-                }
             }
 
             if (c == -1) {
@@ -1535,7 +1564,7 @@ copy:
             unsigned char *oldsrc = src;
 
             while (   (src < end)
-                   && ((*(src + 1) == '/') || (win && (*(src + 1) == '\\'))) )
+                    && ((*(src + 1) == '/') || (win && (*(src + 1) == '\\'))) )
             {
                 src++;
             }
@@ -1573,11 +1602,11 @@ length:
 
 char *modsec_build(apr_pool_t *mp) {
     return apr_psprintf(mp, "%02i%02i%02i%1i%02i",
-                            atoi(MODSEC_VERSION_MAJOR),
-                            atoi(MODSEC_VERSION_MINOR),
-                            atoi(MODSEC_VERSION_MAINT),
-                            get_modsec_build_type(NULL),
-                            atoi(MODSEC_VERSION_RELEASE));
+            atoi(MODSEC_VERSION_MAJOR),
+            atoi(MODSEC_VERSION_MINOR),
+            atoi(MODSEC_VERSION_MAINT),
+            get_modsec_build_type(NULL),
+            atoi(MODSEC_VERSION_RELEASE));
 }
 
 int is_empty_string(const char *string) {
@@ -1600,8 +1629,8 @@ char *resolve_relative_path(apr_pool_t *pool, const char *parent_filename, const
     if (filename[0] == '/') return (char *)filename;
 
     return apr_pstrcat(pool, apr_pstrndup(pool, parent_filename,
-        strlen(parent_filename) - strlen(apr_filepath_name_get(parent_filename))),
-        filename, NULL);
+                strlen(parent_filename) - strlen(apr_filepath_name_get(parent_filename))),
+            filename, NULL);
 }
 
 /**
@@ -1685,8 +1714,8 @@ int css_decode_inplace(unsigned char *input, long int input_len) {
 
                             /* Do full check if first/second bytes are 0 */
                             if (    (input[i] == '0')
-                                 && (input[i + 1] == '0')
-                            ) {
+                                    && (input[i + 1] == '0')
+                               ) {
                                 fullcheck = 1;
                             }
                             else {
@@ -1698,10 +1727,10 @@ int css_decode_inplace(unsigned char *input, long int input_len) {
                     /* Full width ASCII (0xff01 - 0xff5e) needs 0x20 added */
                     if (fullcheck) {
                         if (   (*d > 0x00) && (*d < 0x5f)
-                            && ((input[i + j - 3] == 'f') ||
-                                (input[i + j - 3] == 'F'))
-                            && ((input[i + j - 4] == 'f') ||
-                                (input[i + j - 4] == 'F')))
+                                && ((input[i + j - 3] == 'f') ||
+                                    (input[i + j - 3] == 'F'))
+                                && ((input[i + j - 4] == 'f') ||
+                                    (input[i + j - 4] == 'F')))
                         {
                             (*d) += 0x20;
                         }
@@ -1713,7 +1742,7 @@ int css_decode_inplace(unsigned char *input, long int input_len) {
                     if ((i + j < input_len) && isspace(input[i + j])) {
                         j++;
                     }
-    
+
                     /* Move over. */
                     count++;
                     i += j;
@@ -1732,7 +1761,7 @@ int css_decode_inplace(unsigned char *input, long int input_len) {
                     count++;
                 }
             }
-            
+
             /* No characters after backslash. */
             else {
                 /* Do not include backslash in output (continuation to nothing) */
@@ -1796,7 +1825,7 @@ char *construct_single_var(modsec_rec *msr, char *name) {
 
     /* Resolve variable. */
     var = msre_create_var_ex(msr->mp, msr->modsecurity->msre,
-        varname, param, msr, &my_error_msg);
+            varname, param, msr, &my_error_msg);
     if (var == NULL) return NULL;
 
     /* Generate variable. */
