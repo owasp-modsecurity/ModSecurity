@@ -15,7 +15,7 @@ mod_security2_la_SOURCES = mod_security2.c \
 
 mod_security2_la_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
                           @LIBXML2_CFLAGS@ @LUA_CFLAGS@
-mod_security2_la_CPPFLAGS = @APR_CPPFLAGS@ @LIBXML2_CPPFLAGS@ @LUA_CPPFLAGS@
+mod_security2_la_CPPFLAGS = @APR_CPPFLAGS@ @LIBXML2_CPPFLAGS@
 mod_security2_la_LIBADD = @APR_LDADD@ @APU_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@
 
 if AIX

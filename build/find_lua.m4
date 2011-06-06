@@ -4,18 +4,20 @@ dnl Sets:
 dnl  LUA_CFLAGS
 dnl  LUA_LIBS
 
+AC_DEFUN([CHECK_LUA],
+[dnl
+
+AC_REQUIRE([PKG_PROG_PKG_CONFIG])
+
 LUA_CONFIG=""
 LUA_VERSION=""
 LUA_CFLAGS=""
 LUA_CPPFLAGS=""
 LUA_LDADD=""
 LUA_LDFLAGS=""
-LUA_CONFIG=pkg-config
+LUA_CONFIG=${PKG_CONFIG}
 LUA_PKGNAMES="lua5.1 lua-5.1 lua_5.1 lua-51 lua_51 lua51 lua5 lua"
 LUA_SONAMES="so la sl dll dylib"
-
-AC_DEFUN([CHECK_LUA],
-[dnl
 
 AC_ARG_WITH(
     lua,
@@ -69,10 +71,8 @@ if test -n "${LUA_PKGNAME}"; then
     AC_MSG_RESULT([${LUA_CONFIG}])
     LUA_VERSION="`${LUA_CONFIG} ${LUA_PKGNAME} --modversion`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(lua VERSION: $LUA_VERSION); fi
-    LUA_CFLAGS="`${LUA_CONFIG} ${LUA_PKGNAME} --cflags-only-I`"
+    LUA_CFLAGS="`${LUA_CONFIG} ${LUA_PKGNAME}`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(lua CFLAGS: $LUA_CFLAGS); fi
-    LUA_CPPFLAGS="`${LUA_CONFIG} ${LUA_PKGNAME} --cflags-only-other`"
-    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(lua CPPFLAGS: $LUA_CPPFLAGS); fi
     LUA_LDADD="`${LUA_CONFIG} ${LUA_PKGNAME} --libs-only-l`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(lua LDADD: $LUA_LDADD); fi
     LUA_LDFLAGS="`${LUA_CONFIG} ${LUA_PKGNAME} --libs-only-L --libs-only-other`"
@@ -180,14 +180,11 @@ else
 fi
 
 if test -n "${LUA_LIBS}"; then
-    LUA_CPPFLAGS="-DWITH_LUA"
+    LUA_CFLAGS="-DWITH_LUA"
 fi
 ])
 
-AC_SUBST(LUA_CONFIG)
-AC_SUBST(LUA_VERSION)
 AC_SUBST(LUA_CFLAGS)
-AC_SUBST(LUA_CPPFLAGS)
 AC_SUBST(LUA_LDADD)
 AC_SUBST(LUA_LDFLAGS)
 
