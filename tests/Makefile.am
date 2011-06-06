@@ -23,7 +23,7 @@ msc_test_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
                   @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @LUA_CFLAGS@
 msc_test_CPPFLAGS = -I$(top_srcdir)/apache2 \
                     @APR_CPPFLAGS@ @LIBXML2_CPPFLAGS@ \
-                    @PCRE_CPPFLAGS@ @LUA_CPPFLAGS@
+                    @PCRE_CPPFLAGS@
 msc_test_LDADD = @APR_LDADD@ @APU_LDADD@ \
                  @PCRE_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@
 msc_test_LDFLAGS = @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \

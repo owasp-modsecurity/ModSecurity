@@ -581,9 +581,6 @@ CHECK_APU()
 fi
 CHECK_LIBXML2()
 CHECK_LUA()
-if test -n "$LUA_VERSION"; then
-    LUA_CFLAGS="-DWITH_LUA $LUA_CFLAGS"
-fi
 if test "$build_mlogc" -ne 0; then
 CHECK_CURL()
 fi
