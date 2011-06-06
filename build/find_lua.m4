@@ -71,7 +71,7 @@ if test -n "${LUA_PKGNAME}"; then
     AC_MSG_RESULT([${LUA_CONFIG}])
     LUA_VERSION="`${LUA_CONFIG} ${LUA_PKGNAME} --modversion`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(lua VERSION: $LUA_VERSION); fi
-    LUA_CFLAGS="`${LUA_CONFIG} ${LUA_PKGNAME}`"
+    LUA_CFLAGS="`${LUA_CONFIG} ${LUA_PKGNAME} --cflags`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(lua CFLAGS: $LUA_CFLAGS); fi
     LUA_LDADD="`${LUA_CONFIG} ${LUA_PKGNAME} --libs-only-l`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(lua LDADD: $LUA_LDADD); fi
@@ -179,9 +179,6 @@ else
     fi
 fi
 
-if test -n "${LUA_LIBS}"; then
-    LUA_CFLAGS="-DWITH_LUA"
-fi
 ])
 
 AC_SUBST(LUA_CFLAGS)
@@ -192,6 +189,7 @@ AC_SUBST(LUA_LDFLAGS)
       ifelse([$2], , AC_MSG_NOTICE([optional lua library not found]), $2)
     else
       AC_MSG_NOTICE([using lua v${LUA_VERSION}])
+      LUA_CFLAGS="-DWITH_LUA ${LUA_CFLAGS}"
       ifelse([$1], , , $1) 
     fi 
 ])
