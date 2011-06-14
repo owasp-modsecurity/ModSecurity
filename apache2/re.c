@@ -53,7 +53,7 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
     char *my_error_msg = NULL;
     char *p = NULL, *savedptr = NULL;
     char *target_list = NULL, *replace = NULL;
-    int is_negated = 0, is_counting = 0;
+    unsigned int is_negated = 0, is_counting = 0;
     int name_len = 0, value_len = 0;
     char *name = NULL, *value = NULL;
     char *opt = NULL, *param = NULL;
