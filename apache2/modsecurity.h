@@ -562,8 +562,8 @@ struct msc_string {
 
 struct msc_parm {
     char                    *value;
-    unsigned int            pad_1;
-    unsigned int            pad_2;
+    int                     pad_1;
+    int                     pad_2;
 };
 
 /* Engine functions */

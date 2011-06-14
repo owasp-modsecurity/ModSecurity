@@ -340,7 +340,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     int sub = 0, so = 0, p_len = 0;
     char *replace = NULL;
     char *data = NULL, *pattern = NULL;
-    int size = var->value_len;
+    unsigned int size = var->value_len;
     int output_body = 0, input_body = 0, count = 0;
     ap_regmatch_t pmatch[AP_MAX_REG_MATCH];
 
@@ -1170,12 +1170,13 @@ static int msre_op_gsbLookup_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     msc_regex_t *regex = (msc_regex_t *)rule->op_param_data;
     char *my_error_msg = NULL;
     int ovector[33];
-    int offset = 0;
+    unsigned int offset = 0;
     gsb_db *gsb = msr->txcfg->gsb;
     const char *match = NULL;
     unsigned int match_length;
     unsigned int canon_length;
-    int rv, i, ret, count_slash, j;
+    int rv, i, ret, count_slash;
+    unsigned int j = 0;
     unsigned int size = var->value_len;
     char *base = NULL, *domain = NULL, *savedptr = NULL;
     char *str = NULL, *canon = NULL, *dot = NULL;
@@ -2317,7 +2318,7 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
 static int cpf_verify(const char *cpfnumber, int len) {
 
     int factor, part_1, part_2, var_len = len;
-    int sum = 0, i = 0, cpf_len = 11, c;
+    unsigned int sum = 0, i = 0, cpf_len = 11, c;
     int cpf[11];
     char s_cpf[11];
     char bad_cpf[11][11] = { "00000000000",

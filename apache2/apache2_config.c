@@ -175,13 +175,13 @@ static void copy_rules_phase(apr_pool_t *mp,
                             char *my_error_msg = NULL;
                             const apr_array_header_t *tarr = NULL;
                             const apr_table_entry_t *telts = NULL;
-                            int i;
+                            int c;
 
                             tarr = apr_table_elts(rule->actionset->actions);
                             telts = (const apr_table_entry_t*)tarr->elts;
 
-                            for (i = 0; i < tarr->nelts; i++) {
-                                msre_action *action = (msre_action *)telts[i].val;
+                            for (c = 0; c < tarr->nelts; c++) {
+                                msre_action *action = (msre_action *)telts[c].val;
                                 if(strcmp("tag", action->metadata->name) == 0)  {
 
                                     int rc = msc_regexec(exceptions[j]->param_data,

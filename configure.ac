@@ -241,6 +241,7 @@ AC_ARG_ENABLE(pcre-study,
 [
   if test "$enableval" != "no"; then
     pcre_study='-DWITH_PCRE_STUDY'
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $pcre_study"
   else
     pcre_study=''
   fi
@@ -260,6 +261,7 @@ AC_ARG_ENABLE(pcre-match-limit,
     pcre_match_limit=''
   else
     pcre_match_limit="-DMODSEC_PCRE_MATCH_LIMIT=$enableval"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $pcre_match_limit"
   fi
 ],
 [
@@ -277,6 +279,7 @@ AC_ARG_ENABLE(pcre-match-limit-recursion,
     pcre_match_limit_recursion=''
   else
     pcre_match_limit_recursion="-DMODSEC_PCRE_MATCH_LIMIT_RECURSION=$enableval"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $pcre_match_limit_recursion"
   fi
 ],
 [
@@ -320,6 +323,7 @@ AC_ARG_ENABLE(strict-compile,
 [
   if test "$enableval" != "no"; then
     strict_compile="-std=c99 -Wstrict-overflow=1 -Wextra -Wno-missing-field-initializers -Wshadow -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wno-unused-parameter -Wformat -Wformat-security -Werror -fstack-protector -D_FORTIFY_SOURCE=2"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $strict_compile"
   else
     strict_compile=
   fi
@@ -335,6 +339,7 @@ AC_ARG_ENABLE(debug-conf,
 [
   if test "$enableval" != "no"; then
     debug_conf="-DDEBUG_CONF"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $debug_conf"
   else
     debug_conf=
   fi
@@ -350,6 +355,7 @@ AC_ARG_ENABLE(debug-cache,
 [
   if test "$enableval" != "no"; then
     debug_cache="-DCACHE_DEBUG"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $debug_cache"
   else
     debug_cache=
   fi
@@ -365,6 +371,7 @@ AC_ARG_ENABLE(debug-acmp,
 [
   if test "$enableval" != "no"; then
     debug_acmp="-DDEBUG_ACMP"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $debug_acmp"
   else
     debug_acmp=
   fi
@@ -380,6 +387,7 @@ AC_ARG_ENABLE(debug-mem,
 [
   if test "$enableval" != "no"; then
     debug_mem="-DDEBUG_MEM"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $debug_mem"
   else
     debug_mem=
   fi
@@ -395,6 +403,7 @@ AC_ARG_ENABLE(performance-measurement,
 [
   if test "$enableval" != "no"; then
     perf_meas="-DPERFORMANCE_MEASUREMENT"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $perf_meas"
   else
     perf_meas=
   fi
@@ -410,6 +419,7 @@ AC_ARG_ENABLE(modsec-api,
 [
   if test "$enableval" != "yes"; then
     modsec_api="-DNO_MODSEC_API"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $modsec_api"
   else
     modsec_api=
   fi
@@ -538,7 +548,8 @@ else
     EXTRA_CFLAGS="-O2 -g -Wall $strict_compile"
   fi
 fi
-MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
+
+#MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""

@@ -1022,7 +1022,7 @@ int js_decode_nonstrict_inplace(unsigned char *input, long int input_len) {
 int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len, int *changed) {
     unsigned char *d = input;
     long int i, count, fact, j, xv;
-    unsigned int Code, hmap = -1;
+    int Code, hmap = -1;
 
     *changed = 0;
 
