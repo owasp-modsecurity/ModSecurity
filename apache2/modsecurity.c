@@ -22,6 +22,10 @@
 #include "msc_xml.h"
 #include "apr_version.h"
 
+unsigned long int DSOLOCAL unicode_codepage = 0;
+
+int DSOLOCAL *unicode_map_table = NULL;
+
 /**
  * Format an alert message.
  */

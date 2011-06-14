@@ -12,6 +12,7 @@ msc_test_SOURCES = msc_test.c \
                    $(top_srcdir)/apache2/msc_parsers.c \
                    $(top_srcdir)/apache2/msc_util.c \
                    $(top_srcdir)/apache2/msc_pcre.c \
+                   $(top_srcdir)/apache2/msc_unicode.c \
                    $(top_srcdir)/apache2/persist_dbm.c \
                    $(top_srcdir)/apache2/msc_reqbody.c \
                    $(top_srcdir)/apache2/msc_geo.c \
@@ -20,7 +21,7 @@ msc_test_SOURCES = msc_test.c \
                    $(top_srcdir)/apache2/msc_lua.c \
                    $(top_srcdir)/apache2/msc_release.c
 msc_test_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
-                  @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @LUA_CFLAGS@
+                  @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @MODSEC_EXTRA_CFLAGS@ @LUA_CFLAGS@
 msc_test_CPPFLAGS = -I$(top_srcdir)/apache2 \
                     @APR_CPPFLAGS@ @LIBXML2_CPPFLAGS@ \
                     @PCRE_CPPFLAGS@
