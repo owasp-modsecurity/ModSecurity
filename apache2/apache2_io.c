@@ -84,7 +84,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         return APR_EGENERAL;
     }
 
-    if (chunk && (!msr->txcfg->stream_inbody_inspection || msr->if_stream_changed == 0)) {
+    if (chunk && (!msr->txcfg->stream_inbody_inspection || (msr->txcfg->stream_inbody_inspection && msr->if_stream_changed == 0))) {
         /* Copy the data we received in the chunk */
         bucket = apr_bucket_heap_create(chunk->data, chunk->length, NULL,
             f->r->connection->bucket_alloc);
@@ -114,8 +114,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         }
     } else if (msr->stream_input_data != NULL) {
 
-        if(msr->if_stream_changed == 1)
-            msr->if_stream_changed = 0;
+        msr->if_stream_changed = 0;
 
         bucket = apr_bucket_heap_create(msr->stream_input_data, msr->stream_input_length, NULL,
                 f->r->connection->bucket_alloc);
