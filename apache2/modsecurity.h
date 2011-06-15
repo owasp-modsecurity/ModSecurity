@@ -238,6 +238,8 @@ struct modsec_rec {
     char                *stream_input_data;
     apr_size_t           stream_output_length;
     char                *stream_output_data;
+    unsigned int        of_stream_changed;
+    unsigned int        if_stream_changed;
 
     apr_array_header_t  *error_messages;
     apr_array_header_t  *alerts;
