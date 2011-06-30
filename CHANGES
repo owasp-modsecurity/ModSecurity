@@ -1,3 +1,53 @@
+30 Jun 2011 - 2.6.1-rc1
+-------------------
+
+ * Fixed SecUploadFileMode doesn't work with the new build system.
+
+ * Fixed building with Lua library (Thanks Diego Elio).
+
+ * Fixed some ./configure --enable* features not being enabled in compilation time.
+
+ * Improvements on GSB database add/search operations.
+
+ * Log part K was removed from modsecurity.conf-recommended.
+
+ * Added SecUnicodeMapFile directive. Must be use to load the unicode.mapping file.
+
+ * Added SecUnicodeCodePage directive. Used to define the unicode code page. There are a few already available:
+
+    1250  (ANSI - Central Europe)
+    1251  (ANSI - Cyrillic)
+    1252  (ANSI - Latin I)
+    1253  (ANSI - Greek)
+    1254  (ANSI - Turkish)
+    1255  (ANSI - Hebrew)
+    1256  (ANSI - Arabic)
+    1257  (ANSI - Baltic)
+    1258  (ANSI/OEM - Viet Nam)
+    20127 (US-ASCII)
+    20261 (T.61)
+    20866 (Russian - KOI8)
+    28591 (ISO 8859-1 Latin I)
+    28592 (ISO 8859-2 Central Europe)
+    28605 (ISO 8859-15 Latin 9)
+    37    (IBM EBCDIC - U.S./Canada)
+    437   (OEM - United States)
+    500   (IBM EBCDIC - International)
+    850   (OEM - Multilingual Latin I)
+    860   (OEM - Portuguese)
+    861   (OEM - Icelandic)
+    863   (OEM - Canadian French)
+    865   (OEM - Nordic)
+    874   (ANSI/OEM - Thai)
+    932   (ANSI/OEM - Japanese Shift-JIS)
+    936   (ANSI/OEM - Simplified Chinese GBK)
+    949   (ANSI/OEM - Korean)
+    950   (ANSI/OEM - Traditional Chinese Big5)
+
+    Also mapping some extra unicode chars defined at http://tools.ietf.org/html/rfc3490#section-3.1
+
+ * Fixed SecRequestBodyLimit was truncating the real request body.
+
 18 May 2011 - 2.6.0
 -------------------
 
