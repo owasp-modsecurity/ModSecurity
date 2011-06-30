@@ -247,13 +247,10 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                     *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
                             "configured limit (%ld).", msr->txcfg->reqbody_limit);
 
-                    seen_eos = 1;
-                    buflen = (msr->txcfg->reqbody_limit - msr->reqbody_length);
-
                 } else if ((msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)){
 
-                    seen_eos = 1;
-                    buflen = (msr->txcfg->reqbody_limit - msr->reqbody_length);
+                    *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
+                            "configured limit (%ld).", msr->txcfg->reqbody_limit);
 
                 } else  {
 
@@ -282,13 +279,9 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                         } else if ((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)) {
                             *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
                                     "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
-                            seen_eos = 1;
-
                         } else if ((msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)) {
                             *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
                                     "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
-                            seen_eos = 1;
-
                         } else {
                             *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
                                     "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
