@@ -73,6 +73,17 @@ static int unicode_map_create(directory_config *dcfg, char **error_msg)
         memset(unicode_map_table, -1, (sizeof(int)*65536));
     }
 
+    /* Setting some unicode values - http://tools.ietf.org/html/rfc3490#section-3.1 */
+
+    /* Set 0x3002 -> 0x2e */
+    unicode_map_table[0x3002] = 0x2e;
+    /* Set 0xFF61 -> 0x2e */
+    unicode_map_table[0xff61] = 0x2e;
+    /* Set 0xFF0E -> 0x2e */
+    unicode_map_table[0xff0e] = 0x2e;
+    /* Set 0x002E -> 0x2e */
+    unicode_map_table[0x002e] = 0x2e;
+
     p = apr_strtok(buf,CODEPAGE_SEPARATORS,&savedptr);
 
     while (p != NULL)   {
