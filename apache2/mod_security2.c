@@ -1238,7 +1238,7 @@ static int hook_connection_early(conn_rec *conn)
                             ip_count++;
                         break;
                     case SERVER_BUSY_WRITE:
-                        if ((strcmp(conn->remote_ip, ws_record->client) == 0) && (strstr(ws_record->request, "POST") != NULL))
+                        if (strcmp(conn->remote_ip, ws_record->client) == 0)
                             ip_count_w++;
                         break;
                     default:
