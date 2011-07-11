@@ -96,6 +96,7 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     /* Misc */
     dcfg->data_dir = NOT_SET_P;
     dcfg->webappid = NOT_SET_P;
+    dcfg->httpBlkey = NOT_SET_P;
 
     /* Content injection. */
     dcfg->content_injection_enabled = NOT_SET;
@@ -467,6 +468,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
         ? parent->data_dir : child->data_dir);
     merged->webappid = (child->webappid == NOT_SET_P
         ? parent->webappid : child->webappid);
+    merged->httpBlkey = (child->httpBlkey == NOT_SET_P
+        ? parent->httpBlkey : child->httpBlkey);
 
     /* Content injection. */
     merged->content_injection_enabled = (child->content_injection_enabled == NOT_SET
@@ -580,6 +583,7 @@ void init_directory_config(directory_config *dcfg)
     /* Misc */
     if (dcfg->data_dir == NOT_SET_P) dcfg->data_dir = NULL;
     if (dcfg->webappid == NOT_SET_P) dcfg->webappid = "default";
+    if (dcfg->httpBlkey == NOT_SET_P) dcfg->httpBlkey = NULL;
 
     /* Content injection. */
     if (dcfg->content_injection_enabled == NOT_SET) dcfg->content_injection_enabled = 0;
@@ -1941,6 +1945,18 @@ static const char *cmd_web_app_id(cmd_parms *cmd, void *_dcfg, const char *p1)
     return NULL;
 }
 
+static const char *cmd_httpBl_key(cmd_parms *cmd, void *_dcfg, const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    if (dcfg == NULL) return NULL;
+
+    if (p1 == NULL) return NULL;
+    dcfg->httpBlkey = p1;
+
+    return NULL;
+}
+
 /* PCRE Limits */
 
 static const char *cmd_pcre_match_limit(cmd_parms *cmd,
@@ -2650,6 +2666,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "id"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecHttpBlKey",
+        cmd_httpBl_key,
+        NULL,
+        CMD_SCOPE_ANY,
+        "httpBl access key"
     ),
 
     { NULL }

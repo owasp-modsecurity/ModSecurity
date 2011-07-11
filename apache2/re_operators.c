@@ -2932,6 +2932,7 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
     unsigned int high8bits = 0;
     char *name_to_check = NULL;
     char *target = NULL;
+    char *target2 = NULL;
     apr_sockaddr_t *sa = NULL;
     apr_status_t rc;
     int capture = 0;
@@ -2949,7 +2950,20 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
     /* Construct the host name we want to resolve. */
     if (sscanf(target, "%d.%d.%d.%d", &h0, &h1, &h2, &h3) == 4) {
         /* IPv4 address */
-        name_to_check = apr_psprintf(msr->mp, "%d.%d.%d.%d.%s", h3, h2, h1, h0, rule->op_param);
+        /* If we're using the httpBl blocklist, we need to add the key */
+        if(strstr(rule->op_param,"httpbl.org"))  {
+            if (msr->txcfg->httpBlkey == NULL) {
+                if (msr->txcfg->debuglog_level >= 4) {
+                    msr_log(msr, 4, "RBL httpBl called but no key defined: set SecHttpBlKey");
+                }
+                *error_msg = "RBL httpBl called but no key defined: set SecHttpBlKey";
+            } else {
+                name_to_check = apr_psprintf(msr->mp, "%s.%d.%d.%d.%d.%s", msr->txcfg->httpBlkey, h3, h2, h1, h0, rule->op_param);
+            }
+        } else {
+            /* regular IPv4 RBLs */
+            name_to_check = apr_psprintf(msr->mp, "%d.%d.%d.%d.%s", h3, h2, h1, h0, rule->op_param);
+        }
     } else {
         /* Assume the input is a domain name. */
         name_to_check = apr_psprintf(msr->mp, "%s.%s", target, rule->op_param);
@@ -3025,6 +3039,55 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
 
             set_match_to_tx(msr, capture, *error_msg, 0);
 
+            } else
+                if(strstr(rule->op_param,"httpbl.org"))  {
+                   char *respBl;
+                   int first, days, score, type;
+
+                   respBl = inet_ntoa(sa->sa.sin.sin_addr);
+                   if (sscanf(respBl, "%d.%d.%d.%d", &first, &days, &score, &type) != 4) {
+                       *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s failed: bad response", log_escape_nq(msr->mp, name_to_check));
+                   } else {
+                       if (first != 127) {
+                           *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s failed: bad response", log_escape_nq(msr->mp, name_to_check));
+                       }
+                       else {
+                           char *ptype;
+                           switch(type) {
+                             case 0:
+                               ptype = "Search Engine";
+                               break;
+                             case 1:
+                               ptype = "Suspicious IP";
+                               break;
+                             case 2:
+                               ptype = "Harvester IP";
+                               break;
+                             case 3:
+                               ptype = "Suspicious harvester IP";
+                               break;
+                             case 4:
+                               ptype = "Comment spammer IP";
+                               break;
+                             case 5:
+                               ptype = "Suspicious comment spammer IP";
+                               break;
+                             case 6:
+                               ptype = "Harvester and comment spammer IP";
+                               break;
+                             case 7:
+                               ptype = "Suspicious harvester comment spammer IP";
+                               break;
+                             default:
+                               ptype = " ";
+                           }
+                           *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s. %s: %d days since last activity, threat score %d",
+                               log_escape_nq(msr->mp, name_to_check), var->name,
+                               ptype, days, score);
+                       }
+                   }
+                set_match_to_tx(msr, capture, *error_msg, 0);
+                /* end of httpBl code */
             } else  {
                 *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s.",
                         log_escape_nq(msr->mp, name_to_check), var->name);

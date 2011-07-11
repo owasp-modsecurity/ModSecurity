@@ -486,6 +486,7 @@ struct directory_config {
     /* Misc */
     const char          *data_dir;
     const char          *webappid;
+    const char          *httpBlkey;
 
     /* Content injection. */
     int                  content_injection_enabled;
