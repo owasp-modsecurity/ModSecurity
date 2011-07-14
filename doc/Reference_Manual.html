@@ -55,7 +55,7 @@ type="text/css">
 		var wgUserLanguage = "en";
 		var wgContentLanguage = "en";
 		var wgBreakFrames = false;
-		var wgCurRevisionId = 410;
+		var wgCurRevisionId = 430;
 		var wgVersion = "1.15.1";
 		var wgEnableAPI = true;
 		var wgEnableWriteAPI = true;
@@ -270,61 +270,67 @@ class="tocnumber">6.32</span> <span class="toctext">SecPdfProtectTimeout</span><
 class="tocnumber">6.33</span> <span class="toctext">SecPdfProtectTokenName</span></a></li>
 <li class="toclevel-2"><a href="#SecReadStateLimit"><span 
 class="tocnumber">6.34</span> <span class="toctext">SecReadStateLimit</span></a></li>
+<li class="toclevel-2"><a href="#SecWriteStateLimit"><span 
+class="tocnumber">6.35</span> <span class="toctext">SecWriteStateLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecRequestBodyAccess"><span 
-class="tocnumber">6.35</span> <span class="toctext">SecRequestBodyAccess</span></a></li>
+class="tocnumber">6.36</span> <span class="toctext">SecRequestBodyAccess</span></a></li>
 <li class="toclevel-2"><a href="#SecRequestBodyInMemoryLimit"><span 
-class="tocnumber">6.36</span> <span class="toctext">SecRequestBodyInMemoryLimit</span></a></li>
+class="tocnumber">6.37</span> <span class="toctext">SecRequestBodyInMemoryLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecRequestBodyLimit"><span 
-class="tocnumber">6.37</span> <span class="toctext">SecRequestBodyLimit</span></a></li>
+class="tocnumber">6.38</span> <span class="toctext">SecRequestBodyLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecRequestBodyNoFilesLimit"><span 
-class="tocnumber">6.38</span> <span class="toctext">SecRequestBodyNoFilesLimit</span></a></li>
+class="tocnumber">6.39</span> <span class="toctext">SecRequestBodyNoFilesLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecRequestBodyLimitAction"><span 
-class="tocnumber">6.39</span> <span class="toctext">SecRequestBodyLimitAction</span></a></li>
+class="tocnumber">6.40</span> <span class="toctext">SecRequestBodyLimitAction</span></a></li>
 <li class="toclevel-2"><a href="#SecResponseBodyLimit"><span 
-class="tocnumber">6.40</span> <span class="toctext">SecResponseBodyLimit</span></a></li>
+class="tocnumber">6.41</span> <span class="toctext">SecResponseBodyLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecResponseBodyLimitAction"><span 
-class="tocnumber">6.41</span> <span class="toctext">SecResponseBodyLimitAction</span></a></li>
+class="tocnumber">6.42</span> <span class="toctext">SecResponseBodyLimitAction</span></a></li>
 <li class="toclevel-2"><a href="#SecResponseBodyMimeType"><span 
-class="tocnumber">6.42</span> <span class="toctext">SecResponseBodyMimeType</span></a></li>
+class="tocnumber">6.43</span> <span class="toctext">SecResponseBodyMimeType</span></a></li>
 <li class="toclevel-2"><a href="#SecResponseBodyMimeTypesClear"><span 
-class="tocnumber">6.43</span> <span class="toctext">SecResponseBodyMimeTypesClear</span></a></li>
+class="tocnumber">6.44</span> <span class="toctext">SecResponseBodyMimeTypesClear</span></a></li>
 <li class="toclevel-2"><a href="#SecResponseBodyAccess"><span 
-class="tocnumber">6.44</span> <span class="toctext">SecResponseBodyAccess</span></a></li>
-<li class="toclevel-2"><a href="#SecRule"><span class="tocnumber">6.45</span>
+class="tocnumber">6.45</span> <span class="toctext">SecResponseBodyAccess</span></a></li>
+<li class="toclevel-2"><a href="#SecRule"><span class="tocnumber">6.46</span>
  <span class="toctext">SecRule</span></a></li>
 <li class="toclevel-2"><a href="#SecRuleInheritance"><span 
-class="tocnumber">6.46</span> <span class="toctext">SecRuleInheritance</span></a></li>
-<li class="toclevel-2"><a href="#SecRuleEngine"><span class="tocnumber">6.47</span>
+class="tocnumber">6.47</span> <span class="toctext">SecRuleInheritance</span></a></li>
+<li class="toclevel-2"><a href="#SecRuleEngine"><span class="tocnumber">6.48</span>
  <span class="toctext">SecRuleEngine</span></a></li>
 <li class="toclevel-2"><a href="#SecRuleRemoveById"><span 
-class="tocnumber">6.48</span> <span class="toctext">SecRuleRemoveById</span></a></li>
+class="tocnumber">6.49</span> <span class="toctext">SecRuleRemoveById</span></a></li>
 <li class="toclevel-2"><a href="#SecRuleRemoveByMsg"><span 
-class="tocnumber">6.49</span> <span class="toctext">SecRuleRemoveByMsg</span></a></li>
+class="tocnumber">6.50</span> <span class="toctext">SecRuleRemoveByMsg</span></a></li>
 <li class="toclevel-2"><a href="#SecRuleRemoveByTag"><span 
-class="tocnumber">6.50</span> <span class="toctext">SecRuleRemoveByTag</span></a></li>
-<li class="toclevel-2"><a href="#SecRuleScript"><span class="tocnumber">6.51</span>
+class="tocnumber">6.51</span> <span class="toctext">SecRuleRemoveByTag</span></a></li>
+<li class="toclevel-2"><a href="#SecRuleScript"><span class="tocnumber">6.52</span>
  <span class="toctext">SecRuleScript</span></a></li>
 <li class="toclevel-2"><a href="#SecRuleUpdateActionById"><span 
-class="tocnumber">6.52</span> <span class="toctext">SecRuleUpdateActionById</span></a></li>
+class="tocnumber">6.53</span> <span class="toctext">SecRuleUpdateActionById</span></a></li>
 <li class="toclevel-2"><a href="#SecRuleUpdateTargetById"><span 
-class="tocnumber">6.53</span> <span class="toctext">SecRuleUpdateTargetById</span></a></li>
+class="tocnumber">6.54</span> <span class="toctext">SecRuleUpdateTargetById</span></a></li>
 <li class="toclevel-2"><a href="#SecServerSignature"><span 
-class="tocnumber">6.54</span> <span class="toctext">SecServerSignature</span></a></li>
+class="tocnumber">6.55</span> <span class="toctext">SecServerSignature</span></a></li>
 <li class="toclevel-2"><a href="#SecStreamInBodyInspection"><span 
-class="tocnumber">6.55</span> <span class="toctext">SecStreamInBodyInspection</span></a></li>
+class="tocnumber">6.56</span> <span class="toctext">SecStreamInBodyInspection</span></a></li>
 <li class="toclevel-2"><a href="#SecStreamOutBodyInspection"><span 
-class="tocnumber">6.56</span> <span class="toctext">SecStreamOutBodyInspection</span></a></li>
-<li class="toclevel-2"><a href="#SecTmpDir"><span class="tocnumber">6.57</span>
+class="tocnumber">6.57</span> <span class="toctext">SecStreamOutBodyInspection</span></a></li>
+<li class="toclevel-2"><a href="#SecTmpDir"><span class="tocnumber">6.58</span>
  <span class="toctext">SecTmpDir</span></a></li>
-<li class="toclevel-2"><a href="#SecUploadDir"><span class="tocnumber">6.58</span>
+<li class="toclevel-2"><a href="#SecUnicodeMapFile"><span 
+class="tocnumber">6.59</span> <span class="toctext">SecUnicodeMapFile</span></a></li>
+<li class="toclevel-2"><a href="#SecUnicodeCodePage"><span 
+class="tocnumber">6.60</span> <span class="toctext">SecUnicodeCodePage</span></a></li>
+<li class="toclevel-2"><a href="#SecUploadDir"><span class="tocnumber">6.61</span>
  <span class="toctext">SecUploadDir</span></a></li>
 <li class="toclevel-2"><a href="#SecUploadFileLimit"><span 
-class="tocnumber">6.59</span> <span class="toctext">SecUploadFileLimit</span></a></li>
+class="tocnumber">6.62</span> <span class="toctext">SecUploadFileLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecUploadFileMode"><span 
-class="tocnumber">6.60</span> <span class="toctext">SecUploadFileMode</span></a></li>
+class="tocnumber">6.63</span> <span class="toctext">SecUploadFileMode</span></a></li>
 <li class="toclevel-2"><a href="#SecUploadKeepFiles"><span 
-class="tocnumber">6.61</span> <span class="toctext">SecUploadKeepFiles</span></a></li>
-<li class="toclevel-2"><a href="#SecWebAppId"><span class="tocnumber">6.62</span>
+class="tocnumber">6.64</span> <span class="toctext">SecUploadKeepFiles</span></a></li>
+<li class="toclevel-2"><a href="#SecWebAppId"><span class="tocnumber">6.65</span>
  <span class="toctext">SecWebAppId</span></a></li>
 </ul>
 </li>
@@ -1897,6 +1903,17 @@ href="http://blog.spiderlabs.com/2010/11/advanced-topic-of-the-week-mitigating-s
 title="http://blog.spiderlabs.com/2010/11/advanced-topic-of-the-week-mitigating-slow-http-dos-attacks.html"
  rel="nofollow">http://blog.spiderlabs.com/2010/11/advanced-topic-of-the-week-mitigating-slow-http-dos-attacks.html</a>
 </p>
+<a name="SecWriteStateLimit" id="SecWriteStateLimit"></a><h2> <span 
+class="mw-headline"> SecWriteStateLimit </span></h2>
+<p><b>Description:</b> Establishes a per-IP address limit of how many 
+connections are allowed to be in SERVER_BUSY_WRITE state. 
+</p><p><b>Syntax:</b> <code>SecWriteStateLimit LIMIT </code>
+</p><p><b>Example Usage</b>: <code>SecWriteStateLimit 50 </code>
+</p><p><b>Scope</b>: Main 
+</p><p><b>Version</b>: 2.6.0 
+</p><p><b>Default:</b> 0 (no limit)
+</p><p>This measure is effective against Slow DoS request body attacks.
+</p>
 <a name="SecRequestBodyAccess" id="SecRequestBodyAccess"></a><h2> <span 
 class="mw-headline"> SecRequestBodyAccess </span></h2>
 <p><b>Description</b>: Configures whether request bodies will be 
@@ -2415,39 +2432,37 @@ insert.
 <a name="SecStreamInBodyInspection" id="SecStreamInBodyInspection"></a><h2>
  <span class="mw-headline"> SecStreamInBodyInspection </span></h2>
 <p><b>Description:</b> Configures the ability to use stream inspection 
-for inbound request data.
+for inbound request data in a re-allocable buffer. For security reasons 
+we are still buffering the stream. 
 </p><p><b>Syntax:</b> <code>SecStreamInBodyInspection On|Off</code>
 </p><p><b>Example Usage:</b> <code>SecStreamInBodyInspection On</code>
 </p><p><b>Scope:</b> Any
 </p><p><b>Version:</b> 2.6.0
 </p><p><b>Default:</b> Off
 </p><p>This feature enables the creation of the STREAM_INPUT_BODY 
-variable and is useful in a prequalification ruleset scenario against a 
-large list of strings.
+variable and is useful for data modification or to match data in raw 
+data for any content-types.
 </p>
-<dl><dt> Note&nbsp;</dt><dd> This directive provides stream access to 
+<dl><dt> Note&nbsp;</dt><dd> This directive provides full access to 
 REQUEST_BODY payload data.  It does not include REQUEST_URI or 
-REQUEST_HEADER data.
+REQUEST_HEADER data. Also it provides data to all kind of content types,
+ different than REQUEST_BODY.
 </dd></dl>
 <a name="SecStreamOutBodyInspection" id="SecStreamOutBodyInspection"></a><h2>
  <span class="mw-headline"> SecStreamOutBodyInspection </span></h2>
 <p><b>Description:</b> Configures the ability to use stream inspection 
-for outbound request data.
+for outbound request data in a re-allocable buffer.  For security 
+reasons we are still buffering the stream.
 </p><p><b>Syntax:</b> <code>SecStreamOutBodyInspection On|Off</code>
 </p><p><b>Example Usage:</b> <code>SecStreamOutBodyInspection On</code>
 </p><p><b>Scope:</b> Any
 </p><p><b>Version:</b> 2.6.0
 </p><p><b>Default:</b> Off
 </p><p>This feature enables the creation of the STREAM_OUTPUT_BODY 
-variable and is useful in two main scenarios:
+variable and is useful when you need to do data modification into 
+response body.
 </p>
-<ol><li>A prequalification ruleset scenario against a large list of 
-strings.  This helps with performance as buffering the RESPONSE_BODY 
-data is slow.
-</li><li>In situations where the response body must be streamed to the 
-client (buffering breaks the app).
-</li></ol>
-<dl><dt> Note&nbsp;</dt><dd> This directive provides stream access to 
+<dl><dt> Note&nbsp;</dt><dd> This directive provides access to 
 RESPONSE_BODY payload data. It does not include RESPONSE_HEADER data.
 </dd></dl>
 <a name="SecTmpDir" id="SecTmpDir"></a><h2> <span class="mw-headline"> 
@@ -2462,6 +2477,26 @@ will be created.
 process. This is the directory location where ModSecurity will swap data
  to disk if it runs out of memory (more data than what was specified in 
 the SecRequestBodyInMemoryLimit directive) during inspection.
+</p>
+<a name="SecUnicodeMapFile" id="SecUnicodeMapFile"></a><h2> <span 
+class="mw-headline"> SecUnicodeMapFile </span></h2>
+<p><b>Description:</b> Defines the path to the file that will be used by
+ the urlDecodeUni transformation function to map Unicode code points 
+during normalization.
+</p><p><b>Syntax:</b> <code>SecUnicodeMapFile /path/to/unicode.mapping</code>
+</p><p><b>Example Usage:</b> <code>SecUnicodeMapFile 
+/usr/local/apache/conf/crs/unicode.mapping</code>
+</p><p><b>Scope:</b> Any
+</p><p><b>Version:</b> 2.6.1
+</p>
+<a name="SecUnicodeCodePage" id="SecUnicodeCodePage"></a><h2> <span 
+class="mw-headline"> SecUnicodeCodePage </span></h2>
+<p><b>Description:</b> Defines which Unicode code point will be used by 
+the urlDecodeUni transformation function during normalization.
+</p><p><b>Syntax:</b> <code>SecUnicodeCodePage XXXXX</code>
+</p><p><b>Example Usage:</b> <code>SecUnicodeCodePage 20127</code>
+</p><p><b>Scope:</b> Any
+</p><p><b>Version:</b> 2.6.1
 </p>
 <a name="SecUploadDir" id="SecUploadDir"></a><h2> <span 
 class="mw-headline"> SecUploadDir </span></h2>
@@ -3416,9 +3451,9 @@ class="mw-headline"> STREAM_INPUT_BODY </span></h2>
 variable is best used for two use-cases:
 </p>
 <ol><li>For fast pattern matching - using @pm/@pmf to prequalify large 
-text strings against the data.  This is more performant vs. using 
-REQUEST_BODY/ARGS_POST/ARGS_POST_NAMES as it happens before ModSecurity 
-parsing/buffering in phase:2 variable population.
+text strings against any kind of content-type data.  This is more 
+performant vs. using REQUEST_BODY/ARGS_POST/ARGS_POST_NAMES as it 
+happens before ModSecurity parsing in phase:2 variable population.
 </li><li>For data substitution - using @rsub against this variable 
 allows you to manipulate live request body data.  Example - to remove 
 offending payloads or to substitute benign data.
@@ -3429,14 +3464,10 @@ SecStreamInBodyInspection directive
 <a name="STREAM_OUTPUT_BODY" id="STREAM_OUTPUT_BODY"></a><h2> <span 
 class="mw-headline"> STREAM_OUTPUT_BODY </span></h2>
 <p>This variable give access to the raw response body content.  This 
-variable is best used for two use-cases:
+variable is best used for case:
 </p>
-<ol><li>For fast pattern matching - using @pm/@pmf to prequalify large 
-text strings against the data.  This is more performant vs. using 
-RESPONSE_BODY as it happens before ModSecurity parsing/buffering in 
-phase:2 variable population.
-</li><li>For data substitution - using @rsub against this variable 
-allows you to manipulate live request body data.  Example - to remove 
+<ol><li>For data substitution - using @rsub against this variable allows
+ you to manipulate live request body data.  Example - to remove 
 offending payloads or to substitute benign data.
 </li></ol>
 <dl><dt> Note&nbsp;</dt><dd> You must enable the 
@@ -4508,13 +4539,14 @@ matched, but keep the first byte and last 4 bytes
 </li></ul>
 <pre># Detect credit card numbers in parameters and 
 # prevent them from being logged to audit log 
-SecRule ARGS "@verifyCC \d{13,16}" "phase:2,nolog,pass,msg:'Potential credit card number in request',sanitiseMatchedBytes"
-SecRule RESPONSE_BODY "@verifyCC \d{13,16}" "phase:4,t:none,log,block,msg:'Potential credit card number is response body',sanitiseMatchedBytes:0/4"
+SecRule ARGS "@verifyCC \d{13,16}" "phase:2,nolog,capture,pass,msg:'Potential credit card number in request',sanitiseMatchedBytes"
+SecRule RESPONSE_BODY "@verifyCC \d{13,16}" "phase:4,t:none,log,capture,block,msg:'Potential credit card number is response body',sanitiseMatchedBytes:0/4"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> The sanitize actions affect only the data 
 as it is logged to audit log. High-level debug logs may contain 
 sensitive data. Apache access log may contain sensitive data placed in 
-the request URI.
+the request URI. You must use capture action with sanitiseMatchedBytes, 
+so the operator must support capture action. ie: @rx, @verifyCC.
 </dd></dl>
 <a name="sanitiseRequestHeader" id="sanitiseRequestHeader"></a><h2> <span
  class="mw-headline"> sanitiseRequestHeader </span></h2>
@@ -5006,6 +5038,9 @@ expression.
 <pre># Detect suspicious client by looking at the user agent identification 
 SecRule REQUEST_HEADERS:User-Agent "@pm WebZIP WebCopier Webster WebStripper ... SiteSnagger ProWebWalker CheeseBot"
 </pre>
+<dl><dt> Note&nbsp;</dt><dd> Starting on ModSecurity v2.6.0 this 
+operator supports a snort/suricata content style. ie: "@pm A|42|C|44|F".
+</dd></dl>
 <a name="pmf" id="pmf"></a><h2> <span class="mw-headline"> pmf </span></h2>
 <p>Short alias for pmFromFile.
 </p>
@@ -5073,6 +5108,11 @@ lines and comment lines (beginning with a '#') are ignored.  To allow
 easier inclusion of phrase files with rulesets, relative paths may be 
 used to the phrase files. In this case, the path of the file containing 
 the rule is prepended to the phrase file path.
+</dd></dl>
+<p><br>
+</p>
+<dl><dt> Note&nbsp;</dt><dd> Starting on ModSecurity v2.6.0 this 
+operator supports a snort/suricata content style. ie: "A|42|C|44|F".
 </dd></dl>
 <a name="rbl" id="rbl"></a><h2> <span class="mw-headline"> rbl </span></h2>
 <p><b>Description:</b> Looks up the input value in the RBL (real-time 
@@ -5178,6 +5218,12 @@ expression.
 <pre># Detect suspicious client by looking at the user agent identification 
 SecRule REQUEST_HEADERS:User-Agent "@strmatch WebZIP"
 </pre>
+<p><br>
+</p>
+<dl><dt> Note&nbsp;</dt><dd> Starting on ModSecurity v2.6.0 this 
+operator supports a snort/suricata content style. ie: "@strmatch 
+A|42|C|44|F".
+</dd></dl>
 <a name="validateByteRange" id="validateByteRange"></a><h2> <span 
 class="mw-headline"> validateByteRange </span></h2>
 <p><b>Description:</b> Validates that the byte values used in input fall
@@ -5701,13 +5747,13 @@ SecCookieFormat 0
 
 <!-- 
 NewPP limit report
-Preprocessor node count: 712/1000000
+Preprocessor node count: 715/1000000
 Post-expand include size: 0/2097152 bytes
 Template argument size: 0/2097152 bytes
 Expensive parser function count: 0/100
 -->
 
-<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20110418141641 -->
+<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20110714132413 -->
 <div class="printfooter">
 Retrieved from "<a 
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual">http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual</a>"</div>
@@ -5817,7 +5863,7 @@ pages</a></li>
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;printable=yes&amp;printable=yes"
  rel="alternate" title="Printable version of this page [alt-shift-p]" 
 accesskey="p">Printable version</a></li>				<li id="t-permalink"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=410"
+href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=430"
  title="Permanent link to this revision of the page">Permanent link</a></li>
 			</ul>
 		</div>
@@ -5829,15 +5875,15 @@ href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Referen
 src="Reference_Manual_files/poweredby_mediawiki_88x31.png" alt="Powered 
 by MediaWiki"></a></div>
 			<ul id="f-list">
-					<li id="lastmod"> This page was last modified on 18 April 2011, at 
-14:15.</li>
-					<li id="viewcount">This page has been accessed 8,604 times.</li>
+					<li id="lastmod"> This page was last modified on 7 June 2011, at 
+18:47.</li>
+					<li id="viewcount">This page has been accessed 33,697 times.</li>
 			</ul>
 		</div>
 </div>
 
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
-<!-- Served in 0.183 secs. -->
+<!-- Served in 0.177 secs. -->
     
     
     <script type="text/javascript">
