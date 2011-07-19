@@ -3003,7 +3003,7 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
                             log_escape_nq(msr->mp, name_to_check), var->name);
                     break;
                 default:
-                    *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s.",
+                    *error_msg = apr_psprintf(msr->r->pool, "RBL lookup of %s succeeded at %s (WHITE).",
                             log_escape_nq(msr->mp, name_to_check), var->name);
                     break;
             }
