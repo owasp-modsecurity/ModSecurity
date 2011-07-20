@@ -14,56 +14,56 @@ mod_security2_la_SOURCES = mod_security2.c \
                            msc_geo.c msc_gsb.c msc_unicode.c acmp.c msc_lua.c msc_release.c
 
 mod_security2_la_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
-                          @LIBXML2_CFLAGS@ @LUA_CFLAGS@ @MODSEC_EXTRA_CFLAGS@
-mod_security2_la_CPPFLAGS = @APR_CPPFLAGS@ @LIBXML2_CPPFLAGS@
-mod_security2_la_LIBADD = @APR_LDADD@ @APU_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@
+                          @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @LUA_CFLAGS@ @MODSEC_EXTRA_CFLAGS@
+mod_security2_la_CPPFLAGS = @APR_CPPFLAGS@ @PCRE_CPPFLAGS@ @LIBXML2_CPPFLAGS@
+mod_security2_la_LIBADD = @APR_LDADD@ @APU_LDADD@ @PCRE_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@
 
 if AIX
 mod_security2_la_LDFLAGS = -module -avoid-version \
                            @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
-                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+                           @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 endif
 
 if HPUX
 mod_security2_la_LDFLAGS = -module -avoid-version \
                            @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
-                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+                           @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 endif
 
 if MACOSX
 mod_security2_la_LDFLAGS = -module -avoid-version \
                            @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
-                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+                           @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 endif
 
 if SOLARIS
 mod_security2_la_LDFLAGS = -module -avoid-version \
                            @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
-                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+                           @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 endif
 
 if LINUX
 mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
                            @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
-                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+                           @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 endif
 
 if FREEBSD
 mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
                            @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
-                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+                           @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 endif
 
 if OPENBSD
 mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
                            @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
-                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+                           @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 endif
 
 if NETBSD
 mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
                            @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
-                           @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+                           @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 endif
 
 install-exec-hook: $(pkglib_LTLIBRARIES)
