@@ -53,7 +53,7 @@ all: $(DLL)
 dll: $(DLL)
 
 mod_security2_config.h: mod_security2_config.hw
-        @type mod_security2_config.hw > mod_security2_config.h
+        @type mod_security2_config.hw > modsecurity_config.h
 
 .c.obj:
         $(CC) $(CFLAGS) -c $< -Fo$@
