@@ -488,21 +488,30 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
     *error_msg = NULL;
 
     /* Compile pattern */
-    regex = msc_pregcomp_ex(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
-    if (regex == NULL) {
-        *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
-                erroffset, errptr);
-        return 0;
-    }
+    if(strstr(pattern,"%{") == NULL)    {
+        regex = msc_pregcomp_ex(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+        if (regex == NULL) {
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
+                    erroffset, errptr);
+            return 0;
+        }
 
-    rule->op_param_data = regex;
+        rule->op_param_data = regex;
+    } else {
+        rule->re_precomp = 1;
+        rule->re_str = apr_pstrndup(rule->ruleset->mp, pattern, strlen(pattern));
+        rule->op_param_data = NULL;
+    }
 
     return 1; /* OK */
 }
 
 static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     msc_regex_t *regex = (msc_regex_t *)rule->op_param_data;
+    msc_string *re_pattern = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     const char *target;
+    const char *errptr = NULL;
+    int erroffset;
     unsigned int target_length;
     char *my_error_msg = NULL;
     int ovector[33];
@@ -511,15 +520,41 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     int matched = 0;
     int rc;
     char *qspos = NULL;
-    const char *parm = NULL;
+    const char *parm = NULL, *pattern = NULL;
     msc_parm *mparm = NULL;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
     if (regex == NULL) {
-        *error_msg = "Internal Error: regex data is null.";
-        return -1;
+        if(rule->re_precomp == 0)   {
+            *error_msg = "Internal Error: regex data is null.";
+            return -1;
+        } else  {
+
+            if(re_pattern == NULL)  {
+                *error_msg = "Internal Error: regex variable data is null.";
+                return -1;
+            }
+
+            re_pattern->value = apr_pstrndup(msr->mp, rule->re_str, strlen(rule->re_str));
+            re_pattern->value_len = strlen(re_pattern->value);
+
+            expand_macros(msr, re_pattern, rule, msr->mp);
+
+            pattern = log_escape_re(msr->mp, re_pattern->value);
+            if (msr->txcfg->debuglog_level >= 6) {
+                msr_log(msr, 6, "Escaping pattern [%s]",pattern);
+            }
+
+            regex = msc_pregcomp_ex(rule->ruleset->mp, pattern, PCRE_DOTALL | PCRE_DOLLAR_ENDONLY, &errptr, &erroffset, msc_pcre_match_limit, msc_pcre_match_limit_recursion);
+            if (regex == NULL) {
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
+                        erroffset, errptr);
+                return 0;
+            }
+
+        }
     }
 
     /* If the given target is null run against an empty
