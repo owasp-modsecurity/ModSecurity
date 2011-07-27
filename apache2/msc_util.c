@@ -421,12 +421,26 @@ char *file_dirname(apr_pool_t *p, const char *filename) {
  */
 int hex2bytes_inplace(unsigned char *data, int len) {
     unsigned char *d = data;
+    char print = 0;
     int i, count = 0;
 
     if ((data == NULL)||(len == 0)) return 0;
 
-    for(i = 0; i <= len - 2; i += 2) {
-        *d++ = x2c(&data[i]);
+    for(i = 0; i <= len - 1; i++) {
+        if(VALID_HEX(data[i]) && VALID_HEX(data[i+1]))  {
+            print = data[i];
+            if(print > 0x31 && print < 0x38)    {
+                *d++ = x2c(&data[i]);
+                i++;
+            } else {
+                *d++ = data[i];
+                *d++ = data[i+1];
+                i++;
+                count++;
+            }
+        } else  {
+            *d++ = data[i];
+        }
         count++;
     }
     *d = '\0';
