@@ -1851,7 +1851,7 @@ static apr_status_t msre_action_initcol_execute(modsec_rec *msr, apr_pool_t *mpt
     /* IMP1 We have a function for this now, parse_name_eq_value? */
     s = strstr(data, "=");
     if (s == NULL) return 0;
-    col_name = data;
+    col_name = strtolower_inplace(data);
     col_key = s + 1;
     *s = '\0';
 
