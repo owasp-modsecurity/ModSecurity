@@ -164,7 +164,11 @@ struct msre_rule {
     msc_script              *script;
     #endif
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 0
     ap_regex_t              *sub_regex;
+#else
+    regex_t                 *sub_regex;
+#endif
     char                    *sub_str;
     char                    *re_str;
     int                     re_precomp;

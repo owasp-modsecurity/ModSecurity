@@ -21,7 +21,6 @@
 #include "acmp.h"
 #include "msc_util.h"
 #if !defined(WIN32) || !defined(WINNT)
-#include <regex.h>
 #include <arpa/inet.h>
 #endif
 
@@ -213,7 +212,11 @@ static char *param_remove_escape(msre_rule *rule, char *str, int len)  {
  */
 #if !defined(MSC_TEST)
 static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 0
     ap_regex_t *regex;
+#else
+    regex_t     *regex;
+#endif
     const char *pattern = NULL;
     const char *line = NULL;
     char *reg_pattern = NULL;
@@ -309,8 +312,13 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     pattern = apr_pstrndup(rule->ruleset->mp, e_pattern, strlen(e_pattern));
 
     if(strstr(pattern,"%{") == NULL)    {
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 0
         regex = ap_pregcomp(rule->ruleset->mp, pattern, AP_REG_EXTENDED |
                 (ignore_case ? AP_REG_ICASE : 0));
+#else
+        regex = ap_pregcomp(rule->ruleset->mp, pattern, REG_EXTENDED |
+                (ignore_case ? REG_ICASE : 0));
+#endif
         rule->sub_regex = regex;
     } else {
         rule->re_precomp = 1;
@@ -322,17 +330,17 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
 }
 
 /*
-* \brief Execution function to rsub operator
-*
-* \param msr Pointer internal modsec request structure
-* \param rule Pointer to the rule
-* \param var Pointer to variable structure
-* \param error_msg Pointer to error msg
-*
-* \retval -1 On Failure
-* \retval 1 On Match
-* \retval 0 On No Match
-*/
+ * \brief Execution function to rsub operator
+ *
+ * \param msr Pointer internal modsec request structure
+ * \param rule Pointer to the rule
+ * \param var Pointer to variable structure
+ * \param error_msg Pointer to error msg
+ *
+ * \retval -1 On Failure
+ * \retval 1 On Match
+ * \retval 0 On No Match
+ */
 static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     msc_string *re_pattern = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
@@ -342,7 +350,11 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char *data = NULL, *pattern = NULL;
     unsigned int size = var->value_len;
     int output_body = 0, input_body = 0, count = 0;
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 0
     ap_regmatch_t pmatch[AP_MAX_REG_MATCH];
+#else
+    regmatch_t  pmatch[AP_MAX_REG_MATCH];
+#endif
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -367,12 +379,19 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
                 if (msr->txcfg->debuglog_level >= 6) {
                     msr_log(msr, 6, "Escaping pattern [%s]",pattern);
                 }
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 0
                 rule->sub_regex = ap_pregcomp(msr->mp, pattern, AP_REG_EXTENDED);
+#else
+                rule->sub_regex = ap_pregcomp(msr->mp, pattern, REG_EXTENDED);
+#endif
             } else  {
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 0
                 rule->sub_regex = ap_pregcomp(msr->mp, re_pattern->value, AP_REG_EXTENDED);
+#else
+                rule->sub_regex = ap_pregcomp(msr->mp, re_pattern->value, REG_EXTENDED);
+#endif
             }
-        }
-        else    {
+        } else    {
             rule->sub_regex = NULL;
         }
 
@@ -387,7 +406,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     str->value_len = strlen(str->value);
 
     if(strstr(rule->sub_str,"%{") != NULL)
-    expand_macros(msr, str, rule, msr->mp);
+        expand_macros(msr, str, rule, msr->mp);
 
     replace = apr_pstrndup(msr->mp, str->value, str->value_len);
     data = apr_pcalloc(msr->mp, var->value_len+(AP_MAX_REG_MATCH*strlen(replace))+1);
@@ -436,16 +455,16 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         msr->stream_output_length = size;
 
         if(stream_output_data == NULL)  {
-           free (msr->stream_output_data);
-           msr->stream_output_data = NULL;
-           return -1;
+            free (msr->stream_output_data);
+            msr->stream_output_data = NULL;
+            return -1;
         }
 
         var->value_len = size;
         msr->of_stream_changed = 1;
         msr->stream_output_data = (char *)stream_output_data;
         if(msr->stream_output_data != NULL)
-        apr_cpystrn(msr->stream_output_data, data, size);
+            apr_cpystrn(msr->stream_output_data, data, size);
 
     }
 
@@ -456,15 +475,15 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         msr->stream_input_length = size;
 
         if(stream_input_data == NULL)  {
-           free (msr->stream_input_data);
-           msr->stream_input_data = NULL;
-           return -1;
+            free (msr->stream_input_data);
+            msr->stream_input_data = NULL;
+            return -1;
         }
 
         var->value_len = size;
         msr->stream_input_data = (char *)stream_input_data;
         if(msr->stream_input_data != NULL)
-        apr_cpystrn(msr->stream_input_data, data, size);
+            apr_cpystrn(msr->stream_input_data, data, size);
         msr->if_stream_changed = 1;
     }
 
