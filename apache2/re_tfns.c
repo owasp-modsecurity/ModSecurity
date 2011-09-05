@@ -286,6 +286,95 @@ static int msre_fn_removeWhitespace_execute(apr_pool_t *mptmp, unsigned char *in
     return changed;
 }
 
+/* removeCommentsChar */
+
+static int msre_fn_removeCommentsChar_execute(apr_pool_t *mptmp, unsigned char *input,
+        long int input_len, char **rval, long int *rval_len)
+{
+    long int i, j;
+    int changed = 0;
+
+    i = j = 0;
+    while(i < input_len) {
+        if ((input[i] == '/')&&(i + 1 < input_len)&&(input[i + 1] == '*')) {
+            changed = 1;
+            i += 2;
+        } else if ((input[i] == '*')&&(i + 1 < input_len)&&(input[i + 1] == '/')) {
+            changed = 1;
+            i += 2;
+        } else if ((input[i] == '-')&&(i + 1 < input_len)&&(input[i + 1] == '-')) {
+            changed = 1;
+            i += 2;
+        } else if (input[i] == '#') {
+            changed = 1;
+            i++;
+        } else {
+            input[j] = input[i];
+            i++;
+            j++;
+        }
+    }
+    input[j] = '\0';
+
+    *rval = (char *)input;
+    *rval_len = j;
+
+    return changed;
+}
+
+/* removeComments */
+
+static int msre_fn_removeComments_execute(apr_pool_t *mptmp, unsigned char *input,
+        long int input_len, char **rval, long int *rval_len)
+{
+    long int i, j, incomment;
+    int changed = 0;
+
+    i = j = incomment = 0;
+    while(i < input_len) {
+        if (incomment == 0) {
+            if ((input[i] == '/')&&(i + 1 < input_len)&&(input[i + 1] == '*')) {
+                changed = 1;
+                incomment = 1;
+                i += 2;
+            } else if ((input[i] == '-')&&(i + 1 < input_len)&&(input[i + 1] == '-')) {
+                changed = 1;
+                input[i] = ' ';
+                break;
+                i += 2;
+            } else if (input[i] == '#') {
+                changed = 1;
+                input[i] = ' ';
+               break;
+                i++;
+            } else {
+                input[j] = input[i];
+                i++;
+                j++;
+            }
+        } else {
+            if ((input[i] == '*')&&(i + 1 < input_len)&&(input[i + 1] == '/')) {
+                incomment = 0;
+                i += 2;
+                input[j] = input[i];
+                i++;
+                j++;
+            } else {
+                i++;
+            }
+        }
+    }
+
+    if (incomment) {
+        input[j++] = ' ';
+    }
+
+    *rval = (char *)input;
+    *rval_len = j;
+
+    return changed;
+}
+
 /* replaceComments */
 
 static int msre_fn_replaceComments_execute(apr_pool_t *mptmp, unsigned char *input,
@@ -808,6 +897,18 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     msre_engine_tfn_register(engine,
         "replaceNulls",
         msre_fn_replaceNulls_execute
+    );
+
+    /* removeComments */
+    msre_engine_tfn_register(engine,
+        "removeComments",
+        msre_fn_removeComments_execute
+    );
+
+    /* removeCommentsChar */
+    msre_engine_tfn_register(engine,
+        "removeCommentsChar",
+        msre_fn_removeCommentsChar_execute
     );
 
     /* replaceComments */
