@@ -50,7 +50,7 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
     msre_rule *rule = NULL;
     msre_ruleset *ruleset = NULL;
     const char *curr_targets = NULL;
-    char *my_error_msg = NULL;
+    char *my_error_msg = NULL, *target = NULL;
     char *p = NULL, *savedptr = NULL;
     char *target_list = NULL, *replace = NULL;
     unsigned int is_negated = 0, is_counting = 0;
@@ -162,6 +162,66 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
             }
         } else {
 
+            target = strdup(p);
+            if(target == NULL)
+                return NULL;
+
+            is_negated = is_counting = 0;
+            param = name = value = NULL;
+
+            opt = strchr(target,'!');
+
+            if(opt != NULL)  {
+                *opt = '\0';
+                opt++;
+                param = opt;
+                is_negated = 1;
+            } else if ((opt = strchr(target,'&')) != NULL)  {
+                *opt = '\0';
+                opt++;
+                param = opt;
+                is_counting = 1;
+            } else  {
+                param = target;
+            }
+
+            opt = strchr(param,':');
+
+            if(opt != NULL) {
+                name = apr_strtok(param,":",&value);
+                if(strchr(value,':') != NULL)   {
+                    goto end;
+                }
+            } else {
+                name = param;
+            }
+
+            name_len = strlen(name);
+
+            if(value != NULL)
+                value_len = strlen(value);
+
+            targets = (msre_var **)rule->targets->elts;
+            for (i = 0; i < rule->targets->nelts; i++) {
+                if((strncasecmp(targets[i]->name,name,name_len) == 0) &&
+                        (targets[i]->is_negated == is_negated) &&
+                        (targets[i]->is_counting == is_counting))    {
+
+                    if(value != NULL && targets[i]->param != NULL)  {
+                        if(strncasecmp(targets[i]->param,value,value_len) == 0) {
+                            goto end;
+                        }
+                    } else if (value == NULL && targets[i]->param == NULL){
+                        goto end;
+                    } else
+                        continue;
+
+                }
+            }
+            if(target != NULL)
+                free(replace);
+
+
             rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
             if (rc < 0) {
                 goto end;
@@ -179,6 +239,8 @@ end:
     if(target_list != NULL)
         free(target_list);
     if(replace != NULL)
+        free(replace);
+    if(target != NULL)
         free(replace);
     return NULL;
 }
