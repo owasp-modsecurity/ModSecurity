@@ -1,3 +1,20 @@
+5 Sep 2011 - 2.6.2-rc1
+-------------------
+
+ * Added support to macro expansion for rx operator.
+
+ * Added new transformations removeComments and removeCommentsChars
+
+ * Fixed colletion names are not case-sensitive anymore.
+
+ * Fixed compilation errors with apache 2.0.
+
+ * Fixed build system was not using some libraries CFLAGS.
+
+ * Fixed check for valid hex values into hexDecode transformation.
+
+ * Fixed ctl:ruleUpdateTargetById appending multiple targets.
+
 18 Jun 2011 - 2.6.1
 -------------------
 
