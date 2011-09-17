@@ -219,7 +219,7 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
                 }
             }
             if(target != NULL)
-                free(replace);
+                free(target);
 
 
             rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
@@ -241,7 +241,7 @@ end:
     if(replace != NULL)
         free(replace);
     if(target != NULL)
-        free(replace);
+        free(target);
     return NULL;
 }
 
