@@ -86,6 +86,7 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
         replace = strdup(p3);
         if(replace == NULL) {
             free(target_list);
+            target_list = NULL;
             return NULL;
         }
     }
@@ -217,8 +218,10 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
 
                 }
             }
-            if(target != NULL)
+            if(target != NULL)  {
                 free(target);
+                target = NULL;
+            }
 
 
             rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
