@@ -1,3 +1,10 @@
+30 Sep 2011 - 2.6.2
+-------------------
+
+ * Fixed hexDecode test during make.
+
+ * Updated the reference manual into doc/ directory.
+
 15 Sep 2011 - 2.6.2-rc1
 -------------------
 

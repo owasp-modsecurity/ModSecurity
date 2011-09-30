@@ -55,7 +55,7 @@ type="text/css">
 		var wgUserLanguage = "en";
 		var wgContentLanguage = "en";
 		var wgBreakFrames = false;
-		var wgCurRevisionId = 430;
+		var wgCurRevisionId = 441;
 		var wgVersion = "1.15.1";
 		var wgEnableAPI = true;
 		var wgEnableWriteAPI = true;
@@ -250,87 +250,89 @@ class="tocnumber">6.21</span> <span class="toctext">SecDisableBackendCompression
  <span class="toctext">SecGsbLookupDb</span></a></li>
 <li class="toclevel-2"><a href="#SecGuardianLog"><span class="tocnumber">6.24</span>
  <span class="toctext">SecGuardianLog</span></a></li>
+<li class="toclevel-2"><a href="#SecHttpBlKey"><span class="tocnumber">6.25</span>
+ <span class="toctext">SecHttpBlKey</span></a></li>
 <li class="toclevel-2"><a href="#SecInterceptOnError"><span 
-class="tocnumber">6.25</span> <span class="toctext">SecInterceptOnError</span></a></li>
-<li class="toclevel-2"><a href="#SecMarker"><span class="tocnumber">6.26</span>
+class="tocnumber">6.26</span> <span class="toctext">SecInterceptOnError</span></a></li>
+<li class="toclevel-2"><a href="#SecMarker"><span class="tocnumber">6.27</span>
  <span class="toctext">SecMarker</span></a></li>
 <li class="toclevel-2"><a href="#SecPcreMatchLimit"><span 
-class="tocnumber">6.27</span> <span class="toctext">SecPcreMatchLimit</span></a></li>
+class="tocnumber">6.28</span> <span class="toctext">SecPcreMatchLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecPcreMatchLimitRecursion"><span 
-class="tocnumber">6.28</span> <span class="toctext">SecPcreMatchLimitRecursion</span></a></li>
-<li class="toclevel-2"><a href="#SecPdfProtect"><span class="tocnumber">6.29</span>
+class="tocnumber">6.29</span> <span class="toctext">SecPcreMatchLimitRecursion</span></a></li>
+<li class="toclevel-2"><a href="#SecPdfProtect"><span class="tocnumber">6.30</span>
  <span class="toctext">SecPdfProtect</span></a></li>
 <li class="toclevel-2"><a href="#SecPdfProtectMethod"><span 
-class="tocnumber">6.30</span> <span class="toctext">SecPdfProtectMethod</span></a></li>
+class="tocnumber">6.31</span> <span class="toctext">SecPdfProtectMethod</span></a></li>
 <li class="toclevel-2"><a href="#SecPdfProtectSecret"><span 
-class="tocnumber">6.31</span> <span class="toctext">SecPdfProtectSecret</span></a></li>
+class="tocnumber">6.32</span> <span class="toctext">SecPdfProtectSecret</span></a></li>
 <li class="toclevel-2"><a href="#SecPdfProtectTimeout"><span 
-class="tocnumber">6.32</span> <span class="toctext">SecPdfProtectTimeout</span></a></li>
+class="tocnumber">6.33</span> <span class="toctext">SecPdfProtectTimeout</span></a></li>
 <li class="toclevel-2"><a href="#SecPdfProtectTokenName"><span 
-class="tocnumber">6.33</span> <span class="toctext">SecPdfProtectTokenName</span></a></li>
+class="tocnumber">6.34</span> <span class="toctext">SecPdfProtectTokenName</span></a></li>
 <li class="toclevel-2"><a href="#SecReadStateLimit"><span 
-class="tocnumber">6.34</span> <span class="toctext">SecReadStateLimit</span></a></li>
+class="tocnumber">6.35</span> <span class="toctext">SecReadStateLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecWriteStateLimit"><span 
-class="tocnumber">6.35</span> <span class="toctext">SecWriteStateLimit</span></a></li>
+class="tocnumber">6.36</span> <span class="toctext">SecWriteStateLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecRequestBodyAccess"><span 
-class="tocnumber">6.36</span> <span class="toctext">SecRequestBodyAccess</span></a></li>
+class="tocnumber">6.37</span> <span class="toctext">SecRequestBodyAccess</span></a></li>
 <li class="toclevel-2"><a href="#SecRequestBodyInMemoryLimit"><span 
-class="tocnumber">6.37</span> <span class="toctext">SecRequestBodyInMemoryLimit</span></a></li>
+class="tocnumber">6.38</span> <span class="toctext">SecRequestBodyInMemoryLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecRequestBodyLimit"><span 
-class="tocnumber">6.38</span> <span class="toctext">SecRequestBodyLimit</span></a></li>
+class="tocnumber">6.39</span> <span class="toctext">SecRequestBodyLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecRequestBodyNoFilesLimit"><span 
-class="tocnumber">6.39</span> <span class="toctext">SecRequestBodyNoFilesLimit</span></a></li>
+class="tocnumber">6.40</span> <span class="toctext">SecRequestBodyNoFilesLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecRequestBodyLimitAction"><span 
-class="tocnumber">6.40</span> <span class="toctext">SecRequestBodyLimitAction</span></a></li>
+class="tocnumber">6.41</span> <span class="toctext">SecRequestBodyLimitAction</span></a></li>
 <li class="toclevel-2"><a href="#SecResponseBodyLimit"><span 
-class="tocnumber">6.41</span> <span class="toctext">SecResponseBodyLimit</span></a></li>
+class="tocnumber">6.42</span> <span class="toctext">SecResponseBodyLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecResponseBodyLimitAction"><span 
-class="tocnumber">6.42</span> <span class="toctext">SecResponseBodyLimitAction</span></a></li>
+class="tocnumber">6.43</span> <span class="toctext">SecResponseBodyLimitAction</span></a></li>
 <li class="toclevel-2"><a href="#SecResponseBodyMimeType"><span 
-class="tocnumber">6.43</span> <span class="toctext">SecResponseBodyMimeType</span></a></li>
+class="tocnumber">6.44</span> <span class="toctext">SecResponseBodyMimeType</span></a></li>
 <li class="toclevel-2"><a href="#SecResponseBodyMimeTypesClear"><span 
-class="tocnumber">6.44</span> <span class="toctext">SecResponseBodyMimeTypesClear</span></a></li>
+class="tocnumber">6.45</span> <span class="toctext">SecResponseBodyMimeTypesClear</span></a></li>
 <li class="toclevel-2"><a href="#SecResponseBodyAccess"><span 
-class="tocnumber">6.45</span> <span class="toctext">SecResponseBodyAccess</span></a></li>
-<li class="toclevel-2"><a href="#SecRule"><span class="tocnumber">6.46</span>
+class="tocnumber">6.46</span> <span class="toctext">SecResponseBodyAccess</span></a></li>
+<li class="toclevel-2"><a href="#SecRule"><span class="tocnumber">6.47</span>
  <span class="toctext">SecRule</span></a></li>
 <li class="toclevel-2"><a href="#SecRuleInheritance"><span 
-class="tocnumber">6.47</span> <span class="toctext">SecRuleInheritance</span></a></li>
-<li class="toclevel-2"><a href="#SecRuleEngine"><span class="tocnumber">6.48</span>
+class="tocnumber">6.48</span> <span class="toctext">SecRuleInheritance</span></a></li>
+<li class="toclevel-2"><a href="#SecRuleEngine"><span class="tocnumber">6.49</span>
  <span class="toctext">SecRuleEngine</span></a></li>
 <li class="toclevel-2"><a href="#SecRuleRemoveById"><span 
-class="tocnumber">6.49</span> <span class="toctext">SecRuleRemoveById</span></a></li>
+class="tocnumber">6.50</span> <span class="toctext">SecRuleRemoveById</span></a></li>
 <li class="toclevel-2"><a href="#SecRuleRemoveByMsg"><span 
-class="tocnumber">6.50</span> <span class="toctext">SecRuleRemoveByMsg</span></a></li>
+class="tocnumber">6.51</span> <span class="toctext">SecRuleRemoveByMsg</span></a></li>
 <li class="toclevel-2"><a href="#SecRuleRemoveByTag"><span 
-class="tocnumber">6.51</span> <span class="toctext">SecRuleRemoveByTag</span></a></li>
-<li class="toclevel-2"><a href="#SecRuleScript"><span class="tocnumber">6.52</span>
+class="tocnumber">6.52</span> <span class="toctext">SecRuleRemoveByTag</span></a></li>
+<li class="toclevel-2"><a href="#SecRuleScript"><span class="tocnumber">6.53</span>
  <span class="toctext">SecRuleScript</span></a></li>
 <li class="toclevel-2"><a href="#SecRuleUpdateActionById"><span 
-class="tocnumber">6.53</span> <span class="toctext">SecRuleUpdateActionById</span></a></li>
+class="tocnumber">6.54</span> <span class="toctext">SecRuleUpdateActionById</span></a></li>
 <li class="toclevel-2"><a href="#SecRuleUpdateTargetById"><span 
-class="tocnumber">6.54</span> <span class="toctext">SecRuleUpdateTargetById</span></a></li>
+class="tocnumber">6.55</span> <span class="toctext">SecRuleUpdateTargetById</span></a></li>
 <li class="toclevel-2"><a href="#SecServerSignature"><span 
-class="tocnumber">6.55</span> <span class="toctext">SecServerSignature</span></a></li>
+class="tocnumber">6.56</span> <span class="toctext">SecServerSignature</span></a></li>
 <li class="toclevel-2"><a href="#SecStreamInBodyInspection"><span 
-class="tocnumber">6.56</span> <span class="toctext">SecStreamInBodyInspection</span></a></li>
+class="tocnumber">6.57</span> <span class="toctext">SecStreamInBodyInspection</span></a></li>
 <li class="toclevel-2"><a href="#SecStreamOutBodyInspection"><span 
-class="tocnumber">6.57</span> <span class="toctext">SecStreamOutBodyInspection</span></a></li>
-<li class="toclevel-2"><a href="#SecTmpDir"><span class="tocnumber">6.58</span>
+class="tocnumber">6.58</span> <span class="toctext">SecStreamOutBodyInspection</span></a></li>
+<li class="toclevel-2"><a href="#SecTmpDir"><span class="tocnumber">6.59</span>
  <span class="toctext">SecTmpDir</span></a></li>
 <li class="toclevel-2"><a href="#SecUnicodeMapFile"><span 
-class="tocnumber">6.59</span> <span class="toctext">SecUnicodeMapFile</span></a></li>
+class="tocnumber">6.60</span> <span class="toctext">SecUnicodeMapFile</span></a></li>
 <li class="toclevel-2"><a href="#SecUnicodeCodePage"><span 
-class="tocnumber">6.60</span> <span class="toctext">SecUnicodeCodePage</span></a></li>
-<li class="toclevel-2"><a href="#SecUploadDir"><span class="tocnumber">6.61</span>
+class="tocnumber">6.61</span> <span class="toctext">SecUnicodeCodePage</span></a></li>
+<li class="toclevel-2"><a href="#SecUploadDir"><span class="tocnumber">6.62</span>
  <span class="toctext">SecUploadDir</span></a></li>
 <li class="toclevel-2"><a href="#SecUploadFileLimit"><span 
-class="tocnumber">6.62</span> <span class="toctext">SecUploadFileLimit</span></a></li>
+class="tocnumber">6.63</span> <span class="toctext">SecUploadFileLimit</span></a></li>
 <li class="toclevel-2"><a href="#SecUploadFileMode"><span 
-class="tocnumber">6.63</span> <span class="toctext">SecUploadFileMode</span></a></li>
+class="tocnumber">6.64</span> <span class="toctext">SecUploadFileMode</span></a></li>
 <li class="toclevel-2"><a href="#SecUploadKeepFiles"><span 
-class="tocnumber">6.64</span> <span class="toctext">SecUploadKeepFiles</span></a></li>
-<li class="toclevel-2"><a href="#SecWebAppId"><span class="tocnumber">6.65</span>
+class="tocnumber">6.65</span> <span class="toctext">SecUploadKeepFiles</span></a></li>
+<li class="toclevel-2"><a href="#SecWebAppId"><span class="tocnumber">6.66</span>
  <span class="toctext">SecWebAppId</span></a></li>
 </ul>
 </li>
@@ -597,21 +599,25 @@ class="tocnumber">9.17</span> <span class="toctext">normalisePathWin</span></a><
 class="tocnumber">9.22</span> <span class="toctext">removeWhitespace</span></a></li>
 <li class="toclevel-2"><a href="#replaceComments"><span 
 class="tocnumber">9.23</span> <span class="toctext">replaceComments</span></a></li>
-<li class="toclevel-2"><a href="#replaceNulls"><span class="tocnumber">9.24</span>
+<li class="toclevel-2"><a href="#removeCommentsChar"><span 
+class="tocnumber">9.24</span> <span class="toctext">removeCommentsChar</span></a></li>
+<li class="toclevel-2"><a href="#removeComments"><span class="tocnumber">9.25</span>
+ <span class="toctext">removeComments</span></a></li>
+<li class="toclevel-2"><a href="#replaceNulls"><span class="tocnumber">9.26</span>
  <span class="toctext">replaceNulls</span></a></li>
-<li class="toclevel-2"><a href="#urlDecode"><span class="tocnumber">9.25</span>
+<li class="toclevel-2"><a href="#urlDecode"><span class="tocnumber">9.27</span>
  <span class="toctext">urlDecode</span></a></li>
-<li class="toclevel-2"><a href="#urlDecodeUni"><span class="tocnumber">9.26</span>
+<li class="toclevel-2"><a href="#urlDecodeUni"><span class="tocnumber">9.28</span>
  <span class="toctext">urlDecodeUni</span></a></li>
-<li class="toclevel-2"><a href="#urlEncode"><span class="tocnumber">9.27</span>
+<li class="toclevel-2"><a href="#urlEncode"><span class="tocnumber">9.29</span>
  <span class="toctext">urlEncode</span></a></li>
-<li class="toclevel-2"><a href="#sha1"><span class="tocnumber">9.28</span>
+<li class="toclevel-2"><a href="#sha1"><span class="tocnumber">9.30</span>
  <span class="toctext">sha1</span></a></li>
-<li class="toclevel-2"><a href="#trimLeft"><span class="tocnumber">9.29</span>
+<li class="toclevel-2"><a href="#trimLeft"><span class="tocnumber">9.31</span>
  <span class="toctext">trimLeft</span></a></li>
-<li class="toclevel-2"><a href="#trimRight"><span class="tocnumber">9.30</span>
+<li class="toclevel-2"><a href="#trimRight"><span class="tocnumber">9.32</span>
  <span class="toctext">trimRight</span></a></li>
-<li class="toclevel-2"><a href="#trim"><span class="tocnumber">9.31</span>
+<li class="toclevel-2"><a href="#trim"><span class="tocnumber">9.33</span>
  <span class="toctext">trim</span></a></li>
 </ul>
 </li>
@@ -1740,6 +1746,21 @@ detailed instructions), you only need to add one line to your Apache
 configuration to deploy it:
 </p>
 <pre>SecGuardianLog |/path/to/httpd-guardian</pre>
+<a name="SecHttpBlKey" id="SecHttpBlKey"></a><h2> <span 
+class="mw-headline"> SecHttpBlKey </span></h2>
+<p><b>Description:</b> Configures the user's registered Honeypot Project
+ HTTP BL API Key to use with @rbl.
+</p><p><b>Syntax:</b> <code>SecHttpBlKey [12 char access key] </code>
+</p><p><b>Example Usage:</b> <code>SecHttpBlKey whdkfieyhtnf </code>
+</p><p><b>Scope:</b> Main 
+</p><p><b>Version:</b> 2.7.0
+</p><p>If the @rbl operator uses the dnsbl.httpbl.org RBL (<a 
+href="http://www.projecthoneypot.org/httpbl_api.php" class="external 
+free" title="http://www.projecthoneypot.org/httpbl_api.php" 
+rel="nofollow">http://www.projecthoneypot.org/httpbl_api.php</a>) you 
+must provide an API key.  This key is registered to individual users and
+ is included within the RBL DNS requests.
+</p>
 <a name="SecInterceptOnError" id="SecInterceptOnError"></a><h2> <span 
 class="mw-headline"> SecInterceptOnError </span></h2>
 <p><b>Description:</b> Configures how to respond when rule processing 
@@ -2158,8 +2179,8 @@ class="mw-headline"> SecRuleEngine </span></h2>
 </p>
 <ul><li><b>On</b>: process rules
 </li><li><b>Off</b>: do not process rules 
-</li><li><b>DetectionOnly</b>: process rules but never intercept 
-transactions, even when rules are configured to block
+</li><li><b>DetectionOnly</b>: process rules but never executes any 
+disruptive actions (block, deny, drop, allow, proxy and redirect)
 </li></ul>
 <a name="SecRuleRemoveById" id="SecRuleRemoveById"></a><h2> <span 
 class="mw-headline"> SecRuleRemoveById </span></h2>
@@ -3872,6 +3893,15 @@ compressed). Unterminated comments will also be replaced with a space
 (ASCII 0x20). However, a standalone termination of a comment (*/) will 
 not be acted upon.
 </p>
+<a name="removeCommentsChar" id="removeCommentsChar"></a><h2> <span 
+class="mw-headline"> removeCommentsChar </span></h2>
+<p>Removes common comments chars (/*, */, --, #).
+</p>
+<a name="removeComments" id="removeComments"></a><h2> <span 
+class="mw-headline"> removeComments </span></h2>
+<p>Removes each occurrence of comment (/* ... */, --, #). Multiple 
+consecutive occurrences of which will not be compressed.
+</p>
 <a name="replaceNulls" id="replaceNulls"></a><h2> <span 
 class="mw-headline"> replaceNulls </span></h2>
 <p>Replaces NUL bytes in input with space characters (ASCII 0x20).
@@ -3928,7 +3958,13 @@ does the opposite of blocking. There can only be one disruptive action
 per rule (if there are multiple disruptive actions present, or 
 inherited, only the last one will take effect), or rule chain (in a 
 chain, a disruptive action can only appear in the first rule).
-</li><li> <b>Non-disruptive action</b>s - Do something, but that 
+</li></ul>
+<dl><dt> Note&nbsp;</dt><dd> <b>Disruptive actions will NOT be executed 
+if the SecRuleEngine is set to DetectionOnly</b>.  If you are creating 
+exception/whitelisting rules that use the allow action, you should also 
+add the ctl:ruleEngine=DetectionOnly action to execute the action.
+</dd></dl>
+<ul><li> <b>Non-disruptive action</b>s - Do something, but that 
 something does not and cannot affect the rule processing flow. Setting a
  variable, or changing its value is an example of a non-disruptive 
 action. Non-disruptive action can appear in any rule, including each 
@@ -5123,6 +5159,14 @@ block list) given as parameter. The parameter can be an IPv4 address or a
 <pre>SecRule REMOTE_ADDR "@rbl sbl-xbl.spamhaus.org" "phase:1,t:none,pass,nolog,auditlog,msg:'RBL Match for SPAM Source',tag:'AUTOMATION/MALICIOUS',severity:'2',setvar:'tx.msg=%{rule.msg}',setvar:tx.automation_score=+%{tx.warning_anomaly_score},setvar:tx.anomaly_score=+%{tx.warning_anomaly_score}, \
 setvar:tx.%{rule.id}-AUTOMATION/MALICIOUS-%{matched_var_name}=%{matched_var},setvar:ip.spammer=1,expirevar:ip.spammer=86400,setvar:ip.previous_rbl_check=1,expirevar:ip.previous_rbl_check=86400,skipAfter:END_RBL_CHECK"
 </pre>
+<dl><dt> Note&nbsp;</dt><dd> If the RBL used is dnsbl.httpbl.org 
+(Honeypot Project RBL) then the SecHttpBlKey directive must specify the 
+user's registered API key.
+</dd><dt> Note&nbsp;</dt><dd> If the RBL used is either multi.uribl.com 
+or zen.spamhaus.org combined RBLs, it is possible to also parse the 
+return codes in the last octet of the DNS response to identify which 
+specific RBL the IP was found in.
+</dd></dl>
 <a name="rsub" id="rsub"></a><h2> <span class="mw-headline"> rsub </span></h2>
 <p><b>Description</b>: Performs regular expression data substitution 
 when applied to either the STREAM_INPUT_BODY or STREAM_OUTPUT_BODY 
@@ -5427,9 +5471,9 @@ MULTIPART_STRICT_ERROR, RULE, SESSION, USERID, among others.
 </p>
 <a name="Persistant_Storage" id="Persistant_Storage"></a><h1> <span 
 class="mw-headline"> Persistant Storage </span></h1>
-<p>At this time it is only possible to have three collections in which 
+<p>At this time it is only possible to havefive collections in which 
 data is stored persistantly (i.e. data available to multiple requests). 
-These are: IP, SESSION and USER.
+These are: GLOBAL, RESOURCE, IP, SESSION and USER.
 </p><p>Every collection contains several built-in variables that are 
 available and are read-only unless otherwise specified:
 </p>
@@ -5452,9 +5496,12 @@ since creation.
 </li></ol>
 <p>To create a collection to hold session variables (SESSION) use action
  setsid. To create a collection to hold user variables (USER) use action
- setuid. To create a collection to hold client address variables (IP) 
-use action initcol.
+ setuid. To create a collection to hold client address variables (IP), 
+global data or resource-specific data, use action initcol.
 </p>
+<dl><dt> Note&nbsp;</dt><dd> Persistent collections can only be 
+initialized once per transaction.
+</dd></dl>
 <dl><dt> Note&nbsp;</dt><dd> ModSecurity implements atomic updates of 
 persistent variables only for integer variables (counters) at this time.
  Variables are read from storage whenever initcol is encountered in the 
@@ -5747,13 +5794,13 @@ SecCookieFormat 0
 
 <!-- 
 NewPP limit report
-Preprocessor node count: 715/1000000
+Preprocessor node count: 718/1000000
 Post-expand include size: 0/2097152 bytes
 Template argument size: 0/2097152 bytes
 Expensive parser function count: 0/100
 -->
 
-<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20110714132413 -->
+<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20110930150653 -->
 <div class="printfooter">
 Retrieved from "<a 
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual">http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual</a>"</div>
@@ -5863,7 +5910,7 @@ pages</a></li>
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;printable=yes&amp;printable=yes"
  rel="alternate" title="Printable version of this page [alt-shift-p]" 
 accesskey="p">Printable version</a></li>				<li id="t-permalink"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=430"
+href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=441"
  title="Permanent link to this revision of the page">Permanent link</a></li>
 			</ul>
 		</div>
@@ -5875,15 +5922,15 @@ href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Referen
 src="Reference_Manual_files/poweredby_mediawiki_88x31.png" alt="Powered 
 by MediaWiki"></a></div>
 			<ul id="f-list">
-					<li id="lastmod"> This page was last modified on 7 June 2011, at 
-18:47.</li>
-					<li id="viewcount">This page has been accessed 33,697 times.</li>
+					<li id="lastmod"> This page was last modified on 30 September 2011,
+ at 15:04.</li>
+					<li id="viewcount">This page has been accessed 55,206 times.</li>
 			</ul>
 		</div>
 </div>
 
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
-<!-- Served in 0.177 secs. -->
+<!-- Served in 1.178 secs. -->
     
     
     <script type="text/javascript">
