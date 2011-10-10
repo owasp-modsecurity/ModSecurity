@@ -128,12 +128,14 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
         targets = (msre_var **)rule->targets->elts;
         // TODO need a good way to remove the element from array, maybe change array by tables or rings
         for (i = 0; i < rule->targets->nelts; i++) {
-            if((strncasecmp(targets[i]->name,name,name_len) == 0) &&
+            if((strlen(targets[i]->name) == strlen(name)) && 
+                    (strncasecmp(targets[i]->name,name,strlen(targets[i]->name)) == 0) &&
                     (targets[i]->is_negated == is_negated) &&
                     (targets[i]->is_counting == is_counting))    {
 
                 if(value != NULL && targets[i]->param != NULL)  {
-                    if(strncasecmp(targets[i]->param,value,value_len) == 0) {
+                    if((strlen(targets[i]->param) == strlen(value)) &&
+                        strncasecmp(targets[i]->param,value,strlen(targets[i]->param)) == 0) {
                         memset(targets[i]->name,0,strlen(targets[i]->name));
                         memset(targets[i]->param,0,strlen(targets[i]->param));
                         match = 1;
@@ -196,37 +198,45 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
             } else {
                 name = param;
             }
+
             name_len = strlen(name);
 
             if(value != NULL)
                 value_len = strlen(value);
 
+            match = 0;
+
             targets = (msre_var **)rule->targets->elts;
             for (i = 0; i < rule->targets->nelts; i++) {
-                if((strncasecmp(targets[i]->name,name,name_len) == 0) &&
+                if((strlen(targets[i]->name) == strlen(name)) &&
+                        (strncasecmp(targets[i]->name,name,strlen(targets[i]->name)) == 0) &&
                         (targets[i]->is_negated == is_negated) &&
                         (targets[i]->is_counting == is_counting))    {
 
                     if(value != NULL && targets[i]->param != NULL)  {
-                        if(strncasecmp(targets[i]->param,value,value_len) == 0) {
-                            goto end;
+                        if((strlen(targets[i]->param) == strlen(value)) &&
+                            strncasecmp(targets[i]->param,value,strlen(targets[i]->param)) == 0) {
+                            match = 1;
                         }
                     } else if (value == NULL && targets[i]->param == NULL){
-                        goto end;
+                        match = 1;
                     } else
                         continue;
 
                 }
             }
+
             if(target != NULL)  {
                 free(target);
                 target = NULL;
             }
 
 
-            rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
-            if (rc < 0) {
-                goto end;
+            if(match == 0 ) {
+                rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
+                if (rc < 0) {
+                    goto end;
+                }
             }
         }
 
@@ -281,13 +291,13 @@ static char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule)  {
     for (i = 0; i < rule->targets->nelts; i++) {
 
         if(targets[i]->name != NULL && strlen(targets[i]->name) > 0)    {
-        target_str = apr_pstrcat(pool,
-                (target_str == NULL) ? "" : apr_psprintf(pool, "%s|", target_str),
-                (targets[i]->is_negated == 0) ? "" : "!",
-                (targets[i]->is_counting == 0) ? "" : "&",
-                (targets[i]->name == NULL) ? "" : targets[i]->name,
-                (targets[i]->param == NULL) ? "" : apr_psprintf(pool, ":%s", targets[i]->param),
-                NULL);
+            target_str = apr_pstrcat(pool,
+                    (target_str == NULL) ? "" : apr_psprintf(pool, "%s|", target_str),
+                    (targets[i]->is_negated == 0) ? "" : "!",
+                    (targets[i]->is_counting == 0) ? "" : "&",
+                    (targets[i]->name == NULL) ? "" : targets[i]->name,
+                    (targets[i]->param == NULL) ? "" : apr_psprintf(pool, ":%s", targets[i]->param),
+                    NULL);
         }
 
     }
@@ -319,14 +329,14 @@ static char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_
         if (chain) {
             /* Skip some actions that are not used in a chain. */
             if (   (action->metadata->type == ACTION_DISRUPTIVE)
-                || (action->metadata->type == ACTION_METADATA)
-                || (strcmp("log", action->metadata->name) == 0)
-                || (strcmp("auditlog", action->metadata->name) == 0)
-                || (strcmp("nolog", action->metadata->name) == 0)
-                || (strcmp("noauditlog", action->metadata->name) == 0)
-                || (strcmp("severity", action->metadata->name) == 0)
-                || (strcmp("tag", action->metadata->name) == 0)
-                || (strcmp("phase", action->metadata->name) == 0)) 
+                    || (action->metadata->type == ACTION_METADATA)
+                    || (strcmp("log", action->metadata->name) == 0)
+                    || (strcmp("auditlog", action->metadata->name) == 0)
+                    || (strcmp("nolog", action->metadata->name) == 0)
+                    || (strcmp("noauditlog", action->metadata->name) == 0)
+                    || (strcmp("severity", action->metadata->name) == 0)
+                    || (strcmp("tag", action->metadata->name) == 0)
+                    || (strcmp("phase", action->metadata->name) == 0)) 
             {
                 continue;
             }
@@ -345,14 +355,14 @@ static char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_
         }
 
         actions = apr_pstrcat(pool,
-            (actions == NULL) ? "" : actions,
-            (actions == NULL) ? "" : ",",
-            action->metadata->name,
-            (action->param == NULL) ? "" : ":",
-            (use_quotes) ? "'" : "",
-            (action->param == NULL) ? "" : action->param,
-            (use_quotes) ? "'" : "",
-            NULL);
+                (actions == NULL) ? "" : actions,
+                (actions == NULL) ? "" : ",",
+                action->metadata->name,
+                (action->param == NULL) ? "" : ":",
+                (use_quotes) ? "'" : "",
+                (action->param == NULL) ? "" : action->param,
+                (use_quotes) ? "'" : "",
+                NULL);
     }
 
     return actions;
@@ -396,7 +406,7 @@ static void msre_actionset_action_add(msre_actionset *actionset, msre_action *ac
  * given text string and places them into the supplied table.
  */
 static apr_status_t msre_parse_targets(msre_ruleset *ruleset, const char *text,
-    apr_array_header_t *arr, char **error_msg)
+        apr_array_header_t *arr, char **error_msg)
 {
     const apr_array_header_t *tarr;
     const apr_table_entry_t *telts;
@@ -432,7 +442,7 @@ static apr_status_t msre_parse_targets(msre_ruleset *ruleset, const char *text,
  * them into the supplied array.
  */
 static apr_status_t msre_parse_actions(msre_engine *engine, msre_actionset *actionset,
-    const char *text, char **error_msg)
+        const char *text, char **error_msg)
 {
     const apr_array_header_t *tarr;
     const apr_table_entry_t *telts;
@@ -592,7 +602,7 @@ static msre_var *msre_create_var(msre_ruleset *ruleset, const char *name, const 
  * Creates a new action instance given its name and an (optional) parameter.
  */
 msre_action *msre_create_action(msre_engine *engine, const char *name, const char *param,
-    char **error_msg)
+        char **error_msg)
 {
     msre_action *action = apr_pcalloc(engine->mp, sizeof(msre_action));
     if (action == NULL) return NULL;
@@ -610,7 +620,7 @@ msre_action *msre_create_action(msre_engine *engine, const char *name, const cha
     if (param == NULL) { /* Parameter not present */
         if (action->metadata->argc_min > 0) {
             *error_msg = apr_psprintf(engine->mp, "Missing mandatory parameter for action %s",
-                name);
+                    name);
             return NULL;
         }
     } else { /* Parameter present */
@@ -625,7 +635,7 @@ msre_action *msre_create_action(msre_engine *engine, const char *name, const cha
         if ((param[0] == '+')||(param[0] == '-')) {
             if (action->metadata->allow_param_plusminus == 0) {
                 *error_msg = apr_psprintf(engine->mp,
-                     "Action %s does not allow +/- modificators.", name);
+                        "Action %s does not allow +/- modificators.", name);
                 return NULL;
             }
             else { /* Modificators allowed. */
@@ -633,10 +643,10 @@ msre_action *msre_create_action(msre_engine *engine, const char *name, const cha
                     action->param = param + 1;
                     action->param_plusminus = POSITIVE_VALUE;
                 } else
-                if (param[0] == '-') {
-                    action->param = param + 1;
-                    action->param_plusminus = NEGATIVE_VALUE;
-                }
+                    if (param[0] == '-') {
+                        action->param = param + 1;
+                        action->param_plusminus = NEGATIVE_VALUE;
+                    }
             }
         } else {
             action->param = param;
@@ -658,7 +668,7 @@ msre_action *msre_create_action(msre_engine *engine, const char *name, const cha
  * them into the given table.
  */
 int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
-    char **error_msg)
+        char **error_msg)
 {
     char *p = (char *)text;
     int count = 0;
@@ -701,7 +711,7 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
             }
 
             *error_msg = apr_psprintf(mp, "Unexpected character at position %d: %s",
-                (int)(p - text), text);
+                    (int)(p - text), text);
             return -1;
         }
 
@@ -736,28 +746,28 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
             for(;;) {
                 if (*p == '\0') {
                     *error_msg = apr_psprintf(mp, "Missing closing quote at position %d: %s",
-                        (int)(p - text), text);
+                            (int)(p - text), text);
                     free(value);
                     return -1;
                 } else
-                if (*p == '\\') {
-                    if ( (*(p + 1) == '\0') || ((*(p + 1) != '\'')&&(*(p + 1) != '\\')) ) {
-                        *error_msg = apr_psprintf(mp, "Invalid quoted pair at position %d: %s",
-                            (int)(p - text), text);
-                        free(value);
-                        return -1;
-                    }
-                    p++;
-                    *(d++) = *(p++);
-                } else
-                if (*p == '\'') {
-                    *d = '\0';
-                    p++;
-                    break;
-                }
-                else {
-                    *(d++) = *(p++);
-                }
+                    if (*p == '\\') {
+                        if ( (*(p + 1) == '\0') || ((*(p + 1) != '\'')&&(*(p + 1) != '\\')) ) {
+                            *error_msg = apr_psprintf(mp, "Invalid quoted pair at position %d: %s",
+                                    (int)(p - text), text);
+                            free(value);
+                            return -1;
+                        }
+                        p++;
+                        *(d++) = *(p++);
+                    } else
+                        if (*p == '\'') {
+                            *d = '\0';
+                            p++;
+                            break;
+                        }
+                        else {
+                            *(d++) = *(p++);
+                        }
             }
 
             d = value;
@@ -788,10 +798,10 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
  * parsing the given string which contains a list of actions.
  */
 msre_actionset *msre_actionset_create(msre_engine *engine, const char *text,
-    char **error_msg)
+        char **error_msg)
 {
     msre_actionset *actionset = (msre_actionset *)apr_pcalloc(engine->mp,
-        sizeof(msre_actionset));
+            sizeof(msre_actionset));
     if (actionset == NULL) return NULL;
 
     actionset->actions = apr_table_make(engine->mp, 25);
@@ -854,7 +864,7 @@ static msre_actionset *msre_actionset_copy(apr_pool_t *mp, msre_actionset *orig)
  * Merges two actionsets into one.
  */
 msre_actionset *msre_actionset_merge(msre_engine *engine, msre_actionset *parent,
-    msre_actionset *child, int inherit_by_default)
+        msre_actionset *child, int inherit_by_default)
 {
     msre_actionset *merged = NULL;
     const apr_array_header_t *tarr;
@@ -927,8 +937,8 @@ msre_actionset *msre_actionset_merge(msre_engine *engine, msre_actionset *parent
 msre_actionset *msre_actionset_create_default(msre_engine *engine) {
     char  *my_error_msg = NULL;
     return msre_actionset_create(engine,
-        "phase:2,log,auditlog,pass",
-        &my_error_msg);
+            "phase:2,log,auditlog,pass",
+            &my_error_msg);
 }
 
 /**
@@ -1062,10 +1072,10 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
         if (rule->placeholder == RULE_PH_MARKER) continue;
 
         msr_log(msr, 1, "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"]: %u usec", rule,
-            ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
-            rule->filename != NULL ? rule->filename : "-",
-            rule->line_num,
-            (rule->execution_time / PERFORMANCE_MEASUREMENT_LOOP));
+                ((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                rule->filename != NULL ? rule->filename : "-",
+                rule->line_num,
+                (rule->execution_time / PERFORMANCE_MEASUREMENT_LOOP));
     }
 
     return rc;
@@ -1073,151 +1083,151 @@ apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) 
 
 static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_rec *msr) {
 #else
-apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) {
+    apr_status_t msre_ruleset_process_phase(msre_ruleset *ruleset, modsec_rec *msr) {
 #endif
-    apr_array_header_t *arr = NULL;
-    msre_rule **rules;
-    apr_status_t rc;
-    const char *skip_after = NULL;
-    msre_rule *last_rule = NULL;
-    msre_rule *rule_starter = NULL;
-    int i, mode, skip, skipped, saw_starter;
+        apr_array_header_t *arr = NULL;
+        msre_rule **rules;
+        apr_status_t rc;
+        const char *skip_after = NULL;
+        msre_rule *last_rule = NULL;
+        msre_rule *rule_starter = NULL;
+        int i, mode, skip, skipped, saw_starter;
 
-    /* First determine which set of rules we need to use. */
-    switch (msr->phase) {
-        case PHASE_REQUEST_HEADERS :
-            arr = ruleset->phase_request_headers;
-            break;
-        case PHASE_REQUEST_BODY :
-            arr = ruleset->phase_request_body;
-            break;
-        case PHASE_RESPONSE_HEADERS :
-            arr = ruleset->phase_response_headers;
-            break;
-        case PHASE_RESPONSE_BODY :
-            arr = ruleset->phase_response_body;
-            break;
-        case PHASE_LOGGING :
-            arr = ruleset->phase_logging;
-            break;
-        default :
-            msr_log(msr, 1, "Internal Error: Invalid phase %d", msr->phase);
-            return -1;
-    }
+        /* First determine which set of rules we need to use. */
+        switch (msr->phase) {
+            case PHASE_REQUEST_HEADERS :
+                arr = ruleset->phase_request_headers;
+                break;
+            case PHASE_REQUEST_BODY :
+                arr = ruleset->phase_request_body;
+                break;
+            case PHASE_RESPONSE_HEADERS :
+                arr = ruleset->phase_response_headers;
+                break;
+            case PHASE_RESPONSE_BODY :
+                arr = ruleset->phase_response_body;
+                break;
+            case PHASE_LOGGING :
+                arr = ruleset->phase_logging;
+                break;
+            default :
+                msr_log(msr, 1, "Internal Error: Invalid phase %d", msr->phase);
+                return -1;
+        }
 
-    if (msr->txcfg->debuglog_level >= 9) {
-        msr_log(msr, 9, "This phase consists of %d rule(s).", arr->nelts);
-    }
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "This phase consists of %d rule(s).", arr->nelts);
+        }
 
-    apr_table_clear(msr->matched_vars);
+        apr_table_clear(msr->matched_vars);
 
-    /* Loop through the rules in the selected set. */
-    skip = 0;
-    skipped = 0;
-    saw_starter = 0;
-    mode = NEXT_RULE;
-    rules = (msre_rule **)arr->elts;
-    for (i = 0; i < arr->nelts; i++) {
-        msre_rule *rule = rules[i];
+        /* Loop through the rules in the selected set. */
+        skip = 0;
+        skipped = 0;
+        saw_starter = 0;
+        mode = NEXT_RULE;
+        rules = (msre_rule **)arr->elts;
+        for (i = 0; i < arr->nelts; i++) {
+            msre_rule *rule = rules[i];
 #if defined(PERFORMANCE_MEASUREMENT)
-        apr_time_t time1 = 0;
+            apr_time_t time1 = 0;
 #endif
 
-        /* Reset the rule interception flag */
-        msr->rule_was_intercepted = 0;
+            /* Reset the rule interception flag */
+            msr->rule_was_intercepted = 0;
 
-        /* SKIP_RULES is used to skip all rules until we hit a placeholder
-         * with the specified rule ID and then resume execution after that.
-         */
-        if (mode == SKIP_RULES) {
-            /* Go to the next rule if we have not yet hit the skip_after ID */
+            /* SKIP_RULES is used to skip all rules until we hit a placeholder
+             * with the specified rule ID and then resume execution after that.
+             */
+            if (mode == SKIP_RULES) {
+                /* Go to the next rule if we have not yet hit the skip_after ID */
 
-            if ((rule->placeholder == RULE_PH_NONE) || (rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0)) {
+                if ((rule->placeholder == RULE_PH_NONE) || (rule->actionset->id == NULL) || (strcmp(skip_after, rule->actionset->id) != 0)) {
 
-                if(i-1 >=0)
-                    last_rule = rules[i-1];
-                else
-                    last_rule = rules[0];
+                    if(i-1 >=0)
+                        last_rule = rules[i-1];
+                    else
+                        last_rule = rules[0];
 
-                if((last_rule != NULL) && (last_rule->actionset != NULL) && last_rule->actionset->is_chained && (saw_starter == 1)) {
-                    mode = NEXT_RULE;
-                    skipped = 1;
-                    --i;
-                } else {
-                    mode = SKIP_RULES;
-                    skipped = 0;
-                    saw_starter = 0;
+                    if((last_rule != NULL) && (last_rule->actionset != NULL) && last_rule->actionset->is_chained && (saw_starter == 1)) {
+                        mode = NEXT_RULE;
+                        skipped = 1;
+                        --i;
+                    } else {
+                        mode = SKIP_RULES;
+                        skipped = 0;
+                        saw_starter = 0;
 
-                    if (msr->txcfg->debuglog_level >= 9) {
-                        msr_log(msr, 9, "Current rule is id=\"%s\" [chained %d] is trying to find the SecMarker=\"%s\" [stater %d]",rule->actionset->id,last_rule->actionset->is_chained,skip_after,saw_starter);
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "Current rule is id=\"%s\" [chained %d] is trying to find the SecMarker=\"%s\" [stater %d]",rule->actionset->id,last_rule->actionset->is_chained,skip_after,saw_starter);
+                        }
+
                     }
 
+                    continue;
                 }
 
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Found rule %pp id=\"%s\".", rule, skip_after);
+                }
+
+                /* Go to the rule *after* this one to continue execution. */
+                if (msr->txcfg->debuglog_level >= 4) {
+                    msr_log(msr, 4, "Continuing execution after rule id=\"%s\".", skip_after);
+                }
+
+                saw_starter = 0;
+                skipped = 0;
+                skip_after = NULL;
+                mode = NEXT_RULE;
+                apr_table_clear(msr->matched_vars);
                 continue;
             }
 
-            if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Found rule %pp id=\"%s\".", rule, skip_after);
+            /* Skip any rule marked as a placeholder */
+            if (rule->placeholder != RULE_PH_NONE) {
+                continue;
             }
 
-            /* Go to the rule *after* this one to continue execution. */
-            if (msr->txcfg->debuglog_level >= 4) {
-                msr_log(msr, 4, "Continuing execution after rule id=\"%s\".", skip_after);
-            }
-
-            saw_starter = 0;
-            skipped = 0;
-            skip_after = NULL;
-            mode = NEXT_RULE;
-            apr_table_clear(msr->matched_vars);
-            continue;
-        }
-
-        /* Skip any rule marked as a placeholder */
-        if (rule->placeholder != RULE_PH_NONE) {
-            continue;
-        }
-
-        /* NEXT_CHAIN is used when one of the rules in a chain
-         * fails to match and then we need to skip the remaining
-         * rules in that chain in order to get to the next
-         * rule that can execute.
-         */
-        if (mode == NEXT_CHAIN) {
-            if (rule->actionset->is_chained == 0) {
-                mode = NEXT_RULE;
-            }
-
-            /* Go to the next rule. */
-            apr_table_clear(msr->matched_vars);
-            continue;
-        }
-
-        /* If we are here that means the mode is NEXT_RULE, which
-         * then means we have done processing any chains. However,
-         * if the "skip" parameter is set we need to skip over.
-         */
-        if ((mode == NEXT_RULE)&&(skip > 0)) {
-            /* Decrement the skip counter by one. */
-            skip--;
-
-            /* If the current rule is part of a chain then
-             * we need to skip over the entire chain. Thus
-             * we change the mode to NEXT_CHAIN. The skip
-             * counter will not decrement as we are moving
-             * over the rules belonging to the chain.
+            /* NEXT_CHAIN is used when one of the rules in a chain
+             * fails to match and then we need to skip the remaining
+             * rules in that chain in order to get to the next
+             * rule that can execute.
              */
-            if (rule->actionset->is_chained) {
-                mode = NEXT_CHAIN;
+            if (mode == NEXT_CHAIN) {
+                if (rule->actionset->is_chained == 0) {
+                    mode = NEXT_RULE;
+                }
+
+                /* Go to the next rule. */
+                apr_table_clear(msr->matched_vars);
+                continue;
             }
 
-            /* Go to the next rule. */
-            apr_table_clear(msr->matched_vars);
-            continue;
-        }
+            /* If we are here that means the mode is NEXT_RULE, which
+             * then means we have done processing any chains. However,
+             * if the "skip" parameter is set we need to skip over.
+             */
+            if ((mode == NEXT_RULE)&&(skip > 0)) {
+                /* Decrement the skip counter by one. */
+                skip--;
 
-        /* Check if this rule was removed at runtime */
+                /* If the current rule is part of a chain then
+                 * we need to skip over the entire chain. Thus
+                 * we change the mode to NEXT_CHAIN. The skip
+                 * counter will not decrement as we are moving
+                 * over the rules belonging to the chain.
+                 */
+                if (rule->actionset->is_chained) {
+                    mode = NEXT_CHAIN;
+                }
+
+                /* Go to the next rule. */
+                apr_table_clear(msr->matched_vars);
+                continue;
+            }
+
+            /* Check if this rule was removed at runtime */
         if (((rule->actionset->id !=NULL) && !apr_is_empty_array(msr->removed_rules)) || (apr_is_empty_array(msr->removed_rules_tag)==0)) {
             int j, act;
             int do_process = 1;
