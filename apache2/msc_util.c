@@ -419,15 +419,20 @@ char *file_dirname(apr_pool_t *p, const char *filename) {
 /**
  *
  */
-int hex2bytes_inplace(unsigned char *data, int len) {
+int sql_hex2bytes_inplace(unsigned char *data, int len) {
     unsigned char *d = data;
-    char print = 0;
+    char print = 0, found = 0;
     int i, count = 0;
 
     if ((data == NULL)||(len == 0)) return 0;
 
     for(i = 0; i <= len - 1; i++) {
-        if(VALID_HEX(data[i]) && VALID_HEX(data[i+1]))  {
+        if(data[i] == 0x30 && data[i+1] == 0x78)    {
+            found = 1;
+            i++; continue;
+        }
+
+        if(VALID_HEX(data[i]) && VALID_HEX(data[i+1]) && found)  {
             print = data[i];
             if(print > 0x31 && print < 0x38)    {
                 *d++ = x2c(&data[i]);
@@ -441,6 +446,26 @@ int hex2bytes_inplace(unsigned char *data, int len) {
         } else  {
             *d++ = data[i];
         }
+
+        count++;
+    }
+    *d = '\0';
+
+    return count;
+}
+
+/**
+ *
+ *
+ */
+int hex2bytes_inplace(unsigned char *data, int len) {
+    unsigned char *d = data;
+    int i, count = 0;
+
+    if ((data == NULL)||(len == 0)) return 0;
+
+    for(i = 0; i <= len - 2; i += 2) {
+        *d++ = x2c(&data[i]);
         count++;
     }
     *d = '\0';
