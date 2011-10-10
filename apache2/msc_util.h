@@ -43,6 +43,8 @@ char DSOLOCAL *file_dirname(apr_pool_t *p, const char *filename);
 
 char DSOLOCAL *file_basename(apr_pool_t *p, const char *filename);
 
+int DSOLOCAL sql_hex2bytes_inplace(unsigned char *data, int len);
+
 int DSOLOCAL hex2bytes_inplace(unsigned char *data, int len);
 
 char DSOLOCAL *bytes2hex(apr_pool_t *pool, unsigned char *data, int len);
