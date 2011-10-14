@@ -108,7 +108,10 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
         goto cleanup;
     }
 
-    dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);
+    if(strstr(col_name,"USER") || strstr(col_name,"SESSION"))
+        dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", msr->txcfg->webappid, "_", col_name, NULL);
+    else
+        dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);
 
     key.dptr = (char *)col_key;
     key.dsize = col_key_len + 1;
@@ -576,7 +579,10 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
         goto error;
     }
 
-    dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);
+    if(strstr(col_name,"USER") || strstr(col_name,"SESSION"))
+        dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", msr->txcfg->webappid, "_", col_name, NULL);
+    else
+        dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);
 
     rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
         CREATEMODE, msr->mp);
