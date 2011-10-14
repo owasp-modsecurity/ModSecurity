@@ -126,6 +126,9 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->request_encoding = NOT_SET_P;
     dcfg->disable_backend_compression = NOT_SET;
 
+    /* Collection timeout */
+    dcfg->col_timeout = NOT_SET;
+
     return dcfg;
 }
 
@@ -515,6 +518,9 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->disable_backend_compression = (child->disable_backend_compression == NOT_SET
         ? parent->disable_backend_compression : child->disable_backend_compression);
 
+    merged->col_timeout = (child->col_timeout == NOT_SET
+        ? parent->col_timeout : child->col_timeout);
+
     return merged;
 }
 
@@ -611,6 +617,8 @@ void init_directory_config(directory_config *dcfg)
     if (dcfg->request_encoding == NOT_SET_P) dcfg->request_encoding = NULL;
 
     if (dcfg->disable_backend_compression == NOT_SET) dcfg->disable_backend_compression = 0;
+
+    if (dcfg->col_timeout == NOT_SET) dcfg->col_timeout = 3600;
 }
 
 /**
@@ -1251,6 +1259,18 @@ static const char *cmd_debug_log(cmd_parms *cmd, void *_dcfg, const char *p1)
     }
 
     return NULL;
+}
+
+static const char *cmd_collection_timeout(cmd_parms *cmd, void *_dcfg,
+                                       const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    dcfg->col_timeout = atoi(p1);
+    /* max 30 days */
+    if ((dcfg->col_timeout >= 0)&&(dcfg->col_timeout <= 2592000)) return NULL;
+
+    return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecDefaultCollectionTimeout: %s", p1);
 }
 
 static const char *cmd_debug_log_level(cmd_parms *cmd, void *_dcfg,
@@ -2346,6 +2366,14 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "debug log level, which controls the verbosity of logging."
         " Use values from 0 (no logging) to 9 (a *lot* of logging)."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecDefaultCollectionTimeout",
+        cmd_collection_timeout,
+        NULL,
+        CMD_SCOPE_ANY,
+        "set default collections timeout. default it 3600"
     ),
 
     AP_INIT_TAKE1 (

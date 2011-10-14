@@ -1730,7 +1730,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
 
     if (table == NULL) {
         /* Does not exist yet - create new. */
-        
+
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Creating collection (name \"%s\", key \"%s\").",
                real_col_name, col_key);
@@ -1740,6 +1740,10 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         if (table == NULL) return -1;
 
         /* IMP1 Is the timeout hard-coded to 3600? */
+
+       if(msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Setting default timeout collection value %d.",msr->txcfg->col_timeout);
+        }
 
         /* Add default timeout. */
         var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));

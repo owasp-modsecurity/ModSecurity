@@ -518,8 +518,11 @@ struct directory_config {
 
     /* Request character encoding. */
     const char          *request_encoding;
-    
+
     int disable_backend_compression;
+
+    /* Collection timeout */
+    int col_timeout;
 };
 
 struct error_message {
