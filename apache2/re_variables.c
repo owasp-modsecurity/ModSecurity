@@ -1888,7 +1888,7 @@ static int var_matched_vars_names_generate(modsec_rec *msr, msre_var *var, msre_
             else
                 rvar->is_negated = 1;
 
-            apr_table_setn(vartab, rvar->name, (void *)rvar);
+            apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Set variable \"%s\" value \"%s\" size %d to collection.", rvar->name, rvar->value, rvar->value_len);
@@ -1948,7 +1948,7 @@ static int var_matched_vars_generate(modsec_rec *msr, msre_var *var, msre_rule *
             else
                 rvar->is_negated = 1;
 
-            apr_table_setn(vartab, rvar->name, (void *)rvar);
+            apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Set variable \"%s\" value \"%s\" size %d to collection.", rvar->name, rvar->value, rvar->value_len);
