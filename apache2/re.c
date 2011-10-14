@@ -2235,8 +2235,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
                 mvar->value = apr_pmemdup(msr->mp, var->value, var->value_len);
                 mvar->value_len = var->value_len;
 
-                apr_table_unset(msr->matched_vars, parm);
-                apr_table_setn(msr->matched_vars, parm, (void *)mvar);
+                apr_table_addn(msr->matched_vars, parm, (void *)mvar);
 
             } else {
 
@@ -2246,8 +2245,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
                 mvar->value = apr_pmemdup(msr->mp, var->value, var->value_len);
                 mvar->value_len = var->value_len;
 
-                apr_table_unset(msr->matched_vars, mvar->name);
-                apr_table_setn(msr->matched_vars, mvar->name, (void *)mvar);
+                apr_table_addn(msr->matched_vars, mvar->name, (void *)mvar);
             }
 
         }
