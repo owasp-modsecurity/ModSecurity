@@ -445,6 +445,7 @@ int sql_hex2bytes_inplace(unsigned char *data, int len) {
             }
         } else  {
             *d++ = data[i];
+            found = 0;
         }
 
         count++;
