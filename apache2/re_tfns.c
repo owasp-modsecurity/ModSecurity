@@ -544,6 +544,17 @@ static int msre_fn_sha1_execute(apr_pool_t *mptmp, unsigned char *input,
     return 1;
 }
 
+/* sqlHexDecode */
+
+static int msre_fn_sqlHexDecode_execute(apr_pool_t *mptmp, unsigned char *input,
+    long int input_len, char **rval, long int *rval_len)
+{
+    *rval_len = sql_hex2bytes_inplace(input, input_len);
+    *rval = (char *)input;
+
+    return 1;
+}
+
 /* hexDecode */
 
 static int msre_fn_hexDecode_execute(apr_pool_t *mptmp, unsigned char *input,
@@ -796,6 +807,11 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
         "escapeSeqDecode",
         msre_fn_escapeSeqDecode_execute
     );
+
+    /* sqlHexDecode */
+    msre_engine_tfn_register(engine,
+        "sqlHexDecode",
+        msre_fn_sqlHexDecode_execute
 
     /* hexDecode */
     msre_engine_tfn_register(engine,
