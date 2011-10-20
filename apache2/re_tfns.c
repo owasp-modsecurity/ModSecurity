@@ -812,6 +812,7 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     msre_engine_tfn_register(engine,
         "sqlHexDecode",
         msre_fn_sqlHexDecode_execute
+    );
 
     /* hexDecode */
     msre_engine_tfn_register(engine,
