@@ -1749,7 +1749,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
         var->name = "__expire_KEY";
         var->name_len = strlen(var->name);
-        var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)(apr_time_sec(msr->request_time) + 3600));
+        var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)(apr_time_sec(msr->request_time) + msr->txcfg->col_timeout));
         var->value_len = strlen(var->value);
         apr_table_setn(table, var->name, (void *)var);
 
@@ -1765,7 +1765,7 @@ static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
         var = apr_pcalloc(msr->mp, sizeof(msc_string));
         var->name = "TIMEOUT";
         var->name_len = strlen(var->name);
-        var->value = apr_psprintf(msr->mp, "%d", 3600);
+        var->value = apr_psprintf(msr->mp, "%d", msr->txcfg->col_timeout);
         var->value_len = strlen(var->value);
         apr_table_setn(table, var->name, (void *)var);
 
