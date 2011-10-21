@@ -427,7 +427,7 @@ int sql_hex2bytes_inplace(unsigned char *data, int len) {
     if ((data == NULL)||(len == 0)) return 0;
 
     for(i = 0; i <= len - 1; i++) {
-        if(data[i] == 0x30 && data[i+1] == 0x78)    {
+        if(data[i] == 0x30 && (data[i+1] == 0x78 || data[i+1] == 0x58))    {
             found = 1;
             i++; continue;
         }
