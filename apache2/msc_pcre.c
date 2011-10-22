@@ -62,7 +62,11 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
     if (regex->re == NULL) return NULL;
 
     #ifdef WITH_PCRE_STUDY
-    pe = pcre_study(regex->re, 0, &errptr);
+        #ifdef WITH_PCRE_JIT
+                pe = pcre_study(regex->re, PCRE_STUDY_JIT_COMPILE, &errptr);
+        #else
+                pe = pcre_study(regex->re, 0, &errptr);
+        #endif
     #endif
 
     /* Setup the pcre_extra record if pcre_study did not already do it */

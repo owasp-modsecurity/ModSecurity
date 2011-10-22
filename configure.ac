@@ -250,6 +250,24 @@ AC_ARG_ENABLE(pcre-study,
   pcre_study='-DWITH_PCRE_STUDY'
 ])
 
+# Add PCRE JIT
+
+AC_ARG_ENABLE(pcre-jit,
+              AS_HELP_STRING([--enable-pcre-jit],
+                             [Enable PCRE regex jit support during configure.]),
+[
+  if test "$enableval" != "no"; then
+    pcre_jit='-DWITH_PCRE_JIT'
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $pcre_jit"
+  else
+    pcre_jit=''
+  fi
+],
+[
+  pcre_jit=''
+])
+
+
 # Limit PCRE matching
 AC_ARG_ENABLE(pcre-match-limit,
               AS_HELP_STRING([--enable-pcre-match-limit],
