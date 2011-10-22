@@ -503,6 +503,7 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
     int erroffset;
     msc_regex_t *regex;
     const char *pattern = rule->op_param;
+    int rc, jit;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -514,6 +515,17 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
             *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern (offset %d): %s",
                     erroffset, errptr);
             return 0;
+        }
+
+        rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
+        if ((rc != 0) || (jit != 1)) {
+            *error_msg = apr_psprintf(rule->ruleset->mp,
+                    "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
+                    "Execution error - "
+                    "Does not support JIT (%d)",
+                    rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                    rule->filename != NULL ? rule->filename : "-",
+                    rule->line_num,rc);
         }
 
         rule->op_param_data = regex;
@@ -538,7 +550,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     int capture = 0;
     int matched_bytes = 0;
     int matched = 0;
-    int rc;
+    int rc, jit;
     char *qspos = NULL;
     const char *parm = NULL, *pattern = NULL;
     msc_parm *mparm = NULL;
@@ -573,6 +585,21 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
                         erroffset, errptr);
                 return 0;
             }
+
+            if (msr->txcfg->debuglog_level >= 4) {
+                rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
+                if ((rc != 0) || (jit != 1)) {
+                    *error_msg = apr_psprintf(rule->ruleset->mp,
+                            "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
+                            "Execution error - "
+                            "Does not support JIT (%d)",
+                            rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                            rule->filename != NULL ? rule->filename : "-",
+                            rule->line_num,rc);
+                    msr_log(msr, 4, "%s.", *error_msg);
+                }
+            }
+
 
         }
     }
