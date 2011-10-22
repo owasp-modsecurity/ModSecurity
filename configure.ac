@@ -567,7 +567,7 @@ else
   fi
 fi
 
-#MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""
