@@ -517,6 +517,8 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
             return 0;
         }
 
+        #ifdef WITH_PCRE_STUDY
+            #ifdef WITH_PCRE_JIT
         rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
         if ((rc != 0) || (jit != 1)) {
             *error_msg = apr_psprintf(rule->ruleset->mp,
@@ -527,6 +529,8 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
                     rule->filename != NULL ? rule->filename : "-",
                     rule->line_num,rc);
         }
+            #endif
+        #endif
 
         rule->op_param_data = regex;
     } else {
@@ -586,6 +590,8 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
                 return 0;
             }
 
+            #ifdef WITH_PCRE_STUDY
+                #ifdef WITH_PCRE_JIT
             if (msr->txcfg->debuglog_level >= 4) {
                 rc = msc_fullinfo(regex, PCRE_INFO_JIT, &jit);
                 if ((rc != 0) || (jit != 1)) {
@@ -599,6 +605,8 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
                     msr_log(msr, 4, "%s.", *error_msg);
                 }
             }
+                #endif
+            #endif
 
 
         }
