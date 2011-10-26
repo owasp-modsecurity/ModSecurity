@@ -420,39 +420,33 @@ char *file_dirname(apr_pool_t *p, const char *filename) {
  *
  */
 int sql_hex2bytes_inplace(unsigned char *data, int len) {
-    unsigned char *d = data;
-    char print = 0, found = 0;
-    int i, count = 0;
+    unsigned char *d, *begin = data;
 
     if ((data == NULL)||(len == 0)) return 0;
 
-    for(i = 0; i <= len - 1; i++) {
-        if(data[i] == 0x30 && (data[i+1] == 0x78 || data[i+1] == 0x58))    {
-            found = 1;
-            i++; continue;
+    for( d = data; *data; *d++ = *data++) {
+        if ( *data != '0' ) continue;
+        if ( tolower(*++data) != 'x' ) {
+            data--;
+            continue;
         }
 
-        if(VALID_HEX(data[i]) && VALID_HEX(data[i+1]) && found)  {
-            print = data[i];
-            if(print > 0x31 && print < 0x38)    {
-                *d++ = x2c(&data[i]);
-                i++;
-            } else {
-                *d++ = data[i];
-                *d++ = data[i+1];
-                i++;
-                count++;
-            }
-        } else  {
-            *d++ = data[i];
-            found = 0;
+        data++;
+
+        // Do we need to keep "0x" if no hexa after?
+        if ( !VALID_HEX(data[0]) || !VALID_HEX(data[1]) ) {
+            data-=2;
+            continue;
         }
 
-        count++;
+        while ( VALID_HEX(data[0]) && VALID_HEX(data[1]) )  {
+            *d++ = x2c(data);
+            data += 2;
+        }
     }
-    *d = '\0';
 
-    return count;
+    *d = '\0';
+    return strlen(begin);
 }
 
 /**
