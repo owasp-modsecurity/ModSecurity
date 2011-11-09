@@ -31,6 +31,7 @@ typedef struct msc_script_part msc_script_part;
 struct msc_script {
     const char *name;
     apr_array_header_t *parts;
+    lua_State *Lstate;
 };
 
 struct msc_script_part {

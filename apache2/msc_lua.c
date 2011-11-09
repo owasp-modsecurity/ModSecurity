@@ -108,9 +108,7 @@ char *lua_compile(msc_script **script, const char *filename, apr_pool_t *pool) {
     (*script) = apr_pcalloc(pool, sizeof(msc_script));
     (*script)->name = filename;
     (*script)->parts = dump.parts;
-
-    /* Destroy state. */
-    lua_close(L);
+    (*script)->Lstate = L;
 
     return NULL;
 }
@@ -392,8 +390,8 @@ static const struct luaL_Reg mylib[] = {
  */
 int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rule, char **error_msg) {
     apr_time_t time_before;
-    lua_State *L = NULL;
-    int rc;
+    lua_State *L = script->Lstate;
+    int rc, lvm;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -404,10 +402,16 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
 
     time_before = apr_time_now();
 
-    /* Create new state. */
-    L = lua_open();
-
-    luaL_openlibs(L);
+    if (L == NULL) {
+        /* Create new state. */
+        L = lua_open();
+        luaL_openlibs(L);
+        lvm = 1;
+        if (L == NULL) {
+            *error_msg = apr_psprintf(msr->mp, "Lua: Failed to create Lua state");
+            return -1;
+        }
+    }
 
     /* Associate msr with the state. */
     lua_pushlightuserdata(L, (void *)msr);
@@ -450,9 +454,12 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
         *error_msg = apr_pstrdup(msr->mp, *error_msg);
     }
 
-    /* Destroy state. */
     lua_pop(L, 1);
-    lua_close(L);
+
+    /* Destroy state. */
+    if(lvm) {
+        lua_close(L);
+    }
 
     /* Returns status code to caller. */
     if (msr->txcfg->debuglog_level >= 8) {
