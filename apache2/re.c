@@ -113,9 +113,6 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
 
         if(opt != NULL) {
             name = apr_strtok(param,":",&value);
-            if(strchr(value,':') != NULL)   {
-                goto end;
-            }
         } else {
             name = param;
         }
@@ -192,9 +189,6 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
 
             if(opt != NULL) {
                 name = apr_strtok(param,":",&value);
-                if(strchr(value,':') != NULL)   {
-                    goto end;
-                }
             } else {
                 name = param;
             }
