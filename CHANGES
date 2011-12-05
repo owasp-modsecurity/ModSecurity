@@ -1,3 +1,20 @@
+06 Dec 2011 - 2.6.3-rc1
+-------------------
+
+* Fixed MATCHED_VARS does not correctly handle multiple VARS with the same name.
+
+* Fixed SDBM garbage collection was not working as expected, increasing the size of files.
+
+* Fixed wrong timestamp calculation for some time zones in log files.
+
+* Fixed SecUpdateTargetById failed to load multiple VARS (MODSEC-270).
+
+* Fixed Reverted hexDecode for hexEncode compatibility reason.
+
+* Added SecDefaultCollectionTimeout to set collection timeout, default is 3600.
+
+* Added sqlHexDecode transformation to decode sql hex data. Thanks Marc Stern.
+
 30 Sep 2011 - 2.6.2
 -------------------
 
