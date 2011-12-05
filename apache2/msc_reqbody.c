@@ -400,15 +400,10 @@ apr_status_t modsecurity_request_body_to_stream(modsec_rec *msr, const char *buf
 
         stream_input_body = (char *)realloc(msr->stream_input_data, msr->stream_input_length + 1);
 
-        if(stream_input_body == NULL)   {
-            free(msr->stream_input_data);
-            msr->stream_input_data = NULL;
-        }
-
         msr->stream_input_data = (char *)stream_input_body;
     }
 
-    if (msr->stream_input_data== NULL) {
+    if (msr->stream_input_data == NULL) {
         if(data)    {
             free(data);
             data = NULL;

@@ -119,6 +119,13 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         bucket = apr_bucket_heap_create(msr->stream_input_data, msr->stream_input_length, NULL,
                 f->r->connection->bucket_alloc);
 
+        if (msr->txcfg->stream_inbody_inspection)  {
+            if(msr->stream_input_data != NULL) {
+                free(msr->stream_input_data);
+                msr->stream_input_data = NULL;
+            }
+        }
+
         if (bucket == NULL) return APR_EGENERAL;
         APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
 
@@ -562,24 +569,6 @@ static int flatten_response_body(modsec_rec *msr) {
 
     if (msr->txcfg->stream_outbody_inspection)  {
 
-        char *stream_output_body = NULL;
-
-        if(msr->stream_output_data == NULL)
-            msr->stream_output_data = (char *)malloc(msr->resbody_length+1);
-        else    {
-            stream_output_body = (char *)realloc(msr->stream_output_data, msr->resbody_length+1);
-
-            if(stream_output_body == NULL)  {
-                free(msr->stream_output_data);
-                msr->stream_output_data = NULL;
-                msr_log(msr, 1, "Output filter: Stream Response body data memory allocation failed. Asked for: %" APR_SIZE_T_FMT,
-                    msr->stream_output_length + 1);
-                return -1;
-            }
-
-            msr->stream_output_data = (char *)stream_output_body;
-        }
-
         msr->stream_output_length = msr->resbody_length;
 
         if (msr->stream_output_data == NULL) {
@@ -825,7 +814,24 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
         /* Do we need to process a partial response? */
         if (start_skipping) {
+
+            if (msr->txcfg->stream_outbody_inspection)  {
+                if(msr->stream_output_data != NULL) {
+                    free(msr->stream_output_data);
+                    msr->stream_output_data = NULL;
+                }
+
+                msr->stream_output_data = (char *)malloc(msr->resbody_length+1);
+            }
+
             if (flatten_response_body(msr) < 0) {
+                if (msr->txcfg->stream_outbody_inspection)  {
+                    if(msr->stream_output_data != NULL) {
+                        free(msr->stream_output_data);
+                        msr->stream_output_data = NULL;
+                    }
+                }
+
                 ap_remove_output_filter(f);
                 return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
             }
@@ -885,7 +891,24 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
      * only if it hasn't been processed already.
      */
     if (msr->phase < PHASE_RESPONSE_BODY) {
+
+        if (msr->txcfg->stream_outbody_inspection)  {
+            if(msr->stream_output_data != NULL) {
+                free(msr->stream_output_data);
+                msr->stream_output_data = NULL;
+            }
+
+            msr->stream_output_data = (char *)malloc(msr->resbody_length+1);
+        }
+
         if (flatten_response_body(msr) < 0) {
+            if (msr->txcfg->stream_outbody_inspection)  {
+                if(msr->stream_output_data != NULL) {
+                    free(msr->stream_output_data);
+                    msr->stream_output_data = NULL;
+                }
+            }
+
             ap_remove_output_filter(f);
             return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -912,6 +935,14 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
             inject_content_to_of_brigade(msr,f);
             msr->of_stream_changed = 0;
         }
+
+        if (msr->txcfg->stream_outbody_inspection)  {
+            if(msr->stream_output_data != NULL) {
+                free(msr->stream_output_data);
+                msr->stream_output_data = NULL;
+            }
+        }
+
         prepend_content_to_of_brigade(msr, f);
 
         /* Inject content into response (append & buffering). */

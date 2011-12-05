@@ -456,13 +456,12 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         msr->stream_output_length = size;
 
         if(stream_output_data == NULL)  {
-            free (msr->stream_output_data);
-            msr->stream_output_data = NULL;
             return -1;
         }
 
         var->value_len = size;
         msr->of_stream_changed = 1;
+
         msr->stream_output_data = (char *)stream_output_data;
         if(msr->stream_output_data != NULL)
             apr_cpystrn(msr->stream_output_data, data, size);
@@ -476,16 +475,15 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         msr->stream_input_length = size;
 
         if(stream_input_data == NULL)  {
-            free (msr->stream_input_data);
-            msr->stream_input_data = NULL;
             return -1;
         }
 
         var->value_len = size;
+        msr->if_stream_changed = 1;
+
         msr->stream_input_data = (char *)stream_input_data;
         if(msr->stream_input_data != NULL)
             apr_cpystrn(msr->stream_input_data, data, size);
-        msr->if_stream_changed = 1;
     }
 
     if (! *error_msg) {
