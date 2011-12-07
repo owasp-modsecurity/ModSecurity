@@ -11,7 +11,7 @@
 
 * Fixed Reverted hexDecode for hexEncode compatibility reason.
 
-* Added SecDefaultCollectionTimeout to set collection timeout, default is 3600.
+* Added SecCollectionTimeout to set collection timeout, default is 3600.
 
 * Added sqlHexDecode transformation to decode sql hex data. Thanks Marc Stern.
 
