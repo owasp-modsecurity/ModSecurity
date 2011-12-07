@@ -1270,7 +1270,7 @@ static const char *cmd_collection_timeout(cmd_parms *cmd, void *_dcfg,
     /* max 30 days */
     if ((dcfg->col_timeout >= 0)&&(dcfg->col_timeout <= 2592000)) return NULL;
 
-    return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecDefaultCollectionTimeout: %s", p1);
+    return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecCollectionTimeout: %s", p1);
 }
 
 static const char *cmd_debug_log_level(cmd_parms *cmd, void *_dcfg,
@@ -2369,7 +2369,7 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_TAKE1 (
-        "SecDefaultCollectionTimeout",
+        "SecCollectionTimeout",
         cmd_collection_timeout,
         NULL,
         CMD_SCOPE_ANY,
