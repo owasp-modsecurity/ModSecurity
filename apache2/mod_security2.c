@@ -881,8 +881,7 @@ static int hook_request_late(request_rec *r) {
  * Invoked every time Apache has something to write to the error log.
  */
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-static void hook_error_log(const char *file, int line, int module_index, int level, apr_status_t status,
-        const server_rec *s, const request_rec *r, apr_pool_t *mp, const char *fmt)
+static void hook_error_log(const ap_errorlog_info *info, const char *errstr)
 #else
 static void hook_error_log(const char *file, int line, int level, apr_status_t status,
         const server_rec *s, const request_rec *r, apr_pool_t *mp, const char *fmt)
@@ -891,15 +890,33 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
     modsec_rec *msr = NULL;
     error_message *em = NULL;
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+    if (info == NULL) return;
+#endif
+
     if (r == NULL) return;
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+    msr = retrieve_tx_context((request_rec *)info->r);
+#else
     msr = retrieve_tx_context((request_rec *)r);
+#endif
 
     /* Create a context for requests we never had the chance to process */
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+    if ((msr == NULL)
+        && ((info->level & APLOG_LEVELMASK) < APLOG_DEBUG)
+        && apr_table_get(info->r->subprocess_env, "UNIQUE_ID"))
+#else
     if ((msr == NULL)
         && ((level & APLOG_LEVELMASK) < APLOG_DEBUG)
         && apr_table_get(r->subprocess_env, "UNIQUE_ID"))
+#endif
     {
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+        msr = create_tx_context((request_rec *)info->r);
+#else
         msr = create_tx_context((request_rec *)r);
+#endif
         if (msr->txcfg->debuglog_level >= 9) {
             if (msr == NULL) {
                 msr_log(msr, 9, "Failed to create context after request failure.");
@@ -916,11 +933,19 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
     em = (error_message *)apr_pcalloc(msr->mp, sizeof(error_message));
     if (em == NULL) return;
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+    if (info->file != NULL) em->file = apr_pstrdup(msr->mp, info->file);
+    em->line = info->line;
+    em->level = info->level;
+    em->status = info->status;
+    if (info->format != NULL) em->message = apr_pstrdup(msr->mp, info->format);
+#else
     if (file != NULL) em->file = apr_pstrdup(msr->mp, file);
     em->line = line;
     em->level = level;
     em->status = status;
     if (fmt != NULL) em->message = apr_pstrdup(msr->mp, fmt);
+#endif
 
     /* Remove \n from the end of the message */
     if (em->message != NULL) {
@@ -1214,7 +1239,11 @@ static int hook_connection_early(conn_rec *conn)
         if(ws_record == NULL)
             return DECLINED;
 
+#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+        apr_cpystrn(ws_record->client, conn->client_ip, sizeof(ws_record->client));
+#else
         apr_cpystrn(ws_record->client, conn->remote_ip, sizeof(ws_record->client));
+#endif
         for (i = 0; i < server_limit; ++i) {
             for (j = 0; j < thread_limit; ++j) {
 
@@ -1234,12 +1263,22 @@ static int hook_connection_early(conn_rec *conn)
 
                 switch (ws_record->status) {
                     case SERVER_BUSY_READ:
+#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+                        if (strcmp(conn->client_ip, ws_record->client) == 0)
+                            ip_count++;
+#else
                         if (strcmp(conn->remote_ip, ws_record->client) == 0)
                             ip_count++;
+#endif
                         break;
                     case SERVER_BUSY_WRITE:
+#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+                        if (strcmp(conn->client_ip, ws_record->client) == 0)
+                            ip_count_w++;
+#else
                         if (strcmp(conn->remote_ip, ws_record->client) == 0)
                             ip_count_w++;
+#endif
                         break;
                     default:
                         break;
@@ -1248,10 +1287,18 @@ static int hook_connection_early(conn_rec *conn)
         }
 
         if ((conn_read_state_limit > 0) && (ip_count > conn_read_state_limit)) {
+#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in READ state from %s - Possible DoS Consumption Attack [Rejected]", ip_count,conn_read_state_limit,conn->client_ip);
+#else
             ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in READ state from %s - Possible DoS Consumption Attack [Rejected]", ip_count,conn_read_state_limit,conn->remote_ip);
+#endif
             return OK;
         } else if ((conn_write_state_limit > 0) && (ip_count_w > conn_write_state_limit)) {
+#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in WRITE state from %s - Possible DoS Consumption Attack [Rejected]", ip_count_w,conn_write_state_limit,conn->client_ip);
+#else
             ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in WRITE state from %s - Possible DoS Consumption Attack [Rejected]", ip_count_w,conn_write_state_limit,conn->remote_ip);
+#endif
             return OK;
         } else {
             return DECLINED;
