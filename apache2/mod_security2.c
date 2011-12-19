@@ -897,9 +897,11 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
     if (info == NULL) return;
+    if (info->r == NULL) return;
+#else
+    if (r == NULL) return;
 #endif
 
-    if (r == NULL) return;
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
     msr = retrieve_tx_context((request_rec *)info->r);
 #else
