@@ -1,3 +1,12 @@
+23 Dec 2011 - 2.6.3
+-------------------
+
+* Fixed conn_rec apache API changes in httpd trunk (Thanks Steffen Land).
+
+* Fixed Error log Hook apache API changes in httpd trunk (Thanks Steffen Land).
+
+* Updated doc/ Reference_Manual
+
 06 Dec 2011 - 2.6.3-rc1
 -------------------
 
