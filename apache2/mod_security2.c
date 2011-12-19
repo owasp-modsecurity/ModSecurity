@@ -409,7 +409,7 @@ static modsec_rec *create_tx_context(request_rec *r) {
     msr->local_addr = r->connection->local_ip;
     msr->local_port = r->connection->local_addr->port;
 
-#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
     msr->remote_addr = r->connection->client_ip;
     msr->remote_port = r->connection->client_addr->port;
 #else
@@ -1233,7 +1233,7 @@ static int hook_connection_early(conn_rec *conn)
     int i, j;
     unsigned long int ip_count = 0, ip_count_w = 0;
     worker_score *ws_record = NULL;
-#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
     ap_sb_handle_t *sbh = NULL;
 #endif
 
@@ -1243,7 +1243,7 @@ static int hook_connection_early(conn_rec *conn)
         if(ws_record == NULL)
             return DECLINED;
 
-#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
         apr_cpystrn(ws_record->client, conn->client_ip, sizeof(ws_record->client));
 #else
         apr_cpystrn(ws_record->client, conn->remote_ip, sizeof(ws_record->client));
@@ -1251,7 +1251,7 @@ static int hook_connection_early(conn_rec *conn)
         for (i = 0; i < server_limit; ++i) {
             for (j = 0; j < thread_limit; ++j) {
 
-#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                 sbh = conn->sbh;
                 if (sbh == NULL)        {
                     return DECLINED;
@@ -1267,7 +1267,7 @@ static int hook_connection_early(conn_rec *conn)
 
                 switch (ws_record->status) {
                     case SERVER_BUSY_READ:
-#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                         if (strcmp(conn->client_ip, ws_record->client) == 0)
                             ip_count++;
 #else
@@ -1276,7 +1276,7 @@ static int hook_connection_early(conn_rec *conn)
 #endif
                         break;
                     case SERVER_BUSY_WRITE:
-#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                         if (strcmp(conn->client_ip, ws_record->client) == 0)
                             ip_count_w++;
 #else
@@ -1291,14 +1291,14 @@ static int hook_connection_early(conn_rec *conn)
         }
 
         if ((conn_read_state_limit > 0) && (ip_count > conn_read_state_limit)) {
-#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
             ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in READ state from %s - Possible DoS Consumption Attack [Rejected]", ip_count,conn_read_state_limit,conn->client_ip);
 #else
             ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in READ state from %s - Possible DoS Consumption Attack [Rejected]", ip_count,conn_read_state_limit,conn->remote_ip);
 #endif
             return OK;
         } else if ((conn_write_state_limit > 0) && (ip_count_w > conn_write_state_limit)) {
-#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
             ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in WRITE state from %s - Possible DoS Consumption Attack [Rejected]", ip_count_w,conn_write_state_limit,conn->client_ip);
 #else
             ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in WRITE state from %s - Possible DoS Consumption Attack [Rejected]", ip_count_w,conn_write_state_limit,conn->remote_ip);
