@@ -409,8 +409,13 @@ static modsec_rec *create_tx_context(request_rec *r) {
     msr->local_addr = r->connection->local_ip;
     msr->local_port = r->connection->local_addr->port;
 
+#if AP_SERVER_MINORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+    msr->remote_addr = r->connection->client_ip;
+    msr->remote_port = r->connection->client_addr->port;
+#else
     msr->remote_addr = r->connection->remote_ip;
     msr->remote_port = r->connection->remote_addr->port;
+#endif
 
     msr->request_line = r->the_request;
     msr->request_uri = r->uri;
