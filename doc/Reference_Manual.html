@@ -55,7 +55,7 @@ type="text/css">
 		var wgUserLanguage = "en";
 		var wgContentLanguage = "en";
 		var wgBreakFrames = false;
-		var wgCurRevisionId = 441;
+		var wgCurRevisionId = 444;
 		var wgVersion = "1.15.1";
 		var wgEnableAPI = true;
 		var wgEnableWriteAPI = true;
@@ -334,6 +334,8 @@ class="tocnumber">6.64</span> <span class="toctext">SecUploadFileMode</span></a>
 class="tocnumber">6.65</span> <span class="toctext">SecUploadKeepFiles</span></a></li>
 <li class="toclevel-2"><a href="#SecWebAppId"><span class="tocnumber">6.66</span>
  <span class="toctext">SecWebAppId</span></a></li>
+<li class="toclevel-2"><a href="#SecCollectionTimeout"><span 
+class="tocnumber">6.67</span> <span class="toctext">SecCollectionTimeout</span></a></li>
 </ul>
 </li>
 <li class="toclevel-1"><a href="#Processing_Phases"><span 
@@ -555,69 +557,71 @@ functions</span></a>
 <ul>
 <li class="toclevel-2"><a href="#base64Decode"><span class="tocnumber">9.1</span>
  <span class="toctext">base64Decode</span></a></li>
+<li class="toclevel-2"><a href="#sqlHexDecode"><span class="tocnumber">9.2</span>
+ <span class="toctext">sqlHexDecode</span></a></li>
 <li class="toclevel-2"><a href="#base64DecodeExt"><span 
-class="tocnumber">9.2</span> <span class="toctext">base64DecodeExt</span></a></li>
-<li class="toclevel-2"><a href="#base64Encode"><span class="tocnumber">9.3</span>
+class="tocnumber">9.3</span> <span class="toctext">base64DecodeExt</span></a></li>
+<li class="toclevel-2"><a href="#base64Encode"><span class="tocnumber">9.4</span>
  <span class="toctext">base64Encode</span></a></li>
-<li class="toclevel-2"><a href="#cmdLine"><span class="tocnumber">9.4</span>
+<li class="toclevel-2"><a href="#cmdLine"><span class="tocnumber">9.5</span>
  <span class="toctext">cmdLine</span></a></li>
 <li class="toclevel-2"><a href="#compressWhitespace"><span 
-class="tocnumber">9.5</span> <span class="toctext">compressWhitespace</span></a></li>
-<li class="toclevel-2"><a href="#cssDecode"><span class="tocnumber">9.6</span>
+class="tocnumber">9.6</span> <span class="toctext">compressWhitespace</span></a></li>
+<li class="toclevel-2"><a href="#cssDecode"><span class="tocnumber">9.7</span>
  <span class="toctext">cssDecode</span></a></li>
 <li class="toclevel-2"><a href="#escapeSeqDecode"><span 
-class="tocnumber">9.7</span> <span class="toctext">escapeSeqDecode</span></a></li>
-<li class="toclevel-2"><a href="#hexDecode"><span class="tocnumber">9.8</span>
+class="tocnumber">9.8</span> <span class="toctext">escapeSeqDecode</span></a></li>
+<li class="toclevel-2"><a href="#hexDecode"><span class="tocnumber">9.9</span>
  <span class="toctext">hexDecode</span></a></li>
-<li class="toclevel-2"><a href="#hexEncode"><span class="tocnumber">9.9</span>
+<li class="toclevel-2"><a href="#hexEncode"><span class="tocnumber">9.10</span>
  <span class="toctext">hexEncode</span></a></li>
 <li class="toclevel-2"><a href="#htmlEntityDecode"><span 
-class="tocnumber">9.10</span> <span class="toctext">htmlEntityDecode</span></a></li>
-<li class="toclevel-2"><a href="#jsDecode"><span class="tocnumber">9.11</span>
+class="tocnumber">9.11</span> <span class="toctext">htmlEntityDecode</span></a></li>
+<li class="toclevel-2"><a href="#jsDecode"><span class="tocnumber">9.12</span>
  <span class="toctext">jsDecode</span></a></li>
-<li class="toclevel-2"><a href="#length"><span class="tocnumber">9.12</span>
+<li class="toclevel-2"><a href="#length"><span class="tocnumber">9.13</span>
  <span class="toctext">length</span></a></li>
-<li class="toclevel-2"><a href="#lowercase"><span class="tocnumber">9.13</span>
+<li class="toclevel-2"><a href="#lowercase"><span class="tocnumber">9.14</span>
  <span class="toctext">lowercase</span></a></li>
-<li class="toclevel-2"><a href="#md5"><span class="tocnumber">9.14</span>
+<li class="toclevel-2"><a href="#md5"><span class="tocnumber">9.15</span>
  <span class="toctext">md5</span></a></li>
-<li class="toclevel-2"><a href="#none"><span class="tocnumber">9.15</span>
+<li class="toclevel-2"><a href="#none"><span class="tocnumber">9.16</span>
  <span class="toctext">none</span></a></li>
-<li class="toclevel-2"><a href="#normalisePath"><span class="tocnumber">9.16</span>
+<li class="toclevel-2"><a href="#normalisePath"><span class="tocnumber">9.17</span>
  <span class="toctext">normalisePath</span></a></li>
 <li class="toclevel-2"><a href="#normalisePathWin"><span 
-class="tocnumber">9.17</span> <span class="toctext">normalisePathWin</span></a></li>
-<li class="toclevel-2"><a href="#parityEven7bit"><span class="tocnumber">9.18</span>
+class="tocnumber">9.18</span> <span class="toctext">normalisePathWin</span></a></li>
+<li class="toclevel-2"><a href="#parityEven7bit"><span class="tocnumber">9.19</span>
  <span class="toctext">parityEven7bit</span></a></li>
-<li class="toclevel-2"><a href="#parityOdd7bit"><span class="tocnumber">9.19</span>
+<li class="toclevel-2"><a href="#parityOdd7bit"><span class="tocnumber">9.20</span>
  <span class="toctext">parityOdd7bit</span></a></li>
-<li class="toclevel-2"><a href="#parityZero7bit"><span class="tocnumber">9.20</span>
+<li class="toclevel-2"><a href="#parityZero7bit"><span class="tocnumber">9.21</span>
  <span class="toctext">parityZero7bit</span></a></li>
-<li class="toclevel-2"><a href="#removeNulls"><span class="tocnumber">9.21</span>
+<li class="toclevel-2"><a href="#removeNulls"><span class="tocnumber">9.22</span>
  <span class="toctext">removeNulls</span></a></li>
 <li class="toclevel-2"><a href="#removeWhitespace"><span 
-class="tocnumber">9.22</span> <span class="toctext">removeWhitespace</span></a></li>
+class="tocnumber">9.23</span> <span class="toctext">removeWhitespace</span></a></li>
 <li class="toclevel-2"><a href="#replaceComments"><span 
-class="tocnumber">9.23</span> <span class="toctext">replaceComments</span></a></li>
+class="tocnumber">9.24</span> <span class="toctext">replaceComments</span></a></li>
 <li class="toclevel-2"><a href="#removeCommentsChar"><span 
-class="tocnumber">9.24</span> <span class="toctext">removeCommentsChar</span></a></li>
-<li class="toclevel-2"><a href="#removeComments"><span class="tocnumber">9.25</span>
+class="tocnumber">9.25</span> <span class="toctext">removeCommentsChar</span></a></li>
+<li class="toclevel-2"><a href="#removeComments"><span class="tocnumber">9.26</span>
  <span class="toctext">removeComments</span></a></li>
-<li class="toclevel-2"><a href="#replaceNulls"><span class="tocnumber">9.26</span>
+<li class="toclevel-2"><a href="#replaceNulls"><span class="tocnumber">9.27</span>
  <span class="toctext">replaceNulls</span></a></li>
-<li class="toclevel-2"><a href="#urlDecode"><span class="tocnumber">9.27</span>
+<li class="toclevel-2"><a href="#urlDecode"><span class="tocnumber">9.28</span>
  <span class="toctext">urlDecode</span></a></li>
-<li class="toclevel-2"><a href="#urlDecodeUni"><span class="tocnumber">9.28</span>
+<li class="toclevel-2"><a href="#urlDecodeUni"><span class="tocnumber">9.29</span>
  <span class="toctext">urlDecodeUni</span></a></li>
-<li class="toclevel-2"><a href="#urlEncode"><span class="tocnumber">9.29</span>
+<li class="toclevel-2"><a href="#urlEncode"><span class="tocnumber">9.30</span>
  <span class="toctext">urlEncode</span></a></li>
-<li class="toclevel-2"><a href="#sha1"><span class="tocnumber">9.30</span>
+<li class="toclevel-2"><a href="#sha1"><span class="tocnumber">9.31</span>
  <span class="toctext">sha1</span></a></li>
-<li class="toclevel-2"><a href="#trimLeft"><span class="tocnumber">9.31</span>
+<li class="toclevel-2"><a href="#trimLeft"><span class="tocnumber">9.32</span>
  <span class="toctext">trimLeft</span></a></li>
-<li class="toclevel-2"><a href="#trimRight"><span class="tocnumber">9.32</span>
+<li class="toclevel-2"><a href="#trimRight"><span class="tocnumber">9.33</span>
  <span class="toctext">trimRight</span></a></li>
-<li class="toclevel-2"><a href="#trim"><span class="tocnumber">9.33</span>
+<li class="toclevel-2"><a href="#trim"><span class="tocnumber">9.34</span>
  <span class="toctext">trim</span></a></li>
 </ul>
 </li>
@@ -1357,6 +1361,7 @@ chmod). See SecAuditLogDirMode for controlling the mode of created audit
  log directories.
 </p><p><b>Syntax:</b> <code>SecAuditLogFileMode octal_mode|"default"</code>
  
+</p><p><b>Default:</b> 0600
 </p><p><b>Scope:</b> Any 
 </p><p><b>Version:</b> 2.5.10
 </p><p><b>Example Usage:</b> <code>SecAuditLogFileMode 00640</code> 
@@ -2614,6 +2619,17 @@ SecWebAppId "App2" ...
 in conjunction with the Apache VirtualHost directives. Applications 
 namespace information is also recorded in the audit logs (using the 
 WebApp-Info header of the H part).
+</p><p>This directive is used to set collections timeout. For example:
+</p>
+<pre>SecCollectionTimeout 500</pre>
+<a name="SecCollectionTimeout" id="SecCollectionTimeout"></a><h2> <span 
+class="mw-headline"> SecCollectionTimeout </span></h2>
+<p><b>Description:</b> Specifies the collections timeout. Default is 
+3600 seconds.
+</p><p><b>Syntax:</b> <code>SecCollectionTimeout seconds</code>
+</p><p><b>Default:</b> 3600 
+</p><p><b>Scope:</b> Any
+</p><p><b>Version:</b> 2.6.3
 </p>
 <a name="Processing_Phases" id="Processing_Phases"></a><h1> <span 
 class="mw-headline"> Processing Phases </span></h1>
@@ -3722,6 +3738,11 @@ class="mw-headline"> base64Decode </span></h2>
   SecRule TX:1 ^(\w+): t:base64Decode,capture,chain
     SecRule TX:1 ^(admin|root|backup)$ 
 </pre>
+<a name="sqlHexDecode" id="sqlHexDecode"></a><h2> <span 
+class="mw-headline"> sqlHexDecode </span></h2>
+<p>Decode sql hex data. Example (0x414243) will be decoded to (ABC). 
+Available as of 2.6.3
+</p>
 <a name="base64DecodeExt" id="base64DecodeExt"></a><h2> <span 
 class="mw-headline"> base64DecodeExt </span></h2>
 <p>Decodes a Base64-encoded string. Unlike base64Decode, this version 
@@ -5794,13 +5815,13 @@ SecCookieFormat 0
 
 <!-- 
 NewPP limit report
-Preprocessor node count: 718/1000000
+Preprocessor node count: 723/1000000
 Post-expand include size: 0/2097152 bytes
 Template argument size: 0/2097152 bytes
 Expensive parser function count: 0/100
 -->
 
-<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20110930150653 -->
+<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20111219124748 -->
 <div class="printfooter">
 Retrieved from "<a 
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual">http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual</a>"</div>
@@ -5910,7 +5931,7 @@ pages</a></li>
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;printable=yes&amp;printable=yes"
  rel="alternate" title="Printable version of this page [alt-shift-p]" 
 accesskey="p">Printable version</a></li>				<li id="t-permalink"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=441"
+href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=444"
  title="Permanent link to this revision of the page">Permanent link</a></li>
 			</ul>
 		</div>
@@ -5922,15 +5943,15 @@ href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Referen
 src="Reference_Manual_files/poweredby_mediawiki_88x31.png" alt="Powered 
 by MediaWiki"></a></div>
 			<ul id="f-list">
-					<li id="lastmod"> This page was last modified on 30 September 2011,
- at 15:04.</li>
-					<li id="viewcount">This page has been accessed 55,206 times.</li>
+					<li id="lastmod"> This page was last modified on 19 December 2011, 
+at 12:16.</li>
+					<li id="viewcount">This page has been accessed 77,761 times.</li>
 			</ul>
 		</div>
 </div>
 
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
-<!-- Served in 1.178 secs. -->
+<!-- Served in 1.177 secs. -->
     
     
     <script type="text/javascript">
