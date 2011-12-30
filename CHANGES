@@ -29,7 +29,7 @@
 
  * Added new transformations removeComments and removeCommentsChars
 
- * Fixed colletion names are not case-sensitive anymore.
+ * Fixed collection names are not case-sensitive anymore.
 
  * Fixed compilation errors with apache 2.0.
 
