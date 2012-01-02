@@ -81,7 +81,7 @@ char DSOLOCAL *log_escape_raw(apr_pool_t *mp, const unsigned char *text, unsigne
 
 char DSOLOCAL *log_escape_nul(apr_pool_t *mp, const unsigned char *text, unsigned long int text_length);
 
-int DSOLOCAL decode_base64_ext(char *plain_text, const char *input, int input_len);
+int DSOLOCAL decode_base64_ext(char *plain_text, const unsigned char *input, int input_len);
 
 int DSOLOCAL convert_to_int(const char c);
 
