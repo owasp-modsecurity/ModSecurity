@@ -92,7 +92,7 @@ for my $audit (@AUDIT) {
 			next;
 		};
 		if ($sect eq 'A') {
-			if ($line =~ m%^(\[[-\d/: a-zA-Z]{27}\]) (\S+) (\S+) (\d+) (\S+) (\d+)%) { 
+            if ($line =~ m%^(\[[^:]+:\d+:\d+:\d+ [^\]]+\]) (\S+) (\S+) (\d+) (\S+) (\d+)%) {
 				$data{logtime} = $1;
 				$data{uniqueid} = $2;
 				$data{remote_addr} = $3;
