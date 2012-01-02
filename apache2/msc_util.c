@@ -183,8 +183,7 @@ int decode_base64_ext(char *plain_text, const char *input, int input_len)
  *
  * \retval n The converted number
  */
-int convert_to_int(const char c)
-{
+int convert_to_int(const char c)    {
     int n;
     if ((c>='0') && (c<='9'))
         n = c - '0';
@@ -224,14 +223,6 @@ int set_match_to_tx(modsec_rec *msr, int capture, const char *match, int tx_n)  
             msr_log(msr, 9, "Added phrase match to TX.%d: %s",
                     tx_n, log_escape_nq_ex(msr->mp, s->value, s->value_len));
         }
-
-        /*
-           for(i = 0; i <= 9; i++) {
-           char buf[2];
-           apr_snprintf(buf, sizeof(buf), "%d", i);
-           apr_table_unset(msr->tx_vars, buf);
-           }
-         */
     }
 
     return 0;
