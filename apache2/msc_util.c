@@ -121,9 +121,9 @@ int parse_boolean(const char *input) {
  * \retval 0 On failure
  * \retval string length On Success
  */
-int decode_base64_ext(char *plain_text, const char *input, int input_len)
+int decode_base64_ext(char *plain_text, const unsigned char *input, int input_len)
 {
-    const char *encoded = input;
+    const unsigned char *encoded = input;
     int i = 0, j = 0, k = 0;
     int ch = 0;
 
