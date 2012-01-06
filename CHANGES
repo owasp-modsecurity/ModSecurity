@@ -241,7 +241,7 @@
    importantly, override server configuration in <Location> and others.
    (MODSEC-98) [Ivan Ristic]
 
- * Renamed the sanitise family of actiont to sanitize. Kept the old variants
+ * Renamed the sanitise family of actions to sanitize. Kept the old variants
    for backward compatibility. (MODSEC-95) [Ivan Ristic]
 
  * Improve the logging of the ctl action. (MODSEC-99) [Ivan Ristic]
