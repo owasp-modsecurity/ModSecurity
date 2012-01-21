@@ -458,6 +458,8 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
             return -1;
         }
 
+        memset(stream_output_data, 0x00, size+1);
+
         var->value_len = size;
         msr->of_stream_changed = 1;
 
@@ -476,6 +478,8 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         if(stream_input_data == NULL)  {
             return -1;
         }
+
+        memset(stream_input_data, 0x00, size+1);
 
         var->value_len = size;
         msr->if_stream_changed = 1;
