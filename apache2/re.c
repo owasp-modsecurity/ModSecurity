@@ -1785,8 +1785,9 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
         var->value_len = strlen(actionset->logdata);
         expand_macros(msr, var, NULL, msr->mp);
 
-        logdata = apr_psprintf(msr->mp, " [data \"%s\"]",
+        logdata = apr_psprintf(msr->mp, " [data \"%s",
                 log_escape_hex(msr->mp, (unsigned char *)var->value, var->value_len));
+        logdata = apr_pstrcat(msr->mp, logdata, "\"]", NULL);
 
         /* If it is > 512 bytes, then truncate at 512 with ellipsis.
          * NOTE: 512 actual data + 9 bytes of label = 521
