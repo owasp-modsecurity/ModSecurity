@@ -449,48 +449,54 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
 
     if(msr->stream_output_data != NULL && output_body == 1) {
 
-        char *stream_output_data = NULL;
+        memset(msr->stream_output_data, 0x0, msr->stream_output_length);
+        free(msr->stream_output_data);
+        msr->stream_output_data = NULL;
+        msr->stream_output_length = 0;
 
-        stream_output_data = (char *)realloc(msr->stream_output_data, size+1);
-        msr->stream_output_length = size;
+        msr->stream_output_data = (char *)malloc(size+1);
 
-        if(stream_output_data == NULL)  {
+        if(msr->stream_output_data == NULL)  {
             return -1;
         }
 
-        memset(stream_output_data, 0x00, size+1);
+        msr->stream_output_length = size;
+        memset(msr->stream_output_data, 0x0, size+1);
 
-        var->value_len = size;
         msr->of_stream_changed = 1;
 
-        msr->stream_output_data = (char *)stream_output_data;
-        if(msr->stream_output_data != NULL) {
-            strncpy(msr->stream_output_data, data, size);
-            msr->stream_output_data[size] = '\0';
-        }
+        strncpy(msr->stream_output_data, data, size);
+        msr->stream_output_data[size] = '\0';
+
+        var->value_len = size;
+        var->value = apr_pstrmemdup(msr->mp, msr->stream_output_data, size);
 
     }
 
     if(msr->stream_input_data != NULL && input_body == 1) {
-        char *stream_input_data = NULL;
 
-        stream_input_data = (char *)realloc(msr->stream_input_data, size+1);
-        msr->stream_input_length = size;
+        memset(msr->stream_input_data, 0x0, msr->stream_input_length);
+        free(msr->stream_input_data);
+        msr->stream_input_data = NULL;
+        msr->stream_input_length = 0;
 
-        if(stream_input_data == NULL)  {
+        msr->stream_input_data = (char *)malloc(size+1);
+
+        if(msr->stream_input_data == NULL)  {
             return -1;
         }
 
-        memset(stream_input_data, 0x00, size+1);
+        msr->stream_input_length = size;
+        memset(msr->stream_input_data, 0x0, size+1);
 
-        var->value_len = size;
         msr->if_stream_changed = 1;
 
-        msr->stream_input_data = (char *)stream_input_data;
-        if(msr->stream_input_data != NULL)  {
-            strncpy(msr->stream_input_data, data, size);
-            msr->stream_input_data[size] = '\0';
-        }
+        strncpy(msr->stream_input_data, data, size);
+        msr->stream_input_data[size] = '\0';
+
+        var->value_len = size;
+        var->value = apr_pstrmemdup(msr->mp, msr->stream_input_data, size);
+
     }
 
     if (! *error_msg) {
