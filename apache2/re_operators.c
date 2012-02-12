@@ -469,7 +469,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         msr->stream_output_data[size] = '\0';
 
         var->value_len = size;
-        var->value = apr_pstrmemdup(msr->mp, msr->stream_output_data, size);
+        var->value = msr->stream_output_data;
 
     }
 
@@ -495,7 +495,7 @@ static int msre_op_rsub_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         msr->stream_input_data[size] = '\0';
 
         var->value_len = size;
-        var->value = apr_pstrmemdup(msr->mp, msr->stream_input_data, size);
+        var->value = msr->stream_input_data;
 
     }
 
