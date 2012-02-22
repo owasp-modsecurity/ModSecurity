@@ -2265,6 +2265,10 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     int rc;
     int is_cc = 0;
     int offset;
+    int matched_bytes = 0;
+    char *qspos = NULL;
+    const char *parm = NULL;
+    msc_parm *mparm = NULL;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -2331,6 +2335,8 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
              * and we are done.
              */
 
+            matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
+
             if (apr_table_get(rule->actionset->actions, "capture")) {
                 for(; i < rc; i++) {
                     msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
@@ -2347,6 +2353,30 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
                         msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
                                 log_escape_nq_ex(msr->mp, s->value, s->value_len));
                     }
+
+                    if((matched_bytes == 1) && (var != NULL) && (var->name != NULL))    {
+                        qspos = apr_psprintf(msr->mp, "%s", var->name);
+                        parm = strstr(qspos, ":");
+                        if (parm != NULL)   {
+                            parm++;
+                            mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                            if (mparm == NULL)
+                                continue;
+
+                            mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                            mparm->pad_1 = rule->actionset->arg_min;
+                            mparm->pad_2 = rule->actionset->arg_max;
+                            apr_table_addn(msr->pattern_to_sanitize, parm, (void *)mparm);
+                        } else  {
+                            mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                            if (mparm == NULL)
+                                continue;
+
+                            mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                            apr_table_addn(msr->pattern_to_sanitize, qspos, (void *)mparm);
+                        }
+                    }
+
                 }
             }
 
@@ -2514,6 +2544,11 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     int rc;
     int is_cpf = 0;
     int offset;
+    int matched_bytes = 0;
+    char *qspos = NULL;
+    const char *parm = NULL;
+    msc_parm *mparm = NULL;
+
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -2580,6 +2615,8 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
              * and we are done.
              */
 
+            matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
+
             if (apr_table_get(rule->actionset->actions, "capture")) {
                 for(; i < rc; i++) {
                     msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
@@ -2596,6 +2633,30 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                         msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
                             log_escape_nq_ex(msr->mp, s->value, s->value_len));
                     }
+
+                    if((matched_bytes == 1) && (var != NULL) && (var->name != NULL))    {
+                        qspos = apr_psprintf(msr->mp, "%s", var->name);
+                        parm = strstr(qspos, ":");
+                        if (parm != NULL)   {
+                            parm++;
+                            mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                            if (mparm == NULL)
+                                continue;
+
+                            mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                            mparm->pad_1 = rule->actionset->arg_min;
+                            mparm->pad_2 = rule->actionset->arg_max;
+                            apr_table_addn(msr->pattern_to_sanitize, parm, (void *)mparm);
+                        } else  {
+                            mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                            if (mparm == NULL)
+                                continue;
+
+                            mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                            apr_table_addn(msr->pattern_to_sanitize, qspos, (void *)mparm);
+                        }
+                    }
+
                 }
             }
 
@@ -2753,6 +2814,10 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     int rc;
     int is_ssn = 0;
     int offset;
+    int matched_bytes = 0;
+    char *qspos = NULL;
+    const char *parm = NULL;
+    msc_parm *mparm = NULL;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -2819,6 +2884,8 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
              * and we are done.
              */
 
+            matched_bytes = apr_table_get(rule->actionset->actions, "sanitizeMatchedBytes") ? 1 : 0;
+
             if (apr_table_get(rule->actionset->actions, "capture")) {
                 for(; i < rc; i++) {
                     msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
@@ -2835,6 +2902,30 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                         msr_log(msr, 9, "Added regex subexpression to TX.%d: %s", i,
                             log_escape_nq_ex(msr->mp, s->value, s->value_len));
                     }
+
+                    if((matched_bytes == 1) && (var != NULL) && (var->name != NULL))    {
+                        qspos = apr_psprintf(msr->mp, "%s", var->name);
+                        parm = strstr(qspos, ":");
+                        if (parm != NULL)   {
+                            parm++;
+                            mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                            if (mparm == NULL)
+                                continue;
+
+                            mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                            mparm->pad_1 = rule->actionset->arg_min;
+                            mparm->pad_2 = rule->actionset->arg_max;
+                            apr_table_addn(msr->pattern_to_sanitize, parm, (void *)mparm);
+                        } else  {
+                            mparm = apr_palloc(msr->mp, sizeof(msc_parm));
+                            if (mparm == NULL)
+                                continue;
+
+                            mparm->value = apr_pstrmemdup(msr->mp,s->value,s->value_len);
+                            apr_table_addn(msr->pattern_to_sanitize, qspos, (void *)mparm);
+                        }
+                    }
+
                 }
             }
 

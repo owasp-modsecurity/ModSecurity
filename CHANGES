@@ -1,3 +1,14 @@
+23 Feb 2012 - 2.6.4-rc1
+-------------------
+
+ * Fixed @rsub adding garbage data into stream variables.
+
+ * Fixed regex for section A into mlogc-batch-load.pl (Thanks Ebrahim Khalilzadeh).
+
+ * Fixed logdata cuts message without closing it with final chars.
+
+ * Added sanitizeMatchedBytes support to verifyCPF, verifyCC and verifySSN.
+
 23 Dec 2011 - 2.6.3
 -------------------
 
