@@ -437,7 +437,7 @@ int sql_hex2bytes_inplace(unsigned char *data, int len) {
     }
 
     *d = '\0';
-    return strlen(begin);
+    return strlen((char *)begin);
 }
 
 /**
