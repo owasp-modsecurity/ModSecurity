@@ -337,16 +337,15 @@ static int msre_fn_removeComments_execute(apr_pool_t *mptmp, unsigned char *inpu
                 changed = 1;
                 incomment = 1;
                 i += 2;
-            } else if ((input[i] == '-')&&(i + 1 < input_len)&&(input[i + 1] == '-')) {
+            } else if ((input[i] == '-')&&(i + 1 < input_len)&&(input[i + 1] == '-')
+                        && (incomment == 0)) {
                 changed = 1;
                 input[i] = ' ';
                 break;
-                i += 2;
-            } else if (input[i] == '#') {
+            } else if (input[i] == '#' && (incomment == 0)) {
                 changed = 1;
                 input[i] = ' ';
-               break;
-                i++;
+                break;
             } else {
                 input[j] = input[i];
                 i++;
