@@ -422,11 +422,12 @@ static int read_queue_entries(apr_file_t *fd, apr_time_t *queue_time)
     char linebuf[4100];
     int line_count = -1;
     int line_size = 0;
+    apr_status_t rc = 0;
+    char *p = NULL;
 
     for(;;) {
         memset(linebuf, 0, 4100);
-        apr_status_t rc = apr_file_gets(linebuf, 4096, fd);
-        char *p;
+        rc = apr_file_gets(linebuf, 4096, fd);
 
         if (rc == APR_EOF) break;
         if (rc != APR_SUCCESS) {
