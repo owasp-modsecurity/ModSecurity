@@ -237,17 +237,24 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
         p = apr_strtok(NULL,",",&savedptr);
     }
 
-    curr_targets = msre_generate_target_string(ruleset->mp, rule);
-
-    rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, curr_targets, NULL, NULL);
+    if(match == 0)  {
+        curr_targets = msre_generate_target_string(ruleset->mp, rule);
+        rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, curr_targets, NULL, NULL);
+    }
 
 end:
-    if(target_list != NULL)
+    if(target_list != NULL) {
         free(target_list);
-    if(replace != NULL)
+        target_list = NULL;
+    }
+    if(replace != NULL) {
         free(replace);
-    if(target != NULL)
+        replace = NULL;
+    }
+    if(target != NULL)  {
         free(target);
+        target = NULL;
+    }
     return NULL;
 }
 

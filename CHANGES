@@ -5,6 +5,8 @@
 
  * Fixed ModSecurity cannot load session and user sdbm data.
 
+ * Fixed updateTargetById was creating rule unparsed content making apache memory grow.
+
  * Code cleanup.
 
 23 Feb 2012 - 2.6.4-rc1
