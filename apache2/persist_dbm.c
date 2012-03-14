@@ -110,8 +110,10 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
 
     dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);
 
-    msr_log(msr, 1, "collection_retrieve_ex: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, col_name),
-             log_escape(msr->mp, dbm_filename));
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "collection_retrieve_ex: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, col_name),
+                log_escape(msr->mp, dbm_filename));
+    }
 
     key.dptr = (char *)col_key;
     key.dsize = col_key_len + 1;
@@ -353,8 +355,10 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     // ENH: lowercase the var name in the filename
     dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", var_name->value, NULL);
 
-    msr_log(msr, 1, "collection_store: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, var_name->value),
-            log_escape(msr->mp, dbm_filename));
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "collection_store: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, var_name->value),
+                log_escape(msr->mp, dbm_filename));
+    }
 
     /* Delete IS_NEW on store. */
     apr_table_unset(col, "IS_NEW");
@@ -587,14 +591,16 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     else
         dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);
 
-    msr_log(msr, 1, "collections_remove_stale: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, col_name),
-             log_escape(msr->mp, dbm_filename));
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 1, "collections_remove_stale: Retrieving collection (name \"%s\", filename \"%s\")",log_escape(msr->mp, col_name),
+                log_escape(msr->mp, dbm_filename));
+    }
 
     rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
-        CREATEMODE, msr->mp);
+            CREATEMODE, msr->mp);
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
-            get_apr_error(msr->mp, rc));
+                get_apr_error(msr->mp, rc));
         dbm = NULL;
         goto error;
     }
