@@ -14,6 +14,14 @@
 
 #include "msc_gsb.h"
 
+/** \brief Load GSB database
+ *
+ * \param dcfg Pointer to directory configuration
+ * \param error_msg Error message
+ *
+ * \retval 1 On Success
+ * \retval 0 On Fail
+ */
 static int gsb_db_create(directory_config *dcfg, char **error_msg)
 {
     char errstr[1024];
@@ -89,8 +97,14 @@ static int gsb_db_create(directory_config *dcfg, char **error_msg)
 }
 
 
-/**
- * Initialise Gsb malware data structure
+/** \brief Init GSB database
+ *
+ * \param dcfg Pointer to directory configuration
+ * \param dbfn Database filename
+ * \param error_msg Error message
+ *
+ * \retval gsb_db_create On Success
+ * \retval -1 On Fail
  */
 int gsb_db_init(directory_config *dcfg, const char *dbfn, char **error_msg)
 {

@@ -675,6 +675,14 @@ static int var_webserver_error_log_generate(modsec_rec *msr, msre_var *var, msre
     return count;
 }
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+static int var_useragent_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return var_simple_generate(var, vartab, mptmp, msr->useragent_ip ? msr->useragent_ip : "0.0.0.0");
+}
+#endif
+
 /* REMOTE_ADDR */
 
 static int var_remote_addr_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -1613,6 +1621,50 @@ static int var_perf_logging_generate(modsec_rec *msr, msre_var *var, msre_rule *
     return generate_performance_variable(msr, var, rule, vartab, mptmp, msr->time_logging);
 }
 
+
+/* PERF_RULES */
+
+static int var_perf_rules_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+        apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    const apr_array_header_t *arr = NULL;
+    const apr_table_entry_t *te = NULL;
+    int i, count = 0;
+
+    arr = apr_table_elts(msr->perf_rules);
+    te = (apr_table_entry_t *)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        int match = 0;
+
+        /* Figure out if we want to include this variable. */
+        if (var->param == NULL) match = 1;
+        else {
+            if (var->param_data != NULL) { /* Regex. */
+                char *my_error_msg = NULL;
+                if (!(msc_regexec((msc_regex_t *)var->param_data, te[i].key,
+                                strlen(te[i].key), &my_error_msg) == PCRE_ERROR_NOMATCH)) match = 1;
+            } else { /* Simple comparison. */
+                if (strcasecmp(te[i].key, var->param) == 0) match = 1;
+            }
+        }
+
+        /* If we had a match add this argument to the collection. */
+        if (match) {
+            msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+
+            rvar->value = te[i].val;
+            rvar->value_len = strlen(rvar->value);
+            rvar->name = apr_psprintf(mptmp, "PERF_RULES:%s",
+                log_escape_nq(mptmp, te[i].key));
+            apr_table_addn(vartab, rvar->name, (void *)rvar);
+
+            count++;
+        }
+    }
+
+    return count;
+}
+
 /* DURATION */
 
 static int var_duration_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -1622,9 +1674,8 @@ static int var_duration_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
 
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
     rvar->value = apr_psprintf(mptmp, "%" APR_TIME_T_FMT,
-        (apr_time_msec(apr_time_now() - msr->r->request_time)));
+        (apr_time_usec(apr_time_now() - msr->r->request_time)));
     rvar->value_len = strlen(rvar->value);
-    
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
     return 1;
@@ -1875,7 +1926,7 @@ static int var_matched_vars_names_generate(modsec_rec *msr, msre_var *var, msre_
 
             rvar->value = apr_pstrndup(mptmp, str->name, strlen(str->name));
             rvar->value_len = strlen(rvar->value);
-            rvar->name = apr_psprintf(mptmp, "MATCHED_VARS_NAMES:%s",
+            rvar->name = apr_psprintf(mptmp, "%s",
                     log_escape_nq(mptmp, str->name));
 
             if(var->is_counting == 0)
@@ -1891,7 +1942,7 @@ static int var_matched_vars_names_generate(modsec_rec *msr, msre_var *var, msre_
             apr_table_addn(vartab, rvar->name, (void *)rvar);
 
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Set variable \"%s\" value \"%s\" size %d to collection.", rvar->name, rvar->value, rvar->value_len);
+                msr_log(msr, 9, "Set variable \"%s\" size %d to collection.", rvar->name,rvar->value_len);
             }
 
             count++;
@@ -1935,7 +1986,7 @@ static int var_matched_vars_generate(modsec_rec *msr, msre_var *var, msre_rule *
 
             rvar->value = apr_pstrndup(mptmp, str->value, str->value_len);
             rvar->value_len = str->value_len;
-            rvar->name = apr_psprintf(mptmp, "MATCHED_VARS:%s",
+            rvar->name = apr_psprintf(mptmp, "%s",
                     log_escape_nq(mptmp, str->name));
 
             if(var->is_counting == 0)
@@ -2913,6 +2964,19 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_REQUEST_HEADERS
     );
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
+    /* USERAGENT_IP */
+    msre_engine_variable_register(engine,
+        "USERAGENT_IP",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_useragent_ip_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+#endif
+
     /* REMOTE_ADDR */
     msre_engine_variable_register(engine,
         "REMOTE_ADDR",
@@ -3508,7 +3572,18 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_DONT_CACHE, /* dynamic */
         PHASE_RESPONSE_HEADERS
     );
-    
+
+    /* PERF_RULES */
+    msre_engine_variable_register(engine,
+        "PERF_RULES",
+        VAR_LIST,
+        0, 1,
+        var_generic_list_validate,
+        var_perf_rules_generate,
+        VAR_DONT_CACHE,
+        PHASE_REQUEST_HEADERS
+    );
+
     /* PERF_ALL */
     msre_engine_variable_register(engine,
         "PERF_ALL",
@@ -3519,7 +3594,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
-    
+
     /* PERF_COMBINED */
     msre_engine_variable_register(engine,
         "PERF_COMBINED",
@@ -3530,7 +3605,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
-    
+
     /* PERF_GC */
     msre_engine_variable_register(engine,
         "PERF_GC",
@@ -3541,7 +3616,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
-    
+
     /* PERF_LOGGING */
     msre_engine_variable_register(engine,
         "PERF_LOGGING",
@@ -3552,7 +3627,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
-    
+
     /* PERF_PHASE1 */
     msre_engine_variable_register(engine,
         "PERF_PHASE1",
@@ -3563,7 +3638,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
-    
+
     /* PERF_PHASE2 */
     msre_engine_variable_register(engine,
         "PERF_PHASE2",
@@ -3574,7 +3649,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
-    
+
     /* PERF_PHASE3 */
     msre_engine_variable_register(engine,
         "PERF_PHASE3",
@@ -3585,7 +3660,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
-    
+
     /* PERF_PHASE4 */
     msre_engine_variable_register(engine,
         "PERF_PHASE4",
@@ -3596,7 +3671,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
-    
+
     /* PERF_PHASE5 */
     msre_engine_variable_register(engine,
         "PERF_PHASE5",
@@ -3607,7 +3682,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
-    
+
     /* PERF_SREAD */
     msre_engine_variable_register(engine,
         "PERF_SREAD",
@@ -3618,7 +3693,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
-    
+
     /* PERF_SWRITE */
     msre_engine_variable_register(engine,
         "PERF_SWRITE",
@@ -3629,7 +3704,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_DONT_CACHE,
         PHASE_REQUEST_HEADERS
     );
-    
+
     /* DURATION */
     msre_engine_variable_register(engine,
         "DURATION",

@@ -1050,6 +1050,41 @@ void sec_audit_logger(modsec_rec *msr) {
                 msr->userid == NULL ? "-" : log_escape(msr->mp, msr->userid));
             sec_auditlog_write(msr, text, strlen(text));
         }
+
+        if ( ((msr->txcfg->sensor_id != NULL)&&(strcmp(msr->txcfg->sensor_id, "default") != 0)))
+        {
+            text = apr_psprintf(msr->mp, "Sensor-Id: \"%s\"\n",
+                msr->txcfg->sensor_id == NULL ? "-" : log_escape(msr->mp, msr->txcfg->sensor_id)),
+            sec_auditlog_write(msr, text, strlen(text));
+        }
+
+
+        if (msr->txcfg->is_enabled > 0) {
+            text = apr_psprintf(msr->mp, "Engine-Mode: \"%s\"\n",
+                msr->txcfg->is_enabled == 1 ? "DETECTION_ONLY" : "ENABLED"),
+            sec_auditlog_write(msr, text, strlen(text));
+        }
+
+        /* Rule performance time */
+        if(msr->txcfg->max_rule_time > 0)   {
+            const apr_array_header_t *tarr;
+            const apr_table_entry_t *telts;
+
+            tarr = apr_table_elts(msr->perf_rules);
+            telts = (const apr_table_entry_t*)tarr->elts;
+
+            if (tarr->nelts > 0) {
+                text = apr_psprintf(msr->mp, "Rules-Performance-Info: ");
+                sec_auditlog_write(msr, text, strlen(text));
+            }
+
+            for(i = 0; i < tarr->nelts; i++) {
+                text = apr_psprintf(msr->mp, "%s\"%s=%s\"%s", ((i == 0) ? "" : ", "),
+                    log_escape(msr->mp, telts[i].key), log_escape(msr->mp, telts[i].val), ((i == (tarr->nelts - 1)) ? ".\n" : ""));
+                sec_auditlog_write(msr, text, strlen(text));
+            }
+        }
+
     }
 
     /* AUDITLOG_PART_UPLOADS */

@@ -33,6 +33,11 @@
 
 #include "apr_version.h"
 
+#if defined(WITH_LUA)
+#include "msc_lua.h"
+#endif
+
+
 /* ModSecurity structure */
 
 msc_engine DSOLOCAL *modsecurity = NULL;
@@ -68,7 +73,7 @@ typedef struct {
 
 /* -- Miscellaneous functions -- */
 
-/*
+/**
 * \brief Print informations from used libraries
 *
 * \param mp Pointer to memory pool
@@ -114,6 +119,7 @@ int perform_interception(modsec_rec *msr) {
     msre_actionset *actionset = NULL;
     const char *message = NULL;
     const char *phase_text = "";
+    unsigned int pause = 0;
     int status = DECLINED;
     int log_level = 1;
 
@@ -142,11 +148,31 @@ int perform_interception(modsec_rec *msr) {
     log_level = (actionset->log != 1) ? 4 : 1;
 
     /* Pause the request first (if configured and the initial request). */
-    if (actionset->intercept_pause) {
-        msr_log(msr, (log_level > 3 ? log_level : log_level + 1), "Pausing transaction for "
-            "%d msec.", actionset->intercept_pause);
-        /* apr_sleep accepts microseconds */
-        apr_sleep((apr_interval_time_t)(actionset->intercept_pause * 1000));
+    if (actionset->intercept_pause != NULL) {
+        if(strstr(actionset->intercept_pause,"%{") != NULL) {
+            msc_string *var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+
+            var->value = (char *)actionset->intercept_pause;
+            var->value_len = strlen(actionset->intercept_pause);
+            expand_macros(msr, var, NULL, msr->mp);
+
+            pause = atoi(var->value);
+            if ((pause == LONG_MAX)||(pause == LONG_MIN)||(pause <= 0))
+                pause = 0;
+
+            msr_log(msr, (log_level > 3 ? log_level : log_level + 1), "Pausing transaction for "
+                    "%d msec.", pause);
+            /* apr_sleep accepts microseconds */
+            apr_sleep((apr_interval_time_t)(pause * 1000));
+        } else {
+            pause = atoi(actionset->intercept_pause);
+            if ((pause == LONG_MAX)||(pause == LONG_MIN)||(pause <= 0))
+                pause = 0;
+            msr_log(msr, (log_level > 3 ? log_level : log_level + 1), "Pausing transaction for "
+                    "%d msec.", pause);
+            /* apr_sleep accepts microseconds */
+            apr_sleep((apr_interval_time_t)(pause * 1000));
+        }
     }
 
     /* Determine how to respond and prepare the log message. */
@@ -155,13 +181,13 @@ int perform_interception(modsec_rec *msr) {
             if (actionset->intercept_status != 0) {
                 status = actionset->intercept_status;
                 message = apr_psprintf(msr->mp, "Access denied with code %d%s.",
-                    status, phase_text);
+                        status, phase_text);
             } else {
                 log_level = 1;
                 status = HTTP_INTERNAL_SERVER_ERROR;
                 message = apr_psprintf(msr->mp, "Access denied with code 500%s "
-                    "(Internal Error: Invalid status code requested %d).",
-                    phase_text, actionset->intercept_status);
+                        "(Internal Error: Invalid status code requested %d).",
+                        phase_text, actionset->intercept_status);
             }
             break;
 
@@ -233,18 +259,39 @@ int perform_interception(modsec_rec *msr) {
             break;
 
         case ACTION_REDIRECT :
-            apr_table_setn(msr->r->headers_out, "Location", actionset->intercept_uri);
-            if ((actionset->intercept_status == 301)||(actionset->intercept_status == 302)
-                ||(actionset->intercept_status == 303)||(actionset->intercept_status == 307))
-            {
-                status = actionset->intercept_status;
+            if(strstr(actionset->intercept_uri,"%{") != NULL) {
+                msc_string *var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+
+                var->value = (char *)actionset->intercept_uri;
+                var->value_len = strlen(actionset->intercept_uri);
+                expand_macros(msr, var, NULL, msr->mp);
+
+                apr_table_setn(msr->r->headers_out, "Location", var->value);
+                if ((actionset->intercept_status == 301)||(actionset->intercept_status == 302)
+                        ||(actionset->intercept_status == 303)||(actionset->intercept_status == 307))
+                {
+                    status = actionset->intercept_status;
+                } else {
+                    status = HTTP_MOVED_TEMPORARILY;
+                }
+                message = apr_psprintf(msr->mp, "Access denied with redirection to %s using "
+                        "status %d%s.",
+                        log_escape_nq(msr->mp, var->value), status,
+                        phase_text);
             } else {
-                status = HTTP_MOVED_TEMPORARILY;
+                apr_table_setn(msr->r->headers_out, "Location", actionset->intercept_uri);
+                if ((actionset->intercept_status == 301)||(actionset->intercept_status == 302)
+                        ||(actionset->intercept_status == 303)||(actionset->intercept_status == 307))
+                {
+                    status = actionset->intercept_status;
+                } else {
+                    status = HTTP_MOVED_TEMPORARILY;
+                }
+                message = apr_psprintf(msr->mp, "Access denied with redirection to %s using "
+                        "status %d%s.",
+                        log_escape_nq(msr->mp, actionset->intercept_uri), status,
+                        phase_text);
             }
-            message = apr_psprintf(msr->mp, "Access denied with redirection to %s using "
-                "status %d%s.",
-                log_escape_nq(msr->mp, actionset->intercept_uri), status,
-                phase_text);
             break;
 
         case ACTION_ALLOW :
@@ -272,8 +319,8 @@ int perform_interception(modsec_rec *msr) {
             log_level = 1;
             status = HTTP_INTERNAL_SERVER_ERROR;
             message = apr_psprintf(msr->mp, "Access denied with code 500%s "
-                "(Internal Error: invalid interception action %d).",
-                phase_text, actionset->intercept_action);
+                    "(Internal Error: invalid interception action %d).",
+                    phase_text, actionset->intercept_action);
             break;
     }
 
@@ -365,7 +412,15 @@ static modsec_rec *create_tx_context(request_rec *r) {
     msr->r_early = r;
     msr->request_time = r->request_time;
     msr->dcfg1 = (directory_config *)ap_get_module_config(r->per_dir_config,
-        &security2_module);
+            &security2_module);
+
+#if defined(WITH_LUA)
+    #ifdef CACHE_LUA
+    msr->L = lua_open();
+    luaL_openlibs(msr->L);
+    #endif
+#endif
+
 
     /**
      * Create a special user configuration. This is where
@@ -393,7 +448,7 @@ static modsec_rec *create_tx_context(request_rec *r) {
     msr->txid = get_env_var(r, "UNIQUE_ID");
     if (msr->txid == NULL) {
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
-            "ModSecurity: ModSecurity requires mod_unique_id to be installed.");
+                "ModSecurity: ModSecurity requires mod_unique_id to be installed.");
         return NULL;
     }
 
@@ -409,12 +464,13 @@ static modsec_rec *create_tx_context(request_rec *r) {
     msr->local_addr = r->connection->local_ip;
     msr->local_port = r->connection->local_addr->port;
 
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-    msr->remote_addr = r->connection->client_ip;
-    msr->remote_port = r->connection->client_addr->port;
-#else
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
     msr->remote_addr = r->connection->remote_ip;
     msr->remote_port = r->connection->remote_addr->port;
+#else
+    msr->remote_addr = r->connection->client_ip;
+    msr->remote_port = r->connection->client_addr->port;
+    msr->useragent_ip = r->useragent_ip;
 #endif
 
     msr->request_line = r->the_request;
@@ -459,7 +515,7 @@ static apr_status_t change_server_signature(server_rec *s) {
 
     if (server_version == NULL) {
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, s,
-            "SecServerSignature: Apache returned null as signature.");
+                "SecServerSignature: Apache returned null as signature.");
         return -1;
     }
 
@@ -468,8 +524,8 @@ static apr_status_t change_server_signature(server_rec *s) {
     }
     else {
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, s,
-            "SecServerSignature: original signature too short. Please set "
-            "ServerTokens to Full.");
+                "SecServerSignature: original signature too short. Please set "
+                "ServerTokens to Full.");
         return -1;
     }
 
@@ -520,7 +576,7 @@ static int hook_pre_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_te
     modsecurity = modsecurity_create(mp, MODSEC_ONLINE);
     if (modsecurity == NULL) {
         ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
-            "ModSecurity: Failed to initialise engine.");
+                "ModSecurity: Failed to initialise engine.");
         return HTTP_INTERNAL_SERVER_ERROR;
     }
 
@@ -548,7 +604,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
     if (init_flag == NULL) {
         first_time = 1;
         apr_pool_userdata_set((const void *)1, "modsecurity-init-flag",
-            apr_pool_cleanup_null, s->process->pool);
+                apr_pool_cleanup_null, s->process->pool);
     } else {
         modsecurity_init(modsecurity, mp);
     }
@@ -562,7 +618,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         change_server_signature(s);
     }
 
-    #if (!(defined(WIN32) || defined(NETWARE)))
+#if (!(defined(WIN32) || defined(NETWARE)))
 
     /* Internal chroot functionality */
 
@@ -574,37 +630,37 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
 
         if (first_time == 0) {
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "ModSecurity: chroot checkpoint #2 (pid=%ld ppid=%ld)", (long)getpid(), (long)getppid());
+                    "ModSecurity: chroot checkpoint #2 (pid=%ld ppid=%ld)", (long)getpid(), (long)getppid());
 
             if (chdir(chroot_dir) < 0) {
                 ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, s,
-                    "ModSecurity: chroot failed, unable to chdir to %s, errno=%d (%s)",
-                    chroot_dir, errno, strerror(errno));
+                        "ModSecurity: chroot failed, unable to chdir to %s, errno=%d (%s)",
+                        chroot_dir, errno, strerror(errno));
                 exit(1);
             }
 
             if (chroot(chroot_dir) < 0) {
                 ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, s,
-                    "ModSecurity: chroot failed, path=%s, errno=%d(%s)",
-                    chroot_dir, errno, strerror(errno));
+                        "ModSecurity: chroot failed, path=%s, errno=%d(%s)",
+                        chroot_dir, errno, strerror(errno));
                 exit(1);
             }
 
             if (chdir("/") < 0) {
                 ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, s,
-                    "ModSecurity: chdoot failed, unable to chdir to /, errno=%d (%s)",
-                    errno, strerror(errno));
+                        "ModSecurity: chdoot failed, unable to chdir to /, errno=%d (%s)",
+                        errno, strerror(errno));
                 exit(1);
             }
 
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "ModSecurity: chroot successful, path=%s", chroot_dir);
+                    "ModSecurity: chroot successful, path=%s", chroot_dir);
         } else {
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "ModSecurity: chroot checkpoint #1 (pid=%ld ppid=%ld)", (long)getpid(), (long)getppid());
+                    "ModSecurity: chroot checkpoint #1 (pid=%ld ppid=%ld)", (long)getpid(), (long)getppid());
         }
     }
-    #endif
+#endif
 
     /* Schedule main cleanup for later, when the main pool is destroyed. */
     apr_pool_cleanup_register(mp, (void *)s, module_cleanup, apr_pool_cleanup_null);
@@ -619,7 +675,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         /* If we've changed the server signature make note of the original. */
         if (new_server_signature != NULL) {
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
-                "Original server signature: %s", real_server_signature);
+                    "Original server signature: %s", real_server_signature);
         }
     }
 
@@ -642,6 +698,7 @@ static void hook_child_init(apr_pool_t *mp, server_rec *s) {
  */
 static int hook_request_early(request_rec *r) {
     modsec_rec *msr = NULL;
+    int rc = DECLINED;
 
     /* This function needs to run only once per transaction
      * (i.e. subrequests and redirects are excluded).
@@ -656,22 +713,35 @@ static int hook_request_early(request_rec *r) {
     msr = create_tx_context(r);
     if (msr == NULL) return DECLINED;
 
-    #if 0
-    /* NOTE This check is not currently needed, but it may be needed in the
-     *      future when we add another early phase.
-     */
+#ifdef REQUEST_EARLY
 
     /* Are we allowed to continue? */
     if (msr->txcfg->is_enabled == MODSEC_DISABLED) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Processing disabled, skipping (hook request_early).");
         }
-
         return DECLINED;
-    }    
-    #endif
+    }
 
-    return DECLINED;
+    /* Process phase REQUEST_HEADERS */
+    if (modsecurity_process_phase(msr, PHASE_REQUEST_HEADERS) > 0) {
+        rc = perform_interception(msr);
+    }
+
+    if (    (msr->txcfg->is_enabled != MODSEC_DISABLED)
+            && (msr->txcfg->reqbody_access == 1)
+            && (rc == DECLINED))
+    {
+        /* Check request body limit (non-chunked requests only). */
+        if (msr->request_content_length > msr->txcfg->reqbody_limit) {
+            msr_log(msr, 1, "Request body (Content-Length) is larger than the "
+                    "configured limit (%ld).", msr->txcfg->reqbody_limit);
+            if(msr->txcfg->is_enabled != MODSEC_DETECTION_ONLY)
+                return HTTP_REQUEST_ENTITY_TOO_LARGE;
+        }
+    }
+#endif
+    return rc;
 }
 
 /**
@@ -712,7 +782,7 @@ static int hook_request_late(request_rec *r) {
 
     /* Get the second configuration context. */
     msr->dcfg2 = (directory_config *)ap_get_module_config(r->per_dir_config,
-        &security2_module);
+            &security2_module);
 
     /* Create a transaction context. */
     msr->txcfg = create_directory_config(msr->mp, NULL);
@@ -731,10 +801,10 @@ static int hook_request_late(request_rec *r) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Processing disabled, skipping (hook request_late).");
         }
-
         return DECLINED;
     }
 
+#ifndef REQUEST_EARLY
     /* Phase 1 */
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "First phase starting (dcfg %pp).", msr->dcfg2);
@@ -749,6 +819,7 @@ static int hook_request_late(request_rec *r) {
             return rc;
         }
     }
+#endif
 
     /* The rule engine could have been disabled in phase 1. */
     if (msr->txcfg->is_enabled == MODSEC_DISABLED) {
@@ -933,8 +1004,8 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
             }
         }
     }
-
     if (msr == NULL) return;
+
     /* Store the error message for later */
     em = (error_message *)apr_pcalloc(msr->mp, sizeof(error_message));
     if (em == NULL) return;
@@ -952,7 +1023,6 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
     em->status = status;
     if (fmt != NULL) em->message = apr_pstrdup(msr->mp, fmt);
 #endif
-
     /* Remove \n from the end of the message */
     if (em->message != NULL) {
         char *p = (char *)em->message;
@@ -967,6 +1037,7 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
 
     *(const error_message **)apr_array_push(msr->error_messages) = em;
 }
+
 
 /**
  * Guardian logger is used to interface to the external
@@ -1007,7 +1078,7 @@ static void sec_guardian_logger(request_rec *r, request_rec *origr, modsec_rec *
      */
 
     str2 = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT " %" APR_TIME_T_FMT " \"%s\" %d",
-        duration, apr_time_sec(duration), log_escape(msr->mp, modsec_message), modsec_rating);
+            duration, apr_time_sec(duration), log_escape(msr->mp, modsec_message), modsec_rating);
     if (str2 == NULL) return;
 
     /* We do not want the index line to be longer than 3980 bytes. */
@@ -1087,7 +1158,7 @@ static int hook_log_transaction(request_rec *r) {
     msr->r = r;
     msr->response_status = r->status;
     msr->status_line = ((r->status_line != NULL)
-        ? r->status_line : ap_get_status_line(r->status));
+            ? r->status_line : ap_get_status_line(r->status));
     msr->response_protocol = get_response_protocol(origr);
     msr->response_headers = apr_table_copy(msr->mp, r->headers_out);
     if (!r->assbackwards) msr->response_headers_sent = 1;
@@ -1121,7 +1192,7 @@ static void hook_insert_filter(request_rec *r) {
     if (msr->if_status == IF_STATUS_WANTS_TO_RUN) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Hook insert_filter: Adding input forwarding filter %s(r %pp).",
-                (((r->main != NULL)||(r->prev != NULL)) ? "for subrequest " : ""), r);
+                    (((r->main != NULL)||(r->prev != NULL)) ? "for subrequest " : ""), r);
         }
 
         ap_add_input_filter("MODSECURITY_IN", msr, r, r->connection);
@@ -1220,15 +1291,15 @@ static void modsec_register_operator(const char *name, void *fn_init, void *fn_e
     }
 }
 
-/*
-* \brief Connetion hook to limit the number of
-* connections in BUSY state
-*
-* \param conn Pointer to connection struct
-*
-* \retval DECLINED On failure
-* \retval OK On Success
-*/
+/**
+ * \brief Connetion hook to limit the number of
+ * connections in BUSY state
+ *
+ * \param conn Pointer to connection struct
+ *
+ * \retval DECLINED On failure
+ * \retval OK On Success
+ */
 static int hook_connection_early(conn_rec *conn)
 {
     sb_handle *sb = conn->sbh;

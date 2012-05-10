@@ -1,3 +1,117 @@
+XX NNN 2012 - 2.7.0-rc1
+-------------------
+
+ * Added SecEncryptionEngine. Initial crypt engine support, at the momment it will sign some Html
+   and Response Header options.
+
+ * Added SecEncryptionKey to define the a rand or static key for crypt engine.
+
+ * Added SecEncryptionParam to define the new parameter name.
+
+ * Added SecEncryptionMethodRx used with a regular expression to inspect the html in response
+   body/header and decide what to protect.
+
+ * Added SecEncryptionMethodPm used with multiple or single strings to inspect the html in response
+   body/header and decide what to protect.
+
+ * Added ctl encryptionEngine as a per transaction version of SecEncryptionEgine diretive.
+
+ * Added ctl encryptionEnforcement that will allow the engine to sign the data but the enforcement is
+   disabled.
+
+ * Added validateEncryption operator to enforce the signed elements.
+
+ * Added rsub operator supports the syntax |hex| allowing users to use special chars like \n \r.
+
+ * Added SecRuleUpdateTargetById now supports id range.
+
+ * Added SecRuleUpdateTargetByMsg and its ctl version (Thanks Scott Gifford).
+
+ * Added SecRuleUpdateTargetByTag and its ctl version (Thanks Scott Gifford).
+
+ * Added SecRulePerfTime when greater than zero it will fill rule id's execution time into PERF_RULE
+ and log id=usec information in the new Perf-rule-info: line in part H.
+
+ * Added PERF_RULES variable that contains rule execution time.
+
+ * Added Engine-mode: section in part H.
+
+ * Added ruleRemoveByMsg ctl version.
+
+ * Added removeCommentsChar and removeComments now can work with <!-- --> style.
+
+ * Added SecArgumentSeparator and SecCookieFormat can be used in different scope locations.
+
+ * Added Rules must have ID action and must be numeric.
+
+ * Added The use of tfns are deprecated in SecDefaultAction. Should be forbid in the future.
+
+ * Added Macro expansion support to the action pause.
+
+ * Added IpmatchFromFile/IpmatchF operator.
+
+ * Added New setrsc action, the RESOURCE collection used SecWebAppId Name Space
+
+ * Added Configure option --enable-cache-lua that allows reuse of Lua VM per transaction.
+   It will only take any effect when ModSecurity has multiple scripts to run per transaction.
+
+ * Added Configure option --enable-pcre-jit that allows ModSecurity regex engine to use PCRE Jit support.
+
+ * Added Configure option --enable-request-early that allows ModSecurity run phase 1 in post_read_request hook.
+
+ * Added RBL operator now support the httpBl api (http://www.projecthoneypot.org/httpbl_api.php).
+
+ * Added SecHttpBlKey to be used with httpBl api.
+
+ * Added SecSensorId will specify the modsecurity sensor name into audit log part H.
+
+ * Added aliases to phase:2 (phase:request), phase:4 (phase:response) and phase:5 (phase:logging).
+
+ * Added USERAGENT_IP variable. Created when Apache24 is used with mod_remoteip to know the real
+   client ip address.
+
+ * Fixed Variable DURATION contains the elapsed time in microseconds for compatible reasons with apache and
+ other variables.
+
+ * Fixed Preserve names/identity of the variables going into MATCHED_VARS.
+
+ * Fixed Redirect macro expansion does not work in SecDefaultAction when SecRule uses block action.
+
+ * Fixed rsub operator does not work as expect if regex contains parentheses (Thanks Jerome Freilinger).
+
+ * Current Google Safe Browsing implementation is deprecated. Google changed the API and does not allow
+ anymore the malware database for download.
+
+20 Mar 2012 - 2.6.5
+-------------------
+
+ * Fixed increased a specific message debug level in SBDM code (MODSEC-293).
+
+ * Cleanup build system.
+
+09 Mar 2012 - 2.6.4
+-------------------
+
+ * Fixed Mlogc 100% CPU consume (Thanks Klaubert Herr and Ebrahim Khalilzadeh).
+
+ * Fixed ModSecurity cannot load session and user sdbm data.
+
+ * Fixed updateTargetById was creating rule unparsed content making apache memory grow.
+
+ * Code cleanup.
+
+23 Feb 2012 - 2.6.4-rc1
+-------------------
+
+ * Fixed @rsub adding garbage data into stream variables.
+
+ * Fixed regex for section A into mlogc-batch-load.pl (Thanks Ebrahim Khalilzadeh).
+
+ * Fixed logdata cuts message without closing it with final chars.
+
+ * Added sanitizeMatchedBytes support to verifyCPF, verifyCC and verifySSN.
+
+
 06 Dec 2011 - 2.6.3-rc1
 -------------------
 
@@ -29,7 +143,7 @@
 
  * Added new transformations removeComments and removeCommentsChars
 
- * Fixed collection names are not case-sensitive anymore.
+ * Fixed colletion names are not case-sensitive anymore.
 
  * Fixed compilation errors with apache 2.0.
 

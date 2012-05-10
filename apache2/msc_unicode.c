@@ -16,6 +16,14 @@
 
 #define CODEPAGE_SEPARATORS  " \t\n\r"
 
+/** \brief Load Unicode file
+ *
+ * \param dcfg Pointer to directory configuration
+ * \param error_msg Error message
+ *
+ * \retval 1 On Success
+ * \retval 0 On Fail
+ */
 static int unicode_map_create(directory_config *dcfg, char **error_msg)
 {
     char errstr[1024];
@@ -129,8 +137,14 @@ static int unicode_map_create(directory_config *dcfg, char **error_msg)
 }
 
 
-/**
- * Initialise Unicode Map data structure
+/** \brief Init unicode map
+ *
+ * \param dcfg Pointer to directory configuration
+ * \param mapfn Unicode map filename
+ * \param error_msg Error message
+ *
+ * \retval unicode_map_create On Success
+ * \retval -1 On Fail
  */
 int unicode_map_init(directory_config *dcfg, const char *mapfn, char **error_msg)
 {

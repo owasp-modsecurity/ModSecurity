@@ -26,10 +26,15 @@
 #endif
 
 #include "modsecurity.h"
+#include "re.h"
 
 int DSOLOCAL normalize_path_inplace(unsigned char *input, int len, int win, int *changed);
 
 int DSOLOCAL parse_boolean(const char *input);
+
+char DSOLOCAL *remove_quotes(apr_pool_t *mptmp, const char *input, int input_len);
+
+char DSOLOCAL *parse_pm_content(const char *op_parm, unsigned short int op_len, msre_rule *rule, char **error_msg);
 
 char DSOLOCAL *remove_escape(apr_pool_t *mptmp, const char *input, int input_len);
 
@@ -59,9 +64,9 @@ char DSOLOCAL *current_logtime(apr_pool_t *mp);
 
 char DSOLOCAL *current_filetime(apr_pool_t *mp);
 
-int DSOLOCAL msc_mkstemp_ex(char *template, int mode);
+int DSOLOCAL msc_mkstemp_ex(char *templat, int mode);
 
-int DSOLOCAL msc_mkstemp(char *template);
+int DSOLOCAL msc_mkstemp(char *templat);
 
 char DSOLOCAL *strtolower_inplace(unsigned char *str);
 

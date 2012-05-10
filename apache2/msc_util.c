@@ -74,7 +74,151 @@ static unsigned char *c2x(unsigned what, unsigned char *where);
 static unsigned char x2c(unsigned char *what);
 static unsigned char xsingle2c(unsigned char *what);
 
-/* \brief Remove escape char
+/** \brief Interpret |HEX| syntax
+ *
+ * \param op_parm Pointer to operator input
+ * \param op_len Operator input lenght
+ * \param rule Pointer to rule struct
+ * \param error_msg Pointer to error message
+ *
+ * \retval string On Success
+ */
+char *parse_pm_content(const char *op_parm, unsigned short int op_len, msre_rule *rule, char **error_msg)  {
+    char *parm = NULL;
+    char *content = NULL;
+    unsigned short int offset = 0;
+    char converted = 0;
+    int i, x;
+    unsigned char bin = 0, esc = 0, bin_offset = 0;
+    unsigned char bin_parm[3], c = 0;
+    char *processed = NULL;
+
+    content = apr_pstrdup(rule->ruleset->mp, op_parm);
+
+    if (content == NULL) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating memory for pattern matching content.");
+        return NULL;
+    }
+
+    while (offset < op_len && apr_isspace(content[offset])) {
+        offset++;
+    };
+
+    op_len = strlen(content);
+
+    if (content[offset] == '\"' && content[op_len-1] == '\"') {
+        parm = apr_pstrdup(rule->ruleset->mp, content + offset + 1);
+        if (parm  == NULL) {
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating memory for pattern matching content.");
+            return NULL;
+        }
+        parm[op_len - offset - 2] = '\0';
+    } else {
+        parm = apr_pstrdup(rule->ruleset->mp, content + offset);
+        if (parm == NULL) {
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating memory for pattern matching content.");
+            return NULL;
+        }
+    }
+
+    op_len = strlen(parm);
+
+    if (op_len == 0)   {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Content length is 0.");
+        return NULL;
+    }
+
+
+    for (i = 0, x = 0; i < op_len; i++) {
+        if (parm[i] == '|') {
+            if (bin) {
+                bin = 0;
+            } else {
+                bin = 1;
+            }
+        } else if(!esc && parm[i] == '\\') {
+            esc = 1;
+        } else {
+            if (bin) {
+                if (apr_isdigit(parm[i]) ||
+                        parm[i] == 'A' || parm[i] == 'a' ||
+                        parm[i] == 'B' || parm[i] == 'b' ||
+                        parm[i] == 'C' || parm[i] == 'c' ||
+                        parm[i] == 'D' || parm[i] == 'd' ||
+                        parm[i] == 'E' || parm[i] == 'e' ||
+                        parm[i] == 'F' || parm[i] == 'f')
+                {
+                    bin_parm[bin_offset] = (char)parm[i];
+                    bin_offset++;
+                    if (bin_offset == 2) {
+                        c = strtol((char *)bin_parm, (char **) NULL, 16) & 0xFF;
+                        bin_offset = 0;
+                        parm[x] = c;
+                        x++;
+                        converted = 1;
+                    }
+                } else if (parm[i] == ' ') {
+                }
+            } else if (esc) {
+                if (parm[i] == ':' ||
+                        parm[i] == ';' ||
+                        parm[i] == '\\' ||
+                        parm[i] == '\"')
+                {
+                    parm[x] = parm[i];
+                    x++;
+                } else {
+                    *error_msg = apr_psprintf(rule->ruleset->mp, "Unsupported escape sequence.");
+                    return NULL;
+                }
+                esc = 0;
+                converted = 1;
+            } else {
+                parm[x] = parm[i];
+                x++;
+            }
+        }
+    }
+
+    if (converted) {
+        op_len = x;
+    }
+
+    processed = apr_pstrmemdup(rule->ruleset->mp, parm, op_len);
+
+    if (processed == NULL) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Error allocating memory for pattern matching content.");
+        return NULL;
+    }
+
+    return processed;
+}
+
+
+/** \brief Remove quotes
+ *
+ * \param mptmp Pointer to the pool
+ * \param input Pointer to input string
+ * \param input_len Input data length
+ *
+ * \retval string On Success
+ */
+char *remove_quotes(apr_pool_t *mptmp, const char *input, int input_len)  {
+    char *parm = apr_palloc(mptmp, input_len);
+    char *ret = parm;
+    int len = input_len;
+
+    for(; *input !='\0' && len >=0; input++, len--)    {
+        if(*input != '\'' && *input != '\"')    {
+            *parm++ = *input;
+        }
+    }
+
+    *parm = '\0';
+    return ret;
+}
+
+/** \brief Remove escape char
  *
  * \param mptmp Pointer to the pool
  * \param input Pointer to input string
@@ -112,7 +256,7 @@ int parse_boolean(const char *input) {
     return -1;
 }
 
-/* \brief Decode Base64 data with special chars
+/** \brief Decode Base64 data with special chars
  *
  * \param plain_text Pointer to plain text data
  * \param input Pointer to input data
@@ -121,8 +265,7 @@ int parse_boolean(const char *input) {
  * \retval 0 On failure
  * \retval string length On Success
  */
-int decode_base64_ext(char *plain_text, const unsigned char *input, int input_len)
-{
+int decode_base64_ext(char *plain_text, const unsigned char *input, int input_len)   {
     const unsigned char *encoded = input;
     int i = 0, j = 0, k = 0;
     int ch = 0;
@@ -177,13 +320,14 @@ int decode_base64_ext(char *plain_text, const unsigned char *input, int input_le
     return j;
 }
 
-/* \brief Convert const char to int
+/** \brief Convert const char to int
  *
  * \param c number string
  *
  * \retval n The converted number
  */
-int convert_to_int(const char c)    {
+int convert_to_int(const char c)
+{
     int n;
     if ((c>='0') && (c<='9'))
         n = c - '0';
@@ -196,7 +340,7 @@ int convert_to_int(const char c)    {
     return n;
 }
 
-/* \brief Set a match to tx.N
+/** \brief Set a match to tx.N
  *
  * \param msr Pointer to modsec resource
  * \param capture If ON match will be saved
@@ -223,6 +367,7 @@ int set_match_to_tx(modsec_rec *msr, int capture, const char *match, int tx_n)  
             msr_log(msr, 9, "Added phrase match to TX.%d: %s",
                     tx_n, log_escape_nq_ex(msr->mp, s->value, s->value_len));
         }
+
     }
 
     return 0;
@@ -437,7 +582,7 @@ int sql_hex2bytes_inplace(unsigned char *data, int len) {
     }
 
     *d = '\0';
-    return strlen(begin);
+    return strlen((char *)begin);
 }
 
 /**
@@ -632,13 +777,13 @@ char *current_filetime(apr_pool_t *mp) {
 /**
  *
  */
-int msc_mkstemp_ex(char *template, int mode) {
+int msc_mkstemp_ex(char *templat, int mode) {
     int fd = -1;
 
     /* ENH Use apr_file_mktemp instead. */
 
 #if !(defined(WIN32)||defined(NETWARE))
-    fd = mkstemp(template);
+    fd = mkstemp(templat);
 #ifdef HAVE_FCHMOD
     if ((fd != -1) && (mode != 0)) {
         if (fchmod(fd, mode) == -1) {
@@ -647,8 +792,8 @@ int msc_mkstemp_ex(char *template, int mode) {
     }
 #endif /* HAVE_FCHMOD */
 #else
-    if (mktemp(template) == NULL) return -1;
-    fd = open(template, O_WRONLY | O_APPEND | O_CREAT | O_BINARY, mode);
+    if (mktemp(templat) == NULL) return -1;
+    fd = open(templat, O_WRONLY | O_APPEND | O_CREAT | O_BINARY, mode);
 #endif /* !(defined(WIN32)||defined(NETWARE)) */
 
     return fd;
@@ -657,8 +802,8 @@ int msc_mkstemp_ex(char *template, int mode) {
 /**
  *
  */
-int msc_mkstemp(char *template) {
-    return msc_mkstemp_ex(template, CREATEMODE_UNISTD);
+int msc_mkstemp(char *templat) {
+    return msc_mkstemp_ex(templat, CREATEMODE_UNISTD);
 }
 
 /**

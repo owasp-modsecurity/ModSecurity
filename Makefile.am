@@ -26,8 +26,9 @@ MAINTAINERCLEANFILES += $(CLEANFILES) \
        ext/Makefile.in \
        mlogc/Makefile.in \
        modsecurity_config_auto.h.in~ \
-       tests/Makefile.in \
-       tools/Makefile.in
+       config.log \
+       Makefile \
+       config.status
 
 # Alias for "check"
 test: check

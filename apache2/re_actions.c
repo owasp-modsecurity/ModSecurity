@@ -370,6 +370,14 @@ apr_status_t collection_original_setvar(modsec_rec *msr, const char *col_name, c
     return 0;
 }
 
+/* marker */
+static apr_status_t msre_action_marker_init(msre_engine *engine, msre_actionset *actionset,
+    msre_action *action)
+{
+    actionset->id = action->param;
+    return 1;
+}
+
 /* id */
 
 static apr_status_t msre_action_id_init(msre_engine *engine, msre_actionset *actionset,
@@ -379,10 +387,27 @@ static apr_status_t msre_action_id_init(msre_engine *engine, msre_actionset *act
     return 1;
 }
 
+static char *msre_action_id_validate(msre_engine *engine, msre_action *action) {
+    int id;
+
+    if(action != NULL && action->param != NULL) {
+        for(id=0;id<strlen(action->param);id++) {
+            if(!apr_isdigit(action->param[id]))
+                return apr_psprintf(engine->mp, "ModSecurity: Invalid value for action ID: %s", action->param);
+        }
+        id = atoi(action->param);
+        if ((id == LONG_MAX)||(id == LONG_MIN)||(id <= 0)) {
+            return apr_psprintf(engine->mp, "ModSecurity: Invalid value for action ID: %s", action->param);
+        }
+    }
+
+    return NULL;
+}
+
 /* rev */
 
 static apr_status_t msre_action_rev_init(msre_engine *engine, msre_actionset *actionset,
-    msre_action *action)
+        msre_action *action)
 {
     actionset->rev = action->param;
     return 1;
@@ -534,7 +559,7 @@ static char *msre_action_pause_validate(msre_engine *engine, msre_action *action
 static apr_status_t msre_action_pause_init(msre_engine *engine, msre_actionset *actionset,
     msre_action *action)
 {
-    actionset->intercept_pause = atoi(action->param);
+    actionset->intercept_pause = action->param;
     return 1;
 }
 
@@ -686,7 +711,15 @@ static char *msre_action_phase_validate(msre_engine *engine, msre_action *action
 static apr_status_t msre_action_phase_init(msre_engine *engine, msre_actionset *actionset,
     msre_action *action)
 {
-    actionset->phase = atoi(action->param);
+    if(strcasecmp(action->param,"request") == 0)
+        actionset->phase = 2;
+    else if(strcasecmp(action->param,"response") == 0)
+        actionset->phase = 4;
+    else if(strcasecmp(action->param,"logging") == 0)
+        actionset->phase = 5;
+    else
+        actionset->phase = atoi(action->param);
+
     return 1;
 }
 
@@ -734,7 +767,13 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
         return NULL;
     } else
     if (strcasecmp(name, "ruleRemoveByTag") == 0) {
-        /* ENH nothing yet */
+        if (!msc_pregcomp(engine->mp, value, 0, NULL, NULL))
+           return apr_psprintf(engine->mp, "ModSecurity: Invalid regular expression \"%s\"", value);
+        return NULL;
+    } else
+    if (strcasecmp(name, "ruleRemoveByMsg") == 0) {
+       if (!msc_pregcomp(engine->mp, value, 0, NULL, NULL))
+           return apr_psprintf(engine->mp, "ModSecurity: Invalid regular expression \"%s\"", value);
         return NULL;
     } else
     if (strcasecmp(name, "requestBodyAccess") == 0) {
@@ -828,11 +867,44 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
                 if(parm == NULL && savedptr == NULL)
                     return apr_psprintf(engine->mp, "ruleUpdateTargetById must has at least id;append_value");
 
-                return NULL;
-        }
-        else {
+        return NULL;
+    } else
+        if (strcasecmp(name,"ruleUpdateTargetByTag") == 0) {
+                char *parm = NULL;
+                char *savedptr = NULL;
+
+                parm = apr_strtok(value,";",&savedptr);
+                if(parm == NULL && savedptr == NULL)
+                    return apr_psprintf(engine->mp, "ruleUpdateTargetByTag must has at least tag;append_value");
+            if (!msc_pregcomp(engine->mp, parm, 0, NULL, NULL)) {
+                return apr_psprintf(engine->mp, "ModSecurity: Invalid regular expression \"%s\"", parm);
+            }
+        return NULL;
+    } else
+        if (strcasecmp(name,"ruleUpdateTargetByMsg") == 0) {
+                char *parm = NULL;
+                char *savedptr = NULL;
+
+                parm = apr_strtok(value,";",&savedptr);
+                if(parm == NULL && savedptr == NULL)
+                    return apr_psprintf(engine->mp, "ruleUpdateTargetByMsg must has at least msg;append_value");
+            if (!msc_pregcomp(engine->mp, parm, 0, NULL, NULL)) {
+                return apr_psprintf(engine->mp, "ModSecurity: Invalid regular expression \"%s\"", parm);
+            }
+        return NULL;
+     } else
+        if (strcasecmp(name, "EncryptionEnforcement") == 0) {
+        if (strcasecmp(value, "on") == 0) return NULL;
+        if (strcasecmp(value, "off") == 0) return NULL;
+        return apr_psprintf(engine->mp, "Invalid setting for ctl name EncryptionEnforcement: %s", value);
+     } else
+        if (strcasecmp(name, "EncryptionEngine") == 0) {
+        if (strcasecmp(value, "on") == 0) return NULL;
+        if (strcasecmp(value, "off") == 0) return NULL;
+        return apr_psprintf(engine->mp, "Invalid setting for ctl name EncryptionEngine: %s", value);
+     } else {
             return apr_psprintf(engine->mp, "Invalid ctl name setting: %s", name);
-        }
+     }
 }
 
 static apr_status_t msre_action_ctl_init(msre_engine *engine, msre_actionset *actionset,
@@ -879,17 +951,51 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
+    if (strcasecmp(name, "EncryptionEnforcement") == 0) {
+        if (strcasecmp(value, "on") == 0) {
+            msr->txcfg->encryption_enforcement = ENCRYPTION_ENABLED;
+            msr->usercfg->encryption_enforcement = ENCRYPTION_ENABLED;
+        }
+        if (strcasecmp(value, "off") == 0) {
+            msr->txcfg->encryption_enforcement = ENCRYPTION_DISABLED;
+            msr->usercfg->encryption_enforcement = ENCRYPTION_DISABLED;
+        }
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Set EncryptionEnforcement to %s.", value);
+        }
+    } else
+    if (strcasecmp(name, "EncryptionEngine") == 0) {
+        if (strcasecmp(value, "on") == 0) {
+            msr->txcfg->encryption_is_enabled = ENCRYPTION_ENABLED;
+            msr->usercfg->encryption_is_enabled = ENCRYPTION_ENABLED;
+        }
+        if (strcasecmp(value, "off") == 0) {
+            msr->txcfg->encryption_is_enabled = ENCRYPTION_DISABLED;
+            msr->usercfg->encryption_is_enabled = ENCRYPTION_DISABLED;
+        }
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Set EncryptionEngine to %s.", value);
+        }
+    } else
     if (strcasecmp(name, "ruleRemoveById") == 0) {
         *(const char **)apr_array_push(msr->removed_rules) = (const char *)apr_pstrdup(msr->mp, value);
 
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Removed rule by id : %s.", value);
         }
-
         return 1;
     } else
     if (strcasecmp(name, "ruleRemoveByTag") == 0) {
-        *(const char **)apr_array_push(msr->removed_rules_tag) = (const char *)apr_pstrdup(msr->mp, value);
+        rule_exception *re = apr_pcalloc(mptmp, sizeof(rule_exception));
+        re->type = RULE_EXCEPTION_REMOVE_TAG;
+        re->param = (const char *)apr_pstrdup(msr->mp, value);;
+        re->param_data = msc_pregcomp(msr->mp, re->param, 0, NULL, NULL);
+        if (re->param_data == NULL) {
+            msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", re->param);
+            return -1;
+        }
+
+        *(rule_exception **)apr_array_push(msr->removed_rules_tag) = re;
 
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Removed rule by tag : %s.", value);
@@ -897,6 +1003,24 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
+    if (strcasecmp(name, "ruleRemoveByMsg") == 0) {
+        rule_exception *re = apr_pcalloc(mptmp, sizeof(rule_exception));
+        re->type = RULE_EXCEPTION_REMOVE_MSG;
+        re->param = (const char *)apr_pstrdup(msr->mp, value);;
+        re->param_data = msc_pregcomp(msr->mp, re->param, 0, NULL, NULL);
+        if (re->param_data == NULL) {
+            msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", re->param);
+            return -1;
+        }
+
+        *(rule_exception **)apr_array_push(msr->removed_rules_msg) = re;
+
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: Removed rule by msg : %s.", value);
+        }
+
+        return 1;
+        } else
     if (strcasecmp(name, "requestBodyAccess") == 0) {
         int pv = parse_boolean(value);
 
@@ -1047,6 +1171,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         return 1;
     } else
     if (strcasecmp(name, "ruleUpdateTargetById") == 0)  {
+        rule_exception *re = NULL;
         char *p1 = NULL, *p2 = NULL, *p3 = NULL;
         char *savedptr = NULL;
 
@@ -1059,10 +1184,63 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: ruleUpdateTargetById id=%s append=%s replace=%s", p1, p2, p3);
         }
+    re = apr_pcalloc(mptmp, sizeof(rule_exception));
+    re->type = RULE_EXCEPTION_REMOVE_ID;
+    re->param = p1;
+    msre_ruleset_rule_update_target_matching_exception(msr, rule->ruleset, re, p2, p3);
+    return 1;
+    } else
+    if (strcasecmp(name, "ruleUpdateTargetByTag") == 0)  {
+        rule_exception *re = NULL;
+        char *p1 = NULL, *p2 = NULL, *p3 = NULL;
+        char *savedptr = NULL;
 
-        update_rule_target(NULL, NULL, rule->ruleset, p1, p2, p3);
+        p1 = apr_strtok(value,";",&savedptr);
 
-        return 1;
+        p2 = apr_strtok(NULL,";",&savedptr);
+
+        p3 = apr_strtok(NULL,";",&savedptr);
+
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: ruleUpdateTargetByTag tag=%s append=%s replace=%s", p1, p2, p3);
+        }
+
+    re = apr_pcalloc(mptmp, sizeof(rule_exception));
+    re->type = RULE_EXCEPTION_REMOVE_TAG;
+    re->param = p1;
+    re->param_data = msc_pregcomp(mptmp, p1, 0, NULL, NULL);
+    if (re->param_data == NULL) {
+        msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", p1);
+        return -1;
+    }
+    msre_ruleset_rule_update_target_matching_exception(msr, rule->ruleset, re, p2, p3);
+    return 1;
+    } else
+    if (strcasecmp(name, "ruleUpdateTargetByMsg") == 0)  {
+        rule_exception *re = NULL;
+        char *p1 = NULL, *p2 = NULL, *p3 = NULL;
+        char *savedptr = NULL;
+
+        p1 = apr_strtok(value,";",&savedptr);
+
+        p2 = apr_strtok(NULL,";",&savedptr);
+
+        p3 = apr_strtok(NULL,";",&savedptr);
+
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: ruleUpdateTargetByMsg tag=%s append=%s replace=%s", p1, p2, p3);
+        }
+
+    re = apr_pcalloc(mptmp, sizeof(rule_exception));
+    re->type = RULE_EXCEPTION_REMOVE_MSG;
+    re->param = p1;
+    re->param_data = msc_pregcomp(mptmp, p1, 0, NULL, NULL);
+    if (re->param_data == NULL) {
+        msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", p1);
+        return -1;
+    }
+    msre_ruleset_rule_update_target_matching_exception(msr, rule->ruleset, re, p2, p3);
+    return 1;
     }
     else {
         /* Should never happen, but log if it does. */
@@ -1855,7 +2033,7 @@ static apr_status_t msre_action_initcol_execute(modsec_rec *msr, apr_pool_t *mpt
     /* IMP1 We have a function for this now, parse_name_eq_value? */
     s = strstr(data, "=");
     if (s == NULL) return 0;
-    col_name = strtolower_inplace(data);
+    col_name = strtolower_inplace((unsigned char *)data);
     col_key = s + 1;
     *s = '\0';
 
@@ -1917,6 +2095,29 @@ static apr_status_t msre_action_setuid_execute(modsec_rec *msr, apr_pool_t *mptm
 
     /* Initialise collection. */
     return init_collection(msr, real_col_name, "USER", col_key, col_key_len);
+}
+
+/* setrsc */
+static apr_status_t msre_action_setrsc_execute(modsec_rec *msr, apr_pool_t *mptmp,
+    msre_rule *rule, msre_action *action)
+{
+    msc_string *var = NULL;
+    char *real_col_name = NULL, *col_key = NULL;
+    unsigned int col_key_len;
+
+    /* Construct user ID. */
+    var = apr_pcalloc(mptmp, sizeof(msc_string));
+    var->value = (char *)action->param;
+    var->value_len = strlen(var->value);
+    expand_macros(msr, var, rule, mptmp);
+
+    /* Construct collection name. */
+    col_key = var->value;
+    col_key_len = var->value_len;
+    real_col_name = apr_psprintf(mptmp, "%s_RESOURCE", msr->txcfg->webappid);
+
+    /* Initialise collection. */
+    return init_collection(msr, real_col_name, "RESOURCE", col_key, col_key_len);
 }
 
 /* exec */
@@ -2027,8 +2228,21 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         NO_PLUS_MINUS,
         ACTION_CARDINALITY_ONE,
         ACTION_CGROUP_NONE,
-        NULL,
+        msre_action_id_validate,
         msre_action_id_init,
+        NULL
+    );
+
+    /* marker */
+    msre_engine_action_register(engine,
+        "marker",
+        ACTION_METADATA,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
+        NULL,
+        msre_action_marker_init,
         NULL
     );
 
@@ -2564,6 +2778,19 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         NULL,
         NULL,
         msre_action_setsid_execute
+    );
+
+    /* setuid */
+    msre_engine_action_register(engine,
+        "setrsc",
+        ACTION_NON_DISRUPTIVE,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
+        NULL,
+        NULL,
+        msre_action_setrsc_execute
     );
 
     /* setuid */

@@ -24,6 +24,18 @@
 
 /* cmdline */
 
+/**
+* \brief cmdline transformation function
+*
+* \param mptmp Pointer to resource pool
+* \param input Pointer to input data
+* \param input_len Input data length
+* \param rval Pointer to decoded buffer
+* \param rval_len Decoded buffer length
+*
+* \retval 0 On failure
+* \retval 1 On Success
+*/
 static int msre_fn_cmdline_execute(apr_pool_t *mptmp, unsigned char *input,
         long int input_len, char **rval, long int *rval_len)
 {
@@ -302,6 +314,15 @@ static int msre_fn_removeCommentsChar_execute(apr_pool_t *mptmp, unsigned char *
         } else if ((input[i] == '*')&&(i + 1 < input_len)&&(input[i + 1] == '/')) {
             changed = 1;
             i += 2;
+        } else if ((input[i] == '<')&&(i + 1 < input_len)&&(input[i + 1] == '!')&&
+                    (i + 2 < input_len)&&(input[i+2] == '-')&&(i + 3 < input_len)&&
+                    (input[i + 3] == '-')) {
+            changed = 1;
+            i += 4;
+        } else if ((input[i] == '-')&&(i + 1 < input_len)&&(input[i + 1] == '-')&&
+                    (i + 2 < input_len)&&(input[i+2] == '>'))   {
+            changed = 1;
+            i += 3;
         } else if ((input[i] == '-')&&(i + 1 < input_len)&&(input[i + 1] == '-')) {
             changed = 1;
             i += 2;
@@ -337,16 +358,21 @@ static int msre_fn_removeComments_execute(apr_pool_t *mptmp, unsigned char *inpu
                 changed = 1;
                 incomment = 1;
                 i += 2;
-            } else if ((input[i] == '-')&&(i + 1 < input_len)&&(input[i + 1] == '-')) {
+            } else if ((input[i] == '<')&&(i + 1 < input_len)&&(input[i + 1] == '!')&&
+                    (i + 2 < input_len)&&(input[i+2] == '-')&&(i + 3 < input_len)&&
+                    (input[i + 3] == '-') && (incomment == 0)) {
+                incomment = 1;
+                changed = 1;
+                i += 4;
+            } else if ((input[i] == '-')&&(i + 1 < input_len)&&(input[i + 1] == '-')
+                        && (incomment == 0)) {
                 changed = 1;
                 input[i] = ' ';
                 break;
-                i += 2;
-            } else if (input[i] == '#') {
+            } else if (input[i] == '#' && (incomment == 0)) {
                 changed = 1;
                 input[i] = ' ';
                break;
-                i++;
             } else {
                 input[j] = input[i];
                 i++;
@@ -356,6 +382,13 @@ static int msre_fn_removeComments_execute(apr_pool_t *mptmp, unsigned char *inpu
             if ((input[i] == '*')&&(i + 1 < input_len)&&(input[i + 1] == '/')) {
                 incomment = 0;
                 i += 2;
+                input[j] = input[i];
+                i++;
+                j++;
+            } else if ((input[i] == '-')&&(i + 1 < input_len)&&(input[i + 1] == '-')&&
+                    (i + 2 < input_len)&&(input[i+2] == '>'))   {
+                incomment = 0;
+                i += 3;
                 input[j] = input[i];
                 i++;
                 j++;
@@ -544,8 +577,18 @@ static int msre_fn_sha1_execute(apr_pool_t *mptmp, unsigned char *input,
     return 1;
 }
 
-/* sqlHexDecode */
-
+/**
+* \brief SqlHexDecode transformation function. Transform xNN data.
+*
+* \param mptmp Pointer to resource pool
+* \param input Pointer to input data
+* \param input_len Input data length
+* \param rval Pointer to decoded buffer
+* \param rval_len Decoded buffer length
+*
+* \retval 0 On failure
+* \retval 1 On Success
+*/
 static int msre_fn_sqlHexDecode_execute(apr_pool_t *mptmp, unsigned char *input,
     long int input_len, char **rval, long int *rval_len)
 {
@@ -720,10 +763,10 @@ static int msre_fn_parityOdd7bit_execute(apr_pool_t *mptmp, unsigned char *input
     return changed;
 }
 
-/*
+/**
 * \brief Base64 transformation function based on RFC2045
 *
-* \param mptmp Pointer to resource poil
+* \param mptmp Pointer to resource pool
 * \param input Pointer to input data
 * \param input_len Input data length
 * \param rval Pointer to decoded buffer

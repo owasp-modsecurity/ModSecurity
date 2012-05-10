@@ -47,7 +47,16 @@ typedef struct msre_cache_rec msre_cache_rec;
 #endif
 
 /* Actions, variables, functions and operator functions */
-char DSOLOCAL *update_rule_target(cmd_parms *cmd, directory_config *dcfg, msre_ruleset *rset, const char *p1, const char *p2, const char *p3);
+char DSOLOCAL *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *rule, const char *p2,
+        const char *p3);
+
+int DSOLOCAL msre_ruleset_rule_matches_exception(msre_rule *rule, rule_exception *re);
+
+char DSOLOCAL *msre_ruleset_rule_update_target_matching_exception(modsec_rec *msr, msre_ruleset *ruleset, rule_exception *re,
+    const char *p2, const char *p3);
+
+char DSOLOCAL *msre_ruleset_phase_rule_update_target_matching_exception(modsec_rec *msr, msre_ruleset *ruleset, rule_exception *re,
+     apr_array_header_t *phase_arr, const char *p2, const char *p3);
 
 apr_status_t DSOLOCAL collection_original_setvar(modsec_rec *msr, const char *col_name, const msc_string *orig_var);
 
@@ -295,7 +304,7 @@ struct msre_actionset {
     int                      intercept_action;
     const char              *intercept_uri;
     int                      intercept_status;
-    int                      intercept_pause;
+    const char              *intercept_pause;
 
     /* "block" needs parent action to reset it */
     msre_action             *parent_intercept_action_rec;

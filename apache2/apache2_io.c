@@ -1,21 +1,22 @@
 /*
-* ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
-*
-* You may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* If any of the files related to licensing are missing or if you have any
-* other questions related to licensing please contact Trustwave Holdings, Inc.
-* directly using the email address security@modsecurity.org.
-*/
+ * ModSecurity for Apache 2.x, http://www.modsecurity.org/
+ * Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+ *
+ * You may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * If any of the files related to licensing are missing or if you have any
+ * other questions related to licensing please contact Trustwave Holdings, Inc.
+ * directly using the email address security@modsecurity.org.
+ */
 
 #include <util_filter.h>
 
 #include "modsecurity.h"
 #include "apache2.h"
+#include "msc_crypt.h"
 
 /* -- Input filter -- */
 
@@ -29,7 +30,7 @@ static void dummy_free_func(void *data) {}
  * processing module).
  */
 apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
-    ap_input_mode_t mode, apr_read_type_e block, apr_off_t nbytes)
+        ap_input_mode_t mode, apr_read_type_e block, apr_off_t nbytes)
 {
     modsec_rec *msr = (modsec_rec *)f->ctx;
     msc_data_chunk *chunk = NULL;
@@ -39,7 +40,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 
     if (msr == NULL) {
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, f->r->server,
-            "ModSecurity: Internal error in input filter: msr is null.");
+                "ModSecurity: Internal error in input filter: msr is null.");
         ap_remove_input_filter(f);
         return APR_EGENERAL;
     }
@@ -48,8 +49,8 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
     msr->r = f->r;
 
     if (msr->phase < PHASE_REQUEST_BODY) {
-            msr_log(msr, 1, "Internal error: REQUEST_BODY phase incomplete for input filter in phase %d", msr->phase);
-            return APR_EGENERAL;
+        msr_log(msr, 1, "Internal error: REQUEST_BODY phase incomplete for input filter in phase %d", msr->phase);
+        return APR_EGENERAL;
     }
 
     if ((msr->if_status == IF_STATUS_COMPLETE)||(msr->if_status == IF_STATUS_NONE)) {
@@ -62,7 +63,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Input filter: Forwarding input: mode=%d, block=%d, nbytes=%" APR_OFF_T_FMT
-            " (f %pp, r %pp).", mode, block, nbytes, f, f->r);
+                " (f %pp, r %pp).", mode, block, nbytes, f, f->r);
     }
 
     if (msr->if_started_forwarding == 0) {
@@ -87,24 +88,24 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
     if (chunk && (!msr->txcfg->stream_inbody_inspection || (msr->txcfg->stream_inbody_inspection && msr->if_stream_changed == 0))) {
         /* Copy the data we received in the chunk */
         bucket = apr_bucket_heap_create(chunk->data, chunk->length, NULL,
-            f->r->connection->bucket_alloc);
+                f->r->connection->bucket_alloc);
 
-        #if 0
+#if 0
 
         It would seem that we cannot prevent other filters in the chain
-        from modifying data in-place. Hence we copy.
+            from modifying data in-place. Hence we copy.
 
-        if (chunk->is_permanent) {
-            /* Do not make a copy of the data we received in the chunk. */
-            bucket = apr_bucket_heap_create(chunk->data, chunk->length, dummy_free_func,
-                f->r->connection->bucket_alloc);
-        } else {
-            /* Copy the data we received in the chunk. */
-            bucket = apr_bucket_heap_create(chunk->data, chunk->length, NULL,
-                f->r->connection->bucket_alloc);
-        }
+            if (chunk->is_permanent) {
+                /* Do not make a copy of the data we received in the chunk. */
+                bucket = apr_bucket_heap_create(chunk->data, chunk->length, dummy_free_func,
+                        f->r->connection->bucket_alloc);
+            } else {
+                /* Copy the data we received in the chunk. */
+                bucket = apr_bucket_heap_create(chunk->data, chunk->length, NULL,
+                        f->r->connection->bucket_alloc);
+            }
 
-        #endif
+#endif
 
         if (bucket == NULL) return APR_EGENERAL;
         APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
@@ -226,8 +227,8 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
          * to extract the size of the data available.
          */
         for(bucket = APR_BRIGADE_FIRST(bb_in);
-            bucket != APR_BRIGADE_SENTINEL(bb_in);
-            bucket = APR_BUCKET_NEXT(bucket))
+                bucket != APR_BRIGADE_SENTINEL(bb_in);
+                bucket = APR_BUCKET_NEXT(bucket))
         {
             const char *buf;
             apr_size_t buflen;
@@ -240,7 +241,7 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Input filter: Bucket type %s contains %" APR_SIZE_T_FMT " bytes.",
-                    bucket->type->name, buflen);
+                        bucket->type->name, buflen);
             }
 
             /* Check request body limit (should only trigger on chunked requests). */
@@ -393,7 +394,7 @@ static int output_filter_should_run(modsec_rec *msr, request_rec *r) {
  * Initialises the output filter.
  */
 static apr_status_t output_filter_init(modsec_rec *msr, ap_filter_t *f,
-    apr_bucket_brigade *bb_in)
+        apr_bucket_brigade *bb_in)
 {
     request_rec *r = f->r;
     const char *s_content_length = NULL;
@@ -434,7 +435,7 @@ static apr_status_t output_filter_init(modsec_rec *msr, ap_filter_t *f,
         len = strtol(s_content_length, NULL, 10);
         if ((len == LONG_MIN)||(len == LONG_MAX)||(len < 0)||(len >= 1073741824)) {
             msr_log(msr, 1, "Output filter: Invalid Content-Length: %s", log_escape_nq(r->pool,
-                (char *)s_content_length));
+                        (char *)s_content_length));
             return -1; /* Invalid. */
         }
 
@@ -448,7 +449,7 @@ static apr_status_t output_filter_init(modsec_rec *msr, ap_filter_t *f,
 
         if (len > msr->txcfg->of_limit) {
             msr_log(msr, 1, "Output filter: Content-Length (%s) over the limit (%ld).",
-                log_escape_nq(r->pool, (char *)s_content_length), msr->txcfg->of_limit);
+                    log_escape_nq(r->pool, (char *)s_content_length), msr->txcfg->of_limit);
             msr->outbound_error = 1;
             return -2; /* Over the limit. */
         }
@@ -480,12 +481,12 @@ static apr_status_t send_of_brigade(modsec_rec *msr, ap_filter_t *f) {
                     /* Look like this is caused by the error
                      * already being handled, so we should ignore it
                      *
-                    msr_log(msr, log_level, "Output filter: Error while forwarding response data (%d): Filter error", rc);
+                     msr_log(msr, log_level, "Output filter: Error while forwarding response data (%d): Filter error", rc);
                      */
                     break;
                 default :
                     msr_log(msr, log_level, "Output filter: Error while forwarding response data (%d): %s",
-                        rc, get_apr_error(msr->mp, rc));
+                            rc, get_apr_error(msr->mp, rc));
                     break;
             }
         }
@@ -496,6 +497,12 @@ static apr_status_t send_of_brigade(modsec_rec *msr, ap_filter_t *f) {
     return APR_SUCCESS;
 }
 
+/** \brief Inject data into brigade
+ *
+ * \param msr ModSecurity transation resource
+ * \param ap_filter_t Apache filter
+ *
+ */
 static void inject_content_to_of_brigade(modsec_rec *msr, ap_filter_t *f) {
     apr_bucket *b;
 
@@ -567,7 +574,7 @@ static int flatten_response_body(modsec_rec *msr) {
     msr->resbody_data[msr->resbody_length] = '\0';
     msr->resbody_status = RESBODY_STATUS_READ;
 
-    if (msr->txcfg->stream_outbody_inspection)  {
+    if (msr->txcfg->stream_outbody_inspection && msr->txcfg->encryption_is_enabled == ENCRYPTION_DISABLED)  {
 
         msr->stream_output_length = msr->resbody_length;
 
@@ -580,6 +587,36 @@ static int flatten_response_body(modsec_rec *msr) {
         memset(msr->stream_output_data, 0, msr->stream_output_length+1);
         strncpy(msr->stream_output_data, msr->resbody_data, msr->stream_output_length);
         msr->stream_output_data[msr->stream_output_length] = '\0';
+    } else if (msr->txcfg->stream_outbody_inspection && msr->txcfg->encryption_is_enabled == ENCRYPTION_ENABLED)    {
+        int retval = 0;
+        apr_time_t time1 = apr_time_now();
+
+        retval = init_response_body_html_parser(msr);
+
+        if(retval == 1) {
+            retval = encrypt_response_body_links(msr);
+            if(retval > 0) {
+                retval = inject_encrypted_response_body(msr, retval);
+                if (msr->txcfg->debuglog_level >= 4) {
+                    msr_log(msr, 4, "Encryption completed in %" APR_TIME_T_FMT " usec.", (apr_time_now() - time1));
+                }
+
+            }
+        }
+
+        if(msr->of_stream_changed == 0) {
+            msr->stream_output_length = msr->resbody_length;
+
+            if (msr->stream_output_data == NULL) {
+                msr_log(msr, 1, "Output filter: Stream Response body data memory allocation failed. Asked for: %" APR_SIZE_T_FMT,
+                        msr->stream_output_length + 1);
+                return -1;
+            }
+
+            memset(msr->stream_output_data, 0, msr->stream_output_length+1);
+            strncpy(msr->stream_output_data, msr->resbody_data, msr->stream_output_length);
+            msr->stream_output_data[msr->stream_output_length] = '\0';
+        }
     }
 
     return 1;
@@ -598,7 +635,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
     /* Do we have the context? */
     if (msr == NULL) {
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, f->r->server,
-            "ModSecurity: Internal Error: msr is null in output filter.");
+                "ModSecurity: Internal Error: msr is null in output filter.");
         ap_remove_output_filter(f);
         return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
     }
@@ -631,8 +668,12 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         msr->r = r;
         msr->response_status = r->status;
         msr->status_line = ((r->status_line != NULL)
-            ? r->status_line : ap_get_status_line(r->status));
+                ? r->status_line : ap_get_status_line(r->status));
         msr->response_protocol = get_response_protocol(r);
+
+        if(msr->txcfg->crypto_hash_location_rx == 1 || msr->txcfg->crypto_hash_location_pm == 1)
+            rc = modify_response_header(msr);
+
         msr->response_headers = apr_table_overlay(msr->mp, r->err_headers_out, r->headers_out);
 
         /* Process phase RESPONSE_HEADERS */
@@ -702,28 +743,28 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
         /* Content injection (prepend & non-buffering). */
         if ((msr->txcfg->content_injection_enabled) && (msr->content_prepend) && (msr->of_skipping)) {
             apr_bucket *bucket_ci = apr_bucket_heap_create(msr->content_prepend,
-                msr->content_prepend_len, NULL, f->r->connection->bucket_alloc);
+                    msr->content_prepend_len, NULL, f->r->connection->bucket_alloc);
             APR_BRIGADE_INSERT_HEAD(bb_in, bucket_ci);
 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Content Injection (nb): Added content to top: %s",
-                    log_escape_nq_ex(msr->mp, msr->content_prepend, msr->content_prepend_len));
+                        log_escape_nq_ex(msr->mp, msr->content_prepend, msr->content_prepend_len));
             }
         }
     } else
-    if (msr->of_status == OF_STATUS_COMPLETE) {
-        msr_log(msr, 1, "Output filter: Internal error: output filtering complete yet filter was invoked.");
-        ap_remove_output_filter(f);
-        return APR_EGENERAL;
-    }
+        if (msr->of_status == OF_STATUS_COMPLETE) {
+            msr_log(msr, 1, "Output filter: Internal error: output filtering complete yet filter was invoked.");
+            ap_remove_output_filter(f);
+            return APR_EGENERAL;
+        }
 
 
     /* Loop through the buckets in the brigade in order
      * to extract the size of the data available.
      */
     for(bucket = APR_BRIGADE_FIRST(bb_in);
-      bucket != APR_BRIGADE_SENTINEL(bb_in);
-      bucket = APR_BUCKET_NEXT(bucket)) {
+            bucket != APR_BRIGADE_SENTINEL(bb_in);
+            bucket = APR_BUCKET_NEXT(bucket)) {
         const char *buf;
         apr_size_t buflen;
 
@@ -738,7 +779,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                 msr->resbody_status = RESBODY_STATUS_ERROR;
 
                 msr_log(msr, 1, "Output filter: Failed to read bucket (rc %d): %s",
-                    rc, get_apr_error(r->pool, rc));
+                        rc, get_apr_error(r->pool, rc));
 
                 ap_remove_output_filter(f);
                 return send_error_bucket(msr, f, HTTP_INTERNAL_SERVER_ERROR);
@@ -746,7 +787,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Output filter: Bucket type %s contains %" APR_SIZE_T_FMT " bytes.",
-                    bucket->type->name, buflen);
+                        bucket->type->name, buflen);
             }
 
             /* Check the response size. */
@@ -759,7 +800,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
                 if (msr->txcfg->of_limit_action == RESPONSE_BODY_LIMIT_ACTION_REJECT) {
                     /* Reject response. */
                     msr_log(msr, 1, "Output filter: Response body too large (over limit of %ld, "
-                        "total not specified).", msr->txcfg->of_limit);
+                            "total not specified).", msr->txcfg->of_limit);
 
                     msr->of_status = OF_STATUS_COMPLETE;
                     msr->resbody_status = RESBODY_STATUS_PARTIAL;
@@ -773,7 +814,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
                     if (msr->txcfg->debuglog_level >= 4) {
                         msr_log(msr, 4, "Output filter: Processing partial response body (limit %ld)",
-                            msr->txcfg->of_limit);
+                                msr->txcfg->of_limit);
                     }
                 }
             } else {
@@ -787,17 +828,17 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
             /* Inject content (append & non-buffering). */
             if ((msr->txcfg->content_injection_enabled) && (msr->content_append)
-                && (msr->of_skipping || msr->of_partial || start_skipping))
+                    && (msr->of_skipping || msr->of_partial || start_skipping))
             {
                 apr_bucket *bucket_ci = NULL;
 
                 bucket_ci = apr_bucket_heap_create(msr->content_append,
-                    msr->content_append_len, NULL, f->r->connection->bucket_alloc);
+                        msr->content_append_len, NULL, f->r->connection->bucket_alloc);
                 APR_BUCKET_INSERT_BEFORE(bucket, bucket_ci);
 
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "Content-Injection (nb): Added content to bottom: %s",
-                        log_escape_nq_ex(msr->mp, msr->content_append, msr->content_append_len));
+                            log_escape_nq_ex(msr->mp, msr->content_append, msr->content_append_len));
                 }
             }
 
@@ -867,7 +908,7 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
 
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Output filter: Completed receiving response body (buffered %s - %" APR_SIZE_T_FMT " bytes).",
-                (msr->of_partial ? "partial" : "full"), msr->resbody_length);
+                    (msr->of_partial ? "partial" : "full"), msr->resbody_length);
         }
     } else { /* Not looking at response data. */
         if (msr->of_done_reading == 0) {
@@ -950,12 +991,12 @@ apr_status_t output_filter(ap_filter_t *f, apr_bucket_brigade *bb_in) {
             apr_bucket *bucket_ci = NULL;
 
             bucket_ci = apr_bucket_heap_create(msr->content_append,
-                msr->content_append_len, NULL, f->r->connection->bucket_alloc);
+                    msr->content_append_len, NULL, f->r->connection->bucket_alloc);
             APR_BUCKET_INSERT_BEFORE(eos_bucket, bucket_ci);
 
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Content-Injection (b): Added content to bottom: %s",
-                    log_escape_nq_ex(msr->mp, msr->content_append, msr->content_append_len));
+                        log_escape_nq_ex(msr->mp, msr->content_append, msr->content_append_len));
             }
         }
 

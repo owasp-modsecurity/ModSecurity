@@ -18,6 +18,9 @@
 #include "msc_logging.h"
 #include "msc_util.h"
 #include "http_log.h"
+#include "apr_lib.h"
+#include "acmp.h"
+#include "msc_crypt.h"
 
 #if defined(WITH_LUA)
 #include "msc_lua.h"
@@ -64,10 +67,12 @@ void *create_directory_config(apr_pool_t *mp, char *path)
 
     dcfg->rule_inheritance = NOT_SET;
     dcfg->rule_exceptions = apr_array_make(mp, 16, sizeof(rule_exception *));
+    dcfg->encryption_method = apr_array_make(mp, 16, sizeof(encryption_method *));
 
     /* audit log variables */
     dcfg->auditlog_flag = NOT_SET;
     dcfg->auditlog_type = NOT_SET;
+    dcfg->max_rule_time = NOT_SET;
     dcfg->auditlog_dirperms = NOT_SET;
     dcfg->auditlog_fileperms = NOT_SET;
     dcfg->auditlog_name = NOT_SET_P;
@@ -96,6 +101,7 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     /* Misc */
     dcfg->data_dir = NOT_SET_P;
     dcfg->webappid = NOT_SET_P;
+    dcfg->sensor_id = NOT_SET_P;
     dcfg->httpBlkey = NOT_SET_P;
 
     /* Content injection. */
@@ -128,6 +134,23 @@ void *create_directory_config(apr_pool_t *mp, char *path)
 
     /* Collection timeout */
     dcfg->col_timeout = NOT_SET;
+
+    dcfg->crypto_key = NOT_SET_P;
+    dcfg->crypto_key_add = NOT_SET;
+    dcfg->crypto_param_name = NOT_SET_P;
+    dcfg->encryption_is_enabled = NOT_SET;
+    dcfg->encryption_enforcement = NOT_SET;
+    dcfg->crypto_hash_href_rx = NOT_SET;
+    dcfg->crypto_hash_faction_rx = NOT_SET;
+    dcfg->crypto_hash_location_rx = NOT_SET;
+    dcfg->crypto_hash_iframesrc_rx = NOT_SET;
+    dcfg->crypto_hash_framesrc_rx = NOT_SET;
+    dcfg->crypto_hash_href_pm = NOT_SET;
+    dcfg->crypto_hash_faction_pm = NOT_SET;
+    dcfg->crypto_hash_location_pm = NOT_SET;
+    dcfg->crypto_hash_iframesrc_pm = NOT_SET;
+    dcfg->crypto_hash_framesrc_pm = NOT_SET;
+
 
     return dcfg;
 }
@@ -422,11 +445,16 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->rule_exceptions = apr_array_append(mp, parent->rule_exceptions,
         child->rule_exceptions);
 
+    merged->encryption_method = apr_array_append(mp, parent->encryption_method,
+        child->encryption_method);
+
     /* audit log variables */
     merged->auditlog_flag = (child->auditlog_flag == NOT_SET
         ? parent->auditlog_flag : child->auditlog_flag);
     merged->auditlog_type = (child->auditlog_type == NOT_SET
         ? parent->auditlog_type : child->auditlog_type);
+    merged->max_rule_time = (child->max_rule_time == NOT_SET
+        ? parent->max_rule_time : child->max_rule_time);
     merged->auditlog_dirperms = (child->auditlog_dirperms == NOT_SET
         ? parent->auditlog_dirperms : child->auditlog_dirperms);
     merged->auditlog_fileperms = (child->auditlog_fileperms == NOT_SET
@@ -471,6 +499,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
         ? parent->data_dir : child->data_dir);
     merged->webappid = (child->webappid == NOT_SET_P
         ? parent->webappid : child->webappid);
+    merged->sensor_id = (child->sensor_id == NOT_SET_P
+        ? parent->sensor_id : child->sensor_id);
     merged->httpBlkey = (child->httpBlkey == NOT_SET_P
         ? parent->httpBlkey : child->httpBlkey);
 
@@ -521,6 +551,38 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->col_timeout = (child->col_timeout == NOT_SET
         ? parent->col_timeout : child->col_timeout);
 
+    /* Encryption */
+    merged->crypto_key = (child->crypto_key == NOT_SET_P
+        ? parent->crypto_key : child->crypto_key);
+    merged->crypto_key_add = (child->crypto_key_add == NOT_SET
+        ? parent->crypto_key_add : child->crypto_key_add);
+    merged->crypto_param_name = (child->crypto_param_name == NOT_SET_P
+        ? parent->crypto_param_name : child->crypto_param_name);
+    merged->encryption_is_enabled = (child->encryption_is_enabled == NOT_SET
+        ? parent->encryption_is_enabled : child->encryption_is_enabled);
+    merged->encryption_enforcement = (child->encryption_enforcement == NOT_SET
+        ? parent->encryption_enforcement : child->encryption_enforcement);
+    merged->crypto_hash_href_rx = (child->crypto_hash_href_rx == NOT_SET
+        ? parent->crypto_hash_href_rx : child->crypto_hash_href_rx);
+    merged->crypto_hash_faction_rx = (child->crypto_hash_faction_rx == NOT_SET
+        ? parent->crypto_hash_faction_rx : child->crypto_hash_faction_rx);
+    merged->crypto_hash_location_rx = (child->crypto_hash_location_rx == NOT_SET
+        ? parent->crypto_hash_location_rx : child->crypto_hash_location_rx);
+    merged->crypto_hash_iframesrc_rx = (child->crypto_hash_iframesrc_rx == NOT_SET
+        ? parent->crypto_hash_iframesrc_rx : child->crypto_hash_iframesrc_rx);
+    merged->crypto_hash_framesrc_rx = (child->crypto_hash_framesrc_rx == NOT_SET
+        ? parent->crypto_hash_framesrc_rx : child->crypto_hash_framesrc_rx);
+    merged->crypto_hash_href_pm = (child->crypto_hash_href_pm == NOT_SET
+        ? parent->crypto_hash_href_pm : child->crypto_hash_href_pm);
+    merged->crypto_hash_faction_pm = (child->crypto_hash_faction_pm == NOT_SET
+        ? parent->crypto_hash_faction_pm : child->crypto_hash_faction_pm);
+    merged->crypto_hash_location_pm = (child->crypto_hash_location_pm == NOT_SET
+        ? parent->crypto_hash_location_pm : child->crypto_hash_location_pm);
+    merged->crypto_hash_iframesrc_pm = (child->crypto_hash_iframesrc_pm == NOT_SET
+        ? parent->crypto_hash_iframesrc_pm : child->crypto_hash_iframesrc_pm);
+    merged->crypto_hash_framesrc_pm = (child->crypto_hash_framesrc_pm == NOT_SET
+        ? parent->crypto_hash_framesrc_pm : child->crypto_hash_framesrc_pm);
+
     return merged;
 }
 
@@ -568,6 +630,7 @@ void init_directory_config(directory_config *dcfg)
     /* audit log variables */
     if (dcfg->auditlog_flag == NOT_SET) dcfg->auditlog_flag = 0;
     if (dcfg->auditlog_type == NOT_SET) dcfg->auditlog_type = AUDITLOG_SERIAL;
+    if (dcfg->max_rule_time == NOT_SET) dcfg->max_rule_time = 0;
     if (dcfg->auditlog_dirperms == NOT_SET) dcfg->auditlog_dirperms = CREATEMODE_DIR;
     if (dcfg->auditlog_fileperms == NOT_SET) dcfg->auditlog_fileperms = CREATEMODE;
     if (dcfg->auditlog_fd == NOT_SET_P) dcfg->auditlog_fd = NULL;
@@ -589,6 +652,7 @@ void init_directory_config(directory_config *dcfg)
     /* Misc */
     if (dcfg->data_dir == NOT_SET_P) dcfg->data_dir = NULL;
     if (dcfg->webappid == NOT_SET_P) dcfg->webappid = "default";
+    if (dcfg->sensor_id == NOT_SET_P) dcfg->sensor_id = "default";
     if (dcfg->httpBlkey == NOT_SET_P) dcfg->httpBlkey = NULL;
 
     /* Content injection. */
@@ -619,6 +683,24 @@ void init_directory_config(directory_config *dcfg)
     if (dcfg->disable_backend_compression == NOT_SET) dcfg->disable_backend_compression = 0;
 
     if (dcfg->col_timeout == NOT_SET) dcfg->col_timeout = 3600;
+
+    /* Encryption */
+    if (dcfg->crypto_key == NOT_SET_P) dcfg->crypto_key = getkey(dcfg->mp);
+    if (dcfg->crypto_key_add == NOT_SET) dcfg->crypto_key_add = ENCRYPTION_KEYONLY;
+    if (dcfg->crypto_param_name == NOT_SET_P) dcfg->crypto_param_name = "crypt";
+    if (dcfg->encryption_is_enabled == NOT_SET) dcfg->encryption_is_enabled = ENCRYPTION_DISABLED;
+    if (dcfg->encryption_enforcement == NOT_SET) dcfg->encryption_enforcement = ENCRYPTION_DISABLED;
+    if (dcfg->crypto_hash_href_rx == NOT_SET) dcfg->crypto_hash_href_rx = 0;
+    if (dcfg->crypto_hash_faction_rx == NOT_SET) dcfg->crypto_hash_faction_rx = 0;
+    if (dcfg->crypto_hash_location_rx == NOT_SET) dcfg->crypto_hash_location_rx = 0;
+    if (dcfg->crypto_hash_iframesrc_rx == NOT_SET) dcfg->crypto_hash_iframesrc_rx = 0;
+    if (dcfg->crypto_hash_framesrc_rx == NOT_SET) dcfg->crypto_hash_framesrc_rx = 0;
+    if (dcfg->crypto_hash_href_pm == NOT_SET) dcfg->crypto_hash_href_pm = 0;
+    if (dcfg->crypto_hash_faction_pm == NOT_SET) dcfg->crypto_hash_faction_pm = 0;
+    if (dcfg->crypto_hash_location_pm == NOT_SET) dcfg->crypto_hash_location_pm = 0;
+    if (dcfg->crypto_hash_iframesrc_pm == NOT_SET) dcfg->crypto_hash_iframesrc_pm = 0;
+    if (dcfg->crypto_hash_framesrc_pm == NOT_SET) dcfg->crypto_hash_framesrc_pm = 0;
+
 }
 
 /**
@@ -628,8 +710,9 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
                             const char *p1, const char *p2, const char *p3)
 {
     char *my_error_msg = NULL;
-    msre_rule *rule = NULL;
+    msre_rule *rule = NULL, *tmp_rule = NULL;
     extern msc_engine *modsecurity;
+    int offset = 0;
 
     #ifdef DEBUG_CONF
     ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool,
@@ -658,6 +741,32 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 
     if (rule == NULL) {
         return my_error_msg;
+    }
+
+    /* Rules must have uniq ID */
+    if (
+#if defined(WITH_LUA)
+            type != RULE_TYPE_LUA &&
+#endif
+            (dcfg->tmp_chain_starter == NULL))
+                if(rule->actionset == NULL)
+                    return "Rules must have at least id action";
+
+    if(rule->actionset != NULL && (dcfg->tmp_chain_starter == NULL))    {
+        if(rule->actionset->id == NOT_SET_P
+#if defined(WITH_LUA)
+            && (type != RULE_TYPE_LUA)
+#endif
+          )
+            return "No action id present within the rule";
+#if defined(WITH_LUA)
+        if(type != RULE_TYPE_LUA)
+#endif
+        {
+            tmp_rule = msre_ruleset_fetch_rule(dcfg->ruleset, rule->actionset->id, offset);
+            if(tmp_rule != NULL)
+                return "Found another rule with the same id";
+        }
     }
 
     /* Create default actionset if one does not already exist. */
@@ -1261,6 +1370,16 @@ static const char *cmd_debug_log(cmd_parms *cmd, void *_dcfg, const char *p1)
     return NULL;
 }
 
+/**
+* \brief Add SecCollectionTimeout configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On failure
+* \retval apr_psprintf On Success
+*/
 static const char *cmd_collection_timeout(cmd_parms *cmd, void *_dcfg,
                                        const char *p1)
 {
@@ -1325,6 +1444,14 @@ static const char *cmd_default_action(cmd_parms *cmd, void *_dcfg,
         ap_log_perror(APLOG_MARK,
             APLOG_STARTUP|APLOG_WARNING|APLOG_NOERRNO, 0, cmd->pool,
             "ModSecurity: WARNING Using \"severity\" or \"logdata\" in "
+            "SecDefaultAction is deprecated (%s:%d).",
+            cmd->directive->filename, cmd->directive->line_num);
+    }
+
+    if (apr_table_get(dcfg->tmp_default_actionset->actions, "t")) {
+        ap_log_perror(APLOG_MARK,
+            APLOG_STARTUP|APLOG_WARNING|APLOG_NOERRNO, 0, cmd->pool,
+            "ModSecurity: WARNING Using transformations in "
             "SecDefaultAction is deprecated (%s:%d).",
             cmd->directive->filename, cmd->directive->line_num);
     }
@@ -1409,7 +1536,7 @@ static const char *cmd_guardian_log(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
-/*
+/**
 * \brief Add SecStreamInBodyInspection configuration option
 *
 * \param cmd Pointer to configuration data
@@ -1428,7 +1555,7 @@ static const char *cmd_stream_inbody_inspection(cmd_parms *cmd, void *_dcfg, int
 }
 
 
-/*
+/**
 * \brief Add SecStreamOutBodyInspection configuration option
 *
 * \param cmd Pointer to configuration data
@@ -1445,8 +1572,35 @@ static const char *cmd_stream_outbody_inspection(cmd_parms *cmd, void *_dcfg, in
     dcfg->stream_outbody_inspection = flag;
     return NULL;
 }
+/**
+* \brief Add SecRulePerfTime configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On failure
+* \retval apr_psprintf On Success
+*/
+static const char *cmd_rule_perf_time(cmd_parms *cmd, void *_dcfg,
+        const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    long int limit;
 
-/*
+    if (dcfg == NULL) return NULL;
+
+    limit = strtol(p1, NULL, 10);
+    if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRulePerfTime: %s", p1);
+    }
+
+    dcfg->max_rule_time = limit;
+
+    return NULL;
+}
+
+/**
 * \brief Add SecReadStateLimit configuration option
 *
 * \param cmd Pointer to configuration data
@@ -1474,7 +1628,7 @@ static const char *cmd_conn_read_state_limit(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
-/*
+/**
 * \brief Add SecWriteStateLimit configuration option
 *
 * \param cmd Pointer to configuration data
@@ -1572,6 +1726,16 @@ static const char *cmd_request_body_access(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
+/**
+* \brief Add SecInterceptOnError configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On failure
+* \retval apr_psprintf On success
+*/
 static const char *cmd_request_intercept_on_error(cmd_parms *cmd, void *_dcfg,
                                            const char *p1)
 {
@@ -1656,6 +1820,16 @@ static const char *cmd_response_body_limit_action(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
+/**
+* \brief Add SecRequestBodyLimitAction configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On failure
+* \retval apr_psprintf On success
+*/
 static const char *cmd_resquest_body_limit_action(cmd_parms *cmd, void *_dcfg,
                                                   const char *p1)
 {
@@ -1709,22 +1883,106 @@ static const char *cmd_response_body_mime_types_clear(cmd_parms *cmd,
     return NULL;
 }
 
-/*
-* \brief Add SecRuleUpdateTargetById
-*
-* \param cmd Pointer to configuration data
-* \param _dcfg Pointer to directory configuration
-* \param p1 Pointer to configuration option
-* \param p2 Pointer to configuration option
-* \param p3 Pointer to configuration option
-*
-* \retval NULL On failure|Success
-*/
+/**
+ * \brief Add SecRuleUpdateTargetById
+ *
+ * \param cmd Pointer to configuration data
+ * \param _dcfg Pointer to directory configuration
+ * \param p1 Pointer to configuration option
+ * \param p2 Pointer to configuration option
+ * \param p3 Pointer to configuration option
+ *
+ * \retval NULL On failure|Success
+ */
 static const char *cmd_rule_update_target_by_id(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2, const char *p3)
 {
-    return update_rule_target(cmd, (directory_config *)_dcfg, NULL, p1, p2, p3);
+    directory_config *dcfg = (directory_config *)_dcfg;
+    rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
+    if (dcfg == NULL) return NULL;
+
+    if(p1 == NULL)  {
+        return apr_psprintf(cmd->pool, "Updating target by ID with no ID");
+    }
+
+    re->type = RULE_EXCEPTION_REMOVE_ID;
+    /* TODO: Validate the range here, while we can still tell the user if it's invalid */
+    re->param = p1;
+
+    return msre_ruleset_rule_update_target_matching_exception(NULL, dcfg->ruleset, re, p2, p3);
 }
+
+/**
+ * \brief Add SecRuleUpdateTargetByTag  configuration option
+ *
+ * \param cmd Pointer to configuration data
+ * \param _dcfg Pointer to directory configuration
+ * \param p1 Pointer to configuration option RULETAG
+ * \param p2 Pointer to configuration option TARGET
+ * \param p3 Pointer to configuration option REPLACED_TARGET
+ * \todo Finish documenting
+ *
+ * \retval NULL On success
+ * \retval apr_psprintf On failure
+ *
+ * \todo Figure out error checking
+ */
+static const char *cmd_rule_update_target_by_tag(cmd_parms *cmd, void *_dcfg,
+        const char *p1, const char *p2, const char *p3)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
+    if (dcfg == NULL) return NULL;
+
+    if(p1 == NULL)  {
+        return apr_psprintf(cmd->pool, "Updating target by tag with no tag");
+    }
+
+    re->type = RULE_EXCEPTION_REMOVE_TAG;
+    re->param = p1;
+    re->param_data = msc_pregcomp(cmd->pool, p1, 0, NULL, NULL);
+    if (re->param_data == NULL) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid regular expression: %s", p1);
+    }
+
+    return msre_ruleset_rule_update_target_matching_exception(NULL, dcfg->ruleset, re, p2, p3);
+}
+/**
+ * \brief Add SecRuleUpdateTargetByMsg configuration option
+ *
+ * \param cmd Pointer to configuration data
+ * \param _dcfg Pointer to directory configuration
+ * \param p1 Pointer to configuration option RULEMSG
+ * \param p2 Pointer to configuration option TARGET
+ * \param p3 Pointer to configuration option REPLACED_TARGET
+ * \todo Finish documenting
+ *
+ * \retval NULL On success
+ * \retval apr_psprintf On failure
+ *
+ * \todo Figure out error checking
+ */
+static const char *cmd_rule_update_target_by_msg(cmd_parms *cmd, void *_dcfg,
+        const char *p1, const char *p2, const char *p3)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    rule_exception *re = apr_pcalloc(cmd->pool, sizeof(rule_exception));
+    if (dcfg == NULL) return NULL;
+
+    if(p1 == NULL)  {
+        return apr_psprintf(cmd->pool, "Updating target by message with no message");
+    }
+
+    re->type = RULE_EXCEPTION_REMOVE_MSG;
+    re->param = p1;
+    re->param_data = msc_pregcomp(cmd->pool, p1, 0, NULL, NULL);
+    if (re->param_data == NULL) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid regular expression: %s", p1);
+    }
+
+    return msre_ruleset_rule_update_target_matching_exception(NULL, dcfg->ruleset, re, p2, p3);
+}
+
 
 static const char *cmd_rule(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2, const char *p3)
@@ -1788,6 +2046,16 @@ static const char *cmd_rule_remove_by_id(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
+/**
+* \brief Add SecRuleRemoveByTag  configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On failure
+* \retval apr_psprintf On success
+*/
 static const char *cmd_rule_remove_by_tag(cmd_parms *cmd, void *_dcfg,
                                           const char *p1)
 {
@@ -1965,6 +2233,277 @@ static const char *cmd_web_app_id(cmd_parms *cmd, void *_dcfg, const char *p1)
     return NULL;
 }
 
+static const char *cmd_sensor_id(cmd_parms *cmd, void *_dcfg, const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    /* ENH enforce format (letters, digits, ., _, -) */
+    dcfg->sensor_id = p1;
+
+    return NULL;
+}
+
+
+/**
+* \brief Add SecEncryption configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On failure
+* \retval apr_psprintf On Success
+*/
+static const char *cmd_encryption_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "on") == 0)  {
+        dcfg->encryption_is_enabled = ENCRYPTION_ENABLED;
+        dcfg->encryption_enforcement = ENCRYPTION_ENABLED;
+    }
+    else if (strcasecmp(p1, "off") == 0)    {
+        dcfg->encryption_is_enabled = ENCRYPTION_DISABLED;
+        dcfg->encryption_enforcement = ENCRYPTION_DISABLED;
+    }
+    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRuleEngine: %s", p1);
+
+    return NULL;
+}
+
+/**
+* \brief Add SecEncryptionPram configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On success
+*/
+static const char *cmd_encryption_param(cmd_parms *cmd, void *_dcfg, const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    if (dcfg == NULL) return NULL;
+
+    if (p1 == NULL) return NULL;
+    dcfg->crypto_param_name = p1;
+
+    return NULL;
+}
+
+/**
+* \brief Add SecEncryptionKey configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param _p1 Pointer to configuration option
+* \param _p2 Pointer to configuration option
+*
+* \retval NULL On success
+*/
+static const char *cmd_encryption_key(cmd_parms *cmd, void *_dcfg, const char *_p1, const char *_p2)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    char *p1 = NULL;
+
+    if (dcfg == NULL) return NULL;
+
+    if (p1 == NULL) return NULL;
+    if (strcasecmp(p1, "Rand") == 0)    {
+        p1 = apr_pstrdup(cmd->pool, getkey(cmd->pool));
+        dcfg->crypto_key = p1;
+        dcfg->crypto_key_len = strlen(dcfg->crypto_key);
+    } else    {
+        p1 = apr_pstrdup(cmd->pool, _p1);
+        dcfg->crypto_key = p1;
+        dcfg->crypto_key_len = strlen(p1);
+    }
+
+    if(_p2 == NULL)  {
+        return NULL;
+    } else    {
+        if (strcasecmp(_p2, "KeyOnly") == 0)
+            dcfg->crypto_key_add = ENCRYPTION_KEYONLY;
+        else if (strcasecmp(_p2, "SessionID") == 0)
+            dcfg->crypto_key_add = ENCRYPTION_SESSIONID;
+        else if (strcasecmp(_p2, "RemoteIP") == 0)
+            dcfg->crypto_key_add = ENCRYPTION_REMOTEIP;
+    }
+    return NULL;
+}
+
+/**
+* \brief Add SecEncryptionMethodPm configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+* \param p2 Pointer to configuration option
+*
+* \retval NULL On failure
+* \retval apr_psprintf On Success
+*/
+static const char *cmd_encryption_method_pm(cmd_parms *cmd, void *_dcfg,
+        const char *p1, const char *p2)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    rule_exception *re = apr_pcalloc(cmd->pool, sizeof(encryption_method));
+    const char *_p2 = apr_pstrdup(cmd->pool, p2);
+    ACMP *p = NULL;
+    const char *phrase = NULL;
+    const char *next = NULL;
+
+    if (dcfg == NULL) return NULL;
+
+    p = acmp_create(0, cmd->pool);
+    if (p == NULL) return NULL;
+
+    if(phrase == NULL)
+        phrase = apr_pstrdup(cmd->pool, _p2);
+
+    for (;;) {
+        while((apr_isspace(*phrase) != 0) && (*phrase != '\0')) phrase++;
+        if (*phrase == '\0') break;
+        next = phrase;
+        while((apr_isspace(*next) == 0) && (*next != 0)) next++;
+        acmp_add_pattern(p, phrase, NULL, NULL, next - phrase);
+        phrase = next;
+    }
+
+    acmp_prepare(p);
+
+    if (strcasecmp(p1, "HashHref") == 0) {
+        re->type = ENCRYPTION_URL_HREF_HASH_PM;
+        re->param = _p2;
+        re->param_data = (void *)p;
+        if (re->param_data == NULL) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid pattern: %s", p2);
+        }
+        dcfg->crypto_hash_href_pm = 1;
+    }
+    else if (strcasecmp(p1, "HashFormAction") == 0) {
+        re->type = ENCRYPTION_URL_FACTION_HASH_PM;
+        re->param = _p2;
+        re->param_data = (void *)p;
+        if (re->param_data == NULL) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid pattern: %s", p2);
+        }
+        dcfg->crypto_hash_faction_pm = 1;
+    }
+    else if (strcasecmp(p1, "HashLocation") == 0) {
+        re->type = ENCRYPTION_URL_LOCATION_HASH_PM;
+        re->param = _p2;
+        re->param_data = (void *)p;
+        if (re->param_data == NULL) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid pattern: %s", p2);
+        }
+        dcfg->crypto_hash_location_pm = 1;
+    }
+    else if (strcasecmp(p1, "HashIframeSrc") == 0) {
+        re->type = ENCRYPTION_URL_IFRAMESRC_HASH_PM;
+        re->param = _p2;
+        re->param_data = (void *)p;
+        if (re->param_data == NULL) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid pattern: %s", p2);
+        }
+        dcfg->crypto_hash_iframesrc_pm = 1;
+    }
+    else if (strcasecmp(p1, "HashFrameSrc") == 0) {
+        re->type = ENCRYPTION_URL_FRAMESRC_HASH_PM;
+        re->param = _p2;
+        re->param_data = (void *)p;
+        if (re->param_data == NULL) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid pattern: %s", p2);
+        }
+        dcfg->crypto_hash_framesrc_pm = 1;
+    }
+
+    *(encryption_method **)apr_array_push(dcfg->encryption_method) = re;
+
+    return NULL;
+}
+
+/**
+ * \brief Add SecEncryptionMethodRx configuration option
+ *
+ * \param cmd Pointer to configuration data
+ * \param _dcfg Pointer to directory configuration
+ * \param p1 Pointer to configuration option
+ * \param p2 Pointer to configuration option
+ *
+ * \retval NULL On failure
+ * \retval apr_psprintf On Success
+ */
+static const char *cmd_encryption_method_rx(cmd_parms *cmd, void *_dcfg,
+        const char *p1, const char *p2)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    rule_exception *re = apr_pcalloc(cmd->pool, sizeof(encryption_method));
+    const char *_p2 = apr_pstrdup(cmd->pool, p2);
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "HashHref") == 0) {
+        re->type = ENCRYPTION_URL_HREF_HASH_RX;
+        re->param = _p2;
+        re->param_data = msc_pregcomp(cmd->pool, p2, 0, NULL, NULL);
+        if (re->param_data == NULL) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid regular expression: %s", p2);
+        }
+        dcfg->crypto_hash_href_rx = 1;
+    }
+    else if (strcasecmp(p1, "HashFormAction") == 0) {
+        re->type = ENCRYPTION_URL_FACTION_HASH_RX;
+        re->param = _p2;
+        re->param_data = msc_pregcomp(cmd->pool, p2, 0, NULL, NULL);
+        if (re->param_data == NULL) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid regular expression: %s", p2);
+        }
+        dcfg->crypto_hash_faction_rx = 1;
+    }
+    else if (strcasecmp(p1, "HashLocation") == 0) {
+        re->type = ENCRYPTION_URL_LOCATION_HASH_RX;
+        re->param = _p2;
+        re->param_data = msc_pregcomp(cmd->pool, p2, 0, NULL, NULL);
+        if (re->param_data == NULL) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid regular expression: %s", p2);
+        }
+        dcfg->crypto_hash_location_rx = 1;
+    }
+    else if (strcasecmp(p1, "HashIframeSrc") == 0) {
+        re->type = ENCRYPTION_URL_IFRAMESRC_HASH_RX;
+        re->param = _p2;
+        re->param_data = msc_pregcomp(cmd->pool, p2, 0, NULL, NULL);
+        if (re->param_data == NULL) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid regular expression: %s", p2);
+        }
+        dcfg->crypto_hash_iframesrc_rx = 1;
+    }
+    else if (strcasecmp(p1, "HashFrameSrc") == 0) {
+        re->type = ENCRYPTION_URL_FRAMESRC_HASH_RX;
+        re->param = _p2;
+        re->param_data = msc_pregcomp(cmd->pool, p2, 0, NULL, NULL);
+        if (re->param_data == NULL) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid regular expression: %s", p2);
+        }
+        dcfg->crypto_hash_framesrc_rx = 1;
+    }
+
+    *(encryption_method **)apr_array_push(dcfg->encryption_method) = re;
+
+    return NULL;
+}
+
+/**
+* \brief Add SecHttpBlKey configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On success
+*/
 static const char *cmd_httpBl_key(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -1980,7 +2519,7 @@ static const char *cmd_httpBl_key(cmd_parms *cmd, void *_dcfg, const char *p1)
 /* PCRE Limits */
 
 static const char *cmd_pcre_match_limit(cmd_parms *cmd,
-                                        void *_dcfg, const char *p1)
+        void *_dcfg, const char *p1)
 {
     long val;
 
@@ -1991,7 +2530,7 @@ static const char *cmd_pcre_match_limit(cmd_parms *cmd,
     val = atol(p1);
     if (val <= 0) {
         return apr_psprintf(cmd->pool, "ModSecurity: Invalid setting for "
-                                       "SecPcreMatchLimit: %s", p1);
+                "SecPcreMatchLimit: %s", p1);
     }
     msc_pcre_match_limit = (unsigned long int)val;
 
@@ -1999,7 +2538,7 @@ static const char *cmd_pcre_match_limit(cmd_parms *cmd,
 }
 
 static const char *cmd_pcre_match_limit_recursion(cmd_parms *cmd,
-                                        void *_dcfg, const char *p1)
+        void *_dcfg, const char *p1)
 {
     long val;
 
@@ -2010,7 +2549,7 @@ static const char *cmd_pcre_match_limit_recursion(cmd_parms *cmd,
     val = atol(p1);
     if (val <= 0) {
         return apr_psprintf(cmd->pool, "ModSecurity: Invalid setting for "
-                                       "SecPcreMatchLimitRecursion: %s", p1);
+                "SecPcreMatchLimitRecursion: %s", p1);
     }
     msc_pcre_match_limit_recursion = (unsigned long int)val;
 
@@ -2021,7 +2560,7 @@ static const char *cmd_pcre_match_limit_recursion(cmd_parms *cmd,
 /* -- Geo Lookup configuration -- */
 
 static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
-                                     const char *p1)
+        const char *p1)
 {
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
     char *error_msg;
@@ -2035,8 +2574,15 @@ static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
-/* Unicode CodePage */
-
+/**
+* \brief Add SecUnicodeCodePage configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On success
+*/
 static const char *cmd_unicode_codepage(cmd_parms *cmd,
                                         void *_dcfg, const char *p1)
 {
@@ -2053,8 +2599,15 @@ static const char *cmd_unicode_codepage(cmd_parms *cmd,
     return NULL;
 }
 
-/* Unicode Map */
-
+/**
+* \brief Add SecUnicodeMapFile configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On success
+*/
 static const char *cmd_unicode_map(cmd_parms *cmd, void *_dcfg,
                                      const char *p1)
 {
@@ -2070,8 +2623,15 @@ static const char *cmd_unicode_map(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
-/* Google safe browsing */
-
+/**
+* \brief Add SecGsbLookupDb configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On success
+*/
 static const char *cmd_gsb_lookup_db(cmd_parms *cmd, void *_dcfg,
                                      const char *p1)
 {
@@ -2211,7 +2771,7 @@ const command_rec module_directives[] = {
         "SecArgumentSeparator",
         cmd_argument_separator,
         NULL,
-        CMD_SCOPE_MAIN,
+        CMD_SCOPE_ANY,
         "character that will be used as separator when parsing application/x-www-form-urlencoded content."
     ),
 
@@ -2473,6 +3033,14 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_TAKE1 (
+        "SecRulePerfTime",
+        cmd_rule_perf_time,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Threshold to log slow rules in usecs."
+    ),
+
+    AP_INIT_TAKE1 (
         "SecReadStateLimit",
         cmd_conn_read_state_limit,
         NULL,
@@ -2625,6 +3193,22 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_TAKE2 (
+        "SecEncryptionMethodPm",
+        cmd_encryption_method_pm,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Encryption method and pattern"
+    ),
+
+    AP_INIT_TAKE2 (
+        "SecEncryptionMethodRx",
+        cmd_encryption_method_rx,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Encryption method and regex"
+    ),
+
+    AP_INIT_TAKE2 (
         "SecRuleUpdateActionById",
         cmd_rule_update_action_by_id,
         NULL,
@@ -2639,6 +3223,23 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "updated target list"
     ),
+
+    AP_INIT_TAKE23 (
+        "SecRuleUpdateTargetByTag",
+        cmd_rule_update_target_by_tag,
+        NULL,
+        CMD_SCOPE_ANY,
+        "rule tag pattern and updated target list"
+    ),
+
+    AP_INIT_TAKE23 (
+        "SecRuleUpdateTargetByMsg",
+        cmd_rule_update_target_by_msg,
+        NULL,
+        CMD_SCOPE_ANY,
+        "rule message pattern and updated target list"
+    ),
+
 
     AP_INIT_TAKE1 (
         "SecServerSignature",
@@ -2697,11 +3298,43 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_TAKE1 (
+        "SecSensorId",
+        cmd_sensor_id,
+        NULL,
+        CMD_SCOPE_MAIN,
+        "sensor id"
+    ),
+
+    AP_INIT_TAKE1 (
         "SecHttpBlKey",
         cmd_httpBl_key,
         NULL,
         CMD_SCOPE_ANY,
         "httpBl access key"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecEncryptionEngine",
+        cmd_encryption_engine,
+        NULL,
+        CMD_SCOPE_ANY,
+        "On or Off"
+    ),
+
+    AP_INIT_TAKE2 (
+        "SecEncryptionKey",
+        cmd_encryption_key,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Set Encrytion key"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecEncryptionParam",
+        cmd_encryption_param,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Set Encryption parameter"
     ),
 
     { NULL }

@@ -6,7 +6,7 @@ dnl
 
 AC_PREREQ(2.63)
 
-AC_INIT([modsecurity], [2.6], [support@modsecurity.org])
+AC_INIT([modsecurity], [2.7], [support@modsecurity.org])
 
 AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_SRCDIR([LICENSE])
@@ -304,6 +304,38 @@ AC_ARG_ENABLE(pcre-match-limit-recursion,
   pcre_match_limit_recursion='-DMODSEC_PCRE_MATCH_LIMIT_RECURSION=1500'
 ])
 
+# Enable Lua per transaction cache
+AC_ARG_ENABLE(lua-cache,
+              AS_HELP_STRING([--enable-lua-cache],
+                             [Enable Lua per transaction cache.]),
+[
+  if test "$enableval" != "no"; then
+    lua_cache="-DCACHE_LUA"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $lua_cache"
+  else
+    lua_cache=
+  fi
+],
+[
+  lua_cache=
+])
+
+# Enable phase-1 in post_read_request
+AC_ARG_ENABLE(request-early,
+              AS_HELP_STRING([--enable-request-early],
+                             [Place phase1 into post_read_request hook.]),
+[
+  if test "$enableval" != "no"; then
+    request_early="-DREQUEST_EARLY"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $request_early"
+  else
+    request_early=
+  fi
+],
+[
+  request_early='-DREQUEST_EARLY'
+])
+
 # Ignore configure errors
 AC_ARG_ENABLE(errors,
               AS_HELP_STRING([--disable-errors],
@@ -567,7 +599,7 @@ else
   fi
 fi
 
-MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""

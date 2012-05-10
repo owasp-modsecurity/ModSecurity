@@ -260,6 +260,12 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
         msr_log(msr, 1, "%s", my_error_msg);
     }
 
+#if defined(WITH_LUA)
+    #ifdef CACHE_LUA
+    if(msr->L != NULL)  lua_close(msr->L);
+    #endif
+#endif
+
     return APR_SUCCESS;
 }
 
@@ -378,6 +384,12 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     if (msr->matched_vars == NULL) return -1;
     apr_table_clear(msr->matched_vars);
 
+    if(msr->txcfg->max_rule_time > 0)   {
+        msr->perf_rules = apr_table_make(msr->mp, 8);
+        if (msr->perf_rules == NULL) return -1;
+        apr_table_clear(msr->perf_rules);
+    }
+
     /* Locate the cookie headers and parse them */
     arr = apr_table_elts(msr->request_headers);
     te = (apr_table_entry_t *)arr->elts;
@@ -422,6 +434,9 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
 
     msr->removed_rules_tag = apr_array_make(msr->mp, 16, sizeof(char *));
     if (msr->removed_rules_tag == NULL) return -1;
+
+    msr->removed_rules_msg = apr_array_make(msr->mp, 16, sizeof(char *));
+    if (msr->removed_rules_msg == NULL) return -1;
 
     return 1;
 }

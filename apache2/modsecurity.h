@@ -19,8 +19,11 @@
 #include <stdlib.h>
 
 #include <limits.h>
+#include <libxml/tree.h>
+#include <libxml/HTMLparser.h>
 
 typedef struct rule_exception rule_exception;
+typedef struct rule_exception encryption_method;
 typedef struct modsec_rec modsec_rec;
 typedef struct directory_config directory_config;
 typedef struct error_message error_message;
@@ -40,6 +43,7 @@ typedef struct msc_parm msc_parm;
 #include "msc_gsb.h"
 #include "msc_unicode.h"
 #include "re.h"
+#include "msc_crypt.h"
 
 #include "ap_config.h"
 #include "apr_md5.h"
@@ -49,6 +53,11 @@ typedef struct msc_parm msc_parm;
 #include "http_config.h"
 #include "http_log.h"
 #include "http_protocol.h"
+
+#if defined(WITH_LUA)
+#include "msc_lua.h"
+#endif
+
 
 #define PHASE_REQUEST_HEADERS       1
 #define PHASE_REQUEST_BODY          2
@@ -101,7 +110,7 @@ typedef struct msc_parm msc_parm;
 
 #define SECMARKER_TARGETS                       "REMOTE_ADDR"
 #define SECMARKER_ARGS                          "@noMatch"
-#define SECMARKER_BASE_ACTIONS                  "t:none,pass,id:"
+#define SECMARKER_BASE_ACTIONS                  "t:none,pass,marker:"
 
 #if !defined(OS2) && !defined(WIN32) && !defined(BEOS) && !defined(NETWARE)
 #include "unixd.h"
@@ -171,6 +180,24 @@ extern DSOLOCAL int *unicode_map_table;
 #define MODSEC_DISABLED                 0
 #define MODSEC_DETECTION_ONLY           1
 #define MODSEC_ENABLED                  2
+
+#define ENCRYPTION_DISABLED             0
+#define ENCRYPTION_ENABLED              1
+
+#define ENCRYPTION_URL_HREF_HASH_RX     0
+#define ENCRYPTION_URL_HREF_HASH_PM     1
+#define ENCRYPTION_URL_FACTION_HASH_RX  2
+#define ENCRYPTION_URL_FACTION_HASH_PM  3
+#define ENCRYPTION_URL_LOCATION_HASH_RX 4
+#define ENCRYPTION_URL_LOCATION_HASH_PM 5
+#define ENCRYPTION_URL_IFRAMESRC_HASH_RX 6
+#define ENCRYPTION_URL_IFRAMESRC_HASH_PM 7
+#define ENCRYPTION_URL_FRAMESRC_HASH_RX 8
+#define ENCRYPTION_URL_FRAMESRC_HASH_PM 9
+
+#define ENCRYPTION_KEYONLY              0
+#define ENCRYPTION_SESSIONID            1
+#define ENCRYPTION_REMOTEIP             2
 
 #define MODSEC_CACHE_DISABLED           0
 #define MODSEC_CACHE_ENABLED            1
@@ -259,6 +286,9 @@ struct modsec_rec {
     unsigned int         remote_port;
     const char          *remote_user;
 
+    /* useragent */
+    const char          *useragent_ip;
+
     /* request */
 
     const char          *request_line;
@@ -342,7 +372,7 @@ struct modsec_rec {
     const char          *intercept_message;
 
     /* performance measurement */
-    apr_time_t           request_time;
+    apr_time_t       request_time;
     apr_time_t		 time_phase1;
     apr_time_t		 time_phase2;
     apr_time_t		 time_phase3;
@@ -352,7 +382,8 @@ struct modsec_rec {
     apr_time_t		 time_storage_write;
     apr_time_t		 time_logging;
     apr_time_t		 time_gc;
-    
+    apr_table_t      *perf_rules;
+
     apr_array_header_t  *matched_rules;
     msc_string          *matched_var;
     int                  highest_severity;
@@ -383,6 +414,7 @@ struct modsec_rec {
     /* removed rules */
     apr_array_header_t  *removed_rules;
     apr_array_header_t  *removed_rules_tag;
+    apr_array_header_t  *removed_rules_msg;
 
     /* When "allow" is executed the variable below is
      * updated to contain the scope of the allow action. Set
@@ -397,6 +429,13 @@ struct modsec_rec {
 
     /* Generic request body processor context to be used by custom parsers. */
     void                *reqbody_processor_ctx;
+
+    htmlDocPtr          crypto_html_tree;
+#if defined(WITH_LUA)
+    #ifdef CACHE_LUA
+    lua_State           *L;
+    #endif
+#endif
 };
 
 struct directory_config {
@@ -431,6 +470,9 @@ struct directory_config {
 
 
     /* -- Audit log -- */
+
+    /* Max rule time */
+    int                  max_rule_time;
 
     /* Whether audit log should be enabled in the context or not */
     int                  auditlog_flag;
@@ -486,6 +528,7 @@ struct directory_config {
     /* Misc */
     const char          *data_dir;
     const char          *webappid;
+    const char          *sensor_id;
     const char          *httpBlkey;
 
     /* Content injection. */
@@ -523,6 +566,25 @@ struct directory_config {
 
     /* Collection timeout */
     int col_timeout;
+
+    /* Encryption */
+    apr_array_header_t  *encryption_method;
+    const char          *crypto_key;
+    int                 crypto_key_len;
+    const char          *crypto_param_name;
+    int                 encryption_is_enabled;
+    int                 encryption_enforcement;
+    int                 crypto_key_add;
+    int                 crypto_hash_href_rx;
+    int                 crypto_hash_faction_rx;
+    int                 crypto_hash_location_rx;
+    int                 crypto_hash_iframesrc_rx;
+    int                 crypto_hash_framesrc_rx;
+    int                 crypto_hash_href_pm;
+    int                 crypto_hash_faction_pm;
+    int                 crypto_hash_location_pm;
+    int                 crypto_hash_iframesrc_pm;
+    int                 crypto_hash_framesrc_pm;
 };
 
 struct error_message {

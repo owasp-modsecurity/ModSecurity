@@ -393,7 +393,7 @@ static const struct luaL_Reg mylib[] = {
 int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rule, char **error_msg) {
     apr_time_t time_before;
     lua_State *L = NULL;
-    int rc;
+    int rc = 0;
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -404,10 +404,19 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
 
     time_before = apr_time_now();
 
+#ifdef CACHE_LUA
+    L = msr->L;
+    rc = lua_gettop(L);
+    if(rc)
+        lua_pop(L, rc);
+#else
     /* Create new state. */
     L = lua_open();
-
     luaL_openlibs(L);
+#endif
+
+    if(L == NULL)
+        return -1;
 
     /* Associate msr with the state. */
     lua_pushlightuserdata(L, (void *)msr);
@@ -441,6 +450,11 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
 
     if (lua_pcall(L, ((param != NULL) ? 1 : 0), 1, 0)) {
         *error_msg = apr_psprintf(msr->mp, "Lua: Script execution failed: %s", lua_tostring(L, -1));
+
+        if (msr->txcfg->debuglog_level >= 8) {
+            msr_log(msr, 8, "Lua: Script execution failed: %s", lua_tostring(L, -1));
+        }
+
         return -1;
     }
 
@@ -452,7 +466,9 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
 
     /* Destroy state. */
     lua_pop(L, 1);
+#ifndef CACHE_LUA
     lua_close(L);
+#endif
 
     /* Returns status code to caller. */
     if (msr->txcfg->debuglog_level >= 8) {
