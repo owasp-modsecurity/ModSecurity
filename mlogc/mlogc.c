@@ -421,10 +421,13 @@ static int read_queue_entries(apr_file_t *fd, apr_time_t *queue_time)
 {
     char linebuf[4100];
     int line_count = -1;
+    int line_size = 0;
+    apr_status_t rc = 0;
+    char *p = NULL;
 
     for(;;) {
-        apr_status_t rc = apr_file_gets(linebuf, 4096, fd);
-        char *p;
+        memset(linebuf, 0, 4100);
+        rc = apr_file_gets(linebuf, 4096, fd);
 
         if (rc == APR_EOF) break;
         if (rc != APR_SUCCESS) {
@@ -440,14 +443,16 @@ static int read_queue_entries(apr_file_t *fd, apr_time_t *queue_time)
         }
 
         p = &linebuf[0];
+        line_size = strlen(p);
 
         /* Remove the \n from the end of the line. */
-        while(*p != '\0') {
+        while(*p != '\0' && line_size > 0) {
             if (*p == '\n') {
                 *p = '\0';
                 break;
             }
             p++;
+            line_size--;
         }
 
         if (linebuf[0] == '#') { /* Ignore comments. */
