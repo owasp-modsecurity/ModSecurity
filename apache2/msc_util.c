@@ -74,6 +74,63 @@ static unsigned char *c2x(unsigned what, unsigned char *where);
 static unsigned char x2c(unsigned char *what);
 static unsigned char xsingle2c(unsigned char *what);
 
+/** \brief Validate IPv4 Netmask
+ *
+ * \param ip_strv6 Pointer to ipv6 address
+ *
+ * \retval netmask_v4 On Success
+ */
+unsigned char is_netmask_v4(char *ip_strv4) {
+    unsigned char netmask_v4 = 32;
+    char *mask_str = NULL;
+    int cidr;
+
+    if ((mask_str = strchr(ip_strv4, '/'))) {
+        *(mask_str++) = '\0';
+
+        if (strchr(mask_str, '.') != NULL) {
+            return 0;
+        }
+
+        cidr = atoi(mask_str);
+        if ((cidr < 0) || (cidr > 32)) {
+            return 0;
+        }
+
+        netmask_v4 = (unsigned char)cidr;
+    }
+
+    return netmask_v4;
+}
+
+/** \brief Validate IPv6 Netmask
+ *
+ * \param ip_strv6 Pointer to ipv6 address
+ *
+ * \retval netmask_v6 On Success
+ */
+unsigned char is_netmask_v6(char *ip_strv6) {
+    unsigned char netmask_v6 = 128;
+    char *mask_str = NULL;
+    int cidr;
+
+    if ((mask_str = strchr(ip_strv6, '/'))) {
+        *(mask_str++) = '\0';
+
+        if (strchr(mask_str, '.') != NULL) {
+            return 0;
+        }
+
+        cidr = atoi(mask_str);
+        if ((cidr < 0) || (cidr > 64)) {
+            return 0;
+        }
+        netmask_v6 = (unsigned char)cidr;
+    }
+
+    return netmask_v6;
+}
+
 /** \brief Interpret |HEX| syntax
  *
  * \param op_parm Pointer to operator input

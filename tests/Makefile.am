@@ -16,6 +16,7 @@ msc_test_SOURCES = msc_test.c \
                    $(top_srcdir)/apache2/persist_dbm.c \
                    $(top_srcdir)/apache2/msc_reqbody.c \
                    $(top_srcdir)/apache2/msc_crypt.c \
+                   $(top_srcdir)/apache2/msc_tree.c \
                    $(top_srcdir)/apache2/msc_geo.c \
                    $(top_srcdir)/apache2/msc_gsb.c \
                    $(top_srcdir)/apache2/acmp.c \

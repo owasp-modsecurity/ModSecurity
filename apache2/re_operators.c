@@ -20,6 +20,7 @@
 #include "apr_strmatch.h"
 #include "acmp.h"
 #include "msc_util.h"
+#include "msc_tree.h"
 #include "msc_crypt.h"
 
 #if !defined(WIN32) || !defined(WINNT)
@@ -177,6 +178,182 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
     }
 
    return 0;
+}
+
+/**
+* \brief Init function to ipmatchFromFile operator
+*
+* \param rule Pointer to the rule
+* \param error_msg Pointer to error msg
+*
+* \retval 1 On Success
+* \retval 0 On Fail
+*/
+static int msre_op_ipmatchFromFile_param_init(msre_rule *rule, char **error_msg) {
+    char errstr[1024];
+    char buf[HUGE_STRING_LEN + 1];
+    const char *rootpath = NULL;
+    const char *filepath = NULL;
+    char *fn;
+    char *start;
+    char *end;
+    const char *ipfile_path;
+    int line = 0;
+    unsigned short int op_len;
+    apr_status_t rc;
+    apr_file_t *fd;
+    TreeRoot rtree;
+    TreeNode *tnode;
+
+    if (error_msg == NULL)
+        return -1;
+    else
+        *error_msg = NULL;
+
+    if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'ipmatchFromFile'.");
+        return 0;
+    }
+
+    rtree.ipv4_tree = CPTCreateRadixTree(rule->ruleset->mp);
+    if (rtree.ipv4_tree == NULL) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "ipmatchFromFile: Tree tree initialization failed.");
+        return 0;
+    }
+    rtree.ipv6_tree = CPTCreateRadixTree(rule->ruleset->mp);
+    if (rtree.ipv6_tree == NULL) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "ipmatchFromFile: Tree tree initialization failed.");
+        return 0;
+    }
+
+    fn = apr_pstrdup(rule->ruleset->mp, rule->op_param);
+
+    ipfile_path = apr_pstrndup(rule->ruleset->mp, rule->filename, strlen(rule->filename) - strlen(apr_filepath_name_get(rule->filename)));
+
+    while((apr_isspace(*fn) != 0) && (*fn != '\0')) fn++;
+    if (*fn == '\0') {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Empty file specification for operator ipmatchFromFile \"%s\"", fn);
+        return 0;
+    }
+
+    filepath = fn;
+    if (apr_filepath_root(&rootpath, &filepath, APR_FILEPATH_TRUENAME, rule->ruleset->mp) != APR_SUCCESS) {
+        apr_filepath_merge(&fn, ipfile_path, fn, APR_FILEPATH_TRUENAME, rule->ruleset->mp);
+    }
+
+    rc = apr_file_open(&fd, fn, APR_READ | APR_BUFFERED | APR_FILE_NOCLEANUP, 0, rule->ruleset->mp);
+    if (rc != APR_SUCCESS) {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Could not open ipmatch file \"%s\": %s", fn, apr_strerror(rc, errstr, 1024));
+        return 0;
+    }
+
+    while((rc = apr_file_gets(buf, HUGE_STRING_LEN, fd)) != APR_EOF) {
+        line++;
+        if (rc != APR_SUCCESS) {
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Could not read \"%s\" line %d: %s", fn, line, apr_strerror(rc, errstr, 1024));
+            return 0;
+        }
+
+        op_len = strlen(buf);
+
+        start = buf;
+        while ((apr_isspace(*start) != 0) && (*start != '\0')) start++;
+        for (end = start; end != NULL || *end != '\0' || *end != '\n'; end++) {
+            if (apr_isxdigit(*end) || *end == '.' || *end == '/' || *end == ':') {
+                continue;
+            }
+            else {
+                if (*end != '\n') {
+                    *error_msg = apr_psprintf(rule->ruleset->mp, "Invalid char \"%c\" in line %d of file %s", *end, line, fn);
+                }
+                break;
+            }
+        }
+        *end = '\0';
+
+        if ((start == end) || (*start == '#')) continue;
+
+        if (strchr(start, ':') == NULL) {
+            tnode = TreeAddIP(start, rtree.ipv4_tree, IPV4_TREE);
+        }
+        else {
+            tnode = TreeAddIP(start, rtree.ipv6_tree, IPV6_TREE);
+        }
+        if (tnode == NULL) {
+            *error_msg = apr_psprintf(rule->ruleset->mp, "Could not add entry \"%s\" in line %d of file %s to IP list", start, line, fn);
+        }
+    }
+
+    if (fd != NULL) apr_file_close(fd);
+    rule->op_param_data = &rtree;
+    return 1;
+}
+
+/**
+* \brief Execution function to ipmatchFromFile operator
+*
+* \param msr Pointer internal modsec request structure
+* \param rule Pointer to the rule
+* \param var Pointer to variable structure
+* \param error_msg Pointer to error msg
+*
+* \retval -1 On Failure
+* \retval 1 On Match
+* \retval 0 On No Match
+*/
+
+static int msre_op_ipmatchFromFile_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    TreeRoot *rtree = rule->op_param_data;
+    TreeNode *node;
+    apr_sockaddr_t *sa;
+    struct in_addr in;
+    struct in6_addr in6;
+
+    if (error_msg == NULL)
+        return -1;
+    else
+        *error_msg = NULL;
+
+    if(rtree == NULL) {
+        msr_log(msr, 1, "ipMatchFromFile Internal Error: tree value is null.");
+        return 0;
+    }
+
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "IPmatchFromFile: Total tree entries: %d, ipv4 %d ipv6 %d", rtree->ipv4_tree->count+rtree->ipv6_tree->count,
+            rtree->ipv4_tree->count, rtree->ipv6_tree->count);
+    }
+
+    if (strchr(var->value, ':') == NULL) {
+        if (inet_pton(AF_INET, var->value, &in) <= 0) {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "IPmatchFromFile: bad IPv4 specification \"%s\".", var->value);
+            }
+            *error_msg = apr_psprintf(msr->mp, "IPmatchFromFile: bad IP specification \"%s\".", var->value);
+            return 0;
+        }
+
+        if (CPTIpMatch(msr, (uint8_t *)&in.s_addr, rtree->ipv4_tree, IPV4_TREE) != NULL) {
+            *error_msg = apr_psprintf(msr->mp, "IPmatchFromFile \"%s\" matched at %s.", var->value, var->name);
+            return 1;
+        }
+    }
+    else {
+        if (inet_pton(AF_INET6, var->value, &in6) <= 0) {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "IPmatchFromFile: bad IPv6 specification \"%s\".", var->value);
+            }
+            *error_msg = apr_psprintf(msr->mp, "IPmatchFromFile: bad IP specification \"%s\".", var->value);
+            return 0;
+        }
+
+        if (CPTIpMatch(msr, (uint8_t *)&in6.s6_addr, rtree->ipv6_tree, IPV6_TREE) != NULL) {
+            *error_msg = apr_psprintf(msr->mp, "IPmatchFromFile \"%s\" matched at %s.", var->value, var->name);
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 /* rsub */
@@ -4189,6 +4366,19 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "ipmatch",
         msre_op_ipmatch_param_init,
         msre_op_ipmatch_execute
+    );
+
+    /* ipmatchFromFile */
+    msre_engine_op_register(engine,
+        "ipmatchFromFile",
+        msre_op_ipmatchFromFile_param_init,
+        msre_op_ipmatchFromFile_execute
+    );
+    /* ipmatchf */
+    msre_engine_op_register(engine,
+        "ipmatchf",
+        msre_op_ipmatchFromFile_param_init,
+        msre_op_ipmatchFromFile_execute
     );
 
     /* rsub */
