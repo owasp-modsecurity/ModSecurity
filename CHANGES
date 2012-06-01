@@ -30,7 +30,7 @@ XX NNN 2012 - 2.7.0-rc1
  * Added SecRuleUpdateTargetByTag and its ctl version (Thanks Scott Gifford).
 
  * Added SecRulePerfTime when greater than zero it will fill rule id's execution time into PERF_RULE
- and log id=usec information in the new Perf-rule-info: line in part H.
+   and log id=usec information in the new Perf-rule-info: line in part H.
 
  * Added PERF_RULES variable that contains rule execution time.
 
@@ -71,7 +71,7 @@ XX NNN 2012 - 2.7.0-rc1
    client ip address.
 
  * Fixed Variable DURATION contains the elapsed time in microseconds for compatible reasons with apache and
- other variables.
+   other variables.
 
  * Fixed Preserve names/identity of the variables going into MATCHED_VARS.
 
@@ -80,7 +80,12 @@ XX NNN 2012 - 2.7.0-rc1
  * Fixed rsub operator does not work as expect if regex contains parentheses (Thanks Jerome Freilinger).
 
  * Current Google Safe Browsing implementation is deprecated. Google changed the API and does not allow
- anymore the malware database for download.
+   anymore the malware database for download.
+
+ * In 2009, Stefan Esser published an evasion technique that relies on the use of single quotes and PHP.
+   The trick was treating a request parameter as a file. A patch was applied into ModSecurity 2.5.11 by Brian Rectanus.
+   Ivan Ristic reported that the patch was imcomplete. We added extra checks for this evasion technique (MODSEC-312).
+
 
 20 Mar 2012 - 2.6.5
 -------------------
