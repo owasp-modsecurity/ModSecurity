@@ -20,6 +20,31 @@
 #include "msc_util.h"
 #include "msc_parsers.h"
 
+void validate_quotes(modsec_rec *msr, unsigned char *data)  {
+    int i, len;
+
+    if(msr == NULL)
+        return;
+
+    if(msr->mpd == NULL)
+        return;
+
+    if(data == NULL)
+        return;
+
+    len = strlen(data);
+
+    for(i = 0; i < len; i++)   {
+
+        if(data[i] == '\'' && (data[0] != '\"' || data[len-1] != '\"'))
+            msr->mpd->flag_invalid_quoting = 1;
+        else if (data[i] == '\"')   {
+            if(i != 0 && i != len-1)
+                msr->mpd->flag_invalid_quoting = 1;
+        }
+
+    }
+}
 
 #if 0
 static char *multipart_construct_filename(modsec_rec *msr) {
@@ -97,6 +122,9 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
          * technically "'" is invalid and so flag_invalid_quoting is
          * set so the user can deal with it in the rules if they so wish.
          */
+
+        validate_quotes(msr, p);
+
         if ((*p == '"') || (*p == '\'')) {
             /* quoted */
             char quote = *p;
