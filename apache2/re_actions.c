@@ -459,6 +459,33 @@ static apr_status_t msre_action_sanitizeMatchedBytes_init(msre_engine *engine,
     return 1;
 }
 
+/* accuracy */
+
+static apr_status_t msre_action_accuracy_init(msre_engine *engine,
+    msre_actionset *actionset, msre_action *action)
+{
+    actionset->accuracy = atoi(action->param);
+    return 1;
+}
+
+/* maturity */
+
+static apr_status_t msre_action_maturity_init(msre_engine *engine,
+    msre_actionset *actionset, msre_action *action)
+{
+    actionset->maturity = atoi(action->param);
+    return 1;
+}
+
+/* ver */
+
+static apr_status_t msre_action_ver_init(msre_engine *engine,
+    msre_actionset *actionset, msre_action *action)
+{
+    actionset->version = action->param;
+    return 1;
+}
+
 /* severity */
 
 static apr_status_t msre_action_severity_init(msre_engine *engine,
@@ -2282,6 +2309,45 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         ACTION_CGROUP_NONE,
         NULL,
         msre_action_logdata_init,
+        NULL
+    );
+
+    /* accuracy */
+    msre_engine_action_register(engine,
+        "accuracy",
+        ACTION_METADATA,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
+        NULL,
+        msre_action_accuracy_init,
+        NULL
+    );
+
+    /* maturity */
+    msre_engine_action_register(engine,
+        "maturity",
+        ACTION_METADATA,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
+        NULL,
+        msre_action_maturity_init,
+        NULL
+    );
+
+    /* ver */
+    msre_engine_action_register(engine,
+        "ver",
+        ACTION_METADATA,
+        1, 1,
+        NO_PLUS_MINUS,
+        ACTION_CARDINALITY_ONE,
+        ACTION_CGROUP_NONE,
+        NULL,
+        msre_action_ver_init,
         NULL
     );
 

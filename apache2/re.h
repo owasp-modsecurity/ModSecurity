@@ -289,6 +289,9 @@ struct msre_actionset {
     const char              *rev;
     const char              *msg;
     const char              *logdata;
+    const char              *version;
+    int                      maturity;
+    int                      accuracy;
     int                      severity;
     int                      phase;
     msre_rule               *rule;

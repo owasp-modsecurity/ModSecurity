@@ -548,6 +548,9 @@ static char *msre_actionset_generate_action_string(apr_pool_t *pool, const msre_
                     || (strcmp("nolog", action->metadata->name) == 0)
                     || (strcmp("noauditlog", action->metadata->name) == 0)
                     || (strcmp("severity", action->metadata->name) == 0)
+                    || (strcmp("ver", action->metadata->name) == 0)
+                    || (strcmp("maturity", action->metadata->name) == 0)
+                    || (strcmp("accuracy", action->metadata->name) == 0)
                     || (strcmp("tag", action->metadata->name) == 0)
                     || (strcmp("phase", action->metadata->name) == 0)) 
             {
@@ -1024,9 +1027,12 @@ msre_actionset *msre_actionset_create(msre_engine *engine, const char *text,
     actionset->id = NOT_SET_P;
     actionset->rev = NOT_SET_P;
     actionset->msg = NOT_SET_P;
+    actionset->version = NOT_SET_P;
     actionset->logdata = NOT_SET_P;
     actionset->phase = NOT_SET;
     actionset->severity = -1;
+    actionset->accuracy = -1;
+    actionset->maturity = -1;
     actionset->rule = NOT_SET_P;
     actionset->arg_max = -1;
     actionset->arg_min = -1;
@@ -1106,8 +1112,11 @@ msre_actionset *msre_actionset_merge(msre_engine *engine, msre_actionset *parent
     if (child->id != NOT_SET_P) merged->id = child->id;
     if (child->rev != NOT_SET_P) merged->rev = child->rev;
     if (child->msg != NOT_SET_P) merged->msg = child->msg;
+    if (child->version != NOT_SET_P) merged->version = child->version;
     if (child->logdata != NOT_SET_P) merged->logdata = child->logdata;
     if (child->severity != NOT_SET) merged->severity = child->severity;
+    if (child->accuracy != NOT_SET) merged->accuracy = child->accuracy;
+    if (child->maturity != NOT_SET) merged->maturity = child->maturity;
     if (child->phase != NOT_SET) merged->phase = child->phase;
     if (child->rule != NOT_SET_P) merged->rule = child->rule;
     if (child->arg_min != NOT_SET) merged->arg_min = child->arg_min;
@@ -1162,9 +1171,12 @@ void msre_actionset_set_defaults(msre_actionset *actionset) {
     if (actionset->id == NOT_SET_P) actionset->id = NULL;
     if (actionset->rev == NOT_SET_P) actionset->rev = NULL;
     if (actionset->msg == NOT_SET_P) actionset->msg = NULL;
+    if (actionset->version == NOT_SET_P) actionset->version = NULL;
     if (actionset->logdata == NOT_SET_P) actionset->logdata = NULL;
     if (actionset->phase == NOT_SET) actionset->phase = 2;
     if (actionset->severity == -1) {} /* leave at -1 */
+    if (actionset->accuracy == -1) {} /* leave at -1 */
+    if (actionset->maturity == -1) {} /* leave at -1 */
     if (actionset->rule == NOT_SET_P) actionset->rule = NULL;
     if (actionset->arg_max == NOT_SET) actionset->arg_max = -1;
     if (actionset->arg_min == NOT_SET) actionset->arg_min = -1;
@@ -1995,6 +2007,9 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
     char *msg = "";
     char *logdata = "";
     char *severity = "";
+    char *accuracy = "";
+    char *maturity = "";
+    char *version = "";
     char *tags = "";
     char *fn = "";
     int k;
@@ -2050,6 +2065,18 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
         severity = apr_psprintf(msr->mp, " [severity \"%s\"]",
                 msre_format_severity(actionset->severity));
     }
+    if (actionset->version != NULL) {
+        version = apr_psprintf(msr->mp, " [ver \"%s\"]",
+                log_escape(msr->mp, actionset->version));
+    }
+    if (actionset->maturity >= 0) {
+        maturity = apr_psprintf(msr->mp, " [maturity \"%d\"]",
+                actionset->maturity);
+    }
+    if (actionset->accuracy >= 0) {
+        accuracy = apr_psprintf(msr->mp, " [accuracy \"%d\"]",
+                actionset->accuracy);
+    }
 
     /* Extract rule tags from the action list. */
     tarr = apr_table_elts(actionset->actions);
@@ -2070,7 +2097,7 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
         }
     }
 
-    return apr_pstrcat(msr->mp, fn, id, rev, msg, logdata, severity, tags, NULL);
+    return apr_pstrcat(msr->mp, fn, id, rev, msg, logdata, severity, version, maturity, accuracy, tags, NULL);
 }
 
 char * msre_rule_generate_unparsed(apr_pool_t *pool,  const msre_rule *rule, const char *targets,

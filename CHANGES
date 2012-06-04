@@ -70,6 +70,8 @@ XX NNN 2012 - 2.7.0-rc1
  * Added USERAGENT_IP variable. Created when Apache24 is used with mod_remoteip to know the real
    client ip address.
 
+ ^ Added new rule metadata actions ver, maturity and accuracy. Also included into RULE collection.
+
  * Fixed Variable DURATION contains the elapsed time in microseconds for compatible reasons with apache and
    other variables.
 

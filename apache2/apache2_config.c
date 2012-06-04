@@ -803,9 +803,12 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
             ||(rule->actionset->rev != NOT_SET_P)
             ||(rule->actionset->msg != NOT_SET_P)
             ||(rule->actionset->severity != NOT_SET)
+            ||(rule->actionset->version != NOT_SET_P)
+            ||(rule->actionset->accuracy != NOT_SET)
+            ||(rule->actionset->maturity != NOT_SET)
             ||(rule->actionset->logdata != NOT_SET_P))
         {
-            return apr_psprintf(cmd->pool, "ModSecurity: Metadata actions (id, rev, msg, tag, severity, logdata) "
+            return apr_psprintf(cmd->pool, "ModSecurity: Metadata actions (id, rev, msg, tag, severity, ver, accuracy, maturity, logdata) "
                 " can only be specified by chain starter rules.");
         }
 
@@ -1432,10 +1435,13 @@ static const char *cmd_default_action(cmd_parms *cmd, void *_dcfg,
     /* ENH: loop through to check for tags */
     if ((dcfg->tmp_default_actionset->id != NOT_SET_P)
         ||(dcfg->tmp_default_actionset->rev != NOT_SET_P)
+        ||(dcfg->tmp_default_actionset->version != NOT_SET_P)
+        ||(dcfg->tmp_default_actionset->maturity != NOT_SET)
+        ||(dcfg->tmp_default_actionset->accuracy != NOT_SET)
         ||(dcfg->tmp_default_actionset->msg != NOT_SET_P))
     {
         return apr_psprintf(cmd->pool, "ModSecurity: SecDefaultAction must not "
-            "contain any metadata actions (id, rev, msg, tag, severity, logdata).");
+            "contain any metadata actions (id, rev, msg, tag, severity, ver, accuracy, maturity, logdata).");
     }
     /* These are just a warning for now. */
     if ((dcfg->tmp_default_actionset->severity != NOT_SET)

@@ -396,7 +396,7 @@ static int var_rule_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     msre_actionset *actionset = NULL;
 
     if (rule == NULL) return 0;
-    
+
     actionset = rule->actionset;
     if (rule->chain_starter != NULL) actionset = rule->chain_starter->actionset;
 
@@ -415,7 +415,19 @@ static int var_rule_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     } else
     if ((strcasecmp(var->param, "logdata") == 0)&&(actionset->logdata != NULL)) {
         return var_simple_generate(var, vartab, mptmp, actionset->logdata);
+    } else
+    if ((strcasecmp(var->param, "ver") == 0)&&(actionset->version != NULL)) {
+        return var_simple_generate(var, vartab, mptmp, actionset->version);
+    } else
+    if ((strcasecmp(var->param, "maturity") == 0)&&(actionset->maturity != -1)) {
+        char *value = apr_psprintf(mptmp, "%d", actionset->maturity);
+        return var_simple_generate(var, vartab, mptmp, value);
+    } else
+    if ((strcasecmp(var->param, "accuracy") == 0)&&(actionset->accuracy != -1)) {
+        char *value = apr_psprintf(mptmp, "%d", actionset->accuracy);
+        return var_simple_generate(var, vartab, mptmp, value);
     }
+
 
     return 0;
 }

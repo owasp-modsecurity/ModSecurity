@@ -401,7 +401,6 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     char *reg_pattern = NULL;
     char *replace = NULL;
     char *e_pattern = NULL;
-    char *e_replace = NULL;
     char *parsed_replace = NULL;
     char *flags = NULL;
     char *data = NULL;
@@ -420,7 +419,6 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     }
 
     data = apr_pstrdup(rule->ruleset->mp, line);
-
     delim = *++data;
     if (delim)
         reg_pattern = ++data;
@@ -475,15 +473,15 @@ static int msre_op_rsub_param_init(msre_rule *rule, char **error_msg) {
     }
 
     op_len = strlen(replace);
-    parsed_replace = apr_pstrdup(rule->ruleset->mp, parse_pm_content(replace, op_len, rule, error_msg));
+    parsed_replace = apr_pstrdup(rule->ruleset->mp, parse_pm_content(param_remove_escape(rule, replace, strlen(replace)),
+        op_len, rule, error_msg));
 
     if(!parsed_replace) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error rsub operator parsing input data");
         return -1;
     }
 
-    e_replace = param_remove_escape(rule, parsed_replace, strlen(parsed_replace));
-    rule->sub_str = apr_pstrmemdup(rule->ruleset->mp, e_replace, strlen(e_replace));
+    rule->sub_str = apr_pstrmemdup(rule->ruleset->mp, parsed_replace, strlen(parsed_replace));
 
     if (flags) {
         while (*flags) {
