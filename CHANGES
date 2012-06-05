@@ -72,6 +72,8 @@ XX NNN 2012 - 2.7.0-rc1
 
  ^ Added new rule metadata actions ver, maturity and accuracy. Also included into RULE collection.
 
+ * Added build system support for KfreeBSD and HURD.
+
  * Fixed Variable DURATION contains the elapsed time in microseconds for compatible reasons with apache and
    other variables.
 
