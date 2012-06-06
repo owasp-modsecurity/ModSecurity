@@ -1241,6 +1241,10 @@ unsigned char *do_hash_link(modsec_rec *msr, char *link, int type)  {
             char *relative_uri = NULL;
 
             filename = file_basename(msr->mp, msr->r->parsed_uri.path);
+
+            if(filename == NULL || (strlen(msr->r->parsed_uri.path) - strlen(filename) < 0))
+                return NULL;
+
             relative_path = apr_pstrndup(msr->mp, msr->r->parsed_uri.path, strlen(msr->r->parsed_uri.path) - strlen(filename));
             relative_uri = apr_pstrcat(msr->mp, relative_path, link, NULL);
 
