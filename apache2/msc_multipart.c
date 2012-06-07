@@ -36,7 +36,7 @@ void validate_quotes(modsec_rec *msr, unsigned char *data)  {
 
     for(i = 0; i < len; i++)   {
 
-        if(data[i] == '\'' && (data[0] != '\"' || data[len-1] != '\"')) {
+        if(data[i] == '\'') {
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Multipart: Invalid quoting detected: %s length %d bytes",
                         log_escape_nq(msr->mp, data), len);
