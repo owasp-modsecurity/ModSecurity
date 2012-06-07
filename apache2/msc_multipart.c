@@ -36,13 +36,13 @@ void validate_quotes(modsec_rec *msr, unsigned char *data)  {
 
     for(i = 0; i < len; i++)   {
 
-        if(data[i] == '\'' && (data[0] != '\"' || data[len-1] != '\"'))
+        if(data[i] == '\'' && (data[0] != '\"' || data[len-1] != '\"')) {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Multipart: Invalid quoting detected: %s length %d bytes",
+                        log_escape_nq(msr->mp, data), len);
+            }
             msr->mpd->flag_invalid_quoting = 1;
-        else if (data[i] == '\"')   {
-            if(i != 0 && i != len-1)
-                msr->mpd->flag_invalid_quoting = 1;
         }
-
     }
 }
 
@@ -123,8 +123,6 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
          * set so the user can deal with it in the rules if they so wish.
          */
 
-        validate_quotes(msr, p);
-
         if ((*p == '"') || (*p == '\'')) {
             /* quoted */
             char quote = *p;
@@ -183,6 +181,9 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
         /* evaluate part */
 
         if (strcmp(name, "name") == 0) {
+
+            validate_quotes(msr, value);
+
             if (msr->mpd->mpp->name != NULL) {
                 msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition name: %s",
                     log_escape_nq(msr->mp, value));
@@ -197,6 +198,9 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
         }
         else
         if (strcmp(name, "filename") == 0) {
+
+            validate_quotes(msr, value);
+
             if (msr->mpd->mpp->filename != NULL) {
                 msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename: %s",
                     log_escape_nq(msr->mp, value));
@@ -215,7 +219,18 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
             while((*p == '\t') || (*p == ' ')) p++;
             /* the next character must be a zero or a semi-colon */
             if (*p == '\0') return 1; /* this is OK */
-            if (*p != ';') return -12;
+            if (*p != ';') {
+                p--;
+                if(*p == '\'' || *p == '\"') {
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Multipart: Invalid quoting detected: %s length %d bytes",
+                                log_escape_nq(msr->mp, p), strlen(p));
+                    }
+                    msr->mpd->flag_invalid_quoting = 1;
+                }
+                p++;
+                return -12;
+            }
             p++; /* move over the semi-colon */
         }
 
@@ -258,10 +273,10 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
 
     /* Is this an empty line? */
     if (   ((msr->mpd->buf[0] == '\r')
-          &&(msr->mpd->buf[1] == '\n')
-          &&(msr->mpd->buf[2] == '\0') )
-        || ((msr->mpd->buf[0] == '\n')
-          &&(msr->mpd->buf[1] == '\0') ) )
+                &&(msr->mpd->buf[1] == '\n')
+                &&(msr->mpd->buf[2] == '\0') )
+            || ((msr->mpd->buf[0] == '\n')
+                &&(msr->mpd->buf[1] == '\0') ) )
     { /* Empty line. */
         char *header_value = NULL;
 
@@ -274,7 +289,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
         rc = multipart_parse_content_disposition(msr, header_value);
         if (rc < 0) {
             *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (%d): %s.",
-                rc, log_escape_nq(msr->mp, header_value));
+                    rc, log_escape_nq(msr->mp, header_value));
             return -1;
         }
 
