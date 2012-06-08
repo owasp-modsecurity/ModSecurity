@@ -1,4 +1,4 @@
-XX NNN 2012 - 2.7.0-rc1
+08 Jun 2012 - 2.7.0-rc1
 -------------------
 
  * Added SecEncryptionEngine. Initial crypt engine support, at the momment it will sign some Html
@@ -88,10 +88,12 @@ XX NNN 2012 - 2.7.0-rc1
  * Current Google Safe Browsing implementation is deprecated. Google changed the API and does not allow
    anymore the malware database for download.
 
+08 Jun 2012 - 2.6.6
+-------------------
+
  * In 2009, Stefan Esser published an evasion technique that relies on the use of single quotes and PHP.
    The trick was treating a request parameter as a file. A patch was applied into ModSecurity 2.5.11 by Brian Rectanus.
-   Ivan Ristic reported that the patch was imcomplete. We added extra checks for this evasion technique (MODSEC-312).
-
+   Ivan Ristic reported that the patch was imcomplete. We added extra checks for this evasion.
 
 20 Mar 2012 - 2.6.5
 -------------------
