@@ -20,6 +20,32 @@
 #include "msc_util.h"
 #include "msc_parsers.h"
 
+void validate_quotes(modsec_rec *msr, unsigned char *data)  {
+    int i, len;
+
+    if(msr == NULL)
+        return;
+
+    if(msr->mpd == NULL)
+        return;
+
+    if(data == NULL)
+        return;
+
+    len = strlen(data);
+
+    for(i = 0; i < len; i++)   {
+
+        if(data[i] == '\'') {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Multipart: Invalid quoting detected: %s length %d bytes",
+                        log_escape_nq(msr->mp, data), len);
+            }
+            msr->mpd->flag_invalid_quoting = 1;
+        }
+    }
+}
+
 
 #if 0
 static char *multipart_construct_filename(modsec_rec *msr) {
@@ -155,6 +181,9 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
         /* evaluate part */
 
         if (strcmp(name, "name") == 0) {
+
+            validate_quotes(msr, value);
+
             if (msr->mpd->mpp->name != NULL) {
                 msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition name: %s",
                     log_escape_nq(msr->mp, value));
@@ -169,6 +198,9 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
         }
         else
         if (strcmp(name, "filename") == 0) {
+
+            validate_quotes(msr, value);
+
             if (msr->mpd->mpp->filename != NULL) {
                 msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename: %s",
                     log_escape_nq(msr->mp, value));
@@ -187,7 +219,18 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
             while((*p == '\t') || (*p == ' ')) p++;
             /* the next character must be a zero or a semi-colon */
             if (*p == '\0') return 1; /* this is OK */
-            if (*p != ';') return -12;
+            if (*p != ';') {
+                p--;
+                if(*p == '\'' || *p == '\"') {
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "Multipart: Invalid quoting detected: %s length %d bytes",
+                                log_escape_nq(msr->mp, p), strlen(p));
+                    }
+                    msr->mpd->flag_invalid_quoting = 1;
+                }
+                p++;
+                return -12;
+            }
             p++; /* move over the semi-colon */
         }
 
