@@ -110,12 +110,20 @@ case $host in
     freebsdos=true
     ;;
   *-*-netbsd*)
-    echo "Checking plataform... Identified as FreeBSD"
+    echo "Checking plataform... Identified as NetBSD"
     netbsdos=true
     ;;
   *-*-openbsd*)
-    echo "Checking plataform... Identified as FreeBSD"
+    echo "Checking plataform... Identified as OpenBSD"
     openbsdos=true
+    ;;
+  *-*-kfreebsd*)
+    echo "Checking plataform... Identified as kFreeBSD, treating as linux"
+    linuxos=true
+    ;;
+  *-*-gnu*.*)
+    echo "Checking plataform... Identified as HURD, treating as linux"
+    linuxos=true
     ;;
        *)
     echo "Unknown CANONICAL_HOST $host"
