@@ -55,7 +55,7 @@ type="text/css">
 		var wgUserLanguage = "en";
 		var wgContentLanguage = "en";
 		var wgBreakFrames = false;
-		var wgCurRevisionId = 500;
+		var wgCurRevisionId = 502;
 		var wgVersion = "1.15.1";
 		var wgEnableAPI = true;
 		var wgEnableWriteAPI = true;
@@ -753,65 +753,67 @@ class="tocnumber">10.34</span> <span class="toctext">sanitiseResponseHeader</spa
  <span class="toctext">beginsWith</span></a></li>
 <li class="toclevel-2"><a href="#contains"><span class="tocnumber">11.2</span>
  <span class="toctext">contains</span></a></li>
-<li class="toclevel-2"><a href="#endsWith"><span class="tocnumber">11.3</span>
+<li class="toclevel-2"><a href="#containsWord"><span class="tocnumber">11.3</span>
+ <span class="toctext">containsWord</span></a></li>
+<li class="toclevel-2"><a href="#endsWith"><span class="tocnumber">11.4</span>
  <span class="toctext">endsWith</span></a></li>
-<li class="toclevel-2"><a href="#eq"><span class="tocnumber">11.4</span>
+<li class="toclevel-2"><a href="#eq"><span class="tocnumber">11.5</span>
  <span class="toctext">eq</span></a></li>
-<li class="toclevel-2"><a href="#ge"><span class="tocnumber">11.5</span>
+<li class="toclevel-2"><a href="#ge"><span class="tocnumber">11.6</span>
  <span class="toctext">ge</span></a></li>
-<li class="toclevel-2"><a href="#geoLookup"><span class="tocnumber">11.6</span>
+<li class="toclevel-2"><a href="#geoLookup"><span class="tocnumber">11.7</span>
  <span class="toctext">geoLookup</span></a></li>
-<li class="toclevel-2"><a href="#gsbLookup"><span class="tocnumber">11.7</span>
+<li class="toclevel-2"><a href="#gsbLookup"><span class="tocnumber">11.8</span>
  <span class="toctext">gsbLookup</span></a></li>
-<li class="toclevel-2"><a href="#gt"><span class="tocnumber">11.8</span>
+<li class="toclevel-2"><a href="#gt"><span class="tocnumber">11.9</span>
  <span class="toctext">gt</span></a></li>
-<li class="toclevel-2"><a href="#inspectFile"><span class="tocnumber">11.9</span>
+<li class="toclevel-2"><a href="#inspectFile"><span class="tocnumber">11.10</span>
  <span class="toctext">inspectFile</span></a></li>
-<li class="toclevel-2"><a href="#ipMatch"><span class="tocnumber">11.10</span>
+<li class="toclevel-2"><a href="#ipMatch"><span class="tocnumber">11.11</span>
  <span class="toctext">ipMatch</span></a></li>
-<li class="toclevel-2"><a href="#ipMatchF"><span class="tocnumber">11.11</span>
+<li class="toclevel-2"><a href="#ipMatchF"><span class="tocnumber">11.12</span>
  <span class="toctext">ipMatchF</span></a></li>
 <li class="toclevel-2"><a href="#ipMatchFromFile"><span 
-class="tocnumber">11.12</span> <span class="toctext">ipMatchFromFile</span></a></li>
-<li class="toclevel-2"><a href="#le"><span class="tocnumber">11.13</span>
+class="tocnumber">11.13</span> <span class="toctext">ipMatchFromFile</span></a></li>
+<li class="toclevel-2"><a href="#le"><span class="tocnumber">11.14</span>
  <span class="toctext">le</span></a></li>
-<li class="toclevel-2"><a href="#lt"><span class="tocnumber">11.14</span>
+<li class="toclevel-2"><a href="#lt"><span class="tocnumber">11.15</span>
  <span class="toctext">lt</span></a></li>
-<li class="toclevel-2"><a href="#pm"><span class="tocnumber">11.15</span>
+<li class="toclevel-2"><a href="#pm"><span class="tocnumber">11.16</span>
  <span class="toctext">pm</span></a></li>
-<li class="toclevel-2"><a href="#pmf"><span class="tocnumber">11.16</span>
+<li class="toclevel-2"><a href="#pmf"><span class="tocnumber">11.17</span>
  <span class="toctext">pmf</span></a></li>
-<li class="toclevel-2"><a href="#pmFromFile"><span class="tocnumber">11.17</span>
+<li class="toclevel-2"><a href="#pmFromFile"><span class="tocnumber">11.18</span>
  <span class="toctext">pmFromFile</span></a></li>
-<li class="toclevel-2"><a href="#rbl"><span class="tocnumber">11.18</span>
+<li class="toclevel-2"><a href="#rbl"><span class="tocnumber">11.19</span>
  <span class="toctext">rbl</span></a></li>
-<li class="toclevel-2"><a href="#rsub"><span class="tocnumber">11.19</span>
+<li class="toclevel-2"><a href="#rsub"><span class="tocnumber">11.20</span>
  <span class="toctext">rsub</span></a></li>
-<li class="toclevel-2"><a href="#rx"><span class="tocnumber">11.20</span>
+<li class="toclevel-2"><a href="#rx"><span class="tocnumber">11.21</span>
  <span class="toctext">rx</span></a></li>
-<li class="toclevel-2"><a href="#streq"><span class="tocnumber">11.21</span>
+<li class="toclevel-2"><a href="#streq"><span class="tocnumber">11.22</span>
  <span class="toctext">streq</span></a></li>
-<li class="toclevel-2"><a href="#strmatch"><span class="tocnumber">11.22</span>
+<li class="toclevel-2"><a href="#strmatch"><span class="tocnumber">11.23</span>
  <span class="toctext">strmatch</span></a></li>
 <li class="toclevel-2"><a href="#validateByteRange"><span 
-class="tocnumber">11.23</span> <span class="toctext">validateByteRange</span></a></li>
-<li class="toclevel-2"><a href="#validateDTD"><span class="tocnumber">11.24</span>
+class="tocnumber">11.24</span> <span class="toctext">validateByteRange</span></a></li>
+<li class="toclevel-2"><a href="#validateDTD"><span class="tocnumber">11.25</span>
  <span class="toctext">validateDTD</span></a></li>
 <li class="toclevel-2"><a href="#validateEncryption"><span 
-class="tocnumber">11.25</span> <span class="toctext">validateEncryption</span></a></li>
-<li class="toclevel-2"><a href="#validateSchema"><span class="tocnumber">11.26</span>
+class="tocnumber">11.26</span> <span class="toctext">validateEncryption</span></a></li>
+<li class="toclevel-2"><a href="#validateSchema"><span class="tocnumber">11.27</span>
  <span class="toctext">validateSchema</span></a></li>
 <li class="toclevel-2"><a href="#validateUrlEncoding"><span 
-class="tocnumber">11.27</span> <span class="toctext">validateUrlEncoding</span></a></li>
+class="tocnumber">11.28</span> <span class="toctext">validateUrlEncoding</span></a></li>
 <li class="toclevel-2"><a href="#validateUtf8Encoding"><span 
-class="tocnumber">11.28</span> <span class="toctext">validateUtf8Encoding</span></a></li>
-<li class="toclevel-2"><a href="#verifyCC"><span class="tocnumber">11.29</span>
+class="tocnumber">11.29</span> <span class="toctext">validateUtf8Encoding</span></a></li>
+<li class="toclevel-2"><a href="#verifyCC"><span class="tocnumber">11.30</span>
  <span class="toctext">verifyCC</span></a></li>
-<li class="toclevel-2"><a href="#verifyCPF"><span class="tocnumber">11.30</span>
+<li class="toclevel-2"><a href="#verifyCPF"><span class="tocnumber">11.31</span>
  <span class="toctext">verifyCPF</span></a></li>
-<li class="toclevel-2"><a href="#verifySSN"><span class="tocnumber">11.31</span>
+<li class="toclevel-2"><a href="#verifySSN"><span class="tocnumber">11.32</span>
  <span class="toctext">verifySSN</span></a></li>
-<li class="toclevel-2"><a href="#within"><span class="tocnumber">11.32</span>
+<li class="toclevel-2"><a href="#within"><span class="tocnumber">11.33</span>
  <span class="toctext">within</span></a></li>
 </ul>
 </li>
@@ -5241,6 +5243,24 @@ string before comparison.
 <pre># Detect ".php" anywhere in the request line 
 SecRule REQUEST_LINE "@contains .php" 
 </pre>
+<a name="containsWord" id="containsWord"></a><h2> <span 
+class="mw-headline"> containsWord </span></h2>
+<p><b>Description:</b> Returns true if the parameter string (with word 
+boundaries) is found anywhere in the input. Macro expansion is performed
+ on the parameter string before comparison.
+</p><p><b>Example:</b>
+</p>
+<pre># Detect "select" anywhere in ARGS 
+SecRule ARGS "@containsWord select" 
+</pre>
+<p>Would match on - <br>
+-1 union <b>select</b> 
+BENCHMARK(2142500,MD5(CHAR(115,113,108,109,97,112))) FROM wp_users WHERE
+ ID=1 and (ascii(substr(user_login,1,1))&amp;0x01=0) from wp_users where
+ ID=1--
+</p><p>But not on - <br>
+Your site has a wide <b>select</b>ion of computers.
+</p>
 <a name="endsWith" id="endsWith"></a><h2> <span class="mw-headline"> 
 endsWith </span></h2>
 <p><b>Description:</b> Returns true if the parameter string is found at 
@@ -6227,13 +6247,13 @@ SecCookieFormat 0
 
 <!-- 
 NewPP limit report
-Preprocessor node count: 801/1000000
+Preprocessor node count: 805/1000000
 Post-expand include size: 0/2097152 bytes
 Template argument size: 0/2097152 bytes
 Expensive parser function count: 0/100
 -->
 
-<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20120606075807 -->
+<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20120608123734 -->
 <div class="printfooter">
 Retrieved from "<a 
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual">http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual</a>"</div>
@@ -6343,7 +6363,7 @@ pages</a></li>
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;printable=yes&amp;printable=yes"
  rel="alternate" title="Printable version of this page [alt-shift-p]" 
 accesskey="p">Printable version</a></li>				<li id="t-permalink"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=500"
+href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=502"
  title="Permanent link to this revision of the page">Permanent link</a></li>
 			</ul>
 		</div>
@@ -6355,15 +6375,15 @@ href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Referen
 src="Reference_Manual_files/poweredby_mediawiki_88x31.png" alt="Powered 
 by MediaWiki"></a></div>
 			<ul id="f-list">
-					<li id="lastmod"> This page was last modified on 5 June 2012, at 
-18:32.</li>
-					<li id="viewcount">This page has been accessed 130,057 times.</li>
+					<li id="lastmod"> This page was last modified on 8 June 2012, at 
+12:36.</li>
+					<li id="viewcount">This page has been accessed 130,792 times.</li>
 			</ul>
 		</div>
 </div>
 
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
-<!-- Served in 0.178 secs. -->
+<!-- Served in 1.289 secs. -->
     
     
     <script type="text/javascript">

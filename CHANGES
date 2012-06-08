@@ -74,6 +74,8 @@ XX NNN 2012 - 2.7.0-rc1
 
  * Added build system support for KfreeBSD and HURD.
 
+ * Updated Reference manual into doc/ directory.
+
  * Fixed Variable DURATION contains the elapsed time in microseconds for compatible reasons with apache and
    other variables.
 
