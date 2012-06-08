@@ -72,8 +72,6 @@
 
  ^ Added new rule metadata actions ver, maturity and accuracy. Also included into RULE collection.
 
- * Added build system support for KfreeBSD and HURD.
-
  * Updated Reference manual into doc/ directory.
 
  * Fixed Variable DURATION contains the elapsed time in microseconds for compatible reasons with apache and
@@ -90,6 +88,8 @@
 
 08 Jun 2012 - 2.6.6
 -------------------
+
+ * Added build system support for KfreeBSD and HURD.
 
  * In 2009, Stefan Esser published an evasion technique that relies on the use of single quotes and PHP.
    The trick was treating a request parameter as a file. A patch was applied into ModSecurity 2.5.11 by Brian Rectanus.
