@@ -91,9 +91,8 @@
 
  * Added build system support for KfreeBSD and HURD.
 
- * In 2009, Stefan Esser published an evasion technique that relies on the use of single quotes and PHP.
-   The trick was treating a request parameter as a file. A patch was applied into ModSecurity 2.5.11 by Brian Rectanus.
-   Ivan Ristic reported that the patch was imcomplete. We added extra checks for this evasion.
+ * Fixed a multipart bypass issue related to quote parsing
+   Credits to  Qualys Vulnerability & Malware Research Labs (VMRL).
 
 20 Mar 2012 - 2.6.5
 -------------------
