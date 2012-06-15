@@ -570,6 +570,41 @@ char *file_basename(apr_pool_t *mp, const char *filename) {
     return d;
 }
 
+#ifdef WIN32
+int inet_pton(int family, const char *src, void *dst)   {
+    struct addrinfo addr;
+    struct sockaddr_in *in = NULL;
+    struct sockaddr_in6 *in6 = NULL;
+    struct addrinfo *addr_info = NULL;
+
+    memset(&addr, 0, sizeof(struct addrinfo));
+    addr.ai_family = family;
+
+    if (getaddrinfo(src, NULL, &addr, &addr_info) != 0)
+        return -1;
+
+    if (addr_info) {
+        if (addr_info->ai_family == AF_INET) {
+            in = (struct sockaddr_in*)addr_info->ai_addr;
+            memcpy(dst, &in->sin_addr, 4);
+        }
+        else if (addr_info->ai_family == AF_INET6) {
+            in6 = (struct sockaddr_in6*)addr_info->ai_addr;
+            memcpy(dst, &in6->sin6_addr, 16);
+        }
+        else {
+            freeaddrinfo(addr_info);
+            return -1;
+        }
+
+        freeaddrinfo(addr_info);
+        return 1;
+    }
+
+    return -1;
+}
+#endif
+
 /**
  *
  */
