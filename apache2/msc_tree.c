@@ -16,7 +16,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#if !defined(WIN32) || !defined(WINNT)
 #include <netinet/in.h>
+#endif
 #include "apr_lib.h"
 #include "msc_util.h"
 #include "msc_tree.h"
