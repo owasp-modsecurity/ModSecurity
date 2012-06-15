@@ -16,6 +16,13 @@
 #define __MSC_TREE_H__
 
 #include "modsecurity.h"
+#include <stdint.h>
+
+typedef struct CPTData CPTData;
+typedef struct TreePrefix TreePrefix;
+typedef struct TreeNode TreeNode;
+typedef struct CPTTree CPTTree;
+typedef struct TreeRoot TreeRoot;
 
 #define IPV4_TREE 0x1
 #define IPV6_TREE 0x2
@@ -37,36 +44,36 @@
 #define NETMASK_4  0x4
 #define NETMASK_2  0x2
 
-typedef struct CPTData_ {
+struct CPTData {
     uint8_t netmask;
-    struct CPTData_ *next;
-} CPTData;
+    struct CPTData *next;
+};
 
-typedef struct TreePrefix_ {
+struct TreePrefix {
     uint8_t *buffer;
     uint16_t bitlen;
     CPTData *prefix_data;
-} TreePrefix;
+};
 
-typedef struct TreeNode_ {
+struct TreeNode {
     uint16_t bit;
     int count;
     uint8_t *netmasks;
     TreePrefix *prefix;
-    struct TreeNode_ *left, *right;
-    struct TreeNode_ *parent;
-} TreeNode;
+    struct TreeNode *left, *right;
+    struct TreeNode *parent;
+};
 
-typedef struct CPTTree_ {
+struct CPTTree {
     int count;
     apr_pool_t *pool;
     TreeNode *head;
-} CPTTree;
+};
 
-typedef struct TreeRoot_ {
+struct TreeRoot {
     CPTTree *ipv4_tree;
     CPTTree *ipv6_tree;
-} TreeRoot;
+};
 
 DSOLOCAL CPTTree *CPTCreateRadixTree(apr_pool_t *pool);
 DSOLOCAL TreeNode *CPTIpMatch(modsec_rec *, uint8_t *, CPTTree *, int);

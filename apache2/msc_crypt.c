@@ -177,24 +177,10 @@ unsigned long prng()   {
  */
 unsigned char *getkey(apr_pool_t *mp) {
     unsigned short int length = 12;
-    struct glinear data;
-    uint64_t seed;
-    char output[13];
-    char *key = NULL;
+    unsigned char *key = NULL;
+    unsigned long int seed = time(NULL);
 
-    output[length] = '\0';
-
-    seed = data.seed;
-    srand(data.seed);
-    while(length--) {
-        seed *= data.mul;
-        seed += data.add;
-        data.seed = seed % data.mod;
-        output[length] = (rand() % 94 + 33);
-        srand(data.seed + prng());
-    }
-
-    key = apr_psprintf(mp,"%s",output);
+    key = apr_psprintf(mp,"%lu%lu",prng(),seed);
 
     return key;
 }

@@ -686,6 +686,7 @@ void init_directory_config(directory_config *dcfg)
 
     /* Encryption */
     if (dcfg->crypto_key == NOT_SET_P) dcfg->crypto_key = getkey(dcfg->mp);
+    if (dcfg->crypto_key_len == NOT_SET) dcfg->crypto_key_len = strlen(dcfg->crypto_key);
     if (dcfg->crypto_key_add == NOT_SET) dcfg->crypto_key_add = ENCRYPTION_KEYONLY;
     if (dcfg->crypto_param_name == NOT_SET_P) dcfg->crypto_param_name = "crypt";
     if (dcfg->encryption_is_enabled == NOT_SET) dcfg->encryption_is_enabled = ENCRYPTION_DISABLED;
@@ -2315,9 +2316,9 @@ static const char *cmd_encryption_key(cmd_parms *cmd, void *_dcfg, const char *_
     char *p1 = NULL;
 
     if (dcfg == NULL) return NULL;
+    if (_p1 == NULL) return NULL;
 
-    if (p1 == NULL) return NULL;
-    if (strcasecmp(p1, "Rand") == 0)    {
+    if (strcasecmp(_p1, "Rand") == 0)    {
         p1 = apr_pstrdup(cmd->pool, getkey(cmd->pool));
         dcfg->crypto_key = p1;
         dcfg->crypto_key_len = strlen(dcfg->crypto_key);
