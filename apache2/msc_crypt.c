@@ -125,15 +125,21 @@ char *normalize_path(modsec_rec *msr, char *input) {
  */
 unsigned char *getkey(apr_pool_t *mp) {
     unsigned short int length = 12;
+    struct glinear data;
+    uint64_t seed;
     char output[13];
     char *key = NULL;
 
     output[length] = '\0';
 
-    srand((unsigned int) time(0));
+    seed = data.seed;
+    srand(data.seed);
     while(length--) {
+        seed *= data.mul;
+        seed += data.add;
+        data.seed = seed % data.mod;
         output[length] = (rand() % 94 + 33);
-        srand(rand());
+        srand(data.seed + rand() + time(0));
     }
 
     key = apr_psprintf(mp,"%s",output);
