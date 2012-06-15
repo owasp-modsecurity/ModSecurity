@@ -18,6 +18,7 @@
 #include "acmp.h"
 #include "libxml/HTMLtree.h"
 #include "libxml/uri.h"
+#include <string.h>
 
 /**
  * \brief Normalize path in URI

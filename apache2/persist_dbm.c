@@ -586,7 +586,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
         goto error;
     }
 
-    if(strcasestr(col_name,"user") || strcasestr(col_name,"session") || strcasestr(col_name,"resource"))
+    if(strstr(col_name,"USER") || strstr(col_name,"SESSION") || strstr(col_name, "RESOURCE"))
         dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", msr->txcfg->webappid, "_", col_name, NULL);
     else
         dbm_filename = apr_pstrcat(msr->mp, msr->txcfg->data_dir, "/", col_name, NULL);

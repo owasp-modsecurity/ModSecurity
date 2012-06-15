@@ -75,8 +75,8 @@ struct TreeRoot {
     CPTTree *ipv6_tree;
 };
 
-DSOLOCAL CPTTree *CPTCreateRadixTree(apr_pool_t *pool);
-DSOLOCAL TreeNode *CPTIpMatch(modsec_rec *, uint8_t *, CPTTree *, int);
-DSOLOCAL TreeNode *TreeAddIP(const char *, CPTTree *, int);
+CPTTree  DSOLOCAL  *CPTCreateRadixTree(apr_pool_t *pool);
+TreeNode DSOLOCAL *CPTIpMatch(modsec_rec *, uint8_t *, CPTTree *, int);
+TreeNode DSOLOCAL *TreeAddIP(const char *, CPTTree *, int);
 
 #endif /*__MSC_TREE_H__ */
