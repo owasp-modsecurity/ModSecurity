@@ -132,7 +132,7 @@ unsigned char *getkey(apr_pool_t *mp) {
 
     srand((unsigned int) time(0));
     while(length--) {
-        output[length-1] = (rand() % 94 + 33);
+        output[length] = (rand() % 94 + 33);
         srand(rand());
     }
 
