@@ -128,20 +128,20 @@ unsigned long prng()   {
     unsigned short seed_num;
     unsigned long seed;
 
-    seed_num = seed & 16BITS_MASK;
-    num = seed & 31BITS_MASK;
+    seed_num = seed & N16BITS_MASK;
+    num = seed & N31BITS_MASK;
 
     p = num_matrix1;
 
     for(n = 18; n-- ; ) {
         num = 30903*seed_num + (num>>16);
-        *p++ = seed_num = num & 16BITS_MASK;
+        *p++ = seed_num = num & N16BITS_MASK;
         if (n == 9)
             p = num_matrix2;
     }
 
-    num_matrix1[0] &= 15BITS_MASK;
-    num_matrix2[0] &= 15BITS_MASK;
+    num_matrix1[0] &= N15BITS_MASK;
+    num_matrix2[0] &= N15BITS_MASK;
     memcpy((char*)num_matrix1+2,(char*)num_matrix1+1,8*sizeof(short));
     memcpy((char*)num_matrix2+2,(char*)num_matrix2+1,8*sizeof(short));
 
@@ -158,10 +158,10 @@ unsigned long prng()   {
         5555 * num_matrix2[6] + 6666 * num_matrix2[7] +
         7777 * num_matrix2[8] + 9272 * num_matrix2[9];
 
-    num_matrix1[0] = num1/16BITS_MASK;
-    num_matrix2[0] = num2/16BITS_MASK;
-    num_matrix1[1] = 16BITS_MASK&num1;
-    num_matrix2[1] = 16BITS_MASK&num2;
+    num_matrix1[0] = num1/N16BITS_MASK;
+    num_matrix2[0] = num2/N16BITS_MASK;
+    num_matrix1[1] = N16BITS_MASK&num1;
+    num_matrix2[1] = N16BITS_MASK&num2;
 
     seed = (((long)num_matrix1[1])<<16)+(long)num_matrix2[1];
 
