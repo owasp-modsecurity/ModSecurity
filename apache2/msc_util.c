@@ -586,11 +586,13 @@ int inet_pton(int family, const char *src, void *dst)   {
     if (addr_info) {
         if (addr_info->ai_family == AF_INET) {
             in = (struct sockaddr_in*)addr_info->ai_addr;
-            memcpy(dst, &in->sin_addr, 4);
+            if(in != NULL)
+                memcpy(dst, &in->sin_addr, 4);
         }
         else if (addr_info->ai_family == AF_INET6) {
             in6 = (struct sockaddr_in6*)addr_info->ai_addr;
-            memcpy(dst, &in6->sin6_addr, 16);
+            if(in6 != NULL)
+                memcpy(dst, &in6->sin6_addr, 16);
         }
         else {
             freeaddrinfo(addr_info);
