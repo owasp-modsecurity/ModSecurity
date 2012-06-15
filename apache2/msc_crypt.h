@@ -35,7 +35,7 @@ struct glinear {
 };
 
 #define N16BITS_MASK 65536L
-#define N16BITS_MASK 0xFFFF
+#define N16BITS_MAX  0xFFFF
 #define N15BITS_MASK 0x7FFF
 #define N31BITS_MASK 0x7FFFFFFF
 
