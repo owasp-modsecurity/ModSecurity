@@ -28,6 +28,10 @@
 #include "modsecurity.h"
 #include "re.h"
 
+#if WIN32
+int DSOLOCAL inet_pton(int family, const char *src, void *dst)
+#endif
+
 int DSOLOCAL normalize_path_inplace(unsigned char *input, int len, int win, int *changed);
 
 int DSOLOCAL parse_boolean(const char *input);
