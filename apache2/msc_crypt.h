@@ -27,6 +27,13 @@
 #define INT32_MAX      (2147483647)
 #endif
 
+struct glinear {
+  uint32_t seed;
+  uint32_t mod;
+  uint32_t mul;
+  uint32_t add;
+};
+
 char DSOLOCAL *hmac(modsec_rec *msr,const unsigned char *key, int key_len,
                      char *msg, int msglen);
 unsigned char DSOLOCAL *do_hash_link(modsec_rec *msr, char *link,
