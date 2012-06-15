@@ -122,20 +122,20 @@ char *normalize_path(modsec_rec *msr, char *input) {
  * \retval seed random seed
  */
 unsigned long prng()   {
-    short num_matrix1[10]; num_matrix2[10];
+    short num_matrix1[10], num_matrix2[10];
     unsigned long  num, num1, num2;
     short n, *p;
     unsigned short seed_num;
     unsigned long seed;
 
-    seed_num = seed & N16BITS_MASK;
+    seed_num = seed & N16BITS_MAX;
     num = seed & N31BITS_MASK;
 
     p = num_matrix1;
 
     for(n = 18; n-- ; ) {
         num = 30903*seed_num + (num>>16);
-        *p++ = seed_num = num & N16BITS_MASK;
+        *p++ = seed_num = num & N16BITS_MAX;
         if (n == 9)
             p = num_matrix2;
     }
@@ -160,8 +160,8 @@ unsigned long prng()   {
 
     num_matrix1[0] = num1/N16BITS_MASK;
     num_matrix2[0] = num2/N16BITS_MASK;
-    num_matrix1[1] = N16BITS_MASK&num1;
-    num_matrix2[1] = N16BITS_MASK&num2;
+    num_matrix1[1] = N16BITS_MAX & num1;
+    num_matrix2[1] = N16BITS_MAX & num2;
 
     seed = (((long)num_matrix1[1])<<16)+(long)num_matrix2[1];
 
