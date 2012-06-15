@@ -34,10 +34,10 @@ struct glinear {
   uint32_t add;
 };
 
-#define 16BITS_MASK 65536L
-#define 16BITS_MASK 0xFFFF
-#define 15BITS_MASK 0x7FFF
-#define 31BITS_MASK 0x7FFFFFFF
+#define N16BITS_MASK 65536L
+#define N16BITS_MASK 0xFFFF
+#define N15BITS_MASK 0x7FFF
+#define N31BITS_MASK 0x7FFFFFFF
 
 char DSOLOCAL *hmac(modsec_rec *msr,const unsigned char *key, int key_len,
                      char *msg, int msglen);
