@@ -37,7 +37,7 @@ CPTTree *CPTCreateRadixTree(apr_pool_t *pool)   {
     return tree;
 }
 
-void ConvertIPNetmask(uint8_t *buffer, uint8_t netmask, uint16_t ip_bitmask) {
+void ConvertIPNetmask(unsigned char *buffer, unsigned char netmask, unsigned int ip_bitmask) {
     int aux = 0, bytes = 0;
     int mask = 0, mask_bit = 0;
 
@@ -72,7 +72,7 @@ TreeNode *CPTCreateNode(apr_pool_t *pool)   {
     return node;
 }
 
-CPTData *CPTCreateCPTData(uint8_t netmask, apr_pool_t *pool) {
+CPTData *CPTCreateCPTData(unsigned char netmask, apr_pool_t *pool) {
 
     CPTData *prefix_data = apr_palloc(pool, sizeof(CPTData));
 
@@ -87,8 +87,8 @@ CPTData *CPTCreateCPTData(uint8_t netmask, apr_pool_t *pool) {
     return prefix_data;
 }
 
-TreePrefix *InsertDataPrefix(TreePrefix *prefix, uint8_t *ipdata, uint16_t ip_bitmask,
-        uint8_t netmask, apr_pool_t *pool)  {
+TreePrefix *InsertDataPrefix(TreePrefix *prefix, unsigned char *ipdata, unsigned int ip_bitmask,
+        unsigned char netmask, apr_pool_t *pool)  {
 
     if(prefix == NULL)
         return NULL;
@@ -104,8 +104,8 @@ TreePrefix *InsertDataPrefix(TreePrefix *prefix, uint8_t *ipdata, uint16_t ip_bi
     return prefix;
 }
 
-TreePrefix *CPTCreatePrefix(uint8_t *ipdata, uint16_t ip_bitmask,
-        uint8_t netmask, apr_pool_t *pool)  {
+TreePrefix *CPTCreatePrefix(unsigned char *ipdata, unsigned int ip_bitmask,
+        unsigned char netmask, apr_pool_t *pool)  {
 
     TreePrefix *prefix = NULL;
     int bytes = ip_bitmask/8;
@@ -162,7 +162,7 @@ void CPTAppendToCPTDataList(CPTData *new, CPTData **list)  {
     return;
 }
 
-int TreePrefixContainNetmask(TreePrefix *prefix, uint8_t netmask)   {
+int TreePrefixContainNetmask(TreePrefix *prefix, unsigned char netmask)   {
     CPTData *prefix_data = NULL;
 
     if (prefix == NULL) {
@@ -179,7 +179,7 @@ int TreePrefixContainNetmask(TreePrefix *prefix, uint8_t netmask)   {
     return 0;
 }
 
-int CheckBitmask(uint8_t netmask, uint16_t ip_bitmask)   {
+int CheckBitmask(unsigned char netmask, unsigned int ip_bitmask)   {
 
     switch(netmask) {
 
@@ -198,7 +198,7 @@ int CheckBitmask(uint8_t netmask, uint16_t ip_bitmask)   {
     return 0;
 }
 
-TreeNode *CPTCreateHead(TreePrefix *prefix, TreeNode *node, CPTTree *tree, uint8_t netmask, uint16_t ip_bitmask)    {
+TreeNode *CPTCreateHead(TreePrefix *prefix, TreeNode *node, CPTTree *tree, unsigned char netmask, unsigned int ip_bitmask)    {
 
     if(tree == NULL)
         return NULL;
@@ -216,7 +216,7 @@ TreeNode *CPTCreateHead(TreePrefix *prefix, TreeNode *node, CPTTree *tree, uint8
             return node;
 
         node->count++;
-        node->netmasks = apr_palloc(tree->pool, (node->count *  sizeof(uint8_t)));
+        node->netmasks = apr_palloc(tree->pool, (node->count *  sizeof(unsigned char)));
 
         if(node->netmasks)
             node->netmasks[0] = netmask;
@@ -243,7 +243,7 @@ TreeNode *SetParentNode(TreeNode *node, TreeNode *new_node, CPTTree *tree)  {
 }
 
 int InsertNetmask(TreeNode *node, TreeNode *parent, TreeNode *new_node,
-        CPTTree *tree, uint8_t netmask, uint8_t bitlen) {
+        CPTTree *tree, unsigned char netmask, unsigned char bitlen) {
     int i;
 
     if (netmask != NETMASK_256-1 && netmask != NETMASK_128) {
@@ -258,7 +258,7 @@ int InsertNetmask(TreeNode *node, TreeNode *parent, TreeNode *new_node,
             }
 
             node->count++;
-            node->netmasks = apr_palloc(tree->pool, (node->count * sizeof(uint8_t)));
+            node->netmasks = apr_palloc(tree->pool, (node->count * sizeof(unsigned char)));
 
             if(node->netmasks == NULL)
                 return 0;
@@ -286,12 +286,12 @@ int InsertNetmask(TreeNode *node, TreeNode *parent, TreeNode *new_node,
     return 0;
 }
 
-TreeNode *CPTAddElement(uint8_t *ipdata, uint16_t ip_bitmask, CPTTree *tree, uint8_t netmask)   {
-    uint8_t *buffer = NULL;
-    uint8_t bitlen = 0;
+TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree *tree, unsigned char netmask)   {
+    unsigned char *buffer = NULL;
+    unsigned char bitlen = 0;
     int bit_validation = 0, test_bit = 0;
     int i = 0, j = 0, temp = 0;
-    uint16_t x, y;
+    unsigned int x, y;
     TreeNode *node = NULL, *new_node = NULL;
     TreeNode *parent = NULL, *i_node = NULL;
     TreeNode *bottom_node = NULL;
@@ -407,7 +407,7 @@ TreeNode *CPTAddElement(uint8_t *ipdata, uint16_t ip_bitmask, CPTTree *tree, uin
 
                 node->count++;
                 new_node = node;
-                node->netmasks = apr_palloc(tree->pool, (node->count *  sizeof(uint8_t)));
+                node->netmasks = apr_palloc(tree->pool, (node->count *  sizeof(unsigned char)));
 
                 if ((node->count -1) == 0) {
                     node->netmasks[0] = netmask;
@@ -474,7 +474,7 @@ TreeNode *CPTAddElement(uint8_t *ipdata, uint16_t ip_bitmask, CPTTree *tree, uin
                 i++;
             }
 
-            i_node->netmasks = apr_palloc(tree->pool, (node->count - i) * sizeof(uint8_t));
+            i_node->netmasks = apr_palloc(tree->pool, (node->count - i) * sizeof(unsigned char));
 
             if(i_node->netmasks == NULL) {
                 return NULL;
@@ -514,7 +514,7 @@ TreeNode *CPTAddElement(uint8_t *ipdata, uint16_t ip_bitmask, CPTTree *tree, uin
     return new_node;
 }
 
-int TreeCheckData(TreePrefix *prefix, CPTData *prefix_data, uint16_t netmask)   {
+int TreeCheckData(TreePrefix *prefix, CPTData *prefix_data, unsigned int netmask)   {
 
     for(prefix_data != NULL; ; prefix_data = prefix_data->next) {
         if (prefix_data->netmask == netmask) {
@@ -525,7 +525,7 @@ int TreeCheckData(TreePrefix *prefix, CPTData *prefix_data, uint16_t netmask)   
     return 0;
 }
 
-int TreePrefixNetmask(modsec_rec *msr, TreePrefix *prefix, uint16_t netmask, int flag)   {
+int TreePrefixNetmask(modsec_rec *msr, TreePrefix *prefix, unsigned int netmask, int flag)   {
     CPTData *prefix_data = NULL;
     int ret = 0;
 
@@ -564,8 +564,8 @@ int TreePrefixNetmask(modsec_rec *msr, TreePrefix *prefix, uint16_t netmask, int
     return ret;
 }
 
-TreeNode *CPTRetriveNode(modsec_rec *msr, uint8_t *buffer, uint16_t ip_bitmask, TreeNode *node)  {
-    uint16_t x, y;
+TreeNode *CPTRetriveNode(modsec_rec *msr, unsigned char *buffer, unsigned int ip_bitmask, TreeNode *node)  {
+    unsigned int x, y;
 
     if(node == NULL)    {
         if (msr->txcfg->debuglog_level >= 9) {
@@ -610,7 +610,7 @@ TreeNode *CPTRetriveParentNode(TreeNode *node)  {
     return node;
 }
 
-TreeNode *CPTFindElementIPNetblock(modsec_rec *msr, uint8_t *ipdata, uint8_t ip_bitmask, TreeNode *node) {
+TreeNode *CPTFindElementIPNetblock(modsec_rec *msr, unsigned char *ipdata, unsigned char ip_bitmask, TreeNode *node) {
     TreeNode *netmask_node = NULL;
     int mask = 0,  bytes = 0;
     int i = 0, j = 0;
@@ -690,10 +690,10 @@ TreeNode *CPTFindElementIPNetblock(modsec_rec *msr, uint8_t *ipdata, uint8_t ip_
     return CPTFindElementIPNetblock(msr, ipdata, ip_bitmask, netmask_node->parent);
 }
 
-TreeNode *CPTFindElement(modsec_rec *msr, uint8_t *ipdata, uint16_t ip_bitmask, CPTTree *tree)   {
+TreeNode *CPTFindElement(modsec_rec *msr, unsigned char *ipdata, unsigned int ip_bitmask, CPTTree *tree)   {
     TreeNode *node = NULL;
     int mask = 0, bytes = 0;
-    uint8_t temp_data[NETMASK_256-1];
+    unsigned char temp_data[NETMASK_256-1];
 
     if (tree == NULL)   {
         if (msr->txcfg->debuglog_level >= 9) {
@@ -771,7 +771,7 @@ TreeNode *CPTFindElement(modsec_rec *msr, uint8_t *ipdata, uint16_t ip_bitmask, 
     return CPTFindElementIPNetblock(msr, temp_data, ip_bitmask, node);
 }
 
-TreeNode *CPTIpMatch(modsec_rec *msr, uint8_t *ipdata, CPTTree *tree, int type)   {
+TreeNode *CPTIpMatch(modsec_rec *msr, unsigned char *ipdata, CPTTree *tree, int type)   {
 
     if(tree == NULL)  {
         if (msr->txcfg->debuglog_level >= 9) {
@@ -807,8 +807,8 @@ TreeNode *CPTIpMatch(modsec_rec *msr, uint8_t *ipdata, CPTTree *tree, int type) 
 }
 
 TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
-    uint32_t ip, ret;
-    uint8_t netmask_v4 = NETMASK_32, netmask_v6 = NETMASK_128;
+    unsigned long ip, ret;
+    unsigned char netmask_v4 = NETMASK_32, netmask_v6 = NETMASK_128;
     char ip_strv4[NETMASK_32], ip_strv6[NETMASK_128];
     struct in_addr addr4;
     struct in6_addr addr6;
@@ -820,7 +820,7 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
     switch(type)    {
 
         case IPV4_TREE:
-            bzero(&addr4, sizeof(addr4));
+            memset(&addr4, 0, sizeof(addr4));
             memset(ip_strv4, 0x0, NETMASK_32);
 
             strncpy(ip_strv4, buffer, sizeof(ip_strv4) - 2);
@@ -849,10 +849,10 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
 
             tree->count++;
 
-            return CPTAddElement((uint8_t *)&ip, NETMASK_32, tree, netmask_v4);
+            return CPTAddElement((unsigned char *)&ip, NETMASK_32, tree, netmask_v4);
 
         case IPV6_TREE:
-            bzero(&addr6, sizeof(addr6));
+            memset(&addr6, 0, sizeof(addr6));
             memset(ip_strv6, 0x0, NETMASK_128);
 
             strncpy(ip_strv6, buffer, sizeof(ip_strv6) - 2);
@@ -878,7 +878,7 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
 
             tree->count++;
 
-            return CPTAddElement((uint8_t *)&addr6.s6_addr, NETMASK_128, tree, netmask_v6);
+            return CPTAddElement((unsigned char *)&addr6.s6_addr, NETMASK_128, tree, netmask_v6);
         default:
             return NULL;
     }

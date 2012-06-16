@@ -16,7 +16,6 @@
 #define __MSC_TREE_H__
 
 #include "modsecurity.h"
-#include <stdint.h>
 
 typedef struct CPTData CPTData;
 typedef struct TreePrefix TreePrefix;
@@ -45,20 +44,20 @@ typedef struct TreeRoot TreeRoot;
 #define NETMASK_2  0x2
 
 struct CPTData {
-    uint8_t netmask;
+    unsigned char netmask;
     struct CPTData *next;
 };
 
 struct TreePrefix {
-    uint8_t *buffer;
-    uint16_t bitlen;
+    unsigned char *buffer;
+    unsigned int bitlen;
     CPTData *prefix_data;
 };
 
 struct TreeNode {
-    uint16_t bit;
+    unsigned int bit;
     int count;
-    uint8_t *netmasks;
+    unsigned char *netmasks;
     TreePrefix *prefix;
     struct TreeNode *left, *right;
     struct TreeNode *parent;
@@ -75,8 +74,8 @@ struct TreeRoot {
     CPTTree *ipv6_tree;
 };
 
-CPTTree  DSOLOCAL  *CPTCreateRadixTree(apr_pool_t *pool);
-TreeNode DSOLOCAL *CPTIpMatch(modsec_rec *, uint8_t *, CPTTree *, int);
-TreeNode DSOLOCAL *TreeAddIP(const char *, CPTTree *, int);
+CPTTree  DSOLOCAL *CPTCreateRadixTree(apr_pool_t *pool);
+TreeNode DSOLOCAL *CPTIpMatch(modsec_rec *msr, unsigned char *ipdata, CPTTree *tree, int type);
+TreeNode DSOLOCAL *TreeAddIP(const char *buffer, CPTTree *tree, int type);
 
 #endif /*__MSC_TREE_H__ */
