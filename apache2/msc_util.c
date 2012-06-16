@@ -571,6 +571,24 @@ char *file_basename(apr_pool_t *mp, const char *filename) {
 }
 
 #ifdef WIN32
+char *strcasestr(const char *haystack, const char *needle) {
+    char aux, lower_aux;
+    int length;
+
+    if ((aux = *needle++) != 0) {
+        aux = (char)tolower((unsigned char)aux);
+        length = strlen(needle);
+        do {
+            do {
+                if ((lower_aux = *haystack++) == 0)
+                    return NULL;
+            } while ((char)tolower((unsigned char)lower_aux) != aux);
+        } while (strncasecmp(haystack, needle, length) != 0);
+        haystack--;
+    }
+    return ((char *)haystack);
+}
+
 int inet_pton(int family, const char *src, void *dst)   {
     struct addrinfo addr;
     struct sockaddr_in *in = NULL;

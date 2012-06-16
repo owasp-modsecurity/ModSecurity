@@ -333,7 +333,7 @@ static int msre_op_ipmatchFromFile_execute(modsec_rec *msr, msre_rule *rule, msr
             return 0;
         }
 
-        if (CPTIpMatch(msr, (uint8_t *)&in.s_addr, rtree->ipv4_tree, IPV4_TREE) != NULL) {
+        if (CPTIpMatch(msr, (unsigned char *)&in.s_addr, rtree->ipv4_tree, IPV4_TREE) != NULL) {
             *error_msg = apr_psprintf(msr->mp, "IPmatchFromFile \"%s\" matched at %s.", var->value, var->name);
             return 1;
         }
@@ -347,7 +347,7 @@ static int msre_op_ipmatchFromFile_execute(modsec_rec *msr, msre_rule *rule, msr
             return 0;
         }
 
-        if (CPTIpMatch(msr, (uint8_t *)&in6.s6_addr, rtree->ipv6_tree, IPV6_TREE) != NULL) {
+        if (CPTIpMatch(msr, (unsigned char *)&in6.s6_addr, rtree->ipv6_tree, IPV6_TREE) != NULL) {
             *error_msg = apr_psprintf(msr->mp, "IPmatchFromFile \"%s\" matched at %s.", var->value, var->name);
             return 1;
         }

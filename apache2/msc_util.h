@@ -29,7 +29,9 @@
 #include "re.h"
 
 #ifdef WIN32
+#include <ws2tcpip.h>
 int DSOLOCAL inet_pton(int family, const char *src, void *dst);
+char DSOLOCAL *strcasestr(const char *haystack, const char *needle);
 #endif
 
 int DSOLOCAL normalize_path_inplace(unsigned char *input, int len, int win, int *changed);
