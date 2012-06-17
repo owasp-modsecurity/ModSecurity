@@ -20,7 +20,7 @@
 #include "msc_util.h"
 #include "msc_parsers.h"
 
-void validate_quotes(modsec_rec *msr, unsigned char *data)  {
+void validate_quotes(modsec_rec *msr, char *data)  {
     int i, len;
 
     if(msr == NULL)

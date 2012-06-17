@@ -70,7 +70,7 @@ char *normalize_path(modsec_rec *msr, char *input) {
             xmlNormalizeURIPath(uri->path);
             Uri = apr_pstrdup(msr->mp, uri->path);
 
-            for(i = 0; i < strlen(Uri); i++)    {
+            for(i = 0; i < (int)strlen(Uri); i++)    {
                 if(Uri[i] != '.' && Uri[i] != '/')  {
                     if (i - 1 < 0)
                         i = 0;
@@ -84,7 +84,7 @@ char *normalize_path(modsec_rec *msr, char *input) {
                 }
             }
 
-            if(bytes >= strlen(uri->path))
+            if(bytes >= (int)strlen(uri->path))
                 return NULL;
 
             content = apr_psprintf(msr->mp, "%s", uri->path+bytes);
@@ -126,8 +126,8 @@ unsigned long prng()   {
     short num_matrix1[10], num_matrix2[10];
     unsigned long  num, num1, num2;
     short n, *p;
-    unsigned short seed_num;
-    unsigned long seed;
+    unsigned short seed_num = 0;
+    unsigned long seed = 0;
 
     seed_num = seed & N16BITS_MAX;
     num = seed & N31BITS_MASK;
@@ -176,9 +176,8 @@ unsigned long prng()   {
  *
  * \retval key random key
  */
-unsigned char *getkey(apr_pool_t *mp) {
-    unsigned short int length = 12;
-    unsigned char *key = NULL;
+char *getkey(apr_pool_t *mp) {
+    char *key = NULL;
     unsigned long int seed = time(NULL);
 
     key = apr_psprintf(mp,"%lu%lu",prng(),seed);
@@ -197,8 +196,8 @@ unsigned char *getkey(apr_pool_t *mp) {
  *
  * \retval hex_digest The MAC
  */
-char *hmac(modsec_rec *msr, const unsigned char *key, int key_len,
-        char *msg, int msglen) {
+char *hmac(modsec_rec *msr, const char *key, int key_len,
+        unsigned char *msg, int msglen) {
     apr_sha1_ctx_t ctx;
     unsigned char digest[APR_SHA1_DIGESTSIZE];
     unsigned char hmac_ipad[HMAC_PAD_SIZE], hmac_opad[HMAC_PAD_SIZE];
@@ -294,7 +293,7 @@ int init_response_body_html_parser(modsec_rec *msr)   {
                 msr_log(msr, 4, "init_response_body_html_parser: assuming ISO-8859-1.");
             msr->crypto_html_tree = htmlReadMemory(msr->resbody_data, msr->resbody_length, NULL,
                     "ISO-8859-1", HTML_PARSE_RECOVER | HTML_PARSE_NOBLANKS | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
-            htmlSetMetaEncoding ((htmlDocPtr) msr->crypto_html_tree, "ISO-8859-1");
+            htmlSetMetaEncoding ((htmlDocPtr) msr->crypto_html_tree, (const xmlChar *) "ISO-8859-1");
         }
         else{
             charset+=8;
@@ -310,7 +309,7 @@ int init_response_body_html_parser(modsec_rec *msr)   {
                         "init_response_body_html_parser: Charset[%s]",charset);
             msr->crypto_html_tree = htmlReadMemory(msr->resbody_data, msr->resbody_length, NULL,
                     charset, HTML_PARSE_RECOVER| HTML_PARSE_NOBLANKS | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
-            htmlSetMetaEncoding ((htmlDocPtr) msr->crypto_html_tree, charset);
+            htmlSetMetaEncoding ((htmlDocPtr) msr->crypto_html_tree, (const xmlChar *)charset);
             if(final_charset != NULL) *final_charset=sep;
         }
 
@@ -320,7 +319,7 @@ int init_response_body_html_parser(modsec_rec *msr)   {
             msr_log(msr, 4,"init_response_body_html_parser: Enconding[%s].",msr->r->content_encoding);
         msr->crypto_html_tree = htmlReadMemory(msr->resbody_data, msr->resbody_length, NULL,
                 msr->r->content_encoding, HTML_PARSE_RECOVER | HTML_PARSE_NOBLANKS | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
-        htmlSetMetaEncoding ((htmlDocPtr) msr->crypto_html_tree, msr->r->content_encoding);
+        htmlSetMetaEncoding ((htmlDocPtr) msr->crypto_html_tree, (const xmlChar *)msr->r->content_encoding);
     }
     if(msr->crypto_html_tree == NULL){
         if (msr->txcfg->debuglog_level >= 4)
@@ -356,7 +355,6 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
     char *my_error_msg = NULL;
     int ovector[33];
     int rc;
-    const char *ret;
 
     if(msr == NULL) return -1;
 
@@ -997,8 +995,7 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
     char *p = NULL;
     const char *ctype = NULL;
     const char *encoding = NULL;
-    char* new_ct = NULL;
-    int rc = 0;
+    char *new_ct = NULL, *content_value = NULL;
 
     if(msr == NULL) return -1;
 
@@ -1081,7 +1078,7 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
         }
 
         msr->stream_output_length = output_buf->buffer->use;
-        msr->stream_output_data = (unsigned char *)malloc(msr->stream_output_length+1);
+        msr->stream_output_data = (char *)malloc(msr->stream_output_length+1);
 
         if (msr->stream_output_data == NULL) {
             xmlOutputBufferClose(output_buf);
@@ -1110,7 +1107,7 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
         }
 
         msr->stream_output_length = output_buf->conv->use;
-        msr->stream_output_data = (unsigned char *)malloc(msr->stream_output_length+1);
+        msr->stream_output_data = (char *)malloc(msr->stream_output_length+1);
 
         if (msr->stream_output_data == NULL) {
             xmlOutputBufferClose(output_buf);
@@ -1128,8 +1125,12 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
 
     xmlOutputBufferClose(output_buf);
 
+    content_value = (char*)apr_psprintf(msr->mp, "%"APR_SIZE_T_FMT, msr->stream_output_length);
     apr_table_unset(msr->r->headers_out,"Content-Length");
-    apr_table_set(msr->r->headers_out, "Content-Length",(char*)apr_psprintf(msr->mp, APR_SIZE_T_FMT, msr->stream_output_length));
+
+    if (msr->txcfg->debuglog_level >= 4)
+        msr_log(msr, 4, "inject_encrypted_response_body: Setting new content value %s", content_value);
+    apr_table_set(msr->r->headers_out, "Content-Length", content_value);
 
     xmlFreeDoc(msr->crypto_html_tree);
 
@@ -1149,10 +1150,10 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
  * \retval mac_link MACed link
  * \retval NULL on fail
  */
-unsigned char *do_hash_link(modsec_rec *msr, char *link, int type)  {
-    unsigned char  *mac_link = NULL;
+char *do_hash_link(modsec_rec *msr, char *link, int type)  {
+    char  *mac_link = NULL;
     char *path_chunk = NULL;
-    unsigned char *hash_value = NULL;
+    char *hash_value = NULL;
     char *qm = NULL;
 
     if(msr == NULL) return NULL;
@@ -1339,10 +1340,10 @@ unsigned char *do_hash_link(modsec_rec *msr, char *link, int type)  {
 
     qm = strchr((char*)link,'?');
     if(qm == NULL){
-        mac_link= (unsigned char*)apr_psprintf(msr->mp, "%s?%s=%s", link, msr->txcfg->crypto_param_name, (char *)hash_value);
+        mac_link= (char*)apr_psprintf(msr->mp, "%s?%s=%s", link, msr->txcfg->crypto_param_name, (char *)hash_value);
     }
     else{
-        mac_link= (unsigned char*)apr_psprintf(msr->mp, "%s&%s=%s", link, msr->txcfg->crypto_param_name, (char*)hash_value);
+        mac_link= (char*)apr_psprintf(msr->mp, "%s&%s=%s", link, msr->txcfg->crypto_param_name, (char*)hash_value);
     }
 
     return mac_link;
