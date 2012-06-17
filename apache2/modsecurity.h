@@ -569,7 +569,7 @@ struct directory_config {
 
     /* Encryption */
     apr_array_header_t  *encryption_method;
-    const char          *crypto_key;
+    const char *crypto_key;
     int                 crypto_key_len;
     const char          *crypto_param_name;
     int                 encryption_is_enabled;

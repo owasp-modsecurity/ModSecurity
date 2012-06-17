@@ -1459,7 +1459,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             int do_process = 1;
             const char *range = NULL;
             rule_exception *re = NULL;
-            char *my_error_msg, *error_msg;
+            char *my_error_msg;
             const apr_array_header_t *tag_tarr = NULL;
             const apr_table_entry_t *tag_telts = NULL;
 
@@ -2165,7 +2165,7 @@ msre_rule *msre_rule_create(msre_ruleset *ruleset, int type,
     msre_rule *rule;
     char *my_error_msg;
     const char *argsp;
-    int rc, idx;
+    int rc;
 
     if (error_msg == NULL) return NULL;
     *error_msg = NULL;

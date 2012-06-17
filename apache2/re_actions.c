@@ -990,6 +990,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Set EncryptionEnforcement to %s.", value);
         }
+        return 1;
     } else
     if (strcasecmp(name, "EncryptionEngine") == 0) {
         if (strcasecmp(value, "on") == 0) {
@@ -1003,6 +1004,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Set EncryptionEngine to %s.", value);
         }
+        return 1;
     } else
     if (strcasecmp(name, "ruleRemoveById") == 0) {
         *(const char **)apr_array_push(msr->removed_rules) = (const char *)apr_pstrdup(msr->mp, value);
@@ -1274,6 +1276,8 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         msr_log(msr, 1, "Internal Error: Unknown ctl action \"%s\".", name);
         return -1;
     }
+
+    return -1;
 }
 
 /* xmlns */

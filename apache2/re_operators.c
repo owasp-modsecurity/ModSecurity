@@ -304,8 +304,6 @@ static int msre_op_ipmatchFromFile_param_init(msre_rule *rule, char **error_msg)
 
 static int msre_op_ipmatchFromFile_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     TreeRoot *rtree = rule->op_param_data;
-    TreeNode *node;
-    apr_sockaddr_t *sa;
     struct in_addr in;
     struct in6_addr in6;
 
@@ -736,7 +734,11 @@ static int msre_op_validateEncryption_param_init(msre_rule *rule, char **error_m
     int erroffset;
     msc_regex_t *regex;
     const char *pattern = rule->op_param;
+    #ifdef WITH_PCRE_STUDY
+        #ifdef WITH_PCRE_JIT
     int rc, jit;
+        #endif
+    #endif
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -795,10 +797,14 @@ static int msre_op_validateEncryption_execute(modsec_rec *msr, msre_rule *rule, 
     unsigned int target_length;
     char *my_error_msg = NULL;
     int ovector[33];
-    int rc, jit;
-    char *qspos = NULL;
-    const char *parm = NULL, *pattern = NULL;
-    msc_parm *mparm = NULL;
+    int rc;
+    const char *pattern = NULL;
+    #ifdef WITH_PCRE_STUDY
+       #ifdef WITH_PCRE_JIT
+    int jit;
+       #endif
+    #endif
+
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -968,7 +974,11 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
     int erroffset;
     msc_regex_t *regex;
     const char *pattern = rule->op_param;
+    #ifdef WITH_PCRE_STUDY
+       #ifdef WITH_PCRE_JIT
     int rc, jit;
+       #endif
+    #endif
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -1019,10 +1029,16 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     int capture = 0;
     int matched_bytes = 0;
     int matched = 0;
-    int rc, jit;
+    int rc;
     char *qspos = NULL;
     const char *parm = NULL, *pattern = NULL;
     msc_parm *mparm = NULL;
+    #ifdef WITH_PCRE_STUDY
+       #ifdef WITH_PCRE_JIT
+    int jit;
+       #endif
+    #endif
+
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -2644,14 +2660,18 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     unsigned int target_length;
     char *my_error_msg = NULL;
     int ovector[33];
-    int rc, jit;
+    int rc;
     int is_cc = 0;
     int offset;
     int matched_bytes = 0;
     char *qspos = NULL;
     const char *parm = NULL;
     msc_parm *mparm = NULL;
-
+    #ifdef WITH_PCRE_STUDY
+       #ifdef WITH_PCRE_JIT
+    int jit;
+       #endif
+    #endif
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -2946,13 +2966,19 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     unsigned int target_length;
     char *my_error_msg = NULL;
     int ovector[33];
-    int rc, jit;
+    int rc;
     int is_cpf = 0;
     int offset;
     int matched_bytes = 0;
     char *qspos = NULL;
     const char *parm = NULL;
     msc_parm *mparm = NULL;
+    #ifdef WITH_PCRE_STUDY
+       #ifdef WITH_PCRE_JIT
+    int jit;
+       #endif
+    #endif
+
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -3235,13 +3261,19 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     unsigned int target_length;
     char *my_error_msg = NULL;
     int ovector[33];
-    int rc, jit;
+    int rc;
     int is_ssn = 0;
     int offset;
     int matched_bytes = 0;
     char *qspos = NULL;
     const char *parm = NULL;
     msc_parm *mparm = NULL;
+    #ifdef WITH_PCRE_STUDY
+       #ifdef WITH_PCRE_JIT
+    int jit;
+       #endif
+    #endif
+
 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
@@ -3534,7 +3566,6 @@ static int msre_op_rbl_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, 
     unsigned int high8bits = 0;
     char *name_to_check = NULL;
     char *target = NULL;
-    char *target2 = NULL;
     apr_sockaddr_t *sa = NULL;
     apr_status_t rc;
     int capture = 0;
