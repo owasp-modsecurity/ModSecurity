@@ -18,6 +18,7 @@
 #include <string.h>
 #if !defined(WIN32) || !defined(WINNT)
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #endif
 #include "apr_lib.h"
 #include "msc_util.h"
@@ -171,9 +172,10 @@ int TreePrefixContainNetmask(TreePrefix *prefix, unsigned char netmask)   {
 
     prefix_data = prefix->prefix_data;
 
-    for(prefix_data != NULL; ; prefix_data = prefix_data->next) {
+    while (prefix_data != NULL) {
         if (prefix_data->netmask == netmask)
             return 1;
+        prefix_data = prefix_data->next;
     }
 
     return 0;
@@ -386,9 +388,10 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
 
             prefix_data = node->prefix->prefix_data;
 
-            for(prefix_data != NULL; ; prefix_data = prefix_data->next) {
+            while(prefix_data != NULL)  {
                 if (prefix_data->netmask == netmask)
                     ++found;
+                prefix_data = prefix_data->next;
             }
 
             if (found != 0) {
@@ -516,10 +519,11 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
 
 int TreeCheckData(TreePrefix *prefix, CPTData *prefix_data, unsigned int netmask)   {
 
-    for(prefix_data != NULL; ; prefix_data = prefix_data->next) {
+    while(prefix_data != NULL)  {
         if (prefix_data->netmask == netmask) {
             return 1;
         }
+        prefix_data = prefix_data->next;
     }
 
     return 0;
