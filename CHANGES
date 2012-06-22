@@ -1,10 +1,9 @@
-NN Jun 2012 - 2.7.0-rc2
+22 Jun 2012 - 2.7.0-rc2
 -------------------
 
- * Fix compilation errors unders Windows platform.
+ * Fixed compilation errors and warnings under Windows platform.
 
- * Fix SecEncryptionKey was not working as expected.
-
+ * Fixed SecEncryptionKey was not working as expected.
 
 08 Jun 2012 - 2.7.0-rc1
 -------------------
