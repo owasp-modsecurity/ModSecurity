@@ -136,6 +136,7 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->col_timeout = NOT_SET;
 
     dcfg->crypto_key = NOT_SET_P;
+    dcfg->crypto_key_len = NOT_SET;
     dcfg->crypto_key_add = NOT_SET;
     dcfg->crypto_param_name = NOT_SET_P;
     dcfg->encryption_is_enabled = NOT_SET;
@@ -554,6 +555,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     /* Encryption */
     merged->crypto_key = (child->crypto_key == NOT_SET_P
         ? parent->crypto_key : child->crypto_key);
+    merged->crypto_key_len = (child->crypto_key_len == NOT_SET
+        ? parent->crypto_key_len : child->crypto_key_len);
     merged->crypto_key_add = (child->crypto_key_add == NOT_SET
         ? parent->crypto_key_add : child->crypto_key_add);
     merged->crypto_param_name = (child->crypto_param_name == NOT_SET_P
