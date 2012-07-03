@@ -57,7 +57,7 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
     int name_len = 0, value_len = 0;
     char *name = NULL, *value = NULL;
     char *opt = NULL, *param = NULL;
-    int i, rc, match = 0;
+    int i, rc, match = 0, var_appended = 0;
     int offset = 0;
 
     if(p1 == NULL || p2 == NULL || (dcfg == NULL && rset == NULL))  {
@@ -125,7 +125,7 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
         targets = (msre_var **)rule->targets->elts;
         // TODO need a good way to remove the element from array, maybe change array by tables or rings
         for (i = 0; i < rule->targets->nelts; i++) {
-            if((strlen(targets[i]->name) == strlen(name)) && 
+            if((strlen(targets[i]->name) == strlen(name)) &&
                     (strncasecmp(targets[i]->name,name,strlen(targets[i]->name)) == 0) &&
                     (targets[i]->is_negated == is_negated) &&
                     (targets[i]->is_counting == is_counting))    {
@@ -136,10 +136,14 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
                         memset(targets[i]->name,0,strlen(targets[i]->name));
                         memset(targets[i]->param,0,strlen(targets[i]->param));
                         match = 1;
+                        targets[i]->is_counting = 0;
+                        targets[i]->is_negated = 1;
                     }
                 } else if (value == NULL && targets[i]->param == NULL){
                     memset(targets[i]->name,0,strlen(targets[i]->name));
                     match = 1;
+                    targets[i]->is_counting = 0;
+                    targets[i]->is_negated = 1;
                 } else
                     continue;
 
@@ -157,6 +161,7 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
                 if (rc < 0) {
                     goto end;
                 }
+                var_appended = 1;
             } else  {
                 goto end;
             }
@@ -225,21 +230,22 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
                 target = NULL;
             }
 
-
             if(match == 0 ) {
                 rc = msre_parse_targets(ruleset, p, rule->targets, &my_error_msg);
                 if (rc < 0) {
                     goto end;
                 }
+                var_appended = 1;
             }
         }
 
         p = apr_strtok(NULL,",",&savedptr);
     }
 
-    if(match == 0)  {
+    if(var_appended == 1)  {
         curr_targets = msre_generate_target_string(ruleset->mp, rule);
         rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, curr_targets, NULL, NULL);
+        rule->p1 = apr_pstrdup(ruleset->mp, curr_targets);
     }
 
 end:
