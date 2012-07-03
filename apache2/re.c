@@ -140,7 +140,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
     char *name = NULL, *value = NULL;
     char *opt = NULL, *param = NULL;
     char *target_list = NULL, *replace = NULL;
-    int i, rc, match = 0;
+    int i, rc, match = 0, var_appended = 0;
 
     if(rule != NULL)    {
 
@@ -221,10 +221,14 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                                 strncasecmp(targets[i]->param,value,strlen(targets[i]->param)) == 0) {
                             memset(targets[i]->name,0,strlen(targets[i]->name));
                             memset(targets[i]->param,0,strlen(targets[i]->param));
+                            targets[i]->is_counting = 0;
+                            targets[i]->is_negated = 1;
                             match = 1;
                         }
                     } else if (value == NULL && targets[i]->param == NULL){
                         memset(targets[i]->name,0,strlen(targets[i]->name));
+                        targets[i]->is_counting = 0;
+                        targets[i]->is_negated = 1;
                         match = 1;
                     } else
                         continue;
@@ -251,13 +255,15 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                         goto end;
                     }
                     if(msr) {
-                        msr_log(msr, 9, "Successfuly replaced variable");
+                        msr_log(msr, 9, "Successfully replaced variable");
                     }
 #if !defined(MSC_TEST)
                     else {
-                        ap_log_error(APLOG_MARK, APLOG_INFO, 0, NULL, " ModSecurity: Successfuly replaced variable");
+                        ap_log_error(APLOG_MARK, APLOG_INFO, 0, NULL, " ModSecurity: Successfully replaced variable");
                     }
 #endif
+                var_appended = 1;
+
                 } else  {
                     if(msr) {
                         msr_log(msr, 9, "Cannot find variable to replace");
@@ -361,11 +367,12 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                         }
 #if !defined(MSC_TEST)
                         else {
-                            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Error parseing rule targets to append variable");
+                            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Error parsing rule targets to append variable");
                         }
 #endif
                         goto end;
                     }
+                    var_appended = 1;
                 } else {
                     if(msr) {
                         msr_log(msr, 9, "Skipping variable, already appended");
@@ -381,15 +388,16 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
             p = apr_strtok(NULL,",",&savedptr);
         }
 
-        if(match == 0)  {
+        if(var_appended == 1)  {
             current_targets = msre_generate_target_string(ruleset->mp, rule);
             rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, current_targets, NULL, NULL);
+            rule->p1 = apr_pstrdup(ruleset->mp, current_targets);
             if(msr) {
-                msr_log(msr, 9, "Successfuly appended variable");
+                msr_log(msr, 9, "Successfully appended variable");
             }
 #if !defined(MSC_TEST)
             else {
-                ap_log_error(APLOG_MARK, APLOG_INFO, 0, NULL, " ModSecurity: Successfuly appended variable");
+                ap_log_error(APLOG_MARK, APLOG_INFO, 0, NULL, " ModSecurity: Successfully appended variable");
             }
 #endif
         }
