@@ -84,7 +84,7 @@ static void version(apr_pool_t *mp) {
         ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Loaded APR do not match with compiled!");
     }
 
-    pcre_vrs = apr_psprintf(mp,"%d.%d", PCRE_MAJOR, PCRE_MINOR);
+    pcre_vrs = apr_psprintf(mp,"%d.%02d", PCRE_MAJOR, PCRE_MINOR);
 
     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
             "ModSecurity: PCRE compiled version=\"%s\"; "
