@@ -9,26 +9,30 @@ lang="en"><head>
 		<meta name="generator" content="MediaWiki 1.15.1">
 		<meta name="robots" content="noindex,follow">
 		<meta name="keywords" content="Reference Manual">
-		<link rel="shortcut icon" href="http://sourceforge.net/favicon.ico">
+		<link rel="alternate" type="application/x-wiki" title="Edit" 
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;action=edit">
+		<link rel="edit" title="Edit" 
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;action=edit">
+		<link rel="shortcut icon" href="https://sourceforge.net/favicon.ico">
 		<link rel="search" type="application/opensearchdescription+xml" 
-href="http://sourceforge.net/apps/mediawiki/mod-security/opensearch_desc.php"
+href="https://sourceforge.net/apps/mediawiki/mod-security/opensearch_desc.php"
  title="mod-security (en)">
 		<link rel="alternate" type="application/rss+xml" title="mod-security 
 RSS Feed" 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:RecentChanges&amp;feed=rss">
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:RecentChanges&amp;feed=rss">
 		<link rel="alternate" type="application/atom+xml" title="mod-security 
 Atom Feed" 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:RecentChanges&amp;feed=atom">
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:RecentChanges&amp;feed=atom">
 		<title>SourceForge.net: Reference Manual - mod-security</title>
 		<link rel="stylesheet" href="Reference_Manual_files/commonPrint.css" 
 type="text/css">
-		<link rel="stylesheet" href="Reference_Manual_files/index_003.css" 
+		<link rel="stylesheet" href="Reference_Manual_files/index_002.css" 
 type="text/css">
 		<link rel="stylesheet" href="Reference_Manual_files/index.css" 
 type="text/css">
 		<link rel="stylesheet" href="Reference_Manual_files/index_004.css" 
 type="text/css">
-		<link rel="stylesheet" href="Reference_Manual_files/index_002.css" 
+		<link rel="stylesheet" href="Reference_Manual_files/index_003.css" 
 type="text/css">
 		<!--[if lt IE 7]><script type="text/javascript" src="/apps/mediawiki/mod-security/skins/common/IEFixes.js?207"></script>
 		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
@@ -41,7 +45,7 @@ type="text/css">
 		var wgScript = "/apps/mediawiki/mod-security/index.php";
 		var wgVariantArticlePath = false;
 		var wgActionPaths = {};
-		var wgServer = "http://sourceforge.net";
+		var wgServer = "https://sourceforge.net";
 		var wgCanonicalNamespace = "";
 		var wgCanonicalSpecialPageName = false;
 		var wgNamespaceNumber = 0;
@@ -50,12 +54,12 @@ type="text/css">
 		var wgAction = "view";
 		var wgArticleId = "12";
 		var wgIsArticle = true;
-		var wgUserName = null;
-		var wgUserGroups = null;
+		var wgUserName = "Brenosilva";
+		var wgUserGroups = ["admin", "editor", "*", "user", "autoconfirmed"];
 		var wgUserLanguage = "en";
 		var wgContentLanguage = "en";
 		var wgBreakFrames = false;
-		var wgCurRevisionId = 502;
+		var wgCurRevisionId = 507;
 		var wgVersion = "1.15.1";
 		var wgEnableAPI = true;
 		var wgEnableWriteAPI = true;
@@ -63,11 +67,13 @@ type="text/css">
 		var wgDigitTransformTable = ["", ""];
 		var wgRestrictionEdit = [];
 		var wgRestrictionMove = [];
+		var wgAjaxWatch = {"watchMsg": "Watch", "unwatchMsg": "Unwatch", "watchingMsg": "Watching…", "unwatchingMsg": "Unwatching…"};
 		/*]]>*/</script>
 
 		<script type="text/javascript" src="Reference_Manual_files/wikibits.js"><!-- wikibits js --></script>
 		<!-- Head Scripts -->
 		<script type="text/javascript" src="Reference_Manual_files/ajax.js"></script>
+		<script type="text/javascript" src="Reference_Manual_files/ajaxwatch.js"></script>
 		<script type="text/javascript" src="Reference_Manual_files/index.php"><!-- site js --></script>
 	
 
@@ -2604,6 +2610,9 @@ example, lets say you want to only inspect ARGS for a particular URL:
 </p>
 <pre>SecRule REQUEST_FILENAME "@streq /path/to/file.php" "phase:1,t:none,nolog,pass,ctl:ruleUpdateTargetById=958895;REQUEST_URI;REQUEST_FILENAME"
 </pre>
+<dl><dt> Note&nbsp;</dt><dd> This ctl is deprecated and will be removed 
+from the code, since we cannot use it per-transaction.
+</dd></dl>
 <a name="SecRuleUpdateTargetByMsg" id="SecRuleUpdateTargetByMsg"></a><h2>
  <span class="mw-headline"> SecRuleUpdateTargetByMsg </span></h2>
 <p><b>Description:</b> Updates the target (variable) list of the 
@@ -2653,18 +2662,6 @@ target to the end of the variable list as follows:
      "phase:2,rev:'2.1.1',capture,t:none,t:htmlEntityDecode,t:compressWhitespace,t:lowercase,ctl:auditLogParts=+E,block,msg:'System Command Injection',id:'958895',tag:'WEB_ATTACK/COMMAND_INJECTION',tag:'WASCTC/WASC-31',tag:'OWASP_TOP_10/A1',tag:'PCI/6.5.2',logdata:'%{TX.0}',severity:'2',setvar:'tx.msg=%{rule.msg}',setvar:tx.anomaly_score=+%{tx.critical_anomaly_score},setvar:tx.command_injection_score=+%{tx.critical_anomaly_score},setvar:tx.%{rule.id}-WEB_ATTACK/COMMAND_INJECTION-%{matched_var_name}=%
 {tx.0}""
 </pre>
-<p><b>Conditionally Appending Targets</b>
-</p><p>You could also do the same by using the ctl action.  This is 
-useful if you want to only update the targets for a particular URL
-</p>
-<pre>SecRule REQUEST_FILENAME "@streq /path/to/file.php" "phase:1,t:none,nolog,pass,ctl:ruleUpdateTargetByMsg='System Command Injection';!ARGS:email"
-</pre>
-<p><b>Conditionally Replacing Targets</b>
-</p><p>You could also replace targets using the ctl action.  For 
-example, lets say you want to only inspect ARGS for a particular URL:
-</p>
-<pre>SecRule REQUEST_FILENAME "@streq /path/to/file.php" "phase:1,t:none,nolog,pass,ctl:ruleUpdateTargetByMsg='System Command Injection';REQUEST_URI;REQUEST_FILENAME"
-</pre>
 <a name="SecRuleUpdateTargetByTag" id="SecRuleUpdateTargetByTag"></a><h2>
  <span class="mw-headline"> SecRuleUpdateTargetByTag </span></h2>
 <p><b>Description:</b> Updates the target (variable) list of the 
@@ -2713,18 +2710,6 @@ target to the end of the variable list as follows:
 <pre>SecRule REQUEST_URI|ARGS_NAMES|ARGS|XML:/* "[\;\|\`]\W*?\bmail\b" \
      "phase:2,rev:'2.1.1',capture,t:none,t:htmlEntityDecode,t:compressWhitespace,t:lowercase,ctl:auditLogParts=+E,block,msg:'System Command Injection',id:'958895',tag:'WEB_ATTACK/COMMAND_INJECTION',tag:'WASCTC/WASC-31',tag:'OWASP_TOP_10/A1',tag:'PCI/6.5.2',logdata:'%{TX.0}',severity:'2',setvar:'tx.msg=%{rule.msg}',setvar:tx.anomaly_score=+%{tx.critical_anomaly_score},setvar:tx.command_injection_score=+%{tx.critical_anomaly_score},setvar:tx.%{rule.id}-WEB_ATTACK/COMMAND_INJECTION-%{matched_var_name}=%
 {tx.0}""
-</pre>
-<p><b>Conditionally Appending Targets</b>
-</p><p>You could also do the same by using the ctl action.  This is 
-useful if you want to only update the targets for a particular URL
-</p>
-<pre>SecRule REQUEST_FILENAME "@streq /path/to/file.php" "phase:1,t:none,nolog,pass,ctl:ruleUpdateTargetByMsg='WASCTC/WASC-31';!ARGS:email"
-</pre>
-<p><b>Conditionally Replacing Targets</b>
-</p><p>You could also replace targets using the ctl action.  For 
-example, lets say you want to only inspect ARGS for a particular URL:
-</p>
-<pre>SecRule REQUEST_FILENAME "@streq /path/to/file.php" "phase:1,t:none,nolog,pass,ctl:ruleUpdateTargetByMsg='WASCTC/WASC-31';REQUEST_URI;REQUEST_FILENAME"
 </pre>
 <a name="SecServerSignature" id="SecServerSignature"></a><h2> <span 
 class="mw-headline"> SecServerSignature </span></h2>
@@ -2932,7 +2917,7 @@ five phases of the Apache request cycle:
 <p>Below is a diagram of the standard Apache Request Cycle. In the 
 diagram, the 5 ModSecurity processing phases are shown.
 </p><p><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=File:Apache_request_cycle-modsecurity.jpg"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=File:Apache_request_cycle-modsecurity.jpg"
  class="image" title="Apache request cycle-modsecurity.jpg"><img alt="" 
 src="Reference_Manual_files/600px-Apache_request_cycle-modsecurity.jpg" 
 height="459" width="600" border="0"></a>
@@ -4511,9 +4496,10 @@ SecRule REQUEST_CONTENT_TYPE ^text/xml "nolog,pass,ctl:requestBodyProcessor=XML"
 </li><li><b>ruleRemoveById</b> - since this action us triggered at run 
 time, it should be specified <b>before</b> the rule in which it is 
 disabling.
-</li><li><b>ruleUpdateTargetById</b>
-</li><li><b>ruleUpdateTargetByMsg</b>
-</li><li><b>ruleUpdateTargetByTag</b>
+</li><li><b>ruleUpdateTargetById</b> - This is deprecated and will be 
+removed from the code. Use ruleRemoveTargetById for per-request 
+exceptions.
+</li><li><b>ruleRemoveTargetById</b> 
 </li><li><b>ruleRemoveByMsg</b>
 </li><li><b>encryptionEngine</b>
 </li><li><b>encryptionEnforcement</b>
@@ -6247,16 +6233,16 @@ SecCookieFormat 0
 
 <!-- 
 NewPP limit report
-Preprocessor node count: 805/1000000
+Preprocessor node count: 793/1000000
 Post-expand include size: 0/2097152 bytes
 Template argument size: 0/2097152 bytes
 Expensive parser function count: 0/100
 -->
 
-<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20120608123734 -->
+<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!printable=1 and timestamp 20120723175510 -->
 <div class="printfooter">
 Retrieved from "<a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual">http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual</a>"</div>
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual">https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual</a>"</div>
 						<!-- end content -->
 						<div class="visualClear"></div>
 		</div>
@@ -6269,18 +6255,30 @@ href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Referen
 			<ul>
 	
 				 <li id="ca-nstab-main" class="selected"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual"
  title="View the content page [alt-shift-c]" accesskey="c">Page</a></li>
 				 <li id="ca-talk" class="new"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Talk:Reference_Manual&amp;action=edit&amp;redlink=1"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Talk:Reference_Manual&amp;action=edit&amp;redlink=1"
  title="Discussion about the content page [alt-shift-t]" accesskey="t">Discussion</a></li>
-				 <li id="ca-viewsource"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;action=edit"
- title="This page is protected.
-You can view its source [alt-shift-e]" accesskey="e">View source</a></li>
+				 <li id="ca-edit"><a 
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;action=edit"
+ title="You can edit this page.
+Please use the preview button before saving [alt-shift-e]" accesskey="e">Edit</a></li>
 				 <li id="ca-history"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;action=history"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;action=history"
  title="Past revisions of this page [alt-shift-h]" accesskey="h">History</a></li>
+				 <li id="ca-delete"><a 
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;action=delete"
+ title="Delete this page [alt-shift-d]" accesskey="d">Delete</a></li>
+				 <li id="ca-move"><a 
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:MovePage/Reference_Manual"
+ title="Move this page [alt-shift-m]" accesskey="m">Move</a></li>
+				 <li id="ca-protect"><a 
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;action=protect"
+ title="Protect this page [alt-shift-=]" accesskey="=">Protect</a></li>
+				 <li id="ca-watch"><a 
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;action=watch"
+ title="Add this page to your watchlist [alt-shift-w]" accesskey="w">Watch</a></li>
 			</ul>
 		</div>
 	</div>
@@ -6290,6 +6288,24 @@ href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Referen
 			<table style="height: 4px;" rules="none" border="0" cellpadding="0" 
 cellspacing="0"></table>
 			<ul>
+					<li id="pt-userpage"><a 
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=User:Brenosilva"
+ title="Your user page [alt-shift-.]" accesskey="." class="new">Brenosilva</a></li>
+					<li id="pt-mytalk"><a 
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=User_talk:Brenosilva"
+ title="Your talk page [alt-shift-n]" accesskey="n" class="new">My talk</a></li>
+					<li id="pt-preferences"><a 
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:Preferences"
+ title="Your preferences">My preferences</a></li>
+					<li id="pt-watchlist"><a 
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:Watchlist"
+ title="The list of pages you are monitoring for changes [alt-shift-l]" 
+accesskey="l">My watchlist</a></li>
+					<li id="pt-mycontris"><a 
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:Contributions/Brenosilva"
+ title="List of your contributions [alt-shift-y]" accesskey="y">My 
+contributions</a></li>
+					<li id="pt-logout"></li>
 			</ul>
 		</div>
 	</div>
@@ -6297,7 +6313,7 @@ cellspacing="0"></table>
 		<a style="background-image: 
 url(&quot;/apps/mediawiki/mod-security/nfs/project/m/mo/mod-security/7/70/MediaWikiSidebarLogo.png&quot;);"
  
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Main_Page"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Main_Page"
  title="Visit the main page [alt-shift-z]" accesskey="z"></a>
 	</div>
 	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
@@ -6306,24 +6322,24 @@ href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Main_Pa
 		<div class="pBody">
 			<ul>
 				<li id="n-mainpage-description"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Main_Page">Main
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Main_Page">Main
  Page</a></li>
 				<li id="n-portal"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=mod-security:Community_Portal"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=mod-security:Community_Portal"
  title="About the project, what you can do, where to find things">Community
  portal</a></li>
 				<li id="n-currentevents"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=mod-security:Current_events"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=mod-security:Current_events"
  title="Find background information on current events">Current events</a></li>
 				<li id="n-recentchanges"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:RecentChanges"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:RecentChanges"
  title="The list of recent changes in the wiki [alt-shift-r]" 
 accesskey="r">Recent changes</a></li>
 				<li id="n-randompage"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:Random"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:Random"
  title="Load a random page [alt-shift-x]" accesskey="x">Random page</a></li>
 				<li id="n-help"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Help:Contents"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Help:Contents"
  title="The place to find out">Help</a></li>
 			</ul>
 		</div>
@@ -6348,22 +6364,25 @@ value="Search" title="Search the pages for this text" type="submit">
 		<div class="pBody">
 			<ul>
 				<li id="t-whatlinkshere"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:WhatLinksHere/Reference_Manual"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:WhatLinksHere/Reference_Manual"
  title="List of all wiki pages that link here [alt-shift-j]" 
 accesskey="j">What links here</a></li>
 				<li id="t-recentchangeslinked"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:RecentChangesLinked/Reference_Manual"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:RecentChangesLinked/Reference_Manual"
  title="Recent changes in pages linked from this page [alt-shift-k]" 
 accesskey="k">Related changes</a></li>
+<li id="t-upload"><a 
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:Upload"
+ title="Upload files [alt-shift-u]" accesskey="u">Upload file</a></li>
 <li id="t-specialpages"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:SpecialPages"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Special:SpecialPages"
  title="List of all special pages [alt-shift-q]" accesskey="q">Special 
 pages</a></li>
 				<li id="t-print"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;printable=yes&amp;printable=yes"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;printable=yes&amp;printable=yes"
  rel="alternate" title="Printable version of this page [alt-shift-p]" 
 accesskey="p">Printable version</a></li>				<li id="t-permalink"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=502"
+href="https://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=507"
  title="Permanent link to this revision of the page">Permanent link</a></li>
 			</ul>
 		</div>
@@ -6375,15 +6394,15 @@ href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Referen
 src="Reference_Manual_files/poweredby_mediawiki_88x31.png" alt="Powered 
 by MediaWiki"></a></div>
 			<ul id="f-list">
-					<li id="lastmod"> This page was last modified on 8 June 2012, at 
-12:36.</li>
-					<li id="viewcount">This page has been accessed 130,792 times.</li>
+					<li id="lastmod"> This page was last modified on 23 July 2012, at 
+17:54.</li>
+					<li id="viewcount">This page has been accessed 142,275 times.</li>
 			</ul>
 		</div>
 </div>
 
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
-<!-- Served in 1.289 secs. -->
+<!-- Served in 1.261 secs. -->
     
     
     <script type="text/javascript">
