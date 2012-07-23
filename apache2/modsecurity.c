@@ -368,6 +368,8 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     if (msr->response_headers_to_sanitize == NULL) return -1;
     msr->pattern_to_sanitize = apr_table_make(msr->mp, 32);
     if (msr->pattern_to_sanitize == NULL) return -1;
+    msr->removed_targets = apr_table_make(msr->mp, 16);
+    if (msr->removed_targets == NULL) return -1;
 
     /* Initialise cookies */
     msr->request_cookies = apr_table_make(msr->mp, 16);

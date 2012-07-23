@@ -819,6 +819,17 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
 
         return NULL;
     } else
+        if  (strcasecmp(name, "ruleRemoveTargetById") == 0) {
+                char *parm = NULL;
+                char *savedptr = NULL;
+
+                parm = apr_strtok(value,";",&savedptr);
+
+                if(parm == NULL && savedptr == NULL)
+                    return apr_psprintf(engine->mp, "ruleRemoveTargetById must has at least id;target1,targets2...targetN");
+
+                return NULL;
+    } else
         if  (strcasecmp(name, "ruleUpdateTargetById") == 0) {
                 char *parm = NULL;
                 char *savedptr = NULL;
@@ -1043,6 +1054,23 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Ctl: Set responseBodyLimit to %ld.", limit);
         }
+
+        return 1;
+    } else
+    if (strcasecmp(name, "ruleRemoveTargetById") == 0)  {
+        msre_rule *updated_rule = NULL;
+        char *p1 = NULL, *p2 = NULL;
+        char *savedptr = NULL;
+
+        p1 = apr_strtok(value,";",&savedptr);
+
+        p2 = apr_strtok(NULL,";",&savedptr);
+
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Ctl: ruleRemoveTargetById id=%s targets=%s", p1, p2);
+        }
+
+        apr_table_setn(msr->removed_targets, p1, (const char *)apr_pstrdup(msr->mp, p2));
 
         return 1;
     } else

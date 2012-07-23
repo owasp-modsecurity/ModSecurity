@@ -1,3 +1,15 @@
+23 Jul 2012 - 2.6.7
+-------------------
+
+ * Fixed PCRE mismtach version warning message (Thanks Victor Julien).
+
+ * Fixed explicit target replacement using SecUpdateTargetById was broken.
+
+ * The ctl:updateTargetById is deprecated and will be removed for future versions since
+   there is no safe way to use it per-request.
+
+ * Added ctl:RemoveTargetById that can be used to exclude targets to be processed per-request.
+
 08 Jun 2012 - 2.6.6
 -------------------
 

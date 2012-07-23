@@ -32,6 +32,7 @@ static const char *const severities[] = {
     NULL,
 };
 
+static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, const char *full_varname);
 static apr_status_t msre_parse_targets(msre_ruleset *ruleset, const char *text,
     apr_array_header_t *arr, char **error_msg);
 static char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule);
@@ -42,6 +43,53 @@ static msre_action *msre_create_action(msre_engine *engine, const char *name,
 static apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr);
 
 /* -- Actions, variables, functions and operator functions ----------------- */
+
+static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, const char *full_varname)   {
+    const char *targets = NULL, *exceptions = NULL;
+    char *savedptr = NULL, *target = NULL;
+
+    if(msr == NULL)
+        return 0;
+
+    if(rule == NULL)
+        return 0;
+
+    if(rule->actionset == NULL)
+        return 0;
+
+    if(rule->actionset->id !=NULL)    {
+
+        exceptions = (const char *)apr_table_get(msr->removed_targets, rule->actionset->id);
+
+        targets = apr_pstrdup(msr->mp, exceptions);
+
+        if(targets != NULL) {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "fetch_target_exception: Found exception target list [%s] for rule id %s", targets, rule->actionset->id);
+            }
+
+            target = apr_strtok((char *)targets, ",", &savedptr);
+
+            while(target != NULL)   {
+                if(strncasecmp(target, full_varname, strlen(target)) == 0)   {
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                    }
+                    return 1;
+                }
+                target = apr_strtok(NULL, ",", &savedptr);
+            }
+        } else  {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "fetch_target_exception: No exception target found for rule id %s.", rule->actionset->id);
+
+            }
+        }
+
+    }
+
+    return 0;
+}
 
 char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
         msre_ruleset *rset, const char *p1, const char *p2, const char *p3)
@@ -2161,10 +2209,24 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         full_varname = var->name;
     }
 
+    rc = fetch_target_exception(rule, msr, full_varname);
+
+    if(rc > 0)  {
+
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "Executing operator \"%s%s\" with param \"%s\" against %s skipped.",
+                    (rule->op_negated ? "!" : ""), rule->op_name,
+                    log_escape(msr->mp, rule->op_param), full_varname);
+        }
+
+        return RULE_NO_MATCH;
+
+    }
+
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Executing operator \"%s%s\" with param \"%s\" against %s.",
-            (rule->op_negated ? "!" : ""), rule->op_name,
-            log_escape(msr->mp, rule->op_param), full_varname);
+                (rule->op_negated ? "!" : ""), rule->op_name,
+                log_escape(msr->mp, rule->op_param), full_varname);
     }
 
     if (msr->txcfg->debuglog_level >= 9) {

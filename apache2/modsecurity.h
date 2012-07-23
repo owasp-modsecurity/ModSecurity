@@ -280,6 +280,7 @@ struct modsec_rec {
     apr_table_t         *response_headers_to_sanitize;
     apr_table_t         *request_cookies;
     apr_table_t         *pattern_to_sanitize;
+    apr_table_t         *removed_targets;
 
     unsigned int        urlencoded_error;
     unsigned int        inbound_error;
