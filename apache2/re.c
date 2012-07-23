@@ -32,7 +32,7 @@ static const char *const severities[] = {
     NULL,
 };
 
-static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, const char *full_varname);
+static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *var);
 static apr_status_t msre_parse_targets(msre_ruleset *ruleset, const char *text,
     apr_array_header_t *arr, char **error_msg);
 static char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule);
@@ -44,11 +44,17 @@ static apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr);
 
 /* -- Actions, variables, functions and operator functions ----------------- */
 
-static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, const char *full_varname)   {
+static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *var)   {
     const char *targets = NULL, *exceptions = NULL;
-    char *savedptr = NULL, *target = NULL;
+    char *savedptr = NULL, *target = NULL, *value = NULL;
+    char *c = NULL, *name = NULL;
+    char *variable = NULL, *myvar = NULL;
+    char *myvalue = NULL, *myname = NULL;
 
     if(msr == NULL)
+        return 0;
+
+    if(var == NULL)
         return 0;
 
     if(rule == NULL)
@@ -58,6 +64,16 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, const char *
         return 0;
 
     if(rule->actionset->id !=NULL)    {
+
+        myvar = apr_pstrdup(msr->mp, var->name);
+
+        c = strchr(myvar,':');
+
+        if(c != NULL) {
+            myname = apr_strtok(myvar,":",&myvalue);
+        } else {
+            myname = myvar;
+        }
 
         exceptions = (const char *)apr_table_get(msr->removed_targets, rule->actionset->id);
 
@@ -71,12 +87,41 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, const char *
             target = apr_strtok((char *)targets, ",", &savedptr);
 
             while(target != NULL)   {
-                if(strncasecmp(target, full_varname, strlen(target)) == 0)   {
-                    if (msr->txcfg->debuglog_level >= 9) {
-                        msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
-                    }
-                    return 1;
+
+                variable = apr_pstrdup(msr->mp, target);
+
+                c = strchr(variable,':');
+
+                if(c != NULL) {
+                    name = apr_strtok(variable,":",&value);
+                } else {
+                    name = variable;
                 }
+
+                if((strlen(myname) == strlen(name)) &&
+                        (strncasecmp(myname, name,strlen(myname)) == 0))   {
+
+                    if(value != NULL && myvalue != NULL)  {
+                        if((strlen(myvalue) == strlen(value)) &&
+                                strncasecmp(myvalue,value,strlen(myvalue)) == 0) {
+                            if (msr->txcfg->debuglog_level >= 9) {
+                                msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                            }
+                            return 1;
+                        }
+                    } else if (value == NULL && myvalue == NULL)    {
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                        }
+                        return 1;
+                    } else if (value == NULL && myvalue != NULL)   {
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                        }
+                        return 1;
+                    }
+                }
+
                 target = apr_strtok(NULL, ",", &savedptr);
             }
         } else  {
@@ -2209,7 +2254,7 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         full_varname = var->name;
     }
 
-    rc = fetch_target_exception(rule, msr, full_varname);
+    rc = fetch_target_exception(rule, msr, var);
 
     if(rc > 0)  {
 
