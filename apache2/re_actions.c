@@ -1070,7 +1070,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
             msr_log(msr, 4, "Ctl: ruleRemoveTargetById id=%s targets=%s", p1, p2);
         }
 
-        apr_table_setn(msr->removed_targets, p1, (const char *)apr_pstrdup(msr->mp, p2));
+        apr_table_addn(msr->removed_targets, p1, (const char *)apr_pstrdup(msr->mp, p2));
 
         return 1;
     } else

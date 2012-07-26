@@ -47,9 +47,12 @@ static apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr);
 static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *var)   {
     const char *targets = NULL, *exceptions = NULL;
     char *savedptr = NULL, *target = NULL, *value = NULL;
-    char *c = NULL, *name = NULL;
+    char *c = NULL, *name = NULL, *id = NULL;
     char *variable = NULL, *myvar = NULL;
     char *myvalue = NULL, *myname = NULL;
+    const apr_array_header_t *tarr = NULL;
+    const apr_table_entry_t *telts = NULL;
+    int i, match;
 
     if(msr == NULL)
         return 0;
@@ -75,63 +78,78 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
             myname = myvar;
         }
 
-        exceptions = (const char *)apr_table_get(msr->removed_targets, rule->actionset->id);
+        tarr = apr_table_elts(msr->removed_targets);
+        telts = (const apr_table_entry_t*)tarr->elts;
 
-        targets = apr_pstrdup(msr->mp, exceptions);
+        match = 0;
+        for (i = 0; i < tarr->nelts; i++) {
+            id = (char *)telts[i].key;
 
-        if(targets != NULL) {
-            if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "fetch_target_exception: Found exception target list [%s] for rule id %s", targets, rule->actionset->id);
-            }
+            if(strcasecmp(id, rule->actionset->id) == 0)    {
+                exceptions = (char *)telts[i].val;
 
-            target = apr_strtok((char *)targets, ",", &savedptr);
+                targets = apr_pstrdup(msr->mp, exceptions);
 
-            while(target != NULL)   {
+                if(targets != NULL) {
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "fetch_target_exception: Found exception target list [%s] for rule id %s", targets, rule->actionset->id);
+                    }
 
-                variable = apr_pstrdup(msr->mp, target);
+                    target = apr_strtok((char *)targets, ",", &savedptr);
 
-                c = strchr(variable,':');
+                    while(target != NULL)   {
 
-                if(c != NULL) {
-                    name = apr_strtok(variable,":",&value);
-                } else {
-                    name = variable;
-                }
+                        variable = apr_pstrdup(msr->mp, target);
 
-                if((strlen(myname) == strlen(name)) &&
-                        (strncasecmp(myname, name,strlen(myname)) == 0))   {
+                        c = strchr(variable,':');
 
-                    if(value != NULL && myvalue != NULL)  {
-                        if((strlen(myvalue) == strlen(value)) &&
-                                strncasecmp(myvalue,value,strlen(myvalue)) == 0) {
-                            if (msr->txcfg->debuglog_level >= 9) {
-                                msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                        if(c != NULL) {
+                            name = apr_strtok(variable,":",&value);
+                        } else {
+                            name = variable;
+                        }
+
+                        if((strlen(myname) == strlen(name)) &&
+                                (strncasecmp(myname, name,strlen(myname)) == 0))   {
+
+                            if(value != NULL && myvalue != NULL)  {
+                                if((strlen(myvalue) == strlen(value)) &&
+                                        strncasecmp(myvalue,value,strlen(myvalue)) == 0) {
+                                    if (msr->txcfg->debuglog_level >= 9) {
+                                        msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                                    }
+                                    match = 1;
+                                }
+                            } else if (value == NULL && myvalue == NULL)    {
+                                if (msr->txcfg->debuglog_level >= 9) {
+                                    msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                                }
+                                match = 1;
+                            } else if (value == NULL && myvalue != NULL)   {
+                                if (msr->txcfg->debuglog_level >= 9) {
+                                    msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                                }
+                                match = 1;
                             }
-                            return 1;
                         }
-                    } else if (value == NULL && myvalue == NULL)    {
-                        if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
-                        }
-                        return 1;
-                    } else if (value == NULL && myvalue != NULL)   {
-                        if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
-                        }
-                        return 1;
+
+                        target = apr_strtok(NULL, ",", &savedptr);
+                    }
+                } else  {
+                    if (msr->txcfg->debuglog_level >= 9) {
+                        msr_log(msr, 9, "fetch_target_exception: No exception target found for rule id %s.", rule->actionset->id);
+
                     }
                 }
 
-                target = apr_strtok(NULL, ",", &savedptr);
             }
-        } else  {
-            if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "fetch_target_exception: No exception target found for rule id %s.", rule->actionset->id);
 
-            }
         }
 
     }
+
+    if(match)
+        return 1;
 
     return 0;
 }
@@ -225,7 +243,7 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
 
                 if(value != NULL && targets[i]->param != NULL)  {
                     if((strlen(targets[i]->param) == strlen(value)) &&
-                        strncasecmp(targets[i]->param,value,strlen(targets[i]->param)) == 0) {
+                            strncasecmp(targets[i]->param,value,strlen(targets[i]->param)) == 0) {
                         memset(targets[i]->name,0,strlen(targets[i]->name));
                         memset(targets[i]->param,0,strlen(targets[i]->param));
                         match = 1;
@@ -307,7 +325,7 @@ char *update_rule_target(cmd_parms *cmd, directory_config *dcfg,
 
                     if(value != NULL && targets[i]->param != NULL)  {
                         if((strlen(targets[i]->param) == strlen(value)) &&
-                            strncasecmp(targets[i]->param,value,strlen(targets[i]->param)) == 0) {
+                                strncasecmp(targets[i]->param,value,strlen(targets[i]->param)) == 0) {
                             match = 1;
                         }
                     } else if (value == NULL && targets[i]->param == NULL){
