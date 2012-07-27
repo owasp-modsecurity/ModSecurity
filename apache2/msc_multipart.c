@@ -624,6 +624,7 @@ static int multipart_process_boundary(modsec_rec *msr, int last_part, char **err
             &&(msr->mpd->mpp->tmp_file_fd != 0))
         {
             close(msr->mpd->mpp->tmp_file_fd);
+            msr->mpd->mpp->tmp_file_fd = -1;
         }
 
         if (msr->mpd->mpp->type != MULTIPART_FILE) {
