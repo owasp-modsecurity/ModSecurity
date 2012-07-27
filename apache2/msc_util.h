@@ -31,6 +31,8 @@
 #ifdef WIN32
 #include <ws2tcpip.h>
 int DSOLOCAL inet_pton(int family, const char *src, void *dst);
+#endif
+#if defined(WIN32) || !defined(HAVE_STRCASESTR)
 char DSOLOCAL *strcasestr(const char *haystack, const char *needle);
 #endif
 

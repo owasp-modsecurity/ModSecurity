@@ -46,7 +46,7 @@ AC_TYPE_UINT8_T
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
-AC_CHECK_FUNCS([atexit getcwd memmove memset strcasecmp strchr strdup strerror strncasecmp strrchr strstr strtol fchmod])
+AC_CHECK_FUNCS([atexit getcwd memmove memset strcasecmp strchr strdup strerror strncasecmp strrchr strstr strtol fchmod strcasestr])
 
 # Some directories
 MSC_BASE_DIR=`pwd`
