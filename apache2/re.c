@@ -58,7 +58,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
     char *c = NULL, *name = NULL, *value = NULL;
     char *variable = NULL, *myvar = NULL;
     char *myvalue = NULL, *myname = NULL;
-    int match;
+    int match = 0;
 
     if(msr == NULL)
         return 0;
@@ -141,7 +141,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
 
     }
 
-    if(match)
+    if(match == 1)
         return 1;
 
     return 0;
