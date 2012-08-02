@@ -754,7 +754,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 #endif
             (dcfg->tmp_chain_starter == NULL))
                 if(rule->actionset == NULL)
-                    return "Rules must have at least id action";
+                    return "ModSecurity: Rules must have at least id action";
 
     if(rule->actionset != NULL && (dcfg->tmp_chain_starter == NULL))    {
         if(rule->actionset->id == NOT_SET_P
@@ -762,14 +762,14 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
             && (type != RULE_TYPE_LUA)
 #endif
           )
-            return "No action id present within the rule";
+            return "ModSecurity: No action id present within the rule";
 #if defined(WITH_LUA)
         if(type != RULE_TYPE_LUA)
 #endif
         {
             tmp_rule = msre_ruleset_fetch_rule(dcfg->ruleset, rule->actionset->id, offset);
             if(tmp_rule != NULL)
-                return "Found another rule with the same id";
+                return "ModSecurity: Found another rule with the same id";
         }
     }
 
