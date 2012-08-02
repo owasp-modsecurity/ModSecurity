@@ -416,6 +416,9 @@ struct modsec_rec {
     apr_array_header_t  *removed_rules_tag;
     apr_array_header_t  *removed_rules_msg;
 
+    /* removed targets */
+    apr_table_t         *removed_targets;
+
     /* When "allow" is executed the variable below is
      * updated to contain the scope of the allow action. Set
      * at 0 by default, it will have ACTION_ALLOW if we are

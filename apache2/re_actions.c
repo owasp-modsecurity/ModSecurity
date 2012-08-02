@@ -885,36 +885,36 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
 
         return NULL;
     } else
-        if  (strcasecmp(name, "ruleUpdateTargetById") == 0) {
+        if  (strcasecmp(name, "ruleRemoveTargetById") == 0) {
                 char *parm = NULL;
                 char *savedptr = NULL;
 
                 parm = apr_strtok(value,";",&savedptr);
 
                 if(parm == NULL && savedptr == NULL)
-                    return apr_psprintf(engine->mp, "ruleUpdateTargetById must has at least id;append_value");
+                    return apr_psprintf(engine->mp, "ruleRemoveTargetById must has at least id;append_value");
 
         return NULL;
     } else
-        if (strcasecmp(name,"ruleUpdateTargetByTag") == 0) {
+        if (strcasecmp(name,"ruleRemoveTargetByTag") == 0) {
                 char *parm = NULL;
                 char *savedptr = NULL;
 
                 parm = apr_strtok(value,";",&savedptr);
                 if(parm == NULL && savedptr == NULL)
-                    return apr_psprintf(engine->mp, "ruleUpdateTargetByTag must has at least tag;append_value");
+                    return apr_psprintf(engine->mp, "ruleRemoveTargetByTag must has at least tag;append_value");
             if (!msc_pregcomp(engine->mp, parm, 0, NULL, NULL)) {
                 return apr_psprintf(engine->mp, "ModSecurity: Invalid regular expression \"%s\"", parm);
             }
         return NULL;
     } else
-        if (strcasecmp(name,"ruleUpdateTargetByMsg") == 0) {
+        if (strcasecmp(name,"ruleRemoveTargetByMsg") == 0) {
                 char *parm = NULL;
                 char *savedptr = NULL;
 
                 parm = apr_strtok(value,";",&savedptr);
                 if(parm == NULL && savedptr == NULL)
-                    return apr_psprintf(engine->mp, "ruleUpdateTargetByMsg must has at least msg;append_value");
+                    return apr_psprintf(engine->mp, "ruleRemoveTargetByMsg must has at least msg;append_value");
             if (!msc_pregcomp(engine->mp, parm, 0, NULL, NULL)) {
                 return apr_psprintf(engine->mp, "ModSecurity: Invalid regular expression \"%s\"", parm);
             }
@@ -1017,7 +1017,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
     if (strcasecmp(name, "ruleRemoveByTag") == 0) {
         rule_exception *re = apr_pcalloc(mptmp, sizeof(rule_exception));
         re->type = RULE_EXCEPTION_REMOVE_TAG;
-        re->param = (const char *)apr_pstrdup(msr->mp, value);;
+        re->param = (const char *)apr_pstrdup(msr->mp, value);
         re->param_data = msc_pregcomp(msr->mp, re->param, 0, NULL, NULL);
         if (re->param_data == NULL) {
             msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", re->param);
@@ -1035,7 +1035,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
     if (strcasecmp(name, "ruleRemoveByMsg") == 0) {
         rule_exception *re = apr_pcalloc(mptmp, sizeof(rule_exception));
         re->type = RULE_EXCEPTION_REMOVE_MSG;
-        re->param = (const char *)apr_pstrdup(msr->mp, value);;
+        re->param = (const char *)apr_pstrdup(msr->mp, value);
         re->param_data = msc_pregcomp(msr->mp, re->param, 0, NULL, NULL);
         if (re->param_data == NULL) {
             msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", re->param);
@@ -1199,76 +1199,70 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
-    if (strcasecmp(name, "ruleUpdateTargetById") == 0)  {
+    if (strcasecmp(name, "ruleRemoveTargetById") == 0)  {
         rule_exception *re = NULL;
-        char *p1 = NULL, *p2 = NULL, *p3 = NULL;
+        char *p1 = NULL, *p2 = NULL;
         char *savedptr = NULL;
 
         p1 = apr_strtok(value,";",&savedptr);
 
         p2 = apr_strtok(NULL,";",&savedptr);
 
-        p3 = apr_strtok(NULL,";",&savedptr);
-
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Ctl: ruleUpdateTargetById id=%s append=%s replace=%s", p1, p2, p3);
+            msr_log(msr, 4, "Ctl: ruleUpdateTargetById id=%s targets=%s", p1, p2);
         }
-    re = apr_pcalloc(mptmp, sizeof(rule_exception));
+    re = apr_pcalloc(msr->mp, sizeof(rule_exception));
     re->type = RULE_EXCEPTION_REMOVE_ID;
-    re->param = p1;
-    msre_ruleset_rule_update_target_matching_exception(msr, rule->ruleset, re, p2, p3);
+    re->param = (const char *)apr_pstrdup(msr->mp, p1);
+    apr_table_addn(msr->removed_targets, apr_pstrdup(msr->mp, p2), (void *)re);
     return 1;
     } else
-    if (strcasecmp(name, "ruleUpdateTargetByTag") == 0)  {
+    if (strcasecmp(name, "ruleRemoveTargetByTag") == 0)  {
         rule_exception *re = NULL;
-        char *p1 = NULL, *p2 = NULL, *p3 = NULL;
+        char *p1 = NULL, *p2 = NULL;
         char *savedptr = NULL;
 
         p1 = apr_strtok(value,";",&savedptr);
 
         p2 = apr_strtok(NULL,";",&savedptr);
 
-        p3 = apr_strtok(NULL,";",&savedptr);
-
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Ctl: ruleUpdateTargetByTag tag=%s append=%s replace=%s", p1, p2, p3);
+            msr_log(msr, 4, "Ctl: ruleRemoveTargetByTag tag=%s targets=%s", p1, p2);
         }
 
-    re = apr_pcalloc(mptmp, sizeof(rule_exception));
+    re = apr_pcalloc(msr->mp, sizeof(rule_exception));
     re->type = RULE_EXCEPTION_REMOVE_TAG;
-    re->param = p1;
-    re->param_data = msc_pregcomp(mptmp, p1, 0, NULL, NULL);
+    re->param = (const char *)apr_pstrdup(msr->mp, p1);
+    re->param_data = msc_pregcomp(msr->mp, p1, 0, NULL, NULL);
     if (re->param_data == NULL) {
         msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", p1);
         return -1;
     }
-    msre_ruleset_rule_update_target_matching_exception(msr, rule->ruleset, re, p2, p3);
+    apr_table_addn(msr->removed_targets, apr_pstrdup(msr->mp, p2), (void *)re);
     return 1;
     } else
-    if (strcasecmp(name, "ruleUpdateTargetByMsg") == 0)  {
+    if (strcasecmp(name, "ruleRemoveTargetByMsg") == 0)  {
         rule_exception *re = NULL;
-        char *p1 = NULL, *p2 = NULL, *p3 = NULL;
+        char *p1 = NULL, *p2 = NULL;
         char *savedptr = NULL;
 
         p1 = apr_strtok(value,";",&savedptr);
 
         p2 = apr_strtok(NULL,";",&savedptr);
 
-        p3 = apr_strtok(NULL,";",&savedptr);
-
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Ctl: ruleUpdateTargetByMsg tag=%s append=%s replace=%s", p1, p2, p3);
+            msr_log(msr, 4, "Ctl: ruleUpdateTargetByMsg msg=%s targets=%s", p1, p2);
         }
 
-    re = apr_pcalloc(mptmp, sizeof(rule_exception));
+    re = apr_pcalloc(msr->mp, sizeof(rule_exception));
     re->type = RULE_EXCEPTION_REMOVE_MSG;
-    re->param = p1;
-    re->param_data = msc_pregcomp(mptmp, p1, 0, NULL, NULL);
+    re->param = apr_pstrdup(msr->mp, p1);
+    re->param_data = msc_pregcomp(msr->mp, p1, 0, NULL, NULL);
     if (re->param_data == NULL) {
         msr_log(msr, 1, "ModSecurity: Invalid regular expression \"%s\"", p1);
         return -1;
     }
-    msre_ruleset_rule_update_target_matching_exception(msr, rule->ruleset, re, p2, p3);
+    apr_table_addn(msr->removed_targets, apr_pstrdup(msr->mp, p2), (void *)re);
     return 1;
     }
     else {

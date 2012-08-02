@@ -32,9 +32,11 @@
 #include <ws2tcpip.h>
 int DSOLOCAL inet_pton(int family, const char *src, void *dst);
 #endif
-#if defined(WIN32) || !defined(HAVE_STRCASESTR)
+/*
+#if (defined(WIN32) || (HAVE_STRCASESTR == 0))
 char DSOLOCAL *strcasestr(const char *haystack, const char *needle);
 #endif
+*/
 
 int DSOLOCAL normalize_path_inplace(unsigned char *input, int len, int win, int *changed);
 

@@ -32,6 +32,7 @@ static const char *const severities[] = {
     NULL,
 };
 
+static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *var, const char *exceptions);
 static apr_status_t msre_parse_targets(msre_ruleset *ruleset, const char *text,
     apr_array_header_t *arr, char **error_msg);
 static char *msre_generate_target_string(apr_pool_t *pool, msre_rule *rule);
@@ -42,6 +43,110 @@ static msre_action *msre_create_action(msre_engine *engine, const char *name,
 static apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr);
 
 /* -- Actions, variables, functions and operator functions ----------------- */
+
+/**
+ * \brief Remove rule targets to be processed
+ *
+ * \param rule Pointer to the rule
+ * \param msr ModSecurity transaction resource
+ * \param var Pointer to target structure.
+ * \param targets Exception list.
+ */
+static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *var, const char *exceptions)   {
+    const char *targets = NULL;
+    char *savedptr = NULL, *target = NULL;
+    char *c = NULL, *name = NULL, *value = NULL;
+    char *variable = NULL, *myvar = NULL;
+    char *myvalue = NULL, *myname = NULL;
+    int match;
+
+    if(msr == NULL)
+        return 0;
+
+    if(var == NULL)
+        return 0;
+
+    if(rule == NULL)
+        return 0;
+
+    if(rule->actionset == NULL)
+        return 0;
+
+    if(rule->actionset->id !=NULL)    {
+
+        myvar = apr_pstrdup(msr->mp, var->name);
+
+        c = strchr(myvar,':');
+
+        if(c != NULL) {
+            myname = apr_strtok(myvar,":",&myvalue);
+        } else {
+            myname = myvar;
+        }
+
+        match = 0;
+
+        targets = apr_pstrdup(msr->mp, exceptions);
+
+        if(targets != NULL) {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "fetch_target_exception: Found exception target list [%s] for rule id %s", targets, rule->actionset->id);
+            }
+            target = apr_strtok((char *)targets, ",", &savedptr);
+
+            while(target != NULL)   {
+
+                variable = apr_pstrdup(msr->mp, target);
+
+                c = strchr(variable,':');
+
+                if(c != NULL) {
+                    name = apr_strtok(variable,":",&value);
+                } else {
+                    name = variable;
+                }
+
+                if((strlen(myname) == strlen(name)) &&
+                        (strncasecmp(myname, name,strlen(myname)) == 0))   {
+
+                    if(value != NULL && myvalue != NULL)  {
+                        if((strlen(myvalue) == strlen(value)) &&
+                                strncasecmp(myvalue,value,strlen(myvalue)) == 0) {
+                            if (msr->txcfg->debuglog_level >= 9) {
+                                msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                            }
+                            match = 1;
+                        }
+                    } else if (value == NULL && myvalue == NULL)    {
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                        }
+                        match = 1;
+                    } else if (value == NULL && myvalue != NULL)   {
+                        if (msr->txcfg->debuglog_level >= 9) {
+                            msr_log(msr, 9, "fetch_target_exception: Target %s will not be processed.", target);
+                        }
+                        match = 1;
+                    }
+                }
+
+                target = apr_strtok(NULL, ",", &savedptr);
+            }
+        } else  {
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "fetch_target_exception: No exception target found for rule id %s.", rule->actionset->id);
+
+            }
+        }
+
+    }
+
+    if(match)
+        return 1;
+
+    return 0;
+}
+
 /**
  * \brief Update target for all matching rules in set, in any phase
  *
@@ -2406,7 +2511,11 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
     apr_time_t time_before_op = 0;
     char *my_error_msg = NULL;
     const char *full_varname = NULL;
-    int rc;
+    const apr_array_header_t *tarr = NULL;
+    const apr_table_entry_t *telts = NULL;
+    rule_exception *re = NULL;
+    char *exceptions = NULL;
+    int rc, i;
 
     /* determine the full var name if not already resolved
      *
@@ -2427,28 +2536,55 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         full_varname = var->name;
     }
 
+    tarr = apr_table_elts(msr->removed_targets);
+    telts = (const apr_table_entry_t*)tarr->elts;
+
+    for (i = 0; i < tarr->nelts; i++) {
+        exceptions = (char *)telts[i].key;
+        re = (rule_exception *)telts[i].val;
+
+        rc = msre_ruleset_rule_matches_exception(rule, re);
+
+        if (rc > 0) {
+            rc = fetch_target_exception(rule, msr, var, exceptions);
+
+            if(rc > 0)  {
+
+                if (msr->txcfg->debuglog_level >= 4) {
+                    msr_log(msr, 4, "Executing operator \"%s%s\" with param \"%s\" against %s skipped.",
+                            (rule->op_negated ? "!" : ""), rule->op_name,
+                            log_escape(msr->mp, rule->op_param), full_varname);
+                }
+
+                return RULE_NO_MATCH;
+
+            }
+        }
+
+    }
+
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Executing operator \"%s%s\" with param \"%s\" against %s.",
-            (rule->op_negated ? "!" : ""), rule->op_name,
-            log_escape(msr->mp, rule->op_param), full_varname);
+                (rule->op_negated ? "!" : ""), rule->op_name,
+                log_escape(msr->mp, rule->op_param), full_varname);
     }
 
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "Target value: \"%s\"", log_escape_nq_ex(msr->mp, var->value,
-            var->value_len));
+                    var->value_len));
     }
 
-    #if defined(PERFORMANCE_MEASUREMENT)
+#if defined(PERFORMANCE_MEASUREMENT)
     time_before_op = apr_time_now();
-    #else
+#else
     if (msr->txcfg->debuglog_level >= 4 || msr->txcfg->max_rule_time > 0) {
         time_before_op = apr_time_now();
     }
-    #endif
+#endif
 
     rc = rule->op_metadata->execute(msr, rule, var, &my_error_msg);
 
-    #if defined(PERFORMANCE_MEASUREMENT)
+#if defined(PERFORMANCE_MEASUREMENT)
     {
         /* Record performance but do not log anything. */
         apr_time_t t1 = apr_time_now();
