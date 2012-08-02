@@ -52,7 +52,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
     char *myvalue = NULL, *myname = NULL;
     const apr_array_header_t *tarr = NULL;
     const apr_table_entry_t *telts = NULL;
-    int i, match;
+    int i, match = 0;
 
     if(msr == NULL)
         return 0;
@@ -148,7 +148,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
 
     }
 
-    if(match)
+    if(match == 1)
         return 1;
 
     return 0;
