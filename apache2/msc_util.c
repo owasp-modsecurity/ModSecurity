@@ -569,8 +569,8 @@ char *file_basename(apr_pool_t *mp, const char *filename) {
 
     return d;
 }
-
-#if defined(WIN32) || !defined(HAVE_STRCASESTR)
+/*
+#if (defined(WIN32) || (HAVE_STRCASESTR == 0))
 char *strcasestr(const char *haystack, const char *needle) {
     char aux, lower_aux;
     int length;
@@ -589,6 +589,7 @@ char *strcasestr(const char *haystack, const char *needle) {
     return ((char *)haystack);
 }
 #endif
+*/
 #ifdef WIN32
 int inet_pton(int family, const char *src, void *dst)   {
     struct addrinfo addr;
