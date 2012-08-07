@@ -221,8 +221,6 @@ char *msre_ruleset_phase_rule_update_target_matching_exception(modsec_rec *msr, 
             if (mode == 2) { /* We want to change the rule. */
                 err = update_rule_target_ex(msr, ruleset, rule, p2, p3);
                 if (err) return err;
-            } else {
-                rules[j++] = rules[i];
             }
 
             if ((rule->actionset == NULL)||(rule->actionset->is_chained == 0)) mode = 0;
