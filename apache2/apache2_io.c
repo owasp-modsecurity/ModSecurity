@@ -260,6 +260,11 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                     *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
                             "configured limit (%ld).", msr->txcfg->reqbody_limit);
 
+                } else if ((msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)){
+
+                    *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
+                            "configured limit (%ld).", msr->txcfg->reqbody_limit);
+
                 } else  {
 
                     *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
@@ -298,8 +303,6 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                     }
 
                     if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT))
-                        return -1;
-                    if((msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT))
                         return -1;
                 }
 
