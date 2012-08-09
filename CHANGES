@@ -1,8 +1,6 @@
 23 Jul 2012 - 2.6.7
 -------------------
 
- * Fixed PCRE mismtach version warning message (Thanks Victor Julien).
-
  * Fixed explicit target replacement using SecUpdateTargetById was broken.
 
  * The ctl:ruleUpdateTargetById is deprecated and will be removed for future versions since
