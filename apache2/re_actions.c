@@ -892,7 +892,7 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
                 parm = apr_strtok(value,";",&savedptr);
 
                 if(parm == NULL && savedptr == NULL)
-                    return apr_psprintf(engine->mp, "ruleRemoveTargetById must has at least id;append_value");
+                    return apr_psprintf(engine->mp, "ruleRemoveTargetById must has at least id;VARIABLE");
 
         return NULL;
     } else
@@ -902,7 +902,7 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
 
                 parm = apr_strtok(value,";",&savedptr);
                 if(parm == NULL && savedptr == NULL)
-                    return apr_psprintf(engine->mp, "ruleRemoveTargetByTag must has at least tag;append_value");
+                    return apr_psprintf(engine->mp, "ruleRemoveTargetByTag must has at least tag;VARIABLE");
             if (!msc_pregcomp(engine->mp, parm, 0, NULL, NULL)) {
                 return apr_psprintf(engine->mp, "ModSecurity: Invalid regular expression \"%s\"", parm);
             }
@@ -914,7 +914,7 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
 
                 parm = apr_strtok(value,";",&savedptr);
                 if(parm == NULL && savedptr == NULL)
-                    return apr_psprintf(engine->mp, "ruleRemoveTargetByMsg must has at least msg;append_value");
+                    return apr_psprintf(engine->mp, "ruleRemoveTargetByMsg must has at least msg;VARIABLE");
             if (!msc_pregcomp(engine->mp, parm, 0, NULL, NULL)) {
                 return apr_psprintf(engine->mp, "ModSecurity: Invalid regular expression \"%s\"", parm);
             }
