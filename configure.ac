@@ -162,24 +162,6 @@ if test "$build_apache2_module" -eq 1; then
   TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS apache2"
 fi
 
-AC_ARG_ENABLE(standalone-module,
-              AS_HELP_STRING([--disable-standalone-module],
-                             [Disable building standalone module.]),
-[
-  if test "$enableval" != "no"; then
-    build_standalone_module=1
-  else
-    build_standalone_module=0
-  fi
-],
-[
-  build_standalone_module=1
-])
-AM_CONDITIONAL([BUILD_STANDALONE_MODULE], [test "$build_standalone_module" -eq 1])
-if test "$build_standalone_module" -eq 1; then
-  TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS standalone"
-fi
-
 # Extensions
 AC_ARG_ENABLE(extentions,
               AS_HELP_STRING([--enable-extentions],
@@ -678,9 +660,6 @@ AC_CONFIG_FILES([alp2/Makefile])
 fi
 if test "$build_apache2_module" -ne 0; then
 AC_CONFIG_FILES([apache2/Makefile])
-fi
-if test "$build_standalone_module" -ne 0; then
-AC_CONFIG_FILES([standalone/Makefile])
 fi
 if test "$build_extentions" -ne 0; then
 AC_CONFIG_FILES([ext/Makefile])
