@@ -288,7 +288,7 @@ int init_response_body_html_parser(modsec_rec *msr)   {
     }
 
     if((msr->r->content_encoding == NULL)||(apr_strnatcasecmp(msr->r->content_encoding,"(null)")==0)){
-        charset=ap_strcasestr(msr->r->content_type,"charset=");
+        charset=m_strcasestr(msr->r->content_type,"charset=");
         if(charset == NULL){
             if (msr->txcfg->debuglog_level >= 4)
                 msr_log(msr, 4, "init_response_body_html_parser: assuming ISO-8859-1.");
@@ -1014,7 +1014,7 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
     encoding = (const char *) htmlGetMetaEncoding(msr->crypto_html_tree);
 
     if (ctype && encoding == NULL) {
-        if (ctype && (p = ap_strcasestr(ctype, "charset=") , p != NULL)) {
+        if (ctype && (p = m_strcasestr(ctype, "charset=") , p != NULL)) {
             p += 8 ;
             if (encoding = apr_pstrndup(msr->mp, p, strcspn(p, " ;") ), encoding) {
                 xmlCharEncoding enc;
