@@ -85,6 +85,9 @@ unsigned char is_netmask_v4(char *ip_strv4) {
     char *mask_str = NULL;
     int cidr;
 
+    if(ip_strv4 == NULL)
+        return netmask_v4;
+
     if ((mask_str = strchr(ip_strv4, '/'))) {
         *(mask_str++) = '\0';
 
@@ -113,6 +116,9 @@ unsigned char is_netmask_v6(char *ip_strv6) {
     unsigned char netmask_v6 = 128;
     char *mask_str = NULL;
     int cidr;
+
+    if(ip_strv6 == NULL)
+        return netmask_v6;
 
     if ((mask_str = strchr(ip_strv6, '/'))) {
         *(mask_str++) = '\0';
