@@ -414,6 +414,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         else if (rc < -1) {
                             error_msg = apr_psprintf(msr->mp, "Regex execution failed (%d): %s",
                                     rc, my_error_msg);
+                            if (msr->txcfg->debuglog_level >= 4)
+                                msr_log(msr, 4, "%s.", error_msg);
                             return -1;
                         }
                         if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
@@ -466,6 +468,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         else if (rc < -1) {
                             error_msg = apr_psprintf(msr->mp, "Regex execution failed (%d): %s",
                                     rc, my_error_msg);
+                            if (msr->txcfg->debuglog_level >= 4)
+                                msr_log(msr, 4, "%s.", error_msg);
                             return -1;
                         }
                         if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
@@ -518,6 +522,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         else if (rc < -1) {
                             error_msg = apr_psprintf(msr->mp, "Regex execution failed (%d): %s",
                                     rc, my_error_msg);
+                            if (msr->txcfg->debuglog_level >= 4)
+                                msr_log(msr, 4, "%s.", error_msg);
                             return -1;
                         }
                         if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
@@ -570,6 +576,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         else if (rc < -1) {
                             error_msg = apr_psprintf(msr->mp, "Regex execution failed (%d): %s",
                                     rc, my_error_msg);
+                            if (msr->txcfg->debuglog_level >= 4)
+                                msr_log(msr, 4, "%s.", error_msg);
                             return -1;
                         }
                         if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
@@ -622,6 +630,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         else if (rc < -1) {
                             error_msg = apr_psprintf(msr->mp, "Regex execution failed (%d): %s",
                                     rc, my_error_msg);
+                            if (msr->txcfg->debuglog_level >= 4)
+                                msr_log(msr, 4, "%s.", error_msg);
                             return -1;
                         }
                         if (rc != PCRE_ERROR_NOMATCH) { /* Match. */
