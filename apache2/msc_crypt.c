@@ -124,7 +124,7 @@ char *normalize_path(modsec_rec *msr, char *input) {
  * \retval seed random seed
  */
 unsigned long prng()   {
-    short num_matrix1[10], num_matrix2[10];
+    short num_matrix1[10] = {0}, num_matrix2[10] = {0};
     unsigned long  num, num1, num2;
     short n, *p;
     unsigned short seed_num = 0;
@@ -395,10 +395,11 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
 
                             if (s == NULL) return -1;
                             s->name = apr_pstrdup(msr->mp, "MSC_PCRE_LIMITS_EXCEEDED");
+                            if (s->name == NULL) return -1;
                             s->name_len = strlen(s->name);
                             s->value = apr_pstrdup(msr->mp, "1");
+                            if (s->value == NULL) return -1;
                             s->value_len = 1;
-                            if ((s->name == NULL)||(s->value == NULL)) return -1;
                             apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
                             error_msg = apr_psprintf(msr->mp,
@@ -449,10 +450,11 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
 
                             if (s == NULL) return -1;
                             s->name = apr_pstrdup(msr->mp, "MSC_PCRE_LIMITS_EXCEEDED");
+                            if (s->name == NULL) return -1;
                             s->name_len = strlen(s->name);
                             s->value = apr_pstrdup(msr->mp, "1");
+                            if (s->value == NULL) return -1;
                             s->value_len = 1;
-                            if ((s->name == NULL)||(s->value == NULL)) return -1;
                             apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
                             error_msg = apr_psprintf(msr->mp,
@@ -503,10 +505,11 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
 
                             if (s == NULL) return -1;
                             s->name = apr_pstrdup(msr->mp, "MSC_PCRE_LIMITS_EXCEEDED");
+                            if (s->name == NULL) return -1;
                             s->name_len = strlen(s->name);
                             s->value = apr_pstrdup(msr->mp, "1");
+                            if (s->value == NULL) return -1;
                             s->value_len = 1;
-                            if ((s->name == NULL)||(s->value == NULL)) return -1;
                             apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
                             error_msg = apr_psprintf(msr->mp,
@@ -557,10 +560,11 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
 
                             if (s == NULL) return -1;
                             s->name = apr_pstrdup(msr->mp, "MSC_PCRE_LIMITS_EXCEEDED");
+                            if (s->name == NULL) return -1;
                             s->name_len = strlen(s->name);
                             s->value = apr_pstrdup(msr->mp, "1");
+                            if (s->value == NULL) return -1;
                             s->value_len = 1;
-                            if ((s->name == NULL)||(s->value == NULL)) return -1;
                             apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
                             error_msg = apr_psprintf(msr->mp,
@@ -611,10 +615,11 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
 
                             if (s == NULL) return -1;
                             s->name = apr_pstrdup(msr->mp, "MSC_PCRE_LIMITS_EXCEEDED");
+                            if (s->name == NULL) return -1;
                             s->name_len = strlen(s->name);
                             s->value = apr_pstrdup(msr->mp, "1");
+                            if (s->value == NULL) return -1;
                             s->value_len = 1;
-                            if ((s->name == NULL)||(s->value == NULL)) return -1;
                             apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
                             error_msg = apr_psprintf(msr->mp,
