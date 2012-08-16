@@ -1978,15 +1978,16 @@ static int msre_op_within_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
     unsigned int i, i_max;
 
     str->value = (char *)rule->op_param;
-    str->value_len = strlen(str->value);
-
-    if (error_msg == NULL) return -1;
-    *error_msg = NULL;
 
     if (str->value == NULL) {
         *error_msg = "Internal Error: match string is null.";
         return -1;
     }
+
+    str->value_len = strlen(str->value);
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
 
     expand_macros(msr, str, rule, msr->mp);
 
@@ -2047,15 +2048,16 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     unsigned int i, i_max;
 
     str->value = (char *)rule->op_param;
-    str->value_len = strlen(str->value);
-
-    if (error_msg == NULL) return -1;
-    *error_msg = NULL;
 
     if (str->value == NULL) {
         *error_msg = "Internal Error: match string is null.";
         return -1;
     }
+
+    str->value_len = strlen(str->value);
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
 
     expand_macros(msr, str, rule, msr->mp);
 
@@ -2123,15 +2125,16 @@ static int msre_op_containsWord_execute(modsec_rec *msr, msre_rule *rule, msre_v
     int rc = 0;
 
     str->value = (char *)rule->op_param;
-    str->value_len = strlen(str->value);
-
-    if (error_msg == NULL) return -1;
-    *error_msg = NULL;
 
     if (str->value == NULL) {
         *error_msg = "Internal Error: match string is null.";
         return -1;
     }
+
+    str->value_len = strlen(str->value);
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
 
     expand_macros(msr, str, rule, msr->mp);
 
@@ -2215,15 +2218,16 @@ static int msre_op_streq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var
     unsigned int target_length;
 
     str->value = (char *)rule->op_param;
-    str->value_len = strlen(str->value);
-
-    if (error_msg == NULL) return -1;
-    *error_msg = NULL;
 
     if (str->value == NULL) {
         *error_msg = "Internal Error: match string is null.";
         return -1;
     }
+
+    str->value_len = strlen(str->value);
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
 
     expand_macros(msr, str, rule, msr->mp);
 
@@ -2270,15 +2274,16 @@ static int msre_op_beginsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var
     unsigned int target_length;
 
     str->value = (char *)rule->op_param;
-    str->value_len = strlen(str->value);
-
-    if (error_msg == NULL) return -1;
-    *error_msg = NULL;
 
     if (str->value == NULL) {
         *error_msg = "Internal Error: match string is null.";
         return -1;
     }
+
+    str->value_len = strlen(str->value);
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
 
     expand_macros(msr, str, rule, msr->mp);
 
@@ -2332,15 +2337,16 @@ static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *
     unsigned int target_length;
 
     str->value = (char *)rule->op_param;
-    str->value_len = strlen(str->value);
-
-    if (error_msg == NULL) return -1;
-    *error_msg = NULL;
 
     if (str->value == NULL) {
         *error_msg = "Internal Error: match string is null.";
         return -1;
     }
+
+    str->value_len = strlen(str->value);
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
 
     expand_macros(msr, str, rule, msr->mp);
 
