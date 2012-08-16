@@ -882,10 +882,11 @@ static int msre_op_validateEncryption_execute(modsec_rec *msr, msre_rule *rule, 
 
         if (s == NULL) return -1;
         s->name = apr_pstrdup(msr->mp, "MSC_PCRE_LIMITS_EXCEEDED");
+        if (s->name == NULL) return -1;
         s->name_len = strlen(s->name);
         s->value = apr_pstrdup(msr->mp, "1");
+        if (s->value == NULL) return -1;
         s->value_len = 1;
-        if ((s->name == NULL)||(s->value == NULL)) return -1;
         apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
         *error_msg = apr_psprintf(msr->mp,
@@ -1135,10 +1136,11 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
         if (s == NULL) return -1;
         s->name = apr_pstrdup(msr->mp, "MSC_PCRE_LIMITS_EXCEEDED");
+        if (s->name == NULL) return -1;
         s->name_len = strlen(s->name);
         s->value = apr_pstrdup(msr->mp, "1");
+        if (s->value == NULL) return -1;
         s->value_len = 1;
-        if ((s->name == NULL)||(s->value == NULL)) return -1;
         apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
         *error_msg = apr_psprintf(msr->mp,
@@ -1180,12 +1182,13 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
             if (s == NULL) return -1;
             s->name = apr_psprintf(msr->mp, "%d", i);
+            if (s->name == NULL) return -1;
             s->name_len = strlen(s->name);
             s->value = apr_pstrmemdup(msr->mp,
                     target + ovector[2 * i], ovector[2 * i + 1] - ovector[2 * i]);
+            if (s->value == NULL) return -1;
 
             s->value_len = (ovector[2 * i + 1] - ovector[2 * i]);
-            if ((s->name == NULL)||(s->value == NULL)) return -1;
 
             apr_table_addn(msr->tx_vars, s->name, (void *)s);
 
@@ -2767,10 +2770,11 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
                     msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
                     if (s == NULL) return -1;
                     s->name = apr_psprintf(msr->mp, "%d", i);
+                    if (s->name == NULL) return -1;
                     s->name_len = strlen(s->name);
                     s->value = apr_pstrmemdup(msr->mp, match, length);
+                    if (s->value == NULL) return -1;
                     s->value_len = length;
-                    if ((s->name == NULL)||(s->value == NULL)) return -1;
 
                     apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
@@ -3072,10 +3076,11 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                     msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
                     if (s == NULL) return -1;
                     s->name = apr_psprintf(msr->mp, "%d", i);
+                    if (s->name == NULL) return -1;
                     s->name_len = strlen(s->name);
                     s->value = apr_pstrmemdup(msr->mp, match, length);
+                    if (s->value == NULL) return -1;
                     s->value_len = length;
-                    if ((s->name == NULL)||(s->value == NULL)) return -1;
 
                     apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
@@ -3367,10 +3372,11 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                     msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
                     if (s == NULL) return -1;
                     s->name = apr_psprintf(msr->mp, "%d", i);
+                    if (s->name == NULL) return -1;
                     s->name_len = strlen(s->name);
                     s->value = apr_pstrmemdup(msr->mp, match, length);
+                    if (s->value == NULL) return -1;
                     s->value_len = length;
-                    if ((s->name == NULL)||(s->value == NULL)) return -1;
 
                     apr_table_setn(msr->tx_vars, s->name, (void *)s);
 
