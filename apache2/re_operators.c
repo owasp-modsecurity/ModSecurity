@@ -1285,15 +1285,15 @@ static int msre_op_pm_param_init(msre_rule *rule, char **error_msg) {
 static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     char errstr[1024];
     char buf[HUGE_STRING_LEN + 1];
-    char *fn;
-    char *next;
-    char *start;
-    char *end;
+    char *fn = NULL;
+    char *next = NULL;
+    char *start = NULL;
+    char *end = NULL;
     const char *rulefile_path;
     char *processed = NULL;
     unsigned short int op_len;
     apr_status_t rc;
-    apr_file_t *fd;
+    apr_file_t *fd = NULL;
     ACMP *p;
 
     if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
