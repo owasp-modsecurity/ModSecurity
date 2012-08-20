@@ -1,0 +1,13 @@
+<!--
+    
+    ModSecurity configuration schema.
+    
+-->
+
+<configSchema>
+
+  <sectionSchema name="system.webServer/ModSecurity">
+    <attribute name="enabled" type="bool" defaultValue="false"/>
+    <attribute name="configFile" type="string" defaultValue="c:\inetpub\modsecurity.conf" validationType="nonEmptyString" />
+  </sectionSchema>
+</configSchema>

@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+	<head>
+		<title>Creating a Native Module for IIS7</title>
+	</head>
+	<body>
+        <h1>
+            Creating a Native Module for IIS7</h1>
+        <p>
+            To extend the server, IIS7 provides a new (C++) native core server API, which replaces
+            ISAPI filter and extension API from previous IIS releases. The new API features
+            object-oriented development with an intuitive object model, provides more control
+            over request processing, and uses simpler design patterns to help you write robust
+            code. Please visit <a target="_new" href="http://www.iis.net/default.aspx?tabid=2&subtabid=25&i=942">Developing a Native Module for IIS7</a> for more information about this sample.<br />
+            <br />
+            <strong>NOTE</strong>: The IIS7 native (C++) server API is declared in the Platform
+            SDK <strong>httpserv.h</strong> header file.&nbsp; <strong>You must obtain this SDK
+                and register it with Visual Studio in order to compile this module.</strong></p>
+        <p>
+            A native module is a Windows DLL that contains an the following:</p>
+        <ol>
+            <li><strong>RegisterModule</strong> exported function.&nbsp; This function is responsible
+                for creating a module factory, and registering the module for one or more server
+                events.<br />
+                <br />
+                <em>
+                This function is implemented in <strong>main.cpp</strong>.<br />
+                </em>
+            </li>
+            <li>Implementation of the module class inheriting from the <strong>CHttpModule</strong>
+                base class. &nbsp;This class is provides the main functionality of your module.
+                <br />
+                <br />
+                <em>
+                This class is declared in <strong>mymodule.h</strong>, with method implementations
+                in <strong>mymodule.cpp</strong>.<br />
+                </em>
+            </li>
+            <li>Implementation of the module factory class implementing the <strong>IHttpModuleFactory</strong>
+                interface.&nbsp; The class is responsible for creating instances of your module.<br />
+                <br />
+                <em>
+                This class is declared and implemented in <strong>mymodulefactory.h</strong>.</em></li></ol>
+        <h2>
+            0. Prerequisites</h2>
+        <p class="MsoNormal" style="margin: 0in 0in 0pt">
+            <span style="font-family: Verdana"><span style="font-size: 9pt">In order to compile
+                the module, you will need to install the Windows Platform SDK that contains the
+                required IIS header files.&nbsp;
+                <br />
+                <br />
+                After installing the SDK</span></span><span style="font-size: 9pt; font-family: Verdana;
+                    mso-fareast-font-family: 'Times New Roman'; mso-bidi-font-family: Arial; mso-ansi-language: EN-US;
+                    mso-fareast-language: EN-US; mso-bidi-language: AR-SA">, you will need to register
+                    the SDK with Visual Studio 2005.<span style="mso-spacerun: yes">&nbsp; </span>You
+                    can do this via <b style="mso-bidi-font-weight: normal">Start &gt; Programs &gt; Microsoft
+                        Windows SDK &gt; Visual Studio Registration &gt; Register Windows SDK Directories
+                        with Visual Studio</b>.</span></p>
+        <h2>
+            1. Implement RegisterModule entrypoint</h2>
+        <p>
+            A native module must export the RegisterModule function.&nbsp; This function will
+            be invoked by the server when the module DLL is loaded, so that your DLL can register
+            for the required server events, and provide a mechanism for the server to create
+            instances of your module class.<br />
+            <br />
+            <span style="font-size: 10pt; font-family: Courier New">__stdcall 
+                <br />
+                HRESULT RegisterModule( DWORD dwServerVersion, IHttpModuleRegistrationInfo
+            * pModuleInfo, IHttpServer * pHttpServer );<br />
+            </span>
+            <br />
+            <em>This function is implemented for you in the <strong>main.cpp</strong> source file.&nbsp;
+            </em>
+            <br />
+            <br />
+            It does the following:</p>
+        <ol>
+            <li><strong>Create module factory</strong>.<strong>&nbsp; </strong>This is an instance
+                of your CMyModuleFactory class that implements
+            the IHttpModuleFactory inteface:<br />
+                <br />
+                <span style="font-family: Courier New"><span style="font-size: 10pt"><span style="color: #009900">
+                    // step 2: create module factory</span><br />
+                    pFactory = new CMyHttpModuleFactory();</span></span><br />
+            </li>
+            <li><strong>Register module factory for desired server events</strong>.&nbsp; This registers
+                the module factory for one or more server events that occur during request processing.&nbsp;
+                The server will use the factory to create an instance of your module class for each
+                request, and call the appropriate event handler method on your module instance for
+                each of the requested events:<br />
+                <br />
+                <span style="color: #000000;"><span style="font-family: Courier New"><span style="font-size: 10pt">
+                    <span style="color: #009900">
+                    // step 3: register for server events
+                    <br />
+                    // TODO: register for more server events here
+                    <br />
+                </span>hr = pModuleInfo-&gt;SetRequestNotifications( pFactory, </span></span><span
+                        style="font-family: Courier New"><span style="font-size: 10pt"><span style="color: #009900">
+                    /* module factory */
+                    <br />
+                </span>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; RQ_ACQUIRE_REQUEST_STATE,
+                    <span style="color: #009900">/* server event mask */</span><br />
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;0 <span style="color: #009900">
+                        /* server post event mask */</span> );<br />
+                    <br />
+                            <span style="font-size: 12pt; font-family: Times New Roman">
+                    The server event mask is a bit mask of one or more request processing event names
+                    declared in </span>
+                        </span></span><span style="font-family: Courier New"><span style="font-size: 10pt">
+                                <strong><span style="font-size: 12pt; font-family: Times New Roman">httpserv.h:</span><br />
+                        <br />
+                                </strong><span style="color: #009900">//
+                                    <br />
+                                    // Request deterministic notifications
+                                    <br />
+                                    //
+                                    <br />
+                                    <br />
+                                    // request is beginning </span>
+                                <br />
+                                #define RQ_BEGIN_REQUEST 0x00000001
+                                <br />
+                                <span style="color: #009900">// request is being authenticated
+                                    <br />
+                                </span>#define RQ_AUTHENTICATE_REQUEST 0x00000002
+                                <br />
+                                <span style="color: #009900">// request is being authorized </span>
+                                <br />
+                                #define RQ_AUTHORIZE_REQUEST 0x00000004
+                                <br />
+                                <span style="color: #009900">// satisfy request from cache </span>
+                                <br />
+                                #define RQ_RESOLVE_REQUEST_CACHE 0x00000008
+                                <br />
+                                <span style="color: #009900">// map handler for request</span>
+                                <br />
+                                #define RQ_MAP_REQUEST_HANDLER 0x00000010
+                                <br />
+                                <span style="color: #009900">// acquire request state</span>
+                                <br />
+                                #define RQ_ACQUIRE_REQUEST_STATE 0x00000020
+                                <br />
+                                <span style="color: #009900">// pre-execute handler</span>
+                                <br />
+                                #define RQ_PRE_EXECUTE_REQUEST_HANDLER 0x00000040
+                                <br />
+                                <span style="color: #009900">// execute handler</span>
+                                <br />
+                                #define RQ_EXECUTE_REQUEST_HANDLER 0x00000080
+                                <br />
+                                <span style="color: #009900">// release request state</span>
+                                <br />
+                                #define RQ_RELEASE_REQUEST_STATE 0x00000100
+                                <br />
+                                <span style="color: #009900">// update cache</span>
+                                <br />
+                                #define RQ_UPDATE_REQUEST_CACHE 0x00000200
+                                <br />
+                                <span style="color: #009900">// log request</span>
+                                <br />
+                                #define RQ_LOG_REQUEST 0x00000400
+                                <br />
+                                <span style="color: #009900">// end request</span>
+                                <br />
+                                #define RQ_END_REQUEST 0x00000800
+                                <br />
+                                <br />
+                                <span style="color: #009900">//
+                                <br />
+                                // Request non-deterministic notifications
+                                <br />
+                                //</span>
+                                <br />
+                                <br />
+                                <span style="color: #009900">// custom notification</span>
+                                <br />
+                                #define RQ_CUSTOM_NOTIFICATION 0x10000000
+                                <br />
+                                <span style="color: #009900">// send response</span>
+                                <br />
+                                #define RQ_SEND_RESPONSE 0x20000000
+                                <br />
+                                <span style="color: #009900">// read entity</span>
+                                <br />
+                                #define RQ_READ_ENTITY 0x40000000
+                                <br />
+                                <span style="color: #009900">// map a url to a physical path</span>
+                                <br />
+                                #define RQ_MAP_PATH 0x80000000<br />
+                        <br />
+                        <span style="font-size: 12pt; font-family: Times New Roman">
+                    The post event mask is a bit mask of the same events, allowing to subscribe
+                    to the post events for each of the specified events.<br />
+                        </span>
+                            </span></span>
+                </span></li>
+        </ol>
+        <h2>
+        </h2>
+        <h2>
+            2. Implement module factory class</h2>
+        <p>
+            The server requires a module factory class in order to obtain instances of your
+            module.&nbsp; The factory class must implement the IHttpModuleFactory interface
+            declared in the httpserv.h Windows SDK header file.<br />
+            <br />
+            <em>This factory is implemented for you in the <strong>mymodulefactory.h</strong> header
+                file.<br />
+                <br />
+            </em>The <strong>GetHttpModule</strong> method of the factory class is called at the beginning of
+            each request in order to obtain an instance of your module.&nbsp; The typical implementation
+            simply returns a new instance of your module class:<br />
+            <br />
+            <span style="font-family: Courier New; font-size: 10pt;">class CMyHttpModuleFactory : public IHttpModuleFactory
+                <br />
+                {
+                <br />
+                public:
+                <br />
+                &nbsp; &nbsp; virtual HRESULT GetHttpModule( OUT CHttpModule **ppModule, IN IModuleAllocator
+                * )
+                <br />
+                &nbsp; &nbsp; {&nbsp;<br />
+                &nbsp; &nbsp; &nbsp; &nbsp; ...<br />
+                &nbsp; &nbsp; &nbsp; &nbsp; pModule = new CMyHttpModule();&nbsp;<br />
+                &nbsp; &nbsp; &nbsp; &nbsp; ...<br />
+                &nbsp; &nbsp; &nbsp; &nbsp; *ppModule = pModule;&nbsp;<br />
+                &nbsp; &nbsp; &nbsp; &nbsp; ...<br />
+                &nbsp; &nbsp; }&nbsp;<br />
+                <br />
+                &nbsp; &nbsp; virtual void Terminate() { }<br />
+                }</span></p>
+        <p>
+            The <strong>Terminate</strong> method of the factory class is called during the
+            shutdown of the worker process, before your module DLL is unloaded.&nbsp; It typically
+            releases any resources you may have initialized inside the <strong>RegisterModule</strong>
+            function.</p>
+        <h2>
+            3. Implement module class</h2>
+        <p>
+            The module class inherits from the <strong>CHttpModule</strong> base class, which
+            defines an event handler method for each of the server events discussed earlier.&nbsp;
+            When the server executes each event during the processing of a request, it will
+            invoke the associated event handler method on each of the module instances that
+            have registered for that event.&nbsp;<br />
+            <br />
+            <em>This class is declared in the <strong>mymodule.h</strong> header file, and its event
+                handler methods are implemented in the <strong>mymodule.cpp</strong> source file.</em><br />
+            <br />
+            In order to provide processing for each server event, the module class MUST override
+            the corresponding method.&nbsp; The signature of each event handler method is the
+            following:<br />
+            <br />
+            <span style="font-size: 10pt; font-family: Courier New">REQUEST_NOTIFICATION_STATUS
+                On&lt;EVENT NAME&gt;(
+                IN IHttpContext *                       pHttpContext,
+                IN OUT IHttpEventProvider *             pProvider
+            );            
+            <br />
+            </span>
+            <br />
+ 
+            Where &lt;EVENT NAME&gt; is one of the server events we listed earlier.&nbsp; For
+            example, the module in this project initially overrides only the <strong>OnAcquireRequestState</strong> method since we register only for the <span style="font-size: 10pt;
+                font-family: Courier New"><strong>RQ_ACQUIRE_REQUEST_STATE</strong></span> event:<br />
+            <br />
+            <span style="font-size: 10pt; font-family: Courier New">class CMyHttpModule : public
+                CHttpModule
+                <br />
+                {
+                <br />
+                public:
+                <br />
+                <br />
+                <span style="color: #009900">&nbsp; &nbsp; // Implementation of the AcquireRequestState
+                    event handler method. </span>
+                <br />
+                &nbsp; &nbsp; REQUEST_NOTIFICATION_STATUS OnAcquireRequestState( IN IHttpContext
+                * pHttpContext, IN OUT IHttpEventProvider * pProvider );
+                <br />
+                <br />
+                <span style="color: #009900">&nbsp; &nbsp; // TODO: override additional event handler
+                    methods below. </span>
+                <br />
+                };</span><br />
+            <br />
+            The implementation of this method provides the module functionality desired for
+            processing the request in the appropriate pipeline stage.&nbsp; This project provides
+            a dummy implementation in the <strong>mymodule.cpp</strong> source file.</p>
+        <h2>
+            4. Deploy the module to the server</h2>
+        <p>
+            After you have compiled your module, you need to deploy it on the server.&nbsp;
+            You can do that by compiling the module, and then copying <strong>IIS7NativeModule.dll</strong>
+            (and the <strong>IIS7NativeModule.pdb</strong> debugging symbols file if desired)
+            to any location on the machine running IIS7.<br />
+            <br />
+            You can install your module on the server by running the following command from an Elevated command line prompt:<br />
+            <br />
+            <strong>%systemroot%\system32\inetsrv\APPCMD.EXE install module /name:MyModule /image:&lt;FULL
+                PATH TO DLL&gt;</strong><br />
+            <br />
+            Where <strong>&lt;FULL_PATH_TO_DLL&gt;</strong> is the full path to the module DLL
+            file.<br />
+            <br />
+            You can also install your module using the IIS7 Administration Tool. After installation,
+            your module will be loaded and enabled in all application pools on the server.&nbsp;
+            To learn ore about installing modules, and selecting modules to execute on your
+            server and for specific applications, please visit <a href="http://www.iis.net">www.iis.net</a>.</p>
+        <h2>
+            Congratulations!</h2>
+        <p>
+            You have succesfully built and deployed your own IIS7 module.&nbsp; To learn more
+            about building IIS7 modules, and to download sample modules, be sure to visit <a href="http://www.iis.net">www.iis.net</a>.</p>
+	</body>
+</html>
