@@ -21,7 +21,7 @@ CC = CL
 
 MT = mt
 
-DEFS = /nologo /O2 /LD /W3 /wd4244 /wd4018 -DWIN32 -DWINNT -Dinline=APR_INLINE
+DEFS = /nologo /O2 /LD /W3 /wd4244 /wd4018 -DWIN32 -DWINNT -Dinline=APR_INLINE -D$(VERSION)
 
 DLL = mod_security2.so
 

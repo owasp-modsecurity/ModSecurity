@@ -30,7 +30,14 @@
 
 #ifdef WIN32
 #include <ws2tcpip.h>
+// This is a trick: for ModSecurity modules this will declare inet_pton,
+// but for mymodule.cpp (IIS module) this will skip, because we include
+// windows.h before including msc_util.h
+// Without the trick we have redefinition conflict.
+//
+#if !(NTDDI_VERSION >= NTDDI_VISTA)
 int DSOLOCAL inet_pton(int family, const char *src, void *dst);
+#endif
 #endif
 
 char DSOLOCAL *m_strcasestr(const char *haystack, const char *needle);
