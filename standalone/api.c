@@ -119,7 +119,9 @@ server_rec *modsecInit()    {
     server->limit_req_fields = 1024;
     server->limit_req_fieldsize = 1024;
     server->limit_req_line = 1024;
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
     server->loglevel = APLOG_DEBUG;
+#endif
     server->lookup_defaults = NULL;
     server->module_config = NULL;
     server->names = NULL;
@@ -268,9 +270,14 @@ conn_rec *modsecNewConnection() {
     c->local_host = sa_name;
     c->local_ip = "127.0.0.1";
     c->pool = pc;
-    c->remote_addr = server->addrs->host_addr;
     c->remote_host = sa_name;
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
     c->remote_ip = "127.0.0.1";
+    c->remote_addr = server->addrs->host_addr;
+#else
+    c->client_ip = "127.0.0.1";
+    c->client_addr = server->addrs->host_addr;
+#endif
     c->input_filters = NULL;
     c->output_filters = NULL;
     c->bucket_alloc = apr_bucket_alloc_create(pc);
