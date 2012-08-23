@@ -175,7 +175,7 @@ AC_ARG_ENABLE(standalone-module,
   fi
 ],
 [
-  build_standalone_module=0
+  build_standalone_module=1
 ])
 AM_CONDITIONAL([BUILD_STANDALONE_MODULE], [test "$build_standalone_module" -eq 1])
 if test "$build_standalone_module" -eq 1; then
