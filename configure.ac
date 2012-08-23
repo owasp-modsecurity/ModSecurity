@@ -165,8 +165,8 @@ fi
 
 # Standalone Module
 AC_ARG_ENABLE(standalone-module,
-              AS_HELP_STRING([--disable-standalone-module],
-                             [Disable building standalone module.]),
+              AS_HELP_STRING([--enable-standalone-module],
+                             [Enable building standalone module.]),
 [
   if test "$enableval" != "no"; then
     build_standalone_module=1
@@ -175,7 +175,7 @@ AC_ARG_ENABLE(standalone-module,
   fi
 ],
 [
-  build_standalone_module=1
+  build_standalone_module=0
 ])
 AM_CONDITIONAL([BUILD_STANDALONE_MODULE], [test "$build_standalone_module" -eq 1])
 if test "$build_standalone_module" -eq 1; then
