@@ -830,7 +830,7 @@ AP_DECLARE(void) ap_add_common_vars(request_rec *r)
 
 #ifndef WIN32
 
-unixd_config_rec unixd_config = { NULL, 0, 0, 0, NULL };
+unixd_config_rec unixd_config;
 const char *ap_server_argv0 = "nginx";
 
 #ifdef HAVE_GETPWNAM
@@ -876,8 +876,7 @@ AP_DECLARE(void) unixd_pre_config(apr_pool_t *ptemp)
     unixd_config.user_name = DEFAULT_USER;
     unixd_config.user_id = ap_uname2id(DEFAULT_USER);
     unixd_config.group_id = ap_gname2id(DEFAULT_GROUP);
-    
-    unixd_config.chroot_dir = NULL; /* none */
+    //unixd_config.chroot_dir = NULL; /* none */
 
     /* Check for suexec */
     unixd_config.suexec_enabled = 0;
