@@ -1,3 +1,16 @@
+XX NNN 2012 - 2.7.0-rc3
+-------------------
+
+ * Fixed requests bigger than SecRequestBodyNoFilesLimit were truncated even engine mode was detection only.
+
+ * Fixed double close() for multipart temporary files (Thanks Seema Deepak).
+
+ * Fixed many small issues reported by Coverity Scanner (Thanks Peter Vrabek).
+
+ * Added ctl:ruleRemoveById/Tag/Msg and removed ctl:ruleUpdateTargetById/Tag/Msg.
+
+ * Added IIS and Ngnix platform code.
+
 23 Jul 2012 - 2.6.7
 -------------------
 
