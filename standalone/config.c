@@ -76,6 +76,8 @@ static void *cfg_getstr(void *buf, size_t bufsiz, void *param)
 
 /* Read one line from open ap_configfile_t, strip LF, increase line number */
 /* If custom handler does not define a getstr() function, read char by char */
+
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
 AP_DECLARE(int) ap_cfg_getline(char *buf, size_t bufsize, ap_configfile_t *cfp)
 {
     /* If a "get string" function is defined, use it */
@@ -209,6 +211,16 @@ AP_DECLARE(int) ap_cfg_getline(char *buf, size_t bufsize, ap_configfile_t *cfp)
         }
     }
 }
+#else
+AP_DECLARE(apr_status_t) ap_cfg_getline(char *buf, apr_size_t bufsize,
+		ap_configfile_t *cfp)
+{
+	apr_status_t rc = ap_cfg_getline_core(buf, bufsize, cfp);
+	if (rc == APR_SUCCESS)
+		cfg_trim_line(buf);
+	return rc;
+}
+#endif
 
 static char *substring_conf(apr_pool_t *p, const char *start, int len,
                             char quote)

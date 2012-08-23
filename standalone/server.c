@@ -236,10 +236,12 @@ AP_DECLARE(char *) ap_escape_html2(apr_pool_t *p, const char *s, int toasc)
     return x;
 }
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
 AP_DECLARE(char *) ap_escape_html(apr_pool_t *p, const char *s)
 {
     return ap_escape_html2(p, s, 0);
 }
+#endif
 
 AP_DECLARE(const char *) ap_psignature(const char *prefix, request_rec *r)
 {
@@ -258,6 +260,7 @@ AP_DECLARE(apr_port_t) ap_get_server_port(const request_rec *r)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
 AP_DECLARE(void) ap_log_error(const char *file, int line, int level, 
                              apr_status_t status, const server_rec *s, 
                              const char *fmt, ...)
@@ -293,6 +296,7 @@ AP_DECLARE(void) ap_log_perror(const char *file, int line, int level,
 	if(modsecLogHook != NULL)
 		modsecLogHook(modsecLogObj, level, errstr);
 }
+#endif
 
 AP_DECLARE(module *) ap_find_linked_module(const char *name)
 {
@@ -317,6 +321,7 @@ AP_DECLARE(const char *) ap_get_status_line(int status)
     return status_lines[ap_index_of_response(status)];
 }
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
 AP_DECLARE(worker_score *) ap_get_scoreboard_worker(int x, int y)
 {
     if (((x < 0) || (server_limit < x)) ||
@@ -325,6 +330,7 @@ AP_DECLARE(worker_score *) ap_get_scoreboard_worker(int x, int y)
     }
     return &ap_scoreboard_image->servers[x][y];
 }
+#endif
 
 AP_DECLARE(apr_status_t) ap_mpm_query(int query_code, int *result)
 {
@@ -397,7 +403,11 @@ static APR_INLINE void do_double_reverse (conn_rec *conn)
     rv = apr_sockaddr_info_get(&sa, conn->remote_host, APR_UNSPEC, 0, 0, conn->pool);
     if (rv == APR_SUCCESS) {
         while (sa) {
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
             if (apr_sockaddr_equal(sa, conn->remote_addr)) {
+#else
+	    if (apr_sockaddr_equal(sa, conn->client_addr)) {
+#endif
                 conn->double_reverse = 1;
                 return;
             }
@@ -449,9 +459,13 @@ AP_DECLARE(const char *) ap_get_remote_host(conn_rec *conn, void *dir_config, in
         && conn->remote_host == NULL
         && (type == REMOTE_DOUBLE_REV
         || hostname_lookups != HOSTNAME_LOOKUP_OFF)) {
-
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
         if (apr_getnameinfo(&conn->remote_host, conn->remote_addr, 0)
             == APR_SUCCESS) {
+#else
+        if (apr_getnameinfo(&conn->remote_host, conn->client_addr, 0)
+            == APR_SUCCESS) {
+#endif
             ap_str_tolower(conn->remote_host);
 
             if (hostname_lookups == HOSTNAME_LOOKUP_DOUBLE) {
@@ -489,7 +503,11 @@ AP_DECLARE(const char *) ap_get_remote_host(conn_rec *conn, void *dir_config, in
         }
         else {
             *str_is_ip = 1;
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
             return conn->remote_ip;
+#else
+	    return conn->client_ip;
+#endif
         }
     }
 }
@@ -782,12 +800,20 @@ AP_DECLARE(void) ap_add_common_vars(request_rec *r)
     if (host) {
         apr_table_addn(e, "REMOTE_HOST", host);
     }
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
     apr_table_addn(e, "REMOTE_ADDR", c->remote_ip);
+#else
+    apr_table_addn(e, "REMOTE_ADDR", c->client_ip);
+#endif
     apr_table_addn(e, "DOCUMENT_ROOT", ap_document_root(r));    /* Apache */
     apr_table_addn(e, "SERVER_ADMIN", s->server_admin); /* Apache */
     apr_table_addn(e, "SCRIPT_FILENAME", r->filename);  /* Apache */
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
     rport = c->remote_addr->port;
+#else
+    rport = c->client_addr->port;
+#endif
     apr_table_addn(e, "REMOTE_PORT", apr_itoa(r->pool, rport));
 
     if (r->user) {
@@ -876,7 +902,7 @@ AP_DECLARE(void) unixd_pre_config(apr_pool_t *ptemp)
     unixd_config.user_name = DEFAULT_USER;
     unixd_config.user_id = ap_uname2id(DEFAULT_USER);
     unixd_config.group_id = ap_gname2id(DEFAULT_GROUP);
-    //unixd_config.chroot_dir = NULL; /* none */
+    /* unixd_config.chroot_dir = NULL; none */
 
     /* Check for suexec */
     unixd_config.suexec_enabled = 0;
