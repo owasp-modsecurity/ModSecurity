@@ -74,7 +74,7 @@ static unsigned char *c2x(unsigned what, unsigned char *where);
 static unsigned char x2c(unsigned char *what);
 static unsigned char xsingle2c(unsigned char *what);
 
-/** \brief Validate IPv4 Netmask
+/** \brief Decode utf-8 to unicode format.
  *
  * \param mp Pointer to memory pool
  * \param input Pointer to input data
