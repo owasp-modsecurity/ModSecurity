@@ -4024,12 +4024,6 @@ static int msre_op_validateUrlEncoding_execute(modsec_rec *msr, msre_rule *rule,
 
 /* validateUtf8Encoding */
 
-#define UNICODE_ERROR_CHARACTERS_MISSING    -1
-#define UNICODE_ERROR_INVALID_ENCODING      -2
-#define UNICODE_ERROR_OVERLONG_CHARACTER    -3
-#define UNICODE_ERROR_RESTRICTED_CHARACTER  -4
-#define UNICODE_ERROR_DECODING_ERROR        -5
-
 /* NOTE: This is over-commented for ease of verification */
 static int detect_utf8_character(const unsigned char *p_read, unsigned int length) {
     int unicode_len = 0;

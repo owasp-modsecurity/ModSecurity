@@ -11,6 +11,8 @@ XX NNN 2012 - 2.7.0-rc3
 
  * Added IIS and Ngnix platform code.
 
+ * Added new transformation utf8toUnicode.
+
 23 Jul 2012 - 2.6.7
 -------------------
 

@@ -495,6 +495,18 @@ static int msre_fn_urlDecodeUni_execute(apr_pool_t *mptmp, unsigned char *input,
     return changed;
 }
 
+static int msre_fn_utf8Unicode_execute(apr_pool_t *mptmp, unsigned char *input,
+    long int input_len, char **rval, long int *rval_len)
+{
+    int changed = 0;
+
+    *rval = (char *)utf8_unicode_inplace_ex(mptmp, input, input_len, &changed);
+    *rval_len = strlen(*rval);
+
+    return changed;
+}
+
+
 /* urlEncode */
 
 static int msre_fn_urlEncode_execute(apr_pool_t *mptmp, unsigned char *input,
@@ -1016,6 +1028,12 @@ void msre_engine_register_default_tfns(msre_engine *engine) {
     msre_engine_tfn_register(engine,
         "urlDecodeUni",
         msre_fn_urlDecodeUni_execute
+    );
+
+    /* Utf8Unicode */
+    msre_engine_tfn_register(engine,
+        "Utf8toUnicode",
+        msre_fn_utf8Unicode_execute
     );
 
     /* urlEncode */

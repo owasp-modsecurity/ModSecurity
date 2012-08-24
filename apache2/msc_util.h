@@ -40,6 +40,14 @@ int DSOLOCAL inet_pton(int family, const char *src, void *dst);
 #endif
 #endif
 
+#define UNICODE_ERROR_CHARACTERS_MISSING    -1
+#define UNICODE_ERROR_INVALID_ENCODING      -2
+#define UNICODE_ERROR_OVERLONG_CHARACTER    -3
+#define UNICODE_ERROR_RESTRICTED_CHARACTER  -4
+#define UNICODE_ERROR_DECODING_ERROR        -5
+
+char DSOLOCAL *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int input_len, int *changed);
+
 char DSOLOCAL *m_strcasestr(const char *haystack, const char *needle);
 
 int DSOLOCAL normalize_path_inplace(unsigned char *input, int len, int win, int *changed);
