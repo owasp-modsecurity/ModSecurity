@@ -157,7 +157,7 @@ ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent,
 void modsecLog(void *obj, int level, char *str)
 {
   if(obj != NULL)
-    ngx_log_error(NGX_LOG_INFO, (ngx_log_t *)obj, 0, str);
+    ngx_log_error(NGX_LOG_INFO, (ngx_log_t *)obj, 0, "%s", str);
 }
 
 /*
@@ -337,7 +337,7 @@ static ngx_int_t ngx_http_modsecurity_access_handler(ngx_http_request_t *req)
       const char *msg = modsecProcessConfig(cf->config, path);
   
       if(msg != NULL)
-        ngx_log_error(NGX_LOG_INFO, req->connection->log, 0, msg);
+        ngx_log_error(NGX_LOG_INFO, req->connection->log, 0, "%s", msg);
     }
   }
 
@@ -397,7 +397,7 @@ static ngx_int_t ngx_http_modsecurity_access_handler(ngx_http_request_t *req)
   
   apr_table_setn(r->subprocess_env, "UNIQUE_ID", "12345");
 
-  ngx_log_error(NGX_LOG_INFO, req->connection->log, 0, r->uri);
+  ngx_log_error(NGX_LOG_INFO, req->connection->log, 0, "%s", r->uri);
 
   int status = modsecProcessRequest(r);
   ngx_log_error(NGX_LOG_INFO, req->connection->log, 0, "status: %d", status);
