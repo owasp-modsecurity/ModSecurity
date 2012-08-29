@@ -265,6 +265,12 @@ AP_DECLARE(void) ap_log_error(const char *file, int line, int level,
                              apr_status_t status, const server_rec *s, 
                              const char *fmt, ...)
 //			    __attribute__((format(printf,6,7)))
+#else
+AP_DECLARE(void) ap_log_error_(const char *file, int line, int module_index,
+                               int level, apr_status_t status,
+                               const server_rec *s, const char *fmt, ...)
+//                              __attribute__((format(printf,7,8)))
+#endif
 {
     va_list args;
     char errstr[MAX_STRING_LEN];
@@ -279,10 +285,16 @@ AP_DECLARE(void) ap_log_error(const char *file, int line, int level,
 		modsecLogHook(modsecLogObj, level, errstr);
 }
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
 AP_DECLARE(void) ap_log_perror(const char *file, int line, int level, 
                              apr_status_t status, apr_pool_t *p, 
                              const char *fmt, ...)
 //			    __attribute__((format(printf,6,7)))
+#else
+AP_DECLARE(void) ap_log_perror_(const char *file, int line, int module_index,
+                                int level, apr_status_t status, apr_pool_t *p,
+                                const char *fmt, ...)
+#endif
 {
     va_list args;
     char errstr[MAX_STRING_LEN];
@@ -296,7 +308,6 @@ AP_DECLARE(void) ap_log_perror(const char *file, int line, int level,
 	if(modsecLogHook != NULL)
 		modsecLogHook(modsecLogObj, level, errstr);
 }
-#endif
 
 AP_DECLARE(module *) ap_find_linked_module(const char *name)
 {
@@ -329,6 +340,25 @@ AP_DECLARE(worker_score *) ap_get_scoreboard_worker(int x, int y)
         return(NULL); /* Out of range */
     }
     return &ap_scoreboard_image->servers[x][y];
+}
+#else
+AP_DECLARE(worker_score *) ap_get_scoreboard_worker_from_indexes(int x, int y)
+{
+    if (((x < 0) || (x >= server_limit)) ||
+        ((y < 0) || (y >= thread_limit))) {
+        return(NULL); /* Out of range */
+    }
+    return &ap_scoreboard_image->servers[x][y];
+}
+
+AP_DECLARE(worker_score *) ap_get_scoreboard_worker(ap_sb_handle_t *sbh)
+{
+    //if (!sbh)
+    //    return NULL;
+
+    //return ap_get_scoreboard_worker_from_indexes(sbh->child_num,
+    //                                             sbh->thread_num);
+    return ap_get_scoreboard_worker_from_indexes(0, 0);
 }
 #endif
 
@@ -531,6 +561,11 @@ AP_DECLARE(char *) ap_server_root_relative(apr_pool_t *p, const char *file)
 AP_DECLARE(piped_log *) ap_open_piped_log(apr_pool_t *p, const char *program)
 {
 	return NULL;
+}
+
+AP_DECLARE(apr_file_t *) ap_piped_log_write_fd(piped_log *pl)
+{
+    return NULL;
 }
 
 AP_DECLARE(char **) ap_create_environment(apr_pool_t *p, apr_table_t *t)

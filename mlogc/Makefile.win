@@ -4,17 +4,17 @@
 ###########################################################################
 
 # Path to Apache httpd installation
-BASE = C:\Apache2
+BASE = C:\Apache22
 
 # Paths to required libraries
-PCRE = C:\work\pcre-7.0-lib
-CURL = C:\work\libcurl-7.19.3-win32-ssl-msvc
+PCRE = C:\work\pcre-8.30
+CURL = C:\work\curl-7.24.0
 
 # Linking libraries
 LIBS = $(BASE)\lib\libapr-1.lib \
        $(BASE)\lib\libaprutil-1.lib \
-       $(PCRE)\lib\pcre.lib \
-       $(CURL)\lib\Release\curllib.lib \
+       $(PCRE)\pcre.lib \
+       $(CURL)\libcurl_imp.lib \
        wsock32.lib
 
 ###########################################################################
@@ -28,7 +28,7 @@ DEFS = /nologo /O2 /W3 -DWIN32 -DWINNT -Dinline=APR_INLINE -D_CONSOLE
 
 EXE = mlogc.exe
 
-INCLUDES = -I. -I.. \
+INCLUDES = -I. -I..\apache2 \
            -I$(PCRE)\include -I$(PCRE) \
            -I$(CURL)\include -I$(CURL) \
            -I$(BASE)\include 

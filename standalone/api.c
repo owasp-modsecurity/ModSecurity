@@ -146,9 +146,13 @@ server_rec *modsecInit()    {
 
     ap_server_config_defines = apr_array_make(pool, 1, sizeof(char *));
 
+    // here we should add scoreboard handling for multiple processes and threads
+	//
     ap_scoreboard_image = (scoreboard *)apr_palloc(pool, sizeof(scoreboard));
 
-    // here we should probably fill scoreboard and later keep it updated somewhere
+	memset(ap_scoreboard_image, 0, sizeof(scoreboard));
+
+	// ----------
 
     security2_module.module_index = 0;
 
