@@ -564,10 +564,12 @@ AP_DECLARE(piped_log *) ap_open_piped_log(apr_pool_t *p, const char *program)
 	return NULL;
 }
 #else
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 3
 AP_DECLARE(apr_file_t *) ap_piped_log_write_fd(piped_log *pl)
 {
  return NULL;
 }
+#endif
 #endif
 
 AP_DECLARE(char **) ap_create_environment(apr_pool_t *p, apr_table_t *t)
