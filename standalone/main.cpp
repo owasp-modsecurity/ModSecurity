@@ -62,6 +62,7 @@ void parseeventfile()
 
 	char *t = event_file;
 	char *e = event_file + event_file_len;
+	int nocrlf = 1;
 
 	while(t < e)
 	{
@@ -70,23 +71,35 @@ void parseeventfile()
 		while(t < e && *t != 10 && *t != 13)
 			t++;
 
-		while(t < e && (*t == 10 || *t == 13))
-			*t++ = 0;
-	}
+		char ct = *t;
+		*t = 0;
+		int i = event_line_cnt - 1;
 
-	for(int i = 0; i < event_line_cnt; i++)
-	{
 		int l = strlen(event_file_lines[i]);
 
-		if(l != 14)
-			continue;
+		if(l == 14 && event_file_lines[i][0] == '-' && event_file_lines[i][1] == '-' && event_file_lines[i][l-2] == '-' && event_file_lines[i][l-1] == '-')
+		{
+			char blk =  event_file_lines[i][l-3];
 
-		if(event_file_lines[i][0] != '-' || event_file_lines[i][1] != '-' || event_file_lines[i][l-2] != '-' || event_file_lines[i][l-1] != '-')
-			continue;
+			event_file_blocks[blk] = i;
 
-		char blk =  event_file_lines[i][l-3];
+			if(blk == 'C' || blk == 'G')
+			{
+				nocrlf = 0;
+			}
+			else
+			{
+				nocrlf = 1;
+			}
+		}
+		*t = ct;
 
-		event_file_blocks[blk] = i;
+		if(nocrlf)
+			while(t < e && (*t == 10 || *t == 13))
+				*t++ = 0;
+		else
+			while(t < e && (*t == 10 || *t == 13))
+				t++;
 	}
 }
 
@@ -156,7 +169,9 @@ apr_status_t readbody(request_rec *r, char *buf, unsigned int length, unsigned i
 	*readcnt = size;
 
 	if(bodypos == l)
+	{
 		*is_eos = 1;
+	}
 
 	return APR_SUCCESS;
 }
@@ -239,6 +254,9 @@ void main(int argc, char *argv[])
 	{
 		readeventfile(event_files[i]);
 		parseeventfile();
+
+		bodypos = 0;
+		responsepos = 0;
 
 		c = modsecNewConnection();
 

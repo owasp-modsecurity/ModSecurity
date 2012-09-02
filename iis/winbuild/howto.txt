@@ -12,7 +12,7 @@ IIS enabled/installed
 
 cmake 2.8.7
 curl 7.24.0
-apache 2.2.22
+apache 2.2.22 or apache 2.4.3
 libxml2 2.7.7
 lua 5.1.5
 pcre 8.30
@@ -29,7 +29,7 @@ zlib 1.2.7
 7. Download curl, apache, libxml2, lua, pcre and zlib, place them in zip files in c:\work
 
 curl-7.24.0.zip
-httpd-2.2.22-win32-src.zip
+httpd-2.2.22-win32-src.zip or (httpd-2.4.3.zip (source) and httpd-2.4.3-win32.zip + httpd-2.4.3-win64.zip (binaries))
 libxml2-2.7.7.zip
 lua-5.1.5.zip
 pcre-8.30.zip
@@ -38,7 +38,7 @@ zlib-1.2.7.zip
 Modify c:\work\build.bat accordingly (if other versions were used)
 
 8. Open cmd.exe window, go to c:\work and run buildall.bat
-9. When done, the binaries should appear under c:\drop\x86 (32-bit) and c:\drop\amd64 (64-bit)
+9. When done, the binaries, lib and pdb files should appear under c:\drop\x86 (32-bit) and c:\drop\amd64 (64-bit)
 10. Open the VS ModSecurity IIS installer project
 11. Copy new binaries to the installer's x86 and amd64 directories
 12. Build installer from within VS

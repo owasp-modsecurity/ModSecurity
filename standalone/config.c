@@ -48,6 +48,7 @@ AP_DECLARE(int) ap_cfg_closefile(ap_configfile_t *cfp)
     return (cfp->close == NULL) ? 0 : cfp->close(cfp->param);
 }
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
 static apr_status_t cfg_close(void *param)
 {
     apr_file_t *cfp = (apr_file_t *) param;
@@ -73,6 +74,23 @@ static void *cfg_getstr(void *buf, size_t bufsiz, void *param)
     }
     return NULL;
 }
+#else
+/* we can't use apr_file_* directly because of linking issues on Windows */
+static apr_status_t cfg_close(void *param)
+{
+    return apr_file_close(param);
+}
+
+static apr_status_t cfg_getch(char *ch, void *param)
+{
+    return apr_file_getc(ch, param);
+}
+
+static apr_status_t cfg_getstr(void *buf, apr_size_t bufsiz, void *param)
+{
+    return apr_file_gets(buf, bufsiz, param);
+}
+#endif
 
 /* Read one line from open ap_configfile_t, strip LF, increase line number */
 /* If custom handler does not define a getstr() function, read char by char */
@@ -478,9 +496,15 @@ AP_DECLARE(apr_status_t) ap_pcfg_openfile(ap_configfile_t **ret_cfg,
     new_cfg = apr_palloc(p, sizeof(*new_cfg));
     new_cfg->param = file;
     new_cfg->name = apr_pstrdup(p, name);
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
     new_cfg->getch = (int (*)(void *)) cfg_getch;
     new_cfg->getstr = (void *(*)(void *, size_t, void *)) cfg_getstr;
     new_cfg->close = (int (*)(void *)) cfg_close;
+#else
+    new_cfg->getch = cfg_getch;
+    new_cfg->getstr = cfg_getstr;
+    new_cfg->close = cfg_close; 
+#endif
     new_cfg->line_number = 0;
     *ret_cfg = new_cfg;
     return APR_SUCCESS;
@@ -668,9 +692,15 @@ static const char *invoke_cmd(const command_rec *cmd, cmd_parms *parms,
     }
 }
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
 static cmd_parms default_parms =
 {NULL, 0, -1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+#endif
 
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 3
+static cmd_parms default_parms =
+{NULL, 0, 0, NULL, -1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+#endif
 
 const char *process_command_config(server_rec *s,
                                           void *mconfig,

@@ -4,11 +4,11 @@
 ###########################################################################
 
 # Path to Apache httpd installation
-BASE = C:\Apache22
+BASE = %APACHE%
 
 # Paths to required libraries
-PCRE = C:\work\pcre-8.30
-CURL = C:\work\curl-7.24.0
+PCRE = %PCRE%
+CURL = %CURL%
 
 # Linking libraries
 LIBS = $(BASE)\lib\libapr-1.lib \
@@ -24,7 +24,7 @@ CC = cL
 
 MT = mt
 
-DEFS = /nologo /O2 /W3 -DWIN32 -DWINNT -Dinline=APR_INLINE -D_CONSOLE
+DEFS = /nologo /O2 /W3 -DWIN32 -DWINNT -Dinline=APR_INLINE -D_CONSOLE -D$(VERSION)
 
 EXE = mlogc.exe
 
