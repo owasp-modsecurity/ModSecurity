@@ -39,20 +39,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_2BE0B1E766C340AA82459A4828CBB4BB"
+        "MsmKey" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_3C92A363FD094985B629CDC36B44A3D3"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_3CE93C3FC5AC3E954253889334FBCDA8"
-        "OwnerKey" = "8:_6E5E037AE02FFD61B6DB08B8CD0D9911"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -87,13 +75,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_6E5E037AE02FFD61B6DB08B8CD0D9911"
-        "OwnerKey" = "8:_3C92A363FD094985B629CDC36B44A3D3"
+        "MsmKey" = "8:_72B533FBDB1E48A9B44CAA948E245528"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_72B533FBDB1E48A9B44CAA948E245528"
+        "MsmKey" = "8:_764D5BE911464BEFBCC3BC3B25068987"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -106,12 +94,6 @@
         "Entry"
         {
         "MsmKey" = "8:_804BB5CB74F84281874FF482E8E968A9"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -165,6 +147,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_D8E3D69430F54B5DB4F890834BBC0CC6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_DB58E622510C458A81C3B850EDFC782C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -196,13 +184,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_3C92A363FD094985B629CDC36B44A3D3"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_6E5E037AE02FFD61B6DB08B8CD0D9911"
+        "OwnerKey" = "8:_764D5BE911464BEFBCC3BC3B25068987"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -307,31 +289,17 @@
     {
         "CustomAction"
         {
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_288AFB95ECDF41668E7C8A98BFCC59D5"
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_6AC6216B16A740BFBCF4DFF1FC4FB1CF"
             {
-            "Name" = "8:configure.exe"
+            "Name" = "8:Primary output from configure (Active)"
             "Condition" = "8:"
-            "Object" = "8:_3C92A363FD094985B629CDC36B44A3D3"
+            "Object" = "8:_764D5BE911464BEFBCC3BC3B25068987"
             "FileType" = "3:2"
             "InstallAction" = "3:4"
             "Arguments" = "8:uninstall"
             "EntryPoint" = "8:"
             "Sequence" = "3:1"
-            "Identifier" = "8:_BCC26438_F2BB_4E59_A1CD_9CC1C9460947"
-            "InstallerClass" = "11:FALSE"
-            "CustomActionData" = "8:"
-            }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_A18DDEEDA7F54025A417D48572907972"
-            {
-            "Name" = "8:configure.exe"
-            "Condition" = "8:"
-            "Object" = "8:_3C92A363FD094985B629CDC36B44A3D3"
-            "FileType" = "3:2"
-            "InstallAction" = "3:1"
-            "Arguments" = "8:\"[TARGETDIR]\""
-            "EntryPoint" = "8:"
-            "Sequence" = "3:1"
-            "Identifier" = "8:_B11B1E07_B6DC_43AD_9678_671C4D1B15A7"
+            "Identifier" = "8:_F76041EE_48F4_4DC8_9EF8_47ADAD87FEA2"
             "InstallerClass" = "11:FALSE"
             "CustomActionData" = "8:"
             }
@@ -348,6 +316,20 @@
             "Identifier" = "8:_CB90C8D4_3928_4ACA_9263_454FD47BB545"
             "InstallerClass" = "11:FALSE"
             "CustomActionData" = "8:[TARGETDIR]"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_C6B6E1FCC7E6471F914483477DA0D4B6"
+            {
+            "Name" = "8:Primary output from configure (Active)"
+            "Condition" = "8:"
+            "Object" = "8:_764D5BE911464BEFBCC3BC3B25068987"
+            "FileType" = "3:2"
+            "InstallAction" = "3:1"
+            "Arguments" = "8:\"[TARGETDIR]\""
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_6EC4042E_4AC8_4584_A326_BE8E22FF087D"
+            "InstallerClass" = "11:FALSE"
+            "CustomActionData" = "8:"
             }
             "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_C9D5851C213E4B928C42AC01EEF1458A"
             {
@@ -466,10 +448,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2BE0B1E766C340AA82459A4828CBB4BB"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2A9DB6318EE24F649FB0CDB52691122C"
             {
-            "SourcePath" = "8:D:\\README.rtf"
-            "TargetName" = "8:README.rtf"
+            "SourcePath" = "8:ModSecurityLogo.bmp"
+            "TargetName" = "8:ModSecurityLogo.bmp"
             "Tag" = "8:"
             "Folder" = "8:_565C3432A64049EAA7CA6E8C007B2188"
             "Condition" = "8:"
@@ -484,57 +466,6 @@
             "Register" = "3:1"
             "Exclude" = "11:TRUE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_3C92A363FD094985B629CDC36B44A3D3"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:configure, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86"
-                "ScatterAssemblies"
-                {
-                    "_3C92A363FD094985B629CDC36B44A3D3"
-                    {
-                    "Name" = "8:configure.exe"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:installer project\\bin\\Debug\\configure.exe"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_565C3432A64049EAA7CA6E8C007B2188"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3CE93C3FC5AC3E954253889334FBCDA8"
-            {
-            "SourcePath" = "8:nativerd.dll"
-            "TargetName" = "8:nativerd.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_565C3432A64049EAA7CA6E8C007B2188"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_51AF671FCA3544DEA3E5756B5D450275"
@@ -637,37 +568,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_6E5E037AE02FFD61B6DB08B8CD0D9911"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Interop.AppHostAdminLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86"
-                "ScatterAssemblies"
-                {
-                    "_6E5E037AE02FFD61B6DB08B8CD0D9911"
-                    {
-                    "Name" = "8:Interop.AppHostAdminLibrary.DLL"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Interop.AppHostAdminLibrary.DLL"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_565C3432A64049EAA7CA6E8C007B2188"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_72B533FBDB1E48A9B44CAA948E245528"
             {
             "SourcePath" = "8:x86\\zlib1.dll"
@@ -725,26 +625,6 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_95283EC7A8D94C23B95ED4C710F53A85"
-            {
-            "SourcePath" = "8:D:\\ModSecurityLogo.bmp"
-            "TargetName" = "8:ModSecurityLogo.bmp"
-            "Tag" = "8:"
-            "Folder" = "8:_565C3432A64049EAA7CA6E8C007B2188"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
@@ -905,6 +785,26 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D8E3D69430F54B5DB4F890834BBC0CC6"
+            {
+            "SourcePath" = "8:readme.rtf"
+            "TargetName" = "8:readme.rtf"
+            "Tag" = "8:"
+            "Folder" = "8:_565C3432A64049EAA7CA6E8C007B2188"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
@@ -1087,7 +987,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ModSecurity IIS"
         "ProductCode" = "8:{81EE8A4A-5128-4CDB-97B2-06B147E8B4B8}"
-        "PackageCode" = "8:{3433BFD2-9BFD-4E4B-B50D-77D31A110C44}"
+        "PackageCode" = "8:{0E266CA7-97F3-4DCE-AC7B-5ECCAE18A108}"
         "UpgradeCode" = "8:{7B32CF94-443C-47BB-91C3-0E9D3D12DF8B}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1235,7 +1135,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "InstallAllUsersVisible"
@@ -1271,7 +1171,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "EulaText"
@@ -1319,7 +1219,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "CopyrightWarning"
@@ -1368,7 +1268,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -1400,7 +1300,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "ShowProgress"
@@ -1445,7 +1345,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -1468,7 +1368,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -1491,7 +1391,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "EulaText"
@@ -1539,7 +1439,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "CopyrightWarning"
@@ -1603,7 +1503,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "ShowProgress"
@@ -1654,7 +1554,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "UpdateText"
@@ -1690,7 +1590,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "ReadmeText"
@@ -1702,7 +1602,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:_2BE0B1E766C340AA82459A4828CBB4BB"
+                            "Value" = "8:_D8E3D69430F54B5DB4F890834BBC0CC6"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "Sunken"
@@ -1747,7 +1647,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "ReadmeText"
@@ -1759,7 +1659,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:_2BE0B1E766C340AA82459A4828CBB4BB"
+                            "Value" = "8:_D8E3D69430F54B5DB4F890834BBC0CC6"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "Sunken"
@@ -1795,7 +1695,7 @@
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
                             "Setting" = "3:2"
-                            "Value" = "8:_95283EC7A8D94C23B95ED4C710F53A85"
+                            "Value" = "8:_2A9DB6318EE24F649FB0CDB52691122C"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -1808,6 +1708,34 @@
         }
         "ProjectOutput"
         {
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_764D5BE911464BEFBCC3BC3B25068987"
+            {
+            "SourcePath" = "8:installer project\\obj\\x86\\Release\\configure.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_565C3432A64049EAA7CA6E8C007B2188"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{023E10BD-4FF6-4401-9A40-AED9717073F2}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
         }
     }
 }

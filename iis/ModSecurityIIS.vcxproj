@@ -100,7 +100,7 @@ copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2;..\standalone</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2;..\standalone;c:\work\apache24\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>

@@ -30,6 +30,7 @@
 #include "api.h"
 #include "moduleconfig.h"
 
+#include "winsock2.h"
 
 class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 {
@@ -78,6 +79,54 @@ class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 	unsigned int		m_pResponseLength;
 	unsigned int		m_pResponsePosition;
 };
+
+//----------------------------------------------------------------------------
+
+char *GetIpAddr(apr_pool_t *pool, PSOCKADDR pAddr)
+{
+	DWORD len = 50;
+	char *buf = (char *)apr_palloc(pool, len);
+
+	WSAAddressToString(pAddr, sizeof(SOCKADDR), NULL, buf, &len);
+
+	return buf;
+}
+
+apr_sockaddr_t *CopySockAddr(apr_pool_t *pool, PSOCKADDR pAddr)
+{
+    apr_sockaddr_t *addr = (apr_sockaddr_t *)apr_palloc(pool, sizeof(apr_sockaddr_t));
+	int adrlen = 16, iplen = 4;
+
+	if(pAddr->sa_family == AF_INET6)
+	{
+		adrlen = 46;
+		iplen = 16;
+	}
+
+	addr->addr_str_len = adrlen;
+	addr->family = pAddr->sa_family;
+
+	addr->hostname = "unknown";
+#ifdef WIN32
+    addr->ipaddr_len = sizeof(IN_ADDR);
+#else
+    addr->ipaddr_len = sizeof(struct in_addr);
+#endif
+    addr->ipaddr_ptr = &addr->sa.sin.sin_addr;
+    addr->pool = pool;
+    addr->port = 80;
+#ifdef WIN32
+	memcpy(&addr->sa.sin.sin_addr.S_un.S_addr, pAddr->sa_data, iplen);
+#else
+    memcpy(&addr->sa.sin.sin_addr.s_addr, pAddr->sa_data, iplen);
+#endif
+	addr->sa.sin.sin_family = pAddr->sa_family;
+    addr->sa.sin.sin_port = 80;
+    addr->salen = sizeof(addr->sa);
+	addr->servname = addr->hostname;
+
+	return addr;
+}
 
 //----------------------------------------------------------------------------
 
@@ -944,6 +993,17 @@ CMyHttpModule::OnBeginRequest(
 	_ui64toa(httpRequestID, pszValue, 10);
 
 	apr_table_setn(r->subprocess_env, "UNIQUE_ID", pszValue);
+
+	PSOCKADDR pAddr = pRequest->GetRemoteAddress();
+
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
+    c->remote_addr = CopySockAddr(r->pool, pAddr);
+    c->remote_ip = GetIpAddr(r->pool, pAddr);
+#else
+    c->client_addr = CopySockAddr(r->pool, pAddr);
+	c->client_ip = GetIpAddr(r->pool, pAddr);
+#endif
+	c->remote_host = NULL;
 
 	int status = modsecProcessRequest(r);
 
