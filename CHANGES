@@ -9,7 +9,7 @@ XX NNN 2012 - 2.7.0-rc3
 
  * Fixed format string issue in ngnix experimental code. (Thanks Eldar Zaitov).
 
- * Added ctl:ruleRemoveById/Tag/Msg and removed ctl:ruleUpdateTargetById/Tag/Msg.
+ * Added ctl:ruleRemoveTargetByTag/Msg and removed ctl:ruleUpdateTargetByTag/Msg.
 
  * Added IIS and Ngnix platform code.
 
