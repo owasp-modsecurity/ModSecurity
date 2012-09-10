@@ -1,0 +1,212 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{20EC871F-B6A0-4398-9B67-A33598A796E8}</ProjectGuid>
+    <RootNamespace>standalone</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2;c:\work\apache24\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC;VERSION_STANDALONE</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4244;4018</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);libapr-1.lib;libaprutil-1.lib;pcre.lib;libxml2.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\drop\x86</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4244;4018</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);libapr-1.lib;libaprutil-1.lib;pcre.lib;libxml2.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\drop\amd64</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);libapr-1.lib;libaprutil-1.lib;pcre.lib;libxml2.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\drop\x86</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);libapr-1.lib;libaprutil-1.lib;pcre.lib;libxml2.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\drop\amd64</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\apache2\acmp.c" />
+    <ClCompile Include="..\apache2\apache2_config.c" />
+    <ClCompile Include="..\apache2\apache2_io.c" />
+    <ClCompile Include="..\apache2\apache2_util.c" />
+    <ClCompile Include="..\apache2\modsecurity.c" />
+    <ClCompile Include="..\apache2\mod_security2.c" />
+    <ClCompile Include="..\apache2\msc_crypt.c" />
+    <ClCompile Include="..\apache2\msc_geo.c" />
+    <ClCompile Include="..\apache2\msc_gsb.c" />
+    <ClCompile Include="..\apache2\msc_logging.c" />
+    <ClCompile Include="..\apache2\msc_lua.c" />
+    <ClCompile Include="..\apache2\msc_multipart.c" />
+    <ClCompile Include="..\apache2\msc_parsers.c" />
+    <ClCompile Include="..\apache2\msc_pcre.c" />
+    <ClCompile Include="..\apache2\msc_release.c" />
+    <ClCompile Include="..\apache2\msc_reqbody.c" />
+    <ClCompile Include="..\apache2\msc_tree.c" />
+    <ClCompile Include="..\apache2\msc_unicode.c" />
+    <ClCompile Include="..\apache2\msc_util.c" />
+    <ClCompile Include="..\apache2\msc_xml.c" />
+    <ClCompile Include="..\apache2\persist_dbm.c" />
+    <ClCompile Include="..\apache2\re.c" />
+    <ClCompile Include="..\apache2\re_actions.c" />
+    <ClCompile Include="..\apache2\re_operators.c" />
+    <ClCompile Include="..\apache2\re_tfns.c" />
+    <ClCompile Include="..\apache2\re_variables.c" />
+    <ClCompile Include="api.c" />
+    <ClCompile Include="buckets.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;;..\apache2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;;..\apache2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;;..\apache2</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="config.c" />
+    <ClCompile Include="filters.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="hooks.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="regex.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="server.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\apache2\acmp.h" />
+    <ClInclude Include="..\apache2\apache2.h" />
+    <ClInclude Include="..\apache2\modsecurity.h" />
+    <ClInclude Include="..\apache2\modsecurity_config.h" />
+    <ClInclude Include="..\apache2\modsecurity_config_auto.h" />
+    <ClInclude Include="..\apache2\msc_crypt.h" />
+    <ClInclude Include="..\apache2\msc_geo.h" />
+    <ClInclude Include="..\apache2\msc_gsb.h" />
+    <ClInclude Include="..\apache2\msc_logging.h" />
+    <ClInclude Include="..\apache2\msc_lua.h" />
+    <ClInclude Include="..\apache2\msc_multipart.h" />
+    <ClInclude Include="..\apache2\msc_parsers.h" />
+    <ClInclude Include="..\apache2\msc_pcre.h" />
+    <ClInclude Include="..\apache2\msc_release.h" />
+    <ClInclude Include="..\apache2\msc_tree.h" />
+    <ClInclude Include="..\apache2\msc_unicode.h" />
+    <ClInclude Include="..\apache2\msc_util.h" />
+    <ClInclude Include="..\apache2\msc_xml.h" />
+    <ClInclude Include="..\apache2\persist_dbm.h" />
+    <ClInclude Include="..\apache2\re.h" />
+    <ClInclude Include="..\apache2\utf8tables.h" />
+    <ClInclude Include="api.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

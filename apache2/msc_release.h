@@ -40,7 +40,7 @@
 #define MODSEC_VERSION_MINOR       "7"
 #define MODSEC_VERSION_MAINT       "0"
 #define MODSEC_VERSION_TYPE        "-rc"
-#define MODSEC_VERSION_RELEASE     "2"
+#define MODSEC_VERSION_RELEASE     "3"
 
 #define MODSEC_VERSION_SUFFIX MODSEC_VERSION_TYPE MODSEC_VERSION_RELEASE
 
@@ -49,7 +49,19 @@
   MODSEC_VERSION_SUFFIX
 
 /* Apache Module Defines */
+#ifdef	VERSION_IIS
+#define MODSEC_MODULE_NAME "ModSecurity for IIS"
+#else
+#ifdef	VERSION_NGINX
+#define MODSEC_MODULE_NAME "ModSecurity for nginx"
+#else
+#ifdef	VERSION_STANDALONE
+#define MODSEC_MODULE_NAME "ModSecurity Standalone"
+#else
 #define MODSEC_MODULE_NAME "ModSecurity for Apache"
+#endif
+#endif
+#endif
 #define MODSEC_MODULE_VERSION MODSEC_VERSION
 #define MODSEC_MODULE_NAME_FULL MODSEC_MODULE_NAME "/" MODSEC_MODULE_VERSION " (http://www.modsecurity.org/)"
 

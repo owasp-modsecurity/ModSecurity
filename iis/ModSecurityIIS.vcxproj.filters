@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="moduleconfig.cpp" />
+    <ClCompile Include="mymodule.cpp" />
+    <ClCompile Include="..\apache2\acmp.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\apache2_config.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\apache2_io.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\apache2_util.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\mod_security2.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\modsecurity.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_geo.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_gsb.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_logging.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_lua.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_multipart.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_parsers.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_pcre.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_release.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_reqbody.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_unicode.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_util.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_xml.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\persist_dbm.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\re.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\re_actions.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\re_operators.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\re_tfns.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\re_variables.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\standalone\api.c">
+      <Filter>Standalone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\standalone\buckets.c">
+      <Filter>Standalone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\standalone\config.c">
+      <Filter>Standalone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\standalone\filters.c">
+      <Filter>Standalone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\standalone\hooks.c">
+      <Filter>Standalone</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\standalone\regex.c">
+      <Filter>Standalone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\standalone\server.c">
+      <Filter>Standalone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_crypt.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_tree.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="moduleconfig.h" />
+    <ClInclude Include="mymodule.h" />
+    <ClInclude Include="mymodulefactory.h" />
+    <ClInclude Include="..\apache2\acmp.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\modsecurity.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\modsecurity_config.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\modsecurity_config_auto.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_geo.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_gsb.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_logging.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_lua.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_multipart.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_parsers.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_pcre.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_release.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_unicode.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_util.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_xml.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\persist_dbm.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\re.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\utf8tables.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\apache2.h">
+      <Filter>Standalone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\standalone\api.h">
+      <Filter>Standalone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_crypt.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_tree.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ModSecurity.xml" />
+    <None Include="mymodule.def" />
+    <None Include="readme.htm" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ModSecurity">
+      <UniqueIdentifier>{ba9b4453-b351-4739-9f9d-3d56d6b27bbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Standalone">
+      <UniqueIdentifier>{ba6117ea-f101-4d23-85f2-d1af0235e22a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

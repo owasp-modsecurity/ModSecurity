@@ -52,12 +52,23 @@ if test -n "${libxml2_path}"; then
         LIBXML2_CONFIG="${libxml2_path}/${LIBXML2_CONFIG}"
     fi
     AC_MSG_RESULT([${LIBXML2_CONFIG}])
-    LIBXML2_VERSION="`${LIBXML2_CONFIG} --version`"
+    LIBXML2_VERSION=`${LIBXML2_CONFIG} --version | sed 's/^[[^0-9]][[^[:space:]]][[^[:space:]]]*[[[:space:]]]*//'`
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(xml VERSION: $LIBXML2_VERSION); fi
     LIBXML2_CFLAGS="`${LIBXML2_CONFIG} --cflags`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(xml CFLAGS: $LIBXML2_CFLAGS); fi
     LIBXML2_LDADD="`${LIBXML2_CONFIG} --libs`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(xml LDADD: $LIBXML2_LDADD); fi
+
+    AC_MSG_CHECKING([if libxml2 is at least v2.6.29])
+    libxml2_min_ver=`echo 2.6.29 | awk -F. '{print (\$ 1 * 1000000) + (\$ 2 * 1000) + \$ 3}'`
+    libxml2_ver=`echo ${LIBXML2_VERSION} | awk -F. '{print (\$ 1 * 1000000) + (\$ 2 * 1000) + \$ 3}'`
+    if test "$libxml2_ver" -ge "$libxml2_min_ver"; then
+        AC_MSG_RESULT([yes, $LIBXML2_VERSION])
+    else
+        AC_MSG_RESULT([no, $LIBXML2_VERSION])
+        AC_MSG_ERROR([NOTE: libxml2 library must be at least 2.6.29])
+    fi
+
 else
     AC_MSG_RESULT([no])
 fi
@@ -75,5 +86,5 @@ if test -z "${LIBXML2_VERSION}"; then
 else
     AC_MSG_NOTICE([using libxml2 v${LIBXML2_VERSION}])
     ifelse([$1], , , $1) 
-fi 
+fi
 ])

@@ -1209,7 +1209,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         p2 = apr_strtok(NULL,";",&savedptr);
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Ctl: ruleUpdateTargetById id=%s targets=%s", p1, p2);
+            msr_log(msr, 4, "Ctl: ruleRemoveTargetById id=%s targets=%s", p1, p2);
         }
     re = apr_pcalloc(msr->mp, sizeof(rule_exception));
     re->type = RULE_EXCEPTION_REMOVE_ID;
@@ -1251,7 +1251,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         p2 = apr_strtok(NULL,";",&savedptr);
 
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Ctl: ruleUpdateTargetByMsg msg=%s targets=%s", p1, p2);
+            msr_log(msr, 4, "Ctl: ruleRemoveTargetByMsg msg=%s targets=%s", p1, p2);
         }
 
     re = apr_pcalloc(msr->mp, sizeof(rule_exception));

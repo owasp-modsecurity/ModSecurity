@@ -364,8 +364,8 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
 
         *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
                 "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
-        if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "%s", *error_msg);
+        if (msr->txcfg->debuglog_level >= 1) {
+            msr_log(msr, 1, "%s", *error_msg);
         }
 
         if ((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT))   {

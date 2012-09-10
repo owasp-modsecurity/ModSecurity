@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ModSecurity Headers">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="ModSecurity Sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Standalone Sources">
+      <UniqueIdentifier>{2d4a2f57-e994-4dad-888a-e61a65029abf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\apache2\acmp.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\apache2_config.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\apache2_io.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\apache2_util.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\mod_security2.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\modsecurity.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_geo.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_gsb.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_logging.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_lua.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_multipart.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_parsers.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_pcre.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_release.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_reqbody.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_unicode.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_util.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_xml.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\persist_dbm.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\re.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\re_actions.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\re_operators.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\re_tfns.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\re_variables.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="filters.c">
+      <Filter>Standalone Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="hooks.c">
+      <Filter>Standalone Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="buckets.c">
+      <Filter>Standalone Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="regex.c">
+      <Filter>Standalone Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="server.c">
+      <Filter>Standalone Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="config.c">
+      <Filter>Standalone Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="api.c">
+      <Filter>Standalone Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Standalone Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_crypt.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_tree.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\apache2\acmp.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\apache2.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\modsecurity.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\modsecurity_config.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\modsecurity_config_auto.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_geo.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_gsb.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_logging.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_lua.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_multipart.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_parsers.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_pcre.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_release.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_unicode.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_util.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_xml.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\persist_dbm.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\re.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\utf8tables.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="api.h">
+      <Filter>Standalone Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_crypt.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_tree.h">
+      <Filter>ModSecurity Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
