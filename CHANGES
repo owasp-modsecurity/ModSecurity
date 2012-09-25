@@ -1,3 +1,10 @@
+25 Sep 2012 - 2.6.8
+-------------------
+
+  * Fixed ctl:ruleRemoveTargetByID order issue (MODSEC-333). Thanks to Armadillo Dasypodidae.
+
+  * Fixed variable HIGHEST_SEVERITY incorrectly gets reset in a chain rule (MODSEC-315). Thanks to Valery Reznic.
+
 23 Jul 2012 - 2.6.7
 -------------------
 
