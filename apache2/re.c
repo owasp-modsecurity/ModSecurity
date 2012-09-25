@@ -104,6 +104,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
                     name = apr_strtok(variable,":",&value);
                 } else {
                     name = variable;
+                    value = NULL;
                 }
 
                 if((strlen(myname) == strlen(name)) &&
