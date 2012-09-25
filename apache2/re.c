@@ -2663,8 +2663,8 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
         }
 
         /* Keep track of the highest severity matched so far */
-        if ((acting_actionset->severity > 0) && (acting_actionset->severity < msr->highest_severity))
-        {
+        if ((acting_actionset->severity > 0) && (acting_actionset->severity < msr->highest_severity)
+            && !rule->actionset->is_chained)    {
             msr->highest_severity = acting_actionset->severity;
         }
 
