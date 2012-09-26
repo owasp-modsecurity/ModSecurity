@@ -209,4 +209,4 @@ SecCookieFormat 0
 # these directives helps to reduce false positives and negatives.
 #
 #SecUnicodeCodePage 20127
-#SecUnicodeMapFile conf.d/unicode.mapping
+#SecUnicodeMapFile unicode.mapping
