@@ -202,3 +202,11 @@ SecArgumentSeparator &
 # evasion attacks (against the rules that examine named cookies).
 #
 SecCookieFormat 0
+
+# Specify your Unicode Code Point.
+# This mapping is used by the t:urlDecodeUni transformation function
+# to properly map encoded data to your language. Properly setting
+# these directives helps to reduce false positives and negatives.
+#
+#SecUnicodeCodePage 20127
+#SecUnicodeMapFile conf.d/unicode.mapping
