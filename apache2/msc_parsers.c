@@ -19,7 +19,7 @@
  *
  */
 int parse_cookies_v0(modsec_rec *msr, char *_cookie_header,
-                     apr_table_t *cookies)
+                     apr_table_t *cookies, const char *delim)
 {
     char *attr_name = NULL, *attr_value = NULL;
     char *cookie_header;
@@ -35,7 +35,8 @@ int parse_cookies_v0(modsec_rec *msr, char *_cookie_header,
     cookie_header = strdup(_cookie_header);
     if (cookie_header == NULL) return -1;
 
-    p = apr_strtok(cookie_header, ";", &saveptr);
+    p = apr_strtok(cookie_header, delim, &saveptr);
+
     while(p != NULL) {
         attr_name = NULL;
         attr_value = NULL;
@@ -57,14 +58,14 @@ int parse_cookies_v0(modsec_rec *msr, char *_cookie_header,
             if (attr_value != NULL) {
                 if (msr->txcfg->debuglog_level >= 5) {
                     msr_log(msr, 5, "Adding request cookie: name \"%s\", value \"%s\"",
-                        log_escape(msr->mp, attr_name), log_escape(msr->mp, attr_value));
+                            log_escape(msr->mp, attr_name), log_escape(msr->mp, attr_value));
                 }
 
                 apr_table_add(cookies, attr_name, attr_value);
             } else {
                 if (msr->txcfg->debuglog_level >= 5) {
                     msr_log(msr, 5, "Adding request cookie: name \"%s\", value empty",
-                        log_escape(msr->mp, attr_name));
+                            log_escape(msr->mp, attr_name));
                 }
 
                 apr_table_add(cookies, attr_name, "");
@@ -73,7 +74,7 @@ int parse_cookies_v0(modsec_rec *msr, char *_cookie_header,
             cookie_count++;
         }
 
-        p = apr_strtok(NULL, ";", &saveptr);
+        p = apr_strtok(NULL, delim, &saveptr);
     }
 
     free(cookie_header);
@@ -84,7 +85,7 @@ int parse_cookies_v0(modsec_rec *msr, char *_cookie_header,
  *
  */
 int parse_cookies_v1(modsec_rec *msr, char *_cookie_header,
-                     apr_table_t *cookies)
+        apr_table_t *cookies)
 {
     char *attr_name = NULL, *attr_value = NULL, *p = NULL;
     char *prev_attr_name = NULL;
@@ -162,7 +163,7 @@ int parse_cookies_v1(modsec_rec *msr, char *_cookie_header,
             }
         }
 
-    add_cookie:
+add_cookie:
 
         /* remove the whitespace from the end of cookie name */
         if (attr_name != NULL) {
@@ -193,14 +194,14 @@ int parse_cookies_v1(modsec_rec *msr, char *_cookie_header,
             if (attr_value != NULL) {
                 if (msr->txcfg->debuglog_level >= 5) {
                     msr_log(msr, 5, "Adding request cookie: name \"%s\", value \"%s\"",
-                        log_escape(msr->mp, attr_name), log_escape(msr->mp, attr_value));
+                            log_escape(msr->mp, attr_name), log_escape(msr->mp, attr_value));
                 }
 
                 apr_table_add(cookies, attr_name, attr_value);
             } else {
                 if (msr->txcfg->debuglog_level >= 5) {
                     msr_log(msr, 5, "Adding request cookie: name \"%s\", value empty",
-                        log_escape(msr->mp, attr_name));
+                            log_escape(msr->mp, attr_name));
                 }
 
                 apr_table_add(cookies, attr_name, "");
@@ -227,8 +228,8 @@ int parse_cookies_v1(modsec_rec *msr, char *_cookie_header,
  *
  */
 int parse_arguments(modsec_rec *msr, const char *s, apr_size_t inputlength,
-    int argument_separator, const char *origin,
-    apr_table_t *arguments, int *invalid_count)
+        int argument_separator, const char *origin,
+        apr_table_t *arguments, int *invalid_count)
 {
     msc_arg *arg;
     apr_size_t i, j;
@@ -333,8 +334,8 @@ void add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg)
 {
     if (msr->txcfg->debuglog_level >= 5) {
         msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
-            arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
-            log_escape_ex(msr->mp, arg->value, arg->value_len));
+                arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
+                log_escape_ex(msr->mp, arg->value, arg->value_len));
     }
 
     apr_table_addn(arguments, log_escape_nq_ex(msr->mp, arg->name, arg->name_len), (void *)arg);
