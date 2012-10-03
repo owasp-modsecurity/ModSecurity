@@ -401,7 +401,7 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     for (i = 0; i < arr->nelts; i++) {
         if (strcasecmp(te[i].key, "Cookie") == 0) {
             if (msr->txcfg->cookie_format == COOKIES_V0) {
-                parse_cookies_v0(msr, te[i].val, msr->request_cookies);
+                parse_cookies_v0(msr, te[i].val, msr->request_cookies, msr->txcfg->cookiev0_separator);
             } else {
                 parse_cookies_v1(msr, te[i].val, msr->request_cookies);
             }
