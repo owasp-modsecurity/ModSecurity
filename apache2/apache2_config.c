@@ -64,7 +64,6 @@ void *create_directory_config(apr_pool_t *mp, char *path)
 
     dcfg->cookie_format = NOT_SET;
     dcfg->argument_separator = NOT_SET;
-    dcfg->cookiev0_separator = NOT_SET_P;
 
     dcfg->rule_inheritance = NOT_SET;
     dcfg->rule_exceptions = apr_array_make(mp, 16, sizeof(rule_exception *));
@@ -367,8 +366,6 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
         ? parent->cookie_format : child->cookie_format);
     merged->argument_separator = (child->argument_separator == NOT_SET
         ? parent->argument_separator : child->argument_separator);
-    merged->cookiev0_separator = (child->cookiev0_separator == NOT_SET_P
-        ? parent->cookiev0_separator : child->cookiev0_separator);
 
 
     /* rule inheritance */
@@ -630,7 +627,6 @@ void init_directory_config(directory_config *dcfg)
 
     if (dcfg->cookie_format == NOT_SET) dcfg->cookie_format = 0;
     if (dcfg->argument_separator == NOT_SET) dcfg->argument_separator = '&';
-    if (dcfg->cookiev0_separator == NOT_SET_P) dcfg->cookiev0_separator = ";";
 
     if (dcfg->rule_inheritance == NOT_SET) dcfg->rule_inheritance = 1;
 
@@ -1101,21 +1097,6 @@ static const char *cmd_argument_separator(cmd_parms *cmd, void *_dcfg,
 
     return NULL;
 }
-
-static const char *cmd_cookiev0_separator(cmd_parms *cmd, void *_dcfg,
-        const char *p1)
-{
-    directory_config *dcfg = (directory_config *)_dcfg;
-
-    if (strlen(p1) != 1) {
-        return apr_psprintf(cmd->pool, "ModSecurity: Invalid cookie v0 separator: %s", p1);
-    }
-
-    dcfg->cookiev0_separator = p1;
-
-    return NULL;
-}
-
 
 static const char *cmd_audit_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
@@ -2930,14 +2911,6 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "version of the Cookie specification to use for parsing. Possible values are 0 and 1."
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecCookieV0Separator",
-        cmd_cookiev0_separator,
-        NULL,
-        CMD_SCOPE_ANY,
-        "character that will be used as separator when parsing cookie v0 content."
     ),
 
     AP_INIT_TAKE1 (
