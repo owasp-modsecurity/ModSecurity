@@ -276,6 +276,7 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
 apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     const char *s = NULL;
     const apr_array_header_t *arr;
+    char *_cookies = NULL;
     apr_table_entry_t *te;
     int i;
 
@@ -401,7 +402,12 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     for (i = 0; i < arr->nelts; i++) {
         if (strcasecmp(te[i].key, "Cookie") == 0) {
             if (msr->txcfg->cookie_format == COOKIES_V0) {
-                parse_cookies_v0(msr, te[i].val, msr->request_cookies);
+                _cookies = apr_pstrdup(msr->mp, te[i].val);
+                while((*_cookies != 0)&&(*_cookies != ',')&&(*_cookies != ';')) _cookies++;
+                if(*_cookies == ',')
+                    parse_cookies_v0(msr, te[i].val, msr->request_cookies, ",");
+                else
+                    parse_cookies_v0(msr, te[i].val, msr->request_cookies, ";");
             } else {
                 parse_cookies_v1(msr, te[i].val, msr->request_cookies);
             }

@@ -17,7 +17,8 @@
 
 #include "modsecurity.h"
 
-int DSOLOCAL parse_cookies_v0(modsec_rec *msr, char *_cookie_header, apr_table_t *cookies);
+int DSOLOCAL parse_cookies_v0(modsec_rec *msr, char *_cookie_header, apr_table_t *cookies,
+    const char *delim);
 
 int DSOLOCAL parse_cookies_v1(modsec_rec *msr, char *_cookie_header, apr_table_t *cookies);
 

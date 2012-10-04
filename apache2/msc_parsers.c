@@ -19,7 +19,7 @@
  *
  */
 int parse_cookies_v0(modsec_rec *msr, char *_cookie_header,
-                     apr_table_t *cookies)
+                     apr_table_t *cookies, const char *delim)
 {
     char *attr_name = NULL, *attr_value = NULL;
     char *cookie_header;
@@ -35,7 +35,7 @@ int parse_cookies_v0(modsec_rec *msr, char *_cookie_header,
     cookie_header = strdup(_cookie_header);
     if (cookie_header == NULL) return -1;
 
-    p = apr_strtok(cookie_header, ";", &saveptr);
+    p = apr_strtok(cookie_header, delim, &saveptr);
 
     while(p != NULL) {
         attr_name = NULL;
@@ -74,7 +74,7 @@ int parse_cookies_v0(modsec_rec *msr, char *_cookie_header,
             cookie_count++;
         }
 
-        p = apr_strtok(NULL, ";", &saveptr);
+        p = apr_strtok(NULL, delim, &saveptr);
     }
 
     free(cookie_header);
