@@ -457,7 +457,7 @@ static modsec_rec *create_tx_context(request_rec *r) {
     }
 
     /* Populate tx fields */
-    msr->error_messages = apr_array_make(msr->mp, 5, sizeof(error_message *));
+    msr->error_messages = apr_array_make(msr->mp, 5, sizeof(error_message_t *));
     msr->alerts = apr_array_make(msr->mp, 5, sizeof(char *));
 
     msr->server_software = real_server_signature;
@@ -964,7 +964,7 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
 #endif
 {
     modsec_rec *msr = NULL;
-    error_message *em = NULL;
+    error_message_t *em = NULL;
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
     if (info == NULL) return;
@@ -1007,7 +1007,7 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
     if (msr == NULL) return;
 
     /* Store the error message for later */
-    em = (error_message *)apr_pcalloc(msr->mp, sizeof(error_message));
+    em = (error_message_t *)apr_pcalloc(msr->mp, sizeof(error_message_t));
     if (em == NULL) return;
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
@@ -1035,7 +1035,7 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
         }
     }
 
-    *(const error_message **)apr_array_push(msr->error_messages) = em;
+    *(const error_message_t **)apr_array_push(msr->error_messages) = em;
 }
 
 

@@ -26,7 +26,7 @@ typedef struct rule_exception rule_exception;
 typedef struct rule_exception encryption_method;
 typedef struct modsec_rec modsec_rec;
 typedef struct directory_config directory_config;
-typedef struct error_message error_message;
+typedef struct error_message_t error_message_t;
 typedef struct msc_engine msc_engine;
 typedef struct msc_data_chunk msc_data_chunk;
 typedef struct msc_arg msc_arg;
@@ -590,7 +590,7 @@ struct directory_config {
     int                 crypto_hash_framesrc_pm;
 };
 
-struct error_message {
+struct error_message_t {
     const char          *file;
     int                  line;
     int                  level;
