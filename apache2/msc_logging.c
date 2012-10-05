@@ -930,7 +930,7 @@ void sec_audit_logger(modsec_rec *msr) {
 
         /* Apache error messages */
         for(i = 0; i < msr->error_messages->nelts; i++) {
-            error_message *em = (((error_message**)msr->error_messages->elts)[i]);
+            error_message_t *em = (((error_message_t **)msr->error_messages->elts)[i]);
             text = apr_psprintf(msr->mp, "Apache-Error: %s\n",
                 format_error_log_message(msr->mp, em));
             sec_auditlog_write(msr, text, strlen(text));

@@ -670,7 +670,7 @@ static int var_webserver_error_log_generate(modsec_rec *msr, msre_var *var, msre
     int i, count = 0;
 
     for(i = 0; i < msr->error_messages->nelts; i++) {
-        error_message *em = (((error_message**)msr->error_messages->elts)[i]);
+        error_message_t *em = (((error_message_t **)msr->error_messages->elts)[i]);
         char *fem = NULL;
 
         fem = format_error_log_message(mptmp, em);

@@ -328,7 +328,7 @@ void msr_log_warn(modsec_rec *msr, const char *text, ...) {
 /**
  * Converts an Apache error log message into one line of text.
  */
-char *format_error_log_message(apr_pool_t *mp, error_message *em) {
+char *format_error_log_message(apr_pool_t *mp, error_message_t *em) {
     char *s_file = "", *s_line = "", *s_level = "";
     char *s_status = "", *s_message = "";
     char *msg = NULL;
