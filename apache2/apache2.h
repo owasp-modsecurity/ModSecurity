@@ -90,7 +90,7 @@ void DSOLOCAL msr_log_error(modsec_rec *msr, const char *text, ...) PRINTF_ATTRI
 
 void DSOLOCAL msr_log_warn(modsec_rec *msr, const char *text, ...) PRINTF_ATTRIBUTE(2,3);
 
-char DSOLOCAL *format_error_log_message(apr_pool_t *mp, error_message *em);
+char DSOLOCAL *format_error_log_message(apr_pool_t *mp, error_message_t *em);
 
 const DSOLOCAL char *get_response_protocol(request_rec *r);
 
