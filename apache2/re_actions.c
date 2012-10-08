@@ -586,6 +586,7 @@ static char *msre_action_pause_validate(msre_engine *engine, msre_action *action
 static apr_status_t msre_action_pause_init(msre_engine *engine, msre_actionset *actionset,
     msre_action *action)
 {
+    actionset->intercept_action = ACTION_PAUSE;
     actionset->intercept_pause = action->param;
     return 1;
 }

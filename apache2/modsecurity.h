@@ -176,6 +176,7 @@ extern DSOLOCAL int *unicode_map_table;
 #define ACTION_ALLOW                    5
 #define ACTION_ALLOW_REQUEST            6
 #define ACTION_ALLOW_PHASE              7
+#define ACTION_ALLOW_PHASE              8
 
 #define MODSEC_DISABLED                 0
 #define MODSEC_DETECTION_ONLY           1
