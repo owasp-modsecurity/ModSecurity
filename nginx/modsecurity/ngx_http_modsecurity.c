@@ -797,6 +797,41 @@ modsecurity_read_body_cb(request_rec *r, char *buf, unsigned int length,
     return APR_SUCCESS;
 }
 
+apr_sockaddr_t *CopySockAddr(apr_pool_t *pool, struct sockaddr *pAddr) {
+    apr_sockaddr_t *addr = (apr_sockaddr_t *)apr_palloc(pool, sizeof(apr_sockaddr_t));
+    int adrlen = 16, iplen = 4;
+
+    if(pAddr->sa_family == AF_INET6) {
+        adrlen = 46;
+        iplen = 16;
+    }
+
+    addr->addr_str_len = adrlen;
+    addr->family = pAddr->sa_family;
+
+    addr->hostname = "unknown";
+#ifdef WIN32
+    addr->ipaddr_len = sizeof(IN_ADDR);
+#else
+    addr->ipaddr_len = sizeof(struct in_addr);
+#endif
+    addr->ipaddr_ptr = &addr->sa.sin.sin_addr;
+    addr->pool = pool;
+    addr->port = 80;
+#ifdef WIN32
+    memcpy(&addr->sa.sin.sin_addr.S_un.S_addr, pAddr->sa_data, iplen);
+#else
+    memcpy(&addr->sa.sin.sin_addr.s_addr, pAddr->sa_data, iplen);
+#endif
+    addr->sa.sin.sin_family = pAddr->sa_family;
+    addr->sa.sin.sin_port = 80;
+    addr->salen = sizeof(addr->sa);
+    addr->servname = addr->hostname;
+
+    return addr;
+}
+
+
 /*
 ** [ENTRY POINT] does : this function called by nginx from the request handler
 */
@@ -846,6 +881,14 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     if (cf->enable) {
         if (r->connection->requests == 0 || ctx->connection == NULL) {
             ctx->connection = modsecNewConnection();
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
+            ctx->connection->remote_addr = CopySockAddr(ctx->connection->pool, r->connection->sockaddr);
+            ctx->connection->remote_ip = ConvertNgxStringToUTF8(r->connection->addr_text, ctx->connection->pool);
+#else
+            ctx->connection->client_addr = CopySockAddr(ctx->connection->pool, r->connection->sockaddr);
+            ctx->connection->client_ip = ConvertNgxStringToUTF8(r->connection->addr_text, ctx->connection->pool);
+#endif
+            ctx->connection->remote_host = NULL;
             modsecProcessConnection(ctx->connection);
         }
 
