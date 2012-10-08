@@ -1466,6 +1466,11 @@ static void register_hooks(apr_pool_t *mp) {
         NULL
     };
 
+    static const char *const fixups_beforeme_list[] = {
+        "mod_env.c",
+        NULL
+    };
+
     /* Add the MODSEC_2.x compatibility defines */
     *(char **)apr_array_push(ap_server_config_defines) = apr_pstrdup(mp, "MODSEC_2.5");
 
@@ -1501,7 +1506,7 @@ static void register_hooks(apr_pool_t *mp) {
     ap_hook_post_read_request(hook_request_early,
         postread_beforeme_list, postread_afterme_list, APR_HOOK_REALLY_FIRST);
 
-    ap_hook_fixups(hook_request_late, NULL, NULL, APR_HOOK_REALLY_FIRST);
+    ap_hook_fixups(hook_request_late, fixups_beforeme_list, NULL, APR_HOOK_REALLY_FIRST);
 
     /* Logging */
     ap_hook_error_log(hook_error_log, NULL, NULL, APR_HOOK_MIDDLE);
