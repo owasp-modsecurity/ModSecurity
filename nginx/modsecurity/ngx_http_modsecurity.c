@@ -38,7 +38,6 @@ typedef ngx_int_t (*ngx_http_request_body_data_handler_pt)
 
 typedef struct {
     ngx_uint_t                  enable;
-    char                        *config_path;
     directory_config            *config;
     ngx_str_t                   url;
     ngx_http_complex_value_t    *url_cv;
@@ -168,10 +167,11 @@ ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent,
         conf->config = prev->config;
     }
 
+/*
     if (conf->config_path == NULL) {
         conf->config_path = prev->config_path;
     }
-
+*/
     if ((conf->url.len == 0) && (conf->url_cv == NULL)) {
         conf->url = prev->url;
         conf->url_cv = prev->url_cv;
@@ -224,8 +224,9 @@ ngx_http_modsecurity_init_process(ngx_cycle_t *cycle)
     modsecSetLogHook(cycle->log, modsecLog);
 
     modsecInit();
-    modsecStartConfig();
-    modsecFinalizeConfig();
+    /* config was already parsed in master process */
+//    modsecStartConfig();
+//    modsecFinalizeConfig();
     modsecInitProcess();
 
     return NGX_OK;
@@ -624,7 +625,6 @@ ngx_http_modsecurity_pass_to_backend(ngx_http_request_t *r)
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                        "modSecurity: pass_to_backend");
-
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
     if (!cf) {
         return NGX_ERROR;
@@ -655,14 +655,15 @@ ngx_http_modsecurity_pass_to_backend(ngx_http_request_t *r)
     args = r->args; /* forward the query args */
     flags = 0;
 
-/*
-#if defined nginx_version && nginx_version >= 8011
-    r->main->count--;
-#endif
-*/
     /* XXX: this looks ugly, should we process PUT also? */
     if (r->method == NGX_HTTP_POST && r->request_body) {
         r->request_body->bufs = ctx->chain;
+        /* do we really need it ? :) */
+        r->read_event_handler = ngx_http_request_empty_handler;
+#if defined nginx_version && nginx_version >= 8011
+        r->main->count--;
+#endif
+
     }
 
     if (cf->url_cv) {
@@ -697,7 +698,6 @@ ngx_http_modsecurity_pass_to_backend(ngx_http_request_t *r)
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: using named location");
         rc = ngx_http_named_location(r, &uri);
     }
-
     return rc;
 }
 
@@ -797,6 +797,41 @@ modsecurity_read_body_cb(request_rec *r, char *buf, unsigned int length,
     return APR_SUCCESS;
 }
 
+apr_sockaddr_t *CopySockAddr(apr_pool_t *pool, struct sockaddr *pAddr) {
+    apr_sockaddr_t *addr = (apr_sockaddr_t *)apr_palloc(pool, sizeof(apr_sockaddr_t));
+    int adrlen = 16, iplen = 4;
+
+    if(pAddr->sa_family == AF_INET6) {
+        adrlen = 46;
+        iplen = 16;
+    }
+
+    addr->addr_str_len = adrlen;
+    addr->family = pAddr->sa_family;
+
+    addr->hostname = "unknown";
+#ifdef WIN32
+    addr->ipaddr_len = sizeof(IN_ADDR);
+#else
+    addr->ipaddr_len = sizeof(struct in_addr);
+#endif
+    addr->ipaddr_ptr = &addr->sa.sin.sin_addr;
+    addr->pool = pool;
+    addr->port = 80;
+#ifdef WIN32
+    memcpy(&addr->sa.sin.sin_addr.S_un.S_addr, pAddr->sa_data, iplen);
+#else
+    memcpy(&addr->sa.sin.sin_addr.s_addr, pAddr->sa_data, iplen);
+#endif
+    addr->sa.sin.sin_family = pAddr->sa_family;
+    addr->sa.sin.sin_port = 80;
+    addr->salen = sizeof(addr->sa);
+    addr->servname = addr->hostname;
+
+    return addr;
+}
+
+
 /*
 ** [ENTRY POINT] does : this function called by nginx from the request handler
 */
@@ -809,7 +844,6 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     ngx_table_elt_t *h;
     ngx_uint_t  i;
     ngx_int_t rc;
-    const char *msg;
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: handler");
 
@@ -845,21 +879,20 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
 
     /* do all modsecurity related work only if handler is enabled */
     if (cf->enable) {
-        if (cf->config == NULL) {
-            cf->config = modsecGetDefaultConfig();
-
-            msg = modsecProcessConfig(cf->config, cf->config_path);
-            if (msg != NULL) {
-                ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "modSecurity: modsecProcessConfig() %s", msg);
-                return NGX_ERROR;
-            }
-        }
-
         if (r->connection->requests == 0 || ctx->connection == NULL) {
             ctx->connection = modsecNewConnection();
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
+            ctx->connection->remote_addr = CopySockAddr(ctx->connection->pool, r->connection->sockaddr);
+            ctx->connection->remote_ip = ConvertNgxStringToUTF8(r->connection->addr_text, ctx->connection->pool);
+#else
+            ctx->connection->client_addr = CopySockAddr(ctx->connection->pool, r->connection->sockaddr);
+            ctx->connection->client_ip = ConvertNgxStringToUTF8(r->connection->addr_text, ctx->connection->pool);
+#endif
+            ctx->connection->remote_host = NULL;
             modsecProcessConnection(ctx->connection);
         }
 
+        /* cf->config was set in master process??? */
         ctx->req = modsecNewRequest(ctx->connection, cf->config);
         ctx->req->request_time = apr_time_now();
         ctx->req->method = ConvertNgxStringToUTF8(r->method_name, ctx->req->pool);
@@ -905,32 +938,33 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         apr_table_setn(ctx->req->notes, NOTE_NGINX_REQUEST_CTX, (const char *) ctx);
     }
 
+//    r->keepalive = 0;
     if (r->method == NGX_HTTP_POST) {
         /* Processing POST request body, should we process PUT? */
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: method POST");
         if (cf->enable)
             modsecSetReadBody(modsecurity_read_body_cb);
         rc = ngx_http_read_upload_client_request_body(r);
-        if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
-            return rc;
-        }
     } else {
         /* processing all the other methods */
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: method is not POST");
-        rc = ngx_http_modsecurity_pass_to_backend(r);
+/*        rc = ngx_http_read_client_request_body(r, ngx_http_upstream_init);
         if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
             return rc;
-        }
+        }*/
+        rc = ngx_http_modsecurity_pass_to_backend(r);
     }
 
-    return NGX_DONE;
+    return rc;
 }
 
 static char *
 ngx_http_modsecurity_set_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
-    ngx_http_modsecurity_loc_conf_t *ucf = conf;
-    ngx_str_t  *value;
+    ngx_http_modsecurity_loc_conf_t *mscf = conf;
+    ngx_str_t       *value;
+    char            *config_path;
+    const char      *msg;
 
     value = cf->args->elts;
 
@@ -947,13 +981,33 @@ ngx_http_modsecurity_set_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     ** XXX: we need to check if file exists here
     ** b/c modsecurity standalone will segfault with non-existent file
     */
-    ucf->config_path = (char *) ngx_pcalloc(cf->pool, value[1].len + 1);
-    if (ucf->config_path == NULL) {
+    config_path = (char *) ngx_pcalloc(cf->pool, value[1].len + 1);
+    if (config_path == NULL) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
                               "ModSecurity: config path memory allocation error");
         return NGX_CONF_ERROR;
     }
-    ngx_memcpy(ucf->config_path, value[1].data, value[1].len);
+    ngx_memcpy(config_path, value[1].data, value[1].len);
+
+    pcre_malloc = modsec_pcre_malloc;
+    pcre_free = modsec_pcre_free;
+
+    cf->log->log_level = NGX_LOG_INFO;
+
+    modsecSetLogHook(cf->log, modsecLog);
+
+    modsecInit();
+    modsecStartConfig();
+
+    mscf->config = modsecGetDefaultConfig();
+
+    msg = modsecProcessConfig(mscf->config, config_path);
+    if (msg != NULL) {
+        ngx_conf_log_error(NGX_LOG_INFO, cf, 0, "modSecurity: modsecProcessConfig() %s", msg);
+        return NGX_CONF_ERROR;
+    }
+
+//      modsecFinalizeConfig();
 
     return NGX_CONF_OK;
 }
