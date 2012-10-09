@@ -1,3 +1,18 @@
+15 Oct 2012 - 2.7.0
+-------------------
+
+  * Fixed Pause action should work as a disruptive action (MODSEC-297).
+
+  * Fixed Problem loading mod_env variables in phase 2 (MODSEC-226).
+
+  * Fixed Detect cookie v0 separator and use it for parsing (MODSEC-261).
+
+  * Fixed Variable REMOTE_ADDR with wrong IP address in NGINX version (MODSEC-337).
+
+  * Fixed Errors compiling NGINX version.
+
+  * Updated Reference Manual.
+
 25 Sep 2012 - 2.6.8
 -------------------
 
