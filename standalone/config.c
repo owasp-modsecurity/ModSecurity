@@ -37,7 +37,7 @@
 #include "apr_lib.h"
 #include "ap_config.h"
 #include "http_config.h"
-
+#include "apr_fnmatch.h"
 
 AP_DECLARE(int) ap_cfg_closefile(ap_configfile_t *cfp)
 {
@@ -702,6 +702,281 @@ static cmd_parms default_parms =
 {NULL, 0, 0, NULL, -1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 #endif
 
+typedef struct {
+    const char *fname;
+} fnames;
+
+AP_DECLARE(int) ap_is_directory(apr_pool_t *p, const char *path)
+{
+    apr_finfo_t finfo;
+
+    if (apr_stat(&finfo, path, APR_FINFO_TYPE, p) != APR_SUCCESS)
+        return 0;                /* in error condition, just return no */
+
+    return (finfo.filetype == APR_DIR);
+}
+
+AP_DECLARE(char *) ap_make_full_path(apr_pool_t *a, const char *src1,
+                                  const char *src2)
+{
+    apr_size_t len1, len2;
+    char *path;
+
+    len1 = strlen(src1);
+    len2 = strlen(src2);
+     /* allocate +3 for '/' delimiter, trailing NULL and overallocate
+      * one extra byte to allow the caller to add a trailing '/'
+      */
+    path = (char *)apr_palloc(a, len1 + len2 + 3);
+    if (len1 == 0) {
+        *path = '/';
+        memcpy(path + 1, src2, len2 + 1);
+    }
+    else {
+        char *next;
+        memcpy(path, src1, len1);
+        next = path + len1;
+        if (next[-1] != '/') {
+            *next++ = '/';
+        }
+        memcpy(next, src2, len2 + 1);
+    }
+    return path;
+}
+
+static int fname_alphasort(const void *fn1, const void *fn2)
+{
+    const fnames *f1 = fn1;
+    const fnames *f2 = fn2;
+
+    return strcmp(f1->fname,f2->fname);
+}
+
+AP_DECLARE(const char *) ap_process_resource_config(const char *fname,
+                                                    apr_array_header_t *ari,
+                                                    apr_pool_t *ptemp)
+{
+	*(char **)apr_array_push(ari) = (char *)fname;
+
+    return NULL;
+}
+
+static const char *process_resource_config_nofnmatch(const char *fname,
+                                                     apr_array_header_t *ari,
+                                                     apr_pool_t *p,
+                                                     apr_pool_t *ptemp,
+													 unsigned depth,
+                                                     int optional)
+{
+    const char *error;
+    apr_status_t rv;
+
+    if (ap_is_directory(ptemp, fname)) {
+        apr_dir_t *dirp;
+        apr_finfo_t dirent;
+        int current;
+        apr_array_header_t *candidates = NULL;
+        fnames *fnew;
+        char *path = apr_pstrdup(ptemp, fname);
+
+        if (++depth > 100) {
+            return apr_psprintf(p, "Directory %s exceeds the maximum include "
+                                "directory nesting level of %u. You have "
+                                "probably a recursion somewhere.", path,
+                                100);
+        }
+
+        /*
+         * first course of business is to grok all the directory
+         * entries here and store 'em away. Recall we need full pathnames
+         * for this.
+         */
+        rv = apr_dir_open(&dirp, path, ptemp);
+        if (rv != APR_SUCCESS) {
+            char errmsg[120];
+            return apr_psprintf(p, "Could not open config directory %s: %s",
+                                path, apr_strerror(rv, errmsg, sizeof errmsg));
+        }
+
+        candidates = apr_array_make(ptemp, 1, sizeof(fnames));
+        while (apr_dir_read(&dirent, APR_FINFO_DIRENT, dirp) == APR_SUCCESS) {
+            /* strip out '.' and '..' */
+            if (strcmp(dirent.name, ".")
+                && strcmp(dirent.name, "..")) {
+                fnew = (fnames *) apr_array_push(candidates);
+                fnew->fname = ap_make_full_path(ptemp, path, dirent.name);
+            }
+        }
+
+        apr_dir_close(dirp);
+        if (candidates->nelts != 0) {
+            qsort((void *) candidates->elts, candidates->nelts,
+                  sizeof(fnames), fname_alphasort);
+
+            /*
+             * Now recurse these... we handle errors and subdirectories
+             * via the recursion, which is nice
+             */
+            for (current = 0; current < candidates->nelts; ++current) {
+                fnew = &((fnames *) candidates->elts)[current];
+                error = process_resource_config_nofnmatch(fnew->fname,
+                                                          ari, p, ptemp,
+                                                          depth, optional);
+                if (error) {
+                    return error;
+                }
+            }
+        }
+
+        return NULL;
+    }
+
+    return ap_process_resource_config(fname, ari, ptemp);
+}
+
+static const char *process_resource_config_fnmatch(const char *path,
+                                                   const char *fname,
+                                                   apr_array_header_t *ari,
+                                                   apr_pool_t *p,
+                                                   apr_pool_t *ptemp,
+                                                   unsigned depth,
+                                                   int optional)
+{
+    const char *rest;
+    apr_status_t rv;
+    apr_dir_t *dirp;
+    apr_finfo_t dirent;
+    apr_array_header_t *candidates = NULL;
+    fnames *fnew;
+    int current;
+
+    /* find the first part of the filename */
+    rest = ap_strchr_c(fname, '/');
+    if (rest) {
+        fname = apr_pstrndup(ptemp, fname, rest - fname);
+        rest++;
+    }
+
+    /* optimisation - if the filename isn't a wildcard, process it directly */
+    if (!apr_fnmatch_test(fname)) {
+        path = ap_make_full_path(ptemp, path, fname);
+        if (!rest) {
+            return process_resource_config_nofnmatch(path,
+                                                     ari, p,
+                                                     ptemp, 0, optional);
+        }
+        else {
+            return process_resource_config_fnmatch(path, rest,
+                                                   ari, p,
+                                                   ptemp, 0, optional);
+        }
+    }
+
+    /*
+     * first course of business is to grok all the directory
+     * entries here and store 'em away. Recall we need full pathnames
+     * for this.
+     */
+    rv = apr_dir_open(&dirp, path, ptemp);
+    if (rv != APR_SUCCESS) {
+        char errmsg[120];
+        return apr_psprintf(p, "Could not open config directory %s: %s",
+                            path, apr_strerror(rv, errmsg, sizeof errmsg));
+    }
+
+    candidates = apr_array_make(ptemp, 1, sizeof(fnames));
+    while (apr_dir_read(&dirent, APR_FINFO_DIRENT | APR_FINFO_TYPE, dirp) == APR_SUCCESS) {
+        /* strip out '.' and '..' */
+        if (strcmp(dirent.name, ".")
+            && strcmp(dirent.name, "..")
+            && (apr_fnmatch(fname, dirent.name,
+                            APR_FNM_PERIOD) == APR_SUCCESS)) {
+            const char *full_path = ap_make_full_path(ptemp, path, dirent.name);
+            /* If matching internal to path, and we happen to match something
+             * other than a directory, skip it
+             */
+            if (rest && (rv == APR_SUCCESS) && (dirent.filetype != APR_DIR)) {
+                continue;
+            }
+            fnew = (fnames *) apr_array_push(candidates);
+            fnew->fname = full_path;
+        }
+    }
+
+    apr_dir_close(dirp);
+    if (candidates->nelts != 0) {
+        const char *error;
+
+        qsort((void *) candidates->elts, candidates->nelts,
+              sizeof(fnames), fname_alphasort);
+
+        /*
+         * Now recurse these... we handle errors and subdirectories
+         * via the recursion, which is nice
+         */
+        for (current = 0; current < candidates->nelts; ++current) {
+            fnew = &((fnames *) candidates->elts)[current];
+            if (!rest) {
+                error = process_resource_config_nofnmatch(fnew->fname,
+                                                          ari, p,
+                                                          ptemp, 0, optional);
+            }
+            else {
+                error = process_resource_config_fnmatch(fnew->fname, rest,
+                                                        ari, p,
+                                                        ptemp, 0, optional);
+            }
+            if (error) {
+                return error;
+            }
+        }
+    }
+    else {
+
+        if (!optional) {
+            return apr_psprintf(p, "No matches for the wildcard '%s' in '%s', failing "
+                                   "(use IncludeOptional if required)", fname, path);
+        }
+    }
+
+    return NULL;
+}
+
+AP_DECLARE(const char *) ap_process_fnmatch_configs(apr_array_header_t *ari,
+                                                    const char *fname,
+                                                    apr_pool_t *p,
+                                                    apr_pool_t *ptemp,
+                                                    int optional)
+{
+    if (!apr_fnmatch_test(fname)) {
+        return ap_process_resource_config(fname, ari, p);
+    }
+    else {
+        apr_status_t status;
+        const char *rootpath, *filepath = fname;
+
+        /* locate the start of the directories proper */
+        status = apr_filepath_root(&rootpath, &filepath, APR_FILEPATH_TRUENAME, ptemp);
+
+        /* we allow APR_SUCCESS and APR_EINCOMPLETE */
+        if (APR_ERELATIVE == status) {
+            return apr_pstrcat(p, "Include must have an absolute path, ", fname, NULL);
+        }
+        else if (APR_EBADPATH == status) {
+            return apr_pstrcat(p, "Include has a bad path, ", fname, NULL);
+        }
+
+        /* walk the filepath */
+        return process_resource_config_fnmatch(rootpath, filepath, ari, p, ptemp,
+                                               0, optional);
+    }
+}
+
+const char *populate_include_files(apr_pool_t *p, apr_pool_t *ptemp, apr_array_header_t *ari, const char *fname, int optional)
+{
+	return ap_process_fnmatch_configs(ari, fname, p, ptemp, optional);
+}
+
 const char *process_command_config(server_rec *s,
                                           void *mconfig,
                                           apr_pool_t *p,
@@ -709,74 +984,153 @@ const char *process_command_config(server_rec *s,
 										  const char *filename)
 {
     const char *errmsg;
-    cmd_parms parms;
     char *l = apr_palloc (ptemp, MAX_STRING_LEN);
     const char *args = l;
-    char *cmd_name;
+    char *cmd_name, *w;
 	const command_rec *cmd;
-    apr_array_header_t *arr = apr_array_make(p, 1, sizeof(char *));
+	apr_array_header_t *arr = apr_array_make(p, 1, sizeof(cmd_parms));
+	apr_array_header_t *ari = apr_array_make(p, 1, sizeof(char *));
+    cmd_parms *parms;
 	apr_status_t status;
 	ap_directive_t *newdir;
+	int optional;
 
-    parms = default_parms;
-    parms.pool = p;
-    parms.temp_pool = ptemp;
-    parms.server = s;
-    parms.override = (RSRC_CONF | OR_ALL) & ~(OR_AUTHCFG | OR_LIMIT);
-    parms.override_opts = OPT_ALL | OPT_SYM_OWNER | OPT_MULTI;
+	//*(char **)apr_array_push(ari) = (char *)filename;
+	errmsg = populate_include_files(p, ptemp, ari, filename, 0);
 
-    status = ap_pcfg_openfile(&parms.config_file, p, filename);
+	if(errmsg != NULL)
+		goto Exit;
 
-	if(status != APR_SUCCESS)
+	while(ari->nelts != 0 || arr->nelts != 0)
 	{
-		// cannot open config file
-		//
-	}
-
-	while (!(ap_cfg_getline(l, MAX_STRING_LEN, parms.config_file))) {
-		if (*l == '#' || *l == '\0')
-			continue;
-
-		args = l;
-
-		cmd_name = ap_getword_conf(p, &args);
-		if (*cmd_name == '\0')
-			continue;
-
-		cmd = ap_find_command(cmd_name, security2_module.cmds);
-
-		if(cmd == NULL)
+		if(ari->nelts > 0)
 		{
-			// unknown command, should error
-			//
-			printf("Unknown command: %s\n", cmd_name);
-			continue;
+			char *fn = *(char **)apr_array_pop(ari);
+
+			parms = (cmd_parms *)apr_array_push(arr);
+			*parms = default_parms;
+			parms->pool = p;
+			parms->temp_pool = ptemp;
+			parms->server = s;
+			parms->override = (RSRC_CONF | OR_ALL) & ~(OR_AUTHCFG | OR_LIMIT);
+			parms->override_opts = OPT_ALL | OPT_SYM_OWNER | OPT_MULTI;
+
+			status = ap_pcfg_openfile(&parms->config_file, p, fn);
+
+			if(status != APR_SUCCESS)
+			{
+				apr_array_pop(arr);
+				errmsg = apr_pstrcat(p, "Cannot open config file: ", fn, NULL);
+				goto Exit;
+			}
 		}
 
-		newdir = apr_pcalloc(p, sizeof(ap_directive_t));
-		newdir->filename = parms.config_file->name;
-		newdir->line_num = parms.config_file->line_number;
-		newdir->directive = cmd_name;
-		newdir->args = apr_pstrdup(p, args);
+		if (arr->nelts > 1024) {
+            errmsg = "Exceeded the maximum include directory nesting level. You have "
+                                "probably a recursion somewhere.";
+			goto Exit;
+        }
 
-		parms.directive = newdir;
+		parms = (cmd_parms *)apr_array_pop(arr);
 
-		errmsg = invoke_cmd(cmd, &parms, mconfig, args);
+		if(parms == NULL)
+			break;
+
+		while (!(ap_cfg_getline(l, MAX_STRING_LEN, parms->config_file))) {
+			if (*l == '#' || *l == '\0')
+				continue;
+
+			args = l;
+
+			cmd_name = ap_getword_conf(p, &args);
+
+			if (*cmd_name == '\0')
+				continue;
+
+			if (!strcasecmp(cmd_name, "IncludeOptional"))
+			{
+				optional = 1;
+				goto ProcessInclude;
+			}
+
+			if (!strcasecmp(cmd_name, "Include"))
+			{
+				optional = 0;
+ProcessInclude:
+				w = ap_getword_conf(parms->pool, &args);
+
+				if (*w == '\0' || *args != 0)
+				{
+					ap_cfg_closefile(parms->config_file);
+					errmsg = apr_pstrcat(parms->pool, "Include takes one argument", NULL);
+					goto Exit;
+				}
+
+				errmsg = populate_include_files(p, ptemp, ari, w, optional);
+
+				*(cmd_parms *)apr_array_push(arr) = *parms;
+
+				if(errmsg != NULL)
+					goto Exit;
+
+				// we don't want to close the current file yet
+				//
+				parms = NULL;
+				break;
+			}
+
+			cmd = ap_find_command(cmd_name, security2_module.cmds);
+
+			if(cmd == NULL)
+			{
+				// unknown command, should error
+				//
+				ap_cfg_closefile(parms->config_file);
+				errmsg = apr_pstrcat(p, "Unknown command in config: ", cmd_name, NULL);
+				goto Exit;
+			}
+
+			newdir = apr_pcalloc(p, sizeof(ap_directive_t));
+			newdir->filename = parms->config_file->name;
+			newdir->line_num = parms->config_file->line_number;
+			newdir->directive = cmd_name;
+			newdir->args = apr_pstrdup(p, args);
+
+			parms->directive = newdir;
+
+			errmsg = invoke_cmd(cmd, parms, mconfig, args);
+
+			if(errmsg != NULL)
+				break;
+		}
+
+		if(parms != NULL)
+			ap_cfg_closefile(parms->config_file);
 
 		if(errmsg != NULL)
 			break;
 	}
 
-    ap_cfg_closefile(parms.config_file);
+	while((parms = (cmd_parms *)apr_array_pop(arr)) != NULL)
+	{
+		ap_cfg_closefile(parms->config_file);
+	}
 
     if (errmsg) {
 		char *err = (char *)apr_palloc(p, 1024);
 
-		apr_snprintf(err, 1024, "Syntax error in config file %s, line %d: %s", parms.config_file->name,
-						parms.config_file->line_number, errmsg);
+		apr_snprintf(err, 1024, "Syntax error in config file %s, line %d: %s", parms->config_file->name,
+						parms->config_file->line_number, errmsg);
 
 		return err;
     }
 
     return NULL;
+Exit:
+	while((parms = (cmd_parms *)apr_array_pop(arr)) != NULL)
+	{
+		ap_cfg_closefile(parms->config_file);
+	}
+
+	return errmsg;
 }

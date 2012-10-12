@@ -16,6 +16,10 @@ namespace configure
             {
                 installDir = installDir.Substring(0, installDir.Length - 1);
             }
+            if (installDir.StartsWith("\""))
+            {
+                installDir = installDir.Substring(1);
+            }
 
             Console.WriteLine("Copying 32-bit binaries...");
             string dstpath = Environment.ExpandEnvironmentVariables("%windir%\\SysWow64");
