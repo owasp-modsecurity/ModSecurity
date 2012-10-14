@@ -22,8 +22,9 @@
 class CMyHttpModule : public CHttpModule
 {
 public:
-    HANDLE  m_hEventLog;
-    DWORD   m_dwPageSize;
+    HANDLE				m_hEventLog;
+    DWORD				m_dwPageSize;
+	CRITICAL_SECTION	m_csLock;
 
     REQUEST_NOTIFICATION_STATUS
     OnBeginRequest(

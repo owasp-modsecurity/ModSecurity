@@ -76,8 +76,8 @@ class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 	IHttpContext		*m_pHttpContext;
 	IHttpEventProvider	*m_pProvider;
 	char				*m_pResponseBuffer;
-	unsigned int		m_pResponseLength;
-	unsigned int		m_pResponsePosition;
+	ULONGLONG			m_pResponseLength;
+	ULONGLONG			m_pResponsePosition;
 };
 
 //----------------------------------------------------------------------------
@@ -269,7 +269,7 @@ HRESULT CMyHttpModule::ReadFileChunk(HTTP_DATA_CHUNK *chunk, char *buf)
 {
     OVERLAPPED ovl;
     DWORD dwDataStartOffset;
-    DWORD bytesTotal = 0;
+    ULONGLONG bytesTotal = 0;
 	BYTE *	pIoBuffer = NULL;
 	HANDLE	hIoEvent = INVALID_HANDLE_VALUE;
 	HRESULT hr = S_OK;
@@ -332,6 +332,7 @@ HRESULT CMyHttpModule::ReadFileChunk(HTTP_DATA_CHUNK *chunk, char *buf)
 						 TRUE))
 				{
 					dwErr = GetLastError();
+
 					switch(dwErr)
 					{
 					case ERROR_HANDLE_EOF:
@@ -343,7 +344,6 @@ HRESULT CMyHttpModule::ReadFileChunk(HTTP_DATA_CHUNK *chunk, char *buf)
 						goto Done;
 					}
 				}
-
 				break;
 
 			case ERROR_HANDLE_EOF:
@@ -396,7 +396,9 @@ CMyHttpModule::OnSendResponse(
 
 	rsc = (REQUEST_STORED_CONTEXT *)pHttpContext->GetModuleContextContainer()->GetModuleContext(g_pModuleContext);
 
-	if(rsc == NULL || rsc->m_pRequestRec == NULL || rsc->m_pResponseBuffer != NULL)
+	EnterCriticalSection(&m_csLock);
+
+	if(rsc == NULL || rsc->m_pRequestRec == NULL || rsc->m_pResponseBuffer != NULL || !modsecIsResponseBodyAccessEnabled(rsc->m_pRequestRec))
 	{
 		goto Exit;
 	}
@@ -408,8 +410,8 @@ CMyHttpModule::OnSendResponse(
     HTTP_DATA_CHUNK *pSourceDataChunk = NULL;
     LARGE_INTEGER  lFileSize;
     REQUEST_NOTIFICATION_STATUS ret = RQ_NOTIFICATION_CONTINUE;
-	ULONG ulTotalLength = 0;
-	DWORD c, bytesRead;
+	ULONGLONG ulTotalLength = 0;
+	DWORD c;
 	request_rec *r = rsc->m_pRequestRec;
 
 	pHttpResponse = pHttpContext->GetResponse();
@@ -430,7 +432,6 @@ CMyHttpModule::OnSendResponse(
 
 	// assume HTML if content type not set
 	// without this output filter would not buffer response and processing would hang
-	// this needs further investigation (it did not repro on debug build)
 	//
 	if(ctz[0] == 0)
 		ctz = "text/html";
@@ -494,6 +495,9 @@ CMyHttpModule::OnSendResponse(
 
 		*(const char **)apr_array_push(r->content_languages) = lng;
 	}
+
+	// here we must check if response body processing is enabled
+	//
 
 	// Disable kernel caching for this response
 	// Probably we don't have to do it for ModSecurity
@@ -575,6 +579,7 @@ CMyHttpModule::OnSendResponse(
 			        DWORD dwErr = GetLastError();
 
 					hr = HRESULT_FROM_WIN32(dwErr);
+	                goto Finished;
 				}
 
                 ulTotalLength += pFileByteRange->Length.QuadPart;
@@ -639,6 +644,8 @@ Finished:
 		pHttpContext->SetRequestHandled();
 
 		rsc->FinishRequest();
+
+		LeaveCriticalSection(&m_csLock);
 		
 		return RQ_NOTIFICATION_FINISH_REQUEST;
 	}
@@ -648,6 +655,8 @@ Exit:
 	if(rsc != NULL)
 		rsc->FinishRequest();
 
+	LeaveCriticalSection(&m_csLock);
+		
 	return RQ_NOTIFICATION_CONTINUE;
 }
 
@@ -665,7 +674,11 @@ CMyHttpModule::OnPostEndRequest(
 	//
 	if(rsc != NULL && rsc->m_pResponseBuffer != NULL)
 	{
+		EnterCriticalSection(&m_csLock);
+
 		rsc->FinishRequest();
+
+		LeaveCriticalSection(&m_csLock);
 	}
 
 	return RQ_NOTIFICATION_CONTINUE;
@@ -682,6 +695,8 @@ CMyHttpModule::OnBeginRequest(
 	MODSECURITY_STORED_CONTEXT*		pConfig = NULL;
     
     UNREFERENCED_PARAMETER ( pProvider );
+
+	EnterCriticalSection(&m_csLock);
 
     if ( pHttpContext == NULL ) 
     {
@@ -1012,10 +1027,12 @@ CMyHttpModule::OnBeginRequest(
 		pHttpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
 		pHttpContext->SetRequestHandled();
 
-        return RQ_NOTIFICATION_FINISH_REQUEST;
+		hr = E_FAIL;
+		goto Finished;
 	}
 
 Finished:
+	LeaveCriticalSection(&m_csLock);
 
     if ( FAILED( hr )  )
     {
@@ -1201,6 +1218,8 @@ CMyHttpModule::CMyHttpModule()
     GetSystemInfo(&sysInfo);
     m_dwPageSize = sysInfo.dwPageSize;
 
+	InitializeCriticalSection(&m_csLock);
+
 	modsecSetLogHook(this, Log);
 
 	modsecSetReadBody(ReadBodyCallback);
@@ -1238,6 +1257,8 @@ CMyHttpModule::~CMyHttpModule()
         // Close the handle to the Event Viewer.
         DeregisterEventSource( m_hEventLog );
         m_hEventLog = NULL;
+
+		DeleteCriticalSection(&m_csLock);
     }
 }
 

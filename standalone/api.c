@@ -422,6 +422,16 @@ int modsecProcessRequest(request_rec *r)    {
     return status;
 }
 
+int modsecIsResponseBodyAccessEnabled(request_rec *r)
+{
+	modsec_rec *msr = retrieve_msr(r);
+
+	if(msr == NULL || msr->txcfg == NULL)
+		return 0;
+
+	return msr->txcfg->resbody_access;
+}
+
 int modsecProcessResponse(request_rec *r)   {
     int status = DECLINED;
 

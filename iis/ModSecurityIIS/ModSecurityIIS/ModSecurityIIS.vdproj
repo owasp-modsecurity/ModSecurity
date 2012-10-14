@@ -45,6 +45,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3CE93C3FC5AC3E954253889334FBCDA8"
+        "OwnerKey" = "8:_CB8446F7ADCD4E3DA3F2C6246FA844A0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_51AF671FCA3544DEA3E5756B5D450275"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -141,6 +147,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_CB8446F7ADCD4E3DA3F2C6246FA844A0"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_CEB23D021A2E4EEF9245EEDC143AFBA8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -185,6 +197,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_764D5BE911464BEFBCC3BC3B25068987"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_CB8446F7ADCD4E3DA3F2C6246FA844A0"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -466,6 +484,26 @@
             "Register" = "3:1"
             "Exclude" = "11:TRUE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3CE93C3FC5AC3E954253889334FBCDA8"
+            {
+            "SourcePath" = "8:nativerd.dll"
+            "TargetName" = "8:nativerd.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_565C3432A64049EAA7CA6E8C007B2188"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_51AF671FCA3544DEA3E5756B5D450275"
@@ -768,6 +806,37 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_CB8446F7ADCD4E3DA3F2C6246FA844A0"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Interop.AppHostAdminLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86"
+                "ScatterAssemblies"
+                {
+                    "_CB8446F7ADCD4E3DA3F2C6246FA844A0"
+                    {
+                    "Name" = "8:Interop.AppHostAdminLibrary.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:installer project\\bin\\Release\\Interop.AppHostAdminLibrary.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_565C3432A64049EAA7CA6E8C007B2188"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CEB23D021A2E4EEF9245EEDC143AFBA8"
             {
             "SourcePath" = "8:amd64\\ModSecurityIIS.dll"
@@ -987,7 +1056,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ModSecurity IIS"
         "ProductCode" = "8:{81EE8A4A-5128-4CDB-97B2-06B147E8B4B8}"
-        "PackageCode" = "8:{0E266CA7-97F3-4DCE-AC7B-5ECCAE18A108}"
+        "PackageCode" = "8:{B5E59B35-BF44-4075-B9F5-C251002DF58E}"
         "UpgradeCode" = "8:{7B32CF94-443C-47BB-91C3-0E9D3D12DF8B}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

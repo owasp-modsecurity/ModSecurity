@@ -71,6 +71,8 @@ void modsecSetReadResponse(apr_status_t (*func)(request_rec *r, char *buf, unsig
 void modsecSetWriteBody(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length));
 void modsecSetWriteResponse(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length));
 
+int modsecIsResponseBodyAccessEnabled(request_rec *r);
+
 #ifdef __cplusplus
 }
 #endif
