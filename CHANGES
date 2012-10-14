@@ -11,6 +11,12 @@
 
   * Fixed Errors compiling NGINX version.
 
+  * Added Include directive into standalone module. IIS and NGINX module should
+    support Include directive like Apache2.
+
+  * Added MULTIPART_INVALID_PART flag. Also used in rule id 200002 for multipart strict
+    validation.
+
   * Updated Reference Manual.
 
 25 Sep 2012 - 2.6.8
