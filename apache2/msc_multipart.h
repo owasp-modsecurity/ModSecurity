@@ -117,6 +117,7 @@ struct multipart_data {
     int                      flag_boundary_whitespace;
     int                      flag_missing_semicolon;
     int                      flag_invalid_quoting;
+    int                      flag_invalid_part;
     int                      flag_invalid_header_folding;
     int                      flag_file_limit_exceeded;
 };
