@@ -654,6 +654,7 @@ static int multipart_process_boundary(modsec_rec *msr, int last_part, char **err
             }
         }
         else {
+            msr->mpd->flag_invalid_part = 1;
             msr_log(msr, 3, "Multipart: Skipping invalid part %pp (part name missing): "
                 "(offset %u, length %u)", msr->mpd->mpp,
                 msr->mpd->mpp->offset, msr->mpd->mpp->length);
@@ -945,7 +946,7 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
 
         if (msr->mpd->flag_header_folding) {
             msr_log(msr, 4, "Multipart: Warning: header folding used.");
-        }        
+        }
 
         if (msr->mpd->flag_crlf_line && msr->mpd->flag_lf_line) {
             msr_log(msr, 4, "Multipart: Warning: mixed line endings used (CRLF/LF).");
@@ -962,9 +963,13 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
             msr_log(msr, 4, "Multipart: Warning: invalid quoting used.");
         }
 
+        if (msr->mpd->flag_invalid_part) {
+            msr_log(msr, 4, "Multipart: Warning: invalid part parsing.");
+        }
+
         if (msr->mpd->flag_invalid_header_folding) {
             msr_log(msr, 4, "Multipart: Warning: invalid header folding used.");
-        }        
+        }
     }
 
     if ((msr->mpd->seen_data != 0) && (msr->mpd->is_complete == 0)) {
