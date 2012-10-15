@@ -510,9 +510,6 @@ AP_DECLARE(apr_status_t) ap_pcfg_openfile(ap_configfile_t **ret_cfg,
     return APR_SUCCESS;
 }
 
-
-
-
 AP_CORE_DECLARE(const command_rec *) ap_find_command(const char *name,
                                                      const command_rec *cmds)
 {
@@ -752,7 +749,7 @@ static int fname_alphasort(const void *fn1, const void *fn2)
     return strcmp(f1->fname,f2->fname);
 }
 
-AP_DECLARE(const char *) ap_process_resource_config(const char *fname,
+AP_DECLARE(const char *) process_resource_config(const char *fname,
                                                     apr_array_header_t *ari,
                                                     apr_pool_t *ptemp)
 {
@@ -831,7 +828,7 @@ static const char *process_resource_config_nofnmatch(const char *fname,
         return NULL;
     }
 
-    return ap_process_resource_config(fname, ari, ptemp);
+    return process_resource_config(fname, ari, ptemp);
 }
 
 static const char *process_resource_config_fnmatch(const char *path,
@@ -942,14 +939,14 @@ static const char *process_resource_config_fnmatch(const char *path,
     return NULL;
 }
 
-AP_DECLARE(const char *) ap_process_fnmatch_configs(apr_array_header_t *ari,
+AP_DECLARE(const char *) process_fnmatch_configs(apr_array_header_t *ari,
                                                     const char *fname,
                                                     apr_pool_t *p,
                                                     apr_pool_t *ptemp,
                                                     int optional)
 {
     if (!apr_fnmatch_test(fname)) {
-        return ap_process_resource_config(fname, ari, p);
+        return process_resource_config(fname, ari, p);
     }
     else {
         apr_status_t status;
@@ -974,7 +971,7 @@ AP_DECLARE(const char *) ap_process_fnmatch_configs(apr_array_header_t *ari,
 
 const char *populate_include_files(apr_pool_t *p, apr_pool_t *ptemp, apr_array_header_t *ari, const char *fname, int optional)
 {
-	return ap_process_fnmatch_configs(ari, fname, p, ptemp, optional);
+	return process_fnmatch_configs(ari, fname, p, ptemp, optional);
 }
 
 const char *process_command_config(server_rec *s,
