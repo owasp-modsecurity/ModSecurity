@@ -55,7 +55,7 @@ type="text/css">
 		var wgUserLanguage = "en";
 		var wgContentLanguage = "en";
 		var wgBreakFrames = false;
-		var wgCurRevisionId = 522;
+		var wgCurRevisionId = 537;
 		var wgVersion = "1.15.1";
 		var wgEnableAPI = true;
 		var wgEnableWriteAPI = true;
@@ -2515,7 +2515,7 @@ SecRule </span></h2>
 variables using the selected operator. 
 </p><p><b>Syntax:</b> <code>SecRule VARIABLES OPERATOR [ACTIONS] </code>
 </p><p><b>Example Usage:</b> <code>SecRule ARGS "@rx attack" 
-"phase:1,log,deny" </code>
+"phase:1,log,deny,id:1" </code>
 </p><p><b>Scope:</b> Any
 </p><p><b>Version:</b> 2.0.0
 </p><p>Every rule must provide one or more variables along with the 
@@ -2829,16 +2829,18 @@ target to the end of the variable list as follows:
 </p><p>You could also do the same by using the ctl action.  This is 
 useful if you want to only update the targets for a particular URL
 </p>
-<pre>SecRule REQUEST_FILENAME "@streq /path/to/file.php" "phase:1,t:none,nolog,pass,ctl:ruleUpdateTargetById=958895;!ARGS:email"
+<pre>SecRule REQUEST_FILENAME "@streq /path/to/file.php" "phase:1,id:2,t:none,nolog,pass,ctl:ruleUpdateTargetById=958895;!ARGS:email"
 </pre>
 <p><b>Conditionally Replacing Targets</b>
 </p><p>You could also replace targets using the ctl action.  For 
 example, lets say you want to only inspect ARGS for a particular URL:
 </p>
-<pre>SecRule REQUEST_FILENAME "@streq /path/to/file.php" "phase:1,t:none,nolog,pass,ctl:ruleUpdateTargetById=958895;REQUEST_URI;REQUEST_FILENAME"
+<pre>SecRule REQUEST_FILENAME "@streq /path/to/file.php" "phase:1,id:3,t:none,nolog,pass,ctl:ruleUpdateTargetById=958895;REQUEST_URI;REQUEST_FILENAME"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> This ctl is deprecated and will be removed 
-from the code, since we cannot use it per-transaction.
+from the code, since we cannot use it per-transaction. Please use the 
+new ruleRemoveTargetById ctl option if you want to remove a target or 
+target list per-transaction.
 </dd></dl>
 <a name="SecRuleUpdateTargetByMsg" id="SecRuleUpdateTargetByMsg"></a><h2>
  <span class="mw-headline"> SecRuleUpdateTargetByMsg </span></h2>
@@ -3152,8 +3154,8 @@ height="459" width="600" border="0"></a>
 phase action either directly in the rule or in using the 
 SecDefaultAction directive:
 </p>
-<pre>SecDefaultAction "log,pass,phase:2"
-SecRule REQUEST_HEADERS:Host "!^$" "deny,phase:1"
+<pre>SecDefaultAction "log,pass,phase:2,id:4"
+SecRule REQUEST_HEADERS:Host "!^$" "deny,phase:1,id:5"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> The data available in each phase is 
 cumulative.  This means that as you move onto later phases, you have 
@@ -3256,27 +3258,27 @@ collections.
 </p><p>Some variables are actually collections, which are expanded into 
 more variables at runtime. The following example will examine all 
 request arguments:
-</p><p><code>SecRule ARGS dirty</code>
+</p><p><code>SecRule ARGS dirty "id:7"</code>
 </p><p>Sometimes, however, you will want to look only at parts of a 
 collection. This can be achieved with the help of the selection 
 operator(colon). The following example will only look at the arguments 
 named p (do note that, in general, requests can contain multiple 
 arguments with the same name):
-</p><p><code>SecRule ARGS:p dirty</code>
+</p><p><code>SecRule ARGS:p dirty "id:8"</code>
 </p><p>It is also possible to specify exclusions. The following will 
 examine all request arguments for the word dirty, except the ones named z
  (again, there can be zero or more arguments named z):
-</p><p><code>SecRule ARGS|!ARGS:z dirty</code>
+</p><p><code>SecRule ARGS|!ARGS:z dirty "id:9"</code>
 </p><p>There is a special operator that allows you to count how many 
 variables there are in a collection. The following rule will trigger if 
 there is more than zero arguments in the request (ignore the second 
 parameter for the time being):
-</p><p><code>SecRule &amp;ARGS&nbsp;!^0$</code>
+</p><p><code>SecRule &amp;ARGS&nbsp;!^0$ "id:10"</code>
 </p><p>And sometimes you need to look at an array of parameters, each 
 with a slightly different name. In this case you can specify a regular 
 expression in the selection operator itself. The following rule will 
 look into all arguments whose names begin with id_:
-</p><p><code>SecRule ARGS:/^id_/ dirty</code>
+</p><p><code>SecRule ARGS:/^id_/ dirty "id:11"</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> Using ARGS:p will not result in any 
 invocations against the operator if argument p does not exist.
@@ -3291,7 +3293,7 @@ excluded from the calculation. This variable can be useful, for example,
  to create a rule to ensure that the total size of the argument data is 
 below a certain threshold. The following rule detects a request whose 
 para- meters are more than 2500 bytes long:
-</p><p><code>SecRule ARGS_COMBINED_SIZE "@gt 2500"</code>
+</p><p><code>SecRule ARGS_COMBINED_SIZE "@gt 2500" "id:12"</code>
 </p>
 <a name="ARGS_GET" id="ARGS_GET"></a><h2> <span class="mw-headline"> 
 ARGS_GET </span></h2>
@@ -3310,7 +3312,7 @@ parameter names that you want to inspect. In a positive policy scenario,
  you can also whitelist (using an inverted rule with the exclamation 
 mark) only the authorized argument names.
 This example rule allows only two argument names: p and a: 
-</p><p><code>SecRule ARGS_NAMES "!^(p|a)$"</code>
+</p><p><code>SecRule ARGS_NAMES "!^(p|a)$" "id:13"</code>
 </p>
 <a name="ARGS_POST" id="ARGS_POST"></a><h2> <span class="mw-headline"> 
 ARGS_POST </span></h2>
@@ -3328,7 +3330,7 @@ AUTH_TYPE </span></h2>
 user, if any of the methods built into HTTP are used. In a reverse-proxy
  deployment, this information will not be available if the 
 authentication is handled in the backend web server.
-</p><p><code>SecRule AUTH_TYPE "Basic"</code>
+</p><p><code>SecRule AUTH_TYPE "Basic" "id:14"</code>
 </p>
 <a name="DURATION" id="DURATION"></a><h2> <span class="mw-headline"> 
 DURATION </span></h2>
@@ -3345,10 +3347,10 @@ desired variable.
 </p>
 <pre># Set environment variable 
 SecRule REQUEST_FILENAME "printenv" \
-"phase:2,pass,setenv:tag=suspicious" 
+"phase:2,id:15,pass,setenv:tag=suspicious" 
 
 # Inspect environment variable
-SecRule ENV:tag "suspicious" 
+SecRule ENV:tag "suspicious" "id:16"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> Use setenv to set environment variables to 
 be accessed by Apache.
@@ -3357,7 +3359,7 @@ be accessed by Apache.
 <p>Contains a collection of original file names (as they were called on 
 the remote user’s filesys- tem). Available only on inspected 
 multipart/form-data requests.
-</p><p><code>SecRule FILES "@rx \.conf$"</code>
+</p><p><code>SecRule FILES "@rx \.conf$" "id:17"</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> Only available if files were extracted from
  the request body.
@@ -3366,20 +3368,20 @@ multipart/form-data requests.
 class="mw-headline"> FILES_COMBINED_SIZE </span></h2>
 <p>Contains the total size of the files transported in request body. 
 Available only on inspected multipart/form-data requests.
-</p><p><code>SecRule FILES_COMBINED_SIZE "@gt 100000"</code>
+</p><p><code>SecRule FILES_COMBINED_SIZE "@gt 100000" "id:18"</code>
 </p>
 <a name="FILES_NAMES" id="FILES_NAMES"></a><h2> <span 
 class="mw-headline"> FILES_NAMES </span></h2>
 <p>Contains a list of form fields that were used for file upload. 
 Available only on inspected multipart/form-data requests.
-</p><p><code>SecRule FILES_NAMES "^upfile$"</code>
+</p><p><code>SecRule FILES_NAMES "^upfile$" "id:19"</code>
 </p>
 <a name="FILES_SIZES" id="FILES_SIZES"></a><h2> <span 
 class="mw-headline"> FILES_SIZES </span></h2>
 <p>Contains a list of individual file sizes. Useful for implementing a 
 size limitation on individual uploaded files. Available only on 
 inspected multipart/form-data requests.
-</p><p><code>SecRule FILES_SIZES "@gt 100"</code>
+</p><p><code>SecRule FILES_SIZES "@gt 100" "id:20"</code>
 </p>
 <a name="FILES_TMPNAMES" id="FILES_TMPNAMES"></a><h2> <span 
 class="mw-headline"> FILES_TMPNAMES </span></h2>
@@ -3387,7 +3389,7 @@ class="mw-headline"> FILES_TMPNAMES </span></h2>
 used together with @inspectFile. Available only on inspected 
 multipart/form-data requests.
 </p><p><code>SecRule FILES_TMPNAMES "@inspectFile 
-/path/to/inspect_script.pl"</code>
+/path/to/inspect_script.pl" "id:21"</code>
 </p>
 <a name="GEO" id="GEO"></a><h2> <span class="mw-headline"> GEO </span></h2>
 <p>GEO is a collection populated by the results of the last @geoLookup 
@@ -3415,7 +3417,7 @@ database. (US only)
 </p>
 <pre>SecGeoLookupDb /usr/local/geo/data/GeoLiteCity.dat
 ...
-SecRule REMOTE_ADDR "@geoLookup" "chain,drop,msg:'Non-GB IP address'"
+SecRule REMOTE_ADDR "@geoLookup" "chain,id:22,drop,msg:'Non-GB IP address'"
 SecRule GEO:COUNTRY_CODE "!@streq GB"
 </pre>
 <a name="HIGHEST_SEVERITY" id="HIGHEST_SEVERITY"></a><h2> <span 
@@ -3425,7 +3427,7 @@ matched so far. Severities are numeric values and thus can be used with
 comparison operators such as @lt, and so on. A value of 255 indicates 
 that no severity has been set.
 </p><p><code>SecRule HIGHEST_SEVERITY "@le 2" 
-"phase:2,deny,status:500,msg:'severity&nbsp;%{HIGHEST_SEVERITY}'"</code>
+"phase:2,id:23,deny,status:500,msg:'severity&nbsp;%{HIGHEST_SEVERITY}'"</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> Higher severities have a lower numeric 
 value.
@@ -3439,7 +3441,7 @@ rate of false positives and your default policy you should decide
 whether to block or just warn when the rule is triggered.
 </p><p>The best way to use this variable is as in the example below:
 </p><p><code>SecRule INBOUND_DATA_ERROR "@eq 1" 
-"phase:1,t:none,log,pass,msg:'Request Body Larger than 
+"phase:1,id:24,t:none,log,pass,msg:'Request Body Larger than 
 SecRequestBodyLimit Setting'"</code>
 </p>
 <a name="MATCHED_VAR" id="MATCHED_VAR"></a><h2> <span 
@@ -3448,7 +3450,7 @@ class="mw-headline"> MATCHED_VAR </span></h2>
 It is similar to the TX:0, but it is automatically supported by all 
 operators and there is no need to specify the capture action.
 </p>
-<pre>SecRule ARGS pattern chain,deny
+<pre>SecRule ARGS pattern chain,deny,id:25
   SecRule MATCHED_VAR "further scrutiny"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> Be aware that this variable holds data for 
@@ -3461,7 +3463,7 @@ class="mw-headline"> MATCHED_VARS </span></h2>
 <p>Similar to MATCHED_VAR except that it is a collection of <i><b>all 
 matches</b></i> for the current operator check.
 </p>
-<pre>SecRule ARGS pattern "chain,deny"
+<pre>SecRule ARGS pattern "chain,deny,id:26"
   SecRule MATCHED_VARS "@eq ARGS:param"
 </pre>
 <a name="MATCHED_VAR_NAME" id="MATCHED_VAR_NAME"></a><h2> <span 
@@ -3469,7 +3471,7 @@ class="mw-headline"> MATCHED_VAR_NAME </span></h2>
 <p>This variable holds the full name of the variable that was matched 
 against.
 </p>
-<pre>SecRule ARGS pattern "chain,deny"
+<pre>SecRule ARGS pattern "chain,deny,id:27"
   SecRule MATCHED_VAR_NAME "@eq ARGS:param"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> Be aware that this variable holds data for 
@@ -3482,7 +3484,7 @@ class="mw-headline"> MATCHED_VARS_NAMES </span></h2>
 <p>Similar to MATCHED_VAR_NAME except that it is a collection of <i><b>all
  matches</b></i> for the current operator check.
 </p>
-<pre>SecRule ARGS pattern "chain,deny"
+<pre>SecRule ARGS pattern "chain,deny,id:28"
   SecRule MATCHED_VARS_NAMES "@eq ARGS:param"
 </pre>
 <a name="MODSEC_BUILD" id="MODSEC_BUILD"></a><h2> <span 
@@ -3491,7 +3493,7 @@ class="mw-headline"> MODSEC_BUILD </span></h2>
 intended to be used to check the build number prior to using a feature 
 that is available only in a certain build. Example:
 </p>
-<pre>SecRule MODSEC_BUILD "!@ge 02050102" "skipAfter:12345"
+<pre>SecRule MODSEC_BUILD "!@ge 02050102" "skipAfter:12345,id:29"
 SecRule ARGS "@pm some key words" "id:12345,deny,status:500"
 </pre>
 <a name="MULTIPART_CRLF_LF_LINES" id="MULTIPART_CRLF_LF_LINES"></a><h2> <span
@@ -3525,7 +3527,7 @@ triggered.
 </p><p>The best way to use this variable is as in the example below:
 </p>
 <pre>SecRule MULTIPART_STRICT_ERROR "!@eq 0" \
-"phase:2,t:none,log,deny,msg:'Multipart request body \
+"phase:2,id:30,t:none,log,deny,msg:'Multipart request body \
 failed strict validation: \
 PE&nbsp;%{REQBODY_PROCESSOR_ERROR}, \
 BQ&nbsp;%{MULTIPART_BOUNDARY_QUOTED}, \
@@ -3555,7 +3557,7 @@ ModSecurity encounters what feels like a boundary but it is not. Such an
 </p><p>The best way to use this variable is as in the example below:
 </p>
 <pre>SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
-"phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
+"phase:2,id:31,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
 </pre>
 <p>Change the rule from blocking to logging-only if many false positives
  are encountered.
@@ -3569,7 +3571,7 @@ rate of false positives and your default policy you should decide
 whether to block or just warn when the rule is triggered.
 </p><p>The best way to use this variable is as in the example below:
 </p><p><code>SecRule OUTBOUND_DATA_ERROR "@eq 1" 
-"phase:1,t:none,log,pass,msg:'Response Body Larger than 
+"phase:1,id:32,t:none,log,pass,msg:'Response Body Larger than 
 SecResponseBodyLimit Setting'"</code>
 </p>
 <a name="PATH_INFO" id="PATH_INFO"></a><h2> <span class="mw-headline"> 
@@ -3577,7 +3579,7 @@ PATH_INFO </span></h2>
 <p>Contains the extra request URI information, also known as path info. 
 (For example, in the URI /index.php/123, /123 is the path info.) 
 Available only in embedded deployments.
-</p><p><code>SecRule PATH_INFO "^/(bin|etc|sbin|opt|usr)"</code>
+</p><p><code>SecRule PATH_INFO "^/(bin|etc|sbin|opt|usr)" "id:33"</code>
 </p>
 <a name="PERF_COMBINED" id="PERF_COMBINED"></a><h2> <span 
 class="mw-headline"> PERF_COMBINED </span></h2>
@@ -3644,12 +3646,12 @@ storage. Available starting with 2.6.
 class="mw-headline"> QUERY_STRING </span></h2>
 <p>Contains the query string part of a request URI. The value in 
 QUERY_STRING is always provided raw, without URL decoding taking place.
-</p><p><code>SecRule QUERY_STRING "attack"</code>
+</p><p><code>SecRule QUERY_STRING "attack" "id:34"</code>
 </p>
 <a name="REMOTE_ADDR" id="REMOTE_ADDR"></a><h2> <span 
 class="mw-headline"> REMOTE_ADDR </span></h2>
 <p>This variable holds the IP address of the remote client.
-</p><p><code>SecRule REMOTE_ADDR "@ipMatch 192.168.1.101"</code>
+</p><p><code>SecRule REMOTE_ADDR "@ipMatch 192.168.1.101" "id:35"</code>
 </p>
 <a name="REMOTE_HOST" id="REMOTE_HOST"></a><h2> <span 
 class="mw-headline"> REMOTE_HOST </span></h2>
@@ -3659,7 +3661,7 @@ directive is set to Off, this variable it will hold the remote IP
 address (same as REMOTE_ADDR). Possible uses for this variable would be 
 to deny known bad client hosts or network blocks, or conversely, to 
 allow in authorized hosts.
-</p><p><code>SecRule REMOTE_HOST "\.evil\.network\org$"</code>
+</p><p><code>SecRule REMOTE_HOST "\.evil\.network\org$" "id:36"</code>
 </p>
 <a name="REMOTE_PORT" id="REMOTE_PORT"></a><h2> <span 
 class="mw-headline"> REMOTE_PORT </span></h2>
@@ -3668,14 +3670,14 @@ used when initiating the connection to our web server.
 </p><p>In the following example, we are evaluating to see whether the 
 REMOTE_PORT is less than 1024, which would indicate that the user is a 
 privileged user:
-</p><p><code>SecRule REMOTE_PORT "@lt 1024"</code>
+</p><p><code>SecRule REMOTE_PORT "@lt 1024" "id:37"</code>
 </p>
 <a name="REMOTE_USER" id="REMOTE_USER"></a><h2> <span 
 class="mw-headline"> REMOTE_USER </span></h2>
 <p>This variable holds the username of the authenticated user. If there 
 are no password access controls in place (Basic or Digest 
 authentication), then this variable will be empty.
-</p><p><code>SecRule REMOTE_USER "^admin$" </code>
+</p><p><code>SecRule REMOTE_USER "^admin$" "id:38"</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> In a reverse-proxy deployment, this 
 information will not be available if the authentication is
@@ -3689,7 +3691,7 @@ body parsing. The values can be 0 (no error) or 1 (error). This variable
  will be set by request body processors (typically the 
 multipart/request-data parser or the XML parser) when they fail to do 
 their work.
-</p><p><code>SecRule REQBODY_ERROR "@eq 1" deny,phase:2 </code>
+</p><p><code>SecRule REQBODY_ERROR "@eq 1" deny,phase:2,id:39 </code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> Your policies must have a rule to check for
  request body processor errors at the very beginning of phase 2. Failure
@@ -3705,14 +3707,14 @@ request body processing fails.
 class="mw-headline"> REQBODY_ERROR_MSG </span></h2>
 <p>If there’s been an error during request body parsing, the variable 
 will contain the following error message:
-</p><p><code>SecRule REQBODY_ERROR_MSG "failed to parse"</code>
+</p><p><code>SecRule REQBODY_ERROR_MSG "failed to parse" "id:40"</code>
 </p>
 <a name="REQBODY_PROCESSOR" id="REQBODY_PROCESSOR"></a><h2> <span 
 class="mw-headline"> REQBODY_PROCESSOR </span></h2>
 <p>Contains the name of the currently used request body processor. The 
 possible values are URLENCODED, MULTIPART, and XML.
 </p>
-<pre>SecRule REQBODY_PROCESSOR "^XML$ chain 
+<pre>SecRule REQBODY_PROCESSOR "^XML$ chain,id:41 
   SecRule XML "@validateDTD /opt/apache-frontend/conf/xml.dtd"
 </pre>
 <a name="REQUEST_BASENAME" id="REQUEST_BASENAME"></a><h2> <span 
@@ -3720,7 +3722,7 @@ class="mw-headline"> REQUEST_BASENAME </span></h2>
 <p>This variable holds just the filename part of REQUEST_FILENAME (e.g.,
  index.php). 
 </p><p><code>SecRule REQUEST_BASENAME "^login\.php$" 
-phase:2,t:none,t:lowercase</code>
+phase:2,id:42,t:none,t:lowercase</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> Please note that anti-evasion 
 transformations are not applied to this variable by default. 
@@ -3736,7 +3738,7 @@ URLENCODED request body processor was used, which will occur by default
 when the application/x-www-form-urlencoded content type is detected, or 
 if the use of the URLENCODED request body parser was forced. 
 </p><p><code>SecRule REQUEST_BODY 
-"^username=\w{25,}\&amp;password=\w{25,}\&amp;Submit\=login$"</code>
+"^username=\w{25,}\&amp;password=\w{25,}\&amp;Submit\=login$" "id:43"</code>
 </p><p>As of 2.5.7, it is possible to force the presence of the 
 REQUEST_BODY variable, but only when there is no request body processor 
 defined using the ctl:forceRequestBodyVariable option in the 
@@ -3754,21 +3756,22 @@ only).  Example: the following example is using the Ampersand special
 operator to count how many variables are in the collection. In this 
 rule, it would trigger if the request does not include any Cookie 
 headers.
-</p><p><code>SecRule &amp;REQUEST_COOKIES "@eq 0"</code>
+</p><p><code>SecRule &amp;REQUEST_COOKIES "@eq 0" "id:44"</code>
 </p>
 <a name="REQUEST_COOKIES_NAMES" id="REQUEST_COOKIES_NAMES"></a><h2> <span
  class="mw-headline"> REQUEST_COOKIES_NAMES </span></h2>
 <p>This variable is a collection of the names of all request cookies. 
 For example, the following rule will trigger if the JSESSIONID cookie is
  not present:
-</p><p><code>SecRule &amp;REQUEST_COOKIES_NAMES:JSESSIONID "@eq 0"</code>
+</p><p><code>SecRule &amp;REQUEST_COOKIES_NAMES:JSESSIONID "@eq 0" 
+"id:45"</code>
 </p>
 <a name="REQUEST_FILENAME" id="REQUEST_FILENAME"></a><h2> <span 
 class="mw-headline"> REQUEST_FILENAME </span></h2>
 <p>This variable holds the relative request URL without the query string
  part (e.g., /index.php). 
 </p><p><code>SecRule REQUEST_FILENAME "^/cgi-bin/login\.php$" 
-phase:2,t:none,t:normalizePath</code>
+phase:2,id:46,t:none,t:normalizePath</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> Please note that anti-evasion 
 transformations are not used on REQUEST_FILENAME, which means that you 
@@ -3780,14 +3783,14 @@ class="mw-headline"> REQUEST_HEADERS </span></h2>
 request headers or can be used to inspect selected headers (by using the
  REQUEST_HEADERS:Header-Name syntax).
 </p><p><code>SecRule REQUEST_HEADERS:Host "^[\d\.]+$" 
-"deny,log,status:400,msg:'Host header is a numeric IP address'"</code>
+"deny,id:47,log,status:400,msg:'Host header is a numeric IP address'"</code>
 </p>
 <a name="REQUEST_HEADERS_NAMES" id="REQUEST_HEADERS_NAMES"></a><h2> <span
  class="mw-headline"> REQUEST_HEADERS_NAMES </span></h2>
 <p>This variable is a collection of the names of all of the request 
 headers.
 </p><p><code>SecRule REQUEST_HEADERS_NAMES "^x-forwarded-for" 
-"log,deny,status:403,t:lowercase,msg:'Proxy Server Used'"</code>
+"log,deny,id:48,status:403,t:lowercase,msg:'Proxy Server Used'"</code>
 </p>
 <a name="REQUEST_LINE" id="REQUEST_LINE"></a><h2> <span 
 class="mw-headline"> REQUEST_LINE </span></h2>
@@ -3796,17 +3799,17 @@ class="mw-headline"> REQUEST_LINE </span></h2>
 </p>
 <pre># Allow only POST, GET and HEAD request methods, as well as only
 # the valid protocol versions 
-SecRule REQUEST_LINE "!(^((?:(?:POS|GE)T|HEAD))|HTTP/(0\.9|1\.0|1\.1)$)" "phase:1,log,block,t:none"
+SecRule REQUEST_LINE "!(^((?:(?:POS|GE)T|HEAD))|HTTP/(0\.9|1\.0|1\.1)$)" "phase:1,id:49,log,block,t:none"
 </pre>
 <a name="REQUEST_METHOD" id="REQUEST_METHOD"></a><h2> <span 
 class="mw-headline"> REQUEST_METHOD </span></h2>
 <p>This variable holds the request method used in the transaction.
-</p><p><code>SecRule REQUEST_METHOD "^(?:CONNECT|TRACE)$" "t:none"</code>
+</p><p><code>SecRule REQUEST_METHOD "^(?:CONNECT|TRACE)$" "id:50,t:none"</code>
 </p>
 <a name="REQUEST_PROTOCOL" id="REQUEST_PROTOCOL"></a><h2> <span 
 class="mw-headline"> REQUEST_PROTOCOL </span></h2>
 <p>This variable holds the request protocol version information.
-</p><p><code>SecRule REQUEST_PROTOCOL "!^HTTP/(0\.9|1\.0|1\.1)$"</code>
+</p><p><code>SecRule REQUEST_PROTOCOL "!^HTTP/(0\.9|1\.0|1\.1)$" "id:51"</code>
 </p>
 <a name="REQUEST_URI" id="REQUEST_URI"></a><h2> <span 
 class="mw-headline"> REQUEST_URI </span></h2>
@@ -3814,7 +3817,7 @@ class="mw-headline"> REQUEST_URI </span></h2>
 data (e.g., /index.php? p=X). However, it will never contain a domain 
 name, even if it was provided on the request line.
 </p><p><code>SecRule REQUEST_URI "attack" 
-"phase:1,t:none,t:urlDecode,t:lowercase,t:normalizePath"</code>
+"phase:1,id:52,t:none,t:urlDecode,t:lowercase,t:normalizePath"</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> Please note that anti-evasion 
 transformations are not used on REQUEST_URI, which means that you will 
@@ -3827,7 +3830,7 @@ provided on the request line (e.g., <a
 href="http://www.example.com/index.php?p=X" class="external free" 
 title="http://www.example.com/index.php?p=X" rel="nofollow">http://www.example.com/index.php?p=X</a>).
 </p><p><code>SecRule REQUEST_URI_RAW "http:/" 
-"phase:1,t:none,t:urlDecode,t:lowercase,t:normalizePath"</code>
+"phase:1,id:53,t:none,t:urlDecode,t:lowercase,t:normalizePath"</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> Please note that anti-evasion 
 transformations are not used on REQUEST_URI_RAW, which means that you 
@@ -3837,7 +3840,8 @@ will have to specify them in the rules that use this variable.
 class="mw-headline"> RESPONSE_BODY </span></h2>
 <p>This variable holds the data for the response body, but only when 
 response body buffering is enabled.
-</p><p><code>SecRule RESPONSE_BODY "ODBC Error Code" "phase:4,t:none"</code>
+</p><p><code>SecRule RESPONSE_BODY "ODBC Error Code" 
+"phase:4,id:54,t:none"</code>
 </p>
 <a name="RESPONSE_CONTENT_LENGTH" id="RESPONSE_CONTENT_LENGTH"></a><h2> <span
  class="mw-headline"> RESPONSE_CONTENT_LENGTH </span></h2>
@@ -3863,7 +3867,7 @@ RESPONSE_HEADERS:Content-Type.
 class="mw-headline"> RESPONSE_HEADERS </span></h2>
 <p>This variable refers to response headers, in the same way as 
 REQUEST_HEADERS does to request headers.
-</p><p><code>SecRule RESPONSE_HEADERS:X-Cache "MISS"</code>
+</p><p><code>SecRule RESPONSE_HEADERS:X-Cache "MISS" "id:55"</code>
 </p><p>This variable may not have access to some headers when running in
  embedded mode. Headers such as Server, Date, Connection, and 
 Content-Type could be added just prior to sending the data to the 
@@ -3874,19 +3878,20 @@ proxy mode.
  class="mw-headline"> RESPONSE_HEADERS_NAMES </span></h2>
 <p>This variable is a collection of the response header names.
 </p><p><code>SecRule RESPONSE_HEADERS_NAMES "Set-Cookie" 
-"phase:3,t:none"</code>
+"phase:3,id:56,t:none"</code>
 </p><p>The same limitations apply as the ones discussed in 
 RESPONSE_HEADERS.
 </p>
 <a name="RESPONSE_PROTOCOL" id="RESPONSE_PROTOCOL"></a><h2> <span 
 class="mw-headline"> RESPONSE_PROTOCOL </span></h2>
 <p>This variable holds the HTTP response protocol information.
-</p><p><code>SecRule RESPONSE_PROTOCOL "^HTTP\/0\.9" "phase:3,t:none"</code>
+</p><p><code>SecRule RESPONSE_PROTOCOL "^HTTP\/0\.9" 
+"phase:3,id:57,t:none"</code>
 </p>
 <a name="RESPONSE_STATUS" id="RESPONSE_STATUS"></a><h2> <span 
 class="mw-headline"> RESPONSE_STATUS </span></h2>
 <p>This variable holds the HTTP response status code:
-</p><p><code>SecRule RESPONSE_STATUS "^[45]" "phase:3,t:none"</code>
+</p><p><code>SecRule RESPONSE_STATUS "^[45]" "phase:3,id:58,t:none"</code>
 </p><p>This variable may not work as expected in embedded mode, as 
 Apache sometimes handles certain requests differently, and without 
 invoking ModSecurity (all other modules).
@@ -3896,12 +3901,12 @@ invoking ModSecurity (all other modules).
 severity, logdata, and msg fields of the rule that triggered the action.
  It can be used to refer to only the same rule in which it resides.
 </p><p><code>SecRule &amp;REQUEST_HEADERS:Host "@eq 0" 
-"log,deny,setvar:tx.varname=%{RULE.id}"</code>
+"log,deny,id:59,setvar:tx.varname=%{RULE.id}"</code>
 </p>
 <a name="SCRIPT_BASENAME" id="SCRIPT_BASENAME"></a><h2> <span 
 class="mw-headline"> SCRIPT_BASENAME </span></h2>
 <p>This variable holds just the local filename part of SCRIPT_FILENAME.
-</p><p><code>SecRule SCRIPT_BASENAME "^login\.php$"</code>
+</p><p><code>SecRule SCRIPT_BASENAME "^login\.php$" "id:60"</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd>  Not available in proxy mode.
 </dd></dl>
@@ -3910,7 +3915,7 @@ class="mw-headline"> SCRIPT_FILENAME </span></h2>
 <p>This variable holds the full internal path to the script that will be
  used to serve the request. 
 </p><p><code>SecRule SCRIPT_FILENAME 
-"^/usr/local/apache/cgi-bin/login\.php$"</code>
+"^/usr/local/apache/cgi-bin/login\.php$" "id:61"</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> Not available in proxy mode.
 </dd></dl>
@@ -3918,14 +3923,14 @@ class="mw-headline"> SCRIPT_FILENAME </span></h2>
  SCRIPT_GID </span></h2>
 <p>This variable holds the numerical identifier of the group owner of 
 the script. 
-</p><p><code>SecRule SCRIPT_GID "!^46$"</code>
+</p><p><code>SecRule SCRIPT_GID "!^46$" "id:62"</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> Not available in proxy mode.
 </dd></dl>
 <a name="SCRIPT_GROUPNAME" id="SCRIPT_GROUPNAME"></a><h2> <span 
 class="mw-headline"> SCRIPT_GROUPNAME </span></h2>
 <p>This variable holds the name of the group owner of the script. 
-</p><p><code>SecRule SCRIPT_GROUPNAME "!^apache$"</code>
+</p><p><code>SecRule SCRIPT_GROUPNAME "!^apache$" "id:63"</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> Not available in proxy mode.
 </dd></dl>
@@ -3934,7 +3939,7 @@ class="mw-headline"> SCRIPT_MODE </span></h2>
 <p>This variable holds the script’s permissions mode data (e.g., 644).  
 </p>
 <pre># Do not allow scripts that can be written to
-SecRule SCRIPT_MODE "^(2|3|6|7)$"
+SecRule SCRIPT_MODE "^(2|3|6|7)$" "id:64"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> Not available in proxy mode.
 </dd></dl>
@@ -3945,7 +3950,7 @@ script.
 </p>
 <pre># Do not run any scripts that are owned 
 # by Apache (Apache's user id is 46) 
-SecRule SCRIPT_UID "!^46$"
+SecRule SCRIPT_UID "!^46$" "id:65"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> Not available in proxy mode.
 </dd></dl>
@@ -3954,27 +3959,27 @@ class="mw-headline"> SCRIPT_USERNAME </span></h2>
 <p>This variable holds the username of the owner of the script. 
 </p>
 <pre># Do not run any scripts owned by Apache SecRule 
-SCRIPT_USERNAME "^apache$"
+SCRIPT_USERNAME "^apache$" "id:66"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> Not available in proxy mode.
 </dd></dl>
 <a name="SERVER_ADDR" id="SERVER_ADDR"></a><h2> <span 
 class="mw-headline"> SERVER_ADDR </span></h2>
 <p>This variable contains the IP address of the server.
-</p><p><code>SecRule SERVER_ADDR "@ipMatch 192.168.1.100"</code>
+</p><p><code>SecRule SERVER_ADDR "@ipMatch 192.168.1.100" "id:67"</code>
 </p>
 <a name="SERVER_NAME" id="SERVER_NAME"></a><h2> <span 
 class="mw-headline"> SERVER_NAME </span></h2>
 <p>This variable contains the transaction’s hostname or IP address, 
 taken from the request itself (which means that, in principle, it should
  not be trusted).
-</p><p><code>SecRule SERVER_NAME "hostname\.com$"</code>
+</p><p><code>SecRule SERVER_NAME "hostname\.com$" "id:68"</code>
 </p>
 <a name="SERVER_PORT" id="SERVER_PORT"></a><h2> <span 
 class="mw-headline"> SERVER_PORT </span></h2>
 <p>This variable contains the local port that the web server (or reverse
  proxy) is listening on.
-</p><p><code>SecRule SERVER_PORT "^80$"</code>
+</p><p><code>SecRule SERVER_PORT "^80$" "id:69"</code>
 </p>
 <a name="SESSION" id="SESSION"></a><h2> <span class="mw-headline"> 
 SESSION </span></h2>
@@ -3986,16 +3991,16 @@ set the SESSION.blocked variable, and finally, how to deny the
 connection based on the SESSION:blocked value:
 </p>
 <pre># Initialize session storage 
-SecRule REQUEST_COOKIES:PHPSESSID&nbsp;!^$ "phase:2,nolog,pass,setsid:%{REQUEST_COOKIES.PHPSESSID}"
+SecRule REQUEST_COOKIES:PHPSESSID&nbsp;!^$ "phase:2,id:70,nolog,pass,setsid:%{REQUEST_COOKIES.PHPSESSID}"
 
 # Increment session score on attack 
-SecRule REQUEST_URI "^/cgi-bin/finger$" "phase:2,t:none,t:lowercase,t:normalizePath,pass,setvar:SESSION.score=+10" 
+SecRule REQUEST_URI "^/cgi-bin/finger$" "phase:2,id:71,t:none,t:lowercase,t:normalizePath,pass,setvar:SESSION.score=+10" 
 
 # Detect too many attacks in a session
-SecRule SESSION:score "@gt 50" "phase:2,pass,setvar:SESSION.blocked=1"
+SecRule SESSION:score "@gt 50" "phase:2,id:72,pass,setvar:SESSION.blocked=1"
 
 # Enforce session block 
-SecRule SESSION:blocked "@eq 1" "phase:2,deny,status:403"
+SecRule SESSION:blocked "@eq 1" "phase:2,id:73,deny,status:403"
 </pre>
 <a name="SESSIONID" id="SESSIONID"></a><h2> <span class="mw-headline"> 
 SESSIONID </span></h2>
@@ -4033,14 +4038,16 @@ SecStreamOutBodyInspection directive
 <a name="TIME" id="TIME"></a><h2> <span class="mw-headline"> TIME </span></h2>
 <p>This variable holds a formatted string representing the time 
 (hour:minute:second).
-</p><p><code>SecRule TIME "^(([1](8|9))|([2](0|1|2|3))):\d{2}:\d{2}$"</code>
+</p><p><code>SecRule TIME "^(([1](8|9))|([2](0|1|2|3))):\d{2}:\d{2}$" 
+"id:74"</code>
 </p>
 <a name="TIME_DAY" id="TIME_DAY"></a><h2> <span class="mw-headline"> 
 TIME_DAY </span></h2>
 <p>This variable holds the current date (1–31). The following rule 
 triggers on a transaction that’s happening anytime between the 10th and 
 20th in a month:
-</p><p><code>SecRule TIME_DAY "^(([1](0|1|2|3|4|5|6|7|8|9))|20)$"</code>
+</p><p><code>SecRule TIME_DAY "^(([1](0|1|2|3|4|5|6|7|8|9))|20)$" 
+"id:75"</code>
 </p>
 <a name="TIME_EPOCH" id="TIME_EPOCH"></a><h2> <span class="mw-headline">
  TIME_EPOCH </span></h2>
@@ -4050,36 +4057,37 @@ triggers on a transaction that’s happening anytime between the 10th and
 TIME_HOUR </span></h2>
 <p>This variable holds the current hour value (0–23). The following rule
  triggers when a request is made “off hours”:
-</p><p><code>SecRule TIME_HOUR "^(0|1|2|3|4|5|6|[1](8|9)|[2](0|1|2|3))$"</code>
+</p><p><code>SecRule TIME_HOUR "^(0|1|2|3|4|5|6|[1](8|9)|[2](0|1|2|3))$"
+ "id:76"</code>
 </p>
 <a name="TIME_MIN" id="TIME_MIN"></a><h2> <span class="mw-headline"> 
 TIME_MIN </span></h2>
 <p>This variable holds the current minute value (0–59). The following 
 rule triggers during the last half hour of every hour:
-</p><p><code>SecRule TIME_MIN "^(3|4|5)"</code>
+</p><p><code>SecRule TIME_MIN "^(3|4|5)" "id:77"</code>
 </p>
 <a name="TIME_MON" id="TIME_MON"></a><h2> <span class="mw-headline"> 
 TIME_MON </span></h2>
 <p>This variable holds the current month value (0–11). The following 
 rule matches if the month is either November (value 10) or December 
 (value 11):
-</p><p><code>SecRule TIME_MON "^1"</code>
+</p><p><code>SecRule TIME_MON "^1" "id:78"</code>
 </p>
 <a name="TIME_SEC" id="TIME_SEC"></a><h2> <span class="mw-headline"> 
 TIME_SEC </span></h2>
 <p>This variable holds the current second value (0–59).
-</p><p><code>SecRule TIME_SEC "@gt 30"</code>
+</p><p><code>SecRule TIME_SEC "@gt 30" "id:79"</code>
 </p>
 <a name="TIME_WDAY" id="TIME_WDAY"></a><h2> <span class="mw-headline"> 
 TIME_WDAY </span></h2>
 <p>This variable holds the current weekday value (0–6). The following 
 rule triggers only on Satur- day and Sunday:
-</p><p><code>SecRule TIME_WDAY "^(0|6)$"</code>
+</p><p><code>SecRule TIME_WDAY "^(0|6)$" "id:80"</code>
 </p>
 <a name="TIME_YEAR" id="TIME_YEAR"></a><h2> <span class="mw-headline"> 
 TIME_YEAR </span></h2>
 <p>This variable holds the current four-digit year value.
-</p><p><code>SecRule TIME_YEAR "^2006$"</code>
+</p><p><code>SecRule TIME_YEAR "^2006$" "id:81"</code>
 </p>
 <a name="TX" id="TX"></a><h2> <span class="mw-headline"> TX </span></h2>
 <p>This is the transient transaction collection, which is used to store 
@@ -4088,10 +4096,10 @@ variables placed into this collection are available only until the
 transaction is complete.
 </p>
 <pre># Increment transaction attack score on attack 
-SecRule ARGS attack "phase:2,nolog,pass,setvar:TX.score=+5"
+SecRule ARGS attack "phase:2,id:82,nolog,pass,setvar:TX.score=+5"
 
 # Block the transactions whose scores are too high 
-SecRule TX:SCORE "@gt 20" "phase:2,log,deny"
+SecRule TX:SCORE "@gt 20" "phase:2,id:83,log,deny"
 </pre>
 <p>Some variable names in the TX collection are reserved and cannot be 
 used: 
@@ -4132,10 +4140,10 @@ the requests that use the URLENCODED request body processor).
 <p>This variable contains the value set with setuid. 
 </p>
 <pre># Initialize user tracking
-SecAction "nolog,pass,setuid:%{REMOTE_USER}" 
+SecAction "nolog,id:84,pass,setuid:%{REMOTE_USER}" 
 
 # Is the current user the administrator?
-SecRule USERID "admin"
+SecRule USERID "admin" "id:85"
 </pre>
 <a name="USERAGENT_IP" id="USERAGENT_IP"></a><h2> <span 
 class="mw-headline"> USERAGENT_IP </span></h2>
@@ -4153,7 +4161,7 @@ class="mw-headline"> WEBSERVER_ERROR_LOG </span></h2>
 <p>Contains zero or more error messages produced by the web server. This
  variable is best accessed from phase 5 (logging).
 </p><p><code>SecRule WEBSERVER_ERROR_LOG "File does not exist" 
-"phase:5,t:none,nolog,pass,setvar:TX.score=+5"</code>
+"phase:5,id:86,t:none,nolog,pass,setvar:TX.score=+5"</code>
 </p>
 <a name="XML" id="XML"></a><h2> <span class="mw-headline"> XML </span></h2>
 <p>Special collection used to interact with the XML parser. It can be 
@@ -4161,11 +4169,11 @@ used standalone as a target for the validateDTD and validateSchema
 operator. Otherwise, it must contain a valid XPath expression, which 
 will then be evaluated against a previously parsed XML DOM tree.
 </p>
-<pre>SecDefaultAction log,deny,status:403,phase:2
-SecRule REQUEST_HEADERS:Content-Type ^text/xml$ "phase:1,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-SecRule REQBODY_PROCESSOR "!^XML$" skipAfter:12345
+<pre>SecDefaultAction log,deny,status:403,phase:2,id:90
+SecRule REQUEST_HEADERS:Content-Type ^text/xml$ "phase:1,id:87,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+SecRule REQBODY_PROCESSOR "!^XML$" skipAfter:12345,id:88
 
-SecRule XML:/employees/employee/name/text() Fred
+SecRule XML:/employees/employee/name/text() Fred "id:89"
 SecRule XML:/xq:employees/employee/name/text() Fred "id:12345,xmlns:xq=http://www.example.com/employees"
 </pre>
 <p>The first XPath expression does not use namespaces. It would match 
@@ -4231,7 +4239,7 @@ functions, as there were in the first generation of ModSecurity (1.x).
 </dd></dl>
 <p>In the following example, the request parameter values are converted 
 to lowercase before matching:
-</p><p><code>SecRule ARGS "xp_cmdshell" "t:lowercase"</code>
+</p><p><code>SecRule ARGS "xp_cmdshell" "t:lowercase,id:91"</code>
 </p><p>Multiple transformation actions can be used in the same rule, 
 forming a transformation pipeline. The transformations will be performed
  in the order in which they appear in the rule.
@@ -4242,7 +4250,7 @@ transformations in any other order would allow a skillful attacker to
 evade detection:
 </p><p><code>SecRule ARGS 
 "(asfunction|javascript|vbscript|data|mocha|livescript):" 
-"t:none,t:htmlEntityDecode,t:lowercase,t:removeNulls,t:removeWhitespace"</code>
+"id:92,t:none,t:htmlEntityDecode,t:lowercase,t:removeNulls,t:removeWhitespace"</code>
 </p>
 <dl><dt> Warning&nbsp;</dt><dd> It is currently possible to use 
 SecDefaultAction to specify a default list of transformation functions, 
@@ -4260,7 +4268,7 @@ currently available in ModSecurity.
 class="mw-headline"> base64Decode </span></h2>
 <p>Decodes a Base64-encoded string.
 </p>
-<pre>SecRule REQUEST_HEADERS:Authorization "^Basic ([a-zA-Z0-9]+=*)$" "phase:1,capture,chain,logdata:%{TX.1}"
+<pre>SecRule REQUEST_HEADERS:Authorization "^Basic ([a-zA-Z0-9]+=*)$" "phase:1,id:93,capture,chain,logdata:%{TX.1}"
   SecRule TX:1 ^(\w+): t:base64Decode,capture,chain
     SecRule TX:1 ^(admin|root|backup)$ 
 </pre>
@@ -4315,7 +4323,7 @@ into one space
 </li></ul>
 <p><b>Example Usage:</b>
 </p>
-<pre>SecRule ARGS "(?:command(?:.com)?|cmd(?:.exe)?)(?:/.*)?/[ck]" "phase:2,t:none, t:cmdLine"
+<pre>SecRule ARGS "(?:command(?:.com)?|cmd(?:.exe)?)(?:/.*)?/[ck]" "phase:2,id:94,t:none, t:cmdLine"
 </pre>
 <a name="compressWhitespace" id="compressWhitespace"></a><h2> <span 
 class="mw-headline"> compressWhitespace </span></h2>
@@ -4553,7 +4561,7 @@ allows the transaction to proceed.
 </p><p>Example:
 </p>
 <pre># Allow unrestricted access from 192.168.1.100 
-SecRule REMOTE_ADDR "^192\.168\.1\.100$" phase:1,nolog,allow
+SecRule REMOTE_ADDR "^192\.168\.1\.100$" phase:1,id:95,nolog,allow
 </pre>
 <p><br>
 Prior to ModSecurity 2.5 the allow action would only affect the current 
@@ -4575,16 +4583,16 @@ will be phase RESPONSE_HEADERS.
 <p>Examples:
 </p>
 <pre># Do not process request but process response.
-SecAction phase:1,allow:request
+SecAction phase:1,allow:request,id:96
 
 # Do not process transaction (request and response).
-SecAction phase:1,allow
+SecAction phase:1,allow,id:97
 </pre>
 <p>If you want to allow a response through, put a rule in phase 
 RESPONSE_HEADERS and simply use allow on its own:
 </p>
 <pre># Allow response through.
-SecAction phase:3,allow
+SecAction phase:3,allow,id:98
 </pre>
 <a name="append" id="append"></a><h2> <span class="mw-headline"> append </span></h2>
 <p><b>Description</b>: Appends text given as parameter to the end of 
@@ -4597,7 +4605,7 @@ injection.
 </p><p><b>Processing Phases:</b> 3 and 4.
 </p><p>Example:
 </p>
-<pre>SecRule RESPONSE_CONTENT_TYPE "^text/html" "nolog,pass,append:'&lt;hr&gt;Footer'"</pre>
+<pre>SecRule RESPONSE_CONTENT_TYPE "^text/html" "nolog,id:99,pass,append:'&lt;hr&gt;Footer'"</pre>
 <dl><dt> Warning&nbsp;</dt><dd> Although macro expansion is allowed in 
 the additional content, you are strongly cau- tioned against inserting 
 user-defined data fields into output. Doing so would create a cross-site
@@ -4610,7 +4618,7 @@ log.
 </p><p><b>Action Group</b>: Non-disruptive
 </p><p>Example:
 </p><p><code>SecRule REMOTE_ADDR "^192\.168\.1\.100$" 
-auditlog,phase:1,allow</code>
+auditlog,phase:1,id:100,allow</code>
 </p>
 <dl><dt> Note&nbsp;</dt><dd> The auditlog action is now explicit if log 
 is already specified.
@@ -4629,13 +4637,13 @@ be added to define "how" to block.
 </p><p>Examples:
 </p>
 <pre># Specify how blocking is to be done 
-SecDefaultAction phase:2,deny,status:403,log,auditlog
+SecDefaultAction phase:2,deny,id:101,status:403,log,auditlog
 
 # Detect attacks where we want to block 
-SecRule ARGS attack1 phase:2,block
+SecRule ARGS attack1 phase:2,block,id:102
 
 # Detect attacks where we want only to warn 
-SecRule ARGS attack2 phase:2,pass
+SecRule ARGS attack2 phase:2,pass,id:103
 </pre>
 <p>It is possible to use the SecRuleUpdateActionById directive to 
 override how a rule handles blocking. This is useful in three cases:
@@ -4649,7 +4657,7 @@ policy you determine
 hard-coded block is removed in favor of the user-controllable block:
 </p>
 <pre># Specify how blocking is to be done 
-SecDefaultAction phase:2,deny,status:403,log,auditlog
+SecDefaultAction phase:2,deny,status:403,log,auditlog,id:104
 
 # Detect attacks and block 
 SecRule ARGS attack1 phase:2,id:1,deny
@@ -4666,7 +4674,7 @@ collection.
 </p><p><b>Action Group:</b> Non-disruptive
 </p><p>Example:
 </p>
-<pre>SecRule REQUEST_BODY "^username=(\w{25,})" phase:2,capture,t:none,chain
+<pre>SecRule REQUEST_BODY "^username=(\w{25,})" phase:2,capture,t:none,chain,id:105
   SecRule TX:1 "(?:(?:a(dmin|nonymous)))"
 </pre>
 <p>Up to 10 captures will be copied on a successful pattern match, each 
@@ -4685,7 +4693,7 @@ more complex processing logic.
 <pre># Refuse to accept POST requests that do not contain Content-Length header. 
 # (Do note that this rule should be preceded by a rule 
 # that verifies only valid request methods are used.) 
-SecRule REQUEST_METHOD "^POST$" phase:1,chain,t:none
+SecRule REQUEST_METHOD "^POST$" phase:1,chain,t:none,id:105
   SecRule &amp;REQUEST_HEADERS:Content-Length "@eq 0" t:none
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> Rule chains allow you to simulate logical 
@@ -4724,7 +4732,7 @@ will be unaffected.
 </p><p><b>Example:</b>
 </p>
 <pre># Parse requests with Content-Type "text/xml" as XML 
-SecRule REQUEST_CONTENT_TYPE ^text/xml "nolog,pass,ctl:requestBodyProcessor=XML"
+SecRule REQUEST_CONTENT_TYPE ^text/xml "nolog,pass,id:106,ctl:requestBodyProcessor=XML"
 </pre>
 <p>The following configuration options are supported: 
 </p>
@@ -4776,8 +4784,8 @@ types.
 <p><b>Description:</b> Stops rule processing and intercepts transaction.
 </p><p><b>Action Group:</b> Disruptive
 </p><p>Example:
-<code>SecRule REQUEST_HEADERS:User-Agent "nikto" "log,deny,msg:'Nikto 
-Scanners Identified'"</code>
+<code>SecRule REQUEST_HEADERS:User-Agent "nikto" 
+"log,deny,id:107,msg:'Nikto Scanners Identified'"</code>
 </p>
 <a name="deprecatevar" id="deprecatevar"></a><h2> <span 
 class="mw-headline"> deprecatevar </span></h2>
@@ -4787,7 +4795,7 @@ class="mw-headline"> deprecatevar </span></h2>
 </p><p>Example: The following example will decrement the counter by 60 
 every 300 seconds.
 </p>
-<pre>SecAction phase:5,nolog,pass,deprecatevar:SESSION.score=60/300
+<pre>SecAction phase:5,id:108,nolog,pass,deprecatevar:SESSION.score=60/300
 </pre>
 <p>Counter values are always positive, meaning that the value will never
  go below zero. Unlike expirevar, the deprecate action must be executed 
@@ -4802,9 +4810,9 @@ for tracking Basic Authentication attempts. If the client goes over the
 threshold of more than 25 attempts in 2 minutes, it will DROP subsequent
  connections.
 </p>
-<pre>SecAction phase:1,initcol:ip=%{REMOTE_ADDR},nolog
-SecRule ARGS:login "!^$" "nolog,phase:1,setvar:ip.auth_attempt=+1,deprecatevar:ip.auth_attempt=20/120"
-SecRule IP:AUTH_ATTEMPT "@gt 25" "log,drop,phase:1,msg:'Possible Brute Force Attack'"
+<pre>SecAction phase:1,id:109,initcol:ip=%{REMOTE_ADDR},nolog
+SecRule ARGS:login "!^$" "nolog,phase:1,id:110,setvar:ip.auth_attempt=+1,deprecatevar:ip.auth_attempt=20/120"
+SecRule IP:AUTH_ATTEMPT "@gt 25" "log,drop,phase:1,id:111,msg:'Possible Brute Force Attack'"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> This action is currently not available on 
 Windows based builds. 
@@ -4826,10 +4834,10 @@ documentation for more details on how to write Lua scripts.
 </p><p><b>Example:</b>
 </p>
 <pre># Run external program on rule match 
-SecRule REQUEST_URI "^/cgi-bin/script\.pl" "phase:2,t:none,t:lowercase,t:normalizePath,block,\ exec:/usr/local/apache/bin/test.sh"
+SecRule REQUEST_URI "^/cgi-bin/script\.pl" "phase:2,id:112,t:none,t:lowercase,t:normalizePath,block,\ exec:/usr/local/apache/bin/test.sh"
 
 # Run Lua script on rule match 
-SecRule ARGS:p attack "phase:2,block,exec:/usr/local/apache/conf/exec.lua"
+SecRule ARGS:p attack "phase:2,id:113,block,exec:/usr/local/apache/conf/exec.lua"
 </pre>
 <p>The exec action is executed independently from any disruptive actions
  specified. External scripts will always be called with no parameters. 
@@ -4848,8 +4856,8 @@ the given time period (in seconds).
 </p><p><b>Action Group:</b> Non-disruptive
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule REQUEST_COOKIES:JSESSIONID "!^$" "nolog,phase:1,pass,setsid:%{REQUEST_COOKIES:JSESSIONID}"
-SecRule REQUEST_URI "^/cgi-bin/script\.pl" "phase:2,t:none,t:lowercase,t:normalisePath,log,allow,setvar:session.suspicious=1,expirevar:session.suspicious=3600,phase:1"
+<pre>SecRule REQUEST_COOKIES:JSESSIONID "!^$" "nolog,phase:1,id:114,pass,setsid:%{REQUEST_COOKIES:JSESSIONID}"
+SecRule REQUEST_URI "^/cgi-bin/script\.pl" "phase:2,id:115,t:none,t:lowercase,t:normalisePath,log,allow,setvar:session.suspicious=1,expirevar:session.suspicious=3600,phase:1"
 </pre>
 <p>You should use the expirevar actions at the same time that you use 
 setvar actions in order to keep the indented expiration time. If they 
@@ -4908,7 +4916,7 @@ initcol </span></h2>
 </p><p><b>Example:</b> The following example initiates IP address 
 tracking, which is best done in phase 1:
 </p>
-<pre>SecAction phase:1,nolog,pass,initcol:ip=%{REMOTE_ADDR}
+<pre>SecAction phase:1,id:116,nolog,pass,initcol:ip=%{REMOTE_ADDR}
 </pre>
 <p>Collections are loaded into memory on-demand, when the initcol action
  is executed. A collection will be persisted only if a change was made 
@@ -4921,7 +4929,7 @@ needs to be logged.
 </p><p><b>Action Group:</b> Non-disruptive
 </p><p><b>Example:</b>
 </p>
-<pre>SecAction phase:1,pass,initcol:ip=%{REMOTE_ADDR},log
+<pre>SecAction phase:1,id:117,pass,initcol:ip=%{REMOTE_ADDR},log
 </pre>
 <p>This action will log matches to the Apache error log file and the 
 ModSecurity audit log.
@@ -4933,7 +4941,7 @@ message.
 </p><p><b>Action Group:</b> Non-disruptive
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule ARGS:p "@rx &lt;script&gt;" "phase:2,log,pass,logdata:%{MATCHED_VAR}"
+<pre>SecRule ARGS:p "@rx &lt;script&gt;" "phase:2,id:118,log,pass,logdata:%{MATCHED_VAR}"
 </pre>
 <p>The logdata information appears in the error and/or audit log files. 
 Macro expansion is performed, so you may use variable names such 
@@ -4975,7 +4983,7 @@ anti-evasion transformation is performed.
 </p><p><b>Action Group:</b> Non-disruptive
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule ARGS "attack" "phase1,log,deny,t:removeNulls,t:lowercase,multiMatch"
+<pre>SecRule ARGS "attack" "phase1,log,deny,id:119,t:removeNulls,t:lowercase,multiMatch"
 </pre>
 <p>Normally, variables are inspected only once per rule, and only after 
 all transformation functions have been completed. With multiMatch, 
@@ -4990,7 +4998,7 @@ should be logged to the audit log.
 </p><p><b>Action Group:</b> Non-disruptive
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule REQUEST_HEADERS:User-Agent "Test" allow,noauditlog
+<pre>SecRule REQUEST_HEADERS:User-Agent "Test" allow,noauditlog,id:120
 </pre>
 <p>If the SecAuditEngine is set to On, all of the transactions will be 
 logged. If it is set to RelevantOnly, then you can control the logging 
@@ -5007,7 +5015,7 @@ error and audit logs.
 </p><p><b>Action Group:</b> Non-disruptive
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule REQUEST_HEADERS:User-Agent "Test" allow,nolog
+<pre>SecRule REQUEST_HEADERS:User-Agent "Test" allow,nolog,id:121
 </pre>
 <p>Although nolog implies noauditlog, you can override the former by 
 using nolog,auditlog.
@@ -5018,7 +5026,7 @@ of a successful match.
 </p><p><b>Action Group:</b> Disruptive
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule REQUEST_HEADERS:User-Agent "Test" "log,pass"
+<pre>SecRule REQUEST_HEADERS:User-Agent "Test" "log,pass,id:122"
 </pre>
 <p>When using pass with a SecRule with multiple targets, all variables 
 will be inspected and all non-disruptive actions trigger for every 
@@ -5026,10 +5034,10 @@ match. In the following example, the TX.test variable will be
 incremented once for every request parameter:
 </p>
 <pre># Set TX.test to zero 
-SecAction "phase:2,nolog,pass,setvar:TX.test=0"
+SecAction "phase:2,nolog,pass,setvar:TX.test=0,id:123"
 
 # Increment TX.test for every request parameter 
-SecRule ARGS "test" "phase:2,log,pass,setvar:TX.test=+1"
+SecRule ARGS "test" "phase:2,log,pass,setvar:TX.test=+1,id:124"
 </pre>
 <a name="pause" id="pause"></a><h2> <span class="mw-headline"> pause </span></h2>
 <p><b>Description:</b> Pauses transaction processing for the specified 
@@ -5038,7 +5046,7 @@ supports macro expansion.
 </p><p><b>Action Group:</b> Disruptive
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule REQUEST_HEADERS:User-Agent "Test" "log,pause:5000"
+<pre>SecRule REQUEST_HEADERS:User-Agent "Test" "log,pause:5000,id:125"
 </pre>
 <dl><dt> Warning&nbsp;</dt><dd> This feature can be of limited benefit 
 for slowing down brute force authentication attacks, but use with care. 
@@ -5055,7 +5063,7 @@ establish the rule defaults.
 </p><p><b>Example:</b>
 </p>
 <pre># Initialize IP address tracking in phase 1
-SecAction phase:1,nolog,pass,initcol:IP=%{REMOTE_ADDR}
+SecAction phase:1,nolog,pass,id:126,initcol:IP=%{REMOTE_ADDR}
 </pre>
 <p>Starting in ModSecurity version v2.7 there are aliases for some phase
  numbers:
@@ -5066,7 +5074,7 @@ SecAction phase:1,nolog,pass,initcol:IP=%{REMOTE_ADDR}
 </li></ul>
 <p><b>Example:</b>
 </p>
-<pre>SecRule REQUEST_HEADERS:User-Agent "Test" "phase:request,log,deny"
+<pre>SecRule REQUEST_HEADERS:User-Agent "Test" "phase:request,log,deny,id:127"
 </pre>
 <dl><dt> Warning&nbsp;</dt><dd> Keep in mind that if you specify the 
 incorrect phase, the variable used in the rule may not yet be available.
@@ -5085,7 +5093,7 @@ content type of the response is adequate for injection.
 </p><p><b>Processing Phases:</b> 3 and 4.
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule RESPONSE_CONTENT_TYPE ^text/html \ "phase:3,nolog,pass,prepend:'Header&lt;br&gt;'"
+<pre>SecRule RESPONSE_CONTENT_TYPE ^text/html \ "phase:3,nolog,pass,id:128,prepend:'Header&lt;br&gt;'"
 </pre>
 <dl><dt> Warning&nbsp;</dt><dd> Although macro expansion is allowed in 
 the injected content, you are strongly cautioned against inserting user 
@@ -5100,7 +5108,7 @@ there’s no external redirection taking place).
 </p><p><b>Action Group:</b> Disruptive
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule REQUEST_HEADERS:User-Agent "Test" log,proxy:http://honeypothost/
+<pre>SecRule REQUEST_HEADERS:User-Agent "Test" log,id:129,proxy:http://honeypothost/
 </pre>
 <p>For this action to work, mod_proxy must also be installed. This 
 action is useful if you would like to proxy matching requests onto a 
@@ -5114,7 +5122,7 @@ redirect </span></h2>
 </p><p><b>Action Group:</b> Disruptive
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule REQUEST_HEADERS:User-Agent "Test" "phase:1,log,redirect:http://www.example.com/failed.html"
+<pre>SecRule REQUEST_HEADERS:User-Agent "Test" "phase:1,id:130,log,redirect:http://www.example.com/failed.html"
 </pre>
 <p>If the status action is present on the same rule, and its value can 
 be used for a redirection (i.e., is one of the following: 301, 302, 303,
@@ -5144,7 +5152,7 @@ replaced with an asterisk.
 </p><p><b>Example:</b>
 </p>
 <pre># Never log passwords 
-SecAction "nolog,phase:2,sanitiseArg:password,sanitiseArg:newPassword,sanitiseArg:oldPassword"
+SecAction "nolog,phase:2,id:131,sanitiseArg:password,sanitiseArg:newPassword,sanitiseArg:oldPassword"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> The sanitize actions affect only the data 
 as it is logged to audit log. High-level debug logs may contain 
@@ -5162,7 +5170,7 @@ transaction elements when they match a condition. For example, the
 example below will sanitise any argument that contains the word password
  in the name.
 </p>
-<pre>SecRule ARGS_NAMES password nolog,pass,sanitiseMatched
+<pre>SecRule ARGS_NAMES password nolog,pass,id:132,sanitiseMatched
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> The sanitize actions affect only the data 
 as it is logged to audit log. High-level debug logs may contain 
@@ -5186,8 +5194,8 @@ matched, but keep the first byte and last 4 bytes
 </li></ul>
 <pre># Detect credit card numbers in parameters and 
 # prevent them from being logged to audit log 
-SecRule ARGS "@verifyCC \d{13,16}" "phase:2,nolog,capture,pass,msg:'Potential credit card number in request',sanitiseMatchedBytes"
-SecRule RESPONSE_BODY "@verifyCC \d{13,16}" "phase:4,t:none,log,capture,block,msg:'Potential credit card number is response body',sanitiseMatchedBytes:0/4"
+SecRule ARGS "@verifyCC \d{13,16}" "phase:2,id:133,nolog,capture,pass,msg:'Potential credit card number in request',sanitiseMatchedBytes"
+SecRule RESPONSE_BODY "@verifyCC \d{13,16}" "phase:4,id:134,t:none,log,capture,block,msg:'Potential credit card number is response body',sanitiseMatchedBytes:0/4"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> The sanitize actions affect only the data 
 as it is logged to audit log. High-level debug logs may contain 
@@ -5204,7 +5212,7 @@ so the operator must support capture action. ie: @rx, @verifyCC.
 </p><p><b>Example:</b> This will sanitise the data in the Authorization 
 header.
 </p>
-<pre>SecAction "phase:1,nolog,pass,sanitiseRequestHeader:Authorization"
+<pre>SecAction "phase:1,nolog,pass,id:135,sanitiseRequestHeader:Authorization"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> The sanitize actions affect only the data 
 as it is logged to audit log. High-level debug logs may contain 
@@ -5220,7 +5228,7 @@ with an asterisk.
 </p><p><b>Example:</b> This will sanitise the Set-Cookie data sent to 
 the client.
 </p>
-<pre>SecAction "phase:3,nolog,pass,sanitiseResponseHeader:Set-Cookie"
+<pre>SecAction "phase:3,nolog,pass,id:136,sanitiseResponseHeader:Set-Cookie"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> The sanitize actions affect only the data 
 as it is logged to audit log. High-level debug logs may contain 
@@ -5267,7 +5275,7 @@ collection using the username provided as parameter.
 </p><p><b>Action Group:</b> Non-disruptive
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule ARGS:username ".*" "phase:2,t:none,pass,nolog,noauditlog,capture,setvar:session.username=%{TX.0},setuid:%{TX.0}"
+<pre>SecRule ARGS:username ".*" "phase:2,id:137,t:none,pass,nolog,noauditlog,capture,setvar:session.username=%{TX.0},setuid:%{TX.0}"
 </pre>
 <p>After initialization takes place, the variable USERID will be 
 available for use in the subsequent rules. This action understands 
@@ -5292,7 +5300,7 @@ SESSION collection using the session token provided as parameter.
 </p><p><b>Example:</b>
 </p>
 <pre># Initialise session variables using the session cookie value 
-SecRule REQUEST_COOKIES:PHPSESSID&nbsp;!^$ "chain,nolog,pass,setsid:%{REQUEST_COOKIES.PHPSESSID}"
+SecRule REQUEST_COOKIES:PHPSESSID&nbsp;!^$ "nolog,pass,id:138,setsid:%{REQUEST_COOKIES.PHPSESSID}"
 </pre>
 <p>Note
 </p><p>After the initialization takes place, the variable SESSIONID will
@@ -5306,8 +5314,8 @@ variables that can be accessed by Apache.
 </p><p><b>Action Group:</b> Non-disruptive
 </p><p><b>Examples:</b>
 </p>
-<pre>SecRule RESPONSE_HEADERS:/Set-Cookie2?/ "(?i:(j?sessionid|(php)?sessid|(asp|jserv|jw)?session[-_]?(id)?|cf(id|token)|sid))" "phase:3,t:none,pass,nolog,setvar:tx.sessionid=%{matched_var}"
-SecRule TX:SESSIONID "!(?i:\;?&nbsp;?httponly;?)" "phase:3,t:none,setenv:httponly_cookie=%{matched_var},pass,log,auditlog,msg:'AppDefect: Missing HttpOnly Cookie Flag.'"
+<pre>SecRule RESPONSE_HEADERS:/Set-Cookie2?/ "(?i:(j?sessionid|(php)?sessid|(asp|jserv|jw)?session[-_]?(id)?|cf(id|token)|sid))" "phase:3,t:none,pass,id:139,nolog,setvar:tx.sessionid=%{matched_var}"
+SecRule TX:SESSIONID "!(?i:\;?&nbsp;?httponly;?)" "phase:3,id:140,t:none,setenv:httponly_cookie=%{matched_var},pass,log,auditlog,msg:'AppDefect: Missing HttpOnly Cookie Flag.'"
 
 Header set Set-Cookie "%{httponly_cookie}e; HTTPOnly" env=httponly_cookie
 </pre>
@@ -5343,10 +5351,10 @@ execute when an individual rule matches and not the entire chain.
 </p><p><b>Example:</b>
 </p>
 <pre># Require Accept header, but not from access from the localhost 
-SecRule REMOTE_ADDR "^127\.0\.0\.1$" "phase:1,skip:1" 
+SecRule REMOTE_ADDR "^127\.0\.0\.1$" "phase:1,skip:1,id:141" 
 
 # This rule will be skipped over when REMOTE_ADDR is 127.0.0.1 
-SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" "phase:1,deny,msg:'Request Missing an Accept Header'"
+SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" "phase:1,id:142,deny,msg:'Request Missing an Accept Header'"
 </pre>
 <p>The skip action works only within the current processing phase and 
 not necessarily in the order in which the rules appear in the 
@@ -5364,10 +5372,10 @@ match, resuming rule execution with the first rule that follows the rule
 the skip example, but using skipAfter:
 </p>
 <pre># Require Accept header, but not from access from the localhost 
-SecRule REMOTE_ADDR "^127\.0\.0\.1$" "phase:1,skipAfter:IGNORE_LOCALHOST" 
+SecRule REMOTE_ADDR "^127\.0\.0\.1$" "phase:1,id:143,skipAfter:IGNORE_LOCALHOST" 
 
 # This rule will be skipped over when REMOTE_ADDR is 127.0.0.1 
-SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" "phase:1,deny,msg:'Request Missing an Accept Header'" 
+SecRule &amp;REQUEST_HEADERS:Accept "@eq 0" "phase:1,deny,id:144,msg:'Request Missing an Accept Header'" 
 SecMarker IGNORE_LOCALHOST
 </pre>
 <p>Example from the OWASP ModSecurity CRS:
@@ -5399,7 +5407,7 @@ actions deny and redirect.
 </p><p><b>Example:</b>
 </p>
 <pre># Deny with status 403
-SecDefaultAction "phase:1,log,deny,status:403"
+SecDefaultAction "phase:1,log,deny,id:145,status:403"
 </pre>
 <p>Status actions defined in Apache scope locations (such as Directory, 
 Location, etc...) may be superseded by phase:1 action settings. The 
@@ -5415,7 +5423,7 @@ rule before matching.
 </p><p><b>Action Group:</b> Non-disruptive
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule ARGS "(asfunction|javascript|vbscript|data|mocha|livescript):" "t:none,t:htmlEntityDecode,t:lowercase,t:removeNulls,t:removeWhitespace"
+<pre>SecRule ARGS "(asfunction|javascript|vbscript|data|mocha|livescript):" "id:146,t:none,t:htmlEntityDecode,t:lowercase,t:removeNulls,t:removeWhitespace"
 </pre>
 <p>Any transformation functions that you specify in a SecRule will be 
 added to the previous ones specified in SecDefaultAction. It is 
@@ -5453,9 +5461,9 @@ in the execution of XPath expressions.
 </p><p><b>Action Group:</b> Data
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule REQUEST_HEADERS:Content-Type "text/xml" "phase:1,pass,ctl:requestBodyProcessor=XML,ctl:requestBodyAccess=On, \
+<pre>SecRule REQUEST_HEADERS:Content-Type "text/xml" "phase:1,id:147,pass,ctl:requestBodyProcessor=XML,ctl:requestBodyAccess=On, \
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny
+SecRule XML:/soap:Envelope/soap:Body/q1:getInput/id() "123" phase:2,deny,id:148
 </pre>
 <a name="Operators" id="Operators"></a><h1> <span class="mw-headline"> 
 Operators </span></h1>
@@ -5470,7 +5478,8 @@ parameter string before comparison.
 </p><p><b>Example:</b>
 </p>
 <pre># Detect request line that does not begin with "GET" 
-SecRule REQUEST_LINE "!@beginsWith GET"
+SecRule REQUEST_LINE "!@beginsWith GET" "id:149"
+
 </pre>
 <a name="contains" id="contains"></a><h2> <span class="mw-headline"> 
 contains </span></h2>
@@ -5480,7 +5489,7 @@ string before comparison.
 </p><p><b>Example:</b>
 </p>
 <pre># Detect ".php" anywhere in the request line 
-SecRule REQUEST_LINE "@contains .php" 
+SecRule REQUEST_LINE "@contains .php" "id:150"
 </pre>
 <a name="containsWord" id="containsWord"></a><h2> <span 
 class="mw-headline"> containsWord </span></h2>
@@ -5490,7 +5499,7 @@ boundaries) is found anywhere in the input. Macro expansion is performed
 </p><p><b>Example:</b>
 </p>
 <pre># Detect "select" anywhere in ARGS 
-SecRule ARGS "@containsWord select" 
+SecRule ARGS "@containsWord select" "id:151"
 </pre>
 <p>Would match on - <br>
 -1 union <b>select</b> 
@@ -5508,7 +5517,7 @@ string before comparison.
 </p><p><b>Example:</b>
 </p>
 <pre># Detect request line that does not end with "HTTP/1.1" 
-SecRule REQUEST_LINE "!@endsWith HTTP/1.1"
+SecRule REQUEST_LINE "!@endsWith HTTP/1.1" "id:152"
 </pre>
 <a name="eq" id="eq"></a><h2> <span class="mw-headline"> eq </span></h2>
 <p><b>Description:</b> Performs numerical comparison and returns true if
@@ -5517,7 +5526,7 @@ performed on the parameter string before comparison.
 </p><p><b>Example:</b>
 </p>
 <pre># Detect exactly 15 request headers 
-SecRule &amp;REQUEST_HEADERS_NAMES "@eq 15"
+SecRule &amp;REQUEST_HEADERS_NAMES "@eq 15" "id:153"
 </pre>
 <a name="ge" id="ge"></a><h2> <span class="mw-headline"> ge </span></h2>
 <p><b>Description:</b> Performs numerical comparison and returns true if
@@ -5526,7 +5535,7 @@ Macro expansion is performed on the parameter string before comparison.
 </p><p><b>Example:</b>
 </p>
 <pre># Detect 15 or more request headers 
-SecRule &amp;REQUEST_HEADERS_NAMES "@ge 15"
+SecRule &amp;REQUEST_HEADERS_NAMES "@ge 15" "id:154"
 </pre>
 <a name="geoLookup" id="geoLookup"></a><h2> <span class="mw-headline"> 
 geoLookup </span></h2>
@@ -5544,10 +5553,10 @@ database is), the following example demonstrates how best to do it:
 SecGeoLookupDb /path/to/GeoLiteCity.dat 
 ... 
 # Lookup IP address 
-SecRule REMOTE_ADDR "@geoLookup" "phase:1,nolog,pass"
+SecRule REMOTE_ADDR "@geoLookup" "phase:1,id:155,nolog,pass"
 
 # Block IP address for which geolocation failed
- SecRule &amp;GEO "@eq 0" "phase:1,deny,msg:'Failed to lookup IP'"
+ SecRule &amp;GEO "@eq 0" "phase:1,id:156,deny,msg:'Failed to lookup IP'"
 </pre>
 <p>See the GEO variable for an example and more information on various 
 fields available.
@@ -5570,7 +5579,7 @@ it:
 SecGsbLookupDb /path/to/GsbMalware.dat 
 ... 
 # Check response bodies for malicious links
-SecRule RESPONSE_BODY "@gsbLookup =\"https?\:\/\/(.*?)\"" "phase:4,capture,log,block,msg:'Bad url detected in RESPONSE_BODY (Google Safe Browsing Check)',logdata:'http://www.google.com/safebrowsing/diagnostic?site=%{tx.0}'"
+SecRule RESPONSE_BODY "@gsbLookup =\"https?\:\/\/(.*?)\"" "phase:4,id:157,capture,log,block,msg:'Bad url detected in RESPONSE_BODY (Google Safe Browsing Check)',logdata:'http://www.google.com/safebrowsing/diagnostic?site=%{tx.0}'"
 </pre>
 <a name="gt" id="gt"></a><h2> <span class="mw-headline"> gt </span></h2>
 <p><b>Description:</b> Performs numerical comparison and returns true if
@@ -5579,7 +5588,7 @@ SecRule RESPONSE_BODY "@gsbLookup =\"https?\:\/\/(.*?)\"" "phase:4,capture,log,b
 </p><p><b>Example:</b>
 </p>
 <pre># Detect more than 15 headers in a request 
-SecRule &amp;REQUEST_HEADERS_NAMES "@gt 15"
+SecRule &amp;REQUEST_HEADERS_NAMES "@gt 15" "id:158"
 </pre>
 <a name="inspectFile" id="inspectFile"></a><h2> <span 
 class="mw-headline"> inspectFile </span></h2>
@@ -5652,12 +5661,12 @@ print "$output\n";
 <p><b>Example:</b>  Using the runav.pl script:
 </p>
 <pre># Execute external program to validate uploaded files 
-SecRule FILES_TMPNAMES "@inspectFile /path/to/util/runav.pl"
+SecRule FILES_TMPNAMES "@inspectFile /path/to/util/runav.pl" "id:159"
 </pre>
 <p>Example of using Lua script (placed in the same directory as the 
 configuration file):
 </p>
-<pre>SecRule FILES_TMPNANMES "@inspectFile inspect.lua"
+<pre>SecRule FILES_TMPNANMES "@inspectFile inspect.lua" "id:160"
 </pre>
 <p>The contents of inspect.lua:
 </p>
@@ -5694,11 +5703,11 @@ ipMatch </span></h2>
 <p><b>Examples:</b>
 </p><p>Individual Address:
 </p>
-<pre>SecRule REMOTE_ADDR "@ipMatch 192.168.1.100"
+<pre>SecRule REMOTE_ADDR "@ipMatch 192.168.1.100" "id:161"
 </pre>
 <p>Multiple Addresses w/network block:
 </p>
-<pre>SecRule REMOTE_ADDR "@ipMatch 192.168.1.100,192.168.1.50,10.10.50.0/24"
+<pre>SecRule REMOTE_ADDR "@ipMatch 192.168.1.100,192.168.1.50,10.10.50.0/24" "id:162"
 </pre>
 <a name="ipMatchF" id="ipMatchF"></a><h2> <span class="mw-headline"> 
 ipMatchF </span></h2>
@@ -5717,7 +5726,7 @@ class="mw-headline"> ipMatchFromFile </span></h2>
 </li></ul>
 <p><b>Examples:</b>
 </p>
-<pre>SecRule REMOTE_ADDR "@ipMatch ips.txt"
+<pre>SecRule REMOTE_ADDR "@ipMatch ips.txt" "id:163"
 </pre>
 <p>The file ips.txt may contain:
 </p>
@@ -5732,7 +5741,7 @@ expansion is performed on the parameter string before comparison.
 </p><p><b>Example</b>:
 </p>
 <pre># Detect 15 or fewer headers in a request 
-SecRule &amp;REQUEST_HEADERS_NAMES "@le 15"
+SecRule &amp;REQUEST_HEADERS_NAMES "@le 15" "id:164"
 </pre>
 <a name="lt" id="lt"></a><h2> <span class="mw-headline"> lt </span></h2>
 <p><b>Description:</b> Performs numerical comparison and returns true if
@@ -5741,7 +5750,7 @@ SecRule &amp;REQUEST_HEADERS_NAMES "@le 15"
 </p><p><b>Example:</b>
 </p>
 <pre># Detect fewer than 15 headers in a request 
-SecRule &amp;REQUEST_HEADERS_NAMES "@lt 15"
+SecRule &amp;REQUEST_HEADERS_NAMES "@lt 15" "id:165"
 </pre>
 <a name="pm" id="pm"></a><h2> <span class="mw-headline"> pm </span></h2>
 <p><b>Description:</b> Performs a case-insensitive match of the provided
@@ -5753,7 +5762,7 @@ expression.
 </p><p><b>Example:</b>
 </p>
 <pre># Detect suspicious client by looking at the user agent identification 
-SecRule REQUEST_HEADERS:User-Agent "@pm WebZIP WebCopier Webster WebStripper ... SiteSnagger ProWebWalker CheeseBot"
+SecRule REQUEST_HEADERS:User-Agent "@pm WebZIP WebCopier Webster WebStripper ... SiteSnagger ProWebWalker CheeseBot" "id:166"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> Starting on ModSecurity v2.6.0 this 
 operator supports a snort/suricata content style. ie: "@pm A|42|C|44|F".
@@ -5777,7 +5786,7 @@ file(s) anywhere in the target value.
 <pre># Detect suspicious user agents using the keywords in 
 # the files /path/to/blacklist1 and blacklist2 (the latter 
 # must be placed in the same folder as the configuration file) 
-SecRule REQUEST_HEADERS:User-Agent "@pm /path/to/blacklist1 blacklist2"
+SecRule REQUEST_HEADERS:User-Agent "@pm /path/to/blacklist1 blacklist2" "id:167"
 </pre>
 <p>Notes:
 </p>
@@ -5799,10 +5808,10 @@ own boundaries in phrases. For example, use /1.2.3.4/ instead of just
  You will find a complete example in the example.
 </li></ol>
 <pre># Prepare custom REMOTE_ADDR variable 
-SecAction "phase:1,nolog,pass,setvar:tx.REMOTE_ADDR=/%{REMOTE_ADDR}/"
+SecAction "phase:1,id:168,nolog,pass,setvar:tx.REMOTE_ADDR=/%{REMOTE_ADDR}/"
 
 # Check if REMOTE_ADDR is blacklisted 
-SecRule TX:REMOTE_ADDR "@pmFromFile blacklist.txt" "phase:1,deny,msg:'Blacklisted IP address'" 
+SecRule TX:REMOTE_ADDR "@pmFromFile blacklist.txt" "phase:1,id:169,deny,msg:'Blacklisted IP address'" 
 </pre>
 <p>The file blacklist.txt may contain:
 </p>
@@ -5810,7 +5819,7 @@ SecRule TX:REMOTE_ADDR "@pmFromFile blacklist.txt" "phase:1,deny,msg:'Blackliste
 # NOTE: All IPs must be prefixed/suffixed with "/" as the rules
 #   will add in this character as a boundary to ensure
 #   the entire IP is matched.
-# SecAction "phase:1,pass,nolog,setvar:tx.remote_addr='/%{REMOTE_ADDR}/'"
+# SecAction "phase:1,id:170,pass,nolog,setvar:tx.remote_addr='/%{REMOTE_ADDR}/'"
 /1.2.3.4/ 
 /5.6.7.8/
 </pre>
@@ -5837,7 +5846,7 @@ block list) given as parameter. The parameter can be an IPv4 address or a
  hostname.
 </p><p><b>Example:</b>
 </p>
-<pre>SecRule REMOTE_ADDR "@rbl sbl-xbl.spamhaus.org" "phase:1,t:none,pass,nolog,auditlog,msg:'RBL Match for SPAM Source',tag:'AUTOMATION/MALICIOUS',severity:'2',setvar:'tx.msg=%{rule.msg}',setvar:tx.automation_score=+%{tx.warning_anomaly_score},setvar:tx.anomaly_score=+%{tx.warning_anomaly_score}, \
+<pre>SecRule REMOTE_ADDR "@rbl sbl-xbl.spamhaus.org" "phase:1,id:171,t:none,pass,nolog,auditlog,msg:'RBL Match for SPAM Source',tag:'AUTOMATION/MALICIOUS',severity:'2',setvar:'tx.msg=%{rule.msg}',setvar:tx.automation_score=+%{tx.warning_anomaly_score},setvar:tx.anomaly_score=+%{tx.warning_anomaly_score}, \
 setvar:tx.%{rule.id}-AUTOMATION/MALICIOUS-%{matched_var_name}=%{matched_var},setvar:ip.spammer=1,expirevar:ip.spammer=86400,setvar:ip.previous_rbl_check=1,expirevar:ip.previous_rbl_check=86400,skipAfter:END_RBL_CHECK"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> If the RBL used is dnsbl.httpbl.org 
@@ -5859,7 +5868,7 @@ ModSecurity 2.7.0 this operator supports the syntax |hex| allowing users
 Removing HTML Comments from response bodies:
 </p>
 <pre>SecStreamOutBodyInspection On
-SecRule STREAM_OUTPUT_BODY "@rsub s/&lt;!--.*?--&gt;/ /" "phase:4,t:none,nolog,pass"
+SecRule STREAM_OUTPUT_BODY "@rsub s/&lt;!--.*?--&gt;/ /" "phase:4,id:172,t:none,nolog,pass"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> If you plan to manipulate live data by 
 using @rsub with the STREAM_ variables, you must also enable 
@@ -5895,13 +5904,13 @@ rules that do not explicitly specify an operator default to @rx</b>.
 </p><p><b>Examples:</b>
 </p>
 <pre># Detect Nikto 
-SecRule REQUEST_HEADERS:User-Agent "@rx nikto" phase:1,t:lowercase
+SecRule REQUEST_HEADERS:User-Agent "@rx nikto" phase:1,id:173,t:lowercase
 
 # Detect Nikto with a case-insensitive pattern 
-SecRule REQUEST_HEADERS:User-Agent "@rx (?i)nikto" phase:1,t:none
+SecRule REQUEST_HEADERS:User-Agent "@rx (?i)nikto" phase:1,id:174,t:none
 
 # Detect Nikto with a case-insensitive pattern 
-SecRule REQUEST_HEADERS:User-Agent "(?i)nikto"
+SecRule REQUEST_HEADERS:User-Agent "(?i)nikto" "id:175"
 </pre>
 <p>Regular expressions are handled by the PCRE library <a 
 href="http://www.pcre.org/" class="external autonumber" 
@@ -5931,7 +5940,7 @@ is performed on the parameter string before comparison.
 </p><p><b>Example:</b>
 </p>
 <pre># Detect request parameters "foo" that do not # contain "bar", exactly. 
-SecRule ARGS:foo "!@streq bar"
+SecRule ARGS:foo "!@streq bar" "id:176"
 </pre>
 <a name="strmatch" id="strmatch"></a><h2> <span class="mw-headline"> 
 strmatch </span></h2>
@@ -5943,7 +5952,7 @@ expression.
 </p><p><b>Example:</b>
 </p>
 <pre># Detect suspicious client by looking at the user agent identification 
-SecRule REQUEST_HEADERS:User-Agent "@strmatch WebZIP"
+SecRule REQUEST_HEADERS:User-Agent "@strmatch WebZIP" "id:177"
 </pre>
 <p><br>
 </p>
@@ -5962,14 +5971,14 @@ specified range.
 <pre># Enforce very strict byte range for request parameters (only 
 # works for the applications that do not use the languages other 
 # than English). 
-SecRule ARGS "@validateByteRange 10, 13, 32-126"
+SecRule ARGS "@validateByteRange 10, 13, 32-126" "id:178"
 </pre>
 <p>The validateByteRange is most useful when used to detect the presence
  of NUL bytes, which don’t have a legitimate use, but which are often 
 used as an evasion technique.
 </p>
 <pre># Do not allow NUL bytes 
-SecRule ARGS "@validateByteRange 1-255"
+SecRule ARGS "@validateByteRange 1-255" "id:179"
 </pre>
 <dl><dt> Note&nbsp;</dt><dd> You can force requests to consist only of 
 bytes from a certain byte range. This can be useful to avoid stack 
@@ -5997,10 +6006,10 @@ body processor. This operator matches when the validation fails.
 </p><p><b>Example:</b>
 </p>
 <pre># Parse the request bodies that contain XML 
-SecRule REQUEST_HEADERS:Content-Type ^text/xml$ "phase:1,nolog,pass,t:lowercase,ctl:requestBodyProcessor=XML"
+SecRule REQUEST_HEADERS:Content-Type ^text/xml$ "phase:1,id:180,nolog,pass,t:lowercase,ctl:requestBodyProcessor=XML"
 
 # Validate XML payload against DTD 
-SecRule XML "@validateDTD /path/to/xml.dtd" "phase:2,deny,msg:'Failed DTD validation'"
+SecRule XML "@validateDTD /path/to/xml.dtd" "phase:2,id:181,deny,msg:'Failed DTD validation'"
 </pre>
 <a name="validateEncryption" id="validateEncryption"></a><h2> <span 
 class="mw-headline"> validateEncryption </span></h2>
@@ -6019,10 +6028,10 @@ request body processor. This operator matches when the validation fails.
 </p><p><b>Example:</b>
 </p>
 <pre># Parse the request bodies that contain XML 
-SecRule REQUEST_HEADERS:Content-Type ^text/xml$ "phase:1,nolog,pass,t:lowercase,ctl:requestBodyProcessor=XML"
+SecRule REQUEST_HEADERS:Content-Type ^text/xml$ "phase:1,id:190,nolog,pass,t:lowercase,ctl:requestBodyProcessor=XML"
 
 # Validate XML payload against DTD 
-SecRule XML "@validateSchema /path/to/xml.xsd" "phase:2,deny,msg:'Failed DTD validation'"
+SecRule XML "@validateSchema /path/to/xml.xsd" "phase:2,id:191,deny,msg:'Failed DTD validation'"
 </pre>
 <a name="validateUrlEncoding" id="validateUrlEncoding"></a><h2> <span 
 class="mw-headline"> validateUrlEncoding </span></h2>
@@ -6031,7 +6040,7 @@ provided input string.
 </p><p><b>Example:</b>
 </p>
 <pre># Validate URL-encoded characters in the request URI 
-SecRule REQUEST_URI_RAW "@validateUrlEncoding"
+SecRule REQUEST_URI_RAW "@validateUrlEncoding" "id:192"
 </pre>
 <p>ModSecurity will automatically decode the URL-encoded characters in 
 request parameters, which means that there is little sense in applying 
@@ -6048,7 +6057,7 @@ class="mw-headline"> validateUtf8Encoding </span></h2>
 </p><p><b>Example:</b>
 </p>
 <pre># Make sure all request parameters contain only valid UTF-8 
-SecRule ARGS "@validateUtf8Encoding"
+SecRule ARGS "@validateUtf8Encoding" "id:193"
 </pre>
 <p>The @validateUtf8Encoding operator detects the following problems:
 </p>
@@ -6087,7 +6096,7 @@ minimize false positives.
 </p>
 <pre># Detect credit card numbers in parameters and 
 # prevent them from being logged to audit log 
-SecRule ARGS "@verifyCC \d{13,16}" "phase:2,nolog,pass,msg:'Potential credit card number',sanitiseMatched"
+SecRule ARGS "@verifyCC \d{13,16}" "phase:2,id:194,nolog,pass,msg:'Potential credit card number',sanitiseMatched"
 </pre>
 <a name="verifyCPF" id="verifyCPF"></a><h2> <span class="mw-headline"> 
 verifyCPF </span></h2>
@@ -6099,7 +6108,7 @@ minimize false positives.
 </p>
 <pre># Detect CPF numbers in parameters and 
 # prevent them from being logged to audit log 
-SecRule ARGS "@verifyCPF /^([0-9]{3}\.){2}[0-9]{3}-[0-9]{2}$/" "phase:2,nolog,pass,msg:'Potential CPF number',sanitiseMatched"
+SecRule ARGS "@verifyCPF /^([0-9]{3}\.){2}[0-9]{3}-[0-9]{2}$/" "phase:2,id:195,nolog,pass,msg:'Potential CPF number',sanitiseMatched"
 </pre>
 <a name="verifySSN" id="verifySSN"></a><h2> <span class="mw-headline"> 
 verifySSN </span></h2>
@@ -6111,7 +6120,7 @@ perform an initial match, following up with an SSN algorithm calculation
 </p>
 <pre># Detect social security numbers in parameters and 
 # prevent them from being logged to audit log 
-SecRule ARGS "@verifySSN \d{3}-?\d{2}-?\d{4}" "phase:2,nolog,pass,msg:'Potential social security number',sanitiseMatched"
+SecRule ARGS "@verifySSN \d{3}-?\d{2}-?\d{4}" "phase:2,id:196,nolog,pass,msg:'Potential social security number',sanitiseMatched"
 </pre>
 <p><b>Version:</b> 2.6
 </p><p><b>SSN Format</b>: 
@@ -6492,7 +6501,7 @@ Template argument size: 0/2097152 bytes
 Expensive parser function count: 0/100
 -->
 
-<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20121015135549 -->
+<!-- Saved in parser cache with key p_mod-security_mediawiki:pcache:idhash:12-0!1!0!!en!2!edit=0!printable=1 and timestamp 20121018190422 -->
 <div class="printfooter">
 Retrieved from "<a 
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual">http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual</a>"</div>
@@ -6602,7 +6611,7 @@ pages</a></li>
 href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;printable=yes&amp;printable=yes"
  rel="alternate" title="Printable version of this page [alt-shift-p]" 
 accesskey="p">Printable version</a></li>				<li id="t-permalink"><a 
-href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=522"
+href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Reference_Manual&amp;oldid=537"
  title="Permanent link to this revision of the page">Permanent link</a></li>
 			</ul>
 		</div>
@@ -6614,15 +6623,15 @@ href="http://sourceforge.net/apps/mediawiki/mod-security/index.php?title=Referen
 src="Reference_Manual_files/poweredby_mediawiki_88x31.png" alt="Powered 
 by MediaWiki"></a></div>
 			<ul id="f-list">
-					<li id="lastmod"> This page was last modified on 15 October 2012, 
-at 13:50.</li>
-					<li id="viewcount">This page has been accessed 165,682 times.</li>
+					<li id="lastmod"> This page was last modified on 18 October 2012, 
+at 13:21.</li>
+					<li id="viewcount">This page has been accessed 167,231 times.</li>
 			</ul>
 		</div>
 </div>
 
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
-<!-- Served in 1.311 secs. -->
+<!-- Served in 1.316 secs. -->
     
     
     <script type="text/javascript">
