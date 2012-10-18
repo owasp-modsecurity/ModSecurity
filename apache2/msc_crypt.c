@@ -119,58 +119,6 @@ char *normalize_path(modsec_rec *msr, char *input) {
 }
 
 /**
- * \brief Create a random number
- *
- * \retval seed random seed
- */
-unsigned long prng()   {
-    short num_matrix1[10], num_matrix2[10];
-    unsigned long  num, num1, num2;
-    short n, *p;
-    unsigned short seed_num = 0;
-    unsigned long seed = 0;
-
-    seed_num = seed & N16BITS_MAX;
-    num = seed & N31BITS_MASK;
-
-    p = num_matrix1;
-
-    for(n = 18; n-- ; ) {
-        num = 30903*seed_num + (num>>16);
-        *p++ = seed_num = num & N16BITS_MAX;
-        if (n == 9)
-            p = num_matrix2;
-    }
-
-    num_matrix1[0] &= N15BITS_MASK;
-    num_matrix2[0] &= N15BITS_MASK;
-    memcpy((char*)num_matrix1+2,(char*)num_matrix1+1,8*sizeof(short));
-    memcpy((char*)num_matrix2+2,(char*)num_matrix2+1,8*sizeof(short));
-
-    num1 = num_matrix1[0];
-    num2 = num_matrix2[0];
-
-    num1 += 1941 * num_matrix1[2] + 1860 * num_matrix1[3] +
-        1812 * num_matrix1[4] + 1776 * num_matrix1[5] +
-        1492 * num_matrix1[6] + 1215 * num_matrix1[7] +
-        1066 * num_matrix1[8] + 12013 * num_matrix1[9];
-
-    num2 += 1111 * num_matrix2[2] + 2222 * num_matrix2[3] +
-        3333 * num_matrix2[4] + 4444 * num_matrix2[5] +
-        5555 * num_matrix2[6] + 6666 * num_matrix2[7] +
-        7777 * num_matrix2[8] + 9272 * num_matrix2[9];
-
-    num_matrix1[0] = num1/N16BITS_MASK;
-    num_matrix2[0] = num2/N16BITS_MASK;
-    num_matrix1[1] = N16BITS_MAX & num1;
-    num_matrix2[1] = N16BITS_MAX & num2;
-
-    seed = (((long)num_matrix1[1])<<16)+(long)num_matrix2[1];
-
-    return seed;
-}
-
-/**
  * \brief Create a random password
  *
  * \param mp ModSecurity transaction memory pool
@@ -181,14 +129,17 @@ char *getkey(apr_pool_t *mp) {
     unsigned char digest[APR_SHA1_DIGESTSIZE];
     char *sig, *key, *value;
     apr_sha1_ctx_t ctx;
+    char salt[64];
 
-    key = apr_psprintf(mp,"%lu",prng());
+    pr_generate_random_bytes(salt, sizeof(salt));
+    key = apr_psprintf(mp,"%lu",salt);
 
     apr_sha1_init (&ctx);
     apr_sha1_update (&ctx, (const char*)key, strlen(key));
     apr_sha1_update (&ctx, "\0", 1);
 
-    value = apr_psprintf(mp,"%lu",prng());
+    pr_generate_random_bytes(salt, sizeof(salt));
+    value = apr_psprintf(mp,"%lu",salt);
 
     apr_sha1_update (&ctx, value, strlen (value));
     apr_sha1_final (digest, &ctx);
