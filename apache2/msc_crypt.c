@@ -199,6 +199,7 @@ char *getkey(apr_pool_t *mp) {
     return sig;
 }
 
+
 /**
  * \brief Generate the MAC for a given message
  *
@@ -1092,6 +1093,70 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
 
     htmlDocContentDumpFormatOutput(output_buf, msr->crypto_html_tree, NULL, 0);
 
+#ifdef  LIBXML2_NEW_BUFFER
+
+    if (output_buf->conv == NULL || (output_buf->conv && xmlOutputBufferGetSize(output_buf) == 0)) {
+
+        if(output_buf->buffer == NULL || xmlOutputBufferGetSize(output_buf) == 0)  {
+            xmlOutputBufferClose(output_buf);
+            xmlFreeDoc(msr->crypto_html_tree);
+            msr->of_stream_changed = 0;
+            return -1;
+        }
+
+        if(msr->stream_output_data != NULL) {
+            free(msr->stream_output_data);
+            msr->stream_output_data =  NULL;
+        }
+
+        msr->stream_output_length = xmlOutputBufferGetSize(output_buf);
+        msr->stream_output_data = (char *)malloc(msr->stream_output_length+1);
+
+        if (msr->stream_output_data == NULL) {
+            xmlOutputBufferClose(output_buf);
+            xmlFreeDoc(msr->crypto_html_tree);
+            return -1;
+        }
+
+        memset(msr->stream_output_data, 0x0, msr->stream_output_length+1);
+        memcpy(msr->stream_output_data, xmlOutputBufferGetContent(output_buf), msr->stream_output_length);
+
+        if (msr->txcfg->debuglog_level >= 4)
+            msr_log(msr, 4, "inject_encrypted_response_body: Copying XML tree from CONTENT to stream buffer [%d] bytes.", xmlOutputBufferGetSize(output_buf));
+
+    } else {
+
+        if(output_buf->conv == NULL || xmlOutputBufferGetSize(output_buf) == 0)  {
+            xmlOutputBufferClose(output_buf);
+            xmlFreeDoc(msr->crypto_html_tree);
+            msr->of_stream_changed = 0;
+            return -1;
+        }
+
+        if(msr->stream_output_data != NULL) {
+            free(msr->stream_output_data);
+            msr->stream_output_data =  NULL;
+        }
+
+        msr->stream_output_length = xmlOutputBufferGetSize(output_buf);
+        msr->stream_output_data = (char *)malloc(msr->stream_output_length+1);
+
+        if (msr->stream_output_data == NULL) {
+            xmlOutputBufferClose(output_buf);
+            xmlFreeDoc(msr->crypto_html_tree);
+            return -1;
+        }
+
+        memset(msr->stream_output_data, 0x0, msr->stream_output_length+1);
+        memcpy(msr->stream_output_data, xmlOutputBufferGetContent(output_buf), msr->stream_output_length);
+
+        if (msr->txcfg->debuglog_level >= 4)
+            msr_log(msr, 4, "inject_encrypted_response_body: Copying XML tree from CONV to stream buffer [%d] bytes.", xmlOutputBufferGetSize(output_buf));
+
+    }
+
+#else
+
     if (output_buf->conv == NULL || (output_buf->conv && output_buf->conv->use == 0)) {
 
         if(output_buf->buffer == NULL || output_buf->buffer->use == 0)  {
@@ -1151,6 +1216,8 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
             msr_log(msr, 4, "inject_encrypted_response_body: Copying XML tree from CONV to stream buffer [%d] bytes.", output_buf->conv->use);
 
     }
+
+#endif
 
     xmlOutputBufferClose(output_buf);
 
