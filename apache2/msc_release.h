@@ -38,7 +38,7 @@
 
 #define MODSEC_VERSION_MAJOR       "2"
 #define MODSEC_VERSION_MINOR       "7"
-#define MODSEC_VERSION_MAINT       "0"
+#define MODSEC_VERSION_MAINT       "1"
 #define MODSEC_VERSION_TYPE        ""
 #define MODSEC_VERSION_RELEASE     ""
 
