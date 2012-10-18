@@ -124,7 +124,7 @@ char *normalize_path(modsec_rec *msr, char *input) {
  * \retval seed random seed
  */
 unsigned long prng()   {
-    short num_matrix1[10] = {0}, num_matrix2[10] = {0};
+    short num_matrix1[10], num_matrix2[10];
     unsigned long  num, num1, num2;
     short n, *p;
     unsigned short seed_num = 0;
@@ -178,12 +178,25 @@ unsigned long prng()   {
  * \retval key random key
  */
 char *getkey(apr_pool_t *mp) {
-    char *key = NULL;
-    unsigned long int seed = time(NULL);
+    unsigned char digest[APR_SHA1_DIGESTSIZE];
+    char *sig, *key, *value;
+    apr_sha1_ctx_t ctx;
 
-    key = apr_psprintf(mp,"%lu%lu",prng(),seed);
+    key = apr_psprintf(mp,"%lu",prng());
 
-    return key;
+    apr_sha1_init (&ctx);
+    apr_sha1_update (&ctx, (const char*)key, strlen(key));
+    apr_sha1_update (&ctx, "\0", 1);
+
+    value = apr_psprintf(mp,"%lu",prng());
+
+    apr_sha1_update (&ctx, value, strlen (value));
+    apr_sha1_final (digest, &ctx);
+
+    sig = apr_pcalloc (mp, apr_base64_encode_len (sizeof (digest)));
+    apr_base64_encode (sig, (const char*)digest, sizeof (digest));
+
+    return sig;
 }
 
 /**
