@@ -8,7 +8,7 @@
 
   * Fixed parsing error with modsecurity-recommended.conf and Apache 2.4.
 
-  * Fixed DROP action was disabled for Apache 2 module.
+  * Fixed DROP action was disabled for Apache 2 module by mistake.
 
   * Updated Reference Manual.
 
