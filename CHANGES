@@ -1,4 +1,4 @@
-01 Nov 2012 - 2.7.1
+29 Oct 2012 - 2.7.1
 -------------------
 
   * Added a better random bytes generator using apr_generate_random_bytes() to create
