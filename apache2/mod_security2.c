@@ -222,7 +222,7 @@ int perform_interception(modsec_rec *msr) {
             /* ENH This does not seem to work on Windows. Is there a
              *     better way to drop a connection anyway?
              */
-            #if !defined(WIN32) && defined(ALLOW_ACTION_DROP)
+            #if !defined(WIN32) && !defined(VERSION_NGINX)
             {
                 extern module core_module;
                 apr_socket_t *csd = ap_get_module_config(msr->r->connection->conn_config,
