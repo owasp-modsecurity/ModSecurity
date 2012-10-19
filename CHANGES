@@ -6,6 +6,8 @@
 
   * Fixed compilation bug with LibXML2 2.9.0 (Thanks Athmane Madjoudj).
 
+  * Fixed parsing error with modsecurity-recommended.conf and Apache 2.4.
+
   * Updated Reference Manual.
 
 15 Oct 2012 - 2.7.0
