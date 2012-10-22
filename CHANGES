@@ -10,6 +10,8 @@
 
   * Fixed DROP action was disabled for Apache 2 module by mistake.
 
+  * Fixed bug when use ctl:ruleRemoveByTag.
+
   * Updated Reference Manual.
 
 15 Oct 2012 - 2.7.0
