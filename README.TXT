@@ -28,8 +28,7 @@ oject
 
 
 Download:
-https://sourceforge.net/projects/mod-security/files/modsecurity-crs/0-CURRE
-NT/
+https://github.com/SpiderLabs/owasp-modsecurity-crs
 
 ----------------------------------
 
