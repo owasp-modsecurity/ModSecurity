@@ -1016,7 +1016,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         return 1;
     } else
     if (strcasecmp(name, "ruleRemoveByTag") == 0) {
-        rule_exception *re = apr_pcalloc(mptmp, sizeof(rule_exception));
+        rule_exception *re = apr_pcalloc(msr->mp, sizeof(rule_exception));
         re->type = RULE_EXCEPTION_REMOVE_TAG;
         re->param = (const char *)apr_pstrdup(msr->mp, value);
         re->param_data = msc_pregcomp(msr->mp, re->param, 0, NULL, NULL);
@@ -1034,7 +1034,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
         return 1;
     } else
     if (strcasecmp(name, "ruleRemoveByMsg") == 0) {
-        rule_exception *re = apr_pcalloc(mptmp, sizeof(rule_exception));
+        rule_exception *re = apr_pcalloc(msr->mp, sizeof(rule_exception));
         re->type = RULE_EXCEPTION_REMOVE_MSG;
         re->param = (const char *)apr_pstrdup(msr->mp, value);
         re->param_data = msc_pregcomp(msr->mp, re->param, 0, NULL, NULL);
