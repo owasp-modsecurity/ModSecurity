@@ -13,3 +13,5 @@ Modsecurity NGINX TODO
 * Source code documentation (insert doxygen headers)
 
 * Create better build infrastructure with support for tests and automated regression
+
+* Better things for test
