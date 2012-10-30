@@ -369,7 +369,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 
                             error_msg = apr_psprintf(msr->mp,
                                     "Execution error - "
-                                    "PCRE limits exceeded for Encrytion regex [%s] (%d): %s",
+                                    "PCRE limits exceeded for Hash regex [%s] (%d): %s",
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
@@ -424,7 +424,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 
                             error_msg = apr_psprintf(msr->mp,
                                     "Execution error - "
-                                    "PCRE limits exceeded for Encrytion regex [%s] (%d): %s",
+                                    "PCRE limits exceeded for Hash regex [%s] (%d): %s",
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
@@ -479,7 +479,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 
                             error_msg = apr_psprintf(msr->mp,
                                     "Execution error - "
-                                    "PCRE limits exceeded for Encrytion regex [%s] (%d): %s",
+                                    "PCRE limits exceeded for Hash regex [%s] (%d): %s",
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
@@ -534,7 +534,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 
                             error_msg = apr_psprintf(msr->mp,
                                     "Execution error - "
-                                    "PCRE limits exceeded for Encrytion regex [%s] (%d): %s",
+                                    "PCRE limits exceeded for Hash regex [%s] (%d): %s",
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
@@ -589,7 +589,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 
                             error_msg = apr_psprintf(msr->mp,
                                     "Execution error - "
-                                    "PCRE limits exceeded for Encrytion regex [%s] (%d): %s",
+                                    "PCRE limits exceeded for Hash regex [%s] (%d): %s",
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
@@ -617,7 +617,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 }
 
 /**
- * \brief Encrypt the html elements
+ * \brief Hash the html elements
  *
  * \param msr ModSecurity transaction resource
  *
