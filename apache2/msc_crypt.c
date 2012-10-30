@@ -369,7 +369,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 
                             error_msg = apr_psprintf(msr->mp,
                                     "Execution error - "
-                                    "PCRE limits exceeded for Encrytion regex [%s] (%d): %s",
+                                    "PCRE limits exceeded for Hash regex [%s] (%d): %s",
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
@@ -424,7 +424,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 
                             error_msg = apr_psprintf(msr->mp,
                                     "Execution error - "
-                                    "PCRE limits exceeded for Encrytion regex [%s] (%d): %s",
+                                    "PCRE limits exceeded for Hash regex [%s] (%d): %s",
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
@@ -479,7 +479,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 
                             error_msg = apr_psprintf(msr->mp,
                                     "Execution error - "
-                                    "PCRE limits exceeded for Encrytion regex [%s] (%d): %s",
+                                    "PCRE limits exceeded for Hash regex [%s] (%d): %s",
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
@@ -534,7 +534,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 
                             error_msg = apr_psprintf(msr->mp,
                                     "Execution error - "
-                                    "PCRE limits exceeded for Encrytion regex [%s] (%d): %s",
+                                    "PCRE limits exceeded for Hash regex [%s] (%d): %s",
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
@@ -589,7 +589,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 
                             error_msg = apr_psprintf(msr->mp,
                                     "Execution error - "
-                                    "PCRE limits exceeded for Encrytion regex [%s] (%d): %s",
+                                    "PCRE limits exceeded for Hash regex [%s] (%d): %s",
                                     em[i]->param,rc, my_error_msg);
 
                             if (msr->txcfg->debuglog_level >= 4)
@@ -617,7 +617,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 }
 
 /**
- * \brief Encrypt the html elements
+ * \brief Hash the html elements
  *
  * \param msr ModSecurity transaction resource
  *
@@ -625,7 +625,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
  * \retval 0 No element was changed
  * \retval -1 On fail
  */
-int encrypt_response_body_links(modsec_rec *msr)   {
+int hash_response_body_links(modsec_rec *msr)   {
     int lsize = 0, fsize = 0, lcount = 0, fcount = 0, i;
     int isize = 0, icount = 0, frsize = 0, frcount = 0;
     xmlXPathContextPtr  xpathCtx = NULL;
@@ -639,7 +639,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
 
     if (msr->crypto_html_tree == NULL) {
         if (msr->txcfg->debuglog_level >= 4)
-            msr_log(msr, 4, "encrypt_response_body_links: Cannot parse NULL html tree");
+            msr_log(msr, 4, "hash_response_body_links: Cannot parse NULL html tree");
         return -1;
     }
 
@@ -652,7 +652,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
     xpathCtx = xmlXPathNewContext(msr->crypto_html_tree);
     if(xpathCtx == NULL) {
         if (msr->txcfg->debuglog_level >= 4)
-            msr_log(msr, 4, "encrypt_response_body_links: Unable to create Xpath context.");
+            msr_log(msr, 4, "hash_response_body_links: Unable to create Xpath context.");
         goto ctx_error;
     }
 
@@ -664,7 +664,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
         if(xpathObj == NULL) {
             if (msr->txcfg->debuglog_level >= 4)
                 msr_log(msr, 4,
-                        "encrypt_response_body_links: Unable to evaluate xpath expression.");
+                        "hash_response_body_links: Unable to evaluate xpath expression.");
             goto obj_error;
         }
 
@@ -728,7 +728,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
         if(xpathObj == NULL) {
             if (msr->txcfg->debuglog_level >= 4)
                 msr_log(msr, 4,
-                        "encrypt_response_body_links: Unable to evaluate xpath expression.");
+                        "hash_response_body_links: Unable to evaluate xpath expression.");
             goto obj_error;
         }
 
@@ -804,7 +804,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
         if(xpathObj == NULL) {
             if (msr->txcfg->debuglog_level >= 4)
                 msr_log(msr, 4,
-                        "encrypt_response_body_links: Unable to evaluate xpath expression.");
+                        "hash_response_body_links: Unable to evaluate xpath expression.");
             goto obj_error;
         }
 
@@ -869,7 +869,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
         if(xpathObj == NULL) {
             if (msr->txcfg->debuglog_level >= 4)
                 msr_log(msr, 4,
-                        "encrypt_response_body_links: Unable to evaluate xpath expression.");
+                        "hash_response_body_links: Unable to evaluate xpath expression.");
             goto obj_error;
         }
 
@@ -933,10 +933,10 @@ int encrypt_response_body_links(modsec_rec *msr)   {
         xmlXPathFreeContext(xpathCtx);
 
     if (msr->txcfg->debuglog_level >= 4)    {
-        msr_log(msr, 4, "encrypt_response_body_links: Processed [%d] iframe src, [%d] encrypted.",isize, icount);
-        msr_log(msr, 4, "encrypt_response_body_links: Processed [%d] frame src, [%d] encrypted.",frsize, frcount);
-        msr_log(msr, 4, "encrypt_response_body_links: Processed [%d] form actions, [%d] encrypted.",fsize, fcount);
-        msr_log(msr, 4, "encrypt_response_body_links: Processed [%d] links, [%d] encrypted.",lsize, lcount);
+        msr_log(msr, 4, "hash_response_body_links: Processed [%d] iframe src, [%d] hashed.",isize, icount);
+        msr_log(msr, 4, "hash_response_body_links: Processed [%d] frame src, [%d] hashed.",frsize, frcount);
+        msr_log(msr, 4, "hash_response_body_links: Processed [%d] form actions, [%d] hashed.",fsize, fcount);
+        msr_log(msr, 4, "hash_response_body_links: Processed [%d] links, [%d] hashed.",lsize, lcount);
     }
 
     if(msr->of_stream_changed == 0) {
@@ -965,12 +965,12 @@ ctx_error:
  * \brief Inject the new response body
  *
  * \param msr ModSecurity transaction resource
- * \param elts Number of encrypted elements
+ * \param elts Number of hashed elements
  *
  * \retval 1 On success
  * \retval -1 On fail
  */
-int inject_encrypted_response_body(modsec_rec *msr, int elts) {
+int inject_hashed_response_body(modsec_rec *msr, int elts) {
     xmlOutputBufferPtr output_buf = NULL;
     xmlCharEncodingHandlerPtr  handler = NULL;
     char *p = NULL;
@@ -984,7 +984,7 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
 
     if (msr->crypto_html_tree == NULL) {
         if (msr->txcfg->debuglog_level >= 4)
-            msr_log(msr, 4, "inject_encrypted_response_body: Cannot parse NULL html tree");
+            msr_log(msr, 4, "inject_hashed_response_body: Cannot parse NULL html tree");
         return -1;
     }
 
@@ -1011,7 +1011,7 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
     }
 
     if (msr->txcfg->debuglog_level >= 4)
-        msr_log(msr, 4, "inject_encrypted_response_body: Detected encoding type [%s].", encoding);
+        msr_log(msr, 4, "inject_hashed_response_body: Detected encoding type [%s].", encoding);
 
     if (handler == NULL)
         handler = xmlFindCharEncodingHandler("UTF-8");
@@ -1032,12 +1032,12 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
     apr_table_set(msr->r->err_headers_out,"Content-Type",new_ct);
 
     if (msr->txcfg->debuglog_level >= 4)
-        msr_log(msr, 4, "inject_encrypted_response_body: Using content-type [%s].", handler->name);
+        msr_log(msr, 4, "inject_hashed_response_body: Using content-type [%s].", handler->name);
 
     output_buf = xmlAllocOutputBuffer(handler);
     if (output_buf == NULL) {
         if (msr->txcfg->debuglog_level >= 4)
-            msr_log(msr, 4, "inject_encrypted_response_body: Unable to allocate memory buffer.");
+            msr_log(msr, 4, "inject_hashed_response_body: Unable to allocate memory buffer.");
         xmlFreeDoc(msr->crypto_html_tree);
         return -1;
     }
@@ -1073,7 +1073,7 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
         memcpy(msr->stream_output_data, xmlOutputBufferGetContent(output_buf), msr->stream_output_length);
 
         if (msr->txcfg->debuglog_level >= 4)
-            msr_log(msr, 4, "inject_encrypted_response_body: Copying XML tree from CONTENT to stream buffer [%d] bytes.", xmlOutputBufferGetSize(output_buf));
+            msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONTENT to stream buffer [%d] bytes.", xmlOutputBufferGetSize(output_buf));
 
     } else {
 
@@ -1102,7 +1102,7 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
         memcpy(msr->stream_output_data, xmlOutputBufferGetContent(output_buf), msr->stream_output_length);
 
         if (msr->txcfg->debuglog_level >= 4)
-            msr_log(msr, 4, "inject_encrypted_response_body: Copying XML tree from CONV to stream buffer [%d] bytes.", xmlOutputBufferGetSize(output_buf));
+            msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONV to stream buffer [%d] bytes.", xmlOutputBufferGetSize(output_buf));
 
     }
 
@@ -1135,7 +1135,7 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
         memcpy(msr->stream_output_data, output_buf->buffer->content, msr->stream_output_length);
 
         if (msr->txcfg->debuglog_level >= 4)
-            msr_log(msr, 4, "inject_encrypted_response_body: Copying XML tree from CONTENT to stream buffer [%d] bytes.", output_buf->buffer->use);
+            msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONTENT to stream buffer [%d] bytes.", output_buf->buffer->use);
 
     } else {
 
@@ -1164,7 +1164,7 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
         memcpy(msr->stream_output_data, output_buf->conv->content, msr->stream_output_length);
 
         if (msr->txcfg->debuglog_level >= 4)
-            msr_log(msr, 4, "inject_encrypted_response_body: Copying XML tree from CONV to stream buffer [%d] bytes.", output_buf->conv->use);
+            msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONV to stream buffer [%d] bytes.", output_buf->conv->use);
 
     }
 
@@ -1176,13 +1176,13 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
     apr_table_unset(msr->r->headers_out,"Content-Length");
 
     if (msr->txcfg->debuglog_level >= 4)
-        msr_log(msr, 4, "inject_encrypted_response_body: Setting new content value %s", content_value);
+        msr_log(msr, 4, "inject_hashed_response_body: Setting new content value %s", content_value);
     apr_table_set(msr->r->headers_out, "Content-Length", content_value);
 
     xmlFreeDoc(msr->crypto_html_tree);
 
     if (msr->txcfg->debuglog_level >= 4)
-        msr_log(msr, 4, "inject_encrypted_response_body: Stream buffer [%"APR_SIZE_T_FMT"]. Done",msr->stream_output_length);
+        msr_log(msr, 4, "inject_hashed_response_body: Stream buffer [%"APR_SIZE_T_FMT"]. Done",msr->stream_output_length);
 
     return 1;
 }

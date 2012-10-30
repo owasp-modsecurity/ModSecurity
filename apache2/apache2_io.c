@@ -597,9 +597,9 @@ static int flatten_response_body(modsec_rec *msr) {
         retval = init_response_body_html_parser(msr);
 
         if(retval == 1) {
-            retval = encrypt_response_body_links(msr);
+            retval = hash_response_body_links(msr);
             if(retval > 0) {
-                retval = inject_encrypted_response_body(msr, retval);
+                retval = inject_hashed_response_body(msr, retval);
                 if (msr->txcfg->debuglog_level >= 4) {
                     msr_log(msr, 4, "Hash completed in %" APR_TIME_T_FMT " usec.", (apr_time_now() - time1));
                 }
