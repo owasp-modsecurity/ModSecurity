@@ -67,7 +67,7 @@ void *create_directory_config(apr_pool_t *mp, char *path)
 
     dcfg->rule_inheritance = NOT_SET;
     dcfg->rule_exceptions = apr_array_make(mp, 16, sizeof(rule_exception *));
-    dcfg->encryption_method = apr_array_make(mp, 16, sizeof(encryption_method *));
+    dcfg->hash_method = apr_array_make(mp, 16, sizeof(hash_method *));
 
     /* audit log variables */
     dcfg->auditlog_flag = NOT_SET;
@@ -139,8 +139,8 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->crypto_key_len = NOT_SET;
     dcfg->crypto_key_add = NOT_SET;
     dcfg->crypto_param_name = NOT_SET_P;
-    dcfg->encryption_is_enabled = NOT_SET;
-    dcfg->encryption_enforcement = NOT_SET;
+    dcfg->hash_is_enabled = NOT_SET;
+    dcfg->hash_enforcement = NOT_SET;
     dcfg->crypto_hash_href_rx = NOT_SET;
     dcfg->crypto_hash_faction_rx = NOT_SET;
     dcfg->crypto_hash_location_rx = NOT_SET;
@@ -446,8 +446,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->rule_exceptions = apr_array_append(mp, parent->rule_exceptions,
         child->rule_exceptions);
 
-    merged->encryption_method = apr_array_append(mp, parent->encryption_method,
-        child->encryption_method);
+    merged->hash_method = apr_array_append(mp, parent->hash_method,
+        child->hash_method);
 
     /* audit log variables */
     merged->auditlog_flag = (child->auditlog_flag == NOT_SET
@@ -552,7 +552,7 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->col_timeout = (child->col_timeout == NOT_SET
         ? parent->col_timeout : child->col_timeout);
 
-    /* Encryption */
+    /* Hash */
     merged->crypto_key = (child->crypto_key == NOT_SET_P
         ? parent->crypto_key : child->crypto_key);
     merged->crypto_key_len = (child->crypto_key_len == NOT_SET
@@ -561,10 +561,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
         ? parent->crypto_key_add : child->crypto_key_add);
     merged->crypto_param_name = (child->crypto_param_name == NOT_SET_P
         ? parent->crypto_param_name : child->crypto_param_name);
-    merged->encryption_is_enabled = (child->encryption_is_enabled == NOT_SET
-        ? parent->encryption_is_enabled : child->encryption_is_enabled);
-    merged->encryption_enforcement = (child->encryption_enforcement == NOT_SET
-        ? parent->encryption_enforcement : child->encryption_enforcement);
+    merged->hash_is_enabled = (child->hash_is_enabled == NOT_SET
+        ? parent->hash_is_enabled : child->hash_is_enabled);
+    merged->hash_enforcement = (child->hash_enforcement == NOT_SET
+        ? parent->hash_enforcement : child->hash_enforcement);
     merged->crypto_hash_href_rx = (child->crypto_hash_href_rx == NOT_SET
         ? parent->crypto_hash_href_rx : child->crypto_hash_href_rx);
     merged->crypto_hash_faction_rx = (child->crypto_hash_faction_rx == NOT_SET
@@ -687,13 +687,13 @@ void init_directory_config(directory_config *dcfg)
 
     if (dcfg->col_timeout == NOT_SET) dcfg->col_timeout = 3600;
 
-    /* Encryption */
+    /* Hash */
     if (dcfg->crypto_key == NOT_SET_P) dcfg->crypto_key = getkey(dcfg->mp);
     if (dcfg->crypto_key_len == NOT_SET) dcfg->crypto_key_len = strlen(dcfg->crypto_key);
-    if (dcfg->crypto_key_add == NOT_SET) dcfg->crypto_key_add = ENCRYPTION_KEYONLY;
+    if (dcfg->crypto_key_add == NOT_SET) dcfg->crypto_key_add = HASH_KEYONLY;
     if (dcfg->crypto_param_name == NOT_SET_P) dcfg->crypto_param_name = "crypt";
-    if (dcfg->encryption_is_enabled == NOT_SET) dcfg->encryption_is_enabled = ENCRYPTION_DISABLED;
-    if (dcfg->encryption_enforcement == NOT_SET) dcfg->encryption_enforcement = ENCRYPTION_DISABLED;
+    if (dcfg->hash_is_enabled == NOT_SET) dcfg->hash_is_enabled = HASH_DISABLED;
+    if (dcfg->hash_enforcement == NOT_SET) dcfg->hash_enforcement = HASH_DISABLED;
     if (dcfg->crypto_hash_href_rx == NOT_SET) dcfg->crypto_hash_href_rx = 0;
     if (dcfg->crypto_hash_faction_rx == NOT_SET) dcfg->crypto_hash_faction_rx = 0;
     if (dcfg->crypto_hash_location_rx == NOT_SET) dcfg->crypto_hash_location_rx = 0;
@@ -2255,7 +2255,7 @@ static const char *cmd_sensor_id(cmd_parms *cmd, void *_dcfg, const char *p1)
 
 
 /**
-* \brief Add SecEncryption configuration option
+* \brief Add SecHash configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
@@ -2264,18 +2264,18 @@ static const char *cmd_sensor_id(cmd_parms *cmd, void *_dcfg, const char *p1)
 * \retval NULL On failure
 * \retval apr_psprintf On Success
 */
-static const char *cmd_encryption_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
+static const char *cmd_hash_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "on") == 0)  {
-        dcfg->encryption_is_enabled = ENCRYPTION_ENABLED;
-        dcfg->encryption_enforcement = ENCRYPTION_ENABLED;
+        dcfg->hash_is_enabled = HASH_ENABLED;
+        dcfg->hash_enforcement = HASH_ENABLED;
     }
     else if (strcasecmp(p1, "off") == 0)    {
-        dcfg->encryption_is_enabled = ENCRYPTION_DISABLED;
-        dcfg->encryption_enforcement = ENCRYPTION_DISABLED;
+        dcfg->hash_is_enabled = HASH_DISABLED;
+        dcfg->hash_enforcement = HASH_DISABLED;
     }
     else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRuleEngine: %s", p1);
 
@@ -2283,7 +2283,7 @@ static const char *cmd_encryption_engine(cmd_parms *cmd, void *_dcfg, const char
 }
 
 /**
-* \brief Add SecEncryptionPram configuration option
+* \brief Add SecHashPram configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
@@ -2291,7 +2291,7 @@ static const char *cmd_encryption_engine(cmd_parms *cmd, void *_dcfg, const char
 *
 * \retval NULL On success
 */
-static const char *cmd_encryption_param(cmd_parms *cmd, void *_dcfg, const char *p1)
+static const char *cmd_hash_param(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
 
@@ -2304,7 +2304,7 @@ static const char *cmd_encryption_param(cmd_parms *cmd, void *_dcfg, const char 
 }
 
 /**
-* \brief Add SecEncryptionKey configuration option
+* \brief Add SecHashKey configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
@@ -2313,7 +2313,7 @@ static const char *cmd_encryption_param(cmd_parms *cmd, void *_dcfg, const char 
 *
 * \retval NULL On success
 */
-static const char *cmd_encryption_key(cmd_parms *cmd, void *_dcfg, const char *_p1, const char *_p2)
+static const char *cmd_hash_key(cmd_parms *cmd, void *_dcfg, const char *_p1, const char *_p2)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
     char *p1 = NULL;
@@ -2335,17 +2335,17 @@ static const char *cmd_encryption_key(cmd_parms *cmd, void *_dcfg, const char *_
         return NULL;
     } else    {
         if (strcasecmp(_p2, "KeyOnly") == 0)
-            dcfg->crypto_key_add = ENCRYPTION_KEYONLY;
+            dcfg->crypto_key_add = HASH_KEYONLY;
         else if (strcasecmp(_p2, "SessionID") == 0)
-            dcfg->crypto_key_add = ENCRYPTION_SESSIONID;
+            dcfg->crypto_key_add = HASH_SESSIONID;
         else if (strcasecmp(_p2, "RemoteIP") == 0)
-            dcfg->crypto_key_add = ENCRYPTION_REMOTEIP;
+            dcfg->crypto_key_add = HASH_REMOTEIP;
     }
     return NULL;
 }
 
 /**
-* \brief Add SecEncryptionMethodPm configuration option
+* \brief Add SecHashMethodPm configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
@@ -2355,11 +2355,11 @@ static const char *cmd_encryption_key(cmd_parms *cmd, void *_dcfg, const char *_
 * \retval NULL On failure
 * \retval apr_psprintf On Success
 */
-static const char *cmd_encryption_method_pm(cmd_parms *cmd, void *_dcfg,
+static const char *cmd_hash_method_pm(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
-    rule_exception *re = apr_pcalloc(cmd->pool, sizeof(encryption_method));
+    rule_exception *re = apr_pcalloc(cmd->pool, sizeof(hash_method));
     const char *_p2 = apr_pstrdup(cmd->pool, p2);
     ACMP *p = NULL;
     const char *phrase = NULL;
@@ -2385,7 +2385,7 @@ static const char *cmd_encryption_method_pm(cmd_parms *cmd, void *_dcfg,
     acmp_prepare(p);
 
     if (strcasecmp(p1, "HashHref") == 0) {
-        re->type = ENCRYPTION_URL_HREF_HASH_PM;
+        re->type = HASH_URL_HREF_HASH_PM;
         re->param = _p2;
         re->param_data = (void *)p;
         if (re->param_data == NULL) {
@@ -2394,7 +2394,7 @@ static const char *cmd_encryption_method_pm(cmd_parms *cmd, void *_dcfg,
         dcfg->crypto_hash_href_pm = 1;
     }
     else if (strcasecmp(p1, "HashFormAction") == 0) {
-        re->type = ENCRYPTION_URL_FACTION_HASH_PM;
+        re->type = HASH_URL_FACTION_HASH_PM;
         re->param = _p2;
         re->param_data = (void *)p;
         if (re->param_data == NULL) {
@@ -2403,7 +2403,7 @@ static const char *cmd_encryption_method_pm(cmd_parms *cmd, void *_dcfg,
         dcfg->crypto_hash_faction_pm = 1;
     }
     else if (strcasecmp(p1, "HashLocation") == 0) {
-        re->type = ENCRYPTION_URL_LOCATION_HASH_PM;
+        re->type = HASH_URL_LOCATION_HASH_PM;
         re->param = _p2;
         re->param_data = (void *)p;
         if (re->param_data == NULL) {
@@ -2412,7 +2412,7 @@ static const char *cmd_encryption_method_pm(cmd_parms *cmd, void *_dcfg,
         dcfg->crypto_hash_location_pm = 1;
     }
     else if (strcasecmp(p1, "HashIframeSrc") == 0) {
-        re->type = ENCRYPTION_URL_IFRAMESRC_HASH_PM;
+        re->type = HASH_URL_IFRAMESRC_HASH_PM;
         re->param = _p2;
         re->param_data = (void *)p;
         if (re->param_data == NULL) {
@@ -2421,7 +2421,7 @@ static const char *cmd_encryption_method_pm(cmd_parms *cmd, void *_dcfg,
         dcfg->crypto_hash_iframesrc_pm = 1;
     }
     else if (strcasecmp(p1, "HashFrameSrc") == 0) {
-        re->type = ENCRYPTION_URL_FRAMESRC_HASH_PM;
+        re->type = HASH_URL_FRAMESRC_HASH_PM;
         re->param = _p2;
         re->param_data = (void *)p;
         if (re->param_data == NULL) {
@@ -2430,13 +2430,13 @@ static const char *cmd_encryption_method_pm(cmd_parms *cmd, void *_dcfg,
         dcfg->crypto_hash_framesrc_pm = 1;
     }
 
-    *(encryption_method **)apr_array_push(dcfg->encryption_method) = re;
+    *(hash_method **)apr_array_push(dcfg->hash_method) = re;
 
     return NULL;
 }
 
 /**
- * \brief Add SecEncryptionMethodRx configuration option
+ * \brief Add SecHashMethodRx configuration option
  *
  * \param cmd Pointer to configuration data
  * \param _dcfg Pointer to directory configuration
@@ -2446,16 +2446,16 @@ static const char *cmd_encryption_method_pm(cmd_parms *cmd, void *_dcfg,
  * \retval NULL On failure
  * \retval apr_psprintf On Success
  */
-static const char *cmd_encryption_method_rx(cmd_parms *cmd, void *_dcfg,
+static const char *cmd_hash_method_rx(cmd_parms *cmd, void *_dcfg,
         const char *p1, const char *p2)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
-    rule_exception *re = apr_pcalloc(cmd->pool, sizeof(encryption_method));
+    rule_exception *re = apr_pcalloc(cmd->pool, sizeof(hash_method));
     const char *_p2 = apr_pstrdup(cmd->pool, p2);
     if (dcfg == NULL) return NULL;
 
     if (strcasecmp(p1, "HashHref") == 0) {
-        re->type = ENCRYPTION_URL_HREF_HASH_RX;
+        re->type = HASH_URL_HREF_HASH_RX;
         re->param = _p2;
         re->param_data = msc_pregcomp(cmd->pool, p2, 0, NULL, NULL);
         if (re->param_data == NULL) {
@@ -2464,7 +2464,7 @@ static const char *cmd_encryption_method_rx(cmd_parms *cmd, void *_dcfg,
         dcfg->crypto_hash_href_rx = 1;
     }
     else if (strcasecmp(p1, "HashFormAction") == 0) {
-        re->type = ENCRYPTION_URL_FACTION_HASH_RX;
+        re->type = HASH_URL_FACTION_HASH_RX;
         re->param = _p2;
         re->param_data = msc_pregcomp(cmd->pool, p2, 0, NULL, NULL);
         if (re->param_data == NULL) {
@@ -2473,7 +2473,7 @@ static const char *cmd_encryption_method_rx(cmd_parms *cmd, void *_dcfg,
         dcfg->crypto_hash_faction_rx = 1;
     }
     else if (strcasecmp(p1, "HashLocation") == 0) {
-        re->type = ENCRYPTION_URL_LOCATION_HASH_RX;
+        re->type = HASH_URL_LOCATION_HASH_RX;
         re->param = _p2;
         re->param_data = msc_pregcomp(cmd->pool, p2, 0, NULL, NULL);
         if (re->param_data == NULL) {
@@ -2482,7 +2482,7 @@ static const char *cmd_encryption_method_rx(cmd_parms *cmd, void *_dcfg,
         dcfg->crypto_hash_location_rx = 1;
     }
     else if (strcasecmp(p1, "HashIframeSrc") == 0) {
-        re->type = ENCRYPTION_URL_IFRAMESRC_HASH_RX;
+        re->type = HASH_URL_IFRAMESRC_HASH_RX;
         re->param = _p2;
         re->param_data = msc_pregcomp(cmd->pool, p2, 0, NULL, NULL);
         if (re->param_data == NULL) {
@@ -2491,7 +2491,7 @@ static const char *cmd_encryption_method_rx(cmd_parms *cmd, void *_dcfg,
         dcfg->crypto_hash_iframesrc_rx = 1;
     }
     else if (strcasecmp(p1, "HashFrameSrc") == 0) {
-        re->type = ENCRYPTION_URL_FRAMESRC_HASH_RX;
+        re->type = HASH_URL_FRAMESRC_HASH_RX;
         re->param = _p2;
         re->param_data = msc_pregcomp(cmd->pool, p2, 0, NULL, NULL);
         if (re->param_data == NULL) {
@@ -2500,7 +2500,7 @@ static const char *cmd_encryption_method_rx(cmd_parms *cmd, void *_dcfg,
         dcfg->crypto_hash_framesrc_rx = 1;
     }
 
-    *(encryption_method **)apr_array_push(dcfg->encryption_method) = re;
+    *(hash_method **)apr_array_push(dcfg->hash_method) = re;
 
     return NULL;
 }
@@ -3203,19 +3203,19 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_TAKE2 (
-        "SecEncryptionMethodPm",
-        cmd_encryption_method_pm,
+        "SecHashMethodPm",
+        cmd_hash_method_pm,
         NULL,
         CMD_SCOPE_ANY,
-        "Encryption method and pattern"
+        "Hash method and pattern"
     ),
 
     AP_INIT_TAKE2 (
-        "SecEncryptionMethodRx",
-        cmd_encryption_method_rx,
+        "SecHashMethodRx",
+        cmd_hash_method_rx,
         NULL,
         CMD_SCOPE_ANY,
-        "Encryption method and regex"
+        "Hash method and regex"
     ),
 
     AP_INIT_TAKE2 (
@@ -3324,27 +3324,27 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_TAKE1 (
-        "SecEncryptionEngine",
-        cmd_encryption_engine,
+        "SecHashEngine",
+        cmd_hash_engine,
         NULL,
         CMD_SCOPE_ANY,
         "On or Off"
     ),
 
     AP_INIT_TAKE2 (
-        "SecEncryptionKey",
-        cmd_encryption_key,
+        "SecHashKey",
+        cmd_hash_key,
         NULL,
         CMD_SCOPE_ANY,
         "Set Encrytion key"
     ),
 
     AP_INIT_TAKE1 (
-        "SecEncryptionParam",
-        cmd_encryption_param,
+        "SecHashParam",
+        cmd_hash_param,
         NULL,
         CMD_SCOPE_ANY,
-        "Set Encryption parameter"
+        "Set Hash parameter"
     ),
 
     { NULL }
