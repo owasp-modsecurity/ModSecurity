@@ -43,7 +43,7 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
 endif
 
 if LINUX
-mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
+mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version -R @PCRE_LD_PATH@ \
                            @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
                            @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 endif
