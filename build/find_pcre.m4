@@ -10,6 +10,7 @@ PCRE_CPPFLAGS=""
 PCRE_CFLAGS=""
 PCRE_LDFLAGS=""
 PCRE_LDADD=""
+PCRE_LD_PATH=""
 
 AC_DEFUN([CHECK_PCRE],
 [dnl
@@ -65,6 +66,8 @@ if test -n "${pcre_path}"; then
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(pcre CFLAGS: $PCRE_CFLAGS); fi
     PCRE_LDADD="`${PCRE_CONFIG} --libs`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(pcre LDADD: $PCRE_LDADD); fi
+    PCRE_LD_PATH="/`${PCRE_CONFIG} --libs | cut -d"/" -f2,3,4,5,6 | cut -d " " -f1`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(pcre PCRE_LD_PATH: $PCRE_LD_PATH); fi
 else
     AC_MSG_RESULT([no])
 fi
@@ -75,6 +78,7 @@ AC_SUBST(PCRE_CPPFLAGS)
 AC_SUBST(PCRE_CFLAGS)
 AC_SUBST(PCRE_LDFLAGS)
 AC_SUBST(PCRE_LDADD)
+AC_SUBST(PCRE_LD_PATH)
 
 if test -z "${PCRE_VERSION}"; then
     AC_MSG_NOTICE([*** pcre library not found.])
