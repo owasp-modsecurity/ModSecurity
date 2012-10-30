@@ -3336,7 +3336,7 @@ const command_rec module_directives[] = {
         cmd_hash_key,
         NULL,
         CMD_SCOPE_ANY,
-        "Set Encrytion key"
+        "Set Hash key"
     ),
 
     AP_INIT_TAKE1 (
