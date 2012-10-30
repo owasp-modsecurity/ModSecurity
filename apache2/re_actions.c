@@ -921,15 +921,15 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
             }
         return NULL;
      } else
-        if (strcasecmp(name, "EncryptionEnforcement") == 0) {
+        if (strcasecmp(name, "HashEnforcement") == 0) {
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
-        return apr_psprintf(engine->mp, "Invalid setting for ctl name EncryptionEnforcement: %s", value);
+        return apr_psprintf(engine->mp, "Invalid setting for ctl name HashEnforcement: %s", value);
      } else
-        if (strcasecmp(name, "EncryptionEngine") == 0) {
+        if (strcasecmp(name, "HashEngine") == 0) {
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
-        return apr_psprintf(engine->mp, "Invalid setting for ctl name EncryptionEngine: %s", value);
+        return apr_psprintf(engine->mp, "Invalid setting for ctl name HashEngine: %s", value);
      } else {
             return apr_psprintf(engine->mp, "Invalid ctl name setting: %s", name);
      }
@@ -979,31 +979,31 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 
         return 1;
     } else
-    if (strcasecmp(name, "EncryptionEnforcement") == 0) {
+    if (strcasecmp(name, "HashEnforcement") == 0) {
         if (strcasecmp(value, "on") == 0) {
-            msr->txcfg->encryption_enforcement = ENCRYPTION_ENABLED;
-            msr->usercfg->encryption_enforcement = ENCRYPTION_ENABLED;
+            msr->txcfg->hash_enforcement = HASH_ENABLED;
+            msr->usercfg->hash_enforcement = HASH_ENABLED;
         }
         if (strcasecmp(value, "off") == 0) {
-            msr->txcfg->encryption_enforcement = ENCRYPTION_DISABLED;
-            msr->usercfg->encryption_enforcement = ENCRYPTION_DISABLED;
+            msr->txcfg->hash_enforcement = HASH_DISABLED;
+            msr->usercfg->hash_enforcement = HASH_DISABLED;
         }
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Ctl: Set EncryptionEnforcement to %s.", value);
+            msr_log(msr, 4, "Ctl: Set HashEnforcement to %s.", value);
         }
         return 1;
     } else
-    if (strcasecmp(name, "EncryptionEngine") == 0) {
+    if (strcasecmp(name, "HashEngine") == 0) {
         if (strcasecmp(value, "on") == 0) {
-            msr->txcfg->encryption_is_enabled = ENCRYPTION_ENABLED;
-            msr->usercfg->encryption_is_enabled = ENCRYPTION_ENABLED;
+            msr->txcfg->hash_is_enabled = HASH_ENABLED;
+            msr->usercfg->hash_is_enabled = HASH_ENABLED;
         }
         if (strcasecmp(value, "off") == 0) {
-            msr->txcfg->encryption_is_enabled = ENCRYPTION_DISABLED;
-            msr->usercfg->encryption_is_enabled = ENCRYPTION_DISABLED;
+            msr->txcfg->hash_is_enabled = HASH_DISABLED;
+            msr->usercfg->hash_is_enabled = HASH_DISABLED;
         }
         if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Ctl: Set EncryptionEngine to %s.", value);
+            msr_log(msr, 4, "Ctl: Set HashEngine to %s.", value);
         }
         return 1;
     } else

@@ -1,6 +1,8 @@
 29 Oct 2012 - 2.7.1
 -------------------
 
+  * Changed "Encryption" name of directives and options related to hmac feature to "Hash".
+
   * Added a better random bytes generator using apr_generate_random_bytes() to create
     the HMAC key.
 

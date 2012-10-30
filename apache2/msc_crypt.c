@@ -304,18 +304,18 @@ int init_response_body_html_parser(modsec_rec *msr)   {
 }
 
 /**
- * \brief Execute all encryption methods
+ * \brief Execute all hash methods
  *
  * \param msr ModSecurity transaction resource
  * \param link The html attr value to be checked
- * \param type The encryption method type
+ * \param type The hash method type
  *
  * \retval 1 Match
  * \retval 0 No Match
  * \retval -1 on fail
  */
-int do_encryption_method(modsec_rec *msr, char *link, int type)   {
-    encryption_method **em = NULL;
+int do_hash_method(modsec_rec *msr, char *link, int type)   {
+    hash_method **em = NULL;
     int i = 0;
     char *error_msg = NULL;
     char *my_error_msg = NULL;
@@ -324,18 +324,18 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
 
     if(msr == NULL) return -1;
 
-    em = (encryption_method **)msr->txcfg->encryption_method->elts;
+    em = (hash_method **)msr->txcfg->hash_method->elts;
 
-    if(msr->txcfg->encryption_method->nelts == 0)
+    if(msr->txcfg->hash_method->nelts == 0)
         return 1;
 
-    for (i = 0; i < msr->txcfg->encryption_method->nelts; i++) {
+    for (i = 0; i < msr->txcfg->hash_method->nelts; i++) {
 
         if(em[i] != NULL && em[i]->param_data != NULL){
 
             switch(type)    {
-                case ENCRYPTION_URL_HREF_HASH_PM:
-                    if(em[i]->type == ENCRYPTION_URL_HREF_HASH_PM)   {
+                case HASH_URL_HREF_HASH_PM:
+                    if(em[i]->type == HASH_URL_HREF_HASH_PM)   {
                         const char *match = NULL;
                         apr_status_t rc = 0;
                         ACMPT pt;
@@ -352,8 +352,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         }
                     }
                     break;
-                case ENCRYPTION_URL_HREF_HASH_RX:
-                    if(em[i]->type == ENCRYPTION_URL_HREF_HASH_RX)   {
+                case HASH_URL_HREF_HASH_RX:
+                    if(em[i]->type == HASH_URL_HREF_HASH_RX)   {
                         rc = msc_regexec_capture(em[i]->param_data, link, strlen(link), ovector, 30, &my_error_msg);
                         if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
                             msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
@@ -389,8 +389,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         }
                     }
                     break;
-                case ENCRYPTION_URL_FACTION_HASH_PM:
-                    if(em[i]->type == ENCRYPTION_URL_FACTION_HASH_PM)   {
+                case HASH_URL_FACTION_HASH_PM:
+                    if(em[i]->type == HASH_URL_FACTION_HASH_PM)   {
                        const char *match = NULL;
                         apr_status_t rc = 0;
                         ACMPT pt;
@@ -407,8 +407,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         }
                     }
                     break;
-                case ENCRYPTION_URL_FACTION_HASH_RX:
-                    if(em[i]->type == ENCRYPTION_URL_FACTION_HASH_RX)   {
+                case HASH_URL_FACTION_HASH_RX:
+                    if(em[i]->type == HASH_URL_FACTION_HASH_RX)   {
                         rc = msc_regexec_capture(em[i]->param_data, link, strlen(link), ovector, 30, &my_error_msg);
                         if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
                             msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
@@ -444,8 +444,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         }
                     }
                     break;
-                case ENCRYPTION_URL_LOCATION_HASH_PM:
-                    if(em[i]->type == ENCRYPTION_URL_LOCATION_HASH_PM)   {
+                case HASH_URL_LOCATION_HASH_PM:
+                    if(em[i]->type == HASH_URL_LOCATION_HASH_PM)   {
                        const char *match = NULL;
                         apr_status_t rc = 0;
                         ACMPT pt;
@@ -462,8 +462,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         }
                     }
                     break;
-                case ENCRYPTION_URL_LOCATION_HASH_RX:
-                    if(em[i]->type == ENCRYPTION_URL_LOCATION_HASH_RX)   {
+                case HASH_URL_LOCATION_HASH_RX:
+                    if(em[i]->type == HASH_URL_LOCATION_HASH_RX)   {
                         rc = msc_regexec_capture(em[i]->param_data, link, strlen(link), ovector, 30, &my_error_msg);
                         if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
                             msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
@@ -499,8 +499,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         }
                     }
                     break;
-                case ENCRYPTION_URL_IFRAMESRC_HASH_PM:
-                    if(em[i]->type == ENCRYPTION_URL_IFRAMESRC_HASH_PM)   {
+                case HASH_URL_IFRAMESRC_HASH_PM:
+                    if(em[i]->type == HASH_URL_IFRAMESRC_HASH_PM)   {
                        const char *match = NULL;
                         apr_status_t rc = 0;
                         ACMPT pt;
@@ -517,8 +517,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         }
                     }
                     break;
-                case ENCRYPTION_URL_IFRAMESRC_HASH_RX:
-                    if(em[i]->type == ENCRYPTION_URL_IFRAMESRC_HASH_RX)   {
+                case HASH_URL_IFRAMESRC_HASH_RX:
+                    if(em[i]->type == HASH_URL_IFRAMESRC_HASH_RX)   {
                         rc = msc_regexec_capture(em[i]->param_data, link, strlen(link), ovector, 30, &my_error_msg);
                         if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
                             msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
@@ -554,8 +554,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         }
                     }
                     break;
-                case ENCRYPTION_URL_FRAMESRC_HASH_PM:
-                    if(em[i]->type == ENCRYPTION_URL_FRAMESRC_HASH_PM)   {
+                case HASH_URL_FRAMESRC_HASH_PM:
+                    if(em[i]->type == HASH_URL_FRAMESRC_HASH_PM)   {
                        const char *match = NULL;
                         apr_status_t rc = 0;
                         ACMPT pt;
@@ -572,8 +572,8 @@ int do_encryption_method(modsec_rec *msr, char *link, int type)   {
                         }
                     }
                     break;
-                case ENCRYPTION_URL_FRAMESRC_HASH_RX:
-                    if(em[i]->type == ENCRYPTION_URL_FRAMESRC_HASH_RX)   {
+                case HASH_URL_FRAMESRC_HASH_RX:
+                    if(em[i]->type == HASH_URL_FRAMESRC_HASH_RX)   {
                         rc = msc_regexec_capture(em[i]->param_data, link, strlen(link), ovector, 30, &my_error_msg);
                         if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
                             msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
@@ -679,7 +679,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
 
                 if(content_href != NULL && strstr(content_href,msr->txcfg->crypto_param_name) == NULL) {
                     if(msr->txcfg->crypto_hash_href_rx == 1)    {
-                        rc = do_encryption_method(msr, (char *)content_href, ENCRYPTION_URL_HREF_HASH_RX);
+                        rc = do_hash_method(msr, (char *)content_href, HASH_URL_HREF_HASH_RX);
                         if(rc > 0)  {
                             mac_link = NULL;
                             mac_link = do_hash_link(msr, (char *)content_href, FULL_LINK);
@@ -695,7 +695,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
                         }
                     }
                     if(msr->txcfg->crypto_hash_href_pm == 1)    {
-                        rc = do_encryption_method(msr, (char *)content_href, ENCRYPTION_URL_HREF_HASH_PM);
+                        rc = do_hash_method(msr, (char *)content_href, HASH_URL_HREF_HASH_PM);
                         if(rc > 0)  {
                             mac_link = NULL;
                             mac_link = do_hash_link(msr, (char *)content_href, FULL_LINK);
@@ -750,7 +750,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
 
                 if(content_action != NULL && content_option == NULL && strstr(content_action,msr->txcfg->crypto_param_name) == NULL) {
                     if(msr->txcfg->crypto_hash_faction_rx == 1) {
-                        rc = do_encryption_method(msr, (char *)content_action, ENCRYPTION_URL_FACTION_HASH_RX);
+                        rc = do_hash_method(msr, (char *)content_action, HASH_URL_FACTION_HASH_RX);
                         if(rc > 0)  {
                             mac_link = NULL;
                             mac_link = do_hash_link(msr, (char *)content_action, FULL_LINK);
@@ -766,7 +766,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
                         }
                     }
                     if(msr->txcfg->crypto_hash_faction_pm == 1) {
-                        rc = do_encryption_method(msr, (char *)content_action, ENCRYPTION_URL_FACTION_HASH_PM);
+                        rc = do_hash_method(msr, (char *)content_action, HASH_URL_FACTION_HASH_PM);
                         if(rc > 0)  {
                             mac_link = NULL;
                             mac_link = do_hash_link(msr, (char *)content_action, FULL_LINK);
@@ -820,7 +820,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
 
                 if(content_src != NULL && strstr(content_src,msr->txcfg->crypto_param_name) == NULL) {
                     if(msr->txcfg->crypto_hash_iframesrc_rx == 1) {
-                        rc = do_encryption_method(msr, (char *)content_src, ENCRYPTION_URL_IFRAMESRC_HASH_RX);
+                        rc = do_hash_method(msr, (char *)content_src, HASH_URL_IFRAMESRC_HASH_RX);
                         if(rc > 0)  {
                             mac_link = NULL;
                             mac_link = do_hash_link(msr, (char *)content_src, FULL_LINK);
@@ -836,7 +836,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
                         }
                     }
                     if(msr->txcfg->crypto_hash_iframesrc_pm == 1) {
-                        rc = do_encryption_method(msr, (char *)content_src, ENCRYPTION_URL_IFRAMESRC_HASH_PM);
+                        rc = do_hash_method(msr, (char *)content_src, HASH_URL_IFRAMESRC_HASH_PM);
                         if(rc > 0)  {
                             mac_link = NULL;
                             mac_link = do_hash_link(msr, (char *)content_src, FULL_LINK);
@@ -885,7 +885,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
 
                 if(content_src != NULL && strstr(content_src,msr->txcfg->crypto_param_name) == NULL) {
                     if(msr->txcfg->crypto_hash_framesrc_rx == 1) {
-                        rc = do_encryption_method(msr, (char *)content_src, ENCRYPTION_URL_FRAMESRC_HASH_RX);
+                        rc = do_hash_method(msr, (char *)content_src, HASH_URL_FRAMESRC_HASH_RX);
                         if(rc > 0)  {
                             mac_link = NULL;
                             mac_link = do_hash_link(msr, (char *)content_src, FULL_LINK);
@@ -901,7 +901,7 @@ int encrypt_response_body_links(modsec_rec *msr)   {
                         }
                     }
                     if(msr->txcfg->crypto_hash_framesrc_pm == 1) {
-                        rc = do_encryption_method(msr, (char *)content_src, ENCRYPTION_URL_FRAMESRC_HASH_PM);
+                        rc = do_hash_method(msr, (char *)content_src, HASH_URL_FRAMESRC_HASH_PM);
                         if(rc > 0)  {
                             mac_link = NULL;
                             mac_link = do_hash_link(msr, (char *)content_src, FULL_LINK);
@@ -1192,7 +1192,7 @@ int inject_encrypted_response_body(modsec_rec *msr, int elts) {
  *
  * \param msr ModSecurity transaction resource
  * \param link The html attr value to be checked
- * \param type The encryption method type
+ * \param type The hash method type
  *
  * \retval mac_link MACed link
  * \retval NULL on fail
@@ -1211,10 +1211,10 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
             if (msr->txcfg->debuglog_level >= 4)
                 msr_log(msr, 4, "Signing data [%s]", path_chunk+1);
 
-            if(msr->txcfg->crypto_key_add == ENCRYPTION_KEYONLY)
+            if(msr->txcfg->crypto_key_add == HASH_KEYONLY)
                 hash_value =  hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
 
-            if(msr->txcfg->crypto_key_add == ENCRYPTION_SESSIONID)  {
+            if(msr->txcfg->crypto_key_add == HASH_SESSIONID)  {
                 if(strlen(msr->sessionid) == 0)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                     const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->client_ip);
@@ -1234,7 +1234,7 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 }
             }
 
-            if(msr->txcfg->crypto_key_add == ENCRYPTION_REMOTEIP)   {
+            if(msr->txcfg->crypto_key_add == HASH_REMOTEIP)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                 const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->client_ip);
 #else
@@ -1253,10 +1253,10 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 if (msr->txcfg->debuglog_level >= 4)
                     msr_log(msr, 4, "Signing data [%s]", path_chunk+1);
 
-                if(msr->txcfg->crypto_key_add == ENCRYPTION_KEYONLY)
+                if(msr->txcfg->crypto_key_add == HASH_KEYONLY)
                     hash_value =  hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
 
-                if(msr->txcfg->crypto_key_add == ENCRYPTION_SESSIONID)  {
+                if(msr->txcfg->crypto_key_add == HASH_SESSIONID)  {
                     if(strlen(msr->sessionid) == 0)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                         const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->client_ip);
@@ -1276,7 +1276,7 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                     }
                 }
 
-                if(msr->txcfg->crypto_key_add == ENCRYPTION_REMOTEIP)   {
+                if(msr->txcfg->crypto_key_add == HASH_REMOTEIP)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                     const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->client_ip);
 #else
@@ -1293,10 +1293,10 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
             if (msr->txcfg->debuglog_level >= 4)
                 msr_log(msr, 4, "Signing data [%s]", link+1);
 
-            if(msr->txcfg->crypto_key_add == ENCRYPTION_KEYONLY)
+            if(msr->txcfg->crypto_key_add == HASH_KEYONLY)
                 hash_value = hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) link+1, strlen((char*)link)-1);
 
-            if(msr->txcfg->crypto_key_add == ENCRYPTION_SESSIONID)  {
+            if(msr->txcfg->crypto_key_add == HASH_SESSIONID)  {
                 if(strlen(msr->sessionid) == 0)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                     const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->client_ip);
@@ -1316,7 +1316,7 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 }
             }
 
-            if(msr->txcfg->crypto_key_add == ENCRYPTION_REMOTEIP)   {
+            if(msr->txcfg->crypto_key_add == HASH_REMOTEIP)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                 const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->client_ip);
 #else
@@ -1346,10 +1346,10 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
             if (msr->txcfg->debuglog_level >= 4)
                 msr_log(msr, 4, "Signing data [%s] size %d", relative_link, strlen(relative_link));
 
-            if(msr->txcfg->crypto_key_add == ENCRYPTION_KEYONLY)
+            if(msr->txcfg->crypto_key_add == HASH_KEYONLY)
                 hash_value = hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) relative_link, strlen((char*)relative_link));
 
-            if(msr->txcfg->crypto_key_add == ENCRYPTION_SESSIONID)  {
+            if(msr->txcfg->crypto_key_add == HASH_SESSIONID)  {
                 if(strlen(msr->sessionid) == 0)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                     const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->client_ip);
@@ -1369,7 +1369,7 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 }
             }
 
-            if(msr->txcfg->crypto_key_add == ENCRYPTION_REMOTEIP)   {
+            if(msr->txcfg->crypto_key_add == HASH_REMOTEIP)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                 const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->client_ip);
 #else
@@ -1430,7 +1430,7 @@ int modify_response_header(modsec_rec *msr) {
         msr_log(msr, 4, "Processing reponse header location [%s]", location);
 
     if(msr->txcfg->crypto_hash_location_rx == 1) {
-        rc = do_encryption_method(msr, (char *)location, ENCRYPTION_URL_LOCATION_HASH_RX);
+        rc = do_hash_method(msr, (char *)location, HASH_URL_LOCATION_HASH_RX);
 
         if(rc > 0)  {
             mac_link = NULL;
@@ -1440,7 +1440,7 @@ int modify_response_header(modsec_rec *msr) {
         }
 
     } else if(msr->txcfg->crypto_hash_location_pm == 1) {
-        rc = do_encryption_method(msr, (char *)location, ENCRYPTION_URL_LOCATION_HASH_PM);
+        rc = do_hash_method(msr, (char *)location, HASH_URL_LOCATION_HASH_PM);
 
         if(rc > 0)  {
             mac_link = NULL;
