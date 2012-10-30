@@ -721,7 +721,7 @@ nextround:
 #endif /* MSC_TEST */
 
 /**
- * \brief Init function to validateEncryption
+ * \brief Init function to validateHash
  *
  * \param rule ModSecurity rule struct
  * \param error_msg Error message
@@ -729,7 +729,7 @@ nextround:
  * \retval 1 On success
  * \retval 0 On fail
  */
-static int msre_op_validateEncryption_param_init(msre_rule *rule, char **error_msg) {
+static int msre_op_validateHash_param_init(msre_rule *rule, char **error_msg) {
     const char *errptr = NULL;
     int erroffset;
     msc_regex_t *regex;
@@ -778,7 +778,7 @@ static int msre_op_validateEncryption_param_init(msre_rule *rule, char **error_m
 }
 
 /**
- * \brief Execute function to validateEncryption
+ * \brief Execute function to validateHash
  *
  * \param msr ModSecurity transaction resource
  * \param rule ModSecurity rule struct
@@ -788,7 +788,7 @@ static int msre_op_validateEncryption_param_init(msre_rule *rule, char **error_m
  * \retval 1 On success
  * \retval 0 On fail
  */
-static int msre_op_validateEncryption_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     msc_regex_t *regex = (msc_regex_t *)rule->op_param_data;
     msc_string *re_pattern = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     const char *target;
@@ -809,7 +809,7 @@ static int msre_op_validateEncryption_execute(modsec_rec *msr, msre_rule *rule, 
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    if (msr->txcfg->encryption_enforcement == ENCRYPTION_DISABLED || msr->txcfg->encryption_is_enabled == ENCRYPTION_DISABLED)
+    if (msr->txcfg->hash_enforcement == HASH_DISABLED || msr->txcfg->hash_is_enabled == HASH_DISABLED)
         return 0;
 
     if (regex == NULL) {
@@ -926,13 +926,13 @@ static int msre_op_validateEncryption_execute(modsec_rec *msr, msre_rule *rule, 
         if(valid == NULL)   {
 
             if (msr->txcfg->debuglog_level >= 9)
-                msr_log(msr, 9, "Request URI without encryption parameter [%s]", target);
+                msr_log(msr, 9, "Request URI without hash parameter [%s]", target);
 
             if (strlen(pattern) > 252) {
-                *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%.252s ...\" at %s. No Encryption parameter",
+                *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%.252s ...\" at %s. No Hash parameter",
                         pattern, var->name);
             } else {
-                *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%s\" at %s. No Encryption parameter",
+                *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%s\" at %s. No Hash parameter",
                         pattern, var->name);
             }
             return 1;
@@ -952,10 +952,10 @@ static int msre_op_validateEncryption_execute(modsec_rec *msr, msre_rule *rule, 
             if(strcmp(hmac, hash_link) != 0)    {
 
                 if (strlen(pattern) > 252) {
-                    *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%.252s ...\" at %s. Encryption parameter hash value = [%s] Requested URI hash value = [%s]",
+                    *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%.252s ...\" at %s. Hash parameter hash value = [%s] Requested URI hash value = [%s]",
                             pattern, var->name, hmac, hash_link);
                 } else {
-                    *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%s\" at %s. Encryption parameter hash value = [%s] Requested URI hash value = [%s]",
+                    *error_msg = apr_psprintf(msr->mp, "Request URI matched \"%s\" at %s. Hash parameter hash value = [%s] Requested URI hash value = [%s]",
                             pattern, var->name, hmac, hash_link);
                 }
                 return 1;
@@ -4434,9 +4434,9 @@ void msre_engine_register_default_operators(msre_engine *engine) {
 
     /* validateEncyption */
     msre_engine_op_register(engine,
-        "validateEncryption",
-        msre_op_validateEncryption_param_init,
-        msre_op_validateEncryption_execute
+        "validateHash",
+        msre_op_validateHash_param_init,
+        msre_op_validateHash_execute
     );
 
     /* pm */

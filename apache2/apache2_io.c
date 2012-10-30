@@ -577,7 +577,7 @@ static int flatten_response_body(modsec_rec *msr) {
     msr->resbody_data[msr->resbody_length] = '\0';
     msr->resbody_status = RESBODY_STATUS_READ;
 
-    if (msr->txcfg->stream_outbody_inspection && msr->txcfg->encryption_is_enabled == ENCRYPTION_DISABLED)  {
+    if (msr->txcfg->stream_outbody_inspection && msr->txcfg->hash_is_enabled == HASH_DISABLED)  {
 
         msr->stream_output_length = msr->resbody_length;
 
@@ -590,7 +590,7 @@ static int flatten_response_body(modsec_rec *msr) {
         memset(msr->stream_output_data, 0, msr->stream_output_length+1);
         strncpy(msr->stream_output_data, msr->resbody_data, msr->stream_output_length);
         msr->stream_output_data[msr->stream_output_length] = '\0';
-    } else if (msr->txcfg->stream_outbody_inspection && msr->txcfg->encryption_is_enabled == ENCRYPTION_ENABLED)    {
+    } else if (msr->txcfg->stream_outbody_inspection && msr->txcfg->hash_is_enabled == HASH_ENABLED)    {
         int retval = 0;
         apr_time_t time1 = apr_time_now();
 
@@ -601,7 +601,7 @@ static int flatten_response_body(modsec_rec *msr) {
             if(retval > 0) {
                 retval = inject_encrypted_response_body(msr, retval);
                 if (msr->txcfg->debuglog_level >= 4) {
-                    msr_log(msr, 4, "Encryption completed in %" APR_TIME_T_FMT " usec.", (apr_time_now() - time1));
+                    msr_log(msr, 4, "Hash completed in %" APR_TIME_T_FMT " usec.", (apr_time_now() - time1));
                 }
 
             }

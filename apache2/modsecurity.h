@@ -23,7 +23,7 @@
 #include <libxml/HTMLparser.h>
 
 typedef struct rule_exception rule_exception;
-typedef struct rule_exception encryption_method;
+typedef struct rule_exception hash_method;
 typedef struct modsec_rec modsec_rec;
 typedef struct directory_config directory_config;
 typedef struct error_message_t error_message_t;
@@ -182,23 +182,23 @@ extern DSOLOCAL int *unicode_map_table;
 #define MODSEC_DETECTION_ONLY           1
 #define MODSEC_ENABLED                  2
 
-#define ENCRYPTION_DISABLED             0
-#define ENCRYPTION_ENABLED              1
+#define HASH_DISABLED             0
+#define HASH_ENABLED              1
 
-#define ENCRYPTION_URL_HREF_HASH_RX     0
-#define ENCRYPTION_URL_HREF_HASH_PM     1
-#define ENCRYPTION_URL_FACTION_HASH_RX  2
-#define ENCRYPTION_URL_FACTION_HASH_PM  3
-#define ENCRYPTION_URL_LOCATION_HASH_RX 4
-#define ENCRYPTION_URL_LOCATION_HASH_PM 5
-#define ENCRYPTION_URL_IFRAMESRC_HASH_RX 6
-#define ENCRYPTION_URL_IFRAMESRC_HASH_PM 7
-#define ENCRYPTION_URL_FRAMESRC_HASH_RX 8
-#define ENCRYPTION_URL_FRAMESRC_HASH_PM 9
+#define HASH_URL_HREF_HASH_RX     0
+#define HASH_URL_HREF_HASH_PM     1
+#define HASH_URL_FACTION_HASH_RX  2
+#define HASH_URL_FACTION_HASH_PM  3
+#define HASH_URL_LOCATION_HASH_RX 4
+#define HASH_URL_LOCATION_HASH_PM 5
+#define HASH_URL_IFRAMESRC_HASH_RX 6
+#define HASH_URL_IFRAMESRC_HASH_PM 7
+#define HASH_URL_FRAMESRC_HASH_RX 8
+#define HASH_URL_FRAMESRC_HASH_PM 9
 
-#define ENCRYPTION_KEYONLY              0
-#define ENCRYPTION_SESSIONID            1
-#define ENCRYPTION_REMOTEIP             2
+#define HASH_KEYONLY              0
+#define HASH_SESSIONID            1
+#define HASH_REMOTEIP             2
 
 #define MODSEC_CACHE_DISABLED           0
 #define MODSEC_CACHE_ENABLED            1
@@ -571,13 +571,13 @@ struct directory_config {
     /* Collection timeout */
     int col_timeout;
 
-    /* Encryption */
-    apr_array_header_t  *encryption_method;
+    /* Hash */
+    apr_array_header_t  *hash_method;
     const char *crypto_key;
     int                 crypto_key_len;
     const char          *crypto_param_name;
-    int                 encryption_is_enabled;
-    int                 encryption_enforcement;
+    int                 hash_is_enabled;
+    int                 hash_enforcement;
     int                 crypto_key_add;
     int                 crypto_hash_href_rx;
     int                 crypto_hash_faction_rx;
