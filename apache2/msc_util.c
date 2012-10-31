@@ -74,6 +74,15 @@ static unsigned char *c2x(unsigned what, unsigned char *where);
 static unsigned char x2c(unsigned char *what);
 static unsigned char xsingle2c(unsigned char *what);
 
+#ifdef LINUX_S390
+int swap_int32(int x) {
+    int swap = ((x>>24)&0xff) | ((x<<8)&0xff0000) |
+                ((x>>8)&0xff00) | ((x<<24)&0xff000000);
+    return swap;
+}
+#endif
+
+
 /** \brief Decode utf-8 to unicode format.
  *
  * \param mp Pointer to memory pool
