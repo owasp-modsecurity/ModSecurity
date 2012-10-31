@@ -100,6 +100,11 @@ case $host in
   *-*-linux*)
     echo "Checking plataform... Identified as Linux"
     linuxos=true
+        case "${host_cpu}" in
+            s390x)
+            cpu_type="-DLINUX_S390"
+        ;;
+        esac
     ;;
   *-*-solaris*)
     echo "Checking plataform... Identified as Solaris"
@@ -135,6 +140,7 @@ AM_CONDITIONAL([AIX], [test x$aixos = xtrue])
 AM_CONDITIONAL([HPUX], [test x$hpuxos = xtrue])
 AM_CONDITIONAL([MACOSX], [test x$macos = xtrue])
 AM_CONDITIONAL([LINUX], [test x$linuxos = xtrue])
+AM_CONDITIONAL([LINUX390], [test x$linuxos390 = xtrue])
 AM_CONDITIONAL([SOLARIS], [test x$solarisos = xtrue])
 AM_CONDITIONAL([FREEBSD], [test x$freebsdos = xtrue])
 AM_CONDITIONAL([OPENBSD], [test x$openbsdos = xtrue])
@@ -627,7 +633,7 @@ else
   fi
 fi
 
-MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""
