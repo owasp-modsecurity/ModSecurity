@@ -79,7 +79,7 @@ unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
 unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
 /* Stubs */
-char *format_error_log_message(apr_pool_t *mp, error_message *em) {
+char *format_error_log_message(apr_pool_t *mp, error_message_t *em) {
     return "FAKE ERROR LOG MESSAGE";
 }
 
