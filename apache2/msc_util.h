@@ -46,6 +46,11 @@ int DSOLOCAL inet_pton(int family, const char *src, void *dst);
 #define UNICODE_ERROR_RESTRICTED_CHARACTER  -4
 #define UNICODE_ERROR_DECODING_ERROR        -5
 
+#ifdef LINUX_S390
+int DSOLOCAL swap_int32(int x);
+#endif
+
+
 char DSOLOCAL *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int input_len, int *changed);
 
 char DSOLOCAL *m_strcasestr(const char *haystack, const char *needle);

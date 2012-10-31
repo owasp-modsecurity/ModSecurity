@@ -229,7 +229,11 @@ static char *construct_auditlog_filename(apr_pool_t *mp, const char *uniqueid) {
  * as an audit log boundary.
  */
 static char *create_auditlog_boundary(request_rec *r) {
+#ifdef LINUX_S390
+    int data = swap_int32(rand());
+#else
     unsigned long data = rand();
+#endif
     /* Do note that I tried using apr_generate_random_bytes but it turned
      * out to be terribly slow for some reason. Needs further investigation.
      */
