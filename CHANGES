@@ -1,7 +1,16 @@
-29 Oct 2012 - 2.7.1
+01 Nov 2012 - 2.7.1
 -------------------
 
   * Changed "Encryption" name of directives and options related to hmac feature to "Hash".
+
+    SecEncryptionEngine       to SecHashEngine
+    SecEncryptionKey          to SecHashKey
+    SecEncryptionParam        to SecHashParam
+    SecEncryptionMethodRx     to SecHashMethodRx
+    SecEncryptionMethodPm     to SecHashMethodPm
+    @validateEncryption       to @validateHash
+    ctl:EncryptionEnforcement to ctl:HashEnforcement
+    ctl:EncryptionEngine      to ctl:HashEngine
 
   * Added a better random bytes generator using apr_generate_random_bytes() to create
     the HMAC key.
@@ -14,7 +23,7 @@
 
   * Fixed bug when use ctl:ruleRemoveByTag.
 
-  * Updated Reference Manual.
+  * The doc/ directory now contains the instructions to access online documentation.
 
 15 Oct 2012 - 2.7.0
 -------------------
