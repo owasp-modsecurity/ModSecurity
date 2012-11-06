@@ -9,3 +9,4 @@ Please access the ModSecurity Github space to access the below documentation.
     * RoadMap
 
 https://github.com/SpiderLabs/ModSecurity/wiki/
+or http://www.modsecurity.org
