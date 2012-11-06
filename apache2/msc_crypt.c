@@ -16,6 +16,7 @@
 #include "msc_util.h"
 #include "apr_sha1.h"
 #include "apr_uri.h"
+#include "apr_base64.h"
 #include "acmp.h"
 #include "libxml/HTMLtree.h"
 #include "libxml/uri.h"
