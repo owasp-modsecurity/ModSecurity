@@ -1,4 +1,4 @@
-/*
+﻿/*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
 * Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
@@ -796,8 +796,8 @@ CMyHttpModule::OnBeginRequest(
 
 	HTTP_REQUEST *req = pRequest->GetRawHttpRequest();
 
-	r->hostname = ConvertUTF16ToUTF8(req->CookedUrl.pHost, req->CookedUrl.HostLength, r->pool);
-	r->path_info = ConvertUTF16ToUTF8(req->CookedUrl.pAbsPath, req->CookedUrl.AbsPathLength, r->pool);
+	r->hostname = ConvertUTF16ToUTF8(req->CookedUrl.pHost, req->CookedUrl.HostLength / sizeof(WCHAR), r->pool);
+	r->path_info = ConvertUTF16ToUTF8(req->CookedUrl.pAbsPath, req->CookedUrl.AbsPathLength / sizeof(WCHAR), r->pool);
 
 	if(r->hostname == NULL)
 	{
@@ -825,8 +825,8 @@ CMyHttpModule::OnBeginRequest(
 		}
 	}
 
-	if(req->CookedUrl.pQueryString != NULL)
-		r->args = ConvertUTF16ToUTF8(req->CookedUrl.pQueryString + 1, req->CookedUrl.QueryStringLength - 1, r->pool);
+	if(req->CookedUrl.pQueryString != NULL && req->CookedUrl.QueryStringLength > 0)
+		r->args = ConvertUTF16ToUTF8(req->CookedUrl.pQueryString + 1, (req->CookedUrl.QueryStringLength / sizeof(WCHAR)) - 1, r->pool);
 
 #define _TRANSHEADER(id,str) if(req->Headers.KnownHeaders[id].pRawValue != NULL) \
 	{\
