@@ -143,6 +143,7 @@ server_rec *modsecInit()    {
     server->server_scheme = "";
     server->timeout = 60 * 1000000;// 60 seconds
     server->wild_names = NULL;
+	server->is_virtual = 0;
 
     ap_server_config_defines = apr_array_make(pool, 1, sizeof(char *));
 
