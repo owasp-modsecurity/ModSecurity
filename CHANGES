@@ -23,7 +23,11 @@
 
   * Fixed DROP action was disabled for Apache 2 module by mistake.
 
-  * Fixed bug when use ctl:ruleRemoveByTag.
+  * Fixed bug when use ctl:ruleRemoveTargetByTag.
+
+  * Fixed many IIS port bugs.
+
+  * Fixed bug when @strmatch patterns use invalid escape sequence (Thanks Hideaki Hayashi).
 
   * The doc/ directory now contains the instructions to access online documentation.
 
