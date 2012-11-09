@@ -991,8 +991,8 @@ const char *process_command_config(server_rec *s,
 	apr_status_t status;
 	ap_directive_t *newdir;
 	int optional;
+	char *err = NULL;
 
-	//*(char **)apr_array_push(ari) = (char *)filename;
 	errmsg = populate_include_files(p, ptemp, ari, filename, 0);
 
 	if(errmsg != NULL)
@@ -1108,21 +1108,18 @@ ProcessInclude:
 			break;
 	}
 
-	while((parms = (cmd_parms *)apr_array_pop(arr)) != NULL)
-	{
-		ap_cfg_closefile(parms->config_file);
-	}
-
     if (errmsg) {
-		char *err = (char *)apr_palloc(p, 1024);
+		err = (char *)apr_palloc(p, 1024);
 
-		apr_snprintf(err, 1024, "Syntax error in config file %s, line %d: %s", parms->config_file->name,
-						parms->config_file->line_number, errmsg);
-
-		return err;
+		if(parms != NULL)
+			apr_snprintf(err, 1024, "Syntax error in config file %s, line %d: %s", parms->config_file->name,
+							parms->config_file->line_number, errmsg);
+		else
+			apr_snprintf(err, 1024, "Syntax error in config file: %s", errmsg);
     }
 
-    return NULL;
+    errmsg = err;
+
 Exit:
 	while((parms = (cmd_parms *)apr_array_pop(arr)) != NULL)
 	{

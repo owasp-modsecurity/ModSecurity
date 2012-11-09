@@ -752,8 +752,8 @@ CMyHttpModule::OnBeginRequest(
 
 		pConfig->m_dwLastCheck = ctime;
 
-		if(ret == 0 || pConfig->m_LastChange.dwLowDateTime != fdata.ftLastWriteTime.dwLowDateTime ||
-			pConfig->m_LastChange.dwHighDateTime != fdata.ftLastWriteTime.dwHighDateTime)
+		if(pConfig->m_Config == NULL || (ret != 0 && (pConfig->m_LastChange.dwLowDateTime != fdata.ftLastWriteTime.dwLowDateTime ||
+			pConfig->m_LastChange.dwHighDateTime != fdata.ftLastWriteTime.dwHighDateTime)))
 		{
 			pConfig->m_LastChange.dwLowDateTime = fdata.ftLastWriteTime.dwLowDateTime;
 			pConfig->m_LastChange.dwHighDateTime = fdata.ftLastWriteTime.dwHighDateTime;
@@ -769,9 +769,9 @@ CMyHttpModule::OnBeginRequest(
 					WriteEventViewerLog(err, EVENTLOG_ERROR_TYPE);
 				}
 			}
-
-			delete path;
 		}
+
+		delete path;
 	}
 
 	conn_rec *c;
