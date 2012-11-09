@@ -25,7 +25,7 @@
 
   * Fixed bug when use ctl:ruleRemoveTargetByTag.
 
-  * Fixed many IIS port bugs.
+  * Fixed IIS and NGINX modules bugs.
 
   * Fixed bug when @strmatch patterns use invalid escape sequence (Thanks Hideaki Hayashi).
 
