@@ -2394,6 +2394,7 @@ static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *
 
 static int msre_op_strmatch_param_init(msre_rule *rule, char **error_msg) {
     const apr_strmatch_pattern *compiled_pattern;
+    char *processed = NULL;
     const char *pattern = rule->op_param;
     unsigned short int op_len;
 
@@ -2402,8 +2403,14 @@ static int msre_op_strmatch_param_init(msre_rule *rule, char **error_msg) {
 
     op_len = strlen(pattern);
 
+    /* Process pattern */
+    processed = parse_pm_content(pattern, op_len, rule, error_msg);
+    if (processed == NULL) {
+        return 0;
+    }
+
     /* Compile pattern */
-    compiled_pattern = apr_strmatch_precompile(rule->ruleset->mp, parse_pm_content(pattern, op_len, rule, error_msg), 1);
+    compiled_pattern = apr_strmatch_precompile(rule->ruleset->mp, processed, 1);
     if (compiled_pattern == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern: %s", pattern);
         return 0;
