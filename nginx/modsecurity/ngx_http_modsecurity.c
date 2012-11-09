@@ -488,6 +488,9 @@ ngx_http_do_read_upload_client_request_body(ngx_http_request_t *r)
             if (rb->buf->last == rb->buf->end) {
 
                 rc = ngx_http_process_request_body(r, rb->to_write);
+                if(rc != NGX_OK)    {
+                    return rc;
+                }
 
                 rb->to_write = rb->bufs->next ? rb->bufs->next : rb->bufs;
                 rb->buf->last = rb->buf->start;
@@ -555,7 +558,10 @@ ngx_http_do_read_upload_client_request_body(ngx_http_request_t *r)
         ngx_del_timer(c->read);
     }
 
-    ngx_http_process_request_body(r, rb->to_write);
+    rc = ngx_http_process_request_body(r, rb->to_write);
+    if(rc != NGX_OK)    {
+        return rc;
+    }
 
     return ngx_http_upload_body_handler(r);
 }
@@ -779,7 +785,7 @@ modsecurity_read_body_cb(request_rec *r, char *buf, unsigned int length,
         if (!ctx->body_pos) {
             ctx->body_pos = b->start;
         }
-        if ((b->end - ctx->body_pos) > length) {
+        if ((unsigned int)(b->end - ctx->body_pos) > length) {
             ngx_memcpy(buf, (char *) ctx->body_pos, length);
             ctx->processed += length;
             ctx->body_pos += length;
