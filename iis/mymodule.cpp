@@ -87,6 +87,11 @@ char *GetIpAddr(apr_pool_t *pool, PSOCKADDR pAddr)
 	DWORD len = 50;
 	char *buf = (char *)apr_palloc(pool, len);
 
+	if(buf == NULL)
+		return "";
+
+	buf[0] = 0;
+
 	WSAAddressToString(pAddr, sizeof(SOCKADDR), NULL, buf, &len);
 
 	return buf;
