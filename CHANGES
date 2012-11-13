@@ -29,6 +29,8 @@
 
   * Fixed bug when @strmatch patterns use invalid escape sequence (Thanks Hideaki Hayashi).
 
+  * Fixed bugs in @verifySSN (Thanks Hideaki Hayashi).
+
   * The doc/ directory now contains the instructions to access online documentation.
 
 15 Oct 2012 - 2.7.0
