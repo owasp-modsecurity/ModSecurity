@@ -23,7 +23,17 @@
 
   * Fixed DROP action was disabled for Apache 2 module by mistake.
 
+<<<<<<< HEAD
   * Fixed bug when use ctl:ruleRemoveByTag.
+=======
+  * Fixed bug when use ctl:ruleRemoveTargetByTag.
+
+  * Fixed IIS and NGINX modules bugs.
+
+  * Fixed bug when @strmatch patterns use invalid escape sequence (Thanks Hideaki Hayashi).
+
+  * Fixed bugs in @verifySSN (Thanks Hideaki Hayashi).
+>>>>>>> upstream/master
 
   * The doc/ directory now contains the instructions to access online documentation.
 

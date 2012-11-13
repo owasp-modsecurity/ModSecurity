@@ -2394,6 +2394,7 @@ static int msre_op_endsWith_execute(modsec_rec *msr, msre_rule *rule, msre_var *
 
 static int msre_op_strmatch_param_init(msre_rule *rule, char **error_msg) {
     const apr_strmatch_pattern *compiled_pattern;
+    char *processed = NULL;
     const char *pattern = rule->op_param;
     unsigned short int op_len;
 
@@ -2402,8 +2403,14 @@ static int msre_op_strmatch_param_init(msre_rule *rule, char **error_msg) {
 
     op_len = strlen(pattern);
 
+    /* Process pattern */
+    processed = parse_pm_content(pattern, op_len, rule, error_msg);
+    if (processed == NULL) {
+        return 0;
+    }
+
     /* Compile pattern */
-    compiled_pattern = apr_strmatch_precompile(rule->ruleset->mp, parse_pm_content(pattern, op_len, rule, error_msg), 1);
+    compiled_pattern = apr_strmatch_precompile(rule->ruleset->mp, processed, 1);
     if (compiled_pattern == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Error compiling pattern: %s", pattern);
         return 0;
@@ -3163,15 +3170,15 @@ static int ssn_verify(modsec_rec *msr, const char *ssnumber, int len) {
     int area, serial, grp;
     int sequencial = 0;
     int repetitions = 0;
-    int progression = 0;
     char *str_area;
     char *str_grp;
     char *str_serial;
 
     for (i = 0; i < len; i++) {
         if (apr_isdigit(ssnumber[i])) {
-                num[i] = convert_to_int(ssnumber[i]);
-                digits++;
+            if (digits < 9)
+                num[digits] = convert_to_int(ssnumber[i]);
+            digits++;
         }
     }
 
@@ -3179,24 +3186,19 @@ static int ssn_verify(modsec_rec *msr, const char *ssnumber, int len) {
     if (digits != 9)
         goto invalid;
 
-    digits = 0;
+    for (i=0; i < 8; i++)   {
+        if (num[i] == (num[i+1]-1))
+            sequencial++;
 
-    for (i=0; i < len-1; i++)   {
-        progression = (num[i] - (num[i+1]-1));
-        repetitions = (num[i] - num[i+1]);
-
-        if (repetitions != 0 )
-            sequencial = 1;
-
-        if (progression == 0)
-            digits++;
+        if (num[i] == num[i+1])
+            repetitions++;
     }
 
-    /* We are blocking when all numbers were repeated */
-    if (sequencial == 0)
+    /* We are blocking when all numbers were sequencial or repeated */
+    if (sequencial == 8)
         goto invalid;
 
-    if (digits == 8)
+    if (repetitions == 8)
         goto invalid;
 
     str_area = apr_psprintf(msr->mp,"%d%d%d",num[0],num[1],num[2]);
