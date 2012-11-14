@@ -849,7 +849,11 @@ static const char *process_resource_config_fnmatch(const char *path,
 
     /* find the first part of the filename */
     rest = ap_strchr_c(fname, '/');
-    if (rest) {
+
+	if(rest == NULL)
+		rest = ap_strchr_c(fname, '\\');
+
+	if (rest) {
         fname = apr_pstrndup(ptemp, fname, rest - fname);
         rest++;
     }
@@ -953,7 +957,7 @@ AP_DECLARE(const char *) process_fnmatch_configs(apr_array_header_t *ari,
         const char *rootpath, *filepath = fname;
 
         /* locate the start of the directories proper */
-        status = apr_filepath_root(&rootpath, &filepath, APR_FILEPATH_TRUENAME, ptemp);
+        status = apr_filepath_root(&rootpath, &filepath, APR_FILEPATH_TRUENAME | APR_FILEPATH_NATIVE, ptemp);
 
         /* we allow APR_SUCCESS and APR_EINCOMPLETE */
         if (APR_ERELATIVE == status) {
