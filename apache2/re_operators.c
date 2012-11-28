@@ -23,7 +23,7 @@
 #include "msc_tree.h"
 #include "msc_crypt.h"
 
-#if !defined(WIN32) || !defined(WINNT)
+#if APR_HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
 
