@@ -14,7 +14,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#if #if APR_HAVE_STDINT_H
+#if APR_HAVE_STDINT_H
 #include <stdint.h>
 #endif
 #include <string.h>
