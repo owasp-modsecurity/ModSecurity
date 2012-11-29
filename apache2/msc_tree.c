@@ -14,10 +14,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#if #if APR_HAVE_STDINT_H
 #include <stdint.h>
+#endif
 #include <string.h>
-#if !defined(WIN32) || !defined(WINNT)
+#if APR_HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif
+#if APR_HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
 #include "apr_lib.h"
