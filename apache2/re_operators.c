@@ -305,7 +305,9 @@ static int msre_op_ipmatchFromFile_param_init(msre_rule *rule, char **error_msg)
 static int msre_op_ipmatchFromFile_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     TreeRoot *rtree = rule->op_param_data;
     struct in_addr in;
+#if APR_HAVE_IPV6
     struct in6_addr in6;
+#endif
 
     if (error_msg == NULL)
         return -1;
@@ -336,6 +338,7 @@ static int msre_op_ipmatchFromFile_execute(modsec_rec *msr, msre_rule *rule, msr
             return 1;
         }
     }
+#if APR_HAVE_IPV6
     else {
         if (inet_pton(AF_INET6, var->value, &in6) <= 0) {
             if (msr->txcfg->debuglog_level >= 9) {
@@ -350,6 +353,7 @@ static int msre_op_ipmatchFromFile_execute(modsec_rec *msr, msre_rule *rule, msr
             return 1;
         }
     }
+#endif
 
     return 0;
 }
