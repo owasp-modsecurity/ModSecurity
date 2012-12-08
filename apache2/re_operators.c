@@ -2878,7 +2878,7 @@ static int cpf_verify(const char *cpfnumber, int len) {
         "88888888888",
         "99999999999"};
 
-    while((*cpfnumber != '\0') && ( var_len >= 0))  {
+    while((*cpfnumber != '\0') && ( var_len > 0))  {
 
         if(*cpfnumber != '-' || *cpfnumber != '.') {
             if(i < cpf_len && isdigit(*cpfnumber))  {
@@ -2892,7 +2892,7 @@ static int cpf_verify(const char *cpfnumber, int len) {
     }
 
 
-    if (strlen(s_cpf) != cpf_len || i != cpf_len-1)
+    if (i != cpf_len)
         return 0;
     else {
         for(i = 0; i< cpf_len; i++)   {
