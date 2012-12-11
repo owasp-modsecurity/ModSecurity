@@ -265,7 +265,7 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
-            "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", r->connection->client_ip, str1,
+            "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", r->useragent_ip ? r->useragent_ip : r->connection->client_ip, str1,
             hostname, log_escape(msr->mp, r->uri), unique_id);
 #else
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
