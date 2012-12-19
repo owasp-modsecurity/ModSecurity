@@ -64,6 +64,9 @@ unsigned long int DSOLOCAL conn_read_state_limit = 0;
 
 unsigned long int DSOLOCAL conn_write_state_limit = 0;
 
+#if defined(WIN32) || defined(VERSION_NGINX)
+int (*modsecDropAction)(request_rec *r) = NULL;
+#endif
 static int server_limit, thread_limit;
 
 typedef struct {
@@ -250,11 +253,25 @@ int perform_interception(modsec_rec *msr) {
                 }
             }
             #else
+            {
+                if (modsecDropAction == NULL) {
+                    log_level = 1;
+                    status = HTTP_INTERNAL_SERVER_ERROR;
+                    message = apr_psprintf(msr->mp, "Access denied with code 500%s "
+                        "(Error: Connection drop not implemented on this platform.",
+                        phase_text);
+                } else if (modsecDropAction(msr->r) == 0) {
+                    status = HTTP_FORBIDDEN;
+                    message = apr_psprintf(msr->mp, "Access denied with connection close%s.",
+                        phase_text);
+                } else {
             log_level = 1;
             status = HTTP_INTERNAL_SERVER_ERROR;
             message = apr_psprintf(msr->mp, "Access denied with code 500%s "
-                "(Error: Connection drop not implemented on this platform).",
+                        "(Error: Connection drop request failed.",
                 phase_text);
+                }
+            }
             #endif
             break;
 
