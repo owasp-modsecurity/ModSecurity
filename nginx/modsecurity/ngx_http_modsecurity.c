@@ -81,6 +81,8 @@ static char *ngx_http_modsecurity_add_handler(ngx_conf_t *cf, ngx_command_t *cmd
 static char *ngx_http_modsecurity_pass(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 static ngx_int_t ngx_http_modsecurity_pass_to_backend(ngx_http_request_t *r);
 
+static int ngx_http_modsecurity_drop_action(request_rec *r);
+
 /* command handled by the module */
 static ngx_command_t  ngx_http_modsecurity_commands[] =  {
   { ngx_string("ModSecurityConfig"),
@@ -222,6 +224,8 @@ ngx_http_modsecurity_init_process(ngx_cycle_t *cycle)
     cycle->log->log_level = NGX_LOG_INFO;
 
     modsecSetLogHook(cycle->log, modsecLog);
+
+    modsecSetDropAction(ngx_http_modsecurity_drop_action);
 
     modsecInit();
     /* config was already parsed in master process */
@@ -1093,4 +1097,17 @@ ngx_http_modsecurity_pass(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     }
 
     return NGX_CONF_OK;
+}
+
+static int
+ngx_http_modsecurity_drop_action(request_rec *r)
+{
+    ngx_http_modsecurity_ctx_t     *ctx;
+    ctx = (ngx_http_modsecurity_ctx_t *) apr_table_get(r->notes, NOTE_NGINX_REQUEST_CTX);
+
+    if (ctx == NULL) {
+        return -1;
+    }
+    ctx->r->connection->error = 1;
+    return 0;
 }
