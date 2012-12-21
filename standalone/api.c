@@ -41,7 +41,7 @@
 
 extern void *modsecLogObj;
 extern void (*modsecLogHook)(void *obj, int level, char *str);
-
+extern int (*modsecDropAction)(request_rec *r);
 apr_status_t (*modsecReadBody)(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos);
 apr_status_t (*modsecReadResponse)(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos);
 apr_status_t (*modsecWriteBody)(request_rec *r, char *buf, unsigned int length);
@@ -527,4 +527,8 @@ void modsecSetWriteBody(apr_status_t (*func)(request_rec *r, char *buf, unsigned
 
 void modsecSetWriteResponse(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length))   {
     modsecWriteResponse = func;
+}
+
+void modsecSetDropAction(int (*func)(request_rec *r)) {
+    modsecDropAction = func;
 }
