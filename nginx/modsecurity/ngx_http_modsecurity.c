@@ -49,6 +49,7 @@ typedef struct ngx_http_modsecurity_ctx_s {
     request_rec         *req;
     ngx_chain_t         *chain;
     ngx_buf_t            buf;
+    void               **loc_conf;
     unsigned             request_body_in_single_buf:1;
     unsigned             request_body_in_file_only:1;
 } ngx_http_modsecurity_ctx_t;
@@ -393,7 +394,7 @@ modsecurity_read_body_cb(request_rec *r, char *outpos, unsigned int length,
             rest -= size;
             buf->file_pos += size;
         } else {
-            return APR_ERROR;
+            return -1;
         }
     }
     
@@ -443,14 +444,13 @@ static ngx_int_t
 ngx_http_modsecurity_handler(ngx_http_request_t *r)
 {
     ngx_http_modsecurity_loc_conf_t *cf;
-    ngx_http_core_loc_conf_t        *clcf;
+    ngx_http_core_loc_conf_t        *clcf, *lcf;
     ngx_http_modsecurity_ctx_t      *ctx;
-    ngx_buf_t                       *buf;
-    size_t                           preread;
     ngx_list_part_t                 *part;
     ngx_table_elt_t                 *h;
     ngx_uint_t                       i;
     ngx_int_t                        rc;
+    void                           **loc_conf;
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: handler");
 
@@ -544,36 +544,38 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     if (r->method == NGX_HTTP_POST) {
         /* Processing POST request body, should we process PUT? */
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: method POST");
-
-        /* 
-         * read client request body TODO: chunked request body 
-         */
         
         clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
 
         if (clcf == NULL) {
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
-        
-        preread = r->header_in->last - r->header_in->pos;
 
-        /* force read_client_request_body to use r->header_in as body buffer  */
-        r->headers_in.content_length_n ++;
-        
-        if ( (r->header_in->end - r->header_in->pos) < r->headers_in.content_length_n) {
-            buf = ngx_create_temp_buf(r->pool, r->headers_in.content_length_n);
-            if (buf == NULL) {
+        ctx->loc_conf = r->loc_conf;
+        /* hijack loc_conf so that we can receive any body length
+         *  TODO: nonblocking process & chuncked body
+         */
+        if (clcf->client_body_buffer_size < r->headers_in.content_length_n) {
+            
+            loc_conf = ngx_pcalloc(r->pool, sizeof(void *) * ngx_http_max_module);
+            if (loc_conf == NULL) {
                 return NGX_HTTP_INTERNAL_SERVER_ERROR;
             }
+
+            lcf = ngx_pcalloc(r->pool, sizeof(ngx_http_core_loc_conf_t));
+            if (lcf == NULL) {
+                return NGX_HTTP_INTERNAL_SERVER_ERROR;
+            }
+    
+            ngx_memcpy(loc_conf, r->loc_conf, sizeof(void *) * ngx_http_max_module);
+            ngx_memcpy(lcf, clcf, sizeof(ngx_http_core_loc_conf_t));
             
-            ngx_memcpy(buf->pos + 1, r->header_in->pos, preread);
-            buf->last += preread + 1;
-            r->header_in = buf;
-            *r->header_in->pos = 0xff;
-        } else {
-            ngx_memmove(r->header_in->pos + 1, r->header_in->pos, preread);
-            r->header_in->last ++;
-            *r->header_in->pos = 0xff;
+            ctx->loc_conf = r->loc_conf;
+            r->loc_conf = loc_conf;
+
+            ngx_http_get_module_loc_conf(r, ngx_http_core_module) = lcf;
+            clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
+            clcf->client_body_buffer_size = r->headers_in.content_length_n;
         }
         
         ctx->request_body_in_single_buf = r->request_body_in_single_buf;
@@ -582,7 +584,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         r->request_body_in_file_only = 0;
 
         rc = ngx_http_read_client_request_body(r, ngx_http_modsecurity_request_body_handler);
-		if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
+        if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
             return rc;
         }
 
@@ -608,19 +610,18 @@ ngx_http_modsecurity_request_body_handler(ngx_http_request_t *r)
 
     if (ctx == NULL 
             || r->request_body->bufs == NULL 
-            || *r->request_body->bufs->buf->pos != 0xff) {
+            || r->request_body->bufs->next != NULL) {
         ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
         return;
     }
-
+    
     r->request_body_in_single_buf = ctx->request_body_in_single_buf;
     r->request_body_in_file_only = ctx->request_body_in_file_only;
-
-    r->request_body->bufs->buf->pos ++;
-    r->headers_in.content_length_n --;
-
+    r->header_in = r->request_body->bufs->buf;
     ctx->chain = r->request_body->bufs;
-    
+    r->request_body = NULL;
+    r->loc_conf = ctx->loc_conf;
+
     ngx_http_finalize_request(r, ngx_http_modsecurity_pass_to_backend(r));
     return;
 }
