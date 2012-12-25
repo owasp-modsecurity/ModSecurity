@@ -75,6 +75,8 @@ static ngx_int_t ngx_http_modsecurity_pass_to_backend(ngx_http_request_t *r);
 
 static int ngx_http_modsecurity_drop_action(request_rec *r);
 
+static void ngx_http_modsecurity_cleanup(void *data);
+
 /* command handled by the module */
 static ngx_command_t  ngx_http_modsecurity_commands[] =  {
   { ngx_string("ModSecurityConfig"),
@@ -451,6 +453,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     ngx_uint_t                       i;
     ngx_int_t                        rc;
     void                           **loc_conf;
+    ngx_pool_cleanup_t              *cln;
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: handler");
 
@@ -538,6 +541,14 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         apr_table_setn(ctx->req->subprocess_env, "UNIQUE_ID", "12345");
         /* actually, we need ctx only for POST request body handling - don't like this part */
         apr_table_setn(ctx->req->notes, NOTE_NGINX_REQUEST_CTX, (const char *) ctx);
+
+        /* add cleanup */
+        cln = ngx_pool_cleanup_add(r->pool, 0);
+        if (cln == NULL) {
+            return NGX_ERROR;
+        }
+        cln->data = ctx;
+        cln->handler = ngx_http_modsecurity_cleanup;
     }
 
 //    r->keepalive = 0;
@@ -598,6 +609,16 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     }
 
     return rc;
+}
+
+static void
+ngx_http_modsecurity_cleanup(void *data)
+{
+    ngx_http_modsecurity_ctx_t    *ctx = data;
+    
+    if (ctx->req != NULL) {
+        (void) modsecFinishRequest(ctx->req);
+    }
 }
 
 
