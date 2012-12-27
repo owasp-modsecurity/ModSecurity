@@ -79,7 +79,11 @@ static int lua_restore(lua_State *L, msc_script *script) {
     dumpr.script = script;
     dumpr.index = 0;
 
+#if LUA_VERSION_NUM > 501
+    return lua_load(L, dump_reader, &dumpr, script->name, NULL);
+#else
     return lua_load(L, dump_reader, &dumpr, script->name);
+#endif
 }
 
 /**
