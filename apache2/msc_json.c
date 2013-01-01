@@ -1,21 +1,18 @@
 /*
-* ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
-*
-* You may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* If any of the files related to licensing are missing or if you have any
-* other questions related to licensing please contact Trustwave Holdings, Inc.
-* directly using the email address security@modsecurity.org.
-*/
+ * ModSecurity for Apache 2.x, http://www.modsecurity.org/
+ * Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+ *
+ * You may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * If any of the files related to licensing are missing or if you have any
+ * other questions related to licensing please contact Trustwave Holdings, Inc.
+ * directly using the email address security@modsecurity.org.
+ */
 
 #include "msc_json.h"
-
-#define CKPT(msr, msg, args...) \
-    msr_log(msr, 3, "%s:%s[%d] " msg, __FILE__, __func__, __LINE__, ##args)
 
 int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
 {
@@ -50,7 +47,11 @@ int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
     arg->value = apr_pstrmemdup(msr->mp, value, length);
     arg->value_len = length;
 
-    CKPT(msr, "Adding argument: [ARGS:%s = '%s']", arg->name, arg->value);
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Adding JSON argument '%s' with value '%s'",
+            arg->name, arg->value);
+    }
+
     apr_table_addn(msr->arguments,
         log_escape_nq_ex(msr->mp, arg->name, arg->name_len), (void *) arg);
 
@@ -80,7 +81,9 @@ static int yajl_map_key(void *ctx, const unsigned char *key, unsigned int length
      */
     safe_key = apr_pstrndup(msr->mp, key, length);
 
-    CKPT(msr, "New hash key found: '%s'", safe_key);
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "New JSON hash key '%s'", safe_key);
+    }
 
     /**
      * TODO: How do we free the previously string value stored here?
@@ -148,8 +151,6 @@ static int yajl_start_map(void *ctx)
 {
     modsec_rec *msr = (modsec_rec *) ctx;
 
-    CKPT(msr, "New hash context started");
-
     /**
      * If we do not have a current_key, this is a top-level hash, so we do not
      * need to do anything
@@ -168,7 +169,9 @@ static int yajl_start_map(void *ctx)
         msr->json->prefix = apr_pstrdup(msr->mp, msr->json->current_key);
     }
 
-    CKPT(msr, "New hash context created [prefix = '%s']", msr->json->prefix);
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "New JSON hash context (prefix '%s')", msr->json->prefix);
+    }
 
     return 1;
 }
@@ -235,7 +238,7 @@ int json_init(modsec_rec *msr, char **error_msg) {
     if (error_msg == NULL) return -1;
     *error_msg = NULL;
 
-    CKPT(msr, "Initializing JSON state data");
+    msr_log(msr, 4, "JSON parser initialization");
     msr->json = apr_pcalloc(msr->mp, sizeof(json_data));
     if (msr->json == NULL) return -1;
 
@@ -253,7 +256,9 @@ int json_init(modsec_rec *msr, char **error_msg) {
      *
      * TODO: make UTF8 validation optional, as it depends on Content-Encoding
      */
-    CKPT(msr, "Initializing YAJL callback handlers");
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "yajl JSON parsing callback initialization");
+    }
     msr->json->handle = yajl_alloc(&callbacks, &config, NULL, msr);
 
     return 1;
