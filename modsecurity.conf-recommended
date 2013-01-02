@@ -20,14 +20,14 @@ SecRequestBodyAccess On
 # Initiate XML Processor in case of xml content-type
 #
 SecRule REQUEST_HEADERS:Content-Type "text/xml" \
-     "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"`
+     "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
 
 # Enable JSON request body parser.
 # Initiate JSON Processor in case of JSON content-type; change accordingly
 # if your application does not use 'application/json'
 #
 SecRule REQUEST_HEADERS:Content-Type "application/json" \
-     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"`
+     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
 
 # Maximum request body size we will accept for buffering. If you support
 # file uploads then the value given on the first line has to be as large
