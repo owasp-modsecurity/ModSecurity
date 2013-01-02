@@ -764,7 +764,8 @@ static int msre_op_validateHash_param_init(msre_rule *rule, char **error_msg) {
                     "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
                     "Execution error - "
                     "Does not support JIT (%d)",
-                    rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                    rule,((rule->actionset != NULL)&&((rule->actionset->id != NULL)&&
+                            (rule->actionset->id != NOT_SET_P))) ? rule->actionset->id : "-",
                     rule->filename != NULL ? rule->filename : "-",
                     rule->line_num,rc);
         }
@@ -854,7 +855,8 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
                             "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
                             "Execution error - "
                             "Does not support JIT (%d)",
-                            rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                            rule,((rule->actionset != NULL)&&((rule->actionset->id != NULL)&&
+                                    (rule->actionset->id != NOT_SET_P))) ? rule->actionset->id : "-",
                             rule->filename != NULL ? rule->filename : "-",
                             rule->line_num,rc);
                     msr_log(msr, 4, "%s.", *error_msg);
@@ -1005,7 +1007,8 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
                     "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
                     "Execution error - "
                     "Does not support JIT (%d)",
-                    rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                    rule,((rule->actionset != NULL)&&((rule->actionset->id != NULL)&&
+                            (rule->actionset->id != NOT_SET_P))) ? rule->actionset->id : "-",
                     rule->filename != NULL ? rule->filename : "-",
                     rule->line_num,rc);
         }
@@ -1085,7 +1088,8 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
                             "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
                             "Execution error - "
                             "Does not support JIT (%d)",
-                            rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                            rule,((rule->actionset != NULL)&&((rule->actionset->id != NULL)&&
+                                    (rule->actionset->id != NOT_SET_P))) ? rule->actionset->id : "-",
                             rule->filename != NULL ? rule->filename : "-",
                             rule->line_num,rc);
                     msr_log(msr, 4, "%s.", *error_msg);
@@ -2712,7 +2716,8 @@ static int msre_op_verifyCC_execute(modsec_rec *msr, msre_rule *rule, msre_var *
                     "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
                     "Execution error - "
                     "Does not support JIT (%d)",
-                    rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                    rule,((rule->actionset != NULL)&&((rule->actionset->id != NULL)&&
+                            (rule->actionset->id != NOT_SET_P))) ? rule->actionset->id : "-",
                     rule->filename != NULL ? rule->filename : "-",
                     rule->line_num,rc);
             msr_log(msr, 4, "%s.", *error_msg);
@@ -3020,7 +3025,8 @@ static int msre_op_verifyCPF_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                     "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
                     "Execution error - "
                     "Does not support JIT (%d)",
-                    rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                    rule,((rule->actionset != NULL)&&((rule->actionset->id != NULL)&&
+                            (rule->actionset->id != NOT_SET_P))) ? rule->actionset->id : "-",
                     rule->filename != NULL ? rule->filename : "-",
                     rule->line_num,rc);
             msr_log(msr, 4, "%s.", *error_msg);
@@ -3311,7 +3317,8 @@ static int msre_op_verifySSN_execute(modsec_rec *msr, msre_rule *rule, msre_var 
                     "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
                     "Execution error - "
                     "Does not support JIT (%d)",
-                    rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+                    rule,((rule->actionset != NULL)&&((rule->actionset->id != NULL)&&
+                            (rule->actionset->id != NOT_SET_P))) ? rule->actionset->id : "-",
                     rule->filename != NULL ? rule->filename : "-",
                     rule->line_num,rc);
             msr_log(msr, 4, "%s.", *error_msg);
