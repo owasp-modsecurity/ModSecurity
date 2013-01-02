@@ -19,6 +19,7 @@
 #include "modsecurity.h"
 #include "msc_parsers.h"
 #include "msc_util.h"
+#include "msc_json.h"
 #include "msc_xml.h"
 #include "apr_version.h"
 
@@ -254,6 +255,9 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
 
     /* XML processor cleanup. */
     if (msr->xml != NULL) xml_cleanup(msr);
+
+    /* JSON processor cleanup. */
+    if (msr->json != NULL) json_cleanup(msr);
 
     // TODO: Why do we ignore return code here?
     modsecurity_request_body_clear(msr, &my_error_msg);
