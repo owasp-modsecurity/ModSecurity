@@ -384,7 +384,7 @@ modsecurity_read_body_cb(request_rec *r, char *outpos, unsigned int length,
             
             outpos = (char *) ngx_cpymem(outpos, buf->pos, len);
             rest -= len;
-            buf->last += len;
+            buf->pos += len;
         } else if (buf->in_file) {
             
             size = ngx_read_file(buf->file, (u_char*)outpos, len, buf->file_pos);
