@@ -566,7 +566,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         /* hijack loc_conf so that we can receive any body length
          *  TODO: nonblocking process & chuncked body
          */
-        if (clcf->client_body_buffer_size < r->headers_in.content_length_n) {
+        if (clcf->client_body_buffer_size < (size_t)r->headers_in.content_length_n) {
             
             loc_conf = ngx_pcalloc(r->pool, sizeof(void *) * ngx_http_max_module);
             if (loc_conf == NULL) {
