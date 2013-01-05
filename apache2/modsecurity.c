@@ -403,11 +403,26 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
         if (strcasecmp(te[i].key, "Cookie") == 0) {
             if (msr->txcfg->cookie_format == COOKIES_V0) {
                 _cookies = apr_pstrdup(msr->mp, te[i].val);
-                while((*_cookies != 0)&&(*_cookies != ',')&&(*_cookies != ';')) _cookies++;
-                if(*_cookies == ',')
-                    parse_cookies_v0(msr, te[i].val, msr->request_cookies, ",");
-                else
+                while((*_cookies != 0)&&(*_cookies != ';')) _cookies++;
+                if(*_cookies == ';')    {
                     parse_cookies_v0(msr, te[i].val, msr->request_cookies, ";");
+                } else  {
+                    _cookies = apr_pstrdup(msr->mp, te[i].val);
+                    while((*_cookies != 0)&&(*_cookies != ',')) _cookies++;
+                    if(*_cookies == ',')    {
+                        _cookies++;
+                        if(*_cookies == 0x20)   {// looks like comma is the separator
+                            if (msr->txcfg->debuglog_level >= 5) {
+                                msr_log(msr, 5, "Cookie v0 parser: Using comma as a separator. Semi-colon was not identified!");
+                            }
+                            parse_cookies_v0(msr, te[i].val, msr->request_cookies, ",");
+                        } else {
+                            parse_cookies_v0(msr, te[i].val, msr->request_cookies, ";");
+                        }
+                    } else  {
+                        parse_cookies_v0(msr, te[i].val, msr->request_cookies, ";");
+                    }
+                }
             } else {
                 parse_cookies_v1(msr, te[i].val, msr->request_cookies);
             }
