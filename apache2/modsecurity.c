@@ -276,7 +276,8 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
 apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     const char *s = NULL;
     const apr_array_header_t *arr;
-    char *_cookies = NULL;
+    char *semicolon = NULL;
+    char *comma = NULL;
     apr_table_entry_t *te;
     int i;
 
@@ -402,16 +403,16 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     for (i = 0; i < arr->nelts; i++) {
         if (strcasecmp(te[i].key, "Cookie") == 0) {
             if (msr->txcfg->cookie_format == COOKIES_V0) {
-                _cookies = apr_pstrdup(msr->mp, te[i].val);
-                while((*_cookies != 0)&&(*_cookies != ';')) _cookies++;
-                if(*_cookies == ';')    {
+                semicolon = apr_pstrdup(msr->mp, te[i].val);
+                while((*semicolon != 0)&&(*semicolon != ';')) semicolon++;
+                if(*semicolon == ';')    {
                     parse_cookies_v0(msr, te[i].val, msr->request_cookies, ";");
                 } else  {
-                    _cookies = apr_pstrdup(msr->mp, te[i].val);
-                    while((*_cookies != 0)&&(*_cookies != ',')) _cookies++;
-                    if(*_cookies == ',')    {
-                        _cookies++;
-                        if(*_cookies == 0x20)   {// looks like comma is the separator
+                    comma = apr_pstrdup(msr->mp, te[i].val);
+                    while((*comma != 0)&&(*comma != ',')) comma++;
+                    if(*comma == ',')    {
+                        comma++;
+                        if(*comma == 0x20)   {// looks like comma is the separator
                             if (msr->txcfg->debuglog_level >= 5) {
                                 msr_log(msr, 5, "Cookie v0 parser: Using comma as a separator. Semi-colon was not identified!");
                             }
