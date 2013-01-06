@@ -60,6 +60,7 @@ static char *ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent, v
 static char *ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 apr_status_t modsecurity_read_body_cb(request_rec *r, char *buf, unsigned int length,
                                         unsigned int *readcnt, int *is_eos);
+apr_status_t modsecurity_write_body_cb(request_rec *rec, char *buf, unsigned int length);
 
 static ngx_http_modsecurity_ctx_t * ngx_http_modsecurity_create_ctx(ngx_http_request_t *r);
 static int ngx_http_modsecurity_drop_action(request_rec *r);
@@ -190,6 +191,7 @@ ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
     modsecSetLogHook(cf->log, modsecLog);
     modsecSetDropAction(ngx_http_modsecurity_drop_action);
     modsecSetReadBody(modsecurity_read_body_cb);
+    modsecSetWriteBody(modsecurity_write_body_cb);
 
     modsecInit();
     modsecStartConfig();
@@ -318,6 +320,35 @@ modsecurity_read_body_cb(request_rec *r, char *outpos, unsigned int length,
     }
     
     *outlen = length - rest;
+    return APR_SUCCESS;
+}
+
+apr_status_t 
+modsecurity_write_body_cb(request_rec *rec, char *buf, unsigned int length)
+{
+    ngx_buf_t                      *b;
+    ngx_http_modsecurity_ctx_t     *ctx;
+
+    ctx = (ngx_http_modsecurity_ctx_t *) apr_table_get(rec->notes, NOTE_NGINX_REQUEST_CTX);
+    if (ctx == NULL) {
+        return APR_EINVAL;
+    }
+
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, ctx->r->connection->log, 0, "modSecurity: write_body_cb");
+
+    b = ctx->r->header_in;
+
+    if (b->end - b->pos < length) {
+        b->start = ngx_palloc(ctx->r->pool, length);
+        if (b->start == NULL) {
+            return APR_EINVAL;
+        }
+        b->end = b->start + length;
+        b->pos = b->start;
+    }
+    
+    b->last = ngx_cpymem(b->pos, buf, length);
+
     return APR_SUCCESS;
 }
 
@@ -575,7 +606,7 @@ ngx_http_modsecurity_request_body_handler(ngx_http_request_t *r)
     r->loc_conf = ctx->loc_conf;
 
     rc = modsecProcessRequest(ctx->req);
-    
+
     if (rc != DECLINED) {
         ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: status: %d, need action", rc);
     
