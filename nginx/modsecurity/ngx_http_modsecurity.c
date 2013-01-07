@@ -328,6 +328,8 @@ modsecurity_write_body_cb(request_rec *rec, char *buf, unsigned int length)
 {
     ngx_buf_t                      *b;
     ngx_http_modsecurity_ctx_t     *ctx;
+    ngx_http_request_t             *r;
+    ngx_str_t                      *str;
 
     ctx = (ngx_http_modsecurity_ctx_t *) apr_table_get(rec->notes, NOTE_NGINX_REQUEST_CTX);
     if (ctx == NULL) {
@@ -336,7 +338,10 @@ modsecurity_write_body_cb(request_rec *rec, char *buf, unsigned int length)
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, ctx->r->connection->log, 0, "modSecurity: write_body_cb");
 
-    b = ctx->r->header_in;
+    r = ctx->r;
+
+    /* set request body */
+    b = r->header_in;
 
     if (b->end - b->pos < length) {
         b->start = ngx_palloc(ctx->r->pool, length);
@@ -348,6 +353,18 @@ modsecurity_write_body_cb(request_rec *rec, char *buf, unsigned int length)
     }
     
     b->last = ngx_cpymem(b->pos, buf, length);
+
+    /* set  content_length_n */
+    r->headers_in.content_length_n = length;
+
+    /* set  headers_in.content_length */
+    str = &r->headers_in.content_length->value;
+    str->data = ngx_palloc(r->pool, NGX_OFF_T_LEN);
+    if (str->data == NULL) {
+        return NGX_ERROR;
+    }
+    
+    str->len = ngx_snprintf(str->data, NGX_OFF_T_LEN, "%O", length) - str->data;
 
     return APR_SUCCESS;
 }
@@ -417,7 +434,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         return NGX_ERROR;
     }
     ngx_http_set_ctx(r, ctx, ngx_http_modsecurity);
-	
+    
     if (r->method == NGX_HTTP_POST) {
         /* Processing POST request body, should we process PUT? */
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: method POST");
@@ -507,9 +524,9 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
         return NULL;
     }
     cln->handler = ngx_http_modsecurity_cleanup;
-	ngx_memzero(cln->data, sizeof(ngx_http_modsecurity_ctx_t));
-	
-	ctx = cln->data;
+    ngx_memzero(cln->data, sizeof(ngx_http_modsecurity_ctx_t));
+    
+    ctx = cln->data;
     ctx->r = r;
     
     if (r->connection->requests == 0 || ctx->connection == NULL) {
