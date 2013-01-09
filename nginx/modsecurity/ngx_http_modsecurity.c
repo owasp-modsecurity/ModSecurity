@@ -343,7 +343,7 @@ modsecurity_write_body_cb(request_rec *rec, char *buf, unsigned int length)
     /* set request body */
     b = r->header_in;
 
-    if (b->end - b->pos < length) {
+    if (b->end < b->pos + length) {
         b->start = ngx_palloc(ctx->r->pool, length);
         if (b->start == NULL) {
             return APR_EINVAL;
@@ -641,6 +641,7 @@ ngx_http_modsecurity_request_body_handler(ngx_http_request_t *r)
 
     r->phase_handler++;
     ngx_http_core_run_phases(r);
+	ngx_http_finalize_request(r, NGX_DONE);
 }
 
 
