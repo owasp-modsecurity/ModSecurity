@@ -30,14 +30,19 @@
 #define NOTE_NGINX_REQUEST_CTX "nginx-ctx"
 
 typedef struct {
-    ngx_flag_t                  enable;
+    ngx_flag_t                   enable;
     directory_config            *config;
+	
+	ngx_str_t                   *file;
+	ngx_uint_t                   line;
 } ngx_http_modsecurity_loc_conf_t;
 
 typedef struct {
     ngx_http_request_t  *r;
     conn_rec            *connection;
     request_rec         *req;
+
+	
 } ngx_http_modsecurity_ctx_t;
 
 
@@ -53,7 +58,7 @@ static void ngx_http_modsecurity_exit_process(ngx_cycle_t *cycle);
 static void *ngx_http_modsecurity_create_loc_conf(ngx_conf_t *cf);
 static char *ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child);
 static char *ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
-
+static char *ngx_http_modsecurity_enable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 apr_status_t modsecurity_read_body_cb(request_rec *r, char *buf, unsigned int length,
                                         unsigned int *readcnt, int *is_eos);
 apr_status_t modsecurity_write_body_cb(request_rec *rec, char *buf, unsigned int length);
@@ -74,7 +79,7 @@ static ngx_command_t  ngx_http_modsecurity_commands[] =  {
   { ngx_string("ModSecurityEnabled"),
     NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_SIF_CONF
         |NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
-    ngx_conf_set_flag_slot,
+    ngx_http_modsecurity_enable,
     NGX_HTTP_LOC_CONF_OFFSET,
     offsetof(ngx_http_modsecurity_loc_conf_t, enable),
     NULL },
@@ -176,6 +181,13 @@ ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent,
 
     ngx_conf_merge_value(conf->enable, prev->enable, 0);
     ngx_conf_merge_ptr_value(conf->config, prev->config, NULL);
+
+	if (conf->enable && conf->config == NULL) {
+		ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+                          "ModSecurity: enabled in %V:%ui while no config file is specified ",
+                          &conf->file, conf->line);
+        return NGX_CONF_ERROR;
+	}
 
     return NGX_CONF_OK;
 }
@@ -664,7 +676,6 @@ ngx_http_modsecurity_request_body_handler(ngx_http_request_t *r)
     ngx_http_finalize_request(r, NGX_DONE);
 }
 
-
 static char *
 ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -690,12 +701,29 @@ ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     msg = modsecProcessConfig(mscf->config, (const char *)value[1].data);
     if (msg != NULL) {
-        ngx_conf_log_error(NGX_LOG_INFO, cf, 0, "modSecurity: modsecProcessConfig() %s", msg);
+        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "modSecurity: modsecProcessConfig() %s", msg);
         return NGX_CONF_ERROR;
     }
 
     return NGX_CONF_OK;
 }
+static char *
+ngx_http_modsecurity_enable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+{
+	ngx_http_modsecurity_loc_conf_t *mscf = conf;
+	char                            *rc;
+	
+	rc = ngx_conf_set_flag_slot(cf, cmd, conf);
+	if (rc != NGX_CONF_OK) {
+		return rc;
+	}
+	if (mscf->enable) {
+		mscf->file = &cf->conf_file->file.name;
+		mscf->line = cf->conf_file->line;
+	}
+	return NGX_CONF_OK;
+}
+
 
 static int
 ngx_http_modsecurity_drop_action(request_rec *r)
