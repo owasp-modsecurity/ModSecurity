@@ -580,6 +580,7 @@ ngx_http_modsecurity_request_body_handler(ngx_http_request_t *r)
 
     if (r->request_body == NULL || r->request_body->bufs == NULL) {
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: request body empty");
+        r->phase_handler++;
         ngx_http_core_run_phases(r);
         ngx_http_finalize_request(r, NGX_DONE);
         return;
