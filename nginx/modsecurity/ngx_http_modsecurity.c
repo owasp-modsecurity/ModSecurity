@@ -226,6 +226,9 @@ ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
     return NGX_OK;
 }
 
+static ngx_http_output_header_filter_pt  ngx_http_next_header_filter;
+static ngx_http_output_body_filter_pt    ngx_http_next_body_filter;
+
 static ngx_int_t 
 ngx_http_modsecurity_init(ngx_conf_t *cf)
 {
@@ -258,6 +261,11 @@ ngx_http_modsecurity_init(ngx_conf_t *cf)
     }
     *h = ngx_http_modsecurity_content_handler;
 #endif
+    ngx_http_next_header_filter = ngx_http_top_header_filter;
+    ngx_http_top_header_filter = ngx_http_modsecurity_header_filter;
+
+    ngx_http_next_body_filter = ngx_http_top_body_filter;
+    ngx_http_top_body_filter = ngx_http_modsecurity_body_filter;
 
     return NGX_OK;
 }
@@ -362,6 +370,29 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: process request headers");
     
     rc = modsecProcessRequestHeaders(ctx->req);
+        
+    if (rc == DECLINED) {
+        if (r->method == NGX_HTTP_POST) {
+            /* Processing POST request body, should we process PUT? */
+            ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: method POST");
+            
+            clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
+
+            if (clcf == NULL) {
+                return NGX_HTTP_INTERNAL_SERVER_ERROR;
+            }
+
+            rc = ngx_http_read_client_request_body(r, ngx_http_modsecurity_request_body_handler);
+            if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
+                return rc;
+            }
+
+            return NGX_DONE;
+        }
+        /* other method */
+        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: process request body");
+        rc = modsecProcessRequestBody(ctx->req);
+    } 
 
     if (rc != DECLINED) {
         ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: status: %d, need action", rc);
@@ -376,31 +407,17 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         }
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     } 
-        
-    if (r->method == NGX_HTTP_POST) {
-        /* Processing POST request body, should we process PUT? */
-        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: method POST");
-        
-        clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
-
-        if (clcf == NULL) {
-            return NGX_HTTP_INTERNAL_SERVER_ERROR;
-        }
-
-        rc = ngx_http_read_client_request_body(r, ngx_http_modsecurity_request_body_handler);
-        if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
-            return rc;
-        }
-
-        return NGX_DONE;
-
-    } 
 
     return NGX_DECLINED;
 }
+
+static ngx_int_t
+ngx_http_modsecurity_header_filter(ngx_http_request_t *r, ngx_chain_t *in);
+
+
 #if 0
 static ngx_int_t
-ngx_http_modsecurity_filter(ngx_http_request_t *r, ngx_chain_t *in)
+ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 {
     /* headers */
     ngx_http_modsecurity_loc_conf_t *cf;
