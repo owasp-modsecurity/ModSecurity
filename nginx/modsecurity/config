@@ -5,3 +5,4 @@ NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_modsecurity.c $ngx_addon
 NGX_ADDON_DEPS="$NGX_ADDON_DEPS"
 CORE_LIBS="$CORE_LIBS $ngx_addon_dir/../../standalone/.libs/standalone.a -lapr-1 -laprutil-1 -lxml2 -lm"
 CORE_INCS="$CORE_INCS /usr/include/apache2 /usr/include/apr-1.0 $ngx_addon_dir/../../standalone $ngx_addon_dir/../../apache2 /usr/include/libxml2 /usr/include/apr-1 /usr/include/httpd $ngx_addon_dir"
+have=REQUEST_EARLY . auto/have

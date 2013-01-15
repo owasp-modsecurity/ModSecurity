@@ -225,10 +225,10 @@ ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
 
     return NGX_OK;
 }
-
+#if 0
 static ngx_http_output_header_filter_pt  ngx_http_next_header_filter;
 static ngx_http_output_body_filter_pt    ngx_http_next_body_filter;
-
+#endif
 static ngx_int_t 
 ngx_http_modsecurity_init(ngx_conf_t *cf)
 {
@@ -260,13 +260,12 @@ ngx_http_modsecurity_init(ngx_conf_t *cf)
         return NGX_ERROR;
     }
     *h = ngx_http_modsecurity_content_handler;
-#endif
     ngx_http_next_header_filter = ngx_http_top_header_filter;
     ngx_http_top_header_filter = ngx_http_modsecurity_header_filter;
 
     ngx_http_next_body_filter = ngx_http_top_body_filter;
     ngx_http_top_body_filter = ngx_http_modsecurity_body_filter;
-
+#endif
     return NGX_OK;
 }
 
@@ -411,11 +410,10 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     return NGX_DECLINED;
 }
 
+#if 0
 static ngx_int_t
 ngx_http_modsecurity_header_filter(ngx_http_request_t *r, ngx_chain_t *in);
 
-
-#if 0
 static ngx_int_t
 ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 {
