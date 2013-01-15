@@ -156,10 +156,11 @@ ngx_http_modsecurity_create_loc_conf(ngx_conf_t *cf)
 {
     ngx_http_modsecurity_loc_conf_t  *conf;
 
-    conf = (ngx_http_modsecurity_loc_conf_t  *) ngx_pcalloc(cf->pool, sizeof(ngx_http_modsecurity_loc_conf_t));
+    conf = (ngx_http_modsecurity_loc_conf_t  *) ngx_palloc(cf->pool, sizeof(ngx_http_modsecurity_loc_conf_t));
     if (conf == NULL)
         return NULL;
 
+    conf->config = NGX_CONF_UNSET_PTR;
     conf->enable = NGX_CONF_UNSET;
 
     return conf;
@@ -173,11 +174,8 @@ ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent,
     ngx_http_modsecurity_loc_conf_t  *prev = parent;
     ngx_http_modsecurity_loc_conf_t  *conf = child;
 
-    if (conf->config == NULL) {
-        conf->config = prev->config;
-    }
-
     ngx_conf_merge_value(conf->enable, prev->enable, 0);
+    ngx_conf_merge_ptr_value(conf->config, prev->config, NULL);
 
     return NGX_CONF_OK;
 }
@@ -221,11 +219,6 @@ ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
 
     modsecSetLogHook(cf->log, modsecLog);
     modsecSetDropAction(ngx_http_modsecurity_drop_action);
-#if 0
-    modsecSetReadBody(modsecurity_read_body_cb);
-    modsecSetWriteBody(modsecurity_write_body_cb);
-#endif
-    /* ap_hook_insert_filter(ap_nginx_insert_filter, NULL, NULL, APR_HOOK_FIRST); */
 
     modsecInit();
     modsecStartConfig();
@@ -299,114 +292,6 @@ ConvertNgxStringToUTF8(ngx_str_t str, apr_pool_t *pool)
 
     return t;
 }
-
-#if 0
-/*
-** request body callback, passing body to mod security
-*/
-apr_status_t
-modsecurity_read_body_cb(request_rec *r, char *outpos, unsigned int length,
-                                        unsigned int *outlen, int *is_eos)
-{
-    size_t                          len, rest;
-    ssize_t                         size;
-    ngx_http_modsecurity_ctx_t     *ctx;
-
-    ctx = (ngx_http_modsecurity_ctx_t *) apr_table_get(r->notes, NOTE_NGINX_REQUEST_CTX);
-    if (ctx == NULL) {
-        return APR_EINVAL;
-    }
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, ctx->r->connection->log, 0, "modSecurity: read_body_cb");
-
-    ngx_buf_t *buf = &ctx->buf;
-    rest = length;
-    *is_eos = 0;
-    
-    while (rest) {
-        
-        if (ngx_buf_size(buf) == 0) {
-            if (ctx->chain == NULL) {
-                *outlen = length - rest;
-                *is_eos = 1;
-                // END
-                return APR_SUCCESS;
-            }
-
-            ngx_memcpy(buf, ctx->chain->buf, sizeof(ngx_buf_t));
-            ctx->chain = ctx->chain->next;
-        }
-        
-        len = (size_t) ngx_min((size_t)ngx_buf_size(buf), rest);
-        
-        if (ngx_buf_in_memory(buf)) {
-            
-            outpos = (char *) ngx_cpymem(outpos, buf->pos, len);
-            rest -= len;
-            buf->pos += len;
-        } else if (buf->in_file) {
-            
-            size = ngx_read_file(buf->file, (u_char*)outpos, len, buf->file_pos);
-            
-            if (size < 0) {
-                return NGX_ERROR;
-            }
-            outpos += size;
-            rest -= size;
-            buf->file_pos += size;
-        } else {
-            return -1;
-        }
-    }
-    
-    *outlen = length - rest;
-    return APR_SUCCESS;
-}
-apr_status_t 
-modsecurity_write_body_cb(request_rec *rec, char *buf, unsigned int length)
-{
-    ngx_buf_t                      *b;
-    ngx_http_modsecurity_ctx_t     *ctx;
-    ngx_http_request_t             *r;
-    ngx_str_t                      *str;
-
-    ctx = (ngx_http_modsecurity_ctx_t *) apr_table_get(rec->notes, NOTE_NGINX_REQUEST_CTX);
-    if (ctx == NULL) {
-        return APR_EINVAL;
-    }
-
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, ctx->r->connection->log, 0, "modSecurity: write_body_cb");
-
-    r = ctx->r;
-
-    /* set request body */
-    b = r->header_in;
-
-    if (b->end < b->pos + length) {
-        b->start = ngx_palloc(ctx->r->pool, length);
-        if (b->start == NULL) {
-            return APR_EINVAL;
-        }
-        b->end = b->start + length;
-        b->pos = b->start;
-    }
-    
-    b->last = ngx_cpymem(b->pos, buf, length);
-
-    /* set  content_length_n */
-    r->headers_in.content_length_n = length;
-
-    /* set  headers_in.content_length */
-    str = &r->headers_in.content_length->value;
-    str->data = ngx_palloc(r->pool, NGX_OFF_T_LEN);
-    if (str->data == NULL) {
-        return NGX_ERROR;
-    }
-    
-    str->len = ngx_snprintf(str->data, NGX_OFF_T_LEN, "%O", length) - str->data;
-
-    return APR_SUCCESS;
-}
-#endif
 
 apr_sockaddr_t *CopySockAddr(apr_pool_t *pool, struct sockaddr *pAddr) {
     apr_sockaddr_t *addr = (apr_sockaddr_t *)apr_palloc(pool, sizeof(apr_sockaddr_t));
@@ -703,8 +588,8 @@ ngx_http_modsecurity_request_body_handler(ngx_http_request_t *r)
     }
 
     bb = ngx_chain_to_apr_brigade(r->request_body->bufs, 
-        ctx->req->pool, 
-        ctx->req->connection->bucket_alloc);
+                                  ctx->req->pool, 
+                                  ctx->req->connection->bucket_alloc);
     r->request_body = NULL;
     if (bb == NULL) {
         return ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
@@ -769,7 +654,7 @@ ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     ngx_str_t       *value;
     const char      *msg;
 
-    if (mscf->config != NULL) {
+    if (mscf->config != NGX_CONF_UNSET_PTR) {
         return "is duplicate";
     }
 
@@ -780,6 +665,10 @@ ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     }
 
     mscf->config = modsecGetDefaultConfig();
+
+    if (mscf->config == NULL) {
+        return NGX_CONF_ERROR;
+    }
 
     msg = modsecProcessConfig(mscf->config, (const char *)value[1].data);
     if (msg != NULL) {
@@ -802,106 +691,3 @@ ngx_http_modsecurity_drop_action(request_rec *r)
     ctx->r->connection->error = 1;
     return 0;
 }
-
-#if 0
-static apr_status_t 
-ap_nginx_in_filter(ap_filter_t *f, apr_bucket_brigade *bb,
-        ap_input_mode_t mode, apr_read_type_e block,
-        apr_off_t readbytes)    {
-
-    ngx_http_modsecurity_ctx_t     *ctx;
-    apr_bucket                     *e, *after;
-    apr_status_t                    rv;
-
-    ctx = (ngx_http_modsecurity_ctx_t *) apr_table_get(f->r->notes, NOTE_NGINX_REQUEST_CTX);
-    if (ctx == NULL) {
-        return APR_EINVAL;
-    }
-
-    if (ctx->chain_in == NULL) {
-        e = apr_bucket_eos_create(f->c->bucket_alloc);
-        APR_BRIGADE_INSERT_TAIL(bb, e);
-        return APR_SUCCESS;
-    }
-
-    if (ctx->brigade_in == NULL) {
-        ctx->brigade_in = ngx_chain_to_apr_brigade(ctx->chain_in, f->r->pool, f->c->bucket_alloc);
-        if (ctx->brigade_in == NULL) {
-            return APR_EINVAL;
-        }
-    }
-
-    rv = apr_brigade_partition(ctx->brigade_in, readbytes, &after);
-    if (rv != APR_SUCCESS && rv != APR_INCOMPLETE) {
-        return rv;
-    }
-
-    e = APR_BRIGADE_FIRST(ctx->brigade_in);
-    while (e != after) {
-        if (APR_BUCKET_IS_EOS(e)) {
-            /* last bucket read, step out of the way */
-            ap_remove_input_filter(f);
-        }
-        APR_BUCKET_REMOVE(e);
-        APR_BRIGADE_INSERT_TAIL(bb, e);
-        e = APR_BRIGADE_FIRST(ctx->brigade_in);
-    }
-
-    return APR_SUCCESS;
-}
-
-static apr_status_t 
-ap_nginx_out_filter(ap_filter_t *f, apr_bucket_brigade *bb) {
-
-    ngx_http_modsecurity_ctx_t     *ctx;
-    char                           *data;
-    apr_size_t                      length;
-
-    data = NULL;
-
-    ctx = (ngx_http_modsecurity_ctx_t *) apr_table_get(f->r->notes, NOTE_NGINX_REQUEST_CTX);
-    if (ctx == NULL) {
-        return APR_EINVAL;
-    }
-
-    if (ctx->flatten) {
-        if (apr_brigade_pflatten(bb, &data, &length, f->r->pool) != APR_SUCCESS)  {
-            goto einval;
-        }
-
-        ctx->chain_out = ngx_alloc_chain_link(ctx->r->pool);
-        if (ctx->chain_out == NULL) {
-            goto einval;
-        }
-        ctx->chain_out->next = NULL;
-        ctx->chain_out->buf = ngx_pcalloc(ctx->r->pool, sizeof(ngx_buf_t));
-        if (ctx->chain_out->buf == NULL) {
-            goto einval;
-        }
-        ctx->chain_out->buf->start = ctx->chain_out->buf->pos = (u_char *)data;
-        ctx->chain_out->buf->end = ctx->chain_out->buf->last = (u_char *)data + length;
-        goto ok;
-    }
-
-    ctx->chain_out = apr_brigade_to_ngx_chain(bb, ctx->r->pool);
-
-    if (ctx->chain_out == NULL) {
-        goto einval;
-    }
-ok:
-    apr_brigade_destroy(bb);
-    if (ctx->brigade_in) {
-        apr_brigade_destroy(ctx->brigade_in);
-        ctx->brigade_in = NULL;
-    }
-
-    return APR_SUCCESS;
-einval:
-    apr_brigade_destroy(bb);
-    if (ctx->brigade_in) {
-        apr_brigade_destroy(ctx->brigade_in);
-        ctx->brigade_in = NULL;
-    }
-    return APR_EINVAL;
-}
-#endif
