@@ -407,14 +407,17 @@ static modsec_rec *retrieve_msr(request_rec *r) {
     return NULL;
 }
 
-int modsecProcessRequest(request_rec *r)    {
+int modsecProcessRequestHeaders(request_rec *r) {
+    return hookfn_post_read_request(r);
+}
+
+int modsecProcessRequestBody(request_rec *r) {
     int status = DECLINED;
     modsec_rec *msr = NULL;
 
     ap_filter_t *f = ap_add_input_filter("HTTP_IN", NULL, r, r->connection);
     apr_bucket_brigade* bb_out;
 
-    status = hookfn_post_read_request(r);
     status = hookfn_fixups(r);
 
     ap_remove_input_filter(f);
@@ -457,6 +460,7 @@ int modsecProcessRequest(request_rec *r)    {
 
     return status;
 }
+
 
 int modsecIsResponseBodyAccessEnabled(request_rec *r)
 {

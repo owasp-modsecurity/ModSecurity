@@ -358,6 +358,25 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     }
     ngx_http_set_ctx(r, ctx, ngx_http_modsecurity);
     
+    /* processing request headers */
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: process request headers");
+    
+    rc = modsecProcessRequestHeaders(ctx->req);
+
+    if (rc != DECLINED) {
+        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: status: %d, need action", rc);
+
+        ngx_http_clear_accept_ranges(r);
+        ngx_http_clear_last_modified(r);
+        ngx_http_clear_content_length(r);
+
+        /* Nginx and Apache share same response code  */
+        if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
+            return rc;
+        }
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+    } 
+        
     if (r->method == NGX_HTTP_POST) {
         /* Processing POST request body, should we process PUT? */
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: method POST");
@@ -375,26 +394,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
 
         return NGX_DONE;
 
-    } else {
-        /* processing all the other methods */
-        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: method is not POST");
-        
-        rc = modsecProcessRequest(ctx->req);
-
-        if (rc != DECLINED) {
-            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: status: %d, need action", rc);
-
-            ngx_http_clear_accept_ranges(r);
-            ngx_http_clear_last_modified(r);
-            ngx_http_clear_content_length(r);
-
-            /* Nginx and Apache share same response code  */
-            if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
-                return rc;
-            }
-            return NGX_HTTP_INTERNAL_SERVER_ERROR;
-        } 
-    }
+    } 
 
     return NGX_DECLINED;
 }
@@ -578,14 +578,16 @@ ngx_http_modsecurity_request_body_handler(ngx_http_request_t *r)
     apr_off_t                     len;
     ngx_str_t                    *str;
 
-    rc = NGX_DONE;
+    if (r->request_body == NULL || r->request_body->bufs == NULL) {
+        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: request body empty");
+        ngx_http_core_run_phases(r);
+        ngx_http_finalize_request(r, NGX_DONE);
+        return;
+    }
+
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: process request body");
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
-
-    if (ctx == NULL 
-            || r->request_body->bufs == NULL ) {
-        return ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
-    }
 
     bb = ngx_chain_to_apr_brigade(r->request_body->bufs, 
                                   ctx->req->pool, 
@@ -596,7 +598,7 @@ ngx_http_modsecurity_request_body_handler(ngx_http_request_t *r)
     }
 
     modsecSetBodyBrigade(ctx->req, bb);
-    rc = modsecProcessRequest(ctx->req);
+    rc = modsecProcessRequestBody(ctx->req);
 
     if (rc != DECLINED) {
         ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: status: %d, need action", rc);
