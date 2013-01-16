@@ -41,7 +41,7 @@
 
 extern void *modsecLogObj;
 extern void (*modsecLogHook)(void *obj, int level, char *str);
-
+extern int (*modsecDropAction)(request_rec *r);
 apr_status_t (*modsecReadBody)(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos);
 apr_status_t (*modsecReadResponse)(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos);
 apr_status_t (*modsecWriteBody)(request_rec *r, char *buf, unsigned int length);
@@ -216,6 +216,8 @@ apr_status_t ap_http_out_filter(ap_filter_t *f, apr_bucket_brigade *b)  {
 }
 
 void modsecTerminate()  {
+    apr_pool_destroy(pool);
+    pool = NULL;
     apr_terminate();
 }
 
@@ -267,7 +269,7 @@ conn_rec *modsecNewConnection() {
 
     apr_pool_create(&pc, pool);
 
-    c = apr_palloc(pc, sizeof(conn_rec));
+    c = apr_pcalloc(pc, sizeof(conn_rec));
 
     c->base_server = server;
     c->id = 1;
@@ -300,7 +302,7 @@ request_rec *modsecNewRequest(conn_rec *connection, directory_config *config)   
 
     apr_pool_create(&pr, connection->pool);
 
-    r = apr_palloc(pr, sizeof(request_rec));
+    r = apr_pcalloc(pr, sizeof(request_rec));
 
     r->connection = connection;
     r->server = server;
@@ -527,4 +529,8 @@ void modsecSetWriteBody(apr_status_t (*func)(request_rec *r, char *buf, unsigned
 
 void modsecSetWriteResponse(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length))   {
     modsecWriteResponse = func;
+}
+
+void modsecSetDropAction(int (*func)(request_rec *r)) {
+    modsecDropAction = func;
 }

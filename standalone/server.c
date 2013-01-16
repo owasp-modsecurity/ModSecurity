@@ -992,6 +992,7 @@ AP_DECLARE(apr_status_t) unixd_set_proc_mutex_perms(apr_proc_mutex_t *pmutex)
 #endif
             union semun ick;
             struct semid_ds buf;
+            memset(&buf,0,sizeof(buf));
 
             apr_os_proc_mutex_get(&ospmutex, pmutex);
             buf.sem_perm.uid = unixd_config.user_id;
