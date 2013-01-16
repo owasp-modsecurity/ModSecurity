@@ -180,7 +180,12 @@ apr_status_t ap_http_in_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
     bb_in = modsecGetBodyBrigade(f->r);
 
     /* use request brigade */
-    if (bb_in) {
+    if (bb_in != NULL) {
+        if (!APR_BUCKET_IS_EOS(APR_BRIGADE_LAST(bb_in))) {
+            e = apr_bucket_eos_create(f->c->bucket_alloc);
+            APR_BRIGADE_INSERT_TAIL(bb_in, e);
+        }
+
         rv = apr_brigade_partition(bb_in, readbytes, &after);
         if (rv != APR_SUCCESS && rv != APR_INCOMPLETE) {
             return rv;
@@ -190,48 +195,62 @@ apr_status_t ap_http_in_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
             APR_BUCKET_REMOVE(e);
             APR_BRIGADE_INSERT_TAIL(bb_out, e);
         }
-        
+
         return APR_SUCCESS;
     }
 
     /* call the callback */
-    if(modsecReadBody == NULL)
-        return AP_NOBODY_READ;
+    if(modsecReadBody != NULL) {
 
-    tmp = (char *)apr_palloc(f->r->pool, readbytes);
-    modsecReadBody(f->r, tmp, readbytes, &readcnt, &is_eos);
+        tmp = (char *)apr_palloc(f->r->pool, readbytes);
+        modsecReadBody(f->r, tmp, readbytes, &readcnt, &is_eos);
 
-    e = apr_bucket_pool_create(tmp, readcnt, f->r->pool, f->c->bucket_alloc);
-    APR_BRIGADE_INSERT_TAIL(bb_out, e);
-
-    if(is_eos)  {
-        e = apr_bucket_eos_create(f->c->bucket_alloc);
+        e = apr_bucket_pool_create(tmp, readcnt, f->r->pool, f->c->bucket_alloc);
         APR_BRIGADE_INSERT_TAIL(bb_out, e);
+
+        if(is_eos)  {
+            e = apr_bucket_eos_create(f->c->bucket_alloc);
+            APR_BRIGADE_INSERT_TAIL(bb_out, e);
+        }
+        return APR_SUCCESS;
     }
 
-    return APR_SUCCESS;
+    return AP_NOBODY_READ;
 }
 
 apr_status_t ap_http_out_filter(ap_filter_t *f, apr_bucket_brigade *b)  {
     modsec_rec *msr = (modsec_rec *)f->ctx;
     apr_status_t rc;
+    apr_bucket_brigade *bb_out;
+    
+    bb_out = modsecGetResponseBrigade(f->r);
+
+
+    if (bb_out) {
+        APR_BRIGADE_CONCAT(bb_out, b);
+        return APR_SUCCESS;
+    }
 
     // is there a way to tell whether the response body was modified or not?
     //
     if((msr->txcfg->content_injection_enabled || msr->content_prepend_len != 0 || msr->content_append_len != 0)
-            && modsecWriteResponse != NULL && msr->txcfg->resbody_access)   {
-        char *data = NULL;
-        apr_size_t length;
+            && msr->txcfg->resbody_access)   {
 
-        rc = apr_brigade_pflatten(msr->of_brigade, &data, &length, msr->mp);
+        if (modsecWriteResponse != NULL) {
+            char *data = NULL;
+            apr_size_t length;
 
-        if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "Output filter: Failed to flatten brigade (%d): %s", rc,
-                    get_apr_error(msr->mp, rc));
-            return -1;
+            rc = apr_brigade_pflatten(msr->of_brigade, &data, &length, msr->mp);
+
+            if (rc != APR_SUCCESS) {
+                msr_log(msr, 1, "Output filter: Failed to flatten brigade (%d): %s", rc,
+                        get_apr_error(msr->mp, rc));
+                return -1;
+            }
+
+            /* TODO: return ?*/
+            modsecWriteResponse(msr->r, data, msr->stream_output_length);
         }
-
-        modsecWriteResponse(msr->r, data, msr->stream_output_length);
     }
 
     return APR_SUCCESS;
@@ -483,7 +502,7 @@ int modsecProcessResponse(request_rec *r)   {
         unsigned int readcnt = 0;
         int is_eos = 0;
         ap_filter_t *f = NULL;
-        apr_bucket_brigade *bb = NULL;
+        apr_bucket_brigade *bb_in, *bb = NULL;
 
         if (msr == NULL) {
             ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
@@ -500,33 +519,39 @@ int modsecProcessResponse(request_rec *r)   {
         }
 
         msr->r = r;
+        
+        bb_in = modsecGetResponseBrigade(r);
 
-        if(modsecReadResponse == NULL)
+        if (bb_in != NULL) {
+            APR_BRIGADE_CONCAT(bb, bb_in);
+            if (!APR_BUCKET_IS_EOS(APR_BRIGADE_LAST(bb))) {
+                e = apr_bucket_eos_create(bb->bucket_alloc);
+                APR_BRIGADE_INSERT_TAIL(bb, e);
+            }
+        } else if (modsecReadResponse != NULL) {
+            while(!is_eos)  {
+                modsecReadResponse(r, buf, 8192, &readcnt, &is_eos);
+
+                if(readcnt > 0) {
+                    tmp = (char *)apr_palloc(r->pool, readcnt);
+                    memcpy(tmp, buf, readcnt);
+                    e = apr_bucket_pool_create(tmp, readcnt, r->pool, r->connection->bucket_alloc);
+                    APR_BRIGADE_INSERT_TAIL(bb, e);
+                }
+
+                if(is_eos)  {
+                    e = apr_bucket_eos_create(r->connection->bucket_alloc);
+                    APR_BRIGADE_INSERT_TAIL(bb, e);
+                }
+            }
+        } else {
             return AP_NOBODY_WROTE;
-
-        f = ap_add_output_filter("HTTP_OUT", msr, r, r->connection);
-
-        while(!is_eos)  {
-            modsecReadResponse(r, buf, 8192, &readcnt, &is_eos);
-
-            if(readcnt > 0) {
-                tmp = (char *)apr_palloc(r->pool, readcnt);
-                memcpy(tmp, buf, readcnt);
-
-                e = apr_bucket_pool_create(tmp, readcnt, r->pool, r->connection->bucket_alloc);
-                APR_BRIGADE_INSERT_TAIL(bb, e);
-            }
-
-            if(is_eos)  {
-                e = apr_bucket_eos_create(r->connection->bucket_alloc);
-
-                APR_BRIGADE_INSERT_TAIL(bb, e);
-            }
         }
-
+        
+        f = ap_add_output_filter("HTTP_OUT", msr, r, r->connection);
         status = ap_pass_brigade(r->output_filters, bb);
-
         ap_remove_output_filter(f);
+        return status;
     }
 
     return status;
