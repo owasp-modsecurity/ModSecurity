@@ -44,7 +44,6 @@ typedef struct {
 
     apr_bucket_brigade  *brigade;
     unsigned             complete;
-    unsigned             blocked;
 } ngx_http_modsecurity_ctx_t;
 
 
