@@ -185,7 +185,7 @@ ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent,
     if (conf->enable && conf->config == NULL) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
                           "ModSecurity: enabled in %V:%ui while no config file is specified ",
-                          &conf->file, conf->line);
+                           conf->file, conf->line);
         return NGX_CONF_ERROR;
     }
 
