@@ -52,16 +52,13 @@ all: $(DLL)
 
 dll: $(DLL)
 
-mod_security2_config.h: mod_security2_config.hw
-        @type mod_security2_config.hw > modsecurity_config.h
-
 .c.obj:
         $(CC) $(CFLAGS) -c $< -Fo$@
 
 .cpp.obj:
         $(CC) $(CFLAGS) -c $< -Fo$@
 
-$(DLL): mod_security2_config.h $(OBJS)
+$(DLL): $(OBJS)
         $(CC) $(CFLAGS) $(LDFLAGS) -LD $(OBJS) -Fe$(DLL) $(LIBS) /link
         IF EXIST $(DLL).manifest $(MT) -manifest $(DLL).manifest -outputresource:$(DLL);2
 
@@ -69,4 +66,4 @@ install: $(DLL)
         copy /Y $(DLL) $(APACHE)\modules
 
 clean:
-        del $(OBJS) $(DLL) *.dll *.lib *.pdb *.idb *.ilk *.exp *.res *.rc *.bin mod_security2_config.h *.manifest
+        del $(OBJS) $(DLL) *.dll *.lib *.pdb *.idb *.ilk *.exp *.res *.rc *.bin *.manifest

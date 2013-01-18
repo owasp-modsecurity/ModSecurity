@@ -235,13 +235,44 @@ directory_config *modsecGetDefaultConfig()  {
     return (directory_config *)security2_module.create_dir_config(pool, NULL);
 }
 
-const char *modsecProcessConfig(directory_config *config, const char *dir)  {
+const char *modsecProcessConfig(directory_config *config, const char *file, const char *dir)  {
     apr_pool_t *ptemp = NULL;
     const char *err;
+	apr_status_t status;
+	const char *rootpath, *incpath;
 
-    apr_pool_create(&ptemp, pool);
+	if(dir == NULL || strlen(dir) == 0)
+#ifdef	WIN32
+		dir = "\\";
+#else
+		dir = "/";
+#endif
 
-    err = process_command_config(server, config, pool, ptemp, dir);
+	incpath = file;
+
+	/* locate the start of the directories proper */
+	status = apr_filepath_root(&rootpath, &incpath, APR_FILEPATH_TRUENAME | APR_FILEPATH_NATIVE, pool);
+
+	/* we allow APR_SUCCESS and APR_EINCOMPLETE */
+	if (APR_ERELATIVE == status) {
+		int li = strlen(dir) - 1;
+
+		if(dir[li] != '/' && dir[li] != '\\')
+#ifdef	WIN32
+			file = apr_pstrcat(pool, dir, "\\", file, NULL);
+#else
+			file = apr_pstrcat(pool, dir, "/", file, NULL);
+#endif
+		else
+			file = apr_pstrcat(pool, dir, file, NULL);
+	}
+	else if (APR_EBADPATH == status) {
+		return apr_pstrcat(pool, "Config file has a bad path, ", file, NULL);
+	}
+
+	apr_pool_create(&ptemp, pool);
+
+    err = process_command_config(server, config, pool, ptemp, file);
 
     apr_pool_destroy(ptemp);
 
@@ -423,6 +454,17 @@ int modsecProcessRequest(request_rec *r)    {
     //r->input_filters->frec->filter_func.in_func(r->input_filters, NULL, 0, 0, 0);
 
     return status;
+}
+
+void modsecSetConfigForIISRequestBody(request_rec *r)
+{
+	modsec_rec *msr = retrieve_msr(r);
+
+	if(msr == NULL || msr->txcfg == NULL)
+		return;
+
+	if(msr->txcfg->reqbody_access)
+		msr->txcfg->stream_inbody_inspection = 1;
 }
 
 int modsecIsResponseBodyAccessEnabled(request_rec *r)
