@@ -2,6 +2,8 @@
  * so this is here to prevent that by removing them.
  */
 
+#ifndef	WIN32
+
 /* Undefine all these so there are no conflicts */
 #undef PACKAGE
 #undef PACKAGE_BUGREPORT
@@ -22,3 +24,5 @@
 #undef PACKAGE_TARNAME
 #undef PACKAGE_URL
 #undef PACKAGE_VERSION
+
+#endif
