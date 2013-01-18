@@ -749,6 +749,37 @@ static int fname_alphasort(const void *fn1, const void *fn2)
     return strcmp(f1->fname,f2->fname);
 }
 
+int fnmatch_test(const char *pattern)
+{
+    int nesting;
+
+    nesting = 0;
+    while (*pattern) {
+        switch (*pattern) {
+        case '?':
+        case '*':
+            return 1;
+
+/*        case '\\':
+            if (*++pattern == '\0') {
+                return 0;
+            }
+            break;*/		// this breaks on Windows
+
+        case '[':         /* '[' is only a glob if it has a matching ']' */
+            ++nesting;
+            break;
+
+        case ']':
+            if (nesting) {
+                return 1;
+            }
+            break;
+        }
+        ++pattern;    }
+    return 0;
+}
+
 AP_DECLARE(const char *) process_resource_config(const char *fname,
                                                     apr_array_header_t *ari,
                                                     apr_pool_t *ptemp)
@@ -859,7 +890,7 @@ static const char *process_resource_config_fnmatch(const char *path,
     }
 
     /* optimisation - if the filename isn't a wildcard, process it directly */
-    if (!apr_fnmatch_test(fname)) {
+    if (!fnmatch_test(fname)) {
         path = ap_make_full_path(ptemp, path, fname);
         if (!rest) {
             return process_resource_config_nofnmatch(path,
@@ -891,7 +922,7 @@ static const char *process_resource_config_fnmatch(const char *path,
         if (strcmp(dirent.name, ".")
             && strcmp(dirent.name, "..")
             && (apr_fnmatch(fname, dirent.name,
-                            APR_FNM_PERIOD) == APR_SUCCESS)) {
+                            APR_FNM_PERIOD | APR_FNM_NOESCAPE | APR_FNM_PATHNAME) == APR_SUCCESS)) {
             const char *full_path = ap_make_full_path(ptemp, path, dirent.name);
             /* If matching internal to path, and we happen to match something
              * other than a directory, skip it
@@ -949,7 +980,7 @@ AP_DECLARE(const char *) process_fnmatch_configs(apr_array_header_t *ari,
                                                     apr_pool_t *ptemp,
                                                     int optional)
 {
-    if (!apr_fnmatch_test(fname)) {
+    if (!fnmatch_test(fname)) {
         return process_resource_config(fname, ari, p);
     }
     else {
@@ -996,6 +1027,8 @@ const char *process_command_config(server_rec *s,
 	ap_directive_t *newdir;
 	int optional;
 	char *err = NULL;
+	char *rootpath, *incpath;
+	int li;
 
 	errmsg = populate_include_files(p, ptemp, ari, filename, 0);
 
@@ -1064,6 +1097,27 @@ ProcessInclude:
 				{
 					ap_cfg_closefile(parms->config_file);
 					errmsg = apr_pstrcat(parms->pool, "Include takes one argument", NULL);
+					goto Exit;
+				}
+
+				incpath = w;
+
+				/* locate the start of the directories proper */
+				status = apr_filepath_root(&rootpath, &incpath, APR_FILEPATH_TRUENAME | APR_FILEPATH_NATIVE, ptemp);
+
+				/* we allow APR_SUCCESS and APR_EINCOMPLETE */
+				if (APR_ERELATIVE == status) {
+					rootpath = apr_pstrdup(ptemp, parms->config_file->name);
+					li = strlen(rootpath) - 1;
+
+					while(li >= 0 && rootpath[li] != '/' && rootpath[li] != '\\')
+						rootpath[li--] = 0;
+
+					w = apr_pstrcat(p, rootpath, w, NULL);
+				}
+				else if (APR_EBADPATH == status) {
+					ap_cfg_closefile(parms->config_file);
+					errmsg = apr_pstrcat(p, "Include file has a bad path, ", w, NULL);
 					goto Exit;
 				}
 

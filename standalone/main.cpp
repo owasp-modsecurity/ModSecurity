@@ -239,7 +239,7 @@ void main(int argc, char *argv[])
 
 	config = modsecGetDefaultConfig();
 
-	const char * err = modsecProcessConfig(config, config_file);
+	const char * err = modsecProcessConfig(config, config_file, "c:\\inetpub\\wwwroot");
 
 	if(err != NULL)
 	{

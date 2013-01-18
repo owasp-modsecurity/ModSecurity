@@ -57,9 +57,6 @@ all: $(DLL)
 
 dll: $(DLL)
 
-..\apache2\mod_security2_config.h: ..\apache2\mod_security2_config.hw
-        @type ..\apache2\mod_security2_config.hw > ..\apache2\modsecurity_config.h
-
 $(OBJS1): ..\apache2\$*.c
         $(CC) $(CFLAGS) -c ..\apache2\$*.c -Fo$@
 
@@ -69,7 +66,7 @@ $(OBJS2): ..\standalone\$*.c
 .cpp.obj:
         $(CC) $(CFLAGS) -c $< -Fo$@
 
-$(DLL): ..\apache2\mod_security2_config.h $(OBJS1) $(OBJS2) $(OBJS3)
+$(DLL): $(OBJS1) $(OBJS2) $(OBJS3)
         $(LINK) $(LDFLAGS) $(OBJS1) $(OBJS2) $(OBJS3) $(LIBS)
         IF EXIST $(DLL).manifest $(MT) -manifest $(DLL).manifest -outputresource:$(DLL);#1
 
