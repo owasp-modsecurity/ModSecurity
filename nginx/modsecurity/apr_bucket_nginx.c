@@ -82,7 +82,7 @@ static void nginx_bucket_destroy(void *data)
     apr_bucket_nginx *n = data;
     ngx_buf_t *buf = n->buf;
 
-    if (apr_bucket_shared_destroy(buf)) {
+    if (apr_bucket_shared_destroy(n)) {
         if (!ngx_buf_in_memory(buf) && buf->pos != NULL) {
             apr_bucket_free(buf->pos);
             buf->pos = NULL;
