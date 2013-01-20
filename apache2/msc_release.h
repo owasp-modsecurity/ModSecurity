@@ -50,7 +50,7 @@
 
 /* Apache Module Defines */
 #ifdef	VERSION_IIS
-#define MODSEC_MODULE_NAME "ModSecurity for IIS (RC)"
+#define MODSEC_MODULE_NAME "ModSecurity for IIS (STABLE)"
 #else
 #ifdef	VERSION_NGINX
 #define MODSEC_MODULE_NAME "ModSecurity for nginx (Beta)"
