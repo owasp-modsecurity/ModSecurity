@@ -1,3 +1,45 @@
+21 Jan 2013 - 2.7.2
+-------------------
+
+  * IIS version is now stable.
+
+  * Fixed IIS version does not pass through POST data to ASP.NET when SecRequestBodyAccess
+    is set to On (MODSEC-372).
+
+  * Fixed IIS version HTTP Request Smuggling protection does not work (MODSEC-344).
+
+  * Fixed IIS version PHP Injection Attack (958976) protection does not work (MODSEC-346).
+
+  * Fixed IIS version Request limit protections are not working (MODSEC-349).
+
+  * Fixed IIS version Outbound protections are not working (MODSEC-350).
+
+  * Added IIS version better installer.
+
+  * NGINX version removed ModSecurityPassCommand (Thanks chaizhenhua).
+
+  * Fixed NGINX version ngx_http_read_client_request_body returned unexpected buffer type (Thanks chaizhenhua).
+
+  * Fixed NGINX version INCS config directories on fedora (Thanks chaizhenhua).
+
+  * Added NGINX version Added drop action for nginx (Thanks chaizhenhua).
+
+  * Fixed bug in cpf_verify operator (Thanks Hideaki Hayashi).
+
+  * Fixed build modsecurity under Arch Linux.
+
+  * Fixed make test crashing when JIT pcre is enabled.
+
+  * Fixed better cookie separator detection code.
+
+  * Fixed mod_security displaying wrong ip address in error.log using apache 2.4 and mod_remoteip.
+
+  * Fixed mod_security was not compiling when use apr without ipv6 support.
+
+  * Fixed mod_security was not compiling when use lua 5.2.
+
+  * Fixed issue when execute make install under Solaris.
+
 01 Nov 2012 - 2.7.1
 -------------------
 
