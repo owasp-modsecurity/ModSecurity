@@ -41,7 +41,7 @@
 
 extern void *modsecLogObj;
 extern void (*modsecLogHook)(void *obj, int level, char *str);
-
+extern int (*modsecDropAction)(request_rec *r);
 apr_status_t (*modsecReadBody)(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos);
 apr_status_t (*modsecReadResponse)(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos);
 apr_status_t (*modsecWriteBody)(request_rec *r, char *buf, unsigned int length);
@@ -216,6 +216,8 @@ apr_status_t ap_http_out_filter(ap_filter_t *f, apr_bucket_brigade *b)  {
 }
 
 void modsecTerminate()  {
+    apr_pool_destroy(pool);
+    pool = NULL;
     apr_terminate();
 }
 
@@ -233,13 +235,44 @@ directory_config *modsecGetDefaultConfig()  {
     return (directory_config *)security2_module.create_dir_config(pool, NULL);
 }
 
-const char *modsecProcessConfig(directory_config *config, const char *dir)  {
+const char *modsecProcessConfig(directory_config *config, const char *file, const char *dir)  {
     apr_pool_t *ptemp = NULL;
     const char *err;
+	apr_status_t status;
+	const char *rootpath, *incpath;
 
-    apr_pool_create(&ptemp, pool);
+	if(dir == NULL || strlen(dir) == 0)
+#ifdef	WIN32
+		dir = "\\";
+#else
+		dir = "/";
+#endif
 
-    err = process_command_config(server, config, pool, ptemp, dir);
+	incpath = file;
+
+	/* locate the start of the directories proper */
+	status = apr_filepath_root(&rootpath, &incpath, APR_FILEPATH_TRUENAME | APR_FILEPATH_NATIVE, pool);
+
+	/* we allow APR_SUCCESS and APR_EINCOMPLETE */
+	if (APR_ERELATIVE == status) {
+		int li = strlen(dir) - 1;
+
+		if(dir[li] != '/' && dir[li] != '\\')
+#ifdef	WIN32
+			file = apr_pstrcat(pool, dir, "\\", file, NULL);
+#else
+			file = apr_pstrcat(pool, dir, "/", file, NULL);
+#endif
+		else
+			file = apr_pstrcat(pool, dir, file, NULL);
+	}
+	else if (APR_EBADPATH == status) {
+		return apr_pstrcat(pool, "Config file has a bad path, ", file, NULL);
+	}
+
+	apr_pool_create(&ptemp, pool);
+
+    err = process_command_config(server, config, pool, ptemp, file);
 
     apr_pool_destroy(ptemp);
 
@@ -267,7 +300,7 @@ conn_rec *modsecNewConnection() {
 
     apr_pool_create(&pc, pool);
 
-    c = apr_palloc(pc, sizeof(conn_rec));
+    c = apr_pcalloc(pc, sizeof(conn_rec));
 
     c->base_server = server;
     c->id = 1;
@@ -300,7 +333,7 @@ request_rec *modsecNewRequest(conn_rec *connection, directory_config *config)   
 
     apr_pool_create(&pr, connection->pool);
 
-    r = apr_palloc(pr, sizeof(request_rec));
+    r = apr_pcalloc(pr, sizeof(request_rec));
 
     r->connection = connection;
     r->server = server;
@@ -423,6 +456,17 @@ int modsecProcessRequest(request_rec *r)    {
     return status;
 }
 
+void modsecSetConfigForIISRequestBody(request_rec *r)
+{
+	modsec_rec *msr = retrieve_msr(r);
+
+	if(msr == NULL || msr->txcfg == NULL)
+		return;
+
+	if(msr->txcfg->reqbody_access)
+		msr->txcfg->stream_inbody_inspection = 1;
+}
+
 int modsecIsResponseBodyAccessEnabled(request_rec *r)
 {
 	modsec_rec *msr = retrieve_msr(r);
@@ -527,4 +571,8 @@ void modsecSetWriteBody(apr_status_t (*func)(request_rec *r, char *buf, unsigned
 
 void modsecSetWriteResponse(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length))   {
     modsecWriteResponse = func;
+}
+
+void modsecSetDropAction(int (*func)(request_rec *r)) {
+    modsecDropAction = func;
 }

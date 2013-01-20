@@ -38,7 +38,7 @@
 
 #define MODSEC_VERSION_MAJOR       "2"
 #define MODSEC_VERSION_MINOR       "7"
-#define MODSEC_VERSION_MAINT       "1"
+#define MODSEC_VERSION_MAINT       "2"
 #define MODSEC_VERSION_TYPE        ""
 #define MODSEC_VERSION_RELEASE     ""
 
@@ -50,7 +50,7 @@
 
 /* Apache Module Defines */
 #ifdef	VERSION_IIS
-#define MODSEC_MODULE_NAME "ModSecurity for IIS (Beta)"
+#define MODSEC_MODULE_NAME "ModSecurity for IIS (STABLE)"
 #else
 #ifdef	VERSION_NGINX
 #define MODSEC_MODULE_NAME "ModSecurity for nginx (Beta)"

@@ -66,6 +66,7 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
                            @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 endif
 
+if LINUX
 install-exec-hook: $(pkglib_LTLIBRARIES)
 	@echo "Removing unused static libraries..."; \
 	for m in $(pkglib_LTLIBRARIES); do \
@@ -73,3 +74,12 @@ install-exec-hook: $(pkglib_LTLIBRARIES)
 	  rm -f $(DESTDIR)$(pkglibdir)/$$base.*a; \
 	  install -D -m444 $(DESTDIR)$(pkglibdir)/$$base.so $(DESTDIR)$(APXS_MODULES); \
 	done
+else
+install-exec-hook: $(pkglib_LTLIBRARIES)
+	@echo "Removing unused static libraries..."; \
+	for m in $(pkglib_LTLIBRARIES); do \
+	  base=`echo $$m | sed 's/\..*//'`; \
+	  rm -f $(DESTDIR)$(pkglibdir)/$$base.*a; \
+	  cp -p $(DESTDIR)$(pkglibdir)/$$base.so $(DESTDIR)$(APXS_MODULES); \
+	done
+endif

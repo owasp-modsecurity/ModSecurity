@@ -14,7 +14,8 @@ AC_CONFIG_HEADERS([apache2/modsecurity_config_auto.h])
 AC_CONFIG_AUX_DIR([build])
 AC_PREFIX_DEFAULT([/usr/local/modsecurity])
 
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([-Wall foreign])
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 LT_PREREQ([2.2])
 LT_INIT([dlopen])

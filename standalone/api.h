@@ -51,7 +51,7 @@ void modsecTerminate();
 
 void modsecStartConfig();
 directory_config *modsecGetDefaultConfig();
-const char *modsecProcessConfig(directory_config *config, const char *dir);
+const char *modsecProcessConfig(directory_config *config, const char *file, const char *dir);
 void modsecFinalizeConfig();
 
 void modsecInitProcess();
@@ -70,8 +70,11 @@ void modsecSetReadBody(apr_status_t (*func)(request_rec *r, char *buf, unsigned 
 void modsecSetReadResponse(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos));
 void modsecSetWriteBody(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length));
 void modsecSetWriteResponse(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length));
+void modsecSetDropAction(int (*func)(request_rec *r));
 
 int modsecIsResponseBodyAccessEnabled(request_rec *r);
+
+void modsecSetConfigForIISRequestBody(request_rec *r);
 
 #ifdef __cplusplus
 }

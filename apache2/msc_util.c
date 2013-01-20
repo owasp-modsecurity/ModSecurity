@@ -834,7 +834,9 @@ char *m_strcasestr(const char *haystack, const char *needle) {
 int inet_pton(int family, const char *src, void *dst)   {
     struct addrinfo addr;
     struct sockaddr_in *in = NULL;
+#if APR_HAVE_IPV6
     struct sockaddr_in6 *in6 = NULL;
+#endif
     struct addrinfo *addr_info = NULL;
 
     memset(&addr, 0, sizeof(struct addrinfo));
@@ -849,11 +851,13 @@ int inet_pton(int family, const char *src, void *dst)   {
             if(in != NULL)
                 memcpy(dst, &in->sin_addr, 4);
         }
+#if APR_HAVE_IPV6
         else if (addr_info->ai_family == AF_INET6) {
             in6 = (struct sockaddr_in6*)addr_info->ai_addr;
             if(in6 != NULL)
                 memcpy(dst, &in6->sin6_addr, 16);
         }
+#endif
         else {
             freeaddrinfo(addr_info);
             return -1;
@@ -1202,7 +1206,26 @@ char *log_escape(apr_pool_t *mp, const char *text) {
 }
 
 char *log_escape_nq(apr_pool_t *mp, const char *text) {
+#ifdef VERSION_IIS
+	int l = 0;
+
+	// this is a workaround for unknown bug that causes 'text' sometimes to lack zero-termination
+	//
+	__try
+	{
+		l = text ? strlen(text) : 0;
+	}
+	__except(EXCEPTION_EXECUTE_HANDLER)
+	{
+		l = -1;
+	}
+	if(l < 0)
+	    return _log_escape(mp, "BUG: see log_escape_nq()", 24, 0, 0, 0);
+
+	return _log_escape(mp, (const unsigned char *)text, l, 0, 0, 0);
+#else
     return _log_escape(mp, (const unsigned char *)text, text ? strlen(text) : 0, 0, 0, 0);
+#endif
 }
 
 char *log_escape_ex(apr_pool_t *mp, const char *text, unsigned long int text_length) {
