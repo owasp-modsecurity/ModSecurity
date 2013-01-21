@@ -40,6 +40,8 @@
 
   * Fixed issue when execute make install under Solaris.
 
+  * Fixed ipmatchf operator was not working as expected.
+
 01 Nov 2012 - 2.7.1
 -------------------
 
