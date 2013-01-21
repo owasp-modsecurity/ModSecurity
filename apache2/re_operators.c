@@ -202,26 +202,34 @@ static int msre_op_ipmatchFromFile_param_init(msre_rule *rule, char **error_msg)
     unsigned short int op_len;
     apr_status_t rc;
     apr_file_t *fd;
-    TreeRoot rtree;
-    TreeNode *tnode;
+    TreeRoot *rtree = NULL;
+    TreeNode *tnode = NULL;
 
     if (error_msg == NULL)
         return -1;
     else
         *error_msg = NULL;
 
+    rtree = apr_palloc(rule->ruleset->mp, sizeof(TreeRoot));
+    if(rtree == NULL)   {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "Failed allocating memory to TreeRoot.");
+        return 0;
+    }
+
+    memset(rtree, 0, sizeof(TreeRoot));
+
     if ((rule->op_param == NULL)||(strlen(rule->op_param) == 0)) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Missing parameter for operator 'ipmatchFromFile'.");
         return 0;
     }
 
-    rtree.ipv4_tree = CPTCreateRadixTree(rule->ruleset->mp);
-    if (rtree.ipv4_tree == NULL) {
+    rtree->ipv4_tree = CPTCreateRadixTree(rule->ruleset->mp);
+    if (rtree->ipv4_tree == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "ipmatchFromFile: Tree tree initialization failed.");
         return 0;
     }
-    rtree.ipv6_tree = CPTCreateRadixTree(rule->ruleset->mp);
-    if (rtree.ipv6_tree == NULL) {
+    rtree->ipv6_tree = CPTCreateRadixTree(rule->ruleset->mp);
+    if (rtree->ipv6_tree == NULL) {
         *error_msg = apr_psprintf(rule->ruleset->mp, "ipmatchFromFile: Tree tree initialization failed.");
         return 0;
     }
@@ -274,10 +282,10 @@ static int msre_op_ipmatchFromFile_param_init(msre_rule *rule, char **error_msg)
         if ((start == end) || (*start == '#')) continue;
 
         if (strchr(start, ':') == NULL) {
-            tnode = TreeAddIP(start, rtree.ipv4_tree, IPV4_TREE);
+            tnode = TreeAddIP(start, rtree->ipv4_tree, IPV4_TREE);
         }
         else {
-            tnode = TreeAddIP(start, rtree.ipv6_tree, IPV6_TREE);
+            tnode = TreeAddIP(start, rtree->ipv6_tree, IPV6_TREE);
         }
         if (tnode == NULL) {
             *error_msg = apr_psprintf(rule->ruleset->mp, "Could not add entry \"%s\" in line %d of file %s to IP list", start, line, fn);
@@ -285,7 +293,7 @@ static int msre_op_ipmatchFromFile_param_init(msre_rule *rule, char **error_msg)
     }
 
     if (fd != NULL) apr_file_close(fd);
-    rule->op_param_data = &rtree;
+    rule->op_param_data = rtree;
     return 1;
 }
 
@@ -303,7 +311,7 @@ static int msre_op_ipmatchFromFile_param_init(msre_rule *rule, char **error_msg)
 */
 
 static int msre_op_ipmatchFromFile_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    TreeRoot *rtree = rule->op_param_data;
+    TreeRoot *rtree = (TreeRoot *)rule->op_param_data;
     struct in_addr in;
 #if APR_HAVE_IPV6
     struct in6_addr in6;
