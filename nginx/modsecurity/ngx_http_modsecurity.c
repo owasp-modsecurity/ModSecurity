@@ -664,7 +664,7 @@ ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     mscf->config = modsecGetDefaultConfig();
 
-    msg = modsecProcessConfig(mscf->config, (const char *)value[1].data);
+    msg = modsecProcessConfig(mscf->config, (const char *)value[1].data, "");
     if (msg != NULL) {
         ngx_conf_log_error(NGX_LOG_INFO, cf, 0, "modSecurity: modsecProcessConfig() %s", msg);
         return NGX_CONF_ERROR;

@@ -367,8 +367,12 @@ HRESULT CMyHttpModule::ReadFileChunk(HTTP_DATA_CHUNK *chunk, char *buf)
 		{
 			bytesRead = (DWORD)chunk->FromFileHandle.ByteRange.Length.QuadPart;
 		}
+		if ((bytesTotal + bytesRead) > chunk->FromFileHandle.ByteRange.Length.QuadPart)
+		{ 
+			bytesRead = chunk->FromFileHandle.ByteRange.Length.QuadPart - bytesTotal; 
+		}
 
-		memcpy(buf, pIoBuffer, bytesRead);
+		memcpy(buf, pIoBuffer + dwDataStartOffset, bytesRead);
 
 		buf += bytesRead;
 		bytesTotal += bytesRead;
@@ -403,6 +407,8 @@ CMyHttpModule::OnSendResponse(
 
 	EnterCriticalSection(&m_csLock);
 
+	// here we must check if response body processing is enabled
+	//
 	if(rsc == NULL || rsc->m_pRequestRec == NULL || rsc->m_pResponseBuffer != NULL || !modsecIsResponseBodyAccessEnabled(rsc->m_pRequestRec))
 	{
 		goto Exit;
@@ -500,9 +506,6 @@ CMyHttpModule::OnSendResponse(
 
 		*(const char **)apr_array_push(r->content_languages) = lng;
 	}
-
-	// here we must check if response body processing is enabled
-	//
 
 	// Disable kernel caching for this response
 	// Probably we don't have to do it for ModSecurity
@@ -765,17 +768,33 @@ CMyHttpModule::OnBeginRequest(
 
 			pConfig->m_Config = modsecGetDefaultConfig();
 
+			PCWSTR servpath = pHttpContext->GetApplication()->GetApplicationPhysicalPath();
+			char *apppath;
+			USHORT apppathlen;
+
+			hr = pConfig->GlobalWideCharToMultiByte((WCHAR *)servpath, wcslen(servpath), &apppath, &apppathlen);
+
+			if ( FAILED( hr ) )
+			{
+				delete path;
+				hr = E_UNEXPECTED;
+				goto Finished;
+			}
+
 			if(path[0] != 0)
 			{
-				const char * err = modsecProcessConfig((directory_config *)pConfig->m_Config, path);
+				const char * err = modsecProcessConfig((directory_config *)pConfig->m_Config, path, apppath);
 
 				if(err != NULL)
 				{
 					WriteEventViewerLog(err, EVENTLOG_ERROR_TYPE);
+					delete apppath;
+					delete path;
+					goto Finished;
 				}
 			}
+			delete apppath;
 		}
-
 		delete path;
 	}
 
@@ -787,6 +806,11 @@ CMyHttpModule::OnBeginRequest(
 	modsecProcessConnection(c);
 
 	r = modsecNewRequest(c, (directory_config *)pConfig->m_Config);
+
+	// on IIS we force input stream inspection flag, because its absence does not add any performance gain
+	// it's because on IIS request body must be restored each time it was read
+	//
+	modsecSetConfigForIISRequestBody(r);
 
 	REQUEST_STORED_CONTEXT *rsc = new REQUEST_STORED_CONTEXT();
 
