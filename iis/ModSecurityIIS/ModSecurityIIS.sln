@@ -2,9 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ModSecurityIIS", "ModSecurityIIS\ModSecurityIIS.vdproj", "{3352AEF1-9F2A-47CD-9F63-658553063040}"
-	ProjectSection(ProjectDependencies) = postProject
-		{990BB195-6716-4DE3-B5E4-DCFCB1BD7D9C} = {990BB195-6716-4DE3-B5E4-DCFCB1BD7D9C}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Installer", "Installer\Installer.vcxproj", "{990BB195-6716-4DE3-B5E4-DCFCB1BD7D9C}"
 EndProject
