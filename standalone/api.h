@@ -60,11 +60,48 @@ conn_rec *modsecNewConnection();
 void modsecProcessConnection(conn_rec *c);
 
 request_rec *modsecNewRequest(conn_rec *connection, directory_config *config);
-int modsecProcessRequest(request_rec *r);
+
+int modsecProcessRequestBody(request_rec *r);
+int modsecProcessRequestHeaders(request_rec *r);
+
+static inline int modsecProcessRequest(request_rec *r)    {
+    int status;
+    status = modsecProcessRequestHeaders(r);
+    if (status != DECLINED) {
+        return status;
+    }
+
+    return modsecProcessRequestBody(r);
+}
+
+
 int modsecProcessResponse(request_rec *r);
 int modsecFinishRequest(request_rec *r);
 
 void modsecSetLogHook(void *obj, void (*hook)(void *obj, int level, char *str));
+
+#define NOTE_MSR_BRIGADE_REQUEST  "modsecurity-brigade-request"
+#define NOTE_MSR_BRIGADE_RESPONSE "modsecurity-brigade-response"
+
+static inline void 
+modsecSetBodyBrigade(request_rec *r, apr_bucket_brigade *b) {
+    apr_table_setn(r->notes, NOTE_MSR_BRIGADE_REQUEST, (char *)b);
+};
+
+static inline apr_bucket_brigade * 
+modsecGetBodyBrigade(request_rec *r) {
+    return (apr_bucket_brigade *)apr_table_get(r->notes, NOTE_MSR_BRIGADE_REQUEST);
+};
+
+static inline void 
+modsecSetResponseBrigade(request_rec *r, apr_bucket_brigade *b) {
+    apr_table_setn(r->notes, NOTE_MSR_BRIGADE_RESPONSE, (char *)b);
+};
+
+static inline apr_bucket_brigade * 
+modsecGetResponseBrigade(request_rec *r) {
+    return (apr_bucket_brigade *)apr_table_get(r->notes, NOTE_MSR_BRIGADE_RESPONSE);
+};
 
 void modsecSetReadBody(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos));
 void modsecSetReadResponse(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos));
