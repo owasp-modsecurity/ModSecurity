@@ -468,6 +468,7 @@ struct directory_config {
 
     int                  cookie_format;
     int                  argument_separator;
+    const char           *cookiev0_separator;
 
     int                  rule_inheritance;
     apr_array_header_t  *rule_exceptions;
