@@ -1,6 +1,9 @@
 ngx_addon_name=ngx_http_modsecurity
-HTTP_MODULES="$HTTP_MODULES ngx_http_modsecurity"
-NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_modsecurity.c"
+# HTTP_MODULES="$HTTP_MODULES ngx_http_modsecurity"
+HTTP_HEADERS_FILTER_MODULE="ngx_http_modsecurity $HTTP_HEADERS_FILTER_MODULE"
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_modsecurity.c $ngx_addon_dir/apr_bucket_nginx.c"
 NGX_ADDON_DEPS="$NGX_ADDON_DEPS"
 CORE_LIBS="$CORE_LIBS $ngx_addon_dir/../../standalone/.libs/standalone.a -lapr-1 -laprutil-1 -lxml2 -lm"
-CORE_INCS="$CORE_INCS /usr/include/apache2 /usr/include/apr-1.0 /usr/include/httpd /usr/include/apr-1 $ngx_addon_dir/../../standalone $ngx_addon_dir/../../apache2 /usr/include/libxml2"
+CORE_INCS="$CORE_INCS /usr/include/apache2 /usr/include/apr-1.0 /usr/include/httpd /usr/include/apr-1 $ngx_addon_dir $ngx_addon_dir/../../standalone $ngx_addon_dir/../../apache2 /usr/include/libxml2"
+have=REQUEST_EARLY . auto/have
+
