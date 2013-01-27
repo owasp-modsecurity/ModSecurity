@@ -668,6 +668,9 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
     if (ctx->brigade == NULL) {
         return NULL;
     }
+
+    apr_table_setn(ctx->req->notes, NOTE_NGINX_REQUEST_CTX, (const char *) ctx);
+
     return ctx;
 }
 
