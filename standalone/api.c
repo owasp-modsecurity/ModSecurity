@@ -472,6 +472,10 @@ int modsecProcessRequestBody(request_rec *r) {
 
     ap_remove_input_filter(f);
 
+	if (status != DECLINED) {
+		return status;
+	}
+
     hookfn_insert_filter(r);
 
     /* Find the transaction context first. */
