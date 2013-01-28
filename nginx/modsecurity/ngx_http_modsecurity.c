@@ -183,8 +183,10 @@ ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent,
     ngx_conf_merge_ptr_value(conf->config, prev->config, NULL);
 
     if (conf->enable && conf->config == NULL) {
-        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                          "ModSecurity: enabled in %V:%ui while no config file is specified ",
+        ngx_log_error(NGX_LOG_EMERG, cf->log, 0,
+                          "\"ModSecurityEnabled\" in %V:%ui is set to \"on\""
+                          " while directive \"ModSecurityConfig\" is not found"
+                          " in the same location",
                            conf->file, conf->line);
         return NGX_CONF_ERROR;
     }
@@ -224,6 +226,7 @@ modsec_pcre_free(void *ptr)
 static ngx_int_t
 ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
 {
+    server_rec *s;
 
     /*  XXX: temporary hack, nginx uses pcre as well and hijacks these two */
     pcre_malloc = modsec_pcre_malloc;
@@ -232,9 +235,20 @@ ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
     modsecSetLogHook(cf->log, modsecLog);
     modsecSetDropAction(ngx_http_modsecurity_drop_action);
 
-    modsecInit();
-    modsecStartConfig();
+    s = modsecInit();
+    if (s == NULL) {
+        return NGX_ERROR;
+    }
 
+    /* set host name */
+    s->server_hostname = ngx_palloc(cf->pool, ngx_cycle->hostname.len + 1);
+    if (s->server_hostname == NULL) {
+        return NGX_ERROR;
+    }
+    ngx_memcpy(s->server_hostname, ngx_cycle->hostname.data, ngx_cycle->hostname.len);
+    s->server_hostname[ ngx_cycle->hostname.len] = '\0';
+
+    modsecStartConfig();
     return NGX_OK;
 }
 
@@ -344,14 +358,14 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     ngx_http_modsecurity_ctx_t      *ctx;
     ngx_int_t                        rc;
 
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: handler");
-
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
 
     /* Process only main request */
     if (r != r->main || r->internal || !cf->enable) {
         return NGX_DECLINED;
     }
+
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: handler");
 
     ctx = ngx_http_modsecurity_create_ctx(r);
     if (ctx == NULL) {
@@ -360,15 +374,11 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
     ngx_http_set_ctx(r, ctx, ngx_http_modsecurity);
     
     /* processing request headers */
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: process request headers");
-    
     rc = modsecProcessRequestHeaders(ctx->req);
-        
+    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: modsecProcessRequestHeaders %d", rc);
     if (rc == DECLINED) {
         if (r->method == NGX_HTTP_POST) {
             /* Processing POST request body, should we process PUT? */
-            ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: method POST");
-
             rc = ngx_http_read_client_request_body(r, ngx_http_modsecurity_body_handler);
             if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
                 return rc;
@@ -377,12 +387,11 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
             return NGX_DONE;
         }
         /* other method */
-        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: process request body");
-        rc = modsecProcessRequestBody(ctx->req);
+        rc = modsecProcessRequestBody(ctx->req);		
+        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: modsecProcessRequestBody %d", rc);
     } 
 
     if (rc != DECLINED) {
-        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: status: %d, need action", rc);
 
         /* Nginx and Apache share same response code  */
         if (rc < NGX_HTTP_SPECIAL_RESPONSE || rc >= 600) {
@@ -412,7 +421,7 @@ ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
         return;
     }
 
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: process request body");
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: body handler");
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
 
@@ -426,9 +435,9 @@ ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
     modsecSetBodyBrigade(ctx->req, ctx->brigade);
     
     rc = modsecProcessRequestBody(ctx->req);
+    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: modsecProcessRequestBody %d", rc);
 
     if (rc != DECLINED) {
-        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: status: %d, need action", rc);
     
         /* Nginx and Apache share same response code  */
         if (rc < NGX_HTTP_SPECIAL_RESPONSE || rc >= 600) {
@@ -474,21 +483,17 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
     ngx_http_modsecurity_loc_conf_t *cf;
     ngx_http_modsecurity_ctx_t      *ctx;
     const char                      *lang;
+    ngx_int_t                        rc;
     
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
-
+    
     if (r != r->main || r->internal || !cf->enable || ctx->complete) {
         return ngx_http_next_header_filter(r);
     }
-
-    if (r->method == NGX_HTTP_HEAD || r->header_only 
-            || !modsecIsResponseBodyAccessEnabled(ctx->req) ) {
-        /* TODO: RESPONSE HEADERS PHASE
-        */
-        return ngx_http_next_header_filter(r);
-    } 
-
+    
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: header filter");
+    
     /* copy headers_out */
     if (ngx_list_copy_to_apr_table(&r->headers_out.headers, 
                                 ctx->req->headers_out, 
@@ -507,6 +512,22 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
         *(const char **)apr_array_push(ctx->req->content_languages) = lang;
     }
 
+    if (r->method == NGX_HTTP_HEAD || r->header_only) {
+        
+        ctx->complete = 1;
+        rc = modsecProcessResponse(ctx->req);
+        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: modsecProcessResponse %d", rc);
+        if (rc == DECLINED || rc == APR_SUCCESS) {
+            return ngx_http_next_header_filter(r);
+        }
+
+        if (rc < NGX_HTTP_SPECIAL_RESPONSE || rc >= 600) {
+            rc = NGX_HTTP_INTERNAL_SERVER_ERROR;
+        }
+        
+        return rc;
+    } 
+
     return NGX_OK;
 }
 
@@ -520,7 +541,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
-    
+
     if (r != r->main || r->internal || !cf->enable || ctx->complete) {
         return ngx_http_next_body_filter(r, in);
     }
@@ -532,10 +553,8 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
     }
 
     rc = move_chain_to_brigade(in, ctx->brigade, r->pool);
-    if (rc == NGX_ERROR) {
-        return NGX_ERROR;
-    } else if (rc == NGX_AGAIN) {
-        return NGX_AGAIN;
+    if (rc != NGX_OK)  {
+        return rc;
     }
 
     /* last buf has been saved */
@@ -544,6 +563,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
     modsecSetResponseBrigade(ctx->req, ctx->brigade);
 
     rc = modsecProcessResponse(ctx->req);
+    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: modsecProcessResponse %d", rc);
 
     if (rc == DECLINED || rc == APR_SUCCESS) {
 
@@ -565,22 +585,17 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
         rc = ngx_http_next_header_filter(r);
 
         if (rc == NGX_ERROR || rc > NGX_OK) {
-            return rc;
+            return ngx_http_filter_finalize_request(r, &ngx_http_modsecurity, rc);
         }
 
-        rc = ngx_http_next_body_filter(r, in);
-        if (rc == NGX_ERROR || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
-            return rc;
-        }
-        
-        return NGX_OK;
+        return ngx_http_next_body_filter(r, in);
     } 
 
     if (rc < NGX_HTTP_SPECIAL_RESPONSE || rc >= 600) {
         rc = NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    return rc; /* ngx_http_filter_finalize_request(r, &ngx_http_modsecurity, rc); */
+    return ngx_http_filter_finalize_request(r, &ngx_http_modsecurity, rc);
 }
 
 
@@ -709,7 +724,8 @@ ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     msg = modsecProcessConfig(mscf->config, (const char *)value[1].data, NULL);
     if (msg != NULL) {
-        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "modSecurity: modsecProcessConfig() %s", msg);
+        ngx_log_error(NGX_LOG_EMERG, cf->log, 0, "ModSecurityConfig in %s:%ui: %s", 
+                      cf->conf_file->file.name.data, cf->conf_file->line, msg);
         return NGX_CONF_ERROR;
     }
 
