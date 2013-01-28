@@ -21,7 +21,11 @@
 static apr_status_t msc_pcre_cleanup(msc_regex_t *regex) {
     if (regex != NULL) {
         if (regex->pe != NULL) {
+#if defined(VERSION_NGINX)
+            pcre_free(regex->pe);
+#else
             free(regex->pe);
+#endif
             regex->pe = NULL;
         }
         if (regex->re != NULL) {
@@ -71,7 +75,11 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
 
     /* Setup the pcre_extra record if pcre_study did not already do it */
     if (pe == NULL) {
+#if defined(VERSION_NGINX)
+        pe = pcre_malloc(sizeof(pcre_extra));
+#else
         pe = malloc(sizeof(pcre_extra));
+#endif
         if (pe == NULL) {
             return NULL;
         }
