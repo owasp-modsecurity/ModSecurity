@@ -387,7 +387,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
             return NGX_DONE;
         }
         /* other method */
-        rc = modsecProcessRequestBody(ctx->req);		
+        rc = modsecProcessRequestBody(ctx->req);
         ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: modsecProcessRequestBody %d", rc);
     } 
 
@@ -407,11 +407,11 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
 static void
 ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
 {
-    ngx_http_modsecurity_ctx_t    *ctx;
-    ngx_int_t                      rc;
+    ngx_http_modsecurity_ctx_t    *ctx = NULL;
+    ngx_int_t                      rc = DECLINED;
     apr_off_t                      content_length;
-    ngx_str_t                     *str;
-    ngx_buf_t                     *buf;
+    ngx_str_t                     *str = NULL;
+    ngx_buf_t                     *buf = NULL;
 
     if (r->request_body == NULL || r->request_body->bufs == NULL) {
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: request body empty");
@@ -433,12 +433,12 @@ ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
     r->request_body = NULL;
 
     modsecSetBodyBrigade(ctx->req, ctx->brigade);
-    
-    rc = modsecProcessRequestBody(ctx->req);
+
+    if(modsecIsRequestBodyAccessEnabled(ctx->req))
+        rc = modsecProcessRequestBody(ctx->req);
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: modsecProcessRequestBody %d", rc);
 
     if (rc != DECLINED) {
-    
         /* Nginx and Apache share same response code  */
         if (rc < NGX_HTTP_SPECIAL_RESPONSE || rc >= 600) {
             rc = NGX_HTTP_INTERNAL_SERVER_ERROR;
@@ -451,13 +451,11 @@ ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
     if (buf == NULL){
         return ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
     }
-    
     if (apr_brigade_flatten(ctx->brigade, (char *)buf->pos, (apr_size_t *)&content_length) != APR_SUCCESS) {
         return ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
     }
 
     apr_brigade_cleanup(ctx->brigade);
-    
     buf->last += content_length;
     r->header_in = buf;
 
@@ -469,9 +467,8 @@ ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
         }
         str->len = ngx_snprintf(str->data, NGX_OFF_T_LEN, "%O", content_length) - str->data;
     }
-    
+
     r->headers_in.content_length_n = content_length;
-    
     r->phase_handler++;
     ngx_http_core_run_phases(r);
     ngx_http_finalize_request(r, NGX_DONE);

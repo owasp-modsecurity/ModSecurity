@@ -521,13 +521,23 @@ int modsecProcessRequestBody(request_rec *r) {
 
 void modsecSetConfigForIISRequestBody(request_rec *r)
 {
-	modsec_rec *msr = retrieve_msr(r);
+    modsec_rec *msr = retrieve_msr(r);
 
-	if(msr == NULL || msr->txcfg == NULL)
-		return;
+    if(msr == NULL || msr->txcfg == NULL)
+        return;
 
-	if(msr->txcfg->reqbody_access)
-		msr->txcfg->stream_inbody_inspection = 1;
+    if(msr->txcfg->reqbody_access)
+        msr->txcfg->stream_inbody_inspection = 1;
+}
+
+int modsecIsRequestBodyAccessEnabled(request_rec *r)
+{
+    modsec_rec *msr = retrieve_msr(r);
+
+    if(msr == NULL || msr->txcfg == NULL)
+        return 0;
+
+    return msr->txcfg->reqbody_access;
 }
 
 int modsecIsResponseBodyAccessEnabled(request_rec *r)
