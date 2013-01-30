@@ -110,6 +110,7 @@ void modsecSetWriteResponse(apr_status_t (*func)(request_rec *r, char *buf, unsi
 void modsecSetDropAction(int (*func)(request_rec *r));
 
 int modsecIsResponseBodyAccessEnabled(request_rec *r);
+int modsecIsRequestBodyAccessEnabled(request_rec *r);
 
 void modsecSetConfigForIISRequestBody(request_rec *r);
 
