@@ -94,7 +94,11 @@ char *lua_compile(msc_script **script, const char *filename, apr_pool_t *pool) {
     msc_lua_dumpw_t dump;
 
     /* Initialise state. */
+#if LUA_VERSION_NUM > 501
+    L = luaL_newstate();
+#else
     L = lua_open();
+#endif
     luaL_openlibs(L);
 
     /* Find script. */
@@ -158,7 +162,11 @@ static apr_array_header_t *resolve_tfns(lua_State *L, int idx, modsec_rec *msr, 
     if (lua_isuserdata(L, idx) || lua_isnoneornil(L, idx)) { /* No second parameter */
         return tfn_arr;
     } else if (lua_istable(L, idx)) { /* Is the second parameter an array? */
+#if LUA_VERSION_NUM > 501
+        int i, n = lua_rawlen(L, idx);
+#else
         int i, n = lua_objlen(L, idx);
+#endif
 
         for(i = 1; i <= n; i++) {
             lua_rawgeti(L, idx, i);
@@ -415,7 +423,11 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
         lua_pop(L, rc);
 #else
     /* Create new state. */
+#if LUA_VERSION_NUM > 501
+    L = luaL_newstate();
+#else
     L = lua_open();
+#endif
     luaL_openlibs(L);
 #endif
 
@@ -433,7 +445,12 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
     }
 
     /* Register functions. */
+#if LUA_VERSION_NUM > 501
+    luaL_setfuncs(L,mylib,0);
+    lua_setglobal(L,"m");
+#else
     luaL_register(L, "m", mylib);
+#endif
 
     rc = lua_restore(L, script);
     if (rc) {
