@@ -215,7 +215,11 @@ apr_status_t ap_http_in_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         return APR_SUCCESS;
     }
 
-    return AP_NOBODY_READ;
+    /* cannot read request body */
+    e = apr_bucket_eos_create(f->c->bucket_alloc);
+    APR_BRIGADE_INSERT_TAIL(bb_out, e);
+
+    return APR_SUCCESS;
 }
 
 apr_status_t ap_http_out_filter(ap_filter_t *f, apr_bucket_brigade *b)  {
@@ -560,7 +564,7 @@ int modsecProcessResponse(request_rec *r)   {
 
         if (bb == NULL) {
             msr_log(msr, 1, "Process response: Failed to create brigade.");
-            return -1;
+            return APR_EGENERAL;
         }
 
         msr->r = r;
@@ -583,19 +587,24 @@ int modsecProcessResponse(request_rec *r)   {
                     e = apr_bucket_pool_create(tmp, readcnt, r->pool, r->connection->bucket_alloc);
                     APR_BRIGADE_INSERT_TAIL(bb, e);
                 }
-
-                if(is_eos)  {
-                    e = apr_bucket_eos_create(r->connection->bucket_alloc);
-                    APR_BRIGADE_INSERT_TAIL(bb, e);
-                }
             }
+
+            e = apr_bucket_eos_create(r->connection->bucket_alloc);
+            APR_BRIGADE_INSERT_TAIL(bb, e);
         } else {
-            return AP_NOBODY_WROTE;
+            /* cannot read response body process header only */
+
+            e = apr_bucket_eos_create(r->connection->bucket_alloc);
+            APR_BRIGADE_INSERT_TAIL(bb, e);
         }
         
         f = ap_add_output_filter("HTTP_OUT", msr, r, r->connection);
         status = ap_pass_brigade(r->output_filters, bb);
         ap_remove_output_filter(f);
+        if(status > 0
+                && msr->intercept_actionset->intercept_status != 0)  {
+            status =  msr->intercept_actionset->intercept_status;
+        }
         return status;
     }
 
