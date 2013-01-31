@@ -128,6 +128,8 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->cache_trans_max = NOT_SET;
     dcfg->cache_trans_maxitems = NOT_SET;
 
+    /* Rule ids */
+    dcfg->rule_id_htab = apr_hash_make(mp);
     dcfg->component_signatures = apr_array_make(mp, 16, sizeof(char *));
 
     dcfg->request_encoding = NOT_SET_P;
@@ -718,7 +720,9 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
                             const char *p1, const char *p2, const char *p3)
 {
     char *my_error_msg = NULL;
-    msre_rule *rule = NULL, *tmp_rule = NULL;
+    //msre_rule *rule = NULL, *tmp_rule = NULL;
+    char *rid = NULL;
+    msre_rule *rule = NULL;
     extern msc_engine *modsecurity;
     int offset = 0;
 
@@ -771,9 +775,16 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         if(type != RULE_TYPE_LUA)
 #endif
         {
-            tmp_rule = msre_ruleset_fetch_rule(dcfg->ruleset, rule->actionset->id, offset);
-            if(tmp_rule != NULL)
+            rid = apr_hash_get(dcfg->rule_id_htab, rule->actionset->id, APR_HASH_KEY_STRING);
+            if(rid != NULL) {
                 return "ModSecurity: Found another rule with the same id";
+            } else    {
+                apr_hash_set(dcfg->rule_id_htab, apr_pstrdup(dcfg->mp, rule->actionset->id), APR_HASH_KEY_STRING, apr_pstrdup(dcfg->mp, "1"));
+            }
+
+            //tmp_rule = msre_ruleset_fetch_rule(dcfg->ruleset, rule->actionset->id, offset);
+            //if(tmp_rule != NULL)
+            //    return "ModSecurity: Found another rule with the same id";
         }
     }
 
