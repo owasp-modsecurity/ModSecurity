@@ -1,0 +1,59 @@
+# ---------------------------------------------------------------
+# Core ModSecurity Rule Set ver.2.2.6
+# Copyright (C) 2006-2012 Trustwave All rights reserved.
+#
+# The OWASP ModSecurity Core Rule Set is distributed under 
+# Apache Software License (ASL) version 2
+# Please see the enclosed LICENCE file for full details.
+# ---------------------------------------------------------------
+
+
+# This file is used to allow custom checks and exclusions for the transactional
+# variable rules.  Place rules in this file so that you may influence what happens
+# in the 49 - Enforcement File. 
+
+# In previous ModSecurity rules, the TARGET list would have to be updated in
+# order to exclude a specific paramater like this -
+#
+# SecRule ARGS_NAMES|ARGS|!ARGS:foo
+# 
+# With the new transactional variable rules, parameter exceptions can now
+# be handled AFTER the initial inspection as the rules now use setvars to 
+# capture meta-data with each rule match.  They use this syntax -  
+#
+# 	setvar:tx.%{rule.id}-WEB_ATTACK/SQL_INJECTION-%{matched_var_name}=%{matched_var}
+#
+# When the transactional rules trigger, they will set a TX variable similar to this 
+# for an SQL Injection attack -
+#
+# 	Set variable "tx.950001-WEB_ATTACK/SQL_INJECTION-ARGS:comments" to "1' or select * from users where username = admin ".
+# 
+# With this data now available, the user can implement flexible exceptions.
+# 
+# Exception example - exclude a parameter
+#
+# In this example, we are inspecting
+# the TX collections to see if there is a current variable that has matched
+# for the 950001 SQL Injection rule ID and for the "comments" parameter.  If
+# so, then we are going to remove the collection entirely by using the 
+# setvar:!tx. syntax.  By doing this, the TX collection is removed before final
+# inspection at the end of phase 2 in the enforcement file.
+#
+#SecRule TX:'/^950001.*ARGS:comments/' ".*" "chain,phase:2,t:none,nolog,pass"
+#	SecRule MATCHED_VAR_NAME "TX\:(.*)" "capture,t:none,setvar:!tx.%{tx.1},setvar:tx.anomaly_score=-20"
+
+#
+# This is an example exclusion for the entire SQL Injection category of rules
+#
+#SecRule TX:'/SQL_INJECTION/' ".*" "phase:2,t:none,nolog,pass,chain,setvar:tx.sql_injection=+1,setvar:tx.sql_injection_%{tx.sql_injection}=%{matched_var_name}"
+#	SecRule TX:'/^SQL_INJECTION_/' "TX\:(.*)" "capture,t:none,setvar:!tx.%{tx.1},setvar:tx.anomaly_score=-20"
+
+#
+# This is an example exclusion that combines the URL and parameter and removes
+# a specific SQL Injection ID only if the parameter foo payload matches
+#
+#SecRule REQUEST_FILENAME "@streq /path/to/file.php" "chain,phase:2,t:none,nolog,pass"
+#	SecRule TX:'/^950001.*ARGS:foo/' "@streq Item 1=1" "chain,t:none"
+#       	SecRule MATCHED_VAR_NAME "TX\:(.*)" "capture,t:none,setvar:!tx.%{tx.1},setvar:tx.anomaly_score=-20"
+
+

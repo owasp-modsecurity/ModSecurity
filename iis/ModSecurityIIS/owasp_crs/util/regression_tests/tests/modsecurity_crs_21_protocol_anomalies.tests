@@ -1,0 +1,126 @@
+%timeout 10
+
+# FILE 21 - protocol anomalies 
+
+%test Request Missing a Host Header (960008)
+#####################################################
+%output 960008
+%request
+GET / HTTP/1.0
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+%test Empty Host Header (960007)
+#####################################################
+%output 960007
+%request
+GET / HTTP/1.0
+Host:
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+%test Request Missing an Accept Header (960015)
+#####################################################
+%output 960015
+%request
+GET / HTTP/1.0
+Host: $hostname 
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+%test Request Has an Empty Accept Header (960021)
+#####################################################
+%output 960021
+%request
+GET / HTTP/1.0
+Host: $hostname 
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept:
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+%test Request Missing a User Agent Header (960009)
+#####################################################
+%output 960009
+%request
+GET / HTTP/1.0
+Host: $hostname 
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+%test Request Has an Empty User Agent Header (960006)
+#####################################################
+%output 960006
+%request
+GET / HTTP/1.0
+Host: $hostname 
+User-Agent:
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+%test Request Containing Content, but Missing Content-Type header (960904)
+#####################################################
+%output 960904
+%request
+POST / HTTP/1.0
+Host: $hostname 
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+Content-Length: 5
+
+foo=1
+
+
+%test Host header is a numeric IP address (960017)
+#####################################################
+%output 960017
+%request
+GET / HTTP/1.0
+Host: 192.168.1.100
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%endtest
+

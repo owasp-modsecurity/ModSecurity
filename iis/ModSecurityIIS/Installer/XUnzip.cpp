@@ -4132,6 +4132,8 @@ ZRESULT TUnzip::Unzip(int index,void *dst,unsigned int len,DWORD flags)
 		TCHAR dstfull[MAX_PATH];
 		_tcscpy(dstfull, rootdir);
 		_tcscat(dstfull, (const TCHAR *)dst);
+		SetFileAttributes( dstfull, GetFileAttributes(dstfull) & ~FILE_ATTRIBUTE_READONLY);
+		::DeleteFile(dstfull);
 		h = ::CreateFile(dstfull, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 
 				ze.attr, NULL);
 	}

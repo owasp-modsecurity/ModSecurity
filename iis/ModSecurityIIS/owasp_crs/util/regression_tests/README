@@ -1,0 +1,105 @@
+
+ModSecurity Rules regression testing suite
+==========================================
+
+Rules regression test tool installation:
+----------------------------------------
+Test should be run from the same host ModSecurity runs on, or a computer that 
+has file system access to ModSecurity audit log (see %modseclog in step 5)
+
+1. Copy rulesregtest.pl, rulesregtest.conf and test files to a directory on the 
+server.
+
+2. Put testserver.cgi in the server's /cgi-bin directory (required only if 
+outbound tests are used)
+
+3. Set ModSecurity to use serial logging.
+
+4. Ensure that the web server response with 200 to access the home page (since 
+default tests use "/" as the URL)
+
+5. Edit rulesregtest.conf:
+- Server address and port (%server directive). The default (127.0.0.1:80) may 
+be OK.
+- Location of ModSecurity audit log file (%modseclog directive).
+
+Writing tests:
+--------------
+
+Write a text file with the following directives:
+
+%test <name> - starts a test and set is name (used for report)
+
+%status <number> - sets the expected status code
+
+%event <string> - set a string to search in the audit log of the test. You can 
+use multiple directives to define many required patterns. For example:
+    %event [id "960009"]
+
+%output <string> - set a string to search in the HTTP response. You can use 
+multiple directives to define many required patterns.
+
+%request – multiple lines of the request on the following lines, terminated by 
+the next directive (a line starting with "%"). A request can include variables 
+using perl notation ($var). this would be replaced when testing with a value 
+set by the %var directive.
+
+- Note: Do not forget to leave an empty line as required by HTTP. The script 
+locks otherwise.
+
+- Note: Content-Length has to be calculated manually.
+
+Finding bugs
+------------
+
+The following directives will help to find the problems:
+
+%verbose – will output request, reply and new ModSecurity audit log lines for 
+the current test.
+
+%relevant – will output verbose output for tests that failed.
+ 
+
+Variable replacement:
+---------------------
+%var variable=value, value, value….. - Set values for a variable, the test 
+would be repeated using every value. Values are set only for the current test. 
+
+Multiple %var directives for the same variable add values to the list and do 
+not replace values, so:
+
+%var variable=value1
+%var variable=value2
+
+Would test with both value1 and value2.
+
+If multiple variables are used in the same test, than the test is carried for 
+each combination of values of the variables:
+
+%var var1=v1, v2
+%var var3=v3, v4
+
+The test would be repeated 4 times with the test vectors (v1, v3), (v1, v4), 
+(v2, v3), (v2, v4).
+
+
+Testing responses:
+------------------
+To force response content in request, use /cgi-bin/testserver.cgi as the target 
+URL and add one or more of the following headers to the reuqest:  
+
+Response-Status - Force a response status line. Defaults to "200 OK".
+Response-Content - Adds the string to the response. Note that this would not be
+the entire response. 
+Response-Content-Type - sets the value of the content type header, defaults to 
+"text/html"
+Response-Header-Name - Add a header to the response. This defined the new
+header's name. Response-Header-Value defines the header's value.
+Response-Header-Value - The value of the new header defined by the request
+header Response-Header-Name. Note: If Response-Header-Name is empty, then this
+parameter will be ignored.  
+
+** NOT IMPLEMENTED YET **
+Response-File   - the name of a file to use as the entire response. Name is 
+reletive to the $RESPONSE_FILE_DIR in the testserver.cgi sctip.
+** NOT IMPLEMENTED YET **

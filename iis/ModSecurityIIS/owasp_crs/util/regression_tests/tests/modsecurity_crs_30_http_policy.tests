@@ -1,0 +1,119 @@
+%timeout 10
+
+# FILE 30 - HTTP Policy 
+
+%test Method is not allowed by policy (960032)
+#####################################################
+%output 960032
+%var request_method=DELETE
+%var request_method=FOO
+%var request_method=SUBSCRIBE
+%request
+$request_method / HTTP/1.0
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test Request content type is not allowed by policy (960010)
+#####################################################
+%output 960010
+%var type=multipart/;
+%var type=multipart/foo;
+%var type=application/foo;
+%request
+POST / HTTP/1.1
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+Content-Type: $type boundary=0000
+Content-Length: $CONTENT_LENGTH
+
+--0000
+Content-Disposition: form-data; name="name"
+
+John Smith
+--0000
+Content-Disposition: form-data; name="email"
+
+john.smith@example.com
+--0000
+Content-Disposition: form-data; name="image"; filename="image.jpg"
+Content-Type: image/jpeg
+
+BINARYDATA
+--0000--
+
+
+%test HTTP protocol version is not allowed by policy (960034)
+#####################################################
+%output 960034
+%var http=HTTP/3.0
+%var http=HTTP/0.8
+%var http=JUNK/1.0
+%request
+GET / $http
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test URL file extension is restricted by policy (960035)
+#####################################################
+%output 960035
+%var ext=.bak
+%var ext=.db
+%var ext=.old
+%request
+GET /foo$ext HTTP/1.1
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+%test HTTP header is restricted by policy (960038)
+#####################################################
+%output 960038
+%var restricted_header=Proxy-Connection: keep-alive
+%var restricted_header=Translate: f
+%var restricted_header=Lock-Token: <opaquelocktoken:a515cfa4-5da4-22e1-f5bf-00a0451e6bf7>
+%request
+GET / HTTP/1.1
+Host: $hostname
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+$restricted_header
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+
+
+
+
+
+%endtest

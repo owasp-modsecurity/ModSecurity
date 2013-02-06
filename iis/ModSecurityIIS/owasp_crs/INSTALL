@@ -1,0 +1,93 @@
+Core Rule Set Quick Setup 
+=========================
+
+To activate the rules for your web server installation:
+
+  1) Copy the modsecurity_crs_10_config.conf.example file to modsecurity_crs_10_config.conf
+     and customize the settings for your local environment.
+
+     The modsecurity_crs_10_config.conf file includes management rules and directives
+     that can control important CRS functions. Pay attention to
+     the SecRuleEngine setting (On by default) and that the SecDefaultAction
+     directive is set to "pass".  The 49 inbound blocking and 59 outbound blocking
+     rules files use the "block" action which
+     inherits this setting.  This effectively means that you can toggle the
+     SecDefaultAction setting to decide if you would like to deny on an
+     anomaly scoring/correlation match.
+
+     Update the PARANOID_MODE variable setting if you want to become more 
+     aggressive in your detection.  Caution - this will cause more false positives.
+
+     Update the appropriate anomaly scoring levels that will be propagated
+     to the inbound/outbound blocking files.
+
+     Update the TX policy settings for allowed Request Methods, File Extensions, etc...
+
+  2) Enable the CRS rules files you want to use by creating symlinks under the
+     "activated_rules" directory location.  You will want to create symlinks for the
+     following:
+
+     1) The main modsecurity_crs_10_config.conf file
+     2) Any rules from the base_rules directory
+     3) Any remaining rules from the optional_rules, slr_rules or experimental_rules directories
+
+	$ pwd
+	/usr/local/apache/conf/crs
+	$ ls
+	CHANGELOG                               app_sensor                              modsecurity_crs_10_config.conf          slr_rules
+	LICENSE                                 base_rules                              modsecurity_crs_10_config.conf.example  util
+	README                                  experimental_rules                      modsecurity_crs_15_customrules.conf
+	activated_rules                         lua                                     optional_rules
+	$ sudo ln -s /usr/local/apache/conf/crs/modsecurity_crs_10_config.conf activated_rules/modsecurity_crs_10_config.conf
+	$ for f in `ls base_rules/` ; do sudo ln -s /usr/local/apache/conf/crs/base_rules/$f activated_rules/$f ; done
+	$ for f in `ls optional_rules/ | grep comment_spam` ; do sudo ln -s /usr/local/apache/conf/crs/optional_rules/$f activated_rules/$f ; done
+	$ ls -l activated_rules
+	total 216
+	lrwxr-xr-x  1 root  wheel  52 May 17 14:01 GsbMalware.dat -> /usr/local/apache/conf/crs/base_rules/GsbMalware.dat
+	lrwxr-xr-x  1 root  wheel  68 May 17 14:01 modsecurity_35_bad_robots.data -> /usr/local/apache/conf/crs/base_rules/modsecurity_35_bad_robots.data
+	lrwxr-xr-x  1 root  wheel  66 May 17 14:01 modsecurity_35_scanners.data -> /usr/local/apache/conf/crs/base_rules/modsecurity_35_scanners.data
+	lrwxr-xr-x  1 root  wheel  73 May 17 14:01 modsecurity_40_generic_attacks.data -> /usr/local/apache/conf/crs/base_rules/modsecurity_40_generic_attacks.data
+	lrwxr-xr-x  1 root  wheel  79 May 17 14:01 modsecurity_41_sql_injection_attacks.data -> /usr/local/apache/conf/crs/base_rules/modsecurity_41_sql_injection_attacks.data
+	lrwxr-xr-x  1 root  wheel  74 May 17 14:14 modsecurity_42_comment_spam.data -> /usr/local/apache/conf/crs/optional_rules/modsecurity_42_comment_spam.data
+	lrwxr-xr-x  1 root  wheel  66 May 17 14:01 modsecurity_50_outbound.data -> /usr/local/apache/conf/crs/base_rules/modsecurity_50_outbound.data
+	lrwxr-xr-x  1 root  wheel  74 May 17 14:01 modsecurity_50_outbound_malware.data -> /usr/local/apache/conf/crs/base_rules/modsecurity_50_outbound_malware.data
+	lrwxr-xr-x  1 root  wheel  73 May 17 14:01 modsecurity_crs_14_customrules.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_14_customrules.conf
+	lrwxr-xr-x  1 root  wheel  57 May 17 14:22 modsecurity_crs_10_config.conf -> /usr/local/apache/conf/crs/modsecurity_crs_10_config.conf
+	lrwxr-xr-x  1 root  wheel  81 May 17 14:01 modsecurity_crs_20_protocol_violations.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_20_protocol_violations.conf
+	lrwxr-xr-x  1 root  wheel  80 May 17 14:01 modsecurity_crs_21_protocol_anomalies.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_21_protocol_anomalies.conf
+	lrwxr-xr-x  1 root  wheel  76 May 17 14:01 modsecurity_crs_23_request_limits.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_23_request_limits.conf
+	lrwxr-xr-x  1 root  wheel  73 May 17 14:01 modsecurity_crs_30_http_policy.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_30_http_policy.conf
+	lrwxr-xr-x  1 root  wheel  72 May 17 14:01 modsecurity_crs_35_bad_robots.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_35_bad_robots.conf
+	lrwxr-xr-x  1 root  wheel  77 May 17 14:01 modsecurity_crs_40_generic_attacks.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_40_generic_attacks.conf
+	lrwxr-xr-x  1 root  wheel  83 May 17 14:01 modsecurity_crs_41_sql_injection_attacks.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_41_sql_injection_attacks.conf
+	lrwxr-xr-x  1 root  wheel  73 May 17 14:01 modsecurity_crs_41_xss_attacks.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_41_xss_attacks.conf
+	lrwxr-xr-x  1 root  wheel  78 May 17 14:14 modsecurity_crs_42_comment_spam.conf -> /usr/local/apache/conf/crs/optional_rules/modsecurity_crs_42_comment_spam.conf
+	lrwxr-xr-x  1 root  wheel  76 May 17 14:01 modsecurity_crs_42_tight_security.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_42_tight_security.conf
+	lrwxr-xr-x  1 root  wheel  69 May 17 14:01 modsecurity_crs_45_trojans.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_45_trojans.conf
+	lrwxr-xr-x  1 root  wheel  79 May 17 14:01 modsecurity_crs_47_common_exceptions.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_47_common_exceptions.conf
+	lrwxr-xr-x  1 root  wheel  86 May 17 14:01 modsecurity_crs_48_local_exceptions.conf.example -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_48_local_exceptions.conf.example
+	lrwxr-xr-x  1 root  wheel  78 May 17 14:01 modsecurity_crs_49_inbound_blocking.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_49_inbound_blocking.conf
+	lrwxr-xr-x  1 root  wheel  70 May 17 14:01 modsecurity_crs_50_outbound.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_50_outbound.conf
+	lrwxr-xr-x  1 root  wheel  79 May 17 14:01 modsecurity_crs_59_outbound_blocking.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_59_outbound_blocking.conf
+	lrwxr-xr-x  1 root  wheel  73 May 17 14:01 modsecurity_crs_60_correlation.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_60_correlation.conf
+	lrwxr-xr-x  1 root  wheel  73 May 17 14:01 modsecurity_crs_60_customrules.conf -> /usr/local/apache/conf/crs/base_rules/modsecurity_crs_60_customrules.conf
+ 
+
+  3) Add the following line to your httpd.conf (assuming
+     you've placed the rule files into conf/crs/):
+
+        <IfModule security2_module>
+                Include conf/crs/modsecurity_crs_10_config.conf
+                Include conf/crs/activated_rules/*.conf
+        </IfModule>
+
+  3) Restart web server.
+
+  4) Make sure your web sites are still running fine.
+
+  5) Simulate an attack against the web server. Then check
+     the attack was correctly logged in the Apache error log,
+     ModSecurity debug log (if you enabled it) and ModSecurity
+     audit log (if you enabled it).
+
+
