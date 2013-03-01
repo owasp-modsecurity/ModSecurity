@@ -161,7 +161,7 @@ char *msre_ruleset_rule_update_target_matching_exception(modsec_rec *msr, msre_r
     char *err;
 
     if(ruleset == NULL)
-        return apr_psprintf(ruleset->mp, "No ruleset present");
+        return NULL;
 
     if(p2 == NULL)  {
         return apr_psprintf(ruleset->mp, "Trying to update without a target");

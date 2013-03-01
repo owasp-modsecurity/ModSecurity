@@ -2796,15 +2796,28 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg,
 #define CMD_SCOPE_MAIN  (RSRC_CONF)
 #define CMD_SCOPE_ANY   (RSRC_CONF | ACCESS_CONF)
 
+#if defined(HTACCESS_CONFIG)
+#define CMD_SCOPE_HTACCESS  (OR_OPTIONS)
+#endif
+
 const command_rec module_directives[] = {
 
+#ifdef HTACCESS_CONFIG
+    AP_INIT_TAKE1 (
+        "SecAction",
+        cmd_action,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "an action list"
+    ),
+#else
     AP_INIT_TAKE1 (
         "SecAction",
         cmd_action,
         NULL,
         CMD_SCOPE_ANY,
         "an action list"
-    ),
+#endif
 
     AP_INIT_TAKE1 (
         "SecArgumentSeparator",
@@ -3183,6 +3196,15 @@ const command_rec module_directives[] = {
         "clears the list of MIME types that will be buffered on output"
     ),
 
+#ifdef HTACCESS_CONFIG
+    AP_INIT_TAKE23 (
+        "SecRule",
+        cmd_rule,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "rule target, operator and optional action list"
+    ),
+#else
     AP_INIT_TAKE23 (
         "SecRule",
         cmd_rule,
@@ -3190,6 +3212,7 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "rule target, operator and optional action list"
     ),
+#endif
 
     AP_INIT_TAKE1 (
         "SecRuleEngine",
@@ -3215,6 +3238,31 @@ const command_rec module_directives[] = {
         "rule script and optional actionlist"
     ),
 
+#ifdef HTACCESS_CONFIG
+    AP_INIT_ITERATE (
+        "SecRuleRemoveById",
+        cmd_rule_remove_by_id,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "rule ID for removal"
+    ),
+
+    AP_INIT_ITERATE (
+        "SecRuleRemoveByTag",
+        cmd_rule_remove_by_tag,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "rule tag for removal"
+    ),
+
+    AP_INIT_ITERATE (
+        "SecRuleRemoveByMsg",
+        cmd_rule_remove_by_msg,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "rule message for removal"
+    ),
+#else
     AP_INIT_ITERATE (
         "SecRuleRemoveById",
         cmd_rule_remove_by_id,
@@ -3238,6 +3286,7 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "rule message for removal"
     ),
+#endif
 
     AP_INIT_TAKE2 (
         "SecHashMethodPm",
@@ -3255,6 +3304,39 @@ const command_rec module_directives[] = {
         "Hash method and regex"
     ),
 
+#ifdef HTACCESS_CONFIG
+    AP_INIT_TAKE2 (
+        "SecRuleUpdateActionById",
+        cmd_rule_update_action_by_id,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "updated action list"
+    ),
+
+    AP_INIT_TAKE23 (
+        "SecRuleUpdateTargetById",
+        cmd_rule_update_target_by_id,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "updated target list"
+    ),
+
+    AP_INIT_TAKE23 (
+        "SecRuleUpdateTargetByTag",
+        cmd_rule_update_target_by_tag,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "rule tag pattern and updated target list"
+    ),
+
+    AP_INIT_TAKE23 (
+        "SecRuleUpdateTargetByMsg",
+        cmd_rule_update_target_by_msg,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "rule message pattern and updated target list"
+    ),
+#else
     AP_INIT_TAKE2 (
         "SecRuleUpdateActionById",
         cmd_rule_update_action_by_id,
@@ -3286,7 +3368,7 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "rule message pattern and updated target list"
     ),
-
+#endif
 
     AP_INIT_TAKE1 (
         "SecServerSignature",

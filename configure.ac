@@ -356,6 +356,22 @@ AC_ARG_ENABLE(lua-cache,
 ])
 
 # Enable phase-1 in post_read_request
+AC_ARG_ENABLE(htaccess-config,
+              AS_HELP_STRING([--enable-htaccess-config],
+                             [Enable some mod_security directives into htaccess files.]),
+[
+  if test "$enableval" != "no"; then
+    htaccess_config="-DHTACCESS_CONFIG"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $htaccess_config"
+  else
+    htaccess_config=
+  fi
+],
+[
+  htaccess_config=
+])
+
+# Enable phase-1 in post_read_request
 AC_ARG_ENABLE(request-early,
               AS_HELP_STRING([--enable-request-early],
                              [Place phase1 into post_read_request hook.]),
@@ -634,7 +650,7 @@ else
   fi
 fi
 
-MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type"
+MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type"
 
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""
