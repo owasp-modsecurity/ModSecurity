@@ -595,6 +595,9 @@ struct directory_config {
     int                 crypto_hash_location_pm;
     int                 crypto_hash_iframesrc_pm;
     int                 crypto_hash_framesrc_pm;
+
+    /* xml */
+    int                 xml_external_entity;
 };
 
 struct error_message_t {
