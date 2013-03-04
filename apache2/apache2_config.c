@@ -2817,6 +2817,7 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "an action list"
+    ),
 #endif
 
     AP_INIT_TAKE1 (
