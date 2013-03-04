@@ -156,6 +156,9 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->crypto_hash_framesrc_pm = NOT_SET;
 
 
+    /* xml external entity */
+    dcfg->xml_external_entity = NOT_SET;
+
     return dcfg;
 }
 
@@ -591,6 +594,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->crypto_hash_framesrc_pm = (child->crypto_hash_framesrc_pm == NOT_SET
         ? parent->crypto_hash_framesrc_pm : child->crypto_hash_framesrc_pm);
 
+    /* xml external entity */
+    merged->xml_external_entity = (child->xml_external_entity == NOT_SET
+        ? parent->xml_external_entity : child->xml_external_entity);
+
     return merged;
 }
 
@@ -710,6 +717,9 @@ void init_directory_config(directory_config *dcfg)
     if (dcfg->crypto_hash_location_pm == NOT_SET) dcfg->crypto_hash_location_pm = 0;
     if (dcfg->crypto_hash_iframesrc_pm == NOT_SET) dcfg->crypto_hash_iframesrc_pm = 0;
     if (dcfg->crypto_hash_framesrc_pm == NOT_SET) dcfg->crypto_hash_framesrc_pm = 0;
+
+    /* xml external entity */
+    if (dcfg->xml_external_entity == NOT_SET) dcfg->xml_external_entity = 0;
 
 }
 
@@ -2282,9 +2292,35 @@ static const char *cmd_sensor_id(cmd_parms *cmd, void *_dcfg, const char *p1)
     return NULL;
 }
 
+/**
+* \brief Add SecXmlExternalEntity configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On failure
+* \retval apr_psprintf On Success
+*/
+static const char *cmd_xml_external_entity(cmd_parms *cmd, void *_dcfg, const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "on") == 0)  {
+        dcfg->xml_external_entity = 1;
+    }
+    else if (strcasecmp(p1, "off") == 0)    {
+        dcfg->xml_external_entity = 0;
+    }
+    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecXmlExternalEntity: %s", p1);
+
+    return NULL;
+}
+
 
 /**
-* \brief Add SecHash configuration option
+* \brief Add SecHashEngine configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
@@ -2306,7 +2342,7 @@ static const char *cmd_hash_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
         dcfg->hash_is_enabled = HASH_DISABLED;
         dcfg->hash_enforcement = HASH_DISABLED;
     }
-    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRuleEngine: %s", p1);
+    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SexHashEngine: %s", p1);
 
     return NULL;
 }
@@ -3218,6 +3254,14 @@ const command_rec module_directives[] = {
     AP_INIT_TAKE1 (
         "SecRuleEngine",
         cmd_rule_engine,
+        NULL,
+        CMD_SCOPE_ANY,
+        "On or Off"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecXmlExternalEntity",
+        cmd_xml_external_entity,
         NULL,
         CMD_SCOPE_ANY,
         "On or Off"
