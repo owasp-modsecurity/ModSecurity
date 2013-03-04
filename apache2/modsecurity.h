@@ -355,6 +355,8 @@ struct modsec_rec {
 
     apr_size_t           msc_reqbody_no_files_length;
 
+    char                *multipart_filename;
+    char                *multipart_name;
     multipart_data      *mpd;                        /* MULTIPART processor data structure */
 
     xml_data            *xml;                        /* XML processor data structure       */

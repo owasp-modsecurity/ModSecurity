@@ -1289,6 +1289,22 @@ static int var_modsec_build_generate(modsec_rec *msr, msre_var *var, msre_rule *
     return var_simple_generate(var, vartab, mptmp, modsec_build(mptmp));
 }
 
+/* MULTIPART_FILENAME */
+
+static int var_multipart_filename_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return var_simple_generate(var, vartab, mptmp, msr->multipart_filename);
+}
+
+/* MULTIPART_NAME */
+
+static int var_multipart_name_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    return var_simple_generate(var, vartab, mptmp, msr->multipart_name);
+}
+
 /* MULTIPART_BOUNDARY_QUOTED */
 
 static int var_multipart_boundary_quoted_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -2811,6 +2827,28 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         var_modsec_build_generate,
         VAR_CACHE,
         PHASE_REQUEST_HEADERS
+    );
+
+    /* MULTIPART_FILENAME */
+    msre_engine_variable_register(engine,
+        "MULTIPART_FILENAME",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_filename_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_NAME */
+    msre_engine_variable_register(engine,
+        "MULTIPART_NAME",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_name_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
     );
 
     /* MULTIPART_BOUNDARY_QUOTED */
