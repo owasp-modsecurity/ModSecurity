@@ -184,6 +184,8 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
 
             validate_quotes(msr, value);
 
+            msr->multipart_name = apr_pstrdup(msr->mp, value);
+
             if (msr->mpd->mpp->name != NULL) {
                 msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition name: %s",
                     log_escape_nq(msr->mp, value));
@@ -200,6 +202,8 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
         if (strcmp(name, "filename") == 0) {
 
             validate_quotes(msr, value);
+
+            msr->multipart_filename = apr_pstrdup(msr->mp, value);
 
             if (msr->mpd->mpp->filename != NULL) {
                 msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename: %s",
