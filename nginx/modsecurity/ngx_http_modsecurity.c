@@ -372,7 +372,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         return NGX_ERROR;
     }
     ngx_http_set_ctx(r, ctx, ngx_http_modsecurity);
-    
+
     /* processing request headers */
     rc = modsecProcessRequestHeaders(ctx->req);
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: modsecProcessRequestHeaders %d", rc);
@@ -387,9 +387,11 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
             return NGX_DONE;
         }
         /* other method */
-        rc = modsecProcessRequestBody(ctx->req);
-        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: modsecProcessRequestBody %d", rc);
-    } 
+        if(modsecIsRequestBodyAccessEnabled(ctx->req))  {
+            rc = modsecProcessRequestBody(ctx->req);
+            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: modsecProcessRequestBody %d", rc);
+        }
+    }
 
     if (rc != DECLINED) {
 
@@ -398,7 +400,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
         return rc;
-    } 
+    }
 
     return NGX_DECLINED;
 }
@@ -430,13 +432,15 @@ ngx_http_modsecurity_body_handler(ngx_http_request_t *r)
          return ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
     }
 
+    rc = DECLINED;
     r->request_body = NULL;
 
     modsecSetBodyBrigade(ctx->req, ctx->brigade);
 
-    if(modsecIsRequestBodyAccessEnabled(ctx->req))
+    if(modsecIsRequestBodyAccessEnabled(ctx->req))  {
         rc = modsecProcessRequestBody(ctx->req);
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSecurity: modsecProcessRequestBody %d", rc);
+    }
 
     if (rc != DECLINED) {
         /* Nginx and Apache share same response code  */
