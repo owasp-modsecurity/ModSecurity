@@ -1,0 +1,3 @@
+[submodule "nginx/ngx-pool-context"]
+	path = nginx/ngx-pool-context
+	url = https://github.com/chaizhenhua/ngx-pool-context.git
