@@ -1,3 +1,35 @@
+28 Mar 2013 - 2.7.3
+-------------------
+
+  * Nginx is now RC quality. The rule engine should works for all phases.
+    We fixed many issues and missing features (for more information please check jira).
+    Code is running well with latest Nginx 1.2.7 stable.
+    Thanks chaizhenhua for your help.
+
+  * Added MULTIPART_NAME and MULTIPART_FILENAME. Should be used soon by CRS
+    and will help prevent attacks using multipart data.
+
+  * Added --enable-htaccess-config configure option. It will allow the follow directives
+    to be used into .htaccess files when AllowOverride Options is set:
+
+        - SecAction
+        - SecRule
+
+        - SecRuleRemoveByMsg
+        - SecRuleRemoveByTag
+        - SecRuleRemoveById
+
+        - SecRuleUpdateActionById
+        - SecRuleUpdateTargetById
+        - SecRuleUpdateTargetByTag
+        - SecRuleUpdateTargetByMsg
+
+  * Improvements in the ID duplicate code checking. Should be faster now.
+
+  * SECURITY: Added SecXmlExternalEntity (On|Off - default it Off) that will disable
+    by default the external entity load task executed by LibXml2. This is a security issue
+    reported by Timur Yunusov, Alexey Osipov (Positive Technologies).
+
 21 Jan 2013 - 2.7.2
 -------------------
 
