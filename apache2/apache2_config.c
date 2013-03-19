@@ -1958,6 +1958,10 @@ static const char *cmd_rule_update_target_by_id(cmd_parms *cmd, void *_dcfg,
     /* TODO: Validate the range here, while we can still tell the user if it's invalid */
     re->param = p1;
 
+    if(dcfg->ruleset == NULL) {
+        return apr_psprintf(cmd->pool, "Updating target by ID with no ruleset in this context");
+    }
+
     return msre_ruleset_rule_update_target_matching_exception(NULL, dcfg->ruleset, re, p2, p3);
 }
 
