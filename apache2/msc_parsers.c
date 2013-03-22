@@ -35,7 +35,11 @@ int parse_cookies_v0(modsec_rec *msr, char *_cookie_header,
     cookie_header = strdup(_cookie_header);
     if (cookie_header == NULL) return -1;
 
-    p = apr_strtok(cookie_header, delim, &saveptr);
+    if(msr->txcfg->cookiev0_separator == NULL) {
+        p = apr_strtok(cookie_header, delim, &saveptr);
+    } else {
+        p = apr_strtok(cookie_header, msr->txcfg->cookiev0_separator, &saveptr);
+    }
 
     while(p != NULL) {
         attr_name = NULL;
@@ -74,7 +78,11 @@ int parse_cookies_v0(modsec_rec *msr, char *_cookie_header,
             cookie_count++;
         }
 
-        p = apr_strtok(NULL, delim, &saveptr);
+        if(msr->txcfg->cookiev0_separator == NULL) {
+            p = apr_strtok(NULL, delim, &saveptr);
+        } else {
+            p = apr_strtok(NULL, msr->txcfg->cookiev0_separator, &saveptr);
+        }
     }
 
     free(cookie_header);

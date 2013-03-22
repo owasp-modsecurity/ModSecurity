@@ -64,6 +64,7 @@ void *create_directory_config(apr_pool_t *mp, char *path)
 
     dcfg->cookie_format = NOT_SET;
     dcfg->argument_separator = NOT_SET;
+    dcfg->cookiev0_separator = NOT_SET_P;
 
     dcfg->rule_inheritance = NOT_SET;
     dcfg->rule_exceptions = apr_array_make(mp, 16, sizeof(rule_exception *));
@@ -127,6 +128,8 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->cache_trans_max = NOT_SET;
     dcfg->cache_trans_maxitems = NOT_SET;
 
+    /* Rule ids */
+    dcfg->rule_id_htab = apr_hash_make(mp);
     dcfg->component_signatures = apr_array_make(mp, 16, sizeof(char *));
 
     dcfg->request_encoding = NOT_SET_P;
@@ -152,6 +155,9 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->crypto_hash_iframesrc_pm = NOT_SET;
     dcfg->crypto_hash_framesrc_pm = NOT_SET;
 
+
+    /* xml external entity */
+    dcfg->xml_external_entity = NOT_SET;
 
     return dcfg;
 }
@@ -366,6 +372,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
         ? parent->cookie_format : child->cookie_format);
     merged->argument_separator = (child->argument_separator == NOT_SET
         ? parent->argument_separator : child->argument_separator);
+    merged->cookiev0_separator = (child->cookiev0_separator == NOT_SET_P
+        ? parent->cookiev0_separator : child->cookiev0_separator);
 
 
     /* rule inheritance */
@@ -586,6 +594,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->crypto_hash_framesrc_pm = (child->crypto_hash_framesrc_pm == NOT_SET
         ? parent->crypto_hash_framesrc_pm : child->crypto_hash_framesrc_pm);
 
+    /* xml external entity */
+    merged->xml_external_entity = (child->xml_external_entity == NOT_SET
+        ? parent->xml_external_entity : child->xml_external_entity);
+
     return merged;
 }
 
@@ -627,6 +639,7 @@ void init_directory_config(directory_config *dcfg)
 
     if (dcfg->cookie_format == NOT_SET) dcfg->cookie_format = 0;
     if (dcfg->argument_separator == NOT_SET) dcfg->argument_separator = '&';
+    if (dcfg->cookiev0_separator == NOT_SET_P) dcfg->cookiev0_separator = NULL;
 
     if (dcfg->rule_inheritance == NOT_SET) dcfg->rule_inheritance = 1;
 
@@ -705,6 +718,9 @@ void init_directory_config(directory_config *dcfg)
     if (dcfg->crypto_hash_iframesrc_pm == NOT_SET) dcfg->crypto_hash_iframesrc_pm = 0;
     if (dcfg->crypto_hash_framesrc_pm == NOT_SET) dcfg->crypto_hash_framesrc_pm = 0;
 
+    /* xml external entity */
+    if (dcfg->xml_external_entity == NOT_SET) dcfg->xml_external_entity = 0;
+
 }
 
 /**
@@ -714,7 +730,9 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
                             const char *p1, const char *p2, const char *p3)
 {
     char *my_error_msg = NULL;
-    msre_rule *rule = NULL, *tmp_rule = NULL;
+    //msre_rule *rule = NULL, *tmp_rule = NULL;
+    char *rid = NULL;
+    msre_rule *rule = NULL;
     extern msc_engine *modsecurity;
     int offset = 0;
 
@@ -767,9 +785,16 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         if(type != RULE_TYPE_LUA)
 #endif
         {
-            tmp_rule = msre_ruleset_fetch_rule(dcfg->ruleset, rule->actionset->id, offset);
-            if(tmp_rule != NULL)
+            rid = apr_hash_get(dcfg->rule_id_htab, rule->actionset->id, APR_HASH_KEY_STRING);
+            if(rid != NULL) {
                 return "ModSecurity: Found another rule with the same id";
+            } else    {
+                apr_hash_set(dcfg->rule_id_htab, apr_pstrdup(dcfg->mp, rule->actionset->id), APR_HASH_KEY_STRING, apr_pstrdup(dcfg->mp, "1"));
+            }
+
+            //tmp_rule = msre_ruleset_fetch_rule(dcfg->ruleset, rule->actionset->id, offset);
+            //if(tmp_rule != NULL)
+            //    return "ModSecurity: Found another rule with the same id";
         }
     }
 
@@ -1082,6 +1107,20 @@ static const char *cmd_marker(cmd_parms *cmd, void *_dcfg, const char *p1)
     directory_config *dcfg = (directory_config *)_dcfg;
     const char *action = apr_pstrcat(dcfg->mp, SECMARKER_BASE_ACTIONS, p1, NULL);
     return add_marker(cmd, (directory_config *)_dcfg, SECMARKER_TARGETS, SECMARKER_ARGS, action);
+}
+
+static const char *cmd_cookiev0_separator(cmd_parms *cmd, void *_dcfg,
+        const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    if (strlen(p1) != 1) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid cookie v0 separator: %s", p1);
+    }
+
+    dcfg->cookiev0_separator = p1;
+
+    return NULL;
 }
 
 static const char *cmd_argument_separator(cmd_parms *cmd, void *_dcfg,
@@ -1919,6 +1958,10 @@ static const char *cmd_rule_update_target_by_id(cmd_parms *cmd, void *_dcfg,
     /* TODO: Validate the range here, while we can still tell the user if it's invalid */
     re->param = p1;
 
+    if(dcfg->ruleset == NULL) {
+        return apr_psprintf(cmd->pool, "Updating target by ID with no ruleset in this context");
+    }
+
     return msre_ruleset_rule_update_target_matching_exception(NULL, dcfg->ruleset, re, p2, p3);
 }
 
@@ -2253,9 +2296,35 @@ static const char *cmd_sensor_id(cmd_parms *cmd, void *_dcfg, const char *p1)
     return NULL;
 }
 
+/**
+* \brief Add SecXmlExternalEntity configuration option
+*
+* \param cmd Pointer to configuration data
+* \param _dcfg Pointer to directory configuration
+* \param p1 Pointer to configuration option
+*
+* \retval NULL On failure
+* \retval apr_psprintf On Success
+*/
+static const char *cmd_xml_external_entity(cmd_parms *cmd, void *_dcfg, const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "on") == 0)  {
+        dcfg->xml_external_entity = 1;
+    }
+    else if (strcasecmp(p1, "off") == 0)    {
+        dcfg->xml_external_entity = 0;
+    }
+    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecXmlExternalEntity: %s", p1);
+
+    return NULL;
+}
+
 
 /**
-* \brief Add SecHash configuration option
+* \brief Add SecHashEngine configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
@@ -2277,7 +2346,7 @@ static const char *cmd_hash_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
         dcfg->hash_is_enabled = HASH_DISABLED;
         dcfg->hash_enforcement = HASH_DISABLED;
     }
-    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRuleEngine: %s", p1);
+    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SexHashEngine: %s", p1);
 
     return NULL;
 }
@@ -2767,8 +2836,21 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg,
 #define CMD_SCOPE_MAIN  (RSRC_CONF)
 #define CMD_SCOPE_ANY   (RSRC_CONF | ACCESS_CONF)
 
+#if defined(HTACCESS_CONFIG)
+#define CMD_SCOPE_HTACCESS  (OR_OPTIONS)
+#endif
+
 const command_rec module_directives[] = {
 
+#ifdef HTACCESS_CONFIG
+    AP_INIT_TAKE1 (
+        "SecAction",
+        cmd_action,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "an action list"
+    ),
+#else
     AP_INIT_TAKE1 (
         "SecAction",
         cmd_action,
@@ -2776,6 +2858,7 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "an action list"
     ),
+#endif
 
     AP_INIT_TAKE1 (
         "SecArgumentSeparator",
@@ -2783,6 +2866,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "character that will be used as separator when parsing application/x-www-form-urlencoded content."
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecCookiev0Separator",
+        cmd_cookiev0_separator,
+        NULL,
+        CMD_SCOPE_ANY,
+        "character that will be used as separator when parsing cookie v0 content."
     ),
 
     AP_INIT_TAKE1 (
@@ -3146,6 +3237,15 @@ const command_rec module_directives[] = {
         "clears the list of MIME types that will be buffered on output"
     ),
 
+#ifdef HTACCESS_CONFIG
+    AP_INIT_TAKE23 (
+        "SecRule",
+        cmd_rule,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "rule target, operator and optional action list"
+    ),
+#else
     AP_INIT_TAKE23 (
         "SecRule",
         cmd_rule,
@@ -3153,10 +3253,19 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "rule target, operator and optional action list"
     ),
+#endif
 
     AP_INIT_TAKE1 (
         "SecRuleEngine",
         cmd_rule_engine,
+        NULL,
+        CMD_SCOPE_ANY,
+        "On or Off"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecXmlExternalEntity",
+        cmd_xml_external_entity,
         NULL,
         CMD_SCOPE_ANY,
         "On or Off"
@@ -3178,6 +3287,31 @@ const command_rec module_directives[] = {
         "rule script and optional actionlist"
     ),
 
+#ifdef HTACCESS_CONFIG
+    AP_INIT_ITERATE (
+        "SecRuleRemoveById",
+        cmd_rule_remove_by_id,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "rule ID for removal"
+    ),
+
+    AP_INIT_ITERATE (
+        "SecRuleRemoveByTag",
+        cmd_rule_remove_by_tag,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "rule tag for removal"
+    ),
+
+    AP_INIT_ITERATE (
+        "SecRuleRemoveByMsg",
+        cmd_rule_remove_by_msg,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "rule message for removal"
+    ),
+#else
     AP_INIT_ITERATE (
         "SecRuleRemoveById",
         cmd_rule_remove_by_id,
@@ -3201,6 +3335,7 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "rule message for removal"
     ),
+#endif
 
     AP_INIT_TAKE2 (
         "SecHashMethodPm",
@@ -3218,6 +3353,39 @@ const command_rec module_directives[] = {
         "Hash method and regex"
     ),
 
+#ifdef HTACCESS_CONFIG
+    AP_INIT_TAKE2 (
+        "SecRuleUpdateActionById",
+        cmd_rule_update_action_by_id,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "updated action list"
+    ),
+
+    AP_INIT_TAKE23 (
+        "SecRuleUpdateTargetById",
+        cmd_rule_update_target_by_id,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "updated target list"
+    ),
+
+    AP_INIT_TAKE23 (
+        "SecRuleUpdateTargetByTag",
+        cmd_rule_update_target_by_tag,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "rule tag pattern and updated target list"
+    ),
+
+    AP_INIT_TAKE23 (
+        "SecRuleUpdateTargetByMsg",
+        cmd_rule_update_target_by_msg,
+        NULL,
+        CMD_SCOPE_HTACCESS,
+        "rule message pattern and updated target list"
+    ),
+#else
     AP_INIT_TAKE2 (
         "SecRuleUpdateActionById",
         cmd_rule_update_action_by_id,
@@ -3249,7 +3417,7 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "rule message pattern and updated target list"
     ),
-
+#endif
 
     AP_INIT_TAKE1 (
         "SecServerSignature",

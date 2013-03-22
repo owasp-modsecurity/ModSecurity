@@ -161,7 +161,7 @@ char *msre_ruleset_rule_update_target_matching_exception(modsec_rec *msr, msre_r
     char *err;
 
     if(ruleset == NULL)
-        return apr_psprintf(ruleset->mp, "No ruleset present");
+        return NULL;
 
     if(p2 == NULL)  {
         return apr_psprintf(ruleset->mp, "Trying to update without a target");
@@ -353,7 +353,7 @@ char *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *r
                         }
 #if !defined(MSC_TEST)
                         else {
-                            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Error parseing rule targets to replace variable");
+                            ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, " ModSecurity: Error parsing rule targets to replace variable");
                         }
 #endif
                         goto end;

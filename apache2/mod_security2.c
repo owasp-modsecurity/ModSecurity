@@ -440,7 +440,11 @@ static modsec_rec *create_tx_context(request_rec *r) {
 
 #if defined(WITH_LUA)
     #ifdef CACHE_LUA
+#if LUA_VERSION_NUM > 501
+    msr->L = luaL_newstate();
+#else
     msr->L = lua_open();
+#endif
     luaL_openlibs(msr->L);
     #endif
 #endif

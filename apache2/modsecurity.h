@@ -355,6 +355,8 @@ struct modsec_rec {
 
     apr_size_t           msc_reqbody_no_files_length;
 
+    char                *multipart_filename;
+    char                *multipart_name;
     multipart_data      *mpd;                        /* MULTIPART processor data structure */
 
     xml_data            *xml;                        /* XML processor data structure       */
@@ -468,6 +470,7 @@ struct directory_config {
 
     int                  cookie_format;
     int                  argument_separator;
+    const char           *cookiev0_separator;
 
     int                  rule_inheritance;
     apr_array_header_t  *rule_exceptions;
@@ -571,6 +574,9 @@ struct directory_config {
     /* Collection timeout */
     int col_timeout;
 
+    /* hash of ids */
+    apr_hash_t          *rule_id_htab;
+
     /* Hash */
     apr_array_header_t  *hash_method;
     const char *crypto_key;
@@ -589,6 +595,9 @@ struct directory_config {
     int                 crypto_hash_location_pm;
     int                 crypto_hash_iframesrc_pm;
     int                 crypto_hash_framesrc_pm;
+
+    /* xml */
+    int                 xml_external_entity;
 };
 
 struct error_message_t {
