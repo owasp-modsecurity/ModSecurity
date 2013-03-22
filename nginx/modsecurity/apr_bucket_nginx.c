@@ -2,7 +2,7 @@
 #include <apr_bucket_nginx.h>
 
 static apr_status_t nginx_bucket_read(apr_bucket *b, const char **str,
-                  apr_size_t *len, apr_read_type_e block);
+                                      apr_size_t *len, apr_read_type_e block);
 static void nginx_bucket_destroy(void *data);
 
 static const apr_bucket_type_t apr_bucket_type_nginx = {
@@ -110,14 +110,14 @@ ngx_buf_t * apr_bucket_to_ngx_buf(apr_bucket *e, ngx_pool_t *pool) {
             b->last_buf = 0;
             return b;
         }
-        
+
         buf = ngx_palloc(pool, sizeof(ngx_buf_t));
         if (buf == NULL) {
             return NULL;
         }
         ngx_memcpy(buf, b, sizeof(ngx_buf_t));
-        
-        if (ngx_buf_in_memory(buf)) {         
+
+        if (ngx_buf_in_memory(buf)) {
             buf->start = buf->pos = buf->pos + e->start;
             buf->end = buf->last = buf->pos + e->length;
         } else {
@@ -125,7 +125,7 @@ ngx_buf_t * apr_bucket_to_ngx_buf(apr_bucket *e, ngx_pool_t *pool) {
             buf->file_pos += e->start;
             buf->file_last = buf->file_pos + e->length;
         }
-        
+
         buf->last_buf = 0;
         return buf;
     }
@@ -134,7 +134,7 @@ ngx_buf_t * apr_bucket_to_ngx_buf(apr_bucket *e, ngx_pool_t *pool) {
                         &len, APR_BLOCK_READ) != APR_SUCCESS) {
         return NULL;
     }
-    
+
     buf = ngx_calloc_buf(pool);
     if (buf == NULL) {
         return NULL;
@@ -146,7 +146,7 @@ ngx_buf_t * apr_bucket_to_ngx_buf(apr_bucket *e, ngx_pool_t *pool) {
         buf->start = ngx_palloc(pool, len);
         ngx_memcpy(buf->start, data, len);
     }
-    
+
     buf->pos = buf->start;
     buf->end = buf->last = buf->start + len;
     buf->temporary = 1;
@@ -154,10 +154,10 @@ ngx_buf_t * apr_bucket_to_ngx_buf(apr_bucket *e, ngx_pool_t *pool) {
 }
 
 ngx_int_t
-move_chain_to_brigade(ngx_chain_t *chain, apr_bucket_brigade *bb, ngx_pool_t *pool) {
+move_chain_to_brigade(ngx_chain_t *chain, apr_bucket_brigade *bb, ngx_pool_t *pool, ngx_int_t last_buf) {
     apr_bucket         *e;
     ngx_chain_t        *cl;
-    
+
     while (chain) {
         e = ngx_buf_to_apr_bucket(chain->buf, bb->p, bb->bucket_alloc);
         if (e == NULL) {
@@ -175,6 +175,13 @@ move_chain_to_brigade(ngx_chain_t *chain, apr_bucket_brigade *bb, ngx_pool_t *po
         chain = chain->next;
         ngx_free_chain(pool, cl);
     }
+
+    if (last_buf) {
+        e = apr_bucket_eos_create(bb->bucket_alloc);
+        APR_BRIGADE_INSERT_TAIL(bb, e);
+        return NGX_OK;
+    }
+
     return NGX_AGAIN;
 }
 
@@ -185,16 +192,16 @@ move_brigade_to_chain(apr_bucket_brigade *bb, ngx_chain_t **ll, ngx_pool_t *pool
     ngx_chain_t *cl;
 
     cl = NULL;
-    
+
     if (APR_BRIGADE_EMPTY(bb)) {
         *ll = NULL;
         return NGX_OK;
     }
-    
+
     for (e = APR_BRIGADE_FIRST(bb);
             e != APR_BRIGADE_SENTINEL(bb);
             e = APR_BUCKET_NEXT(e)) {
-                
+
         if (APR_BUCKET_IS_EOS(e)) {
             if (cl == NULL) {
                 *ll = cl;
@@ -204,7 +211,7 @@ move_brigade_to_chain(apr_bucket_brigade *bb, ngx_chain_t **ll, ngx_pool_t *pool
             apr_brigade_cleanup(bb);
             return NGX_OK;
         }
-        
+
         if (APR_BUCKET_IS_METADATA(e)) {
             continue;
         }
@@ -213,12 +220,12 @@ move_brigade_to_chain(apr_bucket_brigade *bb, ngx_chain_t **ll, ngx_pool_t *pool
         if (buf == NULL) {
             break;
         }
-        
+
         cl = ngx_alloc_chain_link(pool);
         if (cl == NULL) {
             break;
         }
-        
+
         cl->buf = buf;
         cl->next = NULL;
         *ll = cl;
