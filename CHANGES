@@ -1,7 +1,11 @@
 28 Mar 2013 - 2.7.3
 -------------------
 
-  * Nginx is now RC quality. The rule engine should works for all phases.
+  * Fixed IIS version race condition when module is initialized.
+
+  * Fixed IIS version failing config commands in libapr.
+
+  * Nginx version is now RC quality. The rule engine should works for all phases.
     We fixed many issues and missing features (for more information please check jira).
     Code is running well with latest Nginx 1.2.7 stable.
     Thanks chaizhenhua for your help.
