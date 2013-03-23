@@ -76,13 +76,13 @@ install-exec-hook: $(pkglib_LTLIBRARIES)
 	@echo "Creating Nginx config file..."; \
 	rm -f ../nginx/modsecurity/config; \
 	echo "ngx_addon_name=ngx_http_modsecurity" >> ../nginx/modsecurity/config; \
-	echo "# HTTP_MODULES=\"\$$HTTP_MODULES ngx_http_modsecurity\"" >> ../nginx/modsecurity/config; \
-	echo "HTTP_HEADERS_FILTER_MODULE=\"ngx_http_modsecurity \$$HTTP_HEADERS_FILTER_MODULE\"" >> ../nginx/modsecurity/config; \
-	echo "NGX_ADDON_SRCS=\"\$$NGX_ADDON_SRCS \$$ngx_addon_dir/ngx_http_modsecurity.c \$$ngx_addon_dir/apr_bucket_nginx.c\"" >> ../nginx/modsecurity/config;\
-	echo "NGX_ADDON_DEPS=\"\$$NGX_ADDON_DEPS\"" >> ../nginx/modsecurity/config; \
+	echo "CORE_MODULES=\"\$$CORE_MODULES ngx_pool_context_module\"" >> ../nginx/modsecurity/config; \
+	echo "HTTP_AUX_FILTER_MODULE=\"ngx_http_modsecurity \$$HTTP_AUX_FILTER_MODULE\"" >> ../nginx/modsecurity/config; \
+	echo "NGX_ADDON_SRCS=\"\$$NGX_ADDON_SRCS \$$ngx_addon_dir/ngx_http_modsecurity.c \$$ngx_addon_dir/apr_bucket_nginx.c \$$ngx_addon_dir/ngx_pool_context.c\"" >> ../nginx/modsecurity/config;\
+	echo "NGX_ADDON_DEPS=\"\$$NGX_ADDON_DEPS \$$ngx_addon_dir/apr_bucket_nginx.h \$$ngx_addon_dir/ngx_pool_context.h\"" >> ../nginx/modsecurity/config; \
 	echo "CORE_LIBS=\"\$$CORE_LIBS \$$ngx_addon_dir/../../standalone/.libs/standalone.a -lapr-1 -laprutil-1 -lxml2 -lm @LUA_LDADD@\"" >> ../nginx/modsecurity/config; \
 	echo "CORE_INCS=\"\$$CORE_INCS /usr/include/apache2 /usr/include/apr-1.0 /usr/include/httpd /usr/include/apr-1 \$$ngx_addon_dir \$$ngx_addon_dir/../../standalone \$$ngx_addon_dir/../../apache2 /usr/include/libxml2 `echo @LUA_CFLAGS@ | cut -d "I" -f3`\"" >> ../nginx/modsecurity/config; \
-	echo "have=REQUEST_EARLY . auto/have" >> ../nginx/modsecurity/config;\
+	echo "#have=REQUEST_EARLY . auto/have" >> ../nginx/modsecurity/config;\
 	echo "Removing unused static libraries..."; \
 	for m in $(pkglib_LTLIBRARIES); do \
 	  base=`echo $$m | sed 's/\..*//'`; \
