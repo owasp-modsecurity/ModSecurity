@@ -582,6 +582,7 @@ sub httpd_start {
     if (defined $out and $out ne "") {
         vrb(join(" ", map { quote_shell($_) } @p));
         msg("Httpd start failed with error messages:\n$out");
+        httpd_stop();
         return -1
     }
 
@@ -590,6 +591,7 @@ sub httpd_start {
         vrb(join(" ", map { quote_shell($_) } @p));
         vrb(match_log("error", qr/(^.*ModSecurity: .*)/sm, 10));
         msg("Httpd server failed to start.");
+        httpd_stop();
         return -1;
     }
 

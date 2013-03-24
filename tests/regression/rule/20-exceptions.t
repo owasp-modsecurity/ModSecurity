@@ -109,7 +109,7 @@
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1,msg:'testing rule'"
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1,msg:'testing rule',id:500001"
 		SecRuleRemoveByMsg "testing rule"
 	),
 	match_log => {
@@ -134,7 +134,7 @@
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1,msg:'testing rule'"
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1,msg:'testing rule',id:500002"
 		SecRuleUpdateActionById 1 "pass,nolog"
 	),
 	match_log => {
@@ -157,8 +157,8 @@
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1,msg:'testing rule',chain"
-        SecRule ARGS "bar"
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1,msg:'testing rule',chain,id:500003"
+        SecRule ARGS "bar,id:500004"
 		SecRuleUpdateActionById 1 "pass,nolog"
 	),
 	match_log => {
