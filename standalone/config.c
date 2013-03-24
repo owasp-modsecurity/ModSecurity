@@ -1153,14 +1153,21 @@ ProcessInclude:
 
 			parms->directive = newdir;
 
+#ifdef WIN32
+			// some config commands fail in APR when there are file
+			// permission issues or other OS-specific problems
+			//
 			__try
 			{
+#endif
 				errmsg = invoke_cmd(cmd, parms, mconfig, args);
+#ifdef WIN32
 			}
 			__except(EXCEPTION_EXECUTE_HANDLER)
 			{
 				errmsg = "Command failed to execute (check file/folder permissions, syntax, etc.).";
 			}
+#endif
 
 			if(errmsg != NULL)
 				break;
