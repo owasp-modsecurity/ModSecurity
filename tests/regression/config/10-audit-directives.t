@@ -46,7 +46,7 @@
 		SecDebugLogLevel 9
 		SecResponseBodyAccess On
 		SecDefaultAction "phase:2,log,auditlog,pass"
-		SecRule REQUEST_URI "." "phase:4,deny"
+		SecRule REQUEST_URI "." "phase:4,deny,id:500251"
 	),
 	match_log => {
 		audit => [ qr/./, 1 ],
@@ -246,7 +246,7 @@
 		SecRequestBodyAccess On
 		SecResponseBodyAccess On
 		SecAuditLogParts "ABCDEFGHIJKZ"
-		SecAction "phase:4,log,auditlog,allow"
+		SecAction "phase:4,log,auditlog,allow,id:500086"
 	),
 	match_log => {
 		audit => [ qr/-A--.*-B--.*-C--.*-F--.*-E--.*-H--.*-K--.*-Z--/s, 1 ],

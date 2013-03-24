@@ -17,9 +17,9 @@
         SecPcreMatchLimitRecursion 100
 
         # Poor REGEX
-        SecRule ARGS "(?:(.{2,})\\1{32,})" "phase:2,deny,capture,msg:'REDoS'"
+        SecRule ARGS "(?:(.{2,})\\1{32,})" "phase:2,deny,capture,msg:'REDoS',id:500053"
 		# Detect PCRE limits exceeded
-        SecRule TX:MSC_PCRE_LIMITS_EXCEEDED "!\@streq 0" "phase:2,deny,msg:'ModSecurity Internal Error Flagged: %{MATCHED_VAR_NAME}'"
+        SecRule TX:MSC_PCRE_LIMITS_EXCEEDED "!\@streq 0" "phase:2,deny,msg:'ModSecurity Internal Error Flagged: %{MATCHED_VAR_NAME}',id:500054"
 	),
 	match_log => {
 		debug => [ qr/PCRE limits exceeded/, 1 ],
