@@ -20,14 +20,17 @@
 // of CMyHttpModule for each request.
 class CMyHttpModuleFactory : public IHttpModuleFactory
 {
-        CMyHttpModule *            m_pModule;
+        CMyHttpModule *				m_pModule;
+		CRITICAL_SECTION			m_csLock;
 
 public:
 	CMyHttpModuleFactory()
 	{
 		m_pModule = NULL;
+
+		InitializeCriticalSection(&m_csLock);
 	}
-	
+
 	virtual
     HRESULT
     GetHttpModule(
@@ -43,6 +46,8 @@ public:
             goto Finished;
         }
 
+		EnterCriticalSection(&m_csLock);
+
 		if(m_pModule == NULL)
 		{
 			m_pModule = new CMyHttpModule();
@@ -53,6 +58,8 @@ public:
 				goto Finished;
 			}
 		}
+
+		LeaveCriticalSection(&m_csLock);
 
         *ppModule = m_pModule;
 
