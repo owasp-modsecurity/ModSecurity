@@ -8,7 +8,7 @@
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 4
-		SecAction "nolog"
+		SecAction "nolog,id:500001"
 	),
 	match_log => {
 		-error => [ qr/ModSecurity: /, 1 ],
@@ -32,7 +32,7 @@
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 5
         SecDefaultAction "phase:2,deny,status:403"
-        SecRule ARGS:test "value"
+        SecRule ARGS:test "value,id:500032"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: /, 1 ],
@@ -53,7 +53,7 @@
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 5
         SecDefaultAction "phase:2,pass"
-        SecRule ARGS:test "value" "deny,status:403"
+        SecRule ARGS:test "value" "deny,status:403,id:500033"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: /, 1 ],
@@ -74,9 +74,9 @@
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 5
         SecDefaultAction "phase:2,log,noauditlog,pass,tag:foo"
-        SecRule ARGS:test "value" "chain,phase:2,deny,status:403"
-        SecRule &ARGS "\@eq 1" "chain,setenv:tx.foo=bar"
-        SecRule REQUEST_METHOD "\@streq GET"
+        SecRule ARGS:test "value" "chain,phase:2,deny,status:403,id:500034"
+        SecRule &ARGS "\@eq 1" "chain,setenv:tx.foo=bar,id:500035"
+        SecRule REQUEST_METHOD "\@streq GET,id:500036"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: /, 1 ],

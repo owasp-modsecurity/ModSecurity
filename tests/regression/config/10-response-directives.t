@@ -10,7 +10,7 @@
 		SecResponseBodyMimeTypesClear
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule RESPONSE_BODY "TEST" "phase:4,deny"
+		SecRule RESPONSE_BODY "TEST" "phase:4,deny,id:500237"
 	),
 	match_log => {
 		-error => [ qr/Access denied/, 1 ],
@@ -34,7 +34,7 @@
 		SecDebugLogLevel 9
 		SecResponseBodyAccess On
 		SecResponseBodyMimeType text/plain null
-		SecRule RESPONSE_BODY "TEST" "phase:4,deny"
+		SecRule RESPONSE_BODY "TEST" "phase:4,deny,id:500238"
 	),
 	match_log => {
 		error => [ qr/Access denied with code 403 \(phase 4\)\. Pattern match "TEST" at RESPONSE_BODY\./, 1 ],
@@ -55,7 +55,7 @@
 		SecDebugLogLevel 9
 		SecResponseBodyAccess Off
 		SecResponseBodyMimeType text/plain null
-		SecRule RESPONSE_BODY "TEST" "phase:4,deny"
+		SecRule RESPONSE_BODY "TEST" "phase:4,deny,id:500239"
 	),
 	match_log => {
 		-error => [ qr/Access denied/, 1 ],

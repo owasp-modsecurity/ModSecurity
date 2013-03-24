@@ -13,7 +13,7 @@
 	conf => qq(
 		SecRuleEngine on
 		SecDefaultAction "phase:1,deny,status:500"
-		SecRule REQUEST_URI "test.txt"
+		SecRule REQUEST_URI "test.txt,id:500240"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Access denied with code 500 \(phase 1\)/, 1 ],
@@ -52,7 +52,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecDataDir "$ENV{DATA_DIR}"
-		SecAction initcol:ip=%{REMOTE_ADDR},setvar:ip.dummy=1,pass
+		SecAction initcol:ip=%{REMOTE_ADDR},setvar:ip.dummy=1,pass,id:500085
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Warning. Unconditional match in SecAction\./, 1 ],
