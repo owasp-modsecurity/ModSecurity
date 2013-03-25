@@ -1153,7 +1153,14 @@ ProcessInclude:
 
 			parms->directive = newdir;
 
-			errmsg = invoke_cmd(cmd, parms, mconfig, args);
+			__try
+			{
+				errmsg = invoke_cmd(cmd, parms, mconfig, args);
+			}
+			__except(EXCEPTION_EXECUTE_HANDLER)
+			{
+				errmsg = "Command failed to execute (check file/folder permissions, syntax, etc.).";
+			}
 
 			if(errmsg != NULL)
 				break;

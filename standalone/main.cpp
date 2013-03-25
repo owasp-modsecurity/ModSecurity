@@ -21,6 +21,7 @@
 
 
 char *config_file = NULL;
+char *url_file = NULL;
 char *event_files[1024];
 int event_file_cnt;
 char *event_file = NULL;
@@ -30,6 +31,11 @@ int event_line_cnt = 0;
 int event_file_blocks[256];
 
 #define	EVENT_FILE_MAX_SIZE		(16*1024*1024)
+
+#define	MAX_URLS	4096
+
+char urls[MAX_URLS][4096];
+int url_cnt = 0;
 
 void readeventfile(char *name)
 {
@@ -116,6 +122,12 @@ void parseargs(int argc, char *argv[])
 			if(argv[i][1] == 'c' && i < argc - 1)
 			{
 				config_file = argv[i + 1];
+				i += 2;
+				continue;
+			}
+			if(argv[i][1] == 'u' && i < argc - 1)
+			{
+				url_file = argv[i + 1];
 				i += 2;
 				continue;
 			}
@@ -224,7 +236,7 @@ void main(int argc, char *argv[])
 	if(config_file == NULL || argc < 3)
 	{
 		printf("Usage:\n");
-		printf("standalone.exe -c <config_file> <event_file1> [<event_file2> <event_file3> ...]\n");
+		printf("standalone.exe -c <config_file> [-u <text_file_with_urls>] <event_file1> [<event_file2> <event_file3> ...]\n");
 		return;
 	}
 
@@ -250,133 +262,171 @@ void main(int argc, char *argv[])
 
 	modsecInitProcess();
 
+	if(url_file != NULL)
+	{
+		FILE *fr = fopen(url_file, "rb");
+		int i = 0;
+
+		while(fgets(urls[i],4096,fr) != NULL)
+		{
+			urls[i][4095] = 0;
+
+			int l = strlen(urls[i]) - 1;
+
+			if(l < 8)
+				continue;
+
+			while(urls[i][l] == 10 || urls[i][l] == 13)
+				l--;
+
+			urls[i++][l + 1] = 0;
+		}
+
+		url_cnt = i;
+		fclose(fr);
+	}
+
 	for(int i = 0; i < event_file_cnt; i++)
 	{
-		readeventfile(event_files[i]);
-		parseeventfile();
+		if(url_cnt == 0)
+		{
+			urls[0][0] = 0;
+			url_cnt = 1;
+		}
 
-		bodypos = 0;
-		responsepos = 0;
+		for(int ui = 0; ui < url_cnt; ui++)
+		{
+			readeventfile(event_files[i]);
+			parseeventfile();
 
-		c = modsecNewConnection();
+			bodypos = 0;
+			responsepos = 0;
 
-		modsecProcessConnection(c);
+			c = modsecNewConnection();
 
-		r = modsecNewRequest(c, config);
+			modsecProcessConnection(c);
 
-		int j = event_file_blocks['B'];
+			r = modsecNewRequest(c, config);
 
-		if(j < 0)
-			continue;
+			int j = event_file_blocks['B'];
 
-		j++;
+			if(j < 0)
+				continue;
 
-		if(event_file_lines[j][0] == 0)
-			continue;
+			j++;
 
-		char *method = event_file_lines[j];
-		char *url = strchr(method, 32);
-		char *proto = strchr(url + 1, 32);
+			if(event_file_lines[j][0] == 0)
+				continue;
 
-		if(url == NULL || proto == NULL)
-			continue;
+			char *method = event_file_lines[j];
+			char *url = strchr(method, 32);
+			char *proto = strchr(url + 1, 32);
 
-		*url++=0;
-		*proto++=0;
+			if(url == NULL || proto == NULL)
+				continue;
+
+			*url++=0;
+			*proto++=0;
+
+			if(urls[ui][0] != 0)
+			{
+				url = urls[ui];
+			}
 
 #define	SETMETHOD(m) if(strcmp(method,#m) == 0){ r->method = method; r->method_number = M_##m; }
 
-		r->method = "INVALID";
-		r->method_number = M_INVALID;
+			r->method = "INVALID";
+			r->method_number = M_INVALID;
 
-		SETMETHOD(OPTIONS)
-		SETMETHOD(GET)
-		SETMETHOD(POST)
-		SETMETHOD(PUT)
-		SETMETHOD(DELETE)
-		SETMETHOD(TRACE)
-		SETMETHOD(CONNECT)
-		SETMETHOD(MOVE)
-		SETMETHOD(COPY)
-		SETMETHOD(PROPFIND)
-		SETMETHOD(PROPPATCH)
-		SETMETHOD(MKCOL)
-		SETMETHOD(LOCK)
-		SETMETHOD(UNLOCK)
+			SETMETHOD(OPTIONS)
+			SETMETHOD(GET)
+			SETMETHOD(POST)
+			SETMETHOD(PUT)
+			SETMETHOD(DELETE)
+			SETMETHOD(TRACE)
+			SETMETHOD(CONNECT)
+			SETMETHOD(MOVE)
+			SETMETHOD(COPY)
+			SETMETHOD(PROPFIND)
+			SETMETHOD(PROPPATCH)
+			SETMETHOD(MKCOL)
+			SETMETHOD(LOCK)
+			SETMETHOD(UNLOCK)
 
-		r->protocol = proto;
+			r->protocol = proto;
 
-		while(event_file_lines[++j][0] != 0)
-		{
-			char *value = strchr(event_file_lines[j], ':');
+			while(event_file_lines[++j][0] != 0)
+			{
+				char *value = strchr(event_file_lines[j], ':');
 
-			if(value == NULL)
-				break;
+				if(value == NULL)
+					break;
 
-			*value++ = 0;
+				*value++ = 0;
 
-			while(*value <=32 && *value != 0)
-				value++;
+				while(*value <=32 && *value != 0)
+					value++;
 
-			apr_table_setn(r->headers_in, event_file_lines[j], value);
-		}
+				apr_table_setn(r->headers_in, event_file_lines[j], value);
+			}
 
-		r->content_encoding = apr_table_get(r->headers_in, "Content-Encoding");
-		r->content_type = apr_table_get(r->headers_in, "Content-Type");
-		r->hostname = apr_table_get(r->headers_in, "Host");
-		r->path_info = url;
+			r->content_encoding = apr_table_get(r->headers_in, "Content-Encoding");
+			r->content_type = apr_table_get(r->headers_in, "Content-Type");
+			r->hostname = apr_table_get(r->headers_in, "Host");
+			r->path_info = url;
 		
-		char *query = strchr(url, '?');
-		char *rawurl = url;
+			char *query = strchr(url, '?');
+			char *rawurl = url;
 
-		if(query != NULL)
-		{
-			rawurl = (char *)apr_palloc(r->pool, strlen(url) + 1);
-			strcpy(rawurl, url);
-			*query++ = 0;
-			r->args = query;
+			if(query != NULL)
+			{
+				rawurl = (char *)apr_palloc(r->pool, strlen(url) + 1);
+				strcpy(rawurl, url);
+				*query++ = 0;
+				r->args = query;
+			}
+
+			const char *lng = apr_table_get(r->headers_in, "Content-Languages");
+
+			if(lng != NULL)
+			{
+				r->content_languages = apr_array_make(r->pool, 1, sizeof(const char *));
+
+				*(const char **)apr_array_push(r->content_languages) = lng;
+			}
+
+			r->request_time = apr_time_now();
+
+			r->parsed_uri.scheme = "http";
+			r->parsed_uri.path = r->path_info;
+			r->parsed_uri.hostname = (char *)r->hostname;
+			r->parsed_uri.is_initialized = 1;
+			r->parsed_uri.port = 80;
+			r->parsed_uri.port_str = "80";
+			r->parsed_uri.query = r->args;
+			r->parsed_uri.dns_looked_up = 0;
+			r->parsed_uri.dns_resolved = 0;
+			r->parsed_uri.password = NULL;
+			r->parsed_uri.user = NULL;
+			r->parsed_uri.fragment = NULL;
+
+			r->unparsed_uri = rawurl;
+			r->uri = r->unparsed_uri;
+
+			r->the_request = (char *)apr_palloc(r->pool, strlen(r->method) + 1 + strlen(r->uri) + 1 + strlen(r->protocol) + 1);
+
+			strcpy(r->the_request, r->method);
+			strcat(r->the_request, " ");
+			strcat(r->the_request, r->uri);
+			strcat(r->the_request, " ");
+			strcat(r->the_request, r->protocol);
+
+			apr_table_setn(r->subprocess_env, "UNIQUE_ID", "1");
+
+			modsecProcessRequest(r);
+			modsecProcessResponse(r);
+			modsecFinishRequest(r);
 		}
-
-		const char *lng = apr_table_get(r->headers_in, "Content-Languages");
-
-		if(lng != NULL)
-		{
-			r->content_languages = apr_array_make(r->pool, 1, sizeof(const char *));
-
-			*(const char **)apr_array_push(r->content_languages) = lng;
-		}
-
-		r->request_time = apr_time_now();
-
-		r->parsed_uri.scheme = "http";
-		r->parsed_uri.path = r->path_info;
-		r->parsed_uri.hostname = (char *)r->hostname;
-		r->parsed_uri.is_initialized = 1;
-		r->parsed_uri.port = 80;
-		r->parsed_uri.port_str = "80";
-		r->parsed_uri.query = r->args;
-		r->parsed_uri.dns_looked_up = 0;
-		r->parsed_uri.dns_resolved = 0;
-		r->parsed_uri.password = NULL;
-		r->parsed_uri.user = NULL;
-		r->parsed_uri.fragment = NULL;
-
-		r->unparsed_uri = rawurl;
-		r->uri = r->unparsed_uri;
-
-		r->the_request = (char *)apr_palloc(r->pool, strlen(r->method) + 1 + strlen(r->uri) + 1 + strlen(r->protocol) + 1);
-
-		strcpy(r->the_request, r->method);
-		strcat(r->the_request, " ");
-		strcat(r->the_request, r->uri);
-		strcat(r->the_request, " ");
-		strcat(r->the_request, r->protocol);
-
-		apr_table_setn(r->subprocess_env, "UNIQUE_ID", "1");
-
-		modsecProcessRequest(r);
-		modsecProcessResponse(r);
-		modsecFinishRequest(r);
 	}
 
 	modsecTerminate();
