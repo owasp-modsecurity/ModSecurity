@@ -200,7 +200,7 @@ ngx_pool_context_init_conf(ngx_cycle_t *cycle, void *conf)
 
     ngx_pool_context_hash_size = pcf->size;
 
-    ngx_pool_context_hash = ngx_palloc(cycle->pool, sizeof(ngx_pool_context_node_t *) * ngx_pool_context_hash_size);
+    ngx_pool_context_hash = ngx_pcalloc(cycle->pool, sizeof(ngx_pool_context_node_t *) * ngx_pool_context_hash_size);
 
     if (ngx_pool_context_hash == NULL) {
         return NGX_CONF_ERROR;
