@@ -950,20 +950,21 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         return NGX_DECLINED;
     }
 
-    if (r->internal) {
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: handler");
 
+    if (r->internal) {
+        /* we have already processed the request headers with previous loc conf */
+
+        /* TODO: do we need update ctx and process headers again? */
         ctx = ngx_http_get_module_pool_ctx(r, ngx_http_modsecurity);
 
-        if (ctx == NULL) {
-            return NGX_ERROR;
+        if (ctx) {
+            ngx_http_set_ctx(r, ctx, ngx_http_modsecurity);
+            return NGX_DECLINED;
         }
 
-        ngx_http_set_ctx(r, ctx, ngx_http_modsecurity);
-
-        return NGX_DECLINED;
+        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: get internel request ctx failed");
     }
-
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: handler");
 
     ctx = ngx_http_modsecurity_create_ctx(r);
     if (ctx == NULL) {
@@ -1083,8 +1084,6 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
     if (r->method == NGX_HTTP_HEAD || r->header_only) {
 
         ctx->complete = 1;
-
-        // TODO: do we need reload headers_in ?
 
         if (ngx_http_modsecurity_load_headers_in(r) != NGX_OK
                 || ngx_http_modsecurity_load_headers_out(r) != NGX_OK) {
