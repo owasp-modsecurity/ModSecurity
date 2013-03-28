@@ -11,8 +11,8 @@
 		SecResponseBodyMimeType null
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule ARGS "val1" "phase:2,log,pass"
-		SecRule ARGS "val2" "phase:2,log,pass"
+		SecRule ARGS "val1" "phase:2,log,pass,id:500189"
+		SecRule ARGS "val2" "phase:2,log,pass,id:500190"
 	),
 	match_log => {
 		error => [ qr/Pattern match "val1" at ARGS.*Pattern match "val2" at ARGS/s, 1 ],
@@ -35,8 +35,8 @@
 		SecResponseBodyMimeType null
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule ARGS "val1" "phase:2,log,pass"
-		SecRule ARGS "val2" "phase:2,log,pass"
+		SecRule ARGS "val1" "phase:2,log,pass,id:500191"
+		SecRule ARGS "val2" "phase:2,log,pass,id:500192"
 	),
 	match_log => {
 		error => [ qr/Pattern match "val1" at ARGS.*Pattern match "val2" at ARGS/s, 1 ],
@@ -63,7 +63,7 @@
 		SecRequestBodyAccess On
 		SecResponseBodyAccess On
 		SecResponseBodyMimeType null
-		SecRule ARGS_COMBINED_SIZE "\@eq 16" "phase:2,log,pass"
+		SecRule ARGS_COMBINED_SIZE "\@eq 16" "phase:2,log,pass,id:500193"
 	),
 	match_log => {
 		error => [ qr/Operator EQ matched 16 at ARGS_COMBINED_SIZE\./s, 1 ],
@@ -83,7 +83,7 @@
 		SecRequestBodyAccess On
 		SecResponseBodyAccess On
 		SecResponseBodyMimeType null
-		SecRule ARGS_COMBINED_SIZE "\@eq 16" "phase:2,log,pass"
+		SecRule ARGS_COMBINED_SIZE "\@eq 16" "phase:2,log,pass,id:500194"
 	),
 	match_log => {
 		error => [ qr/Operator EQ matched 16 at ARGS_COMBINED_SIZE\./s, 1 ],
@@ -111,8 +111,8 @@
 		SecResponseBodyMimeType null
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule ARGS_NAMES "arg1" "phase:2,log,pass"
-		SecRule ARGS_NAMES "arg2" "phase:2,log,pass"
+		SecRule ARGS_NAMES "arg1" "phase:2,log,pass,id:500195"
+		SecRule ARGS_NAMES "arg2" "phase:2,log,pass,id:500196"
 	),
 	match_log => {
 		error => [ qr/Pattern match "arg1" at ARGS.*Pattern match "arg2" at ARGS/s, 1 ],
@@ -135,8 +135,8 @@
 		SecResponseBodyMimeType null
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule ARGS_NAMES "arg1" "phase:2,log,pass"
-		SecRule ARGS_NAMES "arg2" "phase:2,log,pass"
+		SecRule ARGS_NAMES "arg1" "phase:2,log,pass,id:500197"
+		SecRule ARGS_NAMES "arg2" "phase:2,log,pass,id:500198"
 	),
 	match_log => {
 		error => [ qr/Pattern match "arg1" at ARGS_NAMES.*Pattern match "arg2" at ARGS_NAMES/s, 1 ],
@@ -165,8 +165,8 @@
 		SecResponseBodyMimeType null
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule ARGS_GET "val1" "phase:2,log,pass"
-		SecRule ARGS_GET "val2" "phase:2,log,pass"
+		SecRule ARGS_GET "val1" "phase:2,log,pass,id:500199"
+		SecRule ARGS_GET "val2" "phase:2,log,pass,id:500200"
 	),
 	match_log => {
 		error => [ qr/Pattern match "val1" at ARGS_GET.*Pattern match "val2" at ARGS_GET/s, 1 ],
@@ -189,8 +189,8 @@
 		SecResponseBodyMimeType null
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule ARGS_GET "val1" "phase:2,log,pass"
-		SecRule ARGS_GET "val2" "phase:2,log,pass"
+		SecRule ARGS_GET "val1" "phase:2,log,pass,id:500201"
+		SecRule ARGS_GET "val2" "phase:2,log,pass,id:500202"
 	),
 	match_log => {
 		-error => [ qr/Pattern match/, 1 ],
@@ -219,8 +219,8 @@
 		SecResponseBodyMimeType null
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule ARGS_GET_NAMES "arg1" "phase:2,log,pass"
-		SecRule ARGS_GET_NAMES "arg2" "phase:2,log,pass"
+		SecRule ARGS_GET_NAMES "arg1" "phase:2,log,pass,id:500203"
+		SecRule ARGS_GET_NAMES "arg2" "phase:2,log,pass,id:500204"
 	),
 	match_log => {
 		error => [ qr/Pattern match "arg1" at ARGS_GET.*Pattern match "arg2" at ARGS_GET/s, 1 ],
@@ -243,8 +243,8 @@
 		SecResponseBodyMimeType null
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule ARGS_GET_NAMES "arg1" "phase:2,log,pass"
-		SecRule ARGS_GET_NAMES "arg2" "phase:2,log,pass"
+		SecRule ARGS_GET_NAMES "arg1" "phase:2,log,pass,id:500205"
+		SecRule ARGS_GET_NAMES "arg2" "phase:2,log,pass,id:500206"
 	),
 	match_log => {
 		-error => [ qr/Pattern match/, 1 ],
@@ -273,8 +273,8 @@
 		SecResponseBodyMimeType null
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule ARGS_POST "val1" "phase:2,log,pass"
-		SecRule ARGS_POST "val2" "phase:2,log,pass"
+		SecRule ARGS_POST "val1" "phase:2,log,pass,id:500207"
+		SecRule ARGS_POST "val2" "phase:2,log,pass,id:500208"
 	),
 	match_log => {
 		-error => [ qr/Pattern match/, 1 ],
@@ -297,8 +297,8 @@
 		SecResponseBodyMimeType null
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule ARGS_POST "val1" "phase:2,log,pass"
-		SecRule ARGS_POST "val2" "phase:2,log,pass"
+		SecRule ARGS_POST "val1" "phase:2,log,pass,id:500209"
+		SecRule ARGS_POST "val2" "phase:2,log,pass,id:500210"
 	),
 	match_log => {
 		error => [ qr/Pattern match "val1" at ARGS_POST.*Pattern match "val2" at ARGS_POST/s, 1 ],
@@ -327,8 +327,8 @@
 		SecResponseBodyMimeType null
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule ARGS_POST_NAMES "arg1" "phase:2,log,pass"
-		SecRule ARGS_POST_NAMES "arg2" "phase:2,log,pass"
+		SecRule ARGS_POST_NAMES "arg1" "phase:2,log,pass,id:500211"
+		SecRule ARGS_POST_NAMES "arg2" "phase:2,log,pass,id:500212"
 	),
 	match_log => {
 		-error => [ qr/Pattern match/, 1 ],
@@ -351,8 +351,8 @@
 		SecResponseBodyMimeType null
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule ARGS_POST_NAMES "arg1" "phase:2,log,pass"
-		SecRule ARGS_POST_NAMES "arg2" "phase:2,log,pass"
+		SecRule ARGS_POST_NAMES "arg1" "phase:2,log,pass,id:500213"
+		SecRule ARGS_POST_NAMES "arg2" "phase:2,log,pass,id:500214"
 	),
 	match_log => {
 		error => [ qr/Pattern match "arg1" at ARGS_POST.*Pattern match "arg2" at ARGS_POST/s, 1 ],

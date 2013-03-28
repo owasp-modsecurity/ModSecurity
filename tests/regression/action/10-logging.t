@@ -11,7 +11,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,pass,log"
+		SecAction "phase:1,pass,log,id:500006"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Warning\. Unconditional match in SecAction\./, 1 ],
@@ -34,7 +34,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,pass,nolog"
+		SecAction "phase:1,pass,nolog,id:500007"
 	),
 	match_log => {
 		-error => [ qr/ModSecurity: /, 1 ],
@@ -59,7 +59,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,deny,status:403,log"
+		SecAction "phase:1,deny,status:403,log,id:500008"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Access denied with code 403 \(phase 1\)\. Unconditional match in SecAction\./, 1 ],
@@ -82,7 +82,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,deny,status:403,nolog"
+		SecAction "phase:1,deny,status:403,nolog,id:500009"
 	),
 	match_log => {
 		-error => [ qr/ModSecurity: /, 1 ],
@@ -107,7 +107,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,pass,auditlog"
+		SecAction "phase:1,pass,auditlog,id:500010"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Warning\. Unconditional match in SecAction\./, 1 ],
@@ -130,7 +130,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,pass,noauditlog"
+		SecAction "phase:1,pass,noauditlog,id:500011"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Warning\. Unconditional match in SecAction\./, 1 ],
@@ -155,7 +155,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,deny,status:403,auditlog"
+		SecAction "phase:1,deny,status:403,auditlog,id:500012"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Access denied with code 403 \(phase 1\)\. Unconditional match in SecAction\./, 1 ],
@@ -178,7 +178,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,deny,status:403,noauditlog"
+		SecAction "phase:1,deny,status:403,noauditlog,id:500013"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Access denied with code 403 \(phase 1\)\. Unconditional match in SecAction\./, 1 ],
@@ -203,7 +203,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,pass,log,auditlog"
+		SecAction "phase:1,pass,log,auditlog,id:500014"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Warning\. Unconditional match in SecAction\./, 1 ],
@@ -226,7 +226,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,pass,log,noauditlog"
+		SecAction "phase:1,pass,log,noauditlog,id:500015"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Warning\. Unconditional match in SecAction\./, 1 ],
@@ -249,7 +249,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,pass,nolog,auditlog"
+		SecAction "phase:1,pass,nolog,auditlog,id:500016"
 	),
 	match_log => {
 		audit => [ qr/-H--\s+Message: .*Stopwatch: /s, 1 ],
@@ -271,7 +271,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,pass,nolog,noauditlog"
+		SecAction "phase:1,pass,nolog,noauditlog,id:500017"
 	),
 	match_log => {
 		-error => [ qr/ModSecurity: /, 1 ],
@@ -294,7 +294,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,pass,auditlog,log"
+		SecAction "phase:1,pass,auditlog,log,id:500018"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Warning\. Unconditional match in SecAction\./, 1 ],
@@ -317,7 +317,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,pass,auditlog,nolog"
+		SecAction "phase:1,pass,auditlog,nolog,id:500019"
 	),
 	match_log => {
 		-error => [ qr/ModSecurity: /, 1 ],
@@ -340,7 +340,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,pass,noauditlog,log"
+		SecAction "phase:1,pass,noauditlog,log,id:500020"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Warning\. Unconditional match in SecAction\./, 1 ],
@@ -363,7 +363,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,pass,noauditlog,nolog"
+		SecAction "phase:1,pass,noauditlog,nolog,id:500021"
 	),
 	match_log => {
 		-error => [ qr/ModSecurity: /, 1 ],
@@ -388,7 +388,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,deny,status:403,log,auditlog"
+		SecAction "phase:1,deny,status:403,log,auditlog,id:500022"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Access denied with code 403 \(phase 1\)\. Unconditional match in SecAction\./, 1 ],
@@ -411,7 +411,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,deny,status:403,log,noauditlog"
+		SecAction "phase:1,deny,status:403,log,noauditlog,id:500023"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Access denied with code 403 \(phase 1\)\. Unconditional match in SecAction\./, 1 ],
@@ -434,7 +434,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,deny,status:403,nolog,auditlog"
+		SecAction "phase:1,deny,status:403,nolog,auditlog,id:500024"
 	),
 	match_log => {
 		audit => [ qr/-H--\s+Message: .*Stopwatch: /s, 1 ],
@@ -457,7 +457,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,deny,status:403,nolog,noauditlog"
+		SecAction "phase:1,deny,status:403,nolog,noauditlog,id:500025"
 	),
 	match_log => {
 		-error => [ qr/ModSecurity: /, 1 ],
@@ -480,7 +480,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,deny,status:403,auditlog,log"
+		SecAction "phase:1,deny,status:403,auditlog,log,id:500026"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Access denied with code 403 \(phase 1\)\. Unconditional match in SecAction\./, 1 ],
@@ -503,7 +503,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,deny,status:403,auditlog,nolog"
+		SecAction "phase:1,deny,status:403,auditlog,nolog,id:500027"
 	),
 	match_log => {
 		-error => [ qr/ModSecurity: /, 1 ],
@@ -526,7 +526,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,deny,status:403,noauditlog,log"
+		SecAction "phase:1,deny,status:403,noauditlog,log,id:500028"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Access denied with code 403 \(phase 1\)\. Unconditional match in SecAction\./, 1 ],
@@ -549,7 +549,7 @@
         SecAuditLogRelevantStatus xxx
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecAction "phase:1,deny,status:403,noauditlog,nolog"
+		SecAction "phase:1,deny,status:403,noauditlog,nolog,id:500029"
 	),
 	match_log => {
 		-error => [ qr/ModSecurity: /, 1 ],

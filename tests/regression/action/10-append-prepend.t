@@ -9,8 +9,8 @@
         SecContentInjection On
 		SecDebugLog "$ENV{DEBUG_LOG}"
 		SecDebugLogLevel 9
-		SecAction "phase:1,setvar:tx.test=test"
-		SecAction "phase:2,append:'APPEND: \%{tx.test}'"
+		SecAction "phase:1,setvar:tx.test=test,id:500002"
+		SecAction "phase:2,append:'APPEND: \%{tx.test}',id:500003"
 	),
 	match_log => {
         debug => [ "Added content to bottom: APPEND: test", 1 ],
@@ -33,8 +33,8 @@
         SecContentInjection On
 		SecDebugLog "$ENV{DEBUG_LOG}"
 		SecDebugLogLevel 9
-		SecAction "phase:1,setvar:tx.test=test"
-		SecAction "phase:2,prepend:'PREPEND: \%{tx.test}'"
+		SecAction "phase:1,setvar:tx.test=test,id:500004"
+		SecAction "phase:2,prepend:'PREPEND: \%{tx.test}',id:500005"
 	),
 	match_log => {
         debug => [ "Added content to top: PREPEND: test", 1 ],

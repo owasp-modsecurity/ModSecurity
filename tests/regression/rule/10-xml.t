@@ -10,10 +10,10 @@
 		SecRequestBodyAccess On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500005
 		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345
-		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" \\
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
+		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" \\,id:500007
 		        "phase:2,deny,id:12345"
 	),
 	match_log => {
@@ -59,10 +59,10 @@
 		SecDebugLogLevel 9
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500008
 		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345
-		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" \\
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500009
+		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" \\,id:500010
 		        "phase:2,deny,log,auditlog,id:12345"
 	),
 	match_log => {
@@ -108,10 +108,10 @@
 		SecDebugLogLevel 9
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500011
 		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345
-		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" \\
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500012
+		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" \\,id:500013
 		        "phase:2,deny,id:12345"
 	),
 	match_log => {
@@ -158,10 +158,10 @@
 		SecDebugLogLevel 9
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500014
 		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345
-		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" \\
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500015
+		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" \\,id:500016
 		        "phase:2,deny,id:12345"
 	),
 	match_log => {
@@ -208,10 +208,10 @@
 		SecDebugLogLevel 9
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500017
 		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345
-		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope-bad.xsd" \\
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500018
+		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope-bad.xsd" \\,id:500019
 		        "phase:2,deny,id:12345"
 	),
 	match_log => {
@@ -256,10 +256,10 @@
 		SecRequestBodyAccess On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500020
 		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345
-		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope.dtd" \\
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500021
+		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope.dtd" \\,id:500022
 		        "phase:2,deny,id:12345"
 	),
 	match_log => {
@@ -299,10 +299,10 @@
 		SecRequestBodyAccess On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500023
 		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345
-		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope.dtd" \\
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500024
+		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope.dtd" \\,id:500025
 		        "phase:2,deny,id:12345"
 	),
 	match_log => {
@@ -342,10 +342,10 @@
 		SecRequestBodyAccess On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500026
 		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345
-		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope.dtd" \\
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500027
+		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope.dtd" \\,id:500028
 		        "phase:2,deny,id:12345"
 	),
 	match_log => {
@@ -385,10 +385,10 @@
 		SecRequestBodyAccess On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500029
 		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345
-		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope-bad.dtd" \\
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500030
+		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope-bad.dtd" \\,id:500031
 		        "phase:2,deny,id:12345"
 	),
 	match_log => {
