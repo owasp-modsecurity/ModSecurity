@@ -139,6 +139,23 @@ static struct {
 };
 
 
+static inline u_char *
+ngx_pstrdup0(ngx_pool_t *pool, ngx_str_t *src)
+{
+    u_char  *dst;
+
+    dst = ngx_pnalloc(pool, src->len + 1);
+    if (dst == NULL) {
+        return NULL;
+    }
+
+    ngx_memcpy(dst, src->data, src->len);
+    dst[src->len] = '\0';
+
+    return dst;
+}
+
+
 static inline int ngx_http_modsecurity_method_number(unsigned int nginx)
 {
     /*
@@ -195,7 +212,7 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     req = ctx->req;
 
     /* request line */
-    req->method = (char *)ngx_pstrdup(r->pool, &r->method_name);
+    req->method = (char *)ngx_pstrdup0(r->pool, &r->method_name);
 
     /* TODO: how to use ap_method_number_of ?
      * req->method_number = ap_method_number_of(req->method);
@@ -211,15 +228,15 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     req->filename = (char *) path.data;
     req->path_info = req->filename;
 
-    req->args = (char *)ngx_pstrdup(r->pool, &r->args);
+    req->args = (char *)ngx_pstrdup0(r->pool, &r->args);
 
     req->proto_num = r->http_major *1000 + r->http_minor;
-    req->protocol = (char *)ngx_pstrdup(r->pool, &r->http_protocol);
+    req->protocol = (char *)ngx_pstrdup0(r->pool, &r->http_protocol);
     req->request_time = apr_time_make(r->start_sec, r->start_msec);
-    req->the_request = (char *)ngx_pstrdup(r->pool, &r->request_line);
+    req->the_request = (char *)ngx_pstrdup0(r->pool, &r->request_line);
 
-    req->unparsed_uri = (char *)ngx_pstrdup(r->pool, &r->unparsed_uri);
-    req->uri = (char *)ngx_pstrdup(r->pool, &r->uri);
+    req->unparsed_uri = (char *)ngx_pstrdup0(r->pool, &r->unparsed_uri);
+    req->uri = (char *)ngx_pstrdup0(r->pool, &r->uri);
 
     req->parsed_uri.scheme = "http";
 
@@ -235,17 +252,17 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     str.data = r->port_start;
     str.len = r->port_end - r->port_start;
     req->parsed_uri.port = ngx_atoi(str.data, str.len);
-    req->parsed_uri.port_str = (char *)ngx_pstrdup(r->pool, &str);
+    req->parsed_uri.port_str = (char *)ngx_pstrdup0(r->pool, &str);
 
     req->parsed_uri.query = req->args;
     req->parsed_uri.dns_looked_up = 0;
     req->parsed_uri.dns_resolved = 0;
 
-    // req->parsed_uri.password = (char *)ngx_pstrdup(r->pool, &r->headers_in.passwd);
-    // req->parsed_uri.user = (char *)ngx_pstrdup(r->pool, &r->headers_in.user);
-    req->parsed_uri.fragment = (char *)ngx_pstrdup(r->pool, &r->exten);
+    // req->parsed_uri.password = (char *)ngx_pstrdup0(r->pool, &r->headers_in.passwd);
+    // req->parsed_uri.user = (char *)ngx_pstrdup0(r->pool, &r->headers_in.user);
+    req->parsed_uri.fragment = (char *)ngx_pstrdup0(r->pool, &r->exten);
 
-    req->hostname = (char *)ngx_pstrdup(r->pool, (ngx_str_t *)&ngx_cycle->hostname);
+    req->hostname = (char *)ngx_pstrdup0(r->pool, (ngx_str_t *)&ngx_cycle->hostname);
 
     req->header_only = r->header_only ? r->header_only : (r->method == NGX_HTTP_HEAD);
 
@@ -307,7 +324,7 @@ ngx_http_modsecurity_load_headers_in(ngx_http_request_t *r)
 
     req->ap_auth_type = (char *)apr_table_get(req->headers_in, "Authorization");
 
-    req->user = (char *)ngx_pstrdup(r->pool, &r->headers_in.user);
+    req->user = (char *)ngx_pstrdup0(r->pool, &r->headers_in.user);
 
 
 
@@ -580,7 +597,7 @@ ngx_http_modsecurity_load_headers_out(ngx_http_request_t *r)
     req = ctx->req;
 
     req->status = r->headers_out.status;
-    req->status_line = (char *)ngx_pstrdup(r->pool, &r->headers_out.status_line);
+    req->status_line = (char *)ngx_pstrdup0(r->pool, &r->headers_out.status_line);
 
     if (r->headers_out.charset.len) {
 
@@ -1217,7 +1234,7 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
         /* fill apr_sockaddr_t */
         asa = ngx_palloc(r->pool, sizeof(apr_sockaddr_t));
         asa->pool = ctx->connection->pool;
-        asa->hostname = (char *)ngx_pstrdup(r->pool, &r->connection->addr_text);
+        asa->hostname = (char *)ngx_pstrdup0(r->pool, &r->connection->addr_text);
         asa->servname = asa->hostname;
         asa->next = NULL;
         asa->salen = r->connection->socklen;
