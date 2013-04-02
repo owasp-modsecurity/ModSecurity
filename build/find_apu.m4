@@ -10,6 +10,8 @@ APU_CONFIG=""
 APU_CFLAGS=""
 APU_LDFLAGS=""
 APU_LDADD=""
+APU_INCLUDEDIR=""
+APU_LINKLD=""
 
 AC_DEFUN([CHECK_APU],
 [dnl
@@ -18,7 +20,7 @@ AC_ARG_WITH(
     apu,
     [AC_HELP_STRING([--with-apu=PATH],[Path to apu prefix or config script])],
     [test_paths="${with_apu}"],
-    [test_paths="/usr/local/libapr-util /usr/local/apr-util /usr/local/libapu /usr/local/apu /usr/local /opt/libapr-util /opt/apr-util /opt/libapu /opt/apu /opt /usr"])
+    [test_paths="/usr/local/libapr-util /usr/local/apr-util /usr/local/libapu /usr/local/apu /usr/local/apr /usr/local /opt/libapr-util /opt/apr-util /opt/libapu /opt/apu /opt /usr"])
 
 AC_MSG_CHECKING([for libapu config script])
 
@@ -60,6 +62,10 @@ if test -n "${apu_path}"; then
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu LDFLAGS: $APU_LDFLAGS); fi
     APU_LDADD="`${APU_CONFIG} --link-libtool`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu LDADD: $APU_LDADD); fi
+    APU_INCLUDEDIR="`${APU_CONFIG} --includedir`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu INCLUDEDIR: $APU_INCLUDEDIR); fi
+    APU_LINKLD="`${APU_CONFIG} --link-ld`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu LINKLD: $APU_LINKLD); fi
 else
     AC_MSG_RESULT([no])
 fi
@@ -69,6 +75,8 @@ AC_SUBST(APU_VERSION)
 AC_SUBST(APU_CFLAGS)
 AC_SUBST(APU_LDFLAGS)
 AC_SUBST(APU_LDADD)
+AC_SUBST(APU_INCLUDEDIR)
+AC_SUBST(APU_LINKLD)
 
 if test -z "${APU_VERSION}"; then
     AC_MSG_NOTICE([*** apu library not found.])
