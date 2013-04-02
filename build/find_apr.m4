@@ -11,7 +11,8 @@ APR_CFLAGS=""
 APR_CPPFLAGS=""
 APR_LDFLAGS=""
 APR_LDADD=""
-
+APR_INCLUDEDIR=""
+APR_LINKLD=""
 AC_DEFUN([CHECK_APR],
 [dnl
 
@@ -63,6 +64,10 @@ if test -n "${apr_path}"; then
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apr LDFLAGS: $APR_LDFLAGS); fi
     APR_LDADD="`${APR_CONFIG} --link-libtool`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apr LDADD: $APR_LDADD); fi
+    APR_INCLUDEDIR="`${APR_CONFIG} --includedir`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apr INCLUDEDIR: $APR_INCLUDEDIR); fi
+    APR_LINKLD="`${APR_CONFIG} --link-ld`"
+    if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apr LINKLD: $APR_LINKLD); fi
 else
     AC_MSG_RESULT([no])
 fi
@@ -73,6 +78,8 @@ AC_SUBST(APR_CFLAGS)
 AC_SUBST(APR_CPPFLAGS)
 AC_SUBST(APR_LDFLAGS)
 AC_SUBST(APR_LDADD)
+AC_SUBST(APR_INCLUDEDIR)
+AC_SUBST(APR_LINKLD)
 
 if test -z "${APR_VERSION}"; then
     AC_MSG_NOTICE([*** apr library not found.])
