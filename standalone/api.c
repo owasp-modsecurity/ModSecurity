@@ -223,40 +223,10 @@ apr_status_t ap_http_in_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 }
 
 apr_status_t ap_http_out_filter(ap_filter_t *f, apr_bucket_brigade *b)  {
-    modsec_rec *msr = (modsec_rec *)f->ctx;
     apr_status_t rc;
-    apr_bucket_brigade *bb_out;
-    
-    bb_out = modsecGetResponseBrigade(f->r);
+    apr_bucket_brigade *bb_out = (apr_bucket_brigade *)f->ctx;
 
-
-    if (bb_out) {
-        APR_BRIGADE_CONCAT(bb_out, b);
-        return APR_SUCCESS;
-    }
-
-    // is there a way to tell whether the response body was modified or not?
-    //
-    if((msr->txcfg->content_injection_enabled || msr->content_prepend_len != 0 || msr->content_append_len != 0)
-            && msr->txcfg->resbody_access)   {
-
-        if (modsecWriteResponse != NULL) {
-            char *data = NULL;
-            apr_size_t length;
-
-            rc = apr_brigade_pflatten(msr->of_brigade, &data, &length, msr->mp);
-
-            if (rc != APR_SUCCESS) {
-                msr_log(msr, 1, "Output filter: Failed to flatten brigade (%d): %s", rc,
-                        get_apr_error(msr->mp, rc));
-                return -1;
-            }
-
-            /* TODO: return ?*/
-            modsecWriteResponse(msr->r, data, msr->stream_output_length);
-        }
-    }
-
+    APR_BRIGADE_CONCAT(bb_out, b);
     return APR_SUCCESS;
 }
 
@@ -551,74 +521,117 @@ int modsecIsResponseBodyAccessEnabled(request_rec *r)
 }
 
 int modsecProcessResponse(request_rec *r)   {
-    int status = DECLINED;
+    int status;
+    modsec_rec *msr;
+    apr_bucket *e;
+    ap_filter_t *f;
+    apr_bucket_brigade *bb_in, *bb_out, *bb;
 
-    if(r->output_filters != NULL)   {
-        modsec_rec *msr = (modsec_rec *)r->output_filters->ctx;
-        char buf[8192];
-        char *tmp = NULL;
-        apr_bucket *e = NULL;
+    if(r->output_filters == NULL) {
+        return DECLINED;
+    }
+
+    msr = (modsec_rec *)r->output_filters->ctx;
+    if (msr == NULL) {
+        ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
+                "ModSecurity: Internal Error: msr is null in output filter.");
+        ap_remove_output_filter(r->output_filters);
+        return APR_EGENERAL;
+    }
+
+    msr->r = r;
+
+    /* create input response brigade */
+    bb_in = apr_brigade_create(msr->mp, r->connection->bucket_alloc);
+
+    if (bb_in == NULL) {
+        msr_log(msr, 1, "Process response: Failed to create brigade.");
+        return APR_EGENERAL;
+    }
+
+    /* get input response brigade */
+    bb = modsecGetResponseBrigade(r);
+    if (bb != NULL) {
+        APR_BRIGADE_CONCAT(bb_in, bb);
+        if (!APR_BUCKET_IS_EOS(APR_BRIGADE_LAST(bb_in))) {
+            e = apr_bucket_eos_create(bb_in->bucket_alloc);
+            APR_BRIGADE_INSERT_TAIL(bb_in, e);
+        }
+    } else if (modsecReadResponse != NULL) {
         unsigned int readcnt = 0;
         int is_eos = 0;
-        ap_filter_t *f = NULL;
-        apr_bucket_brigade *bb_in, *bb = NULL;
+        char buf[8192];
+        while(!is_eos)  {
+            modsecReadResponse(r, buf, 8192, &readcnt, &is_eos);
 
-        if (msr == NULL) {
-            ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
-                    "ModSecurity: Internal Error: msr is null in output filter.");
-            ap_remove_output_filter(r->output_filters);
-            return send_error_bucket(msr, r->output_filters, HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        bb = apr_brigade_create(msr->mp, r->connection->bucket_alloc);
-
-        if (bb == NULL) {
-            msr_log(msr, 1, "Process response: Failed to create brigade.");
-            return APR_EGENERAL;
-        }
-
-        msr->r = r;
-        
-        bb_in = modsecGetResponseBrigade(r);
-
-        if (bb_in != NULL) {
-            APR_BRIGADE_CONCAT(bb, bb_in);
-            if (!APR_BUCKET_IS_EOS(APR_BRIGADE_LAST(bb))) {
-                e = apr_bucket_eos_create(bb->bucket_alloc);
-                APR_BRIGADE_INSERT_TAIL(bb, e);
+            if(readcnt > 0) {
+                char *tmp = (char *)apr_palloc(r->pool, readcnt);
+                memcpy(tmp, buf, readcnt);
+                e = apr_bucket_pool_create(tmp, readcnt, r->pool, r->connection->bucket_alloc);
+                APR_BRIGADE_INSERT_TAIL(bb_in, e);
             }
-        } else if (modsecReadResponse != NULL) {
-            while(!is_eos)  {
-                modsecReadResponse(r, buf, 8192, &readcnt, &is_eos);
+        }
 
-                if(readcnt > 0) {
-                    tmp = (char *)apr_palloc(r->pool, readcnt);
-                    memcpy(tmp, buf, readcnt);
-                    e = apr_bucket_pool_create(tmp, readcnt, r->pool, r->connection->bucket_alloc);
-                    APR_BRIGADE_INSERT_TAIL(bb, e);
-                }
+        e = apr_bucket_eos_create(r->connection->bucket_alloc);
+        APR_BRIGADE_INSERT_TAIL(bb_in, e);
+    } else {
+        /* cannot read response body process header only */
+
+        e = apr_bucket_eos_create(r->connection->bucket_alloc);
+        APR_BRIGADE_INSERT_TAIL(bb_in, e);
+    }
+
+    bb_out = bb ? bb : apr_brigade_create(msr->mp, r->connection->bucket_alloc);
+
+    if (bb_out == NULL) {
+        msr_log(msr, 1, "Process response: Failed to create brigade.");
+        return APR_EGENERAL;
+    }
+
+    /* concat output bucket to bb_out */
+    f = ap_add_output_filter("HTTP_OUT", bb_out, r, r->connection);
+    status = ap_pass_brigade(r->output_filters, bb_in);
+    ap_remove_output_filter(f);
+
+    if (status == APR_EGENERAL) {
+        /* retrive response status from bb_out */
+        for(e = APR_BRIGADE_FIRST(bb_out);
+                e != APR_BRIGADE_SENTINEL(bb_out);
+                e = APR_BUCKET_NEXT(e)) {
+            if (AP_BUCKET_IS_ERROR(e)) {
+                return ((ap_bucket_error*) e->data)->status;
             }
-
-            e = apr_bucket_eos_create(r->connection->bucket_alloc);
-            APR_BRIGADE_INSERT_TAIL(bb, e);
-        } else {
-            /* cannot read response body process header only */
-
-            e = apr_bucket_eos_create(r->connection->bucket_alloc);
-            APR_BRIGADE_INSERT_TAIL(bb, e);
         }
-        
-        f = ap_add_output_filter("HTTP_OUT", msr, r, r->connection);
-        status = ap_pass_brigade(r->output_filters, bb);
-        ap_remove_output_filter(f);
-        if(status > 0
-                && msr->intercept_actionset->intercept_status != 0)  {
-            status =  msr->intercept_actionset->intercept_status;
-        }
+        return APR_EGENERAL;
+    }
+
+    if (status != DECLINED) {
         return status;
     }
 
-    return status;
+    /* copy bb_out */
+    // is there a way to tell whether the response body was modified or not?
+    if (modsecWriteResponse != NULL
+            && (msr->txcfg->content_injection_enabled || msr->content_prepend_len != 0 || msr->content_append_len != 0)
+            && msr->txcfg->resbody_access)   {
+
+        char *data = NULL;
+        apr_size_t length;
+
+        status = apr_brigade_pflatten(msr->of_brigade, &data, &length, msr->mp);
+
+        if (status != APR_SUCCESS) {
+            msr_log(msr, 1, "Output filter: Failed to flatten brigade (%d): %s", status,
+                    get_apr_error(msr->mp, status));
+            return APR_EGENERAL;
+        }
+
+        if ( modsecWriteResponse(msr->r, data, msr->stream_output_length) != APR_SUCCESS) {
+            return APR_EGENERAL;
+        }
+    }
+    
+    return DECLINED;
 }
 
 int modsecFinishRequest(request_rec *r) {
