@@ -52,7 +52,6 @@ static ngx_int_t ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_cha
 static ngx_int_t ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf);
 static ngx_int_t ngx_http_modsecurity_init(ngx_conf_t *cf);
 static ngx_int_t ngx_http_modsecurity_init_process(ngx_cycle_t *cycle);
-static void ngx_http_modsecurity_exit_process(ngx_cycle_t *cycle);
 static void *ngx_http_modsecurity_create_loc_conf(ngx_conf_t *cf);
 static char *ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child);
 static char *ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
@@ -60,6 +59,7 @@ static char *ngx_http_modsecurity_enable(ngx_conf_t *cf, ngx_command_t *cmd, voi
 
 static ngx_http_modsecurity_ctx_t * ngx_http_modsecurity_create_ctx(ngx_http_request_t *r);
 static int ngx_http_modsecurity_drop_action(request_rec *r);
+static void ngx_http_modsecurity_finalize(void *data);
 static void ngx_http_modsecurity_cleanup(void *data);
 
 static int ngx_http_modsecurity_save_headers_in_visitor(void *data, const char *key, const char *value);
@@ -113,8 +113,8 @@ ngx_module_t ngx_http_modsecurity = {
     ngx_http_modsecurity_init_process, /* init process */
     NULL, /* init thread */
     NULL, /* exit thread */
-    ngx_http_modsecurity_exit_process, /* exit process */
-    ngx_http_modsecurity_exit_process, /* exit master */
+    NULL, /* exit process */
+    NULL, /* exit master */
     NGX_MODULE_V1_PADDING
 };
 
@@ -122,7 +122,6 @@ static ngx_http_output_header_filter_pt  ngx_http_next_header_filter;
 static ngx_http_output_body_filter_pt    ngx_http_next_body_filter;
 
 static ngx_http_upstream_t ngx_http_modsecurity_upstream;
-static ngx_uint_t          ngx_http_modsecurity_term = 0;
 
 static struct {
     char      *name;
@@ -883,7 +882,8 @@ modsec_pcre_free(void *ptr)
 static ngx_int_t
 ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
 {
-    server_rec *s;
+    server_rec          *s;
+    ngx_pool_cleanup_t  *cln;
 
     /*  XXX: temporary hack, nginx uses pcre as well and hijacks these two */
     pcre_malloc = modsec_pcre_malloc;
@@ -898,6 +898,12 @@ ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
         return NGX_ERROR;
     }
 
+    cln = ngx_pool_cleanup_add(cf->pool, 0);
+    if (cln == NULL) {
+        return NGX_ERROR;
+    }
+    cln->handler = ngx_http_modsecurity_finalize;
+
     /* set host name */
     s->server_hostname = ngx_palloc(cf->pool, ngx_cycle->hostname.len + 1);
     if (s->server_hostname == NULL) {
@@ -911,6 +917,12 @@ ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
 }
 
 
+static void
+ngx_http_modsecurity_finalize(void *data)
+{
+    modsecTerminate();
+}
+
 
 static ngx_int_t
 ngx_http_modsecurity_init(ngx_conf_t *cf)
@@ -921,9 +933,6 @@ ngx_http_modsecurity_init(ngx_conf_t *cf)
     modsecFinalizeConfig();
 
     cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module);
-    if (cmcf == NULL) {
-        return NGX_ERROR;
-    }
 
     h = ngx_array_push(&cmcf->phases[NGX_HTTP_PREACCESS_PHASE].handlers);
     if (h == NULL) {
@@ -946,22 +955,10 @@ ngx_http_modsecurity_init(ngx_conf_t *cf)
 static ngx_int_t
 ngx_http_modsecurity_init_process(ngx_cycle_t *cycle)
 {
+    /* must set log hook here cf->log maybe changed */
     modsecSetLogHook(cycle->log, modsecLog);
     modsecInitProcess();
     return NGX_OK;
-}
-
-
-static void
-ngx_http_modsecurity_exit_process(ngx_cycle_t *cycle)
-{
-    /* ngx_single_process_cycle will call master and worker exit_process twice */
-	if (ngx_http_modsecurity_term) {
-		return;
-	}
-
-	ngx_http_modsecurity_term = 1;
-    modsecTerminate();
 }
 
 
