@@ -467,7 +467,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 
                     var->value = apr_psprintf(msr->mp, "%d", newval);
                     var->value_len = strlen(var->value);
-                    
+
                     if (msr->txcfg->debuglog_level >= 9) {
                         msr_log(msr, 9, "collection_store: Delta applied for %s.%s %d->%d (%d): %d + (%d) = %d [%s,%d]",
                         log_escape_ex(msr->mp, var_name->value, var_name->value_len),
@@ -490,7 +490,12 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     /* Now generate the binary object. */
     blob = apr_pcalloc(msr->mp, blob_size);
     if (blob == NULL) {
-        goto error;
+        if (dbm != NULL) {
+            apr_sdbm_unlock(dbm);
+            apr_sdbm_close(dbm);
+        }
+
+        return -1;
     }
 
     blob[0] = 0x49;
@@ -542,10 +547,16 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     rc = apr_sdbm_store(dbm, key, value, APR_SDBM_REPLACE);
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "collection_store: Failed to write to DBM file \"%s\": %s", dbm_filename,
-            get_apr_error(msr->mp, rc));
-        goto error;
+                get_apr_error(msr->mp, rc));
+        if (dbm != NULL) {
+            apr_sdbm_unlock(dbm);
+            apr_sdbm_close(dbm);
+        }
+
+        return -1;
     }
 
+    apr_sdbm_unlock(dbm);
     apr_sdbm_close(dbm);
 
     if (msr->txcfg->debuglog_level >= 4) {
@@ -557,11 +568,6 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     return 0;
 
 error:
-
-    if (dbm) {
-        apr_sdbm_close(dbm);
-    }
-
     return -1;
 }
 
