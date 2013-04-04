@@ -369,7 +369,7 @@ static int msre_op_ipmatchFromFile_execute(modsec_rec *msr, msre_rule *rule, msr
 /* rsub */
 
 static char *param_remove_escape(msre_rule *rule, char *str, int len)  {
-    char *parm = apr_palloc(rule->ruleset->mp, len);
+    char *parm = apr_pcalloc(rule->ruleset->mp, len);
     char *ret = parm;
 
     for(;*str!='\0';str++)    {
