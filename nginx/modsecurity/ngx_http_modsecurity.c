@@ -122,6 +122,7 @@ static ngx_http_output_header_filter_pt  ngx_http_next_header_filter;
 static ngx_http_output_body_filter_pt    ngx_http_next_body_filter;
 
 static ngx_http_upstream_t ngx_http_modsecurity_upstream;
+static ngx_uint_t          ngx_http_modsecurity_term = 0;
 
 static struct {
     char      *name;
@@ -950,9 +951,16 @@ ngx_http_modsecurity_init_process(ngx_cycle_t *cycle)
     return NGX_OK;
 }
 
+
 static void
 ngx_http_modsecurity_exit_process(ngx_cycle_t *cycle)
 {
+    /* ngx_single_process_cycle will call master and worker exit_process twice */
+	if (ngx_http_modsecurity_term) {
+		return;
+	}
+
+	ngx_http_modsecurity_term = 1;
     modsecTerminate();
 }
 
