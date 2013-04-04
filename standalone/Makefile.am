@@ -83,7 +83,7 @@ install-exec-hook: $(pkglib_LTLIBRARIES)
 	echo "CORE_MODULES=\"\$$CORE_MODULES ngx_pool_context_module\"" >> ../nginx/modsecurity/config; \
 	echo "HTTP_AUX_FILTER_MODULES=\"ngx_http_modsecurity \$$HTTP_AUX_FILTER_MODULES\"" >> ../nginx/modsecurity/config; \
 	echo "NGX_ADDON_SRCS=\"\$$NGX_ADDON_SRCS \$$ngx_addon_dir/ngx_http_modsecurity.c \$$ngx_addon_dir/apr_bucket_nginx.c \$$ngx_addon_dir/ngx_pool_context.c\"" >> ../nginx/modsecurity/config;\
-	echo "NGX_ADDON_DEPS=\"\$$NGX_ADDON_DEPS \$$ngx_addon_dir/apr_bucket_nginx.h \$$ngx_addon_dir/ngx_pool_context.h\"" >> ../nginx/modsecurity/config; \
+	echo "NGX_ADDON_DEPS=\"\$$NGX_ADDON_DEPS \$$ngx_addon_dir/apr_bucket_nginx.h \$$ngx_addon_dir/ngx_pool_context.h \$$ngx_addon_dir/ngx_http_modsecurity.c \$$ngx_addon_dir/apr_bucket_nginx.c \$$ngx_addon_dir/ngx_pool_context.c\"" >> ../nginx/modsecurity/config; \
 	echo "CORE_LIBS=\"\$$CORE_LIBS \$$ngx_addon_dir/../../standalone/.libs/standalone.a $(standalone_LIBS) \"" >> ../nginx/modsecurity/config; \
 	echo "CORE_INCS=\"\$$CORE_INCS \$$ngx_addon_dir \$$ngx_addon_dir/../../standalone \$$ngx_addon_dir/../../apache2 $(standalone_INCS)\"" >> ../nginx/modsecurity/config; \
 	echo "Removing unused static libraries..."; \
