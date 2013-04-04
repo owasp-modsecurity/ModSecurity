@@ -170,6 +170,7 @@ static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
 
     /* Would storing this chunk mean going over the limit? */
     if ((msr->msc_reqbody_spilltodisk)
+        && (msr->txcfg->reqbody_buffering != REQUEST_BODY_FORCEBUF_ON)
         && (msr->msc_reqbody_length + length > (apr_size_t)msr->txcfg->reqbody_inmemory_limit))
     {
         msc_data_chunk **chunks;
