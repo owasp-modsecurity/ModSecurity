@@ -2346,7 +2346,7 @@ static const char *cmd_hash_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
         dcfg->hash_is_enabled = HASH_DISABLED;
         dcfg->hash_enforcement = HASH_DISABLED;
     }
-    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SexHashEngine: %s", p1);
+    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecHashEngine: %s", p1);
 
     return NULL;
 }
