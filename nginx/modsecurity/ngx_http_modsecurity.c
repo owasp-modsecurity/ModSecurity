@@ -1077,16 +1077,17 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
     const char                      *location;
     ngx_table_elt_t                 *h;
     ngx_int_t                        rc;
-   
+
 
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
 
+    /* already processed, checking redirect action. */
     if (ctx && ctx->complete 
                && r->err_status >= NGX_HTTP_MOVED_PERMANENTLY
                && r->err_status < 308) {
 
-        /* 3XX load redirect location header so that we can do redirec in phase 3,4 */
+        /* 3XX load redirect location header so that we can do redirect in phase 3,4 */
         location = apr_table_get(ctx->req->headers_out, "Location");
 
         if (location == NULL) {
@@ -1113,7 +1114,8 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: header filter");
 
-    if (r->method == NGX_HTTP_HEAD || r->header_only) {
+    /* header only or SecResponseBodyAccess off */
+    if (r->header_only || (!modsecIsResponseBodyAccessEnabled(ctx->req)) ) {
 
         ctx->complete = 1;
 
@@ -1126,17 +1128,18 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
         rc = ngx_http_modsecurity_status(r, modsecProcessResponse(ctx->req));
 
         if (rc != NGX_DECLINED) {
-            return rc;
+            return ngx_http_filter_finalize_request(r, &ngx_http_modsecurity, rc);
         }
 
         if (ngx_http_modsecurity_save_headers_in(r) != NGX_OK
                 || ngx_http_modsecurity_save_headers_out(r) != NGX_OK) {
-            return NGX_HTTP_INTERNAL_SERVER_ERROR;
+            return ngx_http_filter_finalize_request(r, &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return ngx_http_next_header_filter(r);
     }
 
+    /* SecResponseBodyAccess on, process rules in body filter */
     return NGX_OK;
 }
 
