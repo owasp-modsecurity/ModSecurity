@@ -1162,15 +1162,21 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: body filter");
 
     if (in == NULL) {
+        /* waiting for more buffer */
+        r->buffered |= NGX_HTTP_SSI_BUFFERED;
         return NGX_AGAIN;
     }
 
     rc = move_chain_to_brigade(in, ctx->brigade, r->pool, 0);
     if (rc != NGX_OK)  {
+        /* waiting for more buffer */
+        r->buffered |= NGX_HTTP_SSI_BUFFERED;
         return rc;
     }
 
     /* last buf has been saved */
+    r->buffered &= ~NGX_HTTP_SSI_BUFFERED;
+
     ctx->complete = 1;
     modsecSetResponseBrigade(ctx->req, ctx->brigade);
 
