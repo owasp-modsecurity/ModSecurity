@@ -1140,6 +1140,7 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
     }
 
     /* SecResponseBodyAccess on, process rules in body filter */
+    r->filter_need_in_memory = 1;
     return NGX_OK;
 }
 
