@@ -23,6 +23,10 @@
 #include "msc_tree.h"
 #include "msc_crypt.h"
 
+#include "libinjection/sqlparse.h"
+#include "libinjection/sqli_normalize.h"
+#include "libinjection/sqli_fingerprints.h"
+
 #if APR_HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
@@ -2224,9 +2228,28 @@ static int msre_op_containsWord_execute(modsec_rec *msr, msre_rule *rule, msre_v
     return 0;
 }
 
+/* libinjection issqli */
+static int msre_op_issqli_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+    /* make a copy of the string to normalize it */
+    /* this could be done using Lua code */
+    int issqli;
+    sfilter sf;
+    size_t slen = var->value_len;
+    char* scopy = (char*) apr_pcalloc(msr->mp, slen);
+    memcpy(scopy, var->value, slen);
+    slen = sqli_qs_normalize(scopy, slen);
+
+    /* is_sqli_pattern right is a hardwired set of sqli fingering
+     * prints.  In future, change to read from file
+     */
+    issqli = is_sqli(&sf, scopy, slen,  is_sqli_pattern);
+    return issqli;
+}
+
 /* streq */
 
 static int msre_op_streq_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+
     msc_string *str = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
     const char *match = NULL;
     const char *target;
@@ -4493,6 +4516,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "contains",
         NULL, /* ENH init function to flag var substitution */
         msre_op_contains_execute
+    );
+
+    /* issqli */
+    msre_engine_op_register(engine,
+        "issqli",
+         NULL,
+         msre_op_issqli_execute
     );
 
     /* containsWord */

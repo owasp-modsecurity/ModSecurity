@@ -21,7 +21,13 @@ msc_test_SOURCES = msc_test.c \
                    $(top_srcdir)/apache2/msc_gsb.c \
                    $(top_srcdir)/apache2/acmp.c \
                    $(top_srcdir)/apache2/msc_lua.c \
-                   $(top_srcdir)/apache2/msc_release.c
+                   $(top_srcdir)/apache2/msc_release.c \
+                   $(top_srcdir)/apache2/libinjection/modp_ascii.c \
+                   $(top_srcdir)/apache2/libinjection/modp_burl.c \
+                   $(top_srcdir)/apache2/libinjection/modp_xml.c \
+                   $(top_srcdir)/apache2/libinjection/sqli_normalize.c \
+                   $(top_srcdir)/apache2/libinjection/sqlparse.c
+
 msc_test_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
                   @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @MODSEC_EXTRA_CFLAGS@ @LUA_CFLAGS@
 msc_test_CPPFLAGS = -I$(top_srcdir)/apache2 \
