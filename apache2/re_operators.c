@@ -2235,6 +2235,9 @@ static int msre_op_issqli_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
     int issqli;
     sfilter sf;
     size_t slen = var->value_len;
+    if (slen == 0) {
+        return 0;
+    }
     char* scopy = (char*) apr_pcalloc(msr->mp, slen);
     memcpy(scopy, var->value, slen);
     slen = sqli_qs_normalize(scopy, slen);
