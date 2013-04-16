@@ -2229,23 +2229,13 @@ static int msre_op_containsWord_execute(modsec_rec *msr, msre_rule *rule, msre_v
 
 /* libinjection issqli */
 static int msre_op_issqli_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    /* make a copy of the string to normalize it */
-    /* this could be done using Lua code */
     int issqli;
     sfilter sf;
-    size_t slen = var->value_len;
-    if (slen == 0) {
-        return 0;
-    }
-    char* scopy = (char*) apr_pcalloc(msr->mp, slen);
-
-    /** to be removed ** /
-    modp_toupper_copy(scopy, var->value, slen);
 
     /* is_sqli_pattern right is a hardwired set of sqli fingering
      * prints.  In future, change to read from file
      */
-    issqli = is_sqli(&sf, scopy, slen,  is_sqli_pattern);
+    issqli = is_sqli(&sf, var->value, var->value_len, is_sqli_pattern);
     return issqli;
 }
 

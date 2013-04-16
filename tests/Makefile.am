@@ -22,7 +22,6 @@ msc_test_SOURCES = msc_test.c \
                    $(top_srcdir)/apache2/acmp.c \
                    $(top_srcdir)/apache2/msc_lua.c \
                    $(top_srcdir)/apache2/msc_release.c \
-                   $(top_srcdir)/apache2/libinjection/modp_ascii.c \
                    $(top_srcdir)/apache2/libinjection/sqlparse.c
 
 msc_test_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
