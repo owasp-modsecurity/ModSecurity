@@ -24,7 +24,6 @@
 #include "msc_crypt.h"
 
 #include "libinjection/sqlparse.h"
-#include "libinjection/sqli_normalize.h"
 #include "libinjection/sqli_fingerprints.h"
 
 #if APR_HAVE_ARPA_INET_H
@@ -2239,8 +2238,9 @@ static int msre_op_issqli_execute(modsec_rec *msr, msre_rule *rule, msre_var *va
         return 0;
     }
     char* scopy = (char*) apr_pcalloc(msr->mp, slen);
-    memcpy(scopy, var->value, slen);
-    slen = sqli_qs_normalize(scopy, slen);
+
+    /** to be removed ** /
+    modp_toupper_copy(scopy, var->value, slen);
 
     /* is_sqli_pattern right is a hardwired set of sqli fingering
      * prints.  In future, change to read from file
