@@ -38,6 +38,7 @@ typedef struct msc_parm msc_parm;
 #include "msc_multipart.h"
 #include "msc_pcre.h"
 #include "msc_util.h"
+#include "msc_json.h"
 #include "msc_xml.h"
 #include "msc_geo.h"
 #include "msc_gsb.h"
@@ -360,6 +361,7 @@ struct modsec_rec {
     multipart_data      *mpd;                        /* MULTIPART processor data structure */
 
     xml_data            *xml;                        /* XML processor data structure       */
+    json_data           *json;                       /* JSON processor data structure      */
 
     /* audit logging */
     char                *new_auditlog_boundary;

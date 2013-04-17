@@ -697,6 +697,9 @@ if test "$build_mlogc" -ne 0; then
 CHECK_CURL()
 fi
 
+# Check for YAJL libs (for JSON body processor)
+AC_SEARCH_LIBS([yajl_alloc], [yajl])
+
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([tools/Makefile])
 if test "$build_alp2" -ne 0; then
