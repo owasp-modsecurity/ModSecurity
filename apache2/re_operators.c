@@ -2229,13 +2229,23 @@ static int msre_op_containsWord_execute(modsec_rec *msr, msre_rule *rule, msre_v
 
 /* libinjection issqli */
 static int msre_op_issqli_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    int issqli;
     sfilter sf;
-
     /* is_sqli_pattern right is a hardwired set of sqli fingering
      * prints.  In future, change to read from file
      */
-    issqli = is_sqli(&sf, var->value, var->value_len, is_sqli_pattern);
+
+    int issqli = is_sqli(&sf, var->value, var->value_len, is_sqli_pattern);
+
+    if (issqli) {
+        if (msr->txcfg->debuglog_level >= 4) {
+            msr_log(msr, 4, "ISSQL: input is sqli with fingerprint '%s'", sf.pat);
+        }
+    } else {
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "ISSQL: input is not sqli");
+        }
+    }
+
     return issqli;
 }
 
