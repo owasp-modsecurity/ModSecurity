@@ -1108,7 +1108,7 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
         return ngx_http_next_header_filter(r);
     }
 
-    if (r != r->main || !cf->enable || ctx->complete) {
+    if (r != r->main || !cf->enable || ctx == NULL ||ctx->complete) {
         return ngx_http_next_header_filter(r);
     }
 
@@ -1140,6 +1140,10 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
     }
 
     /* SecResponseBodyAccess on, process rules in body filter */
+
+    /* pretend we are ngx_http_header_filter */
+    r->header_sent = 1;
+
     r->filter_need_in_memory = 1;
     return NGX_OK;
 }
@@ -1156,7 +1160,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
 
-    if (r != r->main || !cf->enable || ctx->complete) {
+    if (r != r->main || !cf->enable || ctx == NULL || ctx->complete) {
         return ngx_http_next_body_filter(r, in);
     }
 
@@ -1212,6 +1216,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
         r->headers_out.content_length = NULL; /* header filter will set this */
     }
 
+    r->header_sent = 0;
     rc = ngx_http_next_header_filter(r);
 
     if (rc == NGX_ERROR || rc > NGX_OK) {
