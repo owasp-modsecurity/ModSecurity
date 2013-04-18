@@ -2228,21 +2228,27 @@ static int msre_op_containsWord_execute(modsec_rec *msr, msre_rule *rule, msre_v
 }
 
 /* libinjection issqli */
+/* links against files in libinjection directory
+ * See www.client9.com/libinjection for details
+ * `is_sqli_pattern` right now is a hardwired set of sqli fingerprints.
+ * In future, change to read from file.
+ */
 static int msre_op_issqli_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     sfilter sf;
-    /* is_sqli_pattern right is a hardwired set of sqli fingering
-     * prints.  In future, change to read from file
-     */
-
     int issqli = is_sqli(&sf, var->value, var->value_len, is_sqli_pattern);
 
     if (issqli) {
-        if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "ISSQL: input is sqli with fingerprint '%s'", sf.pat);
+        *error_msg = apr_psprintf(msr->mp, "detected SQLi using libinjection fingerprint '%s'",
+                                  sf.pat);
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "ISSQL: libinjection fingerprint '%s' matched input '%s'",
+                    sf.pat,
+                    log_escape_ex(msr->mp, var->value, var->value_len));
         }
     } else {
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "ISSQL: input is not sqli");
+            msr_log(msr, 9, "ISSQL: not sqli, no libinjection sqli fingerprint matched input '%s'",
+                    log_escape_ex(msr->mp, var->value, var->value_len));
         }
     }
 
