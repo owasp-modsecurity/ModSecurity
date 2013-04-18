@@ -11,9 +11,10 @@ standalone_la_SOURCES = ../apache2/mod_security2.c \
                            ../apache2/re_variables.c ../apache2/msc_logging.c ../apache2/msc_xml.c \
                            ../apache2/msc_multipart.c ../apache2/modsecurity.c ../apache2/msc_parsers.c \
                            ../apache2/msc_util.c ../apache2/msc_pcre.c ../apache2/persist_dbm.c ../apache2/msc_reqbody.c \
-     			   ../apache2/msc_geo.c ../apache2/msc_gsb.c ../apache2/msc_unicode.c \
-     			   ../apache2/acmp.c ../apache2/msc_lua.c ../apache2/msc_release.c \
-     			   ../apache2/msc_crypt.c ../apache2/msc_tree.c \
+                           ../apache2/msc_geo.c ../apache2/msc_gsb.c ../apache2/msc_unicode.c \
+                           ../apache2/acmp.c ../apache2/msc_lua.c ../apache2/msc_release.c \
+                           ../apache2/msc_crypt.c ../apache2/msc_tree.c \
+                           ../apache2/libinjection/sqlparse.c \
                            api.c buckets.c \
                            config.c filters.c \
                            hooks.c \
