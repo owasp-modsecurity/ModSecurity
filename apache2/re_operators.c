@@ -2239,7 +2239,8 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
     int capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     if (issqli) {
-        set_match_to_tx(msr, capture, sf.pat, 0);
+        if (capture == 1)
+            set_match_to_tx(msr, capture, sf.pat, 0);
 
         *error_msg = apr_psprintf(msr->mp, "detected SQLi using libinjection fingerprint '%s'",
                                   sf.pat);
