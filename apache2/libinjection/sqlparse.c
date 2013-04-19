@@ -387,13 +387,14 @@ size_t parse_slash(sfilter * sf)
     const size_t slen = sf->slen;
     size_t pos = sf->pos;
     const char* cur = cs + pos;
+    size_t inc = 0;
 
     size_t pos1 = pos + 1;
     if (pos1 == slen || cs[pos1] != '*') {
         return parse_operator1(sf);
     }
 
-    size_t inc = is_mysql_comment(cs, slen, pos);
+    inc = is_mysql_comment(cs, slen, pos);
     if (inc == 0) {
 
         // skip over initial '/*'
@@ -446,12 +447,16 @@ size_t parse_operator2(sfilter * sf)
     stoken_t *current = &sf->syntax_current;
     const char *cs = sf->s;
     const size_t slen = sf->slen;
+    char op2[3];
     size_t pos = sf->pos;
 
     if (pos + 1 >= slen) {
         return parse_operator1(sf);
     }
-    char op2[3] = { cs[pos], cs[pos + 1], CHAR_NULL };
+
+    op2[0] = cs[pos];
+    op2[1] = cs[pos + 1];
+    op2[2] = CHAR_NULL;
 
     // Special Hack for MYSQL style comments
     // instead of turning:
@@ -561,6 +566,7 @@ size_t parse_var(sfilter * sf)
     const char *cs = sf->s;
     const size_t slen = sf->slen;
     size_t pos = sf->pos;
+    size_t xlen = 0;
 
     size_t pos1 = pos + 1;
 
@@ -569,9 +575,7 @@ size_t parse_var(sfilter * sf)
         pos1 += 1;
     }
 
-    size_t xlen =
-        strlenspn(cs + pos1, slen - pos1,
-                  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.$");
+    xlen = strlenspn(cs + pos1, slen - pos1, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.$");
     if (xlen == 0) {
         st_assign(current, 'v', cs + pos, (pos1 - pos));
         return pos1;
@@ -587,11 +591,12 @@ size_t parse_number(sfilter * sf)
     const char *cs = sf->s;
     const size_t slen = sf->slen;
     size_t pos = sf->pos;
+    size_t xlen = 0;
+    size_t start = 0;
 
     if (pos + 1 < slen && cs[pos] == '0' && (cs[pos + 1] == 'X' || cs[pos + 1] == 'x')) {
         // TBD compare if isxdigit
-        size_t xlen =
-            strlenspn(cs + pos + 2, slen - pos - 2, "0123456789ABCDEFabcdef");
+        xlen = strlenspn(cs + pos + 2, slen - pos - 2, "0123456789ABCDEFabcdef");
         if (xlen == 0) {
             st_assign_cstr(current, 'n', "0X");
             return pos + 2;
@@ -600,7 +605,7 @@ size_t parse_number(sfilter * sf)
             return pos + 2 + xlen;
         }
     }
-    size_t start = pos;
+    start = pos;
 
     while (isdigit(cs[pos])) {
         pos += 1;
@@ -643,6 +648,7 @@ int parse_token(sfilter * sf)
     const char *s = sf->s;
     const size_t slen = sf->slen;
     size_t *pos = &sf->pos;
+    pt2Function fnptr;
 
     st_clear(current);
 
@@ -657,7 +663,7 @@ int parse_token(sfilter * sf)
             *pos += 1;
             continue;
         }
-        pt2Function fnptr = char_parse_map[ch];
+        fnptr = char_parse_map[ch];
         *pos = (*fnptr) (sf);
         if (current->type != CHAR_NULL) {
             return TRUE;
@@ -675,26 +681,32 @@ void sfilter_reset(sfilter * sf, const char *s, size_t len)
 
 int syntax_merge_words(stoken_t * a, stoken_t * b)
 {
+    size_t sz1 = 0;
+    size_t sz2 = 0;
+    size_t sz3 = 0;
+    char tmp[ST_MAX_SIZE];
+    char ch;
+
     if (!
         (a->type == 'k' || a->type == 'n' || a->type == 'o'
          || a->type == 'U')) {
         return FALSE;
     }
 
-    size_t sz1 = strlen(a->val);
-    size_t sz2 = strlen(b->val);
-    size_t sz3 = sz1 + sz2 + 1;
+    sz1 = strlen(a->val);
+    sz2 = strlen(b->val);
+    sz3 = sz1 + sz2 + 1;
+
     if (sz3 >= ST_MAX_SIZE) {
         return FALSE;
     }
     // oddly annoying  last.val + ' ' + current.val
-    char tmp[ST_MAX_SIZE];
     memcpy(tmp, a->val, sz1);
     tmp[sz1] = ' ';
     memcpy(tmp + sz1 + 1, b->val, sz2);
     tmp[sz3] = CHAR_NULL;
 
-    char ch = bsearch_keyword_type(tmp, multikeywords, multikeywords_sz);
+    ch = bsearch_keyword_type(tmp, multikeywords, multikeywords_sz);
     if (ch != CHAR_NULL) {
         // -1, don't copy the null byte
         st_assign(a, ch, tmp, sz3);
@@ -926,11 +938,12 @@ int filter_fold(sfilter * sf, stoken_t * sout)
 int is_string_sqli(sfilter * sql_state, const char *s, size_t slen,
                     const char delim, ptr_fingerprints_fn fn)
 {
+    int all_done = 0;
+    int tlen = 0;
+    int patmatch = 0;
     sfilter_reset(sql_state, s, slen);
     sql_state->delim = delim;
 
-    int all_done = 0;
-    int tlen = 0;
     while (tlen < MAX_TOKENS) {
         all_done = filter_fold(sql_state, &(sql_state->tokenvec[tlen]));
         if (!all_done) {
@@ -965,7 +978,7 @@ int is_string_sqli(sfilter * sql_state, const char *s, size_t slen,
         return TRUE;
     }
 
-    int patmatch = fn(sql_state->pat);
+    patmatch = fn(sql_state->pat);
 
     if (!patmatch) {
         sql_state->reason = __LINE__;
