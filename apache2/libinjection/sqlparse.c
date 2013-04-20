@@ -7,6 +7,7 @@
  * (setq c-default-style "k&r"
  *     c-basic-offset 4)
  *  indent -kr -nut
+ * test
  */
 
 #include <string.h>
