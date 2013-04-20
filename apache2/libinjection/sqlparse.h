@@ -57,7 +57,7 @@ typedef struct {
     /* final sqli data */
     stoken_t tokenvec[MAX_TOKENS];
 
-    // +1 for possible ending null
+    /*  +1 for possible ending null */
     char pat[MAX_TOKENS + 1];
     char delim;
     int reason;
