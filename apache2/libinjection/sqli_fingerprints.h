@@ -394,6 +394,7 @@ static const char* patmap[] = {
     "1k1U(",
     "1k1Uk",
     "1k1c",
+    "1k1o1",
     "1kU1,",
     "1kUs,",
     "1kUv,",
@@ -526,6 +527,7 @@ static const char* patmap[] = {
     "Ukv,n",
     "Ukv,s",
     "Ukv,v",
+    "f((f(",
     "f((k(",
     "f((kf",
     "f()&f",
@@ -569,6 +571,7 @@ static const char* patmap[] = {
     "f(vov",
     "k()ok",
     "k(1)U",
+    "k(f(1",
     "k(ok(",
     "k(s)U",
     "k(sv)",
@@ -587,9 +590,11 @@ static const char* patmap[] = {
     "k1,vc",
     "k1,vk",
     "k1k(k",
+    "k1kf(",
     "k1o(s",
     "k1o(v",
     "k;non",
+    "kf((f",
     "kf(1)",
     "kf(1,",
     "kf(f(",
@@ -640,7 +645,11 @@ static const char* patmap[] = {
     "knvvn",
     "ko(k(",
     "ko(kf",
+    "ko(n,",
+    "ko(s,",
     "kok(k",
+    "ks&(k",
+    "ks&(o",
     "ks)",
     "ks,1,",
     "ks,1c",
@@ -734,9 +743,13 @@ static const char* patmap[] = {
     "n))&v",
     "n)))&",
     "n)));",
+    "n)))B",
+    "n)))U",
     "n)))k",
     "n)))o",
     "n));k",
+    "n))B1",
+    "n))Uk",
     "n))kk",
     "n))o(",
     "n))o1",
@@ -750,6 +763,8 @@ static const char* patmap[] = {
     "n);kk",
     "n);kn",
     "n);ko",
+    "n)B1c",
+    "n)Uk1",
     "n)k1o",
     "n)kks",
     "n)kkv",
@@ -790,8 +805,10 @@ static const char* patmap[] = {
     "n;kn(",
     "n;ko(",
     "n;kok",
+    "nB1c",
     "nUk(k",
     "nUk1,",
+    "nUk1c",
     "nUkf(",
     "nUkn,",
     "nUks,",
@@ -829,6 +846,7 @@ static const char* patmap[] = {
     "nof(1",
     "nof(s",
     "nof(v",
+    "nok(1",
     "nok(f",
     "nok(k",
     "nok(s",
@@ -2138,7 +2156,7 @@ static const char* patmap[] = {
     "vovso",
     "vovvo",
 };
-static const size_t patmap_sz = 2135;
+static const size_t patmap_sz = 2153;
 
 
 /* Simple binary search */
@@ -2160,4 +2178,5 @@ int is_sqli_pattern(const char *key)
     }
     return 0; /* FALSE */
 }
+
 #endif
