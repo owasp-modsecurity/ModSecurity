@@ -155,17 +155,10 @@ void st_assign_char(stoken_t * st, const char stype, const char value)
 void st_assign(stoken_t * st, const char stype, const char *value,
                size_t len)
 {
-    size_t last = len < (ST_MAX_SIZE - 1) ? len : (ST_MAX_SIZE - 1);
+    size_t last = len < ST_MAX_SIZE ? len : (ST_MAX_SIZE - 1);
     st->type = stype;
-    strncpy(st->val, value, last);
+    memcpy(st->val, value, last);
     st->val[last] = CHAR_NULL;
-}
-
-void st_assign_cstr(stoken_t * st, const char stype, const char *value)
-{
-    st->type = stype;
-    strncpy(st->val, value, ST_MAX_SIZE - 1);
-    st->val[ST_MAX_SIZE - 1] = CHAR_NULL;
 }
 
 void st_copy(stoken_t * dest, const stoken_t * src)
@@ -313,7 +306,7 @@ size_t parse_eol_comment(sfilter * sf)
     const char *endpos =
         (const char *) memchr((const void *) (cs + pos), '\n', slen - pos);
     if (endpos == NULL) {
-        st_assign_cstr(current, 'c', cs + pos);
+        st_assign(current, 'c', cs + pos, slen - pos);
         return slen;
     } else {
         st_assign(current, 'c', cs + pos, endpos - cs - pos);
@@ -404,7 +397,7 @@ size_t parse_slash(sfilter * sf)
             /*
              * unterminated comment
              */
-            st_assign_cstr(current, 'c', cs + pos);
+            st_assign(current, 'c', cs + pos, slen - pos);
             return slen;
         } else {
             /*
@@ -441,7 +434,7 @@ size_t parse_backslash(sfilter * sf)
     size_t pos = sf->pos;
 
     if (pos + 1 < slen && cs[pos + 1] == 'N') {
-        st_assign_cstr(current, '1', "NULL");
+        st_assign(current, '1', "NULL", 4);
         return pos + 2;
     } else {
         return parse_other(sf);
@@ -479,16 +472,16 @@ size_t parse_operator2(sfilter * sf)
         /*
          * special 3-char operator
          */
-        st_assign_cstr(current, 'o', "<=>");
+        st_assign(current, 'o', "<=>", 3);
         return pos + 3;
     } else if (is_operator2(op2)) {
         if (streq(op2, "&&") || streq(op2, "||")) {
-            st_assign_cstr(current, '&', op2);
+            st_assign(current, '&', op2, 2);
         } else {
             /*
              * normal 2 char operator
              */
-            st_assign_cstr(current, 'o', op2);
+            st_assign(current, 'o', op2, 2);
         }
         return pos + 2;
     } else {
@@ -530,7 +523,7 @@ size_t parse_string_core(const char *cs, const size_t len, size_t pos,
              * string ended with no trailing quote
              * assign what we have
              */
-            st_assign_cstr(st, 's', cs + pos + offset);
+            st_assign(st, 's', cs + pos + offset, len - pos - offset);
             st->str_close = CHAR_NULL;
             return len;
         } else if (*(qpos - 1) != '\\') {
@@ -639,6 +632,30 @@ size_t parse_var(sfilter * sf)
     }
 }
 
+size_t parse_money(sfilter *sf)
+{
+    stoken_t *current = &sf->syntax_current;
+    const char *cs = sf->s;
+    const size_t slen = sf->slen;
+    size_t pos = sf->pos;
+    size_t xlen;
+
+    /*
+     * $1,000.00 or $1.000,00 ok!
+     * This also parses $....,,,111 but that's ok
+     */
+    xlen = strlenspn(cs + pos + 1, slen - pos - 1, "0123456789.,");
+    if (xlen == 0) {
+        /*
+         * just ignore '$'
+         */
+        return pos + 1;
+    } else {
+        st_assign(current, '1', cs + pos, 1 + xlen);
+        return pos + 1 + xlen;
+    }
+}
+
 size_t parse_number(sfilter * sf)
 {
     stoken_t *current = &sf->syntax_current;
@@ -655,7 +672,7 @@ size_t parse_number(sfilter * sf)
         xlen =
             strlenspn(cs + pos + 2, slen - pos - 2, "0123456789ABCDEFabcdef");
         if (xlen == 0) {
-            st_assign_cstr(current, 'n', "0X");
+            st_assign(current, 'n', "0X", 2);
             return pos + 2;
         } else {
             st_assign(current, '1', cs + pos, 2 + xlen);
@@ -664,10 +681,10 @@ size_t parse_number(sfilter * sf)
     }
 
     start = pos;
-    while (isdigit(cs[pos])) {
+    while (pos < slen && isdigit(cs[pos])) {
         pos += 1;
     }
-    if (cs[pos] == '.') {
+    if (pos < slen && cs[pos] == '.') {
         pos += 1;
         while (pos < slen && isdigit(cs[pos])) {
             pos += 1;
@@ -678,23 +695,25 @@ size_t parse_number(sfilter * sf)
         }
     }
 
-    if (cs[pos] == 'E' || cs[pos] == 'e') {
-        pos += 1;
-        if (pos < slen && (cs[pos] == '+' || cs[pos] == '-')) {
+    if (pos < slen) {
+        if (cs[pos] == 'E' || cs[pos] == 'e') {
             pos += 1;
+            if (pos < slen && (cs[pos] == '+' || cs[pos] == '-')) {
+                pos += 1;
+            }
+            while (pos < slen && isdigit(cs[pos])) {
+                pos += 1;
+            }
+        } else if (isalpha(cs[pos])) {
+            /*
+             * oh no, we have something like '6FOO'
+             * use microsoft style parsing and take just
+             * the number part and leave the rest to be
+             * parsed later
+             */
+            st_assign(current, '1', cs + start, pos - start);
+            return pos;
         }
-        while (isdigit(cs[pos])) {
-            pos += 1;
-        }
-    } else if (isalpha(cs[pos])) {
-        /*
-         * oh no, we have something like '6FOO'
-         * use microsoft style parsing and take just
-         * the number part and leave the rest to be
-         * parsed later
-         */
-        st_assign(current, '1', cs + start, pos - start);
-        return pos;
     }
 
     st_assign(current, '1', cs + start, pos - start);
@@ -895,7 +914,7 @@ int sqli_tokenize(sfilter * sf, stoken_t * sout)
              */
             if (last->type == 'n' && !cstrcasecmp(last->val, "IN")) {
                 st_copy(last, current);
-                st_assign_cstr(sout, 'f', "IN");
+                st_assign(sout, 'f', "IN", 2);
                 return TRUE;
             } else {
                 /*
