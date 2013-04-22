@@ -60,6 +60,7 @@ int is_operator2(const char *key);
 int is_sqli_pattern(const char *key);
 
 size_t parse_none(sfilter * sf);
+size_t parse_money(sfilter * sf);
 size_t parse_other(sfilter * sf);
 size_t parse_white(sfilter * sf);
 size_t parse_operator1(sfilter *sf);
