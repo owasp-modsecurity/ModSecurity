@@ -579,7 +579,7 @@ struct directory_config {
 
     /* Hash */
     apr_array_header_t  *hash_method;
-    const char *crypto_key;
+    const char          *crypto_key;
     int                 crypto_key_len;
     const char          *crypto_param_name;
     int                 hash_is_enabled;
@@ -598,6 +598,9 @@ struct directory_config {
 
     /* xml */
     int                 xml_external_entity;
+
+    /* remote addr */
+    const char          *remote_define;
 };
 
 struct error_message_t {
