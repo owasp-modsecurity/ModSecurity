@@ -198,6 +198,10 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
     apr_size_t nbytes, nbytes_written;
     apr_file_t *debuglog_fd = NULL;
     int filter_debug_level = 0;
+    char *remote = NULL;
+    char *parse_remote = NULL;
+    char *saved = NULL;
+    char *str = NULL;
     char str1[1024] = "";
     char str2[1256] = "";
 
@@ -268,9 +272,24 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
             "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", r->useragent_ip ? r->useragent_ip : r->connection->client_ip, str1,
             hostname, log_escape(msr->mp, r->uri), unique_id);
 #else
-        ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
-            "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", r->connection->remote_ip, str1,
-            hostname, log_escape(msr->mp, r->uri), unique_id);
+        if(strcasecmp(msr->txcfg->remote_define, "default") == 0)   {
+            ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
+                    "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", r->connection->remote_ip, str1,
+                    hostname, log_escape(msr->mp, r->uri), unique_id);
+        } else  {
+            remote = (char *)apr_table_get(msr->r->headers_in, msr->txcfg->remote_define);
+            if(remote == NULL)  {
+                ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
+                        "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", r->connection->remote_ip, str1,
+                        hostname, log_escape(msr->mp, r->uri), unique_id);
+            } else  {
+                parse_remote = apr_pstrdup(msr->mp, remote);
+                str = apr_strtok(parse_remote, ",", &saved);
+                ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
+                        "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", str, str1,
+                        hostname, log_escape(msr->mp, r->uri), unique_id);
+            }
+        }
 #endif
 
         /* Add this message to the list. */
