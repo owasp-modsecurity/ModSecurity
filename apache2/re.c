@@ -2604,12 +2604,16 @@ static int execute_operator(msre_var *var, msre_rule *rule, modsec_rec *msr,
             rt_time = apr_table_get(msr->perf_rules, rule->actionset->id);
             if(rt_time == NULL) {
                 rt_time = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (t1 - time_before_op));
-                apr_table_setn(msr->perf_rules, rule->actionset->id, rt_time);
+                rule_time = (apr_time_t)atoi(rt_time);
+                if(rule_time >= msr->txcfg->max_rule_time)
+                    apr_table_setn(msr->perf_rules, rule->actionset->id, rt_time);
             } else  {
                 rule_time = (apr_time_t)atoi(rt_time);
                 rule_time += (t1 - time_before_op);
-                rt_time = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, rule_time);
-                apr_table_setn(msr->perf_rules, rule->actionset->id, rt_time);
+                if(rule_time >= msr->txcfg->max_rule_time)  {
+                    rt_time = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, rule_time);
+                    apr_table_setn(msr->perf_rules, rule->actionset->id, rt_time);
+                }
             }
         }
     }
