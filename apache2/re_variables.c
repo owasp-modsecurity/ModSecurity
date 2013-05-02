@@ -3158,7 +3158,6 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_REQUEST_HEADERS
     );
 
-    /* REQBODY_PROCESSOR_ERROR - Deprecated */
     msre_engine_variable_register(engine,
         "SDBM_DELETE_ERROR",
         VAR_SIMPLE,
