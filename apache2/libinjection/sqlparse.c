@@ -32,63 +32,38 @@
 #include "sqlparse_private.h"
 #include "sqlparse_data.h"
 
-/* memmem is a linux function
- *  may not exist in Windows, and doesn't exist
- *  in Mac OS X < 10.8 and FreeBSD < 6.0
- * Define our own.   Modified to use 'const char*'
- * instead of (void *)
- */
-
-/*-
- * Copyright (c) 2005 Pascal Gloor <pascal.gloor@spale.com>
+/* memchr2 finds a string of 2 characters inside another string
+ * This a specialized version of "memmem" or "memchr".
+ * 'memmem' doesn't exist on all platforms
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote
- *    products derived from this software without specific prior written
- *    permission.
+ * Porting notes: this is just a special version of
+ *    astring.find("AB")
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
  */
 const char *
-my_memmem(const char *cl, size_t l_len, const char *cs, size_t s_len)
+memchr2(const char *haystack, size_t haystack_len, char c0, char c1)
 {
-    register const char *cur, *last;
+    const char *cur = haystack;
+    const char *last = haystack + haystack_len - 1;
 
-    /* we need something to compare */
-    if (l_len == 0 || s_len == 0)
+    if (haystack_len < 2) {
         return NULL;
-
-    /* "s" must be smaller or equal to "l" */
-    if (l_len < s_len)
+    }
+    if (c0 == c1) {
         return NULL;
+    }
 
-    /* special case where s_len == 1 */
-    if (s_len == 1)
-        return (const char*) memchr(cl, (int)*cs, l_len);
-
-    /* the last position where its possible to find "s" in "l" */
-    last = cl + l_len - s_len;
-
-    for (cur = cl; cur <= last; cur++)
-        if (cur[0] == cs[0] && memcmp(cur, cs, s_len) == 0)
-            return cur;
+    while (cur < last) {
+        if (cur[0] == c0) {
+            if (cur[1] == c1) {
+                return cur;
+            } else {
+                cur += 2;
+            }
+        } else {
+            cur += 1;
+        }
+    }
 
     return NULL;
 }
@@ -391,8 +366,7 @@ size_t parse_slash(sfilter * sf)
         /*
          * skip over initial '/x'
          */
-        const char *ptr =
-            (const char *) my_memmem(cur + 2, slen - (pos + 2), "*/", 2);
+        const char *ptr = memchr2(cur + 2, slen - (pos + 2), '*', '/');
         if (ptr == NULL) {
             /*
              * unterminated comment
@@ -408,8 +382,7 @@ size_t parse_slash(sfilter * sf)
              */
             char ctype = 'c';
             const size_t clen = (ptr + 2) - (cur);
-            if (my_memmem(cur + 2, ptr - (cur + 2), "/*", 2) !=
-                NULL) {
+            if (memchr2(cur + 2, ptr - (cur + 1), '/', '*') !=  NULL) {
                 ctype = 'X';
             }
             st_assign(current, ctype, cs + pos, clen);
@@ -1102,20 +1075,45 @@ int is_string_sqli(sfilter * sql_state, const char *s, size_t slen,
         /*
          * if 'comment' is '#' ignore.. too many FP
          */
-            if (sql_state->tokenvec[1].val[0] == '#') {
+        if (sql_state->tokenvec[1].val[0] == '#') {
+            sql_state->reason = __LINE__;
+            return FALSE;
+        }
+
+        /*
+         * for fingerprint like 'nc', only comments of /x are treated
+         * as SQL... ending comments of "--" and "#" are not sqli
+         */
+        if (sql_state->tokenvec[0].type == 'n' &&
+            sql_state->tokenvec[1].type == 'c' &&
+            sql_state->tokenvec[1].val[0] != '/') {
                 sql_state->reason = __LINE__;
                 return FALSE;
-            }
-            /*
-             * detect obvious sqli scans.. many people put '--' in plain text
-             * so only detect if input ends with '--', e.g. 1-- but not 1-- foo
-             */
-            if ((strlen(sql_state->tokenvec[1].val) > 2)
-                && sql_state->tokenvec[1].val[0] == '-') {
-                sql_state->reason = __LINE__;
-                return FALSE;
-            }
-            break;
+        }
+        /*
+         * detect obvious sqli scans.. many people put '--' in plain text
+         * so only detect if input ends with '--', e.g. 1-- but not 1-- foo
+         */
+
+        if ((strlen(sql_state->tokenvec[1].val) > 2)
+            && sql_state->tokenvec[1].val[0] == '-') {
+            sql_state->reason = __LINE__;
+            return FALSE;
+        }
+
+        /**
+         * there are some odd base64-looking query string values
+         * 1234-ABCDEFEhfhihwuefi--
+         * which evaluate to "1c"... these are not SQLi
+         * but 1234-- probably is.
+         * Make sure the "1" in "1c" is actually a true decimal number
+         */
+        if (sql_state->tokenvec[0].type == '1'&& sql_state->tokenvec[1].type == 'c' &&
+            strlen(sql_state->tokenvec[0].val) != strcspn(sql_state->tokenvec[0].val, "0123456789")) {
+            sql_state->reason = __LINE__;
+            return FALSE;
+        }
+        break;
         }
     case 3:{
         /*
