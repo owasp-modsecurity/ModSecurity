@@ -442,6 +442,8 @@ struct modsec_rec {
     lua_State           *L;
     #endif
 #endif
+
+    int                 msc_sdbm_delete_error;
 };
 
 struct directory_config {

@@ -220,6 +220,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
             msr_log(msr, 1, "collection_retrieve_ex: Failed deleting collection (name \"%s\", "
                 "key \"%s\"): %s", log_escape(msr->mp, col_name),
                 log_escape_ex(msr->mp, col_key, col_key_len), get_apr_error(msr->mp, rc));
+            msr->msc_sdbm_delete_error = 1;
             goto cleanup;
         }
 
@@ -678,9 +679,10 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
                         msr_log(msr, 1, "collections_remove_stale: Failed deleting collection (name \"%s\", "
                             "key \"%s\"): %s", log_escape(msr->mp, col_name),
                             log_escape_ex(msr->mp, key.dptr, key.dsize - 1), get_apr_error(msr->mp, rc));
+                    msr->msc_sdbm_delete_error = 1;
                         goto error;
                     }
-                    
+
                     if (msr->txcfg->debuglog_level >= 4) {
                         msr_log(msr, 4, "collections_remove_stale: Removed stale collection (name \"%s\", "
                             "key \"%s\").", log_escape(msr->mp, col_name),
