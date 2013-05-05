@@ -511,6 +511,19 @@ static int var_reqbody_processor_generate(modsec_rec *msr, msre_var *var, msre_r
     return 1;
 }
 
+/* SDBM_DELETE_ERROR */
+static int var_sdbm_delete_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+
+    rvar->value = apr_psprintf(mptmp, "%d", msr->msc_sdbm_delete_error);
+    rvar->value_len = strlen(rvar->value);
+    apr_table_addn(vartab, rvar->name, (void *)rvar);
+
+    return 1;
+}
+
 /* REQBODY_ERROR */
 
 static int var_reqbody_processor_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
@@ -3143,6 +3156,16 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         var_reqbody_processor_generate,
         VAR_DONT_CACHE, /* temp copy */
         PHASE_REQUEST_HEADERS
+    );
+
+    msre_engine_variable_register(engine,
+        "SDBM_DELETE_ERROR",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_sdbm_delete_error_generate,
+        VAR_DONT_CACHE, /* dynamic */
+        PHASE_REQUEST_BODY
     );
 
     /* REQBODY_PROCESSOR_ERROR - Deprecated */

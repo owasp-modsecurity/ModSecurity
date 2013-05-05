@@ -32,7 +32,7 @@
 
   * SECURITY: Added SecXmlExternalEntity (On|Off - default it Off) that will disable
     by default the external entity load task executed by LibXml2. This is a security issue
-    reported by Timur Yunusov, Alexey Osipov (Positive Technologies).
+    [CVE-2013-1915] reported by Timur Yunusov, Alexey Osipov (Positive Technologies).
 
 21 Jan 2013 - 2.7.2
 -------------------
@@ -130,7 +130,7 @@
     support Include directive like Apache2.
 
   * Added MULTIPART_INVALID_PART flag. Also used in rule id 200002 for multipart strict
-    validation.
+    validation. https://www.sec-consult.com/fxdata/seccons/prod/temedia/advisories_txt/20121017-0_mod_security_ruleset_bypass.txt).
 
   * Updated Reference Manual.
 

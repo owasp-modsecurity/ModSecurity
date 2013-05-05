@@ -13,10 +13,6 @@
 
 #include "sqlparse.h"
 
-#define CHAR_NULL '\0'
-#define CHAR_SINGLE '\''
-#define CHAR_DOUBLE '"'
-
 /***
  * The stdlib function 'strspn' assumes input to null-delimited.
  * This allows us to specifying and input length and allows
@@ -99,10 +95,6 @@ void sfilter_reset(sfilter * sf, const char *s, size_t slen);
 int sqli_tokenize(sfilter * sf, stoken_t * sout);
 
 int filter_fold(sfilter * sf, stoken_t * sout);
-
-int is_string_sqli(sfilter * sql_state, const char *s, size_t slen,
-                    const char delim,
-                    ptr_fingerprints_fn fn);
 
 int char2int(char c);
 unsigned long long pat2int(const char *pat);
