@@ -196,7 +196,7 @@ ngx_pool_context_init_conf(ngx_cycle_t *cycle, void *conf)
 {
     ngx_pool_context_conf_t      *pcf = conf;
 
-    ngx_conf_init_uint_value(pcf->size, NGX_POOL_CTX_SIZE);
+    ngx_conf_init_uint_value(pcf->size, cycle->connection_n);
 
     ngx_pool_context_hash_size = pcf->size;
 

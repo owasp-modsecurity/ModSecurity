@@ -77,7 +77,7 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 # Did we see anything that might be a boundary?
 #
 SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
-"id:'200003',phase:2,t:none,log,deny,status:44,msg:'Multipart parser detected a possible unmatched boundary.'"
+"id:'200003',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
 
 # PCRE Tuning
 # We want to avoid a potential RegEx DoS condition
