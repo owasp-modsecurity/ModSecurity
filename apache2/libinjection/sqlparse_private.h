@@ -13,36 +13,6 @@
 
 #include "sqlparse.h"
 
-/***
- * The stdlib function 'strspn' assumes input to null-delimited.
- * This allows us to specifying and input length and allows
- * embedded nulls
- */
-size_t strlenspn(const char *s, size_t len, const char *accept);
-
-int streq(const char *a, const char *b);
-
-void st_clear(stoken_t * st);
-void st_assign_char(stoken_t * st, const char stype, const char value);
-void st_set_type(stoken_t * st, const char stype);
-void st_assign(stoken_t * st, const char stype, const char *value,
-               size_t len);
-void st_assign_cstr(stoken_t * st, const char stype, const char *value);
-void st_copy(stoken_t * dest, const stoken_t * src);
-
-int st_equals_cstr(const stoken_t * src, const char stype,
-                    const char *value);
-
-int st_is_empty(const stoken_t * st);
-int st_is_arith_op(const stoken_t * st);
-int st_is_unary_op(const stoken_t * st);
-int st_is_english_op(const stoken_t * st);
-int st_is_logical_op(const stoken_t * st);
-int st_is_multiword_start(const stoken_t * st);
-
-const char *bsearch_cstr(const char *key, const char *base[],
-                         size_t nmemb);
-
 typedef struct {
     const char *word;
     char type;
@@ -96,7 +66,5 @@ int sqli_tokenize(sfilter * sf, stoken_t * sout);
 
 int filter_fold(sfilter * sf, stoken_t * sout);
 
-int char2int(char c);
-unsigned long long pat2int(const char *pat);
 
 #endif /* _SQLPARSE_PRIVATE_H */

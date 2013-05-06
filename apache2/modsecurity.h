@@ -600,9 +600,6 @@ struct directory_config {
 
     /* xml */
     int                 xml_external_entity;
-
-    /* remote addr */
-    const char          *remote_define;
 };
 
 struct error_message_t {

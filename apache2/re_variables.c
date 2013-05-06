@@ -713,35 +713,14 @@ static int var_useragent_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *
 static int var_remote_addr_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
-    char *remote = NULL;
-    char *parse_remote = NULL;
-    char *saved = NULL;
-    char *str = NULL;
-
-    if(strcasecmp(msr->txcfg->remote_define, "default") == 0)   {
-        if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "Set variable \"%s\" to \"%s\".", var->name, msr->remote_addr);
-        }
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 3
+    if (ap_find_linked_module("mod_remoteip.c") != NULL) {
+        if(msr->r->useragent_ip != NULL) msr->remote_addr = apr_pstrdup(msr->mp, msr->r->useragent_ip);
         return var_simple_generate(var, vartab, mptmp, msr->remote_addr);
-    } else  {
-        remote = (char *)apr_table_get(msr->r->headers_in, msr->txcfg->remote_define);
-        if(remote == NULL)  {
-            if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Request header \"%s\" not present setting variable \"%s\" to \"%s\".", msr->txcfg->remote_define,
-                    var->name, msr->remote_addr);
-            }
-            return var_simple_generate(var, vartab, mptmp, msr->remote_addr);
-        } else  {
-            parse_remote = apr_pstrdup(msr->mp, remote);
-            str = apr_strtok(parse_remote, ",", &saved);
-            msr->remote_addr = apr_pstrdup(msr->mp, str);
-            if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Request header \"%s\" is present setting variable \"%s\" to \"%s\".", msr->txcfg->remote_define,
-                    var->name, msr->remote_addr);
-            }
-            return var_simple_generate(var, vartab, mptmp, msr->remote_addr);
-        }
     }
+#endif
+
+    return var_simple_generate(var, vartab, mptmp, msr->remote_addr);
 }
 
 /* REMOTE_HOST */

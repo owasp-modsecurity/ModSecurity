@@ -159,9 +159,6 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     /* xml external entity */
     dcfg->xml_external_entity = NOT_SET;
 
-    /* remote addr define */
-    dcfg->remote_define = NOT_SET_P;
-
     return dcfg;
 }
 
@@ -601,10 +598,6 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->xml_external_entity = (child->xml_external_entity == NOT_SET
         ? parent->xml_external_entity : child->xml_external_entity);
 
-    /* remote add define */
-    merged->remote_define = (child->remote_define == NOT_SET_P
-        ? parent->remote_define : child->remote_define);
-
     return merged;
 }
 
@@ -727,9 +720,6 @@ void init_directory_config(directory_config *dcfg)
 
     /* xml external entity */
     if (dcfg->xml_external_entity == NOT_SET) dcfg->xml_external_entity = 0;
-
-    /* remote addr define */
-    if (dcfg->remote_define == NOT_SET_P) dcfg->remote_define = "default";
 
 }
 
@@ -2296,15 +2286,6 @@ static const char *cmd_web_app_id(cmd_parms *cmd, void *_dcfg, const char *p1)
     return NULL;
 }
 
-static const char *cmd_remote_addr_define(cmd_parms *cmd, void *_dcfg, const char *p1)
-{
-    directory_config *dcfg = (directory_config *)_dcfg;
-
-    dcfg->remote_define = p1;
-
-    return NULL;
-}
-
 static const char *cmd_sensor_id(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3492,14 +3473,6 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "id"
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecRemoteAddrDefine",
-        cmd_remote_addr_define,
-        NULL,
-        CMD_SCOPE_MAIN,
-        "Define a request header field to define remote addr"
     ),
 
     AP_INIT_TAKE1 (
