@@ -1,3 +1,28 @@
+10 May 2013 - 2.7.4
+-------------------
+Improvements:
+
+    * Added Libinjection project http://www.client9.com/projects/libinjection/ as a new operator @detectSQLi. (Thanks Nick Galbreath).
+
+    * Added new variable SDBM_DELETE_ERROR that will be set to 1 when sdbm engine fails to delete entries.
+
+    * Nginx module is set as STABLE.
+
+Bug Fixes:
+
+    * Fixed SecRulePerfTime storing unnecessary rules performance times.
+
+    * Fixed Possible SDBM deadlock condition.
+
+    * Fixed Possible @rsub memory leak.
+
+    * Fixed REMOTE_ADDR content will receive the client ip address when mod_remoteip.c is present.
+
+Security Issues:
+
+    * Fixed Remote Null Pointer DeReference (CVE-2013-2765). When forceRequestBodyVariable action is triggered and a unknown Content-Type is used,
+      mod_security will crash trying to manipulate msr->msc_reqbody_chunks->elts however msr->msc_reqbody_chunks is NULL. (Thanks Younes JAAIDI).
+
 28 Mar 2013 - 2.7.3
 -------------------
 
