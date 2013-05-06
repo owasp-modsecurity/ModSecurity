@@ -34,7 +34,7 @@ extern "C" {
  * See python's normalized version
  * http://www.python.org/dev/peps/pep-0386/#normalizedversion
  */
-#define LIBINJECTION_VERSION "1.1.0"
+#define LIBINJECTION_VERSION "1.2.0"
 
 #define ST_MAX_SIZE 32
 #define MAX_TOKENS 5
