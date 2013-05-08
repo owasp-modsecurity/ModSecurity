@@ -2144,19 +2144,24 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
     int issqli = is_sqli(&sf, var->value, var->value_len, is_sqli_pattern);
     int capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
     if (issqli) {
         set_match_to_tx(msr, capture, sf.pat, 0);
 
-        *error_msg = apr_psprintf(msr->mp, "detected SQLi using libinjection fingerprint '%s'",
-                sf.pat);
+        *error_msg = apr_psprintf(msr->mp, "detected SQLi using libinjection fingerprint '%s' at %s",
+                sf.pat, var->name);
+
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "ISSQL: libinjection fingerprint '%s' matched input '%s'",
+            msr_log(msr, 9, "detectSQLi: libinjection fingerprint '%s' matched input '%s'",
                     sf.pat,
                     log_escape_ex(msr->mp, var->value, var->value_len));
         }
     } else {
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "ISSQL: not sqli, no libinjection sqli fingerprint matched input '%s'",
+            msr_log(msr, 9, "detectSQLi: no sql, libinjection fingerprint '%s' no match input '%s'",
+                    sf.pat,
                     log_escape_ex(msr->mp, var->value, var->value_len));
         }
     }
