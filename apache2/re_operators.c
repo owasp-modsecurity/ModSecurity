@@ -2160,9 +2160,8 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
         }
     } else {
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "detectSQLi: no sql, libinjection fingerprint '%s' no match input '%s'",
-                    sf.pat,
-                    log_escape_ex(msr->mp, var->value, var->value_len));
+            msr_log(msr, 9, "detectSQLi: no sql, libinjection no match input '%s' at '%s'",
+                log_escape_ex(msr->mp, var->value, var->value_len), var->name);
         }
     }
 
