@@ -1,3 +1,28 @@
+10 May 2013 - 2.7.4
+-------------------
+Improvements:
+
+    * Added Libinjection project http://www.client9.com/projects/libinjection/ as a new operator @detectSQLi. (Thanks Nick Galbreath).
+
+    * Added new variable SDBM_DELETE_ERROR that will be set to 1 when sdbm engine fails to delete entries.
+
+    * Nginx module is set as STABLE.
+
+Bug Fixes:
+
+    * Fixed SecRulePerfTime storing unnecessary rules performance times.
+
+    * Fixed Possible SDBM deadlock condition.
+
+    * Fixed Possible @rsub memory leak.
+
+    * Fixed REMOTE_ADDR content will receive the client ip address when mod_remoteip.c is present.
+
+Security Issues:
+
+    * Fixed Remote Null Pointer DeReference (CVE-2013-2765). When forceRequestBodyVariable action is triggered and a unknown Content-Type is used,
+      mod_security will crash trying to manipulate msr->msc_reqbody_chunks->elts however msr->msc_reqbody_chunks is NULL. (Thanks Younes JAAIDI).
+
 28 Mar 2013 - 2.7.3
 -------------------
 
@@ -32,7 +57,7 @@
 
   * SECURITY: Added SecXmlExternalEntity (On|Off - default it Off) that will disable
     by default the external entity load task executed by LibXml2. This is a security issue
-    reported by Timur Yunusov, Alexey Osipov (Positive Technologies).
+    [CVE-2013-1915] reported by Timur Yunusov, Alexey Osipov (Positive Technologies).
 
 21 Jan 2013 - 2.7.2
 -------------------
@@ -130,7 +155,7 @@
     support Include directive like Apache2.
 
   * Added MULTIPART_INVALID_PART flag. Also used in rule id 200002 for multipart strict
-    validation.
+    validation. https://www.sec-consult.com/fxdata/seccons/prod/temedia/advisories_txt/20121017-0_mod_security_ruleset_bypass.txt).
 
   * Updated Reference Manual.
 
