@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -26,6 +26,9 @@
 #if APR_HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
+
+#include "libinjection/sqlparse.h"
+#include "libinjection/sqli_fingerprints.h"
 
 /**
  *
@@ -369,7 +372,7 @@ static int msre_op_ipmatchFromFile_execute(modsec_rec *msr, msre_rule *rule, msr
 /* rsub */
 
 static char *param_remove_escape(msre_rule *rule, char *str, int len)  {
-    char *parm = apr_palloc(rule->ruleset->mp, len);
+    char *parm = apr_pcalloc(rule->ruleset->mp, len);
     char *ret = parm;
 
     for(;*str!='\0';str++)    {
@@ -2127,6 +2130,42 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
 
     /* No match. */
     return 0;
+}
+
+/** libinjection detectSQLi
+*   links against files in libinjection directory
+ *  See www.client9.com/libinjection for details
+ * `is_sqli_pattern` right now is a hardwired set of sqli fingerprints.
+ * In future, change to read from file.
+*/
+static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
+    char **error_msg) {
+    sfilter sf;
+    int issqli = is_sqli(&sf, var->value, var->value_len, is_sqli_pattern);
+    int capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
+
+    if (error_msg == NULL) return -1;
+    *error_msg = NULL;
+
+    if (issqli) {
+        set_match_to_tx(msr, capture, sf.pat, 0);
+
+        *error_msg = apr_psprintf(msr->mp, "detected SQLi using libinjection fingerprint '%s' at %s",
+                sf.pat, var->name);
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "detectSQLi: libinjection fingerprint '%s' matched input '%s'",
+                    sf.pat,
+                    log_escape_ex(msr->mp, var->value, var->value_len));
+        }
+    } else {
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "detectSQLi: no sql, libinjection no match input '%s' at '%s'",
+                log_escape_ex(msr->mp, var->value, var->value_len), var->name);
+        }
+    }
+
+    return issqli;
 }
 
 /* containsWord */
@@ -4502,7 +4541,14 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         msre_op_containsWord_execute
     );
 
-    /* is */
+    /* detectSQLi */
+    msre_engine_op_register(engine,
+        "detectSQLi",
+         NULL,
+         msre_op_detectSQLi_execute
+    );
+
+    /* streq */
     msre_engine_op_register(engine,
         "streq",
         NULL, /* ENH init function to flag var substitution */

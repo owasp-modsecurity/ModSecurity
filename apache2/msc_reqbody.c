@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -170,6 +170,7 @@ static apr_status_t modsecurity_request_body_store_memory(modsec_rec *msr,
 
     /* Would storing this chunk mean going over the limit? */
     if ((msr->msc_reqbody_spilltodisk)
+        && (msr->txcfg->reqbody_buffering != REQUEST_BODY_FORCEBUF_ON)
         && (msr->msc_reqbody_length + length > (apr_size_t)msr->txcfg->reqbody_inmemory_limit))
     {
         msc_data_chunk **chunks;

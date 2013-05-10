@@ -374,7 +374,7 @@ AC_ARG_ENABLE(htaccess-config,
 # Enable phase-1 in post_read_request
 AC_ARG_ENABLE(request-early,
               AS_HELP_STRING([--enable-request-early],
-                             [Place phase1 into post_read_request hook.]),
+                             [Place phase1 into post_read_request hook. default is hook_request_early]),
 [
   if test "$enableval" != "no"; then
     request_early="-DREQUEST_EARLY"

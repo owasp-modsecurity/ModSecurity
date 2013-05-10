@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -2346,7 +2346,7 @@ static const char *cmd_hash_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
         dcfg->hash_is_enabled = HASH_DISABLED;
         dcfg->hash_enforcement = HASH_DISABLED;
     }
-    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SexHashEngine: %s", p1);
+    else return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecHashEngine: %s", p1);
 
     return NULL;
 }
