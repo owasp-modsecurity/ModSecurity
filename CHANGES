@@ -6,8 +6,6 @@ Improvements:
 
     * Added new variable SDBM_DELETE_ERROR that will be set to 1 when sdbm engine fails to delete entries.
 
-    * Nginx module is set as STABLE.
-
 Bug Fixes:
 
     * Fixed SecRulePerfTime storing unnecessary rules performance times.
