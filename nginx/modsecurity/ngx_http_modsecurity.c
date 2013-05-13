@@ -16,6 +16,8 @@
 #include <apr_bucket_nginx.h>
 #include <ngx_pool_context.h>
 
+#include <apr_base64.h>
+
 #undef CR
 #undef LF
 #undef CRLF
