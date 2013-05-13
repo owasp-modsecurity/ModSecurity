@@ -204,6 +204,17 @@ move_brigade_to_chain(apr_bucket_brigade *bb, ngx_chain_t **ll, ngx_pool_t *pool
 
         if (APR_BUCKET_IS_EOS(e)) {
             if (cl == NULL) {
+                cl = ngx_alloc_chain_link(pool);
+                if (cl == NULL) {
+                    break;
+                }
+                
+                cl->buf = ngx_calloc_buf(pool);
+                if (cl->buf == NULL) {
+                    break;
+                }
+
+                cl->buf->last_buf = 1;
                 *ll = cl;
             } else {
                 cl->buf->last_buf = 1;
