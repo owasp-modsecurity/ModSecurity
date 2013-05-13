@@ -1254,6 +1254,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
     return ngx_http_next_body_filter(r, out);
 }
 
+#define TXID_SIZE 25
 
 static ngx_http_modsecurity_ctx_t *
 ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
@@ -1263,6 +1264,9 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
     ngx_http_modsecurity_ctx_t      *ctx;
     apr_sockaddr_t                  *asa;
     struct sockaddr_in              *sin;
+    char *txid;
+    unsigned char salt[TXID_SIZE];
+    int i;
 #if (NGX_HAVE_INET6)
     struct sockaddr_in6             *sin6;
 #endif
@@ -1336,7 +1340,26 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
     ctx->req = modsecNewRequest(ctx->connection, cf->config);
 
     apr_table_setn(ctx->req->notes, NOTE_NGINX_REQUEST_CTX, (const char *) ctx);
-    apr_table_setn(ctx->req->subprocess_env, "UNIQUE_ID", "12345");
+    apr_generate_random_bytes(salt, TXID_SIZE);
+
+    txid = apr_pcalloc (ctx->req->pool, TXID_SIZE);
+    apr_base64_encode (txid, (const char*)salt, TXID_SIZE);
+
+    for(i=0;i<TXID_SIZE;i++)        {
+        if((salt[i] >= 0x30) && (salt[i] <= 0x39))      {}
+        else if((salt[i] >= 0x40) && (salt[i] <= 0x5A)) {}
+        else if((salt[i] >= 0x61) && (salt[i] <= 0x7A)) {}
+        else {
+            if((i%2)==0)
+                salt[i] = 0x41;
+            else
+                salt[i] = 0x63;
+        }
+    }
+
+    salt[i] = '\0';
+
+    apr_table_setn(ctx->req->subprocess_env, "UNIQUE_ID", apr_psprintf(ctx->req->pool, "%s", salt));
 
     ctx->brigade = apr_brigade_create(ctx->req->pool, ctx->req->connection->bucket_alloc);
 
@@ -1347,7 +1370,7 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
     return ctx;
 }
 
-static void
+    static void
 ngx_http_modsecurity_cleanup(void *data)
 {
     ngx_http_modsecurity_ctx_t    *ctx = data;
@@ -1357,7 +1380,7 @@ ngx_http_modsecurity_cleanup(void *data)
     }
 }
 
-static char *
+    static char *
 ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
     ngx_http_modsecurity_loc_conf_t *mscf = conf;
@@ -1383,7 +1406,7 @@ ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     msg = modsecProcessConfig(mscf->config, (const char *)value[1].data, NULL);
     if (msg != NULL) {
         ngx_log_error(NGX_LOG_EMERG, cf->log, 0, "ModSecurityConfig in %s:%ui: %s",
-                      cf->conf_file->file.name.data, cf->conf_file->line, msg);
+                cf->conf_file->file.name.data, cf->conf_file->line, msg);
         return NGX_CONF_ERROR;
     }
 
@@ -1391,7 +1414,7 @@ ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 }
 
 
-static char *
+    static char *
 ngx_http_modsecurity_enable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
     ngx_http_modsecurity_loc_conf_t *mscf = conf;
@@ -1409,7 +1432,7 @@ ngx_http_modsecurity_enable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 }
 
 
-static int
+    static int
 ngx_http_modsecurity_drop_action(request_rec *r)
 {
     ngx_http_modsecurity_ctx_t     *ctx;
