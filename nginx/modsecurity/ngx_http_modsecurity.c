@@ -1156,6 +1156,8 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
     ngx_http_modsecurity_ctx_t      *ctx;
     ngx_int_t                        rc;
     apr_off_t                        content_length;
+    ngx_chain_t                     *cl, *out;
+    ngx_int_t                        last_buf = 0;
 
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
@@ -1166,29 +1168,53 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: body filter");
 
-    if (in == NULL) {
-        /* waiting for more buffer */
-        r->buffered |= NGX_HTTP_SSI_BUFFERED;
+    for (cl = in; cl; cl = cl->next) {
+        apr_bucket  *e;
+        ngx_buf_t   *buf = cl->buf;
+        apr_bucket_brigade  *bb = ctx->brigade;
+        off_t size = ngx_buf_size(buf);
+        if (size) {
+            char *data = apr_pmemdup(bb->p, buf->pos, size);
+            if (data == NULL) {
+                return ngx_http_filter_finalize_request(r, 
+                         &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
+            }
+            e = apr_bucket_pool_create(data , size, bb->p, bb->bucket_alloc);
+            if (e == NULL) {
+                return ngx_http_filter_finalize_request(r, 
+                         &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
+            }
+            APR_BRIGADE_INSERT_TAIL(bb, e);
+        }
+
+        if (buf->last_buf) {
+            last_buf = 1;
+            buf->last_buf = 0;
+            e = apr_bucket_eos_create(bb->bucket_alloc);
+            if (e == NULL) {
+                return ngx_http_filter_finalize_request(r, 
+                         &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
+            }
+            APR_BRIGADE_INSERT_TAIL(bb, e);
+            break;
+        }
+
+        buf->pos = buf->last;
+    }
+
+    if (!last_buf) {
         return NGX_AGAIN;
     }
 
-    rc = move_chain_to_brigade(in, ctx->brigade, r->pool, 0);
-    if (rc != NGX_OK)  {
-        /* waiting for more buffer */
-        r->buffered |= NGX_HTTP_SSI_BUFFERED;
-        return rc;
-    }
-
     /* last buf has been saved */
-    r->buffered &= ~NGX_HTTP_SSI_BUFFERED;
-
     ctx->complete = 1;
     modsecSetResponseBrigade(ctx->req, ctx->brigade);
 
     if (ngx_http_modsecurity_load_headers_in(r) != NGX_OK
             || ngx_http_modsecurity_load_headers_out(r) != NGX_OK) {
 
-        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+        return ngx_http_filter_finalize_request(r, 
+                 &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
     }
 
     rc = ngx_http_modsecurity_status(r, modsecProcessResponse(ctx->req));
@@ -1199,15 +1225,17 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
     apr_brigade_length(ctx->brigade, 0, &content_length);
 
-    rc = move_brigade_to_chain(ctx->brigade, &in, r->pool);
+    rc = move_brigade_to_chain(ctx->brigade, &out, r->pool);
     if (rc == NGX_ERROR) {
-        return NGX_ERROR;
+        return ngx_http_filter_finalize_request(r, 
+                 &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
     }
 
     if (ngx_http_modsecurity_save_headers_in(r) != NGX_OK
             ||ngx_http_modsecurity_save_headers_out(r) != NGX_OK) {
 
-        return ngx_http_filter_finalize_request(r, &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
+        return ngx_http_filter_finalize_request(r, 
+                 &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
     }
 
     if (r->headers_out.content_length_n != -1) {
@@ -1223,9 +1251,10 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
         return ngx_http_filter_finalize_request(r, &ngx_http_modsecurity, rc);
     }
 
-    return ngx_http_next_body_filter(r, in);
+    return ngx_http_next_body_filter(r, out);
 }
 
+#define TXID_SIZE 25
 
 static ngx_http_modsecurity_ctx_t *
 ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
@@ -1235,6 +1264,9 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
     ngx_http_modsecurity_ctx_t      *ctx;
     apr_sockaddr_t                  *asa;
     struct sockaddr_in              *sin;
+    char *txid;
+    unsigned char salt[TXID_SIZE];
+    int i;
 #if (NGX_HAVE_INET6)
     struct sockaddr_in6             *sin6;
 #endif
@@ -1308,7 +1340,26 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
     ctx->req = modsecNewRequest(ctx->connection, cf->config);
 
     apr_table_setn(ctx->req->notes, NOTE_NGINX_REQUEST_CTX, (const char *) ctx);
-    apr_table_setn(ctx->req->subprocess_env, "UNIQUE_ID", "12345");
+    apr_generate_random_bytes(salt, TXID_SIZE);
+
+    txid = apr_pcalloc (ctx->req->pool, TXID_SIZE);
+    apr_base64_encode (txid, (const char*)salt, TXID_SIZE);
+
+    for(i=0;i<TXID_SIZE;i++)        {
+        if((salt[i] >= 0x30) && (salt[i] <= 0x39))      {}
+        else if((salt[i] >= 0x40) && (salt[i] <= 0x5A)) {}
+        else if((salt[i] >= 0x61) && (salt[i] <= 0x7A)) {}
+        else {
+            if((i%2)==0)
+                salt[i] = 0x41;
+            else
+                salt[i] = 0x63;
+        }
+    }
+
+    salt[i] = '\0';
+
+    apr_table_setn(ctx->req->subprocess_env, "UNIQUE_ID", apr_psprintf(ctx->req->pool, "%s", salt));
 
     ctx->brigade = apr_brigade_create(ctx->req->pool, ctx->req->connection->bucket_alloc);
 
@@ -1319,7 +1370,7 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
     return ctx;
 }
 
-static void
+    static void
 ngx_http_modsecurity_cleanup(void *data)
 {
     ngx_http_modsecurity_ctx_t    *ctx = data;
@@ -1329,7 +1380,7 @@ ngx_http_modsecurity_cleanup(void *data)
     }
 }
 
-static char *
+    static char *
 ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
     ngx_http_modsecurity_loc_conf_t *mscf = conf;
@@ -1355,7 +1406,7 @@ ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     msg = modsecProcessConfig(mscf->config, (const char *)value[1].data, NULL);
     if (msg != NULL) {
         ngx_log_error(NGX_LOG_EMERG, cf->log, 0, "ModSecurityConfig in %s:%ui: %s",
-                      cf->conf_file->file.name.data, cf->conf_file->line, msg);
+                cf->conf_file->file.name.data, cf->conf_file->line, msg);
         return NGX_CONF_ERROR;
     }
 
@@ -1363,7 +1414,7 @@ ngx_http_modsecurity_config(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 }
 
 
-static char *
+    static char *
 ngx_http_modsecurity_enable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
     ngx_http_modsecurity_loc_conf_t *mscf = conf;
@@ -1381,7 +1432,7 @@ ngx_http_modsecurity_enable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 }
 
 
-static int
+    static int
 ngx_http_modsecurity_drop_action(request_rec *r)
 {
     ngx_http_modsecurity_ctx_t     *ctx;
