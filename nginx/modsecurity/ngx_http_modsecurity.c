@@ -1034,9 +1034,15 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
 
         return NGX_DONE;
     }
-    
     /* other method */
-    return ngx_http_modsecurity_status(r, modsecProcessRequestBody(ctx->req));
+
+    rc = ngx_http_modsecurity_status(r, modsecProcessRequestBody(ctx->req));
+
+    if (ngx_http_modsecurity_save_headers_in(r) != NGX_OK) {
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+    }
+
+    return rc;
 }
 
 
