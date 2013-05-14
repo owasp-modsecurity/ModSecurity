@@ -6,6 +6,8 @@ Improvements:
 
     * Added new variable SDBM_DELETE_ERROR that will be set to 1 when sdbm engine fails to delete entries.
 
+    * NGINX is now set to STABLE. Thanks chaizhenhua and all the people in community who help the project testing, sending feedback and patches.
+
 Bug Fixes:
 
     * Fixed SecRulePerfTime storing unnecessary rules performance times.
@@ -15,6 +17,10 @@ Bug Fixes:
     * Fixed Possible @rsub memory leak.
 
     * Fixed REMOTE_ADDR content will receive the client ip address when mod_remoteip.c is present.
+
+    * Fixed Audit engine in Concurrent mode was overwriting existing alert files because a issue with UNIQUE_ID.
+
+    * Fixed CPU 100% issue in NGINX port. This is also related to an memory leak when loading response body.
 
 Security Issues:
 
