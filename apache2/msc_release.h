@@ -53,7 +53,7 @@
 #define MODSEC_MODULE_NAME "ModSecurity for IIS (STABLE)"
 #else
 #ifdef	VERSION_NGINX
-#define MODSEC_MODULE_NAME "ModSecurity for nginx (RC)"
+#define MODSEC_MODULE_NAME "ModSecurity for nginx (STABLE)"
 #else
 #ifdef	VERSION_STANDALONE
 #define MODSEC_MODULE_NAME "ModSecurity Standalone (STABLE)"
