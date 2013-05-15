@@ -72,7 +72,7 @@ install-exec-hook: $(pkglib_LTLIBRARIES)
 	for m in $(pkglib_LTLIBRARIES); do \
 	  base=`echo $$m | sed 's/\..*//'`; \
 	  rm -f $(DESTDIR)$(pkglibdir)/$$base.*a; \
-	  install -D -m444 $(DESTDIR)$(pkglibdir)/$$base.so $(DESTDIR)$(APXS_MODULES); \
+	  install -D -m444 $(DESTDIR)$(pkglibdir)/$$base.so $(DESTDIR)$(APXS_MODULES)/$$base.so; \
 	done
 else
 install-exec-hook: $(pkglib_LTLIBRARIES)
