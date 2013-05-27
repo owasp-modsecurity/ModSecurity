@@ -37,7 +37,7 @@ extern "C" {
  * See python's normalized version
  * http://www.python.org/dev/peps/pep-0386/#normalizedversion
  */
-#define LIBINJECTION_VERSION "2.0.0"
+#define LIBINJECTION_VERSION "3.0.0-pre2"
 
 #define ST_MAX_SIZE 32
 #define MAX_TOKENS 5
@@ -50,6 +50,7 @@ typedef struct {
     char type;
     char str_open;
     char str_close;
+    char var_count;
     char val[ST_MAX_SIZE];
 } stoken_t;
 
@@ -62,18 +63,12 @@ typedef struct {
     size_t pos;
     int    in_comment;
 
-    /* syntax fixups state */
-    stoken_t syntax_current;
-    stoken_t syntax_last;
-    stoken_t syntax_comment;
-
-    /* constant folding state */
-    stoken_t fold_current;
-    stoken_t fold_last;
-    int fold_state;
-
     /* final sqli data */
-    stoken_t tokenvec[MAX_TOKENS];
+    stoken_t *current;
+
+    /* MAX TOKENS + 1 since use one extra token to determine
+       the type of the previous token */
+    stoken_t tokenvec[MAX_TOKENS + 1];
 
     /*  +1 for ending null */
     char pat[MAX_TOKENS + 1];
@@ -129,6 +124,15 @@ int libinjection_is_string_sqli(sfilter * sql_state,
                                 const char *s, size_t slen,
                                 const char delim,
                                 ptr_fingerprints_fn fn, void* callbackarg);
+
+/*  FOR H@CKERS ONLY
+ *
+ */
+
+void libinjection_sqli_init(sfilter* sql_state, const char* str,
+                            size_t slen, char delim);
+
+int libinjection_sqli_tokenize(sfilter * sql_state, stoken_t *ouput);
 
 #ifdef __cplusplus
 }
