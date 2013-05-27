@@ -18,7 +18,7 @@ Bug Fixes:
 
     * Fixed REMOTE_ADDR content will receive the client ip address when mod_remoteip.c is present.
 
-    * Fixed Audit engine in Concurrent mode was overwriting existing alert files because a issue with UNIQUE_ID.
+    * Fixed NGINX Audit engine in Concurrent mode was overwriting existing alert files because a issue with UNIQUE_ID.
 
     * Fixed CPU 100% issue in NGINX port. This is also related to an memory leak when loading response body.
 
