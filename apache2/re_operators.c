@@ -27,8 +27,7 @@
 #include <arpa/inet.h>
 #endif
 
-#include "libinjection/sqlparse.h"
-#include "libinjection/sqli_fingerprints.h"
+#include "libinjection/libinjection.h"
 
 /**
  *
@@ -2133,15 +2132,13 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
 }
 
 /** libinjection detectSQLi
-*   links against files in libinjection directory
+ *   links against files in libinjection directory
  *  See www.client9.com/libinjection for details
- * `is_sqli_pattern` right now is a hardwired set of sqli fingerprints.
- * In future, change to read from file.
-*/
+ */
 static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg) {
     sfilter sf;
-    int issqli = is_sqli(&sf, var->value, var->value_len, is_sqli_pattern);
+    int issqli = libinjection_is_sqli(&sf, var->value, var->value_len, NULL, NULL);
     int capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     if (error_msg == NULL) return -1;
