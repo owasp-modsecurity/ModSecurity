@@ -1089,8 +1089,8 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             msr->stream_output_data =  NULL;
         }
 
-        //msr->stream_output_length = xmlOutputBufferGetSize(output_buf);
-        msr->stream_output_length = elts + msr->resbody_length;
+        msr->stream_output_length = xmlOutputBufferGetSize(output_buf);
+        //msr->stream_output_length = elts + msr->resbody_length;
         msr->stream_output_data = (char *)malloc(msr->stream_output_length+1);
 
         if (msr->stream_output_data == NULL) {
@@ -1119,8 +1119,8 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             msr->stream_output_data =  NULL;
         }
 
-        //msr->stream_output_length = xmlOutputBufferGetSize(output_buf);
-        msr->stream_output_length = elts + msr->resbody_length;
+        msr->stream_output_length = xmlOutputBufferGetSize(output_buf);
+        //msr->stream_output_length = elts + msr->resbody_length;
         msr->stream_output_data = (char *)malloc(msr->stream_output_length+1);
 
         if (msr->stream_output_data == NULL) {
@@ -1153,7 +1153,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             msr->stream_output_data =  NULL;
         }
 
-        msr->stream_output_length = elts + msr->resbody_length;
+        msr->stream_output_length = output_buf->buffer->use;
         msr->stream_output_data = (char *)malloc(msr->stream_output_length+1);
 
         if (msr->stream_output_data == NULL) {
@@ -1163,7 +1163,8 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
         }
 
         memset(msr->stream_output_data, 0x0, msr->stream_output_length+1);
-        memcpy(msr->stream_output_data, (char *)xmlBufferContent(output_buf->buffer), msr->stream_output_length);
+        //memcpy(msr->stream_output_data, (char *)xmlBufferContent(output_buf->buffer), msr->stream_output_length);
+        memcpy(msr->stream_output_data, output_buf->buffer->content, msr->stream_output_length);
 
         if (msr->txcfg->debuglog_level >= 4)
             msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONTENT to stream buffer [%d] bytes.", msr->stream_output_length);
@@ -1182,7 +1183,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             msr->stream_output_data =  NULL;
         }
 
-        msr->stream_output_length = elts + msr->resbody_length;
+        msr->stream_output_length = output_buf->conv->use;
         msr->stream_output_data = (char *)malloc(msr->stream_output_length+1);
 
         if (msr->stream_output_data == NULL) {
@@ -1192,7 +1193,8 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
         }
 
         memset(msr->stream_output_data, 0x0, msr->stream_output_length+1);
-        memcpy(msr->stream_output_data, (char *)xmlBufferContent(output_buf->conv), msr->stream_output_length);
+        //memcpy(msr->stream_output_data, (char *)xmlBufferContent(output_buf->conv), msr->stream_output_length);
+        memcpy(msr->stream_output_data, output_buf->conv->content, msr->stream_output_length);
 
         if (msr->txcfg->debuglog_level >= 4)
             msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONV to stream buffer [%d] bytes.", msr->stream_output_length);
