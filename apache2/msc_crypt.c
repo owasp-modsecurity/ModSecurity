@@ -68,10 +68,26 @@ char *normalize_path(modsec_rec *msr, char *input) {
             char *Uri = NULL;
             int bytes = 0;
             int i;
+            char *relative_link = NULL;
+            char *filename = NULL;
+            char *relative_path = NULL;
+            char *relative_uri = NULL;
 
-            xmlNormalizeURIPath(uri->path);
-            Uri = apr_pstrdup(msr->mp, uri->path);
+            filename = file_basename(msr->mp, msr->r->parsed_uri.path);
 
+            if(filename == NULL || (strlen(msr->r->parsed_uri.path) - strlen(filename) < 0))
+                return NULL;
+
+            relative_path = apr_pstrndup(msr->mp, msr->r->parsed_uri.path, strlen(msr->r->parsed_uri.path) - strlen(filename));
+            relative_uri = apr_pstrcat(msr->mp, relative_path, uri->path, NULL);
+
+            relative_link = apr_pstrdup(msr->mp, relative_uri);
+
+            xmlNormalizeURIPath(relative_link);
+
+            Uri = apr_pstrdup(msr->mp, relative_link);
+
+/*
             for(i = 0; i < (int)strlen(Uri); i++)    {
                 if(Uri[i] != '.' && Uri[i] != '/')  {
                     if (i - 1 < 0)
@@ -88,12 +104,15 @@ char *normalize_path(modsec_rec *msr, char *input) {
 
             if(bytes >= (int)strlen(uri->path))
                 return NULL;
+*/
 
-            content = apr_psprintf(msr->mp, "%s", uri->path+bytes);
+            content = apr_psprintf(msr->mp, "%s", Uri);
+
             if(parsed_content)
                 parsed_content = apr_pstrcat(msr->mp, parsed_content, content, NULL);
             else
                 parsed_content = apr_pstrcat(msr->mp, content, NULL);
+
         }
 
         if(uri->query_raw)  {
@@ -629,6 +648,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
 int hash_response_body_links(modsec_rec *msr)   {
     int lsize = 0, fsize = 0, lcount = 0, fcount = 0, i;
     int isize = 0, icount = 0, frsize = 0, frcount = 0;
+    int bytes = 0;
     xmlXPathContextPtr  xpathCtx = NULL;
     xmlXPathObjectPtr   xpathObj = NULL;
     xmlChar *content_option = NULL;
@@ -687,6 +707,7 @@ int hash_response_body_links(modsec_rec *msr)   {
                             if(mac_link != NULL) {
                                 xmlSetProp(cur, (const xmlChar *) "href", (const xmlChar *) mac_link);
                                 lcount++;
+                                bytes += strlen(mac_link);
                                 msr->of_stream_changed = 1;
                             }
                             mac_link = NULL;
@@ -703,6 +724,7 @@ int hash_response_body_links(modsec_rec *msr)   {
                             if(mac_link != NULL) {
                                 xmlSetProp(cur, (const xmlChar *) "href", (const xmlChar *) mac_link);
                                 lcount++;
+                                bytes += strlen(mac_link);
                                 msr->of_stream_changed = 1;
                             }
                             mac_link = NULL;
@@ -758,6 +780,7 @@ int hash_response_body_links(modsec_rec *msr)   {
                             if(mac_link != NULL) {
                                 xmlSetProp(cur, (const xmlChar *) "action", (const xmlChar *) mac_link);
                                 fcount++;
+                                bytes += strlen(mac_link);
                                 msr->of_stream_changed = 1;
                             }
                             mac_link = NULL;
@@ -774,6 +797,7 @@ int hash_response_body_links(modsec_rec *msr)   {
                             if(mac_link != NULL) {
                                 xmlSetProp(cur, (const xmlChar *) "action", (const xmlChar *) mac_link);
                                 fcount++;
+                                bytes += strlen(mac_link);
                                 msr->of_stream_changed = 1;
                             }
                             mac_link = NULL;
@@ -828,6 +852,7 @@ int hash_response_body_links(modsec_rec *msr)   {
                             if(mac_link != NULL) {
                                 xmlSetProp(cur, (const xmlChar *) "src", (const xmlChar *) mac_link);
                                 icount++;
+                                bytes += strlen(mac_link);
                                 msr->of_stream_changed = 1;
                             }
                             mac_link = NULL;
@@ -844,6 +869,7 @@ int hash_response_body_links(modsec_rec *msr)   {
                             if(mac_link != NULL) {
                                 xmlSetProp(cur, (const xmlChar *) "src", (const xmlChar *) mac_link);
                                 icount++;
+                                bytes += strlen(mac_link);
                                 msr->of_stream_changed = 1;
                             }
                             mac_link = NULL;
@@ -893,6 +919,7 @@ int hash_response_body_links(modsec_rec *msr)   {
                             if(mac_link != NULL) {
                                 xmlSetProp(cur, (const xmlChar *) "src", (const xmlChar *) mac_link);
                                 frcount++;
+                                bytes += strlen(mac_link);
                                 msr->of_stream_changed = 1;
                             }
                             mac_link = NULL;
@@ -909,6 +936,7 @@ int hash_response_body_links(modsec_rec *msr)   {
                             if(mac_link != NULL) {
                                 xmlSetProp(cur, (const xmlChar *) "src", (const xmlChar *) mac_link);
                                 frcount++;
+                                bytes += strlen(mac_link);
                                 msr->of_stream_changed = 1;
                             }
                             mac_link = NULL;
@@ -953,7 +981,7 @@ int hash_response_body_links(modsec_rec *msr)   {
     if((elts >= INT32_MAX) || (elts < 0))
         return 0;
 
-    return elts;
+    return bytes;
 
 obj_error:
     if(xpathCtx != NULL)
@@ -1061,7 +1089,8 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             msr->stream_output_data =  NULL;
         }
 
-        msr->stream_output_length = xmlOutputBufferGetSize(output_buf);
+        //msr->stream_output_length = xmlOutputBufferGetSize(output_buf);
+        msr->stream_output_length = elts + msr->resbody_length;
         msr->stream_output_data = (char *)malloc(msr->stream_output_length+1);
 
         if (msr->stream_output_data == NULL) {
@@ -1090,7 +1119,8 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             msr->stream_output_data =  NULL;
         }
 
-        msr->stream_output_length = xmlOutputBufferGetSize(output_buf);
+        //msr->stream_output_length = xmlOutputBufferGetSize(output_buf);
+        msr->stream_output_length = elts + msr->resbody_length;
         msr->stream_output_data = (char *)malloc(msr->stream_output_length+1);
 
         if (msr->stream_output_data == NULL) {
@@ -1123,7 +1153,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             msr->stream_output_data =  NULL;
         }
 
-        msr->stream_output_length = output_buf->buffer->use;
+        msr->stream_output_length = elts + msr->resbody_length;
         msr->stream_output_data = (char *)malloc(msr->stream_output_length+1);
 
         if (msr->stream_output_data == NULL) {
@@ -1133,10 +1163,10 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
         }
 
         memset(msr->stream_output_data, 0x0, msr->stream_output_length+1);
-        memcpy(msr->stream_output_data, output_buf->buffer->content, msr->stream_output_length);
+        memcpy(msr->stream_output_data, (char *)xmlBufferContent(output_buf->buffer), msr->stream_output_length);
 
         if (msr->txcfg->debuglog_level >= 4)
-            msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONTENT to stream buffer [%d] bytes.", output_buf->buffer->use);
+            msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONTENT to stream buffer [%d] bytes.", msr->stream_output_length);
 
     } else {
 
@@ -1152,7 +1182,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
             msr->stream_output_data =  NULL;
         }
 
-        msr->stream_output_length = output_buf->conv->use;
+        msr->stream_output_length = elts + msr->resbody_length;
         msr->stream_output_data = (char *)malloc(msr->stream_output_length+1);
 
         if (msr->stream_output_data == NULL) {
@@ -1162,10 +1192,10 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
         }
 
         memset(msr->stream_output_data, 0x0, msr->stream_output_length+1);
-        memcpy(msr->stream_output_data, output_buf->conv->content, msr->stream_output_length);
+        memcpy(msr->stream_output_data, (char *)xmlBufferContent(output_buf->conv), msr->stream_output_length);
 
         if (msr->txcfg->debuglog_level >= 4)
-            msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONV to stream buffer [%d] bytes.", output_buf->conv->use);
+            msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONV to stream buffer [%d] bytes.", msr->stream_output_length);
 
     }
 
@@ -1209,8 +1239,9 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
     if(strlen(link) > 7 && strncmp("http:",(char*)link,5)==0){
         path_chunk = strchr(link+7,'/');
         if(path_chunk != NULL)  {
-            if (msr->txcfg->debuglog_level >= 4)
+            if (msr->txcfg->debuglog_level >= 4)    {
                 msr_log(msr, 4, "Signing data [%s]", path_chunk+1);
+                }
 
             if(msr->txcfg->crypto_key_add == HASH_KEYONLY)
                 hash_value =  hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
@@ -1251,8 +1282,9 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
         if(strlen(link) > 8 && strncmp("https",(char*)link,5)==0){
             path_chunk = strchr(link+8,'/');
             if(path_chunk != NULL)  {
-                if (msr->txcfg->debuglog_level >= 4)
+                if (msr->txcfg->debuglog_level >= 4)    {
                     msr_log(msr, 4, "Signing data [%s]", path_chunk+1);
+                }
 
                 if(msr->txcfg->crypto_key_add == HASH_KEYONLY)
                     hash_value =  hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
@@ -1291,8 +1323,9 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
             }
         }
         else if(*link=='/'){
-            if (msr->txcfg->debuglog_level >= 4)
+            if (msr->txcfg->debuglog_level >= 4)    {
                 msr_log(msr, 4, "Signing data [%s]", link+1);
+                }
 
             if(msr->txcfg->crypto_key_add == HASH_KEYONLY)
                 hash_value = hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) link+1, strlen((char*)link)-1);
@@ -1344,8 +1377,9 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
 
             relative_link = relative_uri+1;
 
-            if (msr->txcfg->debuglog_level >= 4)
+            if (msr->txcfg->debuglog_level >= 4)    {
                 msr_log(msr, 4, "Signing data [%s] size %d", relative_link, strlen(relative_link));
+                }
 
             if(msr->txcfg->crypto_key_add == HASH_KEYONLY)
                 hash_value = hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) relative_link, strlen((char*)relative_link));
@@ -1379,6 +1413,9 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 msr->txcfg->crypto_key_len = strlen(new_pwd);
                 hash_value = hmac(msr, new_pwd, msr->txcfg->crypto_key_len, (unsigned char *) relative_link, strlen((char*)relative_link));
             }
+
+        link = relative_uri;
+
         }
 
     if(hash_value == NULL) return NULL;
