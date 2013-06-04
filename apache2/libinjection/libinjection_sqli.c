@@ -47,22 +47,37 @@ memchr2(const char *haystack, size_t haystack_len, char c0, char c1)
     if (haystack_len < 2) {
         return NULL;
     }
-    if (c0 == c1) {
-        return NULL;
-    }
 
     while (cur < last) {
         if (cur[0] == c0) {
             if (cur[1] == c1) {
                 return cur;
             } else {
-                cur += 2;
+                cur += 2; //(c0 == c1) ? 1 : 2;
             }
         } else {
             cur += 1;
         }
     }
 
+    return NULL;
+}
+
+/**
+ */
+static const char *
+my_memmem(const char* haystack, size_t hlen, const char* needle, size_t nlen)
+{
+    assert(haystack);
+    assert(needle);
+    assert(nlen > 1);
+    const char* cur;
+    const char* last =  haystack + hlen - nlen;
+    for (cur = haystack; cur <= last; ++cur) {
+        if (cur[0] == needle[0] && memcmp(cur, needle, nlen) == 0) {
+            return cur;
+        }
+    }
     return NULL;
 }
 
@@ -106,6 +121,17 @@ strlencspn(const char *s, size_t len, const char *accept)
         }
     }
     return len;
+}
+static int char_is_white(char ch) {
+    /* ' '  space is 0x32
+       '\t  0x09 \011 horizontal tab
+       '\n' 0x0a \012 new line
+       '\v' 0x0b \013 verical tab
+       '\f' 0x0c \014 new page
+       '\r' 0x0d \015 carriage return
+            0xa0 \240 is latin1
+    */
+    return strchr(" \t\n\v\f\r\240", ch) != NULL;
 }
 
 /*
@@ -205,17 +231,6 @@ static int bsearch_cstrcase(const char *key, const char *base[], size_t nmemb)
 
 /**
  *
- */
-#define UNUSED(x) (void)(x)
-
-static int is_sqli_pattern(const char* key, void* callbackarg)
-{
-    UNUSED(callbackarg);
-    return bsearch_cstr(key, sql_fingerprints, sqli_fingerprints_sz);
-}
-
-/**
- *
  *
  *
  * Porting Notes:
@@ -262,10 +277,7 @@ static char is_keyword(const char* key)
 
 static void st_clear(stoken_t * st)
 {
-    st->type = CHAR_NULL;
-    st->str_open = CHAR_NULL;
-    st->str_close = CHAR_NULL;
-    st->val[0] = CHAR_NULL;
+    memset(st, 0, sizeof(stoken_t));
 }
 
 static void st_assign_char(stoken_t * st, const char stype, const char value)
@@ -275,8 +287,8 @@ static void st_assign_char(stoken_t * st, const char stype, const char value)
     st->val[1] = CHAR_NULL;
 }
 
-static void st_assign(stoken_t * st, const char stype, const char *value,
-               size_t len)
+static void st_assign(stoken_t * st, const char stype,
+                      const char *value, size_t len)
 {
     size_t last = len < ST_MAX_SIZE ? len : (ST_MAX_SIZE - 1);
     st->type = stype;
@@ -367,13 +379,28 @@ static size_t parse_dash(sfilter * sf)
     const size_t slen = sf->slen;
     size_t pos = sf->pos;
 
+    /*
+     * five cases
+     * 1) --[white]  this is always a SQL comment
+     * 2) --[EOF]    this is a comment
+     * 3) --[notwhite] in MySQL this is NOT a comment but two unary operators
+     * 4) --[notwhite] everyone else thinks this is a comment
+     * 5) -[not dash]  '-' is a unary operator
+     */
 
-    size_t pos1 = pos + 1;
-    if (pos1 < slen && cs[pos1] == '-') {
+    if (pos + 2 < slen && cs[pos + 1] == '-' && char_is_white(cs[pos+2]) ) {
+        return parse_eol_comment(sf);
+    } else if (pos +2 == slen && cs[pos + 1] == '-') {
+        return parse_eol_comment(sf);
+    } else if (pos + 1 < slen && cs[pos + 1] == '-' && sf->comment_style == COMMENTS_ANSI) {
+        /* --[not-white] not-white case:
+         *
+         */
+        sf->stats_comment_ddx += 1;
         return parse_eol_comment(sf);
     } else {
         st_assign_char(sf->current, 'o', '-');
-        return pos1;
+        return pos + 1;
     }
 }
 
@@ -582,7 +609,7 @@ static size_t parse_string_core(const char *cs, const size_t len, size_t pos,
             st_assign(st, 's', cs + pos + offset, len - pos - offset);
             st->str_close = CHAR_NULL;
             return len;
-        } else if (*(qpos - 1) != '\\') {
+        } else if (qpos == cs || *(qpos - 1) != '\\') {
             /*
              * ending quote is not escaped.. copy and end
              */
@@ -673,42 +700,156 @@ static size_t parse_string_tick(sfilter *sf)
     }
 }
 
-static size_t parse_word(sfilter * sf)
+/** MySQL ad-hoc character encoding
+ *
+ * if something starts with a underscore
+ * check to see if it's in this form
+ * _[a-z0-9] and if it's a character encoding
+ * If not, let the normal 'word parser'
+ * handle it.
+ */
+static size_t parse_underscore(sfilter *sf)
 {
     const char *cs = sf->s;
+    size_t slen = sf->slen;
     size_t pos = sf->pos;
-    char *dot;
     char ch;
-    size_t slen =
-        strlencspn(cs + pos, sf->slen - pos,
-                   " .`<>:\\?=@!#~+-*/&|^%(),';\r\n\t\"\013\014");
 
-    st_assign(sf->current, 'n', cs + pos, slen);
+    size_t xlen = strlenspn(cs + pos + 1, slen - pos - 1,
+                              "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    if (xlen == 0) {
+        return parse_word(sf);
+    }
+    st_assign(sf->current, 'n', cs + pos, xlen);
+    ch = is_keyword(sf->current->val);
+    if (ch == 't') {
+        sf->current->type = 't';
+        return xlen + 1;
+    }
+    return parse_word(sf);
+}
 
-    dot = strchr(sf->current->val, '.');
-    if (dot != NULL) {
-        *dot = '\0';
+static size_t parse_ustring(sfilter * sf)
+{
+    const char *cs = sf->s;
+    size_t slen = sf->slen;
+    size_t pos = sf->pos;
 
-        ch = is_keyword(sf->current->val);
+    if (pos + 2 < slen && cs[pos+1] == '&' && cs[pos+2] == '\'') {
+        sf->pos += 2;
+        pos = parse_string(sf);
+        sf->current->str_open = 'u';
+        if (sf->current->str_close == '\'') {
+            sf->current->str_close = 'u';
+        }
+        return pos;
+    } else {
+        return parse_word(sf);
+    }
+}
 
-        if (ch == 'k' || ch == 'o' || ch == 'E') {
-            /*
-             * we got something like "SELECT.1"
-             */
-            sf->current->type = ch;
-            return pos + strlen(sf->current->val);
-        } else {
-            /*
-             * something else, put back dot
-             */
-            *dot = '.';
+static size_t parse_qstring_core(sfilter * sf, int offset)
+{
+    char ch;
+    const char *strend;
+    const char *cs = sf->s;
+    size_t slen = sf->slen;
+    size_t pos = sf->pos + offset;
+
+    /* if we are already at end of string..
+       if current char is not q or Q
+       if we don't have 2 more chars
+       if char2 != a single quote
+       then, just treat as word
+    */
+    if (pos >= slen ||
+        (cs[pos] != 'q' && cs[pos] != 'Q') ||
+        pos + 2 >= slen ||
+        cs[pos + 1] != '\'') {
+        return parse_word(sf);
+    }
+
+    ch = cs[pos + 2];
+    if (ch < 33 && ch > 127) {
+        return parse_word(sf);
+    }
+    switch (ch) {
+    case '(' : ch = ')'; break;
+    case '[' : ch = ']'; break;
+    case '{' : ch = '}'; break;
+    case '<' : ch = '>'; break;
+    }
+
+    strend = memchr2(cs + pos + 3, slen - pos - 3, ch, '\'');
+    if (strend == NULL) {
+        st_assign(sf->current, 's', cs + pos + 3, slen - pos - 3);
+        sf->current->str_open = 'q';
+        sf->current->str_close = CHAR_NULL;
+        return slen;
+    } else {
+        st_assign(sf->current, 's', cs + pos + 3, strend - cs - pos -  3);
+        sf->current->str_open = 'q';
+        sf->current->str_close = 'q';
+        return (strend - cs) + 2;
+    }
+}
+
+/*
+ * Oracle's q string
+ */
+static size_t parse_qstring(sfilter * sf)
+{
+    return parse_qstring_core(sf, 0);
+}
+
+/*
+ * Oracle's nq string
+ */
+static size_t parse_nqstring(sfilter * sf)
+{
+    return parse_qstring_core(sf, 1);
+}
+
+static size_t parse_word(sfilter * sf)
+{
+    char ch;
+    char delim;
+    size_t i;
+    const char *cs = sf->s;
+    size_t pos = sf->pos;
+    size_t wlen = strlencspn(cs + pos, sf->slen - pos,
+                             " <>:\\?=@!#~+-*/&|^%(),';\t\n\v\f\r\"");
+
+    st_assign(sf->current, 'n', cs + pos, wlen);
+
+    /* now we need to look inside what we good for "." and "`"
+     * and see if what is before is a keyword or not
+     */
+    for (i =0; i < strlen(sf->current->val); ++i) {
+        delim = sf->current->val[i];
+        if (delim == '.' || delim == '`') {
+            sf->current->val[i] = CHAR_NULL;
+            ch = is_keyword(sf->current->val);
+            if (ch == 'k' || ch == 'o' || ch == 'E') {
+                /* needed for swig */
+                st_clear(sf->current);
+                /*
+                 * we got something like "SELECT.1"
+                 * or SELECT`column`
+                 */
+                st_assign(sf->current, ch, cs + pos, i);
+                return pos + i;
+            } else {
+                /* restore character */
+                sf->current->val[i] = delim;
+            }
         }
     }
 
     /*
      * do normal lookup with word including '.'
      */
-    if (slen < ST_MAX_SIZE) {
+    if (wlen < ST_MAX_SIZE) {
 
         ch = is_keyword(sf->current->val);
 
@@ -717,7 +858,7 @@ static size_t parse_word(sfilter * sf)
         }
         sf->current->type = ch;
     }
-    return pos + slen;
+    return pos + wlen;
 }
 
 /* MySQL backticks are a cross between string and
@@ -794,8 +935,7 @@ static size_t parse_var(sfilter * sf)
 
 
     xlen = strlencspn(cs + pos, slen - pos,
-                     " <>:\\?=@!#~+-*/&|^%(),';\r\n\t\"\013\014");
-//                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.$");
+                     " <>:\\?=@!#~+-*/&|^%(),';\t\n\v\f\r'`\"");
     if (xlen == 0) {
         st_assign(sf->current, 'v', cs + pos, 0);
         return pos;
@@ -807,21 +947,73 @@ static size_t parse_var(sfilter * sf)
 
 static size_t parse_money(sfilter *sf)
 {
+    const char* strend;
     const char *cs = sf->s;
     const size_t slen = sf->slen;
     size_t pos = sf->pos;
     size_t xlen;
 
+    if (pos + 1 == slen) {
+        /* end of line */
+        st_assign_char(sf->current, 'n', '$');
+        return slen;
+    }
+
     /*
      * $1,000.00 or $1.000,00 ok!
      * This also parses $....,,,111 but that's ok
      */
+
     xlen = strlenspn(cs + pos + 1, slen - pos - 1, "0123456789.,");
     if (xlen == 0) {
-        /*
-         * just ignore '$'
-         */
-        return pos + 1;
+        if (cs[pos + 1] == '$') {
+            /* we have $$ .. find ending $$ and make string */
+            strend = memchr2(cs + pos + 2, slen - pos -2, '$', '$');
+            if (strend == NULL) {
+                /* fell off edge */
+                st_assign(sf->current, 's', cs + pos + 2, slen - (pos + 2));
+                sf->current->str_open = '$';
+                sf->current->str_close = CHAR_NULL;
+                return slen;
+            } else {
+                st_assign(sf->current, 's', cs + pos + 2, strend - (cs + pos + 2));
+                sf->current->str_open = '$';
+                sf->current->str_close = '$';
+                return strend - cs + 2;
+            }
+        } else {
+            /* ok it's not a number or '$$', but maybe it's pgsql "$ quoted strings" */
+            xlen = strlenspn(cs + pos + 1, slen - pos - 1, "abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            if (xlen == 0) {
+                /* hmm it's "$" _something_ .. just add $ and keep going*/
+                st_assign_char(sf->current, 'n', '$');
+                return pos + 1;
+            }
+            /* we have $foobar????? */
+            /* is it $foobar$ */
+            if (pos + xlen + 1 == slen || cs[pos+xlen+1] != '$') {
+                /* not $foobar$, or fell off edge */
+                st_assign_char(sf->current, 'n', '$');
+                return pos + 1;
+            }
+
+            /* we have $foobar$ ... find it again */
+            strend = my_memmem(cs+xlen+2, slen - (pos+xlen+2), cs + pos, xlen+2);
+
+            if (strend == NULL) {
+                /* fell off edge */
+                st_assign(sf->current, 's', cs+pos+xlen+2, slen - pos - xlen - 2);
+                sf->current->str_open = '$';
+                sf->current->str_close = CHAR_NULL;
+                return slen;
+            } else {
+                /* got one */
+                st_assign(sf->current, 's', cs+pos+xlen+2, strend - (cs + pos + xlen + 2));
+                sf->current->str_open = '$';
+                sf->current->str_close = '$';
+                return (strend + xlen + 2) - cs;
+            }
+        }
     } else {
         st_assign(sf->current, '1', cs + pos, 1 + xlen);
         return pos + 1 + xlen;
@@ -950,12 +1142,13 @@ int libinjection_sqli_tokenize(sfilter * sf, stoken_t *current)
  * Initializes parsing state
  *
  */
-void libinjection_sqli_init(sfilter * sf, const char *s, size_t len, char delim)
+void libinjection_sqli_init(sfilter * sf, const char *s, size_t len, char delim, char comment_style)
 {
     memset(sf, 0, sizeof(sfilter));
     sf->s = s;
     sf->slen = len;
     sf->delim = delim;
+    sf->comment_style = comment_style;
 }
 
 /** See if two tokens can be merged since they are compound SQL phrases.
@@ -984,7 +1177,7 @@ static int syntax_merge_words(stoken_t * a, stoken_t * b)
 
     if (!
         (a->type == 'k' || a->type == 'n' || a->type == 'o'
-         || a->type == 'U' || a->type == 'E')) {
+         || a->type == 'U' || a->type == 'E' || a->type == 't')) {
         return FALSE;
     }
 
@@ -1083,15 +1276,18 @@ int filter_fold(sfilter * sf)
          */
         if (sf->tokenvec[left].type == 's' && sf->tokenvec[left+1].type == 's') {
             pos -= 1;
+            sf->stats_folds += 1;
             continue;
         } else if (sf->tokenvec[left].type =='o' && st_is_unary_op(&sf->tokenvec[left+1])) {
             pos -= 1;
+            sf->stats_folds += 1;
             if (left > 0) {
                 left -= 1;
             }
             continue;
         } else if (sf->tokenvec[left].type =='(' && st_is_unary_op(&sf->tokenvec[left+1])) {
             pos -= 1;
+            sf->stats_folds += 1;
             if (left > 0) {
                 left -= 1;
             }
@@ -1121,7 +1317,15 @@ int filter_fold(sfilter * sf)
             sf->tokenvec[left].type = 'f';
             continue;
 #endif
+        } else if (sf->tokenvec[left].type == 't' &&
+                   (sf->tokenvec[left+1].type == 'n' || sf->tokenvec[left+1].type == '1' ||
+                    sf->tokenvec[left+1].type == 'v' || sf->tokenvec[left+1].type == 's'))  {
+            st_copy(&sf->tokenvec[left], &sf->tokenvec[left+1]);
+            pos -= 1;
+            sf->stats_folds += 1;
+            continue;
         }
+
 
         /* all cases of handing 2 tokens is done
            and nothing matched.  Get one more token
@@ -1171,13 +1375,18 @@ int filter_fold(sfilter * sf)
                    (sf->tokenvec[left+2].type == '1' || sf->tokenvec[left+2].type == 'n')) {
             pos -= 2;
             continue;
-#if 0
-        } else if ((sf->tokenvec[left].type == 'n' || sf->tokenvec[left].type == '1') &&
+        } else if ((sf->tokenvec[left].type == 'n' || sf->tokenvec[left].type == '1' ||
+                    sf->tokenvec[left].type == 'v' || sf->tokenvec[left].type == 's') &&
+                   sf->tokenvec[left+1].type == 'o' &&
+                   sf->tokenvec[left+2].type == 't') {
+            pos -= 2;
+            sf->stats_folds += 2;
+            continue;
+        } else if ((sf->tokenvec[left].type == 'n' || sf->tokenvec[left].type == '1' || sf->tokenvec[left].type == 's') &&
                    sf->tokenvec[left+1].type == ',' &&
-                   (sf->tokenvec[left+2].type == '1' || sf->tokenvec[left+2].type == 'n')) {
+                   (sf->tokenvec[left+2].type == '1' || sf->tokenvec[left+2].type == 'n' || sf->tokenvec[left+2].type == 's')) {
             pos -= 2;
             continue;
-#endif
         } else if ((sf->tokenvec[left].type == 'k' || sf->tokenvec[left].type == 'E') &&
                    st_is_unary_op(&sf->tokenvec[left+1]) &&
                    (sf->tokenvec[left+2].type == '1' || sf->tokenvec[left+2].type == 'n' || sf->tokenvec[left+2].type == 'v' || sf->tokenvec[left+2].type == 's' || sf->tokenvec[left+2].type == 'f' )) {
@@ -1234,17 +1443,15 @@ int filter_fold(sfilter * sf)
  *          double quote.
  *
  */
-int libinjection_is_string_sqli(sfilter * sql_state,
-                                const char *s, size_t slen,
-                                const char delim,
-                                ptr_fingerprints_fn fn, void* callbackarg)
+const char*
+libinjection_sqli_fingerprint(sfilter * sql_state,
+                              const char *s, size_t slen,
+                              char delim, char comment_style)
 {
     int i;
     int tlen = 0;
-    char ch;
-    int patmatch;
 
-    libinjection_sqli_init(sql_state, s, slen, delim);
+    libinjection_sqli_init(sql_state, s, slen, delim, comment_style);
 
     tlen = filter_fold(sql_state);
     for (i = 0; i < tlen; ++i) {
@@ -1257,17 +1464,45 @@ int libinjection_is_string_sqli(sfilter * sql_state,
     sql_state->pat[tlen] = CHAR_NULL;
 
     /*
-     * check for 'X' in pattern
+     * check for 'X' in pattern, and then
+     * clear out all tokens
+     *
      * this means parsing could not be done
      * accurately due to pgsql's double comments
-     * or other syntax that isn't consistent
-     * should be very rare false positive
+     * or other syntax that isn't consistent.
+     * Should be very rare false positive
      */
     if (strchr(sql_state->pat, 'X')) {
-        return TRUE;
+        /*  needed for SWIG */
+        memset((void*)sql_state->pat, 0, MAX_TOKENS + 1);
+        sql_state->pat[0] = 'X';
+
+        sql_state->tokenvec[0].type = 'X';
+        sql_state->tokenvec[0].val[0] = 'X';
+        sql_state->tokenvec[0].val[1] = '\0';
+        sql_state->tokenvec[1].type = CHAR_NULL;
     }
 
-    patmatch = fn(sql_state->pat, callbackarg);
+    return sql_state->pat;
+}
+
+
+/**
+ *
+ */
+#define UNUSED(x) (void)(x)
+
+int libinjection_sqli_check_fingerprint(sfilter* sql_state, void* callbackarg)
+{
+    UNUSED(callbackarg);
+
+    return libinjection_sqli_blacklist(sql_state) &&
+        libinjection_sqli_not_whitelist(sql_state);
+}
+
+int libinjection_sqli_blacklist(sfilter* sql_state)
+{
+    int patmatch = bsearch_cstr(sql_state->pat, sql_fingerprints, sqli_fingerprints_sz);
 
     /*
      * No match.
@@ -1280,11 +1515,22 @@ int libinjection_is_string_sqli(sfilter * sql_state,
         return FALSE;
     }
 
+    return TRUE;
+}
+
+/*
+ * return TRUE if sqli, false is benign
+ */
+int libinjection_sqli_not_whitelist(sfilter* sql_state)
+{
     /*
-     * We got a SQLi match
+     * We assume we got a SQLi match
      * This next part just helps reduce false positives.
      *
      */
+    char ch;
+    size_t tlen = strlen(sql_state->pat);
+
     switch (tlen) {
     case 2:{
         /*
@@ -1431,7 +1677,6 @@ int libinjection_is_string_sqli(sfilter * sql_state,
 int libinjection_is_sqli(sfilter * sql_state, const char *s, size_t slen,
                          ptr_fingerprints_fn fn, void* callbackarg)
 {
-
     /*
      * no input? not sqli
      */
@@ -1440,17 +1685,21 @@ int libinjection_is_sqli(sfilter * sql_state, const char *s, size_t slen,
     }
 
     if (fn == NULL) {
-        fn = is_sqli_pattern;
+        fn = libinjection_sqli_check_fingerprint;
     }
 
     /*
      * test input "as-is"
      */
-    if (libinjection_is_string_sqli(sql_state, s, slen, CHAR_NULL,
-                                    fn, callbackarg)) {
+    libinjection_sqli_fingerprint(sql_state, s, slen, CHAR_NULL, COMMENTS_ANSI);
+    if (fn(sql_state, callbackarg)) {
         return TRUE;
+    } else if (sql_state->stats_comment_ddx) {
+      libinjection_sqli_fingerprint(sql_state, s, slen, CHAR_NULL, COMMENTS_MYSQL);
+      if (fn(sql_state, callbackarg)) {
+        return TRUE;
+      }
     }
-
     /*
      * if input has a single_quote, then
      * test as if input was actually '
@@ -1460,19 +1709,26 @@ int libinjection_is_sqli(sfilter * sql_state, const char *s, size_t slen,
      *   is_string_sqli(sql_state, "'" + s, slen+1, NULL, fn, arg)
      *
      */
-    if (memchr(s, CHAR_SINGLE, slen)
-        && libinjection_is_string_sqli(sql_state, s, slen, CHAR_SINGLE,
-                                       fn, callbackarg)) {
+    if (memchr(s, CHAR_SINGLE, slen)) {
+      libinjection_sqli_fingerprint(sql_state, s, slen, CHAR_SINGLE, COMMENTS_ANSI);
+      if (fn(sql_state, callbackarg)) {
         return TRUE;
+      } else if (sql_state->stats_comment_ddx) {
+        libinjection_sqli_fingerprint(sql_state, s, slen, CHAR_SINGLE, COMMENTS_MYSQL);
+        if (fn(sql_state, callbackarg)) {
+          return TRUE;
+        }
+      }
     }
 
     /*
      * same as above but with a double-quote "
      */
-    if (memchr(s, CHAR_DOUBLE, slen)
-        && libinjection_is_string_sqli(sql_state, s, slen, CHAR_DOUBLE,
-                                       fn, callbackarg)) {
-        return TRUE;
+    if (memchr(s, CHAR_DOUBLE, slen)) {
+      libinjection_sqli_fingerprint(sql_state, s, slen, CHAR_DOUBLE, COMMENTS_MYSQL);
+        if (fn(sql_state, callbackarg)) {
+            return TRUE;
+        }
     }
 
     /*

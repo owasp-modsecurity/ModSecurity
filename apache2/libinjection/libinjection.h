@@ -37,7 +37,7 @@ extern "C" {
  * See python's normalized version
  * http://www.python.org/dev/peps/pep-0386/#normalizedversion
  */
-#define LIBINJECTION_VERSION "3.0.0-pre2"
+#define LIBINJECTION_VERSION "3.0.0-pre8"
 
 #define ST_MAX_SIZE 32
 #define MAX_TOKENS 5
@@ -46,7 +46,13 @@ extern "C" {
 #define CHAR_SINGLE '\''
 #define CHAR_DOUBLE '"'
 
+#define COMMENTS_ANSI 0
+#define COMMENTS_MYSQL 1
+
 typedef struct {
+#ifdef SWIG
+%immutable;
+#endif
     char type;
     char str_open;
     char str_close;
@@ -55,6 +61,10 @@ typedef struct {
 } stoken_t;
 
 typedef struct {
+#ifdef SWIG
+%immutable;
+#endif
+
     /* input */
     const char *s;
     size_t slen;
@@ -73,13 +83,40 @@ typedef struct {
     /*  +1 for ending null */
     char pat[MAX_TOKENS + 1];
     char delim;
+    char comment_style;
+
     int reason;
+
+    /* Number of ddw (dash-dash-white) comments
+     * These comments are in the form of
+     *   '--[whitespace]' or '--[EOF]'
+     *
+     * All databases treat this as a comment.
+     */
+     int stats_comment_ddw;
+
+    /* Number of ddx (dash-dash-[notwhite]) comments
+     *
+     * ANSI SQL treats these are comments, MySQL treats this as
+     * two unary operators '-' '-'
+     *
+     * If you are parsing result returns FALSE and
+     * stats_comment_dd > 0, you should reparse with
+     * COMMENT_MYSQL
+     *
+     */
+    int stats_comment_ddx;
+
+    int stats_comment_c;
+
+    int stats_folds;
+
 } sfilter;
 
 /**
  * Pointer to function, takes cstr input, returns 1 for true, 0 for false
  */
-typedef int (*ptr_fingerprints_fn)(const char*, void* callbackarg);
+typedef int (*ptr_fingerprints_fn)(sfilter*, void* callbackarg);
 
 /**
  * Main API: tests for SQLi in three possible contexts, no quotes,
@@ -112,27 +149,50 @@ int libinjection_is_sqli(sfilter * sql_state,
  *        CHAR_SINGLE ('), single quote context
  *        CHAR_DOUBLE ("), double quote context
  *        Other values will likely be ignored.
- * \param ptr_fingerprints_fn is a pointer to a function
- *        that determines if a fingerprint is a match or not.
- * \param callbackarg passed to function above
  *
- *
- * \return 1 (true) if SQLi or 0 (false) if not SQLi **in this context**
+ * \return pointer to sfilter.pat as convience.
+ *         do not free!
  *
  */
-int libinjection_is_string_sqli(sfilter * sql_state,
-                                const char *s, size_t slen,
-                                const char delim,
-                                ptr_fingerprints_fn fn, void* callbackarg);
+const char* libinjection_sqli_fingerprint(sfilter * sql_state,
+                                          const char *s, size_t slen,
+                                          char delim,
+                                          char comment_style);
 
 /*  FOR H@CKERS ONLY
  *
  */
 
-void libinjection_sqli_init(sfilter* sql_state, const char* str,
-                            size_t slen, char delim);
+void libinjection_sqli_init(sfilter* sql_state,
+                            const char* s, size_t slen,
+                            char delim, char comment_style);
 
 int libinjection_sqli_tokenize(sfilter * sql_state, stoken_t *ouput);
+
+/** The built-in default function to match fingerprints
+ *  and do false negative/positive analysis.  This calls the following
+ *  two functions.  With this, you other-ride one part or the other.
+ *
+ *     return libinjection_sqli_blacklist(sql_state, callbackarg) &&
+ *        libinject_sqli_not_whitelist(sql_state, callbackarg);
+ *
+ * \param sql_state should be filled out after libinjection_sqli_fingerprint is called
+ * \param callbackarg is unused but here to be used with API.
+ */
+int libinjection_sqli_check_fingerprint(sfilter *sql_state, void* callbackarg);
+
+/* Given a pattern determine if it's a SQLi pattern.
+ *
+ * \return TRUE if sqli, false otherwise
+ */
+int libinjection_sqli_blacklist(sfilter* sql_state);
+
+/* Given a positive match for a pattern (i.e. pattern is SQLi), this function
+ * does additional analysis to reduce false positives.
+ *
+ * \return TRUE if sqli, false otherwise
+ */
+int libinjection_sqli_not_whitelist(sfilter* sql_state);
 
 #ifdef __cplusplus
 }
