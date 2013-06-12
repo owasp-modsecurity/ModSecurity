@@ -1355,7 +1355,7 @@ ngx_http_modsecurity_create_ctx(ngx_http_request_t *r)
         }
     }
 
-    salt[i] = '\0';
+    salt[TXID_SIZE-1] = '\0';
 
     apr_table_setn(ctx->req->subprocess_env, "UNIQUE_ID", apr_psprintf(ctx->req->pool, "%s", salt));
 
