@@ -61,7 +61,7 @@ static char *ngx_http_modsecurity_enable(ngx_conf_t *cf, ngx_command_t *cmd, voi
 
 static ngx_http_modsecurity_ctx_t * ngx_http_modsecurity_create_ctx(ngx_http_request_t *r);
 static int ngx_http_modsecurity_drop_action(request_rec *r);
-static void ngx_http_modsecurity_finalize(void *data);
+static void ngx_http_modsecurity_terminate(ngx_cycle_t *cycle);
 static void ngx_http_modsecurity_cleanup(void *data);
 
 static int ngx_http_modsecurity_save_headers_in_visitor(void *data, const char *key, const char *value);
@@ -115,8 +115,8 @@ ngx_module_t ngx_http_modsecurity = {
     ngx_http_modsecurity_init_process, /* init process */
     NULL, /* init thread */
     NULL, /* exit thread */
-    NULL, /* exit process */
-    NULL, /* exit master */
+    ngx_http_modsecurity_terminate, /* exit process */
+    ngx_http_modsecurity_terminate, /* exit master */
     NGX_MODULE_V1_PADDING
 };
 
@@ -881,12 +881,11 @@ modsec_pcre_free(void *ptr)
 {
 }
 
+static server_rec *modsec_server = NULL;
+
 static ngx_int_t
 ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
 {
-    server_rec          *s;
-    ngx_pool_cleanup_t  *cln;
-
     /*  XXX: temporary hack, nginx uses pcre as well and hijacks these two */
     pcre_malloc = modsec_pcre_malloc;
     pcre_free = modsec_pcre_free;
@@ -895,24 +894,18 @@ ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
     modsecSetDropAction(ngx_http_modsecurity_drop_action);
 
     /* TODO: server_rec per server conf */
-    s = modsecInit();
-    if (s == NULL) {
+    modsec_server = modsecInit();
+    if (modsec_server == NULL) {
         return NGX_ERROR;
     }
-
-    cln = ngx_pool_cleanup_add(cf->pool, 0);
-    if (cln == NULL) {
-        return NGX_ERROR;
-    }
-    cln->handler = ngx_http_modsecurity_finalize;
 
     /* set host name */
-    s->server_hostname = ngx_palloc(cf->pool, ngx_cycle->hostname.len + 1);
-    if (s->server_hostname == NULL) {
+    modsec_server->server_hostname = ngx_palloc(cf->pool, ngx_cycle->hostname.len + 1);
+    if (modsec_server->server_hostname == NULL) {
         return NGX_ERROR;
     }
-    ngx_memcpy(s->server_hostname, ngx_cycle->hostname.data, ngx_cycle->hostname.len);
-    s->server_hostname[ ngx_cycle->hostname.len] = '\0';
+    ngx_memcpy(modsec_server->server_hostname, ngx_cycle->hostname.data, ngx_cycle->hostname.len);
+    modsec_server->server_hostname[ ngx_cycle->hostname.len] = '\0';
 
     modsecStartConfig();
     return NGX_OK;
@@ -920,9 +913,12 @@ ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
 
 
 static void
-ngx_http_modsecurity_finalize(void *data)
+ngx_http_modsecurity_terminate(ngx_cycle_t *cycle)
 {
-    modsecTerminate();
+    if (modsec_server) {
+        modsecTerminate();
+        modsec_server = NULL;
+    }
 }
 
 
