@@ -130,8 +130,10 @@ static int unicode_map_create(directory_config *dcfg, char **error_msg)
 
     apr_file_close(u_map->map);
 
-    free(buf);
-    buf = NULL;
+    if(buf) {
+        free(buf);
+        buf = NULL;
+    }
 
     return 1;
 }
