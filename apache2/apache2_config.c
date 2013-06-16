@@ -2656,6 +2656,8 @@ static const char *cmd_geo_lookup_db(cmd_parms *cmd, void *_dcfg,
 /**
 * \brief Add SecUnicodeCodePage configuration option
 *
+* Depcrecated
+*
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
 * \param p1 Pointer to configuration option
@@ -2688,12 +2690,23 @@ static const char *cmd_unicode_codepage(cmd_parms *cmd,
 * \retval NULL On success
 */
 static const char *cmd_unicode_map(cmd_parms *cmd, void *_dcfg,
-                                     const char *p1)
+                                     const char *p1, const char *p2)
 {
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
     char *error_msg;
+    long val = 0;
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
+
+    if(p2 != NULL)  {
+        val = atol(p2);
+        if (val <= 0) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Invalid setting for "
+                    "SecUnicodeMapFile: %s", p2);
+        }
+
+        unicode_codepage = (unsigned long int)val;
+    }
 
     if (unicode_map_init(dcfg, filename, &error_msg) <= 0) {
         return error_msg;
@@ -3069,7 +3082,7 @@ const command_rec module_directives[] = {
         "Unicode CodePage"
     ),
 
-    AP_INIT_TAKE1 (
+    AP_INIT_TAKE12 (
         "SecUnicodeMapFile",
         cmd_unicode_map,
         NULL,
