@@ -713,11 +713,13 @@ static int var_useragent_ip_generate(modsec_rec *msr, msre_var *var, msre_rule *
 static int var_remote_addr_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
+#if !defined(MSC_TEST)
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 3
     if (ap_find_linked_module("mod_remoteip.c") != NULL) {
         if(msr->r->useragent_ip != NULL) msr->remote_addr = apr_pstrdup(msr->mp, msr->r->useragent_ip);
         return var_simple_generate(var, vartab, mptmp, msr->remote_addr);
     }
+#endif
 #endif
 
     return var_simple_generate(var, vartab, mptmp, msr->remote_addr);
