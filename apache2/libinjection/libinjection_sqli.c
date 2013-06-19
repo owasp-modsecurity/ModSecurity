@@ -120,11 +120,14 @@ memchr2(const char *haystack, size_t haystack_len, char c0, char c1)
 static const char *
 my_memmem(const char* haystack, size_t hlen, const char* needle, size_t nlen)
 {
-    assert(haystack);
-    assert(needle);
-    assert(nlen > 1);
-    const char* cur;
-    const char* last =  haystack + hlen - nlen;
+    const char* cur = NULL;
+    const char* last =  NULL;
+
+    if(nlen < 1 || needle == NULL || haystack == NULL)
+        return NULL;
+
+    last =  haystack + hlen - nlen;
+
     for (cur = haystack; cur <= last; ++cur) {
         if (cur[0] == needle[0] && memcmp(cur, needle, nlen) == 0) {
             return cur;
@@ -132,7 +135,6 @@ my_memmem(const char* haystack, size_t hlen, const char* needle, size_t nlen)
     }
     return NULL;
 }
-
 /** Find largest string containing certain characters.
  *
  * C Standard library 'strspn' only works for 'c-strings' (null terminated)
@@ -475,6 +477,7 @@ static size_t parse_slash(sfilter * sf)
     const char* cur = cs + pos;
     char ctype = TYPE_COMMENT;
     size_t pos1 = pos + 1;
+    const char *ptr;
     if (pos1 == slen || cs[pos1] != '*') {
         return parse_operator1(sf);
     }
@@ -482,7 +485,7 @@ static size_t parse_slash(sfilter * sf)
     /*
      * skip over initial '/x'
      */
-    const char *ptr = memchr2(cur + 2, slen - (pos + 2), '*', '/');
+    ptr = memchr2(cur + 2, slen - (pos + 2), '*', '/');
     if (ptr == NULL) {
         /* till end of line */
         clen = slen - pos;
@@ -1678,6 +1681,7 @@ int libinjection_sqli_blacklist(sfilter* sql_state)
     char fp2[LIBINJECTION_SQLI_MAX_TOKENS + 2];
     char ch;
     size_t i;
+    int patmatch = 0;
     size_t len = strlen(sql_state->fingerprint);
 
     if (len < 1) {
@@ -1702,7 +1706,7 @@ int libinjection_sqli_blacklist(sfilter* sql_state)
     }
     fp2[i+1] = '\0';
 
-    int patmatch = is_keyword(fp2, len + 1) == TYPE_FINGERPRINT;
+    patmatch = is_keyword(fp2, len + 1) == TYPE_FINGERPRINT;
 
     /*
      * No match.

@@ -2142,7 +2142,7 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
     int issqli;
     int capture;
 
-    libinjecton_sqli_init(&sqli_state, var->value, var->value_len, 0);
+    libinjection_sqli_init(&sqli_state, var->value, var->value_len, 0);
     issqli = libinjection_is_sqli(&sqli_state);
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
