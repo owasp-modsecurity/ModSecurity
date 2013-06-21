@@ -22,7 +22,8 @@ msc_test_SOURCES = msc_test.c \
                    $(top_srcdir)/apache2/acmp.c \
                    $(top_srcdir)/apache2/msc_lua.c \
                    $(top_srcdir)/apache2/msc_release.c \
-                   $(top_srcdir)/apache2/libinjection/libinjection_sqli.c
+                   $(top_srcdir)/apache2/libinjection/libinjection_sqli.c \
+		   $(top_srcdir)/apache2/libinjection/libinjection_wrap.c
 msc_test_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
                   @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @MODSEC_EXTRA_CFLAGS@ @LUA_CFLAGS@
 msc_test_CPPFLAGS = -I$(top_srcdir)/apache2 \

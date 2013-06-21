@@ -18,6 +18,8 @@
 
 #include "apr_strings.h"
 
+extern int luaopen_libinjection(lua_State* L);
+
 typedef struct {
     apr_array_header_t *parts;
     apr_pool_t *pool;
@@ -100,6 +102,7 @@ char *lua_compile(msc_script **script, const char *filename, apr_pool_t *pool) {
     L = lua_open();
 #endif
     luaL_openlibs(L);
+    luaopen_libinjection(L);
 
     /* Find script. */
     if (luaL_loadfile(L, filename)) {
@@ -451,6 +454,8 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
 #else
     luaL_register(L, "m", mylib);
 #endif
+    luaopen_libinjection(L);
+
 
     rc = lua_restore(L, script);
     if (rc) {
