@@ -23,6 +23,14 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_initialize
 JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_destroy
   (JNIEnv *, jobject);
 
+/*
+ * Class:     org_modsecurity_ModSecurity
+ * Method:    onRequest
+ * Signature: (Ljava/lang/String;Ljavax/servlet/ServletRequest;Ljavax/servlet/http/HttpServletRequest;Ljava/lang/String;Z)I
+ */
+JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest
+  (JNIEnv *, jobject, jstring, jobject, jobject, jstring, jboolean);
+
 #ifdef __cplusplus
 }
 #endif
