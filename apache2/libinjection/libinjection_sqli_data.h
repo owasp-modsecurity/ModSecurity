@@ -9686,6 +9686,7 @@ static const keyword_t sql_keywords[] = {
     {"FROM_DAYS", 'f'},
     {"FROM_UNIXTIME", 'f'},
     {"FULL OUTER", 'k'},
+    {"FULL OUTER JOIN", 'k'},
     {"FULLTEXT", 'k'},
     {"FULLTEXTCATALOGPROPERTY", 'f'},
     {"FULLTEXTSERVICEPROPERTY", 'f'},
@@ -9741,6 +9742,7 @@ static const keyword_t sql_keywords[] = {
     {"INFILE", 'k'},
     {"INITCAP", 'f'},
     {"INNER", 'k'},
+    {"INNER JOIN", 'k'},
     {"INOUT", 'k'},
     {"INSENSITIVE", 'k'},
     {"INSERT", 'E'},
@@ -9808,6 +9810,7 @@ static const keyword_t sql_keywords[] = {
     {"LEFT", 'n'},
     {"LEFT JOIN", 'k'},
     {"LEFT OUTER", 'k'},
+    {"LEFT OUTER JOIN", 'k'},
     {"LENGTH", 'f'},
     {"LIKE", 'o'},
     {"LIMIT", 'B'},
@@ -9874,6 +9877,8 @@ static const keyword_t sql_keywords[] = {
     {"NATURAL INNER", 'k'},
     {"NATURAL JOIN", 'k'},
     {"NATURAL LEFT", 'k'},
+    {"NATURAL LEFT OUTER", 'k'},
+    {"NATURAL LEFT OUTER JOIN", 'k'},
     {"NATURAL OUTER", 'k'},
     {"NATURAL RIGHT", 'k'},
     {"NETMASK", 'f'},
@@ -10029,6 +10034,7 @@ static const keyword_t sql_keywords[] = {
     {"RIGHT", 'n'},
     {"RIGHT JOIN", 'k'},
     {"RIGHT OUTER", 'k'},
+    {"RIGHT OUTER JOIN", 'k'},
     {"RLIKE", 'o'},
     {"ROUND", 'f'},
     {"ROW", 'f'},
@@ -10317,5 +10323,5 @@ static const keyword_t sql_keywords[] = {
     {"||", '&'},
     {"~*", 'o'},
 };
-static const size_t sql_keywords_sz = 10150;
+static const size_t sql_keywords_sz = 10156;
 #endif
