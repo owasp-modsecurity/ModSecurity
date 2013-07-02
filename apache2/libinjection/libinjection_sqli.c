@@ -181,9 +181,10 @@ static int char_is_white(char ch) {
        '\v' 0x0b \013 verical tab
        '\f' 0x0c \014 new page
        '\r' 0x0d \015 carriage return
+            0x00 \000 null (oracle)
             0xa0 \240 is latin1
     */
-    return strchr(" \t\n\v\f\r\240", ch) != NULL;
+    return strchr(" \t\n\v\f\r\240\000", ch) != NULL;
 }
 
 /* DANGER DANGER
@@ -872,7 +873,7 @@ static size_t parse_word(sfilter * sf)
     const char *cs = sf->s;
     size_t pos = sf->pos;
     size_t wlen = strlencspn(cs + pos, sf->slen - pos,
-                             " <>:\\?=@!#~+-*/&|^%(),';\t\n\v\f\r\"");
+                             " <>:\\?=@!#~+-*/&|^%(),';\t\n\v\f\r\"\000");
 
     st_assign(sf->current, TYPE_BAREWORD, pos, wlen, cs + pos);
 
@@ -1122,6 +1123,15 @@ static size_t parse_number(sfilter * sf)
             while (pos < slen && ISDIGIT(cs[pos])) {
                 pos += 1;
             }
+        }
+    }
+
+    /* oracle's ending float or double suffix
+     * http://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements003.htm#i139891
+     */
+    if (pos < slen) {
+        if (cs[pos] == 'd' || cs[pos] == 'D' || cs[pos] == 'f' || cs[pos] == 'F') {
+            pos += 1;
         }
     }
 

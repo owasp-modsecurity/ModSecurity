@@ -19,7 +19,7 @@ extern "C" {
  * See python's normalized version
  * http://www.python.org/dev/peps/pep-0386/#normalizedversion
  */
-#define LIBINJECTION_VERSION "3.0.0"
+#define LIBINJECTION_VERSION "3.1.0"
 
 /**
  * Libinjection's sqli module makes a "normalized"
@@ -227,21 +227,31 @@ void libinjection_sqli_reset(sfilter* sql_state, int flags);
  *
  * \param sql_state
  *
- * \return pointer to sfilter.pat as convience.
- *         do not free!
+ * \returns a pointer to sfilter.fingerprint as convenience
+ *          do not free!
  *
  */
 const char* libinjection_sqli_fingerprint(sfilter * sql_state, int flags);
 
-
+/**
+ * The default "word" to token-type or fingerprint function.  This
+ * uses a ASCII case-insensitive binary tree.
+ */
 char libinjection_sqli_lookup_word(sfilter *sql_state, int lookup_type,
                                    const char* s, size_t slen);
 
+/* Streaming tokenization interface.
+ *
+ * sql_state->current is updated with the current token.
+ *
+ * \returns 1, has a token, keep going, or 0 no tokens
+ *
+ */
 int  libinjection_sqli_tokenize(sfilter * sql_state);
 
 /** The built-in default function to match fingerprints
  *  and do false negative/positive analysis.  This calls the following
- *  two functions.  With this, you other-ride one part or the other.
+ *  two functions.  With this, you over-ride one part or the other.
  *
  *     return libinjection_sqli_blacklist(sql_state) &&
  *        libinject_sqli_not_whitelist(sql_state);
