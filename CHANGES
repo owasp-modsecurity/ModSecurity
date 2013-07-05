@@ -1,3 +1,25 @@
+19 Jul 2013 - 2.7.5
+-------------------
+Improvements:
+
+    * SecUnicodeCodePage is deprecated. SecUnicodeMapFile now accepts the code page as a second parameter.
+
+    * Updated Libinjection to version 3.2.0. Many improvements were made.
+
+    * Severity action now supports strings (emergency, alert, critical, error, warning, notice, info, debug).
+
+Bug Fixes:
+
+    * Fixed utf8toUnicode tfn null byte conversion.
+
+    * Fixed NGINX crash when issue reload command.
+
+    * Fixed flush output buffer before inject modified hashed response body.
+
+    * Fixed url normalization for Hash Engine.
+
+Security Issues:
+
 10 May 2013 - 2.7.4
 -------------------
 Improvements:
