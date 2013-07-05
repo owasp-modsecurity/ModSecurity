@@ -695,7 +695,7 @@ nextround:
 
         msr->of_stream_changed = 1;
 
-        strncpy(msr->stream_output_data, data, size);
+        memcpy(msr->stream_output_data, data, size);
         msr->stream_output_data[size] = '\0';
 
         var->value_len = size;
@@ -719,7 +719,7 @@ nextround:
 
         msr->if_stream_changed = 1;
 
-        strncpy(msr->stream_input_data, data, size);
+        memcpy(msr->stream_input_data, data, size);
         msr->stream_input_data[size] = '\0';
 
         var->value_len = size;
