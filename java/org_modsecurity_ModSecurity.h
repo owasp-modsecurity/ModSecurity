@@ -7,6 +7,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#undef org_modsecurity_ModSecurity_DONE
+#define org_modsecurity_ModSecurity_DONE -2L
+#undef org_modsecurity_ModSecurity_DECLINED
+#define org_modsecurity_ModSecurity_DECLINED -1L
+#undef org_modsecurity_ModSecurity_OK
+#define org_modsecurity_ModSecurity_OK 0L
 /*
  * Class:     org_modsecurity_ModSecurity
  * Method:    initialize
@@ -30,6 +36,14 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_destroy
  */
 JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest
   (JNIEnv *, jobject, jstring, jobject, jobject, jstring, jboolean);
+
+/*
+ * Class:     org_modsecurity_ModSecurity
+ * Method:    onResponse
+ * Signature: (Ljavax/servlet/ServletResponse;Ljavax/servlet/http/HttpServletResponse;Ljava/lang/String)I
+ */
+JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onResponse
+  (JNIEnv *, jobject, jobject, jobject, jstring);
 
 #ifdef __cplusplus
 }
