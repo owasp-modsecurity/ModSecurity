@@ -1,0 +1,66 @@
+<!-- $Id: package.html,v 1.3 2003/04/27 17:30:06 martinc Exp $ -->
+<html>
+   <head>
+      <title>Overview of the org.apache.commons.fileupload component</title>
+   </head>
+   <body>
+      <p>
+         Component for handling html file uploads as given by rfc 1867
+         <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC&nbsp;1867</a>.
+      </p>
+      <p>
+         Normal usage of the package involves
+         {@link org.apache.commons.fileupload.DiskFileUpload DiskFileUpload}
+         parsing the HttpServletRequest and returning a list of
+         {@link org.apache.commons.fileupload.FileItem FileItem}'s.
+         These <code>FileItem</code>'s provide easy access to the data
+         given in the upload.  There is also a low level api for
+         manipulating the upload data encapsulated in the
+         {@link org.apache.commons.fileupload.MultipartStream MultipartStream}
+         class.
+      </p>
+
+      <p>
+         Normal usage example:
+      </p>
+<pre>
+
+    public void doPost(HttpServletRequest req, HttpServletResponse res)
+    {
+        DiskFileUpload fu = new DiskFileUpload();
+        // maximum size before a FileUploadException will be thrown
+        fu.setSizeMax(1000000);
+        // maximum size that will be stored in memory
+        fu.setSizeThreshold(4096);
+        // the location for saving data that is larger than getSizeThreshold()
+        fu.setRepositoryPath("/tmp");
+
+        List fileItems = fu.parseRequest(req);
+        // assume we know there are two files. The first file is a small
+        // text file, the second is unknown and is written to a file on
+        // the server
+        Iterator i = fileItems.iterator();
+        String comment = ((FileItem)i.next()).getString();
+        FileItem fi = (FileItem)i.next();
+        // filename on the client
+        String fileName = fi.getName();
+        // save comment and filename to database
+        ...
+        // write the file
+        fi.write("/www/uploads/" + fileName);
+    }
+</pre>
+      <p>
+         In the example above the first file is loaded into memory as a
+         <code>String</code>. Before calling the getString method, the data
+         may have been in memory or on disk depending on its size.  The second
+         file we assume it will be large and therefore never explicitly load
+         it into memory, though if it is less than 4096 bytes it will be
+         in memory before it is written to its final location.  When writing to
+         the final location, if the data is larger than the
+         threshold, an attempt is made to rename the temporary file to
+         the given location.  If it cannot be renamed, it is streamed to the
+         new location.
+      </p>
+   </body>
+</html>

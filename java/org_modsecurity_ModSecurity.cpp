@@ -24,6 +24,13 @@
 #define MODSECURITY__ISPV6_MET				"isIPv6"
 #define MODSECURITY__ISPV6_SIG				"(Ljava/lang/String;)Z"
 
+#define HTTPTRANSACTION_HTTPREQUEST_MET		"getHttpRequest"
+#define HTTPTRANSACTION_HTTPREQUEST_SIG		"()Ljavax/servlet/http/HttpServletRequest;"
+#define HTTPTRANSACTION_MSHTTPREQUEST_MET	"getMsHttpRequest"
+#define HTTPTRANSACTION_MSHTTPREQUEST_SIG	"()Lorg/modsecurity/MsHttpServletRequest;"
+#define HTTPTRANSACTION_TRANSACTIONID_MET	"getTransactionID"
+
+
 #define SERVLETREQUEST_SERVERNAME_MET		"getServerName"
 #define SERVLETREQUEST_CHARENCODING_MET		"getCharacterEncoding"
 #define SERVLETREQUEST_CONTENTTYPE_MET		"getContentType"
@@ -42,6 +49,8 @@
 #define HTTPSERVLETREQUEST_REQUESTURL_MET	"getRequestURL"
 #define HTTPSERVLETREQUEST_REQUESTURL_SIG	"()Ljava/lang/StringBuffer;"
 
+#define MSHTTPSERVLETREQUEST_READBODY_MET	"readBody"
+#define MSHTTPSERVLETREQUEST_READBODY_SIG	"(I)V"
 
 #define SERVLETRESPONSE_CONTENTTYPE_MET		"getContentType"
 #define SERVLETRESPONSE_CHARENCODING_MET	"getCharacterEncoding"
@@ -324,7 +333,7 @@ inline void setHeaders(JNIEnv *env, jclass modSecurityClass, jobject httpServlet
 	}
 }
 
-JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest(JNIEnv *env, jobject obj, jstring configPath, jobject servletRequest, jobject httpServletRequest, jstring requestID, jboolean reloadConfig)
+JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest(JNIEnv *env, jobject obj, jstring configPath, jobject httpTransaction, jboolean reloadConfig)
 {
 	//critical section ?
 	conn_rec *c;
@@ -350,18 +359,33 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest(JNIEnv *env, j
 	c = modsecNewConnection();
 	modsecProcessConnection(c);
 	r = modsecNewRequest(c, config);
+	
 
-	const char *reqID = fromJString(env, requestID, r->pool); //unique ID of this request
-	apr_table_setn(requests, reqID, (const char*) r); //store this request for response processing
-
-
+	jclass httpTransactionClass = env->GetObjectClass(httpTransaction);
+	jmethodID getHttpRequest = env->GetMethodID(httpTransactionClass, HTTPTRANSACTION_MSHTTPREQUEST_MET, HTTPTRANSACTION_MSHTTPREQUEST_SIG);
+	
+	jobject httpServletRequest = env->CallObjectMethod(httpTransaction, getHttpRequest);
+	jobject servletRequest = httpServletRequest; //test it
+	
 	jclass httpServletRequestClass = env->GetObjectClass(httpServletRequest); //HttpServletRequest interface
 	jclass servletRequestClass = env->GetObjectClass(servletRequest); //ServletRequest interface
 	jclass modSecurityClass = env->GetObjectClass(obj); //ModSecurity class
 
+	jmethodID readBody = env->GetMethodID(httpServletRequestClass, MSHTTPSERVLETREQUEST_READBODY_MET, MSHTTPSERVLETREQUEST_READBODY_SIG);
+	env->CallIntMethod(httpServletRequest, readBody, config->reqbody_limit);
+	if (env->ExceptionCheck() == JNI_TRUE) //read body raised an Exception, return to JVM
+	{
+		modsecFinishRequest(r);
+		return DONE;
+	}
+	
+	jmethodID getTransactionID = env->GetMethodID(httpTransactionClass, HTTPTRANSACTION_TRANSACTIONID_MET, STRINGRETURN_SIG);
+	const char *reqID = fromJStringMethod(env, getTransactionID, httpTransaction, r->pool); //fromJString(env, requestID, r->pool); //unique ID of this request
+	apr_table_setn(requests, reqID, (const char*) r); //store this request for response processing
 
-	jmethodID getInputStream = (env)->GetMethodID(servletRequestClass, SERVLETREQUEST_INPUTSTREAM_MET, SERVLETREQUEST_INPUTSTREAM_SIG);
-	jobject inputStream = (env)->CallObjectMethod(servletRequest, getInputStream); //Request body input stream used in the read body callback
+
+	jmethodID getInputStream = (env)->GetMethodID(httpServletRequestClass, SERVLETREQUEST_INPUTSTREAM_MET, SERVLETREQUEST_INPUTSTREAM_SIG);
+	jobject inputStream = (env)->CallObjectMethod(httpServletRequest, getInputStream); //Request body input stream used in the read body callback
 
 	storeJavaServletContext(r, inputStream);
 

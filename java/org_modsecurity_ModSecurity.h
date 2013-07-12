@@ -32,15 +32,15 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_destroy
 /*
  * Class:     org_modsecurity_ModSecurity
  * Method:    onRequest
- * Signature: (Ljava/lang/String;Ljavax/servlet/ServletRequest;Ljavax/servlet/http/HttpServletRequest;Ljava/lang/String;Z)I
+ * Signature: (Ljava/lang/String;Lorg/modsecurity/MsHttpTransaction;Z)I
  */
 JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest
-  (JNIEnv *, jobject, jstring, jobject, jobject, jstring, jboolean);
+  (JNIEnv *, jobject, jstring, jobject, jboolean);
 
 /*
  * Class:     org_modsecurity_ModSecurity
  * Method:    onResponse
- * Signature: (Ljavax/servlet/ServletResponse;Ljavax/servlet/http/HttpServletResponse;Ljava/lang/String)I
+ * Signature: (Ljavax/servlet/ServletResponse;Ljavax/servlet/http/HttpServletResponse;Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onResponse
   (JNIEnv *, jobject, jobject, jobject, jstring);
