@@ -19,26 +19,21 @@ public final class ModSecurity {
     public static final int DONE = -2;
     public static final int DECLINED = -1;
     public static final int OK = 0;
-    
     //From build/classes: >"c:\Program Files\Java\jdk1.7.0_05\bin\javah.exe" -classpath c:\work\apache-tomcat-7.0.39\lib\servlet-api.jar;. org.modsecurity.ModSecurity
-
     private FilterConfig filterConfig;
     private String confFilename;
     private long confTime;
     private final static String pathToLib = "c:\\work\\mod_security\\java\\Debug\\";
+
     static {
-        try {
-            //TODO: bad practice, native libraries should be loaded in server's classloader
-            System.load("c:\\work\\mod_security\\java\\libs\\zlib1.dll");
-            System.load("c:\\work\\mod_security\\java\\libs\\libxml2.dll");
-            System.load("c:\\work\\mod_security\\java\\libs\\pcre.dll");
-            System.load("c:\\work\\mod_security\\java\\libs\\libapr-1.dll");
-            System.load("c:\\work\\mod_security\\java\\libs\\libapriconv-1.dll");
-            System.load("c:\\work\\mod_security\\java\\libs\\libaprutil-1.dll");
-            System.load("c:\\work\\mod_security\\java\\Debug\\ModSecurityJNI.dll");
-        } catch (UnsatisfiedLinkError err) {
-            err.printStackTrace();
-        }
+        //TODO: bad practice, native libraries should be loaded in server's classloader
+        System.load("c:\\work\\mod_security\\java\\libs\\zlib1.dll");
+        System.load("c:\\work\\mod_security\\java\\libs\\libxml2.dll");
+        System.load("c:\\work\\mod_security\\java\\libs\\pcre.dll");
+        System.load("c:\\work\\mod_security\\java\\libs\\libapr-1.dll");
+        System.load("c:\\work\\mod_security\\java\\libs\\libapriconv-1.dll");
+        System.load("c:\\work\\mod_security\\java\\libs\\libaprutil-1.dll");
+        System.load("c:\\work\\mod_security\\java\\Debug\\ModSecurityJNI.dll");
         //java.lang.reflect.Field loadedLibraries = ClassLoader.class.getDeclaredField("loadedLibraryNames");
         //loadedLibraries.setAccessible(true);
         //final Vector<String> libraries = (Vector<String>) loadedLibraries.get(ClassLoader.getSystemClassLoader());
@@ -57,10 +52,10 @@ public final class ModSecurity {
 
     public native int destroy();
 
-    public native int onRequest(String config, ServletRequest request, HttpServletRequest httprequest, String requestID, boolean reloadConfig);
+    public native int onRequest(String config, MsHttpTransaction httpTran, boolean reloadConfig);
 
     public native int onResponse(ServletResponse response, HttpServletResponse htttpResponse, String requestID);
-    
+
     public static String[][] getHttpRequestHeaders(HttpServletRequest req) {
         ArrayList<String> aList = Collections.list(req.getHeaderNames());
         String[][] result = new String[aList.size()][2];
@@ -72,9 +67,9 @@ public final class ModSecurity {
 
         return result;
     }
-    
+
     public static String[][] getHttpResponseHeaders(HttpServletResponse resp) {
-        
+
         Collection<String> headerNames = resp.getHeaderNames();
         String[][] result = new String[headerNames.size()][2];
 
@@ -91,7 +86,7 @@ public final class ModSecurity {
     public static boolean isIPv6(String addr) {
         try {
             InetAddress inetAddress = InetAddress.getByName(addr);
-            
+
             if (inetAddress instanceof Inet6Address) {
                 return true;
             } else {
@@ -101,7 +96,7 @@ public final class ModSecurity {
             return false;
         }
     }
-    
+
     public void log(int level, String msg) {
         //if (level == 1) {
         filterConfig.getServletContext().log(msg);

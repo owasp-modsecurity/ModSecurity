@@ -1,5 +1,6 @@
 package org.modsecurity;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.UUID;
 import javax.servlet.Filter;
@@ -35,18 +36,23 @@ public class ModSecurityFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain fc) throws IOException, ServletException {
         HttpServletRequest httpReq = (HttpServletRequest) request;
         HttpServletResponse httpResp = (HttpServletResponse) response;
+        MsHttpTransaction httpTran = new MsHttpTransaction(httpReq, httpResp);
 
-        String requestID = UUID.randomUUID().toString();
-        
-        int status = modsecurity.onRequest(modsecurity.getConfFilename(), request, httpReq, requestID, modsecurity.checkModifiedConfig());
-        
-        if (status != ModSecurity.DECLINED) {
-            return;
+        try {
+            int status = modsecurity.onRequest(modsecurity.getConfFilename(), httpTran, modsecurity.checkModifiedConfig());
+
+            if (status != ModSecurity.DECLINED) {
+                return;
+            }
+
+            //BufferedInputStream buf = new BufferedInputStream(httpReqWrapper.getInputStream());
+            fc.doFilter(httpTran.getMsHttpRequest(), httpTran.getMsHttpResponse());
+            //status = modsecurity.onResponse(response, httpResp, requestID);
+            
+        } finally {
+            httpTran.destroy();
         }
-
-        fc.doFilter(request, response);
         
-        status = modsecurity.onResponse(response, httpResp, requestID);
     }
 
     @Override
