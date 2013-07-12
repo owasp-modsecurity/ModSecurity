@@ -1079,6 +1079,7 @@ static size_t parse_number(sfilter * sf)
 {
     size_t xlen;
     size_t start;
+    const char* digits = NULL;
     const char *cs = sf->s;
     const size_t slen = sf->slen;
     size_t pos = sf->pos;
@@ -1086,18 +1087,22 @@ static size_t parse_number(sfilter * sf)
     /* cs[pos] == '0' has 1/10 chance of being true,
      * while pos+1< slen is almost always true
      */
-    if (cs[pos] == '0' && pos + 1 < slen && (cs[pos + 1] == 'X' || cs[pos + 1] == 'x')) {
-        /*
-         * TBD compare if isxdigit
-         */
-        xlen =
-            strlenspn(cs + pos + 2, slen - pos - 2, "0123456789ABCDEFabcdef");
-        if (xlen == 0) {
-            st_assign(sf->current, TYPE_BAREWORD, pos, 2, cs + pos);
-            return pos + 2;
-        } else {
-            st_assign(sf->current, TYPE_NUMBER, pos, 2 + xlen, cs + pos);
-            return pos + 2 + xlen;
+    if (cs[pos] == '0' && pos + 1 < slen) {
+        if (cs[pos + 1] == 'X' || cs[pos + 1] == 'x') {
+            digits = "0123456789ABCDEFabcdef";
+        } else if (cs[pos + 1] == 'B' || cs[pos + 1] == 'b') {
+            digits = "01";
+        }
+
+        if (digits) {
+            xlen = strlenspn(cs + pos + 2, slen - pos - 2, digits);
+            if (xlen == 0) {
+                st_assign(sf->current, TYPE_BAREWORD, pos, 2, cs + pos);
+                return pos + 2;
+            } else {
+                st_assign(sf->current, TYPE_NUMBER, pos, 2 + xlen, cs + pos);
+                return pos + 2 + xlen;
+            }
         }
     }
 
@@ -1300,7 +1305,7 @@ int filter_fold(sfilter * sf)
 {
     stoken_t last_comment;
 
-    /* POS is the positive of where the NEXT token goes */
+    /* POS is the position of where the NEXT token goes */
     size_t pos = 0;
 
     /* LEFT is a count of how many tokens that are already
@@ -1347,7 +1352,7 @@ int filter_fold(sfilter * sf)
         }
         FOLD_DEBUG
         /* did we get 2 tokens? if not then we are done */
-        if (pos - left != 2) {
+        if (pos - left < 2) {
             left = pos;
             break;
         }
@@ -1463,10 +1468,9 @@ int filter_fold(sfilter * sf)
             st_copy(&sf->tokenvec[left], &sf->tokenvec[left+1]);
             pos -= 1;
             sf->stats_folds += 1;
+            left = 0;
             continue;
         }
-
-
 
         /* all cases of handing 2 tokens is done
            and nothing matched.  Get one more token
@@ -1486,7 +1490,7 @@ int filter_fold(sfilter * sf)
         }
 
         /* do we have three tokens? If not then we are done */
-        if (pos -left != 3) {
+        if (pos -left < 3) {
             left = pos;
             break;
         }
@@ -1518,7 +1522,7 @@ int filter_fold(sfilter * sf)
             continue;
         } else if ((sf->tokenvec[left].type == TYPE_BAREWORD || sf->tokenvec[left].type == TYPE_NUMBER ||
                     sf->tokenvec[left].type == TYPE_VARIABLE || sf->tokenvec[left].type == TYPE_STRING) &&
-                   sf->tokenvec[left+1].type == TYPE_OPERATOR &&
+                   sf->tokenvec[left+1].type == TYPE_OPERATOR && streq(sf->tokenvec[left+1].val, "::") &&
                    sf->tokenvec[left+2].type == TYPE_SQLTYPE) {
             pos -= 2;
             sf->stats_folds += 2;
@@ -1572,7 +1576,9 @@ int filter_fold(sfilter * sf)
             if (left > 0) {
                 left -= 1;
             }
-            pos -=3;
+            /* pos is >= 3 so this is safe */
+            assert(pos >= 3);
+            pos -= 3;
             continue;
         } else if ((sf->tokenvec[left].type == TYPE_BAREWORD || sf->tokenvec[left].type == TYPE_STRING)&&
                    (sf->tokenvec[left+1].type == TYPE_BAREWORD  && sf->tokenvec[left+1].val[0] == '.') &&
