@@ -588,7 +588,7 @@ static int flatten_response_body(modsec_rec *msr) {
         }
 
         memset(msr->stream_output_data, 0, msr->stream_output_length+1);
-        strncpy(msr->stream_output_data, msr->resbody_data, msr->stream_output_length);
+        memcpy(msr->stream_output_data, msr->resbody_data, msr->stream_output_length);
         msr->stream_output_data[msr->stream_output_length] = '\0';
     } else if (msr->txcfg->stream_outbody_inspection && msr->txcfg->hash_is_enabled == HASH_ENABLED)    {
         int retval = 0;
@@ -617,7 +617,7 @@ static int flatten_response_body(modsec_rec *msr) {
             }
 
             memset(msr->stream_output_data, 0, msr->stream_output_length+1);
-            strncpy(msr->stream_output_data, msr->resbody_data, msr->stream_output_length);
+            memcpy(msr->stream_output_data, msr->resbody_data, msr->stream_output_length);
             msr->stream_output_data[msr->stream_output_length] = '\0';
         }
     }
