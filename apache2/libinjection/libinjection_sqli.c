@@ -54,7 +54,7 @@ typedef enum {
     TYPE_OPERATOR    = (int)'o',
     TYPE_LOGIC_OPERATOR = (int)'&',
     TYPE_COMMENT     = (int)'c',
-    TYPE_COLLATE     = (int)'a',
+    TYPE_COLLATE     = (int)'A',
     TYPE_LEFTPARENS  = (int)'(',
     TYPE_RIGHTPARENS = (int)')',  /* not used? */
     TYPE_COMMA       = (int)',',
@@ -1217,6 +1217,10 @@ int libinjection_sqli_tokenize(sfilter * sf)
 
 void libinjection_sqli_init(sfilter * sf, const char *s, size_t len, int flags)
 {
+    if (flags == 0) {
+        flags = FLAG_QUOTE_NONE | FLAG_SQL_ANSI;
+    }
+
     memset(sf, 0, sizeof(sfilter));
     sf->s        = s;
     sf->slen     = len;
@@ -1228,6 +1232,9 @@ void libinjection_sqli_init(sfilter * sf, const char *s, size_t len, int flags)
 
 void libinjection_sqli_reset(sfilter * sf, int flags)
 {
+    if (flags == 0) {
+        flags = FLAG_QUOTE_NONE | FLAG_SQL_ANSI;
+    }
     libinjection_sqli_init(sf, sf->s, sf->slen, flags);
     sf->lookup = sf->lookup;
     sf->userdata = sf->userdata;
@@ -1306,7 +1313,7 @@ static int syntax_merge_words(sfilter * sf,stoken_t * a, stoken_t * b)
     }
 }
 
-int filter_fold(sfilter * sf)
+int libinjection_sqli_fold(sfilter * sf)
 {
     stoken_t last_comment;
 
@@ -1543,8 +1550,8 @@ int filter_fold(sfilter * sf)
             continue;
         } else if (sf->tokenvec[left].type == TYPE_VARIABLE &&
                    sf->tokenvec[left+1].type == TYPE_OPERATOR &&
-                   (sf->tokenvec[left].type == TYPE_VARIABLE || sf->tokenvec[left].type == TYPE_NUMBER ||
-                    sf->tokenvec[left].type == TYPE_BAREWORD)) {
+                   (sf->tokenvec[left+2].type == TYPE_VARIABLE || sf->tokenvec[left+2].type == TYPE_NUMBER ||
+                    sf->tokenvec[left+2].type == TYPE_BAREWORD)) {
             pos -= 2;
             continue;
         } else if ((sf->tokenvec[left].type == TYPE_BAREWORD || sf->tokenvec[left].type == TYPE_NUMBER ) &&
@@ -1668,7 +1675,7 @@ const char* libinjection_sqli_fingerprint(sfilter * sql_state, int flags)
 
     libinjection_sqli_reset(sql_state, flags);
 
-    tlen = filter_fold(sql_state);
+    tlen = libinjection_sqli_fold(sql_state);
     for (i = 0; i < tlen; ++i) {
         sql_state->fingerprint[i] = sql_state->tokenvec[i].type;
     }
