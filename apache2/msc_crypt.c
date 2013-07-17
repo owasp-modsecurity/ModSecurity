@@ -1248,7 +1248,7 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 hash_value =  hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
 
             if(msr->txcfg->crypto_key_add == HASH_SESSIONID)  {
-                if(strlen(msr->sessionid) == 0)   {
+                if(msr->sessionid == NULL || strlen(msr->sessionid) == 0)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                     const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->client_ip);
 #else
@@ -1291,7 +1291,7 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                     hash_value =  hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) path_chunk+1, strlen((char*)path_chunk)-1);
 
                 if(msr->txcfg->crypto_key_add == HASH_SESSIONID)  {
-                    if(strlen(msr->sessionid) == 0)   {
+                    if(msr->sessionid == NULL || strlen(msr->sessionid) == 0)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                         const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->client_ip);
 #else
@@ -1332,7 +1332,7 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 hash_value = hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) link+1, strlen((char*)link)-1);
 
             if(msr->txcfg->crypto_key_add == HASH_SESSIONID)  {
-                if(strlen(msr->sessionid) == 0)   {
+                if(msr->sessionid == NULL || strlen(msr->sessionid) == 0)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                     const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->client_ip);
 #else
@@ -1386,7 +1386,7 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
                 hash_value = hmac(msr, msr->txcfg->crypto_key, msr->txcfg->crypto_key_len, (unsigned char *) relative_link, strlen((char*)relative_link));
 
             if(msr->txcfg->crypto_key_add == HASH_SESSIONID)  {
-                if(strlen(msr->sessionid) == 0)   {
+                if(msr->sessionid == NULL || strlen(msr->sessionid) == 0)   {
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                     const char *new_pwd = apr_psprintf(msr->mp,"%s%s", msr->txcfg->crypto_key, msr->r->connection->client_ip);
 #else
