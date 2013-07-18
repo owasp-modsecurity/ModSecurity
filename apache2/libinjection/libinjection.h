@@ -19,7 +19,7 @@ extern "C" {
  * See python's normalized version
  * http://www.python.org/dev/peps/pep-0386/#normalizedversion
  */
-#define LIBINJECTION_VERSION "3.2.0"
+#define LIBINJECTION_VERSION "3.4.1"
 
 /**
  * Libinjection's sqli module makes a "normalized"
@@ -39,12 +39,12 @@ extern "C" {
 
 enum lookup_type {
     FLAG_NONE          = 0,
-    FLAG_QUOTE_NONE    = 0,
-    FLAG_QUOTE_SINGLE  = 1 << 1,
-    FLAG_QUOTE_DOUBLE  = 1 << 2,
+    FLAG_QUOTE_NONE    = 1 << 1,
+    FLAG_QUOTE_SINGLE  = 1 << 2,
+    FLAG_QUOTE_DOUBLE  = 1 << 3,
 
-    FLAG_SQL_ANSI      = 1 << 3,
-    FLAG_SQL_MYSQL     = 1 << 4,
+    FLAG_SQL_ANSI      = 1 << 4,
+    FLAG_SQL_MYSQL     = 1 << 5,
 
     LOOKUP_WORD,
     LOOKUP_TYPE,
@@ -248,6 +248,12 @@ char libinjection_sqli_lookup_word(sfilter *sql_state, int lookup_type,
  *
  */
 int  libinjection_sqli_tokenize(sfilter * sql_state);
+
+/**
+ * parses and folds input, up to 5 tokens
+ *
+ */
+int libinjection_sqli_fold(sfilter * sql_state);
 
 /** The built-in default function to match fingerprints
  *  and do false negative/positive analysis.  This calls the following

@@ -4,7 +4,7 @@ Improvements:
 
     * SecUnicodeCodePage is deprecated. SecUnicodeMapFile now accepts the code page as a second parameter.
 
-    * Updated Libinjection to version 3.2.0. Many improvements were made.
+    * Updated Libinjection to version 3.4.1. Many improvements were made.
 
     * Severity action now supports strings (emergency, alert, critical, error, warning, notice, info, debug).
 

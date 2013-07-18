@@ -54,15 +54,17 @@ typedef enum {
     TYPE_OPERATOR    = (int)'o',
     TYPE_LOGIC_OPERATOR = (int)'&',
     TYPE_COMMENT     = (int)'c',
+    TYPE_COLLATE     = (int)'A',
     TYPE_LEFTPARENS  = (int)'(',
     TYPE_RIGHTPARENS = (int)')',  /* not used? */
     TYPE_COMMA       = (int)',',
     TYPE_COLON       = (int)':',
     TYPE_SEMICOLON   = (int)';',
-    TYPE_TSQL        = (int)'T', /* TSQL start */
+    TYPE_TSQL        = (int)'T',  /* TSQL start */
     TYPE_UNKNOWN     = (int)'?',
-    TYPE_EVIL        = (int)'X', /* unparsable, abort  */
-    TYPE_FINGERPRINT = (int)'F'  /* not really a token */
+    TYPE_EVIL        = (int)'X',  /* unparsable, abort  */
+    TYPE_FINGERPRINT = (int)'F',  /* not really a token */
+    TYPE_BACKSLASH   = (int)'\\'
 } sqli_token_types;
 
 /**
@@ -79,8 +81,6 @@ static char flag2delim(int flag)
         return CHAR_NULL;
     }
 }
-
-
 
 /* memchr2 finds a string of 2 characters inside another string
  * This a specialized version of "memmem" or "memchr".
@@ -307,6 +307,13 @@ static void st_copy(stoken_t * dest, const stoken_t * src)
     memcpy(dest, src, sizeof(stoken_t));
 }
 
+static int st_is_arithmetic_op(const stoken_t* st)
+{
+    const char ch = st->val[0];
+    return (st->type == TYPE_OPERATOR && st->len == 1 &&
+            (ch == '*' || ch == '/' || ch == '-' || ch == '+' || ch == '%'));
+}
+
 static int st_is_unary_op(const stoken_t * st)
 {
     const char* str = st->val;
@@ -524,11 +531,12 @@ static size_t parse_backslash(sfilter * sf)
     /*
      * Weird MySQL alias for NULL, "\N" (capital N only)
      */
-    if (pos + 1 < slen && cs[pos + 1] == 'N') {
+    if (pos + 1 < slen && cs[pos +1] == 'N') {
         st_assign(sf->current, TYPE_NUMBER, pos, 2, cs + pos);
         return pos + 2;
     } else {
-        return parse_other(sf);
+        st_assign_char(sf->current, TYPE_BACKSLASH, pos, 1, cs[pos]);
+        return pos + 1;
     }
 }
 
@@ -1212,6 +1220,10 @@ int libinjection_sqli_tokenize(sfilter * sf)
 
 void libinjection_sqli_init(sfilter * sf, const char *s, size_t len, int flags)
 {
+    if (flags == 0) {
+        flags = FLAG_QUOTE_NONE | FLAG_SQL_ANSI;
+    }
+
     memset(sf, 0, sizeof(sfilter));
     sf->s        = s;
     sf->slen     = len;
@@ -1223,6 +1235,9 @@ void libinjection_sqli_init(sfilter * sf, const char *s, size_t len, int flags)
 
 void libinjection_sqli_reset(sfilter * sf, int flags)
 {
+    if (flags == 0) {
+        flags = FLAG_QUOTE_NONE | FLAG_SQL_ANSI;
+    }
     libinjection_sqli_init(sf, sf->s, sf->slen, flags);
     sf->lookup = sf->lookup;
     sf->userdata = sf->userdata;
@@ -1301,7 +1316,7 @@ static int syntax_merge_words(sfilter * sf,stoken_t * a, stoken_t * b)
     }
 }
 
-int filter_fold(sfilter * sf)
+int libinjection_sqli_fold(sfilter * sf)
 {
     stoken_t last_comment;
 
@@ -1470,6 +1485,27 @@ int filter_fold(sfilter * sf)
             sf->stats_folds += 1;
             left = 0;
             continue;
+        } else if (sf->tokenvec[left].type == TYPE_COLLATE &&
+                   sf->tokenvec[left+1].type == TYPE_BAREWORD) {
+            /*
+             * there are too many collation types.. so if the bareword has a "_"
+             * then it's TYPE_SQLTYPE
+             */
+            if (strchr(sf->tokenvec[left+1].val, '_') != NULL) {
+                sf->tokenvec[left+1].type = TYPE_SQLTYPE;
+            }
+        } else if (sf->tokenvec[left].type == TYPE_BACKSLASH) {
+            if (st_is_arithmetic_op(&(sf->tokenvec[left+1]))) {
+                /* very weird case in TSQL where '\%1' is parsed as '0 % 1', etc */
+                sf->tokenvec[left].type = TYPE_NUMBER;
+            } else {
+                /* just ignore it.. Again T-SQL seems to parse \1 as "1" */
+                st_copy(&sf->tokenvec[left], &sf->tokenvec[left+1]);
+                pos -= 1;
+                sf->stats_folds += 1;
+            }
+            left = 0;
+            continue;
         }
 
         /* all cases of handing 2 tokens is done
@@ -1513,6 +1549,12 @@ int filter_fold(sfilter * sf)
             continue;
         } else if (sf->tokenvec[left].type == TYPE_LOGIC_OPERATOR &&
                    sf->tokenvec[left+2].type == TYPE_LOGIC_OPERATOR) {
+            pos -= 2;
+            continue;
+        } else if (sf->tokenvec[left].type == TYPE_VARIABLE &&
+                   sf->tokenvec[left+1].type == TYPE_OPERATOR &&
+                   (sf->tokenvec[left+2].type == TYPE_VARIABLE || sf->tokenvec[left+2].type == TYPE_NUMBER ||
+                    sf->tokenvec[left+2].type == TYPE_BAREWORD)) {
             pos -= 2;
             continue;
         } else if ((sf->tokenvec[left].type == TYPE_BAREWORD || sf->tokenvec[left].type == TYPE_NUMBER ) &&
@@ -1636,7 +1678,7 @@ const char* libinjection_sqli_fingerprint(sfilter * sql_state, int flags)
 
     libinjection_sqli_reset(sql_state, flags);
 
-    tlen = filter_fold(sql_state);
+    tlen = libinjection_sqli_fold(sql_state);
     for (i = 0; i < tlen; ++i) {
         sql_state->fingerprint[i] = sql_state->tokenvec[i].type;
     }
