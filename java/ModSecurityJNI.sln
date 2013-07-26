@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "standalone", "standalone.vcxproj", "{20EC871F-B6A0-4398-9B67-A33598A796E8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModSecurityJNI", "ModSecurityJNI.vcxproj", "{20EC871F-B6A0-4398-9B67-A33598A796E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

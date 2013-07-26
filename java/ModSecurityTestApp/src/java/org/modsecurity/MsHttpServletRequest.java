@@ -16,6 +16,8 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -26,11 +28,11 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.DefaultFileItem;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
-
 
 public class MsHttpServletRequest extends HttpServletRequestWrapper {
 
@@ -79,7 +81,23 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
             bodyFile.delete();
         }
     }
+    
+    public static String[][] getHttpRequestHeaders(HttpServletRequest req) {
 
+        ArrayList<String> aList = Collections.list(req.getHeaderNames());
+        String[][] result = new String[aList.size()][2];
+
+        try {
+            for (int i = 0; i < aList.size(); i++) {
+                result[i][0] = aList.get(i);
+                result[i][1] = req.getHeader(aList.get(i));
+            }
+        } catch (Exception ex) {
+        }
+
+        return result;
+    }
+    
     public String getTmpPath() {
         return tmpPath;
     }
@@ -113,7 +131,9 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
     }
 
     public void readBody(int maxContentLength) throws IOException, ServletException {
+        
         String contentType = req.getContentType();
+        
         if ((contentType != null) && (contentType.startsWith("multipart/form-data"))) {
             readBodyMultipart(maxContentLength);
         } else {
@@ -201,6 +221,7 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
             }
         }
     }
+
 
     /**
      * Parses the given URL-encoded string and adds the parameters to the

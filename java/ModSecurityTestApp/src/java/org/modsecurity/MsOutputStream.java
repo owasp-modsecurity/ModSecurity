@@ -1,5 +1,6 @@
 package org.modsecurity;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -36,6 +37,10 @@ public class MsOutputStream extends ServletOutputStream {
 
     public byte[] toByteArray() {
         return buffer.toByteArray();
+    }
+    
+    public ByteArrayInputStream getByteArrayStream() {
+        return new ByteArrayInputStream(buffer.toByteArray());
     }
 
     public void reset() {

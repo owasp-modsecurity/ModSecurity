@@ -1,8 +1,6 @@
 package org.modsecurity;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.util.UUID;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -14,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * Docs: http://docs.oracle.com/javaee/6/tutorial/doc/bnagb.html
+ * @author Mihai Pitu
  */
 public class ModSecurityFilter implements Filter {
 
@@ -36,18 +34,19 @@ public class ModSecurityFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain fc) throws IOException, ServletException {
         HttpServletRequest httpReq = (HttpServletRequest) request;
         HttpServletResponse httpResp = (HttpServletResponse) response;
-        MsHttpTransaction httpTran = new MsHttpTransaction(httpReq, httpResp);
+        MsHttpTransaction httpTran = new MsHttpTransaction(httpReq, httpResp); //transaction object used by native code
 
         try {
-            int status = modsecurity.onRequest(modsecurity.getConfFilename(), httpTran, modsecurity.checkModifiedConfig());
+            int status = modsecurity.onRequest(modsecurity.getConfFilename(), httpTran, modsecurity.checkModifiedConfig()); //modsecurity reloads only if primary config file is modified
 
             if (status != ModSecurity.DECLINED) {
                 return;
             }
 
-            //BufferedInputStream buf = new BufferedInputStream(httpReqWrapper.getInputStream());
+            //process request
             fc.doFilter(httpTran.getMsHttpRequest(), httpTran.getMsHttpResponse());
-            //status = modsecurity.onResponse(response, httpResp, requestID);
+            
+            status = modsecurity.onResponse(httpTran);
             
         } finally {
             httpTran.destroy();

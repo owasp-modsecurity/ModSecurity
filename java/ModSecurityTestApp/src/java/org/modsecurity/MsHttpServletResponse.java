@@ -1,5 +1,6 @@
 package org.modsecurity;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
@@ -114,6 +115,22 @@ public class MsHttpServletResponse extends HttpServletResponseWrapper {
         destroyed = true;
     }
 
+    public static String[][] getHttpResponseHeaders(HttpServletResponse resp) {
+
+        Collection<String> headerNames = resp.getHeaderNames();
+        String[][] result = new String[headerNames.size()][2];
+        try {
+            int i = 0;
+            for (String headerName : headerNames) {
+                result[i][0] = headerName;
+                result[i][1] = resp.getHeader(headerName);
+                i++;
+            }
+        } catch (Exception ex) {
+        }
+        return result;
+    }
+
     public String getBody() {
         if (msWriter != null) {
             return msWriter.toString();
@@ -176,6 +193,19 @@ public class MsHttpServletResponse extends HttpServletResponseWrapper {
         } else {
             return super.getWriter();
         }
+    }
+
+    public ByteArrayInputStream getByteArrayStream() throws Exception {
+        ByteArrayInputStream stream = null;
+        if (msOutputStream == null) {
+            MsWriter writer = ((MsWriter) this.getWriter());
+            stream = new ByteArrayInputStream(new String(writer.toCharArray()).getBytes());
+        } else if (msWriter == null) {
+            stream = new ByteArrayInputStream(((MsOutputStream) this.getOutputStream()).toByteArray());
+        } else {
+            
+        }
+        return stream;
     }
 
     @Override
