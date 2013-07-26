@@ -4,16 +4,13 @@ import java.io.File;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+/**
+ *
+ * @author Mihai Pitu
+ */
 public final class ModSecurity {
 
     public static final int DONE = -2;
@@ -54,34 +51,7 @@ public final class ModSecurity {
 
     public native int onRequest(String config, MsHttpTransaction httpTran, boolean reloadConfig);
 
-    public native int onResponse(ServletResponse response, HttpServletResponse htttpResponse, String requestID);
-
-    public static String[][] getHttpRequestHeaders(HttpServletRequest req) {
-        ArrayList<String> aList = Collections.list(req.getHeaderNames());
-        String[][] result = new String[aList.size()][2];
-
-        for (int i = 0; i < aList.size(); i++) {
-            result[i][0] = aList.get(i);
-            result[i][1] = req.getHeader(aList.get(i));
-        }
-
-        return result;
-    }
-
-    public static String[][] getHttpResponseHeaders(HttpServletResponse resp) {
-
-        Collection<String> headerNames = resp.getHeaderNames();
-        String[][] result = new String[headerNames.size()][2];
-
-        int i = 0;
-        for (String headerName : headerNames) {
-            result[i][0] = headerName;
-            result[i][1] = resp.getHeader(headerName);
-            i++;
-        }
-
-        return result;
-    }
+    public native int onResponse(MsHttpTransaction httpTran);
 
     public static boolean isIPv6(String addr) {
         try {

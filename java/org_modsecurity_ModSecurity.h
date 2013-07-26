@@ -40,10 +40,10 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest
 /*
  * Class:     org_modsecurity_ModSecurity
  * Method:    onResponse
- * Signature: (Ljavax/servlet/ServletResponse;Ljavax/servlet/http/HttpServletResponse;Ljava/lang/String;)I
+ * Signature: (Lorg/modsecurity/MsHttpTransaction;)I
  */
 JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onResponse
-  (JNIEnv *, jobject, jobject, jobject, jstring);
+  (JNIEnv *, jobject, jobject);
 
 #ifdef __cplusplus
 }
