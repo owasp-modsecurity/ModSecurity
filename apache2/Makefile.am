@@ -11,7 +11,8 @@ mod_security2_la_SOURCES = mod_security2.c \
                            re_variables.c msc_logging.c msc_xml.c \
                            msc_multipart.c modsecurity.c msc_parsers.c \
                            msc_util.c msc_pcre.c persist_dbm.c msc_reqbody.c \
-                           msc_geo.c msc_gsb.c msc_crypt.c msc_tree.c msc_unicode.c acmp.c msc_lua.c msc_release.c libinjection/sqlparse.c
+                           msc_geo.c msc_gsb.c msc_crypt.c msc_tree.c msc_unicode.c acmp.c msc_lua.c msc_release.c \
+                           libinjection/libinjection_sqli.c
 
 mod_security2_la_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
                           @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @LUA_CFLAGS@ @MODSEC_EXTRA_CFLAGS@ @CURL_CFLAGS@
@@ -72,7 +73,7 @@ install-exec-hook: $(pkglib_LTLIBRARIES)
 	for m in $(pkglib_LTLIBRARIES); do \
 	  base=`echo $$m | sed 's/\..*//'`; \
 	  rm -f $(DESTDIR)$(pkglibdir)/$$base.*a; \
-	  install -D -m444 $(DESTDIR)$(pkglibdir)/$$base.so $(DESTDIR)$(APXS_MODULES); \
+	  install -D -m444 $(DESTDIR)$(pkglibdir)/$$base.so $(DESTDIR)$(APXS_MODULES)/$$base.so; \
 	done
 else
 install-exec-hook: $(pkglib_LTLIBRARIES)
