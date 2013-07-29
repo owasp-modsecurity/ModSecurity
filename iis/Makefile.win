@@ -52,7 +52,7 @@ OBJS1 = mod_security2.obj apache2_config.obj apache2_io.obj apache2_util.obj \
        msc_release.obj msc_crypt.obj msc_tree.obj
 OBJS2 = api.obj buckets.obj config.obj filters.obj hooks.obj regex.obj server.obj
 OBJS3 = main.obj moduleconfig.obj mymodule.obj
-OBJS4 = libinjection_sql.obj
+OBJS4 = libinjection_sqli.obj
 
 all: $(DLL)
 
