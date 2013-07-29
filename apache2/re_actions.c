@@ -489,9 +489,27 @@ static apr_status_t msre_action_ver_init(msre_engine *engine,
 /* severity */
 
 static apr_status_t msre_action_severity_init(msre_engine *engine,
-    msre_actionset *actionset, msre_action *action)
+        msre_actionset *actionset, msre_action *action)
 {
-    actionset->severity = atoi(action->param);
+    if (strcasecmp(action->param, "emergency") == 0)    {
+        actionset->severity = 0;
+    } else if (strcasecmp(action->param, "alert") == 0) {
+        actionset->severity = 1;
+    } else if (strcasecmp(action->param, "critical") == 0) {
+        actionset->severity = 2;
+    } else if (strcasecmp(action->param, "error") == 0) {
+        actionset->severity = 3;
+    } else if (strcasecmp(action->param, "warning") == 0) {
+        actionset->severity = 4;
+    } else if (strcasecmp(action->param, "notice") == 0) {
+        actionset->severity = 5;
+    } else if (strcasecmp(action->param, "info") == 0) {
+        actionset->severity = 6;
+    } else if (strcasecmp(action->param, "debug") == 0) {
+        actionset->severity = 7;
+    } else  {
+        actionset->severity = atoi(action->param);
+    }
     return 1;
 }
 

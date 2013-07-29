@@ -27,8 +27,7 @@
 #include <arpa/inet.h>
 #endif
 
-#include "libinjection/sqlparse.h"
-#include "libinjection/sqli_fingerprints.h"
+#include "libinjection/libinjection.h"
 
 /**
  *
@@ -696,7 +695,7 @@ nextround:
 
         msr->of_stream_changed = 1;
 
-        strncpy(msr->stream_output_data, data, size);
+        memcpy(msr->stream_output_data, data, size);
         msr->stream_output_data[size] = '\0';
 
         var->value_len = size;
@@ -720,7 +719,7 @@ nextround:
 
         msr->if_stream_changed = 1;
 
-        strncpy(msr->stream_input_data, data, size);
+        memcpy(msr->stream_input_data, data, size);
         msr->stream_input_data[size] = '\0';
 
         var->value_len = size;
@@ -2133,35 +2132,34 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
 }
 
 /** libinjection detectSQLi
-*   links against files in libinjection directory
+ *   links against files in libinjection directory
  *  See www.client9.com/libinjection for details
- * `is_sqli_pattern` right now is a hardwired set of sqli fingerprints.
- * In future, change to read from file.
-*/
+ */
 static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg) {
-    sfilter sf;
-    int issqli = is_sqli(&sf, var->value, var->value_len, is_sqli_pattern);
-    int capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
-    if (error_msg == NULL) return -1;
-    *error_msg = NULL;
+    struct libinjection_sqli_state sqli_state;
+    int issqli;
+    int capture;
+
+    libinjection_sqli_init(&sqli_state, var->value, var->value_len, 0);
+    issqli = libinjection_is_sqli(&sqli_state);
+    capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     if (issqli) {
-        set_match_to_tx(msr, capture, sf.pat, 0);
+        set_match_to_tx(msr, capture, sqli_state.fingerprint, 0);
 
-        *error_msg = apr_psprintf(msr->mp, "detected SQLi using libinjection fingerprint '%s' at %s",
-                sf.pat, var->name);
-
+        *error_msg = apr_psprintf(msr->mp, "detected SQLi using libinjection with fingerprint '%s'",
+                                  sqli_state.fingerprint);
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "detectSQLi: libinjection fingerprint '%s' matched input '%s'",
-                    sf.pat,
+            msr_log(msr, 9, "ISSQL: libinjection fingerprint '%s' matched input '%s'",
+                    sqli_state.fingerprint,
                     log_escape_ex(msr->mp, var->value, var->value_len));
         }
     } else {
         if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "detectSQLi: no sql, libinjection no match input '%s' at '%s'",
-                log_escape_ex(msr->mp, var->value, var->value_len), var->name);
+            msr_log(msr, 9, "ISSQL: not sqli, no libinjection sqli fingerprint matched input '%s'",
+                    log_escape_ex(msr->mp, var->value, var->value_len));
         }
     }
 
