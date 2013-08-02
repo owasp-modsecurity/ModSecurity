@@ -3,6 +3,7 @@
 
 #include "org_modsecurity_ModSecurity.h"
 #include "api.h"
+
 #include <math.h>
 
 #define MODSECURITY_JAVACLASS				"org/modsecurity/ModSecurity"
@@ -54,6 +55,8 @@
 
 #define MSHTTPSERVLETREQUEST_READBODY_MET	"readBody"
 #define MSHTTPSERVLETREQUEST_READBODY_SIG	"(I)V"
+#define MSHTTPSERVLETREQUEST_SETBODY_MET	"setBodyBytes"
+#define MSHTTPSERVLETREQUEST_SETBODY_SIG	"([B)V"
 
 #define SERVLETRESPONSE_CONTENTTYPE_MET		"getContentType"
 #define SERVLETRESPONSE_CHARENCODING_MET	"getCharacterEncoding"
@@ -75,15 +78,20 @@ jmethodID logMethod;
 
 apr_table_t *requests;
 apr_pool_t *requestsPool;
+char *serverHostname;
 
-
-#define JAVASERVLET_INSTREAM "ReqBStr"
-#define JAVASERVLET_OUTSTREAM "ResBStr"
-
+#define JAVASERVLET_INSTREAM	"MSReqBStr"
+#define JAVASERVLET_OUTSTREAM	"MSResBStr"
+#define JAVASERVLET_TRANSACTION	"MSTran"
 
 void storeJavaServletContext(request_rec *r, const char *key, jobject obj)
 {
 	apr_table_setn(r->notes, key, (const char *)obj);
+}
+
+void removeJavaServletContext(request_rec *r, const char *key)
+{
+	apr_table_unset(r->notes, key);
 }
 
 jobject getJavaServletContext(request_rec *r, const char *key)
@@ -121,11 +129,6 @@ jobject getJavaServletContext(request_rec *r, const char *key)
 	return NULL;
 }
 
-//apr_status_t memCleanup(void *mem)
-//{
-//	free(mem);
-//	return APR_SUCCESS;
-//}
 
 apr_sockaddr_t *CopySockAddr(jclass msClass, JNIEnv *env, apr_pool_t *pool, char *addrstr, jstring addrStrJstr)
 {
@@ -246,6 +249,9 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
 			*readcnt = count;
 
 			memcpy(buf, bufferPtr, *readcnt);
+			//const char *test = "Foo' or '2' < '1' ;--";
+			//memcpy(buf, test, strlen(test));
+
 		}
 		(env)->ReleaseByteArrayElements(byteArrayBuf, bufferPtr, NULL);
 		(env)->DeleteLocalRef(byteArrayBuf);
@@ -258,6 +264,38 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
 
 apr_status_t WriteBodyCallback(request_rec *r, char *buf, unsigned int length)
 {
+	jobject httpTransaction = getJavaServletContext(r, JAVASERVLET_TRANSACTION);
+	JNIEnv *env;
+
+	if(httpTransaction == NULL)
+	{
+		return APR_SUCCESS;
+	}
+
+	if (!(jvm)->AttachCurrentThread((void **)&env, NULL))
+	{
+		jclass httpTransactionClass = env->GetObjectClass(httpTransaction);
+
+		jmethodID getHttpRequest = env->GetMethodID(httpTransactionClass, HTTPTRANSACTION_MSHTTPREQUEST_MET, HTTPTRANSACTION_MSHTTPREQUEST_SIG);
+		jobject httpServletRequest = env->CallObjectMethod(httpTransaction, getHttpRequest);
+
+		jclass httpServletRequestClass = env->GetObjectClass(httpServletRequest);
+		jmethodID setBodyBytes = env->GetMethodID(httpServletRequestClass, MSHTTPSERVLETREQUEST_SETBODY_MET, MSHTTPSERVLETREQUEST_SETBODY_SIG);
+
+		jbyte *jbuf = new jbyte[length];
+		for (int i = 0; i < length; i++)
+			jbuf[i] = buf[i];
+
+		jbyteArray byteArrayBuf = (env)->NewByteArray(length);
+		env->SetByteArrayRegion(byteArrayBuf, 0, length, jbuf);
+
+		//on setBodyBytes we copy buf bytes
+		env->CallVoidMethod(httpServletRequest, setBodyBytes, byteArrayBuf);
+
+		//(env)->ReleaseByteArrayElements(byteArrayBuf, jbuf, NULL);
+
+		(jvm)->DetachCurrentThread();
+	}
 	return APR_SUCCESS;
 }
 
@@ -305,10 +343,43 @@ apr_status_t ReadResponseCallback(request_rec *r, char *buf, unsigned int length
 
 apr_status_t WriteResponseCallback(request_rec *r, char *buf, unsigned int length)
 {
+	JNIEnv *env;
+	jobject httpTransaction = getJavaServletContext(r, JAVASERVLET_TRANSACTION);
+
+	if(httpTransaction == NULL)
+	{
+		(jvm)->DetachCurrentThread();
+		return APR_SUCCESS;
+	}
+
+	if (!(jvm)->AttachCurrentThread((void **)&env, NULL))
+	{
+		jclass httpTransactionClass = env->GetObjectClass(httpTransaction);
+
+		jmethodID getHttpResponse = env->GetMethodID(httpTransactionClass, HTTPTRANSACTION_MSHTTPRESPONSE_MET, HTTPTRANSACTION_MSHTTPRESPONSE_SIG);
+		jobject httpServletResponse = env->CallObjectMethod(httpTransaction, getHttpResponse);
+
+		jclass httpServletResponseClass = env->GetObjectClass(httpServletResponse);
+		jmethodID setBodyBytes = env->GetMethodID(httpServletResponseClass, MSHTTPSERVLETREQUEST_SETBODY_MET, MSHTTPSERVLETREQUEST_SETBODY_SIG);
+
+		jbyte *jbuf = new jbyte[length];
+		for (int i = 0; i < length; i++)
+			jbuf[i] = buf[i];
+
+		jbyteArray byteArrayBuf = (env)->NewByteArray(length);
+		env->SetByteArrayRegion(byteArrayBuf, 0, length, jbuf);
+
+		//on setBodyBytes we copy buf bytes
+		env->CallVoidMethod(httpServletResponse, setBodyBytes, byteArrayBuf);
+
+		//(env)->ReleaseByteArrayElements(byteArrayBuf, jbuf, NULL);
+
+		(jvm)->DetachCurrentThread();
+	}
 	return APR_SUCCESS;
 }
 
-JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_initialize(JNIEnv *env, jobject obj)
+JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_initialize(JNIEnv *env, jobject obj, jstring serverName)
 {
 	(env)->GetJavaVM(&jvm);
 	modSecurityInstance = (env)->NewGlobalRef(obj); //Save the ModSecurity object for further use
@@ -333,6 +404,8 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_initialize(JNIEnv *env, 
 	//table for requests
 	apr_pool_create(&requestsPool, NULL);
 	requests = apr_table_make(requestsPool, 10);
+
+	serverHostname = fromJString(env, serverName, requestsPool);
 
 	return APR_SUCCESS;
 }
@@ -404,6 +477,7 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest(JNIEnv *env, j
 	modsecProcessConnection(c);
 	r = modsecNewRequest(c, config);
 
+	r->server->server_hostname = serverHostname;
 	jclass httpTransactionClass = env->GetObjectClass(httpTransaction);
 	jmethodID getHttpRequest = env->GetMethodID(httpTransactionClass, HTTPTRANSACTION_MSHTTPREQUEST_MET, HTTPTRANSACTION_MSHTTPREQUEST_SIG);
 
@@ -424,6 +498,7 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest(JNIEnv *env, j
 		return DONE;
 	}
 
+
 	jmethodID getTransactionID = env->GetMethodID(httpTransactionClass, HTTPTRANSACTION_TRANSACTIONID_MET, STRINGRETURN_SIG);
 	const char *reqID = fromJStringMethod(env, getTransactionID, httpTransaction, r->pool); //fromJString(env, requestID, r->pool); //unique ID of this request
 	apr_table_setn(requests, reqID, (const char*) r); //store this request for response processing
@@ -433,15 +508,15 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest(JNIEnv *env, j
 	jobject inputStream = (env)->CallObjectMethod(httpServletRequest, getInputStream); //Request body input stream used in the read body callback
 
 	storeJavaServletContext(r, JAVASERVLET_INSTREAM, inputStream);
+	storeJavaServletContext(r, JAVASERVLET_TRANSACTION, httpTransaction);
+
 
 	jmethodID getServerName = (env)->GetMethodID(servletRequestClass, SERVLETREQUEST_SERVERNAME_MET, STRINGRETURN_SIG);
 	r->hostname = fromJStringMethod(env, getServerName, servletRequest, r->pool);
 
 	jmethodID getServerPort = (env)->GetMethodID(servletRequestClass, SERVLETREQUEST_SERVERPORT_MET, SERVLETREQUEST_SERVERPORT_SIG);
 	int port = (env)->CallIntMethod(servletRequest, getServerPort); //server port
-	size_t len = (size_t) ceil(log10((float) port));
-	char *port_str = (char*) apr_palloc(r->pool, len);
-	itoa(port, port_str, 10);
+	char *port_str = apr_itoa(r->pool, port);
 
 
 	jmethodID getPathInfo = (env)->GetMethodID(httpServletRequestClass, HTTPSERVLETREQUEST_PATHINFO_MET, STRINGRETURN_SIG);
@@ -559,8 +634,16 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest(JNIEnv *env, j
 #endif
 	c->remote_host = NULL;
 
-
 	int status = modsecProcessRequest(r);
+
+	removeJavaServletContext(r, JAVASERVLET_INSTREAM);
+	removeJavaServletContext(r, JAVASERVLET_TRANSACTION);
+
+	if (status != DECLINED) //Java modsecurityFilter blocks the request, onResponse will not be called, it's safe to finish the request
+	{
+		apr_table_unset(requests, reqID);
+		modsecFinishRequest(r);
+	}
 
 	return status;
 }
@@ -599,11 +682,7 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onResponse(JNIEnv *env, 
 		return DONE;
 	}
 
-	//jclass msOutputStreamClass = env->GetObjectClass(msOutputStream);
-
-	//jmethodID getByteArrayStream = env->GetMethodID(msOutputStreamClass, MSOUTPUTSTREAM_INPUTSTREAM_MET, MSOUTPUTSTREAM_INPUTSTREAM_SIG);
-	//jobject responseStream = env->CallObjectMethod(msOutputStream, getByteArrayStream);
-
+	storeJavaServletContext(r, JAVASERVLET_TRANSACTION, httpTransaction);
 	storeJavaServletContext(r, JAVASERVLET_OUTSTREAM, responseStream);
 
 
@@ -629,16 +708,9 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onResponse(JNIEnv *env, 
 
 	int status = modsecProcessResponse(r);
 
+	removeJavaServletContext(r, JAVASERVLET_OUTSTREAM);
+	removeJavaServletContext(r, JAVASERVLET_TRANSACTION);
 	modsecFinishRequest(r);
 
-	// the logic here is temporary, needs clarification
-	if(status != 0 && status != -1)
-	{
-		//reset the stream, clear the response
-		jmethodID reset = (env)->GetMethodID(httpServletResponseClass, MSSERVLETRESPONSE_RESET_MET, MSSERVLETRESPONSE_RESET_SIG);
-		env->CallVoidMethod(httpServletResponse, reset);
-
-	}
-	
 	return status;
 }

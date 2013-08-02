@@ -202,9 +202,8 @@ public class MsHttpServletResponse extends HttpServletResponseWrapper {
             stream = new ByteArrayInputStream(new String(writer.toCharArray()).getBytes());
         } else if (msWriter == null) {
             stream = new ByteArrayInputStream(((MsOutputStream) this.getOutputStream()).toByteArray());
-        } else {
-            
         }
+
         return stream;
     }
 
@@ -285,6 +284,16 @@ public class MsHttpServletResponse extends HttpServletResponseWrapper {
             return committed;
         }
         return super.isCommitted();
+    }
+
+    public void setBodyBytes(byte[] bytes) throws IOException {
+        if (msOutputStream == null) {
+            msWriter.reset();
+            msWriter.write(new String(bytes));
+        } else if (msWriter == null) {
+            msOutputStream.reset();
+            msOutputStream.write(bytes, 0, bytes.length);
+        }
     }
 
     @Override
