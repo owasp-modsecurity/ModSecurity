@@ -16,10 +16,10 @@ extern "C" {
 /*
  * Class:     org_modsecurity_ModSecurity
  * Method:    initialize
- * Signature: ()I
+ * Signature: (Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_initialize
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jstring);
 
 /*
  * Class:     org_modsecurity_ModSecurity

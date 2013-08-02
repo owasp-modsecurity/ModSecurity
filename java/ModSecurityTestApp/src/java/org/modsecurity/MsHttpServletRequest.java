@@ -81,7 +81,7 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
             bodyFile.delete();
         }
     }
-    
+
     public static String[][] getHttpRequestHeaders(HttpServletRequest req) {
 
         ArrayList<String> aList = Collections.list(req.getHeaderNames());
@@ -97,7 +97,7 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
 
         return result;
     }
-    
+
     public String getTmpPath() {
         return tmpPath;
     }
@@ -130,10 +130,28 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
         return bodyBytes;
     }
 
-    public void readBody(int maxContentLength) throws IOException, ServletException {
-        
+    public void setBodyBytes(byte[] bytes) throws IOException {
         String contentType = req.getContentType();
+        bodyBytes = new byte[bytes.length];
+        System.arraycopy(bytes, 0, bodyBytes, 0, bytes.length);
         
+        body = new String(bodyBytes, encoding);
+        if ((contentType != null) && ((contentType.compareTo("application/x-www-form-urlencoded") == 0) || (contentType.compareTo("application/x-form-urlencoded") == 0))) {
+            addUrlEncoded(body);
+        }
+    }
+    
+    @Override
+    public int getContentLength() {
+        if (bodyBytes == null)
+            return req.getContentLength();
+        return bodyBytes.length;
+    }
+
+    public void readBody(int maxContentLength) throws IOException, ServletException {
+
+        String contentType = req.getContentType();
+
         if ((contentType != null) && (contentType.startsWith("multipart/form-data"))) {
             readBodyMultipart(maxContentLength);
         } else {
@@ -221,7 +239,6 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
             }
         }
     }
-
 
     /**
      * Parses the given URL-encoded string and adds the parameters to the

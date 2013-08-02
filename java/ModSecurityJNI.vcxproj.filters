@@ -96,7 +96,6 @@
     <ClCompile Include="..\apache2\msc_tree.c">
       <Filter>ModSecurity Sources</Filter>
     </ClCompile>
-    <ClCompile Include="org_modsecurity_ModSecurity.c" />
     <ClCompile Include="..\standalone\api.c">
       <Filter>Standalone Sources</Filter>
     </ClCompile>
@@ -118,6 +117,7 @@
     <ClCompile Include="..\standalone\server.c">
       <Filter>Standalone Sources</Filter>
     </ClCompile>
+    <ClCompile Include="org_modsecurity_ModSecurity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\apache2\acmp.h">

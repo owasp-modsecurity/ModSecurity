@@ -12,18 +12,25 @@ import javax.servlet.ServletException;
  * @author Mihai Pitu
  */
 public final class ModSecurity {
+    //From build/classes: >"c:\Program Files\Java\jdk1.7.0_05\bin\javah.exe" -classpath c:\work\apache-tomcat-7.0.39\lib\servlet-api.jar;. org.modsecurity.ModSecurity
 
     public static final int DONE = -2;
     public static final int DECLINED = -1;
     public static final int OK = 0;
-    //From build/classes: >"c:\Program Files\Java\jdk1.7.0_05\bin\javah.exe" -classpath c:\work\apache-tomcat-7.0.39\lib\servlet-api.jar;. org.modsecurity.ModSecurity
     private FilterConfig filterConfig;
     private String confFilename;
     private long confTime;
-    private final static String pathToLib = "c:\\work\\mod_security\\java\\Debug\\";
 
     static {
-        //TODO: bad practice, native libraries should be loaded in server's classloader
+//        try {
+//            Class.forName("org.modsecurity.loader.ModSecurityLoader");
+//            System.out.println("MS loader found");
+//        } catch (ClassNotFoundException ex) {
+//            Logger.getLogger(ModSecurity.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+
+        //TODO: bad practice (if we have two webapps using ModSecurity, one will raise UnsatisfiedLinkError), 
+        //native libraries should be loaded in server's root classloader
         System.load("c:\\work\\mod_security\\java\\libs\\zlib1.dll");
         System.load("c:\\work\\mod_security\\java\\libs\\libxml2.dll");
         System.load("c:\\work\\mod_security\\java\\libs\\pcre.dll");
@@ -31,9 +38,6 @@ public final class ModSecurity {
         System.load("c:\\work\\mod_security\\java\\libs\\libapriconv-1.dll");
         System.load("c:\\work\\mod_security\\java\\libs\\libaprutil-1.dll");
         System.load("c:\\work\\mod_security\\java\\Debug\\ModSecurityJNI.dll");
-        //java.lang.reflect.Field loadedLibraries = ClassLoader.class.getDeclaredField("loadedLibraryNames");
-        //loadedLibraries.setAccessible(true);
-        //final Vector<String> libraries = (Vector<String>) loadedLibraries.get(ClassLoader.getSystemClassLoader());
     }
 
     public ModSecurity(FilterConfig fc, String confFile) throws ServletException {
@@ -41,11 +45,11 @@ public final class ModSecurity {
         this.confFilename = confFile;
         confTime = new File(confFilename).lastModified();
 
-        this.initialize();
+        this.initialize(fc.getFilterName());
         filterConfig.getServletContext().log("ModSecurity started.");
     }
 
-    private native int initialize();
+    private native int initialize(String serverName);
 
     public native int destroy();
 

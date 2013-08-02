@@ -10,7 +10,8 @@
 	    <filter-class>org.modsecurity.ModSecurityFilter</filter-class>
 	    <init-param>
                 <param-name>conf</param-name>
-                <param-value>/WEB-INF/modsecurity.conf</param-value>
+                <param-value>c:\inetpub\wwwroot\owasp-crs\modsecurity.conf</param-value>
+                <!--<param-value>/etc/modsecurity/modsecurity.conf</param-value>-->
             </init-param>
     </filter>
 
