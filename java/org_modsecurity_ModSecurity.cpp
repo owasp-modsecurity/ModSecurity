@@ -34,7 +34,6 @@
 
 #define HTTPTRANSACTION_TRANSACTIONID_MET	"getTransactionID"
 
-
 #define SERVLETREQUEST_SERVERNAME_MET		"getServerName"
 #define SERVLETREQUEST_CHARENCODING_MET		"getCharacterEncoding"
 #define SERVLETREQUEST_CONTENTTYPE_MET		"getContentType"
@@ -63,9 +62,6 @@
 
 #define MSSERVLETRESPONSE_OUTPUTSTREAM_MET	"getByteArrayStream"
 #define MSSERVLETRESPONSE_OUTPUTSTREAM_SIG	"()Ljava/io/ByteArrayInputStream;"
-
-#define MSSERVLETRESPONSE_RESET_MET			"reset"
-#define MSSERVLETRESPONSE_RESET_SIG			"()V"
 
 
 //typedef struct {
@@ -210,7 +206,7 @@ void logSec(void *obj, int level, char *str)
 		(env)->CallVoidMethod(modSecurityInstance, logMethod, level, jStr);
 
 		(jvm)->DetachCurrentThread();
-		//in the context of a JVM thread, any leaked local references are automatically cleaned up.
+		//in the context of a JVM thread, any leaked local references are automatically cleaned up
 		//(env)->ReleaseStringUTFChars(jStr, str);
 	}
 }
@@ -249,9 +245,6 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
 			*readcnt = count;
 
 			memcpy(buf, bufferPtr, *readcnt);
-			//const char *test = "Foo' or '2' < '1' ;--";
-			//memcpy(buf, test, strlen(test));
-
 		}
 		(env)->ReleaseByteArrayElements(byteArrayBuf, bufferPtr, NULL);
 		(env)->DeleteLocalRef(byteArrayBuf);

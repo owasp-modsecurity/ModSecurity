@@ -22,22 +22,14 @@ public final class ModSecurity {
     private long confTime;
 
     static {
-//        try {
-//            Class.forName("org.modsecurity.loader.ModSecurityLoader");
-//            System.out.println("MS loader found");
-//        } catch (ClassNotFoundException ex) {
-//            Logger.getLogger(ModSecurity.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-
-        //TODO: bad practice (if we have two webapps using ModSecurity, one will raise UnsatisfiedLinkError), 
-        //native libraries should be loaded in server's root classloader
-        System.load("c:\\work\\mod_security\\java\\libs\\zlib1.dll");
-        System.load("c:\\work\\mod_security\\java\\libs\\libxml2.dll");
-        System.load("c:\\work\\mod_security\\java\\libs\\pcre.dll");
-        System.load("c:\\work\\mod_security\\java\\libs\\libapr-1.dll");
-        System.load("c:\\work\\mod_security\\java\\libs\\libapriconv-1.dll");
-        System.load("c:\\work\\mod_security\\java\\libs\\libaprutil-1.dll");
-        System.load("c:\\work\\mod_security\\java\\Debug\\ModSecurityJNI.dll");
+        try {
+            //ModSecurityLoader calls System.load() for every native library needed by ModSecurity
+            Class.forName("org.modsecurity.loader.ModSecurityLoader");
+            System.out.println("ModSecurity libraries loaded.");
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ModSecurity.class.getName()).log(java.util.logging.Level.SEVERE,
+                    "ModSecurityLoader was not found, please make sure that you have \"ModSecurityLoader.jar\" in your server lib folder.", ex);
+        }
     }
 
     public ModSecurity(FilterConfig fc, String confFile) throws ServletException {
