@@ -19,6 +19,7 @@ public class MsHttpTransaction {
 
     public MsHttpTransaction(ServletRequest req, ServletResponse res) {
         tranID = UUID.randomUUID().toString();
+        tranID = tranID.replace('-', '0');
         this.req = (HttpServletRequest)req;
         this.res = (HttpServletResponse)res;
         this.msReq = new MsHttpServletRequest(this.req);

@@ -25,7 +25,7 @@ public class ModSecurityFilter implements Filter {
             throw new ServletException("ModSecurity: parameter 'conf' not available in web.xml");
         }
 
-        
+
         modsecurity = new ModSecurity(fc, confFilename);
     }
 
@@ -39,28 +39,25 @@ public class ModSecurityFilter implements Filter {
             int status = modsecurity.onRequest(modsecurity.getConfFilename(), httpTran, modsecurity.checkModifiedConfig()); //modsecurity reloads only if primary config file is modified
 
             if (status != ModSecurity.DECLINED) {
-                if (status > 0) {
-                    httpTran.getHttpResponse().setStatus(status);
-                    httpTran.getHttpResponse().sendError(status);
-                }
+                httpTran.getHttpResponse().sendError(403);
                 return;
             }
 
             //process request
             fc.doFilter(httpTran.getMsHttpRequest(), httpTran.getMsHttpResponse());
-            
-            
+
+
             status = modsecurity.onResponse(httpTran);
-            
-            if(status != ModSecurity.OK && status != ModSecurity.DECLINED) {
+
+            if (status != ModSecurity.OK && status != ModSecurity.DECLINED) {
                 httpTran.getMsHttpResponse().reset();
                 httpTran.getMsHttpResponse().setStatus(status);
             }
-            
+
         } finally {
             httpTran.destroy();
         }
-        
+
     }
 
     @Override

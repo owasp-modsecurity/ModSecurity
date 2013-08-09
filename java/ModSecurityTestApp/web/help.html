@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ModSecurity WAF: Help page</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body style="background: #333333;">
+        <div  align="center" style="width:930px; margin:0 auto; box-shadow: 5px 5px 6px #000; background: #FFFFFF;">
+            <div style="width: 930px;">
+                <img border="0" height="101" alt="ModSecurity: Open Source Web Application Firewall" src="http://www.modsecurity.org/g/header-top.jpg" />
+            </div>
+            <div style="width: 930px;">
+                <table width="90%" cellspacing="0" cellpadding="0" border="0">
+                    <tr>
+                        <td>
+                            <h2 style="font-family: Arial;">ModSecurity for Java - Help Page</h2>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>
+                                <b>ModSecurity</b> is an open source intrusion detection and prevention engine for web
+                                applications. It can also be called an web application firewall. It operates embedded into
+                                the web server, acting as a powerful umbrella, shielding applications from attacks.
+                            </p>
+                            <p>
+                                ModSecurity for Java is designed as a <b>Java Servlet Filter</b> which makes use of ModSecurity's
+                                <a href="https://github.com/SpiderLabs/ModSecurity">native code</a> using the <b>JNI technology</b>.
+                            </p>
+                            
+                            <br />
+                            <h3>Installation</h3>
+                            <p>
+                                First you need to choose whether to install the latest version of ModSecurity directly from
+                                <a href="https://github.com/SpiderLabs/ModSecurity">github.com/SpiderLabs/ModSecurity</a> or using pre-compiled binaries from 
+                                <a href="https://www.modsecurity.org/">modsecurity.org</a>. We will not discuss how to compile
+                                the native libraries needed since these steps are described in the README files from ModSecurity's repository.
+                                The native libraries (.so, .dll, etc.) needed for <b>ModSecurity for Java are:</b>
+                            </p>
+                            <ol>
+                                <li>
+                                    zlib1
+                                </li>
+                                <li>
+                                    libxml2
+                                </li>
+                                <li>
+                                    pcre
+                                </li>
+                                <li>
+                                    libapr-1
+                                </li>
+                                <li>
+                                    libapriconv-1
+                                </li>
+                                <li>
+                                    libaprutil-1
+                                </li>
+                                <li>
+                                    ModSecurityJNI
+                                </li>
+                            </ol>
+                            
+                            <p>
+                                These libraries are loaded by the ModSecurityLoader.jar, which should be placed in your Java server library loader
+                                (for example, in Tomcat 7: $CATALINA_HOME/lib). You can build/modify load directory the ModSecurityLoader from 
+                                /mod_security/java/ModSecurityLoader/src/. The libraries have to be copied in a directory (for example, c:\work\mod_security\java\libs\),
+                                which should be accessible to ModSecurityLoader.jar.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>
