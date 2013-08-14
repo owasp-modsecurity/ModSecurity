@@ -3,6 +3,12 @@
     <head>
         <title>ModSecurity WAF: Help page</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <style>
+            .code {
+                font-family: Courier;
+                font-size: 14px;
+            }
+        </style>
     </head>
     <body style="background: #333333;">
         <div  align="center" style="width:930px; margin:0 auto; box-shadow: 5px 5px 6px #000; background: #FFFFFF;">
@@ -35,7 +41,7 @@
                                 <a href="https://github.com/SpiderLabs/ModSecurity">github.com/SpiderLabs/ModSecurity</a> or using pre-compiled binaries from 
                                 <a href="https://www.modsecurity.org/">modsecurity.org</a>. We will not discuss how to compile
                                 the native libraries needed since these steps are described in the README files from ModSecurity's repository.
-                                The native libraries (.so, .dll, etc.) needed for <b>ModSecurity for Java are:</b>
+                                The native libraries (.so, .dll, etc.) needed for <b>ModSecurity for Java</b>  are:
                             </p>
                             <ol>
                                 <li>
@@ -62,10 +68,10 @@
                             </ol>
                             
                             <p>
-                                These libraries are loaded by the ModSecurityLoader.jar, which should be placed in your Java server library loader
-                                (for example, in Tomcat 7: $CATALINA_HOME/lib). You can build/modify load directory the ModSecurityLoader from 
-                                /mod_security/java/ModSecurityLoader/src/. The libraries have to be copied in a directory (for example, c:\work\mod_security\java\libs\),
-                                which should be accessible to ModSecurityLoader.jar.
+                                These libraries are loaded by the <span class="code">ModSecurityLoader.jar</span>, which should be placed in your Java server library loader
+                                (for example, in Tomcat 7: <span class="code">$CATALINA_HOME/lib</span>). You can build or modify the load directory of <span class="code">ModSecurityLoader</span> from 
+                                <span class="code">/mod_security/java/ModSecurityLoader/src/</span>. The libraries have to be copied in a directory (for example, <span class="code">c:\work\mod_security\java\libs\</span>),
+                                which should be accessible to <span class="code">ModSecurityLoader.jar</span>.
                             </p>
                         </td>
                     </tr>
