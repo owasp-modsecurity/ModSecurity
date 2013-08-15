@@ -10,8 +10,11 @@
 	    <filter-class>org.modsecurity.ModSecurityFilter</filter-class>
 	    <init-param>
                 <param-name>conf</param-name>
-                <param-value>c:\inetpub\wwwroot\owasp-crs\modsecurity.conf</param-value>
-                <!--<param-value>/etc/modsecurity/modsecurity.conf</param-value>-->
+                <param-value>c:\inetpub\wwwroot\owasp-crs\modsecurity.conf</param-value> 
+                <!-- Path to the main configuration file of ModSecurity. You can activate the core rules by including in modsecurity.conf file:
+                    Include modsecurity_crs_10_setup.conf
+                    Include activated_rules\*.conf
+                -->
             </init-param>
     </filter>
 

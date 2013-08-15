@@ -132,17 +132,18 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
         String contentType = req.getContentType();
         bodyBytes = new byte[bytes.length];
         System.arraycopy(bytes, 0, bodyBytes, 0, bytes.length);
-        
+
         body = new String(bodyBytes, encoding);
         if ((contentType != null) && ((contentType.compareTo("application/x-www-form-urlencoded") == 0) || (contentType.compareTo("application/x-form-urlencoded") == 0))) {
             addUrlEncoded(body);
         }
     }
-    
+
     @Override
     public int getContentLength() {
-        if (bodyBytes == null)
+        if (bodyBytes == null) {
             return req.getContentLength();
+        }
         return bodyBytes.length;
     }
 
@@ -275,7 +276,7 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
                     }
                 }
             }
-
+            //test with <£2.00 price
             if (flag == 1) {
                 value = "";
                 if (startPos != -1) {

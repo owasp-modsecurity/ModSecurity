@@ -1,3 +1,4 @@
+<%@page import="java.net.URLDecoder"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -34,7 +35,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <form id="demoForm" method="post" action="index.jsp">
+                            <form id="demoForm" method="get" action="index.jsp">
                                 <b>Payload:</b>
                                 <fieldset>
                                     <textarea name="test" rows="6" cols="90" style="max-width:800px;"></textarea> <!--Foo' or '2' < '1' ;--example payload-->
@@ -88,10 +89,10 @@
                     </tr>
 
                     <tr>
-                        <td>
+                        <td> 
                             <% if (request.getParameter("test") != null) {%>
                             <h3>Last submitted payload:</h3>
-                            <p><%= request.getParameter("test")%></p>
+                            <p><%= request.getParameter("test") %></p>
                             <br />
                             <% }%>
                         </td>

@@ -8,8 +8,12 @@
                 font-family: Courier;
                 font-size: 14px;
             }
+            .codecanvas {
+                background: #DDDDDD;
+            }
         </style>
     </head>
+    
     <body style="background: #333333;">
         <div  align="center" style="width:930px; margin:0 auto; box-shadow: 5px 5px 6px #000; background: #FFFFFF;">
             <div style="width: 930px;">
@@ -30,18 +34,18 @@
                                 the web server, acting as a powerful umbrella, shielding applications from attacks.
                             </p>
                             <p>
-                                ModSecurity for Java is designed as a <b>Java Servlet Filter</b> which makes use of ModSecurity's
+                                ModSecurity for Java is designed as a <a href="http://www.oracle.com/technetwork/java/filters-137243.html">Java Filter</a> which makes use of ModSecurity's
                                 <a href="https://github.com/SpiderLabs/ModSecurity">native code</a> using the <b>JNI technology</b>.
                             </p>
-                            
+
                             <br />
                             <h3>Installation</h3>
                             <p>
-                                First you need to choose whether to install the latest version of ModSecurity directly from
+                                First you need to choose whether to download and compile ModSecurity from the project's version control web-site:
                                 <a href="https://github.com/SpiderLabs/ModSecurity">github.com/SpiderLabs/ModSecurity</a> or using pre-compiled binaries from 
                                 <a href="https://www.modsecurity.org/">modsecurity.org</a>. We will not discuss how to compile
-                                the native libraries needed since these steps are described in the README files from ModSecurity's repository.
-                                The native libraries (.so, .dll, etc.) needed for <b>ModSecurity for Java</b>  are:
+                                the dependent native libraries needed since these steps are described in the README files from ModSecurity's repository.
+                                The native libraries (.so, .dll, etc.) needed for <b>ModSecurity for Java</b> are:
                             </p>
                             <ol>
                                 <li>
@@ -66,13 +70,58 @@
                                     ModSecurityJNI
                                 </li>
                             </ol>
-                            
+
                             <p>
-                                These libraries are loaded by the <span class="code">ModSecurityLoader.jar</span>, which should be placed in your Java server library loader
+                                These native libraries are loaded by the <span class="code">ModSecurityLoader.jar</span>, which should be placed in your Java server library loader
                                 (for example, in Tomcat 7: <span class="code">$CATALINA_HOME/lib</span>). You can build or modify the load directory of <span class="code">ModSecurityLoader</span> from 
                                 <span class="code">/mod_security/java/ModSecurityLoader/src/</span>. The libraries have to be copied in a directory (for example, <span class="code">c:\work\mod_security\java\libs\</span>),
                                 which should be accessible to <span class="code">ModSecurityLoader.jar</span>.
                             </p>
+
+                            <br />
+                            <h4>Java Web Applications with ModSecurity Filter</h4>
+                            <p>
+                                ModSecurity for Java uses <a href="http://www.oracle.com/technetwork/java/filters-137243.html">Java Filters</a> in order to 
+                                intercept Http requests and responses. <b>ModsecurityTestApp</b> is an example of Java EE Web application using the ModSecurity
+                                Filter. To use ModSecurity Filter in your Web application, copy the source files from 
+                                <span class="code">mod_security/java/ModSecurityTestApp/src/</span>
+                                in your application and add the following entry for the filter tag in your <b>web.xml</b> file:    
+                            </p>
+
+                            <pre class="codecanvas"><code >
+&lt;filter&gt;
+        &lt;filter-name&gt;ModSecurityFilter&lt;/filter-name&gt;
+	    &lt;filter-class>org.modsecurity.ModSecurityFilter&lt;/filter-class&gt;
+	    &lt;init-param&gt;
+                &lt;param-name&gt;conf&lt;/param-name&gt;
+                &lt;param-value&gt;c:\inetpub\wwwroot\owasp-crs\modsecurity.conf&lt;/param-value&gt; 
+                &lt;!-- Path to the main configuration file of ModSecurity. You can activate the core 
+                     rules by including in modsecurity.conf file:
+                        Include modsecurity_crs_10_setup.conf
+                        Include activated_rules\*.conf
+                --&gt;
+            &lt;/init-param&gt;
+    &lt;/filter&gt;
+
+    &lt;filter-mapping&gt;
+	    &lt;filter-name&gt;ModSecurityFilter&lt;/filter-name&gt;
+	    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+    &lt;/filter-mapping&gt;
+&lt;/filter&gt;
+                            </code>
+                            </pre>
+                            
+                            <p>
+                                The ModSecurity Filter makes use of the native libraries written in C/C++ using the JNI technology.
+                                As stated earlier, the native libraries are loaded by the <span class="code">ModSecurityLoader.jar</span>
+                                which should be loaded by the server at start-up. If you are unable to configure the server to load the 
+                                ModSecurity libraries at startup, you may load them in your web application although this is not 
+                                recommended because this will raise <span class="code">UnsatisfiedLinkError</span> if the ModSecurity
+                                Filter is used in multiple applications within the same server.
+                            </p>
+                            <br/>
+                            <br/>
+                            <br/>
                         </td>
                     </tr>
                 </table>
