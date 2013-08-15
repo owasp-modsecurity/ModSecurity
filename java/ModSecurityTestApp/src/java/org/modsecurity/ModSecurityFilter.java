@@ -1,6 +1,7 @@
 package org.modsecurity;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -25,7 +26,6 @@ public class ModSecurityFilter implements Filter {
             throw new ServletException("ModSecurity: parameter 'conf' not available in web.xml");
         }
 
-
         modsecurity = new ModSecurity(fc, confFilename);
     }
 
@@ -35,14 +35,14 @@ public class ModSecurityFilter implements Filter {
         HttpServletResponse httpResp = (HttpServletResponse) response;
         MsHttpTransaction httpTran = new MsHttpTransaction(httpReq, httpResp); //transaction object used by native code
 
-        try {
+        try { 
             int status = modsecurity.onRequest(modsecurity.getConfFilename(), httpTran, modsecurity.checkModifiedConfig()); //modsecurity reloads only if primary config file is modified
 
             if (status != ModSecurity.DECLINED) {
                 httpTran.getHttpResponse().sendError(403);
                 return;
             }
-
+            
             //process request
             fc.doFilter(httpTran.getMsHttpRequest(), httpTran.getMsHttpResponse());
 

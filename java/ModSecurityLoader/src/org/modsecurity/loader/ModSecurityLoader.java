@@ -10,7 +10,6 @@ public class ModSecurityLoader {
         File modSecDir = new File(MODSECURITYLIBSDIR_PATH);
 
         File[] flibs = modSecDir.listFiles();
-        System.out.println("len" + flibs.length);
 
         loadLib(flibs, "zlib1");
         loadLib(flibs, "libxml2");
@@ -19,6 +18,16 @@ public class ModSecurityLoader {
         loadLib(flibs, "libapriconv-1");
         loadLib(flibs, "libaprutil-1");
         loadLib(flibs, "ModSecurityJNI");
+
+        //alternative load, this requires native libraries to be in java.library.path, you can set it
+        //by specifying server VM start-up option: -Djava.library.path=path/to/libs/
+//        System.loadLibrary("zlib1");
+//        System.loadLibrary("libxml2");
+//        System.loadLibrary("pcre");
+//        System.loadLibrary("libapr-1");
+//        System.loadLibrary("libapriconv-1");
+//        System.loadLibrary("libaprutil-1");
+//        System.loadLibrary("ModSecurityJNI");
     }
 
     private static void loadLib(File[] files, String lib) {
@@ -28,5 +37,9 @@ public class ModSecurityLoader {
                 break;
             }
         }
+    }
+    
+    public void main(String[] args) {
+        
     }
 }
