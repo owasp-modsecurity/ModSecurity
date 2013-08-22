@@ -1,7 +1,6 @@
 package org.modsecurity;
 
 import java.io.IOException;
-import java.net.URLDecoder;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;

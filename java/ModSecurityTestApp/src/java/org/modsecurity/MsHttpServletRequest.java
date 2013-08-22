@@ -491,7 +491,7 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
      */
     @Override
     public Enumeration getParameterNames() {
-        Hashtable parameterNames = new Hashtable();
+        Hashtable<Object, Object> parameterNames = new Hashtable<Object, Object>();
         for (int i = 0, n = parameters.size(); i < n; i++) {
             Parameter p = (Parameter) parameters.get(i);
             parameterNames.put(p.name, p.value);

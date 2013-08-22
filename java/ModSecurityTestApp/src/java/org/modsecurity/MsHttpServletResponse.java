@@ -25,8 +25,8 @@ public class MsHttpServletResponse extends HttpServletResponseWrapper {
     private static final int INTERCEPT_OBSERVE_ONLY = 2;
     public static final String DEFAULT_CHARACTER_ENCODING = "ISO-8859-1";
     private int interceptMode = INTERCEPT_ON;
-    private ArrayList headers = new ArrayList();
-    private ArrayList cookies = new ArrayList();
+    private ArrayList<Object> headers = new ArrayList<Object>();
+    private ArrayList<Object> cookies = new ArrayList<Object>();
     private int status = -1;
     private boolean committed = false;
     private boolean suspended = false;
@@ -593,11 +593,11 @@ final class FastHttpDateFormat {
     /**
      * Formatter cache.
      */
-    protected static final HashMap formatCache = new HashMap();
+    protected static final HashMap<Object, Object> formatCache = new HashMap<Object, Object>();
     /**
      * Parser cache.
      */
-    protected static final HashMap parseCache = new HashMap();
+    protected static final HashMap<Object, Object> parseCache = new HashMap<Object, Object>();
 
     // --------------------------------------------------------- Public Methods
     /**
@@ -705,7 +705,7 @@ final class FastHttpDateFormat {
     /**
      * Update cache.
      */
-    private static void updateCache(HashMap cache, Object key,
+    private static void updateCache(HashMap<Object, Object> cache, Object key,
             Object value) {
         if (value == null) {
             return;

@@ -117,7 +117,7 @@
     <ClCompile Include="..\standalone\server.c">
       <Filter>Standalone Sources</Filter>
     </ClCompile>
-    <ClCompile Include="org_modsecurity_ModSecurity.cpp" />
+    <ClCompile Include="org_modsecurity_ModSecurity.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\apache2\acmp.h">

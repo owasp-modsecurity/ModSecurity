@@ -13,7 +13,7 @@
             }
         </style>
     </head>
-    
+
     <body style="background: #333333;">
         <div  align="center" style="width:930px; margin:0 auto; box-shadow: 5px 5px 6px #000; background: #FFFFFF;">
             <div style="width: 930px;">
@@ -39,17 +39,16 @@
                             </p>
 
                             <br />
-                            <h3>Installation</h3>
+                            <h2>Installation</h2>
                             <p>
                                 First you need to choose whether to download and compile ModSecurity from the project's version control web-site:
                                 <a href="https://github.com/SpiderLabs/ModSecurity">github.com/SpiderLabs/ModSecurity</a> or using pre-compiled binaries from 
-                                <a href="https://www.modsecurity.org/">modsecurity.org</a>. We will not discuss how to compile
-                                the dependent native libraries needed since these steps are described in the README files from ModSecurity's repository.
+                                <a href="https://www.modsecurity.org/">modsecurity.org</a>.
                                 The native libraries (.so, .dll, etc.) needed for <b>ModSecurity for Java</b> are:
                             </p>
                             <ol>
                                 <li>
-                                    zlib1
+                                    zlib1 (Windows only)
                                 </li>
                                 <li>
                                     libxml2
@@ -61,25 +60,53 @@
                                     libapr-1
                                 </li>
                                 <li>
-                                    libapriconv-1
+                                    libapriconv-1 (Windows only)
                                 </li>
                                 <li>
                                     libaprutil-1
                                 </li>
                                 <li>
-                                    ModSecurityJNI
+                                    ModSecurityJNI (JNI wrapper for mod_security code)
                                 </li>
                             </ol>
 
                             <p>
-                                These native libraries are loaded by the <span class="code">ModSecurityLoader.jar</span>, which should be placed in your Java server library loader
-                                (for example, in Tomcat 7: <span class="code">$CATALINA_HOME/lib</span>). You can build or modify the load directory of <span class="code">ModSecurityLoader</span> from 
-                                <span class="code">/mod_security/java/ModSecurityLoader/src/</span>. The libraries have to be copied in a directory (for example, <span class="code">c:\work\mod_security\java\libs\</span>),
-                                which should be accessible to <span class="code">ModSecurityLoader.jar</span>.
+                                These native libraries are used by the <a class="code" href="../src/java/org/modsecurity/ModSecurityFilter.java">ModSecurityFilter</a>.
                             </p>
 
                             <br />
-                            <h4>Java Web Applications with ModSecurity Filter</h4>
+                            <h3>Compile ModSecurity native library</h3>
+                            <p>
+                                Install required packages for compilation. For example, on Debian/Ubuntu like systems (Windows users have a Visual Studio solution):
+                            </p>
+                            <pre class="codecanvas">
+sudo apt-get install g++ make automake autoconf libtool
+                            </pre> 
+                            <p>
+                                Install required dependent packages:
+                            </p>
+                            <pre class="codecanvas">
+sudo apt-get install libxml2 libxml2-dev libxml2-utils libaprutil1 libaprutil1-dev apache2-prefork-dev
+                            </pre> 
+                            <p>
+                                Download mod_security source code from <a href="https://github.com/mihaipitu/ModSecurity">GitHub</a>, compile and install:
+                            </p>
+                            <pre class="codecanvas">
+cd mod_security/
+./autogen.sh
+./configure --enable-java-module
+make
+                            </pre> 
+                            <p>
+                                Copy compiled library in a convenient folder:
+                            </p>
+                            <pre class="codecanvas">
+sudo cp ./java/.libs/libModSecurityJNI.so /usr/lib/
+                            </pre> 
+
+
+                            <br />
+                            <h3>Java Web Applications with ModSecurity Filter</h3>
                             <p>
                                 ModSecurity for Java uses <a href="http://www.oracle.com/technetwork/java/filters-137243.html">Java Filters</a> in order to 
                                 intercept Http requests and responses. <b>ModsecurityTestApp</b> is an example of Java EE Web application using the ModSecurity
@@ -110,15 +137,41 @@
 &lt;/filter&gt;
                             </code>
                             </pre>
-                            
+
                             <p>
                                 The ModSecurity Filter makes use of the native libraries written in C/C++ using the JNI technology.
-                                As stated earlier, the native libraries are loaded by the <span class="code">ModSecurityLoader.jar</span>
-                                which should be loaded by the server at start-up. If you are unable to configure the server to load the 
-                                ModSecurity libraries at startup, you may load them in your web application although this is not 
-                                recommended because this will raise <span class="code">UnsatisfiedLinkError</span> if the ModSecurity
-                                Filter is used in multiple applications within the same server.
-                            </p>
+                                There are two ways of loading native libraries by Java Web Applications:
+                            <ol>
+                                <li>
+                                    <h4>Loading native libraries directly in the ModSecurityFilter</h4>
+                                    <p>
+                                        Although this is the easier, this is not recommended because the JVM will raise 
+                                        <span class="code">UnsatisfiedLinkError</span> if the ModSecurity Filter is used in 
+                                        multiple applications within the same server. 
+                                        The libraries are loaded in the <a class="code" href="../src/java/org/modsecurity/ModSecurity.java">ModSecurity</a> class using 
+                                        <span class="code">System.loadLibrary()</span>. In this case the server has to be started with                                        
+                                        the following VM options:
+                                    </p>
+                                    <pre class="codecanvas">
+-Djava.library.path=/path/to/libraries/folder/
+                                    </pre>
+                                    <p>
+                                        You can specify multiple folders for the <span class="code">java.library.path</span> variable by using
+                                        : (colon) or ; (semi-colon), depending on your environment.
+                                    </p>
+                                </li>
+
+                                <li>
+                                    <h4>Loading native libraries when the Web Server starts</h4>
+                                    <p>
+                                        <a class="code" href="../../ModSecurityLoader/dist/ModSecurityLoader.jar">ModSecurityLoader.jar</a> should be placed
+                                        in the Java server library loader folder (for example, in Tomcat 7: <span class="code">$CATALINA_HOME/lib</span>). 
+                                        You can build or modify the load directory of <span class="code">ModSecurityLoader</span> from 
+                                        <span class="code">/mod_security/java/ModSecurityLoader/src/</span>.
+                                    </p>
+                                </li>
+                            </ol>
+                            
                             <br/>
                             <br/>
                             <br/>

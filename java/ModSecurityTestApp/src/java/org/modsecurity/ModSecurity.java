@@ -7,10 +7,7 @@ import java.net.UnknownHostException;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 
-/**
- *
- * @author Mihai Pitu
- */
+
 public final class ModSecurity {
     //From build/classes: >"c:\Program Files\Java\jdk1.7.0_05\bin\javah.exe" -classpath c:\work\apache-tomcat-7.0.39\lib\servlet-api.jar;. org.modsecurity.ModSecurity
 
@@ -23,14 +20,14 @@ public final class ModSecurity {
 
     static {
         //ModSecurityLoader calls System.load() for every native library needed by ModSecurity.
-        try {
-            Class.forName("org.modsecurity.loader.ModSecurityLoader");
-            System.out.println("ModSecurity libraries loaded.");
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ModSecurity.class.getName()).log(java.util.logging.Level.SEVERE,
-                    "ModSecurityLoader was not found, please make sure that you have \"ModSecurityLoader.jar\" in your server lib folder.", ex);
-        }
-        
+//        try {
+//            Class.forName("org.modsecurity.loader.ModSecurityLoader");
+//            System.out.println("ModSecurity libraries loaded.");
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(ModSecurity.class.getName()).log(java.util.logging.Level.SEVERE,
+//                    "ModSecurityLoader was not found, please make sure that you have \"ModSecurityLoader.jar\" in your server lib folder.", ex);
+//        }
+
         //If the ModSecurityLoader is not used, native libraries can be loaded here, however this is bad practice since this will raise UnsatisfiedLinkError if 
         //ModSecurity is used in multiple webapps. This will also will raise problems when the web-app is redeployed and the server is running.
 //        System.load("c:\\work\\mod_security\\java\\libs\\zlib1.dll");
@@ -40,6 +37,19 @@ public final class ModSecurity {
 //        System.load("c:\\work\\mod_security\\java\\libs\\libapriconv-1.dll");
 //        System.load("c:\\work\\mod_security\\java\\libs\\libaprutil-1.dll");
 //        System.load("c:\\work\\mod_security\\java\\Debug\\ModSecurityJNI.dll");
+        try {
+        System.loadLibrary("zlib1"); //needed for libxml2 in Windows
+        } catch(UnsatisfiedLinkError ex) {
+        }
+        System.loadLibrary("libxml2");
+        System.loadLibrary("pcre");
+        System.loadLibrary("libapr-1");
+        try {
+        System.loadLibrary("libapriconv-1");
+        } catch(UnsatisfiedLinkError ex) { //needed for libaprutil-1 in Windows
+        }
+        System.loadLibrary("libaprutil-1");
+        System.loadLibrary("ModSecurityJNI");
     }
 
     public ModSecurity(FilterConfig fc, String confFile) throws ServletException {

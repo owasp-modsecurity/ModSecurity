@@ -12,6 +12,7 @@ MAINTAINERCLEANFILES += $(CLEANFILES) \
        aclocal.m4 \
        alp2/Makefile.in \
        apache2/Makefile.in \
+       java/Makefile.in \
        build/config.guess \
        build/config.sub \
        build/depcomp \
