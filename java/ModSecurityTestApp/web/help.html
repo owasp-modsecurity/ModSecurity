@@ -77,7 +77,7 @@
                             <br />
                             <h3>Compile ModSecurity native library</h3>
                             <p>
-                                Install required packages for compilation. For example, on Debian/Ubuntu like systems (Windows users have a Visual Studio solution):
+                                Install required packages for compilation. For example, on Debian/Ubuntu like systems:
                             </p>
                             <pre class="codecanvas">
 sudo apt-get install g++ make automake autoconf libtool
@@ -145,9 +145,9 @@ sudo cp ./java/.libs/libModSecurityJNI.so /usr/lib/
                                 <li>
                                     <h4>Loading native libraries directly in the ModSecurityFilter</h4>
                                     <p>
-                                        Although this is the easier, this is not recommended because the JVM will raise 
+                                        Although this is easier, it is not recommended because the JVM will raise 
                                         <span class="code">UnsatisfiedLinkError</span> if the ModSecurity Filter is used in 
-                                        multiple applications within the same server. 
+                                        multiple applications within the same server or the application is redeployed while the server is running. 
                                         The libraries are loaded in the <a class="code" href="../src/java/org/modsecurity/ModSecurity.java">ModSecurity</a> class using 
                                         <span class="code">System.loadLibrary()</span>. In this case the server has to be started with                                        
                                         the following VM options:
@@ -157,7 +157,8 @@ sudo cp ./java/.libs/libModSecurityJNI.so /usr/lib/
                                     </pre>
                                     <p>
                                         You can specify multiple folders for the <span class="code">java.library.path</span> variable by using
-                                        : (colon) or ; (semi-colon), depending on your environment.
+                                        : (colon) or ; (semi-colon), depending on your environment. Also, the libraries can be loaded using
+                                        their absolute path using <span class="code">System.load()</span>.
                                     </p>
                                 </li>
 
