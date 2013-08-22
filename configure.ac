@@ -17,6 +17,7 @@ AC_PREFIX_DEFAULT([/usr/local/modsecurity])
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects])
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
+
 LT_PREREQ([2.2])
 LT_INIT([dlopen])
 
@@ -28,12 +29,16 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_GREP
+AC_PROG_CXX
 AC_PATH_PROGS(PERL, [perl perl5], )
 AC_PATH_PROGS(ENV_CMD, [env printenv], )
+
 
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([fcntl.h limits.h stdlib.h string.h unistd.h sys/types.h sys/stat.h sys/utsname.h])
+AC_CHECK_HEADER([jni.h])
+
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -187,6 +192,46 @@ AC_ARG_ENABLE(standalone-module,
 AM_CONDITIONAL([BUILD_STANDALONE_MODULE], [test "$build_standalone_module" -eq 1])
 if test "$build_standalone_module" -eq 1; then
   TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS standalone"
+fi
+
+
+# Java Module
+AC_ARG_ENABLE(java-module,
+              AS_HELP_STRING([--enable-java-module],
+                             [Enable building java module.]),
+[
+  if test "$enableval" != "no"; then
+    build_java_module=1
+
+	m4_include([build/ax_jni_include_dir.m4])
+	m4_include([build/ac_prog_javac_works.m4])
+	m4_include([build/ac_prog_javac.m4])
+
+   # Test for java/jni so that we can compile the java bindings
+   AC_PROG_JAVAC
+   if test "x$JAVAC" != x; then
+       AX_JNI_INCLUDE_DIR
+       for JNI_INCLUDE_DIR in $JNI_INCLUDE_DIRS
+       do
+          JNI_CPPFLAGS="$JNI_CPPFLAGS -I$JNI_INCLUDE_DIR"
+       done
+       # Export the paths so that the makefile gets them
+       AC_SUBST(JNI_CPPFLAGS, $JNI_CPPFLAGS)
+
+   fi
+   AM_CONDITIONAL([X_JNI],[test "x$JNI_CPPFLAGS" != x])
+    
+   AC_SUBST(STANDALONE_CPPFLAGS, "-I../standalone")
+  else
+    build_java_module=0
+  fi
+],
+[
+  build_java_module=0
+])
+AM_CONDITIONAL([BUILD_JAVA_MODULE], [test "$build_java_module" -eq 1])
+if test "$build_java_module" -eq 1; then
+  TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS java"
 fi
 
 
@@ -752,6 +797,9 @@ fi
 if test "$build_standalone_module" -ne 0; then
 AC_CONFIG_FILES([standalone/Makefile])
 AC_CONFIG_FILES([nginx/modsecurity/config])
+fi
+if test "$build_java_module" -ne 0; then
+AC_CONFIG_FILES([java/Makefile])
 fi
 if test "$build_extentions" -ne 0; then
 AC_CONFIG_FILES([ext/Makefile])

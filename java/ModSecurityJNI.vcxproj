@@ -164,7 +164,7 @@
     <ClCompile Include="..\standalone\hooks.c" />
     <ClCompile Include="..\standalone\regex.c" />
     <ClCompile Include="..\standalone\server.c" />
-    <ClCompile Include="org_modsecurity_ModSecurity.cpp" />
+    <ClCompile Include="org_modsecurity_ModSecurity.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\apache2\acmp.h" />
