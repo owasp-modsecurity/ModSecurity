@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -220,6 +220,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
             msr_log(msr, 1, "collection_retrieve_ex: Failed deleting collection (name \"%s\", "
                 "key \"%s\"): %s", log_escape(msr->mp, col_name),
                 log_escape_ex(msr->mp, col_key, col_key_len), get_apr_error(msr->mp, rc));
+            msr->msc_sdbm_delete_error = 1;
             goto cleanup;
         }
 
@@ -467,7 +468,7 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
 
                     var->value = apr_psprintf(msr->mp, "%d", newval);
                     var->value_len = strlen(var->value);
-                    
+
                     if (msr->txcfg->debuglog_level >= 9) {
                         msr_log(msr, 9, "collection_store: Delta applied for %s.%s %d->%d (%d): %d + (%d) = %d [%s,%d]",
                         log_escape_ex(msr->mp, var_name->value, var_name->value_len),
@@ -490,7 +491,12 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     /* Now generate the binary object. */
     blob = apr_pcalloc(msr->mp, blob_size);
     if (blob == NULL) {
-        goto error;
+        if (dbm != NULL) {
+            apr_sdbm_unlock(dbm);
+            apr_sdbm_close(dbm);
+        }
+
+        return -1;
     }
 
     blob[0] = 0x49;
@@ -542,10 +548,16 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     rc = apr_sdbm_store(dbm, key, value, APR_SDBM_REPLACE);
     if (rc != APR_SUCCESS) {
         msr_log(msr, 1, "collection_store: Failed to write to DBM file \"%s\": %s", dbm_filename,
-            get_apr_error(msr->mp, rc));
-        goto error;
+                get_apr_error(msr->mp, rc));
+        if (dbm != NULL) {
+            apr_sdbm_unlock(dbm);
+            apr_sdbm_close(dbm);
+        }
+
+        return -1;
     }
 
+    apr_sdbm_unlock(dbm);
     apr_sdbm_close(dbm);
 
     if (msr->txcfg->debuglog_level >= 4) {
@@ -557,11 +569,6 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     return 0;
 
 error:
-
-    if (dbm) {
-        apr_sdbm_close(dbm);
-    }
-
     return -1;
 }
 
@@ -672,9 +679,10 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
                         msr_log(msr, 1, "collections_remove_stale: Failed deleting collection (name \"%s\", "
                             "key \"%s\"): %s", log_escape(msr->mp, col_name),
                             log_escape_ex(msr->mp, key.dptr, key.dsize - 1), get_apr_error(msr->mp, rc));
+                    msr->msc_sdbm_delete_error = 1;
                         goto error;
                     }
-                    
+
                     if (msr->txcfg->debuglog_level >= 4) {
                         msr_log(msr, 4, "collections_remove_stale: Removed stale collection (name \"%s\", "
                             "key \"%s\").", log_escape(msr->mp, col_name),

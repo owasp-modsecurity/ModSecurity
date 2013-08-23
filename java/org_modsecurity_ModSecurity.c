@@ -214,8 +214,14 @@ void logSec(void *obj, int level, char *str)
 
 apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos)
 {
-	jobject inputStream = getJavaServletContext(r, JAVASERVLET_INSTREAM); //servlet request input stream
 	JNIEnv *env;
+	jclass inputStreamClass;
+	jmethodID read;
+	jbyteArray byteArrayBuf;
+	jint count;
+	jbyte *bufferPtr;
+	jobject inputStream = getJavaServletContext(r, JAVASERVLET_INSTREAM); //servlet request input stream
+	
 
 	*readcnt = 0;
 
@@ -228,13 +234,13 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
 	if (!(*jvm)->AttachCurrentThread(jvm, (void **)&env, NULL))
 	{
 		//read request body from the servlet input stream using 'read' method
-		jclass inputStreamClass = (*env)->FindClass(env, SERVLETINPUTSTREAM_JAVACLASS); 
-		jmethodID read = (*env)->GetMethodID(env, inputStreamClass, INPUTSTREAM_READ_MET, INPUTSTREAM_READ_SIG);
+		inputStreamClass = (*env)->FindClass(env, SERVLETINPUTSTREAM_JAVACLASS); 
+		read = (*env)->GetMethodID(env, inputStreamClass, INPUTSTREAM_READ_MET, INPUTSTREAM_READ_SIG);
 
-		jbyteArray byteArrayBuf = (*env)->NewByteArray(env, length);
+		byteArrayBuf = (*env)->NewByteArray(env, length);
 
-		jint count = (*env)->CallIntMethod(env, inputStream, read, byteArrayBuf, 0, length);
-		jbyte* bufferPtr = (*env)->GetByteArrayElements(env, byteArrayBuf, NULL);
+		count = (*env)->CallIntMethod(env, inputStream, read, byteArrayBuf, 0, length);
+		bufferPtr = (*env)->GetByteArrayElements(env, byteArrayBuf, NULL);
 
 		if (count == -1 || count > length || (*env)->ExceptionCheck(env) == JNI_TRUE) //end of stream
 		{

@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -130,8 +130,10 @@ static int unicode_map_create(directory_config *dcfg, char **error_msg)
 
     apr_file_close(u_map->map);
 
-    free(buf);
-    buf = NULL;
+    if(buf) {
+        free(buf);
+        buf = NULL;
+    }
 
     return 1;
 }

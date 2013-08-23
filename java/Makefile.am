@@ -1,5 +1,9 @@
 pkglibdir = $(prefix)/lib
 pkglib_LTLIBRARIES = libModSecurityJNI.la
+#include_HEADERS = re.h modsecurity.h msc_logging.h msc_multipart.h \
+#                  msc_parsers.h msc_pcre.h msc_util.h msc_xml.h \
+#                  persist_dbm.h apache2.h msc_geo.h acmp.h utf8tables.h \
+#                  msc_lua.h msc_release.h
 
 libModSecurityJNI_la_SOURCES = ../apache2/mod_security2.c \
                            ../apache2/apache2_config.c ../apache2/apache2_io.c ../apache2/apache2_util.c \
@@ -7,19 +11,19 @@ libModSecurityJNI_la_SOURCES = ../apache2/mod_security2.c \
                            ../apache2/re_variables.c ../apache2/msc_logging.c ../apache2/msc_xml.c \
                            ../apache2/msc_multipart.c ../apache2/modsecurity.c ../apache2/msc_parsers.c \
                            ../apache2/msc_util.c ../apache2/msc_pcre.c ../apache2/persist_dbm.c ../apache2/msc_reqbody.c \
-     			   ../apache2/msc_geo.c ../apache2/msc_gsb.c ../apache2/msc_unicode.c \
-     			   ../apache2/acmp.c ../apache2/msc_lua.c ../apache2/msc_release.c \
-     			   ../apache2/msc_crypt.c ../apache2/msc_tree.c
-                           ../standalone/api.c ../standalone/buckets.c \
-                           ../standalone/config.c ../standalone/filters.c \
-                           ../standalone/hooks.c ../standalone/regex.c ../standalone/server.c \
-                           org_modsecurity_ModSecurity.c
+      ../apache2/msc_geo.c ../apache2/msc_gsb.c ../apache2/msc_unicode.c \
+      ../apache2/acmp.c ../apache2/msc_lua.c ../apache2/msc_release.c \
+      ../apache2/msc_crypt.c ../apache2/msc_tree.c ../apache2/libinjection/libinjection_sqli.c \
+      ../standalone/api.c ../standalone/buckets.c \
+      ../standalone/config.c ../standalone/filters.c \
+      ../standalone/hooks.c ../standalone/regex.c ../standalone/server.c \
+      org_modsecurity_ModSecurity.c
 
 libModSecurityJNI_la_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
-                          @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @LUA_CFLAGS@ @MODSEC_EXTRA_CFLAGS@  @CURL_CFLAGS@
+                          @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @LUA_CFLAGS@ @MODSEC_EXTRA_CFLAGS@  @CURL_CFLAGS@ -DVERSION_NGINX
 #libModSecurityJNI_la_CXXFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
 #                          @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @LUA_CFLAGS@ @MODSEC_EXTRA_CFLAGS@  @CURL_CFLAGS@
-libModSecurityJNI_la_CPPFLAGS = @APR_CPPFLAGS@ @PCRE_CPPFLAGS@ @LIBXML2_CPPFLAGS@ @JNI_CPPFLAGS@
+libModSecurityJNI_la_CPPFLAGS = @APR_CPPFLAGS@ @PCRE_CPPFLAGS@ @LIBXML2_CPPFLAGS@ @JNI_CPPFLAGS@ @STANDALONE_CPPFLAGS@
 libModSecurityJNI_la_LIBADD = @APR_LDADD@ @APU_LDADD@ @PCRE_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@
 
 if AIX
