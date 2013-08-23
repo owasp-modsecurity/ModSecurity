@@ -13,7 +13,7 @@ standalone_la_SOURCES = ../apache2/mod_security2.c \
                            ../apache2/msc_util.c ../apache2/msc_pcre.c ../apache2/persist_dbm.c ../apache2/msc_reqbody.c \
      			   ../apache2/msc_geo.c ../apache2/msc_gsb.c ../apache2/msc_unicode.c \
      			   ../apache2/acmp.c ../apache2/msc_lua.c ../apache2/msc_release.c \
-     			   ../apache2/msc_crypt.c ../apache2/msc_tree.c \
+     			   ../apache2/msc_crypt.c ../apache2/msc_tree.c ../apache2/libinjection/libinjection_sqli.c \
                            api.c buckets.c \
                            config.c filters.c \
                            hooks.c \
@@ -72,6 +72,10 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
                            @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 endif
 
+standalone_INCS = `echo "@LIBXML2_CFLAGS@ @LUA_CFLAGS@" | sed -n 's/ *-I *\([^ ]*\) /\1 /gp'` \ 
+				@APXS_INCLUDEDIR@ @APR_INCLUDEDIR@ @APU_INCLUDEDIR@
+standalone_LIBS = @APR_LINKLD@ @APU_LINKLD@ @APXS_LDFLAGS@ \
+             @PCRE_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@
 install-exec-hook: $(pkglib_LTLIBRARIES)
 	@echo "Creating Nginx config file..."; \
 	rm -f ../nginx/modsecurity/config; \
@@ -79,9 +83,9 @@ install-exec-hook: $(pkglib_LTLIBRARIES)
 	echo "CORE_MODULES=\"\$$CORE_MODULES ngx_pool_context_module\"" >> ../nginx/modsecurity/config; \
 	echo "HTTP_AUX_FILTER_MODULES=\"ngx_http_modsecurity \$$HTTP_AUX_FILTER_MODULES\"" >> ../nginx/modsecurity/config; \
 	echo "NGX_ADDON_SRCS=\"\$$NGX_ADDON_SRCS \$$ngx_addon_dir/ngx_http_modsecurity.c \$$ngx_addon_dir/apr_bucket_nginx.c \$$ngx_addon_dir/ngx_pool_context.c\"" >> ../nginx/modsecurity/config;\
-	echo "NGX_ADDON_DEPS=\"\$$NGX_ADDON_DEPS \$$ngx_addon_dir/apr_bucket_nginx.h \$$ngx_addon_dir/ngx_pool_context.h\"" >> ../nginx/modsecurity/config; \
-	echo "CORE_LIBS=\"\$$CORE_LIBS \$$ngx_addon_dir/../../standalone/.libs/standalone.a -lapr-1 -laprutil-1 -lxml2 -lm @LUA_LDADD@\"" >> ../nginx/modsecurity/config; \
-	echo "CORE_INCS=\"\$$CORE_INCS /usr/include/apache2 /usr/include/apr-1.0 /usr/include/httpd /usr/include/apr-1 \$$ngx_addon_dir \$$ngx_addon_dir/../../standalone \$$ngx_addon_dir/../../apache2 /usr/include/libxml2 `echo @LUA_CFLAGS@ | cut -d "I" -f3`\"" >> ../nginx/modsecurity/config; \
+	echo "NGX_ADDON_DEPS=\"\$$NGX_ADDON_DEPS \$$ngx_addon_dir/apr_bucket_nginx.h \$$ngx_addon_dir/ngx_pool_context.h \$$ngx_addon_dir/ngx_http_modsecurity.c \$$ngx_addon_dir/apr_bucket_nginx.c \$$ngx_addon_dir/ngx_pool_context.c\"" >> ../nginx/modsecurity/config; \
+	echo "CORE_LIBS=\"\$$CORE_LIBS \$$ngx_addon_dir/../../standalone/.libs/standalone.a $(standalone_LIBS) \"" >> ../nginx/modsecurity/config; \
+	echo "CORE_INCS=\"\$$CORE_INCS \$$ngx_addon_dir \$$ngx_addon_dir/../../standalone \$$ngx_addon_dir/../../apache2 $(standalone_INCS)\"" >> ../nginx/modsecurity/config; \
 	echo "Removing unused static libraries..."; \
 	for m in $(pkglib_LTLIBRARIES); do \
 	  base=`echo $$m | sed 's/\..*//'`; \

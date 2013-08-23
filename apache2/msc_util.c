@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -120,8 +120,13 @@ char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int inp
         if ((c & 0x80) == 0) {
             /* single byte unicode (7 bit ASCII equivilent) has no validation */
             count++;
-            if(count <= len)
-                *data++ = c;
+            if(count <= len)    {
+                if(c == 0)
+                    *data = x2c(&c);
+                else
+                    *data++ = c;
+            }
+
         }
         /* If first byte begins with binary 110 it is two byte encoding*/
         else if ((c & 0xE0) == 0xC0) {

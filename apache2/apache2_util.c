@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -198,6 +198,10 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
     apr_size_t nbytes, nbytes_written;
     apr_file_t *debuglog_fd = NULL;
     int filter_debug_level = 0;
+    char *remote = NULL;
+    char *parse_remote = NULL;
+    char *saved = NULL;
+    char *str = NULL;
     char str1[1024] = "";
     char str2[1256] = "";
 
@@ -269,8 +273,8 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
             hostname, log_escape(msr->mp, r->uri), unique_id);
 #else
         ap_log_error(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, 0, r->server,
-            "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", r->connection->remote_ip, str1,
-            hostname, log_escape(msr->mp, r->uri), unique_id);
+                "[client %s] ModSecurity: %s%s [uri \"%s\"]%s", msr->remote_addr ? msr->remote_addr : r->connection->remote_ip, str1,
+                hostname, log_escape(msr->mp, r->uri), unique_id);
 #endif
 
         /* Add this message to the list. */

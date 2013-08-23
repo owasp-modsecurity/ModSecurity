@@ -1,6 +1,6 @@
 /*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
-* Copyright (c) 2004-2011 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+* Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
 * the License.  You may obtain a copy of the License at
@@ -38,7 +38,7 @@
 
 #define MODSEC_VERSION_MAJOR       "2"
 #define MODSEC_VERSION_MINOR       "7"
-#define MODSEC_VERSION_MAINT       "3"
+#define MODSEC_VERSION_MAINT       "5"
 #define MODSEC_VERSION_TYPE        ""
 #define MODSEC_VERSION_RELEASE     ""
 
@@ -53,10 +53,10 @@
 #define MODSEC_MODULE_NAME "ModSecurity for IIS (STABLE)"
 #else
 #ifdef	VERSION_NGINX
-#define MODSEC_MODULE_NAME "ModSecurity for nginx (RC)"
+#define MODSEC_MODULE_NAME "ModSecurity for nginx (STABLE)"
 #else
 #ifdef	VERSION_STANDALONE
-#define MODSEC_MODULE_NAME "ModSecurity Standalone (RC)"
+#define MODSEC_MODULE_NAME "ModSecurity Standalone (STABLE)"
 #else
 #define MODSEC_MODULE_NAME "ModSecurity for Apache"
 #endif

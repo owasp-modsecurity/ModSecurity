@@ -55,8 +55,8 @@
 {
 	type => "op",
 	name => "rx",
-	param => qr/^([^=])\s*=\s*((?:abc)+(?:def|ghi){2})$/i,
-	input => "x =AbCDeFgHi",
+	param => "(?i:(sleep\\((\\s*?)(\\d*?)(\\s*?)\\)|benchmark\\((.*?)\\,(.*?)\\)))",
+	input => "SELECT pg_sleep(10);",
 	ret => 1,
 },
 
