@@ -70,7 +70,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2;c:\work\httpd-2.2.24\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2;c:\work\apache24\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC;VERSION_STANDALONE</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4018</DisableSpecificWarnings>
     </ClCompile>
@@ -78,6 +78,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);libapr-1.lib;libaprutil-1.lib;pcre.lib;libxml2.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>c:\drop\x86</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

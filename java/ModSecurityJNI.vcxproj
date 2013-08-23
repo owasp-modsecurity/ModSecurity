@@ -71,7 +71,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\standalone;c:\Program Files (x86)\Java\jdk1.7.0_21\include\win32;c:\Program Files (x86)\Java\jdk1.7.0_21\include;C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2;c:\work\httpd-2.2.24\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\standalone;c:\Program Files (x86)\Java\jdk1.7.0_21\include\win32;c:\Program Files (x86)\Java\jdk1.7.0_21\include;C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2;..\apache\libinjection\;c:\work\httpd-2.2.24\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC;VERSION_STANDALONE</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4018</DisableSpecificWarnings>
     </ClCompile>
