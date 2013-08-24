@@ -16,6 +16,46 @@
                     Include activated_rules\*.conf
                 -->
             </init-param>
+            
+            
+            
+            <!--
+            OPTIONAL parameters for loading native libraries from absolute paths. This is an alternitive to specifying 
+            -Djava.library.path=/path/to/libs/ variable which is used by the JVM to search libraries.
+            
+            zlib1 and libapriconv-1 are Windows only libraries
+            -->
+            
+            <!--
+            <init-param>
+                <param-name>zlib1</param-name> 
+                <param-value>c:\work\zlib1.dll</param-value> 
+            </init-param>
+            <init-param>
+                <param-name>libxml2</param-name>
+                <param-value>/usr/lib/i386-linux-gnu/libxml2.so</param-value> 
+            </init-param>
+            <init-param>
+                <param-name>libpcre</param-name>
+                <param-value>/usr/lib/i386-linux-gnu/libxml2.so</param-value> 
+            </init-param>
+            <init-param>
+                <param-name>libapr-1</param-name>
+                <param-value>/usr/lib/libapr-1.so</param-value> 
+            </init-param>
+            <init-param>
+                <param-name>libapriconv-1</param-name>
+                <param-value>c:\work\zlib1.dll</param-value> 
+            </init-param>
+            <init-param>
+                <param-name>libaprutil-1</param-name>
+                <param-value>/usr/lib/libaprutil-1.so</param-value> 
+            </init-param>
+            <init-param>
+                <param-name>libModSecurityJNI</param-name>
+                <param-value>/usr/lib/libModSecurityJNI.so</param-value> 
+            </init-param>
+            -->
     </filter>
 
     <filter-mapping>

@@ -7,7 +7,6 @@ import java.net.UnknownHostException;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 
-
 public final class ModSecurity {
     //From build/classes: >"c:\Program Files\Java\jdk1.7.0_05\bin\javah.exe" -classpath c:\work\apache-tomcat-7.0.39\lib\servlet-api.jar;. org.modsecurity.ModSecurity
 
@@ -17,9 +16,18 @@ public final class ModSecurity {
     private FilterConfig filterConfig;
     private String confFilename;
     private long confTime;
+    private static boolean libsLoaded = false;
 
-    static {
-        //ModSecurityLoader calls System.load() for every native library needed by ModSecurity.
+    private void loadNativeLibs(String zlibPath, 
+                                String libxml2Path, 
+                                String libpcrePath, 
+                                String libaprPath, 
+                                String libapriconvPath, 
+                                String libaprutilPath,
+                                String libModSecurityPath) {
+        if (!libsLoaded) {
+            libsLoaded = true;
+            //ModSecurityLoader calls System.load() for every native library needed by ModSecurity.
 //        try {
 //            Class.forName("org.modsecurity.loader.ModSecurityLoader");
 //        } catch (ClassNotFoundException ex) {
@@ -27,33 +35,55 @@ public final class ModSecurity {
 //                    "ModSecurityLoader was not found, please make sure that you have \"ModSecurityLoader.jar\" in your server lib folder.", ex);
 //        }
 
-        //If the ModSecurityLoader is not used, native libraries can be loaded here, however this is bad practice since this will raise UnsatisfiedLinkError if 
-        //ModSecurity is used in multiple webapps. This will also will raise problems when the web-app is redeployed and the server is running.
-        try {
-        System.loadLibrary("zlib1"); //needed for libxml2 in Windows
-        } catch(UnsatisfiedLinkError ex) {
+            //If the ModSecurityLoader is not used, native libraries can be loaded here, however this is bad practice since this will raise UnsatisfiedLinkError if 
+            //ModSecurity is used in multiple webapps. This will also will raise problems when the web-app is redeployed and the server is running.
+            try {
+                loadLib("zlib1", zlibPath);
+            } catch (UnsatisfiedLinkError ex) {
+            }
+            loadLib("xml2", libxml2Path);
+            loadLib("pcre", libpcrePath);
+            loadLib("apr-1", libaprPath);
+            try {
+                loadLib("apriconv-1", libapriconvPath);
+            } catch (UnsatisfiedLinkError ex) {
+            }
+            loadLib("aprutil-1", libaprutilPath);
+            loadLib("ModSecurityJNI", libModSecurityPath);
         }
-        System.loadLibrary("libxml2");
-        System.loadLibrary("pcre");
-        System.loadLibrary("libapr-1");
+    }
+    
+    private void loadLib(String name, String absolutePath) throws UnsatisfiedLinkError {
         try {
-        System.loadLibrary("libapriconv-1"); //needed for libaprutil-1 in Windows
-        } catch(UnsatisfiedLinkError ex) {
+            System.load(absolutePath);
+            return;
+        } catch (NullPointerException ex) {
+        } catch (UnsatisfiedLinkError ex) {
+            throw ex;
         }
-        System.loadLibrary("libaprutil-1");
-        System.loadLibrary("ModSecurityJNI");
-        //System.loadLibrary tries to resolve native libraries from java.library.path variable. If this fails, absolute path to libraries
-        //can be specified using System.load("/path/lib.so")
-//        try { System.load("c:\\work\\mod_security\\java\\libs\\zlib1.dll"); } catch(UnsatisfiedLinkError ex) {}
-//        System.load("c:\\work\\mod_security\\java\\libs\\libxml2.dll");
-//        System.load("c:\\work\\mod_security\\java\\libs\\pcre.dll");
-//        System.load("c:\\work\\mod_security\\java\\libs\\libapr-1.dll");
-//        try { System.load("c:\\work\\mod_security\\java\\libs\\libapriconv-1.dll"); } catch(UnsatisfiedLinkError ex) {}
-//        System.load("c:\\work\\mod_security\\java\\libs\\libaprutil-1.dll");
-//        System.load("c:\\work\\mod_security\\java\\Debug\\ModSecurityJNI.dll");
+        try {
+            System.loadLibrary(name);
+            return;
+        } catch (UnsatisfiedLinkError ex) {
+        }
+        try {
+            System.loadLibrary("lib" + name);
+        } catch (UnsatisfiedLinkError ex) {
+            throw ex;
+        }
     }
 
-    public ModSecurity(FilterConfig fc, String confFile) throws ServletException {
+    public ModSecurity(FilterConfig fc, 
+                       String confFile,
+                       String zlibPath, 
+                       String libxml2Path, 
+                       String libpcrePath, 
+                       String libaprPath, 
+                       String libapriconvPath, 
+                       String libaprutilPath,
+                       String libModSecurityPath) throws ServletException {
+        loadNativeLibs(zlibPath, libxml2Path, libpcrePath, libaprPath, libapriconvPath, libaprutilPath, libModSecurityPath);
+
         this.filterConfig = fc;
         this.confFilename = confFile;
         confTime = new File(confFilename).lastModified();

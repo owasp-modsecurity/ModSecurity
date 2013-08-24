@@ -25,7 +25,15 @@ public class ModSecurityFilter implements Filter {
             throw new ServletException("ModSecurity: parameter 'conf' not available in web.xml");
         }
 
-        modsecurity = new ModSecurity(fc, confFilename);
+        modsecurity = new ModSecurity(fc, 
+                confFilename, 
+                fc.getInitParameter("zlib1"), 
+                fc.getInitParameter("libxml2"), 
+                fc.getInitParameter("libpcre"), 
+                fc.getInitParameter("libapr-1"), 
+                fc.getInitParameter("libapriconv-1"), 
+                fc.getInitParameter("libaprutil-1"), 
+                fc.getInitParameter("libModSecurityJNI"));
     }
 
     @Override
