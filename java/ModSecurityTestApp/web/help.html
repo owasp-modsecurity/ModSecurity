@@ -128,6 +128,37 @@ sudo cp ./java/.libs/libModSecurityJNI.so /usr/lib/
                         Include activated_rules\*.conf
                 --&gt;
             &lt;/init-param&gt;
+
+           &lt;!--
+           &lt;init-param&gt;
+                &lt;param-name&gt;zlib1&lt;/param-name&gt;
+                &lt;param-value&gt;c:\work\mod_security\java\libs\zlib1.dll&lt;/param-value&gt;
+            &lt;/init-param&gt;
+            &lt;init-param&gt;
+                &lt;param-name&gt;libxml2&lt;/param-name&gt;
+                &lt;param-value&gt;c:\work\mod_security\java\libs\libxml2.dll&lt;/param-value&gt; 
+            &lt;/init-param&gt;
+            &lt;init-param&gt;
+                &lt;param-name&gt;libpcre&lt;/param-name&gt;
+                &lt;param-value&gt;c:\work\mod_security\java\libs\pcre.dll&lt;/param-value&gt; 
+            &lt;/init-param&gt;
+            &lt;init-param&gt;
+                &lt;param-name&gt;libapr-1&lt;/param-name&gt;
+                &lt;param-value&gt;c:\work\mod_security\java\libs\libapr-1.dll&lt;/param-value&gt; 
+            &lt;/init-param&gt;
+            &lt;init-param&gt;
+                &lt;param-name&gt;libapriconv-1&lt;/param-name&gt;
+                &lt;param-value&gt;c:\work\mod_security\java\libs\libapriconv-1.dll&lt;/param-value&gt; 
+            &lt;/init-param&gt;
+            &lt;init-param&gt;
+                &lt;param-name&gt;libaprutil-1&lt;/param-name&gt;
+                &lt;param-value&gt;c:\work\mod_security\java\libs\libaprutil-1.dll&lt;/param-value&gt; 
+            &lt;/init-param&gt;
+            &lt;init-param&gt
+                &lt;param-name&gt;libModSecurityJNI&lt;/param-name&gt;
+                &lt;param-value&gt;c:\work\mod_security\java\libs\ModSecurityJNI.dll&lt;/param-value&gt; 
+            &lt;/init-param&gt;
+            --&gt;
     &lt;/filter&gt;
 
     &lt;filter-mapping&gt;
@@ -158,7 +189,8 @@ sudo cp ./java/.libs/libModSecurityJNI.so /usr/lib/
                                     <p>
                                         You can specify multiple folders for the <span class="code">java.library.path</span> variable by using
                                         : (colon) or ; (semi-colon), depending on your environment. Also, the libraries can be loaded using
-                                        their absolute path using <span class="code">System.load()</span>.
+                                        their absolute path by uncommenting the <span class="code">init-param</span> elements in the above 
+                                        filter example.
                                     </p>
                                 </li>
 
@@ -167,8 +199,14 @@ sudo cp ./java/.libs/libModSecurityJNI.so /usr/lib/
                                     <p>
                                         <a class="code" href="../../ModSecurityLoader/dist/ModSecurityLoader.jar">ModSecurityLoader.jar</a> should be placed
                                         in the Java server library loader folder (for example, in Tomcat 7: <span class="code">$CATALINA_HOME/lib</span>). 
-                                        You can build or modify the load directory of <span class="code">ModSecurityLoader</span> from 
-                                        <span class="code">/mod_security/java/ModSecurityLoader/src/</span>.
+                                        The server has to be started with the VM options:
+                                    </p>
+                                    <pre class="codecanvas">
+-Djava.library.path=/path/to/libraries/folder/
+                                    </pre>
+                                    <p>
+                                        or alternatively by specifying <span class="code">init-param</span> elements with absolute paths
+                                        in the <span class="code">ModSecurityLoaderConfig.xml</span> file.
                                     </p>
                                 </li>
                             </ol>

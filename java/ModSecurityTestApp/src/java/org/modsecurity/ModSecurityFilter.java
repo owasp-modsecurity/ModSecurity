@@ -43,6 +43,7 @@ public class ModSecurityFilter implements Filter {
         MsHttpTransaction httpTran = new MsHttpTransaction(httpReq, httpResp); //transaction object used by native code
 
         try {
+            //onRequest is responsable of calling MsHttpServletRequest.readBody
             int status = modsecurity.onRequest(modsecurity.getConfFilename(), httpTran, modsecurity.checkModifiedConfig()); //modsecurity reloads only if primary config file is modified
 
             if (status != ModSecurity.DECLINED) {
@@ -52,7 +53,7 @@ public class ModSecurityFilter implements Filter {
             
             //process request
             fc.doFilter(httpTran.getMsHttpRequest(), httpTran.getMsHttpResponse());
-
+            
             status = modsecurity.onResponse(httpTran);
             if (status != ModSecurity.OK && status != ModSecurity.DECLINED) {
                 httpTran.getMsHttpResponse().reset();
