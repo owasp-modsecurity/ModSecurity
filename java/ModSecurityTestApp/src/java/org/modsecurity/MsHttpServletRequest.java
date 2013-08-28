@@ -33,7 +33,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 
 public class MsHttpServletRequest extends HttpServletRequestWrapper {
-
+    
     public final static int BODY_NOTYETREAD = 0;
     public final static int BODY_INTERCEPT = 1;
     public final static int BODY_DISK = 2;
@@ -176,6 +176,7 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
                 }
 
                 body = new String(bodyBytes, encoding);
+                
                 if ((contentType != null) && ((contentType.compareTo("application/x-www-form-urlencoded") == 0) || (contentType.compareTo("application/x-form-urlencoded") == 0))) {
                     addUrlEncoded(body);
                 }
@@ -460,6 +461,14 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
     }
 
     /**
+     * Replacement for the ServletRequest.getReader() method.
+     */
+    @Override
+    public BufferedReader getReader() throws java.io.IOException {
+        return new BufferedReader(new InputStreamReader(getInputStream(), encoding));
+    }
+    
+    /**
      * Replacement for the ServletRequest.getParameter() method.
      */
     @Override
@@ -513,6 +522,9 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
                 count++;
             }
         }
+        
+        if (count == 0)
+            return null;
 
         // put them into a String array
         String values[] = new String[count];
@@ -527,11 +539,4 @@ public class MsHttpServletRequest extends HttpServletRequestWrapper {
         return values;
     }
 
-    /**
-     * Replacement for the ServletRequest.getReader() method.
-     */
-    @Override
-    public BufferedReader getReader() throws java.io.IOException {
-        return new BufferedReader(new InputStreamReader(getInputStream(), encoding));
-    }
 }

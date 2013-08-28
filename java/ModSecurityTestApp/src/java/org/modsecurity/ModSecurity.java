@@ -18,41 +18,46 @@ public final class ModSecurity {
     private long confTime;
     private static boolean libsLoaded = false;
 
-    private void loadNativeLibs(String zlibPath, 
-                                String libxml2Path, 
-                                String libpcrePath, 
-                                String libaprPath, 
-                                String libapriconvPath, 
-                                String libaprutilPath,
-                                String libModSecurityPath) {
+    private void loadNativeLibs(String zlibPath,
+            String libxml2Path,
+            String libpcrePath,
+            String libaprPath,
+            String libapriconvPath,
+            String libaprutilPath,
+            String libModSecurityPath) {
         if (!libsLoaded) {
             libsLoaded = true;
             //ModSecurityLoader calls System.load() for every native library needed by ModSecurity.
-//        try {
-//            Class.forName("org.modsecurity.loader.ModSecurityLoader");
-//        } catch (ClassNotFoundException ex) {
-//            java.util.logging.Logger.getLogger(ModSecurity.class.getName()).log(java.util.logging.Level.SEVERE,
-//                    "ModSecurityLoader was not found, please make sure that you have \"ModSecurityLoader.jar\" in your server lib folder.", ex);
-//        }
-
-            //If the ModSecurityLoader is not used, native libraries can be loaded here, however this is bad practice since this will raise UnsatisfiedLinkError if 
-            //ModSecurity is used in multiple webapps. This will also will raise problems when the web-app is redeployed and the server is running.
-            try {
-                loadLib("zlib1", zlibPath);
-            } catch (UnsatisfiedLinkError ex) {
+            boolean loaderFound = false;
+//            try {
+//                Class.forName("org.modsecurity.loader.ModSecurityLoader");
+//                loaderFound = true;
+//            } catch (ClassNotFoundException ex) {
+//                //java.util.logging.Logger.getLogger(ModSecurity.class.getName()).log(java.util.logging.Level.SEVERE,
+//                //        "ModSecurityLoader was not found, please make sure that you have \"ModSecurityLoader.jar\" in your server lib folder.", ex);
+//            } catch (NoClassDefFoundError ex) {
+//            }
+            
+            if (!loaderFound) {
+                //If the ModSecurityLoader is not used, native libraries can be loaded here, however this is bad practice since this will raise UnsatisfiedLinkError if 
+                //ModSecurity is used in multiple webapps. This will also will raise problems when the web-app is redeployed and the server is running.
+                try {
+                    loadLib("zlib1", zlibPath);
+                } catch (UnsatisfiedLinkError err) {
+                }
+                loadLib("xml2", libxml2Path);
+                loadLib("pcre", libpcrePath);
+                loadLib("apr-1", libaprPath);
+                try {
+                    loadLib("apriconv-1", libapriconvPath);
+                } catch (UnsatisfiedLinkError err) {
+                }
+                loadLib("aprutil-1", libaprutilPath);
+                loadLib("ModSecurityJNI", libModSecurityPath);
             }
-            loadLib("xml2", libxml2Path);
-            loadLib("pcre", libpcrePath);
-            loadLib("apr-1", libaprPath);
-            try {
-                loadLib("apriconv-1", libapriconvPath);
-            } catch (UnsatisfiedLinkError ex) {
-            }
-            loadLib("aprutil-1", libaprutilPath);
-            loadLib("ModSecurityJNI", libModSecurityPath);
         }
     }
-    
+
     private void loadLib(String name, String absolutePath) throws UnsatisfiedLinkError {
         try {
             System.load(absolutePath);
@@ -73,15 +78,15 @@ public final class ModSecurity {
         }
     }
 
-    public ModSecurity(FilterConfig fc, 
-                       String confFile,
-                       String zlibPath, 
-                       String libxml2Path, 
-                       String libpcrePath, 
-                       String libaprPath, 
-                       String libapriconvPath, 
-                       String libaprutilPath,
-                       String libModSecurityPath) throws ServletException {
+    public ModSecurity(FilterConfig fc,
+            String confFile,
+            String zlibPath,
+            String libxml2Path,
+            String libpcrePath,
+            String libaprPath,
+            String libapriconvPath,
+            String libaprutilPath,
+            String libModSecurityPath) throws ServletException {
         loadNativeLibs(zlibPath, libxml2Path, libpcrePath, libaprPath, libapriconvPath, libaprutilPath, libModSecurityPath);
 
         this.filterConfig = fc;
