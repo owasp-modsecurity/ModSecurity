@@ -19,7 +19,7 @@ extern "C" {
  * See python's normalized version
  * http://www.python.org/dev/peps/pep-0386/#normalizedversion
  */
-#define LIBINJECTION_VERSION "3.4.1"
+#define LIBINJECTION_VERSION "3.5.3"
 
 /**
  * Libinjection's sqli module makes a "normalized"
@@ -36,6 +36,13 @@ extern "C" {
 #ifndef LIBINJECTION_SQLI_MAX_TOKENS
 #define LIBINJECTION_SQLI_MAX_TOKENS 5
 #endif
+
+#if LIBINJECTION_SQLI_MAX_TOKENS >= 8
+#define LIBINJECTION_SQLI_BUFFER_SZ (LIBINJECTION_SQLI_MAX_TOKENS + 1)
+#else
+#define LIBINJECTION_SQLI_BUFFER_SZ 8
+#endif
+
 
 enum lookup_type {
     FLAG_NONE          = 0,
@@ -119,7 +126,7 @@ typedef struct libinjection_sqli_state {
     /* MAX TOKENS + 1 since we use one extra token
      * to determine the type of the previous token
      */
-    stoken_t tokenvec[LIBINJECTION_SQLI_MAX_TOKENS + 1];
+    stoken_t tokenvec[LIBINJECTION_SQLI_BUFFER_SZ];
 
     /*
      * Pointer to token position in tokenvec, above
@@ -129,8 +136,9 @@ typedef struct libinjection_sqli_state {
     /*
      * fingerprint pattern c-string
      * +1 for ending null
+     * Mimimum of 8 bytes to add gcc's -fstack-protector to work
      */
-    char fingerprint[LIBINJECTION_SQLI_MAX_TOKENS + 1];
+    char fingerprint[LIBINJECTION_SQLI_BUFFER_SZ];
 
     /*
      * Line number of code that said decided if the input was SQLi or
