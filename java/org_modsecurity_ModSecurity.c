@@ -544,6 +544,8 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest(JNIEnv *env, j
 	r = modsecNewRequest(c, config);
 
 	r->server->server_hostname = serverHostname;
+	r->handler = "Java";
+	
 	httpTransactionClass = (*env)->GetObjectClass(env, httpTransaction);
 	getHttpRequest = (*env)->GetMethodID(env, httpTransactionClass, HTTPTRANSACTION_MSHTTPREQUEST_MET, HTTPTRANSACTION_MSHTTPREQUEST_SIG);
 
