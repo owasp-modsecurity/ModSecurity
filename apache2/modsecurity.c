@@ -297,7 +297,7 @@ apr_status_t modsecurity_tx_init(modsec_rec *msr) {
     if (msr->request_content_length == -1) {
         /* There's no C-L, but is chunked encoding used? */
         char *transfer_encoding = (char *)apr_table_get(msr->request_headers, "Transfer-Encoding");
-        if ((transfer_encoding != NULL)&&(strstr(transfer_encoding, "chunked") != NULL)) {
+        if ((transfer_encoding != NULL)&&(m_strcasestr(transfer_encoding, "chunked") != NULL)) {
             msr->reqbody_should_exist = 1;
             msr->reqbody_chunked = 1;
         }
