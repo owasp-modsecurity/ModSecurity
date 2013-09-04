@@ -1,4 +1,4 @@
-/*
+﻿/*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
 * Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
@@ -52,6 +52,9 @@
 #ifdef	VERSION_IIS
 #define MODSEC_MODULE_NAME "ModSecurity for IIS (STABLE)"
 #else
+#ifdef	VERSION_JAVA
+#define MODSEC_MODULE_NAME "ModSecurity for Java (STABLE)"
+#else
 #ifdef	VERSION_NGINX
 #define MODSEC_MODULE_NAME "ModSecurity for nginx (STABLE)"
 #else
@@ -59,6 +62,7 @@
 #define MODSEC_MODULE_NAME "ModSecurity Standalone (STABLE)"
 #else
 #define MODSEC_MODULE_NAME "ModSecurity for Apache"
+#endif
 #endif
 #endif
 #endif
