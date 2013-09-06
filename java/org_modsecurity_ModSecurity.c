@@ -70,7 +70,7 @@ jobject modSecurityInstance;
 directory_config *config;
 //} JavaModSecurityContext;
 jmethodID logMethod;
-
+const char *configErr;
 
 apr_table_t *requests;
 apr_pool_t *requestsPool;
@@ -426,6 +426,7 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_initialize(JNIEnv *env, 
 	modsecFinalizeConfig();
 	modsecInitProcess();
 	config = NULL;
+	configErr = NULL;
 
 	//table for requests
 	apr_pool_create(&requestsPool, NULL);
@@ -488,7 +489,6 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest(JNIEnv *env, j
 {
 	conn_rec *c;
 	request_rec *r;
-	const char *err;
 	jmethodID getHttpRequest;
 	jclass httpTransactionClass;
 	jobject httpServletRequest;
@@ -523,17 +523,17 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest(JNIEnv *env, j
 	int status;
 	int len;
 
-	if (config == NULL || reloadConfig)
+	if (config == NULL || reloadConfig || configErr != NULL)
 	{
 		const char *path;
 		config = modsecGetDefaultConfig();
 		path = fromJString(env, configPath, config->mp); //path to modsecurity.conf
 
-		err = modsecProcessConfig(config, path, NULL);
+		configErr = modsecProcessConfig(config, path, NULL);
 
-		if(err != NULL)
+		if(configErr != NULL)
 		{
-			logSec(NULL, 0, (char*)err);
+			logSec(NULL, 0, (char*)configErr);
 
 			return DONE;
 		}
@@ -543,9 +543,8 @@ JNIEXPORT jint JNICALL Java_org_modsecurity_ModSecurity_onRequest(JNIEnv *env, j
 	modsecProcessConnection(c);
 	r = modsecNewRequest(c, config);
 
-	r->server->server_hostname = serverHostname;
 	r->handler = "Java";
-	
+	r->server->server_hostname = serverHostname;
 	httpTransactionClass = (*env)->GetObjectClass(env, httpTransaction);
 	getHttpRequest = (*env)->GetMethodID(env, httpTransactionClass, HTTPTRANSACTION_MSHTTPREQUEST_MET, HTTPTRANSACTION_MSHTTPREQUEST_SIG);
 
