@@ -342,12 +342,12 @@ static int st_is_unary_op(const stoken_t * st)
  *
  */
 
-static size_t parse_white(sfilter * sf)
+static size_t parse_white(struct libinjection_sqli_state * sf)
 {
     return sf->pos + 1;
 }
 
-static size_t parse_operator1(sfilter * sf)
+static size_t parse_operator1(struct libinjection_sqli_state * sf)
 {
     const char *cs = sf->s;
     size_t pos = sf->pos;
@@ -356,7 +356,7 @@ static size_t parse_operator1(sfilter * sf)
     return pos + 1;
 }
 
-static size_t parse_other(sfilter * sf)
+static size_t parse_other(struct libinjection_sqli_state * sf)
 {
     const char *cs = sf->s;
     size_t pos = sf->pos;
@@ -365,7 +365,7 @@ static size_t parse_other(sfilter * sf)
     return pos + 1;
 }
 
-static size_t parse_char(sfilter * sf)
+static size_t parse_char(struct libinjection_sqli_state * sf)
 {
     const char *cs = sf->s;
     size_t pos = sf->pos;
@@ -374,7 +374,7 @@ static size_t parse_char(sfilter * sf)
     return pos + 1;
 }
 
-static size_t parse_eol_comment(sfilter * sf)
+static size_t parse_eol_comment(struct libinjection_sqli_state * sf)
 {
     const char *cs = sf->s;
     const size_t slen = sf->slen;
@@ -394,7 +394,7 @@ static size_t parse_eol_comment(sfilter * sf)
 /** In Ansi mode, hash is an operator
  *  In MYSQL mode, it's a EOL comment like '--'
  */
-static size_t parse_hash(sfilter * sf)
+static size_t parse_hash(struct libinjection_sqli_state * sf)
 {
     sf->stats_comment_hash += 1;
     if (sf->flags & FLAG_SQL_MYSQL) {
@@ -406,7 +406,7 @@ static size_t parse_hash(sfilter * sf)
     }
 }
 
-static size_t parse_dash(sfilter * sf)
+static size_t parse_dash(struct libinjection_sqli_state * sf)
 {
     const char *cs = sf->s;
     const size_t slen = sf->slen;
@@ -478,7 +478,7 @@ static size_t is_mysql_comment(const char *cs, const size_t len, size_t pos)
     return 1;
 }
 
-static size_t parse_slash(sfilter * sf)
+static size_t parse_slash(struct libinjection_sqli_state * sf)
 {
     size_t clen;
     const char *cs = sf->s;
@@ -528,7 +528,7 @@ static size_t parse_slash(sfilter * sf)
 }
 
 
-static size_t parse_backslash(sfilter * sf)
+static size_t parse_backslash(struct libinjection_sqli_state * sf)
 {
     const char *cs = sf->s;
     const size_t slen = sf->slen;
@@ -546,7 +546,7 @@ static size_t parse_backslash(sfilter * sf)
     }
 }
 
-static size_t parse_operator2(sfilter * sf)
+static size_t parse_operator2(struct libinjection_sqli_state * sf)
 {
     char ch;
     const char *cs = sf->s;
@@ -681,7 +681,7 @@ static size_t parse_string_core(const char *cs, const size_t len, size_t pos,
 /**
  * Used when first char is a ' or "
  */
-static size_t parse_string(sfilter * sf)
+static size_t parse_string(struct libinjection_sqli_state * sf)
 {
     const char *cs = sf->s;
     const size_t slen = sf->slen;
@@ -698,7 +698,7 @@ static size_t parse_string(sfilter * sf)
  *    N or n:  mysql "National Character set"
  *    E     :  psql  "Escaped String"
  */
-static size_t parse_estring(sfilter * sf)
+static size_t parse_estring(struct libinjection_sqli_state * sf)
 {
     const char *cs = sf->s;
     const size_t slen = sf->slen;
@@ -710,7 +710,7 @@ static size_t parse_estring(sfilter * sf)
     return parse_string_core(cs, slen, pos, sf->current, CHAR_SINGLE, 2);
 }
 
-static size_t parse_ustring(sfilter * sf)
+static size_t parse_ustring(struct libinjection_sqli_state * sf)
 {
     const char *cs = sf->s;
     size_t slen = sf->slen;
@@ -729,7 +729,7 @@ static size_t parse_ustring(sfilter * sf)
     }
 }
 
-static size_t parse_qstring_core(sfilter * sf, int offset)
+static size_t parse_qstring_core(struct libinjection_sqli_state * sf, int offset)
 {
     char ch;
     const char *strend;
@@ -782,7 +782,7 @@ static size_t parse_qstring_core(sfilter * sf, int offset)
 /*
  * Oracle's q string
  */
-static size_t parse_qstring(sfilter * sf)
+static size_t parse_qstring(struct libinjection_sqli_state * sf)
 {
     return parse_qstring_core(sf, 0);
 }
@@ -791,7 +791,7 @@ static size_t parse_qstring(sfilter * sf)
  * mysql's N'STRING' or
  * ...  Oracle's nq string
  */
-static size_t parse_nqstring(sfilter * sf)
+static size_t parse_nqstring(struct libinjection_sqli_state * sf)
 {
     size_t slen = sf->slen;
     size_t pos = sf->pos;
@@ -805,7 +805,7 @@ static size_t parse_nqstring(sfilter * sf)
  * binary literal string
  * re: [bB]'[01]*'
  */
-static size_t parse_bstring(sfilter *sf)
+static size_t parse_bstring(struct libinjection_sqli_state *sf)
 {
     size_t wlen;
     const char *cs = sf->s;
@@ -834,7 +834,7 @@ static size_t parse_bstring(sfilter *sf)
  * mysql has requirement of having EVEN number of chars,
  *  but pgsql does not
  */
-static size_t parse_xstring(sfilter *sf)
+static size_t parse_xstring(struct libinjection_sqli_state *sf)
 {
     size_t wlen;
     const char *cs = sf->s;
@@ -857,7 +857,7 @@ static size_t parse_xstring(sfilter *sf)
     return pos + 2 + wlen + 1;
 }
 
-static size_t parse_word(sfilter * sf)
+static size_t parse_word(struct libinjection_sqli_state * sf)
 {
     char ch;
     char delim;
@@ -907,7 +907,7 @@ static size_t parse_word(sfilter * sf)
  * and a bare word.
  *
  */
-static size_t parse_tick(sfilter* sf)
+static size_t parse_tick(struct libinjection_sqli_state* sf)
 {
     size_t pos =  parse_string_core(sf->s, sf->slen, sf->pos, sf->current, CHAR_TICK, 1);
 
@@ -933,7 +933,7 @@ static size_t parse_tick(sfilter* sf)
     return pos;
 }
 
-static size_t parse_var(sfilter * sf)
+static size_t parse_var(struct libinjection_sqli_state * sf)
 {
     size_t xlen;
     const char *cs = sf->s;
@@ -985,7 +985,7 @@ static size_t parse_var(sfilter * sf)
     }
 }
 
-static size_t parse_money(sfilter *sf)
+static size_t parse_money(struct libinjection_sqli_state *sf)
 {
     size_t xlen;
     const char* strend;
@@ -1063,7 +1063,7 @@ static size_t parse_money(sfilter *sf)
     }
 }
 
-static size_t parse_number(sfilter * sf)
+static size_t parse_number(struct libinjection_sqli_state * sf)
 {
     size_t xlen;
     size_t start;
@@ -1165,7 +1165,7 @@ static size_t parse_number(sfilter * sf)
     return pos;
 }
 
-int libinjection_sqli_tokenize(sfilter * sf)
+int libinjection_sqli_tokenize(struct libinjection_sqli_state * sf)
 {
     pt2Function fnptr;
     size_t *pos = &sf->pos;
@@ -1228,13 +1228,13 @@ int libinjection_sqli_tokenize(sfilter * sf)
     return FALSE;
 }
 
-void libinjection_sqli_init(sfilter * sf, const char *s, size_t len, int flags)
+void libinjection_sqli_init(struct libinjection_sqli_state * sf, const char *s, size_t len, int flags)
 {
     if (flags == 0) {
         flags = FLAG_QUOTE_NONE | FLAG_SQL_ANSI;
     }
 
-    memset(sf, 0, sizeof(sfilter));
+    memset(sf, 0, sizeof(struct libinjection_sqli_state));
     sf->s        = s;
     sf->slen     = len;
     sf->lookup   = libinjection_sqli_lookup_word;
@@ -1243,7 +1243,7 @@ void libinjection_sqli_init(sfilter * sf, const char *s, size_t len, int flags)
     sf->current  = &(sf->tokenvec[0]);
 }
 
-void libinjection_sqli_reset(sfilter * sf, int flags)
+void libinjection_sqli_reset(struct libinjection_sqli_state * sf, int flags)
 {
     ptr_lookup_fn lookup = sf->lookup;;
     void *userdata = sf->userdata;
@@ -1256,7 +1256,7 @@ void libinjection_sqli_reset(sfilter * sf, int flags)
     sf->userdata = userdata;
 }
 
-void libinjection_sqli_callback(sfilter * sf, ptr_lookup_fn fn, void* userdata)
+void libinjection_sqli_callback(struct libinjection_sqli_state * sf, ptr_lookup_fn fn, void* userdata)
 {
     if (fn == NULL) {
         sf->lookup = libinjection_sqli_lookup_word;
@@ -1283,7 +1283,7 @@ void libinjection_sqli_callback(sfilter * sf, ptr_lookup_fn fn, void* userdata)
  *  This is just:  multikeywords[token.value + ' ' + token2.value]
  *
  */
-static int syntax_merge_words(sfilter * sf,stoken_t * a, stoken_t * b)
+static int syntax_merge_words(struct libinjection_sqli_state * sf,stoken_t * a, stoken_t * b)
 {
     size_t sz1;
     size_t sz2;
@@ -1335,7 +1335,7 @@ static int syntax_merge_words(sfilter * sf,stoken_t * a, stoken_t * b)
     }
 }
 
-int libinjection_sqli_fold(sfilter * sf)
+int libinjection_sqli_fold(struct libinjection_sqli_state * sf)
 {
     stoken_t last_comment;
 
@@ -1547,6 +1547,7 @@ int libinjection_sqli_fold(sfilter * sf)
         } else if (sf->tokenvec[left].type == TYPE_SQLTYPE &&
                    (sf->tokenvec[left+1].type == TYPE_BAREWORD ||
                     sf->tokenvec[left+1].type == TYPE_NUMBER ||
+                    sf->tokenvec[left+1].type == TYPE_FUNCTION ||
                     sf->tokenvec[left+1].type == TYPE_VARIABLE ||
                     sf->tokenvec[left+1].type == TYPE_STRING))  {
             st_copy(&sf->tokenvec[left], &sf->tokenvec[left+1]);
@@ -1582,6 +1583,11 @@ int libinjection_sqli_fold(sfilter * sf)
             continue;
         } else if (sf->tokenvec[left].type == TYPE_RIGHTPARENS &&
                    sf->tokenvec[left+1].type == TYPE_RIGHTPARENS) {
+            pos -= 1;
+            sf->stats_folds += 1;
+            continue;
+        } else if (sf->tokenvec[left].type == TYPE_SQLTYPE &&
+                   sf->tokenvec[left+1].type == TYPE_SQLTYPE) {
             pos -= 1;
             sf->stats_folds += 1;
             continue;
@@ -1786,7 +1792,7 @@ int libinjection_sqli_fold(sfilter * sf)
  *          double quote.
  *
  */
-const char* libinjection_sqli_fingerprint(sfilter * sql_state, int flags)
+const char* libinjection_sqli_fingerprint(struct libinjection_sqli_state * sql_state, int flags)
 {
     int i;
     int tlen = 0;
@@ -1851,13 +1857,13 @@ const char* libinjection_sqli_fingerprint(sfilter * sql_state, int flags)
  */
 #define UNUSED(x) (void)(x)
 
-int libinjection_sqli_check_fingerprint(sfilter* sql_state)
+int libinjection_sqli_check_fingerprint(struct libinjection_sqli_state* sql_state)
 {
     return libinjection_sqli_blacklist(sql_state) &&
         libinjection_sqli_not_whitelist(sql_state);
 }
 
-char libinjection_sqli_lookup_word(sfilter *sql_state, int lookup_type,
+char libinjection_sqli_lookup_word(struct libinjection_sqli_state *sql_state, int lookup_type,
                                    const char* str, size_t len)
 {
     if (lookup_type == LOOKUP_FINGERPRINT) {
@@ -1867,7 +1873,7 @@ char libinjection_sqli_lookup_word(sfilter *sql_state, int lookup_type,
     }
 }
 
-int libinjection_sqli_blacklist(sfilter* sql_state)
+int libinjection_sqli_blacklist(struct libinjection_sqli_state* sql_state)
 {
     /*
      * use minimum of 8 bytes to make sure gcc -fstack-protector
@@ -1919,7 +1925,7 @@ int libinjection_sqli_blacklist(sfilter* sql_state)
 /*
  * return TRUE if sqli, false is benign
  */
-int libinjection_sqli_not_whitelist(sfilter* sql_state)
+int libinjection_sqli_not_whitelist(struct libinjection_sqli_state* sql_state)
 {
     /*
      * We assume we got a SQLi match
@@ -2117,13 +2123,25 @@ int libinjection_sqli_not_whitelist(sfilter* sql_state)
  *
  *
  */
-static int reparse_as_mysql(sfilter * sql_state)
+static int reparse_as_mysql(struct libinjection_sqli_state * sql_state)
 {
     return sql_state->stats_comment_ddx ||
         sql_state->stats_comment_hash;
 }
 
-int libinjection_is_sqli(sfilter * sql_state)
+/*
+ * This function is mostly use with SWIG
+ */
+struct libinjection_sqli_token* libinjection_sqli_get_token(struct libinjection_sqli_state * sql_state,
+                                                            int i)
+{
+    if (i < 0 || i > (int) strlen(sql_state->fingerprint)) {
+        return NULL;
+    }
+    return &(sql_state->tokenvec[i]);
+}
+
+int libinjection_is_sqli(struct libinjection_sqli_state * sql_state)
 {
     const char *s = sql_state->s;
     size_t slen = sql_state->slen;
