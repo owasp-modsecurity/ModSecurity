@@ -16,7 +16,6 @@
 #include <ctype.h>
 #include "apr_lib.h"
 #include "apr_strmatch.h"
-#include "apr_env.h"
 
 /**
  * Register action with the engine.
@@ -2190,90 +2189,6 @@ static char *msre_action_exec_validate(msre_engine *engine, msre_action *action)
     return NULL;
 }
 
-int beanshell_execute(const char *script, modsec_rec *msr, apr_pool_t *mptmp, msre_rule *rule)
-{
-	apr_status_t rv;
-	apr_pool_t *mp = mptmp;
-	apr_procattr_t *pattr;
-    int argc = 0;
-    const char* argv[8];
-    apr_proc_t proc;
-	int st;
-	apr_exit_why_e why;
-	const char* env[8];
-
-	const char *progname = "java";
-
-	if ((rv = apr_procattr_create(&pattr, mp)) != APR_SUCCESS) {
-		return 0;
-	}
-	if ((rv = apr_procattr_io_set(pattr, APR_CHILD_BLOCK, APR_CHILD_BLOCK, APR_CHILD_BLOCK)) != APR_SUCCESS) {
-		return 0;
-	}
-	if ((rv = apr_procattr_cmdtype_set(pattr, APR_PROGRAM_PATH)) != APR_SUCCESS) {
-		return 0;
-	}
-	//rv = apr_procattr_dir_set(pattr, ".");
-	
-	argv[argc++] = progname;
-	argv[argc++] = "-classpath";
-#ifdef BEANSHELL_JAR
-	argv[argc++] = BEANSHELL_JAR; // "/jars/bsh-2.0b4.jar";
-#else
-	argv[argc++] = "*";
-#endif
-	argv[argc++] = "bsh.Interpreter";
-	argv[argc++] = (const char*) script;
-	argv[argc++] = NULL;
-			
-	apr_env_set("envvar", "This is a value", mp);
-	//apr_env_delete("envvar", mp);
-
-	if (msr->txcfg->debuglog_level >= 8) {
-		msr_log(msr, 8, "BeanShell: Executing script: %s", script);
-	}
-
-	if ((rv = apr_proc_create(&proc, progname, (const char* const*)argv,
-                          NULL, pattr, mp)) != APR_SUCCESS) {
-		msr_log(msr, 1, "Could not find java to execute: %s", script);
-		return rv;
-	}
-		
-	rv = apr_proc_wait(&proc, &st, &why, APR_WAIT);
-	if (APR_STATUS_IS_CHILD_DONE(rv)) {
-		
-		if (proc.err != NULL) {
-			while (1) {
-				char buf[1024];
-					apr_file_pipe_timeout_set(proc.err, -1);
-				/* read the command's output through the pipe */
-				rv = apr_file_gets(buf, sizeof(buf), proc.err);
-				if (rv != APR_SUCCESS) {
-					break;
-				}
-				msr_log(msr, 1, "Script stderr: %s\n", buf);
-			}
-			apr_file_close(proc.err);
-		}
-		while (1) {
-			char buf[1024];
-			apr_file_pipe_timeout_set(proc.out, -1);
-			/* read the command's output through the pipe */
-			rv = apr_file_gets(buf, sizeof(buf), proc.out);
-			if (rv != APR_SUCCESS) {
-				break;
-			}
-			//if (msr->txcfg->debuglog_level >= 8) {
-				msr_log(msr, 1, "BeanShell script output: %s\n", buf);
-			//}
-		}
-		apr_file_close(proc.out);
-
-	} else {
-		msr_log(msr, 1, "Failed to execute: %s", script);
-	}
-}
-
 static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
@@ -2286,7 +2201,7 @@ static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
             action->param[lenparam - 1] == 'h')) {
                 //beanshell_execute(action->param, msr, mptmp, rule);
                 char *script_output = NULL;
-
+				int rc;
                 const char *start = "java -classpath bsh*.jar bsh.Interpreter ";
 
                 char *command = (char*) apr_palloc(mptmp, strlen(start) + lenparam + 1);
@@ -2294,7 +2209,7 @@ static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
                 strcpy(command, start);
                 strcat(command, action->param);
                 command[strlen(start) + lenparam] = '\0';
-                int rc = apache2_exec(msr, command, NULL, &script_output);
+                rc = apache2_exec(msr, command, NULL, &script_output);
                 if (rc != 1) {
                     msr_log(msr, 1, "Failed to execute: %s", action->param);
                     return 0;

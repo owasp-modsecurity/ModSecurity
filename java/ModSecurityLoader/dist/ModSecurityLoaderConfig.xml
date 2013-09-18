@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ModSecurityLoader>
+	<!--
+        OPTIONAL parameters for loading native libraries from absolute paths. This is an alternitive to specifying 
+        -Djava.library.path=/path/to/libs/ variable which is used by the JVM to search libraries.
+            
+        zlib1 and libapriconv-1 are Windows only libraries
+    -->
+            
+    <init-param>
+        <param-name>zlib1</param-name>
+        <param-value>c:\work\mod_security2\java\libs\zlib1.dll</param-value> 
+    </init-param>
+    <init-param>
+        <param-name>libxml2</param-name>
+        <param-value>c:\work\mod_security2\java\libs\libxml2.dll</param-value> 
+    </init-param>
+    <init-param>
+        <param-name>libpcre</param-name>
+        <param-value>c:\work\mod_security2\java\libs\pcre.dll</param-value> 
+    </init-param>
+    <init-param>
+        <param-name>libapr-1</param-name>
+        <param-value>c:\work\mod_security2\java\libs\libapr-1.dll</param-value> 
+    </init-param>
+    <init-param>
+        <param-name>libapriconv-1</param-name>
+        <param-value>c:\work\mod_security2\java\libs\libapriconv-1.dll</param-value> 
+    </init-param>
+    <init-param>
+        <param-name>libaprutil-1</param-name>
+        <param-value>c:\work\mod_security2\java\libs\libaprutil-1.dll</param-value> 
+    </init-param>
+    <init-param>
+        <param-name>libModSecurityJNI</param-name>
+        <param-value>c:\work\mod_security2\java\libs\ModSecurityJNI.dll</param-value> 
+    </init-param>
+</ModSecurityLoader>

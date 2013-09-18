@@ -39,7 +39,7 @@
                             </p>
 
                             <br />
-                            <h2>Installation</h2>
+                            <h2 id="installation">Installation</h2>
                             <p>
                                 First you need to choose whether to download and compile ModSecurity from the project's version control web-site:
                                 <a href="https://github.com/SpiderLabs/ModSecurity">github.com/SpiderLabs/ModSecurity</a> or using pre-compiled binaries from 
@@ -212,6 +212,30 @@ sudo cp ./java/.libs/libModSecurityJNI.so /usr/lib/
                             </ol>
                             
                             <br/>
+                            
+                            <h2 id="beanshell">BeanShell scripting with ModSecurity</h2>
+                            <p>
+                                You can use <a href="http://www.beanshell.org/">BeanShell</a> scripts in <span class="code">SecRule</span>
+                                ModSecurity directives using the <span class="code">exec</span> action. First you need to put the 
+                                <span class="code">bsh.jar</span> file (which can be downloaded from <a href="http://www.beanshell.org/download.html">beanshell.org</a>)
+                                into the current directory of your server (for example <span class="code">$CATALINA_HOME/bin</span> in Tomcat).
+                                An example of an <span class="code">exec</span> can be the following:
+                            </p>
+                            
+                            <pre class="codecanvas">
+<code>
+SecAction "setenv:msg=%{rule.msg},exec:/usr/local/apache/conf/beanshell_script.bsh"
+</code>
+                            </pre>
+                            <p>
+                                The environment variable set in the <span class="code">SecAction</span> can be accessed in BeanShell scripts
+                                using:
+                            </p>
+                            <pre class="codecanvas">
+<code>
+System.getenv("msg");
+</code>
+                            </pre>
                             <br/>
                             <br/>
                         </td>
