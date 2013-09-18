@@ -2214,7 +2214,6 @@ static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
         const char *start = "java -classpath bsh*.jar bsh.Interpreter ";
 
         char *command = (char*) apr_palloc(mptmp, strlen(start) + lenparam + 1);
-	msr_log(msr, 1, "beanshell ftw");
         strcpy(command, start);
         strcat(command, action->param);
         command[strlen(start) + lenparam] = '\0';
