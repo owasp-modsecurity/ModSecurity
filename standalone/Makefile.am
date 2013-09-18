@@ -20,7 +20,7 @@ standalone_la_SOURCES = ../apache2/mod_security2.c \
                            regex.c server.c
 
 standalone_la_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
-                          @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @LUA_CFLAGS@ @MODSEC_EXTRA_CFLAGS@ @CURL_CFLAGS@ -DVERSION_NGINX
+                          @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @LUA_CFLAGS@ @YAJL_CFLAGS@ @MODSEC_EXTRA_CFLAGS@ @CURL_CFLAGS@ -DVERSION_NGINX
 standalone_la_CPPFLAGS = @APR_CPPFLAGS@ @PCRE_CPPFLAGS@ @LIBXML2_CPPFLAGS@
 standalone_la_LIBADD = @APR_LDADD@ @APU_LDADD@ @PCRE_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@
 
@@ -72,7 +72,7 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
                            @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 endif
 
-standalone_INCS = `echo "@LIBXML2_CFLAGS@ @LUA_CFLAGS@" | sed -n 's/ *-I *\([^ ]*\) /\1 /gp'` \ 
+standalone_INCS = `echo "@LIBXML2_CFLAGS@ @LUA_CFLAGS@ @YAJL_CFLAGS@" | sed -n 's/ *-I *\([^ ]*\) /\1 /gp'` \ 
 				@APXS_INCLUDEDIR@ @APR_INCLUDEDIR@ @APU_INCLUDEDIR@
 standalone_LIBS = @APR_LINKLD@ @APU_LINKLD@ @APXS_LDFLAGS@ \
              @PCRE_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@

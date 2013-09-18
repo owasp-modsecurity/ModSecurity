@@ -15,6 +15,8 @@
 #ifndef _MSC_JSON_H_
 #define _MSC_JSON_H_
 
+#ifdef WITH_YAJL
+
 typedef struct json_data json_data;
 
 #include "modsecurity.h"
@@ -46,3 +48,5 @@ int DSOLOCAL json_complete(modsec_rec *msr, char **error_msg);
 apr_status_t DSOLOCAL json_cleanup(modsec_rec *msr);
 
 #endif
+#endif
+
