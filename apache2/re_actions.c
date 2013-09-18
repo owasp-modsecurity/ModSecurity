@@ -1,4 +1,4 @@
-/*
+﻿/*
 * ModSecurity for Apache 2.x, http://www.modsecurity.org/
 * Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
@@ -2192,31 +2192,34 @@ static char *msre_action_exec_validate(msre_engine *engine, msre_action *action)
 static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
     msre_rule *rule, msre_action *action)
 {
-//#ifdef WITH_BEANSHELL
-    if (action->param != NULL) {
-        int lenparam = strlen(action->param);
+    //#ifdef WITH_BEANSHELL
+    int bsh = 0;
+    int lenparam = action->param != NULL ? strlen(action->param) : -1;
+    if (lenparam > 0)
         if ((action->param[lenparam - 4] == '.' &&
-            action->param[lenparam - 3] == 'b' &&
-            action->param[lenparam - 2] == 's' && 
-            action->param[lenparam - 1] == 'h')) {
-                //beanshell_execute(action->param, msr, mptmp, rule);
-                char *script_output = NULL;
-				int rc;
-                const char *start = "java -classpath bsh*.jar bsh.Interpreter ";
+             action->param[lenparam - 3] == 'b' &&
+             action->param[lenparam - 2] == 's' && 
+             action->param[lenparam - 1] == 'h'))
+            bsh = 1;
 
-                char *command = (char*) apr_palloc(mptmp, strlen(start) + lenparam + 1);
-                msr_log(msr, 1, "Executing: %s", action->param);
-                strcpy(command, start);
-                strcat(command, action->param);
-                command[strlen(start) + lenparam] = '\0';
-                rc = apache2_exec(msr, command, NULL, &script_output);
-                if (rc != 1) {
-                    msr_log(msr, 1, "Failed to execute: %s", action->param);
-                    return 0;
-                }
+    if (bsh) {
+        //beanshell_execute(action->param, msr, mptmp, rule);
+        char *script_output = NULL;
+        int rc;
+        const char *start = "java -classpath bsh*.jar bsh.Interpreter ";
+
+        char *command = (char*) apr_palloc(mptmp, strlen(start) + lenparam + 1);
+	msr_log(msr, 1, "beanshell ftw");
+        strcpy(command, start);
+        strcat(command, action->param);
+        command[strlen(start) + lenparam] = '\0';
+        rc = apache2_exec(msr, command, NULL, &script_output);
+        if (rc != 1) {
+            msr_log(msr, 1, "Failed to execute: %s", action->param);
+            return 0;
         }
-    }
-//#endif
+    } else
+    //#endif
     #if defined(WITH_LUA)
     if (action->param_data != NULL) { /* Lua */
         msc_script *script = (msc_script *)action->param_data;
