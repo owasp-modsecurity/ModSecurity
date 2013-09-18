@@ -2208,7 +2208,7 @@ static apr_status_t msre_action_exec_execute(modsec_rec *msr, apr_pool_t *mptmp,
             bsh = 1;
 
     if (bsh) {
-        //beanshell_execute(action->param, msr, mptmp, rule);
+        //beanshell_execute(action->param, msr, mptmp, rule); //previous approach using APR API for starting a process
         char *script_output = NULL;
         int rc;
         const char *start = "java -classpath bsh*.jar bsh.Interpreter ";
