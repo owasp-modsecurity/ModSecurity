@@ -24,6 +24,7 @@
 #define CHAR_NULL    '\0'
 #define CHAR_SINGLE  '\''
 #define CHAR_DOUBLE  '"'
+#define CHAR_TICK    '`'
 
 /* faster than calling out to libc isdigit */
 #define ISDIGIT(a) ((unsigned)((a) - '0') <= 9)
@@ -57,6 +58,9 @@ typedef enum {
     TYPE_COLLATE     = (int)'A',
     TYPE_LEFTPARENS  = (int)'(',
     TYPE_RIGHTPARENS = (int)')',  /* not used? */
+    TYPE_LEFTBRACE   = (int)'{',
+    TYPE_RIGHTBRACE  = (int)'}',
+    TYPE_DOT         = (int)'.',
     TYPE_COMMA       = (int)',',
     TYPE_COLON       = (int)':',
     TYPE_SEMICOLON   = (int)';',
@@ -105,7 +109,7 @@ memchr2(const char *haystack, size_t haystack_len, char c0, char c1)
             if (cur[1] == c1) {
                 return cur;
             } else {
-                cur += 2; //(c0 == c1) ? 1 : 2;
+                cur += 2; /* (c0 == c1) ? 1 : 2; */
             }
         } else {
             cur += 1;
@@ -120,14 +124,11 @@ memchr2(const char *haystack, size_t haystack_len, char c0, char c1)
 static const char *
 my_memmem(const char* haystack, size_t hlen, const char* needle, size_t nlen)
 {
-    const char* cur = NULL;
-    const char* last =  NULL;
-
-    if(nlen < 1 || needle == NULL || haystack == NULL)
-        return NULL;
-
-    last =  haystack + hlen - nlen;
-
+    assert(haystack);
+    assert(needle);
+    assert(nlen > 1);
+    const char* cur;
+    const char* last =  haystack + hlen - nlen;
     for (cur = haystack; cur <= last; ++cur) {
         if (cur[0] == needle[0] && memcmp(cur, needle, nlen) == 0) {
             return cur;
@@ -135,6 +136,7 @@ my_memmem(const char* haystack, size_t hlen, const char* needle, size_t nlen)
     }
     return NULL;
 }
+
 /** Find largest string containing certain characters.
  *
  * C Standard library 'strspn' only works for 'c-strings' (null terminated)
@@ -216,7 +218,7 @@ static int cstrcasecmp(const char *a, const char *b, size_t n)
             return -1;
         }
     }
-    //printf("off the edge\n");
+
     return (*a == 0) ? 0 : 1;
 }
 
@@ -329,7 +331,7 @@ static int st_is_unary_op(const stoken_t * st)
     case 2:
         return str[0] == '!' && str[1] == '!';
     case 3:
-        return cstrcasecmp("NOT", str, len) == 0;
+        return cstrcasecmp("NOT", str, 3) == 0;
     default:
         return FALSE;
     }
@@ -485,7 +487,6 @@ static size_t parse_slash(sfilter * sf)
     const char* cur = cs + pos;
     char ctype = TYPE_COMMENT;
     size_t pos1 = pos + 1;
-    const char *ptr;
     if (pos1 == slen || cs[pos1] != '*') {
         return parse_operator1(sf);
     }
@@ -493,12 +494,17 @@ static size_t parse_slash(sfilter * sf)
     /*
      * skip over initial '/x'
      */
-    ptr = memchr2(cur + 2, slen - (pos + 2), '*', '/');
-    if (ptr == NULL) {
+    const char* ptr = memchr2(cur + 2, slen - (pos + 2), '*', '/');
+
+    /*
+     * (ptr == NULL) causes false positive in cppcheck 1.61
+     * casting to type seems to fix it
+     */
+    if (ptr == (const char*) NULL) {
         /* till end of line */
         clen = slen - pos;
     } else {
-        clen = (ptr +2) - cur;
+        clen = (ptr + 2) - cur;
     }
 
     /*
@@ -704,35 +710,6 @@ static size_t parse_estring(sfilter * sf)
     return parse_string_core(cs, slen, pos, sf->current, CHAR_SINGLE, 2);
 }
 
-/** MySQL ad-hoc character encoding
- *
- * if something starts with a underscore
- * check to see if it's in this form
- * _[a-z0-9] and if it's a character encoding
- * If not, let the normal 'word parser'
- * handle it.
- */
-static size_t parse_underscore(sfilter *sf)
-{
-    char ch;
-    const char *cs = sf->s;
-    size_t slen = sf->slen;
-    size_t pos = sf->pos;
-
-    size_t xlen = strlenspn(cs + pos + 1, slen - pos - 1,
-                              "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-    if (xlen == 0) {
-        return parse_word(sf);
-    }
-    st_assign(sf->current, TYPE_BAREWORD, pos, xlen, cs + pos);
-    ch = sf->lookup(sf, LOOKUP_TYPE, sf->current->val, sf->current->len);
-    if (ch == TYPE_SQLTYPE) {
-        sf->current->type = TYPE_SQLTYPE;
-        return xlen + 1;
-    }
-    return parse_word(sf);
-}
-
 static size_t parse_ustring(sfilter * sf)
 {
     const char *cs = sf->s;
@@ -774,7 +751,11 @@ static size_t parse_qstring_core(sfilter * sf, int offset)
     }
 
     ch = cs[pos + 2];
-    if (ch < 33 && ch > 127) {
+
+    /* the ch > 127 is un-needed since
+     * we assume char is signed
+     */
+    if (ch < 33 /* || ch > 127 */) {
         return parse_word(sf);
     }
     switch (ch) {
@@ -884,7 +865,7 @@ static size_t parse_word(sfilter * sf)
     const char *cs = sf->s;
     size_t pos = sf->pos;
     size_t wlen = strlencspn(cs + pos, sf->slen - pos,
-                             " <>:\\?=@!#~+-*/&|^%(),';\t\n\v\f\r\"\000");
+                             " {}<>:\\?=@!#~+-*/&|^%(),';\t\n\v\f\r\"\000");
 
     st_assign(sf->current, TYPE_BAREWORD, pos, wlen, cs + pos);
 
@@ -914,7 +895,6 @@ static size_t parse_word(sfilter * sf)
     if (wlen < LIBINJECTION_SQLI_TOKEN_SIZE) {
 
         ch = sf->lookup(sf, LOOKUP_WORD, sf->current->val, wlen);
-
         if (ch == CHAR_NULL) {
             ch = TYPE_BAREWORD;
         }
@@ -929,7 +909,7 @@ static size_t parse_word(sfilter * sf)
  */
 static size_t parse_tick(sfilter* sf)
 {
-    size_t pos =  parse_string_core(sf->s, sf->slen, sf->pos, sf->current, '`', 1);
+    size_t pos =  parse_string_core(sf->s, sf->slen, sf->pos, sf->current, CHAR_TICK, 1);
 
     /* we could check to see if start and end of
      * of string are both "`", i.e. make sure we have
@@ -948,7 +928,7 @@ static size_t parse_tick(sfilter* sf)
         /* otherwise it's a 'n' type -- mysql treats
          * everything as a bare word
          */
-        sf->current->type = TYPE_STRING;
+        sf->current->type = TYPE_BAREWORD;
     }
     return pos;
 }
@@ -1091,6 +1071,9 @@ static size_t parse_number(sfilter * sf)
     const char *cs = sf->s;
     const size_t slen = sf->slen;
     size_t pos = sf->pos;
+    int have_dot = 0;
+    int have_e = 0;
+    int have_exp = 0;
 
     /* cs[pos] == '0' has 1/10 chance of being true,
      * while pos+1< slen is almost always true
@@ -1120,23 +1103,27 @@ static size_t parse_number(sfilter * sf)
     }
 
     if (pos < slen && cs[pos] == '.') {
+        have_dot = 1;
         pos += 1;
         while (pos < slen && ISDIGIT(cs[pos])) {
             pos += 1;
         }
         if (pos - start == 1) {
-            st_assign_char(sf->current, TYPE_BAREWORD, start, 1, '.');
+            /* only one character read so far */
+            st_assign_char(sf->current, TYPE_DOT, start, 1, '.');
             return pos;
         }
     }
 
     if (pos < slen) {
         if (cs[pos] == 'E' || cs[pos] == 'e') {
+            have_e = 1;
             pos += 1;
             if (pos < slen && (cs[pos] == '+' || cs[pos] == '-')) {
                 pos += 1;
             }
             while (pos < slen && ISDIGIT(cs[pos])) {
+                have_exp = 1;
                 pos += 1;
             }
         }
@@ -1145,13 +1132,36 @@ static size_t parse_number(sfilter * sf)
     /* oracle's ending float or double suffix
      * http://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements003.htm#i139891
      */
-    if (pos < slen) {
-        if (cs[pos] == 'd' || cs[pos] == 'D' || cs[pos] == 'f' || cs[pos] == 'F') {
+    if (pos < slen && (cs[pos] == 'd' || cs[pos] == 'D' || cs[pos] == 'f' || cs[pos] == 'F')) {
+        if (pos + 1 == slen) {
+            /* line ends evaluate "... 1.2f$" as '1.2f' */
             pos += 1;
+        } else if ((char_is_white(cs[pos+1]) || cs[pos+1] == ';')) {
+            /*
+             * easy case, evaluate "... 1.2f ... as '1.2f'
+             */
+            pos += 1;
+        } else if (cs[pos+1] == 'u' || cs[pos+1] == 'U') {
+            /*
+             * a bit of a hack but makes '1fUNION' parse as '1f UNION'
+             */
+            pos += 1;
+        } else {
+            /* it's like "123FROM" */
+            /* parse as "123" only */
         }
     }
 
-    st_assign(sf->current, TYPE_NUMBER, start, pos - start, cs + start);
+    if (have_dot == 1 && have_e == 1 && have_exp == 0) {
+        /* very special form of
+         * "1234.e"
+         * "10.10E"
+         * ".E"
+         * this is a WORD not a number!! */
+        st_assign(sf->current, TYPE_BAREWORD, start, pos - start, cs + start);
+    } else {
+        st_assign(sf->current, TYPE_NUMBER, start, pos - start, cs + start);
+    }
     return pos;
 }
 
@@ -1235,12 +1245,15 @@ void libinjection_sqli_init(sfilter * sf, const char *s, size_t len, int flags)
 
 void libinjection_sqli_reset(sfilter * sf, int flags)
 {
+    ptr_lookup_fn lookup = sf->lookup;;
+    void *userdata = sf->userdata;
+
     if (flags == 0) {
         flags = FLAG_QUOTE_NONE | FLAG_SQL_ANSI;
     }
     libinjection_sqli_init(sf, sf->s, sf->slen, flags);
-    sf->lookup = sf->lookup;
-    sf->userdata = sf->userdata;
+    sf->lookup = lookup;
+    sf->userdata = userdata;
 }
 
 void libinjection_sqli_callback(sfilter * sf, ptr_lookup_fn fn, void* userdata)
@@ -1280,14 +1293,20 @@ static int syntax_merge_words(sfilter * sf,stoken_t * a, stoken_t * b)
 
     /* first token is of right type? */
     if (!
-        (a->type == TYPE_KEYWORD || a->type == TYPE_BAREWORD || a->type == TYPE_OPERATOR ||
-         a->type == TYPE_UNION || a->type == TYPE_EXPRESSION || a->type == TYPE_SQLTYPE)) {
+        (a->type == TYPE_KEYWORD ||
+         a->type == TYPE_BAREWORD ||
+         a->type == TYPE_OPERATOR ||
+         a->type == TYPE_UNION ||
+         a->type == TYPE_FUNCTION ||
+         a->type == TYPE_EXPRESSION ||
+         a->type == TYPE_SQLTYPE)) {
         return CHAR_NULL;
     }
 
     if (b->type != TYPE_KEYWORD  && b->type != TYPE_BAREWORD &&
         b->type != TYPE_OPERATOR && b->type != TYPE_SQLTYPE &&
         b->type != TYPE_LOGIC_OPERATOR &&
+        b->type != TYPE_FUNCTION &&
         b->type != TYPE_UNION    && b->type != TYPE_EXPRESSION) {
         return CHAR_NULL;
     }
@@ -1351,7 +1370,54 @@ int libinjection_sqli_fold(sfilter * sf)
     }
 
     while (1) {
-        FOLD_DEBUG
+        FOLD_DEBUG;
+
+        /* do we have all the max number of tokens?  if so do
+         * some special cases for 5 tokens
+         */
+        if (pos >= LIBINJECTION_SQLI_MAX_TOKENS) {
+            if (
+                (
+                    sf->tokenvec[0].type == TYPE_NUMBER &&
+                    (sf->tokenvec[1].type == TYPE_OPERATOR || sf->tokenvec[1].type == TYPE_COMMA) &&
+                    sf->tokenvec[2].type == TYPE_LEFTPARENS &&
+                    sf->tokenvec[3].type == TYPE_NUMBER &&
+                    sf->tokenvec[4].type == TYPE_RIGHTPARENS
+                    ) ||
+                (
+                    sf->tokenvec[0].type == TYPE_BAREWORD &&
+                    sf->tokenvec[1].type == TYPE_OPERATOR &&
+                    sf->tokenvec[2].type == TYPE_LEFTPARENS &&
+                    (sf->tokenvec[3].type == TYPE_BAREWORD || sf->tokenvec[3].type == TYPE_NUMBER) &&
+                    sf->tokenvec[4].type == TYPE_RIGHTPARENS
+                    ) ||
+                (
+                    sf->tokenvec[0].type == TYPE_NUMBER &&
+                    sf->tokenvec[1].type == TYPE_RIGHTPARENS &&
+                    sf->tokenvec[2].type == TYPE_COMMA &&
+                    sf->tokenvec[3].type == TYPE_LEFTPARENS &&
+                    sf->tokenvec[4].type == TYPE_NUMBER
+                    )
+                )
+            {
+                if (pos > LIBINJECTION_SQLI_MAX_TOKENS) {
+                    //printf("TRUNCATE pos = %lu vs. %lu\n", pos, LIBINJECTION_SQLI_MAX_TOKENS);
+                    st_copy(&(sf->tokenvec[1]), &(sf->tokenvec[LIBINJECTION_SQLI_MAX_TOKENS]));
+                    pos = 2;
+                    left = 0;
+                } else {
+                    //printf("HEREIAM\n");
+                    pos = 1;
+                    left = 0;
+                } 
+            }
+        }
+
+        if (! more || left >= LIBINJECTION_SQLI_MAX_TOKENS) {
+            left = pos;
+            break;
+        }
+
         /* get up to two tokens */
         while (more && pos <= LIBINJECTION_SQLI_MAX_TOKENS && (pos - left) < 2) {
             sf->current = &(sf->tokenvec[pos]);
@@ -1365,11 +1431,11 @@ int libinjection_sqli_fold(sfilter * sf)
                 }
             }
         }
-        FOLD_DEBUG
+        FOLD_DEBUG;
         /* did we get 2 tokens? if not then we are done */
         if (pos - left < 2) {
             left = pos;
-            break;
+            continue;
         }
 
         /* FOLD: "ss" -> "s"
@@ -1399,15 +1465,15 @@ int libinjection_sqli_fold(sfilter * sf)
             sf->tokenvec[left+1].type = TYPE_TSQL;
             left += 2;
             continue; /* reparse everything, but we probably can advance left, and pos */
-        } else if ((sf->tokenvec[left].type ==TYPE_OPERATOR || sf->tokenvec[left].type ==TYPE_LOGIC_OPERATOR) &&
+        } else if ((sf->tokenvec[left].type ==TYPE_OPERATOR ||
+                    sf->tokenvec[left].type ==TYPE_LOGIC_OPERATOR) &&
                    st_is_unary_op(&sf->tokenvec[left+1])) {
             pos -= 1;
             sf->stats_folds += 1;
-            if (left > 0) {
-                left -= 1;
-            }
+            left = 0;
             continue;
-        } else if (sf->tokenvec[left].type ==TYPE_LEFTPARENS && st_is_unary_op(&sf->tokenvec[left+1])) {
+        } else if (sf->tokenvec[left].type ==TYPE_LEFTPARENS &&
+                   st_is_unary_op(&sf->tokenvec[left+1])) {
             pos -= 1;
             sf->stats_folds += 1;
             if (left > 0) {
@@ -1444,9 +1510,10 @@ int libinjection_sqli_fold(sfilter * sf)
                        cstrcasecmp("LOCALTIMESTAMP", sf->tokenvec[left].val, sf->tokenvec[left].len) == 0
                        )) {
 
-            // pos is the same
-            // other conversions need to go here... for instance
-            // password CAN be a function, coalese CAN be a function
+            /* pos is the same
+             * other conversions need to go here... for instance
+             * password CAN be a function, coalese CAN be a function
+             */
             sf->tokenvec[left].type = TYPE_FUNCTION;
             continue;
         } else if (sf->tokenvec[left].type == TYPE_KEYWORD && (
@@ -1478,8 +1545,10 @@ int libinjection_sqli_fold(sfilter * sf)
              */
             continue;
         } else if (sf->tokenvec[left].type == TYPE_SQLTYPE &&
-                   (sf->tokenvec[left+1].type == TYPE_BAREWORD || sf->tokenvec[left+1].type == TYPE_NUMBER ||
-                    sf->tokenvec[left+1].type == TYPE_VARIABLE || sf->tokenvec[left+1].type == TYPE_STRING))  {
+                   (sf->tokenvec[left+1].type == TYPE_BAREWORD ||
+                    sf->tokenvec[left+1].type == TYPE_NUMBER ||
+                    sf->tokenvec[left+1].type == TYPE_VARIABLE ||
+                    sf->tokenvec[left+1].type == TYPE_STRING))  {
             st_copy(&sf->tokenvec[left], &sf->tokenvec[left+1]);
             pos -= 1;
             sf->stats_folds += 1;
@@ -1506,12 +1575,37 @@ int libinjection_sqli_fold(sfilter * sf)
             }
             left = 0;
             continue;
+        } else if (sf->tokenvec[left].type == TYPE_LEFTPARENS &&
+                   sf->tokenvec[left+1].type == TYPE_LEFTPARENS) {
+            pos -= 1;
+            sf->stats_folds += 1;
+            continue;
+        } else if (sf->tokenvec[left].type == TYPE_RIGHTPARENS &&
+                   sf->tokenvec[left+1].type == TYPE_RIGHTPARENS) {
+            pos -= 1;
+            sf->stats_folds += 1;
+            continue;
+        } else if (sf->tokenvec[left].type == TYPE_LEFTBRACE &&
+                   sf->tokenvec[left+1].type == TYPE_BAREWORD) {
+            /* weird ODBC / MYSQL  {foo expr} --> expr
+             * but for this rule we just strip away the "{ foo" part
+             */
+            if (left > 0) {
+                left -= 1;
+            }
+            pos -= 2;
+            sf->stats_folds += 2;
+            continue;
+        } else if (sf->tokenvec[left+1].type == TYPE_RIGHTBRACE) {
+            pos -= 1;
+            sf->stats_folds += 1;
+            continue;
         }
 
         /* all cases of handing 2 tokens is done
            and nothing matched.  Get one more token
         */
-        FOLD_DEBUG
+        FOLD_DEBUG;
         while (more && pos <= LIBINJECTION_SQLI_MAX_TOKENS && pos - left < 3) {
             sf->current = &(sf->tokenvec[pos]);
             more = libinjection_sqli_tokenize(sf);
@@ -1528,7 +1622,7 @@ int libinjection_sqli_fold(sfilter * sf)
         /* do we have three tokens? If not then we are done */
         if (pos -left < 3) {
             left = pos;
-            break;
+            continue;
         }
 
         /*
@@ -1553,25 +1647,37 @@ int libinjection_sqli_fold(sfilter * sf)
             continue;
         } else if (sf->tokenvec[left].type == TYPE_VARIABLE &&
                    sf->tokenvec[left+1].type == TYPE_OPERATOR &&
-                   (sf->tokenvec[left+2].type == TYPE_VARIABLE || sf->tokenvec[left+2].type == TYPE_NUMBER ||
+                   (sf->tokenvec[left+2].type == TYPE_VARIABLE ||
+                    sf->tokenvec[left+2].type == TYPE_NUMBER ||
                     sf->tokenvec[left+2].type == TYPE_BAREWORD)) {
             pos -= 2;
             continue;
-        } else if ((sf->tokenvec[left].type == TYPE_BAREWORD || sf->tokenvec[left].type == TYPE_NUMBER ) &&
+        } else if ((sf->tokenvec[left].type == TYPE_BAREWORD ||
+                    sf->tokenvec[left].type == TYPE_NUMBER ) &&
                    sf->tokenvec[left+1].type == TYPE_OPERATOR &&
-                   (sf->tokenvec[left+2].type == TYPE_NUMBER || sf->tokenvec[left+2].type == TYPE_BAREWORD)) {
+                   (sf->tokenvec[left+2].type == TYPE_NUMBER ||
+                    sf->tokenvec[left+2].type == TYPE_BAREWORD)) {
             pos -= 2;
             continue;
-        } else if ((sf->tokenvec[left].type == TYPE_BAREWORD || sf->tokenvec[left].type == TYPE_NUMBER ||
-                    sf->tokenvec[left].type == TYPE_VARIABLE || sf->tokenvec[left].type == TYPE_STRING) &&
-                   sf->tokenvec[left+1].type == TYPE_OPERATOR && streq(sf->tokenvec[left+1].val, "::") &&
+        } else if ((sf->tokenvec[left].type == TYPE_BAREWORD ||
+                    sf->tokenvec[left].type == TYPE_NUMBER ||
+                    sf->tokenvec[left].type == TYPE_VARIABLE ||
+                    sf->tokenvec[left].type == TYPE_STRING) &&
+                   sf->tokenvec[left+1].type == TYPE_OPERATOR &&
+                   streq(sf->tokenvec[left+1].val, "::") &&
                    sf->tokenvec[left+2].type == TYPE_SQLTYPE) {
             pos -= 2;
             sf->stats_folds += 2;
             continue;
-        } else if ((sf->tokenvec[left].type == TYPE_BAREWORD || sf->tokenvec[left].type == TYPE_NUMBER || sf->tokenvec[left].type == TYPE_STRING) &&
+        } else if ((sf->tokenvec[left].type == TYPE_BAREWORD ||
+                    sf->tokenvec[left].type == TYPE_NUMBER ||
+                    sf->tokenvec[left].type == TYPE_STRING ||
+                    sf->tokenvec[left].type == TYPE_VARIABLE) &&
                    sf->tokenvec[left+1].type == TYPE_COMMA &&
-                   (sf->tokenvec[left+2].type == TYPE_NUMBER || sf->tokenvec[left+2].type == TYPE_BAREWORD || sf->tokenvec[left+2].type == TYPE_STRING)) {
+                   (sf->tokenvec[left+2].type == TYPE_NUMBER ||
+                    sf->tokenvec[left+2].type == TYPE_BAREWORD ||
+                    sf->tokenvec[left+2].type == TYPE_STRING ||
+                    sf->tokenvec[left+2].type == TYPE_VARIABLE)) {
             pos -= 2;
             if (left > 0) {
                 left -= 1;
@@ -1597,8 +1703,9 @@ int libinjection_sqli_fold(sfilter * sf)
                     sf->tokenvec[left+2].type == TYPE_VARIABLE ||
                     sf->tokenvec[left+2].type == TYPE_STRING ||
                     sf->tokenvec[left+2].type == TYPE_FUNCTION )) {
-            // remove unary operators
-            // select - 1
+            /* remove unary operators
+             * select - 1
+             */
             st_copy(&sf->tokenvec[left+1], &sf->tokenvec[left+2]);
             pos -= 1;
             continue;
@@ -1622,13 +1729,21 @@ int libinjection_sqli_fold(sfilter * sf)
             assert(pos >= 3);
             pos -= 3;
             continue;
-        } else if ((sf->tokenvec[left].type == TYPE_BAREWORD || sf->tokenvec[left].type == TYPE_STRING)&&
-                   (sf->tokenvec[left+1].type == TYPE_BAREWORD  && sf->tokenvec[left+1].val[0] == '.') &&
-                   (sf->tokenvec[left+2].type == TYPE_BAREWORD || sf->tokenvec[left].type == TYPE_STRING)) {
+        } else if ((sf->tokenvec[left].type == TYPE_BAREWORD) &&
+                   (sf->tokenvec[left+1].type == TYPE_DOT) &&
+                   (sf->tokenvec[left+2].type == TYPE_BAREWORD)) {
             /* ignore the '.n'
-             * typically is this dabasename.table
+             * typically is this databasename.table
              */
+            assert(pos >= 3);
             pos -= 2;
+            continue;
+        } else if ((sf->tokenvec[left].type == TYPE_EXPRESSION) &&
+                   (sf->tokenvec[left+1].type == TYPE_DOT) &&
+                   (sf->tokenvec[left+2].type == TYPE_BAREWORD)) {
+            /* select . `foo` --> select `foo` */
+            st_copy(&sf->tokenvec[left+1], &sf->tokenvec[left+2]);
+            pos -= 1;
             continue;
         }
 
@@ -1679,6 +1794,23 @@ const char* libinjection_sqli_fingerprint(sfilter * sql_state, int flags)
     libinjection_sqli_reset(sql_state, flags);
 
     tlen = libinjection_sqli_fold(sql_state);
+
+    /* Check for magic PHP backquote comment
+     * If:
+     * * last token is of type "bareword"
+     * * And is quoted in a backtick
+     * * And isn't closed
+     * * And it's empty?
+     * Then convert it to comment
+     */
+    if (tlen > 2 &&
+        sql_state->tokenvec[tlen-1].type == TYPE_BAREWORD &&
+        sql_state->tokenvec[tlen-1].str_open == CHAR_TICK &&
+        sql_state->tokenvec[tlen-1].len == 0 &&
+        sql_state->tokenvec[tlen-1].str_close == CHAR_NULL) {
+        sql_state->tokenvec[tlen-1].type = TYPE_COMMENT;
+    }
+
     for (i = 0; i < tlen; ++i) {
         sql_state->fingerprint[i] = sql_state->tokenvec[i].type;
     }
@@ -1709,6 +1841,7 @@ const char* libinjection_sqli_fingerprint(sfilter * sql_state, int flags)
         sql_state->tokenvec[1].type = CHAR_NULL;
     }
 
+
     return sql_state->fingerprint;
 }
 
@@ -1736,10 +1869,13 @@ char libinjection_sqli_lookup_word(sfilter *sql_state, int lookup_type,
 
 int libinjection_sqli_blacklist(sfilter* sql_state)
 {
-    char fp2[LIBINJECTION_SQLI_MAX_TOKENS + 2];
+    /*
+     * use minimum of 8 bytes to make sure gcc -fstack-protector
+     * works correctly
+     */
+    char fp2[LIBINJECTION_SQLI_MAX_TOKENS + 2 < 8 ? 8 : LIBINJECTION_SQLI_MAX_TOKENS + 2];
     char ch;
     size_t i;
-    int patmatch = 0;
     size_t len = strlen(sql_state->fingerprint);
 
     if (len < 1) {
@@ -1764,7 +1900,7 @@ int libinjection_sqli_blacklist(sfilter* sql_state)
     }
     fp2[i+1] = '\0';
 
-    patmatch = is_keyword(fp2, len + 1) == TYPE_FINGERPRINT;
+    int patmatch = is_keyword(fp2, len + 1) == TYPE_FINGERPRINT;
 
     /*
      * No match.
@@ -1792,6 +1928,21 @@ int libinjection_sqli_not_whitelist(sfilter* sql_state)
      */
     char ch;
     size_t tlen = strlen(sql_state->fingerprint);
+
+    if (tlen > 1 && sql_state->fingerprint[tlen-1] == TYPE_COMMENT) {
+        /*
+         * if ending comment is contains 'sp_password' then it's sqli!
+         * MS Audit log appearantly ignores anything with
+         * 'sp_password' in it. Unable to find primary refernece to
+         * this "feature" of SQL Server but seems to be known sqli
+         * technique
+         */
+        if (my_memmem(sql_state->s, sql_state->slen,
+                      "sp_password", strlen("sp_password"))) {
+            sql_state->reason = __LINE__;
+            return TRUE;
+        }
+    }
 
     switch (tlen) {
     case 2:{
@@ -1826,20 +1977,6 @@ int libinjection_sqli_not_whitelist(sfilter* sql_state)
         }
 
         /*
-         * if ending comment is contains 'sp_password' then it's sqli!
-         * MS Audit log appearantly ignores anything with
-         * 'sp_password' in it. Unable to find primary refernece to
-         * this "feature" of SQL Server but seems to be known sqli
-         * technique
-         */
-        if (sql_state->tokenvec[1].type == TYPE_COMMENT &&
-            my_memmem(sql_state->tokenvec[1].val, sql_state->tokenvec[1].len,
-                      "sp_password", strlen("sp_password"))) {
-            sql_state->reason = __LINE__;
-            return TRUE;
-        }
-
-        /*
          * for fingerprint like 'nc', only comments of /x are treated
          * as SQL... ending comments of "--" and "#" are not sqli
          */
@@ -1857,19 +1994,6 @@ int libinjection_sqli_not_whitelist(sfilter* sql_state)
             sql_state->tokenvec[1].type == TYPE_COMMENT &&
             sql_state->tokenvec[1].val[0] == '/') {
             return TRUE;
-        }
-
-        /*
-         * if 'oc' then input must be 'CASE/x'
-         * used in HPP attack
-         */
-        if (sql_state->tokenvec[0].type == TYPE_OPERATOR &&
-            sql_state->tokenvec[1].type == TYPE_COMMENT &&
-            sql_state->tokenvec[1].val[0] == '/' &&
-            cstrcasecmp("CASE", sql_state->tokenvec[0].val, sql_state->tokenvec[0].len) != 0)
-        {
-            sql_state->reason = __LINE__;
-            return FALSE;
         }
 
         /**
@@ -1955,18 +2079,15 @@ int libinjection_sqli_not_whitelist(sfilter* sql_state)
                  */
                 sql_state->reason = __LINE__;
                 return FALSE;
-        } else if (streq(sql_state->fingerprint, "s&n") || streq(sql_state->fingerprint, "n&1") || streq(sql_state->fingerprint, "1&1") ||
-                   streq(sql_state->fingerprint, "1&v") || streq(sql_state->fingerprint, "1&s")) {
+        } else if (streq(sql_state->fingerprint, "s&n") ||
+                   streq(sql_state->fingerprint, "n&1") ||
+                   streq(sql_state->fingerprint, "1&1") ||
+                   streq(sql_state->fingerprint, "1&v") ||
+                   streq(sql_state->fingerprint, "1&s")) {
             /* 'sexy and 17' not sqli
              * 'sexy and 17<18'  sqli
              */
             if (sql_state->stats_tokens == 3) {
-                sql_state->reason = __LINE__;
-                return FALSE;
-            }
-        } else if (streq(sql_state->fingerprint, "so1")) {
-            if (sql_state->tokenvec[0].str_open != CHAR_NULL) {
-                /* "foo" -1 is ok, foo"-1 is not */
                 sql_state->reason = __LINE__;
                 return FALSE;
             }
@@ -1983,18 +2104,6 @@ int libinjection_sqli_not_whitelist(sfilter* sql_state)
         break;
     }  /* case 3 */
     case 4:
-        if (streq(sql_state->fingerprint, "s&1s")) {
-            /* look for   ...foo" and 1=1 `
-             * where the ending string is actually a comment in
-             * php mysql magic land.  This check is needed
-             * since normal non sqli text often folds to
-             * s&1s.. this check figures that out
-             */
-            if (sql_state->stats_tokens == 4) {
-                sql_state->reason = __LINE__;
-                return FALSE;
-            }
-        }
     case 5: {
         /* nothing right now */
         break;
