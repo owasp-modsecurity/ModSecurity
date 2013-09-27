@@ -1,121 +1,175 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
-    <head>
-        <title>ModSecurity WAF: Help page</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <style>
-            .code {
-                font-family: Courier;
-                font-size: 14px;
-            }
-            .codecanvas {
-                background: #DDDDDD;
-            }
-        </style>
-    </head>
+<head>
+    <title>ModSecurity WAF: Help page</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style>
+        .code {
+            font-family: Courier;
+            font-size: 14px;
+        }
 
-    <body style="background: #333333;">
-        <div  align="center" style="width:930px; margin:0 auto; box-shadow: 5px 5px 6px #000; background: #FFFFFF;">
-            <div style="width: 930px;">
-                <img border="0" height="101" alt="ModSecurity: Open Source Web Application Firewall" src="http://www.modsecurity.org/g/header-top.jpg" />
-            </div>
-            <div style="width: 930px;">
-                <table width="90%" cellspacing="0" cellpadding="0" border="0">
-                    <tr>
-                        <td>
-                            <h2 style="font-family: Arial;">ModSecurity for Java - Help Page</h2>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p>
-                                <b>ModSecurity</b> is an open source intrusion detection and prevention engine for web
-                                applications. It can also be called an web application firewall. It operates embedded into
-                                the web server, acting as a powerful umbrella, shielding applications from attacks.
-                            </p>
-                            <p>
-                                ModSecurity for Java is designed as a <a href="http://www.oracle.com/technetwork/java/filters-137243.html">Java Filter</a> which makes use of ModSecurity's
-                                <a href="https://github.com/SpiderLabs/ModSecurity">native code</a> using the <b>JNI technology</b>.
-                            </p>
+        .codecanvas {
+            background: #DDDDDD;
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-width: 800px;
+            padding: 5px;
+        }
+    </style>
+</head>
 
-                            <br />
-                            <h2 id="installation">Installation</h2>
-                            <p>
-                                First you need to choose whether to download and compile ModSecurity from the project's version control web-site:
-                                <a href="https://github.com/SpiderLabs/ModSecurity">github.com/SpiderLabs/ModSecurity</a> or using pre-compiled binaries from 
-                                <a href="https://www.modsecurity.org/">modsecurity.org</a>.
-                                The native libraries (.so, .dll, etc.) needed for <b>ModSecurity for Java</b> are:
-                            </p>
-                            <ol>
-                                <li>
-                                    zlib1 (Windows only)
-                                </li>
-                                <li>
-                                    libxml2
-                                </li>
-                                <li>
-                                    pcre
-                                </li>
-                                <li>
-                                    libapr-1
-                                </li>
-                                <li>
-                                    libapriconv-1 (Windows only)
-                                </li>
-                                <li>
-                                    libaprutil-1
-                                </li>
-                                <li>
-                                    ModSecurityJNI (JNI wrapper for mod_security code)
-                                </li>
-                            </ol>
+<body style="background: #333333;">
+    <div align="center" style="width:930px; margin:0 auto; box-shadow: 5px 5px 6px #000; background: #FFFFFF;">
+        <div style="width: 930px;">
+            <img height="101" alt="ModSecurity: Open Source Web Application Firewall" src="http://www.modsecurity.org/g/header-top.jpg" />
+        </div>
+        <div style="width: 930px;">
+            <table width="90%" border="0">
+                <tr>
+                    <td>
+                        <h2 style="font-family: Arial;">ModSecurity for Java - Help Page</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p>
+                            <b>ModSecurity</b> is an open source intrusion detection and prevention engine for web
+                            applications. It can also be called an web application firewall. It operates embedded into
+                            the web server, acting as a powerful umbrella, shielding applications from attacks.
+                        </p>
+                        <p>
+                            ModSecurity for Java is designed as a <a href="http://www.oracle.com/technetwork/java/filters-137243.html">Java Filter</a> which makes use of ModSecurity's
+                            <a href="https://github.com/SpiderLabs/ModSecurity">native code</a> using the <b>JNI technology</b>.
+                        </p>
+                        <br />
 
-                            <p>
-                                These native libraries are used by the <a class="code" href="../src/java/org/modsecurity/ModSecurityFilter.java">ModSecurityFilter</a>.
-                            </p>
+                        <h2 id="installation">Installation steps</h2>
 
-                            <br />
-                            <h3>Compile ModSecurity native library</h3>
-                            <p>
-                                Install required packages for compilation. For example, on Debian/Ubuntu like systems:
-                            </p>
-                            <pre class="codecanvas">
+                        <h3>Step 1: Compile ModSecurity native library</h3>
+                        <p>
+                            Install required packages for compilation. For example, on Debian/Ubuntu like systems:
+                        </p>
+                        <pre class="codecanvas">
 sudo apt-get install g++ make automake autoconf libtool
-                            </pre> 
-                            <p>
-                                Install required dependent packages:
-                            </p>
-                            <pre class="codecanvas">
+                            </pre>
+                        <p>
+                            Install required dependent packages:
+                        </p>
+                        <pre class="codecanvas">
 sudo apt-get install libxml2 libxml2-dev libxml2-utils libaprutil1 libaprutil1-dev apache2-prefork-dev
-                            </pre> 
-                            <p>
-                                Download mod_security source code from <a href="https://github.com/mihaipitu/ModSecurity">GitHub</a>, compile and install:
-                            </p>
-                            <pre class="codecanvas">
+                            </pre>
+
+                        <p>
+                            The native libraries needed for <b>ModSecurity for Java</b> are:
+                        </p>
+                        <ol>
+                            <li>
+                                zlib1 (Windows only)
+                            </li>
+                            <li>
+                                libxml2
+                            </li>
+                            <li>
+                                pcre
+                            </li>
+                            <li>
+                                libapr-1
+                            </li>
+                            <li>
+                                libapriconv-1 (Windows only)
+                            </li>
+                            <li>
+                                libaprutil-1
+                            </li>
+                            <li>
+                                ModSecurityJNI (JNI wrapper for mod_security code)
+                            </li>
+                        </ol>
+
+                        <p>
+                            These native libraries are used by the <a class="code" href="../src/java/org/modsecurity/ModSecurityFilter.java">ModSecurityFilter</a>.
+                        </p>
+                        <br />
+                        <p>
+                            Download mod_security source code from <a href="https://github.com/mihaipitu/ModSecurity">GitHub</a>, compile and install:
+                        </p>
+                        <pre class="codecanvas">
+git clone https://github.com/mihaipitu/ModSecurity.git
 cd mod_security/
 ./autogen.sh
 ./configure --enable-standalone-module --enable-java-module
 make
-                            </pre> 
-                            <p>
-                                Copy compiled library in a convenient folder:
-                            </p>
-                            <pre class="codecanvas">
+                            </pre>
+                        <p>
+                            Copy compiled library in a convenient folder:
+                        </p>
+                        <pre class="codecanvas">
 sudo cp ./java/.libs/libModSecurityJNI.so /usr/lib/
-                            </pre> 
+                            </pre>
+                        <p>
+                            The libModSecurityJNI.so file is the connector that plugs the "standalone" ModSecurity code into the Java application as a Filter.
+                        </p>
+                        <br />
 
+                        <h3>Step 2: Java Web Applications with ModSecurity Filter</h3>
+                        <p>
+                            ModSecurity for Java uses <a href="http://www.oracle.com/technetwork/java/filters-137243.html">Java Filters</a> in order to
+                            intercept Http requests and responses. <b>ModsecurityTestApp</b> is an example of Java EE Web application using the ModSecurity
+                            Filter. To use the ModSecurity filter in your Java web application, you will need to copy either the source .java files or
+                            the compiled .class files into your application.
+                        </p>
+                        <ul>
+                            <li>
+                                <h4>Scenario 1: Add ModSecurity source java files to application and create WAR</h4>
+                                <p>
+                                    Copy the source files from <span class="code">mod_security/java/ModSecurityTestApp/src/</span>
+                                    into your application. By using this option, the ModSecurity Java source code files are compiled
+                                    with the source files from your web application.
+                                </p>
+                                <pre class="codecanvas">
+# pwd
+/tmp/ModSecurity/java/ModSecurityTestApp/src/java/org
+# ls -R
+.:
+apache  modsecurity
+./apache:
+commons
+./apache/commons:
+fileupload
+./apache/commons/fileupload:
+DefaultFileItemFactory.java    DiskFileUpload.java   FileUploadBase.java       MultipartStream.java
+DefaultFileItem.java           FileItemFactory.java  FileUploadException.java  package.html
+DeferredFileOutputStream.java  FileItem.java         FileUpload.java           ThresholdingOutputStream.java
+./modsecurity:
+ModSecurityFilter.java  MsHttpServletRequest.java         MsHttpServletResponse.java  MsOutputStream.java
+ModSecurity.java        MSHttpServletRequestWrapper.java  MsHttpTransaction.java      MsWriter.java
+[root@localhost org]#
+</pre>
+                            </li>
 
-                            <br />
-                            <h3>Java Web Applications with ModSecurity Filter</h3>
-                            <p>
-                                ModSecurity for Java uses <a href="http://www.oracle.com/technetwork/java/filters-137243.html">Java Filters</a> in order to 
-                                intercept Http requests and responses. <b>ModsecurityTestApp</b> is an example of Java EE Web application using the ModSecurity
-                                Filter. To use ModSecurity Filter in your Web application, copy the source files from 
-                                <span class="code">mod_security/java/ModSecurityTestApp/src/</span>
-                                in your application and add the following entry for the filter tag in your <b>web.xml</b> file:    
-                            </p>
+                            <li>
+                                <h4>Scenario 2: Add ModSecurity compiled class files to an already compiled app</h4>
+                                <p>
+                                    If you already have a compiled app and you would like to add in ModSecurity filtering
+                                    without recompiling a new WAR file, you can instead use the compiled .class files.
+                                    Unzip the <span class="code">mod_security/java/ModSecurityTestApp/dist/ModSecurityTestApp.war</span> file
+                                    and copy the <span class="code">/WEB-INF/classes/</span> directory into your own <span class="code">WEB-INF/</span>
+                                    directory.
+                                </p>
+                                <pre class="codecanvas">
+cp -R ModSecurity/java/ModSecurityTestApp/dist/WEB-INF/classes/org/* /opt/tomcat/webapps/WebGoat/WEB-INF/classes/org
+</pre>
+                            </li>
+                        </ul>
+                        <br />
 
-                            <pre class="codecanvas"><code >
+                        <h3>Step 3: Activate the ModSecurityFilter in web.xml</h3>
+                        <p>
+                            Add the following entry for the filter tag in your <b>web.xml</b> file:
+                        </p>
+
+                        <pre class="codecanvas"><code>
 &lt;filter&gt;
         &lt;filter-name&gt;ModSecurityFilter&lt;/filter-name&gt;
 	    &lt;filter-class>org.modsecurity.ModSecurityFilter&lt;/filter-class&gt;
@@ -128,7 +182,6 @@ sudo cp ./java/.libs/libModSecurityJNI.so /usr/lib/
                         Include activated_rules\*.conf
                 --&gt;
             &lt;/init-param&gt;
-
            &lt;!--
            &lt;init-param&gt;
                 &lt;param-name&gt;zlib1&lt;/param-name&gt;
@@ -160,7 +213,6 @@ sudo cp ./java/.libs/libModSecurityJNI.so /usr/lib/
             &lt;/init-param&gt;
             --&gt;
     &lt;/filter&gt;
-
     &lt;filter-mapping&gt;
 	    &lt;filter-name&gt;ModSecurityFilter&lt;/filter-name&gt;
 	    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
@@ -168,80 +220,162 @@ sudo cp ./java/.libs/libModSecurityJNI.so /usr/lib/
 &lt;/filter&gt;
                             </code>
                             </pre>
-
-                            <p>
-                                The ModSecurity Filter makes use of the native libraries written in C/C++ using the JNI technology.
-                                There are two ways of loading native libraries by Java Web Applications:
-                            <ol>
-                                <li>
-                                    <h4>Loading native libraries directly in the ModSecurityFilter</h4>
-                                    <p>
-                                        Although this is easier, it is not recommended because the JVM will raise 
-                                        <span class="code">UnsatisfiedLinkError</span> if the ModSecurity Filter is used in 
-                                        multiple applications within the same server or the application is redeployed while the server is running. 
-                                        The libraries are loaded in the <a class="code" href="../src/java/org/modsecurity/ModSecurity.java">ModSecurity</a> class using 
-                                        <span class="code">System.loadLibrary()</span>. In this case the server has to be started with                                        
-                                        the following VM options:
-                                    </p>
-                                    <pre class="codecanvas">
+                        <br />
+                        <p>
+                            The ModSecurity Filter makes use of the native libraries written in C/C++ using the JNI technology.
+                            There are two ways of loading native libraries by Java Web Applications:
+                        </p>
+                        <ol>
+                            <li>
+                                <h4>Loading native libraries directly in the ModSecurityFilter</h4>
+                                <p>
+                                    Although this is easier, it is not recommended because the JVM will raise
+                                    <span class="code">UnsatisfiedLinkError</span> if the ModSecurity Filter is used in
+                                    multiple applications within the same server or the application is redeployed while the server is running.
+                                    The libraries are loaded in the <a class="code" href="../src/java/org/modsecurity/ModSecurity.java">ModSecurity</a> class using
+                                    <span class="code">System.loadLibrary()</span>. In this case the server has to be started with
+                                    the following VM options:
+                                </p>
+                                <pre class="codecanvas">
 -Djava.library.path=/path/to/libraries/folder/
                                     </pre>
-                                    <p>
-                                        You can specify multiple folders for the <span class="code">java.library.path</span> variable by using
-                                        : (colon) or ; (semi-colon), depending on your environment. Also, the libraries can be loaded using
-                                        their absolute path by uncommenting the <span class="code">init-param</span> elements in the above 
-                                        filter example.
-                                    </p>
-                                </li>
+                                <p>
+                                    You can specify multiple folders for the <span class="code">java.library.path</span> variable by using
+                                    : (colon) or ; (semi-colon), depending on your environment. Also, the libraries can be loaded using
+                                    their absolute path by uncommenting the <span class="code">init-param</span> elements in the above
+                                    filter example.
+                                </p>
+                            </li>
 
-                                <li>
-                                    <h4>Loading native libraries when the Web Server starts</h4>
-                                    <p>
-                                        <a class="code" href="../../ModSecurityLoader/dist/ModSecurityLoader.jar">ModSecurityLoader.jar</a> should be placed
-                                        in the Java server library loader folder (for example, in Tomcat 7: <span class="code">$CATALINA_HOME/lib</span>). 
-                                        The server has to be started with the VM options:
-                                    </p>
-                                    <pre class="codecanvas">
+                            <li>
+                                <h4>Loading native libraries when the Web Server starts</h4>
+                                <p>
+                                    <a class="code" href="../../ModSecurityLoader/dist/ModSecurityLoader.jar">ModSecurityLoader.jar</a> should be placed
+                                    in the Java server library loader folder (for example, in Tomcat 7: <span class="code">$CATALINA_HOME/lib</span>).
+                                    The server has to be started with the VM options:
+                                </p>
+                                <pre class="codecanvas">
 -Djava.library.path=/path/to/libraries/folder/
                                     </pre>
-                                    <p>
-                                        or alternatively by specifying <span class="code">init-param</span> elements with absolute paths
-                                        in the <span class="code">ModSecurityLoaderConfig.xml</span> file.
-                                    </p>
-                                </li>
-                            </ol>
-                            
-                            <br/>
-                            
-                            <h2 id="beanshell">BeanShell scripting with ModSecurity</h2>
-                            <p>
-                                You can use <a href="http://www.beanshell.org/">BeanShell</a> scripts in <span class="code">SecRule</span>
-                                ModSecurity directives using the <span class="code">exec</span> action. First you need to put the 
-                                <span class="code">bsh.jar</span> file (which can be downloaded from <a href="http://www.beanshell.org/download.html">beanshell.org</a>)
-                                into the current directory of your server (for example <span class="code">$CATALINA_HOME/bin</span> in Tomcat).
-                                An example of an <span class="code">exec</span> can be the following:
-                            </p>
-                            
-                            <pre class="codecanvas">
+                                <p>
+                                    or alternatively by specifying <span class="code">init-param</span> elements with absolute paths
+                                    in the <span class="code">ModSecurityLoaderConfig.xml</span> file.
+                                </p>
+                            </li>
+                        </ol>
+
+                        <br />
+
+                        <h3>Step 4: Configure ModSecurity Settings</h3>
+                        <p>
+                            In the web.xml file, you added a path to the main modsecurity.conf file holding directives such as SecRuleEngine, SecAuditEngine, etc...
+                            You should update this file as needed for your environment.
+                        </p>
+                        <pre class="codecanvas">
+# head /root/modsecurity-apache_2.7.2/modsecurity.conf
+# -- Rule engine initialization ----------------------------------------------
+# Enable ModSecurity, attaching it to every transaction. Use detection
+# only to start with, because that minimises the chances of post-installation
+# disruption.
+#
+SecRuleEngine DetectionOnly 
+</pre>
+                        <br />
+                        <h3>Step 5: Add in Rule Files</h3>
+                        <p>
+                            The ModSecurity filter knows how to handle "Apache Include" directives in the "conf" param value.  This means that if you want to create your
+                            own rule files or utilize the OWASP ModSecurity CRS, you should add appropriate Include directives to the main modsecurity.conf file:
+                        </p>
+                        <pre class="codecanvas">
+# tail /root/modsecurity-apache_2.7.2/modsecurity.conf
+# Specify your Unicode Code Point.
+# This mapping is used by the t:urlDecodeUni transformation function
+# to properly map encoded data to your language. Properly setting
+# these directives helps to reduce false positives and negatives.
+#
+#SecUnicodeCodePage 20127
+#SecUnicodeMapFile unicode.mapping
+Include /root/owasp-modsecurity-crs/modsecurity_crs_10_setup.conf
+Include /root/owasp-modsecurity-crs/base_rules/*.conf 
+</pre>
+                        <h3>Step 6: Start Java Server and Confirm ModSecurity Initialization</h3>
+                        <pre class="codecanvas">
+# /opt/apache-tomcat-7.0.42/bin/startup.sh
+Using CATALINA_BASE:   /opt/apache-tomcat-7.0.42
+Using CATALINA_HOME:   /opt/apache-tomcat-7.0.42
+Using CATALINA_TMPDIR: /opt/apache-tomcat-7.0.42/temp
+Using JRE_HOME:        /usr/lib/jvm/java-1.6.0-openjdk
+Using CLASSPATH:       /opt/apache-tomcat-7.0.42/bin/bootstrap.jar:/opt/apache-tomcat-7.0.42/bin/tomcat-juli.jar
+# cat /opt/apache-tomcat-7.0.42/logs/localhost*.log
+Sep 27, 2013 6:35:18 PM org.apache.catalina.core.ApplicationContext log
+INFO: ModSecurity for Java (STABLE)/2.7.5 (http://www.modsecurity.org/) configured.
+Sep 27, 2013 6:35:18 PM org.apache.catalina.core.ApplicationContext log
+INFO: ModSecurity: APR compiled version="1.3.9"; loaded version="1.3.9"
+Sep 27, 2013 6:35:18 PM org.apache.catalina.core.ApplicationContext log
+INFO: ModSecurity: PCRE compiled version="7.8 "; loaded version="7.8 2008-09-05"
+Sep 27, 2013 6:35:18 PM org.apache.catalina.core.ApplicationContext log
+INFO: ModSecurity: LUA compiled version="Lua 5.1"
+Sep 27, 2013 6:35:18 PM org.apache.catalina.core.ApplicationContext log
+INFO: ModSecurity: LIBXML compiled version="2.7.6"
+Sep 27, 2013 6:35:18 PM org.apache.catalina.core.ApplicationContext log
+INFO: ModSecurity started.
+</pre>
+                        <h3>Step 7: Test Rules</h3>
+                        <p>
+                            The next step is to send some example attacks to your application to ensure that the it is working properly.
+                            If you send some XSS attacks for instance, you should see logs similar to the following in the Tomcat logs directory:
+                        </p>
+                        <img src="http://npercoco.typepad.com/.a/6a0133f264aa62970b019affa4378a970b-800wi" />
+
+                        <h3>Step 8: Verify Audit Logging</h3>
+                        <p>
+                            In addition to the short, 1-line alert messages sent to the Tomcat logs, ModSecurity will also generate appropriate Audit log 
+                            entries depending on your configuration.  You can review the corresponding Audit log entry for your test request(s) to see fully 
+                            request/response payloads:
+                        </p>
+                        <img src="http://npercoco.typepad.com/.a/6a0133f264aa62970b019affa43c2f970b-800wi" />
+                        <img src="http://npercoco.typepad.com/.a/6a0133f264aa62970b019affa463c0970c-800wi" />
+                        
+
+                        <h2 id="beanshell">Bonus Testing: BeanShell scripting with ModSecurity</h2>
+                        <p>
+                            You can use <a href="http://www.beanshell.org/">BeanShell</a> scripts in <span class="code">SecRule</span>
+                            ModSecurity directives using the <span class="code">exec</span> action. First you need to put the
+                            <span class="code">bsh.jar</span> file (which can be downloaded from <a href="http://www.beanshell.org/download.html">beanshell.org</a>)
+                            into the current directory of your server (for example <span class="code">$CATALINA_HOME/bin</span> in Tomcat).
+                            An example of an <span class="code">exec</span> can be the following:
+                        </p>
+
+                        <pre class="codecanvas">
+# Alert and Block based on Anomaly Scores
+#
+SecRule TX:ANOMALY_SCORE "@gt 0" \
+    "chain,phase:2,id:'981176',t:none,deny,log,msg:'Inbound Anomaly Score Exceeded (Total Score: %{TX.ANOMALY_SCORE}, SQLi=%{TX.SQL_INJECTION_SCORE}, XSS=%{TX.XSS_SCORE}): Last Matched Message: %{tx.msg}',logdata:'Last Matched Data: %{matched_var}',setvar:tx.inbound_tx_msg=%{tx.msg},setvar:tx.inbound_anomaly_score=%{tx.anomaly_score}"
+        SecRule TX:ANOMALY_SCORE "@ge %{tx.inbound_anomaly_score_level}" chain
+                SecRule TX:ANOMALY_SCORE_BLOCKING "@streq on" chain
+                        SecRule TX:/^\d+\-/ "(.*)" <strong>"setenv:block_session=1,exec:/usr/local/apache/conf/beanshell_script.bsh"</strong>
+
+                            </pre>
+                        <p>
+                            The environment variable set in the <span class="code">SecAction</span> can be accessed in BeanShell scripts
+                            using some pseudo-code like this to instruct the app to block the current session:
+                        </p>
+                        <pre class="codecanvas">
 <code>
-SecAction "setenv:msg=%{rule.msg},exec:/usr/local/apache/conf/beanshell_script.bsh"
+import org.owasp.webgoat.session.WebSession;
+
+System.getenv("block_session");
+if (block_user != null) {
+  session.setAttribute(BLOCKED, "true");
+}
 </code>
                             </pre>
-                            <p>
-                                The environment variable set in the <span class="code">SecAction</span> can be accessed in BeanShell scripts
-                                using:
-                            </p>
-                            <pre class="codecanvas">
-<code>
-System.getenv("msg");
-</code>
-                            </pre>
-                            <br/>
-                            <br/>
-                        </td>
-                    </tr>
-                </table>
-            </div>
+                        <br />
+                        <br />
+                    </td>
+                </tr>
+            </table>
         </div>
-    </body>
+    </div>
+</body>
 </html>
