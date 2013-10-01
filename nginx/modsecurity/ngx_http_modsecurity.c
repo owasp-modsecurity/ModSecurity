@@ -615,7 +615,7 @@ ngx_http_modsecurity_load_headers_out(ngx_http_request_t *r)
         }
 
         ngx_snprintf(content_type, content_type_len,
-                     "%V; charset=%V",
+                     "%V; charset=%V\0",
                      &r->headers_out.content_type,
                      &r->headers_out.charset);
 
