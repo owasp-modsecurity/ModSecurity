@@ -30,6 +30,7 @@ static size_t parse_nqstring(sfilter * sf);
 static size_t parse_xstring(sfilter * sf);
 static size_t parse_bstring(sfilter * sf);
 static size_t parse_estring(sfilter * sf);
+static size_t parse_bword(sfilter * sf);
 
 
 typedef size_t (*pt2Function)(sfilter *sf);
@@ -125,7 +126,7 @@ static const pt2Function char_parse_map[] = {
    &parse_xstring, /* 88 */
    &parse_word, /* 89 */
    &parse_word, /* 90 */
-   &parse_other, /* 91 */
+   &parse_bword, /* 91 */
    &parse_backslash, /* 92 */
    &parse_other, /* 93 */
    &parse_operator1, /* 94 */
@@ -618,6 +619,8 @@ static const keyword_t sql_keywords[] = {
     {"01&VU;", 'F'},
     {"01&VUC", 'F'},
     {"01&VUE", 'F'},
+    {"01(EF(", 'F'},
+    {"01(EKF", 'F'},
     {"01(EKN", 'F'},
     {"01(ENK", 'F'},
     {"01(U(E", 'F'},
@@ -3833,6 +3836,7 @@ static const keyword_t sql_keywords[] = {
     {"0N(1OF", 'F'},
     {"0N(1OS", 'F'},
     {"0N(1OV", 'F'},
+    {"0N(EF(", 'F'},
     {"0N(EKN", 'F'},
     {"0N(ENK", 'F'},
     {"0N(F()", 'F'},
@@ -5525,6 +5529,8 @@ static const keyword_t sql_keywords[] = {
     {"0S&VU;", 'F'},
     {"0S&VUC", 'F'},
     {"0S&VUE", 'F'},
+    {"0S(EF(", 'F'},
+    {"0S(EKF", 'F'},
     {"0S(EKN", 'F'},
     {"0S(ENK", 'F'},
     {"0S(U(E", 'F'},
@@ -7713,6 +7719,8 @@ static const keyword_t sql_keywords[] = {
     {"0V&VU;", 'F'},
     {"0V&VUC", 'F'},
     {"0V&VUE", 'F'},
+    {"0V(EF(", 'F'},
+    {"0V(EKF", 'F'},
     {"0V(EKN", 'F'},
     {"0V(ENK", 'F'},
     {"0V(U(E", 'F'},
@@ -9871,5 +9879,5 @@ static const keyword_t sql_keywords[] = {
     {"||", '&'},
     {"~*", 'o'},
 };
-static const size_t sql_keywords_sz = 9705;
+static const size_t sql_keywords_sz = 9712;
 #endif
