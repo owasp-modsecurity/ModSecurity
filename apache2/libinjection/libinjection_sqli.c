@@ -120,22 +120,6 @@ memchr2(const char *haystack, size_t haystack_len, char c0, char c1)
 }
 
 /**
- * memchr might not exist on some systems
- */
-static const char*
-my_memchr(const char* haystack, size_t hlen, int needle)
-{
-    const char* cur;
-    const char* last =  haystack + hlen;
-    for (cur = haystack; cur < last; ++cur) {
-        if (cur[0] == needle) {
-            return cur;
-        }
-    }
-    return NULL;
-}
-
-/**
  * memmem might not exist on some systems
  */
 static const char *
@@ -885,7 +869,7 @@ static size_t parse_bword(struct libinjection_sqli_state * sf)
 {
     const char *cs = sf->s;
     size_t pos = sf->pos;
-    const char* endptr = my_memchr(cs + pos, sf->slen - pos, ']');
+    const char* endptr = (const char*) memchr(cs + pos, ']', sf->slen - pos);
     if (endptr == NULL) {
         st_assign(sf->current, TYPE_BAREWORD, pos, sf->slen - pos, cs + pos);
         return sf->slen;
