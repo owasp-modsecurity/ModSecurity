@@ -120,6 +120,7 @@ memchr2(const char *haystack, size_t haystack_len, char c0, char c1)
 }
 
 /**
+ * memmem might not exist on some systems
  */
 static const char *
 my_memmem(const char* haystack, size_t hlen, const char* needle, size_t nlen)
@@ -285,9 +286,11 @@ static void st_clear(stoken_t * st)
 static void st_assign_char(stoken_t * st, const char stype, size_t pos, size_t len,
                            const char value)
 {
+    /* done to elimiate unused warning */
+    (void)len;
     st->type = (char) stype;
     st->pos = pos;
-    st->len = len;
+    st->len = 1;
     st->val[0] = value;
     st->val[1] = CHAR_NULL;
 }
@@ -299,7 +302,7 @@ static void st_assign(stoken_t * st, const char stype,
     size_t last = len < MSIZE ? len : (MSIZE - 1);
     st->type = (char) stype;
     st->pos = pos;
-    st->len = len;
+    st->len = last;
     memcpy(st->val, value, last);
     st->val[last] = CHAR_NULL;
 }
@@ -857,6 +860,25 @@ static size_t parse_xstring(struct libinjection_sqli_state *sf)
     return pos + 2 + wlen + 1;
 }
 
+/**
+ * This handles MS SQLSERVER bracket words
+ * http://stackoverflow.com/questions/3551284/sql-serverwhat-do-brackets-mean-around-column-name
+ *
+ */
+static size_t parse_bword(struct libinjection_sqli_state * sf)
+{
+    const char *cs = sf->s;
+    size_t pos = sf->pos;
+    const char* endptr = (const char*) memchr(cs + pos, ']', sf->slen - pos);
+    if (endptr == NULL) {
+        st_assign(sf->current, TYPE_BAREWORD, pos, sf->slen - pos, cs + pos);
+        return sf->slen;
+    } else {
+        st_assign(sf->current, TYPE_BAREWORD, pos, (endptr - cs) - pos + 1, cs + pos);
+        return (endptr - cs) + 1;
+    }
+}
+
 static size_t parse_word(struct libinjection_sqli_state * sf)
 {
     char ch;
@@ -865,7 +887,7 @@ static size_t parse_word(struct libinjection_sqli_state * sf)
     const char *cs = sf->s;
     size_t pos = sf->pos;
     size_t wlen = strlencspn(cs + pos, sf->slen - pos,
-                             " {}<>:\\?=@!#~+-*/&|^%(),';\t\n\v\f\r\"\000");
+                             " []{}<>:\\?=@!#~+-*/&|^%(),';\t\n\v\f\r\"\000");
 
     st_assign(sf->current, TYPE_BAREWORD, pos, wlen, cs + pos);
 
@@ -1720,8 +1742,7 @@ int libinjection_sqli_fold(struct libinjection_sqli_state * sf)
                    (sf->tokenvec[left+2].type == TYPE_NUMBER ||
                     sf->tokenvec[left+2].type == TYPE_BAREWORD ||
                     sf->tokenvec[left+2].type == TYPE_VARIABLE ||
-                    sf->tokenvec[left+2].type == TYPE_STRING ||
-                    sf->tokenvec[left+2].type == TYPE_FUNCTION )) {
+                    sf->tokenvec[left+2].type == TYPE_STRING)) {
             /*
              * interesting case    turn ", -1"  ->> ",1" PLUS we need to back up
              * one token if possible to see if more folding can be done
@@ -1734,6 +1755,19 @@ int libinjection_sqli_fold(struct libinjection_sqli_state * sf)
             /* pos is >= 3 so this is safe */
             assert(pos >= 3);
             pos -= 3;
+            continue;
+        } else if (sf->tokenvec[left].type == TYPE_COMMA &&
+                   st_is_unary_op(&sf->tokenvec[left+1]) &&
+                   sf->tokenvec[left+2].type == TYPE_FUNCTION) {
+
+            /* Seperate case from above since you end up with
+             * 1,-sin(1) --> 1 (1)
+             * Here, just do
+             * 1,-sin(1) --> 1,sin(1)
+             * just remove unary opartor
+             */
+            st_copy(&sf->tokenvec[left+1], &sf->tokenvec[left+2]);
+            pos -= 1;
             continue;
         } else if ((sf->tokenvec[left].type == TYPE_BAREWORD) &&
                    (sf->tokenvec[left+1].type == TYPE_DOT) &&
@@ -2132,10 +2166,10 @@ static int reparse_as_mysql(struct libinjection_sqli_state * sql_state)
 /*
  * This function is mostly use with SWIG
  */
-struct libinjection_sqli_token* libinjection_sqli_get_token(struct libinjection_sqli_state * sql_state,
-                                                            int i)
+struct libinjection_sqli_token*
+libinjection_sqli_get_token(struct libinjection_sqli_state * sql_state, int i)
 {
-    if (i < 0 || i > (int) strlen(sql_state->fingerprint)) {
+    if (i < 0 || i >  LIBINJECTION_SQLI_MAX_TOKENS) {
         return NULL;
     }
     return &(sql_state->tokenvec[i]);
