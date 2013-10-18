@@ -61,7 +61,7 @@ static char *ngx_http_modsecurity_enable(ngx_conf_t *cf, ngx_command_t *cmd, voi
 
 static ngx_http_modsecurity_ctx_t * ngx_http_modsecurity_create_ctx(ngx_http_request_t *r);
 static int ngx_http_modsecurity_drop_action(request_rec *r);
-static void ngx_http_modsecurity_terminate(void *data);
+static void ngx_http_modsecurity_terminate(ngx_cycle_t *cycle);
 static void ngx_http_modsecurity_cleanup(void *data);
 
 static int ngx_http_modsecurity_save_headers_in_visitor(void *data, const char *key, const char *value);
@@ -115,8 +115,8 @@ ngx_module_t ngx_http_modsecurity = {
     ngx_http_modsecurity_init_process, /* init process */
     NULL, /* init thread */
     NULL, /* exit thread */
-    NULL, /* exit process */
-    NULL, /* exit master */
+    ngx_http_modsecurity_terminate, /* exit process */
+    ngx_http_modsecurity_terminate, /* exit master */
     NGX_MODULE_V1_PADDING
 };
 
@@ -886,15 +886,6 @@ static server_rec *modsec_server = NULL;
 static ngx_int_t
 ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
 {
-    ngx_pool_cleanup_t   *cln;
-
-    cln = ngx_pool_cleanup_add(cf->pool, 0);
-    if (cln == NULL) {
-        return NGX_ERROR;
-    }
-
-    cln->handler = ngx_http_modsecurity_terminate;
-
     /*  XXX: temporary hack, nginx uses pcre as well and hijacks these two */
     pcre_malloc = modsec_pcre_malloc;
     pcre_free = modsec_pcre_free;
@@ -922,7 +913,7 @@ ngx_http_modsecurity_preconfiguration(ngx_conf_t *cf)
 
 
 static void
-ngx_http_modsecurity_terminate(void *data)
+ngx_http_modsecurity_terminate(ngx_cycle_t *cycle)
 {
     if (modsec_server) {
         modsecTerminate();
