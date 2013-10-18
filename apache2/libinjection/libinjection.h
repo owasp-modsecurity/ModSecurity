@@ -14,13 +14,6 @@
 extern "C" {
 #endif
 
-/*
- * Version info.
- * See python's normalized version
- * http://www.python.org/dev/peps/pep-0386/#normalizedversion
- */
-#define LIBINJECTION_VERSION "3.7.1"
-
 /**
  * Libinjection's sqli module makes a "normalized"
  * value of the token.  This is the maximum size
@@ -201,6 +194,20 @@ struct libinjection_sqli_token* libinjection_sqli_get_token(
 
 
 typedef struct libinjection_sqli_state sfilter;
+
+
+/*
+ * Version info.
+ *
+ * This is moved into a function to allow SWIG and other auto-generated
+ * binding to not be modified during minor release changes.  We change
+ * change the version number in the c source file, and not regenerated
+ * the binding
+ *
+ * See python's normalized version
+ * http://www.python.org/dev/peps/pep-0386/#normalizedversion
+ */
+const char* libinjection_version();
 
 /**
  *

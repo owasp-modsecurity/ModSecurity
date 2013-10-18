@@ -14,6 +14,8 @@
 #include <assert.h>
 #include <stddef.h>
 
+#define LIBINJECTION_VERSION "3.8.0"
+
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -887,7 +889,7 @@ static size_t parse_word(struct libinjection_sqli_state * sf)
     const char *cs = sf->s;
     size_t pos = sf->pos;
     size_t wlen = strlencspn(cs + pos, sf->slen - pos,
-                             " []{}<>:\\?=@!#~+-*/&|^%(),';\t\n\v\f\r\"\000");
+                             " []{}<>:\\?=@!#~+-*/&|^%(),';\t\n\v\f\r\"\240\000");
 
     st_assign(sf->current, TYPE_BAREWORD, pos, wlen, cs + pos);
 
@@ -1187,6 +1189,16 @@ static size_t parse_number(struct libinjection_sqli_state * sf)
     return pos;
 }
 
+/*
+ * API to return version.  This allows us to increment the version
+ * without having to regenerated the SWIG (or other binding) in minor
+ * releases.
+ */
+const char* libinjection_version()
+{
+    return LIBINJECTION_VERSION;
+}
+
 int libinjection_sqli_tokenize(struct libinjection_sqli_state * sf)
 {
     pt2Function fnptr;
@@ -1218,7 +1230,7 @@ int libinjection_sqli_tokenize(struct libinjection_sqli_state * sf)
         /*
          * get current character
          */
-        const unsigned ch = (unsigned int) (s[*pos]);
+        const unsigned char ch = (unsigned int) (s[*pos]);
 
         /*
          * if not ascii, then continue...
@@ -1226,16 +1238,23 @@ int libinjection_sqli_tokenize(struct libinjection_sqli_state * sf)
          *   it's a string
          */
         if (ch > 127) {
-            fnptr = parse_word;
-        } else {
 
-        /*
-         * look up the parser, and call it
-         *
-         * Porting Note: this is mapping of char to function
-         *   charparsers[ch]()
-         */
-        fnptr = char_parse_map[ch];
+            /* 160 or 0xA0 or octal 240 is "latin1 non-breaking space"
+             * but is treated as a space in mysql.
+             */
+            if (ch == 160) {
+                fnptr = parse_white;
+            } else {
+                fnptr = parse_word;
+            }
+        } else {
+            /*
+             * look up the parser, and call it
+             *
+             * Porting Note: this is mapping of char to function
+             *   charparsers[ch]()
+             */
+            fnptr = char_parse_map[ch];
         }
         *pos = (*fnptr) (sf);
 
