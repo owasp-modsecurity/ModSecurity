@@ -652,7 +652,7 @@ ngx_http_modsecurity_load_headers_out(ngx_http_request_t *r)
         buf = ngx_cpymem(buf, h[i].value.data, h[i].value.len);
         *buf++ = '\0';
 
-        apr_table_setn(req->headers_out, key, value);
+        apr_table_addn(req->headers_out, key, value);
         ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                        "ModSecurity: load headers out: \"%V: %V\"",
                        &h[i].key, &h[i].value);
