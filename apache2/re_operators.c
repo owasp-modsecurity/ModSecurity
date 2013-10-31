@@ -98,9 +98,9 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
     else
         *error_msg = NULL;
 
-    param = apr_pstrdup(rule->ruleset->mp, rule->op_param);//,  &rule->ip_op);
+    param = apr_pstrdup(rule->ruleset->mp, rule->op_param);
 
-    res = ip_list_from_param(rule->ruleset->mp, param, &rule->ip_op,
+    res = ip_tree_from_param(rule->ruleset->mp, param, &rule->ip_op,
         error_msg);
 
     if (res)
@@ -122,7 +122,7 @@ static int msre_op_ipmatch_param_init(msre_rule *rule, char **error_msg) {
 * \retval 0 On No Match
 */
 static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
-    msre_ipmatch *current = rule->ip_op;
+    TreeRoot *rtree = rule->ip_op;
     int res = 0;
 
     if (error_msg == NULL)
@@ -130,12 +130,12 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
     else
         *error_msg = NULL;
 
-    if(current == NULL) {
+    if (rtree == NULL) {
         msr_log(msr, 1, "ipMatch Internal Error: ipmatch value is null.");
         return 0;
     }
 
-    res = list_contains_ip(msr->mp, current, var->value, error_msg);
+    res = tree_contains_ip(msr->mp, rtree, var->value, NULL, error_msg);
 
     if (res < 0) {
         msr_log(msr, 1, "%s", *error_msg);
