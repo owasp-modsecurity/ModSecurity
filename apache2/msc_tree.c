@@ -538,7 +538,7 @@ int TreePrefixNetmask(modsec_rec *msr, TreePrefix *prefix, unsigned int netmask,
     int ret = 0;
 
     if (prefix == NULL) {
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr && msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "TreePrefixNetmask: prefix is NULL.");
         }
         return 0;
@@ -551,19 +551,19 @@ int TreePrefixNetmask(modsec_rec *msr, TreePrefix *prefix, unsigned int netmask,
         if(prefix_data == NULL) return 0;
 
         if (prefix_data->netmask != netmask) {
-            if (msr->txcfg->debuglog_level >= 9) {
+            if (msr && msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "TreePrefixNetmask: Cannot find a prefix with correct netmask.");
             }
             return 0;
         } else {
-            if (msr->txcfg->debuglog_level >= 9) {
+            if (msr && msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "TreePrefixNetmask: Found a prefix with correct netmask.");
             }
             return 1;
         }
     }
 
-    if (msr->txcfg->debuglog_level >= 9) {
+    if (msr && msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "TreePrefixNetmask: Check if a prefix has a the correct netmask");
     }
 
@@ -576,14 +576,14 @@ TreeNode *CPTRetriveNode(modsec_rec *msr, unsigned char *buffer, unsigned int ip
     unsigned int x, y;
 
     if(node == NULL)    {
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr && msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "CPTRetriveNode: Node tree is NULL.");
         }
         return NULL;
     }
 
     if(buffer == NULL)  {
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr && msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "CPTRetriveNode: Empty ip address. Nothing to search for.");
         }
         return NULL;
@@ -602,7 +602,7 @@ TreeNode *CPTRetriveNode(modsec_rec *msr, unsigned char *buffer, unsigned int ip
         }
     }
 
-    if (msr->txcfg->debuglog_level >= 9) {
+    if (msr && msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "CPTRetriveNode: Found the node for provided ip address.");
     }
 
@@ -627,7 +627,7 @@ TreeNode *CPTFindElementIPNetblock(modsec_rec *msr, unsigned char *ipdata, unsig
     node = CPTRetriveParentNode(node);
 
     if (node == NULL)   {
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr && msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "CPTFindElementIPNetblock: Node tree is NULL.");
         }
         return NULL;
@@ -657,14 +657,14 @@ TreeNode *CPTFindElementIPNetblock(modsec_rec *msr, unsigned char *ipdata, unsig
         node = CPTRetriveNode(msr, ipdata, ip_bitmask, node);
 
         if (node && node->bit != ip_bitmask)    {
-            if (msr->txcfg->debuglog_level >= 9) {
+            if (msr && msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "CPTFindElementIPNetblock: Found a tree node but netmask is different.");
             }
             return NULL;
         }
 
         if (node && node->prefix == NULL)   {
-            if (msr->txcfg->debuglog_level >= 9) {
+            if (msr && msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "CPTFindElementIPNetblock: Found a tree node but prefix is NULL.");
             }
             return NULL;
@@ -675,7 +675,7 @@ TreeNode *CPTFindElementIPNetblock(modsec_rec *msr, unsigned char *ipdata, unsig
 
             if ((ip_bitmask % 8) == 0) {
                 if (TreePrefixNetmask(msr, node->prefix, netmask_node->netmasks[j], FALSE)) {
-                    if (msr->txcfg->debuglog_level >= 9) {
+                    if (msr && msr->txcfg->debuglog_level >= 9) {
                         msr_log(msr, 9, "CPTFindElementIPNetblock: Node found for provided ip address");
                     }
                     return node;
@@ -684,7 +684,7 @@ TreeNode *CPTFindElementIPNetblock(modsec_rec *msr, unsigned char *ipdata, unsig
 
             if ((node->prefix->buffer[bytes] & mask) == (ipdata[bytes] & mask)) {
                 if (TreePrefixNetmask(msr, node->prefix, netmask_node->netmasks[j], FALSE)) {
-                    if (msr->txcfg->debuglog_level >= 9) {
+                    if (msr && msr->txcfg->debuglog_level >= 9) {
                         msr_log(msr, 9, "CPTFindElementIPNetblock: Node found for provided ip address");
                     }
                     return node;
@@ -704,14 +704,14 @@ TreeNode *CPTFindElement(modsec_rec *msr, unsigned char *ipdata, unsigned int ip
     unsigned char temp_data[NETMASK_256-1];
 
     if (tree == NULL)   {
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr && msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "CPTFindElement: Tree is NULL. Cannot proceed searching the ip.");
         }
         return node;
     }
 
     if (tree->head == NULL) {
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr && msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "CPTFindElement: Tree head is NULL. Cannot proceed searching the ip.");
         }
         return node;
@@ -720,7 +720,7 @@ TreeNode *CPTFindElement(modsec_rec *msr, unsigned char *ipdata, unsigned int ip
     node = tree->head;
 
     if (ip_bitmask > (NETMASK_256-1))   {
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr && msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "CPTFindElement: Netmask cannot be greater than 255");
         }
         return NULL;
@@ -734,21 +734,21 @@ TreeNode *CPTFindElement(modsec_rec *msr, unsigned char *ipdata, unsigned int ip
     node = CPTRetriveNode(msr, temp_data, ip_bitmask, node);
 
     if (node && (node->bit != ip_bitmask)) {
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr && msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "CPTFindElement: Found a tree node but netmask is different.");
         }
         return NULL;
     }
 
     if(node == NULL)    {
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr && msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "CPTFindElement: Node tree is NULL.");
         }
         return node;
     }
 
     if(node->prefix == NULL)    {
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr && msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "CPTFindElement: Found a tree node but prefix is NULL.");
         }
         return node;
@@ -759,7 +759,7 @@ TreeNode *CPTFindElement(modsec_rec *msr, unsigned char *ipdata, unsigned int ip
 
         if ((ip_bitmask % 8) == 0) {
             if (TreePrefixNetmask(msr, node->prefix, ip_bitmask, TRUE)) {
-                if (msr->txcfg->debuglog_level >= 9) {
+                if (msr && msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "CPTFindElement: Node found for provided ip address");
                 }
                 return node;
@@ -768,7 +768,7 @@ TreeNode *CPTFindElement(modsec_rec *msr, unsigned char *ipdata, unsigned int ip
 
         if ((node->prefix->buffer[bytes] & mask) == (temp_data[bytes] & mask)) {
             if (TreePrefixNetmask(msr, node->prefix, ip_bitmask, TRUE)) {
-                if (msr->txcfg->debuglog_level >= 9) {
+                if (msr && msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "CPTFindElement: Node found for provided ip address");
                 }
                 return node;
@@ -782,14 +782,14 @@ TreeNode *CPTFindElement(modsec_rec *msr, unsigned char *ipdata, unsigned int ip
 TreeNode *CPTIpMatch(modsec_rec *msr, unsigned char *ipdata, CPTTree *tree, int type)   {
 
     if(tree == NULL)  {
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr && msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "CPTIpMatch: Tree is NULL. Cannot proceed searching the ip.");
         }
         return NULL;
     }
 
     if(ipdata == NULL)  {
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr && msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "CPTIpMatch: Empty ip address. Nothing to search for.");
         }
         return NULL;
@@ -797,17 +797,17 @@ TreeNode *CPTIpMatch(modsec_rec *msr, unsigned char *ipdata, CPTTree *tree, int 
 
     switch(type)    {
         case IPV4_TREE:
-            if (msr->txcfg->debuglog_level >= 9) {
+            if (msr && msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "CPTIpMatch: Searching ip type 0x%x", type);
             }
             return CPTFindElement(msr, ipdata, NETMASK_32, tree);
         case IPV6_TREE:
-            if (msr->txcfg->debuglog_level >= 9) {
+            if (msr && msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "CPTIpMatch: Searching ip type 0x%x", type);
             }
             return CPTFindElement(msr, ipdata, NETMASK_128, tree);
         default:
-            if (msr->txcfg->debuglog_level >= 9) {
+            if (msr && msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "CPTIpMatch: Unknown ip type 0x%x", type);
             }
             return NULL;

@@ -64,6 +64,15 @@ unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 int DSOLOCAL status_engine_state = STATUS_ENGINE_DISABLED;
 
 unsigned long int DSOLOCAL conn_read_state_limit = 0;
+TreeRoot DSOLOCAL *conn_read_state_whitelist = 0;
+TreeRoot DSOLOCAL *conn_read_state_suspicious_list = 0;
+msre_ipmatch DSOLOCAL *conn_read_state_whitelist_param = 0;
+msre_ipmatch DSOLOCAL *conn_read_state_suspicious_list_param = 0;
+
+TreeRoot DSOLOCAL *conn_write_state_whitelist = 0;
+TreeRoot DSOLOCAL *conn_write_state_suspicious_list = 0;
+msre_ipmatch DSOLOCAL *conn_write_state_whitelist_param = 0;
+msre_ipmatch DSOLOCAL *conn_write_state_suspicious_list_param = 0;
 
 unsigned long int DSOLOCAL conn_write_state_limit = 0;
 
@@ -1363,29 +1372,30 @@ static int hook_connection_early(conn_rec *conn)
 {
     sb_handle *sb = conn->sbh;
     int i, j;
-    unsigned long int ip_count = 0, ip_count_w = 0;
+    unsigned long int ip_count_r = 0, ip_count_w = 0;
+    char *error_msg;
     worker_score *ws_record = NULL;
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
     ap_sb_handle_t *sbh = NULL;
+    char *client_ip = conn->client_ip;
+#else
+    char *client_ip = conn->remote_ip;
 #endif
 
-    if(sb != NULL && (conn_read_state_limit > 0 || conn_write_state_limit > 0))   {
+    if (sb != NULL && (conn_read_state_limit > 0 || conn_write_state_limit > 0)) {
 
         ws_record = &ap_scoreboard_image->servers[sb->child_num][sb->thread_num];
-        if(ws_record == NULL)
+        if (ws_record == NULL)
             return DECLINED;
 
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-        apr_cpystrn(ws_record->client, conn->client_ip, sizeof(ws_record->client));
-#else
-        apr_cpystrn(ws_record->client, conn->remote_ip, sizeof(ws_record->client));
-#endif
+        apr_cpystrn(ws_record->client, client_ip, sizeof(ws_record->client));
+
         for (i = 0; i < server_limit; ++i) {
             for (j = 0; j < thread_limit; ++j) {
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
                 sbh = conn->sbh;
-                if (sbh == NULL)        {
+                if (sbh == NULL) {
                     return DECLINED;
                 }
 
@@ -1394,27 +1404,19 @@ static int hook_connection_early(conn_rec *conn)
                 ws_record = ap_get_scoreboard_worker(i, j);
 #endif
 
-                if(ws_record == NULL)
+                if (ws_record == NULL)
                     return DECLINED;
 
                 switch (ws_record->status) {
                     case SERVER_BUSY_READ:
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-                        if (strcmp(conn->client_ip, ws_record->client) == 0)
-                            ip_count++;
-#else
-                        if (strcmp(conn->remote_ip, ws_record->client) == 0)
-                            ip_count++;
-#endif
+                        if (strcmp(client_ip, ws_record->client) == 0)
+                            ip_count_r++;
                         break;
+
                     case SERVER_BUSY_WRITE:
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-                        if (strcmp(conn->client_ip, ws_record->client) == 0)
+                        if (strcmp(client_ip, ws_record->client) == 0)
                             ip_count_w++;
-#else
-                        if (strcmp(conn->remote_ip, ws_record->client) == 0)
-                            ip_count_w++;
-#endif
+
                         break;
                     default:
                         break;
@@ -1422,22 +1424,76 @@ static int hook_connection_early(conn_rec *conn)
             }
         }
 
-        if ((conn_read_state_limit > 0) && (ip_count > conn_read_state_limit)) {
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in READ state from %s - Possible DoS Consumption Attack [Rejected]", ip_count,conn_read_state_limit,conn->client_ip);
-#else
-            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in READ state from %s - Possible DoS Consumption Attack [Rejected]", ip_count,conn_read_state_limit,conn->remote_ip);
-#endif
-            return OK;
-        } else if ((conn_write_state_limit > 0) && (ip_count_w > conn_write_state_limit)) {
-#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 2
-            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in WRITE state from %s - Possible DoS Consumption Attack [Rejected]", ip_count_w,conn_write_state_limit,conn->client_ip);
-#else
-            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Access denied with code 400. Too many threads [%ld] of %ld allowed in WRITE state from %s - Possible DoS Consumption Attack [Rejected]", ip_count_w,conn_write_state_limit,conn->remote_ip);
-#endif
-            return OK;
-        } else {
-            return DECLINED;
+
+        if (conn_read_state_limit > 0 && ip_count_r > conn_read_state_limit)
+        {
+            if (conn_read_state_suspicious_list &&
+                (!((tree_contains_ip(conn->pool,
+                   conn_read_state_suspicious_list, client_ip, NULL, &error_msg) <= 0) ||
+                (list_contains_ip(conn->pool,
+                   conn_read_state_suspicious_list_param, client_ip, &error_msg) <= 0))))
+            {
+                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, 
+                    "ModSecurity: Too many threads [%ld] of %ld allowed in " \
+                    "READ state from %s - There is a suspission list but " \
+                    "that IP is not part of it, access granted", ip_count_r,
+                    conn_read_state_limit, client_ip);
+            }
+
+            else if ((tree_contains_ip(conn->pool,
+                conn_read_state_whitelist, client_ip, NULL, &error_msg) > 0) ||
+                (list_contains_ip(conn->pool,
+                    conn_read_state_whitelist_param, client_ip, &error_msg) > 0))
+            {
+                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                    "ModSecurity: Too many threads [%ld] of %ld allowed in " \
+                    "READ state from %s - Ip is on whitelist, access granted",
+                    ip_count_r, conn_read_state_limit, client_ip);
+            }
+            else
+            {
+                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                    "ModSecurity: Access denied with code 400. Too many " \
+                    "threads [%ld] of %ld allowed in READ state from %s - " \
+                    "Possible DoS Consumption Attack [Rejected]", ip_count_r,
+                    conn_read_state_limit, client_ip);
+                return OK;
+            }
+        }
+
+        if (conn_write_state_limit > 0 && ip_count_w > conn_write_state_limit)
+        {
+            if (conn_write_state_suspicious_list &&
+                (!((tree_contains_ip(conn->pool,
+                    conn_write_state_suspicious_list, client_ip, NULL, &error_msg) <= 0) ||
+                (list_contains_ip(conn->pool,
+                    conn_write_state_suspicious_list_param, client_ip, &error_msg) <= 0))))
+            {
+                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                    "ModSecurity: Too many threads [%ld] of %ld allowed in " \
+                    "WRITE state from %s - There is a suspission list but " \
+                    "that IP is not part of it, access granted", ip_count_w,
+                    conn_read_state_limit, client_ip);
+            }
+            else if ((tree_contains_ip(conn->pool,
+                conn_write_state_whitelist, client_ip, NULL, &error_msg) > 0) ||
+                (list_contains_ip(conn->pool,
+                    conn_write_state_whitelist_param, client_ip, &error_msg) > 0))
+            {
+                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                    "ModSecurity: Too many threads [%ld] of %ld allowed in " \
+                    "WRITE state from %s - Ip is on whitelist, access granted",
+                    ip_count_w, conn_read_state_limit, client_ip);
+            }
+            else
+            {
+                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                    "ModSecurity: Access denied with code 400. Too many " \
+                    "threads [%ld] of %ld allowed in WRITE state from %s - " \
+                    "Possible DoS Consumption Attack [Rejected]", ip_count_w,
+                    conn_write_state_limit, client_ip);
+                return OK;
+            }
         }
     }
 

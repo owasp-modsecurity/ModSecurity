@@ -2389,6 +2389,7 @@ char *construct_single_var(modsec_rec *msr, char *name) {
     return (char *)vx->value;
 }
 
+<<<<<<< HEAD
 
 /**
  * @brief Transforms an apr_array_header_t to a text buffer
@@ -2452,5 +2453,236 @@ int msc_headers_to_buffer(const apr_array_header_t *arr, char *buffer,
 
 not_enough_memory:
     return headers_length;
+}
+
+int ip_tree_from_file(TreeRoot **rtree_, char *uri,
+    apr_pool_t *mp, char **error_msg)
+{
+    TreeNode *tnode = NULL;
+    apr_status_t rc;
+    int line = 0;
+    apr_file_t *fd;
+    char *start;
+    char *end;
+    char buf[HUGE_STRING_LEN + 1]; // FIXME: 2013-10-29 zimmerle: dynamic?
+    char errstr[1024];             //
+    TreeRoot *rtree;
+
+    rtree = apr_palloc(mp, sizeof(TreeRoot));
+    if (rtree == NULL)
+    {
+        *error_msg = apr_psprintf(mp, "Failed allocating " \
+            "memory to TreeRoot.");
+        return -1;
+    }
+    memset(rtree, 0, sizeof(TreeRoot));
+
+    rtree->ipv4_tree = CPTCreateRadixTree(mp);
+    if (rtree->ipv4_tree == NULL)
+    {
+        *error_msg = apr_psprintf(mp, "ipmatchFromFile: Tree initialization " \
+            "failed.");
+        return -1;
+    }
+
+    rtree->ipv6_tree = CPTCreateRadixTree(mp);
+    if (rtree->ipv6_tree == NULL)
+    {
+        *error_msg = apr_psprintf(mp, "ipmatchFromFile: Tree initialization " \
+            "failed.");
+        return -1;
+    }
+
+    rc = apr_file_open(&fd, uri, APR_READ | APR_BUFFERED | APR_FILE_NOCLEANUP,
+        0, mp);
+
+    if (rc != APR_SUCCESS)
+    {
+        *error_msg = apr_psprintf(mp, "Could not open ipmatch file \"%s\": %s",
+            uri, apr_strerror(rc, errstr, 1024));
+        return -1;
+    }
+
+    while ((rc = apr_file_gets(buf, HUGE_STRING_LEN, fd)) != APR_EOF)
+    {
+        line++;
+        if (rc != APR_SUCCESS)
+        {
+            *error_msg = apr_psprintf(mp, "Could not read \"%s\" line %d: %s", 
+                uri, line, apr_strerror(rc, errstr, 1024));
+            return -1;
+        }
+
+        start = buf;
+
+        while ((apr_isspace(*start) != 0) && (*start != '\0'))
+        {
+            start++;
+        }
+
+        for (end = start; end != NULL || *end != '\0' || *end != '\n'; end++)
+        {
+            if (apr_isxdigit(*end) || *end == '.' || *end == '/' || *end == ':')
+            {
+                continue;
+            }
+
+            if (*end != '\n')
+            {
+                *error_msg = apr_psprintf(mp, "Invalid char \"%c\" in line %d " \
+                    "of file %s", *end, line, uri);
+            }
+
+            break;
+        }
+
+        *end = '\0';
+
+        if ((start == end) || (*start == '#'))
+        {
+            continue;
+        }
+
+        if (strchr(start, ':') == NULL)
+        {
+            tnode = TreeAddIP(start, rtree->ipv4_tree, IPV4_TREE);
+        }
+        else
+        {
+            tnode = TreeAddIP(start, rtree->ipv6_tree, IPV6_TREE);
+        }
+
+        if (tnode == NULL)
+        {
+            *error_msg = apr_psprintf(mp, "Could not add entry " \
+                "\"%s\" in line %d of file %s to IP list", start, line, uri);
+            return -1;
+        }
+    }
+
+    if (fd != NULL)
+    {
+        apr_file_close(fd);
+    }
+
+    *rtree_ = rtree;
+
+    return 0;
+}
+
+int tree_contains_ip(apr_pool_t *mp, TreeRoot *rtree,
+    const char *value, modsec_rec *msr, char **error_msg)
+{
+    struct in_addr in;
+#if APR_HAVE_IPV6
+    struct in6_addr in6;
+#endif
+
+    if (rtree == NULL)
+    {
+        return 0;
+    }
+
+    if (strchr(value, ':') == NULL) {
+        if (inet_pton(AF_INET, value, &in) <= 0) {
+            *error_msg = apr_psprintf(mp, "IPmatchFromFile: bad IPv4 " \
+                "specification \"%s\".", value);
+            return -1;
+        }
+
+        if (CPTIpMatch(msr, (unsigned char *)&in.s_addr, rtree->ipv4_tree,
+            IPV4_TREE) != NULL) {
+            return 1;
+        }
+    }
+#if APR_HAVE_IPV6
+    else {
+        if (inet_pton(AF_INET6, value, &in6) <= 0) {
+            *error_msg = apr_psprintf(mp, "IPmatchFromFile: bad IPv6 " \
+                "specification \"%s\".", value);
+            return -1;
+        }
+
+        if (CPTIpMatch(msr, (unsigned char *)&in6.s6_addr, rtree->ipv6_tree,
+            IPV6_TREE) != NULL) {
+            return 1;
+        }
+    }
+#endif
+
+    return 0;
+}
+
+int ip_list_from_param(apr_pool_t *pool,
+    char *param, msre_ipmatch **last, char **error_msg)
+{
+    char *saved = NULL;
+    char *str = NULL;
+    apr_status_t rv;
+    msre_ipmatch *current;
+
+    str = apr_strtok(param, ",", &saved);
+    while( str != NULL)  {
+        const char *ipstr, *mask, *sep;
+
+        /* get the IP address and mask strings */
+        sep = strchr(str, '/');
+        if (sep) {
+            ipstr = apr_pstrndup(pool, str, (sep - str) );
+            mask  = apr_pstrdup(pool, (sep + 1) );
+        }
+        else {
+            ipstr = apr_pstrdup(pool, str);
+            mask = NULL;
+        }
+        /* create a new msre_ipmatch containing a new apr_ipsubnet_t*, and add it to the linked list */
+        current = apr_pcalloc(pool, sizeof(msre_ipmatch));
+        rv = apr_ipsubnet_create(&current->ipsubnet, ipstr, mask, pool);
+        if ( rv != APR_SUCCESS ) {
+            char msgbuf[120];
+            apr_strerror(rv, msgbuf, sizeof msgbuf);
+            *error_msg = apr_pstrcat(pool, "Error: ", msgbuf, NULL);
+            return -1;
+        }
+        current->address = str;
+        current->next = NULL;
+        *last = current;
+        last = &current->next;
+
+        str = apr_strtok(NULL, ",",&saved);
+    }
+
+    return 0;
+}
+
+int list_contains_ip(apr_pool_t *mp, msre_ipmatch *current,
+    const char *value, char **error_msg)
+{
+    apr_sockaddr_t *sa;
+
+    if (current == NULL)
+    {
+        return 0;
+    }
+
+    /* create an apr_sockaddr_t for the value string */
+    if (apr_sockaddr_info_get(&sa, value,
+       APR_UNSPEC, 0, 0, mp) != APR_SUCCESS ) {
+        *error_msg = apr_psprintf(mp, "ipMatch Internal Error: Invalid " \
+            "ip address.");
+        return -1;
+    }
+
+    /* look through the linked list for a match */
+    while (current) {
+        if (apr_ipsubnet_test(current->ipsubnet, sa)) {
+            *error_msg = apr_psprintf(mp, "IPmatch \"%s\" matched \"%s\"",
+                value, current->address);
+            return 1;
+        }
+        current = current->next;
+    }
+
+    return 0;
 }
 

@@ -27,6 +27,7 @@
 
 #include "modsecurity.h"
 #include "re.h"
+#include "msc_tree.h"
 
 #ifdef WIN32
 #include <ws2tcpip.h>
@@ -148,4 +149,17 @@ unsigned char DSOLOCAL is_netmask_v4(char *ip_strv4);
 unsigned char DSOLOCAL is_netmask_v6(char *ip_strv6);
 
 int DSOLOCAL msc_headers_to_buffer(const apr_array_header_t *arr, char *buffer, int max_length);
+
+int DSOLOCAL ip_tree_from_file(TreeRoot **rtree, char *uri,
+    apr_pool_t *mp, char **error_msg);
+
+int DSOLOCAL tree_contains_ip(apr_pool_t *mp, TreeRoot *rtree,
+    const char *value, modsec_rec *msr, char **error_msg);
+
+int DSOLOCAL ip_list_from_param(apr_pool_t *pool,
+    char *param, msre_ipmatch **last, char **error_msg);
+
+int list_contains_ip(apr_pool_t *mp, msre_ipmatch *current,
+    const char *value, char **error_msg);
+
 #endif
