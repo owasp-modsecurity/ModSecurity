@@ -63,6 +63,8 @@ unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
 int DSOLOCAL status_engine_state = STATUS_ENGINE_DISABLED;
 
+int DSOLOCAL conn_limits_filter_state = 0;
+
 unsigned long int DSOLOCAL conn_read_state_limit = 0;
 TreeRoot DSOLOCAL *conn_read_state_whitelist = 0;
 TreeRoot DSOLOCAL *conn_read_state_suspicious_list = 0;
@@ -1419,27 +1421,28 @@ static int hook_connection_early(conn_rec *conn)
             }
         }
 
-
         if (conn_read_state_limit > 0 && ip_count_r > conn_read_state_limit)
         {
             if (conn_read_state_suspicious_list &&
                 (tree_contains_ip(conn->pool,
                    conn_read_state_suspicious_list, client_ip, NULL, &error_msg) <= 0))
             {
-                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, 
-                    "ModSecurity: Too many threads [%ld] of %ld allowed in " \
-                    "READ state from %s - There is a suspission list but " \
-                    "that IP is not part of it, access granted", ip_count_r,
-                    conn_read_state_limit, client_ip);
+                if (conn_limits_filter_state == MODSEC_DETECTION_ONLY)
+                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, 
+                        "ModSecurity: Too many threads [%ld] of %ld allowed " \
+                        "in READ state from %s - There is a suspission list " \
+                        "but that IP is not part of it, access granted",
+                        ip_count_r, conn_read_state_limit, client_ip);
             }
-
             else if (tree_contains_ip(conn->pool,
                 conn_read_state_whitelist, client_ip, NULL, &error_msg) > 0)
             {
-                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
-                    "ModSecurity: Too many threads [%ld] of %ld allowed in " \
-                    "READ state from %s - Ip is on whitelist, access granted",
-                    ip_count_r, conn_read_state_limit, client_ip);
+                if (conn_limits_filter_state == MODSEC_DETECTION_ONLY)
+                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                        "ModSecurity: Too many threads [%ld] of %ld allowed " \
+                        "in READ state from %s - Ip is on whitelist, access " \
+                        "granted", ip_count_r, conn_read_state_limit,
+                        client_ip);
             }
             else
             {
@@ -1448,7 +1451,9 @@ static int hook_connection_early(conn_rec *conn)
                     "threads [%ld] of %ld allowed in READ state from %s - " \
                     "Possible DoS Consumption Attack [Rejected]", ip_count_r,
                     conn_read_state_limit, client_ip);
-                return OK;
+
+                if (conn_limits_filter_state == MODSEC_ENABLED)
+                    return OK;
             }
         }
 
@@ -1458,19 +1463,22 @@ static int hook_connection_early(conn_rec *conn)
                 (tree_contains_ip(conn->pool,
                     conn_write_state_suspicious_list, client_ip, NULL, &error_msg) <= 0))
             {
-                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
-                    "ModSecurity: Too many threads [%ld] of %ld allowed in " \
-                    "WRITE state from %s - There is a suspission list but " \
-                    "that IP is not part of it, access granted", ip_count_w,
-                    conn_read_state_limit, client_ip);
+                if (conn_limits_filter_state == MODSEC_DETECTION_ONLY)
+                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                        "ModSecurity: Too many threads [%ld] of %ld allowed " \
+                        "in WRITE state from %s - There is a suspission list " \
+                        "but that IP is not part of it, access granted",
+                        ip_count_w, conn_read_state_limit, client_ip);
             }
             else if (tree_contains_ip(conn->pool,
                 conn_write_state_whitelist, client_ip, NULL, &error_msg) > 0)
             {
-                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
-                    "ModSecurity: Too many threads [%ld] of %ld allowed in " \
-                    "WRITE state from %s - Ip is on whitelist, access granted",
-                    ip_count_w, conn_read_state_limit, client_ip);
+                if (conn_limits_filter_state == MODSEC_DETECTION_ONLY)
+                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                        "ModSecurity: Too many threads [%ld] of %ld allowed " \
+                        "in WRITE state from %s - Ip is on whitelist, " \
+                        "access granted", ip_count_w, conn_read_state_limit,
+                        client_ip);
             }
             else
             {
@@ -1479,7 +1487,9 @@ static int hook_connection_early(conn_rec *conn)
                     "threads [%ld] of %ld allowed in WRITE state from %s - " \
                     "Possible DoS Consumption Attack [Rejected]", ip_count_w,
                     conn_write_state_limit, client_ip);
-                return OK;
+
+                if (!conn_limits_filter_state == MODSEC_ENABLED)
+                    return OK;
             }
         }
     }
