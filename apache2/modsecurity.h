@@ -143,6 +143,8 @@ extern DSOLOCAL unsigned long int msc_pcre_match_limit;
 
 extern DSOLOCAL unsigned long int msc_pcre_match_limit_recursion;
 
+extern DSOLOCAL int conn_limits_filter_state;
+
 extern DSOLOCAL unsigned long int conn_read_state_limit;
 extern DSOLOCAL TreeRoot *conn_read_state_whitelist;
 extern DSOLOCAL TreeRoot *conn_read_state_suspicious_list;
