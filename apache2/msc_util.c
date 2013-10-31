@@ -2547,11 +2547,12 @@ int ip_tree_from_file(TreeRoot **rtree_, char *uri,
         {
             tnode = TreeAddIP(start, rtree->ipv4_tree, IPV4_TREE);
         }
+#if APR_HAVE_IPV6
         else
         {
             tnode = TreeAddIP(start, rtree->ipv6_tree, IPV6_TREE);
         }
-
+#endif
         if (tnode == NULL)
         {
             *error_msg = apr_psprintf(mp, "Could not add entry " \
