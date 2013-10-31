@@ -2389,8 +2389,6 @@ char *construct_single_var(modsec_rec *msr, char *name) {
     return (char *)vx->value;
 }
 
-<<<<<<< HEAD
-
 /**
  * @brief Transforms an apr_array_header_t to a text buffer
  *
@@ -2455,7 +2453,44 @@ not_enough_memory:
     return headers_length;
 }
 
-int ip_tree_from_file(TreeRoot **rtree_, char *uri,
+
+int create_radix_tree(apr_pool_t *mp, TreeRoot **rtree, char **error_msg)
+{
+    *rtree = apr_palloc(mp, sizeof(TreeRoot));
+    if (*rtree == NULL)
+    {
+        *error_msg = apr_psprintf(mp, "Failed allocating " \
+            "memory to TreeRoot.");
+        goto root_node_failed;
+    }
+    memset(*rtree, 0, sizeof(TreeRoot));
+
+    (*rtree)->ipv4_tree = CPTCreateRadixTree(mp);
+    if ((*rtree)->ipv4_tree == NULL)
+    {
+        *error_msg = apr_psprintf(mp, "IPmatch: Tree initialization " \
+            "failed.");
+        goto ipv4_tree_failed;
+    }
+
+    (*rtree)->ipv6_tree = CPTCreateRadixTree(mp);
+    if ((*rtree)->ipv6_tree == NULL)
+    {
+        *error_msg = apr_psprintf(mp, "IPmatch: Tree initialization " \
+            "failed.");
+        goto ipv6_tree_failed;
+    }
+
+    return 0;
+
+ipv6_tree_failed:
+ipv4_tree_failed:
+root_node_failed:
+    return -1;
+}
+
+
+int ip_tree_from_file(TreeRoot **rtree, char *uri,
     apr_pool_t *mp, char **error_msg)
 {
     TreeNode *tnode = NULL;
@@ -2466,30 +2501,9 @@ int ip_tree_from_file(TreeRoot **rtree_, char *uri,
     char *end;
     char buf[HUGE_STRING_LEN + 1]; // FIXME: 2013-10-29 zimmerle: dynamic?
     char errstr[1024];             //
-    TreeRoot *rtree;
 
-    rtree = apr_palloc(mp, sizeof(TreeRoot));
-    if (rtree == NULL)
+    if (create_radix_tree(mp, rtree, error_msg))
     {
-        *error_msg = apr_psprintf(mp, "Failed allocating " \
-            "memory to TreeRoot.");
-        return -1;
-    }
-    memset(rtree, 0, sizeof(TreeRoot));
-
-    rtree->ipv4_tree = CPTCreateRadixTree(mp);
-    if (rtree->ipv4_tree == NULL)
-    {
-        *error_msg = apr_psprintf(mp, "ipmatchFromFile: Tree initialization " \
-            "failed.");
-        return -1;
-    }
-
-    rtree->ipv6_tree = CPTCreateRadixTree(mp);
-    if (rtree->ipv6_tree == NULL)
-    {
-        *error_msg = apr_psprintf(mp, "ipmatchFromFile: Tree initialization " \
-            "failed.");
         return -1;
     }
 
@@ -2545,14 +2559,15 @@ int ip_tree_from_file(TreeRoot **rtree_, char *uri,
 
         if (strchr(start, ':') == NULL)
         {
-            tnode = TreeAddIP(start, rtree->ipv4_tree, IPV4_TREE);
+            tnode = TreeAddIP(start, (*rtree)->ipv4_tree, IPV4_TREE);
         }
 #if APR_HAVE_IPV6
         else
         {
-            tnode = TreeAddIP(start, rtree->ipv6_tree, IPV6_TREE);
+            tnode = TreeAddIP(start, (*rtree)->ipv6_tree, IPV6_TREE);
         }
 #endif
+ 
         if (tnode == NULL)
         {
             *error_msg = apr_psprintf(mp, "Could not add entry " \
@@ -2565,8 +2580,6 @@ int ip_tree_from_file(TreeRoot **rtree_, char *uri,
     {
         apr_file_close(fd);
     }
-
-    *rtree_ = rtree;
 
     return 0;
 }
@@ -2586,7 +2599,7 @@ int tree_contains_ip(apr_pool_t *mp, TreeRoot *rtree,
 
     if (strchr(value, ':') == NULL) {
         if (inet_pton(AF_INET, value, &in) <= 0) {
-            *error_msg = apr_psprintf(mp, "IPmatchFromFile: bad IPv4 " \
+            *error_msg = apr_psprintf(mp, "IPmatch: bad IPv4 " \
                 "specification \"%s\".", value);
             return -1;
         }
@@ -2599,7 +2612,7 @@ int tree_contains_ip(apr_pool_t *mp, TreeRoot *rtree,
 #if APR_HAVE_IPV6
     else {
         if (inet_pton(AF_INET6, value, &in6) <= 0) {
-            *error_msg = apr_psprintf(mp, "IPmatchFromFile: bad IPv6 " \
+            *error_msg = apr_psprintf(mp, "IPmatch: bad IPv6 " \
                 "specification \"%s\".", value);
             return -1;
         }
@@ -2614,74 +2627,39 @@ int tree_contains_ip(apr_pool_t *mp, TreeRoot *rtree,
     return 0;
 }
 
-int ip_list_from_param(apr_pool_t *pool,
-    char *param, msre_ipmatch **last, char **error_msg)
+int ip_tree_from_param(apr_pool_t *mp,
+    char *param, TreeRoot **rtree, char **error_msg)
 {
     char *saved = NULL;
     char *str = NULL;
-    apr_status_t rv;
-    msre_ipmatch *current;
+    TreeNode *tnode = NULL;
 
-    str = apr_strtok(param, ",", &saved);
-    while( str != NULL)  {
-        const char *ipstr, *mask, *sep;
-
-        /* get the IP address and mask strings */
-        sep = strchr(str, '/');
-        if (sep) {
-            ipstr = apr_pstrndup(pool, str, (sep - str) );
-            mask  = apr_pstrdup(pool, (sep + 1) );
-        }
-        else {
-            ipstr = apr_pstrdup(pool, str);
-            mask = NULL;
-        }
-        /* create a new msre_ipmatch containing a new apr_ipsubnet_t*, and add it to the linked list */
-        current = apr_pcalloc(pool, sizeof(msre_ipmatch));
-        rv = apr_ipsubnet_create(&current->ipsubnet, ipstr, mask, pool);
-        if ( rv != APR_SUCCESS ) {
-            char msgbuf[120];
-            apr_strerror(rv, msgbuf, sizeof msgbuf);
-            *error_msg = apr_pstrcat(pool, "Error: ", msgbuf, NULL);
-            return -1;
-        }
-        current->address = str;
-        current->next = NULL;
-        *last = current;
-        last = &current->next;
-
-        str = apr_strtok(NULL, ",",&saved);
-    }
-
-    return 0;
-}
-
-int list_contains_ip(apr_pool_t *mp, msre_ipmatch *current,
-    const char *value, char **error_msg)
-{
-    apr_sockaddr_t *sa;
-
-    if (current == NULL)
+    if (create_radix_tree(mp, rtree, error_msg))
     {
-        return 0;
-    }
-
-    /* create an apr_sockaddr_t for the value string */
-    if (apr_sockaddr_info_get(&sa, value,
-       APR_UNSPEC, 0, 0, mp) != APR_SUCCESS ) {
-        *error_msg = apr_psprintf(mp, "ipMatch Internal Error: Invalid " \
-            "ip address.");
         return -1;
     }
 
-    /* look through the linked list for a match */
-    while (current) {
-        if (apr_ipsubnet_test(current->ipsubnet, sa)) {
-            *error_msg = apr_psprintf(mp, "IPmatch \"%s\" matched \"%s\"",
-                value, current->address);
-            return 1;
+    str = apr_strtok(param, ",", &saved);
+    while (str != NULL)
+    {
+        if (strchr(str, ':') == NULL)
+        {
+            tnode = TreeAddIP(str, (*rtree)->ipv4_tree, IPV4_TREE);
         }
-        current = current->next;
+#if APR_HAVE_IPV6
+        else
+        {
+            tnode = TreeAddIP(str, (*rtree)->ipv6_tree, IPV6_TREE);
+        }
+#endif
+        if (tnode == NULL)
+        {
+            *error_msg = apr_psprintf(mp, "Could not add entry " \
+                "\"%s\" from: %s.", str, param);
+            return -1;
+        }
+
+        str = apr_strtok(NULL, ",", &saved);
     }
 
     return 0;

@@ -1671,8 +1671,7 @@ static const char *cmd_rule_perf_time(cmd_parms *cmd, void *_dcfg,
 }
 
 char *parser_conn_limits_operator(apr_pool_t *mp, const char *p2,
-    TreeRoot **whitelist, msre_ipmatch **whitelist_param,
-    TreeRoot **suspicious_list, msre_ipmatch **suspicious_list_param,
+    TreeRoot **whitelist, TreeRoot **suspicious_list, 
     const char *filename)
 {
     int res = 0;
@@ -1691,22 +1690,18 @@ char *parser_conn_limits_operator(apr_pool_t *mp, const char *p2,
     if ((strncasecmp(p2, "!@ipMatchFromFile", strlen("!@ipMatchFromFile")) == 0) ||
         (strncasecmp(p2, "!@ipMatchF", strlen("!@ipMatchF")) == 0)) {
 
-        res = ip_tree_from_file(whitelist,
-            file, mp, NULL);
+        res = ip_tree_from_file(whitelist, file, mp, &error_msg);
     }
     else if (strncasecmp(p2, "!@ipMatch", strlen("!@ipMatch")) == 0) {
-        res = ip_list_from_param(mp, param,
-            whitelist_param, &error_msg);
+        res = ip_tree_from_param(mp, param, whitelist, &error_msg);
     }
     else if ((strncasecmp(p2, "@ipMatchFromFile", strlen("@ipMatchFromFile")) == 0) ||
         (strncasecmp(p2, "@ipMatchF", strlen("@ipMatchF")) == 0)) {
 
-        res = ip_tree_from_file(suspicious_list,
-            file, mp, NULL);
+        res = ip_tree_from_file(suspicious_list, file, mp, &error_msg);
     }
     else if (strncasecmp(p2, "@ipMatch", strlen("@ipMatch")) == 0) {
-        res = ip_list_from_param(mp, param,
-            suspicious_list_param, &error_msg);
+        res = ip_tree_from_param(mp, param, suspicious_list, &error_msg);
     }
     else {
         return apr_psprintf(mp, "ModSecurity: Invalid operator for " \
@@ -1757,9 +1752,8 @@ static const char *cmd_conn_read_state_limit(cmd_parms *cmd, void *_dcfg,
 
     if (p2 != NULL) {
         char *param = parser_conn_limits_operator(cmd->pool, p2,
-            &conn_read_state_whitelist, &conn_read_state_whitelist_param,
-            &conn_read_state_suspicious_list,
-            &conn_read_state_suspicious_list_param, cmd->directive->filename);
+            &conn_read_state_whitelist, &conn_read_state_suspicious_list,
+            cmd->directive->filename);
 
         if (param)
             return param;
@@ -1797,9 +1791,8 @@ static const char *cmd_conn_write_state_limit(cmd_parms *cmd, void *_dcfg,
 
     if (p2 != NULL) {
         char *param = parser_conn_limits_operator(cmd->pool, p2,
-            &conn_write_state_whitelist, &conn_write_state_whitelist_param,
-            &conn_write_state_suspicious_list,
-            &conn_write_state_suspicious_list_param, cmd->directive->filename);
+            &conn_write_state_whitelist, &conn_write_state_suspicious_list,
+            cmd->directive->filename);
 
         if (param)
             return param;

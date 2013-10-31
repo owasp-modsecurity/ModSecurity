@@ -66,15 +66,10 @@ int DSOLOCAL status_engine_state = STATUS_ENGINE_DISABLED;
 unsigned long int DSOLOCAL conn_read_state_limit = 0;
 TreeRoot DSOLOCAL *conn_read_state_whitelist = 0;
 TreeRoot DSOLOCAL *conn_read_state_suspicious_list = 0;
-msre_ipmatch DSOLOCAL *conn_read_state_whitelist_param = 0;
-msre_ipmatch DSOLOCAL *conn_read_state_suspicious_list_param = 0;
-
-TreeRoot DSOLOCAL *conn_write_state_whitelist = 0;
-TreeRoot DSOLOCAL *conn_write_state_suspicious_list = 0;
-msre_ipmatch DSOLOCAL *conn_write_state_whitelist_param = 0;
-msre_ipmatch DSOLOCAL *conn_write_state_suspicious_list_param = 0;
 
 unsigned long int DSOLOCAL conn_write_state_limit = 0;
+TreeRoot DSOLOCAL *conn_write_state_whitelist = 0;
+TreeRoot DSOLOCAL *conn_write_state_suspicious_list = 0;
 
 #if defined(WIN32) || defined(VERSION_NGINX)
 int (*modsecDropAction)(request_rec *r) = NULL;
@@ -1428,10 +1423,8 @@ static int hook_connection_early(conn_rec *conn)
         if (conn_read_state_limit > 0 && ip_count_r > conn_read_state_limit)
         {
             if (conn_read_state_suspicious_list &&
-                (!((tree_contains_ip(conn->pool,
-                   conn_read_state_suspicious_list, client_ip, NULL, &error_msg) <= 0) ||
-                (list_contains_ip(conn->pool,
-                   conn_read_state_suspicious_list_param, client_ip, &error_msg) <= 0))))
+                (tree_contains_ip(conn->pool,
+                   conn_read_state_suspicious_list, client_ip, NULL, &error_msg) <= 0))
             {
                 ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, 
                     "ModSecurity: Too many threads [%ld] of %ld allowed in " \
@@ -1440,10 +1433,8 @@ static int hook_connection_early(conn_rec *conn)
                     conn_read_state_limit, client_ip);
             }
 
-            else if ((tree_contains_ip(conn->pool,
-                conn_read_state_whitelist, client_ip, NULL, &error_msg) > 0) ||
-                (list_contains_ip(conn->pool,
-                    conn_read_state_whitelist_param, client_ip, &error_msg) > 0))
+            else if (tree_contains_ip(conn->pool,
+                conn_read_state_whitelist, client_ip, NULL, &error_msg) > 0)
             {
                 ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
                     "ModSecurity: Too many threads [%ld] of %ld allowed in " \
@@ -1464,10 +1455,8 @@ static int hook_connection_early(conn_rec *conn)
         if (conn_write_state_limit > 0 && ip_count_w > conn_write_state_limit)
         {
             if (conn_write_state_suspicious_list &&
-                (!((tree_contains_ip(conn->pool,
-                    conn_write_state_suspicious_list, client_ip, NULL, &error_msg) <= 0) ||
-                (list_contains_ip(conn->pool,
-                    conn_write_state_suspicious_list_param, client_ip, &error_msg) <= 0))))
+                (tree_contains_ip(conn->pool,
+                    conn_write_state_suspicious_list, client_ip, NULL, &error_msg) <= 0))
             {
                 ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
                     "ModSecurity: Too many threads [%ld] of %ld allowed in " \
@@ -1475,10 +1464,8 @@ static int hook_connection_early(conn_rec *conn)
                     "that IP is not part of it, access granted", ip_count_w,
                     conn_read_state_limit, client_ip);
             }
-            else if ((tree_contains_ip(conn->pool,
-                conn_write_state_whitelist, client_ip, NULL, &error_msg) > 0) ||
-                (list_contains_ip(conn->pool,
-                    conn_write_state_whitelist_param, client_ip, &error_msg) > 0))
+            else if (tree_contains_ip(conn->pool,
+                conn_write_state_whitelist, client_ip, NULL, &error_msg) > 0)
             {
                 ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
                     "ModSecurity: Too many threads [%ld] of %ld allowed in " \

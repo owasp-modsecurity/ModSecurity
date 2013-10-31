@@ -156,10 +156,7 @@ int DSOLOCAL ip_tree_from_file(TreeRoot **rtree, char *uri,
 int DSOLOCAL tree_contains_ip(apr_pool_t *mp, TreeRoot *rtree,
     const char *value, modsec_rec *msr, char **error_msg);
 
-int DSOLOCAL ip_list_from_param(apr_pool_t *pool,
-    char *param, msre_ipmatch **last, char **error_msg);
-
-int list_contains_ip(apr_pool_t *mp, msre_ipmatch *current,
-    const char *value, char **error_msg);
+int DSOLOCAL ip_tree_from_param(apr_pool_t *pool,
+    char *param, TreeRoot **rtree, char **error_msg);
 
 #endif
