@@ -1684,7 +1684,7 @@ char *parser_conn_limits_operator(apr_pool_t *mp, const char *p2,
     }
     else {
         return apr_psprintf(mp, "ModSecurity: Invalid operator for " \
-           "SecReadStateLimit: %s, expected operators: @ipMatch, @ipMatchF " \
+           "SecConnReadStateLimit: %s, expected operators: @ipMatch, @ipMatchF " \
            "or @ipMatchFromFile with or without !", p2);
     }
 
@@ -1705,7 +1705,7 @@ char *parser_conn_limits_operator(apr_pool_t *mp, const char *p2,
 
 
 /**
-* \brief Add SecReadStateLimit configuration option
+* \brief Add SecConnReadStateLimit configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
@@ -1726,7 +1726,7 @@ static const char *cmd_conn_read_state_limit(cmd_parms *cmd, void *_dcfg,
     limit = strtol(p1, NULL, 10);
     if ((limit == LONG_MAX) || (limit == LONG_MIN) || (limit <= 0)) {
         return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
-            "SecReadStateLimit: %s", p1);
+            "SecConnReadStateLimit: %s", p1);
     }
 
     if (p2 != NULL) {
@@ -1744,7 +1744,7 @@ static const char *cmd_conn_read_state_limit(cmd_parms *cmd, void *_dcfg,
 }
 
 /**
-* \brief Add SecWriteStateLimit configuration option
+* \brief Add SecConnWriteStateLimit configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
@@ -1765,7 +1765,7 @@ static const char *cmd_conn_write_state_limit(cmd_parms *cmd, void *_dcfg,
     limit = strtol(p1, NULL, 10);
     if ((limit == LONG_MAX) || (limit == LONG_MIN) || (limit <= 0)) {
         return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
-            "SecWriteStateLimit: %s", p1);
+            "SecConnWriteStateLimit: %s", p1);
     }
 
     if (p2 != NULL) {
@@ -2142,7 +2142,7 @@ static const char *cmd_sever_conn_filters_engine(cmd_parms *cmd, void *_dcfg,
     else
     {
         return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
-                "SecConnectionEngine: %s", p1);
+                "SecConnEngine: %s", p1);
     }
 
     return NULL;
@@ -3270,7 +3270,7 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_TAKE12 (
-        "SecReadStateLimit",
+        "SecConnReadStateLimit",
         cmd_conn_read_state_limit,
         NULL,
         CMD_SCOPE_ANY,
@@ -3278,7 +3278,7 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_TAKE12 (
-        "SecWriteStateLimit",
+        "SecConnWriteStateLimit",
         cmd_conn_write_state_limit,
         NULL,
         CMD_SCOPE_ANY,
@@ -3392,7 +3392,7 @@ const command_rec module_directives[] = {
     ),
 
     AP_INIT_TAKE1 (
-        "SecConnectionEngine",
+        "SecConnEngine",
         cmd_sever_conn_filters_engine,
         NULL,
         CMD_SCOPE_ANY,
