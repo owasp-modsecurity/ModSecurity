@@ -2141,6 +2141,34 @@ static const char *cmd_rule(cmd_parms *cmd, void *_dcfg,
     return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_NORMAL, p1, p2, p3);
 }
 
+static const char *cmd_sever_conn_filters_engine(cmd_parms *cmd, void *_dcfg,
+    const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "on") == 0)
+    {
+        conn_limits_filter_state = MODSEC_ENABLED;
+    }
+    else if (strcasecmp(p1, "off") == 0)
+    {
+        conn_limits_filter_state = MODSEC_DISABLED;
+    }
+    else if (strcasecmp(p1, "detectiononly") == 0)
+    {
+        conn_limits_filter_state = MODSEC_DETECTION_ONLY;
+    }
+    else
+    {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
+                "SecConnectionEngine: %s", p1);
+    }
+
+    return NULL;
+}
+
 static const char *cmd_rule_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2166,8 +2194,6 @@ static const char *cmd_rule_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
         return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
                 "SecRuleEngine: %s", p1);
     }
-
-    conn_limits_filter_state = dcfg->is_enabled;
 
     return NULL;
 }
@@ -3406,6 +3432,14 @@ const command_rec module_directives[] = {
     AP_INIT_TAKE1 (
         "SecStatusEngine",
         cmd_status_engine,
+        NULL,
+        CMD_SCOPE_ANY,
+        "On or Off"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecConnectionEngine",
+        cmd_sever_conn_filters_engine,
         NULL,
         CMD_SCOPE_ANY,
         "On or Off"
