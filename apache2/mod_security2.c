@@ -60,7 +60,7 @@ unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
 
 unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
-int DSOLOCAL conn_limits_filter_state = 0;
+int DSOLOCAL conn_limits_filter_state = MODSEC_DISABLED;
 
 unsigned long int DSOLOCAL conn_read_state_limit = 0;
 TreeRoot DSOLOCAL *conn_read_state_whitelist = 0;
