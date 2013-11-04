@@ -1649,18 +1649,74 @@ static const char *cmd_rule_perf_time(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
+char *parser_conn_limits_operator(apr_pool_t *mp, const char *p2,
+    TreeRoot **whitelist, TreeRoot **suspicious_list, 
+    const char *filename)
+{
+    int res = 0;
+    char *config_orig_path;
+    char *param = strchr(p2, ' ');
+    char *file = NULL;
+    char *error_msg = NULL;
+    param++;
+
+    config_orig_path = apr_pstrndup(mp, filename,
+        strlen(filename) - strlen(apr_filepath_name_get(filename)));
+
+    apr_filepath_merge(&file, config_orig_path, param, APR_FILEPATH_TRUENAME,
+        mp);
+
+    if ((strncasecmp(p2, "!@ipMatchFromFile", strlen("!@ipMatchFromFile")) == 0) ||
+        (strncasecmp(p2, "!@ipMatchF", strlen("!@ipMatchF")) == 0)) {
+
+        res = ip_tree_from_file(whitelist, file, mp, &error_msg);
+    }
+    else if (strncasecmp(p2, "!@ipMatch", strlen("!@ipMatch")) == 0) {
+        res = ip_tree_from_param(mp, param, whitelist, &error_msg);
+    }
+    else if ((strncasecmp(p2, "@ipMatchFromFile", strlen("@ipMatchFromFile")) == 0) ||
+        (strncasecmp(p2, "@ipMatchF", strlen("@ipMatchF")) == 0)) {
+
+        res = ip_tree_from_file(suspicious_list, file, mp, &error_msg);
+    }
+    else if (strncasecmp(p2, "@ipMatch", strlen("@ipMatch")) == 0) {
+        res = ip_tree_from_param(mp, param, suspicious_list, &error_msg);
+    }
+    else {
+        return apr_psprintf(mp, "ModSecurity: Invalid operator for " \
+           "SecConnReadStateLimit: %s, expected operators: @ipMatch, @ipMatchF " \
+           "or @ipMatchFromFile with or without !", p2);
+    }
+
+    if (res) {
+        char *error;
+        error = apr_psprintf(mp, "ModSecurity: failed to load IPs " \
+            "from: %s", param);
+
+        if (*error_msg) {
+            error = apr_psprintf(mp, "%s %s", error, error_msg);
+        }
+
+        return error;
+    }
+
+    return NULL;
+}
+
+
 /**
-* \brief Add SecReadStateLimit configuration option
+* \brief Add SecConnReadStateLimit configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
 * \param p1 Pointer to configuration option
+* \param p2 Pointer to configuration option
 *
 * \retval NULL On failure
 * \retval apr_psprintf On Success
 */
 static const char *cmd_conn_read_state_limit(cmd_parms *cmd, void *_dcfg,
-        const char *p1)
+        const char *p1, const char *p2)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
@@ -1668,27 +1724,38 @@ static const char *cmd_conn_read_state_limit(cmd_parms *cmd, void *_dcfg,
     if (dcfg == NULL) return NULL;
 
     limit = strtol(p1, NULL, 10);
-    if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
-        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecReadStateLimit: %s", p1);
+    if ((limit == LONG_MAX) || (limit == LONG_MIN) || (limit <= 0)) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
+            "SecConnReadStateLimit: %s", p1);
     }
 
+    if (p2 != NULL) {
+        char *param = parser_conn_limits_operator(cmd->pool, p2,
+            &conn_read_state_whitelist, &conn_read_state_suspicious_list,
+            cmd->directive->filename);
+
+        if (param)
+            return param;
+    }
+    
     conn_read_state_limit = limit;
 
     return NULL;
 }
 
 /**
-* \brief Add SecWriteStateLimit configuration option
+* \brief Add SecConnWriteStateLimit configuration option
 *
 * \param cmd Pointer to configuration data
 * \param _dcfg Pointer to directory configuration
 * \param p1 Pointer to configuration option
+* \param p2 Pointer to configuration option
 *
 * \retval NULL On failure
 * \retval apr_psprintf On Success
 */
 static const char *cmd_conn_write_state_limit(cmd_parms *cmd, void *_dcfg,
-        const char *p1)
+        const char *p1, const char *p2)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
     long int limit;
@@ -1696,8 +1763,18 @@ static const char *cmd_conn_write_state_limit(cmd_parms *cmd, void *_dcfg,
     if (dcfg == NULL) return NULL;
 
     limit = strtol(p1, NULL, 10);
-    if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
-        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecWriteStateLimit: %s", p1);
+    if ((limit == LONG_MAX) || (limit == LONG_MIN) || (limit <= 0)) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
+            "SecConnWriteStateLimit: %s", p1);
+    }
+
+    if (p2 != NULL) {
+        char *param = parser_conn_limits_operator(cmd->pool, p2,
+            &conn_write_state_whitelist, &conn_write_state_suspicious_list,
+            cmd->directive->filename);
+
+        if (param)
+            return param;
     }
 
     conn_write_state_limit = limit;
@@ -2043,21 +2120,59 @@ static const char *cmd_rule(cmd_parms *cmd, void *_dcfg,
     return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_NORMAL, p1, p2, p3);
 }
 
+static const char *cmd_sever_conn_filters_engine(cmd_parms *cmd, void *_dcfg,
+    const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "on") == 0)
+    {
+        conn_limits_filter_state = MODSEC_ENABLED;
+    }
+    else if (strcasecmp(p1, "off") == 0)
+    {
+        conn_limits_filter_state = MODSEC_DISABLED;
+    }
+    else if (strcasecmp(p1, "detectiononly") == 0)
+    {
+        conn_limits_filter_state = MODSEC_DETECTION_ONLY;
+    }
+    else
+    {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
+                "SecConnEngine: %s", p1);
+    }
+
+    return NULL;
+}
+
 static const char *cmd_rule_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
+
     if (dcfg == NULL) return NULL;
 
-    if (strcasecmp(p1, "on") == 0) dcfg->is_enabled = MODSEC_ENABLED;
-    else
-    if (strcasecmp(p1, "off") == 0) dcfg->is_enabled = MODSEC_DISABLED;
-    else
-    if (strcasecmp(p1, "detectiononly") == 0) {
+    if (strcasecmp(p1, "on") == 0)
+    {
+        dcfg->is_enabled = MODSEC_ENABLED;
+    }
+    else if (strcasecmp(p1, "off") == 0)
+    {
+        dcfg->is_enabled = MODSEC_DISABLED;
+    }
+    else if (strcasecmp(p1, "detectiononly") == 0)
+    {
         dcfg->is_enabled = MODSEC_DETECTION_ONLY;
         dcfg->of_limit_action = RESPONSE_BODY_LIMIT_ACTION_PARTIAL;
         dcfg->if_limit_action = REQUEST_BODY_LIMIT_ACTION_PARTIAL;
-    } else
-    return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecRuleEngine: %s", p1);
+    }
+    else
+    {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
+                "SecRuleEngine: %s", p1);
+    }
 
     return NULL;
 }
@@ -3154,16 +3269,16 @@ const command_rec module_directives[] = {
         "Threshold to log slow rules in usecs."
     ),
 
-    AP_INIT_TAKE1 (
-        "SecReadStateLimit",
+    AP_INIT_TAKE12 (
+        "SecConnReadStateLimit",
         cmd_conn_read_state_limit,
         NULL,
         CMD_SCOPE_ANY,
         "maximum number of threads in READ_BUSY state per ip address"
     ),
 
-    AP_INIT_TAKE1 (
-        "SecWriteStateLimit",
+    AP_INIT_TAKE12 (
+        "SecConnWriteStateLimit",
         cmd_conn_write_state_limit,
         NULL,
         CMD_SCOPE_ANY,
@@ -3271,6 +3386,14 @@ const command_rec module_directives[] = {
     AP_INIT_TAKE1 (
         "SecRuleEngine",
         cmd_rule_engine,
+        NULL,
+        CMD_SCOPE_ANY,
+        "On or Off"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecConnEngine",
+        cmd_sever_conn_filters_engine,
         NULL,
         CMD_SCOPE_ANY,
         "On or Off"

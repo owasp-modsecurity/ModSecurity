@@ -39,6 +39,7 @@ typedef struct msc_parm msc_parm;
 #include "msc_pcre.h"
 #include "msc_util.h"
 #include "msc_xml.h"
+#include "msc_tree.h"
 #include "msc_geo.h"
 #include "msc_gsb.h"
 #include "msc_unicode.h"
@@ -142,9 +143,15 @@ extern DSOLOCAL unsigned long int msc_pcre_match_limit;
 
 extern DSOLOCAL unsigned long int msc_pcre_match_limit_recursion;
 
+extern DSOLOCAL int conn_limits_filter_state;
+
 extern DSOLOCAL unsigned long int conn_read_state_limit;
+extern DSOLOCAL TreeRoot *conn_read_state_whitelist;
+extern DSOLOCAL TreeRoot *conn_read_state_suspicious_list;
 
 extern DSOLOCAL unsigned long int conn_write_state_limit;
+extern DSOLOCAL TreeRoot *conn_write_state_whitelist;
+extern DSOLOCAL TreeRoot *conn_write_state_suspicious_list;
 
 extern DSOLOCAL unsigned long int unicode_codepage;
 

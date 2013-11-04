@@ -110,7 +110,7 @@ static int unicode_map_create(directory_config *dcfg, char **error_msg)
                 ucode = apr_strtok(mapping,":", &hmap);
                 sscanf(ucode,"%x",&Code);
                 sscanf(hmap,"%x",&Map);
-                if(Code >= 0 || Code <= 65535)    {
+                if(Code >= 0 && Code <= 65535)    {
                     unicode_map_table[Code] = Map;
                 }
 
