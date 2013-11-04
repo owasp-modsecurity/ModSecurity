@@ -19,7 +19,6 @@
 #define POSITIVE_VALUE 1
 #define NEGATIVE_VALUE 2
 
-typedef struct msre_ipmatch msre_ipmatch;
 typedef struct msre_engine msre_engine;
 typedef struct msre_ruleset msre_ruleset;
 typedef struct msre_ruleset_internal msre_ruleset_internal;
@@ -38,6 +37,7 @@ typedef struct msre_cache_rec msre_cache_rec;
 #include "apr_tables.h"
 #include "modsecurity.h"
 #include "msc_pcre.h"
+#include "msc_tree.h"
 #include "persist_dbm.h"
 #include "apache2.h"
 #include "http_config.h"
@@ -139,12 +139,6 @@ int DSOLOCAL msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset
 #define RULE_TYPE_LUA           3  /* SecRuleScript */
 #endif
 
-struct msre_ipmatch  {
-    apr_ipsubnet_t *ipsubnet;
-    const char * address;
-    struct  msre_ipmatch *next;
-};
-
 struct msre_rule {
     apr_array_header_t      *targets;
     const char              *op_name;
@@ -183,7 +177,7 @@ struct msre_rule {
     int                     re_precomp;
     int                     escape_re;
 
-    msre_ipmatch            *ip_op;
+    TreeRoot                *ip_op;
 };
 
 char DSOLOCAL *msre_rule_generate_unparsed(apr_pool_t *pool, const msre_rule *rule, const char *targets, const char *args, const char *actions);
