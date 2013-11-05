@@ -103,6 +103,7 @@
     <ClCompile Include="..\apache2\msc_tree.c">
       <Filter>ModSecurity</Filter>
     </ClCompile>
+    <ClCompile Include="..\apache2\libinjection\libinjection_sqli.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="moduleconfig.h" />
@@ -174,6 +175,8 @@
     <ClInclude Include="..\apache2\msc_tree.h">
       <Filter>ModSecurity</Filter>
     </ClInclude>
+    <ClInclude Include="..\apache2\libinjection\libinjection.h" />
+    <ClInclude Include="..\apache2\libinjection\libinjection_sqli_data.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ModSecurity.xml" />
