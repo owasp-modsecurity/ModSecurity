@@ -1,13 +1,26 @@
-cd %WORK%
-rmdir /s /q %ZLIB%
-7z.exe x %ZLIB%.zip
-cd %ZLIB%
-nmake -f win32\Makefile.msc
-SET INCLUDE=%INCLUDE%;%WORK%\%ZLIB%
-SET LIB=%LIB%;%WORK%\%ZLIB%
-IF NOT DEFINED FULLBUILD pause
-cd %WORK%
+cd "%WORK_DIR%"
 
-copy /y %WORK%\%ZLIB%\zlib1.dll %DROP%
-copy /y %WORK%\%ZLIB%\zlib1.pdb %DROP%
-copy /y %WORK%\%ZLIB%\zdll.lib %DROP%
+@if NOT EXIST "%SOURCE_DIR%\%ZLIB%" goto file_not_found_bin
+
+@7z.exe x "%SOURCE_DIR%\%ZLIB%" -so | 7z.exe x -aoa -si -ttar 
+
+set ZLIB_DIR=%ZLIB:~0,-7%
+
+cd "%ZLIB_DIR%"
+nmake -f win32\Makefile.msc
+SET INCLUDE=%INCLUDE%;%WORK_DIR%\%ZLIB_DIR%
+SET LIB=%LIB%;%WORK_DIR%\%ZLIB_DIR%
+cd "%WORK_DIR%"
+
+copy /y "%WORK_DIR%\%ZLIB_DIR%\zlib1.dll" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\%ZLIB_DIR%\zlib1.pdb" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\%ZLIB_DIR%\zdll.lib" "%OUTPUT_DIR%"
+
+@exit /B 0
+
+:file_not_found_bin
+@echo File not found: "%SOURCE_DIR%\%ZLIB%"
+@goto failed
+
+:failed
+@exit /B 1
