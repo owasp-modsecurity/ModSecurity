@@ -2,9 +2,12 @@ cd "%WORK_DIR%"
 
 @if NOT EXIST "%SOURCE_DIR%\%ZLIB%" goto file_not_found_bin
 
+
 @7z.exe x "%SOURCE_DIR%\%ZLIB%" -so | 7z.exe x -aoa -si -ttar 
 
 set ZLIB_DIR=%ZLIB:~0,-7%
+
+mklink /D "zlib" "%ZLIB_DIR%"
 
 cd "%ZLIB_DIR%"
 nmake -f win32\Makefile.msc

@@ -6,6 +6,8 @@ cd "%WORK_DIR%"
 
 set LIBXML2_DIR=%LIBXML2:~0,-7%
 
+mklink /D "libxml2" "%LIBXML2_DIR%"
+
 fart.exe -r -i -C "%WORK_DIR%\%LIBXML2_DIR%\win32\*.*" \x2Fopt:nowin98 " "
 cd "%LIBXML2_DIR%\win32"
 CSCRIPT configure.js iconv=no vcmanifest=yes zlib=yes

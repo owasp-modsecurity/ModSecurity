@@ -5,6 +5,8 @@ cd "%WORK_DIR%"
 7z.exe x "%SOURCE_DIR%\%PCRE%"
 set PCRE_DIR=%PCRE:~0,-4%
 
+mklink /D "pcre" "%PCRE_DIR%"
+
 cd "%PCRE_DIR%"
 CMAKE -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True
 NMAKE
