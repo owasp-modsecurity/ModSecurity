@@ -1,9 +1,11 @@
 // Installer.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
 #include <ahadmin.h>
 #include <string>
+#include <stdio.h>
+#include <tchar.h>
+#include "targetver.h"
 #include "XUnzip.h"
 
 // Logging level definition.
