@@ -6,6 +6,8 @@ cd "%WORK_DIR%"
 
 set CURL_DIR=%CURL:~0,-4%
 
+mklink /D "curl" "%CURL_DIR%" 
+
 copy /y CMakeLists.txt "%CURL_DIR%"
 CD "%CURL_DIR%"
 CMAKE   -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True -DCURL_ZLIB=True
