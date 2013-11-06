@@ -18,8 +18,6 @@
 @set APACHE_BIN32=httpd-2.4.6-win32-VC11.zip
 @set APACHE_BIN64=httpd-2.4.6-win64-VC11.zip
 
-@set APACHE_BIN=%APACHE_BIN32%
-
 :: @set VCARGS32="C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
 :: @set VCARGS64="C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat"
 
@@ -38,6 +36,10 @@ if EXIST "%OUTPUT_DIR%" @rmdir /s /q "%OUTPUT_DIR%"
 @echo Checking for vcargs... %1
 @if NOT (%1) == "" call %1
 @if (%ERRORLEVEL%) == (1) goto build_wrong_vcargs
+
+set APACHE_BIN=%APACHE_BIN32%
+call cl 2>&1 | findstr /C:"x64"
+@if (%ERRORLEVEL%) == (0) set APACHE_BIN=%APACHE_BIN64%
 
 @echo Starting with the depdendencies...
 @echo # Apache - %HTTPD%/%APACHE24_ZIP%
