@@ -12,7 +12,7 @@ copy /y CMakeLists.txt "%CURL_DIR%"
 CD "%CURL_DIR%"
 CMAKE   -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True -DCURL_ZLIB=True
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
-"%WORK_DIR%\fart.exe" -r -C "%WORK_DIR%\%CURL_DIR%\include\curl\curlbuild.h" LLU ULL
+:: "%WORK_DIR%\fart.exe" -r -C "%WORK_DIR%\%CURL_DIR%\include\curl\curlbuild.h" LLU ULL
 NMAKE
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 cd "%WORK_DIR%"
