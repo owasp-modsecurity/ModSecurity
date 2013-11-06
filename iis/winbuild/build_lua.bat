@@ -1,14 +1,30 @@
-cd %WORK%
-rmdir /s /q %LUA%
-7z.exe x %LUA%.zip
-CD %LUA%\src
+cd "%WORK_DIR%"
+
+@if NOT EXIST "%SOURCE_DIR%\%LUA%" goto file_not_found_bin
+
+@7z.exe x "%SOURCE_DIR%\%LUA%" -so | 7z.exe x -aoa -si -ttar 
+
+set LUA_DIR=%LUA:~0,-7%
+
+cd "%LUA_DIR%\src"
+
 CL /Ox /arch:SSE2 /GF /GL /Gy /FD /EHsc /MD  /Zi /TC /wd4005 /D "_MBCS" /D "LUA_CORE" /D "LUA_BUILD_AS_DLL" /D "_CRT_SECURE_NO_WARNINGS" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_WIN32" /D "_WINDLL" /c *.c
 DEL lua.obj luac.obj
 LINK /DLL /LTCG /DEBUG /OUT:lua5.1.dll *.obj
 IF EXIST lua5.1.dll.manifest MT  -manifest lua5.1.dll.manifest -outputresource:lua5.1.dll;2
-IF NOT DEFINED FULLBUILD pause
-cd %WORK%
 
-copy /y %WORK%\%LUA%\src\lua5.1.dll %DROP%
-copy /y %WORK%\%LUA%\src\lua5.1.pdb %DROP%
-copy /y %WORK%\%LUA%\src\lua5.1.lib %DROP%
+cd "%WORK_DIR%"
+
+copy /y "%WORK_DIR%\%LUA_DIR%\src\lua5.1.dll" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\%LUA_DIR%\src\lua5.1.pdb" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\%LUA_DIR%\src\lua5.1.lib" "%OUTPUT_DIR%"
+
+@exit /B 0
+
+:file_not_found_bin
+@echo File not found: "%SOURCE_DIR%\%LUA%"
+@goto failed
+
+:failed
+@exit /B 1
+

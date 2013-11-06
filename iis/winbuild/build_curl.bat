@@ -1,14 +1,29 @@
-cd %WORK%
-rmdir /s /q %CURL%
-7z.exe x %CURL%.zip
-copy /y CMakeLists.txt %CURL%
-CD %CURL%
-CMAKE   -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True -DCURL_ZLIB=True
-%WORK%\fart.exe -r -C %WORK%\%CURL%\include\curl\curlbuild.h LLU ULL
-NMAKE
-IF NOT DEFINED FULLBUILD pause
-cd %WORK%
+cd "%WORK_DIR%"
 
-copy /y %WORK%\%CURL%\libcurl.dll %DROP%
-copy /y %WORK%\%CURL%\libcurl.pdb %DROP%
-copy /y %WORK%\%CURL%\libcurl_imp.lib %DROP%
+@if NOT EXIST "%SOURCE_DIR%\%CURL%" goto file_not_found_bin
+
+7z.exe x "%SOURCE_DIR%\%CURL%"
+
+set CURL_DIR=%CURL:~0,-4%
+
+copy /y CMakeLists.txt "%CURL_DIR%"
+CD "%CURL_DIR%"
+CMAKE   -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True -DCURL_ZLIB=True
+"%WORK_DIR%\fart.exe" -r -C "%WORK_DIR%\%CURL_DIR%\include\curl\curlbuild.h" LLU ULL
+NMAKE
+
+cd "%WORK_DIR%"
+
+copy /y "%WORK_DIR%\%CURL_DIR%\lib\libcurl.dll" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\%CURL_DIR%\lib\libcurl.pdb" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\%CURL_DIR%\lib\libcurl_imp.lib" "%OUTPUT_DIR%"
+
+exit /B 0
+
+:file_not_found_bin
+@echo File not found: "%SOURCE_DIR%\%CURL%"
+@goto failed
+
+:failed
+@exit /B 1
+
