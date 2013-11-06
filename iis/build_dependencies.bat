@@ -2,8 +2,8 @@
 :: Use full paths.
 
 :: General paths
-@set WORK_DIR=%cd%\winbuild\build_dir
-@set OUTPUT_DIR=%cd%\winbuild\release_files
+@set WORK_DIR=%cd%\dependencies\build_dir
+@set OUTPUT_DIR=%cd%\dependencies\release_files
 @set SOURCE_DIR=%USERPROFILE%\Downloads
 
 :: Aditional paths.
@@ -41,33 +41,33 @@ if EXIST "%OUTPUT_DIR%" @rmdir /s /q "%OUTPUT_DIR%"
 
 @echo Starting with the depdendencies...
 @echo # Apache - %HTTPD%/%APACHE24_ZIP%
-@call winbuild/build_apache.bat
+@call dependencies/build_apache.bat
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed_apache
 @cd "%CURRENT_DIR%"
 echo "c"
 @echo # pcre. - %PCRE%
-@call winbuild/build_pcre.bat
+@call dependencies/build_pcre.bat
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed_pcre
 @cd "%CURRENT_DIR%"
 echo "b"
 
 @echo # zlib - %ZLIB%
-@call winbuild/build_zlib.bat
+@call dependencies/build_zlib.bat
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed_zlib
 @cd "%CURRENT_DIR%"
 
 @echo # libxml2 - %LIBXML2%
-@call winbuild/build_libxml2.bat
+@call dependencies/build_libxml2.bat
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed_libxml2
 @cd "%CURRENT_DIR%"
 
 @echo # lua - %LUA%
-@call winbuild/build_lua.bat
+@call dependencies/build_lua.bat
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed_lua
 @cd "%CURRENT_DIR%"
 
 @echo # curl - %CURL%
-@call winbuild/build_curl.bat
+@call dependencies/build_curl.bat
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed_curl
 @cd "%CURRENT_DIR%"
 
