@@ -11,6 +11,7 @@ mklink /D "zlib" "%ZLIB_DIR%"
 
 cd "%ZLIB_DIR%"
 nmake -f win32\Makefile.msc
+@if NOT (%ERRORLEVEL%) == (0) goto build_failed
 SET INCLUDE=%INCLUDE%;%WORK_DIR%\%ZLIB_DIR%
 SET LIB=%LIB%;%WORK_DIR%\%ZLIB_DIR%
 cd "%WORK_DIR%"
@@ -23,6 +24,10 @@ copy /y "%WORK_DIR%\%ZLIB_DIR%\zdll.lib" "%OUTPUT_DIR%"
 
 :file_not_found_bin
 @echo File not found: "%SOURCE_DIR%\%ZLIB%"
+@goto failed
+
+:build_failed
+@echo Problems during the building phase
 @goto failed
 
 :failed
