@@ -9,7 +9,9 @@ mklink /D "pcre" "%PCRE_DIR%"
 
 cd "%PCRE_DIR%"
 CMAKE -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True
+@if NOT (%ERRORLEVEL%) == (0) goto build_failed
 NMAKE
+@if NOT (%ERRORLEVEL%) == (0) goto build_failed
 cd "%WORK%"
 
 copy /y "%WORK_DIR%\%PCRE_DIR%\pcre.dll" "%OUTPUT_DIR%"
@@ -20,6 +22,10 @@ echo "a"
 
 :file_not_found_bin
 @echo File not found: "%SOURCE_DIR%\%PCRE%"
+@goto failed
+
+:build_failed
+@echo Problems during the building phase
 @goto failed
 
 :failed

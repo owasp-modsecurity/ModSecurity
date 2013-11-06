@@ -11,7 +11,9 @@ mklink /D "libxml2" "%LIBXML2_DIR%"
 fart.exe -r -i -C "%WORK_DIR%\%LIBXML2_DIR%\win32\*.*" \x2Fopt:nowin98 " "
 cd "%LIBXML2_DIR%\win32"
 CSCRIPT configure.js iconv=no vcmanifest=yes zlib=yes
+@if NOT (%ERRORLEVEL%) == (0) goto build_failed
 NMAKE -f Makefile.msvc
+@if NOT (%ERRORLEVEL%) == (0) goto build_failed
 
 cd "%WORK%"
 
@@ -22,6 +24,10 @@ copy /y "%WORK_DIR%\%LIBXML2_DIR%\win32\bin.msvc\libxml2.lib" "%OUTPUT_DIR%"
 
 :file_not_found_bin
 @echo File not found: "%SOURCE_DIR%\%LIBXML2%"
+@goto failed
+
+:build_failed
+@echo Problems during the building phase
 @goto failed
 
 :failed
