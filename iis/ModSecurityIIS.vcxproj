@@ -96,9 +96,8 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y $(TargetPath) c:\drop\$(PlatformShortName)
-copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,9 +117,8 @@ copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
       <AdditionalLibraryDirectories>c:\drop\amd64</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y $(TargetPath) c:\drop\$(PlatformShortName)
-copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -134,9 +132,8 @@ copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y $(TargetPath) c:\drop\$(PlatformShortName)
-copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,9 +149,8 @@ copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y $(TargetPath) c:\drop\$(PlatformShortName)
-copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
