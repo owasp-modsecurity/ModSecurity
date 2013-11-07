@@ -5,9 +5,9 @@
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFilesFolder">
-                <Directory Id="INSTALLFOLDER" Name="ModSecurity IIS">
-                    <Directory Id="AMD64" Name="amd64" />
-                    <Directory Id="X86" Name="x86" />
+		    <Directory Id="INSTALLFOLDER" Name="ModSecurity IIS">
+                    <Directory Id="b64" Name="amd64" />
+                    <Directory Id="b32" Name="x86" />
                 </Directory>
             </Directory>
             <Directory Id="ProgramMenuFolder">
@@ -43,7 +43,7 @@
                 <File Id="EULA.RTF" Name="EULA.rtf" Source="wix\EULA.rtf" />
             </Component>
         </DirectoryRef>
-        <DirectoryRef Id="AMD64">
+        <DirectoryRef Id="b64">
             <Component Id="LIBAPR_1.DLL" DiskId="1" Guid="514A81F0-2413-42EF-B19F-E2613125ECE0">
                 <File Id="LIBAPR_1.DLL" Name="libapr-1.dll" Source="Release\amd64\libapr-1.dll" />
             </Component>
@@ -75,7 +75,7 @@
                 <File Id="ZLIB1.DLL" Name="zlib1.dll" Source="Release\amd64\zlib1.dll" />
             </Component>
         </DirectoryRef>
-        <DirectoryRef Id="X86">
+        <DirectoryRef Id="b32">
             <Component Id="X86_LIBAPR_1.DLL" DiskId="1" Guid="514A81F0-2413-42EF-B19F-E2613125ECE1">
                 <File Id="X86_LIBAPR_1.DLL" Name="libapr-1.dll" Source="Release\x86\libapr-1.dll" />
             </Component>
@@ -136,10 +136,12 @@
             <ComponentRef Id="X86_ZLIB1.DLL" />
             <ComponentRef Id="StartMenuShortcuts" />
         </Feature>
-        <UIRef Id="WixUI_Minimal" />
-        <WixVariable Id="WixUiBannerBmp" Value="wix\ModSecurityBanner.bmp" />
-        <WixVariable Id="WixUIUpIco" Value="wix\ModSecurityLogo.ico" />
-	<WixVariable Id="WixUILicenseRtf" Value="wix\EULA.rtf" />
+	<UIRef Id="WixUI_Minimal" />
+
+	<WixVariable Id="WixUILicenseRtf" Value="wix\EULA.rtf" /> 
+	<WixVariable Id="WixUIBannerBmp" Value="wix\banner.jpg"/>
+	<WixVariable Id="WixUIDialogBmp" Value="wix\dialog.jpg"/>
+
 
 	<Property Id="QtExecCmdLine" Value="&quot;[INSTALLFOLDER]InstallerHelper.exe&quot; &quot;[INSTALLFOLDER]&quot;" />
 	<CustomAction Id="QtExecCmdLine" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="immediate" Return="check" />
