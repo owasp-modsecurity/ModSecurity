@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <Product Id="22B04FDB-9BAB-46B0-87B8-A39544ECECD3" Name="ModSecurity IIS" Language="1033" Version="2.7.6" Manufacturer="ModSecurity" UpgradeCode="82F09489-1678-4C38-ADCB-08C3757653DB">
+        <Package Description="ModSecurityISS" Comments="none" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated" />
+        <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLFOLDER" Name="ModSecurity IIS">
+                    <Directory Id="AMD64" Name="amd64" />
+                    <Directory Id="X86" Name="x86" />
+                </Directory>
+            </Directory>
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ProgramMenuDir" Name="ModSecurity IIS">
+                    <Component Id="StartMenuShortcuts" Guid="43C26B13-C4D8-42F8-8715-3AF78E66C902">
+                        <util:InternetShortcut Id="WebsiteShortcut" Name="ModSecurity" Target="http://www.modsecurity.org/" />
+                        <util:InternetShortcut Id="CSR" Name="OWASP ModSecurity Core Rule Set " Target="http://spiderlabs.github.io/owasp-modsecurity-crs/" />
+                        <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
+                        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="" />
+                        <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the ModSecurity IIS" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
+                        <Shortcut Id="EULA" Name="EULA" Description="EULA" Target="[INSTALLFOLDER]EULA.rtf" WorkingDirectory="INSTALLFOLDER" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </Directory>
+        <DirectoryRef Id="INSTALLFOLDER">
+            <Component Id="INSTALLERHELPER.EXE" DiskId="1" Guid="D61E9A2F-3077-4FE2-A837-D65CB0F8DA5C">
+                <File Id="INSTALLERHELPER.EXE" Name="InstallerHelper.exe" Source="Release\InstallerHelper.exe" />
+            </Component>
+            <Component Id="INSTALLERHELPER.PDB" DiskId="1" Guid="3A678630-C354-4B00-B108-2FD2489EE54B">
+                <File Id="INSTALLERHELPER.PDB" Name="InstallerHelper.pdb" Source="Release\InstallerHelper.pdb" />
+            </Component>
+            <Component Id="MODSECURITY.XML" DiskId="1" Guid="EC953A29-35AD-44A8-A3D4-875ACCFEC465">
+                <File Id="MODSECURITY.XML" Name="ModSecurity.xml" Source="Release\ModSecurity.xml" />
+            </Component>
+            <Component Id="OWASP_CRS.ZIP" DiskId="1" Guid="13513EF7-FB36-4767-BBBF-7EC750BAC80B">
+                <File Id="OWASP_CRS.ZIP" Name="owasp_crs.zip" Source="Release\owasp_crs.zip" />
+            </Component>
+            <Component Id="README.TXT" DiskId="1" Guid="980270DF-81AB-469B-AB0E-64FA3BA160B6">
+                <File Id="README.TXT" Name="README.TXT" Source="Release\README.TXT" />
+            </Component>
+            <Component Id="EULA.RTF" DiskId="1" Guid="980270DF-81AB-469B-AB0E-64FA3BA160B1">
+                <File Id="EULA.RTF" Name="EULA.rtf" Source="wix\EULA.rtf" />
+            </Component>
+        </DirectoryRef>
+        <DirectoryRef Id="AMD64">
+            <Component Id="LIBAPR_1.DLL" DiskId="1" Guid="514A81F0-2413-42EF-B19F-E2613125ECE0">
+                <File Id="LIBAPR_1.DLL" Name="libapr-1.dll" Source="Release\amd64\libapr-1.dll" />
+            </Component>
+            <Component Id="LIBAPRICONV_1.DLL" DiskId="1" Guid="BAB541D1-9B8E-4220-9112-4B2ED7FD119D">
+                <File Id="LIBAPRICONV_1.DLL" Name="libapriconv-1.dll" Source="Release\amd64\libapriconv-1.dll" />
+            </Component>
+            <Component Id="LIBAPRUTIL_1.DLL" DiskId="1" Guid="2B4762E0-FC6C-4156-A1CA-58504B2F0C8B">
+                <File Id="LIBAPRUTIL_1.DLL" Name="libaprutil-1.dll" Source="Release\amd64\libaprutil-1.dll" />
+            </Component>
+            <Component Id="LIBCURL.DLL" DiskId="1" Guid="7E3AFCBA-8E8E-4B75-9957-91932325CC69">
+                <File Id="LIBCURL.DLL" Name="libcurl.dll" Source="Release\amd64\libcurl.dll" />
+            </Component>
+            <Component Id="LIBXML2.DLL" DiskId="1" Guid="23562703-C4EE-4EF8-B6E4-1E35A2A6BDBB">
+                <File Id="LIBXML2.DLL" Name="libxml2.dll" Source="Release\amd64\libxml2.dll" />
+            </Component>
+            <Component Id="LUA5.1.DLL" DiskId="1" Guid="F2A09A92-F564-4C93-AB17-569A6FDA3A7C">
+                <File Id="LUA5.1.DLL" Name="lua5.1.dll" Source="Release\amd64\lua5.1.dll" />
+            </Component>
+            <Component Id="MLOGC.EXE" DiskId="1" Guid="49A1606F-F374-453F-B968-C22CF6FBF9FF">
+                <File Id="MLOGC.EXE" Name="mlogc.exe" Source="Release\amd64\mlogc.exe" />
+            </Component>
+            <Component Id="MODSECURITYIIS.DLL" DiskId="1" Guid="8EFD370B-D4D9-456C-A065-C8E9C81201A2">
+                <File Id="MODSECURITYIIS.DLL" Name="ModSecurityIIS.dll" Source="Release\amd64\ModSecurityIIS.dll" />
+            </Component>
+            <Component Id="PCRE.DLL" DiskId="1" Guid="F166E5BE-E2F8-47DB-9D17-3A4EB16C222F">
+                <File Id="PCRE.DLL" Name="pcre.dll" Source="Release\amd64\pcre.dll" />
+            </Component>
+            <Component Id="ZLIB1.DLL" DiskId="1" Guid="067F28EC-DD5A-4E18-9824-05C2C0CC8C59">
+                <File Id="ZLIB1.DLL" Name="zlib1.dll" Source="Release\amd64\zlib1.dll" />
+            </Component>
+        </DirectoryRef>
+        <DirectoryRef Id="X86">
+            <Component Id="X86_LIBAPR_1.DLL" DiskId="1" Guid="514A81F0-2413-42EF-B19F-E2613125ECE1">
+                <File Id="X86_LIBAPR_1.DLL" Name="libapr-1.dll" Source="Release\x86\libapr-1.dll" />
+            </Component>
+            <Component Id="X86_LIBAPRICONV_1.DLL" DiskId="1" Guid="BAB541D1-9B8E-4220-9112-4B2ED7FD1191">
+                <File Id="X86_LIBAPRICONV_1.DLL" Name="libapriconv-1.dll" Source="Release\x86\libapriconv-1.dll" />
+            </Component>
+            <Component Id="X86_LIBAPRUTIL_1.DLL" DiskId="1" Guid="2B4762E0-FC6C-4156-A1CA-58504B2F0C81">
+                <File Id="X86_LIBAPRUTIL_1.DLL" Name="libaprutil-1.dll" Source="Release\x86\libaprutil-1.dll" />
+            </Component>
+            <Component Id="X86_LIBCURL.DLL" DiskId="1" Guid="7E3AFCBA-8E8E-4B75-9957-91932325CC61">
+                <File Id="X86_LIBCURL.DLL" Name="libcurl.dll" Source="Release\x86\libcurl.dll" />
+            </Component>
+            <Component Id="X86_LIBXML2.DLL" DiskId="1" Guid="23562703-C4EE-4EF8-B6E4-1E35A2A6BDB1">
+                <File Id="X86_LIBXML2.DLL" Name="libxml2.dll" Source="Release\x86\libxml2.dll" />
+            </Component>
+            <Component Id="X86_LUA5.1.DLL" DiskId="1" Guid="F2A09A92-F564-4C93-AB17-569A6FDA3A71">
+                <File Id="X86_LUA5.1.DLL" Name="lua5.1.dll" Source="Release\x86\lua5.1.dll" />
+            </Component>
+            <Component Id="X86_MLOGC.EXE" DiskId="1" Guid="49A1606F-F374-453F-B968-C22CF6FBF9F1">
+                <File Id="X86_MLOGC.EXE" Name="mlogc.exe" Source="Release\x86\mlogc.exe" />
+            </Component>
+            <Component Id="X86_MODSECURITYIIS.DLL" DiskId="1" Guid="8EFD370B-D4D9-456C-A065-C8E9C81201A1">
+                <File Id="X86_MODSECURITYIIS.DLL" Name="ModSecurityIIS.dll" Source="Release\x86\ModSecurityIIS.dll" />
+            </Component>
+            <Component Id="X86_PCRE.DLL" DiskId="1" Guid="F166E5BE-E2F8-47DB-9D17-3A4EB16C2221">
+                <File Id="X86_PCRE.DLL" Name="pcre.dll" Source="Release\x86\pcre.dll" />
+            </Component>
+            <Component Id="X86_ZLIB1.DLL" DiskId="1" Guid="067F28EC-DD5A-4E18-9824-05C2C0CC8C51">
+                <File Id="X86_ZLIB1.DLL" Name="zlib1.dll" Source="Release\x86\zlib1.dll" />
+            </Component>
+        </DirectoryRef>
+        <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
+            <ComponentRef Id="INSTALLERHELPER.EXE" />
+            <ComponentRef Id="INSTALLERHELPER.PDB" />
+            <ComponentRef Id="MODSECURITY.XML" />
+            <ComponentRef Id="OWASP_CRS.ZIP" />
+            <ComponentRef Id="README.TXT" />
+            <ComponentRef Id="EULA.RTF" />
+            <ComponentRef Id="LIBAPR_1.DLL" />
+            <ComponentRef Id="LIBAPRICONV_1.DLL" />
+            <ComponentRef Id="LIBAPRUTIL_1.DLL" />
+            <ComponentRef Id="LIBCURL.DLL" />
+            <ComponentRef Id="LIBXML2.DLL" />
+            <ComponentRef Id="LUA5.1.DLL" />
+            <ComponentRef Id="MLOGC.EXE" />
+            <ComponentRef Id="MODSECURITYIIS.DLL" />
+            <ComponentRef Id="PCRE.DLL" />
+            <ComponentRef Id="ZLIB1.DLL" />
+            <ComponentRef Id="X86_LIBAPR_1.DLL" />
+            <ComponentRef Id="X86_LIBAPRICONV_1.DLL" />
+            <ComponentRef Id="X86_LIBAPRUTIL_1.DLL" />
+            <ComponentRef Id="X86_LIBCURL.DLL" />
+            <ComponentRef Id="X86_LIBXML2.DLL" />
+            <ComponentRef Id="X86_LUA5.1.DLL" />
+            <ComponentRef Id="X86_MLOGC.EXE" />
+            <ComponentRef Id="X86_MODSECURITYIIS.DLL" />
+            <ComponentRef Id="X86_PCRE.DLL" />
+            <ComponentRef Id="X86_ZLIB1.DLL" />
+            <ComponentRef Id="StartMenuShortcuts" />
+        </Feature>
+        <UIRef Id="WixUI_Minimal" />
+        <WixVariable Id="WixUiBannerBmp" Value="wix\ModSecurityBanner.bmp" />
+        <WixVariable Id="WixUIUpIco" Value="wix\ModSecurityLogo.ico" />
+	<WixVariable Id="WixUILicenseRtf" Value="wix\EULA.rtf" />
+
+	<Property Id="QtExecCmdLine" Value="&quot;[INSTALLFOLDER]InstallerHelper.exe&quot; &quot;[INSTALLFOLDER]&quot;" />
+	<CustomAction Id="QtExecCmdLine" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="immediate" Return="check" />
+
+	<Property Id="QtExecCmdLineUninstall" Value="&quot;[INSTALLFOLDER]InstallerHelper.exe&quot; uninstall" />
+	<CustomAction Id="QtExecCmdLineUninstall" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="immediate" Return="check" />
+
+	<InstallExecuteSequence>
+		<Custom Action="QtExecCmdLine" After="InstallFinalize" />
+		<Custom Action="QtExecCmdLineUninstall" Before="RemoveFiles">INSTALLED</Custom>
+        </InstallExecuteSequence>
+
+        <UI />
+    </Product>
+</Wix>
