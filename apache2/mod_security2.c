@@ -1468,6 +1468,7 @@ static void register_hooks(apr_pool_t *mp) {
     static const char *const postread_beforeme_list[] = {
         "mod_rpaf.c",
         "mod_rpaf-2.0.c",
+        "mod_extract_forwarded.c",
         "mod_extract_forwarded2.c",
         "mod_remoteip.c",
         "mod_custom_header.c",
