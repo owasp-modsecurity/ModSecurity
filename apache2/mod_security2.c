@@ -764,7 +764,7 @@ static int hook_request_early(request_rec *r) {
         if (msr->request_content_length > msr->txcfg->reqbody_limit) {
             msr_log(msr, 1, "Request body (Content-Length) is larger than the "
                     "configured limit (%ld).", msr->txcfg->reqbody_limit);
-            if(msr->txcfg->is_enabled != MODSEC_DETECTION_ONLY)
+            if(msr->txcfg->is_enabled != MODSEC_DETECTION_ONLY && msr->txcfg->if_limit_action != REQUEST_BODY_LIMIT_ACTION_PARTIAL)
                 return HTTP_REQUEST_ENTITY_TOO_LARGE;
         }
     }
