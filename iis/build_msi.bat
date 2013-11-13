@@ -1,14 +1,20 @@
 
-set WIX=C:\Program Files (x86)\WixEdit\wix-3.0.5419.0\
+set WIX=C:\Program Files (x86)\WiX Toolset v3.7\bin
 set CURRENT_DIR=%cd%
 
 del installer.wix*
 
-"%WIX%\candle.exe" -ext WixUtilExtension -ext WixUIExtension "%CURRENT_DIR%\installer.wxs" -out "%CURRENT_DIR%\installer.wixobj"
+"%WIX%\candle.exe" -ext WixUtilExtension -ext WixUIExtension "%CURRENT_DIR%\installer.wxs" -out "%CURRENT_DIR%\installer.wixobj" -dPlatform="x64"
+@if NOT (%ERRORLEVEL%) == (0) goto build_failed
 
-"%WIX%\light.exe" -ext WixUtilExtension -ext WixUIExtension "%CURRENT_DIR%\installer.wixobj" -out "%CURRENT_DIR%\installer.msi"
+"%WIX%\light.exe" -ext WixUtilExtension -ext WixUIExtension "%CURRENT_DIR%\installer.wixobj" -out "%CURRENT_DIR%\installer-64.msi" -dPlatform="x64"
+@if NOT (%ERRORLEVEL%) == (0) goto build_failed
 
+"%WIX%\candle.exe" -ext WixUtilExtension -ext WixUIExtension "%CURRENT_DIR%\installer.wxs" -out "%CURRENT_DIR%\installer.wixobj" -dPlatform="x86"
+@if NOT (%ERRORLEVEL%) == (0) goto build_failed
 
+"%WIX%\light.exe" -ext WixUtilExtension -ext WixUIExtension "%CURRENT_DIR%\installer.wixobj" -out "%CURRENT_DIR%\installer-32.msi" -dPlatform="x86"
+@if NOT (%ERRORLEVEL%) == (0) goto build_failed
 
 exit /B 0
 
