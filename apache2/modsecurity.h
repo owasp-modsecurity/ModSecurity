@@ -142,6 +142,8 @@ extern DSOLOCAL unsigned long int msc_pcre_match_limit;
 
 extern DSOLOCAL unsigned long int msc_pcre_match_limit_recursion;
 
+extern DSOLOCAL int status_engine_state;
+
 extern DSOLOCAL unsigned long int conn_read_state_limit;
 
 extern DSOLOCAL unsigned long int conn_write_state_limit;
@@ -181,6 +183,9 @@ extern DSOLOCAL int *unicode_map_table;
 #define MODSEC_DISABLED                 0
 #define MODSEC_DETECTION_ONLY           1
 #define MODSEC_ENABLED                  2
+
+#define STATUS_ENGINE_ENABLED           1
+#define STATUS_ENGINE_DISABLED          0
 
 #define HASH_DISABLED             0
 #define HASH_ENABLED              1

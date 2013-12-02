@@ -21,7 +21,7 @@
 #include "apr_optional.h"
 #include "msc_pcre.h"
 
-#define STATUS_ENGINE_DNS_IN_BETWEEN_DOTS 13
+#define STATUS_ENGINE_DNS_IN_BETWEEN_DOTS 32
 
 #define STATUS_ENGINE_DNS_SUFFIX "status.modsecurity.org"
 

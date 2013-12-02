@@ -2083,6 +2083,23 @@ static const char *cmd_rule_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
     return NULL;
 }
 
+static const char *cmd_STATUS_ENGINE(cmd_parms *cmd, void *_dcfg, const char *p1)
+{
+    if (strcasecmp(p1, "on") == 0) {
+        status_engine_state = STATUS_ENGINE_ENABLED;
+    }
+    else if (strcasecmp(p1, "off") == 0) {
+        status_engine_state = STATUS_ENGINE_DISABLED;
+    }
+    else {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
+                "SecStatusEngine: %s", p1);
+    }
+
+    return NULL;
+}
+
+
 static const char *cmd_rule_inheritance(cmd_parms *cmd, void *_dcfg, int flag)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3292,6 +3309,14 @@ const command_rec module_directives[] = {
     AP_INIT_TAKE1 (
         "SecRuleEngine",
         cmd_rule_engine,
+        NULL,
+        CMD_SCOPE_ANY,
+        "On or Off"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecStatusEngine",
+        cmd_status_engine,
         NULL,
         CMD_SCOPE_ANY,
         "On or Off"
