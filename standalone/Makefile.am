@@ -9,6 +9,7 @@ standalone_la_SOURCES = ../apache2/acmp.c \
     ../apache2/libinjection/libinjection_sqli.c \
     ../apache2/mod_security2.c \
     ../apache2/modsecurity.c \
+    ../apache2/msc_status_engine.c \
     ../apache2/msc_crypt.c \
     ../apache2/msc_geo.c \
     ../apache2/msc_gsb.c \

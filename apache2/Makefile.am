@@ -8,6 +8,7 @@ mod_security2_la_SOURCES = acmp.c \
     libinjection/libinjection_sqli.c \
     mod_security2.c \
     modsecurity.c \
+    msc_status_engine.c \
     msc_crypt.c \
     msc_geo.c \
     msc_gsb.c \

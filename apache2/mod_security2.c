@@ -37,6 +37,7 @@
 #include "msc_lua.h"
 #endif
 
+#include "msc_status_engine.h"
 
 /* ModSecurity structure */
 
@@ -722,6 +723,8 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
             ap_log_error(APLOG_MARK, APLOG_NOTICE | APLOG_NOERRNO, 0, s,
                     "Original server signature: %s", real_server_signature);
         }
+
+        msc_status_engine_call();
     }
 
     srand((unsigned int)(time(NULL) * getpid()));
