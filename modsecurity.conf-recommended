@@ -22,6 +22,12 @@ SecRequestBodyAccess On
 SecRule REQUEST_HEADERS:Content-Type "text/xml" \
      "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
 
+# Enable JSON request body parser.
+# Initiate JSON Processor in case of JSON content-type; change accordingly
+# if your application does not use 'application/json'
+#
+SecRule REQUEST_HEADERS:Content-Type "application/json" \
+     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
 
 # Maximum request body size we will accept for buffering. If you support
 # file uploads then the value given on the first line has to be as large
@@ -51,7 +57,7 @@ SecRequestBodyLimitAction Reject
 # or log a high-severity alert (when deployed in detection-only mode).
 #
 SecRule REQBODY_ERROR "!@eq 0" \
-"id:'200001', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+"id:'200002', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
 
 # By default be strict with what we accept in the multipart/form-data
 # request body. If the rule below proves to be too strict for your
@@ -59,7 +65,7 @@ SecRule REQBODY_ERROR "!@eq 0" \
 # _not_ to remove it altogether.
 #
 SecRule MULTIPART_STRICT_ERROR "!@eq 0" \
-"id:'200002',phase:2,t:none,log,deny,status:44, \
+"id:'200003',phase:2,t:none,log,deny,status:44, \
 msg:'Multipart request body failed strict validation: \
 PE %{REQBODY_PROCESSOR_ERROR}, \
 BQ %{MULTIPART_BOUNDARY_QUOTED}, \
@@ -77,7 +83,7 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 # Did we see anything that might be a boundary?
 #
 SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
-"id:'200003',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
+"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
 
 # PCRE Tuning
 # We want to avoid a potential RegEx DoS condition
@@ -91,7 +97,7 @@ SecPcreMatchLimitRecursion 1000
 # MSC_PCRE_LIMITS_EXCEEDED: PCRE match limits were exceeded.
 #
 SecRule TX:/^MSC_/ "!@streq 0" \
-        "id:'200004',phase:2,t:none,deny,msg:'ModSecurity internal error flagged: %{MATCHED_VAR_NAME}'"
+        "id:'200005',phase:2,t:none,deny,msg:'ModSecurity internal error flagged: %{MATCHED_VAR_NAME}'"
 
 
 # -- Response body handling --------------------------------------------------
