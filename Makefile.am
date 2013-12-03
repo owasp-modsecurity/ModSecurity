@@ -36,4 +36,11 @@ test: check
 test-regression:
 	(cd tests && $(MAKE) test-regression)
 
+cppcheck:
+	(cppcheck . --enable=all --force)
+
+check-coding-style:
+	(vera++ -rule L004 -param max-line-length=80  `(find . -iname "*.c" ; find . -iname "*.h") | xargs`)
+	(vera++ -rule L001 `(find . -iname "*.c" ; find . -iname "*.h") | xargs`)
+
 .PHONY: test
