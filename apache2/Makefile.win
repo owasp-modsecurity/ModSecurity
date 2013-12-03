@@ -38,6 +38,13 @@ DEFS=$(DEFS) -DWITH_LUA
 INCLUDES = $(INCLUDES) -I$(LUA)\include -I$(LUA) \
 !ENDIF
 
+# Yajl/Json is optional
+!IF "$(YAJL)" != ""
+LIBS = $(LIBS) $(YAJL)\yajl.lib
+DEFS=$(DEFS) -DWITH_YAJL
+INCLUDES = $(INCLUDES) -I$(YAJL)\include -I$(YAJL) \
+!ENDIF
+
 CFLAGS= -MD $(INCLUDES) $(DEFS)
 
 LDFLAGS =
@@ -48,7 +55,8 @@ OBJS = mod_security2.obj apache2_config.obj apache2_io.obj apache2_util.obj \
        msc_parsers.obj msc_util.obj msc_pcre.obj persist_dbm.obj \
        msc_reqbody.obj msc_geo.obj msc_gsb.obj msc_crypt.obj msc_tree.obj msc_unicode.obj acmp.obj msc_lua.obj \
        msc_release.obj libinjection\libinjection_sqli.obj \
-       msc_status_engine.obj
+       msc_status_engine.obj \
+       msc_json.obj
 
 all: $(DLL)
 

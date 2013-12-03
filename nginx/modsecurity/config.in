@@ -7,7 +7,8 @@ CFLAGS="$CFLAGS \
     @LIBXML2_CFLAGS@ \
     @LUA_CFLAGS@ \
     @MODSEC_EXTRA_CFLAGS@ \
-    @PCRE_CFLAGS@"
+    @PCRE_CFLAGS@ \
+    @YAJL_CFLAGS@"
 
 
 CORE_LIBS="$CORE_LIBS \
@@ -18,7 +19,8 @@ CORE_LIBS="$CORE_LIBS \
     @LIBXML2_LDADD@ \
     @LUA_LDADD@ \
     @PCRE_LDADD@ \
-    @APXS_LIBS@"
+    @APXS_LIBS@ \
+    @YAJL_LIBS@"
 
 ngx_addon_name=ngx_http_modsecurity
 
