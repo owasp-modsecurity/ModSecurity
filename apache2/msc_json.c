@@ -222,7 +222,6 @@ int json_init(modsec_rec *msr, char **error_msg) {
     /**
      * yajl configuration and callbacks
      */
-    static yajl_parser_config config = { 0, 1 };
     static yajl_callbacks callbacks = {
         yajl_null,
         yajl_boolean,
@@ -261,7 +260,7 @@ int json_init(modsec_rec *msr, char **error_msg) {
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "yajl JSON parsing callback initialization");
     }
-    msr->json->handle = yajl_alloc(&callbacks, &config, NULL, msr);
+    msr->json->handle = yajl_alloc(&callbacks, NULL, msr);
 
     return 1;
 }
@@ -275,8 +274,7 @@ int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char
 
     /* Feed our parser and catch any errors */
     msr->json->status = yajl_parse(msr->json->handle, buf, size);
-    if (msr->json->status != yajl_status_ok &&
-            msr->json->status != yajl_status_insufficient_data) {
+    if (msr->json->status != yajl_status_ok) {
         /* We need to free the yajl error message later, how to do this? */
         *error_msg = yajl_get_error(msr->json->handle, 0, buf, size);
     }
@@ -294,9 +292,8 @@ int json_complete(modsec_rec *msr, char **error_msg) {
     *error_msg = NULL;
 
     /* Wrap up the parsing process */
-    msr->json->status = yajl_parse_complete(msr->json->handle);
-    if (msr->json->status != yajl_status_ok &&
-            msr->json->status != yajl_status_insufficient_data) {
+    msr->json->status = yajl_complete_parse(msr->json->handle);
+    if (msr->json->status != yajl_status_ok) {
         /* We need to free the yajl error message later, how to do this? */
         *error_msg = yajl_get_error(msr->json->handle, 0, NULL, 0);
     }
