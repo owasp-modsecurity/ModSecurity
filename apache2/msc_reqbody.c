@@ -127,6 +127,14 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
                 msr_log(msr, 2, "%s", *error_msg);
             }
         }
+        else if (strcmp(msr->msc_reqbody_processor, "JSON") == 0) {
+            if (json_init(msr, &my_error_msg) < 0) {
+                *error_msg = apr_psprintf(msr->mp, "JSON parsing error (init): %s", my_error_msg);
+                msr->msc_reqbody_error = 1;
+                msr->msc_reqbody_error_msg = my_error_msg;
+                msr_log(msr, 2, "%s", *error_msg);
+            }
+        }
         else if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
             /* Do nothing, URLENCODED processor does not support streaming yet. */
         }
@@ -339,6 +347,18 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
             /* Process data as XML. */
             if (xml_process_chunk(msr, data, length, &my_error_msg) < 0) {
                 *error_msg = apr_psprintf(msr->mp, "XML parsing error: %s", my_error_msg);
+                msr->msc_reqbody_error = 1;
+                msr->msc_reqbody_error_msg = *error_msg;
+                msr_log(msr, 2, "%s", *error_msg);
+            }
+        }
+        else if (strcmp(msr->msc_reqbody_processor, "JSON") == 0) {
+            /* Increase per-request data length counter. */
+            msr->msc_reqbody_no_files_length += length;
+
+            /* Process data as XML. */
+            if (json_process_chunk(msr, data, length, &my_error_msg) < 0) {
+                *error_msg = apr_psprintf(msr->mp, "JSON parsing error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = *error_msg;
                 msr_log(msr, 2, "%s", *error_msg);
@@ -600,6 +620,15 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
                 msr_log(msr, 2, "%s", *error_msg);
                 return -1;
             }
+        }
+        else if (strcmp(msr->msc_reqbody_processor, "JSON") == 0) {
+            if (json_complete(msr, &my_error_msg) < 0) {
+                *error_msg = apr_psprintf(msr->mp, "JSON parser error: %s", my_error_msg);
+                msr->msc_reqbody_error = 1;
+                msr->msc_reqbody_error_msg = *error_msg;
+                msr_log(msr, 2, "%s", *error_msg);
+                 return -1;
+             }
         }
         else if (strcmp(msr->msc_reqbody_processor, "URLENCODED") == 0) {
             return modsecurity_request_body_end_urlencoded(msr, error_msg);

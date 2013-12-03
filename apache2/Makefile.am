@@ -8,7 +8,7 @@ pkglib_LTLIBRARIES = mod_security2.la
 mod_security2_la_SOURCES = mod_security2.c \
                            apache2_config.c apache2_io.c apache2_util.c \
                            re.c re_operators.c re_actions.c re_tfns.c \
-                           re_variables.c msc_logging.c msc_xml.c \
+                           re_variables.c msc_logging.c msc_xml.c msc_json.c \
                            msc_multipart.c modsecurity.c msc_parsers.c \
                            msc_util.c msc_pcre.c persist_dbm.c msc_reqbody.c \
                            msc_geo.c msc_gsb.c msc_crypt.c msc_tree.c msc_unicode.c acmp.c msc_lua.c msc_release.c \
