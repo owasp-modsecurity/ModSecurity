@@ -47,7 +47,8 @@ standalone_la_CFLAGS = -DVERSION_NGINX \
     @LIBXML2_CFLAGS@ \
     @LUA_CFLAGS@ \
     @MODSEC_EXTRA_CFLAGS@ \
-    @PCRE_CFLAGS@
+    @PCRE_CFLAGS@ \
+    @YAJL_CFLAGS@
 
 standalone_la_CPPFLAGS = @APR_CPPFLAGS@ \
     @LIBXML2_CPPFLAGS@ \
@@ -57,7 +58,8 @@ standalone_la_LIBADD = @APR_LDADD@ \
     @APU_LDADD@ \
     @LIBXML2_LDADD@ \
     @LUA_LDADD@ \
-    @PCRE_LDADD@
+    @PCRE_LDADD@ \
+    @YAJL_LDADD@
 
 if AIX
 standalone_la_LDFLAGS = -module -avoid-version \
@@ -66,7 +68,8 @@ standalone_la_LDFLAGS = -module -avoid-version \
     @APXS_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
-    @PCRE_LDFLAGS@
+    @PCRE_LDFLAGS@ \
+    @YAJL_LDFLAGS@
 endif
 
 if HPUX
@@ -76,7 +79,8 @@ standalone_la_LDFLAGS = -module -avoid-version \
     @APXS_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
-    @PCRE_LDFLAGS@
+    @PCRE_LDFLAGS@ \
+    @YAJL_LDFLAGS@
 endif
 
 if MACOSX
@@ -86,7 +90,8 @@ standalone_la_LDFLAGS = -module -avoid-version \
     @APXS_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
-    @PCRE_LDFLAGS@
+    @PCRE_LDFLAGS@ \
+    @YAJL_LDFLAGS@
 endif
 
 if SOLARIS
@@ -96,7 +101,8 @@ standalone_la_LDFLAGS = -module -avoid-version \
     @APXS_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
-    @PCRE_LDFLAGS@
+    @PCRE_LDFLAGS@ \
+    @YAJL_LDFLAGS@
 endif
 
 if LINUX
@@ -106,7 +112,8 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
     @APXS_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
-    @PCRE_LDFLAGS@
+    @PCRE_LDFLAGS@ \
+    @YAJL_LDFLAGS@
 endif
 
 if FREEBSD
@@ -116,7 +123,8 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
     @APXS_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
-    @PCRE_LDFLAGS@
+    @PCRE_LDFLAGS@ \
+    @YAJL_LDFLAGS@
 endif
 
 if OPENBSD
@@ -126,7 +134,8 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
     @APXS_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
-    @PCRE_LDFLAGS@
+    @PCRE_LDFLAGS@ \
+    @YAJL_LDFLAGS@
 endif
 
 if NETBSD
@@ -136,5 +145,6 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
     @APXS_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
-    @PCRE_LDFLAGS@
+    @PCRE_LDFLAGS@ \
+    @YAJL_LDFLAGS@
 endif

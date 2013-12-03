@@ -59,7 +59,6 @@ typedef struct msc_parm msc_parm;
 #include "msc_lua.h"
 #endif
 
-
 #define PHASE_REQUEST_HEADERS       1
 #define PHASE_REQUEST_BODY          2
 #define PHASE_RESPONSE_HEADERS      3
@@ -369,7 +368,9 @@ struct modsec_rec {
     multipart_data      *mpd;                        /* MULTIPART processor data structure */
 
     xml_data            *xml;                        /* XML processor data structure       */
+#ifdef WITH_YAJL
     json_data           *json;                       /* JSON processor data structure      */
+#endif
 
     /* audit logging */
     char                *new_auditlog_boundary;

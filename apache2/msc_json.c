@@ -14,6 +14,8 @@
 
 #include "msc_json.h"
 
+#ifdef WITH_YAJL
+
 int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
 {
     msc_arg *arg = (msc_arg *) NULL;
@@ -311,3 +313,4 @@ apr_status_t json_cleanup(modsec_rec *msr) {
     return 1;
 }
 
+#endif

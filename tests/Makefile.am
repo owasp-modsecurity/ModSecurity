@@ -6,6 +6,7 @@ msc_test_SOURCES = msc_test.c \
     $(top_srcdir)/apache2/msc_crypt.c \
     $(top_srcdir)/apache2/msc_geo.c \
     $(top_srcdir)/apache2/msc_gsb.c \
+    $(top_srcdir)/apache2/msc_json.c \
     $(top_srcdir)/apache2/msc_logging.c \
     $(top_srcdir)/apache2/msc_lua.c \
     $(top_srcdir)/apache2/msc_multipart.c \
@@ -32,7 +33,8 @@ msc_test_CFLAGS = @APR_CFLAGS@ \
     @LIBXML2_CFLAGS@ \
     @LUA_CFLAGS@ \
     @MODSEC_EXTRA_CFLAGS@ \
-    @PCRE_CFLAGS@
+    @PCRE_CFLAGS@ \
+    @YAJL_CFLAGS@
     
 msc_test_CPPFLAGS = -I$(top_srcdir)/apache2 \
     @APR_CPPFLAGS@ \
@@ -43,14 +45,16 @@ msc_test_LDADD = @APR_LDADD@ \
     @APU_LDADD@ \
     @LIBXML2_LDADD@ \
     @LUA_LDADD@ \
-    @PCRE_LDADD@
+    @PCRE_LDADD@ \
+    @YAJL_LDADD@
 
 msc_test_LDFLAGS = @APR_LDFLAGS@ \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
-    @PCRE_LDFLAGS@
+    @PCRE_LDFLAGS@ \
+    @YAJL_LDFLAGS@
 
 check_SCRIPTS = run-unit-tests.pl
 TESTS = $(check_SCRIPTS)

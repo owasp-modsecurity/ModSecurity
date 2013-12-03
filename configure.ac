@@ -699,7 +699,8 @@ CHECK_CURL()
 fi
 
 # Check for YAJL libs (for JSON body processor)
-AC_SEARCH_LIBS([yajl_alloc], [yajl])
+CHECK_YAJL()
+#AC_SEARCH_LIBS([yajl_alloc], [yajl])
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([tools/Makefile])

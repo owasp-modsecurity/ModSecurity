@@ -256,8 +256,10 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
     /* XML processor cleanup. */
     if (msr->xml != NULL) xml_cleanup(msr);
 
+#ifdef WITH_YAJL
     /* JSON processor cleanup. */
     if (msr->json != NULL) json_cleanup(msr);
+#endif
 
     // TODO: Why do we ignore return code here?
     modsecurity_request_body_clear(msr, &my_error_msg);
