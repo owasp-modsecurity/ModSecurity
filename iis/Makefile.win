@@ -43,7 +43,7 @@ INCLUDES = $(INCLUDES) -I$(LUA)\include -I$(LUA) \
 
 # Yajl/Json is optional
 !IF "$(YAJL)" != ""
-LIBS = $(LIBS) $(YAJL)\yajl.lib
+LIBS = $(LIBS) $(YAJL)\lib\yajl.lib
 DEFS=$(DEFS) -DWITH_YAJL
 INCLUDES = $(INCLUDES) -I$(YAJL)\include -I$(YAJL) \
 !ENDIF

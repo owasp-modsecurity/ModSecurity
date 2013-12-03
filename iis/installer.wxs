@@ -542,6 +542,9 @@
             <Component Id="LUA5.1.DLL" DiskId="1" Guid="F2A09A92-F564-4C93-AB17-569A6FDA3A7C">
                 <File Id="LUA5.1.DLL" Name="lua5.1.dll" Source="Release\amd64\lua5.1.dll" />
             </Component>
+            <Component Id="YAJL.DLL" DiskId="1" Guid="F2A09A92-F564-4C93-AB17-5ZZA6FDA3A7C">
+                <File Id="AYJL.DLL" Name="yajl.dll" Source="Release\amd64\yajl.dll" />
+            </Component>
             <Component Id="MLOGC.EXE" DiskId="1" Guid="49A1606F-F374-453F-B968-C22CF6FBF9FF">
                 <File Id="MLOGC.EXE" Name="mlogc.exe" Source="Release\amd64\mlogc.exe" />
             </Component>
@@ -575,6 +578,9 @@
             <Component Id="LUA5.1.DLL" DiskId="1" Guid="F2A09A92-F564-4C93-AB17-569A6FDA3A71">
                 <File Id="LUA5.1.DLL" Name="lua5.1.dll" Source="Release\x86\lua5.1.dll" />
             </Component>
+            <Component Id="YAJL.DLL" DiskId="1" Guid="F2A09A92-F564-4CZ3-AB17-5ZZA6FDA3A7C">
+                <File Id="AYJL.DLL" Name="yajl.dll" Source="Release\x86\yajl.dll" />
+            </Component>
             <Component Id="MLOGC.EXE" DiskId="1" Guid="49A1606F-F374-453F-B968-C22CF6FBF9F1">
                 <File Id="MLOGC.EXE" Name="mlogc.exe" Source="Release\x86\mlogc.exe" />
             </Component>
@@ -598,6 +604,7 @@
             <ComponentRef Id="LIBCURL.DLL" />
             <ComponentRef Id="LIBXML2.DLL" />
             <ComponentRef Id="LUA5.1.DLL" />
+            <ComponentRef Id="YAJL.DLL" />
             <ComponentRef Id="MLOGC.EXE" />
             <ComponentRef Id="MODSECURITYIIS.DLL" />
             <ComponentRef Id="PCRE.DLL" />
