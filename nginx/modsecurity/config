@@ -1,6 +1,6 @@
 #!/bin/sh
 
-dependencies='apr-1 apr-util-1 libxml-2.0'
+dependencies='apr-1 apr-util-1 libxml-2.0 yajl'
 
 if [ ! -e "$ngx_addon_dir/../../standalone/.libs/standalone.a" ]
 then
