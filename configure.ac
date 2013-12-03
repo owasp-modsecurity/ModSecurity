@@ -693,6 +693,7 @@ CHECK_APU()
 fi
 CHECK_LIBXML2()
 CHECK_LUA()
+CHECK_YAJL()
 if test "$build_mlogc" -ne 0; then
 CHECK_CURL()
 fi

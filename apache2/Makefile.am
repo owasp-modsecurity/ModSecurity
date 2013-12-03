@@ -15,7 +15,7 @@ mod_security2_la_SOURCES = mod_security2.c \
                            libinjection/libinjection_sqli.c
 
 mod_security2_la_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
-                          @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @LUA_CFLAGS@ @MODSEC_EXTRA_CFLAGS@ @CURL_CFLAGS@
+                          @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @LUA_CFLAGS@ @YAJL_CFLAGS@ @MODSEC_EXTRA_CFLAGS@ @CURL_CFLAGS@
 mod_security2_la_CPPFLAGS = @APR_CPPFLAGS@ @PCRE_CPPFLAGS@ @LIBXML2_CPPFLAGS@
 mod_security2_la_LIBADD = @APR_LDADD@ @APU_LDADD@ @PCRE_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@
 

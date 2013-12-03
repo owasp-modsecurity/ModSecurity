@@ -368,7 +368,10 @@ struct modsec_rec {
     multipart_data      *mpd;                        /* MULTIPART processor data structure */
 
     xml_data            *xml;                        /* XML processor data structure       */
+
+#ifdef WITH_YAJL
     json_data           *json;                       /* JSON processor data structure      */
+#endif
 
     /* audit logging */
     char                *new_auditlog_boundary;
