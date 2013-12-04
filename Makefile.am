@@ -37,10 +37,13 @@ test-regression:
 	(cd tests && $(MAKE) test-regression)
 
 cppcheck:
-	(cppcheck . --enable=all --force)
+	cppcheck . --enable=all --force 2>&1 | sed 's/^/warning: /g' 1>&2;
 
 check-coding-style:
-	(vera++ -rule L004 -param max-line-length=80  `(find . -iname "*.c" ; find . -iname "*.h") | xargs`)
-	(vera++ -rule L001 `(find . -iname "*.c" ; find . -iname "*.h") | xargs`)
+	for i in `(find . -iname "*.c" ; find . -iname "*.h")`; \ 
+	    do echo $$i...; \
+	    vera++ -rule L004 -param max-line-length=80 $$i 2>&1 | sed 's/^/warning: /g' 1>&2; \
+	    vera++ -rule L001 $$i 2>&1 | sed 's/^/warning: /g' 1>&2; \
+	done; 
 
 .PHONY: test
