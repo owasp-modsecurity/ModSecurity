@@ -5,8 +5,9 @@ lloyd-yajl-f4b2b1a
 7z.exe x "%SOURCE_DIR%\%YAJL%"
 set YAJL_DIR=%YAJL:~0,-4%
 
-mklink /D "yajl" "%YAJL_DIR%"
-cd "%YAJL_DIR%"
+move "%YAJL_DIR%" "yajl"
+
+cd "yajl"
 
 mkdir build
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
@@ -19,10 +20,10 @@ nmake
 
 cd "%WORK%"
 
-copy /y "%WORK_DIR%\%YAJL_DIR%\build\yajl-2.0.1\lib\yajl.dll" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\%YAJL_DIR%\build\yajl-2.0.1\lib\yajl.pdb" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\%YAJL_DIR%\build\yajl-2.0.1\lib\yajl.lib" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\%YAJL_DIR%\build\yajl-2.0.1\lib\yajl_s.lib" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\yajl\build\yajl-2.0.1\lib\yajl.dll" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\yajl\build\yajl-2.0.1\lib\yajl.pdb" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\yajl\build\yajl-2.0.1\lib\yajl.lib" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\yajl\build\yajl-2.0.1\lib\yajl_s.lib" "%OUTPUT_DIR%"
 
 @exit /B 0
 
