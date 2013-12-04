@@ -6,20 +6,20 @@ cd "%WORK_DIR%"
 
 set CURL_DIR=%CURL:~0,-4%
 
-mklink /D "curl" "%CURL_DIR%" 
+move "%CURL_DIR%" "curl"
 
-copy /y CMakeLists.txt "%CURL_DIR%"
-CD "%CURL_DIR%"
+:: copy /y CMakeLists.txt "curl"
+CD "curl"
 CMAKE   -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True -DCURL_ZLIB=True
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
-:: "%WORK_DIR%\fart.exe" -r -C "%WORK_DIR%\%CURL_DIR%\include\curl\curlbuild.h" LLU ULL
+:: "%WORK_DIR%\fart.exe" -r -C "%WORK_DIR%\curl\include\curl\curlbuild.h" LLU ULL
 NMAKE
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 cd "%WORK_DIR%"
 
-copy /y "%WORK_DIR%\%CURL_DIR%\lib\libcurl.dll" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\%CURL_DIR%\lib\libcurl.pdb" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\%CURL_DIR%\lib\libcurl_imp.lib" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\curl\lib\libcurl.dll" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\curl\lib\libcurl.pdb" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\curl\lib\libcurl_imp.lib" "%OUTPUT_DIR%"
 
 exit /B 0
 

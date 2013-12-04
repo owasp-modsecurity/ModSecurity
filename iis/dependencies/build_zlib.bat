@@ -7,18 +7,18 @@ cd "%WORK_DIR%"
 
 set ZLIB_DIR=%ZLIB:~0,-7%
 
-mklink /D "zlib" "%ZLIB_DIR%"
+move "%ZLIB_DIR%" "zlib"
 
-cd "%ZLIB_DIR%"
+cd "zlib"
 nmake -f win32\Makefile.msc
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
-SET INCLUDE=%INCLUDE%;%WORK_DIR%\%ZLIB_DIR%
-SET LIB=%LIB%;%WORK_DIR%\%ZLIB_DIR%
+SET INCLUDE=%INCLUDE%;%WORK_DIR%\zlib
+SET LIB=%LIB%;%WORK_DIR%\zlib
 cd "%WORK_DIR%"
 
-copy /y "%WORK_DIR%\%ZLIB_DIR%\zlib1.dll" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\%ZLIB_DIR%\zlib1.pdb" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\%ZLIB_DIR%\zdll.lib" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\zlib\zlib1.dll" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\zlib\zlib1.pdb" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\zlib\zdll.lib" "%OUTPUT_DIR%"
 
 @exit /B 0
 
