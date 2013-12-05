@@ -912,11 +912,6 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         }
     }
 
-    /* Optimisation */
-    if ((rule->op_name != NULL)&&(strcasecmp(rule->op_name, "inspectFile") == 0)) {
-        dcfg->upload_validates_files = 1;
-    }
-
     /* Create skip table if one does not already exist. */
     if (dcfg->tmp_rule_placeholders == NULL) {
         dcfg->tmp_rule_placeholders = apr_table_make(cmd->pool, 10);
@@ -2449,6 +2444,30 @@ static const char *cmd_upload_keep_files(cmd_parms *cmd, void *_dcfg,
     return NULL;
 }
 
+static const char *cmd_upload_save_tmp_files(cmd_parms *cmd, void *_dcfg,
+    const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    if (dcfg == NULL) return NULL;
+
+    if (strcasecmp(p1, "on") == 0)
+    {
+        dcfg->upload_validates_files = 1;
+    }
+    else if (strcasecmp(p1, "off") == 0)
+    {
+        dcfg->upload_validates_files = 0;
+    }
+    else
+    {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid setting for SecTmpSaveUploadedFiles: %s",
+            p1);
+    }
+
+    return NULL;
+}
+
 static const char *cmd_web_app_id(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -3680,6 +3699,14 @@ const command_rec module_directives[] = {
     AP_INIT_TAKE1 (
         "SecUploadKeepFiles",
         cmd_upload_keep_files,
+        NULL,
+        CMD_SCOPE_ANY,
+        "On or Off"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecTmpSaveUploadedFiles",
+        cmd_upload_save_tmp_files,
         NULL,
         CMD_SCOPE_ANY,
         "On or Off"
