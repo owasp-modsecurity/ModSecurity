@@ -28,16 +28,17 @@ msc_test_SOURCES = msc_test.c \
                    $(top_srcdir)/apache2/libinjection/libinjection_sqli.c
 msc_test_CFLAGS = @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
                   @PCRE_CFLAGS@ @LIBXML2_CFLAGS@ @MODSEC_EXTRA_CFLAGS@ @LUA_CFLAGS@ @YAJL_CFLAGS@ \
-                  @YAJL_CFLAGS@ 
+                  @YAJL_CFLAGS@ \
+                  @SSDEEP_CFLAGS@
 msc_test_CPPFLAGS = -I$(top_srcdir)/apache2 \
                     @APR_CPPFLAGS@ @LIBXML2_CPPFLAGS@ \
                     @PCRE_CPPFLAGS@
 msc_test_LDADD = @APR_LDADD@ @APU_LDADD@ \
                  @PCRE_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@ \
-                 @YAJL_LDADD@ 
+                 @YAJL_LDADD@ \
+                 @SSDEEP_LDADD@
 msc_test_LDFLAGS = @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
-                   @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@ \
-                   @YAJL_LDFLAGS@
+                   @PCRE_LDFLAGS@ @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
 
 check_SCRIPTS = run-unit-tests.pl
 TESTS = $(check_SCRIPTS)

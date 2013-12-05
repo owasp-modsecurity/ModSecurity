@@ -693,13 +693,15 @@ CHECK_APU()
 fi
 CHECK_LIBXML2()
 CHECK_LUA()
-CHECK_YAJL()
 if test "$build_mlogc" -ne 0; then
 CHECK_CURL()
 fi
 
 # Check for YAJL libs (for JSON body processor)
+CHECK_YAJL()
 AC_SEARCH_LIBS([yajl_alloc], [yajl])
+CHECK_SSDEEP()
+AC_SEARCH_LIBS([fuzzy_hash_buf], [fuzzy])
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([tools/Makefile])
