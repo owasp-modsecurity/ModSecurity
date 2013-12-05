@@ -152,14 +152,14 @@ char *getkey(apr_pool_t *mp) {
     char salt[64];
 
     apr_generate_random_bytes(salt, sizeof(salt));
-    key = apr_psprintf(mp,"%s",salt);
+    key = apr_psprintf(mp,"%.*s",(int)sizeof(salt),salt);
 
     apr_sha1_init (&ctx);
     apr_sha1_update (&ctx, (const char*)key, strlen(key));
     apr_sha1_update (&ctx, "\0", 1);
 
     apr_generate_random_bytes(salt, sizeof(salt));
-    value = apr_psprintf(mp,"%s",salt);
+    value = apr_psprintf(mp,"%.*s",(int)sizeof(salt),salt);
 
     apr_sha1_update (&ctx, value, strlen (value));
     apr_sha1_final (digest, &ctx);
