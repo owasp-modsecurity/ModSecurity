@@ -187,7 +187,8 @@ char *get_env_var(request_rec *r, char *name) {
     return "FAKE-ENV-VAR";
 }
 
-apr_status_t unixd_set_global_mutex_perms(apr_global_mutex_t *gmutex) {
+#define unixd_set_global_mutex_perms(a) my_unixd_set_global_mutex_perms(a)
+apr_status_t my_unixd_set_global_mutex_perms(apr_global_mutex_t *gmutex) {
     return APR_SUCCESS;
 }
 
