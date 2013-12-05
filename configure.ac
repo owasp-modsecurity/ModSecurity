@@ -701,6 +701,8 @@ fi
 # Check for YAJL libs (for JSON body processor)
 CHECK_YAJL()
 #AC_SEARCH_LIBS([yajl_alloc], [yajl])
+CHECK_SSDEEP()
+AC_SEARCH_LIBS([fuzzy_hash_buf], [fuzzy])
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([tools/Makefile])
