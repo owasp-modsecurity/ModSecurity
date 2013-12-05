@@ -191,7 +191,8 @@ apr_status_t unixd_set_global_mutex_perms(apr_global_mutex_t *gmutex) {
     return APR_SUCCESS;
 }
 
-apr_status_t unixd_set_proc_mutex_perms(apr_proc_mutex_t *pmutex) {
+#define unixd_set_proc_mutex_perms(a) my_unixd_set_proc_mutex_perms(a)
+apr_status_t my_unixd_set_proc_mutex_perms(apr_proc_mutex_t *pmutex) {
     return APR_SUCCESS;
 }
 
