@@ -36,7 +36,8 @@ msc_test_CFLAGS = @APR_CFLAGS@ \
     @LUA_CFLAGS@ \
     @MODSEC_EXTRA_CFLAGS@ \
     @PCRE_CFLAGS@ \
-    @YAJL_CFLAGS@
+    @YAJL_CFLAGS@ \
+    @SSDEEP_CFLAGS@
     
 msc_test_CPPFLAGS = -I$(top_srcdir)/apache2 \
     @APR_CPPFLAGS@ \
@@ -48,7 +49,8 @@ msc_test_LDADD = @APR_LDADD@ \
     @LIBXML2_LDADD@ \
     @LUA_LDADD@ \
     @PCRE_LDADD@ \
-    @YAJL_LDADD@
+    @YAJL_LDADD@ \
+    @SSDEEP_CFLAGS@
 
 msc_test_LDFLAGS = @APR_LDFLAGS@ \
     @APU_LDFLAGS@ \
@@ -56,7 +58,8 @@ msc_test_LDFLAGS = @APR_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
-    @YAJL_LDFLAGS@
+    @YAJL_LDFLAGS@ \
+    @SSDEEP_LDFLAGS@
 
 check_SCRIPTS = run-unit-tests.pl
 TESTS = $(check_SCRIPTS)

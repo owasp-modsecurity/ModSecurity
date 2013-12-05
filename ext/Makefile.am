@@ -4,7 +4,8 @@ EXT_CFLAGS = -I../apache2 \
     @APU_CFLAGS@ \
     @APXS_CFLAGS@ \
     @LIBXML2_CFLAGS@ \
-    @LUA_CFLAGS@
+    @LUA_CFLAGS@ \
+    @SSDEEP_CFLAGS@
     
 EXT_CPPFLAGS = @APR_CPPFLAGS@ \
     @LIBXML2_CPPFLAGS@
@@ -13,13 +14,14 @@ EXT_LIBADD = @APR_LDADD@ \
     @APU_LDADD@ \
     @LIBXML2_LDADD@ \
     @LUA_LDADD@
-    
+
 EXT_LDFLAGS = -no-undefined -module -avoid-version \
     @APR_LDFLAGS@ \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
-    @LUA_LDFLAGS@
+    @LUA_LDFLAGS@ \
+    @SSDEEP_LDFLAGS@
 
 pkglibdir = $(prefix)/lib
 
