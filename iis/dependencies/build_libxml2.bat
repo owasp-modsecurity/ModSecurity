@@ -6,10 +6,10 @@ cd "%WORK_DIR%"
 
 set LIBXML2_DIR=%LIBXML2:~0,-7%
 
-mklink /D "libxml2" "%LIBXML2_DIR%"
+move "%LIBXML2_DIR%" "libxml2"
 
 :: fart.exe -r -i -C "%WORK_DIR%\%LIBXML2_DIR%\win32\*.*" \x2Fopt:nowin98 " "
-cd "%LIBXML2_DIR%\win32"
+cd "libxml2\win32"
 CSCRIPT configure.js iconv=no vcmanifest=yes zlib=yes
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 NMAKE -f Makefile.msvc
@@ -17,8 +17,8 @@ NMAKE -f Makefile.msvc
 
 cd "%WORK%"
 
-copy /y "%WORK_DIR%\%LIBXML2_DIR%\win32\bin.msvc\libxml2.dll" "%OUTPUT_DIR%"
-copy /y "%WORK_DIR%\%LIBXML2_DIR%\win32\bin.msvc\libxml2.lib" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\libxml2\win32\bin.msvc\libxml2.dll" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\libxml2\win32\bin.msvc\libxml2.lib" "%OUTPUT_DIR%"
 
 @exit /B 0
 
