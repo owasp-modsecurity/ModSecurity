@@ -178,7 +178,8 @@ void msr_log_warn(modsec_rec *msr, const char *text, ...) {
     va_end(ap);
 }
 
-const char *ap_get_remote_host(conn_rec *conn, void *dir_config, int type, int *str_is_ip) {
+#define ap_get_remote_host(a, b, c, d) test_ap_get_remote_host(a, b, c, d)
+const char *test_ap_get_remote_host(conn_rec *conn, void *dir_config, int type, int *str_is_ip) {
     return "FAKE-REMOTE-HOST";
 }
 
