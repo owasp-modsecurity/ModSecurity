@@ -2453,6 +2453,32 @@ not_enough_memory:
     return headers_length;
 }
 
+int read_line(char *buf, int len, FILE *fp)
+{
+    char *tmp;
+
+    if (buf == NULL)
+    {
+        return -1;
+    }
+
+    memset(buf, '\0', len*sizeof(char));
+
+    if (fgets(buf, len, fp) == NULL)
+    {
+        *buf = '\0';
+        return 0;
+    }
+    else
+    {
+        if ((tmp = strrchr(buf, '\n')) != NULL)
+        {
+            *tmp = '\0';
+        }
+    }
+
+    return 1;
+}
 
 int create_radix_tree(apr_pool_t *mp, TreeRoot **rtree, char **error_msg)
 {
