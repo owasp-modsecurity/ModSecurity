@@ -2598,3 +2598,31 @@ int ip_tree_from_param(apr_pool_t *mp,
     return 0;
 }
 
+int read_line(char *buf, int len, FILE *fp)
+{
+    char *tmp;
+
+    if (buf == NULL)
+    {
+        return -1;
+    }
+
+    memset(buf, '\0', len*sizeof(char));
+
+    if (fgets(buf, len, fp) == NULL)
+    {
+        *buf = '\0';
+        return 0;
+    }
+    else
+    {
+        if ((tmp = strrchr(buf, '\n')) != NULL)
+        {
+            *tmp = '\0';
+        }
+    }
+
+    return 1;
+}
+
+

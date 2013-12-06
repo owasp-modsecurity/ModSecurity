@@ -409,4 +409,9 @@ struct msre_cache_rec {
     apr_size_t               val_len;
 };
 
+struct fuzzy_hash_param_data {
+    const char *file;
+    int threshold;
+};
+
 #endif
