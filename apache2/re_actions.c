@@ -1470,7 +1470,7 @@ static apr_status_t msre_action_setenv_execute(modsec_rec *msr, apr_pool_t *mptm
     env_name = log_escape_nq_ex(msr->mp, env->value, env->value_len);
 
     /* Execute the requested action. */
-    if (env_name[0] == '!') {
+    if (env_name != NULL && env_name[0] == '!') {
         /* Delete */
         apr_table_unset(msr->r->subprocess_env, env_name + 1);
 
@@ -1532,7 +1532,7 @@ apr_status_t msre_action_setvar_execute(modsec_rec *msr, apr_pool_t *mptmp,
     var_name = log_escape_nq_ex(msr->mp, var->value, var->value_len);
 
     /* Handle the exclamation mark. */
-    if (var_name[0] == '!') {
+    if (var_name != NULL && var_name[0] == '!') {
         var_name = var_name + 1;
         is_negated = 1;
     }

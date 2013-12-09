@@ -1340,6 +1340,10 @@ msre_actionset *msre_actionset_create_default(msre_engine *engine) {
  * Sets the default values for the hard-coded actionset configuration.
  */
 void msre_actionset_set_defaults(msre_actionset *actionset) {
+
+    if (actionset == NULL) {
+        return;
+    }
     /* Metadata */
     if (actionset->id == NOT_SET_P) actionset->id = NULL;
     if (actionset->rev == NOT_SET_P) actionset->rev = NULL;
