@@ -10,11 +10,11 @@
 LIBS = $(APACHE)\lib\libapr-1.lib \
        $(APACHE)\lib\libaprutil-1.lib \
        $(PCRE)\pcre.lib \
+       $(SSDEEP)\fuzzy.lib \
        $(LIBXML2)\win32\bin.msvc\libxml2.lib \
        "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" \
        "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib" "ws2_32.lib" \
        "iphlpapi.lib"
-
 ###########################################################################
 ###########################################################################
 
@@ -23,11 +23,13 @@ LINK = link.exe
 
 MT = mt
 
-DEFS = /nologo /O2 /LD /W3 /wd4244 /wd4018 -DWIN32 -DWINNT -Dinline=APR_INLINE -DAP_DECLARE_STATIC -D_MBCS -D$(VERSION)
+DEFS = /nologo /O2 /LD /W3 /wd4244 /wd4018 -DWITH_YAJL -DWIN32 -DWINNT -Dinline=APR_INLINE -DAP_DECLARE_STATIC -D_MBCS -D$(VERSION)
 
 DLL = ModSecurityIIS.dll
 
 INCLUDES = -I. -I.. \
+	   -I$(YAJL)\.. \
+	   -I$(SSDEEP) \
            -I$(PCRE)\include -I$(PCRE) \
            -I$(LIBXML2)\include \
            -I$(APACHE)\include \
@@ -48,6 +50,16 @@ DEFS=$(DEFS) -DWITH_YAJL
 INCLUDES = $(INCLUDES) -I$(YAJL)\include -I$(YAJL) \
 !ENDIF
 
+# ssdeep is optional
+!IF "$(SSDEEP)" != ""
+LIBS = $(LIBS) $(SSDEEP)\fuzzy.lib
+DEFS=$(DEFS) -DWITH_SSDEEP
+INCLUDES = $(INCLUDES) -I$(SSDEEP)\include -I$(SSDEEP) \
+!ENDIF
+
+
+
+
 CFLAGS= -MD /Zi $(INCLUDES) $(DEFS)
 
 LDFLAGS = /DEF:"mymodule.def" /DEBUG /OPT:REF /OPT:ICF /MANIFEST /ManifestFile:"ModSecurityIIS.dll.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /TLBID:1 /DYNAMICBASE /NXCOMPAT
@@ -60,6 +72,7 @@ OBJS1 = mod_security2.obj apache2_config.obj apache2_io.obj apache2_util.obj \
        msc_release.obj msc_crypt.obj msc_tree.obj \
        msc_status_engine.obj \
        msc_json.obj
+       
 OBJS2 = api.obj buckets.obj config.obj filters.obj hooks.obj regex.obj server.obj
 OBJS3 = main.obj moduleconfig.obj mymodule.obj
 OBJS4 = libinjection_html5.obj \

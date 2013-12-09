@@ -1160,8 +1160,7 @@ static int var_files_tmp_contents_generate(modsec_rec *msr, msre_var *var,
             }
             /* If we had a match add this argument to the collection. */
             if (match) {
-                static int buf_size = 1024;
-                char buf[buf_size];
+                char buf[1024];
                 FILE *file;
                 size_t nread;
                 char *full_content = NULL;
@@ -1173,7 +1172,7 @@ static int var_files_tmp_contents_generate(modsec_rec *msr, msre_var *var,
                     continue;
                 }
 
-                while ((nread = fread(buf, 1, buf_size-1, file)) > 0)
+                while ((nread = fread(buf, 1, 1023, file)) > 0)
                 {   
                     total_lenght += nread;
                     buf[nread] = '\0';
