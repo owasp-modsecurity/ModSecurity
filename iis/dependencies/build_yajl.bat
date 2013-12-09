@@ -1,9 +1,12 @@
 cd "%WORK_DIR%"
 
 @if NOT EXIST "%SOURCE_DIR%\%YAJL%" goto file_not_found_bin
-lloyd-yajl-f4b2b1a
-7z.exe x "%SOURCE_DIR%\%YAJL%"
+
 set YAJL_DIR=%YAJL:~0,-4%
+
+del "yajl"
+
+7z.exe x "%SOURCE_DIR%\%YAJL%"
 
 move "%YAJL_DIR%" "yajl"
 
@@ -15,6 +18,7 @@ cd build
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 cmake -G"NMake Makefiles" -DCMAKE_BUILD_TYPE=Release ..
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
+nmake clean
 nmake
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 
@@ -24,6 +28,8 @@ copy /y "%WORK_DIR%\yajl\build\yajl-2.0.1\lib\yajl.dll" "%OUTPUT_DIR%"
 copy /y "%WORK_DIR%\yajl\build\yajl-2.0.1\lib\yajl.pdb" "%OUTPUT_DIR%"
 copy /y "%WORK_DIR%\yajl\build\yajl-2.0.1\lib\yajl.lib" "%OUTPUT_DIR%"
 copy /y "%WORK_DIR%\yajl\build\yajl-2.0.1\lib\yajl_s.lib" "%OUTPUT_DIR%"
+copy /y "%WORK_DIR%\yajl\src\*.h" "%WORK_DIR%\yajl\"
+copy /y "%WORK_DIR%\yajl\src\api\*.h" "%WORK_DIR%\yajl\"
 
 @exit /B 0
 
