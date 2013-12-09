@@ -1029,7 +1029,7 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
 #else
         msr = create_tx_context((request_rec *)r);
 #endif
-        if (msr->txcfg->debuglog_level >= 9) {
+        if (msr != NULL && msr->txcfg->debuglog_level >= 9) {
             if (msr == NULL) {
                 msr_log(msr, 9, "Failed to create context after request failure.");
             }

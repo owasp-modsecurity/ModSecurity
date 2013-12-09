@@ -263,6 +263,7 @@ static int copy_rules(apr_pool_t *mp, msre_ruleset *parent_ruleset,
                       msre_ruleset *child_ruleset,
                       apr_array_header_t *exceptions_arr)
 {
+    if (child_ruleset == NULL) return -1;
     copy_rules_phase(mp, parent_ruleset->phase_request_headers,
         child_ruleset->phase_request_headers, exceptions_arr);
     copy_rules_phase(mp, parent_ruleset->phase_request_body,
@@ -393,7 +394,7 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
 
             /* Copy the rules from the parent context. */
             merged->ruleset = msre_ruleset_create(parent->ruleset->engine, mp);
-            copy_rules(mp, parent->ruleset, merged->ruleset, child->rule_exceptions);
+            if (copy_rules(mp, parent->ruleset, merged->ruleset, child->rule_exceptions) == -1) return NULL;
         } else
         if (parent->ruleset == NULL) {
             #ifdef DEBUG_CONF
@@ -402,6 +403,7 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
 
             /* Copy child rules. */
             merged->ruleset = msre_ruleset_create(child->ruleset->engine, mp);
+	    if (merged->ruleset == NULL) return NULL;
             merged->ruleset->phase_request_headers = apr_array_copy(mp,
                 child->ruleset->phase_request_headers);
             merged->ruleset->phase_request_body = apr_array_copy(mp,
@@ -419,7 +421,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
 
             /* Copy parent rules, then add child rules to it. */
             merged->ruleset = msre_ruleset_create(parent->ruleset->engine, mp);
-            copy_rules(mp, parent->ruleset, merged->ruleset, child->rule_exceptions);
+	    if (merged->ruleset == NULL) return NULL;
+            if (copy_rules(mp, parent->ruleset, merged->ruleset, child->rule_exceptions) == -1) return NULL;
 
             apr_array_cat(merged->ruleset->phase_request_headers,
                 child->ruleset->phase_request_headers);
@@ -437,6 +440,7 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
         if (child->ruleset != NULL) {
             /* Copy child rules. */
             merged->ruleset = msre_ruleset_create(child->ruleset->engine, mp);
+	    if (merged->ruleset == NULL) return NULL;
             merged->ruleset->phase_request_headers = apr_array_copy(mp,
                 child->ruleset->phase_request_headers);
             merged->ruleset->phase_request_body = apr_array_copy(mp,
@@ -854,6 +858,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
      */
     rule->actionset = msre_actionset_merge(modsecurity->msre, dcfg->tmp_default_actionset,
         rule->actionset, 1);
+    if (rule->actionset == NULL) return "ModSecurity: OUT OF MEMORY!";
 
     /* Keep track of the parent action for "block" */
     rule->actionset->parent_intercept_action_rec = dcfg->tmp_default_actionset->intercept_action_rec;
