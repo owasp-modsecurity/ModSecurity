@@ -160,12 +160,16 @@ char *construct_log_vcombinedus_limited(modsec_rec *msr, int _limit, int *was_li
 
         if (strlen(referer) > 64) {
             msr_log(msr, 9, "GuardianLog: Reduced referer to 64.");
+	    /* Parfait_ALLOW buf-overrun - would be possible if
+	     * we didn't use null-terminated string */
             referer[64] = '\0';
         }
         limit -= strlen(referer);
 
         if (strlen(user_agent) > 64) {
             msr_log(msr, 9, "GuardianLog: Reduced user_agent to 64.");
+	    /* Parfait_ALLOW buf-overrun - would be possible if
+	     * we didn't use null-terminated string */
             user_agent[64] = '\0';
         }
         limit -= strlen(user_agent);

@@ -729,6 +729,8 @@ TreeNode *CPTFindElement(modsec_rec *msr, unsigned char *ipdata, unsigned int ip
     bytes = ip_bitmask/8;
 
     memset(temp_data, 0, NETMASK_256-1);
+    /* Parfait_ALLOW buf-overrun - not possible,
+     * the condition above would catch values greater than temp_data size */
     memcpy(temp_data, ipdata, bytes);
 
     node = CPTRetriveNode(msr, temp_data, ip_bitmask, node);
