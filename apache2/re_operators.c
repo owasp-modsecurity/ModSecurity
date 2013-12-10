@@ -168,6 +168,7 @@ static int msre_op_ipmatchFromFile_param_init(msre_rule *rule, char **error_msg)
     const char *filepath = NULL;
     char *fn;
     const char *ipfile_path;
+    int res = 0;
     TreeRoot *rtree = NULL;
 
     if ((rule->op_param == NULL) || (strlen(rule->op_param) == 0))
@@ -196,7 +197,7 @@ static int msre_op_ipmatchFromFile_param_init(msre_rule *rule, char **error_msg)
         apr_filepath_merge(&fn, ipfile_path, fn, APR_FILEPATH_TRUENAME, rule->ruleset->mp);
     }
 
-    int res = ip_tree_from_file(&rtree, fn, rule->ruleset->mp, error_msg);
+    res = ip_tree_from_file(&rtree, fn, rule->ruleset->mp, error_msg);
     if (res)
     {
         return 0;

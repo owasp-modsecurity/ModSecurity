@@ -1165,6 +1165,7 @@ static int var_files_tmp_contents_generate(modsec_rec *msr, msre_var *var,
                 size_t nread;
                 char *full_content = NULL;
                 size_t total_lenght = 0;
+		msre_var *rvar = NULL;
 
                 file = fopen(parts[i]->tmp_file_name, "r");
                 if (file == NULL)
@@ -1187,7 +1188,7 @@ static int var_files_tmp_contents_generate(modsec_rec *msr, msre_var *var,
                 }
                 fclose(file);
 
-                msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+                rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
                 rvar->value = full_content;
                 rvar->value_len = total_lenght;
                 rvar->name = apr_psprintf(mptmp, "FILES_TMP_CONTENT:%s",
