@@ -1,5 +1,8 @@
 ### Base configuration for starting Apache httpd
 
+LoadModule access_compat_module /usr/lib/apache2/modules/mod_access_compat.so
+LoadModule mpm_worker_module /usr/lib/apache2/modules/mod_mpm_worker.so
+
 <IfDefine !CHROOT>
 	# File locations
 	PidFile @MSC_REGRESSION_LOGS_DIR@/httpd.pid
@@ -16,9 +19,7 @@
 
 <IfDefine !NOMODSEC>
 	# TODO: Need to have these configurable
-	LoadFile /usr/lib/libxml2.so
-	LoadFile /usr/lib/liblua5.1.so
-	LoadModule security2_module @APXS_LIBEXECDIR@/mod_security2.so
+	LoadModule security2_module @MSC_BASE_DIR@/apache2/.libs/mod_security2.so
 </IfDefine>
 
 ServerName localhost
@@ -31,7 +32,9 @@ ErrorLog @MSC_REGRESSION_LOGS_DIR@/error.log
 <IfDefine !CHROOT>
 	DocumentRoot @MSC_REGRESSION_DOCROOT_DIR@
 	<Directory "@MSC_REGRESSION_DOCROOT_DIR@">
-		Options Indexes FollowSymLinks
+		Options +Indexes +FollowSymLinks
 		AllowOverride None
+        Allow from all
+        Satisfy Any
 	</Directory>
 </IfDefine>
