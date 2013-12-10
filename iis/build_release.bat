@@ -1,4 +1,6 @@
 
+echo "Building release..."
+
 set RELEASE_DIR=release
 set OUTPUT_DIR=%cd%\dependencies\release_files
 set CURRENT_DIR=%cd%
