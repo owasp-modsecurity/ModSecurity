@@ -9,7 +9,7 @@ then
   exit 1
 fi
 
-echo -n "Checking for Apache headers using apx2... "
+echo -n "Checking for Apache headers using apxs2... "
 apache_include_dir=`apxs2 -q INCLUDEDIR 2> /dev/null`
 RETVAL=$?
 if [ $RETVAL -eq 0 ]
@@ -17,10 +17,18 @@ then
   CORE_INCS="$CORE_INCS $apache_include_dir"
   echo "Ok"
 else
-  echo "FAIL"
-  echo "Aborting. Apache apx2 is not installed or fails to point\
+  echo -n "Checking for Apache headers using apxs... "
+  apache_include_dir=`apxs -q INCLUDEDIR 2> /dev/null`
+  RETVAL=$?
+  if [ $RETVAL -eq 0 ]
+  then
+    CORE_INCS="$CORE_INCS $apache_include_dir"
+    echo "Ok"
+  else
+    echo "Aborting. Apache apxs2/apxs is not installed or fails to point\
 Apache headers."
-  exit 1;
+    exit 1;
+  fi
 fi
 
 missing=""
