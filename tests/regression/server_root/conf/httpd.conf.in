@@ -1,10 +1,5 @@
 ### Base configuration for starting Apache httpd
 
-<IfModule !mod_authz_core.c>
-    LoadModule access_compat_module /usr/lib/apache2/modules/mod_access_compat.so
-    LoadModule mpm_worker_module /usr/lib/apache2/modules/mod_mpm_worker.so
-</IfModule>
-
 <IfDefine !CHROOT>
 	# File locations
 	PidFile @MSC_REGRESSION_LOGS_DIR@/httpd.pid
@@ -31,19 +26,24 @@ CoreDumpDirectory @MSC_REGRESSION_SERVERROOT_DIR@/tmp
 LogLevel debug
 ErrorLog @MSC_REGRESSION_LOGS_DIR@/error.log
 
+<IfVersion >= 2.4>
+    LoadModule access_compat_module /usr/lib/apache2/modules/mod_access_compat.so
+    LoadModule mpm_worker_module /usr/lib/apache2/modules/mod_mpm_worker.so
+</IfVersion>
+
 <IfDefine !CHROOT>
 	DocumentRoot @MSC_REGRESSION_DOCROOT_DIR@
 	<Directory "@MSC_REGRESSION_DOCROOT_DIR@">
 		Options +Indexes +FollowSymLinks
 		AllowOverride None
-        Allow from all
 
-        <IfModule !mod_authz_core.c>
+        <IfVersion >= 2.4>
+            Allow from all
             Satisfy Any
-        </IfModule>
+        </IfVersion>
 
-        <IfModule mod_authz_core.c>
+        <IfVersion < 2.4>
             Require all granted
-        </IfModule>
+        </IfVersion>
 	</Directory>
 </IfDefine>
