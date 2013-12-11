@@ -127,11 +127,12 @@ memchr2(const char *haystack, size_t haystack_len, char c0, char c1)
 static const char *
 my_memmem(const char* haystack, size_t hlen, const char* needle, size_t nlen)
 {
+    const char* cur;
+    const char* last;
     assert(haystack);
     assert(needle);
     assert(nlen > 1);
-    const char* cur;
-    const char* last =  haystack + hlen - nlen;
+    last =  haystack + hlen - nlen;
     for (cur = haystack; cur <= last; ++cur) {
         if (cur[0] == needle[0] && memcmp(cur, needle, nlen) == 0) {
             return cur;
@@ -485,6 +486,7 @@ static size_t is_mysql_comment(const char *cs, const size_t len, size_t pos)
 
 static size_t parse_slash(struct libinjection_sqli_state * sf)
 {
+    const char* ptr;
     size_t clen;
     const char *cs = sf->s;
     const size_t slen = sf->slen;
@@ -499,7 +501,7 @@ static size_t parse_slash(struct libinjection_sqli_state * sf)
     /*
      * skip over initial '/x'
      */
-    const char* ptr = memchr2(cur + 2, slen - (pos + 2), '*', '/');
+    ptr = memchr2(cur + 2, slen - (pos + 2), '*', '/');
 
     /*
      * (ptr == NULL) causes false positive in cppcheck 1.61
@@ -1286,8 +1288,8 @@ void libinjection_sqli_init(struct libinjection_sqli_state * sf, const char *s, 
 
 void libinjection_sqli_reset(struct libinjection_sqli_state * sf, int flags)
 {
-    ptr_lookup_fn lookup = sf->lookup;;
     void *userdata = sf->userdata;
+    ptr_lookup_fn lookup = sf->lookup;;
 
     if (flags == 0) {
         flags = FLAG_QUOTE_NONE | FLAG_SQL_ANSI;
@@ -1936,6 +1938,7 @@ int libinjection_sqli_blacklist(struct libinjection_sqli_state* sql_state)
     char ch;
     size_t i;
     size_t len = strlen(sql_state->fingerprint);
+    int patmatch;
 
     if (len < 1) {
         sql_state->reason = __LINE__;
@@ -1959,7 +1962,7 @@ int libinjection_sqli_blacklist(struct libinjection_sqli_state* sql_state)
     }
     fp2[i+1] = '\0';
 
-    int patmatch = is_keyword(fp2, len + 1) == TYPE_FINGERPRINT;
+    patmatch = is_keyword(fp2, len + 1) == TYPE_FINGERPRINT;
 
     /*
      * No match.
