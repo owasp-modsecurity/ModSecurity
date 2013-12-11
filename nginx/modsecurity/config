@@ -1,6 +1,6 @@
 #!/bin/sh
 
-dependencies='apr-1 apr-util-1 libxml-2.0 yajl fuzzy'
+dependencies='apr-1 apr-util-1 libxml-2.0 yajl'
 
 if [ ! -e "$ngx_addon_dir/../../standalone/.libs/standalone.a" ]
 then
@@ -9,7 +9,7 @@ then
   exit 1
 fi
 
-echo -n "Checking for Apache headers using apxs2... "
+echo "Checking for Apache headers using apxs2... "
 apache_include_dir=`apxs2 -q INCLUDEDIR 2> /dev/null`
 RETVAL=$?
 if [ $RETVAL -eq 0 ]
@@ -17,7 +17,7 @@ then
   CORE_INCS="$CORE_INCS $apache_include_dir"
   echo "Ok"
 else
-  echo -n "Checking for Apache headers using apxs... "
+  echo "Checking for Apache headers using apxs... "
   apache_include_dir=`apxs -q INCLUDEDIR 2> /dev/null`
   RETVAL=$?
   if [ $RETVAL -eq 0 ]
@@ -35,9 +35,9 @@ fi
 missing=""
 for element in $dependencies;
 do
-  echo -n "Checking for $element... ";
+  echo "Checking for $element... ";
 
-  cflags=`pkg-config --cflags-only-I $element 2> /dev/null | sed -s 's/-I//'`
+  cflags=`pkg-config --cflags-only-I $element 2> /dev/null | sed -e 's/-I//'`
   libs=`pkg-config --libs $element 2> /dev/null`
   RETVAL=$?
 
@@ -51,6 +51,15 @@ do
     missing="$missing $element"
   fi
 done
+
+# FIXME: This should be rewrite. autogen already solve this paths to us.
+if [ -f "/opt/local/lib/libfuzzy.dylib" ] || [ -f "/usr/lib/libfuzzy.so.2" ];
+then
+    CORE_LIBS="$CORE_LIBS -lfuzzy"
+else
+    echo "Fuzzy was not found in the expected path"
+fi
+
 
 if [ ! -z $missing ]
 then
