@@ -28,6 +28,7 @@ else
     echo "Aborting. Apache apxs2/apxs is not installed or fails to point\
 Apache headers."
     exit 1;
+  fi
 fi
 
 missing=""
