@@ -95,7 +95,7 @@ int swap_int32(int x) {
 char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int input_len, int *changed) {
     int unicode_len = 0, length = 0;
     unsigned int d = 0, count = 0;
-    unsigned char c, *utf;
+    unsigned char c, *utf, cc[2];
     char *rval, *data;
     unsigned int i, len, j;
     unsigned int bytes_left = input_len;
@@ -121,8 +121,11 @@ char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int inp
             /* single byte unicode (7 bit ASCII equivilent) has no validation */
             count++;
             if(count <= len)    {
-                if(c == 0)
-                    *data = x2c(&c);
+                if(c == 0) {
+                    cc[0] = c;
+                    cc[1] = 0;
+                    *data = x2c(cc);
+                }
                 else
                     *data++ = c;
             }

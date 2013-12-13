@@ -16,7 +16,7 @@ use IPC::Open2 qw(open2);
 my @TYPES = qw(tfn op action);
 my $TEST = "./msc_test";
 my $SCRIPT = basename($0);
-my $SCRIPTDIR = dirname($0);
+my $SCRIPTDIR = "@srcdir@";
 my $PASSED = 0;
 my $TOTAL = 0;
 my $DEBUG = $ENV{MSC_TEST_DEBUG} || 0;
@@ -85,7 +85,10 @@ sub runfile {
             $param = escape($t{output});
         }
         elsif ($t{type} eq "op") {
-            $param = escape($t{param});
+            $param = escape($t{param}); 
+            if ($t{name} eq "pmFromFile") {
+                $param = "$SCRIPTDIR/$param";
+            }
         }
         elsif ($t{type} eq "action") {
             $param = escape($t{param});
