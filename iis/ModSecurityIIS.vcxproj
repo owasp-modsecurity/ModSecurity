@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -26,15 +26,19 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -79,7 +83,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\work\apache24\include;..\apache2;..\standalone</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;dependencies\build_dir\apache24\include;..\apache2;..\standalone</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC;VERSION_IIS</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
@@ -89,18 +93,17 @@
     <Link>
       <ModuleDefinitionFile>mymodule.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);C:\work\apache24\lib\libapr-1.lib;C:\work\apache24\lib\libaprutil-1.lib;C:\work\pcre-8.30\pcre.lib;C:\work\libxml2-2.7.7\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y $(TargetPath) c:\drop\$(PlatformShortName)
-copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2;..\standalone;c:\work\apache24\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;..\apache2;..\standalone;dependencies\build_dir\apache24\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
@@ -110,47 +113,46 @@ copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
     <Link>
       <ModuleDefinitionFile>mymodule.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);libapr-1.lib;libaprutil-1.lib;pcre.lib;libxml2.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>c:\drop\amd64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\core__\ModSecurity\iis\release\x64</AdditionalLibraryDirectories>
+      <AdditionalOptions> /LIBPATH:"C:\core__\ModSecurity\iis\release\x64" %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y $(TargetPath) c:\drop\$(PlatformShortName)
-copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC;VERSION_IIS</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2;..\standalone</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;..\apache2;..\standalone</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>mymodule.def</ModuleDefinitionFile>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);C:\apache22\lib\libapr-1.lib;C:\apache22\lib\libaprutil-1.lib;C:\work\pcre-8.30\pcre.lib;C:\work\libxml2-2.7.7\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y $(TargetPath) c:\drop\$(PlatformShortName)
-copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>C:\work\pcre-8.30\include;C:\work\pcre-8.30;C:\work\libxml2-2.7.7\include;C:\apache22\include;..\apache2;..\standalone</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;..\apache2;..\standalone;dependencies\build_dir\apache24\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>mymodule.def</ModuleDefinitionFile>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);libapr-1.lib;libaprutil-1.lib;pcre.lib;libxml2.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>c:\drop\amd64</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y $(TargetPath) c:\drop\$(PlatformShortName)
-copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -158,6 +160,7 @@ copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
     <ClCompile Include="..\apache2\apache2_config.c" />
     <ClCompile Include="..\apache2\apache2_io.c" />
     <ClCompile Include="..\apache2\apache2_util.c" />
+    <ClCompile Include="..\apache2\libinjection\libinjection_sqli.c" />
     <ClCompile Include="..\apache2\modsecurity.c" />
     <ClCompile Include="..\apache2\mod_security2.c" />
     <ClCompile Include="..\apache2\msc_crypt.c" />
@@ -203,6 +206,8 @@ copy /y $(TargetDir)$(TargetName).pdb c:\drop\$(PlatformShortName)
   <ItemGroup>
     <ClInclude Include="..\apache2\acmp.h" />
     <ClInclude Include="..\apache2\apache2.h" />
+    <ClInclude Include="..\apache2\libinjection\libinjection.h" />
+    <ClInclude Include="..\apache2\libinjection\libinjection_sqli_data.h" />
     <ClInclude Include="..\apache2\modsecurity.h" />
     <ClInclude Include="..\apache2\modsecurity_config.h" />
     <ClInclude Include="..\apache2\modsecurity_config_auto.h" />

@@ -10,11 +10,11 @@
 		SecRequestBodyAccess On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500005
-		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
-		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" \\,id:500007
-		        "phase:2,deny,id:12345"
+		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" "id:500007, \\
+		        phase:3:,deny"
 	),
 	match_log => {
 		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 1\).*Target value: "\[XML document tree\]".*Successfully validated payload against Schema/s, 1 ],
@@ -59,11 +59,11 @@
 		SecDebugLogLevel 9
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500008
-		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500008, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500009
-		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" \\,id:500010
-		        "phase:2,deny,log,auditlog,id:12345"
+		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" "id:500010 \\
+		        phase:2,deny,log,auditlog,id:12345"
 	),
 	match_log => {
 		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 1\).*Target value: "\[XML document tree\]".*'badval' is not a valid value of the local atomic type.*Schema validation failed/s, 1 ],
@@ -108,11 +108,11 @@
 		SecDebugLogLevel 9
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500011
-		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500011, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500012
-		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" \\,id:500013
-		        "phase:2,deny,id:12345"
+		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" "id:500013 \\
+		        phase:2,deny,id:12345"
 	),
 	match_log => {
 		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 1\).*Target value: "\[XML document tree\]".*element is not expected/s, 1 ],
@@ -158,11 +158,11 @@
 		SecDebugLogLevel 9
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500014
-		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500014, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500015
-		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" \\,id:500016
-		        "phase:2,deny,id:12345"
+		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope.xsd" "id:500016, \\
+		        phase:2,deny,id:12345"
 	),
 	match_log => {
 		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 0\).*XML parser error.*validation failed because content is not well formed/s, 1 ],
@@ -208,11 +208,11 @@
 		SecDebugLogLevel 9
 		SecAuditEngine RelevantOnly
 		SecAuditLog "$ENV{AUDIT_LOG}"
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500017
-		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500017 \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500018
-		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope-bad.xsd" \\,id:500019
-		        "phase:2,deny,id:12345"
+		SecRule XML "\@validateSchema $ENV{CONF_DIR}/SoapEnvelope-bad.xsd" "id:500019 \\
+		        phase:2,deny,id:12345"
 	),
 	match_log => {
 		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 1\).*Target value: "\[XML document tree\]".*Failed to parse the XML resource.*Failed to load Schema/s, 1 ],
@@ -256,11 +256,11 @@
 		SecRequestBodyAccess On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500020
-		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500020, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500021
-		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope.dtd" \\,id:500022
-		        "phase:2,deny,id:12345"
+		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope.dtd" "id:500022, \\
+		        phase:2,deny,id:12345"
 	),
 	match_log => {
 		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 1\).*Target value: "\[XML document tree\]".*Successfully validated payload against DTD/s, 1 ],
@@ -299,11 +299,11 @@
 		SecRequestBodyAccess On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500023
-		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500023, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500024
-		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope.dtd" \\,id:500025
-		        "phase:2,deny,id:12345"
+		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope.dtd" "id:500025, \\
+		        phase:2,deny,id:12345"
 	),
 	match_log => {
 		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 1\).*Target value: "\[XML document tree\]".*content does not follow the DTD/s, 1 ],
@@ -342,11 +342,11 @@
 		SecRequestBodyAccess On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500026
-		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500026, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500027
-		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope.dtd" \\,id:500028
-		        "phase:2,deny,id:12345"
+		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope.dtd" "id:500028, \\
+		        phase:2,deny,id:12345"
 	),
 	match_log => {
 		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 0\).*XML parser error.*validation failed because content is not well formed/s, 1 ],
@@ -385,11 +385,11 @@
 		SecRequestBodyAccess On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" \\,id:500029
-		        "phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500029, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
 		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500030
-		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope-bad.dtd" \\,id:500031
-		        "phase:2,deny,id:12345"
+		SecRule XML "\@validateDTD $ENV{CONF_DIR}/SoapEnvelope-bad.dtd" "id:500031 \\
+		        phase:2,deny,id:12345"
 	),
 	match_log => {
 		debug => [ qr/XML: Initialising parser.*XML: Parsing complete \(well_formed 1\).*Target value: "\[XML document tree\]".*Failed to load DTD/s, 1 ],

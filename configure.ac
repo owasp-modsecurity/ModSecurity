@@ -707,6 +707,7 @@ AC_CONFIG_FILES([apache2/Makefile])
 fi
 if test "$build_standalone_module" -ne 0; then
 AC_CONFIG_FILES([standalone/Makefile])
+AC_CONFIG_FILES([nginx/modsecurity/config])
 fi
 if test "$build_extentions" -ne 0; then
 AC_CONFIG_FILES([ext/Makefile])
