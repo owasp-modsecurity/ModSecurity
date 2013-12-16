@@ -371,7 +371,7 @@ apr_status_t collection_original_setvar(modsec_rec *msr, const char *col_name, c
 }
 
 /* marker */
-static apr_status_t msre_action_marker_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_marker_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->id = action->param;
@@ -380,24 +380,24 @@ static apr_status_t msre_action_marker_init(msre_engine *engine, msre_actionset 
 
 /* id */
 
-static apr_status_t msre_action_id_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_id_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->id = action->param;
     return 1;
 }
 
-static char *msre_action_id_validate(msre_engine *engine, msre_action *action) {
+static char *msre_action_id_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     int id;
 
     if(action != NULL && action->param != NULL) {
         for(id=0;id<strlen(action->param);id++) {
             if(!apr_isdigit(action->param[id]))
-                return apr_psprintf(engine->mp, "ModSecurity: Invalid value for action ID: %s", action->param);
+                return apr_psprintf(mp, "ModSecurity: Invalid value for action ID: %s", action->param);
         }
         id = atoi(action->param);
         if ((id == LONG_MAX)||(id == LONG_MIN)||(id <= 0)) {
-            return apr_psprintf(engine->mp, "ModSecurity: Invalid value for action ID: %s", action->param);
+            return apr_psprintf(mp, "ModSecurity: Invalid value for action ID: %s", action->param);
         }
     }
 
@@ -406,7 +406,7 @@ static char *msre_action_id_validate(msre_engine *engine, msre_action *action) {
 
 /* rev */
 
-static apr_status_t msre_action_rev_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_rev_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
         msre_action *action)
 {
     actionset->rev = action->param;
@@ -415,7 +415,7 @@ static apr_status_t msre_action_rev_init(msre_engine *engine, msre_actionset *ac
 
 /* msg */
 
-static apr_status_t msre_action_msg_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_msg_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->msg = action->param;
@@ -424,7 +424,7 @@ static apr_status_t msre_action_msg_init(msre_engine *engine, msre_actionset *ac
 
 /* logdata */
 
-static apr_status_t msre_action_logdata_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_logdata_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->logdata = action->param;
@@ -433,7 +433,7 @@ static apr_status_t msre_action_logdata_init(msre_engine *engine, msre_actionset
 
 /* SanitizeMatchedBytes init */
 
-static apr_status_t msre_action_sanitizeMatchedBytes_init(msre_engine *engine,
+static apr_status_t msre_action_sanitizeMatchedBytes_init(msre_engine *engine, apr_pool_t *mp,
         msre_actionset *actionset, msre_action *action)
 {
     char *parse_parm = NULL;
@@ -444,7 +444,7 @@ static apr_status_t msre_action_sanitizeMatchedBytes_init(msre_engine *engine,
 
     if (action->param != NULL && strlen(action->param) == 3)   {
 
-        ac_param = apr_pstrdup(engine->mp, action->param);
+        ac_param = apr_pstrdup(mp, action->param);
         parse_parm = apr_strtok(ac_param,"/",&savedptr);
 
         if(apr_isdigit(*parse_parm) && apr_isdigit(*savedptr))    {
@@ -461,7 +461,7 @@ static apr_status_t msre_action_sanitizeMatchedBytes_init(msre_engine *engine,
 
 /* accuracy */
 
-static apr_status_t msre_action_accuracy_init(msre_engine *engine,
+static apr_status_t msre_action_accuracy_init(msre_engine *engine, apr_pool_t *mp,
     msre_actionset *actionset, msre_action *action)
 {
     actionset->accuracy = atoi(action->param);
@@ -470,7 +470,7 @@ static apr_status_t msre_action_accuracy_init(msre_engine *engine,
 
 /* maturity */
 
-static apr_status_t msre_action_maturity_init(msre_engine *engine,
+static apr_status_t msre_action_maturity_init(msre_engine *engine, apr_pool_t *mp,
     msre_actionset *actionset, msre_action *action)
 {
     actionset->maturity = atoi(action->param);
@@ -479,7 +479,7 @@ static apr_status_t msre_action_maturity_init(msre_engine *engine,
 
 /* ver */
 
-static apr_status_t msre_action_ver_init(msre_engine *engine,
+static apr_status_t msre_action_ver_init(msre_engine *engine, apr_pool_t *mp,
     msre_actionset *actionset, msre_action *action)
 {
     actionset->version = action->param;
@@ -488,7 +488,7 @@ static apr_status_t msre_action_ver_init(msre_engine *engine,
 
 /* severity */
 
-static apr_status_t msre_action_severity_init(msre_engine *engine,
+static apr_status_t msre_action_severity_init(msre_engine *engine, apr_pool_t *mp,
         msre_actionset *actionset, msre_action *action)
 {
     if (strcasecmp(action->param, "emergency") == 0)    {
@@ -515,7 +515,7 @@ static apr_status_t msre_action_severity_init(msre_engine *engine,
 
 /* chain */
 
-static apr_status_t msre_action_chain_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_chain_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->is_chained = 1;
@@ -523,7 +523,7 @@ static apr_status_t msre_action_chain_init(msre_engine *engine, msre_actionset *
 }
 
 /* log */
-static apr_status_t msre_action_log_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_log_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->log = 1;
@@ -531,7 +531,7 @@ static apr_status_t msre_action_log_init(msre_engine *engine, msre_actionset *ac
 }
 
 /* nolog */
-static apr_status_t msre_action_nolog_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_nolog_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->log = 0;
@@ -540,7 +540,7 @@ static apr_status_t msre_action_nolog_init(msre_engine *engine, msre_actionset *
 }
 
 /* auditlog */
-static apr_status_t msre_action_auditlog_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_auditlog_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->auditlog = 1;
@@ -548,7 +548,7 @@ static apr_status_t msre_action_auditlog_init(msre_engine *engine, msre_actionse
 }
 
 /* noauditlog */
-static apr_status_t msre_action_noauditlog_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_noauditlog_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->auditlog = 0;
@@ -556,7 +556,7 @@ static apr_status_t msre_action_noauditlog_init(msre_engine *engine, msre_action
 }
 
 /* block */
-static apr_status_t msre_action_block_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_block_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     /* Right now we just set a flag and inherit the real disruptive action */
@@ -565,7 +565,7 @@ static apr_status_t msre_action_block_init(msre_engine *engine, msre_actionset *
 }
 
 /* deny */
-static apr_status_t msre_action_deny_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_deny_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->intercept_action = ACTION_DENY;
@@ -574,12 +574,12 @@ static apr_status_t msre_action_deny_init(msre_engine *engine, msre_actionset *a
 }
 
 /* status */
-static char *msre_action_status_validate(msre_engine *engine, msre_action *action) {
+static char *msre_action_status_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     /* ENH action->param must be a valid HTTP status code. */
     return NULL;
 }
 
-static apr_status_t msre_action_status_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_status_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->intercept_status = atoi(action->param);
@@ -587,7 +587,7 @@ static apr_status_t msre_action_status_init(msre_engine *engine, msre_actionset 
 }
 
 /* drop */
-static apr_status_t msre_action_drop_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_drop_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->intercept_action = ACTION_DROP;
@@ -596,12 +596,12 @@ static apr_status_t msre_action_drop_init(msre_engine *engine, msre_actionset *a
 }
 
 /* pause */
-static char *msre_action_pause_validate(msre_engine *engine, msre_action *action) {
+static char *msre_action_pause_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     /* ENH Validate a positive number. */
     return NULL;
 }
 
-static apr_status_t msre_action_pause_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_pause_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->intercept_action = ACTION_PAUSE;
@@ -611,12 +611,12 @@ static apr_status_t msre_action_pause_init(msre_engine *engine, msre_actionset *
 
 /* redirect */
 
-static char *msre_action_redirect_validate(msre_engine *engine, msre_action *action) {
+static char *msre_action_redirect_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     /* ENH Add validation. */
     return NULL;
 }
 
-static apr_status_t msre_action_redirect_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_redirect_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->intercept_action = ACTION_REDIRECT;
@@ -643,12 +643,12 @@ static apr_status_t msre_action_redirect_execute(modsec_rec *msr, apr_pool_t *mp
 
 /* proxy */
 
-static char *msre_action_proxy_validate(msre_engine *engine, msre_action *action) {
+static char *msre_action_proxy_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     /* ENH Add validation. */
     return NULL;
 }
 
-static apr_status_t msre_action_proxy_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_proxy_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
         msre_action *action)
 {
     actionset->intercept_action = ACTION_PROXY;
@@ -675,7 +675,7 @@ static apr_status_t msre_action_proxy_execute(modsec_rec *msr, apr_pool_t *mptmp
 
 /* pass */
 
-static apr_status_t msre_action_pass_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_pass_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
         msre_action *action)
 {
     actionset->intercept_action = ACTION_NONE;
@@ -685,12 +685,12 @@ static apr_status_t msre_action_pass_init(msre_engine *engine, msre_actionset *a
 
 /* skip */
 
-static char *msre_action_skip_validate(msre_engine *engine, msre_action *action) {
+static char *msre_action_skip_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     /* ENH Add validation. */
     return NULL;
 }
 
-static apr_status_t msre_action_skip_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_skip_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
         msre_action *action)
 {
     actionset->skip_count = atoi(action->param);
@@ -700,12 +700,12 @@ static apr_status_t msre_action_skip_init(msre_engine *engine, msre_actionset *a
 
 /* skipAfter */
 
-static char *msre_action_skipAfter_validate(msre_engine *engine, msre_action *action) {
+static char *msre_action_skipAfter_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     /* ENH Add validation. */
     return NULL;
 }
 
-static apr_status_t msre_action_skipAfter_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_skipAfter_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
         msre_action *action)
 {
     actionset->skip_after = action->param;
@@ -714,7 +714,7 @@ static apr_status_t msre_action_skipAfter_init(msre_engine *engine, msre_actions
 
 /* allow */
 
-static apr_status_t msre_action_allow_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_allow_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     actionset->intercept_action = ACTION_ALLOW;
@@ -732,7 +732,7 @@ static apr_status_t msre_action_allow_init(msre_engine *engine, msre_actionset *
     return 1;
 }
 
-static char *msre_action_allow_validate(msre_engine *engine, msre_action *action) {
+static char *msre_action_allow_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     if (action->param != NULL) {
         if (strcasecmp(action->param, "phase") == 0) {
             return NULL;
@@ -740,7 +740,7 @@ static char *msre_action_allow_validate(msre_engine *engine, msre_action *action
         if (strcasecmp(action->param, "request") == 0) {
             return NULL;
         } else {
-            return apr_psprintf(engine->mp, "Invalid parameter for allow: %s", action->param);
+            return apr_psprintf(mp, "Invalid parameter for allow: %s", action->param);
         }
     }
 
@@ -749,12 +749,12 @@ static char *msre_action_allow_validate(msre_engine *engine, msre_action *action
 
 /* phase */
 
-static char *msre_action_phase_validate(msre_engine *engine, msre_action *action) {
+static char *msre_action_phase_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     /* ENH Add validation. */
     return NULL;
 }
 
-static apr_status_t msre_action_phase_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_phase_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     if(strcasecmp(action->param,"request") == 0)
@@ -771,16 +771,16 @@ static apr_status_t msre_action_phase_init(msre_engine *engine, msre_actionset *
 
 /* t */
 
-static char *msre_action_t_validate(msre_engine *engine, msre_action *action) {
+static char *msre_action_t_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     msre_tfn_metadata *metadata = NULL;
     metadata = msre_engine_tfn_resolve(engine, action->param);
-    if (metadata == NULL) return apr_psprintf(engine->mp, "Invalid transformation function: %s",
+    if (metadata == NULL) return apr_psprintf(mp, "Invalid transformation function: %s",
         action->param);
     action->param_data = metadata;
     return NULL;
 }
 
-static apr_status_t msre_action_t_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_t_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
     msre_action *action)
 {
     msre_tfn_metadata *metadata = (msre_tfn_metadata *)action->param_data;
@@ -789,16 +789,16 @@ static apr_status_t msre_action_t_init(msre_engine *engine, msre_actionset *acti
 }
 
 /* ctl */
-static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) {
+static char *msre_action_ctl_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     char *name = NULL;
     char *value = NULL;
 
     /* Parse first. */
-    if (parse_name_eq_value(engine->mp, action->param, &name, &value) < 0) {
+    if (parse_name_eq_value(mp, action->param, &name, &value) < 0) {
         return FATAL_ERROR;
     }
     if (value == NULL) {
-        return apr_psprintf(engine->mp, "Missing ctl value for name: %s", name);
+        return apr_psprintf(mp, "Missing ctl value for name: %s", name);
     }
 
     /* Validate value. */
@@ -806,25 +806,25 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
         if (strcasecmp(value, "detectiononly") == 0) return NULL;
-        return apr_psprintf(engine->mp, "Invalid setting for ctl name ruleEngine: %s", value);
+        return apr_psprintf(mp, "Invalid setting for ctl name ruleEngine: %s", value);
     } else
     if (strcasecmp(name, "ruleRemoveById") == 0) {
         /* ENH nothing yet */
         return NULL;
     } else
     if (strcasecmp(name, "ruleRemoveByTag") == 0) {
-        if (!msc_pregcomp(engine->mp, value, 0, NULL, NULL))
-           return apr_psprintf(engine->mp, "ModSecurity: Invalid regular expression \"%s\"", value);
+        if (!msc_pregcomp(mp, value, 0, NULL, NULL))
+           return apr_psprintf(mp, "ModSecurity: Invalid regular expression \"%s\"", value);
         return NULL;
     } else
     if (strcasecmp(name, "ruleRemoveByMsg") == 0) {
-       if (!msc_pregcomp(engine->mp, value, 0, NULL, NULL))
-           return apr_psprintf(engine->mp, "ModSecurity: Invalid regular expression \"%s\"", value);
+       if (!msc_pregcomp(mp, value, 0, NULL, NULL))
+           return apr_psprintf(mp, "ModSecurity: Invalid regular expression \"%s\"", value);
         return NULL;
     } else
     if (strcasecmp(name, "requestBodyAccess") == 0) {
         if (parse_boolean(value) == -1) {
-            return apr_psprintf(engine->mp, "Invalid setting for ctl name "
+            return apr_psprintf(mp, "Invalid setting for ctl name "
                 " requestBodyAccess: %s", value);
         }
         return NULL;
@@ -838,12 +838,12 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
     if (strcasecmp(name, "forceRequestBodyVariable") == 0) {
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
-        return apr_psprintf(engine->mp, "Invalid setting for ctl name "
+        return apr_psprintf(mp, "Invalid setting for ctl name "
             " forceRequestBodyVariable: %s", value);
     } else
     if (strcasecmp(name, "responseBodyAccess") == 0) {
         if (parse_boolean(value) == -1) {
-            return apr_psprintf(engine->mp, "Invalid setting for ctl name "
+            return apr_psprintf(mp, "Invalid setting for ctl name "
                 " responseBodyAccess: %s", value);
         }
         return NULL;
@@ -852,38 +852,38 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
         if (strcasecmp(value, "relevantonly") == 0) return NULL;
-        return apr_psprintf(engine->mp, "Invalid setting for ctl name "
+        return apr_psprintf(mp, "Invalid setting for ctl name "
             " auditEngine: %s", value);
     } else
     if (strcasecmp(name, "auditLogParts") == 0) {
         if ((value[0] == '+')||(value[0] == '-')) {
             if (is_valid_parts_specification(value + 1) != 1) {
-            return apr_psprintf(engine->mp, "Invalid setting for ctl name "
+            return apr_psprintf(mp, "Invalid setting for ctl name "
                 "auditLogParts: %s", value);
             }
         }
         else
         if (is_valid_parts_specification(value) != 1) {
-            return apr_psprintf(engine->mp, "Invalid setting for ctl name "
+            return apr_psprintf(mp, "Invalid setting for ctl name "
                 "auditLogParts: %s", value);
         }
         return NULL;
     } else
     if (strcasecmp(name, "debugLogLevel") == 0) {
         if ((atoi(value) >= 0)&&(atoi(value) <= 9)) return NULL;
-        return apr_psprintf(engine->mp, "Invalid setting for ctl name "
+        return apr_psprintf(mp, "Invalid setting for ctl name "
             "debugLogLevel: %s", value);
     } else
     if (strcasecmp(name, "requestBodyLimit") == 0) {
         long int limit = strtol(value, NULL, 10);
 
         if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
-            return apr_psprintf(engine->mp, "Invalid setting for ctl name "
+            return apr_psprintf(mp, "Invalid setting for ctl name "
                 "requestBodyLimit: %s", value);
         }
 
         if (limit > REQUEST_BODY_HARD_LIMIT) {
-            return apr_psprintf(engine->mp, "Request size limit cannot exceed "
+            return apr_psprintf(mp, "Request size limit cannot exceed "
                 "the hard limit: %ld", RESPONSE_BODY_HARD_LIMIT);
         }
 
@@ -893,12 +893,12 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
         long int limit = strtol(value, NULL, 10);
 
         if ((limit == LONG_MAX)||(limit == LONG_MIN)||(limit <= 0)) {
-            return apr_psprintf(engine->mp, "Invalid setting for ctl name "
+            return apr_psprintf(mp, "Invalid setting for ctl name "
                 "responseBodyLimit: %s", value);
         }
 
         if (limit > RESPONSE_BODY_HARD_LIMIT) {
-            return apr_psprintf(engine->mp, "Response size limit cannot exceed "
+            return apr_psprintf(mp, "Response size limit cannot exceed "
                 "the hard limit: %ld", RESPONSE_BODY_HARD_LIMIT);
         }
 
@@ -911,7 +911,7 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
                 parm = apr_strtok(value,";",&savedptr);
 
                 if(parm == NULL && savedptr == NULL)
-                    return apr_psprintf(engine->mp, "ruleRemoveTargetById must has at least id;VARIABLE");
+                    return apr_psprintf(mp, "ruleRemoveTargetById must has at least id;VARIABLE");
 
         return NULL;
     } else
@@ -921,9 +921,9 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
 
                 parm = apr_strtok(value,";",&savedptr);
                 if(parm == NULL && savedptr == NULL)
-                    return apr_psprintf(engine->mp, "ruleRemoveTargetByTag must has at least tag;VARIABLE");
-            if (!msc_pregcomp(engine->mp, parm, 0, NULL, NULL)) {
-                return apr_psprintf(engine->mp, "ModSecurity: Invalid regular expression \"%s\"", parm);
+                    return apr_psprintf(mp, "ruleRemoveTargetByTag must has at least tag;VARIABLE");
+            if (!msc_pregcomp(mp, parm, 0, NULL, NULL)) {
+                return apr_psprintf(mp, "ModSecurity: Invalid regular expression \"%s\"", parm);
             }
         return NULL;
     } else
@@ -933,27 +933,27 @@ static char *msre_action_ctl_validate(msre_engine *engine, msre_action *action) 
 
                 parm = apr_strtok(value,";",&savedptr);
                 if(parm == NULL && savedptr == NULL)
-                    return apr_psprintf(engine->mp, "ruleRemoveTargetByMsg must has at least msg;VARIABLE");
-            if (!msc_pregcomp(engine->mp, parm, 0, NULL, NULL)) {
-                return apr_psprintf(engine->mp, "ModSecurity: Invalid regular expression \"%s\"", parm);
+                    return apr_psprintf(mp, "ruleRemoveTargetByMsg must has at least msg;VARIABLE");
+            if (!msc_pregcomp(mp, parm, 0, NULL, NULL)) {
+                return apr_psprintf(mp, "ModSecurity: Invalid regular expression \"%s\"", parm);
             }
         return NULL;
      } else
         if (strcasecmp(name, "HashEnforcement") == 0) {
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
-        return apr_psprintf(engine->mp, "Invalid setting for ctl name HashEnforcement: %s", value);
+        return apr_psprintf(mp, "Invalid setting for ctl name HashEnforcement: %s", value);
      } else
         if (strcasecmp(name, "HashEngine") == 0) {
         if (strcasecmp(value, "on") == 0) return NULL;
         if (strcasecmp(value, "off") == 0) return NULL;
-        return apr_psprintf(engine->mp, "Invalid setting for ctl name HashEngine: %s", value);
+        return apr_psprintf(mp, "Invalid setting for ctl name HashEngine: %s", value);
      } else {
-            return apr_psprintf(engine->mp, "Invalid ctl name setting: %s", name);
+            return apr_psprintf(mp, "Invalid ctl name setting: %s", name);
      }
 }
 
-static apr_status_t msre_action_ctl_init(msre_engine *engine, msre_actionset *actionset,
+static apr_status_t msre_action_ctl_init(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset,
         msre_action *action)
 {
     /* Do nothing. */
@@ -1294,16 +1294,16 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
 }
 
 /* xmlns */
-static char *msre_action_xmlns_validate(msre_engine *engine, msre_action *action) {
+static char *msre_action_xmlns_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     char *name = NULL;
     char *value = NULL;
 
     /* Parse first. */
-    if (parse_name_eq_value(engine->mp, action->param, &name, &value) < 0) {
+    if (parse_name_eq_value(mp, action->param, &name, &value) < 0) {
         return FATAL_ERROR;
     }
     if (value == NULL) {
-        return apr_psprintf(engine->mp, "Missing xmlns href for prefix: %s", name);
+        return apr_psprintf(mp, "Missing xmlns href for prefix: %s", name);
     }
 
     /* Don't do anything else right now, we are just storing
@@ -2165,7 +2165,7 @@ static apr_status_t msre_action_setrsc_execute(modsec_rec *msr, apr_pool_t *mptm
 }
 
 /* exec */
-static char *msre_action_exec_validate(msre_engine *engine, msre_action *action) {
+static char *msre_action_exec_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     #if defined(WITH_LUA)
     char *filename = (char *)action->param;
 
@@ -2179,7 +2179,7 @@ static char *msre_action_exec_validate(msre_engine *engine, msre_action *action)
             msc_script *script = NULL;
 
             /* Compile script. */
-            char *msg = lua_compile(&script, filename, engine->mp);
+            char *msg = lua_compile(&script, filename, mp);
             if (msg != NULL) return msg;
 
             action->param_data = script;
