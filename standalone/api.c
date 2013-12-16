@@ -250,6 +250,10 @@ directory_config *modsecGetDefaultConfig()  {
     return (directory_config *)security2_module.create_dir_config(pool, NULL);
 }
 
+directory_config *modsecGetNewConfig(apr_pool_t *a_pool)  {
+    return (directory_config *)security2_module.create_dir_config(a_pool, NULL);
+}
+
 const char *modsecProcessConfig(directory_config *config, const char *file, const char *dir)  {
     apr_pool_t *ptemp = NULL;
     const char *err;
