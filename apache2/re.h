@@ -319,10 +319,10 @@ void DSOLOCAL msre_engine_variable_register(msre_engine *engine, const char *nam
     fn_var_validate_t validate, fn_var_generate_t generate,
     unsigned int is_cacheable, unsigned int availability);
 
-msre_actionset DSOLOCAL *msre_actionset_create(msre_engine *engine, const char *text,
+msre_actionset DSOLOCAL *msre_actionset_create(msre_engine *engine, apr_pool_t *mp, const char *text,
     char **error_msg);
 
-msre_actionset DSOLOCAL *msre_actionset_merge(msre_engine *engine, msre_actionset *parent,
+msre_actionset DSOLOCAL *msre_actionset_merge(msre_engine *engine, apr_pool_t *mp, msre_actionset *parent,
     msre_actionset *child, int inherit_by_default);
 
 msre_actionset DSOLOCAL *msre_actionset_create_default(msre_engine *engine);
@@ -331,8 +331,8 @@ void DSOLOCAL msre_actionset_set_defaults(msre_actionset *actionset);
 
 void DSOLOCAL msre_actionset_init(msre_actionset *actionset, msre_rule *rule);
 
-typedef char *(*fn_action_validate_t)(msre_engine *engine, msre_action *action);
-typedef apr_status_t (*fn_action_init_t)(msre_engine *engine, msre_actionset *actionset, msre_action *action);
+typedef char *(*fn_action_validate_t)(msre_engine *engine, apr_pool_t *mp, msre_action *action);
+typedef apr_status_t (*fn_action_init_t)(msre_engine *engine, apr_pool_t *mp, msre_actionset *actionset, msre_action *action);
 typedef apr_status_t (*fn_action_execute_t)(modsec_rec *msr, apr_pool_t *mptmp, msre_rule *rule, msre_action *action);
 
 #define ACTION_DISRUPTIVE       1
