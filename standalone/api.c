@@ -266,7 +266,7 @@ const char *modsecProcessConfig(directory_config *config, const char *file, cons
 	incpath = file;
 
 	/* locate the start of the directories proper */
-	status = apr_filepath_root(&rootpath, &incpath, APR_FILEPATH_TRUENAME | APR_FILEPATH_NATIVE, pool);
+	status = apr_filepath_root(&rootpath, &incpath, APR_FILEPATH_TRUENAME | APR_FILEPATH_NATIVE, config->mp);
 
 	/* we allow APR_SUCCESS and APR_EINCOMPLETE */
 	if (APR_ERELATIVE == status) {
@@ -274,20 +274,20 @@ const char *modsecProcessConfig(directory_config *config, const char *file, cons
 
 		if(dir[li] != '/' && dir[li] != '\\')
 #ifdef	WIN32
-			file = apr_pstrcat(pool, dir, "\\", file, NULL);
+			file = apr_pstrcat(config->mp, dir, "\\", file, NULL);
 #else
-			file = apr_pstrcat(pool, dir, "/", file, NULL);
+			file = apr_pstrcat(config->mp, dir, "/", file, NULL);
 #endif
 		else
-			file = apr_pstrcat(pool, dir, file, NULL);
+			file = apr_pstrcat(config->mp, dir, file, NULL);
 	}
 	else if (APR_EBADPATH == status) {
-		return apr_pstrcat(pool, "Config file has a bad path, ", file, NULL);
+		return apr_pstrcat(config->mp, "Config file has a bad path, ", file, NULL);
 	}
 
-	apr_pool_create(&ptemp, pool);
+	apr_pool_create(&ptemp, config->mp);
 
-    err = process_command_config(server, config, pool, ptemp, file);
+    err = process_command_config(server, config, config->mp, ptemp, file);
 
     apr_pool_destroy(ptemp);
 
