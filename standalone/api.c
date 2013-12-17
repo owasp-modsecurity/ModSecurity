@@ -644,10 +644,19 @@ int modsecFinishRequest(request_rec *r) {
     // make sure you cleanup before calling apr_terminate()
     // otherwise double-free might occur, because of the request body pool cleanup function
     //
-    apr_pool_destroy(r->connection->pool);
+    apr_pool_destroy(r->pool);
 
     return DECLINED;
 }
+
+// destroy only the connection pool
+int modsecFinishConnection(conn_rec *c)
+{
+
+    apr_pool_destroy(c->pool);
+
+}
+
 
 void modsecSetLogHook(void *obj, void (*hook)(void *obj, int level, char *str)) {
     modsecLogObj = obj;

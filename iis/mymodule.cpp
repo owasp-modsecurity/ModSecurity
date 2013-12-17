@@ -67,6 +67,10 @@ class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 		{
 			modsecFinishRequest(m_pRequestRec);
 			m_pRequestRec = NULL;
+		}
+		if(m_pConnRec != NULL)
+		{
+			modsecFinishConnection(m_pConnRec);
 			m_pConnRec = NULL;
 		}
 	}
