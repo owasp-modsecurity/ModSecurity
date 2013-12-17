@@ -58,6 +58,7 @@ void modsecInitProcess();
 
 conn_rec *modsecNewConnection();
 void modsecProcessConnection(conn_rec *c);
+int modsecFinishConnection(conn_rec *c);
 
 request_rec *modsecNewRequest(conn_rec *connection, directory_config *config);
 
