@@ -17,7 +17,6 @@
 #include "modsecurity.h"
 #include "msc_logging.h"
 #include "msc_util.h"
-#include "pdf_protect.h"
 #include "http_log.h"
 #include "apr_lib.h"
 #include "acmp.h"
@@ -112,14 +111,6 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     /* Stream inspection */
     dcfg->stream_inbody_inspection = NOT_SET;
     dcfg->stream_outbody_inspection = NOT_SET;
-
-    /* PDF XSS protection. */
-    dcfg->pdfp_enabled = NOT_SET;
-    dcfg->pdfp_secret = NOT_SET_P;
-    dcfg->pdfp_timeout = NOT_SET;
-    dcfg->pdfp_token_name = NOT_SET_P;
-    dcfg->pdfp_only_get = NOT_SET;
-    dcfg->pdfp_method = NOT_SET;
 
     /* Geo Lookups */
     dcfg->geo = NOT_SET_P;
@@ -532,20 +523,6 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->stream_outbody_inspection = (child->stream_outbody_inspection == NOT_SET
         ? parent->stream_outbody_inspection : child->stream_outbody_inspection);
 
-    /* PDF XSS protection. */
-    merged->pdfp_enabled = (child->pdfp_enabled == NOT_SET
-        ? parent->pdfp_enabled : child->pdfp_enabled);
-    merged->pdfp_secret = (child->pdfp_secret == NOT_SET_P
-        ? parent->pdfp_secret : child->pdfp_secret);
-    merged->pdfp_timeout = (child->pdfp_timeout == NOT_SET
-        ? parent->pdfp_timeout : child->pdfp_timeout);
-    merged->pdfp_token_name = (child->pdfp_token_name == NOT_SET_P
-        ? parent->pdfp_token_name : child->pdfp_token_name);
-    merged->pdfp_only_get = (child->pdfp_only_get == NOT_SET
-        ? parent->pdfp_only_get : child->pdfp_only_get);
-    merged->pdfp_method = (child->pdfp_method == NOT_SET
-        ? parent->pdfp_method : child->pdfp_method);
-
     /* Geo Lookup */
     merged->geo = (child->geo == NOT_SET_P
         ? parent->geo : child->geo);
@@ -700,14 +677,6 @@ void init_directory_config(directory_config *dcfg)
     /* Stream inspection */
     if (dcfg->stream_inbody_inspection == NOT_SET) dcfg->stream_inbody_inspection = 0;
     if (dcfg->stream_outbody_inspection == NOT_SET) dcfg->stream_outbody_inspection = 0;
-
-    /* PDF XSS protection. */
-    if (dcfg->pdfp_enabled == NOT_SET) dcfg->pdfp_enabled = 0;
-    if (dcfg->pdfp_secret == NOT_SET_P) dcfg->pdfp_secret = NULL;
-    if (dcfg->pdfp_timeout == NOT_SET) dcfg->pdfp_timeout = 10;
-    if (dcfg->pdfp_token_name == NOT_SET_P) dcfg->pdfp_token_name = "PDFPTOKEN";
-    if (dcfg->pdfp_only_get == NOT_SET) dcfg->pdfp_only_get = 1;
-    if (dcfg->pdfp_method == NOT_SET) dcfg->pdfp_method = PDF_PROTECT_METHOD_TOKEN_REDIRECTION;
 
     /* Geo Lookup */
     if (dcfg->geo == NOT_SET_P) dcfg->geo = NULL;
@@ -2843,6 +2812,7 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg,
             if (intval < 0) {
                 return apr_psprintf(cmd->pool, "ModSecurity: SecCacheTransformations maxlen must be positive: %s", charval);
             }
+
             /* The NOT_SET indicator is -1, a signed long, and therfore
              * we cannot be >= the unsigned value of NOT_SET.
              */
@@ -2870,26 +2840,6 @@ static const char *cmd_cache_transformations(cmd_parms *cmd, void *_dcfg,
         }
     }
 
-    return NULL;
-}
-
-
-static const char *cmd_pdf_protect_method(cmd_parms *cmd, void *_dcfg,
-    const char *p1)
-{
-    directory_config *dcfg = (directory_config *)_dcfg;
-    if (dcfg == NULL) return NULL;
-
-    if (strcasecmp(p1, "TokenRedirection") == 0) {
-        dcfg->pdfp_method = PDF_PROTECT_METHOD_TOKEN_REDIRECTION;
-    } else
-    if (strcasecmp(p1, "ForcedDownload") == 0) {
-        dcfg->pdfp_method = PDF_PROTECT_METHOD_FORCED_DOWNLOAD;
-    } else {
-        return (const char *)apr_psprintf(cmd->pool,
-            "ModSecurity: Unrecognised parameter value for SecPdfProtectMethod: %s", p1);
-    }
-    
     return NULL;
 }
 
@@ -3568,14 +3518,6 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "Set Hash key"
-    ),
-
-    AP_INIT_TAKE1 (
-        "SecPdfProtectMethod",
-        cmd_pdf_protect_method,
-        NULL,
-        RSRC_CONF,
-        "protection method to use. Can be 'TokenRedirection' (default) or 'ForcedDownload'"
     ),
 
     AP_INIT_TAKE1 (
