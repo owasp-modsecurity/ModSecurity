@@ -1,3 +1,11 @@
+17 Dec 2013 - 2.7.7
+-------------------
+Fixes:
+
+- Changed release version to 2.7.7
+- Got the configure scripts inside the release tarball
+
+
 16 Dec 2013 - 2.7.6 
 -------------------
 Improvements:
