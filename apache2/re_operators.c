@@ -2138,22 +2138,21 @@ static int msre_op_contains_execute(modsec_rec *msr, msre_rule *rule, msre_var *
 static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
     char **error_msg) {
 
-    struct libinjection_sqli_state sqli_state;
+    char fingerprint[8];
     int issqli;
     int capture;
 
-    libinjection_sqli_init(&sqli_state, var->value, var->value_len, 0);
-    issqli = libinjection_is_sqli(&sqli_state);
+    issqli = libinjection_sqli(var->value, var->value_len, fingerprint);
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     if (issqli) {
-        set_match_to_tx(msr, capture, sqli_state.fingerprint, 0);
+        set_match_to_tx(msr, capture, fingerprint, 0);
 
         *error_msg = apr_psprintf(msr->mp, "detected SQLi using libinjection with fingerprint '%s'",
-                                  sqli_state.fingerprint);
+                                  fingerprint);
         if (msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "ISSQL: libinjection fingerprint '%s' matched input '%s'",
-                    sqli_state.fingerprint,
+                    fingerprint,
                     log_escape_ex(msr->mp, var->value, var->value_len));
         }
     } else {
