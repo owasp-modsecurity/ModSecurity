@@ -50,9 +50,6 @@ int DSOLOCAL inet_pton(int family, const char *src, void *dst);
 int DSOLOCAL swap_int32(int x);
 #endif
 
-#ifdef WIN32
-#define inet_pton(x, y, z) my_inet_pton(x, y, z)
-#endif
 
 char DSOLOCAL *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int input_len, int *changed);
 

@@ -836,7 +836,7 @@ char *m_strcasestr(const char *haystack, const char *needle) {
 }
 
 #ifdef WIN32
-int my_inet_pton(int family, const char *src, void *dst)   {
+int inet_pton(int family, const char *src, void *dst)   {
     struct addrinfo addr;
     struct sockaddr_in *in = NULL;
 #if APR_HAVE_IPV6
