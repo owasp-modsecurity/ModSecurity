@@ -836,6 +836,7 @@ char *m_strcasestr(const char *haystack, const char *needle) {
 }
 
 #ifdef WIN32
+#if !(NTDDI_VERSION >= NTDDI_VISTA)
 int inet_pton(int family, const char *src, void *dst)   {
     struct addrinfo addr;
     struct sockaddr_in *in = NULL;
@@ -874,6 +875,7 @@ int inet_pton(int family, const char *src, void *dst)   {
 
     return -1;
 }
+#endif
 #endif
 
 /**
