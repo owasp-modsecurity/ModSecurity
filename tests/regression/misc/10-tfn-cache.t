@@ -126,8 +126,8 @@
 
 		# This should see cached versions of *both* ARGS_GET
 		SecRule ARGS:test "queryval" "phase:2,t:none,t:removeWhiteSpace,t:lowercase,deny,chain,id:500046"
-		SecRule ARGS:test "firstval" "t:none,t:removeWhiteSpace,t:lowercase,chain,id:500047"
-		SecRule ARGS:test "secondval" "t:none,t:removeWhiteSpace,t:lowercase,id:500017"
+		SecRule ARGS:test "firstval" "t:none,t:removeWhiteSpace,t:lowercase,chain"
+		SecRule ARGS:test "secondval" "t:none,t:removeWhiteSpace,t:lowercase"
 	),
 	match_log => {
 		debug => [ qr/removeWhiteSpace,lowercase: "queryval" .*removeWhiteSpace,lowercase: "firstval" .*cached.*removeWhiteSpace,lowercase: "secondval" .*cached/s, 1 ],
