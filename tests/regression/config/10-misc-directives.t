@@ -13,7 +13,7 @@
 	conf => qq(
 		SecRuleEngine on
 		SecDefaultAction "phase:1,deny,status:500"
-		SecRule REQUEST_URI "test.txt,id:500240"
+		SecRule REQUEST_URI "test.txt" "id:500241"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Access denied with code 500 \(phase 1\)/, 1 ],
