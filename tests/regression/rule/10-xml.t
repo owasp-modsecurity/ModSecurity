@@ -8,6 +8,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecRequestBodyAccess On
+        SecXmlExternalEntity On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
@@ -55,6 +56,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecRequestBodyAccess On
+        SecXmlExternalEntity On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecAuditEngine RelevantOnly
@@ -104,6 +106,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecRequestBodyAccess On
+        SecXmlExternalEntity On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecAuditEngine RelevantOnly
@@ -154,6 +157,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecRequestBodyAccess On
+        SecXmlExternalEntity On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecAuditEngine RelevantOnly
@@ -204,6 +208,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecRequestBodyAccess On
+        SecXmlExternalEntity On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecAuditEngine RelevantOnly
@@ -254,6 +259,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecRequestBodyAccess On
+        SecXmlExternalEntity On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500020, \\
@@ -297,6 +303,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecRequestBodyAccess On
+        SecXmlExternalEntity On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500023, \\
@@ -340,6 +347,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecRequestBodyAccess On
+        SecXmlExternalEntity On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500026, \\
@@ -383,6 +391,7 @@
 	conf => qq(
 		SecRuleEngine On
 		SecRequestBodyAccess On
+        SecXmlExternalEntity On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500029, \\
