@@ -267,9 +267,7 @@
         SecAuditEngine RelevantOnly
     ),
     match_log => {
-        audit => [ qr/Final boundary missing/, 1 ],
         debug => [ qr/Final boundary missing/, 1 ],
-
     },
     match_response => {
         status => qr/^200$/,

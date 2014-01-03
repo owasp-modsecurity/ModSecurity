@@ -11,7 +11,7 @@
 		SecAction "nolog,id:500001"
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/500001/, 1 ],
 		-audit => [ qr/./, 1 ],
 		debug => [ qr/Warning\. Unconditional match in SecAction\./, 1 ],
 	},
@@ -32,11 +32,11 @@
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 5
         SecDefaultAction "phase:2,deny,status:403"
-        SecRule ARGS:test "value,id:500032"
+        SecRule ARGS:test "value" "id:500032"
 	),
 	match_log => {
-		error => [ qr/ModSecurity: /, 1 ],
-		debug => [ qr/Rule [0-9a-f]+: SecRule "ARGS:test" "\@rx value" "phase:2,deny,status:403"$/m, 1 ],
+		error => [ qr/500032/, 1 ],
+		debug => [ qr/Rule [0-9a-f]+: SecRule "ARGS:test" "\@rx value" "phase:2,deny,status:403,id:500032"$/m, 1 ],
 	},
 	match_response => {
 		status => qr/^403$/,
@@ -57,7 +57,7 @@
 	),
 	match_log => {
 		error => [ qr/ModSecurity: /, 1 ],
-		debug => [ qr/Rule [0-9a-f]+: SecRule "ARGS:test" "\@rx value" "phase:2,deny,status:403"$/m, 1 ],
+		debug => [ qr/Rule [0-9a-f]+: SecRule "ARGS:test" "\@rx value" "phase:2,deny,status:403,id:500033"$/m, 1 ],
 	},
 	match_response => {
 		status => qr/^403$/,
@@ -75,12 +75,12 @@
 		SecDebugLogLevel 5
         SecDefaultAction "phase:2,log,noauditlog,pass,tag:foo"
         SecRule ARGS:test "value" "chain,phase:2,deny,status:403,id:500034"
-        SecRule &ARGS "\@eq 1" "chain,setenv:tx.foo=bar,id:500035"
-        SecRule REQUEST_METHOD "\@streq GET,id:500036"
+        SecRule &ARGS "\@eq 1" "chain,setenv:tx.foo=bar"
+        SecRule REQUEST_METHOD "\@streq GET"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: /, 1 ],
-		debug => [ qr/Rule [0-9a-f]+: SecRule "ARGS:test" "\@rx value" "phase:2,log,noauditlog,tag:foo,chain,deny,status:403"\r?\n.*Rule [0-9a-f]+: SecRule "&ARGS" "\@eq 1" "chain,setenv:tx.foo=bar"\r?\n.*Rule [0-9a-f]+: SecRule "REQUEST_METHOD" "\@streq GET"\r?\n/s, 1 ],
+		debug => [ qr/Rule [0-9a-f]+: SecRule "ARGS:test" "\@rx value" "phase:2,log,noauditlog,tag:foo,chain,deny,status:403,id:500034"\r?\n.*Rule [0-9a-f]+: SecRule "&ARGS" "\@eq 1" "chain,setenv:tx.foo=bar"\r?\n.*Rule [0-9a-f]+: SecRule "REQUEST_METHOD" "\@streq GET"\r?\n/s, 1 ],
 	},
 	match_response => {
 		status => qr/^403$/,

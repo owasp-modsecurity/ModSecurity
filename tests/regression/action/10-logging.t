@@ -37,7 +37,7 @@
 		SecAction "phase:1,pass,nolog,id:500007"
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/500007/, 1 ],
 		-audit => [ qr/./, 1 ],
 	},
 	match_response => {
@@ -85,7 +85,7 @@
 		SecAction "phase:1,deny,status:403,nolog,id:500009"
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/500009/, 1 ],
 		-audit => [ qr/./, 1 ],
 	},
 	match_response => {
@@ -274,7 +274,7 @@
 		SecAction "phase:1,pass,nolog,noauditlog,id:500017"
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/500017/, 1 ],
 		-audit => [ qr/./, 1 ],
 	},
 	match_response => {
@@ -320,7 +320,7 @@
 		SecAction "phase:1,pass,auditlog,nolog,id:500019"
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/500019/, 1 ],
 		-audit => [ qr/./, 1 ],
 	},
 	match_response => {
@@ -366,7 +366,7 @@
 		SecAction "phase:1,pass,noauditlog,nolog,id:500021"
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/500021/, 1 ],
 		-audit => [ qr/./, 1 ],
 	},
 	match_response => {
@@ -460,7 +460,7 @@
 		SecAction "phase:1,deny,status:403,nolog,noauditlog,id:500025"
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/500025/, 1 ],
 		-audit => [ qr/./, 1 ],
 	},
 	match_response => {
@@ -506,7 +506,7 @@
 		SecAction "phase:1,deny,status:403,auditlog,nolog,id:500027"
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/500027/, 1 ],
 		-audit => [ qr/./, 1 ],
 	},
 	match_response => {
@@ -552,7 +552,7 @@
 		SecAction "phase:1,deny,status:403,noauditlog,nolog,id:500029"
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/500029/, 1 ],
 		-audit => [ qr/./, 1 ],
 	},
 	match_response => {

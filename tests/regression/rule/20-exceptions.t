@@ -8,11 +8,11 @@
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1"
-		SecRuleRemoveById 1
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:101010"
+		SecRuleRemoveById 101010
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/101010/, 1 ],
 		-audit => [ qr/./, 1 ],
 		debug => [ qr/Starting phase REQUEST_HEADERS\..*This phase consists of 0 rule.*Starting phase RESPONSE_HEADERS\./s, 1 ],
 		-debug => [ qr/Access denied/, 1 ],
@@ -31,13 +31,13 @@
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1"
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:2"
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:3"
-		SecRuleRemoveById 1 2 3
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:101010"
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:202020"
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:303030"
+		SecRuleRemoveById 101010 202020 303030
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/101010|202020|303030/, 1 ],
 		-audit => [ qr/./, 1 ],
 		debug => [ qr/Starting phase REQUEST_HEADERS\..*This phase consists of 0 rule.*Starting phase RESPONSE_HEADERS\./s, 1 ],
 		-debug => [ qr/Access denied/, 1 ],
@@ -56,13 +56,13 @@
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1"
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:2"
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:3"
-		SecRuleRemoveById 1-3
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:101010"
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:202020"
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:303030"
+		SecRuleRemoveById 101010-303030
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/101010|202020|303030/, 1 ],
 		-audit => [ qr/./, 1 ],
 		debug => [ qr/Starting phase REQUEST_HEADERS\..*This phase consists of 0 rule.*Starting phase RESPONSE_HEADERS\./s, 1 ],
 		-debug => [ qr/Access denied/, 1 ],
@@ -81,14 +81,14 @@
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1"
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:2"
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:3"
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:4"
-		SecRuleRemoveById 1 2-4
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:101010"
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:202020"
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:303030"
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:404040"
+		SecRuleRemoveById 101010 202020-404040
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/101010|202020|303030|404040/, 1 ],
 		-audit => [ qr/./, 1 ],
 		debug => [ qr/Starting phase REQUEST_HEADERS\..*This phase consists of 0 rule.*Starting phase RESPONSE_HEADERS\./s, 1 ],
 		-debug => [ qr/Access denied/, 1 ],
@@ -109,11 +109,11 @@
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1,msg:'testing rule',id:500001"
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,msg:'testing rule',id:500001"
 		SecRuleRemoveByMsg "testing rule"
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/500001/, 1 ],
 		-audit => [ qr/./, 1 ],
 		debug => [ qr/Starting phase REQUEST_HEADERS\..*This phase consists of 0 rule.*Starting phase RESPONSE_HEADERS\./s, 1 ],
 		-debug => [ qr/Access denied/, 1 ],
@@ -134,13 +134,13 @@
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1,msg:'testing rule',id:500002"
-		SecRuleUpdateActionById 1 "pass,nolog"
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,msg:'testing rule',id:500002"
+		SecRuleUpdateActionById 500002 "pass,nolog"
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/500002/, 1 ],
 		-audit => [ qr/./, 1 ],
-		debug => [ qr/id:1,.*,pass,nolog/, 1 ],
+		debug => [ qr/id:500002,pass,nolog/, 1 ],
 		-debug => [ qr/Access denied/, 1 ],
 	},
 	match_response => {
@@ -157,14 +157,14 @@
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_URI "test" "phase:1,deny,status:500,id:1,msg:'testing rule',chain,id:500003"
-        SecRule ARGS "bar,id:500004"
-		SecRuleUpdateActionById 1 "pass,nolog"
+		SecRule REQUEST_URI "test" "phase:1,deny,status:500,msg:'testing rule',chain,id:500003"
+        SecRule ARGS "bar"
+		SecRuleUpdateActionById 500003 "pass,nolog"
 	),
 	match_log => {
-		-error => [ qr/ModSecurity: /, 1 ],
+		-error => [ qr/500003/, 1 ],
 		-audit => [ qr/./, 1 ],
-		debug => [ qr/id:1,.*,pass,nolog/, 1 ],
+		debug => [ qr/id:500003,pass,nolog/, 1 ],
 		-debug => [ qr/Access denied/, 1 ],
 	},
 	match_response => {
