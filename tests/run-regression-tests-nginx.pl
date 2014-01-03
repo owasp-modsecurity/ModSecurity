@@ -581,7 +581,12 @@ sub nginx_stop {
 
 	sleep 0.5;
 	if (-e $PID_FILE) {
-		msg("Nginx stop failed: $PID_FILE still exists");
+		vrb("Nginx pid file still exists, sleeping for more 20 seconds.");
+		sleep 20;
+
+		if (-e $PID_FILE) {
+		    msg("Nginx stop failed: $PID_FILE still exists");
+		}
 	}
 
 	return $rc;
