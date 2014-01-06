@@ -1139,9 +1139,6 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
 
     /* SecResponseBodyAccess on, process rules in body filter */
 
-    /* pretend we are ngx_http_header_filter */
-    r->header_sent = 1;
-
     r->filter_need_in_memory = 1;
     return NGX_OK;
 }
