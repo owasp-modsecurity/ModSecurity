@@ -15,6 +15,7 @@ http {
 		listen [% listen %];
 		server_name localhost;
 		location / {
+			error_page 405 = $uri;
 		}
 	}
 }
