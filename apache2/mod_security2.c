@@ -537,6 +537,11 @@ static modsec_rec *create_tx_context(request_rec *r) {
 static apr_status_t change_server_signature(server_rec *s) {
     char *server_version = NULL;
 
+    /* This is a very particular way to handle the server banner. It is Apache
+     * only. Stanalone and descendants should address that in its specifics
+     * implementations, e.g. Nginx module.
+     */
+#if !(defined(VERSION_IIS)) && !(defined(VERSION_NGINX)) && !(defined(VERSION_STANDALONE))
     if (new_server_signature == NULL) return 0;
 
     server_version = (char *)apache_get_server_version();
@@ -568,7 +573,7 @@ static apr_status_t change_server_signature(server_rec *s) {
     else {
         ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, 0, s, "SecServerSignature: Changed server signature to \"%s\".", server_version);
     }
-
+#endif
     return 1;
 }
 

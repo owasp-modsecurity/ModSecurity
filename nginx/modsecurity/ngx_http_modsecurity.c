@@ -719,6 +719,14 @@ ngx_http_modsecurity_save_headers_out(ngx_http_request_t *r)
     upstream = r->upstream;
     r->upstream = &ngx_http_modsecurity_upstream;
 
+    /* case SecServerSignature was used, the "Server: ..." header is added
+     * here, overwriting the default header supplied by nginx.
+     */
+    if (modsecIsServerSignatureAvailale() != NULL) {
+        apr_table_add(ctx->req->headers_out, "Server",
+                modsecIsServerSignatureAvailale());
+    }
+
     if (apr_table_do(ngx_http_modsecurity_save_headers_out_visitor,
                      r, ctx->req->headers_out, NULL) == 0) {
 

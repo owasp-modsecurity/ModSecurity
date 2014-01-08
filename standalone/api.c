@@ -673,3 +673,11 @@ void modsecSetWriteResponse(apr_status_t (*func)(request_rec *r, char *buf, unsi
 void modsecSetDropAction(int (*func)(request_rec *r)) {
     modsecDropAction = func;
 }
+
+/*
+ * Case SecServerSignature was used, this function returns the banner that
+ * should be used, otherwise it returns NULL.
+ */
+const char *modsecIsServerSignatureAvailale(void) {
+    return new_server_signature;
+}

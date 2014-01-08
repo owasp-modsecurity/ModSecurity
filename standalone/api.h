@@ -114,6 +114,8 @@ int modsecIsRequestBodyAccessEnabled(request_rec *r);
 
 void modsecSetConfigForIISRequestBody(request_rec *r);
 
+const char *modsecIsServerSignatureAvailale(void);
+
 #ifdef __cplusplus
 }
 #endif
