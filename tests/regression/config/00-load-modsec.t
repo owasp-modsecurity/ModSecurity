@@ -2,7 +2,10 @@
 	type => "config",
 	comment => "module loaded",
 	match_log => {
-		error => [ qr/ModSecurity for Apache.* configured\./, 10 ],
+		error => {
+			apache => [ qr/ModSecurity for Apache.* configured\./, 10 ],
+			nginx => [ qr/ModSecurity for nginx.* configured\./, 10 ],
+		},
 	},
 },
 {
@@ -18,6 +21,9 @@
 		return $conf;
 	},
 	match_log => {
-		error => [ qr/ModSecurity for Apache.* configured\./, 10 ],
+		error => {
+			apache => [ qr/ModSecurity for Apache.* configured\./, 10 ],
+			nginx => [ qr/ModSecurity for nginx.* configured\./, 10 ],
+		},
 	},
 },
