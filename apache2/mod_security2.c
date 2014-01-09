@@ -195,6 +195,7 @@ int perform_interception(modsec_rec *msr) {
             break;
 
         case ACTION_PROXY :
+#if !(defined(VERSION_IIS)) && !(defined(VERSION_NGINX)) && !(defined(VERSION_STANDALONE))
             if (msr->phase < 3) {
                 if (ap_find_linked_module("mod_proxy.c") == NULL) {
                     log_level = 1;
@@ -219,6 +220,15 @@ int perform_interception(modsec_rec *msr) {
                     "(Configuration Error: Proxy action requested but it does not work in output phases).",
                     phase_text);
             }
+#else
+            log_level = 1;
+            status = HTTP_INTERNAL_SERVER_ERROR;
+            message = apr_psprintf(msr->mp, "Access denied with code 500%s "
+                "(Configuration Error: Proxy action to %s requested but "
+                "proxy is only available in Apache version).",
+                phase_text,
+                log_escape_nq(msr->mp, actionset->intercept_uri));
+#endif
             break;
 
         case ACTION_DROP :
