@@ -44,6 +44,9 @@ $UA->agent($UA_NAME);
 
 $SIG{TERM} = $SIG{INT} = \&handle_interrupt;
 
+
+my $platform = "nginx";
+
 my %opt;
 getopts('A:E:D:C:T:H:a:p:dvh', \%opt);
 
@@ -233,6 +236,19 @@ sub runfile {
 					for my $key (keys %{ $t{match_response} || {}}) {
 						my($neg,$mtype) = ($key =~ m/^(-?)(.*)$/);
 						my $m = $t{match_response}{$key};
+						if (ref($m) eq "HASH") {
+							if ($m->{$platform}) {
+								$m = $m->{$platform};
+							}
+							else {
+								my $ap = join(", ", keys %{$m});
+								msg("Warning: trying to match response. Nothing " .
+									"to match in current platform: $platform. " .
+									"This test only contains cotent for: $ap.");
+								last;
+							}
+						}
+
 						my $match = match_response($mtype, $resp, $m);
 						if ($neg and defined $match) {
 							$rc = 1;
@@ -266,6 +282,18 @@ sub runfile {
 				for my $key (keys %{ $t{match_log} || {}}) {
 					my($neg,$mtype) = ($key =~ m/^(-?)(.*)$/);
 					my $m = $t{match_log}{$key};
+					if (ref($m) eq "HASH") {
+						if ($m->{$platform}) {
+							$m = $m->{$platform};
+						}
+						else {
+							my $ap = join(", ", keys %{$m});
+							msg("Warning: trying to match: $mtype. Nothing " .
+								"to match in current platform: $platform. " .
+								"This test only contains cotent for: $ap.");
+							last;
+						}
+					}
 					my $match = match_log($mtype, @{$m || []});
 					if ($neg and defined $match) {
 						$rc = 1;
