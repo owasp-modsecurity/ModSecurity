@@ -457,6 +457,14 @@ sub match_log {
 
 	$timeout = 0 unless (defined $timeout);
 
+	# Audit logs are taking too long to be written on the disk. One of the
+	# consequence of that is to have tests that demands to read from audit
+	# log failing. Increase the timeout here, make it wait a little bit
+	# more for the logs before gave up.
+	if ($name eq "audit") {
+		$timeout = 20;
+	}
+
 	my $i = 0;
 	my $graphed = 0;
 READ: {
