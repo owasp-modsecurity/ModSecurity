@@ -32,6 +32,10 @@ my $REG_DIR = "$SCRIPT_DIR/regression";
 my $NGINX_DIR = "$REG_DIR/nginx";
 my $NGINX_CONF_TEMP = "$REG_DIR/nginx/conf/nginx.conf.template";
 my $NGINX = q(/usr/local/nginx/sbin/nginx);
+my $SROOT_DIR = "$REG_DIR/server_root";
+my $TEMP_DIR = "$SROOT_DIR/tmp";
+my $DATA_DIR = "$SROOT_DIR/data";
+my $UPLOAD_DIR = "$SROOT_DIR/upload";
 
 my $PASSED = 0;
 my $TOTAL = 0;
@@ -120,9 +124,9 @@ dircopy("$REG_DIR/server_root/htdocs","$opt{P}/html") or die $!;
 		SERVER_PORT => $opt{p},
 		SERVER_NAME => "localhost",
 #    TEST_NGX_PREFIX => $NGINX_DIR,
-#    DATA_DIR => $DATA_DIR,
-#    TEMP_DIR => $TEMP_DIR,
-#    UPLOAD_DIR => $UPLOAD_DIR,
+		DATA_DIR => $DATA_DIR,
+		TEMP_DIR => $TEMP_DIR,
+		UPLOAD_DIR => $UPLOAD_DIR,
 		CONF_DIR => $CONF_DIR,
 #    MODULES_DIR => $MODULES_DIR,
 		LOGS_DIR => $FILES_DIR,
