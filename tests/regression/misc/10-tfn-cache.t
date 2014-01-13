@@ -153,9 +153,7 @@
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 
-		<IfDefine MODSEC_2.5>
-			SecRequestBodyNoFilesLimit 1048576
-		</IfDefine>
+		SecRequestBodyNoFilesLimit 1048576
 		SecRequestBodyInMemoryLimit 131072
 		SecResponseBodyLimit 1048576
 
