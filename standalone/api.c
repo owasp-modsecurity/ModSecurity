@@ -500,6 +500,16 @@ void modsecSetConfigForIISRequestBody(request_rec *r)
         msr->txcfg->stream_inbody_inspection = 1;
 }
 
+int modsecContextState(request_rec *r)
+{
+    modsec_rec *msr = retrieve_msr(r);
+
+    if(msr == NULL || msr->txcfg == NULL)
+        return NOT_SET;
+
+    return msr->txcfg->is_enabled;
+}
+
 int modsecIsRequestBodyAccessEnabled(request_rec *r)
 {
     modsec_rec *msr = retrieve_msr(r);
@@ -681,3 +691,4 @@ void modsecSetDropAction(int (*func)(request_rec *r)) {
 const char *modsecIsServerSignatureAvailale(void) {
     return new_server_signature;
 }
+

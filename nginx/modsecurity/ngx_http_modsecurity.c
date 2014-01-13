@@ -1027,6 +1027,10 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         return rc;
     }
 
+    if (modsecContextState(ctx->req) == MODSEC_DISABLED) {
+        return NGX_DECLINED;
+    }
+
     if (r->method == NGX_HTTP_POST 
             && modsecIsRequestBodyAccessEnabled(ctx->req) ) {
 
