@@ -1,3 +1,218 @@
+17 Dec 2013 - 2.7.7
+-------------------
+Fixes:
+
+- Changed release version to 2.7.7
+- Got the configure scripts inside the release tarball
+
+
+16 Dec 2013 - 2.7.6 
+-------------------
+Improvements:
+
+- Organizes all Makefile.am - 1cde4d2dd9d96747536c1c25d06ba0677069477f
+  Now using one file per line (sorted). This is the better way to handle it, since it reduces the possibility of merge conflicts.
+
+- nginx: generates config file using configure input. - 351b9cc357d439e30ebd61d89a9e38ecf55c6827
+  The nginx config file was looking for depedencies by its own, by doing that it was ignoring the options that were passed to configure script. This commit deletes this config file and adds a meta-config which is populated by configure whenever the standalone-module is enabled.
+
+- nginx: adds lua support - da16d9e5d51d4ef8734687514a4e1368e7fb4284
+
+- iis: Cosmetics fixies on sqli. - 5046c8327ea21c69b4c0d0c0057c692b05b09fef
+  This is needed to get it compiled with VS2011 on Windows8
+
+- Regression tests: makes configuration compatible with 2.2 and 2.4 (try 2) - ae252ee8767069363906e5a611dff487b799b839
+
+- nginx: Trying apxs and apxs2 while compiling nginx module - 65d9272fdc353e1263567b60604542d377d19672
+
+- nginx: Trying apxs and apxs2 while compiling nginx module - 35fd75d859e4a8873b8843da1db13e04a1b08140
+
+- macos: Using glibtoolize instead of libtoolize - 751a9f4e45213cd69f00c62c71edc9d7ad99b82d
+
+- regression-tests: makes configuration compatible with 2.2 and 2.4 - 6fc4cac37ab1be8d1232140042b58fe4bd93ee17
+
+- Regression test: get it working with apache 2.4 - e9813cd0d9bfc5b0c9aa5832634ec1b39b805108
+  Changes in httpd.conf.in to get it working with apache 2.4
+
+- Code cosmetics. - 7366f35c1d80772d739b35da8faa972f92a72b97
+  Changed to reduce the number of possible fails during Build Bot compilation.
+
+- iis: Waiting for 5 seconds before move curl directory - 9bf2959c919587ebc63f5a1b8c0785da8927bff5
+  Testing buildbot.
+
+- Redefines unixd_set_global_mutex_perms on tests - f70f6f4281b806627e0cf0dbb9c84ae5864bdb16
+  Avoding conflicts with the standalone implementation
+
+- Adds verbose quality check - 388943440cc9b8c6fdea09f5e365a2e5a3e792e2
+  Vera++ and ccpcheck are not outputing to the stderr instead stdout allowing the buildbot to extract some numbers about it.
+
+- Adds support for coding style and quality check - b77e90152d119609ac78a7028383c3b79898b2cf
+  Initial effort to get the code on shape. This will be executed by the buildbots as soon as they get ready for it.
+
+- iis: New improvements on the Wix installer - 2ea5a74a7bfb00f21312e51e48aa6dac03d84600
+  * Now the installation is divided in modules: ModSecurity and CRS.
+  * Added default configuration
+  * Configuration was moved to "Program Files" folder
+  * Build_msi script now using candle available in %PATH%
+
+- iis: Removes the installer helper dependency - 1a12648c9f6028f251af0f03c889397c7954b74c
+  Now using appcmd directly with WiX instead of calling the installer helper.
+
+- iis: Remove readme.html - 550d5aae21cba696cac1ce75ab8113e5255d5a59
+  This HTML is about "Creating a Native Module for IIS7" not straight related to ModSecurity itself.
+
+- iis: Adds batch script to compile Wix - a2c5fc831baf0b324ebb66b0f878dacf1ec2f808
+  This batch script can be used to generate our msi installer.
+
+- iis: Adds Wix installer resources - 3604763e15a665eb7a6ecae1f7e7c65cebbb1d17
+  This is all about cosmetic changes.
+
+- iss: Removes Post-Build event. - 28bbde1bb218b004654cb865fc8563d69b848dc2
+  There was a copy on Post-Build event using a hard coded path. This patch removes this Post-Build event.
+
+- iis: Relative paths on the VS project file - 368617ddb2443f9b6036f80a648d467d07c9a054
+  There are a ModSecurityIIS solution and project files, those were using hard coded paths to meet the dependencies. As consequence of the last update in our build scripts, now we are able to built the dependencies and load it to our Visual Studio project using relative paths.
+
+- iis: Adds release script - 9477118903861ce80c4c27cb581bf3462315e98e
+
+- iis: fixies the Installer.cpp coding style - 79875b1af8e8571098345b91557bab9c06eb7c88
+
+- iis: Removes AppWizard remade file - 91738f93bcc82b6ab756c550a66b6cf6af2fa9f8
+  Apparently the AppWizard was used to generate part of this Installer, the ReadMe.txt created by the AppWizard was removed by this commit
+
+- iss: Removes pre-compiled headers - adfbeb85dcfa9466b72eebb8d1bd8eb7728bab79
+  No need to use the pre-compiled headers in InstallerHelper, removing it, in order to keep the project lean.
+
+- iis: Moves installer to InstallerHelper - 6adf25667dd4bfa33010bd6d8ae3d35046a69967
+  To organize the folder the Installer application was renamed to installer helper. It is not the real installer, it is just an helper which is executed during the installation phase.
+
+- iss: Removes fart dependencies - 8c3b8d81b613aaa38f28472af1eb26c90c7fc9da
+  This commit removes the dependency of the fart.exe utility. The utility was responsible to rename contents inside some dependencies build files. Those modifications are not longer needed.
+
+- iss: Better err handling in build scripts. - 192599bf63b6ae5aa08e4536a90d5d0a17f969f7
+  Now checking for errors in every step of the build phase
+
+- iis: Moves build_module.bat to build_modsecurity.bat - e25c6b2e85ced7beba4d41867dbdf30e9c1286d3
+  The build_modsecurity.bat is now on the iis sub-directory, not in the dependencies anymore. Its content was also changed fixing all the paths.
+
+
+- iis: Identifies arch before unzip apache - cf5de78dfb9fffd21edf17af9e1db8f2fd83c804
+  Currently we need the Apache binary which could be used in 32 or 64 bits. This patch makes usage of 'cl' to identify which architecture is set.
+
+- iis: Renamves winbuild to dependencies - 1447766e816a896e88c9c8f053fcc3f62797bac1
+  Since the directory becomes all about dependencies there is no need to call it winbuild anymore.
+
+- iis: Removes unnecessary files from winbuild dir - 9f8cbf6ed8034ba42aa4967699308df09864fd18
+  Those .mak files seems to be part of an old build system. Since the script are now working fine, this commit removes all those .mac files and also a CMakeList.txt and the Makefile.win.
+
+- iis: Improves the iis build system - b277e538f28c87c81c1b50925dd8b82996b88294
+  Now checking for common errors while building. Refactoring on the build scripts, now there is this build_dependencies.bat script on the iis sub-folder. By calling this script all the dependencies should be build under the winbuild/. This commit also removes build scripts that were not needed anymore.
+
+- iis: Fixes the vcxproj file - a946a163f0ad822c760af80ca32dda61f0e6b2a9
+  Versions of the dependencies were changed, as long as the version of the Visual Studio, now 12.
+
+- iis: Removes unecessary files from the build system - 26738d2e34bcc7620047bd23180e0e26a64c71ee
+  The following files were removed:
+  * VCVarsQueryRegistry.bat
+  * vcvars64.bat
+  * vsvars32.bat
+The visual studio files can be called direcltly, not necessary to distribute those files, at least in VS12.
+
+- iss: Changes httpd version 2.4.6 - 0a772cb0748aa51a01800e0473309b9de792b456
+  Apache version was changed to 2.4.6 to sync with the current apache lounge version.
+
+- iis: Changes the version of the dependencies - 3e6fb41d36b7a5e98a55d8f52b88b29d1bd50b64
+  * pcre from 8.30 to 8.33
+  * zlib from 1.2.7 to 1.2.8
+  * libxml2 from 2.7.7 to 2.9.1
+  * curl from 7.24 to 7.33.0
+
+- Removes standalone/Makefile.in - e3c19d53d23c48fea337aae76a87b2a85c36a1f1
+  Makefile.in is recommended to be in the repository whenever it is edit manually, in our case the automatically generated Makefile.in is ok.
+
+
+Bug Fixes:
+
+- test: Avoids conflict of fuctions definition - cef72855e4106ce29e1d39103ebf9eb9ab28f17e
+
+- test: Makes the unit tests to work again - cc982ae42ec86c79a67be1a01c6ee35fb06c272c
+  The unit tests was not working due to lack update. This patch adds the necessary stuff to have it work again.
+
+- iis: Avoids directory link while building - ad330a44bfa39430cf6340cb52971568cccdf1d6
+  Build scripts was creating links allowing the project to be loaded into Visual Studio without care about the dependencies versions. Sometimes windows refuse to delete those links leading the script to fail. This patch moves the sources directories instead of create links to it.
+
+- QA: Avoids the utilization of 3rd filedescriptor - 69c5ccac662f4e11a6eefd54a3e912583c067b9d
+  No need to use a 3rd description on the quality check scripts. Stderr is now redirected to stdout and filtered as needed.
+
+- Supports WarningCountingShellCommand in cppcheck and vera - baaf502363e68c3240b60adb7f7c91f5b4f0ba03
+  WarningCountingShellCommand allow us to have some measurements on the buildbot waterfall.
+
+- iis: Using base_rules instead of activated_rules - 7b1537058fa451e0df7098cd907ef19f04102f9d
+
+- iis: Fix inet_pton build problem - a4202146b8d26b6615bbab986383fe0afae60d77
+  There is a function named inet_pton on windows API, with different signature. This patch just override the windows function and point the inet_pton to our implementation.
+
+- iis: Adds Wix installer xml file.c - b32cb7d9ab397160f0154aa4bd4e9638658b41e6
+  This commit adds the Wix template to our git repository.
+
+- iis: build_modsecurity.bat fixies - 7e03e3f840375ed682c35a5bb67932461cc77013
+  This commit enable a cleanup on the mod_security build directory avoiding symbols with different architectures.
+
+- iis: Fix mlogc build on windows - 9b7663fa79377a0685130a019916d810f31e7478
+  The libcurl path was not pointing to the correct directory
+
+- Fix #154, Uses addn instead of apr_table_setn - 1734221d9d3a78f9aafd68e35717da9ee1a4fe51
+  The headers are represented in the format of an apr_table, which is able to handle elements with the same key, however the function apr_table_setn checks if the key exists before add the element, if so it replaces the old value with the new one. This was making our implementation to just keep the last added Cookie. The apr_table_addn function, which is now used, just add a new item without check for olders one.
+
+- Merge pull request #579 from zimmerle/revert_139 - 61e54f2067ae760808359926ff91d57275df1aac
+  Revert merge request #139
+
+- Revert "Merge pull request #139 from chaizhenhua/remotes/trunk" - 7f7d00fa2c364716691df1b45779304b24a0debb
+  This reverts commit 10fd40fb0d06f6c577d870b6f15d2f6e2a3a5b1b, reversing changes made to 414033aafa94cd50c9b310afd3f164740caccc94.
+
+- Merge pull request #578 from client9/remotes/trunk - b0c3977845f60747b15ae10531b7d20355a22627
+  libinjection sync to v3.8.0
+
+- libinjection sync - a5f175d79fac1e69124da4e1e227b622e7e233d7
+
+- Merge pull request #152 from client9/remotes/trunk - 88ebf8a0bdbc4db1be76f3a2e70df77cc52a5925
+  Sync to libinjection v3.7.1
+
+- libinjection sync - fcb6dc13ed6efb066fb9b70405eecab8b83a2d96
+
+- libinjection sync - f52242a013f301ca5c17e59b662124833cb7cc6d
+
+- Merge pull request #148 from zimmerle/bugfix_charset_missing_string_terminator - b76e26d81ddafc2b99bffad53d1426f8fd33080a
+  Bugfix: missing string terminator while mounting the charset (nginx)
+
+- Bugfix: missing string terminator while mounting the charset (nginx) - ff19dcd5c53d4af61d0a9397d4616f47f80ee207
+  The charset in headers is mounted using ngx_snprintf which does not place the string terminator. This patch adds the terminator at the end of the string. The size was correctly allocated, just missing the terminator.
+
+- Merge pull request #141 from client9/remotes/trunk - 9a630eea23a7ead4e77617c86dc937fd7a421a57
+  libinjection sync to v3.6.0
+
+- libinjection sync - 11217207e8f2e0cf15742273836399866971071a
+
+- Fix Chunked string case sensitive issue - CVE-2013-5705 - f8d441cd25172fdfe5b613442fedfc0da3cc333d
+
+- Revert "Fix Chuncked string case sensitive issue" - 3901128f17e0763ac1a260106b79859d2aad6d90
+  This reverts commit 16a815a3c2735f62238ef99af26090a2b8430d3d.
+
+- Fix Chuncked string case sensitive issue - 16a815a3c2735f62238ef99af26090a2b8430d3d
+
+- Merge pull request #139 from chaizhenhua/remotes/trunk - 10fd40fb0d06f6c577d870b6f15d2f6e2a3a5b1b
+  Fixed fd leackage after reload
+
+- Merge pull request #138 from client9/remotes/trunk - 414033aafa94cd50c9b310afd3f164740caccc94
+  libinjection sync
+
+- Fixed fd leackage after reload - e0993fcd7a166ce9e1a279a47d050af1311d9001
+
+- libinjection sync - 2268626c20260e88cab9b7830f8a06101fa7172a
+
+- Fix logical disjunction and conjunction issues - 7e0a9ecf7d492e85650671a0cfcfd53e5f15df2c
+
+
 23 Jul 2013 - 2.7.5
 -------------------
 Improvements:

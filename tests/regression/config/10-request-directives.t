@@ -8,7 +8,7 @@
 		SecRuleEngine On
 		SecArgumentSeparator ";"
 		SecRule ARGS:a "@streq 1" "phase:1,deny,chain,id:500215"
-		SecRule ARGS:b "@streq 2,id:500216"
+		SecRule ARGS:b "@streq 2" ""
 	),
 	match_log => {
 		error => [ qr/Access denied with code 403 \(phase 1\)\. String match "2" at ARGS:b\./, 1 ],
@@ -26,7 +26,7 @@
 	conf => q(
 		SecRuleEngine On
 		SecRule ARGS:a "@streq 1" "phase:1,deny,chain,id:500217"
-		SecRule ARGS:b "@streq 2,id:500218"
+		SecRule ARGS:b "@streq 2" ""
 	),
 	match_log => {
 		-error => [ qr/Access denied/, 1 ],
@@ -46,7 +46,7 @@
 		SecRequestBodyAccess On
 		SecArgumentSeparator ";"
 		SecRule ARGS:a "@streq 1" "phase:2,deny,chain,id:500219"
-		SecRule ARGS:b "@streq 2,id:500220"
+		SecRule ARGS:b "@streq 2" ""
 	),
 	match_log => {
 		error => [ qr/Access denied with code 403 \(phase 2\)\. String match "2" at ARGS:b\./, 1 ],
@@ -94,7 +94,7 @@
 		SecRuleEngine On
 		SecRequestBodyAccess On
 		SecRule ARGS:a "\@streq 1" "phase:2,deny,chain,id:500223"
-		SecRule ARGS:b "\@streq 2,id:500224"
+		SecRule ARGS:b "\@streq 2" ""
 	),
 	match_log => {
 		error => [ qr/Access denied with code 403 \(phase 2\)\. String match "2" at ARGS:b\./, 1 ],
@@ -500,8 +500,8 @@
 		SecDebugLogLevel 5
 		SecCookieFormat 1
 		SecRule REQUEST_COOKIES_NAMES "\@streq SESSIONID" "phase:1,deny,chain,id:500231"
-		SecRule REQUEST_COOKIES:\$SESSIONID_PATH "\@streq /" "chain,id:500232"
-		SecRule REQUEST_COOKIES:SESSIONID "\@streq cookieval,id:500233"
+		SecRule REQUEST_COOKIES:\$SESSIONID_PATH "\@streq /" "chain"
+		SecRule REQUEST_COOKIES:SESSIONID "\@streq cookieval"
 	),
 	match_log => {
 		error => [ qr/Access denied with code 403 \(phase 1\)\. String match "cookieval" at REQUEST_COOKIES:SESSIONID\./, 1 ],
@@ -527,8 +527,8 @@
 		SecDebugLogLevel 5
 		SecCookieFormat 0
 		SecRule REQUEST_COOKIES_NAMES "\@streq SESSIONID" "phase:1,deny,chain,id:500234"
-		SecRule REQUEST_COOKIES:\$SESSIONID_PATH "\@streq /" "chain,id:500235"
-		SecRule REQUEST_COOKIES:SESSIONID "\@streq cookieval,id:500236"
+		SecRule REQUEST_COOKIES:\$SESSIONID_PATH "\@streq /" "chain"
+		SecRule REQUEST_COOKIES:SESSIONID "\@streq cookieval"
 	),
 	match_log => {
 		-error => [ qr/Access denied/, 1 ],

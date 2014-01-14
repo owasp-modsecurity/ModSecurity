@@ -178,7 +178,8 @@ void msr_log_warn(modsec_rec *msr, const char *text, ...) {
     va_end(ap);
 }
 
-const char *ap_get_remote_host(conn_rec *conn, void *dir_config, int type, int *str_is_ip) {
+#define ap_get_remote_host(a, b, c, d) test_ap_get_remote_host(a, b, c, d)
+const char *test_ap_get_remote_host(conn_rec *conn, void *dir_config, int type, int *str_is_ip) {
     return "FAKE-REMOTE-HOST";
 }
 
@@ -186,11 +187,13 @@ char *get_env_var(request_rec *r, char *name) {
     return "FAKE-ENV-VAR";
 }
 
-apr_status_t unixd_set_global_mutex_perms(apr_global_mutex_t *gmutex) {
+#define unixd_set_global_mutex_perms(a) my_unixd_set_global_mutex_perms(a)
+apr_status_t my_unixd_set_global_mutex_perms(apr_global_mutex_t *gmutex) {
     return APR_SUCCESS;
 }
 
-apr_status_t unixd_set_proc_mutex_perms(apr_proc_mutex_t *pmutex) {
+#define unixd_set_proc_mutex_perms(a) my_unixd_set_proc_mutex_perms(a)
+apr_status_t my_unixd_set_proc_mutex_perms(apr_proc_mutex_t *pmutex) {
     return APR_SUCCESS;
 }
 
