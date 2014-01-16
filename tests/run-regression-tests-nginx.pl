@@ -459,14 +459,19 @@ sub match_log {
 		return;
 	}
 
-	$timeout = 0 unless (defined $timeout);
+	$timeout = 1 unless (defined $timeout);
+
+	if ($timeout == 1)
+	{
+		$timeout = 0.5;
+	}
 
 	# Audit logs are taking too long to be written on the disk. One of the
 	# consequence of that is to have tests that demands to read from audit
 	# log failing. Increase the timeout here, make it wait a little bit
 	# more for the logs before gave up.
 	if ($name eq "audit") {
-		$timeout = 20;
+		$timeout = 8;
 	}
 
 	my $i = 0;
@@ -490,6 +495,7 @@ READ: {
 #dbg("Match \"$re\" in $name \"$$rbuf\" ($n)");
 		      if ($$rbuf =~ m/$re/m) {
 			      $rc = $&;
+#			      print "bonga\n";
 			      last;
 		      }
 # TODO: Use select()/poll()
@@ -503,6 +509,7 @@ READ: {
 				      print STDERR "."
 			      }
 		      }
+		      system("sync");
 	      } while (gettimeofday - $t0 < $timeout);
       }
       print STDERR "\n" if ($graphed);
@@ -619,14 +626,16 @@ sub nginx_stop {
 		$rc = -1;
 	}
 
-	sleep 0.5;
-	if (-e $PID_FILE) {
-		vrb("Nginx pid file still exists, sleeping for more 20 seconds.");
-		sleep 20;
+	unless (defined match_log("error", qr/signal [0-9]+ \(SIGCHLD\) received/, 60, "exited with code 0")) {
+		vrb(join(" ", map { quote_shell($_) } @p));
+		msg("nginx server failed to shutdown.");
+		sleep 0.5;
+		return -1;
+        }
 
-		if (-e $PID_FILE) {
-		    msg("Nginx stop failed: $PID_FILE still exists");
-		}
+	if (-e $PID_FILE) {
+		msg("nginx server failed to shutdown.");
+		return -1;
 	}
 
 	return $rc;
@@ -767,14 +776,13 @@ sub nginx_start {
 		$rc = -1;
 	}
 
-# Look for startup msg
-#	unless (defined match_log("error", qr/start worker process/, 60, "Waiting on nginx to start: ")) {
-#		vrb(join(" ", map { quote_shell($_) } @p));
-#		vrb(match_log("error", qr/(^.*ModSecurity: .*)/sm, 10));
-#		msg("Nginx server failed to start.");
-#		nginx_stop();
-#		return -1;
-#	}
+	# Look for startup msworker cycleg
+	unless (defined match_log("error", qr/setproctitle: "nginx: worker process"/, 60, "worker cycle")) {
+		vrb(join(" ", map { quote_shell($_) } @p));
+		msg("Nginx server failed to start.");
+		nginx_stop();
+		return -1;
+	}
 
 	return $rc;
 }
