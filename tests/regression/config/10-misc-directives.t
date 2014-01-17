@@ -33,9 +33,6 @@
 	conf => qq(
 		SecServerSignature "NewServerSignature"
 	),
-	match_log => {
-		error => [ qr/NewServerSignature/, 1 ],
-	},
 	match_response => {
 		status => qr/^200$/,
 		raw => qr/^Server: +NewServerSignature$/m,
