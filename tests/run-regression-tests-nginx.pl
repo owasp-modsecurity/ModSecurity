@@ -387,6 +387,9 @@ sub do_raw_request {
 			) or msg("Failed to connect to localhost:$opt{p}: $@");
 	return unless ($sock);
 
+	my $timeo = pack("qq", 2, 0);
+	$sock->sockopt(SO_RCVTIMEO, $timeo);
+
 # Join togeather the request
 	my $r = join("", @_);
 	dbg($r);
@@ -777,7 +780,7 @@ sub nginx_start {
 	}
 
 	# Look for startup msworker cycleg
-	unless (defined match_log("error", qr/setproctitle: "nginx: worker process"/, 60, "worker cycle")) {
+	unless (defined match_log("error", qr/start worker process/, 60)) {
 		vrb(join(" ", map { quote_shell($_) } @p));
 		msg("Nginx server failed to start.");
 		nginx_stop();
