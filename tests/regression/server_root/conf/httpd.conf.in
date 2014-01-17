@@ -6,11 +6,20 @@ LoadModule unique_id_module @APXS_LIBEXECDIR@/mod_unique_id.so
 # TODO: Need to have these configurable
 LoadModule security2_module @MSC_BASE_DIR@/apache2/.libs/mod_security2.so
 
+<IfModule !mod_version.c>
+    LoadModule version_module @APXS_LIBEXECDIR@/mod_version.so
+</IfModule>
+
 <IfVersion >= 2.4>
-    LoadModule access_compat_module /usr/lib/apache2/modules/mod_access_compat.so
-    LoadModule mpm_worker_module /usr/lib/apache2/modules/mod_mpm_worker.so
-    LoadModule authn_core_module /usr/lib/apache2/modules/mod_authn_core.so
-    LoadModule authz_core_module /usr/lib/apache2/modules/mod_authz_core.so
+    <IfModule !mod_unixd.c>
+        LoadModule unixd_module @APXS_LIBEXECDIR@/mod_unixd.so
+    </IfModule>
+    <IfModule !mpm_worker_module>
+	LoadModule mpm_worker_module @APXS_LIBEXECDIR@/mod_mpm_worker.so
+    </IfModule>
+    LoadModule access_compat_module @APXS_LIBEXECDIR@/mod_access_compat.so
+    LoadModule authn_core_module @APXS_LIBEXECDIR@/mod_authn_core.so
+    LoadModule authz_core_module @APXS_LIBEXECDIR@/mod_authz_core.so
 </IfVersion>
 
 ServerName localhost

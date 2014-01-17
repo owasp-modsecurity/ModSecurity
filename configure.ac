@@ -618,6 +618,7 @@ VERSION_OK
   APXS_PROGNAME="`$APXS -q PROGNAME`"
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs PROGNAME: $APXS_PROGNAME); fi
   APXS_LIBEXECDIR="`$APXS -q LIBEXECDIR`"
+  if test "xx$APXS_LIBEXECDIR" = "xx"; then APXS_LIBEXECDIR="`$APXS -q LIBDIR`/modules"; fi
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs LIBEXECDIR: $APXS_LIBEXECDIR); fi
   APXS_MODULES=$APXS_LIBEXECDIR
   if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apxs MODULES: $APXS_MODULES); fi
