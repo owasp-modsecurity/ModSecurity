@@ -500,6 +500,16 @@ void modsecSetConfigForIISRequestBody(request_rec *r)
         msr->txcfg->stream_inbody_inspection = 1;
 }
 
+int modsecContextState(request_rec *r)
+{
+    modsec_rec *msr = retrieve_msr(r);
+
+    if(msr == NULL || msr->txcfg == NULL)
+        return NOT_SET;
+
+    return msr->txcfg->is_enabled;
+}
+
 int modsecIsRequestBodyAccessEnabled(request_rec *r)
 {
     modsec_rec *msr = retrieve_msr(r);
@@ -673,3 +683,12 @@ void modsecSetWriteResponse(apr_status_t (*func)(request_rec *r, char *buf, unsi
 void modsecSetDropAction(int (*func)(request_rec *r)) {
     modsecDropAction = func;
 }
+
+/*
+ * Case SecServerSignature was used, this function returns the banner that
+ * should be used, otherwise it returns NULL.
+ */
+const char *modsecIsServerSignatureAvailale(void) {
+    return new_server_signature;
+}
+

@@ -195,6 +195,7 @@ int perform_interception(modsec_rec *msr) {
             break;
 
         case ACTION_PROXY :
+#if !(defined(VERSION_IIS)) && !(defined(VERSION_NGINX)) && !(defined(VERSION_STANDALONE))
             if (msr->phase < 3) {
                 if (ap_find_linked_module("mod_proxy.c") == NULL) {
                     log_level = 1;
@@ -219,6 +220,15 @@ int perform_interception(modsec_rec *msr) {
                     "(Configuration Error: Proxy action requested but it does not work in output phases).",
                     phase_text);
             }
+#else
+            log_level = 1;
+            status = HTTP_INTERNAL_SERVER_ERROR;
+            message = apr_psprintf(msr->mp, "Access denied with code 500%s "
+                "(Configuration Error: Proxy action to %s requested but "
+                "proxy is only available in Apache version).",
+                phase_text,
+                log_escape_nq(msr->mp, actionset->intercept_uri));
+#endif
             break;
 
         case ACTION_DROP :
@@ -537,6 +547,11 @@ static modsec_rec *create_tx_context(request_rec *r) {
 static apr_status_t change_server_signature(server_rec *s) {
     char *server_version = NULL;
 
+    /* This is a very particular way to handle the server banner. It is Apache
+     * only. Stanalone and descendants should address that in its specifics
+     * implementations, e.g. Nginx module.
+     */
+#if !(defined(VERSION_IIS)) && !(defined(VERSION_NGINX)) && !(defined(VERSION_STANDALONE))
     if (new_server_signature == NULL) return 0;
 
     server_version = (char *)apache_get_server_version();
@@ -568,7 +583,7 @@ static apr_status_t change_server_signature(server_rec *s) {
     else {
         ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, 0, s, "SecServerSignature: Changed server signature to \"%s\".", server_version);
     }
-
+#endif
     return 1;
 }
 

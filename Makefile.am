@@ -35,6 +35,10 @@ test: check
 test-regression:
 	(cd tests && $(MAKE) test-regression)
 
+test-regression-nginx:
+	(cd tests && $(MAKE) test-regression-nginx)
+
+
 cppcheck:
 	cppcheck . --enable=all --force 2>&1 | sed 's/^/warning: /g' 1>&2;
 

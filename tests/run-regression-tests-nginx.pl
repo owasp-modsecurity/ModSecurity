@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #
 # Run regression tests.
 #
@@ -32,6 +32,10 @@ my $REG_DIR = "$SCRIPT_DIR/regression";
 my $NGINX_DIR = "$REG_DIR/nginx";
 my $NGINX_CONF_TEMP = "$REG_DIR/nginx/conf/nginx.conf.template";
 my $NGINX = q(/usr/local/nginx/sbin/nginx);
+my $SROOT_DIR = "$REG_DIR/server_root";
+my $TEMP_DIR = "$SROOT_DIR/tmp";
+my $DATA_DIR = "$SROOT_DIR/data";
+my $UPLOAD_DIR = "$SROOT_DIR/upload";
 
 my $PASSED = 0;
 my $TOTAL = 0;
@@ -43,6 +47,9 @@ my $UA = LWP::UserAgent->new;
 $UA->agent($UA_NAME);
 
 $SIG{TERM} = $SIG{INT} = \&handle_interrupt;
+
+
+my $platform = "nginx";
 
 my %opt;
 getopts('A:E:D:C:T:H:a:p:dvh', \%opt);
@@ -117,9 +124,9 @@ dircopy("$REG_DIR/server_root/htdocs","$opt{P}/html") or die $!;
 		SERVER_PORT => $opt{p},
 		SERVER_NAME => "localhost",
 #    TEST_NGX_PREFIX => $NGINX_DIR,
-#    DATA_DIR => $DATA_DIR,
-#    TEMP_DIR => $TEMP_DIR,
-#    UPLOAD_DIR => $UPLOAD_DIR,
+		DATA_DIR => $DATA_DIR,
+		TEMP_DIR => $TEMP_DIR,
+		UPLOAD_DIR => $UPLOAD_DIR,
 		CONF_DIR => $CONF_DIR,
 #    MODULES_DIR => $MODULES_DIR,
 		LOGS_DIR => $FILES_DIR,
@@ -233,6 +240,19 @@ sub runfile {
 					for my $key (keys %{ $t{match_response} || {}}) {
 						my($neg,$mtype) = ($key =~ m/^(-?)(.*)$/);
 						my $m = $t{match_response}{$key};
+						if (ref($m) eq "HASH") {
+							if ($m->{$platform}) {
+								$m = $m->{$platform};
+							}
+							else {
+								my $ap = join(", ", keys %{$m});
+								msg("Warning: trying to match response. Nothing " .
+									"to match in current platform: $platform. " .
+									"This test only contains cotent for: $ap.");
+								last;
+							}
+						}
+
 						my $match = match_response($mtype, $resp, $m);
 						if ($neg and defined $match) {
 							$rc = 1;
@@ -266,6 +286,18 @@ sub runfile {
 				for my $key (keys %{ $t{match_log} || {}}) {
 					my($neg,$mtype) = ($key =~ m/^(-?)(.*)$/);
 					my $m = $t{match_log}{$key};
+					if (ref($m) eq "HASH") {
+						if ($m->{$platform}) {
+							$m = $m->{$platform};
+						}
+						else {
+							my $ap = join(", ", keys %{$m});
+							msg("Warning: trying to match: $mtype. Nothing " .
+								"to match in current platform: $platform. " .
+								"This test only contains cotent for: $ap.");
+							last;
+						}
+					}
 					my $match = match_log($mtype, @{$m || []});
 					if ($neg and defined $match) {
 						$rc = 1;
@@ -355,6 +387,9 @@ sub do_raw_request {
 			) or msg("Failed to connect to localhost:$opt{p}: $@");
 	return unless ($sock);
 
+	my $timeo = pack("qq", 2, 0);
+	$sock->sockopt(SO_RCVTIMEO, $timeo);
+
 # Join togeather the request
 	my $r = join("", @_);
 	dbg($r);
@@ -427,7 +462,20 @@ sub match_log {
 		return;
 	}
 
-	$timeout = 0 unless (defined $timeout);
+	$timeout = 1 unless (defined $timeout);
+
+	if ($timeout == 1)
+	{
+		$timeout = 0.5;
+	}
+
+	# Audit logs are taking too long to be written on the disk. One of the
+	# consequence of that is to have tests that demands to read from audit
+	# log failing. Increase the timeout here, make it wait a little bit
+	# more for the logs before gave up.
+	if ($name eq "audit") {
+		$timeout = 8;
+	}
 
 	my $i = 0;
 	my $graphed = 0;
@@ -450,6 +498,7 @@ READ: {
 #dbg("Match \"$re\" in $name \"$$rbuf\" ($n)");
 		      if ($$rbuf =~ m/$re/m) {
 			      $rc = $&;
+#			      print "bonga\n";
 			      last;
 		      }
 # TODO: Use select()/poll()
@@ -463,6 +512,7 @@ READ: {
 				      print STDERR "."
 			      }
 		      }
+		      system("sync");
 	      } while (gettimeofday - $t0 < $timeout);
       }
       print STDERR "\n" if ($graphed);
@@ -579,9 +629,16 @@ sub nginx_stop {
 		$rc = -1;
 	}
 
-	sleep 0.5;
+	unless (defined match_log("error", qr/signal [0-9]+ \(SIGCHLD\) received/, 60, "exited with code 0")) {
+		vrb(join(" ", map { quote_shell($_) } @p));
+		msg("nginx server failed to shutdown.");
+		sleep 0.5;
+		return -1;
+        }
+
 	if (-e $PID_FILE) {
-		msg("Nginx stop failed: $PID_FILE still exists");
+		msg("nginx server failed to shutdown.");
+		return -1;
 	}
 
 	return $rc;
@@ -722,14 +779,13 @@ sub nginx_start {
 		$rc = -1;
 	}
 
-# Look for startup msg
-#	unless (defined match_log("error", qr/start worker process/, 60, "Waiting on nginx to start: ")) {
-#		vrb(join(" ", map { quote_shell($_) } @p));
-#		vrb(match_log("error", qr/(^.*ModSecurity: .*)/sm, 10));
-#		msg("Nginx server failed to start.");
-#		nginx_stop();
-#		return -1;
-#	}
+	# Look for startup msworker cycleg
+	unless (defined match_log("error", qr/start worker process/, 60)) {
+		vrb(join(" ", map { quote_shell($_) } @p));
+		msg("Nginx server failed to start.");
+		nginx_stop();
+		return -1;
+	}
 
 	return $rc;
 }

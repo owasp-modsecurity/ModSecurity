@@ -719,6 +719,14 @@ ngx_http_modsecurity_save_headers_out(ngx_http_request_t *r)
     upstream = r->upstream;
     r->upstream = &ngx_http_modsecurity_upstream;
 
+    /* case SecServerSignature was used, the "Server: ..." header is added
+     * here, overwriting the default header supplied by nginx.
+     */
+    if (modsecIsServerSignatureAvailale() != NULL) {
+        apr_table_add(ctx->req->headers_out, "Server",
+                modsecIsServerSignatureAvailale());
+    }
+
     if (apr_table_do(ngx_http_modsecurity_save_headers_out_visitor,
                      r, ctx->req->headers_out, NULL) == 0) {
 
@@ -1019,6 +1027,10 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         return rc;
     }
 
+    if (modsecContextState(ctx->req) == MODSEC_DISABLED) {
+        return NGX_DECLINED;
+    }
+
     if (r->method == NGX_HTTP_POST 
             && modsecIsRequestBodyAccessEnabled(ctx->req) ) {
 
@@ -1074,8 +1086,6 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
     ngx_http_modsecurity_ctx_t      *ctx;
     const char                      *location;
     ngx_table_elt_t                 *h;
-    ngx_int_t                        rc;
-
 
     cf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
@@ -1111,36 +1121,6 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
     }
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "modSecurity: header filter");
-
-    /* header only or SecResponseBodyAccess off */
-    if (r->header_only || (!modsecIsResponseBodyAccessEnabled(ctx->req)) ) {
-
-        ctx->complete = 1;
-
-        if (ngx_http_modsecurity_load_headers_in(r) != NGX_OK
-                || ngx_http_modsecurity_load_headers_out(r) != NGX_OK) {
-
-            return NGX_HTTP_INTERNAL_SERVER_ERROR;
-        }
-
-        rc = ngx_http_modsecurity_status(r, modsecProcessResponse(ctx->req));
-
-        if (rc != NGX_DECLINED) {
-            return ngx_http_filter_finalize_request(r, &ngx_http_modsecurity, rc);
-        }
-
-        if (ngx_http_modsecurity_save_headers_in(r) != NGX_OK
-                || ngx_http_modsecurity_save_headers_out(r) != NGX_OK) {
-            return ngx_http_filter_finalize_request(r, &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        return ngx_http_next_header_filter(r);
-    }
-
-    /* SecResponseBodyAccess on, process rules in body filter */
-
-    /* pretend we are ngx_http_header_filter */
-    r->header_sent = 1;
 
     r->filter_need_in_memory = 1;
     return NGX_OK;

@@ -285,6 +285,10 @@
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?arg1=val1&arg2=val2",
+        [
+                "Content-Type" => "application/x-www-form-urlencoded",
+        ],
+        "a=b",
 	),
 },
 {

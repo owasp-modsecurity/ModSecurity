@@ -454,12 +454,22 @@
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:1,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt',id:500005"
 	),
 	match_log => {
-		error => [ qr/ModSecurity: Access denied using proxy to \(phase 1\)/, 1 ],
+		error => {
+			apache => [qr/ModSecurity: Access denied using proxy to \(phase 1\)/, 1],
+			nginx => [qr/ModSecurity: Access denied with code 500 \(phase 1\) \(Configuration Error: Proxy action to .* requested but proxy is only available in Apache version\)./, 1],
+		},
 	},
 	match_response => {
-		status => qr/^200$/,
-		content => qr/^TEST$/,
+		status => {
+			apache => qr/^200$/,
+			nginx => qr/^500$/,
+		},
+		content => {
+			apache => qr/^TEST$/,
+			nginx => qr/^*$/,
+		},
 	},
+
 	request => new HTTP::Request(
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
 	),
@@ -475,11 +485,20 @@
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:2,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt',id:500006"
 	),
 	match_log => {
-		error => [ qr/ModSecurity: Access denied using proxy to \(phase 2\)/, 1 ],
+		error => {
+			apache => [qr/ModSecurity: Access denied using proxy to \(phase 2\)/, 1],
+			nginx => [qr/ModSecurity: Access denied with code 500 \(phase 2\) \(Configuration Error: Proxy action to .* requested but proxy is only available in Apache version\)./, 1],
+		},
 	},
 	match_response => {
-		status => qr/^200$/,
-		content => qr/^TEST$/,
+		status => {
+			apache => qr/^200$/,
+			nginx => qr/^500$/,
+		},
+		content => {
+			apache => qr/^TEST$/,
+			nginx => qr/^*$/,
+		},
 	},
 	request => new HTTP::Request(
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
@@ -498,10 +517,16 @@
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:3,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt',id:500007"
 	),
 	match_log => {
-		error => [ qr/ModSecurity: Access denied with code 500 \(phase 3\) \(Configuration Error: Proxy action requested but it does not work in output phases\)./, 1 ],
+		error => {
+			apache => [qr/ModSecurity: Access denied with code 500 \(phase 3\) \(Configuration Error: Proxy action requested but it does not work in output phases\)./, 1],
+			nginx => [qr/ModSecurity: Access denied with code 500 \(phase 3\) \(Configuration Error: Proxy action to .* requested but proxy is only available in Apache version\)./, 1],
+		}
 	},
 	match_response => {
-		status => qr/^500$/,
+		status => {
+			apache => qr/^500$/,
+			nginx => qr/^500$/,
+		},
 	},
 	request => new HTTP::Request(
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
@@ -520,10 +545,16 @@
 		SecRule REQUEST_URI "\@streq /test2.txt" "phase:4,proxy:'http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt',id:500008"
 	),
 	match_log => {
-		error => [ qr/ModSecurity: Access denied with code 500 \(phase 4\) \(Configuration Error: Proxy action requested but it does not work in output phases\)./, 1 ],
+		error => {
+			apache => [qr/ModSecurity: Access denied with code 500 \(phase 4\) \(Configuration Error: Proxy action requested but it does not work in output phases\)./, 1],
+			nginx => [qr/ModSecurity: Access denied with code 500 \(phase 4\) \(Configuration Error: Proxy action to .* requested but proxy is only available in Apache version\)./, 1],
+		}
 	},
 	match_response => {
-		status => qr/^500$/,
+		status => {
+			apache => qr/^500$/,
+			nginx => qr/^500$/,
+		},
 	},
 	request => new HTTP::Request(
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",

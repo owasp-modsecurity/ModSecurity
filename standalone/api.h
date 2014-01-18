@@ -112,7 +112,11 @@ void modsecSetDropAction(int (*func)(request_rec *r));
 int modsecIsResponseBodyAccessEnabled(request_rec *r);
 int modsecIsRequestBodyAccessEnabled(request_rec *r);
 
+int modsecContextState(request_rec *r);
+
 void modsecSetConfigForIISRequestBody(request_rec *r);
+
+const char *modsecIsServerSignatureAvailale(void);
 
 #ifdef __cplusplus
 }
