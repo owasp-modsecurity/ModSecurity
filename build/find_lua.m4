@@ -17,7 +17,7 @@ LUA_LDADD=""
 LUA_LDFLAGS=""
 LUA_CONFIG=${PKG_CONFIG}
 LUA_PKGNAMES="lua5.1 lua-5.1 lua_5.1 lua-51 lua_51 lua51 lua5 lua"
-LUA_SONAMES="so la sl dll dylib"
+LUA_SONAMES="so la sl dll dylib a"
 
 AC_ARG_WITH(
     lua,
