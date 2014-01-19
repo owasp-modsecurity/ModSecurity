@@ -96,14 +96,14 @@ void DSOLOCAL msc_status_engine_fill_with_dots(char *encoded_with_dots,
 // Based on:
 // http://stackoverflow.com/questions/16858782/how-to-obtain-almost-unique-system-identifier-in-a-cross-platform-way
 int DSOLOCAL msc_status_engine_machine_name(char *machine_name, size_t len) {
+#ifdef WIN32
+    DWORD lenComputerName = len;
+#endif
+
     memset(machine_name, '\0', sizeof(char) * len);
 
 #ifdef WIN32
-    DWORD size = 1024;
-    GetComputerName(machine_name, &size);
-
-    apr_snprintf(machine_name, len-1, "%s", computerName[0]);
-    machine_name[len - 1] = '\0';
+    GetComputerName(machine_name, &lenComputerName);
 #else
    static struct utsname u;
 

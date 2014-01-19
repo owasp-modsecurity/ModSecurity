@@ -2083,7 +2083,7 @@ static const char *cmd_rule_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
     return NULL;
 }
 
-static const char *cmd_STATUS_ENGINE(cmd_parms *cmd, void *_dcfg, const char *p1)
+static const char *cmd_status_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     if (strcasecmp(p1, "on") == 0) {
         status_engine_state = STATUS_ENGINE_ENABLED;

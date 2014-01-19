@@ -113,7 +113,7 @@
     <Link>
       <ModuleDefinitionFile>mymodule.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;IPHLPAPI.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\core__\ModSecurity\iis\release\x64</AdditionalLibraryDirectories>
       <AdditionalOptions> /LIBPATH:"C:\core__\ModSecurity\iis\release\x64" %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -145,7 +145,7 @@
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>mymodule.def</ModuleDefinitionFile>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;IPHLPAPI.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -163,6 +163,7 @@
     <ClCompile Include="..\apache2\libinjection\libinjection_sqli.c" />
     <ClCompile Include="..\apache2\modsecurity.c" />
     <ClCompile Include="..\apache2\mod_security2.c" />
+    <ClCompile Include="..\apache2\msc_status_engine.c" />
     <ClCompile Include="..\apache2\msc_crypt.c" />
     <ClCompile Include="..\apache2\msc_geo.c" />
     <ClCompile Include="..\apache2\msc_gsb.c" />
@@ -211,6 +212,7 @@
     <ClInclude Include="..\apache2\modsecurity.h" />
     <ClInclude Include="..\apache2\modsecurity_config.h" />
     <ClInclude Include="..\apache2\modsecurity_config_auto.h" />
+    <ClInclude Include="..\apache2\msc_status_engine.h" />
     <ClInclude Include="..\apache2\msc_crypt.h" />
     <ClInclude Include="..\apache2\msc_geo.h" />
     <ClInclude Include="..\apache2\msc_gsb.h" />
