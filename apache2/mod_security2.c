@@ -61,7 +61,7 @@ unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
 
 unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
-int DSOLOCAL status_engine_state = STATUS_ENGINE_ENABLED;
+int DSOLOCAL status_engine_state = STATUS_ENGINE_DISABLED;
 
 unsigned long int DSOLOCAL conn_read_state_limit = 0;
 

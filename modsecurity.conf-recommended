@@ -211,3 +211,10 @@ SecCookieFormat 0
 #
 SecUnicodeMapFile unicode.mapping 20127
 
+# Improve the quality of ModSecurity by sharing information about your
+# current ModSecurity version and dependencies versions.
+# The following information will be shared: ModSecurity version,
+# Web Server version, APR version, PCRE version, Lua version, Libxml2
+# version, Anonymous unique id for host.
+SecStatusEngine On
+
