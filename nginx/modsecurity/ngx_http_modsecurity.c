@@ -586,8 +586,6 @@ ngx_http_modsecurity_load_headers_out(ngx_http_request_t *r)
     ngx_http_modsecurity_ctx_t  *ctx;
     char                        *data;
     request_rec                 *req;
-    u_char                      *content_type;
-    ngx_uint_t                   content_type_len;
     ngx_http_variable_value_t   *vv;
     ngx_list_part_t             *part;
     ngx_table_elt_t             *h;
@@ -601,27 +599,6 @@ ngx_http_modsecurity_load_headers_out(ngx_http_request_t *r)
 
     req->status = r->headers_out.status;
     req->status_line = (char *)ngx_pstrdup0(r->pool, &r->headers_out.status_line);
-
-    if (r->headers_out.charset.len) {
-
-        content_type_len = r->headers_out.content_type.len
-                           + r->headers_out.charset.len
-                           + ngx_strlen("; charset=") + 1;
-
-        content_type = ngx_palloc(r->pool, content_type_len);
-
-        if (content_type == NULL) {
-            return NGX_ERROR;
-        }
-
-        ngx_snprintf(content_type, content_type_len,
-                     "%V; charset=%V%Z",
-                     &r->headers_out.content_type,
-                     &r->headers_out.charset);
-
-        r->headers_out.content_type.data = content_type;
-        r->headers_out.content_type.len = content_type_len;
-    }
 
     /* deep copy */
     part = &r->headers_out.headers.part;
