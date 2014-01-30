@@ -15,7 +15,7 @@ set CURRENT_DIR=%cd%
 cd ..\apache2
 del *.obj *.dll *.lib
 del libinjection\*.obj libinjection\*.dll libinjection\*.lib
-NMAKE -f Makefile.win APACHE=..\iis\%DEPENDENCIES_DIR%\Apache24 PCRE=..\iis\%DEPENDENCIES_DIR%\pcre LIBXML2=..\iis\%DEPENDENCIES_DIR%\libxml2 LUA=..\iis\%DEPENDENCIES_DIR%\lua\src VERSION=VERSION_IIS YAJL=..\iis\%DEPENDENCIES_DIR%\yajl\build\yajl-2.0.1 SSDEEP=..\iis\%DEPENDENCIES_DIR%\ssdeep
+NMAKE -f Makefile.win APACHE=..\iis\%DEPENDENCIES_DIR%\Apache24 PCRE=..\iis\%DEPENDENCIES_DIR%\pcre LIBXML2=..\iis\%DEPENDENCIES_DIR%\libxml2 LUA=..\iis\%DEPENDENCIES_DIR%\lua\src VERSION=VERSION_IIS YAJL=..\iis\%DEPENDENCIES_DIR%\yajl\build\yajl-2.0.1 SSDEEP=..\iis\%DEPENDENCIES_DIR%\ssdeep CURL=..\iis\%DEPENDENCIES_DIR%\curl
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 
 @echo mlogc...
@@ -29,7 +29,7 @@ nmake -f Makefile.win APACHE=..\iis\%DEPENDENCIES_DIR%\Apache24 PCRE=..\iis\%DEP
 cd ..\iis
 del *.obj *.dll *.lib
 nmake -f Makefile.win clean
-NMAKE -f Makefile.win APACHE=..\iis\%DEPENDENCIES_DIR%\Apache24 PCRE=..\iis\%DEPENDENCIES_DIR%\pcre LIBXML2=..\iis\%DEPENDENCIES_DIR%\libxml2 LUA=..\iis\%DEPENDENCIES_DIR%\lua\src VERSION=VERSION_IIS YAJL=..\iis\%DEPENDENCIES_DIR%\yajl\build\yajl-2.0.1 SSDEEP=..\iis\%DEPENDENCIES_DIR%\ssdeep
+NMAKE -f Makefile.win APACHE=..\iis\%DEPENDENCIES_DIR%\Apache24 PCRE=..\iis\%DEPENDENCIES_DIR%\pcre LIBXML2=..\iis\%DEPENDENCIES_DIR%\libxml2 LUA=..\iis\%DEPENDENCIES_DIR%\lua\src VERSION=VERSION_IIS YAJL=..\iis\%DEPENDENCIES_DIR%\yajl\build\yajl-2.0.1 SSDEEP=..\iis\%DEPENDENCIES_DIR%\ssdeep CURL=..\iis\%DEPENDENCIES_DIR%\curl
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 
 cd %CURRENT_DIR%

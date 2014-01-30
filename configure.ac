@@ -694,9 +694,9 @@ CHECK_APU()
 fi
 CHECK_LIBXML2()
 CHECK_LUA()
-if test "$build_mlogc" -ne 0; then
+#if test "$build_mlogc" -ne 0; then
 CHECK_CURL()
-fi
+#fi
 
 # Check for YAJL libs (for JSON body processor)
 CHECK_YAJL()

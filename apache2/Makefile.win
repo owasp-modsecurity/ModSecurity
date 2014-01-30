@@ -2,8 +2,8 @@
 #
 # Usage:   NMAKE -f Makefile.win APACHE={httpd installion dir}  PCRE={pcre dir} LIBXML2={LibXML2 dir} [   LUA={Lua dir} ]
 #
-!IF "$(APACHE)" == "" || "$(PCRE)" == "" || "$(LIBXML2)" == ""
-!ERROR NMAKE arguments: APACHE=dir PCRE=dir LIBXML2=dir are required to build mod_security2 for Windows
+!IF "$(APACHE)" == "" || "$(PCRE)" == "" || "$(LIBXML2)" == "" || "$(CURL)" == ""
+!ERROR NMAKE arguments: APACHE=dir PCRE=dir LIBXML2=dir CURL=dir are required to build mod_security2 for Windows
 !ENDIF
 
 # Linking libraries
@@ -11,6 +11,7 @@ LIBS = $(APACHE)\lib\libhttpd.lib \
        $(APACHE)\lib\libapr-1.lib \
        $(APACHE)\lib\libaprutil-1.lib \
        $(PCRE)\pcre.lib \
+       $(CURL)\lib\libcurl_imp.lib \
        $(LIBXML2)\win32\bin.msvc\libxml2.lib \
        Ws2_32.lib \
        "iphlpapi.lib"
@@ -27,6 +28,7 @@ DEFS = /nologo /O2 /LD /W3 /wd4244 /wd4018 -DWIN32 -DWINNT -Dinline=APR_INLINE -
 DLL = mod_security2.so
 
 INCLUDES = -I. -I.. \
+           -I$(CURL)\include -I$(CURL) \
            -I$(PCRE)\include -I$(PCRE) \
            -I$(LIBXML2)\include \
            -I$(APACHE)\include
