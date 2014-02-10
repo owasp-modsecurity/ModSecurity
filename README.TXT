@@ -23,8 +23,7 @@ OWASP ModSecurity Core Rule Set (CRS)
 
 
 Project Site:
-https://www.owasp.org/index.php/Category:OWASP_ModSecurity_Core_Rule_Set_Pr
-oject
+https://www.owasp.org/index.php/Category:OWASP_ModSecurity_Core_Rule_Set_Project
 
 
 Download:
@@ -72,7 +71,7 @@ server.
 ModSecurity Rules from Trustwave SpiderLabs
 
 Project Site:
-hhttps://www.trustwave.com/modsecurity-rules-support.php
+https://www.trustwave.com/modsecurity-rules-support.php
 
 Download:
 https://ssl.trustwave.com/web-application-firewall
