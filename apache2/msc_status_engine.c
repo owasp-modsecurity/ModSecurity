@@ -356,8 +356,8 @@ int msc_status_engine_call (void) {
     }
 
     apr_snprintf(beacon_string, beacon_string_len+1+10+4,
-        "%s,%s/IIS,%s/%s,%s/%s,%s/%s,%s/%s,%s",
-        modsec, apache, apr, apr_loaded, pcre, pcre_loaded, lua, lua_loaded,
+        "%s,IIS,%s/%s,%s/%s,%s/%s,%s/%s,%s",
+        modsec, apr, apr_loaded, pcre, pcre_loaded, lua, lua_loaded,
         libxml, libxml_loaded, id);
 #else
     beacon_string = malloc(sizeof(char)*(beacon_string_len+1+10));

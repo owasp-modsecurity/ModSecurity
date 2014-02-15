@@ -21,7 +21,11 @@
 #include "apr_optional.h"
 #include "msc_pcre.h"
 
+#ifndef WIN32
 #define STATUS_ENGINE_DNS_IN_BETWEEN_DOTS 32
+#else
+#define STATUS_ENGINE_DNS_IN_BETWEEN_DOTS 30
+#endif
 
 #define STATUS_ENGINE_DNS_SUFFIX "status.modsecurity.org"
 

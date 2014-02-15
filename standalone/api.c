@@ -701,3 +701,16 @@ const char *modsecIsServerSignatureAvailale(void) {
     return new_server_signature;
 }
 
+#ifdef WIN32
+void modsecStatusEngineCall()
+{
+    if (status_engine_state != STATUS_ENGINE_DISABLED) {
+        msc_status_engine_call();
+    }
+    else {
+        ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+            "Status engine is currently disabled, enable it by set " \
+            "SecStatusEngine to On.\n");
+    }
+}
+#endif
