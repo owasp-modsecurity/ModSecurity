@@ -5,7 +5,9 @@ mod_security2_la_SOURCES = acmp.c \
     apache2_config.c \
     apache2_io.c \
     apache2_util.c \
+    libinjection/libinjection_html5.c \
     libinjection/libinjection_sqli.c \
+    libinjection/libinjection_xss.c \
     mod_security2.c \
     modsecurity.c \
     msc_status_engine.c \

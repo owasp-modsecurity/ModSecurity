@@ -2047,6 +2047,32 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
     return issqli;
 }
 
+/** libinjection detectXSS
+ */
+static int msre_op_detectXSS_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
+    char **error_msg) {
+
+    int is_xss;
+    int capture;
+
+    is_xss = libinjection_xss(var->value, var->value_len);
+
+    if (is_xss) {
+        *error_msg = apr_psprintf(msr->mp, "detected XSS using libinjection.");
+
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "IS_XSS: libinjection detected XSS.");
+        }
+    } else {
+        if (msr->txcfg->debuglog_level >= 9) {
+            msr_log(msr, 9, "IS_XSS: not XSS, libinjection was not able to find any XSS.");
+        }
+    }
+
+    return is_xss;
+}
+
+
 /* containsWord */
 
 static int msre_op_containsWord_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
@@ -4425,6 +4451,13 @@ void msre_engine_register_default_operators(msre_engine *engine) {
         "detectSQLi",
          NULL,
          msre_op_detectSQLi_execute
+    );
+
+    /* detectXSS */
+    msre_engine_op_register(engine,
+        "detectXSS",
+         NULL,
+         msre_op_detectXSS_execute
     );
 
     /* streq */

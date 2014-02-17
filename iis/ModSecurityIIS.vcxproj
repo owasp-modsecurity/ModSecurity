@@ -160,7 +160,9 @@
     <ClCompile Include="..\apache2\apache2_config.c" />
     <ClCompile Include="..\apache2\apache2_io.c" />
     <ClCompile Include="..\apache2\apache2_util.c" />
+    <ClCompile Include="..\apache2\libinjection\libinjection_html5.c" />
     <ClCompile Include="..\apache2\libinjection\libinjection_sqli.c" />
+    <ClCompile Include="..\apache2\libinjection\libinjection_xss.c" />
     <ClCompile Include="..\apache2\modsecurity.c" />
     <ClCompile Include="..\apache2\mod_security2.c" />
     <ClCompile Include="..\apache2\msc_status_engine.c" />

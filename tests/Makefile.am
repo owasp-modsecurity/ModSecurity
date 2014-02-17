@@ -1,7 +1,9 @@
 check_PROGRAMS = msc_test
 msc_test_SOURCES = msc_test.c \
     $(top_srcdir)/apache2/acmp.c \
+    $(top_srcdir)/apache2/libinjection/libinjection_html5.c \
     $(top_srcdir)/apache2/libinjection/libinjection_sqli.c \
+    $(top_srcdir)/apache2/libinjection/libinjection_xss.c \
     $(top_srcdir)/apache2/modsecurity.c \
     $(top_srcdir)/apache2/msc_crypt.c \
     $(top_srcdir)/apache2/msc_geo.c \
