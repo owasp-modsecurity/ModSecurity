@@ -7,7 +7,7 @@ extern "C" {
 
 /* pull in size_t */
 
-#include <strings.h>
+#include <stddef.h>
 
 enum html5_type {
     DATA_TEXT

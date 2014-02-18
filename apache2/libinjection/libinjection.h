@@ -11,8 +11,14 @@
 #define _LIBINJECTION_H
 
 #ifdef __cplusplus
-extern "C" {
+# define LIBINJECTION_BEGIN_DECLS    extern "C" {
+# define LIBINJECTION_END_DECLS      }
+#else
+# define LIBINJECTION_BEGIN_DECLS
+# define LIBINJECTION_END_DECLS
 #endif
+
+LIBINJECTION_BEGIN_DECLS
 
 /*
  * Pull in size_t
@@ -43,8 +49,17 @@ const char* libinjection_version(void);
  */
 int libinjection_sqli(const char* s, size_t slen, char fingerprint[]);
 
-#ifdef __cplusplus
-}
-#endif
+/** ALPHA version of xss detector. 
+ *
+ * NOT DONE. 
+ *
+ * \param[in] s  input string, may contain nulls, does not need to be null-terminated
+ * \param[in] slen input string length
+ * \return 1 if XSS found, 0 if benign
+ *
+ */
+int libinjection_xss(const char* s, size_t slen);
+
+LIBINJECTION_END_DECLS
 
 #endif /* _LIBINJECTION_H */
