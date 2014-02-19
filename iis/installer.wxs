@@ -83,18 +83,12 @@
         <Condition Message="This setup requires IIS 6.0, 7.0 or 8.0 is installed."><![CDATA[(IIS="#7") OR (IIS="#6") OR (IIS="#8")]]></Condition>
         <!-- Version 2.7.6 had an uninstall issue that leaves some files behind. Asking the user to manually hash this out. -->
         <Condition Message="A older version of ModSecurityIIS was found in your computer. Please complete uninstall by removing the following file: [FILEEXISTS]. You may have to remove ModSecurity module from IIS, use the IIS Manager to do so."><![CDATA[(NOT FILEEXISTS) OR (Installed)]]></Condition>
-        <!--
-     Won't necessary. We can install 32bits stuff in a 64 machine. If IIS is proper
-     configured it will work like a charm.
-
-     <Condition Message="64-bit operating system was detected, please use the 64-bit installer.">
-         <?if $(var.Win64) = "yes" ?>
-             VersionNT64
-         <?else?>
-             NOT VersionNT64
-         <?endif?>
-     </Condition>
--->
+        <Condition Message="64-bit operating system was detected, please use the 64-bit installer.">
+            <?if $(var.Win64) = "yes" ?>
+         VersionNT64
+         <?else ?>
+         NOT VersionNT64
+         <?endif ?></Condition>
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Directory Id="TARGETDIR" Name="SourceDir">
             <?if $(var.Win64) = "yes" ?>
@@ -408,12 +402,8 @@
         <UI Id="WixUI_FeatureTreeCustom">
             <Dialog Id="CustomizeDlgModSec" Width="370" Height="270" Title="!(loc.CustomizeDlg_Title)" TrackDiskSpace="yes">
                 <Control Id="Tree" Type="SelectionTree" X="25" Y="85" Width="175" Height="115" Property="_BrowseProperty" Sunken="yes" TabSkip="no" Text="!(loc.CustomizeDlgTree)">
-                    <Publish Property="DisableButton" Value="1">
-(NOT &amp;ModSec64=3) AND (NOT &amp;ModSec32=3)
-		  </Publish>
-                    <Publish Property="DisableButton" Value="0">
-	&amp;ModSec64=3 OR &amp;ModSec32=3	
-		  </Publish>
+                    <Publish Property="DisableButton" Value="1">(NOT &amp;ModSec64=3) AND (NOT &amp;ModSec32=3)</Publish>
+                    <Publish Property="DisableButton" Value="0">&amp;ModSec64=3 OR &amp;ModSec32=3</Publish>
                 </Control>
                 <Control Id="Browse" Type="PushButton" X="294" Y="210" Width="66" Height="17" Text="!(loc.CustomizeDlgBrowse)">
                     <Publish Event="SelectionBrowse" Value="BrowseDlg">1</Publish>
@@ -431,12 +421,8 @@
                 <Control Id="Back" Type="PushButton" X="192" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
                 <Control Id="Next" Type="PushButton" X="248" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
                     <Subscribe Event="SelectionNoItems" Attribute="Enabled" />
-                    <Condition Action="disable">
-        DisableButton = 1
-    </Condition>
-                    <Condition Action="enable">
-            DisableButton = 0 
-    </Condition>
+                    <Condition Action="disable">DisableButton = 1</Condition>
+                    <Condition Action="enable">DisableButton = 0</Condition>
                 </Control>
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
                     <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
@@ -564,8 +550,7 @@
         <CustomAction Id="InstallConf" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; set config /section:&quot;system.webServer/ModSecurity&quot; /&quot;enabled:true&quot; /&quot;configFile:[INSTALLFOLDER]modsecurity_iis.conf&quot;" />
         <CustomAction Id="UninstallConf" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; clear config -section:&quot;system.webServer/ModSecurity&quot;" />
         <?endif ?>
-
-	<DirectoryRef Id="TARGETDIR">
+        <DirectoryRef Id="TARGETDIR">
             <?if $(var.Win64) = "yes" ?>
             <Merge Id="VCRedist64" SourceFile="wix\Microsoft_VC120_CRT_x64.msm" DiskId="1" Language="0" />
             <Merge Id="VCRedist32" SourceFile="wix\Microsoft_VC120_CRT_x86.msm" DiskId="1" Language="0" />
