@@ -780,13 +780,36 @@ static apr_status_t msre_parse_actions(msre_engine *engine, msre_actionset *acti
     msre_action *action;
     int i;
 
-    if (text == NULL) return -1;
+
+    if (error_msg == NULL) {
+        return -1;
+    }
+    *error_msg = NULL;
+
+
+    if (text == NULL) {
+        *error_msg = apr_psprintf(engine->mp, "Internal error: " \
+            "msre_parse_actions, variable text is NULL");
+        return -1;
+    }
 
     /* Extract name & value pairs first */
     vartable = apr_table_make(engine->mp, 10);
-    if (vartable == NULL) return -1;
+    if (vartable == NULL) {
+        *error_msg = apr_psprintf(engine->mp, "Internal error: " \
+            "msre_parse_actions, failed to create vartable");
+
+        return -1;
+    }
     rc = msre_parse_generic(engine->mp, text, vartable, error_msg);
-    if (rc < 0) return rc;
+    if (rc < 0) {
+        if (*error_msg == NULL)
+            *error_msg = apr_psprintf(engine->mp, "Internal error: " \
+                "msre_parse_actions, msre_parse_generic failed. Return " \
+                "code: %d", rc);
+
+        return rc;
+    }
 
     /* Loop through the table and create actions */
     tarr = apr_table_elts(vartable);
@@ -794,7 +817,12 @@ static apr_status_t msre_parse_actions(msre_engine *engine, msre_actionset *acti
     for (i = 0; i < tarr->nelts; i++) {
         /* Create action. */
         action = msre_create_action(engine, telts[i].key, telts[i].val, error_msg);
-        if (action == NULL) return -1;
+        if (action == NULL) {
+            if (*error_msg == NULL)
+                *error_msg = apr_psprintf(engine->mp, "Internal error: " \
+                    "msre_parse_actions, msre_create_action failed.");
+            return -1;
+        }
 
         /* Initialise action (option). */
         if (action->metadata->init != NULL) {
@@ -932,11 +960,22 @@ static msre_var *msre_create_var(msre_ruleset *ruleset, const char *name, const 
 msre_action *msre_create_action(msre_engine *engine, const char *name, const char *param,
         char **error_msg)
 {
-    msre_action *action = apr_pcalloc(engine->mp, sizeof(msre_action));
-    if (action == NULL) return NULL;
+    msre_action *action = NULL;
 
-    if (error_msg == NULL) return NULL;
+    if (error_msg == NULL) {
+        return NULL;
+    }
     *error_msg = NULL;
+
+
+    action = apr_pcalloc(engine->mp, sizeof(msre_action));
+
+    if (action == NULL) {
+        *error_msg = apr_psprintf(engine->mp, "Internal error: " \
+            "msre_create_action, not able to allocate action");
+
+        return NULL;
+    }
 
     /* Resolve action */
     action->metadata = msre_resolve_action(engine, name);
@@ -1128,12 +1167,29 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
 msre_actionset *msre_actionset_create(msre_engine *engine, const char *text,
         char **error_msg)
 {
-    msre_actionset *actionset = (msre_actionset *)apr_pcalloc(engine->mp,
+    msre_actionset *actionset = NULL;
+
+    if (error_msg == NULL) {
+        return NULL;
+    }
+
+    *error_msg = NULL;
+
+    actionset = (msre_actionset *)apr_pcalloc(engine->mp,
             sizeof(msre_actionset));
-    if (actionset == NULL) return NULL;
+
+    if (actionset == NULL) {
+        *error_msg = apr_psprintf(engine->mp, "Internal error: " \
+                "msre_actionset_create, not able to allocate msre_actionset");
+        return NULL;
+    }
 
     actionset->actions = apr_table_make(engine->mp, 25);
-    if (actionset->actions == NULL) return NULL;
+    if (actionset->actions == NULL) {
+        *error_msg = apr_psprintf(engine->mp, "Internal error: " \
+                "msre_actionset_create, not able to create actions table");
+        return NULL;
+    }
 
     /* Metadata */
     actionset->id = NOT_SET_P;
@@ -1169,7 +1225,12 @@ msre_actionset *msre_actionset_create(msre_engine *engine, const char *text,
 
     /* Parse the list of actions, if it's present */
     if (text != NULL) {
-        if (msre_parse_actions(engine, actionset, text, error_msg) < 0) {
+        int ret = msre_parse_actions(engine, actionset, text, error_msg);
+        if (ret < 0) {
+            if (*error_msg == NULL)
+                *error_msg = apr_psprintf(engine->mp, "Internal error: " \
+                        "msre_actionset_create, msre_parse_actions failed " \
+                        "without further information. Return code: %d", ret);
             return NULL;
         }
     }
