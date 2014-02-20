@@ -81,14 +81,14 @@
         </Property>
         <Property Id="MSIUSEREALADMINDETECTION" Value="1" />
         <Condition Message="This setup requires IIS 6.0, 7.0 or 8.0 is installed."><![CDATA[(IIS="#7") OR (IIS="#6") OR (IIS="#8")]]></Condition>
-        <!-- Version 2.7.6 had an uninstall issue that leaves some files behind. Asking the user to manually hash this out. -->
+        <!-- Version 2.7.5 had an uninstall issue that leaves some files behind. Asking the user to manually hash this out. -->
         <Condition Message="A older version of ModSecurityIIS was found in your computer. Please complete uninstall by removing the following file: [FILEEXISTS]. You may have to remove ModSecurity module from IIS, use the IIS Manager to do so."><![CDATA[(NOT FILEEXISTS) OR (Installed)]]></Condition>
         <Condition Message="64-bit operating system was detected, please use the 64-bit installer.">
             <?if $(var.Win64) = "yes" ?>
-         VersionNT64
-         <?else ?>
-         NOT VersionNT64
-         <?endif ?></Condition>
+        VersionNT64
+        <?else ?>
+        NOT VersionNT64
+        <?endif ?></Condition>
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Directory Id="TARGETDIR" Name="SourceDir">
             <?if $(var.Win64) = "yes" ?>
@@ -296,6 +296,11 @@
                         <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the ModSecurity IIS" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
                         <Shortcut Id="EULA" Name="EULA" Description="EULA" Target="[INSTALLFOLDER]EULA.rtf" WorkingDirectory="INSTALLFOLDER" />
                         <Shortcut Id="Readme" Name="EULA" Description="EULA" Target="[INSTALLFOLDER]README.TXT" WorkingDirectory="INSTALLFOLDER" />
+                        <?if $(var.Win64) = "yes" ?>
+                        <Shortcut Id="List_Dependencies" Name="List Dependencies (Debug)" Description="Check for missing dependencies" Target="[INSTALLFOLDER]list_dependencies.bat" Arguments="&quot;[inetsrv64]libapr-1.dll&quot; &quot;[inetsrv64]libapriconv-1.dll&quot; &quot;[inetsrv64]libaprutil-1.dll&quot; &quot;[inetsrv64]libcurl.dll&quot; &quot;[inetsrv64]libxml2.dll&quot; &quot;[inetsrv64]lua5.1.dll&quot; &quot;[inetsrv64]mlogc.exe&quot; &quot;[inetsrv64]ModSecurityIIS.dll&quot; &quot;[inetsrv64]pcre.dll&quot; &quot;[inetsrv64]zlib1.dll&quot; &quot;[inetsrv32]libapr-1.dll&quot; &quot;[inetsrv32]libapriconv-1.dll&quot; &quot;[inetsrv32]libaprutil-1.dll&quot; &quot;[inetsrv32]libcurl.dll&quot; &quot;[inetsrv32]libxml2.dll&quot; &quot;[inetsrv32]lua5.1.dll&quot; &quot;[inetsrv32]mlogc.exe&quot; &quot;[inetsrv32]ModSecurityIIS.dll&quot; &quot;[inetsrv32]pcre.dll&quot; &quot;[inetsrv32]zlib1.dll&quot;" WorkingDirectory="INSTALLFOLDER" />
+                        <?else ?>
+                        <Shortcut Id="List_Dependencies" Name="List Dependencies (Debug)" Description="Check for missing dependencies" Target="[INSTALLFOLDER]list_dependencies.bat" Arguments="&quot;[inetsrv32]libapr-1.dll&quot; &quot;[inetsrv32]libapriconv-1.dll&quot; &quot;[inetsrv32]libaprutil-1.dll&quot; &quot;[inetsrv32]libcurl.dll&quot; &quot;[inetsrv32]libxml2.dll&quot; &quot;[inetsrv32]lua5.1.dll&quot; &quot;[inetsrv32]mlogc.exe&quot; &quot;[inetsrv32]ModSecurityIIS.dll&quot; &quot;[inetsrv32]pcre.dll&quot; &quot;[inetsrv32]zlib1.dll&quot;" WorkingDirectory="INSTALLFOLDER" />
+                        <?endif ?>
                     </Component>
                 </Directory>
             </Directory>
@@ -307,6 +312,7 @@
                 <File Id="modsecurity.conf" Name="modsecurity.conf" Source="wix\modsecurity.conf" />
                 <File Id="modsecurity_iis.conf" Name="modsecurity_iis.conf" Source="wix\modsecurity_iis.conf" />
                 <File Id="modsecurity_crs_10_setup.conf" Name="modsecurity_crs_10_setup.conf" Source="wix\modsecurity_crs_10_setup.conf" />
+                <File Id="LIST_DEPENDENCIES.BAT" Name="list_dependencies.bat" Source="wix\list_dependencies.bat" />
             </Component>
         </DirectoryRef>
         <?if $(var.Win64) = "yes" ?>
@@ -402,8 +408,13 @@
         <UI Id="WixUI_FeatureTreeCustom">
             <Dialog Id="CustomizeDlgModSec" Width="370" Height="270" Title="!(loc.CustomizeDlg_Title)" TrackDiskSpace="yes">
                 <Control Id="Tree" Type="SelectionTree" X="25" Y="85" Width="175" Height="115" Property="_BrowseProperty" Sunken="yes" TabSkip="no" Text="!(loc.CustomizeDlgTree)">
+                    <?if $(var.Win64) = "yes" ?>
                     <Publish Property="DisableButton" Value="1">(NOT &amp;ModSec64=3) AND (NOT &amp;ModSec32=3)</Publish>
                     <Publish Property="DisableButton" Value="0">&amp;ModSec64=3 OR &amp;ModSec32=3</Publish>
+                    <?else ?>
+                    <Publish Property="DisableButton" Value="1">(NOT &amp;ModSec32=3)</Publish>
+                    <Publish Property="DisableButton" Value="0">&amp;ModSec32=3</Publish>
+                    <?endif ?>
                 </Control>
                 <Control Id="Browse" Type="PushButton" X="294" Y="210" Width="66" Height="17" Text="!(loc.CustomizeDlgBrowse)">
                     <Publish Event="SelectionBrowse" Value="BrowseDlg">1</Publish>
@@ -450,8 +461,8 @@
                     <Condition Action="hide">Installed</Condition>
                 </Control>
             </Dialog>
-            <Property Id="CONFIGURE_IIS" Secure="yes" Value="1">
-                <RegistrySearch Id="ConfigureIISRegistrySearch" Type="raw" Root="HKLM" Key="SOFTWARE\ModSecurity\ModSecurity" Name="ConfigureIIS" />
+            <Property Id="CONFIGURE_MODSECURITY_IIS">
+                <RegistrySearch Id="ConfigureIISRegistrySearch" Type="raw" Root="HKLM" Key="SOFTWARE\ModSecurity\ModSecurityConfigureIIS" Name="ModSecurityConfigureIIS" />
             </Property>
             <Dialog Id="RegisterDlg" Width="370" Height="270" Title="!(loc.VerifyReadyDlg_Title)" TrackDiskSpace="yes">
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
@@ -469,7 +480,7 @@
                 <Control Id="Title" Type="Text" X="15" Y="6" Width="210" Height="15" Transparent="yes" NoPrefix="yes" Text="{\WixUI_Font_Title}IIS Setup" />
                 <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="Choose to configure ModSecurity on IIS or not." />
                 <Control Id="Text" Type="Text" X="25" Y="55" Width="320" Height="50" Text="ModSecurityIIS needs to be configured under IIS as a module. It is recommended to perform this configuration during the installation. However, if you are facing problems in the installation, the recomendation is to disable this step. This will facilitate the debugging process since the files will be installed in place. Note that some scripts will be installed along with ModSecurity common files that can be later used to help this configuration/debugging process." />
-                <Control Type="CheckBox" Id="ConfigureIIS" Width="200" Height="14" X="25" Y="124" CheckBoxValue="1" Property="CONFIGURE_IIS" Text="Perform ModSecurityIIS configuration." />
+                <Control Type="CheckBox" Id="ConfigureIIS" Width="200" Height="14" X="25" Y="124" CheckBoxValue="1" Property="CONFIGURE_MODSECURITY_IIS" Text="Perform ModSecurityIIS configuration." />
                 <Control Type="Text" Id="troubleshooting" Width="314" Height="37" X="26" Y="161" Text="For further information about problems during the installation, have a look at ModSecurityIIS Troubleshooting guide. Available at: https://github.com/SpiderLabs/ModSecurity/wiki/IIS-Troubleshooting" />
             </Dialog>
             <Binary Id="bannrbmp" SourceFile="wix\banner.jpg" />
@@ -502,7 +513,7 @@
             <Publish Dialog="RegisterDlg" Control="Back" Event="NewDialog" Value="CustomizeDlgModSec" Order="1">NOT Installed OR WixUI_InstallMode = "Change"</Publish>
             <Publish Dialog="RegisterDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">NOT Installed OR WixUI_InstallMode = "Change"</Publish>
             <Publish Dialog="RegisterDlg" Control="Next" Event="NewDialog" Value="WelcomeDlg" Order="3">Installed AND PATCH</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="CustomizeDlgModSec" Order="1">NOT Installed OR WixUI_InstallMode = "Change"</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="RegisterDlg" Order="1">NOT Installed OR WixUI_InstallMode = "Change"</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed AND NOT PATCH</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="3">Installed AND PATCH</Publish>
             <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
@@ -516,32 +527,41 @@
         <WixVariable Id="WixUIBannerBmp" Value="wix\banner.jpg" />
         <WixVariable Id="WixUIDialogBmp" Value="wix\dialog.jpg" />
         <InstallUISequence>
-            <Custom Action="SetCONFIGURE_IIS" Before="AppSearch">NOT Installed AND NOT OLDERVERSIONDETECTED</Custom>
+            <Custom Action="SetCONFIGURE_MODSECURITY_IIS" Before="AppSearch">NOT Installed AND NOT OLDERVERSIONDETECTED</Custom>
         </InstallUISequence>
         <InstallExecuteSequence>
-            <Custom Action="SetCONFIGURE_IIS" Before="AppSearch">NOT Installed AND NOT OLDERVERSIONDETECTED</Custom>
+            <Custom Action="SetCONFIGURE_MODSECURITY_IIS" Before="AppSearch">NOT Installed AND NOT OLDERVERSIONDETECTED</Custom>
         </InstallExecuteSequence>
-        <CustomAction Id="SetCONFIGURE_IIS" Property="CONFIGURE_IIS" Value="1" Execute="firstSequence" />
+        <CustomAction Id="SetCONFIGURE_MODSECURITY_IIS" Property="CONFIGURE_MODSECURITY_IIS" Value="1" Execute="firstSequence" />
         <InstallExecuteSequence>
             <?if $(var.Win64) = "yes" ?>
-            <Custom Action="InstallModule64" Before="InstallFinalize"><![CDATA[NOT Installed AND CONFIGURE_IIS]]></Custom>
-            <Custom Action="InstallModule32" After="InstallModule64"><![CDATA[NOT Installed AND CONFIGURE_IIS]]></Custom>
-            <Custom Action="InstallConf" After="InstallModule32"><![CDATA[NOT Installed AND CONFIGURE_IIS]]></Custom>
-            <Custom Action="UninstallConf" Before="RemoveFiles"><![CDATA[Installed AND CONFIGURE_IIS]]></Custom>
-            <Custom Action="UninstallModule32" After="UninstallConf"><![CDATA[Installed AND CONFIGURE_IIS]]></Custom>
-            <Custom Action="UninstallModule64" After="UninstallModule32"><![CDATA[Installed AND CONFIGURE_IIS]]></Custom>
+            <Custom Action="InstallModule64" Before="InstallFinalize"><![CDATA[NOT Installed AND CONFIGURE_MODSECURITY_IIS]]></Custom>
+            <Custom Action="InstallModule32" After="InstallModule64"><![CDATA[NOT Installed AND CONFIGURE_MODSECURITY_IIS]]></Custom>
+            <Custom Action="InstallConf" After="InstallModule32"><![CDATA[NOT Installed AND CONFIGURE_MODSECURITY_IIS]]></Custom>
+            <Custom Action="UninstallConf" Before="RemoveFiles"><![CDATA[Installed AND CONFIGURE_MODSECURITY_IIS]]></Custom>
+            <Custom Action="UninstallModule32" After="UninstallConf"><![CDATA[Installed AND CONFIGURE_MODSECURITY_IIS]]></Custom>
+            <Custom Action="UninstallModule64" After="UninstallModule32"><![CDATA[Installed AND CONFIGURE_MODSECURITY_IIS]]></Custom>
             <?else ?>
-            <Custom Action="InstallModule32" Before="InstallFinalize"><![CDATA[NOT Installed AND CONFIGURE_IIS]]></Custom>
-            <Custom Action="InstallConf" After="InstallModule32"><![CDATA[NOT Installed AND CONFIGURE_IIS]]></Custom>
-            <Custom Action="UninstallConf" Before="RemoveFiles"><![CDATA[Installed AND CONFIGURE_IIS]]></Custom>
-            <Custom Action="UninstallModule32" After="UninstallConf"><![CDATA[Installed AND CONFIGURE_IIS]]></Custom>
+            <Custom Action="InstallModule32" Before="InstallFinalize"><![CDATA[NOT Installed AND CONFIGURE_MODSECURITY_IIS]]></Custom>
+            <Custom Action="InstallConf" After="InstallModule32"><![CDATA[NOT Installed AND CONFIGURE_MODSECURITY_IIS]]></Custom>
+            <Custom Action="UninstallConf" Before="RemoveFiles"><![CDATA[Installed AND CONFIGURE_MODSECURITY_IIS]]></Custom>
+            <Custom Action="UninstallModule32" After="UninstallConf"><![CDATA[Installed AND CONFIGURE_MODSECURITY_IIS]]></Custom>
             <?endif ?>
         </InstallExecuteSequence>
         <?if $(var.Win64) = "yes" ?>
-        <CustomAction Id="InstallModule32" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (32bits)&quot; /image:&quot;%SystemRoot%\System32\inetsrv\ModSecurityIIS.dll&quot;" />
-        <CustomAction Id="InstallModule64" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (64bits)&quot; /image:&quot;%SystemRoot%\SysWOW64\inetsrv\ModSecurityIIS.dll&quot;" />
+        <?if $(var.Win64) = "yes" ?>
+        <CustomAction Id="InstallModule32" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (64bits)&quot; /image:&quot;%SystemRoot%\System32\inetsrv\ModSecurityIIS.dll&quot; /preCondition:&quot;bitness64&quot;" />
+        <?else ?>
+        <CustomAction Id="InstallModule32" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (32bits)&quot; /image:&quot;%SystemRoot%\System32\inetsrv\ModSecurityIIS.dll&quot;" />
+        <?endif ?>
+        <CustomAction Id="InstallModule64" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (32bits)&quot; /image:&quot;%SystemRoot%\SysWOW64\inetsrv\ModSecurityIIS.dll&quot; /preCondition:&quot;bitness32&quot;" />
+        <?if $(var.Win64) = "yes" ?>
         <CustomAction Id="UninstallModule32" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (32bits)&quot;" />
         <CustomAction Id="UninstallModule64" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (64bits)&quot;" />
+        <?else ?>
+        <CustomAction Id="UninstallModule32" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (32bits)&quot;" />
+        <CustomAction Id="UninstallModule64" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (64bits)&quot;" />
+        <?endif ?>
         <CustomAction Id="InstallConf" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; set config /section:&quot;system.webServer/ModSecurity&quot; /&quot;enabled:true&quot; /&quot;configFile:[INSTALLFOLDER]modsecurity_iis.conf&quot;" />
         <CustomAction Id="UninstallConf" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; clear config -section:&quot;system.webServer/ModSecurity&quot;" />
         <?else ?>
