@@ -124,13 +124,15 @@
             </Directory>
             <?endif ?>
             <Directory Id="$(var.PlatformProgramFilesFolder)">
-                <Directory Id="INSTALLFOLDER" Name="ModSecurity IIS">
+		    <Directory Id="INSTALLFOLDER" Name="ModSecurity IIS">
+                        <Component Id="OWASP_CRS_V_2_2_9_SETUP" DiskId="1" Guid="64629082-F6A2-4675-9E3E-4EA363CD6500">
+ 			   <File Id="MODSECURITY_CRS_10_SETUP.CONF.EXAMPLE" Name="modsecurity_crs_10_setup.conf" Source="release\owasp_crs\modsecurity_crs_10_setup.conf.example" />
+                        </Component>
                     <Directory Id="OWASP_CRS" Name="owasp_crs">
-                        <Component Id="OWASP_CRS_V_2_2_8" DiskId="1" Guid="64629082-F6A2-4675-9E3E-4EA363CD6502">
+                        <Component Id="OWASP_CRS_V_2_2_9" DiskId="1" Guid="64629082-F6A2-4675-9E3E-4EA363CD6502">
                             <File Id="CHANGES" Name="CHANGES" Source="release\owasp_crs\CHANGES" />
                             <File Id="INSTALL" Name="INSTALL" Source="release\owasp_crs\INSTALL" />
                             <File Id="LICENSE" Name="LICENSE" Source="release\owasp_crs\LICENSE" />
-                            <File Id="MODSECURITY_CRS_10_SETUP.CONF.EXAMPLE" Name="modsecurity_crs_10_setup.conf.example" Source="release\owasp_crs\modsecurity_crs_10_setup.conf.example" />
                             <File Id="README.MD" Name="README.md" Source="release\owasp_crs\README.md" />
                         </Component>
                         <Directory Id="ACTIVATED_RULES" Name="activated_rules">
@@ -277,7 +279,7 @@
                                 <Directory Id="TESTS" Name="tests">
                                     <Component Id="TESTS" DiskId="1" Guid="FCCBB8FE-4327-4AF0-AB5C-3120858EBB16">
                                         <File Id="MODSECURITY_CRS_20_PROTOCOL_VIOLATIONS.TESTS" Name="modsecurity_crs_20_protocol_violations.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_20_protocol_violations.tests" />
-                                        <File Id="MODSECURITY_CRS_21_PROTOCOL_ANOMALIES.TESTS" Name="modsecurity_crs_21_protocol_anomalies.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_21_protocol_anomalies.tests" />
+					<File Id="MODSECURITY_CRS_21_PROTOCOL_ANOMALIES.TESTS" Name="modsecurity_crs_21_protocol_anomalies.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_21_protocol_anomalies.tests" />
                                         <File Id="MODSECURITY_CRS_23_REQUEST_LIMITS.TESTS" Name="modsecurity_crs_23_request_limits.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_23_request_limits.tests" />
                                         <File Id="MODSECURITY_CRS_30_HTTP_POLICY.TESTS" Name="modsecurity_crs_30_http_policy.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_30_http_policy.tests" />
                                         <File Id="MODSECURITY_CRS_35_BAD_ROBOTS.TESTS" Name="modsecurity_crs_35_bad_robots.tests" Source="release\owasp_crs\util\regression-tests\tests\modsecurity_crs_35_bad_robots.tests" />
@@ -331,7 +333,7 @@
                 <File Id="EULA.RTF" Name="EULA.rtf" Source="wix\EULA.rtf" />
                 <File Id="modsecurity.conf" Name="modsecurity.conf" Source="wix\modsecurity.conf" />
                 <File Id="modsecurity_iis.conf" Name="modsecurity_iis.conf" Source="wix\modsecurity_iis.conf" />
-                <File Id="modsecurity_crs_10_setup.conf" Name="modsecurity_crs_10_setup.conf" Source="wix\modsecurity_crs_10_setup.conf" />
+	<!-- <File Id="modsecurity_crs_10_setup.conf" Name="modsecurity_crs_10_setup.conf" Source="wix\modsecurity_crs_10_setup.conf" /> -->
                 <File Id="LIST_DEPENDENCIES.BAT" Name="list_dependencies.bat" Source="wix\list_dependencies.bat" />
                 <File Id="ModSecurity.xml" Name="ModSecurity.xml" Source="ModSecurity.xml" />
                 <!-- Modify ApplicationHost.config -->
@@ -416,8 +418,10 @@
             <ComponentRef Id="ConfigSchema64" />
             <?endif ?>
             <ComponentRef Id="StartMenuShortcuts" />
-            <Feature Id="OWASP_ModSecurity_CRS_v2.2.8" Level="1" Title="OWASP ModSecurity CRS v2.2.8" InstallDefault="local" Display="expand" AllowAdvertise="no" Description="Install OWASP CRS v2.2.8">
-                <ComponentRef Id="OWASP_CRS_V_2_2_8" />
+            <Feature Id="OWASP_ModSecurity_CRS_v2.2.9" Level="1" Title="OWASP ModSecurity CRS v2.2.9" InstallDefault="local" Display="expand" AllowAdvertise="no" Description="Install OWASP CRS v2.2.9">
+		    <ComponentRef Id="OWASP_CRS_V_2_2_9" />
+		    <ComponentRef Id="OWASP_CRS_V_2_2_9_SETUP" />
+		    
                 <ComponentRef Id="README" />
                 <ComponentRef Id="BASE_RULES" />
                 <ComponentRef Id="EXPERIMENTAL_RULES" />
