@@ -578,8 +578,13 @@
             <Custom Action="SetIISConfigure" Before="AppSearch">NOT Installed</Custom>
         </InstallUISequence>
         <InstallExecuteSequence>
-            <?if $(var.Win64) = "yes" ?>
             <Custom Action="SetIISConfigure" Before="AppSearch">NOT Installed</Custom>
+            <Custom Action="Cleanup1" After="InstallInitialize"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
+            <Custom Action="Cleanup2" Before="Cleanup1"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
+            <Custom Action="Cleanup3" Before="Cleanup2"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
+            <Custom Action="Cleanup4" Before="Cleanup3"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
+            <Custom Action="Cleanup5" Before="Cleanup4"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
+            <?if $(var.Win64) = "yes" ?>
             <Custom Action="InstallModule64" Before="InstallFinalize"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="InstallModule32" After="InstallModule64"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="InstallConf" After="InstallModule32"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
@@ -587,13 +592,27 @@
             <Custom Action="UninstallModule32" Before="UninstallConf"><![CDATA[Installed AND IIS_SETUP]]></Custom>
             <Custom Action="UninstallModule64" Before="UninstallModule32"><![CDATA[Installed AND IIS_SETUP]]></Custom>
             <?else ?>
-            <Custom Action="SetIISConfigure" Before="AppSearch">NOT Installed</Custom>
             <Custom Action="InstallModule32" Before="InstallFinalize"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="InstallConf" After="InstallModule32"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="UninstallConf" Before="RemoveFiles"><![CDATA[Installed AND IIS_SETUP]]></Custom>
             <Custom Action="UninstallModule32" After="UninstallConf"><![CDATA[Installed AND IIS_SETUP]]></Custom>
             <?endif ?>
         </InstallExecuteSequence>
+        <!-- Cleanup: older versions left some settings behind. This is needed to remove -->
+        <!--          that old stuff before install this brand new version of ModSecurity. -->
+        <?if $(var.Win64) = "yes" ?>
+        <CustomAction Id="Cleanup1" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; clear config -section:&quot;system.webServer/ModSecurity&quot;" />
+        <CustomAction Id="Cleanup2" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (32bits)&quot;" />
+        <CustomAction Id="Cleanup3" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (64bits)&quot;" />
+        <CustomAction Id="Cleanup4" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS&quot;" />
+        <CustomAction Id="Cleanup5" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurityIIS&quot;" />
+        <?else ?>
+        <CustomAction Id="Cleanup1" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; clear config -section:&quot;system.webServer/ModSecurity&quot;" />
+        <CustomAction Id="Cleanup2" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (32bits)&quot;" />
+        <CustomAction Id="Cleanup3" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (64bits)&quot;" />
+        <CustomAction Id="Cleanup4" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS&quot;" />
+        <CustomAction Id="Cleanup5" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurityIIS&quot;" />
+        <?endif ?>
         <?if $(var.Win64) = "yes" ?>
         <CustomAction Id="InstallModule32" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (64bits)&quot; /image:&quot;%SystemRoot%\System32\inetsrv\ModSecurityIIS.dll&quot; /preCondition:&quot;bitness64&quot;" />
         <CustomAction Id="InstallModule64" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (32bits)&quot; /image:&quot;%SystemRoot%\SysWOW64\inetsrv\ModSecurityIIS.dll&quot; /preCondition:&quot;bitness32&quot;" />
