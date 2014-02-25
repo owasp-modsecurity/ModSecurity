@@ -441,10 +441,13 @@
         </Feature>
         <Feature Id="VCRedist" Title="Visual C++ 12.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
             <?if $(var.Win64) = "yes" ?>
-            <MergeRef Id="VCRedist64" />
-            <MergeRef Id="VCRedist32" />
+            <MergeRef Id="VCRedist110_64" />
+            <MergeRef Id="VCRedist120_64" />
+            <MergeRef Id="VCRedist110_32" />
+            <MergeRef Id="VCRedist120_32" />
             <?else ?>
-            <MergeRef Id="VCRedist32" />
+            <MergeRef Id="VCRedist110_32" />
+            <MergeRef Id="VCRedist120_32" />
             <?endif ?>
         </Feature>
         <?if $(var.Win64) = "yes" ?>
@@ -641,10 +644,13 @@
         <?endif ?>
         <DirectoryRef Id="TARGETDIR">
             <?if $(var.Win64) = "yes" ?>
-            <Merge Id="VCRedist64" SourceFile="wix\Microsoft_VC120_CRT_x64.msm" DiskId="1" Language="0" />
-            <Merge Id="VCRedist32" SourceFile="wix\Microsoft_VC120_CRT_x86.msm" DiskId="1" Language="0" />
+            <Merge Id="VCRedist120_64" SourceFile="wix\Microsoft_VC120_CRT_x64.msm" DiskId="1" Language="0" />
+            <Merge Id="VCRedist110_64" SourceFile="wix\Microsoft_VC110_CRT_x64.msm" DiskId="1" Language="0" />
+            <Merge Id="VCRedist120_32" SourceFile="wix\Microsoft_VC120_CRT_x86.msm" DiskId="1" Language="0" />
+            <Merge Id="VCRedist110_32" SourceFile="wix\Microsoft_VC110_CRT_x86.msm" DiskId="1" Language="0" />
             <?else ?>
-            <Merge Id="VCRedist32" SourceFile="wix\Microsoft_VC120_CRT_x86.msm" DiskId="1" Language="0" />
+            <Merge Id="VCRedist120_32" SourceFile="wix\Microsoft_VC120_CRT_x86.msm" DiskId="1" Language="0" />
+            <Merge Id="VCRedist110_32" SourceFile="wix\Microsoft_VC110_CRT_x86.msm" DiskId="1" Language="0" />
             <?endif ?>
         </DirectoryRef>
     </Product>
