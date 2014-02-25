@@ -96,7 +96,11 @@
         VersionNT64
         <?else ?>
         NOT VersionNT64
-        <?endif ?></Condition>
+	<?endif ?></Condition>
+
+<Property Id="ARPNOREPAIR" Value="yes" Secure="yes" /> 
+<Property Id="ARPNOMODIFY" Value="yes" Secure="yes" />
+
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Directory Id="TARGETDIR" Name="SourceDir">
             <?if $(var.Win64) = "yes" ?>
