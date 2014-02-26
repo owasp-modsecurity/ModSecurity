@@ -49,10 +49,13 @@ static int sec_auditlog_write(modsec_rec *msr, const char *data, unsigned int le
     /* Write data to file. */
     rc = apr_file_write_full(msr->new_auditlog_fd, data, nbytes, &nbytes_written);
     if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "Audit log: Failed writing (requested %" APR_SIZE_T_FMT
-            " bytes, written %" APR_SIZE_T_FMT ")", nbytes, nbytes_written);
+        char errstr[1024];
 
-        /* Concurrent log format: Don't leak file handle. */
+        msr_log(msr, 1, "Audit log: Failed writing (requested %" APR_SIZE_T_FMT
+            " bytes, written %" APR_SIZE_T_FMT "): %s", nbytes, nbytes_written,
+            apr_strerror(rc, errstr, sizeof(errstr));
+
+        /* Concurrent log format: don't leak file handle. */
         if (msr->txcfg->auditlog_type == AUDITLOG_CONCURRENT) {
             apr_file_close(msr->new_auditlog_fd);
         }
