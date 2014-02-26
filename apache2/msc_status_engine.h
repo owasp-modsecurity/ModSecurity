@@ -29,6 +29,10 @@
 
 #define STATUS_ENGINE_DNS_SUFFIX "status.modsecurity.org"
 
+#define MAX_MACHINE_NAME_SIZE 100
+
+#define MAC_ADDRESS_SIZE 20
+
 static const char msc_status_engine_basis_32[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
 int msc_status_engine_call(void);
