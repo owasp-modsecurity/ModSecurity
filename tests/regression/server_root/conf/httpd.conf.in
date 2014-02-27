@@ -19,6 +19,10 @@
 	LoadModule security2_module @MSC_BASE_DIR@/apache2/.libs/mod_security2.so
 </IfDefine>
 
+<IfModule !mod_version.c>
+    LoadModule version_module @APXS_LIBEXECDIR@/mod_version.so
+</IfModule>
+
 ServerName localhost
 
 CoreDumpDirectory @MSC_REGRESSION_SERVERROOT_DIR@/tmp
@@ -27,8 +31,8 @@ LogLevel debug
 ErrorLog @MSC_REGRESSION_LOGS_DIR@/error.log
 
 <IfVersion >= 2.4>
-    LoadModule access_compat_module /usr/lib/apache2/modules/mod_access_compat.so
-    LoadModule mpm_worker_module /usr/lib/apache2/modules/mod_mpm_worker.so
+    LoadModule access_compat_module  @APXS_LIBEXECDIR@/mod_access_compat.so
+    LoadModule mpm_worker_module @APXS_LIBEXECDIR@/mod_mpm_worker.so
 </IfVersion>
 
 <IfDefine !CHROOT>
