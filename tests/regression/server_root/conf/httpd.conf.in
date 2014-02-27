@@ -23,6 +23,11 @@
     LoadModule version_module @APXS_LIBEXECDIR@/mod_version.so
 </IfModule>
 
+<IfModule !mod_unixd.c>
+    LoadModule unixd_module /usr/lib64/httpd/modules/mod_unixd.so
+</IfModule>
+
+
 ServerName localhost
 
 CoreDumpDirectory @MSC_REGRESSION_SERVERROOT_DIR@/tmp
