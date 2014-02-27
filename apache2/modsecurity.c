@@ -261,6 +261,12 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
         msr_log(msr, 1, "%s", my_error_msg);
     }
 
+    if (msr->msc_full_request_length > 0 &&
+            msr->msc_full_request_buffer != NULL) {
+        msr->msc_full_request_length = 0;
+        free(msr->msc_full_request_buffer);
+    }
+
 #if defined(WITH_LUA)
     #ifdef CACHE_LUA
     if(msr->L != NULL)  lua_close(msr->L);

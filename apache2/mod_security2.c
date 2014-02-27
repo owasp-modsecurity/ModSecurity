@@ -519,6 +519,8 @@ static modsec_rec *create_tx_context(request_rec *r) {
     msr->request_headers = apr_table_copy(msr->mp, r->headers_in);
     msr->hostname = ap_get_server_name(r);
 
+    msr->msc_full_request_buffer = NULL;
+    msr->msc_full_request_length = 0;
     msr->msc_rule_mptmp = NULL;
 
     /* Invoke the engine to continue with initialisation */

@@ -373,6 +373,110 @@
 		"arg1=val1&arg2=val2",
 	),
 },
+# FULL_REQUEST
+{
+	type => "target",
+	comment => "FULL_REQUEST (get)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule FULL_REQUEST "arg1" "phase:4,log,pass,id:500211"
+		SecRule FULL_REQUEST "arg2" "phase:4,log,pass,id:500212"
+	),
+	match_log => {
+		error => [ qr/Pattern match "arg1" at FULL_REQUEST.*Pattern match "arg2" at FULL_REQUEST/s, 1 ],
+		debug => [ qr/against FULL_REQUEST.*Target value: "GET \/test.txt\?arg1=val1\&arg2=val2 HTTP\/1.1\\n\\nTE: deflate,gzip;q=0.3\\nConnection: TE, close\\nHost: localhost:8088\\nUser-Agent: ModSecurity Regression Tests\/1.2.3\\n\\n\\x00"/s, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?arg1=val1&arg2=val2",
+	),
+},
+{
+	type => "target",
+	comment => "FULL_REQUEST (post)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule FULL_REQUEST "arg1" "phase:4,log,pass,id:500213"
+		SecRule FULL_REQUEST "arg2" "phase:4,log,pass,id:500214"
+	),
+	match_log => {
+		error => [ qr/Pattern match "arg1" at FULL_REQUEST.*Pattern match "arg2" at FULL_REQUEST/s, 1 ],
+		debug => [ qr/against FULL_REQUEST.*Target value: "POST \/test.txt HTTP\/1.1\\n\\nTE: deflate,gzip;q=0.3\\nConnection: TE, close\\nHost: localhost:8088\\nUser-Agent: ModSecurity Regression Tests\/1.2.3\\nContent-Type: application\/x-www-form-urlencoded\\nContent-Length: 19\\n\\narg1=val1&arg2=val2\\x00"/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		"arg1=val1&arg2=val2",
+	),
+},
+# FULL_REQUEST_LENGTH
+{
+	type => "target",
+	comment => "FULL_REQUEST_LENGTH (get)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule FULL_REQUEST_LENGTH "\@eq 1" "phase:4,log,pass,id:500211"
+		SecRule FULL_REQUEST_LENGTH "\@eq 115" "phase:4,log,pass,id:500212"
+	),
+	match_log => {
+		error => [ qr/Operator EQ matched 115 at FULL_REQUEST_LENGTH./s, 1 ],
+		debug => [ qr/against FULL_REQUEST_LENGTH.*Target value: "115"/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?arg1=val1&arg2=val2",
+	),
+},
+{
+	type => "target",
+	comment => "FULL_REQUEST_LENGTH (post)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule FULL_REQUEST_LENGTH "\@eq 1" "phase:4,log,pass,id:500213"
+		SecRule FULL_REQUEST_LENGTH "\@eq 201" "phase:4,log,pass,id:500214"
+	),
+	match_log => {
+		error => [ qr/Operator EQ matched 201 at FULL_REQUEST_LENGTH./s, 1 ],
+		debug => [ qr/against FULL_REQUEST_LENGTH.*Target value: "201"/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/x-www-form-urlencoded",
+		],
+		"arg1=val1&arg2=val2",
+	),
+},
+
+
 
 # AUTH_TYPE
 #{

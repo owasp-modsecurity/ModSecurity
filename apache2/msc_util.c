@@ -2386,3 +2386,69 @@ char *construct_single_var(modsec_rec *msr, char *name) {
 
     return (char *)vx->value;
 }
+
+
+/**
+ * @brief Transforms an apr_array_header_t to a text buffer
+ *
+ * Converts an apr_array_header_t into a plain/text buffer in a Key: Pair
+ * format. The generated buffer is not null terminated.
+ *
+ * If called with `buffer_length` set to 0 or with `buffer` set to NULL,
+ * it will _not_ fill any buffer, instead, it will return the length, that
+ * will be needed to save the entire content of `arr` into a buffer.
+ *
+ * @warning return is not NULL-terminated.
+ * @note memory management is in the responsibility of the caller.
+ *
+ * @param arr apr_array_header_t to be iterated.
+ * @param buffer pointer to the destination buffer.
+ * @param buffer_length length that will fully fill the buffer.
+ * @retval -1 Something went wrong in the process. Do not trust in
+ *            buffer content.
+ * @retval n>0 size of the [needed|] buffer.
+ *
+ */
+int msc_headers_to_buffer(const apr_array_header_t *arr, char *buffer,
+        int buffer_length)
+{
+    int headers_length = 0;
+    int write_to_buffer = 0;
+    int i = 0;
+    const apr_table_entry_t *te = NULL;
+
+    if (buffer != NULL && buffer_length > 0) {
+        write_to_buffer = 1;
+    }
+
+    te = (apr_table_entry_t *)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+            char *value = te[i].val;
+            char *key = te[i].key;
+            headers_length = headers_length + strlen(value) + strlen(key) + /* \n: */ 1 +
+               /* colum */ 1 + /* space: */ 1 ;
+
+            if (write_to_buffer == 1) {
+                if (buffer_length < headers_length) {
+                    headers_length = -1;
+                    goto not_enough_memory;
+                }
+
+                sprintf(buffer, "%s%s: %s\n", buffer, key, value);
+            }
+    }
+
+    headers_length++; /* Save space for an extra '\n' between the hedaers and the request body */
+    if (write_to_buffer) {
+        if (buffer_length < headers_length) {
+            headers_length = -1;
+            goto not_enough_memory;
+        }
+
+        buffer[headers_length-1] = '\n';
+    }
+
+not_enough_memory:
+    return headers_length;
+}
+
