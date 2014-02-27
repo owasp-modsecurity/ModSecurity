@@ -24,7 +24,7 @@
 </IfModule>
 
 <IfModule !mod_unixd.c>
-    LoadModule unixd_module /usr/lib64/httpd/modules/mod_unixd.so
+    LoadModule unixd_module @APXS_LIBEXECDIR@/mod_unixd.so
 </IfModule>
 
 
