@@ -489,6 +489,162 @@
 		1024
 	),
 },
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction Reject (multipart/greater - chunked)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction Reject
+		SecRequestBodyLimit 20
+	),
+	match_log => {
+		debug => [ qr/Request body is larger than the configured limit \(20\).. Deny with code \(413\)/, 1 ],
+	},
+	match_response => {
+		status => qr/^413$/,
+	},
+	request => normalize_raw_request_data(
+		qq(
+			POST /test.txt HTTP/1.1
+			Host: $ENV{SERVER_NAME}:$ENV{SERVER_PORT}
+			User-Agent: $ENV{USER_AGENT}
+			Content-Type: multipart/form-data; boundary=---------------------------69343412719991675451336310646
+			Transfer-Encoding: chunked
+
+		),
+	)
+	.encode_chunked(
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="a"
+
+				1
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="b"
+
+				2
+				-----------------------------69343412719991675451336310646--
+			)
+		),
+		1024
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction Reject (plain/greater)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction Reject
+		SecRequestBodyLimit 131072
+	),
+	match_log => {
+		-debug => [ qr/Request body is larger than the configured limit \(131072\).. Deny with code \(413\)/, 1 ],
+	},
+	match_response => {
+		status => qr/^413$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		normalize_raw_request_data(
+			q(
+				{
+					) . "'abcdefghijlmnopq'='abcdefghijlmnopqrstuvxz',\\n" x 99000 . q(
+				},
+			),
+		),
+	),
+},
+
+
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (multipart/greater - chunked)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 131072
+	),
+	match_log => {
+		-debug => [ qr/Request body is larger than the configured limit/, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => normalize_raw_request_data(
+		qq(
+			POST /test.txt HTTP/1.1
+			Host: $ENV{SERVER_NAME}:$ENV{SERVER_PORT}
+			User-Agent: $ENV{USER_AGENT}
+			Content-Type: multipart/form-data; boundary=---------------------------69343412719991675451336310646
+			Transfer-Encoding: chunked
+
+		),
+	)
+	.encode_chunked(
+		normalize_raw_request_data(
+			q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="a"
+
+				1) . "a" x 131072 . q(
+				-----------------------------69343412719991675451336310646
+				Content-Disposition: form-data; name="b"
+
+				2) . "b" x 131072 . q(
+				-----------------------------69343412719991675451336310646--
+			)
+		),
+		131072*3
+	),
+},
+{
+	type => "config",
+	comment => "SecRequestBodyLimitAction ProcessPartial (plain/greater)",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyLimit 131072
+	),
+	match_log => {
+		-debug => [ qr/Request body is larger than the configured limit/, 1],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/json",
+		],
+		normalize_raw_request_data(
+			q(
+				{
+					) . "'abcdefghijlmnopq'='abcdefghijlmnopqrstuvxz',\\n" x 99000 . q(
+				},
+			),
+		),
+	),
+},
+
+
+
+
 
 # SecCookieFormat
 {
