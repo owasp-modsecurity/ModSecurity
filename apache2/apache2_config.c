@@ -256,13 +256,31 @@ static void copy_rules_phase(apr_pool_t *mp,
 }
 
 /**
- * Copies rules between two configuration contexts,
+ * @brief Copies rules between one phase of two configuration contexts.
+ *
+ * Copies rules between one phase of two configuration contexts,
  * taking exceptions into account.
+ *
+ * @param mp apr pool structure
+ * @param parent_ruleset Parent's msre_ruleset
+ * @param child_ruleset Child's msre_ruleset
+ * @param exceptions_arr Exceptions' apr_array_header_t
+ * @retval 0 Everything went well.
+ * @retval -1 Something went wrong.
+ *
  */
 static int copy_rules(apr_pool_t *mp, msre_ruleset *parent_ruleset,
                       msre_ruleset *child_ruleset,
                       apr_array_header_t *exceptions_arr)
 {
+    int ret = 0;
+
+    if (parent_ruleset == NULL || child_ruleset == NULL ||
+            exceptions_arr == NULL) {
+        ret = -1;
+        goto failed;
+    }
+
     copy_rules_phase(mp, parent_ruleset->phase_request_headers,
         child_ruleset->phase_request_headers, exceptions_arr);
     copy_rules_phase(mp, parent_ruleset->phase_request_body,
@@ -274,7 +292,8 @@ static int copy_rules(apr_pool_t *mp, msre_ruleset *parent_ruleset,
     copy_rules_phase(mp, parent_ruleset->phase_logging,
         child_ruleset->phase_logging, exceptions_arr);
 
-    return 1;
+failed:
+    return ret;
 }
 
 /**
@@ -393,6 +412,7 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
 
             /* Copy the rules from the parent context. */
             merged->ruleset = msre_ruleset_create(parent->ruleset->engine, mp);
+            /* TODO: copy_rules return code should be taken into consideration. */
             copy_rules(mp, parent->ruleset, merged->ruleset, child->rule_exceptions);
         } else
         if (parent->ruleset == NULL) {
@@ -419,6 +439,7 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
 
             /* Copy parent rules, then add child rules to it. */
             merged->ruleset = msre_ruleset_create(parent->ruleset->engine, mp);
+            /* TODO: copy_rules return code should be taken into consideration. */
             copy_rules(mp, parent->ruleset, merged->ruleset, child->rule_exceptions);
 
             apr_array_cat(merged->ruleset->phase_request_headers,
