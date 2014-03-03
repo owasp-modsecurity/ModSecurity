@@ -59,7 +59,7 @@ SecRule REQBODY_ERROR "!@eq 0" \
 # _not_ to remove it altogether.
 #
 SecRule MULTIPART_STRICT_ERROR "!@eq 0" \
-"id:'200002',phase:2,t:none,log,deny,status:44, \
+"id:'200002',phase:2,t:none,log,deny,status:400, \
 msg:'Multipart request body failed strict validation: \
 PE %{REQBODY_PROCESSOR_ERROR}, \
 BQ %{MULTIPART_BOUNDARY_QUOTED}, \
