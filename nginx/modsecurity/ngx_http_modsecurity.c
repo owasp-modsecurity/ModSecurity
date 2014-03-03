@@ -1356,6 +1356,10 @@ ngx_http_modsecurity_cleanup(void *data)
     if (ctx->req != NULL) {
         (void) modsecFinishRequest(ctx->req);
     }
+    if (ctx->connection != NULL) {
+        (void) modsecFinishConnection(ctx->connection);
+    }
+    
 }
 
     static char *
