@@ -51,6 +51,7 @@ void modsecTerminate();
 
 void modsecStartConfig();
 directory_config *modsecGetDefaultConfig();
+directory_config *modsecGetNewConfig(apr_pool_t *a_pool);
 const char *modsecProcessConfig(directory_config *config, const char *file, const char *dir);
 void modsecFinalizeConfig();
 

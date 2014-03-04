@@ -190,7 +190,7 @@ apr_status_t ap_http_in_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         if (rv != APR_SUCCESS && rv != APR_INCOMPLETE) {
             return rv;
         }
-        
+
         for (e = APR_BRIGADE_FIRST(bb_in); e != after; e = APR_BRIGADE_FIRST(bb_in)) {
             APR_BUCKET_REMOVE(e);
             APR_BRIGADE_INSERT_TAIL(bb_out, e);
@@ -248,6 +248,18 @@ void modsecStartConfig()    {
 
 directory_config *modsecGetDefaultConfig()  {
     return (directory_config *)security2_module.create_dir_config(pool, NULL);
+}
+
+/**
+ * @brief   Create a new directory_config object in a user-defined apr pool
+ * @details
+ * @param   a_pool The apr_pool in which to allocate the directory_config object
+ *                 and all it's containing objects
+ * @return  The allocated directory_config object
+ * @return  NULL on alocation failure
+ */
+directory_config *modsecGetNewConfig(apr_pool_t *a_pool)  {
+    return (directory_config *)security2_module.create_dir_config(a_pool, NULL);
 }
 
 const char *modsecProcessConfig(directory_config *config, const char *file, const char *dir)  {
@@ -630,7 +642,7 @@ int modsecProcessResponse(request_rec *r)   {
             return APR_EGENERAL;
         }
     }
-    
+
     return DECLINED;
 }
 
