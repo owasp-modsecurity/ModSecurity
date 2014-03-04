@@ -1,18 +1,32 @@
+
 EXT_CFLAGS = -I../apache2 \
-			 @APXS_CFLAGS@ @APR_CFLAGS@ @APU_CFLAGS@ \
-			 @LIBXML2_CFLAGS@ @LUA_CFLAGS@ @YAJL_CFLAGS@ \
-             @SSDEEP_CFLAGS@
-EXT_CPPFLAGS = @APR_CPPFLAGS@ @LIBXML2_CPPFLAGS@
-EXT_LIBADD = @APR_LDADD@ @APU_LDADD@ @LIBXML2_LDADD@ @LUA_LDADD@
+    @APR_CFLAGS@ \
+    @APU_CFLAGS@ \
+    @APXS_CFLAGS@ \
+    @LIBXML2_CFLAGS@ \
+    @LUA_CFLAGS@
+    
+EXT_CPPFLAGS = @APR_CPPFLAGS@ \
+    @LIBXML2_CPPFLAGS@
+    
+EXT_LIBADD = @APR_LDADD@ \
+    @APU_LDADD@ \
+    @LIBXML2_LDADD@ \
+    @LUA_LDADD@
+    
 EXT_LDFLAGS = -no-undefined -module -avoid-version \
-			  @APR_LDFLAGS@ @APU_LDFLAGS@ @APXS_LDFLAGS@ \
-			  @LIBXML2_LDFLAGS@ @LUA_LDFLAGS@
+    @APR_LDFLAGS@ \
+    @APU_LDFLAGS@ \
+    @APXS_LDFLAGS@ \
+    @LIBXML2_LDFLAGS@ \
+    @LUA_LDFLAGS@
 
 pkglibdir = $(prefix)/lib
+
 pkglib_LTLIBRARIES = mod_op_strstr.la \
-					 mod_tfn_reverse.la \
-					 mod_var_remote_addr_port.la \
-					 mod_reqbody_example.la
+    mod_tfn_reverse.la \
+    mod_var_remote_addr_port.la \
+    mod_reqbody_example.la
 
 mod_op_strstr_la_SOURCES = mod_op_strstr.c
 mod_op_strstr_la_CFLAGS = $(EXT_CFLAGS)

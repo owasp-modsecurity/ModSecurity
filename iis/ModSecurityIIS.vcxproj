@@ -83,8 +83,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\lloyd-yajl-f4b2b1a\build\yajl-2.0.1\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;dependencies\build_dir\apache24\include;..\apache2;..\standalone</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC;VERSION_IIS;WITH_YAJL</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;dependencies\build_dir\apache24\include;..\apache2;..\standalone</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC;VERSION_IIS</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
@@ -93,7 +93,7 @@
     <Link>
       <ModuleDefinitionFile>mymodule.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib;dependencies\build_dir\yajl\build\yajl-2.0.1\lib\yajl.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -103,8 +103,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\lloyd-yajl-f4b2b1a\build\yajl-2.0.1\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;..\apache2;..\standalone;dependencies\build_dir\apache24\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC;WITH_YAJL;VERSION_IIS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;..\apache2;..\standalone;dependencies\build_dir\apache24\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
@@ -113,7 +113,7 @@
     <Link>
       <ModuleDefinitionFile>mymodule.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib;dependencies\build_dir\yajl\build\yajl-2.0.1\lib\yajl.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\core__\ModSecurity\iis\release\x64</AdditionalLibraryDirectories>
       <AdditionalOptions> /LIBPATH:"C:\core__\ModSecurity\iis\release\x64" %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -126,11 +126,11 @@
     <ClCompile>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC;VERSION_IIS;WITH_YAJL</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\lloyd-yajl-f4b2b1a\build\yajl-2.0.1\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;..\apache2;..\standalone</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;..\apache2;..\standalone</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>mymodule.def</ModuleDefinitionFile>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib;dependencies\build_dir\yajl\build\yajl-2.0.1\lib\yajl.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -141,11 +141,11 @@
     <ClCompile>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WINNT;inline=APR_INLINE;AP_DECLARE_STATIC;WITH_YAJL;VERSION_IIS</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\lloyd-yajl-f4b2b1a\build\yajl-2.0.1\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;..\apache2;..\standalone;dependencies\build_dir\apache24\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>dependencies\build_dir\pcre\include;dependencies\build_dir\pcre;dependencies\build_dir\libxml2\include;..\apache2;..\standalone;dependencies\build_dir\apache24\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>mymodule.def</ModuleDefinitionFile>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib;dependencies\build_dir\yajl\build\yajl-2.0.1\lib\yajl.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies);dependencies\build_dir\apache24\lib\libapr-1.lib;dependencies\build_dir\apache24\lib\libaprutil-1.lib;dependencies\build_dir\pcre\pcre.lib;dependencies\build_dir\libxml2\win32\bin.msvc\libxml2.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
