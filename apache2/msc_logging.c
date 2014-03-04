@@ -49,16 +49,24 @@ static int sec_auditlog_write(modsec_rec *msr, const char *data, unsigned int le
     /* Write data to file. */
     rc = apr_file_write_full(msr->new_auditlog_fd, data, nbytes, &nbytes_written);
     if (rc != APR_SUCCESS) {
+        char errstr[1024];
+
         msr_log(msr, 1, "Audit log: Failed writing (requested %" APR_SIZE_T_FMT
-            " bytes, written %" APR_SIZE_T_FMT ")", nbytes, nbytes_written);
+            " bytes, written %" APR_SIZE_T_FMT "): %s", nbytes, nbytes_written,
+            apr_strerror(rc, errstr, sizeof(errstr));
+
+        /* Concurrent log format: don't leak file handle. */
+        if (msr->txcfg->auditlog_type == AUDITLOG_CONCURRENT) {
+            apr_file_close(msr->new_auditlog_fd);
+        }
 
         /* Set to NULL to prevent more than one error message on
          * out-of-disk-space events and to prevent further attempts
          * to write to the same file in this request.
          *
-         * Note that, as we opened the file through the pool mechanism of
-         * the APR, we do not need to close the file here. It will be closed
-         * automatically at the end of the request.
+         * Serial log format: Note that, as we opened the file through the
+         * pool mechanism of the APR, we do not need to close the file
+         * here. It will be closed automatically at the end of the request.
          */
         msr->new_auditlog_fd = NULL;
 
@@ -1181,7 +1189,10 @@ void sec_audit_logger(modsec_rec *msr) {
 
     /* From here on only concurrent-style processing. */
 
-    apr_file_close(msr->new_auditlog_fd);
+    /* File handle might already be closed after write failure. */
+    if (msr->new_auditlog_fd) {
+        apr_file_close(msr->new_auditlog_fd);
+    }
 
     /* Write an entry to the index file */
 
