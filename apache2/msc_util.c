@@ -236,7 +236,7 @@ char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int inp
                 count+=7;
                 if(count <= len) {
                     /* compute character number */
-                    d = ((c & 0x07) << 18) | ((*(utf + 1) & 0x3F) << 12) | ((*(utf + 2) & 0x3F) < 6) | (*(utf + 3) & 0x3F);
+                    d = ((c & 0x07) << 18) | ((*(utf + 1) & 0x3F) << 12) | ((*(utf + 2) & 0x3F) << 6) | (*(utf + 3) & 0x3F);
                     *data++ = '%';
                     *data++ = 'u';
                     unicode = apr_psprintf(mp, "%x", d);
