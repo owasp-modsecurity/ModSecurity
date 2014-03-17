@@ -26,6 +26,9 @@
 #include "msc_lua.h"
 #endif
 
+#ifdef WITH_LIBMEMCACHED
+#include <memcached.h>
+#endif
 
 /* -- Directory context creation and initialisation -- */
 
@@ -65,6 +68,7 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     dcfg->cookie_format = NOT_SET;
     dcfg->argument_separator = NOT_SET;
     dcfg->cookiev0_separator = NOT_SET_P;
+    dcfg->persistent_storage = NOT_SET;
 
     dcfg->rule_inheritance = NOT_SET;
     dcfg->rule_exceptions = apr_array_make(mp, 16, sizeof(rule_exception *));
@@ -1124,6 +1128,34 @@ static const char *cmd_marker(cmd_parms *cmd, void *_dcfg, const char *p1)
     const char *action = apr_pstrcat(dcfg->mp, SECMARKER_BASE_ACTIONS, p1, NULL);
     return add_marker(cmd, (directory_config *)_dcfg, SECMARKER_TARGETS, SECMARKER_ARGS, action);
 }
+
+static const char *cmd_persistent_storage(cmd_parms *cmd, void *_dcfg,
+        const char *p1, const char *p2)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+
+    if (strcmp(p1, "memcache") == 0) {
+#if WITH_LIBMEMCACHED
+        dcfg->persistent_storage = STORAGE_TYPE_MEMCACHE;
+        memcache = memcached(p2, strlen(p2));
+        if (memcache == NULL) {
+            return apr_psprintf(cmd->pool, "ModSecurity: Failed to connect " \
+                    "to memcache server(s)");
+        }
+#else
+
+        return apr_psprintf(cmd->pool, "ModSecurity: Memcached is not " \
+                "supported on this version. See compilation options for " \
+                "further information.");
+#endif
+    }
+    else {
+        dcfg->persistent_storage = STORAGE_TYPE_LOCAL;
+    }
+
+    return NULL;
+}
+
 
 static const char *cmd_cookiev0_separator(cmd_parms *cmd, void *_dcfg,
         const char *p1)
@@ -3304,6 +3336,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "marker for a skipAfter target"
+    ),
+
+    AP_INIT_TAKE12 (
+        "SecPersistentStorage",
+        cmd_persistent_storage,
+        NULL,
+        CMD_SCOPE_ANY,
+        "set storage type"
     ),
 
     AP_INIT_TAKE1 (

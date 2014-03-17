@@ -12,6 +12,7 @@ msc_test_SOURCES = msc_test.c \
     ../apache2/msc_logging.c \
     ../apache2/msc_lua.c \
     ../apache2/msc_multipart.c \
+    ../apache2/msc_persistent_memcache.c \
     ../apache2/msc_parsers.c \
     ../apache2/msc_pcre.c \
     ../apache2/msc_release.c \

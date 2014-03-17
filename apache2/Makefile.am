@@ -20,6 +20,7 @@ mod_security2_la_SOURCES = acmp.c \
     msc_multipart.c \
     msc_parsers.c \
     msc_pcre.c \
+    msc_persistent_memcache.c \
     msc_release.c \
     msc_reqbody.c \
     msc_tree.c \

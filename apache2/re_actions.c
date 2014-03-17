@@ -17,6 +17,7 @@
 #include "apr_lib.h"
 #include "apr_strmatch.h"
 
+#include "msc_persistent_memcache.h"
 
 /**
  * Register action with the engine.
@@ -1933,111 +1934,126 @@ static apr_status_t msre_action_deprecatevar_execute(modsec_rec *msr, apr_pool_t
     return 1;
 }
 
+static apr_table_t *create_collection_table(modsec_rec *msr, const char *real_col_name,
+    const char *col_name, const char *col_key, unsigned int col_key_len)
+{
+    apr_table_t *table = NULL;
+    msc_string *var = NULL;
+
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "Creating collection (name \"%s\", key \"%s\").",
+           real_col_name, col_key);
+    }
+
+    table = apr_table_make(msr->mp, 24);
+    if (table == NULL) {
+        msr_log(msr, 4, "Problems creating collection table. Aborting.");
+        return NULL;
+    }
+
+    /* IMP1 Is the timeout hard-coded to 3600? */
+
+   if(msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "Setting default timeout collection value %d.",msr->txcfg->col_timeout);
+    }
+
+    /* Add default timeout. */
+    var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    var->name = "__expire_KEY";
+    var->name_len = strlen(var->name);
+    var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)(apr_time_sec(msr->request_time) + msr->txcfg->col_timeout));
+    var->value_len = strlen(var->value);
+    apr_table_setn(table, var->name, (void *)var);
+
+    /* Remember the key. */
+    var = apr_pcalloc(msr->mp, sizeof(msc_string));
+    var->name = "KEY";
+    var->name_len = strlen(var->name);
+    var->value = apr_pstrmemdup(msr->mp, col_key, col_key_len);
+    var->value_len = col_key_len;
+    apr_table_setn(table, var->name, (void *)var);
+
+    /* The timeout. */
+    var = apr_pcalloc(msr->mp, sizeof(msc_string));
+    var->name = "TIMEOUT";
+    var->name_len = strlen(var->name);
+    var->value = apr_psprintf(msr->mp, "%d", msr->txcfg->col_timeout);
+    var->value_len = strlen(var->value);
+    apr_table_setn(table, var->name, (void *)var);
+
+    /* We may want to allow the user to unset KEY
+     * but we still need to preserve value to identify
+     * the collection in storage.
+     */
+
+    /* IMP1 Actually I want a better way to delete collections,
+     *      perhaps a dedicated action.
+     */
+
+    var = apr_pcalloc(msr->mp, sizeof(msc_string));
+    var->name = "__key";
+    var->name_len = strlen(var->name);
+    var->value = apr_pstrmemdup(msr->mp, col_key, col_key_len);
+    var->value_len = col_key_len;
+    apr_table_setn(table, var->name, (void *)var);
+
+    /* Peristence code will need to know the name of the collection. */
+    var = apr_pcalloc(msr->mp, sizeof(msc_string));
+    var->name = "__name";
+    var->name_len = strlen(var->name);
+    var->value = apr_pstrdup(msr->mp, real_col_name);
+    var->value_len = strlen(var->value);
+    apr_table_setn(table, var->name, (void *)var);
+
+    /* Create time. */
+    var = apr_pcalloc(msr->mp, sizeof(msc_string));
+    var->name = "CREATE_TIME";
+    var->name_len = strlen(var->name);
+    var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)apr_time_sec(msr->request_time));
+    var->value_len = strlen(var->value);
+    apr_table_setn(table, var->name, (void *)var);
+
+    /* Update counter. */
+    var = apr_pcalloc(msr->mp, sizeof(msc_string));
+    var->name = "UPDATE_COUNTER";
+    var->name_len = strlen(var->name);
+    var->value = "0";
+    var->value_len = strlen(var->value);
+    apr_table_setn(table, var->name, (void *)var);
+
+    /* This is a new collection. */
+    var = apr_pcalloc(msr->mp, sizeof(msc_string));
+    var->name = "IS_NEW";
+    var->name_len = strlen(var->name);
+    var->value = "1";
+    var->value_len = strlen(var->value);
+    apr_table_setn(table, var->name, (void *)var);
+
+    return table;
+}
+
 static apr_status_t init_collection(modsec_rec *msr, const char *real_col_name,
     const char *col_name, const char *col_key, unsigned int col_key_len)
 {
     apr_table_t *table = NULL;
     msc_string *var = NULL;
 
-    /* IMP1 Cannot initialise the built-in collections this way. */
-
-    /* Does the collection exist already? */
     if (apr_table_get(msr->collections, col_name) != NULL) {
         /* ENH Warn about this. */
         return 0;
     }
 
-    /* Init collection from storage. */
-    table = collection_retrieve(msr, real_col_name, col_key, col_key_len);
+    msr_log(msr, 4, "Initializing collection: %s.", real_col_name);
+
+    if (msr->dcfg1->persistent_storage == STORAGE_TYPE_MEMCACHE) {
+        table = msc_memcache_collection_retrieve(msr, real_col_name, col_key, col_key_len);
+    } else {
+        table = collection_retrieve(msr, real_col_name, col_key, col_key_len);
+    }
 
     if (table == NULL) {
-        /* Does not exist yet - create new. */
-
-        if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Creating collection (name \"%s\", key \"%s\").",
-               real_col_name, col_key);
-        }
-
-        table = apr_table_make(msr->mp, 24);
-        if (table == NULL) return -1;
-
-        /* IMP1 Is the timeout hard-coded to 3600? */
-
-       if(msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Setting default timeout collection value %d.",msr->txcfg->col_timeout);
-        }
-
-        /* Add default timeout. */
-        var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-        var->name = "__expire_KEY";
-        var->name_len = strlen(var->name);
-        var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)(apr_time_sec(msr->request_time) + msr->txcfg->col_timeout));
-        var->value_len = strlen(var->value);
-        apr_table_setn(table, var->name, (void *)var);
-
-        /* Remember the key. */
-        var = apr_pcalloc(msr->mp, sizeof(msc_string));
-        var->name = "KEY";
-        var->name_len = strlen(var->name);
-        var->value = apr_pstrmemdup(msr->mp, col_key, col_key_len);
-        var->value_len = col_key_len;
-        apr_table_setn(table, var->name, (void *)var);
-
-        /* The timeout. */
-        var = apr_pcalloc(msr->mp, sizeof(msc_string));
-        var->name = "TIMEOUT";
-        var->name_len = strlen(var->name);
-        var->value = apr_psprintf(msr->mp, "%d", msr->txcfg->col_timeout);
-        var->value_len = strlen(var->value);
-        apr_table_setn(table, var->name, (void *)var);
-
-        /* We may want to allow the user to unset KEY
-         * but we still need to preserve value to identify
-         * the collection in storage.
-         */
-
-        /* IMP1 Actually I want a better way to delete collections,
-         *      perhaps a dedicated action.
-         */
-
-        var = apr_pcalloc(msr->mp, sizeof(msc_string));
-        var->name = "__key";
-        var->name_len = strlen(var->name);
-        var->value = apr_pstrmemdup(msr->mp, col_key, col_key_len);
-        var->value_len = col_key_len;
-        apr_table_setn(table, var->name, (void *)var);
-
-        /* Peristence code will need to know the name of the collection. */
-        var = apr_pcalloc(msr->mp, sizeof(msc_string));
-        var->name = "__name";
-        var->name_len = strlen(var->name);
-        var->value = apr_pstrdup(msr->mp, real_col_name);
-        var->value_len = strlen(var->value);
-        apr_table_setn(table, var->name, (void *)var);
-
-        /* Create time. */
-        var = apr_pcalloc(msr->mp, sizeof(msc_string));
-        var->name = "CREATE_TIME";
-        var->name_len = strlen(var->name);
-        var->value = apr_psprintf(msr->mp, "%" APR_TIME_T_FMT, (apr_time_t)apr_time_sec(msr->request_time));
-        var->value_len = strlen(var->value);
-        apr_table_setn(table, var->name, (void *)var);
-
-        /* Update counter. */
-        var = apr_pcalloc(msr->mp, sizeof(msc_string));
-        var->name = "UPDATE_COUNTER";
-        var->name_len = strlen(var->name);
-        var->value = "0";
-        var->value_len = strlen(var->value);
-        apr_table_setn(table, var->name, (void *)var);
-
-        /* This is a new collection. */
-        var = apr_pcalloc(msr->mp, sizeof(msc_string));
-        var->name = "IS_NEW";
-        var->name_len = strlen(var->name);
-        var->value = "1";
-        var->value_len = strlen(var->value);
-        apr_table_setn(table, var->name, (void *)var);
+        msr_log(msr, 4, "Collection was not found, creating it...");
+        table = create_collection_table(msr, real_col_name, col_name, col_key, col_key_len);
     }
 
     /* Record the original counter value before we change it */

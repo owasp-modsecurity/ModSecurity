@@ -46,6 +46,10 @@ typedef struct msre_cache_rec msre_cache_rec;
 #include "msc_lua.h"
 #endif
 
+#ifdef WITH_LIBMEMCACHED
+#include <memcached.h>
+#endif
+
 /* Actions, variables, functions and operator functions */
 char DSOLOCAL *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *rule, const char *p2,
         const char *p3);

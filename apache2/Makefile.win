@@ -57,6 +57,7 @@ OBJS = mod_security2.obj apache2_config.obj apache2_io.obj apache2_util.obj \
        msc_release.obj \
        msc_status_engine.obj \
        msc_json.obj \
+       msc_persistent_memcache.obj \
        libinjection/libinjection_html5.obj \
        libinjection/libinjection_sqli.obj \
        libinjection/libinjection_xss.obj

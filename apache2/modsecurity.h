@@ -60,6 +60,13 @@ typedef struct msc_parm msc_parm;
 #include "msc_lua.h"
 #endif
 
+#ifdef WITH_LIBMEMCACHED
+#include <memcached.h>
+#endif
+
+#define STORAGE_TYPE_LOCAL 1
+#define STORAGE_TYPE_MEMCACHE 2
+
 #define PHASE_REQUEST_HEADERS       1
 #define PHASE_REQUEST_BODY          2
 #define PHASE_RESPONSE_HEADERS      3
@@ -138,6 +145,10 @@ extern DSOLOCAL char *chroot_dir;
 extern module AP_MODULE_DECLARE_DATA security2_module;
 
 extern DSOLOCAL const command_rec module_directives[];
+
+#if WITH_LIBMEMCACHED
+extern DSOLOCAL memcached_st *memcache;
+#endif
 
 extern DSOLOCAL unsigned long int msc_pcre_match_limit;
 
@@ -491,6 +502,7 @@ struct directory_config {
     int                  cookie_format;
     int                  argument_separator;
     const char           *cookiev0_separator;
+    int                  persistent_storage;
 
     int                  rule_inheritance;
     apr_array_header_t  *rule_exceptions;

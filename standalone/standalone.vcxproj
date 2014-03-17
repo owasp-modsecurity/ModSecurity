@@ -136,6 +136,7 @@
     <ClCompile Include="..\apache2\msc_lua.c" />
     <ClCompile Include="..\apache2\msc_multipart.c" />
     <ClCompile Include="..\apache2\msc_parsers.c" />
+    <ClCompile Include="..\apache2\msc_persistent_memcache.c" />
     <ClCompile Include="..\apache2\msc_pcre.c" />
     <ClCompile Include="..\apache2\msc_release.c" />
     <ClCompile Include="..\apache2\msc_reqbody.c" />

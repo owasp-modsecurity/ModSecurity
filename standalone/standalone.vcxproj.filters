@@ -54,6 +54,9 @@
     <ClCompile Include="..\apache2\msc_parsers.c">
       <Filter>ModSecurity Sources</Filter>
     </ClCompile>
+    <ClCompile Include="..\apache2\msc_persistent_memcache.c">
+      <Filter>ModSecurity Sources</Filter>
+    </ClCompile>
     <ClCompile Include="..\apache2\msc_pcre.c">
       <Filter>ModSecurity Sources</Filter>
     </ClCompile>

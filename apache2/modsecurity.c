@@ -18,10 +18,12 @@
 
 #include "modsecurity.h"
 #include "msc_parsers.h"
+#include "msc_persistent_memcache.h"
 #include "msc_util.h"
 #include "msc_json.h"
 #include "msc_xml.h"
 #include "apr_version.h"
+
 
 unsigned long int DSOLOCAL unicode_codepage = 0;
 
@@ -209,7 +211,13 @@ static void modsecurity_persist_data(modsec_rec *msr) {
 
         /* Only store those collections that changed. */
         if (apr_table_get(msr->collections_dirty, te[i].key)) {
-            collection_store(msr, col);
+
+            if (msr->dcfg1->persistent_storage != STORAGE_TYPE_MEMCACHE) {
+                collection_store(msr, col);
+            } else
+            {
+                msc_memcache_collection_store(msr, col);
+            }
         }
     }
 
@@ -229,7 +237,9 @@ static void modsecurity_persist_data(modsec_rec *msr) {
         arr = apr_table_elts(msr->collections);
         te = (apr_table_entry_t *)arr->elts;
         for (i = 0; i < arr->nelts; i++) {
-            collections_remove_stale(msr, te[i].key);
+            if (msr->dcfg1->persistent_storage != STORAGE_TYPE_MEMCACHE) {
+                collections_remove_stale(msr, te[i].key);
+            }
         }
 
         msr->time_gc = apr_time_now() - time_after;
