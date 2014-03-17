@@ -47,6 +47,7 @@ standalone_la_CFLAGS = -DVERSION_NGINX \
     @APU_CFLAGS@ \
     @APXS_CFLAGS@ \
     @CURL_CFLAGS@ \
+    @LIBMEMCACHED_CFLAGS@ \
     @LIBXML2_CFLAGS@ \
     @LUA_CFLAGS@ \
     @MODSEC_EXTRA_CFLAGS@ \
@@ -60,6 +61,7 @@ standalone_la_CPPFLAGS = @APR_CPPFLAGS@ \
     
 standalone_la_LIBADD = @APR_LDADD@ \
     @APU_LDADD@ \
+    @LIBMEMCACHED_LDADD@ \
     @LIBXML2_LDADD@ \
     @LUA_LDADD@ \
     @PCRE_LDADD@ \
@@ -71,6 +73,7 @@ standalone_la_LDFLAGS = -module -avoid-version \
     @APR_LDFLAGS@ \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
+    @LIBMEMCACHED_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -83,6 +86,7 @@ standalone_la_LDFLAGS = -module -avoid-version \
     @APR_LDFLAGS@ \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
+    @LIBMEMCACHED_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -95,6 +99,7 @@ standalone_la_LDFLAGS = -module -avoid-version \
     @APR_LDFLAGS@ \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
+    @LIBMEMCACHED_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -107,6 +112,7 @@ standalone_la_LDFLAGS = -module -avoid-version \
     @APR_LDFLAGS@ \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
+    @LIBMEMCACHED_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -119,6 +125,7 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
     @APR_LDFLAGS@ \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
+    @LIBMEMCACHED_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -131,6 +138,7 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
     @APR_LDFLAGS@ \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
+    @LIBMEMCACHED_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -143,6 +151,7 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
     @APR_LDFLAGS@ \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
+    @LIBMEMCACHED_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
@@ -155,6 +164,7 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
     @APR_LDFLAGS@ \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \
+    @LIBMEMCACHED_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
