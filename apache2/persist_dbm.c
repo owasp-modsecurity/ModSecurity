@@ -217,13 +217,12 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
 
         rc = apr_sdbm_delete(dbm, key);
         if (rc != APR_SUCCESS) {
-            msr_log(msr, 1, "collection_retrieve_ex: Failed deleting collection (name \"%s\", "
-                "key \"%s\"): %s", log_escape(msr->mp, col_name),
+            msr_log(msr, 9, "collection_retrieve_ex: Failed deleting collection (name \"%s\", "
+                "key \"%s\"): %s (It may already have been excluded).", log_escape(msr->mp, col_name),
                 log_escape_ex(msr->mp, col_key, col_key_len), get_apr_error(msr->mp, rc));
             msr->msc_sdbm_delete_error = 1;
-            goto cleanup;
+            /*goto cleanup;*/
         }
-
 
         if (existing_dbm == NULL) {
             apr_sdbm_close(dbm);
