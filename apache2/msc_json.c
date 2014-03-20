@@ -48,6 +48,7 @@ int json_add_argument(modsec_rec *msr, const char *value, unsigned length)
      */
     arg->value = apr_pstrmemdup(msr->mp, value, length);
     arg->value_len = length;
+    arg->origin = "JSON";
 
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "Adding JSON argument '%s' with value '%s'",
