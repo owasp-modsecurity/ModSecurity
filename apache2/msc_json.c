@@ -254,7 +254,7 @@ int json_init(modsec_rec *msr, char **error_msg) {
      * yajl initialization
      *
      * yajl_parser_config definition:
-     * http://lloyd.github.com/yajl/yajl-1.0.12/structyajl__parser__config.html
+     * http://lloyd.github.io/yajl/yajl-2.0.1/yajl__parse_8h.html#aec816c5518264d2ac41c05469a0f986c
      *
      * TODO: make UTF8 validation optional, as it depends on Content-Encoding
      */
@@ -262,6 +262,7 @@ int json_init(modsec_rec *msr, char **error_msg) {
         msr_log(msr, 9, "yajl JSON parsing callback initialization");
     }
     msr->json->handle = yajl_alloc(&callbacks, NULL, msr);
+    yajl_config(msr->json->handle, yajl_allow_partial_values, 0);
 
     return 1;
 }
@@ -278,6 +279,7 @@ int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char
     if (msr->json->status != yajl_status_ok) {
         /* We need to free the yajl error message later, how to do this? */
         *error_msg = yajl_get_error(msr->json->handle, 0, buf, size);
+        return -1;
     }
 
     return 1;
@@ -297,6 +299,7 @@ int json_complete(modsec_rec *msr, char **error_msg) {
     if (msr->json->status != yajl_status_ok) {
         /* We need to free the yajl error message later, how to do this? */
         *error_msg = yajl_get_error(msr->json->handle, 0, NULL, 0);
+        return -1;
     }
 
     return 1;
