@@ -843,7 +843,7 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
 
             nlink = apr_pstrmemdup(msr->mp, target, strlen(target) - strlen(valid) - 1);
 
-            msr_log(msr, 9, "Validating URI %s size %d",nlink,strlen(nlink));
+            msr_log(msr, 9, "Validating URI %s size %zu",nlink,strlen(nlink));
 
             hash_link = do_hash_link(msr, (char *)nlink, HASH_ONLY);
 

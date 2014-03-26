@@ -1103,7 +1103,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
         memcpy(msr->stream_output_data, xmlOutputBufferGetContent(output_buf), msr->stream_output_length);
 
         if (msr->txcfg->debuglog_level >= 4)
-            msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONTENT to stream buffer [%d] bytes.", xmlOutputBufferGetSize(output_buf));
+            msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONTENT to stream buffer [%zu] bytes.", xmlOutputBufferGetSize(output_buf));
 
     } else {
 
@@ -1132,7 +1132,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
         memcpy(msr->stream_output_data, xmlOutputBufferGetContent(output_buf), msr->stream_output_length);
 
         if (msr->txcfg->debuglog_level >= 4)
-            msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONV to stream buffer [%d] bytes.", xmlOutputBufferGetSize(output_buf));
+            msr_log(msr, 4, "inject_hashed_response_body: Copying XML tree from CONV to stream buffer [%zu] bytes.", xmlOutputBufferGetSize(output_buf));
 
     }
 
@@ -1379,7 +1379,7 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
             relative_link = relative_uri+1;
 
             if (msr->txcfg->debuglog_level >= 4)    {
-                msr_log(msr, 4, "Signing data [%s] size %d", relative_link, strlen(relative_link));
+                msr_log(msr, 4, "Signing data [%s] size %zu", relative_link, strlen(relative_link));
                 }
 
             if(msr->txcfg->crypto_key_add == HASH_KEYONLY)
