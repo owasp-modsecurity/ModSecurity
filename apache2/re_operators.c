@@ -2053,7 +2053,6 @@ static int msre_op_detectXSS_execute(modsec_rec *msr, msre_rule *rule, msre_var 
     char **error_msg) {
 
     int is_xss;
-    int capture;
 
     is_xss = libinjection_xss(var->value, var->value_len);
 

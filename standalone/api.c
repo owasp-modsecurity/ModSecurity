@@ -40,6 +40,10 @@
 
 #include "api.h"
 
+#ifdef WIN32
+#include "msc_status_engine.h"
+#endif
+
 extern void *modsecLogObj;
 extern void (*modsecLogHook)(void *obj, int level, char *str);
 extern int (*modsecDropAction)(request_rec *r);
@@ -75,6 +79,7 @@ DECLARE_HOOK(void,insert_filter,(request_rec *r))
 DECLARE_HOOK(void,insert_error_filter,(request_rec *r))
 
 char *sa_name = "standalone";
+const char *sa_name_argv[] = { "standalone", NULL };
 server_rec *server;
 apr_pool_t *pool = NULL;
 
@@ -135,7 +140,7 @@ server_rec *modsecInit()    {
     server->port = 80;
     server->process = apr_palloc(pool, sizeof(process_rec));
     server->process->argc = 1;
-    server->process->argv = &sa_name;
+    server->process->argv = sa_name_argv;
     server->process->pconf = pool;
     server->process->pool = pool;
     server->process->short_name = sa_name;
@@ -223,7 +228,6 @@ apr_status_t ap_http_in_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 }
 
 apr_status_t ap_http_out_filter(ap_filter_t *f, apr_bucket_brigade *b)  {
-    apr_status_t rc;
     apr_bucket_brigade *bb_out = (apr_bucket_brigade *)f->ctx;
 
     APR_BRIGADE_CONCAT(bb_out, b);
@@ -662,9 +666,9 @@ int modsecFinishRequest(request_rec *r) {
 // destroy only the connection pool
 int modsecFinishConnection(conn_rec *c)
 {
-
     apr_pool_destroy(c->pool);
 
+    return 0;
 }
 
 

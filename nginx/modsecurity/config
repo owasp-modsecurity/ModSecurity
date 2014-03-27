@@ -1,7 +1,5 @@
 #!/bin/sh
 
-# This file should be auto-generated whenever modsecurity is configured as standalone.
-
 CFLAGS="$CFLAGS \
      -I/usr/include/apr-1.0  \
      -I/usr/include/apr-1.0 -I/usr/include \
@@ -9,7 +7,8 @@ CFLAGS="$CFLAGS \
     -I/usr/include/libxml2 \
     -DWITH_LUA -I/usr/include/lua5.1   \
     -DWITH_PCRE_STUDY -DMODSEC_PCRE_MATCH_LIMIT=1500 -DMODSEC_PCRE_MATCH_LIMIT_RECURSION=1500  -DREQUEST_EARLY          \
-    "
+     \
+    -DWITH_YAJL -I/usr/include/yajl  "
 
 
 CORE_LIBS="$CORE_LIBS \
@@ -20,7 +19,8 @@ CORE_LIBS="$CORE_LIBS \
     -lxml2 \
     -llua5.1   \
     -lpcre \
-    -L/usr/lib  -lcap"
+    -L/usr/lib  -lcap \
+    -lyajl  "
 
 ngx_addon_name=ngx_http_modsecurity
 

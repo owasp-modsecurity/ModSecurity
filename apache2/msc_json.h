@@ -53,5 +53,8 @@ int DSOLOCAL json_complete(modsec_rec *msr, char **error_msg);
 
 apr_status_t DSOLOCAL json_cleanup(modsec_rec *msr);
 
+int DSOLOCAL json_process_chunk(modsec_rec *msr, const char *buf,
+		unsigned int size, char **error_msg);
+
 #endif
 #endif

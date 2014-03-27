@@ -67,7 +67,7 @@ char *normalize_path(modsec_rec *msr, char *input) {
         if(uri->path)   {
             char *Uri = NULL;
             int bytes = 0;
-            int i;
+            /*int i;*/
             char *relative_link = NULL;
             char *filename = NULL;
             char *relative_path = NULL;

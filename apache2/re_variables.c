@@ -1993,7 +1993,6 @@ static int var_full_request_generate(modsec_rec *msr, msre_var *var,
 failed_fill_buffer:
 failed_not_enough_mem:
 failed_measure_buffer:
-no_buffer:
     return 0;
 }
 

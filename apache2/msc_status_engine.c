@@ -227,7 +227,6 @@ int DSOLOCAL msc_status_engine_mac_address (unsigned char *mac)
     PIP_ADAPTER_INFO pAdapterInfo;
     PIP_ADAPTER_INFO pAdapter = NULL;
     DWORD dwRetVal = 0;
-    UINT i;
 
     ULONG ulOutBufLen = sizeof (IP_ADAPTER_INFO);
     pAdapterInfo = (IP_ADAPTER_INFO *)malloc(sizeof (IP_ADAPTER_INFO));
