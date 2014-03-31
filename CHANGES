@@ -1,3 +1,66 @@
+31 Mar 2014 - 2.0.8
+-------------------
+
+New features
+ * JSON Parser is no longer under tests. Now it is part of our mainline;
+ * Connection limits (SecConnReadStateLimit/SecConnWriteStateLimit) now support white and suspicious list;
+ * New variables: FULL_REQUEST and FULL_REQUEST_LENGTH were added, allowing the rules to access the full content of a request;
+ * ModSecurity status is now part of our mainline;
+ * New operator: @detectXSS was added. It makes usage of the newest libinjection XSS detection functionality;
+ * Append and prepend are now supported on nginx (Ref: #635);
+ * SecServerSignature is now available on nginx (Ref: #637).
+
+Improvements 
+ * Regression tests are not able to expect different values according to the platform;
+ * Visual C++ 12/10 runtime dependencies are now part of the IIS installer, no need to have it installed prior ModSecurity installation (Ref: #627);
+ * New script was added to the IIS versions to identify whenever there is a missing dependency (available through the Application Menu);
+ * Memory usage improvement: using correct memory pools according to the context (Ref: #618, #620, #619);
+ * Independent API call to free the connection allocations, independently from the request objects, improvements on Nginx performance, vide issue for more information (Ref: #620, #648);
+ * IIS installer is now using the correct 32/64bits folders to install;
+ * IIS Installer 32bits now refuses to install on 64bits environments;
+ * IIS: Using new WiX options to build the package in the correct architecture;
+ * While installing IIS version the installer will remove old ModSecurityIIS configuration or files before proceed with the installation, avoiding further errors;
+ * CRS from IIS version was upgraded to 2.2.9;
+ * IIS installer does not support repair anymore, in fact it was not working already and it is now disabled;
+ * ModSecurity now warns the user who tries to use "proxy" in IIS or Nginx. Proxy is Apache only;
+ * Remove warnings from the build process (Ref: #617);
+ * Apache configuration in regression tests was changed making it more platform independent;
+ * Reduced the amount of warnings during the compilation (Ref: #385a2828e87897bd611bd2a519727ef88dc6d632, #1e63e49db4a592d28e08a33fc60750c37a3886fe);
+ * Regression tests were refactored to be more Nginx friendly;
+ * Fixed some regression tests that were not being flexible to handle multiple platforms: (Ref #636)
+        - Fixed config/00-load-modsec.t test case. Now it expects for Nginx loaded message as it does for Apache. (Ref: #643);
+        - Fixed mixed/10-misc-directives.t. Now it does not expect for SecServerSignature on the logs, just in the headers as the Nginx does in silence.
+        - Fixed tnf/10-tfn-cache.t, action/10-logging.t, config/10-misc-directives.t, config/10-request-directives.t, misc/00-multipart-parser.t , misc/10-tfn-cache.t, rule/20-exceptions.t, rule/00-basics.t, rule/10-xml.t;
+        - Increased the timeout while reading the auditlog;
+        - SecAuditLogType Concurrent was removed from the regression test case, not compatible with all ports yet;
+        - Regression tests were speeded up, as the number of tests are growing it is impossible to have it slow;
+        - Fixed regression tests scripts paths, to make it MacOS friendly;
+        - Avoiding dead locks on Nginx regression tests by enforcing a timeout whenever a request appears to fail; 
+ * Updates to fix errors found by Parfait static code analysis (Ref: #612);
+ * Cleaning up on the repository, by removing unused files;
+ * IIS installer now supports to perform the installation without register the DLL on the system. It means that the user can download our MSI installer as it was a tarball archive (Ref #629, #624);
+ * IIS now support 32bits and 64bits pools, both are registered on IIS (Ref #628).
+
+Bug fix
+ * Correctly handling inet_pton in IIS version;
+ * Nginx was missing a terminator while the charset string was mounted (Ref: #148);
+ * Added mod_extract_forwarded.c to run before mod_security2.c (Ref: #594);
+ * Added missing environment variables to regression tests;
+ * Build system is now more flexible by looking at liblua at: /usr/local/lib;
+ * Fixed typo in README file.
+ * Removed the non standard compliant HTTP response status code 44 from modsecurity recommended file (Ref: #665);
+ * Fixed segmentation fault if it fails to write on the audit log (Ref: #668);
+ * Not rejecting a larger request with ProcessPartial. Regression tests were also added (Ref: #597);
+ * Fixed UF8 to unicode conversion. Regression tests were also added(Ref: #672);
+ * Avoiding segmentation fault by checking if a structure is null before access its members;
+ * Removed double charset-header that used happen due a hardcoded charset in Nginx implementation (Ref: #650);
+ * Now alerting the users that there is no memory to proceed loading the configuration instead of just die;
+ * If SecRuleEngine is set to Off and SecRequestBodyAccess On Nginx returns error 500. Standalone is now capable to identify whenever ModSecurity is enabled or disabled, independently of ModSecurity core (Ref: #645); 
+ * Fixed missing headers on Nginx whenever SecResponseBodyAccess was set to On and happens to be a filter on phase equals or over 3. (Ref #634);
+ * IIS is now picking the correct version of AppCmd while uninstalling or installing ModSecurityISS. (Ref #632).
+
+
+
 17 Dec 2013 - 2.7.7
 -------------------
 Fixes:
