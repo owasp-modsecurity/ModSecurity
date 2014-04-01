@@ -1,5 +1,5 @@
-31 Mar 2014 - 2.0.8
--------------------
+31 Mar 2014 - 2.8.0-RC1
+-----------------------
 
 New features
  * JSON Parser is no longer under tests. Now it is part of our mainline;
