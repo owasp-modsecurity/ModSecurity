@@ -256,13 +256,6 @@ Bug Fixes:
 
 - libinjection sync - 11217207e8f2e0cf15742273836399866971071a
 
-- Fix Chunked string case sensitive issue - CVE-2013-5705 - f8d441cd25172fdfe5b613442fedfc0da3cc333d
-
-- Revert "Fix Chuncked string case sensitive issue" - 3901128f17e0763ac1a260106b79859d2aad6d90
-  This reverts commit 16a815a3c2735f62238ef99af26090a2b8430d3d.
-
-- Fix Chuncked string case sensitive issue - 16a815a3c2735f62238ef99af26090a2b8430d3d
-
 - Merge pull request #139 from chaizhenhua/remotes/trunk - 10fd40fb0d06f6c577d870b6f15d2f6e2a3a5b1b
   Fixed fd leackage after reload
 
@@ -274,6 +267,17 @@ Bug Fixes:
 - libinjection sync - 2268626c20260e88cab9b7830f8a06101fa7172a
 
 - Fix logical disjunction and conjunction issues - 7e0a9ecf7d492e85650671a0cfcfd53e5f15df2c
+
+Security Issues:
+
+- Fix Chunked string case sensitive issue - CVE-2013-5705 - f8d441cd25172fdfe5b613442fedfc0da3cc333d
+  (Thanks Martin Holst Swende - @mhswende)
+
+- Revert "Fix Chuncked string case sensitive issue" - 3901128f17e0763ac1a260106b79859d2aad6d90
+  This reverts commit 16a815a3c2735f62238ef99af26090a2b8430d3d.
+
+- Fix Chuncked string case sensitive issue - 16a815a3c2735f62238ef99af26090a2b8430d3d
+
 
 
 23 Jul 2013 - 2.7.5
