@@ -6,7 +6,7 @@ dnl
 
 AC_PREREQ(2.63)
 
-AC_INIT([modsecurity], [2.7], [support@modsecurity.org])
+AC_INIT([modsecurity], [2.8], [support@modsecurity.org])
 
 AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_SRCDIR([LICENSE])
