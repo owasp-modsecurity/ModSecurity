@@ -1,3 +1,10 @@
+14 Apr 2014 - 2.8.0
+-------------------
+
+Bug fix
+ * Build issue: Now using autotools to idenfiy if sys/utsname.h is present.
+ * Change configure.ac version to 2.8
+
 31 Mar 2014 - 2.8.0-RC1
 -----------------------
 
