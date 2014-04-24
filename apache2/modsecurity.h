@@ -268,6 +268,7 @@ struct modsec_rec {
     unsigned int         phase_request_body_complete;
 
     apr_bucket_brigade  *if_brigade;
+    unsigned int         if_seen_eos;
     unsigned int         if_status;
     unsigned int         if_started_forwarding;
 

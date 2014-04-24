@@ -139,12 +139,14 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
     if (rc == 0) {
         modsecurity_request_body_retrieve_end(msr);
 
-        bucket = apr_bucket_eos_create(f->r->connection->bucket_alloc);
-        if (bucket == NULL) return APR_EGENERAL;
-        APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
+        if (msr->if_seen_eos) {
+            bucket = apr_bucket_eos_create(f->r->connection->bucket_alloc);
+            if (bucket == NULL) return APR_EGENERAL;
+            APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
 
-        if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Input filter: Sent EOS.");
+            if (msr->txcfg->debuglog_level >= 4) {
+                msr_log(msr, 4, "Input filter: Sent EOS.");
+            }
         }
 
         /* We're done */
@@ -164,7 +166,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
  */
 apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
     request_rec *r = msr->r;
-    unsigned int seen_eos;
+    unsigned int finished_reading;
     apr_bucket_brigade *bb_in;
     apr_bucket *bucket;
 
@@ -193,7 +195,8 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
         return -1;
     }
 
-    seen_eos = 0;
+    finished_reading = 0;
+    msr->if_seen_eos = 0;
     bb_in = apr_brigade_create(msr->mp, r->connection->bucket_alloc);
     if (bb_in == NULL) return -1;
     do {
@@ -283,6 +286,11 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
             if (buflen != 0) {
                 int rcbs = modsecurity_request_body_store(msr, buf, buflen, error_msg);
+
+                if (msr->reqbody_length > (apr_size_t)msr->txcfg->reqbody_limit && msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL) {
+                    finished_reading = 1;
+                }
+
                 if (rcbs < 0) {
                     if (rcbs == -5) {
                         if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)) {
@@ -309,12 +317,13 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
             }
 
             if (APR_BUCKET_IS_EOS(bucket)) {
-                seen_eos = 1;
+                finished_reading = 1;
+                msr->if_seen_eos = 1;
             }
         }
 
         apr_brigade_cleanup(bb_in);
-    } while(!seen_eos);
+    } while(!finished_reading);
 
     // TODO: Why ignore the return code here?
     modsecurity_request_body_end(msr, error_msg);
