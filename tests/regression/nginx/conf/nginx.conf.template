@@ -1,8 +1,10 @@
 
-user  root;
-worker_processes  1;
+worker_processes 1;
 daemon on;
-error_log  logs/error.log  debug;
+worker_rlimit_core 500M;
+working_directory /tmp/;
+error_log logs/error.log debug;
+
 events {
 	worker_connections  1024;
 }
@@ -10,13 +12,42 @@ events {
 http {
 	ModSecurityEnabled [% enable %];
 	ModSecurityConfig [% config %];
-	server {
+	client_body_buffer_size 1024M;
 
+	server {
+		client_max_body_size 30M;
 		listen [% listen %];
 		server_name localhost;
-		location / {
-			error_page 405 = $uri;
+
+
+
+		location /no-proxy/test.txt {
+			echo "TEST";
 		}
+
+		location /no-proxy/test2.txt {
+			echo "TEST 2";
+		}
+
+		location /proxy/test.txt {
+			proxy_pass http://localhost:[% listen %]/more/test.txt;
+		}
+
+		location /proxy/test2.txt {
+			proxy_pass http://localhost:[% listen %]/more/test2.txt;
+		}
+
+		location /test.txt {
+			echo "TEST";
+		}
+
+		location /test2.txt {
+			echo "TEST 2";
+		}
+
+		location / {
+		}
+
 	}
 }
 
