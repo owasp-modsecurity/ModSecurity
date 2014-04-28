@@ -204,6 +204,16 @@ sub runfile {
 		my $rc = 0;
 		my $conf_fn;
 
+		# watch for segfaults 
+		if ($t and !$t->{match_log}) {
+			$t->{match_log} = {};
+		}
+		if ($t and $t->{match_log} and !$t->{match_log}{-error}) {
+			$t->{match_log}{-error} = [];
+		}
+		push $t->{match_log}{-error}, qr/(core dump)/;
+		push $t->{match_log}{-error}, 1;
+
 # Startup nginx with optionally included conf.
 		if (exists $t{conf} and defined $t{conf}) {
 			$conf_fn = sprintf "%s/%s_%s_%06d.conf",
@@ -498,7 +508,6 @@ READ: {
 #dbg("Match \"$re\" in $name \"$$rbuf\" ($n)");
 		      if ($$rbuf =~ m/$re/m) {
 			      $rc = $&;
-#			      print "bonga\n";
 			      last;
 		      }
 # TODO: Use select()/poll()
@@ -694,6 +703,7 @@ sub nginx_reset_fd {
 		msg("Warning: Failed to open file \"$opt{D}\": $@");
 		return undef;
 	}
+
 
 # Any extras listed in "match_log"
 	if ($t and exists $t->{match_log}) {
