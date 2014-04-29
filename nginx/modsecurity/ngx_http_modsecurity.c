@@ -639,9 +639,23 @@ ngx_http_modsecurity_save_request_body(ngx_http_request_t *r)
     apr_brigade_cleanup(ctx->brigade);
 #endif
 
+    if (r->headers_in.content_length) {
+        ngx_str_t *str = NULL;
+
+        str = &r->headers_in.content_length->value;
+        str->data = ngx_palloc(r->pool, NGX_OFF_T_LEN);
+        if (str->data == NULL) {
+            ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
+            return NGX_OK;
+        }
+        str->len = ngx_snprintf(str->data, NGX_OFF_T_LEN, "%O", content_length) - str->data;
+
+    }
+
+
     r->headers_in.content_length_n = content_length;
 
-ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSec: Content length: %O, Content length n: %O", content_length, r->headers_in.content_length_n);
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSec: Content length: %O, Content length n: %O", content_length, r->headers_in.content_length_n);
     return NGX_OK;
 }
 
@@ -1221,8 +1235,11 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r) {
     }
 
     if (ctx->waiting_more_body == 0 && ctx->request_processed == 0) {
+
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
             "ModSec: request is ready to be processed.");
+        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, 
+                "ModSec: chuncked? %d", r->chunked);
         ngx_http_modsecurity_process_request(r);
         ctx->request_processed = 1;
     }
