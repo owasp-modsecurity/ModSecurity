@@ -537,9 +537,23 @@ ngx_http_modsecurity_save_request_body(ngx_http_request_t *r)
     buf->last += content_length;
     r->header_in = buf;
 
+    if (r->headers_in.content_length) {
+        ngx_str_t *str = NULL;
+
+        str = &r->headers_in.content_length->value;
+        str->data = ngx_palloc(r->pool, NGX_OFF_T_LEN);
+        if (str->data == NULL) {
+            ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
+            return NGX_OK;
+        }
+        str->len = ngx_snprintf(str->data, NGX_OFF_T_LEN, "%O", content_length) - str->data;
+
+    }
+
+
     r->headers_in.content_length_n = content_length;
 
-ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSec: Content length: %O, Content length n: %O", content_length, r->headers_in.content_length_n);
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSec: Content length: %O, Content length n: %O", content_length, r->headers_in.content_length_n);
     return NGX_OK;
 }
 
@@ -635,7 +649,7 @@ ngx_http_modsecurity_load_headers_out(ngx_http_request_t *r)
         *(const char **)apr_array_push(ctx->req->content_languages) = data;
     }
 
-    /* req->chunked = r->chunked; may be useless */
+    req->chunked = r->chunked;
     req->clength = r->headers_out.content_length_n;
     req->mtime = apr_time_make(r->headers_out.last_modified_time, 0);
 
@@ -654,7 +668,7 @@ ngx_http_modsecurity_save_headers_out(ngx_http_request_t *r)
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
 
-    /* r->chunked = ctx->req->chunked; */
+    r->chunked = ctx->req->chunked;
 
     ngx_http_clean_header(r);
 
@@ -1055,7 +1069,6 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r) {
 
         return NGX_DECLINED;
     }
-
     if (ctx->waiting_more_body == 1) {
        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "ModSec: waiting for more data before proceed. / count: %d", r->main->count);
@@ -1068,6 +1081,8 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r) {
                    "ModSec: asking for the request body, if any.");
 
         ctx->body_requested = 1;
+        r->request_body_in_single_buf = 1;
+
         rc = ngx_http_read_client_request_body(r,
             ngx_http_modsecurity_request_read);
 
@@ -1084,8 +1099,11 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r) {
     }
 
     if (ctx->waiting_more_body == 0 && ctx->request_processed == 0) {
+
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
             "ModSec: request is ready to be processed.");
+        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, 
+                "ModSec: chuncked? %d", r->chunked);
         ngx_http_modsecurity_process_request(r);
         ctx->request_processed = 1;
     }
@@ -1287,6 +1305,8 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
     }
 
     return ngx_http_next_body_filter(r, out);
+
+    return NGX_OK;
 }
 #endif
 
