@@ -18,7 +18,9 @@ http {
 		client_max_body_size 30M;
 		listen [% listen %];
 		server_name localhost;
-
+                client_body_in_single_buffer on;
+		client_body_in_file_only on;
+		proxy_buffering off;
 
 
 		location /no-proxy/test.txt {
