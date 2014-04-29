@@ -566,7 +566,6 @@ ngx_http_modsecurity_load_request_body(ngx_http_request_t *r)
     ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
         "ModSec: loading request body.");
 
-
     ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
         "ModSec: loading request body.");
 
@@ -600,6 +599,10 @@ ngx_http_modsecurity_load_request_body(ngx_http_request_t *r)
     }
 #endif
 
+        return NGX_ERROR;
+    }
+#endif
+
     return NGX_OK;
 }
 static ngx_inline ngx_int_t
@@ -610,6 +613,7 @@ ngx_http_modsecurity_save_request_body(ngx_http_request_t *r)
     apr_off_t content_length;
     ngx_buf_t *buf;
 #endif
+
    ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
 
 #ifdef MOVE_REQUEST_CHAIN_TO_MODSEC
@@ -652,10 +656,15 @@ ngx_http_modsecurity_save_request_body(ngx_http_request_t *r)
 
     }
 
-
     r->headers_in.content_length_n = content_length;
 
-    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSec: Content length: %O, Content length n: %O", content_length, r->headers_in.content_length_n);
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+            "ModSec: Content length: %O, Content length n: %O", content_length,
+            r->headers_in.content_length_n);
+#else
+    apr_brigade_cleanup(ctx->brigade);
+#endif
+
     return NGX_OK;
 }
 
@@ -1238,10 +1247,18 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r) {
 
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
             "ModSec: request is ready to be processed.");
-        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, 
-                "ModSec: chuncked? %d", r->chunked);
-        ngx_http_modsecurity_process_request(r);
+        rc = ngx_http_modsecurity_process_request(r);
         ctx->request_processed = 1;
+
+        if (rc == NGX_ERROR || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
+            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                "ModSec: returning a special response after process " \
+                "a request: %d", rc);
+
+           return rc;
+        }
+
+
     }
 
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
