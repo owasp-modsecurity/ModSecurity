@@ -18,7 +18,6 @@
 
 #include <apr_base64.h>
 
-
 /* Those are defined twice, lets keep it defined just once by `undef`
  * the first one.
  */
@@ -30,6 +29,29 @@
 
 #define NOTE_NGINX_REQUEST_CTX "nginx-ctx"
 #define TXID_SIZE 25
+
+/*
+ * If MOVE_REQUEST_CHAIN_TO_MODSEC is set, the chain will be moved into the
+ * ModSecurity brigade, after be processed by ModSecurity, it needs to be moved
+ * to nginx chains again, in order to be processed by other modules. It seems
+ * that this is not working well whenever the request body is delivered into
+ * chunks. Resulting in segfaults.
+ *
+ * If MOVE_REQUEST_CHAIN_TO_MODSEC is _not_ set, a copy of the request body
+ * will be delivered to ModSecurity and after processed it will be released,
+ * not modifying the nginx chain.
+ *
+ * The malfunctioning can be observer while running the following regression
+ * tests:
+ *  #15 - SecRequestBodyInMemoryLimit
+ *  #16 - SecRequestBodyInMemoryLimit (greater)
+ *  #19 - SecRequestBodyLimitAction ProcessPartial (multipart/greater - chunked)
+ *  (from: regression/config/10-request-directives.t)
+ */
+/*
+#define MOVE_REQUEST_CHAIN_TO_MODSEC
+*/
+
 
 #define tuxb
 
@@ -492,8 +514,8 @@ ngx_http_modsecurity_save_headers_in_visitor(void *data, const char *key, const 
 static ngx_inline ngx_int_t
 ngx_http_modsecurity_load_request_body(ngx_http_request_t *r)
 {
-    ngx_http_modsecurity_ctx_t    *ctx;
-
+    ngx_http_modsecurity_ctx_t *ctx;
+    ngx_chain_t *chain;
 
     ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
         "ModSec: loading request body.");
@@ -502,14 +524,16 @@ ngx_http_modsecurity_load_request_body(ngx_http_request_t *r)
 
     modsecSetBodyBrigade(ctx->req, ctx->brigade);
 
-    if (r->request_body == NULL || r->request_body->bufs == NULL) {
-        ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-            "ModSec: request was null.");
-
-        return move_chain_to_brigade(NULL, ctx->brigade, r->pool, 1);
+    if (r->request_body == NULL) {
+        chain = NULL;
+    }
+    else {
+        chain = r->request_body->bufs;
     }
 
-    if (move_chain_to_brigade(r->request_body->bufs, ctx->brigade, r->pool, 1) != NGX_OK) {
+
+#ifdef MOVE_REQUEST_CHAIN_TO_MODSEC
+    if (move_chain_to_brigade(chain, ctx->brigade, r->pool, 1) != NGX_OK) {
         ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
             "ModSec: failed to move chain to brigade.");
 
@@ -517,6 +541,14 @@ ngx_http_modsecurity_load_request_body(ngx_http_request_t *r)
     }
 
     r->request_body = NULL;
+#else
+    if (copy_chain_to_brigade(chain, ctx->brigade, r->pool, 1) != NGX_OK) {
+        ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+            "ModSec: failed to copy chain to brigade.");
+
+        return NGX_ERROR;
+    }
+#endif
 
     return NGX_OK;
 }
@@ -524,11 +556,15 @@ ngx_http_modsecurity_load_request_body(ngx_http_request_t *r)
 static ngx_inline ngx_int_t
 ngx_http_modsecurity_save_request_body(ngx_http_request_t *r)
 {
-    ngx_http_modsecurity_ctx_t    *ctx;
-    apr_off_t                      content_length;
-    ngx_buf_t                     *buf;
-    ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
+    ngx_http_modsecurity_ctx_t *ctx;
+#ifdef MOVE_REQUEST_CHAIN_TO_MODSEC
+    apr_off_t content_length;
+    ngx_buf_t *buf;
+#endif
 
+   ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
+
+#ifdef MOVE_REQUEST_CHAIN_TO_MODSEC
     apr_brigade_length(ctx->brigade, 0, &content_length);
 
     buf = ngx_create_temp_buf(ctx->r->pool, (size_t) content_length);
@@ -550,10 +586,15 @@ ngx_http_modsecurity_save_request_body(ngx_http_request_t *r)
 
     }
 
-
     r->headers_in.content_length_n = content_length;
 
-    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "ModSec: Content length: %O, Content length n: %O", content_length, r->headers_in.content_length_n);
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+            "ModSec: Content length: %O, Content length n: %O", content_length,
+            r->headers_in.content_length_n);
+#else
+    apr_brigade_cleanup(ctx->brigade);
+#endif
+
     return NGX_OK;
 }
 
@@ -787,7 +828,7 @@ ngx_http_modsecurity_status(ngx_http_request_t *r, int status)
  * @param r pointer to ngx_http_request_t.
  *
  */
-static void
+ngx_int_t
 ngx_http_modsecurity_process_request(ngx_http_request_t *r)
 {
     ngx_int_t rc = 0;
@@ -802,15 +843,13 @@ ngx_http_modsecurity_process_request(ngx_http_request_t *r)
     if (ngx_http_modsecurity_load_request(r) != NGX_OK) {
         ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                "ModSec: failed while loading the request.");
-        ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
-        goto terminate;
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
     if (ngx_http_modsecurity_load_headers_in(r) != NGX_OK) {
         ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                "ModSec: failed while loading the headers.");
-        ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
-        goto terminate;
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
     rc = modsecProcessRequestHeaders(ctx->req);
@@ -818,7 +857,7 @@ ngx_http_modsecurity_process_request(ngx_http_request_t *r)
     if (rc != NGX_DECLINED) {
         ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                "ModSec: failed while processing the request headers");
-        ngx_http_finalize_request(r, rc);
+        return rc;
     }
 
     /* Here we check if ModSecurity is enabled or disabled again.
@@ -841,12 +880,15 @@ ngx_http_modsecurity_process_request(ngx_http_request_t *r)
     }
 
     if (load_request_body == 1) {
+        ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+            "ModSec: loading request body...");
+
         rc = ngx_http_modsecurity_load_request_body(r);
         if (rc != NGX_OK)
         {
             ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                 "ModSec: failed while loading the request body.");
-            ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
+            return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
 
 
@@ -862,24 +904,23 @@ ngx_http_modsecurity_process_request(ngx_http_request_t *r)
             "ModSec: finalizing the connection after process the " \
             "request body.");
 
-        ngx_http_finalize_request(r, rc);
+        return rc;
     }
     if (load_request_body == 1) {
         if (ngx_http_modsecurity_save_request_body(r) != NGX_OK)
         {
             ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                 "ModSec: failed while saving the request body");
-            ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
+            return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
         if (ngx_http_modsecurity_save_headers_in(r) != NGX_OK)
         {
             ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                 "ModSec: failed while saving the headers in");
-            ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
+            return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
     }
-terminate:
-    return;
+    return NGX_OK;
 }
 
 
@@ -1102,14 +1143,22 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r) {
 
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
             "ModSec: request is ready to be processed.");
-        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, 
-                "ModSec: chuncked? %d", r->chunked);
-        ngx_http_modsecurity_process_request(r);
+        rc = ngx_http_modsecurity_process_request(r);
         ctx->request_processed = 1;
+
+        if (rc == NGX_ERROR || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
+            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                "ModSec: returning a special response after process " \
+                "a request: %d", rc);
+
+           return rc;
+        }
+
+
     }
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-        "ModSec: returning NGX_OK. Count++ :P" );
+        "ModSec: returning NGX_DECLINED." );
 
     return NGX_DECLINED;
 }
