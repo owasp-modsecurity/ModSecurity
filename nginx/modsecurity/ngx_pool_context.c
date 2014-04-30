@@ -99,7 +99,8 @@ ngx_pool_get_ctx(ngx_pool_t *pool, ngx_uint_t index)
     ngx_pool_context_node_t *node;
 
     hash = (ngx_uint_t) pool + index;
-    key = ngx_murmur_hash2((u_char *)&hash, sizeof(hash)) % ngx_pool_context_hash_size;
+    key = ngx_murmur_hash2((u_char *)&hash,
+            sizeof(hash)) % ngx_pool_context_hash_size;
 
     node = ngx_pool_context_hash[key];
 
@@ -126,7 +127,8 @@ ngx_pool_set_ctx(ngx_pool_t *pool, ngx_uint_t index, void *data)
     ngx_pool_cleanup_t     *cln;
 
     hash = (ngx_uint_t) pool + index;
-    key = ngx_murmur_hash2((u_char *)&hash, sizeof(hash)) % ngx_pool_context_hash_size;
+    key = ngx_murmur_hash2((u_char *)&hash,
+            sizeof(hash)) % ngx_pool_context_hash_size;
 
     node = ngx_pool_context_hash[key];
 
@@ -200,7 +202,8 @@ ngx_pool_context_init_conf(ngx_cycle_t *cycle, void *conf)
 
     ngx_pool_context_hash_size = pcf->size;
 
-    ngx_pool_context_hash = ngx_pcalloc(cycle->pool, sizeof(ngx_pool_context_node_t *) * ngx_pool_context_hash_size);
+    ngx_pool_context_hash = ngx_pcalloc(cycle->pool,
+            sizeof(ngx_pool_context_node_t *) * ngx_pool_context_hash_size);
 
     if (ngx_pool_context_hash == NULL) {
         return NGX_CONF_ERROR;
