@@ -388,7 +388,7 @@
 	),
 	match_log => {
 		error => [ qr/Pattern match "arg1" at FULL_REQUEST.*Pattern match "arg2" at FULL_REQUEST/s, 1 ],
-		debug => [ qr/against FULL_REQUEST.*Target value: "GET \/test.txt\?arg1=val1\&arg2=val2 HTTP\/1.1\\n\\nTE: deflate,gzip;q=0.3\\nConnection: TE, close\\nHost: localhost:8088\\nUser-Agent: ModSecurity Regression Tests\/1.2.3\\n\\n\\x00"/s, 1],
+		debug => [ qr/against FULL_REQUEST.*Target value: "GET \/test.txt\?arg1=val1\&arg2=val2 HTTP\/1.1\\n\\nTE: deflate,gzip;q=0.3\\nConnection: TE, close\\nHost: localhost:[0-9]+\\nUser-Agent: ModSecurity Regression Tests\/1.2.3\\n\\n\\x00"/s, 1],
 	},
 	match_response => {
 		status => qr/^200$/,
@@ -411,7 +411,7 @@
 	),
 	match_log => {
 		error => [ qr/Pattern match "arg1" at FULL_REQUEST.*Pattern match "arg2" at FULL_REQUEST/s, 1 ],
-		debug => [ qr/against FULL_REQUEST.*Target value: "POST \/test.txt HTTP\/1.1\\n\\nTE: deflate,gzip;q=0.3\\nConnection: TE, close\\nHost: localhost:8088\\nUser-Agent: ModSecurity Regression Tests\/1.2.3\\nContent-Type: application\/x-www-form-urlencoded\\nContent-Length: 19\\n\\narg1=val1&arg2=val2\\x00"/s, 1 ],
+		debug => [ qr/against FULL_REQUEST.*Target value: "POST \/test.txt HTTP\/1.1\\n\\nTE: deflate,gzip;q=0.3\\nConnection: TE, close\\nHost: localhost:[0-9]+\\nUser-Agent: ModSecurity Regression Tests\/1.2.3\\nContent-Type: application\/x-www-form-urlencoded\\nContent-Length: 19\\n\\narg1=val1&arg2=val2\\x00"/s, 1 ],
 	},
 	match_response => {
 		status => qr/^200$/,
