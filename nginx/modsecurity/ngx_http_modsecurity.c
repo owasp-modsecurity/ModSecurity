@@ -55,7 +55,7 @@
 
 #define tuxb
 
-/* 
+/*
  * If NGX_HTTP_MODSECURITY_PREACCESS_HANDLER_ONLY is defined, this module will
  * not process the body and header filter, instead it will only process the
  * preaccess request handler. This is useful to debug the module and check if
@@ -1230,7 +1230,7 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
 
     /* already processed, checking redirect action. */
-    if (ctx && ctx->complete 
+    if (ctx && ctx->complete
                && r->err_status >= NGX_HTTP_MOVED_PERMANENTLY
                && r->err_status < 308) {
 
@@ -1296,12 +1296,12 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
         if (size) {
             char *data = apr_pmemdup(bb->p, buf->pos, size);
             if (data == NULL) {
-                return ngx_http_filter_finalize_request(r, 
+                return ngx_http_filter_finalize_request(r,
                          &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
             }
             e = apr_bucket_pool_create(data , size, bb->p, bb->bucket_alloc);
             if (e == NULL) {
-                return ngx_http_filter_finalize_request(r, 
+                return ngx_http_filter_finalize_request(r,
                          &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
             }
             APR_BRIGADE_INSERT_TAIL(bb, e);
@@ -1312,7 +1312,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
             buf->last_buf = 0;
             e = apr_bucket_eos_create(bb->bucket_alloc);
             if (e == NULL) {
-                return ngx_http_filter_finalize_request(r, 
+                return ngx_http_filter_finalize_request(r,
                          &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
             }
             APR_BRIGADE_INSERT_TAIL(bb, e);
@@ -1333,7 +1333,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
     if (ngx_http_modsecurity_load_headers_in(r) != NGX_OK
             || ngx_http_modsecurity_load_headers_out(r) != NGX_OK) {
 
-        return ngx_http_filter_finalize_request(r, 
+        return ngx_http_filter_finalize_request(r,
                  &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
     }
 
@@ -1350,7 +1350,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
            ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "ModSec: Problems moving brigade to chain");
 
-        return ngx_http_filter_finalize_request(r, 
+        return ngx_http_filter_finalize_request(r,
                  &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
     }
 
@@ -1365,7 +1365,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
                    "ModSecurity: save headers out done _inside_");
 
 
-        return ngx_http_filter_finalize_request(r, 
+        return ngx_http_filter_finalize_request(r,
                  &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
     }
 

@@ -70,7 +70,7 @@ ngx_module_t  ngx_pool_context_module = {
     }                                                                         \
                                                                               \
     node->prev = NULL;                                                        \
- 
+
 
 #define ngx_pool_context_link(queue, node)                                \
                                                                           \
