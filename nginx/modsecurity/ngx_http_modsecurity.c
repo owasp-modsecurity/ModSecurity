@@ -652,7 +652,8 @@ ngx_http_modsecurity_save_request_body(ngx_http_request_t *r)
             ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
             return NGX_OK;
         }
-        str->len = ngx_snprintf(str->data, NGX_OFF_T_LEN, "%O", content_length) - str->data;
+        str->len = ngx_snprintf(str->data, NGX_OFF_T_LEN, "%O",
+                content_length) - str->data;
 
     }
 
