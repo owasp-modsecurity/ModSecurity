@@ -62,7 +62,9 @@ static apr_status_t nginx_bucket_read(apr_bucket *b, const char **str,
             return APR_EGENERAL;
         }
 
-        size = ngx_read_file(buf->file, data, ngx_buf_size(buf), buf->file_pos);
+        size = ngx_read_file(buf->file, data, ngx_buf_size(buf),
+                buf->file_pos);
+
         if (size != ngx_buf_size(buf)) {
             apr_bucket_free(data);
             return APR_EGENERAL;
@@ -153,8 +155,9 @@ ngx_buf_t * apr_bucket_to_ngx_buf(apr_bucket *e, ngx_pool_t *pool) {
     return buf;
 }
 
-ngx_int_t
-copy_chain_to_brigade(ngx_chain_t *chain_orig, apr_bucket_brigade *bb, ngx_pool_t *pool, ngx_int_t last_buf) {
+ngx_int_t copy_chain_to_brigade(ngx_chain_t *chain_orig,
+        apr_bucket_brigade *bb, ngx_pool_t *pool, ngx_int_t last_buf)
+{
     apr_bucket *e;
 
     ngx_chain_t *chain = chain_orig;
@@ -183,8 +186,9 @@ copy_chain_to_brigade(ngx_chain_t *chain_orig, apr_bucket_brigade *bb, ngx_pool_
 }
 
 
-ngx_int_t
-move_chain_to_brigade(ngx_chain_t *chain_orig, apr_bucket_brigade *bb, ngx_pool_t *pool, ngx_int_t last_buf) {
+ngx_int_t move_chain_to_brigade(ngx_chain_t *chain_orig,
+        apr_bucket_brigade *bb, ngx_pool_t *pool, ngx_int_t last_buf)
+{
     apr_bucket         *e;
     ngx_chain_t *cl;
 
@@ -215,8 +219,9 @@ move_chain_to_brigade(ngx_chain_t *chain_orig, apr_bucket_brigade *bb, ngx_pool_
     return NGX_AGAIN;
 }
 
-ngx_int_t
-move_brigade_to_chain(apr_bucket_brigade *bb, ngx_chain_t **ll, ngx_pool_t *pool) {
+ngx_int_t move_brigade_to_chain(apr_bucket_brigade *bb,
+        ngx_chain_t **ll, ngx_pool_t *pool)
+{
     apr_bucket  *e;
     ngx_buf_t   *buf;
     ngx_chain_t *cl;
