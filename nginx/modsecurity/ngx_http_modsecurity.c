@@ -1091,7 +1091,7 @@ ngx_http_modsecurity_init_process(ngx_cycle_t *cycle)
 
 static ngx_int_t
 ngx_http_modsecurity_handler(ngx_http_request_t *r) {
-    ngx_int_t rc = NULL;
+    ngx_int_t rc;
     ngx_http_modsecurity_ctx_t *ctx = NULL;
     ngx_http_modsecurity_loc_conf_t *cf = NULL;
 
