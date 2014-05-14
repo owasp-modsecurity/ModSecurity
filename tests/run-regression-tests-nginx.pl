@@ -52,7 +52,7 @@ $SIG{TERM} = $SIG{INT} = \&handle_interrupt;
 my $platform = "nginx";
 
 my %opt;
-getopts('A:E:D:C:T:H:a:p:dvh', \%opt);
+getopts('A:E:D:C:T:H:P:a:p:dvh', \%opt);
 
 if ($opt{d}) {
 	$Data::Dumper::Indent = 1;
