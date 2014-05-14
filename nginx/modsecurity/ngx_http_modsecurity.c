@@ -252,6 +252,8 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     req->parsed_uri.path = (char *)ngx_pstrdup0(r->pool, &r->uri);
     req->parsed_uri.is_initialized = 1;
 
+    req->parsed_uri.hostname = (char *)ngx_pstrdup0(r->pool, &r->headers_in.host);
+
     str.data = r->port_start;
     str.len = r->port_end - r->port_start;
     req->parsed_uri.port = ngx_atoi(str.data, str.len);
