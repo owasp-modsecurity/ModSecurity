@@ -279,9 +279,13 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
 {
     ngx_http_modsecurity_ctx_t  *ctx;
     request_rec                 *req;
-    ngx_str_t                    str;
     size_t                       root;
     ngx_str_t                    path;
+    ngx_uint_t                   port;
+    struct sockaddr_in          *sin;
+#if (NGX_HAVE_INET6)
+    struct sockaddr_in6         *sin6;
+#endif
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
     req = ctx->req;
@@ -324,10 +328,30 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     req->parsed_uri.path = (char *)ngx_pstrdup0(r->pool, &r->uri);
     req->parsed_uri.is_initialized = 1;
 
-    str.data = r->port_start;
-    str.len = r->port_end - r->port_start;
-    req->parsed_uri.port = ngx_atoi(str.data, str.len);
-    req->parsed_uri.port_str = (char *)ngx_pstrdup0(r->pool, &str);
+    switch (r->connection->local_sockaddr->sa_family) {
+
+#if (NGX_HAVE_INET6)
+    case AF_INET6:
+        sin6 = (struct sockaddr_in6 *) r->connection->local_sockaddr;
+        port = ntohs(sin6->sin6_port);
+        break;
+#endif
+
+#if (NGX_HAVE_UNIX_DOMAIN)
+    case AF_UNIX:
+        port = 0;
+        break;
+#endif
+
+    default: /* AF_INET */
+        sin = (struct sockaddr_in *) r->connection->local_sockaddr;
+        port = ntohs(sin->sin_port);
+        break;
+    }
+
+    req->parsed_uri.port = port;
+    req->parsed_uri.port_str = ngx_pnalloc(r->pool, sizeof("65535"));
+    (void) ngx_sprintf((u_char *)req->parsed_uri.port_str, "%ui%c", port, '\0');
 
     req->parsed_uri.query = r->args.len ? req->args : NULL;
     req->parsed_uri.dns_looked_up = 0;
