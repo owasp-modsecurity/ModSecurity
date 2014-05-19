@@ -1294,7 +1294,7 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
             "modSecurity: header filter");
 
     r->filter_need_in_memory = 1;
-    return NGX_OK;
+    return ngx_http_next_header_filter(r);
 }
 #endif
 #ifndef NGX_HTTP_MODSECURITY_PREACCESS_HANDLER_ONLY
