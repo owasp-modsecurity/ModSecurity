@@ -1409,19 +1409,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
         r->headers_out.content_length = NULL; /* header filter will set this */
     }
 
-    r->header_sent = 0;
-
-    rc = ngx_http_next_header_filter(r);
-    if (rc == NGX_ERROR || rc > NGX_OK) {
-       ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-           "ModSecurity: ngx_http_next_header_filter not NGX_OK.");
-
-        return ngx_http_filter_finalize_request(r, &ngx_http_modsecurity, rc);
-    }
-
     return ngx_http_next_body_filter(r, out);
-
-    return NGX_OK;
 }
 #endif
 
