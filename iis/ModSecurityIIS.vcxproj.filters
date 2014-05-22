@@ -103,9 +103,21 @@
     <ClCompile Include="..\apache2\msc_tree.c">
       <Filter>ModSecurity</Filter>
     </ClCompile>
-    <ClCompile Include="..\apache2\libinjection\libinjection_html5.c" />
-    <ClCompile Include="..\apache2\libinjection\libinjection_sqli.c" />
-    <ClCompile Include="..\apache2\libinjection\libinjection_xss.c" />
+    <ClCompile Include="..\apache2\libinjection\libinjection_html5.c">
+      <Filter>ModSecurity\libinjection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\libinjection\libinjection_sqli.c">
+      <Filter>ModSecurity\libinjection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\libinjection\libinjection_xss.c">
+      <Filter>ModSecurity\libinjection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_json.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\apache2\msc_status_engine.c">
+      <Filter>ModSecurity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="moduleconfig.h" />
@@ -177,8 +189,18 @@
     <ClInclude Include="..\apache2\msc_tree.h">
       <Filter>ModSecurity</Filter>
     </ClInclude>
-    <ClInclude Include="..\apache2\libinjection\libinjection.h" />
-    <ClInclude Include="..\apache2\libinjection\libinjection_sqli_data.h" />
+    <ClInclude Include="..\apache2\libinjection\libinjection.h">
+      <Filter>ModSecurity\libinjection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\libinjection\libinjection_sqli_data.h">
+      <Filter>ModSecurity\libinjection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_json.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apache2\msc_status_engine.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ModSecurity.xml" />
@@ -191,6 +213,9 @@
     </Filter>
     <Filter Include="Standalone">
       <UniqueIdentifier>{ba6117ea-f101-4d23-85f2-d1af0235e22a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ModSecurity\libinjection">
+      <UniqueIdentifier>{6e3cb6bd-89fa-413c-ba35-71d6733e3708}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
