@@ -1310,7 +1310,7 @@ BOOL CMyHttpModule::WriteEventViewerLog(LPCSTR szNotification, WORD category)
         // Write any strings to the Event Viewer and return.
         return ReportEvent(
             m_hEventLog,
-            category, 0, 0,
+            category, 0, 0x1,
             NULL, 1, 0, &szNotification, NULL );
     }
     return FALSE;
