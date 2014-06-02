@@ -563,7 +563,7 @@ ngx_http_modsecurity_load_request_body(ngx_http_request_t *r)
     ngx_http_modsecurity_ctx_t *ctx;
     ngx_chain_t *chain;
 
-    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
         "ModSec: loading request body.");
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
@@ -580,7 +580,7 @@ ngx_http_modsecurity_load_request_body(ngx_http_request_t *r)
 
 #ifdef MOVE_REQUEST_CHAIN_TO_MODSEC
     if (move_chain_to_brigade(chain, ctx->brigade, r->pool, 1) != NGX_OK) {
-        ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
             "ModSec: failed to move chain to brigade.");
 
         return NGX_ERROR;
@@ -589,7 +589,7 @@ ngx_http_modsecurity_load_request_body(ngx_http_request_t *r)
     r->request_body = NULL;
 #else
     if (copy_chain_to_brigade(chain, ctx->brigade, r->pool, 1) != NGX_OK) {
-        ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
             "ModSec: failed to copy chain to brigade.");
 
         return NGX_ERROR;
@@ -636,7 +636,7 @@ ngx_http_modsecurity_save_request_body(ngx_http_request_t *r)
 
     r->headers_in.content_length_n = content_length;
 
-    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
             "ModSec: Content length: %O, Content length n: %O", content_length,
             r->headers_in.content_length_n);
 #else
@@ -890,17 +890,17 @@ ngx_http_modsecurity_process_request(ngx_http_request_t *r)
 
     ctx = ngx_http_get_module_pool_ctx(r, ngx_http_modsecurity);
 
-    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
         "ModSec: starting to process the request...");
 
     if (ngx_http_modsecurity_load_request(r) != NGX_OK) {
-        ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                "ModSec: failed while loading the request.");
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
     if (ngx_http_modsecurity_load_headers_in(r) != NGX_OK) {
-        ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                "ModSec: failed while loading the headers.");
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
@@ -908,7 +908,7 @@ ngx_http_modsecurity_process_request(ngx_http_request_t *r)
     rc = modsecProcessRequestHeaders(ctx->req);
     rc = ngx_http_modsecurity_status(r, rc);
     if (rc != NGX_DECLINED) {
-        ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                "ModSec: failed while processing the request headers");
         return rc;
     }
@@ -928,18 +928,18 @@ ngx_http_modsecurity_process_request(ngx_http_request_t *r)
         modsecContextState(ctx->req) != MODSEC_DISABLED) {
 
         load_request_body = 1;
-        ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
             "ModSec: request body will be processed...");
     }
 
     if (load_request_body == 1) {
-        ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
             "ModSec: loading request body...");
 
         rc = ngx_http_modsecurity_load_request_body(r);
         if (rc != NGX_OK)
         {
-            ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+            ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                 "ModSec: failed while loading the request body.");
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -947,13 +947,13 @@ ngx_http_modsecurity_process_request(ngx_http_request_t *r)
 
     }
 
-    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
         "ModSec: processing request body...");
     rc = modsecProcessRequestBody(ctx->req);
     rc = ngx_http_modsecurity_status(r, rc);
     if (rc != NGX_DECLINED)
     {
-        ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
             "ModSec: finalizing the connection after process the " \
             "request body.");
 
@@ -962,13 +962,13 @@ ngx_http_modsecurity_process_request(ngx_http_request_t *r)
     if (load_request_body == 1) {
         if (ngx_http_modsecurity_save_request_body(r) != NGX_OK)
         {
-            ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+            ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                 "ModSec: failed while saving the request body");
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
         if (ngx_http_modsecurity_save_headers_in(r) != NGX_OK)
         {
-            ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+            ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                 "ModSec: failed while saving the headers in");
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -1181,7 +1181,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r) {
     }
 
     if (ctx->body_requested == 0) {
-       ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+       ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "ModSec: asking for the request body, if any.");
 
         ctx->body_requested = 1;
@@ -1377,7 +1377,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
     rc = move_brigade_to_chain(ctx->brigade, &out, r->pool);
     if (rc == NGX_ERROR) {
-           ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+           ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "ModSec: Problems moving brigade to chain");
 
         return ngx_http_filter_finalize_request(r,
