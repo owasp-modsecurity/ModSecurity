@@ -1143,7 +1143,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r) {
     ngx_http_modsecurity_ctx_t *ctx = NULL;
     ngx_http_modsecurity_loc_conf_t *cf = NULL;
 
-    modsecSetLogHook(r->connection->log, modsecLog);
+    modsecSetLogHook(ngx_cycle->log, modsecLog);
 
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
             "ModSec: Catching a new access phase handler. Count: %d",
