@@ -820,10 +820,13 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
     char ip_strv4[NETMASK_32], ip_strv6[NETMASK_128];
     struct in_addr addr4;
     struct in6_addr addr6;
+    int pos = 0;
     char *ptr = NULL;
 
     if(tree == NULL)
         return NULL;
+
+    pos = strchr(buffer, '/') - buffer;
 
     switch(type)    {
 
@@ -831,24 +834,32 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
             memset(&addr4, 0, sizeof(addr4));
             memset(ip_strv4, 0x0, NETMASK_32);
 
-            strncpy(ip_strv4, buffer, sizeof(ip_strv4) - 2);
+            strncpy(ip_strv4, buffer, sizeof(ip_strv4));
             *(ip_strv4 + (sizeof(ip_strv4) - 1)) = '\0';
 
             ptr = strdup(ip_strv4);
             netmask_v4 = is_netmask_v4(ptr);
+
+            if (netmask_v4 > NETMASK_32) {
+                free(ptr);
+                ptr = NULL;
+                return NULL;
+            }
 
             if(ptr != NULL) {
                 free(ptr);
                 ptr = NULL;
             }
 
-            if(netmask_v4 == 0)
+            if(netmask_v4 == 0) {
                 return NULL;
-            else if(netmask_v4 != NETMASK_32)   {
-                ip_strv4[strlen(ip_strv4)-3] = '\0';
+            }
+            else if (netmask_v4 != NETMASK_32 && pos < strlen(ip_strv4)) {
+                ip_strv4[pos] = '\0';
             }
 
             ret = inet_pton(AF_INET, ip_strv4, &addr4);
+
             if (ret <= 0) {
                 return NULL;
             }
@@ -863,26 +874,36 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
             memset(&addr6, 0, sizeof(addr6));
             memset(ip_strv6, 0x0, NETMASK_128);
 
-            strncpy(ip_strv6, buffer, sizeof(ip_strv6) - 2);
+            strncpy(ip_strv6, buffer, sizeof(ip_strv6));
             *(ip_strv6 + sizeof(ip_strv6) - 1) = '\0';
 
             ptr = strdup(ip_strv6);
             netmask_v6 = is_netmask_v6(ptr);
+
+            if (netmask_v6 > NETMASK_128) {
+                free(ptr);
+                ptr = NULL;
+                return NULL;
+            }
 
             if(ptr != NULL) {
                 free(ptr);
                 ptr = NULL;
             }
 
-            if(netmask_v6 == 0)
+            if(netmask_v6 == 0) {
                 return NULL;
-            else if (netmask_v6 != NETMASK_64)   {
-                ip_strv4[strlen(ip_strv6)-3] = '\0';
+            }
+            else if (netmask_v6 != NETMASK_128 && pos < strlen(ip_strv6)) {
+                ip_strv6[pos] = '\0';
             }
 
             ret = inet_pton(AF_INET6, ip_strv6, &addr6);
-            if(ret <= 0)
+
+            if (ret <= 0)
+            {
                 return NULL;
+            }
 
             tree->count++;
 

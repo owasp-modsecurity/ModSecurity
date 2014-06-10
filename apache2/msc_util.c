@@ -364,12 +364,12 @@ unsigned char is_netmask_v6(char *ip_strv6) {
     if ((mask_str = strchr(ip_strv6, '/'))) {
         *(mask_str++) = '\0';
 
-        if (strchr(mask_str, '.') != NULL) {
+        if (strchr(mask_str, ':') != NULL) {
             return 0;
         }
 
         cidr = atoi(mask_str);
-        if ((cidr < 0) || (cidr > 64)) {
+        if ((cidr < 0) || (cidr > 128)) {
             return 0;
         }
         netmask_v6 = (unsigned char)cidr;
