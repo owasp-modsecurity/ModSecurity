@@ -145,7 +145,7 @@ static int msre_op_ipmatch_execute(modsec_rec *msr, msre_rule *rule, msre_var *v
     }
     
     if (res > 0) {
-        *error_msg = apr_psprintf(msr->mp, "%s at %s.", *error_msg, var->name);
+        *error_msg = apr_psprintf(msr->mp, "IPmatch: \"%s\" matched at %s.", var->value, var->name);
     }
 
     return res;
