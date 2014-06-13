@@ -217,6 +217,10 @@ ngx_pstrdup0(ngx_pool_t *pool, ngx_str_t *src)
 {
     u_char  *dst;
 
+    if (src == NULL) {
+        return NULL;
+    }
+
     dst = ngx_pnalloc(pool, src->len + 1);
     if (dst == NULL) {
        return NULL;
@@ -521,6 +525,10 @@ static int ngx_http_modsecurity_save_headers_in_visitor(void *data,
     ngx_table_elt_t            *h;
     ngx_http_header_t          *hh;
     ngx_http_core_main_conf_t  *cmcf;
+
+    if (r == NULL) {
+        return 0;
+    }
 
     h = ngx_list_push(&r->headers_in.headers);
     if (h == NULL) {
