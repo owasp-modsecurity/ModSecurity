@@ -217,6 +217,10 @@ ngx_pstrdup0(ngx_pool_t *pool, ngx_str_t *src)
 {
     u_char  *dst;
 
+    if (src == NULL) {
+        return NULL;
+    }
+
     dst = ngx_pnalloc(pool, src->len + 1);
     if (dst == NULL) {
        return NULL;
@@ -410,8 +414,8 @@ ngx_http_modsecurity_load_headers_in(ngx_http_request_t *r)
             i = 0;
         }
 
-        apr_table_setn(req->headers_in, (char *)h[i].key.data,
-                (char *)h[i].value.data);
+        apr_table_setn(req->headers_in, (char *)ngx_pstrdup0(r->pool, &h[i].key),
+                (char *)ngx_pstrdup0(r->pool, &h[i].value));
         ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                        "ModSecurity: load headers in: \"%V: %V\"",
                        &h[i].key, &h[i].value);
@@ -519,6 +523,10 @@ static int ngx_http_modsecurity_save_headers_in_visitor(void *data,
     ngx_http_header_t          *hh;
     ngx_http_core_main_conf_t  *cmcf;
 
+    if (r == NULL) {
+        return 0;
+    }
+
     h = ngx_list_push(&r->headers_in.headers);
     if (h == NULL) {
         return 0;
@@ -538,9 +546,15 @@ static int ngx_http_modsecurity_save_headers_in_visitor(void *data,
 
     ngx_strlow(h->lowcase_key, h->key.data, h->key.len);
 
+    /* we can't run Host handler from here */
+    if (ngx_strncmp(h->lowcase_key, "host", sizeof("host")) == 0) {
+        return 1;
+    }
+
     h->hash = ngx_hash_key(h->lowcase_key, h->key.len);
 
     cmcf = ngx_http_get_module_main_conf(r, ngx_http_core_module);
+
 
     hh = ngx_hash_find(&cmcf->headers_in_hash, h->hash,
                        h->lowcase_key, h->key.len);
