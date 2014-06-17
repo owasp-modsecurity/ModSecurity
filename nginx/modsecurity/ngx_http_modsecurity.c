@@ -414,8 +414,8 @@ ngx_http_modsecurity_load_headers_in(ngx_http_request_t *r)
             i = 0;
         }
 
-        apr_table_setn(req->headers_in, ngx_pstrdup0(r->pool, &h[i].key),
-                ngx_pstrdup0(r->pool, &h[i].value));
+        apr_table_setn(req->headers_in, (char *)ngx_pstrdup0(r->pool, &h[i].key),
+                (char *)ngx_pstrdup0(r->pool, &h[i].value));
         ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                        "ModSecurity: load headers in: \"%V: %V\"",
                        &h[i].key, &h[i].value);
