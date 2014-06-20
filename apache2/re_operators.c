@@ -3,9 +3,9 @@
 * Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
-* the License. Â You may obtain a copy of the License at
+* the License.  You may obtain a copy of the License at
 *
-* Â  Â  http://www.apache.org/licenses/LICENSE-2.0
+*     http://www.apache.org/licenses/LICENSE-2.0
 *
 * If any of the files related to licensing are missing or if you have any
 * other questions related to licensing please contact Trustwave Holdings, Inc.
