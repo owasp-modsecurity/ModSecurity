@@ -277,7 +277,10 @@ int perform_interception(modsec_rec *msr) {
                     log_level = 1;
                     status = HTTP_INTERNAL_SERVER_ERROR;
                     message = apr_psprintf(msr->mp, "Access denied with code 500%s "
-                        "(Error: Connection drop not implemented on this platform.",
+#ifndef NO_CON_DROP_WARN
+                        "(Error: Connection drop not implemented on this platform."
+#endif
+			,
                         phase_text);
                 } else if (modsecDropAction(msr->r) == 0) {
                     status = HTTP_FORBIDDEN;
