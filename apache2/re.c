@@ -1920,7 +1920,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             }
         }
         else {
-            msr_log(msr, 1, "Rule processing failed (id=%s, msg=%s).", rule->actionset->id, rule->actionset->msg);
+            msr_log(msr, 1, "Rule processing failed with unknown return code: %d (id=%s, msg=%s).", rc, rule->actionset->id, rule->actionset->msg);
             apr_table_clear(msr->matched_vars);
             return -1;
         }
