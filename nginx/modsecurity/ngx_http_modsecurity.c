@@ -21,7 +21,6 @@
 /* Those are defined twice, lets keep it defined just once by `undef`
  * the first one.
  */
- */
 #undef CR
 #undef LF
 #undef CRLF
