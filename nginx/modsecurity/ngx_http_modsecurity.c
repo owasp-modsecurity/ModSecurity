@@ -734,7 +734,7 @@ static int
 ngx_http_modsecurity_save_headers_out_visitor(void *data, const char *key, const char *value)
 {
     ngx_http_request_t             *r = data;
-    ngx_table_elt_t                *h, he;
+    ngx_table_elt_t                *h, he, *new_h;
     ngx_http_upstream_header_t     *hh;
     ngx_http_upstream_main_conf_t  *umcf;
 
@@ -765,6 +765,21 @@ ngx_http_modsecurity_save_headers_out_visitor(void *data, const char *key, const
         if (hh->copy_handler(r, h, hh->conf) != NGX_OK) {
             return 0;
         }
+    } else {
+        /* Add the response header directly to headers_out if not present in
+         * the hash. This is done to passthrough such response headers.
+         * Remember the response headers were cleared earlier using
+         * ngx_http_clean_header(r) call in ngx_http_modsecurity_save_headers_out.
+         */
+
+        new_h = ngx_list_push(&r->headers_out.headers);
+        if (new_h == NULL) {
+            return NGX_ERROR;
+        }
+
+        new_h->hash = h->hash;
+        new_h->key = h->key;
+        new_h->value = h->value;
     }
 
     ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
@@ -966,7 +981,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
 
     /* create / retrive request ctx */
     if (r->internal) {
-        
+
         ctx = ngx_http_get_module_pool_ctx(r, ngx_http_modsecurity);
 
         if (ctx) {
@@ -1008,7 +1023,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
         return NGX_DECLINED;
     }
 
-    if (r->method == NGX_HTTP_POST 
+    if (r->method == NGX_HTTP_POST
             && modsecIsRequestBodyAccessEnabled(ctx->req) ) {
 
         /* read POST request body, should we process PUT? */
@@ -1019,7 +1034,7 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r)
 
         return NGX_DONE;
     }
-    
+
     /* other method */
     return ngx_http_modsecurity_status(r, modsecProcessRequestBody(ctx->req));
 }
@@ -1068,7 +1083,7 @@ ngx_http_modsecurity_header_filter(ngx_http_request_t *r) {
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
 
     /* already processed, checking redirect action. */
-    if (ctx && ctx->complete 
+    if (ctx && ctx->complete
                && r->err_status >= NGX_HTTP_MOVED_PERMANENTLY
                && r->err_status < 308) {
 
@@ -1131,12 +1146,12 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
         if (size) {
             char *data = apr_pmemdup(bb->p, buf->pos, size);
             if (data == NULL) {
-                return ngx_http_filter_finalize_request(r, 
+                return ngx_http_filter_finalize_request(r,
                          &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
             }
             e = apr_bucket_pool_create(data , size, bb->p, bb->bucket_alloc);
             if (e == NULL) {
-                return ngx_http_filter_finalize_request(r, 
+                return ngx_http_filter_finalize_request(r,
                          &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
             }
             APR_BRIGADE_INSERT_TAIL(bb, e);
@@ -1147,7 +1162,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
             buf->last_buf = 0;
             e = apr_bucket_eos_create(bb->bucket_alloc);
             if (e == NULL) {
-                return ngx_http_filter_finalize_request(r, 
+                return ngx_http_filter_finalize_request(r,
                          &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
             }
             APR_BRIGADE_INSERT_TAIL(bb, e);
@@ -1168,7 +1183,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
     if (ngx_http_modsecurity_load_headers_in(r) != NGX_OK
             || ngx_http_modsecurity_load_headers_out(r) != NGX_OK) {
 
-        return ngx_http_filter_finalize_request(r, 
+        return ngx_http_filter_finalize_request(r,
                  &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
     }
 
@@ -1182,14 +1197,14 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
     rc = move_brigade_to_chain(ctx->brigade, &out, r->pool);
     if (rc == NGX_ERROR) {
-        return ngx_http_filter_finalize_request(r, 
+        return ngx_http_filter_finalize_request(r,
                  &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
     }
 
     if (ngx_http_modsecurity_save_headers_in(r) != NGX_OK
             ||ngx_http_modsecurity_save_headers_out(r) != NGX_OK) {
 
-        return ngx_http_filter_finalize_request(r, 
+        return ngx_http_filter_finalize_request(r,
                  &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
     }
 
@@ -1336,7 +1351,7 @@ ngx_http_modsecurity_cleanup(void *data)
     if (ctx->connection != NULL) {
         (void) modsecFinishConnection(ctx->connection);
     }
-    
+
 }
 
     static char *
