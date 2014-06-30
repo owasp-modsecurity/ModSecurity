@@ -806,7 +806,7 @@ ngx_http_modsecurity_save_headers_out_visitor(void *data,
         const char *key, const char *value)
 {
     ngx_http_request_t             *r = data;
-    ngx_table_elt_t                *h, he;
+    ngx_table_elt_t                *h, he, *new_h;
     ngx_http_upstream_header_t     *hh;
     ngx_http_upstream_main_conf_t  *umcf;
 
@@ -837,6 +837,21 @@ ngx_http_modsecurity_save_headers_out_visitor(void *data,
         if (hh->copy_handler(r, h, hh->conf) != NGX_OK) {
             return 0;
         }
+    } else {
+        /* Add the response header directly to headers_out if not present in
+         * the hash. This is done to passthrough such response headers.
+         * Remember the response headers were cleared earlier using
+         * ngx_http_clean_header(r) call in ngx_http_modsecurity_save_headers_out.
+         */
+
+        new_h = ngx_list_push(&r->headers_out.headers);
+        if (new_h == NULL) {
+            return NGX_ERROR;
+        }
+
+        new_h->hash = h->hash;
+        new_h->key = h->key;
+        new_h->value = h->value;
     }
 
     ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
