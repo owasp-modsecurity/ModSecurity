@@ -739,11 +739,13 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         if (status_engine_state != STATUS_ENGINE_DISABLED) {
             msc_status_engine_call();
         }
+#ifndef LOG_NO_WARN_STATUS
         else {
             ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
                     "Status engine is currently disabled, enable it by set " \
                     "SecStatusEngine to On.");
         }
+#endif
 #endif
     }
 
