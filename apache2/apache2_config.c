@@ -786,6 +786,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         return my_error_msg;
     }
 
+#ifndef ALLOW_ID_NOT_UNIQUE
     /* Rules must have uniq ID */
     if (
 #if defined(WITH_LUA)
@@ -818,6 +819,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
             //    return "ModSecurity: Found another rule with the same id";
         }
     }
+#endif
 
     /* Create default actionset if one does not already exist. */
     if (dcfg->tmp_default_actionset == NULL) {
