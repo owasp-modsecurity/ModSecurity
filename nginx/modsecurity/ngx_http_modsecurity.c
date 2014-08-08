@@ -1193,7 +1193,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
                  &ngx_http_modsecurity, NGX_HTTP_INTERNAL_SERVER_ERROR);
     }
 
-    if (r->headers_out.content_length_n != -1) {
+    if (r->headers_out.content_length_n != -1 && r->method != NGX_HTTP_HEAD) {
 
         r->headers_out.content_length_n = content_length;
         r->headers_out.content_length = NULL; /* header filter will set this */
