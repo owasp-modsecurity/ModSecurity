@@ -20,6 +20,10 @@
 #include "msc_lua.h"
 #endif
 
+#ifdef WITH_PYTHON
+#include "msc_python.h"
+#endif
+
 static const char *const severities[] = {
     "EMERGENCY",
     "ALERT",
@@ -2327,6 +2331,19 @@ char * msre_rule_generate_unparsed(apr_pool_t *pool,  const msre_rule *rule, con
             }
             break;
 #endif
+#ifdef WITH_PYTHON
+        case RULE_TYPE_PYTHON:
+            /* SecRuleScript */
+            if (r_actions == NULL) {
+                unparsed = apr_psprintf(pool, "SecRuleScript \"%s\"", r_args);
+            }
+            else {
+                unparsed = apr_psprintf(pool, "SecRuleScript \"%s\" \"%s\"",
+                        r_args, log_escape(pool, r_actions));
+            }
+            break;
+#endif
+
     }
 
     return unparsed;
@@ -2445,6 +2462,54 @@ msre_rule *msre_rule_lua_create(msre_ruleset *ruleset,
 
     /* Compile script. */
     *error_msg = lua_compile(&rule->script, script_filename, ruleset->mp);
+    if (*error_msg != NULL) {
+        return NULL;
+    }
+
+    /* Parse actions */
+    if (actions != NULL) {
+        /* Create per-rule actionset */
+        rule->actionset = msre_actionset_create(ruleset->engine, ruleset->mp, actions, &my_error_msg);
+        if (rule->actionset == NULL) {
+            *error_msg = apr_psprintf(ruleset->mp, "Error parsing actions: %s", my_error_msg);
+            return NULL;
+        }
+    }
+
+    /* Add the unparsed rule */
+    rule->unparsed = msre_rule_generate_unparsed(ruleset->mp, rule, NULL, script_filename, NULL);
+
+    return rule;
+}
+#endif
+
+#ifdef WITH_PYTHON
+/**
+ * Allocate and initialize the main structure needed for Python
+ * script execution.
+ *
+ */
+msre_rule *msre_rule_python_create(msre_ruleset *ruleset,
+        const char *fn, int line, const char *script_filename,
+        const char *actions, char **error_msg)
+{
+    msre_rule *rule;
+    char *my_error_msg;
+    char *filename = (char *)rule->op_param;
+
+    if (error_msg == NULL) return NULL;
+    *error_msg = NULL;
+
+    rule = (msre_rule *)apr_pcalloc(ruleset->mp, sizeof(msre_rule));
+    if (rule == NULL) return NULL;
+
+    rule->type = RULE_TYPE_PYTHON;
+    rule->ruleset = ruleset;
+    rule->filename = apr_pstrdup(ruleset->mp, fn);
+    rule->line_num = line;
+
+    /* Load the script */
+    *error_msg = python_load(&rule->python_script, script_filename, ruleset->mp);
     if (*error_msg != NULL) {
         return NULL;
     }
@@ -3331,6 +3396,41 @@ static apr_status_t msre_rule_process_lua(msre_rule *rule, modsec_rec *msr) {
 }
 #endif
 
+#ifdef WITH_PYTHON
+static apr_status_t msre_rule_process_python(msre_rule *rule, modsec_rec *msr) {
+    msre_actionset *acting_actionset = NULL;
+    char *my_error_msg = NULL;
+    int rc = 0;
+    /* Choose the correct metadata/disruptive action actionset. */
+    acting_actionset = rule->actionset;
+    if (rule->chain_starter != NULL) {
+        acting_actionset = rule->chain_starter->actionset;
+    }
+
+    rc = python_execute(rule->python_script, NULL, msr, rule, &my_error_msg);
+    if (rc < 0) {
+        msr_log(msr, 1, "%s", my_error_msg);
+        return -1;
+    }
+
+    /* A non-NULL error message means the rule matched. */
+    if (my_error_msg != NULL) {
+        /* Perform non-disruptive actions. */
+        msre_perform_nondisruptive_actions(msr, rule, rule->actionset, msr->msc_rule_mptmp);
+
+        /* Perform disruptive actions, but only if
+         * this rule is not part of a chain.
+         */
+        if (rule->actionset->is_chained == 0) {
+            msre_perform_disruptive_actions(msr, rule, acting_actionset, msr->msc_rule_mptmp, my_error_msg);
+        }
+    }
+
+    return rc;
+}
+#endif
+
+
 /**
  *
  */
@@ -3349,6 +3449,13 @@ static apr_status_t msre_rule_process(msre_rule *rule, modsec_rec *msr) {
         return msre_rule_process_lua(rule, msr);
     }
     #endif
+
+    #ifdef WITH_PYTHON
+    if (rule->type == RULE_TYPE_PYTHON) {
+        return msre_rule_process_python(rule, msr);
+    }
+    #endif
+
 
     return msre_rule_process_normal(rule, msr);
 }

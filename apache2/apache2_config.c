@@ -26,6 +26,9 @@
 #include "msc_lua.h"
 #endif
 
+#ifdef WITH_PYTHON
+#include "msc_python.h"
+#endif
 
 /* -- Directory context creation and initialisation -- */
 
@@ -771,11 +774,19 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
     /* Create the rule now. */
     switch(type) {
         #if defined(WITH_LUA)
-        case RULE_TYPE_LUA :
+        case RULE_TYPE_LUA:
             rule = msre_rule_lua_create(dcfg->ruleset, cmd->directive->filename,
                 cmd->directive->line_num, p1, p2, &my_error_msg);
             break;
         #endif
+
+        #ifdef WITH_PYTHON
+        case RULE_TYPE_PYTHON:
+            rule = msre_rule_python_create(dcfg->ruleset, cmd->directive->filename,
+                cmd->directive->line_num, p1, p2, &my_error_msg);
+            break;
+        #endif
+
         default :
             rule = msre_rule_create(dcfg->ruleset, type, cmd->directive->filename,
                 cmd->directive->line_num, p1, p2, p3, &my_error_msg);
@@ -791,6 +802,9 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 #if defined(WITH_LUA)
             type != RULE_TYPE_LUA &&
 #endif
+#ifdef WITH_PYTHON
+            type != RULE_TYPE_PYTHON &&
+#endif
             (dcfg->tmp_chain_starter == NULL))
                 if(rule->actionset == NULL)
                     return "ModSecurity: Rules must have at least id action";
@@ -800,22 +814,31 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
 #if defined(WITH_LUA)
             && (type != RULE_TYPE_LUA)
 #endif
+#ifdef WITH_PYTHON
+            && (type != RULE_TYPE_PYTHON)
+#endif
           )
             return "ModSecurity: No action id present within the rule";
-#if defined(WITH_LUA)
-        if(type != RULE_TYPE_LUA)
+
+#ifdef WITH_LUA
+        if (type != RULE_TYPE_LUA)
 #endif
         {
-            rid = apr_hash_get(dcfg->rule_id_htab, rule->actionset->id, APR_HASH_KEY_STRING);
-            if(rid != NULL) {
-                return "ModSecurity: Found another rule with the same id";
-            } else    {
-                apr_hash_set(dcfg->rule_id_htab, apr_pstrdup(dcfg->mp, rule->actionset->id), APR_HASH_KEY_STRING, apr_pstrdup(dcfg->mp, "1"));
-            }
+#ifdef WITH_PYTHON
+            if (type != RULE_TYPE_PYTHON)
+#endif
+            {
+                rid = apr_hash_get(dcfg->rule_id_htab, rule->actionset->id, APR_HASH_KEY_STRING);
+                if(rid != NULL) {
+                    return "ModSecurity: Found another rule with the same id";
+                } else {
+                    apr_hash_set(dcfg->rule_id_htab, apr_pstrdup(dcfg->mp, rule->actionset->id), APR_HASH_KEY_STRING, apr_pstrdup(dcfg->mp, "1"));
+                }
 
             //tmp_rule = msre_ruleset_fetch_rule(dcfg->ruleset, rule->actionset->id, offset);
             //if(tmp_rule != NULL)
             //    return "ModSecurity: Found another rule with the same id";
+            }
         }
     }
 
@@ -2246,13 +2269,30 @@ static const char *cmd_rule_inheritance(cmd_parms *cmd, void *_dcfg, int flag)
 static const char *cmd_rule_script(cmd_parms *cmd, void *_dcfg,
                                    const char *p1, const char *p2)
 {
-    #if defined(WITH_LUA)
     const char *filename = resolve_relative_path(cmd->pool, cmd->directive->filename, p1);
-    return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_LUA, filename, p2, NULL);
-    #else
-    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool, "Ignoring SecRuleScript \"%s\" directive (%s:%d): No Lua scripting support.", p1, cmd->directive->filename, cmd->directive->line_num);
+
+    if (strlen(filename) > 3) {
+        const char *p = filename + strlen(filename) - 3;
+
+#ifdef WITH_PYTHON
+       if ((p[0] == '.')&&(p[1] == 'p')&&(p[2] == 'y'))
+        {
+            return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_PYTHON, filename, p2, NULL);
+        }
+#endif
+#ifdef WITH_LUA
+        if ((p[0] == 'l')&&(p[1] == 'u')&&(p[2] == 'a'))
+        {
+            return add_rule(cmd, (directory_config *)_dcfg, RULE_TYPE_LUA, filename, p2, NULL);
+        }
+#endif
+    }
+
+#if !defined(WITH_PYTHON) || !defined(WITH_LUA)
+    ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_NOERRNO, 0, cmd->pool, "Ignoring SecRuleScript \"%s\" directive (%s:%d): No Lua scripting or Python support.", p1, cmd->directive->filename, cmd->directive->line_num);
+#endif
+
     return NULL;
-    #endif
 }
 
 static const char *cmd_rule_remove_by_id(cmd_parms *cmd, void *_dcfg,

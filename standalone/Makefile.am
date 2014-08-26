@@ -21,6 +21,7 @@ standalone_la_SOURCES = ../apache2/acmp.c \
     ../apache2/msc_multipart.c \
     ../apache2/msc_parsers.c \
     ../apache2/msc_pcre.c \
+    ../apache2/msc_python.c \
     ../apache2/msc_release.c \
     ../apache2/msc_reqbody.c \
     ../apache2/msc_tree.c \
@@ -51,6 +52,7 @@ standalone_la_CFLAGS = -DVERSION_NGINX \
     @LUA_CFLAGS@ \
     @MODSEC_EXTRA_CFLAGS@ \
     @PCRE_CFLAGS@ \
+    @PYTHON_CFLAGS@ \
     @YAJL_CFLAGS@
 
 standalone_la_CPPFLAGS = @APR_CPPFLAGS@ \
@@ -62,6 +64,7 @@ standalone_la_LIBADD = @APR_LDADD@ \
     @LIBXML2_LDADD@ \
     @LUA_LDADD@ \
     @PCRE_LDADD@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDADD@
 
 if AIX
@@ -72,6 +75,7 @@ standalone_la_LDFLAGS = -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 
@@ -83,6 +87,7 @@ standalone_la_LDFLAGS = -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 
@@ -94,6 +99,7 @@ standalone_la_LDFLAGS = -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 
@@ -105,6 +111,7 @@ standalone_la_LDFLAGS = -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 
@@ -116,6 +123,7 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 
@@ -127,6 +135,7 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 
@@ -138,6 +147,7 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 
@@ -149,5 +159,6 @@ standalone_la_LDFLAGS = -no-undefined -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
