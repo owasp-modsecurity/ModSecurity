@@ -161,4 +161,13 @@ int DSOLOCAL ip_tree_from_param(apr_pool_t *pool,
 
 int read_line(char *buff, int size, FILE *fp);
 
+size_t msc_curl_write_memory_cb(void *contents, size_t size,
+    size_t nmemb, void *userp);
+
+struct msc_curl_memory_buffer_t
+{
+   char *memory;
+   size_t size;
+};
+
 #endif

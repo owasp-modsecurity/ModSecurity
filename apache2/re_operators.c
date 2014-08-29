@@ -22,6 +22,8 @@
 #include "msc_util.h"
 #include "msc_tree.h"
 #include "msc_crypt.h"
+#include "curl/curl.h"
+#include <apr_sha1.h>
 
 #if APR_HAVE_ARPA_INET_H
 #include <arpa/inet.h>
@@ -32,6 +34,7 @@
 #endif 
 
 #include "libinjection/libinjection.h"
+
 
 /**
  *
@@ -192,17 +195,29 @@ static int msre_op_ipmatchFromFile_param_init(msre_rule *rule, char **error_msg)
     }
     filepath = fn;
 
-    ipfile_path = apr_pstrndup(rule->ruleset->mp, rule->filename,
-        strlen(rule->filename) - strlen(apr_filepath_name_get(rule->filename)));
-    if (apr_filepath_root(&rootpath, &filepath, APR_FILEPATH_TRUENAME,
-        rule->ruleset->mp) != APR_SUCCESS) {
-        apr_filepath_merge(&fn, ipfile_path, fn, APR_FILEPATH_TRUENAME, rule->ruleset->mp);
-    }
-
-    res = ip_tree_from_file(&rtree, fn, rule->ruleset->mp, error_msg);
-    if (res)
+    if ((strlen(fn) > strlen("http://") && strncmp(fn, "http://", strlen("http://")) == 0) ||
+            (strlen(fn) > strlen("https://") && strncmp(fn, "https://", strlen("https://")) == 0))
     {
-        return 0;
+        res = ip_tree_from_uri(&rtree, fn, rule->ruleset->mp, error_msg);
+        if (res)
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        ipfile_path = apr_pstrndup(rule->ruleset->mp, rule->filename,
+            strlen(rule->filename) - strlen(apr_filepath_name_get(rule->filename)));
+        if (apr_filepath_root(&rootpath, &filepath, APR_FILEPATH_TRUENAME,
+            rule->ruleset->mp) != APR_SUCCESS) {
+            apr_filepath_merge(&fn, ipfile_path, fn, APR_FILEPATH_TRUENAME, rule->ruleset->mp);
+        }
+
+        res = ip_tree_from_file(&rtree, fn, rule->ruleset->mp, error_msg);
+        if (res)
+        {
+            return 0;
+        }
     }
 
     rule->op_param_data = rtree;
@@ -1235,61 +1250,152 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
 
         /* Add path of the rule filename for a relative phrase filename */
         filepath = fn;
-        if (apr_filepath_root(&rootpath, &filepath, APR_FILEPATH_TRUENAME, rule->ruleset->mp) != APR_SUCCESS) {
-            /* We are not an absolute path.  It could mean an error, but
-             * let that pass through to the open call for a better error */
-            apr_filepath_merge(&fn, rulefile_path, fn, APR_FILEPATH_TRUENAME, rule->ruleset->mp);
+
+        if ((strlen(fn) > strlen("http://") && strncmp(fn, "http://", strlen("http://")) == 0) ||
+                (strlen(fn) > strlen("https://") && strncmp(fn, "https://", strlen("https://")) == 0))
+        {
+
+            CURL *curl;
+            CURLcode res;
+
+            char id[(APR_SHA1_DIGESTSIZE*2) + 1];
+            char *apr_id = NULL;
+            char *beacon_str = NULL;
+            int beacon_str_len = 0;
+            char *beacon_apr = NULL;
+
+            struct msc_curl_memory_buffer_t chunk;
+            char *word = NULL;
+            char *brkt = NULL;
+            char *sep = "\n";
+
+            /* Retrieve the beacon string */
+            beacon_str_len = msc_beacon_string(NULL, 0);
+
+            beacon_str = malloc(sizeof(char) * beacon_str_len + 1);
+            if (beacon_str == NULL) {
+                beacon_str = "Failed to retrieve beacon string";
+                beacon_apr = apr_psprintf(rule->ruleset->mp, "ModSec-status: %s", beacon_str);
+            }
+            else
+            {
+                msc_beacon_string(beacon_str, beacon_str_len);
+                beacon_apr = apr_psprintf(rule->ruleset->mp, "ModSec-status: %s", beacon_str);
+                free(beacon_str);
+            }
+
+            memset(id, '\0', sizeof(id));
+            if (msc_status_engine_unique_id(id)) {
+              sprintf(id, "no unique id");
+            }
+
+            apr_id = apr_psprintf(rule->ruleset->mp, "ModSec-unique-id: %s", id);
+
+            chunk.memory = malloc(1);  /* will be grown as needed by the realloc above */ 
+            chunk.size = 0;    /* no data at this point */ 
+            curl_global_init(CURL_GLOBAL_ALL);
+            curl = curl_easy_init();
+
+            if (curl) {
+                struct curl_slist *headers_chunk = NULL;
+                curl_easy_setopt(curl, CURLOPT_URL, fn);
+
+                headers_chunk = curl_slist_append(headers_chunk, apr_id);
+                headers_chunk = curl_slist_append(headers_chunk, beacon_apr);
+
+                /* send all data to this function  */
+                curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, msc_curl_write_memory_cb);
+
+                /* we pass our 'chunk' struct to the callback function */
+                curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+                /* some servers don't like requests that are made without a user-agent
+                   field, so we provide one */
+                curl_easy_setopt(curl, CURLOPT_USERAGENT, "ModSecurity");
+                curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers_chunk);
+
+                res = curl_easy_perform(curl);
+
+                if (res != CURLE_OK)
+                    fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+
+                curl_easy_cleanup(curl);
+                curl_slist_free_all(headers_chunk);
+            }
+            curl_global_cleanup();
+
+            for (word = strtok_r(chunk.memory, sep, &brkt);
+                 word;
+                 word = strtok_r(NULL, sep, &brkt))
+            {
+                /* Ignore empty lines and comments */
+                if (*word == '#') continue;
+
+                acmp_add_pattern(p, word, NULL, NULL, strlen(word));
+
+            }
         }
+        else
+        {
+            if (apr_filepath_root(&rootpath, &filepath, APR_FILEPATH_TRUENAME, rule->ruleset->mp) != APR_SUCCESS) {
+                /* We are not an absolute path.  It could mean an error, but
+                 * let that pass through to the open call for a better error */
+                apr_filepath_merge(&fn, rulefile_path, fn, APR_FILEPATH_TRUENAME, rule->ruleset->mp);
+            }
 
-        /* Open file and read */
-        rc = apr_file_open(&fd, fn, APR_READ | APR_BUFFERED | APR_FILE_NOCLEANUP, 0, rule->ruleset->mp);
-        if (rc != APR_SUCCESS) {
-            *error_msg = apr_psprintf(rule->ruleset->mp, "Could not open phrase file \"%s\": %s", fn, apr_strerror(rc, errstr, 1024));
-            return 0;
-        }
-
-        #ifdef DEBUG_CONF
-        fprintf(stderr, "Loading phrase file: \"%s\"\n", fn);
-        #endif
-
-        /* Read one pattern per line skipping empty/commented */
-        for(;;) {
-            line++;
-            rc = apr_file_gets(buf, HUGE_STRING_LEN, fd);
-            if (rc == APR_EOF) break;
+            /* Open file and read */
+            rc = apr_file_open(&fd, fn, APR_READ | APR_BUFFERED | APR_FILE_NOCLEANUP, 0, rule->ruleset->mp);
             if (rc != APR_SUCCESS) {
-                *error_msg = apr_psprintf(rule->ruleset->mp, "Could not read \"%s\" line %d: %s", fn, line, apr_strerror(rc, errstr, 1024));
+                *error_msg = apr_psprintf(rule->ruleset->mp, "Could not open phrase file \"%s\": %s", fn, apr_strerror(rc, errstr, 1024));
                 return 0;
             }
 
-            op_len = strlen(buf);
-            processed = apr_pstrdup(rule->ruleset->mp, parse_pm_content(buf, op_len, rule, error_msg));
+            #ifdef DEBUG_CONF
+            fprintf(stderr, "Loading phrase file: \"%s\"\n", fn);
+            #endif
 
-            /* Trim Whitespace */
-            if(processed != NULL)
-                start = processed;
-            else
-                start = buf;
+            /* Read one pattern per line skipping empty/commented */
+            for(;;) {
+                line++;
+                rc = apr_file_gets(buf, HUGE_STRING_LEN, fd);
+                if (rc == APR_EOF) break;
+                if (rc != APR_SUCCESS) {
+                    *error_msg = apr_psprintf(rule->ruleset->mp, "Could not read \"%s\" line %d: %s", fn, line, apr_strerror(rc, errstr, 1024));
+                    return 0;
+                }
 
-            while ((apr_isspace(*start) != 0) && (*start != '\0')) start++;
-            if(processed != NULL)
-                end = processed + strlen(processed);
-            else
-                end = buf + strlen(buf);
-            if (end > start) end--;
-            while ((end > start) && (apr_isspace(*end) != 0)) end--;
-            if (end > start) {
-                *(++end) = '\0';
+                op_len = strlen(buf);
+                processed = apr_pstrdup(rule->ruleset->mp, parse_pm_content(buf, op_len, rule, error_msg));
+
+                /* Trim Whitespace */
+                if(processed != NULL)
+                    start = processed;
+                else
+                    start = buf;
+
+                while ((apr_isspace(*start) != 0) && (*start != '\0')) start++;
+                if(processed != NULL)
+                    end = processed + strlen(processed);
+                else
+                    end = buf + strlen(buf);
+                if (end > start) end--;
+                while ((end > start) && (apr_isspace(*end) != 0)) end--;
+                if (end > start) {
+                    *(++end) = '\0';
+                }
+
+                /* Ignore empty lines and comments */
+                if ((start == end) || (*start == '#')) continue;
+
+                acmp_add_pattern(p, start, NULL, NULL, (end - start));
             }
-
-            /* Ignore empty lines and comments */
-            if ((start == end) || (*start == '#')) continue;
-
-            acmp_add_pattern(p, start, NULL, NULL, (end - start));
         }
+
         fn = next;
+
+        if (fd != NULL) apr_file_close(fd);
     }
-    if (fd != NULL) apr_file_close(fd);
+
     acmp_prepare(p);
     rule->op_param_data = p;
     return 1;

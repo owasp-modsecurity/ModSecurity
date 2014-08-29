@@ -23,7 +23,10 @@
 #include "msc_util.h"
 
 #include <apr_lib.h>
+#include <apr_sha1.h>
 #include "modsecurity_config.h"
+
+#include "curl/curl.h"
 
 /**
  * NOTE: Be careful as these can ONLY be used on static values for X.
@@ -2593,7 +2596,7 @@ int ip_tree_from_file(TreeRoot **rtree, char *uri,
             tnode = TreeAddIP(start, (*rtree)->ipv6_tree, IPV6_TREE);
         }
 #endif
- 
+
         if (tnode == NULL)
         {
             *error_msg = apr_psprintf(mp, "Could not add entry " \
@@ -2609,6 +2612,140 @@ int ip_tree_from_file(TreeRoot **rtree, char *uri,
 
     return 0;
 }
+
+int ip_tree_from_uri(TreeRoot **rtree, char *uri,
+    apr_pool_t *mp, char **error_msg)
+{
+    TreeNode *tnode = NULL;
+    apr_status_t rc;
+    int line = 0;
+    apr_file_t *fd;
+    char *start;
+    char *end;
+    char buf[HUGE_STRING_LEN + 1]; // FIXME: 2013-10-29 zimmerle: dynamic?
+    char errstr[1024];             //
+
+    CURL *curl;
+    CURLcode res;
+
+    char id[(APR_SHA1_DIGESTSIZE*2) + 1];
+    char *apr_id = NULL;
+    char *beacon_str = NULL;
+    int beacon_str_len = 0;
+    char *beacon_apr = NULL;
+    struct msc_curl_memory_buffer_t chunk;
+    chunk.memory = malloc(1);  /* will be grown as needed by the realloc above */
+    chunk.size = 0;    /* no data at this point */
+    char *word = NULL;
+    char *brkt = NULL;
+    char *sep = "\n";
+
+
+
+    if (create_radix_tree(mp, rtree, error_msg))
+    {
+        return -1;
+    }
+
+    /* Retrieve the beacon string */
+    beacon_str_len = msc_beacon_string(NULL, 0);
+
+    beacon_str = malloc(sizeof(char) * beacon_str_len + 1);
+    if (beacon_str == NULL) {
+        beacon_str = "Failed to retrieve beacon string";
+        beacon_apr = apr_psprintf(mp, "ModSec-status: %s", beacon_str);
+    }
+    else
+    {
+        msc_beacon_string(beacon_str, beacon_str_len);
+        beacon_apr = apr_psprintf(mp, "ModSec-status: %s", beacon_str);
+        free(beacon_str);
+    }
+
+    memset(id, '\0', sizeof(id));
+    if (msc_status_engine_unique_id(id)) {
+      sprintf(id, "no unique id");
+    }
+
+    apr_id = apr_psprintf(mp, "ModSec-unique-id: %s", id);
+    curl_global_init(CURL_GLOBAL_ALL);
+    curl = curl_easy_init();
+
+    if (curl) {
+        struct curl_slist *headers_chunk = NULL;
+        curl_easy_setopt(curl, CURLOPT_URL, uri);
+
+        headers_chunk = curl_slist_append(headers_chunk, apr_id);
+        headers_chunk = curl_slist_append(headers_chunk, beacon_apr);
+
+        /* send all data to this function  */
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, msc_curl_write_memory_cb);
+
+        /* we pass our 'chunk' struct to the callback function */
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+        /* some servers don't like requests that are made without a user-agent
+           field, so we provide one */
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "ModSecurity");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers_chunk);
+
+        res = curl_easy_perform(curl);
+
+        if (res != CURLE_OK)
+        {
+            *error_msg = apr_psprintf(mp, "Failed to fetch \"%s\" error: %s ", uri, curl_easy_strerror(res));
+            return -1;
+        }
+
+        curl_easy_cleanup(curl);
+        curl_slist_free_all(headers_chunk);
+    }
+    curl_global_cleanup();
+
+    for (word = strtok_r(chunk.memory, sep, &brkt);
+         word;
+         word = strtok_r(NULL, sep, &brkt))
+    {
+        int i = 0;
+        line++;
+
+        /* Ignore empty lines and comments */
+        if (*word == '#') continue;
+
+        for (i = 0; i < strlen(word); i++)
+        {
+            if (apr_isxdigit(word[i]) || word[i] == '.' || word[i] == '/' || word[i] == ':' || word[i] == '\n')
+            {
+                continue;
+            }
+
+            *error_msg = apr_psprintf(mp, "Invalid char \"%c\" in line %d " \
+                "of uri %s", *end, line, uri);
+            return -1;
+        }
+
+        if (strchr(word, ':') == NULL)
+        {
+            tnode = TreeAddIP(word, (*rtree)->ipv4_tree, IPV4_TREE);
+        }
+#if APR_HAVE_IPV6
+        else
+        {
+            tnode = TreeAddIP(word, (*rtree)->ipv6_tree, IPV6_TREE);
+        }
+#endif
+
+        if (tnode == NULL)
+        {
+            *error_msg = apr_psprintf(mp, "Could not add entry " \
+                "\"%s\" in line %d of file %s to IP list", word, line, uri);
+            return -1;
+        }
+
+    }
+    return 0;
+}
+
 
 int tree_contains_ip(apr_pool_t *mp, TreeRoot *rtree,
     const char *value, modsec_rec *msr, char **error_msg)
@@ -2689,5 +2826,24 @@ int ip_tree_from_param(apr_pool_t *mp,
     }
 
     return 0;
+}
+
+size_t msc_curl_write_memory_cb(void *contents, size_t size,
+        size_t nmemb, void *userp)
+{
+  size_t realsize = size * nmemb;
+  struct msc_curl_memory_buffer_t *mem = (struct msc_curl_memory_buffer_t *)userp;
+
+  mem->memory = realloc(mem->memory, mem->size + realsize + 1);
+  if(mem->memory == NULL) {
+    /* out of memory! */
+    return 0;
+  }
+
+  memcpy(&(mem->memory[mem->size]), contents, realsize);
+  mem->size += realsize;
+  mem->memory[mem->size] = 0;
+
+  return realsize;
 }
 
