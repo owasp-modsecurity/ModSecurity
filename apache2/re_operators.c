@@ -3789,12 +3789,9 @@ static int msre_op_fuzzy_hash_init(msre_rule *rule, char **error_msg)
 
     rule->op_param_data = param_data;
 #else
-    *error_msg = apr_psprintf(rule->ruleset->mp, "ModSecurity was not " \
-        "compiled with ssdeep support.");
- 
     rule->op_param_data = NULL;
 
-    return -1;
+    return 1;
 #endif
     return 1;
 
@@ -3852,6 +3849,12 @@ static int msre_op_fuzzy_hash_execute(modsec_rec *msr, msre_rule *rule,
     }
 
     fclose(fp);
+#else
+    *error_msg = apr_psprintf(rule->ruleset->mp, "ModSecurity was not " \
+        "compiled with ssdeep support.");
+
+    return -1;
+
 #endif
 
     /* No match. */
