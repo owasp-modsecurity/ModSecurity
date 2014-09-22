@@ -12,11 +12,11 @@
 		SecRule REQUEST_BODY "\@fuzzyHash $ENV{CONF_DIR}/ssdeep.txt 1" "id:192372,log,deny"
 	),
 	match_log => {
-		error => [ qr/ModSecurity: Access denied with code 403 \(phase 2\)\. Fuzzy hash of REQUEST_BODY matched with 96:MbQ1L0LDX8GPI8ov3D2D9zd6.*"modsecurity.conf-recommended"/, 1],
-		debug => [ qr/Access denied with code 403 \(phase 2\)\. Fuzzy hash of REQUEST_BODY matched with 96:MbQ1L0LDX8GPI8ov3D2D9zd6.*"modsecurity.conf-recommended"/, 1],
+		error => [ qr/ModSecurity: Access denied with code 403 \(phase 2\)\. Fuzzy hash of REQUEST_BODY matched with 96:MbQ1L0LDX8GPI8ov3D2D9zd6.*"modsecurity.conf-recommended"|ModSecurity was not compiled with ssdeep support./, 1],
+		debug => [ qr/Access denied with code 403 \(phase 2\)\. Fuzzy hash of REQUEST_BODY matched with 96:MbQ1L0LDX8GPI8ov3D2D9zd6.*"modsecurity.conf-recommended"|ModSecurity was not compiled with ssdeep support./, 1],
 	},
 	match_response => {
-		status => qr/^403$/,
+		status => qr/^403|200$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/index.html",
