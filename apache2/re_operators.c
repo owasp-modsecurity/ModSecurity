@@ -3808,6 +3808,7 @@ static int msre_op_fuzzy_hash_execute(modsec_rec *msr, msre_rule *rule,
 #ifdef WITH_SSDEEP
     char result[FUZZY_MAX_RESULT];
     struct fuzzy_hash_param_data *param = rule->op_param_data;
+    FILE *fp;
     char line[1024];
 #endif
 
@@ -3827,7 +3828,7 @@ static int msre_op_fuzzy_hash_execute(modsec_rec *msr, msre_rule *rule,
         return -1;
     }
 
-    FILE *fp = fopen(param->file, "r");
+    fp = fopen(param->file, "r");
     if (!fp)
     {
         *error_msg = apr_psprintf(rule->ruleset->mp, "Not able to open " \
