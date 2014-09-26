@@ -38,7 +38,7 @@ find(
 			(($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size) = stat($_)) &&
 			-f _ &&
 ####        MODSEC-204 /^\d{8}-\d+-\w{24}$/s
-            /^\d{8}-\d+-.{24}$/s
+            /^\d{8}-\d+-.{24,}$/s
 			&& (($fn = $File::Find::name) =~ s/^\Q$ROOTDIR\E//)
 			&& push(@AUDIT, [$fn, $size]);
 		},
