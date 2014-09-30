@@ -39,6 +39,11 @@
 
 #include "msc_status_engine.h"
 
+
+#ifdef WITH_YAJL
+#include <yajl/yajl_version.h>
+#endif /* WITH_YAJL */
+
 /* ModSecurity structure */
 
 msc_engine DSOLOCAL *modsecurity = NULL;
@@ -97,7 +102,7 @@ static void version(apr_pool_t *mp) {
             "ModSecurity: APR compiled version=\"%s\"; "
             "loaded version=\"%s\"", APR_VERSION_STRING, apr_version_string());
 
-    if (strstr(apr_version_string(),APR_VERSION_STRING) == NULL)    {
+    if (strstr(apr_version_string(), APR_VERSION_STRING) == NULL)    {
         ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, "ModSecurity: Loaded APR do not match with compiled!");
     }
 
@@ -114,11 +119,16 @@ static void version(apr_pool_t *mp) {
     /* Lua version function was removed in current 5.1. Need to check in future versions if it's back */
 #if defined(WITH_LUA)
     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-            "ModSecurity: LUA compiled version=\"%s\"",LUA_VERSION);
+            "ModSecurity: LUA compiled version=\"%s\"", LUA_VERSION);
 #endif /* WITH_LUA */
 
+#ifdef WITH_YAJL
     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-            "ModSecurity: LIBXML compiled version=\"%s\"",LIBXML_DOTTED_VERSION);
+            "ModSecurity: YAJL compiled version=\"%d.%d.%d\"", YAJL_MAJOR, YAJL_MINOR, YAJL_MICRO);
+#endif /* WITH_YAJL */
+
+    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+            "ModSecurity: LIBXML compiled version=\"%s\"", LIBXML_DOTTED_VERSION);
 }
 
 
