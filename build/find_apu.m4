@@ -58,7 +58,8 @@ if test -n "${apu_path}"; then
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu VERSION: $APU_VERSION); fi
     APU_CFLAGS="`${APU_CONFIG} --includes`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu CFLAGS: $APU_CFLAGS); fi
-    APU_LDFLAGS="`${APU_CONFIG} --libs`"
+    APU_LDFLAGS="`${APU_CONFIG} --ldflags`"
+    APU_LDFLAGS="$APU_LDFLAGS `${APU_CONFIG} --libs`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu LDFLAGS: $APU_LDFLAGS); fi
     APU_LDADD="`${APU_CONFIG} --link-libtool`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(apu LDADD: $APU_LDADD); fi
