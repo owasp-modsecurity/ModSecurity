@@ -58,6 +58,7 @@ OBJS = mod_security2.obj apache2_config.obj apache2_io.obj apache2_util.obj \
        msc_reqbody.obj msc_geo.obj msc_gsb.obj msc_crypt.obj msc_tree.obj msc_unicode.obj acmp.obj msc_lua.obj \
        msc_release.obj \
        msc_status_engine.obj \
+       msc_remote_rules.obj \
        msc_json.obj \
        libinjection/libinjection_html5.obj \
        libinjection/libinjection_sqli.obj \

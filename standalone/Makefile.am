@@ -22,6 +22,7 @@ standalone_la_SOURCES = ../apache2/acmp.c \
     ../apache2/msc_parsers.c \
     ../apache2/msc_pcre.c \
     ../apache2/msc_release.c \
+    ../apache2/msc_remote_rules.c \
     ../apache2/msc_reqbody.c \
     ../apache2/msc_tree.c \
     ../apache2/msc_unicode.c \

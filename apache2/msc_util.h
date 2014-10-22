@@ -170,4 +170,8 @@ struct msc_curl_memory_buffer_t
    size_t size;
 };
 
+#ifdef WIN32
+char *strtok_r(char *str, const char *delim, char **nextp);
+#endif
+
 #endif

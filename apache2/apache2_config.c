@@ -2213,6 +2213,50 @@ static const char *cmd_rule_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
     return NULL;
 }
 
+static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
+        const char *p2)
+{
+    char *error_msg = NULL;
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+
+    // FIXME: make it https only.
+    // if (strncasecmp(p1, "https", 5) != 0) {
+    if (strncasecmp(p2, "http", 4) != 0) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
+                " %s, expected an HTTPS address.", p2);
+    }
+
+    // FIXME: Should we handle more then one server at once?
+    if (remote_rules_server != NULL)
+    {
+        return apr_psprintf(cmd->pool, "ModSecurity:  " \
+                "SecRemoteRules cannot be used more than once.");
+    }
+
+    remote_rules_server = apr_pcalloc(cmd->pool, sizeof(msc_remote_rules_server));
+    if (remote_rules_server == NULL)
+    {
+        return apr_psprintf(cmd->pool, "ModSecurity:  " \
+                "SecRemoteRules: Internal failure. Not enougth memory.");
+    }
+
+    remote_rules_server->context = dcfg;
+    remote_rules_server->context_label = apr_pstrdup(cmd->pool, "Unkwon context");
+    remote_rules_server->key = p1;
+    remote_rules_server->uri = p2;
+    remote_rules_server->amount_of_rules = 0;
+
+    msc_remote_add_rules_from_uri(cmd, remote_rules_server, &error_msg);
+    if (error_msg != NULL)
+    {
+        return error_msg;
+    }
+
+    return NULL;
+}
+
+
 static const char *cmd_status_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     if (strcasecmp(p1, "on") == 0) {
@@ -3498,6 +3542,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "On or Off"
+    ),
+
+    AP_INIT_TAKE2 (
+        "SecRemoteRules",
+        cmd_remote_rules,
+        NULL,
+        CMD_SCOPE_ANY,
+        "key and URI to the remote rules"
     ),
 
     AP_INIT_TAKE1 (

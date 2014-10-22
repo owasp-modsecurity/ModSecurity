@@ -2634,12 +2634,12 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
     int beacon_str_len = 0;
     char *beacon_apr = NULL;
     struct msc_curl_memory_buffer_t chunk;
-    chunk.memory = malloc(1);  /* will be grown as needed by the realloc above */
-    chunk.size = 0;    /* no data at this point */
     char *word = NULL;
     char *brkt = NULL;
     char *sep = "\n";
 
+    chunk.memory = malloc(1);  /* will be grown as needed by the realloc above */
+    chunk.size = 0;    /* no data at this point */
 
 
     if (create_radix_tree(mp, rtree, error_msg))
@@ -2834,7 +2834,17 @@ size_t msc_curl_write_memory_cb(void *contents, size_t size,
   size_t realsize = size * nmemb;
   struct msc_curl_memory_buffer_t *mem = (struct msc_curl_memory_buffer_t *)userp;
 
-  mem->memory = realloc(mem->memory, mem->size + realsize + 1);
+  if (mem->size == 0)
+  {
+      mem->memory = malloc(realsize + 1);
+      memset(mem->memory, '\0', sizeof(realsize + 1));
+  }
+  else
+  {
+      mem->memory = realloc(mem->memory, mem->size + realsize + 1);
+      memset(mem->memory + mem->size, '\0', sizeof(realsize + 1));
+  }
+
   if(mem->memory == NULL) {
     /* out of memory! */
     return 0;
@@ -2847,3 +2857,31 @@ size_t msc_curl_write_memory_cb(void *contents, size_t size,
   return realsize;
 }
 
+#ifdef WIN32
+char* strtok_r(
+        char *str,
+        const char *delim,
+        char **nextp)
+{
+    char *ret;
+
+    if (str == NULL)
+    {
+        str = *nextp;
+    }
+    str += strspn(str, delim);
+    if (*str == '\0')
+    {
+        return NULL;
+    }
+    ret = str;
+    str += strcspn(str, delim);
+    if (*str)
+    {
+        *str++ = '\0';
+    }
+    *nextp = str;
+    return ret;
+}
+
+#endif

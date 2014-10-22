@@ -536,7 +536,7 @@ static apr_status_t modsecurity_process_phase_request_body(modsec_rec *msr) {
     apr_time_t time_before;
     apr_status_t rc = 0;
 
-    
+
     if ((msr->allow_scope == ACTION_ALLOW_REQUEST)||(msr->allow_scope == ACTION_ALLOW)) {
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Skipping phase REQUEST_BODY (allow used).");
@@ -626,7 +626,7 @@ static apr_status_t modsecurity_process_phase_response_body(modsec_rec *msr) {
  */
 static apr_status_t modsecurity_process_phase_logging(modsec_rec *msr) {
     apr_time_t time_before, time_after;
-    
+
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "Starting phase LOGGING.");
     }

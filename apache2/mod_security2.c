@@ -33,6 +33,8 @@
 
 #include "apr_version.h"
 
+#include "msc_remote_rules.h"
+
 #if defined(WITH_LUA)
 #include "msc_lua.h"
 #endif
@@ -65,6 +67,8 @@ char DSOLOCAL *guardianlog_condition = NULL;
 unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
 
 unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
+
+msc_remote_rules_server DSOLOCAL *remote_rules_server = NULL;
 
 int DSOLOCAL status_engine_state = STATUS_ENGINE_DISABLED;
 
@@ -752,6 +756,24 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
                     "SecStatusEngine to On.");
         }
 #endif
+
+        if (remote_rules_server != NULL)
+        {
+            if (remote_rules_server->amount_of_rules == 1)
+            {
+                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+                    "ModSecurity: Loaded %d rule from: '%s'.",
+                    remote_rules_server->amount_of_rules,
+                    remote_rules_server->uri);
+            }
+            else
+            {
+                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+                    "ModSecurity: Loaded %d rule from: '%s'.",
+                    remote_rules_server->amount_of_rules,
+                    remote_rules_server->uri);
+            }
+        }
     }
 
     srand((unsigned int)(time(NULL) * getpid()));

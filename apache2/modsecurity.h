@@ -33,6 +33,7 @@ typedef struct msc_arg msc_arg;
 typedef struct msc_string msc_string;
 typedef struct msc_parm msc_parm;
 
+#include "msc_remote_rules.h"
 #include "msc_release.h"
 #include "msc_logging.h"
 #include "msc_multipart.h"
@@ -143,6 +144,8 @@ extern DSOLOCAL const command_rec module_directives[];
 extern DSOLOCAL unsigned long int msc_pcre_match_limit;
 
 extern DSOLOCAL unsigned long int msc_pcre_match_limit_recursion;
+
+extern DSOLOCAL msc_remote_rules_server *remote_rules_server;
 
 extern DSOLOCAL int status_engine_state;
 
@@ -619,6 +622,14 @@ struct directory_config {
 
     /* xml */
     int                 xml_external_entity;
+
+    /* This will be used whenever ModSecurity will be ready
+     * to ask the server for newer rules.
+     */
+#if 0
+    msc_remote_rules_server *remote_rules;
+    int remote_timeout;
+#endif
 };
 
 struct error_message_t {
