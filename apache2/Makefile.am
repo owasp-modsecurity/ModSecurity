@@ -20,6 +20,7 @@ mod_security2_la_SOURCES = acmp.c \
     msc_multipart.c \
     msc_parsers.c \
     msc_pcre.c \
+    msc_python.c \
     msc_release.c \
     msc_reqbody.c \
     msc_tree.c \
@@ -41,6 +42,7 @@ mod_security2_la_CFLAGS = @APR_CFLAGS@ \
     @LUA_CFLAGS@ \
     @MODSEC_EXTRA_CFLAGS@ \
     @PCRE_CFLAGS@ \
+    @PYTHON_CFLAGS@ \
     @YAJL_CFLAGS@
 
 
@@ -53,6 +55,7 @@ mod_security2_la_LIBADD = @APR_LDADD@ \
     @LIBXML2_LDADD@ \
     @LUA_LDADD@ \
     @PCRE_LDADD@ \
+    @PYTHON_LDADD@ \
     @YAJL_LDADD@
 
 if AIX
@@ -63,7 +66,9 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
+
 endif
 
 if HPUX
@@ -74,6 +79,7 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 
@@ -85,6 +91,7 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 
@@ -96,6 +103,7 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 
@@ -107,6 +115,7 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version -R @PCRE_LD_PATH
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 
@@ -118,6 +127,7 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 
@@ -129,6 +139,7 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 
@@ -140,6 +151,7 @@ mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 endif
 

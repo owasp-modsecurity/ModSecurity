@@ -37,6 +37,10 @@
 #include "msc_lua.h"
 #endif
 
+#ifdef WITH_PYTHON
+#include "msc_python.h"
+#endif
+
 #include "msc_status_engine.h"
 
 

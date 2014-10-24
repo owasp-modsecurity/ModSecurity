@@ -14,6 +14,7 @@ msc_test_SOURCES = msc_test.c \
     $(top_srcdir)/apache2/msc_multipart.c \
     $(top_srcdir)/apache2/msc_parsers.c \
     $(top_srcdir)/apache2/msc_pcre.c \
+    $(top_srcdir)/apache2/msc_python.c \
     $(top_srcdir)/apache2/msc_release.c \
     $(top_srcdir)/apache2/msc_reqbody.c \
     $(top_srcdir)/apache2/msc_tree.c \
@@ -36,6 +37,7 @@ msc_test_CFLAGS = @APR_CFLAGS@ \
     @LUA_CFLAGS@ \
     @MODSEC_EXTRA_CFLAGS@ \
     @PCRE_CFLAGS@ \
+    @PYTHON_CFLAGS@ \
     @YAJL_CFLAGS@
     
 msc_test_CPPFLAGS = -I$(top_srcdir)/apache2 \
@@ -48,6 +50,7 @@ msc_test_LDADD = @APR_LDADD@ \
     @LIBXML2_LDADD@ \
     @LUA_LDADD@ \
     @PCRE_LDADD@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDADD@
 
 msc_test_LDFLAGS = @APR_LDFLAGS@ \
@@ -56,6 +59,7 @@ msc_test_LDFLAGS = @APR_LDFLAGS@ \
     @LIBXML2_LDFLAGS@ \
     @LUA_LDFLAGS@ \
     @PCRE_LDFLAGS@ \
+    @PYTHON_LDFLAGS@ \
     @YAJL_LDFLAGS@
 
 check_SCRIPTS = run-unit-tests.pl

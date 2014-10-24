@@ -46,6 +46,10 @@ typedef struct msre_cache_rec msre_cache_rec;
 #include "msc_lua.h"
 #endif
 
+#ifdef WITH_PYTHON
+#include "msc_python.h"
+#endif
+
 /* Actions, variables, functions and operator functions */
 char DSOLOCAL *update_rule_target_ex(modsec_rec *msr, msre_ruleset *ruleset, msre_rule *rule, const char *p2,
         const char *p3);
@@ -136,7 +140,10 @@ int DSOLOCAL msre_ruleset_phase_rule_remove_with_exception(msre_ruleset *ruleset
 #define RULE_TYPE_ACTION        1  /* SecAction */
 #define RULE_TYPE_MARKER        2  /* SecMarker */
 #if defined(WITH_LUA)
-#define RULE_TYPE_LUA           3  /* SecRuleScript */
+#define RULE_TYPE_LUA           3  /* SecRuleScript - lua */
+#endif
+#ifdef WITH_PYTHON
+#define RULE_TYPE_PYTHON        4 /* SecRuleScript - python */
 #endif
 
 struct msre_rule {
@@ -167,6 +174,10 @@ struct msre_rule {
     msc_script              *script;
     #endif
 
+#ifdef WITH_PYTHON
+    msc_python_script       *python_script;
+#endif
+
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER > 0
     ap_regex_t              *sub_regex;
 #else
@@ -190,6 +201,12 @@ msre_rule DSOLOCAL *msre_rule_create(msre_ruleset *ruleset, int type,
 msre_rule DSOLOCAL *msre_rule_lua_create(msre_ruleset *ruleset,
     const char *fn, int line, const char *script_filename,
     const char *actions, char **error_msg);
+#endif
+
+#ifdef WITH_PYTHON
+msre_rule DSOLOCAL *msre_rule_python_create(msre_ruleset *ruleset,
+    const char *fn, int line, const char *script_filename,
+     const char *actions, char **error_msg);
 #endif
 
 #define VAR_SIMPLE              0    /* REQUEST_URI */

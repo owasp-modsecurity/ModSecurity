@@ -60,6 +60,10 @@ typedef struct msc_parm msc_parm;
 #include "msc_lua.h"
 #endif
 
+#ifdef WITH_PYTHON
+#include "msc_python.h"
+#endif
+
 #define PHASE_REQUEST_HEADERS       1
 #define PHASE_REQUEST_BODY          2
 #define PHASE_RESPONSE_HEADERS      3

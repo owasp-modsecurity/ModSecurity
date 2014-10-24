@@ -3733,6 +3733,23 @@ static int msre_op_inspectFile_init(msre_rule *rule, char **error_msg) {
 
     filename = resolve_relative_path(rule->ruleset->mp, rule->filename, filename);
 
+#ifdef WITH_PYTHON
+    /* ENH Write & use string_ends(s, e). */
+    if (strlen(rule->op_param) > 3) {
+        char *p = filename + strlen(filename) - 3;
+        if ((p[0] == '.')&&(p[1] == 'p')&&(p[2] == 'y'))
+        {
+            msc_python_script *script = NULL;
+
+            /* Compile script. */
+            *error_msg = python_load(&script, filename, rule->ruleset->mp);
+            if (*error_msg != NULL) return -1;
+
+            rule->op_param_data = script;
+        }
+    }
+#endif
+
 #if defined(WITH_LUA)
     /* ENH Write & use string_ends(s, e). */
     if (strlen(rule->op_param) > 4) {
@@ -3748,7 +3765,7 @@ static int msre_op_inspectFile_init(msre_rule *rule, char **error_msg) {
             rule->op_param_data = script;
         }
     }
-    #endif
+#endif
 
     if (rule->op_param_data == NULL) {
         /* ENH Verify the script exists and that we have
