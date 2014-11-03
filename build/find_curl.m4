@@ -66,6 +66,10 @@ if test -n "${curl_path}"; then
     curl_ver=`echo ${CURL_VERSION} | awk -F. '{print (\$ 1 * 1000000) + (\$ 2 * 1000) + \$ 3}'`
     if test "$curl_min_ver" -le "$curl_ver"; then
         AC_MSG_RESULT([yes, $CURL_VERSION])
+	curl_tlsv2_ver=`echo 7.34.0 | awk -F. '{print (\$ 1 * 1000000) + (\$ 2 * 1000) + \$ 3}'`
+	if test "$curl_tlsv2_ver" -le "$curl_ver"; then
+	    CURL_CFLAGS="${CURL_CFLAGS} -DWITH_CURL_SSLVERSION_TLSv1_2"
+	fi
     else
         AC_MSG_RESULT([no, $CURL_VERSION])
         AC_MSG_NOTICE([NOTE: curl library may be too old])
