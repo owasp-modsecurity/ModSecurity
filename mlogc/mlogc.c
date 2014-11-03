@@ -1218,8 +1218,8 @@ static void logc_init(void)
         curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
-        /* SSLv3 works better overall as some servers have issues with TLS */
-        curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_SSLv3);
+        curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 15);
         curl_easy_setopt(curl, CURLOPT_NOSIGNAL, TRUE);
         curl_easy_setopt(curl, CURLOPT_HEADER, TRUE);
