@@ -376,7 +376,7 @@ int DSOLOCAL msc_beacon_string (char *beacon_string, int beacon_string_max_len) 
     }
 
     apr_snprintf(beacon_string, beacon_string_max_len,
-        "%.25s,%s,%s/%s,%s/%s,%s,%s,%s",
+        "%.25s,%.25s,%s/%s,%s/%s,%s,%s,%s",
         modsec, apache, apr, apr_loaded, pcre, pcre_loaded, lua, libxml, id);
 
 return_length:
