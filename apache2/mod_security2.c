@@ -54,7 +54,7 @@ char DSOLOCAL *chroot_dir = NULL;
 
 char DSOLOCAL *new_server_signature = NULL;
 
-static char *real_server_signature = NULL;
+char DSOLOCAL *real_server_signature = NULL;
 
 char DSOLOCAL *guardianlog_name = NULL;
 
