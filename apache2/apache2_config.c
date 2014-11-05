@@ -786,6 +786,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         return my_error_msg;
     }
 
+#ifndef ALLOW_ID_NOT_UNIQUE
     /* Rules must have uniq ID */
     if (
 #if defined(WITH_LUA)
@@ -818,6 +819,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
             //    return "ModSecurity: Found another rule with the same id";
         }
     }
+#endif
 
     /* Create default actionset if one does not already exist. */
     if (dcfg->tmp_default_actionset == NULL) {
@@ -1502,6 +1504,8 @@ static const char *cmd_default_action(cmd_parms *cmd, void *_dcfg,
         return apr_psprintf(cmd->pool, "ModSecurity: SecDefaultAction must not "
             "contain any metadata actions (id, rev, msg, tag, severity, ver, accuracy, maturity, logdata).");
     }
+
+#ifndef LOG_NO_DEFAULT_DEPRECATED
     /* These are just a warning for now. */
     if ((dcfg->tmp_default_actionset->severity != NOT_SET)
         ||(dcfg->tmp_default_actionset->logdata != NOT_SET_P))
@@ -1520,6 +1524,7 @@ static const char *cmd_default_action(cmd_parms *cmd, void *_dcfg,
             "SecDefaultAction is deprecated (%s:%d).",
             cmd->directive->filename, cmd->directive->line_num);
     }
+#endif
 
     /* Must not use chain. */
     if (dcfg->tmp_default_actionset->is_chained != NOT_SET) {

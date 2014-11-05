@@ -1920,7 +1920,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             }
         }
         else {
-            msr_log(msr, 1, "Rule processing failed with unknown return code: %d.", rc);
+            msr_log(msr, 1, "Rule processing failed with unknown return code: %d (id=%s, msg=%s).", rc, rule->actionset->id, rule->actionset->msg);
             apr_table_clear(msr->matched_vars);
             return -1;
         }
@@ -2194,10 +2194,12 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
 
     if (actionset == NULL) return "";
 
+#ifndef LOG_NO_FILENAME
     if ((actionset->rule != NULL) && (actionset->rule->filename != NULL)) {
         fn = apr_psprintf(msr->mp, " [file \"%s\"] [line \"%d\"]",
                 actionset->rule->filename, actionset->rule->line_num);
     }
+#endif
     if (actionset->id != NULL) {
         id = apr_psprintf(msr->mp, " [id \"%s\"]",
                 log_escape(msr->mp, actionset->id));

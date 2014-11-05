@@ -956,12 +956,15 @@ void sec_audit_logger(modsec_rec *msr) {
             sec_auditlog_write(msr, text, strlen(text));
         }
 
+#ifndef LOG_NO_HANDLER
         /* Apache-Handler */
         if (msr->r->handler != NULL) {
             text = apr_psprintf(msr->mp, "Apache-Handler: %s\n", msr->r->handler);
             sec_auditlog_write(msr, text, strlen(text));
         }
+#endif
 
+#ifndef LOG_NO_STOPWATCH
         /* Stopwatch; left in for compatibility reasons */
         text = apr_psprintf(msr->mp, "Stopwatch: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT " (- - -)\n",
             msr->request_time, (now - msr->request_time));
@@ -976,7 +979,9 @@ void sec_audit_logger(modsec_rec *msr) {
 
             sec_auditlog_write(msr, text, strlen(text));
         }
+#endif
 
+#ifndef LOG_NO_DECHUNK
         /* Our response body does not contain chunks */
         /* ENH Only write this when the output was chunked. */
         /* ENH Add info when request body was decompressed, dechunked too. */
@@ -984,14 +989,19 @@ void sec_audit_logger(modsec_rec *msr) {
             text = apr_psprintf(msr->mp, "Response-Body-Transformed: Dechunked\n");
             sec_auditlog_write(msr, text, strlen(text));
         }
+#endif
 
+#ifndef LOG_NO_PRODUCERS
         sec_auditlog_write_producer_header(msr);
+#endif
 
+#ifndef LOG_NO_SERVER
         /* Server */
         if (msr->server_software != NULL) {
             text = apr_psprintf(msr->mp, "Server: %s\n", msr->server_software);
             sec_auditlog_write(msr, text, strlen(text));
         }
+#endif
 
         /* Sanitised arguments */
         {

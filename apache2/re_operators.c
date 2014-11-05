@@ -1222,8 +1222,6 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
     /* Loop through filenames */
     /* ENH: Need to allow quoted filenames w/space */
     for (;;) {
-        const char *rootpath = NULL;
-        const char *filepath = NULL;
         int line = 0;
 
         /* Trim whitespace */
@@ -1233,16 +1231,31 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
         while((apr_isspace(*next) == 0) && (*next != '\0')) next++;
         while((apr_isspace(*next) != 0) && (*next != '\0')) *(next++) = '\0';
 
-        /* Add path of the rule filename for a relative phrase filename */
-        filepath = fn;
-        if (apr_filepath_root(&rootpath, &filepath, APR_FILEPATH_TRUENAME, rule->ruleset->mp) != APR_SUCCESS) {
-            /* We are not an absolute path.  It could mean an error, but
-             * let that pass through to the open call for a better error */
-            apr_filepath_merge(&fn, rulefile_path, fn, APR_FILEPATH_TRUENAME, rule->ruleset->mp);
-        }
-
         /* Open file and read */
+        /* Logic to look for data file:
+            - try given filename (absolute or relative to current dir)
+            - if not absolute, try
+                - from the rule directory
+                - from apache root directory
+        */
         rc = apr_file_open(&fd, fn, APR_READ | APR_BUFFERED | APR_FILE_NOCLEANUP, 0, rule->ruleset->mp);
+        if (rc != APR_SUCCESS) {
+            const char *rootpath = NULL;
+            const char *filepath = fn;
+            if (apr_filepath_root(&rootpath, &filepath, APR_FILEPATH_TRUENAME, rule->ruleset->mp) != APR_SUCCESS) {
+                /* Add path of the rule filename for a relative phrase filename */
+                const char *fn_tmp = NULL;
+                apr_filepath_merge(&fn_tmp, rulefile_path, fn, APR_FILEPATH_TRUENAME, rule->ruleset->mp);
+                if (fn_tmp)
+                    rc = apr_file_open(&fd, fn_tmp, APR_READ | APR_BUFFERED | APR_FILE_NOCLEANUP, 0, rule->ruleset->mp);
+                if (rc != APR_SUCCESS) {
+                    /* Add path of httpd root for a relative phrase filename */
+                    fn_tmp = ap_server_root_relative(rule->ruleset->mp, fn);
+                    if (fn_tmp)
+                        rc = apr_file_open(&fd, fn_tmp, APR_READ | APR_BUFFERED | APR_FILE_NOCLEANUP, 0, rule->ruleset->mp);
+                }
+            }
+        }
         if (rc != APR_SUCCESS) {
             *error_msg = apr_psprintf(rule->ruleset->mp, "Could not open phrase file \"%s\": %s", fn, apr_strerror(rc, errstr, 1024));
             return 0;
