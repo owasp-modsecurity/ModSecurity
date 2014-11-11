@@ -146,6 +146,7 @@ extern DSOLOCAL unsigned long int msc_pcre_match_limit;
 extern DSOLOCAL unsigned long int msc_pcre_match_limit_recursion;
 
 extern DSOLOCAL msc_remote_rules_server *remote_rules_server;
+extern DSOLOCAL int remote_rules_fail_action;
 
 extern DSOLOCAL int status_engine_state;
 
@@ -197,6 +198,9 @@ extern DSOLOCAL int *unicode_map_table;
 
 #define STATUS_ENGINE_ENABLED           1
 #define STATUS_ENGINE_DISABLED          0
+
+#define REMOTE_RULES_ABORT_ON_FAIL	0
+#define REMOTE_RULES_WARN_ON_FAIL	1
 
 #define HASH_DISABLED             0
 #define HASH_ENABLED              1

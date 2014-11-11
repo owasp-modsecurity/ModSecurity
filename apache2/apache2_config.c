@@ -2213,6 +2213,28 @@ static const char *cmd_rule_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
     return NULL;
 }
 
+static const char *cmd_remote_rules_fail(cmd_parms *cmd, void *_dcfg, const char *p1)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    if (dcfg == NULL) return NULL;
+
+    if (strncasecmp(p1, "warn", 4) == 0)
+    {
+        remote_rules_fail_action = REMOTE_RULES_WARN_ON_FAIL;
+    }
+    else if (strncasecmp(p1, "abort", 5) == 0)
+    {
+        remote_rules_fail_action = REMOTE_RULES_ABORT_ON_FAIL;
+    }
+    else
+    {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
+                "SecRemoteRulesFailAction, expected: Abort or Warn.");
+    }
+
+    return NULL;
+}
+
 static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
         const char *p2)
 {
@@ -3551,6 +3573,15 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "key and URI to the remote rules"
     ),
+
+    AP_INIT_TAKE1 (
+        "SecRemoteRulesFailAction",
+        cmd_remote_rules_fail,
+        NULL,
+        CMD_SCOPE_ANY,
+        "Abort or Warn"
+    ),
+
 
     AP_INIT_TAKE1 (
         "SecXmlExternalEntity",

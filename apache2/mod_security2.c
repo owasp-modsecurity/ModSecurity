@@ -69,6 +69,7 @@ unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
 unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
 msc_remote_rules_server DSOLOCAL *remote_rules_server = NULL;
+int DSOLOCAL remote_rules_fail_action = REMOTE_RULES_ABORT_ON_FAIL;
 
 int DSOLOCAL status_engine_state = STATUS_ENGINE_DISABLED;
 
@@ -81,6 +82,7 @@ TreeRoot DSOLOCAL *conn_read_state_suspicious_list = 0;
 unsigned long int DSOLOCAL conn_write_state_limit = 0;
 TreeRoot DSOLOCAL *conn_write_state_whitelist = 0;
 TreeRoot DSOLOCAL *conn_write_state_suspicious_list = 0;
+
 
 #if defined(WIN32) || defined(VERSION_NGINX)
 int (*modsecDropAction)(request_rec *r) = NULL;

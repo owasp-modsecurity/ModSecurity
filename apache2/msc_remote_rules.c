@@ -300,8 +300,19 @@ int msc_remote_grab_content(apr_pool_t *mp, const char *uri, const char *key,
 
         if (res != CURLE_OK)
         {
-            *error_msg = apr_psprintf(mp, "Failed to fetch \"%s\" error: %s ",
+            if (remote_rules_fail_action == REMOTE_RULES_WARN_ON_FAIL)
+            {
+                 ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+                         "Failed to fetch \"%s\" error: %s ",
+                         remote_rules_server->uri, curl_easy_strerror(res));
+            }
+            else
+            {
+                *error_msg = apr_psprintf(mp, "Failed to fetch \"%s\" " \
+                    "error: %s ",
                     remote_rules_server->uri, curl_easy_strerror(res));
+            }
+
             return -1;
         }
 
@@ -444,7 +455,8 @@ int msc_remote_decrypt(apr_pool_t *pool,
     //        at least size of IV + Salt
     if (chunk->size < 16+16+1)
     {
-        *error_msg = "Unexpected content.";
+        *error_msg = "Failed to download rules from a remote server: " \
+            "Unexpected content.";
         return -1;
     }
     iv = chunk->memory;
@@ -574,6 +586,7 @@ int msc_remote_add_rules_from_uri(cmd_parms *orig_parms,
     int start = 0;
     int end = 0;
     int added_rules = 0;
+    int res = 0;
     apr_size_t plain_text_len = 0;
 
     apr_pool_t *mp = orig_parms->pool;
@@ -581,11 +594,19 @@ int msc_remote_add_rules_from_uri(cmd_parms *orig_parms,
     chunk_encrypted.size = 0;
     chunk_encrypted.memory = NULL;
 
-    msc_remote_grab_content(mp, remote_rules_server->uri,
+    res = msc_remote_grab_content(mp, remote_rules_server->uri,
             remote_rules_server->key, &chunk_encrypted, error_msg);
     if (*error_msg != NULL)
     {
         return -1;
+    }
+
+    /* error_msg is not filled when the user set SecRemoteRulesFailAction
+     * to warn
+     */
+    if (res != 0)
+    {
+        return res;
     }
 
     msc_remote_decrypt(mp, remote_rules_server->key, &chunk_encrypted,
