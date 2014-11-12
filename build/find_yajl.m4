@@ -99,20 +99,20 @@ else
         fi
     done
     for x in ${test_paths}; do
-        if test -e "${x}/include/yajl.h"; then
+        if test -e "${x}/include/yajl_parse.h"; then
             yajl_inc_path="${x}/include"
             break
-        elif test -e "${x}/yajl.h"; then
+        elif test -e "${x}/yajl_parse.h"; then
             yajl_inc_path="${x}"
             break
         fi
 
         dnl # Check some sub-paths as well
         for yajl_pkg_name in ${yajl_lib_name} ${YAJL_PKGNAMES}; do
-            if test -e "${x}/include/${yajl_pkg_name}/yajl.h"; then
+            if test -e "${x}/include/${yajl_pkg_name}/yajl_parse.h"; then
                 yajl_inc_path="${x}/include"
                 break
-            elif test -e "${x}/${yajl_pkg_name}/yajl.h"; then
+            elif test -e "${x}/${yajl_pkg_name}/yajl_parse.h"; then
                 yajl_inc_path="${x}"
                 break
             else
