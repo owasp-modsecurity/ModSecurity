@@ -45,6 +45,7 @@ struct msc_remote_rules_server {
         const char *uri;
         const char *key;
         int amount_of_rules;
+	int crypto;
 };
 
 const char *msc_remote_invoke_cmd(const command_rec *cmd, cmd_parms *parms,

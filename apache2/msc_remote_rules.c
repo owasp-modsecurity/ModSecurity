@@ -607,16 +607,24 @@ int msc_remote_add_rules_from_uri(cmd_parms *orig_parms,
         return res;
     }
 
-    msc_remote_decrypt(mp, remote_rules_server->key, &chunk_encrypted,
+    if (remote_rules_server->crypto == 1)
+    {
+        msc_remote_decrypt(mp, remote_rules_server->key, &chunk_encrypted,
             &plain_text,
             &plain_text_len,
             error_msg);
-    if (*error_msg != NULL)
-    {
-        return -1;
-    }
+        if (*error_msg != NULL)
+        {
+            return -1;
+        }
 
-    msc_remote_clean_chunk(&chunk_encrypted);
+        msc_remote_clean_chunk(&chunk_encrypted);
+    }
+    else
+    {
+        plain_text = chunk_encrypted.memory;
+        plain_text_len = strlen(plain_text);
+    }
 
     len = 0;
     plain_text_len = strlen(plain_text);
@@ -679,7 +687,7 @@ int msc_remote_add_rules_from_uri(cmd_parms *orig_parms,
             }
             __except(EXCEPTION_EXECUTE_HANDLER)
             {
-                error_msg = "Command failed to execute (check file/folder" \
+                *error_msg = "Command failed to execute (check file/folder" \
                     "permissions, syntax, etc.).";
                 return -1;
             }
@@ -692,6 +700,11 @@ next:
     }
 
     remote_rules_server->amount_of_rules = added_rules;
+
+    if (remote_rules_server->crypto == 1)
+    {
+        msc_remote_clean_chunk(&chunk_encrypted);
+    }
 }
 
 

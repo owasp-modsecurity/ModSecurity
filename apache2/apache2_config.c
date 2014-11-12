@@ -2240,18 +2240,37 @@ static const char *cmd_remote_rules_fail(cmd_parms *cmd, void *_dcfg, const char
 }
 
 static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
-        const char *p2)
+        const char *p2, const char *p3)
 {
     char *error_msg = NULL;
     directory_config *dcfg = (directory_config *)_dcfg;
+#ifdef WITH_REMOTE_RULES_SUPPORT
+    int crypto = 0;
+    const char *uri = p2;
+    const char *key = p1;
+#endif
+
     if (dcfg == NULL) return NULL;
 
 #ifdef WITH_REMOTE_RULES_SUPPORT
+    if (strncasecmp(p1, "crypto", 6) == 0)
+    {
+        uri = p3;
+        key = p2;
+        crypto = 1;
+    }
+
+    if (uri == NULL || key == NULL)
+    {
+        return apr_psprintf(cmd->pool, "ModSecurity: Use SecRemoteRule with " \
+                "Key and URI");
+    }
+
     // FIXME: make it https only.
     // if (strncasecmp(p1, "https", 5) != 0) {
-    if (strncasecmp(p2, "http", 4) != 0) {
-        return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
-                " %s, expected an HTTPS address.", p2);
+    if (strncasecmp(uri, "http", 4) != 0) {
+        return apr_psprintf(cmd->pool, "ModSecurity: Invalid URI:" \
+                " %s, expected an HTTPS address.", uri);
     }
 
     // FIXME: Should we handle more then one server at once?
@@ -2270,9 +2289,10 @@ static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
 
     remote_rules_server->context = dcfg;
     remote_rules_server->context_label = apr_pstrdup(cmd->pool, "Unkwon context");
-    remote_rules_server->key = p1;
-    remote_rules_server->uri = p2;
+    remote_rules_server->key = key;
+    remote_rules_server->uri = uri;
     remote_rules_server->amount_of_rules = 0;
+    remote_rules_server->crypto = crypto;
 
     msc_remote_add_rules_from_uri(cmd, remote_rules_server, &error_msg);
     if (error_msg != NULL)
@@ -3575,7 +3595,7 @@ const command_rec module_directives[] = {
         "On or Off"
     ),
 
-    AP_INIT_TAKE2 (
+    AP_INIT_TAKE23 (
         "SecRemoteRules",
         cmd_remote_rules,
         NULL,
