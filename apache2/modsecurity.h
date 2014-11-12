@@ -33,7 +33,6 @@ typedef struct msc_arg msc_arg;
 typedef struct msc_string msc_string;
 typedef struct msc_parm msc_parm;
 
-#include "msc_remote_rules.h"
 #include "msc_release.h"
 #include "msc_logging.h"
 #include "msc_multipart.h"
@@ -47,11 +46,13 @@ typedef struct msc_parm msc_parm;
 #include "msc_unicode.h"
 #include "re.h"
 #include "msc_crypt.h"
+#include "msc_remote_rules.h"
 
 #include "ap_config.h"
 #include "apr_md5.h"
 #include "apr_strings.h"
 #include "apr_hash.h"
+#include "apr_crypto.h"
 #include "httpd.h"
 #include "http_config.h"
 #include "http_log.h"
@@ -145,8 +146,10 @@ extern DSOLOCAL unsigned long int msc_pcre_match_limit;
 
 extern DSOLOCAL unsigned long int msc_pcre_match_limit_recursion;
 
+#ifdef WITH_REMOTE_RULES_SUPPORT
 extern DSOLOCAL msc_remote_rules_server *remote_rules_server;
 extern DSOLOCAL int remote_rules_fail_action;
+#endif
 
 extern DSOLOCAL int status_engine_state;
 

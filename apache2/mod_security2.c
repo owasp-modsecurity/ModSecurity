@@ -68,8 +68,10 @@ unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
 
 unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
+#ifdef WITH_REMOTE_RULES_SUPPORT
 msc_remote_rules_server DSOLOCAL *remote_rules_server = NULL;
 int DSOLOCAL remote_rules_fail_action = REMOTE_RULES_ABORT_ON_FAIL;
+#endif
 
 int DSOLOCAL status_engine_state = STATUS_ENGINE_DISABLED;
 
@@ -759,6 +761,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         }
 #endif
 
+#ifdef WITH_REMOTE_RULES_SUPPORT
         if (remote_rules_server != NULL)
         {
             if (remote_rules_server->amount_of_rules == 1)
@@ -776,6 +779,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
                     remote_rules_server->uri);
             }
         }
+#endif
     }
 
     srand((unsigned int)(time(NULL) * getpid()));

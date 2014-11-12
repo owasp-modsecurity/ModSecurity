@@ -12,22 +12,32 @@
 * directly using the email address security@modsecurity.org.
 */
 
+#if APU_HAVE_CRYPTO
+#define WITH_REMOTE_RULES_SUPPORT
+#endif
+
+#ifdef WITH_REMOTE_RULES_SUPPORT
+
 #ifndef MSC_REMOTE_RULES_H
 #define MSC_REMOTE_RULES_H
 
-#include <apr_general.h>
-#include <apr_optional.h>
-#include <apr_thread_pool.h>
-#include <curl/curl.h>
-
-#include <apr_sha1.h>
-#include <apr_crypto.h>
-#include "http_core.h"
-
+/* forward declarations */
 typedef struct msc_remote_rules_server msc_remote_rules_server;
 struct msc_curl_memory_buffer_t;
 
 #include "modsecurity.h"
+
+#include <apr_general.h>
+#include <apr_optional.h>
+#include <apr_thread_pool.h>
+#include <apr_sha1.h>
+
+#include "http_core.h"
+#include "http_config.h"
+
+#include <curl/curl.h>
+
+#include <apr_crypto.h>
 
 struct msc_remote_rules_server {
         directory_config *context;
@@ -38,7 +48,7 @@ struct msc_remote_rules_server {
 };
 
 const char *msc_remote_invoke_cmd(const command_rec *cmd, cmd_parms *parms,
-                              void *mconfig, const char *args);
+                             void *mconfig, const char *args);
 
 int msc_remote_grab_content(apr_pool_t *mp, const char *uri, const char *key,
     struct msc_curl_memory_buffer_t *chunk, char **error_msg);
@@ -63,5 +73,6 @@ int msc_remote_add_rules_from_uri(cmd_parms *orig_parms,
 
 int msc_remote_clean_chunk(struct msc_curl_memory_buffer_t *chunk);
 
+#endif
 #endif
 

@@ -26,9 +26,7 @@
 #define AP_MAX_ARGC 64
 #endif
 
-#ifndef APU_HAVE_CRYPTO
-#error Missing apu crypto module
-#endif
+#ifdef WITH_REMOTE_RULES_SUPPORT
 
 /**
  * @brief Insert a new SecRule to be processed by ModSecurity
@@ -716,3 +714,4 @@ end:
     return 0;
 }
 
+#endif
