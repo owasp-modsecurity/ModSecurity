@@ -8,7 +8,7 @@
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
                 SecRequestBodyAccess On
-		SecRule REQUEST_FILENAME "\@pmFromFile http://modsec.zimmerle.org/ip_reputation.txt?code=123" "id:'123',phase:2,log,pass,t:none"
+		SecRule REQUEST_FILENAME "\@pmFromFile https://www.modsecurity.org/modsecurity-regression-test.txt" "id:'123',phase:2,log,pass,t:none"
 	),
 	match_log => {
 		error => [ qr/ModSecurity: Warning. Matched phrase \"127.0.0.1\" at REQUEST_FILENAME./, 1],

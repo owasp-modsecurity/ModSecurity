@@ -2266,11 +2266,9 @@ static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
                 "Key and URI");
     }
 
-    // FIXME: make it https only.
-    // if (strncasecmp(p1, "https", 5) != 0) {
-    if (strncasecmp(uri, "http", 4) != 0) {
+    if (strncasecmp(uri, "https", 5) != 0) {
         return apr_psprintf(cmd->pool, "ModSecurity: Invalid URI:" \
-                " %s, expected an HTTPS address.", uri);
+                " '%s'. Expected HTTPS.", uri);
     }
 
     // FIXME: Should we handle more then one server at once?

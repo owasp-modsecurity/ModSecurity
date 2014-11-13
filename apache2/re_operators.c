@@ -195,8 +195,13 @@ static int msre_op_ipmatchFromFile_param_init(msre_rule *rule, char **error_msg)
     }
     filepath = fn;
 
-    if ((strlen(fn) > strlen("http://") && strncmp(fn, "http://", strlen("http://")) == 0) ||
-            (strlen(fn) > strlen("https://") && strncmp(fn, "https://", strlen("https://")) == 0))
+    if (strlen(fn) > strlen("http://") && strncmp(fn, "http://", strlen("http://")) == 0)
+    {
+        *error_msg = apr_psprintf(rule->ruleset->mp, "HTTPS address or file " \
+            "path are expected for operator ipmatchFromFile \"%s\"", fn);
+        return 0;
+    }
+    else if (strlen(fn) > strlen("https://") && strncmp(fn, "https://", strlen("https://")) == 0)
     {
         res = ip_tree_from_uri(&rtree, fn, rule->ruleset->mp, error_msg);
         if (res)
@@ -1251,10 +1256,14 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
         /* Add path of the rule filename for a relative phrase filename */
         filepath = fn;
 
-        if ((strlen(fn) > strlen("http://") && strncmp(fn, "http://", strlen("http://")) == 0) ||
-                (strlen(fn) > strlen("https://") && strncmp(fn, "https://", strlen("https://")) == 0))
+        if (strlen(fn) > strlen("http://") && strncmp(fn, "http://", strlen("http://")) == 0)
         {
-
+            *error_msg = apr_psprintf(rule->ruleset->mp, "HTTPS address or " \
+		"file path are expected for operator pmFromFile \"%s\"", fn);
+            return 0;
+        }
+        else if (strlen(fn) > strlen("https://") && strncmp(fn, "https://", strlen("https://")) == 0)
+        {
             CURL *curl;
             CURLcode res;
 
@@ -1308,6 +1317,13 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
 
                 /* we pass our 'chunk' struct to the callback function */
                 curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+                /* Make it TLS 1.x only. */
+                curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
+
+                /* those are the default options, but lets make sure */
+                curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
+                curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 1);
 
                 /* some servers don't like requests that are made without a user-agent
                    field, so we provide one */

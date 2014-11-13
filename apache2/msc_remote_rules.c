@@ -283,6 +283,13 @@ int msc_remote_grab_content(apr_pool_t *mp, const char *uri, const char *key,
             headers_chunk = curl_slist_append(headers_chunk, header_key);
         }
 
+        /* Make it TLS 1.x only. */
+        curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
+
+        /* those are the default options, but lets make sure */
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 1);
+
         /* send all data to this function  */
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, msc_curl_write_memory_cb);
 

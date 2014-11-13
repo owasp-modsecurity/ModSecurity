@@ -2684,6 +2684,13 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
         /* we pass our 'chunk' struct to the callback function */
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 
+        /* Make it TLS 1.x only. */
+        curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
+
+        /* those are the default options, but lets make sure */
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 1);
+
         /* some servers don't like requests that are made without a user-agent
            field, so we provide one */
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "ModSecurity");
