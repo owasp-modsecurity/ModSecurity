@@ -1,3 +1,45 @@
+18 Nov 2014 - 2.9.0-RC1
+-----------------------
+
+ * `pmFromFile' and `ipMatchFromFile' operators are now accepting HTTPS served
+    files as parameter.
+ * `SecRemoteRules' directive - allows you to specify a HTTPS served file that
+    may contain rules in the SecRule format to be loaded into your ModSecurity
+    instance.
+ * `SecRemoteRulesFailAction' directive - allows you to control whenever the
+    user wants to Abort or just Warn when there is a problem while downloading
+    rules specified with the directive: `SecRemoteRules'.
+ * `fuzzyHash' operator - allows to match contents using fuzzy hashes.
+ * `FILES_TMP_CONTENT' collection - make available the content of uploaded
+    files.
+ * InsecureNoCheckCert - option to validate or not a chain of SSL certificates
+   on mlogc connections.
+ * ModSecurityIIS: ModSecurity event ID was changed from 0 to 0x1.
+   [Issue #676 - Kris Kater and ModSecurity team]
+ * Fixed signature on "status call": ModSecurity is now using the original
+   server signature.
+   [Issues #702 - Linas and ModSecurity team]
+ * YAJL version is printed while ModSecurity initialization.
+   [Issue #703 - Steffen (Apache Lounge) and Mauro Faccenda]
+ * Fixed subnet representation using slash notation on the @ipMatch operator.
+   [Issue #706 - Walter Hop and ModSecurity team]
+ * Limited the length of a status call.
+   [Issue #714 - 'cpanelkurt' and ModSecurity team]
+ * Added the missing -P option to nginx regression tests.
+   [Issue #720 - Paul Yang]
+ * Fixed automake scripts to do not use features which will be deprecated in
+   the upcoming releases of automake.
+   [Issue #760 - ModSecurity team]
+ * apr-utils's LDFALGS is now considered while building ModSecurity.
+   [Issue #782 - Daniel J. Luke]
+ * IIS installer is not considering IIS 6 as compatible anymore.
+   [Issue #790 - ModSecurity team]
+ * Fixed yajl build script: now looking for the correct header file.
+   [Issue #804 - 'rpfilomeno' and ModSecurity team]
+ * mlgoc is now forced to use TLS 1.x.
+   [Issue #806 - Josh Amishav-Zlatin and ModSecurity team]
+
+
 14 Apr 2014 - 2.8.0
 -------------------
 
