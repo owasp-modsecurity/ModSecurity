@@ -119,4 +119,62 @@ SecRule REQBODY_ERROR \"!\@eq 0\" \
 	),
 },
 
+{
+    type => "misc",
+    comment => "fuzzy hash with FILES_TMP_CONTENT",
+    conf => qq(
+        SecRuleEngine On
+        SecDebugLog $ENV{DEBUG_LOG}
+        SecDebugLogLevel 9
+        SecRequestBodyAccess On
+	SecUploadKeepFiles On
+
+	SecRule FILES_TMP_CONTENT "\@fuzzyHash $ENV{CONF_DIR}/ssdeep.txt 1" "id:192372,log,deny"
+    ),
+    match_log => {
+        debug => [ qr/operator \"fuzzyHash\" with param \".*ssdeep.txt 1\" against FILES_TMP_CONTENT:image1/s, 1 ],
+    },
+    match_response => {
+        status => qr/^200$/,
+    },
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [
+            "Content-Type" => q(multipart/form-data; boundary=0000),
+        ],
+        normalize_raw_request_data(
+            q(
+                --0000
+                Content-Disposition: form-data; name="name"
+
+                Brian Rectanus
+                --0000
+                Content-Disposition: form-data; name="email"
+
+                brian.rectanus@breach.com
+                --0000
+                Content-Disposition: form-data; name="image1"; filename="image1.jpg"
+                Content-Type: image/jpeg
+
+                BINARYDATA1
+                --0000
+                Content-Disposition: form-data; name="image2"; filename="image2.jpg"
+                Content-Type: image/jpeg
+
+                BINARYDATA2
+                --0000
+                Content-Disposition: form-data; name="image3"; filename="image3.jpg"
+                Content-Type: image/jpeg
+
+                BINARYDATA3
+                --0000
+                Content-Disposition: form-data; name="test"
+
+                This is test data.
+                --0000--
+            ),
+        ),
+    ),
+},
+
 
