@@ -157,6 +157,7 @@ static apr_pool_t            *thread_pool = NULL;
 static apr_pool_t            *recv_pool = NULL;
 static apr_array_header_t    *queue = NULL;
 static const char            *queue_path = NULL;
+static int                    ssl_validation = 0;
 /* static apr_time_t             queue_time = 0; */
 static void                  *requestline_regex = NULL;
 static int                    running = 0;
@@ -831,6 +832,20 @@ static void init_configuration(void)
                   "CheckpointInterval=%d", checkpoint_interval);
     }
 
+    s = apr_table_get(conf, "InsecureNoCheckCert");
+    if (s != NULL) {
+        int num = atoi(s);
+        if (num)
+        {
+            ssl_validation = 0;
+        }
+        else
+        {
+            ssl_validation = 1;
+        }
+        error_log(LOG_DEBUG2, NULL, "InsecureNoCheckCert=%d", num);
+    }
+
     s = apr_table_get(conf, "QueuePath");
     if (s != NULL) {
         queue_path = file_path(s);
@@ -1216,16 +1231,24 @@ static void logc_init(void)
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, (char *)NULL);
         curl_easy_setopt(curl, CURLOPT_URL, console_uri);
         curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+
+        if (ssl_validation)
+        {
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 1);
+        }
+        else
+        {
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+        }
+
+
         /* Seems like CURL_SSLVERSION_TLSv1_2 is not supported on libcurl
          * < v7.34.0
          */
-#ifdef WITH_CURL_SSLVERSION_TLSv1_2
-        curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
-#else
         curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
-#endif
+
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 15);
         curl_easy_setopt(curl, CURLOPT_NOSIGNAL, TRUE);
         curl_easy_setopt(curl, CURLOPT_HEADER, TRUE);
