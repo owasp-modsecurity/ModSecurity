@@ -32,6 +32,7 @@ copy "%OUTPUT_DIR%\mlogc.exe" "%AMD64%"
 copy "%OUTPUT_DIR%\ModSecurityIIS.dll" "%AMD64%"
 copy "%OUTPUT_DIR%\pcre.dll" "%AMD64%"
 copy "%OUTPUT_DIR%\zlib1.dll" "%AMD64%"
+copy "%OUTPUT_DIR%\yajl.dll" "%AMD64%"
 
 
 call build_dependencies.bat %VCARGS32%
@@ -47,8 +48,9 @@ copy "%OUTPUT_DIR%\libxml2.dll" "%X86%"
 copy "%OUTPUT_DIR%\lua5.1.dll" "%X86%"
 copy "%OUTPUT_DIR%\mlogc.exe" "%X86%"
 copy "%OUTPUT_DIR%\ModSecurityIIS.dll" "%X86%"
-copy %OUTPUT_DIR%\pcre.dll "%X86%"
-copy %OUTPUT_DIR%\zlib1.dll "%X86%"
+copy "%OUTPUT_DIR%\pcre.dll" "%X86%"
+copy "%OUTPUT_DIR%\zlib1.dll" "%X86%"
+copy "%OUTPUT_DIR%\yajl.dll" "%X86%"
 
 
 :: copy %OUTPUT_DIR%\Installer.exe %RELEASE_DIR%
