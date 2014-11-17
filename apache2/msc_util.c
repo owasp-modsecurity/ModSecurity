@@ -2673,6 +2673,11 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
 
     if (curl) {
         struct curl_slist *headers_chunk = NULL;
+#ifdef WIN32
+        char *buf = malloc(sizeof(TCHAR) * (2048 + 1));
+        char *ptr = NULL;
+        DWORD res_len;
+#endif
         curl_easy_setopt(curl, CURLOPT_URL, uri);
 
         headers_chunk = curl_slist_append(headers_chunk, apr_id);
@@ -2687,7 +2692,15 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
         /* Make it TLS 1.x only. */
         curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
 
-        /* those are the default options, but lets make sure */
+#ifdef WIN32
+        res_len = SearchPathA(NULL, "curl-ca-bundle.crt", NULL, (2048 + 1), buf, &ptr);
+        if (res_len > 0) {
+            curl_easy_setopt(curl, CURLOPT_CAINFO, strdup(buf));
+        }
+        free(buf);
+#endif
+
+        /* thoseeare the default options, but lets make sure */
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 1);
 
@@ -2700,8 +2713,20 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
 
         if (res != CURLE_OK)
         {
-            *error_msg = apr_psprintf(mp, "Failed to fetch \"%s\" error: %s ", uri, curl_easy_strerror(res));
-            return -1;
+            if (remote_rules_fail_action == REMOTE_RULES_WARN_ON_FAIL)
+            {
+                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+                    "Failed to fetch \"%s\" error: %s ",
+                    uri, curl_easy_strerror(res));
+                return 0;
+            }
+            else
+            {
+                *error_msg = apr_psprintf(mp, "Failed to fetch \"%s\" " \
+                    "error: %s ", uri,
+                    curl_easy_strerror(res));
+                return -1;
+            }
         }
 
         curl_easy_cleanup(curl);

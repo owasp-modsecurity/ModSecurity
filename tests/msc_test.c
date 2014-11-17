@@ -78,6 +78,7 @@ msc_engine *modsecurity = NULL;
 unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
 unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 char DSOLOCAL *real_server_signature = NULL;
+int DSOLOCAL remote_rules_fail_action = REMOTE_RULES_ABORT_ON_FAIL;
 
 /* Stubs */
 char *format_error_log_message(apr_pool_t *mp, error_message_t *em) {

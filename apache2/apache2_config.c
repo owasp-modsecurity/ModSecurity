@@ -2217,7 +2217,6 @@ static const char *cmd_remote_rules_fail(cmd_parms *cmd, void *_dcfg, const char
 {
     directory_config *dcfg = (directory_config *)_dcfg;
     if (dcfg == NULL) return NULL;
-#ifdef WITH_REMOTE_RULES_SUPPORT
     if (strncasecmp(p1, "warn", 4) == 0)
     {
         remote_rules_fail_action = REMOTE_RULES_WARN_ON_FAIL;
@@ -2231,10 +2230,6 @@ static const char *cmd_remote_rules_fail(cmd_parms *cmd, void *_dcfg, const char
         return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for " \
                 "SecRemoteRulesFailAction, expected: Abort or Warn.");
     }
-#else
-    return apr_psprintf(cmd->pool, "ModSecurity: " \
-        "SecRemoteRules: ModSecurity was not compiled with such functionality.");
-#endif
 
     return NULL;
 }

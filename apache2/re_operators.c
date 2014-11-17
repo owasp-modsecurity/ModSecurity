@@ -12,6 +12,7 @@
 * directly using the email address security@modsecurity.org.
 */
 
+#include "modsecurity.h"
 #include "re.h"
 #include "msc_pcre.h"
 #include "msc_geo.h"
@@ -1307,6 +1308,11 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
 
             if (curl) {
                 struct curl_slist *headers_chunk = NULL;
+#ifdef WIN32
+                char *buf = malloc(sizeof(TCHAR) * (2048 + 1));
+                char *ptr = NULL;
+                DWORD res_len;
+#endif
                 curl_easy_setopt(curl, CURLOPT_URL, fn);
 
                 headers_chunk = curl_slist_append(headers_chunk, apr_id);
@@ -1321,6 +1327,14 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
                 /* Make it TLS 1.x only. */
                 curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
 
+#ifdef WIN32
+                res_len = SearchPathA(NULL, "curl-ca-bundle.crt", NULL, (2048 + 1), buf, &ptr);
+                if (res_len > 0) {
+                    curl_easy_setopt(curl, CURLOPT_CAINFO, strdup(buf));
+                }
+                free(buf);
+#endif
+
                 /* those are the default options, but lets make sure */
                 curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
                 curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 1);
@@ -1333,7 +1347,22 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
                 res = curl_easy_perform(curl);
 
                 if (res != CURLE_OK)
-                    fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+                {
+                    if (remote_rules_fail_action == REMOTE_RULES_WARN_ON_FAIL)
+                    {
+                        ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
+                            "Failed to fetch \"%s\" error: %s ", fn,
+                            curl_easy_strerror(res));
+                        return 1;
+                    }
+                    else
+                    {
+                        *error_msg = apr_psprintf(rule->ruleset->mp,
+                            "Failed to fetch \"%s\" error: %s ", fn,
+                            curl_easy_strerror(res));
+                        return 0;
+                    }
+                }
 
                 curl_easy_cleanup(curl);
                 curl_slist_free_all(headers_chunk);

@@ -148,8 +148,8 @@ extern DSOLOCAL unsigned long int msc_pcre_match_limit_recursion;
 
 #ifdef WITH_REMOTE_RULES_SUPPORT
 extern DSOLOCAL msc_remote_rules_server *remote_rules_server;
-extern DSOLOCAL int remote_rules_fail_action;
 #endif
+extern DSOLOCAL int remote_rules_fail_action;
 
 extern DSOLOCAL int status_engine_state;
 

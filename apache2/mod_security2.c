@@ -70,8 +70,8 @@ unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
 #ifdef WITH_REMOTE_RULES_SUPPORT
 msc_remote_rules_server DSOLOCAL *remote_rules_server = NULL;
-int DSOLOCAL remote_rules_fail_action = REMOTE_RULES_ABORT_ON_FAIL;
 #endif
+int DSOLOCAL remote_rules_fail_action = REMOTE_RULES_ABORT_ON_FAIL;
 
 int DSOLOCAL status_engine_state = STATUS_ENGINE_DISABLED;
 

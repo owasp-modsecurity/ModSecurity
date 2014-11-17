@@ -13,7 +13,7 @@ echo "Cd..."
 :: copy /y CMakeLists.txt "curl"
 CD "curl"
 echo "Cmake..."
-CMAKE   -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True -DCURL_ZLIB=True
+CMAKE   -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True -DCURL_ZLIB=True -DUSE_SSLEAY=dll -DUSE_OPENSSL=dll -DOPENSSL_ROOT_DIR=%WORK_DIR%/openssl_inst
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed
 :: "%WORK_DIR%\fart.exe" -r -C "%WORK_DIR%\curl\include\curl\curlbuild.h" LLU ULL
 NMAKE

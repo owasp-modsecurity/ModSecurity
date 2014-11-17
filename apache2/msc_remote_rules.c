@@ -274,6 +274,11 @@ int msc_remote_grab_content(apr_pool_t *mp, const char *uri, const char *key,
     if (curl)
     {
         struct curl_slist *headers_chunk = NULL;
+#ifdef WIN32
+        char *buf = malloc(sizeof(TCHAR) * (2048 + 1));
+        char *ptr = NULL;
+        DWORD res_len;
+#endif
         curl_easy_setopt(curl, CURLOPT_URL, remote_rules_server->uri);
 
         headers_chunk = curl_slist_append(headers_chunk, apr_id);
@@ -285,6 +290,14 @@ int msc_remote_grab_content(apr_pool_t *mp, const char *uri, const char *key,
 
         /* Make it TLS 1.x only. */
         curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
+
+#ifdef WIN32
+        res_len = SearchPathA(NULL, "curl-ca-bundle.crt", NULL, (2048 + 1), buf, &ptr);
+        if (res_len > 0) {
+            curl_easy_setopt(curl, CURLOPT_CAINFO, strdup(buf));
+        }
+        free(buf);
+#endif
 
         /* those are the default options, but lets make sure */
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
