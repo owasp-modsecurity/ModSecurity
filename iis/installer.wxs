@@ -86,6 +86,16 @@
             <DirectorySearch Id="CheckFileDir19" Path="C:\Windows\System32\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile19" Name="fuzzy.dll" />
             </DirectorySearch>
+            <DirectorySearch Id="CheckFileDir20" Path="C:\Windows\System32\inetsrv" Depth="0">
+                <FileSearch Id="CheckFile20" Name="libeay32.dll" />
+            </DirectorySearch>
+            <DirectorySearch Id="CheckFileDir21" Path="C:\Windows\System32\inetsrv" Depth="0">
+                <FileSearch Id="CheckFile21" Name="ssleay32.dll" />
+            </DirectorySearch>
+            <DirectorySearch Id="CheckFileDir22" Path="C:\Windows\System32\inetsrv" Depth="0">
+                <FileSearch Id="CheckFile22" Name="curl-ca-bundle.crt" />
+            </DirectorySearch>
+ 
         </Property>
         <Property Id="WWWROOT">
             <RegistrySearch Id="FindInetPubFolder" Root="HKLM" Key="SOFTWARE\Microsoft\InetStp" Name="PathWWWRoot" Type="directory" />
@@ -326,9 +336,9 @@
                         <Shortcut Id="EULA" Name="EULA" Description="EULA" Target="[INSTALLFOLDER]EULA.rtf" WorkingDirectory="INSTALLFOLDER" />
                         <Shortcut Id="Readme" Name="EULA" Description="EULA" Target="[INSTALLFOLDER]README.TXT" WorkingDirectory="INSTALLFOLDER" />
                         <?if $(var.Win64) = "yes" ?>
-                        <Shortcut Id="List_Dependencies" Name="List Dependencies (Debug)" Description="Check for missing dependencies" Target="[INSTALLFOLDER]list_dependencies.bat" Arguments="&quot;[inetsrv64]libapr-1.dll&quot; &quot;[inetsrv64]libapriconv-1.dll&quot; &quot;[inetsrv64]libaprutil-1.dll&quot; &quot;[inetsrv64]libcurl.dll&quot; &quot;[inetsrv64]libxml2.dll&quot; &quot;[inetsrv64]lua5.1.dll&quot; &quot;[inetsrv64]mlogc.exe&quot; &quot;[inetsrv64]ModSecurityIIS.dll&quot; &quot;[inetsrv64]pcre.dll&quot; &quot;[inetsrv64]zlib1.dll&quot; &quot;[inetsrv64]fuzzy.dll&quot; &quot;[inetsrv32]libapr-1.dll&quot; &quot;[inetsrv32]libapriconv-1.dll&quot; &quot;[inetsrv32]libaprutil-1.dll&quot; &quot;[inetsrv32]libcurl.dll&quot; &quot;[inetsrv32]libxml2.dll&quot; &quot;[inetsrv32]lua5.1.dll&quot; &quot;[inetsrv32]mlogc.exe&quot; &quot;[inetsrv32]ModSecurityIIS.dll&quot; &quot;[inetsrv32]pcre.dll&quot; &quot;[inetsrv32]zlib1.dll&quot;  &quot;[inetsrv32]fuzzy.dll&quot;" WorkingDirectory="INSTALLFOLDER" />
+                        <Shortcut Id="List_Dependencies" Name="List Dependencies (Debug)" Description="Check for missing dependencies" Target="[INSTALLFOLDER]list_dependencies.bat" Arguments="&quot;[inetsrv64]libapr-1.dll&quot; &quot;[inetsrv64]libapriconv-1.dll&quot; &quot;[inetsrv64]libaprutil-1.dll&quot; &quot;[inetsrv64]libcurl.dll&quot; &quot;[inetsrv64]libxml2.dll&quot; &quot;[inetsrv64]lua5.1.dll&quot; &quot;[inetsrv64]mlogc.exe&quot; &quot;[inetsrv64]ModSecurityIIS.dll&quot; &quot;[inetsrv64]pcre.dll&quot; &quot;[inetsrv64]zlib1.dll&quot; &quot;[inetsrv64]fuzzy.dll&quot; &quot;[inetsrv64]libeay32.dll&quot; &quot;[inetsrv64]ssleay32.dll&quot; &quot;[inetsrv32]libapr-1.dll&quot; &quot;[inetsrv32]libapriconv-1.dll&quot; &quot;[inetsrv32]libaprutil-1.dll&quot; &quot;[inetsrv32]libcurl.dll&quot; &quot;[inetsrv32]libxml2.dll&quot; &quot;[inetsrv32]lua5.1.dll&quot; &quot;[inetsrv32]mlogc.exe&quot; &quot;[inetsrv32]ModSecurityIIS.dll&quot; &quot;[inetsrv32]pcre.dll&quot; &quot;[inetsrv32]zlib1.dll&quot;  &quot;[inetsrv32]fuzzy.dll&quot; &quot;[inetsrv32]libeay32.dll&quot; &quot;[inetsrv32]ssleay32.dll&quot;" WorkingDirectory="INSTALLFOLDER" />
                         <?else ?>
-                        <Shortcut Id="List_Dependencies" Name="List Dependencies (Debug)" Description="Check for missing dependencies" Target="[INSTALLFOLDER]list_dependencies.bat" Arguments="&quot;[inetsrv32]libapr-1.dll&quot; &quot;[inetsrv32]libapriconv-1.dll&quot; &quot;[inetsrv32]libaprutil-1.dll&quot; &quot;[inetsrv32]libcurl.dll&quot; &quot;[inetsrv32]libxml2.dll&quot; &quot;[inetsrv32]lua5.1.dll&quot; &quot;[inetsrv32]mlogc.exe&quot; &quot;[inetsrv32]ModSecurityIIS.dll&quot; &quot;[inetsrv32]pcre.dll&quot; &quot;[inetsrv32]zlib1.dll&quot; &quot;[inetsrv32]fuzzy.dll&quot;" WorkingDirectory="INSTALLFOLDER" />
+                        <Shortcut Id="List_Dependencies" Name="List Dependencies (Debug)" Description="Check for missing dependencies" Target="[INSTALLFOLDER]list_dependencies.bat" Arguments="&quot;[inetsrv32]libapr-1.dll&quot; &quot;[inetsrv32]libapriconv-1.dll&quot; &quot;[inetsrv32]libaprutil-1.dll&quot; &quot;[inetsrv32]libcurl.dll&quot; &quot;[inetsrv32]libxml2.dll&quot; &quot;[inetsrv32]lua5.1.dll&quot; &quot;[inetsrv32]mlogc.exe&quot; &quot;[inetsrv32]ModSecurityIIS.dll&quot; &quot;[inetsrv32]pcre.dll&quot; &quot;[inetsrv32]zlib1.dll&quot; &quot;[inetsrv32]fuzzy.dll&quot; &quot;[inetsrv32]libeay32.dll&quot; &quot;[inetsrv32]ssleay32.dll&quot;" WorkingDirectory="INSTALLFOLDER" />
                         <?endif ?>
                     </Component>
                 </Directory>
@@ -370,6 +380,9 @@
                 <File Id="_64_PCRE" Name="pcre.dll" Source="Release\amd64\pcre.dll" />
                 <File Id="_64_ZLIB1" Name="zlib1.dll" Source="Release\amd64\zlib1.dll" />
                 <File Id="_64_FUZZY" Name="fuzzy.dll" Source="Release\amd64\fuzzy.dll" />
+                <File Id="_64_LIBEAY" Name="libeay32.dll" Source="Release\amd64\libeay32.dll" />
+                <File Id="_64_SSLEAY" Name="ssleay32.dll" Source="Release\amd64\ssleay32.dll" />
+		<File Id="_64_CA_BUNDLE" Name="curl-ca-bundle.crt" Source="curl-ca-bundle.crt" />
             </Component>
         </DirectoryRef>
         <DirectoryRef Id="inetsrv32">
@@ -386,6 +399,9 @@
                 <File Id="_32_PCRE" Name="pcre.dll" Source="Release\x86\pcre.dll" />
                 <File Id="_32_ZLIB1" Name="zlib1.dll" Source="Release\x86\zlib1.dll" />
                 <File Id="_32_FUZZY" Name="fuzzy.dll" Source="Release\x86\fuzzy.dll" />
+                <File Id="_32_LIBEAY" Name="libeay32.dll" Source="Release\x86\libeay32.dll" />
+                <File Id="_32_SSLEAY" Name="ssleay32.dll" Source="Release\x86\ssleay32.dll" />
+		<File Id="_32_CA_BUNDLE" Name="curl-ca-bundle.crt" Source="curl-ca-bundle.crt" />
             </Component>
         </DirectoryRef>
         <DirectoryRef Id="SystemFolderConfigSchema32">
@@ -413,6 +429,9 @@
                 <File Id="_32_PCRE" Name="pcre.dll" Source="Release\x86\pcre.dll" />
                 <File Id="_32_ZLIB1" Name="zlib1.dll" Source="Release\x86\zlib1.dll" />
                 <File Id="_32_FUZZY" Name="fuzzy.dll" Source="Release\x86\fuzzy.dll" />
+                <File Id="_32_LIBEAY" Name="libeay32.dll" Source="Release\x86\libeay32.dll" />
+                <File Id="_32_SSLEAY" Name="ssleay32.dll" Source="Release\x86\ssleay32.dll" />
+		<File Id="_32_CA_BUNDLE" Name="curl-ca-bundle.crt" Source="curl-ca-bundle.crt" />
             </Component>
         </DirectoryRef>
         <DirectoryRef Id="SystemFolderConfigSchema32">

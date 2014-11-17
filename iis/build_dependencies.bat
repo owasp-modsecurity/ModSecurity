@@ -20,6 +20,7 @@
 @set YAJL=lloyd-yajl-f4b2b1a.zip
 @set SSDEEP=ssdeep-2.10.tar.gz
 @set SSDEEP_BIN=ssdeep-2.10.zip
+@set OPENSSL=openssl-1.0.1j.tar.gz
 
 :: @set VCARGS32="C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"
 :: @set VCARGS64="C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat"
@@ -68,6 +69,11 @@ call cl 2>&1 | findstr /C:"x64"
 @echo # lua - %LUA%
 @call dependencies/build_lua.bat
 @if NOT (%ERRORLEVEL%) == (0) goto build_failed_lua
+@cd "%CURRENT_DIR%"
+
+@echo # openssl - %OPENSSL%
+@call dependencies/build_openssl.bat
+@if NOT (%ERRORLEVEL%) == (0) goto build_failed_openssl
 @cd "%CURRENT_DIR%"
 
 @echo # curl - %CURL%
@@ -119,6 +125,10 @@ call cl 2>&1 | findstr /C:"x64"
 
 :build_failed_curl
 @echo Failed to setup %CURL%...
+@goto failed
+
+:build_failed_openssl
+@echo Failed to setup %OPENSSL%...
 @goto failed
 
 :build_failed_yajl
