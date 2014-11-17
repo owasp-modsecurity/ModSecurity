@@ -10,12 +10,12 @@
 LIBS = $(APACHE)\lib\libapr-1.lib \
        $(APACHE)\lib\libaprutil-1.lib \
        $(PCRE)\pcre.lib \
-       $(SSDEEP)\fuzzy.lib \
        $(CURL)\lib\libcurl_imp.lib \
        $(LIBXML2)\win32\bin.msvc\libxml2.lib \
        "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" \
        "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib" "ws2_32.lib" \
        "iphlpapi.lib"
+#       $(SSDEEP)\fuzzy.lib \
 ###########################################################################
 ###########################################################################
 
@@ -30,7 +30,6 @@ DLL = ModSecurityIIS.dll
 
 INCLUDES = -I. -I.. \
 	   -I$(YAJL)\.. \
-	   -I$(SSDEEP) \
            -I$(PCRE)\include -I$(PCRE) \
            -I$(LIBXML2)\include \
            -I$(CURL)\include -I$(CURL) \
@@ -38,6 +37,8 @@ INCLUDES = -I. -I.. \
            -I..\apache2 \
            -I..\standalone
 
+
+#	   -I$(SSDEEP) \
 # Lua is optional
 !IF "$(LUA)" != ""
 LIBS = $(LIBS) $(LUA)\lua5.1.lib
@@ -53,11 +54,11 @@ INCLUDES = $(INCLUDES) -I$(YAJL)\include -I$(YAJL) \
 !ENDIF
 
 # ssdeep is optional
-!IF "$(SSDEEP)" != ""
-LIBS = $(LIBS) $(SSDEEP)\fuzzy.lib
-DEFS=$(DEFS) -DWITH_SSDEEP
-INCLUDES = $(INCLUDES) -I$(SSDEEP)\include -I$(SSDEEP) \
-!ENDIF
+# !IF "$(SSDEEP)" != ""
+# LIBS = $(LIBS) $(SSDEEP)\fuzzy.lib
+# DEFS=$(DEFS) -DWITH_SSDEEP
+# INCLUDES = $(INCLUDES) -I$(SSDEEP)\include -I$(SSDEEP) \
+# !ENDIF
 
 
 
