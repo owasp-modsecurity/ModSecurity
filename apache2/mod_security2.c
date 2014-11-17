@@ -774,7 +774,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
             else
             {
                 ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-                    "ModSecurity: Loaded %d rule from: '%s'.",
+                    "ModSecurity: Loaded %d rules from: '%s'.",
                     remote_rules_server->amount_of_rules,
                     remote_rules_server->uri);
             }
