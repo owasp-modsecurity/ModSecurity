@@ -2621,7 +2621,6 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
     int line = 0;
     apr_file_t *fd;
     char *start;
-    char *end;
     char buf[HUGE_STRING_LEN + 1]; // FIXME: 2013-10-29 zimmerle: dynamic?
     char errstr[1024];             //
 
@@ -2752,7 +2751,7 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
             }
 
             *error_msg = apr_psprintf(mp, "Invalid char \"%c\" in line %d " \
-                "of uri %s", *end, line, uri);
+                "of uri %s", word[i], line, uri);
             return -1;
         }
 
