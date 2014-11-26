@@ -1,3 +1,9 @@
+DD mmm YYYY - 2.9.????? (To be released)
+-----------------------
+
+ * Curl is not a mandatory dependency to ModSecurity core anymore.
+   [Rainer Jung and ModSecurity team]
+
 18 Nov 2014 - 2.9.0-RC1
 -----------------------
 

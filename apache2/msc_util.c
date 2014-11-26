@@ -26,7 +26,11 @@
 #include <apr_sha1.h>
 #include "modsecurity_config.h"
 
+#include "msc_remote_rules.h"
+
+#ifdef WITH_CURL
 #include "curl/curl.h"
+#endif
 
 /**
  * NOTE: Be careful as these can ONLY be used on static values for X.
@@ -2613,6 +2617,7 @@ int ip_tree_from_file(TreeRoot **rtree, char *uri,
     return 0;
 }
 
+#ifdef WITH_CURL
 int ip_tree_from_uri(TreeRoot **rtree, char *uri,
     apr_pool_t *mp, char **error_msg)
 {
@@ -2621,117 +2626,23 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
     int line = 0;
     apr_file_t *fd;
     char *start;
-    char buf[HUGE_STRING_LEN + 1]; // FIXME: 2013-10-29 zimmerle: dynamic?
-    char errstr[1024];             //
+    int res;
 
-    CURL *curl;
-    CURLcode res;
-
-    char id[(APR_SHA1_DIGESTSIZE*2) + 1];
-    char *apr_id = NULL;
-    char *beacon_str = NULL;
-    int beacon_str_len = 0;
-    char *beacon_apr = NULL;
     struct msc_curl_memory_buffer_t chunk;
     char *word = NULL;
     char *brkt = NULL;
     char *sep = "\n";
-
-    chunk.memory = malloc(1);  /* will be grown as needed by the realloc above */
-    chunk.size = 0;    /* no data at this point */
-
 
     if (create_radix_tree(mp, rtree, error_msg))
     {
         return -1;
     }
 
-    /* Retrieve the beacon string */
-    beacon_str_len = msc_beacon_string(NULL, 0);
-
-    beacon_str = malloc(sizeof(char) * beacon_str_len + 1);
-    if (beacon_str == NULL) {
-        beacon_str = "Failed to retrieve beacon string";
-        beacon_apr = apr_psprintf(mp, "ModSec-status: %s", beacon_str);
-    }
-    else
+    res = msc_remote_download_content(mp, uri, NULL, &chunk, error_msg);
+    if (res)
     {
-        msc_beacon_string(beacon_str, beacon_str_len);
-        beacon_apr = apr_psprintf(mp, "ModSec-status: %s", beacon_str);
-        free(beacon_str);
+        return res;
     }
-
-    memset(id, '\0', sizeof(id));
-    if (msc_status_engine_unique_id(id)) {
-      sprintf(id, "no unique id");
-    }
-
-    apr_id = apr_psprintf(mp, "ModSec-unique-id: %s", id);
-    curl_global_init(CURL_GLOBAL_ALL);
-    curl = curl_easy_init();
-
-    if (curl) {
-        struct curl_slist *headers_chunk = NULL;
-#ifdef WIN32
-        char *buf = malloc(sizeof(TCHAR) * (2048 + 1));
-        char *ptr = NULL;
-        DWORD res_len;
-#endif
-        curl_easy_setopt(curl, CURLOPT_URL, uri);
-
-        headers_chunk = curl_slist_append(headers_chunk, apr_id);
-        headers_chunk = curl_slist_append(headers_chunk, beacon_apr);
-
-        /* send all data to this function  */
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, msc_curl_write_memory_cb);
-
-        /* we pass our 'chunk' struct to the callback function */
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-
-        /* Make it TLS 1.x only. */
-        curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
-
-#ifdef WIN32
-        res_len = SearchPathA(NULL, "curl-ca-bundle.crt", NULL, (2048 + 1), buf, &ptr);
-        if (res_len > 0) {
-            curl_easy_setopt(curl, CURLOPT_CAINFO, strdup(buf));
-        }
-        free(buf);
-#endif
-
-        /* thoseeare the default options, but lets make sure */
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 1);
-
-        /* some servers don't like requests that are made without a user-agent
-           field, so we provide one */
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, "ModSecurity");
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers_chunk);
-
-        res = curl_easy_perform(curl);
-
-        if (res != CURLE_OK)
-        {
-            if (remote_rules_fail_action == REMOTE_RULES_WARN_ON_FAIL)
-            {
-                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-                    "Failed to fetch \"%s\" error: %s ",
-                    uri, curl_easy_strerror(res));
-                return 0;
-            }
-            else
-            {
-                *error_msg = apr_psprintf(mp, "Failed to fetch \"%s\" " \
-                    "error: %s ", uri,
-                    curl_easy_strerror(res));
-                return -1;
-            }
-        }
-
-        curl_easy_cleanup(curl);
-        curl_slist_free_all(headers_chunk);
-    }
-    curl_global_cleanup();
 
     for (word = strtok_r(chunk.memory, sep, &brkt);
          word;
@@ -2774,9 +2685,12 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
         }
 
     }
+
+    msc_remote_clean_chunk(&chunk);
+
     return 0;
 }
-
+#endif
 
 int tree_contains_ip(apr_pool_t *mp, TreeRoot *rtree,
     const char *value, modsec_rec *msr, char **error_msg)
@@ -2859,34 +2773,36 @@ int ip_tree_from_param(apr_pool_t *mp,
     return 0;
 }
 
+#ifdef WITH_CURL
 size_t msc_curl_write_memory_cb(void *contents, size_t size,
         size_t nmemb, void *userp)
 {
-  size_t realsize = size * nmemb;
-  struct msc_curl_memory_buffer_t *mem = (struct msc_curl_memory_buffer_t *)userp;
+    size_t realsize = size * nmemb;
+    struct msc_curl_memory_buffer_t *mem = (struct msc_curl_memory_buffer_t *)userp;
 
-  if (mem->size == 0)
-  {
-      mem->memory = malloc(realsize + 1);
-      memset(mem->memory, '\0', sizeof(realsize + 1));
-  }
-  else
-  {
-      mem->memory = realloc(mem->memory, mem->size + realsize + 1);
-      memset(mem->memory + mem->size, '\0', sizeof(realsize + 1));
-  }
+    if (mem->size == 0)
+    {
+        mem->memory = malloc(realsize + 1);
+        memset(mem->memory, '\0', sizeof(realsize + 1));
+    }
+    else
+    {
+        mem->memory = realloc(mem->memory, mem->size + realsize + 1);
+        memset(mem->memory + mem->size, '\0', sizeof(realsize + 1));
+    }
 
-  if(mem->memory == NULL) {
-    /* out of memory! */
-    return 0;
-  }
+    if (mem->memory == NULL) {
+        /* out of memory! */
+        return 0;
+    }
 
-  memcpy(&(mem->memory[mem->size]), contents, realsize);
-  mem->size += realsize;
-  mem->memory[mem->size] = 0;
+    memcpy(&(mem->memory[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->memory[mem->size] = 0;
 
-  return realsize;
+    return realsize;
 }
+#endif
 
 #ifdef WIN32
 char* strtok_r(
@@ -2914,5 +2830,5 @@ char* strtok_r(
     *nextp = str;
     return ret;
 }
-
 #endif
+

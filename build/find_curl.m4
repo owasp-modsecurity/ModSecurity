@@ -70,6 +70,7 @@ if test -n "${curl_path}"; then
 	if test "$curl_tlsv2_ver" -le "$curl_ver"; then
 	    CURL_CFLAGS="${CURL_CFLAGS} -DWITH_CURL_SSLVERSION_TLSv1_2"
 	fi
+	CURL_CFLAGS="${CURL_CFLAGS} -DWITH_CURL"
     else
         AC_MSG_RESULT([no, $CURL_VERSION])
         AC_MSG_NOTICE([NOTE: curl library may be too old])

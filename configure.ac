@@ -702,7 +702,27 @@ CHECK_CURL()
 CHECK_YAJL()
 #AC_SEARCH_LIBS([yajl_alloc], [yajl])
 CHECK_SSDEEP()
-AC_SEARCH_LIBS([fuzzy_hash_buf], [fuzzy])
+#AC_SEARCH_LIBS([fuzzy_hash_buf], [fuzzy])
+
+CFLAGS="$CFLAGS $APU_CFLAGS"
+AC_TRY_COMPILE(
+	[#include <apr_crypto.h>],
+	[
+          #if APU_HAVE_CRYPTO == 0
+          #error APR util was not compiled with crypto support.
+          #endif
+	],
+	[ AC_DEFINE([WITH_APU_CRYPTO], [1], [APR util was compiled with crypto support])
+	  MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS -DWITH_APU_CRYPTO"
+	],
+	[ AC_MSG_WARN([APR util was not compiled with crypto support. SecRemoteRule will not support the parameter 'crypto']) ]
+)
+
+# Current our unique download backend is curl, furhter we can support more.
+if test ! -z "${CURL_VERSION}"; then
+  AC_DEFINE([WITH_REMOTE_RULES], [1], [Enables SecRemoteRules support])
+  MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS -DWITH_REMOTE_RULES"
+fi
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([tools/Makefile])

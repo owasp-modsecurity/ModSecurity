@@ -2239,7 +2239,7 @@ static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
 {
     char *error_msg = NULL;
     directory_config *dcfg = (directory_config *)_dcfg;
-#ifdef WITH_REMOTE_RULES_SUPPORT
+#ifdef WITH_REMOTE_RULES
     int crypto = 0;
     const char *uri = p2;
     const char *key = p1;
@@ -2247,12 +2247,18 @@ static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
 
     if (dcfg == NULL) return NULL;
 
-#ifdef WITH_REMOTE_RULES_SUPPORT
+#ifdef WITH_REMOTE_RULES
     if (strncasecmp(p1, "crypto", 6) == 0)
     {
+#ifdef WITH_APU_CRYPTO
         uri = p3;
         key = p2;
         crypto = 1;
+#else
+        return apr_psprintf(cmd->pool, "ModSecurity: SecRemoteRule using " \
+                "`crypto' but ModSecurity was not compiled with crypto " \
+                "support.");
+#endif
     }
 
     if (uri == NULL || key == NULL)
@@ -2269,14 +2275,14 @@ static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
     // FIXME: Should we handle more then one server at once?
     if (remote_rules_server != NULL)
     {
-        return apr_psprintf(cmd->pool, "ModSecurity:  " \
+        return apr_psprintf(cmd->pool, "ModSecurity: " \
                 "SecRemoteRules cannot be used more than once.");
     }
 
     remote_rules_server = apr_pcalloc(cmd->pool, sizeof(msc_remote_rules_server));
     if (remote_rules_server == NULL)
     {
-        return apr_psprintf(cmd->pool, "ModSecurity:  " \
+        return apr_psprintf(cmd->pool, "ModSecurity: " \
                 "SecRemoteRules: Internal failure. Not enougth memory.");
     }
 
@@ -2293,8 +2299,8 @@ static const char *cmd_remote_rules(cmd_parms *cmd, void *_dcfg, const char *p1,
         return error_msg;
     }
 #else
-    return apr_psprintf(cmd->pool, "ModSecurity:  " \
-        "SecRemoteRules: ModSecurity was not compiled with such functionality.");
+    return apr_psprintf(cmd->pool, "ModSecurity: SecRemoteRules: " \
+            "ModSecurity was not compiled with SecRemoteRules support.");
 #endif
 
     return NULL;

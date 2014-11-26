@@ -68,7 +68,7 @@ unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
 
 unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 
-#ifdef WITH_REMOTE_RULES_SUPPORT
+#ifdef WITH_REMOTE_RULES
 msc_remote_rules_server DSOLOCAL *remote_rules_server = NULL;
 #endif
 int DSOLOCAL remote_rules_fail_action = REMOTE_RULES_ABORT_ON_FAIL;
@@ -761,7 +761,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
         }
 #endif
 
-#ifdef WITH_REMOTE_RULES_SUPPORT
+#ifdef WITH_REMOTE_RULES
         if (remote_rules_server != NULL)
         {
             if (remote_rules_server->amount_of_rules == 1)
