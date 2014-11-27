@@ -266,8 +266,12 @@ static int msre_op_ipmatchFromFile_execute(modsec_rec *msr, msre_rule *rule,
     else
         *error_msg = NULL;
 
-    if(rtree == NULL) {
-        msr_log(msr, 1, "ipMatchFromFile Internal Error: tree value is null.");
+    if (rtree == NULL)
+    {
+        if (msr->txcfg->debuglog_level >= 4)
+        {
+            msr_log(msr, 1, "ipMatchFromFile: tree value is null.");
+        }
         return 0;
     }
 
@@ -1387,6 +1391,16 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
     /* Are we supposed to capture subexpressions? */
     capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
+
+    if (rule->op_param_data == NULL)
+    {
+        if (msr->txcfg->debuglog_level >= 4)
+        {
+            msr_log(msr, 1, "ACMPTree is null.");
+        }
+
+        return 0;
+    }
 
     pt.parser = (ACMP *)rule->op_param_data;
     pt.ptr = NULL;

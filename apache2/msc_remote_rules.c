@@ -247,6 +247,7 @@ int msc_remote_download_content(apr_pool_t *mp, const char *uri, const char *key
     char *beacon_str = NULL;
     char *beacon_apr = NULL;
     int beacon_str_len = 0;
+    int ret = 0;
 
     chunk->size = 0;
 
@@ -315,10 +316,11 @@ int msc_remote_download_content(apr_pool_t *mp, const char *uri, const char *key
         /* we pass our 'chunk' struct to the callback function */
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)chunk);
 
-        /* some servers don't like requests that are made without a user-agent
-           field, so we provide one */
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "modesecurity");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers_chunk);
+
+        /* We want Curl to return error in case there is an HTTP error code */
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 
         res = curl_easy_perform(curl);
 
@@ -330,7 +332,8 @@ int msc_remote_download_content(apr_pool_t *mp, const char *uri, const char *key
                          "Failed to download \"%s\" error: %s ",
                          uri, curl_easy_strerror(res));
 
-                 return -2;
+                 ret = -2;
+                 goto failed;
             }
             else
             {
@@ -338,16 +341,18 @@ int msc_remote_download_content(apr_pool_t *mp, const char *uri, const char *key
                     "error: %s ",
                     uri, curl_easy_strerror(res));
 
-                return -1;
+                ret = -1;
+                goto failed;
             }
         }
 
         curl_slist_free_all(headers_chunk);
     }
 
+failed:
     curl_easy_cleanup(curl);
 
-    return 0;
+    return ret;
 #else
     return -3;
 #endif
