@@ -1,6 +1,11 @@
 DD mmm YYYY - 2.9.????? (To be released)
 -----------------------
 
+ * Adds missing 'ModSecurity:' prefix in some warnings messages.
+   [Walter Hop and ModSecurity team]
+ * Refactoring external resources download warn messages. Holding the message
+   to be displayed when Apache is ready to write on the error_log.
+   [ModSecurity team]
  * Remote resources loading process is now failing in case of HTTP error.
    [Walter Hop and ModSecurity team]
  * Fixed start up crash on Apache with mod_ssl configured. Crash was happening

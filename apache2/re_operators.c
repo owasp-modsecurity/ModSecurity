@@ -268,7 +268,7 @@ static int msre_op_ipmatchFromFile_execute(modsec_rec *msr, msre_rule *rule,
 
     if (rtree == NULL)
     {
-        if (msr->txcfg->debuglog_level >= 4)
+        if (msr->txcfg->debuglog_level >= 6)
         {
             msr_log(msr, 1, "ipMatchFromFile: tree value is null.");
         }
@@ -1394,7 +1394,7 @@ static int msre_op_pm_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
     if (rule->op_param_data == NULL)
     {
-        if (msr->txcfg->debuglog_level >= 4)
+        if (msr->txcfg->debuglog_level >= 6)
         {
             msr_log(msr, 1, "ACMPTree is null.");
         }

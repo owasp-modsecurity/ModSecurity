@@ -328,16 +328,22 @@ int msc_remote_download_content(apr_pool_t *mp, const char *uri, const char *key
         {
             if (remote_rules_fail_action == REMOTE_RULES_WARN_ON_FAIL)
             {
-                 ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-                         "Failed to download \"%s\" error: %s ",
-                         uri, curl_easy_strerror(res));
+                if (remote_rules_fail_message == NULL)
+                {
+                    remote_rules_fail_message = "";
+                }
 
-                 ret = -2;
-                 goto failed;
+                remote_rules_fail_message = apr_psprintf(mp, "%sFailed to " \
+                            "download: \"%s\" error: %s. ",
+                            remote_rules_fail_message, uri,
+                            curl_easy_strerror(res));
+
+                ret = -2;
+                goto failed;
             }
             else
             {
-                *error_msg = apr_psprintf(mp, "Failed to download \"%s\" " \
+                *error_msg = apr_psprintf(mp, "Failed to download: \"%s\" " \
                     "error: %s ",
                     uri, curl_easy_strerror(res));
 
@@ -581,6 +587,11 @@ int msc_remote_decrypt(apr_pool_t *pool,
     }
 
     apr_crypto_block_cleanup(block);
+    apr_crypto_cleanup(f);
+
+    // Shutdown the apr_crypto seems to be the correct thing to do.
+    // However it seems to add instability especially if mod_ssl is enabled.
+    // apr_crypto_shutdown(driver);
 
     return 0;
 }
@@ -611,7 +622,7 @@ int msc_remote_add_rules_from_uri(cmd_parms *orig_parms,
 {
 
 #ifdef WITH_REMOTE_RULES
-    struct msc_curl_memory_buffer_t chunk_encrypted;
+    struct msc_curl_memory_buffer_t downloaded_content;
     unsigned char *plain_text = NULL;
     int len = 0;
     int start = 0;
@@ -622,11 +633,11 @@ int msc_remote_add_rules_from_uri(cmd_parms *orig_parms,
 
     apr_pool_t *mp = orig_parms->pool;
 
-    chunk_encrypted.size = 0;
-    chunk_encrypted.memory = NULL;
+    downloaded_content.size = 0;
+    downloaded_content.memory = NULL;
 
     res = msc_remote_download_content(mp, remote_rules_server->uri,
-            remote_rules_server->key, &chunk_encrypted, error_msg);
+            remote_rules_server->key, &downloaded_content, error_msg);
     if (*error_msg != NULL)
     {
         return -1;
@@ -642,26 +653,26 @@ int msc_remote_add_rules_from_uri(cmd_parms *orig_parms,
     if (remote_rules_server->crypto == 1)
     {
 #ifdef WITH_APU_CRYPTO
-        msc_remote_decrypt(mp, remote_rules_server->key, &chunk_encrypted,
+        msc_remote_decrypt(mp, remote_rules_server->key, &downloaded_content,
             &plain_text,
             &plain_text_len,
             error_msg);
+
         if (*error_msg != NULL)
         {
-            msc_remote_clean_chunk(&chunk_encrypted);
+            msc_remote_clean_chunk(&downloaded_content);
             return -1;
         }
 #else
         *error_msg = "ModSecurity was not compiled with crypto support.\n";
-        msc_remote_clean_chunk(&chunk_encrypted);
+        msc_remote_clean_chunk(&downloaded_content);
         return -1;
 #endif
-
-        msc_remote_clean_chunk(&chunk_encrypted);
+        msc_remote_clean_chunk(&downloaded_content);
     }
     else
     {
-        plain_text = chunk_encrypted.memory;
+        plain_text = downloaded_content.memory;
         plain_text_len = strlen(plain_text);
     }
 
@@ -740,9 +751,9 @@ next:
 
     remote_rules_server->amount_of_rules = added_rules;
 
-    if (remote_rules_server->crypto == 1)
+    if (remote_rules_server->crypto != 1)
     {
-        msc_remote_clean_chunk(&chunk_encrypted);
+        msc_remote_clean_chunk(&downloaded_content);
     }
 #else
     *error_msg = "SecRemoteRules was not enabled during ModSecurity " \

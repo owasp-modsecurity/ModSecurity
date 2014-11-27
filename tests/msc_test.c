@@ -79,6 +79,7 @@ unsigned long int DSOLOCAL msc_pcre_match_limit = 0;
 unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 char DSOLOCAL *real_server_signature = NULL;
 int DSOLOCAL remote_rules_fail_action = REMOTE_RULES_ABORT_ON_FAIL;
+char DSOLOCAL *remote_rules_fail_message = NULL;
 module AP_MODULE_DECLARE_DATA security2_module = {
     NULL,
     NULL,

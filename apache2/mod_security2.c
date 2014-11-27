@@ -72,6 +72,7 @@ unsigned long int DSOLOCAL msc_pcre_match_limit_recursion = 0;
 msc_remote_rules_server DSOLOCAL *remote_rules_server = NULL;
 #endif
 int DSOLOCAL remote_rules_fail_action = REMOTE_RULES_ABORT_ON_FAIL;
+char DSOLOCAL *remote_rules_fail_message = NULL;
 
 int DSOLOCAL status_engine_state = STATUS_ENGINE_DISABLED;
 
@@ -760,6 +761,13 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
                     "SecStatusEngine to On.");
         }
 #endif
+
+        if (remote_rules_fail_message != NULL)
+        {
+            ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL, "ModSecurity: " \
+                    "Problems loading external resources: %s",
+                    remote_rules_fail_message);
+        }
 
 #ifdef WITH_REMOTE_RULES
         if (remote_rules_server != NULL)

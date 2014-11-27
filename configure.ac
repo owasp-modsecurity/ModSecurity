@@ -743,6 +743,9 @@ AC_CONFIG_FILES([build/apxs-wrapper], [chmod +x build/apxs-wrapper])
 if test -e "$PERL"; then
     if test "$build_mlogc" -ne 0; then
         AC_CONFIG_FILES([mlogc/mlogc-batch-load.pl], [chmod +x mlogc/mlogc-batch-load.pl])
+        AC_CONFIG_FILES([tests/regression/misc/40-secRemoteRules.t])
+        AC_CONFIG_FILES([tests/regression/misc/50-ipmatchfromfile-external.t])
+        AC_CONFIG_FILES([tests/regression/misc/60-pmfromfile-external.t])
     fi
     AC_CONFIG_FILES([tests/run-unit-tests.pl], [chmod +x tests/run-unit-tests.pl])
     AC_CONFIG_FILES([tests/run-regression-tests.pl], [chmod +x tests/run-regression-tests.pl])
