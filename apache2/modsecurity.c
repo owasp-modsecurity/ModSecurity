@@ -23,6 +23,10 @@
 #include "msc_xml.h"
 #include "apr_version.h"
 
+#ifdef WITH_CURL
+#include <curl/curl.h>
+#endif
+
 unsigned long int DSOLOCAL unicode_codepage = 0;
 
 int DSOLOCAL *unicode_map_table = NULL;
@@ -118,6 +122,16 @@ msc_engine *modsecurity_create(apr_pool_t *mp, int processing_mode) {
 int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
     apr_status_t rc;
 
+    /**
+     * Notice that curl is initialized here but never cleaned up. First version
+     * of this implementation curl was initialized and cleaned for every
+     * utilization. Turns out that it was not only cleaning stuff that was
+     * utilized by Curl but also other OpenSSL stuff that was utilized by
+     * mod_ssl leading the SSL support to crash.
+     */
+#ifdef WITH_CURL
+    curl_global_init(CURL_GLOBAL_ALL);
+#endif
     /* Serial audit log mutext */
     rc = apr_global_mutex_create(&msce->auditlog_lock, NULL, APR_LOCK_DEFAULT, mp);
     if (rc != APR_SUCCESS) {

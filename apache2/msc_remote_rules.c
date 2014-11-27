@@ -258,7 +258,6 @@ int msc_remote_download_content(apr_pool_t *mp, const char *uri, const char *key
 
     apr_id = apr_psprintf(mp, "ModSec-unique-id: %s", id);
 
-    curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();
 
     beacon_str_len = msc_beacon_string(NULL, 0);
@@ -348,7 +347,6 @@ int msc_remote_download_content(apr_pool_t *mp, const char *uri, const char *key
 
     curl_easy_cleanup(curl);
 
-    curl_global_cleanup();
     return 0;
 #else
     return -3;

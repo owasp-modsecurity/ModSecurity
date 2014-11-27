@@ -1,6 +1,11 @@
 DD mmm YYYY - 2.9.????? (To be released)
 -----------------------
 
+ * Remote resources loading process is now failing in case of HTTP error.
+   [Walter Hop and ModSecurity team]
+ * Fixed start up crash on Apache with mod_ssl configured. Crash was happening
+   during the download of remote resources.
+   [Christian Folini, Walter Hop and ModSecurity team]
  * Curl is not a mandatory dependency to ModSecurity core anymore.
    [Rainer Jung and ModSecurity team]
 
