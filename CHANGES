@@ -1,6 +1,8 @@
 DD mmm YYYY - 2.9.????? (To be released)
 -----------------------
 
+ * Informs about external resources loaded/failed while reloading Apache.
+   [ModSecurity team]
  * Adds missing 'ModSecurity:' prefix in some warnings messages.
    [Walter Hop and ModSecurity team]
  * Refactoring external resources download warn messages. Holding the message

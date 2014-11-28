@@ -762,14 +762,15 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
                     "it by set SecStatusEngine to On.");
         }
 #endif
+    }
 
-        if (remote_rules_fail_message != NULL)
-        {
-            ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL, "ModSecurity: " \
-                    "Problems loading external resources: %s",
-                    remote_rules_fail_message);
-        }
-
+    /**
+     * Checking if it is not the first time that we are in this very function.
+     * We want to show the messages below during the start and the reload.
+     *
+     */
+    if (first_time != 1)
+    {
 #ifdef WITH_REMOTE_RULES
         if (remote_rules_server != NULL)
         {
@@ -789,6 +790,12 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
             }
         }
 #endif
+        if (remote_rules_fail_message != NULL)
+        {
+            ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL, "ModSecurity: " \
+                "Problems loading external resources: %s",
+                remote_rules_fail_message);
+        }
     }
 
     srand((unsigned int)(time(NULL) * getpid()));

@@ -1293,7 +1293,12 @@ static int msre_op_pmFromFile_param_init(msre_rule *rule, char **error_msg) {
 
             res = msc_remote_download_content(rule->ruleset->mp, fn, NULL,
                     &chunk, error_msg);
-            if (res == -1)
+            if (res == -2)
+            {
+                /* If download failed but SecRemoteRulesFailAction is set to Warn. */
+                return 1;
+            }
+            else if (res < 0)
             {
                 return 0;
             }
