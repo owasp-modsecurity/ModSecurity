@@ -37,4 +37,8 @@ static const char msc_status_engine_basis_32[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ2345
 
 int msc_status_engine_call(void);
 
+int DSOLOCAL msc_status_engine_unique_id (unsigned char *digest);
+
+int DSOLOCAL msc_beacon_string (char *beacon_string, int beacon_string_max_len);
+
 #endif
