@@ -3943,7 +3943,7 @@ static int msre_op_fuzzy_hash_execute(modsec_rec *msr, msre_rule *rule,
         if (i >= param->threshold)
         {
             *error_msg = apr_psprintf(msr->mp, "Fuzzy hash of %s matched " \
-                "with %s (from: %s). Socore: %d.", var->name, line,
+                "with %s (from: %s). Score: %d.", var->name, line,
                 param->file, i);
             return 1;
         }
