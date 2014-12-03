@@ -224,6 +224,14 @@ AC_ARG_ENABLE(mlogc,
 [
   build_mlogc=1
 ])
+
+CHECK_CURL()
+
+if test -z "${CURL_VERSION}"; then
+  AC_MSG_NOTICE([NOTE: mlgoc compilation was disabled.])
+  build_mlogc=0
+fi
+
 AM_CONDITIONAL([BUILD_MLOGC], [test "$build_mlogc" -eq 1])
 if test "$build_mlogc" -eq 1; then
   TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS mlogc"
@@ -695,7 +703,7 @@ fi
 CHECK_LIBXML2()
 CHECK_LUA()
 #if test "$build_mlogc" -ne 0; then
-CHECK_CURL()
+#CHECK_CURL()
 #fi
 
 # Check for YAJL libs (for JSON body processor)
