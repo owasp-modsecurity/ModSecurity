@@ -13,7 +13,7 @@ class Singleton(object):
     return class_._instances[class_]
 """
 
-class ModSecurity():
+class ModSecurity(): 
   def __init__(self):
     self.default_attr = ["default_attr", "name", "modsecCore"]
     self.name = None
@@ -31,6 +31,30 @@ class ModSecurity():
       self.modsecCore.log(level, msg)
     return True
 
+  def __getitem__(self,key):
+    v = None
+    # split our key by parts
+    key = key.split(".")
+    if(len(key) > 2):
+        print("error")
+    if(len(key) == 1):
+        collection = key[0]
+        param = None
+    if(len(key) == 2):
+        collection = key[0]
+        param = key[1]
+    try:
+      v = object.__getattribute__(self, collection)
+      # try and access the the collection via parameter
+      try:
+        return(v[param])  
+      # if we fail, it means an improper parameter was passed (may be a list collection)
+      except:
+        return v
+    except:
+      if self.modsecCore != None:
+        v = self.modsecCore.getVariable(collection,param)
+    return v
   def __getattribute__(self, key):
     v = None
     try:
@@ -40,16 +64,14 @@ class ModSecurity():
     except:
       if self.modsecCore != None:
         v = self.modsecCore.getVariable(key)
-
     return v
 
   def __setattr__(self, name, value):
     self.__dict__[name] = value
-
+ 
     if name not in self.default_attr:
       if self.modsecCore != None:
         self.modsecCore.setVariable("tx." + name, value)
-
 
 """
 TODO: transformation

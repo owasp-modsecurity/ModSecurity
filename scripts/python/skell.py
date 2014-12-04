@@ -27,7 +27,7 @@ class ModSecurityExtension(ModSecurity):
 
 
     self.log(8, "Hum... Do we have something at FILES_TMPNAMES? %s" %
-      self.FILES_TMPNAMES)
+      self["FILES_TMPNAMES"])
 
     # Returns True whenever you want to send a "match" to ModSecurity core.
     return True

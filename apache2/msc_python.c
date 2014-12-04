@@ -31,7 +31,7 @@ static PyObject *pyModSecurityI_log(PyObject *self, PyObject *args, PyObject *kw
     int level = 0;
     PyObject *capsuleModSecurity = NULL;
     modsec_rec *msr = NULL;
-
+    
     if (PyArg_ParseTuple(args, "is", &level, &str) == 0)
     {
         /* PyArg already set this.
@@ -55,7 +55,7 @@ static PyObject *pyModSecurityI_log(PyObject *self, PyObject *args, PyObject *kw
         PyErr_SetString(PyExc_TypeError, "log() needs ModSecurity core to be attached.");
         goto end_no_msr;
     }
-
+    //msr_log(msr, 1, "%s", str);
     msr_log(msr, level, str);
 
 end_no_msr:
@@ -125,6 +125,7 @@ end:
 static PyObject *pyModSecurityI_getVariable(PyObject *self, PyObject *args, PyObject *kwds) {
     char *my_error_msg = NULL;
     const char *var_name = NULL;
+    const char *param_name = NULL;
     const apr_array_header_t *arr = NULL;
     PyObject *ret = Py_None;
     PyObject *capsuleRule = NULL;
@@ -134,14 +135,17 @@ static PyObject *pyModSecurityI_getVariable(PyObject *self, PyObject *args, PyOb
     modsec_rec *msr = NULL;
     apr_table_t *vartab = NULL;
 
-    if (PyArg_ParseTuple(args, "s", &var_name) == 0)
+
+
+    if (PyArg_ParseTuple(args, "sz", &var_name, &param_name) == 0)
     {
         goto end;
     }
-
+    
     capsuleRule = PyObject_GetAttrString(self, "capsuleRule");
     if (capsuleRule == NULL)
     {
+
         // FIXME: Use the correct error object.
         PyErr_SetString(PyExc_TypeError, "getVariable() needs ModSecurity core to be attached.");
         goto end_no_rule;
@@ -150,6 +154,7 @@ static PyObject *pyModSecurityI_getVariable(PyObject *self, PyObject *args, PyOb
     capsuleModSecurity = PyObject_GetAttrString(self, "capsuleModSecurity");
     if (capsuleModSecurity == NULL)
     {
+        
         // FIXME: Use the correct error object.
         PyErr_SetString(PyExc_TypeError, "getVariable() needs ModSecurity core to be attached.");
         goto end_no_msr;
@@ -157,6 +162,7 @@ static PyObject *pyModSecurityI_getVariable(PyObject *self, PyObject *args, PyOb
 
     rule = PyCapsule_GetPointer(capsuleRule, "rule");
     msr = PyCapsule_GetPointer(capsuleModSecurity, "modsecurity");
+
     if (rule == NULL || msr == NULL)
     {
         // FIXME: Use the correct error object.
@@ -164,11 +170,20 @@ static PyObject *pyModSecurityI_getVariable(PyObject *self, PyObject *args, PyOb
         goto end_no_rule_or_msr;
     }
 
-    var = msre_create_var_ex(msr->msc_rule_mptmp, msr->modsecurity->msre,
+    if(param_name == NULL){
+        msr_log(msr, 9, "getVariable(): prased collection %s with no parameters",var_name);
+        var = msre_create_var_ex(msr->msc_rule_mptmp, msr->modsecurity->msre,
         var_name, '\0', msr, &my_error_msg);
+    }else{
+        msr_log(msr, 9, "getVariable(): prased collection %s with paramater %s",var_name, param_name);
+        var = msre_create_var_ex(msr->msc_rule_mptmp, msr->modsecurity->msre,
+        var_name, param_name, msr, &my_error_msg);
+    }
 
     if (var == NULL)
     {
+        PyErr_SetString(PyExc_KeyError, "getVariable() did not receive a valid collection name");
+        msr_log(msr, 1, "Warning: getVariable() did not receive a valid collection name %s",var_name);
         goto end_no_var;
     }
 
@@ -182,7 +197,7 @@ static PyObject *pyModSecurityI_getVariable(PyObject *self, PyObject *args, PyOb
 
     var->metadata->generate(msr, var, rule, vartab, msr->msc_rule_mptmp);
     arr = apr_table_elts(vartab);
-
+    
     if (arr->nelts == 1)
     {
         msre_var *vx = generate_single_var(msr, var, NULL, rule, msr->msc_rule_mptmp);
@@ -304,7 +319,7 @@ static struct PyModuleDef pyModSecurityI_def = {
         PyModuleDef_HEAD_INIT,
         "ModSecurityI",
         NULL,
-        0,
+        -1,
         pyModSecurityI_functions,
         NULL,
         NULL,
@@ -374,8 +389,16 @@ char *python_load(msc_python_script **script, const char *filename, apr_pool_t *
 int python_execute(msc_python_script *script, char *param, modsec_rec *msr, msre_rule *rule, char **error_msg) {
     apr_time_t time_before;
     int ret = RULE_NO_MATCH;
+    char * s = NULL;
     PyObject* methodRes = NULL;
     PyObject *extObject = NULL;
+    PyObject *pmeth = NULL; 
+    PyObject *pargs = NULL;
+    PyObject *exc_type = NULL;
+    PyObject *exc_value = NULL;
+    PyObject *exc_tb = NULL;
+    PyObject *err = NULL;
+    PyObject* pyStr = NULL;
 
     if (error_msg == NULL) {
         return -1;
@@ -385,57 +408,89 @@ int python_execute(msc_python_script *script, char *param, modsec_rec *msr, msre
 
 //    if (script->extInstance == NULL) // FIXME: without cache this will draing the performance.
 //    {
-        extObject = PyObject_GetAttrString(script->pModule, "ModSecurityExtension");
-        script->extInstance = PyObject_CallObject(extObject, NULL);
+    extObject = PyObject_GetAttrString(script->pModule, "ModSecurityExtension");
+    script->extInstance = PyObject_CallObject(extObject, NULL);
 
-        PyObject *logMod = PyModule_Create(&pyModSecurityI_def);
-        PyObject *capsule_msr = PyCapsule_New(msr, "modsecurity", NULL);
-        PyObject *capsule_rule = PyCapsule_New(rule, "rule", NULL);
-        PyObject* setCapsule1 = PyObject_CallMethod(logMod, "setCapsuleModSecurity", "(O)", capsule_msr);
-        PyObject* setCapsule2 = PyObject_CallMethod(logMod, "setCapsuleRule", "(O)", capsule_rule);
+    PyObject *logMod = PyModule_Create(&pyModSecurityI_def);
+    if (logMod == NULL){
+        PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
+        err = PyObject_Repr(exc_value); 
+        pyStr = PyUnicode_AsEncodedString(err, "utf-8", NULL);
+        s = PyBytes_AS_STRING(pyStr);
+        *error_msg = apr_psprintf(msr->mp, "Error couldn't create ModSecurityI module: %s", s); 
+        goto end;
+    }
+    PyObject *capsule_msr = PyCapsule_New(msr, "modsecurity", NULL);
+    if(capsule_msr == NULL){
+        PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
+        err = PyObject_Repr(exc_value); 
+        pyStr = PyUnicode_AsEncodedString(err, "utf-8", NULL);
+        s = PyBytes_AS_STRING(pyStr);
+        *error_msg = apr_psprintf(msr->mp, "Error couldn't create capsule for pointer to 'modsecurity': %s", s);
+        goto end;
+    }
+    PyObject *capsule_rule = PyCapsule_New(rule, "rule", NULL);
+    if(capsule_rule == NULL){
+        PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
+        err = PyObject_Repr(exc_value); 
+        pyStr = PyUnicode_AsEncodedString(err, "utf-8", NULL);
+        s = PyBytes_AS_STRING(pyStr);
+        *error_msg = apr_psprintf(msr->mp, "Error couldn't create capsule for pointer to 'rule': %s", s); 
+         goto end;
+    }
+    PyObject* setCapsule1 = PyObject_CallMethod(logMod, "setCapsuleModSecurity", "(O)", capsule_msr);
+    if(setCapsule1 == NULL){
+        PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
+        err = PyObject_Repr(exc_value); 
+        pyStr = PyUnicode_AsEncodedString(err, "utf-8", NULL);
+        s = PyBytes_AS_STRING(pyStr);
+        *error_msg = apr_psprintf(msr->mp, "Error could not call method setCapsuleModSecurity(): %s", s);
+        goto end;
+    }
+    PyObject* setCapsule2 = PyObject_CallMethod(logMod, "setCapsuleRule", "(O)", capsule_rule);
 
-
-        PyObject* setLog = PyObject_CallMethod(script->extInstance, "setModSecurityCore", "(O)", logMod);
-        if (setLog == NULL)
-        {
-            const char *s = NULL;
-            PyObject *exc_type = NULL, *exc_value = NULL, *exc_tb = NULL, *err = NULL;
-
-            PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
-            err = PyObject_Repr(exc_value); //Now a unicode object
-
-            PyObject* pyStr = PyUnicode_AsEncodedString(err, "utf-8", NULL);
-            s = PyBytes_AS_STRING(pyStr);
-            msr_log(msr, 8, "Python problem: %s", s);
-        }
-//    }
+    if(setCapsule2 == NULL){
+        PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
+        err = PyObject_Repr(exc_value); 
+        pyStr = PyUnicode_AsEncodedString(err, "utf-8", NULL);
+        s = PyBytes_AS_STRING(pyStr);
+        *error_msg = apr_psprintf(msr->mp, "Error could not call method setCapsuleRule(): %s", s); 
+        goto end;
+    }
+    
+    PyObject* setLog = PyObject_CallMethod(script->extInstance, "setModSecurityCore", "(O)", logMod);
+    if (setLog == NULL){
+        PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
+        err = PyObject_Repr(exc_value); 
+        pyStr = PyUnicode_AsEncodedString(err, "utf-8", NULL);
+        s = PyBytes_AS_STRING(pyStr);
+        *error_msg = apr_psprintf(msr->mp, "Error couldn't call method setModSecurityCore: %s", s);
+        goto end;
+    }
+    Py_DECREF(logMod);
+    Py_DECREF(setLog);
     methodRes = PyObject_CallMethod(script->extInstance, "process", NULL);
-
     if (methodRes == NULL)
     {
-        const char *s = NULL;
-        PyObject *exc_type = NULL, *exc_value = NULL, *exc_tb = NULL, *err = NULL;
-
         PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
         err = PyObject_Repr(exc_value); //Now a unicode object
-
-        PyObject* pyStr = PyUnicode_AsEncodedString(err, "utf-8", NULL);
+        pyStr = PyUnicode_AsEncodedString(err, "utf-8", NULL);
         s = PyBytes_AS_STRING(pyStr);
-
-        *error_msg = apr_psprintf(msr->mp, "Python script failed: '%s'.", s);
+        *error_msg = apr_psprintf(msr->mp, "Error couldn't call method process: %s", s);
         goto end;
     }
     if (methodRes == Py_True)
     {
-        *error_msg = apr_psprintf(msr->mp, "Python script matched");
+        msr_log(msr, 7, "Python script matched");
         ret = RULE_MATCH;
     }
 
     Py_DECREF(methodRes);
 end: 
-//    Py_DECREF(extInstance);
-//    Py_DECREF(extObject);
-
+    Py_XDECREF(pyStr);
+    Py_XDECREF(exc_type);
+    Py_XDECREF(exc_value);
+    Py_XDECREF(exc_tb);
     return ret;
 }
 
