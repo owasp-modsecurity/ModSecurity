@@ -672,7 +672,7 @@ int msc_remote_add_rules_from_uri(cmd_parms *orig_parms,
             }
 
             cmd_name = ap_getword_conf(mp, &rule);
-            cmd = ap_find_command(cmd_name, security2_module.cmds);
+            cmd = (const command_rec *)(intptr_t)p_find_command(cmd_name, security2_module.cmds);
 
             if (cmd == NULL)
             {
