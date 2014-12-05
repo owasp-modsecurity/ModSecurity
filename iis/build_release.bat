@@ -35,8 +35,6 @@ copy "%OUTPUT_DIR%\pcre.dll" "%AMD64%"
 copy "%OUTPUT_DIR%\zlib1.dll" "%AMD64%"
 copy "%OUTPUT_DIR%\yajl.dll" "%AMD64%"
 copy "%OUTPUT_DIR%\fuzzy.dll" "%AMD64%"
-copy "%OUTPUT_DIR%\libeay32.dll" "%AMD64%"
-copy "%OUTPUT_DIR%\ssleay32.dll" "%AMD64%"
 
 set SSDEEP_ARCH="x86"
 call build_dependencies.bat %VCARGS32%
@@ -56,8 +54,6 @@ copy "%OUTPUT_DIR%\pcre.dll" "%X86%"
 copy "%OUTPUT_DIR%\zlib1.dll" "%X86%"
 copy "%OUTPUT_DIR%\yajl.dll" "%X86%"
 copy "%OUTPUT_DIR%\fuzzy.dll" "%X86%"
-copy "%OUTPUT_DIR%\libeay32.dll" "%X86%"
-copy "%OUTPUT_DIR%\ssleay32.dll" "%X86%"
 
 
 :: copy %OUTPUT_DIR%\Installer.exe %RELEASE_DIR%

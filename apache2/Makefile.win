@@ -11,7 +11,7 @@ LIBS = $(APACHE)\lib\libhttpd.lib \
        $(APACHE)\lib\libapr-1.lib \
        $(APACHE)\lib\libaprutil-1.lib \
        $(PCRE)\pcre.lib \
-       $(CURL)\lib\libcurl_imp.lib \
+       $(CURL)\libcurl.lib \
        $(LIBXML2)\win32\bin.msvc\libxml2.lib \
        Ws2_32.lib \
        "iphlpapi.lib"
@@ -32,6 +32,9 @@ INCLUDES = -I. -I.. \
            -I$(PCRE)\include -I$(PCRE) \
            -I$(LIBXML2)\include \
            -I$(APACHE)\include
+
+# Enables support for SecRemoteRules and external resources.
+DEFS=$(DEFS) -DWITH_CURL -DWITH_REMOTE_RULES
 
 # Lua is optional
 !IF "$(LUA)" != ""

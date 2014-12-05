@@ -14,7 +14,7 @@ CURL = %CURL%
 LIBS = $(BASE)\lib\libapr-1.lib \
        $(BASE)\lib\libaprutil-1.lib \
        $(PCRE)\pcre.lib \
-       $(CURL)\lib\libcurl_imp.lib \
+       $(CURL)\libcurl.lib \
        wsock32.lib
 
 ###########################################################################

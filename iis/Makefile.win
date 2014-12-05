@@ -10,7 +10,7 @@
 LIBS = $(APACHE)\lib\libapr-1.lib \
        $(APACHE)\lib\libaprutil-1.lib \
        $(PCRE)\pcre.lib \
-       $(CURL)\lib\libcurl_imp.lib \
+       $(CURL)\libcurl.lib \
        $(LIBXML2)\win32\bin.msvc\libxml2.lib \
        "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" \
        "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib" "ws2_32.lib" \
@@ -37,6 +37,8 @@ INCLUDES = -I. -I.. \
            -I..\apache2 \
            -I..\standalone
 
+# Enables support for SecRemoteRules and external resources.
+DEFS=$(DEFS) -DWITH_CURL -DWITH_REMOTE_RULES
 
 #	   -I$(SSDEEP) \
 # Lua is optional

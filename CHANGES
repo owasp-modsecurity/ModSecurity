@@ -1,6 +1,9 @@
 DD mmm YYYY - 2.9.????? (To be released)
 -----------------------
 
+ * OpenSSL dependency was removed on MS Windows builds. ModSecurity is now using
+   the Windows certificate storage.
+   [Gregg Smith, Steffen and ModSecurity team]
  * Informs about external resources loaded/failed while reloading Apache.
    [ModSecurity team]
  * Adds missing 'ModSecurity:' prefix in some warnings messages.
