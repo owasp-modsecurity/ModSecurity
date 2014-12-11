@@ -1,4 +1,4 @@
-DD mmm YYYY - 2.9.????? (To be released)
+15 Dez 2014 - 2.9.0-RC2
 -----------------------
 
  * OpenSSL dependency was removed on MS Windows builds. ModSecurity is now using
