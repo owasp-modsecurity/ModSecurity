@@ -2446,7 +2446,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         NULL
     );
 
-    /* deny */
+    /* block */
     msre_engine_action_register(engine,
         "block",
         ACTION_DISRUPTIVE,
