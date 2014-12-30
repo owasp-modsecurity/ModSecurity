@@ -23,7 +23,7 @@
 
 #include <apu.h>
 
-#ifdef WITH_REMOTE_RULES
+#ifdef WITH_REMOTE_RULES_SUPPORT
 #include <apr_crypto.h>
 #include <apr_sha1.h>
 #endif
