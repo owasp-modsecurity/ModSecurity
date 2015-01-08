@@ -3,9 +3,9 @@
 * Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
+* the License.  You may obtain a copy of the License at
 *
-*     http://www.apache.org/licenses/LICENSE-2.0
+*     http://www.apache.org/licenses/LICENSE-2.0
 *
 * If any of the files related to licensing are missing or if you have any
 * other questions related to licensing please contact Trustwave Holdings, Inc.
@@ -70,6 +70,7 @@
 
 typedef struct {
     ngx_flag_t enable;
+    ngx_flag_t x_headers;
     directory_config *config;
 
     ngx_str_t *file;
@@ -157,6 +158,12 @@ static ngx_command_t ngx_http_modsecurity_commands[] =  {
     ngx_http_modsecurity_enable,
     NGX_HTTP_LOC_CONF_OFFSET,
     offsetof(ngx_http_modsecurity_loc_conf_t, enable),
+    NULL },
+  { ngx_string("ModSecurityXHeaders"),
+    NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_SIF_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
+    ngx_conf_set_flag_slot,
+    NGX_HTTP_LOC_CONF_OFFSET,
+    offsetof(ngx_http_modsecurity_loc_conf_t, x_headers),
     NULL },
   ngx_null_command
 };
@@ -537,6 +544,10 @@ static int ngx_http_modsecurity_save_headers_in_visitor(void *data,
     }
 
     ngx_strlow(h->lowcase_key, h->key.data, h->key.len);
+    h->lowcase_key[h->key.len] = '\0';
+
+    if(!ngx_strcmp(h->lowcase_key, "host"))
+      return 1;
 
     h->hash = ngx_hash_key(h->lowcase_key, h->key.len);
 
@@ -805,12 +816,14 @@ static int
 ngx_http_modsecurity_save_headers_out_visitor(void *data,
         const char *key, const char *value)
 {
-    ngx_http_request_t             *r = data;
-    ngx_table_elt_t                *h, he;
-    ngx_http_upstream_header_t     *hh;
-    ngx_http_upstream_main_conf_t  *umcf;
+    ngx_http_request_t              *r = data;
+    ngx_table_elt_t                 *h, he;
+    ngx_http_upstream_header_t      *hh;
+    ngx_http_upstream_main_conf_t   *umcf;
+    ngx_table_elt_t                 *tmp_header;
 
     umcf = ngx_http_get_module_main_conf(r, ngx_http_upstream_module);
+    ngx_http_modsecurity_loc_conf_t *conf = ngx_http_get_module_loc_conf(r, ngx_http_modsecurity);
 
     h = &he;
 
@@ -826,6 +839,20 @@ ngx_http_modsecurity_save_headers_out_visitor(void *data,
     }
 
     ngx_strlow(h->lowcase_key, h->key.data, h->key.len);
+
+    if(conf->x_headers) {
+      h->lowcase_key[h->key.len] = '\0';
+      if(h->lowcase_key[0] == 'x' &&
+          h->lowcase_key[1] == '-') {
+
+        tmp_header = ngx_list_push(&r->headers_out.headers);
+        tmp_header->key = h->key;
+        tmp_header->value = h->value;
+        tmp_header->hash = 1;
+        return 1;
+
+      }
+    }
 
     h->hash = ngx_hash_key(h->lowcase_key, h->key.len);
 
@@ -991,6 +1018,7 @@ ngx_http_modsecurity_create_loc_conf(ngx_conf_t *cf)
 
     conf->config = NGX_CONF_UNSET_PTR;
     conf->enable = NGX_CONF_UNSET;
+    conf->x_headers = NGX_CONF_UNSET;
 
     return conf;
 }
@@ -1004,6 +1032,7 @@ ngx_http_modsecurity_merge_loc_conf(ngx_conf_t *cf, void *parent,
     ngx_http_modsecurity_loc_conf_t  *conf = child;
 
     ngx_conf_merge_value(conf->enable, prev->enable, 0);
+    ngx_conf_merge_value(conf->x_headers, prev->x_headers, 0);
     ngx_conf_merge_ptr_value(conf->config, prev->config, NULL);
 
     if (conf->enable && conf->config == NULL) {
