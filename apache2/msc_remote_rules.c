@@ -24,7 +24,9 @@
 #include <apu.h>
 
 #ifdef WITH_REMOTE_RULES
+#ifdef WITH_APU_CRYPTO
 #include <apr_crypto.h>
+#endif
 #include <apr_sha1.h>
 #endif
 

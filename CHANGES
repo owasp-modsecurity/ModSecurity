@@ -1,3 +1,10 @@
+XX xxx XXXX - 2.9.0
+-------------------
+
+ * Fix apr_crypto.h include, now checking if apr_crypto.h is available by
+   checking the definition WITH_APU_CRYPTO.
+   [martinjina and ModSecurity team]
+
 15 Dez 2014 - 2.9.0-RC2
 -----------------------
 

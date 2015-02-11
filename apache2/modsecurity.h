@@ -52,7 +52,6 @@ typedef struct msc_parm msc_parm;
 #include "apr_md5.h"
 #include "apr_strings.h"
 #include "apr_hash.h"
-#include "apr_crypto.h"
 #include "httpd.h"
 #include "http_config.h"
 #include "http_log.h"
