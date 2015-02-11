@@ -1,4 +1,4 @@
-XX xxx XXXX - 2.9.0
+12 Feb 2015 - 2.9.0
 -------------------
 
  * Fix apr_crypto.h include, now checking if apr_crypto.h is available by

@@ -7,7 +7,7 @@
     lightArgs: 
 -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-    <Product Id="22B04FDB-9BAB-46B0-87B8-A39544ECECD3" Name="ModSecurity IIS" Language="1033" Version="2.9.0.1" Manufacturer="ModSecurity" UpgradeCode="82F09489-1678-4C38-ADCB-08C3757653DB">
+    <Product Id="22B04FDB-9BAB-46B0-87B8-A39544ECECD3" Name="ModSecurity IIS" Language="1033" Version="2.9.0" Manufacturer="ModSecurity" UpgradeCode="82F09489-1678-4C38-ADCB-08C3757653DB">
         <Package Description="ModSecurityISS" Comments="none" InstallerVersion="405" Compressed="yes" InstallPrivileges="elevated" InstallScope="perMachine" />
         <?define ProductName = "ModSecuirty IIS" ?>
         <?if $(sys.BUILDARCH) = x64 ?>
