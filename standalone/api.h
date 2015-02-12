@@ -119,8 +119,9 @@ void modsecSetConfigForIISRequestBody(request_rec *r);
 
 const char *modsecIsServerSignatureAvailale(void);
 
-#ifdef WIN32
+#ifdef VERSION_IIS
 void modsecStatusEngineCall(void);
+void modsecReportRemoteLoadedRules(void);
 #endif
 
 #ifdef __cplusplus

@@ -797,8 +797,12 @@ CMyHttpModule::OnBeginRequest(
 					goto Finished;
 				}
 
-				modsecStatusEngineCall();
-
+				modsecReportRemoteLoadedRules();
+				if (this->status_call_already_sent == false)
+				{
+					this->status_call_already_sent = true;
+					modsecStatusEngineCall();
+				}
 			}
 			delete apppath;
 		}
@@ -1253,6 +1257,8 @@ CMyHttpModule::CMyHttpModule()
 
     GetSystemInfo(&sysInfo);
     m_dwPageSize = sysInfo.dwPageSize;
+
+    this->status_call_already_sent = false;
 
 	InitializeCriticalSection(&m_csLock);
 

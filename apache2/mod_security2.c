@@ -752,7 +752,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
                     real_server_signature);
         }
 
-#ifndef WIN32
+#ifndef VERSION_IIS
         if (status_engine_state != STATUS_ENGINE_DISABLED) {
             msc_status_engine_call();
         }
@@ -767,18 +767,12 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
     /**
      * Checking if it is not the first time that we are in this very function.
      * We want to show the messages below during the start and the reload.
-     *
-     * Turns out that IIS version does not hit it twice, thus, we have to show
-     * the message in the first (and unique) opportunity.
      */
-#ifdef VERSION_IIS
-    if (first_time == 1)
-    {
-#else
+#ifndef VERSION_IIS
     if (first_time != 1)
     {
-#endif
 #ifdef WITH_REMOTE_RULES
+
         if (remote_rules_server != NULL)
         {
             if (remote_rules_server->amount_of_rules == 1)
@@ -804,6 +798,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
                 remote_rules_fail_message);
         }
     }
+#endif
 
     srand((unsigned int)(time(NULL) * getpid()));
 
