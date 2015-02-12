@@ -34,6 +34,35 @@
 #define AP_MAX_ARGC 64
 #endif
 
+/**
+ * @brief Find command in a list.
+ *
+ * This is a duplicate of `ap_find_command', which is part of the standalone module.
+ * Apache versions does not include the standalone, thus, this is necessary for
+ * the Apache versions. Once it is here it may not be necessary to be part of
+ * the standalone module, but, for this version both function will co-exist
+ * avoiding problems with 3rd parties that are extending the standalone module.
+ *
+ * @note Prefer this function instead of `ap_finc_command` which is part of the
+ *       standalone module.
+ *
+ * @param parms char pointer, function name.
+ * @param cmds pointer to command_rec[].
+ * @retval NULL if command was not found.
+ *
+ */
+const command_rec *msc_remote_find_command(const char *name, const command_rec *cmds)
+{
+    while (cmds->name) {
+        if (!strcasecmp(name, cmds->name))
+            return cmds;
+
+        ++cmds;
+    }
+
+    return NULL;
+}
+
 
 /**
  * @brief Insert a new SecRule to be processed by ModSecurity
@@ -686,9 +715,10 @@ int msc_remote_add_rules_from_uri(cmd_parms *orig_parms,
         {
             const char *rule = NULL;
             int tmp = len;
-            char *cmd_name;
-            char *word;
+            char *cmd_name = NULL;
+            char *word = NULL;
             const command_rec *cmd;
+
             ap_directive_t *newdir;
             cmd_parms *parms = apr_pcalloc(mp, sizeof (cmd_parms));
 
@@ -704,7 +734,7 @@ int msc_remote_add_rules_from_uri(cmd_parms *orig_parms,
             }
 
             cmd_name = ap_getword_conf(mp, &rule);
-            cmd = ap_find_command(cmd_name, security2_module.cmds);
+            cmd = msc_remote_find_command(cmd_name, security2_module.cmds);
 
             if (cmd == NULL)
             {
