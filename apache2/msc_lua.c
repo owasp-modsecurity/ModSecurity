@@ -111,8 +111,11 @@ char *lua_compile(msc_script **script, const char *filename, apr_pool_t *pool) {
     dump.pool = pool;
     dump.parts = apr_array_make(pool, 128, sizeof(msc_script_part *));
 
+#if LUA_VERSION_NUM >= 503
+    lua_dump(L, dump_writer, &dump, 1);
+#else
     lua_dump(L, dump_writer, &dump);
-
+#endif
     (*script) = apr_pcalloc(pool, sizeof(msc_script));
     (*script)->name = filename;
     (*script)->parts = dump.parts;
