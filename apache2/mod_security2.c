@@ -1278,7 +1278,7 @@ static int hook_log_transaction(request_rec *r) {
 
     msr->r = r;
     msr->response_status = r->status;
-    msr->status_line = ((r->status_line != NULL)
+    msr->status_line = ((r->status_line != NULL) && (*r->status_line != '\0')
             ? r->status_line : ap_get_status_line(r->status));
     msr->response_protocol = get_response_protocol(origr);
     msr->response_headers = apr_table_copy(msr->mp, r->headers_out);
