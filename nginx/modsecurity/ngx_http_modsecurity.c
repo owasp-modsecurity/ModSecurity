@@ -832,27 +832,33 @@ ngx_http_modsecurity_save_headers_out_visitor(void *data,
     hh = ngx_hash_find(&umcf->headers_in_hash, h->hash,
                        h->lowcase_key, h->key.len);
 
-    if (hh) {
-        /* copy all */
-        if (hh->copy_handler(r, h, hh->conf) != NGX_OK) {
-            return 0;
-        }
-    } else {
-        /* Add the response header directly to headers_out if not present in
-         * the hash. This is done to passthrough such response headers.
-         * Remember the response headers were cleared earlier using
-         * ngx_http_clean_header(r) call in ngx_http_modsecurity_save_headers_out.
-         */
+    // While using proxy_pass with a combination of other factores
+    // there seems to be a memory corruption if we use hh->copy_handler.
+    // Temporary using new_h. This demand a further investigation.
+    //
+    //if (hh && 0 == 1) {
+    //    /* copy all */
+    //    if (hh->copy_handler(r, h, hh->conf) != NGX_OK) {
+    //        return 0;
+    //    }
+    //} else {
+    
+    /* Add the response header directly to headers_out if not present in
+     * the hash. This is done to passthrough such response headers.
+     * Remember the response headers were cleared earlier using
+     * ngx_http_clean_header(r) call in ngx_http_modsecurity_save_headers_out.
+     */
 
-        new_h = ngx_list_push(&r->headers_out.headers);
-        if (new_h == NULL) {
-            return NGX_ERROR;
-        }
-
-        new_h->hash = h->hash;
-        new_h->key = h->key;
-        new_h->value = h->value;
+    new_h = ngx_list_push(&r->headers_out.headers);
+    if (new_h == NULL) {
+        return NGX_ERROR;
     }
+
+    new_h->hash = h->hash;
+    new_h->key = h->key;
+    new_h->value = h->value;
+
+   // }
 
     ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "ModSecurity: save headers out: \"%V: %V\"",
