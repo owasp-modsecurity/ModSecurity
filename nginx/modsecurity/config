@@ -6,21 +6,23 @@ CFLAGS="$CFLAGS \
     -I/usr/include/apache2 \
     -I/usr/include/libxml2 \
     -DWITH_LUA -I/usr/include/lua5.1   \
-    -DWITH_PCRE_STUDY -DMODSEC_PCRE_MATCH_LIMIT=1500 -DMODSEC_PCRE_MATCH_LIMIT_RECURSION=1500  -DREQUEST_EARLY          \
+    -DWITH_PCRE_STUDY -DMODSEC_PCRE_MATCH_LIMIT=1500 -DMODSEC_PCRE_MATCH_LIMIT_RECURSION=1500  -DREQUEST_EARLY          -DWITH_APU_CRYPTO -DWITH_REMOTE_RULES \
      \
-    -DWITH_YAJL -I/usr/include/yajl  "
+    -DWITH_YAJL -I/usr/include/yajl   \
+    -DWITH_SSDEEP -I/usr/"
 
 
 CORE_LIBS="$CORE_LIBS \
-     -L/usr/lib -lapr-1 \
-     -L/usr/lib -laprutil-1 \
+     -L/usr/lib/x86_64-linux-gnu -lapr-1 \
+     -L/usr/lib/x86_64-linux-gnu -laprutil-1 \
     -I/usr/include/apache2 \
     -L/usr/lib/x86_64-linux-gnu -lcurl \
     -lxml2 \
     -llua5.1   \
     -lpcre \
-    -L/usr/lib  -lcap \
-    -lyajl  "
+    -L/usr/lib   \
+    -lyajl   \
+    -lfuzzy"
 
 ngx_addon_name=ngx_http_modsecurity
 
