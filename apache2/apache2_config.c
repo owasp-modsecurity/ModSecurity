@@ -1192,10 +1192,13 @@ static const char *cmd_audit_log(cmd_parms *cmd, void *_dcfg, const char *p1)
     else {
         const char *file_name = ap_server_root_relative(cmd->pool, dcfg->auditlog_name);
         apr_status_t rc;
-
+        
+        if (dcfg->auditlog_fileperms == NOT_SET) {
+            dcfg->auditlog_fileperms = CREATEMODE;
+        }
         rc = apr_file_open(&dcfg->auditlog_fd, file_name,
                 APR_WRITE | APR_APPEND | APR_CREATE | APR_BINARY,
-                CREATEMODE, cmd->pool);
+                dcfg->auditlog_fileperms, cmd->pool);
 
         if (rc != APR_SUCCESS) {
             return apr_psprintf(cmd->pool, "ModSecurity: Failed to open the audit log file: %s",
