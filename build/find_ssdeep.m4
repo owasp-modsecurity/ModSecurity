@@ -25,20 +25,23 @@ AS_IF([test "x${test_paths}" != "x"], [
 AC_MSG_CHECKING([for ssdeep path])
   
   SSDEEP_LIB_NAME="fuzzy"
+  ssdeep_dir=
 
   if test -z "$withssdeep" -o "$withssdeep" = "yes"; then
     for i in ${test_paths}; do
       if test -f "$i/include/fuzzy.h"; then
-        SSDEEP_CFLAGS="-I$i"
+        SSDEEP_CFLAGS="-I$i/include"
+        ssdeep_dir=$i
       fi
     done
   else
     if test -f "$withssdeep/include/fuzzy.h"; then
-      SSDEEP_CFLAGS="-I$i"
+      SSDEEP_CFLAGS="-I$withssdeep/include"
+      ssdeep_dir=$withssdeep
     fi
   fi
 
-  SSDEEP_LDFLAGS="-lfuzzy"
+  SSDEEP_LDFLAGS="-L$ssdeep_dir/lib -lfuzzy"
   SSDEEP_LDADD="-lfuzzy"
 
 ])  
