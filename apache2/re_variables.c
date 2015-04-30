@@ -1828,7 +1828,7 @@ static int var_duration_generate(modsec_rec *msr, msre_var *var, msre_rule *rule
 
     rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
     rvar->value = apr_psprintf(mptmp, "%" APR_TIME_T_FMT,
-        (apr_time_usec(apr_time_now() - msr->r->request_time)));
+        (apr_time_now() - msr->r->request_time));
     rvar->value_len = strlen(rvar->value);
     apr_table_addn(vartab, rvar->name, (void *)rvar);
 
