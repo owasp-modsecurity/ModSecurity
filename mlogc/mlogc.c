@@ -158,6 +158,8 @@ static apr_pool_t            *recv_pool = NULL;
 static apr_array_header_t    *queue = NULL;
 static const char            *queue_path = NULL;
 static int                    ssl_validation = 0;
+static int                    tlsprotocol = 1;
+static curl_version_info_data* curlversion = NULL;
 /* static apr_time_t             queue_time = 0; */
 static void                  *requestline_regex = NULL;
 static int                    running = 0;
@@ -810,6 +812,26 @@ static void init_configuration(void)
         startup_delay = atoi(s);
     }
 
+    /* TLS Protocol - TLSv1(0) TLSv1.1(1) TLSv1.2(2) (SSLv3 not supported) */
+    s = apr_table_get(conf, "TLSProtocol");
+    if (s != NULL) {
+    	int num = atoi(s);
+    	switch (num) {
+    	case 0:
+    		tlsprotocol = 0;
+    		break;
+    	case 1:
+    		tlsprotocol = 1;
+    		break;
+    	case 2:
+    		tlsprotocol = 2;
+    		break;
+    	default:
+    		tlsprotocol = 2; /* Default is TLSv1.2 */
+    	}
+    }
+    curlversion = curl_version_info(CURLVERSION_NOW);
+
     if ( startup_delay > 0 ) {
         error_log(LOG_NOTICE, NULL,
                   "Delaying execution for %dms.", startup_delay);
@@ -824,6 +846,8 @@ static void init_configuration(void)
     error_log(LOG_DEBUG2, NULL, "ErrorLog=%s", error_log_path);
     error_log(LOG_DEBUG2, NULL, "ErrorLogLevel=%d", error_log_level);
     error_log(LOG_DEBUG2, NULL, "StartupDelay=%d", startup_delay);
+    error_log(LOG_DEBUG2, NULL, "TLSProtocol=%d", tlsprotocol);
+    error_log(LOG_DEBUG2, NULL, "cURL version=%s",  curlversion->version);
 
     s = apr_table_get(conf, "CheckpointInterval");
     if (s != NULL) {
@@ -1182,6 +1206,8 @@ static void logc_init(void)
     apr_status_t rc = 0;
     const char *errptr = NULL;
     int i, erroffset;
+    /* cURL major, minor and patch version */
+    short cmaj, cmin, cpat = 0;
 
     queue = apr_array_make(pool, 64, sizeof(entry_t *));
     if (queue == NULL) {
@@ -1246,8 +1272,31 @@ static void logc_init(void)
 
         /* Seems like CURL_SSLVERSION_TLSv1_2 is not supported on libcurl
          * < v7.34.0
+         *
+         * version_num is a 24 bit number created like this:
+         * <8 bits major number> | <8 bits minor number> | <8 bits patch number>.
          */
-        curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
+        switch (tlsprotocol) {
+        case 0:
+        	curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_0);
+        	break;
+        case 1:
+        	curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_1);
+        	break;
+        case 2:
+        	curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+        	break;
+        default:
+        	curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+        	break;
+        }
+        cmaj = curlversion->version_num >> 16;
+        cmin = (curlversion->version_num & 0x00ff00) >> 8;
+        cpat = (curlversion->version_num & 0x0000ff);
+        /* If cURL version < v7.34.0, use TLS v1.x */
+        if (cmaj <= 7 && cmin < 34) {
+        	curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
+        }
 
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 15);
         curl_easy_setopt(curl, CURLOPT_NOSIGNAL, TRUE);
@@ -1256,6 +1305,10 @@ static void logc_init(void)
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writefunction);
 
         *(CURL **)apr_array_push(curl_handles) = curl;
+    }
+
+    if (cmaj <= 7 && cmin < 34) {
+    	error_log(LOG_DEBUG2, NULL, "TLSv1.2 is unsupported in cURL %d.%d.%d",  cmaj, cmin, cpat);
     }
 
     logline_regex = pcre_compile(logline_pattern, PCRE_CASELESS,
