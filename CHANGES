@@ -1,9 +1,11 @@
 DD mmm YYYY - X.Y.Z (To be released)
 ------------------------------------
 
+ * Fix apr_crypto.h check on 32-bit Linux platform
+   [Issue #882 - Kurt Newman]
  * Fix compilation problem while ssdeep is installed in non-standard
    location.
-   [Issude #872 - Kurt Newman]
+   [Issue #872 - Kurt Newman]
  * Fix invalid storage reference by apr_psprintf at msc_crypt.c
    [Issue #609 - Jeff Trawick]
 

@@ -712,7 +712,12 @@ CHECK_YAJL()
 CHECK_SSDEEP()
 #AC_SEARCH_LIBS([fuzzy_hash_buf], [fuzzy])
 
-CFLAGS="$CFLAGS $APU_CFLAGS"
+# Temporarily set cflags for apr_crypto check, then restore
+# since it's already used correctly to compile modsecurity module.
+ORIG_CFLAGS="$CFLAGS $APU_CFLAGS"
+ORIG_CPPFLAGS="$CPPFLAGS"
+CFLAGS="$CFLAGS $APR_CFLAGS"
+CPPFLAGS="$CPPFLAGS $APR_CPPFLAGS"
 AC_TRY_COMPILE(
 	[#include <apr_crypto.h>],
 	[
@@ -725,6 +730,10 @@ AC_TRY_COMPILE(
 	],
 	[ AC_MSG_WARN([APR util was not compiled with crypto support. SecRemoteRule will not support the parameter 'crypto']) ]
 )
+# Restore env vars so that we don't clutter with duplicates that
+# are eventually appended later on
+CFLAGS="$ORIG_CFLAGS"
+CPPFLAGS="$ORIG_CPPFLAGS"
 
 # Current our unique download backend is curl, furhter we can support more.
 if test ! -z "${CURL_VERSION}"; then
