@@ -1,6 +1,8 @@
 DD mmm YYYY - X.Y.Z (To be released)
 ------------------------------------
 
+ * Fix apr_crypto.h check on 32-bit Linux platform
+   [Issue #882 - Kurt Newman]
  * Fix variable resolution duration (Content of the DURATION variable).
    [Issue #662 - Andrew Elble]
  * Fix crash while adding empty keys to persistent collections.
