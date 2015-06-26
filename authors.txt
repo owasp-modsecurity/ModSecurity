@@ -1,8 +1,0 @@
-b1v1r = Brian Rectanus <brectanu@gmail.com>
-brectanu = Brian Rectanus <brectanu@gmail.com>
-brectanus = Brian Rectanus <brectanu@gmail.com>
-ivanr = Ivan Ristić <ivanr@webkreator.com>
-rbarnett = Ryan C. Barnett <rcbarnett@gmail.com>
-[anonymous] = Brian Rectanus <brectanu@gmail.com>
-(no author) = Brian Rectanus <brectanu@gmail.com>
-brenosilva = Breno Silva <breno.silva@gmail.com>
