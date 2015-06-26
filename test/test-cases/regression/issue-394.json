@@ -1,0 +1,34 @@
+[
+{
+  "enabled": 1,
+  "version_min": 209000,
+  "version_max": -1,
+  "title": "Segmentation fault when uploading file with SecStreamInBodyInspection enabled",
+  "url": "https:\/\/github.com\/SpiderLabs\/ModSecurity\/issues\/394",
+  "gihub_issue": 394,
+  "request": {
+    "headers": "",
+    "body": ""
+  },
+  "response": {
+    "headers": "",
+    "body": ""
+  },
+  "expected": {
+    "audit_logs": "",
+    "debug_logs": "",
+    "error_logs": ""
+  },
+  "rules": [
+    "SecRuleEngine On",
+    "SecRequestBodyAccess On",
+    "SecResponseBodyAccess On",
+    "SecAuditEngine On",
+    "SecAuditLogType Serial",
+    "SecAuditLog logs\/modsec_audit.log",
+    "SecAuditLogParts ABCDEFHJKZ",
+    "SecDebugLog \/tmp\/modsec_debug.log",
+    "SecDebugLogLevel 9"
+  ]
+}
+]
