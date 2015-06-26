@@ -13,36 +13,34 @@
  *
  */
 
+#include "actions/transformations/trim_right.h"
+
+#include <iostream>
 #include <string>
+#include <algorithm>
+#include <functional>
+#include <cctype>
+#include <locale>
 
-#include "actions/action.h"
+#include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
+#include "actions/action.h"
 
-#ifndef SRC_ACTIONS_TRANSFORMATIONS_TRIM_H_
-#define SRC_ACTIONS_TRANSFORMATIONS_TRIM_H_
-
-#ifdef __cplusplus
 namespace ModSecurity {
-class Assay;
-
 namespace actions {
 namespace transformations {
 
-class Trim : public Transformation {
- public:
-    explicit Trim(std::string action);
-    std::string& evaluate(std::string exp,
-        Assay *assay) override;
+  
+TrimRight::TrimRight(std::string action)
+    : Trim(action) {
+    this->action_kind = 1;
+}
 
-    std::string *ltrim(std::string *s);
-    std::string *rtrim(std::string *s);
-    std::string *trim(std::string *s);
-};
+std::string& TrimRight::evaluate(std::string value,
+    Assay *assay) {
+    return *this->trim(&value);
+}
 
 }  // namespace transformations
 }  // namespace actions
 }  // namespace ModSecurity
-
-#endif
-
-#endif  // SRC_ACTIONS_TRANSFORMATIONS_TRIM_H_

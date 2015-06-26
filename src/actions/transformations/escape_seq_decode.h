@@ -18,8 +18,8 @@
 #include "actions/action.h"
 #include "actions/transformations/transformation.h"
 
-#ifndef SRC_ACTIONS_TRANSFORMATIONS_TRIM_H_
-#define SRC_ACTIONS_TRANSFORMATIONS_TRIM_H_
+#ifndef SRC_ACTIONS_TRANSFORMATIONS_ESCAPE_SEQ_DECODE_H_
+#define SRC_ACTIONS_TRANSFORMATIONS_ESCAPE_SEQ_DECODE_H_
 
 #ifdef __cplusplus
 namespace ModSecurity {
@@ -28,15 +28,11 @@ class Assay;
 namespace actions {
 namespace transformations {
 
-class Trim : public Transformation {
+class EscapeSeqDecode : public Transformation {
  public:
-    explicit Trim(std::string action);
+    explicit EscapeSeqDecode(std::string action);
     std::string& evaluate(std::string exp,
         Assay *assay) override;
-
-    std::string *ltrim(std::string *s);
-    std::string *rtrim(std::string *s);
-    std::string *trim(std::string *s);
 };
 
 }  // namespace transformations
@@ -45,4 +41,4 @@ class Trim : public Transformation {
 
 #endif
 
-#endif  // SRC_ACTIONS_TRANSFORMATIONS_TRIM_H_
+#endif  // SRC_ACTIONS_TRANSFORMATIONS_ESCAPE_SEQ_DECODE_H_

@@ -13,36 +13,37 @@
  *
  */
 
-#include <string>
+#include "actions/transformations/url_decode_uni.h"
 
-#include "actions/action.h"
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <functional>
+#include <cctype>
+#include <locale>
+
+#include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
 
-#ifndef SRC_ACTIONS_TRANSFORMATIONS_TRIM_H_
-#define SRC_ACTIONS_TRANSFORMATIONS_TRIM_H_
 
-#ifdef __cplusplus
 namespace ModSecurity {
-class Assay;
-
 namespace actions {
 namespace transformations {
 
-class Trim : public Transformation {
- public:
-    explicit Trim(std::string action);
-    std::string& evaluate(std::string exp,
-        Assay *assay) override;
+UrlDecodeUni::UrlDecodeUni(std::string action)
+    : Transformation(action) {
+    this->action_kind = 1;
+}
 
-    std::string *ltrim(std::string *s);
-    std::string *rtrim(std::string *s);
-    std::string *trim(std::string *s);
-};
+std::string& UrlDecodeUni::evaluate(std::string value,
+    Assay *assay) {
+    /**
+     * @todo Implement the transformation UrlDecodeUni
+     */
+    assay->debug(4, "Transformation UrlDecodeUni is not implemented yet.");
+    return value;
+}
 
 }  // namespace transformations
 }  // namespace actions
 }  // namespace ModSecurity
-
-#endif
-
-#endif  // SRC_ACTIONS_TRANSFORMATIONS_TRIM_H_

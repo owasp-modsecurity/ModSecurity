@@ -17,9 +17,10 @@
 
 #include "actions/action.h"
 #include "actions/transformations/transformation.h"
+#include "actions/transformations/trim.h"
 
-#ifndef SRC_ACTIONS_TRANSFORMATIONS_TRIM_H_
-#define SRC_ACTIONS_TRANSFORMATIONS_TRIM_H_
+#ifndef SRC_ACTIONS_TRANSFORMATIONS_TRIM_RIGHT_H_
+#define SRC_ACTIONS_TRANSFORMATIONS_TRIM_RIGHT_H_
 
 #ifdef __cplusplus
 namespace ModSecurity {
@@ -28,15 +29,11 @@ class Assay;
 namespace actions {
 namespace transformations {
 
-class Trim : public Transformation {
+class TrimRight : public Trim {
  public:
-    explicit Trim(std::string action);
+    explicit TrimRight(std::string action);
     std::string& evaluate(std::string exp,
         Assay *assay) override;
-
-    std::string *ltrim(std::string *s);
-    std::string *rtrim(std::string *s);
-    std::string *trim(std::string *s);
 };
 
 }  // namespace transformations
