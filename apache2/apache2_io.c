@@ -77,15 +77,16 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         }
     }
 
-    rc = modsecurity_request_body_retrieve(msr, &chunk, (unsigned int)nbytes, &my_error_msg);
-    if (rc == -1) {
+    do{
+      rc = modsecurity_request_body_retrieve(msr, &chunk, (unsigned int)nbytes, &my_error_msg);
+      if (rc == -1) {
         if (my_error_msg != NULL) {
             msr_log(msr, 1, "%s", my_error_msg);
         }
         return APR_EGENERAL;
-    }
+      }
 
-    if (chunk && (!msr->txcfg->stream_inbody_inspection || (msr->txcfg->stream_inbody_inspection && msr->if_stream_changed == 0))) {
+      if (chunk && (!msr->txcfg->stream_inbody_inspection || (msr->txcfg->stream_inbody_inspection && msr->if_stream_changed == 0))) {
         /* Copy the data we received in the chunk */
         bucket = apr_bucket_heap_create(chunk->data, chunk->length, NULL,
                 f->r->connection->bucket_alloc);
@@ -113,7 +114,7 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
         if (msr->txcfg->debuglog_level >= 4) {
             msr_log(msr, 4, "Input filter: Forwarded %" APR_SIZE_T_FMT " bytes.", chunk->length);
         }
-    } else if (msr->stream_input_data != NULL) {
+      } else if (msr->stream_input_data != NULL) {
 
         msr->if_stream_changed = 0;
 
@@ -134,26 +135,26 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
             msr_log(msr, 4, "Input stream filter: Forwarded %" APR_SIZE_T_FMT " bytes.", msr->stream_input_length);
         }
 
+      }
+
+    } while (rc != 0);
+
+    modsecurity_request_body_retrieve_end(msr);
+
+    bucket = apr_bucket_eos_create(f->r->connection->bucket_alloc);
+    if (bucket == NULL) return APR_EGENERAL;
+    APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
+
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "Input filter: Sent EOS.");
     }
 
-    if (rc == 0) {
-        modsecurity_request_body_retrieve_end(msr);
+    /* We're done */
+    msr->if_status = IF_STATUS_COMPLETE;
+    ap_remove_input_filter(f);
 
-        bucket = apr_bucket_eos_create(f->r->connection->bucket_alloc);
-        if (bucket == NULL) return APR_EGENERAL;
-        APR_BRIGADE_INSERT_TAIL(bb_out, bucket);
-
-        if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Input filter: Sent EOS.");
-        }
-
-        /* We're done */
-        msr->if_status = IF_STATUS_COMPLETE;
-        ap_remove_input_filter(f);
-
-        if (msr->txcfg->debuglog_level >= 4) {
-            msr_log(msr, 4, "Input filter: Input forwarding complete.");
-        }
+    if (msr->txcfg->debuglog_level >= 4) {
+        msr_log(msr, 4, "Input filter: Input forwarding complete.");
     }
 
     return APR_SUCCESS;
