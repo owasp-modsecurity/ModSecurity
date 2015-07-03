@@ -21,15 +21,25 @@ ACTION          (?i:accuracy|allow|append|auditlog|block|capture|chain|ctl|deny|
 
 DIRECTIVE       SecRule
 
-CONFIG_DIRECTIVE SecRequestBodyLimitAction|SecRequestBodyNoFilesLimit|SecRequestBodyInMemoryLimit|SecRequestBodyLimit|SecPcreMatchLimitRecursion|SecPcreMatchLimit|SecResponseBodyMimeType|SecResponseBodyLimitAction|SecResponseBodyLimit|SecTmpDir|SecDataDir|SecAuditLogRelevantStatus|SecAuditLogType|SecArgumentSeparator|SecCookieFormat|SecStatusEngine
+CONFIG_DIRECTIVE SecRequestBodyLimitAction|SecRequestBodyNoFilesLimit|SecRequestBodyInMemoryLimit|SecRequestBodyLimit|SecPcreMatchLimitRecursion|SecPcreMatchLimit|SecResponseBodyMimeType|SecResponseBodyLimitAction|SecResponseBodyLimit|SecTmpDir|SecDataDir|SecArgumentSeparator|SecCookieFormat|SecStatusEngine
+
 
 CONFIG_DIR_RULE_ENG SecRuleEngine
 CONFIG_DIR_REQ_BODY SecRequestBodyAccess
 CONFIG_DIR_RES_BODY SecResponseBodyAccess
-CONFIG_DIR_AUDIT_ENG SecAuditEngine
-CONFIG_DIR_AUDIT_TPE SecAuditLogType
-CONFIG_DIR_AUDIT_LOG SecAuditLog
-CONFIG_DIR_AUDIT_LOG_P SecAuditLogParts
+
+
+CONFIG_DIR_AUDIT_DIR_MOD (?i:SecAuditLogDirMode)
+CONFIG_DIR_AUDIT_DIR     (?i:SecAuditLogStorageDir)
+CONFIG_DIR_AUDIT_ENG     (?i:SecAuditEngine)
+CONFIG_DIR_AUDIT_FLE_MOD (?i:SecAuditLogFileMode)
+CONFIG_DIR_AUDIT_LOG2    (?i:SecAuditLog2)
+CONFIG_DIR_AUDIT_LOG_P   (?i:SecAuditLogParts)
+CONFIG_DIR_AUDIT_LOG     (?i:SecAuditLog)
+CONFIG_DIR_AUDIT_STS     (?i:SecAuditLogRelevantStatus)
+CONFIG_DIR_AUDIT_TPE     (?i:SecAuditLogType)
+
+
 CONFIG_DIR_DEBUG_LOG SecDebugLog
 CONFIG_DIR_DEBUG_LVL SecDebugLogLevel
 
@@ -54,6 +64,7 @@ CONFIG_VALUE_OFF    Off
 CONFIG_VALUE_DETC    DetectOnly
 CONFIG_VALUE_SERIAL Serial
 CONFIG_VALUE_PARALLEL Parallel
+CONFIG_VALUE_RELEVANT_ONLY RelevantOnly
 
 CONFIG_VALUE_PATH    [A-Za-z_/\.]+
 AUDIT_PARTS [ABCDEFHJKZ]+
@@ -78,19 +89,31 @@ FREE_TEXT       [^\"]+
 {CONFIG_DIR_RULE_ENG}           { return yy::seclang_parser::make_CONFIG_DIR_RULE_ENG(yytext, loc); }
 {CONFIG_DIR_RES_BODY}           { return yy::seclang_parser::make_CONFIG_DIR_RES_BODY(yytext, loc); }
 {CONFIG_DIR_REQ_BODY}           { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY(yytext, loc); }
-{CONFIG_DIR_AUDIT_ENG}           { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY(yytext, loc); }
-{CONFIG_DIR_AUDIT_TPE}           { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_TPE(yytext, loc); }
+
+%{ /* Audit log entries */ %}
+{CONFIG_DIR_AUDIT_DIR}[ ]{CONFIG_VALUE_PATH}       { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_DIR(strchr(yytext, ' ') + 1, loc); }
+{CONFIG_DIR_AUDIT_DIR_MOD}[ ]{CONFIG_VALUE_NUMBER} { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_DIR_MOD(strchr(yytext, ' ') + 1, loc); }
+{CONFIG_DIR_AUDIT_ENG}                             { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_ENG(yytext, loc); }
+{CONFIG_DIR_AUDIT_FLE_MOD}[ ]{CONFIG_VALUE_NUMBER} { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_FLE_MOD(strchr(yytext, ' ') + 1, loc); }
+{CONFIG_DIR_AUDIT_LOG2}[ ]{CONFIG_VALUE_PATH}      { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_LOG2(strchr(yytext, ' ') + 1, loc); }
+{CONFIG_DIR_AUDIT_LOG}[ ]{CONFIG_VALUE_PATH}       { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_LOG(strchr(yytext, ' ') + 1, loc); }
+{CONFIG_DIR_AUDIT_LOG_P}[ ]{AUDIT_PARTS}           { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_LOG_P(strchr(yytext, ' ') + 1, loc); }
+{CONFIG_DIR_AUDIT_STS}[ ]["]{FREE_TEXT}["]         { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_STS(strchr(yytext, ' ') + 1, loc); }
+{CONFIG_DIR_AUDIT_TPE}                             { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_TPE(yytext, loc); }
+
+%{ /* Debug log entries */ %}
 {CONFIG_DIR_DEBUG_LOG}[ ]{CONFIG_VALUE_PATH}    { return yy::seclang_parser::make_CONFIG_DIR_DEBUG_LOG(strchr(yytext, ' ') + 1, loc); }
 {CONFIG_DIR_DEBUG_LVL}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_DEBUG_LVL(strchr(yytext, ' ') + 1, loc); }
-{CONFIG_DIR_AUDIT_LOG}[ ]{CONFIG_VALUE_PATH}    { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_LOG(strchr(yytext, ' ') + 1, loc); }
-{CONFIG_DIR_AUDIT_LOG_P}[ ]{AUDIT_PARTS}    { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_LOG_P(strchr(yytext, ' ') + 1, loc); }
-{CONFIG_VALUE_ON}              { return yy::seclang_parser::make_CONFIG_VALUE_ON(yytext, loc); }
+
+
+{CONFIG_VALUE_ON}               { return yy::seclang_parser::make_CONFIG_VALUE_ON(yytext, loc); }
 {CONFIG_VALUE_OFF}              { return yy::seclang_parser::make_CONFIG_VALUE_OFF(yytext, loc); }
-{CONFIG_VALUE_SERIAL}              { return yy::seclang_parser::make_CONFIG_VALUE_SERIAL(yytext, loc); }
-{CONFIG_VALUE_PARALLEL}              { return yy::seclang_parser::make_CONFIG_VALUE_PARALLEL(yytext, loc); }
-{CONFIG_VALUE_DETC}              { return yy::seclang_parser::make_CONFIG_VALUE_DETC(yytext, loc); }
+{CONFIG_VALUE_SERIAL}           { return yy::seclang_parser::make_CONFIG_VALUE_SERIAL(yytext, loc); }
+{CONFIG_VALUE_PARALLEL}         { return yy::seclang_parser::make_CONFIG_VALUE_PARALLEL(yytext, loc); }
+{CONFIG_VALUE_DETC}             { return yy::seclang_parser::make_CONFIG_VALUE_DETC(yytext, loc); }
+{CONFIG_VALUE_RELEVANT_ONLY}    { return yy::seclang_parser::make_CONFIG_VALUE_RELEVANT_ONLY(yytext, loc); }
 ["]{OPERATOR}[ ]{FREE_TEXT}["]  { return yy::seclang_parser::make_OPERATOR(yytext, loc); }
-["]{OPERATORNOARG}["] 	 	{ return yy::seclang_parser::make_OPERATOR(yytext, loc); }
+["]{OPERATORNOARG}["]           { return yy::seclang_parser::make_OPERATOR(yytext, loc); }
 {ACTION}                        { return yy::seclang_parser::make_ACTION(yytext, loc); }
 ["]                             { return yy::seclang_parser::make_QUOTATION_MARK(loc); }
 [,]                             { return yy::seclang_parser::make_COMMA(loc); }

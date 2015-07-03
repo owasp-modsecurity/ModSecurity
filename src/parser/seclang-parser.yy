@@ -50,28 +50,39 @@ using ModSecurity::Rule;
   FREE_TEXT
 ;
 
-%left ARGS CONFIG_VALUE_ON CONFIG_VALUE_OFF CONFIG_VALUE
+%left ARGS CONFIG_VALUE_RELEVANT_ONLY CONFIG_VALUE_ON CONFIG_VALUE_OFF CONFIG_VALUE
 %token <std::string> DIRECTIVE
 %token <std::string> CONFIG_DIRECTIVE
 %token <std::string> CONFIG_DIR_RULE_ENG
 %token <std::string> CONFIG_DIR_REQ_BODY
 %token <std::string> CONFIG_DIR_RES_BODY
-%token <std::string> CONFIG_DIR_AUDIT_ENG
-%token <std::string> CONFIG_DIR_AUDIT_TPE
 %token <std::string> CONFIG_VALUE
 %token <std::string> CONFIG_VALUE_ON
 %token <std::string> CONFIG_VALUE_OFF
 %token <std::string> CONFIG_VALUE_DETC
 %token <std::string> CONFIG_VALUE_SERIAL
 %token <std::string> CONFIG_VALUE_PARALLEL
+%token <std::string> CONFIG_VALUE_RELEVANT_ONLY
+
+%token <std::string> CONFIG_DIR_AUDIT_DIR
+%token <std::string> CONFIG_DIR_AUDIT_DIR_MOD
+%token <std::string> CONFIG_DIR_AUDIT_ENG
+%token <std::string> CONFIG_DIR_AUDIT_FLE_MOD
 %token <std::string> CONFIG_DIR_AUDIT_LOG
+%token <std::string> CONFIG_DIR_AUDIT_LOG2
 %token <std::string> CONFIG_DIR_AUDIT_LOG_P
+%token <std::string> CONFIG_DIR_AUDIT_STS
+%token <std::string> CONFIG_DIR_AUDIT_TPE
+
 %token <std::string> CONFIG_DIR_DEBUG_LOG
 %token <std::string> CONFIG_DIR_DEBUG_LVL
+
 %token <std::string> OPERATOR
 %token <std::string> ACTION
 %token <std::string> VARIABLE
 %token <std::string> TRANSFORMATION
+
+%token <double> CONFIG_VALUE_NUMBER
 
 %type <std::vector<Action *> *> actions
 %type <std::vector<Variable> *> variables
@@ -91,8 +102,80 @@ line:
     | SPACE NEW_LINE
     | SPACE
 
+audit_log:
+    /* SecAuditLogDirMode */
+    CONFIG_DIR_AUDIT_DIR_MOD
+      {
+        driver.audit_log->setStorageDirMode(strtol($1.c_str(), NULL, 8));
+      }
+
+    /* SecAuditLogStorageDir */
+    | CONFIG_DIR_AUDIT_DIR
+      {
+        driver.audit_log->setStorageDir($1);
+      }
+
+    /* SecAuditEngine */
+    | CONFIG_DIR_AUDIT_ENG SPACE CONFIG_VALUE_RELEVANT_ONLY
+      {
+        driver.audit_log->setStatus(ModSecurity::AuditLog::RelevantOnlyAuditLogStatus);
+      }
+    | CONFIG_DIR_AUDIT_ENG SPACE CONFIG_VALUE_OFF
+      {
+        driver.audit_log->setStatus(ModSecurity::AuditLog::OffAuditLogStatus);
+      }
+    | CONFIG_DIR_AUDIT_ENG SPACE CONFIG_VALUE_ON
+      {
+        driver.audit_log->setStatus(ModSecurity::AuditLog::OnAuditLogStatus);
+      }
+
+    /* SecAuditLogFileMode */
+    | CONFIG_DIR_AUDIT_FLE_MOD
+      {
+        driver.audit_log->setFileMode(strtol($1.c_str(), NULL, 8));
+      }
+
+    /* SecAuditLog2 */
+    | CONFIG_DIR_AUDIT_LOG2
+      {
+        driver.audit_log->setFilePath2($1);
+      }
+
+    /* SecAuditLogParts */
+    | CONFIG_DIR_AUDIT_LOG_P
+      {
+        driver.audit_log->setParts($1);
+      }
+
+    /* SecAuditLog */
+    | CONFIG_DIR_AUDIT_LOG
+      {
+        driver.audit_log->setFilePath1($1);
+      }
+
+    /* SecAuditLogRelevantStatus */
+    | CONFIG_DIR_AUDIT_STS
+      {
+        std::string relevant_status($1);
+        relevant_status.pop_back();
+        relevant_status.erase(0, 1);
+        driver.audit_log->setRelevantStatus(relevant_status);
+      }
+
+    /* SecAuditLogType */
+    | CONFIG_DIR_AUDIT_TPE SPACE CONFIG_VALUE_SERIAL
+      {
+        driver.audit_log->setType(ModSecurity::AuditLog::SerialAuditLogType);
+      }
+    | CONFIG_DIR_AUDIT_TPE SPACE CONFIG_VALUE_PARALLEL
+      {
+        driver.audit_log->setType(ModSecurity::AuditLog::ParallelAuditLogType);
+      }
+
+
 expression:
-    DIRECTIVE SPACE variables SPACE OPERATOR SPACE QUOTATION_MARK actions QUOTATION_MARK
+    audit_log
+    | DIRECTIVE SPACE variables SPACE OPERATOR SPACE QUOTATION_MARK actions QUOTATION_MARK
       {
         Rule *rule = new Rule(
             /* op */ Operator::instantiate($5),
@@ -129,30 +212,7 @@ expression:
       {
         driver.sec_request_body_access = false;
       }
-    | CONFIG_DIR_AUDIT_ENG SPACE CONFIG_VALUE_ON
-      {
-        driver.sec_audit_engine = true;
-      }
-    | CONFIG_DIR_AUDIT_ENG SPACE CONFIG_VALUE_OFF
-      {
-        driver.sec_audit_engine = false;
-      }
-    | CONFIG_DIR_AUDIT_TPE SPACE CONFIG_VALUE_SERIAL
-      {
-        driver.sec_audit_type = 0;
-      }
-    | CONFIG_DIR_AUDIT_TPE SPACE CONFIG_VALUE_PARALLEL
-      {
-        driver.sec_audit_type = 1;
-      }
-    | CONFIG_DIR_AUDIT_LOG
-      {
-        //driver.audit_log_path = $1;
-      }
-    | CONFIG_DIR_AUDIT_LOG_P
-      {
-        //driver.audit_log_parts = $1;
-      }
+    /* Debug log: start */
     | CONFIG_DIR_DEBUG_LVL
       {
         driver.debug_level = atoi($1.c_str());
@@ -161,6 +221,7 @@ expression:
       {
         driver.debug_log_path = $1;
       }
+    /* Debug log: end */
 
 variables:
     variables PIPE VARIABLE
