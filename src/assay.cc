@@ -77,7 +77,8 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     m_uri(NULL),
     m_rules(rules),
     save_in_auditlog(false),
-    do_not_save_in_auditlog(false) {
+    do_not_save_in_auditlog(false),
+    http_code_returned(200) {
     m_rules->incrementReferenceCount();
     this->debug(4, "Initialising transaction");
 }

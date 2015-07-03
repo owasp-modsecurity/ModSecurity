@@ -130,6 +130,8 @@ class Assay {
     bool save_in_auditlog;
     bool do_not_save_in_auditlog;
 
+    int http_code_returned;
+
  private:
     std::ofstream myfile;
     Rules *m_rules;
