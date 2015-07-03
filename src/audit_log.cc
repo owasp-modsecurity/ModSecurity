@@ -136,6 +136,24 @@ bool AuditLog::isRelevant(int status) {
 
 
 bool AuditLog::saveIfRelevant(Assay *assay) {
+    if (this->isRelevant(assay->http_code_returned) == false &&
+        assay->save_in_auditlog == false) {
+        return true;
+    }
+
+    /**
+     * Even if it is relevant, if it is marked not to be save,
+     * we won't save it.
+     *
+     */
+    if (assay->do_not_save_in_auditlog == true) {
+        return true;
+    }
+
+    std::string log = logfy(assay);
+
+    m_writer->write(log);
+
     return true;
 }
 

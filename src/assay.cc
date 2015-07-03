@@ -592,6 +592,9 @@ int Assay::processLogging() {
     debug(4, "Starting phase LOGGING. (SecRules 5)");
     this->m_rules->evaluate(ModSecurity::LoggingPhase, this);
 
+    /* If relevant, save this assay information at the audit_logs */
+    this->m_rules->audit_log->saveIfRelevant(this);
+
     return 0;
 }
 
