@@ -31,7 +31,9 @@ pkginclude_HEADERS = \
 
 ACTIONS = \
 	actions/action.cc \
+	actions/audit_log.cc \
 	actions/block.cc \
+	actions/no_audit_log.cc \
 	actions/phase.cc \
 	actions/redirect.cc \
 	actions/rule_id.cc \

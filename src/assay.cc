@@ -75,7 +75,9 @@ namespace ModSecurity {
 Assay::Assay(ModSecurity *ms, Rules *rules)
     : m_ipAddress(NULL),
     m_uri(NULL),
-    m_rules(rules) {
+    m_rules(rules),
+    save_in_auditlog(false),
+    do_not_save_in_auditlog(false) {
     m_rules->incrementReferenceCount();
     this->debug(4, "Initialising transaction");
 }

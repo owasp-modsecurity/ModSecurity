@@ -127,6 +127,9 @@ class Assay {
     void debug(int, std::string);
     std::vector<actions::Action *> actions;
 
+    bool save_in_auditlog;
+    bool do_not_save_in_auditlog;
+
  private:
     std::ofstream myfile;
     Rules *m_rules;
