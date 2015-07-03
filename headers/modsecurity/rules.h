@@ -39,6 +39,7 @@ class Driver;
 
 namespace ModSecurity {
 class Rule;
+class AuditLog;
 
 /** @ingroup ModSecurity_CPP_API */
 class Rules {
@@ -84,6 +85,8 @@ class Rules {
     int debug_level;
     DebugLog *debug_log;
     void debug(int level, std::string message);
+
+    AuditLog *audit_log;
 
  private:
     int m_referenceCount;

@@ -78,6 +78,7 @@ libmodsecurity_la_SOURCES = \
 	parser/seclang-scanner.ll \
 	parser/driver.cc \
 	assay.cc \
+	audit_log.cc \
 	modsecurity.cc \
 	rules.cc \
 	utils.cc \

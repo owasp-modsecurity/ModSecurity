@@ -147,11 +147,11 @@ expression:
       }
     | CONFIG_DIR_AUDIT_LOG
       {
-        driver.audit_log_path = $1;
+        //driver.audit_log_path = $1;
       }
     | CONFIG_DIR_AUDIT_LOG_P
       {
-        driver.audit_log_parts = $1;
+        //driver.audit_log_parts = $1;
       }
     | CONFIG_DIR_DEBUG_LVL
       {

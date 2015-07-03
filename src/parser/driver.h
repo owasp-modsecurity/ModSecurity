@@ -25,6 +25,7 @@
 
 #include "modsecurity/modsecurity.h"
 #include "src/rule.h"
+#include "src/audit_log.h"
 
 #include "parser/seclang-parser.hh"
 
@@ -85,9 +86,11 @@ class Driver {
     bool sec_audit_engine;
     bool sec_request_body_access;
     bool sec_response_body_access;
-    std::string audit_log_path;
-    std::string audit_log_parts;
+
     std::string debug_log_path;
+
+    ModSecurity::AuditLog *audit_log;
+
     int debug_level;
 };
 

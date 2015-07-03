@@ -28,6 +28,7 @@
 #include "modsecurity/intervention.h"
 #include "actions/action.h"
 #include "src/utils.h"
+#include "src/audit_log.h"
 
 using ModSecurity::actions::Action;
 

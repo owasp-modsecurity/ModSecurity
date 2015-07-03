@@ -18,7 +18,9 @@
 #include "parser/seclang-parser.hh"
 
 Driver::Driver()
-  : trace_scanning(false), trace_parsing(false) {
+  : trace_scanning(false),
+  trace_parsing(false),
+  audit_log(new ModSecurity::AuditLog()) {
 }
 
 
@@ -45,6 +47,11 @@ int Driver::parse(const std::string &f) {
     // yy_scan_buffer
 
     int res = parser.parse();
+
+    if (this->audit_log->init() == false)
+    {
+        return false;
+    }
 
     scan_end();
     return res;

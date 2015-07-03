@@ -159,8 +159,6 @@ int Rules::merge(Driver *from) {
     this->sec_audit_engine = from->sec_audit_engine;
     this->sec_request_body_access = from->sec_request_body_access;
     this->sec_response_body_access = from->sec_response_body_access;
-    this->audit_log_path = from->audit_log_path;
-    this->audit_log_parts = from->audit_log_parts;
     this->debug_log_path = from->debug_log_path;
     this->debug_level = from->debug_level;
 
@@ -169,6 +167,8 @@ int Rules::merge(Driver *from) {
     } else {
         this->debug_log = new DebugLog();
     }
+
+    this->audit_log = from->audit_log;
 
     this->debug_log->setDebugLevel(this->debug_level);
     this->debug_log->setOutputFile(this->debug_log_path);
@@ -194,8 +194,6 @@ int Rules::merge(Rules *from) {
     this->sec_audit_engine = from->sec_audit_engine;
     this->sec_request_body_access = from->sec_request_body_access;
     this->sec_response_body_access = from->sec_response_body_access;
-    this->audit_log_path = from->audit_log_path;
-    this->audit_log_parts = from->audit_log_parts;
 
     this->debug_log = from->debug_log;
 
