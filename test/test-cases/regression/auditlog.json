@@ -1,0 +1,49 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "auditlog : basic parser test",
+    "request": {
+      "ip": "200.249.12.31",
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text\/html,application\/xhtml+xml,application\/xml;q=0.9,*\/*;q=0.8",
+        "Accept-Language": "en-us,en;q=0.5",
+        "Accept-Encoding": "gzip,deflate",
+        "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+        "Keep-Alive": "300",
+        "Connection": "keep-alive",
+        "Pragma": "no-cache",
+        "Cache-Control": "no-cache"
+      },
+      "uri": "GET \/test.pl?param1=   test   &param2=test2",
+      "body": ""
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "plain\/text\n\r"
+      },
+      "body": [
+        "test"
+      ]
+    },
+    "expected": {
+      "audit_log": "",
+      "debug_log": "\\[9\\]  T \\(0\\) trim: \"test\"",
+      "error_log": "",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecRule ARGS \"@contains test\" \"t:trim,block,auditlog\"",
+      "SecAuditEngine RelevantOnly",
+      "SecAuditLogParts ABCFHZ",
+      "SecAuditLogStorageDir /tmp",
+      "SecAuditLogRelevantStatus \"^(?:5|4(?!04))\""
+    ]
+  }
+]
