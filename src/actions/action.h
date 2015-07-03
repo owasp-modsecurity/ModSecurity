@@ -34,6 +34,9 @@ class Action {
     explicit Action(std::string _action)
         : action_kind(2),
         action(_action) { }
+    explicit Action(std::string _action, int kind)
+        : action_kind(kind),
+        action(_action) { }
 
     /**
      *
