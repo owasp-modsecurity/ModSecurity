@@ -36,8 +36,8 @@ bool CustomDebugLog::write_log(int level, const std::string& message) {
 bool CustomDebugLog::contains(const std::string& pattern) {
     std::regex re(pattern);
     std::smatch match;
-
-    return (std::regex_search(m_log.str(), match, re) && match.size() >= 1);
+    std::string s = m_log.str();
+    return (std::regex_search(s, match, re) && match.size() >= 1);
 }
 
 std::string CustomDebugLog::log_messages() {
