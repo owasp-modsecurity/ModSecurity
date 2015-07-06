@@ -8,9 +8,9 @@ application.
 Currently the libmodsecurity is used by the ModSecurity nginx connector
 (ModSecurity-nginx).
 
-Notice: This project is under development and it is not ready to be placed in
+_Notice: This project is under development and it is not ready to be placed in
 production yet. It is not supporting all the operators and/or actions of the
-SecRules languages yet.
+SecRules languages yet._
 
 
 ### What is the difference between this project and the old ModSecurity (v2.x.x)?
