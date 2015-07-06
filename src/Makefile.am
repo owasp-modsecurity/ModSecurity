@@ -1,9 +1,10 @@
 
+BUILT_SOURCES= \
+	parser/seclang-parser.cc
 
 libmodsecuritydir = $(prefix)/lib
 libmodsecurity_LTLIBRARIES = libmodsecurity.la
 libmodsecurity_ladir = $(prefix)/include
-
 
 CLEANFILES = \
 	location.hh \
