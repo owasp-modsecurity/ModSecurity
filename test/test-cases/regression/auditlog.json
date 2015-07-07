@@ -4,8 +4,15 @@
     "version_min": 300000,
     "version_max": 0,
     "title": "auditlog : basic parser test",
-    "request": {
+    "client": {
       "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
       "headers": {
         "Host": "www.modsecurity.org",
         "User-Agent": "Mozilla\/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko\/20091102 Firefox\/3.5.5 (.NET CLR 3.5.30729)",

@@ -17,7 +17,8 @@
 #include <iostream>
 
 #include "modsecurity/modsecurity.h"
-#include "src/utils.h"
+#include "src/unique_id.h"
+
 
 namespace ModSecurity {
 
@@ -39,6 +40,7 @@ namespace ModSecurity {
  * @endcode
  */
 ModSecurity::ModSecurity() {
+    UniqueId::uniqueId();
 }
 
 

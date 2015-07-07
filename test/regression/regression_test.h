@@ -51,7 +51,11 @@ class RegressionTest {
     std::string debug_log;
     std::string error_log;
 
-    std::string ip;
+    std::string clientIp;
+    std::string serverIp;
+    int clientPort;
+    int serverPort;
+
     std::string uri;
 
     static inline std::string yajl_array_to_str(const yajl_val &node);

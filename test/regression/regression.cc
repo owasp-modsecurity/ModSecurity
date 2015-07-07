@@ -78,13 +78,12 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         }
         modsec_assay = new ModSecurity::Assay(modsec, modsec_rules);
 
-        if (t->ip.empty() == false) {
-            // FIXME: no cast please.
-            modsec_assay->processConnection(t->ip.c_str());
-            actions(&r, modsec_assay->intervention());
-            if (r.status != 200) {
-                goto end;
-            }
+        modsec_assay->processConnection(t->clientIp.c_str(),
+            t->clientPort, t->serverIp.c_str(), t->serverPort);
+
+        actions(&r, modsec_assay->intervention());
+        if (r.status != 200) {
+             goto end;
         }
         if (t->uri.empty() == false) {
             modsec_assay->processURI(t->uri.c_str());

@@ -74,6 +74,8 @@ ACTIONS = \
 	actions/transformations/url_encode.cc \
 	actions/transformations/utf8_to_unicode.cc
 
+UTILS = \
+	utils/sha1.cc
 
 libmodsecurity_la_SOURCES = \
 	parser/seclang-parser.yy \
@@ -89,6 +91,7 @@ libmodsecurity_la_SOURCES = \
 	utils.cc \
 	debug_log.cc \
 	rule.cc \
+	unique_id.cc \
 	variable.cc \
 	operators/operator.cc \
 	operators/detect_sqli.cc \
@@ -127,7 +130,8 @@ libmodsecurity_la_SOURCES = \
 	operators/str_eq.cc \
 	operators/str_match.cc \
 	operators/begins_with.cc \
-	${ACTIONS}
+	${ACTIONS} \
+	${UTILS}
 
 
 

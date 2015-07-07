@@ -85,7 +85,8 @@ class Assay {
     ~Assay();
 
     /** TODO: Should be an structure that fits an IP address */
-    int processConnection(const char *ip);
+    int processConnection(const char *client, int cPort,
+        const char *server, int sPort);
     int processURI(const char *uri);
 
 
@@ -135,7 +136,10 @@ class Assay {
  private:
     std::ofstream myfile;
     Rules *m_rules;
-    const char *m_ipAddress;
+    const char *m_clientIpAddress;
+    const char *m_serverIpAddress;
+    int m_clientPort;
+    int m_serverPort;
     const char *m_uri;
     std::ostringstream m_requestBody;
     std::ostringstream m_responseBody;
@@ -153,7 +157,8 @@ extern "C" {
 Assay *msc_new_assay(ModSecurity *ms, Rules *rules);
 
 /** @ingroup ModSecurity_C_API */
-int msc_process_connection(Assay *assay, const char *ip);
+int msc_process_connection(Assay *assay, const char *client, int cPort,
+    const char *server, int sPort);
 
 /** @ingroup ModSecurity_C_API */
 int msc_process_request_headers(Assay *assay);

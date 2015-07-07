@@ -107,6 +107,32 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
         if (strcmp(key, "github_issue") == 0) {
             u->github_issue = YAJL_GET_INTEGER(val);
         }
+        if (strcmp(key, "client") == 0) {
+            for (int j = 0; j < val->u.object.len; j++) {
+                const char *key2 = val->u.object.keys[j];
+                yajl_val val2 = val->u.object.values[j];
+
+                if (strcmp(key2, "ip") == 0) {
+                    u->clientIp = YAJL_GET_STRING(val2);
+                }
+                if (strcmp(key2, "port") == 0) {
+                    u->clientPort = YAJL_GET_INTEGER(val2);
+                }
+            }
+        }
+        if (strcmp(key, "server") == 0) {
+            for (int j = 0; j < val->u.object.len; j++) {
+                const char *key2 = val->u.object.keys[j];
+                yajl_val val2 = val->u.object.values[j];
+
+                if (strcmp(key2, "ip") == 0) {
+                    u->serverIp = YAJL_GET_STRING(val2);
+                }
+                if (strcmp(key2, "port") == 0) {
+                    u->serverPort = YAJL_GET_INTEGER(val2);
+                }
+            }
+        }
         if (strcmp(key, "request") == 0) {
             for (int j = 0; j < val->u.object.len; j++) {
                 const char *key2 = val->u.object.keys[j];
@@ -114,9 +140,6 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
 
                 if (strcmp(key2, "uri") == 0) {
                    u->uri = YAJL_GET_STRING(val2);
-                }
-                if (strcmp(key2, "ip") == 0) {
-                   u->ip = YAJL_GET_STRING(val2);
                 }
                 if (strcmp(key2, "headers") == 0) {
                     u->request_headers = yajl_array_to_map(val2);

@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
         std::cout << "Proceding with request " << i << std::endl;
 
         Assay *modsecAssay = new Assay(modsec, rules);
-        modsecAssay->processConnection(ip);
+        modsecAssay->processConnection(ip, 12345, "127.0.0.1", 80);
 
         if (modsecAssay->intervention()) {
             std::cout << "There is an intervention" << std::endl;

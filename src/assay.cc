@@ -61,7 +61,7 @@ namespace ModSecurity {
  * rules->loadFromUri(rules_file);
  *
  * Assay *modsecAssay = new Assay(modsec, rules);
- * modsecAssay->processConnection("127.0.0.1");
+ * modsecAssay->processConnection("127.0.0.1", 33333, "127.0.0.1", 8080);
  *
  * if (modsecAssay->intervention()) {
  *     std::cout << "There is an intervention" << std::endl;
@@ -73,8 +73,11 @@ namespace ModSecurity {
  *
  */
 Assay::Assay(ModSecurity *ms, Rules *rules)
-    : m_ipAddress(NULL),
-    m_uri(NULL),
+    : m_clientIpAddress(""),
+    m_serverIpAddress(""),
+    m_clientPort(0),
+    m_serverPort(0),
+    m_uri(""),
     m_rules(rules),
     save_in_auditlog(false),
     do_not_save_in_auditlog(false),
@@ -115,19 +118,27 @@ void Assay::debug(int level, std::string message) {
  *
  * @note Remember to check for a possible intervention.
  *
- * @param buf Client's IP address in text format.
+ * @param assay ModSecurity assay.
+ * @param client Client's IP address in text format.
+ * @param cPort Client's port
+ * @param server Server's IP address in text format.
+ * @param sPort Server's port
  *
  * @returns If the operation was successful or not.
  * @retval true Operation was successful.
  * @retval false Operation failed.
  *
  */
-int Assay::processConnection(const char *ipAddress) {
-    this->m_ipAddress = ipAddress;
+int Assay::processConnection(const char *client, int cPort, const char *server,
+    int sPort) {
+    this->m_clientIpAddress = client;
+    this->m_serverIpAddress = server;
+    this->m_clientPort = cPort;
+    this->m_serverPort = sPort;
     debug(4, "Transaction context created (blah blah)");
     debug(4, "Starting phase CONNECTION. (SecRules 0)");
 
-    this->store_variable("REMOTE_ADDR", ipAddress);
+    this->store_variable("REMOTE_ADDR", m_clientIpAddress);
     this->m_rules->evaluate(ModSecurity::ConnectionPhase, this);
     return true;
 }
@@ -711,15 +722,19 @@ extern "C" Assay *msc_new_assay(ModSecurity *ms,
  * @note Remember to check for a possible intervention.
  *
  * @param assay ModSecurity assay.
- * @param buf Client's IP address in text format.
+ * @param client Client's IP address in text format.
+ * @param cPort Client's port
+ * @param server Server's IP address in text format.
+ * @param sPort Server's port
  *
  * @returns If the operation was successful or not.
  * @retval 1 Operation was successful.
  * @retval 0 Operation failed.
  *
  */
-extern "C" int msc_process_connection(Assay *assay, const char *buf) {
-    return assay->processConnection(buf);
+extern "C" int msc_process_connection(Assay *assay, const char *client,
+    int cPort, const char *server, int sPort) {
+    return assay->processConnection(client, cPort, server, sPort);
 }
 
 

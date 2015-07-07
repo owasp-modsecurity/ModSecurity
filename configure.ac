@@ -43,6 +43,7 @@ AM_CONDITIONAL([YAJL_VERSION], [test "$YAJL_VERSION" != ""])
 AC_HEADER_STDC
 AC_CHECK_HEADERS([string])
 AC_CHECK_HEADERS([iostream])
+AC_CHECK_HEADERS([sys/utsname.h])
 
 
 # ??
