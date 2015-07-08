@@ -38,7 +38,24 @@ typedef struct Rules_t Rules;
 
 #include "modsecurity/intervention.h"
 
+#define LOGFY_ADD(a, b) \
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
+    if (b == NULL) { \
+      yajl_gen_string(g, reinterpret_cast<const unsigned char*>(""), \
+          strlen("")); \
+    } else { \
+      yajl_gen_string(g, reinterpret_cast<const unsigned char*>(b), \
+          strlen(b)); \
+    }
 
+
+#define LOGFY_ADD_INT(a, b) \
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
+    yajl_gen_number(g, reinterpret_cast<const char*>(b), strlen(b));
+
+#define LOGFY_ADD_NUM(a, b) \
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
+    yajl_gen_integer(g, b);
 
 #ifdef __cplusplus
 
@@ -134,10 +151,13 @@ class Assay {
 
     int http_code_returned;
 
+    std::string to_json(int parts);
+
  private:
     std::string id;
     std::ofstream myfile;
     Rules *m_rules;
+
     const char *m_clientIpAddress;
     const char *m_serverIpAddress;
     int m_clientPort;

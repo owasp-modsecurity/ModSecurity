@@ -15,6 +15,8 @@
 
 #include "modsecurity/assay.h"
 
+#include <yajl/yajl_tree.h>
+#include <yajl/yajl_gen.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -23,12 +25,14 @@
 #include <unordered_map>
 #include <fstream>
 #include <vector>
+#include <iomanip>
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/intervention.h"
 #include "actions/action.h"
 #include "src/utils.h"
 #include "src/audit_log.h"
+#include "src/unique_id.h"
 
 using ModSecurity::actions::Action;
 
@@ -681,6 +685,112 @@ ModSecurityIntervention *Assay::intervention() {
     return ret;
 }
 
+
+std::string Assay::to_json(int parts) {
+    const unsigned char *buf;
+    size_t len;
+    yajl_gen g = NULL;
+    std::string ts = ascTime(&m_timeStamp).c_str();
+    std::string uniqueId = UniqueId::uniqueId();
+
+    g = yajl_gen_alloc(NULL);
+    if (g == NULL) {
+      return "";
+    }
+    yajl_gen_config(g, yajl_gen_beautify, 1);
+
+    /* main */
+    yajl_gen_map_open(g);
+
+    /* trasaction */
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("transaction"),
+        strlen("transaction"));
+
+    yajl_gen_map_open(g);
+    LOGFY_ADD("client_ip", this->m_clientIpAddress);
+    LOGFY_ADD("time_stamp", ts.c_str());
+    LOGFY_ADD("server_id", uniqueId.c_str());
+    LOGFY_ADD_NUM("client_port", m_clientPort);
+    LOGFY_ADD("host_ip", m_serverIpAddress);
+    LOGFY_ADD_NUM("host_port", m_serverPort);
+    LOGFY_ADD("id", this->id.c_str());
+
+    /* request */
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("request"),
+        strlen("request"));
+    yajl_gen_map_open(g);
+
+    LOGFY_ADD("protocol", m_protocol);
+    LOGFY_ADD_INT("http_version", m_httpVersion);
+    LOGFY_ADD("uri", this->m_uri);
+    LOGFY_ADD("body", this->m_requestBody.str().c_str());
+
+    /* request headers */
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
+        strlen("headers"));
+    yajl_gen_map_open(g);
+
+    for (auto h : this->m_variables_strings) {
+        std::string filter = "REQUEST_HEADERS:";
+        std::string a = h.first;
+        std::string b = h.second;
+
+        if (a.compare(0, filter.length(), filter) == 0) {
+            if (a.length() > filter.length()) {
+                LOGFY_ADD(a.c_str() + filter.length(), b.c_str());
+            }
+        }
+    }
+
+    /* end: request headers */
+    yajl_gen_map_close(g);
+    /* end: request */
+    yajl_gen_map_close(g);
+
+    /* response */
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("response"),
+        strlen("response"));
+    yajl_gen_map_open(g);
+
+    LOGFY_ADD("body", this->m_responseBody.str().c_str());
+    LOGFY_ADD_NUM("http_code", http_code_returned);
+
+    /* response headers */
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
+        strlen("headers"));
+    yajl_gen_map_open(g);
+
+    for (auto h : this->m_variables_strings) {
+        std::string filter = "RESPONSE_HEADERS:";
+        std::string a = h.first;
+        std::string b = h.second;
+
+        if (a.compare(0, filter.length(), filter) == 0) {
+            if (a.length() > filter.length()) {
+                LOGFY_ADD(a.c_str() + filter.length(), b.c_str());
+            }
+        }
+    }
+    /* end: response headers */
+    yajl_gen_map_close(g);
+    /* end: response */
+    yajl_gen_map_close(g);
+
+
+    /* end: transaction */
+    yajl_gen_map_close(g);
+
+    /* end: main */
+    yajl_gen_map_close(g);
+
+    yajl_gen_get_buf(g, &buf, &len);
+
+    std::string log(reinterpret_cast<const char*>(buf), len);
+
+    yajl_gen_free(g);
+
+    return log;
+}
 
 void Assay::store_variable(std::string key, std::string value) {
     this->m_variables_strings[key] = value;

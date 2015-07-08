@@ -148,8 +148,8 @@ libmodsecurity_la_CPPFLAGS = \
 
 
 libmodsecurity_la_LIBADD = \
-	@LEXLIB@
-
+	@LEXLIB@ \
+	 $(YAJL_LDADD)
 
 libmodsecurity_la_LDFLAGS = \
 	-version-info @MSC_VERSION_INFO@

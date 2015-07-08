@@ -6,7 +6,8 @@ benchmark_SOURCES = \
         benchmark.cc
 
 benchmark_LDADD = \
-        $(top_builddir)/src/.libs/libmodsecurity.a
+        $(top_builddir)/src/.libs/libmodsecurity.a \
+        $(YAJL_LDADD)
 
 benchmark_CPPFLAGS = \
         -std=c++11 \

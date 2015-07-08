@@ -34,7 +34,7 @@ class AuditLogWriter : public std::ofstream {
 
     virtual bool close() { return true; }
     virtual bool init() { return true; }
-    virtual bool write(const std::string& log) { return true; }
+    virtual bool write(const std::string& log);
 
     std::string file_name(const std::string& unique_id);
 };

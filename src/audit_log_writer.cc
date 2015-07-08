@@ -28,6 +28,14 @@ std::string AuditLogWriter::file_name(const std::string& unique_id) {
     /** TODO: return file with time stamp and etc.  */
     return std::string("/tmp/temp_audit_log_file.txt");
 }
-
+/**
+ *
+ * Temporary print the log into the std::cout to debug purposes.
+ *
+ */
+bool AuditLogWriter::write(const std::string& log) {
+    std::cout << log << std::endl;
+    return true;
+}
 
 }  // namespace ModSecurity

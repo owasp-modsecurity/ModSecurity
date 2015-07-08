@@ -160,7 +160,6 @@ class AuditLog {
     bool close();
 
     bool saveIfRelevant(Assay *assay);
-    std::string logfy(Assay *assay);
     bool isRelevant(int status);
 
  private:

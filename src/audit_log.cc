@@ -15,8 +15,6 @@
 
 #include "src/audit_log.h"
 
-#include <yajl/yajl_tree.h>
-#include <yajl/yajl_gen.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -150,17 +148,11 @@ bool AuditLog::saveIfRelevant(Assay *assay) {
         return true;
     }
 
-    std::string log = logfy(assay);
+    std::string log = assay->to_json(0);
 
     m_writer->write(log);
 
     return true;
-}
-
-
-std::string AuditLog::logfy(Assay *assay) {
-    std::string log("ops");
-    return log;
 }
 
 
