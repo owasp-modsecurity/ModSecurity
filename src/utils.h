@@ -26,6 +26,7 @@ namespace ModSecurity {
     std::vector<std::string> split(std::string str, char delimiter);
     double random_number(const double from, const double to);
     double generate_assay_unique_id();
+    std::string ascTime(time_t *t);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_

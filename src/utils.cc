@@ -55,5 +55,12 @@ double generate_assay_unique_id() {
 }
 
 
+std::string ascTime(time_t *t) {
+    std::string ts = std::ctime(t);
+    ts.pop_back();
+    return ts;
+}
+
+
 }  // namespace ModSecurity
 
