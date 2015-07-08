@@ -87,7 +87,8 @@ class Assay {
     /** TODO: Should be an structure that fits an IP address */
     int processConnection(const char *client, int cPort,
         const char *server, int sPort);
-    int processURI(const char *uri);
+    int processURI(const char *uri, const char *protocol,
+        const char *http_version);
 
 
     int processRequestHeaders();
@@ -141,6 +142,9 @@ class Assay {
     int m_clientPort;
     int m_serverPort;
     const char *m_uri;
+    const char *m_protocol;
+    const char *m_httpVersion;
+
     std::ostringstream m_requestBody;
     std::ostringstream m_responseBody;
     ModSecurityCollectionsVariables m_variables_collections;
@@ -194,7 +198,9 @@ int msc_append_response_body(Assay *assay,
     const unsigned char *body, size_t size);
 
 /** @ingroup ModSecurity_C_API */
-int msc_process_uri(Assay *assay, const char *uri);
+int msc_process_uri(Assay *assay, const char *uri, const char *protocol,
+    const char *http_version);
+
 /** @ingroup ModSecurity_C_API */
 const char *msc_get_response_body(Assay *assay);
 /** @ingroup ModSecurity_C_API */

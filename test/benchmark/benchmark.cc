@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
             std::cout << "There is an intervention" << std::endl;
             continue;
         }
-        modsecAssay->processURI(request_uri);
+        modsecAssay->processURI(request_uri, "GET", "1.1");
         if (modsecAssay->intervention()) {
             std::cout << "There is an intervention" << std::endl;
             continue;

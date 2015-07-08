@@ -25,7 +25,9 @@
         "Pragma": "no-cache",
         "Cache-Control": "no-cache"
       },
-      "uri": "GET \/test.pl?param1=   test   &param2=test2",
+      "uri": "\/test.pl?param1=   test   &param2=test2",
+      "protocol": "GET",
+      "http_version": 1.1,
       "body": ""
     },
     "response": {

@@ -85,12 +85,13 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         if (r.status != 200) {
              goto end;
         }
-        if (t->uri.empty() == false) {
-            modsec_assay->processURI(t->uri.c_str());
-            actions(&r, modsec_assay->intervention());
-            if (r.status != 200) {
-                goto end;
-            }
+
+        modsec_assay->processURI(t->uri.c_str(), t->protocol.c_str(),
+            t->httpVersion.c_str());
+
+        actions(&r, modsec_assay->intervention());
+        if (r.status != 200) {
+            goto end;
         }
 
         for (std::pair<std::string, std::string> headers :

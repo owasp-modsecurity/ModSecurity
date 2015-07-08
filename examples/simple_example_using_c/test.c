@@ -36,7 +36,9 @@ int main (int argc, char **argv)
     assay = msc_new_assay(modsec, rules);
 
     msc_process_connection(assay, "127.0.0.1", 12345, "127.0.0.1", 80);
-    msc_process_uri(assay, "http://www.modsecurity.org/test?key1=value1&key2=value2&key3=value3&test=args&test=test");
+    msc_process_uri(assay,
+        "http://www.modsecurity.org/test?key1=value1&key2=value2&key3=value3",
+        "GET", "1.1");
     msc_process_request_headers(assay);
     msc_process_request_body(assay);
     msc_process_response_headers(assay);

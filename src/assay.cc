@@ -78,6 +78,8 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     m_clientPort(0),
     m_serverPort(0),
     m_uri(""),
+    m_protocol(""),
+    m_httpVersion(""),
     m_rules(rules),
     save_in_auditlog(false),
     do_not_save_in_auditlog(false),
@@ -157,15 +159,23 @@ int Assay::processConnection(const char *client, int cPort, const char *server,
  *       SecLanguage phase 1 and 2.
  * @note Remember to check for a possible intervention.
  *
- * @param buf   Uri.
+ * @param assay ModSecurity assay.
+ * @param uri   Uri.
+ * @param protocol   Protocol (GET, POST, PUT).
+ * @param http_version   Http version (1.0, 1.2, 2.0).
  *
  * @returns If the operation was successful or not.
  * @retval true Operation was successful.
  * @retval false Operation failed.
  *
  */
-int Assay::processURI(const char *uri) {
+int Assay::processURI(const char *uri, const char *protocol,
+    const char *http_version) {
     debug(4, "Starting phase URI. (SecRules 0 + 1/2)");
+
+    m_protocol = protocol;
+    m_httpVersion = http_version;
+    m_uri = uri;
 
     const char *pos = strchr(uri, '?');
 
@@ -197,7 +207,7 @@ int Assay::processURI(const char *uri) {
             store_variable("QUERY_STRING:" + key_value[0], key_value[1]);
         }
     }
-    return 0;
+    return true;
 }
 
 
@@ -752,15 +762,18 @@ extern "C" int msc_process_connection(Assay *assay, const char *client,
  * @note Remember to check for a possible intervention.
  *
  * @param assay ModSecurity assay.
- * @param buf   Uri.
+ * @param uri   Uri.
+ * @param protocol   Protocol (GET, POST, PUT).
+ * @param http_version   Http version (1.0, 1.2, 2.0).
  *
  * @returns If the operation was successful or not.
  * @retval 1 Operation was successful.
  * @retval 0 Operation failed.
  *
  */
-extern "C" int msc_process_uri(Assay *assay, const char *buf) {
-    return assay->processURI(buf);
+extern "C" int msc_process_uri(Assay *assay, const char *uri,
+    const char *protocol, const char *http_version) {
+    return assay->processURI(uri, protocol, http_version);
 }
 
 

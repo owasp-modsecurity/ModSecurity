@@ -16,7 +16,9 @@
   },
   "request": {
     "headers": "",
-    "body": ""
+    "body": "",
+    "protocol": "GET",
+    "http_version": 1.1
   },
   "response": {
     "headers": "",

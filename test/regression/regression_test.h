@@ -56,6 +56,8 @@ class RegressionTest {
     int clientPort;
     int serverPort;
 
+    std::string protocol;
+    std::string httpVersion;
     std::string uri;
 
     static inline std::string yajl_array_to_str(const yajl_val &node);
