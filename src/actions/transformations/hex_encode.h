@@ -18,8 +18,8 @@
 #include "actions/action.h"
 #include "actions/transformations/transformation.h"
 
-#ifndef SRC_ACTIONS_TRANSFORMATIONS_BASE64DECODE_H_
-#define SRC_ACTIONS_TRANSFORMATIONS_BASE64DECODE_H_
+#ifndef SRC_ACTIONS_TRANSFORMATIONS_HEX_ENCODE_H_
+#define SRC_ACTIONS_TRANSFORMATIONS_HEX_ENCODE_H_
 
 #ifdef __cplusplus
 namespace ModSecurity {
@@ -41,4 +41,4 @@ class HexEncode : public Transformation {
 
 #endif
 
-#endif  // SRC_ACTIONS_TRANSFORMATIONS_BASE64DECODE_H_
+#endif  // SRC_ACTIONS_TRANSFORMATIONS_HEX_ENCODE_H_

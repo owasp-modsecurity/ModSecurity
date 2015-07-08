@@ -64,7 +64,7 @@ class Rules {
     */
     int loadFromUri(char *uri);
     int loadRemote(char *key, char *uri);
-    int load(char *rules);
+    int load(const char *rules);
 
     int merge(Driver *driver);
     int merge(Rules *rules);
@@ -100,7 +100,7 @@ Rules *msc_create_rules_set();
 int msc_rules_merge(Rules *rules_dst, Rules *rules_from);
 int msc_rules_add_remote(Rules *rules, char *key, char *uri);
 int msc_rules_add_file(Rules *rules, char *file);
-int msc_rules_add(Rules *rules, char *plain_rules);
+int msc_rules_add(Rules *rules, const char *plain_rules);
 
 #ifdef __cplusplus
 }

@@ -49,7 +49,6 @@
 #include "actions/transformations/replace_nulls.h"
 #include "actions/transformations/sha1.h"
 #include "actions/transformations/sql_hex_decode.h"
-#include "actions/transformations/transformation.h"
 #include "actions/transformations/trim.h"
 #include "actions/transformations/trim_left.h"
 #include "actions/transformations/trim_right.h"
@@ -79,7 +78,6 @@ std::string &Transformation::evaluate(std::string value,
 }
 
 Transformation* Transformation::instantiate(std::string a) {
-  
     IF_MATCH(base64_decode_ext) { return new Base64DecodeExt(a); }
     IF_MATCH(base64_decode) { return new Base64Decode(a); }
     IF_MATCH(cmd_line) { return new CmdLine(a); }
@@ -115,7 +113,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(url_decode_uni) { return new UrlDecodeUni(a); }
     IF_MATCH(url_encode) { return new UrlEncode(a); }
     IF_MATCH(utf8_to_unicode) { return new Utf8Unicode(a); }
-    
+
     return new Transformation(a);
 }
 

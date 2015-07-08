@@ -58,7 +58,7 @@ int Driver::parseFile(const std::string &f) {
     parser.set_debug_level(trace_parsing);
     int res = parser.parse();
 
-    //std::cout << "Leaving the parser: " << res << std::endl;
+    // std::cout << "Leaving the parser: " << res << std::endl;
 
     scan_end();
     return res;

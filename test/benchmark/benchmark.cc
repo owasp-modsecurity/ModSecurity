@@ -93,30 +93,30 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        modsecAssay->addRequestHeader((char *) "Host",
-            (char *) "net.tutsplus.com");
-        modsecAssay->addRequestHeader((char *) "User-Agent", (char *)
+        modsecAssay->addRequestHeader("Host",
+            "net.tutsplus.com");
+        modsecAssay->addRequestHeader("User-Agent",
             "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) " \
             "Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\n\r");
-        modsecAssay->addRequestHeader((char *) "Accept",
-            (char *) "text/html,application/xhtml+xml,application/xml;" \
+        modsecAssay->addRequestHeader("Accept",
+            "text/html,application/xhtml+xml,application/xml;" \
             "q=0.9,*/*;q=0.8");
-        modsecAssay->addRequestHeader((char *) "Accept-Language",
-            (char *) "en-us,en;q=0.5");
-        modsecAssay->addRequestHeader((char *) "Accept-Encoding",
-            (char *) "gzip,deflate");
-        modsecAssay->addRequestHeader((char *) "Accept-Charset",
-            (char *) "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
-        modsecAssay->addRequestHeader((char *) "Keep-Alive",
-            (char *) "300");
-        modsecAssay->addRequestHeader((char *) "Connection",
-            (char *) "keep-alive");
-        modsecAssay->addRequestHeader((char *) "Cookie",
-            (char *) "PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120");
-        modsecAssay->addRequestHeader((char *) "Pragma",
-            (char *) "no-cache");
-        modsecAssay->addRequestHeader((char *) "Cache-Control",
-            (char *) "no-cache");
+        modsecAssay->addRequestHeader("Accept-Language",
+            "en-us,en;q=0.5");
+        modsecAssay->addRequestHeader("Accept-Encoding",
+            "gzip,deflate");
+        modsecAssay->addRequestHeader("Accept-Charset",
+            "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
+        modsecAssay->addRequestHeader("Keep-Alive",
+            "300");
+        modsecAssay->addRequestHeader("Connection",
+            "keep-alive");
+        modsecAssay->addRequestHeader("Cookie",
+            "PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120");
+        modsecAssay->addRequestHeader("Pragma",
+            "no-cache");
+        modsecAssay->addRequestHeader("Cache-Control",
+            "no-cache");
         modsecAssay->processRequestHeaders();
 
         if (modsecAssay->intervention()) {
@@ -132,12 +132,12 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        modsecAssay->addResponseHeader((char *) "HTTP/1.1",
-            (char *) "200 OK");
-        modsecAssay->addResponseHeader((char *) "Content-Type",
-            (char *) "text/xml; charset=utf-8");
-        modsecAssay->addResponseHeader((char *) "Content-Length",
-            (char *) "200");
+        modsecAssay->addResponseHeader("HTTP/1.1",
+            "200 OK");
+        modsecAssay->addResponseHeader("Content-Type",
+            "text/xml; charset=utf-8");
+        modsecAssay->addResponseHeader("Content-Length",
+            "200");
 
         modsecAssay->processResponseHeaders();
 

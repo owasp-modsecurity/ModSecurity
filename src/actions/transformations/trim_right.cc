@@ -30,7 +30,7 @@ namespace ModSecurity {
 namespace actions {
 namespace transformations {
 
-  
+
 TrimRight::TrimRight(std::string action)
     : Trim(action) {
     this->action_kind = 1;

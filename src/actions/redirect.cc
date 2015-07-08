@@ -44,7 +44,7 @@ void Redirect::fill_intervention(ModSecurityIntervention *i) {
         i->status = this->status;
     }
     // reinterpret_cast<char *>
-    i->url = (char *) this->url.c_str();  //** TODO: wheee */
+    i->url = this->url.c_str();  //** TODO: wheee */
     i->log = "Redirecting";
 }
 

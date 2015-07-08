@@ -72,7 +72,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         modsec = new ModSecurity::ModSecurity();
         modsec_rules = new ModSecurity::Rules(debug_log);
 
-        if (modsec_rules->load((char *)(t->rules.c_str())) == false) {
+        if (modsec_rules->load(t->rules.c_str()) == false) {
             std::cerr << "Problems parsing the rules, aborting!" << std::endl;
             return;
         }
@@ -80,14 +80,14 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
 
         if (t->ip.empty() == false) {
             // FIXME: no cast please.
-            modsec_assay->processConnection((char *)(t->ip.c_str()));
+            modsec_assay->processConnection(t->ip.c_str());
             actions(&r, modsec_assay->intervention());
             if (r.status != 200) {
                 goto end;
             }
         }
         if (t->uri.empty() == false) {
-            modsec_assay->processURI((char *)(t->uri.c_str()));
+            modsec_assay->processURI(t->uri.c_str());
             actions(&r, modsec_assay->intervention());
             if (r.status != 200) {
                 goto end;
@@ -96,8 +96,8 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
 
         for (std::pair<std::string, std::string> headers :
             t->request_headers) {
-            modsec_assay->addRequestHeader((char *)headers.first.c_str(),
-                (char *)headers.second.c_str());
+            modsec_assay->addRequestHeader(headers.first.c_str(),
+                headers.second.c_str());
         }
 
         modsec_assay->processRequestHeaders();
@@ -117,8 +117,8 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
 
         for (std::pair<std::string, std::string> headers :
             t->response_headers) {
-            modsec_assay->addResponseHeader((char *)headers.first.c_str(),
-            (char *)headers.second.c_str());
+            modsec_assay->addResponseHeader(headers.first.c_str(),
+                headers.second.c_str());
         }
 
         modsec_assay->processResponseHeaders();

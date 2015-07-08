@@ -105,7 +105,7 @@ int Rules::loadRemote(char *key, char *uri) {
 }
 
 
-int Rules::load(char *plain_rules) {
+int Rules::load(const char *plain_rules) {
     bool ret = true;
     /**
      * @todo rgg. we should make the parser work out of the buffer.
@@ -252,7 +252,7 @@ extern "C" int msc_rules_add_file(Rules *rules, char *file) {
 }
 
 
-extern "C" int msc_rules_add(Rules *rules, char *plain_rules) {
+extern "C" int msc_rules_add(Rules *rules, const char *plain_rules) {
     rules->load(plain_rules);
 
     return 0;

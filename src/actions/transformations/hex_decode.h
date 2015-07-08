@@ -41,4 +41,4 @@ class HexDecode : public Transformation {
 
 #endif
 
-#endif  // SRC_ACTIONS_TRANSFORMATIONS_BASE64DECODE_H_
+#endif  // SRC_ACTIONS_TRANSFORMATIONS_HEX_DECODE_H_

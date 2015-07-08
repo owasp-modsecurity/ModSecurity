@@ -42,4 +42,4 @@ class TrimRight : public Trim {
 
 #endif
 
-#endif  // SRC_ACTIONS_TRANSFORMATIONS_TRIM_H_
+#endif  // SRC_ACTIONS_TRANSFORMATIONS_TRIM_RIGHT_H_

@@ -118,7 +118,7 @@ void Assay::debug(int level, std::string message) {
  * @retval false Operation failed.
  *
  */
-int Assay::processConnection(char *ipAddress) {
+int Assay::processConnection(const char *ipAddress) {
     this->m_ipAddress = ipAddress;
     debug(4, "Transaction context created (blah blah)");
     debug(4, "Starting phase CONNECTION. (SecRules 0)");
@@ -149,10 +149,10 @@ int Assay::processConnection(char *ipAddress) {
  * @retval false Operation failed.
  *
  */
-int Assay::processURI(char *uri) {
+int Assay::processURI(const char *uri) {
     debug(4, "Starting phase URI. (SecRules 0 + 1/2)");
 
-    char *pos = strchr(uri, '?');
+    const char *pos = strchr(uri, '?');
 
     if (pos != NULL && strlen(pos) > 2) {
         /**
@@ -711,7 +711,7 @@ extern "C" Assay *msc_new_assay(ModSecurity *ms,
  * @retval 0 Operation failed.
  *
  */
-extern "C" int msc_process_connection(Assay *assay, char *buf) {
+extern "C" int msc_process_connection(Assay *assay, const char *buf) {
     return assay->processConnection(buf);
 }
 
@@ -737,7 +737,7 @@ extern "C" int msc_process_connection(Assay *assay, char *buf) {
  * @retval 0 Operation failed.
  *
  */
-extern "C" int msc_process_uri(Assay *assay, char *buf) {
+extern "C" int msc_process_uri(Assay *assay, const char *buf) {
     return assay->processURI(buf);
 }
 

@@ -41,4 +41,4 @@ class ParityOdd7bit : public Transformation {
 
 #endif
 
-#endif  // SRC_ACTIONS_TRANSFORMATIONS_PARITY_EVEN_7BIT_H_
+#endif  // SRC_ACTIONS_TRANSFORMATIONS_PARITY_ODD_7BIT_H_

@@ -23,8 +23,8 @@ namespace ModSecurity {
 typedef struct ModSecurityIntervention_t {
     int status;
     int pause;
-    char *url;
-    char *log;
+    const char *url;
+    const char *log;
 } ModSecurityIntervention;
 
 #ifdef __cplusplus
