@@ -81,6 +81,9 @@ libmodsecurity_la_SOURCES = \
 	parser/driver.cc \
 	assay.cc \
 	audit_log.cc \
+	audit_log_writer.cc \
+	audit_log_writer_serial.cc \
+	audit_log_writer_parallel.cc \
 	modsecurity.cc \
 	rules.cc \
 	utils.cc \

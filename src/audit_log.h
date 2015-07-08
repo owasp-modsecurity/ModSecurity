@@ -1,4 +1,4 @@
-/**
+/*
  * ModSecurity, http://www.modsecurity.org/
  * Copyright (c) 2015 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
@@ -23,6 +23,7 @@
 #define SRC_AUDIT_LOG_H_
 
 #include "modsecurity/assay.h"
+#include "src/audit_log_writer.h"
 
 #ifdef __cplusplus
 
@@ -39,6 +40,7 @@ class AuditLog {
         m_parts(AAuditLogPart | BAuditLogPart | CAuditLogPart | FAuditLogPart
             | HAuditLogPart | ZAuditLogPart),
         m_type(ParallelAuditLogType),
+        m_writer(NULL),
         m_relevant("")
         { }
 
@@ -174,7 +176,7 @@ class AuditLog {
     AuditLogType m_type;
     std::string m_relevant;
 
-//    AuditLogWriter *m_writer;
+    AuditLogWriter *m_writer;
 };
 
 }  // namespace ModSecurity

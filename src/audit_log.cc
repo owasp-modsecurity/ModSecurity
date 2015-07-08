@@ -1,4 +1,4 @@
-/**
+/*
  * ModSecurity, http://www.modsecurity.org/
  * Copyright (c) 2015 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
@@ -24,6 +24,8 @@
 #include <fstream>
 #include <regex>
 
+#include "src/audit_log_writer_parallel.h"
+#include "src/audit_log_writer_serial.h"
 
 #define PARTS_CONSTAINS(a, c) \
     if (new_parts.find(toupper(a)) != std::string::npos \
@@ -101,7 +103,29 @@ bool AuditLog::setType(AuditLogType audit_type) {
 
 
 bool AuditLog::init() {
-     return true;
+    if (m_type == ParallelAuditLogType) {
+        m_writer = new AuditLogWriterParallel();
+    }
+
+    if (m_type == SerialAuditLogType) {
+        m_writer = new AuditLogWriterSerial();
+    }
+
+    if (m_writer == NULL || m_writer->init() == false) {
+        std::cout << "not able to open the log for write." << std::endl;
+        return false;
+    }
+
+    /* Sanity check */
+    if (m_status == RelevantOnlyAuditLogStatus) {
+        if (m_relevant.empty()) {
+            std::cout << "m_relevant cannot be null while status is " << \
+                "RelevantOnly" << std::endl;
+            return false;
+        }
+    }
+
+    return true;
 }
 
 
