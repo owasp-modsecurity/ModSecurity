@@ -85,6 +85,8 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     do_not_save_in_auditlog(false),
     m_timeStamp(std::time(NULL)),
     http_code_returned(200) {
+    id = std::to_string(this->m_timeStamp) + \
+        std::to_string(generate_assay_unique_id());
     m_rules->incrementReferenceCount();
     this->debug(4, "Initialising transaction");
 }

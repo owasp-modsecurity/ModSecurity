@@ -135,6 +135,7 @@ class Assay {
     int http_code_returned;
 
  private:
+    std::string id;
     std::ofstream myfile;
     Rules *m_rules;
     const char *m_clientIpAddress;

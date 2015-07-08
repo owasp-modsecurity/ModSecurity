@@ -26,9 +26,7 @@ namespace ModSecurity {
  * @name    ModSecurity
  * @brief   Initilizes ModSecurity CPP API
  *
- * ModSecurity initializer. Although it is not really doing anything
- * in this version, further versions of this API may demands this to
- * be executed.
+ * ModSecurity initializer.
  *
  * Example Usage:
  * @code
@@ -41,6 +39,7 @@ namespace ModSecurity {
  */
 ModSecurity::ModSecurity() {
     UniqueId::uniqueId();
+    srand(time(NULL));
 }
 
 
@@ -48,9 +47,7 @@ ModSecurity::ModSecurity() {
  * @name    msc_init
  * @brief   Initilizes ModSecurity C API
  *
- * ModSecurity initializer. Although it is not really doing anything
- * in this version, further versions of this API may demands this to
- * be executed.
+ * ModSecurity initializer.
  *
  * Example Usage:
  * @code

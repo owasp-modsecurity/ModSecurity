@@ -15,6 +15,14 @@
 
 #include "src/utils.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stddef.h>
+#include <string.h>
+
+#include <random>
+#include <memory>
+#include <functional>
 
 #include "modsecurity/modsecurity.h"
 
@@ -30,6 +38,20 @@ std::vector<std::string> split(std::string str, char delimiter) {
     }
 
     return internal;
+}
+
+
+double random_number(const double from, const double to) {
+    std::random_device rd;
+
+    return std::bind(
+        std::uniform_real_distribution<>{from, to},
+        std::default_random_engine{ rd() })();
+}
+
+
+double generate_assay_unique_id() {
+    return random_number(0, 100);
 }
 
 
