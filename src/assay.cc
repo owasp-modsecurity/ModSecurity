@@ -83,6 +83,7 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     m_rules(rules),
     save_in_auditlog(false),
     do_not_save_in_auditlog(false),
+    m_timeStamp(std::time(NULL)),
     http_code_returned(200) {
     m_rules->incrementReferenceCount();
     this->debug(4, "Initialising transaction");

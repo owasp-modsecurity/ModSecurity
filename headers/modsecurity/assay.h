@@ -144,6 +144,7 @@ class Assay {
     const char *m_uri;
     const char *m_protocol;
     const char *m_httpVersion;
+    time_t m_timeStamp;
 
     std::ostringstream m_requestBody;
     std::ostringstream m_responseBody;
