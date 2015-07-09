@@ -776,6 +776,16 @@ std::string Assay::to_json(int parts) {
     /* end: response */
     yajl_gen_map_close(g);
 
+    /* producer */
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("producer"),
+        strlen("producer"));
+    yajl_gen_map_open(g);
+
+    /* producer > libmodsecurity */
+    LOGFY_ADD("modsecurity", ModSecurity::whoAmI().c_str());
+
+    /* end: producer */
+    yajl_gen_map_close(g);
 
     /* end: transaction */
     yajl_gen_map_close(g);
