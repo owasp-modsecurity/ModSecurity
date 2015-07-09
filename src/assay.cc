@@ -788,6 +788,10 @@ std::string Assay::to_json(int parts) {
     /* producer > connector */
     LOGFY_ADD("connector", m_ms->getConnectorInformation().c_str());
 
+    /* producer > engine state */
+    LOGFY_ADD("secrules_engine",
+        Rules::ruleEngineStateString(m_rules->secRuleEngine));
+
     /* end: producer */
     yajl_gen_map_close(g);
 
