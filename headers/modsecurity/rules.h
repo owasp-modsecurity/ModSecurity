@@ -74,7 +74,43 @@ class Rules {
 
     std::vector<Rule *> rules[7];  // Number of Phases.
 
-    int sec_rule_engine;
+    /**
+     *
+     * The RuleEngine enumerator consists in mapping the different states
+     * of the rule engine.
+     *
+     */
+    enum RuleEngine {
+    /**
+     * Rules won't be evaluated if Rule Engine is set to DisabledRuleEngine
+     *
+     */
+     DisabledRuleEngine,
+    /**
+     * Rules will be evaluated and disturb actions will take place if needed.
+     *
+     */
+     EnabledRuleEngine,
+    /**
+     * Rules will be evaluated but it won't generate any disruptive action.
+     *
+     */
+     DetectionOnlyRuleEngine
+    };
+
+    static const char *ruleEngineStateString(RuleEngine i) {
+      switch (i) {
+      case DisabledRuleEngine:
+          return "Disabled";
+      case EnabledRuleEngine:
+          return "Enabled";
+      case DetectionOnlyRuleEngine:
+          return "DetectionOnly";
+      }
+      return NULL;
+    }
+
+    RuleEngine secRuleEngine;
     int sec_audit_type;
     bool sec_audit_engine;
     bool sec_request_body_access;

@@ -154,7 +154,7 @@ int Rules::merge(Driver *from) {
         }
     }
 
-    this->sec_rule_engine = from->sec_rule_engine;
+    this->secRuleEngine = from->secRuleEngine;
     this->sec_audit_type = from->sec_audit_type;
     this->sec_audit_engine = from->sec_audit_engine;
     this->sec_request_body_access = from->sec_request_body_access;
@@ -189,7 +189,7 @@ int Rules::merge(Rules *from) {
         }
     }
 
-    this->sec_rule_engine = from->sec_rule_engine;
+    this->secRuleEngine = from->secRuleEngine;
     this->sec_audit_type = from->sec_audit_type;
     this->sec_audit_engine = from->sec_audit_engine;
     this->sec_request_body_access = from->sec_request_body_access;

@@ -186,15 +186,15 @@ expression:
       }
     | CONFIG_DIR_RULE_ENG SPACE CONFIG_VALUE_OFF
       {
-        driver.sec_rule_engine = 0;
+        driver.secRuleEngine = ModSecurity::Rules::DisabledRuleEngine;
       }
     | CONFIG_DIR_RULE_ENG SPACE CONFIG_VALUE_ON
       {
-        driver.sec_rule_engine = 1;
+        driver.secRuleEngine = ModSecurity::Rules::EnabledRuleEngine;
       }
     | CONFIG_DIR_RULE_ENG SPACE CONFIG_VALUE_DETC
       {
-        driver.sec_rule_engine = 2;
+        driver.secRuleEngine = ModSecurity::Rules::DetectionOnlyRuleEngine;
       }
     | CONFIG_DIR_REQ_BODY SPACE CONFIG_VALUE_ON
       {

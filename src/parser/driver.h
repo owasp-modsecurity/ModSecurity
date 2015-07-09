@@ -81,7 +81,7 @@ class Driver {
 
     std::vector<Rule *> rules[7];  // Number of Phases.
 
-    int sec_rule_engine;
+    ModSecurity::Rules::RuleEngine secRuleEngine;
     int sec_audit_type;
     bool sec_audit_engine;
     bool sec_request_body_access;
