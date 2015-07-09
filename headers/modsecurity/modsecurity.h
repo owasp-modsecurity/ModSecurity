@@ -124,6 +124,8 @@ class ModSecurity {
     ~ModSecurity() { }
 
     static std::string whoAmI();
+    void setConnectorInformation(std::string connector);
+    const std::string& getConnectorInformation();
 
     /**
      *
@@ -200,6 +202,9 @@ class ModSecurity {
      */
      NUMBER_OF_PHASES,
     };
+
+ private:
+    std::string m_connector;
 };
 
 
@@ -213,6 +218,8 @@ extern "C" {
 ModSecurity *msc_init();
 /** @ingroup ModSecurity_C_API */
 const char *msc_who_am_i(ModSecurity *msc);
+/** @ingroup ModSecurity_C_API */
+void msc_set_connector_info(ModSecurity *msc, const char *connector);
 
 #ifdef __cplusplus
 }

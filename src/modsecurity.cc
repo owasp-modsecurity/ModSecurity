@@ -38,7 +38,8 @@ namespace ModSecurity {
  *
  * @endcode
  */
-ModSecurity::ModSecurity() {
+ModSecurity::ModSecurity()
+    : m_connector("") {
     UniqueId::uniqueId();
     srand(time(NULL));
 }
@@ -81,6 +82,66 @@ std::string ModSecurity::whoAmI() {
 
     return std::string("ModSecurity v" MODSECURITY_VERSION \
         " (" + platform + ")");
+}
+
+
+/**
+ * @name    setConnectorInformation
+ * @brief   Set information about the connector that is using the library.
+ *
+ * For the purpose of log it is necessary for modsecurity to understand which
+ * 'connector' is consuming the API.
+ *
+ * @note It is strongly recommended to set a information in the following
+ *       pattern:
+ *
+ *       ConnectorName vX.Y.Z-tag (something else)
+ *
+ *       For instance: ModSecurity-nginx v0.0.1-alpha (Whee)
+ *
+ * @param connector Information about the connector.
+ *
+ */
+void ModSecurity::setConnectorInformation(std::string connector) {
+    m_connector = connector;
+}
+
+
+/**
+ * @name    getConnectorInformation
+ * @brief   Returns the connector information.
+ *
+ * Returns whatever was set by 'setConnectorInformation'. Check
+ * setConnectorInformation documentation to understand the expected format.
+ *
+ * @retval "" Nothing was informed about the connector.
+ * @retval !="" Connector information.
+ */
+const std::string& ModSecurity::getConnectorInformation() {
+    return m_connector;
+}
+
+
+/**
+ * @name    msc_set_connector_info
+ * @brief   Set information about the connector that is using the library.
+ *
+ * For the purpose of log it is necessary for modsecurity to understand which
+ * 'connector' is consuming the API.
+ *
+ * @note It is strongly recommended to set a information in the following
+ *       pattern:
+ *
+ *       ConnectorName vX.Y.Z-tag (something else)
+ *
+ *       For instance: ModSecurity-nginx v0.0.1-alpha (Whee)
+ *
+ * @param connector Information about the connector.
+ *
+ */
+extern "C" void msc_set_connector_info(ModSecurity *msc,
+    const char *connector) {
+    msc->setConnectorInformation(std::string(connector));
 }
 
 

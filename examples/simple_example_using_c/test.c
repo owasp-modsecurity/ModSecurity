@@ -30,6 +30,9 @@ int main (int argc, char **argv)
 
     modsec = msc_init();
 
+    msc_set_connector_info(modsec, "ModSecurity-test v0.0.1-alpha (Simple " \
+        "example on how to use ModSecurity API");
+
     rules = msc_create_rules_set();
     msc_rules_add_file(rules, main_rule_uri);
 

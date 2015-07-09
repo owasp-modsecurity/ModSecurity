@@ -70,6 +70,8 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         r.status = 200;
 
         modsec = new ModSecurity::ModSecurity();
+        modsec->setConnectorInformation("ModSecurity-regression v0.0.1-alpha" \
+            " (ModSecurity regression test utility)");
         modsec_rules = new ModSecurity::Rules(debug_log);
 
         if (modsec_rules->load(t->rules.c_str()) == false) {

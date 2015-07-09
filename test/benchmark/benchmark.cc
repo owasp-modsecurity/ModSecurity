@@ -74,6 +74,9 @@ int main(int argc, char *argv[]) {
     ModSecurity::Rules *rules;
 
     modsec = new ModSecurity::ModSecurity();
+    modsec->setConnectorInformation("ModSecurity-benchmark v0.0.1-alpha" \
+            " (ModSecurity benchmark utility)");
+
     rules = new ModSecurity::Rules();
     rules->loadFromUri(rules_file);
 
