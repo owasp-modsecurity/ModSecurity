@@ -43,6 +43,7 @@ CONFIG_DIR_AUDIT_TPE     (?i:SecAuditLogType)
 CONFIG_DIR_DEBUG_LOG SecDebugLog
 CONFIG_DIR_DEBUG_LVL SecDebugLogLevel
 
+CONFIG_COMPONENT_SIG     (?i:SecComponentSignature)
 
 CONFIG_INCLUDE  Include
 DICT_ELEMENT    [A-Za-z_]+
@@ -105,6 +106,7 @@ FREE_TEXT       [^\"]+
 {CONFIG_DIR_DEBUG_LOG}[ ]{CONFIG_VALUE_PATH}    { return yy::seclang_parser::make_CONFIG_DIR_DEBUG_LOG(strchr(yytext, ' ') + 1, loc); }
 {CONFIG_DIR_DEBUG_LVL}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_DEBUG_LVL(strchr(yytext, ' ') + 1, loc); }
 
+{CONFIG_COMPONENT_SIG}[ ]["]{FREE_TEXT}["] { return yy::seclang_parser::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, loc); }
 
 {CONFIG_VALUE_ON}               { return yy::seclang_parser::make_CONFIG_VALUE_ON(yytext, loc); }
 {CONFIG_VALUE_OFF}              { return yy::seclang_parser::make_CONFIG_VALUE_OFF(yytext, loc); }

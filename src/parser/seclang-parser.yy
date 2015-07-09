@@ -74,6 +74,8 @@ using ModSecurity::Rule;
 %token <std::string> CONFIG_DIR_AUDIT_STS
 %token <std::string> CONFIG_DIR_AUDIT_TPE
 
+%token <std::string> CONFIG_COMPONENT_SIG
+
 %token <std::string> CONFIG_DIR_DEBUG_LOG
 %token <std::string> CONFIG_DIR_DEBUG_LVL
 
@@ -211,6 +213,10 @@ expression:
     | CONFIG_DIR_RES_BODY SPACE CONFIG_VALUE_OFF
       {
         driver.sec_request_body_access = false;
+      }
+    | CONFIG_COMPONENT_SIG
+      {
+        driver.components.push_back($1);
       }
     /* Debug log: start */
     | CONFIG_DIR_DEBUG_LVL

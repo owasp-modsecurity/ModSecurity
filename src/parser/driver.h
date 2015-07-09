@@ -18,6 +18,7 @@
 #include <map>
 #include <stack>
 #include <vector>
+#include <list>
 #endif
 
 #ifndef SRC_PARSER_DRIVER_H_
@@ -88,6 +89,7 @@ class Driver {
     bool sec_response_body_access;
 
     std::string debug_log_path;
+    std::list<std::string> components;
 
     ModSecurity::AuditLog *audit_log;
 

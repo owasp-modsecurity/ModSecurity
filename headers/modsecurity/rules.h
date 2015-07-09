@@ -18,6 +18,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <list>
 #endif
 
 
@@ -121,6 +122,7 @@ class Rules {
     int debug_level;
     DebugLog *debug_log;
     void debug(int level, std::string message);
+    std::list<std::string> components;
 
     AuditLog *audit_log;
 
