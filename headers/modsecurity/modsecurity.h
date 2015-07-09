@@ -76,6 +76,7 @@
 #ifdef __cplusplus
 #include <ctime>
 #include <iostream>
+#include <string>
 #endif
 
 
@@ -94,14 +95,14 @@ typedef struct ModSecurity_t ModSecurity;
 #include "modsecurity/rules.h"
 
 
-
 #define MODSECURITY_MAJOR "3"
 #define MODSECURITY_MINOR "0"
 #define MODSECURITY_PATCHLEVEL "0"
-
+#define MODSECURITY_TAG "-alpha"
 
 #define MODSECURITY_VERSION MODSECURITY_MAJOR "." \
-    MODSECURITY_MINOR "." MODSECURITY_PATCHLEVEL
+    MODSECURITY_MINOR "." MODSECURITY_PATCHLEVEL \
+    MODSECURITY_TAG
 
 
 #ifdef __cplusplus
@@ -121,6 +122,8 @@ class ModSecurity {
  public:
     ModSecurity();
     ~ModSecurity() { }
+
+    static std::string whoAmI();
 
     /**
      *
@@ -208,6 +211,8 @@ extern "C" {
 
 /** @ingroup ModSecurity_C_API */
 ModSecurity *msc_init();
+/** @ingroup ModSecurity_C_API */
+const char *msc_who_am_i(ModSecurity *msc);
 
 #ifdef __cplusplus
 }

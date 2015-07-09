@@ -17,6 +17,7 @@
 #include <iostream>
 
 #include "modsecurity/modsecurity.h"
+#include "src/config.h"
 #include "src/unique_id.h"
 
 
@@ -44,6 +45,63 @@ ModSecurity::ModSecurity() {
 
 
 /**
+ * @name    whoAmI
+ * @brief   Return information about this ModSecurity version and platform.
+ *
+ * Platform and version are two questions that community will ask prior to
+ * provide support. Making it available internally and to the connector as
+ * well.
+ *
+ * @note This information maybe will be used by a log parser. If you want to
+ *       update it, make it in a fashion that won't break the existent parsers.
+ *       (e.g. adding extra information _only_ to the end of the string)
+ */
+std::string ModSecurity::whoAmI() {
+    std::string platform("Unknown platform");
+
+#if AIX
+    platform = "AIX";
+#elif LINUX
+    platform = "Linux";
+#elif OPENBSD
+    platform = "OpenBSD";
+#elif SOLARIS
+    platform = "Solaris";
+#elif HPUX
+    platform = "HPUX";
+#elif MACOSX
+    platform = "MacOSX";
+#elif FREEBSD
+    platform = "FreeBSD";
+#elif NETBSD
+    platform = "NetBSD";
+#elif WIN32
+    platform = "Windows";
+#endif
+
+    return std::string("ModSecurity v" MODSECURITY_VERSION \
+        " (" + platform + ")");
+}
+
+
+/**
+ * @name    msc_who_am_i
+ * @brief   Return information about this ModSecurity version and platform.
+ *
+ * Platform and version are two questions that community will ask prior to
+ * provide support. Making it available internally and to the connector as
+ * well.
+ *
+ * @note This information maybe will be used by a log parser. If you want to
+ *       update it, make it in a fashion that won't break the existent parsers.
+ *       (e.g. adding extra information _only_ to the end of the string)
+ */
+extern "C" const char *msc_who_am_i(ModSecurity *msc) {
+    return msc->whoAmI().c_str();
+}
+
+
+/**
  * @name    msc_init
  * @brief   Initilizes ModSecurity C API
  *
@@ -61,7 +119,5 @@ extern "C" ModSecurity *msc_init() {
 
     return modsec;
 }
-
-
 
 }  // namespace ModSecurity

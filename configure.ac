@@ -49,6 +49,55 @@ AC_CHECK_HEADERS([sys/utsname.h])
 # ??
 LT_INIT([dlopen])
 
+# Identify platform
+AC_CANONICAL_HOST
+
+case $host in
+  *-*-aix*)
+    echo "Checking platform... Identified as AIX"
+    AC_DEFINE([AIX], [1], [Define if the operating system is AIX])
+    ;;
+  *-*-hpux*)
+    echo "Checking platform... Identified as HPUX"
+    AC_DEFINE([HPUX], [1], [Define if the operating system is HPUX])
+    ;;
+  *-*-darwin*)
+    echo "Checking platform... Identified as Macintosh OS X"
+    AC_DEFINE([MACOSX], [1], [Define if the operating system is Macintosh OSX])
+    ;;
+  *-*-linux*)
+    echo "Checking platform... Identified as Linux"
+    AC_DEFINE([LINUX], [1], [Define if the operating system is LINUX])
+    ;;
+  *-*-solaris*)
+    echo "Checking platform... Identified as Solaris"
+    AC_DEFINE([SOLARIS], [1], [Define if the operating system is SOLARIS])
+    ;;
+  *-*-freebsd*)
+    echo "Checking platform... Identified as FreeBSD"
+    AC_DEFINE([FREEBSD], [1], [Define if the operating system is FREEBSD])
+    ;;
+  *-*-netbsd*)
+    echo "Checking platform... Identified as NetBSD"
+    AC_DEFINE([NETBSD], [1], [Define if the operating system is NETBSD])
+    ;;
+  *-*-openbsd*)
+    echo "Checking platform... Identified as OpenBSD"
+    AC_DEFINE([OPENBSD], [1], [Define if the operating system is OPENBSD])
+    ;;
+  *-*-kfreebsd*)
+    echo "Checking platform... Identified as kFreeBSD, treating as linux"
+    AC_DEFINE([FREEBSD], [1], [Define if the operating system is FREEBSD])
+    ;;
+  *-*-gnu*.*)
+    echo "Checking platform... Identified as HURD, treating as linux"
+    AC_DEFINE([LINUX], [1], [Define if the operating system is LINUX])
+    ;;
+       *)
+    echo "Unknown CANONICAL_HOST $host"
+    exit
+    ;;
+esac
 
 # Variables to be used inside the Makefile.am files.
 MSC_BASE_DIR=`pwd`
