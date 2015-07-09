@@ -157,6 +157,7 @@ class Assay {
     std::string id;
     std::ofstream myfile;
     Rules *m_rules;
+    ModSecurity *m_ms;
 
     const char *m_clientIpAddress;
     const char *m_serverIpAddress;

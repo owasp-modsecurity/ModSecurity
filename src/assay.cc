@@ -88,7 +88,8 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     save_in_auditlog(false),
     do_not_save_in_auditlog(false),
     m_timeStamp(std::time(NULL)),
-    http_code_returned(200) {
+    http_code_returned(200),
+    m_ms(ms) {
     id = std::to_string(this->m_timeStamp) + \
         std::to_string(generate_assay_unique_id());
     m_rules->incrementReferenceCount();
@@ -783,6 +784,9 @@ std::string Assay::to_json(int parts) {
 
     /* producer > libmodsecurity */
     LOGFY_ADD("modsecurity", ModSecurity::whoAmI().c_str());
+
+    /* producer > connector */
+    LOGFY_ADD("connector", m_ms->getConnectorInformation().c_str());
 
     /* end: producer */
     yajl_gen_map_close(g);
