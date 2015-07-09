@@ -792,6 +792,19 @@ std::string Assay::to_json(int parts) {
     LOGFY_ADD("secrules_engine",
         Rules::ruleEngineStateString(m_rules->secRuleEngine));
 
+    /* producer > components */
+    yajl_gen_string(g,
+        reinterpret_cast<const unsigned char*>("components"),
+        strlen("components"));
+
+    yajl_gen_array_open(g);
+    for (auto a : m_rules->components) {
+        yajl_gen_string(g,
+            reinterpret_cast<const unsigned char*>
+                (a.c_str()), a.length());
+    }
+    yajl_gen_array_close(g);
+
     /* end: producer */
     yajl_gen_map_close(g);
 
