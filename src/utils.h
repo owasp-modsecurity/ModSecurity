@@ -27,6 +27,7 @@ namespace ModSecurity {
     double random_number(const double from, const double to);
     double generate_assay_unique_id();
     std::string ascTime(time_t *t);
+    void createDir(std::string dir);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_

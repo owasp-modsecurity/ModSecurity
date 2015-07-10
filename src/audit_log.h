@@ -162,11 +162,12 @@ class AuditLog {
     bool saveIfRelevant(Assay *assay);
     bool isRelevant(int status);
 
- private:
-    AuditLogStatus m_status;
     std::string m_path1;
     std::string m_path2;
     std::string m_storage_dir;
+
+ private:
+    AuditLogStatus m_status;
 
     int m_file_permissions;
     int m_storage_permission;

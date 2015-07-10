@@ -30,7 +30,7 @@ bool AuditLogWriterSerial::close() {
 }
 
 
-bool AuditLogWriterSerial::write(const std::string& log) {
+bool AuditLogWriterSerial::write(Assay *assay) {
     return true;
 }
 

@@ -33,8 +33,8 @@ std::string AuditLogWriter::file_name(const std::string& unique_id) {
  * Temporary print the log into the std::cout to debug purposes.
  *
  */
-bool AuditLogWriter::write(const std::string& log) {
-    std::cout << log << std::endl;
+bool AuditLogWriter::write(Assay *assay) {
+    std::cout << assay->to_json(0) << std::endl;
     return true;
 }
 

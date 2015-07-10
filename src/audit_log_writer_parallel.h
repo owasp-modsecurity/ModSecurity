@@ -13,10 +13,13 @@
  *
  */
 
+#include <string>
+
 #ifndef SRC_AUDIT_LOG_WRITER_PARALLEL_H_
 #define SRC_AUDIT_LOG_WRITER_PARALLEL_H_
 
 #include "src/audit_log_writer.h"
+#include "modsecurity/assay.h"
 
 #ifdef __cplusplus
 
@@ -25,7 +28,36 @@ namespace ModSecurity {
 /** @ingroup ModSecurity_CPP_API */
 class AuditLogWriterParallel : public AuditLogWriter {
  public:
-    AuditLogWriterParallel() { }
+    explicit AuditLogWriterParallel(AuditLog *audit)
+        : AuditLogWriter(audit) { }
+
+    bool init() override;
+    bool close() override;
+    bool write(Assay *assay) override;
+
+    /**
+     *
+     * Audit log file is saved into a directory structure. This directory
+     * structure is based on the timestamp of the assay creation, at the exact
+     * moment that ModSecurity be aware of a particular request/transaction.
+     * The expect fromat is:
+     *
+     * [...]/YearMonthDay/YearMonthDayAndTime/YearMonthDayAndTime-RequestId
+     *
+     * Example:
+     *
+     * /20150710/20150710-1353/20150710-135353-143654723362.584244
+     *
+     * This enumeration describes the subpaths of this structure.
+     *
+     */
+    enum AuditLogFilePath {
+     YearMonthDayDirectory = 2,
+     YearMonthDayAndTimeDirectory = 4,
+     YearMonthDayAndTimeFileName = 8,
+    };
+
+    inline std::string logFilePath(time_t *t, int part);
 };
 
 }  // namespace ModSecurity

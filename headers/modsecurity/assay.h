@@ -126,7 +126,7 @@ class Assay {
     int processResponseBody();
     int appendResponseBody(const unsigned char *body, size_t size);
 
-    int processLogging();
+    int processLogging(int status_code);
 
     ModSecurityIntervention *intervention();
 
@@ -149,12 +149,14 @@ class Assay {
     bool save_in_auditlog;
     bool do_not_save_in_auditlog;
 
-    int http_code_returned;
+    int httpCodeReturned;
 
     std::string to_json(int parts);
 
- private:
     std::string id;
+    time_t timeStamp;
+
+ private:
     std::ofstream myfile;
     Rules *m_rules;
     ModSecurity *m_ms;
@@ -166,7 +168,6 @@ class Assay {
     const char *m_uri;
     const char *m_protocol;
     const char *m_httpVersion;
-    time_t m_timeStamp;
 
     std::ostringstream m_requestBody;
     std::ostringstream m_responseBody;
@@ -236,7 +237,7 @@ void msc_assay_cleanup(Assay *assay);
 ModSecurityIntervention *msc_intervention(Assay *assay);
 
 /** @ingroup ModSecurity_C_API */
-int msc_process_logging(Assay *assay);
+int msc_process_logging(Assay *assay, int code);
 
 #ifdef __cplusplus
 }

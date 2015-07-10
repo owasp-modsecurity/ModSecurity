@@ -87,10 +87,10 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     m_rules(rules),
     save_in_auditlog(false),
     do_not_save_in_auditlog(false),
-    m_timeStamp(std::time(NULL)),
-    http_code_returned(200),
+    timeStamp(std::time(NULL)),
+    httpCodeReturned(200),
     m_ms(ms) {
-    id = std::to_string(this->m_timeStamp) + \
+    id = std::to_string(this->timeStamp) + \
         std::to_string(generate_assay_unique_id());
     m_rules->incrementReferenceCount();
     this->debug(4, "Initialising transaction");
@@ -617,8 +617,9 @@ int Assay::getResponseBodyLenth() {
  * @retval false Operation failed.
  *
  */
-int Assay::processLogging() {
+int Assay::processLogging(int returned_code) {
     debug(4, "Starting phase LOGGING. (SecRules 5)");
+    this->httpCodeReturned = returned_code;
     this->m_rules->evaluate(ModSecurity::LoggingPhase, this);
 
     /* If relevant, save this assay information at the audit_logs */
@@ -691,7 +692,7 @@ std::string Assay::to_json(int parts) {
     const unsigned char *buf;
     size_t len;
     yajl_gen g = NULL;
-    std::string ts = ascTime(&m_timeStamp).c_str();
+    std::string ts = ascTime(&timeStamp).c_str();
     std::string uniqueId = UniqueId::uniqueId();
 
     g = yajl_gen_alloc(NULL);
@@ -754,7 +755,7 @@ std::string Assay::to_json(int parts) {
     yajl_gen_map_open(g);
 
     LOGFY_ADD("body", this->m_responseBody.str().c_str());
-    LOGFY_ADD_NUM("http_code", http_code_returned);
+    LOGFY_ADD_NUM("http_code", httpCodeReturned);
 
     /* response headers */
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
@@ -1251,14 +1252,15 @@ extern "C" int msc_get_response_body_length(Assay *assay) {
  * delivered prior to the execution of this function.
  *
  * @param assay ModSecurity assay.
+ * @param code  HTTP code returned to the user.
  *
  * @returns If the operation was successful or not.
  * @retval 1 Operation was successful.
  * @retval 0 Operation failed.
  *
  */
-extern "C" int msc_process_logging(Assay *assay) {
-    return assay->processLogging();
+extern "C" int msc_process_logging(Assay *assay, int code) {
+    return assay->processLogging(code);
 }
 
 }  // namespace ModSecurity

@@ -23,20 +23,28 @@
 #include <fstream>
 #endif
 
+#include "modsecurity/assay.h"
+
+
 #ifdef __cplusplus
 
 namespace ModSecurity {
+class AuditLog;
 
 /** @ingroup ModSecurity_CPP_API */
 class AuditLogWriter : public std::ofstream {
  public:
-    AuditLogWriter() { }
+    explicit AuditLogWriter(AuditLog *audit)
+        : m_audit(audit) { }
 
     virtual bool close() { return true; }
     virtual bool init() { return true; }
-    virtual bool write(const std::string& log);
+    virtual bool write(Assay *assay);
 
     std::string file_name(const std::string& unique_id);
+
+ protected:
+    AuditLog *m_audit;
 };
 
 }  // namespace ModSecurity

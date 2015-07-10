@@ -102,11 +102,11 @@ bool AuditLog::setType(AuditLogType audit_type) {
 
 bool AuditLog::init() {
     if (m_type == ParallelAuditLogType) {
-        m_writer = new AuditLogWriterParallel();
+        m_writer = new AuditLogWriterParallel(this);
     }
 
     if (m_type == SerialAuditLogType) {
-        m_writer = new AuditLogWriterSerial();
+        m_writer = new AuditLogWriterSerial(this);
     }
 
     if (m_writer == NULL || m_writer->init() == false) {
@@ -134,7 +134,7 @@ bool AuditLog::isRelevant(int status) {
 
 
 bool AuditLog::saveIfRelevant(Assay *assay) {
-    if (this->isRelevant(assay->http_code_returned) == false &&
+    if (this->isRelevant(assay->httpCodeReturned) == false &&
         assay->save_in_auditlog == false) {
         return true;
     }
@@ -148,9 +148,7 @@ bool AuditLog::saveIfRelevant(Assay *assay) {
         return true;
     }
 
-    std::string log = assay->to_json(0);
-
-    m_writer->write(log);
+    m_writer->write(assay);
 
     return true;
 }

@@ -23,6 +23,7 @@
 #define SRC_AUDIT_LOG_WRITER_SERIAL_H_
 
 #include "src/audit_log_writer.h"
+#include "modsecurity/assay.h"
 
 #ifdef __cplusplus
 
@@ -31,11 +32,12 @@ namespace ModSecurity {
 /** @ingroup ModSecurity_CPP_API */
 class AuditLogWriterSerial : public AuditLogWriter {
  public:
-    AuditLogWriterSerial() { }
+    explicit AuditLogWriterSerial(AuditLog *audit)
+        : AuditLogWriter(audit) { }
 
     bool init() override;
     bool close() override;
-    bool write(const std::string& log) override;
+    bool write(Assay *assay) override;
 };
 
 }  // namespace ModSecurity
