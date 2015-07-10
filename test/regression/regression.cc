@@ -138,9 +138,9 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
             goto end;
         }
 
+end:
         modsec_assay->processLogging();
 
-end:
         CustomDebugLog *d = reinterpret_cast<CustomDebugLog *>
             (modsec_rules->debug_log);
 
