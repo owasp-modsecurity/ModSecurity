@@ -18,9 +18,6 @@
 
 #ifdef __cplusplus
 #include <string>
-#include <iostream>
-#include <sstream>
-#include <fstream>
 #endif
 
 #include "modsecurity/assay.h"
@@ -32,7 +29,7 @@ namespace ModSecurity {
 class AuditLog;
 
 /** @ingroup ModSecurity_CPP_API */
-class AuditLogWriter : public std::ofstream {
+class AuditLogWriter {
  public:
     explicit AuditLogWriter(AuditLog *audit)
         : m_audit(audit) { }

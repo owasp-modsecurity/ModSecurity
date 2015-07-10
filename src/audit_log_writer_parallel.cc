@@ -18,6 +18,9 @@
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include <fstream>
 
@@ -72,24 +75,35 @@ bool AuditLogWriterParallel::close() {
 
 
 bool AuditLogWriterParallel::write(Assay *assay) {
+    FILE *fp;
+    int fd;
     std::string log = assay->to_json(0);
     std::string fileName = logFilePath(&assay->timeStamp,
         YearMonthDayDirectory | YearMonthDayAndTimeDirectory
         | YearMonthDayAndTimeFileName);
-    fileName = fileName + "-" + assay->id;
 
     std::string logPath = m_audit->m_storage_dir;
+    fileName = logPath + fileName + "-" + assay->id;
+
+    if (logPath.empty()) {
+      return false;
+    }
 
     createDir((logPath +
-        logFilePath(&assay->timeStamp, YearMonthDayDirectory)).c_str());
+        logFilePath(&assay->timeStamp, YearMonthDayDirectory)).c_str(),
+        m_audit->directoryPermission);
     createDir((logPath +
         logFilePath(&assay->timeStamp, YearMonthDayDirectory
-            | YearMonthDayAndTimeDirectory)).c_str());
+            | YearMonthDayAndTimeDirectory)).c_str(),
+        m_audit->directoryPermission);
 
-    std::ofstream f;
-    f.open(logPath + fileName, std::fstream::out | std::fstream::app);
-    f << log;
-    f.close();
+    fd = open(fileName.c_str(), O_CREAT | O_WRONLY, m_audit->filePermission);
+    if (fd < 0) {
+        return false;
+    }
+    fp = fdopen(fd, "w");
+    fwrite(log.c_str(), log.length(), 1, fp);
+    fclose(fp);
 
     return true;
 }

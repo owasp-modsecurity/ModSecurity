@@ -51,7 +51,9 @@
       "SecRule ARGS \"@contains test\" \"t:trim,block,auditlog\"",
       "SecAuditEngine RelevantOnly",
       "SecAuditLogParts ABCFHZ",
-      "SecAuditLogStorageDir /tmp",
+      "SecAuditLogStorageDir /tmp/test",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0600",
       "SecAuditLogRelevantStatus \"^(?:5|4(?!04))\""
     ]
   }

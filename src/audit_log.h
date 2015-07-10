@@ -41,7 +41,9 @@ class AuditLog {
             | HAuditLogPart | ZAuditLogPart),
         m_type(ParallelAuditLogType),
         m_writer(NULL),
-        m_relevant("")
+        m_relevant(""),
+        filePermission(0600),
+        directoryPermission(0600)
         { }
 
     enum AuditLogType {
@@ -166,11 +168,12 @@ class AuditLog {
     std::string m_path2;
     std::string m_storage_dir;
 
+    int filePermission;
+    int directoryPermission;
+
  private:
     AuditLogStatus m_status;
 
-    int m_file_permissions;
-    int m_storage_permission;
 
     int m_parts;
     AuditLogType m_type;

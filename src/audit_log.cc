@@ -35,13 +35,13 @@ namespace ModSecurity {
 
 
 bool AuditLog::setStorageDirMode(int permission) {
-    this->m_storage_permission = permission;
+    this->directoryPermission = permission;
     return true;
 }
 
 
 bool AuditLog::setFileMode(int permission) {
-    this->m_file_permissions = permission;
+    this->filePermission = permission;
     return true;
 }
 

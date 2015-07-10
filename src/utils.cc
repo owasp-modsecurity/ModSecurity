@@ -69,11 +69,11 @@ std::string ascTime(time_t *t) {
 }
 
 
-void createDir(std::string dir) {
+void createDir(std::string dir, int mode) {
 #if defined _MSC_VER
     _mkdir(dir.data());
 #elif defined __GNUC__
-    mkdir(dir.data(), 0777);
+    mkdir(dir.data(), mode);
 #endif
 }
 
