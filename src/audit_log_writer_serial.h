@@ -37,7 +37,7 @@ class AuditLogWriterSerial : public AuditLogWriter {
 
     bool init() override;
     bool close() override;
-    bool write(Assay *assay) override;
+    bool write(Assay *assay, int parts) override;
 };
 
 }  // namespace ModSecurity

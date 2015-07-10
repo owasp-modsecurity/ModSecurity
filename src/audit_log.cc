@@ -148,7 +148,7 @@ bool AuditLog::saveIfRelevant(Assay *assay) {
         return true;
     }
 
-    m_writer->write(assay);
+    m_writer->write(assay, m_parts);
 
     return true;
 }

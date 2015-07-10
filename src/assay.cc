@@ -695,6 +695,7 @@ std::string Assay::to_json(int parts) {
     std::string ts = ascTime(&timeStamp).c_str();
     std::string uniqueId = UniqueId::uniqueId();
 
+    parts = 0;
     g = yajl_gen_alloc(NULL);
     if (g == NULL) {
       return "";
@@ -709,6 +710,7 @@ std::string Assay::to_json(int parts) {
         strlen("transaction"));
 
     yajl_gen_map_open(g);
+    /* Part: A (header mandatory) */
     LOGFY_ADD("client_ip", this->m_clientIpAddress);
     LOGFY_ADD("time_stamp", ts.c_str());
     LOGFY_ADD("server_id", uniqueId.c_str());
@@ -725,27 +727,33 @@ std::string Assay::to_json(int parts) {
     LOGFY_ADD("protocol", m_protocol);
     LOGFY_ADD_INT("http_version", m_httpVersion);
     LOGFY_ADD("uri", this->m_uri);
-    LOGFY_ADD("body", this->m_requestBody.str().c_str());
 
-    /* request headers */
-    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
-        strlen("headers"));
-    yajl_gen_map_open(g);
-
-    for (auto h : this->m_variables_strings) {
-        std::string filter = "REQUEST_HEADERS:";
-        std::string a = h.first;
-        std::string b = h.second;
-
-        if (a.compare(0, filter.length(), filter) == 0) {
-            if (a.length() > filter.length()) {
-                LOGFY_ADD(a.c_str() + filter.length(), b.c_str());
-            }
-        }
+    if (parts & AuditLog::CAuditLogPart) {
+        LOGFY_ADD("body", this->m_requestBody.str().c_str());
     }
 
-    /* end: request headers */
-    yajl_gen_map_close(g);
+    /* request headers */
+    if (parts & AuditLog::BAuditLogPart) {
+        yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
+            strlen("headers"));
+        yajl_gen_map_open(g);
+
+        for (auto h : this->m_variables_strings) {
+            std::string filter = "REQUEST_HEADERS:";
+            std::string a = h.first;
+            std::string b = h.second;
+
+            if (a.compare(0, filter.length(), filter) == 0) {
+                if (a.length() > filter.length()) {
+                    LOGFY_ADD(a.c_str() + filter.length(), b.c_str());
+                }
+            }
+        }
+
+        /* end: request headers */
+        yajl_gen_map_close(g);
+    }
+
     /* end: request */
     yajl_gen_map_close(g);
 
@@ -754,61 +762,66 @@ std::string Assay::to_json(int parts) {
         strlen("response"));
     yajl_gen_map_open(g);
 
-    LOGFY_ADD("body", this->m_responseBody.str().c_str());
+    if (parts & AuditLog::GAuditLogPart) {
+        LOGFY_ADD("body", this->m_responseBody.str().c_str());
+    }
     LOGFY_ADD_NUM("http_code", httpCodeReturned);
 
     /* response headers */
-    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
-        strlen("headers"));
-    yajl_gen_map_open(g);
+    if (parts & AuditLog::FAuditLogPart) {
+        yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
+            strlen("headers"));
+        yajl_gen_map_open(g);
 
-    for (auto h : this->m_variables_strings) {
-        std::string filter = "RESPONSE_HEADERS:";
-        std::string a = h.first;
-        std::string b = h.second;
+        for (auto h : this->m_variables_strings) {
+            std::string filter = "RESPONSE_HEADERS:";
+            std::string a = h.first;
+            std::string b = h.second;
 
-        if (a.compare(0, filter.length(), filter) == 0) {
-            if (a.length() > filter.length()) {
-                LOGFY_ADD(a.c_str() + filter.length(), b.c_str());
+            if (a.compare(0, filter.length(), filter) == 0) {
+                if (a.length() > filter.length()) {
+                    LOGFY_ADD(a.c_str() + filter.length(), b.c_str());
+                }
             }
         }
+        /* end: response headers */
+        yajl_gen_map_close(g);
     }
-    /* end: response headers */
-    yajl_gen_map_close(g);
     /* end: response */
     yajl_gen_map_close(g);
 
     /* producer */
-    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("producer"),
-        strlen("producer"));
-    yajl_gen_map_open(g);
+    if (parts & AuditLog::HAuditLogPart) {
+        yajl_gen_string(g, reinterpret_cast<const unsigned char*>("producer"),
+            strlen("producer"));
+        yajl_gen_map_open(g);
 
-    /* producer > libmodsecurity */
-    LOGFY_ADD("modsecurity", ModSecurity::whoAmI().c_str());
+        /* producer > libmodsecurity */
+        LOGFY_ADD("modsecurity", ModSecurity::whoAmI().c_str());
 
-    /* producer > connector */
-    LOGFY_ADD("connector", m_ms->getConnectorInformation().c_str());
+        /* producer > connector */
+        LOGFY_ADD("connector", m_ms->getConnectorInformation().c_str());
 
-    /* producer > engine state */
-    LOGFY_ADD("secrules_engine",
-        Rules::ruleEngineStateString(m_rules->secRuleEngine));
+        /* producer > engine state */
+        LOGFY_ADD("secrules_engine",
+            Rules::ruleEngineStateString(m_rules->secRuleEngine));
 
-    /* producer > components */
-    yajl_gen_string(g,
-        reinterpret_cast<const unsigned char*>("components"),
-        strlen("components"));
-
-    yajl_gen_array_open(g);
-    for (auto a : m_rules->components) {
+        /* producer > components */
         yajl_gen_string(g,
-            reinterpret_cast<const unsigned char*>
-                (a.c_str()), a.length());
+            reinterpret_cast<const unsigned char*>("components"),
+            strlen("components"));
+
+        yajl_gen_array_open(g);
+        for (auto a : m_rules->components) {
+            yajl_gen_string(g,
+                reinterpret_cast<const unsigned char*>
+                    (a.c_str()), a.length());
+        }
+        yajl_gen_array_close(g);
+
+        /* end: producer */
+        yajl_gen_map_close(g);
     }
-    yajl_gen_array_close(g);
-
-    /* end: producer */
-    yajl_gen_map_close(g);
-
     /* end: transaction */
     yajl_gen_map_close(g);
 

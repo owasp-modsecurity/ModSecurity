@@ -30,7 +30,7 @@ bool AuditLogWriterSerial::close() {
 }
 
 
-bool AuditLogWriterSerial::write(Assay *assay) {
+bool AuditLogWriterSerial::write(Assay *assay, int parts) {
     return true;
 }
 

@@ -74,10 +74,10 @@ bool AuditLogWriterParallel::close() {
 }
 
 
-bool AuditLogWriterParallel::write(Assay *assay) {
+bool AuditLogWriterParallel::write(Assay *assay, int parts) {
     FILE *fp;
     int fd;
-    std::string log = assay->to_json(0);
+    std::string log = assay->to_json(parts);
     std::string fileName = logFilePath(&assay->timeStamp,
         YearMonthDayDirectory | YearMonthDayAndTimeDirectory
         | YearMonthDayAndTimeFileName);

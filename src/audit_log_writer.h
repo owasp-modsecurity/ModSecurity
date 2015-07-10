@@ -36,7 +36,7 @@ class AuditLogWriter {
 
     virtual bool close() { return true; }
     virtual bool init() { return true; }
-    virtual bool write(Assay *assay);
+    virtual bool write(Assay *assay, int parts);
 
     std::string file_name(const std::string& unique_id);
 
