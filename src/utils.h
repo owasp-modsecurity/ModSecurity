@@ -28,6 +28,7 @@ namespace ModSecurity {
     double generate_assay_unique_id();
     std::string ascTime(time_t *t);
     void createDir(std::string dir, int mode);
+    std::string dash_if_empty(const std::string& str);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_

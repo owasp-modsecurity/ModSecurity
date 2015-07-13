@@ -31,7 +31,7 @@ class AuditLogWriterParallel : public AuditLogWriter {
     explicit AuditLogWriterParallel(AuditLog *audit)
         : AuditLogWriter(audit) { }
 
-    ~AuditLogWriterParallel() { }
+    ~AuditLogWriterParallel();
     bool init() override;
     bool write(Assay *assay, int parts) override;
 
@@ -69,6 +69,8 @@ class AuditLogWriterParallel : public AuditLogWriter {
      YearMonthDayAndTimeFileName = 8,
     };
 
+    std::ofstream log1;
+    std::ofstream log2;
     inline std::string logFilePath(time_t *t, int part);
 };
 

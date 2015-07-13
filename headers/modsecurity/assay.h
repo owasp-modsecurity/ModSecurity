@@ -153,6 +153,8 @@ class Assay {
 
     std::string to_json(int parts);
     std::string toOldAuditLogFormat(int parts, const std::string &trailer);
+    std::string toOldAuditLogFormatIndex(const std::string &filename,
+        double size, const std::string &md5);
 
     std::string id;
     time_t timeStamp;

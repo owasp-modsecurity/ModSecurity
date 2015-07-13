@@ -27,8 +27,20 @@
 #include "src/audit_log.h"
 #include "modsecurity/assay.h"
 #include "src/utils.h"
+#include "utils/md5.h"
 
 namespace ModSecurity {
+
+
+AuditLogWriterParallel::~AuditLogWriterParallel() {
+    if (log1.is_open()) {
+        log1.close();
+    }
+
+    if (log2.is_open()) {
+        log2.close();
+    }
+}
 
 
 inline std::string AuditLogWriterParallel::logFilePath(time_t *t,
@@ -65,6 +77,15 @@ inline std::string AuditLogWriterParallel::logFilePath(time_t *t,
 bool AuditLogWriterParallel::init() {
     /** TODO:: Check if the directory exists. */
     /** TODO:: Checking if we have permission to write in the target dir */
+
+    if (!m_audit->m_path1.empty()) {
+        log1.open(m_audit->m_path1, std::fstream::out | std::fstream::app);
+    }
+
+    if (!m_audit->m_path2.empty()) {
+        log2.open(m_audit->m_path2, std::fstream::out | std::fstream::app);
+    }
+
     return true;
 }
 
@@ -100,7 +121,21 @@ bool AuditLogWriterParallel::write(Assay *assay, int parts) {
     fwrite(log.c_str(), log.length(), 1, fp);
     fclose(fp);
 
+    if (log1.is_open() && log2.is_open()) {
+        log2 << assay->toOldAuditLogFormatIndex(fileName, log.length(),
+            md5(log));
+    }
+    if (log1.is_open() && !log2.is_open()) {
+        log1 << assay->toOldAuditLogFormatIndex(fileName, log.length(),
+            md5(log));
+    }
+    if (!log1.is_open() && log2.is_open()) {
+        log2 << assay->toOldAuditLogFormatIndex(fileName, log.length(),
+            md5(log));
+    }
+
     return true;
 }
+
 
 }  // namespace ModSecurity

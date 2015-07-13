@@ -75,7 +75,8 @@ ACTIONS = \
 	actions/transformations/utf8_to_unicode.cc
 
 UTILS = \
-	utils/sha1.cc
+	utils/sha1.cc \
+	utils/md5.cc
 
 libmodsecurity_la_SOURCES = \
 	parser/seclang-parser.yy \

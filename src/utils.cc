@@ -57,6 +57,15 @@ double random_number(const double from, const double to) {
 }
 
 
+std::string dash_if_empty(const std::string& str) {
+    if (str.empty()) {
+        return "-";
+    }
+
+    return str;
+}
+
+
 double generate_assay_unique_id() {
     return random_number(0, 100);
 }

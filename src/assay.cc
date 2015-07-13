@@ -688,6 +688,51 @@ ModSecurityIntervention *Assay::intervention() {
 }
 
 
+std::string Assay::toOldAuditLogFormatIndex(const std::string &filename,
+    double size, const std::string &md5) {
+    std::stringstream ss;
+    struct tm timeinfo;
+    char tstr[300];
+
+    memset(tstr, '\0', 300);
+    localtime_r(&this->timeStamp, &timeinfo);
+
+    strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
+
+    ss << dash_if_empty(this->resolve_variable("REQUEST_HEADERS:Host")) << " ";
+    ss << dash_if_empty(this->m_clientIpAddress) << " ";
+    /** TODO: Check variable */
+    ss << dash_if_empty(this->resolve_variable("REMOTE_USER")) << " ";
+    /** TODO: Check variable */
+    ss << dash_if_empty(this->resolve_variable("LOCAL_USER")) << " ";
+    ss << tstr << " ";
+
+    ss << "\"";
+    ss << this->m_protocol << " ";
+    ss << this->m_uri << " ";
+    ss << "HTTP/" << m_httpVersion;
+    ss << "\" ";
+
+    ss << this->httpCodeReturned << " ";
+    ss << this->m_responseBody.tellp();
+    /** TODO: Check variable */
+    ss << dash_if_empty(this->resolve_variable("REFERER")) << " ";
+    ss << "\"";
+    ss << dash_if_empty(this->resolve_variable("REQUEST_HEADERS:User-Agent"));
+    ss << "\" ";
+    ss << this->id << " ";
+    /** TODO: Check variable */
+    ss << dash_if_empty(this->resolve_variable("REFERER")) << " ";
+
+    ss << filename << " ";
+    ss << "0" << " ";
+    ss << std::to_string(size) << " ";
+    ss << "md5:" << md5 << std::endl;
+
+    return ss.str();
+}
+
+
 std::string Assay::toOldAuditLogFormat(int parts, const std::string &trailer) {
     std::stringstream audit_log;
     struct tm timeinfo;
