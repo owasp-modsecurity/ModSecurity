@@ -47,6 +47,9 @@ int main (int argc, char **argv)
     msc_process_response_headers(assay);
     msc_process_response_body(assay);
 
+    msc_rules_cleanup(rules);
+    msc_cleanup(modsec);
+
     return 0;
 }
 

@@ -43,8 +43,23 @@ class AuditLog {
         m_writer(NULL),
         m_relevant(""),
         filePermission(0600),
-        directoryPermission(0600)
+        directoryPermission(0600),
+        m_refereceCount(1)
         { }
+
+    ~AuditLog();
+
+    void refCountIncrease() {
+        m_refereceCount++;
+    }
+
+
+    void refCountDecreaseAndCheck() {
+        m_refereceCount--;
+        if (m_refereceCount == 0) {
+            delete this;
+        }
+    }
 
     enum AuditLogType {
      SerialAuditLogType,
@@ -180,6 +195,7 @@ class AuditLog {
     std::string m_relevant;
 
     AuditLogWriter *m_writer;
+    int m_refereceCount;
 };
 
 }  // namespace ModSecurity

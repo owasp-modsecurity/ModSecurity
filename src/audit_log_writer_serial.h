@@ -35,8 +35,21 @@ class AuditLogWriterSerial : public AuditLogWriter {
     explicit AuditLogWriterSerial(AuditLog *audit)
         : AuditLogWriter(audit) { }
 
-    bool init() override;
-    bool close() override;
+    ~AuditLogWriterSerial();
+
+    void refCountIncrease() override {
+        m_refereceCount++;
+    }
+
+
+    void refCountDecreaseAndCheck() override {
+        m_refereceCount--;
+        if (m_refereceCount == 0) {
+            delete this;
+        }
+    }
+
+    bool init() override;;
     bool write(Assay *assay, int parts) override;
 };
 

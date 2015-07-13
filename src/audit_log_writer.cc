@@ -38,4 +38,5 @@ bool AuditLogWriter::write(Assay *assay, int parts) {
     return true;
 }
 
+
 }  // namespace ModSecurity

@@ -20,12 +20,11 @@
 namespace ModSecurity {
 
 
+AuditLogWriterSerial::~AuditLogWriterSerial()
+{ }
+
+
 bool AuditLogWriterSerial::init() {
-    return true;
-}
-
-
-bool AuditLogWriterSerial::close() {
     return true;
 }
 
@@ -33,5 +32,6 @@ bool AuditLogWriterSerial::close() {
 bool AuditLogWriterSerial::write(Assay *assay, int parts) {
     return true;
 }
+
 
 }  // namespace ModSecurity

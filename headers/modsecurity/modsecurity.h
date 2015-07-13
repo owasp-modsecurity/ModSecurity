@@ -121,7 +121,7 @@ class Rule;
 class ModSecurity {
  public:
     ModSecurity();
-    ~ModSecurity() { }
+    ~ModSecurity();
 
     static std::string whoAmI();
     void setConnectorInformation(std::string connector);
@@ -220,6 +220,8 @@ ModSecurity *msc_init();
 const char *msc_who_am_i(ModSecurity *msc);
 /** @ingroup ModSecurity_C_API */
 void msc_set_connector_info(ModSecurity *msc, const char *connector);
+/** @ingroup ModSecurity_C_API */
+void msc_cleanup(ModSecurity *msc);
 
 #ifdef __cplusplus
 }

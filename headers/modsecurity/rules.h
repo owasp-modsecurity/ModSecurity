@@ -53,7 +53,7 @@ class Rules {
         : m_referenceCount(0),
         m_custom_debug_log(custom_log) { }
 
-    ~Rules() { }
+    ~Rules();
 
     void incrementReferenceCount(void);
     void decrementReferenceCount(void);
@@ -142,6 +142,7 @@ int msc_rules_merge(Rules *rules_dst, Rules *rules_from);
 int msc_rules_add_remote(Rules *rules, char *key, char *uri);
 int msc_rules_add_file(Rules *rules, char *file);
 int msc_rules_add(Rules *rules, const char *plain_rules);
+int msc_rules_cleanup(Rules *rules);
 
 #ifdef __cplusplus
 }

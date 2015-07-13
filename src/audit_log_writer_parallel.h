@@ -31,9 +31,21 @@ class AuditLogWriterParallel : public AuditLogWriter {
     explicit AuditLogWriterParallel(AuditLog *audit)
         : AuditLogWriter(audit) { }
 
+    ~AuditLogWriterParallel() { }
     bool init() override;
-    bool close() override;
     bool write(Assay *assay, int parts) override;
+
+    void refCountIncrease() override {
+        m_refereceCount++;
+    }
+
+
+    void refCountDecreaseAndCheck() override {
+        m_refereceCount--;
+        if (m_refereceCount == 0) {
+            delete this;
+        }
+    }
 
     /**
      *

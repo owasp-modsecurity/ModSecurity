@@ -45,6 +45,10 @@ ModSecurity::ModSecurity()
 }
 
 
+ModSecurity::~ModSecurity() {
+}
+
+
 /**
  * @name    whoAmI
  * @brief   Return information about this ModSecurity version and platform.
@@ -159,6 +163,18 @@ extern "C" void msc_set_connector_info(ModSecurity *msc,
  */
 extern "C" const char *msc_who_am_i(ModSecurity *msc) {
     return msc->whoAmI().c_str();
+}
+
+
+/**
+ * @name    msc_cleanup
+ * @brief   Cleanup ModSecurity C API
+ *
+ * Cleanup ModSecurity instance.
+ *
+ */
+extern "C" void msc_cleanup(ModSecurity *msc) {
+    delete msc;
 }
 
 

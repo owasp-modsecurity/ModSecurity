@@ -69,11 +69,6 @@ bool AuditLogWriterParallel::init() {
 }
 
 
-bool AuditLogWriterParallel::close() {
-    return true;
-}
-
-
 bool AuditLogWriterParallel::write(Assay *assay, int parts) {
     FILE *fp;
     int fd;

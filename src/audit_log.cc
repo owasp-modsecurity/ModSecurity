@@ -34,6 +34,11 @@
 namespace ModSecurity {
 
 
+AuditLog::~AuditLog() {
+    m_writer->refCountDecreaseAndCheck();
+}
+
+
 bool AuditLog::setStorageDirMode(int permission) {
     this->directoryPermission = permission;
     return true;

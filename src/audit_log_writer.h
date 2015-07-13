@@ -32,9 +32,14 @@ class AuditLog;
 class AuditLogWriter {
  public:
     explicit AuditLogWriter(AuditLog *audit)
-        : m_audit(audit) { }
+        : m_audit(audit),
+        m_refereceCount(1) { }
 
-    virtual bool close() { return true; }
+    ~AuditLogWriter() { }
+
+    virtual void refCountIncrease() = 0;
+    virtual void refCountDecreaseAndCheck() = 0;
+
     virtual bool init() { return true; }
     virtual bool write(Assay *assay, int parts);
 
@@ -42,6 +47,7 @@ class AuditLogWriter {
 
  protected:
     AuditLog *m_audit;
+    int m_refereceCount;
 };
 
 }  // namespace ModSecurity

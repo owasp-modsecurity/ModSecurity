@@ -100,6 +100,11 @@ int Rules::loadFromUri(char *uri) {
 }
 
 
+Rules::~Rules() {
+    audit_log->refCountDecreaseAndCheck();
+}
+
+
 int Rules::loadRemote(char *key, char *uri) {
     return true;
 }
@@ -257,6 +262,13 @@ extern "C" int msc_rules_add(Rules *rules, const char *plain_rules) {
 
     return 0;
 }
+
+
+extern "C" int msc_rules_cleanup(Rules *rules) {
+    delete rules;
+    return true;
+}
+
 
 }  // namespace ModSecurity
 
