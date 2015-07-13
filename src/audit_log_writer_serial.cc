@@ -15,21 +15,46 @@
 
 #include "src/audit_log_writer_serial.h"
 
+#include <mutex>
+
 #include "src/audit_log.h"
 
 namespace ModSecurity {
 
+static std::mutex serialLoggingMutex;
 
-AuditLogWriterSerial::~AuditLogWriterSerial()
-{ }
+
+AuditLogWriterSerial::~AuditLogWriterSerial() {
+    log.close();
+}
+
+
+void AuditLogWriterSerial::generateBoundary(std::string *boundary) {
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+
+    for (int i = 0; i < SERIAL_AUDIT_LOG_BOUNDARY_LENGTH; ++i) {
+        boundary->append(1, alphanum[rand() % (sizeof(alphanum) - 1)]);
+    }
+}
 
 
 bool AuditLogWriterSerial::init() {
+    log.open(m_audit->m_path1, std::fstream::out | std::fstream::app);
     return true;
 }
 
 
 bool AuditLogWriterSerial::write(Assay *assay, int parts) {
+    std::string boundary;
+
+    generateBoundary(&boundary);
+
+    serialLoggingMutex.lock();
+    log << assay->toOldAuditLogFormat(parts, "-" + boundary + "--");
+    serialLoggingMutex.unlock();
     return true;
 }
 

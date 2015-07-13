@@ -152,6 +152,7 @@ class Assay {
     int httpCodeReturned;
 
     std::string to_json(int parts);
+    std::string toOldAuditLogFormat(int parts, const std::string &trailer);
 
     std::string id;
     time_t timeStamp;

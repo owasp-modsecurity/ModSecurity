@@ -29,6 +29,8 @@
 
 namespace ModSecurity {
 
+#define SERIAL_AUDIT_LOG_BOUNDARY_LENGTH 8
+
 /** @ingroup ModSecurity_CPP_API */
 class AuditLogWriterSerial : public AuditLogWriter {
  public:
@@ -51,6 +53,10 @@ class AuditLogWriterSerial : public AuditLogWriter {
 
     bool init() override;;
     bool write(Assay *assay, int parts) override;
+
+ private:
+    std::ofstream log;
+    void generateBoundary(std::string *boundary);
 };
 
 }  // namespace ModSecurity

@@ -688,6 +688,95 @@ ModSecurityIntervention *Assay::intervention() {
 }
 
 
+std::string Assay::toOldAuditLogFormat(int parts, const std::string &trailer) {
+    std::stringstream audit_log;
+    struct tm timeinfo;
+    char tstr[300];
+
+    memset(tstr, '\0', 300);
+    localtime_r(&this->timeStamp, &timeinfo);
+
+    audit_log << "--" << trailer << "-" << "A--" << std::endl;
+    strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
+    audit_log << tstr;
+    audit_log << " " << this->id.c_str();
+    audit_log << " " << this->m_clientIpAddress;
+    audit_log << " " << this->m_clientPort;
+    audit_log << " " << this->m_serverIpAddress;
+    audit_log << " " << this->m_serverPort;
+    audit_log << std::endl;
+
+    if (parts & AuditLog::BAuditLogPart) {
+        audit_log << "--" << trailer << "-" << "B--" << std::endl;
+        audit_log << this->m_protocol << " " << this->m_uri << " " << "HTTP/";
+        audit_log << this->m_httpVersion << std::endl;
+
+        for (auto h : this->m_variables_strings) {
+            std::string filter = "REQUEST_HEADERS:";
+            std::string a = h.first;
+            std::string b = h.second;
+
+            if (a.compare(0, filter.length(), filter) == 0) {
+                if (a.length() > filter.length()) {
+                    audit_log << a.c_str() + filter.length() << ": ";
+                    audit_log << b.c_str() << std::endl;
+                }
+            }
+        }
+    }
+    if (parts & AuditLog::CAuditLogPart) {
+        audit_log << "--" << trailer << "-" << "C--" << std::endl;
+        /** TODO: write audit_log C part. */
+    }
+    if (parts & AuditLog::DAuditLogPart) {
+        audit_log << "--" << trailer << "-" << "D--" << std::endl;
+        /** TODO: write audit_log D part. */
+    }
+    if (parts & AuditLog::EAuditLogPart) {
+        audit_log << "--" << trailer << "-" << "E--" << std::endl;
+        /** TODO: write audit_log E part. */
+    }
+    if (parts & AuditLog::FAuditLogPart) {
+        audit_log << "--" << trailer << "-" << "F--" << std::endl;
+        for (auto h : this->m_variables_strings) {
+            std::string filter = "RESPONSE_HEADERS:";
+            std::string a = h.first;
+            std::string b = h.second;
+
+            if (a.compare(0, filter.length(), filter) == 0) {
+                if (a.length() > filter.length()) {
+                    audit_log << a.c_str() + filter.length() << ": ";
+                    audit_log << b.c_str() << std::endl;
+                }
+            }
+        }
+    }
+    if (parts & AuditLog::GAuditLogPart) {
+        audit_log << "--" << trailer << "-" << "G--" << std::endl;
+        /** TODO: write audit_log G part. */
+    }
+    if (parts & AuditLog::HAuditLogPart) {
+        audit_log << "--" << trailer << "-" << "H--" << std::endl;
+        /** TODO: write audit_log H part. */
+    }
+    if (parts & AuditLog::IAuditLogPart) {
+        audit_log << "--" << trailer << "-" << "I--" << std::endl;
+        /** TODO: write audit_log I part. */
+    }
+    if (parts & AuditLog::JAuditLogPart) {
+        audit_log << "--" << trailer << "-" << "J--" << std::endl;
+        /** TODO: write audit_log J part. */
+    }
+    if (parts & AuditLog::KAuditLogPart) {
+        audit_log << "--" << trailer << "-" << "K--" << std::endl;
+        /** TODO: write audit_log K part. */
+    }
+    audit_log << "--" << trailer << "-" << "Z--" << std::endl << std::endl;
+
+    return audit_log.str();
+}
+
+
 std::string Assay::to_json(int parts) {
     const unsigned char *buf;
     size_t len;
