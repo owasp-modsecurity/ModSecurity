@@ -350,6 +350,34 @@ int Assay::addRequestHeader(const unsigned char *key, size_t key_n,
  */
 int Assay::processRequestBody() {
     debug(4, "Starting phase REQUEST_BODY. (SecRules 2)");
+
+    if (m_requestBody.tellp() > 0) {
+        /**
+         * FIXME:
+         *
+         * This is configurable by secrules, we should respect whatever
+         * the secrules said about it.
+         *
+         */
+        std::string content = m_requestBody.str();
+        char sep1 = '&';
+
+        std::vector<std::string> key_value = split(content, sep1);
+
+        for (std::string t : key_value) {
+            /**
+             * FIXME:
+             *
+             * Mimic modsecurity when there are multiple keys with the same name.
+             *
+             */
+            char sep2 = '=';
+
+            std::vector<std::string> key_value = split(t, sep2);
+            store_variable("ARGS:" + key_value[0], key_value[1]);
+        }
+    }
+
     this->m_rules->evaluate(ModSecurity::RequestBodyPhase, this);
     return 0;
 }
