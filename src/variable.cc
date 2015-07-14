@@ -18,12 +18,13 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <list>
 
 #include "modsecurity/assay.h"
 
 namespace ModSecurity {
 
-std::string Variable::evaluate(Assay *assay) {
+std::list<std::string> Variable::evaluate(Assay *assay) {
     return assay->resolve_variable(this->name);
 }
 

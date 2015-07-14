@@ -15,6 +15,7 @@
 
 #include <vector>
 #include <string>
+#include <list>
 
 #ifndef SRC_VARIABLE_H_
 #define SRC_VARIABLE_H_
@@ -29,7 +30,7 @@ class Variable {
         : name(_name) { }
 
     static std::string to_s(std::vector<Variable> *variables);
-    std::string evaluate(Assay *assay);
+    std::list<std::string> evaluate(Assay *assay);
     std::string name;
 };
 

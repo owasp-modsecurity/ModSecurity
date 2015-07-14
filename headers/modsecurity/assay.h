@@ -21,6 +21,7 @@
 #include <string>
 #include <sstream>
 #include <unordered_map>
+#include <map>
 #include <fstream>
 #include <vector>
 #endif
@@ -91,7 +92,7 @@ class ModSecurityCollectionsVariables :
 
 
 class ModSecurityStringVariables :
-    public std::unordered_map<std::string, std::string> {
+    public std::unordered_multimap<std::string, std::string> {
  public:
 };
 
@@ -135,11 +136,10 @@ class Assay {
     const char *getResponseBody();
     int getResponseBodyLenth();
 
-    std::string resolve_variable(std::string);
+    std::list<std::string> resolve_variable(std::string var);
+    std::string* resolve_variable_first(std::string);
 
     void store_variable(std::string, std::string);
-    void store_variable(std::string,
-        std::unordered_map<std::string, std::string>);
 
     ModSecurityStringVariables m_variables_strings;
 
@@ -171,6 +171,9 @@ class Assay {
     const char *m_uri;
     const char *m_protocol;
     const char *m_httpVersion;
+
+    std::string m_namesResponse;
+    std::string m_namesRequest;
 
     std::ostringstream m_requestBody;
     std::ostringstream m_responseBody;

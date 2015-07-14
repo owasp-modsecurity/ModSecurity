@@ -20,6 +20,7 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <list>
 
 #include "operators/operator.h"
 #include "actions/action.h"
@@ -120,8 +121,12 @@ bool Rule::evaluate(Assay *assay) {
         } else {
             bool ret = false;
             try {
-                ret = this->op->evaluate(assay,
-                  assay->m_variables_strings.at(variable.name));
+                std::list<std::string> e = assay->resolve_variable(
+                    variable.name);
+                for (std::string value : e) {
+                    ret = this->op->evaluate(assay,
+                        value);
+                }
             } catch (...) {
             }
 

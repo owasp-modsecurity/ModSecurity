@@ -26,6 +26,7 @@
 #include <fstream>
 #include <vector>
 #include <iomanip>
+#include <set>
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/intervention.h"
@@ -259,18 +260,16 @@ int Assay::processRequestHeaders() {
  */
 int Assay::addRequestHeader(const std::string& key,
     const std::string& value) {
+    std::string *names = resolve_variable_first("REQUEST_HEADERS_NAMES");
 
-    std::string names = resolve_variable("REQUEST_HEADERS_NAMES");
-
-    this->store_variable("REQUEST_HEADERS:" + key, value);
-
-    if (names.length() > 0) {
-        names = names + " " + key;
+    if (names == NULL) {
+        this->store_variable("REQUEST_HEADERS_NAMES", m_namesRequest);
+        m_namesRequest = key;
     } else {
-        names = key;
+        m_namesRequest = m_namesRequest + " " + key;
     }
 
-    this->store_variable("REQUEST_HEADERS_NAMES", names + " " + key);
+    this->store_variable("REQUEST_HEADERS:" + key, value);
 
     return 1;
 }
@@ -432,17 +431,16 @@ int Assay::processResponseHeaders() {
  */
 int Assay::addResponseHeader(const std::string& key,
     const std::string& value) {
-    std::string names = resolve_variable("RESPONSE_HEADERS_NAMES");
+    std::string *names = resolve_variable_first("RESPONSE_HEADERS_NAMES");
 
-    this->store_variable("RESPONSE_HEADERS:" + key, value);
-
-    if (names.length() > 0) {
-        names = names + " " + key;
+    if (names == NULL) {
+        this->store_variable("RESPONSE_HEADERS_NAMES", m_namesResponse);
+        m_namesRequest = key;
     } else {
-        names = key;
+        m_namesRequest = m_namesRequest + " " + key;
     }
 
-    this->store_variable("RESPONSE_HEADERS_NAMES", names + " " + key);
+    this->store_variable("RESPONSE_HEADERS:" + key, value);
 
     return 1;
 }
@@ -699,12 +697,13 @@ std::string Assay::toOldAuditLogFormatIndex(const std::string &filename,
 
     strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
 
-    ss << dash_if_empty(this->resolve_variable("REQUEST_HEADERS:Host")) << " ";
+    ss << dash_if_empty(
+        *this->resolve_variable_first("REQUEST_HEADERS:Host")) << " ";
     ss << dash_if_empty(this->m_clientIpAddress) << " ";
     /** TODO: Check variable */
-    ss << dash_if_empty(this->resolve_variable("REMOTE_USER")) << " ";
+    ss << dash_if_empty(*this->resolve_variable_first("REMOTE_USER")) << " ";
     /** TODO: Check variable */
-    ss << dash_if_empty(this->resolve_variable("LOCAL_USER")) << " ";
+    ss << dash_if_empty(*this->resolve_variable_first("LOCAL_USER")) << " ";
     ss << tstr << " ";
 
     ss << "\"";
@@ -716,13 +715,14 @@ std::string Assay::toOldAuditLogFormatIndex(const std::string &filename,
     ss << this->httpCodeReturned << " ";
     ss << this->m_responseBody.tellp();
     /** TODO: Check variable */
-    ss << dash_if_empty(this->resolve_variable("REFERER")) << " ";
+    ss << dash_if_empty(*this->resolve_variable_first("REFERER")) << " ";
     ss << "\"";
-    ss << dash_if_empty(this->resolve_variable("REQUEST_HEADERS:User-Agent"));
+    ss << dash_if_empty(
+        *this->resolve_variable_first("REQUEST_HEADERS:User-Agent"));
     ss << "\" ";
     ss << this->id << " ";
     /** TODO: Check variable */
-    ss << dash_if_empty(this->resolve_variable("REFERER")) << " ";
+    ss << dash_if_empty(*this->resolve_variable_first("REFERER")) << " ";
 
     ss << filename << " ";
     ss << "0" << " ";
@@ -972,19 +972,31 @@ std::string Assay::to_json(int parts) {
 }
 
 void Assay::store_variable(std::string key, std::string value) {
-    this->m_variables_strings[key] = value;
+    this->m_variables_strings.emplace(key, value);
 }
 
 
-void Assay::store_variable(std::string key,
-    std::unordered_map<std::string, std::string> value) {
-    std::cout << "Storing variable: " << key << ", value is a collection." \
-        << std::endl;
+std::list<std::string> Assay::resolve_variable(std::string var) {
+    std::list<std::string> l;
+    auto range = m_variables_strings.equal_range(var);
+
+    for (auto it = range.first; it != range.second; ++it) {
+        std::cout << it->first << ' ' << it->second << '\n';
+        l.push_back(it->second);
+    }
+
+    return l;
 }
 
 
-std::string Assay::resolve_variable(std::string var) {
-    return this->m_variables_strings[var];
+std::string* Assay::resolve_variable_first(std::string var) {
+    auto range = m_variables_strings.equal_range(var);
+
+    for (auto it = range.first; it != range.second; ++it) {
+        return &it->second;
+    }
+
+    return NULL;
 }
 
 
