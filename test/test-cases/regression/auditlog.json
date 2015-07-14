@@ -3,7 +3,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "auditlog : basic parser test",
+    "title": "auditlog : basic parser test - Parallel",
     "client": {
       "ip": "200.249.12.31",
       "port": 2313
@@ -40,7 +40,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) trim: \"test\"",
+      "debug_log": "\\[9\\]  T \\(0\\) trim: \"test",
       "error_log": "",
       "http_code": 403
     },
@@ -62,7 +62,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "auditlog : basic parser test - serial",
+    "title": "auditlog : basic parser test - Serial",
     "client": {
       "ip": "200.249.12.31",
       "port": 2313
@@ -99,7 +99,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) trim: \"test\"",
+      "debug_log": "\\[9\\]  T \\(0\\) trim: \"test",
       "error_log": "",
       "http_code": 403
     },
@@ -122,7 +122,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "auditlog : basic parser test - serial",
+    "title": "auditlog : basic parser test - Parallel",
     "client": {
       "ip": "200.249.12.31",
       "port": 2313
@@ -159,7 +159,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) trim: \"test\"",
+      "debug_log": "\\[9\\]  T \\(0\\) trim: \"test",
       "error_log": "",
       "http_code": 403
     },
