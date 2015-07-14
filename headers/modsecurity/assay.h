@@ -173,6 +173,7 @@ class Assay {
     const char *m_protocol;
     const char *m_httpVersion;
 
+    std::string *m_namesArgs;
     std::string m_namesResponse;
     std::string m_namesRequest;
     double m_ARGScombinedSize;

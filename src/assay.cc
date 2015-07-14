@@ -92,6 +92,7 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     httpCodeReturned(200),
     m_ARGScombinedSize(0),
     m_ARGScombinedSizeStr(NULL),
+    m_namesArgs(NULL),
     m_ms(ms) {
     id = std::to_string(this->timeStamp) + \
         std::to_string(generate_assay_unique_id());
@@ -99,6 +100,8 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
 
     store_variable("ARGS_COMBINED_SIZE", std::string("0"));
     this->m_ARGScombinedSizeStr = resolve_variable_first("ARGS_COMBINED_SIZE");
+    store_variable("ARGS_NAMES", std::string(""));
+    this->m_namesArgs = resolve_variable_first("ARGS_NAMES");
 
     this->debug(4, "Initialising transaction");
 }
@@ -219,6 +222,13 @@ int Assay::processURI(const char *uri, const char *protocol,
             std::vector<std::string> key_value = split(t, sep2);
             store_variable("ARGS:" + key_value[0], key_value[1]);
             store_variable("ARGS_GET:" + key_value[0], key_value[1]);
+
+            if (m_namesArgs->empty()) {
+                m_namesArgs->assign(key_value[0]);
+            } else {
+                m_namesArgs->assign(*m_namesArgs + " " + key_value[0]);
+            }
+
             this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
                 key_value[0].length() + key_value[1].length();
             this->m_ARGScombinedSizeStr->assign(
@@ -392,6 +402,13 @@ int Assay::processRequestBody() {
             std::vector<std::string> key_value = split(t, sep2);
             store_variable("ARGS:" + key_value[0], key_value[1]);
             store_variable("ARGS_POST:" + key_value[0], key_value[1]);
+
+            if (m_namesArgs->empty()) {
+                m_namesArgs->assign(key_value[0]);
+            } else {
+                m_namesArgs->assign(*m_namesArgs + " " + key_value[0]);
+            }
+
             this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
                 key_value[0].length() + key_value[1].length();
             this->m_ARGScombinedSizeStr->assign(
