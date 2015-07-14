@@ -139,7 +139,7 @@ class Assay {
     std::list<std::string> resolve_variable(std::string var);
     std::string* resolve_variable_first(std::string);
 
-    void store_variable(std::string, std::string);
+    void store_variable(std::string, const std::string &value);
 
     ModSecurityStringVariables m_variables_strings;
 
@@ -175,6 +175,9 @@ class Assay {
 
     std::string m_namesResponse;
     std::string m_namesRequest;
+    double m_ARGScombinedSize;
+    /** TODO: Support to save double in the storage. */
+    std::string *m_ARGScombinedSizeStr;
 
     std::ostringstream m_requestBody;
     std::ostringstream m_responseBody;

@@ -90,10 +90,16 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     do_not_save_in_auditlog(false),
     timeStamp(std::time(NULL)),
     httpCodeReturned(200),
+    m_ARGScombinedSize(0),
+    m_ARGScombinedSizeStr(NULL),
     m_ms(ms) {
     id = std::to_string(this->timeStamp) + \
         std::to_string(generate_assay_unique_id());
     m_rules->incrementReferenceCount();
+
+    store_variable("ARGS_COMBINED_SIZE", std::string("0"));
+    this->m_ARGScombinedSizeStr = resolve_variable_first("ARGS_COMBINED_SIZE");
+
     this->debug(4, "Initialising transaction");
 }
 
@@ -212,6 +218,11 @@ int Assay::processURI(const char *uri, const char *protocol,
 
             std::vector<std::string> key_value = split(t, sep2);
             store_variable("ARGS:" + key_value[0], key_value[1]);
+            this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
+                key_value[0].length() + key_value[1].length();
+            this->m_ARGScombinedSizeStr->assign(
+                std::to_string(this->m_ARGScombinedSize));
+
             debug(4, "Adding request argument (QUERY_STRING): name \"" + \
                 key_value[0] + "\", value \"" + key_value[1] + "\"");
             store_variable("QUERY_STRING:" + key_value[0], key_value[1]);
@@ -379,6 +390,10 @@ int Assay::processRequestBody() {
 
             std::vector<std::string> key_value = split(t, sep2);
             store_variable("ARGS:" + key_value[0], key_value[1]);
+            this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
+                key_value[0].length() + key_value[1].length();
+            this->m_ARGScombinedSizeStr->assign(
+                std::to_string(this->m_ARGScombinedSize));
         }
     }
 
@@ -1004,7 +1019,7 @@ std::string Assay::to_json(int parts) {
 }
 
 
-void Assay::store_variable(std::string key, std::string value) {
+void Assay::store_variable(std::string key, const std::string &value) {
     this->m_variables_strings.emplace(key, value);
 }
 
