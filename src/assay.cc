@@ -390,6 +390,7 @@ int Assay::processRequestBody() {
 
             std::vector<std::string> key_value = split(t, sep2);
             store_variable("ARGS:" + key_value[0], key_value[1]);
+            store_variable("ARGS_POST:" + key_value[0], key_value[1]);
             this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
                 key_value[0].length() + key_value[1].length();
             this->m_ARGScombinedSizeStr->assign(
