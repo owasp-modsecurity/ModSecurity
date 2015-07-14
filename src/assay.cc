@@ -185,8 +185,9 @@ int Assay::processURI(const char *uri, const char *protocol,
     m_protocol = protocol;
     m_httpVersion = http_version;
     m_uri = uri;
+    m_uri_decoded = uri_decode(uri);
 
-    const char *pos = strchr(uri, '?');
+    const char *pos = strchr(m_uri_decoded.c_str(), '?');
 
     if (pos != NULL && strlen(pos) > 2) {
         /**
@@ -359,10 +360,13 @@ int Assay::processRequestBody() {
          * the secrules said about it.
          *
          */
-        std::string content = m_requestBody.str();
-        char sep1 = '&';
+        std::string content = uri_decode(m_requestBody.str());
+        content.erase(content.length()-1, 1);
 
-        std::vector<std::string> key_value = split(content, sep1);
+        char sep1 = '&';
+        const char *pos = strchr(content.c_str(), '?');
+
+        std::vector<std::string> key_value = split(content.c_str(), sep1);
 
         for (std::string t : key_value) {
             /**
@@ -998,6 +1002,7 @@ std::string Assay::to_json(int parts) {
 
     return log;
 }
+
 
 void Assay::store_variable(std::string key, std::string value) {
     this->m_variables_strings.emplace(key, value);

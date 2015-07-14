@@ -29,6 +29,8 @@ namespace ModSecurity {
     std::string ascTime(time_t *t);
     void createDir(std::string dir, int mode);
     std::string dash_if_empty(const std::string& str);
+    void chomp(std::string *str);
+    std::string uri_decode(const std::string & sSrc);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_

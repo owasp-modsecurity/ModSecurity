@@ -169,6 +169,7 @@ class Assay {
     int m_clientPort;
     int m_serverPort;
     const char *m_uri;
+    std::string m_uri_decoded;
     const char *m_protocol;
     const char *m_httpVersion;
 
