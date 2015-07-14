@@ -93,6 +93,7 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     m_ARGScombinedSize(0),
     m_ARGScombinedSizeStr(NULL),
     m_namesArgs(NULL),
+    m_namesArgsPost(NULL),
     m_ms(ms) {
     id = std::to_string(this->timeStamp) + \
         std::to_string(generate_assay_unique_id());
@@ -102,6 +103,8 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     this->m_ARGScombinedSizeStr = resolve_variable_first("ARGS_COMBINED_SIZE");
     store_variable("ARGS_NAMES", std::string(""));
     this->m_namesArgs = resolve_variable_first("ARGS_NAMES");
+    store_variable("ARGS_POST_NAMES", std::string(""));
+    this->m_namesArgsPost = resolve_variable_first("ARGS_POST_NAMES");
 
     this->debug(4, "Initialising transaction");
 }
@@ -407,6 +410,11 @@ int Assay::processRequestBody() {
                 m_namesArgs->assign(key_value[0]);
             } else {
                 m_namesArgs->assign(*m_namesArgs + " " + key_value[0]);
+            }
+            if (m_namesArgsPost->empty()) {
+                m_namesArgsPost->assign(key_value[0]);
+            } else {
+                m_namesArgsPost->assign(*m_namesArgsPost + " " + key_value[0]);
             }
 
             this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
