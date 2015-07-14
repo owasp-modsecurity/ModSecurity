@@ -94,6 +94,7 @@ libmodsecurity_la_SOURCES = \
 	rule.cc \
 	unique_id.cc \
 	variable.cc \
+	variable_duration.cc \
 	operators/operator.cc \
 	operators/detect_sqli.cc \
 	operators/detect_xss.cc \

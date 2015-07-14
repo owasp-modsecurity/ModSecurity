@@ -95,6 +95,7 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     m_namesArgs(NULL),
     m_namesArgsPost(NULL),
     m_namesArgsGet(NULL),
+    start(std::chrono::system_clock::now()),
     m_ms(ms) {
     id = std::to_string(this->timeStamp) + \
         std::to_string(generate_assay_unique_id());

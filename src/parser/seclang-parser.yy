@@ -15,11 +15,13 @@ class Driver;
 #include "actions/transformations/transformation.h"
 #include "operators/operator.h"
 #include "rule.h"
+#include "variable_duration.h"
 
 using ModSecurity::actions::Action;
 using ModSecurity::actions::transformations::Transformation;
 using ModSecurity::operators::Operator;
 using ModSecurity::Variable;
+using ModSecurity::VariableDuration;
 using ModSecurity::Rule;
 
 }
@@ -246,13 +248,13 @@ variables:
     | variables PIPE RUN_TIME_VAR_DUR
       {
         std::vector<Variable *> *v = $1;
-        v->push_back(new Variable($3));
+        v->push_back(new VariableDuration($3));
         $$ = $1;
       }
     | RUN_TIME_VAR_DUR
       {
         std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new Variable($1));
+        variables->push_back(new VariableDuration($1));
         $$ = variables;
       }
 
