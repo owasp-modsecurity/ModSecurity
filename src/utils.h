@@ -31,6 +31,7 @@ namespace ModSecurity {
     std::string dash_if_empty(const std::string& str);
     void chomp(std::string *str);
     std::string uri_decode(const std::string & sSrc);
+    std::string tolower(std::string str);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_

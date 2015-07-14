@@ -305,6 +305,11 @@ int Assay::addRequestHeader(const std::string& key,
 
     this->store_variable("REQUEST_HEADERS:" + key, value);
 
+    if (tolower(key) == tolower("Authorization")) {
+        std::vector<std::string> type = split(value, ' ');
+        this->store_variable("AUTH_TYPE", type[0]);
+    }
+
     return 1;
 }
 

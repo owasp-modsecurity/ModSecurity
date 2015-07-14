@@ -26,7 +26,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-
+#include <cstring>
 
 #if defined _MSC_VER
 #include <direct.h>
@@ -87,6 +87,18 @@ void chomp(std::string *str) {
     if (pos != std::string::npos) {
         str->erase(pos+1, str->length()-pos-1);
     }
+}
+
+
+std::string tolower(std::string str) {
+    std::locale loc;
+    std::string value;
+
+    for (std::string::size_type i=0; i < str.length(); ++i) {
+        value.assign(value + std::tolower(str[i], loc));
+    }
+
+    return value;
 }
 
 
