@@ -1064,13 +1064,32 @@ void Assay::store_variable(std::string key, const std::string &value) {
 }
 
 
-std::list<std::string> Assay::resolve_variable(std::string var) {
-    std::list<std::string> l;
+std::list<std::pair<std::string, std::string>>
+    Assay::resolve_variable(std::string var) {
+    std::list<std::pair<std::string, std::string>> l;
+    std::pair<std::string, std::string> pair;
+
     auto range = m_variables_strings.equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
-        std::cout << it->first << ' ' << it->second << '\n';
-        l.push_back(it->second);
+        pair = std::make_pair(std::string(var), std::string(it->second));
+        l.push_back(pair);
+    }
+
+    if (l.size() == 0) {
+        for (auto& x : m_variables_strings) {
+            if ((x.first.substr(0, var.size() + 1).compare(var + ":") != 0)
+                && (x.first != var)) {
+                continue;
+            }
+            std::list<std::pair<std::string, std::string>> t;
+            t = resolve_variable(x.first);
+            for (std::pair<std::string, std::string> z : t) {
+                pair = std::make_pair(std::string(z.first),
+                    std::string(z.second));
+                l.push_back(pair);
+            }
+        }
     }
 
     return l;

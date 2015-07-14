@@ -82,12 +82,13 @@ using ModSecurity::Rule;
 %token <std::string> OPERATOR
 %token <std::string> ACTION
 %token <std::string> VARIABLE
+%token <std::string> RUN_TIME_VAR_DUR
 %token <std::string> TRANSFORMATION
 
 %token <double> CONFIG_VALUE_NUMBER
 
 %type <std::vector<Action *> *> actions
-%type <std::vector<Variable> *> variables
+%type <std::vector<Variable *> *> variables
 
 %printer { yyoutput << $$; } <*>;
 %%
@@ -232,14 +233,26 @@ expression:
 variables:
     variables PIPE VARIABLE
       {
-        std::vector<Variable> *v = $1;
-        v->push_back(Variable($3));
+        std::vector<Variable *> *v = $1;
+        v->push_back(new Variable($3));
         $$ = $1;
       }
     | VARIABLE
       {
-        std::vector<Variable> *variables = new std::vector<Variable>;
-        variables->push_back(Variable($1));
+        std::vector<Variable *> *variables = new std::vector<Variable *>;
+        variables->push_back(new Variable($1));
+        $$ = variables;
+      }
+    | variables PIPE RUN_TIME_VAR_DUR
+      {
+        std::vector<Variable *> *v = $1;
+        v->push_back(new Variable($3));
+        $$ = $1;
+      }
+    | RUN_TIME_VAR_DUR
+      {
+        std::vector<Variable *> *variables = new std::vector<Variable *>;
+        variables->push_back(new Variable($1));
         $$ = variables;
       }
 

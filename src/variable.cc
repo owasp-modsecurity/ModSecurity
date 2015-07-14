@@ -24,15 +24,16 @@
 
 namespace ModSecurity {
 
-std::list<std::string> Variable::evaluate(Assay *assay) {
+std::list<std::pair<std::string, std::string>>
+    Variable::evaluate(Assay *assay) {
     return assay->resolve_variable(this->name);
 }
 
 std::string Variable::to_s(
-    std::vector<Variable> *variables) {
+    std::vector<Variable *> *variables) {
     std::string ret;
     for (int i = 0; i < variables->size() ; i++) {
-        std::string name = variables->at(i).name;
+        std::string name = variables->at(i)->name;
 
         if (i == 0) {
             ret = ret + name;

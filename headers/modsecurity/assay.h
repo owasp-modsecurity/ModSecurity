@@ -24,6 +24,8 @@
 #include <map>
 #include <fstream>
 #include <vector>
+#include <utility>
+#include <chrono>
 #endif
 
 #include <stdlib.h>
@@ -136,7 +138,8 @@ class Assay {
     const char *getResponseBody();
     int getResponseBodyLenth();
 
-    std::list<std::string> resolve_variable(std::string var);
+    std::list<std::pair<std::string, std::string>>
+        resolve_variable(std::string var);
     std::string* resolve_variable_first(std::string);
 
     void store_variable(std::string, const std::string &value);
@@ -158,6 +161,7 @@ class Assay {
 
     std::string id;
     time_t timeStamp;
+    std::chrono::system_clock::time_point start;
 
  private:
     std::ofstream myfile;

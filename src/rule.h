@@ -31,7 +31,7 @@ namespace ModSecurity {
 class Rule {
  public:
     Rule(operators::Operator *_op,
-            std::vector<Variable> *_variables,
+            std::vector<Variable *> *_variables,
             std::vector<actions::Action *> *_actions);
 
     bool evaluate(Assay *assay);
@@ -41,7 +41,7 @@ class Rule {
     std::vector<actions::Action *> actions_runtime_pre;
     std::vector<actions::Action *> actions_runtime_pos;
 
-    std::vector<Variable> *variables;
+    std::vector<Variable *> *variables;
     int phase;
     double rule_id;
 };

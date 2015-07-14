@@ -21,6 +21,7 @@
 #include <string>
 #include <cstring>
 #include <list>
+#include <utility>
 
 #include "operators/operator.h"
 #include "actions/action.h"
@@ -33,7 +34,7 @@ using operators::Operator;
 using actions::Action;
 
 Rule::Rule(Operator *_op,
-        std::vector<Variable> *_variables,
+        std::vector<Variable *> *_variables,
         std::vector<Action *> *_actions)
     : variables(_variables),
     op(_op),
@@ -63,78 +64,59 @@ Rule::Rule(Operator *_op,
 }
 
 bool Rule::evaluate(Assay *assay) {
-    std::vector<Variable> *variables = this->variables;
+    bool ret = false;
+    std::vector<Variable *> *variables = this->variables;
 
     assay->debug(4, "Executing operator \"" + this->op->op \
         + "\" with param \"" + this->op->param +  "\" against " \
         + Variable::to_s(variables) + ".");
 
+    clock_t begin = clock();
+
     for (int i = 0; i < variables->size(); i++) {
-        Variable variable = variables->at(i);
+        int transformations = 0;
+        Variable *variable = variables->at(i);
 
-        if (std::strchr(variable.name.c_str(), ':') == NULL) {
-            for (auto& x : assay->m_variables_strings) {
-                if ((x.first.substr(0, variable.name.size() + 1).compare( \
-                    variable.name + ":") != 0) && (x.first != variable.name)) {
-                    continue;
-                }
+        std::list<std::pair<std::string, std::string>> e =
+            variable->evaluate(assay);
 
-                int transformations = 0;
-                std::string value = x.second;
+        for (auto &v : e) {
+            std::string value = v.second;
+            for (Action *a :
+                this->actions_runtime_pre) {
+                value = a->evaluate(value, assay);
+                assay->debug(9, " T (" + \
+                        std::to_string(transformations) + ") " + \
+                        a->name + ": \"" + value +"\"");
+                transformations++;
+            }
+
+            assay->debug(9, "Target value: \"" + value + "\" (Variable: " + \
+                v.first + ")");
+
+            ret = this->op->evaluate(assay, value);
+
+            clock_t end = clock();
+            double elapsed_secs = static_cast<double>(end - begin) \
+                / CLOCKS_PER_SEC;
+
+            assay->debug(4, "Operator completed in " + \
+                std::to_string(elapsed_secs) + " seconds");
+
+            if (ret) {
+                assay->debug(4, "Rule returned 1.");
 
                 for (Action *a :
-                    this->actions_runtime_pre) {
-                    value = a->evaluate(value, assay);
-                    assay->debug(9, " T (" + \
-                            std::to_string(transformations) + ") " + \
-                            a->name + ": \"" + value +"\"");
-
-                    transformations++;
+                    this->actions_runtime_pos) {
+                    assay->debug(4, "Running action: " + a->action);
+                    a->evaluate(assay);
                 }
-
-                assay->debug(9, "Target value: \"" + value + "\"");
-                clock_t begin = clock();
-
-                bool ret = this->op->evaluate(assay, value);
-
-                clock_t end = clock();
-                double elapsed_secs = static_cast<double>(end - begin) \
-                                      / CLOCKS_PER_SEC;
-
-                assay->debug(4, "Operator completed in " + \
-                        std::to_string(elapsed_secs) + " seconds");
-
-                if (ret) {
-                    assay->debug(4, "Rule returned 1.");
-
-                    for (Action *a :
-                        this->actions_runtime_pos) {
-                        assay->debug(4, "Running action: " + a->action);
-                        a->evaluate(assay);
-                    }
-
-                    return ret;
-                } else {
-                    assay->debug(4, "Rule returned 0.");
-                }
+            } else {
+                assay->debug(4, "Rule returned 0.");
             }
-        } else {
-            bool ret = false;
-            try {
-                std::list<std::string> e = assay->resolve_variable(
-                    variable.name);
-                for (std::string value : e) {
-                    ret = this->op->evaluate(assay,
-                        value);
-                }
-            } catch (...) {
-            }
-
-            return ret;
         }
-
-        return false;
     }
+    return ret;
 }
 
 }  // namespace ModSecurity

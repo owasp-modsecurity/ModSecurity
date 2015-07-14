@@ -16,6 +16,7 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <utility>
 
 #ifndef SRC_VARIABLE_H_
 #define SRC_VARIABLE_H_
@@ -29,8 +30,9 @@ class Variable {
     explicit Variable(std::string _name)
         : name(_name) { }
 
-    static std::string to_s(std::vector<Variable> *variables);
-    std::list<std::string> evaluate(Assay *assay);
+    static std::string to_s(std::vector<Variable *> *variables);
+    virtual std::list<std::pair<std::string, std::string>>
+        evaluate(Assay *assay);
     std::string name;
 };
 
