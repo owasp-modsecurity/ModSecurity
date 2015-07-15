@@ -275,6 +275,21 @@ if test "$build_docs" -eq 1; then
     TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS docs"
 fi
 
+# Add JSON audit logging
+AC_ARG_ENABLE(json-logging,
+				AS_HELP_STRING([--enabled-json-logging],
+								[Enable JSON audit logging.]),
+[
+	if test "$enableval" != "no"; then
+		json_logging='-DWITH_JSON_LOGGING'
+		MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $json_logging"
+	else
+		json_logging=''
+	fi
+],
+[
+	json_logging=''
+])
 
 # Add PCRE Studying
 
@@ -659,8 +674,7 @@ else
   fi
 fi
 
-MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type"
-
+MODSEC_EXTRA_CFLAGS="$json_logging $pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type"
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""
 for f in $EXTRA_CFLAGS; do
