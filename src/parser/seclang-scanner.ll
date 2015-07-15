@@ -58,6 +58,7 @@ TRANSFORMATION  t:(lowercase|urlDecodeUni|urlDecode|none|compressWhitespace|remo
 
 VARIABLE          (?i:AUTH_TYPE|ARGS_NAMES|ARGS|QUERY_STRING|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_COOKIES_NAMES|REQUEST_COOKIES|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_HEADERS|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_HEADERS|RESPONSE_PROTOCOL|RESPONSE_STATUS|TX)
 RUN_TIME_VAR_DUR  (?i:DURATION)
+RUN_TIME_VAR_ENV  (?i:ENV)
 
 VARIABLENOCOLON  (?i:REQBODY_ERROR|MULTIPART_STRICT_ERROR|MULTIPART_UNMATCHED_BOUNDARY|REMOTE_ADDR|REQUEST_LINE)
 
@@ -107,6 +108,12 @@ FREE_TEXT       [^\"]+
 {CONFIG_DIR_DEBUG_LOG}[ ]{CONFIG_VALUE_PATH}    { return yy::seclang_parser::make_CONFIG_DIR_DEBUG_LOG(strchr(yytext, ' ') + 1, loc); }
 {CONFIG_DIR_DEBUG_LVL}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_DEBUG_LVL(strchr(yytext, ' ') + 1, loc); }
 
+%{ /* Variables */ %}
+{VARIABLE}:?{DICT_ELEMENT}?             { return yy::seclang_parser::make_VARIABLE(yytext, loc); }
+{RUN_TIME_VAR_DUR}                      { return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, loc); }
+{RUN_TIME_VAR_ENV}:?{DICT_ELEMENT}?     { return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, loc); }
+
+
 {CONFIG_COMPONENT_SIG}[ ]["]{FREE_TEXT}["] { return yy::seclang_parser::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, loc); }
 
 {CONFIG_VALUE_ON}               { return yy::seclang_parser::make_CONFIG_VALUE_ON(yytext, loc); }
@@ -121,8 +128,6 @@ FREE_TEXT       [^\"]+
 ["]                             { return yy::seclang_parser::make_QUOTATION_MARK(loc); }
 [,]                             { return yy::seclang_parser::make_COMMA(loc); }
 [|]                             { return yy::seclang_parser::make_PIPE(loc); }
-{VARIABLE}:?{DICT_ELEMENT}?     { return yy::seclang_parser::make_VARIABLE(yytext, loc); }
-{RUN_TIME_VAR_DUR}              { return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, loc); }
 {VARIABLENOCOLON}	   	{ return yy::seclang_parser::make_VARIABLE(yytext, loc); }
 [ \t]+                          { return yy::seclang_parser::make_SPACE(loc); }
 \n                              { return yy::seclang_parser::make_NEW_LINE(loc); }

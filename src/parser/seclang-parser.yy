@@ -16,12 +16,14 @@ class Driver;
 #include "operators/operator.h"
 #include "rule.h"
 #include "variable_duration.h"
+#include "variable_env.h"
 
 using ModSecurity::actions::Action;
 using ModSecurity::actions::transformations::Transformation;
 using ModSecurity::operators::Operator;
 using ModSecurity::Variable;
 using ModSecurity::VariableDuration;
+using ModSecurity::VariableEnv;
 using ModSecurity::Rule;
 
 }
@@ -81,10 +83,12 @@ using ModSecurity::Rule;
 %token <std::string> CONFIG_DIR_DEBUG_LOG
 %token <std::string> CONFIG_DIR_DEBUG_LVL
 
-%token <std::string> OPERATOR
-%token <std::string> ACTION
 %token <std::string> VARIABLE
 %token <std::string> RUN_TIME_VAR_DUR
+%token <std::string> RUN_TIME_VAR_ENV
+
+%token <std::string> OPERATOR
+%token <std::string> ACTION
 %token <std::string> TRANSFORMATION
 
 %token <double> CONFIG_VALUE_NUMBER
@@ -255,6 +259,18 @@ variables:
       {
         std::vector<Variable *> *variables = new std::vector<Variable *>;
         variables->push_back(new VariableDuration($1));
+        $$ = variables;
+      }
+    | variables PIPE RUN_TIME_VAR_ENV
+      {
+        std::vector<Variable *> *v = $1;
+        v->push_back(new VariableEnv($3));
+        $$ = $1;
+      }
+    | RUN_TIME_VAR_ENV
+      {
+        std::vector<Variable *> *variables = new std::vector<Variable *>;
+        variables->push_back(new VariableEnv($1));
         $$ = variables;
       }
 
