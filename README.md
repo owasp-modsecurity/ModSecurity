@@ -1,44 +1,31 @@
 # Introduction
 
-libmodsecurity is a library which provides the functionalities of ModSecurity
-to be used on your application. It is capable to load/interpret rules on the
-ModSecurity SecRules format and apply them on the HTTP content informed by your
-application.
+Libmodsecurity is one component of the ModSecurity v3 project. The library codebase serves as an interface to ModSecurity Connectors taking in web traffic and applying traditional ModSecurity processing. In general, it provides the capability to load/interpret rules written in the ModSecurity SecRules format and apply them to HTTP content provided by your application via Connectors.
 
-Currently the libmodsecurity is used by the ModSecurity nginx connector
-(ModSecurity-nginx).
+Currently, libmodsecurity is known to be compatible with the following Connectors:
+ModSecurity Nginx Connector (ModSecurity-nginx).
 
-_Notice: This project is under development and it is not ready to be placed in
-production yet. It is not supporting all the operators and/or actions of the
-SecRules languages yet._
+_Notice: This project is under development and it is NOT ready to be placed in
+production yet. It currently does not support all the operators and/or actions of the SecRules language, yet._
 
 
 ### What is the difference between this project and the old ModSecurity (v2.x.x)?
 
-* All Apache dependences were removed
+* All Apache dependences have been removed
 * Higher performance
 * New features
+* New architecture 
 
-ModSecurity project started as just an Apache module, and as the project had
-been extending to be used by other platforms (nginx, IIS and others) it became
-necessary to remove the Apache dependencies, making the project more platform
-independent.
+Libmodsecurity is a complete rewrite of the ModSecurity platform. When it was first devised the ModSecurity project started as just an Apache module. Over time the project has been extended, due to popular demand, to support other platforms including (but not limited to) Nginx and IIS. In order to provide for the growing demand for additional platform support, it has became necessary to remove the Apache dependencies underlying this project, making it more platform independent.
 
-libmodsecurity is no longer dependent on the Apache web server (both
-compilation and runtime), and it also performs a way better. This project adds
-also some new features, for instance, further it will be expended to support
-audit logs into a JSON format.
+As a result of this goal we have rearchitechted Libmodsecurity such that it is no longer dependent on the Apache web server (both at compilation and during runtime). One side effect of this is that across all platforms users can expect increased performance. Additionally, we have taken this opprotunity to lay the groundwork for some new features that users have been long seeking. For example we are looking to nativly support auditlogs in the JSON format, along with a host of other functionality in future versions.
 
 
-### It is no longer an Apache module.
+### It is no longer just a module.
 
-This branch does not contain the ModSecurity module for Apache, nginx or IIS,
-instead it contains a library which can be consumed by connectors that can
-interface with your web server, for instance the ModSecurity-nginx
-(https://github.com/SpiderLabs/ModSecurity-nginx) project.
+The 'ModSecurity' branch no longer contains the traditional module logic (for Nginx, Apache, and IIS) that has traditionally been packaged all togerher. Instead, this branch only contains the library portion (libmodsecurity) for this project. This library is consumed by what we have termed 'Connectors' these connectors will interface with your webserver and provide the library with a common format that it undersands. Each of these connectors is maintained as a seperate GitHub project. For instance, the Nginx connector is supplied by the ModSecurity-nginx project (https://github.com/SpiderLabs/ModSecurity-nginx).
 
-The connectors are separated projects with different release cycles, issues and
-development trees.
+Keeping these connectors seperated allows each project to be have different release cycles, issues and development trees. Addtionally, it means that when you install ModSecurity v3 you only get exactly what you need, no extras you won't be using.
 
 # Compilation
 
@@ -48,10 +35,9 @@ information.
 
 After the compilation make sure that there are no issues on your
 build/platform. We strongly recommend the utilization of the unit tests and
-regression tests. The test utilities are located under the subfolder ‘tests’.
+regression tests. These test utilities are located under the subfolder ‘tests’.
 
-As a dynamic library, don’t forget that it has to be installed in a folder
-where your O.S. will look for dynamic libraries in it.
+As a dynamic library, don’t forget that libmodsecurity must be installed to a location (folder) where you OS will be looking for dynamic libraries.
 
 ### Unix (Linux, MacOS, FreeBSD, …)
 
@@ -71,30 +57,27 @@ Windows build is not ready yet.
 
 ## Dependencies
 
-This library is written in C++ using the C++11 standards. It also uses the Flex
-and Yacc to produce the “Sec Rules Language” parser. Another dependency that is
-mandatory is the YAJL, as ModSecurity uses JSON for logging, and testing
-framework. 
+This library is written in C++ using the C++11 standards. It also uses Flex
+and Yacc to produce the “Sec Rules Language” parser. Other, manditory dependencies include YAJL, as ModSecurity uses JSON for producing logs and its testing framework, libpcre (not yet manditory) for processing regular expressions in SecRules, and libXML2 (not yet manditory) which is used for parsing XML requests. 
 
-Others dependencies are operators related and may not be mandatory. For
-instance: libinjection is needed for the operator @detectXSS, also curl is
-needed for the SecRemoteRules. If those libraries are missing ModSecurity will
-be compiled without the support for the operator @detectXSS and the
-configuration directive SecRemoteRules. 
+All others dependencies are related to operators specified within SecRules or configuration directives and may not be required for compilation. A short list of such dependencies is as follows:
+
+* libinjection is needed for the operator @detectXSS and @detectSQL
+* curl is needed for the directive SecRemoteRules. 
+
+If those libraries are missing ModSecurity will be compiled without the support for the operator @detectXSS and the configuration directive SecRemoteRules. 
 
 # Library documentation
 
-The library documentation is written within the code in Doxygen format. Use
-doxygen utility with the configuration file “doxygen.cfg” inside the "doc/"
-subfolder to generate HTML output of the documentation, including examples.
+The library documentation is written within the code in Doxygen format. To generate this documentation, please use the doxygen utility with the provided configuration file, “doxygen.cfg”, located with the "doc/" subfolder. This will generate HTML formatted documentation including usage examples.
 
 # Library utilization
 
 The library provides a C++ and C interface. Some resources are currently only
-available to the C++, for instance: the capability to create custom logging
-mechanism (see the regression test to check how those logging mechanism works).
-The objective is to have both APIs (C, C++) providing the same functionalities,
-if you are missing something, please report.
+available via the C++ interface, for instance, the capability to create custom logging
+mechanism (see the regression test to check for how those logging mechanism works).
+The objective is to have both APIs (C, C++) providing the same functionality,
+if you find an aspect of the API that is missing via a perticular interface, please open an issue.
 
 Inside the subfolder examples, there are simple examples on how to use the API.
 Below some are illustrated:
@@ -159,24 +142,24 @@ int main (int argc, char **argv)
 
 # Contributing
 
-You are more than welcome to contribute with the growth of our community. New
-functionalities, fixes, bug report, support beginners users, anything that you
-are willing to help.
+You are more than welcome to contribute to this project and look forward to growing the community around this new version of ModSecurity. Areas of interest include: New
+functionalities, fixes, bug report, support for beginning users, or anything that you
+are willing to help with.
 
 ## Providing patches
 
 We prefer to have your patch within the GtiHub infrastructure to facilitate our
-review work, and our Q.A. integration. GitHub provides an excellent
+review work, and our Q.A. integration. GitHub provides excellent
 documentation on how to perform “Pull Requests”, more information available
 here: https://help.github.com/articles/using-pull-requests/
 
 Please respect the coding style. Pull requests can include various commits, so
-provide one fix or one functionality per commit. Do not change anything outside
-the scope of our target work (e.g. coding style in a function that you have
+provide one fix or one piece of functionality per commit. Please do not change anything outside
+the scope of your target work (e.g. coding style in a function that you have
 passed by). For further information about the coding style used in this
 project, please check: https://www.chromium.org/blink/coding-style
 
-Provides explanative commit messages. First line gives the highlight of your
+Provides explanative commit messages. Your first line should  give the highlights of your
 patch, 3rd and on give a more detailed explanation/technical details about your
 patch. Patch explanation is valuable during the review process.
 
@@ -196,12 +179,11 @@ A TODO list is also available as part of the Doxygen documentation.
 
 Along with the manual testing, we strongly recommend you to use the our
 regression tests and unit tests. If you have implemented an operator, don’t
-forget to create unit tests for it. Anything else, it is recommended to have a
-regression test for it.
+forget to create unit tests for it. If you impliment anything else, it is encouraged that you develop complimentary regression tests for it.
 
 The regression test and unit test utilities are native and do not demand any
 external tool or script, although you need to fetch the test cases from other
-repositories as they are shared with other versions of ModSecurity, those
+repositories, as they are shared with other versions of ModSecurity, those
 others repositories git submodules. To fetch the submodules repository and run
 the utilities, follow the commands listed below:
 
@@ -216,12 +198,12 @@ $ ./unit-tests
 ### Debugging 
 
 
-Before start the debugging process, make sure where your bug is. The problem
+Before start the debugging process, make sure of where your bug is. The problem
 could be on your connector or in libmodsecurity. In order to identify where the
-bug is, it is recommended the creation of a regression test that mimic the
+bug is, it is recommended that you develop a regression test that mimics the
 scenario where the bug is happening. If the bug is reproducible with the
-regression-test utility, then it will be a way simple to debug. On Linux it is
-recommended the utilization of gdb and/or valgrind.
+regression-test utility, then it will be far simpliar to debug and ensure that it never occurs again. On Linux it is
+recommended that anyone undertaking debugging utilize gdb and/or valgrind as needed.
 
 During the configuration/compilation time, you may want to disable the compiler
 optimization making your “back traces” populated with readable data. Use the
@@ -239,12 +221,10 @@ $ sudo make install
 ## Reporting Issues
 
 If you are facing a configuration issue or something is not working as you
-expected to be, please use ModSecurity user’s mailing list. Issues on GitHub
-are also welcomed, but prefer to have user questions on the mailing list first,
-where you can reach an entire community. Also don’t forget to look for an
-existent issue before open a new one.
+expected to be, please use the ModSecurity user’s mailing list. Issues on GitHub
+are also welcomed, but we prefer to have user ask questions on the mailing list first so that you can reach an entire community. Also don’t forget to look for existing issues before open a new one.
 
-If you are willing to open an issue on GitHub, don’t forget to tell us the
+If you are going to open a new issue on GitHub, don’t forget to tell us the
 version of your libmodsecurity and the version of a specific connector if there
 is one.
 
@@ -253,13 +233,13 @@ is one.
 
 Please do not make public any security issue. Contact us at:
 security@modsecurity.org reporting the issue. Once the problem is fixed your
-credits will be given.
+credit will be given.
 
 ## Feature request
 
-It will be a pleasure to discuss any feature request with the community, also,
-feel free to open GitHub issues requesting for new features. Before opening a
-new issue, please check if there is one already opened with the same subject.
+We are open to discussing any new feature request with the community via the mailing lists. You can alternativly,
+feel free to open GitHub issues requesting new features. Before opening a
+new issue, please check if there is one already opened on the same topic.
 
 ## Packing
 
