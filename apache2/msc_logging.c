@@ -521,6 +521,26 @@ static int chained_is_matched(modsec_rec *msr, const msre_rule *next_rule) {
 
 #ifdef WITH_JSON_LOGGING
 /**
+ * Write detailed information about performance metrics into a JSON generator
+ */
+static void format_performance_variables_json(modsec_rec *msr, yajl_gen g) {
+    yajl_string(g, "stopwatch");
+    yajl_gen_map_open(g);
+
+    yajl_kv_int(g, "p1", msr->time_phase1);
+    yajl_kv_int(g, "p2", msr->time_phase2);
+    yajl_kv_int(g, "p3", msr->time_phase3);
+    yajl_kv_int(g, "p4", msr->time_phase4);
+    yajl_kv_int(g, "p5", msr->time_phase5);
+    yajl_kv_int(g, "sr", msr->time_storage_read);
+    yajl_kv_int(g, "sw", msr->time_storage_write);
+    yajl_kv_int(g, "l", msr->time_logging);
+    yajl_kv_int(g, "gc", msr->time_gc);
+
+    yajl_gen_map_close(g);
+}
+
+/**
  * Write detailed information about a rule and its actionset into a JSON generator
  */
 static void write_rule_json(modsec_rec *msr, const msre_rule *rule, yajl_gen g) {
@@ -558,6 +578,9 @@ static void write_rule_json(modsec_rec *msr, const msre_rule *rule, yajl_gen g) 
         yajl_kv_int(g, "phase", rule->actionset->phase);
     }
     yajl_kv_bool(g, "is_chained", rule->actionset->is_chained);
+    if (rule->actionset->is_chained && (rule->chain_starter == NULL)) {
+        yajl_kv_bool(g, "chain_starter", 1);
+    }
     yajl_gen_map_close(g);
 
     yajl_string(g, "operator");
@@ -602,6 +625,7 @@ void sec_audit_logger(modsec_rec *msr) {
     int arg_min, arg_max, sanitize_matched;
 #ifdef WITH_JSON_LOGGING
     yajl_gen g;
+    int been_opened = 0; // helper flag for conditionally opening maps
 #endif
 
 #ifndef WITH_JSON_LOGGING
@@ -704,7 +728,7 @@ void sec_audit_logger(modsec_rec *msr) {
     g = yajl_gen_alloc(NULL);
 
     /**
-     * don't pretty print JSON by default
+     * don't pretty print JSON
      * this is harder to eyeball but much easier to parse programmatically
      */
     yajl_gen_config(g, yajl_gen_beautify, 0);
@@ -771,16 +795,14 @@ void sec_audit_logger(modsec_rec *msr) {
         for (i = 0; i < arr->nelts; i++) {
             sanitized_partial = 0;
             sanitize_matched = 0;
-#ifndef WITH_JSON_LOGGING
             text = apr_psprintf(msr->mp, "%s: %s\n", te[i].key, te[i].val);
-#else
+#ifdef WITH_JSON_LOGGING
             // write the key no matter what
             // since sanitization only occurs on the value
             yajl_string(g, te[i].key);
 #endif
             if (apr_table_get(msr->request_headers_to_sanitize, te[i].key) != NULL) {
                 buf = apr_psprintf(msr->mp, "%s",text+strlen(te[i].key)+2);
-
                 for ( k = 0; k < tarr_pattern->nelts; k++)  {
                     if(strncmp(telts_pattern[k].key,te[i].key,strlen(te[i].key)) ==0 ) {
                         mparm = (msc_parm *)telts_pattern[k].val;
@@ -818,7 +840,8 @@ void sec_audit_logger(modsec_rec *msr) {
 #ifndef WITH_JSON_LOGGING
                     memset(text + strlen(te[i].key) + 2, '*', strlen(te[i].val));
 #else
-                    yajl_string(g, "****"); // fix this later
+                    memset(buf, '*', strlen(buf)); // strlen also includes the appended newline on the header
+                    yajl_string(g, buf);
 #endif
                 }
             }
@@ -827,7 +850,9 @@ void sec_audit_logger(modsec_rec *msr) {
 #else
             // we diverge from the original logic a bit because we always print the key
             // at this no point sanitization had occured, so we just print the value
-            yajl_string(g, te[i].val);
+            else {
+                yajl_string(g, te[i].val);
+            }
 #endif
         }
 #ifdef WITH_JSON_LOGGING
@@ -1025,7 +1050,6 @@ void sec_audit_logger(modsec_rec *msr) {
                 sec_auditlog_write(msr, text, strlen(text));
                 sec_auditlog_write(msr, buffer, strlen(buffer));
 #else
-                // this is a key instead 'request', doesn't need an array or map since it's one value
                 yajl_kv_string(g, "fake_body", buffer);
 #endif
             }
@@ -1055,7 +1079,8 @@ void sec_audit_logger(modsec_rec *msr) {
                         msr->status_line);
 #else
                 yajl_kv_string(g, "protocol", msr->response_protocol);
-                yajl_kv_string(g, "status", msr->status_line);
+                // as an integer, response status is easier to parse than status_line
+                yajl_kv_int(g, "status", (int)msr->response_status);
 #endif
             } else {
 #ifndef WITH_JSON_LOGGING
@@ -1084,9 +1109,8 @@ void sec_audit_logger(modsec_rec *msr) {
             for (i = 0; i < arr->nelts; i++) {
                 sanitized_partial = 0;
                 sanitize_matched = 0;
-#ifndef WITH_JSON_LOGGING
                 text = apr_psprintf(msr->mp, "%s: %s\n", te[i].key, te[i].val);
-#else
+#ifdef WITH_JSON_LOGGING
                 // write the key no matter what
                 // since sanitization only occurs on the value
                 yajl_string(g, te[i].key);
@@ -1131,7 +1155,8 @@ void sec_audit_logger(modsec_rec *msr) {
 #ifndef WITH_JSON_LOGGING
                         memset(text + strlen(te[i].key) + 2, '*', strlen(te[i].val));
 #else
-                        yajl_string(g, "****"); // fix this later
+                        memset(buf, '*', strlen(buf));
+                        yajl_string(g, buf);
 #endif
                     }
                 }
@@ -1140,7 +1165,9 @@ void sec_audit_logger(modsec_rec *msr) {
 #else
                 // we diverge from the original logic a bit because we always print the key
                 // at this point no sanitization had occured, so we just print the value
-                yajl_string(g, te[i].val);
+                else {
+                    yajl_string(g, te[i].val);
+                }
 #endif
             }
 #ifdef WITH_JSON_LOGGING
@@ -1169,8 +1196,8 @@ void sec_audit_logger(modsec_rec *msr) {
 #ifdef WITH_JSON_LOGGING
     yajl_gen_map_close(g); // response top-level key is finished
 
-    yajl_string(g, "data");
-    yajl_gen_map_open(g); // data top-level key
+    yajl_string(g, "audit_data");
+    yajl_gen_map_open(g); // audit_data top-level key
 #endif
 
     /* AUDITLOG_PART_TRAILER */
@@ -1184,8 +1211,12 @@ void sec_audit_logger(modsec_rec *msr) {
 
         /* Messages */
 #ifdef WITH_JSON_LOGGING
-        yajl_string(g, "messages");
-        yajl_gen_array_open(g);
+        been_opened = 0;
+        if (msr->alerts->nelts > 0) {
+            yajl_string(g, "messages");
+            yajl_gen_array_open(g);
+            been_opened = 1;
+        }
 #endif
         for(i = 0; i < msr->alerts->nelts; i++) {
 #ifndef WITH_JSON_LOGGING
@@ -1196,13 +1227,19 @@ void sec_audit_logger(modsec_rec *msr) {
 #endif
         }
 #ifdef WITH_JSON_LOGGING
-        yajl_gen_array_close(g);
+        if (been_opened == 1) {
+            yajl_gen_array_close(g);
+        }
 #endif
 
         /* Apache error messages */
 #ifdef WITH_JSON_LOGGING
-        yajl_string(g, "error_messages");
-        yajl_gen_array_open(g);
+        been_opened = 0;
+        if (msr->error_messages->nelts > 0) {
+            yajl_string(g, "error_messages");
+            yajl_gen_array_open(g);
+            been_opened = 1;
+        }
 #endif
         for(i = 0; i < msr->error_messages->nelts; i++) {
             error_message_t *em = (((error_message_t **)msr->error_messages->elts)[i]);
@@ -1215,7 +1252,9 @@ void sec_audit_logger(modsec_rec *msr) {
 #endif
         }
 #ifdef WITH_JSON_LOGGING
-        yajl_gen_array_close(g);
+        if (been_opened == 1) {
+            yajl_gen_array_close(g);
+        }
 #endif
 
         /* Action */
@@ -1228,6 +1267,7 @@ void sec_audit_logger(modsec_rec *msr) {
             yajl_gen_map_open(g);
             yajl_kv_bool(g, "intercepted", 1);
             yajl_kv_int(g, "phase", msr->intercept_phase);
+            yajl_kv_string(g, "message", msr->intercept_message);
             yajl_gen_map_close(g);
 #endif
         }
@@ -1242,27 +1282,25 @@ void sec_audit_logger(modsec_rec *msr) {
 #endif
         }
 
+#ifndef WITH_JSON_LOGGING
         /* Stopwatch; left in for compatibility reasons */
         text = apr_psprintf(msr->mp, "Stopwatch: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT " (- - -)\n",
             msr->request_time, (now - msr->request_time));
-#ifndef WITH_JSON_LOGGING
         sec_auditlog_write(msr, text, strlen(text));
-#else
-        yajl_kv_string(g, "stopwatch", text);
 #endif
 
         /* Stopwatch2 */
+#ifndef WITH_JSON_LOGGING
         {
             char *perf_all = format_all_performance_variables(msr, msr->mp);
 
             text = apr_psprintf(msr->mp, "Stopwatch2: %" APR_TIME_T_FMT " %" APR_TIME_T_FMT
                 "; %s\n", msr->request_time, (now - msr->request_time), perf_all);
-#ifndef WITH_JSON_LOGGING
             sec_auditlog_write(msr, text, strlen(text));
-#else
-            yajl_kv_string(g, "stopwatch2", text);
-#endif
         }
+#else
+        format_performance_variables_json(msr, g);
+#endif
 
         /* Our response body does not contain chunks */
         /* ENH Only write this when the output was chunked. */
@@ -1293,8 +1331,7 @@ void sec_audit_logger(modsec_rec *msr) {
         }
 
 #ifdef WITH_JSON_LOGGING
-        yajl_string(g, "sanitized");
-        yajl_gen_map_open(g); // open a separate map for sanitized values
+        been_opened = 0;
 #endif
 
         /* Sanitised arguments */
@@ -1310,6 +1347,12 @@ void sec_audit_logger(modsec_rec *msr) {
                 text = apr_psprintf(msr->mp, "Sanitised-Args: ");
                 sec_auditlog_write(msr, text, strlen(text));
 #else
+                if (been_opened == 0) {
+                    yajl_string(g, "sanitized");
+                    yajl_gen_map_open(g);
+                    been_opened = 1;
+                }
+
                 yajl_string(g, "args");
                 yajl_gen_array_open(g);
 #endif
@@ -1346,6 +1389,12 @@ void sec_audit_logger(modsec_rec *msr) {
                 text = apr_psprintf(msr->mp, "Sanitised-Request-Headers: ");
                 sec_auditlog_write(msr, text, strlen(text));
 #else
+                if (been_opened == 0) {
+                    yajl_string(g, "sanitized");
+                    yajl_gen_map_open(g);
+                    been_opened = 1;
+                }
+
                 yajl_string(g, "request_headers");
                 yajl_gen_array_open(g);
 #endif
@@ -1380,6 +1429,12 @@ void sec_audit_logger(modsec_rec *msr) {
                 text = apr_psprintf(msr->mp, "Sanitised-Response-Headers: ");
                 sec_auditlog_write(msr, text, strlen(text));
 #else
+                if (been_opened == 0) {
+                    yajl_string(g, "sanitized");
+                    yajl_gen_map_open(g);
+                    been_opened = 1;
+                }
+
                 yajl_string(g, "response_headers");
                 yajl_gen_array_open(g);
 #endif
@@ -1402,7 +1457,9 @@ void sec_audit_logger(modsec_rec *msr) {
         }
 
 #ifdef WITH_JSON_LOGGING
-        yajl_gen_map_close(g); // sanitized args map is finished
+        if (been_opened == 1) {
+            yajl_gen_map_close(g); // sanitized args map is finished
+        }
 #endif
 
         /* Web application info. */
@@ -1493,7 +1550,7 @@ void sec_audit_logger(modsec_rec *msr) {
     }
 
 #ifdef WITH_JSON_LOGGING
-    yajl_gen_map_close(g); // data top-level key is finished
+    yajl_gen_map_close(g); // audit_data top-level key is finished
 #endif
 
     /* AUDITLOG_PART_UPLOADS */
@@ -1552,7 +1609,6 @@ void sec_audit_logger(modsec_rec *msr) {
         yajl_gen_array_open(g); // matched_rules top-level key
 #endif
 
-
         /* Matched Rules */
 
         for(i = 0; i < msr->matched_rules->nelts; i++) {
@@ -1608,7 +1664,7 @@ void sec_audit_logger(modsec_rec *msr) {
             }
         }
 #ifdef WITH_JSON_LOGGING
-    yajl_gen_array_close(g); // matched_rules top-level key is finished
+        yajl_gen_array_close(g); // matched_rules top-level key is finished
 #endif
 
     }
