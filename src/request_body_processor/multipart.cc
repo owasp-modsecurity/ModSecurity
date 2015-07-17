@@ -205,14 +205,17 @@ bool Multipart::process(std::string data) {
         start = end;
     }
 
+    double files_size = 0;
     for (std::string x : blobs) {
         MultipartBlob m(x, this);
 
         if (m.filename.empty() == false) {
             variables.emplace("FILES:" + m.name, m.filename);
             variables.emplace("FILES_NAMES:" + m.name, m.name);
+            files_size = files_size + m.content.size();
         }
     }
+    variables.emplace("FILES_COMBINED_SIZE", std::to_string(files_size));
 
     return true;
 }
