@@ -210,6 +210,7 @@ bool Multipart::process(std::string data) {
 
         if (m.filename.empty() == false) {
             variables.emplace("FILES:" + m.name, m.filename);
+            variables.emplace("FILES_NAMES:" + m.name, m.name);
         }
     }
 
