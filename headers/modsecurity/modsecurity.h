@@ -94,16 +94,31 @@ typedef struct ModSecurity_t ModSecurity;
 #include "modsecurity/debug_log.h"
 #include "modsecurity/rules.h"
 
+/**
+ * TAG_NUM:
+ *
+ * Alpha  - 001
+ * Beta   - 002
+ * Dev    - 010
+ * Rc1    - 051
+ * Rc2    - 052
+ * ...    - ...
+ * Release- 100
+ *
+ */
 
 #define MODSECURITY_MAJOR "3"
 #define MODSECURITY_MINOR "0"
 #define MODSECURITY_PATCHLEVEL "0"
 #define MODSECURITY_TAG "-alpha"
+#define MODSECURITY_TAG_NUM "001"
 
 #define MODSECURITY_VERSION MODSECURITY_MAJOR "." \
     MODSECURITY_MINOR "." MODSECURITY_PATCHLEVEL \
     MODSECURITY_TAG
 
+#define MODSECURITY_VERSION_NUM MODSECURITY_MAJOR \
+    MODSECURITY_MINOR MODSECURITY_PATCHLEVEL MODSECURITY_TAG_NUM
 
 #ifdef __cplusplus
 namespace ModSecurity {

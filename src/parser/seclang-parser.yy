@@ -17,6 +17,7 @@ class Driver;
 #include "rule.h"
 #include "variable_duration.h"
 #include "variable_env.h"
+#include "variable_modsec_build.h"
 
 using ModSecurity::actions::Action;
 using ModSecurity::actions::transformations::Transformation;
@@ -24,6 +25,7 @@ using ModSecurity::operators::Operator;
 using ModSecurity::Variable;
 using ModSecurity::VariableDuration;
 using ModSecurity::VariableEnv;
+using ModSecurity::VariableModsecBuild;
 using ModSecurity::Rule;
 
 }
@@ -86,6 +88,7 @@ using ModSecurity::Rule;
 %token <std::string> VARIABLE
 %token <std::string> RUN_TIME_VAR_DUR
 %token <std::string> RUN_TIME_VAR_ENV
+%token <std::string> RUN_TIME_VAR_BLD
 
 %token <std::string> OPERATOR
 %token <std::string> ACTION
@@ -271,6 +274,18 @@ variables:
       {
         std::vector<Variable *> *variables = new std::vector<Variable *>;
         variables->push_back(new VariableEnv($1));
+        $$ = variables;
+      }
+    | variables PIPE RUN_TIME_VAR_BLD
+      {
+        std::vector<Variable *> *v = $1;
+        v->push_back(new VariableModsecBuild($3));
+        $$ = $1;
+      }
+    | RUN_TIME_VAR_BLD
+      {
+        std::vector<Variable *> *variables = new std::vector<Variable *>;
+        variables->push_back(new VariableModsecBuild($1));
         $$ = variables;
       }
 

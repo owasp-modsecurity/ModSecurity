@@ -98,6 +98,7 @@ libmodsecurity_la_SOURCES = \
 	variable.cc \
 	variable_duration.cc \
 	variable_env.cc \
+	variable_modsec_build.cc \
 	operators/operator.cc \
 	operators/detect_sqli.cc \
 	operators/detect_xss.cc \
