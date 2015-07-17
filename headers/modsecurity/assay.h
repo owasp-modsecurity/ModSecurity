@@ -110,6 +110,32 @@ class Assay {
     int processURI(const char *uri, const char *protocol,
         const char *http_version);
 
+    /**
+     * Types of request body that ModSecurity may give a special treatment
+     * for the data.
+     */
+    enum RequestBodyType {
+      /**
+       *
+       */
+      UnknownFormat,
+      /**
+       *
+       */
+      MultiPartRequestBody,
+      /**
+       *
+       */
+      WWWFormUrlEncoded,
+      /**
+       *
+       */
+      JSONRequestBody,
+      /**
+       *
+       */
+      XMLRequestBody
+    };
 
     int processRequestHeaders();
     int addRequestHeader(const std::string& key, const std::string& value);
@@ -185,6 +211,7 @@ class Assay {
     double m_ARGScombinedSize;
     /** TODO: Support to save double in the storage. */
     std::string *m_ARGScombinedSizeStr;
+    RequestBodyType m_requestBodyType;
 
     std::ostringstream m_requestBody;
     std::ostringstream m_responseBody;

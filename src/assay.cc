@@ -34,8 +34,10 @@
 #include "src/utils.h"
 #include "src/audit_log.h"
 #include "src/unique_id.h"
+#include "request_body_processor/multipart.h"
 
 using ModSecurity::actions::Action;
+using ModSecurity::RequestBodyProcessor::Multipart;
 
 namespace ModSecurity {
 
@@ -95,6 +97,7 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     m_namesArgs(NULL),
     m_namesArgsPost(NULL),
     m_namesArgsGet(NULL),
+    m_requestBodyType(UnknownFormat),
     start(std::chrono::system_clock::now()),
     m_ms(ms) {
     id = std::to_string(this->timeStamp) + \
@@ -271,7 +274,7 @@ int Assay::processURI(const char *uri, const char *protocol,
  */
 int Assay::processRequestHeaders() {
     debug(4, "Starting phase REQUEST_HEADERS.  (SecRules 1)");
-    this->m_rules->evaluate(ModSecurity::RequestHeadersPhase, this);
+        this->m_rules->evaluate(ModSecurity::RequestHeadersPhase, this);
     return 0;
 }
 
@@ -311,6 +314,25 @@ int Assay::addRequestHeader(const std::string& key,
         this->store_variable("AUTH_TYPE", type[0]);
     }
 
+    /**
+     * Simple check to decide the request body content. This is not the right
+     * place, the "body processor" should be able to tell what he is capable
+     * to deal with.
+     *
+     */
+
+    if (tolower(key) == "content-type") {
+        std::string multipart("multipart/form-data");
+        std::string l = tolower(value);
+
+        if (l.compare(0, multipart.length(), multipart) == 0) {
+            this->m_requestBodyType = MultiPartRequestBody;
+        }
+
+        if (l == "application/x-www-form-urlencoded") {
+            this->m_requestBodyType = WWWFormUrlEncoded;
+        }
+    }
     return 1;
 }
 
@@ -391,7 +413,26 @@ int Assay::addRequestHeader(const unsigned char *key, size_t key_n,
 int Assay::processRequestBody() {
     debug(4, "Starting phase REQUEST_BODY. (SecRules 2)");
 
-    if (m_requestBody.tellp() > 0) {
+    if (m_requestBody.tellp() <= 0) {
+        return true;
+    }
+
+    if (m_requestBodyType == MultiPartRequestBody) {
+        std::string *a = resolve_variable_first("REQUEST_HEADERS:Content-Type");
+        if (a != NULL) {
+            Multipart m(*a);
+            m.init();
+            m.process(m_requestBody.str());
+            for (auto &a : m.variables) {
+                store_variable(a.first, a.second);
+            }
+        }
+    }
+
+    if (m_requestBodyType == WWWFormUrlEncoded) {
+        std::string content = uri_decode(m_requestBody.str());
+        content.erase(content.length()-1, 1);
+
         /**
          * FIXME:
          *
@@ -399,9 +440,6 @@ int Assay::processRequestBody() {
          * the secrules said about it.
          *
          */
-        std::string content = uri_decode(m_requestBody.str());
-        content.erase(content.length()-1, 1);
-
         char sep1 = '&';
         const char *pos = strchr(content.c_str(), '?');
 
