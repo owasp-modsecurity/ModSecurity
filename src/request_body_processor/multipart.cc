@@ -212,6 +212,8 @@ bool Multipart::process(std::string data) {
         if (m.filename.empty() == false) {
             variables.emplace("FILES:" + m.name, m.filename);
             variables.emplace("FILES_NAMES:" + m.name, m.name);
+            variables.emplace("FILES_SIZES:" + m.name,
+                std::to_string(m.content.size()));
             files_size = files_size + m.content.size();
         }
     }
