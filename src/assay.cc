@@ -476,6 +476,20 @@ int Assay::processRequestBody() {
         }
     }
 
+    /**
+     * FIXME: This variable should be calculated on demand, it is
+     * computationally intensive.
+     */
+    std::string fullRequest;
+    for (auto &a : resolve_variable("REQUEST_HEADERS")) {
+        fullRequest = fullRequest + \
+            std::string(a.first, 16, a.first.length() - 16) + ": " \
+            + a.second + "\n";
+    }
+    fullRequest = fullRequest + "\n\n";
+    fullRequest = fullRequest + m_requestBody.str();
+    store_variable("FULL_REQUEST", fullRequest);
+
     this->m_rules->evaluate(ModSecurity::RequestBodyPhase, this);
     return 0;
 }
