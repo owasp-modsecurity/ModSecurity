@@ -489,6 +489,7 @@ int Assay::processRequestBody() {
     fullRequest = fullRequest + "\n\n";
     fullRequest = fullRequest + m_requestBody.str();
     store_variable("FULL_REQUEST", fullRequest);
+    store_variable("FULL_REQUEST_LENGTH", std::to_string(fullRequest.size()));
 
     this->m_rules->evaluate(ModSecurity::RequestBodyPhase, this);
     return 0;
