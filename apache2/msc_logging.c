@@ -1326,6 +1326,15 @@ void sec_audit_logger_json(modsec_rec *msr) {
         for(i = 0; i < msr->matched_rules->nelts; i++) {
             rule = ((msre_rule **)msr->matched_rules->elts)[i];
             if ((rule != NULL) && (rule->actionset != NULL) && rule->actionset->is_chained && (rule->chain_starter == NULL)) {
+                /*
+                 * create a separate map for each rule chain
+                 * this makes it a lot easier to search for partial chains
+                 */
+                yajl_gen_map_open(g); // map for this chain
+                yajl_kv_bool(g, "chain", 1);
+                yajl_string(g, "rules");
+                yajl_gen_array_open(g); // array for the rules
+
                 write_rule_json(msr, rule, g);
                 do {
                     if (rule->ruleset != NULL)   {
@@ -1344,10 +1353,23 @@ void sec_audit_logger_json(modsec_rec *msr) {
                     }
                     rule = next_rule;
                 } while (rule != NULL && rule->actionset != NULL && rule->actionset->is_chained);
+                yajl_gen_array_close(g);
+
+                yajl_kv_bool(g, "full_chain_match", present); // if one of the rules didnt match, present is set to 0
+                yajl_gen_map_close(g); // close the map for this chain
             } else  {
+                yajl_gen_map_open(g);
+
+                yajl_kv_bool(g, "chain", 0);
+                yajl_string(g, "rules"); // this really should be 'rule', but we're keeping in line with other chain maps
+
+                yajl_gen_array_open(g);
                 if ((rule != NULL) && (rule->actionset != NULL) && !rule->actionset->is_chained && (rule->chain_starter == NULL)) {
                     write_rule_json(msr, rule, g);
                 }
+                yajl_gen_array_close(g);
+
+                yajl_gen_map_close(g);
             }
         }
         yajl_gen_array_close(g); // matched_rules top-level key is finished
