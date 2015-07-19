@@ -22,6 +22,9 @@
 #define AUDITLOG_SERIAL                      0
 #define AUDITLOG_CONCURRENT                  1
 
+#define AUDITLOGFORMAT_JSON                  0
+#define AUDITLOGFORMAT_NATIVE                1
+
 #define AUDITLOG_PART_FIRST                 'A'
 #define AUDITLOG_PART_HEADER                'A'
 #define AUDITLOG_PART_REQUEST_HEADERS       'B'

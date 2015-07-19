@@ -73,6 +73,7 @@ void *create_directory_config(apr_pool_t *mp, char *path)
     /* audit log variables */
     dcfg->auditlog_flag = NOT_SET;
     dcfg->auditlog_type = NOT_SET;
+    dcfg->auditlog_format = NOT_SET;
     dcfg->max_rule_time = NOT_SET;
     dcfg->auditlog_dirperms = NOT_SET;
     dcfg->auditlog_fileperms = NOT_SET;
@@ -503,6 +504,8 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
         merged->auditlog2_fd = parent->auditlog2_fd;
         merged->auditlog2_name = parent->auditlog2_name;
     }
+    merged->auditlog_format = (child->auditlog_format == NOT_SET
+        ? parent->auditlog_format : child->auditlog_format);
     merged->auditlog_storage_dir = (child->auditlog_storage_dir == NOT_SET_P
         ? parent->auditlog_storage_dir : child->auditlog_storage_dir);
     merged->auditlog_parts = (child->auditlog_parts == NOT_SET_P
@@ -667,6 +670,7 @@ void init_directory_config(directory_config *dcfg)
     /* audit log variables */
     if (dcfg->auditlog_flag == NOT_SET) dcfg->auditlog_flag = 0;
     if (dcfg->auditlog_type == NOT_SET) dcfg->auditlog_type = AUDITLOG_SERIAL;
+    if (dcfg->auditlog_format == NOT_SET) dcfg->auditlog_format = AUDITLOGFORMAT_NATIVE;
     if (dcfg->max_rule_time == NOT_SET) dcfg->max_rule_time = 0;
     if (dcfg->auditlog_dirperms == NOT_SET) dcfg->auditlog_dirperms = CREATEMODE_DIR;
     if (dcfg->auditlog_fileperms == NOT_SET) dcfg->auditlog_fileperms = CREATEMODE;
@@ -1287,6 +1291,21 @@ static const char *cmd_audit_log_type(cmd_parms *cmd, void *_dcfg,
         else
             return (const char *)apr_psprintf(cmd->pool,
                     "ModSecurity: Unrecognised parameter value for SecAuditLogType: %s", p1);
+
+    return NULL;
+}
+
+static const char *cmd_audit_log_mode(cmd_parms *cmd, void *_dcfg,
+        const char *p1)
+{
+    directory_config *dcfg = _dcfg;
+
+    if (strcasecmp(p1, "JSON") == 0) dcfg->auditlog_format = AUDITLOGFORMAT_JSON;
+    else
+        if (strcasecmp(p1, "Native") == 0) dcfg->auditlog_format = AUDITLOGFORMAT_NATIVE;
+        else
+            return (const char *)apr_psprintf(cmd->pool,
+                    "ModSecurity: Unrecognised parameter value for SecAuditLogFormat: %s", p1);
 
     return NULL;
 }
@@ -3230,6 +3249,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "whether to use the old audit log format (Serial) or new (Concurrent)"
+    ),
+
+    AP_INIT_TAKE1 (
+        "SecAuditLogFormat",
+        cmd_audit_log_mode,
+        NULL,
+        CMD_SCOPE_ANY,
+        "whether to emit audit log data in native format or JSON"
     ),
 
     AP_INIT_TAKE1 (
