@@ -518,6 +518,9 @@ struct directory_config {
     /* AUDITLOG_SERIAL (single file) or AUDITLOG_CONCURRENT (multiple files) */
     int                  auditlog_type;
 
+    /* AUDITLOGFORMAT_NATIVE or AUDITLOGFORMAT_JSON */
+    int                  auditlog_format;
+
     /* Mode for audit log directories and files */
     apr_fileperms_t      auditlog_dirperms;
     apr_fileperms_t      auditlog_fileperms;
