@@ -63,6 +63,7 @@ using ModSecurity::Utils::GeoLookup;
 %left ARGS CONFIG_VALUE_RELEVANT_ONLY CONFIG_VALUE_ON CONFIG_VALUE_OFF CONFIG_VALUE
 %token <std::string> DIRECTIVE
 %token <std::string> CONFIG_DIRECTIVE
+%token <std::string> CONFIG_DIR_REQ_BODY_LIMIT
 %token <std::string> CONFIG_DIR_RULE_ENG
 %token <std::string> CONFIG_DIR_REQ_BODY
 %token <std::string> CONFIG_DIR_RES_BODY
@@ -249,6 +250,10 @@ expression:
     | CONFIG_DIR_GEO_DB
       {
         GeoLookup::getInstance().setDataBase($1);
+      }
+    | CONFIG_DIR_REQ_BODY_LIMIT
+      {
+        driver.requestBodyLimit = atoi($1.c_str());
       }
 
 variables:

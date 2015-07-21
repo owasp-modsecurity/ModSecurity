@@ -414,6 +414,10 @@ int Assay::addRequestHeader(const unsigned char *key, size_t key_n,
 int Assay::processRequestBody() {
     debug(4, "Starting phase REQUEST_BODY. (SecRules 2)");
 
+    if (resolve_variable_first("INBOUND_DATA_ERROR") == NULL) {
+        store_variable("INBOUND_DATA_ERROR", "0");
+    }
+
     if (m_requestBody.tellp() <= 0) {
         return true;
     }
@@ -522,10 +526,16 @@ int Assay::processRequestBody() {
  *
  */
 int Assay::appendRequestBody(const unsigned char *buf, size_t len) {
-    /**
-     * as part of the confiurations or rules it is expected to 
-     * set a higher value for this. Will not handle it for now.
-     */
+    int current_size = this->m_requestBody.tellp();
+
+    debug(9, "Appending request body: " + std::to_string(len) + " bytes. " \
+        "Limit set to: " + std::to_string(this->m_rules->requestBodyLimit));
+
+    if (this->m_rules->requestBodyLimit > 0
+        && this->m_rules->requestBodyLimit < len + current_size) {
+        store_variable("INBOUND_DATA_ERROR", "1");
+    }
+
     this->m_requestBody.write(reinterpret_cast<const char*>(buf), len);
 
     return 0;

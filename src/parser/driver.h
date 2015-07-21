@@ -87,6 +87,7 @@ class Driver {
     bool sec_audit_engine;
     bool sec_request_body_access;
     bool sec_response_body_access;
+    int requestBodyLimit;
 
     std::string debug_log_path;
     std::list<std::string> components;

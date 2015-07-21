@@ -47,6 +47,7 @@ class Rules {
  public:
     Rules()
         : m_referenceCount(0),
+        requestBodyLimit(0),
         m_custom_debug_log(NULL) { }
 
     explicit Rules(DebugLog *custom_log)
@@ -124,6 +125,7 @@ class Rules {
     void debug(int level, std::string message);
     std::list<std::string> components;
 
+    int requestBodyLimit;
     AuditLog *audit_log;
 
  private:

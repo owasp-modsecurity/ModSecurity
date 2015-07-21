@@ -20,6 +20,7 @@
 Driver::Driver()
   : trace_scanning(false),
   trace_parsing(false),
+  requestBodyLimit(0),
   audit_log(new ModSecurity::AuditLog()) {
 }
 
