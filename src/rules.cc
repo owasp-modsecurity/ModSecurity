@@ -168,6 +168,7 @@ int Rules::merge(Driver *from) {
     this->debug_level = from->debug_level;
     this->components = from->components;
     this->requestBodyLimit = from->requestBodyLimit;
+    this->responseBodyLimit = from->responseBodyLimit;
 
     if (m_custom_debug_log) {
         this->debug_log = m_custom_debug_log->new_instance();
@@ -203,6 +204,7 @@ int Rules::merge(Rules *from) {
     this->sec_response_body_access = from->sec_response_body_access;
     this->components = from->components;
     this->requestBodyLimit = from->requestBodyLimit;
+    this->responseBodyLimit = from->responseBodyLimit;
 
     this->debug_log = from->debug_log;
 

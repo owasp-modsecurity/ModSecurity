@@ -64,6 +64,7 @@ using ModSecurity::Utils::GeoLookup;
 %token <std::string> DIRECTIVE
 %token <std::string> CONFIG_DIRECTIVE
 %token <std::string> CONFIG_DIR_REQ_BODY_LIMIT
+%token <std::string> CONFIG_DIR_RES_BODY_LIMIT
 %token <std::string> CONFIG_DIR_RULE_ENG
 %token <std::string> CONFIG_DIR_REQ_BODY
 %token <std::string> CONFIG_DIR_RES_BODY
@@ -254,6 +255,10 @@ expression:
     | CONFIG_DIR_REQ_BODY_LIMIT
       {
         driver.requestBodyLimit = atoi($1.c_str());
+      }
+    | CONFIG_DIR_RES_BODY_LIMIT
+      {
+        driver.responseBodyLimit = atoi($1.c_str());
       }
 
 variables:

@@ -718,6 +718,11 @@ int Assay::addResponseHeader(const unsigned char *key, size_t key_n,
  */
 int Assay::processResponseBody() {
     debug(4, "Starting phase RESPONSE_BODY. (SecRules 4)");
+
+    if (resolve_variable_first("OUTBOUND_DATA_ERROR") == NULL) {
+        store_variable("OUTBOUND_DATA_ERROR", "0");
+    }
+
     this->m_rules->evaluate(ModSecurity::ResponseBodyPhase, this);
     return 0;
 }
@@ -742,10 +747,16 @@ int Assay::processResponseBody() {
  *
  */
 int Assay::appendResponseBody(const unsigned char *buf, size_t len) {
-    /**
-     * as part of the confiurations or rules it is expected to 
-     * set a higher value for this. Will not handle it for now.
-     */
+    int current_size = this->m_responseBody.tellp();
+
+    debug(9, "Appending response body: " + std::to_string(len) + " bytes. " \
+        "Limit set to: " + std::to_string(this->m_rules->responseBodyLimit));
+
+    if (this->m_rules->responseBodyLimit > 0
+        && this->m_rules->responseBodyLimit < len + current_size) {
+        store_variable("OUTBOUND_DATA_ERROR", "1");
+    }
+
     this->m_responseBody.write(reinterpret_cast<const char*>(buf), len);
 
     return 0;
