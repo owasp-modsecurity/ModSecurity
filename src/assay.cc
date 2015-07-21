@@ -450,7 +450,10 @@ int Assay::processRequestBody() {
                 if (m.containsDataAfter) {
                     debug(9, "Multipart: There is data after the boundary, " \
                         "setting MULTIPART_STRICT_ERROR to 1");
-                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                    update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                    store_variable("MULTIPART_UNMATCHED_BOUNDARY", "1");
+                } else {
+                    store_variable("MULTIPART_UNMATCHED_BOUNDARY", "0");
                 }
                 if (m.containsDataBefore) {
                     debug(9, "Multipart: There is data before the boundary, " \
