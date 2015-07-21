@@ -33,8 +33,11 @@ class Multipart {
     bool boundaryContainsOnlyValidCharacters();
     bool conuntBoundaryParameters();
     bool process(std::string data);
+    void checkForCrlfLf(const std::string &blob);
 
     ModSecurityStringVariables variables;
+    bool crlf;
+    bool lf;
  private:
     void debug(int a, std::string str) {
         std::cout << "Debug: " << str << std::endl;

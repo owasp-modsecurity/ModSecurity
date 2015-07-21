@@ -431,6 +431,12 @@ int Assay::processRequestBody() {
             for (auto &a : m.variables) {
                 store_variable(a.first, a.second);
             }
+
+            if (m.crlf && m.lf) {
+                store_variable("MULTIPART_CRLF_LF_LINES", "1");
+            } else {
+                store_variable("MULTIPART_CRLF_LF_LINES", "0");
+            }
         }
     }
 

@@ -25,7 +25,9 @@ namespace ModSecurity {
 namespace RequestBodyProcessor {
 
 Multipart::Multipart(std:: string header)
-    : m_boundaryStartsWithWhiteSpace(false),
+    : crlf(false),
+    lf(true),
+    m_boundaryStartsWithWhiteSpace(false),
     m_boundaryIsQuoted(false),
     m_header(header) {
 }
@@ -184,6 +186,21 @@ bool Multipart::boundaryContainsOnlyValidCharacters() {
     return true;
 }
 
+void Multipart::checkForCrlfLf(const std::string &data) {
+    size_t start = 0;
+    size_t pos = 0;
+
+    pos = data.find("\n", start);
+    while (pos != std::string::npos) {
+        if (pos > 1 && data.at(pos-1) == '\r') {
+            this->crlf = true;
+        } else {
+            this->lf = true;
+        }
+        pos = data.find("\n", pos + 1);
+    }
+}
+
 bool Multipart::process(std::string data) {
     std::list<std::string> blobs;
     size_t start = data.find(m_boundary);
@@ -201,6 +218,9 @@ bool Multipart::process(std::string data) {
         }
         std::string block = std::string(data, start + m_boundary.length() +
             + endl, end - (start + m_boundary.length() + endl) - endl);
+
+        checkForCrlfLf(block);
+
         blobs.push_back(block);
         start = end;
     }
