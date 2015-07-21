@@ -122,12 +122,17 @@ bool Rule::evaluate(Assay *assay) {
                         value) == false) {
                         assay->store_variable("MATCHED_VAR", value);
                     }
+                    if (assay->update_variable_first("MATCHED_VAR_NAME",
+                        v.first) == false) {
+                        assay->store_variable("MATCHED_VAR_NAME", v.first);
+                    }
                     assay->store_variable("MATCHED_VARS:" + v.first, value);
                     assay->store_variable("MATCHED_VARS_NAMES:" + v.first,
                         v.first);
                     this->chainedRule->evaluate(assay);
                     assay->update_variable_first("MATCHED_VAR", "");
                     assay->delete_variable("MATCHED_VARS:" + v.first);
+                    assay->delete_variable("MATCHED_VARS_NAMES:" + v.first);
                     assay->delete_variable("MATCHED_VARS_NAMES:" + v.first);
                 }
             } else {
