@@ -34,9 +34,33 @@ int Driver::addSecRule(ModSecurity::Rule *rule) {
         /** TODO: return an error message */
         return -1;
     }
+
+    int size = this->rules[rule->phase].size();
+
+    if (size == 0) {
+        this->rules[rule->phase].push_back(rule);
+        return true;
+    }
+
+    ModSecurity::Rule *lastRule = this->rules[rule->phase][size-1];
+    if (lastRule->chained && lastRule->chainedRule == NULL) {
+        lastRule->chainedRule = rule;
+        return true;
+    }
+    if (lastRule->chained && lastRule->chainedRule != NULL) {
+        ModSecurity::Rule *a = lastRule->chainedRule;
+        while (a->chained && a->chainedRule != NULL) {
+            a = a->chainedRule;
+        }
+        if (a->chained && a->chainedRule == NULL) {
+            a->chainedRule = rule;
+            return true;
+        }
+    }
+
     this->rules[rule->phase].push_back(rule);
 
-    return 1;
+    return true;
 }
 
 

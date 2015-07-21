@@ -44,6 +44,9 @@ class Rule {
     std::vector<Variable *> *variables;
     int phase;
     double rule_id;
+
+    Rule *chainedRule;
+    bool chained;
 };
 
 }  // namespace ModSecurity

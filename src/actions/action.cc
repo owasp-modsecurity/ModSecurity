@@ -20,11 +20,13 @@
 
 #include "modsecurity/assay.h"
 #include "actions/block.h"
+#include "actions/chain.h"
 #include "actions/redirect.h"
 #include "actions/status.h"
 #include "actions/rule_id.h"
 #include "actions/phase.h"
 #include "actions/severity.h"
+
 
 
 #define IF_MATCH(a) \
@@ -79,7 +81,9 @@ Action *Action::instantiate(std::string name) {
     if (name.compare(0, severity.length(), severity) == 0) {
         return new Severity(name);
     }
-
+    if (name == "chain") {
+        return new Chain(name);
+    }
     return new Action(name);
 }
 

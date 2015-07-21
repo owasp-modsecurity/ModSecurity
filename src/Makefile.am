@@ -33,6 +33,7 @@ ACTIONS = \
 	actions/action.cc \
 	actions/audit_log.cc \
 	actions/block.cc \
+	actions/chain.cc \
 	actions/no_audit_log.cc \
 	actions/phase.cc \
 	actions/redirect.cc \

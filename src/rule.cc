@@ -36,7 +36,9 @@ using actions::Action;
 Rule::Rule(Operator *_op,
         std::vector<Variable *> *_variables,
         std::vector<Action *> *_actions)
-    : variables(_variables),
+    : chained(false),
+    chainedRule(NULL),
+    variables(_variables),
     op(_op),
     rule_id(0),
     phase(-1) {
@@ -110,6 +112,10 @@ bool Rule::evaluate(Assay *assay) {
                     this->actions_runtime_pos) {
                     assay->debug(4, "Running action: " + a->action);
                     a->evaluate(assay);
+                }
+
+                if (this->chained && this->chainedRule != NULL) {
+                    this->chainedRule->evaluate(assay);
                 }
             } else {
                 assay->debug(4, "Rule returned 0.");
