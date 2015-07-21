@@ -36,17 +36,22 @@ class Multipart {
     void checkForCrlfLf(const std::string &blob);
 
     ModSecurityStringVariables variables;
+
     bool crlf;
+    bool containsDataAfter;
+    bool containsDataBefore;
     bool lf;
+    bool boundaryStartsWithWhiteSpace;
+    bool boundaryIsQuoted;
+    bool missingSemicolon;
+    bool invalidQuote;
+
  private:
     void debug(int a, std::string str) {
         std::cout << "Debug: " << str << std::endl;
     }
     std::string m_boundary;
     std::string m_header;
-
-    bool m_boundaryStartsWithWhiteSpace = false;
-    bool m_boundaryIsQuoted = false;
 };
 
 }  // namespace RequestBodyProcessor

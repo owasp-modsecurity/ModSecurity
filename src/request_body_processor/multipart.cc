@@ -26,9 +26,12 @@ namespace RequestBodyProcessor {
 
 Multipart::Multipart(std:: string header)
     : crlf(false),
-    lf(true),
-    m_boundaryStartsWithWhiteSpace(false),
-    m_boundaryIsQuoted(false),
+    containsDataAfter(false),
+    containsDataBefore(false),
+    lf(false),
+    missingSemicolon(false),
+    boundaryStartsWithWhiteSpace(false),
+    boundaryIsQuoted(false),
     m_header(header) {
 }
 
@@ -57,8 +60,9 @@ bool Multipart::init() {
         return false;
     }
 
-    if (semicolon_pos < 0) {
+    if (semicolon_pos == std::string::npos) {
         debug(4, "Multipart: Missing semicolon.");
+        this->missingSemicolon = true;
     }
 
     if (boundary.at(8) != '=') {
@@ -66,46 +70,19 @@ bool Multipart::init() {
             "Missing equals.");
         return false;
     }
-#if 0
-       Not checked.
-       /* Check parameter name ends well. */
-        if (b != (msr->mpd->boundary + 8)) {
-            /* Check all characters between the end of the boundary
-             * and the = character.
-             */
-            for (p = msr->mpd->boundary + 8; p < b; p++) {
-                if (isspace(*p)) {
-                    /* Flag for whitespace after parameter name. */
-                    msr->mpd->flag_boundary_whitespace = 1;
-                } else {
-                    msr->mpd->flag_error = 1;
-                    *error_msg = apr_psprintf(msr->mp, "Multipart: " \
-                        "Invalid boundary in C-T (parameter name).");
-                    return -1;
-                }
-            }
-        }
 
-        b++; /* Go over the = character. */
-        len = strlen(b);
-
-        /* Flag for whitespace before parameter value. */
-        if (isspace(*b)) {
-            msr->mpd->flag_boundary_whitespace = 1;
-        }
-#endif  // if 0
     if (boundary.at(8 + 1) == ' ') {
-        m_boundaryStartsWithWhiteSpace = true;
+        boundaryStartsWithWhiteSpace = true;
         debug(4, "Multipart: Boundary starts with a white space");
     }
 
-    if ((m_boundaryStartsWithWhiteSpace && boundary.at(8 + 2) == '"') ||
-        (!m_boundaryStartsWithWhiteSpace && boundary.at(8 + 1) == '"')) {
-        m_boundaryIsQuoted = true;
+    if ((boundaryStartsWithWhiteSpace && boundary.at(8 + 2) == '"') ||
+        (!boundaryStartsWithWhiteSpace && boundary.at(8 + 1) == '"')) {
+        boundaryIsQuoted = true;
             debug(4, "Multipart: Boundary inside quotes");
     }
 
-    if (m_boundaryIsQuoted && boundary.at(boundary.length()-1) != '"') {
+    if (boundaryIsQuoted && boundary.at(boundary.length()-1) != '"') {
         debug(4, "Multipart: Invalid boundary in Content-type (quote).");
         return false;
     }
@@ -123,17 +100,17 @@ bool Multipart::init() {
 
     int real_boundary_pos = 9;
 
-    if (m_boundaryStartsWithWhiteSpace) {
+    if (boundaryStartsWithWhiteSpace) {
         real_boundary_pos++;
     }
 
-    if (m_boundaryIsQuoted) {
+    if (boundaryIsQuoted) {
         real_boundary_pos++;
     }
 
     m_boundary = boundary.c_str() + real_boundary_pos;
 
-    if (m_boundaryIsQuoted) {
+    if (boundaryIsQuoted) {
         m_boundary.pop_back();
     }
 
@@ -205,9 +182,13 @@ bool Multipart::process(std::string data) {
     std::list<std::string> blobs;
     size_t start = data.find(m_boundary);
     size_t endl = 1;
+    size_t lastValidBoundary = 0;
+    size_t firstValidBoundary = start;
+    double files_size = 0;
 
     if (start != 0) {
       debug(4, "Multipart: Boundary was not the first thing.");
+      this->containsDataBefore = true;
     }
 
     while (start != std::string::npos) {
@@ -222,10 +203,22 @@ bool Multipart::process(std::string data) {
         checkForCrlfLf(block);
 
         blobs.push_back(block);
+        lastValidBoundary = end;
         start = end;
     }
 
-    double files_size = 0;
+    size_t lastPiece = m_boundary.length() + lastValidBoundary \
+        + firstValidBoundary + 2;
+    if (this->crlf) {
+        lastPiece = lastPiece + 2;
+    } else {
+        lastPiece = lastPiece + 1;
+    }
+
+    if (data.length() > lastPiece) {
+        this->containsDataAfter = true;
+    }
+
     std::string filename("");
     std::string name("");
     for (std::string x : blobs) {
@@ -242,6 +235,10 @@ bool Multipart::process(std::string data) {
                 std::to_string(m.content.size()));
             variables.emplace("FILES_TMP_CONTENT:" + m.name, m.content);
             files_size = files_size + m.content.size();
+        }
+        if (m.invalidQuote) {
+            debug(4, "Multipart: Found invalid quoting.");
+            this->invalidQuote = true;
         }
     }
     if (filename.empty() == false) {

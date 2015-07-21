@@ -426,16 +426,52 @@ int Assay::processRequestBody() {
         std::string *a = resolve_variable_first("REQUEST_HEADERS:Content-Type");
         if (a != NULL) {
             Multipart m(*a);
-            m.init();
-            m.process(m_requestBody.str());
-            for (auto &a : m.variables) {
-                store_variable(a.first, a.second);
-            }
 
-            if (m.crlf && m.lf) {
-                store_variable("MULTIPART_CRLF_LF_LINES", "1");
-            } else {
-                store_variable("MULTIPART_CRLF_LF_LINES", "0");
+            if (m.init() == true) {
+                m.process(m_requestBody.str());
+                for (auto &a : m.variables) {
+                    store_variable(a.first, a.second);
+                }
+                if (m.crlf && m.lf) {
+                    store_variable("MULTIPART_CRLF_LF_LINES", "1");
+                } else {
+                    store_variable("MULTIPART_CRLF_LF_LINES", "0");
+                }
+                if (m.boundaryStartsWithWhiteSpace) {
+                    debug(9, "Multipart: Boundary starts with white space, " \
+                       "setting MULTIPART_STRICT_ERROR to 1");
+                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                }
+                if (m.boundaryIsQuoted) {
+                    debug(9, "Multipart: Boundary is quoted, " \
+                        "setting MULTIPART_STRICT_ERROR to 1");
+                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                }
+                if (m.containsDataAfter) {
+                    debug(9, "Multipart: There is data after the boundary, " \
+                        "setting MULTIPART_STRICT_ERROR to 1");
+                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                }
+                if (m.containsDataBefore) {
+                    debug(9, "Multipart: There is data before the boundary, " \
+                        "setting MULTIPART_STRICT_ERROR to 1");
+                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                }
+                if (m.lf) {
+                    debug(9, "Multipart: Lines are LF-terminated, " \
+                        "setting MULTIPART_STRICT_ERROR to 1");
+                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                }
+                if (m.missingSemicolon) {
+                    debug(9, "Multipart: Boundary missing semicolon, " \
+                        "setting MULTIPART_STRICT_ERROR to 1");
+                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                }
+                 if (m.invalidQuote) {
+                    debug(9, "Multipart: Invalid quote, " \
+                        "setting MULTIPART_STRICT_ERROR to 1");
+                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                }
             }
         }
     }

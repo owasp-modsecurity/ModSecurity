@@ -25,6 +25,7 @@ namespace RequestBodyProcessor {
 
 MultipartBlob::MultipartBlob(const std::string &blob, Multipart *parent)
     : m_blob(blob),
+    invalidQuote(false),
     m_parent(parent) {
     processContent();
 }
@@ -98,6 +99,10 @@ bool MultipartBlob::processContentDispositionLine(
     // Find name=
     offset = dispositionLine.find("name=");
     if (offset != std::string::npos) {
+        size_t invalidQuote = dispositionLine.find("\'", offset);
+        if (invalidQuote != std::string::npos) {
+            this->invalidQuote = true;
+        }
         offset = offset + 5 /* name= */ + 1 /* " */;
         size_t end = dispositionLine.find("\"", offset);
         if (end != std::string::npos) {
@@ -108,6 +113,10 @@ bool MultipartBlob::processContentDispositionLine(
     // Find filename=
     offset = dispositionLine.find("filename=");
     if (offset != std::string::npos) {
+        size_t invalidQuote = dispositionLine.find("\'", offset);
+        if (invalidQuote != std::string::npos) {
+            this->invalidQuote = true;
+        }
         offset = offset + 9 /* filename= */ + 1 /* " */;
         size_t end = dispositionLine.find("\"", offset);
         if (end != std::string::npos) {

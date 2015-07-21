@@ -36,6 +36,7 @@ class MultipartBlob {
         std::cout << "Debug: " << str << std::endl;
     }
 
+    bool invalidQuote;
     std::string name;
     std::string filename;
     std::string contentType;
