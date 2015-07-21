@@ -92,6 +92,7 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     do_not_save_in_auditlog(false),
     timeStamp(std::time(NULL)),
     httpCodeReturned(200),
+    highest_severity(255),
     m_ARGScombinedSize(0),
     m_ARGScombinedSizeStr(NULL),
     m_namesArgs(NULL),

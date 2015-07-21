@@ -24,6 +24,7 @@
 #include "actions/status.h"
 #include "actions/rule_id.h"
 #include "actions/phase.h"
+#include "actions/severity.h"
 
 
 #define IF_MATCH(a) \
@@ -58,6 +59,7 @@ Action *Action::instantiate(std::string name) {
     std::string block("block");
     std::string phase("phase:");
     std::string rule_id("id:");
+    std::string severity("severity:");
 
     if (name.compare(0, status.length(), status) == 0) {
         return new Status(name);
@@ -73,6 +75,9 @@ Action *Action::instantiate(std::string name) {
     }
     if (name.compare(0, rule_id.length(), rule_id) == 0) {
         return new RuleId(name);
+    }
+    if (name.compare(0, severity.length(), severity) == 0) {
+        return new Severity(name);
     }
 
     return new Action(name);

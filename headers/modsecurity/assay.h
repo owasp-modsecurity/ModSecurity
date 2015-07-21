@@ -188,6 +188,7 @@ class Assay {
     std::string id;
     time_t timeStamp;
     std::chrono::system_clock::time_point start;
+    int highest_severity;
 
  private:
     std::ofstream myfile;

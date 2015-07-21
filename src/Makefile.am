@@ -37,6 +37,7 @@ ACTIONS = \
 	actions/phase.cc \
 	actions/redirect.cc \
 	actions/rule_id.cc \
+	actions/severity.cc \
 	actions/status.cc \
 	actions/transformations/base64_decode.cc \
 	actions/transformations/base64_decode_ext.cc \
@@ -100,6 +101,7 @@ libmodsecurity_la_SOURCES = \
 	variable_duration.cc \
 	variable_env.cc \
 	variable_modsec_build.cc \
+	variable_highest_severity.cc \
 	operators/operator.cc \
 	operators/detect_sqli.cc \
 	operators/detect_xss.cc \

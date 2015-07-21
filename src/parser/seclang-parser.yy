@@ -18,6 +18,7 @@ class Driver;
 #include "variable_duration.h"
 #include "variable_env.h"
 #include "variable_modsec_build.h"
+#include "variable_highest_severity.h"
 #include "utils/geo_lookup.h"
 
 using ModSecurity::actions::Action;
@@ -27,6 +28,7 @@ using ModSecurity::Variable;
 using ModSecurity::VariableDuration;
 using ModSecurity::VariableEnv;
 using ModSecurity::VariableModsecBuild;
+using ModSecurity::VariableHighestSeverity;
 using ModSecurity::Rule;
 using ModSecurity::Utils::GeoLookup;
 
@@ -91,11 +93,13 @@ using ModSecurity::Utils::GeoLookup;
 %token <std::string> RUN_TIME_VAR_DUR
 %token <std::string> RUN_TIME_VAR_ENV
 %token <std::string> RUN_TIME_VAR_BLD
+%token <std::string> RUN_TIME_VAR_HSV
 
 %token <std::string> CONFIG_DIR_GEO_DB
 
 %token <std::string> OPERATOR
 %token <std::string> ACTION
+%token <std::string> ACTION_SEVERITY
 %token <std::string> TRANSFORMATION
 
 %token <double> CONFIG_VALUE_NUMBER
@@ -296,7 +300,20 @@ variables:
         variables->push_back(new VariableModsecBuild($1));
         $$ = variables;
       }
+    | variables PIPE RUN_TIME_VAR_HSV
+      {
+        std::vector<Variable *> *v = $1;
+        v->push_back(new VariableHighestSeverity($3));
+        $$ = $1;
+      }
+    | RUN_TIME_VAR_HSV
+      {
+        std::vector<Variable *> *variables = new std::vector<Variable *>;
+        variables->push_back(new VariableHighestSeverity($1));
+        $$ = variables;
+      }
 
+      
 actions:
     actions COMMA SPACE ACTION
       {
@@ -348,6 +365,31 @@ actions:
       {
         std::vector<Action *> *actions = new std::vector<Action *>;
         actions->push_back(Transformation::instantiate($1));
+        $$ = actions;
+      }
+    | actions COMMA SPACE ACTION_SEVERITY
+      {
+        std::vector<Action *> *a = $1;
+        a->push_back(Action::instantiate($4));
+        $$ = $1;
+      }
+    | actions COMMA ACTION_SEVERITY
+      {
+        std::vector<Action *> *a = $1;
+        a->push_back(Action::instantiate($3));
+        $$ = $1;
+      }
+    | SPACE ACTION_SEVERITY
+      {
+        std::vector<Action *> *actions = new std::vector<Action *>;
+        actions->push_back(Action::instantiate($2));
+        $$ = actions;
+
+      }
+    | ACTION_SEVERITY
+      {
+        std::vector<Action *> *actions = new std::vector<Action *>;
+        actions->push_back(Action::instantiate($1));
         $$ = actions;
       }
 
