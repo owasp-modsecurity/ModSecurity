@@ -113,15 +113,19 @@ bool Rule::evaluate(Assay *assay) {
                     assay->debug(4, "Running action: " + a->action);
                     a->evaluate(assay);
                 }
-
+                if (this->chained && this->chainedRule == NULL) {
+                    assay->debug(4, "Rule is marked as chained but there isn't a subsequent rule.");
+                }
                 if (this->chained && this->chainedRule != NULL) {
                     assay->debug(4, "Executing chained rule.");
                     if (assay->update_variable_first("MATCHED_VAR",
                         value) == false) {
                         assay->store_variable("MATCHED_VAR", value);
                     }
+                    assay->store_variable("MATCHED_VARS:" + v.first, value);
                     this->chainedRule->evaluate(assay);
                     assay->update_variable_first("MATCHED_VAR", "");
+                    assay->delete_variable("MATCHED_VARS:" + v.first);
                 }
             } else {
                 assay->debug(4, "Rule returned 0.");

@@ -1139,6 +1139,10 @@ bool Assay::update_variable_first(std::string var, const std::string &value) {
     return false;
 }
 
+void Assay::delete_variable(std::string key) {
+    this->m_variables_strings.erase(key);
+}
+
 
 std::list<std::pair<std::string, std::string>>
     Assay::resolve_variable(std::string var) {
