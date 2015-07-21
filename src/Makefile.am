@@ -76,7 +76,8 @@ ACTIONS = \
 
 UTILS = \
 	utils/sha1.cc \
-	utils/md5.cc
+	utils/md5.cc \
+	utils/geo_lookup.cc
 
 libmodsecurity_la_SOURCES = \
 	parser/seclang-parser.yy \
@@ -113,7 +114,7 @@ libmodsecurity_la_SOURCES = \
 	operators/verify_cc.cc \
 	operators/verify_cpf.cc \
 	operators/verify_ssn.cc \
-	operators/geolookup.cc \
+	operators/geo_lookup.cc \
 	operators/gsblookup.cc \
 	operators/rsub.cc \
 	operators/within.cc \
@@ -152,10 +153,10 @@ libmodsecurity_la_CPPFLAGS = \
 	-O0 \
 	-I ../headers
 
-
 libmodsecurity_la_LIBADD = \
 	@LEXLIB@ \
-	 $(YAJL_LDADD)
+	$(GEOIP_LDADD) \
+    $(YAJL_LDADD)
 
 libmodsecurity_la_LDFLAGS = \
 	-version-info @MSC_VERSION_INFO@

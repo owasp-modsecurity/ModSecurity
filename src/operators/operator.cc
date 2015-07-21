@@ -34,7 +34,7 @@
 #include "operators/verify_cc.h"
 #include "operators/verify_cpf.h"
 #include "operators/verify_ssn.h"
-#include "operators/geolookup.h"
+#include "operators/geo_lookup.h"
 #include "operators/gsblookup.h"
 #include "operators/rsub.h"
 #include "operators/within.h"
@@ -65,6 +65,12 @@ namespace ModSecurity {
 namespace operators {
 
 Operator::Operator() {
+}
+
+
+bool Operator::debug(Assay *assay, int x, std::string a) {
+    assay->debug(x, a);
+    return true;
 }
 
 

@@ -1,0 +1,476 @@
+[  
+  {  
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: GEO:LONGITUDE",
+    "client":{  
+      "ip":"64.17.254.216",
+      "port":123
+    },
+    "server":{  
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{  
+      "headers":{  
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "protocol":"GET"
+    },
+    "response":{  
+      "headers":{  
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[  
+        "no need."
+      ]
+    },
+    "expected":{  
+      "debug_log":"Target value: \"-118.403999\" \\(Variable: GEO:LONGITUDE\\)"
+    },
+    "rules":[  
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+    ]
+  },
+  {  
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: GEO:COUNTRY_NAME",
+    "client":{  
+      "ip":"64.17.254.216",
+      "port":123
+    },
+    "server":{  
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{  
+      "headers":{  
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "protocol":"GET"
+    },
+    "response":{  
+      "headers":{  
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[  
+        "no need."
+      ]
+    },
+    "expected":{  
+      "debug_log":"Target value: \"United States\" \\(Variable: GEO:COUNTRY_NAME\\)"
+    },
+    "rules":[  
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+    ]
+  },
+  {  
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: GEO:LATITUDE",
+    "client":{  
+      "ip":"64.17.254.216",
+      "port":123
+    },
+    "server":{  
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{  
+      "headers":{  
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "protocol":"GET"
+    },
+    "response":{  
+      "headers":{  
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[  
+        "no need."
+      ]
+    },
+    "expected":{  
+      "debug_log":"Target value: \"33.916401\" \\(Variable: GEO:LATITUDE\\)"
+    },
+    "rules":[  
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+    ]
+  },
+  {  
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: GEO:COUNTRY_CODE3",
+    "client":{  
+      "ip":"64.17.254.216",
+      "port":123
+    },
+    "server":{  
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{  
+      "headers":{  
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "protocol":"GET"
+    },
+    "response":{  
+      "headers":{  
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[  
+        "no need."
+      ]
+    },
+    "expected":{  
+      "debug_log":"Target value: \"USA\" \\(Variable: GEO:COUNTRY_CODE3\\)"
+    },
+    "rules":[  
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+    ]
+  },
+  {  
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: GEO:COUNTRY_CODE",
+    "client":{  
+      "ip":"64.17.254.216",
+      "port":123
+    },
+    "server":{  
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{  
+      "headers":{  
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "protocol":"GET"
+    },
+    "response":{  
+      "headers":{  
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[  
+        "no need."
+      ]
+    },
+    "expected":{  
+      "debug_log":"Target value: \"US\" \\(Variable: GEO:COUNTRY_CODE\\)"
+    },
+    "rules":[  
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+    ]
+  },
+  {  
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: GEO:COUNTRY_CONTINENT",
+    "client":{  
+      "ip":"64.17.254.216",
+      "port":123
+    },
+    "server":{ 
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{  
+      "headers":{  
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "protocol":"GET"
+    },
+    "response":{  
+      "headers":{  
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[  
+        "no need."
+      ]
+    },
+    "expected":{  
+      "debug_log":"Target value: \"NA\" \\(Variable: GEO:COUNTRY_CONTINENT\\)"
+    },
+    "rules":[  
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+    ]
+  },
+  {  
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: GEO:AREA_CODE",
+    "client":{  
+      "ip":"64.17.254.216",
+      "port":123
+    },
+    "server":{ 
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{  
+      "headers":{  
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "protocol":"GET"
+    },
+    "response":{  
+      "headers":{  
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[  
+        "no need."
+      ]
+    },
+    "expected":{  
+      "debug_log":"Target value: \"310\" \\(Variable: GEO:AREA_CODE\\)"
+    },
+    "rules":[  
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+    ]
+  },
+  {  
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: GEO:DMA_CODE",
+    "client":{  
+      "ip":"64.17.254.216",
+      "port":123
+    },
+    "server":{ 
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{  
+      "headers":{  
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "protocol":"GET"
+    },
+    "response":{  
+      "headers":{  
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[  
+        "no need."
+      ]
+    },
+    "expected":{  
+      "debug_log":"Target value: \"803\" \\(Variable: GEO:DMA_CODE\\)"
+    },
+    "rules":[  
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+    ]
+  },
+  {  
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: GEO:POSTAL_CODE",
+    "client":{  
+      "ip":"64.17.254.216",
+      "port":123
+    },
+    "server":{ 
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{  
+      "headers":{  
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "protocol":"GET"
+    },
+    "response":{  
+      "headers":{  
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[  
+        "no need."
+      ]
+    },
+    "expected":{  
+      "debug_log":"Target value: \"90245\" \\(Variable: GEO:POSTAL_CODE\\)"
+    },
+    "rules":[  
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+    ]
+  },
+  {  
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: GEO:REGION",
+    "client":{  
+      "ip":"64.17.254.216",
+      "port":123
+    },
+    "server":{ 
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{  
+      "headers":{  
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "protocol":"GET"
+    },
+    "response":{  
+      "headers":{  
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[  
+        "no need."
+      ]
+    },
+    "expected":{  
+      "debug_log":"Target value: \"California\" \\(Variable: GEO:REGION\\)"
+    },
+    "rules":[  
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+    ]
+  },
+  {  
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: GEO:CITY",
+    "client":{  
+      "ip":"64.17.254.216",
+      "port":123
+    },
+    "server":{ 
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{  
+      "headers":{  
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "protocol":"GET"
+    },
+    "response":{  
+      "headers":{  
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[  
+        "no need."
+      ]
+    },
+    "expected":{  
+      "debug_log":"Target value: \"El Segundo\" \\(Variable: GEO:CITY\\)"
+    },
+    "rules":[  
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+    ]
+  }
+]
+

@@ -24,6 +24,7 @@ unit_tests_SOURCES = \
 
 unit_tests_LDADD = \
         $(top_builddir)/src/.libs/libmodsecurity.a \
+        $(GEOIP_LDADD) \
         $(YAJL_LDADD)
 
 unit_tests_CPPFLAGS = \
@@ -32,7 +33,9 @@ unit_tests_CPPFLAGS = \
 		-O0 \
 		-g \
         -I$(top_builddir)/headers \
+        $(GEOIP_CFLAGS) \
         $(YAJL_CFLAGS)
+
 
 # regression
 
@@ -43,6 +46,7 @@ regression_tests_SOURCES = \
 
 regression_tests_LDADD = \
         $(top_builddir)/src/.libs/libmodsecurity.a \
+        $(GEOIP_LDADD) \
         $(YAJL_LDADD)
 
 regression_tests_CPPFLAGS = \
@@ -51,5 +55,5 @@ regression_tests_CPPFLAGS = \
 		-O0 \
 		-g \
         -I$(top_builddir)/headers \
+        $(GEOIP_CFLAGS) \
         $(YAJL_CFLAGS)
-

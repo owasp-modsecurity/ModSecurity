@@ -18,6 +18,7 @@ class Driver;
 #include "variable_duration.h"
 #include "variable_env.h"
 #include "variable_modsec_build.h"
+#include "utils/geo_lookup.h"
 
 using ModSecurity::actions::Action;
 using ModSecurity::actions::transformations::Transformation;
@@ -27,6 +28,7 @@ using ModSecurity::VariableDuration;
 using ModSecurity::VariableEnv;
 using ModSecurity::VariableModsecBuild;
 using ModSecurity::Rule;
+using ModSecurity::Utils::GeoLookup;
 
 }
 // The parsing context.
@@ -89,6 +91,8 @@ using ModSecurity::Rule;
 %token <std::string> RUN_TIME_VAR_DUR
 %token <std::string> RUN_TIME_VAR_ENV
 %token <std::string> RUN_TIME_VAR_BLD
+
+%token <std::string> CONFIG_DIR_GEO_DB
 
 %token <std::string> OPERATOR
 %token <std::string> ACTION
@@ -238,6 +242,10 @@ expression:
         driver.debug_log_path = $1;
       }
     /* Debug log: end */
+    | CONFIG_DIR_GEO_DB
+      {
+        GeoLookup::getInstance().setDataBase($1);
+      }
 
 variables:
     variables PIPE VARIABLE

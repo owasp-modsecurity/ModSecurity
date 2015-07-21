@@ -1,4 +1,4 @@
-/**
+/*
  * ModSecurity, http://www.modsecurity.org/
  * Copyright (c) 2015 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
@@ -13,29 +13,27 @@
  *
  */
 
-#include "operators/geolookup.h"
+#ifndef SRC_OPERATORS_GEO_LOOKUP_H_
+#define SRC_OPERATORS_GEO_LOOKUP_H_
 
 #include <string>
 
 #include "operators/operator.h"
 
+#ifdef __cplusplus
 namespace ModSecurity {
 namespace operators {
 
-bool GeoLookup::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator GeoLookup.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#geolookup
-     */
-    return true;
-}
-
-GeoLookup::GeoLookup(std::string op, std::string param,
-bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
+class GeoLookup : public Operator {
+ public:
+    /** @ingroup ModSecurity_Operator */
+    GeoLookup(std::string o, std::string p, bool i);
+    bool evaluate(Assay *assay, const std::string &exp) override;
+};
 
 }  // namespace operators
 }  // namespace ModSecurity
+#endif
+
+
+#endif  // SRC_OPERATORS_GEO_LOOKUP_H_

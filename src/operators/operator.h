@@ -39,6 +39,7 @@ class Operator {
     virtual bool evaluate(Assay *assay, const std::string &str);
     static Operator *instantiate(std::string op);
  protected:
+    bool debug(Assay *assay, int x, std::string a);
 };
 
 }  // namespace operators

@@ -39,6 +39,11 @@ PROG_YAJL
 
 AM_CONDITIONAL([YAJL_VERSION], [test "$YAJL_VERSION" != ""])
 
+# Check for libgeoip
+PROG_GEOIP
+
+AM_CONDITIONAL([GEOIP_VERSION], [test "$GEOIP_VERSION" != ""])
+
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([string])

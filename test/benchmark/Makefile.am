@@ -7,6 +7,7 @@ benchmark_SOURCES = \
 
 benchmark_LDADD = \
         $(top_builddir)/src/.libs/libmodsecurity.a \
+        $(GEOIP_LDADD) \
         $(YAJL_LDADD)
 
 benchmark_CPPFLAGS = \
