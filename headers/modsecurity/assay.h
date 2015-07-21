@@ -169,6 +169,7 @@ class Assay {
     std::string* resolve_variable_first(std::string);
 
     void store_variable(std::string, const std::string &value);
+    bool update_variable_first(std::string var, const std::string &value);
 
     ModSecurityStringVariables m_variables_strings;
 

@@ -1128,6 +1128,17 @@ void Assay::store_variable(std::string key, const std::string &value) {
     this->m_variables_strings.emplace(key, value);
 }
 
+bool Assay::update_variable_first(std::string var, const std::string &value) {
+    auto range = m_variables_strings.equal_range(var);
+
+    for (auto it = range.first; it != range.second; ++it) {
+        it->second = value;
+        return true;
+    }
+
+    return false;
+}
+
 
 std::list<std::pair<std::string, std::string>>
     Assay::resolve_variable(std::string var) {

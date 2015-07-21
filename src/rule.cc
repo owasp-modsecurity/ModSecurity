@@ -115,7 +115,13 @@ bool Rule::evaluate(Assay *assay) {
                 }
 
                 if (this->chained && this->chainedRule != NULL) {
+                    assay->debug(4, "Executing chained rule.");
+                    if (assay->update_variable_first("MATCHED_VAR",
+                        value) == false) {
+                        assay->store_variable("MATCHED_VAR", value);
+                    }
                     this->chainedRule->evaluate(assay);
+                    assay->update_variable_first("MATCHED_VAR", "");
                 }
             } else {
                 assay->debug(4, "Rule returned 0.");
