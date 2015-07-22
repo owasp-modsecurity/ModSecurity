@@ -82,7 +82,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         std::cout << std::setw(3) << std::right <<
             std::to_string(*count) << " ";
         std::cout << std::setw(50) << std::left << filename;
-        std::cout << std::setw(60) << std::left << t->name;
+        std::cout << std::setw(70) << std::left << t->name;
 
         modsec = new ModSecurity::ModSecurity();
         modsec->setConnectorInformation("ModSecurity-regression v0.0.1-alpha" \
@@ -91,6 +91,10 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
 
         if (modsec_rules->load(t->rules.c_str()) == false) {
             std::cerr << "parse failed." << std::endl;
+            std::cout << std::endl;
+            std::cout << "-------------" << std::endl;
+            std::cout << modsec_rules->getParserError() << std::endl;
+            std::cout << "-------------" << std::endl;
             return;
         }
         modsec_assay = new ModSecurity::Assay(modsec, modsec_rules);
@@ -200,12 +204,12 @@ int main(int argc, char **argv) {
 
     std::cout << std::setw(4) << std::right << "# ";
     std::cout << std::setw(50) << std::left << "File Name";
-    std::cout << std::setw(60) << std::left << "Test Name";
+    std::cout << std::setw(70) << std::left << "Test Name";
     std::cout << std::setw(10) << std::left << "Passed?";
     std::cout << std::endl;
     std::cout << std::setw(4) << std::right << "--- ";
     std::cout << std::setw(50) << std::left << "---------";
-    std::cout << std::setw(60) << std::left << "---------";
+    std::cout << std::setw(70) << std::left << "---------";
     std::cout << std::setw(10) << std::left << "-------";
     std::cout << std::endl;
     int counter = 0;
