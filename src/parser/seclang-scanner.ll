@@ -66,6 +66,16 @@ RUN_TIME_VAR_ENV  (?i:ENV)
 RUN_TIME_VAR_BLD  (?i:MODSEC_BUILD)
 RUN_TIME_VAR_HSV  (?i:HIGHEST_SEVERITY)
 
+RUN_TIME_VAR_TIME       (?i:TIME)
+RUN_TIME_VAR_TIME_DAY   (?i:TIME_DAY)
+RUN_TIME_VAR_TIME_EPOCH (?i:TIME_EPOCH)
+RUN_TIME_VAR_TIME_HOUR  (?i:TIME_HOUR)
+RUN_TIME_VAR_TIME_MIN   (?i:TIME_MIN)
+RUN_TIME_VAR_TIME_MON   (?i:TIME_MON)
+RUN_TIME_VAR_TIME_SEC   (?i:TIME_SEC)
+RUN_TIME_VAR_TIME_WDAY  (?i:TIME_WDAY)
+RUN_TIME_VAR_TIME_YEAR  (?i:TIME_YEAR)
+
 VARIABLENOCOLON  (?i:REQBODY_ERROR|MULTIPART_STRICT_ERROR|MULTIPART_UNMATCHED_BOUNDARY|REMOTE_ADDR|REQUEST_LINE)
 
 CONFIG_VALUE_ON On
@@ -121,6 +131,17 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 {RUN_TIME_VAR_ENV}:?{DICT_ELEMENT}?     { return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, loc); }
 {RUN_TIME_VAR_BLD}                      { return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, loc); }
 {RUN_TIME_VAR_HSV}                      { return yy::seclang_parser::make_RUN_TIME_VAR_HSV(yytext, loc); }
+
+%{ /* Variables: TIME */ %}
+{RUN_TIME_VAR_TIME}        { return yy::seclang_parser::make_RUN_TIME_VAR_TIME(yytext, loc); }
+{RUN_TIME_VAR_TIME_DAY}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_DAY(yytext, loc); }
+{RUN_TIME_VAR_TIME_EPOCH}  { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_EPOCH(yytext, loc); }
+{RUN_TIME_VAR_TIME_HOUR}   { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_HOUR(yytext, loc); }
+{RUN_TIME_VAR_TIME_MIN}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MIN(yytext, loc); }
+{RUN_TIME_VAR_TIME_MON}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MON(yytext, loc); }
+{RUN_TIME_VAR_TIME_SEC}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_SEC(yytext, loc); }
+{RUN_TIME_VAR_TIME_WDAY}   { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_WDAY(yytext, loc); }
+{RUN_TIME_VAR_TIME_YEAR}   { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_YEAR(yytext, loc); }
 
 %{ /* Geo DB loopkup */ %}
 {CONFIG_DIR_GEO_DB}[ ]{FREE_TEXT_NEW_LINE}      { return yy::seclang_parser::make_CONFIG_DIR_GEO_DB(strchr(yytext, ' ') + 1, loc); }

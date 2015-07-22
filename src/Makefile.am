@@ -28,6 +28,16 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/debug_log.h \
 	../headers/modsecurity/intervention.h
 
+VARIABLES = \
+	variables/time.cc \
+	variables/time_day.cc \
+	variables/time_epoch.cc \
+	variables/time_hour.cc \
+	variables/time_min.cc \
+	variables/time_mon.cc \
+	variables/time_sec.cc \
+	variables/time_wday.cc \
+	variables/time_year.cc
 
 ACTIONS = \
 	actions/action.cc \
@@ -141,7 +151,8 @@ libmodsecurity_la_SOURCES = \
 	operators/str_match.cc \
 	operators/begins_with.cc \
 	${ACTIONS} \
-	${UTILS}
+	${UTILS} \
+	${VARIABLES}
 
 
 
