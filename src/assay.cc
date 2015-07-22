@@ -178,6 +178,7 @@ int Assay::processConnection(const char *client, int cPort, const char *server,
     debug(4, "Starting phase CONNECTION. (SecRules 0)");
 
     this->store_variable("REMOTE_HOST", m_clientIpAddress);
+    this->store_variable("UNIQUE_ID", id);
     this->store_variable("REMOTE_ADDR", m_clientIpAddress);
     this->store_variable("SERVER_ADDR", m_serverIpAddress);
     this->store_variable("SERVER_PORT", std::to_string(this->m_serverPort));
