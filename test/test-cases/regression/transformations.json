@@ -49,7 +49,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) trim: \"test2\"",
+      "debug_log": "\\[9\\]  T \\(0\\) trim: \"test\"",
       "error_log": ""
     },
     "rules": [
@@ -109,7 +109,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(1\\) lowercase: \"test2\"",
+      "debug_log": "lowercase: \"test",
       "error_log": ""
     },
     "rules": [
