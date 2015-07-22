@@ -209,8 +209,8 @@ class Assay {
     std::string *m_namesArgs;
     std::string *m_namesArgsPost;
     std::string *m_namesArgsGet;
-    std::string m_namesResponse;
-    std::string m_namesRequest;
+    std::string *m_requestHeadersNames;
+    std::string *m_responseHeadersNames;
     double m_ARGScombinedSize;
     /** TODO: Support to save double in the storage. */
     std::string *m_ARGScombinedSizeStr;

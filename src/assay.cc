@@ -99,6 +99,8 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     m_namesArgsPost(NULL),
     m_namesArgsGet(NULL),
     m_requestBodyType(UnknownFormat),
+    m_requestHeadersNames(NULL),
+    m_responseHeadersNames(NULL),
     start(std::chrono::system_clock::now()),
     m_ms(ms) {
     id = std::to_string(this->timeStamp) + \
@@ -113,6 +115,12 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     this->m_namesArgsPost = resolve_variable_first("ARGS_POST_NAMES");
     store_variable("ARGS_GET_NAMES", std::string(""));
     this->m_namesArgsGet = resolve_variable_first("ARGS_GET_NAMES");
+    store_variable("REQUEST_HEADERS_NAMES", std::string(""));
+    this->m_requestHeadersNames = resolve_variable_first(
+        "REQUEST_HEADERS_NAMES");
+    store_variable("RESPONSE_HEADERS_NAMES", std::string(""));
+    this->m_responseHeadersNames = resolve_variable_first(
+        "RESPONSE_HEADERS_NAMES");
 
     this->debug(4, "Initialising transaction");
 }
@@ -318,14 +326,7 @@ int Assay::processRequestHeaders() {
  */
 int Assay::addRequestHeader(const std::string& key,
     const std::string& value) {
-    std::string *names = resolve_variable_first("REQUEST_HEADERS_NAMES");
-
-    if (names == NULL) {
-        this->store_variable("REQUEST_HEADERS_NAMES", m_namesRequest);
-        m_namesRequest = key;
-    } else {
-        m_namesRequest = m_namesRequest + " " + key;
-    }
+    m_requestHeadersNames->assign(*m_requestHeadersNames + " " + key);
 
     this->store_variable("REQUEST_HEADERS:" + key, value);
 
@@ -652,13 +653,7 @@ int Assay::processResponseHeaders() {
 int Assay::addResponseHeader(const std::string& key,
     const std::string& value) {
     std::string *names = resolve_variable_first("RESPONSE_HEADERS_NAMES");
-
-    if (names == NULL) {
-        this->store_variable("RESPONSE_HEADERS_NAMES", m_namesResponse);
-        m_namesRequest = key;
-    } else {
-        m_namesRequest = m_namesRequest + " " + key;
-    }
+    m_responseHeadersNames->assign(*m_responseHeadersNames + " " + key);
 
     this->store_variable("RESPONSE_HEADERS:" + key, value);
 
