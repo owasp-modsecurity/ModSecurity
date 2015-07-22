@@ -169,6 +169,7 @@ int Assay::processConnection(const char *client, int cPort, const char *server,
     debug(4, "Transaction context created (blah blah)");
     debug(4, "Starting phase CONNECTION. (SecRules 0)");
 
+    this->store_variable("REMOTE_HOST", m_serverIpAddress);
     this->store_variable("REMOTE_ADDR", m_clientIpAddress);
     this->m_rules->evaluate(ModSecurity::ConnectionPhase, this);
     return true;
