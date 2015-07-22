@@ -18,6 +18,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <list>
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
@@ -58,7 +59,7 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
 
 
 void perform_unit_test(std::vector<RegressionTest *> *tests,
-    ModSecurityTestResults<RegressionTest> *res) {
+    ModSecurityTestResults<RegressionTest> *res, int *count) {
     ModSecurity::ModSecurity *modsec;
     ModSecurity::Rules *modsec_rules;
     ModSecurity::Assay *modsec_assay;
@@ -68,6 +69,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
     for (RegressionTest *t : *tests) {
         ModSecurityTestResults<RegressionTest> r;
         r.status = 200;
+        (*count)++;
 
         modsec = new ModSecurity::ModSecurity();
         modsec->setConnectorInformation("ModSecurity-regression v0.0.1-alpha" \
@@ -144,7 +146,18 @@ end:
         CustomDebugLog *d = reinterpret_cast<CustomDebugLog *>
             (modsec_rules->debug_log);
 
-        std::cout << "- " << t->name << " ...";
+        size_t offset = t->filename.find_last_of("/\\");
+        std::string filename("");
+        if (offset != std::string::npos) {
+            filename = std::string(t->filename, offset + 1,
+                t->filename.length() - offset - 1);
+        } else {
+            filename = t->filename;
+        }
+        std::cout << std::setw(3) << std::right <<
+            std::to_string(*count) << " ";
+        std::cout << std::setw(50) << std::left << filename;
+        std::cout << std::setw(60) << std::left << t->name;
 
         if (!d->contains(t->debug_log)) {
             std::cout << "Debug log was not matching the expected results.";
@@ -185,11 +198,28 @@ int main(int argc, char **argv) {
     std::ofstream test_log;
     test_log.open("regression_test_log.txt");
 
+    std::cout << std::setw(4) << std::right << "# ";
+    std::cout << std::setw(50) << std::left << "File Name";
+    std::cout << std::setw(60) << std::left << "Test Name";
+    std::cout << std::setw(10) << std::left << "Passed?";
+    std::cout << std::endl;
+    std::cout << std::setw(4) << std::right << "--- ";
+    std::cout << std::setw(50) << std::left << "---------";
+    std::cout << std::setw(60) << std::left << "---------";
+    std::cout << std::setw(10) << std::left << "-------";
+    std::cout << std::endl;
+    int counter = 0;
+
+    std::list<std::string> keyList;
     for (std::pair<std::string, std::vector<RegressionTest *> *> a : test) {
-        std::vector<RegressionTest *> *tests = a.second;
+        keyList.push_back(a.first);
+    }
+    keyList.sort();
+    for (std::string a : keyList) {
+        std::vector<RegressionTest *> *tests = test[a];
         ModSecurityTestResults<RegressionTest> res;
 
-        perform_unit_test(tests, &res);
+        perform_unit_test(tests, &res, &counter);
 
         test_log << res.log_raw_debug_log;
     }

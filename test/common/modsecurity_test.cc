@@ -73,15 +73,15 @@ bool ModSecurityTest<T>::load_test_json(std::string file) {
 
         T *u = T::from_yajl_node(obj);
         u->filename = file;
-        u->name = u->filename + ":" + u->name;
 
-        if (this->count(u->name) == 0) {
+        if (this->count(u->filename + ":" + u->name) == 0) {
             std::vector<T *> *vector = new std::vector<T *>;
             vector->push_back(u);
-            std::pair<std::string, std::vector<T *> *> a(u->name, vector);
+            std::pair<std::string, std::vector<T *> *> a(u->filename + ":" +
+                u->name, vector);
             this->insert(a);
         } else {
-            std::vector<T *> *vec = this->at(u->name);
+            std::vector<T *> *vec = this->at(u->filename + ":" + u->name);
             vec->push_back(u);
         }
     }
