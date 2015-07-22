@@ -239,6 +239,10 @@ int Assay::processURI(const char *uri, const char *protocol,
             path_info.length() - offset);
         store_variable("REQUEST_BASENAME", basename);
     }
+    store_variable("REQUEST_METHOD", protocol);
+    store_variable("REQUEST_PROTOCOL", "HTTP/" + std::string(http_version));
+    store_variable("REQUEST_URI", uri);
+    store_variable("REQUEST_URI_RAW", uri);
 
     if (pos != NULL && strlen(pos) > 2) {
         /**
