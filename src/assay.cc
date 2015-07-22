@@ -219,6 +219,9 @@ int Assay::processURI(const char *uri, const char *protocol,
 
     const char *pos = strchr(m_uri_decoded.c_str(), '?');
 
+    store_variable("REQUEST_LINE", std::string(protocol) + " " +
+        std::string(uri) + " HTTP/" + std::string(http_version));
+
     std::string path_info;
     if (pos == NULL) {
         path_info = std::string(m_uri_decoded, 0);
