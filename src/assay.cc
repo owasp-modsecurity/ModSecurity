@@ -211,12 +211,21 @@ int Assay::processURI(const char *uri, const char *protocol,
 
     const char *pos = strchr(m_uri_decoded.c_str(), '?');
 
+    std::string path_info;
     if (pos == NULL) {
-        store_variable("PATH_INFO", std::string(m_uri_decoded, 0));
+        path_info = std::string(m_uri_decoded, 0);
     } else {
-        store_variable("PATH_INFO", std::string(m_uri_decoded, 0,
-            pos - m_uri_decoded.c_str()));
+        path_info = std::string(m_uri_decoded, 0,
+            pos - m_uri_decoded.c_str());
         store_variable("QUERY_STRING", std::string(strchr(m_uri, '?')));
+    }
+    store_variable("PATH_INFO", path_info);
+
+    size_t offset = path_info.find_last_of("/\\");
+    if (offset != std::string::npos) {
+        std::string basename = std::string(path_info, offset,
+            path_info.length() - offset);
+        store_variable("REQUEST_BASENAME", basename);
     }
 
     if (pos != NULL && strlen(pos) > 2) {
@@ -549,6 +558,8 @@ int Assay::processRequestBody() {
     fullRequest = fullRequest + m_requestBody.str();
     store_variable("FULL_REQUEST", fullRequest);
     store_variable("FULL_REQUEST_LENGTH", std::to_string(fullRequest.size()));
+
+    store_variable("REQUEST_BODY", m_requestBody.str());
 
     this->m_rules->evaluate(ModSecurity::RequestBodyPhase, this);
     return 0;
