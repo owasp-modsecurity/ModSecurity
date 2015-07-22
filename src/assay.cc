@@ -220,6 +220,7 @@ int Assay::processURI(const char *uri, const char *protocol,
         store_variable("QUERY_STRING", std::string(strchr(m_uri, '?')));
     }
     store_variable("PATH_INFO", path_info);
+    store_variable("REQUEST_FILENAME", path_info);
 
     size_t offset = path_info.find_last_of("/\\");
     if (offset != std::string::npos) {
