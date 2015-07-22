@@ -560,6 +560,8 @@ int Assay::processRequestBody() {
     store_variable("FULL_REQUEST_LENGTH", std::to_string(fullRequest.size()));
 
     store_variable("REQUEST_BODY", m_requestBody.str());
+    store_variable("REQUEST_BODY_LENGTH",
+        std::to_string(m_requestBody.str().size()));
 
     this->m_rules->evaluate(ModSecurity::RequestBodyPhase, this);
     return 0;
