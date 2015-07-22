@@ -36,7 +36,7 @@ template <class T> class ModSecurityTest :
     std::pair<std::string, std::vector<T *>>* load_tests();
     bool load_test_json(std::string);
 
-    std::string target_folder;
+    std::string target;
     bool verbose = false;
     bool color = false;
 };

@@ -18,11 +18,13 @@
 #include <yajl/yajl_tree.h>
 #include <dirent.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include <fstream>
 #include <cstdlib>
 #include <sstream>
 #include <string>
+#include <iostream>
 
 #include "modsecurity/modsecurity.h"
 
@@ -92,10 +94,16 @@ template <class T>
 std::pair<std::string, std::vector<T *>>* ModSecurityTest<T>::load_tests() {
     DIR *dir;
     struct dirent *ent;
+    struct stat buffer;
 
-    if ((dir = opendir(this->target_folder.c_str())) == NULL) {
-        std::cout << "Problems opening directory: " << this->target_folder;
-        std::cout << std::endl;
+    if ((dir = opendir(this->target.c_str())) == NULL) {
+        /* if target is a file, use it as a single test. */
+        if (stat(this->target.c_str(), &buffer) == 0) {
+            if (load_test_json(this->target) == false) {
+                std::cout << "Problems loading from: " << this->target;
+                std::cout << std::endl;
+            }
+        }
         return NULL;
     }
 
@@ -106,12 +114,11 @@ std::pair<std::string, std::vector<T *>>* ModSecurityTest<T>::load_tests() {
             || !std::equal(json.rbegin(), json.rend(), filename.rbegin())) {
             continue;
         }
-        if (load_test_json(this->target_folder + "/" + filename) == false) {
+        if (load_test_json(this->target + "/" + filename) == false) {
             std::cout << "Problems loading tests from: " << filename;
             std::cout << std::endl;
         }
     }
-
     closedir(dir);
 
     return NULL;
@@ -143,9 +150,9 @@ void ModSecurityTest<T>::cmd_options(int argc, char **argv) {
     }
 #else
     if (argv[1]) {
-        this->target_folder = argv[1];
+        this->target = argv[1];
     } else {
-        this->target_folder = default_test_path;
+        this->target = default_test_path;
     }
 #endif
 }
