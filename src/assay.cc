@@ -209,6 +209,13 @@ int Assay::processURI(const char *uri, const char *protocol,
 
     const char *pos = strchr(m_uri_decoded.c_str(), '?');
 
+    if (pos == NULL) {
+        store_variable("PATH_INFO", std::string(m_uri_decoded, 0));
+    } else {
+        store_variable("PATH_INFO", std::string(m_uri_decoded, 0,
+            pos - m_uri_decoded.c_str()));
+    }
+
     if (pos != NULL && strlen(pos) > 2) {
         /**
          * FIXME:
