@@ -2,7 +2,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Variables :: REMOTE_HOST",
+    "title":"Testing Variables :: SERVER_PORT",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -33,19 +33,19 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"200.249.12.31\" \\(Variable: REMOTE_HOST\\)"
+      "debug_log":"Target value: \"80\" \\(Variable: SERVER_PORT\\)"
     },
     "rules":[
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REMOTE_HOST \"@contains test \" \"phase:3,pass,t:trim\""
+      "SecRule SERVER_PORT \"@contains test \" \"phase:3,pass,t:trim\""
     ]
   },
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Variables :: REMOTE_HOST",
+    "title":"Testing Variables :: SERVER_PORT",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -76,13 +76,13 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"200.249.12.31\" \\(Variable: REMOTE_HOST\\)"
+      "debug_log":"Target value: \"80\" \\(Variable: SERVER_PORT\\)"
     },
     "rules":[
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REMOTE_HOST \"@contains test \" \"phase:3,pass,t:trim\""
+      "SecRule SERVER_PORT \"@contains test \" \"phase:3,pass,t:trim\""
     ]
   }
 ]
