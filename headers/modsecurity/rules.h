@@ -74,6 +74,7 @@ class Rules {
     int merge(Rules *rules);
 
     int evaluate(int phase, Assay *assay);
+    std::string getParserError();
 
     std::vector<Rule *> rules[7];  // Number of Phases.
 
@@ -101,6 +102,18 @@ class Rules {
      DetectionOnlyRuleEngine
     };
 
+    enum BodyLimitAction {
+    /**
+     * Process partial
+     *
+     */
+     ProcessPartialBodyLimitAction,
+    /**
+     * Process partial
+     *
+     */
+     RejectBodyLimitAction
+    };
     static const char *ruleEngineStateString(RuleEngine i) {
       switch (i) {
       case DisabledRuleEngine:
@@ -128,6 +141,11 @@ class Rules {
 
     int requestBodyLimit;
     int responseBodyLimit;
+    int requestBodyLimitAction;
+    int responseBodyLimitAction;
+
+    std::string parserError;
+
     AuditLog *audit_log;
 
  private:

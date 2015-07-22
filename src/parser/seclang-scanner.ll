@@ -17,14 +17,16 @@
 static yy::location loc;
 %}
 %option noyywrap nounput batch debug noinput
-ACTION          (?i:accuracy|allow|append|auditlog|block|capture|chain|ctl|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|initcol|log|logdata|maturity|msg|multiMatch|noauditlog|nolog|pass|pause|phase:[0-9]+|prepend|proxy|redirect:[A-z0-9_\|\&\:\/\/\.]+|rev|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|setvar|skip|skipAfter|status:[0-9]+|tag|ver|xmlns|t)
+ACTION          (?i:accuracy|allow|append|auditlog|block|capture|chain|ctl|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|initcol|log|logdata|maturity|msg|multiMatch|noauditlog|nolog|pass|pause|phase:[0-9]+|prepend|proxy|redirect:[A-z0-9_\|\&\:\/\/\.]+|rev|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|setvar|skip|skipAfter|status:[0-9]+|tag|ver|xmlns)
 ACTION_SEVERITY (?i:severity:[0-9]+|severity:'[0-9]+'|severity:(EMERGENCY|ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)|severity:'(EMERGENCY|ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)')
 DIRECTIVE       SecRule
 
-CONFIG_DIRECTIVE SecRequestBodyLimitAction|SecRequestBodyNoFilesLimit|SecRequestBodyInMemoryLimit|SecPcreMatchLimitRecursion|SecPcreMatchLimit|SecResponseBodyMimeType|SecResponseBodyLimitAction|SecTmpDir|SecDataDir|SecArgumentSeparator|SecCookieFormat|SecStatusEngine
+CONFIG_DIRECTIVE SecRequestBodyNoFilesLimit|SecRequestBodyInMemoryLimit|SecPcreMatchLimitRecursion|SecPcreMatchLimit|SecResponseBodyMimeType|SecTmpDir|SecDataDir|SecArgumentSeparator|SecCookieFormat|SecStatusEngine
+
 CONFIG_DIR_REQ_BODY_LIMIT (?i:SecRequestBodyLimit)
 CONFIG_DIR_RES_BODY_LIMIT (?i:SecResponseBodyLimit)
-
+CONFIG_DIR_REQ_BODY_LIMIT_ACTION (?i:SecRequestBodyLimitAction)
+CONFIG_DIR_RES_BODY_LIMIT_ACTION (?i:SecResponseBodyLimitAction)
 
 CONFIG_DIR_GEO_DB (?i:SecGeoLookupDb)
 
@@ -85,6 +87,10 @@ CONFIG_VALUE_SERIAL Serial
 CONFIG_VALUE_PARALLEL Parallel
 CONFIG_VALUE_RELEVANT_ONLY RelevantOnly
 
+CONFIG_VALUE_PROCESS_PARTIAL (?i:ProcessPartial)
+CONFIG_VALUE_REJECT (?i:Reject)
+
+
 CONFIG_VALUE_PATH    [A-Za-z_/\.]+
 AUDIT_PARTS [ABCDEFHJKZ]+
 CONFIG_VALUE_NUMBER [0-9]+
@@ -101,7 +107,7 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 
 %{
   // Code run each time yylex is called.
-  loc.step ();
+  loc.step();
 %}
 
 {DIRECTIVE}                     { return yy::seclang_parser::make_DIRECTIVE(yytext, loc); }
@@ -148,8 +154,10 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 
 %{ /* Request body limit */ %}
 {CONFIG_DIR_REQ_BODY_LIMIT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_LIMIT(strchr(yytext, ' ') + 1, loc); }
+{CONFIG_DIR_REQ_BODY_LIMIT_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_LIMIT_ACTION(yytext, loc); }
 %{ /* Reponse body limit */ %}
 {CONFIG_DIR_RES_BODY_LIMIT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_RES_BODY_LIMIT(strchr(yytext, ' ') + 1, loc); }
+{CONFIG_DIR_RES_BODY_LIMIT_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_RES_BODY_LIMIT_ACTION(yytext, loc); }
 
 {CONFIG_COMPONENT_SIG}[ ]["]{FREE_TEXT}["] { return yy::seclang_parser::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, loc); }
 
@@ -159,6 +167,9 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 {CONFIG_VALUE_PARALLEL}         { return yy::seclang_parser::make_CONFIG_VALUE_PARALLEL(yytext, loc); }
 {CONFIG_VALUE_DETC}             { return yy::seclang_parser::make_CONFIG_VALUE_DETC(yytext, loc); }
 {CONFIG_VALUE_RELEVANT_ONLY}    { return yy::seclang_parser::make_CONFIG_VALUE_RELEVANT_ONLY(yytext, loc); }
+{CONFIG_VALUE_PROCESS_PARTIAL}  { return yy::seclang_parser::make_CONFIG_VALUE_PROCESS_PARTIAL(yytext, loc); }
+{CONFIG_VALUE_REJECT}           { return yy::seclang_parser::make_CONFIG_VALUE_REJECT(yytext, loc); }
+
 ["]{OPERATOR}[ ]{FREE_TEXT}["]  { return yy::seclang_parser::make_OPERATOR(yytext, loc); }
 ["]{OPERATORNOARG}["]           { return yy::seclang_parser::make_OPERATOR(yytext, loc); }
 {ACTION}                        { return yy::seclang_parser::make_ACTION(yytext, loc); }
@@ -168,8 +179,8 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 [|]                             { return yy::seclang_parser::make_PIPE(loc); }
 {VARIABLENOCOLON}	   	{ return yy::seclang_parser::make_VARIABLE(yytext, loc); }
 [ \t]+                          { return yy::seclang_parser::make_SPACE(loc); }
-\n                              { return yy::seclang_parser::make_NEW_LINE(loc); }
-.                               driver.error (loc, "invalid character");
+[\n]+                           { loc.lines(yyleng); loc.step(); }
+.                               { driver.error (loc, "invalid character", yytext); }
 <<EOF>>                         { return yy::seclang_parser::make_END(loc); }
 
 %%

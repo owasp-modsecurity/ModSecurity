@@ -78,7 +78,8 @@ class Driver {
 
     // Error handling.
     void error(const yy::location& l, const std::string& m);
-    void error(const std::string& m);
+    void parser_error(const yy::location& l, const std::string& m);
+    void error(const yy::location& l, const std::string& m, const std::string& c);
 
     std::vector<Rule *> rules[7];  // Number of Phases.
 
@@ -89,9 +90,13 @@ class Driver {
     bool sec_response_body_access;
     int requestBodyLimit;
     int responseBodyLimit;
+    int requestBodyLimitAction;
+    int responseBodyLimitAction;
 
     std::string debug_log_path;
     std::list<std::string> components;
+    std::ostringstream parserError;
+    std::ostringstream syntaxError;
 
     ModSecurity::AuditLog *audit_log;
 

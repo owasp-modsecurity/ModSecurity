@@ -124,11 +124,17 @@ int Rules::load(const char *plain_rules) {
     Driver *driver = new Driver();
     if (driver->parse("/tmp/modsec_ugly_hack.txt")) {
         ret = false;
+        parserError = driver->parserError.str();
     }
     this->merge(driver);
     delete driver;
 
     return ret;
+}
+
+
+std::string Rules::getParserError() {
+    return this->parserError;
 }
 
 
@@ -169,6 +175,8 @@ int Rules::merge(Driver *from) {
     this->components = from->components;
     this->requestBodyLimit = from->requestBodyLimit;
     this->responseBodyLimit = from->responseBodyLimit;
+    this->requestBodyLimitAction = from->requestBodyLimitAction;
+    this->responseBodyLimitAction = from->responseBodyLimitAction;
 
     if (m_custom_debug_log) {
         this->debug_log = m_custom_debug_log->new_instance();
@@ -205,6 +213,8 @@ int Rules::merge(Rules *from) {
     this->components = from->components;
     this->requestBodyLimit = from->requestBodyLimit;
     this->responseBodyLimit = from->responseBodyLimit;
+    this->requestBodyLimitAction = from->requestBodyLimitAction;
+    this->responseBodyLimitAction = from->responseBodyLimitAction;
 
     this->debug_log = from->debug_log;
 

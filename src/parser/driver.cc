@@ -74,8 +74,7 @@ int Driver::parse(const std::string &f) {
 
     int res = parser.parse();
 
-    if (this->audit_log->init() == false)
-    {
+    if (this->audit_log->init() == false) {
         return false;
     }
 
@@ -98,11 +97,18 @@ int Driver::parseFile(const std::string &f) {
 }
 
 
-void Driver::error(const yy::location& l, const std::string& m) {
-    std::cerr << l << ": " << m << std::endl;
+void Driver::error(const yy::location& l, const std::string& m,
+    const std::string& c) {
+    if (parserError.tellp() == 0) {
+        parserError << "Parser error, ";
+        parserError << "Filename: " << file << ". ";
+        parserError << "Line: " << l.end.line << ". ";
+        parserError << "Column: " << l.end.column << ". ";
+    }
+    parserError << c;
 }
 
 
-void Driver::error(const std::string& m) {
-    std::cerr << m << std::endl;
+void Driver::parser_error(const yy::location& l, const std::string& m) {
+    parserError << ". " << m << "." << std::endl;
 }

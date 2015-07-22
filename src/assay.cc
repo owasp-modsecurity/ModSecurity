@@ -31,6 +31,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/intervention.h"
 #include "actions/action.h"
+#include "actions/block.h"
 #include "src/utils.h"
 #include "src/audit_log.h"
 #include "src/unique_id.h"
@@ -613,6 +614,24 @@ int Assay::appendRequestBody(const unsigned char *buf, size_t len) {
     if (this->m_rules->requestBodyLimit > 0
         && this->m_rules->requestBodyLimit < len + current_size) {
         store_variable("INBOUND_DATA_ERROR", "1");
+        debug(5, "Rquest body is bigger than the maximum expected.");
+        if (this->m_rules->requestBodyLimitAction ==
+            Rules::BodyLimitAction::ProcessPartialBodyLimitAction) {
+            size_t spaceLeft = this->m_rules->requestBodyLimit - current_size;
+            this->m_requestBody.write(reinterpret_cast<const char*>(buf),
+                spaceLeft);
+            debug(5, "Request body limit is marked to process partial");
+            return false;
+        } else {
+            if (this->m_rules->requestBodyLimitAction ==
+                Rules::BodyLimitAction::RejectBodyLimitAction) {
+                debug(5, "Request body limit is marked to reject the " \
+                    "request");
+                Action *a = new actions::Block("block");
+                actions.push_back(a);
+            }
+            return true;
+        }
     }
 
     this->m_requestBody.write(reinterpret_cast<const char*>(buf), len);
@@ -778,23 +797,42 @@ int Assay::processResponseBody() {
  *
  * @returns If the operation was successful or not.
  * @retval true Operation was successful.
- * @retval false Operation failed.
+ * @retval false Operation failed, process partial demanded.
  *
  */
 int Assay::appendResponseBody(const unsigned char *buf, size_t len) {
     int current_size = this->m_responseBody.tellp();
 
-    debug(9, "Appending response body: " + std::to_string(len) + " bytes. " \
-        "Limit set to: " + std::to_string(this->m_rules->responseBodyLimit));
+    debug(9, "Appending response body: " + std::to_string(len + current_size)
+        + " bytes. Limit set to: " +
+        std::to_string(this->m_rules->responseBodyLimit));
 
     if (this->m_rules->responseBodyLimit > 0
         && this->m_rules->responseBodyLimit < len + current_size) {
         store_variable("OUTBOUND_DATA_ERROR", "1");
+        debug(5, "Response body is bigger than the maximum expected.");
+        if (this->m_rules->responseBodyLimitAction ==
+            Rules::BodyLimitAction::ProcessPartialBodyLimitAction) {
+            size_t spaceLeft = this->m_rules->responseBodyLimit - current_size;
+            this->m_responseBody.write(reinterpret_cast<const char*>(buf),
+                spaceLeft);
+            debug(5, "Response body limit is marked to process partial");
+            return false;
+        } else {
+            if (this->m_rules->responseBodyLimitAction ==
+                Rules::BodyLimitAction::RejectBodyLimitAction) {
+                debug(5, "Response body limit is marked to reject the " \
+                    "request");
+                Action *a = new actions::Block("block");
+                actions.push_back(a);
+            }
+            return true;
+        }
     }
 
     this->m_responseBody.write(reinterpret_cast<const char*>(buf), len);
 
-    return 0;
+    return true;
 }
 
 

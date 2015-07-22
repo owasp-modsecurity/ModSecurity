@@ -73,7 +73,6 @@ using ModSecurity::Variables::TimeYear;
   QUOTATION_MARK  ")"
   SPACE
   PIPE
-  NEW_LINE
   UNKNOWN
   FREE_TEXT
 ;
@@ -83,6 +82,8 @@ using ModSecurity::Variables::TimeYear;
 %token <std::string> CONFIG_DIRECTIVE
 %token <std::string> CONFIG_DIR_REQ_BODY_LIMIT
 %token <std::string> CONFIG_DIR_RES_BODY_LIMIT
+%token <std::string> CONFIG_DIR_REQ_BODY_LIMIT_ACTION
+%token <std::string> CONFIG_DIR_RES_BODY_LIMIT_ACTION
 %token <std::string> CONFIG_DIR_RULE_ENG
 %token <std::string> CONFIG_DIR_REQ_BODY
 %token <std::string> CONFIG_DIR_RES_BODY
@@ -93,6 +94,8 @@ using ModSecurity::Variables::TimeYear;
 %token <std::string> CONFIG_VALUE_SERIAL
 %token <std::string> CONFIG_VALUE_PARALLEL
 %token <std::string> CONFIG_VALUE_RELEVANT_ONLY
+%token <std::string> CONFIG_VALUE_PROCESS_PARTIAL
+%token <std::string> CONFIG_VALUE_REJECT
 
 %token <std::string> CONFIG_DIR_AUDIT_DIR
 %token <std::string> CONFIG_DIR_AUDIT_DIR_MOD
@@ -146,11 +149,12 @@ secrule:
     | secrule line
 
 line: 
-    expression NEW_LINE
-    | SPACE expression NEW_LINE
-    | NEW_LINE
-    | SPACE NEW_LINE
+    expression
+    | SPACE expression
     | SPACE
+      {
+
+      }
 
 audit_log:
     /* SecAuditLogDirMode */
@@ -280,6 +284,7 @@ expression:
       {
         GeoLookup::getInstance().setDataBase($1);
       }
+    /* Body limits */
     | CONFIG_DIR_REQ_BODY_LIMIT
       {
         driver.requestBodyLimit = atoi($1.c_str());
@@ -287,6 +292,22 @@ expression:
     | CONFIG_DIR_RES_BODY_LIMIT
       {
         driver.responseBodyLimit = atoi($1.c_str());
+      }
+    | CONFIG_DIR_REQ_BODY_LIMIT_ACTION SPACE CONFIG_VALUE_PROCESS_PARTIAL
+      {
+        driver.requestBodyLimitAction = ModSecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
+      }
+    | CONFIG_DIR_REQ_BODY_LIMIT_ACTION SPACE CONFIG_VALUE_REJECT
+      {
+        driver.requestBodyLimitAction = ModSecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+      }
+    | CONFIG_DIR_RES_BODY_LIMIT_ACTION SPACE CONFIG_VALUE_PROCESS_PARTIAL
+      {
+        driver.responseBodyLimitAction = ModSecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
+      }
+    | CONFIG_DIR_RES_BODY_LIMIT_ACTION SPACE CONFIG_VALUE_REJECT
+      {
+        driver.responseBodyLimitAction = ModSecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
 
 variables:
@@ -544,5 +565,5 @@ void
 yy::seclang_parser::error (const location_type& l,
                           const std::string& m)
 {
-    driver.error (l, m);
+    driver.parser_error (l, m);
 }
