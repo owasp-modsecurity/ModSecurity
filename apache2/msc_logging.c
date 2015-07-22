@@ -539,26 +539,49 @@ static void format_performance_variables_json(modsec_rec *msr, yajl_gen g) {
  * Write detailed information about a rule and its actionset into a JSON generator
  */
 static void write_rule_json(modsec_rec *msr, const msre_rule *rule, yajl_gen g) {
-    int present = 0;
+    const apr_array_header_t *tarr;
+    const apr_table_entry_t *telts;
+    int been_opened = 0;
+    int k;
 
     yajl_gen_map_open(g);
 
     yajl_string(g, "actionset");
     yajl_gen_map_open(g);
     if (rule->actionset->id) {
-        yajl_kv_string(g, "id", rule->actionset->id);
+        yajl_kv_string(g, "id", log_escape(msr->mp, rule->actionset->id));
     }
     if (rule->actionset->rev) {
-        yajl_kv_string(g, "rev", rule->actionset->rev);
+        yajl_kv_string(g, "rev", log_escape(msr->mp, rule->actionset->rev));
     }
     if (rule->actionset->msg) {
-        yajl_kv_string(g, "msg", rule->actionset->msg);
+        msc_string *var = (msc_string *)apr_palloc(msr->mp, sizeof(msc_string));
+        var->value = (char *)rule->actionset->msg;
+        var->value_len = strlen(rule->actionset->msg);
+        expand_macros(msr, var, NULL, msr->mp);
+
+        yajl_kv_string(g, "msg", log_escape_ex(msr->mp, var->value, var->value_len));
     }
     if (rule->actionset->version) {
-        yajl_kv_string(g, "version", rule->actionset->version);
+        yajl_kv_string(g, "version", log_escape(msr->mp, rule->actionset->version));
     }
     if (rule->actionset->logdata) {
-        yajl_kv_string(g, "logdata", rule->actionset->logdata);
+        msc_string *var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+        var->value = (char *)rule->actionset->logdata;
+        var->value_len = strlen(rule->actionset->logdata);
+        expand_macros(msr, var, NULL, msr->mp);
+
+        char *logdata = apr_pstrdup(msr->mp, log_escape_hex(msr->mp, (unsigned char *)var->value, var->value_len));
+
+        // if it is > 512 bytes, then truncate at 512 with ellipsis.
+        if (strlen(logdata) > 515) {
+            logdata[512] = '.';
+            logdata[513] = '.';
+            logdata[514] = '.';
+            logdata[515] = '\0';
+        }
+
+        yajl_kv_string(g, "logdata", logdata);
     }
     if (rule->actionset->severity != NOT_SET) {
         yajl_kv_int(g, "severity", rule->actionset->severity);
@@ -576,6 +599,33 @@ static void write_rule_json(modsec_rec *msr, const msre_rule *rule, yajl_gen g) 
     if (rule->actionset->is_chained && (rule->chain_starter == NULL)) {
         yajl_kv_bool(g, "chain_starter", 1);
     }
+
+    // tags, lazily opened
+    tarr = apr_table_elts(rule->actionset->actions);
+    telts = (const apr_table_entry_t*)tarr->elts;
+    for (k = 0; k < tarr->nelts; k++) {
+        msre_action *action = (msre_action *)telts[k].val;
+        if (strcmp(telts[k].key, "tag") == 0) {
+            if (been_opened == 0) {
+                yajl_string(g, "tags");
+                yajl_gen_array_open(g);
+                been_opened = 1;
+            }
+
+            // expand variables in the tag
+            msc_string *var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+            var->value = (char *)action->param;
+            var->value_len = strlen(action->param);
+            expand_macros(msr, var, NULL, msr->mp);
+
+            yajl_string(g, log_escape(msr->mp, var->value));
+        }
+    }
+
+    if (been_opened == 1) {
+        yajl_gen_array_close(g);
+    }
+
     yajl_gen_map_close(g);
 
     yajl_string(g, "operator");
@@ -583,6 +633,7 @@ static void write_rule_json(modsec_rec *msr, const msre_rule *rule, yajl_gen g) 
     yajl_kv_string(g, "operator", rule->op_name);
     yajl_kv_string(g, "operator_param", rule->op_param);
     yajl_kv_string(g, "target", rule->p1);
+    yajl_kv_bool(g, "negated", rule->op_negated);
     yajl_gen_map_close(g);
 
     yajl_string(g, "config");
@@ -591,6 +642,7 @@ static void write_rule_json(modsec_rec *msr, const msre_rule *rule, yajl_gen g) 
     yajl_kv_int(g, "line_num", rule->line_num);
     yajl_gen_map_close(g);
 
+    yajl_kv_string(g, "unparsed", rule->unparsed);
     yajl_kv_bool(g, "is_matched", chained_is_matched(msr, rule));
 
     yajl_gen_map_close(g);
