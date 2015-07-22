@@ -71,13 +71,26 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         r.status = 200;
         (*count)++;
 
+        size_t offset = t->filename.find_last_of("/\\");
+        std::string filename("");
+        if (offset != std::string::npos) {
+            filename = std::string(t->filename, offset + 1,
+                t->filename.length() - offset - 1);
+        } else {
+            filename = t->filename;
+        }
+        std::cout << std::setw(3) << std::right <<
+            std::to_string(*count) << " ";
+        std::cout << std::setw(50) << std::left << filename;
+        std::cout << std::setw(60) << std::left << t->name;
+
         modsec = new ModSecurity::ModSecurity();
         modsec->setConnectorInformation("ModSecurity-regression v0.0.1-alpha" \
             " (ModSecurity regression test utility)");
         modsec_rules = new ModSecurity::Rules(debug_log);
 
         if (modsec_rules->load(t->rules.c_str()) == false) {
-            std::cerr << "Problems parsing the rules, aborting!" << std::endl;
+            std::cerr << "parse failed." << std::endl;
             return;
         }
         modsec_assay = new ModSecurity::Assay(modsec, modsec_rules);
@@ -145,19 +158,6 @@ end:
 
         CustomDebugLog *d = reinterpret_cast<CustomDebugLog *>
             (modsec_rules->debug_log);
-
-        size_t offset = t->filename.find_last_of("/\\");
-        std::string filename("");
-        if (offset != std::string::npos) {
-            filename = std::string(t->filename, offset + 1,
-                t->filename.length() - offset - 1);
-        } else {
-            filename = t->filename;
-        }
-        std::cout << std::setw(3) << std::right <<
-            std::to_string(*count) << " ";
-        std::cout << std::setw(50) << std::left << filename;
-        std::cout << std::setw(60) << std::left << t->name;
 
         if (!d->contains(t->debug_log)) {
             std::cout << "Debug log was not matching the expected results.";
