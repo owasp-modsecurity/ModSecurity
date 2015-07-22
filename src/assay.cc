@@ -171,6 +171,7 @@ int Assay::processConnection(const char *client, int cPort, const char *server,
 
     this->store_variable("REMOTE_HOST", m_serverIpAddress);
     this->store_variable("REMOTE_ADDR", m_clientIpAddress);
+    this->store_variable("REMOTE_PORT", std::to_string(this->m_clientPort));
     this->m_rules->evaluate(ModSecurity::ConnectionPhase, this);
     return true;
 }
