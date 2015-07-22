@@ -214,6 +214,7 @@ int Assay::processURI(const char *uri, const char *protocol,
     } else {
         store_variable("PATH_INFO", std::string(m_uri_decoded, 0,
             pos - m_uri_decoded.c_str()));
+        store_variable("QUERY_STRING", std::string(strchr(m_uri, '?')));
     }
 
     if (pos != NULL && strlen(pos) > 2) {
@@ -259,7 +260,6 @@ int Assay::processURI(const char *uri, const char *protocol,
 
             debug(4, "Adding request argument (QUERY_STRING): name \"" + \
                 key_value[0] + "\", value \"" + key_value[1] + "\"");
-            store_variable("QUERY_STRING:" + key_value[0], key_value[1]);
         }
     }
     return true;
