@@ -664,6 +664,9 @@ int Assay::addResponseHeader(const std::string& key,
 
     this->store_variable("RESPONSE_HEADERS:" + key, value);
 
+    if (tolower(key) == "content-type") {
+        this->store_variable("RESPONSE_CONTENT_TYPE", value);
+    }
     return 1;
 }
 
@@ -747,6 +750,10 @@ int Assay::processResponseBody() {
     if (resolve_variable_first("OUTBOUND_DATA_ERROR") == NULL) {
         store_variable("OUTBOUND_DATA_ERROR", "0");
     }
+
+    store_variable("RESPONSE_BODY", m_responseBody.str());
+    store_variable("RESPONSE_CONTENT_LENGTH",
+        std::to_string(m_responseBody.str().size()));
 
     this->m_rules->evaluate(ModSecurity::ResponseBodyPhase, this);
     return 0;
