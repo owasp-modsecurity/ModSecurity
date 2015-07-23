@@ -24,6 +24,8 @@ char main_rule_uri[] = "basic_rules.conf";
 
 int main (int argc, char **argv)
 {
+    int ret = 1;
+    const char *error = NULL;
     ModSecurity *modsec = NULL;
     Assay *assay = NULL;
     Rules *rules = NULL;
@@ -34,7 +36,24 @@ int main (int argc, char **argv)
         "example on how to use ModSecurity API");
 
     rules = msc_create_rules_set();
-    msc_rules_add_file(rules, main_rule_uri);
+
+    ret = msc_rules_add_file(rules, main_rule_uri, &error);
+    if (ret == 0) {
+        fprintf(stderr, "Problems loading the rules --\n");
+        fprintf(stderr, "%s\n", error);
+        goto end;
+    }
+    msc_rules_dump(rules);
+
+    ret = msc_rules_add_remote(rules, "test",
+        "https://www.modsecurity.org/modsecurity-regression-test-secremoterules.txt",
+        &error);
+    if (ret == 0) {
+        fprintf(stderr, "Problems loading the rules --\n");
+        fprintf(stderr, "%s\n", error);
+        goto end;
+    }
+    msc_rules_dump(rules);
 
     assay = msc_new_assay(modsec, rules);
 
@@ -46,7 +65,7 @@ int main (int argc, char **argv)
     msc_process_request_body(assay);
     msc_process_response_headers(assay);
     msc_process_response_body(assay);
-
+end:
     msc_rules_cleanup(rules);
     msc_cleanup(modsec);
 

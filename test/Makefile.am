@@ -16,6 +16,7 @@ MAINTAINERCLEANFILES = \
 
 bin_PROGRAMS = unit-tests regression-tests
 
+
 # unit_tests
 
 unit_tests_SOURCES = \
@@ -23,18 +24,20 @@ unit_tests_SOURCES = \
         unit/unit_test.cc
 
 unit_tests_LDADD = \
-        $(top_builddir)/src/.libs/libmodsecurity.a \
-        $(GEOIP_LDADD) \
-        $(YAJL_LDADD)
+	$(top_builddir)/src/.libs/libmodsecurity.a \
+	$(CURL_LDADD) \
+	$(GEOIP_LDADD) \
+	$(YAJL_LDADD)
 
 unit_tests_CPPFLAGS = \
-        -std=c++11 \
-        -Icommon \
-		-O0 \
-		-g \
-        -I$(top_builddir)/headers \
-        $(GEOIP_CFLAGS) \
-        $(YAJL_CFLAGS)
+	-std=c++11 \
+	-Icommon \
+	-O0 \
+	-g \
+	-I$(top_builddir)/headers \
+	$(CURL_CFLAGS) \
+	$(GEOIP_CFLAGS) \
+	$(YAJL_CFLAGS)
 
 
 # regression
@@ -45,15 +48,17 @@ regression_tests_SOURCES = \
         regression/custom_debug_log.cc
 
 regression_tests_LDADD = \
-        $(top_builddir)/src/.libs/libmodsecurity.a \
-        $(GEOIP_LDADD) \
-        $(YAJL_LDADD)
+	$(top_builddir)/src/.libs/libmodsecurity.a \
+	$(CURL_LDADD) \
+	$(GEOIP_LDADD) \
+	$(YAJL_LDADD)
 
 regression_tests_CPPFLAGS = \
-        -std=c++11 \
-        -Icommon \
-		-O0 \
-		-g \
-        -I$(top_builddir)/headers \
-        $(GEOIP_CFLAGS) \
-        $(YAJL_CFLAGS)
+	-std=c++11 \
+	-Icommon \
+	-O0 \
+	-g \
+	-I$(top_builddir)/headers \
+	$(CURL_CFLAGS) \
+	$(GEOIP_CFLAGS) \
+	$(YAJL_CFLAGS)

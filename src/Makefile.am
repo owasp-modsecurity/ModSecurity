@@ -94,10 +94,13 @@ ACTIONS = \
 	actions/transformations/url_encode.cc \
 	actions/transformations/utf8_to_unicode.cc
 
+
 UTILS = \
-	utils/sha1.cc \
+	utils/geo_lookup.cc \
+	utils/https_client.cc \
 	utils/md5.cc \
-	utils/geo_lookup.cc
+	utils/sha1.cc
+
 
 libmodsecurity_la_SOURCES = \
 	parser/seclang-parser.yy \
@@ -171,9 +174,11 @@ libmodsecurity_la_CPPFLAGS = \
 	-I ../headers
 
 libmodsecurity_la_LIBADD = \
-	@LEXLIB@ \
-	$(GEOIP_LDADD) \
-    $(YAJL_LDADD)
+        $(CURL_LDADD) \
+        $(GEOIP_LDADD) \
+        @LEXLIB@ \
+        $(YAJL_LDADD)
+
 
 libmodsecurity_la_LDFLAGS = \
 	-version-info @MSC_VERSION_INFO@

@@ -66,9 +66,12 @@ class Rules {
     * names should follow a patterner
     *
     */
-    int loadFromUri(char *uri);
-    int loadRemote(char *key, char *uri);
-    int load(const char *rules);
+    bool loadFromUri(char *uri);
+    bool loadRemote(char *key, char *uri);
+    bool load(const char *rules);
+    bool load(const char *rules, const std::string &ref);
+
+    void dump();
 
     int merge(Parser::Driver *driver);
     int merge(Rules *rules);
@@ -160,10 +163,12 @@ extern "C" {
 #endif
 
 Rules *msc_create_rules_set();
+void msc_rules_dump(Rules *rules);
 int msc_rules_merge(Rules *rules_dst, Rules *rules_from);
-int msc_rules_add_remote(Rules *rules, char *key, char *uri);
-int msc_rules_add_file(Rules *rules, char *file);
-int msc_rules_add(Rules *rules, const char *plain_rules);
+int msc_rules_add_remote(Rules *rules, char *key, char *uri,
+    const char **error);
+int msc_rules_add_file(Rules *rules, char *file, const char **error);
+int msc_rules_add(Rules *rules, const char *plain_rules, const char **error);
 int msc_rules_cleanup(Rules *rules);
 
 #ifdef __cplusplus

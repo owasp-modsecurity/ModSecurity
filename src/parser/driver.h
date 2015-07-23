@@ -71,7 +71,7 @@ class Driver : public Rules {
     // Run the parser on file F.
     // Return 0 on success.
     int parseFile(const std::string& f);
-    int parse(const std::string& f);
+    int parse(const std::string& f, const std::string &ref);
 
     // The name of the file being parsed.
     // Used later to pass the file name to the location tracker.
@@ -87,6 +87,7 @@ class Driver : public Rules {
     void error(const yy::location& l, const std::string& m,
         const std::string& c);
 
+    std::string ref;
     std::string buffer;
 };
 

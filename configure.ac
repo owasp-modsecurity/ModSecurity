@@ -44,6 +44,19 @@ PROG_GEOIP
 
 AM_CONDITIONAL([GEOIP_VERSION], [test "$GEOIP_VERSION" != ""])
 
+#
+# Check for curl
+#
+CHECK_CURL
+
+if test -z "${CURL_VERSION}"; then
+  AC_MSG_NOTICE([NOTE: curl was not found. SecRemoteRules support was disabled.])
+else
+  AC_DEFINE([MSC_WITH_CURL], [1], [Define if libcurl is available])
+fi
+
+
+
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([string])

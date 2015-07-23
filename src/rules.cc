@@ -25,8 +25,10 @@
 #include "modsecurity/assay.h"
 #include "src/utils.h"
 #include "parser/driver.h"
+#include "utils/https_client.h"
 
 using ModSecurity::Parser::Driver;
+using ModSecurity::Utils::HttpsClient;
 
 namespace ModSecurity {
 
@@ -75,6 +77,11 @@ void Rules::decrementReferenceCount(void) {
 }
 
 
+Rules::~Rules() {
+    // audit_log->refCountDecreaseAndCheck();
+}
+
+
 /**
  * @name    loadFromUri
  * @brief   load rules from a give uri
@@ -90,11 +97,14 @@ void Rules::decrementReferenceCount(void) {
  * @retval false Problem loading the rules.
  *
  */
-int Rules::loadFromUri(char *uri) {
-    std::cout << "Loading rules from: " << uri << std::endl;
-
+bool Rules::loadFromUri(char *uri) {
     Driver *driver = new Driver();
-    driver->parse(uri);
+
+    if (driver->parseFile(uri) == false) {
+        parserError << driver->parserError.rdbuf();
+        return false;
+    }
+
     this->merge(driver);
     delete driver;
 
@@ -102,24 +112,30 @@ int Rules::loadFromUri(char *uri) {
 }
 
 
-Rules::~Rules() {
-    // audit_log->refCountDecreaseAndCheck();
-}
+bool Rules::loadRemote(char *key, char *uri) {
+    HttpsClient client;
+    bool ret = client.download(uri);
 
-
-int Rules::loadRemote(char *key, char *uri) {
-    return true;
-}
-
-
-int Rules::load(const char *plain_rules) {
-    Driver *driver = new Driver();
-
-    if (driver->parse(plain_rules) == false) {
-        parserError << driver->parserError.rdbuf();
-        return false;
+    if (ret) {
+        return this->load(client.content.c_str(), uri);
     }
 
+    return false;
+}
+
+
+bool Rules::load(const char *plain_rules) {
+    return this->load(plain_rules, "");
+}
+
+
+bool Rules::load(const char *plain_rules, const std::string &ref) {
+    Driver *driver = new Driver();
+
+    if (driver->parse(plain_rules, ref) == false) {
+        parserError << driver->parserError.str();
+        return false;
+    }
     this->merge(driver);
     delete driver;
 
@@ -225,10 +241,30 @@ int Rules::merge(Rules *from) {
 }
 
 
+void Rules::dump() {
+    std::cout << "Rules: " << std::endl;
+    for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+        std::vector<Rule *> rules = this->rules[i];
+        std::cout << "Phase: " << std::to_string(i);
+        std::cout << " (" << std::to_string(rules.size());
+        std::cout << " rules)" << std::endl;
+        for (int j = 0; j < rules.size(); j++) {
+            std::cout << "    Rule ID: " << std::to_string(rules[j]->rule_id);
+            std::cout << std::endl;
+        }
+    }
+}
+
+
 extern "C" Rules *msc_create_rules_set() {
     Rules *rules = new Rules();
 
     return rules;
+}
+
+
+extern "C" void msc_rules_dump(Rules *rules) {
+    rules->dump();
 }
 
 
@@ -241,24 +277,32 @@ extern "C" int msc_rules_merge(Rules *rules_dst,
 
 
 extern "C" int msc_rules_add_remote(Rules *rules,
-    char *key, char *uri) {
-    rules->loadRemote(key, uri);
-
-    return 0;
+    char *key, char *uri, const char **error) {
+    int ret = rules->loadRemote(key, uri);
+    if (ret == 0) {
+        *error = rules->getParserError().c_str();
+    }
+    return ret;
 }
 
 
-extern "C" int msc_rules_add_file(Rules *rules, char *file) {
-    rules->loadFromUri(file);
-
-    return 0;
+extern "C" int msc_rules_add_file(Rules *rules, char *file,
+    const char **error) {
+    int ret = rules->loadFromUri(file);
+    if (ret == 0) {
+        *error = rules->getParserError().c_str();
+    }
+    return ret;
 }
 
 
-extern "C" int msc_rules_add(Rules *rules, const char *plain_rules) {
-    rules->load(plain_rules);
-
-    return 0;
+extern "C" int msc_rules_add(Rules *rules, const char *plain_rules,
+    const char **error) {
+    int ret = rules->load(plain_rules);
+    if (ret == 0) {
+        *error = rules->getParserError().c_str();
+    }
+    return ret;
 }
 
 

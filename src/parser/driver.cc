@@ -70,11 +70,12 @@ int Driver::addSecRule(Rule *rule) {
 }
 
 
-int Driver::parse(const std::string &f) {
+int Driver::parse(const std::string &f, const std::string &ref) {
+    this->ref = ref;
     buffer = f;
     scan_begin();
     yy::seclang_parser parser(*this);
-    parser.set_debug_level(0);
+    parser.set_debug_level(trace_parsing);
     int res = parser.parse();
 
     if (audit_log->init() == false) {
@@ -87,6 +88,7 @@ int Driver::parse(const std::string &f) {
 
 
 int Driver::parseFile(const std::string &f) {
+    this->ref = f;
     file = f;
     scan_begin();
     yy::seclang_parser parser(*this);
@@ -106,7 +108,7 @@ void Driver::error(const yy::location& l, const std::string& m,
     const std::string& c) {
     if (parserError.tellp() == 0) {
         parserError << "Parser error, ";
-        parserError << "Filename: " << file << ". ";
+        parserError << "File: " << ref << ". ";
         parserError << "Line: " << l.end.line << ". ";
         parserError << "Column: " << l.end.column << ". ";
     }

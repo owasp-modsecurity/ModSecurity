@@ -20,6 +20,9 @@
 #include "src/config.h"
 #include "src/unique_id.h"
 
+#ifdef MSC_WITH_CURL
+#include <curl/curl.h>
+#endif
 
 namespace ModSecurity {
 
@@ -42,6 +45,9 @@ ModSecurity::ModSecurity()
     : m_connector("") {
     UniqueId::uniqueId();
     srand(time(NULL));
+#ifdef MSC_WITH_CURL
+    curl_global_init(CURL_GLOBAL_ALL);
+#endif
 }
 
 
