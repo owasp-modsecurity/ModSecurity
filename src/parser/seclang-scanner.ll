@@ -185,23 +185,24 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 
 %%
 
-void
-Driver::scan_begin ()
-{
-  yy_flex_debug = trace_scanning;
-  if (file.empty () || file == "-")
-    yyin = stdin;
-  else if (!(yyin = fopen (file.c_str (), "r")))
-    {
-      exit (EXIT_FAILURE);
+void Driver::scan_begin () {
+    yy_flex_debug = trace_scanning;
+    if (buffer.empty() == false) {
+        yy_scan_string(buffer.c_str());
+    } else if (file.empty() == false) {
+        if (!(yyin = fopen (file.c_str (), "r"))) {
+            // FIXME: we should return a decent error.
+            exit (EXIT_FAILURE);
+        }
     }
+
 }
 
-
-
-void
-Driver::scan_end ()
-{
-  fclose (yyin);
+void Driver::scan_end () {
+    if (buffer.empty() == false) {
+        yy_scan_string(buffer.c_str());
+    } else if (file.empty() == false) {
+        fclose(yyin);
+    }
 }
 

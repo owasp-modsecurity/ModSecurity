@@ -111,25 +111,17 @@ int Rules::loadRemote(char *key, char *uri) {
 
 
 int Rules::load(const char *plain_rules) {
-    bool ret = true;
-    /**
-     * @todo rgg. we should make the parser work out of the buffer.
-     *
-     */
-    std::ofstream myfile;
-    myfile.open("/tmp/modsec_ugly_hack.txt");
-    myfile << plain_rules;
-    myfile.close();
-
     Driver *driver = new Driver();
-    if (driver->parse("/tmp/modsec_ugly_hack.txt")) {
-        ret = false;
+
+    if (driver->parse(plain_rules) == false) {
         parserError << driver->parserError.rdbuf();
+        return false;
     }
+
     this->merge(driver);
     delete driver;
 
-    return ret;
+    return true;
 }
 
 

@@ -66,12 +66,10 @@ int Driver::addSecRule(ModSecurity::Rule *rule) {
 
 
 int Driver::parse(const std::string &f) {
-    file = f;
+    buffer = f;
     scan_begin();
     yy::seclang_parser parser(*this);
-    parser.set_debug_level(trace_parsing);
-    // yy_scan_buffer
-
+    parser.set_debug_level(0);
     int res = parser.parse();
 
     if (audit_log->init() == false) {
@@ -79,7 +77,7 @@ int Driver::parse(const std::string &f) {
     }
 
     scan_end();
-    return res;
+    return res == 0;
 }
 
 
@@ -90,10 +88,12 @@ int Driver::parseFile(const std::string &f) {
     parser.set_debug_level(trace_parsing);
     int res = parser.parse();
 
-    // std::cout << "Leaving the parser: " << res << std::endl;
+    if (audit_log->init() == false) {
+        return false;
+    }
 
     scan_end();
-    return res;
+    return res == 0;
 }
 
 
@@ -112,3 +112,4 @@ void Driver::error(const yy::location& l, const std::string& m,
 void Driver::parser_error(const yy::location& l, const std::string& m) {
     parserError << ". " << m << "." << std::endl;
 }
+

@@ -34,6 +34,7 @@
 using ModSecurity::Rule;
 using ModSecurity::Rules;
 
+
 # define YY_DECL \
   yy::seclang_parser::symbol_type yylex(Driver& driver)
 
@@ -83,6 +84,9 @@ class Driver : public Rules {
     void parser_error(const yy::location& l, const std::string& m);
     void error(const yy::location& l, const std::string& m,
         const std::string& c);
+
+    std::string buffer;
 };
+
 
 #endif  // SRC_PARSER_DRIVER_H_
