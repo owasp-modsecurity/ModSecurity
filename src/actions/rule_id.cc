@@ -29,6 +29,10 @@ RuleId::RuleId(std::string action)
     this->action_kind = ConfigurationKind;
     std::string a = action;
     a.erase(0, 3);
+    if (a.at(0) == '\'') {
+        a.erase(0, 1);
+        a.pop_back();
+    }
     this->rule_id = std::stod(a);
     }
 
