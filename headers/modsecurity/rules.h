@@ -32,8 +32,6 @@ typedef struct Assay_t Assay;
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/assay.h"
-#include "modsecurity/debug_log.h"
-
 
 #ifdef __cplusplus
 class Driver;
@@ -144,7 +142,7 @@ class Rules {
     int requestBodyLimitAction;
     int responseBodyLimitAction;
 
-    std::string parserError;
+    std::ostringstream parserError;
 
     AuditLog *audit_log;
 

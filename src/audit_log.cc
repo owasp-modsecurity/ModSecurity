@@ -109,7 +109,6 @@ bool AuditLog::init() {
     if (m_type == ParallelAuditLogType) {
         m_writer = new AuditLogWriterParallel(this);
     }
-
     if (m_type == SerialAuditLogType) {
         m_writer = new AuditLogWriterSerial(this);
     }

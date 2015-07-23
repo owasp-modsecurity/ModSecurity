@@ -16,14 +16,14 @@
 #include "parser/driver.h"
 
 #include "parser/seclang-parser.hh"
+#include "src/audit_log.h"
+
 
 Driver::Driver()
   : trace_scanning(false),
-  trace_parsing(false),
-  requestBodyLimit(0),
-  responseBodyLimit(0),
-  audit_log(new ModSecurity::AuditLog()) {
-}
+  trace_parsing(false) {
+      audit_log = new ModSecurity::AuditLog();
+  }
 
 
 Driver::~Driver() {
@@ -74,7 +74,7 @@ int Driver::parse(const std::string &f) {
 
     int res = parser.parse();
 
-    if (this->audit_log->init() == false) {
+    if (audit_log->init() == false) {
         return false;
     }
 

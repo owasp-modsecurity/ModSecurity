@@ -16,6 +16,7 @@ class Driver;
 #include "operators/operator.h"
 #include "rule.h"
 #include "utils/geo_lookup.h"
+#include "audit_log.h"
 
 #include "variables/duration.h"
 #include "variables/env.h"

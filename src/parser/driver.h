@@ -26,11 +26,13 @@
 
 #include "modsecurity/modsecurity.h"
 #include "src/rule.h"
+#include "modsecurity/rules.h"
 #include "src/audit_log.h"
 
 #include "parser/seclang-parser.hh"
 
 using ModSecurity::Rule;
+using ModSecurity::Rules;
 
 # define YY_DECL \
   yy::seclang_parser::symbol_type yylex(Driver& driver)
@@ -45,7 +47,7 @@ typedef struct Driver_t Driver;
 #endif
 
 
-class Driver {
+class Driver : public Rules {
 /**
  * @todo Place driver and parser under the correct namespace.
  * 
@@ -79,28 +81,8 @@ class Driver {
     // Error handling.
     void error(const yy::location& l, const std::string& m);
     void parser_error(const yy::location& l, const std::string& m);
-    void error(const yy::location& l, const std::string& m, const std::string& c);
-
-    std::vector<Rule *> rules[7];  // Number of Phases.
-
-    ModSecurity::Rules::RuleEngine secRuleEngine;
-    int sec_audit_type;
-    bool sec_audit_engine;
-    bool sec_request_body_access;
-    bool sec_response_body_access;
-    int requestBodyLimit;
-    int responseBodyLimit;
-    int requestBodyLimitAction;
-    int responseBodyLimitAction;
-
-    std::string debug_log_path;
-    std::list<std::string> components;
-    std::ostringstream parserError;
-    std::ostringstream syntaxError;
-
-    ModSecurity::AuditLog *audit_log;
-
-    int debug_level;
+    void error(const yy::location& l, const std::string& m,
+        const std::string& c);
 };
 
 #endif  // SRC_PARSER_DRIVER_H_

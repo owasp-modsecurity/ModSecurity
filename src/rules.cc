@@ -101,7 +101,7 @@ int Rules::loadFromUri(char *uri) {
 
 
 Rules::~Rules() {
-    audit_log->refCountDecreaseAndCheck();
+    // audit_log->refCountDecreaseAndCheck();
 }
 
 
@@ -124,7 +124,7 @@ int Rules::load(const char *plain_rules) {
     Driver *driver = new Driver();
     if (driver->parse("/tmp/modsec_ugly_hack.txt")) {
         ret = false;
-        parserError = driver->parserError.str();
+        parserError << driver->parserError.rdbuf();
     }
     this->merge(driver);
     delete driver;
@@ -134,7 +134,7 @@ int Rules::load(const char *plain_rules) {
 
 
 std::string Rules::getParserError() {
-    return this->parserError;
+    return this->parserError.str();
 }
 
 
@@ -216,26 +216,16 @@ int Rules::merge(Rules *from) {
     this->requestBodyLimitAction = from->requestBodyLimitAction;
     this->responseBodyLimitAction = from->responseBodyLimitAction;
 
-    this->debug_log = from->debug_log;
+    if (m_custom_debug_log) {
+        this->debug_log = m_custom_debug_log->new_instance();
+    } else {
+        this->debug_log = new DebugLog();
+    }
 
-    /*
-    if (from->debug_log->isConfigured())
-    {
-        if (this->debug_log_path.compare(from->debug_log_path) != 0)
-        {
-            this->debug_log = new DebugLog();
-            this->debug_log->setDebugLevel(from->debug_level);
-            this->debug_log->setOutputFile(this->debug_log_path);
-        }
-        if (this->debug_level != from->debug_level)
-        {
-            this->debug_log->setDebugLevel(this->debug_log);
-        }
-    }
-    else
-    {
-    }
-    */
+    this->audit_log = from->audit_log;
+
+    this->debug_log->setDebugLevel(this->debug_level);
+    this->debug_log->setOutputFile(this->debug_log_path);
 
     return 0;
 }
