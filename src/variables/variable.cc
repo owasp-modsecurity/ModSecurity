@@ -13,35 +13,39 @@
  *
  */
 
-#include "src/variable_modsec_build.h"
+#include "variables/variable.h"
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <list>
-#include <utility>
 
 #include "modsecurity/assay.h"
-#include "modsecurity/modsecurity.h"
 
 namespace ModSecurity {
+namespace Variables {
 
 std::list<std::pair<std::string, std::string>>
-    VariableModsecBuild::evaluate(Assay *assay) {
-    std::list<std::pair<std::string, std::string>> resl;
-    std::pair<std::string, std::string> pair;
+    Variable::evaluate(Assay *assay) {
+    return assay->resolve_variable(this->name);
+}
 
-    std::ostringstream ss;
-    ss << std::setw(2) << std::setfill('0') << MODSECURITY_MAJOR;
-    ss << std::setw(2) << std::setfill('0') << MODSECURITY_MINOR;
-    ss << std::setw(2) << std::setfill('0') << MODSECURITY_PATCHLEVEL;
-    ss << std::setw(2) << std::setfill('0') << MODSECURITY_TAG_NUM;
+std::string Variable::to_s(
+    std::vector<Variable *> *variables) {
+    std::string ret;
+    for (int i = 0; i < variables->size() ; i++) {
+        std::string name = variables->at(i)->name;
 
-    pair = std::make_pair(std::string("MODSEC_BUILD"), ss.str());
-    resl.push_back(pair);
+        if (i == 0) {
+            ret = ret + name;
+        } else {
+            ret = ret + "|" + name;
+        }
+    }
 
-    return resl;
+    return ret;
 }
 
 
+}  // namespace Variables
 }  // namespace ModSecurity

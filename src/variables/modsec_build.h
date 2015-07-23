@@ -18,24 +18,27 @@
 #include <list>
 #include <utility>
 
-#ifndef SRC_VARIABLE_H_
-#define SRC_VARIABLE_H_
+#ifndef SRC_VARIABLES_MODSEC_BUILD_H_
+#define SRC_VARIABLES_MODSEC_BUILD_H_
+
+#include "variables/variable.h"
 
 namespace ModSecurity {
 
 class Assay;
+namespace Variables {
 
-class Variable {
+class ModsecBuild : public Variable {
  public:
-    explicit Variable(std::string _name)
-        : name(_name) { }
+    explicit ModsecBuild(std::string _name)
+        : Variable(_name) { }
 
-    static std::string to_s(std::vector<Variable *> *variables);
-    virtual std::list<std::pair<std::string, std::string>>
-        evaluate(Assay *assay);
-    std::string name;
+    std::list<std::pair<std::string, std::string>>
+        evaluate(Assay *assay) override;
 };
 
+
+}  // namespace Variables
 }  // namespace ModSecurity
 
-#endif  // SRC_VARIABLE_H_
+#endif  // SRC_VARIABLES_MODSEC_BUILD_H_

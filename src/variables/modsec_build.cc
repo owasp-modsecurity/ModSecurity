@@ -13,35 +13,37 @@
  *
  */
 
-#include "src/variable_duration.h"
+#include "variables/modsec_build.h"
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <list>
-#include <chrono>
 #include <utility>
 
 #include "modsecurity/assay.h"
+#include "modsecurity/modsecurity.h"
 
 namespace ModSecurity {
+namespace Variables {
 
 std::list<std::pair<std::string, std::string>>
-    VariableDuration::evaluate(Assay *assay) {
+    ModsecBuild::evaluate(Assay *assay) {
     std::list<std::pair<std::string, std::string>> resl;
-    std::string res;
     std::pair<std::string, std::string> pair;
 
-    auto e = std::chrono::high_resolution_clock::now() - assay->start;
+    std::ostringstream ss;
+    ss << std::setw(2) << std::setfill('0') << MODSECURITY_MAJOR;
+    ss << std::setw(2) << std::setfill('0') << MODSECURITY_MINOR;
+    ss << std::setw(2) << std::setfill('0') << MODSECURITY_PATCHLEVEL;
+    ss << std::setw(2) << std::setfill('0') << MODSECURITY_TAG_NUM;
 
-    res = std::to_string(
-        std::chrono::duration_cast<std::chrono::microseconds>(e).count());
-
-    pair = std::make_pair(std::string("DURATION"), std::string(res));
+    pair = std::make_pair(std::string("MODSEC_BUILD"), ss.str());
     resl.push_back(pair);
 
     return resl;
 }
 
 
+}  // namespace Variables
 }  // namespace ModSecurity

@@ -28,7 +28,12 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/debug_log.h \
 	../headers/modsecurity/intervention.h
 
+
 VARIABLES = \
+	variables/duration.cc \
+	variables/env.cc \
+	variables/highest_severity.cc \
+	variables/modsec_build.cc \
 	variables/time.cc \
 	variables/time_day.cc \
 	variables/time_epoch.cc \
@@ -37,7 +42,10 @@ VARIABLES = \
 	variables/time_mon.cc \
 	variables/time_sec.cc \
 	variables/time_wday.cc \
-	variables/time_year.cc
+	variables/time_year.cc \
+	variables/variable.cc
+
+
 
 ACTIONS = \
 	actions/action.cc \
@@ -108,11 +116,6 @@ libmodsecurity_la_SOURCES = \
 	request_body_processor/multipart_blob.cc \
 	rule.cc \
 	unique_id.cc \
-	variable.cc \
-	variable_duration.cc \
-	variable_env.cc \
-	variable_modsec_build.cc \
-	variable_highest_severity.cc \
 	operators/operator.cc \
 	operators/detect_sqli.cc \
 	operators/detect_xss.cc \

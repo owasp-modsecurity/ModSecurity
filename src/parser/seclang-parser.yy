@@ -15,14 +15,15 @@ class Driver;
 #include "actions/transformations/transformation.h"
 #include "operators/operator.h"
 #include "rule.h"
-#include "variable_duration.h"
-#include "variable_env.h"
-#include "variable_modsec_build.h"
-#include "variable_highest_severity.h"
 #include "utils/geo_lookup.h"
-#include "variables/time.h"
+
+#include "variables/duration.h"
+#include "variables/env.h"
+#include "variables/highest_severity.h"
+#include "variables/modsec_build.h"
 #include "variables/time_day.h"
 #include "variables/time_epoch.h"
+#include "variables/time.h"
 #include "variables/time_hour.h"
 #include "variables/time_min.h"
 #include "variables/time_mon.h"
@@ -33,13 +34,13 @@ class Driver;
 using ModSecurity::actions::Action;
 using ModSecurity::actions::transformations::Transformation;
 using ModSecurity::operators::Operator;
-using ModSecurity::Variable;
-using ModSecurity::VariableDuration;
-using ModSecurity::VariableEnv;
-using ModSecurity::VariableModsecBuild;
-using ModSecurity::VariableHighestSeverity;
 using ModSecurity::Rule;
 using ModSecurity::Utils::GeoLookup;
+
+using ModSecurity::Variables::Duration;
+using ModSecurity::Variables::Env;
+using ModSecurity::Variables::HighestSeverity;
+using ModSecurity::Variables::ModsecBuild;
 using ModSecurity::Variables::Time;
 using ModSecurity::Variables::TimeDay;
 using ModSecurity::Variables::TimeEpoch;
@@ -49,6 +50,7 @@ using ModSecurity::Variables::TimeMon;
 using ModSecurity::Variables::TimeSec;
 using ModSecurity::Variables::TimeWDay;
 using ModSecurity::Variables::TimeYear;
+using ModSecurity::Variables::Variable;
 
 }
 // The parsing context.
@@ -326,61 +328,61 @@ variables:
     | variables PIPE RUN_TIME_VAR_DUR
       {
         std::vector<Variable *> *v = $1;
-        v->push_back(new VariableDuration($3));
+        v->push_back(new Duration($3));
         $$ = $1;
       }
     | RUN_TIME_VAR_DUR
       {
         std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new VariableDuration($1));
+        variables->push_back(new Duration($1));
         $$ = variables;
       }
     | variables PIPE RUN_TIME_VAR_ENV
       {
         std::vector<Variable *> *v = $1;
-        v->push_back(new VariableEnv($3));
+        v->push_back(new Env($3));
         $$ = $1;
       }
     | RUN_TIME_VAR_ENV
       {
         std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new VariableEnv($1));
+        variables->push_back(new Env($1));
         $$ = variables;
       }
     | variables PIPE RUN_TIME_VAR_BLD
       {
         std::vector<Variable *> *v = $1;
-        v->push_back(new VariableModsecBuild($3));
+        v->push_back(new ModsecBuild($3));
         $$ = $1;
       }
     | RUN_TIME_VAR_BLD
       {
         std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new VariableModsecBuild($1));
+        variables->push_back(new ModsecBuild($1));
         $$ = variables;
       }
     | variables PIPE RUN_TIME_VAR_HSV
       {
         std::vector<Variable *> *v = $1;
-        v->push_back(new VariableHighestSeverity($3));
+        v->push_back(new HighestSeverity($3));
         $$ = $1;
       }
     | RUN_TIME_VAR_HSV
       {
         std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new VariableHighestSeverity($1));
+        variables->push_back(new HighestSeverity($1));
         $$ = variables;
       }
     | RUN_TIME_VAR_TIME
       {
         std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new ModSecurity::Variables::Time($1));
+        variables->push_back(new Time($1));
         $$ = variables;
       }
     | RUN_TIME_VAR_TIME_DAY
       {
         std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new ModSecurity::Variables::TimeDay($1));
+        variables->push_back(new TimeDay($1));
         $$ = variables;
       }
     | RUN_TIME_VAR_TIME_EPOCH

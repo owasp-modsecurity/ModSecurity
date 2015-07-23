@@ -18,24 +18,27 @@
 #include <list>
 #include <utility>
 
-#ifndef SRC_VARIABLE_DURATION_H_
-#define SRC_VARIABLE_DURATION_H_
+#ifndef SRC_VARIABLES_HIGHEST_SEVERITY_H_
+#define SRC_VARIABLES_HIGHEST_SEVERITY_H_
 
-#include "src/variable.h"
+#include "variables/variable.h"
 
 namespace ModSecurity {
 
 class Assay;
+namespace Variables {
 
-class VariableDuration : public Variable {
+class HighestSeverity : public Variable {
  public:
-    explicit VariableDuration(std::string _name)
+    explicit HighestSeverity(std::string _name)
         : Variable(_name) { }
 
     std::list<std::pair<std::string, std::string>>
         evaluate(Assay *assay) override;
 };
 
+
+}  // namespace Variables
 }  // namespace ModSecurity
 
-#endif  // SRC_VARIABLE_DURATION_H_
+#endif  // SRC_VARIABLES_HIGHEST_SEVERITY_H_

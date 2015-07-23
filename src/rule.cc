@@ -32,6 +32,7 @@ namespace ModSecurity {
 
 using operators::Operator;
 using actions::Action;
+using Variables::Variable;
 
 Rule::Rule(Operator *_op,
         std::vector<Variable *> *_variables,

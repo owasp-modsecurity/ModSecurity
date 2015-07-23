@@ -13,7 +13,7 @@
  *
  */
 
-#include "src/variable_env.h"
+#include "variables/env.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -31,9 +31,10 @@
 extern char **environ;
 
 namespace ModSecurity {
+namespace Variables {
 
 std::list<std::pair<std::string, std::string>>
-    VariableEnv::evaluate(Assay *assay) {
+    Env::evaluate(Assay *assay) {
     std::list<std::pair<std::string, std::string>> resl;
 
     std::map<std::string, std::string> envs;
@@ -64,4 +65,5 @@ std::list<std::pair<std::string, std::string>>
 }
 
 
+}  // namespace Variables
 }  // namespace ModSecurity

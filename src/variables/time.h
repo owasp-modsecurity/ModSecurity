@@ -22,7 +22,7 @@
 #ifndef SRC_VARIABLES_TIME_H_
 #define SRC_VARIABLES_TIME_H_
 
-#include "src/variable.h"
+#include "variables/variable.h"
 
 namespace ModSecurity {
 

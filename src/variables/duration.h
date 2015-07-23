@@ -13,36 +13,32 @@
  *
  */
 
-#include "src/variable.h"
-
-#include <iostream>
-#include <string>
 #include <vector>
+#include <string>
 #include <list>
+#include <utility>
 
-#include "modsecurity/assay.h"
+#ifndef SRC_VARIABLES_DURATION_H_
+#define SRC_VARIABLES_DURATION_H_
+
+#include "variables/variable.h"
 
 namespace ModSecurity {
 
-std::list<std::pair<std::string, std::string>>
-    Variable::evaluate(Assay *assay) {
-    return assay->resolve_variable(this->name);
-}
+class Assay;
+namespace Variables {
 
-std::string Variable::to_s(
-    std::vector<Variable *> *variables) {
-    std::string ret;
-    for (int i = 0; i < variables->size() ; i++) {
-        std::string name = variables->at(i)->name;
+class Duration : public Variable {
+ public:
+    explicit Duration(std::string _name)
+        : Variable(_name) { }
 
-        if (i == 0) {
-            ret = ret + name;
-        } else {
-            ret = ret + "|" + name;
-        }
-    }
+    std::list<std::pair<std::string, std::string>>
+        evaluate(Assay *assay) override;
+};
 
-    return ret;
-}
 
+}  // namespace Variables
 }  // namespace ModSecurity
+
+#endif  // SRC_VARIABLES_DURATION_H_

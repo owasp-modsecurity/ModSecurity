@@ -13,29 +13,31 @@
  *
  */
 
-#include <vector>
+#include "variables/highest_severity.h"
+
+#include <iostream>
 #include <string>
+#include <vector>
 #include <list>
 #include <utility>
 
-#ifndef SRC_VARIABLE_ENV_H_
-#define SRC_VARIABLE_ENV_H_
-
-#include "src/variable.h"
+#include "modsecurity/assay.h"
 
 namespace ModSecurity {
+namespace Variables {
 
-class Assay;
+std::list<std::pair<std::string, std::string>>
+    HighestSeverity::evaluate(Assay *assay) {
+    std::list<std::pair<std::string, std::string>> resl;
+    std::pair<std::string, std::string> pair;
 
-class VariableEnv : public Variable {
- public:
-    explicit VariableEnv(std::string _name)
-        : Variable(_name) { }
+    pair = std::make_pair(std::string("HIGHEST_SEVERITY"),
+        std::to_string(assay->highest_severity));
+    resl.push_back(pair);
 
-    std::list<std::pair<std::string, std::string>>
-        evaluate(Assay *assay) override;
-};
+    return resl;
+}
 
+
+}  // namespace Variables
 }  // namespace ModSecurity
-
-#endif  // SRC_VARIABLE_ENV_H_
