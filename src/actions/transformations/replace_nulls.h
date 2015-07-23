@@ -1,4 +1,4 @@
-/**
+/*
  * ModSecurity, http://www.modsecurity.org/
  * Copyright (c) 2015 Trustwave Holdings, Inc. (http://www.trustwave.com/)
  *
