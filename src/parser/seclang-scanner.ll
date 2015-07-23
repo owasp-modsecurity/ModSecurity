@@ -6,6 +6,8 @@
 # include "parser/driver.h"
 # include "seclang-parser.hh"
 
+using ModSecurity::Parser::Driver;
+
 // Work around an incompatibility in flex (at least versions
 // 2.5.31 through 2.5.33): it generates code that does
 // not conform to C89.  See Debian bug 333231
@@ -185,6 +187,8 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 
 %%
 
+namespace ModSecurity {
+
 void Driver::scan_begin () {
     yy_flex_debug = trace_scanning;
     if (buffer.empty() == false) {
@@ -206,3 +210,4 @@ void Driver::scan_end () {
     }
 }
 
+}

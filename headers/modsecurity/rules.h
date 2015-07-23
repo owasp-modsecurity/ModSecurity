@@ -34,11 +34,13 @@ typedef struct Assay_t Assay;
 #include "modsecurity/assay.h"
 
 #ifdef __cplusplus
-class Driver;
 
 namespace ModSecurity {
 class Rule;
 class AuditLog;
+namespace Parser {
+class Driver;
+}
 
 /** @ingroup ModSecurity_CPP_API */
 class Rules {
@@ -68,7 +70,7 @@ class Rules {
     int loadRemote(char *key, char *uri);
     int load(const char *rules);
 
-    int merge(Driver *driver);
+    int merge(Parser::Driver *driver);
     int merge(Rules *rules);
 
     int evaluate(int phase, Assay *assay);

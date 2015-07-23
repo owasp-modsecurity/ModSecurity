@@ -9,7 +9,11 @@
 {
 # include <string>
 
+namespace ModSecurity {
+namespace Parser {
 class Driver;
+}
+}
 
 #include "actions/action.h"
 #include "actions/transformations/transformation.h"
@@ -55,7 +59,7 @@ using ModSecurity::Variables::Variable;
 
 }
 // The parsing context.
-%param { Driver& driver }
+%param { ModSecurity::Parser::Driver& driver }
 %locations
 %initial-action
 {

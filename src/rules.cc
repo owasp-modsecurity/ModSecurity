@@ -26,6 +26,8 @@
 #include "src/utils.h"
 #include "parser/driver.h"
 
+using ModSecurity::Parser::Driver;
+
 namespace ModSecurity {
 
 

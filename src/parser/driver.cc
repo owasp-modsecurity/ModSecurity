@@ -18,11 +18,16 @@
 #include "parser/seclang-parser.hh"
 #include "src/audit_log.h"
 
+using ModSecurity::AuditLog;
+using ModSecurity::Rule;
+
+namespace ModSecurity {
+namespace Parser {
 
 Driver::Driver()
   : trace_scanning(false),
   trace_parsing(false) {
-      audit_log = new ModSecurity::AuditLog();
+      audit_log = new AuditLog();
   }
 
 
@@ -30,8 +35,8 @@ Driver::~Driver() {
 }
 
 
-int Driver::addSecRule(ModSecurity::Rule *rule) {
-    if (rule->phase >= ModSecurity::ModSecurity::Phases::NUMBER_OF_PHASES) {
+int Driver::addSecRule(Rule *rule) {
+    if (rule->phase >= ModSecurity::Phases::NUMBER_OF_PHASES) {
         /** TODO: return an error message */
         return -1;
     }
@@ -43,13 +48,13 @@ int Driver::addSecRule(ModSecurity::Rule *rule) {
         return true;
     }
 
-    ModSecurity::Rule *lastRule = this->rules[rule->phase][size-1];
+    Rule *lastRule = this->rules[rule->phase][size-1];
     if (lastRule->chained && lastRule->chainedRule == NULL) {
         lastRule->chainedRule = rule;
         return true;
     }
     if (lastRule->chained && lastRule->chainedRule != NULL) {
-        ModSecurity::Rule *a = lastRule->chainedRule;
+        Rule *a = lastRule->chainedRule;
         while (a->chained && a->chainedRule != NULL) {
             a = a->chainedRule;
         }
@@ -113,3 +118,6 @@ void Driver::parser_error(const yy::location& l, const std::string& m) {
     parserError << ". " << m << "." << std::endl;
 }
 
+
+}  // namespace Parser
+}  // namespace ModSecurity

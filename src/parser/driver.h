@@ -36,10 +36,12 @@ using ModSecurity::Rules;
 
 
 # define YY_DECL \
-  yy::seclang_parser::symbol_type yylex(Driver& driver)
+  yy::seclang_parser::symbol_type yylex(ModSecurity::Parser::Driver& driver)
 
 YY_DECL;
 
+namespace ModSecurity {
+namespace Parser {
 
 #ifdef __cplusplus
 class Driver;
@@ -88,5 +90,8 @@ class Driver : public Rules {
     std::string buffer;
 };
 
+
+}  // namespace Parser
+}  // namespace ModSecurity
 
 #endif  // SRC_PARSER_DRIVER_H_
