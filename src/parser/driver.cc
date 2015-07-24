@@ -64,14 +64,18 @@ int Driver::addSecRule(Rule *rule) {
         }
     }
 
-    this->rules[rule->phase].push_back(rule);
-
+    rules[rule->phase].push_back(rule);
     return true;
 }
 
 
 int Driver::parse(const std::string &f, const std::string &ref) {
-    this->ref = ref;
+    if (ref.empty()) {
+        this->ref = "<<reference missing or not informed>>";
+    } else {
+        this->ref = ref;
+    }
+
     buffer = f;
     scan_begin();
     yy::seclang_parser parser(*this);
@@ -81,43 +85,48 @@ int Driver::parse(const std::string &f, const std::string &ref) {
     if (audit_log->init() == false) {
         return false;
     }
-
     scan_end();
+
     return res == 0;
 }
 
 
 int Driver::parseFile(const std::string &f) {
-    this->ref = f;
-    file = f;
-    scan_begin();
-    yy::seclang_parser parser(*this);
-    parser.set_debug_level(trace_parsing);
-    int res = parser.parse();
+    std::ifstream t(f);
+    std::string str;
 
-    if (audit_log->init() == false) {
+    if (t.is_open() == false) {
+        parserError << "Failed to open the file: " << f << std::endl;
         return false;
     }
 
-    scan_end();
-    return res == 0;
+    t.seekg(0, std::ios::end);
+    str.reserve(t.tellg());
+    t.seekg(0, std::ios::beg);
+
+    str.assign((std::istreambuf_iterator<char>(t)),
+        std::istreambuf_iterator<char>());
+
+    return parse(str, f);
+}
+
+
+void Driver::error(const yy::location& l, const std::string& m) {
+    error(l, m, "");
 }
 
 
 void Driver::error(const yy::location& l, const std::string& m,
     const std::string& c) {
     if (parserError.tellp() == 0) {
-        parserError << "Parser error, ";
+        parserError << "Configuration error, ";
         parserError << "File: " << ref << ". ";
         parserError << "Line: " << l.end.line << ". ";
         parserError << "Column: " << l.end.column << ". ";
     }
-    parserError << c;
-}
-
-
-void Driver::parser_error(const yy::location& l, const std::string& m) {
-    parserError << ". " << m << "." << std::endl;
+    if (c.empty() == false) {
+        parserError << c;
+    }
 }
 
 

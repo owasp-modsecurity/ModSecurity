@@ -32,6 +32,7 @@ typedef struct Assay_t Assay;
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/assay.h"
+#include "modsecurity/rules_properties.h"
 
 #ifdef __cplusplus
 
@@ -43,30 +44,20 @@ class Driver;
 }
 
 /** @ingroup ModSecurity_CPP_API */
-class Rules {
+class Rules : public RulesProperties  {
  public:
     Rules()
-        : m_referenceCount(0),
-        requestBodyLimit(0),
-        responseBodyLimit(0),
-        m_custom_debug_log(NULL) { }
+        : RulesProperties(NULL) { }
 
-    explicit Rules(DebugLog *custom_log)
-        : m_referenceCount(0),
-        m_custom_debug_log(custom_log) { }
+    Rules(DebugLog *customLog)
+        : RulesProperties(customLog) { }
 
     ~Rules();
 
     void incrementReferenceCount(void);
     void decrementReferenceCount(void);
 
-    /**
-    * FIXME:
-    *
-    * names should follow a patterner
-    *
-    */
-    bool loadFromUri(char *uri);
+    bool loadFromUri(const char *uri);
     bool loadRemote(char *key, char *uri);
     bool load(const char *rules);
     bool load(const char *rules, const std::string &ref);
@@ -79,81 +70,13 @@ class Rules {
     int evaluate(int phase, Assay *assay);
     std::string getParserError();
 
-    std::vector<Rule *> rules[7];  // Number of Phases.
-
-    /**
-     *
-     * The RuleEngine enumerator consists in mapping the different states
-     * of the rule engine.
-     *
-     */
-    enum RuleEngine {
-    /**
-     * Rules won't be evaluated if Rule Engine is set to DisabledRuleEngine
-     *
-     */
-     DisabledRuleEngine,
-    /**
-     * Rules will be evaluated and disturb actions will take place if needed.
-     *
-     */
-     EnabledRuleEngine,
-    /**
-     * Rules will be evaluated but it won't generate any disruptive action.
-     *
-     */
-     DetectionOnlyRuleEngine
-    };
-
-    enum BodyLimitAction {
-    /**
-     * Process partial
-     *
-     */
-     ProcessPartialBodyLimitAction,
-    /**
-     * Process partial
-     *
-     */
-     RejectBodyLimitAction
-    };
-    static const char *ruleEngineStateString(RuleEngine i) {
-      switch (i) {
-      case DisabledRuleEngine:
-          return "Disabled";
-      case EnabledRuleEngine:
-          return "Enabled";
-      case DetectionOnlyRuleEngine:
-          return "DetectionOnly";
-      }
-      return NULL;
-    }
-
-    RuleEngine secRuleEngine;
-    int sec_audit_type;
-    bool sec_audit_engine;
-    bool sec_request_body_access;
-    bool sec_response_body_access;
-    std::string audit_log_path;
-    std::string audit_log_parts;
-    std::string debug_log_path;
-    int debug_level;
-    DebugLog *debug_log;
     void debug(int level, std::string message);
-    std::list<std::string> components;
-
-    int requestBodyLimit;
-    int responseBodyLimit;
-    int requestBodyLimitAction;
-    int responseBodyLimitAction;
 
     std::ostringstream parserError;
 
-    AuditLog *audit_log;
-
+    DebugLog *debugLog;
  private:
     int m_referenceCount;
-    DebugLog *m_custom_debug_log;
 };
 
 #endif

@@ -517,7 +517,9 @@ int Assay::processRequestBody() {
 
     if (m_requestBodyType == WWWFormUrlEncoded) {
         std::string content = uri_decode(m_requestBody.str());
-        content.erase(content.length()-1, 1);
+        if (content.empty() == false) {
+            content.pop_back();
+        }
 
         /**
          * FIXME:
@@ -577,7 +579,7 @@ int Assay::processRequestBody() {
     store_variable("FULL_REQUEST", fullRequest);
     store_variable("FULL_REQUEST_LENGTH", std::to_string(fullRequest.size()));
 
-    if (m_requestBody.tellp() <= 0) {
+    if (m_requestBody.tellp() > 0) {
         store_variable("REQUEST_BODY", m_requestBody.str());
         store_variable("REQUEST_BODY_LENGTH",
             std::to_string(m_requestBody.str().size()));

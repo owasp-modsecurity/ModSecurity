@@ -27,6 +27,7 @@
 #include "modsecurity/modsecurity.h"
 #include "src/rule.h"
 #include "modsecurity/rules.h"
+#include "modsecurity/rules_properties.h"
 #include "src/audit_log.h"
 
 #include "parser/seclang-parser.hh"
@@ -50,11 +51,7 @@ typedef struct Driver_t Driver;
 #endif
 
 
-class Driver : public Rules {
-/**
- * @todo Place driver and parser under the correct namespace.
- * 
- */
+class Driver : public RulesProperties {
  public:
     Driver();
     virtual ~Driver();
@@ -63,29 +60,22 @@ class Driver : public Rules {
 
     int result;
 
-    // Handling the scanner.
-    void scan_begin();
+    bool scan_begin();
     void scan_end();
     bool trace_scanning;
 
-    // Run the parser on file F.
-    // Return 0 on success.
     int parseFile(const std::string& f);
     int parse(const std::string& f, const std::string &ref);
 
-    // The name of the file being parsed.
-    // Used later to pass the file name to the location tracker.
     std::string file;
 
-    // Whether parser traces should be generated.
     bool trace_parsing;
 
-
-    // Error handling.
     void error(const yy::location& l, const std::string& m);
-    void parser_error(const yy::location& l, const std::string& m);
     void error(const yy::location& l, const std::string& m,
         const std::string& c);
+
+    yy::location loc;
 
     std::string ref;
     std::string buffer;

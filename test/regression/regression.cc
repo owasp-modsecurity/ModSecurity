@@ -161,7 +161,7 @@ end:
         modsec_assay->processLogging(r.status);
 
         CustomDebugLog *d = reinterpret_cast<CustomDebugLog *>
-            (modsec_rules->debug_log);
+            (modsec_rules->debugLog);
 
         if (!d->contains(t->debug_log)) {
             std::cout << "Debug log was not matching the expected results.";

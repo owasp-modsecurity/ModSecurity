@@ -4,6 +4,7 @@
 %define parser_class_name {seclang_parser}
 %define api.token.constructor
 %define api.value.type variant
+//%define api.namespace {ModSecurity::yy}
 %define parse.assert
 %code requires
 {
@@ -103,6 +104,8 @@ using ModSecurity::Variables::Variable;
 %token <std::string> CONFIG_VALUE_RELEVANT_ONLY
 %token <std::string> CONFIG_VALUE_PROCESS_PARTIAL
 %token <std::string> CONFIG_VALUE_REJECT
+%token <std::string> CONFIG_VALUE_ABORT
+%token <std::string> CONFIG_VALUE_WARN
 
 %token <std::string> CONFIG_DIR_AUDIT_DIR
 %token <std::string> CONFIG_DIR_AUDIT_DIR_MOD
@@ -134,6 +137,10 @@ using ModSecurity::Variables::Variable;
 %token <std::string> RUN_TIME_VAR_TIME_SEC
 %token <std::string> RUN_TIME_VAR_TIME_WDAY
 %token <std::string> RUN_TIME_VAR_TIME_YEAR
+
+%token <std::string> CONFIG_INCLUDE
+%token <std::string> CONFIG_SEC_REMOTE_RULES
+%token <std::string> CONFIG_SEC_REMOTE_RULES_FAIL_ACTION
 
 %token <std::string> CONFIG_DIR_GEO_DB
 
@@ -315,6 +322,14 @@ expression:
     | CONFIG_DIR_RES_BODY_LIMIT_ACTION SPACE CONFIG_VALUE_REJECT
       {
         driver.responseBodyLimitAction = ModSecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+      }
+    | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION CONFIG_VALUE_ABORT
+      {
+        driver.remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
+      }
+    | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION CONFIG_VALUE_WARN
+      {
+        driver.remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
       }
 
 variables:
@@ -572,5 +587,5 @@ void
 yy::seclang_parser::error (const location_type& l,
                           const std::string& m)
 {
-    driver.parser_error (l, m);
+    driver.error (l, m);
 }

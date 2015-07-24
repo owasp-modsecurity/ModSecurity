@@ -97,14 +97,27 @@ Rules::~Rules() {
  * @retval false Problem loading the rules.
  *
  */
-bool Rules::loadFromUri(char *uri) {
+bool Rules::loadFromUri(const char *uri) {
     Driver *driver = new Driver();
 
     if (driver->parseFile(uri) == false) {
-        parserError << driver->parserError.rdbuf();
+        parserError << driver->parserError.str();
         return false;
     }
 
+    this->merge(driver);
+    delete driver;
+
+    return true;
+}
+
+bool Rules::load(const char *file, const std::string &ref) {
+    Driver *driver = new Driver();
+
+    if (driver->parse(file, ref) == false) {
+        parserError << driver->parserError.str();
+        return false;
+    }
     this->merge(driver);
     delete driver;
 
@@ -124,22 +137,8 @@ bool Rules::loadRemote(char *key, char *uri) {
 }
 
 
-bool Rules::load(const char *plain_rules) {
-    return this->load(plain_rules, "");
-}
-
-
-bool Rules::load(const char *plain_rules, const std::string &ref) {
-    Driver *driver = new Driver();
-
-    if (driver->parse(plain_rules, ref) == false) {
-        parserError << driver->parserError.str();
-        return false;
-    }
-    this->merge(driver);
-    delete driver;
-
-    return true;
+bool Rules::load(const char *plainRules) {
+    return this->load(plainRules, "");
 }
 
 
@@ -188,23 +187,20 @@ int Rules::merge(Driver *from) {
     this->requestBodyLimitAction = from->requestBodyLimitAction;
     this->responseBodyLimitAction = from->responseBodyLimitAction;
 
-    if (m_custom_debug_log) {
-        this->debug_log = m_custom_debug_log->new_instance();
+    if (customDebugLog) {
+        this->debugLog = customDebugLog->new_instance();
     } else {
-        this->debug_log = new DebugLog();
+        this->debugLog = new DebugLog();
     }
 
     this->audit_log = from->audit_log;
 
-    this->debug_log->setDebugLevel(this->debug_level);
-    this->debug_log->setOutputFile(this->debug_log_path);
+    this->debugLog->setDebugLevel(this->debug_level);
+    this->debugLog->setOutputFile(this->debug_log_path);
 
     return 0;
 }
 
-void Rules::debug(int level, std::string message) {
-    this->debug_log->write_log(level, message);
-}
 
 int Rules::merge(Rules *from) {
     for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
@@ -226,18 +222,25 @@ int Rules::merge(Rules *from) {
     this->requestBodyLimitAction = from->requestBodyLimitAction;
     this->responseBodyLimitAction = from->responseBodyLimitAction;
 
-    if (m_custom_debug_log) {
-        this->debug_log = m_custom_debug_log->new_instance();
+    if (customDebugLog) {
+        this->debugLog = customDebugLog->new_instance();
     } else {
-        this->debug_log = new DebugLog();
+        this->debugLog = new DebugLog();
     }
 
     this->audit_log = from->audit_log;
 
-    this->debug_log->setDebugLevel(this->debug_level);
-    this->debug_log->setOutputFile(this->debug_log_path);
+    this->debugLog->setDebugLevel(this->debug_level);
+    this->debugLog->setOutputFile(this->debug_log_path);
 
     return 0;
+}
+
+
+void Rules::debug(int level, std::string message) {
+    if (debugLog != NULL) {
+        debugLog->write_log(level, message);
+    }
 }
 
 
