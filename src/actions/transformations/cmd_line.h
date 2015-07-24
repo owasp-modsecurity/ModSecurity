@@ -31,7 +31,7 @@ namespace transformations {
 class CmdLine : public Transformation {
  public:
     explicit CmdLine(std::string action);
-    std::string& evaluate(std::string exp,
+    std::string evaluate(std::string exp,
         Assay *assay) override;
 };
 

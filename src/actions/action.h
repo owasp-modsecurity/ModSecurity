@@ -74,7 +74,7 @@ class Action {
     int action_kind;
     std::string name;
 
-    virtual std::string& evaluate(std::string exp,
+    virtual std::string evaluate(std::string exp,
         Assay *assay);
     virtual bool evaluate(Assay *assay);
     virtual bool evaluate(Rule *rule);

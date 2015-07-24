@@ -35,7 +35,7 @@ RemoveCommentsChar::RemoveCommentsChar(std::string action)
     this->action_kind = 1;
 }
 
-std::string& RemoveCommentsChar::evaluate(std::string value,
+std::string RemoveCommentsChar::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation RemoveCommentsChar

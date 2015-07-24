@@ -35,7 +35,7 @@ Utf8Unicode::Utf8Unicode(std::string action)
     this->action_kind = 1;
 }
 
-std::string& Utf8Unicode::evaluate(std::string value,
+std::string Utf8Unicode::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation Utf8Unicode

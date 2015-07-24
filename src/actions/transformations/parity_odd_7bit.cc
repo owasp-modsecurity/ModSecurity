@@ -35,7 +35,7 @@ ParityOdd7bit::ParityOdd7bit(std::string action)
     this->action_kind = 1;
 }
 
-std::string& ParityOdd7bit::evaluate(std::string value,
+std::string ParityOdd7bit::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation ParityOdd7bit

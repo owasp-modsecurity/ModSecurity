@@ -35,7 +35,7 @@ RemoveNulls::RemoveNulls(std::string action)
     this->action_kind = 1;
 }
 
-std::string& RemoveNulls::evaluate(std::string value,
+std::string RemoveNulls::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation RemoveNulls

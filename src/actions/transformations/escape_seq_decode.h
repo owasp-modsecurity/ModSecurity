@@ -31,7 +31,7 @@ namespace transformations {
 class EscapeSeqDecode : public Transformation {
  public:
     explicit EscapeSeqDecode(std::string action);
-    std::string& evaluate(std::string exp,
+    std::string evaluate(std::string exp,
         Assay *assay) override;
 };
 

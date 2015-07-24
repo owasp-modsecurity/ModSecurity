@@ -35,12 +35,13 @@ Base64DecodeExt::Base64DecodeExt(std::string action)
     this->action_kind = 1;
 }
 
-std::string& Base64DecodeExt::evaluate(std::string value,
+std::string Base64DecodeExt::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation Base64DecodeExt
      */
     assay->debug(4, "Transformation Base64DecodeExt is not implemented yet.");
+    return value;
 }
 
 }  // namespace transformations

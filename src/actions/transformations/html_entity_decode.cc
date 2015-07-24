@@ -35,7 +35,7 @@ HtmlEntityDecode::HtmlEntityDecode(std::string action)
     this->action_kind = 1;
 }
 
-std::string& HtmlEntityDecode::evaluate(std::string value,
+std::string HtmlEntityDecode::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation HtmlEntityDecode

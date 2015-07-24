@@ -31,7 +31,7 @@ namespace transformations {
 class Trim : public Transformation {
  public:
     explicit Trim(std::string action);
-    std::string& evaluate(std::string exp,
+    std::string evaluate(std::string exp,
         Assay *assay) override;
 
     std::string *ltrim(std::string *s);

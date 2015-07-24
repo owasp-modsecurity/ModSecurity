@@ -31,7 +31,7 @@ namespace transformations {
 class JsDecode : public Transformation {
  public:
     explicit JsDecode(std::string action);
-    std::string& evaluate(std::string exp,
+    std::string evaluate(std::string exp,
         Assay *assay) override;
 };
 

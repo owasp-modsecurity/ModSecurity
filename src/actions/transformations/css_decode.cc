@@ -35,12 +35,13 @@ CssDecode::CssDecode(std::string action)
     this->action_kind = 1;
 }
 
-std::string& CssDecode::evaluate(std::string value,
+std::string CssDecode::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation CssDecode
      */
     assay->debug(4, "Transformation CssDecode is not implemented yet.");
+    return value;
 }
 
 }  // namespace transformations

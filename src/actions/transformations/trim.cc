@@ -56,7 +56,8 @@ Trim::Trim(std::string action)
 }
 
 
-std::string& Trim::evaluate(std::string value,
+std::string
+Trim::evaluate(std::string value,
     Assay *assay) {
     return *this->trim(&value);
 }

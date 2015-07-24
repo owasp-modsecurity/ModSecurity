@@ -31,7 +31,7 @@ namespace transformations {
 class RemoveNulls : public Transformation {
  public:
     explicit RemoveNulls(std::string action);
-    std::string& evaluate(std::string exp,
+    std::string evaluate(std::string exp,
         Assay *assay) override;
 };
 

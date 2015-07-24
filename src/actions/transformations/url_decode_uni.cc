@@ -35,7 +35,7 @@ UrlDecodeUni::UrlDecodeUni(std::string action)
     this->action_kind = 1;
 }
 
-std::string& UrlDecodeUni::evaluate(std::string value,
+std::string UrlDecodeUni::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation UrlDecodeUni

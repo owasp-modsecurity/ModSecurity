@@ -31,7 +31,7 @@ namespace transformations {
 class NormalisePath : public Transformation {
  public:
     explicit NormalisePath(std::string action);
-    std::string& evaluate(std::string exp,
+    std::string evaluate(std::string exp,
         Assay *assay) override;
 };
 

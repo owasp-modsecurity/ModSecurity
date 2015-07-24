@@ -31,7 +31,7 @@ namespace transformations {
 class ParityZero7bit : public Transformation {
  public:
     explicit ParityZero7bit(std::string action);
-    std::string& evaluate(std::string exp,
+    std::string evaluate(std::string exp,
         Assay *assay) override;
 };
 

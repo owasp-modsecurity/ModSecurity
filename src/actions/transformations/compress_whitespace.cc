@@ -35,13 +35,14 @@ CompressWhitespace::CompressWhitespace(std::string action)
     this->action_kind = 1;
 }
 
-std::string& CompressWhitespace::evaluate(std::string value,
+std::string CompressWhitespace::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation CompressWhitespace
      */
     assay->debug(4, "Transformation CompressWhitespace is " \
         "not implemented yet.");
+    return value;
 }
 
 }  // namespace transformations

@@ -35,12 +35,13 @@ SqlHexDecode::SqlHexDecode(std::string action)
     this->action_kind = 1;
 }
 
-std::string& SqlHexDecode::evaluate(std::string value,
+std::string SqlHexDecode::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation SqlHexDecode
      */
     assay->debug(4, "Transformation SqlHexDecode is not implemented yet.");
+    return value;
 }
 
 }  // namespace transformations

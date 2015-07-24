@@ -36,7 +36,7 @@ TrimRight::TrimRight(std::string action)
     this->action_kind = 1;
 }
 
-std::string& TrimRight::evaluate(std::string value,
+std::string TrimRight::evaluate(std::string value,
     Assay *assay) {
     return *this->trim(&value);
 }

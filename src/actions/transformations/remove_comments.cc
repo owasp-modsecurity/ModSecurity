@@ -35,7 +35,7 @@ RemoveComments::RemoveComments(std::string action)
     this->action_kind = 1;
 }
 
-std::string& RemoveComments::evaluate(std::string value,
+std::string RemoveComments::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation RemoveComments

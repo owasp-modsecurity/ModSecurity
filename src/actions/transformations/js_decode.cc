@@ -35,12 +35,13 @@ JsDecode::JsDecode(std::string action)
     this->action_kind = 1;
 }
 
-std::string& JsDecode::evaluate(std::string value,
+std::string JsDecode::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation JsDecode
      */
     assay->debug(4, "Transformation JsDecode is not implemented yet.");
+    return value;
 }
 
 }  // namespace transformations

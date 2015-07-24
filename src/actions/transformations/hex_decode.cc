@@ -35,12 +35,13 @@ HexDecode::HexDecode(std::string action)
     this->action_kind = 1;
 }
 
-std::string& HexDecode::evaluate(std::string value,
+std::string HexDecode::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation HexDecode
      */
     assay->debug(4, "Transformation HexDecode is not implemented yet.");
+    return value;
 }
 
 }  // namespace transformations

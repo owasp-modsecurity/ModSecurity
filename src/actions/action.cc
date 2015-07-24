@@ -36,7 +36,7 @@ namespace ModSecurity {
 namespace actions {
 
 
-std::string & Action::evaluate(std::string value,
+std::string Action::evaluate(std::string value,
     Assay *assay) {
     return value;
 }

@@ -35,12 +35,13 @@ CmdLine::CmdLine(std::string action)
     this->action_kind = 1;
 }
 
-std::string& CmdLine::evaluate(std::string value,
+std::string CmdLine::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation CmdLine
      */
     assay->debug(4, "Transformation CmdLine is not implemented yet.");
+    return value;
 }
 
 }  // namespace transformations

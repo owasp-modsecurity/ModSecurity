@@ -38,7 +38,7 @@ TrimLeft::TrimLeft(std::string action)
     this->action_kind = 1;
 }
 
-std::string& TrimLeft::evaluate(std::string value,
+std::string TrimLeft::evaluate(std::string value,
     Assay *assay) {
     return *trim(&value);
 }

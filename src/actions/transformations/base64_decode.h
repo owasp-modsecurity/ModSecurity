@@ -31,7 +31,7 @@ namespace transformations {
 class Base64Decode : public Transformation {
  public:
     explicit Base64Decode(std::string action);
-    std::string& evaluate(std::string exp,
+    std::string evaluate(std::string exp,
         Assay *assay) override;
 };
 

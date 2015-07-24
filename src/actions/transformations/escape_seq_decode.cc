@@ -35,7 +35,7 @@ EscapeSeqDecode::EscapeSeqDecode(std::string action)
     this->action_kind = 1;
 }
 
-std::string& EscapeSeqDecode::evaluate(std::string value,
+std::string EscapeSeqDecode::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation EscapeSeqDecode

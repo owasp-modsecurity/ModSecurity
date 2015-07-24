@@ -35,7 +35,7 @@ Sha1::Sha1(std::string action)
     this->action_kind = 1;
 }
 
-std::string& Sha1::evaluate(std::string value,
+std::string Sha1::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation Sha1

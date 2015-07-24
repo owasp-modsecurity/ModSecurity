@@ -31,7 +31,7 @@ LowerCase::LowerCase(std::string a)
     : Transformation(a) {
 }
 
-std::string & LowerCase::evaluate(std::string value,
+std::string LowerCase::evaluate(std::string value,
     Assay *assay) {
     std::locale loc;
 

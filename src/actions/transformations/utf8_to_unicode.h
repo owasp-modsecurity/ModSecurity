@@ -31,7 +31,7 @@ namespace transformations {
 class Utf8Unicode : public Transformation {
  public:
     explicit Utf8Unicode(std::string action);
-    std::string& evaluate(std::string exp,
+    std::string evaluate(std::string exp,
         Assay *assay) override;
 };
 

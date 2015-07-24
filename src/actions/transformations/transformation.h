@@ -33,7 +33,7 @@ class Transformation : public Action {
     explicit Transformation(std::string action);
     static Transformation* instantiate(std::string);
 
-    std::string& evaluate(std::string exp,
+    std::string evaluate(std::string exp,
         Assay *assay) override;
 };
 

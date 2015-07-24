@@ -72,7 +72,7 @@ Transformation::Transformation(std::string action)
     this->action_kind = 1;
 }
 
-std::string &Transformation::evaluate(std::string value,
+std::string Transformation::evaluate(std::string value,
     Assay *assay) {
     return value;
 }

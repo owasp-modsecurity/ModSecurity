@@ -31,7 +31,7 @@ namespace transformations {
 class ReplaceComments : public Transformation {
  public:
     explicit ReplaceComments(std::string action);
-    std::string& evaluate(std::string exp,
+    std::string evaluate(std::string exp,
         Assay *assay) override;
 };
 

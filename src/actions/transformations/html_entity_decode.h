@@ -31,7 +31,7 @@ namespace transformations {
 class HtmlEntityDecode : public Transformation {
  public:
     explicit HtmlEntityDecode(std::string action);
-    std::string& evaluate(std::string exp,
+    std::string evaluate(std::string exp,
         Assay *assay) override;
 };
 

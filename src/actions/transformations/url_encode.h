@@ -31,7 +31,7 @@ namespace transformations {
 class UrlEncode : public Transformation {
  public:
     explicit UrlEncode(std::string action);
-    std::string& evaluate(std::string exp,
+    std::string evaluate(std::string exp,
         Assay *assay) override;
 };
 

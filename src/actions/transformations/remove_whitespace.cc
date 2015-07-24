@@ -35,7 +35,7 @@ RemoveWhitespace::RemoveWhitespace(std::string action)
     this->action_kind = 1;
 }
 
-std::string& RemoveWhitespace::evaluate(std::string value,
+std::string RemoveWhitespace::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation RemoveWhitespace

@@ -35,7 +35,7 @@ Md5::Md5(std::string action)
     this->action_kind = 1;
 }
 
-std::string& Md5::evaluate(std::string value,
+std::string Md5::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation Md5

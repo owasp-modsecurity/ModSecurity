@@ -35,7 +35,7 @@ NormalisePathWin::NormalisePathWin(std::string action)
     this->action_kind = 1;
 }
 
-std::string& NormalisePathWin::evaluate(std::string value,
+std::string NormalisePathWin::evaluate(std::string value,
     Assay *assay) {
     /**
      * @todo Implement the transformation NormalisePathWin
