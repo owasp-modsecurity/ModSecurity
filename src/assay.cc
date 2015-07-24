@@ -449,9 +449,14 @@ int Assay::processRequestBody() {
         store_variable("INBOUND_DATA_ERROR", "0");
     }
 
-    if (m_requestBody.tellp() <= 0) {
-        return true;
-    }
+    /*
+     * Process the request body even if there is nothing to be done.
+     * 
+     * if (m_requestBody.tellp() <= 0) {
+     *     return true;
+     * }
+     * 
+     */
 
     if (m_requestBodyType == MultiPartRequestBody) {
         std::string *a = resolve_variable_first("REQUEST_HEADERS:Content-Type");
@@ -572,9 +577,11 @@ int Assay::processRequestBody() {
     store_variable("FULL_REQUEST", fullRequest);
     store_variable("FULL_REQUEST_LENGTH", std::to_string(fullRequest.size()));
 
-    store_variable("REQUEST_BODY", m_requestBody.str());
-    store_variable("REQUEST_BODY_LENGTH",
-        std::to_string(m_requestBody.str().size()));
+    if (m_requestBody.tellp() <= 0) {
+        store_variable("REQUEST_BODY", m_requestBody.str());
+        store_variable("REQUEST_BODY_LENGTH",
+            std::to_string(m_requestBody.str().size()));
+    }
 
     this->m_rules->evaluate(ModSecurity::RequestBodyPhase, this);
     return 0;
