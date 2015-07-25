@@ -1,0 +1,62 @@
+[
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Include - bad rule",
+    "expected":{
+      "parser_error": "Rules error. File: config-include-bad.json. Line: 5. Column: 15."
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "Include test-cases/data/config_example.txt",
+      "SecRule ARGS \"@missing_operator test\" \"id:9,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Include - missing file",
+    "expected":{
+      "parser_error": "Rules error. File: config-include-bad.json. Line: 4. Column: 47. Include test-cases/data/config_example-ops.txt: Not able to open file."
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "Include test-cases/data/config_example-ops.txt",
+      "SecRule ARGS \"@contains test\" \"id:9,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Include - missing at include",
+    "expected":{
+      "parser_error": "Rules error. File: test-cases/data/config_example-ops-include.txt. Line: 1. Column: 53. Include test-cases/data/config_example-not-exist.txt: Not able to open file."
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "Include test-cases/data/config_example-ops-include.txt",
+      "SecRule ARGS \"@contains test\" \"id:9,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Include - bad operator inside include",
+    "expected":{
+      "parser_error": "Rules error. File: test-cases/data/config_example-bad-op-include.txt. Line: 2. Column: 15."
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "Include test-cases/data/config_example-bad-op-include.txt",
+      "SecRule ARGS \"@contains test\" \"id:9,pass,t:trim\""
+    ]
+  }
+]

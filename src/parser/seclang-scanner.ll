@@ -236,6 +236,7 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
     std::vector<std::string> conf = split(yytext, ' ');
     key = conf[1];
     url = conf[2];
+
     driver.ref.push_back(url);
     driver.loc.push_back(*(new yy::location()));
     YY_BUFFER_STATE temp = YY_CURRENT_BUFFER;
@@ -244,13 +245,12 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
     bool ret = c.download(url);
 
     if (ret == false) {
-        /**
-         * TODO: Implement the fail action.
-         *
-         */
         if (driver.remoteRulesActionOnFailed == Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction) {
+            /** TODO: Implement the server logging mechanism. */
         }
         if (driver.remoteRulesActionOnFailed == Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction) {
+            driver.error (driver.loc.back(), "", yytext + std::string(" - Failed to download: ") + c.error);
+            throw yy::seclang_parser::syntax_error(driver.loc.back(), "");
         }
     }
 

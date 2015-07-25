@@ -323,11 +323,11 @@ expression:
       {
         driver.responseBodyLimitAction = ModSecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
-    | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION CONFIG_VALUE_ABORT
+    | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION SPACE CONFIG_VALUE_ABORT
       {
         driver.remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
       }
-    | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION CONFIG_VALUE_WARN
+    | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION SPACE CONFIG_VALUE_WARN
       {
         driver.remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
       }
