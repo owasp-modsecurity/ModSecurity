@@ -19,6 +19,7 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <regex>
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
@@ -89,14 +90,34 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
             " (ModSecurity regression test utility)");
         modsec_rules = new ModSecurity::Rules(debug_log);
 
-        if (modsec_rules->load(t->rules.c_str()) == false) {
-            std::cerr << "parse failed." << std::endl;
-            std::cout << std::endl;
-            std::cout << "-------------" << std::endl;
-            std::cout << modsec_rules->getParserError() << std::endl;
-            std::cout << "-------------" << std::endl;
-            return;
+        if (modsec_rules->load(t->rules.c_str(), filename) == false) {
+            if (t->parser_error.empty() == true) {
+                std::cerr << "parse failed." << std::endl;
+                std::cout << modsec_rules->getParserError() << std::endl;
+                return;
+            }
+
+            std::regex re(t->parser_error);
+            std::smatch match;
+            std::string s = modsec_rules->getParserError();
+
+            if (std::regex_search(s, match, re) && match.size() >= 1) {
+                std::cout << "passed!" << std::endl;
+                return;
+            } else {
+                std::cout << "Expected a parser error." << std::endl;
+                std::cout << "Expected: " << t->parser_error << std::endl;
+                std::cout << "Produced: " << s << std::endl;
+                return;
+            }
+
+        } else {
+            if (t->parser_error.empty() == false) {
+                std::cout << "Expected a parser error." << std::endl;
+                std::cout << "Expected: " << t->parser_error << std::endl;
+            }
         }
+
         modsec_assay = new ModSecurity::Assay(modsec, modsec_rules);
 
         modsec_assay->processConnection(t->clientIp.c_str(),
@@ -219,6 +240,7 @@ int main(int argc, char **argv) {
         keyList.push_back(a.first);
     }
     keyList.sort();
+
     for (std::string a : keyList) {
         std::vector<RegressionTest *> *tests = test[a];
         ModSecurityTestResults<RegressionTest> res;
@@ -227,7 +249,6 @@ int main(int argc, char **argv) {
 
         test_log << res.log_raw_debug_log;
     }
-
     test_log.close();
 
     return 0;

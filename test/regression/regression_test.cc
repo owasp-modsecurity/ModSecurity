@@ -188,6 +188,9 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
                 if (strcmp(key2, "redirect_url") == 0) {
                     u->redirect_url = YAJL_GET_STRING(val2);
                 }
+                if (strcmp(key2, "parser_error") == 0) {
+                    u->parser_error = YAJL_GET_STRING(val2);
+                }
             }
         }
         if (strcmp(key, "rules") == 0) {

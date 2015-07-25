@@ -70,10 +70,11 @@ int Driver::addSecRule(Rule *rule) {
 
 
 int Driver::parse(const std::string &f, const std::string &ref) {
+    loc.push_back(*(new yy::location()));
     if (ref.empty()) {
-        this->ref = "<<reference missing or not informed>>";
+        this->ref.push_back("<<reference missing or not informed>>");
     } else {
-        this->ref = ref;
+        this->ref.push_back(ref);
     }
 
     buffer = f;
@@ -119,8 +120,8 @@ void Driver::error(const yy::location& l, const std::string& m) {
 void Driver::error(const yy::location& l, const std::string& m,
     const std::string& c) {
     if (parserError.tellp() == 0) {
-        parserError << "Configuration error, ";
-        parserError << "File: " << ref << ". ";
+        parserError << "Rules error. ";
+        parserError << "File: " << ref.back() << ". ";
         parserError << "Line: " << l.end.line << ". ";
         parserError << "Column: " << l.end.column << ". ";
     }

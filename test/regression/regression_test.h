@@ -50,6 +50,7 @@ class RegressionTest {
     std::string audit_log;
     std::string debug_log;
     std::string error_log;
+    std::string parser_error;
 
     std::string clientIp;
     std::string serverIp;
