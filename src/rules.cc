@@ -137,7 +137,7 @@ bool Rules::load(const char *file, const std::string &ref) {
 }
 
 
-bool Rules::loadRemote(char *key, char *uri) {
+bool Rules::loadRemote(const char *key, const char *uri) {
     HttpsClient client;
     bool ret = client.download(uri);
 
@@ -298,7 +298,7 @@ extern "C" int msc_rules_merge(Rules *rules_dst,
 
 
 extern "C" int msc_rules_add_remote(Rules *rules,
-    char *key, char *uri, const char **error) {
+    const char *key, const char *uri, const char **error) {
     int ret = rules->loadRemote(key, uri);
     if (ret == 0) {
         *error = rules->getParserError().c_str();
@@ -307,7 +307,7 @@ extern "C" int msc_rules_add_remote(Rules *rules,
 }
 
 
-extern "C" int msc_rules_add_file(Rules *rules, char *file,
+extern "C" int msc_rules_add_file(Rules *rules, const char *file,
     const char **error) {
     int ret = rules->loadFromUri(file);
     if (ret == 0) {

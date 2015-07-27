@@ -58,7 +58,7 @@ class Rules : public RulesProperties  {
     void decrementReferenceCount(void);
 
     bool loadFromUri(const char *uri);
-    bool loadRemote(char *key, char *uri);
+    bool loadRemote(const char *key, const char *uri);
     bool load(const char *rules);
     bool load(const char *rules, const std::string &ref);
 
@@ -89,9 +89,9 @@ extern "C" {
 Rules *msc_create_rules_set();
 void msc_rules_dump(Rules *rules);
 int msc_rules_merge(Rules *rules_dst, Rules *rules_from);
-int msc_rules_add_remote(Rules *rules, char *key, char *uri,
+int msc_rules_add_remote(Rules *rules, const char *key, const char *uri,
     const char **error);
-int msc_rules_add_file(Rules *rules, char *file, const char **error);
+int msc_rules_add_file(Rules *rules, const char *file, const char **error);
 int msc_rules_add(Rules *rules, const char *plain_rules, const char **error);
 int msc_rules_cleanup(Rules *rules);
 
