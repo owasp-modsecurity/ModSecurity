@@ -64,19 +64,10 @@
 namespace ModSecurity {
 namespace operators {
 
-Operator::Operator() {
-}
-
 
 bool Operator::debug(Assay *assay, int x, std::string a) {
     assay->debug(x, a);
     return true;
-}
-
-
-Operator::Operator(std::string op, std::string param, bool negation) {
-    this->op = op;
-    this->param = param;
 }
 
 

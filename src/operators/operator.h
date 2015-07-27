@@ -29,11 +29,16 @@ namespace operators {
 class Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Operator();
-    Operator(std::string po, std::string param, bool invert);
+    Operator() { }
+    Operator(std::string op, std::string param, bool negation)
+        : op(op),
+        param(param),
+        negation(negation) { }
+
 
     std::string op;
     std::string param;
+    bool negation;
 
     virtual bool evaluate(Assay *assay);
     virtual bool evaluate(Assay *assay, const std::string &str);
