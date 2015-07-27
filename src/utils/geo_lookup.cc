@@ -30,8 +30,20 @@ namespace ModSecurity {
 namespace Utils {
 
 
-bool GeoLookup::setDataBase(std::string file_path) {
-    m_gi = GeoIP_open(file_path.c_str(), GEOIP_INDEX_CACHE);
+GeoLookup::~GeoLookup() {
+    cleanUp();
+}
+
+void GeoLookup::cleanUp() {
+    if (m_gi != NULL) {
+        GeoIP_delete(m_gi);
+        m_gi = NULL;
+    }
+}
+
+
+bool GeoLookup::setDataBase(const std::string& filePath) {
+    m_gi = GeoIP_open(filePath.c_str(), GEOIP_INDEX_CACHE);
 
     if (m_gi == NULL) {
         return false;

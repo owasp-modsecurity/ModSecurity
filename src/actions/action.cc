@@ -55,7 +55,7 @@ bool Action::evaluate(Rule *rule) {
 void Action::fill_intervention(ModSecurityIntervention *i) {
 }
 
-Action *Action::instantiate(std::string name) {
+Action *Action::instantiate(const std::string& name) {
     std::string status("status:");
     std::string redirect("redirect:");
     std::string block("block");

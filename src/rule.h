@@ -34,6 +34,7 @@ class Rule {
             std::vector<Variables::Variable *> *_variables,
             std::vector<actions::Action *> *_actions);
 
+    ~Rule();
     bool evaluate(Assay *assay);
 
     operators::Operator *op;
@@ -47,6 +48,20 @@ class Rule {
 
     Rule *chainedRule;
     bool chained;
+
+    void refCountDecreaseAndCheck() {
+        this->m_referenceCount--;
+        if (this->m_referenceCount == 0) {
+            delete this;
+        }
+    }
+
+    void refCountIncrease() {
+        this->m_referenceCount++;
+    }
+
+ private:
+    int m_referenceCount;
 };
 
 }  // namespace ModSecurity

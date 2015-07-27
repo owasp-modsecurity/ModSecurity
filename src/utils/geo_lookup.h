@@ -36,13 +36,15 @@ class GeoLookup {
         return instance;
     }
 
-    bool setDataBase(std::string file_path);
+    bool setDataBase(const std::string& filePath);
     bool lookup(const std::string& target, GeoIPRecord **georec,
         std::function<bool(int, std::string)> callback);
+    void cleanUp();
 
  private:
-    GeoLookup() : m_gi(NULL) {}
-
+    GeoLookup()
+        : m_gi(NULL) { }
+    ~GeoLookup();
     GeoLookup(GeoLookup const&);
     void operator=(GeoLookup const&);
 

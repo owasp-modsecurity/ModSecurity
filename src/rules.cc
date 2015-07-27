@@ -78,7 +78,19 @@ void Rules::decrementReferenceCount(void) {
 
 
 Rules::~Rules() {
-    // audit_log->refCountDecreaseAndCheck();
+    /** Cleanup the rules */
+    for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+        std::vector<Rule *> rules = this->rules[i];
+        while (rules.empty() == false) {
+            Rule *rule = rules.back();
+            rule->refCountDecreaseAndCheck();
+            rules.pop_back();
+        }
+    }
+    /** Cleanup audit log */
+    audit_log->refCountDecreaseAndCheck();
+    /** Cleanup debug log */
+    debugLog->refCountDecreaseAndCheck();
 }
 
 
@@ -171,6 +183,7 @@ int Rules::merge(Driver *from) {
         for (int j = 0; j < rules.size(); j++) {
             Rule *rule = rules[j];
             this->rules[i].push_back(rule);
+            rule->refCountIncrease();
         }
     }
 
@@ -192,8 +205,10 @@ int Rules::merge(Driver *from) {
     } else {
         this->debugLog = new DebugLog();
     }
+    this->debugLog->refCountIncrease();
 
     this->audit_log = from->audit_log;
+    this->audit_log->refCountIncrease();
 
     this->debugLog->setDebugLevel(this->debug_level);
     this->debugLog->setOutputFile(this->debug_log_path);
@@ -208,6 +223,7 @@ int Rules::merge(Rules *from) {
         for (int j = 0; j < rules.size(); j++) {
             Rule *rule = rules[j];
             this->rules[i].push_back(rule);
+            rule->refCountIncrease();
         }
     }
 
@@ -227,8 +243,10 @@ int Rules::merge(Rules *from) {
     } else {
         this->debugLog = new DebugLog();
     }
+    this->debugLog->refCountIncrease();
 
     this->audit_log = from->audit_log;
+    this->audit_log->refCountIncrease();
 
     this->debugLog->setDebugLevel(this->debug_level);
     this->debugLog->setOutputFile(this->debug_log_path);

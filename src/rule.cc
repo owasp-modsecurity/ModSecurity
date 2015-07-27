@@ -34,27 +34,55 @@ using operators::Operator;
 using actions::Action;
 using Variables::Variable;
 
+Rule::~Rule() {
+    delete op;
+    while (actions_conf.empty() == false) {
+        auto *a = actions_conf.back();
+        actions_conf.pop_back();
+        delete a;
+    }
+    while (actions_runtime_pre.empty() == false) {
+        auto *a = actions_runtime_pre.back();
+        actions_runtime_pre.pop_back();
+        delete a;
+    }
+    while (actions_runtime_pos.empty() == false) {
+        auto *a = actions_runtime_pos.back();
+        actions_runtime_pos.pop_back();
+        delete a;
+    }
+    while (variables->empty() == false) {
+        auto *a = variables->back();
+        variables->pop_back();
+        delete a;
+    }
+
+    delete variables;
+}
+
+
 Rule::Rule(Operator *_op,
         std::vector<Variable *> *_variables,
-        std::vector<Action *> *_actions)
+        std::vector<Action *> *actions)
     : chained(false),
     chainedRule(NULL),
     variables(_variables),
     op(_op),
     rule_id(0),
-    phase(-1) {
-    for (Action *a : *_actions) {
+    phase(-1),
+    m_referenceCount(0) {
+    for (Action *a : *actions) {
         if (a->action_kind == Action::ConfigurationKind) {
             actions_conf.push_back(a);
             a->evaluate(this);
-        }
-
-        if (a->action_kind == Action::RunTimeBeforeMatchAttemptKind) {
+        } else if (a->action_kind == Action::RunTimeBeforeMatchAttemptKind) {
             actions_runtime_pre.push_back(a);
-        }
-
-        if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
+        } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
             actions_runtime_pos.push_back(a);
+        } else {
+            std::cout << "General failure, action: " << a->name;
+            std::cout << " has an unknown type." << std::endl;
+            delete a;
         }
     }
     /**
@@ -64,6 +92,8 @@ Rule::Rule(Operator *_op,
     if (phase == -1) {
         phase = ModSecurity::Phases::RequestHeadersPhase;
     }
+
+    delete actions;
 }
 
 bool Rule::evaluate(Assay *assay) {
@@ -115,7 +145,8 @@ bool Rule::evaluate(Assay *assay) {
                     a->evaluate(assay);
                 }
                 if (this->chained && this->chainedRule == NULL) {
-                    assay->debug(4, "Rule is marked as chained but there isn't a subsequent rule.");
+                    assay->debug(4, "Rule is marked as chained but there " \
+                        "isn't a subsequent rule.");
                 }
                 if (this->chained && this->chainedRule != NULL) {
                     assay->debug(4, "Executing chained rule.");

@@ -37,7 +37,7 @@ class AuditLogWriterSerial : public AuditLogWriter {
     explicit AuditLogWriterSerial(AuditLog *audit)
         : AuditLogWriter(audit) { }
 
-    ~AuditLogWriterSerial();
+    ~AuditLogWriterSerial() override;
 
     void refCountIncrease() override {
         m_refereceCount++;

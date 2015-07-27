@@ -30,7 +30,8 @@ namespace actions {
 
 class Redirect : public Action {
  public:
-    explicit Redirect(std::string action);
+    explicit Redirect(const std::string &action);
+    ~Redirect() override;
 
     bool evaluate(Assay *assay) override;
     int status;

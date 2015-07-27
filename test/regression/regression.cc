@@ -44,16 +44,19 @@ void print_help() {
 
 
 void actions(ModSecurityTestResults<RegressionTest> *r,
-    ModSecurity::ModSecurityIntervention *it) {
-    if (it != NULL) {
-        if (it->pause != 0) {
+    ModSecurity::Assay *a) {
+    ModSecurity::ModSecurityIntervention it;
+    memset(&it, '\0', sizeof(ModSecurity::ModSecurityIntervention));
+    it.status = 200;
+    if (a->intervention(&it) == true) {
+        if (it.pause != 0) {
             // FIXME:
         }
-        if (it->status != 0) {
-            r->status = it->status;
+        if (it.status != 0) {
+            r->status = it.status;
         }
-        if (it->url != NULL) {
-            r->location = it->url;
+        if (it.url != NULL) {
+            r->location = it.url;
         }
     }
 }
@@ -61,13 +64,13 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
 
 void perform_unit_test(std::vector<RegressionTest *> *tests,
     ModSecurityTestResults<RegressionTest> *res, int *count) {
-    ModSecurity::ModSecurity *modsec;
-    ModSecurity::Rules *modsec_rules;
-    ModSecurity::Assay *modsec_assay;
 
     CustomDebugLog *debug_log = new CustomDebugLog();
 
     for (RegressionTest *t : *tests) {
+        ModSecurity::ModSecurity *modsec = NULL;
+        ModSecurity::Rules *modsec_rules = NULL;
+        ModSecurity::Assay *modsec_assay = NULL;
         ModSecurityTestResults<RegressionTest> r;
         r.status = 200;
         (*count)++;
@@ -123,7 +126,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         modsec_assay->processConnection(t->clientIp.c_str(),
             t->clientPort, t->serverIp.c_str(), t->serverPort);
 
-        actions(&r, modsec_assay->intervention());
+        actions(&r, modsec_assay);
         if (r.status != 200) {
              goto end;
         }
@@ -131,7 +134,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         modsec_assay->processURI(t->uri.c_str(), t->protocol.c_str(),
             t->httpVersion.c_str());
 
-        actions(&r, modsec_assay->intervention());
+        actions(&r, modsec_assay);
         if (r.status != 200) {
             goto end;
         }
@@ -143,7 +146,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         }
 
         modsec_assay->processRequestHeaders();
-        actions(&r, modsec_assay->intervention());
+        actions(&r, modsec_assay);
         if (r.status != 200) {
             goto end;
         }
@@ -152,7 +155,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
             (unsigned char *)t->request_body.c_str(),
             t->request_body.size());
         modsec_assay->processRequestBody();
-        actions(&r, modsec_assay->intervention());
+        actions(&r, modsec_assay);
         if (r.status != 200) {
             goto end;
         }
@@ -164,7 +167,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         }
 
         modsec_assay->processResponseHeaders();
-        actions(&r, modsec_assay->intervention());
+        actions(&r, modsec_assay);
         if (r.status != 200) {
             goto end;
         }
@@ -173,7 +176,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
             (unsigned char *)t->response_body.c_str(),
             t->response_body.size());
         modsec_assay->processResponseBody();
-        actions(&r, modsec_assay->intervention());
+        actions(&r, modsec_assay);
         if (r.status != 200) {
             goto end;
         }
@@ -208,6 +211,8 @@ after_debug_log:
 
         res->insert(res->end(), r.begin(), r.end());
     }
+
+    delete debug_log;
 }
 
 
@@ -241,7 +246,7 @@ int main(int argc, char **argv) {
     }
     keyList.sort();
 
-    for (std::string a : keyList) {
+    for (std::string &a : keyList) {
         std::vector<RegressionTest *> *tests = test[a];
         ModSecurityTestResults<RegressionTest> res;
 
@@ -251,8 +256,13 @@ int main(int argc, char **argv) {
     }
     test_log.close();
 
+    for (std::pair<std::string, std::vector<RegressionTest *> *> a : test) {
+        std::vector<RegressionTest *> *vec = a.second;
+        for (int i = 0; i < vec->size(); i++) {
+            delete vec->at(i);
+        }
+        delete vec;
+    }
+
     return 0;
 }
-
-
-

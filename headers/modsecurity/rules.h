@@ -49,7 +49,7 @@ class Rules : public RulesProperties  {
     Rules()
         : RulesProperties(NULL) { }
 
-    Rules(DebugLog *customLog)
+    explicit Rules(DebugLog *customLog)
         : RulesProperties(customLog) { }
 
     ~Rules();
@@ -75,6 +75,7 @@ class Rules : public RulesProperties  {
     std::ostringstream parserError;
 
     DebugLog *debugLog;
+
  private:
     int m_referenceCount;
 };

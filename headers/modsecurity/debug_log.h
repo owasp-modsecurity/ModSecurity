@@ -42,7 +42,8 @@ class DebugLog : public std::ofstream {
     */
     DebugLog()
         : m_is_configured(false),
-        m_debug_level(0) { }
+        m_debug_level(0),
+        m_referenceCount(0) { }
 
     bool setOutputFile(const std::string& file);
     virtual bool write_log(int level, const std::string& data);
@@ -53,6 +54,9 @@ class DebugLog : public std::ofstream {
 
     virtual DebugLog *new_instance();
 
+    void refCountDecreaseAndCheck(void);
+    void refCountIncrease(void);
+
  private:
         /*
         ModSecurityDebugLog(ModSecurityDebugLog const&);
@@ -60,6 +64,7 @@ class DebugLog : public std::ofstream {
         */
         int m_debug_level;
         bool m_is_configured;
+        int m_referenceCount;
 };
 
 }  // namespace ModSecurity

@@ -85,9 +85,11 @@ bool ModSecurityTest<T>::load_test_json(std::string file) {
             vec->push_back(u);
         }
     }
+
+    yajl_tree_free(node);
+
     return true;
 }
-
 
 
 template <class T>

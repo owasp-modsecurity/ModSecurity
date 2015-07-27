@@ -75,7 +75,7 @@ class Driver : public RulesProperties {
     void error(const yy::location& l, const std::string& m,
         const std::string& c);
 
-    std::list<yy::location> loc;
+    std::list<yy::location *> loc;
 
     std::list<std::string> ref;
     std::string buffer;

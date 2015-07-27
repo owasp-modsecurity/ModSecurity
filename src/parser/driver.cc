@@ -32,6 +32,7 @@ Driver::Driver()
 
 
 Driver::~Driver() {
+    delete loc.back();
 }
 
 
@@ -70,7 +71,7 @@ int Driver::addSecRule(Rule *rule) {
 
 
 int Driver::parse(const std::string &f, const std::string &ref) {
-    loc.push_back(*(new yy::location()));
+    loc.push_back(new yy::location());
     if (ref.empty()) {
         this->ref.push_back("<<reference missing or not informed>>");
     } else {

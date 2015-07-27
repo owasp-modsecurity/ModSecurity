@@ -33,9 +33,9 @@ class AuditLogWriter {
  public:
     explicit AuditLogWriter(AuditLog *audit)
         : m_audit(audit),
-        m_refereceCount(1) { }
+        m_refereceCount(0) { }
 
-    ~AuditLogWriter() { }
+    virtual ~AuditLogWriter() { }
 
     virtual void refCountIncrease() = 0;
     virtual void refCountDecreaseAndCheck() = 0;

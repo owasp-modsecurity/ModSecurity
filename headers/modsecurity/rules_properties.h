@@ -27,7 +27,6 @@
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/assay.h"
-#include "modsecurity/assay.h"
 
 #ifdef __cplusplus
 
@@ -61,7 +60,7 @@ class RulesProperties {
         responseBodyLimitAction(ProcessPartialBodyLimitAction),
         secRuleEngine(DetectionOnlyRuleEngine) { }
 
-    ~RulesProperties() { };
+    ~RulesProperties() { }
 
     std::vector<Rule *> rules[7];  // ModSecurity::Phases::NUMBER_OF_PHASES
 
@@ -174,10 +173,7 @@ class RulesProperties {
     AuditLog *audit_log;
 
     OnFailedRemoteRulesAction remoteRulesActionOnFailed;
-
-
 };
-
 #endif
 
 #ifdef __cplusplus

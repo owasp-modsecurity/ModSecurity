@@ -23,12 +23,13 @@
 namespace ModSecurity {
 namespace actions {
 
-Redirect::Redirect(std::string action)
-    : Action(action) {
-    this->url = action;
-    this->url.erase(0, 9);
-    this->action = action;
-    this->action_kind = 2;
+Redirect::~Redirect() {
+}
+
+Redirect::Redirect(const std::string& action)
+    : Action(action, RunTimeOnlyIfMatchKind),
+    url(action) {
+    this->url = this->url.erase(0, 9);
     this->status = 302;
 }
 

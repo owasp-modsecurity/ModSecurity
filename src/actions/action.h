@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <iostream>
 
 #include "modsecurity/intervention.h"
 
@@ -31,13 +32,16 @@ namespace actions {
 
 class Action {
  public:
-    explicit Action(std::string _action)
+    explicit Action(const std::string& _action)
         : action_kind(2),
-        action(_action) { }
-    explicit Action(std::string _action, int kind)
+        action(_action),
+        temporaryAction(false) { }
+    explicit Action(const std::string& _action, int kind)
         : action_kind(kind),
-        action(_action) { }
+        action(_action),
+        temporaryAction(false) { }
 
+    virtual ~Action() { }
     /**
      *
      * Define the action kind regarding to the execution time.
@@ -79,9 +83,10 @@ class Action {
     virtual bool evaluate(Assay *assay);
     virtual bool evaluate(Rule *rule);
 
-    static Action *instantiate(std::string action);
+    static Action *instantiate(const std::string& name);
 
     virtual void fill_intervention(ModSecurityIntervention *intervention);
+    bool temporaryAction;
 };
 
 

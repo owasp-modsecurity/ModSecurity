@@ -128,6 +128,12 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
 
 
 Assay::~Assay() {
+    m_responseBody.str(std::string());
+    m_responseBody.clear();
+
+    m_requestBody.str(std::string());
+    m_requestBody.clear();
+
     m_rules->decrementReferenceCount();
 }
 
@@ -637,6 +643,7 @@ int Assay::appendRequestBody(const unsigned char *buf, size_t len) {
                 debug(5, "Request body limit is marked to reject the " \
                     "request");
                 Action *a = new actions::Block("block");
+                a->temporaryAction = true;
                 actions.push_back(a);
             }
             return true;
@@ -833,6 +840,7 @@ int Assay::appendResponseBody(const unsigned char *buf, size_t len) {
                 debug(5, "Response body limit is marked to reject the " \
                     "request");
                 Action *a = new actions::Block("block");
+                a->temporaryAction = true;
                 actions.push_back(a);
             }
             return true;
@@ -930,12 +938,6 @@ int Assay::processLogging(int returned_code) {
  *
  */
 void Assay::cleanup() {
-    m_responseBody.str("");
-    m_responseBody.clear();
-
-    m_requestBody.str("");
-    m_requestBody.clear();
-
     delete this;
 }
 
@@ -946,32 +948,25 @@ void Assay::cleanup() {
  *
  * Intervention can generate a log event and/or perform a disruptive action.
  *
- * @return Pointer to ModSecurityIntervention structure
- * @retval >0   A intervention should be made.
- * @retval NULL Nothing to be done.
+ * @param Pointer ModSecurityIntervention structure
+ * @retval true  A intervention should be made.
+ * @retval false Nothing to be done.
  *
  */
-ModSecurityIntervention *Assay::intervention() {
-    ModSecurityIntervention *ret = NULL;
-
-    /**
-     * FIXME: Implement this.
-     * 
-     */
+bool Assay::intervention(ModSecurityIntervention *it) {
+    bool ret = false;
     if (actions.size() > 0) {
         for (Action *a : actions) {
             if (a->action_kind == Action::Kind::RunTimeOnlyIfMatchKind) {
-                if (ret == NULL) {
-                    ret = static_cast<ModSecurityIntervention *>(calloc( \
-                        1, sizeof(struct ModSecurityIntervention_t)));
-                    ret->status = 200;
-                }
-                a->fill_intervention(ret);
+                a->fill_intervention(it);
+            }
+            if (a->temporaryAction) {
+                delete a;
             }
         }
         actions.clear();
+        ret = true;
     }
-
     return ret;
 }
 
@@ -1684,8 +1679,8 @@ extern "C" void msc_assay_cleanup(Assay *assay) {
  * @retval NULL Nothing to be done.
  *
  */
-extern "C" ModSecurityIntervention *msc_intervention(Assay *assay) {
-    return assay->intervention();
+extern "C" int msc_intervention(Assay *assay, ModSecurityIntervention *it) {
+    return assay->intervention(it);
 }
 
 

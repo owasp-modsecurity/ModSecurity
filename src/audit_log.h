@@ -44,7 +44,7 @@ class AuditLog {
         m_relevant(""),
         filePermission(0600),
         directoryPermission(0600),
-        m_refereceCount(1)
+        m_refereceCount(0)
         { }
 
     ~AuditLog();

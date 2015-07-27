@@ -123,4 +123,17 @@ bool DebugLog::isConfigured() {
 }
 
 
+void DebugLog::refCountDecreaseAndCheck(void) {
+    this->m_referenceCount--;
+    if (this->m_referenceCount == 0) {
+        delete this;
+    }
+}
+
+
+void DebugLog::refCountIncrease(void) {
+    this->m_referenceCount++;
+}
+
+
 }  // namespace ModSecurity

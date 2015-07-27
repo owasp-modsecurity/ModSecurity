@@ -40,12 +40,17 @@ std::list<std::pair<std::string, std::string>>
     std::map<std::string, std::string> envs;
     for (char **current = environ; *current; current++) {
         std::string env = std::string(*current);
-        std::vector<std::string> key_value = split(env, '=');
-        envs.insert(std::pair<std::string, std::string>("ENV:" + key_value[0],
-            key_value[1]));
-        if ("env:" + key_value[0] == name) {
+        size_t pos = env.find_first_of("=");
+        if (pos == std::string::npos) {
+            continue;
+        }
+        std::string key = std::string(env, 0, pos);
+        std::string value = std::string(env, pos+1, env.length() - (pos + 1));
+
+        envs.insert(std::pair<std::string, std::string>("ENV:" + key, value));
+        if ("env:" + key == name) {
             std::pair<std::string, std::string> pair;
-            pair = std::make_pair(name, key_value[1]);
+            pair = std::make_pair(name, value);
             resl.push_back(pair);
             return resl;
         }

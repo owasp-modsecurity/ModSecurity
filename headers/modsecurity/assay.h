@@ -157,7 +157,7 @@ class Assay {
 
     int processLogging(int status_code);
 
-    ModSecurityIntervention *intervention();
+    bool intervention(ModSecurityIntervention *it);
 
     void cleanup();
 
@@ -281,7 +281,7 @@ int msc_get_response_body_length(Assay *assay);
 void msc_assay_cleanup(Assay *assay);
 
 /** @ingroup ModSecurity_C_API */
-ModSecurityIntervention *msc_intervention(Assay *assay);
+int msc_intervention(Assay *assay, ModSecurityIntervention *it);
 
 /** @ingroup ModSecurity_C_API */
 int msc_process_logging(Assay *assay, int code);

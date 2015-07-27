@@ -112,6 +112,7 @@ bool AuditLog::init() {
     if (m_type == SerialAuditLogType) {
         m_writer = new AuditLogWriterSerial(this);
     }
+    m_writer->refCountIncrease();
 
     if (m_writer == NULL || m_writer->init() == false) {
         std::cout << "not able to open the log for write." << std::endl;

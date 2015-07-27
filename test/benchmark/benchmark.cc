@@ -72,6 +72,7 @@ int main(int argc, char *argv[]) {
     int i = 0;
     ModSecurity::ModSecurity *modsec;
     ModSecurity::Rules *rules;
+    ModSecurity::ModSecurityIntervention it;
 
     modsec = new ModSecurity::ModSecurity();
     modsec->setConnectorInformation("ModSecurity-benchmark v0.0.1-alpha" \
@@ -86,12 +87,12 @@ int main(int argc, char *argv[]) {
         Assay *modsecAssay = new Assay(modsec, rules);
         modsecAssay->processConnection(ip, 12345, "127.0.0.1", 80);
 
-        if (modsecAssay->intervention()) {
+        if (modsecAssay->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             continue;
         }
         modsecAssay->processURI(request_uri, "GET", "1.1");
-        if (modsecAssay->intervention()) {
+        if (modsecAssay->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             continue;
         }
@@ -122,7 +123,7 @@ int main(int argc, char *argv[]) {
             "no-cache");
         modsecAssay->processRequestHeaders();
 
-        if (modsecAssay->intervention()) {
+        if (modsecAssay->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             continue;
         }
@@ -130,7 +131,7 @@ int main(int argc, char *argv[]) {
 
         modsecAssay->processRequestBody();
 
-        if (modsecAssay->intervention()) {
+        if (modsecAssay->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             continue;
         }
@@ -144,7 +145,7 @@ int main(int argc, char *argv[]) {
 
         modsecAssay->processResponseHeaders();
 
-        if (modsecAssay->intervention()) {
+        if (modsecAssay->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             continue;
         }
@@ -154,7 +155,7 @@ int main(int argc, char *argv[]) {
             strlen((const char*)response_body));
         modsecAssay->processResponseBody();
 
-        if (modsecAssay->intervention()) {
+        if (modsecAssay->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             continue;
         }

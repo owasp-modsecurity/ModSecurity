@@ -31,7 +31,7 @@ class AuditLogWriterParallel : public AuditLogWriter {
     explicit AuditLogWriterParallel(AuditLog *audit)
         : AuditLogWriter(audit) { }
 
-    ~AuditLogWriterParallel();
+    ~AuditLogWriterParallel() override;
     bool init() override;
     bool write(Assay *assay, int parts) override;
 

@@ -30,6 +30,7 @@ Multipart::Multipart(std:: string header)
     containsDataBefore(false),
     lf(false),
     missingSemicolon(false),
+    invalidQuote(false),
     boundaryStartsWithWhiteSpace(false),
     boundaryIsQuoted(false),
     m_header(header) {

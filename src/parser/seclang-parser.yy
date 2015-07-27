@@ -58,6 +58,21 @@ using ModSecurity::Variables::TimeWDay;
 using ModSecurity::Variables::TimeYear;
 using ModSecurity::Variables::Variable;
 
+/**
+ * %destructor { code } THING
+ *
+ * %destructor is not working as expected. Apparently it was fixed on a most recent,
+ * version of Bison. We are not interested to limit the usage to this newest version,
+ * thus, we have to deal with memory leak when rules failed to load. Not that big
+ * problem, as we don't really continue when it fails (only for SecRemoteRules).
+ *
+ * Information about destructor:
+ * http://www.gnu.org/software/bison/manual/html_node/Destructor-Decl.html
+ *
+ * Patch:
+ * https://www.mail-archive.com/search?l=bug-bison@gnu.org&q=subject:%22Destructor+miscompilation+with+C%2B%2B+variants%3F%22&o=newest&f=1
+ */
+
 }
 // The parsing context.
 %param { ModSecurity::Parser::Driver& driver }
@@ -153,6 +168,7 @@ using ModSecurity::Variables::Variable;
 
 %type <std::vector<Action *> *> actions
 %type <std::vector<Variable *> *> variables
+
 
 %printer { yyoutput << $$; } <*>;
 %%

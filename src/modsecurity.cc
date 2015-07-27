@@ -24,6 +24,8 @@
 #include <curl/curl.h>
 #endif
 
+#include "utils/geo_lookup.h"
+
 namespace ModSecurity {
 
 /**
@@ -52,6 +54,10 @@ ModSecurity::ModSecurity()
 
 
 ModSecurity::~ModSecurity() {
+#ifdef MSC_WITH_CURL
+    curl_global_cleanup();
+#endif
+    Utils::GeoLookup::getInstance().cleanUp();
 }
 
 
