@@ -21,14 +21,13 @@ namespace ModSecurity {
 namespace operators {
 
 bool Contains::evaluate(Assay *assay, const std::string &input) {
-    return input.find(this->param) != std::string::npos;
-}
+    bool contains = input.find(param) != std::string::npos;
 
-Contains::Contains(std::string _op, std::string _param,
-    bool negation)
-    : Operator() {
-    this->op = _op;
-    this->param = _param;
+    if (negation) {
+        return !contains;
+    }
+
+    return contains;
 }
 
 }  // namespace operators
