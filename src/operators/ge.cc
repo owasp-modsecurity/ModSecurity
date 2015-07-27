@@ -22,22 +22,16 @@
 namespace ModSecurity {
 namespace operators {
 
-bool Ge::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator Ge.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#ge
-     */
+bool Ge::evaluate(Assay *assay, const std::string &input) {
+    bool ge = atoll(input.c_str()) >= atoll(param.c_str());
 
-    return true;
+    if (negation) {
+        return !ge;
+    }
+
+    return ge;
 }
 
-
-Ge::Ge(std::string op, std::string param,
-    bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity

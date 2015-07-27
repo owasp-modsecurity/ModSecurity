@@ -27,8 +27,10 @@ namespace operators {
 class Ge : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Ge(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    Ge(std::string op, std::string param, bool negation)
+        : Operator(op, param, negation) { }
+
+    bool evaluate(Assay *assay, const std::string &input) override;
 };
 
 }  // namespace operators
