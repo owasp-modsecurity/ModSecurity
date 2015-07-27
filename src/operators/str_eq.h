@@ -30,7 +30,9 @@ namespace operators {
 class StrEq : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    StrEq(std::string o, std::string p, bool i);
+    StrEq(std::string op, std::string param, bool negation)
+        : Operator(op, param, negation) { }
+
     bool evaluate(Assay *assay, const std::string &str) override;
 };
 

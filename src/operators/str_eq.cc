@@ -21,19 +21,15 @@ namespace ModSecurity {
 namespace operators {
 
 bool StrEq::evaluate(Assay *assay, const std::string &str) {
-    /**
-     * @todo Implement the operator StrEq.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#streq
-     */
-    return !this->param.compare(str);
+    bool eq = !this->param.compare(str);
+
+    if (negation) {
+        return !eq;
+    }
+
+    return eq;
 }
 
-
-StrEq::StrEq(std::string op, std::string param, bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity
