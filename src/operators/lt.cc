@@ -22,20 +22,16 @@
 namespace ModSecurity {
 namespace operators {
 
-bool Lt::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator Lt.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#lt
-     */
-    return true;
+bool Lt::evaluate(Assay *assay, const std::string &input) {
+    bool lt = atoll(input.c_str()) < atoll(param.c_str());
+
+    if (negation) {
+        return !lt;
+    }
+
+    return lt;
 }
 
-
-Lt::Lt(std::string op, std::string param, bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity
