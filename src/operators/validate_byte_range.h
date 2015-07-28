@@ -27,8 +27,17 @@ namespace operators {
 class ValidateByteRange : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    ValidateByteRange(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    ValidateByteRange(std::string op, std::string param, bool negation)
+    : Operator(op, param, negation) { }
+
+    ~ValidateByteRange() override { }
+
+    bool evaluate(Assay *assay, const std::string &input) override;
+    bool getRange(const std::string &rangeRepresentation, const char **error);
+    bool init(const char **error) override;
+ private:
+    std::vector<std::string> ranges;
+    char table[32];
 };
 
 }  // namespace operators
