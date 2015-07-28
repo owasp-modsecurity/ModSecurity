@@ -54,9 +54,11 @@ void print_help() {
 
 
 void perform_unit_test(UnitTest *t, ModSecurityTestResults<UnitTest>* res) {
+    const char *error = NULL;
     ModSecurity::operators::Operator *op =
         ModSecurity::operators::Operator::instantiate("\"@" + t->name + \
             " " + t->param + "\"");
+    op->init(&error);
 
     int ret = op->evaluate(NULL, t->input);
     if (ret != t->ret) {

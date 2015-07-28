@@ -35,11 +35,12 @@ class Operator {
         param(param),
         negation(negation) { }
 
-
+    virtual ~Operator() { }
     std::string op;
     std::string param;
     bool negation;
 
+    virtual bool init(const char **error) { return true; }
     virtual bool evaluate(Assay *assay);
     virtual bool evaluate(Assay *assay, const std::string &str);
     static Operator *instantiate(std::string op);

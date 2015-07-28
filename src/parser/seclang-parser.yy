@@ -261,8 +261,14 @@ expression:
     audit_log
     | DIRECTIVE SPACE variables SPACE OPERATOR SPACE QUOTATION_MARK actions QUOTATION_MARK
       {
+        Operator *op = Operator::instantiate($5);
+        const char *error = NULL;
+        if (op->init(&error) == false) {
+            driver.parserError << error;
+            YYERROR;
+        }
         Rule *rule = new Rule(
-            /* op */ Operator::instantiate($5),
+            /* op */ op,
             /* variables */ $3,
             /* actions */ $8
             );
