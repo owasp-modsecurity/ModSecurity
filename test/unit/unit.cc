@@ -65,6 +65,7 @@ void perform_unit_test(UnitTest *t, ModSecurityTestResults<UnitTest>* res) {
         t->obtained = ret;
         res->push_back(t);
     }
+    delete op;
 }
 
 
@@ -113,6 +114,15 @@ int main(int argc, char **argv) {
     } else {
         std::cout << KRED << results.size() << " failed." << RESET << std::endl;
     }
+
+    for (std::pair<std::string, std::vector<UnitTest *> *> a : test) {
+        std::vector<UnitTest *> *vec = a.second;
+        for (int i = 0; i < vec->size(); i++) {
+            delete vec->at(i);
+        }
+        delete vec;
+    }
+
 }
 
 
