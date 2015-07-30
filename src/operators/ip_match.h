@@ -19,6 +19,7 @@
 #include <string>
 
 #include "operators/operator.h"
+#include "utils/ip_tree.h"
 
 #ifdef __cplusplus
 namespace ModSecurity {
@@ -27,8 +28,15 @@ namespace operators {
 class IpMatch : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    IpMatch(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    IpMatch(std::string op, std::string param, bool negation)
+        : Operator(op, param, negation) { }
+
+    bool evaluate(Assay *assay, const std::string &input);
+
+    bool init(const char **error);
+
+ private:
+    Utils::IpTree m_tree;
 };
 
 }  // namespace operators

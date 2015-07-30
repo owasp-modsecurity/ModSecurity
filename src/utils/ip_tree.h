@@ -13,34 +13,38 @@
  *
  */
 
-#include "operators/ip_match.h"
-
-#include <string.h>
+#include <iostream>
+#include <fstream>
 #include <string>
+#include <functional>
 
+#include <GeoIPCity.h>
+
+#ifndef SRC_UTILS_IP_TREE_H_
+#define SRC_UTILS_IP_TREE_H_
+
+#include "modsecurity/assay.h"
 #include "utils/msc_tree.h"
-#include "operators/operator.h"
 
 namespace ModSecurity {
-namespace operators {
+namespace Utils {
 
 
-bool IpMatch::init(const char **error) {
-    std::string e("");
-    bool res = m_tree.addFromBuffer(param, &e);
+class IpTree {
+ public:
+    IpTree()
+        : m_tree(NULL) { }
+    ~IpTree();
 
-    if (res == false) {
-        *error = e.c_str();
-    }
-
-    return res;
-}
-
-
-bool IpMatch::evaluate(Assay *assay, const std::string &input) {
-    return m_tree.contains(input);
-}
+    bool contains(const std::string &ip);
+    bool addFromBuffer(const std::string& buffer, std::string *error);
+    void postOrderTraversal(TreeNode *node);
+ private:
+    TreeRoot *m_tree;
+};
 
 
-}  // namespace operators
+}  // namespace Utils
 }  // namespace ModSecurity
+
+#endif  // SRC_UTILS_IP_TREE_H_
