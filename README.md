@@ -1,12 +1,17 @@
 # Introduction
 
-Libmodsecurity is one component of the ModSecurity v3 project. The library codebase serves as an interface to ModSecurity Connectors taking in web traffic and applying traditional ModSecurity processing. In general, it provides the capability to load/interpret rules written in the ModSecurity SecRules format and apply them to HTTP content provided by your application via Connectors.
+Libmodsecurity is one component of the ModSecurity v3 project. The library
+codebase serves as an interface to ModSecurity Connectors taking in web traffic
+and applying traditional ModSecurity processing. In general, it provides the
+capability to load/interpret rules written in the ModSecurity SecRules format
+and apply them to HTTP content provided by your application via Connectors.
 
-Currently, libmodsecurity is known to be compatible with the following Connectors:
-ModSecurity Nginx Connector (ModSecurity-nginx).
+Currently, libmodsecurity is known to be compatible with the following
+Connectors: ModSecurity Nginx Connector (ModSecurity-nginx).
 
 _Notice: This project is under development and it is NOT ready to be placed in
-production yet. It currently does not support all the operators and/or actions of the SecRules language, yet._
+production yet. It currently does not support all the operators and/or actions
+of the SecRules language, yet._
 
 
 ### What is the difference between this project and the old ModSecurity (v2.x.x)?
