@@ -25,7 +25,6 @@
 #include <fstream>
 #include <vector>
 #include <utility>
-#include <chrono>
 #endif
 
 #include <stdlib.h>
@@ -189,7 +188,7 @@ class Assay {
 
     std::string id;
     time_t timeStamp;
-    std::chrono::system_clock::time_point start;
+    clock_t start;
     int highest_severity;
 
  private:

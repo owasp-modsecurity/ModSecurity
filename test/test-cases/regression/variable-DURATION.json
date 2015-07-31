@@ -37,7 +37,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"[0-9]+\""
+      "debug_log":"Target value: \"[0-9\\.]+\""
     },
     "rules":[
       "SecRuleEngine On",

@@ -27,6 +27,7 @@
 #include <vector>
 #include <iomanip>
 #include <set>
+#include <cstdio>
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/intervention.h"
@@ -102,7 +103,7 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     m_requestBodyType(UnknownFormat),
     m_requestHeadersNames(NULL),
     m_responseHeadersNames(NULL),
-    start(std::chrono::system_clock::now()),
+    start(cpu_seconds()),
     m_ms(ms) {
     id = std::to_string(this->timeStamp) + \
         std::to_string(generate_assay_unique_id());

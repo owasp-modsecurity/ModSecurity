@@ -32,6 +32,7 @@ namespace ModSecurity {
     void chomp(std::string *str);
     std::string uri_decode(const std::string & sSrc);
     std::string tolower(std::string str);
+    double cpu_seconds(void);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_

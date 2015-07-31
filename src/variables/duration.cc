@@ -19,10 +19,10 @@
 #include <string>
 #include <vector>
 #include <list>
-#include <chrono>
 #include <utility>
 
 #include "modsecurity/assay.h"
+#include "src/utils.h"
 
 namespace ModSecurity {
 namespace Variables {
@@ -33,10 +33,9 @@ std::list<std::pair<std::string, std::string>>
     std::string res;
     std::pair<std::string, std::string> pair;
 
-    auto e = std::chrono::high_resolution_clock::now() - assay->start;
+    double e = cpu_seconds() - assay->start;
 
-    res = std::to_string(
-        std::chrono::duration_cast<std::chrono::microseconds>(e).count());
+    res = std::to_string(e);
 
     pair = std::make_pair(std::string("DURATION"), std::string(res));
     resl.push_back(pair);
