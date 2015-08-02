@@ -56,6 +56,12 @@ else
 fi
 
 
+#
+# Check for libpcre
+#
+CHECK_PCRE
+
+
 
 # Checks for header files.
 AC_HEADER_STDC

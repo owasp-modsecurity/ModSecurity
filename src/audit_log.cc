@@ -20,10 +20,10 @@
 #include <ctype.h>
 
 #include <fstream>
-#include <regex>
 
 #include "src/audit_log_writer_parallel.h"
 #include "src/audit_log_writer_serial.h"
+#include "utils/regex.h"
 
 #define PARTS_CONSTAINS(a, c) \
     if (new_parts.find(toupper(a)) != std::string::npos \
@@ -134,7 +134,8 @@ bool AuditLog::init() {
 
 bool AuditLog::isRelevant(int status) {
     std::string sstatus = std::to_string(status);
-    return std::regex_search(sstatus, std::regex(this->m_relevant)) != 0;
+    return Utils::regex_search(sstatus,
+        Utils::Regex(this->m_relevant)) != 0;
 }
 
 

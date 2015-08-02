@@ -17,9 +17,9 @@
 
 #include <iostream>
 #include <string>
-#include <regex>
 
 #include "modsecurity/debug_log.h"
+#include "utils/regex.h"
 
 namespace modsecurity_test {
 
@@ -34,10 +34,11 @@ bool CustomDebugLog::write_log(int level, const std::string& message) {
 
 
 bool CustomDebugLog::contains(const std::string& pattern) {
-    std::regex re(pattern);
-    std::smatch match;
+    ModSecurity::Utils::Regex re(pattern);
+    ModSecurity::Utils::SMatch match;
     std::string s = m_log.str();
-    return (std::regex_search(s, match, re) && match.size() >= 1);
+    return (ModSecurity::Utils::regex_search(s, &match, re)
+        && match.size() >= 1);
 }
 
 std::string CustomDebugLog::log_messages() {

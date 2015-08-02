@@ -102,6 +102,7 @@ UTILS = \
 	utils/ip_tree.cc \
 	utils/md5.cc \
 	utils/msc_tree.cc \
+	utils/regex.cc \
 	utils/sha1.cc
 
 
@@ -174,12 +175,14 @@ libmodsecurity_la_CPPFLAGS = \
 	-I.. \
 	-g \
 	-O0 \
-	-I ../headers
+	-I ../headers \
+	$(PCRE_CPPFLAGS)
 
 libmodsecurity_la_LIBADD = \
         $(CURL_LDADD) \
         $(GEOIP_LDADD) \
         @LEXLIB@ \
+        $(PCRE_LDADD) \
         $(YAJL_LDADD)
 
 

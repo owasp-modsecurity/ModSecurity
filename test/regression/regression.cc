@@ -19,7 +19,6 @@
 #include <iostream>
 #include <string>
 #include <list>
-#include <regex>
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
@@ -28,11 +27,16 @@
 #include "regression/regression_test.h"
 #include "common/modsecurity_test_results.h"
 #include "regression/custom_debug_log.h"
+#include "utils/regex.h"
 
 using modsecurity_test::CustomDebugLog;
 using modsecurity_test::ModSecurityTest;
 using modsecurity_test::ModSecurityTestResults;
 using modsecurity_test::RegressionTest;
+
+using ModSecurity::Utils::regex_search;
+using ModSecurity::Utils::SMatch;
+using ModSecurity::Utils::Regex;
 
 std::string default_test_path = "test-cases/regression";
 
@@ -100,11 +104,11 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
                 return;
             }
 
-            std::regex re(t->parser_error);
-            std::smatch match;
+            Regex re(t->parser_error);
+            SMatch match;
             std::string s = modsec_rules->getParserError();
 
-            if (std::regex_search(s, match, re) && match.size() >= 1) {
+            if (regex_search(s, &match, re) && match.size() >= 1) {
                 std::cout << "passed!" << std::endl;
                 return;
             } else {

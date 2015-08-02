@@ -27,6 +27,7 @@ unit_tests_LDADD = \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
+	$(PCRE_LDADD) \
 	$(YAJL_LDADD)
 
 unit_tests_CPPFLAGS = \
@@ -37,6 +38,7 @@ unit_tests_CPPFLAGS = \
 	-I$(top_builddir)/headers \
 	$(CURL_CFLAGS) \
 	$(GEOIP_CFLAGS) \
+	$(PCRE_CPPFLAGS) \
 	$(YAJL_CFLAGS)
 
 
@@ -51,6 +53,7 @@ regression_tests_LDADD = \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
+	$(PCRE_LDADD) \
 	$(YAJL_LDADD)
 
 regression_tests_CPPFLAGS = \
@@ -61,4 +64,5 @@ regression_tests_CPPFLAGS = \
 	-I$(top_builddir)/headers \
 	$(CURL_CFLAGS) \
 	$(GEOIP_CFLAGS) \
+	$(PCRE_CPPFLAGS) \
 	$(YAJL_CFLAGS)
