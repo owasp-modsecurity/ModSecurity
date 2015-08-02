@@ -16,7 +16,6 @@
 #include "operators/contains_word.h"
 
 #include <string>
-#include <regex>
 
 #include "operators/operator.h"
 
@@ -42,13 +41,13 @@ bool ContainsWord::evaluate(Assay *assay,
         return 1;
     }
 
-    std::regex r("\\b" + this->param + "\\b");
-    std::smatch m;
-    if (std::regex_search(input, m, r)) {
+    // std::regex r("\\b" + this->param + "\\b");
+    // std::smatch m;
+    // if (std::regex_search(input, m, r)) {
         // this won't find anything because 'spoons' is not
         // the word you're searching for
-        return 1;
-    }
+    //    return 1;
+    // }
 
     return 0;
 }
