@@ -37,8 +37,11 @@ class IpTree {
     ~IpTree();
 
     bool contains(const std::string &ip);
-    bool addFromBuffer(const std::string& buffer, std::string *error);
     void postOrderTraversal(TreeNode *node);
+    bool addFromBuffer(std::istream *ss, std::string *error);
+    bool addFromBuffer(const std::string& buffer, std::string *error);
+    bool addFromFile(const std::string& file, std::string *error);
+    bool addFromUrl(const std::string& url, std::string *error);
  private:
     TreeRoot *m_tree;
 };

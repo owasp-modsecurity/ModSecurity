@@ -25,6 +25,7 @@
 #include <iostream>
 
 #include "utils/geo_lookup.h"
+#include "utils/https_client.h"
 
 namespace ModSecurity {
 namespace Utils {
@@ -77,16 +78,12 @@ IpTree::~IpTree() {
     }
 }
 
-
-bool IpTree::addFromBuffer(const std::string& buffer, std::string *error) {
+bool IpTree::addFromBuffer(std::istream *ss, std::string *error) {
     char *error_msg = NULL;
-    std::stringstream ss;
-    std::string line;
-    ss << buffer;
     int res = 0;
 
-    for (std::string line; std::getline(ss, line); ) {
-        res = ip_tree_from_param(buffer.c_str(), &m_tree, &error_msg);
+    for (std::string line; std::getline(*ss, line); ) {
+        res = ip_tree_from_param(line.c_str(), &m_tree, &error_msg);
         if (res != 0) {
             if (error_msg != NULL) {
                 error->assign(error_msg);
@@ -96,6 +93,40 @@ bool IpTree::addFromBuffer(const std::string& buffer, std::string *error) {
     }
 
     return true;
+}
+
+
+bool IpTree::addFromBuffer(const std::string& buffer, std::string *error) {
+    std::stringstream ss;
+    ss << buffer;
+
+    return addFromBuffer(&ss, error);
+}
+
+
+bool IpTree::addFromFile(const std::string& file, std::string *error) {
+    std::ifstream myfile(file, std::ios::in);
+
+    if (myfile.is_open() == false) {
+        error->assign("Failed to open file: " + file);
+        return false;
+    }
+
+    return addFromBuffer(&myfile, error);
+}
+
+
+bool IpTree::addFromUrl(const std::string& url, std::string *error) {
+    HttpsClient c;
+    bool ret = c.download(url);
+
+    if (ret == false) {
+        error->assign(c.error);
+    } else {
+        ret = addFromBuffer(c.content, error);
+    }
+
+    return ret;
 }
 
 

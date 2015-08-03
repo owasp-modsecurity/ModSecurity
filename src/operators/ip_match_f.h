@@ -18,17 +18,16 @@
 
 #include <string>
 
-#include "operators/operator.h"
+#include "operators/ip_match_from_file.h"
 
 #ifdef __cplusplus
 namespace ModSecurity {
 namespace operators {
 
-class IpMatchF : public Operator {
+class IpMatchF : public IpMatchFromFile {
  public:
-    /** @ingroup ModSecurity_Operator */
-    IpMatchF(std::string p, std::string o, bool i);
-    bool evaluate(Assay *assay);
+    IpMatchF(std::string op, std::string param, bool negation)
+        : IpMatchFromFile(op, param, negation) { }
 };
 
 }  // namespace operators

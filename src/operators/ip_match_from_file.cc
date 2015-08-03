@@ -22,21 +22,24 @@
 namespace ModSecurity {
 namespace operators {
 
-bool IpMatchFromFile::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator IpMatchFromFile.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#ipmatchfromfile
-     */
-    return true;
+
+bool IpMatchFromFile::init(const char **error) {
+    std::string e("");
+    bool res = false;
+
+    if (param.compare(0, 8, "https://") == 0) {
+        res = m_tree.addFromUrl(param, &e);
+    } else {
+        res = m_tree.addFromFile(param, &e);
+    }
+
+    if (res == false) {
+        *error = e.c_str();
+    }
+
+    return res;
 }
 
-
-IpMatchFromFile::IpMatchFromFile(std::string op, std::string param,
-    bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity

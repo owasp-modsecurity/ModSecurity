@@ -22,21 +22,6 @@
 namespace ModSecurity {
 namespace operators {
 
-bool IpMatchF::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator IpMatchF.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#ipmatchf
-     */
-    return true;
-}
-
-
-IpMatchF::IpMatchF(std::string op, std::string param,
-    bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity
