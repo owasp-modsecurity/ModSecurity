@@ -17,6 +17,7 @@
 #define SRC_OPERATORS_VALIDATE_BYTE_RANGE_H_
 
 #include <string>
+#include <vector>
 
 #include "operators/operator.h"
 
@@ -28,7 +29,7 @@ class ValidateByteRange : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     ValidateByteRange(std::string op, std::string param, bool negation)
-    : Operator(op, param, negation) { }
+        : Operator(op, param, negation) { }
 
     ~ValidateByteRange() override { }
 
