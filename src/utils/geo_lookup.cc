@@ -56,7 +56,10 @@ bool GeoLookup::setDataBase(const std::string& filePath) {
 bool GeoLookup::lookup(const std::string& target, GeoIPRecord **gir,
     std::function<bool(int, std::string)> debug) {
     if (m_gi == NULL) {
-        debug(4, "GeoIP: Database is not open. Use: SecGeoLookupDb directive.");
+        if (debug) {
+            debug(4, "GeoIP: Database is not open. " \
+                "Use: SecGeoLookupDb directive.");
+        }
         return false;
     }
 

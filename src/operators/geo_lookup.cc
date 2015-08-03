@@ -35,9 +35,13 @@ bool GeoLookup::evaluate(Assay *assay, const std::string &exp) {
     GeoIPRecord *gir;
     bool ret = true;
 
-    //bool ret = Utils::GeoLookup::getInstance().lookup(exp, &gir,
-    //    std::bind(&GeoLookup::debug, this, assay, _1, _2));
-
+    if (assay) {
+        ret = Utils::GeoLookup::getInstance().lookup(exp, &gir,
+            std::bind(&GeoLookup::debug, this, assay, _1, _2));
+    } else {
+        ret = Utils::GeoLookup::getInstance().lookup(exp, &gir,
+            nullptr);
+    }
     if (ret && gir) {
         if (gir->country_code) {
             assay->store_variable("GEO:COUNTRY_CODE", gir->country_code);
