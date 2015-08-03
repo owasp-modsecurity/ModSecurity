@@ -19,17 +19,30 @@
 #include <string>
 
 #include "operators/operator.h"
+#include "utils/regex.h"
 
 #ifdef __cplusplus
 namespace ModSecurity {
+using Utils::SMatch;
+using Utils::regex_search;
+using Utils::Regex;
+
 namespace operators {
+
 
 class Rx : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Rx(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    Rx(std::string op, std::string param, bool negation)
+        : Operator(op, param, negation),
+        m_re(param) { }
+
+    bool evaluate(Assay *assay, const std::string &input);
+ private:
+    Regex m_re;
 };
+
+
 }  // namespace operators
 }  // namespace ModSecurity
 

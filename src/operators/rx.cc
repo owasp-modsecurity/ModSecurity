@@ -22,20 +22,17 @@
 namespace ModSecurity {
 namespace operators {
 
-bool Rx::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator Rx.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#rx
-     */
-    return true;
+
+bool Rx::evaluate(Assay *assay, const std::string& input) {
+    SMatch match;
+
+    if (regex_search(input, &match, m_re) && match.size() >= 1) {
+        return true;
+    }
+
+    return false;
 }
 
-
-Rx::Rx(std::string op, std::string param, bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity
