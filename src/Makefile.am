@@ -97,6 +97,7 @@ ACTIONS = \
 
 
 UTILS = \
+	utils/acmp.cc \
 	utils/geo_lookup.cc \
 	utils/https_client.cc \
 	utils/ip_tree.cc \
@@ -174,6 +175,7 @@ libmodsecurity_la_CPPFLAGS = \
 	-std=c++11 \
 	-I.. \
 	-g \
+	-fPIC \
 	-O0 \
 	-I ../headers \
 	$(PCRE_CPPFLAGS)

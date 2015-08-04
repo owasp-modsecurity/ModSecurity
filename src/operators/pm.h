@@ -19,17 +19,31 @@
 #include <string>
 
 #include "operators/operator.h"
+#include "utils/acmp.h"
 
 #ifdef __cplusplus
 namespace ModSecurity {
 namespace operators {
 
+
 class Pm : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Pm(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    Pm(std::string op, std::string param, bool negation)
+        : Operator(op, param, negation) {
+        m_p = acmp_create(0);
+    }
+    ~Pm();
+
+    bool evaluate(Assay *assay, const std::string &input);
+
+    virtual bool init(const char **error);
+    void postOrderTraversal(acmp_btree_node_t *node);
+
+ protected:
+    ACMP *m_p;
 };
+
 
 }  // namespace operators
 }  // namespace ModSecurity
