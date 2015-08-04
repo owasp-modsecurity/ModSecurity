@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "operators/operator.h"
+#include "utils/acmp.h"
 
 namespace ModSecurity {
 namespace operators {
@@ -76,6 +77,11 @@ bool Pm::evaluate(Assay *assay, const std::string &input) {
 
 bool Pm::init(const char **error) {
     std::vector<std::string> vec;
+
+    char *content = parse_pm_content(param.c_str(), param.length(), error);
+    if (content == NULL) {
+        return false;
+    }
 
     std::istringstream iss(param);
     std::copy(std::istream_iterator<std::string>(iss),
