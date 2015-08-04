@@ -353,6 +353,20 @@ int Assay::addRequestHeader(const std::string& key,
         this->store_variable("AUTH_TYPE", type[0]);
     }
 
+    if (tolower(key) == "cookie") {
+        std::vector<std::string> cookies = split(value, ';');
+        while (cookies.empty() == false) {
+            std::vector<std::string> s = split(cookies.back(), '=');
+            if (s.size() > 1) {
+                if (s[0].at(0) == ' ') {
+                    s[0].erase(0, 1);
+                }
+                this->store_variable("REQUEST_COOKIES:" + s[0], s[1]);
+                this->store_variable("REQUEST_COOKIES_NAMES:" + s[0], s[0]);
+            }
+            cookies.pop_back();
+        }
+    }
     /**
      * Simple check to decide the request body content. This is not the right
      * place, the "body processor" should be able to tell what he is capable
