@@ -18,18 +18,20 @@
 
 #include <string>
 
-#include "operators/operator.h"
+#include "operators/pm_from_file.h"
 
 #ifdef __cplusplus
 namespace ModSecurity {
 namespace operators {
 
-class PmF : public Operator {
+
+class PmF : public PmFromFile {
  public:
     /** @ingroup ModSecurity_Operator */
-    PmF(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    PmF(std::string op, std::string param, bool negation)
+        : PmFromFile(op, param, negation) { }
 };
+
 
 }  // namespace operators
 }  // namespace ModSecurity

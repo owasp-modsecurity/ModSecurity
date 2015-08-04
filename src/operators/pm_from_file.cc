@@ -18,24 +18,41 @@
 #include <string>
 
 #include "operators/operator.h"
+#include "utils/https_client.h"
 
 namespace ModSecurity {
 namespace operators {
 
-bool PmFromFile::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator PmFromFile.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#pmfromfile
-     */
+
+bool PmFromFile::init(const char **error) {
+    std::istream *iss;
+
+    if (param.compare(0, 8, "https://") == 0) {
+        Utils::HttpsClient client;
+        bool ret = client.download(param);
+        if (ret == false) {
+            *error = client.error.c_str();
+            return false;
+        }
+        iss = new std::stringstream(client.content);
+    } else {
+        iss = new std::ifstream(param, std::ios::in);
+
+        if (((std::ifstream *)iss)->is_open() == false) {
+            *error = std::string("Failed to open file: " + param).c_str();
+            return false;
+        }
+    }
+
+    for (std::string line; std::getline(*iss, line); ) {
+        acmp_add_pattern(m_p, line.c_str(), NULL, NULL, line.length());
+    }
+
+    acmp_prepare(m_p);
+
     return true;
 }
 
-
-PmFromFile::PmFromFile(std::string op, std::string param, bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity

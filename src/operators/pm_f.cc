@@ -17,25 +17,11 @@
 
 #include <string>
 
-#include "operators/operator.h"
+#include "operators/pm_from_file.h"
 
 namespace ModSecurity {
 namespace operators {
 
-bool PmF::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator PmF.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#pmf
-     */
-    return true;
-}
-
-
-PmF::PmF(std::string op, std::string param, bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity
