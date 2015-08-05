@@ -15,6 +15,8 @@
 
 #include "actions/transformations/js_decode.h"
 
+#include <string.h>
+
 #include <iostream>
 #include <string>
 #include <algorithm>
@@ -24,25 +26,25 @@
 
 #include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
+#include "src/utils.h"
 
 
 namespace ModSecurity {
 namespace actions {
 namespace transformations {
 
-JsDecode::JsDecode(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 std::string JsDecode::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation JsDecode
-     */
-    assay->debug(4, "Transformation JsDecode is not implemented yet.");
-    return value;
+    char *tmp = strdup(value.c_str());
+    int res = js_decode_nonstrict_inplace((unsigned char *)tmp, value.size());
+    std::string ret("");
+    ret.assign(tmp);
+    free(tmp);
+
+    return ret;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

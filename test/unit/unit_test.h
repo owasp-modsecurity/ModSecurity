@@ -36,8 +36,10 @@ class UnitTest {
     std::string name;
     std::string type;
     std::string filename;
+    std::string output;
     int ret;
     int obtained;
+    std::string obtainedOutput;
 };
 
 }  // namespace modsecurity_test

@@ -30,7 +30,12 @@ namespace transformations {
 
 class Transformation : public Action {
  public:
-    explicit Transformation(std::string action);
+    explicit Transformation(const std::string& _action)
+        : Action(_action, RunTimeBeforeMatchAttemptKind) { }
+
+    explicit Transformation(const std::string& _action, int kind)
+        : Action(_action, kind) { }
+
     static Transformation* instantiate(std::string);
 
     std::string evaluate(std::string exp,

@@ -33,6 +33,8 @@ namespace ModSecurity {
     std::string uri_decode(const std::string & sSrc);
     std::string tolower(std::string str);
     double cpu_seconds(void);
+    int js_decode_nonstrict_inplace(unsigned char *input, int64_t input_len);
+    static unsigned char x2c(unsigned char *what);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_

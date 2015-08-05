@@ -65,17 +65,12 @@ namespace ModSecurity {
 namespace actions {
 namespace transformations {
 
-Transformation::Transformation(std::string action)
-    : Action(action) {
-    this->name = this->action;
-    this->name.erase(0, 2);
-    this->action_kind = 1;
-}
 
 std::string Transformation::evaluate(std::string value,
     Assay *assay) {
     return value;
 }
+
 
 Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(base64_decode_ext) { return new Base64DecodeExt(a); }
@@ -87,7 +82,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(hex_decode) { return new HexDecode(a); }
     IF_MATCH(hex_encode) { return new HexEncode(a); }
     IF_MATCH(html_entity_decode) { return new HtmlEntityDecode(a); }
-    IF_MATCH(js_decode) { return new JsDecode(a); }
+    IF_MATCH(jsDecode) { return new JsDecode(a); }
     IF_MATCH(length) { return new Length(a); }
     IF_MATCH(lowercase) { return new LowerCase(a); }
     IF_MATCH(md5) { return new Md5(a); }

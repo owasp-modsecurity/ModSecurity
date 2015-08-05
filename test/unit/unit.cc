@@ -22,6 +22,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
 #include "operators/operator.h"
+#include "actions/transformations/transformation.h"
 
 #include "common/modsecurity_test.h"
 #include "common/modsecurity_test_results.h"
@@ -32,6 +33,8 @@
 using modsecurity_test::UnitTest;
 using modsecurity_test::ModSecurityTest;
 using modsecurity_test::ModSecurityTestResults;
+using ModSecurity::actions::transformations::Transformation;
+using ModSecurity::operators::Operator;
 
 std::string default_test_path = "test-cases/secrules-language-tests/operators";
 
@@ -55,17 +58,35 @@ void print_help() {
 
 void perform_unit_test(UnitTest *t, ModSecurityTestResults<UnitTest>* res) {
     const char *error = NULL;
-    ModSecurity::operators::Operator *op =
-        ModSecurity::operators::Operator::instantiate("\"@" + t->name + \
-            " " + t->param + "\"");
-    op->init(&error);
+    int ret = 0;
 
-    int ret = op->evaluate(NULL, t->input);
-    if (ret != t->ret) {
-        t->obtained = ret;
-        res->push_back(t);
+    if (t->type == "op") {
+        Operator *op = Operator::instantiate("\"@" + t->name + \
+                " " + t->param + "\"");
+        op->init(&error);
+        ret = op->evaluate(NULL, t->input);
+        if (ret != t->ret) {
+            t->obtained = ret;
+            res->push_back(t);
+        }
+
+        delete op;
+    } else if (t->type == "tfn") {
+        Transformation *tfn = Transformation::instantiate("t:" + t->name);
+        std::string ret = tfn->evaluate(t->input, NULL);
+        t->obtained = 1;
+        if (ret != t->output) {
+            std::cout << "ret: !" << ret << "!" << std::endl;
+            std::cout << "obt: !" << t->output << "!" << std::endl;
+            t->obtainedOutput = ret;
+            res->push_back(t);
+        }
+
+        delete tfn;
+    } else {
+        std::cerr << "Failed. Test type is unknown: << " << t->type;
+        std::cerr << std::endl;
     }
-    delete op;
 }
 
 

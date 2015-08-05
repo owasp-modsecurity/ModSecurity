@@ -35,9 +35,16 @@ std::string UnitTest::print() {
     i << "  \"name\": \"" << this->name << "\"" << std::endl;
     i << "  \"input\": \"" << this->input << "\"" << std::endl;
     i << "  \"param\": \"" << this->param << "\"" << std::endl;
+    i << "  \"output\": \"" << this->output << "\"" << std::endl;
     i << "}" << std::endl;
-    i << "Expecting: " << this->ret << " - operator returned: ";
-    i << this->obtained << std::endl;
+    if (this->ret != this->obtained) {
+        i << "Expecting: " << this->ret << " - operator returned: ";
+        i << this->obtained << std::endl;
+    }
+    if (this->output != this->obtainedOutput) {
+        i << "Expecting: " << this->output << " - operator returned: ";
+        i << this->obtainedOutput << std::endl;
+    }
 
     return i.str();
 }
@@ -62,6 +69,8 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
            u->type = YAJL_GET_STRING(val);
         } else if (strcmp(key, "ret") == 0) {
            u->ret = YAJL_GET_INTEGER(val);
+        } else if (strcmp(key, "output") == 0) {
+           u->output = YAJL_GET_STRING(val);
         }
     }
 
