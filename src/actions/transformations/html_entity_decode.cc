@@ -15,6 +15,8 @@
 
 #include "actions/transformations/html_entity_decode.h"
 
+#include <string.h>
+
 #include <iostream>
 #include <string>
 #include <algorithm>
@@ -24,25 +26,25 @@
 
 #include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
+#include "src/utils.h"
 
 
 namespace ModSecurity {
 namespace actions {
 namespace transformations {
 
-HtmlEntityDecode::HtmlEntityDecode(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 std::string HtmlEntityDecode::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation HtmlEntityDecode
-     */
-    assay->debug(4, "Transformation HtmlEntityDecode is not implemented yet.");
-    return value;
+    char *tmp = strdup(value.c_str());
+    int res = html_entities_decode_inplace((unsigned char *)tmp, value.size());
+    std::string ret("");
+    ret.assign(tmp);
+    free(tmp);
+
+    return ret;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

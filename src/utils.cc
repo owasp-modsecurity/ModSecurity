@@ -45,6 +45,7 @@
 #define VALID_HEX(X) (((X >= '0') && (X <= '9')) || \
     ((X >= 'a') && (X <= 'f')) || ((X >= 'A') && (X <= 'F')))
 #define ISODIGIT(X) ((X >= '0') && (X <= '7'))
+#define NBSP 160
 
 namespace ModSecurity {
 
@@ -467,6 +468,156 @@ int css_decode_inplace(unsigned char *input, int64_t input_len) {
     return count;
 }
 
+
+/**
+ *
+ * IMP1 Assumes NUL-terminated
+ */
+int html_entities_decode_inplace(unsigned char *input, int input_len) {
+    unsigned char *d = input;
+    int i, count;
+
+    if ((input == NULL) || (input_len <= 0)) return 0;
+
+    i = count = 0;
+    while ((i < input_len) && (count < input_len)) {
+        int z, copy = 1;
+
+        /* Require an ampersand and at least one character to
+         * start looking into the entity.
+         */
+        if ((input[i] == '&') && (i + 1 < input_len)) {
+            int k, j = i + 1;
+
+            if (input[j] == '#') {
+                /* Numerical entity. */
+                copy++;
+
+                if (!(j + 1 < input_len)) {
+                    /* Not enough bytes. */
+                    goto HTML_ENT_OUT;
+                }
+                j++;
+
+                if ((input[j] == 'x') || (input[j] == 'X')) {
+                    /* Hexadecimal entity. */
+                    copy++;
+
+                    if (!(j + 1 < input_len)) {
+                        /* Not enough bytes. */
+                        goto HTML_ENT_OUT;
+                    }
+                    j++; /* j is the position of the first digit now. */
+
+                    k = j;
+                    while ((j < input_len) && (isxdigit(input[j]))) j++;
+                    if (j > k) { /* Do we have at least one digit? */
+                        char *x;
+                        /* Decode the entity. */
+                        /* char *x = apr_pstrmemdup(mp,
+                         * (const char *)&input[k], j - k); */
+                        x = reinterpret_cast<char *>(malloc(sizeof(char) *
+                            (j - k)));
+                        memcpy(x, (const char *)&input[k], j - k);
+                        *d++ = (unsigned char)strtol(x, NULL, 16);
+                        count++;
+                        free(x);
+                        /* Skip over the semicolon if it's there. */
+                        if ((j < input_len) && (input[j] == ';')) {
+                            i = j + 1;
+                        } else {
+                            i = j;
+                        }
+
+                        continue;
+                    } else {
+                        goto HTML_ENT_OUT;
+                    }
+                } else {
+                    /* Decimal entity. */
+                    k = j;
+                    while ((j < input_len) && (isdigit(input[j]))) j++;
+                    if (j > k) { /* Do we have at least one digit? */
+                        /* Decode the entity. */
+                        char *x = NULL;
+                        /* char *x = apr_pstrmemdup(mp,
+                         * (const char *)&input[k], j - k); */
+                        x = reinterpret_cast<char *>(malloc(sizeof(char) *
+                            (j - k)));
+                        memcpy(x, (const char *)&input[k], j - k);
+                        *d++ = (unsigned char)strtol(x, NULL, 10);
+                        count++;
+                        free(x);
+                        /* Skip over the semicolon if it's there. */
+                        if ((j < input_len) && (input[j] == ';')) {
+                            i = j + 1;
+                        } else {
+                            i = j;
+                        }
+
+                        continue;
+                    } else {
+                        goto HTML_ENT_OUT;
+                    }
+                }
+            } else {
+                /* Text entity. */
+
+                k = j;
+                while ((j < input_len) && (isalnum(input[j]))) j++;
+                if (j > k) { /* Do we have at least one digit? */
+                    /* char *x = apr_pstrmemdup(mp,
+                     *  (const char *)&input[k], j - k); */
+                    char *x = NULL;
+                    x = reinterpret_cast<char *>(malloc(sizeof(char) *
+                        (j - k)));
+                    memcpy(x, (const char *)&input[k], j - k);
+
+                    /* Decode the entity. */
+                    /* ENH What about others? */
+                    if (strcasecmp(x, "quot") == 0) {
+                        *d++ = '"';
+                    } else if (strcasecmp(x, "amp") == 0) {
+                        *d++ = '&';
+                    } else if (strcasecmp(x, "lt") == 0) {
+                        *d++ = '<';
+                    } else if (strcasecmp(x, "gt") == 0) {
+                        *d++ = '>';
+                    } else if (strcasecmp(x, "nbsp") == 0) {
+                        *d++ = NBSP;
+                    } else {
+                        /* We do no want to convert this entity,
+                        * copy the raw data over. */
+                        copy = j - k + 1;
+                        free(x);
+                        goto HTML_ENT_OUT;
+                    }
+
+                    count++;
+
+                    /* Skip over the semicolon if it's there. */
+                    if ((j < input_len) && (input[j] == ';')) {
+                        i = j + 1;
+                    } else {
+                        i = j;
+                    }
+
+                    free(x);
+                    continue;
+                }
+            }
+        }
+HTML_ENT_OUT:
+        for (z = 0; ((z < copy) && (count < input_len)); z++) {
+            *d++ = input[i++];
+            count++;
+        }
+    }
+
+    *d = '\0';
+
+    return count;
+}
 
 /**
  * Converts a single hexadecimal digit into a decimal value.

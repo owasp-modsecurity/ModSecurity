@@ -81,7 +81,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(escape_seq_decode) { return new EscapeSeqDecode(a); }
     IF_MATCH(hex_decode) { return new HexDecode(a); }
     IF_MATCH(hex_encode) { return new HexEncode(a); }
-    IF_MATCH(html_entity_decode) { return new HtmlEntityDecode(a); }
+    IF_MATCH(htmlEntityDecode) { return new HtmlEntityDecode(a); }
     IF_MATCH(jsDecode) { return new JsDecode(a); }
     IF_MATCH(length) { return new Length(a); }
     IF_MATCH(lowercase) { return new LowerCase(a); }

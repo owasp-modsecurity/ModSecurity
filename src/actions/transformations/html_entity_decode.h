@@ -28,12 +28,16 @@ class Assay;
 namespace actions {
 namespace transformations {
 
+
 class HtmlEntityDecode : public Transformation {
  public:
-    explicit HtmlEntityDecode(std::string action);
+    explicit HtmlEntityDecode(std::string action)
+        : Transformation(action) { }
+
     std::string evaluate(std::string exp,
         Assay *assay) override;
 };
+
 
 }  // namespace transformations
 }  // namespace actions
