@@ -34,7 +34,7 @@ class AuditLog : public Action {
     explicit AuditLog(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(Assay *assay) override;
+    bool evaluate(Rule *rule, Assay *assay) override;
 };
 
 }  // namespace actions

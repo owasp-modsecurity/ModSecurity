@@ -33,7 +33,7 @@ Status::Status(std::string action)
 }
 
 
-bool Status::evaluate(Assay *assay) {
+bool Status::evaluate(Rule *rule, Assay *assay) {
     assay->actions.push_back(this);
     return true;
 }

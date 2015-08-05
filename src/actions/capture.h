@@ -13,42 +13,29 @@
  *
  */
 
-#include <iostream>
-#include <fstream>
 #include <string>
 
-#ifndef SRC_UTILS_REGEX_H_
-#define SRC_UTILS_REGEX_H_
+#include "actions/action.h"
+
+#ifndef SRC_ACTIONS_CAPTURE_H_
+#define SRC_ACTIONS_CAPTURE_H_
 
 
 namespace ModSecurity {
-namespace Utils {
+class Rule;
+namespace actions {
 
 
-class Regex {
+class Capture : public Action {
  public:
-    explicit Regex(const std::string& pattern_);
-    std::string pattern;
+    explicit Capture(std::string action)
+        : Action(action, RunTimeOnlyIfMatchKind) { }
+
+    bool evaluate(Rule *rule, Assay *assay) override;
 };
 
 
-class SMatch {
- public:
-    SMatch() : size_(0) { }
-    size_t size() { return size_; }
-    int size_;
-    std::string match;
-};
-
-
-int regex_search(const std::string& s, SMatch *m,
-    const Regex& regex);
-
-int regex_search(const std::string& s, Regex r);
-
-
-
-}  // namespace Utils
+}  // namespace actions
 }  // namespace ModSecurity
 
-#endif  // SRC_UTILS_REGEX_H_
+#endif  // SRC_ACTIONS_CAPTURE_H_

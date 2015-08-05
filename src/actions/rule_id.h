@@ -34,7 +34,7 @@ class RuleId : public Action {
  public:
     explicit RuleId(std::string action);
 
-    bool evaluate(Rule *rule) override;
+    bool evaluate(Rule *rule, Assay *assay) override;
     double rule_id;
 };
 

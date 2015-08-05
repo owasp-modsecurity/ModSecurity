@@ -14,41 +14,31 @@
  */
 
 #include <iostream>
-#include <fstream>
 #include <string>
+#include <vector>
+#include <list>
+#include <utility>
 
-#ifndef SRC_UTILS_REGEX_H_
-#define SRC_UTILS_REGEX_H_
+#ifndef SRC_VARIABLES_TX_H_
+#define SRC_VARIABLES_TX_H_
 
+#include "variables/variable.h"
 
 namespace ModSecurity {
-namespace Utils {
 
+class Assay;
+namespace Variables {
 
-class Regex {
+class Tx : public Variable {
  public:
-    explicit Regex(const std::string& pattern_);
-    std::string pattern;
+    explicit Tx(std::string _name)
+        : Variable(_name) { }
+
+    std::list<std::pair<std::string, std::string>>
+        evaluate(Assay *assay) override;
 };
 
-
-class SMatch {
- public:
-    SMatch() : size_(0) { }
-    size_t size() { return size_; }
-    int size_;
-    std::string match;
-};
-
-
-int regex_search(const std::string& s, SMatch *m,
-    const Regex& regex);
-
-int regex_search(const std::string& s, Regex r);
-
-
-
-}  // namespace Utils
+}  // namespace Variables
 }  // namespace ModSecurity
 
-#endif  // SRC_UTILS_REGEX_H_
+#endif  // SRC_VARIABLES_TX_H_

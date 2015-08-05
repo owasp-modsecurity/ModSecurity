@@ -26,7 +26,7 @@ namespace actions {
 
 
 
-bool Chain::evaluate(Rule *rule) {
+bool Chain::evaluate(Rule *rule, Assay *assay) {
     rule->chained = true;
     return true;
 }

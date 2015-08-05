@@ -31,7 +31,7 @@ class Status : public Action {
  public:
     explicit Status(std::string actions);
 
-    bool evaluate(Assay *assay) override;
+    bool evaluate(Rule *rule, Assay *assay) override;
     void fill_intervention(ModSecurityIntervention *i) override;
     int status;
 };

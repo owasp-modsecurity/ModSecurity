@@ -17,6 +17,7 @@
 #define SRC_OPERATORS_RX_H_
 
 #include <string>
+#include <list>
 
 #include "operators/operator.h"
 #include "utils/regex.h"
@@ -38,6 +39,8 @@ class Rx : public Operator {
         m_re(param) { }
 
     bool evaluate(Assay *assay, const std::string &input);
+
+    std::list<std::string> matched;
  private:
     Regex m_re;
 };

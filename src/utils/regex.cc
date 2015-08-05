@@ -40,13 +40,20 @@ Regex::Regex(const std::string& pattern_)
 
 int regex_search(const std::string& s, SMatch *match,
     const Regex& regex) {
+    std::string m;
     pcrecpp::RE re(regex.pattern,
         pcrecpp::RE_Options(PCRE_DOTALL|PCRE_MULTILINE));
+
+    /** FIXME: Should be not necessary to call PartialMatch twice here. */
     match->size_ = re.PartialMatch(s);
+    re.PartialMatch(s, &m);
+    match->match = m;
+
     return match->size_;
 }
 
 int regex_search(const std::string& s, Regex regex) {
+    std::string match;
     pcrecpp::RE re(regex.pattern);
     return re.PartialMatch(s);
 }

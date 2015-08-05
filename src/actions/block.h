@@ -33,7 +33,7 @@ class Block : public Action {
  public:
     explicit Block(std::string action);
 
-    bool evaluate(Assay *assay) override;
+    bool evaluate(Rule *rule, Assay *assay) override;
     void fill_intervention(ModSecurityIntervention *i) override;
 };
 

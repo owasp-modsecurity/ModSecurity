@@ -20,6 +20,7 @@
 #include <iterator>
 #include <sstream>
 #include <vector>
+#include <list>
 
 #include "operators/operator.h"
 #include "utils/acmp.h"
@@ -68,7 +69,7 @@ bool Pm::evaluate(Assay *assay, const std::string &input) {
 
     rc = acmp_process_quick(&pt, &match, input.c_str(), input.length());
     if (rc == 1) {
-        // save into tx, etc...
+        this->matched.push_back(std::string(match));
     }
 
     return rc == 1;

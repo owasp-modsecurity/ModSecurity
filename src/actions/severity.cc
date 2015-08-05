@@ -51,7 +51,7 @@ Severity::Severity(std::string action)
 }
 
 
-bool Severity::evaluate(Assay *assay) {
+bool Severity::evaluate(Rule *rule, Assay *assay) {
     assay->debug(9, "This rule severity is: " + \
         std::to_string(this->m_severity) + " current assay is: " + \
         std::to_string(assay->highest_severity));

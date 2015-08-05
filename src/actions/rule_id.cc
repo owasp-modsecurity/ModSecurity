@@ -37,7 +37,7 @@ RuleId::RuleId(std::string action)
     }
 
 
-bool RuleId::evaluate(Rule *rule) {
+bool RuleId::evaluate(Rule *rule, Assay *assay) {
     rule->rule_id = this->rule_id;
     return true;
 }

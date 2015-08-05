@@ -17,6 +17,7 @@
 #define SRC_OPERATORS_PM_H_
 
 #include <string>
+#include <list>
 
 #include "operators/operator.h"
 #include "utils/acmp.h"
@@ -40,6 +41,7 @@ class Pm : public Operator {
     virtual bool init(const char **error);
     void postOrderTraversal(acmp_btree_node_t *node);
 
+    std::list<std::string> matched;
  protected:
     ACMP *m_p;
 };

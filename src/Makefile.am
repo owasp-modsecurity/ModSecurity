@@ -44,6 +44,7 @@ VARIABLES = \
 	variables/time_sec.cc \
 	variables/time_wday.cc \
 	variables/time_year.cc \
+	variables/tx.cc \
 	variables/variable.cc
 
 
@@ -52,6 +53,7 @@ ACTIONS = \
 	actions/action.cc \
 	actions/audit_log.cc \
 	actions/block.cc \
+	actions/capture.cc \
 	actions/chain.cc \
 	actions/no_audit_log.cc \
 	actions/phase.cc \

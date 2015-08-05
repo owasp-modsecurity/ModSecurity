@@ -13,42 +13,39 @@
  *
  */
 
+#include "variables/tx.h"
+
+#include <time.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include <iostream>
-#include <fstream>
 #include <string>
+#include <vector>
+#include <list>
+#include <utility>
 
-#ifndef SRC_UTILS_REGEX_H_
-#define SRC_UTILS_REGEX_H_
-
+#include "modsecurity/assay.h"
 
 namespace ModSecurity {
-namespace Utils {
+namespace Variables {
+
+std::list<std::pair<std::string, std::string>>
+    Tx::evaluate(Assay *assay) {
+    std::list<std::pair<std::string, std::string>> resl;
+    std::pair<std::string, std::string> pair;
+
+    pair = std::make_pair(std::string("TX:0"),
+       std::string("teste"));
+
+    resl.push_back(pair);
+
+    return resl;
+}
 
 
-class Regex {
- public:
-    explicit Regex(const std::string& pattern_);
-    std::string pattern;
-};
-
-
-class SMatch {
- public:
-    SMatch() : size_(0) { }
-    size_t size() { return size_; }
-    int size_;
-    std::string match;
-};
-
-
-int regex_search(const std::string& s, SMatch *m,
-    const Regex& regex);
-
-int regex_search(const std::string& s, Regex r);
-
-
-
-}  // namespace Utils
+}  // namespace Variables
 }  // namespace ModSecurity
-
-#endif  // SRC_UTILS_REGEX_H_

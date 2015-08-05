@@ -80,8 +80,7 @@ class Action {
 
     virtual std::string evaluate(std::string exp,
         Assay *assay);
-    virtual bool evaluate(Assay *assay);
-    virtual bool evaluate(Rule *rule);
+    virtual bool evaluate(Rule *rule, Assay *assay);
 
     static Action *instantiate(const std::string& name);
 

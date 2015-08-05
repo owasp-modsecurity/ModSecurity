@@ -41,7 +41,7 @@ Phase::Phase(std::string action)
     }
 }
 
-bool Phase::evaluate(Rule *rule) {
+bool Phase::evaluate(Rule *rule, Assay *assay) {
     rule->phase = this->phase;
     return true;
 }

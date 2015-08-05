@@ -30,7 +30,7 @@ Block::Block(std::string action)
 }
 
 
-bool Block::evaluate(Assay *assay) {
+bool Block::evaluate(Rule *rule, Assay *assay) {
     assay->actions.push_back(this);
     return true;
 }

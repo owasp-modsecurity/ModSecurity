@@ -23,7 +23,7 @@
 namespace ModSecurity {
 namespace actions {
 
-bool NoAuditLog::evaluate(Assay *assay) {
+bool NoAuditLog::evaluate(Rule *rule, Assay *assay) {
     assay->do_not_save_in_auditlog = true;
     return true;
 }

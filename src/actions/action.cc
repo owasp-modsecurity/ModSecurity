@@ -19,6 +19,8 @@
 #include <string>
 
 #include "modsecurity/assay.h"
+#include "src/rule.h"
+
 #include "actions/block.h"
 #include "actions/chain.h"
 #include "actions/redirect.h"
@@ -26,6 +28,7 @@
 #include "actions/rule_id.h"
 #include "actions/phase.h"
 #include "actions/severity.h"
+#include "actions/capture.h"
 
 
 
@@ -42,12 +45,7 @@ std::string Action::evaluate(std::string value,
 }
 
 
-bool Action::evaluate(Assay *assay) {
-    return true;
-}
-
-
-bool Action::evaluate(Rule *rule) {
+bool Action::evaluate(Rule *rule, Assay *assay) {
     return true;
 }
 
@@ -83,6 +81,9 @@ Action *Action::instantiate(const std::string& name) {
     }
     if (name == "chain") {
         return new Chain(name);
+    }
+    if (name == "capture") {
+        return new Capture(name);
     }
     return new Action(name);
 }

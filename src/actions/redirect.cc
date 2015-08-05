@@ -34,7 +34,7 @@ Redirect::Redirect(const std::string& action)
 }
 
 
-bool Redirect::evaluate(Assay *assay) {
+bool Redirect::evaluate(Rule *rule, Assay *assay) {
     assay->actions.push_back(this);
     return true;
 }

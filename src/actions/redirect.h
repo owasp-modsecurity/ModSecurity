@@ -33,7 +33,7 @@ class Redirect : public Action {
     explicit Redirect(const std::string &action);
     ~Redirect() override;
 
-    bool evaluate(Assay *assay) override;
+    bool evaluate(Rule *rule, Assay *assay) override;
     int status;
     std::string url;
     void fill_intervention(ModSecurityIntervention *i) override;

@@ -74,7 +74,7 @@ Rule::Rule(Operator *_op,
     for (Action *a : *actions) {
         if (a->action_kind == Action::ConfigurationKind) {
             actions_conf.push_back(a);
-            a->evaluate(this);
+            a->evaluate(this, NULL);
         } else if (a->action_kind == Action::RunTimeBeforeMatchAttemptKind) {
             actions_runtime_pre.push_back(a);
         } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
@@ -142,7 +142,7 @@ bool Rule::evaluate(Assay *assay) {
                 for (Action *a :
                     this->actions_runtime_pos) {
                     assay->debug(4, "Running action: " + a->action);
-                    a->evaluate(assay);
+                    a->evaluate(this, assay);
                 }
                 if (this->chained && this->chainedRule == NULL) {
                     assay->debug(4, "Rule is marked as chained but there " \
