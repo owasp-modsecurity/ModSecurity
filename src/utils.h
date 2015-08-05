@@ -38,6 +38,8 @@ namespace ModSecurity {
     int css_decode_inplace(unsigned char *input, int64_t input_len);
     static unsigned char xsingle2c(unsigned char *what);
     int html_entities_decode_inplace(unsigned char *input, int input_len);
+    int normalize_path_inplace(unsigned char *input, int input_len,
+        int win, int *changed);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_

@@ -15,6 +15,8 @@
 
 #include "actions/transformations/normalise_path_win.h"
 
+#include <string.h>
+
 #include <iostream>
 #include <string>
 #include <algorithm>
@@ -24,25 +26,27 @@
 
 #include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
+#include "src/utils.h"
 
 
 namespace ModSecurity {
 namespace actions {
 namespace transformations {
 
-NormalisePathWin::NormalisePathWin(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 std::string NormalisePathWin::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation NormalisePathWin
-     */
-    assay->debug(4, "Transformation NormalisePathWin is not implemented yet.");
-    return value;
+    int changed;
+    char *tmp = strdup(value.c_str());
+    int res = normalize_path_inplace((unsigned char *)tmp,
+        value.size(), 1, &changed);
+    std::string ret("");
+    ret.assign(tmp);
+    free(tmp);
+
+    return ret;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

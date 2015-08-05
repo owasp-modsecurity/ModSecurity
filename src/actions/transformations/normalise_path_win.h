@@ -21,7 +21,7 @@
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_NORMALISE_PATH_WIN_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_NORMALISE_PATH_WIN_H_
 
-#ifdef __cplusplus
+
 namespace ModSecurity {
 class Assay;
 
@@ -30,7 +30,9 @@ namespace transformations {
 
 class NormalisePathWin : public Transformation {
  public:
-    explicit NormalisePathWin(std::string action);
+    explicit NormalisePathWin(std::string action)
+        : Transformation(action) { }
+
     std::string evaluate(std::string exp,
         Assay *assay) override;
 };
@@ -39,6 +41,5 @@ class NormalisePathWin : public Transformation {
 }  // namespace actions
 }  // namespace ModSecurity
 
-#endif
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_NORMALISE_PATH_WIN_H_
