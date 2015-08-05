@@ -328,6 +328,158 @@ int js_decode_nonstrict_inplace(unsigned char *input, int64_t input_len) {
 }
 
 
+/**
+ * Decode a string that contains CSS-escaped characters.
+ *
+ * References:
+ *     http://www.w3.org/TR/REC-CSS2/syndata.html#q4
+ *     http://www.unicode.org/roadmaps/
+ */
+int css_decode_inplace(unsigned char *input, int64_t input_len) {
+    unsigned char *d = (unsigned char *)input;
+    int64_t i, j, count;
+
+    if (input == NULL) {
+        return -1;
+    }
+
+    i = count = 0;
+    while (i < input_len) {
+        /* Is the character a backslash? */
+        if (input[i] == '\\') {
+            /* Is there at least one more byte? */
+            if (i + 1 < input_len) {
+                i++; /* We are not going to need the backslash. */
+
+                /* Check for 1-6 hex characters following the backslash */
+                j = 0;
+                while ((j < 6)
+                        && (i + j < input_len)
+                        && (VALID_HEX(input[i + j]))) {
+                    j++;
+                }
+
+                if (j > 0) {
+                    /* We have at least one valid hexadecimal character. */
+                    int fullcheck = 0;
+
+                    /* For now just use the last two bytes. */
+                    switch (j) {
+                        /* Number of hex characters */
+                        case 1:
+                            *d++ = xsingle2c(&input[i]);
+                            break;
+
+                        case 2:
+                        case 3:
+                            /* Use the last two from the end. */
+                            *d++ = x2c(&input[i + j - 2]);
+                            break;
+
+                        case 4:
+                            /* Use the last two from the end, but request
+                             * a full width check.
+                             */
+                            *d = x2c(&input[i + j - 2]);
+                            fullcheck = 1;
+                            break;
+
+                        case 5:
+                            /* Use the last two from the end, but request
+                             * a full width check if the number is greater
+                             * or equal to 0xFFFF.
+                             */
+                            *d = x2c(&input[i + j - 2]);
+                            /* Do full check if first byte is 0 */
+                            if (input[i] == '0') {
+                                fullcheck = 1;
+                            } else {
+                                d++;
+                            }
+                            break;
+
+                        case 6:
+                            /* Use the last two from the end, but request
+                             * a full width check if the number is greater
+                             * or equal to 0xFFFF.
+                             */
+                            *d = x2c(&input[i + j - 2]);
+
+                            /* Do full check if first/second bytes are 0 */
+                            if ((input[i] == '0')
+                                    && (input[i + 1] == '0')) {
+                                fullcheck = 1;
+                            } else {
+                                d++;
+                            }
+                            break;
+                    }
+
+                    /* Full width ASCII (0xff01 - 0xff5e) needs 0x20 added */
+                    if (fullcheck) {
+                        if ((*d > 0x00) && (*d < 0x5f)
+                                && ((input[i + j - 3] == 'f') ||
+                                    (input[i + j - 3] == 'F'))
+                                && ((input[i + j - 4] == 'f') ||
+                                    (input[i + j - 4] == 'F'))) {
+                            (*d) += 0x20;
+                        }
+
+                        d++;
+                    }
+
+                    /* We must ignore a single whitespace after a hex escape */
+                    if ((i + j < input_len) && isspace(input[i + j])) {
+                        j++;
+                    }
+
+                    /* Move over. */
+                    count++;
+                    i += j;
+                } else if (input[i] == '\n') {
+                /* No hexadecimal digits after backslash */
+                    /* A newline character following backslash is ignored. */
+                    i++;
+                } else {
+                /* The character after backslash is not a hexadecimal digit,
+                 * nor a newline. */
+                    /* Use one character after backslash as is. */
+                    *d++ = input[i++];
+                    count++;
+                }
+            } else {
+            /* No characters after backslash. */
+                /* Do not include backslash in output
+                 *(continuation to nothing) */
+                i++;
+            }
+        } else {
+        /* Character is not a backslash. */
+            /* Copy one normal character to output. */
+            *d++ = input[i++];
+            count++;
+        }
+    }
+
+    /* Terminate output string. */
+    *d = '\0';
+
+    return count;
+}
+
+
+/**
+ * Converts a single hexadecimal digit into a decimal value.
+ */
+static unsigned char xsingle2c(unsigned char *what) {
+    register unsigned char digit;
+
+    digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
+
+    return digit;
+}
+
+
 static unsigned char x2c(unsigned char *what) {
     register unsigned char digit;
 

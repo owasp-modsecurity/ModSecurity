@@ -35,6 +35,8 @@ namespace ModSecurity {
     double cpu_seconds(void);
     int js_decode_nonstrict_inplace(unsigned char *input, int64_t input_len);
     static unsigned char x2c(unsigned char *what);
+    int css_decode_inplace(unsigned char *input, int64_t input_len);
+    static unsigned char xsingle2c(unsigned char *what);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_

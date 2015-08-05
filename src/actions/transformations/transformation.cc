@@ -77,7 +77,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(base64_decode) { return new Base64Decode(a); }
     IF_MATCH(cmd_line) { return new CmdLine(a); }
     IF_MATCH(compress_whitespace) { return new CompressWhitespace(a); }
-    IF_MATCH(css_decode) { return new CssDecode(a); }
+    IF_MATCH(cssDecode) { return new CssDecode(a); }
     IF_MATCH(escape_seq_decode) { return new EscapeSeqDecode(a); }
     IF_MATCH(hex_decode) { return new HexDecode(a); }
     IF_MATCH(hex_encode) { return new HexEncode(a); }

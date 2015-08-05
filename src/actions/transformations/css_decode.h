@@ -28,12 +28,15 @@ class Assay;
 namespace actions {
 namespace transformations {
 
+
 class CssDecode : public Transformation {
  public:
-    explicit CssDecode(std::string action);
+    explicit CssDecode(std::string action)
+        : Transformation(action) { }
     std::string evaluate(std::string exp,
         Assay *assay) override;
 };
+
 
 }  // namespace transformations
 }  // namespace actions

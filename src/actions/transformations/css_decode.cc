@@ -15,6 +15,8 @@
 
 #include "actions/transformations/css_decode.h"
 
+#include <string.h>
+
 #include <iostream>
 #include <string>
 #include <algorithm>
@@ -24,25 +26,23 @@
 
 #include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
+#include "src/utils.h"
 
 
 namespace ModSecurity {
 namespace actions {
 namespace transformations {
 
-CssDecode::CssDecode(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 std::string CssDecode::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation CssDecode
-     */
-    assay->debug(4, "Transformation CssDecode is not implemented yet.");
-    return value;
+    char *tmp = strdup(value.c_str());
+    int res = css_decode_inplace((unsigned char *)tmp, value.size());
+    std::string ret(tmp, 0, value.size());
+    free(tmp);
+    return ret;
 }
+
 
 }  // namespace transformations
 }  // namespace actions
