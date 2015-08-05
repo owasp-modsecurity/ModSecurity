@@ -13,35 +13,33 @@
  *
  */
 
-#include "actions/transformations/lowercase.h"
-
-#include <algorithm>
 #include <string>
 
-#include "modsecurity/assay.h"
-#include "actions/transformations/transformation.h"
 #include "actions/action.h"
+#include "actions/transformations/transformation.h"
+
+#ifndef SRC_ACTIONS_TRANSFORMATIONS_LOWER_CASE_H_
+#define SRC_ACTIONS_TRANSFORMATIONS_LOWER_CASE_H_
+
+#ifdef __cplusplus
 
 namespace ModSecurity {
+class Assay;
 namespace actions {
 namespace transformations {
 
 
-LowerCase::LowerCase(std::string a)
-    : Transformation(a) {
-}
-
-std::string LowerCase::evaluate(std::string value,
-    Assay *assay) {
-    std::locale loc;
-
-    for (std::string::size_type i=0; i < value.length(); ++i) {
-        value[i] = std::tolower(value[i], loc);
-    }
-
-    return value;
-}
+class LowerCase : public Transformation {
+ public:
+    explicit LowerCase(std::string action);
+    std::string evaluate(std::string exp,
+        Assay *assay) override;
+};
 
 }  // namespace transformations
 }  // namespace actions
 }  // namespace ModSecurity
+
+#endif
+
+#endif  // SRC_ACTIONS_TRANSFORMATIONS_LOWER_CASE_H_

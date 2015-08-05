@@ -33,7 +33,7 @@
 #include "actions/transformations/html_entity_decode.h"
 #include "actions/transformations/js_decode.h"
 #include "actions/transformations/length.h"
-#include "actions/transformations/lowercase.h"
+#include "actions/transformations/lower_case.h"
 #include "actions/transformations/md5.h"
 #include "actions/transformations/none.h"
 #include "actions/transformations/normalise_path.h"

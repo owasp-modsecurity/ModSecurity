@@ -72,7 +72,7 @@ ACTIONS = \
 	actions/transformations/html_entity_decode.cc \
 	actions/transformations/js_decode.cc \
 	actions/transformations/length.cc \
-	actions/transformations/lowercase.cc \
+	actions/transformations/lower_case.cc \
 	actions/transformations/md5.cc \
 	actions/transformations/none.cc \
 	actions/transformations/normalise_path.cc \
