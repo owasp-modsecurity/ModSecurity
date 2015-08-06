@@ -28,9 +28,9 @@
 #include "actions/action.h"
 #include "modsecurity/modsecurity.h"
 #include "actions/transformations/none.h"
-#include "variables/variation/exclusion.h"
+#include "variables/variations/exclusion.h"
 
-using ModSecurity::Variables::Variation::Exclusion;
+using ModSecurity::Variables::Variations::Exclusion;
 
 namespace ModSecurity {
 
