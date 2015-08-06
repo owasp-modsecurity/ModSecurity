@@ -41,6 +41,8 @@ namespace ModSecurity {
     int normalize_path_inplace(unsigned char *input, int input_len,
         int win, int *changed);
     std::string string_to_hex(const std::string& input);
+    int urldecode_uni_nonstrict_inplace_ex(Assay *assay, unsigned char *input,
+        int64_t input_len, int *changed);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_

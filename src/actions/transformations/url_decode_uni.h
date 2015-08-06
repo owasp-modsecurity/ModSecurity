@@ -30,7 +30,9 @@ namespace transformations {
 
 class UrlDecodeUni : public Transformation {
  public:
-    explicit UrlDecodeUni(std::string action);
+    explicit UrlDecodeUni(std::string action)
+        : Transformation(action) { }
+
     std::string evaluate(std::string exp,
         Assay *assay) override;
 };

@@ -105,7 +105,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(trim_left) { return new TrimLeft(a); }
     IF_MATCH(trim_right) { return new TrimRight(a); }
     IF_MATCH(url_decode) { return new UrlDecode(a); }
-    IF_MATCH(url_decode_uni) { return new UrlDecodeUni(a); }
+    IF_MATCH(urlDecodeUni) { return new UrlDecodeUni(a); }
     IF_MATCH(url_encode) { return new UrlEncode(a); }
     IF_MATCH(utf8_to_unicode) { return new Utf8Unicode(a); }
 

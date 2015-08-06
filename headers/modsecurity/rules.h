@@ -13,6 +13,9 @@
  *
  */
 
+#include <stdio.h>
+#include <string.h>
+
 #ifdef __cplusplus
 #include <ctime>
 #include <iostream>
@@ -47,10 +50,20 @@ class Driver;
 class Rules : public RulesProperties  {
  public:
     Rules()
-        : RulesProperties(NULL) { }
+        : RulesProperties(NULL),
+        unicode_codepage(0) {
+            unicode_map_table = reinterpret_cast<int *>(
+                malloc(sizeof(int)*65536));
+            memset(unicode_map_table, -1, (sizeof(int)*65536));
+        }
 
     explicit Rules(DebugLog *customLog)
-        : RulesProperties(customLog) { }
+        : unicode_codepage(0),
+        RulesProperties(customLog) {
+            unicode_map_table = reinterpret_cast<int *>(
+                malloc(sizeof(int)*65536));
+            memset(unicode_map_table, -1, (sizeof(int)*65536));
+        }
 
     ~Rules();
 
@@ -75,6 +88,9 @@ class Rules : public RulesProperties  {
     std::ostringstream parserError;
 
     DebugLog *debugLog;
+
+    int *unicode_map_table;
+    int64_t unicode_codepage;
 
  private:
     int m_referenceCount;

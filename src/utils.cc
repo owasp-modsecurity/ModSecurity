@@ -824,5 +824,137 @@ std::string string_to_hex(const std::string& input) {
 }
 
 
+/**
+ *
+ * IMP1 Assumes NUL-terminated
+ */
+int urldecode_uni_nonstrict_inplace_ex(Assay *assay, unsigned char *input,
+    int64_t input_len, int *changed) {
+    unsigned char *d = input;
+    int64_t i, count, fact, j, xv;
+    int Code, hmap = -1;
+
+    *changed = 0;
+
+    if (input == NULL) return -1;
+
+    i = count = 0;
+    while (i < input_len) {
+        if (input[i] == '%') {
+            if ((i + 1 < input_len) &&
+                ((input[i + 1] == 'u') || (input[i + 1] == 'U'))) {
+            /* Character is a percent sign. */
+                /* IIS-specific %u encoding. */
+                if (i + 5 < input_len) {
+                    /* We have at least 4 data bytes. */
+                    if ((VALID_HEX(input[i + 2])) &&
+                        (VALID_HEX(input[i + 3])) &&
+                        (VALID_HEX(input[i + 4])) &&
+                        (VALID_HEX(input[i + 5]))) {
+                        Code = 0;
+                        fact = 1;
+
+                        if (assay
+                            && assay->m_rules->unicode_map_table != NULL
+                            && assay->m_rules->unicode_codepage > 0)  {
+                            for (j = 5; j >= 2; j--) {
+                                if (isxdigit((input[i+j]))) {
+                                    if (input[i+j] >= 97) {
+                                        xv = (input[i+j] - 97) + 10;
+                                    } else if (input[i+j] >= 65)  {
+                                        xv = (input[i+j] - 65) + 10;
+                                    } else {
+                                        xv = (input[i+j]) - 48;
+                                    }
+                                    Code += (xv * fact);
+                                    fact *= 16;
+                                }
+                            }
+
+                            if (Code >= 0 && Code <= 65535)  {
+                                hmap = assay->m_rules->unicode_map_table[Code];
+                            }
+                        }
+
+                        if (hmap != -1)  {
+                            *d = hmap;
+                        } else {
+                            /* We first make use of the lower byte here,
+                             * ignoring the higher byte. */
+                            *d = x2c(&input[i + 4]);
+
+                            /* Full width ASCII (ff01 - ff5e)
+                             * needs 0x20 added */
+                            if ((*d > 0x00) && (*d < 0x5f)
+                                    && ((input[i + 2] == 'f')
+                                    || (input[i + 2] == 'F'))
+                                    && ((input[i + 3] == 'f')
+                                    || (input[i + 3] == 'F'))) {
+                                (*d) += 0x20;
+                            }
+                        }
+                        d++;
+                        count++;
+                        i += 6;
+                        *changed = 1;
+                    } else {
+                        /* Invalid data, skip %u. */
+                        *d++ = input[i++];
+                        *d++ = input[i++];
+                        count += 2;
+                    }
+                } else {
+                    /* Not enough bytes (4 data bytes), skip %u. */
+                    *d++ = input[i++];
+                    *d++ = input[i++];
+                    count += 2;
+                }
+            } else {
+                /* Standard URL encoding. */
+                /* Are there enough bytes available? */
+                if (i + 2 < input_len) {
+                    /* Yes. */
+
+                    /* Decode a %xx combo only if it is valid.
+                     */
+                    char c1 = input[i + 1];
+                    char c2 = input[i + 2];
+
+                    if (VALID_HEX(c1) && VALID_HEX(c2)) {
+                        *d++ = x2c(&input[i + 1]);
+                        count++;
+                        i += 3;
+                        *changed = 1;
+                    } else {
+                        /* Not a valid encoding, skip this % */
+                        *d++ = input[i++];
+                        count++;
+                    }
+                } else {
+                    /* Not enough bytes available, skip this % */
+                    *d++ = input[i++];
+                    count++;
+                }
+            }
+        } else {
+            /* Character is not a percent sign. */
+            if (input[i] == '+') {
+                *d++ = ' ';
+                *changed = 1;
+            } else {
+                *d++ = input[i];
+            }
+
+            count++;
+            i++;
+        }
+    }
+
+    *d = '\0';
+
+    return count;
+}
+
+
 }  // namespace ModSecurity
 

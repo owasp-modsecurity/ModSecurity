@@ -15,6 +15,8 @@
 
 #include "actions/transformations/url_decode_uni.h"
 
+#include <string.h>
+
 #include <iostream>
 #include <string>
 #include <algorithm>
@@ -24,25 +26,27 @@
 
 #include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
+#include "src/utils.h"
 
 
 namespace ModSecurity {
 namespace actions {
 namespace transformations {
 
-UrlDecodeUni::UrlDecodeUni(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 std::string UrlDecodeUni::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation UrlDecodeUni
-     */
-    assay->debug(4, "Transformation UrlDecodeUni is not implemented yet.");
-    return value;
+    int changed = 0;
+    char *tmp = strdup(value.c_str());
+    int res = urldecode_uni_nonstrict_inplace_ex(assay, (unsigned char *)tmp,
+        value.size(), &changed);
+    std::string ret("");
+    ret.assign(tmp);
+    free(tmp);
+
+    return ret;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

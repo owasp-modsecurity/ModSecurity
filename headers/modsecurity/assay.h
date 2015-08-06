@@ -191,9 +191,10 @@ class Assay {
     clock_t start;
     int highest_severity;
 
+    Rules *m_rules;
+
  private:
     std::ofstream myfile;
-    Rules *m_rules;
     ModSecurity *m_ms;
 
     const char *m_clientIpAddress;
