@@ -30,19 +30,12 @@ namespace ModSecurity {
 namespace actions {
 namespace transformations {
 
-None::None(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 std::string None::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation None
-     */
-    assay->debug(4, "Transformation None is not implemented yet.");
     return value;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

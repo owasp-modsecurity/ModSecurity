@@ -25,7 +25,8 @@
 
 #include "operators/operator.h"
 #include "actions/action.h"
-#include "../headers/modsecurity/modsecurity.h"
+#include "modsecurity/modsecurity.h"
+#include "actions/transformations/none.h"
 
 
 namespace ModSecurity {
@@ -33,6 +34,7 @@ namespace ModSecurity {
 using operators::Operator;
 using actions::Action;
 using Variables::Variable;
+using actions::transformations::None;
 
 Rule::~Rule() {
     delete op;
@@ -115,13 +117,25 @@ bool Rule::evaluate(Assay *assay) {
 
         for (auto &v : e) {
             std::string value = v.second;
-            for (Action *a :
-                this->actions_runtime_pre) {
-                value = a->evaluate(value, assay);
-                assay->debug(9, " T (" + \
-                        std::to_string(transformations) + ") " + \
-                        a->name + ": \"" + value +"\"");
-                transformations++;
+            int none = 0;
+            for (Action *a : this->actions_runtime_pre) {
+                None *z = dynamic_cast<None *>(a);
+                if (z != NULL) {
+                    none++;
+                }
+            }
+            for (Action *a : this->actions_runtime_pre) {
+                None *z = dynamic_cast<None *>(a);
+                if (none == 0) {
+                    value = a->evaluate(value, assay);
+                    assay->debug(9, " T (" + \
+                            std::to_string(transformations) + ") " + \
+                            a->name + ": \"" + value +"\"");
+                    transformations++;
+                }
+                if (z != NULL) {
+                    none--;
+                }
             }
 
             assay->debug(9, "Target value: \"" + value + "\" (Variable: " + \
