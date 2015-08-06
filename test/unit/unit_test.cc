@@ -22,7 +22,37 @@
 
 #include "common/colors.h"
 
+
 namespace modsecurity_test {
+
+
+std::string string_to_hex(const std::string& input) {
+    static const char* const lut = "0123456789ABCDEF";
+    size_t len = input.length();
+
+    std::string output;
+    output.reserve(2 * len);
+    for (size_t i = 0; i < len; ++i) {
+        const unsigned char c = input[i];
+        output.push_back(lut[c >> 4]);
+        output.push_back(lut[c & 15]);
+    }
+    return output;
+}
+
+
+void replaceAll(std::string *s, const std::string &search,
+    const char replace) {
+    for (size_t pos = 0; ; pos += 0) {
+        pos = s->find(search, pos);
+        if (pos == std::string::npos) {
+            break;
+        }
+        s->erase(pos, search.length());
+        s->insert(pos, &replace);
+    }
+}
+
 
 std::string UnitTest::print() {
     std::stringstream i;
@@ -63,6 +93,7 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
            u->param = YAJL_GET_STRING(val);
         } else if (strcmp(key, "input") == 0) {
            u->input = YAJL_GET_STRING(val);
+           replaceAll(&(u->input), "\\0", '\0');
         } else if (strcmp(key, "name") == 0) {
            u->name = YAJL_GET_STRING(val);
         } else if (strcmp(key, "type") == 0) {

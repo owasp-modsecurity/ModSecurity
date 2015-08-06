@@ -40,6 +40,7 @@ namespace ModSecurity {
     int html_entities_decode_inplace(unsigned char *input, int input_len);
     int normalize_path_inplace(unsigned char *input, int input_len,
         int win, int *changed);
+    std::string string_to_hex(const std::string& input);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_

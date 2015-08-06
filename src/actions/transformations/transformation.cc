@@ -94,7 +94,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(parity_zero_7bit) { return new ParityZero7bit(a); }
     IF_MATCH(remove_comments_char) { return new RemoveCommentsChar(a); }
     IF_MATCH(remove_comments) { return new RemoveComments(a); }
-    IF_MATCH(remove_nulls) { return new RemoveNulls(a); }
+    IF_MATCH(removeNulls) { return new RemoveNulls(a); }
     IF_MATCH(remove_whitespace) { return new RemoveWhitespace(a); }
     IF_MATCH(replace_comments) { return new ReplaceComments(a); }
     IF_MATCH(replace_nulls) { return new ReplaceNulls(a); }
