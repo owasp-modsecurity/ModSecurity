@@ -144,22 +144,22 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 {CONFIG_DIR_DEBUG_LVL}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_DEBUG_LVL(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 
 %{ /* Variables */ %}
-{VARIABLE}:?{DICT_ELEMENT}?             { return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
-{RUN_TIME_VAR_DUR}                      { return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
-{RUN_TIME_VAR_ENV}:?{DICT_ELEMENT}?     { return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
-{RUN_TIME_VAR_BLD}                      { return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
-{RUN_TIME_VAR_HSV}                      { return yy::seclang_parser::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
+[!|&]?{VARIABLE}:?{DICT_ELEMENT}?             { return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_DUR}                      { return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_ENV}:?{DICT_ELEMENT}?     { return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_BLD}                      { return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_HSV}                      { return yy::seclang_parser::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
 
 %{ /* Variables: TIME */ %}
-{RUN_TIME_VAR_TIME}        { return yy::seclang_parser::make_RUN_TIME_VAR_TIME(yytext, *driver.loc.back()); }
-{RUN_TIME_VAR_TIME_DAY}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_DAY(yytext, *driver.loc.back()); }
-{RUN_TIME_VAR_TIME_EPOCH}  { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_EPOCH(yytext, *driver.loc.back()); }
-{RUN_TIME_VAR_TIME_HOUR}   { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_HOUR(yytext, *driver.loc.back()); }
-{RUN_TIME_VAR_TIME_MIN}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MIN(yytext, *driver.loc.back()); }
-{RUN_TIME_VAR_TIME_MON}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MON(yytext, *driver.loc.back()); }
-{RUN_TIME_VAR_TIME_SEC}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_SEC(yytext, *driver.loc.back()); }
-{RUN_TIME_VAR_TIME_WDAY}   { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_WDAY(yytext, *driver.loc.back()); }
-{RUN_TIME_VAR_TIME_YEAR}   { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_YEAR(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME}        { return yy::seclang_parser::make_RUN_TIME_VAR_TIME(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_DAY}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_DAY(yytext, *driver.loc.back()); }
+[!|&]?[&]?{RUN_TIME_VAR_TIME_EPOCH}  { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_EPOCH(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_HOUR}   { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_HOUR(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_MIN}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MIN(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_MON}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MON(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_SEC}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_SEC(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_WDAY}   { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_WDAY(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_YEAR}   { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_YEAR(yytext, *driver.loc.back()); }
 
 %{ /* Geo DB loopkup */ %}
 {CONFIG_DIR_GEO_DB}[ ]{FREE_TEXT_NEW_LINE}      { return yy::seclang_parser::make_CONFIG_DIR_GEO_DB(strchr(yytext, ' ') + 1, *driver.loc.back()); }

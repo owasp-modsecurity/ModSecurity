@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -27,7 +28,9 @@
 #include "actions/action.h"
 #include "modsecurity/modsecurity.h"
 #include "actions/transformations/none.h"
+#include "variables/variation/exclusion.h"
 
+using ModSecurity::Variables::Variation::Exclusion;
 
 namespace ModSecurity {
 
@@ -108,14 +111,39 @@ bool Rule::evaluate(Assay *assay) {
 
     clock_t begin = clock();
 
+    std::list<std::string> exclusions;
+    for (int i = 0; i < variables->size(); i++) {
+        Variable *variable = variables->at(i);
+        Exclusion *exl = dynamic_cast<Exclusion *>(variable);
+
+        if (exl != NULL) {
+            std::list<std::pair<std::string, std::string>> z =
+                variable->evaluate(assay);
+            for (auto &y : z) {
+                exclusions.push_back(y.first);
+            }
+            exclusions.push_back(variable->name);
+        }
+    }
+
     for (int i = 0; i < variables->size(); i++) {
         int transformations = 0;
         Variable *variable = variables->at(i);
+        Exclusion *exl = dynamic_cast<Exclusion *>(variable);
+        if (exl != NULL) {
+            continue;
+        }
 
         std::list<std::pair<std::string, std::string>> e =
             variable->evaluate(assay);
 
         for (auto &v : e) {
+            if (std::find(exclusions.begin(), exclusions.end(),
+                v.first) != exclusions.end()) {
+                assay->debug(9, "Variable: " + v.first + " is part of the" +
+                    " exclusion list, skipping...");
+                continue;
+            }
             std::string value = v.second;
             int none = 0;
             for (Action *a : this->actions_runtime_pre) {

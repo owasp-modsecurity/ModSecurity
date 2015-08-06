@@ -21,6 +21,9 @@
 #include <list>
 
 #include "modsecurity/assay.h"
+#include "variations/exclusion.h"
+
+using ModSecurity::Variables::Variations::Exclusion;
 
 namespace ModSecurity {
 namespace Variables {
@@ -33,8 +36,18 @@ std::list<std::pair<std::string, std::string>>
 std::string Variable::to_s(
     std::vector<Variable *> *variables) {
     std::string ret;
+    std::string except("");
     for (int i = 0; i < variables->size() ; i++) {
         std::string name = variables->at(i)->name;
+        Exclusion *e =  dynamic_cast<Exclusion *>(variables->at(i));
+        if (e != NULL) {
+            if (except.empty()) {
+                except = except + name;
+            } else {
+                except = except + "|" + name;
+            }
+            continue;
+        }
 
         if (i == 0) {
             ret = ret + name;
@@ -43,6 +56,9 @@ std::string Variable::to_s(
         }
     }
 
+    if (except.empty() == false) {
+        ret = ret + ", except for: " + except;
+    }
     return ret;
 }
 

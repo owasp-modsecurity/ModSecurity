@@ -45,8 +45,9 @@ VARIABLES = \
 	variables/time_wday.cc \
 	variables/time_year.cc \
 	variables/tx.cc \
-	variables/variable.cc
-
+	variables/variable.cc \
+	variables/variations/count.cc \
+	variables/variations/exclusion.cc
 
 
 ACTIONS = \

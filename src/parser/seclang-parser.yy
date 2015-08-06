@@ -23,6 +23,8 @@ class Driver;
 #include "utils/geo_lookup.h"
 #include "audit_log.h"
 
+#include "variables/variations/count.h"
+#include "variables/variations/exclusion.h"
 #include "variables/duration.h"
 #include "variables/env.h"
 #include "variables/highest_severity.h"
@@ -43,6 +45,8 @@ using ModSecurity::operators::Operator;
 using ModSecurity::Rule;
 using ModSecurity::Utils::GeoLookup;
 
+using ModSecurity::Variables::Variations::Count;
+using ModSecurity::Variables::Variations::Exclusion;
 using ModSecurity::Variables::Duration;
 using ModSecurity::Variables::Env;
 using ModSecurity::Variables::HighestSeverity;
@@ -57,6 +61,22 @@ using ModSecurity::Variables::TimeSec;
 using ModSecurity::Variables::TimeWDay;
 using ModSecurity::Variables::TimeYear;
 using ModSecurity::Variables::Variable;
+
+#define CHECK_VARIATION_DECL \
+    Variable *var = NULL; \
+    bool t = false;
+
+#define CHECK_VARIATION(a) \
+    if (var == NULL) { \
+        if (name.at(0) == std::string(#a).at(0)) { \
+            name.erase(0, 1); \
+            t = true ; \
+        } \
+    } else { \
+        t = false; \
+    } \
+    if (t)
+
 
 /**
  * %destructor { code } THING
@@ -168,6 +188,7 @@ using ModSecurity::Variables::Variable;
 
 %type <std::vector<Action *> *> actions
 %type <std::vector<Variable *> *> variables
+%type <Variable *> var
 
 
 %printer { yyoutput << $$; } <*>;
@@ -354,174 +375,147 @@ expression:
         driver.remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
       }
 
+
 variables:
-    variables PIPE VARIABLE
+    variables PIPE var
       {
         std::vector<Variable *> *v = $1;
-        v->push_back(new Variable($3));
+        v->push_back($3);
         $$ = $1;
       }
-    | VARIABLE
+    | var
       {
         std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new Variable($1));
+        variables->push_back($1);
         $$ = variables;
       }
-    | variables PIPE RUN_TIME_VAR_DUR
+
+var:
+    VARIABLE
       {
-        std::vector<Variable *> *v = $1;
-        v->push_back(new Duration($3));
-        $$ = $1;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new Variable(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new Variable(name)); }
+        if (!var) { var = new Variable(name); }
+        $$ = var;
       }
     | RUN_TIME_VAR_DUR
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new Duration($1));
-        $$ = variables;
-      }
-    | variables PIPE RUN_TIME_VAR_ENV
-      {
-        std::vector<Variable *> *v = $1;
-        v->push_back(new Env($3));
-        $$ = $1;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new Duration(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new Duration(name)); }
+        if (!var) { var = new Duration(name); }
+        $$ = var;
       }
     | RUN_TIME_VAR_ENV
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new Env($1));
-        $$ = variables;
-      }
-    | variables PIPE RUN_TIME_VAR_BLD
-      {
-        std::vector<Variable *> *v = $1;
-        v->push_back(new ModsecBuild($3));
-        $$ = $1;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new Env(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new Env(name)); }
+        if (!var) { var = new Env(name); }
+        $$ = var;
       }
     | RUN_TIME_VAR_BLD
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new ModsecBuild($1));
-        $$ = variables;
-      }
-    | variables PIPE RUN_TIME_VAR_HSV
-      {
-        std::vector<Variable *> *v = $1;
-        v->push_back(new HighestSeverity($3));
-        $$ = $1;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new ModsecBuild(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new ModsecBuild(name)); }
+        if (!var) { var = new ModsecBuild(name); }
+        $$ = var;
       }
     | RUN_TIME_VAR_HSV
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new HighestSeverity($1));
-        $$ = variables;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new HighestSeverity(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new HighestSeverity(name)); }
+        if (!var) { var = new HighestSeverity(name); }
+        $$ = var;
       }
     | RUN_TIME_VAR_TIME
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new Time($1));
-        $$ = variables;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new Time(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new Time(name)); }
+        if (!var) { var = new Time(name); }
+        $$ = var;
       }
     | RUN_TIME_VAR_TIME_DAY
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new TimeDay($1));
-        $$ = variables;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new TimeDay(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new TimeDay(name)); }
+        if (!var) { var = new TimeDay(name); }
+        $$ = var;
       }
     | RUN_TIME_VAR_TIME_EPOCH
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new ModSecurity::Variables::TimeEpoch($1));
-        $$ = variables;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new TimeEpoch(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new TimeEpoch(name)); }
+        if (!var) { var = new TimeEpoch(name); }
+        $$ = var;
       }
     | RUN_TIME_VAR_TIME_HOUR
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new ModSecurity::Variables::TimeHour($1));
-        $$ = variables;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new TimeHour(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new TimeHour(name)); }
+        if (!var) { var = new TimeHour(name); }
+        $$ = var;
       }
     | RUN_TIME_VAR_TIME_MIN
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new ModSecurity::Variables::TimeMin($1));
-        $$ = variables;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new TimeMin(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new TimeMin(name)); }
+        if (!var) { var = new TimeMin(name); }
+        $$ = var;
       }
     | RUN_TIME_VAR_TIME_MON
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new ModSecurity::Variables::TimeMon($1));
-        $$ = variables;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new TimeMon(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new TimeMon(name)); }
+        if (!var) { var = new TimeMon(name); }
+        $$ = var;
       }
     | RUN_TIME_VAR_TIME_SEC
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new ModSecurity::Variables::TimeSec($1));
-        $$ = variables;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new TimeSec(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new TimeSec(name)); }
+        if (!var) { var = new TimeSec(name); }
+        $$ = var;
       }
     | RUN_TIME_VAR_TIME_WDAY
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new ModSecurity::Variables::TimeWDay($1));
-        $$ = variables;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new TimeWDay(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new TimeWDay(name)); }
+        if (!var) { var = new TimeWDay(name); }
+        $$ = var;
       }
     | RUN_TIME_VAR_TIME_YEAR
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back(new ModSecurity::Variables::TimeYear($1));
-        $$ = variables;
-      }
-    | variables PIPE RUN_TIME_VAR_TIME
-      {
-        std::vector<Variable *> *v = $1;
-        v->push_back(new ModSecurity::Variables::Time($3));
-        $$ = $1;
-      }
-    | variables PIPE RUN_TIME_VAR_TIME_DAY
-      {
-        std::vector<Variable *> *v = $1;
-        v->push_back(new ModSecurity::Variables::TimeDay($3));
-        $$ = $1;
-      }
-    | variables PIPE RUN_TIME_VAR_TIME_EPOCH
-      {
-        std::vector<Variable *> *v = $1;
-        v->push_back(new ModSecurity::Variables::TimeEpoch($3));
-        $$ = $1;
-      }
-    | variables PIPE RUN_TIME_VAR_TIME_HOUR
-      {
-        std::vector<Variable *> *v = $1;
-        v->push_back(new ModSecurity::Variables::TimeHour($3));
-        $$ = $1;
-      }
-    | variables PIPE RUN_TIME_VAR_TIME_MIN
-      {
-        std::vector<Variable *> *v = $1;
-        v->push_back(new ModSecurity::Variables::TimeMin($3));
-        $$ = $1;
-      }
-    | variables PIPE RUN_TIME_VAR_TIME_MON
-      {
-        std::vector<Variable *> *v = $1;
-        v->push_back(new ModSecurity::Variables::TimeMon($3));
-        $$ = $1;
-      }
-    | variables PIPE RUN_TIME_VAR_TIME_SEC
-      {
-        std::vector<Variable *> *v = $1;
-        v->push_back(new ModSecurity::Variables::TimeSec($3));
-        $$ = $1;
-      }
-    | variables PIPE RUN_TIME_VAR_TIME_WDAY
-      {
-        std::vector<Variable *> *v = $1;
-        v->push_back(new ModSecurity::Variables::TimeWDay($3));
-        $$ = $1;
-      }
-    | variables PIPE RUN_TIME_VAR_TIME_YEAR
-      {
-        std::vector<Variable *> *v = $1;
-        v->push_back(new ModSecurity::Variables::TimeYear($3));
-        $$ = $1;
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new TimeYear(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new TimeYear(name)); }
+        if (!var) { var = new TimeYear(name); }
+        $$ = var;
       }
 
 actions:
