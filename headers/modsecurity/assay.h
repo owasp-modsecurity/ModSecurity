@@ -239,6 +239,7 @@ class Assay {
     std::unordered_map<std::string, ModSecurityStringVariables *> collections;
 
     void debug(int, std::string);
+    void serverLog(const std::string& msg);
     std::vector<actions::Action *> actions;
 
     bool save_in_auditlog;
@@ -257,6 +258,8 @@ class Assay {
     int highest_severity;
 
     Rules *m_rules;
+
+    std::list<std::string> rulesMessages;
 
  private:
     std::ofstream myfile;

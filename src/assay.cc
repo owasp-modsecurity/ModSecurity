@@ -1353,6 +1353,9 @@ std::list<std::pair<std::string, std::string>>
     return l;
 }
 
+void Assay::serverLog(const std::string& msg) {
+    std::cerr << "Server log is not ready : " << msg << std::endl;
+}
 
 std::string* Assay::resolve_variable_first(std::string var) {
     auto range = m_variables_strings.equal_range(var);
