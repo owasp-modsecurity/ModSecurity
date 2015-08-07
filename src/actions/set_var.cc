@@ -20,6 +20,7 @@
 
 #include "modsecurity/assay.h"
 #include "src/rule.h"
+#include "src/macro_expansion.h"
 
 namespace ModSecurity {
 namespace actions {
@@ -94,6 +95,7 @@ void SetVar::dump() {
 bool SetVar::evaluate(Rule *rule, Assay *assay) {
     std::string targetValue;
 
+    variableName = MacroExpansion::expand(variableName, assay);
     int value = 0;
     try {
         std::string *resolvedValue =
@@ -111,14 +113,16 @@ bool SetVar::evaluate(Rule *rule, Assay *assay) {
     try {
         pre = stoi(predicate);
     } catch (...) {
-        /* perform a macro expansion. */
-        pre = 0;
+        try {
+            pre = stoi(MacroExpansion::expand(predicate, assay));
+        } catch (...) {
+            pre = 0;
+        }
     }
 
     switch (operation) {
         case setOperation:
-            /* perform a macro expansion. */
-            targetValue = predicate;
+            targetValue = MacroExpansion::expand(predicate, assay);
             break;
         case sumAndSetOperation:
             targetValue = std::to_string(value + pre);

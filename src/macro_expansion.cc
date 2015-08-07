@@ -14,10 +14,43 @@
  */
 
 #include "src/macro_expansion.h"
+#include "modsecurity/assay.h"
 
 namespace ModSecurity {
 
-MacroExpansion::MacroExpansion() {
+MacroExpansion::MacroExpansion() { }
+
+std::string MacroExpansion::expand(const std::string& input, Assay *assay) {
+    std::string res(input);
+
+    size_t pos = res.find("%{");
+    while (pos != std::string::npos) {
+        size_t start = pos;
+        size_t end = res.find("}%");
+        if (end == std::string::npos) {
+            return res;
+        }
+        std::string variable(res, start + 2, end - (start + 2));
+        std::string *variableValue;
+        size_t collection = variable.find(".");
+        if (collection == std::string::npos) {
+            variableValue = assay->resolve_variable_first(variable);
+        } else {
+            std::string col = std::string(variable, 0, collection);
+            std::string var = std::string(variable, collection + 1,
+                variable.length() - (collection + 1));
+            variableValue = assay->resolve_variable_first(col, var);
+        }
+
+        res.erase(start, end + 2);
+        if (variableValue != NULL) {
+            res.insert(start, *variableValue);
+        }
+
+        pos = res.find("%{");
+    }
+
+    return res;
 }
 
 }  // namespace ModSecurity

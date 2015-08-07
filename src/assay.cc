@@ -1374,8 +1374,9 @@ std::string* Assay::resolve_variable_first(std::string var) {
 std::string* Assay::resolve_variable_first(const std::string collectionName,
     std::string var) {
     for (auto &a : collections) {
-        if (a.first == collectionName) {
-            auto range = a.second->equal_range(collectionName + ":" + var);
+        if (tolower(a.first) == tolower(collectionName)) {
+            auto range = a.second->equal_range(toupper(collectionName)
+                + ":" + var);
             for (auto it = range.first; it != range.second; ++it) {
                 return &it->second;
             }
@@ -1391,8 +1392,8 @@ void Assay::setCollection(const std::string& collectionName,
     ModSecurityStringVariables *collection;
 
     try {
-        collection = collections.at(collectionName);
-        collection->storeOrUpdateVariable(collectionName + ":"
+        collection = collections.at(toupper(collectionName));
+        collection->storeOrUpdateVariable(toupper(collectionName) + ":"
             + variableName, targetValue);
     } catch (...) {
         debug(9, "don't know any collection named: "
