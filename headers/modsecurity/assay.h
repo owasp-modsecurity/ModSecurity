@@ -95,6 +95,64 @@ class ModSecurityCollectionsVariables :
 class ModSecurityStringVariables :
     public std::unordered_multimap<std::string, std::string> {
  public:
+    void storeVariable(std::string key, std::string value) {
+        this->emplace(key, value);
+    }
+
+    bool storeOrUpdateVariable(const std::string &key,
+        const std::string &value) {
+        if (updateFirstVariable(key, value) == false) {
+            storeVariable(key, value);
+        }
+    }
+
+
+    bool updateFirstVariable(const std::string &key, const std::string &value) {
+        auto range = this->equal_range(key);
+
+        for (auto it = range.first; it != range.second; ++it) {
+            it->second = value;
+            return true;
+        }
+        return false;
+    }
+
+
+    void deleteVariable(const std::string& key) {
+        this->erase(key);
+    }
+
+
+    std::list<std::pair<std::string, std::string>>
+        resolveVariable(const std::string& key) {
+        std::list<std::pair<std::string, std::string>> l;
+        std::pair<std::string, std::string> pair;
+
+        auto range = this->equal_range(key);
+
+        for (auto it = range.first; it != range.second; ++it) {
+            pair = std::make_pair(std::string(key), std::string(it->second));
+            l.push_back(pair);
+        }
+
+        if (l.size() == 0) {
+            for (auto& x : *this) {
+                if ((x.first.substr(0, key.size() + 1).compare(key + ":") != 0)
+                    && (x.first != key)) {
+                    continue;
+                }
+                std::list<std::pair<std::string, std::string>> t;
+                t = this->resolveVariable(x.first);
+                for (std::pair<std::string, std::string> z : t) {
+                    pair = std::make_pair(std::string(z.first),
+                        std::string(z.second));
+                    l.push_back(pair);
+                }
+            }
+        }
+
+        return l;
+    }
 };
 
 /** @ingroup ModSecurity_CPP_API */
@@ -160,18 +218,25 @@ class Assay {
 
     void cleanup();
 
+    void setCollection(const std::string& collectionName,
+        const std::string& variableName,
+        const std::string& targetValue);
+
     const char *getResponseBody();
     int getResponseBodyLenth();
 
     std::list<std::pair<std::string, std::string>>
         resolve_variable(std::string var);
     std::string* resolve_variable_first(std::string);
+    std::string* resolve_variable_first(const std::string collectionName,
+        std::string var);
 
     void store_variable(std::string, const std::string &value);
     bool update_variable_first(std::string var, const std::string &value);
     void delete_variable(std::string key);
 
     ModSecurityStringVariables m_variables_strings;
+    std::unordered_map<std::string, ModSecurityStringVariables *> collections;
 
     void debug(int, std::string);
     std::vector<actions::Action *> actions;

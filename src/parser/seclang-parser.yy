@@ -17,6 +17,7 @@ class Driver;
 }
 
 #include "actions/action.h"
+#include "actions/set_var.h"
 #include "actions/transformations/transformation.h"
 #include "operators/operator.h"
 #include "rule.h"
@@ -40,6 +41,7 @@ class Driver;
 #include "variables/time_year.h"
 
 using ModSecurity::actions::Action;
+using ModSecurity::actions::SetVar;
 using ModSecurity::actions::transformations::Transformation;
 using ModSecurity::operators::Operator;
 using ModSecurity::Rule;
@@ -61,6 +63,7 @@ using ModSecurity::Variables::TimeSec;
 using ModSecurity::Variables::TimeWDay;
 using ModSecurity::Variables::TimeYear;
 using ModSecurity::Variables::Variable;
+
 
 #define CHECK_VARIATION_DECL \
     Variable *var = NULL; \
@@ -182,6 +185,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> OPERATOR
 %token <std::string> ACTION
 %token <std::string> ACTION_SEVERITY
+%token <std::string> ACTION_SETVAR
 %token <std::string> TRANSFORMATION
 
 %token <double> CONFIG_VALUE_NUMBER
@@ -594,6 +598,49 @@ actions:
       {
         std::vector<Action *> *actions = new std::vector<Action *>;
         actions->push_back(Action::instantiate($1));
+        $$ = actions;
+      }
+    | actions COMMA ACTION_SETVAR
+      {
+        std::vector<Action *> *a = $1;
+        std::string error;
+        SetVar *setVar = new SetVar($3);
+
+        if (setVar->init(&error) == false) {
+            driver.parserError << error;
+            YYERROR;
+        }
+
+        a->push_back(setVar);
+        $$ = $1;
+      }
+    | SPACE ACTION_SETVAR
+      {
+        std::vector<Action *> *actions = new std::vector<Action *>;
+        std::string error;
+        SetVar *setVar = new SetVar($2);
+
+        if (setVar->init(&error) == false) {
+            driver.parserError << error;
+            YYERROR;
+        }
+
+        actions->push_back(setVar);
+        $$ = actions;
+
+      }
+    | ACTION_SETVAR
+      {
+        std::vector<Action *> *actions = new std::vector<Action *>;
+        std::string error;
+        SetVar *setVar = new SetVar($1);
+
+        if (setVar->init(&error) == false) {
+            driver.parserError << error;
+            YYERROR;
+        }
+
+        actions->push_back(setVar);
         $$ = actions;
       }
 

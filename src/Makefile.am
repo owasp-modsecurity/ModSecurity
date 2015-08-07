@@ -61,6 +61,7 @@ ACTIONS = \
 	actions/redirect.cc \
 	actions/rule_id.cc \
 	actions/severity.cc \
+	actions/set_var.cc \
 	actions/status.cc \
 	actions/transformations/base64_decode.cc \
 	actions/transformations/base64_decode_ext.cc \
@@ -123,6 +124,7 @@ libmodsecurity_la_SOURCES = \
 	rules.cc \
 	utils.cc \
 	debug_log.cc \
+	macro_expansion.cc \
 	request_body_processor/multipart.cc \
 	request_body_processor/multipart_blob.cc \
 	rule.cc \

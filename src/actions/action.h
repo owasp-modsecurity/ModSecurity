@@ -35,11 +35,17 @@ class Action {
     explicit Action(const std::string& _action)
         : action_kind(2),
         action(_action),
-        temporaryAction(false) { }
+        name(_action),
+        temporaryAction(false) {
+            name.erase(0, 2);
+        }
     explicit Action(const std::string& _action, int kind)
         : action_kind(kind),
         action(_action),
-        temporaryAction(false) { }
+        name(_action),
+        temporaryAction(false) {
+            name.erase(0, 2);
+        }
 
     virtual ~Action() { }
     /**

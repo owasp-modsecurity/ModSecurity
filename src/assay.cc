@@ -124,6 +124,7 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     this->m_responseHeadersNames = resolve_variable_first(
         "RESPONSE_HEADERS_NAMES");
 
+    collections.emplace("TX", new ModSecurityStringVariables());
     this->debug(4, "Initialising transaction");
 }
 
@@ -134,6 +135,10 @@ Assay::~Assay() {
 
     m_requestBody.str(std::string());
     m_requestBody.clear();
+
+    for (auto &a : collections) {
+        delete a.second;
+    }
 
     m_rules->decrementReferenceCount();
 }
@@ -1305,7 +1310,7 @@ std::list<std::pair<std::string, std::string>>
     }
 
     if (l.size() == 0) {
-        for (auto& x : m_variables_strings) {
+        for (auto &x : m_variables_strings) {
             if ((x.first.substr(0, var.size() + 1).compare(var + ":") != 0)
                 && (x.first != var)) {
                 continue;
@@ -1316,6 +1321,31 @@ std::list<std::pair<std::string, std::string>>
                 pair = std::make_pair(std::string(z.first),
                     std::string(z.second));
                 l.push_back(pair);
+            }
+        }
+    }
+
+    for (auto &a : collections) {
+        auto range = a.second->equal_range(var);
+
+        for (auto it = range.first; it != range.second; ++it) {
+            pair = std::make_pair(std::string(var), std::string(it->second));
+            l.push_back(pair);
+        }
+
+        if (l.size() == 0) {
+            for (auto &x : *a.second) {
+                if ((x.first.substr(0, var.size() + 1).compare(var + ":") != 0)
+                    && (x.first != var)) {
+                    continue;
+                }
+                std::list<std::pair<std::string, std::string>> t;
+                t = resolve_variable(x.first);
+                for (std::pair<std::string, std::string> z : t) {
+                    pair = std::make_pair(std::string(z.first),
+                        std::string(z.second));
+                    l.push_back(pair);
+                }
             }
         }
     }
@@ -1331,9 +1361,45 @@ std::string* Assay::resolve_variable_first(std::string var) {
         return &it->second;
     }
 
+    for (auto &a : collections) {
+        auto range = a.second->equal_range(var);
+        for (auto it = range.first; it != range.second; ++it) {
+            return &it->second;
+        }
+    }
     return NULL;
 }
 
+
+std::string* Assay::resolve_variable_first(const std::string collectionName,
+    std::string var) {
+    for (auto &a : collections) {
+        if (a.first == collectionName) {
+            auto range = a.second->equal_range(collectionName + ":" + var);
+            for (auto it = range.first; it != range.second; ++it) {
+                return &it->second;
+            }
+        }
+    }
+    return NULL;
+}
+
+
+void Assay::setCollection(const std::string& collectionName,
+    const std::string& variableName,
+    const std::string& targetValue) {
+    ModSecurityStringVariables *collection;
+
+    try {
+        collection = collections.at(collectionName);
+        collection->storeOrUpdateVariable(collectionName + ":"
+            + variableName, targetValue);
+    } catch (...) {
+        debug(9, "don't know any collection named: "
+            + collectionName + ". it was created?");
+        return;
+    }
+}
 
 /**
  * @name    msc_new_assay
