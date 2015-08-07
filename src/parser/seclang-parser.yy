@@ -19,6 +19,7 @@ class Driver;
 #include "actions/action.h"
 #include "actions/set_var.h"
 #include "actions/msg.h"
+#include "actions/rev.h"
 #include "actions/tag.h"
 #include "actions/transformations/transformation.h"
 #include "operators/operator.h"
@@ -45,6 +46,7 @@ class Driver;
 using ModSecurity::actions::Action;
 using ModSecurity::actions::SetVar;
 using ModSecurity::actions::Tag;
+using ModSecurity::actions::Rev;
 using ModSecurity::actions::Msg;
 using ModSecurity::actions::transformations::Transformation;
 using ModSecurity::operators::Operator;
@@ -192,6 +194,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> ACTION_SETVAR
 %token <std::string> ACTION_MSG
 %token <std::string> ACTION_TAG
+%token <std::string> ACTION_REV
 %token <std::string> TRANSFORMATION
 
 %token <double> CONFIG_VALUE_NUMBER
@@ -691,6 +694,28 @@ actions:
         std::vector<Action *> *actions = new std::vector<Action *>;
         Tag *tag = new Tag($1);
         actions->push_back(tag);
+        $$ = actions;
+      }
+    | actions COMMA ACTION_REV
+      {
+        std::vector<Action *> *a = $1;
+        Rev *rev = new Rev($3);
+        a->push_back(rev);
+        $$ = $1;
+      }
+    | SPACE ACTION_REV
+      {
+        std::vector<Action *> *actions = new std::vector<Action *>;
+        Rev *rev = new Rev($2);
+        actions->push_back(rev);
+        $$ = actions;
+
+      }
+    | ACTION_REV
+      {
+        std::vector<Action *> *actions = new std::vector<Action *>;
+        Rev *rev = new Rev($1);
+        actions->push_back(rev);
         $$ = actions;
       }
 

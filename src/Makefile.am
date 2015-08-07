@@ -60,6 +60,7 @@ ACTIONS = \
 	actions/no_audit_log.cc \
 	actions/phase.cc \
 	actions/redirect.cc \
+	actions/rev.cc \
 	actions/rule_id.cc \
 	actions/severity.cc \
 	actions/set_var.cc \

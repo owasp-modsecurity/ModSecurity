@@ -23,11 +23,12 @@ using ModSecurity::split;
 %}
 %option noyywrap nounput batch debug noinput
 
-ACTION          (?i:accuracy|allow|append|auditlog|block|capture|chain|ctl|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|initcol|log|logdata|maturity|multiMatch|noauditlog|nolog|pass|pause|phase:[0-9]+|prepend|proxy|redirect:[A-Z0-9_\|\&\:\/\/\.]+|rev|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|skipAfter|status:[0-9]+|ver|xmlns)
+ACTION          (?i:accuracy|allow|append|auditlog|block|capture|chain|ctl|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|initcol|log|logdata|maturity|multiMatch|noauditlog|nolog|pass|pause|phase:[0-9]+|prepend|proxy|redirect:[A-Z0-9_\|\&\:\/\/\.]+|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|skipAfter|status:[0-9]+|ver|xmlns)
 ACTION_SEVERITY (?i:severity:[0-9]+|severity:'[0-9]+'|severity:(EMERGENCY|ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)|severity:'(EMERGENCY|ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)')
 ACTION_SETVAR   (?i:setvar)
 ACTION_MSG      (?i:msg)
 ACTION_TAG      (?i:tag)
+ACTION_REV      (?i:rev)
 DIRECTIVE       SecRule
 
 CONFIG_DIRECTIVE SecRequestBodyNoFilesLimit|SecRequestBodyInMemoryLimit|SecPcreMatchLimitRecursion|SecPcreMatchLimit|SecResponseBodyMimeType|SecTmpDir|SecDataDir|SecArgumentSeparator|SecCookieFormat|SecStatusEngine
@@ -202,6 +203,7 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
                                          }
 {ACTION_MSG}:'{FREE_TEXT}'      { return yy::seclang_parser::make_ACTION_MSG(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_TAG}:'{FREE_TEXT}'      { return yy::seclang_parser::make_ACTION_TAG(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_REV}:'{FREE_TEXT}'      { return yy::seclang_parser::make_ACTION_REV(strchr(yytext, ':') + 1, *driver.loc.back()); }
 
 ["]                             { return yy::seclang_parser::make_QUOTATION_MARK(*driver.loc.back()); }
 [,]                             { return yy::seclang_parser::make_COMMA(*driver.loc.back()); }

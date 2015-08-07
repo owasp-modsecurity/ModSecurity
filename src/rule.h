@@ -16,6 +16,7 @@
 #ifdef __cplusplus
 #include <stack>
 #include <vector>
+#include <string>
 #endif
 
 #ifndef SRC_RULE_H_
@@ -59,6 +60,8 @@ class Rule {
     void refCountIncrease() {
         this->m_referenceCount++;
     }
+
+    std::string rev;
 
  private:
     int m_referenceCount;
