@@ -64,6 +64,7 @@ ACTIONS = \
 	actions/severity.cc \
 	actions/set_var.cc \
 	actions/status.cc \
+	actions/tag.cc \
 	actions/transformations/base64_decode.cc \
 	actions/transformations/base64_decode_ext.cc \
 	actions/transformations/cmd_line.cc \

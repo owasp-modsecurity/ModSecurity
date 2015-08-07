@@ -19,6 +19,7 @@ class Driver;
 #include "actions/action.h"
 #include "actions/set_var.h"
 #include "actions/msg.h"
+#include "actions/tag.h"
 #include "actions/transformations/transformation.h"
 #include "operators/operator.h"
 #include "rule.h"
@@ -43,6 +44,7 @@ class Driver;
 
 using ModSecurity::actions::Action;
 using ModSecurity::actions::SetVar;
+using ModSecurity::actions::Tag;
 using ModSecurity::actions::Msg;
 using ModSecurity::actions::transformations::Transformation;
 using ModSecurity::operators::Operator;
@@ -189,6 +191,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> ACTION_SEVERITY
 %token <std::string> ACTION_SETVAR
 %token <std::string> ACTION_MSG
+%token <std::string> ACTION_TAG
 %token <std::string> TRANSFORMATION
 
 %token <double> CONFIG_VALUE_NUMBER
@@ -666,6 +669,28 @@ actions:
         std::vector<Action *> *actions = new std::vector<Action *>;
         Msg *msg = new Msg($1);
         actions->push_back(msg);
+        $$ = actions;
+      }
+    | actions COMMA ACTION_TAG
+      {
+        std::vector<Action *> *a = $1;
+        Tag *tag = new Tag($3);
+        a->push_back(tag);
+        $$ = $1;
+      }
+    | SPACE ACTION_TAG
+      {
+        std::vector<Action *> *actions = new std::vector<Action *>;
+        Tag *tag = new Tag($2);
+        actions->push_back(tag);
+        $$ = actions;
+
+      }
+    | ACTION_TAG
+      {
+        std::vector<Action *> *actions = new std::vector<Action *>;
+        Tag *tag = new Tag($1);
+        actions->push_back(tag);
         $$ = actions;
       }
 

@@ -260,6 +260,7 @@ class Assay {
     Rules *m_rules;
 
     std::list<std::string> rulesMessages;
+    std::list<std::string> ruleTags;
 
  private:
     std::ofstream myfile;
