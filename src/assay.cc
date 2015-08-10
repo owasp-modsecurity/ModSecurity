@@ -156,6 +156,10 @@ Assay::~Assay() {
  *
  */
 void Assay::debug(int level, std::string message) {
+    if (m_rules == NULL) {
+        return;
+    }
+
     m_rules->debug(level, message);
 }
 
@@ -233,18 +237,18 @@ int Assay::processURI(const char *uri, const char *protocol,
     m_uri = uri;
     m_uri_decoded = uri_decode(uri);
 
-    const char *pos = strchr(m_uri_decoded.c_str(), '?');
+    size_t pos = m_uri_decoded.find("?");
 
     store_variable("REQUEST_LINE", std::string(protocol) + " " +
         std::string(uri) + " HTTP/" + std::string(http_version));
 
     std::string path_info;
-    if (pos == NULL) {
+    if (pos == std::string::npos) {
         path_info = std::string(m_uri_decoded, 0);
     } else {
-        path_info = std::string(m_uri_decoded, 0,
-            pos - m_uri_decoded.c_str());
-        store_variable("QUERY_STRING", std::string(strchr(m_uri, '?')));
+        path_info = std::string(m_uri_decoded, 0, pos);
+        store_variable("QUERY_STRING", std::string(m_uri_decoded, pos + 1,
+            m_uri_decoded.length() - (pos + 1)));
     }
     store_variable("PATH_INFO", path_info);
     store_variable("REQUEST_FILENAME", path_info);
@@ -260,7 +264,7 @@ int Assay::processURI(const char *uri, const char *protocol,
     store_variable("REQUEST_URI", uri);
     store_variable("REQUEST_URI_RAW", uri);
 
-    if (pos != NULL && strlen(pos) > 2) {
+    if (pos != std::string::npos && (m_uri_decoded.length() - pos) > 2) {
         /**
          * FIXME:
          *
@@ -269,10 +273,11 @@ int Assay::processURI(const char *uri, const char *protocol,
          *
          */
         char sep1 = '&';
+        std::string sets(m_uri_decoded, pos + 1, m_uri_decoded.length() -
+            (pos + 1));
+        std::vector<std::string> key_value_sets = split(sets, sep1);
 
-        std::vector<std::string> key_value = split(pos+1, sep1);
-
-        for (std::string t : key_value) {
+        for (std::string t : key_value_sets) {
             /**
              * FIXME:
              *
@@ -282,27 +287,41 @@ int Assay::processURI(const char *uri, const char *protocol,
             char sep2 = '=';
 
             std::vector<std::string> key_value = split(t, sep2);
-            store_variable("ARGS:" + key_value[0], key_value[1]);
-            store_variable("ARGS_GET:" + key_value[0], key_value[1]);
+            if (key_value.size() <= 1) {
+                /** TODO: Verify what ModSecurity 2.9.0 does when there is a
+                 *        key without an argument
+                 */
+                continue;
+            }
+            std::string key = key_value[0];
+            std::string value = key_value[1];
+            int i = key_value.size() - 1;
+            while (i > 2) {
+                value = value + sep2 + key_value[i];
+                i--;
+            }
+
+            store_variable("ARGS:" + key, value);
+            store_variable("ARGS_GET:" + key, value);
 
             if (m_namesArgs->empty()) {
-                m_namesArgs->assign(key_value[0]);
+                m_namesArgs->assign(key);
             } else {
-                m_namesArgs->assign(*m_namesArgs + " " + key_value[0]);
+                m_namesArgs->assign(*m_namesArgs + " " + key);
             }
             if (m_namesArgsGet->empty()) {
-                m_namesArgsGet->assign(key_value[0]);
+                m_namesArgsGet->assign(key);
             } else {
-                m_namesArgsGet->assign(*m_namesArgsGet + " " + key_value[0]);
+                m_namesArgsGet->assign(*m_namesArgsGet + " " + key);
             }
 
             this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
-                key_value[0].length() + key_value[1].length();
+                key.length() + value.length();
             this->m_ARGScombinedSizeStr->assign(
                 std::to_string(this->m_ARGScombinedSize));
 
             debug(4, "Adding request argument (QUERY_STRING): name \"" + \
-                key_value[0] + "\", value \"" + key_value[1] + "\"");
+                key + "\", value \"" + value + "\"");
         }
     }
     return true;
@@ -939,7 +958,9 @@ int Assay::processLogging(int returned_code) {
     this->m_rules->evaluate(ModSecurity::LoggingPhase, this);
 
     /* If relevant, save this assay information at the audit_logs */
-    this->m_rules->audit_log->saveIfRelevant(this);
+    if (m_rules != NULL && m_rules->audit_log != NULL) {
+        this->m_rules->audit_log->saveIfRelevant(this);
+    }
 
     return 0;
 }
@@ -1277,7 +1298,7 @@ std::string Assay::to_json(int parts) {
 }
 
 
-void Assay::store_variable(std::string key, const std::string &value) {
+void Assay::store_variable(std::string key, std::string value) {
     this->m_variables_strings.emplace(key, value);
 }
 

@@ -231,7 +231,7 @@ class Assay {
     std::string* resolve_variable_first(const std::string collectionName,
         std::string var);
 
-    void store_variable(std::string, const std::string &value);
+    void store_variable(std::string, std::string value);
     bool update_variable_first(std::string var, const std::string &value);
     void delete_variable(std::string key);
 

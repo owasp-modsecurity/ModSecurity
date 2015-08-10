@@ -50,7 +50,8 @@ class Driver;
 class Rules : public RulesProperties  {
  public:
     Rules()
-        : RulesProperties(NULL),
+        : debugLog(NULL),
+        RulesProperties(NULL),
         unicode_codepage(0) {
             unicode_map_table = reinterpret_cast<int *>(
                 malloc(sizeof(int)*65536));
@@ -58,7 +59,8 @@ class Rules : public RulesProperties  {
         }
 
     explicit Rules(DebugLog *customLog)
-        : unicode_codepage(0),
+        : debugLog(NULL),
+        unicode_codepage(0),
         RulesProperties(customLog) {
             unicode_map_table = reinterpret_cast<int *>(
                 malloc(sizeof(int)*65536));

@@ -32,34 +32,11 @@ namespace ModSecurity {
 /** @ingroup ModSecurity_CPP_API */
 class AuditLog {
  public:
-    AuditLog()
-        : m_status(OffAuditLogStatus),
-        m_path1(""),
-        m_path2(""),
-        m_storage_dir(""),
-        m_parts(AAuditLogPart | BAuditLogPart | CAuditLogPart | FAuditLogPart
-            | HAuditLogPart | ZAuditLogPart),
-        m_type(ParallelAuditLogType),
-        m_writer(NULL),
-        m_relevant(""),
-        filePermission(0600),
-        directoryPermission(0600),
-        m_refereceCount(0)
-        { }
-
+    AuditLog();
     ~AuditLog();
 
-    void refCountIncrease() {
-        m_refereceCount++;
-    }
-
-
-    void refCountDecreaseAndCheck() {
-        m_refereceCount--;
-        if (m_refereceCount == 0) {
-            delete this;
-        }
-    }
+    void refCountIncrease();
+    void refCountDecreaseAndCheck();
 
     enum AuditLogType {
      SerialAuditLogType,

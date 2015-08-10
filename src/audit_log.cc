@@ -33,11 +33,37 @@
 
 namespace ModSecurity {
 
+AuditLog::AuditLog()
+    : m_status(OffAuditLogStatus),
+    m_path1(""),
+    m_path2(""),
+    m_storage_dir(""),
+    m_parts(AAuditLogPart | BAuditLogPart | CAuditLogPart | FAuditLogPart
+            | HAuditLogPart | ZAuditLogPart),
+    m_type(ParallelAuditLogType),
+    m_writer(NULL),
+    m_relevant(""),
+    filePermission(0600),
+    directoryPermission(0600),
+    m_refereceCount(0) { }
 
 AuditLog::~AuditLog() {
-    m_writer->refCountDecreaseAndCheck();
+    if (m_writer) {
+        m_writer->refCountDecreaseAndCheck();
+    }
 }
 
+void AuditLog::refCountIncrease() {
+    m_refereceCount++;
+}
+
+
+void AuditLog::refCountDecreaseAndCheck() {
+    m_refereceCount--;
+    if (m_refereceCount == 0) {
+        delete this;
+    }
+}
 
 bool AuditLog::setStorageDirMode(int permission) {
     this->directoryPermission = permission;
@@ -134,8 +160,13 @@ bool AuditLog::init() {
 
 bool AuditLog::isRelevant(int status) {
     std::string sstatus = std::to_string(status);
+
+    if (m_relevant.empty()) {
+        return false;
+    }
+
     return Utils::regex_search(sstatus,
-        Utils::Regex(this->m_relevant)) != 0;
+        Utils::Regex(m_relevant)) != 0;
 }
 
 
