@@ -20,7 +20,13 @@
 
 #include "operators/operator.h"
 
-#ifdef __cplusplus
+
+#define UNICODE_ERROR_CHARACTERS_MISSING    -1
+#define UNICODE_ERROR_INVALID_ENCODING      -2
+#define UNICODE_ERROR_OVERLONG_CHARACTER    -3
+#define UNICODE_ERROR_RESTRICTED_CHARACTER  -4
+#define UNICODE_ERROR_DECODING_ERROR        -5
+
 
 namespace ModSecurity {
 namespace operators {
@@ -28,14 +34,18 @@ namespace operators {
 class ValidateUtf8Encoding : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    ValidateUtf8Encoding(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    ValidateUtf8Encoding(std::string op, std::string param, bool negation)
+        : Operator(op, param, negation) { }
+
+    bool evaluate(Assay *assay, const std::string &input) override;
+
+    int detect_utf8_character(const unsigned char *p_read,
+        unsigned int length);
 };
 
 }  // namespace operators
 }  // namespace ModSecurity
 
-#endif
 
 
 #endif  // SRC_OPERATORS_VALIDATE_UTF8_ENCODING_H_

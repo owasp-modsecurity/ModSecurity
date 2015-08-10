@@ -94,6 +94,12 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
         } else if (strcmp(key, "input") == 0) {
            u->input = YAJL_GET_STRING(val);
            replaceAll(&(u->input), "\\0", '\0');
+           replaceAll(&(u->input), "\\xe4", '\xe4');
+           replaceAll(&(u->input), "\\x03", '\x03');
+           replaceAll(&(u->input), "\\xbf", '\xbf');
+           replaceAll(&(u->input), "\\xc9", '\xc9');
+           replaceAll(&(u->input), "\\x3b", '\x3b');
+           replaceAll(&(u->input), "\\xFF", '\xff');
         } else if (strcmp(key, "name") == 0) {
            u->name = YAJL_GET_STRING(val);
         } else if (strcmp(key, "type") == 0) {
