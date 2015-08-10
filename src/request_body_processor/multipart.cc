@@ -120,6 +120,8 @@ bool Multipart::init() {
             "(invalid characters).");
         return false;
     }
+
+    return true;
 }
 
 
