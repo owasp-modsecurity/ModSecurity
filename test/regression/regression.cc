@@ -112,6 +112,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
                 std::cout << "passed!" << std::endl;
                 return;
             } else {
+                std::cout << "failed!" << std::endl;
                 std::cout << "Expected a parser error." << std::endl;
                 std::cout << "Expected: " << t->parser_error << std::endl;
                 std::cout << "Produced: " << s << std::endl;
@@ -120,6 +121,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
 
         } else {
             if (t->parser_error.empty() == false) {
+                std::cout << "failed!" << std::endl;
                 std::cout << "Expected a parser error." << std::endl;
                 std::cout << "Expected: " << t->parser_error << std::endl;
             }
@@ -192,9 +194,11 @@ end:
             (modsec_rules->debugLog);
 
         if (!d->contains(t->debug_log)) {
+            std::cout << "failed!" << std::endl;
             std::cout << "Debug log was not matching the expected results.";
             std::cout << std::endl;
         } else if (r.status != t->http_code) {
+            std::cout << "failed!" << std::endl;
             std::cout << "HTTP code mismatch. expecting: " + \
                 std::to_string(t->http_code) + \
                 " got: " + std::to_string(r.status) + "\n";
