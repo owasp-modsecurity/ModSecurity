@@ -18,47 +18,57 @@
 #include <string>
 
 #include "operators/operator.h"
+#include "src/macro_expansion.h"
 
 namespace ModSecurity {
 namespace operators {
 
+bool ContainsWord::acceptableChar(const std::string& a, size_t pos) {
+    if (a.size() - 1 < pos) {
+        return false;
+    }
+
+    if ((a.at(pos) >= 65 && a.at(pos) <= 90) ||
+        (a.at(pos) >= 97 && a.at(pos) <= 122)) {
+        return false;
+    }
+
+    return true;
+}
+
 bool ContainsWord::evaluate(Assay *assay,
-    std::string input) {
-    /**
-     * @todo Implement the operator ContainsWord in a performative way.
-     */
+    const std::string& input) {
+    std::string paramTarget = MacroExpansion::expand(param, assay);
 
-    // FIXME: This is odd logic and should be removed in a future version
-    if (this->param == "") {
-        return 1;
+    if (paramTarget.empty()) {
+        return true;
     }
-    // If our length is too long we will never match
-    if (this->param.length() > input.length()) {
-        return 0;
+    if (input.empty()) {
+        return false;
     }
-    // If they are exact matches shortcut
-    if (this->param == input) {
-        return 1;
+    if (input == paramTarget) {
+        return true;
     }
 
-    // std::regex r("\\b" + this->param + "\\b");
-    // std::smatch m;
-    // if (std::regex_search(input, m, r)) {
-        // this won't find anything because 'spoons' is not
-        // the word you're searching for
-    //    return 1;
-    // }
+    size_t pos = input.find(paramTarget);
+    while (pos != std::string::npos) {
+        if (pos == 0 && acceptableChar(input, paramTarget.size())) {
+            return true;
+        }
+        if (pos + paramTarget.size() == input.size() &&
+            acceptableChar(input, pos - 1)) {
+            return true;
+        }
+        if (acceptableChar(input, pos - 1) &&
+            acceptableChar(input, pos + paramTarget.size())) {
+            return true;
+        }
+        pos = input.find(paramTarget, pos + 1);
+    }
 
-    return 0;
+    return false;
 }
 
-
-ContainsWord::ContainsWord(std::string op,
-    std::string param, bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity

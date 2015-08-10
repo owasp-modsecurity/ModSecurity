@@ -59,7 +59,7 @@
 #include "operators/begins_with.h"
 
 #define IF_MATCH(a) \
-    if (op.compare(1, std::strlen(#a), #a) == 0)
+    if (op.compare(1, op.length() - 2, #a) == 0)
 
 namespace ModSecurity {
 namespace operators {
@@ -75,6 +75,9 @@ bool Operator::evaluate(Assay *assay) {
     if (assay) {
         assay->debug(2, "Operator: " + this->op + \
             " is not implemented or malfunctioning.");
+    } else {
+        std::cerr << "Operator: " + this->op + \
+            " is not implemented or malfunctioning.";
     }
     return true;
 }
@@ -84,6 +87,9 @@ bool Operator::evaluate(Assay *assay, const std::string& a) {
     if (assay) {
         assay->debug(2, "Operator: " + this->op + \
             " is not implemented or malfunctioning.");
+    } else {
+        std::cerr << "Operator: " + this->op + \
+            " is not implemented or malfunctioning.";
     }
 
     return true;
