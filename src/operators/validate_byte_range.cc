@@ -100,6 +100,8 @@ bool ValidateByteRange::init(const char **error) {
         }
         pos = next_pos;
     }
+
+    return true;
 }
 
 
