@@ -27,8 +27,10 @@ namespace operators {
 class Eq : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Eq(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    Eq(std::string op, std::string param, bool negation)
+        : Operator(op, param, negation) { }
+
+    bool evaluate(Assay *assay, const std::string &input) override;
 };
 
 }  // namespace operators

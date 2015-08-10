@@ -22,21 +22,32 @@
 namespace ModSecurity {
 namespace operators {
 
-bool Eq::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator Eq.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#eq
-     */
-    return true;
+
+bool Eq::evaluate(Assay *assay, const std::string &input) {
+    int p = 0;
+    int i = 0;
+    bool eq = false;
+
+    try {
+        p = std::stoi(param);
+    } catch (...) {
+        p = 0;
+    }
+    try {
+        i = std::stoi(input);
+    } catch (...) {
+        i = 0;
+    }
+
+    eq = p == i;
+
+    if (negation) {
+        return !eq;
+    }
+
+    return eq;
 }
 
-
-Eq::Eq(std::string op, std::string param,
-    bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity
