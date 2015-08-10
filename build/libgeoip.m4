@@ -103,17 +103,17 @@ else
         if test -e "${x}/include/geoip_parse.h"; then
             geoip_inc_path="${x}/include"
             break
-        elif test -e "${x}/geoip_parse.h"; then
+        elif test -e "${x}/GeoIPCity.h"; then
             geoip_inc_path="${x}"
             break
         fi
 
         dnl # Check some sub-paths as well
         for geoip_pkg_name in ${geoip_lib_name} ${GEOIP_PKGNAMES}; do
-            if test -e "${x}/include/${geoip_pkg_name}/geoip_parse.h"; then
+            if test -e "${x}/include/${geoip_pkg_name}/GeoIPCity.h"; then
                 geoip_inc_path="${x}/include"
                 break
-            elif test -e "${x}/${geoip_pkg_name}/geoip_parse.h"; then
+            elif test -e "${x}/${geoip_pkg_name}/GeoIPCity.h"; then
                 geoip_inc_path="${x}"
                 break
             else
