@@ -235,20 +235,22 @@ int Assay::processURI(const char *uri, const char *protocol,
     m_protocol = protocol;
     m_httpVersion = http_version;
     m_uri = uri;
+    std::string uri_s(uri);
     m_uri_decoded = uri_decode(uri);
 
     size_t pos = m_uri_decoded.find("?");
+    size_t pos_raw = uri_s.find("?");
 
     store_variable("REQUEST_LINE", std::string(protocol) + " " +
         std::string(uri) + " HTTP/" + std::string(http_version));
 
     std::string path_info;
-    if (pos == std::string::npos) {
-        path_info = std::string(m_uri_decoded, 0);
+    if (pos_raw == std::string::npos) {
+        path_info = std::string(uri_s, 0);
     } else {
-        path_info = std::string(m_uri_decoded, 0, pos);
-        store_variable("QUERY_STRING", std::string(m_uri_decoded, pos + 1,
-            m_uri_decoded.length() - (pos + 1)));
+        path_info = std::string(uri_s, 0, pos_raw);
+        store_variable("QUERY_STRING", std::string(uri_s, pos_raw + 1,
+            uri_s.length() - (pos_raw + 1)));
     }
     store_variable("PATH_INFO", path_info);
     store_variable("REQUEST_FILENAME", path_info);
