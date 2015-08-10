@@ -1,5 +1,5 @@
 %skeleton "lalr1.cc" /* -*- C++ -*- */
-%require "3.0.2"
+%require "3.0"
 %defines
 %define parser_class_name {seclang_parser}
 %define api.token.constructor
