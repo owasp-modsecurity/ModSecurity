@@ -22,20 +22,17 @@
 namespace ModSecurity {
 namespace operators {
 
-bool StrMatch::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator StrMatch.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#strmatch
-     */
-    return true;
+
+bool StrMatch::evaluate(Assay *assay, const std::string &input) {
+    bool ret = input.find(param) != std::string::npos;
+
+    if (negation) {
+        return !ret;
+    }
+
+    return ret;
 }
 
-
-StrMatch::StrMatch(std::string op, std::string param, bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity
