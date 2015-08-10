@@ -40,8 +40,10 @@ std::string CompressWhitespace::evaluate(std::string value,
     /**
      * @todo Implement the transformation CompressWhitespace
      */
-    assay->debug(4, "Transformation CompressWhitespace is " \
-        "not implemented yet.");
+    if (assay) {
+        assay->debug(4, "Transformation CompressWhitespace is " \
+            "not implemented yet.");
+    }
     return value;
 }
 

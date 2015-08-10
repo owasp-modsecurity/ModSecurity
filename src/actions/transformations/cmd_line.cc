@@ -40,7 +40,9 @@ std::string CmdLine::evaluate(std::string value,
     /**
      * @todo Implement the transformation CmdLine
      */
-    assay->debug(4, "Transformation CmdLine is not implemented yet.");
+    if (assay) {
+        assay->debug(4, "Transformation CmdLine is not implemented yet.");
+    }
     return value;
 }
 

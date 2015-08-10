@@ -40,7 +40,9 @@ std::string Utf8Unicode::evaluate(std::string value,
     /**
      * @todo Implement the transformation Utf8Unicode
      */
-    assay->debug(4, "Transformation Utf8Unicode is not implemented yet.");
+    if (assay) {
+        assay->debug(4, "Transformation Utf8Unicode is not implemented yet.");
+    }
     return value;
 }
 

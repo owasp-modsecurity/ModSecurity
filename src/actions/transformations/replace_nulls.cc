@@ -40,7 +40,9 @@ std::string ReplaceNulls::evaluate(std::string value,
     /**
      * @todo Implement the transformation ReplaceNulls
      */
-    assay->debug(4, "Transformation ReplaceNulls is not implemented yet.");
+    if (assay) {
+        assay->debug(4, "Transformation ReplaceNulls is not implemented yet.");
+    }
     return value;
 }
 

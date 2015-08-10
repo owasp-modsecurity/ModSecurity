@@ -40,7 +40,10 @@ std::string Base64DecodeExt::evaluate(std::string value,
     /**
      * @todo Implement the transformation Base64DecodeExt
      */
-    assay->debug(4, "Transformation Base64DecodeExt is not implemented yet.");
+    if (assay) {
+        assay->debug(4, "Transformation Base64DecodeExt is" \
+            " not implemented yet.");
+    }
     return value;
 }
 

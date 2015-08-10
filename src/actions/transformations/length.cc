@@ -40,7 +40,9 @@ std::string Length::evaluate(std::string value,
     /**
      * @todo Implement the transformation Length
      */
-    assay->debug(4, "Transformation Length is not implemented yet.");
+    if (assay) {
+        assay->debug(4, "Transformation Length is not implemented yet.");
+    }
     return value;
 }
 

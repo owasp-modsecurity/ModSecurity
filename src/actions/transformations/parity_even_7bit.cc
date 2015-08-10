@@ -40,7 +40,10 @@ std::string ParityEven7bit::evaluate(std::string value,
     /**
      * @todo Implement the transformation ParityEven7bit
      */
-    assay->debug(4, "Transformation ParityEven7bit is not implemented yet.");
+    if (assay) {
+        assay->debug(4, "Transformation ParityEven7bit is not" \
+            " implemented yet.");
+    }
     return value;
 }
 

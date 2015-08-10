@@ -40,7 +40,9 @@ std::string UrlDecode::evaluate(std::string value,
     /**
      * @todo Implement the transformation UrlDecode
      */
-    assay->debug(4, "Transformation UrlDecode is not implemented yet.");
+    if (assay) {
+        assay->debug(4, "Transformation UrlDecode is not implemented yet.");
+    }
     return value;
 }
 

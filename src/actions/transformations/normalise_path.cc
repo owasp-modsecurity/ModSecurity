@@ -40,7 +40,10 @@ std::string NormalisePath::evaluate(std::string value,
     /**
      * @todo Implement the transformation NormalisePath
      */
-    assay->debug(4, "Transformation NormalisePath is not implemented yet.");
+    if (assay) {
+        assay->debug(4, "Transformation NormalisePath is not" \
+        " implemented yet.");
+    }
     return value;
 }
 

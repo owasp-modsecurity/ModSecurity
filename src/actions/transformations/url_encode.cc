@@ -40,7 +40,9 @@ std::string UrlEncode::evaluate(std::string value,
     /**
      * @todo Implement the transformation UrlEncode
      */
-    assay->debug(4, "Transformation UrlEncode is not implemented yet.");
+    if (assay) {
+        assay->debug(4, "Transformation UrlEncode is not implemented yet.");
+    }
     return value;
 }
 

@@ -40,7 +40,9 @@ std::string Sha1::evaluate(std::string value,
     /**
      * @todo Implement the transformation Sha1
      */
-    assay->debug(4, "Transformation Sha1 is not implemented yet.");
+    if (assay) {
+        assay->debug(4, "Transformation Sha1 is not implemented yet.");
+    }
     return value;
 }
 
