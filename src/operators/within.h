@@ -27,8 +27,10 @@ namespace operators {
 class Within : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Within(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    Within(std::string op, std::string param, bool negation)
+        : Operator(op, param, negation) { }
+
+    bool evaluate(Assay *assay, const std::string &str);
 };
 
 }  // namespace operators

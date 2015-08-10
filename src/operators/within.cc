@@ -18,24 +18,30 @@
 #include <string>
 
 #include "operators/operator.h"
+#include "src/macro_expansion.h"
 
 namespace ModSecurity {
 namespace operators {
 
-bool Within::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator Within.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#within
-     */
-    return true;
-}
+
+bool Within::evaluate(Assay *assay, const std::string &str) {
+    bool res = false;
+    std::string paramTarget = MacroExpansion::expand(param, assay);
+
+    if (str.empty()) {
+        return true;
+    }
+
+    res = paramTarget.find(str) != std::string::npos;
 
 
-Within::Within(std::string op, std::string param, bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
+    if (negation) {
+        return !res;
+    }
+
+    return res;
 }
+
 
 }  // namespace operators
 }  // namespace ModSecurity
