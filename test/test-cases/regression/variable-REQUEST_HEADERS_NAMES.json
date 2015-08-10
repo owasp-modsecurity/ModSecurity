@@ -51,7 +51,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"Expect Content-Type Accept User-Agent Content-Length Host\" \\(Variable: REQUEST_HEADERS_NAMES\\)"
+      "debug_log":"Target value: \"[Accept|Expect|Content\\-Type|User\\-Agent|Content\\-Length|Host| ]+\" \\(Variable: REQUEST_HEADERS_NAMES\\)"
     },
     "rules":[  
       "SecRuleEngine On",
