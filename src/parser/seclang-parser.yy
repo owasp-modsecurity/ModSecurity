@@ -120,18 +120,14 @@ using ModSecurity::Variables::Variable;
 %define api.token.prefix {TOK_}
 %token
   END  0  "end of file"
-  CONFIG_DIR_VAL    "+"
-  COMMA    "*"
+  COMMA    ","
   QUOTATION_MARK  ")"
   SPACE
   PIPE
-  UNKNOWN
-  FREE_TEXT
 ;
 
-%left ARGS CONFIG_VALUE_RELEVANT_ONLY CONFIG_VALUE_ON CONFIG_VALUE_OFF CONFIG_VALUE
+%left CONFIG_VALUE_RELEVANT_ONLY CONFIG_VALUE_ON CONFIG_VALUE_OFF
 %token <std::string> DIRECTIVE
-%token <std::string> CONFIG_DIRECTIVE
 %token <std::string> CONFIG_DIR_REQ_BODY_LIMIT
 %token <std::string> CONFIG_DIR_RES_BODY_LIMIT
 %token <std::string> CONFIG_DIR_REQ_BODY_LIMIT_ACTION
@@ -139,7 +135,6 @@ using ModSecurity::Variables::Variable;
 %token <std::string> CONFIG_DIR_RULE_ENG
 %token <std::string> CONFIG_DIR_REQ_BODY
 %token <std::string> CONFIG_DIR_RES_BODY
-%token <std::string> CONFIG_VALUE
 %token <std::string> CONFIG_VALUE_ON
 %token <std::string> CONFIG_VALUE_OFF
 %token <std::string> CONFIG_VALUE_DETC
@@ -182,8 +177,6 @@ using ModSecurity::Variables::Variable;
 %token <std::string> RUN_TIME_VAR_TIME_WDAY
 %token <std::string> RUN_TIME_VAR_TIME_YEAR
 
-%token <std::string> CONFIG_INCLUDE
-%token <std::string> CONFIG_SEC_REMOTE_RULES
 %token <std::string> CONFIG_SEC_REMOTE_RULES_FAIL_ACTION
 
 %token <std::string> CONFIG_DIR_GEO_DB
@@ -197,8 +190,6 @@ using ModSecurity::Variables::Variable;
 %token <std::string> ACTION_REV
 %token <std::string> TRANSFORMATION
 
-%token <double> CONFIG_VALUE_NUMBER
-
 %type <std::vector<Action *> *> actions
 %type <std::vector<Variable *> *> variables
 %type <Variable *> var
@@ -206,19 +197,17 @@ using ModSecurity::Variables::Variable;
 
 %printer { yyoutput << $$; } <*>;
 %%
-%start secrule;
+%start input;
 
 
-secrule:
-    | secrule line
+input:
+    %empty
+    | input line
+    ;
 
-line: 
-    expression
+line: expression
     | SPACE expression
-    | SPACE
-      {
-
-      }
+    ;
 
 audit_log:
     /* SecAuditLogDirMode */
@@ -289,7 +278,7 @@ audit_log:
       {
         driver.audit_log->setType(ModSecurity::AuditLog::ParallelAuditLogType);
       }
-
+    ;
 
 expression:
     audit_log
@@ -387,7 +376,7 @@ expression:
       {
         driver.remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
       }
-
+    ;
 
 variables:
     variables PIPE var
@@ -402,6 +391,7 @@ variables:
         variables->push_back($1);
         $$ = variables;
       }
+    ;
 
 var:
     VARIABLE
@@ -530,6 +520,7 @@ var:
         if (!var) { var = new TimeYear(name); }
         $$ = var;
       }
+    ;
 
 actions:
     actions COMMA SPACE ACTION
@@ -718,6 +709,7 @@ actions:
         actions->push_back(rev);
         $$ = actions;
       }
+    ;
 
 %%
 void
