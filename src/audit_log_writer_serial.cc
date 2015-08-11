@@ -15,13 +15,13 @@
 
 #include "src/audit_log_writer_serial.h"
 
-#include <mutex>
+// #include <mutex>
 
 #include "src/audit_log.h"
 
 namespace ModSecurity {
 
-static std::mutex serialLoggingMutex;
+// static std::mutex serialLoggingMutex;
 
 
 AuditLogWriterSerial::~AuditLogWriterSerial() {
@@ -52,9 +52,9 @@ bool AuditLogWriterSerial::write(Assay *assay, int parts) {
 
     generateBoundary(&boundary);
 
-    serialLoggingMutex.lock();
+    // serialLoggingMutex.lock();
     log << assay->toOldAuditLogFormat(parts, "-" + boundary + "--");
-    serialLoggingMutex.unlock();
+    // serialLoggingMutex.unlock();
     return true;
 }
 
