@@ -128,7 +128,9 @@ Operator *Operator::instantiate(std::string op_string) {
     std::string op_ = op;
     if (op_.length() > 2) {
         op_.erase(0, 1);
-        op_.pop_back();
+        if (op_.back() == ' ') {
+            op_.pop_back();
+        }
     }
 
     IF_MATCH(beginswith) { return new BeginsWith(op, param, negation); }
@@ -139,7 +141,7 @@ Operator *Operator::instantiate(std::string op_string) {
     IF_MATCH(endswith) { return new EndsWith(op, param, negation); }
     IF_MATCH(eq) { return new Eq(op, param, negation); }
     IF_MATCH(fuzzyhash) { return new FuzzyHash(op, param, negation); }
-    IF_MATCH(geolooku) { return new GeoLookup(op, param, negation); }
+    IF_MATCH(geolookup) { return new GeoLookup(op, param, negation); }
     IF_MATCH(ge) { return new Ge(op, param, negation); }
     IF_MATCH(gsblookup) { return new GsbLookup(op, param, negation); }
     IF_MATCH(gt) { return new Gt(op, param, negation); }
