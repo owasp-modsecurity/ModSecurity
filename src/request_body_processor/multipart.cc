@@ -44,12 +44,11 @@ bool Multipart::init() {
     }
 
     std::size_t boundary_pos = m_header.find("boundary");
-    if (boundary_pos < 0) {
-        if (boundary_pos > 0 && m_header.find("boundary", boundary_pos) > 0) {
-            debug(4, "Multipart: Multiple boundary parameters in " \
-                "Content-Type.");
-            return false;
-        }
+    if (boundary_pos != std::string::npos &&
+        m_header.find("boundary", boundary_pos + 1) != std::string::npos) {
+        debug(4, "Multipart: Multiple boundary parameters in " \
+            "Content-Type.");
+        return false;
     }
 
     std::string boundary = m_header.c_str() + boundary_pos;

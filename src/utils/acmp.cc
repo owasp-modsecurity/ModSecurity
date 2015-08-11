@@ -52,7 +52,7 @@ char *parse_pm_content(const char *op_parm, unsigned short int op_len, const cha
         return NULL;
     }
 
-    while (offset < op_len && content[offset] == ' ' || content[offset] == '\t') {
+    while (offset < op_len && (content[offset] == ' ' || content[offset] == '\t')) {
         offset++;
     };
 
@@ -380,7 +380,7 @@ static int acmp_connect_fail_branches(ACMP *parser) {
     std::vector<acmp_node_t *> arr2;
     std::vector<acmp_node_t *> tmp;
 
-    parser->root_node->text = "";
+    parser->root_node->text = (char *)"";
 
     parser->root_node->fail = parser->root_node;
 
@@ -496,7 +496,7 @@ if (parser->is_active != 0) return -1;
         if (child == NULL) {
             child = (acmp_node_t *) calloc(1, sizeof(acmp_node_t));
             /* ENH: Check alloc succeded */
-            child->pattern = "";
+            child->pattern = (char *)"";
             child->letter = letter;
             child->depth = i;
             child->text = (char *)calloc(1, strlen(pattern) + 2);

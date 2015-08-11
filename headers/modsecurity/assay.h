@@ -104,6 +104,7 @@ class ModSecurityStringVariables :
         if (updateFirstVariable(key, value) == false) {
             storeVariable(key, value);
         }
+        return true;
     }
 
 

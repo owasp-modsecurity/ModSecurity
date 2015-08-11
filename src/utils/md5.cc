@@ -59,19 +59,19 @@ documentation and/or software.
  
 // F, G, H and I are basic MD5 functions.
 inline MD5::uint4 MD5::F(uint4 x, uint4 y, uint4 z) {
-  return x&y | ~x&z;
+  return (x & y) | (~x & z);
 }
  
 inline MD5::uint4 MD5::G(uint4 x, uint4 y, uint4 z) {
-  return x&z | y&~z;
+  return (x & z) | (y & ~z);
 }
  
 inline MD5::uint4 MD5::H(uint4 x, uint4 y, uint4 z) {
-  return x^y^z;
+  return (x ^ y ^ z);
 }
  
 inline MD5::uint4 MD5::I(uint4 x, uint4 y, uint4 z) {
-  return y ^ (x | ~z);
+  return (y ^ (x | ~z));
 }
  
 // rotate_left rotates x left n bits.

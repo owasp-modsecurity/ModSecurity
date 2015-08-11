@@ -70,6 +70,8 @@ bool MultipartBlob::processContent() {
         offset = end + 1;
     }
     content = std::string(m_blob, offset, m_blob.length() - offset + 1);
+
+    return true;
 }
 
 
@@ -123,6 +125,8 @@ bool MultipartBlob::processContentDispositionLine(
             filename = std::string(dispositionLine, offset, end - offset);
         }
     }
+
+    return true;
 }
 
 

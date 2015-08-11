@@ -30,6 +30,7 @@ CustomDebugLog *CustomDebugLog::new_instance() {
 
 bool CustomDebugLog::write_log(int level, const std::string& message) {
     m_log << "[" << level << "] " << message << std::endl;
+    return true;
 }
 
 

@@ -28,11 +28,6 @@
 #ifndef HEADERS_MODSECURITY_RULES_H_
 #define HEADERS_MODSECURITY_RULES_H_
 
-#ifndef __cplusplus
-typedef struct Rules_t Rules;
-typedef struct Assay_t Assay;
-#endif
-
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/assay.h"
 #include "modsecurity/rules_properties.h"

@@ -93,8 +93,9 @@ bool Pm::init(const char **error) {
         acmp_add_pattern(m_p, a.c_str(), NULL, NULL, a.length());
     }
 
-
     acmp_prepare(m_p);
+
+    return true;
 }
 
 
