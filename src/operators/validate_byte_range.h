@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include <cstring>
 
 #include "operators/operator.h"
 
@@ -29,7 +30,9 @@ class ValidateByteRange : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     ValidateByteRange(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
+        : Operator(op, param, negation) {
+            std::memset(table, '\0', sizeof(char) * 32);
+        }
 
     ~ValidateByteRange() override { }
 
