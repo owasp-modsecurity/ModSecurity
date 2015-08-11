@@ -49,26 +49,21 @@ class SHA1 {
     std::string final();
 
  private:
-    /* just needs to be at least 32bit */
-    typedef unsigned long int uint32;
-    /* just needs to be at least 64bit */
-    typedef unsigned long long uint64;
-
     /* number of 32bit integers per SHA1 digest */
     static const unsigned int DIGEST_INTS = 5;
     /* number of 32bit integers per SHA1 block */
     static const unsigned int BLOCK_INTS = 16;
     static const unsigned int BLOCK_BYTES = BLOCK_INTS * 4;
 
-    uint32 digest[DIGEST_INTS];
+    uint32_t digest[DIGEST_INTS];
     std::string buffer;
-    uint64 transforms;
+    uint64_t transforms;
 
     void reset();
-    void transform(uint32 block[BLOCK_BYTES]);
+    void transform(uint32_t block[BLOCK_BYTES]);
 
     static void buffer_to_block(const std::string &buffer,
-        uint32 block[BLOCK_BYTES]);
+        uint32_t block[BLOCK_BYTES]);
 
     void read(std::istream *is, std::string *s, int max);
 };

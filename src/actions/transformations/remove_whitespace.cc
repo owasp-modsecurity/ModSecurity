@@ -41,7 +41,8 @@ std::string RemoveWhitespace::evaluate(std::string value,
      * @todo Implement the transformation RemoveWhitespace
      */
     if (assay) {
-        assay->debug(4, "Transformation RemoveWhitespace is not implemented yet.");
+        assay->debug(4, "Transformation RemoveWhitespace is " \
+            "not implemented yet.");
     }
     return value;
 }
