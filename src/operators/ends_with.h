@@ -27,8 +27,10 @@ namespace operators {
 class EndsWith : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    EndsWith(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay, std::string exp);
+    EndsWith(std::string op, std::string param, bool negation)
+        : Operator(op, param, negation) { }
+
+    bool evaluate(Assay *assay, const std::string &str) override;
 };
 
 

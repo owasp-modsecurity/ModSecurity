@@ -22,37 +22,21 @@
 namespace ModSecurity {
 namespace operators {
 
-bool EndsWith::evaluate(Assay *assay,
-    std::string input) {
-    // Check that the param is not longer than the input
-    if (this->param.length() > input.length()) {
-        return 0;
+
+bool EndsWith::evaluate(Assay *assay, const std::string &input) {
+    bool ret = false;
+    if (input.length() >= param.length()) {
+        ret = (0 == input.compare(input.length() - param.length(),
+            param.length(), param));
     }
 
-    // Check that the input != the param
-    if (this->param == input) {
-        return 1;
+    if (negation) {
+        return !ret;
     }
 
-    // Start at the end of the input minus the size of the input
-    std::string endString = input.substr(input.length() - \
-        (this->param.length()), (this->param.length()));
-
-    // FIXME: We can make this smalle
-    if (endString == this->param) {
-        return 1;
-    }
-
-    return 0;
+    return ret;
 }
 
-
-EndsWith::EndsWith(std::string op, std::string param,
-    bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity
