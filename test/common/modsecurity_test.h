@@ -43,7 +43,7 @@ template <class T> class ModSecurityTest :
 
 }  // namespace modsecurity_test
 
-#include "modsecurity_test.cc"
+#include "test/common/modsecurity_test.cc"
 
 
 #endif  // TEST_COMMON_MODSECURITY_TEST_H_

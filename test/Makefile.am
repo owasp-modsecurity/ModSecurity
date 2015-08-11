@@ -33,6 +33,7 @@ unit_tests_LDADD = \
 unit_tests_CPPFLAGS = \
 	-std=c++11 \
 	-Icommon \
+	-I../ \
 	-O0 \
 	-g \
 	-I$(top_builddir)/headers \
@@ -59,6 +60,7 @@ regression_tests_LDADD = \
 regression_tests_CPPFLAGS = \
 	-std=c++11 \
 	-Icommon \
+	-I../ \
 	-O0 \
 	-g \
 	-I$(top_builddir)/headers \
