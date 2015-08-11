@@ -22,21 +22,91 @@
 namespace ModSecurity {
 namespace operators {
 
-bool ValidateUrlEncoding::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator ValidateUrlEncoding.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#validateUrlEncoding
-     */
-    return true;
+
+int ValidateUrlEncoding::validate_url_encoding(const char *input,
+    uint64_t input_length) {
+    int i;
+
+    if ((input == NULL) || (input_length < 0)) {
+        return -1;
+    }
+
+    i = 0;
+    while (i < input_length) {
+        if (input[i] == '%') {
+            if (i + 2 >= input_length) {
+                /* Not enough bytes. */
+                return -3;
+            } else {
+                /* Here we only decode a %xx combination if it is valid,
+                 * leaving it as is otherwise.
+                 */
+                char c1 = input[i + 1];
+                char c2 = input[i + 2];
+
+                if ( (((c1 >= '0') && (c1 <= '9'))
+                    || ((c1 >= 'a') && (c1 <= 'f'))
+                    || ((c1 >= 'A') && (c1 <= 'F')))
+                    && (((c2 >= '0') && (c2 <= '9'))
+                    || ((c2 >= 'a') && (c2 <= 'f'))
+                    || ((c2 >= 'A') && (c2 <= 'F'))) ) {
+                    i += 3;
+                } else {
+                    /* Non-hexadecimal characters used in encoding. */
+                    return -2;
+                }
+            }
+        } else {
+            i++;
+        }
+    }
+
+    return 1;
 }
 
 
-ValidateUrlEncoding::ValidateUrlEncoding(std::string op, std::string param,
-    bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
+bool ValidateUrlEncoding::evaluate(Assay *assay, const std::string &input) {
+    bool res = false;
+    int rc = validate_url_encoding(input.c_str(), input.size());
+    switch (rc) {
+        case 1 :
+            /* Encoding is valid */
+            if (assay) {
+                assay->debug(7, "Valid URL Encoding at '" +input + "'");
+            }
+            res = false;
+            break;
+        case -2 :
+            if (assay) {
+                assay->debug(7, "Invalid URL Encoding: Non-hexadecimal "
+                    "digits used at '" + input + "'");
+            }
+            res = true; /* Invalid match. */
+            break;
+        case -3 :
+            if (assay) {
+                assay->debug(7, "Invalid URL Encoding: Not enough characters "
+                "at the end of input at '" + input + "'");
+            }
+            res = true; /* Invalid match. */
+            break;
+        case -1 :
+        default :
+            if (assay) {
+                assay->debug(7, "Invalid URL Encoding: Internal Error (rc = " +
+                    std::to_string(rc) + ") at '" + input + "'");
+            }
+            res = true;
+            break;
+    }
+
+    if (negation) {
+        return !res;
+    }
+
+    return res;
 }
+
 
 }  // namespace operators
 }  // namespace ModSecurity
