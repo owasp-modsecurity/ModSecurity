@@ -23,22 +23,22 @@ namespace ModSecurity {
 namespace operators {
 
 
+bool BeginsWith::evaluate(Assay *assay, const std::string &str) {
+    bool ret = false;
 
-bool BeginsWith::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator BeginsWith.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#beginswith
-     */
-    return true;
+    if (str.size() < param.size()) {
+        ret = false;
+    } else if (!str.compare(0, param.size(), param)) {
+         ret = true;
+    }
+
+    if (negation) {
+        return !ret;
+    }
+
+    return ret;
 }
 
-
-BeginsWith::BeginsWith(std::string op, std::string param,
-    bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity
