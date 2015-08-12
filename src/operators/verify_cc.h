@@ -16,25 +16,31 @@
 #ifndef SRC_OPERATORS_VERIFY_CC_H_
 #define SRC_OPERATORS_VERIFY_CC_H_
 
+#include <pcrecpp.h>
+
 #include <string>
 
 #include "operators/operator.h"
 
-#ifdef __cplusplus
 namespace ModSecurity {
 namespace operators {
 
 class VerifyCC : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    VerifyCC(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    VerifyCC(std::string op, std::string param, bool negation)
+        : Operator(op, param, negation),
+        m_re(param, pcrecpp::RE_Options()) { }
+
+    int luhnVerify(const char *ccnumber, int len);
+    bool evaluate(Assay *assay, const std::string &input) override;
+
+ private:
+    pcrecpp::RE m_re;
 };
 
 }  // namespace operators
 }  // namespace ModSecurity
-
-#endif
 
 
 #endif  // SRC_OPERATORS_VERIFY_CC_H_
