@@ -227,10 +227,10 @@ class Assay {
     int getResponseBodyLenth();
 
     std::list<std::pair<std::string, std::string>>
-        resolve_variable(std::string var);
-    std::string* resolve_variable_first(std::string);
-    std::string* resolve_variable_first(const std::string collectionName,
-        std::string var);
+        resolve_variable(const std::string& var);
+    std::string* resolve_variable_first(const std::string& key);
+    std::string* resolve_variable_first(const std::string& collectionName,
+       const std::string& var);
 
     void store_variable(std::string, std::string value);
     bool update_variable_first(std::string var, const std::string &value);

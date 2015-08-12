@@ -37,7 +37,7 @@ namespace transformations {
 std::string JsDecode::evaluate(std::string value,
     Assay *assay) {
     char *tmp = strdup(value.c_str());
-    int res = js_decode_nonstrict_inplace((unsigned char *)tmp, value.size());
+    js_decode_nonstrict_inplace((unsigned char *)tmp, value.size());
     std::string ret("");
     ret.assign(tmp);
     free(tmp);

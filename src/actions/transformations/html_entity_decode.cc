@@ -37,7 +37,7 @@ namespace transformations {
 std::string HtmlEntityDecode::evaluate(std::string value,
     Assay *assay) {
     char *tmp = strdup(value.c_str());
-    int res = html_entities_decode_inplace((unsigned char *)tmp, value.size());
+    html_entities_decode_inplace((unsigned char *)tmp, value.size());
     std::string ret("");
     ret.assign(tmp);
     free(tmp);

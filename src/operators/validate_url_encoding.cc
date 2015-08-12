@@ -27,7 +27,7 @@ int ValidateUrlEncoding::validate_url_encoding(const char *input,
     uint64_t input_length) {
     int i;
 
-    if ((input == NULL) || (input_length < 0)) {
+    if ((input == NULL) || (input_length <= 0)) {
         return -1;
     }
 

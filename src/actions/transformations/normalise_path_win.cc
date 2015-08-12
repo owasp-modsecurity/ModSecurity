@@ -38,7 +38,7 @@ std::string NormalisePathWin::evaluate(std::string value,
     Assay *assay) {
     int changed;
     char *tmp = strdup(value.c_str());
-    int res = normalize_path_inplace((unsigned char *)tmp,
+    normalize_path_inplace((unsigned char *)tmp,
         value.size(), 1, &changed);
     std::string ret("");
     ret.assign(tmp);

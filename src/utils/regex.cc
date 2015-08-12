@@ -53,7 +53,6 @@ int regex_search(const std::string& s, SMatch *match,
 }
 
 int regex_search(const std::string& s, Regex regex) {
-    std::string match;
     pcrecpp::RE re(regex.pattern);
     return re.PartialMatch(s);
 }

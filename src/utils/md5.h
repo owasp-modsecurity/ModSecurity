@@ -88,6 +88,6 @@ private:
   static inline void II(uint4 &a, uint4 b, uint4 c, uint4 d, uint4 x, uint4 s, uint4 ac);
 };
  
-std::string md5(const std::string str);
+std::string md5(const std::string& str);
  
 #endif

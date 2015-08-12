@@ -579,7 +579,6 @@ int Assay::processRequestBody() {
          *
          */
         char sep1 = '&';
-        const char *pos = strchr(content.c_str(), '?');
 
         std::vector<std::string> key_value = split(content.c_str(), sep1);
 
@@ -741,7 +740,6 @@ int Assay::processResponseHeaders() {
  */
 int Assay::addResponseHeader(const std::string& key,
     const std::string& value) {
-    std::string *names = resolve_variable_first("RESPONSE_HEADERS_NAMES");
     m_responseHeadersNames->assign(*m_responseHeadersNames + " " + key);
 
     this->store_variable("RESPONSE_HEADERS:" + key, value);
@@ -1324,7 +1322,7 @@ void Assay::delete_variable(std::string key) {
 
 
 std::list<std::pair<std::string, std::string>>
-    Assay::resolve_variable(std::string var) {
+    Assay::resolve_variable(const std::string& var) {
     std::list<std::pair<std::string, std::string>> l;
     std::pair<std::string, std::string> pair;
 
@@ -1335,7 +1333,7 @@ std::list<std::pair<std::string, std::string>>
         l.push_back(pair);
     }
 
-    if (l.size() == 0) {
+    if (l.empty()) {
         for (auto &x : m_variables_strings) {
             if ((x.first.substr(0, var.size() + 1).compare(var + ":") != 0)
                 && (x.first != var)) {
@@ -1359,7 +1357,7 @@ std::list<std::pair<std::string, std::string>>
             l.push_back(pair);
         }
 
-        if (l.size() == 0) {
+        if (l.empty()) {
             for (auto &x : *a.second) {
                 if ((x.first.substr(0, var.size() + 1).compare(var + ":") != 0)
                     && (x.first != var)) {
@@ -1383,7 +1381,7 @@ void Assay::serverLog(const std::string& msg) {
     std::cerr << "Server log is not ready : " << msg << std::endl;
 }
 
-std::string* Assay::resolve_variable_first(std::string var) {
+std::string* Assay::resolve_variable_first(const std::string& var) {
     auto range = m_variables_strings.equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
@@ -1400,8 +1398,8 @@ std::string* Assay::resolve_variable_first(std::string var) {
 }
 
 
-std::string* Assay::resolve_variable_first(const std::string collectionName,
-    std::string var) {
+std::string* Assay::resolve_variable_first(const std::string& collectionName,
+    const std::string& var) {
     for (auto &a : collections) {
         if (tolower(a.first) == tolower(collectionName)) {
             auto range = a.second->equal_range(toupper(collectionName)
@@ -1418,9 +1416,9 @@ std::string* Assay::resolve_variable_first(const std::string collectionName,
 void Assay::setCollection(const std::string& collectionName,
     const std::string& variableName,
     const std::string& targetValue) {
-    ModSecurityStringVariables *collection;
 
     try {
+        ModSecurityStringVariables *collection;
         collection = collections.at(toupper(collectionName));
         collection->storeOrUpdateVariable(toupper(collectionName) + ":"
             + variableName, targetValue);

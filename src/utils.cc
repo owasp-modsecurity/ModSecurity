@@ -73,7 +73,7 @@ double random_number(const double from, const double to) {
 
 
 std::string dash_if_empty(const std::string& str) {
-    if (&str == NULL || str.empty()) {
+    if (str.empty()) {
         return "-";
     }
 

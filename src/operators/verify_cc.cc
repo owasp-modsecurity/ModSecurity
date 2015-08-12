@@ -70,7 +70,6 @@ bool VerifyCC::evaluate(Assay *assay, const std::string &i) {
     int offset = 0;
     bool is_cc = false;
     int target_length = i.length();
-    const char *target = i.c_str();
 
     for (offset = 0; offset < target_length; offset++) {
         std::string shiftedString(i, offset, i.length() - offset);

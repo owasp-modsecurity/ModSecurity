@@ -80,10 +80,9 @@ IpTree::~IpTree() {
 
 bool IpTree::addFromBuffer(std::istream *ss, std::string *error) {
     char *error_msg = NULL;
-    int res = 0;
 
     for (std::string line; std::getline(*ss, line); ) {
-        res = ip_tree_from_param(line.c_str(), &m_tree, &error_msg);
+        int res = ip_tree_from_param(line.c_str(), &m_tree, &error_msg);
         if (res != 0) {
             if (error_msg != NULL) {
                 error->assign(error_msg);

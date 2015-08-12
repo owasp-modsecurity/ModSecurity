@@ -56,7 +56,7 @@ bool MultipartBlob::processContent() {
     }
 
     bool contentTypeLine = processContentTypeLine(secondLine);
-    if (dispositionLine == false) {
+    if (contentTypeLine == false) {
         return false;
     }
 

@@ -58,13 +58,12 @@ void print_help() {
 
 void perform_unit_test(UnitTest *t, ModSecurityTestResults<UnitTest>* res) {
     const char *error = NULL;
-    int ret = 0;
 
     if (t->type == "op") {
         Operator *op = Operator::instantiate("\"@" + t->name + \
                 " " + t->param + "\"");
         op->init(&error);
-        ret = op->evaluate(NULL, t->input);
+        int ret = op->evaluate(NULL, t->input);
         if (ret != t->ret) {
             t->obtained = ret;
             res->push_back(t);

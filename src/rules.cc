@@ -188,12 +188,10 @@ int Rules::merge(Driver *from) {
     }
 
     this->secRuleEngine = from->secRuleEngine;
-    this->sec_audit_type = from->sec_audit_type;
-    this->sec_audit_engine = from->sec_audit_engine;
-    this->sec_request_body_access = from->sec_request_body_access;
-    this->sec_response_body_access = from->sec_response_body_access;
+    this->secRequestBodyAccess = from->secRequestBodyAccess;
+    this->secResponseBodyAccess = from->secResponseBodyAccess;
     this->debug_log_path = from->debug_log_path;
-    this->debug_level = from->debug_level;
+    this->debugLevel = from->debugLevel;
     this->components = from->components;
     this->requestBodyLimit = from->requestBodyLimit;
     this->responseBodyLimit = from->responseBodyLimit;
@@ -210,7 +208,7 @@ int Rules::merge(Driver *from) {
     this->audit_log = from->audit_log;
     this->audit_log->refCountIncrease();
 
-    this->debugLog->setDebugLevel(this->debug_level);
+    this->debugLog->setDebugLevel(this->debugLevel);
     this->debugLog->setOutputFile(this->debug_log_path);
 
     return 0;
@@ -228,10 +226,8 @@ int Rules::merge(Rules *from) {
     }
 
     this->secRuleEngine = from->secRuleEngine;
-    this->sec_audit_type = from->sec_audit_type;
-    this->sec_audit_engine = from->sec_audit_engine;
-    this->sec_request_body_access = from->sec_request_body_access;
-    this->sec_response_body_access = from->sec_response_body_access;
+    this->secRequestBodyAccess = from->secRequestBodyAccess;
+    this->secResponseBodyAccess = from->secResponseBodyAccess;
     this->components = from->components;
     this->requestBodyLimit = from->requestBodyLimit;
     this->responseBodyLimit = from->responseBodyLimit;
@@ -248,7 +244,7 @@ int Rules::merge(Rules *from) {
     this->audit_log = from->audit_log;
     this->audit_log->refCountIncrease();
 
-    this->debugLog->setDebugLevel(this->debug_level);
+    this->debugLog->setDebugLevel(this->debugLevel);
     this->debugLog->setOutputFile(this->debug_log_path);
 
     return 0;

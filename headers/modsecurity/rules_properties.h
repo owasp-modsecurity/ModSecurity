@@ -45,8 +45,11 @@ class RulesProperties {
         customDebugLog(NULL),
         remoteRulesActionOnFailed(AbortOnFailedRemoteRulesAction),
         requestBodyLimit(0),
+        secRequestBodyAccess(false),
+        secResponseBodyAccess(false),
         requestBodyLimitAction(ProcessPartialBodyLimitAction),
         responseBodyLimit(0),
+        debugLevel(0),
         responseBodyLimitAction(ProcessPartialBodyLimitAction),
         secRuleEngine(DetectionOnlyRuleEngine) { }
 
@@ -54,6 +57,9 @@ class RulesProperties {
         : audit_log(NULL),
         customDebugLog(customDebugLog),
         remoteRulesActionOnFailed(AbortOnFailedRemoteRulesAction),
+        secRequestBodyAccess(false),
+        secResponseBodyAccess(false),
+        debugLevel(0),
         requestBodyLimit(0),
         requestBodyLimitAction(ProcessPartialBodyLimitAction),
         responseBodyLimit(0),
@@ -157,14 +163,12 @@ class RulesProperties {
 
     DebugLog *customDebugLog;
 
-    int sec_audit_type;
-    bool sec_audit_engine;
-    bool sec_request_body_access;
-    bool sec_response_body_access;
+    bool secRequestBodyAccess;
+    bool secResponseBodyAccess;
     std::string audit_log_path;
     std::string audit_log_parts;
     std::string debug_log_path;
-    int debug_level;
+    int debugLevel;
     std::list<std::string> components;
 
 

@@ -311,19 +311,19 @@ expression:
       }
     | CONFIG_DIR_REQ_BODY SPACE CONFIG_VALUE_ON
       {
-        driver.sec_request_body_access = true;
+        driver.secRequestBodyAccess = true;
       }
     | CONFIG_DIR_REQ_BODY SPACE CONFIG_VALUE_OFF
       {
-        driver.sec_request_body_access = false;
+        driver.secRequestBodyAccess = false;
       }
     | CONFIG_DIR_RES_BODY SPACE CONFIG_VALUE_ON
       {
-        driver.sec_request_body_access = true;
+        driver.secResponseBodyAccess = true;
       }
     | CONFIG_DIR_RES_BODY SPACE CONFIG_VALUE_OFF
       {
-        driver.sec_request_body_access = false;
+        driver.secResponseBodyAccess = false;
       }
     | CONFIG_COMPONENT_SIG
       {
@@ -332,7 +332,7 @@ expression:
     /* Debug log: start */
     | CONFIG_DIR_DEBUG_LVL
       {
-        driver.debug_level = atoi($1.c_str());
+        driver.debugLevel = atoi($1.c_str());
       }
     | CONFIG_DIR_DEBUG_LOG
       {

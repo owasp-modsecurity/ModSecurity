@@ -38,7 +38,7 @@ std::string UrlDecodeUni::evaluate(std::string value,
     Assay *assay) {
     int changed = 0;
     char *tmp = strdup(value.c_str());
-    int res = urldecode_uni_nonstrict_inplace_ex(assay, (unsigned char *)tmp,
+    urldecode_uni_nonstrict_inplace_ex(assay, (unsigned char *)tmp,
         value.size(), &changed);
     std::string ret("");
     ret.assign(tmp);

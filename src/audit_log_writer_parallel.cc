@@ -47,7 +47,6 @@ inline std::string AuditLogWriterParallel::logFilePath(time_t *t,
     int part) {
     struct tm timeinfo;
     char tstr[300];
-    size_t len;
     std::string name("");
 
     localtime_r(t, &timeinfo);

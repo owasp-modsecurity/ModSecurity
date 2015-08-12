@@ -47,6 +47,7 @@ class Rules : public RulesProperties  {
     Rules()
         : debugLog(NULL),
         RulesProperties(NULL),
+        m_referenceCount(0),
         unicode_codepage(0) {
             unicode_map_table = reinterpret_cast<int *>(
                 malloc(sizeof(int)*65536));
@@ -55,6 +56,7 @@ class Rules : public RulesProperties  {
 
     explicit Rules(DebugLog *customLog)
         : debugLog(NULL),
+        m_referenceCount(0),
         unicode_codepage(0),
         RulesProperties(customLog) {
             unicode_map_table = reinterpret_cast<int *>(

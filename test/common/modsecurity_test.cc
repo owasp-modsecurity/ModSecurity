@@ -45,7 +45,6 @@ std::string ModSecurityTest<T>::header() {
 
 template <class T>
 bool ModSecurityTest<T>::load_test_json(std::string file) {
-    std::vector<yajl_val> tests;
     char errbuf[1024];
     yajl_val node;
 
@@ -128,9 +127,8 @@ std::pair<std::string, std::vector<T *>>* ModSecurityTest<T>::load_tests() {
 
 template <class T>
 void ModSecurityTest<T>::cmd_options(int argc, char **argv) {
-    int option_char;
-
 #if HAS_GETOPT
+    int option_char;
     GetOpt getopt(argc, argv, "hvct:");
 
     while ((option_char = getopt()) != EOF) {

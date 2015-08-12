@@ -31,7 +31,7 @@ SetVar::SetVar(std::string action)
 
 
 bool SetVar::init(std::string *error) {
-    size_t pos = std::string::npos;
+    size_t pos;
 
     // Resolv operation
     operation = setToOne;

@@ -190,7 +190,7 @@ std::string UniqueId::ethernetMacAddress() {
 
     if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) {
         free(pAdapterInfo);
-        pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO *>malloc(ulOutBufLen));
+        pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO *>(malloc(ulOutBufLen));
         if (!pAdapterInfo) {
             goto failed;
         }
