@@ -29,7 +29,7 @@ AC_ARG_WITH(
 
 AS_CASE(["${with_geoip}"],
   [no], [test_paths=],
-  [yes], [test_paths="/usr/local/libgeoip /usr/local/geoip /usr/local /opt/libgeoip /opt/geoip /opt /usr"],
+  [yes], [test_paths="/usr/local/libgeoip /usr/local/geoip /usr/local /opt/libgeoip /opt/geoip /opt /usr /opt/local/include /opt/local"],
   [test_paths="${with_geoip}"])
 
 AS_IF([test "x${test_paths}" != "x"], [
@@ -100,7 +100,7 @@ else
         fi
     done
     for x in ${test_paths}; do
-        if test -e "${x}/include/geoip_parse.h"; then
+        if test -e "${x}/include/GeoIPCity.h"; then
             geoip_inc_path="${x}/include"
             break
         elif test -e "${x}/GeoIPCity.h"; then
