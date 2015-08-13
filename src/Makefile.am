@@ -174,11 +174,15 @@ libmodsecurity_la_SOURCES = \
 	rule.cc \
 	unique_id.cc \
 	${ACTIONS} \
+	${LIBINJECTION} \
 	${OPERATORS} \
 	${UTILS} \
 	${VARIABLES}
 
 
+LIBINJECTION = \
+	../others/libinjection/src/libinjection_html5.c \
+	../others/libinjection/src/libinjection_xss.c
 
 
 libmodsecurity_la_CFLAGS = 

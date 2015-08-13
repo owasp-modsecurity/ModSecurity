@@ -18,25 +18,35 @@
 #include <string>
 
 #include "operators/operator.h"
-
+#include "others/libinjection/src/libinjection.h"
 
 namespace ModSecurity {
 namespace operators {
 
-bool DetectXSS::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator DetectXSS.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#detectxss
-     */
-    return true;
+
+bool DetectXSS::evaluate(Assay *assay, const std::string &input) {
+    int is_xss;
+
+    is_xss = libinjection_xss(input.c_str(), input.length());
+
+    if (is_xss) {
+        if (assay) {
+            assay->debug(5, "detected XSS using libinjection.");
+        }
+    } else {
+        if (assay) {
+            assay->debug(9, "libinjection was not able to " \
+                "find any XSS in: " + input);
+        }
+    }
+
+    if (negation) {
+        return is_xss == 0;
+    }
+
+    return is_xss != 0;
 }
 
-
-DetectXSS::DetectXSS(std::string op, std::string param, bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity
