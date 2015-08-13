@@ -103,6 +103,47 @@ ACTIONS = \
 	actions/transformations/utf8_to_unicode.cc
 
 
+OPERATORS = \
+	operators/begins_with.cc \
+	operators/contains.cc \
+	operators/contains_word.cc \
+	operators/detect_sqli.cc \
+	operators/detect_xss.cc \
+	operators/ends_with.cc \
+	operators/eq.cc \
+	operators/fuzzy_hash.cc \
+	operators/ge.cc \
+	operators/geo_lookup.cc \
+	operators/gsblookup.cc \
+	operators/gt.cc \
+	operators/inspect_file.cc \
+	operators/ip_match.cc \
+	operators/ip_match_f.cc \
+	operators/ip_match_from_file.cc \
+	operators/le.cc \
+	operators/lt.cc \
+	operators/no_match.cc \
+	operators/operator.cc \
+	operators/pm.cc \
+	operators/pm_f.cc \
+	operators/pm_from_file.cc \
+	operators/rbl.cc \
+	operators/rsub.cc \
+	operators/rx.cc \
+	operators/str_eq.cc \
+	operators/str_match.cc \
+	operators/validate_byte_range.cc \
+	operators/validate_dtd.cc \
+	operators/validate_hash.cc \
+	operators/validate_schema.cc \
+	operators/validate_url_encoding.cc \
+	operators/validate_utf8_encoding.cc \
+	operators/verify_cc.cc \
+	operators/verify_cpf.cc \
+	operators/verify_ssn.cc \
+	operators/within.cc
+
+
 UTILS = \
 	utils/acmp.cc \
 	utils/geo_lookup.cc \
@@ -132,44 +173,8 @@ libmodsecurity_la_SOURCES = \
 	request_body_processor/multipart_blob.cc \
 	rule.cc \
 	unique_id.cc \
-	operators/operator.cc \
-	operators/detect_sqli.cc \
-	operators/detect_xss.cc \
-	operators/inspect_file.cc \
-	operators/fuzzy_hash.cc \
-	operators/validate_byte_range.cc \
-	operators/validate_dtd.cc \
-	operators/validate_hash.cc \
-	operators/validate_schema.cc \
-	operators/validate_url_encoding.cc \
-	operators/validate_utf8_encoding.cc \
-	operators/verify_cc.cc \
-	operators/verify_cpf.cc \
-	operators/verify_ssn.cc \
-	operators/geo_lookup.cc \
-	operators/gsblookup.cc \
-	operators/rsub.cc \
-	operators/within.cc \
-	operators/contains_word.cc \
-	operators/contains.cc \
-	operators/ends_with.cc \
-	operators/eq.cc \
-	operators/ge.cc \
-	operators/gt.cc \
-	operators/ip_match_f.cc \
-	operators/ip_match.cc \
-	operators/ip_match_from_file.cc \
-	operators/le.cc \
-	operators/lt.cc \
-	operators/pm_f.cc \
-	operators/pm.cc \
-	operators/pm_from_file.cc \
-	operators/rbl.cc \
-	operators/rx.cc \
-	operators/str_eq.cc \
-	operators/str_match.cc \
-	operators/begins_with.cc \
 	${ACTIONS} \
+	${OPERATORS} \
 	${UTILS} \
 	${VARIABLES}
 

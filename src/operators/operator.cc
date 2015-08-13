@@ -21,10 +21,33 @@
 
 #include "modsecurity/assay.h"
 
+#include "operators/begins_with.h"
+#include "operators/contains.h"
+#include "operators/contains_word.h"
 #include "operators/detect_sqli.h"
 #include "operators/detect_xss.h"
-#include "operators/inspect_file.h"
+#include "operators/ends_with.h"
+#include "operators/eq.h"
 #include "operators/fuzzy_hash.h"
+#include "operators/ge.h"
+#include "operators/geo_lookup.h"
+#include "operators/gsblookup.h"
+#include "operators/gt.h"
+#include "operators/inspect_file.h"
+#include "operators/ip_match_f.h"
+#include "operators/ip_match_from_file.h"
+#include "operators/ip_match.h"
+#include "operators/le.h"
+#include "operators/lt.h"
+#include "operators/no_match.h"
+#include "operators/pm_f.h"
+#include "operators/pm_from_file.h"
+#include "operators/pm.h"
+#include "operators/rbl.h"
+#include "operators/rsub.h"
+#include "operators/rx.h"
+#include "operators/str_eq.h"
+#include "operators/str_match.h"
 #include "operators/validate_byte_range.h"
 #include "operators/validate_dtd.h"
 #include "operators/validate_hash.h"
@@ -34,29 +57,7 @@
 #include "operators/verify_cc.h"
 #include "operators/verify_cpf.h"
 #include "operators/verify_ssn.h"
-#include "operators/geo_lookup.h"
-#include "operators/gsblookup.h"
-#include "operators/rsub.h"
 #include "operators/within.h"
-#include "operators/contains_word.h"
-#include "operators/contains.h"
-#include "operators/ends_with.h"
-#include "operators/eq.h"
-#include "operators/ge.h"
-#include "operators/gt.h"
-#include "operators/ip_match_f.h"
-#include "operators/ip_match.h"
-#include "operators/ip_match_from_file.h"
-#include "operators/le.h"
-#include "operators/lt.h"
-#include "operators/pm_f.h"
-#include "operators/pm.h"
-#include "operators/pm_from_file.h"
-#include "operators/rbl.h"
-#include "operators/rx.h"
-#include "operators/str_eq.h"
-#include "operators/str_match.h"
-#include "operators/begins_with.h"
 
 #define IF_MATCH(a) \
     if (op_ == #a)
@@ -153,6 +154,7 @@ Operator *Operator::instantiate(std::string op_string) {
     IF_MATCH(ipmatch) { return new IpMatch(op, param, negation); }
     IF_MATCH(le) { return new Le(op, param, negation); }
     IF_MATCH(lt) { return new Lt(op, param, negation); }
+    IF_MATCH(nomatch) { return new NoMatch(op, param, negation); }
     IF_MATCH(pmf) { return new PmF(op, param, negation); }
     IF_MATCH(pmfromfile) { return new PmFromFile(op, param, negation); }
     IF_MATCH(pm) { return new Pm(op, param, negation); }
