@@ -18,26 +18,41 @@
 #include <string>
 
 #include "operators/operator.h"
+#include "others/libinjection/src/libinjection.h"
 
 namespace ModSecurity {
 namespace operators {
 
-bool DetectSQLi::evaluate(Assay *assay) {
-    /**
-     * @todo Implement the operator BeginsWith.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#detectsqli
-     */
 
-    return true;
+bool DetectSQLi::evaluate(Assay *assay, const std::string &input) {
+    char fingerprint[8];
+    int issqli;
+    // int capture;
+
+    issqli = libinjection_sqli(input.c_str(), input.length(), fingerprint);
+    // capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
+
+    if (issqli) {
+        // set_match_to_tx(msr, capture, fingerprint, 0);
+        if (assay) {
+            assay->debug(4, "detected SQLi using libinjection with " \
+                "fingerprint '" + std::string(fingerprint) + "' at: '" +
+                input + "'");
+        }
+    } else {
+        if (assay) {
+            assay->debug(9, "detected SQLi: not able to find an inject on '" +
+                input + "'");
+        }
+    }
+
+    if (negation) {
+        return issqli == 0;
+    }
+
+    return issqli != 0;
 }
 
-
-DetectSQLi::DetectSQLi(std::string op, std::string param,
-    bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
-}
 
 }  // namespace operators
 }  // namespace ModSecurity

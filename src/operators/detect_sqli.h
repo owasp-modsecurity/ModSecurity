@@ -20,20 +20,20 @@
 
 #include "operators/operator.h"
 
-#ifdef __cplusplus
 namespace ModSecurity {
 namespace operators {
 
 class DetectSQLi : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    DetectSQLi(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    DetectSQLi(std::string op, std::string param, bool negation)
+        : Operator(op, param, negation) { }
+
+    bool evaluate(Assay *assay, const std::string &input);
 };
 
 }  // namespace operators
 }  // namespace ModSecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_DETECT_SQLI_H_

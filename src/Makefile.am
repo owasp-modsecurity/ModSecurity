@@ -182,6 +182,7 @@ libmodsecurity_la_SOURCES = \
 
 LIBINJECTION = \
 	../others/libinjection/src/libinjection_html5.c \
+	../others/libinjection/src/libinjection_sqli.c \
 	../others/libinjection/src/libinjection_xss.c
 
 
