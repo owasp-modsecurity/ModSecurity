@@ -67,6 +67,11 @@ int ValidateUrlEncoding::validate_url_encoding(const char *input,
 
 bool ValidateUrlEncoding::evaluate(Assay *assay, const std::string &input) {
     bool res = false;
+
+    if (input.empty() == true) {
+        return res;
+    }
+
     int rc = validate_url_encoding(input.c_str(), input.size());
     switch (rc) {
         case 1 :
