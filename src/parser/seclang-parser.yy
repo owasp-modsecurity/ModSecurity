@@ -121,12 +121,12 @@ using ModSecurity::Variables::Variable;
 %token
   END  0  "end of file"
   COMMA    ","
-  QUOTATION_MARK  ")"
   SPACE
   PIPE
 ;
 
 %left CONFIG_VALUE_RELEVANT_ONLY CONFIG_VALUE_ON CONFIG_VALUE_OFF
+%token <std::string> QUOTATION_MARK
 %token <std::string> DIRECTIVE
 %token <std::string> CONFIG_DIR_REQ_BODY_LIMIT
 %token <std::string> CONFIG_DIR_RES_BODY_LIMIT
@@ -182,6 +182,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> CONFIG_DIR_GEO_DB
 
 %token <std::string> OPERATOR
+%token <std::string> FREE_TEXT
 %token <std::string> ACTION
 %token <std::string> ACTION_SEVERITY
 %token <std::string> ACTION_SETVAR
@@ -285,6 +286,21 @@ expression:
     | DIRECTIVE SPACE variables SPACE OPERATOR SPACE QUOTATION_MARK actions QUOTATION_MARK
       {
         Operator *op = Operator::instantiate($5);
+        const char *error = NULL;
+        if (op->init(&error) == false) {
+            driver.parserError << error;
+            YYERROR;
+        }
+        Rule *rule = new Rule(
+            /* op */ op,
+            /* variables */ $3,
+            /* actions */ $8
+            );
+        driver.addSecRule(rule);
+      }
+    | DIRECTIVE SPACE variables SPACE FREE_TEXT SPACE QUOTATION_MARK actions QUOTATION_MARK
+      {
+        Operator *op = Operator::instantiate("@pm " + $5);
         const char *error = NULL;
         if (op->init(&error) == false) {
             driver.parserError << error;

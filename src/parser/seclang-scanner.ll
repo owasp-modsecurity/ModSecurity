@@ -114,6 +114,8 @@ CONFIG_VALUE_NUMBER [0-9]+
 FREE_TEXT       [^\"]+
 FREE_TEXT_NEW_LINE       [^\"|\n]+
 
+%x EXPECTING_OPERATOR
+
 %{
   // Code run each time a pattern is matched.
   # define YY_USER_ACTION  driver.loc.back()->columns (yyleng);
@@ -147,23 +149,26 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 {CONFIG_DIR_DEBUG_LOG}[ ]{CONFIG_VALUE_PATH}    { return yy::seclang_parser::make_CONFIG_DIR_DEBUG_LOG(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_DEBUG_LVL}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_DEBUG_LVL(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 
+<INITIAL,EXPECTING_OPERATOR>{
 %{ /* Variables */ %}
-[!|&]?{VARIABLE}:?{DICT_ELEMENT}?             { return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_DUR}                      { return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_ENV}:?{DICT_ELEMENT}?     { return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_BLD}                      { return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_HSV}                      { return yy::seclang_parser::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
+[!|&]?{VARIABLE}:?{DICT_ELEMENT}?             { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_DUR}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_ENV}:?{DICT_ELEMENT}?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_BLD}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_HSV}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
 
 %{ /* Variables: TIME */ %}
-[!|&]?{RUN_TIME_VAR_TIME}        { return yy::seclang_parser::make_RUN_TIME_VAR_TIME(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_DAY}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_DAY(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_EPOCH}  { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_EPOCH(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_HOUR}   { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_HOUR(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_MIN}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MIN(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_MON}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MON(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_SEC}    { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_SEC(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_WDAY}   { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_WDAY(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_YEAR}   { return yy::seclang_parser::make_RUN_TIME_VAR_TIME_YEAR(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME}        { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_DAY}    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_DAY(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_EPOCH}  { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_EPOCH(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_HOUR}   { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_HOUR(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_MIN}    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MIN(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_MON}    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MON(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_SEC}    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_SEC(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_WDAY}   { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_WDAY(yytext, *driver.loc.back()); }
+[!|&]?{RUN_TIME_VAR_TIME_YEAR}   { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_YEAR(yytext, *driver.loc.back()); }
+}
+
 
 %{ /* Geo DB loopkup */ %}
 {CONFIG_DIR_GEO_DB}[ ]{FREE_TEXT_NEW_LINE}      { return yy::seclang_parser::make_CONFIG_DIR_GEO_DB(strchr(yytext, ' ') + 1, *driver.loc.back()); }
@@ -188,14 +193,16 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 {CONFIG_VALUE_PROCESS_PARTIAL}  { return yy::seclang_parser::make_CONFIG_VALUE_PROCESS_PARTIAL(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_REJECT}           { return yy::seclang_parser::make_CONFIG_VALUE_REJECT(yytext, *driver.loc.back()); }
 
-["]{OPERATOR}[ ]{FREE_TEXT}["]  { return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
-["]{OPERATORNOARG}["]           { return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
+
+<EXPECTING_OPERATOR>{
+["][^@]{FREE_TEXT}["]  { BEGIN(INITIAL); return yy::seclang_parser::make_FREE_TEXT(yytext, *driver.loc.back()); }
+["]{OPERATOR}[ ]{FREE_TEXT}["]  { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
+["]{OPERATORNOARG}["]           { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
+}
+
 {ACTION}                        { return yy::seclang_parser::make_ACTION(yytext, *driver.loc.back()); }
 {ACTION_SEVERITY}                        { return yy::seclang_parser::make_ACTION_SEVERITY(yytext, *driver.loc.back()); }
 {ACTION_SETVAR}:{FREE_TEXT}={FREE_TEXT}  {
-                                    return yy::seclang_parser::make_ACTION_SETVAR(strchr(yytext, ':') + 1, *driver.loc.back());
-                                         }
-{ACTION_SETVAR}:{FREE_TEXT}=+{FREE_TEXT} {
                                     return yy::seclang_parser::make_ACTION_SETVAR(strchr(yytext, ':') + 1, *driver.loc.back());
                                          }
 {ACTION_SETVAR}:{FREE_TEXT}              {
@@ -205,11 +212,15 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 {ACTION_TAG}:'{FREE_TEXT}'      { return yy::seclang_parser::make_ACTION_TAG(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_REV}:'{FREE_TEXT}'      { return yy::seclang_parser::make_ACTION_REV(strchr(yytext, ':') + 1, *driver.loc.back()); }
 
-["]                             { return yy::seclang_parser::make_QUOTATION_MARK(*driver.loc.back()); }
+["]                             { return yy::seclang_parser::make_QUOTATION_MARK(yytext, *driver.loc.back()); }
 [,]                             { return yy::seclang_parser::make_COMMA(*driver.loc.back()); }
+<INITIAL,EXPECTING_OPERATOR>{
 [|]                             { return yy::seclang_parser::make_PIPE(*driver.loc.back()); }
+}
 {VARIABLENOCOLON}	   	{ return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
+<INITIAL,EXPECTING_OPERATOR>{
 [ \t]+                          { return yy::seclang_parser::make_SPACE(*driver.loc.back()); }
+}
 [\n]+                           { driver.loc.back()->lines(yyleng); driver.loc.back()->step(); }
 #.*                             { /* comment, just ignore. */ }
 .                               { driver.error (*driver.loc.back(), "invalid character", yytext); }
@@ -240,6 +251,7 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
     const char *file = strchr(yytext, ' ') + 1;
     yyin = fopen(file, "r" );
     if (!yyin) {
+        BEGIN(INITIAL);
         driver.error (*driver.loc.back(), "", yytext + std::string(": Not able to open file."));
         throw yy::seclang_parser::syntax_error(*driver.loc.back(), "");
     }
@@ -265,6 +277,7 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
     bool ret = c.download(url);
 
     if (ret == false) {
+        BEGIN(INITIAL);
         if (driver.remoteRulesActionOnFailed == Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction) {
             /** TODO: Implement the server logging mechanism. */
         }
@@ -295,6 +308,7 @@ bool Driver::scan_begin () {
 }
 
 void Driver::scan_end () {
+    BEGIN(INITIAL);
 }
 
 }

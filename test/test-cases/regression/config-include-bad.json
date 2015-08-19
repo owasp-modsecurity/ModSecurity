@@ -4,7 +4,7 @@
     "version_min":300000,
     "title":"Include - bad rule",
     "expected":{
-      "parser_error": "Rules error. File: config-include-bad.json. Line: 5. Column: 15."
+      "parser_error": "Rules error. File: config-include-bad.json. Line: 5. Column: 33."
     },
     "rules":[
       "SecRuleEngine On",
@@ -49,7 +49,7 @@
     "version_min":300000,
     "title":"Include - bad operator inside include",
     "expected":{
-      "parser_error": "Rules error. File: test-cases/data/config_example-bad-op-include.txt. Line: 2. Column: 15."
+      "parser_error": "Rules error. File: test-cases/data/config_example-bad-op-include.txt. Line: 2. Column: 32."
     },
     "rules":[
       "SecRuleEngine On",
