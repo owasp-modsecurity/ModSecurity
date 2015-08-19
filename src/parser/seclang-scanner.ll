@@ -220,6 +220,8 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 {VARIABLENOCOLON}	   	{ return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
 <INITIAL,EXPECTING_OPERATOR>{
 [ \t]+                          { return yy::seclang_parser::make_SPACE(*driver.loc.back()); }
+[ \t]+\\\n                            { /* ignore */ }
+[ \t]+\\\r\n                          { /* ignore */ }
 }
 [\n]+                           { driver.loc.back()->lines(yyleng); driver.loc.back()->step(); }
 #.*                             { /* comment, just ignore. */ }
