@@ -211,6 +211,7 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 {VARIABLENOCOLON}	   	{ return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
 [ \t]+                          { return yy::seclang_parser::make_SPACE(*driver.loc.back()); }
 [\n]+                           { driver.loc.back()->lines(yyleng); driver.loc.back()->step(); }
+#.*                             { /* comment, just ignore. */ }
 .                               { driver.error (*driver.loc.back(), "invalid character", yytext); }
 <<EOF>>                         {
                                     if (driver.ref.size() > 0) {
