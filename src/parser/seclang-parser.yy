@@ -130,6 +130,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> DIRECTIVE
 %token <std::string> CONFIG_DIR_REQ_BODY_LIMIT
 %token <std::string> CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT
+%token <std::string> CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT
 %token <std::string> CONFIG_DIR_RES_BODY_LIMIT
 %token <std::string> CONFIG_DIR_REQ_BODY_LIMIT_ACTION
 %token <std::string> CONFIG_DIR_RES_BODY_LIMIT_ACTION
@@ -370,6 +371,10 @@ expression:
     | CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT
       {
         driver.requestBodyNoFilesLimit = atoi($1.c_str());
+      }
+    | CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT
+      {
+        driver.requestBodyInMemoryLimit = atoi($1.c_str());
       }
     | CONFIG_DIR_RES_BODY_LIMIT
       {

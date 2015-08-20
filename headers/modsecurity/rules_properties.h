@@ -46,6 +46,7 @@ class RulesProperties {
         remoteRulesActionOnFailed(AbortOnFailedRemoteRulesAction),
         requestBodyLimit(0),
         requestBodyNoFilesLimit(0),
+        requestBodyInMemoryLimit(0),
         secRequestBodyAccess(false),
         secResponseBodyAccess(false),
         requestBodyLimitAction(ProcessPartialBodyLimitAction),
@@ -64,6 +65,7 @@ class RulesProperties {
         requestBodyLimit(0),
         requestBodyLimitAction(ProcessPartialBodyLimitAction),
         requestBodyNoFilesLimit(0),
+        requestBodyInMemoryLimit(0),
         responseBodyLimit(0),
         responseBodyLimitAction(ProcessPartialBodyLimitAction),
         secRuleEngine(DetectionOnlyRuleEngine) { }
@@ -159,6 +161,7 @@ class RulesProperties {
 
     RuleEngine secRuleEngine;
     double requestBodyNoFilesLimit;
+    double requestBodyInMemoryLimit;
     double requestBodyLimit;
     double responseBodyLimit;
     BodyLimitAction requestBodyLimitAction;

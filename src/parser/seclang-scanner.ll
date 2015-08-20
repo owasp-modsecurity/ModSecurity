@@ -33,7 +33,9 @@ ACTION_CTL_BDY_XML ctl:requestBodyProcessor=XML
 ACTION_CTL_BDY_JSON ctl:requestBodyProcessor=JSON
 DIRECTIVE       SecRule
 
-CONFIG_DIRECTIVE SecRequestBodyInMemoryLimit|SecPcreMatchLimitRecursion|SecPcreMatchLimit|SecResponseBodyMimeType|SecTmpDir|SecDataDir|SecArgumentSeparator|SecCookieFormat|SecStatusEngine
+CONFIG_DIRECTIVE SecPcreMatchLimitRecursion|SecPcreMatchLimit|SecResponseBodyMimeType|SecTmpDir|SecDataDir|SecArgumentSeparator|SecCookieFormat|SecStatusEngine
+
+CONFIG_DIR_REQ_BOYD_IN_MEMORY_LIMIT (?i:SecRequestBodyInMemoryLimit)
 
 CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT (?i:SecRequestBodyNoFilesLimit)
 CONFIG_DIR_REQ_BODY_LIMIT (?i:SecRequestBodyLimit)
@@ -179,7 +181,8 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 %{ /* Request body limit */ %}
 {CONFIG_DIR_REQ_BODY_LIMIT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
-{CONFIG_DIR_REQ_BODY_LIMIT_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_LIMIT_ACTION(yytext, *driver.loc.back()); }
+{CONFIG_DIR_REQ_BODY_LIMIT_ACTION}[ ]{CONFIG_VALUE_NUMBER} { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_LIMIT_ACTION(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT}[ ]{CONFIG_VALUE_NUMBER}{ return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 %{ /* Reponse body limit */ %}
 {CONFIG_DIR_RES_BODY_LIMIT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_RES_BODY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_RES_BODY_LIMIT_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_RES_BODY_LIMIT_ACTION(yytext, *driver.loc.back()); }
