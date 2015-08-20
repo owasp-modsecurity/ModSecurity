@@ -33,8 +33,15 @@ ACTION_CTL_BDY_XML ctl:requestBodyProcessor=XML
 ACTION_CTL_BDY_JSON ctl:requestBodyProcessor=JSON
 DIRECTIVE       SecRule
 
-CONFIG_DIRECTIVE SecPcreMatchLimitRecursion|SecPcreMatchLimit|SecResponseBodyMimeType|SecTmpDir|SecDataDir|SecArgumentSeparator|SecCookieFormat|SecStatusEngine
 
+CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION (?i:SecPcreMatchLimitRecursion)
+CONFIG_DIR_PCRE_MATCH_LIMIT (?i:SecPcreMatchLimit)
+CONGIG_DIR_RESPONSE_BODY_MP (?i:SecResponseBodyMimeType)
+CONGIG_DIR_SEC_TMP_DIR (?i:SecTmpDir)
+CONGIG_DIR_SEC_DATA_DIR (?i:SecDataDir)
+CONGIG_DIR_SEC_ARG_SEP (?i:SecArgumentSeparator)
+CONGIG_DIR_SEC_COOKIE_FORMAT (?i:SecCookieFormat)
+CONGIG_DIR_SEC_STATUS_ENGINE (?i:SecStatusEngine)
 
 CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT (?i:SecRequestBodyInMemoryLimit)
 CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT (?i:SecRequestBodyNoFilesLimit)
@@ -113,11 +120,13 @@ CONFIG_VALUE_ABORT   (?i:Abort)
 CONFIG_VALUE_WARN    (?i:Warn)
 
 CONFIG_VALUE_PATH    [0-9A-Za-z_/\.\-]+
-AUDIT_PARTS [ABCDEFHJKZ]+
+AUDIT_PARTS [ABCDEFHJKIZ]+
 CONFIG_VALUE_NUMBER [0-9]+
 
 FREE_TEXT       [^\"]+
 FREE_TEXT_NEW_LINE       [^\"|\n]+
+
+CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 %x EXPECTING_OPERATOR
 
@@ -190,6 +199,17 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 
 {CONFIG_COMPONENT_SIG}[ ]["]{FREE_TEXT}["] { return yy::seclang_parser::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
 
+%{ /* Other configurations */ %}
+{CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_PCRE_MATCH_LIMIT}[ ]{CONFIG_VALUE_NUMBER}    { return yy::seclang_parser::make_CONFIG_DIR_PCRE_MATCH_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONGIG_DIR_RESPONSE_BODY_MP}[ ]{FREE_TEXT_NEW_LINE}   { return yy::seclang_parser::make_CONGIG_DIR_RESPONSE_BODY_MP(yytext, *driver.loc.back()); }
+{CONGIG_DIR_SEC_TMP_DIR}[ ]{CONFIG_VALUE_PATH}        { return yy::seclang_parser::make_CONGIG_DIR_SEC_TMP_DIR(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONGIG_DIR_SEC_DATA_DIR}[ ]{CONFIG_VALUE_PATH}       { return yy::seclang_parser::make_CONGIG_DIR_SEC_DATA_DIR(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONGIG_DIR_SEC_ARG_SEP}[ ]{FREE_TEXT_NEW_LINE}        { return yy::seclang_parser::make_CONGIG_DIR_SEC_ARG_SEP(yytext, *driver.loc.back()); }
+{CONGIG_DIR_SEC_COOKIE_FORMAT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONGIG_DIR_SEC_COOKIE_FORMAT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONGIG_DIR_SEC_STATUS_ENGINE}[ ]{FREE_TEXT_NEW_LINE}  { return yy::seclang_parser::make_CONGIG_DIR_SEC_STATUS_ENGINE(yytext, *driver.loc.back()); }
+{CONFIG_DIR_UNICODE_MAP_FILE}[ ]{FREE_TEXT_NEW_LINE} { return yy::seclang_parser::make_CONFIG_DIR_UNICODE_MAP_FILE(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+
 {CONFIG_VALUE_WARN}             { return yy::seclang_parser::make_CONFIG_VALUE_WARN(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_ABORT}            { return yy::seclang_parser::make_CONFIG_VALUE_ABORT(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_ON}               { return yy::seclang_parser::make_CONFIG_VALUE_ON(yytext, *driver.loc.back()); }
@@ -233,6 +253,7 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 [ \t]+                          { return yy::seclang_parser::make_SPACE(*driver.loc.back()); }
 [ \t]*\\\n[ \t]*                            { return yy::seclang_parser::make_SPACE(*driver.loc.back());  }
 [ \t]*\\\r\n[ \t]*                          { return yy::seclang_parser::make_SPACE(*driver.loc.back());  }
+
 }
 [\n]+                           { driver.loc.back()->lines(yyleng); driver.loc.back()->step(); }
 #.*                             { /* comment, just ignore. */ }

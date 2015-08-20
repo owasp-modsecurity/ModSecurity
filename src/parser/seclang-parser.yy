@@ -134,6 +134,17 @@ using ModSecurity::Variables::Variable;
 %token <std::string> CONFIG_DIR_RES_BODY_LIMIT
 %token <std::string> CONFIG_DIR_REQ_BODY_LIMIT_ACTION
 %token <std::string> CONFIG_DIR_RES_BODY_LIMIT_ACTION
+
+%token <std::string> CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION
+%token <std::string> CONFIG_DIR_PCRE_MATCH_LIMIT
+%token <std::string> CONGIG_DIR_RESPONSE_BODY_MP
+%token <std::string> CONGIG_DIR_SEC_TMP_DIR
+%token <std::string> CONGIG_DIR_SEC_DATA_DIR
+%token <std::string> CONGIG_DIR_SEC_ARG_SEP
+%token <std::string> CONGIG_DIR_SEC_COOKIE_FORMAT
+%token <std::string> CONGIG_DIR_SEC_STATUS_ENGINE
+%token <std::string> CONFIG_DIR_UNICODE_MAP_FILE
+
 %token <std::string> CONFIG_DIR_RULE_ENG
 %token <std::string> CONFIG_DIR_REQ_BODY
 %token <std::string> CONFIG_DIR_RES_BODY
@@ -403,6 +414,17 @@ expression:
     | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION SPACE CONFIG_VALUE_WARN
       {
         driver.remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
+      }
+    | CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION
+    | CONFIG_DIR_PCRE_MATCH_LIMIT
+    | CONGIG_DIR_RESPONSE_BODY_MP
+    | CONGIG_DIR_SEC_TMP_DIR
+    | CONGIG_DIR_SEC_DATA_DIR
+    | CONGIG_DIR_SEC_ARG_SEP
+    | CONGIG_DIR_SEC_COOKIE_FORMAT
+    | CONGIG_DIR_SEC_STATUS_ENGINE
+    | CONFIG_DIR_UNICODE_MAP_FILE
+      {
       }
     ;
 
