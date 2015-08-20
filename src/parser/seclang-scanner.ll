@@ -35,8 +35,8 @@ DIRECTIVE       SecRule
 
 CONFIG_DIRECTIVE SecPcreMatchLimitRecursion|SecPcreMatchLimit|SecResponseBodyMimeType|SecTmpDir|SecDataDir|SecArgumentSeparator|SecCookieFormat|SecStatusEngine
 
-CONFIG_DIR_REQ_BOYD_IN_MEMORY_LIMIT (?i:SecRequestBodyInMemoryLimit)
 
+CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT (?i:SecRequestBodyInMemoryLimit)
 CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT (?i:SecRequestBodyNoFilesLimit)
 CONFIG_DIR_REQ_BODY_LIMIT (?i:SecRequestBodyLimit)
 CONFIG_DIR_RES_BODY_LIMIT (?i:SecResponseBodyLimit)
@@ -161,6 +161,7 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 [!|&]?{RUN_TIME_VAR_ENV}:?{DICT_ELEMENT}?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
 [!|&]?{RUN_TIME_VAR_BLD}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
 [!|&]?{RUN_TIME_VAR_HSV}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
+[!|&]?{VARIABLENOCOLON}                       { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
 
 %{ /* Variables: TIME */ %}
 [!|&]?{RUN_TIME_VAR_TIME}        { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME(yytext, *driver.loc.back()); }
@@ -179,10 +180,10 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 {CONFIG_DIR_GEO_DB}[ ]{FREE_TEXT_NEW_LINE}      { return yy::seclang_parser::make_CONFIG_DIR_GEO_DB(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 
 %{ /* Request body limit */ %}
-{CONFIG_DIR_REQ_BODY_LIMIT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
-{CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
-{CONFIG_DIR_REQ_BODY_LIMIT_ACTION}[ ]{CONFIG_VALUE_NUMBER} { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_LIMIT_ACTION(strchr(yytext, ' ') + 1, *driver.loc.back()); }
-{CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT}[ ]{CONFIG_VALUE_NUMBER}{ return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_REQ_BODY_LIMIT}[ ]{CONFIG_VALUE_NUMBER}             { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT}[ ]{CONFIG_VALUE_NUMBER}    { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_REQ_BODY_LIMIT_ACTION}                              { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_LIMIT_ACTION(yytext, *driver.loc.back()); }
+{CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT}[ ]{CONFIG_VALUE_NUMBER}   { return yy::seclang_parser::make_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 %{ /* Reponse body limit */ %}
 {CONFIG_DIR_RES_BODY_LIMIT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_RES_BODY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_RES_BODY_LIMIT_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_RES_BODY_LIMIT_ACTION(yytext, *driver.loc.back()); }
@@ -202,7 +203,7 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 
 
 <EXPECTING_OPERATOR>{
-["][^@]{FREE_TEXT}["]  { BEGIN(INITIAL); return yy::seclang_parser::make_FREE_TEXT(yytext, *driver.loc.back()); }
+["][^@]{FREE_TEXT}["]           { BEGIN(INITIAL); return yy::seclang_parser::make_FREE_TEXT(yytext, *driver.loc.back()); }
 ["]{OPERATOR}[ ]{FREE_TEXT}["]  { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
 ["]{OPERATORNOARG}["]           { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
 }
@@ -227,11 +228,11 @@ FREE_TEXT_NEW_LINE       [^\"|\n]+
 <INITIAL,EXPECTING_OPERATOR>{
 [|]                             { return yy::seclang_parser::make_PIPE(*driver.loc.back()); }
 }
-{VARIABLENOCOLON}	   	{ return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
+
 <INITIAL,EXPECTING_OPERATOR>{
 [ \t]+                          { return yy::seclang_parser::make_SPACE(*driver.loc.back()); }
-[ \t]+\\\n                            { /* ignore */ }
-[ \t]+\\\r\n                          { /* ignore */ }
+[ \t]*\\\n[ \t]*                            { return yy::seclang_parser::make_SPACE(*driver.loc.back());  }
+[ \t]*\\\r\n[ \t]*                          { return yy::seclang_parser::make_SPACE(*driver.loc.back());  }
 }
 [\n]+                           { driver.loc.back()->lines(yyleng); driver.loc.back()->step(); }
 #.*                             { /* comment, just ignore. */ }
