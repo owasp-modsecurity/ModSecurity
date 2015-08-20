@@ -129,6 +129,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> QUOTATION_MARK
 %token <std::string> DIRECTIVE
 %token <std::string> CONFIG_DIR_REQ_BODY_LIMIT
+%token <std::string> CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT
 %token <std::string> CONFIG_DIR_RES_BODY_LIMIT
 %token <std::string> CONFIG_DIR_REQ_BODY_LIMIT_ACTION
 %token <std::string> CONFIG_DIR_RES_BODY_LIMIT_ACTION
@@ -190,11 +191,13 @@ using ModSecurity::Variables::Variable;
 %token <std::string> ACTION_TAG
 %token <std::string> ACTION_REV
 %token <std::string> TRANSFORMATION
+%token <std::string> ACTION_CTL_BDY_XML
+%token <std::string> ACTION_CTL_BDY_JSON
 
 %type <std::vector<Action *> *> actions
 %type <std::vector<Variable *> *> variables
 %type <Variable *> var
-
+%type <Action *> act
 
 %printer { yyoutput << $$; } <*>;
 %%
@@ -363,6 +366,10 @@ expression:
     | CONFIG_DIR_REQ_BODY_LIMIT
       {
         driver.requestBodyLimit = atoi($1.c_str());
+      }
+    | CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT
+      {
+        driver.requestBodyNoFilesLimit = atoi($1.c_str());
       }
     | CONFIG_DIR_RES_BODY_LIMIT
       {
@@ -538,116 +545,21 @@ var:
       }
     ;
 
-actions:
-    actions COMMA SPACE ACTION
+act:
+    ACTION
       {
-        std::vector<Action *> *a = $1;
-        a->push_back(Action::instantiate($4));
-        $$ = $1;
-      }
-
-    | actions COMMA ACTION
-      {
-        std::vector<Action *> *a = $1;
-        a->push_back(Action::instantiate($3));
-        $$ = $1;
-      }
-    | SPACE ACTION
-      {
-        std::vector<Action *> *actions = new std::vector<Action *>;
-        actions->push_back(Action::instantiate($2));
-        $$ = actions;
-
-      }
-    | ACTION
-      {
-        std::vector<Action *> *actions = new std::vector<Action *>;
-        actions->push_back(Action::instantiate($1));
-        $$ = actions;
-      }
-    | actions COMMA SPACE TRANSFORMATION
-      {
-        std::vector<Action *> *a = $1;
-        a->push_back(Transformation::instantiate($4));
-        $$ = $1;
-      }
-
-    | actions COMMA TRANSFORMATION
-      {
-        std::vector<Action *> *a = $1;
-        a->push_back(Transformation::instantiate($3));
-        $$ = $1;
-      }
-    | SPACE TRANSFORMATION
-      {
-        std::vector<Action *> *actions = new std::vector<Action *>;
-        actions->push_back(Transformation::instantiate($2));
-        $$ = actions;
-
-      }
-    | TRANSFORMATION
-      {
-        std::vector<Action *> *actions = new std::vector<Action *>;
-        actions->push_back(Transformation::instantiate($1));
-        $$ = actions;
-      }
-    | actions COMMA SPACE ACTION_SEVERITY
-      {
-        std::vector<Action *> *a = $1;
-        a->push_back(Action::instantiate($4));
-        $$ = $1;
-      }
-    | actions COMMA ACTION_SEVERITY
-      {
-        std::vector<Action *> *a = $1;
-        a->push_back(Action::instantiate($3));
-        $$ = $1;
-      }
-    | SPACE ACTION_SEVERITY
-      {
-        std::vector<Action *> *actions = new std::vector<Action *>;
-        actions->push_back(Action::instantiate($2));
-        $$ = actions;
-
+        $$ = Action::instantiate($1);
       }
     | ACTION_SEVERITY
       {
-        std::vector<Action *> *actions = new std::vector<Action *>;
-        actions->push_back(Action::instantiate($1));
-        $$ = actions;
+        $$ = Action::instantiate($1);
       }
-    | actions COMMA ACTION_SETVAR
+    | TRANSFORMATION
       {
-        std::vector<Action *> *a = $1;
-        std::string error;
-        SetVar *setVar = new SetVar($3);
-
-        if (setVar->init(&error) == false) {
-            driver.parserError << error;
-            YYERROR;
-        }
-
-        a->push_back(setVar);
-        $$ = $1;
-      }
-    | SPACE ACTION_SETVAR
-      {
-        std::vector<Action *> *actions = new std::vector<Action *>;
-        std::string error;
-        SetVar *setVar = new SetVar($2);
-
-        if (setVar->init(&error) == false) {
-            driver.parserError << error;
-            YYERROR;
-        }
-
-        actions->push_back(setVar);
-        $$ = actions;
-
+        $$ = Transformation::instantiate($1);
       }
     | ACTION_SETVAR
       {
-        std::vector<Action *> *actions = new std::vector<Action *>;
         std::string error;
         SetVar *setVar = new SetVar($1);
 
@@ -656,74 +568,56 @@ actions:
             YYERROR;
         }
 
-        actions->push_back(setVar);
-        $$ = actions;
-      }
-    | actions COMMA ACTION_MSG
-      {
-        std::vector<Action *> *a = $1;
-        Msg *msg = new Msg($3);
-        a->push_back(msg);
-        $$ = $1;
-      }
-    | SPACE ACTION_MSG
-      {
-        std::vector<Action *> *actions = new std::vector<Action *>;
-        Msg *msg = new Msg($2);
-        actions->push_back(msg);
-        $$ = actions;
-
+        $$ = setVar;
       }
     | ACTION_MSG
       {
-        std::vector<Action *> *actions = new std::vector<Action *>;
-        Msg *msg = new Msg($1);
-        actions->push_back(msg);
-        $$ = actions;
-      }
-    | actions COMMA ACTION_TAG
-      {
-        std::vector<Action *> *a = $1;
-        Tag *tag = new Tag($3);
-        a->push_back(tag);
-        $$ = $1;
-      }
-    | SPACE ACTION_TAG
-      {
-        std::vector<Action *> *actions = new std::vector<Action *>;
-        Tag *tag = new Tag($2);
-        actions->push_back(tag);
-        $$ = actions;
-
+        $$ = new Msg($1);
       }
     | ACTION_TAG
       {
-        std::vector<Action *> *actions = new std::vector<Action *>;
-        Tag *tag = new Tag($1);
-        actions->push_back(tag);
-        $$ = actions;
-      }
-    | actions COMMA ACTION_REV
-      {
-        std::vector<Action *> *a = $1;
-        Rev *rev = new Rev($3);
-        a->push_back(rev);
-        $$ = $1;
-      }
-    | SPACE ACTION_REV
-      {
-        std::vector<Action *> *actions = new std::vector<Action *>;
-        Rev *rev = new Rev($2);
-        actions->push_back(rev);
-        $$ = actions;
-
+        $$ = new Tag($1);
       }
     | ACTION_REV
       {
-        std::vector<Action *> *actions = new std::vector<Action *>;
-        Rev *rev = new Rev($1);
-        actions->push_back(rev);
-        $$ = actions;
+        $$ = new Rev($1);
+      }
+    | ACTION_CTL_BDY_XML
+      {
+        /* not ready yet. */
+        $$ = Action::instantiate($1);
+      }
+    | ACTION_CTL_BDY_JSON
+      {
+        /* not ready yet. */
+        $$ = Action::instantiate($1);
+      }
+    ;
+
+actions:
+    actions COMMA SPACE act
+      {
+        std::vector<Action *> *a = $1;
+        a->push_back($4);
+        $$ = $1;
+      }
+    | actions COMMA act
+      {
+        std::vector<Action *> *a = $1;
+        a->push_back($3);
+        $$ = $1;
+      }
+    | SPACE act
+      {
+        std::vector<Action *> *a = new std::vector<Action *>;
+        a->push_back($2);
+        $$ = a;
+      }
+    | act
+      {
+        std::vector<Action *> *a = new std::vector<Action *>;
+        a->push_back($1);
+        $$ = a;
       }
     ;
 
