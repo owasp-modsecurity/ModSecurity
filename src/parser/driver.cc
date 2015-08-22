@@ -25,8 +25,8 @@ namespace ModSecurity {
 namespace Parser {
 
 Driver::Driver()
-  : trace_scanning(true),
-  trace_parsing(true) {
+  : trace_scanning(false),
+  trace_parsing(false) {
       audit_log = new AuditLog();
   }
 
@@ -46,11 +46,13 @@ int Driver::addSecRule(Rule *rule) {
 
     if (size == 0) {
         this->rules[rule->phase].push_back(rule);
+        lastRule = rule;
         return true;
     }
 
-    Rule *lastRule = this->rules[rule->phase][size-1];
+
     if (lastRule->chained && lastRule->chainedRule == NULL) {
+        rule->phase = lastRule->phase;
         lastRule->chainedRule = rule;
         return true;
     }
@@ -64,7 +66,7 @@ int Driver::addSecRule(Rule *rule) {
             return true;
         }
     }
-
+    lastRule = rule;
     rules[rule->phase].push_back(rule);
     return true;
 }

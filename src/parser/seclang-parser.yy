@@ -18,7 +18,9 @@ class Driver;
 
 #include "actions/action.h"
 #include "actions/set_var.h"
+#include "actions/severity.h"
 #include "actions/msg.h"
+#include "actions/log_data.h"
 #include "actions/rev.h"
 #include "actions/tag.h"
 #include "actions/transformations/transformation.h"
@@ -45,9 +47,11 @@ class Driver;
 
 using ModSecurity::actions::Action;
 using ModSecurity::actions::SetVar;
+using ModSecurity::actions::Severity;
 using ModSecurity::actions::Tag;
 using ModSecurity::actions::Rev;
 using ModSecurity::actions::Msg;
+using ModSecurity::actions::LogData;
 using ModSecurity::actions::transformations::Transformation;
 using ModSecurity::operators::Operator;
 using ModSecurity::Rule;
@@ -125,7 +129,7 @@ using ModSecurity::Variables::Variable;
   PIPE
 ;
 
-%left CONFIG_VALUE_RELEVANT_ONLY CONFIG_VALUE_ON CONFIG_VALUE_OFF
+%left SPACE CONFIG_VALUE_RELEVANT_ONLY CONFIG_VALUE_ON CONFIG_VALUE_OFF
 %token <std::string> QUOTATION_MARK
 %token <std::string> DIRECTIVE
 %token <std::string> CONFIG_DIR_REQ_BODY_LIMIT
@@ -202,9 +206,11 @@ using ModSecurity::Variables::Variable;
 %token <std::string> ACTION_MSG
 %token <std::string> ACTION_TAG
 %token <std::string> ACTION_REV
+%token <std::string> LOG_DATA
 %token <std::string> TRANSFORMATION
 %token <std::string> ACTION_CTL_BDY_XML
 %token <std::string> ACTION_CTL_BDY_JSON
+%token <std::string> ACTION_CTL_AUDIT_LOG_PARTS
 
 %type <std::vector<Action *> *> actions
 %type <std::vector<Variable *> *> variables
@@ -223,6 +229,8 @@ input:
 
 line: expression
     | SPACE expression
+    | SPACE expression SPACE
+    | expression SPACE
     ;
 
 audit_log:
@@ -298,6 +306,7 @@ audit_log:
 
 expression:
     audit_log
+    | DIRECTIVE SPACE variables SPACE OPERATOR SPACE QUOTATION_MARK actions SPACE QUOTATION_MARK
     | DIRECTIVE SPACE variables SPACE OPERATOR SPACE QUOTATION_MARK actions QUOTATION_MARK
       {
         Operator *op = Operator::instantiate($5);
@@ -313,6 +322,7 @@ expression:
             );
         driver.addSecRule(rule);
       }
+    | DIRECTIVE SPACE variables SPACE FREE_TEXT SPACE QUOTATION_MARK actions SPACE QUOTATION_MARK
     | DIRECTIVE SPACE variables SPACE FREE_TEXT SPACE QUOTATION_MARK actions QUOTATION_MARK
       {
         Operator *op = Operator::instantiate("@pm " + $5);
@@ -577,13 +587,13 @@ act:
       {
         $$ = Action::instantiate($1);
       }
-    | ACTION_SEVERITY
-      {
-        $$ = Action::instantiate($1);
-      }
     | TRANSFORMATION
       {
         $$ = Transformation::instantiate($1);
+      }
+    | ACTION_SEVERITY
+      {
+        $$ =  new Severity($1);
       }
     | ACTION_SETVAR
       {
@@ -596,6 +606,10 @@ act:
         }
 
         $$ = setVar;
+      }
+    | LOG_DATA
+      {
+        $$ = new LogData($1);
       }
     | ACTION_MSG
       {
@@ -615,6 +629,11 @@ act:
         $$ = Action::instantiate($1);
       }
     | ACTION_CTL_BDY_JSON
+      {
+        /* not ready yet. */
+        $$ = Action::instantiate($1);
+      }
+    | ACTION_CTL_AUDIT_LOG_PARTS
       {
         /* not ready yet. */
         $$ = Action::instantiate($1);

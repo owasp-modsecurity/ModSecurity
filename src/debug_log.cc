@@ -75,6 +75,7 @@ bool DebugLog::setOutputFile(const std::string& file_path) {
  *
  */
 bool DebugLog::write_log(int debug_level, const std::string &text) {
+    std::cout << "?" << std::to_string(is_open()) << ":" << std::to_string(m_debug_level) <<" [" << debug_level << "] " << text << std::endl;
     if (!is_open()) {
         return false;
     }

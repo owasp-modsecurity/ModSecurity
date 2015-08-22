@@ -76,9 +76,6 @@ Action *Action::instantiate(const std::string& name) {
     if (name.compare(0, rule_id.length(), rule_id) == 0) {
         return new RuleId(name);
     }
-    if (name.compare(0, severity.length(), severity) == 0) {
-        return new Severity(name);
-    }
     if (name == "chain") {
         return new Chain(name);
     }

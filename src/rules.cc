@@ -104,52 +104,53 @@ Rules::~Rules() {
  *
  * @param uri Full path to the rules file.
  *
- * @return If rules were loaded successfully or not.
+ * @return Number of rules loaded, -1 if failed.
  * @retval true  Rules where loaded successfully.
  * @retval false Problem loading the rules.
  *
  */
-bool Rules::loadFromUri(const char *uri) {
+int Rules::loadFromUri(const char *uri) {
     Driver *driver = new Driver();
 
     if (driver->parseFile(uri) == false) {
         parserError << driver->parserError.str();
-        return false;
+        return -1;
     }
 
-    this->merge(driver);
+    int rules = this->merge(driver);
     delete driver;
 
-    return true;
+    return rules;
 }
 
-bool Rules::load(const char *file, const std::string &ref) {
+int Rules::load(const char *file, const std::string &ref) {
     Driver *driver = new Driver();
 
     if (driver->parse(file, ref) == false) {
         parserError << driver->parserError.str();
-        return false;
+        return -1;
     }
-    this->merge(driver);
+    int rules = this->merge(driver);
     delete driver;
 
-    return true;
+    return rules;
 }
 
 
-bool Rules::loadRemote(const char *key, const char *uri) {
+int Rules::loadRemote(const char *key, const char *uri) {
     HttpsClient client;
+    client.setKey(key);
     bool ret = client.download(uri);
 
     if (ret) {
         return this->load(client.content.c_str(), uri);
     }
 
-    return false;
+    return -1;
 }
 
 
-bool Rules::load(const char *plainRules) {
+int Rules::load(const char *plainRules) {
     return this->load(plainRules, "");
 }
 
@@ -178,9 +179,11 @@ int Rules::evaluate(int phase, Assay *assay) {
 
 
 int Rules::merge(Driver *from) {
+    int amount_of_rules = 0;
     for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = from->rules[i];
         for (int j = 0; j < rules.size(); j++) {
+            amount_of_rules++;
             Rule *rule = rules[j];
             this->rules[i].push_back(rule);
             rule->refCountIncrease();
@@ -208,17 +211,19 @@ int Rules::merge(Driver *from) {
     this->audit_log = from->audit_log;
     this->audit_log->refCountIncrease();
 
-    this->debugLog->setDebugLevel(this->debugLevel);
-    this->debugLog->setOutputFile(this->debug_log_path);
+    this->debugLog->setDebugLevel(from->debugLevel);
+    this->debugLog->setOutputFile(from->debug_log_path);
 
-    return 0;
+    return amount_of_rules;
 }
 
 
 int Rules::merge(Rules *from) {
+    int amount_of_rules = 0;
     for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = from->rules[i];
         for (int j = 0; j < rules.size(); j++) {
+            amount_of_rules++;
             Rule *rule = rules[j];
             this->rules[i].push_back(rule);
             rule->refCountIncrease();
@@ -244,10 +249,10 @@ int Rules::merge(Rules *from) {
     this->audit_log = from->audit_log;
     this->audit_log->refCountIncrease();
 
-    this->debugLog->setDebugLevel(this->debugLevel);
-    this->debugLog->setOutputFile(this->debug_log_path);
+    this->debugLog->setDebugLevel(from->debugLevel);
+    this->debugLog->setOutputFile(from->debug_log_path);
 
-    return 0;
+    return amount_of_rules;
 }
 
 
@@ -267,7 +272,7 @@ void Rules::dump() {
         std::cout << " rules)" << std::endl;
         for (int j = 0; j < rules.size(); j++) {
             std::cout << "    Rule ID: " << std::to_string(rules[j]->rule_id);
-            std::cout << std::endl;
+            std::cout << "--" << rules[j] << std::endl;
         }
     }
 }
@@ -297,7 +302,7 @@ extern "C" int msc_rules_add_remote(Rules *rules,
     const char *key, const char *uri, const char **error) {
     int ret = rules->loadRemote(key, uri);
     if (ret == 0) {
-        *error = rules->getParserError().c_str();
+        *error = strdup(rules->getParserError().c_str());
     }
     return ret;
 }
@@ -307,7 +312,7 @@ extern "C" int msc_rules_add_file(Rules *rules, const char *file,
     const char **error) {
     int ret = rules->loadFromUri(file);
     if (ret == 0) {
-        *error = rules->getParserError().c_str();
+        *error = strdup(rules->getParserError().c_str());
     }
     return ret;
 }
@@ -317,7 +322,7 @@ extern "C" int msc_rules_add(Rules *rules, const char *plain_rules,
     const char **error) {
     int ret = rules->load(plain_rules);
     if (ret == 0) {
-        *error = rules->getParserError().c_str();
+        *error = strdup(rules->getParserError().c_str());
     }
     return ret;
 }

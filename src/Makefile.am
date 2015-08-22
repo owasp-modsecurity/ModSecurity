@@ -56,6 +56,7 @@ ACTIONS = \
 	actions/block.cc \
 	actions/capture.cc \
 	actions/chain.cc \
+	actions/log_data.cc \
 	actions/msg.cc \
 	actions/no_audit_log.cc \
 	actions/phase.cc \

@@ -79,6 +79,7 @@ class Driver : public RulesProperties {
 
     std::list<std::string> ref;
     std::string buffer;
+    Rule *lastRule;
 };
 
 

@@ -29,6 +29,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "modsecurity/modsecurity.h"
 #include "src/unique_id.h"
 
 namespace ModSecurity {
@@ -45,12 +46,16 @@ size_t HttpsClient::handle_impl(char* data, size_t size, size_t nmemb) {
     return size * nmemb;
 }
 
+void HttpsClient::setKey(const std::string& key) {
+    m_key = "ModSec-key: " + key;
+}
 
 #ifdef MSC_WITH_CURL
 bool HttpsClient::download(const std::string &uri) {
     CURL *curl;
     CURLcode res;
     std::string uniqueId = "ModSec-unique-id: " + UniqueId::uniqueId();
+    std::string status = "ModSec-status: " MODSECURITY_VERSION_NUM;
 
     curl = curl_easy_init();
     if (!curl) {
@@ -62,6 +67,10 @@ bool HttpsClient::download(const std::string &uri) {
     curl_easy_setopt(curl, CURLOPT_URL, uri.c_str());
 
     headers_chunk = curl_slist_append(headers_chunk, uniqueId.c_str());
+    headers_chunk = curl_slist_append(headers_chunk, status.c_str());
+    if (m_key.empty() == false) {
+        headers_chunk = curl_slist_append(headers_chunk, m_key.c_str());
+    }
 
     /* Make it TLS 1.x only. */
     curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);

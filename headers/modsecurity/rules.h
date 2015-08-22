@@ -69,10 +69,10 @@ class Rules : public RulesProperties  {
     void incrementReferenceCount(void);
     void decrementReferenceCount(void);
 
-    bool loadFromUri(const char *uri);
-    bool loadRemote(const char *key, const char *uri);
-    bool load(const char *rules);
-    bool load(const char *rules, const std::string &ref);
+    int loadFromUri(const char *uri);
+    int loadRemote(const char *key, const char *uri);
+    int load(const char *rules);
+    int load(const char *rules, const std::string &ref);
 
     void dump();
 

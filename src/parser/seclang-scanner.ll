@@ -23,16 +23,18 @@ using ModSecurity::split;
 %}
 %option noyywrap nounput batch debug noinput
 
-ACTION          (?i:accuracy|allow|append|auditlog|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|initcol|log|logdata|maturity|multiMatch|noauditlog|nolog|pass|pause|phase:[0-9]+|prepend|proxy|redirect:[A-Z0-9_\|\&\:\/\/\.]+|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|skipAfter|status:[0-9]+|ver|xmlns)
-ACTION_SEVERITY (?i:severity:[0-9]+|severity:'[0-9]+'|severity:(EMERGENCY|ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)|severity:'(EMERGENCY|ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)')
+ACTION          (?i:accuracy|allow|append|auditlog|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|initcol|log|maturity|multiMatch|noauditlog|nolog|pass|pause|phase:[0-9]+|prepend|proxy|redirect:[A-Z0-9_\|\&\:\/\/\.]+|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|skipAfter|status:[0-9]+|ver|xmlns)
+ACTION_SEVERITY (?i:severity)
+ACTION_SEVERITY_VALUE (?i:(EMERGENCY|ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)|[0-9]+)
 ACTION_SETVAR   (?i:setvar)
 ACTION_MSG      (?i:msg)
 ACTION_TAG      (?i:tag)
 ACTION_REV      (?i:rev)
 ACTION_CTL_BDY_XML ctl:requestBodyProcessor=XML
 ACTION_CTL_BDY_JSON ctl:requestBodyProcessor=JSON
+ACTION_CTL_AUDIT_LOG_PARTS (?i:ctl:auditLogParts)
 DIRECTIVE       SecRule
-
+LOG_DATA        (?i:logdata)
 
 CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION (?i:SecPcreMatchLimitRecursion)
 CONFIG_DIR_PCRE_MATCH_LIMIT (?i:SecPcreMatchLimit)
@@ -78,7 +80,7 @@ CONFIG_SEC_REMOTE_RULES              (?i:SecRemoteRules)
 CONFIG_SEC_REMOTE_RULES_FAIL_ACTION  (?i:SecRemoteRulesFailAction)
 
 
-DICT_ELEMENT    [A-Za-z_0-9-]+
+DICT_ELEMENT    [^ \|\t]+
 
 
 OPERATOR        (?i:(?:@inspectFile|@fuzzyHash|@validateByteRange|@validateDTD|@validateHash|@validateSchema|@verifyCC|@verifyCPF|@verifySSN|@gsbLookup|@rsub)|(?:\!{0,1})(?:@within|@containsWord|@contains|@endsWith|@eq|@ge|@gt|@ipMatchF|@ipMatch|@ipMatchFromFile|@le|@lt|@pmf|@pm|@pmFromFile|@rbl|@rx|@streq|@strmatch|@beginsWith))
@@ -86,7 +88,7 @@ OPERATOR        (?i:(?:@inspectFile|@fuzzyHash|@validateByteRange|@validateDTD|@
 OPERATORNOARG	(?i:@detectSQLi|@detectXSS|@geoLookup|@validateUrlEncoding|@validateUtf8Encoding)
 
 
-TRANSFORMATION  t:(lowercase|urlDecodeUni|urlDecode|none|compressWhitespace|removeWhitespace|replaceNulls|removeNulls|htmlEntityDecode|jsDecode|cssDecode|trim)
+TRANSFORMATION  t:(lowercase|urlDecodeUni|urlDecode|none|compressWhitespace|removeWhitespace|replaceNulls|removeNulls|htmlEntityDecode|jsDecode|cssDecode|trim|normalizePathWin|length)
 
 VARIABLE          (?i:UNIQUE_ID|SERVER_PORT|SERVER_ADDR|REMOTE_PORT|REMOTE_HOST|MULTIPART_STRICT_ERROR|PATH_INFO|MULTIPART_NAME|MULTIPART_FILENAME|MULTIPART_CRLF_LF_LINES|MATCHED_VAR_NAME|MATCHED_VARS_NAMES|MATCHED_VAR|MATCHED_VARS|INBOUND_DATA_ERROR|OUTBOUND_DATA_ERROR|FULL_REQUEST|FILES|AUTH_TYPE|ARGS_NAMES|ARGS|QUERY_STRING|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_COOKIES_NAMES|REQUEST_COOKIES|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_HEADERS|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_HEADERS|RESPONSE_PROTOCOL|RESPONSE_STATUS|TX|GEO)
 RUN_TIME_VAR_DUR  (?i:DURATION)
@@ -123,8 +125,16 @@ CONFIG_VALUE_PATH    [0-9A-Za-z_/\.\-]+
 AUDIT_PARTS [ABCDEFHJKIZ]+
 CONFIG_VALUE_NUMBER [0-9]+
 
-FREE_TEXT       [^\"]+
+FREE_TEXT       ([^\"]|([^\\]\\\"))+
+
 FREE_TEXT_NEW_LINE       [^\"|\n]+
+FREE_TEXT_QUOTE ([^\']|([^\\]\\\'))+
+FREE_TEXT_SPACE [^ \t]+
+FREE_TEXT_SPACE_COMMA [^, \t]+
+
+VAR_FREE_TEXT_QUOTE ([^\']|([^\\]\\\'))+
+VAR_FREE_TEXT_SPACE_COMMA [^, \t\"]+
+VAR_FREE_TEXT_SPACE [^ \t\"]+
 
 CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
@@ -158,6 +168,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {CONFIG_DIR_AUDIT_LOG_P}[ ]{AUDIT_PARTS}           { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_LOG_P(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_STS}[ ]["]{FREE_TEXT}["]         { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_STS(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_TPE}                             { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_TPE(yytext, *driver.loc.back()); }
+{ACTION_CTL_AUDIT_LOG_PARTS}=[+|-]{AUDIT_PARTS}    { return yy::seclang_parser::make_ACTION_CTL_AUDIT_LOG_PARTS(yytext, *driver.loc.back()); }
 
 %{ /* Debug log entries */ %}
 {CONFIG_DIR_DEBUG_LOG}[ ]{CONFIG_VALUE_PATH}    { return yy::seclang_parser::make_CONFIG_DIR_DEBUG_LOG(strchr(yytext, ' ') + 1, *driver.loc.back()); }
@@ -165,23 +176,30 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 <INITIAL,EXPECTING_OPERATOR>{
 %{ /* Variables */ %}
-[!|&]?{VARIABLE}:?{DICT_ELEMENT}?             { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_DUR}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_ENV}:?{DICT_ELEMENT}?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_BLD}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_HSV}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
-[!|&]?{VARIABLENOCOLON}                       { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
+[!&]?{VARIABLE}:?{DICT_ELEMENT}?             { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_DUR}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_ENV}:?{DICT_ELEMENT}?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_BLD}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_HSV}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
+[!&]?{VARIABLENOCOLON}                       { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
+
+["][!&]?{VARIABLE}:?{DICT_ELEMENT}?["]             { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
+["][!&]?{RUN_TIME_VAR_DUR}["]                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
+["][!&]?{RUN_TIME_VAR_ENV}:?{DICT_ELEMENT}?["]     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
+["][!&]?{RUN_TIME_VAR_BLD}["]                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
+["][!&]?{RUN_TIME_VAR_HSV}["]                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
+["][!&]?{VARIABLENOCOLON}["]                       { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
 
 %{ /* Variables: TIME */ %}
-[!|&]?{RUN_TIME_VAR_TIME}        { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_DAY}    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_DAY(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_EPOCH}  { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_EPOCH(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_HOUR}   { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_HOUR(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_MIN}    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MIN(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_MON}    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MON(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_SEC}    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_SEC(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_WDAY}   { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_WDAY(yytext, *driver.loc.back()); }
-[!|&]?{RUN_TIME_VAR_TIME_YEAR}   { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_YEAR(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_TIME}        { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_TIME_DAY}    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_DAY(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_TIME_EPOCH}  { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_EPOCH(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_TIME_HOUR}   { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_HOUR(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_TIME_MIN}    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MIN(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_TIME_MON}    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_MON(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_TIME_SEC}    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_SEC(yytext, *driver.loc.back()); }
+[&]?{RUN_TIME_VAR_TIME_WDAY}   { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_WDAY(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_TIME_YEAR}   { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_TIME_YEAR(yytext, *driver.loc.back()); }
 }
 
 
@@ -225,20 +243,32 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 <EXPECTING_OPERATOR>{
 ["][^@]{FREE_TEXT}["]           { BEGIN(INITIAL); return yy::seclang_parser::make_FREE_TEXT(yytext, *driver.loc.back()); }
 ["]{OPERATOR}[ ]{FREE_TEXT}["]  { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
-["]{OPERATORNOARG}["]           { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
+["]{OPERATORNOARG}[\t ]*["]           { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
 }
 
 {ACTION}                        { return yy::seclang_parser::make_ACTION(yytext, *driver.loc.back()); }
-{ACTION_SEVERITY}                        { return yy::seclang_parser::make_ACTION_SEVERITY(yytext, *driver.loc.back()); }
-{ACTION_SETVAR}:{FREE_TEXT}={FREE_TEXT}  {
+
+{ACTION_SEVERITY}:{ACTION_SEVERITY_VALUE}       { return yy::seclang_parser::make_ACTION_SEVERITY(yytext + 9, *driver.loc.back()); }
+{ACTION_SEVERITY}:'{ACTION_SEVERITY_VALUE}'     { return yy::seclang_parser::make_ACTION_SEVERITY(std::string(yytext, 10, yyleng - 11), *driver.loc.back()); }
+
+
+{ACTION_SETVAR}:'{VAR_FREE_TEXT_QUOTE}={VAR_FREE_TEXT_QUOTE}'  {
                                     return yy::seclang_parser::make_ACTION_SETVAR(strchr(yytext, ':') + 1, *driver.loc.back());
                                          }
-{ACTION_SETVAR}:{FREE_TEXT}              {
+{ACTION_SETVAR}:'{VAR_FREE_TEXT_QUOTE}'              {
                                     return yy::seclang_parser::make_ACTION_SETVAR(strchr(yytext, ':') + 1, *driver.loc.back());
                                          }
-{ACTION_MSG}:'{FREE_TEXT}'      { return yy::seclang_parser::make_ACTION_MSG(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_TAG}:'{FREE_TEXT}'      { return yy::seclang_parser::make_ACTION_TAG(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_REV}:'{FREE_TEXT}'      { return yy::seclang_parser::make_ACTION_REV(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_SETVAR}:{VAR_FREE_TEXT_SPACE}={VAR_FREE_TEXT_SPACE_COMMA}  {
+                                    return yy::seclang_parser::make_ACTION_SETVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+{ACTION_SETVAR}:{VAR_FREE_TEXT_SPACE_COMMA}  {
+                                    return yy::seclang_parser::make_ACTION_SETVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+
+{LOG_DATA}:'{FREE_TEXT_QUOTE}'         { return yy::seclang_parser::make_LOG_DATA(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_MSG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_MSG(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_TAG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_TAG(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_REV}:'{CONFIG_VALUE_NUMBER}'      { return yy::seclang_parser::make_ACTION_REV(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_CTL_BDY_XML}              { return yy::seclang_parser::make_ACTION_CTL_BDY_XML(yytext, *driver.loc.back()); }
 {ACTION_CTL_BDY_JSON}             { return yy::seclang_parser::make_ACTION_CTL_BDY_JSON(yytext, *driver.loc.back()); }
 

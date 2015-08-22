@@ -59,6 +59,14 @@ void Pm::postOrderTraversal(acmp_btree_node_t *node) {
     node = NULL;
 }
 
+void Pm::replaceAll(std::string& str, const std::string& from, const std::string& to) {
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        size_t end_pos = start_pos + from.length();
+        str.replace(start_pos, end_pos, to);
+        start_pos += to.length();
+    }
+}
 
 bool Pm::evaluate(Assay *assay, const std::string &input) {
     int rc = 0;
@@ -78,6 +86,8 @@ bool Pm::evaluate(Assay *assay, const std::string &input) {
 
 bool Pm::init(const char **error) {
     std::vector<std::string> vec;
+
+    replaceAll(param, "\\", "\\\\");
 
     char *content = parse_pm_content(param.c_str(), param.length(), error);
     if (content == NULL) {

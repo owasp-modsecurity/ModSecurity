@@ -28,7 +28,6 @@ namespace actions {
 Severity::Severity(std::string action)
     : Action(action, RunTimeOnlyIfMatchKind) {
     std::string a = action;
-    a.erase(0, 9);
     if (tolower(a) == "emergency") {
         this->m_severity = 0;
     } else if (tolower(a) == "alert") {
