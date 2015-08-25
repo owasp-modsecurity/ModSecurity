@@ -6,6 +6,7 @@ benchmark_SOURCES = \
         benchmark.cc
 
 benchmark_LDADD = \
+	-lrt \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \

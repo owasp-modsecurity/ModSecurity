@@ -102,6 +102,7 @@ AC_SUBST(CURL_USES_GNUTLS)
 
 if test -z "${CURL_VERSION}"; then
   AC_MSG_NOTICE([*** curl library not found.])
+  ifelse([$2], , AC_MSG_ERROR([curl library is required]), $2)
 else
   AC_MSG_NOTICE([using curl v${CURL_VERSION}])
   ifelse([$1], , , $1) 

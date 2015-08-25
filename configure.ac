@@ -34,6 +34,29 @@ AC_PROG_YACC
 AC_PROG_LEX
 AC_PROG_MAKE_SET
 
+
+AC_PATH_PROG([FLEX], [flex])
+test "x$FLEX" = "x" && AC_MSG_ERROR([flex is needed to build ModSecurity])
+
+AC_PATH_PROG([BISON], [bison])
+test "x$BISON" = "x" && AC_MSG_ERROR([bison is needed to build ModSecurity])
+
+AC_PATH_PROG([YACC_INST], $YACC)
+if test ! -f "$srcdir/gram.c"; then
+    if test -z "$YACC_INST"; then
+        AC_MSG_ERROR([yacc not found - unable to compile ModSecurity])
+    fi
+fi
+
+
+# Check if the compiler is c++11 compatible.
+AX_CXX_COMPILE_STDCXX_11(,mandatory)
+
+# Check for libinjection
+AC_CHECK_FILE("others/libinjection/src/libinjection_html5.c", HAS_LIBINJECTION=1)
+
+test "x$HAS_LIBINJECTION" = "x" && AC_MSG_ERROR([libinjection is needed to build ModSecurity, make sure you have downloaded all the git submodules])
+
 # Check for yajl
 PROG_YAJL
 
@@ -49,9 +72,7 @@ AM_CONDITIONAL([GEOIP_VERSION], [test "$GEOIP_VERSION" != ""])
 #
 CHECK_CURL
 
-if test -z "${CURL_VERSION}"; then
-  AC_MSG_NOTICE([NOTE: curl was not found. SecRemoteRules support was disabled.])
-else
+if ! test -z "${CURL_VERSION}"; then
   AC_DEFINE([MSC_WITH_CURL], [1], [Define if libcurl is available])
 fi
 
@@ -161,5 +182,4 @@ DX_INIT_DOXYGEN([ModSecurity],[doc/doxygen.cfg])
 
 # Generate the files.
 AC_OUTPUT
-
 

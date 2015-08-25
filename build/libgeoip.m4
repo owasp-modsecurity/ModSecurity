@@ -19,7 +19,7 @@ GEOIP_CPPFLAGS=""
 GEOIP_LDADD=""
 GEOIP_LDFLAGS=""
 GEOIP_CONFIG=${PKG_CONFIG}
-GEOIP_PKGNAMES="geoip2 geoip"
+GEOIP_PKGNAMES="geoip2 geoip GeoIP"
 GEOIP_SONAMES="so la sl dll dylib"
 
 AC_ARG_WITH(
@@ -29,7 +29,7 @@ AC_ARG_WITH(
 
 AS_CASE(["${with_geoip}"],
   [no], [test_paths=],
-  [yes], [test_paths="/usr/local/libgeoip /usr/local/geoip /usr/local /opt/libgeoip /opt/geoip /opt /usr /opt/local/include /opt/local"],
+  [yes], [test_paths="/usr/local/libgeoip /usr/local/geoip /usr/local /opt/libgeoip /opt/geoip /opt /usr /opt/local/include /opt/local /usr/lib /usr/local/lib /usr/lib64"],
   [test_paths="${with_geoip}"])
 
 AS_IF([test "x${test_paths}" != "x"], [
@@ -43,7 +43,7 @@ for x in ${test_paths}; do
 
     dnl # Try known config script names/locations
     for y in $GEOIP_CONFIG; do
-        if test -e "${x}/bin/${y}"; then
+       if test -e "${x}/bin/${y}"; then
             GEOIP_CONFIG="${x}/bin/${y}"
             geoip_config="${GEOIP_CONFIG}"
             break
@@ -86,14 +86,21 @@ else
     AC_MSG_CHECKING([for geoip install])
     for x in ${test_paths}; do
         for y in ${GEOIP_SONAMES}; do
-           if test -e "${x}/libgeoip.${y}"; then
-                geoip_lib_path="${x}/"
-                geoip_lib_name="geoip"
-                break
-            else
-                geoip_lib_path=""
-                geoip_lib_name=""
-            fi
+      	    for z in ${GEOIP_PKGNAMES}; do
+               if test -e "${x}/${z}.${y}"; then
+                   geoip_lib_path="${x}/"
+                   geoip_lib_name="${z}"
+                   break
+               fi
+               if test -e "${x}/lib${z}.${y}"; then
+                   geoip_lib_path="${x}/"
+                   geoip_lib_name="${z}"
+                   break
+               fi
+            done
+           if test -n "$geoip_lib_path"; then
+               break
+           fi
         done
         if test -n "$geoip_lib_path"; then
             break
@@ -146,7 +153,7 @@ AC_SUBST(GEOIP_LDADD)
 AC_SUBST(GEOIP_LIBS)
 AC_SUBST(GEOIP_LDFLAGS)
     if test -z "${GEOIP_VERSION}"; then
-      ifelse([$2], , AC_MSG_NOTICE([optional geoip library not found]), $2)
+      ifelse([$2], , AC_MSG_ERROR([*** geoip library not found]), $2)
     else
       AC_MSG_NOTICE([using geoip v${GEOIP_VERSION}])
       GEOIP_CFLAGS="-DWITH_GEOIP ${GEOIP_CFLAGS}"

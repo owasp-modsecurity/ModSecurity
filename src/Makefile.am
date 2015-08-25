@@ -201,6 +201,7 @@ libmodsecurity_la_CPPFLAGS = \
 	$(PCRE_CPPFLAGS)
 
 libmodsecurity_la_LIBADD = \
+	-lrt \
         $(CURL_LDADD) \
         $(GEOIP_LDADD) \
         @LEXLIB@ \

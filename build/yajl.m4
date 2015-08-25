@@ -29,7 +29,7 @@ AC_ARG_WITH(
 
 AS_CASE(["${with_yajl}"],
   [no], [test_paths=],
-  [yes], [test_paths="/usr/local/libyajl /usr/local/yajl /usr/local /opt/libyajl /opt/yajl /opt /usr"],
+  [yes], [test_paths="/usr/lib /usr/local/lib /usr/local/libyajl /usr/local/yajl /usr/local /opt/libyajl /opt/yajl /opt /usr"],
   [test_paths="${with_yajl}"])
 
 AS_IF([test "x${test_paths}" != "x"], [
@@ -146,7 +146,7 @@ AC_SUBST(YAJL_LDADD)
 AC_SUBST(YAJL_LIBS)
 AC_SUBST(YAJL_LDFLAGS)
     if test -z "${YAJL_VERSION}"; then
-      ifelse([$2], , AC_MSG_NOTICE([optional yajl library not found]), $2)
+      ifelse([$2], , AC_MSG_ERROR([*** yajl library not found]), $2)
     else
       AC_MSG_NOTICE([using yajl v${YAJL_VERSION}])
       YAJL_CFLAGS="-DWITH_YAJL ${YAJL_CFLAGS}"

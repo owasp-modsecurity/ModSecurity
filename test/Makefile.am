@@ -24,6 +24,7 @@ unit_tests_SOURCES = \
         unit/unit_test.cc
 
 unit_tests_LDADD = \
+	-lrt \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
@@ -51,6 +52,7 @@ regression_tests_SOURCES = \
         regression/custom_debug_log.cc
 
 regression_tests_LDADD = \
+	-lrt \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
