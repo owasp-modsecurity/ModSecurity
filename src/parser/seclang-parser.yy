@@ -229,7 +229,6 @@ input:
 
 line: expression
     | SPACE expression
-    | SPACE expression SPACE
     | expression SPACE
     ;
 
