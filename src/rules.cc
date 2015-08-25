@@ -251,7 +251,9 @@ int Rules::merge(Rules *from) {
     this->debugLog->refCountIncrease();
 
     this->audit_log = from->audit_log;
-    this->audit_log->refCountIncrease();
+    if (this->audit_log != NULL) {
+        this->audit_log->refCountIncrease();
+    }
 
     this->debugLog->setDebugLevel(from->debugLevel);
     this->debugLog->setOutputFile(from->debug_log_path);
