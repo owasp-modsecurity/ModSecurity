@@ -42,21 +42,13 @@ int Driver::addSecRule(Rule *rule) {
         return -1;
     }
 
-    int size = this->rules[rule->phase].size();
-
-    if (size == 0) {
-        this->rules[rule->phase].push_back(rule);
-        lastRule = rule;
-        return true;
-    }
-
-
-    if (lastRule->chained && lastRule->chainedRule == NULL) {
+    if (lastRule && lastRule->chained && lastRule->chainedRule == NULL) {
         rule->phase = lastRule->phase;
         lastRule->chainedRule = rule;
         return true;
     }
-    if (lastRule->chained && lastRule->chainedRule != NULL) {
+
+    if (lastRule && lastRule->chained && lastRule->chainedRule != NULL) {
         Rule *a = lastRule->chainedRule;
         while (a->chained && a->chainedRule != NULL) {
             a = a->chainedRule;
@@ -66,6 +58,7 @@ int Driver::addSecRule(Rule *rule) {
             return true;
         }
     }
+
     lastRule = rule;
     rules[rule->phase].push_back(rule);
     return true;

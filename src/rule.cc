@@ -179,13 +179,9 @@ bool Rule::evaluate(Assay *assay) {
                 std::to_string(elapsed_secs) + " seconds");
 
             if (ret) {
+                bool chainResult = false;
                 assay->debug(4, "Rule returned 1.");
 
-                for (Action *a :
-                    this->actions_runtime_pos) {
-                    assay->debug(4, "Running action: " + a->action);
-                    a->evaluate(this, assay);
-                }
                 if (this->chained && this->chainedRule == NULL) {
                     assay->debug(4, "Rule is marked as chained but there " \
                         "isn't a subsequent rule.");
@@ -203,12 +199,20 @@ bool Rule::evaluate(Assay *assay) {
                     assay->store_variable("MATCHED_VARS:" + v.first, value);
                     assay->store_variable("MATCHED_VARS_NAMES:" + v.first,
                         v.first);
-                    this->chainedRule->evaluate(assay);
+                    chainResult = this->chainedRule->evaluate(assay);
                     assay->update_variable_first("MATCHED_VAR", "");
                     assay->delete_variable("MATCHED_VARS:" + v.first);
                     assay->delete_variable("MATCHED_VARS_NAMES:" + v.first);
                     assay->delete_variable("MATCHED_VARS_NAMES:" + v.first);
                 }
+                if (this->chained && chainResult == true || !this->chained) {
+                    for (Action *a :
+                        this->actions_runtime_pos) {
+                        assay->debug(4, "Running action: " + a->action);
+                        a->evaluate(this, assay);
+                    }
+                }
+
             } else {
                 assay->debug(4, "Rule returned 0.");
             }
