@@ -97,7 +97,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
             " (ModSecurity regression test utility)");
         modsec_rules = new ModSecurity::Rules(debug_log);
 
-        if (modsec_rules->load(t->rules.c_str(), filename) == false) {
+        if (modsec_rules->load(t->rules.c_str(), filename) < 0) {
             if (t->parser_error.empty() == true) {
                 std::cerr << "parse failed." << std::endl;
                 std::cout << modsec_rules->getParserError() << std::endl;

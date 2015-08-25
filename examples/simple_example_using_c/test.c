@@ -38,7 +38,7 @@ int main (int argc, char **argv)
     rules = msc_create_rules_set();
 
     ret = msc_rules_add_file(rules, main_rule_uri, &error);
-    if (ret == 0) {
+    if (ret < 0) {
         fprintf(stderr, "Problems loading the rules --\n");
         fprintf(stderr, "%s\n", error);
         goto end;
@@ -48,7 +48,7 @@ int main (int argc, char **argv)
     ret = msc_rules_add_remote(rules, "test",
         "https://www.modsecurity.org/modsecurity-regression-test-secremoterules.txt",
         &error);
-    if (ret == 0) {
+    if (ret < 0) {
         fprintf(stderr, "Problems loading the rules --\n");
         fprintf(stderr, "%s\n", error);
         goto end;
