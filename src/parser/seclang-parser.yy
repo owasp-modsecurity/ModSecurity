@@ -225,6 +225,7 @@ using ModSecurity::Variables::Variable;
 input:
     %empty
     | input line
+    | SPACE
     ;
 
 line: expression
