@@ -88,9 +88,13 @@ Rules::~Rules() {
         }
     }
     /** Cleanup audit log */
-    audit_log->refCountDecreaseAndCheck();
+    if (audit_log) {
+        audit_log->refCountDecreaseAndCheck();
+    }
     /** Cleanup debug log */
-    debugLog->refCountDecreaseAndCheck();
+    if (debugLog) {
+        debugLog->refCountDecreaseAndCheck();
+    }
 }
 
 

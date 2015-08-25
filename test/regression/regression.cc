@@ -69,9 +69,9 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
 void perform_unit_test(std::vector<RegressionTest *> *tests,
     ModSecurityTestResults<RegressionTest> *res, int *count) {
 
-    CustomDebugLog *debug_log = new CustomDebugLog();
 
     for (RegressionTest *t : *tests) {
+        CustomDebugLog *debug_log = new CustomDebugLog();
         ModSecurity::ModSecurity *modsec = NULL;
         ModSecurity::Rules *modsec_rules = NULL;
         ModSecurity::Assay *modsec_assay = NULL;
@@ -193,34 +193,37 @@ end:
         CustomDebugLog *d = reinterpret_cast<CustomDebugLog *>
             (modsec_rules->debugLog);
 
-        if (!d->contains(t->debug_log)) {
-            std::cout << "failed!" << std::endl;
-            std::cout << "Debug log was not matching the expected results.";
-            std::cout << std::endl;
-        } else if (r.status != t->http_code) {
-            std::cout << "failed!" << std::endl;
-            std::cout << "HTTP code mismatch. expecting: " + \
-                std::to_string(t->http_code) + \
-                " got: " + std::to_string(r.status) + "\n";
-        } else {
-            std::cout << "passed!" << std::endl;
-            goto after_debug_log;
+        if (d != NULL) {
+            if (!d->contains(t->debug_log)) {
+                std::cout << "failed!" << std::endl;
+                std::cout << "Debug log was not matching the expected results.";
+                std::cout << std::endl;
+            } else if (r.status != t->http_code) {
+                std::cout << "failed!" << std::endl;
+                std::cout << "HTTP code mismatch. expecting: " + \
+                    std::to_string(t->http_code) + \
+                    " got: " + std::to_string(r.status) + "\n";
+            } else {
+                std::cout << "passed!" << std::endl;
+                goto after_debug_log;
+            }
+
+            std::cout << "Debug log:" << std::endl;
+            std::cout << "" << d->log_messages() << "" <<std::endl;
         }
 
-        std::cout << "Debug log:" << std::endl;
-        std::cout << "" << d->log_messages() << "" <<std::endl;
 after_debug_log:
-
-        res->log_raw_debug_log = d->log_messages();
+        if (d != NULL) {
+            res->log_raw_debug_log = d->log_messages();
+        }
 
         delete modsec_assay;
         delete modsec_rules;
         delete modsec;
+        delete debug_log;
 
         res->insert(res->end(), r.begin(), r.end());
     }
-
-    delete debug_log;
 }
 
 
