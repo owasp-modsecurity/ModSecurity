@@ -44,7 +44,7 @@ AuditLog::AuditLog()
     m_writer(NULL),
     m_relevant(""),
     filePermission(0600),
-    directoryPermission(0600),
+    directoryPermission(0766),
     m_refereceCount(0) { }
 
 AuditLog::~AuditLog() {

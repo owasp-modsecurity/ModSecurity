@@ -17,6 +17,7 @@ class Driver;
 }
 
 #include "actions/action.h"
+#include "actions/audit_log.h"
 #include "actions/set_var.h"
 #include "actions/severity.h"
 #include "actions/msg.h"
@@ -201,6 +202,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> OPERATOR
 %token <std::string> FREE_TEXT
 %token <std::string> ACTION
+%token <std::string> ACTION_AUDIT_LOG
 %token <std::string> ACTION_SEVERITY
 %token <std::string> ACTION_SETVAR
 %token <std::string> ACTION_MSG
@@ -618,6 +620,10 @@ act:
         }
 
         $$ = setVar;
+      }
+    | ACTION_AUDIT_LOG
+      {
+        $$ = new ModSecurity::actions::AuditLog($1);
       }
     | LOG_DATA
       {

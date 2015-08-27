@@ -65,6 +65,7 @@ int main (int argc, char **argv)
     msc_process_request_body(assay);
     msc_process_response_headers(assay);
     msc_process_response_body(assay);
+    msc_process_logging(assay, 200);
 end:
     msc_rules_cleanup(rules);
     msc_cleanup(modsec);
