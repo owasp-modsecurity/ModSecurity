@@ -91,10 +91,6 @@ Rules::~Rules() {
     if (audit_log) {
         audit_log->refCountDecreaseAndCheck();
     }
-    /** Cleanup debug log */
-    if (debugLog) {
-        debugLog->refCountDecreaseAndCheck();
-    }
 }
 
 
@@ -197,26 +193,24 @@ int Rules::merge(Driver *from) {
     this->secRuleEngine = from->secRuleEngine;
     this->secRequestBodyAccess = from->secRequestBodyAccess;
     this->secResponseBodyAccess = from->secResponseBodyAccess;
-    this->debug_log_path = from->debug_log_path;
-    this->debugLevel = from->debugLevel;
+    if (from->m_debugLog && this->m_debugLog &&
+        from->m_debugLog->isLogFileSet()) {
+        this->m_debugLog->setDebugLogFile(from->m_debugLog->getDebugLogFile());
+    }
+    if (from->m_debugLog && this->m_debugLog &&
+        from->m_debugLog->isLogLevelSet()) {
+        this->m_debugLog->setDebugLogLevel(
+            from->m_debugLog->getDebugLogLevel());
+    }
     this->components = from->components;
     this->requestBodyLimit = from->requestBodyLimit;
     this->responseBodyLimit = from->responseBodyLimit;
     this->requestBodyLimitAction = from->requestBodyLimitAction;
     this->responseBodyLimitAction = from->responseBodyLimitAction;
 
-    if (customDebugLog) {
-        this->debugLog = customDebugLog->new_instance();
-    } else {
-        this->debugLog = new DebugLog();
-    }
-    this->debugLog->refCountIncrease();
 
     this->audit_log = from->audit_log;
     this->audit_log->refCountIncrease();
-
-    this->debugLog->setDebugLevel(from->debugLevel);
-    this->debugLog->setOutputFile(from->debug_log_path);
 
     return amount_of_rules;
 }
@@ -243,28 +237,28 @@ int Rules::merge(Rules *from) {
     this->requestBodyLimitAction = from->requestBodyLimitAction;
     this->responseBodyLimitAction = from->responseBodyLimitAction;
 
-    if (customDebugLog) {
-        this->debugLog = customDebugLog->new_instance();
-    } else {
-        this->debugLog = new DebugLog();
+    if (from->m_debugLog && this->m_debugLog &&
+        from->m_debugLog->isLogFileSet()) {
+        this->m_debugLog->setDebugLogFile(from->m_debugLog->getDebugLogFile());
     }
-    this->debugLog->refCountIncrease();
+    if (from->m_debugLog && this->m_debugLog &&
+        from->m_debugLog->isLogLevelSet()) {
+        this->m_debugLog->setDebugLogLevel(
+            from->m_debugLog->getDebugLogLevel());
+    }
 
     this->audit_log = from->audit_log;
     if (this->audit_log != NULL) {
         this->audit_log->refCountIncrease();
     }
 
-    this->debugLog->setDebugLevel(from->debugLevel);
-    this->debugLog->setOutputFile(from->debug_log_path);
-
     return amount_of_rules;
 }
 
 
 void Rules::debug(int level, std::string message) {
-    if (debugLog != NULL) {
-        debugLog->write_log(level, message);
+    if (m_debugLog != NULL) {
+        m_debugLog->write(level, message);
     }
 }
 

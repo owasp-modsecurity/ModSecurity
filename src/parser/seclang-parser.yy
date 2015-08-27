@@ -373,11 +373,23 @@ expression:
     /* Debug log: start */
     | CONFIG_DIR_DEBUG_LVL
       {
-        driver.debugLevel = atoi($1.c_str());
+        if (driver.m_debugLog != NULL) {
+          driver.m_debugLog->setDebugLogLevel(atoi($1.c_str()));
+        } else {
+            driver.parserError << "Internal error, there is no DebugLog ";
+            driver.parserError << "object associated with the driver class";
+            YYERROR;
+        }
       }
     | CONFIG_DIR_DEBUG_LOG
       {
-        driver.debug_log_path = $1;
+        if (driver.m_debugLog != NULL) {
+            driver.m_debugLog->setDebugLogFile($1);
+        } else {
+            driver.parserError << "Internal error, there is no DebugLog ";
+            driver.parserError << "object associated with the driver class";
+            YYERROR;
+        }
       }
     /* Debug log: end */
     | CONFIG_DIR_GEO_DB

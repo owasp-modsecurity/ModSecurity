@@ -42,7 +42,7 @@ class RulesProperties {
  public:
     RulesProperties()
         : audit_log(NULL),
-        customDebugLog(NULL),
+        m_debugLog(new DebugLog()),
         remoteRulesActionOnFailed(AbortOnFailedRemoteRulesAction),
         requestBodyLimit(0),
         requestBodyNoFilesLimit(0),
@@ -51,26 +51,25 @@ class RulesProperties {
         secResponseBodyAccess(false),
         requestBodyLimitAction(ProcessPartialBodyLimitAction),
         responseBodyLimit(0),
-        debugLevel(0),
         responseBodyLimitAction(ProcessPartialBodyLimitAction),
         secRuleEngine(DetectionOnlyRuleEngine) { }
 
-    explicit RulesProperties(DebugLog *customDebugLog)
+    explicit RulesProperties(DebugLog *debugLog)
         : audit_log(NULL),
-        customDebugLog(customDebugLog),
+        m_debugLog(debugLog),
         remoteRulesActionOnFailed(AbortOnFailedRemoteRulesAction),
-        secRequestBodyAccess(false),
-        secResponseBodyAccess(false),
-        debugLevel(0),
         requestBodyLimit(0),
-        requestBodyLimitAction(ProcessPartialBodyLimitAction),
         requestBodyNoFilesLimit(0),
         requestBodyInMemoryLimit(0),
+        secRequestBodyAccess(false),
+        secResponseBodyAccess(false),
+        requestBodyLimitAction(ProcessPartialBodyLimitAction),
         responseBodyLimit(0),
         responseBodyLimitAction(ProcessPartialBodyLimitAction),
         secRuleEngine(DetectionOnlyRuleEngine) { }
-
-    ~RulesProperties() { }
+    ~RulesProperties() {
+        delete m_debugLog;
+    }
 
     std::vector<Rule *> rules[7];  // ModSecurity::Phases::NUMBER_OF_PHASES
 
@@ -167,16 +166,13 @@ class RulesProperties {
     BodyLimitAction requestBodyLimitAction;
     BodyLimitAction responseBodyLimitAction;
 
-    DebugLog *customDebugLog;
-
     bool secRequestBodyAccess;
     bool secResponseBodyAccess;
     std::string audit_log_path;
     std::string audit_log_parts;
-    std::string debug_log_path;
-    int debugLevel;
     std::list<std::string> components;
 
+    DebugLog *m_debugLog;
 
     std::ostringstream parserError;
 

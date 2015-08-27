@@ -191,7 +191,7 @@ end:
         modsec_assay->processLogging(r.status);
 
         CustomDebugLog *d = reinterpret_cast<CustomDebugLog *>
-            (modsec_rules->debugLog);
+            (modsec_rules->m_debugLog);
 
         if (d != NULL) {
             if (!d->contains(t->debug_log)) {
@@ -220,7 +220,7 @@ after_debug_log:
         delete modsec_assay;
         delete modsec_rules;
         delete modsec;
-        delete debug_log;
+        /* delete debug_log; */
 
         res->insert(res->end(), r.begin(), r.end());
     }

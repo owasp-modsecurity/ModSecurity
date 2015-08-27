@@ -14,8 +14,6 @@
  */
 
 #ifdef __cplusplus
-#include <iostream>
-#include <fstream>
 #include <string>
 #endif
 
@@ -32,39 +30,25 @@ typedef struct DebugLog_t DebugLog;
 namespace ModSecurity {
 
 /** @ingroup ModSecurity_CPP_API */
-class DebugLog : public std::ofstream {
+class DebugLog {
  public:
-    /*
-    static ModSecurityDebugLog& instance() {
-        static ModSecurityDebugLog i;
-        return i;
-    }
-    */
     DebugLog()
-        : m_is_configured(false),
-        m_debug_level(0),
-        m_referenceCount(0) { }
+        : m_debugLevel(-1),
+        m_fileName("") { }
 
-    bool setOutputFile(const std::string& file);
-    virtual bool write_log(int level, const std::string& data);
-    bool setDebugLevel(int level);
-    bool isConfigured();
+    ~DebugLog();
 
-
-
-    virtual DebugLog *new_instance();
-
-    void refCountDecreaseAndCheck(void);
-    void refCountIncrease(void);
+    virtual void write(int level, const std::string &msg);
+    bool isLogFileSet();
+    bool isLogLevelSet();
+    void setDebugLogLevel(int level);
+    void setDebugLogFile(const std::string &fileName);
+    const std::string& getDebugLogFile();
+    int getDebugLogLevel();
 
  private:
-        /*
-        ModSecurityDebugLog(ModSecurityDebugLog const&);
-        void operator=(ModSecurityDebugLog const&);
-        */
-        int m_debug_level;
-        bool m_is_configured;
-        int m_referenceCount;
+    int m_debugLevel;
+    std::string m_fileName;
 };
 
 }  // namespace ModSecurity

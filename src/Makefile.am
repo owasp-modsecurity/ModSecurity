@@ -169,6 +169,8 @@ libmodsecurity_la_SOURCES = \
 	rules.cc \
 	utils.cc \
 	debug_log.cc \
+	debug_log_writer.cc \
+	debug_log_writer_agent.cc \
 	macro_expansion.cc \
 	request_body_processor/multipart.cc \
 	request_body_processor/multipart_blob.cc \

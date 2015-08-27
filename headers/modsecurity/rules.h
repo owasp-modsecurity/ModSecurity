@@ -45,8 +45,7 @@ class Driver;
 class Rules : public RulesProperties  {
  public:
     Rules()
-        : debugLog(NULL),
-        RulesProperties(NULL),
+        : RulesProperties(new DebugLog()),
         m_referenceCount(0),
         unicode_codepage(0) {
             unicode_map_table = reinterpret_cast<int *>(
@@ -55,8 +54,7 @@ class Rules : public RulesProperties  {
         }
 
     explicit Rules(DebugLog *customLog)
-        : debugLog(NULL),
-        m_referenceCount(0),
+        : m_referenceCount(0),
         unicode_codepage(0),
         RulesProperties(customLog) {
             unicode_map_table = reinterpret_cast<int *>(
@@ -86,7 +84,6 @@ class Rules : public RulesProperties  {
 
     std::ostringstream parserError;
 
-    DebugLog *debugLog;
 
     int *unicode_map_table;
     int64_t unicode_codepage;
