@@ -65,7 +65,8 @@ $ cd /opt/
 $ wget http://nginx.org/download/nginx-1.9.2.tar.gz
 $ tar -xvzf nginx-1.9.2.tar.gz
 $ yum install zlib-devel
-$ ./configure --add-module=/opt/ModSecurity-nginx```
+$ ./configure --add-module=/opt/ModSecurity-nginx
+```
 
 On unix the project uses autotools to help the compilation process.
 
