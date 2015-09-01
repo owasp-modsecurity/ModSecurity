@@ -48,8 +48,7 @@ As a dynamic library, don’t forget that libmodsecurity must be installed to a 
 
 Several individuals have been building the project on Fedora (22 or later). We were able to get it to build using the following packages. These packages have no been thoroughly tested yet so compile at your own risk. 
 
-```sudo dnf install gcc-c++, flex, bison, curl-devel curl, yajl, yajl-devel, GeoIP-devel
-```
+```sudo dnf install gcc-c++, flex, bison, curl-devel curl, yajl, yajl-devel, GeoIP-devel```
 
 On unix the project uses autotools to help the compilation process.
 
