@@ -191,7 +191,7 @@ int Assay::processConnection(const char *client, int cPort, const char *server,
     this->m_serverIpAddress = server;
     this->m_clientPort = cPort;
     this->m_serverPort = sPort;
-    debug(4, "Transaction context created (blah blah)");
+    debug(4, "Transaction context created.");
     debug(4, "Starting phase CONNECTION. (SecRules 0)");
 
     this->store_variable("REMOTE_HOST", m_clientIpAddress);
