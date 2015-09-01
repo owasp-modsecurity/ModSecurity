@@ -150,7 +150,7 @@ int AuditLog::removeParts(int parts, const std::string& new_parts) {
 
 
 bool AuditLog::setParts(const std::basic_string<char>& new_parts) {
-    int parts = m_parts;
+    int parts = 0;
 
     PARTS_CONSTAINS('A', AAuditLogPart)
     PARTS_CONSTAINS('B', BAuditLogPart)
