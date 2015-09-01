@@ -28,10 +28,14 @@ Driver::Driver()
   : trace_scanning(false),
   trace_parsing(false) {
       audit_log = new AuditLog();
+      audit_log->refCountIncrease();
   }
 
 
 Driver::~Driver() {
+    if (audit_log != NULL) {
+        audit_log->refCountDecreaseAndCheck();
+    }
     delete loc.back();
 }
 

@@ -28,7 +28,13 @@
 #define PARTS_CONSTAINS(a, c) \
     if (new_parts.find(toupper(a)) != std::string::npos \
         || new_parts.find(tolower(a)) != std::string::npos) { \
-          this->m_parts = this->m_parts | c; \
+          parts = parts | c; \
+    }
+
+#define PARTS_CONSTAINS_REM(a, c) \
+    if (new_parts.find(toupper(a)) != std::string::npos \
+        || new_parts.find(tolower(a)) != std::string::npos) { \
+          parts = parts & ~c; \
     }
 
 namespace ModSecurity {
@@ -84,7 +90,7 @@ bool AuditLog::setStatus(AuditLogStatus new_status) {
 
 
 bool AuditLog::setRelevantStatus(const std::basic_string<char>& status) {
-    this->m_relevant = status;
+    this->m_relevant = std::string(status);
     return true;
 }
 
@@ -107,7 +113,7 @@ bool AuditLog::setFilePath2(const std::basic_string<char>& path) {
 }
 
 
-bool AuditLog::setParts(const std::basic_string<char>& new_parts) {
+int AuditLog::addParts(int parts, const std::string& new_parts) {
     PARTS_CONSTAINS('A', AAuditLogPart)
     PARTS_CONSTAINS('B', BAuditLogPart)
     PARTS_CONSTAINS('C', CAuditLogPart)
@@ -121,6 +127,45 @@ bool AuditLog::setParts(const std::basic_string<char>& new_parts) {
     PARTS_CONSTAINS('K', KAuditLogPart)
     PARTS_CONSTAINS('Z', ZAuditLogPart)
 
+    return parts;
+}
+
+
+int AuditLog::removeParts(int parts, const std::string& new_parts) {
+    PARTS_CONSTAINS_REM('A', AAuditLogPart)
+    PARTS_CONSTAINS_REM('B', BAuditLogPart)
+    PARTS_CONSTAINS_REM('C', CAuditLogPart)
+    PARTS_CONSTAINS_REM('D', DAuditLogPart)
+    PARTS_CONSTAINS_REM('E', EAuditLogPart)
+    PARTS_CONSTAINS_REM('F', FAuditLogPart)
+    PARTS_CONSTAINS_REM('G', GAuditLogPart)
+    PARTS_CONSTAINS_REM('H', HAuditLogPart)
+    PARTS_CONSTAINS_REM('I', IAuditLogPart)
+    PARTS_CONSTAINS_REM('J', JAuditLogPart)
+    PARTS_CONSTAINS_REM('K', KAuditLogPart)
+    PARTS_CONSTAINS_REM('Z', ZAuditLogPart)
+
+    return parts;
+}
+
+
+bool AuditLog::setParts(const std::basic_string<char>& new_parts) {
+    int parts = m_parts;
+
+    PARTS_CONSTAINS('A', AAuditLogPart)
+    PARTS_CONSTAINS('B', BAuditLogPart)
+    PARTS_CONSTAINS('C', CAuditLogPart)
+    PARTS_CONSTAINS('D', DAuditLogPart)
+    PARTS_CONSTAINS('E', EAuditLogPart)
+    PARTS_CONSTAINS('F', FAuditLogPart)
+    PARTS_CONSTAINS('G', GAuditLogPart)
+    PARTS_CONSTAINS('H', HAuditLogPart)
+    PARTS_CONSTAINS('I', IAuditLogPart)
+    PARTS_CONSTAINS('J', JAuditLogPart)
+    PARTS_CONSTAINS('K', KAuditLogPart)
+    PARTS_CONSTAINS('Z', ZAuditLogPart)
+
+    m_parts = parts;
     return true;
 }
 
@@ -165,15 +210,24 @@ bool AuditLog::isRelevant(int status) {
         return false;
     }
 
+    if (sstatus.empty()) {
+        return true;
+    }
+
     return Utils::regex_search(sstatus,
         Utils::Regex(m_relevant)) != 0;
 }
 
 
 bool AuditLog::saveIfRelevant(Assay *assay) {
+    return saveIfRelevant(assay, -1);
+}
+
+
+bool AuditLog::saveIfRelevant(Assay *assay, int parts) {
     if (this->isRelevant(assay->httpCodeReturned) == false &&
         assay->save_in_auditlog == false) {
-        return true;
+        return false;
     }
 
     /**
@@ -182,10 +236,14 @@ bool AuditLog::saveIfRelevant(Assay *assay) {
      *
      */
     if (assay->do_not_save_in_auditlog == true) {
-        return true;
+        return false;
     }
 
-    m_writer->write(assay, m_parts);
+    if (parts == -1)
+    {
+        parts = m_parts;
+    }
+    m_writer->write(assay, parts);
 
     return true;
 }

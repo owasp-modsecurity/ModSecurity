@@ -962,7 +962,31 @@ int Assay::processLogging(int returned_code) {
 
     /* If relevant, save this assay information at the audit_logs */
     if (m_rules != NULL && m_rules->audit_log != NULL) {
-        this->m_rules->audit_log->saveIfRelevant(this);
+        debug(8, "Checking if this request is suitable to be saved as an audit log.");
+        int parts = -1;
+
+        if (this->auditLogModifier.size() > 0)
+        {
+            debug(4, "There was an audit log modifier for this transaction.");
+            std::list<std::pair<int, std::string>>::iterator it;
+            parts = this->m_rules->audit_log->m_parts;
+             for (it = auditLogModifier.begin(); it != auditLogModifier.end(); ++it) {
+                std::pair <int, std::string> p = *it;
+                if (p.first == 0) { // Add
+                    parts = this->m_rules->audit_log->addParts(parts, p.second);
+                } else { // Remove
+                    parts = this->m_rules->audit_log->removeParts(parts, p.second);
+                }
+            }
+        }
+        if (save_in_auditlog) {
+            debug(8, "This request was marked to be saved via auditlog action.");
+        }
+
+        bool saved = this->m_rules->audit_log->saveIfRelevant(this, parts);
+        if (saved) {
+            debug(8, "Request was relevant to be saved.");
+        }
     }
 
     return 0;

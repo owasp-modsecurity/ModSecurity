@@ -45,17 +45,23 @@ class AuditLogWriterSerial : public AuditLogWriter {
 
 
     void refCountDecreaseAndCheck() override {
+        /*
         m_refereceCount--;
+
+
         if (m_refereceCount == 0) {
-            delete this;
-        }
+        */
+        delete this;
+        /*
+        /}
+        */
     }
 
     bool init() override;;
     bool write(Assay *assay, int parts) override;
 
  private:
-    std::ofstream log;
+    std::ofstream m_log;
     void generateBoundary(std::string *boundary);
 };
 

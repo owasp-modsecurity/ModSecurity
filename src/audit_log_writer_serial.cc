@@ -25,7 +25,7 @@ namespace ModSecurity {
 
 
 AuditLogWriterSerial::~AuditLogWriterSerial() {
-    log.close();
+    m_log.close();
 }
 
 
@@ -42,7 +42,7 @@ void AuditLogWriterSerial::generateBoundary(std::string *boundary) {
 
 
 bool AuditLogWriterSerial::init() {
-    log.open(m_audit->m_path1, std::fstream::out | std::fstream::app);
+    m_log.open(m_audit->m_path1, std::fstream::out | std::fstream::app);
     return true;
 }
 
@@ -53,8 +53,12 @@ bool AuditLogWriterSerial::write(Assay *assay, int parts) {
     generateBoundary(&boundary);
 
     // serialLoggingMutex.lock();
-    log << assay->toOldAuditLogFormat(parts, "-" + boundary + "--");
+
+    m_log << assay->toOldAuditLogFormat(parts, "-" + boundary + "--");
+    m_log.flush();
+
     // serialLoggingMutex.unlock();
+
     return true;
 }
 

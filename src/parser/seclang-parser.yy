@@ -18,6 +18,7 @@ class Driver;
 
 #include "actions/action.h"
 #include "actions/audit_log.h"
+#include "actions/ctl_audit_log_parts.h"
 #include "actions/set_var.h"
 #include "actions/severity.h"
 #include "actions/msg.h"
@@ -47,6 +48,7 @@ class Driver;
 #include "variables/time_year.h"
 
 using ModSecurity::actions::Action;
+using ModSecurity::actions::CtlAuditLogParts;
 using ModSecurity::actions::SetVar;
 using ModSecurity::actions::Severity;
 using ModSecurity::actions::Tag;
@@ -653,8 +655,7 @@ act:
       }
     | ACTION_CTL_AUDIT_LOG_PARTS
       {
-        /* not ready yet. */
-        $$ = Action::instantiate($1);
+        $$ = new CtlAuditLogParts($1);
       }
     ;
 

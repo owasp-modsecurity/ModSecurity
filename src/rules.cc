@@ -209,8 +209,15 @@ int Rules::merge(Driver *from) {
     this->responseBodyLimitAction = from->responseBodyLimitAction;
 
 
-    this->audit_log = from->audit_log;
-    this->audit_log->refCountIncrease();
+    if (from->audit_log != NULL && this->audit_log != NULL) {
+        this->audit_log->refCountDecreaseAndCheck();
+    }
+    if (from->audit_log) {
+        this->audit_log = from->audit_log;
+    }
+    if (this->audit_log != NULL) {
+        this->audit_log->refCountIncrease();
+    }
 
     return amount_of_rules;
 }
@@ -247,7 +254,12 @@ int Rules::merge(Rules *from) {
             from->m_debugLog->getDebugLogLevel());
     }
 
-    this->audit_log = from->audit_log;
+    if (from->audit_log != NULL && this->audit_log != NULL) {
+        this->audit_log->refCountDecreaseAndCheck();
+    }
+    if (from->audit_log) {
+        this->audit_log = from->audit_log;
+    }
     if (this->audit_log != NULL) {
         this->audit_log->refCountIncrease();
     }

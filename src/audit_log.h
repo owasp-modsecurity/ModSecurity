@@ -154,7 +154,11 @@ class AuditLog {
     bool close();
 
     bool saveIfRelevant(Assay *assay);
+    bool saveIfRelevant(Assay *assay, int parts);
     bool isRelevant(int status);
+
+    int addParts(int parts, const std::string& new_parts);
+    int removeParts(int parts, const std::string& new_parts);
 
     std::string m_path1;
     std::string m_path2;
@@ -163,11 +167,12 @@ class AuditLog {
     int filePermission;
     int directoryPermission;
 
- private:
+    int m_parts;
+
+private:
     AuditLogStatus m_status;
 
 
-    int m_parts;
     AuditLogType m_type;
     std::string m_relevant;
 

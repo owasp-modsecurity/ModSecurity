@@ -263,6 +263,7 @@ class Assay {
     std::list<std::string> rulesMessages;
     std::list<std::string> ruleTags;
 
+    std::list<std::pair<int, std::string>> auditLogModifier;
  private:
     std::ofstream myfile;
     ModSecurity *m_ms;
