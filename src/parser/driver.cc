@@ -42,8 +42,9 @@ Driver::~Driver() {
 
 int Driver::addSecRule(Rule *rule) {
     if (rule->phase >= ModSecurity::Phases::NUMBER_OF_PHASES) {
-        /** TODO: return an error message */
-        return -1;
+        parserError << "Unknown phase: " << std::to_string(rule->phase);
+        parserError << std::endl;
+        return false;
     }
 
     if (lastRule && lastRule->chained && lastRule->chainedRule == NULL) {

@@ -20,6 +20,7 @@
 
 #include "modsecurity/assay.h"
 #include "src/rule.h"
+#include "src/utils.h"
 #include "modsecurity/modsecurity.h"
 
 namespace ModSecurity {
@@ -30,7 +31,25 @@ Phase::Phase(std::string action)
     this->action_kind = ConfigurationKind;
     std::string a = action;
     a.erase(0, 6);
-    this->phase = std::stoi(a);
+    if (a.at(0) == '\'') {
+        a.erase(0, 1);
+        a.pop_back();
+    }
+
+    try {
+        this->phase = std::stoi(a);
+    } catch (...) {
+        this->phase = 0;
+        if (tolower(a) == "request") {
+            this->phase = this->phase + ModSecurity::Phases::RequestHeadersPhase;
+        }
+        if (tolower(a) == "response") {
+            this->phase = this->phase + ModSecurity::Phases::ResponseBodyPhase;
+        }
+        if (tolower(a) == "logging") {
+            this->phase = this->phase + ModSecurity::Phases::LoggingPhase;
+        }
+    }
 
     if (this->phase == 0) {
       /* Phase 0 is something new, we want to use as ConnectionPhase */

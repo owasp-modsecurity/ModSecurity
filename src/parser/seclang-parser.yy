@@ -324,6 +324,7 @@ expression:
             /* variables */ $3,
             /* actions */ $8
             );
+
         if (driver.addSecRule(rule) == false) {
             YYERROR;
         }

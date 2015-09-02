@@ -23,7 +23,8 @@ using ModSecurity::split;
 %}
 %option noyywrap nounput batch debug noinput
 
-ACTION          (?i:accuracy|allow|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|initcol|log|maturity|multiMatch|noauditlog|nolog|pass|pause|phase:[0-9]+|prepend|proxy|redirect:[A-Z0-9_\|\&\:\/\/\.]+|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|skipAfter|status:[0-9]+|ver|xmlns)
+ACTION          (?i:accuracy|allow|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|initcol|log|maturity|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|redirect:[A-Z0-9_\|\&\:\/\/\.]+|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|skipAfter|status:[0-9]+|ver|xmlns)
+ACTION_PHASE    ((?i:phase:(?i:REQUEST|RESPONSE|LOGGING|[0-9]+))|(?i:phase:'(?i:REQUEST|RESPONSE|LOGGING|[0-9]+)'))
 ACTION_AUDIT_LOG (?i:auditlog)
 ACTION_SEVERITY (?i:severity)
 ACTION_SEVERITY_VALUE (?i:(EMERGENCY|ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)|[0-9]+)
@@ -248,6 +249,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 }
 
 {ACTION}                        { return yy::seclang_parser::make_ACTION(yytext, *driver.loc.back()); }
+{ACTION_PHASE}                  { return yy::seclang_parser::make_ACTION(yytext, *driver.loc.back()); }
 {ACTION_AUDIT_LOG}              { return yy::seclang_parser::make_ACTION_AUDIT_LOG(yytext, *driver.loc.back()); }
 
 {ACTION_SEVERITY}:{ACTION_SEVERITY_VALUE}       { return yy::seclang_parser::make_ACTION_SEVERITY(yytext + 9, *driver.loc.back()); }
