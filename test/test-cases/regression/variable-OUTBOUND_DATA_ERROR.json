@@ -37,7 +37,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule OUTBOUND_DATA_ERROR \"@eq 1\" \"phase:4,pass,t:trim\""
+      "SecRule OUTBOUND_DATA_ERROR \"@eq 1\" \"id:1,phase:4,pass,t:trim\""
     ]
   },
   {  
@@ -113,7 +113,7 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecResponseBodyLimit 2",
       "SecDebugLogLevel 9",
-      "SecRule OUTBOUND_DATA_ERROR \"@eq 1\" \"phase:4,pass,t:trim\""
+      "SecRule OUTBOUND_DATA_ERROR \"@eq 1\" \"id:1,phase:4,pass,t:trim\""
     ]
   }
 ]

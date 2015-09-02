@@ -38,8 +38,8 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
-      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
-      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
   {  
@@ -81,8 +81,8 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
-      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
-      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
   {  
@@ -124,8 +124,8 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
-      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
-      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
   {  
@@ -167,8 +167,8 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
-      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
-      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
   {  
@@ -210,8 +210,8 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
-      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
-      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
   {  
@@ -253,8 +253,8 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
-      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
-      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
   {  
@@ -296,8 +296,8 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
-      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
-      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
   {  
@@ -339,8 +339,8 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
-      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
-      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
   {  
@@ -382,8 +382,8 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
-      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
-      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
   {  
@@ -425,8 +425,8 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
-      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
-      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   },
   {  
@@ -468,8 +468,8 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecGeoLookupDb test-cases\/data\/geo\/GeoIPCity.dat",
-      "SecRule REMOTE_ADDR \"@geoLookup\" \"pass,t:trim\"",
-      "SecRule GEO \"@contains test \" \"pass,t:trim\""
+      "SecRule REMOTE_ADDR \"@geoLookup\" \"id:1,pass,t:trim\"",
+      "SecRule GEO \"@contains test \" \"id:2,pass,t:trim\""
     ]
   }
 ]

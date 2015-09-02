@@ -56,7 +56,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REQUEST_COOKIES \"@contains test \" \"t:lowercase,t:none\""
+      "SecRule REQUEST_COOKIES \"@contains test \" \"id:1,t:lowercase,t:none\""
     ]
   },
   {

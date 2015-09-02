@@ -4,14 +4,14 @@
     "version_min":300000,
     "title":"Include - bad rule",
     "expected":{
-      "parser_error": "Rules error. File: config-include-bad.json. Line: 5. Column: 33."
+      "parser_error": "Rules error. File: test-cases/data/config_example3.txt. Line: 2. Column: 42. ops"
     },
     "rules":[
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "Include test-cases/data/config_example.txt",
-      "SecRule ARGS \"@missing_operator test\" \"id:9,pass,t:trim\""
+      "Include test-cases/data/config_example3.txt",
+      "SecRule ARGS \"@missing_operator test\" \"id:19,pass,t:trim\""
     ]
   },
   {
@@ -26,7 +26,7 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "Include test-cases/data/config_example-ops.txt",
-      "SecRule ARGS \"@contains test\" \"id:9,pass,t:trim\""
+      "SecRule ARGS \"@contains test\" \"id:19,pass,t:trim\""
     ]
   },
   {
@@ -41,7 +41,7 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "Include test-cases/data/config_example-ops-include.txt",
-      "SecRule ARGS \"@contains test\" \"id:9,pass,t:trim\""
+      "SecRule ARGS \"@contains test\" \"id:19,pass,t:trim\""
     ]
   },
   {
@@ -56,7 +56,23 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "Include test-cases/data/config_example-bad-op-include.txt",
-      "SecRule ARGS \"@contains test\" \"id:9,pass,t:trim\""
+      "SecRule ARGS \"@contains test\" \"id:19,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Include - duplicate id",
+    "expected":{
+      "parser_error": "Rule id: 40.000000 is duplicated"
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "Include test-cases/data/config_example.txt",
+      "Include test-cases/data/config_example.txt",
+      "SecRule ARGS \"@missing_operator test\" \"id:19,pass,t:trim\""
     ]
   }
 ]

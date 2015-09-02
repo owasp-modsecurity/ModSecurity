@@ -55,8 +55,8 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"t:lowercase,t:none,setvar:TX.something=%{REQUEST_HEADERS:Cookie}%\"",
-      "SecRule TX \"@contains to_test\" \"t:lowercase,t:none\""
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,t:lowercase,t:none,setvar:TX.something=%{REQUEST_HEADERS:Cookie}%\"",
+      "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
     ]
   },
   {
@@ -115,8 +115,8 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"t:lowercase,t:none,setvar:TX.something%{REQUEST_HEADERS:Cookie}%\"",
-      "SecRule TX \"@contains to_test\" \"t:lowercase,t:none\""
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,t:lowercase,t:none,setvar:TX.something%{REQUEST_HEADERS:Cookie}%\"",
+      "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
     ]
   },
   {
@@ -175,9 +175,9 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"t:lowercase,t:none,setvar:TX.something=%{REQUEST_HEADERS:Keep-Alive}%\"",
-      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"t:lowercase,t:none,setvar:TX.something=+10\"",
-      "SecRule TX \"@contains to_test\" \"t:lowercase,t:none\""
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,t:lowercase,t:none,setvar:TX.something=%{REQUEST_HEADERS:Keep-Alive}%\"",
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:2,t:lowercase,t:none,setvar:TX.something=+10\"",
+      "SecRule TX \"@contains to_test\" \"id:3,t:lowercase,t:none\""
     ]
   },
   {
@@ -236,10 +236,10 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"t:lowercase,t:none,setvar:TX.something=+10\"",
-      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"t:lowercase,t:none,setvar:TX.something_else=%{tx.something}%\"",
-      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"t:lowercase,t:none,setvar:TX.something_else=-5\"",
-      "SecRule TX:something_else \"@contains to_test\" \"t:lowercase,t:none\""
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,t:lowercase,t:none,setvar:TX.something=+10\"",
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:2,t:lowercase,t:none,setvar:TX.something_else=%{tx.something}%\"",
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:3,t:lowercase,t:none,setvar:TX.something_else=-5\"",
+      "SecRule TX:something_else \"@contains to_test\" \"id:4,t:lowercase,t:none\""
     ]
   }
 ]

@@ -324,7 +324,9 @@ expression:
             /* variables */ $3,
             /* actions */ $8
             );
-        driver.addSecRule(rule);
+        if (driver.addSecRule(rule) == false) {
+            YYERROR;
+        }
       }
     | DIRECTIVE SPACE variables SPACE FREE_TEXT SPACE QUOTATION_MARK actions SPACE QUOTATION_MARK
     | DIRECTIVE SPACE variables SPACE FREE_TEXT SPACE QUOTATION_MARK actions QUOTATION_MARK

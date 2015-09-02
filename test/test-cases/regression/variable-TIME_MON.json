@@ -39,7 +39,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule TIME_MON \"@contains test \" \"phase:3,pass,t:trim\""
+      "SecRule TIME_MON \"@contains test \" \"id:1,phase:3,pass,t:trim\""
     ]
   }
 ]

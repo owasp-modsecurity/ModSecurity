@@ -37,7 +37,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"pass\""
+      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"id:1,pass\""
     ]
   },
   {  
@@ -78,7 +78,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"pass\""
+      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"id:1,pass\""
     ]
   },
   {
@@ -124,7 +124,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"phase:3,pass\""
+      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"id:1,phase:3,pass\""
     ]
   },
   {
@@ -170,7 +170,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"phase:3,pass,t:trim\""
+      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"id:1,phase:3,pass,t:trim\""
     ]
   },
   {
@@ -216,7 +216,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"phase:3,pass,t:trim\""
+      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"id:1,phase:3,pass,t:trim\""
     ]
   },
   {
@@ -259,7 +259,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"phase:3,pass,t:trim\""
+      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"id:1,phase:3,pass,t:trim\""
     ]
   },
   {
@@ -302,7 +302,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"phase:3,pass,t:trim\""
+      "SecRule ARGS_COMBINED_SIZE \"@gt 10 \" \"id:1,phase:3,pass,t:trim\""
     ]
   }
 ]

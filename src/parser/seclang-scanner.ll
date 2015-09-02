@@ -374,6 +374,7 @@ bool Driver::scan_begin () {
 }
 
 void Driver::scan_end () {
+    yylex_destroy();
     BEGIN(INITIAL);
 }
 

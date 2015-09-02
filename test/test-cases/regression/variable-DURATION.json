@@ -43,9 +43,9 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule DURATION \"@contains test \" \"phase:3,pass,t:trim\"",
-      "SecRule DURATION \"@contains test \" \"phase:3,pass,t:trim\"",
-      "SecRule DURATION \"@contains test \" \"phase:3,pass,t:trim\""
+      "SecRule DURATION \"@contains test \" \"id:1,phase:3,pass,t:trim\"",
+      "SecRule DURATION \"@contains test \" \"id:2,phase:3,pass,t:trim\"",
+      "SecRule DURATION \"@contains test \" \"id:3,phase:3,pass,t:trim\""
     ]
   }
 ]

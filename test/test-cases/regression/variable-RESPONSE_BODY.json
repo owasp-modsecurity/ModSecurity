@@ -38,7 +38,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule RESPONSE_BODY \"@contains test \" \"phase:4,pass,t:trim\""
+      "SecRule RESPONSE_BODY \"@contains test \" \"id:1,phase:4,pass,t:trim\""
     ]
   }
 ]

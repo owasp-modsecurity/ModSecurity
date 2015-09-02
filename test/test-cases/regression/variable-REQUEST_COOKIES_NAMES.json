@@ -38,7 +38,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REQUEST_COOKIES_NAMES \"@contains test \" \"pass,t:trim\""
+      "SecRule REQUEST_COOKIES_NAMES \"@contains test \" \"id:1,pass,t:trim\""
     ]
   },
   {
@@ -80,7 +80,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REQUEST_COOKIES_NAMES \"@contains test \" \"pass,t:trim\""
+      "SecRule REQUEST_COOKIES_NAMES \"@contains test \" \"id:1,pass,t:trim\""
     ]
   },
   {
@@ -122,7 +122,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REQUEST_COOKIES_NAMES \"@contains test \" \"pass,t:trim\""
+      "SecRule REQUEST_COOKIES_NAMES \"@contains test \" \"id:1,pass,t:trim\""
     ]
   }
 ]

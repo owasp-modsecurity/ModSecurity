@@ -38,7 +38,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REQUEST_PROTOCOL \"@contains test \" \"pass,t:trim\""
+      "SecRule REQUEST_PROTOCOL \"@contains test \" \"id:1,pass,t:trim\""
     ]
   }
 ]

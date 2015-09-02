@@ -55,8 +55,8 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"t:lowercase,t:none,msg:'This is a test, %{REQUEST_HEADERS:Accept}%'\"",
-      "SecRule TX \"@contains to_test\" \"t:lowercase,t:none\""
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,t:lowercase,t:none,msg:'This is a test, %{REQUEST_HEADERS:Accept}%'\"",
+      "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
     ]
   }
 ]

@@ -37,7 +37,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "Include test-cases/data/config_example.txt",
+      "Include test-cases/data/config_example2.txt",
       "SecRule ARGS \"@contains test\" \"id:9,pass,t:trim\""
     ]
   },
@@ -206,7 +206,6 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test\" \"id:1,pass,t:trim\"",
-      "Include test-cases/data/config_example.txt",
       "Include test-cases/data/config_example.txt",
       "SecRule ARGS \"@contains test\" \"id:3,pass,t:trim\""
     ]

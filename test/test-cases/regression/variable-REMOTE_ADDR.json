@@ -39,7 +39,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REMOTE_ADDR \"@contains test \" \"phase:3,pass,t:trim\""
+      "SecRule REMOTE_ADDR \"@contains test \" \"id:1,phase:3,pass,t:trim\""
     ]
   },
   {
@@ -82,7 +82,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule REMOTE_ADDR \"@contains test \" \"phase:3,pass,t:trim\""
+      "SecRule REMOTE_ADDR \"@contains test \" \"id:1,phase:3,pass,t:trim\""
     ]
   }
 ]

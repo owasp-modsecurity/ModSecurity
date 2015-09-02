@@ -57,7 +57,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule MULTIPART_STRICT_ERROR \"@contains 0\" \"phase:3,pass,t:trim\""
+      "SecRule MULTIPART_STRICT_ERROR \"@contains 0\" \"id:1,phase:3,pass,t:trim\""
     ]
   },
   {
@@ -118,7 +118,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule MULTIPART_STRICT_ERROR \"@contains 0\" \"phase:3,pass,t:trim\""
+      "SecRule MULTIPART_STRICT_ERROR \"@contains 0\" \"id:1,phase:3,pass,t:trim\""
     ]
   },
   {
@@ -179,7 +179,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule MULTIPART_STRICT_ERROR \"@contains 0\" \"phase:3,pass,t:trim\""
+      "SecRule MULTIPART_STRICT_ERROR \"@contains 0\" \"id:1,phase:3,pass,t:trim\""
     ]
   },
   {
@@ -240,7 +240,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule MULTIPART_STRICT_ERROR \"@contains 0\" \"phase:3,pass,t:trim\""
+      "SecRule MULTIPART_STRICT_ERROR \"@contains 0\" \"id:1,phase:3,pass,t:trim\""
     ]
   },
   {
@@ -301,7 +301,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule MULTIPART_STRICT_ERROR \"@contains 0\" \"phase:3,pass,t:trim\""
+      "SecRule MULTIPART_STRICT_ERROR \"@contains 0\" \"id:1,phase:3,pass,t:trim\""
     ]
   },
   {
@@ -362,7 +362,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule MULTIPART_STRICT_ERROR \"@contains 0\" \"phase:3,pass,t:trim\""
+      "SecRule MULTIPART_STRICT_ERROR \"@contains 0\" \"id:1,phase:3,pass,t:trim\""
     ]
   }
 ]

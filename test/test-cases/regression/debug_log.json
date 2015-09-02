@@ -56,10 +56,10 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS \"@contains test\" \"pass\"",
-      "SecRule ARGS \"@contains /test.txt\" \"allow\"",
-      "SecRule ARGS:teste \"@contains /test.txt\" \" allow,deny\"",
-      "SecRule ARGS \"@contains /test.txt\" \"allow, allow,deny\""
+      "SecRule ARGS \"@contains test\" \"id:3,pass\"",
+      "SecRule ARGS \"@contains /test.txt\" \"id:4,allow\"",
+      "SecRule ARGS:teste \"@contains /test.txt\" \" id:1,allow,deny\"",
+      "SecRule ARGS \"@contains /test.txt\" \"allow, allow,id:2,deny\""
 
     ]
   }

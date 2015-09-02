@@ -57,7 +57,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS \"@contains test\" \"t:trim,block\""
+      "SecRule ARGS \"@contains test\" \"id:1,t:trim,block\""
     ]
   },
     {
@@ -119,7 +119,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS \"@contains test\" \"t:trim,redirect:http://www.google.com\""
+      "SecRule ARGS \"@contains test\" \"id:1,t:trim,redirect:http://www.google.com\""
     ]
   },
       {
@@ -181,7 +181,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS \"@contains test\" \"t:trim,status:500,redirect:http://www.google.com\""
+      "SecRule ARGS \"@contains test\" \"id:1,t:trim,status:500,redirect:http://www.google.com\""
     ]
   },
        {
@@ -242,7 +242,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS \"@contains test\" \"t:trim,status:500\""
+      "SecRule ARGS \"@contains test\" \"id:1,t:trim,status:500\""
     ]
   },
          {
@@ -303,7 +303,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS \"@contains test\" \"phase:1,t:trim,status:500\""
+      "SecRule ARGS \"@contains test\" \"id:1,phase:1,t:trim,status:500\""
     ]
   },
   {
@@ -364,7 +364,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS \"@contains test\" \"phase:4,t:trim,status:500\""
+      "SecRule ARGS \"@contains test\" \"id:1,phase:4,t:trim,status:500\""
     ]
   }
 ]

@@ -63,6 +63,24 @@ int Driver::addSecRule(Rule *rule) {
         }
     }
 
+    /*
+     * Checking if the rule has an ID and also checking if this ID is not used
+     * by other rule
+     */
+    if (rule->rule_id == 0) {
+        parserError << "Rules must have an ID." << std::endl;
+        return false;
+    }
+    for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+        std::vector<Rule *> rules = this->rules[i];
+        for (int j = 0; j < rules.size(); j++) {
+            if (rules[j]->rule_id == rule->rule_id) {
+                parserError << "Rule id: " << std::to_string(rule->rule_id) << " is duplicated" << std::endl;
+                return false;
+            }
+        }
+    }
+
     lastRule = rule;
     rules[rule->phase].push_back(rule);
     return true;
@@ -83,11 +101,12 @@ int Driver::parse(const std::string &f, const std::string &ref) {
     yy::seclang_parser parser(*this);
     parser.set_debug_level(trace_parsing);
     int res = parser.parse();
+    scan_end();
 
     if (audit_log->init() == false) {
+        parserError << "Problems while initializing the audit logs" << std::endl;
         return false;
     }
-    scan_end();
 
     return res == 0;
 }
@@ -126,6 +145,11 @@ void Driver::error(const yy::location& l, const std::string& m,
         parserError << "Line: " << l.end.line << ". ";
         parserError << "Column: " << l.end.column << ". ";
     }
+    /*
+    if (m.empty() == false) {
+        parserError << " " << m << ".";
+    }
+    */
     if (c.empty() == false) {
         parserError << c;
     }
