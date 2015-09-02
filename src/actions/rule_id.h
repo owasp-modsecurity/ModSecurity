@@ -32,10 +32,14 @@ namespace actions {
 
 class RuleId : public Action {
  public:
-    explicit RuleId(std::string action);
+    explicit RuleId(std::string action)
+        : Action(action, ConfigurationKind) { }
 
+    bool init(std::string *error) override;
     bool evaluate(Rule *rule, Assay *assay) override;
-    double rule_id;
+
+private:
+    double m_ruleId;
 };
 
 }  // namespace actions

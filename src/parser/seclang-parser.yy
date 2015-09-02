@@ -604,7 +604,13 @@ var:
 act:
     ACTION
       {
+        std::string error;
         $$ = Action::instantiate($1);
+
+        if ($$->init(&error) == false) {
+            driver.parserError << error;
+            YYERROR;
+        }
       }
     | TRANSFORMATION
       {

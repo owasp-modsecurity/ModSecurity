@@ -24,21 +24,33 @@
 namespace ModSecurity {
 namespace actions {
 
-RuleId::RuleId(std::string action)
-    : Action(action) {
-    this->action_kind = ConfigurationKind;
+bool RuleId::init(std::string *error) {
     std::string a = action;
-    a.erase(0, 3);
-    if (a.at(0) == '\'') {
-        a.erase(0, 1);
-        a.pop_back();
-    }
-    this->rule_id = std::stod(a);
+
+    try {
+        a.erase(0, 3);
+        if (a.at(0) == '\'') {
+            a.erase(0, 1);
+            a.pop_back();
+        }
+        m_ruleId = std::stod(a);
+    } catch (...) {
+        m_ruleId = 0;
+        error->assign("The input \"" + a + "\" does not seems to be a valid rule id.");
+        return false;
     }
 
+    std::ostringstream oss;
+    oss << std::setprecision(40) << m_ruleId;
+    if (a != oss.str() || m_ruleId < 0) {
+        error->assign("The input \"" + a + "\" does not seems to be a valid rule id.");
+        return false;
+    }
+    return true;
+}
 
 bool RuleId::evaluate(Rule *rule, Assay *assay) {
-    rule->rule_id = this->rule_id;
+    rule->rule_id = m_ruleId;
     return true;
 }
 
