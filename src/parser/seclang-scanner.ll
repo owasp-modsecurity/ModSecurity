@@ -32,10 +32,10 @@ ACTION_SETVAR   (?i:setvar)
 ACTION_MSG      (?i:msg)
 ACTION_TAG      (?i:tag)
 ACTION_REV      (?i:rev)
-ACTION_CTL_BDY_XML ctl:requestBodyProcessor=XML
-ACTION_CTL_BDY_JSON ctl:requestBodyProcessor=JSON
+ACTION_CTL_BDY_XML (?i:ctl:requestBodyProcessor=XML)
+ACTION_CTL_BDY_JSON (?i:ctl:requestBodyProcessor=JSON)
 ACTION_CTL_AUDIT_LOG_PARTS (?i:ctl:auditLogParts)
-DIRECTIVE       SecRule
+DIRECTIVE       (?i:SecRule)
 LOG_DATA        (?i:logdata)
 
 CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION (?i:SecPcreMatchLimitRecursion)
@@ -56,9 +56,9 @@ CONFIG_DIR_RES_BODY_LIMIT_ACTION (?i:SecResponseBodyLimitAction)
 
 CONFIG_DIR_GEO_DB (?i:SecGeoLookupDb)
 
-CONFIG_DIR_RULE_ENG SecRuleEngine
-CONFIG_DIR_REQ_BODY SecRequestBodyAccess
-CONFIG_DIR_RES_BODY SecResponseBodyAccess
+CONFIG_DIR_RULE_ENG (?i:SecRuleEngine)
+CONFIG_DIR_REQ_BODY (?i:SecRequestBodyAccess)
+CONFIG_DIR_RES_BODY (?i:SecResponseBodyAccess)
 
 
 CONFIG_DIR_AUDIT_DIR_MOD (?i:SecAuditLogDirMode)
@@ -72,8 +72,8 @@ CONFIG_DIR_AUDIT_STS     (?i:SecAuditLogRelevantStatus)
 CONFIG_DIR_AUDIT_TPE     (?i:SecAuditLogType)
 
 
-CONFIG_DIR_DEBUG_LOG SecDebugLog
-CONFIG_DIR_DEBUG_LVL SecDebugLogLevel
+CONFIG_DIR_DEBUG_LOG (?i:SecDebugLog)
+CONFIG_DIR_DEBUG_LVL (?i:SecDebugLogLevel)
 
 CONFIG_COMPONENT_SIG     (?i:SecComponentSignature)
 
@@ -110,12 +110,12 @@ RUN_TIME_VAR_TIME_YEAR  (?i:TIME_YEAR)
 
 VARIABLENOCOLON  (?i:REQBODY_ERROR|MULTIPART_STRICT_ERROR|MULTIPART_UNMATCHED_BOUNDARY|REMOTE_ADDR|REQUEST_LINE)
 
-CONFIG_VALUE_ON On
-CONFIG_VALUE_OFF    Off
-CONFIG_VALUE_DETC    DetectionOnly
-CONFIG_VALUE_SERIAL Serial
+CONFIG_VALUE_ON (?i:On)
+CONFIG_VALUE_OFF    (?i:Off)
+CONFIG_VALUE_DETC    (?i:DetectionOnly)
+CONFIG_VALUE_SERIAL (?i:Serial)
 CONFIG_VALUE_PARALLEL (?i:Parallel|Concurrent)
-CONFIG_VALUE_RELEVANT_ONLY RelevantOnly
+CONFIG_VALUE_RELEVANT_ONLY (?i:RelevantOnly)
 
 CONFIG_VALUE_PROCESS_PARTIAL (?i:ProcessPartial)
 CONFIG_VALUE_REJECT (?i:Reject)
