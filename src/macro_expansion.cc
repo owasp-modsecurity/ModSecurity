@@ -42,7 +42,7 @@ std::string MacroExpansion::expand(const std::string& input, Assay *assay) {
             variableValue = assay->resolve_variable_first(col, var);
         }
 
-        res.erase(start, end + 2);
+        res.erase(start, end - start + 2);
         if (variableValue != NULL) {
             res.insert(start, *variableValue);
         }
