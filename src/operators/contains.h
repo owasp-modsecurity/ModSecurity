@@ -31,6 +31,8 @@ class Contains : public Operator {
     Contains(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
     bool evaluate(Assay *assay, const std::string &exp) override;
+
+    std::list<std::string> matched;
 };
 
 }  // namespace operators

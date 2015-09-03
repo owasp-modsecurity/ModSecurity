@@ -23,6 +23,10 @@ namespace operators {
 bool Contains::evaluate(Assay *assay, const std::string &input) {
     bool contains = input.find(param) != std::string::npos;
 
+    if (contains) {
+        matched.push_back(param);
+    }
+
     if (negation) {
         return !contains;
     }

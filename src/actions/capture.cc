@@ -25,6 +25,7 @@
 #include "operators/operator.h"
 #include "operators/pm.h"
 #include "operators/rx.h"
+#include "operators/contains.h"
 
 namespace ModSecurity {
 namespace actions {
@@ -35,6 +36,7 @@ bool Capture::evaluate(Rule *rule, Assay *assay) {
 
     operators::Pm *pm = dynamic_cast<operators::Pm *>(op);
     operators::Rx *rx = dynamic_cast<operators::Rx *>(op);
+    operators::Contains *contains = dynamic_cast<operators::Contains *>(op);
 
     if (pm != NULL) {
         match = pm->matched;
@@ -44,20 +46,19 @@ bool Capture::evaluate(Rule *rule, Assay *assay) {
         match = rx->matched;
     }
 
+    if (contains != NULL) {
+        match = contains->matched;
+    }
+
     if (match.empty()) {
         return false;
     }
 
     int i = 0;
     while (match.empty() == false) {
-        std::string varName = "TX:" + std::to_string(i);
-        std::string *a = assay->resolve_variable_first(varName);
-        if (a == NULL) {
-            assay->store_variable(varName, match.back());
-        } else {
-            assay->update_variable_first(varName, match.back());
-        }
+        assay->setCollection("TX", std::to_string(i), match.back());
         match.pop_back();
+        i++;
     }
 
     return true;
