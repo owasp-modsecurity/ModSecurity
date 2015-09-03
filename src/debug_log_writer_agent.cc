@@ -39,7 +39,7 @@ void DebugLogWriterAgent::write(const std::string& msg) {
     }
 
     *this << msg << std::endl;
-    *this << flush();
+    *this << std::flush;
 }
 
 

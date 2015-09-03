@@ -48,7 +48,7 @@ As a dynamic library, don’t forget that libmodsecurity must be installed to a 
 
 Several individuals have been building the project on Fedora (22 or later) succesfully. We were able to get it to build using the following packages. These packages have no been thoroughly tested yet so compile at your own risk. You may have to manually link the generated ModSecurity library file location if it is not put into a location that is in your path (export  LD_LIBRARY_PATH=/usr/local/modsecurity/lib/). 
 
-```$ sudo dnf install gcc-c++ flex bison curl-devel curl yajl yajl-devel GeoIP-devel
+```$ sudo dnf install gcc-c++ flex bison curl-devel curl yajl yajl-devel GeoIP-devel doxygen
 $ cd /opt/
 $ git clone https://github.com/SpiderLabs/ModSecurity
 $ cd ModSecurity
