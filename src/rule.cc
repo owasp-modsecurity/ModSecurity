@@ -40,7 +40,9 @@ using Variables::Variable;
 using actions::transformations::None;
 
 Rule::~Rule() {
-    delete op;
+    if (op != NULL) {
+        delete op;
+    }
     while (actions_conf.empty() == false) {
         auto *a = actions_conf.back();
         actions_conf.pop_back();
@@ -62,9 +64,22 @@ Rule::~Rule() {
         delete a;
     }
 
-    delete variables;
+    if (variables != NULL) {
+        delete variables;
+    }
 }
 
+Rule::Rule(std::string marker)
+    : chained(false),
+    chainedRule(NULL),
+    variables(NULL),
+    op(NULL),
+    rule_id(0),
+    phase(-1),
+    m_unconditional(false),
+    m_secmarker(true),
+    m_marker(marker),
+    m_referenceCount(0) { };
 
 Rule::Rule(Operator *_op,
         std::vector<Variable *> *_variables,
@@ -76,6 +91,8 @@ Rule::Rule(Operator *_op,
     rule_id(0),
     phase(-1),
     m_unconditional(false),
+    m_secmarker(false),
+    m_marker(""),
     m_referenceCount(0) {
     for (Action *a : *actions) {
         if (a->action_kind == Action::ConfigurationKind) {
@@ -170,6 +187,9 @@ bool Rule::evaluate(Assay *assay) {
     bool ret = false;
     std::vector<Variable *> *variables = this->variables;
 
+    if (m_secmarker == true) {
+        return true;
+    }
     if (m_unconditional == true) {
         return evaluateActions(assay);
     }

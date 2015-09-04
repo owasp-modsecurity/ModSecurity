@@ -58,6 +58,7 @@ class Driver : public RulesProperties {
 
     int addSecRule(Rule *rule);
     int addSecAction(Rule *rule);
+    int addSecMarker(std::string marker);
 
     int result;
 

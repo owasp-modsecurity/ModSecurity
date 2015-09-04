@@ -23,6 +23,7 @@ class Driver;
 #include "actions/ctl_audit_log_parts.h"
 #include "actions/set_var.h"
 #include "actions/severity.h"
+#include "actions/skip_after.h"
 #include "actions/msg.h"
 #include "actions/phase.h"
 #include "actions/log_data.h"
@@ -192,6 +193,7 @@ using ModSecurity::Variables::Variable;
 
 %token <std::string> CONFIG_DIR_SEC_ACTION
 %token <std::string> CONFIG_DIR_SEC_DEFAULT_ACTION
+%token <std::string> CONFIG_DIR_SEC_MARKER
 
 %token <std::string> VARIABLE
 %token <std::string> RUN_TIME_VAR_DUR
@@ -216,6 +218,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> OPERATOR
 %token <std::string> FREE_TEXT
 %token <std::string> ACTION
+%token <std::string> ACTION_SKIP_AFTER
 %token <std::string> ACTION_AUDIT_LOG
 %token <std::string> ACTION_SEVERITY
 %token <std::string> ACTION_SETVAR
@@ -411,6 +414,10 @@ expression:
         for (Action *a : checkedActions) {
             driver.defaultActions[definedPhase].push_back(a);
         }
+      }
+    | CONFIG_DIR_SEC_MARKER
+      {
+        driver.addSecMarker($1);
       }
     | CONFIG_DIR_RULE_ENG SPACE CONFIG_VALUE_OFF
       {
@@ -698,6 +705,10 @@ act:
         }
 
         $$ = setVar;
+      }
+    | ACTION_SKIP_AFTER
+      {
+        $$ = new ModSecurity::actions::SkipAfter($1);
       }
     | ACTION_AUDIT_LOG
       {

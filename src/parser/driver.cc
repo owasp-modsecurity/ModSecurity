@@ -39,6 +39,16 @@ Driver::~Driver() {
     delete loc.back();
 }
 
+
+int Driver::addSecMarker(std::string marker) {
+    for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+        Rule *rule = new Rule(marker);
+        rule->phase = i;
+        rules[i].push_back(rule);
+    }
+}
+
+
 int Driver::addSecAction(Rule *rule) {
     if (rule->phase >= ModSecurity::Phases::NUMBER_OF_PHASES) {
         parserError << "Unknown phase: " << std::to_string(rule->phase);

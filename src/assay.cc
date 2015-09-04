@@ -103,6 +103,7 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     m_requestBodyType(UnknownFormat),
     m_requestHeadersNames(NULL),
     m_responseHeadersNames(NULL),
+    m_marker(""),
     start(cpu_seconds()),
     m_ms(ms) {
     id = std::to_string(this->timeStamp) + \

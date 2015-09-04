@@ -47,6 +47,7 @@ class Rules : public RulesProperties  {
     Rules()
         : RulesProperties(new DebugLog()),
         m_referenceCount(0),
+        m_secmarker_skipped(0),
         unicode_codepage(0) {
             unicode_map_table = reinterpret_cast<int *>(
                 malloc(sizeof(int)*65536));
@@ -55,6 +56,7 @@ class Rules : public RulesProperties  {
 
     explicit Rules(DebugLog *customLog)
         : m_referenceCount(0),
+        m_secmarker_skipped(0),
         unicode_codepage(0),
         RulesProperties(customLog) {
             unicode_map_table = reinterpret_cast<int *>(
@@ -90,6 +92,7 @@ class Rules : public RulesProperties  {
 
  private:
     int m_referenceCount;
+    double m_secmarker_skipped;
 };
 
 #endif
