@@ -49,6 +49,33 @@
 
 namespace ModSecurity {
 
+std::string phase_name(int x) {
+    switch(x) {
+        case ModSecurity::Phases::ConnectionPhase:
+            return "Connection Phase";
+            break;
+        case ModSecurity::Phases::UriPhase:
+            return "URI Phase";
+            break;
+        case ModSecurity::Phases::RequestHeadersPhase:
+            return "Request Headers";
+            break;
+        case ModSecurity::Phases::RequestBodyPhase:
+            return "Request Headers";
+            break;
+        case ModSecurity::Phases::ResponseHeadersPhase:
+            return "Response Headers";
+            break;
+        case ModSecurity::Phases::ResponseBodyPhase:
+            return "Reponse Body";
+            break;
+        case ModSecurity::Phases::LoggingPhase:
+            return "Logging";
+            break;
+    }
+    return "Phase '" + std::to_string(x) + "' is not known.";
+}
+
 
 std::vector<std::string> split(std::string str, char delimiter) {
     std::vector<std::string> internal;

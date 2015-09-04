@@ -152,6 +152,22 @@ bool Rule::evaluate(Assay *assay) {
                     none++;
                 }
             }
+
+            // Check for transformations on the SecDefaultAction
+            // Notice that first we make sure that won't be a t:none
+            // on the target rule.
+            if (none == 0) {
+                for (Action *a : assay->m_rules->defaultActions[this->phase]) {
+                    if (a->action_kind == actions::Action::RunTimeBeforeMatchAttemptKind) {
+                        value = a->evaluate(value, assay);
+                        assay->debug(9, "(SecDefaultAction) T (" + \
+                            std::to_string(transformations) + ") " + \
+                            a->name + ": \"" + value +"\"");
+                        transformations++;
+                    }
+                }
+            }
+
             for (Action *a : this->actions_runtime_pre) {
                 None *z = dynamic_cast<None *>(a);
                 if (none == 0) {
@@ -206,6 +222,12 @@ bool Rule::evaluate(Assay *assay) {
                     assay->delete_variable("MATCHED_VARS_NAMES:" + v.first);
                 }
                 if (this->chained && chainResult == true || !this->chained) {
+                    for (Action *a : assay->m_rules->defaultActions[this->phase]) {
+                        if (a->action_kind == actions::Action::RunTimeOnlyIfMatchKind) {
+                            assay->debug(4, "(SecDefaultAction) Running action: " + a->action);
+                            a->evaluate(this, assay);
+                        }
+                    }
                     for (Action *a :
                         this->actions_runtime_pos) {
                         assay->debug(4, "Running action: " + a->action);

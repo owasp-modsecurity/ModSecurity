@@ -36,6 +36,7 @@ class Phase : public Action {
 
     bool evaluate(Rule *rule, Assay *assay) override;
     int phase;
+    int m_secRulesPhase;
 };
 
 }  // namespace actions

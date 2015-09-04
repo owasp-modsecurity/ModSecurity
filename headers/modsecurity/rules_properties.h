@@ -33,6 +33,9 @@
 namespace ModSecurity {
 class Rule;
 class AuditLog;
+namespace actions {
+class Action;
+}
 namespace Parser {
 class Driver;
 }
@@ -72,7 +75,7 @@ class RulesProperties {
     }
 
     std::vector<Rule *> rules[7];  // ModSecurity::Phases::NUMBER_OF_PHASES
-
+    std::vector<actions::Action *> defaultActions[7];  // ModSecurity::Phases::NUMBER_OF_PHASES
 
     /**
      *

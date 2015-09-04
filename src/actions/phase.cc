@@ -27,7 +27,9 @@ namespace ModSecurity {
 namespace actions {
 
 Phase::Phase(std::string action)
-    : Action(action) {
+    : Action(action),
+    m_secRulesPhase(0),
+    phase(0) {
     this->action_kind = ConfigurationKind;
     std::string a = action;
     a.erase(0, 6);
@@ -42,20 +44,25 @@ Phase::Phase(std::string action)
         this->phase = 0;
         if (tolower(a) == "request") {
             this->phase = this->phase + ModSecurity::Phases::RequestHeadersPhase;
+            m_secRulesPhase = 2;
         }
         if (tolower(a) == "response") {
             this->phase = this->phase + ModSecurity::Phases::ResponseBodyPhase;
+            m_secRulesPhase = 4;
         }
         if (tolower(a) == "logging") {
             this->phase = this->phase + ModSecurity::Phases::LoggingPhase;
+            m_secRulesPhase = 5;
         }
     }
 
     if (this->phase == 0) {
       /* Phase 0 is something new, we want to use as ConnectionPhase */
       this->phase = ModSecurity::Phases::ConnectionPhase;
+      m_secRulesPhase = 2;
     } else {
       /* Otherwise we want to shift the rule to the correct phase */
+      m_secRulesPhase = phase;
       this->phase = phase + ModSecurity::Phases::RequestHeadersPhase - 1;
     }
 }

@@ -44,6 +44,7 @@ namespace ModSecurity {
     std::string string_to_hex(const std::string& input);
     int urldecode_uni_nonstrict_inplace_ex(Assay *assay, unsigned char *input,
         int64_t input_len, int *changed);
+    std::string phase_name(int x);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_

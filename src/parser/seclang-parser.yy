@@ -16,20 +16,25 @@ class Driver;
 }
 }
 
+#include "modsecurity/modsecurity.h"
+
 #include "actions/action.h"
 #include "actions/audit_log.h"
 #include "actions/ctl_audit_log_parts.h"
 #include "actions/set_var.h"
 #include "actions/severity.h"
 #include "actions/msg.h"
+#include "actions/phase.h"
 #include "actions/log_data.h"
 #include "actions/rev.h"
 #include "actions/tag.h"
 #include "actions/transformations/transformation.h"
+#include "actions/transformations/none.h"
 #include "operators/operator.h"
 #include "rule.h"
 #include "utils/geo_lookup.h"
 #include "audit_log.h"
+#include "utils.h"
 
 #include "variables/variations/count.h"
 #include "variables/variations/exclusion.h"
@@ -47,6 +52,8 @@ class Driver;
 #include "variables/time_wday.h"
 #include "variables/time_year.h"
 
+using ModSecurity::ModSecurity;
+
 using ModSecurity::actions::Action;
 using ModSecurity::actions::CtlAuditLogParts;
 using ModSecurity::actions::SetVar;
@@ -54,6 +61,8 @@ using ModSecurity::actions::Severity;
 using ModSecurity::actions::Tag;
 using ModSecurity::actions::Rev;
 using ModSecurity::actions::Msg;
+using ModSecurity::actions::Phase;
+using ModSecurity::actions::transformations::None;
 using ModSecurity::actions::LogData;
 using ModSecurity::actions::transformations::Transformation;
 using ModSecurity::operators::Operator;
@@ -180,6 +189,8 @@ using ModSecurity::Variables::Variable;
 
 %token <std::string> CONFIG_DIR_DEBUG_LOG
 %token <std::string> CONFIG_DIR_DEBUG_LVL
+
+%token <std::string> CONFIG_DIR_SEC_DEFAULT_ACTION
 
 %token <std::string> VARIABLE
 %token <std::string> RUN_TIME_VAR_DUR
@@ -344,6 +355,43 @@ expression:
             /* actions */ $8
             );
         driver.addSecRule(rule);
+      }
+    | CONFIG_DIR_SEC_DEFAULT_ACTION SPACE QUOTATION_MARK actions QUOTATION_MARK
+      {
+        std::vector<Action *> *actions = $4;
+        std::vector<Action *> checkedActions;
+        int definedPhase = -1;
+        int secRuleDefinedPhase = -1;
+        for (Action *a : *actions) {
+            Phase *phase = dynamic_cast<Phase *>(a);
+            if (phase != NULL) {
+                definedPhase = phase->phase;
+                secRuleDefinedPhase = phase->m_secRulesPhase;
+            } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind ||
+                a->action_kind == Action::RunTimeBeforeMatchAttemptKind) {
+                None *none = dynamic_cast<None *>(a);
+                if (none != NULL) {
+                    driver.parserError << "The transformation none is not suitable to be part of the SecDefaultActions";
+                    YYERROR;
+                }
+                checkedActions.push_back(a);
+            } else {
+                driver.parserError << "The action '" << a->action << "' is not suitable to be part of the SecDefaultActions";
+                YYERROR;
+            }
+        }
+        if (definedPhase == -1) {
+            definedPhase = ModSecurity::ModSecurity::Phases::RequestHeadersPhase;
+        }
+
+        if (!driver.defaultActions[definedPhase].empty()) {
+            driver.parserError << "SecDefaultActions can only be placed once per phase and configuration context. Phase " << secRuleDefinedPhase << " was informed already.";
+            YYERROR;
+        }
+
+        for (Action *a : checkedActions) {
+            driver.defaultActions[definedPhase].push_back(a);
+        }
       }
     | CONFIG_DIR_RULE_ENG SPACE CONFIG_VALUE_OFF
       {

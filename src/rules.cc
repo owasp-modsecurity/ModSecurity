@@ -208,6 +208,20 @@ int Rules::merge(Driver *from) {
     this->requestBodyLimitAction = from->requestBodyLimitAction;
     this->responseBodyLimitAction = from->responseBodyLimitAction;
 
+    /*
+     *
+     * default Actions is something per configuration context, there is
+     * need to merge anything.
+     *
+     */
+    for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+        std::vector<Action *> actions = from->defaultActions[i];
+        this->defaultActions[i].clear();
+        for (int j = 0; j < actions.size(); j++) {
+            Action *action = actions[j];
+            this->defaultActions[i].push_back(action);
+        }
+    }
 
     if (from->audit_log != NULL && this->audit_log != NULL) {
         this->audit_log->refCountDecreaseAndCheck();
