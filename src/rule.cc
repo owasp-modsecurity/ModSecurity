@@ -56,7 +56,7 @@ Rule::~Rule() {
         actions_runtime_pos.pop_back();
         delete a;
     }
-    while (variables->empty() == false) {
+    while (variables != NULL && variables->empty() == false) {
         auto *a = variables->back();
         variables->pop_back();
         delete a;
@@ -75,6 +75,7 @@ Rule::Rule(Operator *_op,
     op(_op),
     rule_id(0),
     phase(-1),
+    m_unconditional(false),
     m_referenceCount(0) {
     for (Action *a : *actions) {
         if (a->action_kind == Action::ConfigurationKind) {
@@ -98,12 +99,80 @@ Rule::Rule(Operator *_op,
         phase = ModSecurity::Phases::RequestHeadersPhase;
     }
 
+    if (op == NULL) {
+        m_unconditional = true;
+    }
+
     delete actions;
 }
+
+
+bool Rule::evaluateActions(Assay *assay) {
+    int none = 0;
+    int transformations = 0;
+    for (Action *a : this->actions_runtime_pre) {
+        None *z = dynamic_cast<None *>(a);
+        if (z != NULL) {
+            none++;
+        }
+    }
+
+    assay->debug(4, "Running unconditional rule.");
+
+    if (none == 0) {
+        /*
+        for (Action *a : assay->m_rules->defaultActions[this->phase]) {
+            if (a->action_kind == actions::Action::RunTimeBeforeMatchAttemptKind) {
+                value = a->evaluate(value, assay);
+                assay->debug(9, "(SecDefaultAction) T (" + \
+                    std::to_string(transformations) + ") " + \
+                    a->name + ": \"" + value +"\"");
+                    transformations++;
+            }
+        }
+        */
+    }
+
+    for (Action *a : this->actions_runtime_pre) {
+        None *z = dynamic_cast<None *>(a);
+        /*
+        if (none == 0) {
+            value = a->evaluate(value, assay);
+            assay->debug(9, " T (" + \
+                std::to_string(transformations) + ") " + \
+                a->name + ": \"" + value +"\"");
+                transformations++;
+        }
+        */
+        if (z != NULL) {
+            none--;
+        }
+    }
+
+    for (Action *a : assay->m_rules->defaultActions[this->phase]) {
+        if (a->action_kind == actions::Action::RunTimeOnlyIfMatchKind) {
+            assay->debug(4, "(SecDefaultAction) Running action: " + a->action);
+            a->evaluate(this, assay);
+        }
+    }
+
+    for (Action *a :
+        this->actions_runtime_pos) {
+        assay->debug(4, "Running action: " + a->action);
+        a->evaluate(this, assay);
+    }
+
+    return true;
+}
+
 
 bool Rule::evaluate(Assay *assay) {
     bool ret = false;
     std::vector<Variable *> *variables = this->variables;
+
+    if (m_unconditional == true) {
+        return evaluateActions(assay);
+    }
 
     assay->debug(4, "Executing operator \"" + this->op->op \
         + "\" with param \"" + this->op->param +  "\" against " \

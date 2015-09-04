@@ -37,6 +37,7 @@ class Rule {
 
     ~Rule();
     bool evaluate(Assay *assay);
+    bool evaluateActions(Assay *assay);
 
     operators::Operator *op;
     std::vector<actions::Action *> actions_conf;
@@ -64,6 +65,7 @@ class Rule {
     std::string rev;
 
  private:
+    bool m_unconditional;
     int m_referenceCount;
 };
 

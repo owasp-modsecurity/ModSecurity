@@ -57,6 +57,7 @@ class Driver : public RulesProperties {
     virtual ~Driver();
 
     int addSecRule(Rule *rule);
+    int addSecAction(Rule *rule);
 
     int result;
 

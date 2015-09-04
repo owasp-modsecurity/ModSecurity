@@ -190,6 +190,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> CONFIG_DIR_DEBUG_LOG
 %token <std::string> CONFIG_DIR_DEBUG_LVL
 
+%token <std::string> CONFIG_DIR_SEC_ACTION
 %token <std::string> CONFIG_DIR_SEC_DEFAULT_ACTION
 
 %token <std::string> VARIABLE
@@ -355,6 +356,24 @@ expression:
             /* actions */ $8
             );
         driver.addSecRule(rule);
+      }
+    | CONFIG_DIR_SEC_ACTION SPACE QUOTATION_MARK actions QUOTATION_MARK
+      {
+        Rule *rule = new Rule(
+            /* op */ NULL,
+            /* variables */ NULL,
+            /* actions */ $4
+            );
+        driver.addSecAction(rule);
+      }
+    | CONFIG_DIR_SEC_ACTION SPACE actions
+      {
+        Rule *rule = new Rule(
+            /* op */ NULL,
+            /* variables */ NULL,
+            /* actions */ $3
+            );
+        driver.addSecAction(rule);
       }
     | CONFIG_DIR_SEC_DEFAULT_ACTION SPACE QUOTATION_MARK actions QUOTATION_MARK
       {

@@ -39,6 +39,7 @@ DIRECTIVE       (?i:SecRule)
 LOG_DATA        (?i:logdata)
 
 CONFIG_DIR_SEC_DEFAULT_ACTION (?i:SecDefaultAction)
+CONFIG_DIR_SEC_ACTION (?i:SecAction)
 
 CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION (?i:SecPcreMatchLimitRecursion)
 CONFIG_DIR_PCRE_MATCH_LIMIT (?i:SecPcreMatchLimit)
@@ -243,6 +244,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {CONFIG_VALUE_PROCESS_PARTIAL}  { return yy::seclang_parser::make_CONFIG_VALUE_PROCESS_PARTIAL(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_REJECT}           { return yy::seclang_parser::make_CONFIG_VALUE_REJECT(yytext, *driver.loc.back()); }
 
+{CONFIG_DIR_SEC_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_SEC_ACTION(yytext, *driver.loc.back()); }
 {CONFIG_DIR_SEC_DEFAULT_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_SEC_DEFAULT_ACTION(yytext, *driver.loc.back()); }
 
 <EXPECTING_OPERATOR>{
