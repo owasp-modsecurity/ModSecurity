@@ -25,7 +25,6 @@
 #define SRC_PARSER_DRIVER_H_
 
 #include "modsecurity/modsecurity.h"
-#include "src/rule.h"
 #include "modsecurity/rules.h"
 #include "modsecurity/rules_properties.h"
 #include "src/audit_log.h"

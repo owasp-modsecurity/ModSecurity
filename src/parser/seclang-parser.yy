@@ -27,12 +27,13 @@ class Driver;
 #include "actions/msg.h"
 #include "actions/phase.h"
 #include "actions/log_data.h"
+#include "actions/redirect.h"
 #include "actions/rev.h"
 #include "actions/tag.h"
 #include "actions/transformations/transformation.h"
 #include "actions/transformations/none.h"
 #include "operators/operator.h"
-#include "rule.h"
+#include "modsecurity/rule.h"
 #include "utils/geo_lookup.h"
 #include "audit_log.h"
 #include "utils.h"
@@ -60,6 +61,7 @@ using ModSecurity::actions::CtlAuditLogParts;
 using ModSecurity::actions::SetVar;
 using ModSecurity::actions::Severity;
 using ModSecurity::actions::Tag;
+using ModSecurity::actions::Redirect;
 using ModSecurity::actions::Rev;
 using ModSecurity::actions::Msg;
 using ModSecurity::actions::Phase;
@@ -218,6 +220,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> OPERATOR
 %token <std::string> FREE_TEXT
 %token <std::string> ACTION
+%token <std::string> ACTION_REDIRECT
 %token <std::string> ACTION_SKIP_AFTER
 %token <std::string> ACTION_AUDIT_LOG
 %token <std::string> ACTION_SEVERITY
@@ -689,6 +692,10 @@ act:
     | TRANSFORMATION
       {
         $$ = Transformation::instantiate($1);
+      }
+    | ACTION_REDIRECT
+      {
+        $$ =  new Redirect($1);
       }
     | ACTION_SEVERITY
       {

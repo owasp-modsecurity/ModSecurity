@@ -17,9 +17,9 @@
 #include <iostream>
 
 #include "modsecurity/modsecurity.h"
+#include "modsecurity/rule.h"
 #include "src/config.h"
 #include "src/unique_id.h"
-
 #ifdef MSC_WITH_CURL
 #include <curl/curl.h>
 #endif
@@ -208,5 +208,6 @@ extern "C" ModSecurity *msc_init() {
 
     return modsec;
 }
+
 
 }  // namespace ModSecurity

@@ -23,7 +23,8 @@ using ModSecurity::split;
 %}
 %option noyywrap nounput batch debug noinput
 
-ACTION          (?i:accuracy|allow|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|initcol|log|maturity|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|redirect:[A-Z0-9_\|\&\:\/\/\.]+|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|status:[0-9]+|ver|xmlns)
+ACTION          (?i:accuracy|allow|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|initcol|log|maturity|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|status:[0-9]+|ver|xmlns)
+ACTION_REDIRECT (?i:redirect)
 ACTION_SKIP_AFTER (?i:skipAfter)
 ACTION_PHASE    ((?i:phase:(?i:REQUEST|RESPONSE|LOGGING|[0-9]+))|(?i:phase:'(?i:REQUEST|RESPONSE|LOGGING|[0-9]+)'))
 ACTION_AUDIT_LOG (?i:auditlog)
@@ -97,7 +98,7 @@ OPERATORNOARG	(?i:@detectSQLi|@detectXSS|@geoLookup|@validateUrlEncoding|@valida
 
 TRANSFORMATION  t:(lowercase|urlDecodeUni|urlDecode|none|compressWhitespace|removeWhitespace|replaceNulls|removeNulls|htmlEntityDecode|jsDecode|cssDecode|trim|normalizePathWin|length)
 
-VARIABLE          (?i:UNIQUE_ID|SERVER_PORT|SERVER_ADDR|REMOTE_PORT|REMOTE_HOST|MULTIPART_STRICT_ERROR|PATH_INFO|MULTIPART_NAME|MULTIPART_FILENAME|MULTIPART_CRLF_LF_LINES|MATCHED_VAR_NAME|MATCHED_VARS_NAMES|MATCHED_VAR|MATCHED_VARS|INBOUND_DATA_ERROR|OUTBOUND_DATA_ERROR|FULL_REQUEST|FILES|AUTH_TYPE|ARGS_NAMES|ARGS|QUERY_STRING|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_COOKIES_NAMES|REQUEST_COOKIES|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_HEADERS|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_HEADERS|RESPONSE_PROTOCOL|RESPONSE_STATUS|TX|GEO)
+VARIABLE          (?i:UNIQUE_ID|SERVER_PORT|SERVER_ADDR|REMOTE_PORT|REMOTE_HOST|MULTIPART_STRICT_ERROR|PATH_INFO|MULTIPART_NAME|MULTIPART_FILENAME|MULTIPART_CRLF_LF_LINES|MATCHED_VAR_NAME|MATCHED_VARS_NAMES|MATCHED_VAR|MATCHED_VARS|INBOUND_DATA_ERROR|OUTBOUND_DATA_ERROR|FULL_REQUEST|FILES|AUTH_TYPE|ARGS_NAMES|ARGS|QUERY_STRING|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_COOKIES_NAMES|REQUEST_COOKIES|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_HEADERS|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_HEADERS|RESPONSE_PROTOCOL|RESPONSE_STATUS|TX|GEO|REQBODY_PROCESSOR)
 RUN_TIME_VAR_DUR  (?i:DURATION)
 RUN_TIME_VAR_ENV  (?i:ENV)
 RUN_TIME_VAR_BLD  (?i:MODSEC_BUILD)
@@ -145,7 +146,7 @@ VAR_FREE_TEXT_SPACE [^ \t\"]+
 
 CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
-%x EXPECTING_OPERATOR
+%x EXPECTING_OPERATOR COMMENT
 
 %{
   // Code run each time a pattern is matched.
@@ -280,6 +281,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 {LOG_DATA}:'{FREE_TEXT_QUOTE}'         { return yy::seclang_parser::make_LOG_DATA(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_MSG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_MSG(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_REDIRECT}:'{FREE_TEXT_QUOTE}' { return yy::seclang_parser::make_ACTION_REDIRECT(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_TAG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_TAG(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_REV}:'{CONFIG_VALUE_NUMBER}'      { return yy::seclang_parser::make_ACTION_REV(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_CTL_BDY_XML}              { return yy::seclang_parser::make_ACTION_CTL_BDY_XML(yytext, *driver.loc.back()); }
@@ -294,11 +296,22 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 <INITIAL,EXPECTING_OPERATOR>{
 [ \t]+                          { return yy::seclang_parser::make_SPACE(*driver.loc.back()); }
-[ \t]*\\\n[ \t]*                            { return yy::seclang_parser::make_SPACE(*driver.loc.back());  }
-[ \t]*\\\r\n[ \t]*                          { return yy::seclang_parser::make_SPACE(*driver.loc.back());  }
-
+[ \t]*\\\n[ \t]*                { return yy::seclang_parser::make_SPACE(*driver.loc.back());  }
+[ \t]*\\\r\n[ \t]*              { return yy::seclang_parser::make_SPACE(*driver.loc.back());  }
 }
+
+<COMMENT>{
+.*[ \t]*\\\n[ \t]*                { driver.loc.back()->step(); }
+.*[ \t]*\\\r\n[ \t]*              { driver.loc.back()->step(); }
+.*[^\\]               { BEGIN(INITIAL); driver.loc.back()->step(); }
+.*[^\\]               { BEGIN(INITIAL); driver.loc.back()->step(); }
+}
+
 [\n]+                           { driver.loc.back()->lines(yyleng); driver.loc.back()->step(); }
+#[ \t]*SecRule[^\\]*\\\n[ \t]*        { BEGIN(COMMENT); }
+#[ \t]*SecRule[^\\]*\\\r\n[ \t]*      { BEGIN(COMMENT);  }
+#[ \t]*SecAction[^\\]*\\\n[ \t]*        { BEGIN(COMMENT);  }
+#[ \t]*SecAction[^\\]*\\\r\n[ \t]*      { BEGIN(COMMENT);  }
 #.*                             { /* comment, just ignore. */ }
 .                               { driver.error (*driver.loc.back(), "invalid character", yytext); }
 <<EOF>>                         {
