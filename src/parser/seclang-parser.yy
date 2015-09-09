@@ -230,9 +230,11 @@ using ModSecurity::Variables::Variable;
 %token <std::string> ACTION_REV
 %token <std::string> LOG_DATA
 %token <std::string> TRANSFORMATION
-%token <std::string> ACTION_CTL_BDY_XML
-%token <std::string> ACTION_CTL_BDY_JSON
+%token <std::string> ACTION_CTL_AUDIT_ENGINE
 %token <std::string> ACTION_CTL_AUDIT_LOG_PARTS
+%token <std::string> ACTION_CTL_BDY_JSON
+%token <std::string> ACTION_CTL_BDY_XML
+%token <std::string> ACTION_CTL_RULE_ENGINE
 
 %type <std::vector<Action *> *> actions
 %type <std::vector<Variable *> *> variables
@@ -750,6 +752,30 @@ act:
     | ACTION_CTL_AUDIT_LOG_PARTS
       {
         $$ = new CtlAuditLogParts($1);
+      }
+    | ACTION_CTL_RULE_ENGINE CONFIG_VALUE_ON
+      {
+        $$ = Action::instantiate($1);
+      }
+    | ACTION_CTL_RULE_ENGINE CONFIG_VALUE_OFF
+      {
+        $$ = Action::instantiate($1);
+      }
+    | ACTION_CTL_RULE_ENGINE CONFIG_VALUE_DETC
+      {
+        $$ = Action::instantiate($1);
+      }
+    | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_ON
+      {
+        $$ = Action::instantiate($1);
+      }
+    | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_OFF
+      {
+        $$ = Action::instantiate($1);
+      }
+    | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_RELEVANT_ONLY
+      {
+        $$ = Action::instantiate($1);
       }
     ;
 

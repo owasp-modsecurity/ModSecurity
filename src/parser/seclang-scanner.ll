@@ -34,9 +34,11 @@ ACTION_SETVAR   (?i:setvar)
 ACTION_MSG      (?i:msg)
 ACTION_TAG      (?i:tag)
 ACTION_REV      (?i:rev)
-ACTION_CTL_BDY_XML (?i:ctl:requestBodyProcessor=XML)
-ACTION_CTL_BDY_JSON (?i:ctl:requestBodyProcessor=JSON)
+ACTION_CTL_BDY_XML         (?i:ctl:requestBodyProcessor=XML)
+ACTION_CTL_BDY_JSON        (?i:ctl:requestBodyProcessor=JSON)
 ACTION_CTL_AUDIT_LOG_PARTS (?i:ctl:auditLogParts)
+ACTION_CTL_RULE_ENGINE     (?i:ctl:ruleEngine)
+ACTION_CTL_AUDIT_ENGINE    (?i:ctl:auditEngine)
 DIRECTIVE       (?i:SecRule)
 LOG_DATA        (?i:logdata)
 
@@ -177,6 +179,8 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {CONFIG_DIR_AUDIT_STS}[ ]["]{FREE_TEXT}["]         { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_STS(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_TPE}                             { return yy::seclang_parser::make_CONFIG_DIR_AUDIT_TPE(yytext, *driver.loc.back()); }
 {ACTION_CTL_AUDIT_LOG_PARTS}=[+|-]{AUDIT_PARTS}    { return yy::seclang_parser::make_ACTION_CTL_AUDIT_LOG_PARTS(yytext, *driver.loc.back()); }
+{ACTION_CTL_RULE_ENGINE}=                          { return yy::seclang_parser::make_ACTION_CTL_RULE_ENGINE(yytext, *driver.loc.back()); }
+{ACTION_CTL_AUDIT_ENGINE}=                         { return yy::seclang_parser::make_ACTION_CTL_AUDIT_ENGINE(yytext, *driver.loc.back()); }
 
 %{ /* Debug log entries */ %}
 {CONFIG_DIR_DEBUG_LOG}[ ]{CONFIG_VALUE_PATH}    { return yy::seclang_parser::make_CONFIG_DIR_DEBUG_LOG(strchr(yytext, ' ') + 1, *driver.loc.back()); }
