@@ -31,6 +31,7 @@ ACTION_AUDIT_LOG (?i:auditlog)
 ACTION_SEVERITY (?i:severity)
 ACTION_SEVERITY_VALUE (?i:(EMERGENCY|ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)|[0-9]+)
 ACTION_SETVAR   (?i:setvar)
+ACTION_EXPIREVAR (?i:expirevar)
 ACTION_MSG      (?i:msg)
 ACTION_TAG      (?i:tag)
 ACTION_REV      (?i:rev)
@@ -100,7 +101,7 @@ OPERATORNOARG	(?i:@detectSQLi|@detectXSS|@geoLookup|@validateUrlEncoding|@valida
 
 TRANSFORMATION  t:(sha1|hexEncode|lowercase|urlDecodeUni|urlDecode|none|compressWhitespace|removeWhitespace|replaceNulls|removeNulls|htmlEntityDecode|jsDecode|cssDecode|trim|normalizePathWin|length)
 
-VARIABLE          (?i:UNIQUE_ID|SERVER_PORT|SERVER_ADDR|REMOTE_PORT|REMOTE_HOST|MULTIPART_STRICT_ERROR|PATH_INFO|MULTIPART_NAME|MULTIPART_FILENAME|MULTIPART_CRLF_LF_LINES|MATCHED_VAR_NAME|MATCHED_VARS_NAMES|MATCHED_VAR|MATCHED_VARS|INBOUND_DATA_ERROR|OUTBOUND_DATA_ERROR|FULL_REQUEST|FILES|AUTH_TYPE|ARGS_NAMES|ARGS|QUERY_STRING|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_COOKIES_NAMES|REQUEST_COOKIES|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_HEADERS|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_HEADERS|RESPONSE_PROTOCOL|RESPONSE_STATUS|TX|GEO|REQBODY_PROCESSOR)
+VARIABLE          (?i:UNIQUE_ID|SERVER_PORT|SERVER_ADDR|REMOTE_PORT|REMOTE_HOST|MULTIPART_STRICT_ERROR|PATH_INFO|MULTIPART_NAME|MULTIPART_FILENAME|MULTIPART_CRLF_LF_LINES|MATCHED_VAR_NAME|MATCHED_VARS_NAMES|MATCHED_VAR|MATCHED_VARS|INBOUND_DATA_ERROR|OUTBOUND_DATA_ERROR|FULL_REQUEST|FILES|AUTH_TYPE|ARGS_NAMES|ARGS|QUERY_STRING|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_COOKIES_NAMES|REQUEST_COOKIES|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_HEADERS|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_HEADERS|RESPONSE_PROTOCOL|RESPONSE_STATUS|TX|GEO|REQBODY_PROCESSOR|IP)
 RUN_TIME_VAR_DUR  (?i:DURATION)
 RUN_TIME_VAR_ENV  (?i:ENV)
 RUN_TIME_VAR_BLD  (?i:MODSEC_BUILD)
@@ -270,6 +271,20 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {ACTION_SEVERITY}:'{ACTION_SEVERITY_VALUE}'     { return yy::seclang_parser::make_ACTION_SEVERITY(std::string(yytext, 10, yyleng - 11), *driver.loc.back()); }
 
 
+{ACTION_EXPIREVAR}:'{VAR_FREE_TEXT_QUOTE}={VAR_FREE_TEXT_QUOTE}'  {
+                                    return yy::seclang_parser::make_ACTION_EXPIREVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+{ACTION_EXPIREVAR}:'{VAR_FREE_TEXT_QUOTE}'              {
+                                    return yy::seclang_parser::make_ACTION_EXPIREVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+{ACTION_EXPIREVAR}:{VAR_FREE_TEXT_SPACE}={VAR_FREE_TEXT_SPACE_COMMA}  {
+                                    return yy::seclang_parser::make_ACTION_EXPIREVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+{ACTION_EXPIREVAR}:{VAR_FREE_TEXT_SPACE_COMMA}  {
+                                    return yy::seclang_parser::make_ACTION_EXPIREVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+
+
 {ACTION_SETVAR}:'{VAR_FREE_TEXT_QUOTE}={VAR_FREE_TEXT_QUOTE}'  {
                                     return yy::seclang_parser::make_ACTION_SETVAR(strchr(yytext, ':') + 1, *driver.loc.back());
                                          }
@@ -300,15 +315,15 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 <INITIAL,EXPECTING_OPERATOR>{
 [ \t]+                          { return yy::seclang_parser::make_SPACE(*driver.loc.back()); }
-[ \t]*\\\n[ \t]*                { return yy::seclang_parser::make_SPACE(*driver.loc.back());  }
-[ \t]*\\\r\n[ \t]*              { return yy::seclang_parser::make_SPACE(*driver.loc.back());  }
+[ \t]*\\\n[ \t]*                { driver.loc.back()->lines(1); driver.loc.back()->step(); return yy::seclang_parser::make_SPACE(*driver.loc.back());  }
+[ \t]*\\\r\n[ \t]*              { driver.loc.back()->lines(1); driver.loc.back()->step(); return yy::seclang_parser::make_SPACE(*driver.loc.back());  }
 }
 
 <COMMENT>{
-.*[ \t]*\\\n[ \t]*                { driver.loc.back()->step(); }
-.*[ \t]*\\\r\n[ \t]*              { driver.loc.back()->step(); }
-.*[^\\]               { BEGIN(INITIAL); driver.loc.back()->step(); }
-.*[^\\]               { BEGIN(INITIAL); driver.loc.back()->step(); }
+.*[ \t]*\\\n[ \t]*                { driver.loc.back()->lines(1); driver.loc.back()->step(); }
+.*[ \t]*\\\r\n[ \t]*              { driver.loc.back()->lines(1); driver.loc.back()->step(); }
+.*[^\\]               { BEGIN(INITIAL); driver.loc.back()->lines(1); driver.loc.back()->step(); }
+.*[^\\]               { BEGIN(INITIAL); driver.loc.back()->lines(1); driver.loc.back()->step(); }
 }
 
 [\n]+                           { driver.loc.back()->lines(yyleng); driver.loc.back()->step(); }

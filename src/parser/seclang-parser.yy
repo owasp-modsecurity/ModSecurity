@@ -225,6 +225,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> ACTION_AUDIT_LOG
 %token <std::string> ACTION_SEVERITY
 %token <std::string> ACTION_SETVAR
+%token <std::string> ACTION_EXPIREVAR
 %token <std::string> ACTION_MSG
 %token <std::string> ACTION_TAG
 %token <std::string> ACTION_REV
@@ -702,6 +703,10 @@ act:
     | ACTION_SEVERITY
       {
         $$ =  new Severity($1);
+      }
+    | ACTION_EXPIREVAR
+      {
+        $$ = Action::instantiate($1);
       }
     | ACTION_SETVAR
       {
