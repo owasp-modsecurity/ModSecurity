@@ -25,6 +25,7 @@ using ModSecurity::split;
 
 ACTION          (?i:accuracy|allow|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|initcol|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|status:[0-9]+|xmlns)
 
+ACTION_ACCURACY (?i:accuracy)
 ACTION_REDIRECT (?i:redirect)
 ACTION_SKIP_AFTER (?i:skipAfter)
 ACTION_PHASE    ((?i:phase:(?i:REQUEST|RESPONSE|LOGGING|[0-9]+))|(?i:phase:'(?i:REQUEST|RESPONSE|LOGGING|[0-9]+)'))
@@ -309,6 +310,8 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {ACTION_VER}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_VER(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_MATURITY}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_MATURITY(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_MATURITY}:{FREE_TEXT_QUOTE}      { return yy::seclang_parser::make_ACTION_MATURITY(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_ACCURACY}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_ACCURACY(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_ACCURACY}:{FREE_TEXT_QUOTE}      { return yy::seclang_parser::make_ACTION_ACCURACY(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_CTL_BDY_XML}              { return yy::seclang_parser::make_ACTION_CTL_BDY_XML(yytext, *driver.loc.back()); }
 {ACTION_CTL_BDY_JSON}             { return yy::seclang_parser::make_ACTION_CTL_BDY_JSON(yytext, *driver.loc.back()); }
 

@@ -220,6 +220,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> OPERATOR
 %token <std::string> FREE_TEXT
 %token <std::string> ACTION
+%token <std::string> ACTION_ACCURACY
 %token <std::string> ACTION_REDIRECT
 %token <std::string> ACTION_SKIP_AFTER
 %token <std::string> ACTION_AUDIT_LOG
@@ -697,6 +698,10 @@ act:
     | TRANSFORMATION
       {
         $$ = Transformation::instantiate($1);
+      }
+    | ACTION_ACCURACY
+      {
+        $$ = Action::instantiate($1);
       }
     | ACTION_REDIRECT
       {
