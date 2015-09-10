@@ -23,7 +23,8 @@ using ModSecurity::split;
 %}
 %option noyywrap nounput batch debug noinput
 
-ACTION          (?i:accuracy|allow|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|initcol|log|maturity|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|status:[0-9]+|ver|xmlns)
+ACTION          (?i:accuracy|allow|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|initcol|log|maturity|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|status:[0-9]+|xmlns)
+
 ACTION_REDIRECT (?i:redirect)
 ACTION_SKIP_AFTER (?i:skipAfter)
 ACTION_PHASE    ((?i:phase:(?i:REQUEST|RESPONSE|LOGGING|[0-9]+))|(?i:phase:'(?i:REQUEST|RESPONSE|LOGGING|[0-9]+)'))
@@ -35,6 +36,7 @@ ACTION_EXPIREVAR (?i:expirevar)
 ACTION_MSG      (?i:msg)
 ACTION_TAG      (?i:tag)
 ACTION_REV      (?i:rev)
+ACTION_VER      (?i:ver)
 ACTION_CTL_BDY_XML         (?i:ctl:requestBodyProcessor=XML)
 ACTION_CTL_BDY_JSON        (?i:ctl:requestBodyProcessor=JSON)
 ACTION_CTL_AUDIT_LOG_PARTS (?i:ctl:auditLogParts)
@@ -303,6 +305,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {ACTION_REDIRECT}:'{FREE_TEXT_QUOTE}' { return yy::seclang_parser::make_ACTION_REDIRECT(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_TAG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_TAG(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_REV}:'{CONFIG_VALUE_NUMBER}'      { return yy::seclang_parser::make_ACTION_REV(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_VER}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_VER(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_CTL_BDY_XML}              { return yy::seclang_parser::make_ACTION_CTL_BDY_XML(yytext, *driver.loc.back()); }
 {ACTION_CTL_BDY_JSON}             { return yy::seclang_parser::make_ACTION_CTL_BDY_JSON(yytext, *driver.loc.back()); }
 

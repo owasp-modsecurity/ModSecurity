@@ -229,6 +229,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> ACTION_MSG
 %token <std::string> ACTION_TAG
 %token <std::string> ACTION_REV
+%token <std::string> ACTION_VER
 %token <std::string> LOG_DATA
 %token <std::string> TRANSFORMATION
 %token <std::string> ACTION_CTL_AUDIT_ENGINE
@@ -743,6 +744,10 @@ act:
     | ACTION_REV
       {
         $$ = new Rev($1);
+      }
+    | ACTION_VER
+      {
+        $$ = Action::instantiate($1);
       }
     | ACTION_CTL_BDY_XML
       {
