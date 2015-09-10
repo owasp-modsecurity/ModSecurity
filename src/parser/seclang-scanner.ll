@@ -44,6 +44,7 @@ ACTION_CTL_BDY_JSON        (?i:ctl:requestBodyProcessor=JSON)
 ACTION_CTL_AUDIT_LOG_PARTS (?i:ctl:auditLogParts)
 ACTION_CTL_RULE_ENGINE     (?i:ctl:ruleEngine)
 ACTION_CTL_AUDIT_ENGINE    (?i:ctl:auditEngine)
+ACTION_CTL_FORCE_REQ_BODY_VAR (?i:ctl:forceRequestBodyVariable)
 DIRECTIVE       (?i:SecRule)
 LOG_DATA        (?i:logdata)
 
@@ -186,6 +187,8 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {ACTION_CTL_AUDIT_LOG_PARTS}=[+|-]{AUDIT_PARTS}    { return yy::seclang_parser::make_ACTION_CTL_AUDIT_LOG_PARTS(yytext, *driver.loc.back()); }
 {ACTION_CTL_RULE_ENGINE}=                          { return yy::seclang_parser::make_ACTION_CTL_RULE_ENGINE(yytext, *driver.loc.back()); }
 {ACTION_CTL_AUDIT_ENGINE}=                         { return yy::seclang_parser::make_ACTION_CTL_AUDIT_ENGINE(yytext, *driver.loc.back()); }
+{ACTION_CTL_FORCE_REQ_BODY_VAR}=                   { return yy::seclang_parser::make_ACTION_CTL_FORCE_REQ_BODY_VAR(yytext, *driver.loc.back()); }
+
 
 %{ /* Debug log entries */ %}
 {CONFIG_DIR_DEBUG_LOG}[ ]{CONFIG_VALUE_PATH}    { return yy::seclang_parser::make_CONFIG_DIR_DEBUG_LOG(strchr(yytext, ' ') + 1, *driver.loc.back()); }

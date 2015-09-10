@@ -239,6 +239,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> ACTION_CTL_BDY_JSON
 %token <std::string> ACTION_CTL_BDY_XML
 %token <std::string> ACTION_CTL_RULE_ENGINE
+%token <std::string> ACTION_CTL_FORCE_REQ_BODY_VAR
 
 %type <std::vector<Action *> *> actions
 %type <std::vector<Variable *> *> variables
@@ -772,6 +773,14 @@ act:
     | ACTION_CTL_AUDIT_LOG_PARTS
       {
         $$ = new CtlAuditLogParts($1);
+      }
+    | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_ON
+      {
+        $$ = Action::instantiate($1);
+      }
+    | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_OFF
+      {
+        $$ = Action::instantiate($1);
       }
     | ACTION_CTL_RULE_ENGINE CONFIG_VALUE_ON
       {
