@@ -47,7 +47,7 @@ class Rule {
 
     std::vector<Variables::Variable *> *variables;
     int phase;
-    double rule_id;
+    long rule_id;
 
     Rule *chainedRule;
     bool chained;
