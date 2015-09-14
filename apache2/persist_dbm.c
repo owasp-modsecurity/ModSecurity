@@ -626,7 +626,7 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
      */
     rc = apr_sdbm_firstkey(dbm, &key);
     while(rc == APR_SUCCESS) {
-        char *s = apr_pstrmemdup(msr->mp, key.dptr, key.dsize - 1);
+        char *s = apr_pstrmemdup(msr->mp, key.dptr, strlen(key.dptr));
         *(char **)apr_array_push(keys_arr) = s;
         rc = apr_sdbm_nextkey(dbm, &key);
     }
