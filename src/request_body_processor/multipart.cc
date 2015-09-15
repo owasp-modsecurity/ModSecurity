@@ -192,7 +192,6 @@ bool Multipart::process(std::string data) {
       debug(4, "Multipart: Boundary was not the first thing.");
       this->containsDataBefore = true;
     }
-
     while (start != std::string::npos) {
         size_t end = data.find(m_boundary, start + m_boundary.length());
         if (end == std::string::npos) {
@@ -203,6 +202,10 @@ bool Multipart::process(std::string data) {
             + endl, end - (start + m_boundary.length() + endl) - endl);
 
         checkForCrlfLf(block);
+
+        if (this->crlf) {
+            block.erase(0, 1);
+        }
 
         blobs.push_back(block);
         lastValidBoundary = end;
@@ -223,21 +226,31 @@ bool Multipart::process(std::string data) {
 
     std::string filename("");
     std::string name("");
+    int i = 0;
     for (std::string x : blobs) {
+        i++;
+        debug(5, "Multipart: Inspecting blob: " + std::to_string(i));
         MultipartBlob m(x, this);
 
         if (m.name.empty() == false) {
             name = m.name;
+        } else {
+            name = "no-name-" + std::to_string(i);
         }
+
         if (m.filename.empty() == false) {
             filename = m.filename;
-            variables.emplace("FILES:" + m.name, m.filename);
-            variables.emplace("FILES_NAMES:" + m.name, m.name);
-            variables.emplace("FILES_SIZES:" + m.name,
-                std::to_string(m.content.size()));
-            variables.emplace("FILES_TMP_CONTENT:" + m.name, m.content);
-            files_size = files_size + m.content.size();
+        } else {
+            filename = "no-file-name-" + std::to_string(i);
         }
+
+        variables.emplace("FILES:" + name, filename);
+        variables.emplace("FILES_NAMES:" + name, name);
+        variables.emplace("FILES_SIZES:" + name,
+            std::to_string(m.content.size()));
+        debug(5, "Multipart: Saving FILES_TMP_CONTENT:" + name + " variable.");
+        variables.emplace("FILES_TMP_CONTENT:" + name, m.content);
+        files_size = files_size + m.content.size();
         if (m.invalidQuote) {
             debug(4, "Multipart: Found invalid quoting.");
             this->invalidQuote = true;

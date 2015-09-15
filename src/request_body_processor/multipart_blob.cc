@@ -41,7 +41,6 @@ bool MultipartBlob::processContent() {
         return false;
     }
     std::string firstLine = std::string(m_blob, offset, end);
-
     offset = end + 1;
     end = m_blob.find("\n", offset);
     if (end == std::string::npos) {
@@ -93,7 +92,8 @@ bool MultipartBlob::processContentDispositionLine(
     const std::string &dispositionLine) {
     size_t offset;
 
-    if (dispositionLine.compare(21, 9, "form-data") != 0) {
+    if (dispositionLine.size() < 30 ||
+        dispositionLine.compare(21, 9, "form-data") != 0) {
         debug(4, "Multipart: Content-Disposition is unknown");
         return false;
     }
