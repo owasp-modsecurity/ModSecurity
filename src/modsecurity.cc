@@ -17,7 +17,7 @@
 #include <iostream>
 
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/rule.h"
+#include "src/rule.h"
 #include "src/config.h"
 #include "src/unique_id.h"
 #ifdef MSC_WITH_CURL
