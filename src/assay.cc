@@ -664,6 +664,30 @@ int Assay::processRequestBody() {
  * @retval false Operation failed.
  *
  */
+int Assay::requestBodyFromFile(const char *path) {
+    std::ifstream request_body(path);
+    std::string str;
+
+    if (request_body.is_open() == false) {
+        debug(3, "Failed to open request body at: " + std::string(path));
+        return false;
+    }
+
+    request_body.seekg(0, std::ios::end);
+    str.reserve(request_body.tellg());
+    request_body.seekg(0, std::ios::beg);
+    str.assign((std::istreambuf_iterator<char>(request_body)),
+            std::istreambuf_iterator<char>());
+
+    const char *buf = str.c_str();
+    int len = request_body.tellg();
+
+    debug(9, "Adding request body: " + std::to_string(len) + " bytes. " \
+        "Limit set to: " + std::to_string(this->m_rules->requestBodyLimit));
+
+    return appendRequestBody(reinterpret_cast<const unsigned char*>(buf), len);
+}
+
 int Assay::appendRequestBody(const unsigned char *buf, size_t len) {
     int current_size = this->m_requestBody.tellp();
 
@@ -673,7 +697,7 @@ int Assay::appendRequestBody(const unsigned char *buf, size_t len) {
     if (this->m_rules->requestBodyLimit > 0
         && this->m_rules->requestBodyLimit < len + current_size) {
         store_variable("INBOUND_DATA_ERROR", "1");
-        debug(5, "Rquest body is bigger than the maximum expected.");
+        debug(5, "Request body is bigger than the maximum expected.");
         if (this->m_rules->requestBodyLimitAction ==
             Rules::BodyLimitAction::ProcessPartialBodyLimitAction) {
             size_t spaceLeft = this->m_rules->requestBodyLimit - current_size;
@@ -1024,6 +1048,8 @@ void Assay::cleanup() {
  */
 bool Assay::intervention(ModSecurityIntervention *it) {
     bool ret = false;
+    it->status = 200;
+    it->url = NULL;
     if (actions.size() > 0) {
         for (Action *a : actions) {
             if (a->action_kind == Action::Kind::RunTimeOnlyIfMatchKind) {
@@ -1609,6 +1635,12 @@ extern "C" int msc_process_request_body(Assay *assay) {
 extern "C" int msc_append_request_body(Assay *assay,
     const unsigned char *buf, size_t len) {
     return assay->appendRequestBody(buf, len);
+}
+
+
+extern "C" int msc_request_body_from_file(Assay *assay,
+    const char *path) {
+    return assay->requestBodyFromFile(path);
 }
 
 

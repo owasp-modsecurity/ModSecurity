@@ -203,6 +203,7 @@ class Assay {
 
     int processRequestBody();
     int appendRequestBody(const unsigned char *body, size_t size);
+    int requestBodyFromFile(const char *path);
 
     int processResponseHeaders();
     int addResponseHeader(const std::string& key, const std::string& value);
@@ -324,6 +325,9 @@ int msc_process_request_body(Assay *assay);
 /** @ingroup ModSecurity_C_API */
 int msc_append_request_body(Assay *assay,
     const unsigned char *body, size_t size);
+
+/** @ingroup ModSecurity_C_API */
+int msc_request_body_from_file(Assay *assay, const char *path);
 
 /** @ingroup ModSecurity_C_API */
 int msc_process_response_headers(Assay *assay);
