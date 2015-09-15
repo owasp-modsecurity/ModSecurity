@@ -29,6 +29,7 @@
 #include "modsecurity/modsecurity.h"
 #include "actions/transformations/none.h"
 #include "variables/variations/exclusion.h"
+#include "src/utils.h"
 
 using ModSecurity::Variables::Variations::Exclusion;
 
@@ -271,8 +272,8 @@ bool Rule::evaluate(Assay *assay) {
                 }
             }
 
-            assay->debug(9, "Target value: \"" + value + "\" (Variable: " + \
-                v.first + ")");
+            assay->debug(9, "Target value: \"" + limitTo(80, toHexIfNeeded(value)) + \
+                "\" (Variable: " + v.first + ")");
 
             ret = this->op->evaluate(assay, value);
 
