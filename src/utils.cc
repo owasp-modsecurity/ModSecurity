@@ -992,6 +992,35 @@ int urldecode_uni_nonstrict_inplace_ex(Assay *assay, unsigned char *input,
     return count;
 }
 
+std::string limitTo(int amount, const std::string &str) {
+    std::string ret;
+
+    if (str.length() > amount) {
+        ret.assign(str, 0, amount);
+        ret = ret + " (" + std::to_string(str.length() - amount) + " " \
+            "characters omitted)";
+        return ret;
+    }
+
+    return str;
+}
+
+std::string toHexIfNeeded(const std::string &str) {
+    std::stringstream res;
+    size_t pos;
+
+    for (int i = 0; i < str.size(); i++) {
+        int c = str.at(i);
+        if (c < 33 || c > 126) {
+            res << "\\x" << std::setw(2) << std::setfill('0') << std::hex << c;
+        } else {
+            res << str.at(i);
+        }
+    }
+
+    return res.str();
+}
+
 
 }  // namespace ModSecurity
 

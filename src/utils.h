@@ -45,6 +45,8 @@ namespace ModSecurity {
     int urldecode_uni_nonstrict_inplace_ex(Assay *assay, unsigned char *input,
         int64_t input_len, int *changed);
     std::string phase_name(int x);
+    std::string limitTo(int amount, const std::string &str);
+    std::string toHexIfNeeded(const std::string &str);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_
