@@ -196,11 +196,19 @@ bool Rule::evaluate(Assay *assay) {
         return evaluateActions(assay);
     }
 
+    std::string eparam = MacroExpansion::expand(this->op->param, assay);
+
+    if (this->op->param != eparam) {
+        eparam = "\"" + eparam + "\" Was: \"" + this->op->param + "\"";
+    } else {
+        eparam = "\"" + eparam + "\"";
+    }
+
     assay->debug(4, "(Rule: " + std::to_string(rule_id) \
         + ") Executing operator \"" + this->op->op \
-        + "\" with param: " \
-        + MacroExpansion::expandKeepOriginal(this->op->param, assay) \
-        + ", against " \
+        + "\" with param " \
+        + eparam \
+        + " against " \
         + Variable::to_s(variables) + ".");
 
     clock_t begin = clock();
