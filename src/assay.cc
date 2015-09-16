@@ -512,7 +512,7 @@ int Assay::processRequestBody() {
     if (m_requestBodyType == MultiPartRequestBody) {
         std::string *a = resolve_variable_first("REQUEST_HEADERS:Content-Type");
         if (a != NULL) {
-            Multipart m(*a);
+            Multipart m(*a, this);
 
             if (m.init() == true) {
                 m.process(m_requestBody.str());

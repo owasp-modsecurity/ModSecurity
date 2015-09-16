@@ -27,7 +27,7 @@ namespace RequestBodyProcessor {
 
 class Multipart {
  public:
-    explicit Multipart(std::string header);
+    Multipart(std::string header, Assay *assay);
     bool init();
 
     bool boundaryContainsOnlyValidCharacters();
@@ -46,12 +46,13 @@ class Multipart {
     bool missingSemicolon;
     bool invalidQuote;
 
- private:
     void debug(int a, std::string str) {
-        std::cout << "Debug: " << str << std::endl;
+        m_assay->debug(a, str);
     }
+ private:
     std::string m_boundary;
     std::string m_header;
+    Assay *m_assay;
 };
 
 }  // namespace RequestBodyProcessor

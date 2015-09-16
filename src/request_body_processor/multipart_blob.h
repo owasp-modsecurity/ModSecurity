@@ -32,15 +32,14 @@ class MultipartBlob {
     bool processContentDispositionLine(const std::string &dispositionLine);
     bool processContentTypeLine(const std::string &contentTypeLine);
 
-    void debug(int a, std::string str) {
-        std::cout << "Debug: " << str << std::endl;
-    }
-
     bool invalidQuote;
     std::string name;
     std::string filename;
     std::string contentType;
     std::string content;
+    void debug(int a, std::string str) {
+        m_parent->debug(a, str);
+    }
  private:
     const std::string m_blob;
     Multipart *m_parent;

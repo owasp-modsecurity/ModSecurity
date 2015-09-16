@@ -24,7 +24,7 @@
 namespace ModSecurity {
 namespace RequestBodyProcessor {
 
-Multipart::Multipart(std:: string header)
+Multipart::Multipart(std:: string header, Assay *assay)
     : crlf(false),
     containsDataAfter(false),
     containsDataBefore(false),
@@ -33,6 +33,7 @@ Multipart::Multipart(std:: string header)
     invalidQuote(false),
     boundaryStartsWithWhiteSpace(false),
     boundaryIsQuoted(false),
+    m_assay(assay),
     m_header(header) {
 }
 
