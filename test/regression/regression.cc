@@ -200,7 +200,10 @@ end:
         if (d != NULL) {
             if (!d->contains(t->debug_log)) {
                 std::cout << KRED << "failed!" << RESET << std::endl;
-                testRes->reason << "Debug log was not matching the expected results.";
+                testRes->reason << "Debug log was not matching the " \
+                    << "expected results." << std::endl;
+                testRes->reason << KWHT << "Expecting: " << RESET \
+                    << t->debug_log + ".";
                 testRes->passed = false;
             } else if (r.status != t->http_code) {
                 std::cout << KRED << "failed!" << RESET << std::endl;
