@@ -30,6 +30,7 @@
 #include "actions/transformations/none.h"
 #include "variables/variations/exclusion.h"
 #include "src/utils.h"
+#include "src/macro_expansion.h"
 
 using ModSecurity::Variables::Variations::Exclusion;
 
@@ -195,8 +196,11 @@ bool Rule::evaluate(Assay *assay) {
         return evaluateActions(assay);
     }
 
-    assay->debug(4, "Executing operator \"" + this->op->op \
-        + "\" with param \"" + this->op->param +  "\" against " \
+    assay->debug(4, "(Rule: " + std::to_string(rule_id) \
+        + ") Executing operator \"" + this->op->op \
+        + "\" with param: " \
+        + MacroExpansion::expandKeepOriginal(this->op->param, assay) \
+        + ", against " \
         + Variable::to_s(variables) + ".");
 
     clock_t begin = clock();
