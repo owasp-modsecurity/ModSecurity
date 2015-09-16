@@ -16,6 +16,7 @@
 #include <yajl/yajl_tree.h>
 
 #include <iostream>
+#include <sstream>
 #include <unordered_map>
 #include <vector>
 #include <string>
@@ -24,6 +25,7 @@
 #define TEST_REGRESSION_REGRESSION_TEST_H_
 
 namespace modsecurity_test {
+
 
 class RegressionTest {
  public:
@@ -70,6 +72,15 @@ class RegressionTest {
     int http_code;
     std::string redirect_url;
 };
+
+
+class RegressionTestResult {
+ public:
+    bool passed;
+    RegressionTest *test;
+    std::stringstream reason;
+};
+
 
 }  // namespace modsecurity_test
 

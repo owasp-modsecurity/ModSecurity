@@ -24,6 +24,7 @@
 #include "modsecurity/rules.h"
 
 #include "common/modsecurity_test.h"
+#include "common/colors.h"
 #include "regression/regression_test.h"
 #include "common/modsecurity_test_results.h"
 #include "regression/custom_debug_log.h"
@@ -33,6 +34,7 @@ using modsecurity_test::CustomDebugLog;
 using modsecurity_test::ModSecurityTest;
 using modsecurity_test::ModSecurityTestResults;
 using modsecurity_test::RegressionTest;
+using modsecurity_test::RegressionTestResult;
 
 using ModSecurity::Utils::regex_search;
 using ModSecurity::Utils::SMatch;
@@ -67,7 +69,7 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
 
 
 void perform_unit_test(std::vector<RegressionTest *> *tests,
-    ModSecurityTestResults<RegressionTest> *res, int *count) {
+    ModSecurityTestResults<RegressionTestResult> *res, int *count) {
 
 
     for (RegressionTest *t : *tests) {
@@ -75,7 +77,9 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         ModSecurity::ModSecurity *modsec = NULL;
         ModSecurity::Rules *modsec_rules = NULL;
         ModSecurity::Assay *modsec_assay = NULL;
-        ModSecurityTestResults<RegressionTest> r;
+        ModSecurityTestResults<RegressionTest> r; 
+        RegressionTestResult *testRes = new RegressionTestResult();
+        testRes->test = t;
         r.status = 200;
         (*count)++;
 
@@ -195,26 +199,31 @@ end:
 
         if (d != NULL) {
             if (!d->contains(t->debug_log)) {
-                std::cout << "failed!" << std::endl;
-                std::cout << "Debug log was not matching the expected results.";
-                std::cout << std::endl;
+                std::cout << KRED << "failed!" << RESET << std::endl;
+                testRes->reason << "Debug log was not matching the expected results.";
+                testRes->passed = false;
             } else if (r.status != t->http_code) {
-                std::cout << "failed!" << std::endl;
-                std::cout << "HTTP code mismatch. expecting: " + \
+                std::cout << KRED << "failed!" << RESET << std::endl;
+                testRes->reason << "HTTP code mismatch. expecting: " + \
                     std::to_string(t->http_code) + \
                     " got: " + std::to_string(r.status) + "\n";
+                testRes->passed = false;
             } else {
-                std::cout << "passed!" << std::endl;
+                std::cout << KGRN << "passed!" << RESET << std::endl;
+                testRes->passed = true;
                 goto after_debug_log;
             }
 
-            std::cout << "Debug log:" << std::endl;
-            std::cout << "" << d->log_messages() << "" <<std::endl;
+            if (testRes->passed == false) {
+                testRes->reason << std::endl;
+                testRes->reason << KWHT << "Debug log:" << RESET << std::endl;
+                testRes->reason << d->log_messages() << std::endl;
+            }
         }
 
 after_debug_log:
         if (d != NULL) {
-            res->log_raw_debug_log = d->log_messages();
+            r.log_raw_debug_log = d->log_messages();
         }
 
         delete modsec_assay;
@@ -222,7 +231,7 @@ after_debug_log:
         delete modsec;
         /* delete debug_log; */
 
-        res->insert(res->end(), r.begin(), r.end());
+        res->push_back(testRes);
     }
 }
 
@@ -235,9 +244,6 @@ int main(int argc, char **argv) {
     std::cout << test.header();
 
     test.load_tests();
-
-    std::ofstream test_log;
-    test_log.open("regression_test_log.txt");
 
     std::cout << std::setw(4) << std::right << "# ";
     std::cout << std::setw(50) << std::left << "File Name";
@@ -257,15 +263,36 @@ int main(int argc, char **argv) {
     }
     keyList.sort();
 
+    ModSecurityTestResults<RegressionTestResult> res;
     for (std::string &a : keyList) {
         std::vector<RegressionTest *> *tests = test[a];
-        ModSecurityTestResults<RegressionTest> res;
-
         perform_unit_test(tests, &res, &counter);
-
-        test_log << res.log_raw_debug_log;
     }
-    test_log.close();
+
+    std::cout << std::endl;
+
+    int passed = 0;
+    int failed = 0;
+    for (RegressionTestResult *r : res) {
+        if (r->passed) { 
+            passed++;
+        } else {
+            std::cout << KRED << "Test failed." << RESET << KWHT << " From: " \
+               << RESET << r->test->filename << "." << std::endl;
+            std::cout << KWHT << "Test name: " << RESET << r->test->name << "." << std::endl;
+            std::cout << KWHT << "Reason: " << RESET << std::endl;
+            std::cout << r->reason.str() << std::endl;
+            failed++;
+        }
+    }
+
+    std::cout << "Ran a total of: " << std::to_string(failed + passed) \
+        << " regression tests - ";
+    if (failed == 0) {
+        std::cout << KGRN << "All tests passed" << RESET << std::endl;
+    } else {
+        std::cout << KRED << failed << " failed." << RESET << std::endl;
+    }
 
     for (std::pair<std::string, std::vector<RegressionTest *> *> a : test) {
         std::vector<RegressionTest *> *vec = a.second;

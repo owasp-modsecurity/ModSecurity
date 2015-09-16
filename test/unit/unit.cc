@@ -39,18 +39,7 @@ using ModSecurity::operators::Operator;
 std::string default_test_path = "test-cases/secrules-language-tests/operators";
 
 void print_help() {
-#ifdef HAS_GETOPT
-    std::cout << "Use ./unit  [--no-color]  -t /path/to/test/files ";
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << "  -h\t\tThis help message" << std::endl;
-    std::cout << "  -v\t\tVerbose" << std::endl;
-    std::cout << "  -c\t\tNo color" << std::endl;
-    std::cout << "  -t\t\tPath to test cases" << std::endl;
-#else
     std::cout << "Use ./unit /path/to/file" << std::endl;
-#endif
     std::cout << std::endl;
     std::cout << std::endl;
 }
