@@ -51,7 +51,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"-------------------------756b6d74fa1a8ee2--\" \\(Variable: REQUEST_BODY\\)"
+      "debug_log":"--------------------------756b6d74fa1a8ee2\\x0aContent-Disposition: form-data; na \(469 characters omitted\)\" \(Variable: REQUEST_BODY\)"
     },
     "rules":[  
       "SecRuleEngine On",
