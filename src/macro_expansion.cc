@@ -20,13 +20,26 @@ namespace ModSecurity {
 
 MacroExpansion::MacroExpansion() { }
 
+
+std::string MacroExpansion::expandKeepOriginal(const std::string& input,
+    Assay *assay) {
+    std::string a = MacroExpansion::expand(input, assay);
+
+    if (a != input) {
+        return "\"" + a + "\" (Was: " + input + ")";
+    }
+
+    return input;
+}
+
+
 std::string MacroExpansion::expand(const std::string& input, Assay *assay) {
     std::string res(input);
 
     size_t pos = res.find("%{");
     while (pos != std::string::npos) {
         size_t start = pos;
-        size_t end = res.find("}%");
+        size_t end = res.find("}");
         if (end == std::string::npos) {
             return res;
         }
