@@ -18,12 +18,15 @@
 #include <string>
 
 #include "operators/operator.h"
+#include "src/macro_expansion.h"
 
 namespace ModSecurity {
 namespace operators {
 
 bool Le::evaluate(Assay *assay, const std::string &input) {
-    bool le = atoll(input.c_str()) <= atoll(param.c_str());
+    std::string p = MacroExpansion::expand(param, assay);
+
+    bool le = atoll(input.c_str()) <= atoll(p.c_str());
 
     if (negation) {
         return !le;

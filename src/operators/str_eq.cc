@@ -16,12 +16,14 @@
 #include "operators/str_eq.h"
 
 #include <string>
+#include "src/macro_expansion.h"
 
 namespace ModSecurity {
 namespace operators {
 
 bool StrEq::evaluate(Assay *assay, const std::string &str) {
-    bool eq = !this->param.compare(str);
+    std::string p = MacroExpansion::expand(param, assay);
+    bool eq = !p.compare(str);
 
     if (negation) {
         return !eq;

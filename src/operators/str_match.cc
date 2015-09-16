@@ -18,13 +18,15 @@
 #include <string>
 
 #include "operators/operator.h"
+#include "src/macro_expansion.h"
 
 namespace ModSecurity {
 namespace operators {
 
 
 bool StrMatch::evaluate(Assay *assay, const std::string &input) {
-    bool ret = input.find(param) != std::string::npos;
+    std::string p = MacroExpansion::expand(param, assay);
+    bool ret = input.find(p) != std::string::npos;
 
     if (negation) {
         return !ret;

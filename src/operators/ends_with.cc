@@ -18,6 +18,7 @@
 #include <string>
 
 #include "operators/operator.h"
+#include "src/macro_expansion.h"
 
 namespace ModSecurity {
 namespace operators {
@@ -25,9 +26,11 @@ namespace operators {
 
 bool EndsWith::evaluate(Assay *assay, const std::string &input) {
     bool ret = false;
-    if (input.length() >= param.length()) {
-        ret = (0 == input.compare(input.length() - param.length(),
-            param.length(), param));
+    std::string p = MacroExpansion::expand(param, assay);
+
+    if (input.length() >= p.length()) {
+        ret = (0 == input.compare(input.length() - p.length(),
+            p.length(), p));
     }
 
     if (negation) {

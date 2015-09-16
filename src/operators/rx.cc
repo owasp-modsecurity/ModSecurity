@@ -19,6 +19,7 @@
 #include <list>
 
 #include "operators/operator.h"
+#include "src/macro_expansion.h"
 
 namespace ModSecurity {
 namespace operators {
@@ -28,8 +29,8 @@ namespace operators {
 bool Rx::evaluate(Assay *assay, const std::string& input) {
     SMatch match;
 
-    std::string i = input;
-    if (regex_search(i, &match, m_re) && match.size() >= 1) {
+    Regex re(MacroExpansion::expand(param, assay));
+    if (regex_search(input, &match, re) && match.size() >= 1) {
         this->matched.push_back(match.match);
         return true;
     }

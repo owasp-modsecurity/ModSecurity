@@ -357,7 +357,7 @@ expression:
     | DIRECTIVE SPACE variables SPACE FREE_TEXT SPACE QUOTATION_MARK actions SPACE QUOTATION_MARK
     | DIRECTIVE SPACE variables SPACE FREE_TEXT SPACE QUOTATION_MARK actions QUOTATION_MARK
       {
-        Operator *op = Operator::instantiate("@rx " + $5);
+        Operator *op = Operator::instantiate("\"@rx " + $5 + "\"");
         const char *error = NULL;
         if (op->init(&error) == false) {
             driver.parserError << error;

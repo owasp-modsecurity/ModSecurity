@@ -17,14 +17,17 @@
 
 #include <string>
 
+#include "src/macro_expansion.h"
+
 namespace ModSecurity {
 namespace operators {
 
 bool Contains::evaluate(Assay *assay, const std::string &input) {
-    bool contains = input.find(param) != std::string::npos;
+    std::string p = MacroExpansion::expand(param, assay);
+    bool contains = input.find(p) != std::string::npos;
 
     if (contains) {
-        matched.push_back(param);
+        matched.push_back(p);
     }
 
     if (negation) {
