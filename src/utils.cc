@@ -1011,7 +1011,7 @@ std::string toHexIfNeeded(const std::string &str) {
 
     for (int i = 0; i < str.size(); i++) {
         int c = str.at(i);
-        if (c < 33 || c > 126) {
+        if (c < 32 || c > 126) {
             res << "\\x" << std::setw(2) << std::setfill('0') << std::hex << c;
         } else {
             res << str.at(i);
