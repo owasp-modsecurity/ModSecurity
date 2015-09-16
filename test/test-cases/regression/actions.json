@@ -3,7 +3,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "actions :: trim,block",
+    "title": "actions :: trim,deny",
     "client": {
       "ip": "200.249.12.31",
       "port": 2313
@@ -57,7 +57,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS \"@contains test\" \"id:1,t:trim,block\""
+      "SecRule ARGS \"@contains test\" \"id:1,t:trim,deny\""
     ]
   },
     {

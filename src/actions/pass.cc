@@ -13,35 +13,32 @@
  *
  */
 
+#include "actions/pass.h"
+
+#include <iostream>
 #include <string>
 
-#include "actions/action.h"
-
-#ifndef SRC_ACTIONS_REDIRECT_H_
-#define SRC_ACTIONS_REDIRECT_H_
-
-#ifdef __cplusplus
-class Assay;
+#include "modsecurity/assay.h"
+#include "src/rule.h"
 
 namespace ModSecurity {
-class Assay;
-
 namespace actions {
 
-class Redirect : public Action {
- public:
-    explicit Redirect(const std::string &action);
-    ~Redirect() override;
+Pass::Pass(std::string action)
+    : Action(action) {
+    this->action = action;
+    this->action_kind = 2;
+}
 
-    bool evaluate(Rule *rule, Assay *assay) override;
-    int status;
-    std::string url;
-    void fill_intervention(ModSecurityIntervention *i) override;
-    bool isDisruptive() override { return true; }
-};
+
+bool Pass::evaluate(Rule *rule, Assay *assay) {
+    assay->actions.clear();
+    return true;
+}
+
+void Pass::fill_intervention(ModSecurityIntervention *i) {
+
+}
 
 }  // namespace actions
 }  // namespace ModSecurity
-#endif
-
-#endif  // SRC_ACTIONS_REDIRECT_H_

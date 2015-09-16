@@ -297,8 +297,19 @@ bool Rule::evaluate(Assay *assay) {
                 std::to_string(elapsed_secs) + " seconds");
 
             if (ret) {
+                bool containsDisruptive = false;
                 bool chainResult = false;
                 assay->debug(4, "Rule returned 1.");
+
+                for (Action *a :
+                    this->actions_runtime_pos) {
+                    if (a->isDisruptive() == false) {
+                        assay->debug(4, "Running (_non_ disruptive) action: " + a->action);
+                        a->evaluate(this, assay);
+                    } else {
+                        containsDisruptive = true;
+                    }
+                }
 
                 if (this->chained && this->chainedRule == NULL) {
                     assay->debug(4, "Rule is marked as chained but there " \
@@ -326,14 +337,31 @@ bool Rule::evaluate(Assay *assay) {
                 if (this->chained && chainResult == true || !this->chained) {
                     for (Action *a : assay->m_rules->defaultActions[this->phase]) {
                         if (a->action_kind == actions::Action::RunTimeOnlyIfMatchKind) {
-                            assay->debug(4, "(SecDefaultAction) Running action: " + a->action);
-                            a->evaluate(this, assay);
+                            if (a->isDisruptive()) {
+                                if (containsDisruptive) {
+                                    assay->debug(4, "(SecDefaultAction) " \
+                                        "_ignoring_ action: " + a->action + \
+                                        " (rule contains a disruptive action)");
+                                } else {
+                                    assay->debug(4, "(SecDefaultAction) " \
+                                        "Running action: " + a->action + \
+                                        " (rule _does not_ contains a " \
+                                        "disruptive action)");
+                                    a->evaluate(this, assay);
+                                }
+                            } else {
+                                assay->debug(4, "(SecDefaultAction) Running " \
+                                    "action: " + a->action);
+                                a->evaluate(this, assay);
+                            }
                         }
                     }
                     for (Action *a :
                         this->actions_runtime_pos) {
-                        assay->debug(4, "Running action: " + a->action);
-                        a->evaluate(this, assay);
+                        if (a->isDisruptive()) {
+                            assay->debug(4, "Running (disruptive) action: " + a->action);
+                            a->evaluate(this, assay);
+                        }
                     }
                 }
 

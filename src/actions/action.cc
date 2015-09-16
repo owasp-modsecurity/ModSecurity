@@ -23,12 +23,14 @@
 
 #include "actions/block.h"
 #include "actions/chain.h"
+#include "actions/deny.h"
 #include "actions/redirect.h"
 #include "actions/status.h"
 #include "actions/rule_id.h"
 #include "actions/phase.h"
 #include "actions/severity.h"
 #include "actions/capture.h"
+#include "actions/pass.h"
 
 
 
@@ -81,6 +83,12 @@ Action *Action::instantiate(const std::string& name) {
     }
     if (name == "capture") {
         return new Capture(name);
+    }
+    if (name == "pass") {
+        return new Pass(name);
+    }
+    if (name == "deny") {
+        return new Deny(name);
     }
     return new Action(name);
 }

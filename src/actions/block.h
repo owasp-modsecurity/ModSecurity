@@ -35,6 +35,7 @@ class Block : public Action {
 
     bool evaluate(Rule *rule, Assay *assay) override;
     void fill_intervention(ModSecurityIntervention *i) override;
+    bool isDisruptive() override { return true; }
 };
 
 }  // namespace actions

@@ -49,7 +49,7 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecComponentSignature \"OWASP_CRS/2.2.9\"",
-      "SecRule ARGS \"@contains test\" \"id:1,t:trim,block,auditlog\""
+      "SecRule ARGS \"@contains test\" \"id:1,t:trim,deny,status:403,auditlog\""
     ]
   }
 ]

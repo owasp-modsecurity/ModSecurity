@@ -32,7 +32,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/intervention.h"
 #include "actions/action.h"
-#include "actions/block.h"
+#include "actions/deny.h"
 #include "src/utils.h"
 #include "src/audit_log.h"
 #include "src/unique_id.h"
@@ -710,7 +710,7 @@ int Assay::appendRequestBody(const unsigned char *buf, size_t len) {
                 Rules::BodyLimitAction::RejectBodyLimitAction) {
                 debug(5, "Request body limit is marked to reject the " \
                     "request");
-                Action *a = new actions::Block("block");
+                Action *a = new actions::Deny("deny");
                 a->temporaryAction = true;
                 actions.push_back(a);
             }
@@ -906,7 +906,7 @@ int Assay::appendResponseBody(const unsigned char *buf, size_t len) {
                 Rules::BodyLimitAction::RejectBodyLimitAction) {
                 debug(5, "Response body limit is marked to reject the " \
                     "request");
-                Action *a = new actions::Block("block");
+                Action *a = new actions::Deny("deny");
                 a->temporaryAction = true;
                 actions.push_back(a);
             }

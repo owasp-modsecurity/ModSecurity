@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modsecurity/assay.h"
+#include "src/rule.h"
 
 namespace ModSecurity {
 namespace actions {
@@ -31,13 +32,16 @@ Block::Block(std::string action)
 
 
 bool Block::evaluate(Rule *rule, Assay *assay) {
-    assay->actions.push_back(this);
+    for (Action *a : rule->actions_runtime_pos) {
+        if (a->isDisruptive() == true) {
+            assay->actions.push_back(a);
+        }
+    }
     return true;
 }
 
 void Block::fill_intervention(ModSecurityIntervention *i) {
-    i->status = 403;
-    i->log = "Blocked request!";
+
 }
 
 }  // namespace actions

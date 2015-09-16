@@ -57,9 +57,11 @@ ACTIONS = \
 	actions/capture.cc \
 	actions/chain.cc \
 	actions/ctl_audit_log_parts.cc \
+	actions/deny.cc \
 	actions/log_data.cc \
 	actions/msg.cc \
 	actions/no_audit_log.cc \
+	actions/pass.cc \
 	actions/phase.cc \
 	actions/redirect.cc \
 	actions/rev.cc \

@@ -13,35 +13,32 @@
  *
  */
 
+#include "actions/deny.h"
+
+#include <iostream>
 #include <string>
 
-#include "actions/action.h"
-
-#ifndef SRC_ACTIONS_REDIRECT_H_
-#define SRC_ACTIONS_REDIRECT_H_
-
-#ifdef __cplusplus
-class Assay;
+#include "modsecurity/assay.h"
 
 namespace ModSecurity {
-class Assay;
-
 namespace actions {
 
-class Redirect : public Action {
- public:
-    explicit Redirect(const std::string &action);
-    ~Redirect() override;
+Deny::Deny(std::string action)
+    : Action(action) {
+    this->action = action;
+    this->action_kind = 2;
+}
 
-    bool evaluate(Rule *rule, Assay *assay) override;
-    int status;
-    std::string url;
-    void fill_intervention(ModSecurityIntervention *i) override;
-    bool isDisruptive() override { return true; }
-};
+
+bool Deny::evaluate(Rule *rule, Assay *assay) {
+    assay->actions.push_back(this);
+    return true;
+}
+
+void Deny::fill_intervention(ModSecurityIntervention *i) {
+    i->status = 403;
+    i->log = "Deny action";
+}
 
 }  // namespace actions
 }  // namespace ModSecurity
-#endif
-
-#endif  // SRC_ACTIONS_REDIRECT_H_
