@@ -36,13 +36,17 @@ class Rx : public Operator {
     /** @ingroup ModSecurity_Operator */
     Rx(std::string op, std::string param, bool negation)
         : Operator(op, param, negation),
-        m_param(param) { }
+        m_param(param) {
+            Regex r(param);
+            m_re = &r;
+        }
 
     bool evaluate(Assay *assay, const std::string &input);
 
     std::list<std::string> matched;
  private:
     std::string m_param;
+    Regex *m_re;
 };
 
 

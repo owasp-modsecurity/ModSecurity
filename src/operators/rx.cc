@@ -29,8 +29,7 @@ namespace operators {
 bool Rx::evaluate(Assay *assay, const std::string& input) {
     SMatch match;
 
-    Regex re(MacroExpansion::expand(param, assay));
-    if (regex_search(input, &match, re) && match.size() >= 1) {
+    if (regex_search(input, &match, *m_re) && match.size() >= 1) {
         this->matched.push_back(match.match);
         return true;
     }

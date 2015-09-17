@@ -15,7 +15,7 @@
 
 #include "utils/regex.h"
 
-#include <pcrecpp.h>
+#include <pcre.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -33,28 +33,28 @@ namespace Utils {
 
 Regex::Regex(const std::string& pattern_)
     : pattern(pattern_) {
+    const char *errptr = NULL;
+    int erroffset;
+
     if (pattern.empty() == true) {
         pattern.assign(".*");
     }
+
+    m_pc = pcre_compile(pattern.c_str(), PCRE_DOTALL|PCRE_MULTILINE, &errptr, &erroffset, NULL);
+    m_pce = pcre_study(m_pc, PCRE_STUDY_JIT_COMPILE, &errptr);
 }
 
 int regex_search(const std::string& s, SMatch *match,
     const Regex& regex) {
-    std::string m;
-    pcrecpp::RE re(regex.pattern,
-        pcrecpp::RE_Options(PCRE_DOTALL|PCRE_MULTILINE));
-
-    /** FIXME: Should be not necessary to call PartialMatch twice here. */
-    match->size_ = re.PartialMatch(s);
-    re.PartialMatch(s, &m);
-    match->match = m;
-
-    return match->size_;
+    int *ovector = 0;
+    int ovecsize = 0;
+    return pcre_exec(regex.m_pc, regex.m_pce, s.c_str(), s.size(), 0, 0, ovector, ovecsize) > 0;
 }
 
-int regex_search(const std::string& s, Regex regex) {
-    pcrecpp::RE re(regex.pattern);
-    return re.PartialMatch(s);
+int regex_search(const std::string& s, const Regex& regex) {
+    int *ovector = 0;
+    int ovecsize = 0;
+    return pcre_exec(regex.m_pc, regex.m_pce, s.c_str(), s.size(), 0, 0, ovector, ovecsize) > 0;
 }
 
 }  // namespace Utils

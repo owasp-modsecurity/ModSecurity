@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <pcre.h>
 
 #ifndef SRC_UTILS_REGEX_H_
 #define SRC_UTILS_REGEX_H_
@@ -29,6 +30,9 @@ class Regex {
  public:
     explicit Regex(const std::string& pattern_);
     std::string pattern;
+    pcre *m_pc = NULL;
+    pcre_extra *m_pce = NULL;
+
 };
 
 
@@ -44,7 +48,7 @@ class SMatch {
 int regex_search(const std::string& s, SMatch *m,
     const Regex& regex);
 
-int regex_search(const std::string& s, Regex r);
+int regex_search(const std::string& s, const Regex& r);
 
 
 
