@@ -33,6 +33,11 @@ SetVar::SetVar(std::string action)
 bool SetVar::init(std::string *error) {
     size_t pos;
 
+    if (action.at(0) == '\'' && action.size() > 3) {
+        action.erase(0, 1);
+        action.pop_back();
+    }
+
     // Resolv operation
     operation = setToOne;
     pos = action.find("=");
@@ -135,6 +140,8 @@ bool SetVar::evaluate(Rule *rule, Assay *assay) {
             break;
     }
 
+    assay->debug(8, "Saving variable: " + collectionName + ":" + \
+        variableName + " with value: " + targetValue);
     assay->setCollection(collectionName, variableName, targetValue);
 
     return true;
