@@ -20,6 +20,7 @@
 
 #include "modsecurity/assay.h"
 #include "src/rule.h"
+#include "modsecurity/intervention.h"
 
 namespace ModSecurity {
 namespace actions {
@@ -32,6 +33,7 @@ Block::Block(std::string action)
 
 
 bool Block::evaluate(Rule *rule, Assay *assay) {
+    assay->debug(8, "Running action block");
     for (Action *a : rule->actions_runtime_pos) {
         if (a->isDisruptive() == true) {
             assay->actions.push_back(a);
@@ -41,7 +43,7 @@ bool Block::evaluate(Rule *rule, Assay *assay) {
 }
 
 void Block::fill_intervention(ModSecurityIntervention *i) {
-
+    i->disruptive = true;
 }
 
 }  // namespace actions

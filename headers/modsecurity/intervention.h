@@ -25,6 +25,7 @@ typedef struct ModSecurityIntervention_t {
     int pause;
     const char *url;
     const char *log;
+    int disruptive;
 } ModSecurityIntervention;
 
 #ifdef __cplusplus

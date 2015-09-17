@@ -31,13 +31,17 @@ Deny::Deny(std::string action)
 
 
 bool Deny::evaluate(Rule *rule, Assay *assay) {
+    assay->debug(8, "Running action deny");
     assay->actions.push_back(this);
     return true;
 }
 
 void Deny::fill_intervention(ModSecurityIntervention *i) {
-    i->status = 403;
+    if (i->status == 200) {
+        i->status = 403;
+    }
     i->log = "Deny action";
+    i->disruptive = true;
 }
 
 }  // namespace actions

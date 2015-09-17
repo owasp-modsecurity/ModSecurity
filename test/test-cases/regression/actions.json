@@ -242,14 +242,14 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS \"@contains test\" \"id:1,t:trim,status:500\""
+      "SecRule ARGS \"@contains test\" \"id:1,t:trim,deny,status:500\""
     ]
   },
          {
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "actions :: phase:1,trim,status:500",
+    "title": "actions :: phase:1,trim,status:500,deny",
     "client": {
       "ip": "200.249.12.31",
       "port": 2313
@@ -303,14 +303,14 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS \"@contains test\" \"id:1,phase:1,t:trim,status:500\""
+      "SecRule ARGS \"@contains test\" \"id:1,phase:1,t:trim,status:500,deny\""
     ]
   },
   {
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "actions :: phase:4,trim,status:500",
+    "title": "actions :: phase:4,trim,status:500,deny",
     "client": {
       "ip": "200.249.12.31",
       "port": 2313
@@ -364,7 +364,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS \"@contains test\" \"id:1,phase:4,t:trim,status:500\""
+      "SecRule ARGS \"@contains test\" \"id:1,phase:4,t:trim,status:500,deny\""
     ]
   }
 ]

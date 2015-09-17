@@ -30,6 +30,7 @@
 #include "actions/transformations/none.h"
 #include "variables/variations/exclusion.h"
 #include "src/utils.h"
+#include "modsecurity/rules.h"
 #include "src/macro_expansion.h"
 
 using ModSecurity::Variables::Variations::Exclusion;
@@ -128,6 +129,7 @@ Rule::Rule(Operator *_op,
 
 bool Rule::evaluateActions(Assay *assay) {
     int none = 0;
+    bool containsDisruptive = false;
     int transformations = 0;
     for (Action *a : this->actions_runtime_pre) {
         None *z = dynamic_cast<None *>(a);
@@ -168,17 +170,54 @@ bool Rule::evaluateActions(Assay *assay) {
         }
     }
 
-    for (Action *a : assay->m_rules->defaultActions[this->phase]) {
-        if (a->action_kind == actions::Action::RunTimeOnlyIfMatchKind) {
-            assay->debug(4, "(SecDefaultAction) Running action: " + a->action);
+    for (Action *a : this->actions_runtime_pos) {
+        if (a->isDisruptive() == false) {
+            assay->debug(4, "Running (_non_ disruptive) action: " + a->action);
             a->evaluate(this, assay);
+        } else {
+            containsDisruptive = true;
         }
     }
 
-    for (Action *a :
-        this->actions_runtime_pos) {
-        assay->debug(4, "Running action: " + a->action);
-        a->evaluate(this, assay);
+    for (Action *a : assay->m_rules->defaultActions[this->phase]) {
+        if (a->action_kind == actions::Action::RunTimeOnlyIfMatchKind) {
+            if (a->isDisruptive()) {
+                if (containsDisruptive) {
+                    assay->debug(4, "(SecDefaultAction) " \
+                        "_ignoring_ action: " + a->action + \
+                        " (rule contains a disruptive action)");
+                } else {
+                    if (assay->m_rules->secRuleEngine
+                        == Rules::EnabledRuleEngine) {
+                        assay->debug(4, "(SecDefaultAction) " \
+                            "Running action: " + a->action + \
+                            " (rule _does not_ contains a " \
+                            "disruptive action)");
+                            a->evaluate(this, assay);
+                    } else {
+                        assay->debug(4, "(SecDefaultAction) " \
+                            "_Not_ running action: " + a->action + \
+                            ". Rule _does not_ contains a " \
+                            "disruptive action, but SecRuleEngine is not On.");
+                    }
+                }
+            } else {
+                assay->debug(4, "(SecDefaultAction) Running action: " + \
+                    a->action);
+                    a->evaluate(this, assay);
+            }
+        }
+    }
+
+    for (Action *a : this->actions_runtime_pos) {
+        if (a->isDisruptive()
+            && assay->m_rules->secRuleEngine == Rules::EnabledRuleEngine) {
+            assay->debug(4, "Running (disruptive) action: " + a->action);
+            a->evaluate(this, assay);
+        } else if (a->isDisruptive()) {
+            assay->debug(4, "Not running disruptive action: " + \
+                a->action + ". SecRuleEngine is not On");
+        }
     }
 
     return true;
@@ -343,24 +382,39 @@ bool Rule::evaluate(Assay *assay) {
                                         "_ignoring_ action: " + a->action + \
                                         " (rule contains a disruptive action)");
                                 } else {
-                                    assay->debug(4, "(SecDefaultAction) " \
-                                        "Running action: " + a->action + \
-                                        " (rule _does not_ contains a " \
-                                        "disruptive action)");
-                                    a->evaluate(this, assay);
+                                    if (assay->m_rules->secRuleEngine
+                                        == Rules::EnabledRuleEngine) {
+                                        assay->debug(4, "(SecDefaultAction) " \
+                                            "Running action: " + a->action + \
+                                            " (rule _does not_ contains a " \
+                                            "disruptive action)");
+                                        a->evaluate(this, assay);
+                                    } else {
+                                        assay->debug(4, "(SecDefaultAction) " \
+                                            "_Not_ running action: " + a->action + \
+                                            ". Rule _does not_ contains a " \
+                                            "disruptive action, but SecRuleEngine is not On.");
+                                    }
                                 }
                             } else {
                                 assay->debug(4, "(SecDefaultAction) Running " \
-                                    "action: " + a->action);
+                                    "action: " + a->action + "!!" + std::to_string(a->isDisruptive()));
                                 a->evaluate(this, assay);
                             }
                         }
                     }
                     for (Action *a :
                         this->actions_runtime_pos) {
-                        if (a->isDisruptive()) {
-                            assay->debug(4, "Running (disruptive) action: " + a->action);
+                        if (a->isDisruptive()
+                            && assay->m_rules->secRuleEngine
+                                == Rules::EnabledRuleEngine) {
+                            assay->debug(4, "Running (disruptive) action: " + \
+                                a->action);
                             a->evaluate(this, assay);
+                        } else if (a->isDisruptive()) {
+                            assay->debug(4,
+                                "Not running disruptive action: " + \
+                                a->action + ". SecRuleEngine is not On");
                         }
                     }
                 }

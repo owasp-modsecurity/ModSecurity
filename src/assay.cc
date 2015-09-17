@@ -1048,7 +1048,6 @@ void Assay::cleanup() {
  *
  */
 bool Assay::intervention(ModSecurityIntervention *it) {
-    bool ret = false;
     it->status = 200;
     it->url = NULL;
     if (actions.size() > 0) {
@@ -1061,9 +1060,8 @@ bool Assay::intervention(ModSecurityIntervention *it) {
             }
         }
         actions.clear();
-        ret = true;
     }
-    return ret;
+    return it->disruptive;
 }
 
 
