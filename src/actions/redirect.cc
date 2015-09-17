@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modsecurity/assay.h"
+#include "src/macro_expansion.h"
 
 namespace ModSecurity {
 namespace actions {
@@ -28,13 +29,14 @@ Redirect::~Redirect() {
 
 Redirect::Redirect(const std::string& action)
     : Action(action, RunTimeOnlyIfMatchKind),
-    url(action) {
-    this->url = this->url.erase(0, 9);
-    this->status = 302;
+    m_url(action) {
+    m_url = m_url.erase(0, 9);
+    m_status = 302;
 }
 
 
 bool Redirect::evaluate(Rule *rule, Assay *assay) {
+    m_urlExpanded = MacroExpansion::expand(m_url, assay);
     assay->actions.push_back(this);
     return true;
 }
@@ -42,10 +44,10 @@ bool Redirect::evaluate(Rule *rule, Assay *assay) {
 void Redirect::fill_intervention(ModSecurityIntervention *i) {
     /* if it was changed before, lets keep it. */
     if (i->status == 200) {
-        i->status = this->status;
+        i->status = m_status;
     }
-    // reinterpret_cast<char *>
-    i->url = this->url.c_str();  //** TODO: wheee */
+
+    i->url = m_urlExpanded.c_str();
     i->log = "Redirecting";
 }
 

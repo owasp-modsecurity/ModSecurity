@@ -34,10 +34,12 @@ class Redirect : public Action {
     ~Redirect() override;
 
     bool evaluate(Rule *rule, Assay *assay) override;
-    int status;
-    std::string url;
     void fill_intervention(ModSecurityIntervention *i) override;
     bool isDisruptive() override { return true; }
+ private:
+    int m_status;
+    std::string m_urlExpanded;
+    std::string m_url;
 };
 
 }  // namespace actions
