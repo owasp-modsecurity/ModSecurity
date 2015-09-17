@@ -35,14 +35,18 @@ bool DetectSQLi::evaluate(Assay *assay, const std::string &input) {
     if (issqli) {
         // set_match_to_tx(msr, capture, fingerprint, 0);
         if (assay) {
+#ifndef NO_LOGS
             assay->debug(4, "detected SQLi using libinjection with " \
                 "fingerprint '" + std::string(fingerprint) + "' at: '" +
                 input + "'");
+#endif
         }
     } else {
         if (assay) {
+#ifndef NO_LOGS
             assay->debug(9, "detected SQLi: not able to find an inject on '" +
                 input + "'");
+#endif
         }
     }
 

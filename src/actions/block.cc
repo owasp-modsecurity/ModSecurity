@@ -33,7 +33,9 @@ Block::Block(std::string action)
 
 
 bool Block::evaluate(Rule *rule, Assay *assay) {
+#ifndef NO_LOGS
     assay->debug(8, "Running action block");
+#endif
     for (Action *a : rule->actions_runtime_pos) {
         if (a->isDisruptive() == true) {
             assay->actions.push_back(a);

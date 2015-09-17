@@ -66,7 +66,7 @@ char ip[] = "200.249.12.31";
 char rules_file[] = "basic_rules.conf";
 
 
-#define NUM_REQUESTS 1000
+#define NUM_REQUESTS 10000
 
 int main(int argc, char *argv[]) {
     int i = 0;
@@ -79,10 +79,14 @@ int main(int argc, char *argv[]) {
             " (ModSecurity benchmark utility)");
 
     rules = new ModSecurity::Rules();
-    rules->loadFromUri(rules_file);
+    if (rules->loadFromUri(rules_file) < 0) {
+        std::cout << "Problems loading the rules..." << std::endl;
+        std::cout << rules->parserError.str() << std::endl;
+        return -1;
+    }
 
     for (i = 0; i < NUM_REQUESTS; i++) {
-        std::cout << "Proceding with request " << i << std::endl;
+        std::cout << "Proceeding with request " << i << std::endl;
 
         Assay *modsecAssay = new Assay(modsec, rules, NULL);
         modsecAssay->processConnection(ip, 12345, "127.0.0.1", 80);

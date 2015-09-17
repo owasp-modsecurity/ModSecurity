@@ -41,8 +41,10 @@ std::string EscapeSeqDecode::evaluate(std::string value,
      * @todo Implement the transformation EscapeSeqDecode
      */
     if (assay) {
+#ifndef NO_LOGS
         assay->debug(4, "Transformation EscapeSeqDecode is " \
             "not implemented yet.");
+#endif
     }
     return value;
 }

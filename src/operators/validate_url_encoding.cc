@@ -77,29 +77,37 @@ bool ValidateUrlEncoding::evaluate(Assay *assay, const std::string &input) {
         case 1 :
             /* Encoding is valid */
             if (assay) {
+#ifndef NO_LOGS
                 assay->debug(7, "Valid URL Encoding at '" +input + "'");
+#endif
             }
             res = false;
             break;
         case -2 :
             if (assay) {
+#ifndef NO_LOGS
                 assay->debug(7, "Invalid URL Encoding: Non-hexadecimal "
                     "digits used at '" + input + "'");
+#endif
             }
             res = true; /* Invalid match. */
             break;
         case -3 :
             if (assay) {
+#ifndef NO_LOGS
                 assay->debug(7, "Invalid URL Encoding: Not enough characters "
                 "at the end of input at '" + input + "'");
+#endif
             }
             res = true; /* Invalid match. */
             break;
         case -1 :
         default :
             if (assay) {
+#ifndef NO_LOGS
                 assay->debug(7, "Invalid URL Encoding: Internal Error (rc = " +
                     std::to_string(rc) + ") at '" + input + "'");
+#endif
             }
             res = true;
             break;

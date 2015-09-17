@@ -79,9 +79,11 @@ bool VerifyCC::evaluate(Assay *assay, const std::string &i) {
             is_cc = luhnVerify(match.c_str(), match.size());
             if (is_cc) {
                 if (assay) {
+#ifndef NO_LOGS
                     assay->debug(9, "CC# match \"" + param +
                         "\" at " + i + ". [offset " +
                         std::to_string(offset) + "]");
+#endif
                 }
                 return true;
             }

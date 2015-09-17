@@ -37,14 +37,18 @@ bool MultipartBlob::processContent() {
 
     end = m_blob.find("\n", offset);
     if (end == std::string::npos) {
+#ifndef NO_LOGS
         debug(4, "Missing end of line");
+#endif
         return false;
     }
     std::string firstLine = std::string(m_blob, offset, end);
     offset = end + 1;
     end = m_blob.find("\n", offset);
     if (end == std::string::npos) {
+#ifndef NO_LOGS
         debug(4, "Missing end of line");
+#endif
         return false;
     }
     std::string secondLine = std::string(m_blob, offset, end - offset);
@@ -63,7 +67,9 @@ bool MultipartBlob::processContent() {
     if (contentType.empty() == false) {
         end = m_blob.find_first_of("\n", offset);
         if (end == std::string::npos) {
+#ifndef NO_LOGS
             debug(4, "Missing end of line");
+#endif
             return false;
         }
         offset = end + 1;
@@ -94,7 +100,9 @@ bool MultipartBlob::processContentDispositionLine(
 
     if (dispositionLine.size() < 30 ||
         dispositionLine.compare(21, 9, "form-data") != 0) {
+#ifndef NO_LOGS
         debug(4, "Multipart: Content-Disposition is unknown");
+#endif
         return false;
     }
 

@@ -127,7 +127,9 @@ Assay::Assay(ModSecurity *ms, Rules *rules, void *logCbData)
         "RESPONSE_HEADERS_NAMES");
 
     collections.emplace("TX", new ModSecurityStringVariables());
+#ifndef NO_LOGS
     this->debug(4, "Initialising transaction");
+#endif
 }
 
 
@@ -157,6 +159,7 @@ Assay::~Assay() {
  * @param message Message to be logged.
  *
  */
+#ifndef NO_LOGS
 void Assay::debug(int level, std::string message) {
     if (m_rules == NULL) {
         return;
@@ -164,7 +167,7 @@ void Assay::debug(int level, std::string message) {
 
     m_rules->debug(level, message);
 }
-
+#endif
 
 /**
  * @name    processConnection
@@ -193,8 +196,10 @@ int Assay::processConnection(const char *client, int cPort, const char *server,
     this->m_serverIpAddress = server;
     this->m_clientPort = cPort;
     this->m_serverPort = sPort;
+#ifndef NO_LOGS
     debug(4, "Transaction context created.");
     debug(4, "Starting phase CONNECTION. (SecRules 0)");
+#endif
 
     this->store_variable("REMOTE_HOST", m_clientIpAddress);
     this->store_variable("UNIQUE_ID", id);
@@ -232,7 +237,10 @@ int Assay::processConnection(const char *client, int cPort, const char *server,
  */
 int Assay::processURI(const char *uri, const char *protocol,
     const char *http_version) {
+
+#ifndef NO_LOGS
     debug(4, "Starting phase URI. (SecRules 0 + 1/2)");
+#endif
 
     m_protocol = protocol;
     m_httpVersion = http_version;
@@ -326,9 +334,10 @@ int Assay::processURI(const char *uri, const char *protocol,
                 key.length() + value.length();
             this->m_ARGScombinedSizeStr->assign(
                 std::to_string(this->m_ARGScombinedSize));
-
+#ifndef NO_LOGS
             debug(4, "Adding request argument (QUERY_STRING): name \"" + \
                 key + "\", value \"" + value + "\"");
+#endif
         }
     }
     return true;
@@ -350,10 +359,14 @@ int Assay::processURI(const char *uri, const char *protocol,
  *
  */
 int Assay::processRequestHeaders() {
+#ifndef NO_LOGS
     debug(4, "Starting phase REQUEST_HEADERS.  (SecRules 1)");
+#endif
 
     if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+#ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
+#endif
         return true;
     }
 
@@ -502,10 +515,14 @@ int Assay::addRequestHeader(const unsigned char *key, size_t key_n,
  *
  */
 int Assay::processRequestBody() {
+#ifndef NO_LOGS
     debug(4, "Starting phase REQUEST_BODY. (SecRules 2)");
+#endif
 
     if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+#ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
+#endif
         return true;
     }
 
@@ -538,41 +555,56 @@ int Assay::processRequestBody() {
                     store_variable("MULTIPART_CRLF_LF_LINES", "0");
                 }
                 if (m.boundaryStartsWithWhiteSpace) {
+#ifndef NO_LOGS
                     debug(9, "Multipart: Boundary starts with white space, " \
                        "setting MULTIPART_STRICT_ERROR to 1");
+#endif
                         update_variable_first("MULTIPART_STRICT_ERROR", "1");
                 }
                 if (m.boundaryIsQuoted) {
+#ifndef NO_LOGS
+
                     debug(9, "Multipart: Boundary is quoted, " \
                         "setting MULTIPART_STRICT_ERROR to 1");
+#endif
                         update_variable_first("MULTIPART_STRICT_ERROR", "1");
                 }
                 if (m.containsDataAfter) {
+#ifndef NO_LOGS
                     debug(9, "Multipart: There is data after the boundary, " \
                         "setting MULTIPART_STRICT_ERROR to 1");
+#endif
                     update_variable_first("MULTIPART_STRICT_ERROR", "1");
                     store_variable("MULTIPART_UNMATCHED_BOUNDARY", "1");
                 } else {
                     store_variable("MULTIPART_UNMATCHED_BOUNDARY", "0");
                 }
                 if (m.containsDataBefore) {
+#ifndef NO_LOGS
                     debug(9, "Multipart: There is data before the boundary, " \
                         "setting MULTIPART_STRICT_ERROR to 1");
+#endif
                         update_variable_first("MULTIPART_STRICT_ERROR", "1");
                 }
                 if (m.lf) {
+#ifndef NO_LOGS
                     debug(9, "Multipart: Lines are LF-terminated, " \
                         "setting MULTIPART_STRICT_ERROR to 1");
+#endif
                         update_variable_first("MULTIPART_STRICT_ERROR", "1");
                 }
                 if (m.missingSemicolon) {
+#ifndef NO_LOGS
                     debug(9, "Multipart: Boundary missing semicolon, " \
                         "setting MULTIPART_STRICT_ERROR to 1");
+#endif
                         update_variable_first("MULTIPART_STRICT_ERROR", "1");
                 }
                  if (m.invalidQuote) {
+#ifndef NO_LOGS
                     debug(9, "Multipart: Invalid quote, " \
                         "setting MULTIPART_STRICT_ERROR to 1");
+#endif
                         update_variable_first("MULTIPART_STRICT_ERROR", "1");
                 }
             }
@@ -682,7 +714,9 @@ int Assay::requestBodyFromFile(const char *path) {
     std::string str;
 
     if (request_body.is_open() == false) {
+#ifndef NO_LOGS
         debug(3, "Failed to open request body at: " + std::string(path));
+#endif
         return false;
     }
 
@@ -695,8 +729,10 @@ int Assay::requestBodyFromFile(const char *path) {
     const char *buf = str.c_str();
     int len = request_body.tellg();
 
+#ifndef NO_LOGS
     debug(9, "Adding request body: " + std::to_string(len) + " bytes. " \
         "Limit set to: " + std::to_string(this->m_rules->requestBodyLimit));
+#endif
 
     return appendRequestBody(reinterpret_cast<const unsigned char*>(buf), len);
 }
@@ -704,25 +740,33 @@ int Assay::requestBodyFromFile(const char *path) {
 int Assay::appendRequestBody(const unsigned char *buf, size_t len) {
     int current_size = this->m_requestBody.tellp();
 
+#ifndef NO_LOGS
     debug(9, "Appending request body: " + std::to_string(len) + " bytes. " \
         "Limit set to: " + std::to_string(this->m_rules->requestBodyLimit));
+#endif
 
     if (this->m_rules->requestBodyLimit > 0
         && this->m_rules->requestBodyLimit < len + current_size) {
         store_variable("INBOUND_DATA_ERROR", "1");
+#ifndef NO_LOGS
         debug(5, "Request body is bigger than the maximum expected.");
+#endif
         if (this->m_rules->requestBodyLimitAction ==
             Rules::BodyLimitAction::ProcessPartialBodyLimitAction) {
             size_t spaceLeft = this->m_rules->requestBodyLimit - current_size;
             this->m_requestBody.write(reinterpret_cast<const char*>(buf),
                 spaceLeft);
+#ifndef NO_LOGS
             debug(5, "Request body limit is marked to process partial");
+#endif
             return false;
         } else {
             if (this->m_rules->requestBodyLimitAction ==
                 Rules::BodyLimitAction::RejectBodyLimitAction) {
+#ifndef NO_LOGS
                 debug(5, "Request body limit is marked to reject the " \
                     "request");
+#endif
                 Action *a = new actions::Deny("deny");
                 a->temporaryAction = true;
                 actions.push_back(a);
@@ -752,10 +796,14 @@ int Assay::appendRequestBody(const unsigned char *buf, size_t len) {
  *
  */
 int Assay::processResponseHeaders() {
+#ifndef NO_LOGS
     debug(4, "Starting phase RESPONSE_HEADERS. (SecRules 3)");
+#endif
 
     if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+#ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
+#endif
         return true;
     }
 
@@ -869,10 +917,14 @@ int Assay::addResponseHeader(const unsigned char *key, size_t key_n,
  *
  */
 int Assay::processResponseBody() {
+#ifndef NO_LOGS
     debug(4, "Starting phase RESPONSE_BODY. (SecRules 4)");
+#endif
 
     if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+#ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
+#endif
         return true;
     }
 
@@ -910,26 +962,34 @@ int Assay::processResponseBody() {
 int Assay::appendResponseBody(const unsigned char *buf, size_t len) {
     int current_size = this->m_responseBody.tellp();
 
+#ifndef NO_LOGS
     debug(9, "Appending response body: " + std::to_string(len + current_size)
         + " bytes. Limit set to: " +
         std::to_string(this->m_rules->responseBodyLimit));
+#endif
 
     if (this->m_rules->responseBodyLimit > 0
         && this->m_rules->responseBodyLimit < len + current_size) {
         store_variable("OUTBOUND_DATA_ERROR", "1");
+#ifndef NO_LOGS
         debug(5, "Response body is bigger than the maximum expected.");
+#endif
         if (this->m_rules->responseBodyLimitAction ==
             Rules::BodyLimitAction::ProcessPartialBodyLimitAction) {
             size_t spaceLeft = this->m_rules->responseBodyLimit - current_size;
             this->m_responseBody.write(reinterpret_cast<const char*>(buf),
                 spaceLeft);
+#ifndef NO_LOGS
             debug(5, "Response body limit is marked to process partial");
+#endif
             return false;
         } else {
             if (this->m_rules->responseBodyLimitAction ==
                 Rules::BodyLimitAction::RejectBodyLimitAction) {
+#ifndef NO_LOGS
                 debug(5, "Response body limit is marked to reject the " \
                     "request");
+#endif
                 Action *a = new actions::Deny("deny");
                 a->temporaryAction = true;
                 actions.push_back(a);
@@ -1005,10 +1065,14 @@ int Assay::getResponseBodyLenth() {
  *
  */
 int Assay::processLogging(int returned_code) {
+#ifndef NO_LOGS
     debug(4, "Starting phase LOGGING. (SecRules 5)");
+#endif
 
     if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+#ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
+#endif
         return true;
     }
 
@@ -1017,12 +1081,16 @@ int Assay::processLogging(int returned_code) {
 
     /* If relevant, save this assay information at the audit_logs */
     if (m_rules != NULL && m_rules->audit_log != NULL) {
+#ifndef NO_LOGS
         debug(8, "Checking if this request is suitable to be saved as an audit log.");
+#endif
         int parts = -1;
 
         if (this->auditLogModifier.size() > 0)
         {
+#ifndef NO_LOGS
             debug(4, "There was an audit log modifier for this transaction.");
+#endif
             std::list<std::pair<int, std::string>>::iterator it;
             parts = this->m_rules->audit_log->m_parts;
              for (it = auditLogModifier.begin(); it != auditLogModifier.end(); ++it) {
@@ -1034,6 +1102,7 @@ int Assay::processLogging(int returned_code) {
                 }
             }
         }
+#ifndef NO_LOGS
         if (save_in_auditlog) {
             debug(8, "This request was marked to be saved via auditlog action.");
         }
@@ -1042,6 +1111,7 @@ int Assay::processLogging(int returned_code) {
         if (saved) {
             debug(8, "Request was relevant to be saved.");
         }
+#endif
     }
 
     return true;
@@ -1079,6 +1149,7 @@ void Assay::cleanup() {
 bool Assay::intervention(ModSecurityIntervention *it) {
     it->status = 200;
     it->url = NULL;
+    it->disruptive = false;
     if (actions.size() > 0) {
         for (Action *a : actions) {
             if (a->action_kind == Action::Kind::RunTimeOnlyIfMatchKind) {
@@ -1405,50 +1476,15 @@ std::list<std::pair<std::string, std::string>>
     std::list<std::pair<std::string, std::string>> l;
     std::pair<std::string, std::string> pair;
 
-    auto range = m_variables_strings.equal_range(var);
+    l = m_variables_strings.resolveVariable(var);
 
-    for (auto it = range.first; it != range.second; ++it) {
-        pair = std::make_pair(std::string(var), std::string(it->second));
-        l.push_back(pair);
-    }
-
-    if (l.empty()) {
-        for (auto &x : m_variables_strings) {
-            if ((x.first.substr(0, var.size() + 1).compare(var + ":") != 0)
-                && (x.first != var)) {
-                continue;
-            }
-            std::list<std::pair<std::string, std::string>> t;
-            t = resolve_variable(x.first);
-            for (std::pair<std::string, std::string> z : t) {
-                pair = std::make_pair(std::string(z.first),
-                    std::string(z.second));
-                l.push_back(pair);
-            }
-        }
-    }
-
-    for (auto &a : collections) {
-        auto range = a.second->equal_range(var);
-
-        for (auto it = range.first; it != range.second; ++it) {
-            pair = std::make_pair(std::string(var), std::string(it->second));
-            l.push_back(pair);
-        }
-
-        if (l.empty()) {
-            for (auto &x : *a.second) {
-                if ((x.first.substr(0, var.size() + 1).compare(var + ":") != 0)
-                    && (x.first != var)) {
-                    continue;
-                }
-                std::list<std::pair<std::string, std::string>> t;
-                t = resolve_variable(x.first);
-                for (std::pair<std::string, std::string> z : t) {
-                    pair = std::make_pair(std::string(z.first),
-                        std::string(z.second));
-                    l.push_back(pair);
-                }
+    size_t ac = var.find(":");
+    if (ac != std::string::npos) {
+        /* It may be a collection */
+        for (auto &a : collections) {
+            std::list<std::pair<std::string, std::string>> l2 = a.second->resolveVariable(var);
+            if (l2.empty() == false) {
+                l.insert(l.end(), l2.begin(), l2.end());
             }
         }
     }
@@ -1500,12 +1536,14 @@ void Assay::setCollection(const std::string& collectionName,
 
     try {
         ModSecurityStringVariables *collection;
-        collection = collections.at(toupper(collectionName));
-        collection->storeOrUpdateVariable(toupper(collectionName) + ":"
+        collection = collections.at(collectionName);
+        collection->storeOrUpdateVariable(collectionName + ":"
             + variableName, targetValue);
     } catch (...) {
+#ifndef NO_LOGS
         debug(9, "don't know any collection named: "
             + collectionName + ". it was created?");
+#endif
         return;
     }
 }

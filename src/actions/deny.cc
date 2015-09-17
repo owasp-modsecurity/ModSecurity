@@ -31,7 +31,9 @@ Deny::Deny(std::string action)
 
 
 bool Deny::evaluate(Rule *rule, Assay *assay) {
+#ifndef NO_LOGS
     assay->debug(8, "Running action deny");
+#endif
     assay->actions.push_back(this);
     return true;
 }

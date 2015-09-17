@@ -32,7 +32,9 @@ SkipAfter::SkipAfter(std::string action)
 
 
 bool SkipAfter::evaluate(Rule *rule, Assay *assay) {
+#ifndef NO_LOGS
     assay->debug(5, "Setting skipAfter for: " + m_marker);
+#endif
     assay->m_marker = m_marker;
     return true;
 }

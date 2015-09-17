@@ -41,7 +41,9 @@ std::string Base64Decode::evaluate(std::string value,
      * @todo Implement the transformation base64decode
      */
     if (assay) {
+#ifndef NO_LOGS
         assay->debug(4, "Transformation 64 is not implemented yet.");
+#endif
     }
     return value;
 }

@@ -21,6 +21,7 @@
 #include "modsecurity/assay.h"
 #include "src/rule.h"
 #include "src/macro_expansion.h"
+#include "src/utils.h"
 
 namespace ModSecurity {
 namespace actions {
@@ -57,6 +58,7 @@ bool SetVar::init(std::string *error) {
     pos = action.find(".");
     if (pos != std::string::npos) {
         collectionName = std::string(action, 0, pos);
+        collectionName = toupper(collectionName);
     } else {
         error->assign("Missing the collection and/or variable name");
         return false;
@@ -140,8 +142,10 @@ bool SetVar::evaluate(Rule *rule, Assay *assay) {
             break;
     }
 
+#ifndef NO_LOGS
     assay->debug(8, "Saving variable: " + collectionName + ":" + \
         variableName + " with value: " + targetValue);
+#endif
     assay->setCollection(collectionName, variableName, targetValue);
 
     return true;

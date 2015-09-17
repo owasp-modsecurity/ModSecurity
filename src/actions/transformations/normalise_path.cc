@@ -41,8 +41,10 @@ std::string NormalisePath::evaluate(std::string value,
      * @todo Implement the transformation NormalisePath
      */
     if (assay) {
+#ifndef NO_LOGS
         assay->debug(4, "Transformation NormalisePath is not" \
         " implemented yet.");
+#endif
     }
     return value;
 }

@@ -41,7 +41,9 @@ std::string SqlHexDecode::evaluate(std::string value,
      * @todo Implement the transformation SqlHexDecode
      */
     if (assay) {
+#ifndef NO_LOGS
         assay->debug(4, "Transformation SqlHexDecode is not implemented yet.");
+#endif
     }
     return value;
 }

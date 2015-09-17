@@ -41,7 +41,9 @@ std::string Md5::evaluate(std::string value,
      * @todo Implement the transformation Md5
      */
     if (assay) {
+#ifndef NO_LOGS
         assay->debug(4, "Transformation Md5 is not implemented yet.");
+#endif
     }
     return value;
 }

@@ -41,8 +41,10 @@ std::string ReplaceComments::evaluate(std::string value,
      * @todo Implement the transformation ReplaceComments
      */
     if (assay) {
+#ifndef NO_LOGS
         assay->debug(4, "Transformation ReplaceComments " \
             "is not implemented yet.");
+#endif
     }
     return value;
 }

@@ -41,8 +41,10 @@ std::string RemoveCommentsChar::evaluate(std::string value,
      * @todo Implement the transformation RemoveCommentsChar
      */
     if (assay) {
+#ifndef NO_LOGS
         assay->debug(4, "Transformation RemoveCommentsChar " \
             "is not implemented yet.");
+#endif
     }
     return value;
 }

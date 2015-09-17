@@ -136,7 +136,7 @@ class ModSecurityStringVariables :
             l.push_back(pair);
         }
 
-        if (l.size() == 0) {
+        if (l.size() == 0 && key.find(":") == std::string::npos) {
             for (auto& x : *this) {
                 if ((x.first.substr(0, key.size() + 1).compare(key + ":") != 0)
                     && (x.first != key)) {
@@ -144,10 +144,8 @@ class ModSecurityStringVariables :
                 }
                 std::list<std::pair<std::string, std::string>> t;
                 t = this->resolveVariable(x.first);
-                for (std::pair<std::string, std::string> z : t) {
-                    pair = std::make_pair(std::string(z.first),
-                        std::string(z.second));
-                    l.push_back(pair);
+                if (t.empty() == false) {
+                    l.insert(l.end(), t.begin(), t.end());
                 }
             }
         }
@@ -239,8 +237,9 @@ class Assay {
 
     ModSecurityStringVariables m_variables_strings;
     std::unordered_map<std::string, ModSecurityStringVariables *> collections;
-
+#ifndef NO_LOGS
     void debug(int, std::string);
+#endif
     void serverLog(const std::string& msg);
     std::vector<actions::Action *> actions;
 

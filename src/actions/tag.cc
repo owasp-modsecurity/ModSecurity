@@ -36,7 +36,9 @@ Tag::Tag(std::string action)
 
 bool Tag::evaluate(Rule *rule, Assay *assay) {
     std::string tag = MacroExpansion::expand(m_tag, assay);
+#ifndef NO_LOGS
     assay->debug(9, "Rule tag: " + tag);
+#endif
     assay->ruleTags.push_back(tag);
     return true;
 }

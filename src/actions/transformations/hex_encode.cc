@@ -41,7 +41,9 @@ std::string HexEncode::evaluate(std::string value,
      * @todo Implement the transformation HexEncode
      */
     if (assay) {
+#ifndef NO_LOGS
         assay->debug(4, "Transformation HexEncode is not implemented yet.");
+#endif
     }
     return value;
 }

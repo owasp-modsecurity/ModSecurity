@@ -36,7 +36,9 @@ LogData::LogData(std::string action)
 
 bool LogData::evaluate(Rule *rule, Assay *assay) {
     std::string msg = MacroExpansion::expand(m_data, assay);
+#ifndef NO_LOGS
     assay->debug(9, "Saving msg: " + msg);
+#endif
     assay->rulesMessages.push_back(msg);
     assay->serverLog(msg);
     return true;

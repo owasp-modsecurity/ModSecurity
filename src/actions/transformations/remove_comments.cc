@@ -41,8 +41,10 @@ std::string RemoveComments::evaluate(std::string value,
      * @todo Implement the transformation RemoveComments
      */
     if (assay) {
+#ifndef NO_LOGS
         assay->debug(4, "Transformation RemoveComments is not " \
             "implemented yet.");
+#endif
     }
     return value;
 }

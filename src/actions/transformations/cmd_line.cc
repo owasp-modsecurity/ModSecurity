@@ -41,7 +41,9 @@ std::string CmdLine::evaluate(std::string value,
      * @todo Implement the transformation CmdLine
      */
     if (assay) {
+#ifndef NO_LOGS
         assay->debug(4, "Transformation CmdLine is not implemented yet.");
+#endif
     }
     return value;
 }

@@ -35,17 +35,16 @@ bool Capture::evaluate(Rule *rule, Assay *assay) {
     std::list<std::string> match;
 
     operators::Pm *pm = dynamic_cast<operators::Pm *>(op);
-    operators::Rx *rx = dynamic_cast<operators::Rx *>(op);
-    operators::Contains *contains = dynamic_cast<operators::Contains *>(op);
-
     if (pm != NULL) {
         match = pm->matched;
     }
 
+    operators::Rx *rx = dynamic_cast<operators::Rx *>(op);
     if (rx != NULL) {
         match = rx->matched;
     }
 
+    operators::Contains *contains = dynamic_cast<operators::Contains *>(op);
     if (contains != NULL) {
         match = contains->matched;
     }

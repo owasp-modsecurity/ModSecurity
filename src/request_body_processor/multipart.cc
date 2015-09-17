@@ -40,15 +40,19 @@ Multipart::Multipart(std:: string header, Assay *assay)
 
 bool Multipart::init() {
     if (m_header.length() > 1024) {
+#ifndef NO_LOGS
         debug(4, "Multipart: Invalid boundary in Content-Type (length).");
+#endif
         return false;
     }
 
     std::size_t boundary_pos = m_header.find("boundary");
     if (boundary_pos != std::string::npos &&
         m_header.find("boundary", boundary_pos + 1) != std::string::npos) {
+#ifndef NO_LOGS
         debug(4, "Multipart: Multiple boundary parameters in " \
             "Content-Type.");
+#endif
         return false;
     }
 
@@ -56,35 +60,47 @@ bool Multipart::init() {
     std::size_t semicolon_pos = boundary.find(";");
     if (semicolon_pos != std::string::npos
         && boundary.find(";", semicolon_pos + 1) != std::string::npos) {
+#ifndef NO_LOGS
         debug(4, "Multipart: Invalid boundary in Content-Type. (malformed). " \
             "Too many semicolons.");
+#endif
         return false;
     }
 
     if (semicolon_pos == std::string::npos) {
+#ifndef NO_LOGS
         debug(4, "Multipart: Missing semicolon.");
+#endif
         this->missingSemicolon = true;
     }
 
     if (boundary.at(8) != '=') {
+#ifndef NO_LOGS
         debug(4, "Multipart: Invalid boundary in Content-Type. (malformed). " \
             "Missing equals.");
+#endif
         return false;
     }
 
     if (boundary.at(8 + 1) == ' ') {
         boundaryStartsWithWhiteSpace = true;
+#ifndef NO_LOGS
         debug(4, "Multipart: Boundary starts with a white space");
+#endif
     }
 
     if ((boundaryStartsWithWhiteSpace && boundary.at(8 + 2) == '"') ||
         (!boundaryStartsWithWhiteSpace && boundary.at(8 + 1) == '"')) {
         boundaryIsQuoted = true;
+#ifndef NO_LOGS
             debug(4, "Multipart: Boundary inside quotes");
+#endif
     }
 
     if (boundaryIsQuoted && boundary.at(boundary.length()-1) != '"') {
+#ifndef NO_LOGS
         debug(4, "Multipart: Invalid boundary in Content-type (quote).");
+#endif
         return false;
     }
 
@@ -116,8 +132,10 @@ bool Multipart::init() {
     }
 
     if (boundaryContainsOnlyValidCharacters() == false) {
+#ifndef NO_LOGS
         debug(4, "Multipart: Invalid boundary in Content-type " \
             "(invalid characters).");
+#endif
         return false;
     }
 
@@ -190,8 +208,10 @@ bool Multipart::process(std::string data) {
     double files_size = 0;
 
     if (start != 0) {
-      debug(4, "Multipart: Boundary was not the first thing.");
-      this->containsDataBefore = true;
+#ifndef NO_LOGS
+        debug(4, "Multipart: Boundary was not the first thing.");
+#endif
+        this->containsDataBefore = true;
     }
     while (start != std::string::npos) {
         size_t end = data.find(m_boundary, start + m_boundary.length());
@@ -230,7 +250,9 @@ bool Multipart::process(std::string data) {
     int i = 0;
     for (std::string x : blobs) {
         i++;
+#ifndef NO_LOGS
         debug(5, "Multipart: Inspecting blob: " + std::to_string(i));
+#endif
         MultipartBlob m(x, this);
 
         if (m.name.empty() == false) {
@@ -249,11 +271,15 @@ bool Multipart::process(std::string data) {
         variables.emplace("FILES_NAMES:" + name, name);
         variables.emplace("FILES_SIZES:" + name,
             std::to_string(m.content.size()));
+#ifndef NO_LOGS
         debug(5, "Multipart: Saving FILES_TMP_CONTENT:" + name + " variable.");
+#endif
         variables.emplace("FILES_TMP_CONTENT:" + name, m.content);
         files_size = files_size + m.content.size();
         if (m.invalidQuote) {
+#ifndef NO_LOGS
             debug(4, "Multipart: Found invalid quoting.");
+#endif
             this->invalidQuote = true;
         }
     }

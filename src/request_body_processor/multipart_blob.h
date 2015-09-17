@@ -37,9 +37,12 @@ class MultipartBlob {
     std::string filename;
     std::string contentType;
     std::string content;
+
+#ifndef NO_LOGS
     void debug(int a, std::string str) {
         m_parent->debug(a, str);
     }
+#endif
  private:
     const std::string m_blob;
     Multipart *m_parent;

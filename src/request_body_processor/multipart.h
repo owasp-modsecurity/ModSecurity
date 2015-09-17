@@ -45,10 +45,11 @@ class Multipart {
     bool boundaryIsQuoted;
     bool missingSemicolon;
     bool invalidQuote;
-
+#ifndef NO_LOGS
     void debug(int a, std::string str) {
         m_assay->debug(a, str);
     }
+#endif
  private:
     std::string m_boundary;
     std::string m_header;
