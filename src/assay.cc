@@ -351,8 +351,15 @@ int Assay::processURI(const char *uri, const char *protocol,
  */
 int Assay::processRequestHeaders() {
     debug(4, "Starting phase REQUEST_HEADERS.  (SecRules 1)");
-        this->m_rules->evaluate(ModSecurity::RequestHeadersPhase, this);
-    return 0;
+
+    if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+        debug(4, "Rule engine disabled, returning...");
+        return true;
+    }
+
+    this->m_rules->evaluate(ModSecurity::RequestHeadersPhase, this);
+
+    return true;
 }
 
 
@@ -497,6 +504,11 @@ int Assay::addRequestHeader(const unsigned char *key, size_t key_n,
 int Assay::processRequestBody() {
     debug(4, "Starting phase REQUEST_BODY. (SecRules 2)");
 
+    if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+        debug(4, "Rule engine disabled, returning...");
+        return true;
+    }
+
     if (resolve_variable_first("INBOUND_DATA_ERROR") == NULL) {
         store_variable("INBOUND_DATA_ERROR", "0");
     }
@@ -637,7 +649,7 @@ int Assay::processRequestBody() {
     }
 
     this->m_rules->evaluate(ModSecurity::RequestBodyPhase, this);
-    return 0;
+    return true;
 }
 
 
@@ -721,7 +733,7 @@ int Assay::appendRequestBody(const unsigned char *buf, size_t len) {
 
     this->m_requestBody.write(reinterpret_cast<const char*>(buf), len);
 
-    return 0;
+    return true;
 }
 
 
@@ -741,8 +753,14 @@ int Assay::appendRequestBody(const unsigned char *buf, size_t len) {
  */
 int Assay::processResponseHeaders() {
     debug(4, "Starting phase RESPONSE_HEADERS. (SecRules 3)");
+
+    if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+        debug(4, "Rule engine disabled, returning...");
+        return true;
+    }
+
     this->m_rules->evaluate(ModSecurity::ResponseHeadersPhase, this);
-    return 0;
+    return true;
 }
 
 
@@ -853,6 +871,11 @@ int Assay::addResponseHeader(const unsigned char *key, size_t key_n,
 int Assay::processResponseBody() {
     debug(4, "Starting phase RESPONSE_BODY. (SecRules 4)");
 
+    if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+        debug(4, "Rule engine disabled, returning...");
+        return true;
+    }
+
     if (resolve_variable_first("OUTBOUND_DATA_ERROR") == NULL) {
         store_variable("OUTBOUND_DATA_ERROR", "0");
     }
@@ -862,7 +885,7 @@ int Assay::processResponseBody() {
         std::to_string(m_responseBody.str().size()));
 
     this->m_rules->evaluate(ModSecurity::ResponseBodyPhase, this);
-    return 0;
+    return true;
 }
 
 
@@ -983,6 +1006,12 @@ int Assay::getResponseBodyLenth() {
  */
 int Assay::processLogging(int returned_code) {
     debug(4, "Starting phase LOGGING. (SecRules 5)");
+
+    if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+        debug(4, "Rule engine disabled, returning...");
+        return true;
+    }
+
     this->httpCodeReturned = returned_code;
     this->m_rules->evaluate(ModSecurity::LoggingPhase, this);
 
@@ -1015,7 +1044,7 @@ int Assay::processLogging(int returned_code) {
         }
     }
 
-    return 0;
+    return true;
 }
 
 
