@@ -81,7 +81,7 @@ namespace ModSecurity {
  * @endcode
  *
  */
-Assay::Assay(ModSecurity *ms, Rules *rules)
+Assay::Assay(ModSecurity *ms, Rules *rules, void *logCbData)
     : m_clientIpAddress(""),
     m_serverIpAddress(""),
     m_clientPort(0),
@@ -105,6 +105,7 @@ Assay::Assay(ModSecurity *ms, Rules *rules)
     m_responseHeadersNames(NULL),
     m_marker(""),
     start(cpu_seconds()),
+    m_logCbData(logCbData),
     m_ms(ms) {
     id = std::to_string(this->timeStamp) + \
         std::to_string(generate_assay_unique_id());
@@ -1428,9 +1429,11 @@ std::list<std::pair<std::string, std::string>>
     return l;
 }
 
+
 void Assay::serverLog(const std::string& msg) {
-    std::cerr << "Server log is not ready : " << msg << std::endl;
+    m_ms->serverLog(m_logCbData, msg);
 }
+
 
 std::string* Assay::resolve_variable_first(const std::string& var) {
     auto range = m_variables_strings.equal_range(var);
@@ -1500,8 +1503,8 @@ void Assay::setCollection(const std::string& collectionName,
  *
  */
 extern "C" Assay *msc_new_assay(ModSecurity *ms,
-    Rules *rules) {
-    return new Assay(ms, rules);
+    Rules *rules, void *logCbData) {
+    return new Assay(ms, rules, logCbData);
 }
 
 

@@ -44,7 +44,8 @@ namespace ModSecurity {
  * @endcode
  */
 ModSecurity::ModSecurity()
-    : m_connector("") {
+    : m_connector(""),
+    m_logCb(NULL) {
     UniqueId::uniqueId();
     srand(time(NULL));
 #ifdef MSC_WITH_CURL
@@ -137,6 +138,23 @@ const std::string& ModSecurity::getConnectorInformation() {
     return m_connector;
 }
 
+
+void ModSecurity::serverLog(void *data, const std::string& msg) {
+    if (m_logCb == NULL) {
+        std::cout << "Server log callback is not set -- " << msg << std::endl;
+    } else {
+        m_logCb(data, msg.c_str());
+    }
+}
+
+
+void ModSecurity::setServerLogCb(LogCb cb) {
+    m_logCb = (LogCb) cb;
+}
+
+extern "C" void msc_set_log_cb(ModSecurity *msc, LogCb cb) {
+    msc->setServerLogCb(cb);
+}
 
 /**
  * @name    msc_set_connector_info

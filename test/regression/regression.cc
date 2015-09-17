@@ -67,6 +67,11 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
     }
 }
 
+void logCb(void *data, const char *msg) {
+    std::stringstream *ss = (std::stringstream *) data;
+    *ss << msg << std::endl;
+}
+
 
 void perform_unit_test(std::vector<RegressionTest *> *tests,
     ModSecurityTestResults<RegressionTestResult> *res, int *count) {
@@ -77,7 +82,8 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         ModSecurity::ModSecurity *modsec = NULL;
         ModSecurity::Rules *modsec_rules = NULL;
         ModSecurity::Assay *modsec_assay = NULL;
-        ModSecurityTestResults<RegressionTest> r; 
+        ModSecurityTestResults<RegressionTest> r;
+        std::stringstream serverLog;
         RegressionTestResult *testRes = new RegressionTestResult();
         testRes->test = t;
         r.status = 200;
@@ -99,6 +105,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         modsec = new ModSecurity::ModSecurity();
         modsec->setConnectorInformation("ModSecurity-regression v0.0.1-alpha" \
             " (ModSecurity regression test utility)");
+        modsec->setServerLogCb(logCb);
         modsec_rules = new ModSecurity::Rules(debug_log);
 
         if (modsec_rules->load(t->rules.c_str(), filename) < 0) {
@@ -140,7 +147,8 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
             }
         }
 
-        modsec_assay = new ModSecurity::Assay(modsec, modsec_rules);
+        modsec_assay = new ModSecurity::Assay(modsec, modsec_rules,
+            &serverLog);
 
         modsec_assay->processConnection(t->clientIp.c_str(),
             t->clientPort, t->serverIp.c_str(), t->serverPort);

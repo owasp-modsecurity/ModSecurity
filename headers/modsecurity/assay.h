@@ -159,7 +159,7 @@ class ModSecurityStringVariables :
 /** @ingroup ModSecurity_CPP_API */
 class Assay {
  public:
-    Assay(ModSecurity *assay, Rules *rules);
+    Assay(ModSecurity *assay, Rules *rules, void *logCbData);
     ~Assay();
 
     /** TODO: Should be an structure that fits an IP address */
@@ -292,6 +292,7 @@ class Assay {
     std::ostringstream m_requestBody;
     std::ostringstream m_responseBody;
     ModSecurityCollectionsVariables m_variables_collections;
+    void *m_logCbData;
 };
 
 
@@ -302,7 +303,7 @@ extern "C" {
 #endif
 
 /** @ingroup ModSecurity_C_API */
-Assay *msc_new_assay(ModSecurity *ms, Rules *rules);
+Assay *msc_new_assay(ModSecurity *ms, Rules *rules, void *logCbData);
 
 /** @ingroup ModSecurity_C_API */
 int msc_process_connection(Assay *assay, const char *client, int cPort,

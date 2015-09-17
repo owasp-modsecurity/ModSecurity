@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < NUM_REQUESTS; i++) {
         std::cout << "Proceding with request " << i << std::endl;
 
-        Assay *modsecAssay = new Assay(modsec, rules);
+        Assay *modsecAssay = new Assay(modsec, rules, NULL);
         modsecAssay->processConnection(ip, 12345, "127.0.0.1", 80);
 
         if (modsecAssay->intervention(&it)) {

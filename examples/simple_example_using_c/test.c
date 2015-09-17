@@ -55,7 +55,7 @@ int main (int argc, char **argv)
     }
     msc_rules_dump(rules);
 
-    assay = msc_new_assay(modsec, rules);
+    assay = msc_new_assay(modsec, rules, NULL);
 
     msc_process_connection(assay, "127.0.0.1", 12345, "127.0.0.1", 80);
     msc_process_uri(assay,

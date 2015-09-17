@@ -120,6 +120,8 @@ typedef struct ModSecurity_t ModSecurity;
 #define MODSECURITY_VERSION_NUM MODSECURITY_MAJOR \
     MODSECURITY_MINOR MODSECURITY_PATCHLEVEL MODSECURITY_TAG_NUM
 
+typedef void (*LogCb) (void *, const char *);
+
 #ifdef __cplusplus
 namespace ModSecurity {
 
@@ -140,6 +142,8 @@ class ModSecurity {
 
     static std::string whoAmI();
     void setConnectorInformation(std::string connector);
+    void setServerLogCb(LogCb cb);
+    void serverLog(void *data, const std::string& msg);
     const std::string& getConnectorInformation();
 
     /**
@@ -220,6 +224,7 @@ class ModSecurity {
 
  private:
     std::string m_connector;
+    LogCb m_logCb;
 };
 
 
@@ -235,6 +240,8 @@ ModSecurity *msc_init();
 const char *msc_who_am_i(ModSecurity *msc);
 /** @ingroup ModSecurity_C_API */
 void msc_set_connector_info(ModSecurity *msc, const char *connector);
+/** @ingroup ModSecurity_C_API */
+void msc_set_log_cb(ModSecurity *msc, LogCb cb);
 /** @ingroup ModSecurity_C_API */
 void msc_cleanup(ModSecurity *msc);
 
