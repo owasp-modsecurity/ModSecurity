@@ -27,10 +27,9 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<std::pair<std::string, std::string>>
+std::list<ModSecurityStringVar *> *
     ModsecBuild::evaluate(Assay *assay) {
-    std::list<std::pair<std::string, std::string>> resl;
-    std::pair<std::string, std::string> pair;
+    std::list<ModSecurityStringVar *> *resl = new std::list<ModSecurityStringVar *>();
 
     std::ostringstream ss;
     ss << std::setw(2) << std::setfill('0') << MODSECURITY_MAJOR;
@@ -38,8 +37,7 @@ std::list<std::pair<std::string, std::string>>
     ss << std::setw(2) << std::setfill('0') << MODSECURITY_PATCHLEVEL;
     ss << std::setw(2) << std::setfill('0') << MODSECURITY_TAG_NUM;
 
-    pair = std::make_pair(std::string("MODSEC_BUILD"), ss.str());
-    resl.push_back(pair);
+    resl->push_back(new ModSecurityStringVar("MODSEC_BUILD", ss.str()));
 
     return resl;
 }

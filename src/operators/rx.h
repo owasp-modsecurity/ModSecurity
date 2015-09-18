@@ -37,8 +37,7 @@ class Rx : public Operator {
     Rx(std::string op, std::string param, bool negation)
         : Operator(op, param, negation),
         m_param(param) {
-            Regex r(param);
-            m_re = &r;
+            m_re = new Regex(param);
         }
 
     bool evaluate(Assay *assay, const std::string &input);

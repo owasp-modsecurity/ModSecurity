@@ -35,7 +35,7 @@ class Count : public Variable {
         : Variable("count(" + v->name + ")"),
         var(v) { }
 
-    std::list<std::pair<std::string, std::string>>
+    std::list<ModSecurityStringVar *> *
         evaluate(Assay *assay) override;
 
     Variable *var;

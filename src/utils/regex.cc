@@ -46,15 +46,13 @@ Regex::Regex(const std::string& pattern_)
 
 int regex_search(const std::string& s, SMatch *match,
     const Regex& regex) {
-    int *ovector = 0;
-    int ovecsize = 0;
-    return pcre_exec(regex.m_pc, regex.m_pce, s.c_str(), s.size(), 0, 0, ovector, ovecsize) > 0;
+    int ovector[OVECCOUNT];
+    return pcre_exec(regex.m_pc, regex.m_pce, s.c_str(), s.size(), 0, 0, ovector, OVECCOUNT) > 0;
 }
 
 int regex_search(const std::string& s, const Regex& regex) {
-    int *ovector = 0;
-    int ovecsize = 0;
-    return pcre_exec(regex.m_pc, regex.m_pce, s.c_str(), s.size(), 0, 0, ovector, ovecsize) > 0;
+    int ovector[OVECCOUNT];
+    return pcre_exec(regex.m_pc, regex.m_pce, s.c_str(), s.size(), 0, 0, ovector, OVECCOUNT) > 0;
 }
 
 }  // namespace Utils

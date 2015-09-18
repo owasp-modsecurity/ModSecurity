@@ -33,14 +33,11 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<std::pair<std::string, std::string>>
+std::list<ModSecurityStringVar *> *
     TimeEpoch::evaluate(Assay *assay) {
-    std::list<std::pair<std::string, std::string>> resl;
-    std::pair<std::string, std::string> pair;
+    std::list<ModSecurityStringVar *> *resl = new std::list<ModSecurityStringVar *>();
 
-    pair = std::make_pair(std::string("TIME_EPOCH"),
-       std::to_string(std::time(nullptr)));
-    resl.push_back(pair);
+    resl->push_back(new ModSecurityStringVar("TIME_EPOCH",  std::to_string(std::time(nullptr))));
 
     return resl;
 }

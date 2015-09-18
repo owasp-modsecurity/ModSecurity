@@ -25,6 +25,7 @@
 namespace ModSecurity {
 namespace Utils {
 
+#define OVECCOUNT 30
 
 class Regex {
  public:
@@ -32,7 +33,7 @@ class Regex {
     std::string pattern;
     pcre *m_pc = NULL;
     pcre_extra *m_pce = NULL;
-
+    int m_ovector[OVECCOUNT];
 };
 
 

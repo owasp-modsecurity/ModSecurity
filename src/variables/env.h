@@ -33,7 +33,7 @@ class Env : public Variable {
     explicit Env(std::string _name)
         : Variable(_name) { }
 
-    std::list<std::pair<std::string, std::string>>
+    std::list<ModSecurityStringVar *> *
         evaluate(Assay *assay) override;
 };
 

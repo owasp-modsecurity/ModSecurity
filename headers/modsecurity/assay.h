@@ -92,9 +92,23 @@ class ModSecurityCollectionsVariables :
 };
 
 
+class ModSecurityStringVar {
+ public:
+     ModSecurityStringVar(const std::string& key, const std::string& value) :
+        m_key(key),
+        m_value(value) { }
+     std::string m_key;
+     std::string m_value;
+};
+
 class ModSecurityStringVariables :
     public std::unordered_multimap<std::string, std::string> {
  public:
+
+    ModSecurityStringVariables() {
+        this->reserve(1000);
+    }
+
     void storeVariable(std::string key, std::string value) {
         this->emplace(key, value);
     }
@@ -123,34 +137,44 @@ class ModSecurityStringVariables :
         this->erase(key);
     }
 
-
-    std::list<std::pair<std::string, std::string>>
-        resolveVariable(const std::string& key) {
-        std::list<std::pair<std::string, std::string>> l;
-        std::pair<std::string, std::string> pair;
+    std::list<ModSecurityStringVar *>
+        resolveVariable(const std::string& key,
+        std::list<ModSecurityStringVar *> *l) {
 
         auto range = this->equal_range(key);
 
         for (auto it = range.first; it != range.second; ++it) {
-            pair = std::make_pair(std::string(key), std::string(it->second));
-            l.push_back(pair);
+            l->push_back(new ModSecurityStringVar(key, it->second));
         }
 
-        if (l.size() == 0 && key.find(":") == std::string::npos) {
+        if (key.find(":") == std::string::npos && l->size() == 0) {
+            size_t keySize = key.size() + 1;
             for (auto& x : *this) {
-                if ((x.first.substr(0, key.size() + 1).compare(key + ":") != 0)
-                    && (x.first != key)) {
+                if (x.first.size() <= keySize) {
                     continue;
                 }
-                std::list<std::pair<std::string, std::string>> t;
-                t = this->resolveVariable(x.first);
-                if (t.empty() == false) {
-                    l.insert(l.end(), t.begin(), t.end());
+                if (x.first.at(keySize - 1) != ':') {
+                    continue;
                 }
+                if (x.first.compare(0, keySize, key + ":") != 0) {
+                    continue;
+                }
+                //auto range = this->equal_range(x.first);
+
+                //for (auto it = range.first; it != range.second; ++it) {
+                l->push_back(new ModSecurityStringVar(x.first, x.second));
+                //}
             }
         }
 
-        return l;
+        return *l;
+    }
+
+    std::list<ModSecurityStringVar *>
+        resolveVariable(const std::string& key) {
+        std::list<ModSecurityStringVar *> l;
+
+        return resolveVariable(key, &l);
     }
 };
 
@@ -225,8 +249,12 @@ class Assay {
     const char *getResponseBody();
     int getResponseBodyLenth();
 
-    std::list<std::pair<std::string, std::string>>
+    std::list<ModSecurityStringVar *> *
         resolve_variable(const std::string& var);
+
+    void resolve_variable(const std::string& var,
+        std::list<ModSecurityStringVar *> *);
+
     std::string* resolve_variable_first(const std::string& key);
     std::string* resolve_variable_first(const std::string& collectionName,
        const std::string& var);

@@ -28,23 +28,22 @@ namespace ModSecurity {
 namespace Variables {
 namespace Variations {
 
-std::list<std::pair<std::string, std::string>>
+std::list<ModSecurityStringVar *> *
     Count::evaluate(Assay *assay) {
-    std::list<std::pair<std::string, std::string>> reslIn;
-    std::list<std::pair<std::string, std::string>> reslOut;
-    std::pair<std::string, std::string> pair;
+    std::list<ModSecurityStringVar *> *reslIn;
+    std::list<ModSecurityStringVar *> *reslOut = new std::list<ModSecurityStringVar *>();
     int count = 0;
 
     reslIn = var->evaluate(assay);
 
-    for (auto &a : reslIn) {
+    for (auto &a : *reslIn) {
         count++;
     }
 
     std::string res = std::to_string(count);
 
-    pair = std::make_pair(std::string(var->name), std::string(res));
-    reslOut.push_back(pair);
+    reslOut->push_back(new ModSecurityStringVar(std::string(var->name),
+        std::string(res)));
 
     return reslOut;
 }

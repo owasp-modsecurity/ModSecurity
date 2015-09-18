@@ -116,30 +116,29 @@ bool SetVar::evaluate(Rule *rule, Assay *assay) {
         value = 0;
     }
 
-    int pre = 0;
-    try {
-        pre = stoi(predicate);
-    } catch (...) {
+
+    std::string resolvedPre = MacroExpansion::expand(predicate, assay);
+    if (operation == setOperation) {
+        targetValue = resolvedPre;
+    } else {
+        int pre = 0;
         try {
-            pre = stoi(MacroExpansion::expand(predicate, assay));
+            pre = stoi(resolvedPre);
         } catch (...) {
             pre = 0;
         }
-    }
 
-    switch (operation) {
-        case setOperation:
-            targetValue = MacroExpansion::expand(predicate, assay);
-            break;
-        case sumAndSetOperation:
-            targetValue = std::to_string(value + pre);
-            break;
-        case substractAndSetOperation:
-            targetValue = std::to_string(value - pre);
-            break;
-        case setToOne:
-            targetValue = std::string("1");
-            break;
+        switch (operation) {
+            case sumAndSetOperation:
+                targetValue = std::to_string(value + pre);
+                break;
+            case substractAndSetOperation:
+                targetValue = std::to_string(value - pre);
+                break;
+            case setToOne:
+                targetValue = std::string("1");
+                break;
+        }
     }
 
 #ifndef NO_LOGS

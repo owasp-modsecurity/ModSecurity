@@ -32,34 +32,33 @@ namespace actions {
 
 bool Capture::evaluate(Rule *rule, Assay *assay) {
     operators::Operator *op = rule->op;
-    std::list<std::string> match;
+    std::list<std::string> *match;
 
     operators::Pm *pm = dynamic_cast<operators::Pm *>(op);
     if (pm != NULL) {
-        match = pm->matched;
+        match = &pm->matched;
     }
 
     operators::Rx *rx = dynamic_cast<operators::Rx *>(op);
     if (rx != NULL) {
-        match = rx->matched;
+        match = &rx->matched;
     }
 
     operators::Contains *contains = dynamic_cast<operators::Contains *>(op);
     if (contains != NULL) {
-        match = contains->matched;
+        match = &contains->matched;
     }
 
-    if (match.empty()) {
+    if (match->empty()) {
         return false;
     }
 
     int i = 0;
-    while (match.empty() == false) {
-        assay->setCollection("TX", std::to_string(i), match.back());
-        match.pop_back();
+    while (match->empty() == false) {
+        assay->setCollection("TX", std::to_string(i), match->back());
+        match->pop_back();
         i++;
     }
-
     return true;
 }
 

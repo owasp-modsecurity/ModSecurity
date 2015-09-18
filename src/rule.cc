@@ -276,10 +276,10 @@ bool Rule::evaluate(Assay *assay) {
         Exclusion *exl = dynamic_cast<Exclusion *>(variable);
 
         if (exl != NULL) {
-            std::list<std::pair<std::string, std::string>> z =
+            std::list<ModSecurityStringVar *> *z =
                 variable->evaluate(assay);
-            for (auto &y : z) {
-                exclusions.push_back(y.first);
+            for (auto &y : *z) {
+                exclusions.push_back(y->m_key);
             }
             exclusions.push_back(variable->name);
         }
@@ -293,19 +293,19 @@ bool Rule::evaluate(Assay *assay) {
             continue;
         }
 
-        std::list<std::pair<std::string, std::string>> e =
+        std::list<ModSecurityStringVar *> *e =
             variable->evaluate(assay);
 
-        for (auto &v : e) {
+        for (auto &v : *e) {
             if (std::find(exclusions.begin(), exclusions.end(),
-                v.first) != exclusions.end()) {
+                v->m_key) != exclusions.end()) {
 #ifndef NO_LOGS
-                assay->debug(9, "Variable: " + v.first + " is part of the" +
+                assay->debug(9, "Variable: " + v.m_key + " is part of the" +
                     " exclusion list, skipping...");
 #endif
                 continue;
             }
-            std::string value = v.second;
+            std::string value = v->m_value;
             int none = 0;
             for (Action *a : this->actions_runtime_pre) {
                 None *z = dynamic_cast<None *>(a);
@@ -349,7 +349,7 @@ bool Rule::evaluate(Assay *assay) {
 
 #ifndef NO_LOGS
             assay->debug(9, "Target value: \"" + limitTo(80, toHexIfNeeded(value)) + \
-                "\" (Variable: " + v.first + ")");
+                "\" (Variable: " + v.m_key + ")");
 #endif
 
             ret = this->op->evaluate(assay, value);
@@ -397,17 +397,17 @@ bool Rule::evaluate(Assay *assay) {
                         assay->store_variable("MATCHED_VAR", value);
                     }
                     if (assay->update_variable_first("MATCHED_VAR_NAME",
-                        v.first) == false) {
-                        assay->store_variable("MATCHED_VAR_NAME", v.first);
+                        v->m_key) == false) {
+                        assay->store_variable("MATCHED_VAR_NAME", v->m_key);
                     }
-                    assay->store_variable("MATCHED_VARS:" + v.first, value);
-                    assay->store_variable("MATCHED_VARS_NAMES:" + v.first,
-                        v.first);
+                    assay->store_variable("MATCHED_VARS:" + v->m_key, value);
+                    assay->store_variable("MATCHED_VARS_NAMES:" + v->m_key,
+                        v->m_key);
                     chainResult = this->chainedRule->evaluate(assay);
                     assay->update_variable_first("MATCHED_VAR", "");
-                    assay->delete_variable("MATCHED_VARS:" + v.first);
-                    assay->delete_variable("MATCHED_VARS_NAMES:" + v.first);
-                    assay->delete_variable("MATCHED_VARS_NAMES:" + v.first);
+                    assay->delete_variable("MATCHED_VARS:" + v->m_key);
+                    assay->delete_variable("MATCHED_VARS_NAMES:" + v->m_key);
+                    assay->delete_variable("MATCHED_VARS_NAME");
                 }
                 if (this->chained && chainResult == true || !this->chained) {
                     for (Action *a : assay->m_rules->defaultActions[this->phase]) {
@@ -472,6 +472,11 @@ bool Rule::evaluate(Assay *assay) {
                 assay->debug(4, "Rule returned 0.");
 #endif
             }
+        }
+
+        while (e->empty() == false) {
+            delete e->front();
+            e->pop_front();
         }
     }
     return ret;

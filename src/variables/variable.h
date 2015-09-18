@@ -17,6 +17,7 @@
 #include <string>
 #include <list>
 #include <utility>
+#include "modsecurity/assay.h"
 
 #ifndef SRC_VARIABLES_VARIABLE_H_
 #define SRC_VARIABLES_VARIABLE_H_
@@ -32,7 +33,7 @@ class Variable {
         : name(_name) { }
 
     static std::string to_s(std::vector<Variable *> *variables);
-    virtual std::list<std::pair<std::string, std::string>>
+    virtual std::list<ModSecurityStringVar *> *
         evaluate(Assay *assay);
     std::string name;
 };

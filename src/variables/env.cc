@@ -33,9 +33,9 @@ extern char **environ;
 namespace ModSecurity {
 namespace Variables {
 
-std::list<std::pair<std::string, std::string>>
+std::list<ModSecurityStringVar *> *
     Env::evaluate(Assay *assay) {
-    std::list<std::pair<std::string, std::string>> resl;
+    std::list<ModSecurityStringVar *> *resl = new std::list<ModSecurityStringVar *>();
 
     std::map<std::string, std::string> envs;
     for (char **current = environ; *current; current++) {
@@ -49,9 +49,7 @@ std::list<std::pair<std::string, std::string>>
 
         envs.insert(std::pair<std::string, std::string>("ENV:" + key, value));
         if ("env:" + key == name) {
-            std::pair<std::string, std::string> pair;
-            pair = std::make_pair(name, value);
-            resl.push_back(pair);
+            resl->push_back(new ModSecurityStringVar(name, value));
             return resl;
         }
     }
@@ -61,9 +59,7 @@ std::list<std::pair<std::string, std::string>>
             && (x.first != name)) {
             continue;
         }
-        std::pair<std::string, std::string> pair;
-        pair = std::make_pair(x.first, x.second);
-        resl.push_back(pair);
+        resl->push_back(new ModSecurityStringVar(x.first, x.second));
     }
 
     return resl;

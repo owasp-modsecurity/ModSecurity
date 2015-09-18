@@ -28,9 +28,11 @@ using ModSecurity::Variables::Variations::Exclusion;
 namespace ModSecurity {
 namespace Variables {
 
-std::list<std::pair<std::string, std::string>>
+std::list<ModSecurityStringVar *> *
     Variable::evaluate(Assay *assay) {
-    return assay->resolve_variable(this->name);
+    std::list<ModSecurityStringVar *> *l = new std::list<ModSecurityStringVar *>();
+    assay->resolve_variable(this->name, l);
+    return l;
 }
 
 std::string Variable::to_s(

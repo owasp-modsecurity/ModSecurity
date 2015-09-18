@@ -33,15 +33,11 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<std::pair<std::string, std::string>>
+std::list<ModSecurityStringVar *> *
     Tx::evaluate(Assay *assay) {
-    std::list<std::pair<std::string, std::string>> resl;
-    std::pair<std::string, std::string> pair;
+    std::list<ModSecurityStringVar *> *resl = new std::list<ModSecurityStringVar *>();
 
-    pair = std::make_pair(std::string("TX:0"),
-       std::string("teste"));
-
-    resl.push_back(pair);
+    resl->push_back(new ModSecurityStringVar("TX:0", "teste"));
 
     return resl;
 }

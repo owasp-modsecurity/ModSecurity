@@ -33,10 +33,10 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<std::pair<std::string, std::string>>
+std::list<ModSecurityStringVar *> *
     TimeSec::evaluate(Assay *assay) {
-    std::list<std::pair<std::string, std::string>> resl;
-    std::pair<std::string, std::string> pair;
+    std::list<ModSecurityStringVar *> *resl = new std::list<ModSecurityStringVar *>();
+
     char tstr[200];
     struct tm timeinfo;
     time_t timer;
@@ -47,9 +47,7 @@ std::list<std::pair<std::string, std::string>>
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%S", &timeinfo);
 
-    pair = std::make_pair(std::string("TIME_SEC"),
-       std::string(tstr));
-    resl.push_back(pair);
+    resl->push_back(new ModSecurityStringVar("TIME_SEC",  std::string(tstr)));
 
     return resl;
 }

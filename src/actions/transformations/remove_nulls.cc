@@ -35,23 +35,17 @@ namespace transformations {
 
 std::string RemoveNulls::evaluate(std::string value,
     Assay *assay) {
-    int64_t i, j;
+    int64_t i;
 
-    char *input = reinterpret_cast<char *>(malloc(value.size()
-        * sizeof(char)));
-    memcpy(input, value.c_str(), value.size());
+    std::string ret;
 
-    i = j = 0;
+    i = 0;
     while (i < value.size()) {
-        if (input[i] != '\0') {
-            input[j] = input[i];
-            j++;
+        if (value.at(i) != '\0') {
+            ret += value.at(i);
         }
         i++;
     }
-
-    std::string ret(input, 0, j);
-    free(input);
 
     return ret;
 }

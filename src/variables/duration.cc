@@ -27,18 +27,16 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<std::pair<std::string, std::string>>
+std::list<ModSecurityStringVar *> *
     Duration::evaluate(Assay *assay) {
-    std::list<std::pair<std::string, std::string>> resl;
+    std::list<ModSecurityStringVar *> *resl = new std::list<ModSecurityStringVar *>();
     std::string res;
-    std::pair<std::string, std::string> pair;
 
     double e = cpu_seconds() - assay->start;
 
     res = std::to_string(e);
 
-    pair = std::make_pair(std::string("DURATION"), std::string(res));
-    resl.push_back(pair);
+    resl->push_back(new ModSecurityStringVar("DURATION",  std::string(res)));
 
     return resl;
 }

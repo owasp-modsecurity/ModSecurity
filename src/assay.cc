@@ -664,10 +664,12 @@ int Assay::processRequestBody() {
      * computationally intensive.
      */
     std::string fullRequest;
-    for (auto &a : resolve_variable("REQUEST_HEADERS")) {
+    std::list<ModSecurityStringVar *> l;
+    resolve_variable("REQUEST_HEADERS", &l);
+    for (auto &a : l) {
         fullRequest = fullRequest + \
-            std::string(a.first, 16, a.first.length() - 16) + ": " \
-            + a.second + "\n";
+            std::string(a->m_key, 16, a->m_key.length() - 16) + ": " \
+            + a->m_value + "\n";
     }
     fullRequest = fullRequest + "\n\n";
     fullRequest = fullRequest + m_requestBody.str();
@@ -1471,23 +1473,25 @@ void Assay::delete_variable(std::string key) {
 }
 
 
-std::list<std::pair<std::string, std::string>>
-    Assay::resolve_variable(const std::string& var) {
-    std::list<std::pair<std::string, std::string>> l;
-    std::pair<std::string, std::string> pair;
+void Assay::resolve_variable(const std::string& var,
+    std::list<ModSecurityStringVar *> *l) {
 
-    l = m_variables_strings.resolveVariable(var);
+    m_variables_strings.resolveVariable(var, l);
 
     size_t ac = var.find(":");
     if (ac != std::string::npos) {
         /* It may be a collection */
         for (auto &a : collections) {
-            std::list<std::pair<std::string, std::string>> l2 = a.second->resolveVariable(var);
-            if (l2.empty() == false) {
-                l.insert(l.end(), l2.begin(), l2.end());
-            }
+            a.second->resolveVariable(var, l);
         }
     }
+}
+
+std::list<ModSecurityStringVar *> *
+    Assay::resolve_variable(const std::string& var) {
+    std::list<ModSecurityStringVar *> *l = new std::list<ModSecurityStringVar *>();
+
+    resolve_variable(var, l);
 
     return l;
 }

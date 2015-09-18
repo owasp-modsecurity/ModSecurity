@@ -26,14 +26,12 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<std::pair<std::string, std::string>>
+std::list<ModSecurityStringVar *> *
     HighestSeverity::evaluate(Assay *assay) {
-    std::list<std::pair<std::string, std::string>> resl;
-    std::pair<std::string, std::string> pair;
+    std::list<ModSecurityStringVar *> *resl = new std::list<ModSecurityStringVar *>();
 
-    pair = std::make_pair(std::string("HIGHEST_SEVERITY"),
-        std::to_string(assay->highest_severity));
-    resl.push_back(pair);
+    resl->push_back(new ModSecurityStringVar("HIGHEST_SEVERITY",
+        std::to_string(assay->highest_severity)));
 
     return resl;
 }
