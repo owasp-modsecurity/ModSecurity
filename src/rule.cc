@@ -300,7 +300,7 @@ bool Rule::evaluate(Assay *assay) {
             if (std::find(exclusions.begin(), exclusions.end(),
                 v->m_key) != exclusions.end()) {
 #ifndef NO_LOGS
-                assay->debug(9, "Variable: " + v.m_key + " is part of the" +
+                assay->debug(9, "Variable: " + v->m_key + " is part of the" +
                     " exclusion list, skipping...");
 #endif
                 continue;
@@ -349,7 +349,7 @@ bool Rule::evaluate(Assay *assay) {
 
 #ifndef NO_LOGS
             assay->debug(9, "Target value: \"" + limitTo(80, toHexIfNeeded(value)) + \
-                "\" (Variable: " + v.m_key + ")");
+                "\" (Variable: " + v->m_key + ")");
 #endif
 
             ret = this->op->evaluate(assay, value);
