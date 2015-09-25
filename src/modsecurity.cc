@@ -168,7 +168,7 @@ extern "C" void msc_set_log_cb(ModSecurity *msc, LogCb cb) {
  *
  *       ConnectorName vX.Y.Z-tag (something else)
  *
- *       For instance: ModSecurity-nginx v0.0.1-alpha (Whee)
+ *       For instance: ModSecurity-nginx v0.0.1-alpha
  *
  * @param connector Information about the connector.
  *
