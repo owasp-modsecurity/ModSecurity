@@ -152,6 +152,18 @@ void ModSecurity::setServerLogCb(LogCb cb) {
     m_logCb = (LogCb) cb;
 }
 
+/**
+ * @name    msc_set_log_cb
+ * @brief   Set the log callback functiond
+ *
+ * It is neccessary to indicate to libModSecurity which function within the
+ * connector should be called when logging is required.
+ *
+ * @oarm msc The current ModSecurity instance
+ * @param LogCB The callback function to which a reference to the log msgs 
+ * will be passed.
+ *
+ */
 extern "C" void msc_set_log_cb(ModSecurity *msc, LogCb cb) {
     msc->setServerLogCb(cb);
 }
