@@ -37,8 +37,7 @@ bool CustomDebugLog::contains(const std::string& pattern) {
     ModSecurity::Utils::Regex re(pattern);
     ModSecurity::Utils::SMatch match;
     std::string s = m_log.str();
-    return (ModSecurity::Utils::regex_search(s, &match, re)
-        && match.size() >= 1);
+    return ModSecurity::Utils::regex_search(s, re);
 }
 
 std::string CustomDebugLog::log_messages() {
