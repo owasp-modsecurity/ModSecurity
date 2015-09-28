@@ -43,7 +43,8 @@ Phase::Phase(std::string action)
     } catch (...) {
         this->phase = 0;
         if (tolower(a) == "request") {
-            this->phase = this->phase + ModSecurity::Phases::RequestHeadersPhase;
+            this->phase = this->phase +
+                ModSecurity::Phases::RequestHeadersPhase;
             m_secRulesPhase = 2;
         }
         if (tolower(a) == "response") {

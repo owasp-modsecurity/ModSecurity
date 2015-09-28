@@ -30,7 +30,6 @@ class Pass : public Action {
     explicit Pass(std::string action);
 
     bool evaluate(Rule *rule, Assay *assay) override;
-    void fill_intervention(ModSecurityIntervention *i) override;
     bool isDisruptive() override { return true; }
 };
 

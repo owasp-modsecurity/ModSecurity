@@ -70,7 +70,8 @@ int DebugLog::getDebugLogLevel() {
 
 void DebugLog::write(int level, const std::string &msg) {
     if (level <= m_debugLevel) {
-        DebugLogWriter::getInstance().write(m_fileName, "[" + std::to_string(level) + "] " + msg);
+        DebugLogWriter::getInstance().write(m_fileName, "[" \
+            + std::to_string(level) + "] " + msg);
     }
 }
 

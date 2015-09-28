@@ -40,19 +40,22 @@ Regex::Regex(const std::string& pattern_)
         pattern.assign(".*");
     }
 
-    m_pc = pcre_compile(pattern.c_str(), PCRE_DOTALL|PCRE_MULTILINE, &errptr, &erroffset, NULL);
+    m_pc = pcre_compile(pattern.c_str(), PCRE_DOTALL|PCRE_MULTILINE,
+        &errptr, &erroffset, NULL);
     m_pce = pcre_study(m_pc, PCRE_STUDY_JIT_COMPILE, &errptr);
 }
 
 int regex_search(const std::string& s, SMatch *match,
     const Regex& regex) {
     int ovector[OVECCOUNT];
-    return pcre_exec(regex.m_pc, regex.m_pce, s.c_str(), s.size(), 0, 0, ovector, OVECCOUNT) > 0;
+    return pcre_exec(regex.m_pc, regex.m_pce, s.c_str(),
+        s.size(), 0, 0, ovector, OVECCOUNT) > 0;
 }
 
 int regex_search(const std::string& s, const Regex& regex) {
     int ovector[OVECCOUNT];
-    return pcre_exec(regex.m_pc, regex.m_pce, s.c_str(), s.size(), 0, 0, ovector, OVECCOUNT) > 0;
+    return pcre_exec(regex.m_pc, regex.m_pce, s.c_str(),
+        s.size(), 0, 0, ovector, OVECCOUNT) > 0;
 }
 
 }  // namespace Utils

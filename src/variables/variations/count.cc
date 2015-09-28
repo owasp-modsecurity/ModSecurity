@@ -31,7 +31,8 @@ namespace Variations {
 std::list<ModSecurityStringVar *> *
     Count::evaluate(Assay *assay) {
     std::list<ModSecurityStringVar *> *reslIn;
-    std::list<ModSecurityStringVar *> *reslOut = new std::list<ModSecurityStringVar *>();
+    std::list<ModSecurityStringVar *> *reslOut =
+        new std::list<ModSecurityStringVar *>();
     int count = 0;
 
     reslIn = var->evaluate(assay);

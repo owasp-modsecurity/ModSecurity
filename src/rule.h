@@ -67,6 +67,7 @@ class Rule {
 
     std::string m_marker;
     bool m_secmarker;
+
  private:
     bool m_unconditional;
     int m_referenceCount;

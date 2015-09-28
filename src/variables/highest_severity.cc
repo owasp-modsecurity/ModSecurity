@@ -28,7 +28,8 @@ namespace Variables {
 
 std::list<ModSecurityStringVar *> *
     HighestSeverity::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *resl = new std::list<ModSecurityStringVar *>();
+    std::list<ModSecurityStringVar *> *resl =
+        new std::list<ModSecurityStringVar *>();
 
     resl->push_back(new ModSecurityStringVar("HIGHEST_SEVERITY",
         std::to_string(assay->highest_severity)));

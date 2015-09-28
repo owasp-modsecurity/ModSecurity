@@ -29,7 +29,8 @@ namespace Variables {
 
 std::list<ModSecurityStringVar *> *
     ModsecBuild::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *resl = new std::list<ModSecurityStringVar *>();
+    std::list<ModSecurityStringVar *> *resl =
+        new std::list<ModSecurityStringVar *>();
 
     std::ostringstream ss;
     ss << std::setw(2) << std::setfill('0') << MODSECURITY_MAJOR;

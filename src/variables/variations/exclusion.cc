@@ -31,7 +31,8 @@ namespace Variations {
 
 std::list<ModSecurityStringVar *> *
     Exclusion::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *l = new std::list<ModSecurityStringVar *>();
+    std::list<ModSecurityStringVar *> *l =
+        new std::list<ModSecurityStringVar *>();
     assay->resolve_variable(this->name, l);
     return l;
 }

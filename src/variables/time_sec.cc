@@ -35,7 +35,8 @@ namespace Variables {
 
 std::list<ModSecurityStringVar *> *
     TimeSec::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *resl = new std::list<ModSecurityStringVar *>();
+    std::list<ModSecurityStringVar *> *resl =
+        new std::list<ModSecurityStringVar *>();
 
     char tstr[200];
     struct tm timeinfo;

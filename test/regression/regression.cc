@@ -110,8 +110,10 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
 
         if (modsec_rules->load(t->rules.c_str(), filename) < 0) {
             if (t->parser_error.empty() == true) {
-                testRes->reason << KRED << "parse failed." << RESET << std::endl;
-                testRes->reason << modsec_rules->getParserError() << std::endl;
+                testRes->reason << KRED << "parse failed." << RESET \
+                    << std::endl;
+                testRes->reason << modsec_rules->getParserError() \
+                    << std::endl;
                 testRes->passed = false;
                 return;
             }
@@ -294,12 +296,13 @@ int main(int argc, char **argv) {
     int passed = 0;
     int failed = 0;
     for (RegressionTestResult *r : res) {
-        if (r->passed) { 
+        if (r->passed) {
             passed++;
         } else {
             std::cout << KRED << "Test failed." << RESET << KWHT << " From: " \
-               << RESET << r->test->filename << "." << std::endl;
-            std::cout << KWHT << "Test name: " << RESET << r->test->name << "." << std::endl;
+                << RESET << r->test->filename << "." << std::endl;
+            std::cout << KWHT << "Test name: " << RESET << r->test->name \
+                << "." << std::endl;
             std::cout << KWHT << "Reason: " << RESET << std::endl;
             std::cout << r->reason.str() << std::endl;
             failed++;

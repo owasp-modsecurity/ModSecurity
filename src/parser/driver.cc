@@ -97,7 +97,8 @@ int Driver::addSecRule(Rule *rule) {
         std::vector<Rule *> rules = this->rules[i];
         for (int j = 0; j < rules.size(); j++) {
             if (rules[j]->rule_id == rule->rule_id) {
-                parserError << "Rule id: " << std::to_string(rule->rule_id) << " is duplicated" << std::endl;
+                parserError << "Rule id: " << std::to_string(rule->rule_id) \
+                    << " is duplicated" << std::endl;
                 return false;
             }
         }
@@ -126,7 +127,8 @@ int Driver::parse(const std::string &f, const std::string &ref) {
     scan_end();
 
     if (audit_log->init() == false) {
-        parserError << "Problems while initializing the audit logs" << std::endl;
+        parserError << "Problems while initializing the audit logs" \
+            << std::endl;
         return false;
     }
 

@@ -35,7 +35,8 @@ namespace Variables {
 
 std::list<ModSecurityStringVar *> *
     Env::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *resl = new std::list<ModSecurityStringVar *>();
+    std::list<ModSecurityStringVar *> *resl =
+        new std::list<ModSecurityStringVar *>();
 
     std::map<std::string, std::string> envs;
     for (char **current = environ; *current; current++) {

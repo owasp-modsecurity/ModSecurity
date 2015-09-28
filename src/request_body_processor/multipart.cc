@@ -224,9 +224,9 @@ bool Multipart::process(std::string data) {
 
         checkForCrlfLf(block);
 
-        //if (this->crlf) {
-        //    block.erase(0, 1);
-        //}
+        //  if (this->crlf) {
+        //      block.erase(0, 1);
+        //  }
 
         blobs.push_back(block);
         lastValidBoundary = end;

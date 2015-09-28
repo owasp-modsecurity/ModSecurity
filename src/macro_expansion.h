@@ -32,7 +32,8 @@ class MacroExpansion {
     MacroExpansion();
 
     static std::string expand(const std::string& input, Assay *assay);
-    static std::string expandKeepOriginal(const std::string& input, Assay *assay);
+    static std::string expandKeepOriginal(const std::string& input,
+        Assay *assay);
 };
 
 

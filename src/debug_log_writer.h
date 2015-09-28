@@ -20,7 +20,7 @@
 #ifndef SRC_DEBUG_LOG_WRITER_H_
 #define SRC_DEBUG_LOG_WRITER_H_
 
-#include "debug_log_writer_agent.h"
+#include "src/debug_log_writer_agent.h"
 
 
 namespace ModSecurity {
@@ -37,7 +37,7 @@ class DebugLogWriter {
     void close(const std::string& m_fileName);
     void open(const std::string& m_fileName);
  private:
-    DebugLogWriter() {};
+    DebugLogWriter() {}
 
     // C++ 03
     // ========

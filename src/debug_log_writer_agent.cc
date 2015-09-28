@@ -19,8 +19,7 @@
 
 #include <fstream>
 
-#include "debug_log_writer.h"
-
+#include "src/debug_log_writer.h"
 
 
 namespace ModSecurity {

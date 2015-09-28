@@ -38,7 +38,7 @@ class RuleId : public Action {
     bool init(std::string *error) override;
     bool evaluate(Rule *rule, Assay *assay) override;
 
-private:
+ private:
     double m_ruleId;
 };
 

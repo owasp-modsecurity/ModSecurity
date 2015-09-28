@@ -50,7 +50,7 @@
 namespace ModSecurity {
 
 std::string phase_name(int x) {
-    switch(x) {
+    switch (x) {
         case ModSecurity::Phases::ConnectionPhase:
             return "Connection Phase";
             break;

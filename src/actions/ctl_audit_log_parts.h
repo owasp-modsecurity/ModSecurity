@@ -18,8 +18,8 @@
 #include "actions/action.h"
 #include "modsecurity/assay.h"
 
-#ifndef SRC_CLT_ACTIONS_AUDIT_LOG_PARTS_H_
-#define SRC_CLT_ACTIONS_AUDIT_LOG_PARTS_H_
+#ifndef SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_
+#define SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_
 
 namespace ModSecurity {
 namespace actions {
@@ -37,4 +37,4 @@ class CtlAuditLogParts : public Action {
 }  // namespace actions
 }  // namespace ModSecurity
 
-#endif  // SRC_CLT_ACTIONS_AUDIT_LOG_PARTS_H_
+#endif  // SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_

@@ -35,9 +35,11 @@ namespace Variables {
 
 std::list<ModSecurityStringVar *> *
     TimeEpoch::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *resl = new std::list<ModSecurityStringVar *>();
+    std::list<ModSecurityStringVar *> *resl =
+        new std::list<ModSecurityStringVar *>();
 
-    resl->push_back(new ModSecurityStringVar("TIME_EPOCH",  std::to_string(std::time(nullptr))));
+    resl->push_back(new ModSecurityStringVar("TIME_EPOCH",
+        std::to_string(std::time(nullptr))));
 
     return resl;
 }

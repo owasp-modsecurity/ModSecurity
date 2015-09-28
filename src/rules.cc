@@ -175,7 +175,8 @@ int Rules::evaluate(int phase, Assay *assay) {
         if (assay->m_marker.empty()) {
             rule->evaluate(assay);
         } else {
-            debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) + "' due to a SecMarker: " + assay->m_marker);
+            debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
+                + "' due to a SecMarker: " + assay->m_marker);
             m_secmarker_skipped++;
             debug(9, "Rule: " + rule->m_marker);
             if (rule->m_secmarker && rule->m_marker == assay->m_marker) {

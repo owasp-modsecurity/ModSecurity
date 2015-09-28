@@ -25,8 +25,7 @@ namespace actions {
 
 CtlAuditLogParts::CtlAuditLogParts(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind),
-        mPartsAction(0)
-{
+        mPartsAction(0) {
     std::string what(action, 18, 1);
     mParts = std::string(action, 19, action.length()-19);
     if (what == "+") {

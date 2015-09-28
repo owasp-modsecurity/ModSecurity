@@ -239,8 +239,7 @@ bool AuditLog::saveIfRelevant(Assay *assay, int parts) {
         return false;
     }
 
-    if (parts == -1)
-    {
+    if (parts == -1) {
         parts = m_parts;
     }
     m_writer->write(assay, parts);

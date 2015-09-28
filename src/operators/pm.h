@@ -35,7 +35,8 @@ class Pm : public Operator {
         m_p = acmp_create(0);
     }
     ~Pm();
-    void replaceAll(std::string& str, const std::string& from, const std::string& to);
+    void replaceAll(std::string str, const std::string& from,
+        const std::string& to);
     bool evaluate(Assay *assay, const std::string &input);
 
     virtual bool init(const char **error);

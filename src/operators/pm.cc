@@ -59,9 +59,10 @@ void Pm::postOrderTraversal(acmp_btree_node_t *node) {
     node = NULL;
 }
 
-void Pm::replaceAll(std::string& str, const std::string& from, const std::string& to) {
+void Pm::replaceAll(std::string str, const std::string& from,
+    const std::string& to) {
     size_t start_pos = 0;
-    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
         size_t end_pos = start_pos + from.length();
         str.replace(start_pos, end_pos, to);
         start_pos += to.length();

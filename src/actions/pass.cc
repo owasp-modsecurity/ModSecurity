@@ -36,9 +36,6 @@ bool Pass::evaluate(Rule *rule, Assay *assay) {
     return true;
 }
 
-void Pass::fill_intervention(ModSecurityIntervention *i) {
-
-}
 
 }  // namespace actions
 }  // namespace ModSecurity

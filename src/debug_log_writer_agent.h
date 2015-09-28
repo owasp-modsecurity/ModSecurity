@@ -25,7 +25,7 @@ namespace ModSecurity {
 /** @ingroup ModSecurity_CPP_API */
 class DebugLogWriterAgent : public std::ofstream {
  public:
-    DebugLogWriterAgent(const std::string& fileName);
+    explicit DebugLogWriterAgent(const std::string& fileName);
     ~DebugLogWriterAgent() {
         if (is_open()) {
             close();

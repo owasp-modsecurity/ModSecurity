@@ -36,14 +36,16 @@ bool RuleId::init(std::string *error) {
         m_ruleId = std::stod(a);
     } catch (...) {
         m_ruleId = 0;
-        error->assign("The input \"" + a + "\" does not seems to be a valid rule id.");
+        error->assign("The input \"" + a + "\" does not " \
+            "seems to be a valid rule id.");
         return false;
     }
 
     std::ostringstream oss;
     oss << std::setprecision(40) << m_ruleId;
     if (a != oss.str() || m_ruleId < 0) {
-        error->assign("The input \"" + a + "\" does not seems to be a valid rule id.");
+        error->assign("The input \"" + a + "\" does not seems " \
+            "to be a valid rule id.");
         return false;
     }
     return true;

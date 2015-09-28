@@ -30,7 +30,8 @@ namespace Variables {
 
 std::list<ModSecurityStringVar *> *
     Variable::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *l = new std::list<ModSecurityStringVar *>();
+    std::list<ModSecurityStringVar *> *l =
+        new std::list<ModSecurityStringVar *>();
     assay->resolve_variable(this->name, l);
     return l;
 }

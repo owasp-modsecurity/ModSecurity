@@ -104,7 +104,6 @@ class ModSecurityStringVar {
 class ModSecurityStringVariables :
     public std::unordered_multimap<std::string, std::string> {
  public:
-
     ModSecurityStringVariables() {
         this->reserve(1000);
     }
@@ -140,7 +139,6 @@ class ModSecurityStringVariables :
     std::list<ModSecurityStringVar *>
         resolveVariable(const std::string& key,
         std::list<ModSecurityStringVar *> *l) {
-
         auto range = this->equal_range(key);
 
         for (auto it = range.first; it != range.second; ++it) {
@@ -159,11 +157,11 @@ class ModSecurityStringVariables :
                 if (x.first.compare(0, keySize, key + ":") != 0) {
                     continue;
                 }
-                //auto range = this->equal_range(x.first);
+                //  auto range = this->equal_range(x.first);
 
-                //for (auto it = range.first; it != range.second; ++it) {
+                //  for (auto it = range.first; it != range.second; ++it) {
                 l->push_back(new ModSecurityStringVar(x.first, x.second));
-                //}
+                //  }
             }
         }
 
@@ -293,6 +291,7 @@ class Assay {
 
     std::list<std::pair<int, std::string>> auditLogModifier;
     std::string m_marker;
+
  private:
     std::ofstream myfile;
     ModSecurity *m_ms;

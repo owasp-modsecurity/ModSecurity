@@ -169,7 +169,7 @@ class AuditLog {
 
     int m_parts;
 
-private:
+ private:
     AuditLogStatus m_status;
 
 

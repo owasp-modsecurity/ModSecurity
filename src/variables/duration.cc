@@ -29,7 +29,8 @@ namespace Variables {
 
 std::list<ModSecurityStringVar *> *
     Duration::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *resl = new std::list<ModSecurityStringVar *>();
+    std::list<ModSecurityStringVar *> *resl =
+        new std::list<ModSecurityStringVar *>();
     std::string res;
 
     double e = cpu_seconds() - assay->start;

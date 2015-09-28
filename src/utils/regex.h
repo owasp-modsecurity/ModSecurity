@@ -13,10 +13,11 @@
  *
  */
 
+#include <pcre.h>
+
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <pcre.h>
 
 #ifndef SRC_UTILS_REGEX_H_
 #define SRC_UTILS_REGEX_H_

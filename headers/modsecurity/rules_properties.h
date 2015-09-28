@@ -74,8 +74,10 @@ class RulesProperties {
         delete m_debugLog;
     }
 
-    std::vector<Rule *> rules[7];  // ModSecurity::Phases::NUMBER_OF_PHASES
-    std::vector<actions::Action *> defaultActions[7];  // ModSecurity::Phases::NUMBER_OF_PHASES
+    std::vector<Rule *> rules[7];
+    //  ModSecurity::Phases::NUMBER_OF_PHASES
+    std::vector<actions::Action *> defaultActions[7];
+    //  ModSecurity::Phases::NUMBER_OF_PHASES
 
     /**
      *

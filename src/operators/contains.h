@@ -17,6 +17,7 @@
 #define SRC_OPERATORS_CONTAINS_H_
 
 #include <string>
+#include <list>
 
 #include "modsecurity/assay.h"
 #include "operators/operator.h"

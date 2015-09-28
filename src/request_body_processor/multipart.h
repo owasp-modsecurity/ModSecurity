@@ -50,6 +50,7 @@ class Multipart {
         m_assay->debug(a, str);
     }
 #endif
+
  private:
     std::string m_boundary;
     std::string m_header;
