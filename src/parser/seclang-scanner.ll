@@ -23,7 +23,8 @@ using ModSecurity::split;
 %}
 %option noyywrap nounput batch debug noinput
 
-ACTION          (?i:accuracy|allow|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|initcol|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|status:[0-9]+|xmlns)
+ACTION          (?i:accuracy|allow|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|status:[0-9]+|xmlns)
+ACTION_INITCOL  (?i:initcol)
 
 ACTION_ACCURACY (?i:accuracy)
 ACTION_REDIRECT (?i:redirect)
@@ -85,6 +86,7 @@ CONFIG_DIR_AUDIT_LOG     (?i:SecAuditLog)
 CONFIG_DIR_AUDIT_STS     (?i:SecAuditLogRelevantStatus)
 CONFIG_DIR_AUDIT_TPE     (?i:SecAuditLogType)
 
+CONFIG_SEC_COLLECTION_TIMEOUT (?i:SecCollectionTimeout)
 
 CONFIG_DIR_DEBUG_LOG (?i:SecDebugLog)
 CONFIG_DIR_DEBUG_LVL (?i:SecDebugLogLevel)
@@ -318,7 +320,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {ACTION_ACCURACY}:{FREE_TEXT_QUOTE}      { return yy::seclang_parser::make_ACTION_ACCURACY(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_CTL_BDY_XML}              { return yy::seclang_parser::make_ACTION_CTL_BDY_XML(yytext, *driver.loc.back()); }
 {ACTION_CTL_BDY_JSON}             { return yy::seclang_parser::make_ACTION_CTL_BDY_JSON(yytext, *driver.loc.back()); }
-
+{ACTION_INITCOL}:{FREE_TEXT_QUOTE}={FREE_TEXT_SPACE_COMMA} { return yy::seclang_parser::make_ACTION_INITCOL(yytext, *driver.loc.back()); }
 
 ["]                             { return yy::seclang_parser::make_QUOTATION_MARK(yytext, *driver.loc.back()); }
 [,]                             { return yy::seclang_parser::make_COMMA(*driver.loc.back()); }
@@ -430,7 +432,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 }
 
 {CONFIG_SEC_REMOTE_RULES_FAIL_ACTION}  { return yy::seclang_parser::make_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION(yytext, *driver.loc.back()); }
-
+{CONFIG_SEC_COLLECTION_TIMEOUT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_SEC_COLLECTION_TIMEOUT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 
 %%
 

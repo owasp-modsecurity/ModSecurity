@@ -227,6 +227,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> ACTION_SEVERITY
 %token <std::string> ACTION_SETVAR
 %token <std::string> ACTION_EXPIREVAR
+%token <std::string> ACTION_INITCOL
 %token <std::string> ACTION_MSG
 %token <std::string> ACTION_TAG
 %token <std::string> ACTION_REV
@@ -240,6 +241,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> ACTION_CTL_BDY_XML
 %token <std::string> ACTION_CTL_RULE_ENGINE
 %token <std::string> ACTION_CTL_FORCE_REQ_BODY_VAR
+%token <std::string> CONFIG_SEC_COLLECTION_TIMEOUT
 
 %type <std::vector<Action *> *> actions
 %type <std::vector<Variable *> *> variables
@@ -537,6 +539,7 @@ expression:
     | CONGIG_DIR_SEC_COOKIE_FORMAT
     | CONGIG_DIR_SEC_STATUS_ENGINE
     | CONFIG_DIR_UNICODE_MAP_FILE
+    | CONFIG_SEC_COLLECTION_TIMEOUT
       {
       }
     ;
@@ -695,6 +698,10 @@ act:
             driver.parserError << error;
             YYERROR;
         }
+      }
+    | ACTION_INITCOL
+      {
+        $$ = Action::instantiate($1);
       }
     | TRANSFORMATION
       {
