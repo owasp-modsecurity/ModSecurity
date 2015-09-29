@@ -139,7 +139,7 @@ CONFIG_VALUE_REJECT (?i:Reject)
 CONFIG_VALUE_ABORT   (?i:Abort)
 CONFIG_VALUE_WARN    (?i:Warn)
 
-CONFIG_VALUE_PATH    [0-9A-Za-z_/\.\-]+
+CONFIG_VALUE_PATH    [0-9A-Za-z_/\.\-\*]+
 AUDIT_PARTS [ABCDEFHJKIZ]+
 CONFIG_VALUE_NUMBER [0-9]+
 
@@ -373,31 +373,37 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 %{ /* Include external configurations */ %}
 {CONFIG_INCLUDE}[ ]{CONFIG_VALUE_PATH} {
     const char *file = strchr(yytext, ' ') + 1;
-    yyin = fopen(file, "r" );
-    if (!yyin) {
-        BEGIN(INITIAL);
-        driver.error (*driver.loc.back(), "", yytext + std::string(": Not able to open file."));
-        throw yy::seclang_parser::syntax_error(*driver.loc.back(), "");
+    for (auto& s: ModSecurity::expandEnv(file, 0)) {
+        yyin = fopen(s.c_str(), "r" );
+        if (!yyin) {
+            BEGIN(INITIAL);
+            driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file."));
+            throw yy::seclang_parser::syntax_error(*driver.loc.back(), "");
+        }
+        driver.ref.push_back(file);
+        driver.loc.push_back(new yy::location());
+        yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
+
     }
-    driver.ref.push_back(file);
-    driver.loc.push_back(new yy::location());
-    yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 }
 
 {CONFIG_INCLUDE}[ ]["]{CONFIG_VALUE_PATH}["] {
     const char *file = strchr(yytext, ' ') + 1;
     char *f = strdup(file + 1);
     f[strlen(f)-1] = '\0';
-    yyin = fopen(f, "r" );
-    if (!yyin) {
-        BEGIN(INITIAL);
-        driver.error (*driver.loc.back(), "", yytext + std::string(": Not able to open file."));
-        throw yy::seclang_parser::syntax_error(*driver.loc.back(), "");
+    for (auto& s: ModSecurity::expandEnv(f, 0)) {
+        yyin = fopen(s.c_str(), "r" );
+        if (!yyin) {
+            BEGIN(INITIAL);
+            driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file."));
+            throw yy::seclang_parser::syntax_error(*driver.loc.back(), "");
+        }
+        driver.ref.push_back(file);
+        driver.loc.push_back(new yy::location());
+        yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
+
     }
     free(f);
-    driver.ref.push_back(file);
-    driver.loc.push_back(new yy::location());
-    yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 }
 
 

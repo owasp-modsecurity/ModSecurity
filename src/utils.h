@@ -47,6 +47,7 @@ namespace ModSecurity {
     std::string phase_name(int x);
     std::string limitTo(int amount, const std::string &str);
     std::string toHexIfNeeded(const std::string &str);
+    std::vector<std::string> expandEnv(const std::string& var, int flags);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_

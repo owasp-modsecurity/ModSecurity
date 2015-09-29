@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <wordexp.h>
 
 
 #include <stdint.h>
@@ -1019,6 +1020,23 @@ std::string toHexIfNeeded(const std::string &str) {
     }
 
     return res.str();
+}
+
+
+std::vector<std::string> expandEnv(const std::string& var, int flags)
+{
+    std::vector<std::string> vars;
+
+    wordexp_t p;
+    if (wordexp(var.c_str(), &p, flags) == false) {
+        if (p.we_wordc) {
+            for (char** exp = p.we_wordv; *exp; ++exp) {
+                vars.push_back(exp[0]);
+            }
+        }
+        wordfree(&p);
+    }
+    return vars;
 }
 
 
