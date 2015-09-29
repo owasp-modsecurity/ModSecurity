@@ -382,6 +382,23 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
     yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 }
 
+{CONFIG_INCLUDE}[ ]["]{CONFIG_VALUE_PATH}["] {
+    const char *file = strchr(yytext, ' ') + 1;
+    char *f = strdup(file + 1);
+    f[strlen(f)-1] = '\0';
+    yyin = fopen(f, "r" );
+    if (!yyin) {
+        BEGIN(INITIAL);
+        driver.error (*driver.loc.back(), "", yytext + std::string(": Not able to open file."));
+        throw yy::seclang_parser::syntax_error(*driver.loc.back(), "");
+    }
+    free(f);
+    driver.ref.push_back(file);
+    driver.loc.push_back(new yy::location());
+    yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
+}
+
+
 {CONFIG_SEC_REMOTE_RULES}[ ][^ ]+[ ][^\n\r ]+ {
     HttpsClient c;
     std::string key;
