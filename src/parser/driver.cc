@@ -169,11 +169,11 @@ void Driver::error(const yy::location& l, const std::string& m,
         parserError << "Line: " << l.end.line << ". ";
         parserError << "Column: " << l.end.column << ". ";
     }
-    /*
+
     if (m.empty() == false) {
-        parserError << " " << m << ".";
+        parserError << "" << m << " ";
     }
-    */
+
     if (c.empty() == false) {
         parserError << c;
     }
