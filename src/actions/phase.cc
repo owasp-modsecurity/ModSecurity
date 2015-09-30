@@ -43,16 +43,15 @@ Phase::Phase(std::string action)
     } catch (...) {
         this->phase = 0;
         if (tolower(a) == "request") {
-            this->phase = this->phase +
-                ModSecurity::Phases::RequestHeadersPhase;
+            this->phase = ModSecurity::Phases::RequestHeadersPhase;
             m_secRulesPhase = 2;
         }
         if (tolower(a) == "response") {
-            this->phase = this->phase + ModSecurity::Phases::ResponseBodyPhase;
+            this->phase = ModSecurity::Phases::ResponseBodyPhase;
             m_secRulesPhase = 4;
         }
         if (tolower(a) == "logging") {
-            this->phase = this->phase + ModSecurity::Phases::LoggingPhase;
+            this->phase = ModSecurity::Phases::LoggingPhase;
             m_secRulesPhase = 5;
         }
     }
@@ -60,17 +59,17 @@ Phase::Phase(std::string action)
     if (this->phase == 0) {
       /* Phase 0 is something new, we want to use as ConnectionPhase */
       this->phase = ModSecurity::Phases::ConnectionPhase;
-      m_secRulesPhase = 2;
+      m_secRulesPhase = 1;
     } else {
       /* Otherwise we want to shift the rule to the correct phase */
       m_secRulesPhase = phase;
-      this->phase = phase + ModSecurity::Phases::RequestHeadersPhase - 1;
+      this->phase = phase + 1;
     }
 }
 
 
 bool Phase::init(std::string *error) {
-    if (phase >= ModSecurity::Phases::NUMBER_OF_PHASES) {
+    if (phase > ModSecurity::Phases::NUMBER_OF_PHASES) {
         error->assign("Unknown phase: " + std::to_string(phase));
         return false;
     }

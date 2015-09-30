@@ -249,7 +249,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "actions :: phase:1,trim,status:500,deny",
+    "title": "actions :: phase:2,trim,status:500,deny",
     "client": {
       "ip": "200.249.12.31",
       "port": 2313
@@ -303,7 +303,7 @@
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule ARGS \"@contains test\" \"id:1,phase:1,t:trim,status:500,deny\""
+      "SecRule ARGS \"@contains test\" \"id:1,phase:2,t:trim,status:500,deny\""
     ]
   },
   {

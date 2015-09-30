@@ -50,7 +50,7 @@ int Driver::addSecMarker(std::string marker) {
 
 
 int Driver::addSecAction(Rule *rule) {
-    if (rule->phase >= ModSecurity::Phases::NUMBER_OF_PHASES) {
+    if (rule->phase > ModSecurity::Phases::NUMBER_OF_PHASES) {
         parserError << "Unknown phase: " << std::to_string(rule->phase);
         parserError << std::endl;
         return false;
@@ -62,7 +62,7 @@ int Driver::addSecAction(Rule *rule) {
 }
 
 int Driver::addSecRule(Rule *rule) {
-    if (rule->phase >= ModSecurity::Phases::NUMBER_OF_PHASES) {
+    if (rule->phase > ModSecurity::Phases::NUMBER_OF_PHASES) {
         parserError << "Unknown phase: " << std::to_string(rule->phase);
         parserError << std::endl;
         return false;
