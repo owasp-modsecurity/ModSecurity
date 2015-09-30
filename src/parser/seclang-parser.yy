@@ -224,6 +224,7 @@ using ModSecurity::Variables::Variable;
 %token <std::string> ACTION_REDIRECT
 %token <std::string> ACTION_SKIP_AFTER
 %token <std::string> ACTION_AUDIT_LOG
+%token <std::string> ACTION_PHASE
 %token <std::string> ACTION_SEVERITY
 %token <std::string> ACTION_SETVAR
 %token <std::string> ACTION_EXPIREVAR
@@ -343,7 +344,7 @@ expression:
         Operator *op = Operator::instantiate($5);
         const char *error = NULL;
         if (op->init(&error) == false) {
-            driver.parserError << error;
+            driver.error(@0, error);
             YYERROR;
         }
         Rule *rule = new Rule(
@@ -362,7 +363,7 @@ expression:
         Operator *op = Operator::instantiate("\"@rx " + $5 + "\"");
         const char *error = NULL;
         if (op->init(&error) == false) {
-            driver.parserError << error;
+            driver.error(@0, error);
             YYERROR;
         }
         Rule *rule = new Rule(
@@ -370,7 +371,10 @@ expression:
             /* variables */ $3,
             /* actions */ $8
             );
-        driver.addSecRule(rule);
+
+        if (driver.addSecRule(rule) == false) {
+            YYERROR;
+        }
       }
     | CONFIG_DIR_SEC_ACTION SPACE QUOTATION_MARK actions QUOTATION_MARK
       {
@@ -405,12 +409,12 @@ expression:
                 a->action_kind == Action::RunTimeBeforeMatchAttemptKind) {
                 None *none = dynamic_cast<None *>(a);
                 if (none != NULL) {
-                    driver.parserError << "The transformation none is not suitable to be part of the SecDefaultActions";
+                    driver.error(@0, "The transformation none is not suitable to be part of the SecDefaultActions");
                     YYERROR;
                 }
                 checkedActions.push_back(a);
             } else {
-                driver.parserError << "The action '" << a->action << "' is not suitable to be part of the SecDefaultActions";
+                driver.error(@0, "The action '" + a->action + "' is not suitable to be part of the SecDefaultActions");
                 YYERROR;
             }
         }
@@ -419,7 +423,11 @@ expression:
         }
 
         if (!driver.defaultActions[definedPhase].empty()) {
-            driver.parserError << "SecDefaultActions can only be placed once per phase and configuration context. Phase " << secRuleDefinedPhase << " was informed already.";
+            std::stringstream ss;
+            ss << "SecDefaultActions can only be placed once per phase and configuration context. Phase ";
+            ss << secRuleDefinedPhase;
+            ss << " was informed already.";
+            driver.error(@0, ss.str());
             YYERROR;
         }
 
@@ -469,8 +477,10 @@ expression:
         if (driver.m_debugLog != NULL) {
           driver.m_debugLog->setDebugLogLevel(atoi($1.c_str()));
         } else {
-            driver.parserError << "Internal error, there is no DebugLog ";
-            driver.parserError << "object associated with the driver class";
+            std::stringstream ss;
+            ss << "Internal error, there is no DebugLog ";
+            ss << "object associated with the driver class";
+            driver.error(@0, ss.str());
             YYERROR;
         }
       }
@@ -479,8 +489,10 @@ expression:
         if (driver.m_debugLog != NULL) {
             driver.m_debugLog->setDebugLogFile($1);
         } else {
-            driver.parserError << "Internal error, there is no DebugLog ";
-            driver.parserError << "object associated with the driver class";
+            std::stringstream ss;
+            ss << "Internal error, there is no DebugLog ";
+            ss << "object associated with the driver class";
+            driver.error(@0, ss.str());
             YYERROR;
         }
       }
@@ -696,6 +708,15 @@ act:
 
         if ($$->init(&error) == false) {
             driver.parserError << error;
+            YYERROR;
+        }
+      }
+    | ACTION_PHASE
+      {
+        std::string error;
+        $$ = new Phase($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
             YYERROR;
         }
       }

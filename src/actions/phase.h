@@ -34,6 +34,7 @@ class Phase : public Action {
  public:
     explicit Phase(std::string action);
 
+    bool init(std::string *error) override;
     bool evaluate(Rule *rule, Assay *assay) override;
     int phase;
     int m_secRulesPhase;

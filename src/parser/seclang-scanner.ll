@@ -272,7 +272,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 }
 
 {ACTION}                        { return yy::seclang_parser::make_ACTION(yytext, *driver.loc.back()); }
-{ACTION_PHASE}                  { return yy::seclang_parser::make_ACTION(yytext, *driver.loc.back()); }
+{ACTION_PHASE}                  { return yy::seclang_parser::make_ACTION_PHASE(yytext, *driver.loc.back()); }
 {ACTION_SKIP_AFTER}:{FREE_TEXT} { return yy::seclang_parser::make_ACTION_SKIP_AFTER(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_AUDIT_LOG}              { return yy::seclang_parser::make_ACTION_AUDIT_LOG(yytext, *driver.loc.back()); }
 
@@ -398,7 +398,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
             driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file."));
             throw yy::seclang_parser::syntax_error(*driver.loc.back(), "");
         }
-        driver.ref.push_back(file);
+        driver.ref.push_back(s.c_str());
         driver.loc.push_back(new yy::location());
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 

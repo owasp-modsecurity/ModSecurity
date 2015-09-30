@@ -68,6 +68,16 @@ Phase::Phase(std::string action)
     }
 }
 
+
+bool Phase::init(std::string *error) {
+    if (phase >= ModSecurity::Phases::NUMBER_OF_PHASES) {
+        error->assign("Unknown phase: " + std::to_string(phase));
+        return false;
+    }
+    return true;
+}
+
+
 bool Phase::evaluate(Rule *rule, Assay *assay) {
     rule->phase = this->phase;
     return true;
