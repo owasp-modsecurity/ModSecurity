@@ -97,18 +97,20 @@ Rule::Rule(Operator *_op,
     m_secmarker(false),
     m_marker(""),
     m_referenceCount(0) {
-    for (Action *a : *actions) {
-        if (a->action_kind == Action::ConfigurationKind) {
-            actions_conf.push_back(a);
-            a->evaluate(this, NULL);
-        } else if (a->action_kind == Action::RunTimeBeforeMatchAttemptKind) {
-            actions_runtime_pre.push_back(a);
-        } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
-            actions_runtime_pos.push_back(a);
-        } else {
-            std::cout << "General failure, action: " << a->name;
-            std::cout << " has an unknown type." << std::endl;
-            delete a;
+    if (actions != NULL) {
+        for (Action *a : *actions) {
+            if (a->action_kind == Action::ConfigurationKind) {
+                actions_conf.push_back(a);
+                a->evaluate(this, NULL);
+            } else if (a->action_kind == Action::RunTimeBeforeMatchAttemptKind) {
+                actions_runtime_pre.push_back(a);
+            } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
+                actions_runtime_pos.push_back(a);
+            } else {
+                std::cout << "General failure, action: " << a->name;
+                std::cout << " has an unknown type." << std::endl;
+                delete a;
+            }
         }
     }
     /**

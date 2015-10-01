@@ -248,6 +248,7 @@ using ModSecurity::Variables::Variable;
 %type <std::vector<Variable *> *> variables
 %type <Variable *> var
 %type <Action *> act
+%type <std::vector<Action *> *> actings
 
 %printer { yyoutput << $$; } <*>;
 %%
@@ -336,10 +337,24 @@ audit_log:
       }
     ;
 
+actings:
+    QUOTATION_MARK actions SPACE QUOTATION_MARK
+      {
+        $$ = $2;
+      }
+    | QUOTATION_MARK actions QUOTATION_MARK
+      {
+        $$ = $2;
+      }
+    | actions
+      {
+        $$ = $1;
+      }
+    ;
+
 expression:
     audit_log
-    | DIRECTIVE SPACE variables SPACE OPERATOR SPACE QUOTATION_MARK actions SPACE QUOTATION_MARK
-    | DIRECTIVE SPACE variables SPACE OPERATOR SPACE QUOTATION_MARK actions QUOTATION_MARK
+    | DIRECTIVE SPACE variables SPACE OPERATOR SPACE actings
       {
         Operator *op = Operator::instantiate($5);
         const char *error = NULL;
@@ -350,15 +365,14 @@ expression:
         Rule *rule = new Rule(
             /* op */ op,
             /* variables */ $3,
-            /* actions */ $8
+            /* actions */ $7
             );
 
         if (driver.addSecRule(rule) == false) {
             YYERROR;
         }
       }
-    | DIRECTIVE SPACE variables SPACE FREE_TEXT SPACE QUOTATION_MARK actions SPACE QUOTATION_MARK
-    | DIRECTIVE SPACE variables SPACE FREE_TEXT SPACE QUOTATION_MARK actions QUOTATION_MARK
+    | DIRECTIVE SPACE variables SPACE FREE_TEXT SPACE actings
       {
         Operator *op = Operator::instantiate("\"@rx " + $5 + "\"");
         const char *error = NULL;
@@ -369,7 +383,25 @@ expression:
         Rule *rule = new Rule(
             /* op */ op,
             /* variables */ $3,
-            /* actions */ $8
+            /* actions */ $7
+            );
+
+        if (driver.addSecRule(rule) == false) {
+            YYERROR;
+        }
+      }
+    | DIRECTIVE SPACE variables SPACE OPERATOR
+      {
+        Operator *op = Operator::instantiate("\"@rx " + $5 + "\"");
+        const char *error = NULL;
+        if (op->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
+        Rule *rule = new Rule(
+            /* op */ op,
+            /* variables */ $3,
+            /* actions */ NULL
             );
 
         if (driver.addSecRule(rule) == false) {
