@@ -144,7 +144,6 @@ using ModSecurity::Variables::Variable;
   PIPE
 ;
 
-%left SPACE CONFIG_VALUE_RELEVANT_ONLY CONFIG_VALUE_ON CONFIG_VALUE_OFF
 %token <std::string> QUOTATION_MARK
 %token <std::string> DIRECTIVE
 %token <std::string> CONFIG_DIR_REQ_BODY_LIMIT
@@ -250,19 +249,20 @@ using ModSecurity::Variables::Variable;
 %type <Action *> act
 %type <std::vector<Action *> *> actings
 
+
 %printer { yyoutput << $$; } <*>;
+
 %%
 %start input;
 
 
 input:
-    %empty
-    | input line
+    input line
+    | line
     | SPACE
     ;
 
 line: expression
-    | SPACE expression
     | expression SPACE
     ;
 
@@ -351,6 +351,7 @@ actings:
         $$ = $1;
       }
     ;
+
 
 expression:
     audit_log
