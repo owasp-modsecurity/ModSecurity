@@ -247,6 +247,7 @@ using ModSecurity::Variables::Variable;
 %type <Variable *> var
 %type <Action *> act
 %type <std::vector<Action *> *> actings
+%type <Operator *> op
 
 
 %printer { yyoutput << $$; } <*>;
@@ -345,19 +346,34 @@ actings:
       }
     ;
 
+op:
+    OPERATOR
+      {
+        Operator *op = Operator::instantiate($1);
+        const char *error = NULL;
+        if (op->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
+        $$ = op;
+      }
+    | FREE_TEXT
+      {
+        Operator *op = Operator::instantiate("\"@rx " + $1 + "\"");
+        const char *error = NULL;
+        if (op->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
+        $$ = op;
+      }
 
 expression:
     audit_log
-    | DIRECTIVE variables OPERATOR actings
+    | DIRECTIVE variables op actings
       {
-        Operator *op = Operator::instantiate($3);
-        const char *error = NULL;
-        if (op->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
         Rule *rule = new Rule(
-            /* op */ op,
+            /* op */ $3,
             /* variables */ $2,
             /* actions */ $4
             );
@@ -366,34 +382,10 @@ expression:
             YYERROR;
         }
       }
-    | DIRECTIVE variables FREE_TEXT actings
+    | DIRECTIVE variables op
       {
-        Operator *op = Operator::instantiate("\"@rx " + $3 + "\"");
-        const char *error = NULL;
-        if (op->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
         Rule *rule = new Rule(
-            /* op */ op,
-            /* variables */ $2,
-            /* actions */ $4
-            );
-
-        if (driver.addSecRule(rule) == false) {
-            YYERROR;
-        }
-      }
-    | DIRECTIVE variables OPERATOR
-      {
-        Operator *op = Operator::instantiate("\"@rx " + $3 + "\"");
-        const char *error = NULL;
-        if (op->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-        Rule *rule = new Rule(
-            /* op */ op,
+            /* op */ $3,
             /* variables */ $2,
             /* actions */ NULL
             );
@@ -402,16 +394,7 @@ expression:
             YYERROR;
         }
       }
-    | CONFIG_DIR_SEC_ACTION QUOTATION_MARK actions QUOTATION_MARK
-      {
-        Rule *rule = new Rule(
-            /* op */ NULL,
-            /* variables */ NULL,
-            /* actions */ $3
-            );
-        driver.addSecAction(rule);
-      }
-    | CONFIG_DIR_SEC_ACTION actions
+    | CONFIG_DIR_SEC_ACTION actings
       {
         Rule *rule = new Rule(
             /* op */ NULL,
@@ -420,9 +403,9 @@ expression:
             );
         driver.addSecAction(rule);
       }
-    | CONFIG_DIR_SEC_DEFAULT_ACTION QUOTATION_MARK actions QUOTATION_MARK
+    | CONFIG_DIR_SEC_DEFAULT_ACTION actings
       {
-        std::vector<Action *> *actions = $3;
+        std::vector<Action *> *actions = $2;
         std::vector<Action *> checkedActions;
         int definedPhase = -1;
         int secRuleDefinedPhase = -1;
