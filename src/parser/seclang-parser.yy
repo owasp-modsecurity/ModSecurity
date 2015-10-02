@@ -140,7 +140,6 @@ using ModSecurity::Variables::Variable;
 %token
   END  0  "end of file"
   COMMA    ","
-  SPACE
   PIPE
 ;
 
@@ -278,15 +277,15 @@ audit_log:
       }
 
     /* SecAuditEngine */
-    | CONFIG_DIR_AUDIT_ENG SPACE CONFIG_VALUE_RELEVANT_ONLY
+    | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_RELEVANT_ONLY
       {
         driver.audit_log->setStatus(ModSecurity::AuditLog::RelevantOnlyAuditLogStatus);
       }
-    | CONFIG_DIR_AUDIT_ENG SPACE CONFIG_VALUE_OFF
+    | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_OFF
       {
         driver.audit_log->setStatus(ModSecurity::AuditLog::OffAuditLogStatus);
       }
-    | CONFIG_DIR_AUDIT_ENG SPACE CONFIG_VALUE_ON
+    | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_ON
       {
         driver.audit_log->setStatus(ModSecurity::AuditLog::OnAuditLogStatus);
       }
@@ -325,22 +324,18 @@ audit_log:
       }
 
     /* SecAuditLogType */
-    | CONFIG_DIR_AUDIT_TPE SPACE CONFIG_VALUE_SERIAL
+    | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_SERIAL
       {
         driver.audit_log->setType(ModSecurity::AuditLog::SerialAuditLogType);
       }
-    | CONFIG_DIR_AUDIT_TPE SPACE CONFIG_VALUE_PARALLEL
+    | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_PARALLEL
       {
         driver.audit_log->setType(ModSecurity::AuditLog::ParallelAuditLogType);
       }
     ;
 
 actings:
-    QUOTATION_MARK actions SPACE QUOTATION_MARK
-      {
-        $$ = $2;
-      }
-    | QUOTATION_MARK actions QUOTATION_MARK
+    QUOTATION_MARK actions QUOTATION_MARK
       {
         $$ = $2;
       }
@@ -353,9 +348,9 @@ actings:
 
 expression:
     audit_log
-    | DIRECTIVE SPACE variables SPACE OPERATOR SPACE actings
+    | DIRECTIVE variables OPERATOR actings
       {
-        Operator *op = Operator::instantiate($5);
+        Operator *op = Operator::instantiate($3);
         const char *error = NULL;
         if (op->init(&error) == false) {
             driver.error(@0, error);
@@ -363,17 +358,17 @@ expression:
         }
         Rule *rule = new Rule(
             /* op */ op,
-            /* variables */ $3,
-            /* actions */ $7
+            /* variables */ $2,
+            /* actions */ $4
             );
 
         if (driver.addSecRule(rule) == false) {
             YYERROR;
         }
       }
-    | DIRECTIVE SPACE variables SPACE FREE_TEXT SPACE actings
+    | DIRECTIVE variables FREE_TEXT actings
       {
-        Operator *op = Operator::instantiate("\"@rx " + $5 + "\"");
+        Operator *op = Operator::instantiate("\"@rx " + $3 + "\"");
         const char *error = NULL;
         if (op->init(&error) == false) {
             driver.error(@0, error);
@@ -381,17 +376,17 @@ expression:
         }
         Rule *rule = new Rule(
             /* op */ op,
-            /* variables */ $3,
-            /* actions */ $7
+            /* variables */ $2,
+            /* actions */ $4
             );
 
         if (driver.addSecRule(rule) == false) {
             YYERROR;
         }
       }
-    | DIRECTIVE SPACE variables SPACE OPERATOR
+    | DIRECTIVE variables OPERATOR
       {
-        Operator *op = Operator::instantiate("\"@rx " + $5 + "\"");
+        Operator *op = Operator::instantiate("\"@rx " + $3 + "\"");
         const char *error = NULL;
         if (op->init(&error) == false) {
             driver.error(@0, error);
@@ -399,7 +394,7 @@ expression:
         }
         Rule *rule = new Rule(
             /* op */ op,
-            /* variables */ $3,
+            /* variables */ $2,
             /* actions */ NULL
             );
 
@@ -407,16 +402,7 @@ expression:
             YYERROR;
         }
       }
-    | CONFIG_DIR_SEC_ACTION SPACE QUOTATION_MARK actions QUOTATION_MARK
-      {
-        Rule *rule = new Rule(
-            /* op */ NULL,
-            /* variables */ NULL,
-            /* actions */ $4
-            );
-        driver.addSecAction(rule);
-      }
-    | CONFIG_DIR_SEC_ACTION SPACE actions
+    | CONFIG_DIR_SEC_ACTION QUOTATION_MARK actions QUOTATION_MARK
       {
         Rule *rule = new Rule(
             /* op */ NULL,
@@ -425,9 +411,18 @@ expression:
             );
         driver.addSecAction(rule);
       }
-    | CONFIG_DIR_SEC_DEFAULT_ACTION SPACE QUOTATION_MARK actions QUOTATION_MARK
+    | CONFIG_DIR_SEC_ACTION actions
       {
-        std::vector<Action *> *actions = $4;
+        Rule *rule = new Rule(
+            /* op */ NULL,
+            /* variables */ NULL,
+            /* actions */ $2
+            );
+        driver.addSecAction(rule);
+      }
+    | CONFIG_DIR_SEC_DEFAULT_ACTION QUOTATION_MARK actions QUOTATION_MARK
+      {
+        std::vector<Action *> *actions = $3;
         std::vector<Action *> checkedActions;
         int definedPhase = -1;
         int secRuleDefinedPhase = -1;
@@ -470,31 +465,31 @@ expression:
       {
         driver.addSecMarker($1);
       }
-    | CONFIG_DIR_RULE_ENG SPACE CONFIG_VALUE_OFF
+    | CONFIG_DIR_RULE_ENG CONFIG_VALUE_OFF
       {
         driver.secRuleEngine = ModSecurity::Rules::DisabledRuleEngine;
       }
-    | CONFIG_DIR_RULE_ENG SPACE CONFIG_VALUE_ON
+    | CONFIG_DIR_RULE_ENG CONFIG_VALUE_ON
       {
         driver.secRuleEngine = ModSecurity::Rules::EnabledRuleEngine;
       }
-    | CONFIG_DIR_RULE_ENG SPACE CONFIG_VALUE_DETC
+    | CONFIG_DIR_RULE_ENG CONFIG_VALUE_DETC
       {
         driver.secRuleEngine = ModSecurity::Rules::DetectionOnlyRuleEngine;
       }
-    | CONFIG_DIR_REQ_BODY SPACE CONFIG_VALUE_ON
+    | CONFIG_DIR_REQ_BODY CONFIG_VALUE_ON
       {
         driver.secRequestBodyAccess = true;
       }
-    | CONFIG_DIR_REQ_BODY SPACE CONFIG_VALUE_OFF
+    | CONFIG_DIR_REQ_BODY CONFIG_VALUE_OFF
       {
         driver.secRequestBodyAccess = false;
       }
-    | CONFIG_DIR_RES_BODY SPACE CONFIG_VALUE_ON
+    | CONFIG_DIR_RES_BODY CONFIG_VALUE_ON
       {
         driver.secResponseBodyAccess = true;
       }
-    | CONFIG_DIR_RES_BODY SPACE CONFIG_VALUE_OFF
+    | CONFIG_DIR_RES_BODY CONFIG_VALUE_OFF
       {
         driver.secResponseBodyAccess = false;
       }
@@ -549,27 +544,27 @@ expression:
       {
         driver.responseBodyLimit = atoi($1.c_str());
       }
-    | CONFIG_DIR_REQ_BODY_LIMIT_ACTION SPACE CONFIG_VALUE_PROCESS_PARTIAL
+    | CONFIG_DIR_REQ_BODY_LIMIT_ACTION CONFIG_VALUE_PROCESS_PARTIAL
       {
         driver.requestBodyLimitAction = ModSecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
-    | CONFIG_DIR_REQ_BODY_LIMIT_ACTION SPACE CONFIG_VALUE_REJECT
+    | CONFIG_DIR_REQ_BODY_LIMIT_ACTION CONFIG_VALUE_REJECT
       {
         driver.requestBodyLimitAction = ModSecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
-    | CONFIG_DIR_RES_BODY_LIMIT_ACTION SPACE CONFIG_VALUE_PROCESS_PARTIAL
+    | CONFIG_DIR_RES_BODY_LIMIT_ACTION CONFIG_VALUE_PROCESS_PARTIAL
       {
         driver.responseBodyLimitAction = ModSecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
-    | CONFIG_DIR_RES_BODY_LIMIT_ACTION SPACE CONFIG_VALUE_REJECT
+    | CONFIG_DIR_RES_BODY_LIMIT_ACTION CONFIG_VALUE_REJECT
       {
         driver.responseBodyLimitAction = ModSecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
-    | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION SPACE CONFIG_VALUE_ABORT
+    | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION CONFIG_VALUE_ABORT
       {
         driver.remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
       }
-    | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION SPACE CONFIG_VALUE_WARN
+    | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION CONFIG_VALUE_WARN
       {
         driver.remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
       }
@@ -868,23 +863,11 @@ act:
     ;
 
 actions:
-    actions COMMA SPACE act
-      {
-        std::vector<Action *> *a = $1;
-        a->push_back($4);
-        $$ = $1;
-      }
-    | actions COMMA act
+    actions COMMA act
       {
         std::vector<Action *> *a = $1;
         a->push_back($3);
         $$ = $1;
-      }
-    | SPACE act
-      {
-        std::vector<Action *> *a = new std::vector<Action *>;
-        a->push_back($2);
-        $$ = a;
       }
     | act
       {
