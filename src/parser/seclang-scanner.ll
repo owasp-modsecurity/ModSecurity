@@ -170,7 +170,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
   driver.loc.back()->step();
 %}
 
-{DIRECTIVE}                     { return yy::seclang_parser::make_DIRECTIVE(yytext, *driver.loc.back()); }
+[ \t]*{DIRECTIVE}                     { return yy::seclang_parser::make_DIRECTIVE(yytext, *driver.loc.back()); }
 {TRANSFORMATION}                { return yy::seclang_parser::make_TRANSFORMATION(yytext, *driver.loc.back()); }
 {CONFIG_DIR_RULE_ENG}           { return yy::seclang_parser::make_CONFIG_DIR_RULE_ENG(yytext, *driver.loc.back()); }
 {CONFIG_DIR_RES_BODY}           { return yy::seclang_parser::make_CONFIG_DIR_RES_BODY(yytext, *driver.loc.back()); }
@@ -341,7 +341,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 .*[^\\]               { BEGIN(INITIAL); driver.loc.back()->lines(1); driver.loc.back()->step(); }
 }
 
-[\n]+                           { driver.loc.back()->lines(yyleng); driver.loc.back()->step(); }
+[ \t]*[\n]+                           { driver.loc.back()->lines(yyleng); driver.loc.back()->step(); }
 #[ \t]*SecRule[^\\]*\\\n[ \t]*        { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT); }
 #[ \t]*SecRule[^\\]*\\\r\n[ \t]*      { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
 #[ \t]*SecAction[^\\]*\\\n[ \t]*        { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }

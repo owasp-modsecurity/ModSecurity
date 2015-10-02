@@ -259,11 +259,9 @@ using ModSecurity::Variables::Variable;
 input:
     input line
     | line
-    | SPACE
     ;
 
 line: expression
-    | expression SPACE
     ;
 
 audit_log:
