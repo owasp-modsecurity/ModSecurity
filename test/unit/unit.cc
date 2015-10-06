@@ -51,7 +51,7 @@ void perform_unit_test(UnitTest *t, ModSecurityTestResults<UnitTest>* res) {
     if (t->type == "op") {
         Operator *op = Operator::instantiate("\"@" + t->name + \
                 " " + t->param + "\"");
-        op->init(&error);
+        op->init(t->filename, &error);
         int ret = op->evaluate(NULL, t->input);
         if (ret != t->ret) {
             t->obtained = ret;

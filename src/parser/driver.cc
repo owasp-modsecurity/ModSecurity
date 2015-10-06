@@ -90,7 +90,9 @@ int Driver::addSecRule(Rule *rule) {
      * by other rule
      */
     if (rule->rule_id == 0) {
-        parserError << "Rules must have an ID." << std::endl;
+        parserError << "Rules must have an ID. File: ";
+        parserError << rule->m_fileName << " at line: ";
+        parserError << std::to_string(rule->m_lineNumber) << std::endl;
         return false;
     }
     for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {

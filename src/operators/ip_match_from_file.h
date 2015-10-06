@@ -29,7 +29,7 @@ class IpMatchFromFile : public IpMatch {
     IpMatchFromFile(std::string op, std::string param, bool negation)
         : IpMatch(op, param, negation) { }
 
-    bool init(const char **error) override;
+    bool init(const std::string& file, const char **error) override;
 };
 
 }  // namespace operators

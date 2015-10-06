@@ -1040,5 +1040,38 @@ std::vector<std::string> expandEnv(const std::string& var, int flags)
 }
 
 
+std::string get_path(const std::string& file) {
+    size_t found;
+
+    found = file.find_last_of("/\\");
+    if (found > 0) {
+        return file.substr(0, found);
+    }
+
+    return std::string("");
+}
+
+
+std::string find_resource(const std::string& resource, const std::string& config) {
+    std::ifstream *iss = NULL;
+
+    // Trying absolute or relative to the current dir.
+    iss = new std::ifstream(resource, std::ios::in);
+    if (iss->is_open()) {
+        iss->close();
+        return resource;
+    }
+
+    // Trying the same path of the configuration file.
+    std::string f = get_path(config) + "/" + resource;
+    iss = new std::ifstream(f, std::ios::in);
+    if (iss->is_open()) {
+        iss->close();
+        return f;
+    }
+
+    return std::string("");
+}
+
 }  // namespace ModSecurity
 

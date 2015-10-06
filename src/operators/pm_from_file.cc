@@ -19,12 +19,13 @@
 
 #include "operators/operator.h"
 #include "utils/https_client.h"
+#include "src/utils.h"
 
 namespace ModSecurity {
 namespace operators {
 
 
-bool PmFromFile::init(const char **error) {
+bool PmFromFile::init(const std::string &config, const char **error) {
     std::istream *iss;
 
     if (param.compare(0, 8, "https://") == 0) {
@@ -36,7 +37,8 @@ bool PmFromFile::init(const char **error) {
         }
         iss = new std::stringstream(client.content);
     } else {
-        iss = new std::ifstream(param, std::ios::in);
+        std::string resource = find_resource(param, config);
+        iss = new std::ifstream(resource, std::ios::in);
 
         if (((std::ifstream *)iss)->is_open() == false) {
             *error = std::string("Failed to open file: " + param).c_str();

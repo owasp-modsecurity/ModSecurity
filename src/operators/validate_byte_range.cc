@@ -83,7 +83,8 @@ bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
 }
 
 
-bool ValidateByteRange::init(const char **error) {
+bool ValidateByteRange::init(const std::string &file,
+    const char **error) {
     size_t pos = param.find_first_of(",");
 
     if (pos == std::string::npos) {

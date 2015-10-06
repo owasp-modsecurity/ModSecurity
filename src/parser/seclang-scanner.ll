@@ -98,7 +98,7 @@ CONFIG_SEC_REMOTE_RULES              (?i:SecRemoteRules)
 CONFIG_SEC_REMOTE_RULES_FAIL_ACTION  (?i:SecRemoteRulesFailAction)
 
 
-DICT_ELEMENT    [^ \|\t]+
+DICT_ELEMENT    [^ \t]+
 
 
 OPERATOR        (?i:(?:@inspectFile|@fuzzyHash|@validateByteRange|@validateDTD|@validateHash|@validateSchema|@verifyCC|@verifyCPF|@verifySSN|@gsbLookup|@rsub)|(?:\!{0,1})(?:@within|@containsWord|@contains|@endsWith|@eq|@ge|@gt|@ipMatchF|@ipMatch|@ipMatchFromFile|@le|@lt|@pmf|@pm|@pmFromFile|@rbl|@rx|@streq|@strmatch|@beginsWith))
@@ -143,16 +143,19 @@ CONFIG_VALUE_PATH    [0-9A-Za-z_/\.\-\*]+
 AUDIT_PARTS [ABCDEFHJKIZ]+
 CONFIG_VALUE_NUMBER [0-9]+
 
-FREE_TEXT       ([^\"]|([^\\]\\\"))+
+FREE_TEXT       ([^\"]|(\\\"))+
 
 FREE_TEXT_NEW_LINE       [^\"|\n]+
 FREE_TEXT_QUOTE ([^\']|([^\\]\\\'))+
 FREE_TEXT_SPACE [^ \t]+
 FREE_TEXT_SPACE_COMMA [^, \t]+
+FREE_TEXT_SPACE_COMMA_QUOTE [^, \t\"]+
 
 VAR_FREE_TEXT_QUOTE ([^\']|([^\\]\\\'))+
 VAR_FREE_TEXT_SPACE_COMMA [^, \t\"]+
 VAR_FREE_TEXT_SPACE [^ \t\"]+
+
+SOMETHING ["]{1}[^@]{1}([^"]|([^\\"]\\\"))*["]{1}
 
 CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
@@ -266,14 +269,14 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {CONFIG_DIR_SEC_MARKER}[ ]{FREE_TEXT_NEW_LINE} { return yy::seclang_parser::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 
 <EXPECTING_OPERATOR>{
-["][^@]{FREE_TEXT}["]           { BEGIN(INITIAL); return yy::seclang_parser::make_FREE_TEXT(yytext, *driver.loc.back()); }
+{SOMETHING}           { BEGIN(INITIAL); return yy::seclang_parser::make_FREE_TEXT(yytext, *driver.loc.back()); }
 ["]{OPERATOR}[ ]{FREE_TEXT}["]  { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
 ["]{OPERATORNOARG}[\t ]*["]           { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
 }
 
 {ACTION}                        { return yy::seclang_parser::make_ACTION(yytext, *driver.loc.back()); }
 {ACTION_PHASE}                  { return yy::seclang_parser::make_ACTION_PHASE(yytext, *driver.loc.back()); }
-{ACTION_SKIP_AFTER}:{FREE_TEXT} { return yy::seclang_parser::make_ACTION_SKIP_AFTER(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_SKIP_AFTER}:{FREE_TEXT_SPACE_COMMA_QUOTE} { return yy::seclang_parser::make_ACTION_SKIP_AFTER(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_AUDIT_LOG}              { return yy::seclang_parser::make_ACTION_AUDIT_LOG(yytext, *driver.loc.back()); }
 
 {ACTION_SEVERITY}:{ACTION_SEVERITY_VALUE}       { return yy::seclang_parser::make_ACTION_SEVERITY(yytext + 9, *driver.loc.back()); }

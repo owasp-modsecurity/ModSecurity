@@ -82,12 +82,15 @@ Rule::Rule(std::string marker)
     m_unconditional(false),
     m_secmarker(true),
     m_marker(marker),
-    m_referenceCount(0) { }
+    m_referenceCount(0),
+    m_fileName(""),
+    m_lineNumber(0) { }
 
 Rule::Rule(Operator *_op,
         std::vector<Variable *> *_variables,
-        std::vector<Action *> *actions)
-    : chained(false),
+        std::vector<Action *> *actions,
+        std::string fileName,
+        int lineNumber): chained(false),
     chainedRule(NULL),
     variables(_variables),
     op(_op),
@@ -96,7 +99,9 @@ Rule::Rule(Operator *_op,
     m_unconditional(false),
     m_secmarker(false),
     m_marker(""),
-    m_referenceCount(0) {
+    m_referenceCount(0),
+    m_fileName(fileName),
+    m_lineNumber(lineNumber) {
     if (actions != NULL) {
         for (Action *a : *actions) {
             if (a->action_kind == Action::ConfigurationKind) {

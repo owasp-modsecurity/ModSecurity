@@ -351,7 +351,7 @@ op:
       {
         Operator *op = Operator::instantiate($1);
         const char *error = NULL;
-        if (op->init(&error) == false) {
+        if (op->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -361,7 +361,7 @@ op:
       {
         Operator *op = Operator::instantiate("\"@rx " + $1 + "\"");
         const char *error = NULL;
-        if (op->init(&error) == false) {
+        if (op->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
@@ -375,7 +375,9 @@ expression:
         Rule *rule = new Rule(
             /* op */ $3,
             /* variables */ $2,
-            /* actions */ $4
+            /* actions */ $4,
+            /* file name */ driver.ref.back(),
+            /* line number */ @0.end.line
             );
 
         if (driver.addSecRule(rule) == false) {
@@ -387,7 +389,9 @@ expression:
         Rule *rule = new Rule(
             /* op */ $3,
             /* variables */ $2,
-            /* actions */ NULL
+            /* actions */ NULL,
+            /* file name */ driver.ref.back(),
+            /* line number */ @0.end.line
             );
 
         if (driver.addSecRule(rule) == false) {
@@ -399,7 +403,9 @@ expression:
         Rule *rule = new Rule(
             /* op */ NULL,
             /* variables */ NULL,
-            /* actions */ $2
+            /* actions */ $2,
+            /* file name */ driver.ref.back(),
+            /* line number */ @0.end.line
             );
         driver.addSecAction(rule);
       }
@@ -508,7 +514,14 @@ expression:
     /* Debug log: end */
     | CONFIG_DIR_GEO_DB
       {
-        GeoLookup::getInstance().setDataBase($1);
+        std::string file = ModSecurity::find_resource($1, driver.ref.back());
+        if (GeoLookup::getInstance().setDataBase(file) == false) {
+            std::stringstream ss;
+            ss << "Failed to load the GeoDB from: ";
+            ss << file;
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
       }
     /* Body limits */
     | CONFIG_DIR_REQ_BODY_LIMIT

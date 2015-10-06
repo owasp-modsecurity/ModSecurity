@@ -23,7 +23,8 @@ namespace ModSecurity {
 namespace operators {
 
 
-bool IpMatchFromFile::init(const char **error) {
+bool IpMatchFromFile::init(const std::string &file,
+    const char **error) {
     std::string e("");
     bool res = false;
 

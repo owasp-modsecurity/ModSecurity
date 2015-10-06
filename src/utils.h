@@ -48,6 +48,8 @@ namespace ModSecurity {
     std::string limitTo(int amount, const std::string &str);
     std::string toHexIfNeeded(const std::string &str);
     std::vector<std::string> expandEnv(const std::string& var, int flags);
+    std::string find_resource(const std::string& file,
+        const std::string& param);
 }  // namespace ModSecurity
 
 #define SRC_UTILS_H_
