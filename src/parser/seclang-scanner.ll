@@ -377,16 +377,16 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {CONFIG_INCLUDE}[ ]{CONFIG_VALUE_PATH} {
     const char *file = strchr(yytext, ' ') + 1;
     for (auto& s: ModSecurity::expandEnv(file, 0)) {
-        yyin = fopen(s.c_str(), "r" );
+        std::string f = ModSecurity::find_resource(s, driver.ref.back());
+        yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
             driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file."));
             throw yy::seclang_parser::syntax_error(*driver.loc.back(), "");
         }
-        driver.ref.push_back(file);
+        driver.ref.push_back(f);
         driver.loc.push_back(new yy::location());
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
-
     }
 }
 
@@ -395,13 +395,14 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
     char *f = strdup(file + 1);
     f[strlen(f)-1] = '\0';
     for (auto& s: ModSecurity::expandEnv(f, 0)) {
-        yyin = fopen(s.c_str(), "r" );
+        std::string f = ModSecurity::find_resource(s, driver.ref.back());
+        yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
             driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file."));
             throw yy::seclang_parser::syntax_error(*driver.loc.back(), "");
         }
-        driver.ref.push_back(s.c_str());
+        driver.ref.push_back(f.c_str());
         driver.loc.push_back(new yy::location());
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 
