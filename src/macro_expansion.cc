@@ -34,9 +34,15 @@ std::string MacroExpansion::expandKeepOriginal(const std::string& input,
 
 
 std::string MacroExpansion::expand(const std::string& input, Assay *assay) {
-    std::string res(input);
+    std::string res;
+    size_t pos = input.find("%{");
 
-    size_t pos = res.find("%{");
+    if (pos != std::string::npos) {
+        res = input;
+    } else {
+        return input;
+    }
+
     while (pos != std::string::npos) {
         size_t start = pos;
         size_t end = res.find("}");
