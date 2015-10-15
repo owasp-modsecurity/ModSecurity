@@ -204,6 +204,7 @@ libmodsecurity_la_CPPFLAGS = \
 	-O3 \
 	-I ../headers \
 	$(GEOIP_CFLAGS) \
+	$(MODSEC_NO_LOGS) \
 	$(PCRE_CPPFLAGS)
 
 libmodsecurity_la_LIBADD = \

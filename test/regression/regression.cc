@@ -262,6 +262,10 @@ int main(int argc, char **argv) {
     ModSecurityTest<RegressionTest> test;
     ModSecurityTestResults<RegressionTest> results;
 
+#ifdef NO_LOGS
+    std::cout << "Test utility cannot work without logging support." \
+        << std::endl;
+#else
     test.cmd_options(argc, argv);
     std::cout << test.header();
 
@@ -324,6 +328,6 @@ int main(int argc, char **argv) {
         }
         delete vec;
     }
-
+#endif
     return 0;
 }

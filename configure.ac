@@ -152,6 +152,9 @@ MSC_VERSION_INFO=msc_version_info
 AC_SUBST([MSC_VERSION_INFO])
 
 
+# MODSEC_NO_LOGS="-DNO_LOGS=1"
+# AC_SUBST(MODSEC_NO_LOGS)
+
 
 # Files to be generated via autotools.
 AC_CONFIG_FILES([\

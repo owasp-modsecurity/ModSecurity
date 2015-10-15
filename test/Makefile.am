@@ -39,6 +39,7 @@ unit_tests_CPPFLAGS = \
 	-g \
 	-I$(top_builddir)/headers \
 	$(CURL_CFLAGS) \
+	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
 	$(PCRE_CPPFLAGS) \
 	$(YAJL_CFLAGS)
@@ -67,6 +68,7 @@ regression_tests_CPPFLAGS = \
 	-g \
 	-I$(top_builddir)/headers \
 	$(CURL_CFLAGS) \
+	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
 	$(PCRE_CPPFLAGS) \
 	$(YAJL_CFLAGS)
