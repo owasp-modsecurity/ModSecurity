@@ -101,31 +101,33 @@ void SetVar::dump() {
 
 bool SetVar::evaluate(Rule *rule, Assay *assay) {
     std::string targetValue;
-
-    variableName = MacroExpansion::expand(variableName, assay);
     int value = 0;
-    try {
-        std::string *resolvedValue =
-            assay->resolve_variable_first(collectionName, variableName);
-        if (resolvedValue == NULL) {
-            value = 0;
-        } else {
-            value = stoi(*resolvedValue);
-        }
-    } catch (...) {
-        value = 0;
-    }
-
-
+    std::string variableNameExpanded = MacroExpansion::expand(variableName, assay);
     std::string resolvedPre = MacroExpansion::expand(predicate, assay);
+
     if (operation == setOperation) {
         targetValue = resolvedPre;
+    } else if (operation == setToOne) {
+        targetValue = std::string("1");
     } else {
         int pre = 0;
         try {
             pre = stoi(resolvedPre);
         } catch (...) {
             pre = 0;
+        }
+
+        try {
+            std::string *resolvedValue =
+                assay->resolve_variable_first(collectionName,
+                    variableNameExpanded);
+            if (resolvedValue == NULL) {
+                value = 0;
+            } else {
+                value = stoi(*resolvedValue);
+            }
+        } catch (...) {
+            value = 0;
         }
 
         switch (operation) {
@@ -135,17 +137,14 @@ bool SetVar::evaluate(Rule *rule, Assay *assay) {
             case substractAndSetOperation:
                 targetValue = std::to_string(value - pre);
                 break;
-            case setToOne:
-                targetValue = std::string("1");
-                break;
         }
     }
 
 #ifndef NO_LOGS
     assay->debug(8, "Saving variable: " + collectionName + ":" + \
-        variableName + " with value: " + targetValue);
+        variableNameExpanded + " with value: " + targetValue);
 #endif
-    assay->setCollection(collectionName, variableName, targetValue);
+    assay->setCollection(collectionName, variableNameExpanded, targetValue);
 
     return true;
 }
