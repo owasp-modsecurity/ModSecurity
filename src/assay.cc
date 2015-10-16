@@ -1482,12 +1482,9 @@ void Assay::resolve_variable(const std::string& var,
 
     m_variables_strings.resolveVariable(var, l);
 
-    size_t ac = var.find(":");
-    if (ac != std::string::npos) {
-        /* It may be a collection */
-        for (auto &a : collections) {
-            a.second->resolveVariable(var, l);
-        }
+    /* It may be a collection */
+    for (auto &a : collections) {
+        a.second->resolveVariable(var, l);
     }
 }
 
