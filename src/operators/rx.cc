@@ -30,8 +30,7 @@ bool Rx::evaluate(Assay *assay, const std::string& input) {
     SMatch match;
 
     if (regex_search(input, &match, *m_re) && match.size() >= 1) {
-        std::cout << "wheee" << std::endl;
-        //  this->matched.push_back(match.match);
+        this->matched.push_back(match.match);
         return true;
     }
 

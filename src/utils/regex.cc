@@ -48,8 +48,15 @@ Regex::Regex(const std::string& pattern_)
 int regex_search(const std::string& s, SMatch *match,
     const Regex& regex) {
     int ovector[OVECCOUNT];
-    return pcre_exec(regex.m_pc, regex.m_pce, s.c_str(),
+    int ret = pcre_exec(regex.m_pc, regex.m_pce, s.c_str(),
         s.size(), 0, 0, ovector, OVECCOUNT) > 0;
+
+    if (ret > 0) {
+        match->match = std::string(s, ovector[2], ovector[3] - ovector[2]);
+        match->size_ = ret;
+    }
+
+    return ret;
 }
 
 int regex_search(const std::string& s, const Regex& regex) {
