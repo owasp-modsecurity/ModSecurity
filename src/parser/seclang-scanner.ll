@@ -98,7 +98,7 @@ CONFIG_SEC_REMOTE_RULES              (?i:SecRemoteRules)
 CONFIG_SEC_REMOTE_RULES_FAIL_ACTION  (?i:SecRemoteRulesFailAction)
 
 
-DICT_ELEMENT    [^ \t]+
+DICT_ELEMENT    [^ \t|]+
 
 
 OPERATOR        (?i:(?:@inspectFile|@fuzzyHash|@validateByteRange|@validateDTD|@validateHash|@validateSchema|@verifyCC|@verifyCPF|@verifySSN|@gsbLookup|@rsub)|(?:\!{0,1})(?:@within|@containsWord|@contains|@endsWith|@eq|@ge|@gt|@ipMatchF|@ipMatch|@ipMatchFromFile|@le|@lt|@pmf|@pm|@pmFromFile|@rbl|@rx|@streq|@strmatch|@beginsWith))
@@ -108,7 +108,10 @@ OPERATORNOARG	(?i:@detectSQLi|@detectXSS|@geoLookup|@validateUrlEncoding|@valida
 
 TRANSFORMATION  t:(sha1|hexEncode|lowercase|urlDecodeUni|urlDecode|none|compressWhitespace|removeWhitespace|replaceNulls|removeNulls|htmlEntityDecode|jsDecode|cssDecode|trim|normalizePathWin|normalisePath|length|utf8toUnicode|urldecode|removeComments|replaceComments)
 
-VARIABLE          (?i:UNIQUE_ID|SERVER_PORT|SERVER_ADDR|REMOTE_PORT|REMOTE_HOST|MULTIPART_STRICT_ERROR|PATH_INFO|MULTIPART_NAME|MULTIPART_FILENAME|MULTIPART_CRLF_LF_LINES|MATCHED_VAR_NAME|MATCHED_VARS_NAMES|MATCHED_VAR|MATCHED_VARS|INBOUND_DATA_ERROR|OUTBOUND_DATA_ERROR|FULL_REQUEST|FILES|AUTH_TYPE|ARGS_NAMES|ARGS|QUERY_STRING|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_COOKIES_NAMES|REQUEST_COOKIES|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_HEADERS|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_HEADERS|RESPONSE_PROTOCOL|RESPONSE_STATUS|TX|GEO|REQBODY_PROCESSOR|IP|XML)
+VARIABLE UNIQUE_ID|SERVER_PORT|SERVER_ADDR|REMOTE_PORT|REMOTE_HOST|MULTIPART_STRICT_ERROR|PATH_INFO|MULTIPART_NAME|MULTIPART_FILENAME|MULTIPART_CRLF_LF_LINES|MATCHED_VAR_NAME|MATCHED_VARS_NAMES|MATCHED_VAR|MATCHED_VARS|INBOUND_DATA_ERROR|OUTBOUND_DATA_ERROR|FULL_REQUEST|FILES|AUTH_TYPE|ARGS_NAMES|ARGS|QUERY_STRING|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_COOKIES_NAMES|REQUEST_COOKIES|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_HEADERS|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_HEADERS|RESPONSE_PROTOCOL|RESPONSE_STATUS|TX|GEO|REQBODY_PROCESSOR|IP|XML
+
+
+
 RUN_TIME_VAR_DUR  (?i:DURATION)
 RUN_TIME_VAR_ENV  (?i:ENV)
 RUN_TIME_VAR_BLD  (?i:MODSEC_BUILD)
@@ -201,16 +204,16 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 <INITIAL,EXPECTING_OPERATOR>{
 %{ /* Variables */ %}
-[!&]?{VARIABLE}:?{DICT_ELEMENT}?             { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
+[!&]?{VARIABLE}(\:{DICT_ELEMENT})?             { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_DUR}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_ENV}:?{DICT_ELEMENT}?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_ENV}(\:{DICT_ELEMENT})?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_BLD}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_HSV}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
 [!&]?{VARIABLENOCOLON}                       { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
 
-["][!&]?{VARIABLE}:?{DICT_ELEMENT}?["]             { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
+["][!&]?{VARIABLE}(\:{DICT_ELEMENT})?             { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
 ["][!&]?{RUN_TIME_VAR_DUR}["]                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
-["][!&]?{RUN_TIME_VAR_ENV}:?{DICT_ELEMENT}?["]     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
+["][!&]?{RUN_TIME_VAR_ENV}(\:{DICT_ELEMENT})?["]     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
 ["][!&]?{RUN_TIME_VAR_BLD}["]                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
 ["][!&]?{RUN_TIME_VAR_HSV}["]                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
 ["][!&]?{VARIABLENOCOLON}["]                       { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
