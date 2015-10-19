@@ -3,7 +3,7 @@
     "enabled":1,
     "version_min":300000,
     "version_max":0,
-    "title":"Testing variable variations :: exclusion (1/3)",
+    "title":"Testing variable variations :: exclusion (1/2)",
     "client":{  
       "ip":"200.249.12.31",
       "port":2313
@@ -62,7 +62,7 @@
     "enabled":1,
     "version_min":300000,
     "version_max":0,
-    "title":"Testing variable variations :: exclusion (1/3)",
+    "title":"Testing variable variations :: exclusion (2/2)",
     "client":{  
       "ip":"200.249.12.31",
       "port":2313
