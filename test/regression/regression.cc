@@ -115,6 +115,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
                 testRes->reason << modsec_rules->getParserError() \
                     << std::endl;
                 testRes->passed = false;
+                res->push_back(testRes);
                 return;
             }
 
