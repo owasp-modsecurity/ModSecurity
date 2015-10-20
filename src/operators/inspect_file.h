@@ -28,7 +28,7 @@ class InspectFile : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     InspectFile(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    bool evaluate(Assay *assay) override;
 };
 
 }  // namespace operators

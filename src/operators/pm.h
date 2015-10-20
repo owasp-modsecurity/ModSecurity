@@ -37,9 +37,9 @@ class Pm : public Operator {
     ~Pm();
     void replaceAll(std::string str, const std::string& from,
         const std::string& to);
-    bool evaluate(Assay *assay, const std::string &input);
+    bool evaluate(Assay *assay, const std::string &input) override;
 
-    virtual bool init(const char **error);
+    virtual bool init(const std::string &file, const char **error) override;
     void postOrderTraversal(acmp_btree_node_t *node);
 
     std::list<std::string> matched;

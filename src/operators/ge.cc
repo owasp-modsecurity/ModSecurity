@@ -25,8 +25,9 @@ namespace operators {
 
 bool Ge::evaluate(Assay *assay, const std::string &input) {
     std::string p = MacroExpansion::expand(param, assay);
+    std::string i = MacroExpansion::expand(input, assay);
 
-    bool ge = atoll(p.c_str()) >= atoll(p.c_str());
+    bool ge = atoll(i.c_str()) >= atoll(p.c_str());
 
     if (negation) {
         return !ge;

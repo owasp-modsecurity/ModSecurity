@@ -85,7 +85,7 @@ bool Pm::evaluate(Assay *assay, const std::string &input) {
 }
 
 
-bool Pm::init(const char **error) {
+bool Pm::init(const std::string &file, const char **error) {
     std::vector<std::string> vec;
 
     replaceAll(param, "\\", "\\\\");

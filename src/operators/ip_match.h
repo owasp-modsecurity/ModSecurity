@@ -31,9 +31,9 @@ class IpMatch : public Operator {
     IpMatch(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
 
-    bool evaluate(Assay *assay, const std::string &input);
+    bool evaluate(Assay *assay, const std::string &input) override;
 
-    virtual bool init(const char **error);
+    virtual bool init(const std::string &file, const char **error) override;
 
  protected:
     Utils::IpTree m_tree;
