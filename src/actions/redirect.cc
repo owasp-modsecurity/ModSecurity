@@ -30,7 +30,13 @@ Redirect::~Redirect() {
 Redirect::Redirect(const std::string& action)
     : Action(action, RunTimeOnlyIfMatchKind),
     m_url(action) {
-    m_url = m_url.erase(0, 9);
+    //m_url = m_url.erase(0, 9);
+    if (m_url.at(0) == '\'') {
+        m_url.erase(0, 1);
+        if (m_url.size() > 0) {
+            m_url.pop_back();
+        }
+    }
     m_status = 302;
 }
 
@@ -46,9 +52,9 @@ void Redirect::fill_intervention(ModSecurityIntervention *i) {
     if (i->status == 200) {
         i->status = m_status;
     }
-
     i->url = m_urlExpanded.c_str();
     i->log = "Redirecting";
+    i->disruptive = true;
 }
 
 }  // namespace actions
