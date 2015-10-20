@@ -35,8 +35,7 @@ class Rule {
             std::vector<Variables::Variable *> *_variables,
             std::vector<actions::Action *> *_actions,
             std::string fileName,
-            int lineNumber
-        );
+            int lineNumber);
     explicit Rule(std::string marker);
 
     ~Rule();

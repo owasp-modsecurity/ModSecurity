@@ -1023,8 +1023,7 @@ std::string toHexIfNeeded(const std::string &str) {
 }
 
 
-std::vector<std::string> expandEnv(const std::string& var, int flags)
-{
+std::vector<std::string> expandEnv(const std::string& var, int flags) {
     std::vector<std::string> vars;
 
     wordexp_t p;
@@ -1052,7 +1051,8 @@ std::string get_path(const std::string& file) {
 }
 
 
-std::string find_resource(const std::string& resource, const std::string& config) {
+std::string find_resource(const std::string& resource,
+    const std::string& config) {
     std::ifstream *iss = NULL;
 
     // Trying absolute or relative to the current dir.

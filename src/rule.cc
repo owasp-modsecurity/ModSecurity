@@ -107,7 +107,8 @@ Rule::Rule(Operator *_op,
             if (a->action_kind == Action::ConfigurationKind) {
                 actions_conf.push_back(a);
                 a->evaluate(this, NULL);
-            } else if (a->action_kind == Action::RunTimeBeforeMatchAttemptKind) {
+            } else if (a->action_kind
+                == Action::RunTimeBeforeMatchAttemptKind) {
                 actions_runtime_pre.push_back(a);
             } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
                 actions_runtime_pos.push_back(a);

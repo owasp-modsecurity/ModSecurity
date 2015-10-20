@@ -30,7 +30,7 @@ Redirect::~Redirect() {
 Redirect::Redirect(const std::string& action)
     : Action(action, RunTimeOnlyIfMatchKind),
     m_url(action) {
-    //m_url = m_url.erase(0, 9);
+    //  m_url = m_url.erase(0, 9);
     if (m_url.at(0) == '\'') {
         m_url.erase(0, 1);
         if (m_url.size() > 0) {

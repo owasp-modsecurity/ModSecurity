@@ -52,7 +52,8 @@ int regex_search(const std::string& s, SMatch *match,
         s.size(), 0, 0, ovector, OVECCOUNT) > 0;
 
     if (ret > 0) {
-        match->match = std::string(s, ovector[ret-1], ovector[ret] - ovector[ret-1]);
+        match->match = std::string(s, ovector[ret-1],
+            ovector[ret] - ovector[ret-1]);
         match->size_ = ret;
     }
 
