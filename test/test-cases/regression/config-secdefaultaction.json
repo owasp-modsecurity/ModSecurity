@@ -285,14 +285,14 @@
     "expected":{
       "audit_log":"",
       "debug_log":"Request was relevant to be saved.",
-      "http_code": 500
+      "http_code": 302
     },
     "rules":[
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecDefaultAction \"phase:2,log,auditlog,status:500\"",
-      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"phase:2,id:1,redirect:http://www.google.com\"",
+      "SecDefaultAction \"phase:2,log,auditlog,status:302\"",
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"phase:2,id:1,redirect:'http://www.google.com'\"",
       "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
     ]
   }

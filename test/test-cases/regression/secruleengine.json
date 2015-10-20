@@ -28,7 +28,7 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecRuleEngine Off",
       "SecDefaultAction \"phase:2,deny,status:404\"",
-      "SecAction \"'id:'1',phase:request,nolog,t:none\""
+      "SecAction \"id:'1',phase:request,nolog,t:none\""
     ]
   },
   {
@@ -60,7 +60,7 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecRuleEngine Off",
       "SecDefaultAction \"phase:2,deny,status:404\"",
-      "SecAction \"'id:'1',phase:request,nolog,t:none\""
+      "SecAction \"id:'1',phase:request,nolog,t:none\""
     ]
   },
   {
