@@ -37,16 +37,28 @@ CompressWhitespace::CompressWhitespace(std::string action)
 
 std::string CompressWhitespace::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation CompressWhitespace
-     */
-    if (assay) {
-#ifndef NO_LOGS
-        assay->debug(4, "Transformation CompressWhitespace is " \
-            "not implemented yet.");
-#endif
+
+    std::string a;
+    int inWhiteSpace = 0;
+    int i = 0;
+
+    while (i < value.size()) {
+        if (isspace(value[i])) {
+            if (inWhiteSpace) {
+                i++;
+                continue;
+            } else {
+                inWhiteSpace = 1;
+                a.append(" ", 1);
+            }
+        } else {
+            inWhiteSpace = 0;
+            a.append(&value.at(i), 1);
+        }
+        i++;
     }
-    return value;
+
+    return a;
 }
 
 }  // namespace transformations

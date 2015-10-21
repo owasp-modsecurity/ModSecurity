@@ -45,6 +45,7 @@
 #include "actions/transformations/remove_comments.h"
 #include "actions/transformations/remove_nulls.h"
 #include "actions/transformations/remove_whitespace.h"
+#include "actions/transformations/compress_whitespace.h"
 #include "actions/transformations/replace_comments.h"
 #include "actions/transformations/replace_nulls.h"
 #include "actions/transformations/sha1.h"
@@ -96,6 +97,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(remove_comments) { return new RemoveComments(a); }
     IF_MATCH(removeNulls) { return new RemoveNulls(a); }
     IF_MATCH(remove_whitespace) { return new RemoveWhitespace(a); }
+    IF_MATCH(compressWhitespace) { return new CompressWhitespace(a); }
     IF_MATCH(replace_comments) { return new ReplaceComments(a); }
     IF_MATCH(replace_nulls) { return new ReplaceNulls(a); }
     IF_MATCH(sha1) { return new Sha1(a); }
