@@ -64,8 +64,6 @@ void perform_unit_test(UnitTest *t, ModSecurityTestResults<UnitTest>* res) {
         std::string ret = tfn->evaluate(t->input, NULL);
         t->obtained = 1;
         if (ret != t->output) {
-            std::cout << "ret: !" << ret << "!" << std::endl;
-            std::cout << "obt: !" << t->output << "!" << std::endl;
             t->obtainedOutput = ret;
             res->push_back(t);
         }

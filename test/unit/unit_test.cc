@@ -21,7 +21,7 @@
 #include <string>
 
 #include "common/colors.h"
-
+#include "src/utils.h"
 
 namespace modsecurity_test {
 
@@ -49,7 +49,7 @@ void replaceAll(std::string *s, const std::string &search,
             break;
         }
         s->erase(pos, search.length());
-        s->insert(pos, &replace);
+        s->insert(pos, &replace, 1);
     }
 }
 
@@ -68,12 +68,12 @@ std::string UnitTest::print() {
     i << "  \"output\": \"" << this->output << "\"" << std::endl;
     i << "}" << std::endl;
     if (this->ret != this->obtained) {
-        i << "Expecting: " << this->ret << " - operator returned: ";
-        i << this->obtained << std::endl;
+        i << "Expecting: \"" << this->ret << "\" - returned: \"";
+        i << this->obtained << "\"" << std::endl;
     }
     if (this->output != this->obtainedOutput) {
-        i << "Expecting: " << this->output << " - operator returned: ";
-        i << this->obtainedOutput << std::endl;
+        i << "Expecting: \"" << ModSecurity::toHexIfNeeded(this->output) << "\" - returned: \"";
+        i << ModSecurity::toHexIfNeeded(this->obtainedOutput) << "\"" << std::endl;
     }
 
     return i.str();
@@ -100,6 +100,7 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
            replaceAll(&(u->input), "\\xc9", '\xc9');
            replaceAll(&(u->input), "\\x3b", '\x3b');
            replaceAll(&(u->input), "\\xFF", '\xff');
+           replaceAll(&(u->input), "\\u0000", '\u0000');
         } else if (strcmp(key, "name") == 0) {
            u->name = YAJL_GET_STRING(val);
         } else if (strcmp(key, "type") == 0) {
@@ -108,6 +109,7 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
            u->ret = YAJL_GET_INTEGER(val);
         } else if (strcmp(key, "output") == 0) {
            u->output = YAJL_GET_STRING(val);
+           replaceAll(&(u->output), "\\u0000", '\u0000');
         }
     }
 

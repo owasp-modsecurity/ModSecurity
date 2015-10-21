@@ -40,7 +40,7 @@ TrimLeft::TrimLeft(std::string action)
 
 std::string TrimLeft::evaluate(std::string value,
     Assay *assay) {
-    return *trim(&value);
+    return *ltrim(&value);
 }
 
 }  // namespace transformations

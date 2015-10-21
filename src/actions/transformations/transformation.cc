@@ -101,9 +101,9 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(sha1) { return new Sha1(a); }
     IF_MATCH(sql_hex_decode) { return new SqlHexDecode(a); }
     IF_MATCH(transformation) { return new Transformation(a); }
+    IF_MATCH(trimLeft) { return new TrimLeft(a); }
+    IF_MATCH(trimRight) { return new TrimRight(a); }
     IF_MATCH(trim) { return new Trim(a); }
-    IF_MATCH(trim_left) { return new TrimLeft(a); }
-    IF_MATCH(trim_right) { return new TrimRight(a); }
     IF_MATCH(url_decode) { return new UrlDecode(a); }
     IF_MATCH(urlDecodeUni) { return new UrlDecodeUni(a); }
     IF_MATCH(url_encode) { return new UrlEncode(a); }

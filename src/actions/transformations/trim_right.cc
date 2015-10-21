@@ -38,7 +38,7 @@ TrimRight::TrimRight(std::string action)
 
 std::string TrimRight::evaluate(std::string value,
     Assay *assay) {
-    return *this->trim(&value);
+    return *this->rtrim(&value);
 }
 
 }  // namespace transformations
