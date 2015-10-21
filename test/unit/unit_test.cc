@@ -93,7 +93,7 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
            u->param = YAJL_GET_STRING(val);
         } else if (strcmp(key, "input") == 0) {
            u->input = YAJL_GET_STRING(val);
-           replaceAll(&(u->input), "\\0", '\u0000');
+           replaceAll(&(u->input), "\\0", '\0');
            replaceAll(&(u->input), "\\xe4", '\xe4');
            replaceAll(&(u->input), "\\x03", '\x03');
            replaceAll(&(u->input), "\\xbf", '\xbf');
@@ -110,6 +110,7 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
         } else if (strcmp(key, "output") == 0) {
            u->output = YAJL_GET_STRING(val);
            replaceAll(&(u->output), "\\u0000", '\u0000');
+           replaceAll(&(u->output), "\\0", '\u0000');
         }
     }
 

@@ -26,7 +26,7 @@
 
 #include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
-
+#include "src/utils.h"
 
 namespace ModSecurity {
 namespace actions {
@@ -37,17 +37,16 @@ std::string RemoveNulls::evaluate(std::string value,
     Assay *assay) {
     int64_t i;
 
-    std::string ret;
-
     i = 0;
     while (i < value.size()) {
-        if (value.at(i) != '\0') {
-            ret += value.at(i);
+        if (value.at(i) == '\0') {
+            value.erase(i, 1);
+        } else {
+            i++;
         }
-        i++;
     }
 
-    return ret;
+    return value;
 }
 
 
