@@ -24,29 +24,78 @@
 
 #include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
-
+#include "src/utils.h"
 
 namespace ModSecurity {
 namespace actions {
 namespace transformations {
+
 
 UrlEncode::UrlEncode(std::string action)
     : Transformation(action) {
     this->action_kind = 1;
 }
 
+
+std::string UrlEncode::url_enc(const char *input,
+    unsigned int input_len, int *changed) {
+    char *rval, *d;
+    unsigned int i, len;
+    int count = 0;
+
+    *changed = 0;
+
+    len = input_len * 3 + 1;
+    d = rval = (char *)malloc(len);
+    if (rval == NULL) {
+        return NULL;
+    }
+
+    /* ENH Only encode the characters that really need to be encoded. */
+
+    for (i = 0; i < input_len; i++) {
+        unsigned char c = input[i];
+
+        if (c == ' ') {
+            *d++ = '+';
+            *changed = 1;
+            count++;
+        } else {
+            if ( (c == 42) || ((c >= 48) && (c <= 57))
+                || ((c >= 65) && (c <= 90))
+                || ((c >= 97)&&(c <= 122))) {
+                *d++ = c;
+                count++;
+            } else {
+                *d++ = '%';
+                count++;
+                c2x(c, (unsigned char *)d);
+                d += 2;
+                count++;
+                count++;
+                *changed = 1;
+            }
+        }
+    }
+
+    *d = '\0';
+
+    std::string ret("");
+    ret.append(rval, count);
+    free(rval);
+    return ret;
+}
+
+
 std::string UrlEncode::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation UrlEncode
-     */
-    if (assay) {
-#ifndef NO_LOGS
-        assay->debug(4, "Transformation UrlEncode is not implemented yet.");
-#endif
-    }
-    return value;
+    int changed;
+
+    std::string ret = url_enc(value.c_str(), value.size(), &changed);
+
+    return ret;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

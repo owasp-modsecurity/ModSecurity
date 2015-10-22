@@ -842,6 +842,17 @@ unsigned char x2c(unsigned char *what) {
 }
 
 
+unsigned char *c2x(unsigned what, unsigned char *where) {
+    static const char c2x_table[] = "0123456789abcdef";
+
+    what = what & 0xff;
+    *where++ = c2x_table[what >> 4];
+    *where++ = c2x_table[what & 0x0f];
+
+    return where;
+}
+
+
 std::string string_to_hex(const std::string& input) {
     static const char* const lut = "0123456789ABCDEF";
     size_t len = input.length();

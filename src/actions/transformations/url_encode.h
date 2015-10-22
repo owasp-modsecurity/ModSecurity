@@ -33,6 +33,9 @@ class UrlEncode : public Transformation {
     explicit UrlEncode(std::string action);
     std::string evaluate(std::string exp,
         Assay *assay) override;
+
+    std::string url_enc(const char *input,
+        unsigned int input_len, int *changed);
 };
 
 }  // namespace transformations

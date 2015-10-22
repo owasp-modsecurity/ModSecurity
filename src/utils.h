@@ -43,6 +43,7 @@ namespace ModSecurity {
     double cpu_seconds(void);
     int js_decode_nonstrict_inplace(unsigned char *input, int64_t input_len);
     unsigned char x2c(unsigned char *what);
+    unsigned char *c2x(unsigned what, unsigned char *where);
     int css_decode_inplace(unsigned char *input, int64_t input_len);
     unsigned char xsingle2c(unsigned char *what);
     int html_entities_decode_inplace(unsigned char *input, int input_len);
