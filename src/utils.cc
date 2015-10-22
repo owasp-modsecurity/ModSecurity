@@ -43,11 +43,6 @@
 
 #include "modsecurity/modsecurity.h"
 
-#define VALID_HEX(X) (((X >= '0') && (X <= '9')) || \
-    ((X >= 'a') && (X <= 'f')) || ((X >= 'A') && (X <= 'F')))
-#define ISODIGIT(X) ((X >= '0') && (X <= '7'))
-#define NBSP 160
-
 namespace ModSecurity {
 
 std::string phase_name(int x) {
@@ -827,7 +822,7 @@ length:
 /**
  * Converts a single hexadecimal digit into a decimal value.
  */
-static unsigned char xsingle2c(unsigned char *what) {
+unsigned char xsingle2c(unsigned char *what) {
     register unsigned char digit;
 
     digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
@@ -836,7 +831,7 @@ static unsigned char xsingle2c(unsigned char *what) {
 }
 
 
-static unsigned char x2c(unsigned char *what) {
+unsigned char x2c(unsigned char *what) {
     register unsigned char digit;
 
     digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));

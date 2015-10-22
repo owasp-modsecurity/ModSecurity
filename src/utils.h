@@ -22,6 +22,13 @@
 
 #ifndef SRC_UTILS_H_
 
+
+#define VALID_HEX(X) (((X >= '0') && (X <= '9')) || \
+    ((X >= 'a') && (X <= 'f')) || ((X >= 'A') && (X <= 'F')))
+#define ISODIGIT(X) ((X >= '0') && (X <= '7'))
+#define NBSP 160
+
+
 namespace ModSecurity {
     std::vector<std::string> split(std::string str, char delimiter);
     double random_number(const double from, const double to);
@@ -35,9 +42,9 @@ namespace ModSecurity {
     std::string toupper(std::string str);
     double cpu_seconds(void);
     int js_decode_nonstrict_inplace(unsigned char *input, int64_t input_len);
-    static unsigned char x2c(unsigned char *what);
+    unsigned char x2c(unsigned char *what);
     int css_decode_inplace(unsigned char *input, int64_t input_len);
-    static unsigned char xsingle2c(unsigned char *what);
+    unsigned char xsingle2c(unsigned char *what);
     int html_entities_decode_inplace(unsigned char *input, int input_len);
     int normalize_path_inplace(unsigned char *input, int input_len,
         int win, int *changed);

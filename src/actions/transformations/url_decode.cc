@@ -24,11 +24,70 @@
 
 #include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
-
+#include "src/utils.h"
 
 namespace ModSecurity {
 namespace actions {
 namespace transformations {
+
+
+int UrlDecode::urldecode_nonstrict_inplace(unsigned char *input,
+    long int input_len, int *invalid_count, int *changed) {
+    unsigned char *d = (unsigned char *)input;
+    long int i, count;
+
+    *changed = 0;
+
+    if (input == NULL) {
+        return -1;
+    }
+
+    i = count = 0;
+    while (i < input_len) {
+        if (input[i] == '%') {
+            /* Character is a percent sign. */
+
+            /* Are there enough bytes available? */
+            if (i + 2 < input_len) {
+                char c1 = input[i + 1];
+                char c2 = input[i + 2];
+                if (VALID_HEX(c1) && VALID_HEX(c2)) {
+                    unsigned long uni = x2c(&input[i + 1]);
+
+                    *d++ = (wchar_t)uni;
+                    count++;
+                    i += 3;
+                    *changed = 1;
+                } else {
+                    /* Not a valid encoding, skip this % */
+                    *d++ = input[i++];
+                    count ++;
+                    (*invalid_count)++;
+                }
+            } else {
+                /* Not enough bytes available, copy the raw bytes. */
+                *d++ = input[i++];
+                count ++;
+                (*invalid_count)++;
+            }
+        } else {
+            /* Character is not a percent sign. */
+            if (input[i] == '+') {
+                *d++ = ' ';
+                *changed = 1;
+            } else {
+                *d++ = input[i];
+            }
+            count++;
+            i++;
+        }
+    }
+
+    *d = '\0';
+
+    return count;
+}
+
 
 UrlDecode::UrlDecode(std::string action)
     : Transformation(action) {
@@ -37,16 +96,24 @@ UrlDecode::UrlDecode(std::string action)
 
 std::string UrlDecode::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation UrlDecode
-     */
-    if (assay) {
-#ifndef NO_LOGS
-        assay->debug(4, "Transformation UrlDecode is not implemented yet.");
-#endif
-    }
-    return value;
+    unsigned char *val = NULL;
+    int invalid_count;
+    int changed;
+
+    val = (unsigned char *) malloc(sizeof(char) * value.size() + 1);
+    memcpy(val, value.c_str(), value.size() + 1);
+    val[value.size()] = '\0';
+
+    int size = urldecode_nonstrict_inplace(val, value.size(), &invalid_count, &changed);
+    std::string out;
+
+    out.append((const char *)val, size);
+
+    free(val);
+
+    return out;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

@@ -93,6 +93,11 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
            u->param = YAJL_GET_STRING(val);
         } else if (strcmp(key, "input") == 0) {
            u->input = YAJL_GET_STRING(val);
+           /*
+            * Converting \\u0000 to \0 due to the following gcc bug:
+            * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53690
+            *
+            */
            replaceAll(&(u->input), "\\0", '\0');
            replaceAll(&(u->input), "\\xe4", '\xe4');
            replaceAll(&(u->input), "\\x03", '\x03');
@@ -100,7 +105,7 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
            replaceAll(&(u->input), "\\xc9", '\xc9');
            replaceAll(&(u->input), "\\x3b", '\x3b');
            replaceAll(&(u->input), "\\xFF", '\xff');
-           replaceAll(&(u->input), "\\u0000", '\u0000');
+           replaceAll(&(u->input), "\\u0000", '\0');
         } else if (strcmp(key, "name") == 0) {
            u->name = YAJL_GET_STRING(val);
         } else if (strcmp(key, "type") == 0) {
@@ -108,9 +113,20 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
         } else if (strcmp(key, "ret") == 0) {
            u->ret = YAJL_GET_INTEGER(val);
         } else if (strcmp(key, "output") == 0) {
-           u->output = YAJL_GET_STRING(val);
-           replaceAll(&(u->output), "\\u0000", '\u0000');
-           replaceAll(&(u->output), "\\0", '\u0000');
+           u->output = std::string(YAJL_GET_STRING(val));
+           /*
+            * Converting \\u0000 to \0 due to the following gcc bug:
+            * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53690
+            *
+            */
+           replaceAll(&(u->output), "\\u0000", '\0');
+           replaceAll(&(u->output), "\\xe4", '\xe4');
+           replaceAll(&(u->output), "\\x03", '\x03');
+           replaceAll(&(u->output), "\\xbf", '\xbf');
+           replaceAll(&(u->output), "\\xc9", '\xc9');
+           replaceAll(&(u->output), "\\x3b", '\x3b');
+           replaceAll(&(u->output), "\\xFF", '\xff');
+           replaceAll(&(u->output), "\\0", '\0');
         }
     }
 
