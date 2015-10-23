@@ -47,6 +47,10 @@ class SHA1 {
     void update(std::string *s);
     void update(std::istream *is);
     std::string final();
+    std::string final_bin() {
+        return final_bin(true);
+    }
+    std::string final_bin(bool reset);
 
  private:
     /* number of 32bit integers per SHA1 digest */

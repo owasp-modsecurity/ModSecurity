@@ -24,6 +24,8 @@
 
 #include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
+#include "utils/sha1.h"
+#include "src/utils.h"
 
 
 namespace ModSecurity {
@@ -37,15 +39,12 @@ Sha1::Sha1(std::string action)
 
 std::string Sha1::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation Sha1
-     */
-    if (assay) {
-#ifndef NO_LOGS
-        assay->debug(4, "Transformation Sha1 is not implemented yet.");
-#endif
-    }
-    return value;
+
+    Utils::SHA1 sha1;
+    sha1.update(&value);
+    std::string sha1_bin = sha1.final_bin();
+
+    return sha1_bin;
 }
 
 }  // namespace transformations

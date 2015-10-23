@@ -65,7 +65,7 @@ void SHA1::update(std::istream *is) {
 }
 
 
-std::string SHA1::final() {
+std::string SHA1::final_bin(bool toReset = true) {
     /* Total number of hashed bits */
     uint64_t total_bits = (transforms*BLOCK_BYTES + buffer.size()) * 8;
 
@@ -90,6 +90,22 @@ std::string SHA1::final() {
     block[BLOCK_INTS - 1] = total_bits;
     block[BLOCK_INTS - 2] = (total_bits >> 32);
     transform(block);
+
+    if (toReset) {
+        /* Reset for next run */
+        reset();
+    }
+
+    std::string bin;
+    bin.append((const char*) digest, BLOCK_INTS);
+
+    return bin;
+}
+
+
+std::string SHA1::final() {
+
+    final_bin(false);
 
     /* Hex std::string */
     std::ostringstream result;
