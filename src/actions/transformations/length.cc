@@ -37,15 +37,8 @@ Length::Length(std::string action)
 
 std::string Length::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation Length
-     */
-    if (assay) {
-#ifndef NO_LOGS
-        assay->debug(4, "Transformation Length is not implemented yet.");
-#endif
-    }
-    return value;
+
+    return std::to_string(value.size());
 }
 
 }  // namespace transformations
