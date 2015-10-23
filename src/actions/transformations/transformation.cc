@@ -88,8 +88,8 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(lowercase) { return new LowerCase(a); }
     IF_MATCH(md5) { return new Md5(a); }
     IF_MATCH(none) { return new None(a); }
-    IF_MATCH(normalise_path) { return new NormalisePath(a); }
     IF_MATCH(normalisePathWin) { return new NormalisePathWin(a); }
+    IF_MATCH(normalisePath) { return new NormalisePath(a); }
     IF_MATCH(parity_even_7bit) { return new ParityEven7bit(a); }
     IF_MATCH(parity_odd_7bit) { return new ParityOdd7bit(a); }
     IF_MATCH(parity_zero_7bit) { return new ParityZero7bit(a); }

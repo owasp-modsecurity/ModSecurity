@@ -15,6 +15,8 @@
 
 #include "actions/transformations/normalise_path.h"
 
+#include <string.h>
+
 #include <iostream>
 #include <string>
 #include <algorithm>
@@ -24,6 +26,7 @@
 
 #include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
+#include "src/utils.h"
 
 
 namespace ModSecurity {
@@ -37,16 +40,20 @@ NormalisePath::NormalisePath(std::string action)
 
 std::string NormalisePath::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation NormalisePath
-     */
-    if (assay) {
-#ifndef NO_LOGS
-        assay->debug(4, "Transformation NormalisePath is not" \
-        " implemented yet.");
-#endif
-    }
-    return value;
+    int changed = 0;
+
+    char *tmp = (char *) malloc(sizeof(char) * value.size() + 1);
+    memcpy(tmp, value.c_str(), value.size() + 1);
+    tmp[value.size()] = '\0';
+
+    int i = normalize_path_inplace((unsigned char *)tmp,
+        value.size(), 0, &changed);
+
+    std::string ret("");
+    ret.assign(tmp, i);
+    free(tmp);
+
+    return ret;
 }
 
 }  // namespace transformations
