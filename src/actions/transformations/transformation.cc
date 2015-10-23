@@ -79,7 +79,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(cmd_line) { return new CmdLine(a); }
     IF_MATCH(compress_whitespace) { return new CompressWhitespace(a); }
     IF_MATCH(cssDecode) { return new CssDecode(a); }
-    IF_MATCH(escape_seq_decode) { return new EscapeSeqDecode(a); }
+    IF_MATCH(escapeSeqDecode) { return new EscapeSeqDecode(a); }
     IF_MATCH(hexDecode) { return new HexDecode(a); }
     IF_MATCH(hexEncode) { return new HexEncode(a); }
     IF_MATCH(htmlEntityDecode) { return new HtmlEntityDecode(a); }

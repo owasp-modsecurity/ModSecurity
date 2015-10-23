@@ -24,7 +24,7 @@
 
 #include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
-
+#include "src/utils.h"
 
 namespace ModSecurity {
 namespace actions {
@@ -35,18 +35,125 @@ EscapeSeqDecode::EscapeSeqDecode(std::string action)
     this->action_kind = 1;
 }
 
+
+int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
+    int input_len) {
+    unsigned char *d = input;
+    int i, count;
+
+    i = count = 0;
+    while (i < input_len) {
+        if ((input[i] == '\\') && (i + 1 < input_len)) {
+            int c = -1;
+
+            switch(input[i + 1]) {
+                case 'a' :
+                    c = '\a';
+                    break;
+                case 'b' :
+                    c = '\b';
+                    break;
+                case 'f' :
+                    c = '\f';
+                    break;
+                case 'n' :
+                    c = '\n';
+                    break;
+                case 'r' :
+                    c = '\r';
+                    break;
+                case 't' :
+                    c = '\t';
+                    break;
+                case 'v' :
+                    c = '\v';
+                    break;
+                case '\\' :
+                    c = '\\';
+                    break;
+                case '?' :
+                    c = '?';
+                    break;
+                case '\'' :
+                    c = '\'';
+                    break;
+                case '"' :
+                    c = '"';
+                    break;
+            }
+
+            if (c != -1) i += 2;
+
+            /* Hexadecimal or octal? */
+            if (c == -1) {
+                if ((input[i + 1] == 'x')||(input[i + 1] == 'X')) {
+                    /* Hexadecimal. */
+                    if ((i + 3 < input_len)&&(isxdigit(input[i + 2]))&&(isxdigit(input[i + 3]))) {
+                        /* Two digits. */
+                        c = x2c(&input[i + 2]);
+                        i += 4;
+                    } else {
+                        /* Invalid encoding, do nothing. */
+                    }
+                }
+                else
+                    if (ISODIGIT(input[i + 1])) { /* Octal. */
+                        char buf[4];
+                        int j = 0;
+
+                        while((i + 1 + j < input_len)&&(j < 3)) {
+                            buf[j] = input[i + 1 + j];
+                            j++;
+                            if (!ISODIGIT(input[i + 1 + j])) break;
+                        }
+                        buf[j] = '\0';
+
+                        if (j > 0) {
+                            c = strtol(buf, NULL, 8);
+                            i += 1 + j;
+                        }
+                    }
+            }
+
+            if (c == -1) {
+                /* Didn't recognise encoding, copy raw bytes. */
+                *d++ = input[i + 1];
+                count++;
+                i += 2;
+            } else {
+                /* Converted the encoding. */
+                *d++ = c;
+                count++;
+            }
+        } else {
+            /* Input character not a backslash, copy it. */
+            *d++ = input[i++];
+            count++;
+        }
+    }
+
+    *d = '\0';
+
+    return count;
+}
+
+
 std::string EscapeSeqDecode::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation EscapeSeqDecode
-     */
-    if (assay) {
-#ifndef NO_LOGS
-        assay->debug(4, "Transformation EscapeSeqDecode is " \
-            "not implemented yet.");
-#endif
-    }
-    return value;
+
+    unsigned char *tmp = (unsigned char *) malloc(sizeof(char)
+        * value.size() + 1);
+    memcpy(tmp, value.c_str(), value.size() + 1);
+    tmp[value.size()] = '\0';
+
+    int size = ansi_c_sequences_decode_inplace(tmp, value.size());
+
+    std::string ret("");
+    ret.assign((char *)tmp, size);
+    //ret.append((const char *)tmp);
+    free(tmp);
+
+    return ret;
 }
 
 }  // namespace transformations
