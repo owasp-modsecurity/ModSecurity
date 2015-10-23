@@ -36,7 +36,11 @@ namespace transformations {
 
 std::string CssDecode::evaluate(std::string value,
     Assay *assay) {
-    char *tmp = strdup(value.c_str());
+
+    char *tmp = (char *) malloc(sizeof(char) * value.size() + 1);
+    memcpy(tmp, value.c_str(), value.size() + 1);
+    tmp[value.size()] = '\0';
+
     css_decode_inplace((unsigned char *)tmp, value.size());
     std::string ret(tmp, 0, value.size());
     free(tmp);
