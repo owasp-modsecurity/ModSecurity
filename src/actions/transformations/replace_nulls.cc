@@ -37,14 +37,18 @@ ReplaceNulls::ReplaceNulls(std::string action)
 
 std::string ReplaceNulls::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation ReplaceNulls
-     */
-    if (assay) {
-#ifndef NO_LOGS
-        assay->debug(4, "Transformation ReplaceNulls is not implemented yet.");
-#endif
+    int64_t i;
+
+    i = 0;
+    while (i < value.size()) {
+        if (value.at(i) == '\0') {
+            value.erase(i, 1);
+            value.insert(i, " ", 1);
+        } else {
+            i++;
+        }
     }
+
     return value;
 }
 

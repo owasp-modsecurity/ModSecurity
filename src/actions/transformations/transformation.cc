@@ -99,7 +99,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(remove_whitespace) { return new RemoveWhitespace(a); }
     IF_MATCH(compressWhitespace) { return new CompressWhitespace(a); }
     IF_MATCH(replaceComments) { return new ReplaceComments(a); }
-    IF_MATCH(replace_nulls) { return new ReplaceNulls(a); }
+    IF_MATCH(replaceNulls) { return new ReplaceNulls(a); }
     IF_MATCH(sha1) { return new Sha1(a); }
     IF_MATCH(sql_hex_decode) { return new SqlHexDecode(a); }
     IF_MATCH(transformation) { return new Transformation(a); }
