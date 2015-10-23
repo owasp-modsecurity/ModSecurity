@@ -21,6 +21,7 @@
 #include <functional>
 #include <cctype>
 #include <locale>
+#include <iterator>
 
 #include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
@@ -37,15 +38,14 @@ HexEncode::HexEncode(std::string action)
 
 std::string HexEncode::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation HexEncode
-     */
-    if (assay) {
-#ifndef NO_LOGS
-        assay->debug(4, "Transformation HexEncode is not implemented yet.");
-#endif
+
+    std::stringstream result;
+    for (std::size_t i=0; i < value.length(); i++) {
+        int ii = (char)value[i];
+        result << std::setw(2) << std::setfill('0') << std::hex << ii;
     }
-    return value;
+
+    return result.str();
 }
 
 }  // namespace transformations
