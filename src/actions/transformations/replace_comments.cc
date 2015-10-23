@@ -24,6 +24,7 @@
 
 #include "modsecurity/assay.h"
 #include "actions/transformations/transformation.h"
+#include "src/utils.h"
 
 
 namespace ModSecurity {
@@ -37,16 +38,51 @@ ReplaceComments::ReplaceComments(std::string action)
 
 std::string ReplaceComments::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation ReplaceComments
-     */
-    if (assay) {
-#ifndef NO_LOGS
-        assay->debug(4, "Transformation ReplaceComments " \
-            "is not implemented yet.");
-#endif
+
+    long int i, j, incomment;
+    int changed = 0;
+
+    char *input = (char *) malloc(sizeof(char) * value.size() + 1);
+    memcpy(input, value.c_str(), value.size() + 1);
+    input[value.size()] = '\0';
+
+    i = j = incomment = 0;
+    while(i < value.size()) {
+        if (incomment == 0) {
+            if ((input[i] == '/') && (i + 1 < value.size())
+                && (input[i + 1] == '*')) {
+                changed = 1;
+                incomment = 1;
+                i += 2;
+            } else {
+                input[j] = input[i];
+                i++;
+                j++;
+            }
+        } else {
+            if ((input[i] == '*') && (i + 1 < value.size())
+                && (input[i + 1] == '/')) {
+                incomment = 0;
+                i += 2;
+                input[j] = ' ';
+                j++;
+            } else {
+                i++;
+            }
+        }
     }
-    return value;
+
+    if (incomment) {
+        input[j++] = ' ';
+    }
+
+
+    std::string resp;
+    resp.append((char *)input, j);
+
+    free(input);
+
+    return resp;
 }
 
 }  // namespace transformations
