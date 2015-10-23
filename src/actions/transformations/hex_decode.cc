@@ -30,23 +30,27 @@ namespace ModSecurity {
 namespace actions {
 namespace transformations {
 
+
 HexDecode::HexDecode(std::string action)
     : Transformation(action) {
     this->action_kind = 1;
 }
 
+
 std::string HexDecode::evaluate(std::string value,
     Assay *assay) {
-    /**
-     * @todo Implement the transformation HexDecode
-     */
-    if (assay) {
-#ifndef NO_LOGS
-        assay->debug(4, "Transformation HexDecode is not implemented yet.");
-#endif
+    int len = value.length();
+    std::string newString;
+
+    for(int i=0; i< len; i+=2) {
+        std::string byte = value.substr(i,2);
+        char chr = (char) (int)strtol(byte.c_str(), NULL, 16);
+        newString.push_back(chr);
     }
-    return value;
+
+    return newString;
 }
+
 
 }  // namespace transformations
 }  // namespace actions
