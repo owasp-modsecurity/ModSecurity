@@ -15,8 +15,9 @@
 
 #include "operators/verify_cc.h"
 
-#include <pcrecpp.h>
 #include <iostream>
+#include <pcre.h>
+#include <cstring>
 
 #include "operators/operator.h"
 
@@ -66,16 +67,47 @@ int VerifyCC::luhnVerify(const char *ccnumber, int len) {
 }
 
 
+
+bool VerifyCC::init(const std::string &param2, const char **error) {
+    std::vector<std::string> vec;
+    const char *errptr = NULL;
+    int erroffset = 0;
+
+    m_pc = pcre_compile(param.c_str(), PCRE_DOTALL|PCRE_MULTILINE,
+        &errptr, &erroffset, NULL);
+    m_pce = pcre_study(m_pc, PCRE_STUDY_JIT_COMPILE, &errptr);
+
+    if ((m_pc == NULL) || (m_pce == NULL)) {
+        *error = errptr;
+        return false;
+    }
+
+    return true;
+}
+
+
 bool VerifyCC::evaluate(Assay *assay, const std::string &i) {
     int offset = 0;
     bool is_cc = false;
     int target_length = i.length();
 
     for (offset = 0; offset < target_length; offset++) {
-        std::string shiftedString(i, offset, i.length() - offset);
         std::string match;
-        pcrecpp::StringPiece input(shiftedString);
-        while (m_re.FindAndConsume(&input, &match)) {
+        int ovector[33];
+        memset(ovector, 0, sizeof(ovector));
+        int ret = pcre_exec(m_pc, m_pce, i.c_str(), i.size(), offset,
+            0, ovector, 33) > 0;
+
+        /* If there was no match, then we are done. */
+        if (ret == PCRE_ERROR_NOMATCH) {
+            break;
+        }
+        if (ret < 0) {
+            return false;
+        }
+
+        if (ret > 0) {
+            match = std::string(i, ovector[0], ovector[1] - ovector[0]);
             is_cc = luhnVerify(match.c_str(), match.size());
             if (is_cc) {
                 if (assay) {

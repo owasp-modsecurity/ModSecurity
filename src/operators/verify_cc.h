@@ -16,9 +16,8 @@
 #ifndef SRC_OPERATORS_VERIFY_CC_H_
 #define SRC_OPERATORS_VERIFY_CC_H_
 
-#include <pcrecpp.h>
-
 #include <string>
+#include <pcre.h>
 
 #include "operators/operator.h"
 
@@ -29,14 +28,14 @@ class VerifyCC : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     VerifyCC(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation),
-        m_re(param, pcrecpp::RE_Options()) { }
+        : Operator(op, param, negation) { }
 
     int luhnVerify(const char *ccnumber, int len);
     bool evaluate(Assay *assay, const std::string &input) override;
-
+    bool init(const std::string &param, const char **error) override;
  private:
-    pcrecpp::RE m_re;
+    pcre *m_pc;
+    pcre_extra *m_pce;
 };
 
 }  // namespace operators
