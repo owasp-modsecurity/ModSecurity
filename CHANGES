@@ -1,6 +1,8 @@
 DD mmm YYYY - X.Y.Z (To be released)
 ------------------------------------
 
+ * Fix crash while adding empty keys to persistent collections.
+   [Issues #927 - Eugene Alekseev, Marc Stern and ModSecurity team]
  * Remove misguided call to srand()
    [Issues #778, #781 and #836 - Michael Bunk, @gilperon]
  * Fix compilation problem while ssdeep is installed in non-standard
