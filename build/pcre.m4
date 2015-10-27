@@ -79,6 +79,6 @@ if test -z "${PCRE_VERSION}"; then
 else
     AC_MSG_NOTICE([using pcre v${PCRE_VERSION}])
     ifelse([$1], , , $1) 
-    PCRE_LDADD="${PCRE_LDADD} -lpcrecpp"
+    PCRE_LDADD="${PCRE_LDADD} -lpcre"
 fi 
 ])
