@@ -1,6 +1,8 @@
 DD mmm YYYY - X.Y.Z (To be released)
 ------------------------------------
 
+ * Fix variable resolution duration (Content of the DURATION variable).
+   [Issue #662 - Andrew Elble]
  * Fix crash while adding empty keys to persistent collections.
    [Issue #927 - Eugene Alekseev, Marc Stern and ModSecurity team]
  * Remove misguided call to srand()
