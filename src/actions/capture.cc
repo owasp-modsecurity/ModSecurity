@@ -26,6 +26,7 @@
 #include "operators/pm.h"
 #include "operators/rx.h"
 #include "operators/contains.h"
+#include "operators/detect_sqli.h"
 
 namespace ModSecurity {
 namespace actions {
@@ -47,6 +48,11 @@ bool Capture::evaluate(Rule *rule, Assay *assay) {
     operators::Contains *contains = dynamic_cast<operators::Contains *>(op);
     if (contains != NULL) {
         match = &contains->matched;
+    }
+
+    operators::DetectSQLi *dsqli = dynamic_cast<operators::DetectSQLi *>(op);
+    if (dsqli != NULL) {
+        match = &dsqli->matched;
     }
 
     if (match->empty()) {

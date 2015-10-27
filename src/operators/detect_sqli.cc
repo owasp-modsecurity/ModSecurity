@@ -27,13 +27,11 @@ namespace operators {
 bool DetectSQLi::evaluate(Assay *assay, const std::string &input) {
     char fingerprint[8];
     int issqli;
-    // int capture;
 
     issqli = libinjection_sqli(input.c_str(), input.length(), fingerprint);
-    // capture = apr_table_get(rule->actionset->actions, "capture") ? 1 : 0;
 
     if (issqli) {
-        // set_match_to_tx(msr, capture, fingerprint, 0);
+        matched.push_back(fingerprint);
         if (assay) {
 #ifndef NO_LOGS
             assay->debug(4, "detected SQLi using libinjection with " \

@@ -30,6 +30,8 @@ class DetectSQLi : public Operator {
         : Operator(op, param, negation) { }
 
     bool evaluate(Assay *assay, const std::string &input);
+
+    std::list<std::string> matched;
 };
 
 }  // namespace operators
