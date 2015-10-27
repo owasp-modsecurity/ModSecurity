@@ -46,7 +46,7 @@ std::string UrlEncode::url_enc(const char *input,
     *changed = 0;
 
     len = input_len * 3 + 1;
-    d = rval = (char *)malloc(len);
+    d = rval = reinterpret_cast<char *>(malloc(len));
     if (rval == NULL) {
         return NULL;
     }
@@ -63,7 +63,7 @@ std::string UrlEncode::url_enc(const char *input,
         } else {
             if ( (c == 42) || ((c >= 48) && (c <= 57))
                 || ((c >= 65) && (c <= 90))
-                || ((c >= 97)&&(c <= 122))) {
+                || ((c >= 97) && (c <= 122))) {
                 *d++ = c;
                 count++;
             } else {

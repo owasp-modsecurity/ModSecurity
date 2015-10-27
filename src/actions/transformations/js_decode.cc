@@ -37,7 +37,8 @@ namespace transformations {
 std::string JsDecode::evaluate(std::string value,
     Assay *assay) {
 
-    char *val = (char *) malloc(sizeof(char) * value.size() + 1);
+    char *val = reinterpret_cast<char *>(
+        malloc(sizeof(char) * value.size() + 1));
     memcpy(val, value.c_str(), value.size() + 1);
     val[value.size()] = '\0';
 

@@ -104,7 +104,6 @@ std::string SHA1::final_bin(bool toReset = true) {
 
 
 std::string SHA1::final() {
-
     final_bin(false);
 
     /* Hex std::string */

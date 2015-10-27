@@ -46,7 +46,7 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
         if ((input[i] == '\\') && (i + 1 < input_len)) {
             int c = -1;
 
-            switch(input[i + 1]) {
+            switch (input[i + 1]) {
                 case 'a' :
                     c = '\a';
                     break;
@@ -86,22 +86,22 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
 
             /* Hexadecimal or octal? */
             if (c == -1) {
-                if ((input[i + 1] == 'x')||(input[i + 1] == 'X')) {
+                if ((input[i + 1] == 'x') || (input[i + 1] == 'X')) {
                     /* Hexadecimal. */
-                    if ((i + 3 < input_len)&&(isxdigit(input[i + 2]))&&(isxdigit(input[i + 3]))) {
+                    if ((i + 3 < input_len) && (isxdigit(input[i + 2]))
+                        && (isxdigit(input[i + 3]))) {
                         /* Two digits. */
                         c = x2c(&input[i + 2]);
                         i += 4;
                     } else {
                         /* Invalid encoding, do nothing. */
                     }
-                }
-                else
+                } else {
                     if (ISODIGIT(input[i + 1])) { /* Octal. */
                         char buf[4];
                         int j = 0;
 
-                        while((i + 1 + j < input_len)&&(j < 3)) {
+                        while ((i + 1 + j < input_len) && (j < 3)) {
                             buf[j] = input[i + 1 + j];
                             j++;
                             if (!ISODIGIT(input[i + 1 + j])) break;
@@ -113,6 +113,7 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
                             i += 1 + j;
                         }
                     }
+                }
             }
 
             if (c == -1) {
@@ -149,8 +150,7 @@ std::string EscapeSeqDecode::evaluate(std::string value,
     int size = ansi_c_sequences_decode_inplace(tmp, value.size());
 
     std::string ret("");
-    ret.assign((char *)tmp, size);
-    //ret.append((const char *)tmp);
+    ret.assign(reinterpret_cast<char *>(tmp), size);
     free(tmp);
 
     return ret;

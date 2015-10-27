@@ -15,9 +15,10 @@
 
 #include "operators/verify_cc.h"
 
-#include <iostream>
 #include <pcre.h>
+#include <iostream>
 #include <cstring>
+#include <vector>
 
 #include "operators/operator.h"
 

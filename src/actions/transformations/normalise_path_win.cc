@@ -38,11 +38,12 @@ std::string NormalisePathWin::evaluate(std::string value,
     Assay *assay) {
     int changed;
 
-    char *tmp = (char *) malloc(sizeof(char) * value.size() + 1);
+    char *tmp = reinterpret_cast<char *>(
+        malloc(sizeof(char) * value.size() + 1));
     memcpy(tmp, value.c_str(), value.size() + 1);
     tmp[value.size()] = '\0';
 
-    int i = normalize_path_inplace((unsigned char *)tmp,
+    int i = normalize_path_inplace(reinterpret_cast<unsigned char *>(tmp),
         value.size(), 1, &changed);
 
     std::string ret("");

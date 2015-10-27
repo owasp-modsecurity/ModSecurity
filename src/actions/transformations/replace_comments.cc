@@ -39,15 +39,16 @@ ReplaceComments::ReplaceComments(std::string action)
 std::string ReplaceComments::evaluate(std::string value,
     Assay *assay) {
 
-    long int i, j, incomment;
+    uint64_t i, j, incomment;
     int changed = 0;
 
-    char *input = (char *) malloc(sizeof(char) * value.size() + 1);
+    char *input = reinterpret_cast<char *>(
+        malloc(sizeof(char) * value.size() + 1));
     memcpy(input, value.c_str(), value.size() + 1);
     input[value.size()] = '\0';
 
     i = j = incomment = 0;
-    while(i < value.size()) {
+    while (i < value.size()) {
         if (incomment == 0) {
             if ((input[i] == '/') && (i + 1 < value.size())
                 && (input[i + 1] == '*')) {
@@ -78,7 +79,7 @@ std::string ReplaceComments::evaluate(std::string value,
 
 
     std::string resp;
-    resp.append((char *)input, j);
+    resp.append(reinterpret_cast<char *>(input), j);
 
     free(input);
 

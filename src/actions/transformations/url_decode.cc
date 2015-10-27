@@ -32,9 +32,9 @@ namespace transformations {
 
 
 int UrlDecode::urldecode_nonstrict_inplace(unsigned char *input,
-    long int input_len, int *invalid_count, int *changed) {
+    uint64_t input_len, int *invalid_count, int *changed) {
     unsigned char *d = (unsigned char *)input;
-    long int i, count;
+    uint64_t i, count;
 
     *changed = 0;
 
@@ -52,7 +52,7 @@ int UrlDecode::urldecode_nonstrict_inplace(unsigned char *input,
                 char c1 = input[i + 1];
                 char c2 = input[i + 2];
                 if (VALID_HEX(c1) && VALID_HEX(c2)) {
-                    unsigned long uni = x2c(&input[i + 1]);
+                    uint64_t uni = x2c(&input[i + 1]);
 
                     *d++ = (wchar_t)uni;
                     count++;
@@ -61,13 +61,13 @@ int UrlDecode::urldecode_nonstrict_inplace(unsigned char *input,
                 } else {
                     /* Not a valid encoding, skip this % */
                     *d++ = input[i++];
-                    count ++;
+                    count++;
                     (*invalid_count)++;
                 }
             } else {
                 /* Not enough bytes available, copy the raw bytes. */
                 *d++ = input[i++];
-                count ++;
+                count++;
                 (*invalid_count)++;
             }
         } else {
@@ -104,7 +104,8 @@ std::string UrlDecode::evaluate(std::string value,
     memcpy(val, value.c_str(), value.size() + 1);
     val[value.size()] = '\0';
 
-    int size = urldecode_nonstrict_inplace(val, value.size(), &invalid_count, &changed);
+    int size = urldecode_nonstrict_inplace(val, value.size(),
+        &invalid_count, &changed);
     std::string out;
 
     out.append((const char *)val, size);

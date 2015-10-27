@@ -42,7 +42,8 @@ std::string NormalisePath::evaluate(std::string value,
     Assay *assay) {
     int changed = 0;
 
-    char *tmp = (char *) malloc(sizeof(char) * value.size() + 1);
+    char *tmp = reinterpret_cast<char *>(
+        malloc(sizeof(char) * value.size() + 1));
     memcpy(tmp, value.c_str(), value.size() + 1);
     tmp[value.size()] = '\0';
 

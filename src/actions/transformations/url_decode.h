@@ -34,7 +34,7 @@ class UrlDecode : public Transformation {
     std::string evaluate(std::string exp,
         Assay *assay) override;
 
-    int urldecode_nonstrict_inplace(unsigned char *input, long int input_len,
+    int urldecode_nonstrict_inplace(unsigned char *input, uint64_t input_len,
         int *invalid_count, int *changed);
 };
 

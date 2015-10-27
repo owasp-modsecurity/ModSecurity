@@ -45,7 +45,6 @@
 #include "actions/transformations/remove_comments.h"
 #include "actions/transformations/remove_nulls.h"
 #include "actions/transformations/remove_whitespace.h"
-#include "actions/transformations/compress_whitespace.h"
 #include "actions/transformations/replace_comments.h"
 #include "actions/transformations/replace_nulls.h"
 #include "actions/transformations/sha1.h"

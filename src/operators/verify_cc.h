@@ -16,8 +16,8 @@
 #ifndef SRC_OPERATORS_VERIFY_CC_H_
 #define SRC_OPERATORS_VERIFY_CC_H_
 
-#include <string>
 #include <pcre.h>
+#include <string>
 
 #include "operators/operator.h"
 

@@ -42,9 +42,10 @@ std::string HexDecode::evaluate(std::string value,
     int len = value.length();
     std::string newString;
 
-    for(int i=0; i< len; i+=2) {
-        std::string byte = value.substr(i,2);
-        char chr = (char) (int)strtol(byte.c_str(), NULL, 16);
+    for (int i=0; i< len; i+=2) {
+        std::string byte = value.substr(i, 2);
+        char chr =  static_cast<char>(static_cast<int>(strtol(byte.c_str(),
+            NULL, 16)));
         newString.push_back(chr);
     }
 

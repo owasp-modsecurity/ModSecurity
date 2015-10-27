@@ -72,8 +72,10 @@ std::string UnitTest::print() {
         i << this->obtained << "\"" << std::endl;
     }
     if (this->output != this->obtainedOutput) {
-        i << "Expecting: \"" << ModSecurity::toHexIfNeeded(this->output) << "\" - returned: \"";
-        i << ModSecurity::toHexIfNeeded(this->obtainedOutput) << "\"" << std::endl;
+        i << "Expecting: \"" << ModSecurity::toHexIfNeeded(this->output);
+        i << "\" - returned: \"";
+        i << ModSecurity::toHexIfNeeded(this->obtainedOutput) << "\"";
+        i << std::endl;
     }
 
     return i.str();

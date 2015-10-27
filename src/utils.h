@@ -21,7 +21,7 @@
 #include "modsecurity/modsecurity.h"
 
 #ifndef SRC_UTILS_H_
-
+#define SRC_UTILS_H_
 
 #define VALID_HEX(X) (((X >= '0') && (X <= '9')) || \
     ((X >= 'a') && (X <= 'f')) || ((X >= 'A') && (X <= 'F')))
@@ -60,6 +60,5 @@ namespace ModSecurity {
         const std::string& param);
 }  // namespace ModSecurity
 
-#define SRC_UTILS_H_
 
 #endif  // SRC_UTILS_H_
