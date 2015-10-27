@@ -16,6 +16,7 @@
 #include "operators/detect_sqli.h"
 
 #include <string>
+#include <list>
 
 #include "operators/operator.h"
 #include "others/libinjection/src/libinjection.h"

@@ -61,7 +61,6 @@ Action *Action::instantiate(const std::string& name) {
     std::string block("block");
     std::string phase("phase:");
     std::string rule_id("id:");
-    std::string severity("severity:");
 
     if (name.compare(0, status.length(), status) == 0) {
         return new Status(name);

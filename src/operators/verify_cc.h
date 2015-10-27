@@ -28,7 +28,9 @@ class VerifyCC : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     VerifyCC(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
+        : Operator(op, param, negation),
+        m_pc(NULL),
+        m_pce(NULL) { }
 
     int luhnVerify(const char *ccnumber, int len);
     bool evaluate(Assay *assay, const std::string &input) override;

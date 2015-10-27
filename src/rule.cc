@@ -138,7 +138,7 @@ Rule::Rule(Operator *_op,
 bool Rule::evaluateActions(Assay *assay) {
     int none = 0;
     bool containsDisruptive = false;
-    int transformations = 0;
+    // int transformations = 0;
     for (Action *a : this->actions_runtime_pre) {
         None *z = dynamic_cast<None *>(a);
         if (z != NULL) {

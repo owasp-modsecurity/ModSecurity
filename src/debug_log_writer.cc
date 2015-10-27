@@ -56,11 +56,10 @@ void DebugLogWriter::close(const std::string& fileName) {
 
 void DebugLogWriter::write(const std::string& file, const std::string &msg) {
     std::map<std::string, DebugLogWriterAgent *>::iterator it;
-    DebugLogWriterAgent *agent;
 
     it = agents.find(file);
     if (it != agents.end()) {
-        agent = it->second;
+        DebugLogWriterAgent *agent = it->second;
         agent->write(msg);
     } else {
         std::cout << file << ": " << msg << std::endl;

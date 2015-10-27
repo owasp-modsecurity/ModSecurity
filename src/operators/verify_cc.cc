@@ -70,7 +70,6 @@ int VerifyCC::luhnVerify(const char *ccnumber, int len) {
 
 
 bool VerifyCC::init(const std::string &param2, const char **error) {
-    std::vector<std::string> vec;
     const char *errptr = NULL;
     int erroffset = 0;
 

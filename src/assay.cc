@@ -1083,11 +1083,11 @@ int Assay::processLogging(int returned_code) {
 
     /* If relevant, save this assay information at the audit_logs */
     if (m_rules != NULL && m_rules->audit_log != NULL) {
+        int parts = -1;
 #ifndef NO_LOGS
         debug(8, "Checking if this request is suitable to be " \
             "saved as an audit log.");
 #endif
-        int parts = -1;
 
         if (this->auditLogModifier.size() > 0) {
 #ifndef NO_LOGS
@@ -1112,12 +1112,14 @@ int Assay::processLogging(int returned_code) {
             debug(8, "This request was marked to be " \
                 "saved via auditlog action.");
         }
+#endif
 
         bool saved = this->m_rules->audit_log->saveIfRelevant(this, parts);
         if (saved) {
+#ifndef NO_LOGS
             debug(8, "Request was relevant to be saved.");
-        }
 #endif
+        }
     }
 
     return true;

@@ -70,6 +70,23 @@ class RulesProperties {
         responseBodyLimit(0),
         responseBodyLimitAction(ProcessPartialBodyLimitAction),
         secRuleEngine(DetectionOnlyRuleEngine) { }
+
+
+/*
+    RulesProperties(const RulesProperties &other)
+        : audit_log(other.audit_log),
+        m_debugLog(other.m_debugLog),
+        remoteRulesActionOnFailed(other.remoteRulesActionOnFailed),
+        requestBodyLimit(other.requestBodyLimit),
+        requestBodyNoFilesLimit(other.requestBodyNoFilesLimit),
+        requestBodyInMemoryLimit(other.requestBodyInMemoryLimit),
+        secRequestBodyAccess(other.secRequestBodyAccess),
+        secResponseBodyAccess(other.secResponseBodyAccess),
+        requestBodyLimitAction(other.requestBodyLimitAction),
+        responseBodyLimit(other.responseBodyLimit),
+        responseBodyLimitAction(other.responseBodyLimitAction),
+        secRuleEngine(other.secRuleEngine) { }
+*/
     ~RulesProperties() {
         delete m_debugLog;
     }

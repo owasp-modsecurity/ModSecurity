@@ -1014,7 +1014,6 @@ std::string limitTo(int amount, const std::string &str) {
 
 std::string toHexIfNeeded(const std::string &str) {
     std::stringstream res;
-    size_t pos;
 
     for (int i = 0; i < str.size(); i++) {
         int c = str.at(i);

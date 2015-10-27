@@ -30,19 +30,15 @@ bool DetectXSS::evaluate(Assay *assay, const std::string &input) {
 
     is_xss = libinjection_xss(input.c_str(), input.length());
 
-    if (is_xss) {
-        if (assay) {
+    if (assay) {
 #ifndef NO_LOGS
+        if (is_xss) {
             assay->debug(5, "detected XSS using libinjection.");
-#endif
-        }
-    } else {
-        if (assay) {
-#ifndef NO_LOGS
+        } else {
             assay->debug(9, "libinjection was not able to " \
                 "find any XSS in: " + input);
-#endif
         }
+#endif
     }
 
     if (negation) {

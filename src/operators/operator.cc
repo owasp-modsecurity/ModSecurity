@@ -75,33 +75,29 @@ bool Operator::debug(Assay *assay, int x, std::string a) {
 
 
 bool Operator::evaluate(Assay *assay) {
-    if (assay) {
 #ifndef NO_LOGS
+    if (assay) {
         assay->debug(2, "Operator: " + this->op + \
             " is not implemented or malfunctioning.");
-#endif
     } else {
-#ifndef NO_LOGS
         std::cerr << "Operator: " + this->op + \
             " is not implemented or malfunctioning.";
-#endif
     }
+#endif
     return true;
 }
 
 
 bool Operator::evaluate(Assay *assay, const std::string& a) {
-    if (assay) {
 #ifndef NO_LOGS
+    if (assay) {
         assay->debug(2, "Operator: " + this->op + \
             " is not implemented or malfunctioning.");
-#endif
     } else {
-#ifndef NO_LOGS
         std::cerr << "Operator: " + this->op + \
             " is not implemented or malfunctioning.";
-#endif
     }
+#endif
 
     return true;
 }

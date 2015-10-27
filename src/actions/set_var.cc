@@ -101,7 +101,6 @@ void SetVar::dump() {
 
 bool SetVar::evaluate(Rule *rule, Assay *assay) {
     std::string targetValue;
-    int value = 0;
     std::string variableNameExpanded = MacroExpansion::expand(variableName,
         assay);
     std::string resolvedPre = MacroExpansion::expand(predicate, assay);
@@ -112,6 +111,8 @@ bool SetVar::evaluate(Rule *rule, Assay *assay) {
         targetValue = std::string("1");
     } else {
         int pre = 0;
+        int value = 0;
+
         try {
             pre = stoi(resolvedPre);
         } catch (...) {
