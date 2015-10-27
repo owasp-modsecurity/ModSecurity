@@ -2,12 +2,12 @@ DD mmm YYYY - X.Y.Z (To be released)
 ------------------------------------
 
  * Fix crash while adding empty keys to persistent collections.
-   [Issues #927 - Eugene Alekseev, Marc Stern and ModSecurity team]
+   [Issue #927 - Eugene Alekseev, Marc Stern and ModSecurity team]
  * Remove misguided call to srand()
    [Issues #778, #781 and #836 - Michael Bunk, @gilperon]
  * Fix compilation problem while ssdeep is installed in non-standard
    location.
-   [Issude #872 - Kurt Newman]
+   [Issue #872 - Kurt Newman]
  * Fix invalid storage reference by apr_psprintf at msc_crypt.c
    [Issue #609 - Jeff Trawick]
 
