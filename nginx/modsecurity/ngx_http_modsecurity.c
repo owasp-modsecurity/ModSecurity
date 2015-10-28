@@ -363,12 +363,7 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     /*      &r->headers_in.user);                           */
     req->parsed_uri.fragment = (char *)ngx_pstrdup0(r->pool, &r->exten);
 
-    if (&r->headers_in != NULL && &r->headers_in.server != NULL) {
-        req->hostname = (char *)ngx_pstrdup0(r->pool, &r->headers_in.server);
-    } else {
-        req->hostname = (char *)ngx_pstrdup0(r->pool,
-            (ngx_str_t *)&ngx_cycle->hostname);
-    }
+    req->hostname = (char *)ngx_pstrdup0(r->pool, &r->headers_in.server);
 
     if (r->header_only) {
         req->header_only = r->header_only;
