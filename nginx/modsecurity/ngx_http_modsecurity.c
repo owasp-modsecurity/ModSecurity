@@ -265,7 +265,8 @@ ngx_http_modsecurity_load_request(ngx_http_request_t *r)
     // req->parsed_uri.user = (char *)ngx_pstrdup0(r->pool, &r->headers_in.user);
     req->parsed_uri.fragment = (char *)ngx_pstrdup0(r->pool, &r->exten);
 
-    req->hostname = (char *)ngx_pstrdup0(r->pool, (ngx_str_t *)&ngx_cycle->hostname);
+    req->hostname = (char *)ngx_pstrdup0(r->pool, &r->headers_in.server);
+
 
     req->header_only = r->header_only ? r->header_only : (r->method == NGX_HTTP_HEAD);
 
