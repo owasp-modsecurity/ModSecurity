@@ -33,7 +33,7 @@ class Variable {
         : name(_name) { }
 
     static std::string to_s(std::vector<Variable *> *variables);
-    virtual std::list<ModSecurityStringVar *> *
+    virtual std::list<transaction::Variable *> *
         evaluate(Assay *assay);
     std::string name;
 };

@@ -33,10 +33,10 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<ModSecurityStringVar *> *
+std::list<transaction::Variable *> *
     Time::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *resl =
-        new std::list<ModSecurityStringVar *>();
+    std::list<transaction::Variable *> *resl =
+        new std::list<transaction::Variable *>();
 
     char tstr[200];
     struct tm timeinfo;
@@ -48,7 +48,7 @@ std::list<ModSecurityStringVar *> *
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%H:%M:%S", &timeinfo);
 
-    resl->push_back(new ModSecurityStringVar("TIME", std::string(tstr)));
+    resl->push_back(new transaction::Variable("TIME", std::string(tstr)));
 
     return resl;
 }

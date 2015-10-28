@@ -73,38 +73,22 @@ namespace operators {
 class Operator;
 }
 
-class ModSecurityHeader {
+namespace transaction {
+
+class Variable {
  public:
-    ModSecurityHeader(char *key, char *value)
-        : _key(key),
-        _value(value)
-        { }
-
-    char *_key;
-    char *_value;
-};
-
-
-class ModSecurityCollectionsVariables :
-    public std::unordered_map<std::string,
-        std::unordered_map<std::string, std::string>> {
- public:
-};
-
-
-class ModSecurityStringVar {
- public:
-     ModSecurityStringVar(const std::string& key, const std::string& value) :
+     Variable(const std::string& key, const std::string& value) :
         m_key(key),
         m_value(value) { }
      std::string m_key;
      std::string m_value;
 };
 
-class ModSecurityStringVariables :
+
+class Variables :
     public std::unordered_multimap<std::string, std::string> {
  public:
-    ModSecurityStringVariables() {
+    Variables() {
         this->reserve(1000);
     }
 
@@ -136,13 +120,13 @@ class ModSecurityStringVariables :
         this->erase(key);
     }
 
-    std::list<ModSecurityStringVar *>
+    std::list<Variable *>
         resolveVariable(const std::string& key,
-        std::list<ModSecurityStringVar *> *l) {
+        std::list<Variable *> *l) {
         auto range = this->equal_range(key);
 
         for (auto it = range.first; it != range.second; ++it) {
-            l->push_back(new ModSecurityStringVar(key, it->second));
+            l->push_back(new transaction::Variable(key, it->second));
         }
 
         if (key.find(":") == std::string::npos && l->size() == 0) {
@@ -160,7 +144,7 @@ class ModSecurityStringVariables :
                 //  auto range = this->equal_range(x.first);
 
                 //  for (auto it = range.first; it != range.second; ++it) {
-                l->push_back(new ModSecurityStringVar(x.first, x.second));
+                l->push_back(new transaction::Variable(x.first, x.second));
                 //  }
             }
         }
@@ -168,13 +152,16 @@ class ModSecurityStringVariables :
         return *l;
     }
 
-    std::list<ModSecurityStringVar *>
+    std::list<Variable *>
         resolveVariable(const std::string& key) {
-        std::list<ModSecurityStringVar *> l;
+        std::list<Variable *> l;
 
         return resolveVariable(key, &l);
     }
 };
+
+
+} // name space Transaction
 
 /** @ingroup ModSecurity_CPP_API */
 class Assay {
@@ -247,11 +234,11 @@ class Assay {
     const char *getResponseBody();
     int getResponseBodyLenth();
 
-    std::list<ModSecurityStringVar *> *
+    std::list<transaction::Variable *> *
         resolve_variable(const std::string& var);
 
     void resolve_variable(const std::string& var,
-        std::list<ModSecurityStringVar *> *);
+        std::list<transaction::Variable *> *);
 
     std::string* resolve_variable_first(const std::string& key);
     std::string* resolve_variable_first(const std::string& collectionName,
@@ -261,8 +248,8 @@ class Assay {
     bool update_variable_first(std::string var, const std::string &value);
     void delete_variable(std::string key);
 
-    ModSecurityStringVariables m_variables_strings;
-    std::unordered_map<std::string, ModSecurityStringVariables *> collections;
+    transaction::Variables m_variables_strings;
+    std::unordered_map<std::string, transaction::Variables *> collections;
 #ifndef NO_LOGS
     void debug(int, std::string);
 #endif
@@ -317,7 +304,6 @@ class Assay {
 
     std::ostringstream m_requestBody;
     std::ostringstream m_responseBody;
-    ModSecurityCollectionsVariables m_variables_collections;
     void *m_logCbData;
 };
 

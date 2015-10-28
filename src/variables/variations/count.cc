@@ -28,11 +28,11 @@ namespace ModSecurity {
 namespace Variables {
 namespace Variations {
 
-std::list<ModSecurityStringVar *> *
+std::list<transaction::Variable *> *
     Count::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *reslIn;
-    std::list<ModSecurityStringVar *> *reslOut =
-        new std::list<ModSecurityStringVar *>();
+    std::list<transaction::Variable *> *reslIn;
+    std::list<transaction::Variable *> *reslOut =
+        new std::list<transaction::Variable *>();
     int count = 0;
 
     reslIn = var->evaluate(assay);
@@ -43,7 +43,7 @@ std::list<ModSecurityStringVar *> *
 
     std::string res = std::to_string(count);
 
-    reslOut->push_back(new ModSecurityStringVar(std::string(var->name),
+    reslOut->push_back(new transaction::Variable(std::string(var->name),
         std::string(res)));
 
     return reslOut;

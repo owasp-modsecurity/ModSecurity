@@ -33,10 +33,10 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<ModSecurityStringVar *> *
+std::list<transaction::Variable *> *
     TimeMon::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *resl =
-        new std::list<ModSecurityStringVar *>();
+    std::list<transaction::Variable *> *resl =
+        new std::list<transaction::Variable *>();
 
     char tstr[200];
     struct tm timeinfo;
@@ -50,7 +50,7 @@ std::list<ModSecurityStringVar *> *
     int a = atoi(tstr);
     a--;
 
-    resl->push_back(new ModSecurityStringVar("TIME_MON",  std::to_string(a)));
+    resl->push_back(new transaction::Variable("TIME_MON",  std::to_string(a)));
 
     return resl;
 }

@@ -126,7 +126,7 @@ Assay::Assay(ModSecurity *ms, Rules *rules, void *logCbData)
     this->m_responseHeadersNames = resolve_variable_first(
         "RESPONSE_HEADERS_NAMES");
 
-    collections.emplace("TX", new ModSecurityStringVariables());
+    collections.emplace("TX", new transaction::Variables());
 #ifndef NO_LOGS
     this->debug(4, "Initialising transaction");
 #endif
@@ -664,7 +664,7 @@ int Assay::processRequestBody() {
      * computationally intensive.
      */
     std::string fullRequest;
-    std::list<ModSecurityStringVar *> l;
+    std::list<transaction::Variable *> l;
     resolve_variable("REQUEST_HEADERS", &l);
     for (auto &a : l) {
         fullRequest = fullRequest + \
@@ -1480,7 +1480,7 @@ void Assay::delete_variable(std::string key) {
 
 
 void Assay::resolve_variable(const std::string& var,
-    std::list<ModSecurityStringVar *> *l) {
+    std::list<transaction::Variable *> *l) {
 
     m_variables_strings.resolveVariable(var, l);
 
@@ -1490,10 +1490,10 @@ void Assay::resolve_variable(const std::string& var,
     }
 }
 
-std::list<ModSecurityStringVar *> *
+std::list<transaction::Variable *> *
     Assay::resolve_variable(const std::string& var) {
-    std::list<ModSecurityStringVar *> *l =
-        new std::list<ModSecurityStringVar *>();
+    std::list<transaction::Variable *> *l =
+        new std::list<transaction::Variable *>();
 
     resolve_variable(var, l);
 
@@ -1543,7 +1543,7 @@ void Assay::setCollection(const std::string& collectionName,
     const std::string& targetValue) {
 
     try {
-        ModSecurityStringVariables *collection;
+        transaction::Variables *collection;
         collection = collections.at(collectionName);
         collection->storeOrUpdateVariable(collectionName + ":"
             + variableName, targetValue);

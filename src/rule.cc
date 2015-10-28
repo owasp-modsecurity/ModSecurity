@@ -284,7 +284,7 @@ bool Rule::evaluate(Assay *assay) {
         Exclusion *exl = dynamic_cast<Exclusion *>(variable);
 
         if (exl != NULL) {
-            std::list<ModSecurityStringVar *> *z =
+            std::list<transaction::Variable *> *z =
                 variable->evaluate(assay);
             for (auto &y : *z) {
                 exclusions.push_back(y->m_key);
@@ -301,7 +301,7 @@ bool Rule::evaluate(Assay *assay) {
             continue;
         }
 
-        std::list<ModSecurityStringVar *> *e =
+        std::list<transaction::Variable *> *e =
             variable->evaluate(assay);
 
         for (auto &v : *e) {

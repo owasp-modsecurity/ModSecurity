@@ -33,7 +33,7 @@ class TimeMon : public Variable {
     explicit TimeMon(std::string _name)
         : Variable(_name) { }
 
-    std::list<ModSecurityStringVar *> *
+    std::list<transaction::Variable *> *
         evaluate(Assay *assay) override;
 };
 

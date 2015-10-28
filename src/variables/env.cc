@@ -33,10 +33,10 @@ extern char **environ;
 namespace ModSecurity {
 namespace Variables {
 
-std::list<ModSecurityStringVar *> *
+std::list<transaction::Variable *> *
     Env::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *resl =
-        new std::list<ModSecurityStringVar *>();
+    std::list<transaction::Variable *> *resl =
+        new std::list<transaction::Variable *>();
 
     std::map<std::string, std::string> envs;
     for (char **current = environ; *current; current++) {
@@ -50,7 +50,7 @@ std::list<ModSecurityStringVar *> *
 
         envs.insert(std::pair<std::string, std::string>("ENV:" + key, value));
         if ("env:" + key == name) {
-            resl->push_back(new ModSecurityStringVar(name, value));
+            resl->push_back(new transaction::Variable(name, value));
             return resl;
         }
     }
@@ -60,7 +60,7 @@ std::list<ModSecurityStringVar *> *
             && (x.first != name)) {
             continue;
         }
-        resl->push_back(new ModSecurityStringVar(x.first, x.second));
+        resl->push_back(new transaction::Variable(x.first, x.second));
     }
 
     return resl;

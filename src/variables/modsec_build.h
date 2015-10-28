@@ -33,7 +33,7 @@ class ModsecBuild : public Variable {
     explicit ModsecBuild(std::string _name)
         : Variable(_name) { }
 
-    std::list<ModSecurityStringVar *> *
+    std::list<transaction::Variable *> *
         evaluate(Assay *assay) override;
 };
 

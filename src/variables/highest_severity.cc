@@ -26,12 +26,12 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<ModSecurityStringVar *> *
+std::list<transaction::Variable *> *
     HighestSeverity::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *resl =
-        new std::list<ModSecurityStringVar *>();
+    std::list<transaction::Variable *> *resl =
+        new std::list<transaction::Variable *>();
 
-    resl->push_back(new ModSecurityStringVar("HIGHEST_SEVERITY",
+    resl->push_back(new transaction::Variable("HIGHEST_SEVERITY",
         std::to_string(assay->highest_severity)));
 
     return resl;

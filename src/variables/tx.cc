@@ -33,12 +33,12 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<ModSecurityStringVar *> *
+std::list<transaction::Variable *> *
     Tx::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *resl =
-        new std::list<ModSecurityStringVar *>();
+    std::list<transaction::Variable *> *resl =
+        new std::list<transaction::Variable *>();
 
-    resl->push_back(new ModSecurityStringVar("TX:0", "teste"));
+    resl->push_back(new transaction::Variable("TX:0", "teste"));
 
     return resl;
 }

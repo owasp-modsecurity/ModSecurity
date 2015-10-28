@@ -27,10 +27,10 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<ModSecurityStringVar *> *
+std::list<transaction::Variable *> *
     ModsecBuild::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *resl =
-        new std::list<ModSecurityStringVar *>();
+    std::list<transaction::Variable *> *resl =
+        new std::list<transaction::Variable *>();
 
     std::ostringstream ss;
     ss << std::setw(2) << std::setfill('0') << MODSECURITY_MAJOR;
@@ -38,7 +38,7 @@ std::list<ModSecurityStringVar *> *
     ss << std::setw(2) << std::setfill('0') << MODSECURITY_PATCHLEVEL;
     ss << std::setw(2) << std::setfill('0') << MODSECURITY_TAG_NUM;
 
-    resl->push_back(new ModSecurityStringVar("MODSEC_BUILD", ss.str()));
+    resl->push_back(new transaction::Variable("MODSEC_BUILD", ss.str()));
 
     return resl;
 }

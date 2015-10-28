@@ -29,10 +29,10 @@ namespace Variables {
 namespace Variations {
 
 
-std::list<ModSecurityStringVar *> *
+std::list<transaction::Variable *> *
     Exclusion::evaluate(Assay *assay) {
-    std::list<ModSecurityStringVar *> *l =
-        new std::list<ModSecurityStringVar *>();
+    std::list<transaction::Variable *> *l =
+        new std::list<transaction::Variable *>();
     assay->resolve_variable(this->name, l);
     return l;
 }
