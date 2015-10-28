@@ -147,20 +147,6 @@ class Assay {
     const char *getResponseBody();
     int getResponseBodyLenth();
 
-    std::list<transaction::Variable *> *
-        resolve_variable(const std::string& var);
-
-    void resolve_variable(const std::string& var,
-        std::list<transaction::Variable *> *);
-
-    std::string* resolve_variable_first(const std::string& key);
-    std::string* resolve_variable_first(const std::string& collectionName,
-       const std::string& var);
-
-    void store_variable(std::string, std::string value);
-    bool update_variable_first(std::string var, const std::string &value);
-    void delete_variable(std::string key);
-
     transaction::Variables m_variables;
     std::unordered_map<std::string, transaction::Variables *> collections;
 #ifndef NO_LOGS

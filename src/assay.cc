@@ -111,21 +111,22 @@ Assay::Assay(ModSecurity *ms, Rules *rules, void *logCbData)
         std::to_string(generate_assay_unique_id());
     m_rules->incrementReferenceCount();
 
-    store_variable("ARGS_COMBINED_SIZE", std::string("0"));
-    this->m_ARGScombinedSizeStr = resolve_variable_first("ARGS_COMBINED_SIZE");
-    store_variable("ARGS_NAMES", std::string(""));
-    this->m_namesArgs = resolve_variable_first("ARGS_NAMES");
-    store_variable("ARGS_POST_NAMES", std::string(""));
-    this->m_namesArgsPost = resolve_variable_first("ARGS_POST_NAMES");
-    store_variable("ARGS_GET_NAMES", std::string(""));
-    this->m_namesArgsGet = resolve_variable_first("ARGS_GET_NAMES");
-    store_variable("REQUEST_HEADERS_NAMES", std::string(""));
-    this->m_requestHeadersNames = resolve_variable_first(
+    m_variables.store("ARGS_COMBINED_SIZE", std::string("0"));
+    m_ARGScombinedSizeStr = m_variables.resolveFirst("ARGS_COMBINED_SIZE");
+    m_variables.store("ARGS_NAMES", std::string(""));
+    this->m_namesArgs = m_variables.resolveFirst("ARGS_NAMES");
+    m_variables.store("ARGS_POST_NAMES", std::string(""));
+    this->m_namesArgsPost = m_variables.resolveFirst("ARGS_POST_NAMES");
+    m_variables.store("ARGS_GET_NAMES", std::string(""));
+    this->m_namesArgsGet = m_variables.resolveFirst("ARGS_GET_NAMES");
+    m_variables.store("REQUEST_HEADERS_NAMES", std::string(""));
+    this->m_requestHeadersNames = m_variables.resolveFirst(
         "REQUEST_HEADERS_NAMES");
-    store_variable("RESPONSE_HEADERS_NAMES", std::string(""));
-    this->m_responseHeadersNames = resolve_variable_first(
+    m_variables.store("RESPONSE_HEADERS_NAMES", std::string(""));
+    this->m_responseHeadersNames = m_variables.resolveFirst(
         "RESPONSE_HEADERS_NAMES");
 
+    m_variables.setCollections(&collections);
     collections.emplace("TX", new transaction::Variables());
 #ifndef NO_LOGS
     this->debug(4, "Initialising transaction");
@@ -201,12 +202,12 @@ int Assay::processConnection(const char *client, int cPort, const char *server,
     debug(4, "Starting phase CONNECTION. (SecRules 0)");
 #endif
 
-    this->store_variable("REMOTE_HOST", m_clientIpAddress);
-    this->store_variable("UNIQUE_ID", id);
-    this->store_variable("REMOTE_ADDR", m_clientIpAddress);
-    this->store_variable("SERVER_ADDR", m_serverIpAddress);
-    this->store_variable("SERVER_PORT", std::to_string(this->m_serverPort));
-    this->store_variable("REMOTE_PORT", std::to_string(this->m_clientPort));
+    this->m_variables.store("REMOTE_HOST", m_clientIpAddress);
+    this->m_variables.store("UNIQUE_ID", id);
+    this->m_variables.store("REMOTE_ADDR", m_clientIpAddress);
+    this->m_variables.store("SERVER_ADDR", m_serverIpAddress);
+    this->m_variables.store("SERVER_PORT", std::to_string(this->m_serverPort));
+    this->m_variables.store("REMOTE_PORT", std::to_string(this->m_clientPort));
     this->m_rules->evaluate(ModSecurity::ConnectionPhase, this);
     return true;
 }
@@ -251,11 +252,11 @@ int Assay::processURI(const char *uri, const char *protocol,
     size_t pos = m_uri_decoded.find("?");
     size_t pos_raw = uri_s.find("?");
 
-    store_variable("REQUEST_LINE", std::string(protocol) + " " +
+    m_variables.store("REQUEST_LINE", std::string(protocol) + " " +
         std::string(uri) + " HTTP/" + std::string(http_version));
 
     if (pos_raw != std::string::npos) {
-        store_variable("QUERY_STRING", std::string(uri_s, pos_raw + 1,
+        m_variables.store("QUERY_STRING", std::string(uri_s, pos_raw + 1,
             uri_s.length() - (pos_raw + 1)));
     }
 
@@ -265,19 +266,19 @@ int Assay::processURI(const char *uri, const char *protocol,
     } else {
         path_info = std::string(m_uri_decoded, 0, pos);
     }
-    store_variable("PATH_INFO", path_info);
-    store_variable("REQUEST_FILENAME", path_info);
+    m_variables.store("PATH_INFO", path_info);
+    m_variables.store("REQUEST_FILENAME", path_info);
 
     size_t offset = path_info.find_last_of("/\\");
     if (offset != std::string::npos) {
         std::string basename = std::string(path_info, offset,
             path_info.length() - offset);
-        store_variable("REQUEST_BASENAME", basename);
+        m_variables.store("REQUEST_BASENAME", basename);
     }
-    store_variable("REQUEST_METHOD", protocol);
-    store_variable("REQUEST_PROTOCOL", "HTTP/" + std::string(http_version));
-    store_variable("REQUEST_URI", uri);
-    store_variable("REQUEST_URI_RAW", uri);
+    m_variables.store("REQUEST_METHOD", protocol);
+    m_variables.store("REQUEST_PROTOCOL", "HTTP/" + std::string(http_version));
+    m_variables.store("REQUEST_URI", uri);
+    m_variables.store("REQUEST_URI_RAW", uri);
 
     if (pos != std::string::npos && (m_uri_decoded.length() - pos) > 2) {
         /**
@@ -316,8 +317,8 @@ int Assay::processURI(const char *uri, const char *protocol,
                 i--;
             }
 
-            store_variable("ARGS:" + key, value);
-            store_variable("ARGS_GET:" + key, value);
+            m_variables.store("ARGS:" + key, value);
+            m_variables.store("ARGS_GET:" + key, value);
 
             if (m_namesArgs->empty()) {
                 m_namesArgs->assign(key);
@@ -397,11 +398,11 @@ int Assay::addRequestHeader(const std::string& key,
     const std::string& value) {
     m_requestHeadersNames->assign(*m_requestHeadersNames + " " + key);
 
-    this->store_variable("REQUEST_HEADERS:" + key, value);
+    this->m_variables.store("REQUEST_HEADERS:" + key, value);
 
     if (tolower(key) == tolower("Authorization")) {
         std::vector<std::string> type = split(value, ' ');
-        this->store_variable("AUTH_TYPE", type[0]);
+        this->m_variables.store("AUTH_TYPE", type[0]);
     }
 
     if (tolower(key) == "cookie") {
@@ -412,8 +413,8 @@ int Assay::addRequestHeader(const std::string& key,
                 if (s[0].at(0) == ' ') {
                     s[0].erase(0, 1);
                 }
-                this->store_variable("REQUEST_COOKIES:" + s[0], s[1]);
-                this->store_variable("REQUEST_COOKIES_NAMES:" + s[0], s[0]);
+                this->m_variables.store("REQUEST_COOKIES:" + s[0], s[1]);
+                this->m_variables.store("REQUEST_COOKIES_NAMES:" + s[0], s[0]);
             }
             cookies.pop_back();
         }
@@ -526,8 +527,8 @@ int Assay::processRequestBody() {
         return true;
     }
 
-    if (resolve_variable_first("INBOUND_DATA_ERROR") == NULL) {
-        store_variable("INBOUND_DATA_ERROR", "0");
+    if (m_variables.resolveFirst("INBOUND_DATA_ERROR") == NULL) {
+        m_variables.store("INBOUND_DATA_ERROR", "0");
     }
 
     /*
@@ -540,26 +541,28 @@ int Assay::processRequestBody() {
      */
 
     if (m_requestBodyType == MultiPartRequestBody) {
-        std::string *a = resolve_variable_first("REQUEST_HEADERS:Content-Type");
+        std::string *a = m_variables.resolveFirst(
+            "REQUEST_HEADERS:Content-Type");
         if (a != NULL) {
             Multipart m(*a, this);
 
             if (m.init() == true) {
                 m.process(m_requestBody.str());
                 for (auto &a : m.variables) {
-                    store_variable(a.first, a.second);
+                    m_variables.store(a.first, a.second);
                 }
                 if (m.crlf && m.lf) {
-                    store_variable("MULTIPART_CRLF_LF_LINES", "1");
+                    m_variables.store("MULTIPART_CRLF_LF_LINES", "1");
                 } else {
-                    store_variable("MULTIPART_CRLF_LF_LINES", "0");
+                    m_variables.store("MULTIPART_CRLF_LF_LINES", "0");
                 }
                 if (m.boundaryStartsWithWhiteSpace) {
 #ifndef NO_LOGS
                     debug(9, "Multipart: Boundary starts with white space, " \
                        "setting MULTIPART_STRICT_ERROR to 1");
 #endif
-                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                        m_variables.storeOrUpdateFirst(
+                            "MULTIPART_STRICT_ERROR", "1");
                 }
                 if (m.boundaryIsQuoted) {
 #ifndef NO_LOGS
@@ -567,45 +570,51 @@ int Assay::processRequestBody() {
                     debug(9, "Multipart: Boundary is quoted, " \
                         "setting MULTIPART_STRICT_ERROR to 1");
 #endif
-                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                        m_variables.storeOrUpdateFirst(
+                            "MULTIPART_STRICT_ERROR", "1");
                 }
                 if (m.containsDataAfter) {
 #ifndef NO_LOGS
                     debug(9, "Multipart: There is data after the boundary, " \
                         "setting MULTIPART_STRICT_ERROR to 1");
 #endif
-                    update_variable_first("MULTIPART_STRICT_ERROR", "1");
-                    store_variable("MULTIPART_UNMATCHED_BOUNDARY", "1");
+                    m_variables.storeOrUpdateFirst(
+                        "MULTIPART_STRICT_ERROR", "1");
+                    m_variables.store("MULTIPART_UNMATCHED_BOUNDARY", "1");
                 } else {
-                    store_variable("MULTIPART_UNMATCHED_BOUNDARY", "0");
+                    m_variables.store("MULTIPART_UNMATCHED_BOUNDARY", "0");
                 }
                 if (m.containsDataBefore) {
 #ifndef NO_LOGS
                     debug(9, "Multipart: There is data before the boundary, " \
                         "setting MULTIPART_STRICT_ERROR to 1");
 #endif
-                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                        m_variables.storeOrUpdateFirst(
+                            "MULTIPART_STRICT_ERROR", "1");
                 }
                 if (m.lf) {
 #ifndef NO_LOGS
                     debug(9, "Multipart: Lines are LF-terminated, " \
                         "setting MULTIPART_STRICT_ERROR to 1");
 #endif
-                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                        m_variables.storeOrUpdateFirst(
+                            "MULTIPART_STRICT_ERROR", "1");
                 }
                 if (m.missingSemicolon) {
 #ifndef NO_LOGS
                     debug(9, "Multipart: Boundary missing semicolon, " \
                         "setting MULTIPART_STRICT_ERROR to 1");
 #endif
-                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                        m_variables.storeOrUpdateFirst(
+                            "MULTIPART_STRICT_ERROR", "1");
                 }
                  if (m.invalidQuote) {
 #ifndef NO_LOGS
                     debug(9, "Multipart: Invalid quote, " \
                         "setting MULTIPART_STRICT_ERROR to 1");
 #endif
-                        update_variable_first("MULTIPART_STRICT_ERROR", "1");
+                        m_variables.storeOrUpdateFirst(
+                            "MULTIPART_STRICT_ERROR", "1");
                 }
             }
         }
@@ -638,8 +647,8 @@ int Assay::processRequestBody() {
             char sep2 = '=';
 
             std::vector<std::string> key_value = split(t, sep2);
-            store_variable("ARGS:" + key_value[0], key_value[1]);
-            store_variable("ARGS_POST:" + key_value[0], key_value[1]);
+            m_variables.store("ARGS:" + key_value[0], key_value[1]);
+            m_variables.store("ARGS_POST:" + key_value[0], key_value[1]);
 
             if (m_namesArgs->empty()) {
                 m_namesArgs->assign(key_value[0]);
@@ -665,7 +674,7 @@ int Assay::processRequestBody() {
      */
     std::string fullRequest;
     std::list<transaction::Variable *> l;
-    resolve_variable("REQUEST_HEADERS", &l);
+    m_variables.resolve("REQUEST_HEADERS", &l);
     for (auto &a : l) {
         fullRequest = fullRequest + \
             std::string(a->m_key, 16, a->m_key.length() - 16) + ": " \
@@ -673,12 +682,13 @@ int Assay::processRequestBody() {
     }
     fullRequest = fullRequest + "\n\n";
     fullRequest = fullRequest + m_requestBody.str();
-    store_variable("FULL_REQUEST", fullRequest);
-    store_variable("FULL_REQUEST_LENGTH", std::to_string(fullRequest.size()));
+    m_variables.store("FULL_REQUEST", fullRequest);
+    m_variables.store("FULL_REQUEST_LENGTH",
+        std::to_string(fullRequest.size()));
 
     if (m_requestBody.tellp() > 0) {
-        store_variable("REQUEST_BODY", m_requestBody.str());
-        store_variable("REQUEST_BODY_LENGTH",
+        m_variables.store("REQUEST_BODY", m_requestBody.str());
+        m_variables.store("REQUEST_BODY_LENGTH",
             std::to_string(m_requestBody.str().size()));
     }
 
@@ -749,7 +759,7 @@ int Assay::appendRequestBody(const unsigned char *buf, size_t len) {
 
     if (this->m_rules->requestBodyLimit > 0
         && this->m_rules->requestBodyLimit < len + current_size) {
-        store_variable("INBOUND_DATA_ERROR", "1");
+        m_variables.store("INBOUND_DATA_ERROR", "1");
 #ifndef NO_LOGS
         debug(5, "Request body is bigger than the maximum expected.");
 #endif
@@ -836,10 +846,10 @@ int Assay::addResponseHeader(const std::string& key,
     const std::string& value) {
     m_responseHeadersNames->assign(*m_responseHeadersNames + " " + key);
 
-    this->store_variable("RESPONSE_HEADERS:" + key, value);
+    this->m_variables.store("RESPONSE_HEADERS:" + key, value);
 
     if (tolower(key) == "content-type") {
-        this->store_variable("RESPONSE_CONTENT_TYPE", value);
+        this->m_variables.store("RESPONSE_CONTENT_TYPE", value);
     }
     return 1;
 }
@@ -930,12 +940,12 @@ int Assay::processResponseBody() {
         return true;
     }
 
-    if (resolve_variable_first("OUTBOUND_DATA_ERROR") == NULL) {
-        store_variable("OUTBOUND_DATA_ERROR", "0");
+    if (m_variables.resolveFirst("OUTBOUND_DATA_ERROR") == NULL) {
+        m_variables.store("OUTBOUND_DATA_ERROR", "0");
     }
 
-    store_variable("RESPONSE_BODY", m_responseBody.str());
-    store_variable("RESPONSE_CONTENT_LENGTH",
+    m_variables.store("RESPONSE_BODY", m_responseBody.str());
+    m_variables.store("RESPONSE_CONTENT_LENGTH",
         std::to_string(m_responseBody.str().size()));
 
     this->m_rules->evaluate(ModSecurity::ResponseBodyPhase, this);
@@ -972,7 +982,7 @@ int Assay::appendResponseBody(const unsigned char *buf, size_t len) {
 
     if (this->m_rules->responseBodyLimit > 0
         && this->m_rules->responseBodyLimit < len + current_size) {
-        store_variable("OUTBOUND_DATA_ERROR", "1");
+        m_variables.store("OUTBOUND_DATA_ERROR", "1");
 #ifndef NO_LOGS
         debug(5, "Response body is bigger than the maximum expected.");
 #endif
@@ -1185,12 +1195,12 @@ std::string Assay::toOldAuditLogFormatIndex(const std::string &filename,
     strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
 
     ss << dash_if_empty(
-        *this->resolve_variable_first("REQUEST_HEADERS:Host")) << " ";
+        *this->m_variables.resolveFirst("REQUEST_HEADERS:Host")) << " ";
     ss << dash_if_empty(this->m_clientIpAddress) << " ";
     /** TODO: Check variable */
-    ss << dash_if_empty(*this->resolve_variable_first("REMOTE_USER")) << " ";
+    ss << dash_if_empty(*this->m_variables.resolveFirst("REMOTE_USER")) << " ";
     /** TODO: Check variable */
-    ss << dash_if_empty(*this->resolve_variable_first("LOCAL_USER")) << " ";
+    ss << dash_if_empty(*this->m_variables.resolveFirst("LOCAL_USER")) << " ";
     ss << tstr << " ";
 
     ss << "\"";
@@ -1202,14 +1212,14 @@ std::string Assay::toOldAuditLogFormatIndex(const std::string &filename,
     ss << this->httpCodeReturned << " ";
     ss << this->m_responseBody.tellp();
     /** TODO: Check variable */
-    ss << dash_if_empty(*this->resolve_variable_first("REFERER")) << " ";
+    ss << dash_if_empty(*this->m_variables.resolveFirst("REFERER")) << " ";
     ss << "\"";
     ss << dash_if_empty(
-        *this->resolve_variable_first("REQUEST_HEADERS:User-Agent"));
+        *this->m_variables.resolveFirst("REQUEST_HEADERS:User-Agent"));
     ss << "\" ";
     ss << this->id << " ";
     /** TODO: Check variable */
-    ss << dash_if_empty(*this->resolve_variable_first("REFERER")) << " ";
+    ss << dash_if_empty(*this->m_variables.resolveFirst("REFERER")) << " ";
 
     ss << filename << " ";
     ss << "0" << " ";
@@ -1459,82 +1469,8 @@ std::string Assay::to_json(int parts) {
 }
 
 
-void Assay::store_variable(std::string key, std::string value) {
-    m_variables.emplace(key, value);
-}
-
-bool Assay::update_variable_first(std::string var, const std::string &value) {
-    auto range = m_variables.equal_range(var);
-
-    for (auto it = range.first; it != range.second; ++it) {
-        it->second = value;
-        return true;
-    }
-
-    return false;
-}
-
-void Assay::delete_variable(std::string key) {
-    m_variables.erase(key);
-}
-
-
-void Assay::resolve_variable(const std::string& var,
-    std::list<transaction::Variable *> *l) {
-
-    m_variables.resolveVariable(var, l);
-
-    /* It may be a collection */
-    for (auto &a : collections) {
-        a.second->resolveVariable(var, l);
-    }
-}
-
-std::list<transaction::Variable *> *
-    Assay::resolve_variable(const std::string& var) {
-    std::list<transaction::Variable *> *l =
-        new std::list<transaction::Variable *>();
-
-    resolve_variable(var, l);
-
-    return l;
-}
-
-
 void Assay::serverLog(const std::string& msg) {
     m_ms->serverLog(m_logCbData, msg);
-}
-
-
-std::string* Assay::resolve_variable_first(const std::string& var) {
-    auto range = m_variables.equal_range(var);
-
-    for (auto it = range.first; it != range.second; ++it) {
-        return &it->second;
-    }
-
-    for (auto &a : collections) {
-        auto range = a.second->equal_range(var);
-        for (auto it = range.first; it != range.second; ++it) {
-            return &it->second;
-        }
-    }
-    return NULL;
-}
-
-
-std::string* Assay::resolve_variable_first(const std::string& collectionName,
-    const std::string& var) {
-    for (auto &a : collections) {
-        if (tolower(a.first) == tolower(collectionName)) {
-            auto range = a.second->equal_range(toupper(collectionName)
-                + ":" + var);
-            for (auto it = range.first; it != range.second; ++it) {
-                return &it->second;
-            }
-        }
-    }
-    return NULL;
 }
 
 
@@ -1545,7 +1481,7 @@ void Assay::setCollection(const std::string& collectionName,
     try {
         transaction::Variables *collection;
         collection = collections.at(collectionName);
-        collection->storeOrUpdateVariable(collectionName + ":"
+        collection->storeOrUpdateFirst(collectionName + ":"
             + variableName, targetValue);
     } catch (...) {
 #ifndef NO_LOGS

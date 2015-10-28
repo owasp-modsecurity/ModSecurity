@@ -24,7 +24,6 @@
 
 #include "modsecurity/transaction/variable.h"
 
-
 #ifndef HEADERS_MODSECURITY_TRANSACTION_VARIABLES_H_
 #define HEADERS_MODSECURITY_TRANSACTION_VARIABLES_H_
 
@@ -39,80 +38,40 @@ namespace transaction {
 class Variables :
     public std::unordered_multimap<std::string, std::string> {
  public:
-    Variables() {
-        this->reserve(1000);
-    }
+    std::unordered_map<std::string, transaction::Variables *> *m_collections;
 
+    Variables();
+    void store(std::string key, std::string value);
 
-    void storeVariable(std::string key, std::string value) {
-        this->emplace(key, value);
-    }
+    bool storeOrUpdateFirst(const std::string &key,
+        const std::string &value);
 
+    bool updateFirst(const std::string &key, const std::string &value);
 
-    bool storeOrUpdateVariable(const std::string &key,
-        const std::string &value) {
-        if (updateFirstVariable(key, value) == false) {
-            storeVariable(key, value);
-        }
-        return true;
-    }
-
-
-    bool updateFirstVariable(const std::string &key, const std::string &value) {
-        auto range = this->equal_range(key);
-
-        for (auto it = range.first; it != range.second; ++it) {
-            it->second = value;
-            return true;
-        }
-        return false;
-    }
-
-
-    void deleteVariable(const std::string& key) {
-        this->erase(key);
-    }
-
+    void del(const std::string& key);
 
     std::list<Variable *>
-        resolveVariable(const std::string& key,
-        std::list<Variable *> *l) {
-        auto range = this->equal_range(key);
-
-        for (auto it = range.first; it != range.second; ++it) {
-            l->push_back(new transaction::Variable(key, it->second));
-        }
-
-        if (key.find(":") == std::string::npos && l->size() == 0) {
-            size_t keySize = key.size() + 1;
-            for (auto& x : *this) {
-                if (x.first.size() <= keySize) {
-                    continue;
-                }
-                if (x.first.at(keySize - 1) != ':') {
-                    continue;
-                }
-                if (x.first.compare(0, keySize, key + ":") != 0) {
-                    continue;
-                }
-                //  auto range = this->equal_range(x.first);
-
-                //  for (auto it = range.first; it != range.second; ++it) {
-                l->push_back(new transaction::Variable(x.first, x.second));
-                //  }
-            }
-        }
-
-        return *l;
-    }
-
+        resolveInt(const std::string& key,
+        std::list<Variable *> *l);
 
     std::list<Variable *>
-        resolveVariable(const std::string& key) {
-        std::list<Variable *> l;
+        resolveInt(const std::string& key);
 
-        return resolveVariable(key, &l);
-    }
+
+    std::string* resolveFirst(const std::string& var);
+
+
+    std::string* resolveFirst(const std::string& collectionName,
+        const std::string& var);
+
+    void setCollections(std::unordered_map<std::string,
+        transaction::Variables *> *c);
+
+    std::list<transaction::Variable *> *
+        resolve(const std::string& var);
+
+    void resolve(const std::string& var,
+        std::list<transaction::Variable *> *l);
 };
 
 }  // namespace transaction

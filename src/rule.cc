@@ -402,22 +402,22 @@ bool Rule::evaluate(Assay *assay) {
 #ifndef NO_LOGS
                     assay->debug(4, "Executing chained rule.");
 #endif
-                    if (assay->update_variable_first("MATCHED_VAR",
+                    if (assay->m_variables.storeOrUpdateFirst("MATCHED_VAR",
                         value) == false) {
-                        assay->store_variable("MATCHED_VAR", value);
+                        assay->m_variables.store("MATCHED_VAR", value);
                     }
-                    if (assay->update_variable_first("MATCHED_VAR_NAME",
-                        v->m_key) == false) {
-                        assay->store_variable("MATCHED_VAR_NAME", v->m_key);
+                    if (assay->m_variables.storeOrUpdateFirst(
+                        "MATCHED_VAR_NAME", v->m_key) == false) {
+                        assay->m_variables.store("MATCHED_VAR_NAME", v->m_key);
                     }
-                    assay->store_variable("MATCHED_VARS:" + v->m_key, value);
-                    assay->store_variable("MATCHED_VARS_NAMES:" + v->m_key,
+                    assay->m_variables.store("MATCHED_VARS:" + v->m_key, value);
+                    assay->m_variables.store("MATCHED_VARS_NAMES:" + v->m_key,
                         v->m_key);
                     chainResult = this->chainedRule->evaluate(assay);
-                    assay->update_variable_first("MATCHED_VAR", "");
-                    assay->delete_variable("MATCHED_VARS:" + v->m_key);
-                    assay->delete_variable("MATCHED_VARS_NAMES:" + v->m_key);
-                    assay->delete_variable("MATCHED_VARS_NAME");
+                    assay->m_variables.storeOrUpdateFirst("MATCHED_VAR", "");
+                    assay->m_variables.del("MATCHED_VARS:" + v->m_key);
+                    assay->m_variables.del("MATCHED_VARS_NAMES:" + v->m_key);
+                    assay->m_variables.del("MATCHED_VARS_NAME");
                 }
                 if (this->chained && chainResult == true || !this->chained) {
                     for (Action *a :

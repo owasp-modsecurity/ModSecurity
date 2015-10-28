@@ -53,12 +53,12 @@ std::string MacroExpansion::expand(const std::string& input, Assay *assay) {
         std::string *variableValue;
         size_t collection = variable.find(".");
         if (collection == std::string::npos) {
-            variableValue = assay->resolve_variable_first(variable);
+            variableValue = assay->m_variables.resolveFirst(variable);
         } else {
             std::string col = std::string(variable, 0, collection);
             std::string var = std::string(variable, collection + 1,
                 variable.length() - (collection + 1));
-            variableValue = assay->resolve_variable_first(col, var);
+            variableValue = assay->m_variables.resolveFirst(col, var);
         }
 
         res.erase(start, end - start + 2);

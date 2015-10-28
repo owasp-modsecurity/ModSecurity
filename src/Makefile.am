@@ -172,6 +172,7 @@ libmodsecurity_la_SOURCES = \
 	modsecurity.cc \
 	rules.cc \
 	utils.cc \
+	variables.cc \
 	debug_log.cc \
 	debug_log_writer.cc \
 	debug_log_writer_agent.cc \

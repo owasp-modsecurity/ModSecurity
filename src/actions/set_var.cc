@@ -121,7 +121,7 @@ bool SetVar::evaluate(Rule *rule, Assay *assay) {
 
         try {
             std::string *resolvedValue =
-                assay->resolve_variable_first(collectionName,
+                assay->m_variables.resolveFirst(collectionName,
                     variableNameExpanded);
             if (resolvedValue == NULL) {
                 value = 0;
