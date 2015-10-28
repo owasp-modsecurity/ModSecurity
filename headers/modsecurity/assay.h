@@ -39,6 +39,8 @@ typedef struct Rules_t Rules;
 #endif
 
 #include "modsecurity/intervention.h"
+#include "modsecurity/transaction/variable.h"
+#include "modsecurity/transaction/variables.h"
 
 #define LOGFY_ADD(a, b) \
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
@@ -73,95 +75,6 @@ namespace operators {
 class Operator;
 }
 
-namespace transaction {
-
-class Variable {
- public:
-     Variable(const std::string& key, const std::string& value) :
-        m_key(key),
-        m_value(value) { }
-     std::string m_key;
-     std::string m_value;
-};
-
-
-class Variables :
-    public std::unordered_multimap<std::string, std::string> {
- public:
-    Variables() {
-        this->reserve(1000);
-    }
-
-    void storeVariable(std::string key, std::string value) {
-        this->emplace(key, value);
-    }
-
-    bool storeOrUpdateVariable(const std::string &key,
-        const std::string &value) {
-        if (updateFirstVariable(key, value) == false) {
-            storeVariable(key, value);
-        }
-        return true;
-    }
-
-
-    bool updateFirstVariable(const std::string &key, const std::string &value) {
-        auto range = this->equal_range(key);
-
-        for (auto it = range.first; it != range.second; ++it) {
-            it->second = value;
-            return true;
-        }
-        return false;
-    }
-
-
-    void deleteVariable(const std::string& key) {
-        this->erase(key);
-    }
-
-    std::list<Variable *>
-        resolveVariable(const std::string& key,
-        std::list<Variable *> *l) {
-        auto range = this->equal_range(key);
-
-        for (auto it = range.first; it != range.second; ++it) {
-            l->push_back(new transaction::Variable(key, it->second));
-        }
-
-        if (key.find(":") == std::string::npos && l->size() == 0) {
-            size_t keySize = key.size() + 1;
-            for (auto& x : *this) {
-                if (x.first.size() <= keySize) {
-                    continue;
-                }
-                if (x.first.at(keySize - 1) != ':') {
-                    continue;
-                }
-                if (x.first.compare(0, keySize, key + ":") != 0) {
-                    continue;
-                }
-                //  auto range = this->equal_range(x.first);
-
-                //  for (auto it = range.first; it != range.second; ++it) {
-                l->push_back(new transaction::Variable(x.first, x.second));
-                //  }
-            }
-        }
-
-        return *l;
-    }
-
-    std::list<Variable *>
-        resolveVariable(const std::string& key) {
-        std::list<Variable *> l;
-
-        return resolveVariable(key, &l);
-    }
-};
-
-
-} // name space Transaction
 
 /** @ingroup ModSecurity_CPP_API */
 class Assay {
@@ -248,7 +161,7 @@ class Assay {
     bool update_variable_first(std::string var, const std::string &value);
     void delete_variable(std::string key);
 
-    transaction::Variables m_variables_strings;
+    transaction::Variables m_variables;
     std::unordered_map<std::string, transaction::Variables *> collections;
 #ifndef NO_LOGS
     void debug(int, std::string);

@@ -1243,7 +1243,7 @@ std::string Assay::toOldAuditLogFormat(int parts, const std::string &trailer) {
         audit_log << this->m_protocol << " " << this->m_uri << " " << "HTTP/";
         audit_log << this->m_httpVersion << std::endl;
 
-        for (auto h : this->m_variables_strings) {
+        for (auto h : m_variables) {
             std::string filter = "REQUEST_HEADERS:";
             std::string a = h.first;
             std::string b = h.second;
@@ -1270,7 +1270,7 @@ std::string Assay::toOldAuditLogFormat(int parts, const std::string &trailer) {
     }
     if (parts & AuditLog::FAuditLogPart) {
         audit_log << "--" << trailer << "-" << "F--" << std::endl;
-        for (auto h : this->m_variables_strings) {
+        for (auto h : m_variables) {
             std::string filter = "RESPONSE_HEADERS:";
             std::string a = h.first;
             std::string b = h.second;
@@ -1359,7 +1359,7 @@ std::string Assay::to_json(int parts) {
             strlen("headers"));
         yajl_gen_map_open(g);
 
-        for (auto h : this->m_variables_strings) {
+        for (auto h : m_variables) {
             std::string filter = "REQUEST_HEADERS:";
             std::string a = h.first;
             std::string b = h.second;
@@ -1394,7 +1394,7 @@ std::string Assay::to_json(int parts) {
             strlen("headers"));
         yajl_gen_map_open(g);
 
-        for (auto h : this->m_variables_strings) {
+        for (auto h : m_variables) {
             std::string filter = "RESPONSE_HEADERS:";
             std::string a = h.first;
             std::string b = h.second;
@@ -1460,11 +1460,11 @@ std::string Assay::to_json(int parts) {
 
 
 void Assay::store_variable(std::string key, std::string value) {
-    this->m_variables_strings.emplace(key, value);
+    m_variables.emplace(key, value);
 }
 
 bool Assay::update_variable_first(std::string var, const std::string &value) {
-    auto range = m_variables_strings.equal_range(var);
+    auto range = m_variables.equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
         it->second = value;
@@ -1475,14 +1475,14 @@ bool Assay::update_variable_first(std::string var, const std::string &value) {
 }
 
 void Assay::delete_variable(std::string key) {
-    this->m_variables_strings.erase(key);
+    m_variables.erase(key);
 }
 
 
 void Assay::resolve_variable(const std::string& var,
     std::list<transaction::Variable *> *l) {
 
-    m_variables_strings.resolveVariable(var, l);
+    m_variables.resolveVariable(var, l);
 
     /* It may be a collection */
     for (auto &a : collections) {
@@ -1507,7 +1507,7 @@ void Assay::serverLog(const std::string& msg) {
 
 
 std::string* Assay::resolve_variable_first(const std::string& var) {
-    auto range = m_variables_strings.equal_range(var);
+    auto range = m_variables.equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
         return &it->second;
