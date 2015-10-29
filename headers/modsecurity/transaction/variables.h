@@ -38,8 +38,6 @@ namespace transaction {
 class Variables :
     public std::unordered_multimap<std::string, std::string> {
  public:
-    std::unordered_map<std::string, transaction::Variables *> *m_collections;
-
     Variables();
     void store(std::string key, std::string value);
 
@@ -50,27 +48,14 @@ class Variables :
 
     void del(const std::string& key);
 
-    std::list<Variable *>
-        resolveInt(const std::string& key,
-        std::list<Variable *> *l);
-
-    std::list<Variable *>
-        resolveInt(const std::string& key);
-
-
     std::string* resolveFirst(const std::string& var);
-
 
     std::string* resolveFirst(const std::string& collectionName,
         const std::string& var);
 
-    void setCollections(std::unordered_map<std::string,
-        transaction::Variables *> *c);
+    std::list<transaction::Variable *> resolve(const std::string& key);
 
-    std::list<transaction::Variable *> *
-        resolve(const std::string& var);
-
-    void resolve(const std::string& var,
+    std::list<Variable *> resolve(const std::string& var,
         std::list<transaction::Variable *> *l);
 };
 

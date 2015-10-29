@@ -121,7 +121,7 @@ bool SetVar::evaluate(Rule *rule, Assay *assay) {
 
         try {
             std::string *resolvedValue =
-                assay->m_variables.resolveFirst(collectionName,
+                assay->m_collections.resolveFirst(collectionName,
                     variableNameExpanded);
             if (resolvedValue == NULL) {
                 value = 0;
@@ -146,7 +146,8 @@ bool SetVar::evaluate(Rule *rule, Assay *assay) {
     assay->debug(8, "Saving variable: " + collectionName + ":" + \
         variableNameExpanded + " with value: " + targetValue);
 #endif
-    assay->setCollection(collectionName, variableNameExpanded, targetValue);
+    assay->m_collections.storeOrUpdateFirst(collectionName,
+        variableNameExpanded, targetValue);
 
     return true;
 }

@@ -61,7 +61,8 @@ bool Capture::evaluate(Rule *rule, Assay *assay) {
 
     int i = 0;
     while (match->empty() == false) {
-        assay->setCollection("TX", std::to_string(i), match->back());
+        assay->m_collections.storeOrUpdateFirst("TX",
+            std::to_string(i), match->back());
         match->pop_back();
         i++;
     }

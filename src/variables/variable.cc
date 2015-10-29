@@ -32,7 +32,7 @@ std::list<transaction::Variable *> *
     Variable::evaluate(Assay *assay) {
     std::list<transaction::Variable *> *l =
         new std::list<transaction::Variable *>();
-    assay->m_variables.resolve(this->name, l);
+    assay->m_collections.resolve(this->name, l);
     return l;
 }
 

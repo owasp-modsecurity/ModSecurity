@@ -402,22 +402,24 @@ bool Rule::evaluate(Assay *assay) {
 #ifndef NO_LOGS
                     assay->debug(4, "Executing chained rule.");
 #endif
-                    if (assay->m_variables.storeOrUpdateFirst("MATCHED_VAR",
+                    if (assay->m_collections.storeOrUpdateFirst("MATCHED_VAR",
                         value) == false) {
-                        assay->m_variables.store("MATCHED_VAR", value);
+                        assay->m_collections.store("MATCHED_VAR", value);
                     }
-                    if (assay->m_variables.storeOrUpdateFirst(
+                    if (assay->m_collections.storeOrUpdateFirst(
                         "MATCHED_VAR_NAME", v->m_key) == false) {
-                        assay->m_variables.store("MATCHED_VAR_NAME", v->m_key);
+                        assay->m_collections.store("MATCHED_VAR_NAME",
+                            v->m_key);
                     }
-                    assay->m_variables.store("MATCHED_VARS:" + v->m_key, value);
-                    assay->m_variables.store("MATCHED_VARS_NAMES:" + v->m_key,
-                        v->m_key);
+                    assay->m_collections.store("MATCHED_VARS:"
+                        + v->m_key, value);
+                    assay->m_collections.store("MATCHED_VARS_NAMES:"
+                        + v->m_key, v->m_key);
                     chainResult = this->chainedRule->evaluate(assay);
-                    assay->m_variables.storeOrUpdateFirst("MATCHED_VAR", "");
-                    assay->m_variables.del("MATCHED_VARS:" + v->m_key);
-                    assay->m_variables.del("MATCHED_VARS_NAMES:" + v->m_key);
-                    assay->m_variables.del("MATCHED_VARS_NAME");
+                    assay->m_collections.storeOrUpdateFirst("MATCHED_VAR", "");
+                    assay->m_collections.del("MATCHED_VARS:" + v->m_key);
+                    assay->m_collections.del("MATCHED_VARS_NAMES:" + v->m_key);
+                    assay->m_collections.del("MATCHED_VARS_NAME");
                 }
                 if (this->chained && chainResult == true || !this->chained) {
                     for (Action *a :

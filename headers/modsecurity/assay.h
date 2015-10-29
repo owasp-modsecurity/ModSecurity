@@ -41,6 +41,7 @@ typedef struct Rules_t Rules;
 #include "modsecurity/intervention.h"
 #include "modsecurity/transaction/variable.h"
 #include "modsecurity/transaction/variables.h"
+#include "modsecurity/transaction/collections.h"
 
 #define LOGFY_ADD(a, b) \
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
@@ -68,6 +69,7 @@ namespace ModSecurity {
 class ModSecurity;
 class Assay;
 class Rules;
+class Collections;
 namespace actions {
 class Action;
 }
@@ -140,15 +142,10 @@ class Assay {
 
     void cleanup();
 
-    void setCollection(const std::string& collectionName,
-        const std::string& variableName,
-        const std::string& targetValue);
-
     const char *getResponseBody();
     int getResponseBodyLenth();
 
-    transaction::Variables m_variables;
-    std::unordered_map<std::string, transaction::Variables *> collections;
+    transaction::Collections m_collections;
 #ifndef NO_LOGS
     void debug(int, std::string);
 #endif
