@@ -29,6 +29,7 @@
 
 #include "modsecurity/transaction/variables.h"
 #include "modsecurity/transaction/variable.h"
+#include "modsecurity/transaction/collection.h"
 
 #ifndef HEADERS_MODSECURITY_TRANSACTION_COLLECTIONS_H_
 #define HEADERS_MODSECURITY_TRANSACTION_COLLECTIONS_H_
@@ -42,11 +43,12 @@ namespace ModSecurity {
 namespace transaction {
 
 class Collections :
-    public std::unordered_map<std::string, transaction::Variables *> {
+    public std::unordered_map<std::string, Collection *> {
  public:
     Collections();
     ~Collections();
 
+    void init(const std::string& name, const std::string& key);
     void store(std::string key, std::string value);
     void storeOrUpdateFirst(const std::string& collectionName,
         const std::string& variableName,
@@ -61,7 +63,6 @@ class Collections :
     void resolve(const std::string& var,
         std::list<transaction::Variable *> *l);
     std::list<transaction::Variable *> *resolve(const std::string& var);
-
 
     /**
      * This is a special collection to host the transaction variables.
