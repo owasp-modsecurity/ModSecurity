@@ -5,6 +5,7 @@ BUILT_SOURCES= \
 libmodsecuritydir = $(prefix)/lib
 libmodsecurity_LTLIBRARIES = libmodsecurity.la
 libmodsecurity_ladir = $(prefix)/include
+libmodsecurity_includesubdir = $(pkgincludedir)/transaction/
 
 CLEANFILES = \
 	location.hh \
@@ -22,12 +23,21 @@ MAINTAINERCLEANFILES = \
 
 
 pkginclude_HEADERS = \
-        ../headers/modsecurity/assay.h \
-        ../headers/modsecurity/debug_log.h \
-        ../headers/modsecurity/intervention.h \
-        ../headers/modsecurity/modsecurity.h \
-        ../headers/modsecurity/rules.h \
-        ../headers/modsecurity/rules_properties.h
+	../headers/modsecurity/assay.h \
+	../headers/modsecurity/debug_log.h \
+	../headers/modsecurity/intervention.h \
+	../headers/modsecurity/modsecurity.h \
+	../headers/modsecurity/rules.h \
+	../headers/modsecurity/rules_properties.h
+
+
+libmodsecurity_includesub_HEADERS = \
+	../headers/modsecurity/transaction/collection.h \
+	../headers/modsecurity/transaction/collections.h \
+	../headers/modsecurity/transaction/variable.h \
+	../headers/modsecurity/transaction/variables.h
+
+
 
 
 VARIABLES = \
