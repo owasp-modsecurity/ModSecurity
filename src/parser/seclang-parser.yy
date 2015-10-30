@@ -420,6 +420,7 @@ expression:
             if (phase != NULL) {
                 definedPhase = phase->phase;
                 secRuleDefinedPhase = phase->m_secRulesPhase;
+                delete phase;
             } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind ||
                 a->action_kind == Action::RunTimeBeforeMatchAttemptKind) {
                 None *none = dynamic_cast<None *>(a);
@@ -449,6 +450,8 @@ expression:
         for (Action *a : checkedActions) {
             driver.defaultActions[definedPhase].push_back(a);
         }
+
+        delete actions;
       }
     | CONFIG_DIR_SEC_MARKER
       {

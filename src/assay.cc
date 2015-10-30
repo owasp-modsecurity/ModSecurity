@@ -683,6 +683,12 @@ int Assay::processRequestBody() {
             std::string(a->m_key, 16, a->m_key.length() - 16) + ": " \
             + a->m_value + "\n";
     }
+
+    while (l.empty() == false) {
+        delete l.front();
+        l.pop_front();
+    }
+
     fullRequest = fullRequest + "\n\n";
     fullRequest = fullRequest + m_requestBody.str();
     m_collections.store("FULL_REQUEST", fullRequest);

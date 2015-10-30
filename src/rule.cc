@@ -290,6 +290,7 @@ bool Rule::evaluate(Assay *assay) {
                 exclusions.push_back(y->m_key);
             }
             exclusions.push_back(variable->name);
+            delete z;
         }
     }
 
@@ -495,6 +496,7 @@ bool Rule::evaluate(Assay *assay) {
             delete e->front();
             e->pop_front();
         }
+        delete e;
     }
     return ret;
 }

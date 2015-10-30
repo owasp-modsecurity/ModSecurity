@@ -88,7 +88,6 @@ std::vector<std::string> split(std::string str, char delimiter) {
 
 double random_number(const double from, const double to) {
     std::random_device rd;
-
     return std::bind(
         std::uniform_real_distribution<>{from, to},
         std::default_random_engine{ rd() })();
@@ -1064,16 +1063,20 @@ std::string find_resource(const std::string& resource,
     iss = new std::ifstream(resource, std::ios::in);
     if (iss->is_open()) {
         iss->close();
+        delete iss;
         return resource;
     }
+    delete iss;
 
     // Trying the same path of the configuration file.
     std::string f = get_path(config) + "/" + resource;
     iss = new std::ifstream(f, std::ios::in);
     if (iss->is_open()) {
         iss->close();
+        delete iss;
         return f;
     }
+    delete iss;
 
     return std::string("");
 }

@@ -42,6 +42,7 @@ bool PmFromFile::init(const std::string &config, const char **error) {
 
         if (((std::ifstream *)iss)->is_open() == false) {
             *error = std::string("Failed to open file: " + param).c_str();
+            delete iss;
             return false;
         }
     }
@@ -52,6 +53,7 @@ bool PmFromFile::init(const std::string &config, const char **error) {
 
     acmp_prepare(m_p);
 
+    delete iss;
     return true;
 }
 

@@ -41,6 +41,12 @@ std::list<transaction::Variable *> *
         count++;
     }
 
+    while (reslIn->empty() == false) {
+        delete reslIn->front();
+        reslIn->pop_front();
+    }
+    delete reslIn;
+
     std::string res = std::to_string(count);
 
     reslOut->push_back(new transaction::Variable(std::string(var->name),

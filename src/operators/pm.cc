@@ -87,16 +87,18 @@ bool Pm::evaluate(Assay *assay, const std::string &input) {
 
 bool Pm::init(const std::string &file, const char **error) {
     std::vector<std::string> vec;
+    std::istringstream *iss;
 
     replaceAll(param, "\\", "\\\\");
 
     char *content = parse_pm_content(param.c_str(), param.length(), error);
     if (content == NULL) {
-        return false;
+        iss = new std::istringstream(param);
+    } else {
+        iss = new std::istringstream(content);
     }
 
-    std::istringstream iss(param);
-    std::copy(std::istream_iterator<std::string>(iss),
+    std::copy(std::istream_iterator<std::string>(*iss),
         std::istream_iterator<std::string>(),
         back_inserter(vec));
 
@@ -105,6 +107,13 @@ bool Pm::init(const std::string &file, const char **error) {
     }
 
     acmp_prepare(m_p);
+
+    if (content) {
+        free(content);
+        content = NULL;
+    }
+
+    delete iss;
 
     return true;
 }
