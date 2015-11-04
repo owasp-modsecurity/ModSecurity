@@ -28,11 +28,9 @@ namespace ModSecurity {
 namespace Variables {
 namespace Variations {
 
-std::list<transaction::Variable *> *
-    Count::evaluate(Assay *assay) {
-    std::list<transaction::Variable *> *reslIn;
-    std::list<transaction::Variable *> *reslOut =
-        new std::list<transaction::Variable *>();
+void Count::evaluateInternal(Assay *assay,
+    std::vector<const transaction::Variable *> *l) {
+    std::vector<const transaction::Variable *> *reslIn;
     int count = 0;
 
     reslIn = var->evaluate(assay);
@@ -42,17 +40,15 @@ std::list<transaction::Variable *> *
     }
 
     while (reslIn->empty() == false) {
-        delete reslIn->front();
-        reslIn->pop_front();
+        delete reslIn->back();
+        reslIn->pop_back();
     }
     delete reslIn;
 
     std::string res = std::to_string(count);
 
-    reslOut->push_back(new transaction::Variable(std::string(var->m_name),
+    l->push_back(new transaction::Variable(std::string(var->m_name),
         std::string(res)));
-
-    return reslOut;
 }
 
 

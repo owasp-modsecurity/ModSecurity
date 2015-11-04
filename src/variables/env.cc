@@ -33,11 +33,8 @@ extern char **environ;
 namespace ModSecurity {
 namespace Variables {
 
-std::list<transaction::Variable *> *
-    Env::evaluate(Assay *assay) {
-    std::list<transaction::Variable *> *resl =
-        new std::list<transaction::Variable *>();
-
+void Env::evaluateInternal(Assay *assay,
+    std::vector<const transaction::Variable *> *l) {
     std::map<std::string, std::string> envs;
     for (char **current = environ; *current; current++) {
         std::string env = std::string(*current);
@@ -50,8 +47,8 @@ std::list<transaction::Variable *> *
 
         envs.insert(std::pair<std::string, std::string>("ENV:" + key, value));
         if ("env:" + key == m_name) {
-            resl->push_back(new transaction::Variable(m_name, value));
-            return resl;
+            l->push_back(new transaction::Variable(m_name, value));
+            return;
         }
     }
 
@@ -60,10 +57,8 @@ std::list<transaction::Variable *> *
             && (x.first != m_name)) {
             continue;
         }
-        resl->push_back(new transaction::Variable(x.first, x.second));
+        l->push_back(new transaction::Variable(x.first, x.second));
     }
-
-    return resl;
 }
 
 

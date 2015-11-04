@@ -65,9 +65,8 @@ void Variables::del(const std::string& key) {
 }
 
 
-
 void Variables::resolveSingleMatch(const std::string& var,
-    std::list<transaction::Variable *> *l) {
+    std::vector<const transaction::Variable *> *l) {
     auto range = this->equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
@@ -77,16 +76,17 @@ void Variables::resolveSingleMatch(const std::string& var,
 
 
 void Variables::resolveMultiMatches(const std::string& var,
-    std::list<transaction::Variable *> *l) {
+    std::vector<const transaction::Variable *> *l) {
     size_t keySize = var.size();
+    l->reserve(15);
 
     auto range = this->equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
-        l->push_back(new transaction::Variable(var, it->second));
+        l->insert(l->begin(), new transaction::Variable(var, it->second));
     }
 
-    for (auto& x : *this) {
+    for (const auto& x : *this) {
         if (x.first.size() <= keySize + 1) {
             continue;
         }
@@ -96,52 +96,15 @@ void Variables::resolveMultiMatches(const std::string& var,
         if (x.first.compare(0, keySize, var) != 0) {
             continue;
         }
-        l->push_back(new transaction::Variable(x.first, x.second));
+        const transaction::Variable *v = new transaction::Variable(x.first, x.second);
+        l->insert(l->begin(), v);
     }
 }
 
 
 void Variables::resolveRegularExpression(const std::string& var,
-    std::list<transaction::Variable *> *l) {
+    std::vector<const transaction::Variable *> *l) {
     /* Not ready */
-}
-
-
-std::list<transaction::Variable *> Variables::resolve(const std::string& key,
-    std::list<transaction::Variable *> *l) {
-    auto range = this->equal_range(key);
-
-    for (auto it = range.first; it != range.second; ++it) {
-        l->push_back(new transaction::Variable(key, it->second));
-    }
-
-    if (key.find(":") == std::string::npos && l->size() == 0) {
-        size_t keySize = key.size() + 1;
-        for (auto& x : *this) {
-            if (x.first.size() <= keySize) {
-                continue;
-            }
-            if (x.first.at(keySize - 1) != ':') {
-                continue;
-            }
-            if (x.first.compare(0, keySize, key + ":") != 0) {
-                 continue;
-            }
-            //  auto range = this->equal_range(x.first);
-
-            //  for (auto it = range.first; it != range.second; ++it) {
-            l->push_back(new transaction::Variable(x.first, x.second));
-            //  }
-        }
-    }
-
-    return *l;
-}
-
-
-std::list<transaction::Variable *> Variables::resolve(const std::string& key) {
-    std::list<transaction::Variable *> l;
-    return resolve(key, &l);
 }
 
 

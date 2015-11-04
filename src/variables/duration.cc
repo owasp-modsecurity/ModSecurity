@@ -27,19 +27,15 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<transaction::Variable *> *
-    Duration::evaluate(Assay *assay) {
-    std::list<transaction::Variable *> *resl =
-        new std::list<transaction::Variable *>();
+void Duration::evaluateInternal(Assay *assay,
+        std::vector<const transaction::Variable *> *l) {
     std::string res;
 
     double e = cpu_seconds() - assay->start;
 
     res = std::to_string(e);
 
-    resl->push_back(new transaction::Variable("DURATION",  std::string(res)));
-
-    return resl;
+    l->push_back(new transaction::Variable("DURATION",  std::string(res)));
 }
 
 

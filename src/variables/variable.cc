@@ -73,11 +73,15 @@ Variable::Variable(std::string name, VariableKind kind)
 }
 
 
-std::list<transaction::Variable *> *
+std::vector<const transaction::Variable *> *
     Variable::evaluate(Assay *assay) {
-    std::list<transaction::Variable *> *l =
-        new std::list<transaction::Variable *>();
+    std::vector<const transaction::Variable *> *l = new std::vector<const transaction::Variable *>();
+    evaluate(assay, l);
 
+    return l;
+}
+
+void Variable::evaluateInternal(Assay *assay, std::vector<const transaction::Variable *> *l) {
     if (m_collectionName.empty() == false) {
         if (m_kind == CollectionVarible && m_type == MultipleMatches) {
             assay->m_collections.resolveMultiMatches(m_name, m_collectionName, l);
@@ -95,8 +99,11 @@ std::list<transaction::Variable *> *
             assay->m_collections.resolveSingleMatch(m_name, l);
         }
     }
+}
 
-    return l;
+
+void Variable::evaluate(Assay *assay, std::vector<const transaction::Variable *> *l) {
+    evaluateInternal(assay, l);
 }
 
 

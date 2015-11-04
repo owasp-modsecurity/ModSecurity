@@ -33,20 +33,16 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<transaction::Variable *> *
-    Tx::evaluate(Assay *assay) {
-    std::list<transaction::Variable *> *resl =
-        new std::list<transaction::Variable *>();
 
+void Tx::evaluateInternal(Assay *assay,
+    std::vector<const transaction::Variable *> *l) {
     if (m_type == SingleMatch) {
-        assay->m_collections.resolveSingleMatch(m_name, "TX", resl);
+        assay->m_collections.resolveSingleMatch(m_name, "TX", l);
     } else if (m_type == MultipleMatches) {
-        assay->m_collections.resolveMultiMatches(m_name, "TX", resl);
+        assay->m_collections.resolveMultiMatches(m_name, "TX", l);
     } else if (m_type == RegularExpression) {
-        assay->m_collections.resolveRegularExpression(m_name, "TX", resl);
+        assay->m_collections.resolveRegularExpression(m_name, "TX", l);
     }
-
-    return resl;
 }
 
 

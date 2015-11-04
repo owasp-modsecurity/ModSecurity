@@ -35,8 +35,8 @@ class Count : public Variable {
         : Variable("count(" + v->m_name + ")"),
         var(v) { }
 
-    std::list<transaction::Variable *> *
-        evaluate(Assay *assay) override;
+    void evaluateInternal(Assay *assay,
+        std::vector<const transaction::Variable *> *l) override;
 
     Variable *var;
 };

@@ -66,8 +66,10 @@ class Variable {
 
     static std::string to_s(std::vector<Variable *> *variables);
 
-    virtual std::list<transaction::Variable *> *evaluate(Assay *assay);
-    //virtual std::list<transaction::Variable *> *eval_int(Assay *assay);
+    virtual std::vector<const transaction::Variable *> *evaluate(Assay *assay);
+    virtual void evaluate(Assay *assay, std::vector<const transaction::Variable *> *l);
+    virtual void evaluateInternal(Assay *assay, std::vector<const transaction::Variable *> *l);
+
 
     std::string m_name;
     std::string m_collectionName;

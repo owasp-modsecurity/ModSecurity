@@ -21,6 +21,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <list>
+#include <vector>
 #endif
 
 #include "modsecurity/transaction/variable.h"
@@ -115,33 +116,11 @@ std::string* Collections::resolveFirst(const std::string& collectionName,
         }
 
         return NULL;
-    }
-
-
-void Collections::resolve(const std::string& var,
-    std::list<transaction::Variable *> *l) {
-
-    m_transient.resolve(var, l);
-
-    /* It may be a collection */
-    for (auto &a : *this) {
-        transaction::Variables *t = a.second;
-        a.second->resolve(var, l);
-    }
-}
-
-
-std::list<transaction::Variable *> *
-    Collections::resolve(const std::string& var) {
-    std::list<transaction::Variable *> *l =
-        new std::list<transaction::Variable *>();
-
-    resolve(var, l);
 }
 
 
 void Collections::resolveSingleMatch(const std::string& var,
-    std::list<transaction::Variable *> *l) {
+    std::vector<const transaction::Variable *> *l) {
 
     m_transient.resolveSingleMatch(var, l);
 }
@@ -149,7 +128,7 @@ void Collections::resolveSingleMatch(const std::string& var,
 
 void Collections::resolveSingleMatch(const std::string& var,
     const std::string& collection,
-    std::list<transaction::Variable *> *l) {
+    std::vector<const transaction::Variable *> *l) {
 
     try {
         this->at(collection)->resolveSingleMatch(var, l);
@@ -159,7 +138,7 @@ void Collections::resolveSingleMatch(const std::string& var,
 }
 
 void Collections::resolveMultiMatches(const std::string& var,
-    std::list<transaction::Variable *> *l) {
+    std::vector<const transaction::Variable *> *l) {
 
     m_transient.resolveMultiMatches(var, l);
 }
@@ -167,7 +146,7 @@ void Collections::resolveMultiMatches(const std::string& var,
 
 void Collections::resolveMultiMatches(const std::string& var,
     const std::string& collection,
-    std::list<transaction::Variable *> *l) {
+    std::vector<const transaction::Variable *> *l) {
     try {
         this->at(collection)->resolveMultiMatches(var, l);
     } catch (...) {
@@ -176,14 +155,14 @@ void Collections::resolveMultiMatches(const std::string& var,
 }
 
 void Collections::resolveRegularExpression(const std::string& var,
-    std::list<transaction::Variable *> *l) {
+    std::vector<const transaction::Variable *> *l) {
     m_transient.resolveRegularExpression(var, l);
 }
 
 
 void Collections::resolveRegularExpression(const std::string& var,
     const std::string& collection,
-    std::list<transaction::Variable *> *l) {
+    std::vector<const transaction::Variable *> *l) {
 
     try {
         this->at(collection)->resolveRegularExpression(var, l);

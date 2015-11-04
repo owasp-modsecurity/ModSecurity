@@ -33,11 +33,8 @@
 namespace ModSecurity {
 namespace Variables {
 
-std::list<transaction::Variable *> *
-    TimeHour::evaluate(Assay *assay) {
-    std::list<transaction::Variable *> *resl =
-        new std::list<transaction::Variable *>();
-
+void TimeHour::evaluateInternal(Assay *assay,
+    std::vector<const transaction::Variable *> *l) {
     char tstr[200];
     struct tm timeinfo;
     time_t timer;
@@ -48,9 +45,7 @@ std::list<transaction::Variable *> *
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%H", &timeinfo);
 
-    resl->push_back(new transaction::Variable("TIME_HOUR",  std::string(tstr)));
-
-    return resl;
+    l->push_back(new transaction::Variable("TIME_HOUR",  std::string(tstr)));
 }
 
 

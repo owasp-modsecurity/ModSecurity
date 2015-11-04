@@ -676,8 +676,8 @@ int Assay::processRequestBody() {
      * computationally intensive.
      */
     std::string fullRequest;
-    std::list<transaction::Variable *> l;
-    m_collections.resolve("REQUEST_HEADERS", &l);
+    std::vector<const transaction::Variable *> l;
+    m_collections.resolveMultiMatches("REQUEST_HEADERS", &l);
     for (auto &a : l) {
         fullRequest = fullRequest + \
             std::string(a->m_key, 16, a->m_key.length() - 16) + ": " \
@@ -685,8 +685,8 @@ int Assay::processRequestBody() {
     }
 
     while (l.empty() == false) {
-        delete l.front();
-        l.pop_front();
+        delete l.back();
+        l.pop_back();
     }
 
     fullRequest = fullRequest + "\n\n";

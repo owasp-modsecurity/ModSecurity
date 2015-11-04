@@ -29,12 +29,9 @@ namespace Variables {
 namespace Variations {
 
 
-std::list<transaction::Variable *> *
-    Exclusion::evaluate(Assay *assay) {
-    std::list<transaction::Variable *> *l =
-        new std::list<transaction::Variable *>();
-    assay->m_collections.resolve(this->m_name, l);
-    return l;
+void Exclusion::evaluateInternal(Assay *assay,
+    std::vector<const transaction::Variable *> *l) {
+    assay->m_collections.resolveMultiMatches(m_name, l);
 }
 
 

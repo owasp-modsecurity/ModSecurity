@@ -37,8 +37,8 @@ class Exclusion : public Variable {
         var(v)
         { m_isExclusion = true; }
 
-    std::list<transaction::Variable *> *
-        evaluate(Assay *assay) override;
+    void evaluateInternal(Assay *assay,
+        std::vector<const transaction::Variable *> *l) override;
 
     Variable *var;
 };

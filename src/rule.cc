@@ -280,13 +280,12 @@ bool Rule::evaluate(Assay *assay) {
     for (int i = 0; i < variables->size(); i++) {
         Variable *variable = variables->at(i);
         if (variable->m_isExclusion) {
-            std::list<transaction::Variable *> *z =
-                variable->evaluate(assay);
-            for (auto &y : *z) {
+            std::vector<const transaction::Variable *> z;
+            variable->evaluateInternal(assay, &z);
+            for (auto &y : z) {
                 exclusions.push_back(y->m_key);
             }
             exclusions.push_back(variable->m_name);
-            delete z;
         }
     }
 
@@ -297,10 +296,10 @@ bool Rule::evaluate(Assay *assay) {
             continue;
         }
 
-        std::list<transaction::Variable *> *e =
-            variable->evaluate(assay);
+        std::vector<const transaction::Variable *> e;
+        variable->evaluateInternal(assay, &e);
 
-        for (auto &v : *e) {
+        for (auto &v : e) {
             if (std::find(exclusions.begin(), exclusions.end(),
                 v->m_key) != exclusions.end()) {
 #ifndef NO_LOGS
@@ -312,7 +311,7 @@ bool Rule::evaluate(Assay *assay) {
             std::string value = v->m_value;
             int none = 0;
             for (Action *a : this->actions_runtime_pre) {
-                if (a->m_isNone != NULL) {
+                if (a->m_isNone) {
                     none++;
                 }
             }
@@ -345,7 +344,7 @@ bool Rule::evaluate(Assay *assay) {
 #endif
                     transformations++;
                 }
-                if (a->m_isNone != NULL) {
+                if (a->m_isNone) {
                     none--;
                 }
             }
@@ -485,11 +484,11 @@ bool Rule::evaluate(Assay *assay) {
             }
         }
 
-        while (e->empty() == false) {
-            delete e->front();
-            e->pop_front();
+        while (e.empty() == false) {
+            delete e.back();
+            e.pop_back();
         }
-        delete e;
+        //delete e;
     }
     return ret;
 }

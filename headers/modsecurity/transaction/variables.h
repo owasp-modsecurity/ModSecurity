@@ -19,6 +19,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <list>
+#include <vector>
 #endif
 
 
@@ -53,17 +54,13 @@ class Variables :
     std::string* resolveFirst(const std::string& collectionName,
         const std::string& var);
 
-    std::list<transaction::Variable *> resolve(const std::string& key);
-
-    std::list<Variable *> resolve(const std::string& var,
-        std::list<transaction::Variable *> *l);
 
     void resolveSingleMatch(const std::string& var,
-        std::list<transaction::Variable *> *l);
+        std::vector<const transaction::Variable *> *l);
     void resolveMultiMatches(const std::string& var,
-        std::list<transaction::Variable *> *l);
+        std::vector<const transaction::Variable *> *l);
     void resolveRegularExpression(const std::string& var,
-        std::list<transaction::Variable *> *l);
+        std::vector<const transaction::Variable *> *l);
 
 };
 

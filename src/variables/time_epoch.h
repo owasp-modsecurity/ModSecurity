@@ -33,8 +33,8 @@ class TimeEpoch : public Variable {
     explicit TimeEpoch(std::string _name)
         : Variable(_name) { }
 
-    std::list<transaction::Variable *> *
-        evaluate(Assay *assay) override;
+    void evaluateInternal(Assay *assay,
+        std::vector<const transaction::Variable *> *l) override;
 };
 
 }  // namespace Variables

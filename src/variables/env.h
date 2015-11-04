@@ -33,8 +33,8 @@ class Env : public Variable {
     explicit Env(std::string _name)
         : Variable(_name) { }
 
-    std::list<transaction::Variable *> *
-        evaluate(Assay *assay) override;
+    void evaluateInternal(Assay *assay,
+        std::vector<const transaction::Variable *> *l) override;
 };
 
 
