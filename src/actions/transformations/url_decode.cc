@@ -116,7 +116,7 @@ std::string UrlDecode::evaluate(std::string value,
 
     free(val);
 
-    UrlDecodeInstantCache::getInstance().emplace(value, out);
+    UrlDecodeInstantCache::getInstance().cache(value, out);
 
     return out;
 }

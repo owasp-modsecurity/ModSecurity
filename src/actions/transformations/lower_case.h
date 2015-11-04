@@ -36,6 +36,12 @@ class LowerCaseInstantCache : public std::unordered_map<std::string, std::string
         return instance;
     }
 
+    void cache(const std::string& value, const std::string& out) {
+        emplace(value, out);
+        if (size() > 100) {
+            erase(begin());
+        }
+    }
  private:
     LowerCaseInstantCache() {};
 };

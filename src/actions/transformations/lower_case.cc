@@ -45,7 +45,7 @@ std::string LowerCase::evaluate(std::string value,
         value[i] = std::tolower(value[i], loc);
     }
 
-    LowerCaseInstantCache::getInstance().emplace(orig_value, value);
+    LowerCaseInstantCache::getInstance().cache(orig_value, value);
 
     return value;
 }

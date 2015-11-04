@@ -47,7 +47,7 @@ std::string HtmlEntityDecode::evaluate(std::string value,
     ret.assign(tmp);
     free(tmp);
 
-    HtmlEntityDecodeInstantCache::getInstance().emplace(value, ret);
+    HtmlEntityDecodeInstantCache::getInstance().cache(value, ret);
 
     return ret;
 }
