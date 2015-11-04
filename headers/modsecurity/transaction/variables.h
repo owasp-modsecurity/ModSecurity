@@ -57,6 +57,14 @@ class Variables :
 
     std::list<Variable *> resolve(const std::string& var,
         std::list<transaction::Variable *> *l);
+
+    void resolveSingleMatch(const std::string& var,
+        std::list<transaction::Variable *> *l);
+    void resolveMultiMatches(const std::string& var,
+        std::list<transaction::Variable *> *l);
+    void resolveRegularExpression(const std::string& var,
+        std::list<transaction::Variable *> *l);
+
 };
 
 }  // namespace transaction

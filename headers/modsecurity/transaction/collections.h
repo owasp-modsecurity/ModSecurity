@@ -64,6 +64,23 @@ class Collections :
         std::list<transaction::Variable *> *l);
     std::list<transaction::Variable *> *resolve(const std::string& var);
 
+
+    void resolveSingleMatch(const std::string& var,
+        std::list<transaction::Variable *> *l);
+    void resolveSingleMatch(const std::string& var,
+        const std::string& collection,
+        std::list<transaction::Variable *> *l);
+    void resolveMultiMatches(const std::string& var,
+        std::list<transaction::Variable *> *l);
+    void resolveMultiMatches(const std::string& var,
+        const std::string& collection,
+        std::list<transaction::Variable *> *l);
+    void resolveRegularExpression(const std::string& var,
+        std::list<transaction::Variable *> *l);
+    void resolveRegularExpression(const std::string& var,
+        const std::string& collection,
+        std::list<transaction::Variable *> *l);
+
     /**
      * This is a special collection to host the transaction variables.
      *

@@ -49,7 +49,7 @@ std::list<transaction::Variable *> *
 
     std::string res = std::to_string(count);
 
-    reslOut->push_back(new transaction::Variable(std::string(var->name),
+    reslOut->push_back(new transaction::Variable(std::string(var->m_name),
         std::string(res)));
 
     return reslOut;

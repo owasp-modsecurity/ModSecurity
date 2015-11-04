@@ -33,7 +33,7 @@ namespace Variations {
 class Exclusion : public Variable {
  public:
     explicit Exclusion(Variable *v)
-        : Variable(v->name),
+        : Variable(v->m_name),
         var(v) { }
 
     std::list<transaction::Variable *> *

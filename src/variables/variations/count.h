@@ -32,7 +32,7 @@ namespace Variations {
 class Count : public Variable {
  public:
     explicit Count(Variable *v)
-        : Variable("count(" + v->name + ")"),
+        : Variable("count(" + v->m_name + ")"),
         var(v) { }
 
     std::list<transaction::Variable *> *

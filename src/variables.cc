@@ -65,6 +65,48 @@ void Variables::del(const std::string& key) {
 }
 
 
+
+void Variables::resolveSingleMatch(const std::string& var,
+    std::list<transaction::Variable *> *l) {
+    auto range = this->equal_range(var);
+
+    for (auto it = range.first; it != range.second; ++it) {
+        l->push_back(new transaction::Variable(var, it->second));
+    }
+}
+
+
+void Variables::resolveMultiMatches(const std::string& var,
+    std::list<transaction::Variable *> *l) {
+    size_t keySize = var.size();
+
+    auto range = this->equal_range(var);
+
+    for (auto it = range.first; it != range.second; ++it) {
+        l->push_back(new transaction::Variable(var, it->second));
+    }
+
+    for (auto& x : *this) {
+        if (x.first.size() <= keySize + 1) {
+            continue;
+        }
+        if (x.first.at(keySize) != ':') {
+            continue;
+        }
+        if (x.first.compare(0, keySize, var) != 0) {
+            continue;
+        }
+        l->push_back(new transaction::Variable(x.first, x.second));
+    }
+}
+
+
+void Variables::resolveRegularExpression(const std::string& var,
+    std::list<transaction::Variable *> *l) {
+    /* Not ready */
+}
+
+
 std::list<transaction::Variable *> Variables::resolve(const std::string& key,
     std::list<transaction::Variable *> *l) {
     auto range = this->equal_range(key);

@@ -38,7 +38,13 @@ std::list<transaction::Variable *> *
     std::list<transaction::Variable *> *resl =
         new std::list<transaction::Variable *>();
 
-    resl->push_back(new transaction::Variable("TX:0", "teste"));
+    if (m_type == SingleMatch) {
+        assay->m_collections.resolveSingleMatch(m_name, "TX", resl);
+    } else if (m_type == MultipleMatches) {
+        assay->m_collections.resolveMultiMatches(m_name, "TX", resl);
+    } else if (m_type == RegularExpression) {
+        assay->m_collections.resolveRegularExpression(m_name, "TX", resl);
+    }
 
     return resl;
 }

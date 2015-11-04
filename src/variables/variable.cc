@@ -28,20 +28,80 @@ using ModSecurity::Variables::Variations::Exclusion;
 namespace ModSecurity {
 namespace Variables {
 
+
+Variable::Variable(std::string name)
+    : m_name(name),
+    m_collectionName("") {
+
+    if (m_name.at(0) == '\\') {
+        m_type = RegularExpression;
+    } else if (m_name.find(":") != std::string::npos) {
+        m_type = SingleMatch;
+    } else {
+        m_type = MultipleMatches;
+    }
+
+    if (m_name.find(".") != std::string::npos) {
+        m_kind = CollectionVarible;
+        m_collectionName = std::string(m_name, 0, m_name.find("."));
+    } else {
+        m_kind = DirectVariable;
+    }
+}
+
+
+Variable::Variable(std::string name, VariableKind kind)
+    : m_name(name),
+    m_collectionName(""),
+    m_kind(kind) {
+
+    if (m_name.at(0) == '\\') {
+        m_type = RegularExpression;
+    } else if (m_name.find(":") != std::string::npos) {
+        m_type = SingleMatch;
+    } else {
+        m_type = MultipleMatches;
+    }
+
+    if (m_name.find(".") != std::string::npos) {
+        m_collectionName = std::string(m_name, 0, m_name.find("."));
+    }
+}
+
+
 std::list<transaction::Variable *> *
     Variable::evaluate(Assay *assay) {
     std::list<transaction::Variable *> *l =
         new std::list<transaction::Variable *>();
-    assay->m_collections.resolve(this->name, l);
+
+    if (m_collectionName.empty() == false) {
+        if (m_kind == CollectionVarible && m_type == MultipleMatches) {
+            assay->m_collections.resolveMultiMatches(m_name, m_collectionName, l);
+        } if (m_kind == CollectionVarible && m_type == RegularExpression) {
+            assay->m_collections.resolveRegularExpression(m_name, m_collectionName, l);
+        } else {
+            assay->m_collections.resolveSingleMatch(m_name, m_collectionName, l);
+        }
+    } else {
+        if (m_kind == CollectionVarible && m_type == MultipleMatches) {
+            assay->m_collections.resolveMultiMatches(m_name, l);
+        } if (m_kind == CollectionVarible && m_type == RegularExpression) {
+            assay->m_collections.resolveRegularExpression(m_name, l);
+        } else {
+            assay->m_collections.resolveSingleMatch(m_name, l);
+        }
+    }
+
     return l;
 }
+
 
 std::string Variable::to_s(
     std::vector<Variable *> *variables) {
     std::string ret;
     std::string except("");
     for (int i = 0; i < variables->size() ; i++) {
-        std::string name = variables->at(i)->name;
+        std::string name = variables->at(i)->m_name;
         Exclusion *e =  dynamic_cast<Exclusion *>(variables->at(i));
         if (e != NULL) {
             if (except.empty()) {

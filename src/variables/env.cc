@@ -49,15 +49,15 @@ std::list<transaction::Variable *> *
         std::string value = std::string(env, pos+1, env.length() - (pos + 1));
 
         envs.insert(std::pair<std::string, std::string>("ENV:" + key, value));
-        if ("env:" + key == name) {
-            resl->push_back(new transaction::Variable(name, value));
+        if ("env:" + key == m_name) {
+            resl->push_back(new transaction::Variable(m_name, value));
             return resl;
         }
     }
 
     for (auto& x : envs) {
-        if ((x.first.substr(0, name.size() + 1).compare(name + ":") != 0)
-            && (x.first != name)) {
+        if ((x.first.substr(0, m_name.size() + 1).compare(m_name + ":") != 0)
+            && (x.first != m_name)) {
             continue;
         }
         resl->push_back(new transaction::Variable(x.first, x.second));

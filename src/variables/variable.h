@@ -29,13 +29,51 @@ namespace Variables {
 
 class Variable {
  public:
-    explicit Variable(std::string _name)
-        : name(_name) { }
+    /**
+     *
+     */
+    enum VariableType {
+      /**
+       *
+       */
+      SingleMatch,
+      /**
+       *
+       */
+      MultipleMatches,
+      /**
+       *
+       */
+      RegularExpression
+    };
+
+    /**
+     *
+     */
+    enum VariableKind {
+      /**
+       *
+       */
+      DirectVariable,
+      /**
+       *
+       */
+      CollectionVarible,
+    };
+
+    explicit Variable(std::string _name);
+    Variable(std::string name, VariableKind kind);
 
     static std::string to_s(std::vector<Variable *> *variables);
-    virtual std::list<transaction::Variable *> *
-        evaluate(Assay *assay);
-    std::string name;
+
+    virtual std::list<transaction::Variable *> *evaluate(Assay *assay);
+    //virtual std::list<transaction::Variable *> *eval_int(Assay *assay);
+
+    std::string m_name;
+    std::string m_collectionName;
+
+    VariableType m_type;
+    VariableKind m_kind;
 };
 
 

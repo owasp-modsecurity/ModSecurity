@@ -289,7 +289,7 @@ bool Rule::evaluate(Assay *assay) {
             for (auto &y : *z) {
                 exclusions.push_back(y->m_key);
             }
-            exclusions.push_back(variable->name);
+            exclusions.push_back(variable->m_name);
             delete z;
         }
     }

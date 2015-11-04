@@ -53,6 +53,7 @@ class Driver;
 #include "variables/time_sec.h"
 #include "variables/time_wday.h"
 #include "variables/time_year.h"
+#include "variables/tx.h"
 
 using ModSecurity::ModSecurity;
 
@@ -88,6 +89,7 @@ using ModSecurity::Variables::TimeSec;
 using ModSecurity::Variables::TimeWDay;
 using ModSecurity::Variables::TimeYear;
 using ModSecurity::Variables::Variable;
+using ModSecurity::Variables::Tx;
 
 
 #define CHECK_VARIATION_DECL \
@@ -196,6 +198,8 @@ using ModSecurity::Variables::Variable;
 %token <std::string> CONFIG_DIR_SEC_MARKER
 
 %token <std::string> VARIABLE
+%token <std::string> VARIABLE_TX
+%token <std::string> VARIABLE_COL
 %token <std::string> RUN_TIME_VAR_DUR
 %token <std::string> RUN_TIME_VAR_ENV
 %token <std::string> RUN_TIME_VAR_BLD
@@ -601,9 +605,27 @@ var:
       {
         std::string name($1);
         CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new Variable(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new Variable(name)); }
-        if (!var) { var = new Variable(name); }
+        CHECK_VARIATION(&) { var = new Count(new Variable(name, Variable::VariableKind::DirectVariable)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)); }
+        if (!var) { var = new Variable(name, Variable::VariableKind::DirectVariable); }
+        $$ = var;
+      }
+    | VARIABLE_COL
+      {
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new Variable(name, Variable::VariableKind::CollectionVarible)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new Variable(name, Variable::VariableKind::CollectionVarible)); }
+        if (!var) { var = new Variable(name, Variable::VariableKind::CollectionVarible); }
+        $$ = var;
+      }
+    | VARIABLE_TX
+      {
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new Tx(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new Tx(name)); }
+        if (!var) { var = new Tx(name); }
         $$ = var;
       }
     | RUN_TIME_VAR_DUR
