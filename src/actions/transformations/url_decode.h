@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <unordered_map>
 
 #include "actions/action.h"
 #include "actions/transformations/transformation.h"
@@ -27,6 +28,18 @@ class Assay;
 
 namespace actions {
 namespace transformations {
+
+class UrlDecodeInstantCache : public std::unordered_map<std::string, std::string> {
+ public:
+    static UrlDecodeInstantCache& getInstance() {
+        static UrlDecodeInstantCache instance;
+        return instance;
+    }
+
+ private:
+    UrlDecodeInstantCache() {};
+};
+
 
 class UrlDecode : public Transformation {
  public:

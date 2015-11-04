@@ -36,11 +36,18 @@ namespace transformations {
 
 std::string HtmlEntityDecode::evaluate(std::string value,
     Assay *assay) {
+
+    if (HtmlEntityDecodeInstantCache::getInstance().count(value) > 0) {
+        return HtmlEntityDecodeInstantCache::getInstance().at(value);
+    }
+
     char *tmp = strdup(value.c_str());
     html_entities_decode_inplace((unsigned char *)tmp, value.size());
     std::string ret("");
     ret.assign(tmp);
     free(tmp);
+
+    HtmlEntityDecodeInstantCache::getInstance().emplace(value, ret);
 
     return ret;
 }

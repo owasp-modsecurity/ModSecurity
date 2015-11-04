@@ -74,6 +74,8 @@ class Variable {
 
     VariableType m_type;
     VariableKind m_kind;
+    bool m_isExclusion;
+    bool m_isCount;
 };
 
 

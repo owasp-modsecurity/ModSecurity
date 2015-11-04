@@ -31,7 +31,9 @@ namespace Variables {
 
 Variable::Variable(std::string name)
     : m_name(name),
-    m_collectionName("") {
+    m_collectionName(""),
+    m_isExclusion(false),
+    m_isCount(false) {
 
     if (m_name.at(0) == '\\') {
         m_type = RegularExpression;
@@ -53,7 +55,9 @@ Variable::Variable(std::string name)
 Variable::Variable(std::string name, VariableKind kind)
     : m_name(name),
     m_collectionName(""),
-    m_kind(kind) {
+    m_kind(kind),
+    m_isExclusion(false),
+    m_isCount(false) {
 
     if (m_name.at(0) == '\\') {
         m_type = RegularExpression;

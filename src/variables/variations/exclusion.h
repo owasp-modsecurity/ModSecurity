@@ -34,7 +34,8 @@ class Exclusion : public Variable {
  public:
     explicit Exclusion(Variable *v)
         : Variable(v->m_name),
-        var(v) { }
+        var(v)
+        { m_isExclusion = true; }
 
     std::list<transaction::Variable *> *
         evaluate(Assay *assay) override;

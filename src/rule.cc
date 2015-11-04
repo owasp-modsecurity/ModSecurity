@@ -140,8 +140,7 @@ bool Rule::evaluateActions(Assay *assay) {
     bool containsDisruptive = false;
     // int transformations = 0;
     for (Action *a : this->actions_runtime_pre) {
-        None *z = dynamic_cast<None *>(a);
-        if (z != NULL) {
+        if (a->m_isNone) {
             none++;
         }
     }
@@ -165,7 +164,6 @@ bool Rule::evaluateActions(Assay *assay) {
     }
 
     for (Action *a : this->actions_runtime_pre) {
-        None *z = dynamic_cast<None *>(a);
         /*
         if (none == 0) {
             value = a->evaluate(value, assay);
@@ -175,7 +173,7 @@ bool Rule::evaluateActions(Assay *assay) {
                 transformations++;
         }
         */
-        if (z != NULL) {
+        if (a->m_isNone) {
             none--;
         }
     }
@@ -281,9 +279,7 @@ bool Rule::evaluate(Assay *assay) {
     std::list<std::string> exclusions;
     for (int i = 0; i < variables->size(); i++) {
         Variable *variable = variables->at(i);
-        Exclusion *exl = dynamic_cast<Exclusion *>(variable);
-
-        if (exl != NULL) {
+        if (variable->m_isExclusion) {
             std::list<transaction::Variable *> *z =
                 variable->evaluate(assay);
             for (auto &y : *z) {
@@ -297,8 +293,7 @@ bool Rule::evaluate(Assay *assay) {
     for (int i = 0; i < variables->size(); i++) {
         int transformations = 0;
         Variable *variable = variables->at(i);
-        Exclusion *exl = dynamic_cast<Exclusion *>(variable);
-        if (exl != NULL) {
+        if (variable->m_isExclusion) {
             continue;
         }
 
@@ -317,8 +312,7 @@ bool Rule::evaluate(Assay *assay) {
             std::string value = v->m_value;
             int none = 0;
             for (Action *a : this->actions_runtime_pre) {
-                None *z = dynamic_cast<None *>(a);
-                if (z != NULL) {
+                if (a->m_isNone != NULL) {
                     none++;
                 }
             }
@@ -342,7 +336,6 @@ bool Rule::evaluate(Assay *assay) {
             }
 
             for (Action *a : this->actions_runtime_pre) {
-                None *z = dynamic_cast<None *>(a);
                 if (none == 0) {
                     value = a->evaluate(value, assay);
 #ifndef NO_LOGS
@@ -352,7 +345,7 @@ bool Rule::evaluate(Assay *assay) {
 #endif
                     transformations++;
                 }
-                if (z != NULL) {
+                if (a->m_isNone != NULL) {
                     none--;
                 }
             }

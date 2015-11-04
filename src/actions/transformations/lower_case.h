@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <unordered_map>
 
 #include "actions/action.h"
 #include "actions/transformations/transformation.h"
@@ -27,6 +28,17 @@ namespace ModSecurity {
 class Assay;
 namespace actions {
 namespace transformations {
+
+class LowerCaseInstantCache : public std::unordered_map<std::string, std::string> {
+ public:
+    static LowerCaseInstantCache& getInstance() {
+        static LowerCaseInstantCache instance;
+        return instance;
+    }
+
+ private:
+    LowerCaseInstantCache() {};
+};
 
 
 class LowerCase : public Transformation {

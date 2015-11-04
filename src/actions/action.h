@@ -36,6 +36,7 @@ class Action {
         : action_kind(2),
         action(_action),
         name(_action),
+        m_isNone(false),
         temporaryAction(false) {
             name.erase(0, 2);
         }
@@ -43,6 +44,7 @@ class Action {
         : action_kind(kind),
         action(_action),
         name(_action),
+        m_isNone(false),
         temporaryAction(false) {
             name.erase(0, 2);
         }
@@ -94,6 +96,7 @@ class Action {
 
     virtual void fill_intervention(ModSecurityIntervention *intervention);
     bool temporaryAction;
+    bool m_isNone;
 };
 
 

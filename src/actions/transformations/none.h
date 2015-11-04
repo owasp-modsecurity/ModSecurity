@@ -31,7 +31,8 @@ namespace transformations {
 class None : public Transformation {
  public:
     explicit None(std::string action)
-        : Transformation(action) { }
+        : Transformation(action)
+        { m_isNone = true; }
 
     std::string evaluate(std::string exp,
         Assay *assay) override;
