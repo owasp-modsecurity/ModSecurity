@@ -87,10 +87,10 @@ std::vector<std::string> split(std::string str, char delimiter) {
 
 
 double random_number(const double from, const double to) {
-    std::random_device rd;
+    std::mt19937 mt(time(0));
     return std::bind(
         std::uniform_real_distribution<>{from, to},
-        std::default_random_engine{ rd() })();
+        std::default_random_engine{ mt() })();
 }
 
 
