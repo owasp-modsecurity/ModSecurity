@@ -38,7 +38,7 @@ class UrlDecodeInstantCache : public std::unordered_map<std::string, std::string
 
     void cache(const std::string& value, const std::string& out) {
         emplace(value, out);
-        if (size() > 100) {
+        if (size() > 500) {
             erase(begin());
         }
     }
