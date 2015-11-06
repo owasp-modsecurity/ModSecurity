@@ -29,6 +29,24 @@
 
 namespace ModSecurity {
 
+class RuleInstantCache : public std::unordered_map<std::string, int> {
+ public:
+    static RuleInstantCache& getInstance() {
+        static RuleInstantCache instance;
+        return instance;
+    }
+
+    void cache(const std::string& value) {
+        emplace(value, 1);
+        if (size() > 1500) {
+            erase(begin());
+        }
+    }
+ private:
+    RuleInstantCache() {};
+};
+
+
 class Rule {
  public:
     Rule(operators::Operator *_op,

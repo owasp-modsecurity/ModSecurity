@@ -257,9 +257,13 @@ bool Rule::evaluate(Assay *assay) {
         return evaluateActions(assay);
     }
 
-#ifndef NO_LOGS
     std::string eparam = MacroExpansion::expand(this->op->param, assay);
+    std::string cache_key = eparam + this->op->op + Variable::to_s(variables) + std::to_string(rule_id);
+    if (RuleInstantCache::getInstance().count(cache_key) > 0) {
+        return 0;
+    }
 
+#ifndef NO_LOGS
     if (this->op->param != eparam) {
         eparam = "\"" + eparam + "\" Was: \"" + this->op->param + "\"";
     } else {
@@ -490,6 +494,11 @@ bool Rule::evaluate(Assay *assay) {
         }
         //delete e;
     }
+
+    if (ret == 0) {
+        RuleInstantCache::getInstance().cache(cache_key);
+    }
+
     return ret;
 }
 
