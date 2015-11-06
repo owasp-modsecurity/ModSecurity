@@ -14,7 +14,7 @@ MAINTAINERCLEANFILES = \
 
 
 
-bin_PROGRAMS = unit-tests regression-tests
+bin_PROGRAMS = unit-tests regression-tests rules-optimization
 
 
 # unit_tests
@@ -61,6 +61,33 @@ regression_tests_LDADD = \
 	$(YAJL_LDADD)
 
 regression_tests_CPPFLAGS = \
+	-std=c++11 \
+	-Icommon \
+	-I../ \
+	-O0 \
+	-g \
+	-I$(top_builddir)/headers \
+	$(CURL_CFLAGS) \
+	$(MODSEC_NO_LOGS) \
+	$(GEOIP_CFLAGS) \
+	$(PCRE_CPPFLAGS) \
+	$(YAJL_CFLAGS)
+
+
+# optimization
+
+rules_optimization_SOURCES = \
+        optimization/optimization.cc
+
+rules_optimization_LDADD = \
+	-lrt \
+	$(top_builddir)/src/.libs/libmodsecurity.a \
+	$(CURL_LDADD) \
+	$(GEOIP_LDADD) \
+	$(PCRE_LDADD) \
+	$(YAJL_LDADD)
+
+rules_optimization_CPPFLAGS = \
 	-std=c++11 \
 	-Icommon \
 	-I../ \
