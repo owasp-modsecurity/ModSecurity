@@ -25,8 +25,10 @@
 #include "apr_version.h"
 #include <libxml/xmlversion.h>
 
+#ifdef WITH_YAJL
 #include <yajl/yajl_gen.h>
 #include "msc_logging_json.h"
+#endif
 
 /**
  * Write the supplied data to the audit log (if the FD is ready), update
@@ -384,6 +386,7 @@ static void sec_auditlog_write_producer_header(modsec_rec *msr) {
     sec_auditlog_write(msr, ".\n", 2);
 }
 
+#ifdef WITH_YAJL
 /**
  * Ouput the Producer header into a JSON generator
  */
@@ -415,6 +418,7 @@ static void sec_auditlog_write_producer_header_json(modsec_rec *msr, yajl_gen g)
 
     yajl_gen_array_close(g); // array for producers is finished
 }
+#endif
 
 /*
 * \brief This function will returns the next chain node
@@ -515,6 +519,7 @@ static int chained_is_matched(modsec_rec *msr, const msre_rule *next_rule) {
     return 0;
 }
 
+#ifdef WITH_YAJL
 /**
  * Write detailed information about performance metrics into a JSON generator
  */
@@ -1516,6 +1521,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
         apr_file_write_full(msr->txcfg->auditlog2_fd, text, nbytes, &nbytes_written);
     }
 }
+#endif
 
 /*
  * Produce an audit log entry in native format.
@@ -2282,9 +2288,13 @@ void sec_audit_logger_native(modsec_rec *msr) {
  * Handler for audit log writers.
  */
 void sec_audit_logger(modsec_rec *msr) {
+    #ifdef WITH_YAJL
     if (msr->txcfg->auditlog_format == AUDITLOGFORMAT_JSON) {
         sec_audit_logger_json(msr);
     } else {
+    #endif
         sec_audit_logger_native(msr);
+    #ifdef WITH_YAJL
     }
+    #endif
 }
