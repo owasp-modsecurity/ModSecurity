@@ -19,12 +19,12 @@ GEOIP_CPPFLAGS=""
 GEOIP_LDADD=""
 GEOIP_LDFLAGS=""
 GEOIP_CONFIG=${PKG_CONFIG}
-GEOIP_PKGNAMES="geoip2 geoip GeoIP"
+GEOIP_PKGNAMES="geoip2 geoip GeoIP libGeoIP"
 GEOIP_SONAMES="so la sl dll dylib"
 
 AC_ARG_WITH(
     geoip,
-    [AC_HELP_STRING([--with-geoip=PATH],[Path to geoip prefix or config script])]
+    [AC_HELP_STRING([--with-geoip=PATH],[Path to geoip prefix])]
     ,, with_geoip=yes)
 
 AS_CASE(["${with_geoip}"],
