@@ -600,7 +600,7 @@ static void write_rule_json(modsec_rec *msr, const msre_rule *rule, yajl_gen g) 
     if (rule->actionset->phase != NOT_SET) {
         yajl_kv_int(g, "phase", rule->actionset->phase);
     }
-    yajl_kv_bool(g, "is_chained", rule->actionset->is_chained);
+    yajl_kv_bool(g, "is_chained", rule->actionset->is_chained || (rule->chain_starter != NULL));
     if (rule->actionset->is_chained && (rule->chain_starter == NULL)) {
         yajl_kv_bool(g, "chain_starter", 1);
     }
