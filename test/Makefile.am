@@ -27,9 +27,9 @@ unit_tests_LDADD = \
 	-lrt \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
-	$(GEOIP_LDADD) \
+	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
 	$(PCRE_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDFLAGS) $(YAJL_LDADD)
 
 unit_tests_CPPFLAGS = \
 	-std=c++11 \
@@ -41,7 +41,7 @@ unit_tests_CPPFLAGS = \
 	$(CURL_CFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
-	$(PCRE_CPPFLAGS) \
+	$(PCRE_CFLAGS) \
 	$(YAJL_CFLAGS)
 
 
@@ -56,9 +56,9 @@ regression_tests_LDADD = \
 	-lrt \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
-	$(GEOIP_LDADD) \
+	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
 	$(PCRE_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDFLAGS) $(YAJL_LDADD)
 
 regression_tests_CPPFLAGS = \
 	-std=c++11 \
@@ -70,7 +70,7 @@ regression_tests_CPPFLAGS = \
 	$(CURL_CFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
-	$(PCRE_CPPFLAGS) \
+	$(PCRE_CFLAGS) \
 	$(YAJL_CFLAGS)
 
 
@@ -83,9 +83,9 @@ rules_optimization_LDADD = \
 	-lrt \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
-	$(GEOIP_LDADD) \
+	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
 	$(PCRE_LDADD) \
-	$(YAJL_LDADD)
+	$(YAJL_LDFLAGS) $(YAJL_LDADD)
 
 rules_optimization_CPPFLAGS = \
 	-std=c++11 \
@@ -97,5 +97,5 @@ rules_optimization_CPPFLAGS = \
 	$(CURL_CFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
-	$(PCRE_CPPFLAGS) \
+	$(PCRE_CFLAGS) \
 	$(YAJL_CFLAGS)
