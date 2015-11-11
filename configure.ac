@@ -275,6 +275,7 @@ if test "$build_docs" -eq 1; then
     TOPLEVEL_SUBDIRS="$TOPLEVEL_SUBDIRS docs"
 fi
 
+
 # Add PCRE Studying
 
 AC_ARG_ENABLE(pcre-study,
@@ -659,6 +660,7 @@ else
 fi
 
 MODSEC_EXTRA_CFLAGS="$pcre_study $pcre_match_limit $pcre_match_limit_recursion $pcre_jit $request_early $htaccess_config $lua_cache $debug_conf $debug_cache $debug_acmp $debug_mem $perf_meas $modsec_api $cpu_type"
+
 APXS_WRAPPER=build/apxs-wrapper
 APXS_EXTRA_CFLAGS=""
 for f in $EXTRA_CFLAGS; do
