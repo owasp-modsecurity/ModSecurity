@@ -167,7 +167,9 @@ void Driver::error(const yy::location& l, const std::string& m,
     const std::string& c) {
     if (parserError.tellp() == 0) {
         parserError << "Rules error. ";
-        parserError << "File: " << ref.back() << ". ";
+        if (ref.empty() == false) {
+            parserError << "File: " << ref.back() << ". ";
+        }
         parserError << "Line: " << l.end.line << ". ";
         parserError << "Column: " << l.end.column << ". ";
     }
