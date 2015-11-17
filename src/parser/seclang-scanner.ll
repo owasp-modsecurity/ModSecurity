@@ -322,8 +322,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 {LOG_DATA}:'{FREE_TEXT_QUOTE}'         { return yy::seclang_parser::make_LOG_DATA(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_MSG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_MSG(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_REDIRECT}:'{FREE_TEXT_QUOTE}' { return yy::seclang_parser::make_ACTION_REDIRECT(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_REDIRECT}:{FREE_TEXT_QUOTE} { return yy::seclang_parser::make_ACTION_REDIRECT(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_REDIRECT}:{FREE_TEXT} { return yy::seclang_parser::make_ACTION_REDIRECT(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_TAG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_TAG(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_REV}:'{CONFIG_VALUE_NUMBER}'      { return yy::seclang_parser::make_ACTION_REV(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_VER}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_VER(strchr(yytext, ':') + 1, *driver.loc.back()); }
