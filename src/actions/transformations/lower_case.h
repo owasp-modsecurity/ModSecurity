@@ -29,7 +29,8 @@ class Assay;
 namespace actions {
 namespace transformations {
 
-class LowerCaseInstantCache : public std::unordered_map<std::string, std::string> {
+class LowerCaseInstantCache :
+    public std::unordered_map<std::string, std::string> {
  public:
     static LowerCaseInstantCache& getInstance() {
         static LowerCaseInstantCache instance;
@@ -43,7 +44,7 @@ class LowerCaseInstantCache : public std::unordered_map<std::string, std::string
         }
     }
  private:
-    LowerCaseInstantCache() {};
+    LowerCaseInstantCache() {}
 };
 
 

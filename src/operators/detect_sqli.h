@@ -17,6 +17,7 @@
 #define SRC_OPERATORS_DETECT_SQLI_H_
 
 #include <string>
+#include <list>
 
 #include "operators/operator.h"
 

@@ -29,7 +29,8 @@ class Assay;
 namespace actions {
 namespace transformations {
 
-class UrlDecodeInstantCache : public std::unordered_map<std::string, std::string> {
+class UrlDecodeInstantCache :
+    public std::unordered_map<std::string, std::string> {
  public:
     static UrlDecodeInstantCache& getInstance() {
         static UrlDecodeInstantCache instance;
@@ -43,7 +44,7 @@ class UrlDecodeInstantCache : public std::unordered_map<std::string, std::string
         }
     }
  private:
-    UrlDecodeInstantCache() {};
+    UrlDecodeInstantCache() {}
 };
 
 

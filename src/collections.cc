@@ -132,9 +132,7 @@ void Collections::resolveSingleMatch(const std::string& var,
 
     try {
         this->at(collection)->resolveSingleMatch(var, l);
-    } catch (...) {
-
-    }
+    } catch (...) { }
 }
 
 void Collections::resolveMultiMatches(const std::string& var,
@@ -149,9 +147,7 @@ void Collections::resolveMultiMatches(const std::string& var,
     std::vector<const transaction::Variable *> *l) {
     try {
         this->at(collection)->resolveMultiMatches(var, l);
-    } catch (...) {
-
-    }
+    } catch (...) { }
 }
 
 void Collections::resolveRegularExpression(const std::string& var,
@@ -166,9 +162,7 @@ void Collections::resolveRegularExpression(const std::string& var,
 
     try {
         this->at(collection)->resolveRegularExpression(var, l);
-    } catch (...) {
-
-    }
+    } catch (...) { }
 }
 
 }  // namespace transaction

@@ -488,7 +488,6 @@ bool Rule::evaluate(Assay *assay) {
             delete e.back();
             e.pop_back();
         }
-        //delete e;
     }
     return ret;
 }

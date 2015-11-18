@@ -30,7 +30,8 @@ namespace actions {
 namespace transformations {
 
 
-class HtmlEntityDecodeInstantCache : public std::unordered_map<std::string, std::string> {
+class HtmlEntityDecodeInstantCache :
+    public std::unordered_map<std::string, std::string> {
  public:
     static HtmlEntityDecodeInstantCache& getInstance() {
         static HtmlEntityDecodeInstantCache instance;
@@ -44,7 +45,7 @@ class HtmlEntityDecodeInstantCache : public std::unordered_map<std::string, std:
         }
     }
  private:
-    HtmlEntityDecodeInstantCache() {};
+    HtmlEntityDecodeInstantCache() {}
 };
 
 

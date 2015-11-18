@@ -34,7 +34,6 @@ Variable::Variable(std::string name)
     m_collectionName(""),
     m_isExclusion(false),
     m_isCount(false) {
-
     if (m_name.at(0) == '\\') {
         m_type = RegularExpression;
     } else if (m_name.find(":") != std::string::npos) {
@@ -58,7 +57,6 @@ Variable::Variable(std::string name, VariableKind kind)
     m_kind(kind),
     m_isExclusion(false),
     m_isCount(false) {
-
     if (m_name.at(0) == '\\') {
         m_type = RegularExpression;
     } else if (m_name.find(":") != std::string::npos) {
@@ -75,25 +73,32 @@ Variable::Variable(std::string name, VariableKind kind)
 
 std::vector<const transaction::Variable *> *
     Variable::evaluate(Assay *assay) {
-    std::vector<const transaction::Variable *> *l = new std::vector<const transaction::Variable *>();
+    std::vector<const transaction::Variable *> *l = NULL;
+    l = new std::vector<const transaction::Variable *>();
     evaluate(assay, l);
 
     return l;
 }
 
-void Variable::evaluateInternal(Assay *assay, std::vector<const transaction::Variable *> *l) {
+void Variable::evaluateInternal(Assay *assay,
+    std::vector<const transaction::Variable *> *l) {
     if (m_collectionName.empty() == false) {
         if (m_kind == CollectionVarible && m_type == MultipleMatches) {
-            assay->m_collections.resolveMultiMatches(m_name, m_collectionName, l);
-        } if (m_kind == CollectionVarible && m_type == RegularExpression) {
-            assay->m_collections.resolveRegularExpression(m_name, m_collectionName, l);
+            assay->m_collections.resolveMultiMatches(m_name,
+                m_collectionName, l);
+        } else if (m_kind == CollectionVarible
+            && m_type == RegularExpression) {
+            assay->m_collections.resolveRegularExpression(m_name,
+                m_collectionName, l);
         } else {
-            assay->m_collections.resolveSingleMatch(m_name, m_collectionName, l);
+            assay->m_collections.resolveSingleMatch(m_name,
+                m_collectionName, l);
         }
     } else {
         if (m_kind == CollectionVarible && m_type == MultipleMatches) {
             assay->m_collections.resolveMultiMatches(m_name, l);
-        } if (m_kind == CollectionVarible && m_type == RegularExpression) {
+        } else if (m_kind == CollectionVarible
+            && m_type == RegularExpression) {
             assay->m_collections.resolveRegularExpression(m_name, l);
         } else {
             assay->m_collections.resolveSingleMatch(m_name, l);
@@ -102,7 +107,8 @@ void Variable::evaluateInternal(Assay *assay, std::vector<const transaction::Var
 }
 
 
-void Variable::evaluate(Assay *assay, std::vector<const transaction::Variable *> *l) {
+void Variable::evaluate(Assay *assay,
+    std::vector<const transaction::Variable *> *l) {
     evaluateInternal(assay, l);
 }
 

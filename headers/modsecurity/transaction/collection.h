@@ -24,13 +24,15 @@ typedef struct Collection_t Collection;
 
 
 #ifdef __cplusplus
+#include <string>
+
 namespace ModSecurity {
 
 class Collection : public transaction::Variables {
  public:
      Collection(std::string name, std::string key)
        : m_name(name),
-       m_key(key) { };
+       m_key(key) { }
 
      std::string m_name;
      clock_t m_createTime;

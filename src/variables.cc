@@ -96,8 +96,7 @@ void Variables::resolveMultiMatches(const std::string& var,
         if (x.first.compare(0, keySize, var) != 0) {
             continue;
         }
-        const transaction::Variable *v = new transaction::Variable(x.first, x.second);
-        l->insert(l->begin(), v);
+        l->insert(l->begin(), new transaction::Variable(x.first, x.second));
     }
 }
 

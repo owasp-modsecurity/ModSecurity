@@ -61,7 +61,6 @@ class Variables :
         std::vector<const transaction::Variable *> *l);
     void resolveRegularExpression(const std::string& var,
         std::vector<const transaction::Variable *> *l);
-
 };
 
 }  // namespace transaction
