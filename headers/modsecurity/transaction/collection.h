@@ -32,6 +32,10 @@ class Collection : public transaction::Variables {
  public:
      Collection(std::string name, std::string key)
        : m_name(name),
+       m_persisted(false),
+       m_timeout(0),
+       m_updateCounter(0),
+       m_updateRate(0),
        m_key(key) { }
 
      std::string m_name;

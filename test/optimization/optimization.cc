@@ -109,9 +109,7 @@ int main(int argc, char **argv) {
             }
         }
 
-        if (operators.size() == 0 &&
-            variables.size() == 0 &&
-            op2var.size() == 0) {
+        if (operators.empty() && variables.empty() && op2var.empty()) {
             std::cout << " ~ no SecRule found ~ " << std::endl;
             continue;
         }
