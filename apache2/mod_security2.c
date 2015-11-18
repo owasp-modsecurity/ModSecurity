@@ -135,9 +135,11 @@ static void version(apr_pool_t *mp) {
     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
             "ModSecurity: YAJL compiled version=\"%d.%d.%d\"", YAJL_MAJOR, YAJL_MINOR, YAJL_MICRO);
 #endif /* WITH_YAJL */
-
+#ifdef WITH_LIBXML
     ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-            "ModSecurity: LIBXML compiled version=\"%s\"", LIBXML_DOTTED_VERSION);
+            "ModSecurity: LIBXML compiled version=\"%s\"", LIBXML_DOTTED_VERSION
+);
+#endif
 }
 
 

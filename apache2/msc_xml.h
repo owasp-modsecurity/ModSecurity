@@ -15,18 +15,24 @@
 #ifndef _MSC_XML_H_
 #define _MSC_XML_H_
 
+#ifdef WITH_LIBXML
 typedef struct xml_data xml_data;
+#endif
 
 #include "modsecurity.h"
+#if WITH_LIBXML
 #include <libxml/xmlschemas.h>
 #include <libxml/xpath.h>
+#endif 
 
 /* Structures */
 
 struct xml_data {
+#ifdef WITH_LIBXML
     xmlSAXHandler           *sax_handler;
     xmlParserCtxtPtr        parsing_ctx;
     xmlDocPtr               doc;
+#endif // WITH_LIBXML
 
     unsigned int            well_formed;
 };

@@ -15,7 +15,7 @@
 #include "msc_remote_rules.h"
 #include "msc_status_engine.h"
 
-#include <apr_thread_pool.h>
+// #include <apr_thread_pool.h>
 
 #ifdef WITH_CURL
 #include <curl/curl.h>

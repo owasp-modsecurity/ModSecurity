@@ -19,8 +19,10 @@
 #include <stdlib.h>
 
 #include <limits.h>
+#ifdef WITH_LIBXML
 #include <libxml/tree.h>
 #include <libxml/HTMLparser.h>
+#endif
 
 typedef struct rule_exception rule_exception;
 typedef struct rule_exception hash_method;
@@ -384,8 +386,11 @@ struct modsec_rec {
     char                *multipart_filename;
     char                *multipart_name;
     multipart_data      *mpd;                        /* MULTIPART processor data structure */
-
+#ifdef WITH_LIBXML
     xml_data            *xml;                        /* XML processor data structure       */
+#else
+    void		*xml;
+#endif
 #ifdef WITH_YAJL
     json_data           *json;                       /* JSON processor data structure      */
 #endif
@@ -465,7 +470,9 @@ struct modsec_rec {
     /* Generic request body processor context to be used by custom parsers. */
     void                *reqbody_processor_ctx;
 
+#ifdef WITH_LIBXML
     htmlDocPtr          crypto_html_tree;
+#endif
 #if defined(WITH_LUA)
     #ifdef CACHE_LUA
     lua_State           *L;
@@ -628,7 +635,9 @@ struct directory_config {
     int                 crypto_hash_framesrc_pm;
 
     /* xml */
+#ifdef WITH_LIBXML
     int                 xml_external_entity;
+#endif
 
     /* This will be used whenever ModSecurity will be ready
      * to ask the server for newer rules.

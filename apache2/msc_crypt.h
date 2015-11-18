@@ -16,8 +16,10 @@
 #define _MSC_CRYPT_H_
 
 #include "modsecurity.h"
+#ifdef WITH_LIBXML
 #include <libxml/HTMLparser.h>
 #include <libxml/xpath.h>
+#endif
 
 #define HMAC_PAD_SIZE 65
 #define HASH_ONLY 0

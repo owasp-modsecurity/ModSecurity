@@ -2536,6 +2536,7 @@ static int msre_op_validateDTD_init(msre_rule *rule, char **error_msg) {
 static int msre_op_validateDTD_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         char **error_msg)
 {
+#ifdef WITH_LIBXML
     xmlValidCtxtPtr cvp;
     xmlDtdPtr dtd;
 
@@ -2591,7 +2592,7 @@ static int msre_op_validateDTD_execute(modsec_rec *msr, msre_rule *rule, msre_va
 
     xmlFreeValidCtxt(cvp);
     xmlFreeDtd(dtd);
-
+#endif
     /* Match. */
     return 0;
 }
@@ -2606,6 +2607,7 @@ static int msre_op_validateSchema_init(msre_rule *rule, char **error_msg) {
 static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre_var *var,
         char **error_msg)
 {
+#ifdef WITH_LIBXML
     xmlSchemaParserCtxtPtr parserCtx;
     xmlSchemaValidCtxtPtr validCtx;
     xmlSchemaPtr schema;
@@ -2673,7 +2675,7 @@ static int msre_op_validateSchema_execute(modsec_rec *msr, msre_rule *rule, msre
 
     xmlSchemaFree(schema);
     xmlSchemaFreeValidCtxt(validCtx);
-
+#endif
     return 0;
 }
 

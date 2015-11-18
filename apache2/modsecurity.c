@@ -179,7 +179,9 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
  */
 void modsecurity_child_init(msc_engine *msce) {
     /* Need to call this once per process before any other XML calls. */
+#ifdef WITH_LIBXML
     xmlInitParser();
+#endif
 
     if (msce->auditlog_lock != NULL) {
         apr_status_t rc = apr_global_mutex_child_init(&msce->auditlog_lock, NULL, msce->mp);
@@ -266,7 +268,9 @@ static apr_status_t modsecurity_tx_cleanup(void *data) {
     if (msr->mpd != NULL) multipart_cleanup(msr);
 
     /* XML processor cleanup. */
+#ifdef WITH_LIBXML
     if (msr->xml != NULL) xml_cleanup(msr);
+#endif
 
 #ifdef WITH_YAJL
     /* JSON processor cleanup. */

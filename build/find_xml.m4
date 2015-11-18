@@ -80,11 +80,4 @@ AC_SUBST(LIBXML2_CPPFLAGS)
 AC_SUBST(LIBXML2_LDADD)
 AC_SUBST(LIBXML2_LDFLAGS)
 
-if test -z "${LIBXML2_VERSION}"; then
-    AC_MSG_NOTICE([*** xml library not found.])
-    ifelse([$2], , AC_MSG_ERROR([libxml2 is required]), $2)
-else
-    AC_MSG_NOTICE([using libxml2 v${LIBXML2_VERSION}])
-    ifelse([$1], , , $1) 
-fi
 ])

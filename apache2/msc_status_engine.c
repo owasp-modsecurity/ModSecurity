@@ -347,7 +347,12 @@ int DSOLOCAL msc_beacon_string (char *beacon_string, int beacon_string_max_len) 
 #ifdef WITH_LUA
     lua = LUA_VERSION;
 #endif
+#ifdef WITH_LIBXML
     libxml = LIBXML_DOTTED_VERSION;
+#else
+    libxml = "(null)";
+#endif
+
     modsec = MODSEC_VERSION;
 #ifdef VERSION_IIS
     apache = "IIS";

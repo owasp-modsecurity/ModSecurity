@@ -18,8 +18,10 @@
 #include "apr_uri.h"
 #include "apr_base64.h"
 #include "acmp.h"
+#ifdef WITH_LIBXML
 #include "libxml/HTMLtree.h"
 #include "libxml/uri.h"
+#endif
 #include <string.h>
 
 /**
@@ -32,6 +34,7 @@
  * \retval NULL on fail
  */
 char *normalize_path(modsec_rec *msr, char *input) {
+#ifdef WITH_LIBXML
     xmlURI *uri = NULL;
     char *parsed_content = NULL;
     char *content = NULL;
@@ -136,6 +139,8 @@ char *normalize_path(modsec_rec *msr, char *input) {
 
     if(uri != NULL) xmlFreeURI(uri);
     return apr_pstrdup(msr->mp, input);
+#endif
+    return;
 }
 
 /**
@@ -146,6 +151,7 @@ char *normalize_path(modsec_rec *msr, char *input) {
  * \retval key random key
  */
 char *getkey(apr_pool_t *mp) {
+#ifdef WITH_LIBXML
     unsigned char digest[APR_SHA1_DIGESTSIZE];
     char *sig, *key, *value;
     apr_sha1_ctx_t ctx;
@@ -168,6 +174,8 @@ char *getkey(apr_pool_t *mp) {
     apr_base64_encode (sig, (const char*)digest, sizeof (digest));
 
     return sig;
+#endif
+    return NULL;
 }
 
 
@@ -184,6 +192,7 @@ char *getkey(apr_pool_t *mp) {
  */
 char *hmac(modsec_rec *msr, const char *key, int key_len,
         unsigned char *msg, int msglen) {
+#ifdef WITH_XML
     apr_sha1_ctx_t ctx;
     unsigned char digest[APR_SHA1_DIGESTSIZE];
     unsigned char hmac_ipad[HMAC_PAD_SIZE], hmac_opad[HMAC_PAD_SIZE];
@@ -227,6 +236,8 @@ char *hmac(modsec_rec *msr, const char *key, int key_len,
     *hmac_digest = '\0';
 
     return apr_pstrdup (msr->mp, hex_digest);
+#endif
+    return NULL;
 }
 
 
@@ -239,6 +250,7 @@ char *hmac(modsec_rec *msr, const char *key, int key_len,
  * \retval -1 on fail
  */
 int init_response_body_html_parser(modsec_rec *msr)   {
+#ifdef WITH_LIBXML
     char *charset = NULL;
     char *final_charset = NULL;
     char sep;
@@ -319,7 +331,7 @@ int init_response_body_html_parser(modsec_rec *msr)   {
                     "init_response_body_html_parser: Successfully html parser generated.");
         return 1;
     }
-
+#endif
     return 1;
 }
 
@@ -335,6 +347,7 @@ int init_response_body_html_parser(modsec_rec *msr)   {
  * \retval -1 on fail
  */
 int do_hash_method(modsec_rec *msr, char *link, int type)   {
+#ifdef WITH_LIBXML
     hash_method **em = NULL;
     int i = 0;
     char *error_msg = NULL;
@@ -633,6 +646,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
         }
 
     }
+#endif
     return 0;
 }
 
@@ -646,6 +660,7 @@ int do_hash_method(modsec_rec *msr, char *link, int type)   {
  * \retval -1 On fail
  */
 int hash_response_body_links(modsec_rec *msr)   {
+#ifdef WITH_LIBXML
     int lsize = 0, fsize = 0, lcount = 0, fcount = 0, i;
     int isize = 0, icount = 0, frsize = 0, frcount = 0;
     int bytes = 0;
@@ -987,6 +1002,7 @@ obj_error:
     if(xpathCtx != NULL)
     xmlXPathFreeContext(xpathCtx);
 ctx_error:
+#endif
     return -1;
 }
 
@@ -1000,6 +1016,7 @@ ctx_error:
  * \retval -1 On fail
  */
 int inject_hashed_response_body(modsec_rec *msr, int elts) {
+#ifdef WITH_LIBXML
     xmlOutputBufferPtr output_buf = NULL;
     xmlCharEncodingHandlerPtr  handler = NULL;
     char *p = NULL;
@@ -1215,7 +1232,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
 
     if (msr->txcfg->debuglog_level >= 4)
         msr_log(msr, 4, "inject_hashed_response_body: Stream buffer [%"APR_SIZE_T_FMT"]. Done",msr->stream_output_length);
-
+#endif
     return 1;
 }
 
@@ -1230,6 +1247,7 @@ int inject_hashed_response_body(modsec_rec *msr, int elts) {
  * \retval NULL on fail
  */
 char *do_hash_link(modsec_rec *msr, char *link, int type)  {
+#ifdef WITH_LIBXML
     char  *mac_link = NULL;
     char *path_chunk = NULL;
     char *hash_value = NULL;
@@ -1433,6 +1451,8 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
     }
 
     return mac_link;
+#endif
+    return NULL;
 }
 
 /**
@@ -1444,6 +1464,7 @@ char *do_hash_link(modsec_rec *msr, char *link, int type)  {
  * \retval 0 on fail
  */
 int modify_response_header(modsec_rec *msr) {
+#ifdef WITH_LIBXML
     char *mac_link = NULL;
     const char *location = NULL;
     int rc = 0;
@@ -1500,6 +1521,6 @@ int modify_response_header(modsec_rec *msr) {
         apr_table_unset(msr->r->headers_out,"Location");
         apr_table_set(msr->r->headers_out, "Location",(char*)apr_psprintf(msr->mp,"%s", mac_link));
     }
-
+#endif
     return 1;
 }

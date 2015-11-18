@@ -23,7 +23,9 @@
 #include "msc_util.h"
 
 #include "apr_version.h"
+#ifdef WITH_LIBXML
 #include <libxml/xmlversion.h>
+#endif
 
 /**
  * Write the supplied data to the audit log (if the FD is ready), update

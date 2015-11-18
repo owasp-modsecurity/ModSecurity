@@ -1293,6 +1293,7 @@ static apr_status_t msre_action_ctl_execute(modsec_rec *msr, apr_pool_t *mptmp,
     return -1;
 }
 
+#ifdef WITH_LIBXML
 /* xmlns */
 static char *msre_action_xmlns_validate(msre_engine *engine, apr_pool_t *mp, msre_action *action) {
     char *name = NULL;
@@ -1313,6 +1314,7 @@ static char *msre_action_xmlns_validate(msre_engine *engine, apr_pool_t *mp, msr
 
     return NULL;
 }
+#endif
 
 /* sanitizeArg */
 static apr_status_t msre_action_sanitizeArg_execute(modsec_rec *msr, apr_pool_t *mptmp,
@@ -2629,6 +2631,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         msre_action_ctl_execute
     );
 
+#ifdef WITH_LIBXML
     /* xmlns */
     msre_engine_action_register(engine,
         "xmlns",
@@ -2641,6 +2644,7 @@ void msre_engine_register_default_actions(msre_engine *engine) {
         NULL,
         NULL
     );
+#endif
 
     /* capture */
     msre_engine_action_register(engine,

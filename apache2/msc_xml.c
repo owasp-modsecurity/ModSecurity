@@ -14,6 +14,7 @@
 
 #include "msc_xml.h"
 
+#ifdef WITH_XML
 static xmlParserInputBufferPtr
 xml_unload_external_entity(const char *URI, xmlCharEncoding enc)    {
     return NULL;
@@ -32,10 +33,11 @@ int xml_init(modsec_rec *msr, char **error_msg) {
     msr->xml = apr_pcalloc(msr->mp, sizeof(xml_data));
     if (msr->xml == NULL) return -1;
 
+#ifdef WITH_LIBXML
     if(msr->txcfg->xml_external_entity == 0)    {
         entity = xmlParserInputBufferCreateFilenameDefault(xml_unload_external_entity);
     }
-
+#endif
     return 1;
 }
 
@@ -144,3 +146,5 @@ apr_status_t xml_cleanup(modsec_rec *msr) {
 
     return 1;
 }
+
+#endif

@@ -120,13 +120,16 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
             }
         }
         else if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
+#ifdef WITH_LIBXML
             if (xml_init(msr, &my_error_msg) < 0) {
                 *error_msg = apr_psprintf(msr->mp, "XML parsing error (init): %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = my_error_msg;
                 msr_log(msr, 2, "%s", *error_msg);
             }
+#endif
         }
+
         else if (strcmp(msr->msc_reqbody_processor, "JSON") == 0) {
 #ifdef WITH_YAJL
             if (json_init(msr, &my_error_msg) < 0) {
@@ -352,12 +355,14 @@ apr_status_t modsecurity_request_body_store(modsec_rec *msr,
             msr->msc_reqbody_no_files_length += length;
 
             /* Process data as XML. */
+#ifdef WITH_LIBXML
             if (xml_process_chunk(msr, data, length, &my_error_msg) < 0) {
                 *error_msg = apr_psprintf(msr->mp, "XML parsing error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = *error_msg;
                 msr_log(msr, 2, "%s", *error_msg);
             }
+#endif
         }
         else if (strcmp(msr->msc_reqbody_processor, "JSON") == 0) {
             /* Increase per-request data length counter. */
@@ -657,6 +662,7 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
             return modsecurity_request_body_end_urlencoded(msr, error_msg);
         }
         else if (strcmp(msr->msc_reqbody_processor, "XML") == 0) {
+#ifdef WITH_LIBXML
             if (xml_complete(msr, &my_error_msg) < 0) {
                 *error_msg = apr_psprintf(msr->mp, "XML parser error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
@@ -664,6 +670,7 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
                 msr_log(msr, 2, "%s", *error_msg);
                 return -1;
             }
+#endif
         }
     } else if (msr->txcfg->reqbody_buffering != REQUEST_BODY_FORCEBUF_OFF) {
         /* Convert to a single continous buffer, but don't do anything else. */

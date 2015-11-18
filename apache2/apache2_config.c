@@ -157,7 +157,9 @@ void *create_directory_config(apr_pool_t *mp, char *path)
 
 
     /* xml external entity */
+#ifdef WITH_LIBXML
     dcfg->xml_external_entity = NOT_SET;
+#endif
 
     return dcfg;
 }
@@ -616,8 +618,10 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
         ? parent->crypto_hash_framesrc_pm : child->crypto_hash_framesrc_pm);
 
     /* xml external entity */
+#ifdef WITH_LIBXML
     merged->xml_external_entity = (child->xml_external_entity == NOT_SET
         ? parent->xml_external_entity : child->xml_external_entity);
+#endif
 
     return merged;
 }
@@ -722,6 +726,7 @@ void init_directory_config(directory_config *dcfg)
     if (dcfg->col_timeout == NOT_SET) dcfg->col_timeout = 3600;
 
     /* Hash */
+#ifdef WITH_LIBXML
     if (dcfg->crypto_key == NOT_SET_P) dcfg->crypto_key = getkey(dcfg->mp);
     if (dcfg->crypto_key_len == NOT_SET) dcfg->crypto_key_len = strlen(dcfg->crypto_key);
     if (dcfg->crypto_key_add == NOT_SET) dcfg->crypto_key_add = HASH_KEYONLY;
@@ -738,9 +743,12 @@ void init_directory_config(directory_config *dcfg)
     if (dcfg->crypto_hash_location_pm == NOT_SET) dcfg->crypto_hash_location_pm = 0;
     if (dcfg->crypto_hash_iframesrc_pm == NOT_SET) dcfg->crypto_hash_iframesrc_pm = 0;
     if (dcfg->crypto_hash_framesrc_pm == NOT_SET) dcfg->crypto_hash_framesrc_pm = 0;
+#endif
 
+#ifdef WITH_LIBXML
     /* xml external entity */
     if (dcfg->xml_external_entity == NOT_SET) dcfg->xml_external_entity = 0;
+#endif
 
 }
 
@@ -2592,6 +2600,7 @@ static const char *cmd_sensor_id(cmd_parms *cmd, void *_dcfg, const char *p1)
 * \retval NULL On failure
 * \retval apr_psprintf On Success
 */
+#ifdef WITH_LIBXML
 static const char *cmd_xml_external_entity(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     directory_config *dcfg = (directory_config *)_dcfg;
@@ -2607,7 +2616,7 @@ static const char *cmd_xml_external_entity(cmd_parms *cmd, void *_dcfg, const ch
 
     return NULL;
 }
-
+#endif
 
 /**
 * \brief Add SecHashEngine configuration option
@@ -3610,7 +3619,7 @@ const command_rec module_directives[] = {
         "Abort or Warn"
     ),
 
-
+#ifdef WITH_LIBXML
     AP_INIT_TAKE1 (
         "SecXmlExternalEntity",
         cmd_xml_external_entity,
@@ -3618,6 +3627,7 @@ const command_rec module_directives[] = {
         CMD_SCOPE_ANY,
         "On or Off"
     ),
+#endif
 
     AP_INIT_FLAG (
         "SecRuleInheritance",
