@@ -141,8 +141,8 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
                 if (strcmp(key2, "uri") == 0) {
                    u->uri = YAJL_GET_STRING(val2);
                 }
-                if (strcmp(key2, "protocol") == 0) {
-                   u->protocol = YAJL_GET_STRING(val2);
+                if (strcmp(key2, "method") == 0) {
+                   u->method = YAJL_GET_STRING(val2);
                 }
                 if (strcmp(key2, "http_version") == 0) {
                    u->httpVersion = YAJL_GET_NUMBER(val2);

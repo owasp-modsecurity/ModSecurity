@@ -18,7 +18,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -62,7 +62,7 @@
         "Expect":"100-continue"
       },
       "uri":"/",
-      "protocol":"POST",
+      "method":"POST",
       "body":[  
         "--------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"name\"",

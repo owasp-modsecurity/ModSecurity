@@ -18,7 +18,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -59,7 +59,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value&a=b",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -102,7 +102,7 @@
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri":"/",
-      "protocol":"POST",
+      "method":"POST",
       "body": [
         "param1=value1&param2=value2"
       ]
@@ -148,7 +148,7 @@
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri":"/",
-      "protocol":"POST",
+      "method":"POST",
       "body": [
         "param1=value1&param2=value2&a=b\n"
       ]
@@ -194,7 +194,7 @@
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri":"/",
-      "protocol":"POST",
+      "method":"POST",
       "body": [
         "a=%EC%A7%84%20%EB%A7%88%EC%9D%BC%20%EB%A6%AC"
       ]
@@ -240,7 +240,7 @@
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri":"/?z=%EC%A7%84%20%EB%A7%88%EC%9D%BC%20%EB%A6%AC",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{
       "headers":{
@@ -283,7 +283,7 @@
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri":"/?z=진 마일 리",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{
       "headers":{

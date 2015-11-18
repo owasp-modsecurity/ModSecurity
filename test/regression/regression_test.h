@@ -59,7 +59,7 @@ class RegressionTest {
     int clientPort;
     int serverPort;
 
-    std::string protocol;
+    std::string method;
     std::string httpVersion;
     std::string uri;
 

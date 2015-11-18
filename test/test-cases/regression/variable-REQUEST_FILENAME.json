@@ -20,7 +20,7 @@
         "Content-Type":"application/x-www-form-urlencoded"
       },
       "uri":"/one/two/login.php?key1=value1&key2=v%20a%20l%20u%20e%202",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{
       "headers":{

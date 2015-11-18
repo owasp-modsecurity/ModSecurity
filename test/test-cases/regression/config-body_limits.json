@@ -18,7 +18,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -60,7 +60,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -102,7 +102,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"POST",
+      "method":"POST",
       "body":[  
         "--------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"name\"",
@@ -161,7 +161,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"POST",
+      "method":"POST",
       "body":[  
         "--------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"name\"",

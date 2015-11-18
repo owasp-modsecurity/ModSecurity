@@ -161,7 +161,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
              goto end;
         }
 
-        modsec_assay->processURI(t->uri.c_str(), t->protocol.c_str(),
+        modsec_assay->processURI(t->uri.c_str(), t->method.c_str(),
             t->httpVersion.c_str());
 
         actions(&r, modsec_assay);

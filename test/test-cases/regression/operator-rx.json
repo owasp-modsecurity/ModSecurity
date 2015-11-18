@@ -20,7 +20,7 @@
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri":"/",
-      "protocol":"POST",
+      "method":"POST",
       "body": [
         "param1=value1&param2=value2"
       ]

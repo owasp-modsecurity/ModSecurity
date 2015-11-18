@@ -19,7 +19,7 @@
         "Cookie":"USER_TOKEN=Yes; a=z; t=b"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{
       "headers":{
@@ -61,7 +61,7 @@
         "Cookie":"USER_TOKEN=Yes; a=z; t=b"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{
       "headers":{
@@ -103,7 +103,7 @@
         "Cookie":"USER_TOKEN=Yes; a=z; t=b"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{
       "headers":{

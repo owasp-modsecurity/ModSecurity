@@ -18,7 +18,7 @@
         "Accept":"*/*"
       },
       "uri":"/?keyI=value&keyII=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{
       "headers":{
@@ -61,7 +61,7 @@
         "Accept":"*/*"
       },
       "uri":"/?keyI=value&keyII=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{
       "headers":{

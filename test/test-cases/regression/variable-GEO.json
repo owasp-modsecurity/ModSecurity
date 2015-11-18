@@ -18,7 +18,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -61,7 +61,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -104,7 +104,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -147,7 +147,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -190,7 +190,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -233,7 +233,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -276,7 +276,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -319,7 +319,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -362,7 +362,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -405,7 +405,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  
@@ -448,7 +448,7 @@
         "Accept":"*/*"
       },
       "uri":"/?key=value&key=other_value",
-      "protocol":"GET"
+      "method":"GET"
     },
     "response":{  
       "headers":{  

@@ -17,7 +17,7 @@
   "request": {
     "headers": "",
     "body": "",
-    "protocol": "GET",
+    "method": "GET",
     "http_version": 1.1
   },
   "response": {

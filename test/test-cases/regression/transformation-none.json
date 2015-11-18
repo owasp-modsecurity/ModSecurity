@@ -27,7 +27,7 @@
         "Cache-Control": "no-cache"
       },
       "uri": "\/test.pl?param1=   test   &param2=test2",
-      "protocol": "GET",
+      "method": "GET",
       "http_version": 1.1,
       "body": ""
     },
@@ -87,7 +87,7 @@
         "Cache-Control": "no-cache"
       },
       "uri": "\/test.pl?param1=   test   &param2=test2",
-      "protocol": "GET",
+      "method": "GET",
       "http_version": 1.1,
       "body": ""
     },
