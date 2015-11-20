@@ -2,6 +2,7 @@
   {  
     "enabled":1,
     "version_min":300000,
+    "resource":"geoip",
     "title":"Testing Variables :: GEO:LONGITUDE",
     "client":{  
       "ip":"64.17.254.216",
@@ -45,6 +46,7 @@
   {  
     "enabled":1,
     "version_min":300000,
+    "resource":"geoip",
     "title":"Testing Variables :: GEO:COUNTRY_NAME",
     "client":{  
       "ip":"64.17.254.216",
@@ -88,6 +90,7 @@
   {  
     "enabled":1,
     "version_min":300000,
+    "resource":"geoip",
     "title":"Testing Variables :: GEO:LATITUDE",
     "client":{  
       "ip":"64.17.254.216",
@@ -131,6 +134,7 @@
   {  
     "enabled":1,
     "version_min":300000,
+    "resource":"geoip",
     "title":"Testing Variables :: GEO:COUNTRY_CODE3",
     "client":{  
       "ip":"64.17.254.216",
@@ -174,6 +178,7 @@
   {  
     "enabled":1,
     "version_min":300000,
+    "resource":"geoip",
     "title":"Testing Variables :: GEO:COUNTRY_CODE",
     "client":{  
       "ip":"64.17.254.216",
@@ -217,6 +222,7 @@
   {  
     "enabled":1,
     "version_min":300000,
+    "resource":"geoip",
     "title":"Testing Variables :: GEO:COUNTRY_CONTINENT",
     "client":{  
       "ip":"64.17.254.216",
@@ -260,6 +266,7 @@
   {  
     "enabled":1,
     "version_min":300000,
+    "resource":"geoip",
     "title":"Testing Variables :: GEO:AREA_CODE",
     "client":{  
       "ip":"64.17.254.216",
@@ -303,6 +310,7 @@
   {  
     "enabled":1,
     "version_min":300000,
+    "resource":"geoip",
     "title":"Testing Variables :: GEO:DMA_CODE",
     "client":{  
       "ip":"64.17.254.216",
@@ -346,6 +354,7 @@
   {  
     "enabled":1,
     "version_min":300000,
+    "resource":"geoip",
     "title":"Testing Variables :: GEO:POSTAL_CODE",
     "client":{  
       "ip":"64.17.254.216",
@@ -389,6 +398,7 @@
   {  
     "enabled":1,
     "version_min":300000,
+    "resource":"geoip",
     "title":"Testing Variables :: GEO:REGION",
     "client":{  
       "ip":"64.17.254.216",
@@ -432,6 +442,7 @@
   {  
     "enabled":1,
     "version_min":300000,
+    "resource":"geoip",
     "title":"Testing Variables :: GEO:CITY",
     "client":{  
       "ip":"64.17.254.216",

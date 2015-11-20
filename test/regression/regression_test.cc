@@ -104,6 +104,9 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
         if (strcmp(key, "url") == 0) {
            u->url = YAJL_GET_STRING(val);
         }
+        if (strcmp(key, "resource") == 0) {
+           u->resource = YAJL_GET_STRING(val);
+        }
         if (strcmp(key, "github_issue") == 0) {
             u->github_issue = YAJL_GET_INTEGER(val);
         }

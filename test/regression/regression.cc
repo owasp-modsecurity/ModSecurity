@@ -19,6 +19,7 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <algorithm>
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
@@ -41,6 +42,7 @@ using ModSecurity::Utils::SMatch;
 using ModSecurity::Utils::Regex;
 
 std::string default_test_path = "test-cases/regression";
+std::list<std::string> resources;
 
 void print_help() {
     std::cout << "Use ./regression-tests /path/to/file" << std::endl;
@@ -107,6 +109,24 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
             " (ModSecurity regression test utility)");
         modsec->setServerLogCb(logCb);
         modsec_rules = new ModSecurity::Rules(debug_log);
+
+        bool found = true;
+        if (t->resource.empty() == false) {
+            found = (std::find(resources.begin(), resources.end(), t->resource)
+                != resources.end());
+        }
+
+        if (!found) {
+            testRes->passed = false;
+            testRes->skipped = true;
+            testRes->reason << KCYN << "ModSecurity was not " << std::endl;
+            testRes->reason << KCYN << "compiled with support " << std::endl;
+            testRes->reason << KCYN << "to: " << t->resource << std::endl;
+            testRes->reason << RESET << std::endl;
+            std::cout << KCYN << "skipped!" << RESET << std::endl;
+            res->push_back(testRes);
+            continue;
+        }
 
         if (modsec_rules->load(t->rules.c_str(), filename) < 0) {
             if (t->parser_error.empty() == true) {
@@ -263,6 +283,10 @@ int main(int argc, char **argv) {
     ModSecurityTest<RegressionTest> test;
     ModSecurityTestResults<RegressionTest> results;
 
+#ifdef WITH_GEOIP
+    resources.push_back("geoip");
+#endif
+
 #ifdef NO_LOGS
     std::cout << "Test utility cannot work without logging support." \
         << std::endl;
@@ -300,10 +324,14 @@ int main(int argc, char **argv) {
 
     int passed = 0;
     int failed = 0;
+    int skipped = 0;
     for (RegressionTestResult *r : res) {
-        if (r->passed) {
+        if (r->skipped == true) {
+            skipped++;
+        }
+        if (r->passed == true && r->skipped == false) {
             passed++;
-        } else {
+        } else if (r->skipped == false) {
             std::cout << KRED << "Test failed." << RESET << KWHT << " From: " \
                 << RESET << r->test->filename << "." << std::endl;
             std::cout << KWHT << "Test name: " << RESET << r->test->name \
@@ -317,9 +345,16 @@ int main(int argc, char **argv) {
     std::cout << "Ran a total of: " << std::to_string(failed + passed) \
         << " regression tests - ";
     if (failed == 0) {
-        std::cout << KGRN << "All tests passed" << RESET << std::endl;
+        std::cout << KGRN << "All tests passed." << RESET;
     } else {
-        std::cout << KRED << failed << " failed." << RESET << std::endl;
+        std::cout << KRED << failed << " failed." << RESET;
+    }
+
+    if (skipped > 0) {
+        std::cout << KCYN << " " << std::to_string(skipped) << " ";
+        std::cout << "skipped tests." << RESET << std::endl;
+    } else {
+        std::cout << std::endl;
     }
 
     for (std::pair<std::string, std::vector<RegressionTest *> *> a : test) {

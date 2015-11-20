@@ -62,6 +62,7 @@ class RegressionTest {
     std::string method;
     std::string httpVersion;
     std::string uri;
+    std::string resource;
 
     static inline std::string yajl_array_to_str(const yajl_val &node);
     static inline std::vector<std::string> yajl_array_to_vec_str(
@@ -76,7 +77,13 @@ class RegressionTest {
 
 class RegressionTestResult {
  public:
+    RegressionTestResult() :
+      passed(false),
+      skipped(false),
+      test(NULL) { }
+
     bool passed;
+    bool skipped;
     RegressionTest *test;
     std::stringstream reason;
 };
