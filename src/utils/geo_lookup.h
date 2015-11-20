@@ -18,7 +18,9 @@
 #include <string>
 #include <functional>
 
+#ifdef WITH_GEOIP  // WITH_GEOIP
 #include <GeoIPCity.h>
+#endif
 
 #ifndef SRC_UTILS_GEO_LOOKUP_H_
 #define SRC_UTILS_GEO_LOOKUP_H_
@@ -35,11 +37,12 @@ class GeoLookup {
         static GeoLookup instance;
         return instance;
     }
-
+#ifdef WITH_GEOIP
     bool setDataBase(const std::string& filePath);
     bool lookup(const std::string& target, GeoIPRecord **georec,
         std::function<bool(int, std::string)> callback);
     void cleanUp();
+#endif  // WITH_GEOIP
 
  private:
     GeoLookup()
@@ -47,8 +50,11 @@ class GeoLookup {
     ~GeoLookup();
     GeoLookup(GeoLookup const&);
     void operator=(GeoLookup const&);
-
+#ifdef WITH_GEOIP
     GeoIP *m_gi;
+#else  // WITH_GEOIP
+    void *m_gi;
+#endif  // WITH_GEOIP
 };
 
 

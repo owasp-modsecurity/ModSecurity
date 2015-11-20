@@ -15,7 +15,9 @@
 
 #include "operators/geo_lookup.h"
 
+#ifdef WITH_GEOIP
 #include <GeoIPCity.h>
+#endif
 
 #include <string>
 #include <functional>
@@ -31,9 +33,10 @@ namespace operators {
 bool GeoLookup::evaluate(Assay *assay, const std::string &exp) {
     using std::placeholders::_1;
     using std::placeholders::_2;
-
-    GeoIPRecord *gir;
     bool ret = true;
+
+#ifdef WITH_GEOIP
+    GeoIPRecord *gir;
 
     if (assay) {
         ret = Utils::GeoLookup::getInstance().lookup(exp, &gir,
@@ -85,6 +88,7 @@ bool GeoLookup::evaluate(Assay *assay, const std::string &exp) {
 
         GeoIPRecord_delete(gir);
     }
+#endif  // WITH_GEOIP
 
     return ret;
 }

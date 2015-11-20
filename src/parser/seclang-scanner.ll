@@ -103,8 +103,8 @@ DICT_ELEMENT    [^ \t|]+
 
 OPERATOR        (?i:(?:@inspectFile|@fuzzyHash|@validateByteRange|@validateDTD|@validateHash|@validateSchema|@verifyCC|@verifyCPF|@verifySSN|@gsbLookup|@rsub)|(?:\!{0,1})(?:@within|@containsWord|@contains|@endsWith|@eq|@ge|@gt|@ipMatchF|@ipMatch|@ipMatchFromFile|@le|@lt|@pmf|@pm|@pmFromFile|@rbl|@rx|@streq|@strmatch|@beginsWith))
 
-OPERATORNOARG	(?i:@detectSQLi|@detectXSS|@geoLookup|@validateUrlEncoding|@validateUtf8Encoding)
-
+OPERATORNOARG	(?i:@detectSQLi|@detectXSS|@validateUrlEncoding|@validateUtf8Encoding)
+OPERATOR_GEOIP  (?i:@geoLookup)
 
 TRANSFORMATION  t:(sha1|hexEncode|lowercase|urlDecodeUni|urlDecode|none|compressWhitespace|removeWhitespace|replaceNulls|removeNulls|htmlEntityDecode|jsDecode|cssDecode|trim|normalizePathWin|normalisePath|length|utf8toUnicode|urldecode|removeComments|replaceComments)
 
@@ -281,7 +281,8 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 <EXPECTING_OPERATOR>{
 {SOMETHING}           { BEGIN(INITIAL); return yy::seclang_parser::make_FREE_TEXT(yytext, *driver.loc.back()); }
 ["]{OPERATOR}[ ]{FREE_TEXT}["]  { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
-["]{OPERATORNOARG}[\t ]*["]           { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
+["]{OPERATORNOARG}[\t ]*["]     { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
+["]{OPERATOR_GEOIP}[\t ]*["]    { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR_GEOIP(yytext, *driver.loc.back()); }
 }
 
 {ACTION}                        { return yy::seclang_parser::make_ACTION(yytext, *driver.loc.back()); }

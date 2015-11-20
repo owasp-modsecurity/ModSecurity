@@ -220,6 +220,7 @@ using ModSecurity::Variables::Tx;
 %token <std::string> CONFIG_DIR_GEO_DB
 
 %token <std::string> OPERATOR
+%token <std::string> OPERATOR_GEOIP
 %token <std::string> FREE_TEXT
 %token <std::string> ACTION
 %token <std::string> ACTION_ACCURACY
@@ -360,6 +361,23 @@ op:
             YYERROR;
         }
         $$ = op;
+      }
+    | OPERATOR_GEOIP
+      {
+#ifdef WITH_GEOIP
+        Operator *op = Operator::instantiate($1);
+        const char *error = NULL;
+        if (op->init(driver.ref.back(), &error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
+        $$ = op;
+#else
+        std::stringstream ss;
+            ss << "This version of ModSecurity was not compiled with GeoIP support.";
+            driver.error(@0, ss.str());
+            YYERROR;
+#endif  // WITH_GEOIP
       }
     | FREE_TEXT
       {
@@ -521,6 +539,7 @@ expression:
     /* Debug log: end */
     | CONFIG_DIR_GEO_DB
       {
+#ifdef WITH_GEOIP
         std::string file = ModSecurity::find_resource($1, driver.ref.back());
         if (GeoLookup::getInstance().setDataBase(file) == false) {
             std::stringstream ss;
@@ -529,6 +548,12 @@ expression:
             driver.error(@0, ss.str());
             YYERROR;
         }
+#else
+        std::stringstream ss;
+        ss << "This version of ModSecurity was not compiled with GeoIP support.";
+        driver.error(@0, ss.str());
+        YYERROR;
+#endif  // WITH_GEOIP
       }
     /* Body limits */
     | CONFIG_DIR_REQ_BODY_LIMIT

@@ -31,8 +31,12 @@ namespace Utils {
 
 
 GeoLookup::~GeoLookup() {
+#ifdef WITH_GEOIP
     cleanUp();
+#endif  // WITH_GEOIP
 }
+
+#ifdef WITH_GEOIP
 
 void GeoLookup::cleanUp() {
     if (m_gi != NULL) {
@@ -41,10 +45,8 @@ void GeoLookup::cleanUp() {
     }
 }
 
-
 bool GeoLookup::setDataBase(const std::string& filePath) {
     m_gi = GeoIP_open(filePath.c_str(), GEOIP_INDEX_CACHE);
-
     if (m_gi == NULL) {
         return false;
     }
@@ -70,6 +72,8 @@ bool GeoLookup::lookup(const std::string& target, GeoIPRecord **gir,
 
     return true;
 }
+
+#endif  // WITH_GEOIP
 
 
 }  // namespace Utils
