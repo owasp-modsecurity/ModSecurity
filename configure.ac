@@ -1,6 +1,11 @@
 # ModSecurity configure.ac
 
 
+# Get the hash of the last commit, to be used if it is not an
+# official release.
+AC_DEFUN([MSC_GIT_HASH], m4_esyscmd_s(git log -1 --format="%h" --abbrev-commit))
+
+
 # Version definition to be further used by AC_INIT and 
 # .so file naming.
 m4_define([msc_version_major], [3])
@@ -9,6 +14,9 @@ m4_define([msc_version_patchlevel], [0])
 
 m4_define([msc_version],
     [msc_version_major.msc_version_minor])
+
+m4_define([msc_version_git],
+    [msc_version_major.msc_version_minor.msc_version_patchlevel+MSC_GIT_HASH])
 
 m4_define([msc_version_info],
     [msc_version_major:msc_version_minor:msc_version_patchlevel])
@@ -62,10 +70,10 @@ PROG_YAJL
 
 AM_CONDITIONAL([YAJL_VERSION], [test "$YAJL_VERSION" != ""])
 
-# Check for libgeoip
+# Check for LibGeoIP
 PROG_GEOIP
+AM_CONDITIONAL([GEOIP_CFLAGS], [test "GEOIP_CFLAGS" != ""])
 
-AM_CONDITIONAL([GEOIP_VERSION], [test "$GEOIP_VERSION" != ""])
 
 #
 # Check for curl
@@ -151,6 +159,12 @@ AC_SUBST([MSC_BASE_DIR])
 MSC_VERSION_INFO=msc_version_info
 AC_SUBST([MSC_VERSION_INFO])
 
+MSC_VERSION=msc_version
+AC_SUBST([MSC_VERSION])
+
+MSC_GIT_VERSION=msc_version_git
+AC_SUBST([MSC_GIT_VERSION])
+
 
 # MODSEC_NO_LOGS="-DNO_LOGS=1"
 # AC_SUBST(MODSEC_NO_LOGS)
@@ -182,7 +196,29 @@ DX_PS_FEATURE(OFF)
 
 DX_INIT_DOXYGEN([ModSecurity],[doc/doxygen.cfg])
 
-
 # Generate the files.
 AC_OUTPUT
 
+
+# Print a fancy summary
+echo " "
+echo " "
+echo "ModSecurity - v${MSC_GIT_VERSION}"
+echo " "
+echo " Optional dependencies"
+if test "x$GEOIP_FOUND" = "x0"; then
+    echo "   + GeoIP                                         ....not found"
+fi
+if test "x$GEOIP_FOUND" = "x1"; then
+    echo -n "   + GeoIP                                         ....found "
+    if ! test "x$GEOIP_VERSION" = "x"; then
+        echo "v${GEOIP_VERSION}"
+    else
+        echo ""
+    fi
+    echo "      ${GEOIP_DISPLAY}"
+fi
+if test "x$GEOIP_FOUND" = "x2"; then
+    echo "   + GeoIP                                         ....disabled"
+fi
+echo " "
