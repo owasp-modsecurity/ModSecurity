@@ -285,7 +285,32 @@ int Assay::processURI(const char *uri, const char *protocol,
     m_collections.store("REQUEST_METHOD", protocol);
     m_collections.store("REQUEST_PROTOCOL",
         "HTTP/" + std::string(http_version));
-    m_collections.store("REQUEST_URI", uri);
+
+std::string parsedURI = uri;
+    // The more popular case is without domain
+    if (m_uri_decoded.at(1) != '/'){
+        bool fullDomain = true;
+        size_t scheme = m_uri_decoded.find(":")+1;
+        if(scheme==std::string::npos){
+            fullDomain = false;
+        }
+        // Searching with a pos of -1 is undefined we also shortcut
+        if(scheme != std::string::npos and fullDomain == true){
+            // Assuming we found a colon make sure its followed
+            size_t netloc = m_uri_decoded.find("//",scheme)+2;
+            if(netloc==std::string::npos or (netloc != scheme+2)){
+                fullDomain = false;
+            }
+            if(netloc != std::string::npos and fullDomain == true){
+                size_t path = m_uri_decoded.find("/",netloc);
+                if(path != std::string::npos and fullDomain == true){
+                    parsedURI = m_uri_decoded.substr(path);
+                }
+            }
+        }
+    }
+
+    m_collections.store("REQUEST_URI", parsedURI);
     m_collections.store("REQUEST_URI_RAW", uri);
 
     if (pos != std::string::npos && (m_uri_decoded.length() - pos) > 2) {
