@@ -15,8 +15,10 @@
 
 #include "modsecurity/assay.h"
 
+#ifdef WITH_YAJL
 #include <yajl/yajl_tree.h>
 #include <yajl/yajl_gen.h>
+#endif
 #include <stdio.h>
 #include <string.h>
 
@@ -1331,6 +1333,7 @@ std::string Assay::toOldAuditLogFormat(int parts, const std::string &trailer) {
 
 
 std::string Assay::to_json(int parts) {
+#ifdef WITH_YAJL
     const unsigned char *buf;
     size_t len;
     yajl_gen g = NULL;
@@ -1477,6 +1480,9 @@ std::string Assay::to_json(int parts) {
     yajl_gen_free(g);
 
     return log;
+#else
+    return std::string("");
+#endif
 }
 
 

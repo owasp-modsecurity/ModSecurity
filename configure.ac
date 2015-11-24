@@ -190,6 +190,7 @@ AC_SUBST([MSC_GIT_VERSION])
 
 
 # Files to be generated via autotools.
+AM_CONDITIONAL([WITH_YAJL], [test "$want_test" = yes])
 AC_CONFIG_FILES([\
     Makefile \
     doc/Makefile \
@@ -266,6 +267,24 @@ if test "x$CURL_FOUND" = "x1"; then
 fi
 if test "x$CURL_FOUND" = "x2"; then
     echo "   + LibCURL                                       ....disabled"
+fi
+
+
+## YAJL
+if test "x$YAJL_FOUND" = "x0"; then
+    echo "   + YAJL                                          ....not found"
+fi
+if test "x$YAJL_FOUND" = "x1"; then
+    echo -n "   + YAJL                                          ....found "
+    if ! test "x$YAJL_VERSION" = "x"; then
+        echo "v${YAJL_VERSION}"
+    else
+        echo ""
+    fi
+    echo "      ${YAJL_DISPLAY}"
+fi
+if test "x$YAJL_FOUND" = "x2"; then
+    echo "   + YAJL                                          ....disabled"
 fi
 
 echo " "

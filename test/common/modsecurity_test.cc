@@ -15,7 +15,9 @@
 
 #include "common/modsecurity_test.h"
 
+#ifdef WITH_YAJL
 #include <yajl/yajl_tree.h>
+#endif
 #include <dirent.h>
 #include <string.h>
 #include <sys/stat.h>
