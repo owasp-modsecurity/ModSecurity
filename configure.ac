@@ -232,6 +232,8 @@ echo SECLANG_TEST_VERSION
 
 echo " "
 echo " Optional dependencies"
+
+## GeoIP
 if test "x$GEOIP_FOUND" = "x0"; then
     echo "   + GeoIP                                         ....not found"
 fi
@@ -247,4 +249,23 @@ fi
 if test "x$GEOIP_FOUND" = "x2"; then
     echo "   + GeoIP                                         ....disabled"
 fi
+
+
+## LibCurl
+if test "x$CURL_FOUND" = "x0"; then
+    echo "   + LibCURL                                       ....not found"
+fi
+if test "x$CURL_FOUND" = "x1"; then
+    echo -n "   + LibCURL                                       ....found "
+    if ! test "x$CURL_VERSION" = "x"; then
+        echo "v${CURL_VERSION}"
+    else
+        echo ""
+    fi
+    echo "      ${CURL_DISPLAY}"
+fi
+if test "x$CURL_FOUND" = "x2"; then
+    echo "   + LibCURL                                       ....disabled"
+fi
+
 echo " "

@@ -12,8 +12,8 @@ CURL_LDFLAGS=""
 CURL_LDADD=""
 CURL_MIN_VERSION="7.15.1"
 
-AC_DEFUN([CHECK_CURL],
-[dnl
+AC_DEFUN([CHECK_CURL], [
+
 
 AC_ARG_WITH(
     curl,
@@ -100,11 +100,32 @@ AC_SUBST(CURL_LDFLAGS)
 AC_SUBST(CURL_LDADD)
 AC_SUBST(CURL_USES_GNUTLS)
 
-if test -z "${CURL_VERSION}"; then
-  AC_MSG_NOTICE([*** curl library not found.])
-  ifelse([$2], , AC_MSG_ERROR([curl library is required]), $2)
+if test "x${with_curl}" == "xno"; then
+    CURL_DISABLED=yes
 else
-  AC_MSG_NOTICE([using curl v${CURL_VERSION}])
-  ifelse([$1], , , $1) 
-fi 
+    if test "x${with_curl}" != "x"; then
+        CURL_MANDATORY=yes
+    fi
+fi
+
+if test -z "${CURL_VERSION}"; then
+    AC_MSG_NOTICE([*** curl library not found.])
+    if test -z "${CURL_MANDATORY}"; then
+        if test -z "${CURL_DISABLED}"; then
+            CURL_FOUND=0
+        else
+            CURL_FOUND=2
+        fi
+    else
+        AC_MSG_ERROR([Curl was explicitly referenced but it was not found])
+        CURL_FOUND=-1
+    fi
+else
+    CURL_FOUND=1
+    AC_MSG_NOTICE([using curl v${CURL_VERSION}])
+    CURL_DISPLAY="${CURL_LDADD}, ${CURL_CFLAGS}"
+fi
+
+AC_SUBST(CURL_FOUND)
+AC_SUBST(CURL_DISPLAY)
 ])
