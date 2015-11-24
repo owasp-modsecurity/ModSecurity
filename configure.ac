@@ -80,6 +80,8 @@ test "x$HAS_LIBINJECTION" = "x" && AC_MSG_ERROR([\
 # Libinjection version
 AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(PWD="others/libinjection" git describe))
 
+# SecLang test version
+AC_DEFUN([SECLANG_TEST_VERSION], m4_esyscmd_s(PWD="test/test-cases/secrules-language-tests" git log -1 --format="%h" --abbrev-commit))
 
 
 # Check for yajl
@@ -225,6 +227,9 @@ echo " "
 echo " Mandatory dependencies"
 echo -n "   + libInjection                                  ...."
 echo LIBINJECTION_VERSION
+echo -n "   + SecLang tests                                 ...."
+echo SECLANG_TEST_VERSION
+
 echo " "
 echo " Optional dependencies"
 if test "x$GEOIP_FOUND" = "x0"; then
