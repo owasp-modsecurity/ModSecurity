@@ -62,8 +62,25 @@ AX_CXX_COMPILE_STDCXX_11(,mandatory)
 
 # Check for libinjection
 AC_CHECK_FILE("others/libinjection/src/libinjection_html5.c", HAS_LIBINJECTION=1)
+test "x$HAS_LIBINJECTION" = "x" && AC_MSG_ERROR([\
 
-test "x$HAS_LIBINJECTION" = "x" && AC_MSG_ERROR([libinjection is needed to build ModSecurity, make sure you have downloaded all the git submodules])
+
+  libInjection was not found within ModSecurity source directory.
+
+  libInjection code is available as part of ModSecurity source code in a format
+  of a git-submodule. git-submodule allow us to specify the correct version of
+  libInjection and still uses the libInjection repository to download it.
+
+  You can download libInjection using git:
+
+     $ git submodule init
+     $ git submodule update
+
+   ])
+# Libinjection version
+AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(PWD="others/libinjection" git describe))
+
+
 
 # Check for yajl
 PROG_YAJL
@@ -204,6 +221,10 @@ AC_OUTPUT
 echo " "
 echo " "
 echo "ModSecurity - v${MSC_GIT_VERSION}"
+echo " "
+echo " Mandatory dependencies"
+echo -n "   + libInjection                                  ...."
+echo LIBINJECTION_VERSION
 echo " "
 echo " Optional dependencies"
 if test "x$GEOIP_FOUND" = "x0"; then
