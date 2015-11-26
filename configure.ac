@@ -185,12 +185,37 @@ MSC_GIT_VERSION=msc_version_git
 AC_SUBST([MSC_GIT_VERSION])
 
 
-# MODSEC_NO_LOGS="-DNO_LOGS=1"
-# AC_SUBST(MODSEC_NO_LOGS)
+AC_ARG_ENABLE(debug-logs,
+    [AC_HELP_STRING([--disable-debug-logs],[Turn off the SecDebugLog feature])],
 
+    [case "${enableval}" in
+        yes) debugLogs=true ;;
+        no)  debugLogs=false ;;
+        *) AC_MSG_ERROR(bad value ${enableval} for --enable-debug-logs) ;;
+    esac],
+
+    [debugLogs=true]
+    )
+if test "$debugLogs" != "true"; then
+    MODSEC_NO_LOGS="-DNO_LOGS=1"
+    AC_SUBST(MODSEC_NO_LOGS)
+fi
+
+
+# Decide if we want to build the tests or not.
+buildTestUtilities=false
+if test "x$YAJL_FOUND" = "x1"; then
+    # Regression tests will not be able to run without the logging support.
+    # But we still have the unit tests.
+    # if test "$debugLogs" = "true"; then
+        buildTestUtilities=true
+    # fi
+fi
+
+
+AM_CONDITIONAL([TEST_UTILITIES], [test $buildTestUtilities = true])
 
 # Files to be generated via autotools.
-AM_CONDITIONAL([WITH_YAJL], [test "$want_test" = yes])
 AC_CONFIG_FILES([\
     Makefile \
     doc/Makefile \
@@ -285,6 +310,23 @@ if test "x$YAJL_FOUND" = "x1"; then
 fi
 if test "x$YAJL_FOUND" = "x2"; then
     echo "   + YAJL                                          ....disabled"
+fi
+
+echo " "
+echo " Other Options"
+if test $buildTestUtilities = true; then
+    if test $debugLogs = true; then
+        echo "   + Test Utilities                                ....enabled"
+    else
+        echo "   + Test Utilities                                ....partially"
+    fi
+else
+    echo "   + Test Utilities                                ....disabled"
+fi
+if test $debugLogs = true; then
+    echo "   + SecDebugLog                                   ....enabled"
+else
+    echo "   + SecDebugLog                                   ....disabled"
 fi
 
 echo " "

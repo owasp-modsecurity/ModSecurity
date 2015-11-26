@@ -1,6 +1,4 @@
 
-ACLOCAL_AMFLAGS = -I build
-
 
 SUBDIRS = \
 	benchmark

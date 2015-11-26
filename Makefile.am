@@ -1,16 +1,13 @@
 
-ACLOCAL_AMFLAGS = -I build
-
-
-if WITH_YAJL
-	WITH_TESTS = tests
+if TEST_UTILITIES
+export MAYBE_TEST = test
 endif
 
 SUBDIRS = \
 	src \
 	doc \
 	examples \
-	$(WITH_TESTS)
+	$(MAYBE_TEST)
 
 
 # make clean
