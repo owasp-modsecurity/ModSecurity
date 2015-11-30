@@ -19,7 +19,7 @@
 
 #include "src/audit_log.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 
 std::string AuditLogWriter::file_name(const std::string& unique_id) {
     time_t timer;

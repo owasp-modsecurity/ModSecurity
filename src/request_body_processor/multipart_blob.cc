@@ -20,7 +20,7 @@
 #include <string>
 
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace RequestBodyProcessor {
 
 MultipartBlob::MultipartBlob(const std::string &blob, Multipart *parent)

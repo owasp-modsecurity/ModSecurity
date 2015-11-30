@@ -36,13 +36,13 @@ void print_help() {
 
 
 int main(int argc, char **argv) {
-    ModSecurity::Rules *modsecRules = new ModSecurity::Rules();
+    modsecurity::Rules *modsecRules = new modsecurity::Rules();
     std::vector<std::string> files;
     int total = 0;
 
     int i = 1;
     while (i < argc) {
-        std::vector<std::string> tfiles = ModSecurity::expandEnv(argv[i] , 0);
+        std::vector<std::string> tfiles = modsecurity::expandEnv(argv[i] , 0);
         for (const auto &file : tfiles) {
             files.insert(files.begin(), file);
         }
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
     std::cout << "Rules optimization" << std::endl;
     std::cout << std::endl;
 
-    int nphases = ModSecurity::ModSecurity::Phases::NUMBER_OF_PHASES;
+    int nphases = modsecurity::ModSecurity::Phases::NUMBER_OF_PHASES;
     for (int i = 0; i < nphases; i++) {
         std::vector<Rule *> rules = modsecRules->rules[i];
         if (rules.size() == 0) {

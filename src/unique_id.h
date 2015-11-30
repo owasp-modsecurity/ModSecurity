@@ -23,7 +23,7 @@
 
 #ifdef __cplusplus
 
-namespace ModSecurity {
+namespace modsecurity {
 
 #define MAC_ADDRESS_SIZE 19
 #define MAX_MACHINE_NAME_SIZE 256

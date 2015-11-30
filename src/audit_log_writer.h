@@ -25,7 +25,7 @@
 
 #ifdef __cplusplus
 
-namespace ModSecurity {
+namespace modsecurity {
 class AuditLog;
 
 /** @ingroup ModSecurity_CPP_API */

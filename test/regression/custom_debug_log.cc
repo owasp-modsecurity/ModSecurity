@@ -34,10 +34,10 @@ void CustomDebugLog::write(int level, const std::string& message) {
 
 
 bool CustomDebugLog::contains(const std::string& pattern) {
-    ModSecurity::Utils::Regex re(pattern);
-    ModSecurity::Utils::SMatch match;
+    modsecurity::Utils::Regex re(pattern);
+    modsecurity::Utils::SMatch match;
     std::string s = m_log.str();
-    return ModSecurity::Utils::regex_search(s, re);
+    return modsecurity::Utils::regex_search(s, re);
 }
 
 std::string CustomDebugLog::log_messages() {

@@ -17,7 +17,7 @@
 
 #include <string>
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 bool NoMatch::evaluate(Assay *assay, const std::string &str) {

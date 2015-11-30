@@ -21,7 +21,7 @@
 
 #include "request_body_processor/multipart_blob.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace RequestBodyProcessor {
 
 Multipart::Multipart(std:: string header, Assay *assay)

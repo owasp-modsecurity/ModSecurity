@@ -22,7 +22,7 @@
 #ifndef SRC_VARIABLES_VARIABLE_H_
 #define SRC_VARIABLES_VARIABLE_H_
 
-namespace ModSecurity {
+namespace modsecurity {
 
 class Assay;
 namespace Variables {

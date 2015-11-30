@@ -20,7 +20,7 @@
 
 #include "modsecurity/assay.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 bool NoAuditLog::evaluate(Rule *rule, Assay *assay) {

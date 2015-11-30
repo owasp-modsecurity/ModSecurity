@@ -20,7 +20,7 @@
 
 #include "modsecurity/assay.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 bool Log::evaluate(Rule *rule, Assay *assay) {

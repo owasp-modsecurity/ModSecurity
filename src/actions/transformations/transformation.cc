@@ -61,7 +61,7 @@
     if (a.compare(2, std::strlen(#b), #b) == 0)
 
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 namespace transformations {
 

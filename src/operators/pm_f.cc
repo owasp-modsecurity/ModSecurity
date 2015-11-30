@@ -19,7 +19,7 @@
 
 #include "operators/pm_from_file.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 

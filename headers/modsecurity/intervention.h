@@ -17,7 +17,7 @@
 #define HEADERS_MODSECURITY_INTERVENTION_H_
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 #endif
 
 typedef struct ModSecurityIntervention_t {

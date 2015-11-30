@@ -21,7 +21,7 @@
 #include "operators/pm_from_file.h"
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 

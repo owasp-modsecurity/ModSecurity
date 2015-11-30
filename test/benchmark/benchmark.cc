@@ -22,7 +22,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
 
-using ModSecurity::Assay;
+using modsecurity::Assay;
 
 char request_header[] =  "" \
     "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\n\r" \
@@ -70,15 +70,15 @@ char rules_file[] = "basic_rules.conf";
 
 int main(int argc, char *argv[]) {
     int i = 0;
-    ModSecurity::ModSecurity *modsec;
-    ModSecurity::Rules *rules;
-    ModSecurity::ModSecurityIntervention it;
+    modsecurity::ModSecurity *modsec;
+    modsecurity::Rules *rules;
+    modsecurity::ModSecurityIntervention it;
 
-    modsec = new ModSecurity::ModSecurity();
+    modsec = new modsecurity::ModSecurity();
     modsec->setConnectorInformation("ModSecurity-benchmark v0.0.1-alpha" \
             " (ModSecurity benchmark utility)");
 
-    rules = new ModSecurity::Rules();
+    rules = new modsecurity::Rules();
     if (rules->loadFromUri(rules_file) < 0) {
         std::cout << "Problems loading the rules..." << std::endl;
         std::cout << rules->parserError.str() << std::endl;

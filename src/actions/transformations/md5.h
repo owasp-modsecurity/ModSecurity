@@ -22,7 +22,7 @@
 #define SRC_ACTIONS_TRANSFORMATIONS_MD5_H_
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 class Assay;
 
 namespace actions {

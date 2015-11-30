@@ -22,7 +22,7 @@
 #include "utils/ip_tree.h"
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 class IpMatch : public Operator {

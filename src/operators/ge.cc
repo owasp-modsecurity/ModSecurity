@@ -20,7 +20,7 @@
 #include "operators/operator.h"
 #include "src/macro_expansion.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 bool Ge::evaluate(Assay *assay, const std::string &input) {

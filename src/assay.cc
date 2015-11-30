@@ -40,10 +40,10 @@
 #include "src/unique_id.h"
 #include "request_body_processor/multipart.h"
 
-using ModSecurity::actions::Action;
-using ModSecurity::RequestBodyProcessor::Multipart;
+using modsecurity::actions::Action;
+using modsecurity::RequestBodyProcessor::Multipart;
 
-namespace ModSecurity {
+namespace modsecurity {
 
 /**
  * @name    Assay
@@ -1442,7 +1442,7 @@ std::string Assay::to_json(int parts) {
         yajl_gen_map_open(g);
 
         /* producer > libmodsecurity */
-        LOGFY_ADD("modsecurity", ModSecurity::whoAmI().c_str());
+        LOGFY_ADD("modsecurity", modsecurity::whoAmI().c_str());
 
         /* producer > connector */
         LOGFY_ADD("connector", m_ms->getConnectorInformation().c_str());

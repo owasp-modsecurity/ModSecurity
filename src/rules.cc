@@ -27,10 +27,10 @@
 #include "parser/driver.h"
 #include "utils/https_client.h"
 
-using ModSecurity::Parser::Driver;
-using ModSecurity::Utils::HttpsClient;
+using modsecurity::Parser::Driver;
+using modsecurity::Utils::HttpsClient;
 
-namespace ModSecurity {
+namespace modsecurity {
 
 
 /**

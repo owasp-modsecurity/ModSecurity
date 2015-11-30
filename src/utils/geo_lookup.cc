@@ -26,7 +26,7 @@
 
 #include <GeoIPCity.h>
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Utils {
 
 

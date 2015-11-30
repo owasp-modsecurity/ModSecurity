@@ -23,7 +23,7 @@
 #include "utils/acmp.h"
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 

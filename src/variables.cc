@@ -26,7 +26,7 @@
 #include "modsecurity/transaction/variable.h"
 #include "src/utils.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace transaction {
 
 

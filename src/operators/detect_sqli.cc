@@ -21,7 +21,7 @@
 #include "operators/operator.h"
 #include "others/libinjection/src/libinjection.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 

@@ -37,9 +37,9 @@ using modsecurity_test::ModSecurityTestResults;
 using modsecurity_test::RegressionTest;
 using modsecurity_test::RegressionTestResult;
 
-using ModSecurity::Utils::regex_search;
-using ModSecurity::Utils::SMatch;
-using ModSecurity::Utils::Regex;
+using modsecurity::Utils::regex_search;
+using modsecurity::Utils::SMatch;
+using modsecurity::Utils::Regex;
 
 std::string default_test_path = "test-cases/regression";
 std::list<std::string> resources;
@@ -52,9 +52,9 @@ void print_help() {
 
 
 void actions(ModSecurityTestResults<RegressionTest> *r,
-    ModSecurity::Assay *a) {
-    ModSecurity::ModSecurityIntervention it;
-    memset(&it, '\0', sizeof(ModSecurity::ModSecurityIntervention));
+    modsecurity::Assay *a) {
+    modsecurity::ModSecurityIntervention it;
+    memset(&it, '\0', sizeof(modsecurity::ModSecurityIntervention));
     it.status = 200;
     if (a->intervention(&it) == true) {
         if (it.pause != 0) {
@@ -81,9 +81,9 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
 
     for (RegressionTest *t : *tests) {
         CustomDebugLog *debug_log = new CustomDebugLog();
-        ModSecurity::ModSecurity *modsec = NULL;
-        ModSecurity::Rules *modsec_rules = NULL;
-        ModSecurity::Assay *modsec_assay = NULL;
+        modsecurity::ModSecurity *modsec = NULL;
+        modsecurity::Rules *modsec_rules = NULL;
+        modsecurity::Assay *modsec_assay = NULL;
         ModSecurityTestResults<RegressionTest> r;
         std::stringstream serverLog;
         RegressionTestResult *testRes = new RegressionTestResult();
@@ -104,11 +104,11 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         std::cout << std::setw(50) << std::left << filename;
         std::cout << std::setw(70) << std::left << t->name;
 
-        modsec = new ModSecurity::ModSecurity();
+        modsec = new modsecurity::ModSecurity();
         modsec->setConnectorInformation("ModSecurity-regression v0.0.1-alpha" \
             " (ModSecurity regression test utility)");
         modsec->setServerLogCb(logCb);
-        modsec_rules = new ModSecurity::Rules(debug_log);
+        modsec_rules = new modsecurity::Rules(debug_log);
 
         bool found = true;
         if (t->resource.empty() == false) {
@@ -170,7 +170,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
             }
         }
 
-        modsec_assay = new ModSecurity::Assay(modsec, modsec_rules,
+        modsec_assay = new modsecurity::Assay(modsec, modsec_rules,
             &serverLog);
 
         modsec_assay->processConnection(t->clientIp.c_str(),

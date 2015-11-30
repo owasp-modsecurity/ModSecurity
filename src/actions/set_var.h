@@ -20,7 +20,7 @@
 #ifndef SRC_ACTIONS_SET_VAR_H_
 #define SRC_ACTIONS_SET_VAR_H_
 
-namespace ModSecurity {
+namespace modsecurity {
 class Assay;
 class Rule;
 
@@ -33,7 +33,7 @@ class SetVar : public Action {
 
     bool evaluate(Rule *rule, Assay *assay) override;
     void dump();
-    bool init(std::string *error);
+    bool init(std::string *error) override;
 
     std::string collectionName;
     std::string variableName;

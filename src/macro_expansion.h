@@ -24,7 +24,7 @@
 #ifndef SRC_MACRO_EXPANSION_H_
 #define SRC_MACRO_EXPANSION_H_
 
-namespace ModSecurity {
+namespace modsecurity {
 
 
 class MacroExpansion {

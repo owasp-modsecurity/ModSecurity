@@ -27,7 +27,7 @@ typedef struct DebugLog_t DebugLog;
 
 #ifdef __cplusplus
 
-namespace ModSecurity {
+namespace modsecurity {
 
 /** @ingroup ModSecurity_CPP_API */
 class DebugLog {

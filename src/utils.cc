@@ -43,7 +43,7 @@
 
 #include "modsecurity/modsecurity.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 
 std::string phase_name(int x) {
     switch (x) {

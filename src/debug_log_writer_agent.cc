@@ -22,7 +22,7 @@
 #include "src/debug_log_writer.h"
 
 
-namespace ModSecurity {
+namespace modsecurity {
 
 
 DebugLogWriterAgent::DebugLogWriterAgent(const std::string& fileName) :

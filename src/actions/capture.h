@@ -21,7 +21,7 @@
 #define SRC_ACTIONS_CAPTURE_H_
 
 
-namespace ModSecurity {
+namespace modsecurity {
 class Rule;
 namespace actions {
 

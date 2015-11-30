@@ -19,7 +19,7 @@
 
 #include "src/audit_log.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 
 // static std::mutex serialLoggingMutex;
 

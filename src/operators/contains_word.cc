@@ -20,7 +20,7 @@
 #include "operators/operator.h"
 #include "src/macro_expansion.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 bool ContainsWord::acceptableChar(const std::string& a, size_t pos) {

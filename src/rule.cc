@@ -33,9 +33,9 @@
 #include "modsecurity/rules.h"
 #include "src/macro_expansion.h"
 
-using ModSecurity::Variables::Variations::Exclusion;
+using modsecurity::Variables::Variations::Exclusion;
 
-namespace ModSecurity {
+namespace modsecurity {
 
 using operators::Operator;
 using actions::Action;

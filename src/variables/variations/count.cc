@@ -24,7 +24,7 @@
 #include "modsecurity/assay.h"
 #include "src/utils.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Variables {
 namespace Variations {
 

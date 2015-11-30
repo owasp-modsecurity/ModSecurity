@@ -28,7 +28,7 @@
 #define UNICODE_ERROR_DECODING_ERROR        -5
 
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 class ValidateUtf8Encoding : public Operator {

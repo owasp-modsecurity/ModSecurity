@@ -21,7 +21,7 @@
 #include "modsecurity/assay.h"
 #include "src/macro_expansion.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 Redirect::~Redirect() {

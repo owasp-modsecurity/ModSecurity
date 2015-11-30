@@ -23,7 +23,7 @@
 
 #include "modsecurity/assay.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Variables {
 
 void HighestSeverity::evaluateInternal(Assay *assay,

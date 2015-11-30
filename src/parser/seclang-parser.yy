@@ -4,7 +4,7 @@
 %define parser_class_name {seclang_parser}
 %define api.token.constructor
 %define api.value.type variant
-//%define api.namespace {ModSecurity::yy}
+//%define api.namespace {modsecurity::yy}
 %define parse.assert
 %code requires
 {
@@ -55,41 +55,41 @@ class Driver;
 #include "variables/time_year.h"
 #include "variables/tx.h"
 
-using ModSecurity::ModSecurity;
+using modsecurity::ModSecurity;
 
-using ModSecurity::actions::Action;
-using ModSecurity::actions::CtlAuditLogParts;
-using ModSecurity::actions::SetVar;
-using ModSecurity::actions::Severity;
-using ModSecurity::actions::Tag;
-using ModSecurity::actions::Redirect;
-using ModSecurity::actions::Rev;
-using ModSecurity::actions::Msg;
-using ModSecurity::actions::Phase;
-using ModSecurity::actions::transformations::None;
-using ModSecurity::actions::LogData;
-using ModSecurity::actions::transformations::Transformation;
-using ModSecurity::operators::Operator;
-using ModSecurity::Rule;
-using ModSecurity::Utils::GeoLookup;
+using modsecurity::actions::Action;
+using modsecurity::actions::CtlAuditLogParts;
+using modsecurity::actions::SetVar;
+using modsecurity::actions::Severity;
+using modsecurity::actions::Tag;
+using modsecurity::actions::Redirect;
+using modsecurity::actions::Rev;
+using modsecurity::actions::Msg;
+using modsecurity::actions::Phase;
+using modsecurity::actions::transformations::None;
+using modsecurity::actions::LogData;
+using modsecurity::actions::transformations::Transformation;
+using modsecurity::operators::Operator;
+using modsecurity::Rule;
+using modsecurity::Utils::GeoLookup;
 
-using ModSecurity::Variables::Variations::Count;
-using ModSecurity::Variables::Variations::Exclusion;
-using ModSecurity::Variables::Duration;
-using ModSecurity::Variables::Env;
-using ModSecurity::Variables::HighestSeverity;
-using ModSecurity::Variables::ModsecBuild;
-using ModSecurity::Variables::Time;
-using ModSecurity::Variables::TimeDay;
-using ModSecurity::Variables::TimeEpoch;
-using ModSecurity::Variables::TimeHour;
-using ModSecurity::Variables::TimeMin;
-using ModSecurity::Variables::TimeMon;
-using ModSecurity::Variables::TimeSec;
-using ModSecurity::Variables::TimeWDay;
-using ModSecurity::Variables::TimeYear;
-using ModSecurity::Variables::Variable;
-using ModSecurity::Variables::Tx;
+using modsecurity::Variables::Variations::Count;
+using modsecurity::Variables::Variations::Exclusion;
+using modsecurity::Variables::Duration;
+using modsecurity::Variables::Env;
+using modsecurity::Variables::HighestSeverity;
+using modsecurity::Variables::ModsecBuild;
+using modsecurity::Variables::Time;
+using modsecurity::Variables::TimeDay;
+using modsecurity::Variables::TimeEpoch;
+using modsecurity::Variables::TimeHour;
+using modsecurity::Variables::TimeMin;
+using modsecurity::Variables::TimeMon;
+using modsecurity::Variables::TimeSec;
+using modsecurity::Variables::TimeWDay;
+using modsecurity::Variables::TimeYear;
+using modsecurity::Variables::Variable;
+using modsecurity::Variables::Tx;
 
 
 #define CHECK_VARIATION_DECL \
@@ -125,7 +125,7 @@ using ModSecurity::Variables::Tx;
 
 }
 // The parsing context.
-%param { ModSecurity::Parser::Driver& driver }
+%param { modsecurity::Parser::Driver& driver }
 %locations
 %initial-action
 {
@@ -285,15 +285,15 @@ audit_log:
     /* SecAuditEngine */
     | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_RELEVANT_ONLY
       {
-        driver.audit_log->setStatus(ModSecurity::AuditLog::RelevantOnlyAuditLogStatus);
+        driver.audit_log->setStatus(modsecurity::AuditLog::RelevantOnlyAuditLogStatus);
       }
     | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_OFF
       {
-        driver.audit_log->setStatus(ModSecurity::AuditLog::OffAuditLogStatus);
+        driver.audit_log->setStatus(modsecurity::AuditLog::OffAuditLogStatus);
       }
     | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_ON
       {
-        driver.audit_log->setStatus(ModSecurity::AuditLog::OnAuditLogStatus);
+        driver.audit_log->setStatus(modsecurity::AuditLog::OnAuditLogStatus);
       }
 
     /* SecAuditLogFileMode */
@@ -332,11 +332,11 @@ audit_log:
     /* SecAuditLogType */
     | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_SERIAL
       {
-        driver.audit_log->setType(ModSecurity::AuditLog::SerialAuditLogType);
+        driver.audit_log->setType(modsecurity::AuditLog::SerialAuditLogType);
       }
     | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_PARALLEL
       {
-        driver.audit_log->setType(ModSecurity::AuditLog::ParallelAuditLogType);
+        driver.audit_log->setType(modsecurity::AuditLog::ParallelAuditLogType);
       }
     ;
 
@@ -457,7 +457,7 @@ expression:
             }
         }
         if (definedPhase == -1) {
-            definedPhase = ModSecurity::ModSecurity::Phases::RequestHeadersPhase;
+            definedPhase = modsecurity::ModSecurity::Phases::RequestHeadersPhase;
         }
 
         if (!driver.defaultActions[definedPhase].empty()) {
@@ -481,15 +481,15 @@ expression:
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_OFF
       {
-        driver.secRuleEngine = ModSecurity::Rules::DisabledRuleEngine;
+        driver.secRuleEngine = modsecurity::Rules::DisabledRuleEngine;
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_ON
       {
-        driver.secRuleEngine = ModSecurity::Rules::EnabledRuleEngine;
+        driver.secRuleEngine = modsecurity::Rules::EnabledRuleEngine;
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_DETC
       {
-        driver.secRuleEngine = ModSecurity::Rules::DetectionOnlyRuleEngine;
+        driver.secRuleEngine = modsecurity::Rules::DetectionOnlyRuleEngine;
       }
     | CONFIG_DIR_REQ_BODY CONFIG_VALUE_ON
       {
@@ -540,7 +540,7 @@ expression:
     | CONFIG_DIR_GEO_DB
       {
 #ifdef WITH_GEOIP
-        std::string file = ModSecurity::find_resource($1, driver.ref.back());
+        std::string file = modsecurity::find_resource($1, driver.ref.back());
         if (GeoLookup::getInstance().setDataBase(file) == false) {
             std::stringstream ss;
             ss << "Failed to load the GeoDB from: ";
@@ -574,19 +574,19 @@ expression:
       }
     | CONFIG_DIR_REQ_BODY_LIMIT_ACTION CONFIG_VALUE_PROCESS_PARTIAL
       {
-        driver.requestBodyLimitAction = ModSecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
+        driver.requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
     | CONFIG_DIR_REQ_BODY_LIMIT_ACTION CONFIG_VALUE_REJECT
       {
-        driver.requestBodyLimitAction = ModSecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+        driver.requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
     | CONFIG_DIR_RES_BODY_LIMIT_ACTION CONFIG_VALUE_PROCESS_PARTIAL
       {
-        driver.responseBodyLimitAction = ModSecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
+        driver.responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
     | CONFIG_DIR_RES_BODY_LIMIT_ACTION CONFIG_VALUE_REJECT
       {
-        driver.responseBodyLimitAction = ModSecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+        driver.responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
     | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION CONFIG_VALUE_ABORT
       {
@@ -830,11 +830,11 @@ act:
       }
     | ACTION_SKIP_AFTER
       {
-        $$ = new ModSecurity::actions::SkipAfter($1);
+        $$ = new modsecurity::actions::SkipAfter($1);
       }
     | ACTION_AUDIT_LOG
       {
-        $$ = new ModSecurity::actions::AuditLog($1);
+        $$ = new modsecurity::actions::AuditLog($1);
       }
     | LOG_DATA
       {

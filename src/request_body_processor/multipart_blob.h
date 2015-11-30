@@ -21,7 +21,7 @@
 #ifndef SRC_REQUEST_BODY_PROCESSOR_MULTIPART_BLOB_H_
 #define SRC_REQUEST_BODY_PROCESSOR_MULTIPART_BLOB_H_
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace RequestBodyProcessor {
 
 class MultipartBlob {

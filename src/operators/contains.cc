@@ -19,7 +19,7 @@
 
 #include "src/macro_expansion.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 bool Contains::evaluate(Assay *assay, const std::string &input) {

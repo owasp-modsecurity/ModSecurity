@@ -22,7 +22,7 @@
 #define SRC_ACTIONS_TRANSFORMATIONS_PARITY_ZERO_7BIT_H_
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 class Assay;
 
 namespace actions {

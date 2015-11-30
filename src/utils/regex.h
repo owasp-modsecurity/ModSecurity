@@ -23,7 +23,7 @@
 #define SRC_UTILS_REGEX_H_
 
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Utils {
 
 #define OVECCOUNT 30

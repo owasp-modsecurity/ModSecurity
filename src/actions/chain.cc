@@ -21,7 +21,7 @@
 #include "modsecurity/assay.h"
 #include "src/rule.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 

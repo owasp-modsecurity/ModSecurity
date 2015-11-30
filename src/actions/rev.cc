@@ -24,7 +24,7 @@
 #include "src/rule.h"
 #include "src/macro_expansion.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 Rev::Rev(std::string action)

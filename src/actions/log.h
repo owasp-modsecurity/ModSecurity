@@ -22,7 +22,7 @@
 
 class Assay;
 
-namespace ModSecurity {
+namespace modsecurity {
 class Assay;
 namespace actions {
 

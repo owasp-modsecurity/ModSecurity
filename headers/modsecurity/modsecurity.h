@@ -85,7 +85,7 @@
 
 
 #ifndef __cplusplus
-typedef struct ModSecurity_t ModSecurity;
+typedef struct ModSecurity_t modsecurity;
 #endif
 
 
@@ -123,7 +123,7 @@ typedef struct ModSecurity_t ModSecurity;
 typedef void (*LogCb) (void *, const char *);
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 
 /* few forwarded declarations */
 namespace actions {

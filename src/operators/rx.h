@@ -23,7 +23,7 @@
 #include "utils/regex.h"
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 using Utils::SMatch;
 using Utils::regex_search;
 using Utils::Regex;

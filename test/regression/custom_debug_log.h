@@ -23,7 +23,7 @@
 
 namespace modsecurity_test {
 
-class CustomDebugLog : public ModSecurity::DebugLog {
+class CustomDebugLog : public modsecurity::DebugLog {
  public:
     CustomDebugLog *new_instance();
 

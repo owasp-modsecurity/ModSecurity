@@ -22,7 +22,7 @@
 #define SRC_ACTIONS_TRANSFORMATIONS_REMOVE_COMMENTS_CHAR_H_
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 class Assay;
 
 namespace actions {

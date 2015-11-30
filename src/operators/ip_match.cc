@@ -21,7 +21,7 @@
 #include "utils/msc_tree.h"
 #include "operators/operator.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 

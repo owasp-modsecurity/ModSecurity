@@ -33,8 +33,8 @@
 using modsecurity_test::UnitTest;
 using modsecurity_test::ModSecurityTest;
 using modsecurity_test::ModSecurityTestResults;
-using ModSecurity::actions::transformations::Transformation;
-using ModSecurity::operators::Operator;
+using modsecurity::actions::transformations::Transformation;
+using modsecurity::operators::Operator;
 
 std::string default_test_path = "test-cases/secrules-language-tests/operators";
 

@@ -22,7 +22,7 @@
 
 #ifdef __cplusplus
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 class VerifySSN : public Operator {

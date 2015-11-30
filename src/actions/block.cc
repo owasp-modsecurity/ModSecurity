@@ -22,7 +22,7 @@
 #include "src/rule.h"
 #include "modsecurity/intervention.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 Block::Block(std::string action)

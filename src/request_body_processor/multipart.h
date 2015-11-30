@@ -22,7 +22,7 @@
 
 #include "modsecurity/assay.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace RequestBodyProcessor {
 
 class Multipart {

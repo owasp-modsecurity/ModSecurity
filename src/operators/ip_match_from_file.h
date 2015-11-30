@@ -20,7 +20,7 @@
 #include "operators/ip_match.h"
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 class IpMatchFromFile : public IpMatch {

@@ -21,7 +21,7 @@
 #include "operators/operator.h"
 #include "src/macro_expansion.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 

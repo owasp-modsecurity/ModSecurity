@@ -24,7 +24,7 @@
 
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 class StrEq : public Operator {

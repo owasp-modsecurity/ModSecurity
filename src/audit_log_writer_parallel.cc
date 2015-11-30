@@ -29,7 +29,7 @@
 #include "src/utils.h"
 #include "utils/md5.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 
 
 AuditLogWriterParallel::~AuditLogWriterParallel() {

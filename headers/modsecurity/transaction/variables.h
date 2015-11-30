@@ -33,7 +33,7 @@ typedef struct Variable_t Variables;
 #endif
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 namespace transaction {
 
 class Variables :

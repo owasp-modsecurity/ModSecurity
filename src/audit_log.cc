@@ -37,7 +37,7 @@
           parts = parts & ~c; \
     }
 
-namespace ModSecurity {
+namespace modsecurity {
 
 AuditLog::AuditLog()
     : m_status(OffAuditLogStatus),

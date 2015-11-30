@@ -26,7 +26,7 @@
 #include "modsecurity/assay.h"
 #include "utils/msc_tree.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Utils {
 
 

@@ -30,7 +30,7 @@
 
 #ifdef __cplusplus
 
-namespace ModSecurity {
+namespace modsecurity {
 class Rule;
 class AuditLog;
 namespace actions {

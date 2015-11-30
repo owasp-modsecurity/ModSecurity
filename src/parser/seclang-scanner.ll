@@ -8,9 +8,9 @@
 #include "utils/https_client.h"
 #include "utils.h"
 
-using ModSecurity::Parser::Driver;
-using ModSecurity::Utils::HttpsClient;
-using ModSecurity::split;
+using modsecurity::Parser::Driver;
+using modsecurity::Utils::HttpsClient;
+using modsecurity::split;
 
 // Work around an incompatibility in flex (at least versions
 // 2.5.31 through 2.5.33): it generates code that does
@@ -386,8 +386,8 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 %{ /* Include external configurations */ %}
 {CONFIG_INCLUDE}[ ]{CONFIG_VALUE_PATH} {
     const char *file = strchr(yytext, ' ') + 1;
-    for (auto& s: ModSecurity::expandEnv(file, 0)) {
-        std::string f = ModSecurity::find_resource(s, driver.ref.back());
+    for (auto& s: modsecurity::expandEnv(file, 0)) {
+        std::string f = modsecurity::find_resource(s, driver.ref.back());
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
@@ -404,8 +404,8 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
     const char *file = strchr(yytext, ' ') + 1;
     char *f = strdup(file + 1);
     f[strlen(f)-1] = '\0';
-    for (auto& s: ModSecurity::expandEnv(f, 0)) {
-        std::string f = ModSecurity::find_resource(s, driver.ref.back());
+    for (auto& s: modsecurity::expandEnv(f, 0)) {
+        std::string f = modsecurity::find_resource(s, driver.ref.back());
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
@@ -456,7 +456,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 %%
 
-namespace ModSecurity {
+namespace modsecurity {
 
 bool Driver::scan_begin () {
     yy_flex_debug = trace_scanning;

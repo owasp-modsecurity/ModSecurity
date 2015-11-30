@@ -23,9 +23,9 @@
 #include "modsecurity/assay.h"
 #include "variations/exclusion.h"
 
-using ModSecurity::Variables::Variations::Exclusion;
+using modsecurity::Variables::Variations::Exclusion;
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Variables {
 
 

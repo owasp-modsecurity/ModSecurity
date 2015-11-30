@@ -24,7 +24,7 @@
 
 #ifdef __cplusplus
 
-namespace ModSecurity {
+namespace modsecurity {
 class Assay;
 namespace actions {
 namespace transformations {

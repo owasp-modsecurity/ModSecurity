@@ -26,7 +26,7 @@
 #include "actions/transformations/transformation.h"
 #include "src/utils.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 namespace transformations {
 

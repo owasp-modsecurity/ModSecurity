@@ -23,7 +23,7 @@
 #include "operators/operator.h"
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 class Contains : public Operator {

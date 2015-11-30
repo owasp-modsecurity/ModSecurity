@@ -34,6 +34,7 @@
 #define HEADERS_MODSECURITY_ASSAY_H_
 
 #ifndef __cplusplus
+typedef struct ModSecurity_t ModSecurity;
 typedef struct Assay_t Assay;
 typedef struct Rules_t Rules;
 #endif
@@ -64,7 +65,7 @@ typedef struct Rules_t Rules;
 
 #ifdef __cplusplus
 
-namespace ModSecurity {
+namespace modsecurity {
 
 class ModSecurity;
 class Assay;

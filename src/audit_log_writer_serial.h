@@ -27,7 +27,7 @@
 
 #ifdef __cplusplus
 
-namespace ModSecurity {
+namespace modsecurity {
 
 #define SERIAL_AUDIT_LOG_BOUNDARY_LENGTH 8
 

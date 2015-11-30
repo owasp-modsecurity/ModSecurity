@@ -22,7 +22,7 @@
 #define SRC_ACTIONS_TRANSFORMATIONS_SQL_HEX_DECODE_H_
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 class Assay;
 
 namespace actions {

@@ -21,7 +21,7 @@
 #include "utils/https_client.h"
 #include "src/utils.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 

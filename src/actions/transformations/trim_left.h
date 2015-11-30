@@ -23,7 +23,7 @@
 #define SRC_ACTIONS_TRANSFORMATIONS_TRIM_LEFT_H_
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 class Assay;
 
 namespace actions {

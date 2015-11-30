@@ -27,7 +27,7 @@
 #include "utils/geo_lookup.h"
 #include "utils/https_client.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Utils {
 
 void IpTree::postOrderTraversal(TreeNode *node) {

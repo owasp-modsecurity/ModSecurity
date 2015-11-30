@@ -23,7 +23,7 @@
 #include "src/debug_log_writer_agent.h"
 
 
-namespace ModSecurity {
+namespace modsecurity {
 
 /** @ingroup ModSecurity_CPP_API */
 class DebugLogWriter {

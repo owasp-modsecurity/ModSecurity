@@ -62,7 +62,7 @@
 #define IF_MATCH(a) \
     if (op_ == #a)
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 

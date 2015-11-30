@@ -23,7 +23,7 @@
 #include "src/macro_expansion.h"
 #include "src/utils.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 SetVar::SetVar(std::string action)

@@ -38,7 +38,7 @@
 #include <iostream>
 #include <string>
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Utils {
 
 class SHA1 {

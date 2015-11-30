@@ -20,7 +20,7 @@
 #ifndef SRC_DEBUG_LOG_WRITER_AGENT_H_
 #define SRC_DEBUG_LOG_WRITER_AGENT_H_
 
-namespace ModSecurity {
+namespace modsecurity {
 
 /** @ingroup ModSecurity_CPP_API */
 class DebugLogWriterAgent : public std::ofstream {

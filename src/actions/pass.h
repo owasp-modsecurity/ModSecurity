@@ -21,7 +21,7 @@
 #ifndef SRC_ACTIONS_PASS_H_
 #define SRC_ACTIONS_PASS_H_
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 

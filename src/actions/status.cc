@@ -20,7 +20,7 @@
 
 #include "modsecurity/assay.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 Status::Status(std::string action)

@@ -21,7 +21,7 @@
 #ifndef SRC_ACTIONS_DENY_H_
 #define SRC_ACTIONS_DENY_H_
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 

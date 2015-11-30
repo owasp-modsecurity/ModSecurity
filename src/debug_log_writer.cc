@@ -21,7 +21,7 @@
 
 #include "src/debug_log_writer_agent.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 
 
 void DebugLogWriter::open(const std::string& fileName) {

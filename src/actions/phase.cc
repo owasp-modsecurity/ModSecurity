@@ -23,7 +23,7 @@
 #include "src/utils.h"
 #include "modsecurity/modsecurity.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 Phase::Phase(std::string action)

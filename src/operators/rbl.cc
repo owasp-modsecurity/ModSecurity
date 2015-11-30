@@ -19,7 +19,7 @@
 
 #include "operators/operator.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 bool Rbl::evaluate(Assay *assay) {

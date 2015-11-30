@@ -23,7 +23,7 @@
 #ifdef __cplusplus
 class Assay;
 
-namespace ModSecurity {
+namespace modsecurity {
 class Assay;
 namespace actions {
 

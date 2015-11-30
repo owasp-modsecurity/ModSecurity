@@ -25,7 +25,7 @@
 #include "operators/operator.h"
 #include "utils/acmp.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 Pm::~Pm() {

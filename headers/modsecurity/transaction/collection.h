@@ -26,7 +26,7 @@ typedef struct Collection_t Collection;
 #ifdef __cplusplus
 #include <string>
 
-namespace ModSecurity {
+namespace modsecurity {
 
 class Collection : public transaction::Variables {
  public:

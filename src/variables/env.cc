@@ -30,7 +30,7 @@
 
 extern char **environ;
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Variables {
 
 void Env::evaluateInternal(Assay *assay,

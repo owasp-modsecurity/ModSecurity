@@ -21,7 +21,7 @@
 #include "operators/ip_match_from_file.h"
 
 #ifdef __cplusplus
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 class IpMatchF : public IpMatchFromFile {

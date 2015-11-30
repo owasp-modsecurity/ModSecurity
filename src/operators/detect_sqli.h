@@ -21,7 +21,7 @@
 
 #include "operators/operator.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 class DetectSQLi : public Operator {

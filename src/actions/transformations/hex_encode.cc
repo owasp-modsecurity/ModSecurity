@@ -27,7 +27,7 @@
 #include "actions/transformations/transformation.h"
 
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 namespace transformations {
 

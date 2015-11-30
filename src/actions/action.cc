@@ -37,7 +37,7 @@
 #define IF_MATCH(a) \
     if (op.compare(1, std::strlen(#a), #a) == 0)
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 

@@ -27,7 +27,7 @@
 
 #include "utils/geo_lookup.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Utils {
 
 

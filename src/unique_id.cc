@@ -53,7 +53,7 @@
 
 #include "src/utils/sha1.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 
 void UniqueId::fillUniqueId() {
     std::string macAddress;

@@ -31,16 +31,16 @@
 
 #include "parser/seclang-parser.hh"
 
-using ModSecurity::Rule;
-using ModSecurity::Rules;
+using modsecurity::Rule;
+using modsecurity::Rules;
 
 
 # define YY_DECL \
-  yy::seclang_parser::symbol_type yylex(ModSecurity::Parser::Driver& driver)
+  yy::seclang_parser::symbol_type yylex(modsecurity::Parser::Driver& driver)
 
 YY_DECL;
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Parser {
 
 #ifdef __cplusplus

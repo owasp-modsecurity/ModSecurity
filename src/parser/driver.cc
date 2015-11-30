@@ -18,10 +18,10 @@
 #include "parser/seclang-parser.hh"
 #include "src/audit_log.h"
 
-using ModSecurity::AuditLog;
-using ModSecurity::Rule;
+using modsecurity::AuditLog;
+using modsecurity::Rule;
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Parser {
 
 Driver::Driver()

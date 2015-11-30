@@ -24,7 +24,7 @@
 #include "modsecurity/assay.h"
 #include "modsecurity/modsecurity.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Variables {
 
 void ModsecBuild::evaluateInternal(Assay *assay,

@@ -23,7 +23,7 @@
 #include "src/utils.h"
 #include "src/macro_expansion.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 Tag::Tag(std::string action)

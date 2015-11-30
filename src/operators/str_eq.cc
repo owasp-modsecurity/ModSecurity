@@ -18,7 +18,7 @@
 #include <string>
 #include "src/macro_expansion.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 bool StrEq::evaluate(Assay *assay, const std::string &str) {

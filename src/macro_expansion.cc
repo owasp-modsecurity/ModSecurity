@@ -16,7 +16,7 @@
 #include "src/macro_expansion.h"
 #include "modsecurity/assay.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 
 MacroExpansion::MacroExpansion() { }
 

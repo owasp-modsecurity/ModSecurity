@@ -30,7 +30,7 @@
 
 #include "modsecurity/assay.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Variables {
 
 void TimeDay::evaluateInternal(Assay *assay,

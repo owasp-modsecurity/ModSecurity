@@ -24,7 +24,7 @@
 
 #include "variables/variable.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 
 class Assay;
 namespace Variables {

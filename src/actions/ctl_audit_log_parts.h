@@ -21,7 +21,7 @@
 #ifndef SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_
 #define SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 

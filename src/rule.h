@@ -27,7 +27,7 @@
 
 #ifdef __cplusplus
 
-namespace ModSecurity {
+namespace modsecurity {
 
 class Rule {
  public:

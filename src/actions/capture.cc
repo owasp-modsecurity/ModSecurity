@@ -28,7 +28,7 @@
 #include "operators/contains.h"
 #include "operators/detect_sqli.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace actions {
 
 bool Capture::evaluate(Rule *rule, Assay *assay) {

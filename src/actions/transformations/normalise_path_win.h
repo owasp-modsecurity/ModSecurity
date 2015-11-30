@@ -22,7 +22,7 @@
 #define SRC_ACTIONS_TRANSFORMATIONS_NORMALISE_PATH_WIN_H_
 
 
-namespace ModSecurity {
+namespace modsecurity {
 class Assay;
 
 namespace actions {

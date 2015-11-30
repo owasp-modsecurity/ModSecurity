@@ -32,7 +32,7 @@
 #include "modsecurity/modsecurity.h"
 #include "src/unique_id.h"
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Utils {
 
 

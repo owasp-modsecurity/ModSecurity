@@ -37,7 +37,7 @@
 #include <iomanip>
 #include <fstream>
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace Utils {
 
 SHA1::SHA1() {

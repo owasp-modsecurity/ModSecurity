@@ -23,7 +23,7 @@
 #define SRC_OPERATORS_NO_MATCH_H_
 
 
-namespace ModSecurity {
+namespace modsecurity {
 namespace operators {
 
 class NoMatch : public Operator {
