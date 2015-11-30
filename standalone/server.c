@@ -286,6 +286,31 @@ AP_DECLARE(void) ap_log_error_(const char *file, int line, int module_index,
 }
 
 #if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
+AP_DECLARE(void) ap_log_rerror(const char *file, int line, int level,
+                             apr_status_t status, const request_rec *r,
+                             const char *fmt, ...)
+//			    __attribute__((format(printf,6,7)))
+#else
+AP_DECLARE(void) ap_log_rerror_(const char *file, int line, int module_index,
+                               int level, apr_status_t status,
+                               const request_rec *r, const char *fmt, ...)
+//                              __attribute__((format(printf,7,8)))
+#endif
+{
+    va_list args;
+    char errstr[MAX_STRING_LEN];
+
+    va_start(args, fmt);
+
+    apr_vsnprintf(errstr, MAX_STRING_LEN, fmt, args);
+
+	va_end(args);
+
+	if(modsecLogHook != NULL)
+		modsecLogHook(modsecLogObj, level, errstr);
+}
+
+#if AP_SERVER_MAJORVERSION_NUMBER > 1 && AP_SERVER_MINORVERSION_NUMBER < 3
 AP_DECLARE(void) ap_log_perror(const char *file, int line, int level, 
                              apr_status_t status, apr_pool_t *p, 
                              const char *fmt, ...)
