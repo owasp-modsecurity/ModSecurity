@@ -58,7 +58,7 @@ fi
 
 
 # Check if the compiler is c++11 compatible.
-AX_CXX_COMPILE_STDCXX_11(,mandatory)
+# AX_CXX_COMPILE_STDCXX_11(,mandatory)
 
 # Check for libinjection
 AC_CHECK_FILE("others/libinjection/src/libinjection_html5.c", HAS_LIBINJECTION=1)
@@ -220,6 +220,7 @@ AC_CONFIG_FILES([\
     Makefile \
     doc/Makefile \
     src/Makefile \
+    others/Makefile \
     test/Makefile \
     test/benchmark/Makefile \
     examples/Makefile \

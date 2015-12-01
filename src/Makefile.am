@@ -193,16 +193,9 @@ libmodsecurity_la_SOURCES = \
 	rule.cc \
 	unique_id.cc \
 	${ACTIONS} \
-	${LIBINJECTION} \
 	${OPERATORS} \
 	${UTILS} \
 	${VARIABLES}
-
-
-LIBINJECTION = \
-	../others/libinjection/src/libinjection_html5.c \
-	../others/libinjection/src/libinjection_sqli.c \
-	../others/libinjection/src/libinjection_xss.c
 
 
 libmodsecurity_la_CFLAGS = 
@@ -225,7 +218,8 @@ libmodsecurity_la_LIBADD = \
         $(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
         @LEXLIB@ \
         $(PCRE_LDADD) \
-        $(YAJL_LDADD)
+        $(YAJL_LDADD) \
+        ../others/libinjection.la
 
 
 libmodsecurity_la_LDFLAGS = \

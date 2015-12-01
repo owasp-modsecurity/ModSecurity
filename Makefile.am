@@ -4,6 +4,7 @@ export MAYBE_TEST = test
 endif
 
 SUBDIRS = \
+	others \
 	src \
 	doc \
 	examples \
