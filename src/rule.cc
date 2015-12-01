@@ -414,7 +414,7 @@ bool Rule::evaluate(Assay *assay) {
                     assay->m_collections.del("MATCHED_VARS_NAMES:" + v->m_key);
                     assay->m_collections.del("MATCHED_VARS_NAME");
                 }
-                if (this->chained && chainResult == true || !this->chained) {
+                if ((this->chained && chainResult == true) || !this->chained) {
                     for (Action *a :
                         assay->m_rules->defaultActions[this->phase]) {
                         if (a->action_kind
