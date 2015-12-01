@@ -18,8 +18,6 @@
 #include <string>
 #include <functional>
 
-#include <GeoIPCity.h>
-
 #ifndef SRC_UTILS_IP_TREE_H_
 #define SRC_UTILS_IP_TREE_H_
 

@@ -24,7 +24,9 @@
 
 #include "utils/geo_lookup.h"
 
+#ifdef WITH_GEOIP
 #include <GeoIPCity.h>
+#endif  // WITH_GEOIP
 
 namespace modsecurity {
 namespace Utils {

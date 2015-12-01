@@ -22,8 +22,6 @@
 #include <string>
 #include <functional>
 
-#include <GeoIPCity.h>
-
 #ifndef SRC_UTILS_HTTPS_CLIENT_H_
 #define SRC_UTILS_HTTPS_CLIENT_H_
 
