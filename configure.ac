@@ -128,42 +128,52 @@ case $host in
   *-*-aix*)
     echo "Checking platform... Identified as AIX"
     AC_DEFINE([AIX], [1], [Define if the operating system is AIX])
+    PLATFORM="AIX"
     ;;
   *-*-hpux*)
     echo "Checking platform... Identified as HPUX"
     AC_DEFINE([HPUX], [1], [Define if the operating system is HPUX])
+    PLATFORM="HPUX"
     ;;
   *-*-darwin*)
     echo "Checking platform... Identified as Macintosh OS X"
     AC_DEFINE([MACOSX], [1], [Define if the operating system is Macintosh OSX])
+    PLATFORM="MacOSX"
     ;;
   *-*-linux*)
     echo "Checking platform... Identified as Linux"
     AC_DEFINE([LINUX], [1], [Define if the operating system is LINUX])
+    PLATFORM="Linux"
     ;;
   *-*-solaris*)
     echo "Checking platform... Identified as Solaris"
     AC_DEFINE([SOLARIS], [1], [Define if the operating system is SOLARIS])
+    PLATFORM="Solaris"
     ;;
   *-*-freebsd*)
     echo "Checking platform... Identified as FreeBSD"
     AC_DEFINE([FREEBSD], [1], [Define if the operating system is FREEBSD])
+    PLATFORM="FreeBSD"
     ;;
   *-*-netbsd*)
     echo "Checking platform... Identified as NetBSD"
     AC_DEFINE([NETBSD], [1], [Define if the operating system is NETBSD])
+    PLATFORM="NetBSD"
     ;;
   *-*-openbsd*)
     echo "Checking platform... Identified as OpenBSD"
     AC_DEFINE([OPENBSD], [1], [Define if the operating system is OPENBSD])
+    PLATFORM="OpenBSD"
     ;;
   *-*-kfreebsd*)
     echo "Checking platform... Identified as kFreeBSD, treating as linux"
     AC_DEFINE([FREEBSD], [1], [Define if the operating system is FREEBSD])
+    PLATFORM="kFreeBSD"
     ;;
   *-*-gnu*.*)
     echo "Checking platform... Identified as HURD, treating as linux"
     AC_DEFINE([LINUX], [1], [Define if the operating system is LINUX])
+    PLATFORM="HURD"
     ;;
        *)
     echo "Unknown CANONICAL_HOST $host"
@@ -215,6 +225,14 @@ fi
 
 AM_CONDITIONAL([TEST_UTILITIES], [test $buildTestUtilities = true])
 
+
+# General link options
+if test "$PLATFORM" != "MacOSX"; then
+    GLOBAL_LDADD="-lrt"
+    AC_SUBST(GLOBAL_LDADD)
+fi
+
+
 # Files to be generated via autotools.
 AC_CONFIG_FILES([\
     Makefile \
@@ -249,7 +267,7 @@ AC_OUTPUT
 # Print a fancy summary
 echo " "
 echo " "
-echo "ModSecurity - v${MSC_GIT_VERSION}"
+echo "ModSecurity - v${MSC_GIT_VERSION} for $PLATFORM"
 echo " "
 echo " Mandatory dependencies"
 echo -n "   + libInjection                                  ...."

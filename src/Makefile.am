@@ -213,7 +213,7 @@ libmodsecurity_la_CPPFLAGS = \
 	$(PCRE_CFLAGS)
 
 libmodsecurity_la_LIBADD = \
-	-lrt \
+		$(GLOBAL_LDADD) \
         $(CURL_LDADD) \
         $(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
         @LEXLIB@ \
