@@ -22,7 +22,7 @@ Parse ModSecurity logs generated as JSON
 
 =head1 USAGE
 
-Usage: $0 [h] [Gtsrfdbalspj]
+Usage: $0 [h] [Htsrfdbalspjv]
     -H|--host             Search rules based on the Host request header
     -t|--transaction-id   Search rules based on the unique transaction ID
     -s|--source-ip        Search rules based on the client IP address (can be presented as an address or CIDR block)
@@ -35,7 +35,7 @@ Usage: $0 [h] [Gtsrfdbalspj]
     -S|--stdin            Read rules from stdin instead of an on-disk file
     -p|--partial-chains   Do not prune partial chain matches
     -j|--json             Print rule entries as a JSON blob, rather than nice formatting
-	-v|--verbose          Be verbose about various details such as JSON parse failures
+    -v|--verbose          Be verbose about various details such as JSON parse failures and log data
 
 
 =head2 FILTERS
@@ -129,6 +129,10 @@ Print all log entries from the default log location:
 
 	parse_modsec.pl
 
+Print all log entries and show more detailed information, such as response data and matched rule details
+
+	parse_modsec.pl -v
+
 Print entries matching a specific source IP:
 
 	parse_modsec.pl -s 1.2.3.4
@@ -161,7 +165,7 @@ Print entries that contain an HTTP GET request with a 'Content-Length' header
 
 sub usage {
 	print <<"_EOF";
-Usage: $0 [h] [Gtsrfdbalspj]
+Usage: $0 [h] [Htsrfdbalspjv]
 	-h|--help             Print this help
 	-H|--host             Search rules based on the Host request header
 	-t|--transaction-id   Search rules based on the unique transaction ID
@@ -175,7 +179,7 @@ Usage: $0 [h] [Gtsrfdbalspj]
 	-S|--stdin            Read rules from stdin instead of an on-disk file
 	-p|--partial-chains   Do not prune partial chain matches
 	-j|--json             Print rule entries as a JSON blob, rather than nice formatting
-	-v|--verbose          Be verbose about various details such as JSON parse failures
+	-v|--verbose          Be verbose about various details such as JSON parse failures and log data
 
 	For detailed explanations of various options and example usages, see 'perldoc $0'
 
@@ -339,22 +343,44 @@ sub print_matches {
 		} else {
 			printf "\n%s\n", '=' x 80;
 
-			# request
-			my $transaction = $entry->{transaction};
-			my $request = $entry->{request};
+			my $transaction   = $entry->{transaction};
+			my $request       = $entry->{request};
+			my $response      = $entry->{response};
+			my $audit_data    = $entry->{audit_data};
+			my $matched_rules = $entry->{matched_rules};
 
-			printf "%s\nTransaction ID: %s\nIP: %s\n\n%s\n",
-				parse_modsec_timestamp($transaction->{time}),
-				$transaction->{transaction_id},
-				$transaction->{remote_address},
-				$request->{request_line};
-
-			for my $header (sort keys %{$request->{headers}}) {
-				printf "%s: %s\n", $header, $request->{headers}->{$header};
+			if ($transaction) {
+				printf "%s\nTransaction ID: %s\nIP: %s\n\n",
+					parse_modsec_timestamp($transaction->{time}),
+					$transaction->{transaction_id},
+					$transaction->{remote_address};
 			}
 
-			# matched rules
-			for my $chain (@{$entry->{matched_rules}}) {
+			printf "%s\n", $request->{request_line}
+				if $request->{request_line};
+
+			if ($request->{headers}) {
+				for my $header (sort keys %{$request->{headers}}) {
+					printf "%s: %s\n", $header, $request->{headers}->{$header};
+				}
+			}
+
+			if ($verbose) {
+				print join ("\n", @{$request->{body}}) . "\n"
+					if $request->{body};
+
+				printf "\n%s %s\n", $response->{protocol}, $response->{status}
+					if $response->{protocol} && $response->{status};
+
+				for my $header (sort keys %{$response->{headers}}) {
+					printf "%s: %s\n", $header, $response->{headers}->{$header};
+				}
+
+				printf "\n%s\n", $response->{body}
+					if $response->{body};
+			}
+
+			for my $chain (@{$matched_rules}) {
 				print "\n";
 				my @extra_data;
 				my $ctr = 0;
@@ -365,11 +391,12 @@ sub print_matches {
 					push @extra_data, $rule->{actionset}->{logdata} if $rule->{actionset}->{logdata};
 				}
 
-				printf "\n-- %s\n", join "\n-- ", @extra_data if @extra_data && $verbose;
+				printf "\n-- %s\n", join "\n-- ", @extra_data
+					if @extra_data && $verbose;
 			}
 
-			# audit message
-			printf "\n-- %s\n\n", $entry->{audit_data}->{action}->{message} if $verbose;
+			printf "\n-- %s\n\n", $audit_data->{action}->{message}
+				if $audit_data->{action}->{message} && $verbose;
 
 			printf "%s\n", '=' x 80;
 		}
@@ -531,7 +558,7 @@ sub main {
 	$after  = build_datetime($after);
 
 	# figure where we're reading from
-	$logpath ||= '/var/log/modsec_audit.log';
+	$logpath ||= '/var/log/mod_sec/modsec_audit.log';
 	$fh = get_input({
 		logpath => $logpath,
 		stdin   => $stdin,
@@ -551,7 +578,7 @@ sub main {
 		delim          => $delim,
 	});
 
-	# walk through our input, getting an arrayref of entries valid based on filters and timeframe
+	# walk through our input, getting an arrayref of valid entries based on filters and timeframe
 	$parsed_ref = grok_input({
 		fh        => $fh,
 		filters   => \%filters,
