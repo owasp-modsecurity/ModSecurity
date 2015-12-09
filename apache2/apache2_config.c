@@ -755,6 +755,9 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
     char *rid = NULL;
     msre_rule *rule = NULL;
     extern msc_engine *modsecurity;
+    int type_with_lua = 1;
+    int type_rule;
+    int rule_actionset;
     int offset = 0;
 
     #ifdef DEBUG_CONF
@@ -787,25 +790,25 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
     }
 
     /* Rules must have uniq ID */
-    if (
+    type_rule = (dcfg->tmp_chain_starter == NULL);
 #if defined(WITH_LUA)
-            type != RULE_TYPE_LUA &&
+            type_rule = (type != RULE_TYPE_LUA && type_rule);
 #endif
-            (dcfg->tmp_chain_starter == NULL))
+            if (type_rule)
                 if(rule->actionset == NULL)
                     return "ModSecurity: Rules must have at least id action";
 
     if(rule->actionset != NULL && (dcfg->tmp_chain_starter == NULL))    {
-        if(rule->actionset->id == NOT_SET_P
+        rule_actionset = (rule->actionset->id == NOT_SET_P);
 #if defined(WITH_LUA)
-            && (type != RULE_TYPE_LUA)
+        rule_actionset = (rule_actionset && (type != RULE_TYPE_LUA));
 #endif
-          )
-            return "ModSecurity: No action id present within the rule";
+        if (rule_actionset)
+          return "ModSecurity: No action id present within the rule";
 #if defined(WITH_LUA)
-        if(type != RULE_TYPE_LUA)
+        type_with_lua = (type != RULE_TYPE_LUA);
 #endif
-        {
+        if (type_with_lua){
             rid = apr_hash_get(dcfg->rule_id_htab, rule->actionset->id, APR_HASH_KEY_STRING);
             if(rid != NULL) {
                 return "ModSecurity: Found another rule with the same id";
@@ -1666,7 +1669,7 @@ static const char *cmd_rule_perf_time(cmd_parms *cmd, void *_dcfg,
 }
 
 char *parser_conn_limits_operator(apr_pool_t *mp, const char *p2,
-    TreeRoot **whitelist, TreeRoot **suspicious_list, 
+    TreeRoot **whitelist, TreeRoot **suspicious_list,
     const char *filename)
 {
     int res = 0;
@@ -1753,7 +1756,7 @@ static const char *cmd_conn_read_state_limit(cmd_parms *cmd, void *_dcfg,
         if (param)
             return param;
     }
-    
+
     conn_read_state_limit = limit;
 
     return NULL;

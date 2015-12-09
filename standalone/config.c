@@ -432,6 +432,7 @@ AP_DECLARE(apr_status_t) ap_pcfg_openfile(ap_configfile_t **ret_cfg,
     apr_file_t *file = NULL;
     apr_finfo_t finfo;
     apr_status_t status;
+    int exist_type;
 #ifdef DEBUG
     char buf[120];
 #endif
@@ -457,13 +458,13 @@ AP_DECLARE(apr_status_t) ap_pcfg_openfile(ap_configfile_t **ret_cfg,
     if (status != APR_SUCCESS)
         return status;
 
-    if (finfo.filetype != APR_REG &&
+    exist_type = (finfo.filetype != APR_REG);
 #if defined(WIN32) || defined(OS2) || defined(NETWARE)
-        strcasecmp(apr_filepath_name_get(name), "nul") != 0) {
+    exist_type = (exist_type && strcasecmp(apr_filepath_name_get(name), "nul") != 0);
 #else
-        strcmp(name, "/dev/null") != 0) {
+    exist_type = (exist_type && strcmp(name, "/dev/null") != 0);
 #endif /* WIN32 || OS2 */
-        ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL,
+    if (exist_type){ ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL,
                      "Access to file %s denied by server: not a regular file",
                      name);
         apr_file_close(file);
@@ -503,7 +504,7 @@ AP_DECLARE(apr_status_t) ap_pcfg_openfile(ap_configfile_t **ret_cfg,
 #else
     new_cfg->getch = cfg_getch;
     new_cfg->getstr = cfg_getstr;
-    new_cfg->close = cfg_close; 
+    new_cfg->close = cfg_close;
 #endif
     new_cfg->line_number = 0;
     *ret_cfg = new_cfg;
