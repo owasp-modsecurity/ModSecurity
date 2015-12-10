@@ -105,6 +105,12 @@ fi
 
 
 #
+# Check for LibXML
+#
+CHECK_LIBXML2
+
+
+#
 # Check for libpcre
 #
 CHECK_PCRE
@@ -330,6 +336,25 @@ fi
 if test "x$YAJL_FOUND" = "x2"; then
     echo "   + YAJL                                          ....disabled"
 fi
+
+
+## libxml2
+if test "x$LIBXML2_FOUND" = "x0"; then
+    echo "   + LibXML2                                       ....not found"
+fi
+if test "x$LIBXML2_FOUND" = "x1"; then
+    echo -n "   + LibXML2                                       ....found "
+    if ! test "x$LIBXML2_VERSION" = "x"; then
+        echo "v${LIBXML2_VERSION}"
+    else
+        echo ""
+    fi
+    echo "      ${LIBXML2_DISPLAY}"
+fi
+if test "x$LIBXML2_FOUND" = "x2"; then
+    echo "   + LibXML2                                       ....disabled"
+fi
+
 
 echo " "
 echo " Other Options"
