@@ -853,7 +853,7 @@ void sec_audit_logger(modsec_rec *msr) {
 
         /* There are no response headers (or the status line) in HTTP 0.9 */
         if (msr->response_headers_sent) {
-            if (msr->status_line != NULL) {
+            if (msr->status_line != NULL && msr->status_line[0] != '\0') {
                 text = apr_psprintf(msr->mp, "%s %s\n", msr->response_protocol,
                         msr->status_line);
             } else {
