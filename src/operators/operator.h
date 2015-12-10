@@ -52,7 +52,7 @@ class Operator {
 };
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // SRC_OPERATORS_OPERATOR_H__

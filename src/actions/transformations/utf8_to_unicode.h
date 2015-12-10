@@ -37,7 +37,7 @@ class Utf8Unicode : public Transformation {
 
 }  // namespace transformations
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif
 

@@ -64,7 +64,7 @@ class Variables :
 };
 
 }  // namespace transaction
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 

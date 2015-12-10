@@ -41,7 +41,7 @@ class Phase : public Action {
 };
 
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // SRC_ACTIONS_PHASE_H_

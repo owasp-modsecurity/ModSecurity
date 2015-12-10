@@ -120,4 +120,4 @@ bool Pm::init(const std::string &file, const char **error) {
 
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity

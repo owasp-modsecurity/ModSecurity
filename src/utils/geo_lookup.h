@@ -59,6 +59,6 @@ class GeoLookup {
 
 
 }  // namespace Utils
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_UTILS_GEO_LOOKUP_H_

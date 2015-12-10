@@ -40,7 +40,7 @@ class Severity : public Action {
 };
 
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // SRC_ACTIONS_SEVERITY_H_

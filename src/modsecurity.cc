@@ -242,4 +242,4 @@ extern "C" ModSecurity *msc_init() {
 }
 
 
-}  // namespace ModSecurity
+}  // namespace modsecurity

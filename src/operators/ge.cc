@@ -38,4 +38,4 @@ bool Ge::evaluate(Assay *assay, const std::string &input) {
 
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity

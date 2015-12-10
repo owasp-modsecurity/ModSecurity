@@ -52,6 +52,6 @@ class HttpsClient {
 
 
 }  // namespace Utils
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_UTILS_HTTPS_CLIENT_H_

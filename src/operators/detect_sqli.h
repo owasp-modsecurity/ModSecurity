@@ -36,7 +36,7 @@ class DetectSQLi : public Operator {
 };
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 
 #endif  // SRC_OPERATORS_DETECT_SQLI_H_

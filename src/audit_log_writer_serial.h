@@ -65,7 +65,7 @@ class AuditLogWriterSerial : public AuditLogWriter {
     void generateBoundary(std::string *boundary);
 };
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // SRC_AUDIT_LOG_WRITER_SERIAL_H_

@@ -199,4 +199,4 @@ bool ValidateUtf8Encoding::evaluate(Assay *assay, const std::string &str) {
 
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity

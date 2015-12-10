@@ -74,7 +74,7 @@ class AuditLogWriterParallel : public AuditLogWriter {
     inline std::string logFilePath(time_t *t, int part);
 };
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // SRC_AUDIT_LOG_WRITER_PARALLEL_H_

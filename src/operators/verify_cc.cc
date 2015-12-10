@@ -127,4 +127,4 @@ bool VerifyCC::evaluate(Assay *assay, const std::string &i) {
 
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity

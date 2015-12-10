@@ -41,7 +41,7 @@ class Variable {
 };
 
 }  // namespace transaction
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // HEADERS_MODSECURITY_TRANSACTION_VARIABLE_H_

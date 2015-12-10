@@ -101,4 +101,4 @@ bool negation)
 }
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity

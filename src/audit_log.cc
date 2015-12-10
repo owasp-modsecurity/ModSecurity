@@ -253,4 +253,4 @@ bool AuditLog::close() {
 }
 
 
-}  // namespace ModSecurity
+}  // namespace modsecurity

@@ -47,4 +47,4 @@ void Tx::evaluateInternal(Assay *assay,
 
 
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity

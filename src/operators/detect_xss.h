@@ -33,7 +33,7 @@ class DetectXSS : public Operator {
 };
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 
 #endif  // SRC_OPERATORS_DETECT_XSS_H_

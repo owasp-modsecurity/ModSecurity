@@ -93,4 +93,4 @@ Action *Action::instantiate(const std::string& name) {
 }
 
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity

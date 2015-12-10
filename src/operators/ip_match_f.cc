@@ -24,4 +24,4 @@ namespace operators {
 
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity

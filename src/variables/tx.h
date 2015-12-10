@@ -39,6 +39,6 @@ class Tx : public Variable {
 };
 
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_TX_H_

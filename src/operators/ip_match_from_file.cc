@@ -43,4 +43,4 @@ bool IpMatchFromFile::init(const std::string &file,
 
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity

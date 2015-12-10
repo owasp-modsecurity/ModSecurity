@@ -39,6 +39,6 @@ class Duration : public Variable {
 
 
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_DURATION_H_

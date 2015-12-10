@@ -180,7 +180,7 @@ class AuditLog {
     int m_refereceCount;
 };
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // SRC_AUDIT_LOG_H_

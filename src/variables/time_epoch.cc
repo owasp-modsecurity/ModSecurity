@@ -41,4 +41,4 @@ void TimeEpoch::evaluateInternal(Assay *assay,
 
 
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity

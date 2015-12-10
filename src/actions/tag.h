@@ -39,6 +39,6 @@ class Tag : public Action {
 
 
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_ACTIONS_TAG_H_

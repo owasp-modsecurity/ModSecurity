@@ -52,6 +52,6 @@ class DebugLogWriter {
 };
 
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_DEBUG_LOG_WRITER_H_

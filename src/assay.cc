@@ -1919,5 +1919,5 @@ extern "C" int msc_process_logging(Assay *assay, int code) {
     return assay->processLogging(code);
 }
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 

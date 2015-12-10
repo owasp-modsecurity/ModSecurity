@@ -48,7 +48,7 @@ class Collection : public transaction::Variables {
      double m_updateRate;
 };
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 

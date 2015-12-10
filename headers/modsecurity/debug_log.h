@@ -51,7 +51,7 @@ class DebugLog {
     std::string m_fileName;
 };
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // HEADERS_MODSECURITY_DEBUG_LOG_H_

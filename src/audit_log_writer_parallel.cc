@@ -137,4 +137,4 @@ bool AuditLogWriterParallel::write(Assay *assay, int parts) {
 }
 
 
-}  // namespace ModSecurity
+}  // namespace modsecurity

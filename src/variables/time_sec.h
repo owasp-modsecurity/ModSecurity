@@ -38,6 +38,6 @@ class TimeSec : public Variable {
 };
 
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_TIME_SEC_H_

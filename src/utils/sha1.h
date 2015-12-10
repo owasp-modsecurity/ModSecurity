@@ -73,6 +73,6 @@ class SHA1 {
 };
 
 }  // namespace Utils
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_UTILS_SHA1_H_

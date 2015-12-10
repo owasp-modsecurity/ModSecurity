@@ -34,7 +34,7 @@ class Gt : public Operator {
 };
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // SRC_OPERATORS_GT_H_

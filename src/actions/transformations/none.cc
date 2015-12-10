@@ -39,4 +39,4 @@ std::string None::evaluate(std::string value,
 
 }  // namespace transformations
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity

@@ -37,7 +37,7 @@ class MacroExpansion {
 };
 
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 
 

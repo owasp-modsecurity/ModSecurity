@@ -52,4 +52,4 @@ std::string LowerCase::evaluate(std::string value,
 
 }  // namespace transformations
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity

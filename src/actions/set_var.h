@@ -54,7 +54,7 @@ class SetVar : public Action {
 };
 
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 
 #endif  // SRC_ACTIONS_SET_VAR_H_

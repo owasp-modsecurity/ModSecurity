@@ -72,4 +72,4 @@ std::string MacroExpansion::expand(const std::string& input, Assay *assay) {
     return res;
 }
 
-}  // namespace ModSecurity
+}  // namespace modsecurity

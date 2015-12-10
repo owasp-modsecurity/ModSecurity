@@ -1081,5 +1081,5 @@ std::string find_resource(const std::string& resource,
     return std::string("");
 }
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 

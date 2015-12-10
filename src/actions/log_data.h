@@ -39,6 +39,6 @@ class LogData : public Action {
 
 
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_ACTIONS_LOG_DATA_H_

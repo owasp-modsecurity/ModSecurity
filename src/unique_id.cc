@@ -227,4 +227,4 @@ failed:
 }
 
 
-}  // namespace ModSecurity
+}  // namespace modsecurity

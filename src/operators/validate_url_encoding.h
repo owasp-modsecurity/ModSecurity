@@ -35,7 +35,7 @@ class ValidateUrlEncoding : public Operator {
 };
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 

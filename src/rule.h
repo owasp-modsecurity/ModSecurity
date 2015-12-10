@@ -77,7 +77,7 @@ class Rule {
     int m_referenceCount;
 };
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 

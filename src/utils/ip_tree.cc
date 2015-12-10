@@ -148,4 +148,4 @@ bool IpTree::contains(const std::string& ip) {
 
 
 }  // namespace Utils
-}  // namespace ModSecurity
+}  // namespace modsecurity

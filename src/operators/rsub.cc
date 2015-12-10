@@ -38,4 +38,4 @@ Rsub::Rsub(std::string op, std::string param, bool negation)
 }
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity

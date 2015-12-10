@@ -85,6 +85,6 @@ class Driver : public RulesProperties {
 
 
 }  // namespace Parser
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_PARSER_DRIVER_H_

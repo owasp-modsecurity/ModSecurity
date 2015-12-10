@@ -39,6 +39,6 @@ class Env : public Variable {
 
 
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_ENV_H_

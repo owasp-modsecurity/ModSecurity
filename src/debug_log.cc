@@ -76,4 +76,4 @@ void DebugLog::write(int level, const std::string &msg) {
 }
 
 
-}  // namespace ModSecurity
+}  // namespace modsecurity

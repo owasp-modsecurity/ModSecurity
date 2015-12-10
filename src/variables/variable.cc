@@ -144,4 +144,4 @@ std::string Variable::to_s(
 
 
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity

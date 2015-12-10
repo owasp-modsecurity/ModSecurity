@@ -54,4 +54,4 @@ void Count::evaluateInternal(Assay *assay,
 
 }  // namespace Variations
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity

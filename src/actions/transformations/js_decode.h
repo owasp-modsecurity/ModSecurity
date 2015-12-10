@@ -39,7 +39,7 @@ class JsDecode : public Transformation {
 
 }  // namespace transformations
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif
 

@@ -373,5 +373,5 @@ extern "C" int msc_rules_cleanup(Rules *rules) {
 }
 
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 

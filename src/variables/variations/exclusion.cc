@@ -37,4 +37,4 @@ void Exclusion::evaluateInternal(Assay *assay,
 
 }  // namespace Variations
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity

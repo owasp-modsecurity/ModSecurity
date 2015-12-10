@@ -63,4 +63,4 @@ bool AuditLogWriterSerial::write(Assay *assay, int parts) {
 }
 
 
-}  // namespace ModSecurity
+}  // namespace modsecurity

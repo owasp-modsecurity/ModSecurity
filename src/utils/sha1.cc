@@ -279,5 +279,5 @@ void SHA1::read(std::istream *is, std::string *s, int k_max) {
 }
 
 }  // namespace Utils
-}  // namespace ModSecurity
+}  // namespace modsecurity
 

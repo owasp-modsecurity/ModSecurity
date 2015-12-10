@@ -115,4 +115,4 @@ Transformation* Transformation::instantiate(std::string a) {
 
 }  // namespace transformations
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity

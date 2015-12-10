@@ -71,4 +71,4 @@ bool ContainsWord::evaluate(Assay *assay,
 
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity

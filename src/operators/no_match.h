@@ -36,7 +36,7 @@ class NoMatch : public Operator {
 };
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 
 #endif  // SRC_OPERATORS_NO_MATCH_H_

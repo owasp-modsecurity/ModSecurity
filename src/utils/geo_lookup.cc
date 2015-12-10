@@ -79,5 +79,5 @@ bool GeoLookup::lookup(const std::string& target, GeoIPRecord **gir,
 
 
 }  // namespace Utils
-}  // namespace ModSecurity
+}  // namespace modsecurity
 

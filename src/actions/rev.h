@@ -39,6 +39,6 @@ class Rev : public Action {
 
 
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_ACTIONS_REV_H_

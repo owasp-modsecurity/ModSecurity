@@ -166,4 +166,4 @@ void Collections::resolveRegularExpression(const std::string& var,
 }
 
 }  // namespace transaction
-}  // namespace ModSecurity
+}  // namespace modsecurity

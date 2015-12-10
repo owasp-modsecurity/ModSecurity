@@ -39,6 +39,6 @@ class HighestSeverity : public Variable {
 
 
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_HIGHEST_SEVERITY_H_

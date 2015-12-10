@@ -46,6 +46,6 @@ class IpTree {
 
 
 }  // namespace Utils
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_UTILS_IP_TREE_H_

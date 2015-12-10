@@ -296,4 +296,4 @@ bool Multipart::process(std::string data) {
 
 
 }  // namespace RequestBodyProcessor
-}  // namespace ModSecurity
+}  // namespace modsecurity

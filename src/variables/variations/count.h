@@ -44,6 +44,6 @@ class Count : public Variable {
 
 }  // namespace Variations
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_VARIATIONS_COUNT_H_

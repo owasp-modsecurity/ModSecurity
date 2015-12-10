@@ -61,7 +61,7 @@ class UniqueId {
     // void operator=(UniqueId const&) = delete;
 };
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // SRC_UNIQUE_ID_H_

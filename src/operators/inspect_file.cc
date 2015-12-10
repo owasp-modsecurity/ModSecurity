@@ -39,4 +39,4 @@ InspectFile::InspectFile(std::string op, std::string param,
 }
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity

@@ -37,7 +37,7 @@ class CmdLine : public Transformation {
 
 }  // namespace transformations
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif
 

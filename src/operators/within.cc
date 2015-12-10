@@ -44,4 +44,4 @@ bool Within::evaluate(Assay *assay, const std::string &str) {
 
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity

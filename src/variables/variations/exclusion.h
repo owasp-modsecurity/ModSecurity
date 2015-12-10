@@ -46,6 +46,6 @@ class Exclusion : public Variable {
 
 }  // namespace Variations
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_VARIATIONS_EXCLUSION_H_

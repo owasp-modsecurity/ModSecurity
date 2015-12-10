@@ -39,6 +39,6 @@ class SkipAfter : public Action {
 
 
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_ACTIONS_SKIP_AFTER_H_

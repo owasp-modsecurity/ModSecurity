@@ -36,7 +36,7 @@ class PmFromFile : public Pm {
 
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif
 

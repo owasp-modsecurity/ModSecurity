@@ -112,7 +112,7 @@ int msc_rules_cleanup(Rules *rules);
 
 #ifdef __cplusplus
 }
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // HEADERS_MODSECURITY_RULES_H_

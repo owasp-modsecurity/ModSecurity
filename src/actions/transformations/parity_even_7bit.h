@@ -37,7 +37,7 @@ class ParityEven7bit : public Transformation {
 
 }  // namespace transformations
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif
 

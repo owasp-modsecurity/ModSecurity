@@ -39,7 +39,7 @@ class NormalisePathWin : public Transformation {
 
 }  // namespace transformations
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_NORMALISE_PATH_WIN_H_

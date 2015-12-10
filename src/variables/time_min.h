@@ -38,6 +38,6 @@ class TimeMin : public Variable {
 };
 
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_TIME_MIN_H_

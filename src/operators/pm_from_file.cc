@@ -59,4 +59,4 @@ bool PmFromFile::init(const std::string &config, const char **error) {
 
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity

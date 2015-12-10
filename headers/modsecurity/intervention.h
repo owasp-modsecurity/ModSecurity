@@ -29,7 +29,7 @@ typedef struct ModSecurityIntervention_t {
 } ModSecurityIntervention;
 
 #ifdef __cplusplus
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // HEADERS_MODSECURITY_INTERVENTION_H_

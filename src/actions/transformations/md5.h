@@ -38,7 +38,7 @@ class Md5 : public Transformation {
 
 }  // namespace transformations
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif
 

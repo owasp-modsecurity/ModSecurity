@@ -185,4 +185,4 @@ void Driver::error(const yy::location& l, const std::string& m,
 
 
 }  // namespace Parser
-}  // namespace ModSecurity
+}  // namespace modsecurity

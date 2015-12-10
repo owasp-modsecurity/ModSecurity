@@ -50,7 +50,7 @@ class AuditLogWriter {
     int m_refereceCount;
 };
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // SRC_AUDIT_LOG_WRITER_H_

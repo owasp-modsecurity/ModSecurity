@@ -67,5 +67,5 @@ void DebugLogWriter::write(const std::string& file, const std::string &msg) {
 }
 
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 

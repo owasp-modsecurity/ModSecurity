@@ -58,4 +58,4 @@ void Redirect::fill_intervention(ModSecurityIntervention *i) {
 }
 
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity

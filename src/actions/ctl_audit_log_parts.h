@@ -35,6 +35,6 @@ class CtlAuditLogParts : public Action {
 };
 
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_

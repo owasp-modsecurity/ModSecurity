@@ -42,4 +42,4 @@ void DebugLogWriterAgent::write(const std::string& msg) {
 }
 
 
-}  // namespace ModSecurity
+}  // namespace modsecurity

@@ -44,4 +44,4 @@ bool Tag::evaluate(Rule *rule, Assay *assay) {
 }
 
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity

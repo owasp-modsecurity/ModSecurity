@@ -84,6 +84,6 @@ class Variable {
 
 
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_VARIABLE_H_

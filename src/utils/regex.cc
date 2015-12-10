@@ -67,4 +67,4 @@ int regex_search(const std::string& s, const Regex& regex) {
 }
 
 }  // namespace Utils
-}  // namespace ModSecurity
+}  // namespace modsecurity

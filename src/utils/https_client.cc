@@ -111,5 +111,5 @@ bool HttpsClient::download(const std::string &uri) {
 #endif
 
 }  // namespace Utils
-}  // namespace ModSecurity
+}  // namespace modsecurity
 

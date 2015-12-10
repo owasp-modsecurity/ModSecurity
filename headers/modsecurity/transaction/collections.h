@@ -87,7 +87,7 @@ class Collections :
 };
 
 }  // namespace transaction
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 

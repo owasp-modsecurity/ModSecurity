@@ -205,7 +205,7 @@ class RulesProperties {
 #endif
 
 #ifdef __cplusplus
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // HEADERS_MODSECURITY_RULES_PROPERTIES_H_

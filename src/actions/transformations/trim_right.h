@@ -38,7 +38,7 @@ class TrimRight : public Trim {
 
 }  // namespace transformations
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif
 

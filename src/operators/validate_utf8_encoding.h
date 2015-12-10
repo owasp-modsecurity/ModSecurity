@@ -44,7 +44,7 @@ class ValidateUtf8Encoding : public Operator {
 };
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 
 

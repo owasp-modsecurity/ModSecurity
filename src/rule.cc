@@ -492,4 +492,4 @@ bool Rule::evaluate(Assay *assay) {
     return ret;
 }
 
-}  // namespace ModSecurity
+}  // namespace modsecurity

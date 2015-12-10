@@ -38,6 +38,6 @@ class TimeDay : public Variable {
 };
 
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_TIME_DAY_H_

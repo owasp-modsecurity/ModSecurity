@@ -101,7 +101,7 @@ class Action {
 
 
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif
 

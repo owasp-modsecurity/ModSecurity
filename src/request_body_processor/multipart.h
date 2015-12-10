@@ -58,6 +58,6 @@ class Multipart {
 };
 
 }  // namespace RequestBodyProcessor
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_REQUEST_BODY_PROCESSOR_MULTIPART_H_

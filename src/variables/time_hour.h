@@ -38,6 +38,6 @@ class TimeHour : public Variable {
 };
 
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_TIME_HOUR_H_

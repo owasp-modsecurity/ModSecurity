@@ -34,7 +34,7 @@ class PmF : public PmFromFile {
 
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 

@@ -31,7 +31,7 @@ class Rsub : public Operator {
     bool evaluate(Assay *assay);
 };
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 

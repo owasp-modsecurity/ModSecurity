@@ -55,6 +55,6 @@ int regex_search(const std::string& s, const Regex& r);
 
 
 }  // namespace Utils
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_UTILS_REGEX_H_

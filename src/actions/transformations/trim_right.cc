@@ -43,4 +43,4 @@ std::string TrimRight::evaluate(std::string value,
 
 }  // namespace transformations
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity

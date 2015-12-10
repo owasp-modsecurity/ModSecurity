@@ -33,7 +33,7 @@ class IpMatchFromFile : public IpMatch {
 };
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 

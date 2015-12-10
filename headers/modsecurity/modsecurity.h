@@ -249,7 +249,7 @@ void msc_cleanup(ModSecurity *msc);
 }
 
 
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // HEADERS_MODSECURITY_MODSECURITY_H_

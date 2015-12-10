@@ -191,5 +191,5 @@ Operator *Operator::instantiate(std::string op_string) {
 }
 
 }  // namespace operators
-}  // namespace ModSecurity
+}  // namespace modsecurity
 

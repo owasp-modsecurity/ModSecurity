@@ -39,7 +39,7 @@ class Chain : public Action {
 };
 
 }  // namespace actions
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 #endif  // SRC_ACTIONS_CHAIN_H_

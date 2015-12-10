@@ -274,7 +274,7 @@ int msc_process_logging(Assay *assay, int code);
 
 #ifdef __cplusplus
 }
-}  // namespace ModSecurity
+}  // namespace modsecurity
 #endif
 
 

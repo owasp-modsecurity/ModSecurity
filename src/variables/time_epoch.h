@@ -38,6 +38,6 @@ class TimeEpoch : public Variable {
 };
 
 }  // namespace Variables
-}  // namespace ModSecurity
+}  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_TIME_EPOCH_H_
