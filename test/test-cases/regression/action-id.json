@@ -82,7 +82,7 @@
       ]
     },
     "expected":{
-      "parser_error": "Rules error. File: action-id.json. Line: 4. Column: 31. id:-1"
+      "parser_error": "Rules error. File: action-id.json. Line: 4. Column: 31. .*"
     },
     "rules":[
       "SecRuleEngine On",
@@ -220,7 +220,7 @@
       ]
     },
     "expected":{
-      "parser_error": "Rules error. File: action-id.json. Line: 4. Column: 31. id:'1"
+      "parser_error": "Rules error. File: action-id.json. Line: 4. Column: 31. .*"
     },
     "rules":[
       "SecRuleEngine On",

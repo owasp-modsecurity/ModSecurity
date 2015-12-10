@@ -4,7 +4,7 @@
     "version_min":300000,
     "title":"Include - bad rule",
     "expected":{
-      "parser_error": "Rules error. File: test-cases/data/config_example3.txt. Line: 2. Column: 42. ops"
+      "parser_error": "Rules error. File: test-cases/data/config_example3.txt. Line: 2. Column: 42. invalid character .*"
     },
     "rules":[
       "SecRuleEngine On",
@@ -19,7 +19,7 @@
     "version_min":300000,
     "title":"Include - missing file",
     "expected":{
-      "parser_error": "Rules error. File: config-include-bad.json. Line: 4. Column: 47. Include test-cases/data/config_example-ops.txt: Not able to open file."
+      "parser_error": "Rules error. File: config-include-bad.json. Line: 4. Column: 47. test-cases/data/config_example-ops.txt: Not able to open file."
     },
     "rules":[
       "SecRuleEngine On",
@@ -34,7 +34,7 @@
     "version_min":300000,
     "title":"Include - missing at include",
     "expected":{
-      "parser_error": "Rules error. File: test-cases/data/config_example-ops-include.txt. Line: 1. Column: 53. Include test-cases/data/config_example-not-exist.txt: Not able to open file."
+      "parser_error": "Rules error. File: test-cases/data/config_example-ops-include.txt. Line: 1. Column: 53. test-cases/data/config_example-not-exist.txt: Not able to open file."
     },
     "rules":[
       "SecRuleEngine On",
@@ -49,7 +49,7 @@
     "version_min":300000,
     "title":"Include - bad operator inside include",
     "expected":{
-      "parser_error": "Rules error. File: test-cases/data/config_example-bad-op-include.txt. Line: 2. Column: 32."
+      "parser_error": "Rules error. File: test-cases/data/config_example-bad-op-include.txt. Line: 2. Column: 67. .*"
     },
     "rules":[
       "SecRuleEngine On",
@@ -64,7 +64,7 @@
     "version_min":300000,
     "title":"Include - duplicate id",
     "expected":{
-      "parser_error": "Rule id: 40.000000 is duplicated"
+      "parser_error": "Rule id: 40 is duplicated"
     },
     "rules":[
       "SecRuleEngine On",

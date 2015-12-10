@@ -82,7 +82,7 @@
       ]
     },
     "expected":{
-      "parser_error":"Failed to open file: file-not-found.txt"
+      "parser_error":"Rules error. File: operator-ipMatchFromFile.json. Line: 4. Column: 20. .*"
     },
     "rules":[
       "SecRuleEngine On",

@@ -129,14 +129,17 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         }
 
         if (modsec_rules->load(t->rules.c_str(), filename) < 0) {
+            /* Parser error */
             if (t->parser_error.empty() == true) {
+                /* Not expecting any error, thus return the error to the user. */
+                std::cout << KRED << "failed!" << RESET << std::endl;
                 testRes->reason << KRED << "parse failed." << RESET \
                     << std::endl;
                 testRes->reason << modsec_rules->getParserError() \
                     << std::endl;
                 testRes->passed = false;
                 res->push_back(testRes);
-                return;
+                continue;
             }
 
             Regex re(t->parser_error);
@@ -144,10 +147,16 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
             std::string s = modsec_rules->getParserError();
 
             if (regex_search(s, &match, re) && match.size() >= 1) {
+                std::cout << KGRN << "passed!" << RESET << std::endl;
+                /* Parser error was expected, thus, the test passed. */
                 testRes->reason << KGRN << "passed!" << RESET << std::endl;
                 testRes->passed = true;
-                return;
+                res->push_back(testRes);
+                continue;
             } else {
+                /* Parser error was expected, but with a different content */
+                std::cout << KRED << "failed!" << RESET << std::endl;
+
                 testRes->reason << KRED << "failed!" << RESET << std::endl;
                 testRes->reason << KWHT << "Expected a parser error." \
                     << RESET << std::endl;
@@ -156,17 +165,20 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
                 testRes->reason << KWHT << "Produced: " << RESET \
                     << s << std::endl;
                 testRes->passed = false;
-                return;
+                res->push_back(testRes);
+                continue;
             }
-
         } else {
+            /* Parser error was expected but never happened */
             if (t->parser_error.empty() == false) {
-                std::cout << KRED << "failed!" << std::endl;
+                std::cout << KRED << "failed!" << RESET << std::endl;
                 std::cout << KWHT << "Expected a parser error." \
                     << RESET << std::endl;
                 std::cout << KWHT << "Expected: " << RESET \
                     << t->parser_error << std::endl;
                 testRes->passed = false;
+                res->push_back(testRes);
+                continue;
             }
         }
 
