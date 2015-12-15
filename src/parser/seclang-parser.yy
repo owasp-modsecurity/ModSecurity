@@ -21,6 +21,7 @@ class Driver;
 #include "actions/action.h"
 #include "actions/audit_log.h"
 #include "actions/ctl_audit_log_parts.h"
+#include "actions/init_col.h"
 #include "actions/set_var.h"
 #include "actions/severity.h"
 #include "actions/skip_after.h"
@@ -59,6 +60,7 @@ using modsecurity::ModSecurity;
 
 using modsecurity::actions::Action;
 using modsecurity::actions::CtlAuditLogParts;
+using modsecurity::actions::InitCol;
 using modsecurity::actions::SetVar;
 using modsecurity::actions::Severity;
 using modsecurity::actions::Tag;
@@ -794,7 +796,12 @@ act:
       }
     | ACTION_INITCOL
       {
-        $$ = Action::instantiate($1);
+        std::string error;
+        $$ = new InitCol($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | TRANSFORMATION
       {

@@ -155,9 +155,13 @@ FREE_TEXT_SPACE [^ \t]+
 FREE_TEXT_SPACE_COMMA [^, \t]+
 FREE_TEXT_SPACE_COMMA_QUOTE [^, \t\"]+
 
+COL_NAME [A-Za-z]+
+COL_FREE_TEXT_SPACE_COMMA ([^,])+
+
 VAR_FREE_TEXT_QUOTE ([^\']|([^\\]\\\'))+
 VAR_FREE_TEXT_SPACE_COMMA [^, \t\"]+
 VAR_FREE_TEXT_SPACE [^ \t\"]+
+
 
 SOMETHING ["]{1}[^@]{1}([^"]|([^\\"]\\\"))*["]{1}
 
@@ -333,7 +337,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {ACTION_ACCURACY}:{FREE_TEXT_QUOTE}      { return yy::seclang_parser::make_ACTION_ACCURACY(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_CTL_BDY_XML}              { return yy::seclang_parser::make_ACTION_CTL_BDY_XML(yytext, *driver.loc.back()); }
 {ACTION_CTL_BDY_JSON}             { return yy::seclang_parser::make_ACTION_CTL_BDY_JSON(yytext, *driver.loc.back()); }
-{ACTION_INITCOL}:{FREE_TEXT_QUOTE}={FREE_TEXT_SPACE_COMMA} { return yy::seclang_parser::make_ACTION_INITCOL(yytext, *driver.loc.back()); }
+{ACTION_INITCOL}:{COL_NAME}={COL_FREE_TEXT_SPACE_COMMA} { return yy::seclang_parser::make_ACTION_INITCOL(yytext, *driver.loc.back()); }
 
 ["]                             { return yy::seclang_parser::make_QUOTATION_MARK(yytext, *driver.loc.back()); }
 [,]                             { return yy::seclang_parser::make_COMMA(*driver.loc.back()); }
