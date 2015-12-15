@@ -2513,6 +2513,11 @@ static void msre_perform_disruptive_actions(modsec_rec *msr, msre_rule *rule,
             }
         }
     }
+    if (actionset->intercept_action_rec->metadata->type == ACTION_DISRUPTIVE) {
+        if (actionset->intercept_action_rec->metadata->execute != NULL) {
+            actionset->intercept_action_rec->metadata->execute(msr, mptmp, rule, actionset->intercept_action_rec);
+        }
+    }
 
     /* If "noauditlog" was used do not mark the transaction relevant. */
     if (actionset->auditlog != 0) {
