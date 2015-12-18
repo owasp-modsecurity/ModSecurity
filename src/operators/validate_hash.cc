@@ -22,7 +22,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool ValidateHash::evaluate(Assay *assay) {
+bool ValidateHash::evaluate(Assay *assay, const std::string &str) {
     /**
      * @todo Implement the operator ValidateHash.
      *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#validateHash

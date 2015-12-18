@@ -28,7 +28,7 @@ class GsbLookup : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     GsbLookup(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    bool evaluate(Assay *assay, const std::string &str);
 };
 
 }  // namespace operators

@@ -22,7 +22,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool Rbl::evaluate(Assay *assay) {
+bool Rbl::evaluate(Assay *assay, const std::string &str) {
     /**
      * @todo Implement the operator Rbl.
      *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#rbl

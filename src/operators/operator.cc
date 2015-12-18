@@ -74,20 +74,6 @@ bool Operator::debug(Assay *assay, int x, std::string a) {
 }
 
 
-bool Operator::evaluate(Assay *assay) {
-#ifndef NO_LOGS
-    if (assay) {
-        assay->debug(2, "Operator: " + this->op + \
-            " is not implemented or malfunctioning.");
-    } else {
-        std::cerr << "Operator: " + this->op + \
-            " is not implemented or malfunctioning.";
-    }
-#endif
-    return true;
-}
-
-
 bool Operator::evaluate(Assay *assay, const std::string& a) {
 #ifndef NO_LOGS
     if (assay) {

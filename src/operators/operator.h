@@ -44,7 +44,6 @@ class Operator {
         return true;
     }
 
-    virtual bool evaluate(Assay *assay);
     virtual bool evaluate(Assay *assay, const std::string &str);
     static Operator *instantiate(std::string op);
  protected:

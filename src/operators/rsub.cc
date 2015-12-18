@@ -22,7 +22,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool Rsub::evaluate(Assay *assay) {
+bool Rsub::evaluate(Assay *assay, const std::string &str) {
     /**
      * @todo Implement the operator Rsub.
      *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#rsub

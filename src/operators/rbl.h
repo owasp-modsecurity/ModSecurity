@@ -29,7 +29,7 @@ class Rbl : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     Rbl(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    bool evaluate(Assay *assay, const std::string  &str) override;
 };
 
 }  // namespace operators

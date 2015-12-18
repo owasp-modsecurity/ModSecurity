@@ -22,7 +22,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool GsbLookup::evaluate(Assay *assay) {
+bool GsbLookup::evaluate(Assay *assay, const std::string &str) {
     /**
      * @todo Implement the operator GeoLookup.
      *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#gsblookup

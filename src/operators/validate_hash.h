@@ -28,7 +28,7 @@ class ValidateHash : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     ValidateHash(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay);
+    bool evaluate(Assay *assay, const std::string  &str) override;
 };
 
 }  // namespace operators
