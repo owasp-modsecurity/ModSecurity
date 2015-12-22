@@ -4,3 +4,6 @@
 [submodule "others/libinjection"]
 	path = others/libinjection
 	url = https://github.com/client9/libinjection.git
+[submodule "bindings/python"]
+	path = bindings/python
+	url = https://github.com/SpiderLabs/ModSecurity-Python-bindings.git
