@@ -218,6 +218,20 @@ if test "$debugLogs" != "true"; then
 fi
 
 
+# Fuzzer
+AC_ARG_ENABLE(afl-fuzz,
+    [AC_HELP_STRING([--enable-afl-fuzz],[Turn on the afl fuzzer compilation utilities])],
+
+    [case "${enableval}" in
+        yes) aflFuzzer=true ;;
+        no)  aflFuzzer=false ;;
+        *) AC_MSG_ERROR(bad value ${enableval} for --enable-afl-fuzz) ;;
+    esac],
+
+    [aflFuzzer=false]
+    )
+
+
 # Decide if we want to build the tests or not.
 buildTestUtilities=false
 if test "x$YAJL_FOUND" = "x1"; then
@@ -234,10 +248,21 @@ AM_CONDITIONAL([TEST_UTILITIES], [test $buildTestUtilities = true])
 
 # General link options
 if test "$PLATFORM" != "MacOSX"; then
-    GLOBAL_LDADD="-lrt"
-    AC_SUBST(GLOBAL_LDADD)
+    GLOBAL_LDADD="-lrt  "
 fi
 
+if test "$aflFuzzer" == "true"; then
+    FUZZ_CPPCFLAGS="-fsanitize=address -fsanitize-coverage=edge,indirect-calls,8bit-counters "
+    GLOBAL_LDADD="$GLOBAL_LDADD -fsanitize=address "
+    GLOBAL_CPPFLAGS="$GLOBAL_CPPFLAGS $FUZZ_CPPCFLAGS"
+fi
+AC_SUBST(GLOBAL_LDADD)
+AC_SUBST(GLOBAL_CPPFLAGS)
+
+AM_CONDITIONAL([AFL_FUZZER], [test $aflFuzzer = true])
+
+GLOBAL_CFLAGS=""
+AC_SUBST(GLOBAL_CFLAGS)
 
 # Files to be generated via autotools.
 AC_CONFIG_FILES([\
@@ -247,6 +272,7 @@ AC_CONFIG_FILES([\
     others/Makefile \
     test/Makefile \
     test/benchmark/Makefile \
+    test/fuzzer/Makefile \
     examples/Makefile \
     examples/simple_example_using_c/Makefile \
     ])
@@ -373,4 +399,25 @@ else
     echo "   + SecDebugLog                                   ....disabled"
 fi
 
+if test "$aflFuzzer" = "true"; then
+    echo "   + afl fuzzer                                    ....enabled"
+    echo "    ($FUZZ_CPPCFLAGS)"
+else
+    echo "   + afl fuzzer                                    ....disabled"
+fi
+
 echo " "
+
+
+if test "$aflFuzzer" = "true"; then
+    echo "WARNING: afl fuzzer was enabled. Make sure you are using the"
+    echo " 'afl-clang-fast' as the compiler, otherwise the compilation"
+    echo "  will fail."
+    echo " "
+    echo " You can set the compiler using:"
+    echo " "
+    echo "  $ export CXX=afl-clang-fast++ "
+    echo "  $ export CC=afl-clang-fast "
+    echo " "
+fi
+

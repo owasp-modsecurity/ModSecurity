@@ -1,7 +1,13 @@
 
+if AFL_FUZZER
+export MAYBE_AFL_FUZZER = fuzzer
+endif
+
 
 SUBDIRS = \
-	benchmark
+	benchmark \
+	$(MAYBE_AFL_FUZZER)
+
 
 # make clean
 CLEANFILES = 
@@ -9,7 +15,6 @@ CLEANFILES =
 # make maintainer-clean
 MAINTAINERCLEANFILES = \
 	Makefile.in
-
 
 
 bin_PROGRAMS = unit-tests regression-tests rules-optimization
@@ -39,6 +44,7 @@ unit_tests_CPPFLAGS = \
 	$(CURL_CFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
+	$(GLOBAL_CPPFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(YAJL_CFLAGS)
 
@@ -68,6 +74,7 @@ regression_tests_CPPFLAGS = \
 	$(CURL_CFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
+	$(GLOBAL_CPPFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(YAJL_CFLAGS)
 
@@ -95,5 +102,7 @@ rules_optimization_CPPFLAGS = \
 	$(CURL_CFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
+	$(GLOBAL_CPPFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(YAJL_CFLAGS)
+
