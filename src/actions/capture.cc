@@ -21,7 +21,7 @@
 
 #include "modsecurity/assay.h"
 
-#include "src/rule.h"
+#include "modsecurity/rule.h"
 #include "operators/operator.h"
 #include "operators/pm.h"
 #include "operators/rx.h"

@@ -19,7 +19,7 @@
 #include <string>
 
 #include "modsecurity/assay.h"
-#include "src/rule.h"
+#include "modsecurity/rule.h"
 
 namespace modsecurity {
 namespace actions {

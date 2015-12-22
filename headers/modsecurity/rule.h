@@ -23,11 +23,14 @@
 #define SRC_RULE_H_
 
 #include "modsecurity/modsecurity.h"
-#include "variables/variable.h"
+
 
 #ifdef __cplusplus
 
 namespace modsecurity {
+namespace Variables {
+    class Variable;
+}
 
 class Rule {
  public:
@@ -46,6 +49,8 @@ class Rule {
     std::vector<actions::Action *> actions_conf;
     std::vector<actions::Action *> actions_runtime_pre;
     std::vector<actions::Action *> actions_runtime_pos;
+
+    std::vector<std::string> getActionNames();
 
     std::vector<Variables::Variable *> *variables;
     int phase;

@@ -21,7 +21,7 @@
 #include "actions/action.h"
 #include "modsecurity/assay.h"
 #include "src/utils.h"
-#include "src/rule.h"
+#include "modsecurity/rule.h"
 #include "src/macro_expansion.h"
 
 namespace modsecurity {

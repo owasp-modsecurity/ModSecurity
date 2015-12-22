@@ -13,7 +13,7 @@
  *
  */
 
-#include "src/rule.h"
+#include "modsecurity/rule.h"
 
 #include <stdio.h>
 
@@ -132,6 +132,25 @@ Rule::Rule(Operator *_op,
     }
 
     delete actions;
+}
+
+
+std::vector<std::string> Rule::getActionNames() {
+    std::vector<std::string> a;
+    for (auto &z : this->actions_runtime_pos)
+    {
+        a.push_back(z->action);
+    }
+    for (auto &z : this->actions_runtime_pre)
+    {
+        a.push_back(z->action);
+    }
+    for (auto &z : this->actions_conf)
+    {
+        a.push_back(z->action);
+    }
+
+    return a;
 }
 
 

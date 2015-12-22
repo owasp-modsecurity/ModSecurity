@@ -17,7 +17,7 @@
 #include <iostream>
 
 #include "modsecurity/modsecurity.h"
-#include "src/rule.h"
+#include "modsecurity/rule.h"
 #include "src/config.h"
 #include "src/unique_id.h"
 #ifdef MSC_WITH_CURL
@@ -76,7 +76,7 @@ ModSecurity::~ModSecurity() {
  *       update it, make it in a fashion that won't break the existent parsers.
  *       (e.g. adding extra information _only_ to the end of the string)
  */
-std::string ModSecurity::whoAmI() {
+const std::string ModSecurity::whoAmI() {
     std::string platform("Unknown platform");
 
 #if AIX

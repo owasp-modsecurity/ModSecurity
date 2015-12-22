@@ -33,7 +33,7 @@ class Driver;
 #include "actions/transformations/transformation.h"
 #include "actions/transformations/none.h"
 #include "operators/operator.h"
-#include "src/rule.h"
+#include "modsecurity/rule.h"
 #include "utils/geo_lookup.h"
 #include "audit_log.h"
 #include "utils.h"

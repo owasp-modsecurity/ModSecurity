@@ -173,7 +173,7 @@ class Assay {
     std::list<std::string> rulesMessages;
     std::list<std::string> ruleTags;
 
-    std::list<std::pair<int, std::string>> auditLogModifier;
+    std::list< std::pair<int, std::string> > auditLogModifier;
     std::string m_marker;
 
  private:

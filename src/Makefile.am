@@ -27,6 +27,7 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/debug_log.h \
 	../headers/modsecurity/intervention.h \
 	../headers/modsecurity/modsecurity.h \
+	../headers/modsecurity/rule.h \
 	../headers/modsecurity/rules.h \
 	../headers/modsecurity/rules_properties.h
 

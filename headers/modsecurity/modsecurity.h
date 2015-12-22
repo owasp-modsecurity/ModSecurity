@@ -140,7 +140,7 @@ class ModSecurity {
     ModSecurity();
     ~ModSecurity();
 
-    static std::string whoAmI();
+    static const std::string whoAmI();
     void setConnectorInformation(std::string connector);
     void setServerLogCb(LogCb cb);
     void serverLog(void *data, const std::string& msg);
