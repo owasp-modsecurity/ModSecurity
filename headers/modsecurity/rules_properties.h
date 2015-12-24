@@ -201,6 +201,7 @@ class RulesProperties {
     std::string audit_log_path;
     std::string audit_log_parts;
     std::list<std::string> components;
+    std::set<std::string> m_responseBodyTypeToBeInspected;
 
     DebugLog *m_debugLog;
 

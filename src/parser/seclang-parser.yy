@@ -8,7 +8,8 @@
 %define parse.assert
 %code requires
 {
-# include <string>
+#include <string>
+#include <iterator>
 
 namespace ModSecurity {
 namespace Parser {
@@ -601,6 +602,16 @@ expression:
     | CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION
     | CONFIG_DIR_PCRE_MATCH_LIMIT
     | CONGIG_DIR_RESPONSE_BODY_MP
+      {
+        std::istringstream buf($1);
+        std::istream_iterator<std::string> beg(buf), end;
+        std::set<std::string> tokens(beg, end);
+        for (std::set<std::string>::iterator it=tokens.begin();
+            it!=tokens.end(); ++it)
+        {
+            driver.m_responseBodyTypeToBeInspected.insert(*it);
+        }
+      }
     | CONGIG_DIR_SEC_TMP_DIR
     | CONGIG_DIR_SEC_DATA_DIR
     | CONGIG_DIR_SEC_ARG_SEP

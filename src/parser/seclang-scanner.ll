@@ -259,7 +259,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 %{ /* Other configurations */ %}
 {CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_PCRE_MATCH_LIMIT}[ ]{CONFIG_VALUE_NUMBER}    { return yy::seclang_parser::make_CONFIG_DIR_PCRE_MATCH_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
-{CONGIG_DIR_RESPONSE_BODY_MP}[ ]{FREE_TEXT_NEW_LINE}   { return yy::seclang_parser::make_CONGIG_DIR_RESPONSE_BODY_MP(yytext, *driver.loc.back()); }
+{CONGIG_DIR_RESPONSE_BODY_MP}[ ]{FREE_TEXT_NEW_LINE}   { return yy::seclang_parser::make_CONGIG_DIR_RESPONSE_BODY_MP(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONGIG_DIR_SEC_TMP_DIR}[ ]{CONFIG_VALUE_PATH}        { return yy::seclang_parser::make_CONGIG_DIR_SEC_TMP_DIR(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONGIG_DIR_SEC_DATA_DIR}[ ]{CONFIG_VALUE_PATH}       { return yy::seclang_parser::make_CONGIG_DIR_SEC_DATA_DIR(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONGIG_DIR_SEC_ARG_SEP}[ ]{FREE_TEXT_NEW_LINE}        { return yy::seclang_parser::make_CONGIG_DIR_SEC_ARG_SEP(yytext, *driver.loc.back()); }

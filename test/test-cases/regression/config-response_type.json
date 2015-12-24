@@ -1,0 +1,87 @@
+[
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecResponseBodyMimeType (1/x)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log":"T \\(0\\) trim: \"no need.\""
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecResponseBodyMimeType text\/plain text\/html text\/xml",
+      "SecRule RESPONSE_BODY \"@contains RESPONSE_CONTENT_TYPE\" \"id:9,pass,t:trim,phase:4\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"SecResponseBodyMimeType (1/x)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*"
+      },
+      "uri":"/?key=value&key=other_value",
+      "method":"GET"
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log":"T \\(0\\) trim: \"text/html\""
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecResponseBodyMimeType application\/something",
+      "SecRule RESPONSE_BODY \"@contains RESPONSE_CONTENT_TYPE\" \"id:9,pass,t:trim,phase:4\""
+    ]
+  }
+
+]

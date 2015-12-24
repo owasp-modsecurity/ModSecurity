@@ -221,6 +221,13 @@ int Rules::merge(Driver *from) {
     this->requestBodyLimitAction = from->requestBodyLimitAction;
     this->responseBodyLimitAction = from->responseBodyLimitAction;
 
+    for (std::set<std::string>::iterator
+        it=from->m_responseBodyTypeToBeInspected.begin();
+        it!=from->m_responseBodyTypeToBeInspected.end(); ++it)
+    {
+        m_responseBodyTypeToBeInspected.insert(*it);
+    }
+
     /*
      *
      * default Actions is something per configuration context, there is

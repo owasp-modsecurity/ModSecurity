@@ -105,6 +105,7 @@ Assay::Assay(ModSecurity *ms, Rules *rules, void *logCbData)
     m_requestBodyType(UnknownFormat),
     m_requestHeadersNames(NULL),
     m_responseHeadersNames(NULL),
+    m_responseContentType(NULL),
     m_marker(""),
     start(cpu_seconds()),
     m_logCbData(logCbData),
@@ -127,6 +128,10 @@ Assay::Assay(ModSecurity *ms, Rules *rules, void *logCbData)
     m_collections.store("RESPONSE_HEADERS_NAMES", std::string(""));
     this->m_responseHeadersNames = m_collections.resolveFirst(
         "RESPONSE_HEADERS_NAMES");
+    m_collections.store("RESPONSE_CONTENT_TYPE", std::string(""));
+    this->m_responseContentType = m_collections.resolveFirst(
+        "RESPONSE_CONTENT_TYPE");
+
 
 #ifndef NO_LOGS
     this->debug(4, "Initialising transaction");
@@ -860,7 +865,7 @@ int Assay::addResponseHeader(const std::string& key,
     this->m_collections.store("RESPONSE_HEADERS:" + key, value);
 
     if (tolower(key) == "content-type") {
-        this->m_collections.store("RESPONSE_CONTENT_TYPE", value);
+        this->m_responseContentType->assign(value);
     }
     return 1;
 }
@@ -951,6 +956,21 @@ int Assay::processResponseBody() {
         return true;
     }
 
+    std::set<std::string> &bi = this->m_rules->m_responseBodyTypeToBeInspected;
+    auto t = bi.find(*m_responseContentType);
+    if (t == bi.end() && bi.empty() == false) {
+#ifndef NO_LOGS
+        debug(5, "Response Content-Type is " + *m_responseContentType + \
+            ". It is not marked to be inspected.");
+        std::string validContetTypes("");
+        for (std::set<std::string>::iterator i = bi.begin();
+             i != bi.end(); i++) {
+            validContetTypes.append(*i + " ");
+        }
+        debug(8, "Content-Type(s) marked to be inspected: " + validContetTypes);
+#endif
+        return true;
+    }
     if (m_collections.resolveFirst("OUTBOUND_DATA_ERROR") == NULL) {
         m_collections.store("OUTBOUND_DATA_ERROR", "0");
     }
@@ -984,6 +1004,17 @@ int Assay::processResponseBody() {
  */
 int Assay::appendResponseBody(const unsigned char *buf, size_t len) {
     int current_size = this->m_responseBody.tellp();
+
+    std::set<std::string> &bi = this->m_rules->m_responseBodyTypeToBeInspected;
+    auto t = bi.find(*m_responseContentType);
+    if (t == bi.end() && bi.empty() == false) {
+#ifndef NO_LOGS
+        debug(4, "Not appending response body. " \
+            "Response Content-Type is " + *m_responseContentType + \
+            ". It is not marked to be inspected.");
+#endif
+        return true;
+    }
 
 #ifndef NO_LOGS
     debug(9, "Appending response body: " + std::to_string(len + current_size)
