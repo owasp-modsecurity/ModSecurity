@@ -19,7 +19,7 @@ of the SecRules language, yet._
 * All Apache dependences have been removed
 * Higher performance
 * New features
-* New architecture 
+* New architecture
 
 Libmodsecurity is a complete rewrite of the ModSecurity platform. When it was first devised the ModSecurity project started as just an Apache module. Over time the project has been extended, due to popular demand, to support other platforms including (but not limited to) Nginx and IIS. In order to provide for the growing demand for additional platform support, it has became necessary to remove the Apache dependencies underlying this project, making it more platform independent.
 
@@ -46,9 +46,10 @@ As a dynamic library, don’t forget that libmodsecurity must be installed to a 
 
 ### Unix (Linux, MacOS, FreeBSD, …)
 
-Several individuals have been building the project on Fedora (22 or later) succesfully. We were able to get it to build using the following packages. These packages have no been thoroughly tested yet so compile at your own risk. You may have to manually link the generated ModSecurity library file location if it is not put into a location that is in your path (export  LD_LIBRARY_PATH=/usr/local/modsecurity/lib/). 
+Several individuals have been building the project on Fedora (22 or later) succesfully. We were able to get it to build using the following packages. These packages have no been thoroughly tested yet so compile at your own risk. You may have to manually link the generated ModSecurity library file location if it is not put into a location that is in your path (export  LD_LIBRARY_PATH=/usr/local/modsecurity/lib/).
 
-```$ sudo dnf install gcc-c++ flex bison curl-devel curl yajl yajl-devel GeoIP-devel doxygen
+```shell
+$ sudo dnf install gcc-c++ flex bison curl-devel curl yajl yajl-devel GeoIP-devel doxygen
 $ cd /opt/
 $ git clone https://github.com/SpiderLabs/ModSecurity
 $ cd ModSecurity
@@ -65,7 +66,8 @@ $ cd /opt/
 $ wget http://nginx.org/download/nginx-1.9.2.tar.gz
 $ tar -xvzf nginx-1.9.2.tar.gz
 $ yum install zlib-devel
-$ ./configure --add-module=/opt/ModSecurity-nginx```
+$ ./configure --add-module=/opt/ModSecurity-nginx
+```
 
 On unix the project uses autotools to help the compilation process.
 
@@ -84,14 +86,14 @@ Windows build is not ready yet.
 ## Dependencies
 
 This library is written in C++ using the C++11 standards. It also uses Flex
-and Yacc to produce the “Sec Rules Language” parser. Other, manditory dependencies include YAJL, as ModSecurity uses JSON for producing logs and its testing framework, libpcre (not yet manditory) for processing regular expressions in SecRules, and libXML2 (not yet manditory) which is used for parsing XML requests. 
+and Yacc to produce the “Sec Rules Language” parser. Other, manditory dependencies include YAJL, as ModSecurity uses JSON for producing logs and its testing framework, libpcre (not yet manditory) for processing regular expressions in SecRules, and libXML2 (not yet manditory) which is used for parsing XML requests.
 
 All others dependencies are related to operators specified within SecRules or configuration directives and may not be required for compilation. A short list of such dependencies is as follows:
 
 * libinjection is needed for the operator @detectXSS and @detectSQL
-* curl is needed for the directive SecRemoteRules. 
+* curl is needed for the directive SecRemoteRules.
 
-If those libraries are missing ModSecurity will be compiled without the support for the operator @detectXSS and the configuration directive SecRemoteRules. 
+If those libraries are missing ModSecurity will be compiled without the support for the operator @detectXSS and the configuration directive SecRemoteRules.
 
 # Library documentation
 
@@ -199,7 +201,7 @@ $ cd /path/to/modsecurity-nginx
 $ egrep -Rin "TODO|FIXME" -R *
 ```
 
-A TODO list is also available as part of the Doxygen documentation. 
+A TODO list is also available as part of the Doxygen documentation.
 
 ### Testing your patch
 
@@ -221,7 +223,7 @@ $ ./regression-tests
 $ ./unit-tests
  ```
 
-### Debugging 
+### Debugging
 
 
 Before start the debugging process, make sure of where your bug is. The problem
