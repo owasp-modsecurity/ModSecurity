@@ -1,6 +1,9 @@
 DD mmm YYYY - X.Y.Z (To be released)
 ------------------------------------
 
+ * mlogc-batch-load.pl.in: fix searching SecAuditLogStorageDir
+   files with Apache 2.4
+   [Issue #775 - Elia Pinto]
  * Understands IIS 10 as compatible on Windows installer.
    [Issue #931 - Anton Serbulov, Pavel Vasilevich and ModSecurity team]
  * Fix apache logging limitation by using correct apache call.
