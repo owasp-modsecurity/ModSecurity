@@ -3,9 +3,9 @@
 * Copyright (c) 2004-2013 Trustwave Holdings, Inc. (http://www.trustwave.com/)
 *
 * You may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
+* the License.  You may obtain a copy of the License at
 *
-*     http://www.apache.org/licenses/LICENSE-2.0
+*     http://www.apache.org/licenses/LICENSE-2.0
 *
 * If any of the files related to licensing are missing or if you have any
 * other questions related to licensing please contact Trustwave Holdings, Inc.
@@ -460,9 +460,9 @@ AP_DECLARE(apr_status_t) ap_pcfg_openfile(ap_configfile_t **ret_cfg,
 
     exist_type = (finfo.filetype != APR_REG);
 #if defined(WIN32) || defined(OS2) || defined(NETWARE)
-    exist_type = (exist_type && strcasecmp(apr_filepath_name_get(name), "nul") != 0));
+    exist_type = (exist_type && strcasecmp(apr_filepath_name_get(name), "nul") != 0);
 #else
-    exist_type = (exist_type && strcmp(name, "/dev/null") != 0);
+    exist_type = (exist_type && strcmp(name, "/dev/null") != 0));
 #endif /* WIN32 || OS2 */
     if (exist_type){ ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL,
                      "Access to file %s denied by server: not a regular file",
