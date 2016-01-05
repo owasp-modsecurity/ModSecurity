@@ -462,7 +462,7 @@ AP_DECLARE(apr_status_t) ap_pcfg_openfile(ap_configfile_t **ret_cfg,
 #if defined(WIN32) || defined(OS2) || defined(NETWARE)
     exist_type = (exist_type && strcasecmp(apr_filepath_name_get(name), "nul") != 0);
 #else
-    exist_type = (exist_type && strcmp(name, "/dev/null") != 0));
+    exist_type = (exist_type && strcmp(name, "/dev/null") != 0);
 #endif /* WIN32 || OS2 */
     if (exist_type){ ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL,
                      "Access to file %s denied by server: not a regular file",
