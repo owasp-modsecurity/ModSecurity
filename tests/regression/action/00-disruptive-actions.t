@@ -476,6 +476,37 @@
 },
 {
 	type => "action",
+	comment => "nocanon proxy in phase:1 (get)",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecResponseBodyAccess On
+		SecResponseBodyMimeType null
+		SecRule REQUEST_URI "\@streq /test2.txt" "phase:1,proxy:'[nocanon]http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt',id:500005"
+	),
+	match_log => {
+		error => {
+			apache => [qr/ModSecurity: Access denied using proxy to \(phase 1\)/, 1],
+			nginx => [qr/ModSecurity: Access denied with code 500 \(phase 1\) \(Configuration Error: Proxy action to .* requested but proxy is only available in Apache version\)./, 1],
+		},
+	},
+	match_response => {
+		status => {
+			apache => qr/^200$/,
+			nginx => qr/^500$/,
+		},
+		content => {
+			apache => qr/^TEST$/,
+			nginx => qr/^*$/,
+		},
+	},
+
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test2.txt",
+	),
+},
+{
+	type => "action",
 	comment => "proxy in phase:2 (get)",
 	conf => qq(
 		SecRuleEngine On
