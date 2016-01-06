@@ -33,31 +33,26 @@ InitCol::InitCol(std::string action)
 
 
 bool InitCol::init(std::string *error) {
-        int posEquals = action.find("=");
-        int posInit = strlen("initcol:");
-std::cout << "Init collection!!!!!!!!!!!!!" << std::endl;
+    int posEquals = action.find("=");
+    int posInit = strlen("initcol:");
 
-        if (action.size() < 8) {
-            // return false;
-        }
-        if (posEquals == std::string::npos) {
-            // return false;
-        }
+    if (action.size() < 8) {
+        return false;
+    }
+    if (posEquals == std::string::npos) {
+        return false;
+    }
 
-        m_collection_key = std::string(action, posInit,  posEquals - posInit);
-        m_collection_value = std::string(action, posEquals + 1);
+    m_collection_key = std::string(action, posInit,  posEquals - posInit);
+    m_collection_value = std::string(action, posEquals + 1);
+
+    return true;
 }
 
 
 bool InitCol::evaluate(Rule *rule, Assay *assay) {
     std::string collectionName;
-
     collectionName = MacroExpansion::expand(m_collection_value, assay);
-    std::cout << std::endl;
-    std::cout << "Evaluate collection!!!!!!!!!!!!!" << std::endl;
-    std::cout << "Collection key: " << m_collection_key << std::endl;
-    std::cout << "Collection value: " << m_collection_value << std::endl;
-    std::cout << "Collection value (expanded): " << collectionName << std::endl;
     return true;
 }
 
