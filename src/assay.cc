@@ -288,7 +288,7 @@ int Assay::processURI(const char *uri, const char *protocol,
 
     std::string parsedURI = uri;
     // The more popular case is without domain
-    if (!m_uri_decoded.empty() && m_uri_decoded.at(1) != '/') {
+    if (!m_uri_decoded.empty() && m_uri_decoded.at(0) != '/') {
         bool fullDomain = true;
         size_t scheme = m_uri_decoded.find(":")+1;
         if (scheme==std::string::npos) {
