@@ -665,7 +665,7 @@ static apr_status_t msre_action_proxy_execute(modsec_rec *msr, apr_pool_t *mptmp
     var = apr_pcalloc(mptmp, sizeof(msc_string));
     if (var == NULL) return -1;
     if (!strncmp(action->param,"[nocanon]",9)) {
-        apr_table_setn(msr->r->notes,"proxy-nocanon",1);
+        apr_table_setn(msr->r->notes,"proxy-nocanon", "1");
         var->value = (char *)action->param+9;
     } else {
         var->value = (char *)action->param;
