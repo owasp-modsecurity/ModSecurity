@@ -73,7 +73,7 @@
       ]
     },
     "expected":{
-      "debug_log":"T \\(0\\) trim: \"text/html\""
+      "debug_log":"Response Content-Type is text/html. It is not marked to be inspected."
     },
     "rules":[
       "SecRuleEngine On",
