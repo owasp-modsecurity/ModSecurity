@@ -1,6 +1,9 @@
 DD mmm YYYY - X.Y.Z (To be released)
 ------------------------------------
 
+ * mlogc: Allow user to choose between TLS versions (TLSProtocol option
+   introduced).
+   [Issue #881 - Ishwor Gurung]
  * Allow mod_proxy's "nocanon" behavior to be specified in proxy actions
    and Perform the intercept_action as well as the disruptive actions.
    [Issue #1031, #961, #763 - Mario D. Santana and ModSecurity team]
