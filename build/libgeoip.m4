@@ -82,7 +82,7 @@ else
                 GEOIP_DISPLAY="${GEOIP_LDADD}, ${GEOIP_CFLAGS}"
             else
                 # If pkg-config did not find anything useful, go over file lookup.
-                for x in ${GEOIP_POSSIBLE_LIB_NAMES}; do
+                for x in ${GEOIP_POSSIBLE_PATHS}; do
                     CHECK_FOR_GEOIP_AT(${x})
                     if test -n "${GEOIP_VERSION}"; then
                         break
@@ -162,18 +162,26 @@ AC_DEFUN([CHECK_FOR_GEOIP_AT], [
            break
        fi
     done
+    for x in ${GEOIP_POSSIBLE_PATHS}; do
+        if test -e "${x}/include/GeoIPCity.h"; then
+            geoip_inc_path="${x}/include"
+	    break
+        elif test -e "${x}/GeoIPCity.h"; then
+            geoip_inc_path="${x}"
+            break
+        fi
+    done
     if test -e "${path}/include/GeoIPCity.h"; then
         geoip_inc_path="${path}/include"
     elif test -e "${path}/GeoIPCity.h"; then
         geoip_inc_path="${path}"
     fi
 
-    if test -n "${geoip_lib_path}"; then
-        AC_MSG_NOTICE([GeoIP library found at: ${geoip_lib_file}])
-    fi
 
-    if test -n "${geoip_inc_path}"; then
+    if test -n "${geoip_inc_path}" -a -n "${geoip_lib_path}"; then
+
         AC_MSG_NOTICE([GeoIP headers found at: ${geoip_inc_path}])
+        AC_MSG_NOTICE([GeoIP library found at: ${geoip_lib_file}])
     fi
 
     if test -n "${geoip_lib_path}" -a -n "${geoip_inc_path}"; then
