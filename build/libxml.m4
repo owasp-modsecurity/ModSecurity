@@ -80,10 +80,10 @@ AC_SUBST(LIBXML2_LDADD)
 AC_SUBST(LIBXML2_LDFLAGS)
 
 
-if test "x${with_libxml2}" == "xno"; then
+if test "x${with_libxml}" == "xno"; then
     LIBXML2_DISABLED=yes
 else
-    if test "x${with_libxml2}" != "x"; then
+    if test "x${with_libxml}" != "x"; then
         LIBXML2_MANDATORY=yes
     fi
 fi
