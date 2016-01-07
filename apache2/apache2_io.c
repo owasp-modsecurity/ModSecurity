@@ -609,8 +609,12 @@ static int flatten_response_body(modsec_rec *msr) {
             retval = hash_response_body_links(msr);
             if(retval > 0) {
                 retval = inject_hashed_response_body(msr, retval);
-                if (msr->txcfg->debuglog_level >= 4) {
-                    msr_log(msr, 4, "Hash completed in %" APR_TIME_T_FMT " usec.", (apr_time_now() - time1));
+                if(retval < 0){
+                    msr_log(msr, 1, "inject_hashed_response_body: Unable to inject hash into response body. Returning response without changes." );
+                }else{
+                    if (msr->txcfg->debuglog_level >= 4) {
+                        msr_log(msr, 4, "Hash completed in %" APR_TIME_T_FMT " usec.", (apr_time_now() - time1));
+                    }
                 }
 
             }
