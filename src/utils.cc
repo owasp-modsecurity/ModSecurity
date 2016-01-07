@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-
+#include <algorithm>
 #include <random>
 #include <memory>
 #include <functional>
@@ -126,10 +126,12 @@ void chomp(std::string *str) {
 std::string tolower(std::string str) {
     std::locale loc;
     std::string value;
+    value.resize(str.length());
 
-    for (std::string::size_type i=0; i < str.length(); ++i) {
-        value.assign(value + std::tolower(str[i], loc));
-    }
+    std::transform(str.begin(),
+            str.end(),
+            value.begin(),
+            ::tolower);
 
     return value;
 }

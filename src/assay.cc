@@ -433,12 +433,13 @@ int Assay::addRequestHeader(const std::string& key,
 
     this->m_collections.store("REQUEST_HEADERS:" + key, value);
 
-    if (tolower(key) == tolower("Authorization")) {
+    std::string keyl = tolower(key);
+    if (keyl == "authorization") {
         std::vector<std::string> type = split(value, ' ');
         this->m_collections.store("AUTH_TYPE", type[0]);
     }
 
-    if (tolower(key) == "cookie") {
+    if (keyl == "cookie") {
         std::vector<std::string> cookies = split(value, ';');
         while (cookies.empty() == false) {
             std::vector<std::string> s = split(cookies.back(), '=');
@@ -461,7 +462,7 @@ int Assay::addRequestHeader(const std::string& key,
      *
      */
 
-    if (tolower(key) == "content-type") {
+    if (keyl == "content-type") {
         std::string multipart("multipart/form-data");
         std::string l = tolower(value);
 
