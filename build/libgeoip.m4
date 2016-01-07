@@ -21,7 +21,7 @@ GEOIP_POSSIBLE_LIB_NAMES="geoip2 geoip GeoIP"
 GEOIP_POSSIBLE_EXTENSIONS="so la sl dll dylib"
 
 # Possible paths (if pkg-config was not found, proceed with the file lookup)
-GEOIP_POSSIBLE_PATHS="/usr/local/libgeoip /usr/local/geoip /usr/local /opt/libgeoip /opt/geoip /opt /usr /opt/local/include /opt/local /usr/lib /usr/local/lib /usr/lib64"
+GEOIP_POSSIBLE_PATHS="/usr/local/libgeoip /usr/local/geoip /usr/local /opt/libgeoip /opt/geoip /opt /usr /opt/local/include /opt/local /usr/lib /usr/local/lib /usr/lib64 /usr"
 
 # Variables to be set by this very own script.
 GEOIP_VERSION=""
@@ -82,7 +82,7 @@ else
                 GEOIP_DISPLAY="${GEOIP_LDADD}, ${GEOIP_CFLAGS}"
             else
                 # If pkg-config did not find anything useful, go over file lookup.
-                for x in ${GEOIP_POSSIBLE_LIB_NAMES}; do
+                for x in ${GEOIP_POSSIBLE_PATHS}; do
                     CHECK_FOR_GEOIP_AT(${x})
                     if test -n "${GEOIP_VERSION}"; then
                         break
@@ -151,6 +151,12 @@ AC_DEFUN([CHECK_FOR_GEOIP_AT], [
                geoip_lib_file="${geoip_lib_path}/lib${z}.${y}"
                break
            fi
+           if test -e "${path}/lib64/lib${z}.${y}"; then
+               geoip_lib_path="${path}/lib64/"
+               geoip_lib_name="${z}"
+               geoip_lib_file="${geoip_lib_path}/lib${z}.${y}"
+               break
+           fi
            if test -e "${path}/lib/x86_64-linux-gnu/lib${z}.${y}"; then
                geoip_lib_path="${path}/lib/x86_64-linux-gnu/"
                geoip_lib_name="${z}"
@@ -168,12 +174,11 @@ AC_DEFUN([CHECK_FOR_GEOIP_AT], [
         geoip_inc_path="${path}"
     fi
 
-    if test -n "${geoip_lib_path}"; then
-        AC_MSG_NOTICE([GeoIP library found at: ${geoip_lib_file}])
-    fi
 
-    if test -n "${geoip_inc_path}"; then
+    if test -n "${geoip_inc_path}" -a -n "${geoip_lib_path}"; then
+
         AC_MSG_NOTICE([GeoIP headers found at: ${geoip_inc_path}])
+        AC_MSG_NOTICE([GeoIP library found at: ${geoip_lib_file}])
     fi
 
     if test -n "${geoip_lib_path}" -a -n "${geoip_inc_path}"; then
