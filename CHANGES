@@ -1,6 +1,8 @@
 DD mmm YYYY - X.Y.Z (To be released)
 ------------------------------------
 
+ * Extanded Lua support to include version 5.3
+   [Issue #837, #762, #814 - Athmane Madjoudj and ModSecurity team]
  * mlogc: Allow user to choose between TLS versions (TLSProtocol option
    introduced).
    [Issue #881 - Ishwor Gurung]

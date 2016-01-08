@@ -112,7 +112,7 @@ char *lua_compile(msc_script **script, const char *filename, apr_pool_t *pool) {
     dump.parts = apr_array_make(pool, 128, sizeof(msc_script_part *));
 
 #if LUA_VERSION_NUM >= 503
-    lua_dump(L, dump_writer, &dump, 1);
+    lua_dump(L, dump_writer, &dump, 0);
 #else
     lua_dump(L, dump_writer, &dump);
 #endif
@@ -420,22 +420,31 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
     time_before = apr_time_now();
 
 #ifdef CACHE_LUA
+
     L = msr->L;
     rc = lua_gettop(L);
     if(rc)
         lua_pop(L, rc);
+
 #else
+
     /* Create new state. */
-#if LUA_VERSION_NUM > 501
+#if LUA_VERSION_NUM == 502 || LUA_VERSION_NUM == 503 || LUA_VERSION_NUM == 501
     L = luaL_newstate();
-#else
+#elif LUA_VERSION_NUM == 500
     L = lua_open();
+#else
+#error We are only tested under Lua 5.0, 5.1, 5.2, or 5.3.
 #endif
     luaL_openlibs(L);
+
 #endif
 
     if(L == NULL)
         return -1;
+
+    luaL_newmetatable(L, "luaL_msc");
+    lua_newtable(L);
 
     /* Associate msr with the state. */
     lua_pushlightuserdata(L, (void *)msr);
@@ -448,12 +457,15 @@ int lua_execute(msc_script *script, char *param, modsec_rec *msr, msre_rule *rul
     }
 
     /* Register functions. */
-#if LUA_VERSION_NUM > 501
-    luaL_setfuncs(L,mylib,0);
-    lua_setglobal(L,"m");
-#else
+#if LUA_VERSION_NUM == 500 || LUA_VERSION_NUM == 501
     luaL_register(L, "m", mylib);
+#elif LUA_VERSION_NUM == 502 || LUA_VERSION_NUM == 503
+    luaL_setfuncs(L, mylib, 0);
+#else
+#error We are only tested under Lua 5.0, 5.1, 5.2, or 5.3.
 #endif
+
+    lua_setglobal(L, "m");
 
     rc = lua_restore(L, script);
     if (rc) {
