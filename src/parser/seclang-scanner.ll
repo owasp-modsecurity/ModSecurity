@@ -23,17 +23,19 @@ using modsecurity::split;
 %}
 %option noyywrap nounput batch debug noinput
 
-ACTION          (?i:accuracy|allow|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|skip|status:[0-9]+|xmlns)
+ACTION          (?i:accuracy|allow|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|status:[0-9]+|xmlns)
 ACTION_INITCOL  (?i:initcol)
 
 ACTION_ACCURACY (?i:accuracy)
 ACTION_REDIRECT (?i:redirect)
+ACTION_SKIP (?i:skip)
 ACTION_SKIP_AFTER (?i:skipAfter)
 ACTION_PHASE    ((?i:phase:(?i:REQUEST|RESPONSE|LOGGING|[0-9]+))|(?i:phase:'(?i:REQUEST|RESPONSE|LOGGING|[0-9]+)'))
 ACTION_AUDIT_LOG (?i:auditlog)
 ACTION_SEVERITY (?i:severity)
 ACTION_SEVERITY_VALUE (?i:(EMERGENCY|ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)|[0-9]+)
 ACTION_SETVAR   (?i:setvar)
+ACTION_SETENV   (?i:setenv)
 ACTION_EXPIREVAR (?i:expirevar)
 ACTION_MSG      (?i:msg)
 ACTION_TAG      (?i:tag)
@@ -98,7 +100,7 @@ CONFIG_SEC_REMOTE_RULES              (?i:SecRemoteRules)
 CONFIG_SEC_REMOTE_RULES_FAIL_ACTION  (?i:SecRemoteRulesFailAction)
 
 
-DICT_ELEMENT    [^ \t]+
+DICT_ELEMENT    [^ \t|]+
 
 
 OPERATOR        (?i:(?:@inspectFile|@fuzzyHash|@validateByteRange|@validateDTD|@validateHash|@validateSchema|@verifyCC|@verifyCPF|@verifySSN|@gsbLookup|@rsub)|(?:\!{0,1})(?:@within|@containsWord|@contains|@endsWith|@eq|@ge|@gt|@ipMatchF|@ipMatch|@ipMatchFromFile|@le|@lt|@pmf|@pm|@pmFromFile|@rbl|@rx|@streq|@strmatch|@beginsWith))
@@ -106,10 +108,10 @@ OPERATOR        (?i:(?:@inspectFile|@fuzzyHash|@validateByteRange|@validateDTD|@
 OPERATORNOARG	(?i:@detectSQLi|@detectXSS|@validateUrlEncoding|@validateUtf8Encoding)
 OPERATOR_GEOIP  (?i:@geoLookup)
 
-TRANSFORMATION  t:(sha1|hexEncode|lowercase|urlDecodeUni|urlDecode|none|compressWhitespace|removeWhitespace|replaceNulls|removeNulls|htmlEntityDecode|jsDecode|cssDecode|trim|normalizePathWin|normalisePath|length|utf8toUnicode|urldecode|removeComments|replaceComments)
+TRANSFORMATION  t:(?i:(cmdLine|sha1|hexEncode|lowercase|urlDecodeUni|urlDecode|none|compressWhitespace|removeWhitespace|replaceNulls|removeNulls|htmlEntityDecode|jsDecode|cssDecode|trim|normalizePathWin|normalisePathWin|normalisePath|length|utf8toUnicode|urldecode|removeComments|replaceComments))
 
 
-VARIABLE (?i:(ARGS_COMBINED_SIZE|ARGS_GET_NAMES|ARGS_POST_NAMES|FILES_COMBINED_SIZE|FULL_REQUEST_LENGTH|REQUEST_BODY_LENGTH|REQUEST_URI_RAW|UNIQUE_ID|SERVER_PORT|SERVER_ADDR|REMOTE_PORT|REMOTE_HOST|MULTIPART_STRICT_ERROR|PATH_INFO|MULTIPART_CRLF_LF_LINES|MATCHED_VAR_NAME|MATCHED_VAR|INBOUND_DATA_ERROR|OUTBOUND_DATA_ERROR|FULL_REQUEST|AUTH_TYPE|ARGS_NAMES|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_PROTOCOL|RESPONSE_STATUS|REQBODY_PROCESSOR))
+VARIABLE (?i:(RESOURCE|ARGS_COMBINED_SIZE|ARGS_GET_NAMES|ARGS_POST_NAMES|FILES_COMBINED_SIZE|FULL_REQUEST_LENGTH|REQUEST_BODY_LENGTH|REQUEST_URI_RAW|UNIQUE_ID|SERVER_PORT|SERVER_ADDR|REMOTE_PORT|REMOTE_HOST|MULTIPART_STRICT_ERROR|PATH_INFO|MULTIPART_CRLF_LF_LINES|MATCHED_VAR_NAME|MATCHED_VAR|INBOUND_DATA_ERROR|OUTBOUND_DATA_ERROR|FULL_REQUEST|AUTH_TYPE|ARGS_NAMES|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_PROTOCOL|RESPONSE_STATUS|REQBODY_PROCESSOR))
 VARIABLE_COL (?i:(GLOBAL|ARGS_POST|ARGS_GET|ARGS|FILES_SIZES|FILES_NAMES|FILES_TMP_CONTENT|MULTIPART_FILENAME|MULTIPART_NAME|MATCHED_VARS_NAMES|MATCHED_VARS|FILES|QUERY_STRING|REQUEST_COOKIES|REQUEST_HEADERS|RESPONSE_HEADERS|GEO|IP|XML|REQUEST_COOKIES_NAMES))
 
 VARIABLE_TX (?i:TX)
@@ -156,9 +158,10 @@ FREE_TEXT_QUOTE ([^\']|([^\\]\\\'))+
 FREE_TEXT_SPACE [^ \t]+
 FREE_TEXT_SPACE_COMMA [^, \t]+
 FREE_TEXT_SPACE_COMMA_QUOTE [^, \t\"]+
+FREE_TEXT_QUOTE_COMMA [^,\']+
 
 COL_NAME [A-Za-z]+
-COL_FREE_TEXT_SPACE_COMMA ([^,])+
+COL_FREE_TEXT_SPACE_COMMA ([^,"])+
 
 VAR_FREE_TEXT_QUOTE ([^\']|([^\\]\\\'))+
 VAR_FREE_TEXT_SPACE_COMMA [^, \t\"]+
@@ -294,6 +297,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 {ACTION}                        { return yy::seclang_parser::make_ACTION(yytext, *driver.loc.back()); }
 {ACTION_PHASE}                  { return yy::seclang_parser::make_ACTION_PHASE(yytext, *driver.loc.back()); }
+{ACTION_SKIP}:{CONFIG_VALUE_NUMBER} { return yy::seclang_parser::make_ACTION_SKIP(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_SKIP_AFTER}:{FREE_TEXT_SPACE_COMMA_QUOTE} { return yy::seclang_parser::make_ACTION_SKIP_AFTER(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_AUDIT_LOG}              { return yy::seclang_parser::make_ACTION_AUDIT_LOG(yytext, *driver.loc.back()); }
 
@@ -314,6 +318,18 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
                                     return yy::seclang_parser::make_ACTION_EXPIREVAR(strchr(yytext, ':') + 1, *driver.loc.back());
                                          }
 
+{ACTION_SETENV}:'{VAR_FREE_TEXT_QUOTE}={VAR_FREE_TEXT_QUOTE}'  {
+                                    return yy::seclang_parser::make_ACTION_SETENV(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+{ACTION_SETENV}:'{VAR_FREE_TEXT_QUOTE}'              {
+                                    return yy::seclang_parser::make_ACTION_SETENV(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+{ACTION_SETENV}:{VAR_FREE_TEXT_SPACE}={VAR_FREE_TEXT_SPACE_COMMA}  {
+                                    return yy::seclang_parser::make_ACTION_SETENV(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+{ACTION_SETENV}:{VAR_FREE_TEXT_SPACE_COMMA}  {
+                                    return yy::seclang_parser::make_ACTION_SETENV(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
 
 {ACTION_SETVAR}:'{VAR_FREE_TEXT_QUOTE}={VAR_FREE_TEXT_QUOTE}'  {
                                     return yy::seclang_parser::make_ACTION_SETVAR(strchr(yytext, ':') + 1, *driver.loc.back());
@@ -332,7 +348,8 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {ACTION_MSG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_MSG(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_REDIRECT}:{FREE_TEXT} { return yy::seclang_parser::make_ACTION_REDIRECT(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_TAG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_TAG(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_REV}:'{CONFIG_VALUE_NUMBER}'      { return yy::seclang_parser::make_ACTION_REV(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_REV}:'{FREE_TEXT_QUOTE_COMMA}'      { return yy::seclang_parser::make_ACTION_REV(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_REV}:{FREE_TEXT_QUOTE_COMMA}      { return yy::seclang_parser::make_ACTION_REV(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_VER}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_VER(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_MATURITY}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_MATURITY(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_MATURITY}:{FREE_TEXT_QUOTE}      { return yy::seclang_parser::make_ACTION_MATURITY(strchr(yytext, ':') + 1, *driver.loc.back()); }

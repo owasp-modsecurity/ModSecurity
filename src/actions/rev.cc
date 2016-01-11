@@ -30,8 +30,10 @@ namespace actions {
 Rev::Rev(std::string action)
     : Action(action, ConfigurationKind),
     m_rev(action) {
-    m_rev.erase(0, 1);
-    m_rev.pop_back();
+    if (m_rev.at(0) == '\'') {
+        m_rev.erase(0, 1);
+        m_rev.pop_back();
+    }
 }
 
 

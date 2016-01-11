@@ -229,9 +229,11 @@ using modsecurity::Variables::Tx;
 %token <std::string> ACTION_ACCURACY
 %token <std::string> ACTION_REDIRECT
 %token <std::string> ACTION_SKIP_AFTER
+%token <std::string> ACTION_SKIP
 %token <std::string> ACTION_AUDIT_LOG
 %token <std::string> ACTION_PHASE
 %token <std::string> ACTION_SEVERITY
+%token <std::string> ACTION_SETENV
 %token <std::string> ACTION_SETVAR
 %token <std::string> ACTION_EXPIREVAR
 %token <std::string> ACTION_INITCOL
@@ -834,6 +836,24 @@ act:
       {
         $$ = Action::instantiate($1);
       }
+    | ACTION_SETENV
+      {
+        /*
+
+        TODO: setEnv is not implemented yet.
+
+        std::string error;
+        SetEnv *setEnv = new SetEnv($1);
+
+        if (setEnv->init(&error) == false) {
+            driver.parserError << error;
+            YYERROR;
+        }
+
+        $$ = setEnv;
+        */
+        $$ = Action::instantiate($1);
+      }
     | ACTION_SETVAR
       {
         std::string error;
@@ -845,6 +865,16 @@ act:
         }
 
         $$ = setVar;
+      }
+    | ACTION_SKIP
+      {
+        /*
+
+        TODO: skip is not implemented yet.
+
+        $$ = new modsecurity::actions::SkipAfter($1);
+        */
+        $$ = Action::instantiate($1);
       }
     | ACTION_SKIP_AFTER
       {
