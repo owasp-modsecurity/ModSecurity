@@ -216,21 +216,29 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 %{ /* Variables */ %}
 [!&]?{VARIABLE_WEBSERVER_ERROR_LOG}     { driver.error (*driver.loc.back(), "Variable VARIABLE_WEBSERVER_ERROR_LOG is not supported by libModSecurity", ""); throw yy::seclang_parser::syntax_error(*driver.loc.back(), "");}
 [!&]?{VARIABLE}(\:{DICT_ELEMENT})?        { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
+[!&]?{VARIABLE}(\:\'{FREE_TEXT_QUOTE}\')?        { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
 [!&]?{VARIABLE_COL}(\:{DICT_ELEMENT})?    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_COL(yytext, *driver.loc.back()); }
+[!&]?{VARIABLE_COL}(\:\'{FREE_TEXT_QUOTE}\')?    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_COL(yytext, *driver.loc.back()); }
 [!&]?{VARIABLE_TX}(\:{DICT_ELEMENT})?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_TX(yytext, *driver.loc.back()); }
+[!&]?{VARIABLE_TX}(\:\'{FREE_TEXT_QUOTE}\')?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_TX(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_DUR}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_ENV}(\:{DICT_ELEMENT})?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_ENV}(\:\'{FREE_TEXT_QUOTE}\')?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_BLD}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_HSV}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
 [!&]?{VARIABLENOCOLON}                       { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
 
 
+["][!&]?{VARIABLE}(\:\'{FREE_TEXT_QUOTE}\')?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
 ["][!&]?{VARIABLE}(\:{DICT_ELEMENT})?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
 ["][!&]?{VARIABLE_TX}(\:{DICT_ELEMENT})?  { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_TX(yytext, *driver.loc.back()); }
+["][!&]?{VARIABLE_TX}(\:\'{FREE_TEXT_QUOTE}\')?  { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_TX(yytext, *driver.loc.back()); }
 ["][!&]?{VARIABLE_COL}(\:{DICT_ELEMENT})? { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_COL(yytext, *driver.loc.back()); }
+["][!&]?{VARIABLE_COL}(\:\'{FREE_TEXT_QUOTE}\')? { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_COL(yytext, *driver.loc.back()); }
 
 ["][!&]?{RUN_TIME_VAR_DUR}["]                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
 ["][!&]?{RUN_TIME_VAR_ENV}(\:{DICT_ELEMENT})?["]     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
+["][!&]?{RUN_TIME_VAR_ENV}(\:\'{FREE_TEXT_QUOTE}\')?["]     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
 ["][!&]?{RUN_TIME_VAR_BLD}["]                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
 ["][!&]?{RUN_TIME_VAR_HSV}["]                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
 ["][!&]?{VARIABLENOCOLON}["]                       { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
