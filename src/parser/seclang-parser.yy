@@ -150,6 +150,7 @@ using modsecurity::Variables::Tx;
 
 %token <std::string> QUOTATION_MARK
 %token <std::string> DIRECTIVE
+%token <std::string> DIRECTIVE_SECRULESCRIPT
 %token <std::string> CONFIG_DIR_REQ_BODY_LIMIT
 %token <std::string> CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT
 %token <std::string> CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT
@@ -439,6 +440,14 @@ expression:
             /* line number */ @0.end.line
             );
         driver.addSecAction(rule);
+      }
+    | DIRECTIVE_SECRULESCRIPT actings
+      {
+        /*
+
+        TODO: implement the SecRuleScript directive
+
+        */
       }
     | CONFIG_DIR_SEC_DEFAULT_ACTION actings
       {
