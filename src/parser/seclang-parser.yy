@@ -227,6 +227,7 @@ using modsecurity::Variables::Tx;
 %token <std::string> FREE_TEXT
 %token <std::string> ACTION
 %token <std::string> ACTION_ACCURACY
+%token <std::string> ACTION_ALLOW
 %token <std::string> ACTION_REDIRECT
 %token <std::string> ACTION_SKIP_AFTER
 %token <std::string> ACTION_SKIP
@@ -824,6 +825,24 @@ act:
       }
     | ACTION_ACCURACY
       {
+        $$ = Action::instantiate($1);
+      }
+    | ACTION_ALLOW
+      {
+        /*
+
+        TODO: allow is not implemented yet.
+
+        std::string error;
+        Allow *allow = new Allow($1);
+
+        if (allow->init(&error) == false) {
+            driver.parserError << error;
+            YYERROR;
+        }
+
+        $$ = allow;
+        */
         $$ = Action::instantiate($1);
       }
     | ACTION_REDIRECT
