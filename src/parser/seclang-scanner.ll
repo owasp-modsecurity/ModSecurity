@@ -23,7 +23,7 @@ using modsecurity::split;
 %}
 %option noyywrap nounput batch debug noinput
 
-ACTION          (?i:accuracy|allow|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setuid|setrsc|setsid|setenv|status:[0-9]+|xmlns)
+ACTION          (?i:accuracy|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setrsc|setenv|status:[0-9]+|xmlns)
 ACTION_INITCOL  (?i:initcol)
 
 ACTION_ACCURACY (?i:accuracy)
@@ -36,6 +36,8 @@ ACTION_SEVERITY (?i:severity)
 ACTION_SEVERITY_VALUE (?i:(EMERGENCY|ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)|[0-9]+)
 ACTION_SETVAR   (?i:setvar)
 ACTION_SETENV   (?i:setenv)
+ACTION_SETSID   (?i:setsid)
+ACTION_SETUID   (?i:setuid)
 ACTION_EXPIREVAR (?i:expirevar)
 ACTION_MSG      (?i:msg)
 ACTION_TAG      (?i:tag)
@@ -112,7 +114,7 @@ TRANSFORMATION  t:(?i:(cmdLine|sha1|hexEncode|lowercase|urlDecodeUni|urlDecode|n
 
 
 VARIABLE (?i:(RESOURCE|ARGS_COMBINED_SIZE|ARGS_GET_NAMES|ARGS_POST_NAMES|FILES_COMBINED_SIZE|FULL_REQUEST_LENGTH|REQUEST_BODY_LENGTH|REQUEST_URI_RAW|UNIQUE_ID|SERVER_PORT|SERVER_ADDR|REMOTE_PORT|REMOTE_HOST|MULTIPART_STRICT_ERROR|PATH_INFO|MULTIPART_CRLF_LF_LINES|MATCHED_VAR_NAME|MATCHED_VAR|INBOUND_DATA_ERROR|OUTBOUND_DATA_ERROR|FULL_REQUEST|AUTH_TYPE|ARGS_NAMES|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_PROTOCOL|RESPONSE_STATUS|REQBODY_PROCESSOR))
-VARIABLE_COL (?i:(GLOBAL|ARGS_POST|ARGS_GET|ARGS|FILES_SIZES|FILES_NAMES|FILES_TMP_CONTENT|MULTIPART_FILENAME|MULTIPART_NAME|MATCHED_VARS_NAMES|MATCHED_VARS|FILES|QUERY_STRING|REQUEST_COOKIES|REQUEST_HEADERS|RESPONSE_HEADERS|GEO|IP|XML|REQUEST_COOKIES_NAMES))
+VARIABLE_COL (?i:(SESSION|GLOBAL|ARGS_POST|ARGS_GET|ARGS|FILES_SIZES|FILES_NAMES|FILES_TMP_CONTENT|MULTIPART_FILENAME|MULTIPART_NAME|MATCHED_VARS_NAMES|MATCHED_VARS|FILES|QUERY_STRING|REQUEST_COOKIES|REQUEST_HEADERS|RESPONSE_HEADERS|GEO|IP|XML|REQUEST_COOKIES_NAMES))
 
 VARIABLE_TX (?i:TX)
 VARIABLE_WEBSERVER_ERROR_LOG (?:WEBSERVER_ERROR_LOG)
@@ -337,6 +339,20 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
                                          }
 {ACTION_SETENV}:{VAR_FREE_TEXT_SPACE_COMMA}  {
                                     return yy::seclang_parser::make_ACTION_SETENV(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+
+{ACTION_SETSID}:{VAR_FREE_TEXT_SPACE_COMMA}  {
+                                    return yy::seclang_parser::make_ACTION_SETSID(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+{ACTION_SETSID}:'{VAR_FREE_TEXT_QUOTE}'      {
+                                    return yy::seclang_parser::make_ACTION_SETSID(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+
+{ACTION_SETUID}:{VAR_FREE_TEXT_SPACE_COMMA}  {
+                                    return yy::seclang_parser::make_ACTION_SETUID(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+{ACTION_SETUID}:'{VAR_FREE_TEXT_QUOTE}'      {
+                                    return yy::seclang_parser::make_ACTION_SETUID(strchr(yytext, ':') + 1, *driver.loc.back());
                                          }
 
 {ACTION_SETVAR}:'{VAR_FREE_TEXT_QUOTE}={VAR_FREE_TEXT_QUOTE}'  {

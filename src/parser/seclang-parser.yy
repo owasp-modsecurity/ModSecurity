@@ -235,6 +235,8 @@ using modsecurity::Variables::Tx;
 %token <std::string> ACTION_SEVERITY
 %token <std::string> ACTION_SETENV
 %token <std::string> ACTION_SETVAR
+%token <std::string> ACTION_SETSID
+%token <std::string> ACTION_SETUID
 %token <std::string> ACTION_EXPIREVAR
 %token <std::string> ACTION_INITCOL
 %token <std::string> ACTION_MSG
@@ -851,6 +853,42 @@ act:
         }
 
         $$ = setEnv;
+        */
+        $$ = Action::instantiate($1);
+      }
+    | ACTION_SETSID
+      {
+        /*
+
+        TODO: setSID is not implemented yet.
+
+        std::string error;
+        SetEnv *setSID = new SetSID($1);
+
+        if (setSID->init(&error) == false) {
+            driver.parserError << error;
+            YYERROR;
+        }
+
+        $$ = setSID;
+        */
+        $$ = Action::instantiate($1);
+      }
+    | ACTION_SETUID
+      {
+        /*
+
+        TODO: setUID is not implemented yet.
+
+        std::string error;
+        SetEnv *setUID = new SetUID($1);
+
+        if (setUID->init(&error) == false) {
+            driver.parserError << error;
+            YYERROR;
+        }
+
+        $$ = setUID;
         */
         $$ = Action::instantiate($1);
       }
