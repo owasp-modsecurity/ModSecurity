@@ -23,7 +23,7 @@ using modsecurity::split;
 %}
 %option noyywrap nounput batch debug noinput
 
-ACTION          (?i:accuracy|append|block|capture|chain|deny|deprecatevar|drop|exec|expirevar|id:[0-9]+|id:'[0-9]+'|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setrsc|setenv|status:[0-9]+|xmlns)
+ACTION          (?i:accuracy|append|block|capture|chain|deny|deprecatevar|drop|expirevar|id:[0-9]+|id:'[0-9]+'|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setrsc|setenv|status:[0-9]+|xmlns)
 ACTION_ALLOW    (?i:allow)
 ACTION_INITCOL  (?i:initcol)
 
@@ -33,6 +33,7 @@ ACTION_SKIP (?i:skip)
 ACTION_SKIP_AFTER (?i:skipAfter)
 ACTION_PHASE    ((?i:phase:(?i:REQUEST|RESPONSE|LOGGING|[0-9]+))|(?i:phase:'(?i:REQUEST|RESPONSE|LOGGING|[0-9]+)'))
 ACTION_AUDIT_LOG (?i:auditlog)
+ACTION_EXEC     (?i:exec)
 ACTION_SEVERITY (?i:severity)
 ACTION_SEVERITY_VALUE (?i:(EMERGENCY|ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)|[0-9]+)
 ACTION_SETVAR   (?i:setvar)
@@ -315,6 +316,13 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {ACTION_SEVERITY}:{ACTION_SEVERITY_VALUE}       { return yy::seclang_parser::make_ACTION_SEVERITY(yytext + 9, *driver.loc.back()); }
 {ACTION_SEVERITY}:'{ACTION_SEVERITY_VALUE}'     { return yy::seclang_parser::make_ACTION_SEVERITY(std::string(yytext, 10, yyleng - 11), *driver.loc.back()); }
 
+{ACTION_EXEC}:'{VAR_FREE_TEXT_QUOTE}'              {
+                                    return yy::seclang_parser::make_ACTION_EXEC(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
+
+{ACTION_EXEC}:{VAR_FREE_TEXT_SPACE_COMMA}  {
+                                    return yy::seclang_parser::make_ACTION_EXEC(strchr(yytext, ':') + 1, *driver.loc.back());
+                                         }
 
 {ACTION_EXPIREVAR}:'{VAR_FREE_TEXT_QUOTE}={VAR_FREE_TEXT_QUOTE}'  {
                                     return yy::seclang_parser::make_ACTION_EXPIREVAR(strchr(yytext, ':') + 1, *driver.loc.back());

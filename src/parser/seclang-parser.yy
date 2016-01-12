@@ -227,6 +227,7 @@ using modsecurity::Variables::Tx;
 %token <std::string> FREE_TEXT
 %token <std::string> ACTION
 %token <std::string> ACTION_ACCURACY
+%token <std::string> ACTION_EXEC
 %token <std::string> ACTION_ALLOW
 %token <std::string> ACTION_REDIRECT
 %token <std::string> ACTION_SKIP_AFTER
@@ -825,6 +826,24 @@ act:
       }
     | ACTION_ACCURACY
       {
+        $$ = Action::instantiate($1);
+      }
+    | ACTION_EXEC
+      {
+        /*
+
+        TODO: exec is not implemented yet.
+
+        std::string error;
+        Allow *exec = new Exec($1);
+
+        if (exec->init(&error) == false) {
+            driver.parserError << error;
+            YYERROR;
+        }
+
+        $$ = exec;
+        */
         $$ = Action::instantiate($1);
       }
     | ACTION_ALLOW
