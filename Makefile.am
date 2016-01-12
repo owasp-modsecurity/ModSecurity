@@ -14,6 +14,8 @@ SUBDIRS = \
 # make clean
 CLEANFILES = 
 
+ACLOCAL_AMFLAGS = -I build
+
 # make maintainer-clean
 MAINTAINERCLEANFILES = \
 	Makefile.in \
