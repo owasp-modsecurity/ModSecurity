@@ -23,7 +23,7 @@
 
 #ifdef __cplusplus
 namespace modsecurity {
-class Assay;
+class Transaction;
 
 namespace actions {
 namespace transformations {
@@ -32,7 +32,7 @@ class Sha1 : public Transformation {
  public:
     explicit Sha1(std::string action);
     std::string evaluate(std::string exp,
-        Assay *assay) override;
+        Transaction *transaction) override;
 };
 
 }  // namespace transformations

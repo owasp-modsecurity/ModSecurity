@@ -20,10 +20,10 @@
 #ifndef SRC_ACTIONS_MSG_H_
 #define SRC_ACTIONS_MSG_H_
 
-class Assay;
+class Transaction;
 
 namespace modsecurity {
-class Assay;
+class Transaction;
 namespace actions {
 
 
@@ -31,7 +31,7 @@ class Msg : public Action {
  public:
     explicit Msg(std::string action);
 
-    bool evaluate(Rule *rule, Assay *assay) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
 
  private:
     std::string m_msg;

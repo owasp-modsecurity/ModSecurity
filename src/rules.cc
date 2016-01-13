@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/utils.h"
 #include "parser/driver.h"
 #include "utils/https_client.h"
@@ -35,7 +35,7 @@ namespace modsecurity {
 
 /**
  * @name    incrementReferenceCount
- * @brief   Increment the number of assays using this class
+ * @brief   Increment the number of transactions using this class
  * @ingroup ModSecCore
  *
  * At certain point it is expected to have two differnt
@@ -45,7 +45,7 @@ namespace modsecurity {
  * for the old connections and the new rules are available 
  * for the newest connections.
  *
- * @return Number of the current assays using this rules
+ * @return Number of the current transactions using this rules
  *
  */
 void Rules::incrementReferenceCount(void) {
@@ -54,10 +54,10 @@ void Rules::incrementReferenceCount(void) {
 
 /**
  * @name    decrementReferenceCount
- * @brief   Decrement the number of assays using this class
+ * @brief   Decrement the number of transactions using this class
  * @ingroup ModSecCore
  *
- * @return Number of the current assays using this rules
+ * @return Number of the current transactions using this rules
  *
  */
 void Rules::decrementReferenceCount(void) {
@@ -160,7 +160,7 @@ std::string Rules::getParserError() {
 }
 
 
-int Rules::evaluate(int phase, Assay *assay) {
+int Rules::evaluate(int phase, Transaction *transaction) {
     if (phase > ModSecurity::Phases::NUMBER_OF_PHASES) {
        return 0;
     }
@@ -172,17 +172,17 @@ int Rules::evaluate(int phase, Assay *assay) {
 
     for (int i = 0; i < rules.size(); i++) {
         Rule *rule = rules[i];
-        if (assay->m_marker.empty()) {
-            rule->evaluate(assay);
+        if (transaction->m_marker.empty()) {
+            rule->evaluate(transaction);
         } else {
             debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
-                + "' due to a SecMarker: " + assay->m_marker);
+                + "' due to a SecMarker: " + transaction->m_marker);
             m_secmarker_skipped++;
             debug(9, "Rule: " + rule->m_marker);
-            if (rule->m_secmarker && rule->m_marker == assay->m_marker) {
+            if (rule->m_secmarker && rule->m_marker == transaction->m_marker) {
                 debug(4, "Out of a SecMarker after skip " \
                     + std::to_string(m_secmarker_skipped) + " rules.");
-                assay->m_marker.clear();
+                transaction->m_marker.clear();
                 m_secmarker_skipped = 0;
             }
         }
@@ -222,9 +222,8 @@ int Rules::merge(Driver *from) {
     this->responseBodyLimitAction = from->responseBodyLimitAction;
 
     for (std::set<std::string>::iterator
-        it=from->m_responseBodyTypeToBeInspected.begin();
-        it!=from->m_responseBodyTypeToBeInspected.end(); ++it)
-    {
+        it = from->m_responseBodyTypeToBeInspected.begin();
+        it != from->m_responseBodyTypeToBeInspected.end(); ++it) {
         m_responseBodyTypeToBeInspected.insert(*it);
     }
 

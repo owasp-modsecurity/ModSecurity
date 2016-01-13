@@ -28,7 +28,7 @@ class FuzzyHash : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     FuzzyHash(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay, const std::string &std) override;
+    bool evaluate(Transaction *transaction, const std::string &std) override;
 };
 
 }  // namespace operators

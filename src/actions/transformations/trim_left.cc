@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 #include "actions/transformations/trim.h"
 #include "actions/action.h"
@@ -39,7 +39,7 @@ TrimLeft::TrimLeft(std::string action)
 }
 
 std::string TrimLeft::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     return *ltrim(&value);
 }
 

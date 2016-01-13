@@ -28,12 +28,12 @@
 #include <list>
 #include <utility>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 namespace modsecurity {
 namespace Variables {
 
-void TimeDay::evaluateInternal(Assay *assay,
+void TimeDay::evaluateInternal(Transaction *transaction,
     std::vector<const transaction::Variable *> *l) {
     char tstr[200];
     struct tm timeinfo;

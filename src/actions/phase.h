@@ -21,10 +21,10 @@
 #define SRC_ACTIONS_PHASE_H_
 
 #ifdef __cplusplus
-class Assay;
+class Transaction;
 
 namespace modsecurity {
-class Assay;
+class Transaction;
 class Rule;
 
 namespace actions {
@@ -35,7 +35,7 @@ class Phase : public Action {
     explicit Phase(std::string action);
 
     bool init(std::string *error) override;
-    bool evaluate(Rule *rule, Assay *assay) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
     int phase;
     int m_secRulesPhase;
 };

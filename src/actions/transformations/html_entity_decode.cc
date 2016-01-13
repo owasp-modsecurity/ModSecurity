@@ -24,7 +24,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 #include "src/utils.h"
 
@@ -35,7 +35,7 @@ namespace transformations {
 
 
 std::string HtmlEntityDecode::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
 
     if (HtmlEntityDecodeInstantCache::getInstance().count(value) > 0) {
         return HtmlEntityDecodeInstantCache::getInstance().at(value);

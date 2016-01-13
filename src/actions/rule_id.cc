@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 
 namespace modsecurity {
@@ -51,7 +51,7 @@ bool RuleId::init(std::string *error) {
     return true;
 }
 
-bool RuleId::evaluate(Rule *rule, Assay *assay) {
+bool RuleId::evaluate(Rule *rule, Transaction *transaction) {
     rule->rule_id = m_ruleId;
     return true;
 }

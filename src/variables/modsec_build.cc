@@ -21,13 +21,13 @@
 #include <list>
 #include <utility>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "modsecurity/modsecurity.h"
 
 namespace modsecurity {
 namespace Variables {
 
-void ModsecBuild::evaluateInternal(Assay *assay,
+void ModsecBuild::evaluateInternal(Transaction *transaction,
     std::vector<const transaction::Variable *> *l) {
     std::ostringstream ss;
     ss << std::setw(2) << std::setfill('0') << MODSECURITY_MAJOR;

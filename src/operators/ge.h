@@ -30,7 +30,7 @@ class Ge : public Operator {
     Ge(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
 
-    bool evaluate(Assay *assay, const std::string &input) override;
+    bool evaluate(Transaction *transaction, const std::string &input) override;
 };
 
 }  // namespace operators

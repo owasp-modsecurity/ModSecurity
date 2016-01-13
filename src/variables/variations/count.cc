@@ -21,19 +21,19 @@
 #include <list>
 #include <utility>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/utils.h"
 
 namespace modsecurity {
 namespace Variables {
 namespace Variations {
 
-void Count::evaluateInternal(Assay *assay,
+void Count::evaluateInternal(Transaction *transaction,
     std::vector<const transaction::Variable *> *l) {
     std::vector<const transaction::Variable *> *reslIn;
     int count = 0;
 
-    reslIn = var->evaluate(assay);
+    reslIn = var->evaluate(transaction);
 
     for (auto &a : *reslIn) {
         count++;

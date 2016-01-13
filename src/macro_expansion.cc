@@ -14,7 +14,7 @@
  */
 
 #include "src/macro_expansion.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 namespace modsecurity {
 
@@ -22,8 +22,8 @@ MacroExpansion::MacroExpansion() { }
 
 
 std::string MacroExpansion::expandKeepOriginal(const std::string& input,
-    Assay *assay) {
-    std::string a = MacroExpansion::expand(input, assay);
+    Transaction *transaction) {
+    std::string a = MacroExpansion::expand(input, transaction);
 
     if (a != input) {
         return "\"" + a + "\" (Was: " + input + ")";
@@ -33,7 +33,8 @@ std::string MacroExpansion::expandKeepOriginal(const std::string& input,
 }
 
 
-std::string MacroExpansion::expand(const std::string& input, Assay *assay) {
+std::string MacroExpansion::expand(const std::string& input,
+    Transaction *transaction) {
     std::string res;
     size_t pos = input.find("%{");
 
@@ -53,12 +54,12 @@ std::string MacroExpansion::expand(const std::string& input, Assay *assay) {
         std::string *variableValue;
         size_t collection = variable.find(".");
         if (collection == std::string::npos) {
-            variableValue = assay->m_collections.resolveFirst(variable);
+            variableValue = transaction->m_collections.resolveFirst(variable);
         } else {
             std::string col = std::string(variable, 0, collection);
             std::string var = std::string(variable, collection + 1,
                 variable.length() - (collection + 1));
-            variableValue = assay->m_collections.resolveFirst(col, var);
+            variableValue = transaction->m_collections.resolveFirst(col, var);
         }
 
         res.erase(start, end - start + 2);

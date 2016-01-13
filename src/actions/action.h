@@ -24,7 +24,7 @@
 #ifdef __cplusplus
 
 namespace modsecurity {
-class Assay;
+class Transaction;
 class Rule;
 
 namespace actions {
@@ -87,8 +87,8 @@ class Action {
     std::string name;
 
     virtual std::string evaluate(std::string exp,
-        Assay *assay);
-    virtual bool evaluate(Rule *rule, Assay *assay);
+        Transaction *transaction);
+    virtual bool evaluate(Rule *rule, Transaction *transaction);
     virtual bool init(std::string *error) { return true; }
     virtual bool isDisruptive() { return false; }
 

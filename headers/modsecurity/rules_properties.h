@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <set>
 #endif
 
 
@@ -26,7 +27,7 @@
 #define HEADERS_MODSECURITY_RULES_PROPERTIES_H_
 
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 #ifdef __cplusplus
 
@@ -93,12 +94,11 @@ class RulesProperties {
 
     std::vector<Rule *> rules[7];
     std::vector<Rule *> * getRulesForPhase(int phase) {
-        if (phase > 7)
-        {
+        if (phase > 7) {
             return NULL;
         }
         return &rules[phase];
-    };
+    }
 
     //  ModSecurity::Phases::NUMBER_OF_PHASES
     std::vector<actions::Action *> defaultActions[7];

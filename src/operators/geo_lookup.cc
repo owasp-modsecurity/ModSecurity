@@ -30,7 +30,7 @@ namespace modsecurity {
 namespace operators {
 
 
-bool GeoLookup::evaluate(Assay *assay, const std::string &exp) {
+bool GeoLookup::evaluate(Transaction *trans, const std::string &exp) {
     using std::placeholders::_1;
     using std::placeholders::_2;
     bool ret = true;
@@ -38,51 +38,51 @@ bool GeoLookup::evaluate(Assay *assay, const std::string &exp) {
 #ifdef WITH_GEOIP
     GeoIPRecord *gir;
 
-    if (assay) {
+    if (trans) {
         ret = Utils::GeoLookup::getInstance().lookup(exp, &gir,
-            std::bind(&GeoLookup::debug, this, assay, _1, _2));
+            std::bind(&GeoLookup::debug, this, trans, _1, _2));
     } else {
         ret = Utils::GeoLookup::getInstance().lookup(exp, &gir,
             nullptr);
     }
     if (ret && gir) {
         if (gir->country_code) {
-            assay->m_collections.store("GEO:COUNTRY_CODE", gir->country_code);
+            trans->m_collections.store("GEO:COUNTRY_CODE", gir->country_code);
         }
         if (gir->country_code3) {
-            assay->m_collections.store("GEO:COUNTRY_CODE3", gir->country_code3);
+            trans->m_collections.store("GEO:COUNTRY_CODE3", gir->country_code3);
         }
         if (gir->country_name) {
-            assay->m_collections.store("GEO:COUNTRY_NAME", gir->country_name);
+            trans->m_collections.store("GEO:COUNTRY_NAME", gir->country_name);
         }
         if (gir->continent_code) {
-            assay->m_collections.store("GEO:COUNTRY_CONTINENT",
+            trans->m_collections.store("GEO:COUNTRY_CONTINENT",
                 gir->continent_code);
         }
         if (gir->country_code && gir->region) {
-            assay->m_collections.store("GEO:REGION",
+            trans->m_collections.store("GEO:REGION",
                 GeoIP_region_name_by_code(gir->country_code, gir->region));
         }
         if (gir->city) {
-            assay->m_collections.store("GEO:CITY", gir->city);
+            trans->m_collections.store("GEO:CITY", gir->city);
         }
         if (gir->postal_code) {
-            assay->m_collections.store("GEO:POSTAL_CODE", gir->postal_code);
+            trans->m_collections.store("GEO:POSTAL_CODE", gir->postal_code);
         }
         if (gir->latitude) {
-            assay->m_collections.store("GEO:LATITUDE",
+            trans->m_collections.store("GEO:LATITUDE",
                 std::to_string(gir->latitude));
         }
         if (gir->longitude) {
-            assay->m_collections.store("GEO:LONGITUDE",
+            trans->m_collections.store("GEO:LONGITUDE",
                 std::to_string(gir->longitude));
         }
         if (gir->metro_code) {
-            assay->m_collections.store("GEO:DMA_CODE",
+            trans->m_collections.store("GEO:DMA_CODE",
                 std::to_string(gir->metro_code));
         }
         if (gir->area_code) {
-            assay->m_collections.store("GEO:AREA_CODE",
+            trans->m_collections.store("GEO:AREA_CODE",
                 std::to_string(gir->area_code));
         }
 

@@ -20,7 +20,7 @@
 #include <string>
 #endif
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 
 #ifdef __cplusplus
@@ -41,7 +41,7 @@ class AuditLogWriter {
     virtual void refCountDecreaseAndCheck() = 0;
 
     virtual bool init() { return true; }
-    virtual bool write(Assay *assay, int parts);
+    virtual bool write(Transaction *transaction, int parts);
 
     std::string file_name(const std::string& unique_id);
 

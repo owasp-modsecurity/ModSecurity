@@ -20,14 +20,14 @@
 #ifndef SRC_REQUEST_BODY_PROCESSOR_MULTIPART_H_
 #define SRC_REQUEST_BODY_PROCESSOR_MULTIPART_H_
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 namespace modsecurity {
 namespace RequestBodyProcessor {
 
 class Multipart {
  public:
-    Multipart(std::string header, Assay *assay);
+    Multipart(std::string header, Transaction *transaction);
     bool init();
 
     bool boundaryContainsOnlyValidCharacters();
@@ -47,14 +47,14 @@ class Multipart {
     bool invalidQuote;
 #ifndef NO_LOGS
     void debug(int a, std::string str) {
-        m_assay->debug(a, str);
+        m_transaction->debug(a, str);
     }
 #endif
 
  private:
     std::string m_boundary;
     std::string m_header;
-    Assay *m_assay;
+    Transaction *m_transaction;
 };
 
 }  // namespace RequestBodyProcessor

@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 
 
@@ -38,7 +38,7 @@ HexDecode::HexDecode(std::string action)
 
 
 std::string HexDecode::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     int len = value.length();
     std::string newString;
 

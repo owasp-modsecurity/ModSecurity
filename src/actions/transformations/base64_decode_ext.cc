@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 
 
@@ -36,13 +36,13 @@ Base64DecodeExt::Base64DecodeExt(std::string action)
 }
 
 std::string Base64DecodeExt::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     /**
      * @todo Implement the transformation Base64DecodeExt
      */
-    if (assay) {
+    if (transaction) {
 #ifndef NO_LOGS
-        assay->debug(4, "Transformation Base64DecodeExt is" \
+        transaction->debug(4, "Transformation Base64DecodeExt is" \
             " not implemented yet.");
 #endif
     }

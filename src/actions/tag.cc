@@ -19,7 +19,7 @@
 #include <string>
 
 #include "actions/action.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/utils.h"
 #include "src/macro_expansion.h"
 
@@ -34,12 +34,12 @@ Tag::Tag(std::string action)
 }
 
 
-bool Tag::evaluate(Rule *rule, Assay *assay) {
-    std::string tag = MacroExpansion::expand(m_tag, assay);
+bool Tag::evaluate(Rule *rule, Transaction *transaction) {
+    std::string tag = MacroExpansion::expand(m_tag, transaction);
 #ifndef NO_LOGS
-    assay->debug(9, "Rule tag: " + tag);
+    transaction->debug(9, "Rule tag: " + tag);
 #endif
-    assay->ruleTags.push_back(tag);
+    transaction->ruleTags.push_back(tag);
     return true;
 }
 

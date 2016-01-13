@@ -21,10 +21,10 @@
 #define SRC_ACTIONS_BLOCK_H_
 
 #ifdef __cplusplus
-class Assay;
+class Transaction;
 
 namespace modsecurity {
-class Assay;
+class Transaction;
 
 namespace actions {
 
@@ -33,7 +33,7 @@ class Block : public Action {
  public:
     explicit Block(std::string action);
 
-    bool evaluate(Rule *rule, Assay *assay) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
     void fill_intervention(ModSecurityIntervention *i) override;
     bool isDisruptive() override { return true; }
 };

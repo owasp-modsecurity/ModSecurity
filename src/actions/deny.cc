@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 namespace modsecurity {
 namespace actions {
@@ -30,11 +30,11 @@ Deny::Deny(std::string action)
 }
 
 
-bool Deny::evaluate(Rule *rule, Assay *assay) {
+bool Deny::evaluate(Rule *rule, Transaction *transaction) {
 #ifndef NO_LOGS
-    assay->debug(8, "Running action deny");
+    transaction->debug(8, "Running action deny");
 #endif
-    assay->actions.push_back(this);
+    transaction->actions.push_back(this);
     return true;
 }
 

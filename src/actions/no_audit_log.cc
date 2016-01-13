@@ -18,13 +18,13 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 namespace modsecurity {
 namespace actions {
 
-bool NoAuditLog::evaluate(Rule *rule, Assay *assay) {
-    assay->do_not_save_in_auditlog = true;
+bool NoAuditLog::evaluate(Rule *rule, Transaction *transaction) {
+    transaction->do_not_save_in_auditlog = true;
     return true;
 }
 

@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 #include "actions/action.h"
 
@@ -32,7 +32,7 @@ LowerCase::LowerCase(std::string a)
 }
 
 std::string LowerCase::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     std::locale loc;
 
     if (LowerCaseInstantCache::getInstance().count(value) > 0) {

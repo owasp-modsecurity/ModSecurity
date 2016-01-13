@@ -22,7 +22,7 @@
  *
  * using ModSecurity::ModSecurity;
  * using ModSecurity::Rules;
- * using ModSecurity::Assay;
+ * using ModSecurity::Transaction;
  *
  * ModSecurity *modsec;
  * ModSecurity::Rules *rules;
@@ -31,10 +31,10 @@
  * rules = new Rules();
  * rules->loadFromUri(rules_file);
  *
- * Assay *modsecAssay = new Assay(modsec, rules);
- * modsecAssay->processConnection("127.0.0.1");
+ * Transaction *modsecTransaction = new Transaction(modsec, rules);
+ * modsecTransaction->processConnection("127.0.0.1");
  *
- * if (modsecAssay->intervention()) {
+ * if (modsecTransaction->intervention()) {
  *     std::cout << "There is an intervention" << std::endl;
  * }
  *
@@ -90,7 +90,7 @@ typedef struct ModSecurity_t modsecurity;
 
 
 #include "modsecurity/intervention.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "modsecurity/debug_log.h"
 #include "modsecurity/rules.h"
 

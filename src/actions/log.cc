@@ -18,15 +18,15 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 namespace modsecurity {
 namespace actions {
 
-bool Log::evaluate(Rule *rule, Assay *assay) {
-    assay->save_in_auditlog = true;
-    /* FIXME: assay->serverLog("Something...."); */
-    assay->debug(9, "Saving transaction to logs");
+bool Log::evaluate(Rule *rule, Transaction *transaction) {
+    transaction->save_in_auditlog = true;
+    /* FIXME: transaction->serverLog("Something...."); */
+    transaction->debug(9, "Saving transaction to logs");
     return true;
 }
 

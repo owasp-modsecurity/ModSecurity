@@ -21,17 +21,17 @@
 #define SRC_ACTIONS_STATUS_H_
 
 #ifdef __cplusplus
-class Assay;
+class Transaction;
 
 namespace modsecurity {
-class Assay;
+class Transaction;
 namespace actions {
 
 class Status : public Action {
  public:
     explicit Status(std::string actions);
 
-    bool evaluate(Rule *rule, Assay *assay) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
     void fill_intervention(ModSecurityIntervention *i) override;
     int status;
 };

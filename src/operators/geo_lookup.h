@@ -28,7 +28,7 @@ class GeoLookup : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     GeoLookup(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay, const std::string &exp) override;
+    bool evaluate(Transaction *transaction, const std::string &exp) override;
 };
 
 }  // namespace operators

@@ -47,14 +47,14 @@ bool AuditLogWriterSerial::init() {
 }
 
 
-bool AuditLogWriterSerial::write(Assay *assay, int parts) {
+bool AuditLogWriterSerial::write(Transaction *transaction, int parts) {
     std::string boundary;
 
     generateBoundary(&boundary);
 
     // serialLoggingMutex.lock();
 
-    m_log << assay->toOldAuditLogFormat(parts, "-" + boundary + "--");
+    m_log << transaction->toOldAuditLogFormat(parts, "-" + boundary + "--");
     m_log.flush();
 
     // serialLoggingMutex.unlock();

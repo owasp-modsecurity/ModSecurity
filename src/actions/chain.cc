@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 
 namespace modsecurity {
@@ -26,7 +26,7 @@ namespace actions {
 
 
 
-bool Chain::evaluate(Rule *rule, Assay *assay) {
+bool Chain::evaluate(Rule *rule, Transaction *transaction) {
     rule->chained = true;
     return true;
 }

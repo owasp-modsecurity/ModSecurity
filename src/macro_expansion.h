@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 #ifndef SRC_MACRO_EXPANSION_H_
 #define SRC_MACRO_EXPANSION_H_
@@ -31,9 +31,10 @@ class MacroExpansion {
  public:
     MacroExpansion();
 
-    static std::string expand(const std::string& input, Assay *assay);
+    static std::string expand(const std::string& input,
+        Transaction *transaction);
     static std::string expandKeepOriginal(const std::string& input,
-        Assay *assay);
+        Transaction *transaction);
 };
 
 

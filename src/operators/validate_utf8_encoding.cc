@@ -113,7 +113,8 @@ int ValidateUtf8Encoding::detect_utf8_character(
     return unicode_len;
 }
 
-bool ValidateUtf8Encoding::evaluate(Assay *assay, const std::string &str) {
+bool ValidateUtf8Encoding::evaluate(Transaction *transaction,
+    const std::string &str) {
     unsigned int i, bytes_left;
 
     const char *str_c = str.c_str();
@@ -124,9 +125,9 @@ bool ValidateUtf8Encoding::evaluate(Assay *assay, const std::string &str) {
 
         switch (rc) {
             case UNICODE_ERROR_CHARACTERS_MISSING :
-                if (assay) {
+                if (transaction) {
 #ifndef NO_LOGS
-                    assay->debug(8, "Invalid UTF-8 encoding: "
+                    transaction->debug(8, "Invalid UTF-8 encoding: "
                         "not enough bytes in character "
                         "at " + str + ". [offset \"" +
                         std::to_string(i) + "\"]");
@@ -135,9 +136,9 @@ bool ValidateUtf8Encoding::evaluate(Assay *assay, const std::string &str) {
                 return true;
                 break;
             case UNICODE_ERROR_INVALID_ENCODING :
-                if (assay) {
+                if (transaction) {
 #ifndef NO_LOGS
-                    assay->debug(8, "Invalid UTF-8 encoding: "
+                    transaction->debug(8, "Invalid UTF-8 encoding: "
                         "invalid byte value in character "
                         "at " + str + ". [offset \"" +
                         std::to_string(i) + "\"]");
@@ -146,9 +147,9 @@ bool ValidateUtf8Encoding::evaluate(Assay *assay, const std::string &str) {
                 return true;
                 break;
             case UNICODE_ERROR_OVERLONG_CHARACTER :
-                if (assay) {
+                if (transaction) {
 #ifndef NO_LOGS
-                    assay->debug(8, "Invalid UTF-8 encoding: "
+                    transaction->debug(8, "Invalid UTF-8 encoding: "
                         "overlong character detected "
                         "at " + str + ". [offset \"" +
                         std::to_string(i) + "\"]");
@@ -157,9 +158,9 @@ bool ValidateUtf8Encoding::evaluate(Assay *assay, const std::string &str) {
                 return true;
                 break;
             case UNICODE_ERROR_RESTRICTED_CHARACTER :
-                if (assay) {
+                if (transaction) {
 #ifndef NO_LOGS
-                    assay->debug(8, "Invalid UTF-8 encoding: "
+                    transaction->debug(8, "Invalid UTF-8 encoding: "
                         "use of restricted character "
                         "at " + str + ". [offset \"" +
                         std::to_string(i) + "\"]");
@@ -168,9 +169,9 @@ bool ValidateUtf8Encoding::evaluate(Assay *assay, const std::string &str) {
                 return true;
                 break;
             case UNICODE_ERROR_DECODING_ERROR :
-                if (assay) {
+                if (transaction) {
 #ifndef NO_LOGS
-                    assay->debug(8, "Error validating UTF-8 decoding "
+                    transaction->debug(8, "Error validating UTF-8 decoding "
                         "at " + str + ". [offset \"" +
                         std::to_string(i) + "\"]");
 #endif
@@ -180,9 +181,9 @@ bool ValidateUtf8Encoding::evaluate(Assay *assay, const std::string &str) {
         }
 
         if (rc <= 0) {
-            if (assay) {
+            if (transaction) {
 #ifndef NO_LOGS
-                assay->debug(8, "Internal error during UTF-8 validation "
+                transaction->debug(8, "Internal error during UTF-8 validation "
                     "at " + str + ". [offset \"" +
                     std::to_string(i) + "\"]");
 #endif

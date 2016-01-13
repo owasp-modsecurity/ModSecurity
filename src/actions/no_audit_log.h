@@ -21,10 +21,10 @@
 #define SRC_ACTIONS_NO_AUDIT_LOG_H_
 
 #ifdef __cplusplus
-class Assay;
+class Transaction;
 
 namespace modsecurity {
-class Assay;
+class Transaction;
 
 namespace actions {
 
@@ -34,7 +34,7 @@ class NoAuditLog : public Action {
     explicit NoAuditLog(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(Rule *rule, Assay *assay) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
 };
 
 }  // namespace actions

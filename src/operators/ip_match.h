@@ -31,7 +31,7 @@ class IpMatch : public Operator {
     IpMatch(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
 
-    bool evaluate(Assay *assay, const std::string &input) override;
+    bool evaluate(Transaction *transaction, const std::string &input) override;
 
     bool init(const std::string &file, const char **error) override;
 

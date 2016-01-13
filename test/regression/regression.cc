@@ -52,7 +52,7 @@ void print_help() {
 
 
 void actions(ModSecurityTestResults<RegressionTest> *r,
-    modsecurity::Assay *a) {
+    modsecurity::Transaction *a) {
     modsecurity::ModSecurityIntervention it;
     memset(&it, '\0', sizeof(modsecurity::ModSecurityIntervention));
     it.status = 200;
@@ -83,7 +83,7 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         CustomDebugLog *debug_log = new CustomDebugLog();
         modsecurity::ModSecurity *modsec = NULL;
         modsecurity::Rules *modsec_rules = NULL;
-        modsecurity::Assay *modsec_assay = NULL;
+        modsecurity::Transaction *modsec_transaction = NULL;
         ModSecurityTestResults<RegressionTest> r;
         std::stringstream serverLog;
         RegressionTestResult *testRes = new RegressionTestResult();
@@ -131,7 +131,10 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         if (modsec_rules->load(t->rules.c_str(), filename) < 0) {
             /* Parser error */
             if (t->parser_error.empty() == true) {
-                /* Not expecting any error, thus return the error to the user. */
+                /*
+                 * Not expecting any error, thus return the error to
+                 * the user.
+                 */
                 std::cout << KRED << "failed!" << RESET << std::endl;
                 testRes->reason << KRED << "parse failed." << RESET \
                     << std::endl;
@@ -182,69 +185,69 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
             }
         }
 
-        modsec_assay = new modsecurity::Assay(modsec, modsec_rules,
+        modsec_transaction = new modsecurity::Transaction(modsec, modsec_rules,
             &serverLog);
 
-        modsec_assay->processConnection(t->clientIp.c_str(),
+        modsec_transaction->processConnection(t->clientIp.c_str(),
             t->clientPort, t->serverIp.c_str(), t->serverPort);
 
-        actions(&r, modsec_assay);
+        actions(&r, modsec_transaction);
         if (r.status != 200) {
              goto end;
         }
 
-        modsec_assay->processURI(t->uri.c_str(), t->method.c_str(),
+        modsec_transaction->processURI(t->uri.c_str(), t->method.c_str(),
             t->httpVersion.c_str());
 
-        actions(&r, modsec_assay);
+        actions(&r, modsec_transaction);
         if (r.status != 200) {
             goto end;
         }
 
         for (std::pair<std::string, std::string> headers :
             t->request_headers) {
-            modsec_assay->addRequestHeader(headers.first.c_str(),
+            modsec_transaction->addRequestHeader(headers.first.c_str(),
                 headers.second.c_str());
         }
 
-        modsec_assay->processRequestHeaders();
-        actions(&r, modsec_assay);
+        modsec_transaction->processRequestHeaders();
+        actions(&r, modsec_transaction);
         if (r.status != 200) {
             goto end;
         }
 
-        modsec_assay->appendRequestBody(
+        modsec_transaction->appendRequestBody(
             (unsigned char *)t->request_body.c_str(),
             t->request_body.size());
-        modsec_assay->processRequestBody();
-        actions(&r, modsec_assay);
+        modsec_transaction->processRequestBody();
+        actions(&r, modsec_transaction);
         if (r.status != 200) {
             goto end;
         }
 
         for (std::pair<std::string, std::string> headers :
             t->response_headers) {
-            modsec_assay->addResponseHeader(headers.first.c_str(),
+            modsec_transaction->addResponseHeader(headers.first.c_str(),
                 headers.second.c_str());
         }
 
-        modsec_assay->processResponseHeaders();
-        actions(&r, modsec_assay);
+        modsec_transaction->processResponseHeaders();
+        actions(&r, modsec_transaction);
         if (r.status != 200) {
             goto end;
         }
 
-        modsec_assay->appendResponseBody(
+        modsec_transaction->appendResponseBody(
             (unsigned char *)t->response_body.c_str(),
             t->response_body.size());
-        modsec_assay->processResponseBody();
-        actions(&r, modsec_assay);
+        modsec_transaction->processResponseBody();
+        actions(&r, modsec_transaction);
         if (r.status != 200) {
             goto end;
         }
 
 end:
-        modsec_assay->processLogging(r.status);
+        modsec_transaction->processLogging(r.status);
 
         CustomDebugLog *d = reinterpret_cast<CustomDebugLog *>
             (modsec_rules->m_debugLog);
@@ -281,7 +284,7 @@ after_debug_log:
             r.log_raw_debug_log = d->log_messages();
         }
 
-        delete modsec_assay;
+        delete modsec_transaction;
         delete modsec_rules;
         delete modsec;
         /* delete debug_log; */

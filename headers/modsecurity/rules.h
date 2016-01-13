@@ -29,7 +29,7 @@
 #define HEADERS_MODSECURITY_RULES_H_
 
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "modsecurity/rules_properties.h"
 
 #ifdef __cplusplus
@@ -79,7 +79,7 @@ class Rules : public RulesProperties  {
     int merge(Parser::Driver *driver);
     int merge(Rules *rules);
 
-    int evaluate(int phase, Assay *assay);
+    int evaluate(int phase, Transaction *transaction);
     std::string getParserError();
 
     void debug(int level, std::string message);

@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 #include "src/utils.h"
 
@@ -95,7 +95,7 @@ UrlDecode::UrlDecode(std::string action)
 }
 
 std::string UrlDecode::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     unsigned char *val = NULL;
     int invalid_count;
     int changed;

@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 #include "utils/sha1.h"
 #include "src/utils.h"
@@ -38,7 +38,7 @@ Sha1::Sha1(std::string action)
 }
 
 std::string Sha1::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
 
     Utils::SHA1 sha1;
     sha1.update(&value);

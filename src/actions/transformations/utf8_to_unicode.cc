@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 
 
@@ -36,13 +36,14 @@ Utf8Unicode::Utf8Unicode(std::string action)
 }
 
 std::string Utf8Unicode::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     /**
      * @todo Implement the transformation Utf8Unicode
      */
-    if (assay) {
+    if (transaction) {
 #ifndef NO_LOGS
-        assay->debug(4, "Transformation Utf8Unicode is not implemented yet.");
+        transaction->debug(4, "Transformation Utf8Unicode is " \
+            "not implemented yet.");
 #endif
     }
     return value;

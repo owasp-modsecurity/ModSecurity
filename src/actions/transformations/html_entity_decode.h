@@ -24,7 +24,7 @@
 
 #ifdef __cplusplus
 namespace modsecurity {
-class Assay;
+class Transaction;
 
 namespace actions {
 namespace transformations {
@@ -55,7 +55,7 @@ class HtmlEntityDecode : public Transformation {
         : Transformation(action) { }
 
     std::string evaluate(std::string exp,
-        Assay *assay) override;
+        Transaction *transaction) override;
 };
 
 

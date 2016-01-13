@@ -25,8 +25,8 @@
 #include "src/utils.h"
 #include "parser/driver.h"
 #include "utils/https_client.h"
-#include "modsecurity/assay.h"
 #include "modsecurity/rules_properties.h"
+#include "modsecurity/transaction.h"
 
 void print_help() {
     std::cout << "Use ./optimization /path/to/files.something" << std::endl;

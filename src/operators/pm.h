@@ -37,7 +37,7 @@ class Pm : public Operator {
     ~Pm();
     void replaceAll(std::string str, const std::string& from,
         const std::string& to);
-    bool evaluate(Assay *assay, const std::string &input) override;
+    bool evaluate(Transaction *transaction, const std::string &input) override;
 
     bool init(const std::string &file, const char **error) override;
     void postOrderTraversal(acmp_btree_node_t *node);

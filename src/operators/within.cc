@@ -24,9 +24,9 @@ namespace modsecurity {
 namespace operators {
 
 
-bool Within::evaluate(Assay *assay, const std::string &str) {
+bool Within::evaluate(Transaction *transaction, const std::string &str) {
     bool res = false;
-    std::string paramTarget = MacroExpansion::expand(param, assay);
+    std::string paramTarget = MacroExpansion::expand(param, transaction);
 
     if (str.empty()) {
         return true;

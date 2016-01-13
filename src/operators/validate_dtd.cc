@@ -22,7 +22,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool ValidateDTD::evaluate(Assay *assay, const std::string &str) {
+bool ValidateDTD::evaluate(Transaction *transaction, const std::string &str) {
     /**
      * @todo Implement the operator ValidateDTD.
      *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#validateDTD

@@ -24,10 +24,10 @@ namespace modsecurity {
 namespace operators {
 
 
-bool BeginsWith::evaluate(Assay *assay, const std::string &str) {
+bool BeginsWith::evaluate(Transaction *transaction, const std::string &str) {
     bool ret = false;
 
-    std::string p = MacroExpansion::expand(param, assay);
+    std::string p = MacroExpansion::expand(param, transaction);
 
     if (str.size() < p.size()) {
         ret = false;

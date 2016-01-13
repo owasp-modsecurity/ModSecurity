@@ -21,7 +21,7 @@
 #include <list>
 #include <utility>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/utils.h"
 
 namespace modsecurity {
@@ -29,9 +29,9 @@ namespace Variables {
 namespace Variations {
 
 
-void Exclusion::evaluateInternal(Assay *assay,
+void Exclusion::evaluateInternal(Transaction *transaction,
     std::vector<const transaction::Variable *> *l) {
-    assay->m_collections.resolveMultiMatches(m_name, l);
+    transaction->m_collections.resolveMultiMatches(m_name, l);
 }
 
 

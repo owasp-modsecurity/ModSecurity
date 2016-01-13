@@ -21,17 +21,17 @@
 #include <list>
 #include <utility>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/utils.h"
 
 namespace modsecurity {
 namespace Variables {
 
-void Duration::evaluateInternal(Assay *assay,
+void Duration::evaluateInternal(Transaction *transaction,
         std::vector<const transaction::Variable *> *l) {
     std::string res;
 
-    double e = cpu_seconds() - assay->start;
+    double e = cpu_seconds() - transaction->start;
 
     res = std::to_string(e);
 

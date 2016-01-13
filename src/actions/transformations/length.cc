@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 
 
@@ -36,7 +36,7 @@ Length::Length(std::string action)
 }
 
 std::string Length::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
 
     return std::to_string(value.size());
 }

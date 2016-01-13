@@ -21,7 +21,7 @@
 #define SRC_ACTIONS_SET_VAR_H_
 
 namespace modsecurity {
-class Assay;
+class Transaction;
 class Rule;
 
 namespace actions {
@@ -31,7 +31,7 @@ class SetVar : public Action {
  public:
     explicit SetVar(std::string action);
 
-    bool evaluate(Rule *rule, Assay *assay) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
     void dump();
     bool init(std::string *error) override;
 

@@ -137,16 +137,13 @@ Rule::Rule(Operator *_op,
 
 std::vector<std::string> Rule::getActionNames() {
     std::vector<std::string> a;
-    for (auto &z : this->actions_runtime_pos)
-    {
+    for (auto &z : this->actions_runtime_pos) {
         a.push_back(z->action);
     }
-    for (auto &z : this->actions_runtime_pre)
-    {
+    for (auto &z : this->actions_runtime_pre) {
         a.push_back(z->action);
     }
-    for (auto &z : this->actions_conf)
-    {
+    for (auto &z : this->actions_conf) {
         a.push_back(z->action);
     }
 
@@ -154,7 +151,7 @@ std::vector<std::string> Rule::getActionNames() {
 }
 
 
-bool Rule::evaluateActions(Assay *assay) {
+bool Rule::evaluateActions(Transaction *trasn) {
     int none = 0;
     bool containsDisruptive = false;
     // int transformations = 0;
@@ -165,15 +162,15 @@ bool Rule::evaluateActions(Assay *assay) {
     }
 
 #ifndef NO_LOGS
-    assay->debug(4, "Running unconditional rule.");
+    trasn->debug(4, "Running unconditional rule.");
 #endif
 
     if (none == 0) {
         /*
-        for (Action *a : assay->m_rules->defaultActions[this->phase]) {
+        for (Action *a : trasn->m_rules->defaultActions[this->phase]) {
             if (a->action_kind == actions::Action::RunTimeBeforeMatchAttemptKind) {
-                value = a->evaluate(value, assay);
-                assay->debug(9, "(SecDefaultAction) T (" + \
+                value = a->evaluate(value, trasn);
+                trasn->debug(9, "(SecDefaultAction) T (" + \
                     std::to_string(transformations) + ") " + \
                     a->name + ": \"" + value +"\"");
                     transformations++;
@@ -185,8 +182,8 @@ bool Rule::evaluateActions(Assay *assay) {
     for (Action *a : this->actions_runtime_pre) {
         /*
         if (none == 0) {
-            value = a->evaluate(value, assay);
-            assay->debug(9, " T (" + \
+            value = a->evaluate(value, trasn);
+            trasn->debug(9, " T (" + \
                 std::to_string(transformations) + ") " + \
                 a->name + ": \"" + value +"\"");
                 transformations++;
@@ -200,36 +197,37 @@ bool Rule::evaluateActions(Assay *assay) {
     for (Action *a : this->actions_runtime_pos) {
         if (a->isDisruptive() == false) {
 #ifndef NO_LOGS
-            assay->debug(4, "Running (_non_ disruptive) action: " + a->action);
+            trasn->debug(4, "Running (_non_ disruptive) action: " +
+                a->action);
 #endif
-            a->evaluate(this, assay);
+            a->evaluate(this, trasn);
         } else {
             containsDisruptive = true;
         }
     }
 
-    for (Action *a : assay->m_rules->defaultActions[this->phase]) {
+    for (Action *a : trasn->m_rules->defaultActions[this->phase]) {
         if (a->action_kind == actions::Action::RunTimeOnlyIfMatchKind) {
             if (a->isDisruptive()) {
                 if (containsDisruptive) {
 #ifndef NO_LOGS
-                    assay->debug(4, "(SecDefaultAction) " \
+                    trasn->debug(4, "(SecDefaultAction) " \
                         "_ignoring_ action: " + a->action + \
                         " (rule contains a disruptive action)");
 #endif
                 } else {
-                    if (assay->m_rules->secRuleEngine
+                    if (trasn->m_rules->secRuleEngine
                         == Rules::EnabledRuleEngine) {
 #ifndef NO_LOGS
-                        assay->debug(4, "(SecDefaultAction) " \
+                        trasn->debug(4, "(SecDefaultAction) " \
                             "Running action: " + a->action + \
                             " (rule _does not_ contains a " \
                             "disruptive action)");
 #endif
-                            a->evaluate(this, assay);
+                            a->evaluate(this, trasn);
                     } else {
 #ifndef NO_LOGS
-                        assay->debug(4, "(SecDefaultAction) " \
+                        trasn->debug(4, "(SecDefaultAction) " \
                             "_Not_ running action: " + a->action + \
                             ". Rule _does not_ contains a " \
                             "disruptive action, but SecRuleEngine is not On.");
@@ -238,9 +236,9 @@ bool Rule::evaluateActions(Assay *assay) {
                 }
             } else {
 #ifndef NO_LOGS
-                assay->debug(4, "(SecDefaultAction) Running action: " + \
+                trasn->debug(4, "(SecDefaultAction) Running action: " + \
                     a->action);
-                    a->evaluate(this, assay);
+                    a->evaluate(this, trasn);
 #endif
             }
         }
@@ -248,14 +246,15 @@ bool Rule::evaluateActions(Assay *assay) {
 
     for (Action *a : this->actions_runtime_pos) {
         if (a->isDisruptive()
-            && assay->m_rules->secRuleEngine == Rules::EnabledRuleEngine) {
+            && trasn->m_rules->secRuleEngine
+                == Rules::EnabledRuleEngine) {
 #ifndef NO_LOGS
-            assay->debug(4, "Running (disruptive) action: " + a->action);
+            trasn->debug(4, "Running (disruptive) action: " + a->action);
 #endif
-            a->evaluate(this, assay);
+            a->evaluate(this, trasn);
         } else if (a->isDisruptive()) {
 #ifndef NO_LOGS
-            assay->debug(4, "Not running disruptive action: " + \
+            trasn->debug(4, "Not running disruptive action: " + \
                 a->action + ". SecRuleEngine is not On");
 #endif
         }
@@ -265,7 +264,7 @@ bool Rule::evaluateActions(Assay *assay) {
 }
 
 
-bool Rule::evaluate(Assay *assay) {
+bool Rule::evaluate(Transaction *trasn) {
     bool ret = false;
     std::vector<Variable *> *variables = this->variables;
 
@@ -273,11 +272,11 @@ bool Rule::evaluate(Assay *assay) {
         return true;
     }
     if (m_unconditional == true) {
-        return evaluateActions(assay);
+        return evaluateActions(trasn);
     }
 
 #ifndef NO_LOGS
-    std::string eparam = MacroExpansion::expand(this->op->param, assay);
+    std::string eparam = MacroExpansion::expand(this->op->param, trasn);
 
     if (this->op->param != eparam) {
         eparam = "\"" + eparam + "\" Was: \"" + this->op->param + "\"";
@@ -285,7 +284,7 @@ bool Rule::evaluate(Assay *assay) {
         eparam = "\"" + eparam + "\"";
     }
 
-    assay->debug(4, "(Rule: " + std::to_string(rule_id) \
+    trasn->debug(4, "(Rule: " + std::to_string(rule_id) \
         + ") Executing operator \"" + this->op->op \
         + "\" with param " \
         + eparam \
@@ -300,7 +299,7 @@ bool Rule::evaluate(Assay *assay) {
         Variable *variable = variables->at(i);
         if (variable->m_isExclusion) {
             std::vector<const transaction::Variable *> z;
-            variable->evaluateInternal(assay, &z);
+            variable->evaluateInternal(trasn, &z);
             for (auto &y : z) {
                 exclusions.push_back(y->m_key);
             }
@@ -316,14 +315,14 @@ bool Rule::evaluate(Assay *assay) {
         }
 
         std::vector<const transaction::Variable *> e;
-        variable->evaluateInternal(assay, &e);
+        variable->evaluateInternal(trasn, &e);
 
         for (auto &v : e) {
             if (std::find(exclusions.begin(), exclusions.end(),
                 v->m_key) != exclusions.end()) {
 #ifndef NO_LOGS
-                assay->debug(9, "Variable: " + v->m_key + " is part of the" +
-                    " exclusion list, skipping...");
+                trasn->debug(9, "Variable: " + v->m_key +
+                    " is part of the exclusion list, skipping...");
 #endif
                 continue;
             }
@@ -339,12 +338,13 @@ bool Rule::evaluate(Assay *assay) {
             // Notice that first we make sure that won't be a t:none
             // on the target rule.
             if (none == 0) {
-                for (Action *a : assay->m_rules->defaultActions[this->phase]) {
+                for (Action *a :
+                    trasn->m_rules->defaultActions[this->phase]) {
                     if (a->action_kind ==
                         actions::Action::RunTimeBeforeMatchAttemptKind) {
-                        value = a->evaluate(value, assay);
+                        value = a->evaluate(value, trasn);
 #ifndef NO_LOGS
-                        assay->debug(9, "(SecDefaultAction) T (" + \
+                        trasn->debug(9, "(SecDefaultAction) T (" + \
                             std::to_string(transformations) + ") " + \
                             a->name + ": \"" + value +"\"");
 #endif
@@ -355,9 +355,9 @@ bool Rule::evaluate(Assay *assay) {
 
             for (Action *a : this->actions_runtime_pre) {
                 if (none == 0) {
-                    value = a->evaluate(value, assay);
+                    value = a->evaluate(value, trasn);
 #ifndef NO_LOGS
-                    assay->debug(9, " T (" + \
+                    trasn->debug(9, " T (" + \
                             std::to_string(transformations) + ") " + \
                             a->name + ": \"" + value +"\"");
 #endif
@@ -369,18 +369,18 @@ bool Rule::evaluate(Assay *assay) {
             }
 
 #ifndef NO_LOGS
-            assay->debug(9, "Target value: \"" + limitTo(80,
+            trasn->debug(9, "Target value: \"" + limitTo(80,
                 toHexIfNeeded(value)) + "\" (Variable: " + v->m_key + ")");
 #endif
 
-            ret = this->op->evaluate(assay, value);
+            ret = this->op->evaluate(trasn, value);
 
 #ifndef NO_LOGS
             clock_t end = clock();
             double elapsed_secs = static_cast<double>(end - begin) \
                 / CLOCKS_PER_SEC;
 
-            assay->debug(4, "Operator completed in " + \
+            trasn->debug(4, "Operator completed in " + \
                 std::to_string(elapsed_secs) + " seconds");
 #endif
 
@@ -388,17 +388,17 @@ bool Rule::evaluate(Assay *assay) {
                 bool containsDisruptive = false;
                 bool chainResult = false;
 #ifndef NO_LOGS
-                assay->debug(4, "Rule returned 1.");
+                trasn->debug(4, "Rule returned 1.");
 #endif
 
                 for (Action *a :
                     this->actions_runtime_pos) {
                     if (a->isDisruptive() == false) {
 #ifndef NO_LOGS
-                        assay->debug(4, "Running (_non_ disruptive) action: " \
-                            + a->action);
+                        trasn->debug(4, "Running (_non_ disruptive) " \
+                            "action: " + a->action);
 #endif
-                        a->evaluate(this, assay);
+                        a->evaluate(this, trasn);
                     } else {
                         containsDisruptive = true;
                     }
@@ -406,59 +406,59 @@ bool Rule::evaluate(Assay *assay) {
 
                 if (this->chained && this->chainedRule == NULL) {
 #ifndef NO_LOGS
-                    assay->debug(4, "Rule is marked as chained but there " \
+                    trasn->debug(4, "Rule is marked as chained but there " \
                         "isn't a subsequent rule.");
 #endif
                 }
                 if (this->chained && this->chainedRule != NULL) {
 #ifndef NO_LOGS
-                    assay->debug(4, "Executing chained rule.");
+                    trasn->debug(4, "Executing chained rule.");
 #endif
-                    if (assay->m_collections.storeOrUpdateFirst("MATCHED_VAR",
+                    if (trasn->m_collections.storeOrUpdateFirst("MATCHED_VAR",
                         value) == false) {
-                        assay->m_collections.store("MATCHED_VAR", value);
+                        trasn->m_collections.store("MATCHED_VAR", value);
                     }
-                    if (assay->m_collections.storeOrUpdateFirst(
+                    if (trasn->m_collections.storeOrUpdateFirst(
                         "MATCHED_VAR_NAME", v->m_key) == false) {
-                        assay->m_collections.store("MATCHED_VAR_NAME",
+                        trasn->m_collections.store("MATCHED_VAR_NAME",
                             v->m_key);
                     }
-                    assay->m_collections.store("MATCHED_VARS:"
+                    trasn->m_collections.store("MATCHED_VARS:"
                         + v->m_key, value);
-                    assay->m_collections.store("MATCHED_VARS_NAMES:"
+                    trasn->m_collections.store("MATCHED_VARS_NAMES:"
                         + v->m_key, v->m_key);
-                    chainResult = this->chainedRule->evaluate(assay);
-                    assay->m_collections.storeOrUpdateFirst("MATCHED_VAR", "");
-                    assay->m_collections.del("MATCHED_VARS:" + v->m_key);
-                    assay->m_collections.del("MATCHED_VARS_NAMES:" + v->m_key);
-                    assay->m_collections.del("MATCHED_VARS_NAME");
+                    chainResult = this->chainedRule->evaluate(trasn);
+                    trasn->m_collections.storeOrUpdateFirst("MATCHED_VAR", "");
+                    trasn->m_collections.del("MATCHED_VARS:" + v->m_key);
+                    trasn->m_collections.del("MATCHED_VARS_NAMES:" + v->m_key);
+                    trasn->m_collections.del("MATCHED_VARS_NAME");
                 }
                 if ((this->chained && chainResult == true) || !this->chained) {
                     for (Action *a :
-                        assay->m_rules->defaultActions[this->phase]) {
+                        trasn->m_rules->defaultActions[this->phase]) {
                         if (a->action_kind
                             == actions::Action::RunTimeOnlyIfMatchKind) {
                             if (a->isDisruptive()) {
                                 if (containsDisruptive) {
 #ifndef NO_LOGS
-                                    assay->debug(4, "(SecDefaultAction) " \
-                                        "_ignoring_ action: " + a->action \
-                                        + " (rule contains " \
-                                        + "a disruptive action)");
+                                    trasn->debug(4,
+                                        "(SecDefaultAction) _ignoring_ " \
+                                        "action: " + a->action + \
+                                        " (rule contains a disruptive action)");
 #endif
                                 } else {
-                                    if (assay->m_rules->secRuleEngine
+                                    if (trasn->m_rules->secRuleEngine
                                         == Rules::EnabledRuleEngine) {
 #ifndef NO_LOGS
-                                        assay->debug(4, "(SecDefaultAction) " \
+                                        trasn->debug(4, "(SecDefaultAction) " \
                                             "Running action: " + a->action + \
                                             " (rule _does not_ contains a " \
                                             "disruptive action)");
 #endif
-                                        a->evaluate(this, assay);
+                                        a->evaluate(this, trasn);
                                     } else {
 #ifndef NO_LOGS
-                                        assay->debug(4, "(SecDefaultAction) " \
+                                        trasn->debug(4, "(SecDefaultAction) " \
                                             "_Not_ running action: " \
                                             + a->action + ". Rule _does not_" \
                                             + " contains a disruptive action,"\
@@ -468,27 +468,27 @@ bool Rule::evaluate(Assay *assay) {
                                 }
                             } else {
 #ifndef NO_LOGS
-                                assay->debug(4, "(SecDefaultAction) Running " \
+                                trasn->debug(4, "(SecDefaultAction) Running " \
                                     "action: " + a->action + "!!" \
                                     + std::to_string(a->isDisruptive()));
 #endif
-                                a->evaluate(this, assay);
+                                a->evaluate(this, trasn);
                             }
                         }
                     }
                     for (Action *a :
                         this->actions_runtime_pos) {
                         if (a->isDisruptive()
-                            && assay->m_rules->secRuleEngine
+                            && trasn->m_rules->secRuleEngine
                                 == Rules::EnabledRuleEngine) {
 #ifndef NO_LOGS
-                            assay->debug(4, "Running (disruptive) action: " + \
-                                a->action);
+                            trasn->debug(4, "Running (disruptive) " \
+                                "action: " + a->action);
 #endif
-                            a->evaluate(this, assay);
+                            a->evaluate(this, trasn);
                         } else if (a->isDisruptive()) {
 #ifndef NO_LOGS
-                            assay->debug(4,
+                            trasn->debug(4,
                                 "Not running disruptive action: " + \
                                 a->action + ". SecRuleEngine is not On");
 #endif
@@ -498,7 +498,7 @@ bool Rule::evaluate(Assay *assay) {
 
             } else {
 #ifndef NO_LOGS
-                assay->debug(4, "Rule returned 0.");
+                trasn->debug(4, "Rule returned 0.");
 #endif
             }
         }

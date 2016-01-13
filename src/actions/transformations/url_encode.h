@@ -23,7 +23,7 @@
 
 #ifdef __cplusplus
 namespace modsecurity {
-class Assay;
+class Transaction;
 
 namespace actions {
 namespace transformations {
@@ -32,7 +32,7 @@ class UrlEncode : public Transformation {
  public:
     explicit UrlEncode(std::string action);
     std::string evaluate(std::string exp,
-        Assay *assay) override;
+        Transaction *transaction) override;
 
     std::string url_enc(const char *input,
         unsigned int input_len, int *changed);

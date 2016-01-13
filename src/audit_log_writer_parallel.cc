@@ -25,7 +25,7 @@
 #include <fstream>
 
 #include "src/audit_log.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/utils.h"
 #include "utils/md5.h"
 
@@ -89,26 +89,26 @@ bool AuditLogWriterParallel::init() {
 }
 
 
-bool AuditLogWriterParallel::write(Assay *assay, int parts) {
+bool AuditLogWriterParallel::write(Transaction *transaction, int parts) {
     FILE *fp;
     int fd;
-    std::string log = assay->to_json(parts);
-    std::string fileName = logFilePath(&assay->timeStamp,
+    std::string log = transaction->to_json(parts);
+    std::string fileName = logFilePath(&transaction->timeStamp,
         YearMonthDayDirectory | YearMonthDayAndTimeDirectory
         | YearMonthDayAndTimeFileName);
 
     std::string logPath = m_audit->m_storage_dir;
-    fileName = logPath + fileName + "-" + assay->id;
+    fileName = logPath + fileName + "-" + transaction->id;
 
     if (logPath.empty()) {
       return false;
     }
 
     createDir((logPath +
-        logFilePath(&assay->timeStamp, YearMonthDayDirectory)).c_str(),
+        logFilePath(&transaction->timeStamp, YearMonthDayDirectory)).c_str(),
         m_audit->directoryPermission);
     createDir((logPath +
-        logFilePath(&assay->timeStamp, YearMonthDayDirectory
+        logFilePath(&transaction->timeStamp, YearMonthDayDirectory
             | YearMonthDayAndTimeDirectory)).c_str(),
         m_audit->directoryPermission);
 
@@ -121,15 +121,15 @@ bool AuditLogWriterParallel::write(Assay *assay, int parts) {
     fclose(fp);
 
     if (log1.is_open() && log2.is_open()) {
-        log2 << assay->toOldAuditLogFormatIndex(fileName, log.length(),
+        log2 << transaction->toOldAuditLogFormatIndex(fileName, log.length(),
             md5(log));
     }
     if (log1.is_open() && !log2.is_open()) {
-        log1 << assay->toOldAuditLogFormatIndex(fileName, log.length(),
+        log1 << transaction->toOldAuditLogFormatIndex(fileName, log.length(),
             md5(log));
     }
     if (!log1.is_open() && log2.is_open()) {
-        log2 << assay->toOldAuditLogFormatIndex(fileName, log.length(),
+        log2 << transaction->toOldAuditLogFormatIndex(fileName, log.length(),
             md5(log));
     }
 

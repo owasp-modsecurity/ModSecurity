@@ -23,7 +23,7 @@
 
 #ifdef __cplusplus
 namespace modsecurity {
-class Assay;
+class Transaction;
 
 namespace actions {
 namespace transformations {
@@ -34,7 +34,7 @@ class CssDecode : public Transformation {
     explicit CssDecode(std::string action)
         : Transformation(action) { }
     std::string evaluate(std::string exp,
-        Assay *assay) override;
+        Transaction *transaction) override;
 };
 
 

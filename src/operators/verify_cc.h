@@ -33,7 +33,7 @@ class VerifyCC : public Operator {
         m_pce(NULL) { }
 
     int luhnVerify(const char *ccnumber, int len);
-    bool evaluate(Assay *assay, const std::string &input) override;
+    bool evaluate(Transaction *transaction, const std::string &input) override;
     bool init(const std::string &param, const char **error) override;
  private:
     pcre *m_pc;

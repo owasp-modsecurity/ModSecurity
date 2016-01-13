@@ -16,7 +16,7 @@
 #include <string>
 
 #include "actions/action.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 #ifndef SRC_ACTIONS_PASS_H_
 #define SRC_ACTIONS_PASS_H_
@@ -29,7 +29,7 @@ class Pass : public Action {
  public:
     explicit Pass(std::string action);
 
-    bool evaluate(Rule *rule, Assay *assay) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
     bool isDisruptive() override { return true; }
 };
 

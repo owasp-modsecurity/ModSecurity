@@ -26,7 +26,7 @@ namespace operators {
 
 
 
-bool Rx::evaluate(Assay *assay, const std::string& input) {
+bool Rx::evaluate(Transaction *transaction, const std::string& input) {
     SMatch match;
 
     if (regex_search(input, &match, *m_re) && match.size() >= 1) {

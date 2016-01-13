@@ -20,7 +20,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool NoMatch::evaluate(Assay *assay, const std::string &str) {
+bool NoMatch::evaluate(Transaction *transaction, const std::string &str) {
     return false;
 }
 

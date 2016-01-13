@@ -25,7 +25,7 @@
 #ifndef SRC_UTILS_GEO_LOOKUP_H_
 #define SRC_UTILS_GEO_LOOKUP_H_
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 namespace modsecurity {
 namespace Utils {

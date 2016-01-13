@@ -24,7 +24,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 #include "src/utils.h"
 
@@ -35,7 +35,7 @@ namespace transformations {
 
 
 std::string NormalisePathWin::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     int changed;
 
     char *tmp = reinterpret_cast<char *>(

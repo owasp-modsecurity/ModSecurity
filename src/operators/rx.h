@@ -40,7 +40,7 @@ class Rx : public Operator {
             m_re = new Regex(param);
         }
 
-    bool evaluate(Assay *assay, const std::string &input);
+    bool evaluate(Transaction *transaction, const std::string &input);
 
     std::list<std::string> matched;
  private:

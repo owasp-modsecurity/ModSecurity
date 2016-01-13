@@ -19,7 +19,7 @@
 #include <string>
 
 #include "actions/action.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/utils.h"
 
 namespace modsecurity {
@@ -50,15 +50,15 @@ Severity::Severity(std::string action)
 }
 
 
-bool Severity::evaluate(Rule *rule, Assay *assay) {
+bool Severity::evaluate(Rule *rule, Transaction *transaction) {
 #ifndef NO_LOGS
-    assay->debug(9, "This rule severity is: " + \
-        std::to_string(this->m_severity) + " current assay is: " + \
-        std::to_string(assay->highest_severity));
+    transaction->debug(9, "This rule severity is: " + \
+        std::to_string(this->m_severity) + " current transaction is: " + \
+        std::to_string(transaction->highest_severity));
 #endif
 
-    if (assay->highest_severity > this->m_severity) {
-        assay->highest_severity = this->m_severity;
+    if (transaction->highest_severity > this->m_severity) {
+        transaction->highest_severity = this->m_severity;
     }
     return true;
 }

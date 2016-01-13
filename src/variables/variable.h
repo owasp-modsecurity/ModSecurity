@@ -17,14 +17,14 @@
 #include <string>
 #include <list>
 #include <utility>
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 #ifndef SRC_VARIABLES_VARIABLE_H_
 #define SRC_VARIABLES_VARIABLE_H_
 
 namespace modsecurity {
 
-class Assay;
+class Transaction;
 namespace Variables {
 
 class Variable {
@@ -66,10 +66,13 @@ class Variable {
 
     static std::string to_s(std::vector<Variable *> *variables);
 
-    virtual std::vector<const transaction::Variable *> *evaluate(Assay *assay);
-    virtual void evaluate(Assay *assay,
+    virtual std::vector<const transaction::Variable *>
+        *evaluate(Transaction *transaction);
+
+    virtual void evaluate(Transaction *transaction,
         std::vector<const transaction::Variable *> *l);
-    virtual void evaluateInternal(Assay *assay,
+
+    virtual void evaluateInternal(Transaction *transaction,
         std::vector<const transaction::Variable *> *l);
 
 

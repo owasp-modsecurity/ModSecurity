@@ -22,7 +22,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool InspectFile::evaluate(Assay *assay, const std::string &str) {
+bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
     /**
      * @todo Implement the operator InspectFile.
      *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#inspectfile

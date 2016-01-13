@@ -24,7 +24,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 #include "src/utils.h"
 
@@ -39,7 +39,7 @@ NormalisePath::NormalisePath(std::string action)
 }
 
 std::string NormalisePath::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     int changed = 0;
 
     char *tmp = reinterpret_cast<char *>(

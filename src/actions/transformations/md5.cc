@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 
 
@@ -36,13 +36,13 @@ Md5::Md5(std::string action)
 }
 
 std::string Md5::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     /**
      * @todo Implement the transformation Md5
      */
-    if (assay) {
+    if (transaction) {
 #ifndef NO_LOGS
-        assay->debug(4, "Transformation Md5 is not implemented yet.");
+        transaction->debug(4, "Transformation Md5 is not implemented yet.");
 #endif
     }
     return value;

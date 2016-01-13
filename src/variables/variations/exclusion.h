@@ -26,7 +26,7 @@
 
 namespace modsecurity {
 
-class Assay;
+class Transaction;
 namespace Variables {
 namespace Variations {
 
@@ -37,7 +37,7 @@ class Exclusion : public Variable {
         var(v)
         { m_isExclusion = true; }
 
-    void evaluateInternal(Assay *assay,
+    void evaluateInternal(Transaction *transaction,
         std::vector<const transaction::Variable *> *l) override;
 
     Variable *var;

@@ -23,7 +23,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool FuzzyHash::evaluate(Assay *assay, const std::string &str) {
+bool FuzzyHash::evaluate(Transaction *transaction, const std::string &str) {
     /**
      * @todo Implement the operator FuzzyHash.
      *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#fuzzyhash

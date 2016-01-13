@@ -21,7 +21,7 @@
 #ifndef SRC_UTILS_IP_TREE_H_
 #define SRC_UTILS_IP_TREE_H_
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "utils/msc_tree.h"
 
 namespace modsecurity {

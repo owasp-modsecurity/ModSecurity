@@ -37,7 +37,7 @@ bool IpMatch::init(const std::string &file, const char **error) {
 }
 
 
-bool IpMatch::evaluate(Assay *assay, const std::string &input) {
+bool IpMatch::evaluate(Transaction *transaction, const std::string &input) {
     return m_tree.contains(input);
 }
 

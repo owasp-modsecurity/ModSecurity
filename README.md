@@ -115,7 +115,7 @@ Below some are illustrated:
 ```c++
 using ModSecurity::ModSecurity;
 using ModSecurity::Rules;
-using ModSecurity::Assay;
+using ModSecurity::Transaction;
 
 ModSecurity *modsec;
 ModSecurity::Rules *rules;
@@ -126,10 +126,10 @@ rules = new Rules();
 
 rules->loadFromUri(rules_file);
 
-Assay *modsecAssay = new Assay(modsec, rules);
+Transaction *modsecTransaction = new Transaction(modsec, rules);
 
-modsecAssay->processConnection("127.0.0.1");
-if (modsecAssay->intervention()) {
+modsecTransaction->processConnection("127.0.0.1");
+if (modsecTransaction->intervention()) {
    std::cout << "There is an intervention" << std::endl;
 }
 ```
@@ -138,7 +138,7 @@ if (modsecAssay->intervention()) {
 
 ```c
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 
 char main_rule_uri[] = "basic_rules.conf";
@@ -146,7 +146,7 @@ char main_rule_uri[] = "basic_rules.conf";
 int main (int argc, char **argv)
 {
     ModSecurity *modsec = NULL;
-    Assay *assay = NULL;
+    Transaction *transaction = NULL;
     Rules *rules = NULL;
 
     modsec = msc_init();
@@ -154,14 +154,14 @@ int main (int argc, char **argv)
     rules = msc_create_rules_set();
     msc_rules_add_file(rules, main_rule_uri);
 
-    assay = msc_new_assay(modsec, rules);
+    transaction = msc_new_transaction(modsec, rules);
 
-    msc_process_connection(assay, "127.0.0.1");
-    msc_process_uri(assay, "http://www.modsecurity.org/test?key1=value1&key2=value2&key3=value3&test=args&test=test");
-    msc_process_request_headers(assay);
-    msc_process_request_body(assay);
-    msc_process_response_headers(assay);
-    msc_process_response_body(assay);
+    msc_process_connection(transaction, "127.0.0.1");
+    msc_process_uri(transaction, "http://www.modsecurity.org/test?key1=value1&key2=value2&key3=value3&test=args&test=test");
+    msc_process_request_headers(transaction);
+    msc_process_request_body(transaction);
+    msc_process_response_headers(transaction);
+    msc_process_response_body(transaction);
 
     return 0;
 }

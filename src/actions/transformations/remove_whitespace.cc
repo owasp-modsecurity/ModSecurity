@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 
 
@@ -36,13 +36,13 @@ RemoveWhitespace::RemoveWhitespace(std::string action)
 }
 
 std::string RemoveWhitespace::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     /**
      * @todo Implement the transformation RemoveWhitespace
      */
-    if (assay) {
+    if (transaction) {
 #ifndef NO_LOGS
-        assay->debug(4, "Transformation RemoveWhitespace is " \
+        transaction->debug(4, "Transformation RemoveWhitespace is " \
             "not implemented yet.");
 #endif
     }

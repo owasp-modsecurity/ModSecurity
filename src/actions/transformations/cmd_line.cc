@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 
 
@@ -36,13 +36,13 @@ CmdLine::CmdLine(std::string action)
 }
 
 std::string CmdLine::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     /**
      * @todo Implement the transformation CmdLine
      */
-    if (assay) {
+    if (transaction) {
 #ifndef NO_LOGS
-        assay->debug(4, "Transformation CmdLine is not implemented yet.");
+        transaction->debug(4, "Transformation CmdLine is not implemented yet.");
 #endif
     }
     return value;

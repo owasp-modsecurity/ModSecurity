@@ -19,7 +19,7 @@
 #include <string>
 
 #include "actions/action.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/utils.h"
 #include "modsecurity/rule.h"
 #include "src/macro_expansion.h"
@@ -50,9 +50,9 @@ bool InitCol::init(std::string *error) {
 }
 
 
-bool InitCol::evaluate(Rule *rule, Assay *assay) {
+bool InitCol::evaluate(Rule *rule, Transaction *transaction) {
     std::string collectionName;
-    collectionName = MacroExpansion::expand(m_collection_value, assay);
+    collectionName = MacroExpansion::expand(m_collection_value, transaction);
     return true;
 }
 

@@ -31,7 +31,7 @@ class Capture : public Action {
     explicit Capture(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(Rule *rule, Assay *assay) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
 };
 
 

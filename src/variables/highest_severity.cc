@@ -21,15 +21,15 @@
 #include <list>
 #include <utility>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 namespace modsecurity {
 namespace Variables {
 
-void HighestSeverity::evaluateInternal(Assay *assay,
+void HighestSeverity::evaluateInternal(Transaction *transaction,
     std::vector<const transaction::Variable *> *l) {
     l->push_back(new transaction::Variable("HIGHEST_SEVERITY",
-        std::to_string(assay->highest_severity)));
+        std::to_string(transaction->highest_severity)));
 }
 
 

@@ -32,7 +32,7 @@
 namespace modsecurity {
     std::vector<std::string> split(std::string str, char delimiter);
     double random_number(const double from, const double to);
-    double generate_assay_unique_id();
+    double generate_transaction_unique_id();
     std::string ascTime(time_t *t);
     void createDir(std::string dir, int mode);
     std::string dash_if_empty(const std::string& str);
@@ -50,8 +50,8 @@ namespace modsecurity {
     int normalize_path_inplace(unsigned char *input, int input_len,
         int win, int *changed);
     std::string string_to_hex(const std::string& input);
-    int urldecode_uni_nonstrict_inplace_ex(Assay *assay, unsigned char *input,
-        int64_t input_len, int *changed);
+    int urldecode_uni_nonstrict_inplace_ex(Transaction *transaction,
+        unsigned char *input, int64_t input_len, int *changed);
     std::string phase_name(int x);
     std::string limitTo(int amount, const std::string &str);
     std::string toHexIfNeeded(const std::string &str);

@@ -20,7 +20,7 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/action.h"
 #include "actions/transformations/base64_decode_ext.h"
 #include "actions/transformations/base64_decode.h"
@@ -67,7 +67,7 @@ namespace transformations {
 
 
 std::string Transformation::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     return value;
 }
 

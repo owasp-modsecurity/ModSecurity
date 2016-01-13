@@ -22,7 +22,8 @@
 namespace modsecurity {
 namespace operators {
 
-bool ValidateSchema::evaluate(Assay *assay, const std::string &str) {
+bool ValidateSchema::evaluate(Transaction *transaction,
+    const std::string &str) {
     /**
      * @todo Implement the operator ValidateSchema.
      *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#validateSchema
@@ -31,7 +32,8 @@ bool ValidateSchema::evaluate(Assay *assay, const std::string &str) {
 }
 
 
-ValidateSchema::ValidateSchema(std::string op, std::string param, bool negation)
+ValidateSchema::ValidateSchema(std::string op, std::string param,
+    bool negation)
     : Operator() {
     this->op = op;
     this->param = param;

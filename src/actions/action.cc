@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 
 #include "actions/block.h"
@@ -42,12 +42,12 @@ namespace actions {
 
 
 std::string Action::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     return value;
 }
 
 
-bool Action::evaluate(Rule *rule, Assay *assay) {
+bool Action::evaluate(Rule *rule, Transaction *transaction) {
     return true;
 }
 

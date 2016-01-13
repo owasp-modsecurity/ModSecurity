@@ -30,7 +30,7 @@ class ValidateUrlEncoding : public Operator {
     ValidateUrlEncoding(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
 
-    bool evaluate(Assay *assay, const std::string &input) override;
+    bool evaluate(Transaction *transaction, const std::string &input) override;
     int validate_url_encoding(const char *input, uint64_t input_length);
 };
 

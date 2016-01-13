@@ -106,7 +106,8 @@ bool ValidateByteRange::init(const std::string &file,
 }
 
 
-bool ValidateByteRange::evaluate(Assay *assay, const std::string &input) {
+bool ValidateByteRange::evaluate(Transaction *transaction,
+    const std::string &input) {
     bool ret = true;
 
     size_t count = 0;

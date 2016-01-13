@@ -23,7 +23,7 @@
 #include <locale>
 #include <iterator>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 
 
@@ -37,7 +37,7 @@ HexEncode::HexEncode(std::string action)
 }
 
 std::string HexEncode::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
 
     std::stringstream result;
     for (std::size_t i=0; i < value.length(); i++) {

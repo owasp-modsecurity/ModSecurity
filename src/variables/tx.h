@@ -26,7 +26,7 @@
 
 namespace modsecurity {
 
-class Assay;
+class Transaction;
 namespace Variables {
 
 class Tx : public Variable {
@@ -34,7 +34,7 @@ class Tx : public Variable {
     explicit Tx(std::string _name)
         : Variable(_name) { }
 
-    void evaluateInternal(Assay *assay,
+    void evaluateInternal(Transaction *transaction,
         std::vector<const transaction::Variable *> *l) override;
 };
 

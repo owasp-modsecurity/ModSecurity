@@ -19,7 +19,7 @@
 #include <string>
 
 #include "actions/action.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/utils.h"
 
 namespace modsecurity {
@@ -31,11 +31,11 @@ SkipAfter::SkipAfter(std::string action)
 }
 
 
-bool SkipAfter::evaluate(Rule *rule, Assay *assay) {
+bool SkipAfter::evaluate(Rule *rule, Transaction *transaction) {
 #ifndef NO_LOGS
-    assay->debug(5, "Setting skipAfter for: " + m_marker);
+    transaction->debug(5, "Setting skipAfter for: " + m_marker);
 #endif
-    assay->m_marker = m_marker;
+    transaction->m_marker = m_marker;
     return true;
 }
 

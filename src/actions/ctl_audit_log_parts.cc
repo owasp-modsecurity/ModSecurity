@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 namespace modsecurity {
 namespace actions {
@@ -35,8 +35,9 @@ CtlAuditLogParts::CtlAuditLogParts(std::string action)
     }
 }
 
-bool CtlAuditLogParts::evaluate(Rule *rule, Assay *assay) {
-    assay->auditLogModifier.push_back(std::make_pair(mPartsAction, mParts));
+bool CtlAuditLogParts::evaluate(Rule *rule, Transaction *transaction) {
+    transaction->auditLogModifier.push_back(
+        std::make_pair(mPartsAction, mParts));
     return true;
 }
 

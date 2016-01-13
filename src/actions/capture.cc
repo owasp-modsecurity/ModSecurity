@@ -19,7 +19,7 @@
 #include <string>
 #include <list>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 #include "modsecurity/rule.h"
 #include "operators/operator.h"
@@ -31,7 +31,7 @@
 namespace modsecurity {
 namespace actions {
 
-bool Capture::evaluate(Rule *rule, Assay *assay) {
+bool Capture::evaluate(Rule *rule, Transaction *transaction) {
     operators::Operator *op = rule->op;
     std::list<std::string> *match;
 
@@ -61,7 +61,7 @@ bool Capture::evaluate(Rule *rule, Assay *assay) {
 
     int i = 0;
     while (match->empty() == false) {
-        assay->m_collections.storeOrUpdateFirst("TX",
+        transaction->m_collections.storeOrUpdateFirst("TX",
             std::to_string(i), match->back());
         match->pop_back();
         i++;

@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 #include "src/utils.h"
 
@@ -37,7 +37,7 @@ ReplaceComments::ReplaceComments(std::string action)
 }
 
 std::string ReplaceComments::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     uint64_t i, j, incomment;
 
     char *input = reinterpret_cast<char *>(

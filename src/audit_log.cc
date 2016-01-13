@@ -219,14 +219,14 @@ bool AuditLog::isRelevant(int status) {
 }
 
 
-bool AuditLog::saveIfRelevant(Assay *assay) {
-    return saveIfRelevant(assay, -1);
+bool AuditLog::saveIfRelevant(Transaction *transaction) {
+    return saveIfRelevant(transaction, -1);
 }
 
 
-bool AuditLog::saveIfRelevant(Assay *assay, int parts) {
-    if (this->isRelevant(assay->httpCodeReturned) == false &&
-        assay->save_in_auditlog == false) {
+bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
+    if (this->isRelevant(transaction->httpCodeReturned) == false &&
+        transaction->save_in_auditlog == false) {
         return false;
     }
 
@@ -235,14 +235,14 @@ bool AuditLog::saveIfRelevant(Assay *assay, int parts) {
      * we won't save it.
      *
      */
-    if (assay->do_not_save_in_auditlog == true) {
+    if (transaction->do_not_save_in_auditlog == true) {
         return false;
     }
 
     if (parts == -1) {
         parts = m_parts;
     }
-    m_writer->write(assay, parts);
+    m_writer->write(transaction, parts);
 
     return true;
 }

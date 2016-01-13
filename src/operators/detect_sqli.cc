@@ -25,7 +25,7 @@ namespace modsecurity {
 namespace operators {
 
 
-bool DetectSQLi::evaluate(Assay *assay, const std::string &input) {
+bool DetectSQLi::evaluate(Transaction *transaction, const std::string &input) {
     char fingerprint[8];
     int issqli;
 
@@ -33,18 +33,18 @@ bool DetectSQLi::evaluate(Assay *assay, const std::string &input) {
 
     if (issqli) {
         matched.push_back(fingerprint);
-        if (assay) {
+        if (transaction) {
 #ifndef NO_LOGS
-            assay->debug(4, "detected SQLi using libinjection with " \
+            transaction->debug(4, "detected SQLi using libinjection with " \
                 "fingerprint '" + std::string(fingerprint) + "' at: '" +
                 input + "'");
 #endif
         }
     } else {
-        if (assay) {
+        if (transaction) {
 #ifndef NO_LOGS
-            assay->debug(9, "detected SQLi: not able to find an inject on '" +
-                input + "'");
+            transaction->debug(9, "detected SQLi: not able to find an " \
+                "inject on '" + input + "'");
 #endif
         }
     }

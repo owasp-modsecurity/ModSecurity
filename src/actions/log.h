@@ -20,10 +20,10 @@
 #ifndef SRC_ACTIONS_LOG_H_
 #define SRC_ACTIONS_LOG_H_
 
-class Assay;
+class Transaction;
 
 namespace modsecurity {
-class Assay;
+class Transaction;
 namespace actions {
 
 
@@ -32,7 +32,7 @@ class Log : public Action {
     explicit Log(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(Rule *rule, Assay *assay) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
 };
 
 }  // namespace actions

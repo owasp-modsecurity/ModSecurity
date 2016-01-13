@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 namespace modsecurity {
 namespace actions {
@@ -33,8 +33,8 @@ Status::Status(std::string action)
 }
 
 
-bool Status::evaluate(Rule *rule, Assay *assay) {
-    assay->actions.push_back(this);
+bool Status::evaluate(Rule *rule, Transaction *transaction) {
+    transaction->actions.push_back(this);
     return true;
 }
 

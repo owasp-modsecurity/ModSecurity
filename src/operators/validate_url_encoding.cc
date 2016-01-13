@@ -65,7 +65,8 @@ int ValidateUrlEncoding::validate_url_encoding(const char *input,
 }
 
 
-bool ValidateUrlEncoding::evaluate(Assay *assay, const std::string &input) {
+bool ValidateUrlEncoding::evaluate(Transaction *transaction,
+    const std::string &input) {
     bool res = false;
 
     if (input.empty() == true) {
@@ -76,37 +77,38 @@ bool ValidateUrlEncoding::evaluate(Assay *assay, const std::string &input) {
     switch (rc) {
         case 1 :
             /* Encoding is valid */
-            if (assay) {
+            if (transaction) {
 #ifndef NO_LOGS
-                assay->debug(7, "Valid URL Encoding at '" +input + "'");
+                transaction->debug(7, "Valid URL Encoding at '" +input + "'");
 #endif
             }
             res = false;
             break;
         case -2 :
-            if (assay) {
+            if (transaction) {
 #ifndef NO_LOGS
-                assay->debug(7, "Invalid URL Encoding: Non-hexadecimal "
+                transaction->debug(7, "Invalid URL Encoding: Non-hexadecimal "
                     "digits used at '" + input + "'");
 #endif
             }
             res = true; /* Invalid match. */
             break;
         case -3 :
-            if (assay) {
+            if (transaction) {
 #ifndef NO_LOGS
-                assay->debug(7, "Invalid URL Encoding: Not enough characters "
-                "at the end of input at '" + input + "'");
+                transaction->debug(7, "Invalid URL Encoding: Not enough " \
+                "characters at the end of input at '" + input + "'");
 #endif
             }
             res = true; /* Invalid match. */
             break;
         case -1 :
         default :
-            if (assay) {
+            if (transaction) {
 #ifndef NO_LOGS
-                assay->debug(7, "Invalid URL Encoding: Internal Error (rc = " +
-                    std::to_string(rc) + ") at '" + input + "'");
+                transaction->debug(7, "Invalid URL Encoding: Internal " \
+                    "Error (rc = " + std::to_string(rc) + ") at '" +
+                    input + "'");
 #endif
             }
             res = true;

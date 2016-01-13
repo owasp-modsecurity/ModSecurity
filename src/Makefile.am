@@ -23,7 +23,7 @@ MAINTAINERCLEANFILES = \
 
 
 pkginclude_HEADERS = \
-	../headers/modsecurity/assay.h \
+	../headers/modsecurity/transaction.h \
 	../headers/modsecurity/debug_log.h \
 	../headers/modsecurity/intervention.h \
 	../headers/modsecurity/modsecurity.h \
@@ -176,7 +176,7 @@ libmodsecurity_la_SOURCES = \
 	parser/seclang-parser.yy \
 	parser/seclang-scanner.ll \
 	parser/driver.cc \
-	assay.cc \
+	transaction.cc \
 	audit_log.cc \
 	audit_log_writer.cc \
 	audit_log_writer_serial.cc \

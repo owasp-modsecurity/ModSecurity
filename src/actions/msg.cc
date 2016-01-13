@@ -19,7 +19,7 @@
 #include <string>
 
 #include "actions/action.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/utils.h"
 #include "src/macro_expansion.h"
 
@@ -34,13 +34,13 @@ Msg::Msg(std::string action)
 }
 
 
-bool Msg::evaluate(Rule *rule, Assay *assay) {
-    std::string msg = MacroExpansion::expand(m_msg, assay);
+bool Msg::evaluate(Rule *rule, Transaction *transaction) {
+    std::string msg = MacroExpansion::expand(m_msg, transaction);
 #ifndef NO_LOGS
-    assay->debug(9, "Saving msg: " + msg);
+    transaction->debug(9, "Saving msg: " + msg);
 #endif
-    assay->rulesMessages.push_back(msg);
-    assay->serverLog(msg);
+    transaction->rulesMessages.push_back(msg);
+    transaction->serverLog(msg);
     return true;
 }
 

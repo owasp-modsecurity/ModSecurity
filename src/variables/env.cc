@@ -25,7 +25,7 @@
 #include <utility>
 #include <map>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/utils.h"
 
 extern char **environ;
@@ -33,7 +33,7 @@ extern char **environ;
 namespace modsecurity {
 namespace Variables {
 
-void Env::evaluateInternal(Assay *assay,
+void Env::evaluateInternal(Transaction *transaction,
     std::vector<const transaction::Variable *> *l) {
     std::map<std::string, std::string> envs;
     for (char **current = environ; *current; current++) {

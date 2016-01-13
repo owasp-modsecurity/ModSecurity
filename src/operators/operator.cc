@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 #include "operators/begins_with.h"
 #include "operators/contains.h"
@@ -66,18 +66,18 @@ namespace modsecurity {
 namespace operators {
 
 
-bool Operator::debug(Assay *assay, int x, std::string a) {
+bool Operator::debug(Transaction *transaction, int x, std::string a) {
 #ifndef NO_LOGS
-    assay->debug(x, a);
+    transaction->debug(x, a);
 #endif
     return true;
 }
 
 
-bool Operator::evaluate(Assay *assay, const std::string& a) {
+bool Operator::evaluate(Transaction *transaction, const std::string& a) {
 #ifndef NO_LOGS
-    if (assay) {
-        assay->debug(2, "Operator: " + this->op + \
+    if (transaction) {
+        transaction->debug(2, "Operator: " + this->op + \
             " is not implemented or malfunctioning.");
     } else {
         std::cerr << "Operator: " + this->op + \

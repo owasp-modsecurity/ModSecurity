@@ -20,7 +20,7 @@
 #ifndef SRC_OPERATORS_OPERATOR_H__
 #define SRC_OPERATORS_OPERATOR_H__
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 #ifdef __cplusplus
 namespace modsecurity {
@@ -44,10 +44,10 @@ class Operator {
         return true;
     }
 
-    virtual bool evaluate(Assay *assay, const std::string &str);
+    virtual bool evaluate(Transaction *transaction, const std::string &str);
     static Operator *instantiate(std::string op);
  protected:
-    bool debug(Assay *assay, int x, std::string a);
+    bool debug(Transaction *transaction, int x, std::string a);
 };
 
 }  // namespace operators

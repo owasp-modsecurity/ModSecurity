@@ -21,10 +21,10 @@
 #define SRC_ACTIONS_CHAIN_H_
 
 #ifdef __cplusplus
-class Assay;
+class Transaction;
 
 namespace modsecurity {
-class Assay;
+class Transaction;
 class Rule;
 
 namespace actions {
@@ -35,7 +35,7 @@ class Chain : public Action {
     explicit Chain(std::string action)
         : Action(action, ConfigurationKind) { }
 
-    bool evaluate(Rule *rule, Assay *assay) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
 };
 
 }  // namespace actions

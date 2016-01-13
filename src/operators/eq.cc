@@ -24,11 +24,11 @@ namespace modsecurity {
 namespace operators {
 
 
-bool Eq::evaluate(Assay *assay, const std::string &input) {
+bool Eq::evaluate(Transaction *transaction, const std::string &input) {
     int p = 0;
     int i = 0;
     bool eq = false;
-    std::string pt = MacroExpansion::expand(param, assay);
+    std::string pt = MacroExpansion::expand(param, transaction);
 
     try {
         p = std::stoi(pt);

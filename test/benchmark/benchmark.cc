@@ -22,7 +22,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
 
-using modsecurity::Assay;
+using modsecurity::Transaction;
 
 char request_header[] =  "" \
     "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\n\r" \
@@ -88,83 +88,83 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < NUM_REQUESTS; i++) {
         std::cout << "Proceeding with request " << i << std::endl;
 
-        Assay *modsecAssay = new Assay(modsec, rules, NULL);
-        modsecAssay->processConnection(ip, 12345, "127.0.0.1", 80);
+        Transaction *modsecTransaction = new Transaction(modsec, rules, NULL);
+        modsecTransaction->processConnection(ip, 12345, "127.0.0.1", 80);
 
-        if (modsecAssay->intervention(&it)) {
+        if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             continue;
         }
-        modsecAssay->processURI(request_uri, "GET", "1.1");
-        if (modsecAssay->intervention(&it)) {
+        modsecTransaction->processURI(request_uri, "GET", "1.1");
+        if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             continue;
         }
 
-        modsecAssay->addRequestHeader("Host",
+        modsecTransaction->addRequestHeader("Host",
             "net.tutsplus.com");
-        modsecAssay->addRequestHeader("User-Agent",
+        modsecTransaction->addRequestHeader("User-Agent",
             "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) " \
             "Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\n\r");
-        modsecAssay->addRequestHeader("Accept",
+        modsecTransaction->addRequestHeader("Accept",
             "text/html,application/xhtml+xml,application/xml;" \
             "q=0.9,*/*;q=0.8");
-        modsecAssay->addRequestHeader("Accept-Language",
+        modsecTransaction->addRequestHeader("Accept-Language",
             "en-us,en;q=0.5");
-        modsecAssay->addRequestHeader("Accept-Encoding",
+        modsecTransaction->addRequestHeader("Accept-Encoding",
             "gzip,deflate");
-        modsecAssay->addRequestHeader("Accept-Charset",
+        modsecTransaction->addRequestHeader("Accept-Charset",
             "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
-        modsecAssay->addRequestHeader("Keep-Alive",
+        modsecTransaction->addRequestHeader("Keep-Alive",
             "300");
-        modsecAssay->addRequestHeader("Connection",
+        modsecTransaction->addRequestHeader("Connection",
             "keep-alive");
-        modsecAssay->addRequestHeader("Cookie",
+        modsecTransaction->addRequestHeader("Cookie",
             "PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120");
-        modsecAssay->addRequestHeader("Pragma",
+        modsecTransaction->addRequestHeader("Pragma",
             "no-cache");
-        modsecAssay->addRequestHeader("Cache-Control",
+        modsecTransaction->addRequestHeader("Cache-Control",
             "no-cache");
-        modsecAssay->processRequestHeaders();
+        modsecTransaction->processRequestHeaders();
 
-        if (modsecAssay->intervention(&it)) {
+        if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             continue;
         }
 
 
-        modsecAssay->processRequestBody();
+        modsecTransaction->processRequestBody();
 
-        if (modsecAssay->intervention(&it)) {
+        if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             continue;
         }
 
-        modsecAssay->addResponseHeader("HTTP/1.1",
+        modsecTransaction->addResponseHeader("HTTP/1.1",
             "200 OK");
-        modsecAssay->addResponseHeader("Content-Type",
+        modsecTransaction->addResponseHeader("Content-Type",
             "text/xml; charset=utf-8");
-        modsecAssay->addResponseHeader("Content-Length",
+        modsecTransaction->addResponseHeader("Content-Length",
             "200");
 
-        modsecAssay->processResponseHeaders();
+        modsecTransaction->processResponseHeaders();
 
-        if (modsecAssay->intervention(&it)) {
+        if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             continue;
         }
 
 
-        modsecAssay->appendResponseBody(response_body,
+        modsecTransaction->appendResponseBody(response_body,
             strlen((const char*)response_body));
-        modsecAssay->processResponseBody();
+        modsecTransaction->processResponseBody();
 
-        if (modsecAssay->intervention(&it)) {
+        if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             continue;
         }
 
-        delete modsecAssay;
+        delete modsecTransaction;
     }
 
     delete modsec;

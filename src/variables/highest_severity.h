@@ -25,7 +25,7 @@
 
 namespace modsecurity {
 
-class Assay;
+class Transaction;
 namespace Variables {
 
 class HighestSeverity : public Variable {
@@ -33,7 +33,7 @@ class HighestSeverity : public Variable {
     explicit HighestSeverity(std::string _name)
         : Variable(_name) { }
 
-    void evaluateInternal(Assay *assay,
+    void evaluateInternal(Transaction *transaction,
         std::vector<const transaction::Variable *> *l) override;
 };
 

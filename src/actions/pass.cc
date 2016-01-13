@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 
 namespace modsecurity {
@@ -31,8 +31,8 @@ Pass::Pass(std::string action)
 }
 
 
-bool Pass::evaluate(Rule *rule, Assay *assay) {
-    assay->actions.clear();
+bool Pass::evaluate(Rule *rule, Transaction *transaction) {
+    transaction->actions.clear();
     return true;
 }
 

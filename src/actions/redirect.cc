@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/macro_expansion.h"
 
 namespace modsecurity {
@@ -41,9 +41,9 @@ Redirect::Redirect(const std::string& action)
 }
 
 
-bool Redirect::evaluate(Rule *rule, Assay *assay) {
-    m_urlExpanded = MacroExpansion::expand(m_url, assay);
-    assay->actions.push_back(this);
+bool Redirect::evaluate(Rule *rule, Transaction *transaction) {
+    m_urlExpanded = MacroExpansion::expand(m_url, transaction);
+    transaction->actions.push_back(this);
     return true;
 }
 

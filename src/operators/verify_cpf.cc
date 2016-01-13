@@ -22,7 +22,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool VerifyCPF::evaluate(Assay *assay, const std::string &str) {
+bool VerifyCPF::evaluate(Transaction *transaction, const std::string &str) {
     /**
      * @todo Implement the operator VerifyCPF.
      *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#verifyCPF

@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
 
         ModSecurity *ms = new ModSecurity();
         Rules *rules = new Rules();
-        Assay *assay = new Assay(ms, rules, NULL);
+        Transaction *transaction = new Transaction(ms, rules, NULL);
 
 
         /**
@@ -189,43 +189,43 @@ Utf8Unicode *utf8unicode = new Utf8Unicode("Utf8Unicode"); utf8unicode->evaluate
         *
         */
 #if 1
-BeginsWith *beginswith = new BeginsWith("@BeginsWith", z, false); beginswith->evaluate(assay, s); delete beginswith;
-Contains *contains = new Contains("@Contains", z, false); contains->evaluate(assay, s); delete contains;
-ContainsWord *containsword = new ContainsWord("@ContainsWord", z, false); containsword->evaluate(assay, s); delete containsword;
-DetectSQLi *detectsqli = new DetectSQLi("@DetectSQLi", z, false); detectsqli->evaluate(assay, s); delete detectsqli;
-DetectXSS *detectxss = new DetectXSS("@DetectXSS", z, false); detectxss->evaluate(assay, s); delete detectxss;
-EndsWith *endswith = new EndsWith("@EndsWith", z, false); endswith->evaluate(assay, s); delete endswith;
-Eq *eq = new Eq("@Eq", z, false); eq->evaluate(assay, s); delete eq;
-FuzzyHash *fuzzyhash = new FuzzyHash("@FuzzyHash", z, false); fuzzyhash->evaluate(assay, s); delete fuzzyhash;
-Ge *ge = new Ge("@Ge", z, false); ge->evaluate(assay, s); delete ge;
-GeoLookup *geolookup = new GeoLookup("@GeoLookup", z, false); geolookup->evaluate(assay, s); delete geolookup;
-GsbLookup *gsblookup = new GsbLookup("@GsbLookup", z, false); gsblookup->evaluate(assay, s); delete gsblookup;
-Gt *gt = new Gt("@Gt", z, false); gt->evaluate(assay, s); delete gt;
-InspectFile *inspectfile = new InspectFile("@InspectFile", z, false); inspectfile->evaluate(assay, s); delete inspectfile;
-IpMatchF *ipmatchf = new IpMatchF("@IpMatchF", z, false); ipmatchf->evaluate(assay, s); delete ipmatchf;
-IpMatchFromFile *ipmatchfromfile = new IpMatchFromFile("@IpMatchFromFile", z, false); ipmatchfromfile->evaluate(assay, s); delete ipmatchfromfile;
-IpMatch *ipmatch = new IpMatch("@IpMatch", z, false); ipmatch->evaluate(assay, s); delete ipmatch;
-Le *le = new Le("@Le", z, false); le->evaluate(assay, s); delete le;
-Lt *lt = new Lt("@Lt", z, false); lt->evaluate(assay, s); delete lt;
-NoMatch *nomatch = new NoMatch("@NoMatch", z, false); nomatch->evaluate(assay, s); delete nomatch;
-PmF *pmf = new PmF("@PmF", z, false); pmf->evaluate(assay, s); delete pmf;
-PmFromFile *pmfromfile = new PmFromFile("@PmFromFile", z, false); pmfromfile->evaluate(assay, s); delete pmfromfile;
-Pm *pm = new Pm("@Pm", z, false); pm->evaluate(assay, s); delete pm;
-Rbl *rbl = new Rbl("@Rbl", z, false); rbl->evaluate(assay, s); delete rbl;
-Rsub *rsub = new Rsub("@Rsub", z, false); rsub->evaluate(assay, s); delete rsub;
-Rx *rx = new Rx("@Rx", z, false); rx->evaluate(assay, s); delete rx;
-StrEq *streq = new StrEq("@StrEq", z, false); streq->evaluate(assay, s); delete streq;
-StrMatch *strmatch = new StrMatch("@StrMatch", z, false); strmatch->evaluate(assay, s); delete strmatch;
-ValidateByteRange *validatebyterange = new ValidateByteRange("@ValidateByteRange", z, false); validatebyterange->evaluate(assay, s); delete validatebyterange;
-ValidateDTD *validatedtd = new ValidateDTD("@ValidateDTD", z, false); validatedtd->evaluate(assay, s); delete validatedtd;
-ValidateHash *validatehash = new ValidateHash("@ValidateHash", z, false); validatehash->evaluate(assay, s); delete validatehash;
-ValidateSchema *validateschema = new ValidateSchema("@ValidateSchema", z, false); validateschema->evaluate(assay, s); delete validateschema;
-ValidateUrlEncoding *validateurlencoding = new ValidateUrlEncoding("@ValidateUrlEncoding", z, false); validateurlencoding->evaluate(assay, s); delete validateurlencoding;
-ValidateUtf8Encoding *validateutf8encoding = new ValidateUtf8Encoding("@ValidateUtf8Encoding", z, false); validateutf8encoding->evaluate(assay, s); delete validateutf8encoding;
-VerifyCC *verifycc = new VerifyCC("@VerifyCC", z, false); verifycc->evaluate(assay, s); delete verifycc;
-VerifyCPF *verifycpf = new VerifyCPF("@VerifyCPF", z, false); verifycpf->evaluate(assay, s); delete verifycpf;
-VerifySSN *verifyssn = new VerifySSN("@VerifySSN", z, false); verifyssn->evaluate(assay, s); delete verifyssn;
-Within *within = new Within("@Within", z, false); within->evaluate(assay, s); delete within;
+BeginsWith *beginswith = new BeginsWith("@BeginsWith", z, false); beginswith->evaluate(transaction, s); delete beginswith;
+Contains *contains = new Contains("@Contains", z, false); contains->evaluate(transaction, s); delete contains;
+ContainsWord *containsword = new ContainsWord("@ContainsWord", z, false); containsword->evaluate(transaction, s); delete containsword;
+DetectSQLi *detectsqli = new DetectSQLi("@DetectSQLi", z, false); detectsqli->evaluate(transaction, s); delete detectsqli;
+DetectXSS *detectxss = new DetectXSS("@DetectXSS", z, false); detectxss->evaluate(transaction, s); delete detectxss;
+EndsWith *endswith = new EndsWith("@EndsWith", z, false); endswith->evaluate(transaction, s); delete endswith;
+Eq *eq = new Eq("@Eq", z, false); eq->evaluate(transaction, s); delete eq;
+FuzzyHash *fuzzyhash = new FuzzyHash("@FuzzyHash", z, false); fuzzyhash->evaluate(transaction, s); delete fuzzyhash;
+Ge *ge = new Ge("@Ge", z, false); ge->evaluate(transaction, s); delete ge;
+GeoLookup *geolookup = new GeoLookup("@GeoLookup", z, false); geolookup->evaluate(transaction, s); delete geolookup;
+GsbLookup *gsblookup = new GsbLookup("@GsbLookup", z, false); gsblookup->evaluate(transaction, s); delete gsblookup;
+Gt *gt = new Gt("@Gt", z, false); gt->evaluate(transaction, s); delete gt;
+InspectFile *inspectfile = new InspectFile("@InspectFile", z, false); inspectfile->evaluate(transaction, s); delete inspectfile;
+IpMatchF *ipmatchf = new IpMatchF("@IpMatchF", z, false); ipmatchf->evaluate(transaction, s); delete ipmatchf;
+IpMatchFromFile *ipmatchfromfile = new IpMatchFromFile("@IpMatchFromFile", z, false); ipmatchfromfile->evaluate(transaction, s); delete ipmatchfromfile;
+IpMatch *ipmatch = new IpMatch("@IpMatch", z, false); ipmatch->evaluate(transaction, s); delete ipmatch;
+Le *le = new Le("@Le", z, false); le->evaluate(transaction, s); delete le;
+Lt *lt = new Lt("@Lt", z, false); lt->evaluate(transaction, s); delete lt;
+NoMatch *nomatch = new NoMatch("@NoMatch", z, false); nomatch->evaluate(transaction, s); delete nomatch;
+PmF *pmf = new PmF("@PmF", z, false); pmf->evaluate(transaction, s); delete pmf;
+PmFromFile *pmfromfile = new PmFromFile("@PmFromFile", z, false); pmfromfile->evaluate(transaction, s); delete pmfromfile;
+Pm *pm = new Pm("@Pm", z, false); pm->evaluate(transaction, s); delete pm;
+Rbl *rbl = new Rbl("@Rbl", z, false); rbl->evaluate(transaction, s); delete rbl;
+Rsub *rsub = new Rsub("@Rsub", z, false); rsub->evaluate(transaction, s); delete rsub;
+Rx *rx = new Rx("@Rx", z, false); rx->evaluate(transaction, s); delete rx;
+StrEq *streq = new StrEq("@StrEq", z, false); streq->evaluate(transaction, s); delete streq;
+StrMatch *strmatch = new StrMatch("@StrMatch", z, false); strmatch->evaluate(transaction, s); delete strmatch;
+ValidateByteRange *validatebyterange = new ValidateByteRange("@ValidateByteRange", z, false); validatebyterange->evaluate(transaction, s); delete validatebyterange;
+ValidateDTD *validatedtd = new ValidateDTD("@ValidateDTD", z, false); validatedtd->evaluate(transaction, s); delete validatedtd;
+ValidateHash *validatehash = new ValidateHash("@ValidateHash", z, false); validatehash->evaluate(transaction, s); delete validatehash;
+ValidateSchema *validateschema = new ValidateSchema("@ValidateSchema", z, false); validateschema->evaluate(transaction, s); delete validateschema;
+ValidateUrlEncoding *validateurlencoding = new ValidateUrlEncoding("@ValidateUrlEncoding", z, false); validateurlencoding->evaluate(transaction, s); delete validateurlencoding;
+ValidateUtf8Encoding *validateutf8encoding = new ValidateUtf8Encoding("@ValidateUtf8Encoding", z, false); validateutf8encoding->evaluate(transaction, s); delete validateutf8encoding;
+VerifyCC *verifycc = new VerifyCC("@VerifyCC", z, false); verifycc->evaluate(transaction, s); delete verifycc;
+VerifyCPF *verifycpf = new VerifyCPF("@VerifyCPF", z, false); verifycpf->evaluate(transaction, s); delete verifycpf;
+VerifySSN *verifyssn = new VerifySSN("@VerifySSN", z, false); verifyssn->evaluate(transaction, s); delete verifyssn;
+Within *within = new Within("@Within", z, false); within->evaluate(transaction, s); delete within;
 #endif
 
 
@@ -234,26 +234,26 @@ Within *within = new Within("@Within", z, false); within->evaluate(assay, s); de
         *
         */
 #if 0
-    assay->processConnection(s.c_str(), 123, s.c_str(), 123);
-    assay->processURI(s.c_str(), z.c_str(), z.c_str());
-    assay->addRequestHeader(s, z);
-    assay->addRequestHeader(s, s);
-    assay->addRequestHeader(z, z);
-    assay->addRequestHeader(z, s);
-    assay->processRequestHeaders();
-    assay->appendRequestBody((const unsigned char *)s.c_str(), s.length());
-    assay->processRequestBody();
-    assay->addResponseHeader(s, z);
-    assay->addResponseHeader(s, s);
-    assay->addResponseHeader(z, z);
-    assay->addResponseHeader(z, s);
-    assay->processResponseHeaders();
-    assay->appendResponseBody((const unsigned char *)s.c_str(), s.length());
-    assay->processResponseBody();
+    transaction->processConnection(s.c_str(), 123, s.c_str(), 123);
+    transaction->processURI(s.c_str(), z.c_str(), z.c_str());
+    transaction->addRequestHeader(s, z);
+    transaction->addRequestHeader(s, s);
+    transaction->addRequestHeader(z, z);
+    transaction->addRequestHeader(z, s);
+    transaction->processRequestHeaders();
+    transaction->appendRequestBody((const unsigned char *)s.c_str(), s.length());
+    transaction->processRequestBody();
+    transaction->addResponseHeader(s, z);
+    transaction->addResponseHeader(s, s);
+    transaction->addResponseHeader(z, z);
+    transaction->addResponseHeader(z, s);
+    transaction->processResponseHeaders();
+    transaction->appendResponseBody((const unsigned char *)s.c_str(), s.length());
+    transaction->processResponseBody();
 #endif
 
 
-        delete assay;
+        delete transaction;
         delete rules;
         delete ms;
 

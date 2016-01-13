@@ -19,8 +19,8 @@
 #include <string>
 #endif
 
-#ifndef SRC_RULE_H_
-#define SRC_RULE_H_
+#ifndef HEADERS_MODSECURITY_RULE_H_
+#define HEADERS_MODSECURITY_RULE_H_
 
 #include "modsecurity/modsecurity.h"
 
@@ -29,7 +29,7 @@
 
 namespace modsecurity {
 namespace Variables {
-    class Variable;
+class Variable;
 }
 
 class Rule {
@@ -42,8 +42,8 @@ class Rule {
     explicit Rule(std::string marker);
 
     ~Rule();
-    bool evaluate(Assay *assay);
-    bool evaluateActions(Assay *assay);
+    bool evaluate(Transaction *transaction);
+    bool evaluateActions(Transaction *transaction);
 
     operators::Operator *op;
     std::vector<actions::Action *> actions_conf;
@@ -86,6 +86,6 @@ class Rule {
 #endif
 
 
-#endif  // SRC_RULE_H_
+#endif  // HEADERS_MODSECURITY_RULE_H_
 
 

@@ -23,7 +23,7 @@
 #define SRC_AUDIT_LOG_WRITER_SERIAL_H_
 
 #include "src/audit_log_writer.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 #ifdef __cplusplus
 
@@ -58,7 +58,7 @@ class AuditLogWriterSerial : public AuditLogWriter {
     }
 
     bool init() override;;
-    bool write(Assay *assay, int parts) override;
+    bool write(Transaction *transaction, int parts) override;
 
  private:
     std::ofstream m_log;

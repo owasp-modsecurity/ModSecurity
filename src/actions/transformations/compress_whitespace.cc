@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 
 
@@ -36,7 +36,7 @@ CompressWhitespace::CompressWhitespace(std::string action)
 }
 
 std::string CompressWhitespace::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
 
     std::string a;
     int inWhiteSpace = 0;

@@ -20,10 +20,10 @@
 #ifndef SRC_ACTIONS_REV_H_
 #define SRC_ACTIONS_REV_H_
 
-class Assay;
+class Transaction;
 
 namespace modsecurity {
-class Assay;
+class Transaction;
 namespace actions {
 
 
@@ -31,7 +31,7 @@ class Rev : public Action {
  public:
     explicit Rev(std::string action);
 
-    bool evaluate(Rule *rule, Assay *assay) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
 
  private:
     std::string m_rev;

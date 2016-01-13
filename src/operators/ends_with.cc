@@ -24,9 +24,9 @@ namespace modsecurity {
 namespace operators {
 
 
-bool EndsWith::evaluate(Assay *assay, const std::string &input) {
+bool EndsWith::evaluate(Transaction *transaction, const std::string &input) {
     bool ret = false;
-    std::string p = MacroExpansion::expand(param, assay);
+    std::string p = MacroExpansion::expand(param, transaction);
 
     if (input.length() >= p.length()) {
         ret = (0 == input.compare(input.length() - p.length(),

@@ -69,7 +69,7 @@ void Pm::replaceAll(std::string str, const std::string& from,
     }
 }
 
-bool Pm::evaluate(Assay *assay, const std::string &input) {
+bool Pm::evaluate(Transaction *transaction, const std::string &input) {
     int rc = 0;
     ACMPT pt;
     pt.parser = m_p;

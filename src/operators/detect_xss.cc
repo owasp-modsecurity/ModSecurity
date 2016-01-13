@@ -25,17 +25,17 @@ namespace modsecurity {
 namespace operators {
 
 
-bool DetectXSS::evaluate(Assay *assay, const std::string &input) {
+bool DetectXSS::evaluate(Transaction *transaction, const std::string &input) {
     int is_xss;
 
     is_xss = libinjection_xss(input.c_str(), input.length());
 
-    if (assay) {
+    if (transaction) {
 #ifndef NO_LOGS
         if (is_xss) {
-            assay->debug(5, "detected XSS using libinjection.");
+            transaction->debug(5, "detected XSS using libinjection.");
         } else {
-            assay->debug(9, "libinjection was not able to " \
+            transaction->debug(9, "libinjection was not able to " \
                 "find any XSS in: " + input);
         }
 #endif

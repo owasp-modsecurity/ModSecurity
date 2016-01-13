@@ -103,7 +103,7 @@ std::string dash_if_empty(const std::string& str) {
 }
 
 
-double generate_assay_unique_id() {
+double generate_transaction_unique_id() {
     return random_number(0, 100);
 }
 
@@ -873,8 +873,8 @@ std::string string_to_hex(const std::string& input) {
  *
  * IMP1 Assumes NUL-terminated
  */
-int urldecode_uni_nonstrict_inplace_ex(Assay *assay, unsigned char *input,
-    int64_t input_len, int *changed) {
+int urldecode_uni_nonstrict_inplace_ex(Transaction *transaction,
+    unsigned char *input, int64_t input_len, int *changed) {
     unsigned char *d = input;
     int64_t i, count, fact, j, xv;
     int Code, hmap = -1;
@@ -899,9 +899,9 @@ int urldecode_uni_nonstrict_inplace_ex(Assay *assay, unsigned char *input,
                         Code = 0;
                         fact = 1;
 
-                        if (assay
-                            && assay->m_rules->unicode_map_table != NULL
-                            && assay->m_rules->unicode_codepage > 0)  {
+                        if (transaction
+                            && transaction->m_rules->unicode_map_table != NULL
+                            && transaction->m_rules->unicode_codepage > 0)  {
                             for (j = 5; j >= 2; j--) {
                                 if (isxdigit((input[i+j]))) {
                                     if (input[i+j] >= 97) {
@@ -917,7 +917,8 @@ int urldecode_uni_nonstrict_inplace_ex(Assay *assay, unsigned char *input,
                             }
 
                             if (Code >= 0 && Code <= 65535)  {
-                                hmap = assay->m_rules->unicode_map_table[Code];
+                                Rules *r = transaction->m_rules;
+                                hmap = r->unicode_map_table[Code];
                             }
                         }
 

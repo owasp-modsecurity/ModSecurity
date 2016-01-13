@@ -24,7 +24,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 #include "src/utils.h"
 
@@ -35,10 +35,10 @@ namespace transformations {
 
 
 std::string UrlDecodeUni::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     int changed = 0;
     char *tmp = strdup(value.c_str());
-    urldecode_uni_nonstrict_inplace_ex(assay, (unsigned char *)tmp,
+    urldecode_uni_nonstrict_inplace_ex(transaction, (unsigned char *)tmp,
         value.size(), &changed);
     std::string ret("");
     ret.assign(tmp);

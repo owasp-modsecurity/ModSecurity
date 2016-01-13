@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 #include "src/utils.h"
 
@@ -88,7 +88,7 @@ std::string UrlEncode::url_enc(const char *input,
 
 
 std::string UrlEncode::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     int changed;
 
     std::string ret = url_enc(value.c_str(), value.size(), &changed);

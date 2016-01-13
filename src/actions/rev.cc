@@ -19,7 +19,7 @@
 #include <string>
 
 #include "actions/action.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/utils.h"
 #include "modsecurity/rule.h"
 #include "src/macro_expansion.h"
@@ -37,7 +37,7 @@ Rev::Rev(std::string action)
 }
 
 
-bool Rev::evaluate(Rule *rule, Assay *assay) {
+bool Rev::evaluate(Rule *rule, Transaction *transaction) {
     rule->rev = m_rev;
     return true;
 }

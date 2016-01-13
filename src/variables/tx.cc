@@ -28,20 +28,20 @@
 #include <list>
 #include <utility>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 namespace modsecurity {
 namespace Variables {
 
 
-void Tx::evaluateInternal(Assay *assay,
+void Tx::evaluateInternal(Transaction *transaction,
     std::vector<const transaction::Variable *> *l) {
     if (m_type == SingleMatch) {
-        assay->m_collections.resolveSingleMatch(m_name, "TX", l);
+        transaction->m_collections.resolveSingleMatch(m_name, "TX", l);
     } else if (m_type == MultipleMatches) {
-        assay->m_collections.resolveMultiMatches(m_name, "TX", l);
+        transaction->m_collections.resolveMultiMatches(m_name, "TX", l);
     } else if (m_type == RegularExpression) {
-        assay->m_collections.resolveRegularExpression(m_name, "TX", l);
+        transaction->m_collections.resolveRegularExpression(m_name, "TX", l);
     }
 }
 

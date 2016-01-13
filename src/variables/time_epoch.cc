@@ -28,12 +28,12 @@
 #include <list>
 #include <utility>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 namespace modsecurity {
 namespace Variables {
 
-void TimeEpoch::evaluateInternal(Assay *assay,
+void TimeEpoch::evaluateInternal(Transaction *transaction,
     std::vector<const transaction::Variable *> *l) {
     l->push_back(new transaction::Variable("TIME_EPOCH",
         std::to_string(std::time(nullptr))));

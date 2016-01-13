@@ -21,10 +21,10 @@
 #define SRC_ACTIONS_RULE_ID_H_
 
 #ifdef __cplusplus
-class Assay;
+class Transaction;
 
 namespace modsecurity {
-class Assay;
+class Transaction;
 class Rule;
 
 namespace actions {
@@ -37,7 +37,7 @@ class RuleId : public Action {
         m_ruleId(0) { }
 
     bool init(std::string *error) override;
-    bool evaluate(Rule *rule, Assay *assay) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
 
  private:
     double m_ruleId;

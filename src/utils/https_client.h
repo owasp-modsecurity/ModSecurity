@@ -25,7 +25,7 @@
 #ifndef SRC_UTILS_HTTPS_CLIENT_H_
 #define SRC_UTILS_HTTPS_CLIENT_H_
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 namespace modsecurity {
 namespace Utils {

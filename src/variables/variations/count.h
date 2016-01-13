@@ -25,7 +25,7 @@
 
 namespace modsecurity {
 
-class Assay;
+class Transaction;
 namespace Variables {
 namespace Variations {
 
@@ -35,7 +35,7 @@ class Count : public Variable {
         : Variable("count(" + v->m_name + ")"),
         var(v) { }
 
-    void evaluateInternal(Assay *assay,
+    void evaluateInternal(Transaction *transaction,
         std::vector<const transaction::Variable *> *l) override;
 
     Variable *var;

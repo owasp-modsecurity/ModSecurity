@@ -19,7 +19,7 @@
 #define SRC_AUDIT_LOG_WRITER_PARALLEL_H_
 
 #include "src/audit_log_writer.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 #ifdef __cplusplus
 
@@ -33,7 +33,7 @@ class AuditLogWriterParallel : public AuditLogWriter {
 
     ~AuditLogWriterParallel() override;
     bool init() override;
-    bool write(Assay *assay, int parts) override;
+    bool write(Transaction *transaction, int parts) override;
 
     void refCountIncrease() override {
         m_refereceCount++;
@@ -50,8 +50,9 @@ class AuditLogWriterParallel : public AuditLogWriter {
     /**
      *
      * Audit log file is saved into a directory structure. This directory
-     * structure is based on the timestamp of the assay creation, at the exact
-     * moment that ModSecurity be aware of a particular request/transaction.
+     * structure is based on the timestamp of the transaction creation, at
+     * the exact moment that ModSecurity be aware of a particular
+     * request/transaction.
      * The expect fromat is:
      *
      * [...]/YearMonthDay/YearMonthDayAndTime/YearMonthDayAndTime-RequestId

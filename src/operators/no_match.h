@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "operators/operator.h"
 
 
@@ -32,7 +32,7 @@ class NoMatch : public Operator {
     NoMatch(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
 
-    bool evaluate(Assay *assay, const std::string &str) override;
+    bool evaluate(Transaction *transaction, const std::string &str) override;
 };
 
 }  // namespace operators

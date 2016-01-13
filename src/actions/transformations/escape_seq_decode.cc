@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 #include "src/utils.h"
 
@@ -140,7 +140,7 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
 
 
 std::string EscapeSeqDecode::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
 
     unsigned char *tmp = (unsigned char *) malloc(sizeof(char)
         * value.size() + 1);

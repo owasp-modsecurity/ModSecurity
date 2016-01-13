@@ -13,11 +13,11 @@
  *
  */
 
+#include <modsecurity/transaction.h>
 #include "stdio.h"
 #include "stdlib.h"
 
 #include "modsecurity/modsecurity.h"
-#include "modsecurity/assay.h"
 
 
 char main_rule_uri[] = "basic_rules.conf";
@@ -27,7 +27,7 @@ int main (int argc, char **argv)
     int ret = 1;
     const char *error = NULL;
     ModSecurity *modsec = NULL;
-    Assay *assay = NULL;
+    Transaction *transaction = NULL;
     Rules *rules = NULL;
 
     modsec = msc_init();
@@ -55,17 +55,17 @@ int main (int argc, char **argv)
     }
     msc_rules_dump(rules);
 
-    assay = msc_new_assay(modsec, rules, NULL);
+    transaction = msc_new_transaction(modsec, rules, NULL);
 
-    msc_process_connection(assay, "127.0.0.1", 12345, "127.0.0.1", 80);
-    msc_process_uri(assay,
+    msc_process_connection(transaction, "127.0.0.1", 12345, "127.0.0.1", 80);
+    msc_process_uri(transaction,
         "http://www.modsecurity.org/test?key1=value1&key2=value2&key3=value3",
         "GET", "1.1");
-    msc_process_request_headers(assay);
-    msc_process_request_body(assay);
-    msc_process_response_headers(assay);
-    msc_process_response_body(assay);
-    msc_process_logging(assay, 200);
+    msc_process_request_headers(transaction);
+    msc_process_request_body(transaction);
+    msc_process_response_headers(transaction);
+    msc_process_response_body(transaction);
+    msc_process_logging(transaction, 200);
 end:
     msc_rules_cleanup(rules);
     msc_cleanup(modsec);

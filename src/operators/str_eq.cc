@@ -21,8 +21,8 @@
 namespace modsecurity {
 namespace operators {
 
-bool StrEq::evaluate(Assay *assay, const std::string &str) {
-    std::string p = MacroExpansion::expand(param, assay);
+bool StrEq::evaluate(Transaction *transaction, const std::string &str) {
+    std::string p = MacroExpansion::expand(param, transaction);
     bool eq = !p.compare(str);
 
     if (negation) {

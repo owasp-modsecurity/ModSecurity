@@ -22,7 +22,7 @@
 namespace modsecurity {
 namespace operators {
 
-bool VerifySSN::evaluate(Assay *assay, const std::string &str) {
+bool VerifySSN::evaluate(Transaction *transaction, const std::string &str) {
     /**
      * @todo Implement the operator VerifySSN.
      *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#verifySSN

@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 
 
@@ -36,13 +36,13 @@ ParityEven7bit::ParityEven7bit(std::string action)
 }
 
 std::string ParityEven7bit::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     /**
      * @todo Implement the transformation ParityEven7bit
      */
-    if (assay) {
+    if (transaction) {
 #ifndef NO_LOGS
-        assay->debug(4, "Transformation ParityEven7bit is not" \
+        transaction->debug(4, "Transformation ParityEven7bit is not" \
             " implemented yet.");
 #endif
     }

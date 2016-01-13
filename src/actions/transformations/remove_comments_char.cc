@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 
 
@@ -36,13 +36,13 @@ RemoveCommentsChar::RemoveCommentsChar(std::string action)
 }
 
 std::string RemoveCommentsChar::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     /**
      * @todo Implement the transformation RemoveCommentsChar
      */
-    if (assay) {
+    if (transaction) {
 #ifndef NO_LOGS
-        assay->debug(4, "Transformation RemoveCommentsChar " \
+        transaction->debug(4, "Transformation RemoveCommentsChar " \
             "is not implemented yet.");
 #endif
     }

@@ -28,7 +28,7 @@ class ValidateDTD : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     ValidateDTD(std::string o, std::string p, bool i);
-    bool evaluate(Assay *assay, const std::string  &str) override;
+    bool evaluate(Transaction *transaction, const std::string  &str) override;
 };
 
 }  // namespace operators

@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 
 
@@ -32,7 +32,7 @@ namespace transformations {
 
 
 std::string None::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     return value;
 }
 

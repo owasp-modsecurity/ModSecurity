@@ -16,7 +16,7 @@
 #include <string>
 
 #include "actions/action.h"
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 
 #ifndef SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_
 #define SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_
@@ -29,7 +29,7 @@ class CtlAuditLogParts : public Action {
  public:
     explicit CtlAuditLogParts(std::string action);
 
-    bool evaluate(Rule *rule, Assay *assay) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
     int mPartsAction;
     std::string mParts;
 };

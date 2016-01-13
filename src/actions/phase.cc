@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 #include "src/utils.h"
 #include "modsecurity/modsecurity.h"
@@ -77,7 +77,7 @@ bool Phase::init(std::string *error) {
 }
 
 
-bool Phase::evaluate(Rule *rule, Assay *assay) {
+bool Phase::evaluate(Rule *rule, Transaction *transaction) {
     rule->phase = this->phase;
     return true;
 }

@@ -22,7 +22,7 @@
 #include <cctype>
 #include <locale>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 
 
@@ -36,7 +36,7 @@ ReplaceNulls::ReplaceNulls(std::string action)
 }
 
 std::string ReplaceNulls::evaluate(std::string value,
-    Assay *assay) {
+    Transaction *transaction) {
     int64_t i;
 
     i = 0;

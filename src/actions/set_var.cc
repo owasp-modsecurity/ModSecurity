@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 #include "src/macro_expansion.h"
 #include "src/utils.h"
@@ -99,11 +99,11 @@ void SetVar::dump() {
     std::cout << " Predicate: " << predicate << std::endl;
 }
 
-bool SetVar::evaluate(Rule *rule, Assay *assay) {
+bool SetVar::evaluate(Rule *rule, Transaction *transaction) {
     std::string targetValue;
     std::string variableNameExpanded = MacroExpansion::expand(variableName,
-        assay);
-    std::string resolvedPre = MacroExpansion::expand(predicate, assay);
+        transaction);
+    std::string resolvedPre = MacroExpansion::expand(predicate, transaction);
 
     if (operation == setOperation) {
         targetValue = resolvedPre;
@@ -121,7 +121,7 @@ bool SetVar::evaluate(Rule *rule, Assay *assay) {
 
         try {
             std::string *resolvedValue =
-                assay->m_collections.resolveFirst(collectionName,
+                transaction->m_collections.resolveFirst(collectionName,
                     variableNameExpanded);
             if (resolvedValue == NULL) {
                 value = 0;
@@ -143,10 +143,10 @@ bool SetVar::evaluate(Rule *rule, Assay *assay) {
     }
 
 #ifndef NO_LOGS
-    assay->debug(8, "Saving variable: " + collectionName + ":" + \
+    transaction->debug(8, "Saving variable: " + collectionName + ":" + \
         variableNameExpanded + " with value: " + targetValue);
 #endif
-    assay->m_collections.storeOrUpdateFirst(collectionName,
+    transaction->m_collections.storeOrUpdateFirst(collectionName,
         variableNameExpanded, targetValue);
 
     return true;

@@ -23,7 +23,7 @@
 
 #ifdef __cplusplus
 namespace modsecurity {
-class Assay;
+class Transaction;
 
 namespace actions {
 namespace transformations {
@@ -32,7 +32,7 @@ class EscapeSeqDecode : public Transformation {
  public:
     explicit EscapeSeqDecode(std::string action);
     std::string evaluate(std::string exp,
-        Assay *assay) override;
+        Transaction *transaction) override;
     int ansi_c_sequences_decode_inplace(unsigned char *input, int input_len);
 };
 

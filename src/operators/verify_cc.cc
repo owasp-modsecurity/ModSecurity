@@ -86,7 +86,7 @@ bool VerifyCC::init(const std::string &param2, const char **error) {
 }
 
 
-bool VerifyCC::evaluate(Assay *assay, const std::string &i) {
+bool VerifyCC::evaluate(Transaction *transaction, const std::string &i) {
     int offset = 0;
     bool is_cc = false;
     int target_length = i.length();
@@ -110,9 +110,9 @@ bool VerifyCC::evaluate(Assay *assay, const std::string &i) {
             match = std::string(i, ovector[0], ovector[1] - ovector[0]);
             is_cc = luhnVerify(match.c_str(), match.size());
             if (is_cc) {
-                if (assay) {
+                if (transaction) {
 #ifndef NO_LOGS
-                    assay->debug(9, "CC# match \"" + param +
+                    transaction->debug(9, "CC# match \"" + param +
                         "\" at " + i + ". [offset " +
                         std::to_string(offset) + "]");
 #endif

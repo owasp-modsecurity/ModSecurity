@@ -22,7 +22,7 @@
 #ifndef SRC_AUDIT_LOG_H_
 #define SRC_AUDIT_LOG_H_
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "src/audit_log_writer.h"
 
 #ifdef __cplusplus
@@ -153,8 +153,8 @@ class AuditLog {
     bool init();
     bool close();
 
-    bool saveIfRelevant(Assay *assay);
-    bool saveIfRelevant(Assay *assay, int parts);
+    bool saveIfRelevant(Transaction *transaction);
+    bool saveIfRelevant(Transaction *transaction, int parts);
     bool isRelevant(int status);
 
     int addParts(int parts, const std::string& new_parts);

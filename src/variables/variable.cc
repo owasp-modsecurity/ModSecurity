@@ -20,7 +20,7 @@
 #include <vector>
 #include <list>
 
-#include "modsecurity/assay.h"
+#include "modsecurity/transaction.h"
 #include "variations/exclusion.h"
 
 using modsecurity::Variables::Variations::Exclusion;
@@ -72,44 +72,44 @@ Variable::Variable(std::string name, VariableKind kind)
 
 
 std::vector<const transaction::Variable *> *
-    Variable::evaluate(Assay *assay) {
+    Variable::evaluate(Transaction *transaction) {
     std::vector<const transaction::Variable *> *l = NULL;
     l = new std::vector<const transaction::Variable *>();
-    evaluate(assay, l);
+    evaluate(transaction, l);
 
     return l;
 }
 
-void Variable::evaluateInternal(Assay *assay,
+void Variable::evaluateInternal(Transaction *transaction,
     std::vector<const transaction::Variable *> *l) {
     if (m_collectionName.empty() == false) {
         if (m_kind == CollectionVarible && m_type == MultipleMatches) {
-            assay->m_collections.resolveMultiMatches(m_name,
+            transaction->m_collections.resolveMultiMatches(m_name,
                 m_collectionName, l);
         } else if (m_kind == CollectionVarible
             && m_type == RegularExpression) {
-            assay->m_collections.resolveRegularExpression(m_name,
+            transaction->m_collections.resolveRegularExpression(m_name,
                 m_collectionName, l);
         } else {
-            assay->m_collections.resolveSingleMatch(m_name,
+            transaction->m_collections.resolveSingleMatch(m_name,
                 m_collectionName, l);
         }
     } else {
         if (m_kind == CollectionVarible && m_type == MultipleMatches) {
-            assay->m_collections.resolveMultiMatches(m_name, l);
+            transaction->m_collections.resolveMultiMatches(m_name, l);
         } else if (m_kind == CollectionVarible
             && m_type == RegularExpression) {
-            assay->m_collections.resolveRegularExpression(m_name, l);
+            transaction->m_collections.resolveRegularExpression(m_name, l);
         } else {
-            assay->m_collections.resolveSingleMatch(m_name, l);
+            transaction->m_collections.resolveSingleMatch(m_name, l);
         }
     }
 }
 
 
-void Variable::evaluate(Assay *assay,
+void Variable::evaluate(Transaction *transaction,
     std::vector<const transaction::Variable *> *l) {
-    evaluateInternal(assay, l);
+    evaluateInternal(transaction, l);
 }
 
 
