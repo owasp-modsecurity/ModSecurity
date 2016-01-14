@@ -37,7 +37,7 @@ class Driver;
 #include "operators/operator.h"
 #include "modsecurity/rule.h"
 #include "utils/geo_lookup.h"
-#include "audit_log.h"
+#include "audit_log/audit_log.h"
 #include "utils.h"
 
 #include "variables/variations/count.h"
@@ -295,15 +295,15 @@ audit_log:
     /* SecAuditEngine */
     | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_RELEVANT_ONLY
       {
-        driver.audit_log->setStatus(modsecurity::AuditLog::RelevantOnlyAuditLogStatus);
+        driver.audit_log->setStatus(modsecurity::audit_log::AuditLog::RelevantOnlyAuditLogStatus);
       }
     | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_OFF
       {
-        driver.audit_log->setStatus(modsecurity::AuditLog::OffAuditLogStatus);
+        driver.audit_log->setStatus(modsecurity::audit_log::AuditLog::OffAuditLogStatus);
       }
     | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_ON
       {
-        driver.audit_log->setStatus(modsecurity::AuditLog::OnAuditLogStatus);
+        driver.audit_log->setStatus(modsecurity::audit_log::AuditLog::OnAuditLogStatus);
       }
 
     /* SecAuditLogFileMode */
@@ -342,11 +342,11 @@ audit_log:
     /* SecAuditLogType */
     | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_SERIAL
       {
-        driver.audit_log->setType(modsecurity::AuditLog::SerialAuditLogType);
+        driver.audit_log->setType(modsecurity::audit_log::AuditLog::SerialAuditLogType);
       }
     | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_PARALLEL
       {
-        driver.audit_log->setType(modsecurity::AuditLog::ParallelAuditLogType);
+        driver.audit_log->setType(modsecurity::audit_log::AuditLog::ParallelAuditLogType);
       }
     ;
 

@@ -13,7 +13,7 @@
  *
  */
 
-#include "src/audit_log_writer_parallel.h"
+#include "audit_log/writer/parallel.h"
 
 #include <time.h>
 #include <stdio.h>
@@ -24,15 +24,16 @@
 
 #include <fstream>
 
-#include "src/audit_log.h"
+#include "audit_log/audit_log.h"
 #include "modsecurity/transaction.h"
 #include "src/utils.h"
 #include "utils/md5.h"
 
 namespace modsecurity {
+namespace audit_log {
+namespace writer {
 
-
-AuditLogWriterParallel::~AuditLogWriterParallel() {
+Parallel::~Parallel() {
     if (log1.is_open()) {
         log1.close();
     }
@@ -43,7 +44,7 @@ AuditLogWriterParallel::~AuditLogWriterParallel() {
 }
 
 
-inline std::string AuditLogWriterParallel::logFilePath(time_t *t,
+inline std::string Parallel::logFilePath(time_t *t,
     int part) {
     struct tm timeinfo;
     char tstr[300];
@@ -73,7 +74,7 @@ inline std::string AuditLogWriterParallel::logFilePath(time_t *t,
 }
 
 
-bool AuditLogWriterParallel::init() {
+bool Parallel::init() {
     /** TODO:: Check if the directory exists. */
     /** TODO:: Checking if we have permission to write in the target dir */
 
@@ -89,7 +90,7 @@ bool AuditLogWriterParallel::init() {
 }
 
 
-bool AuditLogWriterParallel::write(Transaction *transaction, int parts) {
+bool Parallel::write(Transaction *transaction, int parts) {
     FILE *fp;
     int fd;
     std::string log = transaction->toJSON(parts);
@@ -136,5 +137,6 @@ bool AuditLogWriterParallel::write(Transaction *transaction, int parts) {
     return true;
 }
 
-
+}  // namespace writer
+}  // namespace audit_log
 }  // namespace modsecurity

@@ -19,15 +19,16 @@
 #include <string>
 #endif
 
-#ifndef SRC_AUDIT_LOG_H_
-#define SRC_AUDIT_LOG_H_
+#ifndef SRC_AUDIT_LOG_AUDIT_LOG_H_
+#define SRC_AUDIT_LOG_AUDIT_LOG_H_
 
 #include "modsecurity/transaction.h"
-#include "src/audit_log_writer.h"
+#include "audit_log/writer.h"
 
 #ifdef __cplusplus
 
 namespace modsecurity {
+namespace audit_log {
 
 /** @ingroup ModSecurity_CPP_API */
 class AuditLog {
@@ -176,11 +177,12 @@ class AuditLog {
     AuditLogType m_type;
     std::string m_relevant;
 
-    AuditLogWriter *m_writer;
+    audit_log::Writer *m_writer;
     int m_refereceCount;
 };
 
+}  // namespace audit_log
 }  // namespace modsecurity
 #endif
 
-#endif  // SRC_AUDIT_LOG_H_
+#endif  // SRC_AUDIT_LOG_AUDIT_LOG_H_

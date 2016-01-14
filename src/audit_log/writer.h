@@ -26,16 +26,18 @@
 #ifdef __cplusplus
 
 namespace modsecurity {
+namespace audit_log {
+
 class AuditLog;
 
 /** @ingroup ModSecurity_CPP_API */
-class AuditLogWriter {
+class Writer {
  public:
-    explicit AuditLogWriter(AuditLog *audit)
+    explicit Writer(AuditLog *audit)
         : m_audit(audit),
         m_refereceCount(0) { }
 
-    virtual ~AuditLogWriter() { }
+    virtual ~Writer() { }
 
     virtual void refCountIncrease() = 0;
     virtual void refCountDecreaseAndCheck() = 0;
@@ -50,6 +52,7 @@ class AuditLogWriter {
     int m_refereceCount;
 };
 
+}  // namespace audit_log
 }  // namespace modsecurity
 #endif
 

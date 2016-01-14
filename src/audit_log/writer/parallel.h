@@ -18,20 +18,22 @@
 #ifndef SRC_AUDIT_LOG_WRITER_PARALLEL_H_
 #define SRC_AUDIT_LOG_WRITER_PARALLEL_H_
 
-#include "src/audit_log_writer.h"
+#include "audit_log/writer.h"
 #include "modsecurity/transaction.h"
 
 #ifdef __cplusplus
 
 namespace modsecurity {
+namespace audit_log {
+namespace writer {
 
 /** @ingroup ModSecurity_CPP_API */
-class AuditLogWriterParallel : public AuditLogWriter {
+class Parallel : public audit_log::Writer {
  public:
-    explicit AuditLogWriterParallel(AuditLog *audit)
-        : AuditLogWriter(audit) { }
+    explicit Parallel(AuditLog *audit)
+        : audit_log::Writer(audit) { }
 
-    ~AuditLogWriterParallel() override;
+    ~Parallel() override;
     bool init() override;
     bool write(Transaction *transaction, int parts) override;
 
@@ -75,6 +77,8 @@ class AuditLogWriterParallel : public AuditLogWriter {
     inline std::string logFilePath(time_t *t, int part);
 };
 
+}  // namespace writer
+}  // namespace audit_log
 }  // namespace modsecurity
 #endif
 

@@ -13,7 +13,7 @@
  *
  */
 
-#include "src/audit_log.h"
+#include "audit_log/audit_log.h"
 
 #include <stddef.h>
 #include <stdio.h>
@@ -21,8 +21,8 @@
 
 #include <fstream>
 
-#include "src/audit_log_writer_parallel.h"
-#include "src/audit_log_writer_serial.h"
+#include "audit_log/writer/parallel.h"
+#include "audit_log/writer/serial.h"
 #include "utils/regex.h"
 
 #define PARTS_CONSTAINS(a, c) \
@@ -38,6 +38,7 @@
     }
 
 namespace modsecurity {
+namespace audit_log {
 
 AuditLog::AuditLog()
     : m_status(OffAuditLogStatus),
@@ -178,10 +179,10 @@ bool AuditLog::setType(AuditLogType audit_type) {
 
 bool AuditLog::init() {
     if (m_type == ParallelAuditLogType) {
-        m_writer = new AuditLogWriterParallel(this);
+        m_writer = new audit_log::writer::Parallel(this);
     }
     if (m_type == SerialAuditLogType) {
-        m_writer = new AuditLogWriterSerial(this);
+        m_writer = new audit_log::writer::Serial(this);
     }
     m_writer->refCountIncrease();
 
@@ -253,4 +254,5 @@ bool AuditLog::close() {
 }
 
 
+}  // namespace audit_log
 }  // namespace modsecurity

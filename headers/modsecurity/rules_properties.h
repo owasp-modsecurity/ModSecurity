@@ -33,7 +33,9 @@
 
 namespace modsecurity {
 class Rule;
+namespace audit_log {
 class AuditLog;
+}
 namespace actions {
 class Action;
 }
@@ -207,7 +209,7 @@ class RulesProperties {
 
     std::ostringstream parserError;
 
-    AuditLog *audit_log;
+    audit_log::AuditLog *audit_log;
 
     OnFailedRemoteRulesAction remoteRulesActionOnFailed;
 };

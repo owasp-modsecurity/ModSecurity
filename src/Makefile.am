@@ -177,10 +177,10 @@ libmodsecurity_la_SOURCES = \
 	parser/seclang-scanner.ll \
 	parser/driver.cc \
 	transaction.cc \
-	audit_log.cc \
-	audit_log_writer.cc \
-	audit_log_writer_serial.cc \
-	audit_log_writer_parallel.cc \
+	audit_log/audit_log.cc \
+	audit_log/writer.cc \
+	audit_log/writer/serial.cc \
+	audit_log/writer/parallel.cc \
 	modsecurity.cc \
 	rules.cc \
 	utils.cc \

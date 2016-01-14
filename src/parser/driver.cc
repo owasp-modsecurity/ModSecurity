@@ -16,9 +16,9 @@
 #include "parser/driver.h"
 
 #include "parser/seclang-parser.hh"
-#include "src/audit_log.h"
+#include "audit_log/audit_log.h"
 
-using modsecurity::AuditLog;
+using modsecurity::audit_log::AuditLog;
 using modsecurity::Rule;
 
 namespace modsecurity {
@@ -27,7 +27,7 @@ namespace Parser {
 Driver::Driver()
   : trace_scanning(false),
   trace_parsing(false) {
-      audit_log = new AuditLog();
+      audit_log = new audit_log::AuditLog();
       audit_log->refCountIncrease();
   }
 

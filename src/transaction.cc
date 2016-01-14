@@ -37,7 +37,7 @@
 #include "modsecurity/intervention.h"
 #include "modsecurity/modsecurity.h"
 #include "request_body_processor/multipart.h"
-#include "src/audit_log.h"
+#include "audit_log/audit_log.h"
 #include "src/unique_id.h"
 #include "src/utils.h"
 
@@ -1303,7 +1303,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     audit_log << " " << this->m_serverPort;
     audit_log << std::endl;
 
-    if (parts & AuditLog::BAuditLogPart) {
+    if (parts & audit_log::AuditLog::BAuditLogPart) {
         audit_log << "--" << trailer << "-" << "B--" << std::endl;
         audit_log << this->m_method << " " << this->m_uri << " " << "HTTP/";
         audit_log << this->m_httpVersion << std::endl;
@@ -1321,19 +1321,19 @@ std::string Transaction::toOldAuditLogFormat(int parts,
             }
         }
     }
-    if (parts & AuditLog::CAuditLogPart) {
+    if (parts & audit_log::AuditLog::CAuditLogPart) {
         audit_log << "--" << trailer << "-" << "C--" << std::endl;
         /** TODO: write audit_log C part. */
     }
-    if (parts & AuditLog::DAuditLogPart) {
+    if (parts & audit_log::AuditLog::DAuditLogPart) {
         audit_log << "--" << trailer << "-" << "D--" << std::endl;
         /** TODO: write audit_log D part. */
     }
-    if (parts & AuditLog::EAuditLogPart) {
+    if (parts & audit_log::AuditLog::EAuditLogPart) {
         audit_log << "--" << trailer << "-" << "E--" << std::endl;
         /** TODO: write audit_log E part. */
     }
-    if (parts & AuditLog::FAuditLogPart) {
+    if (parts & audit_log::AuditLog::FAuditLogPart) {
         audit_log << "--" << trailer << "-" << "F--" << std::endl;
         for (auto h : m_collections.m_transient) {
             std::string filter = "RESPONSE_HEADERS:";
@@ -1348,23 +1348,23 @@ std::string Transaction::toOldAuditLogFormat(int parts,
             }
         }
     }
-    if (parts & AuditLog::GAuditLogPart) {
+    if (parts & audit_log::AuditLog::GAuditLogPart) {
         audit_log << "--" << trailer << "-" << "G--" << std::endl;
         /** TODO: write audit_log G part. */
     }
-    if (parts & AuditLog::HAuditLogPart) {
+    if (parts & audit_log::AuditLog::HAuditLogPart) {
         audit_log << "--" << trailer << "-" << "H--" << std::endl;
         /** TODO: write audit_log H part. */
     }
-    if (parts & AuditLog::IAuditLogPart) {
+    if (parts & audit_log::AuditLog::IAuditLogPart) {
         audit_log << "--" << trailer << "-" << "I--" << std::endl;
         /** TODO: write audit_log I part. */
     }
-    if (parts & AuditLog::JAuditLogPart) {
+    if (parts & audit_log::AuditLog::JAuditLogPart) {
         audit_log << "--" << trailer << "-" << "J--" << std::endl;
         /** TODO: write audit_log J part. */
     }
-    if (parts & AuditLog::KAuditLogPart) {
+    if (parts & audit_log::AuditLog::KAuditLogPart) {
         audit_log << "--" << trailer << "-" << "K--" << std::endl;
         /** TODO: write audit_log K part. */
     }
@@ -1415,12 +1415,12 @@ std::string Transaction::toJSON(int parts) {
     LOGFY_ADD_INT("http_version", m_httpVersion);
     LOGFY_ADD("uri", this->m_uri);
 
-    if (parts & AuditLog::CAuditLogPart) {
+    if (parts & audit_log::AuditLog::CAuditLogPart) {
         LOGFY_ADD("body", this->m_requestBody.str().c_str());
     }
 
     /* request headers */
-    if (parts & AuditLog::BAuditLogPart) {
+    if (parts & audit_log::AuditLog::BAuditLogPart) {
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
             strlen("headers"));
         yajl_gen_map_open(g);
@@ -1449,13 +1449,13 @@ std::string Transaction::toJSON(int parts) {
         strlen("response"));
     yajl_gen_map_open(g);
 
-    if (parts & AuditLog::GAuditLogPart) {
+    if (parts & audit_log::AuditLog::GAuditLogPart) {
         LOGFY_ADD("body", this->m_responseBody.str().c_str());
     }
     LOGFY_ADD_NUM("http_code", m_httpCodeReturned);
 
     /* response headers */
-    if (parts & AuditLog::FAuditLogPart) {
+    if (parts & audit_log::AuditLog::FAuditLogPart) {
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
             strlen("headers"));
         yajl_gen_map_open(g);
@@ -1478,7 +1478,7 @@ std::string Transaction::toJSON(int parts) {
     yajl_gen_map_close(g);
 
     /* producer */
-    if (parts & AuditLog::HAuditLogPart) {
+    if (parts & audit_log::AuditLog::HAuditLogPart) {
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("producer"),
             strlen("producer"));
         yajl_gen_map_open(g);

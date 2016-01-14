@@ -13,23 +13,24 @@
  *
  */
 
-#include "src/audit_log_writer_serial.h"
+#include "audit_log/writer/serial.h"
 
 // #include <mutex>
 
-#include "src/audit_log.h"
+#include "audit_log/audit_log.h"
 
 namespace modsecurity {
-
+namespace audit_log {
+namespace writer {
 // static std::mutex serialLoggingMutex;
 
 
-AuditLogWriterSerial::~AuditLogWriterSerial() {
+Serial::~Serial() {
     m_log.close();
 }
 
 
-void AuditLogWriterSerial::generateBoundary(std::string *boundary) {
+void Serial::generateBoundary(std::string *boundary) {
     static const char alphanum[] =
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -41,13 +42,13 @@ void AuditLogWriterSerial::generateBoundary(std::string *boundary) {
 }
 
 
-bool AuditLogWriterSerial::init() {
+bool Serial::init() {
     m_log.open(m_audit->m_path1, std::fstream::out | std::fstream::app);
     return true;
 }
 
 
-bool AuditLogWriterSerial::write(Transaction *transaction, int parts) {
+bool Serial::write(Transaction *transaction, int parts) {
     std::string boundary;
 
     generateBoundary(&boundary);
@@ -62,5 +63,6 @@ bool AuditLogWriterSerial::write(Transaction *transaction, int parts) {
     return true;
 }
 
-
+}  // namespace writer
+}  // namespace audit_log
 }  // namespace modsecurity

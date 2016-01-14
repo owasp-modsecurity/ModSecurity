@@ -13,15 +13,16 @@
  *
  */
 
-#include "src/audit_log_writer.h"
+#include "audit_log/writer.h"
 
 #include <string>
 
-#include "src/audit_log.h"
+#include "audit_log/audit_log.h"
 
 namespace modsecurity {
+namespace audit_log {
 
-std::string AuditLogWriter::file_name(const std::string& unique_id) {
+std::string Writer::file_name(const std::string& unique_id) {
     time_t timer;
     time(&timer);
 
@@ -33,10 +34,11 @@ std::string AuditLogWriter::file_name(const std::string& unique_id) {
  * Temporary print the log into the std::cout to debug purposes.
  *
  */
-bool AuditLogWriter::write(Transaction *transaction, int parts) {
+bool Writer::write(Transaction *transaction, int parts) {
     std::cout << transaction->toJSON(0) << std::endl;
     return true;
 }
 
 
+}  // namespace audit_log
 }  // namespace modsecurity

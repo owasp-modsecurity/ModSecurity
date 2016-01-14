@@ -27,7 +27,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
 #include "modsecurity/rules_properties.h"
-#include "src/audit_log.h"
+#include "audit_log/audit_log.h"
 
 #include "parser/seclang-parser.hh"
 
