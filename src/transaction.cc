@@ -52,10 +52,8 @@ namespace modsecurity {
  * An instance of the Transaction class represents an entire request, on its
  * different phases.
  *
- * @note Remember to cleanup the transaction when the transaction is complete.
- *
- * @param ms ModSecurity core pointer.
- * @param rules Rules pointer.
+ * @param ms ModSecurity core instance.
+ * @param rules Rules instance.
  *
  * Example Usage:
  * @code
@@ -80,6 +78,8 @@ namespace modsecurity {
  *
  * ...
  *
+ * delete modsecTransaction;
+ *
  * @endcode
  *
  */
@@ -92,11 +92,11 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_protocol(""),
     m_httpVersion(""),
     m_rules(rules),
-    save_in_auditlog(false),
-    do_not_save_in_auditlog(false),
-    timeStamp(std::time(NULL)),
-    httpCodeReturned(200),
-    highest_severity(255),
+    m_toBeSavedInAuditlogs(false),
+    m_toNotBeSavedInAuditLogs(false),
+    m_timeStamp(std::time(NULL)),
+    m_httpCodeReturned(200),
+    m_highestSeverityAction(255),
     m_ARGScombinedSize(0),
     m_ARGScombinedSizeStr(NULL),
     m_namesArgs(NULL),
@@ -110,7 +110,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     start(cpu_seconds()),
     m_logCbData(logCbData),
     m_ms(ms) {
-    id = std::to_string(this->timeStamp) + \
+    m_id = std::to_string(this->m_timeStamp) + \
         std::to_string(generate_transaction_unique_id());
     m_rules->incrementReferenceCount();
 
@@ -208,7 +208,7 @@ int Transaction::processConnection(const char *client, int cPort,
 #endif
 
     this->m_collections.store("REMOTE_HOST", m_clientIpAddress);
-    this->m_collections.store("UNIQUE_ID", id);
+    this->m_collections.store("UNIQUE_ID", m_id);
     this->m_collections.store("REMOTE_ADDR", m_clientIpAddress);
     this->m_collections.store("SERVER_ADDR", m_serverIpAddress);
     this->m_collections.store("SERVER_PORT",
@@ -823,7 +823,7 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
 #endif
                 Action *a = new actions::Deny("deny");
                 a->temporaryAction = true;
-                actions.push_back(a);
+                m_actions.push_back(a);
             }
             return true;
         }
@@ -1072,7 +1072,7 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
 #endif
                 Action *a = new actions::Deny("deny");
                 a->temporaryAction = true;
-                actions.push_back(a);
+                m_actions.push_back(a);
             }
             return true;
         }
@@ -1156,7 +1156,7 @@ int Transaction::processLogging(int returned_code) {
         return true;
     }
 
-    this->httpCodeReturned = returned_code;
+    this->m_httpCodeReturned = returned_code;
     this->m_rules->evaluate(ModSecurity::LoggingPhase, this);
 
     /* If relevant, save this transaction information at the audit_logs */
@@ -1167,14 +1167,14 @@ int Transaction::processLogging(int returned_code) {
             "saved as an audit log.");
 #endif
 
-        if (this->auditLogModifier.size() > 0) {
+        if (this->m_auditLogModifier.size() > 0) {
 #ifndef NO_LOGS
             debug(4, "There was an audit log modifier for this transaction.");
 #endif
             std::list<std::pair<int, std::string>>::iterator it;
             parts = this->m_rules->audit_log->m_parts;
-            for (it = auditLogModifier.begin();
-                it != auditLogModifier.end(); ++it) {
+            for (it = m_auditLogModifier.begin();
+                it != m_auditLogModifier.end(); ++it) {
                 std::pair <int, std::string> p = *it;
                 if (p.first == 0) {  // Add
                     parts = this->m_rules->audit_log->addParts(parts,
@@ -1186,7 +1186,7 @@ int Transaction::processLogging(int returned_code) {
             }
         }
 #ifndef NO_LOGS
-        if (save_in_auditlog) {
+        if (m_toBeSavedInAuditlogs) {
             debug(8, "This request was marked to be " \
                 "saved via auditlog action.");
         }
@@ -1205,23 +1205,6 @@ int Transaction::processLogging(int returned_code) {
 
 
 /**
- * @name    cleanup
- * @brief   Removes all the resources allocated by a given Transaction.
- *
- * It is mandatory to call this function after every request being finished,
- * otherwise it may end up in a huge memory leak.
- *
- * @returns If the operation was successful or not.
- * @retval true Operation was successful.
- * @retval false Operation failed.
- *
- */
-void Transaction::cleanup() {
-    delete this;
-}
-
-
-/**
  * @name    intervention
  * @brief   Check if ModSecurity has anything to ask to the server.
  *
@@ -1236,8 +1219,8 @@ bool Transaction::intervention(ModSecurityIntervention *it) {
     it->status = 200;
     it->url = NULL;
     it->disruptive = false;
-    if (actions.size() > 0) {
-        for (Action *a : actions) {
+    if (m_actions.size() > 0) {
+        for (Action *a : m_actions) {
             if (a->action_kind == Action::Kind::RunTimeOnlyIfMatchKind) {
                 a->fill_intervention(it);
             }
@@ -1245,7 +1228,7 @@ bool Transaction::intervention(ModSecurityIntervention *it) {
                 delete a;
             }
         }
-        actions.clear();
+        m_actions.clear();
     }
     return it->disruptive;
 }
@@ -1258,7 +1241,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     char tstr[300];
 
     memset(tstr, '\0', 300);
-    localtime_r(&this->timeStamp, &timeinfo);
+    localtime_r(&this->m_timeStamp, &timeinfo);
 
     strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
 
@@ -1279,7 +1262,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << "HTTP/" << m_httpVersion;
     ss << "\" ";
 
-    ss << this->httpCodeReturned << " ";
+    ss << this->m_httpCodeReturned << " ";
     ss << this->m_responseBody.tellp();
     /** TODO: Check variable */
     ss << dash_if_empty(*this->m_collections.resolveFirst("REFERER")) << " ";
@@ -1287,7 +1270,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << dash_if_empty(
         *this->m_collections.resolveFirst("REQUEST_HEADERS:User-Agent"));
     ss << "\" ";
-    ss << this->id << " ";
+    ss << this->m_id << " ";
     /** TODO: Check variable */
     ss << dash_if_empty(*this->m_collections.resolveFirst("REFERER")) << " ";
 
@@ -1307,12 +1290,12 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     char tstr[300];
 
     memset(tstr, '\0', 300);
-    localtime_r(&this->timeStamp, &timeinfo);
+    localtime_r(&this->m_timeStamp, &timeinfo);
 
     audit_log << "--" << trailer << "-" << "A--" << std::endl;
     strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
     audit_log << tstr;
-    audit_log << " " << this->id.c_str();
+    audit_log << " " << this->m_id.c_str();
     audit_log << " " << this->m_clientIpAddress;
     audit_log << " " << this->m_clientPort;
     audit_log << " " << this->m_serverIpAddress;
@@ -1390,12 +1373,12 @@ std::string Transaction::toOldAuditLogFormat(int parts,
 }
 
 
-std::string Transaction::to_json(int parts) {
+std::string Transaction::toJSON(int parts) {
 #ifdef WITH_YAJL
     const unsigned char *buf;
     size_t len;
     yajl_gen g = NULL;
-    std::string ts = ascTime(&timeStamp).c_str();
+    std::string ts = ascTime(&m_timeStamp).c_str();
     std::string uniqueId = UniqueId::uniqueId();
 
     parts = 0;
@@ -1420,7 +1403,7 @@ std::string Transaction::to_json(int parts) {
     LOGFY_ADD_NUM("client_port", m_clientPort);
     LOGFY_ADD("host_ip", m_serverIpAddress);
     LOGFY_ADD_NUM("host_port", m_serverPort);
-    LOGFY_ADD("id", this->id.c_str());
+    LOGFY_ADD("id", this->m_id.c_str());
 
     /* request */
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>("request"),
@@ -1468,7 +1451,7 @@ std::string Transaction::to_json(int parts) {
     if (parts & AuditLog::GAuditLogPart) {
         LOGFY_ADD("body", this->m_responseBody.str().c_str());
     }
-    LOGFY_ADD_NUM("http_code", httpCodeReturned);
+    LOGFY_ADD_NUM("http_code", m_httpCodeReturned);
 
     /* response headers */
     if (parts & AuditLog::FAuditLogPart) {
@@ -1900,7 +1883,7 @@ extern "C" int msc_add_n_response_header(Transaction *transaction,
  *
  */
 extern "C" void msc_transaction_cleanup(Transaction *transaction) {
-    transaction->cleanup();
+    delete transaction;
 }
 
 
