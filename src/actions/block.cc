@@ -38,7 +38,7 @@ bool Block::evaluate(Rule *rule, Transaction *transaction) {
 #endif
     for (Action *a : rule->actions_runtime_pos) {
         if (a->isDisruptive() == true) {
-            transaction->actions.push_back(a);
+            transaction->m_actions.push_back(a);
         }
     }
     return true;

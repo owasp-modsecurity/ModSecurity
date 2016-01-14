@@ -19,26 +19,27 @@
 #include <yajl/yajl_tree.h>
 #include <yajl/yajl_gen.h>
 #endif
+
 #include <stdio.h>
 #include <string.h>
 
-#include <ctime>
-#include <iostream>
-#include <unordered_map>
-#include <fstream>
-#include <vector>
-#include <iomanip>
-#include <set>
 #include <cstdio>
+#include <ctime>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <set>
+#include <unordered_map>
+#include <vector>
 
-#include "modsecurity/modsecurity.h"
-#include "modsecurity/intervention.h"
 #include "actions/action.h"
 #include "actions/deny.h"
-#include "src/utils.h"
+#include "modsecurity/intervention.h"
+#include "modsecurity/modsecurity.h"
+#include "request_body_processor/multipart.h"
 #include "src/audit_log.h"
 #include "src/unique_id.h"
-#include "request_body_processor/multipart.h"
+#include "src/utils.h"
 
 using modsecurity::actions::Action;
 using modsecurity::RequestBodyProcessor::Multipart;
@@ -89,7 +90,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_clientPort(0),
     m_serverPort(0),
     m_uri(""),
-    m_protocol(""),
+    m_method(""),
     m_httpVersion(""),
     m_rules(rules),
     m_toBeSavedInAuditlogs(false),
@@ -107,7 +108,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_responseHeadersNames(NULL),
     m_responseContentType(NULL),
     m_marker(""),
-    start(cpu_seconds()),
+    m_creationTimeStamp(cpu_seconds()),
     m_logCbData(logCbData),
     m_ms(ms) {
     m_id = std::to_string(this->m_timeStamp) + \
@@ -235,7 +236,7 @@ int Transaction::processConnection(const char *client, int cPort,
  *
  * @param transaction ModSecurity transaction.
  * @param uri   Uri.
- * @param protocol   Protocol (GET, POST, PUT).
+ * @param method   Method (GET, POST, PUT).
  * @param http_version   Http version (1.0, 1.2, 2.0).
  *
  * @returns If the operation was successful or not.
@@ -243,14 +244,14 @@ int Transaction::processConnection(const char *client, int cPort,
  * @retval false Operation failed.
  *
  */
-int Transaction::processURI(const char *uri, const char *protocol,
+int Transaction::processURI(const char *uri, const char *method,
     const char *http_version) {
 
 #ifndef NO_LOGS
     debug(4, "Starting phase URI. (SecRules 0 + 1/2)");
 #endif
 
-    m_protocol = protocol;
+    m_method = method;
     m_httpVersion = http_version;
     m_uri = uri;
     std::string uri_s(uri);
@@ -259,7 +260,7 @@ int Transaction::processURI(const char *uri, const char *protocol,
     size_t pos = m_uri_decoded.find("?");
     size_t pos_raw = uri_s.find("?");
 
-    m_collections.store("REQUEST_LINE", std::string(protocol) + " " +
+    m_collections.store("REQUEST_LINE", std::string(method) + " " +
         std::string(uri) + " HTTP/" + std::string(http_version));
 
     if (pos_raw != std::string::npos) {
@@ -282,7 +283,7 @@ int Transaction::processURI(const char *uri, const char *protocol,
             path_info.length() - offset);
         m_collections.store("REQUEST_BASENAME", basename);
     }
-    m_collections.store("REQUEST_METHOD", protocol);
+    m_collections.store("REQUEST_METHOD", method);
     m_collections.store("REQUEST_PROTOCOL",
         "HTTP/" + std::string(http_version));
 
@@ -1257,7 +1258,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << tstr << " ";
 
     ss << "\"";
-    ss << this->m_protocol << " ";
+    ss << this->m_method << " ";
     ss << this->m_uri << " ";
     ss << "HTTP/" << m_httpVersion;
     ss << "\" ";
@@ -1304,7 +1305,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
 
     if (parts & AuditLog::BAuditLogPart) {
         audit_log << "--" << trailer << "-" << "B--" << std::endl;
-        audit_log << this->m_protocol << " " << this->m_uri << " " << "HTTP/";
+        audit_log << this->m_method << " " << this->m_uri << " " << "HTTP/";
         audit_log << this->m_httpVersion << std::endl;
 
         for (auto h : m_collections.m_transient) {
@@ -1410,7 +1411,7 @@ std::string Transaction::toJSON(int parts) {
         strlen("request"));
     yajl_gen_map_open(g);
 
-    LOGFY_ADD("protocol", m_protocol);
+    LOGFY_ADD("protocol", m_method);
     LOGFY_ADD_INT("http_version", m_httpVersion);
     LOGFY_ADD("uri", this->m_uri);
 

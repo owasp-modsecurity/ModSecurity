@@ -29,7 +29,7 @@ namespace Variables {
 void HighestSeverity::evaluateInternal(Transaction *transaction,
     std::vector<const transaction::Variable *> *l) {
     l->push_back(new transaction::Variable("HIGHEST_SEVERITY",
-        std::to_string(transaction->highest_severity)));
+        std::to_string(transaction->m_highestSeverityAction)));
 }
 
 

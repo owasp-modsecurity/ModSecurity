@@ -24,7 +24,7 @@ namespace modsecurity {
 namespace actions {
 
 bool AuditLog::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->save_in_auditlog = true;
+    transaction->m_toBeSavedInAuditlogs = true;
     return true;
 }
 

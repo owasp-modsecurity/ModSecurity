@@ -225,8 +225,8 @@ bool AuditLog::saveIfRelevant(Transaction *transaction) {
 
 
 bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
-    if (this->isRelevant(transaction->httpCodeReturned) == false &&
-        transaction->save_in_auditlog == false) {
+    if (this->isRelevant(transaction->m_httpCodeReturned) == false &&
+        transaction->m_toBeSavedInAuditlogs == false) {
         return false;
     }
 
@@ -235,7 +235,7 @@ bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
      * we won't save it.
      *
      */
-    if (transaction->do_not_save_in_auditlog == true) {
+    if (transaction->m_toNotBeSavedInAuditLogs == true) {
         return false;
     }
 

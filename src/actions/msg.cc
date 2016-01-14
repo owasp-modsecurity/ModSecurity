@@ -39,7 +39,7 @@ bool Msg::evaluate(Rule *rule, Transaction *transaction) {
 #ifndef NO_LOGS
     transaction->debug(9, "Saving msg: " + msg);
 #endif
-    transaction->rulesMessages.push_back(msg);
+    transaction->m_rulesMessages.push_back(msg);
     transaction->serverLog(msg);
     return true;
 }

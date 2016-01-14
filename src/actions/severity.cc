@@ -54,11 +54,11 @@ bool Severity::evaluate(Rule *rule, Transaction *transaction) {
 #ifndef NO_LOGS
     transaction->debug(9, "This rule severity is: " + \
         std::to_string(this->m_severity) + " current transaction is: " + \
-        std::to_string(transaction->highest_severity));
+        std::to_string(transaction->m_highestSeverityAction));
 #endif
 
-    if (transaction->highest_severity > this->m_severity) {
-        transaction->highest_severity = this->m_severity;
+    if (transaction->m_highestSeverityAction > this->m_severity) {
+        transaction->m_highestSeverityAction = this->m_severity;
     }
     return true;
 }

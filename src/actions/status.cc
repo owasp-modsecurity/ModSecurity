@@ -34,7 +34,7 @@ Status::Status(std::string action)
 
 
 bool Status::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->actions.push_back(this);
+    transaction->m_actions.push_back(this);
     return true;
 }
 

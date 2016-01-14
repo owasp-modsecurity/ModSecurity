@@ -31,7 +31,7 @@ void Duration::evaluateInternal(Transaction *transaction,
         std::vector<const transaction::Variable *> *l) {
     std::string res;
 
-    double e = cpu_seconds() - transaction->start;
+    double e = cpu_seconds() - transaction->m_creationTimeStamp;
 
     res = std::to_string(e);
 

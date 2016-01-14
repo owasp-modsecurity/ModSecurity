@@ -92,23 +92,23 @@ bool AuditLogWriterParallel::init() {
 bool AuditLogWriterParallel::write(Transaction *transaction, int parts) {
     FILE *fp;
     int fd;
-    std::string log = transaction->to_json(parts);
-    std::string fileName = logFilePath(&transaction->timeStamp,
+    std::string log = transaction->toJSON(parts);
+    std::string fileName = logFilePath(&transaction->m_timeStamp,
         YearMonthDayDirectory | YearMonthDayAndTimeDirectory
         | YearMonthDayAndTimeFileName);
 
     std::string logPath = m_audit->m_storage_dir;
-    fileName = logPath + fileName + "-" + transaction->id;
+    fileName = logPath + fileName + "-" + transaction->m_id;
 
     if (logPath.empty()) {
       return false;
     }
 
     createDir((logPath +
-        logFilePath(&transaction->timeStamp, YearMonthDayDirectory)).c_str(),
+        logFilePath(&transaction->m_timeStamp, YearMonthDayDirectory)).c_str(),
         m_audit->directoryPermission);
     createDir((logPath +
-        logFilePath(&transaction->timeStamp, YearMonthDayDirectory
+        logFilePath(&transaction->m_timeStamp, YearMonthDayDirectory
             | YearMonthDayAndTimeDirectory)).c_str(),
         m_audit->directoryPermission);
 

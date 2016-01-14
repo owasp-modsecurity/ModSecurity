@@ -36,7 +36,7 @@ CtlAuditLogParts::CtlAuditLogParts(std::string action)
 }
 
 bool CtlAuditLogParts::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->auditLogModifier.push_back(
+    transaction->m_auditLogModifier.push_back(
         std::make_pair(mPartsAction, mParts));
     return true;
 }

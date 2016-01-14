@@ -34,7 +34,7 @@ bool Deny::evaluate(Rule *rule, Transaction *transaction) {
 #ifndef NO_LOGS
     transaction->debug(8, "Running action deny");
 #endif
-    transaction->actions.push_back(this);
+    transaction->m_actions.push_back(this);
     return true;
 }
 

@@ -34,7 +34,7 @@ std::string AuditLogWriter::file_name(const std::string& unique_id) {
  *
  */
 bool AuditLogWriter::write(Transaction *transaction, int parts) {
-    std::cout << transaction->to_json(0) << std::endl;
+    std::cout << transaction->toJSON(0) << std::endl;
     return true;
 }
 

@@ -39,7 +39,7 @@ bool Tag::evaluate(Rule *rule, Transaction *transaction) {
 #ifndef NO_LOGS
     transaction->debug(9, "Rule tag: " + tag);
 #endif
-    transaction->ruleTags.push_back(tag);
+    transaction->m_ruleTags.push_back(tag);
     return true;
 }
 

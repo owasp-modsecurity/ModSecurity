@@ -24,7 +24,7 @@ namespace modsecurity {
 namespace actions {
 
 bool NoAuditLog::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->do_not_save_in_auditlog = true;
+    transaction->m_toNotBeSavedInAuditLogs = true;
     return true;
 }
 

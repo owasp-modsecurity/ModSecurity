@@ -32,7 +32,7 @@ Pass::Pass(std::string action)
 
 
 bool Pass::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->actions.clear();
+    transaction->m_actions.clear();
     return true;
 }
 
