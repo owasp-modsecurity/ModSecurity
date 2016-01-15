@@ -213,6 +213,7 @@ libmodsecurity_la_CPPFLAGS = \
 	$(GEOIP_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \
+	$(YAJL_CFLAGS) \
 	$(PCRE_CFLAGS)
 
 libmodsecurity_la_LIBADD = \
