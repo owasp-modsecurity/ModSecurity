@@ -683,23 +683,42 @@ int Transaction::processRequestBody() {
              */
             char sep2 = '=';
 
-            std::vector<std::string> key_value = split(t, sep2);
-            m_collections.store("ARGS:" + key_value[0], key_value[1]);
-            m_collections.store("ARGS_POST:" + key_value[0], key_value[1]);
+            std::vector<std::string> key_value2 = split(t, sep2);
+
+            if (key_value2.size() == 0) {
+                continue;
+            }
+
+            std::string key = key_value2[0];
+            std::string value = std::string("");
+
+            if (key_value2.size() == 2) {
+                value = key_value2[1];
+            } else if (key_value2.size() > 2) {
+                int i = 2;
+                value = key_value2[1];
+                while (i < key_value2.size()) {
+                    value = value + std::string("=") + key_value2[i];
+                    i++;
+                }
+            }
+
+            m_collections.store("ARGS:" + key, value);
+            m_collections.store("ARGS_POST:" + key, value);
 
             if (m_namesArgs->empty()) {
-                m_namesArgs->assign(key_value[0]);
+                m_namesArgs->assign(key);
             } else {
-                m_namesArgs->assign(*m_namesArgs + " " + key_value[0]);
+                m_namesArgs->assign(*m_namesArgs + " " + key);
             }
             if (m_namesArgsPost->empty()) {
-                m_namesArgsPost->assign(key_value[0]);
+                m_namesArgsPost->assign(key);
             } else {
-                m_namesArgsPost->assign(*m_namesArgsPost + " " + key_value[0]);
+                m_namesArgsPost->assign(*m_namesArgsPost + " " + key);
             }
 
             this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
-                key_value[0].length() + key_value[1].length();
+                key.length() + value.length();
             this->m_ARGScombinedSizeStr->assign(
                 std::to_string(this->m_ARGScombinedSize));
         }
