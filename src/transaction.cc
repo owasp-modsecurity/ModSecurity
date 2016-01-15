@@ -1484,7 +1484,7 @@ std::string Transaction::toJSON(int parts) {
         yajl_gen_map_open(g);
 
         /* producer > libmodsecurity */
-        LOGFY_ADD("modsecurity", modsecurity::whoAmI().c_str());
+        LOGFY_ADD("modsecurity", m_ms->whoAmI().c_str());
 
         /* producer > connector */
         LOGFY_ADD("connector", m_ms->getConnectorInformation().c_str());
