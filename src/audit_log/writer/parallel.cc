@@ -23,6 +23,7 @@
 #include <fcntl.h>
 
 #include <fstream>
+#include <mutex>
 
 #include "audit_log/audit_log.h"
 #include "modsecurity/transaction.h"
@@ -32,6 +33,9 @@
 namespace modsecurity {
 namespace audit_log {
 namespace writer {
+
+std::mutex g_writeMutex;
+
 
 Parallel::~Parallel() {
     if (log1.is_open()) {
@@ -91,6 +95,7 @@ bool Parallel::init() {
 
 
 bool Parallel::write(Transaction *transaction, int parts) {
+    std::lock_guard<std::mutex> guard(g_writeMutex);
     FILE *fp;
     int fd;
     std::string log = transaction->toJSON(parts);
@@ -124,14 +129,17 @@ bool Parallel::write(Transaction *transaction, int parts) {
     if (log1.is_open() && log2.is_open()) {
         log2 << transaction->toOldAuditLogFormatIndex(fileName, log.length(),
             md5(log));
+        log2.flush();
     }
     if (log1.is_open() && !log2.is_open()) {
         log1 << transaction->toOldAuditLogFormatIndex(fileName, log.length(),
             md5(log));
+        log1.flush();
     }
     if (!log1.is_open() && log2.is_open()) {
         log2 << transaction->toOldAuditLogFormatIndex(fileName, log.length(),
             md5(log));
+        log2.flush();
     }
 
     return true;
