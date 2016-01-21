@@ -35,7 +35,7 @@ std::string Writer::file_name(const std::string& unique_id) {
  *
  */
 bool Writer::write(Transaction *transaction, int parts) {
-    std::cout << transaction->toJSON(0) << std::endl;
+    std::cout << transaction->toJSON(parts) << std::endl;
     return true;
 }
 

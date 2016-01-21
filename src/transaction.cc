@@ -1193,6 +1193,7 @@ int Transaction::processLogging(int returned_code) {
 #endif
             std::list<std::pair<int, std::string>>::iterator it;
             parts = this->m_rules->audit_log->m_parts;
+            debug(7, "AuditLog parts before modification(s): " + std::to_string(parts) + ".");
             for (it = m_auditLogModifier.begin();
                 it != m_auditLogModifier.end(); ++it) {
                 std::pair <int, std::string> p = *it;
@@ -1215,7 +1216,7 @@ int Transaction::processLogging(int returned_code) {
         bool saved = this->m_rules->audit_log->saveIfRelevant(this, parts);
         if (saved) {
 #ifndef NO_LOGS
-            debug(8, "Request was relevant to be saved.");
+            debug(8, "Request was relevant to be saved. Parts: " + std::to_string(parts));
 #endif
         }
     }
@@ -1401,7 +1402,6 @@ std::string Transaction::toJSON(int parts) {
     std::string ts = ascTime(&m_timeStamp).c_str();
     std::string uniqueId = UniqueId::uniqueId();
 
-    parts = 0;
     g = yajl_gen_alloc(NULL);
     if (g == NULL) {
       return "";
