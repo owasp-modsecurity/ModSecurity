@@ -1,6 +1,8 @@
 DD mmm YYYY - X.Y.Z (To be released)
 ------------------------------------
 
+ * Checking for hashing injection response to report in case of failure.
+   [Issue #1041 - ModSecurity team]
  * Stop buffering when the request is larger than SecRequestBodyLimit
    in ProcessPartial mode
    [Issue #709, #705, #728 - Justin Gerace and ModSecurity team]
