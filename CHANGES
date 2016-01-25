@@ -1,6 +1,9 @@
 DD mmm YYYY - X.Y.Z (To be released)
 ------------------------------------
 
+ * Stop buffering when the request is larger than SecRequestBodyLimit
+   in ProcessPartial mode
+   [Issue #709, #705, #728 - Justin Gerace and ModSecurity team]
  * Extanded Lua support to include version 5.3
    [Issue #837, #762, #814 - Athmane Madjoudj and ModSecurity team]
  * mlogc: Allow user to choose between TLS versions (TLSProtocol option
