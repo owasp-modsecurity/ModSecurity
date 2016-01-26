@@ -1,6 +1,10 @@
 DD mmm YYYY - X.Y.Z (To be released)
 ------------------------------------
 
+ * Creating AuditLog serial file (or paralel index) respecting the
+   permission configured with SecAuditLogFileMode, before, it was used
+   only to save the transactions while in paralel mode.
+   [Issue #852 - @littlecho and ModSecurity team]
  * Checking for hashing injection response to report in case of failure.
    [Issue #1041 - ModSecurity team]
  * Stop buffering when the request is larger than SecRequestBodyLimit
