@@ -208,6 +208,9 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
              *      too large and APR_EGENERAL when the client disconnects.
              */
             switch(rc) {
+                case APR_INCOMPLETE :
+                    *error_msg = apr_psprintf(msr->mp, "Error reading request body: %s", get_apr_error(msr->mp, rc));
+                    return -7;
                 case APR_EOF :
                     *error_msg = apr_psprintf(msr->mp, "Error reading request body: %s", get_apr_error(msr->mp, rc));
                     return -6;
