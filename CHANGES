@@ -1,6 +1,8 @@
 DD mmm YYYY - X.Y.Z (To be released)
 ------------------------------------
 
+ * Treat APR_INCOMPLETE as APR_EOF while receiving the request body.
+   [Issue #1060, #334 - Alexey Sintsov]
  * Added support to generate audit logs in JSON format.
    [Issue #914, #897, #656 - Robert Paprocki]
  * Creating AuditLog serial file (or paralel index) respecting the
