@@ -100,7 +100,7 @@ vulnerability classes for applications such as:
  * Joomla
  * For a complete listing of application coverage, please refer to this
 link (which is updated daily).
-https://modsecurity.org/projects/commercial/rules/application_coverage.html
+https://modsecurity.org/application_coverage.html
 
 3. Complements and integrates with the OWASP Core Rule Set
 4. IP Reputation capabilities which provide protection against malicious
