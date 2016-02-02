@@ -228,6 +228,7 @@ ngx_pstrdup0(ngx_pool_t *pool, ngx_str_t *src)
     return dst;
 }
 
+
 /*
  * MultiplyDeBruijnBitPosition
  * http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup
@@ -568,9 +569,6 @@ ngx_http_modsecurity_load_request_body(ngx_http_request_t *r)
     ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
         "ModSec: loading request body.");
 
-    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-        "ModSec: loading request body.");
-
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
 
     modsecSetBodyBrigade(ctx->req, ctx->brigade);
@@ -601,12 +599,9 @@ ngx_http_modsecurity_load_request_body(ngx_http_request_t *r)
     }
 #endif
 
-        return NGX_ERROR;
-    }
-#endif
-
     return NGX_OK;
 }
+
 static ngx_inline ngx_int_t
 ngx_http_modsecurity_save_request_body(ngx_http_request_t *r)
 {
@@ -627,23 +622,6 @@ ngx_http_modsecurity_save_request_body(ngx_http_request_t *r)
     apr_brigade_cleanup(ctx->brigade);
     buf->last += content_length;
     r->header_in = buf;
-    if (r->headers_in.content_length) {
-        ngx_str_t *str = NULL;
-        str = &r->headers_in.content_length->value;
-        str->data = ngx_palloc(r->pool, NGX_OFF_T_LEN);
-        if (str->data == NULL) {
-            ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
-            return NGX_OK;
-        }
-        str->len = ngx_snprintf(str->data, NGX_OFF_T_LEN, "%O",
-                content_length) - str->data;
-    r->headers_in.content_length_n = content_length;
-    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-            "ModSec: Content length: %O, Content length n: %O", content_length,
-            r->headers_in.content_length_n);
-#else
-    apr_brigade_cleanup(ctx->brigade);
-#endif
 
     if (r->headers_in.content_length) {
         ngx_str_t *str = NULL;
@@ -1176,25 +1154,19 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r) {
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "ModSec: ModSecurity is not enabled or not a main request.");
 
-        ctx = ngx_http_modsecurity_create_ctx(r);
-
         return NGX_DECLINED;
-        if (ngx_http_set_pool_ctx(r, ctx, ngx_http_modsecurity) != NGX_OK) {
-            return NGX_ERROR;
     }
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_modsecurity);
 
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "ModSec: Recovering ctx: %p", ctx);
-        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "ModSec: ctx is null, nothing we can do, returning.");
 
     if (ctx == NULL) {
         ctx = ngx_http_modsecurity_create_ctx(r);
 
         ngx_http_set_ctx(r, ctx, ngx_http_modsecurity);
-                   "ModSec: ctx is now: %p / count: %d", ctx, r->main->count);
+
         if (ngx_http_set_pool_ctx(r, ctx, ngx_http_modsecurity) != NGX_OK) {
             return NGX_ERROR;
         }
@@ -1212,9 +1184,12 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r) {
     ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "ModSec: ctx is now: %p / count: %d", ctx, r->main->count);
 
+    if (modsecContextState(ctx->req) == MODSEC_DISABLED) {
         ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "ModSec: ModSecurity was disabled, returning....", ctx);
 
+        return NGX_DECLINED;
+    }
     if (ctx->waiting_more_body == 1) {
        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                "ModSec: waiting for more data before proceed. / count: %d",
@@ -1222,7 +1197,6 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r) {
 
         return NGX_DONE;
     }
-            ngx_http_modsecurity_request_read);
 
     if (ctx->body_requested == 0) {
        ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
@@ -1263,23 +1237,6 @@ ngx_http_modsecurity_handler(ngx_http_request_t *r) {
 
 
     }
-
-        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-            "ModSec: request is ready to be processed.");
-        rc = ngx_http_modsecurity_process_request(r);
-        ctx->request_processed = 1;
-        if (rc == NGX_ERROR || rc >= NGX_HTTP_SPECIAL_RESPONSE) {
-            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                "ModSec: returning a special response after process " \
-                "a request: %d", rc);
-
-           return rc;
-        }
-
-void
-ngx_http_modsecurity_request_read(ngx_http_request_t *r)
-{
-
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
         "ModSec: returning NGX_DECLINED." );
@@ -1481,7 +1438,7 @@ ngx_http_modsecurity_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
     }
 
     return ngx_http_next_body_filter(r, out);
-#endif
+
     return NGX_OK;
 }
 #endif
