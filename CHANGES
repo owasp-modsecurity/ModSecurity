@@ -1,34 +1,32 @@
-DD mmm YYYY - X.Y.Z (To be released)
-------------------------------------
+03 Feb 2016 - 2.9.1-RC1
+-----------------------
 
  * Added support to generate audit logs in JSON format.
    [Issue #914, #897, #656 - Robert Paprocki]
- * Creating AuditLog serial file (or paralel index) respecting the
-   permission configured with SecAuditLogFileMode, before, it was used
-   only to save the transactions while in paralel mode.
+ * Creating AuditLog serial file (or parallel index) respecting the
+   permission configured with SecAuditLogFileMode. Previously, it was
+   used only to save the transactions while in parallel mode.
    [Issue #852 - @littlecho and ModSecurity team]
- * Checking for hashing injection response to report in case of failure.
+ * Checking for hashing injection response, to report in case of failure.
    [Issue #1041 - ModSecurity team]
  * Stop buffering when the request is larger than SecRequestBodyLimit
    in ProcessPartial mode
    [Issue #709, #705, #728 - Justin Gerace and ModSecurity team]
- * Extanded Lua support to include version 5.3
+ * Extended Lua support to include version 5.3
    [Issue #837, #762, #814 - Athmane Madjoudj and ModSecurity team]
- * mlogc: Allow user to choose between TLS versions (TLSProtocol option
+ * mlogc: Allows user to choose between TLS versions (TLSProtocol option
    introduced).
    [Issue #881 - Ishwor Gurung]
- * Allow mod_proxy's "nocanon" behavior to be specified in proxy actions
-   and Perform the intercept_action as well as the disruptive actions.
+ * Allows mod_proxy's "nocanon" behavior to be specified in proxy actions
    [Issue #1031, #961, #763 - Mario D. Santana and ModSecurity team]
- * Refactoring conditional directives for if wrappers, alternative if
-   statements and incomplete if conditions.
+ * Refactoring conditional #if/#defs directives.
    [Issue #996 - Wesley M and ModSecurity team]
  * mlogc-batch-load.pl.in: fix searching SecAuditLogStorageDir
    files with Apache 2.4
    [Issue #775 - Elia Pinto]
  * Understands IIS 10 as compatible on Windows installer.
    [Issue #931 - Anton Serbulov, Pavel Vasilevich and ModSecurity team]
- * Fix apache logging limitation by using correct apache call.
+ * Fix apache logging limitation by using correct Apache call.
    [Issue #840 - Christian Folini]
  * Fix apr_crypto.h check on 32-bit Linux platform
    [Issue #882, #883 - Kurt Newman]
