@@ -571,12 +571,13 @@ static void write_rule_json(modsec_rec *msr, const msre_rule *rule, yajl_gen g) 
         yajl_kv_string(g, "version", log_escape(msr->mp, rule->actionset->version));
     }
     if (rule->actionset->logdata) {
+        char *logdata = NULL;
         msc_string *var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
         var->value = (char *)rule->actionset->logdata;
         var->value_len = strlen(rule->actionset->logdata);
         expand_macros(msr, var, NULL, msr->mp);
 
-        char *logdata = apr_pstrdup(msr->mp, log_escape_hex(msr->mp, (unsigned char *)var->value, var->value_len));
+        logdata = apr_pstrdup(msr->mp, log_escape_hex(msr->mp, (unsigned char *)var->value, var->value_len));
 
         // if it is > 512 bytes, then truncate at 512 with ellipsis.
         if (strlen(logdata) > 515) {
@@ -611,6 +612,7 @@ static void write_rule_json(modsec_rec *msr, const msre_rule *rule, yajl_gen g) 
     for (k = 0; k < tarr->nelts; k++) {
         msre_action *action = (msre_action *)telts[k].val;
         if (strcmp(telts[k].key, "tag") == 0) {
+            msc_string *var = NULL;
             if (been_opened == 0) {
                 yajl_string(g, "tags");
                 yajl_gen_array_open(g);
@@ -618,7 +620,7 @@ static void write_rule_json(modsec_rec *msr, const msre_rule *rule, yajl_gen g) 
             }
 
             // expand variables in the tag
-            msc_string *var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+            var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
             var->value = (char *)action->param;
             var->value_len = strlen(action->param);
             expand_macros(msr, var, NULL, msr->mp);
@@ -676,6 +678,9 @@ void sec_audit_logger_json(modsec_rec *msr) {
     int arg_min, arg_max, sanitize_matched;
     yajl_gen g;
     int been_opened = 0; // helper flag for conditionally opening maps
+    const unsigned char *final_buf;
+    size_t len;
+
 
     /* Return silently if we don't have a request line. This
      * means we will not be logging request timeouts.
@@ -1437,8 +1442,6 @@ void sec_audit_logger_json(modsec_rec *msr) {
     /* finished building JSON */
     yajl_gen_map_close(g); // box it up!
 
-    const unsigned char *final_buf;
-    size_t len;
     yajl_gen_get_buf(g, &final_buf, &len);
     sec_auditlog_write(msr, final_buf, len);
 
