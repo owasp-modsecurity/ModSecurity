@@ -68,24 +68,30 @@ char *normalize_path(modsec_rec *msr, char *input) {
             char *Uri = NULL;
             int bytes = 0;
             /*int i;*/
-            char *relative_link = NULL;
+            char *abs_link = NULL;
             char *filename = NULL;
-            char *relative_path = NULL;
-            char *relative_uri = NULL;
+            char *abs_path = NULL;
+            char *abs_uri = NULL;
 
-            filename = file_basename(msr->mp, msr->r->parsed_uri.path);
+            if (uri->path[0] != '/') {
+                /* uri->path is relative. make it absolute */
+                filename = file_basename(msr->mp, msr->r->parsed_uri.path);
 
-            if(filename == NULL || (strlen(msr->r->parsed_uri.path) - strlen(filename) < 0))
-                return NULL;
+                if(filename == NULL || (strlen(msr->r->parsed_uri.path) - strlen(filename) < 0))
+                    return NULL;
 
-            relative_path = apr_pstrndup(msr->mp, msr->r->parsed_uri.path, strlen(msr->r->parsed_uri.path) - strlen(filename));
-            relative_uri = apr_pstrcat(msr->mp, relative_path, uri->path, NULL);
+                abs_path = apr_pstrndup(msr->mp, msr->r->parsed_uri.path, strlen(msr->r->parsed_uri.path) - strlen(filename));
+                abs_uri = apr_pstrcat(msr->mp, abs_path, uri->path, NULL);
 
-            relative_link = apr_pstrdup(msr->mp, relative_uri);
+                abs_link = apr_pstrdup(msr->mp, abs_uri);
+            }
+            else {
+                abs_link = apr_pstrdup(msr->mp, uri->path);
+            }
 
-            xmlNormalizeURIPath(relative_link);
+            xmlNormalizeURIPath(abs_link);
 
-            Uri = apr_pstrdup(msr->mp, relative_link);
+            Uri = apr_pstrdup(msr->mp, abs_link);
 
 /*
             for(i = 0; i < (int)strlen(Uri); i++)    {
