@@ -40,6 +40,7 @@
 #include "audit_log/audit_log.h"
 #include "src/unique_id.h"
 #include "src/utils.h"
+#include "modsecurity/rule.h"
 
 using modsecurity::actions::Action;
 using modsecurity::RequestBodyProcessor::Multipart;
@@ -1527,7 +1528,46 @@ std::string Transaction::toJSON(int parts) {
 
         /* end: producer */
         yajl_gen_map_close(g);
+
+        /* messages */
+        yajl_gen_string(g,
+            reinterpret_cast<const unsigned char*>("messages"),
+            strlen("messages"));
+        yajl_gen_array_open(g);
+        for (auto a : m_rulesMessages) {
+            yajl_gen_map_open(g);
+            LOGFY_ADD("message", a->m_message.c_str());
+            yajl_gen_string(g,
+                reinterpret_cast<const unsigned char*>("producer"),
+                strlen("producer"));
+            yajl_gen_map_open(g);
+            LOGFY_ADD("ruleId", std::to_string(a->m_ruleId).c_str());
+            LOGFY_ADD("file", a->m_ruleFile.c_str());
+            LOGFY_ADD("lineNumber", std::to_string(a->m_ruleLine).c_str());
+            LOGFY_ADD("data", a->m_data.c_str());
+            LOGFY_ADD("serverity", a->m_severity.c_str());
+            LOGFY_ADD("ver", a->m_ver.c_str());
+
+            yajl_gen_string(g,
+                reinterpret_cast<const unsigned char*>("tags"),
+                strlen("tags"));
+            yajl_gen_array_open(g);
+            for (auto b : a->m_rule->m_tags) {
+                yajl_gen_string(g,
+                    reinterpret_cast<const unsigned char*>(b.c_str()),
+                    strlen(b.c_str()));
+            }
+            yajl_gen_array_close(g);
+
+            LOGFY_ADD("maturity", std::to_string(a->m_maturity).c_str());
+            LOGFY_ADD("accuracy", std::to_string(a->m_accuracy).c_str());
+            yajl_gen_map_close(g);
+            yajl_gen_map_close(g);
+        }
+        yajl_gen_array_close(g);
+        /* end: messages */
     }
+
     /* end: transaction */
     yajl_gen_map_close(g);
 

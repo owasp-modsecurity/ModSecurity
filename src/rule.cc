@@ -508,6 +508,13 @@ bool Rule::evaluate(Transaction *trasn) {
             e.pop_back();
         }
     }
+
+    if (!m_log_message.empty() || !m_log_data.empty()) {
+        RuleMessage *ruleMessage = new modsecurity::RuleMessage(this, m_log_message);
+        ruleMessage->m_data = m_log_data;
+        trasn->m_rulesMessages.push_back(ruleMessage);
+    }
+
     return ret;
 }
 

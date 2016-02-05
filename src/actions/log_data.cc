@@ -22,6 +22,7 @@
 #include "modsecurity/transaction.h"
 #include "src/utils.h"
 #include "src/macro_expansion.h"
+#include "modsecurity/rule.h"
 
 namespace modsecurity {
 namespace actions {
@@ -35,14 +36,11 @@ LogData::LogData(std::string action)
 
 
 bool LogData::evaluate(Rule *rule, Transaction *transaction) {
-    std::string msg = MacroExpansion::expand(m_data, transaction);
-#ifndef NO_LOGS
-    transaction->debug(9, "Saving msg: " + msg);
-#endif
-    transaction->m_rulesMessages.push_back(msg);
-    transaction->serverLog(msg);
-    return true;
+    std::string data = MacroExpansion::expand(m_data, transaction);
+
+    rule->m_log_data = data;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

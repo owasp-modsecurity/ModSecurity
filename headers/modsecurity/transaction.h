@@ -71,6 +71,7 @@ class ModSecurity;
 class Transaction;
 class Rules;
 class Collections;
+class RuleMessage;
 namespace actions {
 class Action;
 }
@@ -264,14 +265,14 @@ class Transaction {
 
     /**
      * This variable holds all the messages asked to be save by the utilization
-	 * of the actions: `log_data' and `msg'. These should be included on the
-	 * auditlogs.
+     * of the actions: `log_data' and `msg'. These should be included on the
+     * auditlogs.
      */
-    std::list<std::string> m_rulesMessages;
+    std::list<modsecurity::RuleMessage *> m_rulesMessages;
 
     /**
      * The list m_ruleTags contains all tags that were specified by the
-	 * action `tag'.
+     * action `tag'.
      */
     std::list<std::string> m_ruleTags;
 
