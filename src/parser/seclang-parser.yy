@@ -31,6 +31,7 @@ class Driver;
 #include "actions/log_data.h"
 #include "actions/redirect.h"
 #include "actions/rev.h"
+#include "actions/ver.h"
 #include "actions/tag.h"
 #include "actions/transformations/transformation.h"
 #include "actions/transformations/none.h"
@@ -67,6 +68,7 @@ using modsecurity::actions::Severity;
 using modsecurity::actions::Tag;
 using modsecurity::actions::Redirect;
 using modsecurity::actions::Rev;
+using modsecurity::actions::Ver;
 using modsecurity::actions::Msg;
 using modsecurity::actions::Phase;
 using modsecurity::actions::transformations::None;
@@ -987,7 +989,7 @@ act:
       }
     | ACTION_VER
       {
-        $$ = Action::instantiate($1);
+        $$ = new Ver($1);
       }
     | ACTION_MATURITY
       {
