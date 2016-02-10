@@ -397,13 +397,7 @@ bool Rule::evaluate(Transaction *trasn) {
 
                 for (Action *a :
                     this->actions_runtime_pos) {
-                    if (a->isDisruptive() == false) {
-#ifndef NO_LOGS
-                        trasn->debug(4, "Running (_non_ disruptive) " \
-                            "action: " + a->action);
-#endif
-                        a->evaluate(this, trasn, ruleMessage);
-                    } else {
+                    if (a->isDisruptive() == true) {
                         containsDisruptive = true;
                     }
                 }
@@ -496,6 +490,12 @@ bool Rule::evaluate(Transaction *trasn) {
                                 "Not running disruptive action: " + \
                                 a->action + ". SecRuleEngine is not On");
 #endif
+                        } else if (!a->isDisruptive()) {
+#ifndef NO_LOGS
+                            trasn->debug(4, "Running (_non_ disruptive) " \
+                                "action: " + a->action);
+#endif
+                            a->evaluate(this, trasn, ruleMessage);
                         }
                     }
                 }
