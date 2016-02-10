@@ -35,10 +35,12 @@ LogData::LogData(std::string action)
 }
 
 
-bool LogData::evaluate(Rule *rule, Transaction *transaction) {
+bool LogData::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
     std::string data = MacroExpansion::expand(m_data, transaction);
 
-    rule->m_log_data = data;
+    rm->m_data = data;
+
+    return true;
 }
 
 

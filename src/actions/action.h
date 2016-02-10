@@ -17,6 +17,7 @@
 #include <iostream>
 
 #include "modsecurity/intervention.h"
+#include "modsecurity/rule.h"
 
 #ifndef SRC_ACTIONS_ACTION_H_
 #define SRC_ACTIONS_ACTION_H_
@@ -89,6 +90,10 @@ class Action {
     virtual std::string evaluate(std::string exp,
         Transaction *transaction);
     virtual bool evaluate(Rule *rule, Transaction *transaction);
+    virtual bool evaluate(Rule *rule, Transaction *transaction,
+        RuleMessage *ruleMessage) {
+        return evaluate(rule, transaction);
+    }
     virtual bool init(std::string *error) { return true; }
     virtual bool isDisruptive() { return false; }
 

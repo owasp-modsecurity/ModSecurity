@@ -33,7 +33,8 @@ class Severity : public Action {
  public:
     explicit Severity(std::string action);
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(Rule *rule, Transaction *transaction,
+        RuleMessage *rm) override;
 
  private:
     int m_severity;

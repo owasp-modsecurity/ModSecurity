@@ -267,6 +267,8 @@ bool Rule::evaluateActions(Transaction *trasn) {
 bool Rule::evaluate(Transaction *trasn) {
     bool ret = false;
     std::vector<Variable *> *variables = this->variables;
+    RuleMessage *ruleMessage = new modsecurity::RuleMessage(this, m_log_message);
+
 
     if (m_secmarker == true) {
         return true;
@@ -398,7 +400,7 @@ bool Rule::evaluate(Transaction *trasn) {
                         trasn->debug(4, "Running (_non_ disruptive) " \
                             "action: " + a->action);
 #endif
-                        a->evaluate(this, trasn);
+                        a->evaluate(this, trasn, ruleMessage);
                     } else {
                         containsDisruptive = true;
                     }
@@ -510,7 +512,6 @@ bool Rule::evaluate(Transaction *trasn) {
     }
 
     if (!m_log_message.empty() || !m_log_data.empty()) {
-        RuleMessage *ruleMessage = new modsecurity::RuleMessage(this, m_log_message);
         ruleMessage->m_data = m_log_data;
         trasn->m_rulesMessages.push_back(ruleMessage);
     }

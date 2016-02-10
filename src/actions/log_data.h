@@ -31,7 +31,7 @@ class LogData : public Action {
  public:
     explicit LogData(std::string action);
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) override;
 
  private:
     std::string m_data;

@@ -57,12 +57,15 @@ Tag::Tag(std::string action)
 }
 
 
-bool Tag::evaluate(Rule *rule, Transaction *transaction) {
+bool Tag::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
     std::string tag = MacroExpansion::expand(m_tag, transaction);
+
 #ifndef NO_LOGS
     transaction->debug(9, "Rule tag: " + tag);
 #endif
-    rule->m_tags.push_back(tag);
+
+    rm->m_tags.push_back(tag);
+
     return true;
 }
 

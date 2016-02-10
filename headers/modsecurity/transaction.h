@@ -271,12 +271,6 @@ class Transaction {
     std::list<modsecurity::RuleMessage *> m_rulesMessages;
 
     /**
-     * The list m_ruleTags contains all tags that were specified by the
-     * action `tag'.
-     */
-    std::list<std::string> m_ruleTags;
-
-    /**
      * Holds the request body, in case of any.
      */
     std::ostringstream m_requestBody;

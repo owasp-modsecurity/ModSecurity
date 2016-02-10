@@ -38,7 +38,7 @@ Rev::Rev(std::string action)
 
 
 bool Rev::evaluate(Rule *rule, Transaction *transaction) {
-    rule->rev = m_rev;
+    rule->m_rev = m_rev;
     return true;
 }
 

@@ -20,6 +20,7 @@
 
 #include "actions/action.h"
 #include "modsecurity/transaction.h"
+#include "modsecurity/rule.h"
 #include "src/utils.h"
 
 namespace modsecurity {
@@ -50,12 +51,15 @@ Severity::Severity(std::string action)
 }
 
 
-bool Severity::evaluate(Rule *rule, Transaction *transaction) {
+bool Severity::evaluate(Rule *rule, Transaction *transaction,
+    RuleMessage *rm) {
 #ifndef NO_LOGS
     transaction->debug(9, "This rule severity is: " + \
         std::to_string(this->m_severity) + " current transaction is: " + \
         std::to_string(transaction->m_highestSeverityAction));
 #endif
+
+    rm->m_severity = m_severity;
 
     if (transaction->m_highestSeverityAction > this->m_severity) {
         transaction->m_highestSeverityAction = this->m_severity;

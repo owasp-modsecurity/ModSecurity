@@ -70,16 +70,16 @@ class Rule {
         this->m_referenceCount++;
     }
 
-    std::string rev;
+    std::string m_rev;
+    std::string m_ver;
 
     std::string m_marker;
     bool m_secmarker;
     std::string m_fileName;
     int m_lineNumber;
-    std::list<std::string> m_tags;
 
-    std::string m_log_data;
     std::string m_log_message;
+    std::string m_log_data;
 
  private:
     bool m_unconditional;
@@ -92,28 +92,26 @@ class RuleMessage {
         m_ruleFile = rule->m_fileName;
         m_ruleLine = rule->m_lineNumber;
         m_ruleId = rule->rule_id;
-        m_ruleRev = 0;
+        m_rev = rule->m_rev;
         m_message = std::string("");
         m_data = std::string("");
-        m_severity = std::string("");
-        m_ver = std::string("");
+        m_severity = 0;
+        m_ver = rule->m_ver;
         m_maturity = 0;
         m_accuracy = 0;
-        m_tags = std::string("");
         m_rule = rule;
     };
     RuleMessage(Rule *rule, std::string message) {
         m_ruleFile = rule->m_fileName;
         m_ruleLine = rule->m_lineNumber;
         m_ruleId = rule->rule_id;
-        m_ruleRev = 0;
+        m_rev = rule->m_rev;
         m_message = message;
         m_data = std::string("");
-        m_severity = std::string("");
-        m_ver = std::string("");
+        m_severity = 0;
+        m_ver = rule->m_ver;
         m_maturity = 0;
         m_accuracy = 0;
-        m_tags = std::string("");
         m_rule = rule;
     };
 
@@ -121,14 +119,15 @@ class RuleMessage {
     std::string m_ruleFile;
     int m_ruleLine;
     int m_ruleId;
-    int m_ruleRev;
     std::string m_message;
     std::string m_data;
-    std::string m_severity;
+    int m_severity;
     std::string m_ver;
+    std::string m_rev;
     int m_maturity;
     int m_accuracy;
-    std::string m_tags;
+
+    std::list<std::string> m_tags;
 
     Rule *m_rule;
 };

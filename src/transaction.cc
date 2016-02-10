@@ -1545,14 +1545,15 @@ std::string Transaction::toJSON(int parts) {
             LOGFY_ADD("file", a->m_ruleFile.c_str());
             LOGFY_ADD("lineNumber", std::to_string(a->m_ruleLine).c_str());
             LOGFY_ADD("data", a->m_data.c_str());
-            LOGFY_ADD("serverity", a->m_severity.c_str());
+            LOGFY_ADD("serverity", std::to_string(a->m_severity).c_str());
             LOGFY_ADD("ver", a->m_ver.c_str());
+            LOGFY_ADD("rev", a->m_rev.c_str());
 
             yajl_gen_string(g,
                 reinterpret_cast<const unsigned char*>("tags"),
                 strlen("tags"));
             yajl_gen_array_open(g);
-            for (auto b : a->m_rule->m_tags) {
+            for (auto b : a->m_tags) {
                 yajl_gen_string(g,
                     reinterpret_cast<const unsigned char*>(b.c_str()),
                     strlen(b.c_str()));
