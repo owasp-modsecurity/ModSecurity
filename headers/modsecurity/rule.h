@@ -80,6 +80,7 @@ class Rule {
 
     std::string m_log_message;
     std::string m_log_data;
+    int m_accuracy;
 
  private:
     bool m_unconditional;
@@ -93,12 +94,12 @@ class RuleMessage {
         m_ruleLine = rule->m_lineNumber;
         m_ruleId = rule->rule_id;
         m_rev = rule->m_rev;
+        m_accuracy = rule->m_accuracy;
         m_message = std::string("");
         m_data = std::string("");
         m_severity = 0;
         m_ver = rule->m_ver;
         m_maturity = 0;
-        m_accuracy = 0;
         m_rule = rule;
     };
     RuleMessage(Rule *rule, std::string message) {
@@ -106,12 +107,12 @@ class RuleMessage {
         m_ruleLine = rule->m_lineNumber;
         m_ruleId = rule->rule_id;
         m_rev = rule->m_rev;
+        m_accuracy = rule->m_accuracy;
         m_message = message;
         m_data = std::string("");
         m_severity = 0;
         m_ver = rule->m_ver;
         m_maturity = 0;
-        m_accuracy = 0;
         m_rule = rule;
     };
 

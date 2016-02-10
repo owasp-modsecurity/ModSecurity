@@ -62,6 +62,7 @@ VARIABLES = \
 
 
 ACTIONS = \
+	actions/accuracy.cc \
 	actions/action.cc \
 	actions/audit_log.cc \
 	actions/block.cc \

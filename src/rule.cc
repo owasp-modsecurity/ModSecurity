@@ -79,6 +79,7 @@ Rule::Rule(std::string marker)
     op(NULL),
     rule_id(0),
     phase(-1),
+    m_accuracy(0),
     m_unconditional(false),
     m_secmarker(true),
     m_marker(marker),

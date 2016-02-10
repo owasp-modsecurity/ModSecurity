@@ -19,6 +19,7 @@ class Driver;
 
 #include "modsecurity/modsecurity.h"
 
+#include "actions/accuracy.h"
 #include "actions/action.h"
 #include "actions/audit_log.h"
 #include "actions/ctl_audit_log_parts.h"
@@ -60,6 +61,7 @@ class Driver;
 
 using modsecurity::ModSecurity;
 
+using modsecurity::actions::Accuracy;
 using modsecurity::actions::Action;
 using modsecurity::actions::CtlAuditLogParts;
 using modsecurity::actions::InitCol;
@@ -837,7 +839,7 @@ act:
       }
     | ACTION_ACCURACY
       {
-        $$ = Action::instantiate($1);
+        $$ = new Accuracy($1);
       }
     | ACTION_EXEC
       {
