@@ -83,6 +83,7 @@ Rule::Rule(std::string marker)
     m_unconditional(false),
     m_secmarker(true),
     m_marker(marker),
+    m_maturity(0),
     m_referenceCount(0),
     m_fileName(""),
     m_lineNumber(0) { }

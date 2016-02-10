@@ -81,6 +81,7 @@ class Rule {
     std::string m_log_message;
     std::string m_log_data;
     int m_accuracy;
+    int m_maturity;
 
  private:
     bool m_unconditional;
@@ -99,7 +100,7 @@ class RuleMessage {
         m_data = std::string("");
         m_severity = 0;
         m_ver = rule->m_ver;
-        m_maturity = 0;
+        m_maturity = rule->m_maturity;
         m_rule = rule;
     };
     RuleMessage(Rule *rule, std::string message) {
@@ -112,7 +113,7 @@ class RuleMessage {
         m_data = std::string("");
         m_severity = 0;
         m_ver = rule->m_ver;
-        m_maturity = 0;
+        m_maturity = rule->m_maturity;
         m_rule = rule;
     };
 

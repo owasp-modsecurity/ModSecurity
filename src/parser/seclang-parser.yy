@@ -30,6 +30,7 @@ class Driver;
 #include "actions/msg.h"
 #include "actions/phase.h"
 #include "actions/log_data.h"
+#include "actions/maturity.h"
 #include "actions/redirect.h"
 #include "actions/rev.h"
 #include "actions/ver.h"
@@ -75,6 +76,7 @@ using modsecurity::actions::Msg;
 using modsecurity::actions::Phase;
 using modsecurity::actions::transformations::None;
 using modsecurity::actions::LogData;
+using modsecurity::actions::Maturity;
 using modsecurity::actions::transformations::Transformation;
 using modsecurity::operators::Operator;
 using modsecurity::Rule;
@@ -995,7 +997,7 @@ act:
       }
     | ACTION_MATURITY
       {
-        $$ = Action::instantiate($1);
+        $$ = new Maturity($1);
       }
     | ACTION_CTL_BDY_XML
       {
