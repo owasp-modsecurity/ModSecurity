@@ -158,11 +158,12 @@ CONFIG_VALUE_NUMBER [0-9]+
 
 FREE_TEXT       ([^\"]|(\\\"))+
 
+NEW_LINE_FREE_TEXT [^, \t\"\n\r]+
 FREE_TEXT_NEW_LINE       [^\"|\n]+
 FREE_TEXT_QUOTE ([^\']|([^\\]\\\'))+
 FREE_TEXT_SPACE [^ \t]+
 FREE_TEXT_SPACE_COMMA [^, \t]+
-FREE_TEXT_SPACE_COMMA_QUOTE [^, \t\"]+
+FREE_TEXT_SPACE_COMMA_QUOTE [^, \t\"\n\r]+
 FREE_TEXT_QUOTE_COMMA [^,\']+
 
 COL_NAME [A-Za-z]+
@@ -300,7 +301,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 {CONFIG_DIR_SEC_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_SEC_ACTION(yytext, *driver.loc.back()); }
 {CONFIG_DIR_SEC_DEFAULT_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_SEC_DEFAULT_ACTION(yytext, *driver.loc.back()); }
-{CONFIG_DIR_SEC_MARKER}[ ]{FREE_TEXT_NEW_LINE} { return yy::seclang_parser::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_SEC_MARKER}[ ]{NEW_LINE_FREE_TEXT} { return yy::seclang_parser::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 
 <EXPECTING_OPERATOR>{
 {SOMETHING}           { BEGIN(INITIAL); return yy::seclang_parser::make_FREE_TEXT(yytext, *driver.loc.back()); }
