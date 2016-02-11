@@ -49,6 +49,7 @@ class RulesProperties {
     RulesProperties()
         : audit_log(NULL),
         m_debugLog(new DebugLog()),
+        m_httpbl_key(""),
         remoteRulesActionOnFailed(AbortOnFailedRemoteRulesAction),
         requestBodyLimit(0),
         requestBodyNoFilesLimit(0),
@@ -63,6 +64,7 @@ class RulesProperties {
     explicit RulesProperties(DebugLog *debugLog)
         : audit_log(NULL),
         m_debugLog(debugLog),
+        m_httpbl_key(""),
         remoteRulesActionOnFailed(AbortOnFailedRemoteRulesAction),
         requestBodyLimit(0),
         requestBodyNoFilesLimit(0),
@@ -207,6 +209,7 @@ class RulesProperties {
 
     DebugLog *m_debugLog;
 
+    std::string m_httpbl_key;
     std::ostringstream parserError;
 
     audit_log::AuditLog *audit_log;
