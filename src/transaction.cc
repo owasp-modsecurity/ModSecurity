@@ -1213,7 +1213,8 @@ int Transaction::processLogging(int returned_code) {
                 "saved via auditlog action.");
         }
 #endif
-
+        debug(8, "Checking if this request is relevant to be " \
+            "part of the audit logs.");
         bool saved = this->m_rules->audit_log->saveIfRelevant(this, parts);
         if (saved) {
 #ifndef NO_LOGS

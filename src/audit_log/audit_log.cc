@@ -228,6 +228,11 @@ bool AuditLog::saveIfRelevant(Transaction *transaction) {
 bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
     if (this->isRelevant(transaction->m_httpCodeReturned) == false &&
         transaction->m_toBeSavedInAuditlogs == false) {
+        transaction->debug(5, "Return code `" +
+            std::to_string(transaction->m_httpCodeReturned) + "'" \
+            " is not interesting to audit logs, relevant code(s): `" +
+            m_relevant + "'.");
+
         return false;
     }
 
@@ -237,12 +242,16 @@ bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
      *
      */
     if (transaction->m_toNotBeSavedInAuditLogs == true) {
+        transaction->debug(5, "This request was marked to not " \
+            "be saved in the audit logs.");
         return false;
     }
 
     if (parts == -1) {
         parts = m_parts;
     }
+    transaction->debug(5, "Saving this request as part " \
+            "of the audit logs.");
     m_writer->write(transaction, parts);
 
     return true;
