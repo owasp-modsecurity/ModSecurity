@@ -391,6 +391,10 @@ bool Rule::evaluate(Transaction *trasn) {
             if (ret) {
                 bool containsDisruptive = false;
                 bool chainResult = false;
+
+                ruleMessage->m_match = "Operator `" + this->op->op +
+                    "' with parameter `" + this->op->param + "' against" \
+                    " variable `" + v->m_key + "' (Value: `" + value + "' )";
 #ifndef NO_LOGS
                 trasn->debug(4, "Rule returned 1.");
 #endif

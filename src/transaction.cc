@@ -1542,6 +1542,7 @@ std::string Transaction::toJSON(int parts) {
                 reinterpret_cast<const unsigned char*>("producer"),
                 strlen("producer"));
             yajl_gen_map_open(g);
+            LOGFY_ADD("match", a->m_match.c_str());
             LOGFY_ADD("ruleId", std::to_string(a->m_ruleId).c_str());
             LOGFY_ADD("file", a->m_ruleFile.c_str());
             LOGFY_ADD("lineNumber", std::to_string(a->m_ruleLine).c_str());

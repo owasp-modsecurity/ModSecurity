@@ -102,6 +102,7 @@ class RuleMessage {
         m_ver = rule->m_ver;
         m_maturity = rule->m_maturity;
         m_rule = rule;
+        m_match = std::string("");
     };
     RuleMessage(Rule *rule, std::string message) {
         m_ruleFile = rule->m_fileName;
@@ -115,6 +116,7 @@ class RuleMessage {
         m_ver = rule->m_ver;
         m_maturity = rule->m_maturity;
         m_rule = rule;
+        m_match = std::string("");
     };
 
     std::string m_match;
