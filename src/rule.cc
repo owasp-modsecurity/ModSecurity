@@ -98,6 +98,7 @@ Rule::Rule(Operator *_op,
     op(_op),
     rule_id(0),
     phase(-1),
+    m_accuracy(0),
     m_unconditional(false),
     m_secmarker(false),
     m_marker(""),
@@ -503,7 +504,6 @@ bool Rule::evaluate(Transaction *trasn) {
                         }
                     }
                 }
-
             } else {
 #ifndef NO_LOGS
                 trasn->debug(4, "Rule returned 0.");
@@ -517,7 +517,7 @@ bool Rule::evaluate(Transaction *trasn) {
         }
     }
 
-    if (!m_log_message.empty() || !m_log_data.empty()) {
+    if ((!m_log_message.empty() || !m_log_data.empty()) && !ruleMessage->m_match.empty()) {
         ruleMessage->m_data = m_log_data;
         trasn->m_rulesMessages.push_back(ruleMessage);
     }
