@@ -93,11 +93,13 @@ int main(int argc, char *argv[]) {
 
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
+            delete modsecTransaction;
             continue;
         }
         modsecTransaction->processURI(request_uri, "GET", "1.1");
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
+            delete modsecTransaction;
             continue;
         }
 
@@ -129,6 +131,7 @@ int main(int argc, char *argv[]) {
 
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
+            delete modsecTransaction;
             continue;
         }
 
@@ -137,6 +140,7 @@ int main(int argc, char *argv[]) {
 
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
+            delete modsecTransaction;
             continue;
         }
 
@@ -151,6 +155,7 @@ int main(int argc, char *argv[]) {
 
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
+            delete modsecTransaction;
             continue;
         }
 
@@ -161,6 +166,7 @@ int main(int argc, char *argv[]) {
 
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
+            delete modsecTransaction;
             continue;
         }
 
