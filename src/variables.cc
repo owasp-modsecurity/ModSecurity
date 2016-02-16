@@ -34,6 +34,11 @@ Variables::Variables() {
     this->reserve(1000);
 }
 
+Variables::~Variables() {
+    for (auto &a : *this) {
+        this->erase(a.first);
+    }
+}
 
 void Variables::store(std::string key, std::string value) {
     this->emplace(key, value);

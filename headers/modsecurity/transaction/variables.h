@@ -40,6 +40,7 @@ class Variables :
     public std::unordered_multimap<std::string, std::string> {
  public:
     Variables();
+    ~Variables();
     void store(std::string key, std::string value);
 
     bool storeOrUpdateFirst(const std::string &key,

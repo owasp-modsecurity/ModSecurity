@@ -37,7 +37,12 @@ Collections::Collections() {
 }
 
 
-Collections::~Collections() { }
+Collections::~Collections() {
+    for (auto &a : *this) {
+        this->erase(a.first);
+        delete a.second;
+    }
+}
 
 
 void Collections::init(const std::string& name, const std::string& key) {
