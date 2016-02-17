@@ -148,6 +148,10 @@ Transaction::~Transaction() {
     m_requestBody.str(std::string());
     m_requestBody.clear();
 
+    for (auto *a : m_rulesMessages) {
+        delete a;
+    }
+
     m_rules->decrementReferenceCount();
 }
 
