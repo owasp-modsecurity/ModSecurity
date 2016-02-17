@@ -93,14 +93,12 @@ int main(int argc, char *argv[]) {
 
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
-            delete modsecTransaction;
-            continue;
+            goto next_request;
         }
         modsecTransaction->processURI(request_uri, "GET", "1.1");
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
-            delete modsecTransaction;
-            continue;
+            goto next_request;
         }
 
         modsecTransaction->addRequestHeader("Host",
@@ -131,8 +129,7 @@ int main(int argc, char *argv[]) {
 
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
-            delete modsecTransaction;
-            continue;
+            goto next_request;
         }
 
 
@@ -140,8 +137,7 @@ int main(int argc, char *argv[]) {
 
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
-            delete modsecTransaction;
-            continue;
+            goto next_request;
         }
 
         modsecTransaction->addResponseHeader("HTTP/1.1",
@@ -155,8 +151,7 @@ int main(int argc, char *argv[]) {
 
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
-            delete modsecTransaction;
-            continue;
+            goto next_request;
         }
 
 
@@ -166,10 +161,11 @@ int main(int argc, char *argv[]) {
 
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
-            delete modsecTransaction;
-            continue;
+            goto next_request;
         }
 
+next_request:
+        modsecTransaction->processLogging(200);
         delete modsecTransaction;
     }
 
