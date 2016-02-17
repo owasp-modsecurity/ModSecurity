@@ -35,9 +35,7 @@ Variables::Variables() {
 }
 
 Variables::~Variables() {
-    for (auto &a : *this) {
-        this->erase(a.first);
-    }
+    this->clear();
 }
 
 void Variables::store(std::string key, std::string value) {

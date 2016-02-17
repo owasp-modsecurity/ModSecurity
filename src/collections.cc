@@ -38,10 +38,10 @@ Collections::Collections() {
 
 
 Collections::~Collections() {
-    for (auto &a : *this) {
-        this->erase(a.first);
-        delete a.second;
+    for (const auto &thing : *this) {
+        delete thing.second;
     }
+    this->clear();
 }
 
 
