@@ -151,6 +151,7 @@ Transaction::~Transaction() {
     for (auto *a : m_rulesMessages) {
         delete a;
     }
+    m_rulesMessages.clear();
 
     m_rules->decrementReferenceCount();
 }

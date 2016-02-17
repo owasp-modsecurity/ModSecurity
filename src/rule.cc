@@ -270,7 +270,7 @@ bool Rule::evaluateActions(Transaction *trasn) {
 bool Rule::evaluate(Transaction *trasn) {
     bool ret = false;
     std::vector<Variable *> *variables = this->variables;
-    RuleMessage *ruleMessage = new modsecurity::RuleMessage(this, m_log_message);
+    RuleMessage *ruleMessage = NULL;
 
     trasn->m_matched.clear();
 
@@ -281,6 +281,7 @@ bool Rule::evaluate(Transaction *trasn) {
         return evaluateActions(trasn);
     }
 
+    ruleMessage = new modsecurity::RuleMessage(this, m_log_message);
 #ifndef NO_LOGS
     std::string eparam = MacroExpansion::expand(this->op->param, trasn);
 
