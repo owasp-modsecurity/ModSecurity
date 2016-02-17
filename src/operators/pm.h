@@ -42,7 +42,6 @@ class Pm : public Operator {
     bool init(const std::string &file, const char **error) override;
     void postOrderTraversal(acmp_btree_node_t *node);
 
-    std::list<std::string> matched;
  protected:
     ACMP *m_p;
 };

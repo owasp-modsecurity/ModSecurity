@@ -78,7 +78,7 @@ bool Pm::evaluate(Transaction *transaction, const std::string &input) {
 
     rc = acmp_process_quick(&pt, &match, input.c_str(), input.length());
     if (rc == 1) {
-        this->matched.push_back(std::string(match));
+        transaction->m_matched.push_back(std::string(match));
     }
 
     return rc == 1;

@@ -30,7 +30,7 @@ bool Rx::evaluate(Transaction *transaction, const std::string& input) {
     SMatch match;
 
     if (regex_search(input, &match, *m_re) && match.size() >= 1) {
-        this->matched.push_back(match.match);
+        transaction->m_matched.push_back(match.match);
         return true;
     }
 

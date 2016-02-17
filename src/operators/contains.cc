@@ -27,7 +27,7 @@ bool Contains::evaluate(Transaction *transaction, const std::string &input) {
     bool contains = input.find(p) != std::string::npos;
 
     if (contains) {
-        matched.push_back(p);
+        transaction->m_matched.push_back(p);
     }
 
     if (negation) {

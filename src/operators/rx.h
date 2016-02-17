@@ -42,7 +42,6 @@ class Rx : public Operator {
 
     bool evaluate(Transaction *transaction, const std::string &input);
 
-    std::list<std::string> matched;
  private:
     std::string m_param;
     Regex *m_re;

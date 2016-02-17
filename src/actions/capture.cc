@@ -32,38 +32,15 @@ namespace modsecurity {
 namespace actions {
 
 bool Capture::evaluate(Rule *rule, Transaction *transaction) {
-    operators::Operator *op = rule->op;
-    std::list<std::string> *match;
-
-    operators::Pm *pm = dynamic_cast<operators::Pm *>(op);
-    if (pm != NULL) {
-        match = &pm->matched;
-    }
-
-    operators::Rx *rx = dynamic_cast<operators::Rx *>(op);
-    if (rx != NULL) {
-        match = &rx->matched;
-    }
-
-    operators::Contains *contains = dynamic_cast<operators::Contains *>(op);
-    if (contains != NULL) {
-        match = &contains->matched;
-    }
-
-    operators::DetectSQLi *dsqli = dynamic_cast<operators::DetectSQLi *>(op);
-    if (dsqli != NULL) {
-        match = &dsqli->matched;
-    }
-
-    if (match->empty()) {
+    if (transaction->m_matched.empty()) {
         return false;
     }
 
     int i = 0;
-    while (match->empty() == false) {
+    while (transaction->m_matched.empty() == false) {
         transaction->m_collections.storeOrUpdateFirst("TX",
-            std::to_string(i), match->back());
-        match->pop_back();
+            std::to_string(i), transaction->m_matched.back());
+        transaction->m_matched.pop_back();
         i++;
     }
     return true;

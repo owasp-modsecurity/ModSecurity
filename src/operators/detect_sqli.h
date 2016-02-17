@@ -31,8 +31,6 @@ class DetectSQLi : public Operator {
         : Operator(op, param, negation) { }
 
     bool evaluate(Transaction *transaction, const std::string &input);
-
-    std::list<std::string> matched;
 };
 
 }  // namespace operators

@@ -272,6 +272,7 @@ bool Rule::evaluate(Transaction *trasn) {
     std::vector<Variable *> *variables = this->variables;
     RuleMessage *ruleMessage = new modsecurity::RuleMessage(this, m_log_message);
 
+    trasn->m_matched.clear();
 
     if (m_secmarker == true) {
         return true;

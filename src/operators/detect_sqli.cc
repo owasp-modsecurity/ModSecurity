@@ -32,8 +32,8 @@ bool DetectSQLi::evaluate(Transaction *transaction, const std::string &input) {
     issqli = libinjection_sqli(input.c_str(), input.length(), fingerprint);
 
     if (issqli) {
-        matched.push_back(fingerprint);
         if (transaction) {
+            transaction->m_matched.push_back(fingerprint);
 #ifndef NO_LOGS
             transaction->debug(4, "detected SQLi using libinjection with " \
                 "fingerprint '" + std::string(fingerprint) + "' at: '" +

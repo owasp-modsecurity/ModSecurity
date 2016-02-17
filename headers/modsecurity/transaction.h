@@ -318,6 +318,13 @@ class Transaction {
      */
     transaction::Collections m_collections;
 
+    /**
+     * Holds the whatever matched in the operation utilization.
+     * That variable will be further used by the capture action.
+     *
+     */
+    std::list<std::string> m_matched;
+
  private:
     std::string *m_ARGScombinedSizeStr;
     std::string *m_namesArgs;

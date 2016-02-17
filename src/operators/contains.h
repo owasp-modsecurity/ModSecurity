@@ -31,9 +31,8 @@ class Contains : public Operator {
     /** @ingroup ModSecurity_Operator */
     Contains(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
-    bool evaluate(Transaction *transaction, const std::string &exp) override;
 
-    std::list<std::string> matched;
+    bool evaluate(Transaction *transaction, const std::string &exp) override;
 };
 
 }  // namespace operators
