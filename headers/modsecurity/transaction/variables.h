@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <list>
 #include <vector>
+#include <algorithm>
 #endif
 
 
@@ -36,8 +37,47 @@ typedef struct Variable_t Variables;
 namespace modsecurity {
 namespace transaction {
 
+
+/*
+ * FIXME:
+ *
+ * This was an example grabbed from:
+ * http://stackoverflow.com/questions/8627698/case-insensitive-stl-containers-e-g-stdunordered-set
+ *
+ * We have to have a better hash function, maybe based on the std::hash.
+ *
+ */
+struct MyEqual
+{
+    bool operator()(const std::string& Left, const std::string& Right) const
+    {
+        return Left.size() == Right.size()
+             && std::equal ( Left.begin() , Left.end() , Right.begin(),
+            []( char a , char b )
+        {
+            return tolower(a) == tolower(b);
+        }
+        );
+    }
+};
+
+struct MyHash
+{
+    size_t operator()(const std::string& Keyval) const
+    {
+        //You might need a better hash function than this
+        size_t h = 0;
+        std::for_each( Keyval.begin() , Keyval.end() , [&](char c )
+        {
+            h += tolower(c);
+        });
+        return h;
+    }
+};
+
 class Variables :
-    public std::unordered_multimap<std::string, std::string> {
+    public std::unordered_multimap<std::string, std::string,
+        /*std::hash<std::string>*/MyHash, MyEqual> {
  public:
     Variables();
     ~Variables();
@@ -59,6 +99,7 @@ class Variables :
         std::vector<const transaction::Variable *> *l);
     void resolveRegularExpression(const std::string& var,
         std::vector<const transaction::Variable *> *l);
+
 };
 
 }  // namespace transaction
