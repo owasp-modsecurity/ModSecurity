@@ -400,6 +400,14 @@ bool Rule::evaluate(Transaction *trasn) {
                     " variable `" + v->m_key + "' (Value: `" + value + "' )";
 #ifndef NO_LOGS
                 trasn->debug(4, "Rule returned 1.");
+                    trasn->m_collections.storeOrUpdateFirst("MATCHED_VAR",
+                        value);
+                    trasn->m_collections.storeOrUpdateFirst("MATCHED_VAR_NAME",
+                        v->m_key);
+                    trasn->m_collections.store("MATCHED_VARS:"
+                        + v->m_key, value);
+                    trasn->m_collections.store("MATCHED_VARS_NAMES:"
+                        + v->m_key, v->m_key);
 #endif
 
                 for (Action *a :
@@ -419,24 +427,7 @@ bool Rule::evaluate(Transaction *trasn) {
 #ifndef NO_LOGS
                     trasn->debug(4, "Executing chained rule.");
 #endif
-                    if (trasn->m_collections.storeOrUpdateFirst("MATCHED_VAR",
-                        value) == false) {
-                        trasn->m_collections.store("MATCHED_VAR", value);
-                    }
-                    if (trasn->m_collections.storeOrUpdateFirst(
-                        "MATCHED_VAR_NAME", v->m_key) == false) {
-                        trasn->m_collections.store("MATCHED_VAR_NAME",
-                            v->m_key);
-                    }
-                    trasn->m_collections.store("MATCHED_VARS:"
-                        + v->m_key, value);
-                    trasn->m_collections.store("MATCHED_VARS_NAMES:"
-                        + v->m_key, v->m_key);
                     chainResult = this->chainedRule->evaluate(trasn);
-                    trasn->m_collections.storeOrUpdateFirst("MATCHED_VAR", "");
-                    trasn->m_collections.del("MATCHED_VARS:" + v->m_key);
-                    trasn->m_collections.del("MATCHED_VARS_NAMES:" + v->m_key);
-                    trasn->m_collections.del("MATCHED_VARS_NAME");
                 }
                 if ((this->chained && chainResult == true) || !this->chained) {
                     for (Action *a :
@@ -509,6 +500,11 @@ bool Rule::evaluate(Transaction *trasn) {
             } else {
 #ifndef NO_LOGS
                 trasn->debug(4, "Rule returned 0.");
+                trasn->m_collections.storeOrUpdateFirst("MATCHED_VAR", "");
+                trasn->m_collections.del("MATCHED_VARS:" + v->m_key);
+                trasn->m_collections.del("MATCHED_VARS_NAMES:" + v->m_key);
+                trasn->m_collections.del("MATCHED_VARS_NAME");
+
 #endif
             }
         }
