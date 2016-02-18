@@ -397,7 +397,10 @@ op:
       }
     | FREE_TEXT
       {
-        Operator *op = Operator::instantiate("\"@rx " + $1 + "\"");
+        std::string text = std::string($1);
+        text.pop_back();
+        text.erase(0, 1);
+        Operator *op = Operator::instantiate("\"@rx " + text + "\"");
         const char *error = NULL;
         if (op->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
