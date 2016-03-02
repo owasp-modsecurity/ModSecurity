@@ -1,6 +1,9 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Avoid additional operator invokation if last transform of a multimatch
+   doesn't modify the input
+   [Issue #1086, #1087 - Daniel Stelter-Gliese]
  * Adds a sanity check before use ctl:ruleRemoveTargetByTag.
    [Issue #1353 - @LukeP21 and @zimmerle]
  * Uses an optional global lock while manipulating collections.
