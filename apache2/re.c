@@ -2851,7 +2851,10 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
     arr = apr_table_elts(tartab);
     te = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
+        /* Variable was modified by *any* transformation */
         int changed;
+        /* Variable was modified by *last applied* transformation (needed by multimatch) */
+        int tfnchanged;
         int usecache = 0;
         apr_table_t *cachetab = NULL;
         apr_time_t time_before_trans = 0;
@@ -2974,8 +2977,8 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
             apr_table_t *normtab;
             const char *lastvarval = NULL;
             apr_size_t lastvarlen = 0;
-            int tfnchanged = 0;
 
+            tfnchanged = 0;
             changed = 0;
             normtab = apr_table_make(mptmp, 10);
             if (normtab == NULL) return -1;
@@ -3257,7 +3260,7 @@ static apr_status_t msre_rule_process_normal(msre_rule *rule, modsec_rec *msr) {
          * or if it is and we need to process the result of the
          * last transformation.
          */
-        if (!multi_match || changed) {
+        if (!multi_match || tfnchanged) {
             invocations++;
 
             #if defined(PERFORMANCE_MEASUREMENT)
