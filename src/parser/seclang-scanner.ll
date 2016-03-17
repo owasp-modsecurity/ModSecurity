@@ -174,7 +174,7 @@ VAR_FREE_TEXT_SPACE_COMMA [^, \t\"]+
 VAR_FREE_TEXT_SPACE [^ \t\"]+
 
 
-SOMETHING ["]{1}[^@]{1}([^"]|([^\\"]\\\"))*["]{1}
+SOMETHING ["]{1}[^@|!]{1}([^"]|([^\\"]\\\"))*["]{1}
 
 CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 

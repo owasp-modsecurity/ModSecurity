@@ -109,9 +109,9 @@ Operator *Operator::instantiate(std::string op_string) {
     std::string param = "";
     if (op.find(" ") != std::string::npos) {
         param = op;
-        param.erase(0, op_string.find(" "));
-        op.erase(op_string.find(" "),
-            op_string.length() - op_string.find(" "));
+        param.erase(0, param.find(" ") + 1);
+        op.erase(op.find(" "),
+            op.length() - op.find(" "));
     }
 
     for (std::basic_string<char>::iterator p = op.begin();

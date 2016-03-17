@@ -6,7 +6,7 @@
     "title":"Testing action :: SecRule directives should be case insensitive",
     "expected":{
       "audit_log":"",
-      "debug_log":"Executing operator \"@contains \" with param \"PHPSESSID\" against REQUEST_HEADERS.",
+      "debug_log":"Executing operator \"@contains\" with param \"PHPSESSID\" against REQUEST_HEADERS.",
       "error_log":""
     },
     "rules":[
