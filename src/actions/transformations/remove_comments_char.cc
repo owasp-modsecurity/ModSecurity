@@ -37,14 +37,28 @@ RemoveCommentsChar::RemoveCommentsChar(std::string action)
 
 std::string RemoveCommentsChar::evaluate(std::string value,
     Transaction *transaction) {
-    /**
-     * @todo Implement the transformation RemoveCommentsChar
-     */
-    if (transaction) {
-#ifndef NO_LOGS
-        transaction->debug(4, "Transformation RemoveCommentsChar " \
-            "is not implemented yet.");
-#endif
+    int64_t i;
+
+    i = 0;
+    while (i < value.size()) {
+        if (value.at(i) == '/' && (i+1 < value.size()) && value.at(i+1) == '*') {
+            value.erase(i, 2);
+        } else if (value.at(i) == '*' && (i+1 < value.size()) && value.at(i+1) == '/') {
+            value.erase(i, 2);
+        } else if (value.at(i) == '<' && (i+1 < value.size()) && value.at(i+1) == '!' &&
+                  (i+2 < value.size()) && value.at(i+2) == '-' && (i+3 < value.size()) &&
+                  value.at(i+3) == '-') {
+            value.erase(i, 4);
+        } else if (value.at(i) == '-' && (i+1 < value.size()) && value.at(i+1) == '-' &&
+                  (i+2 < value.size()) && value.at(i+2) == '>') {
+            value.erase(i, 3);
+        } else if (value.at(i) == '-' && (i+1 < value.size()) && value.at(i+1) == '-') {
+            value.erase(i, 2);
+        } else if (value.at(i) == '#') {
+            value.erase(i, 1);
+        } else {
+            i++;
+        }
     }
     return value;
 }
