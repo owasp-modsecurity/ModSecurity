@@ -125,7 +125,6 @@ void chomp(std::string *str) {
 
 
 std::string tolower(std::string str) {
-    std::locale loc;
     std::string value;
     value.resize(str.length());
 

@@ -114,7 +114,7 @@ void Rbl::futherInfo_httpbl(struct sockaddr_in *sin, std::string ipStr,
     debug(trans, 4, "RBL lookup of " + ipStr + " succeeded. %s: " \
         + std::to_string(days) + " " \
         "days since last activity, threat score " \
-        + std::to_string(score));
+        + std::to_string(score) +  ". Case: " + ptype);
 }
 
 

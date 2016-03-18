@@ -53,6 +53,8 @@ bool InitCol::init(std::string *error) {
 bool InitCol::evaluate(Rule *rule, Transaction *transaction) {
     std::string collectionName;
     collectionName = MacroExpansion::expand(m_collection_value, transaction);
+    std::cout << "Collection is not implemented yet, here is the ";
+    std::cout << "collection name: " << collectionName << std::endl;
     return true;
 }
 
