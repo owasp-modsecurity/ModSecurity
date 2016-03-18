@@ -17,11 +17,13 @@ MAINTAINERCLEANFILES = \
 	Makefile.in
 
 
-bin_PROGRAMS = unit-tests regression-tests rules-optimization
+bin_PROGRAMS =
+noinst_PROGRAMS =
 
 
 # unit_tests
 
+noinst_PROGRAMS += unit_tests
 unit_tests_SOURCES = \
         unit/unit.cc \
         unit/unit_test.cc
@@ -51,6 +53,7 @@ unit_tests_CPPFLAGS = \
 
 # regression
 
+noinst_PROGRAMS += regression_tests
 regression_tests_SOURCES = \
         regression/regression.cc \
         regression/regression_test.cc \
@@ -81,6 +84,8 @@ regression_tests_CPPFLAGS = \
 
 # optimization
 
+
+noinst_PROGRAMS += rules_optimization
 rules_optimization_SOURCES = \
         optimization/optimization.cc
 

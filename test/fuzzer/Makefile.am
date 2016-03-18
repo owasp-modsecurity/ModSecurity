@@ -8,7 +8,7 @@ MAINTAINERCLEANFILES = \
 	Makefile.in
 
 
-bin_PROGRAMS = afl_fuzzer
+noinst_PROGRAMS = afl_fuzzer
 
 afl_fuzzer_SOURCES = \
 	afl_fuzzer.cc
