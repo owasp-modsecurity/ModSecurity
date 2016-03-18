@@ -14,7 +14,7 @@ YAJL_POSSIBLE_LIB_NAMES="yajl2 yajl"
 YAJL_POSSIBLE_EXTENSIONS="so la sl dll dylib"
 
 # Possible paths (if pkg-config was not found, proceed with the file lookup)
-YAJL_POSSIBLE_PATHS="/usr/lib /usr/local/lib /usr/local/libyajl /usr/local/yajl /usr/local /opt/libyajl /opt/yajl /opt /usr"
+YAJL_POSSIBLE_PATHS="/usr/lib /usr/local/lib /usr/local/libyajl /usr/local/yajl /usr/local /opt/libyajl /opt/yajl /opt /usr /usr/lib64"
 
 # Variables to be set by this very own script.
 YAJL_VERSION=""
