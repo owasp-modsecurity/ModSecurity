@@ -85,7 +85,7 @@ else
 #    fi
 fi
 
-if test -z "${YAJL_CFLAGS}"; then
+if test -z "${YAJL_LDADD}"; then
     if test -z "${YAJL_MANDATORY}"; then
         if test -z "${YAJL_DISABLED}"; then
             AC_MSG_NOTICE([YAJL library was not found])
