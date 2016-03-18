@@ -2,8 +2,7 @@
 BUILT_SOURCES= \
 	parser/seclang-parser.cc
 
-libmodsecuritydir = $(prefix)/lib
-libmodsecurity_LTLIBRARIES = libmodsecurity.la
+lib_LTLIBRARIES = libmodsecurity.la
 libmodsecurity_ladir = $(prefix)/include
 libmodsecurity_includesubdir = $(pkgincludedir)/transaction/
 
