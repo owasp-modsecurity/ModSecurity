@@ -515,7 +515,8 @@ bool Rule::evaluate(Transaction *trasn) {
         }
     }
 
-    if ((!m_log_message.empty() || !m_log_data.empty()) && !ruleMessage->m_match.empty()) {
+    if ((!m_log_message.empty() || !m_log_data.empty())
+        && !ruleMessage->m_match.empty()) {
         ruleMessage->m_data = m_log_data;
         trasn->m_rulesMessages.push_back(ruleMessage);
     } else {

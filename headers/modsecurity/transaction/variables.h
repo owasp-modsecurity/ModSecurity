@@ -47,28 +47,21 @@ namespace transaction {
  * We have to have a better hash function, maybe based on the std::hash.
  *
  */
-struct MyEqual
-{
-    bool operator()(const std::string& Left, const std::string& Right) const
-    {
+struct MyEqual {
+    bool operator()(const std::string& Left, const std::string& Right) const {
         return Left.size() == Right.size()
-             && std::equal ( Left.begin() , Left.end() , Right.begin(),
-            []( char a , char b )
-        {
+             && std::equal(Left.begin(), Left.end(), Right.begin(),
+            [](char a, char b) {
             return tolower(a) == tolower(b);
-        }
-        );
+        });
     }
 };
 
-struct MyHash
-{
-    size_t operator()(const std::string& Keyval) const
-    {
-        //You might need a better hash function than this
+struct MyHash{
+    size_t operator()(const std::string& Keyval) const {
+        // You might need a better hash function than this
         size_t h = 0;
-        std::for_each( Keyval.begin() , Keyval.end() , [&](char c )
-        {
+        std::for_each(Keyval.begin(), Keyval.end(), [&](char c) {
             h += tolower(c);
         });
         return h;
@@ -92,14 +85,12 @@ class Variables :
 
     std::string* resolveFirst(const std::string& var);
 
-
     void resolveSingleMatch(const std::string& var,
         std::vector<const transaction::Variable *> *l);
     void resolveMultiMatches(const std::string& var,
         std::vector<const transaction::Variable *> *l);
     void resolveRegularExpression(const std::string& var,
         std::vector<const transaction::Variable *> *l);
-
 };
 
 }  // namespace transaction

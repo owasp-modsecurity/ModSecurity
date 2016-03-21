@@ -17,6 +17,7 @@
 #include <stack>
 #include <vector>
 #include <string>
+#include <list>
 #endif
 
 #ifndef HEADERS_MODSECURITY_RULE_H_
@@ -90,7 +91,7 @@ class Rule {
 
 class RuleMessage {
  public:
-    RuleMessage(Rule *rule) :
+    explicit RuleMessage(Rule *rule) :
         m_ruleFile(rule->m_fileName),
         m_ruleLine(rule->m_lineNumber),
         m_ruleId(rule->rule_id),
