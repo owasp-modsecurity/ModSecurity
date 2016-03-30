@@ -2695,7 +2695,11 @@ int ip_tree_from_uri(TreeRoot **rtree, char *uri,
 int tree_contains_ip(apr_pool_t *mp, TreeRoot *rtree,
     const char *value, modsec_rec *msr, char **error_msg)
 {
+	const char *format = "%15[0-9.]:%5[0-9]";
+	char ip[16] = { 0 };  // ip4 addresses have max len 15
+	char port[6] = { 0 }; // port numbers are 16bit, ie 5 digits max
     struct in_addr in;
+
 #if APR_HAVE_IPV6
     struct in6_addr in6;
 #endif
@@ -2705,8 +2709,10 @@ int tree_contains_ip(apr_pool_t *mp, TreeRoot *rtree,
         return 0;
     }
 
-    if (strchr(value, ':') == NULL) {
-        if (inet_pton(AF_INET, value, &in) <= 0) {
+	// test for IPV4 with a port on the end	
+	if (sscanf(value, format, ip, port) == 2) {
+    //if (strchr(value, ':') == NULL) {
+        if (inet_pton(AF_INET, ip, &in) <= 0) {
             *error_msg = apr_psprintf(mp, "IPmatch: bad IPv4 " \
                 "specification \"%s\".", value);
             return -1;
@@ -2734,6 +2740,7 @@ int tree_contains_ip(apr_pool_t *mp, TreeRoot *rtree,
 
     return 0;
 }
+
 
 int ip_tree_from_param(apr_pool_t *mp,
     char *param, TreeRoot **rtree, char **error_msg)
