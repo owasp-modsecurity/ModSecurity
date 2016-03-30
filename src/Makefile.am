@@ -36,6 +36,7 @@ libmodsecurity_includesub_HEADERS = \
 	../headers/modsecurity/transaction/collections.h \
 	../headers/modsecurity/transaction/variable.h \
 	../headers/modsecurity/transaction/variables.h
+	../headers/modsecurity/transaction/global_variables.h
 
 
 
@@ -188,6 +189,7 @@ libmodsecurity_la_SOURCES = \
 	utils.cc \
 	collections.cc \
 	variables.cc \
+	global_variables.cc \
 	debug_log.cc \
 	debug_log_writer.cc \
 	debug_log_writer_agent.cc \

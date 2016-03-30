@@ -31,7 +31,12 @@ namespace modsecurity {
 namespace transaction {
 
 
-Collections::Collections() {
+Collections::Collections(transaction::GlobalVariables *global,
+    transaction::GlobalVariables *ip)
+    : m_global_collection_key(""),
+    m_ip_collection_key(""),
+    m_global_collection(global),
+    m_ip_collection(ip) {
     /* Create collection TX */
     this->emplace("TX", new Collection("TX", ""));
 }
@@ -53,6 +58,20 @@ void Collections::init(const std::string& name, const std::string& key) {
 void Collections::storeOrUpdateFirst(const std::string& collectionName,
     const std::string& variableName,
     const std::string& targetValue) {
+    if (tolower(collectionName) == "ip"
+        && !m_ip_collection_key.empty()) {
+        m_ip_collection->storeOrUpdateFirst(collectionName + ":"
+            + variableName, m_ip_collection_key, targetValue);
+        return;
+    }
+
+    if (tolower(collectionName) == "global"
+        && !m_global_collection_key.empty()) {
+        m_global_collection->storeOrUpdateFirst(collectionName + ":"
+            + variableName, m_global_collection_key, targetValue);
+        return;
+    }
+
     try {
         transaction::Variables *collection;
         collection = this->at(collectionName);
@@ -99,7 +118,7 @@ std::string* Collections::resolveFirst(const std::string& var) {
     for (auto &a : *this) {
         auto range = a.second->equal_range(var);
         for (auto it = range.first; it != range.second; ++it) {
-            return &it->second;
+            return & it->second;
         }
     }
 
@@ -109,6 +128,19 @@ std::string* Collections::resolveFirst(const std::string& var) {
 
 std::string* Collections::resolveFirst(const std::string& collectionName,
         const std::string& var) {
+
+        if (tolower(collectionName) == "ip"
+            && !m_ip_collection_key.empty()) {
+            return m_ip_collection->resolveFirst(toupper(collectionName)
+                    + ":" + var, m_ip_collection_key);
+        }
+
+        if (tolower(collectionName) == "global"
+            && !m_global_collection_key.empty()) {
+            return m_global_collection->resolveFirst(toupper(collectionName)
+                    + ":" + var, m_global_collection_key);
+        }
+
         for (auto &a : *this) {
             if (tolower(a.first) == tolower(collectionName)) {
                 transaction::Variables *t = a.second;
@@ -135,6 +167,18 @@ void Collections::resolveSingleMatch(const std::string& var,
     const std::string& collection,
     std::vector<const transaction::Variable *> *l) {
 
+    if (tolower(collection) == "ip"
+        && !m_ip_collection_key.empty()) {
+        m_ip_collection->resolveSingleMatch(var, m_ip_collection_key, l);
+        return;
+    }
+
+    if (tolower(collection) == "global"
+        && !m_global_collection_key.empty()) {
+        m_global_collection->resolveSingleMatch(var, m_global_collection_key, l);
+        return;
+    }
+
     try {
         this->at(collection)->resolveSingleMatch(var, l);
     } catch (...) { }
@@ -150,6 +194,18 @@ void Collections::resolveMultiMatches(const std::string& var,
 void Collections::resolveMultiMatches(const std::string& var,
     const std::string& collection,
     std::vector<const transaction::Variable *> *l) {
+    if (tolower(collection) == "ip"
+        && !m_ip_collection_key.empty()) {
+        m_ip_collection->resolveMultiMatches(var, m_ip_collection_key, l);
+        return;
+    }
+
+    if (tolower(collection) == "global"
+        && !m_global_collection_key.empty()) {
+        m_global_collection->resolveMultiMatches(var, m_global_collection_key, l);
+        return;
+    }
+
     try {
         this->at(collection)->resolveMultiMatches(var, l);
     } catch (...) { }
@@ -164,6 +220,19 @@ void Collections::resolveRegularExpression(const std::string& var,
 void Collections::resolveRegularExpression(const std::string& var,
     const std::string& collection,
     std::vector<const transaction::Variable *> *l) {
+    if (tolower(collection) == "ip"
+        && !m_ip_collection_key.empty()) {
+        m_ip_collection->resolveRegularExpression(toupper(collection)
+            + ":" + var, m_ip_collection_key, l);
+        return;
+    }
+
+    if (tolower(collection) == "global"
+        && !m_global_collection_key.empty()) {
+        m_global_collection->resolveRegularExpression(toupper(collection)
+            + ":" + var, m_global_collection_key, l);
+        return;
+    }
 
     try {
         this->at(collection)->resolveRegularExpression(var, l);

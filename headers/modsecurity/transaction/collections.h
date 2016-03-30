@@ -27,6 +27,7 @@
 #include <list>
 #endif
 
+#include "modsecurity/transaction/global_variables.h"
 #include "modsecurity/transaction/variables.h"
 #include "modsecurity/transaction/variable.h"
 #include "modsecurity/transaction/collection.h"
@@ -45,7 +46,7 @@ namespace transaction {
 class Collections :
     public std::unordered_map<std::string, Collection *> {
  public:
-    Collections();
+    Collections(GlobalVariables *global, GlobalVariables *ip);
     ~Collections();
 
     void init(const std::string& name, const std::string& key);
@@ -84,6 +85,12 @@ class Collections :
      * Notice that it is not the TX collection.
      */
     transaction::Variables m_transient;
+
+    std::string m_global_collection_key;
+    std::string m_ip_collection_key;
+
+    transaction::GlobalVariables *m_global_collection;
+    transaction::GlobalVariables *m_ip_collection;
 };
 
 }  // namespace transaction
