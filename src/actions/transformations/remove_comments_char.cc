@@ -60,6 +60,7 @@ std::string RemoveCommentsChar::evaluate(std::string value,
             i++;
         }
     }
+    return value;
 }
 
 }  // namespace transformations
