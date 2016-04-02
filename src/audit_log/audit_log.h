@@ -42,6 +42,7 @@ class AuditLog {
     enum AuditLogType {
      SerialAuditLogType,
      ParallelAuditLogType,
+     HttpsAuditLogType
     };
 
     enum AuditLogStatus {

@@ -144,6 +144,7 @@ CONFIG_VALUE_OFF    (?i:Off)
 CONFIG_VALUE_DETC    (?i:DetectionOnly)
 CONFIG_VALUE_SERIAL (?i:Serial)
 CONFIG_VALUE_PARALLEL (?i:Parallel|Concurrent)
+CONFIG_VALUE_HTTPS     (?i:https)
 CONFIG_VALUE_RELEVANT_ONLY (?i:RelevantOnly)
 
 CONFIG_VALUE_PROCESS_PARTIAL (?i:ProcessPartial)
@@ -152,7 +153,7 @@ CONFIG_VALUE_REJECT (?i:Reject)
 CONFIG_VALUE_ABORT   (?i:Abort)
 CONFIG_VALUE_WARN    (?i:Warn)
 
-CONFIG_VALUE_PATH    [0-9A-Za-z_/\.\-\*]+
+CONFIG_VALUE_PATH    [0-9A-Za-z_\/\.\-\*\:]+
 AUDIT_PARTS [ABCDEFHJKIZ]+
 CONFIG_VALUE_NUMBER [0-9]+
 
@@ -294,6 +295,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {CONFIG_VALUE_OFF}              { return yy::seclang_parser::make_CONFIG_VALUE_OFF(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_SERIAL}           { return yy::seclang_parser::make_CONFIG_VALUE_SERIAL(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_PARALLEL}         { return yy::seclang_parser::make_CONFIG_VALUE_PARALLEL(yytext, *driver.loc.back()); }
+{CONFIG_VALUE_HTTPS}            { return yy::seclang_parser::make_CONFIG_VALUE_HTTPS(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_DETC}             { return yy::seclang_parser::make_CONFIG_VALUE_DETC(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_RELEVANT_ONLY}    { return yy::seclang_parser::make_CONFIG_VALUE_RELEVANT_ONLY(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_PROCESS_PARTIAL}  { return yy::seclang_parser::make_CONFIG_VALUE_PROCESS_PARTIAL(yytext, *driver.loc.back()); }

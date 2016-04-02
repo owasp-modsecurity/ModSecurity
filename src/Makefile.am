@@ -182,6 +182,7 @@ libmodsecurity_la_SOURCES = \
 	transaction.cc \
 	audit_log/audit_log.cc \
 	audit_log/writer.cc \
+	audit_log/writer/https.cc \
 	audit_log/writer/serial.cc \
 	audit_log/writer/parallel.cc \
 	modsecurity.cc \

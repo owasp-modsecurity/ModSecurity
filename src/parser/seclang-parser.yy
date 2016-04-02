@@ -180,6 +180,7 @@ using modsecurity::Variables::Tx;
 %token <std::string> CONFIG_VALUE_ON
 %token <std::string> CONFIG_VALUE_OFF
 %token <std::string> CONFIG_VALUE_DETC
+%token <std::string> CONFIG_VALUE_HTTPS
 %token <std::string> CONFIG_VALUE_SERIAL
 %token <std::string> CONFIG_VALUE_PARALLEL
 %token <std::string> CONFIG_VALUE_RELEVANT_ONLY
@@ -353,6 +354,10 @@ audit_log:
     | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_PARALLEL
       {
         driver.audit_log->setType(modsecurity::audit_log::AuditLog::ParallelAuditLogType);
+      }
+    | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_HTTPS
+      {
+        driver.audit_log->setType(modsecurity::audit_log::AuditLog::HttpsAuditLogType);
       }
     ;
 

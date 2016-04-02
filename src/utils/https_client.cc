@@ -50,6 +50,15 @@ void HttpsClient::setKey(const std::string& key) {
     m_key = "ModSec-key: " + key;
 }
 
+void HttpsClient::setRequestBody(const std::string& requestBody) {
+    m_requestBody = requestBody;
+}
+
+void HttpsClient::setRequestType(const std::string& requestType) {
+    m_requestType = requestType;
+}
+
+
 #ifdef MSC_WITH_CURL
 bool HttpsClient::download(const std::string &uri) {
     CURL *curl;
@@ -68,6 +77,12 @@ bool HttpsClient::download(const std::string &uri) {
 
     headers_chunk = curl_slist_append(headers_chunk, uniqueId.c_str());
     headers_chunk = curl_slist_append(headers_chunk, status.c_str());
+
+    if (m_requestType.empty() == false) {
+        std::string hdr = "Content-Type: " + m_requestType;
+        headers_chunk = curl_slist_append(headers_chunk, hdr.c_str());
+    }
+
     if (m_key.empty() == false) {
         headers_chunk = curl_slist_append(headers_chunk, m_key.c_str());
     }
@@ -90,6 +105,10 @@ bool HttpsClient::download(const std::string &uri) {
 
     /* We want Curl to return error in case there is an HTTP error code */
     curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
+
+    if (m_requestBody.empty() == false) {
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, m_requestBody.c_str());
+    }
 
     res = curl_easy_perform(curl);
 
