@@ -100,7 +100,7 @@ bool HttpsClient::download(const std::string &uri) {
     /* we pass our 'chunk' struct to the callback function */
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
 
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "modesecurity3");
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "ModSecurity3");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers_chunk);
 
     /* We want Curl to return error in case there is an HTTP error code */
