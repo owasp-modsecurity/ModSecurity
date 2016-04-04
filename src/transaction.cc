@@ -111,7 +111,10 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_marker(""),
     m_creationTimeStamp(cpu_seconds()),
     m_logCbData(logCbData),
-    m_ms(ms) {
+    m_ms(ms),
+    m_collections(&ms->m_global_collection, &ms->m_ip_collection)
+     {
+
     m_id = std::to_string(this->m_timeStamp) + \
         std::to_string(generate_transaction_unique_id());
     m_rules->incrementReferenceCount();
@@ -1195,7 +1198,8 @@ int Transaction::processLogging(int returned_code) {
 #endif
             std::list<std::pair<int, std::string>>::iterator it;
             parts = this->m_rules->audit_log->m_parts;
-            debug(7, "AuditLog parts before modification(s): " + std::to_string(parts) + ".");
+            debug(7, "AuditLog parts before modification(s): " +
+                std::to_string(parts) + ".");
             for (it = m_auditLogModifier.begin();
                 it != m_auditLogModifier.end(); ++it) {
                 std::pair <int, std::string> p = *it;
@@ -1219,7 +1223,8 @@ int Transaction::processLogging(int returned_code) {
         bool saved = this->m_rules->audit_log->saveIfRelevant(this, parts);
         if (saved) {
 #ifndef NO_LOGS
-            debug(8, "Request was relevant to be saved. Parts: " + std::to_string(parts));
+            debug(8, "Request was relevant to be saved. Parts: " +
+                std::to_string(parts));
 #endif
         }
     }
@@ -1548,7 +1553,7 @@ std::string Transaction::toJSON(int parts) {
             LOGFY_ADD("file", a->m_ruleFile.c_str());
             LOGFY_ADD("lineNumber", std::to_string(a->m_ruleLine).c_str());
             LOGFY_ADD("data", a->m_data.c_str());
-            LOGFY_ADD("serverity", std::to_string(a->m_severity).c_str());
+            LOGFY_ADD("severity", std::to_string(a->m_severity).c_str());
             LOGFY_ADD("ver", a->m_ver.c_str());
             LOGFY_ADD("rev", a->m_rev.c_str());
 

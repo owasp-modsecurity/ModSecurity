@@ -1,6 +1,6 @@
 
 
-bin_PROGRAMS = benchmark
+noinst_PROGRAMS = benchmark
 
 benchmark_SOURCES = \
         benchmark.cc

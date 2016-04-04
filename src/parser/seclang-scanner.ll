@@ -113,7 +113,7 @@ OPERATOR        (?i:(?:@inspectFile|@fuzzyHash|@validateByteRange|@validateDTD|@
 OPERATORNOARG	(?i:@detectSQLi|@detectXSS|@validateUrlEncoding|@validateUtf8Encoding)
 OPERATOR_GEOIP  (?i:@geoLookup)
 
-TRANSFORMATION  t:(?i:(cmdLine|sha1|hexEncode|lowercase|urlDecodeUni|urlDecode|none|compressWhitespace|removeWhitespace|replaceNulls|removeNulls|htmlEntityDecode|jsDecode|cssDecode|trim|normalizePathWin|normalisePathWin|normalisePath|length|utf8toUnicode|urldecode|removeComments|replaceComments))
+TRANSFORMATION  t:(?i:(cmdLine|sha1|hexEncode|lowercase|urlDecodeUni|urlDecode|none|compressWhitespace|removeWhitespace|replaceNulls|removeNulls|htmlEntityDecode|jsDecode|cssDecode|trim|normalizePathWin|normalisePathWin|normalisePath|length|utf8toUnicode|urldecode|removeCommentsChar|removeComments|replaceComments))
 
 
 VARIABLE (?i:(RESOURCE|ARGS_COMBINED_SIZE|ARGS_GET_NAMES|ARGS_POST_NAMES|FILES_COMBINED_SIZE|FULL_REQUEST_LENGTH|REQUEST_BODY_LENGTH|REQUEST_URI_RAW|UNIQUE_ID|SERVER_PORT|SERVER_ADDR|REMOTE_PORT|REMOTE_HOST|MULTIPART_STRICT_ERROR|PATH_INFO|MULTIPART_CRLF_LF_LINES|MATCHED_VAR_NAME|MATCHED_VAR|INBOUND_DATA_ERROR|OUTBOUND_DATA_ERROR|FULL_REQUEST|AUTH_TYPE|ARGS_NAMES|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_PROTOCOL|RESPONSE_STATUS|REQBODY_PROCESSOR))
@@ -144,6 +144,7 @@ CONFIG_VALUE_OFF    (?i:Off)
 CONFIG_VALUE_DETC    (?i:DetectionOnly)
 CONFIG_VALUE_SERIAL (?i:Serial)
 CONFIG_VALUE_PARALLEL (?i:Parallel|Concurrent)
+CONFIG_VALUE_HTTPS     (?i:https)
 CONFIG_VALUE_RELEVANT_ONLY (?i:RelevantOnly)
 
 CONFIG_VALUE_PROCESS_PARTIAL (?i:ProcessPartial)
@@ -152,7 +153,7 @@ CONFIG_VALUE_REJECT (?i:Reject)
 CONFIG_VALUE_ABORT   (?i:Abort)
 CONFIG_VALUE_WARN    (?i:Warn)
 
-CONFIG_VALUE_PATH    [0-9A-Za-z_/\.\-\*]+
+CONFIG_VALUE_PATH    [0-9A-Za-z_\/\.\-\*\:]+
 AUDIT_PARTS [ABCDEFHJKIZ]+
 CONFIG_VALUE_NUMBER [0-9]+
 
@@ -174,7 +175,7 @@ VAR_FREE_TEXT_SPACE_COMMA [^, \t\"]+
 VAR_FREE_TEXT_SPACE [^ \t\"]+
 
 
-SOMETHING ["]{1}[^@]{1}([^"]|([^\\"]\\\"))*["]{1}
+SOMETHING ["]{1}[^@|!]{1}([^"]|([^\\"]\\\"))*["]{1}
 
 CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
@@ -294,6 +295,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {CONFIG_VALUE_OFF}              { return yy::seclang_parser::make_CONFIG_VALUE_OFF(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_SERIAL}           { return yy::seclang_parser::make_CONFIG_VALUE_SERIAL(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_PARALLEL}         { return yy::seclang_parser::make_CONFIG_VALUE_PARALLEL(yytext, *driver.loc.back()); }
+{CONFIG_VALUE_HTTPS}            { return yy::seclang_parser::make_CONFIG_VALUE_HTTPS(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_DETC}             { return yy::seclang_parser::make_CONFIG_VALUE_DETC(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_RELEVANT_ONLY}    { return yy::seclang_parser::make_CONFIG_VALUE_RELEVANT_ONLY(yytext, *driver.loc.back()); }
 {CONFIG_VALUE_PROCESS_PARTIAL}  { return yy::seclang_parser::make_CONFIG_VALUE_PROCESS_PARTIAL(yytext, *driver.loc.back()); }

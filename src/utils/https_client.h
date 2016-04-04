@@ -36,7 +36,9 @@ class HttpsClient {
     HttpsClient()
         : content(""),
         error(""),
-        m_key("") { }
+        m_key(""),
+        m_requestBody(""),
+        m_requestType("") { }
 
     bool download(const std::string &uri);
     std::string content;
@@ -44,10 +46,14 @@ class HttpsClient {
     static size_t handle(char * data, size_t size, size_t nmemb, void * p);
     size_t handle_impl(char * data, size_t size, size_t nmemb);
     void setKey(const std::string& key);
+    void setRequestType(const std::string& requestType);
+    void setRequestBody(const std::string& requestType);
 
     std::string error;
  private:
     std::string m_key;
+    std::string m_requestBody;
+    std::string m_requestType;
 };
 
 

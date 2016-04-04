@@ -31,7 +31,8 @@ class Tag : public Action {
  public:
     explicit Tag(std::string action);
 
-    bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) override;
+    bool evaluate(Rule *rule, Transaction *transaction,
+        RuleMessage *rm) override;
 
  private:
     std::string m_tag;

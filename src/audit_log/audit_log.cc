@@ -21,6 +21,7 @@
 
 #include <fstream>
 
+#include "audit_log/writer/https.h"
 #include "audit_log/writer/parallel.h"
 #include "audit_log/writer/serial.h"
 #include "utils/regex.h"
@@ -183,6 +184,9 @@ bool AuditLog::init() {
     }
     if (m_type == SerialAuditLogType) {
         m_writer = new audit_log::writer::Serial(this);
+    }
+    if (m_type == HttpsAuditLogType) {
+        m_writer = new audit_log::writer::Https(this);
     }
     m_writer->refCountIncrease();
 

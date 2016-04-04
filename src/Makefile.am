@@ -2,8 +2,7 @@
 BUILT_SOURCES= \
 	parser/seclang-parser.cc
 
-libmodsecuritydir = $(prefix)/lib
-libmodsecurity_LTLIBRARIES = libmodsecurity.la
+lib_LTLIBRARIES = libmodsecurity.la
 libmodsecurity_ladir = $(prefix)/include
 libmodsecurity_includesubdir = $(pkgincludedir)/transaction/
 
@@ -37,6 +36,7 @@ libmodsecurity_includesub_HEADERS = \
 	../headers/modsecurity/transaction/collections.h \
 	../headers/modsecurity/transaction/variable.h \
 	../headers/modsecurity/transaction/variables.h
+	../headers/modsecurity/transaction/global_variables.h
 
 
 
@@ -182,6 +182,7 @@ libmodsecurity_la_SOURCES = \
 	transaction.cc \
 	audit_log/audit_log.cc \
 	audit_log/writer.cc \
+	audit_log/writer/https.cc \
 	audit_log/writer/serial.cc \
 	audit_log/writer/parallel.cc \
 	modsecurity.cc \
@@ -189,6 +190,7 @@ libmodsecurity_la_SOURCES = \
 	utils.cc \
 	collections.cc \
 	variables.cc \
+	global_variables.cc \
 	debug_log.cc \
 	debug_log_writer.cc \
 	debug_log_writer_agent.cc \

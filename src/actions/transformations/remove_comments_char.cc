@@ -41,13 +41,20 @@ std::string RemoveCommentsChar::evaluate(std::string value,
 
     i = 0;
     while (i < value.size()) {
-        if (value.at(i) == '/' && (i+1 < value.size()) && value.at(i+1) == '*') {
+        if (value.at(i) == '/'
+            && (i+1 < value.size()) && value.at(i+1) == '*') {
             value.erase(i, 2);
-        } else if (value.at(i) == '*' && (i+1 < value.size()) && value.at(i+1) == '/') {
+        } else if (value.at(i) == '*'
+            && (i+1 < value.size()) && value.at(i+1) == '/') {
             value.erase(i, 2);
-        } else if (value.at(i) == '<' && (i+1 < value.size()) && value.at(i+1) == '!' &&
-                  (i+2 < value.size()) && value.at(i+2) == '-' && (i+3 < value.size()) &&
-                  value.at(i+3) == '-') {
+        } else if (value.at(i) == '<'
+            && (i+1 < value.size())
+            && value.at(i+1) == '!'
+            && (i+2 < value.size())
+            && value.at(i+2) == '-'
+            && (i+3 < value.size())
+            && value.at(i+3) == '-') {
+
             value.erase(i, 4);
         } else if (value.at(i) == '-' && (i+1 < value.size()) && value.at(i+1) == '-' &&
                   (i+2 < value.size()) && value.at(i+2) == '>') {

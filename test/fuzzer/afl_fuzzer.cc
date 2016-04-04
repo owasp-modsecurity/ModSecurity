@@ -116,15 +116,13 @@ using namespace modsecurity;
 
 
 int main(int argc, char** argv) {
-    size_t count;
-    uint8_t buf[128]; 
-    ssize_t read_bytes;
+    uint8_t buf[128];
 
     std::string lastString;
 
     while (__AFL_LOOP(1000)) {
+        ssize_t read_bytes;
         // (re-) initialize the library and read new input
-        read_bytes = -1; 
         memset(buf, 0, 128);
         read_bytes = read(STDIN_FILENO, buf, 128);
 

@@ -45,7 +45,7 @@ std::string HtmlEntityDecode::evaluate(std::string value,
 
     // FIXME: html_entities_decode_inplace is not working as expected
     //        temporary disabled to perform the audit_log tests.
-    //html_entities_decode_inplace((unsigned char *)tmp, value.size());
+    //  html_entities_decode_inplace((unsigned char *)tmp, value.size());
     std::string ret("");
     ret.assign(tmp);
     free(tmp);

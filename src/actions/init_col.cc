@@ -46,13 +46,30 @@ bool InitCol::init(std::string *error) {
     m_collection_key = std::string(action, posInit,  posEquals - posInit);
     m_collection_value = std::string(action, posEquals + 1);
 
+    if (m_collection_key != "ip" && m_collection_key != "global") {
+        return false;
+    }
+
     return true;
 }
 
 
-bool InitCol::evaluate(Rule *rule, Transaction *transaction) {
+bool InitCol::evaluate(Rule *rule, Transaction *t) {
     std::string collectionName;
-    collectionName = MacroExpansion::expand(m_collection_value, transaction);
+    collectionName = MacroExpansion::expand(m_collection_value, t);
+
+
+    if (m_collection_key == "ip") {
+        t->m_collections.m_ip_collection_key = collectionName;
+    } else if (m_collection_key == "global") {
+        t->m_collections.m_global_collection_key = collectionName;
+    } else {
+        return false;
+    }
+
+    t->debug(5, "Collection `" + m_collection_key + "' initialized with " \
+        "value: " + collectionName);
+
     return true;
 }
 
