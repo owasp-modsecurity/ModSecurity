@@ -1553,7 +1553,7 @@ std::string Transaction::toJSON(int parts) {
             LOGFY_ADD("file", a->m_ruleFile.c_str());
             LOGFY_ADD("lineNumber", std::to_string(a->m_ruleLine).c_str());
             LOGFY_ADD("data", a->m_data.c_str());
-            LOGFY_ADD("serverity", std::to_string(a->m_severity).c_str());
+            LOGFY_ADD("severity", std::to_string(a->m_severity).c_str());
             LOGFY_ADD("ver", a->m_ver.c_str());
             LOGFY_ADD("rev", a->m_rev.c_str());
 
