@@ -98,7 +98,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(removeCommentsChar) { return new RemoveCommentsChar(a); }
     IF_MATCH(remove_comments) { return new RemoveComments(a); }
     IF_MATCH(removeNulls) { return new RemoveNulls(a); }
-    IF_MATCH(remove_whitespace) { return new RemoveWhitespace(a); }
+    IF_MATCH(removeWhitespace) { return new RemoveWhitespace(a); }
     IF_MATCH(compressWhitespace) { return new CompressWhitespace(a); }
     IF_MATCH(replaceComments) { return new ReplaceComments(a); }
     IF_MATCH(replaceNulls) { return new ReplaceNulls(a); }
