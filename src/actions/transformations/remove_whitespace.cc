@@ -39,15 +39,14 @@ RemoveWhitespace::RemoveWhitespace(std::string action)
 std::string RemoveWhitespace::evaluate(std::string value,
     Transaction *transaction) {
 
-    long int i = 0;
+    int64_t i = 0;
 
     // loop through all the chars
-    while(i < value.size()) {
+    while (i < value.size()) {
         // remove whitespaces and non breaking spaces (NBSP)
-        if (isspace(value[i])||(value[i] == NBSP)) {
-            value.erase(i, 1); 
-        }
-        else {
+        if (isspace(value[i]) || (value[i] == NBSP)) {
+            value.erase(i, 1);
+        } else {
           /* if the space is not a whitespace char, increment counter
            counter should not be incremented if a character is erased because
            the index erased will be replaced by the following character */
