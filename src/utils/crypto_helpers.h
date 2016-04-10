@@ -18,6 +18,8 @@
  *  This file is part of mbed TLS (https://tls.mbed.org)
  */
 
+#include <string>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -25,6 +27,7 @@ extern "C" {
 #ifdef __cplusplus
 namespace modsecurity {
 namespace utils {
+namespace crypto {
 #endif
 
 /**
@@ -36,19 +39,11 @@ namespace utils {
  *
  * \param len       The length of the raw input
  */
-void hexify( unsigned char *obuf, const unsigned char *ibuf, int len );
-
-/**
- * \brief           Converts a hex encoded value to binary
- *
- * \param obuf      The output raw value
- *
- * \param ibuf      The hex encoded input buffer
- */
-int unhexify( unsigned char *obuf, const char *ibuf );
+std::string md5( std::string input );
 
 
 #ifdef __cplusplus
+}  // namespace crypto
 }  // namespace utils
 }  // namespace modsecurity
 #endif

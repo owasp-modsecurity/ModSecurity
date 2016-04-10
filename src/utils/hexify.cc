@@ -17,8 +17,11 @@
  *
  *  This file is part of mbed TLS (https://tls.mbed.org)
  */
+#include <string.h>
+#include <assert.h>
+#include "hexify.h"
 
-static void hexify( unsigned char *obuf, const unsigned char *ibuf, int len )
+void modsecurity::utils::hexify( unsigned char *obuf, const unsigned char *ibuf, int len )
 {
     unsigned char l, h;
 
@@ -43,7 +46,7 @@ static void hexify( unsigned char *obuf, const unsigned char *ibuf, int len )
 }
 
 
-static int unhexify( unsigned char *obuf, const char *ibuf )
+int modsecurity::utils::unhexify( unsigned char *obuf, const char *ibuf )
 {
     unsigned char c, c2;
     int len = strlen( ibuf ) / 2;

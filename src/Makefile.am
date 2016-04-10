@@ -166,8 +166,12 @@ OPERATORS = \
 
 UTILS = \
 	utils/acmp.cc \
+    utils/crypto_helpers.cc \
+    utils/crypto_helpers.h \
 	utils/geo_lookup.cc \
     utils/hexify.cc \
+    utils/hexify.h \
+    utils/md5.o \
 	utils/https_client.cc \
 	utils/ip_tree.cc \
 	utils/md5.cc \
