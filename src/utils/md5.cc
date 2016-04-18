@@ -47,9 +47,10 @@
 
 #if !defined(MBEDTLS_MD5_ALT)
 
+// csanders: We don't need this function but C++ requires an an explicit cast
 /* Implementation that should never be optimized out by the compiler */
 static void mbedtls_zeroize( void *v, size_t n ) {
-    volatile unsigned char *p = v; while( n-- ) *p++ = 0;
+    volatile unsigned char *p = static_cast<unsigned char*>(v); while( n-- ) *p++ = 0;
 }
 
 /*

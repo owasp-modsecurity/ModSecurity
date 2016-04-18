@@ -40,11 +40,11 @@
 extern "C" {
 #endif
 
-#ifdef __cplusplus
-namespace modsecurity {
-namespace utils {
-namespace crypto {
-#endif
+//#ifdef __cplusplus
+//namespace modsecurity {
+//namespace utils {
+//namespace crypto {
+//#endif
 
 /**
  * \brief          MD5 context structure
@@ -135,11 +135,11 @@ void mbedtls_md5( const unsigned char *input, size_t ilen, unsigned char output[
  */
 int mbedtls_md5_self_test( int verbose );
 
-#ifdef __cplusplus
-}  // namespace crypto
-}  // namespace utils
-}  // namespace modsecurity
-#endif
+//#ifdef __cplusplus
+//}  // namespace crypto
+//}  // namespace utils
+//}  // namespace modsecurity
+//#endif
 
 #ifdef __cplusplus
 }

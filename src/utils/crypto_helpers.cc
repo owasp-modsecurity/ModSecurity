@@ -10,14 +10,28 @@ std::string modsecurity::utils::crypto::md5( std::string input )
 {
     const char unsigned * y = (unsigned char *)input.c_str();
     unsigned char md5sum[16];
-    modsecurity::utils::crypto::mbedtls_md5_context md5_ctx;
-    modsecurity::utils::crypto::mbedtls_md5_init(&md5_ctx);
-    modsecurity::utils::crypto::mbedtls_md5_starts(&md5_ctx);
-    modsecurity::utils::crypto::mbedtls_md5_update(&md5_ctx,y,input.length());
-    modsecurity::utils::crypto::mbedtls_md5_finish(&md5_ctx,md5sum);
+    mbedtls_md5_context md5_ctx;
+    mbedtls_md5_init(&md5_ctx);
+    mbedtls_md5_starts(&md5_ctx);
+    mbedtls_md5_update(&md5_ctx,y,input.length());
+    mbedtls_md5_finish(&md5_ctx,md5sum);
     unsigned char output[32];
     modsecurity::utils::hexify(output,md5sum, 16);
     std::string myString(reinterpret_cast<char const*>(output), 32);
     return myString;
 }
+
+std::string modsecurity::utils::crypto::md5_raw( std::string input )
+{
+    const char unsigned * y = (unsigned char *)input.c_str();
+    unsigned char md5sum[16];
+    mbedtls_md5_context md5_ctx;
+    mbedtls_md5_init(&md5_ctx);
+    mbedtls_md5_starts(&md5_ctx);
+    mbedtls_md5_update(&md5_ctx,y,input.length());
+    mbedtls_md5_finish(&md5_ctx,md5sum);
+    std::string retval( reinterpret_cast<char const*>(md5sum), 16 ) ;
+    return retval;
+}
+
 

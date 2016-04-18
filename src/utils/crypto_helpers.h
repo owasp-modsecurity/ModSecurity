@@ -41,6 +41,8 @@ namespace crypto {
  */
 std::string md5( std::string input );
 
+std::string md5_raw( std::string input );
+
 
 #ifdef __cplusplus
 }  // namespace crypto
