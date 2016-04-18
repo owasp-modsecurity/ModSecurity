@@ -57,6 +57,12 @@ typedef struct
 }
 mbedtls_md5_context;
 
+#ifdef __cplusplus
+namespace modsecurity {
+namespace utils {
+namespace crypto {
+#endif
+
 /**
  * \brief          Initialize MD5 context
  *
@@ -108,6 +114,13 @@ void mbedtls_md5_finish( mbedtls_md5_context *ctx, unsigned char output[16] );
 void mbedtls_md5_process( mbedtls_md5_context *ctx, const unsigned char data[64] );
 
 #ifdef __cplusplus
+}  // namespace crypto
+}  // namespace utils
+}  // namespace modsecurity
+#endif
+
+
+#ifdef __cplusplus
 }
 #endif
 
@@ -118,6 +131,13 @@ void mbedtls_md5_process( mbedtls_md5_context *ctx, const unsigned char data[64]
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifdef __cplusplus
+namespace modsecurity {
+namespace utils {
+namespace crypto {
+#endif
+
 
 /**
  * \brief          Output = MD5( input buffer )
@@ -135,11 +155,11 @@ void mbedtls_md5( const unsigned char *input, size_t ilen, unsigned char output[
  */
 int mbedtls_md5_self_test( int verbose );
 
-//#ifdef __cplusplus
-//}  // namespace crypto
-//}  // namespace utils
-//}  // namespace modsecurity
-//#endif
+#ifdef __cplusplus
+}  // namespace crypto
+}  // namespace utils
+}  // namespace modsecurity
+#endif
 
 #ifdef __cplusplus
 }

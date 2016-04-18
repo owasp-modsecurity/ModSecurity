@@ -76,12 +76,12 @@ static void mbedtls_zeroize( void *v, size_t n ) {
 }
 #endif
 
-void mbedtls_md5_init( mbedtls_md5_context *ctx )
+void modsecurity::utils::crypto::mbedtls_md5_init( mbedtls_md5_context *ctx )
 {
     memset( ctx, 0, sizeof( mbedtls_md5_context ) );
 }
 
-void mbedtls_md5_free( mbedtls_md5_context *ctx )
+void modsecurity::utils::crypto::mbedtls_md5_free( mbedtls_md5_context *ctx )
 {
     if( ctx == NULL )
         return;
@@ -89,7 +89,7 @@ void mbedtls_md5_free( mbedtls_md5_context *ctx )
     mbedtls_zeroize( ctx, sizeof( mbedtls_md5_context ) );
 }
 
-void mbedtls_md5_clone( mbedtls_md5_context *dst,
+void modsecurity::utils::crypto::mbedtls_md5_clone( mbedtls_md5_context *dst,
                         const mbedtls_md5_context *src )
 {
     *dst = *src;
@@ -98,7 +98,7 @@ void mbedtls_md5_clone( mbedtls_md5_context *dst,
 /*
  * MD5 context setup
  */
-void mbedtls_md5_starts( mbedtls_md5_context *ctx )
+void modsecurity::utils::crypto::mbedtls_md5_starts( mbedtls_md5_context *ctx )
 {
     ctx->total[0] = 0;
     ctx->total[1] = 0;
@@ -110,7 +110,7 @@ void mbedtls_md5_starts( mbedtls_md5_context *ctx )
 }
 
 #if !defined(MBEDTLS_MD5_PROCESS_ALT)
-void mbedtls_md5_process( mbedtls_md5_context *ctx, const unsigned char data[64] )
+void modsecurity::utils::crypto::mbedtls_md5_process( mbedtls_md5_context *ctx, const unsigned char data[64] )
 {
     uint32_t X[16], A, B, C, D;
 
@@ -237,7 +237,7 @@ void mbedtls_md5_process( mbedtls_md5_context *ctx, const unsigned char data[64]
 /*
  * MD5 process buffer
  */
-void mbedtls_md5_update( mbedtls_md5_context *ctx, const unsigned char *input, size_t ilen )
+void modsecurity::utils::crypto::mbedtls_md5_update( mbedtls_md5_context *ctx, const unsigned char *input, size_t ilen )
 {
     size_t fill;
     uint32_t left;
@@ -287,7 +287,7 @@ static const unsigned char md5_padding[64] =
 /*
  * MD5 final digest
  */
-void mbedtls_md5_finish( mbedtls_md5_context *ctx, unsigned char output[16] )
+void modsecurity::utils::crypto::mbedtls_md5_finish( mbedtls_md5_context *ctx, unsigned char output[16] )
 {
     uint32_t last, padn;
     uint32_t high, low;
@@ -317,7 +317,7 @@ void mbedtls_md5_finish( mbedtls_md5_context *ctx, unsigned char output[16] )
 /*
  * output = MD5( input buffer )
  */
-void mbedtls_md5( const unsigned char *input, size_t ilen, unsigned char output[16] )
+void modsecurity::utils::crypto::mbedtls_md5( const unsigned char *input, size_t ilen, unsigned char output[16] )
 {
     mbedtls_md5_context ctx;
 
@@ -370,7 +370,7 @@ static const unsigned char md5_test_sum[7][16] =
 /*
  * Checkup routine
  */
-int mbedtls_md5_self_test( int verbose )
+int modsecurity::utils::crypto::mbedtls_md5_self_test( int verbose )
 {
     int i;
     unsigned char md5sum[16];
