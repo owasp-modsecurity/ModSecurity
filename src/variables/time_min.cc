@@ -34,7 +34,7 @@ namespace modsecurity {
 namespace Variables {
 
 void TimeMin::evaluateInternal(Transaction *transaction,
-    std::vector<const transaction::Variable *> *l) {
+    std::vector<const collection::Variable *> *l) {
     char tstr[200];
     struct tm timeinfo;
     time_t timer;
@@ -45,7 +45,7 @@ void TimeMin::evaluateInternal(Transaction *transaction,
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%M", &timeinfo);
 
-    l->push_back(new transaction::Variable("TIME_MIN",  std::string(tstr)));
+    l->push_back(new collection::Variable("TIME_MIN",  std::string(tstr)));
 }
 
 

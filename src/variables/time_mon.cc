@@ -34,7 +34,7 @@ namespace modsecurity {
 namespace Variables {
 
 void TimeMon::evaluateInternal(Transaction *transaction,
-    std::vector<const transaction::Variable *> *l) {
+    std::vector<const collection::Variable *> *l) {
     char tstr[200];
     struct tm timeinfo;
     time_t timer;
@@ -47,7 +47,7 @@ void TimeMon::evaluateInternal(Transaction *transaction,
     int a = atoi(tstr);
     a--;
 
-    l->push_back(new transaction::Variable("TIME_MON",  std::to_string(a)));
+    l->push_back(new collection::Variable("TIME_MON",  std::to_string(a)));
 }
 
 

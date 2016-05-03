@@ -29,8 +29,8 @@ namespace Variables {
 namespace Variations {
 
 void Count::evaluateInternal(Transaction *transaction,
-    std::vector<const transaction::Variable *> *l) {
-    std::vector<const transaction::Variable *> *reslIn;
+    std::vector<const collection::Variable *> *l) {
+    std::vector<const collection::Variable *> *reslIn;
     int count = 0;
 
     reslIn = var->evaluate(transaction);
@@ -47,7 +47,7 @@ void Count::evaluateInternal(Transaction *transaction,
 
     std::string res = std::to_string(count);
 
-    l->push_back(new transaction::Variable(std::string(var->m_name),
+    l->push_back(new collection::Variable(std::string(var->m_name),
         std::string(res)));
 }
 

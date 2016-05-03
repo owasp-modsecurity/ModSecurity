@@ -112,9 +112,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_creationTimeStamp(cpu_seconds()),
     m_logCbData(logCbData),
     m_ms(ms),
-    m_collections(&ms->m_global_collection, &ms->m_ip_collection)
-     {
-
+    m_collections(&ms->m_global_collection, &ms->m_ip_collection) {
     m_id = std::to_string(this->m_timeStamp) + \
         std::to_string(generate_transaction_unique_id());
     m_rules->incrementReferenceCount();
@@ -590,9 +588,6 @@ int Transaction::processRequestBody() {
 
             if (m.init() == true) {
                 m.process(m_requestBody.str());
-                for (auto &a : m.variables) {
-                    m_collections.store(a.first, a.second);
-                }
                 if (m.crlf && m.lf) {
                     m_collections.store("MULTIPART_CRLF_LF_LINES", "1");
                 } else {
@@ -734,7 +729,7 @@ int Transaction::processRequestBody() {
      * computationally intensive.
      */
     std::string fullRequest;
-    std::vector<const transaction::Variable *> l;
+    std::vector<const collection::Variable *> l;
     m_collections.resolveMultiMatches("REQUEST_HEADERS", &l);
     for (auto &a : l) {
         fullRequest = fullRequest + \

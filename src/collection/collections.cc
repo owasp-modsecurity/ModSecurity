@@ -14,7 +14,7 @@
  */
 
 
-#include "modsecurity/transaction/collections.h"
+#include "modsecurity/collection/collections.h"
 
 #ifdef __cplusplus
 #include <string>
@@ -24,21 +24,22 @@
 #include <vector>
 #endif
 
-#include "modsecurity/transaction/variable.h"
+#include "modsecurity/collection/variable.h"
+#include "modsecurity/collection/collection.h"
 #include "src/utils.h"
 
 namespace modsecurity {
-namespace transaction {
+namespace collection {
 
 
-Collections::Collections(transaction::GlobalVariables *global,
-    transaction::GlobalVariables *ip)
+Collections::Collections(GlobalCollection *global,
+    GlobalCollection *ip)
     : m_global_collection_key(""),
     m_ip_collection_key(""),
     m_global_collection(global),
     m_ip_collection(ip) {
     /* Create collection TX */
-    this->emplace("TX", new Collection("TX", ""));
+    this->emplace("TX", new Collection());
 }
 
 
@@ -48,12 +49,6 @@ Collections::~Collections() {
     }
     this->clear();
 }
-
-
-void Collections::init(const std::string& name, const std::string& key) {
-    this->emplace(name, new Collection(name, key));
-}
-
 
 void Collections::storeOrUpdateFirst(const std::string& collectionName,
     const std::string& variableName,
@@ -73,7 +68,7 @@ void Collections::storeOrUpdateFirst(const std::string& collectionName,
     }
 
     try {
-        transaction::Variables *collection;
+        Collection *collection;
         collection = this->at(collectionName);
         collection->storeOrUpdateFirst(collectionName + ":"
             + variableName, targetValue);
@@ -128,7 +123,6 @@ std::string* Collections::resolveFirst(const std::string& var) {
 
 std::string* Collections::resolveFirst(const std::string& collectionName,
         const std::string& var) {
-
         if (tolower(collectionName) == "ip"
             && !m_ip_collection_key.empty()) {
             return m_ip_collection->resolveFirst(toupper(collectionName)
@@ -143,7 +137,7 @@ std::string* Collections::resolveFirst(const std::string& collectionName,
 
         for (auto &a : *this) {
             if (tolower(a.first) == tolower(collectionName)) {
-                transaction::Variables *t = a.second;
+                Collection *t = a.second;
                 auto range = t->equal_range(toupper(collectionName)
                     + ":" + var);
                 for (auto it = range.first; it != range.second; ++it) {
@@ -157,7 +151,7 @@ std::string* Collections::resolveFirst(const std::string& collectionName,
 
 
 void Collections::resolveSingleMatch(const std::string& var,
-    std::vector<const transaction::Variable *> *l) {
+    std::vector<const Variable *> *l) {
 
     m_transient.resolveSingleMatch(var, l);
 }
@@ -165,7 +159,7 @@ void Collections::resolveSingleMatch(const std::string& var,
 
 void Collections::resolveSingleMatch(const std::string& var,
     const std::string& collection,
-    std::vector<const transaction::Variable *> *l) {
+    std::vector<const Variable *> *l) {
 
     if (tolower(collection) == "ip"
         && !m_ip_collection_key.empty()) {
@@ -175,7 +169,8 @@ void Collections::resolveSingleMatch(const std::string& var,
 
     if (tolower(collection) == "global"
         && !m_global_collection_key.empty()) {
-        m_global_collection->resolveSingleMatch(var, m_global_collection_key, l);
+        m_global_collection->resolveSingleMatch(var,
+            m_global_collection_key, l);
         return;
     }
 
@@ -185,7 +180,7 @@ void Collections::resolveSingleMatch(const std::string& var,
 }
 
 void Collections::resolveMultiMatches(const std::string& var,
-    std::vector<const transaction::Variable *> *l) {
+    std::vector<const Variable *> *l) {
 
     m_transient.resolveMultiMatches(var, l);
 }
@@ -193,7 +188,7 @@ void Collections::resolveMultiMatches(const std::string& var,
 
 void Collections::resolveMultiMatches(const std::string& var,
     const std::string& collection,
-    std::vector<const transaction::Variable *> *l) {
+    std::vector<const Variable *> *l) {
     if (tolower(collection) == "ip"
         && !m_ip_collection_key.empty()) {
         m_ip_collection->resolveMultiMatches(var, m_ip_collection_key, l);
@@ -202,7 +197,8 @@ void Collections::resolveMultiMatches(const std::string& var,
 
     if (tolower(collection) == "global"
         && !m_global_collection_key.empty()) {
-        m_global_collection->resolveMultiMatches(var, m_global_collection_key, l);
+        m_global_collection->resolveMultiMatches(var,
+            m_global_collection_key, l);
         return;
     }
 
@@ -212,14 +208,14 @@ void Collections::resolveMultiMatches(const std::string& var,
 }
 
 void Collections::resolveRegularExpression(const std::string& var,
-    std::vector<const transaction::Variable *> *l) {
+    std::vector<const Variable *> *l) {
     m_transient.resolveRegularExpression(var, l);
 }
 
 
 void Collections::resolveRegularExpression(const std::string& var,
     const std::string& collection,
-    std::vector<const transaction::Variable *> *l) {
+    std::vector<const Variable *> *l) {
     if (tolower(collection) == "ip"
         && !m_ip_collection_key.empty()) {
         m_ip_collection->resolveRegularExpression(toupper(collection)
@@ -239,5 +235,5 @@ void Collections::resolveRegularExpression(const std::string& var,
     } catch (...) { }
 }
 
-}  // namespace transaction
+}  // namespace collection
 }  // namespace modsecurity

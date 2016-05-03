@@ -51,7 +51,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"32\" \\(Variable: FILES_SIZES:filedata\\)"
+      "debug_log":"Target value: \"38\" \\(Variable: FILES_SIZES:filedata\\)"
     },
     "rules":[  
       "SecRuleEngine On",

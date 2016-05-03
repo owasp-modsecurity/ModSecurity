@@ -32,11 +32,10 @@ pkginclude_HEADERS = \
 
 
 libmodsecurity_includesub_HEADERS = \
-	../headers/modsecurity/transaction/collection.h \
-	../headers/modsecurity/transaction/collections.h \
-	../headers/modsecurity/transaction/variable.h \
-	../headers/modsecurity/transaction/variables.h
-	../headers/modsecurity/transaction/global_variables.h
+	../headers/modsecurity/collection/collection.h \
+	../headers/modsecurity/collection/collections.h \
+	../headers/modsecurity/collection/global_collection.h \
+	../headers/modsecurity/collection/variable.h
 
 
 
@@ -176,6 +175,9 @@ UTILS = \
 
 
 libmodsecurity_la_SOURCES = \
+	collection/collection.cc \
+	collection/collections.cc \
+	collection/global_collections.cc \
 	parser/seclang-parser.yy \
 	parser/seclang-scanner.ll \
 	parser/driver.cc \
@@ -188,9 +190,6 @@ libmodsecurity_la_SOURCES = \
 	modsecurity.cc \
 	rules.cc \
 	utils.cc \
-	collections.cc \
-	variables.cc \
-	global_variables.cc \
 	debug_log.cc \
 	debug_log_writer.cc \
 	debug_log_writer_agent.cc \

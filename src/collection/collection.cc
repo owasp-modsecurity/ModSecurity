@@ -14,7 +14,7 @@
  */
 
 
-#include "modsecurity/transaction/variables.h"
+#include "modsecurity/collection/collection.h"
 
 #ifdef __cplusplus
 #include <string>
@@ -23,27 +23,27 @@
 #include <list>
 #endif
 
-#include "modsecurity/transaction/variable.h"
+#include "modsecurity/collection/variable.h"
 #include "src/utils.h"
 
 namespace modsecurity {
-namespace transaction {
+namespace collection {
 
 
-Variables::Variables() {
+Collection::Collection() {
     this->reserve(1000);
 }
 
-Variables::~Variables() {
+Collection::~Collection() {
     this->clear();
 }
 
-void Variables::store(std::string key, std::string value) {
+void Collection::store(std::string key, std::string value) {
     this->emplace(key, value);
 }
 
 
-bool Variables::storeOrUpdateFirst(const std::string &key,
+bool Collection::storeOrUpdateFirst(const std::string &key,
     const std::string &value) {
     if (updateFirst(key, value) == false) {
         store(key, value);
@@ -52,7 +52,7 @@ bool Variables::storeOrUpdateFirst(const std::string &key,
 }
 
 
-bool Variables::updateFirst(const std::string &key, const std::string &value) {
+bool Collection::updateFirst(const std::string &key, const std::string &value) {
     auto range = this->equal_range(key);
 
     for (auto it = range.first; it != range.second; ++it) {
@@ -63,30 +63,30 @@ bool Variables::updateFirst(const std::string &key, const std::string &value) {
 }
 
 
-void Variables::del(const std::string& key) {
+void Collection::del(const std::string& key) {
     this->erase(key);
 }
 
 
-void Variables::resolveSingleMatch(const std::string& var,
-    std::vector<const transaction::Variable *> *l) {
+void Collection::resolveSingleMatch(const std::string& var,
+    std::vector<const Variable *> *l) {
     auto range = this->equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
-        l->push_back(new transaction::Variable(var, it->second));
+        l->push_back(new Variable(var, it->second));
     }
 }
 
 
-void Variables::resolveMultiMatches(const std::string& var,
-    std::vector<const transaction::Variable *> *l) {
+void Collection::resolveMultiMatches(const std::string& var,
+    std::vector<const Variable *> *l) {
     size_t keySize = var.size();
     l->reserve(15);
 
     auto range = this->equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
-        l->insert(l->begin(), new transaction::Variable(var, it->second));
+        l->insert(l->begin(), new Variable(var, it->second));
     }
 
     for (const auto& x : *this) {
@@ -99,18 +99,18 @@ void Variables::resolveMultiMatches(const std::string& var,
         if (x.first.compare(0, keySize, var) != 0) {
             continue;
         }
-        l->insert(l->begin(), new transaction::Variable(x.first, x.second));
+        l->insert(l->begin(), new Variable(x.first, x.second));
     }
 }
 
 
-void Variables::resolveRegularExpression(const std::string& var,
-    std::vector<const transaction::Variable *> *l) {
+void Collection::resolveRegularExpression(const std::string& var,
+    std::vector<const Variable *> *l) {
     /* Not ready */
 }
 
 
-std::string* Variables::resolveFirst(const std::string& var) {
+std::string* Collection::resolveFirst(const std::string& var) {
     auto range = equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
@@ -121,5 +121,5 @@ std::string* Variables::resolveFirst(const std::string& var) {
 }
 
 
-}  // namespace transaction
+}  // namespace collection
 }  // namespace modsecurity

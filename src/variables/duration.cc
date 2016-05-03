@@ -28,14 +28,14 @@ namespace modsecurity {
 namespace Variables {
 
 void Duration::evaluateInternal(Transaction *transaction,
-        std::vector<const transaction::Variable *> *l) {
+        std::vector<const collection::Variable *> *l) {
     std::string res;
 
     double e = cpu_seconds() - transaction->m_creationTimeStamp;
 
     res = std::to_string(e);
 
-    l->push_back(new transaction::Variable("DURATION",  std::string(res)));
+    l->push_back(new collection::Variable("DURATION",  std::string(res)));
 }
 
 

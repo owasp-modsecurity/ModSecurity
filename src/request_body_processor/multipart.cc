@@ -20,6 +20,7 @@
 #include <string>
 
 #include "request_body_processor/multipart_blob.h"
+#include "modsecurity/collection/collections.h"
 
 namespace modsecurity {
 namespace RequestBodyProcessor {
@@ -200,12 +201,14 @@ void Multipart::checkForCrlfLf(const std::string &data) {
 }
 
 bool Multipart::process(std::string data) {
+    collection::Collections *col;
     std::list<std::string> blobs;
     size_t start = data.find(m_boundary);
     size_t endl = 1;
     size_t lastValidBoundary = 0;
     size_t firstValidBoundary = start;
     double files_size = 0;
+    col = &m_transaction->m_collections;
 
     if (start != 0) {
 #ifndef NO_LOGS
@@ -267,14 +270,14 @@ bool Multipart::process(std::string data) {
             filename = "no-file-name-" + std::to_string(i);
         }
 
-        variables.emplace("FILES:" + name, filename);
-        variables.emplace("FILES_NAMES:" + name, name);
-        variables.emplace("FILES_SIZES:" + name,
+        col->storeOrUpdateFirst("FILES:" + name, filename);
+        col->storeOrUpdateFirst("FILES_NAMES:" + name, name);
+        col->storeOrUpdateFirst("FILES_SIZES:" + name,
             std::to_string(m.content.size()));
 #ifndef NO_LOGS
         debug(5, "Multipart: Saving FILES_TMP_CONTENT:" + name + " variable.");
 #endif
-        variables.emplace("FILES_TMP_CONTENT:" + name, m.content);
+        col->storeOrUpdateFirst("FILES_TMP_CONTENT:" + name, m.content);
         files_size = files_size + m.content.size();
         if (m.invalidQuote) {
 #ifndef NO_LOGS
@@ -284,12 +287,12 @@ bool Multipart::process(std::string data) {
         }
     }
     if (filename.empty() == false) {
-        variables.emplace("MULTIPART_FILENAME", filename);
+        col->storeOrUpdateFirst("MULTIPART_FILENAME", filename);
     }
     if (name.empty() == false) {
-        variables.emplace("MULTIPART_NAME", name);
+        col->storeOrUpdateFirst("MULTIPART_NAME", name);
     }
-    variables.emplace("FILES_COMBINED_SIZE", std::to_string(files_size));
+    col->storeOrUpdateFirst("FILES_COMBINED_SIZE", std::to_string(files_size));
 
     return true;
 }

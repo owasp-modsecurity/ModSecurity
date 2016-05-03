@@ -34,7 +34,7 @@ namespace modsecurity {
 namespace Variables {
 
 void Env::evaluateInternal(Transaction *transaction,
-    std::vector<const transaction::Variable *> *l) {
+    std::vector<const collection::Variable *> *l) {
     std::map<std::string, std::string> envs;
     for (char **current = environ; *current; current++) {
         std::string env = std::string(*current);
@@ -47,7 +47,7 @@ void Env::evaluateInternal(Transaction *transaction,
 
         envs.insert(std::pair<std::string, std::string>("ENV:" + key, value));
         if ("env:" + key == m_name) {
-            l->push_back(new transaction::Variable(m_name, value));
+            l->push_back(new collection::Variable(m_name, value));
             return;
         }
     }
@@ -57,7 +57,7 @@ void Env::evaluateInternal(Transaction *transaction,
             && (x.first != m_name)) {
             continue;
         }
-        l->push_back(new transaction::Variable(x.first, x.second));
+        l->push_back(new collection::Variable(x.first, x.second));
     }
 }
 

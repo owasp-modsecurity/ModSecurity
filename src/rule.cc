@@ -305,7 +305,7 @@ bool Rule::evaluate(Transaction *trasn) {
     for (int i = 0; i < variables->size(); i++) {
         Variable *variable = variables->at(i);
         if (variable->m_isExclusion) {
-            std::vector<const transaction::Variable *> z;
+            std::vector<const collection::Variable *> z;
             variable->evaluateInternal(trasn, &z);
             for (auto &y : z) {
                 exclusions.push_back(y->m_key);
@@ -321,7 +321,7 @@ bool Rule::evaluate(Transaction *trasn) {
             continue;
         }
 
-        std::vector<const transaction::Variable *> e;
+        std::vector<const collection::Variable *> e;
         variable->evaluateInternal(trasn, &e);
 
         for (auto &v : e) {

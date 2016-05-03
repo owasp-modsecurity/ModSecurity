@@ -35,8 +35,6 @@ class Multipart {
     bool process(std::string data);
     void checkForCrlfLf(const std::string &blob);
 
-    transaction::Variables variables;
-
     bool crlf;
     bool containsDataAfter;
     bool containsDataBefore;

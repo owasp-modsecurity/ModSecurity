@@ -30,7 +30,7 @@ namespace Variations {
 
 
 void Exclusion::evaluateInternal(Transaction *transaction,
-    std::vector<const transaction::Variable *> *l) {
+    std::vector<const collection::Variable *> *l) {
     transaction->m_collections.resolveMultiMatches(m_name, l);
 }
 

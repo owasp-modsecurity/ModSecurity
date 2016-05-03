@@ -34,7 +34,7 @@ namespace modsecurity {
 namespace Variables {
 
 void Time::evaluateInternal(Transaction *transaction,
-    std::vector<const transaction::Variable *> *l) {
+    std::vector<const collection::Variable *> *l) {
 
     char tstr[200];
     struct tm timeinfo;
@@ -46,7 +46,7 @@ void Time::evaluateInternal(Transaction *transaction,
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%H:%M:%S", &timeinfo);
 
-    l->push_back(new transaction::Variable("TIME", std::string(tstr)));
+    l->push_back(new collection::Variable("TIME", std::string(tstr)));
 }
 
 

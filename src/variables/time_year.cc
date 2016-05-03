@@ -34,7 +34,7 @@ namespace modsecurity {
 namespace Variables {
 
 void TimeYear::evaluateInternal(Transaction *transaction,
-    std::vector<const transaction::Variable *> *l) {
+    std::vector<const collection::Variable *> *l) {
     char tstr[200];
     struct tm timeinfo;
     time_t timer;
@@ -45,7 +45,7 @@ void TimeYear::evaluateInternal(Transaction *transaction,
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%Y", &timeinfo);
 
-    l->push_back(new transaction::Variable("TIME_YEAR",  std::string(tstr)));
+    l->push_back(new collection::Variable("TIME_YEAR",  std::string(tstr)));
 }
 
 

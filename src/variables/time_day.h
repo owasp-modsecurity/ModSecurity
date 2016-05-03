@@ -34,7 +34,7 @@ class TimeDay : public Variable {
         : Variable(_name) { }
 
     void evaluateInternal(Transaction *transaction,
-        std::vector<const transaction::Variable *> *l) override;
+        std::vector<const collection::Variable *> *l) override;
 };
 
 }  // namespace Variables

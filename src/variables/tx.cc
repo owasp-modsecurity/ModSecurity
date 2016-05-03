@@ -35,7 +35,7 @@ namespace Variables {
 
 
 void Tx::evaluateInternal(Transaction *transaction,
-    std::vector<const transaction::Variable *> *l) {
+    std::vector<const collection::Variable *> *l) {
     if (m_type == SingleMatch) {
         transaction->m_collections.resolveSingleMatch(m_name, "TX", l);
     } else if (m_type == MultipleMatches) {

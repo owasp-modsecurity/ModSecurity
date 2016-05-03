@@ -40,9 +40,9 @@ typedef struct Rules_t Rules;
 #endif
 
 #include "modsecurity/intervention.h"
-#include "modsecurity/transaction/collections.h"
-#include "modsecurity/transaction/variable.h"
-#include "modsecurity/transaction/variables.h"
+#include "modsecurity/collection/collections.h"
+#include "modsecurity/collection/variable.h"
+#include "modsecurity/collection/collection.h"
 
 #define LOGFY_ADD(a, b) \
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
@@ -70,7 +70,6 @@ namespace modsecurity {
 class ModSecurity;
 class Transaction;
 class Rules;
-class Collections;
 class RuleMessage;
 namespace actions {
 class Action;
@@ -316,7 +315,7 @@ class Transaction {
     /**
      * Holds all the collections related to that transaction.
      */
-    transaction::Collections m_collections;
+    collection::Collections m_collections;
 
     /**
      * Holds the whatever matched in the operation utilization.

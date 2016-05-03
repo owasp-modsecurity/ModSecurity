@@ -38,7 +38,7 @@ class Exclusion : public Variable {
         { m_isExclusion = true; }
 
     void evaluateInternal(Transaction *transaction,
-        std::vector<const transaction::Variable *> *l) override;
+        std::vector<const collection::Variable *> *l) override;
 
     Variable *var;
 };
