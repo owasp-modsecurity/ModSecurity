@@ -27,8 +27,8 @@
 #include "modsecurity/collection/variable.h"
 #include "modsecurity/collection/collection.h"
 
-#ifndef HEADERS_MODSECURITY_COLLECTION_BACKEND_IN_MEMORY_PER_PROCESS_H_
-#define HEADERS_MODSECURITY_COLLECTION_BACKEND_IN_MEMORY_PER_PROCESS_H_
+#ifndef SRC_COLLECTION_BACKEND_IN_MEMORY_PER_PROCESS_H_
+#define SRC_COLLECTION_BACKEND_IN_MEMORY_PER_PROCESS_H_
 
 #ifdef __cplusplus
 namespace modsecurity {
@@ -46,14 +46,11 @@ namespace backend {
  */
 struct MyEqual {
     bool operator()(const std::string& Left, const std::string& Right) const {
-        /*
         return Left.size() == Right.size()
              && std::equal(Left.begin(), Left.end(), Right.begin(),
             [](char a, char b) {
             return tolower(a) == tolower(b);
         });
-        */
-        return Left == Right;
     }
 };
 
@@ -75,23 +72,41 @@ class InMemoryPerProcess :
  public:
     InMemoryPerProcess();
     ~InMemoryPerProcess();
-    void store(std::string key, std::string value);
+    void store(std::string key, std::string value) override;
 
     bool storeOrUpdateFirst(const std::string &key,
-        const std::string &value);
+        const std::string &value) override;
 
-    bool updateFirst(const std::string &key, const std::string &value);
+    bool updateFirst(const std::string &key,
+        const std::string &value) override;
 
-    void del(const std::string& key);
+    void del(const std::string& key) override;
 
-    std::string* resolveFirst(const std::string& var);
+    std::string* resolveFirst(const std::string& var) override;
 
     void resolveSingleMatch(const std::string& var,
-        std::vector<const Variable *> *l);
+        std::vector<const Variable *> *l) override;
     void resolveMultiMatches(const std::string& var,
-        std::vector<const Variable *> *l);
+        std::vector<const Variable *> *l) override;
     void resolveRegularExpression(const std::string& var,
-        std::vector<const Variable *> *l);
+        std::vector<const Variable *> *l) override;
+
+    void store(std::string key, std::string compartment,
+        std::string value) override;
+    bool storeOrUpdateFirst(const std::string &key, std::string compartment,
+        const std::string &value) override;
+    bool updateFirst(const std::string &key, std::string compartment,
+        const std::string &value) override;
+    void del(const std::string& key, std::string compartment) override;
+
+    std::string* resolveFirst(const std::string& var,
+        std::string compartment) override;
+    void resolveSingleMatch(const std::string& var, std::string compartment,
+        std::vector<const Variable *> *l) override;
+    void resolveMultiMatches(const std::string& var, std::string compartment,
+        std::vector<const Variable *> *l) override;
+    void resolveRegularExpression(const std::string& var,
+        std::string compartment, std::vector<const Variable *> *l) override;
 };
 
 }  // namespace backend
@@ -100,4 +115,4 @@ class InMemoryPerProcess :
 #endif
 
 
-#endif  // HEADERS_MODSECURITY_COLLECTION_BACKEND_IN_MEMORY_PER_PROCESS_H_
+#endif  // SRC_COLLECTION_BACKEND_IN_MEMORY_PER_PROCESS_H_

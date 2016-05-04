@@ -27,12 +27,11 @@
 #include <list>
 #endif
 
-#include "modsecurity/collection/global_collection.h"
 #include "modsecurity/collection/collection.h"
 #include "modsecurity/collection/variable.h"
 
-#ifndef HEADERS_MODSECURITY_TRANSACTION_COLLECTIONS_H_
-#define HEADERS_MODSECURITY_TRANSACTION_COLLECTIONS_H_
+#ifndef HEADERS_MODSECURITY_COLLECTION_COLLECTIONS_H_
+#define HEADERS_MODSECURITY_COLLECTION_COLLECTIONS_H_
 
 #ifndef __cplusplus
 typedef struct Collections_t Collections;
@@ -46,7 +45,7 @@ namespace collection {
 class Collections :
     public std::unordered_map<std::string, Collection *> {
  public:
-    Collections(GlobalCollection *global, GlobalCollection *ip);
+    Collections(Collection *global, Collection *ip);
     ~Collections();
 
     void store(std::string key, std::string value);
@@ -88,8 +87,8 @@ class Collections :
     std::string m_global_collection_key;
     std::string m_ip_collection_key;
 
-    GlobalCollection *m_global_collection;
-    GlobalCollection *m_ip_collection;
+    Collection *m_global_collection;
+    Collection *m_ip_collection;
 };
 
 }  // namespace collection
@@ -97,6 +96,6 @@ class Collections :
 #endif
 
 
-#endif  // HEADERS_MODSECURITY_TRANSACTION_COLLECTIONS_H_
+#endif  // HEADERS_MODSECURITY_COLLECTION_COLLECTIONS_H_
 
 

@@ -33,8 +33,8 @@ namespace modsecurity {
 namespace collection {
 
 
-Collections::Collections(GlobalCollection *global,
-    GlobalCollection *ip)
+Collections::Collections(Collection *global,
+    Collection *ip)
     : m_global_collection_key(""),
     m_ip_collection_key(""),
     m_global_collection(global),
@@ -139,7 +139,8 @@ std::string* Collections::resolveFirst(const std::string& collectionName,
 
         for (auto &a : *this) {
             if (tolower(a.first) == tolower(collectionName)) {
-                std::string *res = a.second->resolveFirst(toupper(a.first) + ":" + var);
+                std::string *res = a.second->resolveFirst(toupper(a.first)
+                    + ":" + var);
                 if (res != NULL) {
                     return res;
                 }

@@ -53,7 +53,8 @@ bool InMemoryPerProcess::storeOrUpdateFirst(const std::string &key,
 }
 
 
-bool InMemoryPerProcess::updateFirst(const std::string &key, const std::string &value) {
+bool InMemoryPerProcess::updateFirst(const std::string &key,
+    const std::string &value) {
     auto range = this->equal_range(key);
 
     for (auto it = range.first; it != range.second; ++it) {
@@ -120,6 +121,63 @@ std::string* InMemoryPerProcess::resolveFirst(const std::string& var) {
 
     return NULL;
 }
+
+
+void InMemoryPerProcess::store(std::string key, std::string compartment,
+    std::string value) {
+    std::string nkey = key + "::" + compartment;
+    store(nkey, value);
+}
+
+
+bool InMemoryPerProcess::storeOrUpdateFirst(const std::string &key,
+    std::string compartment, const std::string &value) {
+    std::string nkey = key + "::" + compartment;
+    return storeOrUpdateFirst(nkey, value);
+}
+
+
+bool InMemoryPerProcess::updateFirst(const std::string &key,
+    std::string compartment, const std::string &value) {
+    std::string nkey = key + "::" + compartment;
+    return updateFirst(nkey, value);
+}
+
+
+void InMemoryPerProcess::del(const std::string& key,
+    std::string compartment) {
+    std::string nkey = key + "::" + compartment;
+    del(nkey);
+}
+
+
+std::string* InMemoryPerProcess::resolveFirst(const std::string& var,
+    std::string compartment) {
+    std::string nkey = var + "::" + compartment;
+    return resolveFirst(nkey);
+}
+
+
+void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
+    std::string compartment, std::vector<const Variable *> *l) {
+    std::string nkey = var + "::" + compartment;
+    resolveSingleMatch(nkey, l);
+}
+
+
+void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
+    std::string compartment, std::vector<const Variable *> *l) {
+    std::string nkey = var + "::" + compartment;
+    resolveMultiMatches(nkey, l);
+}
+
+
+void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
+    std::string compartment, std::vector<const Variable *> *l) {
+    std::string nkey = var + "::" + compartment;
+    resolveRegularExpression(nkey, l);
+}
+
 
 }  // namespace backend
 }  // namespace collection

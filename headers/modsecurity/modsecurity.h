@@ -93,7 +93,6 @@ typedef struct ModSecurity_t modsecurity;
 #include "modsecurity/transaction.h"
 #include "modsecurity/debug_log.h"
 #include "modsecurity/rules.h"
-#include "modsecurity/collection/global_collection.h"
 
 /**
  * TAG_NUM:
@@ -223,8 +222,9 @@ class ModSecurity {
      NUMBER_OF_PHASES,
     };
 
-    collection::GlobalCollection m_global_collection;
-    collection::GlobalCollection m_ip_collection;
+    collection::Collection *m_global_collection;
+    collection::Collection *m_ip_collection;
+
  private:
     std::string m_connector;
     LogCb m_logCb;

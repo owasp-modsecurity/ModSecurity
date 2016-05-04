@@ -34,7 +34,6 @@ pkginclude_HEADERS = \
 libmodsecurity_includesub_HEADERS = \
 	../headers/modsecurity/collection/collection.h \
 	../headers/modsecurity/collection/collections.h \
-	../headers/modsecurity/collection/global_collection.h \
 	../headers/modsecurity/collection/variable.h
 
 
@@ -175,7 +174,6 @@ UTILS = \
 
 COLLECTION = \
 	collection/collections.cc \
-	collection/global_collections.cc \
 	collection/backend/in_memory-per_process.cc
 
 

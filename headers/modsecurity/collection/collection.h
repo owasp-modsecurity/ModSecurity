@@ -26,8 +26,8 @@
 
 #include "modsecurity/collection/variable.h"
 
-#ifndef HEADERS_MODSECURITY_TRANSACTION_COLLECTION_H_
-#define HEADERS_MODSECURITY_TRANSACTION_COLLECTION_H_
+#ifndef HEADERS_MODSECURITY_COLLECTION_COLLECTION_H_
+#define HEADERS_MODSECURITY_COLLECTION_COLLECTION_H_
 
 #ifndef __cplusplus
 typedef struct Variable_t Variables;
@@ -44,7 +44,8 @@ class Collection {
     virtual bool storeOrUpdateFirst(const std::string &key,
         const std::string &value) = 0;
 
-    virtual bool updateFirst(const std::string &key, const std::string &value) = 0;
+    virtual bool updateFirst(const std::string &key,
+        const std::string &value) = 0;
 
     virtual void del(const std::string& key) = 0;
 
@@ -56,6 +57,28 @@ class Collection {
         std::vector<const Variable *> *l) = 0;
     virtual void resolveRegularExpression(const std::string& var,
         std::vector<const Variable *> *l) = 0;
+
+
+    virtual void store(std::string key, std::string compartment,
+        std::string value) = 0;
+
+    virtual bool storeOrUpdateFirst(const std::string &key,
+        std::string compartment, const std::string &value) = 0;
+
+    virtual bool updateFirst(const std::string &key, std::string compartment,
+        const std::string &value) = 0;
+
+    virtual void del(const std::string& key, std::string compartment) = 0;
+
+    virtual std::string* resolveFirst(const std::string& var,
+        std::string compartment) = 0;
+    virtual void resolveSingleMatch(const std::string& var,
+        std::string compartment, std::vector<const Variable *> *l) = 0;
+    virtual void resolveMultiMatches(const std::string& var,
+        std::string compartment, std::vector<const Variable *> *l) = 0;
+    virtual void resolveRegularExpression(const std::string& var,
+        std::string compartment,
+        std::vector<const Variable *> *l) = 0;
 };
 
 }  // namespace collection
@@ -63,4 +86,4 @@ class Collection {
 #endif
 
 
-#endif  // HEADERS_MODSECURITY_TRANSACTION_COLLECTION_H_
+#endif  // HEADERS_MODSECURITY_COLLECTION_COLLECTION_H_
