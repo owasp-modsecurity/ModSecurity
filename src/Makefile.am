@@ -173,11 +173,13 @@ UTILS = \
 	utils/regex.cc \
 	utils/sha1.cc
 
-
-libmodsecurity_la_SOURCES = \
-	collection/collection.cc \
+COLLECTION = \
 	collection/collections.cc \
 	collection/global_collections.cc \
+	collection/backend/in_memory-per_process.cc
+
+
+libmodsecurity_la_SOURCES = \
 	parser/seclang-parser.yy \
 	parser/seclang-scanner.ll \
 	parser/driver.cc \
@@ -199,6 +201,7 @@ libmodsecurity_la_SOURCES = \
 	rule.cc \
 	unique_id.cc \
 	${ACTIONS} \
+	${COLLECTION} \
 	${OPERATORS} \
 	${UTILS} \
 	${VARIABLES}

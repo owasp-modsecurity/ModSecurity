@@ -1327,21 +1327,15 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     audit_log << std::endl;
 
     if (parts & audit_log::AuditLog::BAuditLogPart) {
+        std::vector<const collection::Variable *> l;
         audit_log << "--" << trailer << "-" << "B--" << std::endl;
         audit_log << this->m_method << " " << this->m_uri << " " << "HTTP/";
         audit_log << this->m_httpVersion << std::endl;
 
-        for (auto h : m_collections.m_transient) {
-            std::string filter = "REQUEST_HEADERS:";
-            std::string a = h.first;
-            std::string b = h.second;
-
-            if (a.compare(0, filter.length(), filter) == 0) {
-                if (a.length() > filter.length()) {
-                    audit_log << a.c_str() + filter.length() << ": ";
-                    audit_log << b.c_str() << std::endl;
-                }
-            }
+        m_collections.m_transient->resolveMultiMatches("REQUEST_HEADERS", &l);
+        for (auto h : l) {
+            audit_log << h->m_key.c_str() << ": ";
+            audit_log << h->m_value.c_str() << std::endl;
         }
     }
     if (parts & audit_log::AuditLog::CAuditLogPart) {
@@ -1357,18 +1351,13 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         /** TODO: write audit_log E part. */
     }
     if (parts & audit_log::AuditLog::FAuditLogPart) {
-        audit_log << "--" << trailer << "-" << "F--" << std::endl;
-        for (auto h : m_collections.m_transient) {
-            std::string filter = "RESPONSE_HEADERS:";
-            std::string a = h.first;
-            std::string b = h.second;
+        std::vector<const collection::Variable *> l;
 
-            if (a.compare(0, filter.length(), filter) == 0) {
-                if (a.length() > filter.length()) {
-                    audit_log << a.c_str() + filter.length() << ": ";
-                    audit_log << b.c_str() << std::endl;
-                }
-            }
+        audit_log << "--" << trailer << "-" << "F--" << std::endl;
+        m_collections.m_transient->resolveMultiMatches("RESPONSE_HEADERS", &l);
+        for (auto h : l) {
+            audit_log << h->m_key.c_str() << ": ";
+            audit_log << h->m_value.c_str() << std::endl;
         }
     }
     if (parts & audit_log::AuditLog::GAuditLogPart) {
@@ -1443,20 +1432,15 @@ std::string Transaction::toJSON(int parts) {
 
     /* request headers */
     if (parts & audit_log::AuditLog::BAuditLogPart) {
+        std::vector<const collection::Variable *> l;
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
             strlen("headers"));
         yajl_gen_map_open(g);
 
-        for (auto h : m_collections.m_transient) {
-            std::string filter = "REQUEST_HEADERS:";
-            std::string a = h.first;
-            std::string b = h.second;
 
-            if (a.compare(0, filter.length(), filter) == 0) {
-                if (a.length() > filter.length()) {
-                    LOGFY_ADD(a.c_str() + filter.length(), b.c_str());
-                }
-            }
+        m_collections.m_transient->resolveMultiMatches("REQUEST_HEADERS", &l);
+        for (auto h : l) {
+            LOGFY_ADD(h->m_key.c_str(), h->m_value.c_str());
         }
 
         /* end: request headers */
@@ -1478,21 +1462,16 @@ std::string Transaction::toJSON(int parts) {
 
     /* response headers */
     if (parts & audit_log::AuditLog::FAuditLogPart) {
+        std::vector<const collection::Variable *> l;
         yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
             strlen("headers"));
         yajl_gen_map_open(g);
 
-        for (auto h : m_collections.m_transient) {
-            std::string filter = "RESPONSE_HEADERS:";
-            std::string a = h.first;
-            std::string b = h.second;
-
-            if (a.compare(0, filter.length(), filter) == 0) {
-                if (a.length() > filter.length()) {
-                    LOGFY_ADD(a.c_str() + filter.length(), b.c_str());
-                }
-            }
+        m_collections.m_transient->resolveMultiMatches("RESPONSE_HEADERS", &l);
+        for (auto h : l) {
+            LOGFY_ADD(h->m_key.c_str(), h->m_value.c_str());
         }
+
         /* end: response headers */
         yajl_gen_map_close(g);
     }

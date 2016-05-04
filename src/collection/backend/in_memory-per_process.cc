@@ -14,7 +14,7 @@
  */
 
 
-#include "modsecurity/collection/collection.h"
+#include "src/collection/backend/in_memory-per_process.h"
 
 #ifdef __cplusplus
 #include <string>
@@ -28,22 +28,23 @@
 
 namespace modsecurity {
 namespace collection {
+namespace backend {
 
 
-Collection::Collection() {
+InMemoryPerProcess::InMemoryPerProcess() {
     this->reserve(1000);
 }
 
-Collection::~Collection() {
+InMemoryPerProcess::~InMemoryPerProcess() {
     this->clear();
 }
 
-void Collection::store(std::string key, std::string value) {
+void InMemoryPerProcess::store(std::string key, std::string value) {
     this->emplace(key, value);
 }
 
 
-bool Collection::storeOrUpdateFirst(const std::string &key,
+bool InMemoryPerProcess::storeOrUpdateFirst(const std::string &key,
     const std::string &value) {
     if (updateFirst(key, value) == false) {
         store(key, value);
@@ -52,7 +53,7 @@ bool Collection::storeOrUpdateFirst(const std::string &key,
 }
 
 
-bool Collection::updateFirst(const std::string &key, const std::string &value) {
+bool InMemoryPerProcess::updateFirst(const std::string &key, const std::string &value) {
     auto range = this->equal_range(key);
 
     for (auto it = range.first; it != range.second; ++it) {
@@ -63,12 +64,12 @@ bool Collection::updateFirst(const std::string &key, const std::string &value) {
 }
 
 
-void Collection::del(const std::string& key) {
+void InMemoryPerProcess::del(const std::string& key) {
     this->erase(key);
 }
 
 
-void Collection::resolveSingleMatch(const std::string& var,
+void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
     std::vector<const Variable *> *l) {
     auto range = this->equal_range(var);
 
@@ -78,7 +79,7 @@ void Collection::resolveSingleMatch(const std::string& var,
 }
 
 
-void Collection::resolveMultiMatches(const std::string& var,
+void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
     std::vector<const Variable *> *l) {
     size_t keySize = var.size();
     l->reserve(15);
@@ -104,13 +105,13 @@ void Collection::resolveMultiMatches(const std::string& var,
 }
 
 
-void Collection::resolveRegularExpression(const std::string& var,
+void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
     std::vector<const Variable *> *l) {
     /* Not ready */
 }
 
 
-std::string* Collection::resolveFirst(const std::string& var) {
+std::string* InMemoryPerProcess::resolveFirst(const std::string& var) {
     auto range = equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
@@ -120,6 +121,6 @@ std::string* Collection::resolveFirst(const std::string& var) {
     return NULL;
 }
 
-
+}  // namespace backend
 }  // namespace collection
 }  // namespace modsecurity
