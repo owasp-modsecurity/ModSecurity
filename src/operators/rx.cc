@@ -29,8 +29,14 @@ namespace operators {
 bool Rx::evaluate(Transaction *transaction, const std::string& input) {
     SMatch match;
 
+    if (m_param.empty()) {
+        return true;
+    }
+
     if (regex_search(input, &match, *m_re) && match.size() >= 1) {
-        transaction->m_matched.push_back(match.match);
+        if (transaction) {
+            transaction->m_matched.push_back(match.match);
+        }
         return true;
     }
 
