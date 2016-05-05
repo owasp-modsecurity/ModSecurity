@@ -85,7 +85,8 @@ int main (int argc, char **argv)
     int i = 0;
     pid_t pid;
     int shmid;
-
+    int h;
+    
     modsec = msc_init();
 
     key = ftok("shmdemo.c", 'R');
@@ -110,7 +111,7 @@ int main (int argc, char **argv)
 
     msc_rules_dump(rules);
 
-    for (int h = 0; h < FORKS; h++) {
+    for (h = 0; h < FORKS; h++) {
         pid = fork();
         if (pid == 0) {
             pthread_create (&thread[h*TRHREADS], NULL, (void *) &process_request, (void *) NULL);
