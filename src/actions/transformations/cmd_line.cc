@@ -30,23 +30,57 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-CmdLine::CmdLine(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 std::string CmdLine::evaluate(std::string value,
     Transaction *transaction) {
-    /**
-     * @todo Implement the transformation CmdLine
-     */
-    if (transaction) {
-#ifndef NO_LOGS
-        transaction->debug(4, "Transformation CmdLine is not implemented yet.");
-#endif
+    std::string ret;
+    int space = 0;
+
+    for (auto& a : value) {
+        switch (a) {
+            /* remove some characters */
+            case '"':
+            case '\'':
+            case '\\':
+            case '^':
+                //ret.append("i was here");
+                break;
+
+            /* replace some characters to space (only one) */
+            case ' ':
+            case ',':
+            case ';':
+            case '\t':
+            case '\r':
+            case '\n':
+                if (space == 0) {
+                    ret.append(" ");
+                    space++;
+                }
+                break;
+
+            /* remove space before / or ( */
+            case '/':
+            case '(':
+                if (space) {
+                    ret.pop_back();
+                }
+                space = 0;
+                ret.append(&a, 1);
+                break;
+
+            /* copy normal characters */
+            default :
+                char b = std::tolower(a);
+                ret.append(&b);
+                space = 0;
+                break;
+        }
     }
-    return value;
+
+    return ret;
 }
+
 
 }  // namespace transformations
 }  // namespace actions
