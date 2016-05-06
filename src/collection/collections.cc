@@ -34,11 +34,12 @@ namespace collection {
 
 
 Collections::Collections(Collection *global,
-    Collection *ip)
+    Collection *ip, Collection *session)
     : m_global_collection_key(""),
     m_ip_collection_key(""),
     m_global_collection(global),
     m_ip_collection(ip),
+    m_session_collection(session),
     m_transient(new backend::InMemoryPerProcess()) {
     /* Create collection TX */
     this->emplace("TX", new backend::InMemoryPerProcess());
@@ -66,6 +67,13 @@ void Collections::storeOrUpdateFirst(const std::string& collectionName,
         && !m_global_collection_key.empty()) {
         m_global_collection->storeOrUpdateFirst(collectionName + ":"
             + variableName, m_global_collection_key, targetValue);
+        return;
+    }
+
+    if (tolower(collectionName) == "session"
+        && !m_session_collection_key.empty()) {
+        m_session_collection->storeOrUpdateFirst(collectionName + ":"
+            + variableName, m_session_collection_key, targetValue);
         return;
     }
 
@@ -137,6 +145,12 @@ std::string* Collections::resolveFirst(const std::string& collectionName,
                     + ":" + var, m_global_collection_key);
         }
 
+        if (tolower(collectionName) == "session"
+            && !m_session_collection_key.empty()) {
+            return m_session_collection->resolveFirst(toupper(collectionName)
+                    + ":" + var, m_session_collection_key);
+        }
+
         for (auto &a : *this) {
             if (tolower(a.first) == tolower(collectionName)) {
                 std::string *res = a.second->resolveFirst(toupper(a.first)
@@ -175,6 +189,13 @@ void Collections::resolveSingleMatch(const std::string& var,
         return;
     }
 
+    if (tolower(collection) == "session"
+        && !m_session_collection_key.empty()) {
+        m_session_collection->resolveSingleMatch(var,
+            m_session_collection_key, l);
+        return;
+    }
+
     try {
         this->at(collection)->resolveSingleMatch(var, l);
     } catch (...) { }
@@ -203,6 +224,13 @@ void Collections::resolveMultiMatches(const std::string& var,
         return;
     }
 
+    if (tolower(collection) == "session"
+        && !m_session_collection_key.empty()) {
+        m_session_collection->resolveMultiMatches(var,
+            m_session_collection_key, l);
+        return;
+    }
+
     try {
         this->at(collection)->resolveMultiMatches(var, l);
     } catch (...) { }
@@ -228,6 +256,13 @@ void Collections::resolveRegularExpression(const std::string& var,
         && !m_global_collection_key.empty()) {
         m_global_collection->resolveRegularExpression(toupper(collection)
             + ":" + var, m_global_collection_key, l);
+        return;
+    }
+
+    if (tolower(collection) == "session"
+        && !m_session_collection_key.empty()) {
+        m_session_collection->resolveRegularExpression(toupper(collection)
+            + ":" + var, m_session_collection_key, l);
         return;
     }
 

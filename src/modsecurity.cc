@@ -48,6 +48,7 @@ ModSecurity::ModSecurity()
     : m_connector(""),
     m_global_collection(new collection::backend::InMemoryPerProcess()),
     m_ip_collection(new collection::backend::InMemoryPerProcess()),
+    m_session_collection(new collection::backend::InMemoryPerProcess()),
     m_logCb(NULL) {
     UniqueId::uniqueId();
     srand(time(NULL));

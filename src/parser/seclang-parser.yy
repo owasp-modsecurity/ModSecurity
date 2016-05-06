@@ -24,6 +24,7 @@ class Driver;
 #include "actions/audit_log.h"
 #include "actions/ctl_audit_log_parts.h"
 #include "actions/init_col.h"
+#include "actions/set_sid.h"
 #include "actions/set_var.h"
 #include "actions/severity.h"
 #include "actions/skip_after.h"
@@ -66,6 +67,7 @@ using modsecurity::actions::Accuracy;
 using modsecurity::actions::Action;
 using modsecurity::actions::CtlAuditLogParts;
 using modsecurity::actions::InitCol;
+using modsecurity::actions::SetSID;
 using modsecurity::actions::SetVar;
 using modsecurity::actions::Severity;
 using modsecurity::actions::Tag;
@@ -906,7 +908,7 @@ act:
         TODO: setEnv is not implemented yet.
 
         std::string error;
-        SetEnv *setEnv = new SetEnv($1);
+        SetEnv *setEnv = new s($1);
 
         if (setEnv->init(&error) == false) {
             driver.parserError << error;
@@ -919,12 +921,8 @@ act:
       }
     | ACTION_SETSID
       {
-        /*
-
-        TODO: setSID is not implemented yet.
-
         std::string error;
-        SetEnv *setSID = new SetSID($1);
+        SetSID *setSID = new SetSID($1);
 
         if (setSID->init(&error) == false) {
             driver.parserError << error;
@@ -932,8 +930,6 @@ act:
         }
 
         $$ = setSID;
-        */
-        $$ = Action::instantiate($1);
       }
     | ACTION_SETUID
       {

@@ -112,7 +112,8 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_creationTimeStamp(cpu_seconds()),
     m_logCbData(logCbData),
     m_ms(ms),
-    m_collections(ms->m_global_collection, ms->m_ip_collection) {
+    m_collections(ms->m_global_collection, ms->m_ip_collection,
+        ms->m_session_collection) {
     m_id = std::to_string(this->m_timeStamp) + \
         std::to_string(generate_transaction_unique_id());
     m_rules->incrementReferenceCount();
