@@ -62,11 +62,11 @@ std::string MacroExpansion::expand(const std::string& input,
             variableValue = transaction->m_collections.resolveFirst(col, var);
         }
 
-        if (res[end - start + 2] == '%') {
-            res.erase(start, end - start + 1);
-        } else {
-            res.erase(start, end - start + 2);
+        res.erase(start, end - start + 1);
+        if (res[start] == '%') {
+            res.erase(start, 1);
         }
+
         if (variableValue != NULL) {
             res.insert(start, *variableValue);
         }
