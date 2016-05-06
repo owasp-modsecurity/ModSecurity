@@ -47,6 +47,7 @@ bool SetSID::evaluate(Rule *rule, Transaction *t) {
 #endif
 
     t->m_collections.m_session_collection_key = colNameExpanded;
+    t->m_collections.storeOrUpdateFirst("SESSIONID", colNameExpanded);
 
     return true;
 }
