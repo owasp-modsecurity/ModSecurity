@@ -25,6 +25,7 @@ class Driver;
 #include "actions/ctl_audit_log_parts.h"
 #include "actions/init_col.h"
 #include "actions/set_sid.h"
+#include "actions/set_uid.h"
 #include "actions/set_var.h"
 #include "actions/severity.h"
 #include "actions/skip_after.h"
@@ -68,6 +69,7 @@ using modsecurity::actions::Action;
 using modsecurity::actions::CtlAuditLogParts;
 using modsecurity::actions::InitCol;
 using modsecurity::actions::SetSID;
+using modsecurity::actions::SetUID;
 using modsecurity::actions::SetVar;
 using modsecurity::actions::Severity;
 using modsecurity::actions::Tag;
@@ -933,12 +935,8 @@ act:
       }
     | ACTION_SETUID
       {
-        /*
-
-        TODO: setUID is not implemented yet.
-
         std::string error;
-        SetEnv *setUID = new SetUID($1);
+        SetUID *setUID = new SetUID($1);
 
         if (setUID->init(&error) == false) {
             driver.parserError << error;
@@ -946,8 +944,6 @@ act:
         }
 
         $$ = setUID;
-        */
-        $$ = Action::instantiate($1);
       }
     | ACTION_SETVAR
       {

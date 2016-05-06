@@ -45,7 +45,8 @@ namespace collection {
 class Collections :
     public std::unordered_map<std::string, Collection *> {
  public:
-    Collections(Collection *global, Collection *ip, Collection *session);
+    Collections(Collection *global, Collection *ip, Collection *session,
+        Collection *user);
     ~Collections();
 
     void store(std::string key, std::string value);
@@ -87,10 +88,12 @@ class Collections :
     std::string m_global_collection_key;
     std::string m_ip_collection_key;
     std::string m_session_collection_key;
+    std::string m_user_collection_key;
 
     Collection *m_global_collection;
     Collection *m_ip_collection;
     Collection *m_session_collection;
+    Collection *m_user_collection;
 };
 
 }  // namespace collection

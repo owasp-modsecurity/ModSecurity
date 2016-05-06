@@ -225,6 +225,7 @@ class ModSecurity {
     collection::Collection *m_global_collection;
     collection::Collection *m_ip_collection;
     collection::Collection *m_session_collection;
+    collection::Collection *m_user_collection;
 
  private:
     std::string m_connector;

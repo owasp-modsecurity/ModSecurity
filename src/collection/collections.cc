@@ -34,12 +34,13 @@ namespace collection {
 
 
 Collections::Collections(Collection *global,
-    Collection *ip, Collection *session)
+    Collection *ip, Collection *session, Collection *user)
     : m_global_collection_key(""),
     m_ip_collection_key(""),
     m_global_collection(global),
     m_ip_collection(ip),
     m_session_collection(session),
+    m_user_collection(user),
     m_transient(new backend::InMemoryPerProcess()) {
     /* Create collection TX */
     this->emplace("TX", new backend::InMemoryPerProcess());
