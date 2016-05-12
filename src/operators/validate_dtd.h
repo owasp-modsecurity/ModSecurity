@@ -16,6 +16,12 @@
 #ifndef SRC_OPERATORS_VALIDATE_DTD_H_
 #define SRC_OPERATORS_VALIDATE_DTD_H_
 
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <libxml/xmlschemas.h>
+#include <libxml/xpath.h>
+
 #include <string>
 
 #include "operators/operator.h"
@@ -27,8 +33,60 @@ namespace operators {
 class ValidateDTD : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    ValidateDTD(std::string o, std::string p, bool i);
+    ValidateDTD(std::string o, std::string p, bool i)
+        : Operator(o, p, i),
+        m_dtd(NULL) { }
+    ~ValidateDTD() {
+        if (m_dtd != NULL) {
+            xmlFreeDtd(m_dtd);
+            m_dtd = NULL;
+        }
+    }
+
     bool evaluate(Transaction *transaction, const std::string  &str) override;
+    bool init(const std::string &file, const char **error) override;
+
+
+    static void error_runtime(void *ctx, const char *msg, ...) {
+        Transaction *t = reinterpret_cast<Transaction *>(ctx);
+        char buf[1024];
+        std::string s;
+        va_list args;
+
+        va_start(args, msg);
+        int len = vsnprintf(buf, sizeof(buf), msg, args);
+        va_end(args);
+
+        if (len > 0) {
+            s = "XML Error: " + std::string(buf);
+        }
+        t->debug(4, s);
+    }
+
+
+    static void warn_runtime(void *ctx, const char *msg, ...) {
+        Transaction *t = reinterpret_cast<Transaction *>(ctx);
+        char buf[1024];
+        std::string s;
+        va_list args;
+
+        va_start(args, msg);
+        int len = vsnprintf(buf, sizeof(buf), msg, args);
+        va_end(args);
+
+        if (len > 0) {
+            s = "XML Warning: " + std::string(buf);
+        }
+        t->debug(4, s);
+    }
+
+
+    static void null_error(void *ctx, const char *msg, ...) {
+    }
+
+ private:
+    std::string m_resource;
+    xmlDtdPtr m_dtd;
 };
 
 }  // namespace operators

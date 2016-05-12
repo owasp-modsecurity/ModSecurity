@@ -17,25 +17,90 @@
 
 #include <string>
 
+#include "request_body_processor/xml.h"
+#include "src/utils.h"
 #include "operators/operator.h"
 
 namespace modsecurity {
 namespace operators {
 
-bool ValidateDTD::evaluate(Transaction *transaction, const std::string &str) {
-    /**
-     * @todo Implement the operator ValidateDTD.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#validateDTD
-     */
+
+bool ValidateDTD::init(const std::string &file, const char **error) {
+    m_resource = find_resource(param, file);
+    if (m_resource == "") {
+        std::string f("XML: File not found: " + param + ".");
+        *error = strdup(f.c_str());
+        return false;
+    }
+
+    xmlThrDefSetGenericErrorFunc(NULL,
+        null_error);
+
+    xmlSetGenericErrorFunc(NULL,
+        null_error);
+
+    m_dtd = xmlParseDTD(NULL, (const xmlChar *)m_resource.c_str());
+    if (m_dtd == NULL) {
+        std::string err = std::string("XML: Failed to load DTD: ") \
+            + m_resource;
+        *error = strdup(err.c_str());
+        return false;
+    }
+
     return true;
 }
 
 
-ValidateDTD::ValidateDTD(std::string op, std::string param, bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
+bool ValidateDTD::evaluate(Transaction *t, const std::string &str) {
+    xmlValidCtxtPtr cvp;
+
+    if (t->m_xml->m_data.doc == NULL) {
+        t->debug(4, "XML document tree could not "\
+            "be found for DTD validation.");
+        return true;
+    }
+
+    if (t->m_xml->m_data.well_formed != 1) {
+        t->debug(4, "XML: DTD validation failed because " \
+            "content is not well formed.");
+        return true;
+    }
+
+#if 0
+    /* Make sure there were no other generic processing errors */
+    if (msr->msc_reqbody_error) {
+        *error_msg = apr_psprintf(msr->mp,
+                "XML: DTD validation could not proceed due to previous"
+                " processing errors.");
+        return 1;
+    }
+#endif
+
+    cvp = xmlNewValidCtxt();
+    if (cvp == NULL) {
+        t->debug(4, "XML: Failed to create a validation context.");
+        return true;
+    }
+
+    /* Send validator errors/warnings to msr_log */
+    cvp->error = (xmlSchemaValidityErrorFunc)error_runtime;
+    cvp->warning = (xmlSchemaValidityErrorFunc)warn_runtime;
+    cvp->userData = t;
+
+    if (!xmlValidateDtd(cvp, t->m_xml->m_data.doc, m_dtd)) {
+        t->debug(4, "XML: DTD validation failed.");
+        xmlFreeValidCtxt(cvp);
+        return true;
+    }
+
+    t->debug(4, std::string("XML: Successfully validated " \
+        "payload against DTD: ") + m_resource);
+
+    xmlFreeValidCtxt(cvp);
+
+    return false;
 }
+
 
 }  // namespace operators
 }  // namespace modsecurity
