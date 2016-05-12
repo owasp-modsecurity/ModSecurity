@@ -11,13 +11,15 @@ benchmark_LDADD = \
 	$(CURL_LDADD) \
 	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
 	$(PCRE_LDADD) \
-	$(YAJL_LDFLAGS) $(YAJL_LDADD)
+	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
+	$(LIBXML2_LDADD)
 
 benchmark_CPPFLAGS = \
 	-std=c++11 \
 	-I$(top_builddir)/headers \
 	$(GLOBAL_CPPFLAGS) \
-	$(PCRE_CFLAGS)
+	$(PCRE_CFLAGS) \
+	$(LIBXML2_CFLAGS)
 
 
 MAINTAINERCLEANFILES = \

@@ -37,6 +37,7 @@
 #include "modsecurity/intervention.h"
 #include "modsecurity/modsecurity.h"
 #include "request_body_processor/multipart.h"
+#include "request_body_processor/xml.h"
 #include "audit_log/audit_log.h"
 #include "src/unique_id.h"
 #include "src/utils.h"
@@ -44,6 +45,7 @@
 
 using modsecurity::actions::Action;
 using modsecurity::RequestBodyProcessor::Multipart;
+using modsecurity::RequestBodyProcessor::XML;
 
 namespace modsecurity {
 
@@ -113,7 +115,8 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_logCbData(logCbData),
     m_ms(ms),
     m_collections(ms->m_global_collection, ms->m_ip_collection,
-        ms->m_session_collection, ms->m_user_collection) {
+        ms->m_session_collection, ms->m_user_collection),
+    m_xml(new RequestBodyProcessor::XML(this)) {
     m_id = std::to_string(this->m_timeStamp) + \
         std::to_string(generate_transaction_unique_id());
     m_rules->incrementReferenceCount();
@@ -156,6 +159,8 @@ Transaction::~Transaction() {
     m_rulesMessages.clear();
 
     m_rules->decrementReferenceCount();
+
+    delete m_xml;
 }
 
 
@@ -478,6 +483,10 @@ int Transaction::addRequestHeader(const std::string& key,
         if (l == "application/x-www-form-urlencoded") {
             this->m_requestBodyType = WWWFormUrlEncoded;
         }
+
+        if (l == "text/xml") {
+            this->m_requestBodyType = XMLRequestBody;
+        }
     }
     return 1;
 }
@@ -580,6 +589,18 @@ int Transaction::processRequestBody() {
      * }
      * 
      */
+
+    if (m_requestBodyType == XMLRequestBody) {
+        std::string *a = m_collections.resolveFirst(
+            "REQUEST_HEADERS:Content-Type");
+        if (a != NULL) {
+            if (m_xml->init() == true) {
+                m_xml->processChunk(m_requestBody.str().c_str(),
+                    m_requestBody.str().size());
+                m_xml->complete();
+            }
+        }
+    }
 
     if (m_requestBodyType == MultiPartRequestBody) {
         std::string *a = m_collections.resolveFirst(

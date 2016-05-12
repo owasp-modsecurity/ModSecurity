@@ -34,7 +34,9 @@ unit_tests_LDADD = \
 	$(CURL_LDADD) \
 	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
 	$(PCRE_LDADD) \
-	$(YAJL_LDFLAGS) $(YAJL_LDADD)
+	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
+	$(LIBXML2_LDADD)
+
 
 unit_tests_CPPFLAGS = \
 	-std=c++11 \
@@ -48,7 +50,8 @@ unit_tests_CPPFLAGS = \
 	$(GEOIP_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(PCRE_CFLAGS) \
-	$(YAJL_CFLAGS)
+	$(YAJL_CFLAGS) \
+	$(LIBXML2_CFLAGS)
 
 
 # regression
@@ -65,7 +68,9 @@ regression_tests_LDADD = \
 	$(CURL_LDADD) \
 	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
 	$(PCRE_LDADD) \
-	$(YAJL_LDFLAGS) $(YAJL_LDADD)
+	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
+	$(LIBXML2_LDADD)
+
 
 regression_tests_CPPFLAGS = \
 	-std=c++11 \
@@ -79,7 +84,8 @@ regression_tests_CPPFLAGS = \
 	$(GEOIP_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(PCRE_CFLAGS) \
-	$(YAJL_CFLAGS)
+	$(YAJL_CFLAGS) \
+	$(LIBXML2_CFLAGS)
 
 
 # optimization
@@ -95,7 +101,9 @@ rules_optimization_LDADD = \
 	$(CURL_LDADD) \
 	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
 	$(PCRE_LDADD) \
-	$(YAJL_LDFLAGS) $(YAJL_LDADD)
+	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
+	$(LIBXML2_LDADD)
+
 
 rules_optimization_CPPFLAGS = \
 	-std=c++11 \
@@ -109,5 +117,6 @@ rules_optimization_CPPFLAGS = \
 	$(GEOIP_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(PCRE_CFLAGS) \
-	$(YAJL_CFLAGS)
+	$(YAJL_CFLAGS) \
+	$(LIBXML2_CFLAGS)
 

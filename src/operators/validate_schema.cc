@@ -18,26 +18,116 @@
 #include <string>
 
 #include "operators/operator.h"
+#include "request_body_processor/xml.h"
+#include "src/utils.h"
+
 
 namespace modsecurity {
 namespace operators {
 
-bool ValidateSchema::evaluate(Transaction *transaction,
-    const std::string &str) {
-    /**
-     * @todo Implement the operator ValidateSchema.
-     *       Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#validateSchema
-     */
+bool ValidateSchema::init(const std::string &file, const char **error) {
+    m_resource = find_resource(param, file);
+    if (m_resource == "") {
+        std::string f("XML: File not found: " + param + ".");
+        *error = strdup(f.c_str());
+        return false;
+    }
+
+    m_parserCtx = xmlSchemaNewParserCtxt(m_resource.c_str());
+    if (m_parserCtx == NULL) {
+        std::stringstream err;
+        err << "XML: Failed to load Schema from file: ";
+        err << m_resource;
+        err << ". ";
+        if (m_err.empty() == false) {
+            err << m_err;
+        }
+        *error = strdup(err.str().c_str());
+        return false;
+    }
+
+    xmlSchemaSetParserErrors(m_parserCtx,
+        (xmlSchemaValidityErrorFunc)error_load,
+        (xmlSchemaValidityWarningFunc)warn_load, &m_err);
+
+    xmlThrDefSetGenericErrorFunc(m_parserCtx,
+        null_error);
+
+    xmlSetGenericErrorFunc(m_parserCtx,
+        null_error);
+
+    m_schema = xmlSchemaParse(m_parserCtx);
+    if (m_schema == NULL) {
+        std::stringstream err;
+        err << "XML: Failed to load Schema: ";
+        err << m_resource;
+        err << ".";
+        if (m_err.empty() == false) {
+            err << " " << m_err;
+        }
+        *error = strdup(err.str().c_str());
+        xmlSchemaFreeParserCtxt(m_parserCtx);
+        return false;
+    }
+
+    m_validCtx = xmlSchemaNewValidCtxt(m_schema);
+    if (m_validCtx == NULL) {
+        std::stringstream err("XML: Failed to create validation context.");
+        if (m_err.empty() == false) {
+            err << " " << m_err;
+        }
+        *error = strdup(err.str().c_str());
+        return false;
+    }
+
     return true;
 }
 
 
-ValidateSchema::ValidateSchema(std::string op, std::string param,
-    bool negation)
-    : Operator() {
-    this->op = op;
-    this->param = param;
+bool ValidateSchema::evaluate(Transaction *t,
+    const std::string &str) {
+    int rc;
+
+    /* Send validator errors/warnings to msr_log */
+    xmlSchemaSetValidErrors(m_validCtx,
+        (xmlSchemaValidityErrorFunc)error_runtime,
+        (xmlSchemaValidityWarningFunc)warn_runtime, t);
+
+    if (t->m_xml->m_data.doc == NULL) {
+        t->debug(4, "XML document tree could not be found for " \
+            "schema validation.");
+        return true;
+    }
+
+    if (t->m_xml->m_data.well_formed != 1) {
+        t->debug(4, "XML: Schema validation failed because " \
+            "content is not well formed.");
+        return true;
+    }
+
+    /* Make sure there were no other generic processing errors */
+    /*
+    if (msr->msc_reqbody_error) {
+        t->debug(4, "XML: Schema validation could not proceed due to previous"
+                " processing errors.");
+        return true;
+    }
+    */
+
+    rc = xmlSchemaValidateDoc(m_validCtx, t->m_xml->m_data.doc);
+    if (rc != 0) {
+       t->debug(4, "XML: Schema validation failed.");
+        xmlSchemaFree(m_schema);
+        xmlSchemaFreeParserCtxt(m_parserCtx);
+        return true; /* No match. */
+    }
+
+    t->debug(4, "XML: Successfully validated payload against " \
+        "Schema: " + m_resource);
+
+    return false;
 }
+
 
 }  // namespace operators
 }  // namespace modsecurity

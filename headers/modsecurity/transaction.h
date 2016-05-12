@@ -74,6 +74,9 @@ class RuleMessage;
 namespace actions {
 class Action;
 }
+namespace RequestBodyProcessor {
+class XML;
+}
 namespace operators {
 class Operator;
 }
@@ -323,6 +326,8 @@ class Transaction {
      *
      */
     std::list<std::string> m_matched;
+
+    RequestBodyProcessor::XML *m_xml;
 
  private:
     std::string *m_ARGScombinedSizeStr;

@@ -56,7 +56,8 @@ VARIABLES = \
 	variables/tx.cc \
 	variables/variable.cc \
 	variables/variations/count.cc \
-	variables/variations/exclusion.cc
+	variables/variations/exclusion.cc \
+	variables/xml.cc
 
 
 ACTIONS = \
@@ -179,6 +180,12 @@ COLLECTION = \
 	collection/backend/in_memory-per_process.cc
 
 
+BODY_PROCESSORS = \
+	request_body_processor/multipart.cc \
+	request_body_processor/multipart_blob.cc \
+	request_body_processor/xml.cc
+
+
 libmodsecurity_la_SOURCES = \
 	parser/seclang-parser.yy \
 	parser/seclang-scanner.ll \
@@ -196,10 +203,9 @@ libmodsecurity_la_SOURCES = \
 	debug_log_writer.cc \
 	debug_log_writer_agent.cc \
 	macro_expansion.cc \
-	request_body_processor/multipart.cc \
-	request_body_processor/multipart_blob.cc \
 	rule.cc \
 	unique_id.cc \
+	${BODY_PROCESSORS} \
 	${ACTIONS} \
 	${COLLECTION} \
 	${OPERATORS} \
@@ -221,16 +227,18 @@ libmodsecurity_la_CPPFLAGS = \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(YAJL_CFLAGS) \
-	$(PCRE_CFLAGS)
+	$(PCRE_CFLAGS) \
+	$(LIBXML2_CFLAGS)
 
 libmodsecurity_la_LIBADD = \
-		$(GLOBAL_LDADD) \
-        $(CURL_LDADD) \
-        $(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
-        @LEXLIB@ \
-        $(PCRE_LDADD) \
-        $(YAJL_LDADD) \
-        ../others/libinjection.la
+	$(GLOBAL_LDADD) \
+	$(CURL_LDADD) \
+	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
+	@LEXLIB@ \
+	$(PCRE_LDADD) \
+	$(YAJL_LDADD) \
+	$(LIBXML2_LDADD) \
+	../others/libinjection.la
 
 
 libmodsecurity_la_LDFLAGS = \
