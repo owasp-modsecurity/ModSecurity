@@ -23,7 +23,8 @@ using modsecurity::split;
 %}
 %option noyywrap nounput batch debug noinput
 
-ACTION          (?i:accuracy|append|block|capture|chain|deny|deprecatevar|drop|expirevar|id:[0-9]+|id:'[0-9]+'|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setrsc|setenv|status:[0-9]+|xmlns)
+ACTION          (?i:accuracy|append|block|capture|chain|deny|deprecatevar|drop|expirevar|id:[0-9]+|id:'[0-9]+'|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setrsc|setenv|status:[0-9]+)
+ACTION_XMLNS    (?i:xmlns)
 ACTION_ALLOW    (?i:allow)
 ACTION_INITCOL  (?i:initcol)
 
@@ -386,6 +387,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {ACTION_SETVAR}:{VAR_FREE_TEXT_SPACE_COMMA}  {
                                     return yy::seclang_parser::make_ACTION_SETVAR(strchr(yytext, ':') + 1, *driver.loc.back());
                                          }
+{ACTION_XMLNS}:{FREE_TEXT_SPACE_COMMA_QUOTE} { return yy::seclang_parser::make_ACTION_XMLNS(strchr(yytext, ':') + 1, *driver.loc.back()); }
 
 {LOG_DATA}:'{FREE_TEXT_QUOTE}'         { return yy::seclang_parser::make_LOG_DATA(strchr(yytext, ':') + 1, *driver.loc.back()); }
 {ACTION_MSG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_MSG(strchr(yytext, ':') + 1, *driver.loc.back()); }

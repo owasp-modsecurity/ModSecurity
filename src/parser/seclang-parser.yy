@@ -39,6 +39,7 @@ class Driver;
 #include "actions/tag.h"
 #include "actions/transformations/transformation.h"
 #include "actions/transformations/none.h"
+#include "actions/xmlns.h"
 #include "operators/operator.h"
 #include "modsecurity/rule.h"
 #include "utils/geo_lookup.h"
@@ -261,6 +262,7 @@ using modsecurity::Variables::XML;
 %token <std::string> ACTION_REV
 %token <std::string> ACTION_VER
 %token <std::string> ACTION_MATURITY
+%token <std::string> ACTION_XMLNS
 %token <std::string> LOG_DATA
 %token <std::string> TRANSFORMATION
 %token <std::string> ACTION_CTL_AUDIT_ENGINE
@@ -1010,6 +1012,15 @@ act:
     | ACTION_MATURITY
       {
         $$ = new Maturity($1);
+      }
+    | ACTION_XMLNS
+      {
+        std::string error;
+        $$ = new modsecurity::actions::XmlNS($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_CTL_BDY_XML
       {

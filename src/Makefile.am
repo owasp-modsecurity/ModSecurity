@@ -121,7 +121,8 @@ ACTIONS = \
 	actions/transformations/url_decode_uni.cc \
 	actions/transformations/url_encode.cc \
 	actions/transformations/utf8_to_unicode.cc \
-	actions/ver.cc
+	actions/ver.cc \
+	actions/xmlns.cc
 
 
 OPERATORS = \
