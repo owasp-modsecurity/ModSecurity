@@ -18,6 +18,7 @@
 #include <list>
 #include <utility>
 #include "modsecurity/transaction.h"
+#include "modsecurity/rule.h"
 
 #ifndef SRC_VARIABLES_VARIABLE_H_
 #define SRC_VARIABLES_VARIABLE_H_
@@ -66,14 +67,29 @@ class Variable {
 
     static std::string to_s(std::vector<Variable *> *variables);
 
+
     virtual std::vector<const collection::Variable *>
         *evaluate(Transaction *transaction);
+
+
+    virtual void evaluateInternal(Transaction *transaction,
+        std::vector<const collection::Variable *> *l);
+
+    virtual void evaluateInternal(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) {
+        evaluateInternal(transaction, l);
+    }
+
 
     virtual void evaluate(Transaction *transaction,
         std::vector<const collection::Variable *> *l);
 
-    virtual void evaluateInternal(Transaction *transaction,
-        std::vector<const collection::Variable *> *l);
+    virtual void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) {
+        evaluate(transaction, l);
+    }
 
 
     std::string m_name;
