@@ -799,7 +799,8 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
         return my_error_msg;
     }
 
-    /* Rules must have uniq ID */
+#ifndef ALLOW_ID_NOT_UNIQUE
+	/* Rules must have uniq ID */
     type_rule = (dcfg->tmp_chain_starter == NULL);
 #if defined(WITH_LUA)
             type_rule = (type != RULE_TYPE_LUA && type_rule);
@@ -831,6 +832,7 @@ static const char *add_rule(cmd_parms *cmd, directory_config *dcfg, int type,
             //    return "ModSecurity: Found another rule with the same id";
         }
     }
+#endif
 
     /* Create default actionset if one does not already exist. */
     if (dcfg->tmp_default_actionset == NULL) {

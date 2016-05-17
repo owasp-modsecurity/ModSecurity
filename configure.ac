@@ -411,6 +411,22 @@ AC_ARG_ENABLE(request-early,
   request_early='-DREQUEST_EARLY'
 ])
 
+# Enable duplicate rules id
+AC_ARG_ENABLE(rule-id-validation,
+              AS_HELP_STRING([--enable-rule-id-validation],
+                             [Forbid duplicate rule ids and missing ones. This is the default]),
+[
+  if test "$enableval" != "no"; then
+    unique_id=
+  else
+    unique_id="-DALLOW_ID_NOT_UNIQUE"
+    MODSEC_EXTRA_CFLAGS="$MODSEC_EXTRA_CFLAGS $unique_id"
+  fi
+],
+[
+  unique_id=''
+])
+
 # Ignore configure errors
 AC_ARG_ENABLE(errors,
               AS_HELP_STRING([--disable-errors],
