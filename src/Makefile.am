@@ -4,7 +4,7 @@ BUILT_SOURCES= \
 
 lib_LTLIBRARIES = libmodsecurity.la
 libmodsecurity_ladir = $(prefix)/include
-libmodsecurity_includesubdir = $(pkgincludedir)/transaction/
+libmodsecurity_includesubdir = $(pkgincludedir)/collection/
 
 CLEANFILES = \
 	location.hh \
