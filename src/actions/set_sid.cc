@@ -28,9 +28,11 @@ namespace actions {
 
 
 bool SetSID::init(std::string *error) {
-    m_collection_key = std::string(action, 0, action.length());
+    m_collection_key = std::string(m_parser_payload, 0,
+        m_parser_payload.length());
 
     if (m_collection_key.empty()) {
+        error->assign("Missing collection key");
         return false;
     }
 

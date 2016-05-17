@@ -29,12 +29,14 @@ namespace actions {
 
 class Accuracy : public Action {
  public:
-    explicit Accuracy(std::string action);
+    explicit Accuracy(std::string action)
+        : Action(action, ConfigurationKind),
+        m_accuracy(0) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool init(std::string *error) override;
 
  private:
-    std::string m_accuracy_str;
     int m_accuracy;
 };
 

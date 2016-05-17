@@ -481,7 +481,7 @@ expression:
         for (Action *a : *actions) {
             Phase *phase = dynamic_cast<Phase *>(a);
             if (phase != NULL) {
-                definedPhase = phase->phase;
+                definedPhase = phase->m_phase;
                 secRuleDefinedPhase = phase->m_secRulesPhase;
                 delete phase;
             } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind ||
@@ -493,7 +493,7 @@ expression:
                 }
                 checkedActions.push_back(a);
             } else {
-                driver.error(@0, "The action '" + a->action + "' is not suitable to be part of the SecDefaultActions");
+                driver.error(@0, "The action '" + a->m_name + "' is not suitable to be part of the SecDefaultActions");
                 YYERROR;
             }
         }
@@ -863,11 +863,21 @@ act:
       }
     | TRANSFORMATION
       {
+        std::string error;
         $$ = Transformation::instantiate($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_ACCURACY
       {
+        std::string error;
         $$ = new Accuracy($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_EXEC
       {
@@ -907,15 +917,30 @@ act:
       }
     | ACTION_REDIRECT
       {
+        std::string error;
         $$ =  new Redirect($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_SEVERITY
       {
+        std::string error;
         $$ =  new Severity($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_EXPIREVAR
       {
+        std::string error;
         $$ = Action::instantiate($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_SETENV
       {
@@ -973,6 +998,7 @@ act:
       }
     | ACTION_SKIP
       {
+        std::string error;
         /*
 
         TODO: skip is not implemented yet.
@@ -980,38 +1006,82 @@ act:
         $$ = new modsecurity::actions::SkipAfter($1);
         */
         $$ = Action::instantiate($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_SKIP_AFTER
       {
+        std::string error;
         $$ = new modsecurity::actions::SkipAfter($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_AUDIT_LOG
       {
+        std::string error;
         $$ = new modsecurity::actions::AuditLog($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | LOG_DATA
       {
+        std::string error;
         $$ = new LogData($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_MSG
       {
+        std::string error;
         $$ = new Msg($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_TAG
       {
+        std::string error;
         $$ = new Tag($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_REV
       {
+        std::string error;
         $$ = new Rev($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_VER
       {
+        std::string error;
         $$ = new Ver($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_MATURITY
       {
+        std::string error;
         $$ = new Maturity($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_XMLNS
       {
@@ -1034,7 +1104,12 @@ act:
       }
     | ACTION_CTL_AUDIT_LOG_PARTS
       {
+        std::string error;
         $$ = new CtlAuditLogParts($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
       }
     | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_ON
       {

@@ -24,12 +24,6 @@
 namespace modsecurity {
 namespace actions {
 
-Pass::Pass(std::string action)
-    : Action(action) {
-    this->action = action;
-    this->action_kind = 2;
-}
-
 
 bool Pass::evaluate(Rule *rule, Transaction *transaction) {
     transaction->m_actions.clear();

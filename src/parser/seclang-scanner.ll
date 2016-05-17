@@ -320,89 +320,89 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 {ACTION}                        { return yy::seclang_parser::make_ACTION(yytext, *driver.loc.back()); }
 {ACTION_PHASE}                  { return yy::seclang_parser::make_ACTION_PHASE(yytext, *driver.loc.back()); }
-{ACTION_SKIP}:{CONFIG_VALUE_NUMBER} { return yy::seclang_parser::make_ACTION_SKIP(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_SKIP_AFTER}:{FREE_TEXT_SPACE_COMMA_QUOTE} { return yy::seclang_parser::make_ACTION_SKIP_AFTER(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_SKIP}:{CONFIG_VALUE_NUMBER} { return yy::seclang_parser::make_ACTION_SKIP(yytext, *driver.loc.back()); }
+{ACTION_SKIP_AFTER}:{FREE_TEXT_SPACE_COMMA_QUOTE} { return yy::seclang_parser::make_ACTION_SKIP_AFTER(yytext, *driver.loc.back()); }
 {ACTION_AUDIT_LOG}              { return yy::seclang_parser::make_ACTION_AUDIT_LOG(yytext, *driver.loc.back()); }
 
-{ACTION_SEVERITY}:{ACTION_SEVERITY_VALUE}       { return yy::seclang_parser::make_ACTION_SEVERITY(yytext + 9, *driver.loc.back()); }
-{ACTION_SEVERITY}:'{ACTION_SEVERITY_VALUE}'     { return yy::seclang_parser::make_ACTION_SEVERITY(std::string(yytext, 10, yyleng - 11), *driver.loc.back()); }
+{ACTION_SEVERITY}:{ACTION_SEVERITY_VALUE}       { return yy::seclang_parser::make_ACTION_SEVERITY(yytext, *driver.loc.back()); }
+{ACTION_SEVERITY}:'{ACTION_SEVERITY_VALUE}'     { return yy::seclang_parser::make_ACTION_SEVERITY(yytext, *driver.loc.back()); }
 
 {ACTION_EXEC}:'{VAR_FREE_TEXT_QUOTE}'              {
-                                    return yy::seclang_parser::make_ACTION_EXEC(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_EXEC(yytext, *driver.loc.back());
                                          }
 
 {ACTION_EXEC}:{VAR_FREE_TEXT_SPACE_COMMA}  {
-                                    return yy::seclang_parser::make_ACTION_EXEC(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_EXEC(yytext, *driver.loc.back());
                                          }
 
 {ACTION_EXPIREVAR}:'{VAR_FREE_TEXT_QUOTE}={VAR_FREE_TEXT_QUOTE}'  {
-                                    return yy::seclang_parser::make_ACTION_EXPIREVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_EXPIREVAR(yytext, *driver.loc.back());
                                          }
 {ACTION_EXPIREVAR}:'{VAR_FREE_TEXT_QUOTE}'              {
-                                    return yy::seclang_parser::make_ACTION_EXPIREVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_EXPIREVAR(yytext, *driver.loc.back());
                                          }
 {ACTION_EXPIREVAR}:{VAR_FREE_TEXT_SPACE}={VAR_FREE_TEXT_SPACE_COMMA}  {
-                                    return yy::seclang_parser::make_ACTION_EXPIREVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_EXPIREVAR(yytext, *driver.loc.back());
                                          }
 {ACTION_EXPIREVAR}:{VAR_FREE_TEXT_SPACE_COMMA}  {
-                                    return yy::seclang_parser::make_ACTION_EXPIREVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_EXPIREVAR(yytext, *driver.loc.back());
                                          }
 
 {ACTION_SETENV}:'{VAR_FREE_TEXT_QUOTE}={VAR_FREE_TEXT_QUOTE}'  {
-                                    return yy::seclang_parser::make_ACTION_SETENV(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_SETENV(yytext, *driver.loc.back());
                                          }
 {ACTION_SETENV}:'{VAR_FREE_TEXT_QUOTE}'              {
-                                    return yy::seclang_parser::make_ACTION_SETENV(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_SETENV(yytext, *driver.loc.back());
                                          }
 {ACTION_SETENV}:{VAR_FREE_TEXT_SPACE}={VAR_FREE_TEXT_SPACE_COMMA}  {
-                                    return yy::seclang_parser::make_ACTION_SETENV(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_SETENV(yytext, *driver.loc.back());
                                          }
 {ACTION_SETENV}:{VAR_FREE_TEXT_SPACE_COMMA}  {
-                                    return yy::seclang_parser::make_ACTION_SETENV(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_SETENV(yytext, *driver.loc.back());
                                          }
 
 {ACTION_SETSID}:{VAR_FREE_TEXT_SPACE_COMMA}  {
-                                    return yy::seclang_parser::make_ACTION_SETSID(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_SETSID(yytext, *driver.loc.back());
                                          }
 {ACTION_SETSID}:'{VAR_FREE_TEXT_QUOTE}'      {
-                                    return yy::seclang_parser::make_ACTION_SETSID(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_SETSID(yytext, *driver.loc.back());
                                          }
 
 {ACTION_SETUID}:{VAR_FREE_TEXT_SPACE_COMMA}  {
-                                    return yy::seclang_parser::make_ACTION_SETUID(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_SETUID(yytext, *driver.loc.back());
                                          }
 {ACTION_SETUID}:'{VAR_FREE_TEXT_QUOTE}'      {
-                                    return yy::seclang_parser::make_ACTION_SETUID(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_SETUID(yytext, *driver.loc.back());
                                          }
 
 {ACTION_SETVAR}:'{VAR_FREE_TEXT_QUOTE}={VAR_FREE_TEXT_QUOTE}'  {
-                                    return yy::seclang_parser::make_ACTION_SETVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_SETVAR(yytext, *driver.loc.back());
                                          }
 {ACTION_SETVAR}:'{VAR_FREE_TEXT_QUOTE}'              {
-                                    return yy::seclang_parser::make_ACTION_SETVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_SETVAR(yytext, *driver.loc.back());
                                          }
 {ACTION_SETVAR}:{VAR_FREE_TEXT_SPACE}={VAR_FREE_TEXT_SPACE_COMMA}  {
-                                    return yy::seclang_parser::make_ACTION_SETVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_SETVAR(yytext, *driver.loc.back());
                                          }
 {ACTION_SETVAR}:{VAR_FREE_TEXT_SPACE_COMMA}  {
-                                    return yy::seclang_parser::make_ACTION_SETVAR(strchr(yytext, ':') + 1, *driver.loc.back());
+                                    return yy::seclang_parser::make_ACTION_SETVAR(yytext, *driver.loc.back());
                                          }
-{ACTION_XMLNS}:{FREE_TEXT_SPACE_COMMA_QUOTE} { return yy::seclang_parser::make_ACTION_XMLNS(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_XMLNS}:{FREE_TEXT_SPACE_COMMA_QUOTE} { return yy::seclang_parser::make_ACTION_XMLNS(yytext, *driver.loc.back()); }
 
-{LOG_DATA}:'{FREE_TEXT_QUOTE}'         { return yy::seclang_parser::make_LOG_DATA(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_MSG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_MSG(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_ALLOW}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_ALLOW(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_ALLOW}:{FREE_TEXT_QUOTE_COMMA}  { return yy::seclang_parser::make_ACTION_ALLOW(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{LOG_DATA}:'{FREE_TEXT_QUOTE}'         { return yy::seclang_parser::make_LOG_DATA(yytext, *driver.loc.back()); }
+{ACTION_MSG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_MSG(yytext, *driver.loc.back()); }
+{ACTION_ALLOW}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_ALLOW(yytext, *driver.loc.back()); }
+{ACTION_ALLOW}:{FREE_TEXT_QUOTE_COMMA}  { return yy::seclang_parser::make_ACTION_ALLOW(yytext, *driver.loc.back()); }
 {ACTION_ALLOW}                          { return yy::seclang_parser::make_ACTION_ALLOW("", *driver.loc.back()); }
-{ACTION_REDIRECT}:{FREE_TEXT} { return yy::seclang_parser::make_ACTION_REDIRECT(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_TAG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_TAG(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_REV}:'{FREE_TEXT_QUOTE_COMMA}'      { return yy::seclang_parser::make_ACTION_REV(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_REV}:{FREE_TEXT_QUOTE_COMMA}      { return yy::seclang_parser::make_ACTION_REV(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_VER}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_VER(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_MATURITY}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_MATURITY(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_MATURITY}:{FREE_TEXT_QUOTE}      { return yy::seclang_parser::make_ACTION_MATURITY(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_ACCURACY}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_ACCURACY(strchr(yytext, ':') + 1, *driver.loc.back()); }
-{ACTION_ACCURACY}:{FREE_TEXT_QUOTE}      { return yy::seclang_parser::make_ACTION_ACCURACY(strchr(yytext, ':') + 1, *driver.loc.back()); }
+{ACTION_REDIRECT}:{FREE_TEXT} { return yy::seclang_parser::make_ACTION_REDIRECT(yytext, *driver.loc.back()); }
+{ACTION_TAG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_TAG(yytext, *driver.loc.back()); }
+{ACTION_REV}:'{FREE_TEXT_QUOTE_COMMA}'      { return yy::seclang_parser::make_ACTION_REV(yytext, *driver.loc.back()); }
+{ACTION_REV}:{FREE_TEXT_QUOTE_COMMA}      { return yy::seclang_parser::make_ACTION_REV(yytext, *driver.loc.back()); }
+{ACTION_VER}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_VER(yytext, *driver.loc.back()); }
+{ACTION_MATURITY}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_MATURITY(yytext, *driver.loc.back()); }
+{ACTION_MATURITY}:{FREE_TEXT_QUOTE}      { return yy::seclang_parser::make_ACTION_MATURITY(yytext, *driver.loc.back()); }
+{ACTION_ACCURACY}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_ACCURACY(yytext, *driver.loc.back()); }
+{ACTION_ACCURACY}:{FREE_TEXT_QUOTE}      { return yy::seclang_parser::make_ACTION_ACCURACY(yytext, *driver.loc.back()); }
 {ACTION_CTL_BDY_XML}              { return yy::seclang_parser::make_ACTION_CTL_BDY_XML(yytext, *driver.loc.back()); }
 {ACTION_CTL_BDY_JSON}             { return yy::seclang_parser::make_ACTION_CTL_BDY_JSON(yytext, *driver.loc.back()); }
 {ACTION_INITCOL}:{COL_NAME}={COL_FREE_TEXT_SPACE_COMMA} { return yy::seclang_parser::make_ACTION_INITCOL(yytext, *driver.loc.back()); }

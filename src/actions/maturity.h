@@ -29,12 +29,14 @@ namespace actions {
 
 class Maturity : public Action {
  public:
-    explicit Maturity(std::string action);
+    explicit Maturity(std::string action)
+        : Action(action, ConfigurationKind),
+        m_maturity(0) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool init(std::string *error) override;
 
  private:
-    std::string m_maturity_str;
     int m_maturity;
 };
 

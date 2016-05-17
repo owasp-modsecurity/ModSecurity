@@ -52,7 +52,7 @@ bool Action::evaluate(Rule *rule, Transaction *transaction) {
 }
 
 
-void Action::fill_intervention(ModSecurityIntervention *i) {
+void Action::fillIntervention(ModSecurityIntervention *i) {
 }
 
 Action *Action::instantiate(const std::string& name) {

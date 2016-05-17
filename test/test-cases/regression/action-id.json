@@ -128,7 +128,7 @@
       ]
     },
     "expected":{
-      "debug_log": " trim: \"value2\""
+      "debug_log": " t:trim: \"value2\""
     },
     "rules":[
       "SecRuleEngine On",
@@ -174,7 +174,7 @@
       ]
     },
     "expected":{
-      "debug_log": " trim: \"value2\""
+      "debug_log": " t:trim: \"value2\""
     },
     "rules":[
       "SecRuleEngine On",

@@ -26,65 +26,60 @@
 namespace modsecurity {
 namespace actions {
 
-SetVar::SetVar(std::string action)
-    : Action(action, RunTimeOnlyIfMatchKind) {
-}
-
 
 bool SetVar::init(std::string *error) {
     size_t pos;
 
-    if (action.at(0) == '\'' && action.size() > 3) {
-        action.erase(0, 1);
-        action.pop_back();
-    }
-
     // Resolv operation
-    operation = setToOne;
-    pos = action.find("=");
+    m_operation = setToOne;
+    pos = m_parser_payload.find("=");
     if (pos != std::string::npos) {
-        operation = setOperation;
+        m_operation = setOperation;
     }
-    pos = action.find("=+");
+    pos = m_parser_payload.find("=+");
     if (pos != std::string::npos) {
-        operation = sumAndSetOperation;
+        m_operation = sumAndSetOperation;
     }
-    pos = action.find("=-");
+    pos = m_parser_payload.find("=-");
     if (pos != std::string::npos) {
-        operation = substractAndSetOperation;
+        m_operation = substractAndSetOperation;
     }
 
     // Collection name
-    pos = action.find(".");
+    pos = m_parser_payload.find(".");
     if (pos != std::string::npos) {
-        collectionName = std::string(action, 0, pos);
-        collectionName = toupper(collectionName);
+        m_collectionName = std::string(m_parser_payload, 0, pos);
+        m_collectionName = toupper(m_collectionName);
     } else {
         error->assign("Missing the collection and/or variable name");
         return false;
     }
 
     // Variable name
-    if (operation == setToOne) {
-        variableName = std::string(action, pos + 1, action.length()
+    if (m_operation == setToOne) {
+        m_variableName = std::string(m_parser_payload, pos + 1,
+            m_parser_payload.length()
             - (pos + 1));
     } else {
-        size_t pos2 = action.find("=");
-        variableName = std::string(action, pos + 1, pos2 - (pos + 1));
-        if (pos2 + 2 > action.length()) {
+        size_t pos2 = m_parser_payload.find("=");
+        m_variableName = std::string(m_parser_payload, pos + 1,
+            pos2 - (pos + 1));
+        if (pos2 + 2 > m_parser_payload.length()) {
             error->assign("Something wrong with the input format");
             return false;
         }
 
-        if (operation == setOperation) {
-            predicate = std::string(action, pos2 + 1, action.length() - (pos2));
+        if (m_operation == setOperation) {
+            m_predicate = std::string(m_parser_payload, pos2 + 1,
+                m_parser_payload.length() - (pos2));
         } else {
-            predicate = std::string(action, pos2 + 2, action.length()
+            m_predicate = std::string(m_parser_payload, pos2 + 2,
+                m_parser_payload.length()
                 - (pos2 + 1));
         }
     }
 
-    if (collectionName.empty() || variableName.empty()) {
+    if (m_collectionName.empty() || m_variableName.empty()) {
         error->assign("Something wrong with the input format");
         return false;
     }
@@ -92,22 +87,17 @@ bool SetVar::init(std::string *error) {
     return true;
 }
 
-void SetVar::dump() {
-    std::cout << " Operation: " << std::to_string(operation) << std::endl;
-    std::cout << "Collection: " << collectionName << std::endl;
-    std::cout << "  Variable: " << variableName << std::endl;
-    std::cout << " Predicate: " << predicate << std::endl;
-}
 
-bool SetVar::evaluate(Rule *rule, Transaction *transaction) {
+bool SetVar::evaluate(Rule *rule, Transaction *transm_parser_payload) {
     std::string targetValue;
-    std::string variableNameExpanded = MacroExpansion::expand(variableName,
-        transaction);
-    std::string resolvedPre = MacroExpansion::expand(predicate, transaction);
+    std::string m_variableNameExpanded = MacroExpansion::expand(m_variableName,
+        transm_parser_payload);
+    std::string resolvedPre = MacroExpansion::expand(m_predicate,
+        transm_parser_payload);
 
-    if (operation == setOperation) {
+    if (m_operation == setOperation) {
         targetValue = resolvedPre;
-    } else if (operation == setToOne) {
+    } else if (m_operation == setToOne) {
         targetValue = std::string("1");
     } else {
         int pre = 0;
@@ -121,8 +111,9 @@ bool SetVar::evaluate(Rule *rule, Transaction *transaction) {
 
         try {
             std::string *resolvedValue =
-                transaction->m_collections.resolveFirst(collectionName,
-                    variableNameExpanded);
+                transm_parser_payload->m_collections.resolveFirst(
+                    m_collectionName,
+                    m_variableNameExpanded);
             if (resolvedValue == NULL) {
                 value = 0;
             } else {
@@ -132,7 +123,7 @@ bool SetVar::evaluate(Rule *rule, Transaction *transaction) {
             value = 0;
         }
 
-        switch (operation) {
+        switch (m_operation) {
             case sumAndSetOperation:
                 targetValue = std::to_string(value + pre);
                 break;
@@ -143,11 +134,11 @@ bool SetVar::evaluate(Rule *rule, Transaction *transaction) {
     }
 
 #ifndef NO_LOGS
-    transaction->debug(8, "Saving variable: " + collectionName + ":" + \
-        variableNameExpanded + " with value: " + targetValue);
+    transm_parser_payload->debug(8, "Saving variable: " + m_collectionName \
+        + ":" + m_variableNameExpanded + " with value: " + targetValue);
 #endif
-    transaction->m_collections.storeOrUpdateFirst(collectionName,
-        variableNameExpanded, targetValue);
+    transm_parser_payload->m_collections.storeOrUpdateFirst(m_collectionName,
+        m_variableNameExpanded, targetValue);
 
     return true;
 }

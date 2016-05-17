@@ -29,11 +29,14 @@ namespace actions {
 
 class Status : public Action {
  public:
-    explicit Status(std::string actions);
+    explicit Status(std::string action) : Action(action, 2) { }
 
+    bool init(std::string *error);
     bool evaluate(Rule *rule, Transaction *transaction) override;
-    void fill_intervention(ModSecurityIntervention *i) override;
-    int status;
+    void fillIntervention(ModSecurityIntervention *i) override;
+
+ protected:
+    int m_status;
 };
 
 }  // namespace actions

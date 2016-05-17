@@ -27,13 +27,10 @@
 namespace modsecurity {
 namespace actions {
 
-Rev::Rev(std::string action)
-    : Action(action, ConfigurationKind),
-    m_rev(action) {
-    if (m_rev.at(0) == '\'') {
-        m_rev.erase(0, 1);
-        m_rev.pop_back();
-    }
+
+bool Rev::init(std::string *error) {
+    m_rev = m_parser_payload;
+    return true;
 }
 
 
@@ -41,6 +38,7 @@ bool Rev::evaluate(Rule *rule, Transaction *transaction) {
     rule->m_rev = m_rev;
     return true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

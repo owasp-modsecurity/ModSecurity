@@ -32,11 +32,14 @@ namespace actions {
 
 class Phase : public Action {
  public:
-    explicit Phase(std::string action);
+    explicit Phase(std::string action) : Action(action, ConfigurationKind),
+        m_secRulesPhase(0),
+        m_phase(0) { }
 
     bool init(std::string *error) override;
     bool evaluate(Rule *rule, Transaction *transaction) override;
-    int phase;
+
+    int m_phase;
     int m_secRulesPhase;
 };
 

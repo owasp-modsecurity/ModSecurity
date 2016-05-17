@@ -27,7 +27,7 @@ namespace actions {
 
 class Pass : public Action {
  public:
-    explicit Pass(std::string action);
+    explicit Pass(std::string action) : Action(action) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
     bool isDisruptive() override { return true; }

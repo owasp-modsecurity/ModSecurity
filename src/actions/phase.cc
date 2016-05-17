@@ -26,51 +26,39 @@
 namespace modsecurity {
 namespace actions {
 
-Phase::Phase(std::string action)
-    : Action(action),
-    m_secRulesPhase(0),
-    phase(0) {
-    this->action_kind = ConfigurationKind;
-    std::string a = action;
-    a.erase(0, 6);
-    if (a.at(0) == '\'') {
-        a.erase(0, 1);
-        a.pop_back();
-    }
+bool Phase::init(std::string *error) {
+    std::string a = tolower(m_parser_payload);
 
     try {
-        this->phase = std::stoi(a);
+        m_phase = std::stoi(m_parser_payload);
     } catch (...) {
-        this->phase = 0;
-        if (tolower(a) == "request") {
-            this->phase = ModSecurity::Phases::RequestHeadersPhase;
+        m_phase = 0;
+        if (a == "request") {
+            m_phase = ModSecurity::Phases::RequestHeadersPhase;
             m_secRulesPhase = 2;
         }
-        if (tolower(a) == "response") {
-            this->phase = ModSecurity::Phases::ResponseBodyPhase;
+        if (a == "response") {
+            m_phase = ModSecurity::Phases::ResponseBodyPhase;
             m_secRulesPhase = 4;
         }
-        if (tolower(a) == "logging") {
-            this->phase = ModSecurity::Phases::LoggingPhase;
+        if (a == "logging") {
+            m_phase = ModSecurity::Phases::LoggingPhase;
             m_secRulesPhase = 5;
         }
     }
 
-    if (this->phase == 0) {
+    if (m_phase == 0) {
       /* Phase 0 is something new, we want to use as ConnectionPhase */
-      this->phase = ModSecurity::Phases::ConnectionPhase;
+      m_phase = ModSecurity::Phases::ConnectionPhase;
       m_secRulesPhase = 1;
     } else {
       /* Otherwise we want to shift the rule to the correct phase */
-      m_secRulesPhase = phase;
-      this->phase = phase + 1;
+      m_secRulesPhase = m_phase;
+      m_phase = m_phase + 1;
     }
-}
 
-
-bool Phase::init(std::string *error) {
-    if (phase > ModSecurity::Phases::NUMBER_OF_PHASES) {
-        error->assign("Unknown phase: " + std::to_string(phase));
+    if (m_phase > ModSecurity::Phases::NUMBER_OF_PHASES) {
+        error->assign("Unknown phase: " + std::to_string(m_phase));
         return false;
     }
     return true;
@@ -78,7 +66,7 @@ bool Phase::init(std::string *error) {
 
 
 bool Phase::evaluate(Rule *rule, Transaction *transaction) {
-    rule->phase = this->phase;
+    rule->phase = m_phase;
     return true;
 }
 

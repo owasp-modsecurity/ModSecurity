@@ -116,7 +116,7 @@ Rule::Rule(Operator *_op,
             } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind) {
                 actions_runtime_pos.push_back(a);
             } else {
-                std::cout << "General failure, action: " << a->name;
+                std::cout << "General failure, action: " << a->m_name;
                 std::cout << " has an unknown type." << std::endl;
                 delete a;
             }
@@ -141,13 +141,13 @@ Rule::Rule(Operator *_op,
 std::vector<std::string> Rule::getActionNames() {
     std::vector<std::string> a;
     for (auto &z : this->actions_runtime_pos) {
-        a.push_back(z->action);
+        a.push_back(z->m_name);
     }
     for (auto &z : this->actions_runtime_pre) {
-        a.push_back(z->action);
+        a.push_back(z->m_name);
     }
     for (auto &z : this->actions_conf) {
-        a.push_back(z->action);
+        a.push_back(z->m_name);
     }
 
     return a;
@@ -201,7 +201,7 @@ bool Rule::evaluateActions(Transaction *trasn) {
         if (a->isDisruptive() == false) {
 #ifndef NO_LOGS
             trasn->debug(4, "Running (_non_ disruptive) action: " +
-                a->action);
+                a->m_name);
 #endif
             a->evaluate(this, trasn);
         } else {
@@ -215,7 +215,7 @@ bool Rule::evaluateActions(Transaction *trasn) {
                 if (containsDisruptive) {
 #ifndef NO_LOGS
                     trasn->debug(4, "(SecDefaultAction) " \
-                        "_ignoring_ action: " + a->action + \
+                        "_ignoring_ action: " + a->m_name + \
                         " (rule contains a disruptive action)");
 #endif
                 } else {
@@ -223,7 +223,7 @@ bool Rule::evaluateActions(Transaction *trasn) {
                         == Rules::EnabledRuleEngine) {
 #ifndef NO_LOGS
                         trasn->debug(4, "(SecDefaultAction) " \
-                            "Running action: " + a->action + \
+                            "Running action: " + a->m_name + \
                             " (rule _does not_ contains a " \
                             "disruptive action)");
 #endif
@@ -231,7 +231,7 @@ bool Rule::evaluateActions(Transaction *trasn) {
                     } else {
 #ifndef NO_LOGS
                         trasn->debug(4, "(SecDefaultAction) " \
-                            "_Not_ running action: " + a->action + \
+                            "_Not_ running action: " + a->m_name + \
                             ". Rule _does not_ contains a " \
                             "disruptive action, but SecRuleEngine is not On.");
 #endif
@@ -240,7 +240,7 @@ bool Rule::evaluateActions(Transaction *trasn) {
             } else {
 #ifndef NO_LOGS
                 trasn->debug(4, "(SecDefaultAction) Running action: " + \
-                    a->action);
+                    a->m_name);
                     a->evaluate(this, trasn);
 #endif
             }
@@ -252,13 +252,13 @@ bool Rule::evaluateActions(Transaction *trasn) {
             && trasn->m_rules->secRuleEngine
                 == Rules::EnabledRuleEngine) {
 #ifndef NO_LOGS
-            trasn->debug(4, "Running (disruptive) action: " + a->action);
+            trasn->debug(4, "Running (disruptive) action: " + a->m_name);
 #endif
             a->evaluate(this, trasn);
         } else if (a->isDisruptive()) {
 #ifndef NO_LOGS
             trasn->debug(4, "Not running disruptive action: " + \
-                a->action + ". SecRuleEngine is not On");
+                a->m_name + ". SecRuleEngine is not On");
 #endif
         }
     }
@@ -353,7 +353,7 @@ bool Rule::evaluate(Transaction *trasn) {
 #ifndef NO_LOGS
                         trasn->debug(9, "(SecDefaultAction) T (" + \
                             std::to_string(transformations) + ") " + \
-                            a->name + ": \"" + value +"\"");
+                            a->m_name + ": \"" + value +"\"");
 #endif
                         transformations++;
                     }
@@ -366,7 +366,7 @@ bool Rule::evaluate(Transaction *trasn) {
 #ifndef NO_LOGS
                     trasn->debug(9, " T (" + \
                             std::to_string(transformations) + ") " + \
-                            a->name + ": \"" + value +"\"");
+                            a->m_name + ": \"" + value +"\"");
 #endif
                     transformations++;
                 }
@@ -439,7 +439,7 @@ bool Rule::evaluate(Transaction *trasn) {
 #ifndef NO_LOGS
                                     trasn->debug(4,
                                         "(SecDefaultAction) _ignoring_ " \
-                                        "action: " + a->action + \
+                                        "action: " + a->m_name + \
                                         " (rule contains a disruptive action)");
 #endif
                                 } else {
@@ -447,7 +447,7 @@ bool Rule::evaluate(Transaction *trasn) {
                                         == Rules::EnabledRuleEngine) {
 #ifndef NO_LOGS
                                         trasn->debug(4, "(SecDefaultAction) " \
-                                            "Running action: " + a->action + \
+                                            "Running action: " + a->m_name + \
                                             " (rule _does not_ contains a " \
                                             "disruptive action)");
 #endif
@@ -456,7 +456,7 @@ bool Rule::evaluate(Transaction *trasn) {
 #ifndef NO_LOGS
                                         trasn->debug(4, "(SecDefaultAction) " \
                                             "_Not_ running action: " \
-                                            + a->action + ". Rule _does not_" \
+                                            + a->m_name + ". Rule _does not_" \
                                             + " contains a disruptive action,"\
                                             + " but SecRuleEngine is not On.");
 #endif
@@ -465,7 +465,7 @@ bool Rule::evaluate(Transaction *trasn) {
                             } else {
 #ifndef NO_LOGS
                                 trasn->debug(4, "(SecDefaultAction) Running " \
-                                    "action: " + a->action + "!!" \
+                                    "action: " + a->m_name + "!!" \
                                     + std::to_string(a->isDisruptive()));
 #endif
                                 a->evaluate(this, trasn);
@@ -479,19 +479,20 @@ bool Rule::evaluate(Transaction *trasn) {
                                 == Rules::EnabledRuleEngine) {
 #ifndef NO_LOGS
                             trasn->debug(4, "Running (disruptive) " \
-                                "action: " + a->action);
+                                "action: " + a->m_name);
 #endif
                             a->evaluate(this, trasn);
                         } else if (a->isDisruptive()) {
 #ifndef NO_LOGS
                             trasn->debug(4,
                                 "Not running disruptive action: " + \
-                                a->action + ". SecRuleEngine is not On");
+                                a->m_name + ". SecRuleEngine " + \
+                                "is not On");
 #endif
                         } else if (!a->isDisruptive()) {
 #ifndef NO_LOGS
                             trasn->debug(4, "Running (_non_ disruptive) " \
-                                "action: " + a->action);
+                                "action: " + a->m_name);
 #endif
                             a->evaluate(this, trasn, ruleMessage);
                         }

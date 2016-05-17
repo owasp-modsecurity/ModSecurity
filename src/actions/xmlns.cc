@@ -30,15 +30,15 @@ bool XmlNS::init(std::string *error) {
     size_t pos;
     std::string http = "http://";
 
-    pos = action.find("=");
+    pos = m_parser_payload.find("=");
     if (pos == std::string::npos) {
         error->assign("XMLS: Bad format, missing equals sign.");
         return false;
     }
-    m_name = std::string(action, 0, pos);
-    m_value = std::string(action, pos+1, action.size());
+    m_name = std::string(m_parser_payload, 0, pos);
+    m_value = std::string(m_parser_payload, pos+1, m_parser_payload.size());
 
-    if (m_value.empty() or m_name.empty()) {
+    if (m_value.empty() || m_name.empty()) {
         error->assign("XMLS: XMLNS is invalid. Expecting a " \
             "name=value format.");
         return false;

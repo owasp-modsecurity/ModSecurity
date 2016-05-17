@@ -29,15 +29,10 @@ namespace actions {
 
 class SetVar : public Action {
  public:
-    explicit SetVar(std::string action);
+    explicit SetVar(std::string action) : Action(action) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
-    void dump();
     bool init(std::string *error) override;
-
-    std::string collectionName;
-    std::string variableName;
-    std::string predicate;
 
     enum SetVarOperation {
         /* Set variable to something */
@@ -50,7 +45,11 @@ class SetVar : public Action {
         setToOne
     };
 
-    SetVarOperation operation;
+ private:
+    SetVarOperation m_operation;
+    std::string m_collectionName;
+    std::string m_variableName;
+    std::string m_predicate;
 };
 
 }  // namespace actions

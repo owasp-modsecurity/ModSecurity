@@ -29,7 +29,7 @@ namespace actions {
 
 class InitCol : public Action {
  public:
-    explicit InitCol(std::string action);
+    explicit InitCol(std::string action) : Action(action) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
     bool init(std::string *error) override;

@@ -25,19 +25,15 @@
 namespace modsecurity {
 namespace actions {
 
-SkipAfter::SkipAfter(std::string action)
-    : Action(action, RunTimeOnlyIfMatchKind),
-    m_marker(action) {
-}
-
 
 bool SkipAfter::evaluate(Rule *rule, Transaction *transaction) {
 #ifndef NO_LOGS
-    transaction->debug(5, "Setting skipAfter for: " + m_marker);
+    transaction->debug(5, "Setting skipAfter for: " + m_parser_payload);
 #endif
-    transaction->m_marker = m_marker;
+    transaction->m_marker = m_parser_payload;
     return true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

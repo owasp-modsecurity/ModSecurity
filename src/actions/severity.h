@@ -21,7 +21,6 @@
 #define SRC_ACTIONS_SEVERITY_H_
 
 #ifdef __cplusplus
-class Transaction;
 
 namespace modsecurity {
 class Transaction;
@@ -31,14 +30,18 @@ namespace actions {
 
 class Severity : public Action {
  public:
-    explicit Severity(std::string action);
+    explicit Severity(std::string action)
+        : Action(action),
+        m_severity(0) { }
 
     bool evaluate(Rule *rule, Transaction *transaction,
         RuleMessage *rm) override;
+    bool init(std::string *error);
 
  private:
     int m_severity;
 };
+
 
 }  // namespace actions
 }  // namespace modsecurity

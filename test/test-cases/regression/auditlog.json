@@ -40,7 +40,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) trim: \"test",
+      "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
       "error_log": "",
       "http_code": 403
     },
@@ -99,7 +99,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) trim: \"test",
+      "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
       "error_log": "",
       "http_code": 403
     },
@@ -159,7 +159,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "\\[9\\]  T \\(0\\) trim: \"test",
+      "debug_log": "\\[9\\]  T \\(0\\) t:trim: \"test",
       "error_log": "",
       "http_code": 403
     },

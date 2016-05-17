@@ -49,7 +49,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": " trim: \"test\"",
+      "debug_log": " t:trim: \"test\"",
       "error_log": ""
     },
     "rules": [

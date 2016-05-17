@@ -26,28 +26,44 @@
 namespace modsecurity {
 namespace actions {
 
-Severity::Severity(std::string action)
-    : Action(action, RunTimeOnlyIfMatchKind) {
-    std::string a = action;
-    if (tolower(a) == "emergency") {
-        this->m_severity = 0;
-    } else if (tolower(a) == "alert") {
-        this->m_severity = 1;
-    } else if (tolower(a) == "critical") {
-        this->m_severity = 2;
-    } else if (tolower(a) == "error") {
-        this->m_severity = 3;
-    } else if (tolower(a) == "warning") {
-        this->m_severity = 4;
-    } else if (tolower(a) == "notice") {
-        this->m_severity = 5;
-    } else if (tolower(a) == "info") {
-        this->m_severity = 6;
-    } else if (tolower(a) == "debug") {
-        this->m_severity = 7;
+
+bool Severity::init(std::string *error) {
+    std::string a = tolower(m_parser_payload);
+    if (a == "emergency") {
+        m_severity = 0;
+        return true;
+    } else if (a == "alert") {
+        m_severity = 1;
+        return true;
+    } else if (a == "critical") {
+        m_severity = 2;
+        return true;
+    } else if (a == "error") {
+        m_severity = 3;
+        return true;
+    } else if (a == "warning") {
+        m_severity = 4;
+        return true;
+    } else if (a == "notice") {
+        m_severity = 5;
+        return true;
+    } else if (a == "info") {
+        m_severity = 6;
+        return true;
+    } else if (a == "debug") {
+        m_severity = 7;
+        return true;
     } else {
-        this->m_severity = std::stod(a);
+        try {
+            m_severity = std::stoi(a);
+            return true;
+        }  catch (...) {
+            error->assign("Severity: The input \"" + a + "\" is " \
+                "not a number.");
+        }
     }
+
+    return false;
 }
 
 
@@ -66,6 +82,7 @@ bool Severity::evaluate(Rule *rule, Transaction *transaction,
     }
     return true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

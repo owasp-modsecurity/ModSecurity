@@ -34,6 +34,7 @@ class SetSID : public Action {
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
+
  private:
     std::string m_collection_key;
 };

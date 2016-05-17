@@ -27,24 +27,19 @@
 namespace modsecurity {
 namespace actions {
 
-InitCol::InitCol(std::string action)
-    : Action(action, RunTimeOnlyIfMatchKind) {
-}
-
 
 bool InitCol::init(std::string *error) {
-    int posEquals = action.find("=");
-    int posInit = strlen("initcol:");
+    int posEquals = m_parser_payload.find("=");
 
-    if (action.size() < 8) {
+    if (m_parser_payload.size() < 8) {
         return false;
     }
     if (posEquals == std::string::npos) {
         return false;
     }
 
-    m_collection_key = std::string(action, posInit,  posEquals - posInit);
-    m_collection_value = std::string(action, posEquals + 1);
+    m_collection_key = std::string(m_parser_payload, 0,  posEquals);
+    m_collection_value = std::string(m_parser_payload, posEquals + 1);
 
     if (m_collection_key != "ip" && m_collection_key != "global") {
         return false;

@@ -27,16 +27,9 @@
 namespace modsecurity {
 namespace actions {
 
-LogData::LogData(std::string action)
-    : Action(action, RunTimeOnlyIfMatchKind),
-    m_data(action) {
-    m_data.erase(0, 1);
-    m_data.pop_back();
-}
-
 
 bool LogData::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
-    std::string data = MacroExpansion::expand(m_data, transaction);
+    std::string data = MacroExpansion::expand(m_parser_payload, transaction);
 
     rm->m_data = data;
 

@@ -23,11 +23,9 @@
 namespace modsecurity {
 namespace actions {
 
-CtlAuditLogParts::CtlAuditLogParts(std::string action)
-        : Action(action, RunTimeOnlyIfMatchKind),
-        mPartsAction(0) {
-    std::string what(action, 18, 1);
-    mParts = std::string(action, 19, action.length()-19);
+bool CtlAuditLogParts::init(std::string *error) {
+    std::string what(m_parser_payload, 14, 1);
+    mParts = std::string(m_parser_payload, 15, m_parser_payload.length()-15);
     if (what == "+") {
         mPartsAction = 0;
     } else {

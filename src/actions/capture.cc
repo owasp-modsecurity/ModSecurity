@@ -31,6 +31,7 @@
 namespace modsecurity {
 namespace actions {
 
+
 bool Capture::evaluate(Rule *rule, Transaction *transaction) {
     if (transaction->m_matched.empty()) {
         return false;
@@ -45,6 +46,7 @@ bool Capture::evaluate(Rule *rule, Transaction *transaction) {
     }
     return true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

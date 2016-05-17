@@ -23,12 +23,6 @@
 namespace modsecurity {
 namespace actions {
 
-Deny::Deny(std::string action)
-    : Action(action) {
-    this->action = action;
-    this->action_kind = 2;
-}
-
 
 bool Deny::evaluate(Rule *rule, Transaction *transaction) {
 #ifndef NO_LOGS
@@ -38,13 +32,15 @@ bool Deny::evaluate(Rule *rule, Transaction *transaction) {
     return true;
 }
 
-void Deny::fill_intervention(ModSecurityIntervention *i) {
+
+void Deny::fillIntervention(ModSecurityIntervention *i) {
     if (i->status == 200) {
         i->status = 403;
     }
     i->log = "Deny action";
     i->disruptive = true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

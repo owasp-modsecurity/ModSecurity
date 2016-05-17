@@ -27,14 +27,16 @@
 namespace modsecurity {
 namespace actions {
 
-Accuracy::Accuracy(std::string action)
-    : Action(action, ConfigurationKind),
-    m_accuracy_str(action) {
-    if (m_accuracy_str.at(0) == '\'') {
-        m_accuracy_str.erase(0, 1);
-        m_accuracy_str.pop_back();
+
+bool Accuracy::init(std::string *error) {
+    try {
+        m_accuracy = std::stoi(m_parser_payload);
+    }  catch (...) {
+        error->assign("Accuracy: The input \"" + m_parser_payload + "\" is " \
+            "not a number.");
+        return false;
     }
-    m_accuracy = std::stoi(m_accuracy_str);
+    return true;
 }
 
 
@@ -42,6 +44,7 @@ bool Accuracy::evaluate(Rule *rule, Transaction *transaction) {
     rule->m_accuracy = m_accuracy;
     return true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

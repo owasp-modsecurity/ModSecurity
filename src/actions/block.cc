@@ -25,12 +25,6 @@
 namespace modsecurity {
 namespace actions {
 
-Block::Block(std::string action)
-    : Action(action) {
-    this->action = action;
-    this->action_kind = 2;
-}
-
 
 bool Block::evaluate(Rule *rule, Transaction *transaction) {
 #ifndef NO_LOGS
@@ -44,9 +38,11 @@ bool Block::evaluate(Rule *rule, Transaction *transaction) {
     return true;
 }
 
-void Block::fill_intervention(ModSecurityIntervention *i) {
+
+void Block::fillIntervention(ModSecurityIntervention *i) {
     i->disruptive = true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

@@ -45,16 +45,9 @@
 namespace modsecurity {
 namespace actions {
 
-Msg::Msg(std::string action)
-    : Action(action, RunTimeOnlyIfMatchKind),
-    m_msg(action) {
-    m_msg.erase(0, 1);
-    m_msg.pop_back();
-}
-
 
 bool Msg::evaluate(Rule *rule, Transaction *transaction) {
-    std::string msg = MacroExpansion::expand(m_msg, transaction);
+    std::string msg = MacroExpansion::expand(m_parser_payload, transaction);
 
 #ifndef NO_LOGS
     transaction->debug(9, "Saving msg: " + msg);

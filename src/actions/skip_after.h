@@ -29,12 +29,10 @@ namespace actions {
 
 class SkipAfter : public Action {
  public:
-    explicit SkipAfter(std::string action);
+    explicit SkipAfter(std::string action)
+        : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
-
- private:
-    std::string m_marker;
 };
 
 

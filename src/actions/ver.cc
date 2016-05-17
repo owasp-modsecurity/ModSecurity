@@ -27,20 +27,12 @@
 namespace modsecurity {
 namespace actions {
 
-Ver::Ver(std::string action)
-    : Action(action, ConfigurationKind),
-    m_ver(action) {
-    if (m_ver.at(0) == '\'') {
-        m_ver.erase(0, 1);
-        m_ver.pop_back();
-    }
-}
-
 
 bool Ver::evaluate(Rule *rule, Transaction *transaction) {
-    rule->m_ver = m_ver;
+    rule->m_ver = m_parser_payload;
     return true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

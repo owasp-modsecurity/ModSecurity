@@ -27,14 +27,16 @@
 namespace modsecurity {
 namespace actions {
 
-Maturity::Maturity(std::string action)
-    : Action(action, ConfigurationKind),
-    m_maturity_str(action) {
-    if (m_maturity_str.at(0) == '\'') {
-        m_maturity_str.erase(0, 1);
-        m_maturity_str.pop_back();
+
+bool Maturity::init(std::string *error) {
+    try {
+        m_maturity = std::stoi(m_parser_payload);
+    }  catch (...) {
+        error->assign("Maturity: The input \"" + m_parser_payload + "\" is " \
+            "not a number.");
+        return false;
     }
-    m_maturity = std::stoi(m_maturity_str);
+    return true;
 }
 
 
@@ -42,6 +44,7 @@ bool Maturity::evaluate(Rule *rule, Transaction *transaction) {
     rule->m_maturity = m_maturity;
     return true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

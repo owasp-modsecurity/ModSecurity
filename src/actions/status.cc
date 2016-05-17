@@ -23,13 +23,16 @@
 namespace modsecurity {
 namespace actions {
 
-Status::Status(std::string action)
-    : Action(action) {
-    std::string a = action;
-    a.erase(0, 7);
-    this->action = action;
-    this->action_kind = 2;
-    this->status = stoi(a);
+
+bool Status::init(std::string *error) {
+    try {
+        m_status = std::stoi(m_parser_payload);
+    } catch (...) {
+        error->assign("Not a valid number: " + m_parser_payload);
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -39,10 +42,11 @@ bool Status::evaluate(Rule *rule, Transaction *transaction) {
 }
 
 
-void Status::fill_intervention(ModSecurityIntervention *i) {
-    i->status = this->status;
+void Status::fillIntervention(ModSecurityIntervention *i) {
+    i->status = m_status;
     i->log = "Status";
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

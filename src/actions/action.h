@@ -35,20 +35,42 @@ class Action {
  public:
     explicit Action(const std::string& _action)
         : action_kind(2),
-        action(_action),
-        name(_action),
+        m_name(""),
+        m_parser_payload(""),
         m_isNone(false),
         temporaryAction(false) {
-            name.erase(0, 2);
+            set_name_and_payload(_action);
         }
     explicit Action(const std::string& _action, int kind)
         : action_kind(kind),
-        action(_action),
-        name(_action),
+        m_name(""),
+        m_parser_payload(""),
         m_isNone(false),
         temporaryAction(false) {
-            name.erase(0, 2);
+            set_name_and_payload(_action);
         }
+
+    void set_name_and_payload(const std::string& data) {
+        size_t pos = data.find(":");
+        std::string t = "t:";
+
+        if (data.compare(0, t.length(), t) == 0) {
+            pos = data.find(":", 2);
+        }
+
+        if (pos == std::string::npos) {
+            m_name = data;
+            return;
+        }
+
+        m_name = std::string(data, 0, pos);
+        m_parser_payload = std::string(data, pos + 1, data.length());
+
+        if (m_parser_payload.at(0) == '\'' && m_parser_payload.size() > 2) {
+            m_parser_payload.erase(0, 1);
+            m_parser_payload.pop_back();
+        }
+    }
 
     virtual ~Action() { }
     /**
@@ -83,9 +105,6 @@ class Action {
      RunTimeOnlyIfMatchKind,
     };
 
-    std::string action;
-    int action_kind;
-    std::string name;
 
     virtual std::string evaluate(std::string exp,
         Transaction *transaction);
@@ -94,14 +113,20 @@ class Action {
         RuleMessage *ruleMessage) {
         return evaluate(rule, transaction);
     }
+
     virtual bool init(std::string *error) { return true; }
+
     virtual bool isDisruptive() { return false; }
+
+    virtual void fillIntervention(ModSecurityIntervention *intervention);
 
     static Action *instantiate(const std::string& name);
 
-    virtual void fill_intervention(ModSecurityIntervention *intervention);
     bool temporaryAction;
+    std::string m_name;
+    std::string m_parser_payload;
     bool m_isNone;
+    int action_kind;
 };
 
 

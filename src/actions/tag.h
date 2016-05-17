@@ -29,13 +29,11 @@ namespace actions {
 
 class Tag : public Action {
  public:
-    explicit Tag(std::string action);
+    explicit Tag(std::string action)
+        : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool evaluate(Rule *rule, Transaction *transaction,
         RuleMessage *rm) override;
-
- private:
-    std::string m_tag;
 };
 
 

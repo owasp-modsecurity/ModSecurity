@@ -23,10 +23,12 @@
 namespace modsecurity {
 namespace actions {
 
+
 bool NoAuditLog::evaluate(Rule *rule, Transaction *transaction) {
     transaction->m_toNotBeSavedInAuditLogs = true;
     return true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

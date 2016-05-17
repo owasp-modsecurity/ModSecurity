@@ -25,11 +25,11 @@ namespace modsecurity {
 namespace actions {
 
 
-
 bool Chain::evaluate(Rule *rule, Transaction *transaction) {
     rule->chained = true;
     return true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

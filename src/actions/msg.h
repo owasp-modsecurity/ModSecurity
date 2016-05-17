@@ -29,12 +29,10 @@ namespace actions {
 
 class Msg : public Action {
  public:
-    explicit Msg(std::string action);
+    explicit Msg(std::string action)
+        : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
-
- private:
-    std::string m_msg;
 };
 
 

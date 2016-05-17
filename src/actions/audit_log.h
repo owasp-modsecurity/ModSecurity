@@ -37,6 +37,7 @@ class AuditLog : public Action {
     bool evaluate(Rule *rule, Transaction *transaction) override;
 };
 
+
 }  // namespace actions
 }  // namespace modsecurity
 #endif

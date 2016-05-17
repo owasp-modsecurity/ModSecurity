@@ -23,12 +23,14 @@
 namespace modsecurity {
 namespace actions {
 
+
 bool Log::evaluate(Rule *rule, Transaction *transaction) {
     transaction->m_toBeSavedInAuditlogs = true;
     /* FIXME: transaction->serverLog("Something...."); */
     transaction->debug(9, "Saving transaction to logs");
     return true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

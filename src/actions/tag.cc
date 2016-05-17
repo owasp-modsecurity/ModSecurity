@@ -49,16 +49,9 @@
 namespace modsecurity {
 namespace actions {
 
-Tag::Tag(std::string action)
-    : Action(action, RunTimeOnlyIfMatchKind),
-    m_tag(action) {
-    m_tag.erase(0, 1);
-    m_tag.pop_back();
-}
-
 
 bool Tag::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
-    std::string tag = MacroExpansion::expand(m_tag, transaction);
+    std::string tag = MacroExpansion::expand(m_parser_payload, transaction);
 
 #ifndef NO_LOGS
     transaction->debug(9, "Rule tag: " + tag);
@@ -68,6 +61,7 @@ bool Tag::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
 
     return true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

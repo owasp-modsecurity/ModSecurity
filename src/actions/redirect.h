@@ -30,12 +30,14 @@ namespace actions {
 
 class Redirect : public Action {
  public:
-    explicit Redirect(const std::string &action);
-    ~Redirect() override;
+    explicit Redirect(const std::string &action)
+        : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
-    void fill_intervention(ModSecurityIntervention *i) override;
+    bool init(std::string *error) override;
+    void fillIntervention(ModSecurityIntervention *i) override;
     bool isDisruptive() override { return true; }
+
  private:
     int m_status;
     std::string m_urlExpanded;

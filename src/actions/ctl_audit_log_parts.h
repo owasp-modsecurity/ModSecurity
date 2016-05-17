@@ -27,9 +27,15 @@ namespace actions {
 
 class CtlAuditLogParts : public Action {
  public:
-    explicit CtlAuditLogParts(std::string action);
+    explicit CtlAuditLogParts(std::string action)
+        : Action(action, RunTimeOnlyIfMatchKind),
+        mPartsAction(0),
+        mParts("") { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool init(std::string *error) override;
+
+ protected:
     int mPartsAction;
     std::string mParts;
 };

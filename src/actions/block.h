@@ -31,12 +31,13 @@ namespace actions {
 
 class Block : public Action {
  public:
-    explicit Block(std::string action);
+    explicit Block(std::string action) : Action(action) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
-    void fill_intervention(ModSecurityIntervention *i) override;
+    void fillIntervention(ModSecurityIntervention *i) override;
     bool isDisruptive() override { return true; }
 };
+
 
 }  // namespace actions
 }  // namespace modsecurity

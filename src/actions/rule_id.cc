@@ -24,15 +24,11 @@
 namespace modsecurity {
 namespace actions {
 
+
 bool RuleId::init(std::string *error) {
-    std::string a = action;
+    std::string a = m_parser_payload;
 
     try {
-        a.erase(0, 3);
-        if (a.at(0) == '\'') {
-            a.erase(0, 1);
-            a.pop_back();
-        }
         m_ruleId = std::stod(a);
     } catch (...) {
         m_ruleId = 0;
@@ -51,10 +47,12 @@ bool RuleId::init(std::string *error) {
     return true;
 }
 
+
 bool RuleId::evaluate(Rule *rule, Transaction *transaction) {
     rule->rule_id = m_ruleId;
     return true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity

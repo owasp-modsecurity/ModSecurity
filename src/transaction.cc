@@ -1268,7 +1268,7 @@ bool Transaction::intervention(ModSecurityIntervention *it) {
     if (m_actions.size() > 0) {
         for (Action *a : m_actions) {
             if (a->action_kind == Action::Kind::RunTimeOnlyIfMatchKind) {
-                a->fill_intervention(it);
+                a->fillIntervention(it);
             }
             if (a->temporaryAction) {
                 delete a;

@@ -27,10 +27,10 @@ namespace actions {
 
 class Deny : public Action {
  public:
-    explicit Deny(std::string action);
+    explicit Deny(std::string action) : Action(action) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
-    void fill_intervention(ModSecurityIntervention *i) override;
+    void fillIntervention(ModSecurityIntervention *i) override;
     bool isDisruptive() override { return true; }
 };
 

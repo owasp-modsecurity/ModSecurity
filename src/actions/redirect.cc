@@ -24,20 +24,11 @@
 namespace modsecurity {
 namespace actions {
 
-Redirect::~Redirect() {
-}
 
-Redirect::Redirect(const std::string& action)
-    : Action(action, RunTimeOnlyIfMatchKind),
-    m_url(action) {
-    //  m_url = m_url.erase(0, 9);
-    if (m_url.at(0) == '\'') {
-        m_url.erase(0, 1);
-        if (m_url.size() > 0) {
-            m_url.pop_back();
-        }
-    }
+bool Redirect::init(std::string *error) {
+    m_url = m_parser_payload;
     m_status = 302;
+    return true;
 }
 
 
@@ -47,7 +38,8 @@ bool Redirect::evaluate(Rule *rule, Transaction *transaction) {
     return true;
 }
 
-void Redirect::fill_intervention(ModSecurityIntervention *i) {
+
+void Redirect::fillIntervention(ModSecurityIntervention *i) {
     /* if it was changed before, lets keep it. */
     if (i->status == 200) {
         i->status = m_status;
@@ -56,6 +48,7 @@ void Redirect::fill_intervention(ModSecurityIntervention *i) {
     i->log = "Redirecting";
     i->disruptive = true;
 }
+
 
 }  // namespace actions
 }  // namespace modsecurity
