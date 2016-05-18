@@ -253,6 +253,11 @@ class Transaction {
     RequestBodyType m_requestBodyType;
 
     /**
+     * Holds the request body "processor"
+     */
+    RequestBodyType m_requestBodyProcessor;
+
+    /**
      * Rules object utilized during this specific transaction.
      */
     Rules *m_rules;

@@ -23,6 +23,7 @@ class Driver;
 #include "actions/action.h"
 #include "actions/audit_log.h"
 #include "actions/ctl_audit_log_parts.h"
+#include "actions/ctl_request_body_processor_xml.h"
 #include "actions/init_col.h"
 #include "actions/set_sid.h"
 #include "actions/set_uid.h"
@@ -69,6 +70,7 @@ using modsecurity::ModSecurity;
 using modsecurity::actions::Accuracy;
 using modsecurity::actions::Action;
 using modsecurity::actions::CtlAuditLogParts;
+using modsecurity::actions::CtlRequestBodyProcessorXML;
 using modsecurity::actions::InitCol;
 using modsecurity::actions::SetSID;
 using modsecurity::actions::SetUID;
@@ -1094,8 +1096,7 @@ act:
       }
     | ACTION_CTL_BDY_XML
       {
-        /* not ready yet. */
-        $$ = Action::instantiate($1);
+        $$ = new modsecurity::actions::CtlRequestBodyProcessorXML($1);
       }
     | ACTION_CTL_BDY_JSON
       {

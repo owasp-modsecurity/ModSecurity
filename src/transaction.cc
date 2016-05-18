@@ -107,6 +107,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_namesArgsPost(NULL),
     m_namesArgsGet(NULL),
     m_requestBodyType(UnknownFormat),
+    m_requestBodyProcessor(UnknownFormat),
     m_requestHeadersNames(NULL),
     m_responseHeadersNames(NULL),
     m_responseContentType(NULL),
@@ -475,7 +476,6 @@ int Transaction::addRequestHeader(const std::string& key,
     if (keyl == "content-type") {
         std::string multipart("multipart/form-data");
         std::string l = tolower(value);
-
         if (l.compare(0, multipart.length(), multipart) == 0) {
             this->m_requestBodyType = MultiPartRequestBody;
         }
@@ -590,15 +590,11 @@ int Transaction::processRequestBody() {
      * 
      */
 
-    if (m_requestBodyType == XMLRequestBody) {
-        std::string *a = m_collections.resolveFirst(
-            "REQUEST_HEADERS:Content-Type");
-        if (a != NULL) {
-            if (m_xml->init() == true) {
-                m_xml->processChunk(m_requestBody.str().c_str(),
-                    m_requestBody.str().size());
-                m_xml->complete();
-            }
+    if (m_requestBodyProcessor == XMLRequestBody) {
+        if (m_xml->init() == true) {
+            m_xml->processChunk(m_requestBody.str().c_str(),
+                m_requestBody.str().size());
+            m_xml->complete();
         }
     }
 
