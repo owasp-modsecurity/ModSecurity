@@ -41,10 +41,22 @@ XML::~XML() {
 
 
 bool XML::init() {
-    // xmlParserInputBufferCreateFilenameFunc entity;
-    // entity = xmlParserInputBufferCreateFilenameDefault(
-    //     this->unloadExternalEntity);
+    xmlParserInputBufferCreateFilenameFunc entity;
+    if (m_transaction->m_rules->secXMLExternalEntity == true) {
+        entity = xmlParserInputBufferCreateFilenameDefault(
+            __xmlParserInputBufferCreateFilename);
+    } else {
+        entity = xmlParserInputBufferCreateFilenameDefault(
+            this->unloadExternalEntity);
+    }
+
     return true;
+}
+
+
+xmlParserInputBufferPtr XML::unloadExternalEntity(const char *URI,
+    xmlCharEncoding enc) {
+    return NULL;
 }
 
 

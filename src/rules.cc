@@ -206,6 +206,7 @@ int Rules::merge(Driver *from) {
     this->secRuleEngine = from->secRuleEngine;
     this->secRequestBodyAccess = from->secRequestBodyAccess;
     this->secResponseBodyAccess = from->secResponseBodyAccess;
+    this->secXMLExternalEntity = from->secXMLExternalEntity;
     if (from->m_debugLog && this->m_debugLog &&
         from->m_debugLog->isLogFileSet()) {
         this->m_debugLog->setDebugLogFile(from->m_debugLog->getDebugLogFile());

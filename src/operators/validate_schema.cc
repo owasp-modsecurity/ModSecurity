@@ -33,6 +33,14 @@ bool ValidateSchema::init(const std::string &file, const char **error) {
         return false;
     }
 
+    return true;
+}
+
+
+bool ValidateSchema::evaluate(Transaction *t,
+    const std::string &str) {
+    int rc;
+
     m_parserCtx = xmlSchemaNewParserCtxt(m_resource.c_str());
     if (m_parserCtx == NULL) {
         std::stringstream err;
@@ -42,8 +50,8 @@ bool ValidateSchema::init(const std::string &file, const char **error) {
         if (m_err.empty() == false) {
             err << m_err;
         }
-        *error = strdup(err.str().c_str());
-        return false;
+        t->debug(4, err.str());
+        return true;
     }
 
     xmlSchemaSetParserErrors(m_parserCtx,
@@ -65,9 +73,9 @@ bool ValidateSchema::init(const std::string &file, const char **error) {
         if (m_err.empty() == false) {
             err << " " << m_err;
         }
-        *error = strdup(err.str().c_str());
+        t->debug(4, err.str());
         xmlSchemaFreeParserCtxt(m_parserCtx);
-        return false;
+        return true;
     }
 
     m_validCtx = xmlSchemaNewValidCtxt(m_schema);
@@ -76,17 +84,9 @@ bool ValidateSchema::init(const std::string &file, const char **error) {
         if (m_err.empty() == false) {
             err << " " << m_err;
         }
-        *error = strdup(err.str().c_str());
-        return false;
+        t->debug(4, err.str());
+        return true;
     }
-
-    return true;
-}
-
-
-bool ValidateSchema::evaluate(Transaction *t,
-    const std::string &str) {
-    int rc;
 
     /* Send validator errors/warnings to msr_log */
     xmlSchemaSetValidErrors(m_validCtx,

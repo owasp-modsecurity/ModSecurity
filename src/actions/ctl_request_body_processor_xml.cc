@@ -24,8 +24,9 @@ namespace modsecurity {
 namespace actions {
 
 
-bool CtlRequestBodyProcessorXML::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->m_requestBodyProcessor = modsecurity::Transaction::XMLRequestBody;
+bool CtlRequestBodyProcessorXML::evaluate(Rule *rule,
+    Transaction *transaction) {
+    transaction->m_requestBodyProcessor = Transaction::XMLRequestBody;
     return true;
 }
 

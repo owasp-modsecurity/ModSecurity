@@ -213,6 +213,8 @@ using modsecurity::Variables::XML;
 %token <std::string> CONFIG_DIR_DEBUG_LOG
 %token <std::string> CONFIG_DIR_DEBUG_LVL
 
+%token <std::string> CONFIG_XML_EXTERNAL_ENTITY
+
 %token <std::string> CONFIG_DIR_SEC_ACTION
 %token <std::string> CONFIG_DIR_SEC_DEFAULT_ACTION
 %token <std::string> CONFIG_DIR_SEC_MARKER
@@ -651,6 +653,14 @@ expression:
         {
             driver.m_responseBodyTypeToBeInspected.insert(*it);
         }
+      }
+    | CONFIG_XML_EXTERNAL_ENTITY CONFIG_VALUE_OFF
+      {
+        driver.secXMLExternalEntity = false;
+      }
+    | CONFIG_XML_EXTERNAL_ENTITY CONFIG_VALUE_ON
+      {
+        driver.secXMLExternalEntity = true;
       }
     | CONGIG_DIR_SEC_TMP_DIR
     | CONGIG_DIR_SEC_DATA_DIR

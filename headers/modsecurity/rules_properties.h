@@ -56,6 +56,7 @@ class RulesProperties {
         requestBodyInMemoryLimit(0),
         secRequestBodyAccess(false),
         secResponseBodyAccess(false),
+        secXMLExternalEntity(false),
         requestBodyLimitAction(ProcessPartialBodyLimitAction),
         responseBodyLimit(0),
         responseBodyLimitAction(ProcessPartialBodyLimitAction),
@@ -71,6 +72,7 @@ class RulesProperties {
         requestBodyInMemoryLimit(0),
         secRequestBodyAccess(false),
         secResponseBodyAccess(false),
+        secXMLExternalEntity(false),
         requestBodyLimitAction(ProcessPartialBodyLimitAction),
         responseBodyLimit(0),
         responseBodyLimitAction(ProcessPartialBodyLimitAction),
@@ -202,6 +204,7 @@ class RulesProperties {
 
     bool secRequestBodyAccess;
     bool secResponseBodyAccess;
+    bool secXMLExternalEntity;
     std::string audit_log_path;
     std::string audit_log_parts;
     std::list<std::string> components;

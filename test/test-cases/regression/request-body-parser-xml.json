@@ -43,6 +43,7 @@
     "rules":[
         "SecRuleEngine On",
         "SecRequestBodyAccess On",
+        "SecXMLExternalEntity On",
         "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500005,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
         "SecRule XML \"@validateSchema test-cases/data/SoapEnvelope.xsd\" \"id:500007,phase:3,deny\""
     ]
@@ -92,6 +93,7 @@
     "rules":[
         "SecRuleEngine On",
         "SecRequestBodyAccess On",
+        "SecXMLExternalEntity On",
         "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500008,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
         "SecRule XML \"@validateSchema test-cases/data/SoapEnvelope.xsd\" \"id:500007,phase:3,deny\""
     ]
@@ -141,6 +143,7 @@
     "rules":[
         "SecRuleEngine On",
         "SecRequestBodyAccess On",
+        "SecXMLExternalEntity On",
         "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500008,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
         "SecRule XML \"@validateSchema test-cases/data/SoapEnvelope.xsd\" \"id:500007,phase:3,deny\""
     ]
@@ -190,6 +193,7 @@
     "rules":[
         "SecRuleEngine On",
         "SecRequestBodyAccess On",
+        "SecXMLExternalEntity On",
         "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500008,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
         "SecRule XML \"@validateSchema test-cases/data/SoapEnvelope.xsd\" \"id:500007,phase:3,deny\""
     ]
@@ -199,7 +203,8 @@
     "version_min":300000,
     "title":"Testing XML request body parser (bad schema)",
     "expected":{
-      "parser_error": " XML: Failed to load Schema: test-cases/data/SoapEnvelope-bad.xsd. XML Error: Failed to parse the XML resource 'test-cases/data/SoapEnvelope-bad.xsd"
+      "debug_log": "XML: Failed to load Schema: test-cases/data/SoapEnvelope-bad.xsd. XML Error: Failed to parse the XML resource 'test-cases/data/SoapEnvelope-bad.xsd",
+      "http_code": 403
     },
     "client":{
       "ip":"200.249.12.31",
@@ -238,6 +243,7 @@
     "rules":[
         "SecRuleEngine On",
         "SecRequestBodyAccess On",
+        "SecXMLExternalEntity On",
         "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500008,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
         "SecRule XML \"@validateSchema test-cases/data/SoapEnvelope-bad.xsd\" \"id:500007,phase:3,deny\""
     ]

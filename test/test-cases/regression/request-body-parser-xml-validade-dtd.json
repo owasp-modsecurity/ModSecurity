@@ -39,6 +39,7 @@
     "rules":[
         "SecRuleEngine On",
         "SecRequestBodyAccess On",
+        "SecXMLExternalEntity On",
         "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500008,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
         "SecRule XML \"@validateDTD test-cases/data/SoapEnvelope.dtd\" \"id:500007,phase:3,deny\""
     ]
@@ -84,6 +85,7 @@
     "rules":[
         "SecRuleEngine On",
         "SecRequestBodyAccess On",
+        "SecXMLExternalEntity On",
         "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500008,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
         "SecRule XML \"@validateDTD test-cases/data/SoapEnvelope.dtd\" \"id:500007,phase:3,deny\""
     ]
@@ -129,6 +131,7 @@
     "rules":[
         "SecRuleEngine On",
         "SecRequestBodyAccess On",
+        "SecXMLExternalEntity On",
         "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500008,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
         "SecRule XML \"@validateDTD test-cases/data/SoapEnvelope.dtd\" \"id:500007,phase:3,deny\""
     ]
@@ -138,7 +141,8 @@
     "version_min":300000,
     "title":"Testing XML request body parser - validateDTD (bad DTD)",
     "expected":{
-      "parser_error": "Line: 4. Column: 12. XML: Failed to load DTD: test-cases/data/SoapEnvelope-bad.dtd"
+      "debug_log": "Failed to load DTD: test-cases/data/SoapEnvelope-bad.dtd",
+      "http_code": 403
     },
     "client":{
       "ip":"200.249.12.31",
@@ -173,6 +177,7 @@
     "rules":[
         "SecRuleEngine On",
         "SecRequestBodyAccess On",
+        "SecXMLExternalEntity On",
         "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500008,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
         "SecRule XML \"@validateDTD test-cases/data/SoapEnvelope-bad.dtd\" \"id:500007,phase:3,deny\""
     ]

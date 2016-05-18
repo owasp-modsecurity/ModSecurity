@@ -21,6 +21,7 @@
 #include <iostream>
 
 #include "modsecurity/transaction.h"
+#include "modsecurity/rules.h"
 
 #ifndef SRC_REQUEST_BODY_PROCESSOR_XML_H_
 #define SRC_REQUEST_BODY_PROCESSOR_XML_H_
@@ -48,7 +49,7 @@ class XML {
     bool processChunk(const char *buf, unsigned int size);
     bool complete();
     static xmlParserInputBufferPtr unloadExternalEntity(const char *URI,
-        xmlCharEncoding enc) { return NULL; }
+        xmlCharEncoding enc);
 
 #ifndef NO_LOGS
     void debug(int a, std::string str) {

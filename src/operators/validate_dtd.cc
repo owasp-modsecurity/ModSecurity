@@ -39,20 +39,20 @@ bool ValidateDTD::init(const std::string &file, const char **error) {
     xmlSetGenericErrorFunc(NULL,
         null_error);
 
-    m_dtd = xmlParseDTD(NULL, (const xmlChar *)m_resource.c_str());
-    if (m_dtd == NULL) {
-        std::string err = std::string("XML: Failed to load DTD: ") \
-            + m_resource;
-        *error = strdup(err.c_str());
-        return false;
-    }
-
     return true;
 }
 
 
 bool ValidateDTD::evaluate(Transaction *t, const std::string &str) {
     xmlValidCtxtPtr cvp;
+
+    m_dtd = xmlParseDTD(NULL, (const xmlChar *)m_resource.c_str());
+    if (m_dtd == NULL) {
+        std::string err = std::string("XML: Failed to load DTD: ") \
+            + m_resource;
+        t->debug(4, err);
+        return true;
+    }
 
     if (t->m_xml->m_data.doc == NULL) {
         t->debug(4, "XML document tree could not "\

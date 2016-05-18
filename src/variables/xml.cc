@@ -34,6 +34,8 @@
 #include <utility>
 
 #include "modsecurity/transaction.h"
+#include "modsecurity/rules_properties.h"
+#include "modsecurity/rules.h"
 
 #include "src/request_body_processor/xml.h"
 #include "src/actions/action.h"
