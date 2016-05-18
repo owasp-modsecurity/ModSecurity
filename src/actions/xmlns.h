@@ -37,9 +37,8 @@ class XmlNS : public Action {
 
     bool init(std::string *error);
 
- private:
-    std::string m_name;
-    std::string m_value;
+    std::string m_scope;
+    std::string m_href;
 };
 
 

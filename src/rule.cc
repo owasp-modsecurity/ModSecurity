@@ -527,4 +527,25 @@ bool Rule::evaluate(Transaction *trasn) {
     return ret;
 }
 
+
+std::vector<actions::Action *> Rule::getActionsByName(const std::string& name) {
+    std::vector<actions::Action *> ret;
+    for (auto &z : this->actions_runtime_pos) {
+        if (z->m_name == name) {
+            ret.push_back(z);
+        }
+    }
+    for (auto &z : this->actions_runtime_pre) {
+        if (z->m_name == name) {
+            ret.push_back(z);
+        }
+    }
+    for (auto &z : this->actions_conf) {
+        if (z->m_name == name) {
+            ret.push_back(z);
+        }
+    }
+    return ret;
+}
+
 }  // namespace modsecurity

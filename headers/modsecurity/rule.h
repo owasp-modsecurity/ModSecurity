@@ -52,6 +52,7 @@ class Rule {
     std::vector<actions::Action *> actions_runtime_pos;
 
     std::vector<std::string> getActionNames();
+    std::vector<actions::Action *> getActionsByName(const std::string& name);
 
     std::vector<Variables::Variable *> *variables;
     int phase;

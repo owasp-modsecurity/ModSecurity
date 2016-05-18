@@ -23,6 +23,9 @@
 #include <fcntl.h>
 #include <libxml/xmlschemas.h>
 #include <libxml/xpath.h>
+#include <libxml/tree.h>
+#include <libxml/parser.h>
+#include <libxml/xpathInternals.h>
 
 #include <iostream>
 #include <string>
@@ -33,11 +36,14 @@
 #include "modsecurity/transaction.h"
 
 #include "src/request_body_processor/xml.h"
+#include "src/actions/action.h"
+#include "src/actions/xmlns.h"
 
 namespace modsecurity {
 namespace Variables {
 
 void XML::evaluateInternal(Transaction *t,
+    Rule *rule,
     std::vector<const collection::Variable *> *l) {
     xmlXPathContextPtr xpathCtx;
     xmlXPathObjectPtr xpathObj;
@@ -60,8 +66,10 @@ void XML::evaluateInternal(Transaction *t,
     /* Is there an XML document tree at all? */
     if (t->m_xml->m_data.doc == NULL) {
         /* Sorry, we've got nothing to give! */
+        t->debug(1, "XML: No XML document found, returning.");
         return;
     }
+
     if (param.empty() == true) {
         /* Invocation without an XPath expression makes sense
          * with functions that manipulate the document tree.
@@ -70,6 +78,7 @@ void XML::evaluateInternal(Transaction *t,
             std::string("[XML document tree]" + param)));
         return;
     }
+
     /* Process the XPath expression. */
     xpathExpr = (const xmlChar*)param.c_str();
     xpathCtx = xmlXPathNewContext(t->m_xml->m_data.doc);
@@ -77,32 +86,24 @@ void XML::evaluateInternal(Transaction *t,
         t->debug(1, "XML: Unable to create new XPath context.");
         return;
     }
-#if 0
-    /* Look through the actionset of the associated rule
-     * for the namespace information. Register them if any are found.
-     */
-    tarr = apr_table_elts(rule->actionset->actions);
-    telts = (const apr_table_entry_t*)tarr->elts;
-    for (i = 0; i < tarr->nelts; i++) {
-        msre_action *action = (msre_action *)telts[i].val;
 
-        if (strcasecmp(action->metadata->name, "xmlns") == 0) {
-            char *prefix, *href;
-
-            if (parse_name_eq_value(mptmp, action->param, &prefix, &href) < 0) return -1;
-            if ((prefix == NULL)||(href == NULL)) return -1;
-
-            if(xmlXPathRegisterNs(xpathCtx, (const xmlChar*)prefix, (const xmlChar*)href) != 0) {
-                msr_log(msr, 1, "Failed to register XML namespace href \"%s\" prefix \"%s\".",
-                    log_escape(mptmp, prefix), log_escape(mptmp, href));
-                return -1;
+    if (rule == NULL) {
+        t->debug(2, "XML: Can't look for xmlns, internal error.");
+    } else {
+        std::vector<actions::Action *> acts = rule->getActionsByName("xmlns");
+        for (auto &x : acts) {
+            actions::XmlNS *z = (actions::XmlNS *)x;
+            if (xmlXPathRegisterNs(xpathCtx, (const xmlChar*)z->m_scope.c_str(),
+                    (const xmlChar*)z->m_href.c_str()) != 0) {
+                t->debug(1, "Failed to register XML namespace href \"" + \
+                    z->m_href + "\" prefix \"" + z->m_scope + "\".");
+                return;
             }
 
-            msr_log(msr, 4, "Registered XML namespace href \"%s\" prefix \"%s\".",
-                log_escape(mptmp, prefix), log_escape(mptmp, href));
+            t->debug(4, "Registered XML namespace href \"" + z->m_href + \
+                "\" prefix \"" + z->m_scope + "\"");
         }
     }
-#endif
 
     /* Initialise XPath expression. */
     xpathObj = xmlXPathEvalExpression(xpathExpr, xpathCtx);

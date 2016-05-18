@@ -35,23 +35,23 @@ bool XmlNS::init(std::string *error) {
         error->assign("XMLS: Bad format, missing equals sign.");
         return false;
     }
-    m_name = std::string(m_parser_payload, 0, pos);
-    m_value = std::string(m_parser_payload, pos+1, m_parser_payload.size());
+    m_scope = std::string(m_parser_payload, 0, pos);
+    m_href = std::string(m_parser_payload, pos+1, m_parser_payload.size());
 
-    if (m_value.empty() || m_name.empty()) {
+    if (m_href.empty() || m_scope.empty()) {
         error->assign("XMLS: XMLNS is invalid. Expecting a " \
             "name=value format.");
         return false;
     }
 
-    if (m_value.at(0) == '\'' && m_value.size() > 3) {
-        m_value.erase(0, 1);
-        m_value.pop_back();
+    if (m_href.at(0) == '\'' && m_href.size() > 3) {
+        m_href.erase(0, 1);
+        m_href.pop_back();
     }
 
-    if (m_value.compare(0, http.length(), http) != 0) {
+    if (m_href.compare(0, http.length(), http) != 0) {
         error->assign("XMLS: Missing xmlns href for prefix: " \
-            "`" + m_value + "'.");
+            "`" + m_href + "'.");
         return false;
     }
 
