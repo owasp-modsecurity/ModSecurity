@@ -3,8 +3,20 @@ BUILT_SOURCES= \
 	parser/seclang-parser.cc
 
 lib_LTLIBRARIES = libmodsecurity.la
+noinst_LTLIBRARIES = libmbedtls.la
 libmodsecurity_ladir = $(prefix)/include
 libmodsecurity_includesubdir = $(pkgincludedir)/collection/
+
+
+
+libmbedtls_la_SOURCES = \
+	utils/mbedtls/base64.c
+
+
+libmbedtls_la_CFLAGS = -D MBEDTLS_CONFIG_FILE=\"mbed-tls-config.h\" -Iutils
+libmbedtls_la_CPPFLAGS =
+libmbedtls_la_LIBADD =
+
 
 CLEANFILES = \
 	location.hh \
@@ -170,6 +182,7 @@ OPERATORS = \
 
 UTILS = \
 	utils/acmp.cc \
+	utils/base64.cc \
 	utils/geo_lookup.cc \
 	utils/https_client.cc \
 	utils/ip_tree.cc \
@@ -241,7 +254,8 @@ libmodsecurity_la_LIBADD = \
 	$(PCRE_LDADD) \
 	$(YAJL_LDADD) \
 	$(LIBXML2_LDADD) \
-	../others/libinjection.la
+	../others/libinjection.la \
+	libmbedtls.la
 
 
 libmodsecurity_la_LDFLAGS = \
