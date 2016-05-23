@@ -24,6 +24,7 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
+#include "utils/crypto_helpers.h"
 
 
 namespace modsecurity {
@@ -37,15 +38,7 @@ Md5::Md5(std::string action)
 
 std::string Md5::evaluate(std::string value,
     Transaction *transaction) {
-    /**
-     * @todo Implement the transformation Md5
-     */
-    if (transaction) {
-#ifndef NO_LOGS
-        transaction->debug(4, "Transformation Md5 is not implemented yet.");
-#endif
-    }
-    return value;
+    return modsecurity::utils::crypto::md5_raw(value);
 }
 
 }  // namespace transformations

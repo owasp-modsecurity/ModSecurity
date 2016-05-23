@@ -169,7 +169,9 @@ OPERATORS = \
 
 UTILS = \
 	utils/acmp.cc \
+    utils/crypto_helpers.cc \
 	utils/geo_lookup.cc \
+    utils/hexify.cc \
 	utils/https_client.cc \
 	utils/ip_tree.cc \
 	utils/md5.cc \

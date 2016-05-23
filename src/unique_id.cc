@@ -51,22 +51,23 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "src/utils/sha1.h"
+#include "src/utils/crypto_helpers.h"
 
 namespace modsecurity {
 
 void UniqueId::fillUniqueId() {
     std::string macAddress;
     std::string name;
-    Utils::SHA1 sha1;
+    //Utils::SHA1 sha1;
 
     macAddress = ethernetMacAddress();
     name = machineName();
-
-    sha1.update(&macAddress);
-    sha1.update(&name);
-
-    this->uniqueId_str = sha1.final();
+    std::string macAndName = macAddress + name;
+    this->uniqueId_str = modsecurity::utils::crypto::sha1( macAndName );
+    //this->uniqueId_str = retval;
+    //sha1.update(&macAddress);
+    //sha1.update(&name);
+    //this->uniqueId_str = sha1.final();
 }
 
 // Based on:

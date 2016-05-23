@@ -24,7 +24,7 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
-#include "utils/sha1.h"
+#include "utils/crypto_helpers.h"
 #include "src/utils.h"
 
 
@@ -39,12 +39,12 @@ Sha1::Sha1(std::string action)
 
 std::string Sha1::evaluate(std::string value,
     Transaction *transaction) {
-
-    Utils::SHA1 sha1;
-    sha1.update(&value);
-    std::string sha1_bin = sha1.final_bin();
-
-    return sha1_bin;
+    
+    //Utils::SHA1 sha1;
+    //sha1.update(&value);
+    //std::string sha1_bin = sha1.final_bin();
+    
+    return modsecurity::utils::crypto::sha1_raw(value);
 }
 
 }  // namespace transformations
