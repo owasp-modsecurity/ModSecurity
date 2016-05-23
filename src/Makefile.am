@@ -44,6 +44,7 @@ VARIABLES = \
 	variables/env.cc \
 	variables/highest_severity.cc \
 	variables/modsec_build.cc \
+	variables/remote_user.cc \
 	variables/time.cc \
 	variables/time_day.cc \
 	variables/time_epoch.cc \

@@ -53,6 +53,7 @@ class Driver;
 #include "variables/env.h"
 #include "variables/highest_severity.h"
 #include "variables/modsec_build.h"
+#include "variables/remote_user.h"
 #include "variables/time_day.h"
 #include "variables/time_epoch.h"
 #include "variables/time.h"
@@ -96,6 +97,7 @@ using modsecurity::Variables::Duration;
 using modsecurity::Variables::Env;
 using modsecurity::Variables::HighestSeverity;
 using modsecurity::Variables::ModsecBuild;
+using modsecurity::Variables::RemoteUser;
 using modsecurity::Variables::Time;
 using modsecurity::Variables::TimeDay;
 using modsecurity::Variables::TimeEpoch;
@@ -226,6 +228,8 @@ using modsecurity::Variables::XML;
 %token <std::string> RUN_TIME_VAR_ENV
 %token <std::string> RUN_TIME_VAR_BLD
 %token <std::string> RUN_TIME_VAR_HSV
+
+%token <std::string> RUN_TIME_VAR_REMOTE_USER
 
 %token <std::string> RUN_TIME_VAR_TIME
 %token <std::string> RUN_TIME_VAR_TIME_DAY
@@ -750,6 +754,15 @@ var:
         CHECK_VARIATION(&) { var = new Count(new HighestSeverity(name)); }
         CHECK_VARIATION(!) { var = new Exclusion(new HighestSeverity(name)); }
         if (!var) { var = new HighestSeverity(name); }
+        $$ = var;
+      }
+    | RUN_TIME_VAR_REMOTE_USER
+      {
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new RemoteUser(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new RemoteUser(name)); }
+        if (!var) { var = new RemoteUser(name); }
         $$ = var;
       }
     | RUN_TIME_VAR_TIME

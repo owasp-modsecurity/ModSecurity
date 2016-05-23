@@ -124,6 +124,7 @@ VARIABLE_COL (?i:(SESSION|GLOBAL|ARGS_POST|ARGS_GET|ARGS|FILES_SIZES|FILES_NAMES
 VARIABLE_TX (?i:TX)
 VARIABLE_WEBSERVER_ERROR_LOG (?:WEBSERVER_ERROR_LOG)
 
+RUN_TIME_VAR_REMOTE_USER  (?i:REMOTE_USER)
 RUN_TIME_VAR_DUR  (?i:DURATION)
 RUN_TIME_VAR_ENV  (?i:ENV)
 RUN_TIME_VAR_BLD  (?i:MODSEC_BUILD)
@@ -235,6 +236,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 [!&]?{VARIABLE_TX}(\:{DICT_ELEMENT})?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_TX(yytext, *driver.loc.back()); }
 [!&]?{VARIABLE_TX}(\:[\']{FREE_TEXT_QUOTE}[\'])?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_TX(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_DUR}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_REMOTE_USER}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_REMOTE_USER(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_ENV}(\:{DICT_ELEMENT})?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_ENV}(\:[\']{FREE_TEXT_QUOTE}[\'])?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_BLD}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
