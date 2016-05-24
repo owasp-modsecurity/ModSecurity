@@ -24,29 +24,21 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
+#include "utils/base64.h"
 
 
 namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-Base64Decode::Base64Decode(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 std::string Base64Decode::evaluate(std::string value,
     Transaction *transaction) {
-    /**
-     * @todo Implement the transformation base64decode
-     */
-    if (transaction) {
-#ifndef NO_LOGS
-        transaction->debug(4, "Transformation 64 is not implemented yet.");
-#endif
-    }
-    return value;
+    std::string ret = Utils::Base64::decode(value);
+
+    return ret;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

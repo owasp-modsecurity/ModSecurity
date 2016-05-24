@@ -74,7 +74,7 @@ std::string Transformation::evaluate(std::string value,
 
 Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(base64_decode_ext) { return new Base64DecodeExt(a); }
-    IF_MATCH(base64_decode) { return new Base64Decode(a); }
+    IF_MATCH(base64Decode) { return new Base64Decode(a); }
     IF_MATCH(cmd_line) { return new CmdLine(a); }
     IF_MATCH(compress_whitespace) { return new CompressWhitespace(a); }
     IF_MATCH(cssDecode) { return new CssDecode(a); }
