@@ -101,6 +101,7 @@ ACTIONS = \
 	actions/skip_after.cc \
 	actions/tag.cc \
 	actions/transformations/base64_decode.cc \
+	actions/transformations/base64_encode.cc \
 	actions/transformations/base64_decode_ext.cc \
 	actions/transformations/cmd_line.cc \
 	actions/transformations/compress_whitespace.cc \

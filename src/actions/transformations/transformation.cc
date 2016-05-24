@@ -24,6 +24,7 @@
 #include "actions/action.h"
 #include "actions/transformations/base64_decode_ext.h"
 #include "actions/transformations/base64_decode.h"
+#include "actions/transformations/base64_encode.h"
 #include "actions/transformations/cmd_line.h"
 #include "actions/transformations/compress_whitespace.h"
 #include "actions/transformations/css_decode.h"
@@ -75,6 +76,7 @@ std::string Transformation::evaluate(std::string value,
 Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(base64_decode_ext) { return new Base64DecodeExt(a); }
     IF_MATCH(base64Decode) { return new Base64Decode(a); }
+    IF_MATCH(base64Encode) { return new Base64Encode(a); }
     IF_MATCH(cmd_line) { return new CmdLine(a); }
     IF_MATCH(compress_whitespace) { return new CompressWhitespace(a); }
     IF_MATCH(cssDecode) { return new CssDecode(a); }
