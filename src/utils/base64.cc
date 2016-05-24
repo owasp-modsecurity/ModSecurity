@@ -31,7 +31,7 @@ std::string Base64::encode(std::string& data) {
     std::string ret;
 
     mbedtls_base64_encode(NULL, 0, &encoded_len,
-        reinterpret_cast<const unsigned char*>(data.c_str()), data.size());
+        reinterpret_cast<const unsigned char*>(data.c_str()), data.length());
 
     d = reinterpret_cast<unsigned char*>(malloc(sizeof(char) * encoded_len));
     if (d == NULL) {
@@ -41,13 +41,13 @@ std::string Base64::encode(std::string& data) {
     memset(d, '\0', encoded_len);
 
     mbedtls_base64_encode(d, encoded_len, &encoded_len,
-        (unsigned char*) data.c_str(), data.size());
+        (unsigned char*) data.c_str(), data.length());
 
     ret.assign(reinterpret_cast<const char*>(d));
     free(d);
 
 
-    return std::string(reinterpret_cast<const char*>(d));
+    return ret;
 }
 
 
