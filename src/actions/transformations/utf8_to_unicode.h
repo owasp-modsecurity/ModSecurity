@@ -21,24 +21,32 @@
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_UTF8_TO_UNICODE_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_UTF8_TO_UNICODE_H_
 
-#ifdef __cplusplus
+#define UNICODE_ERROR_CHARACTERS_MISSING    -1
+#define UNICODE_ERROR_INVALID_ENCODING      -2
+#define UNICODE_ERROR_OVERLONG_CHARACTER    -3
+#define UNICODE_ERROR_RESTRICTED_CHARACTER  -4
+#define UNICODE_ERROR_DECODING_ERROR        -5
+
 namespace modsecurity {
 class Transaction;
 
 namespace actions {
 namespace transformations {
 
-class Utf8Unicode : public Transformation {
+class Utf8ToUnicode : public Transformation {
  public:
-    explicit Utf8Unicode(std::string action);
+    explicit Utf8ToUnicode(std::string action) : Transformation(action) { }
+
     std::string evaluate(std::string exp,
         Transaction *transaction) override;
+
+    static char *inplace(unsigned char *input, uint64_t input_len,
+        int *changed);
 };
 
 }  // namespace transformations
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_UTF8_TO_UNICODE_H_

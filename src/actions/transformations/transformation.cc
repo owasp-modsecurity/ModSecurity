@@ -113,7 +113,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(urlDecode) { return new UrlDecode(a); }
     IF_MATCH(urlDecodeUni) { return new UrlDecodeUni(a); }
     IF_MATCH(urlEncode) { return new UrlEncode(a); }
-    IF_MATCH(utf8_to_unicode) { return new Utf8Unicode(a); }
+    IF_MATCH(utf8ToUnicode) { return new Utf8ToUnicode(a); }
 
     return new Transformation(a);
 }
