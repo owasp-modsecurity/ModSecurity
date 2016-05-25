@@ -19,6 +19,10 @@
 
 #include <sstream>
 #include <string>
+#include <iostream>
+#include <iterator>
+#include <regex>
+#include <string>
 
 #include "common/colors.h"
 #include "src/utils.h"
@@ -124,68 +128,23 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
            u->ret = YAJL_GET_INTEGER(val);
         } else if (strcmp(key, "output") == 0) {
            u->output = std::string(YAJL_GET_STRING(val));
+           std::string *in = &u->output;
            /*
             * Converting \\u0000 to \0 due to the following gcc bug:
             * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53690
             *
             */
-           // FIXME: Really? replace the hex chars in a smart fashion.
-           replaceAll(&(u->output), "\\x00", '\0');
+            std::regex re("\\\\x([a-z0-9A-Z]{2})");
+            std::smatch match;
+            while (std::regex_search(*in, match, re) && match.size() > 1) {
+                unsigned int p;
+                std::string toBeReplaced = match.str();
+                toBeReplaced.erase(0, 2);
+                sscanf(toBeReplaced.c_str(), "%x", &p);
+                replaceAll(in, match.str(), p);
+            }
            replaceAll(&(u->output), "\\u0000", '\0');
-           replaceAll(&(u->output), "\\xe4", '\xe4');
-           replaceAll(&(u->output), "\\x03", '\x03');
-           replaceAll(&(u->output), "\\x04", '\x04');
-           replaceAll(&(u->output), "\\x07", '\x07');
-           replaceAll(&(u->output), "\\x09", '\x09');
-           replaceAll(&(u->output), "\\xbf", '\xbf');
-           replaceAll(&(u->output), "\\xc9", '\xc9');
-           replaceAll(&(u->output), "\\x3b", '\x3b');
-           replaceAll(&(u->output), "\\xFF", '\xff');
            replaceAll(&(u->output), "\\0", '\0');
-           replaceAll(&(u->output), "\\x90", '\x90');
-           replaceAll(&(u->output), "\\x14", '\x14');
-           replaceAll(&(u->output), "\\x82", '\x82');
-           replaceAll(&(u->output), "\\x9a", '\x9a');
-           replaceAll(&(u->output), "\\xbc", '\xbc');
-           replaceAll(&(u->output), "\\xfe", '\xfe');
-           replaceAll(&(u->output), "\\x89", '\x89');
-           replaceAll(&(u->output), "\\xa0", '\xa0');
-           replaceAll(&(u->output), "\\xa2", '\xa2');
-           replaceAll(&(u->output), "\\xa6", '\xa6');
-           replaceAll(&(u->output), "\\xab", '\xab');
-           replaceAll(&(u->output), "\\xd4", '\xd4');
-           replaceAll(&(u->output), "\\x1d", '\x1d');
-           replaceAll(&(u->output), "\\x8c", '\x8c');
-           replaceAll(&(u->output), "\\xd9", '\xd9');
-           replaceAll(&(u->output), "\\x8f", '\x8f');
-           replaceAll(&(u->output), "\\xb2", '\xb2');
-           replaceAll(&(u->output), "\\xe9", '\xe9');
-           replaceAll(&(u->output), "\\x9e", '\x9e');
-           replaceAll(&(u->output), "\\x80", '\x80');
-           replaceAll(&(u->output), "\\x98", '\x98');
-           replaceAll(&(u->output), "\\xec", '\xec');
-           replaceAll(&(u->output), "\\xf8", '\xf8');
-           replaceAll(&(u->output), "\\xc1", '\xc1');
-           replaceAll(&(u->output), "\\xc3", '\xc3');
-           replaceAll(&(u->output), "\\x83", '\x83');
-           replaceAll(&(u->output), "\\xaa", '\xaa');
-           replaceAll(&(u->output), "\\xa5", '\xa5');
-           replaceAll(&(u->output), "\\xb5", '\xb5');
-           replaceAll(&(u->output), "\\xd1", '\xd1');
-           replaceAll(&(u->output), "\\xde", '\xde');
-           replaceAll(&(u->output), "\\xea", '\xea');
-           replaceAll(&(u->output), "\\xe6", '\xe6');
-           replaceAll(&(u->output), "\\xe7", '\xe7');
-           replaceAll(&(u->output), "\\xd3", '\xd3');
-           replaceAll(&(u->output), "\\xb4", '\xb4');
-           replaceAll(&(u->output), "\\xdf", '\xdf');
-           replaceAll(&(u->output), "\\xaf", '\xaf');
-           replaceAll(&(u->output), "\\x01", '\x01');
-           replaceAll(&(u->output), "\\x16", '\x16');
-           replaceAll(&(u->output), "\\x0b", '\x0b');
-           replaceAll(&(u->output), "\\x1f", '\x1f');
-           replaceAll(&(u->output), "\\x83", '\x83');
-           replaceAll(&(u->output), "\\xd2", '\xd2');
         }
     }
 
