@@ -30,9 +30,12 @@ namespace transformations {
 
 class HexDecode : public Transformation {
  public:
-    explicit HexDecode(std::string action);
+    explicit HexDecode(std::string action) : Transformation(action) { }
+
     std::string evaluate(std::string exp,
         Transaction *transaction) override;
+
+    static int inplace(unsigned char *data, int len);
 };
 
 }  // namespace transformations

@@ -45,11 +45,12 @@ std::string Utf8ToUnicode::evaluate(std::string value,
         return "";
     }
 
-    inplace(input, value.size() + 1, &changed);
-
     memcpy(input, value.c_str(), value.length()+1);
 
-    ret.assign(reinterpret_cast<char *>(input), 10);
+    inplace(input, value.size() + 1, &changed);
+
+    ret.assign(reinterpret_cast<char *>(input),
+        strlen(reinterpret_cast<char *>(input)));
     free(input);
 
     return ret;

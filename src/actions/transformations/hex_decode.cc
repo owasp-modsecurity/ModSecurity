@@ -24,32 +24,52 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
-
+#include "src/utils.h"
 
 namespace modsecurity {
 namespace actions {
 namespace transformations {
 
 
-HexDecode::HexDecode(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
+std::string HexDecode::evaluate(std::string value,
+    Transaction *transaction) {
+    std::string ret;
+    unsigned char *input = NULL;
+    int size = 0;
+
+    input = reinterpret_cast<unsigned char *>
+        (malloc(sizeof(char) * value.length()+1));
+
+    if (input == NULL) {
+        return "";
+    }
+
+    memcpy(input, value.c_str(), value.length()+1);
+
+    size = inplace(input, value.length());
+
+    ret.assign(reinterpret_cast<char *>(input), size);
+    free(input);
+
+    return ret;
 }
 
 
-std::string HexDecode::evaluate(std::string value,
-    Transaction *transaction) {
-    int len = value.length();
-    std::string newString;
+int HexDecode::inplace(unsigned char *data, int len) {
+    unsigned char *d = data;
+    int i, count = 0;
 
-    for (int i=0; i< len; i+=2) {
-        std::string byte = value.substr(i, 2);
-        char chr =  static_cast<char>(static_cast<int>(strtol(byte.c_str(),
-            NULL, 16)));
-        newString.push_back(chr);
+    if ((data == NULL) || (len == 0)) {
+        return 0;
     }
 
-    return newString;
+    for (i = 0; i <= len - 2; i += 2) {
+        *d++ = x2c(&data[i]);
+        count++;
+    }
+    *d = '\0';
+
+    return count;
 }
 
 
