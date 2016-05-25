@@ -30,24 +30,86 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-RemoveComments::RemoveComments(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 std::string RemoveComments::evaluate(std::string value,
     Transaction *transaction) {
-    /**
-     * @todo Implement the transformation RemoveComments
-     */
-    if (transaction) {
-#ifndef NO_LOGS
-        transaction->debug(4, "Transformation RemoveComments is not " \
-            "implemented yet.");
-#endif
+    std::string ret;
+    unsigned char *input = NULL;
+
+    input = reinterpret_cast<unsigned char *>
+        (malloc(sizeof(char) * value.length()+1));
+
+    if (input == NULL) {
+        return "";
     }
-    return value;
+
+    memcpy(input, value.c_str(), value.length()+1);
+
+    u_int64_t input_len = value.size();
+    u_int64_t i, j, incomment;
+    int changed = 0;
+
+    i = j = incomment = 0;
+    while (i < input_len) {
+        if (incomment == 0) {
+            if ((input[i] == '/') && (i + 1 < input_len)
+                && (input[i + 1] == '*')) {
+                changed = 1;
+                incomment = 1;
+                i += 2;
+            } else if ((input[i] == '<') && (i + 1 < input_len)
+                && (input[i + 1] == '!') && (i + 2 < input_len)
+                && (input[i+2] == '-') && (i + 3 < input_len)
+                && (input[i + 3] == '-') && (incomment == 0)) {
+                incomment = 1;
+                changed = 1;
+                i += 4;
+            } else if ((input[i] == '-') && (i + 1 < input_len)
+                && (input[i + 1] == '-') && (incomment == 0)) {
+                changed = 1;
+                input[i] = ' ';
+                break;
+            } else if (input[i] == '#' && (incomment == 0)) {
+                changed = 1;
+                input[i] = ' ';
+                break;
+            } else {
+                input[j] = input[i];
+                i++;
+                j++;
+            }
+        } else {
+            if ((input[i] == '*') && (i + 1 < input_len)
+                && (input[i + 1] == '/')) {
+                incomment = 0;
+                i += 2;
+                input[j] = input[i];
+                i++;
+                j++;
+            } else if ((input[i] == '-') && (i + 1 < input_len)
+                && (input[i + 1] == '-') && (i + 2 < input_len)
+                && (input[i+2] == '>'))   {
+                incomment = 0;
+                i += 3;
+                input[j] = input[i];
+                i++;
+                j++;
+            } else {
+                i++;
+            }
+        }
+    }
+
+    if (incomment) {
+        input[j++] = ' ';
+    }
+
+    ret.assign(reinterpret_cast<char *>(input), j);
+    free(input);
+
+    return ret;
 }
+
 
 }  // namespace transformations
 }  // namespace actions

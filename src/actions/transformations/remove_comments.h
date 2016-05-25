@@ -28,12 +28,15 @@ class Transaction;
 namespace actions {
 namespace transformations {
 
+
 class RemoveComments : public Transformation {
  public:
-    explicit RemoveComments(std::string action);
+    explicit RemoveComments(std::string action) : Transformation(action) { }
+
     std::string evaluate(std::string exp,
         Transaction *transaction) override;
 };
+
 
 }  // namespace transformations
 }  // namespace actions
