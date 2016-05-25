@@ -128,17 +128,17 @@ bool Parallel::write(Transaction *transaction, int parts) {
 
     if (log1.is_open() && log2.is_open()) {
         log2 << transaction->toOldAuditLogFormatIndex(fileName, log.length(),
-            md5(log));
+            Utils::Md5::hexdigest(log));
         log2.flush();
     }
     if (log1.is_open() && !log2.is_open()) {
         log1 << transaction->toOldAuditLogFormatIndex(fileName, log.length(),
-            md5(log));
+            Utils::Md5::hexdigest(log));
         log1.flush();
     }
     if (!log1.is_open() && log2.is_open()) {
         log2 << transaction->toOldAuditLogFormatIndex(fileName, log.length(),
-            md5(log));
+            Utils::Md5::hexdigest(log));
         log2.flush();
     }
 

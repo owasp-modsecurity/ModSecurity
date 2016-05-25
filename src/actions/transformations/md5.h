@@ -30,9 +30,9 @@ namespace transformations {
 
 class Md5 : public Transformation {
  public:
-    explicit Md5(std::string action);
-    std::string
-    evaluate(std::string exp,
+    explicit Md5(std::string action) : Transformation(action) { }
+
+    std::string evaluate(std::string exp,
         Transaction *transaction) override;
 };
 

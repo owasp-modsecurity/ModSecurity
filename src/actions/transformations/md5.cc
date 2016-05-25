@@ -24,29 +24,20 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
-
+#include "src/utils/md5.h"
 
 namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-Md5::Md5(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 std::string Md5::evaluate(std::string value,
     Transaction *transaction) {
-    /**
-     * @todo Implement the transformation Md5
-     */
-    if (transaction) {
-#ifndef NO_LOGS
-        transaction->debug(4, "Transformation Md5 is not implemented yet.");
-#endif
-    }
-    return value;
+    std::string ret =  Utils::Md5::digest(value);
+
+    return ret;
 }
+
 
 }  // namespace transformations
 }  // namespace actions
