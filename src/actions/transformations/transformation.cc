@@ -105,7 +105,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(replaceComments) { return new ReplaceComments(a); }
     IF_MATCH(replaceNulls) { return new ReplaceNulls(a); }
     IF_MATCH(sha1) { return new Sha1(a); }
-    IF_MATCH(sql_hex_decode) { return new SqlHexDecode(a); }
+    IF_MATCH(sqlHexDecode) { return new SqlHexDecode(a); }
     IF_MATCH(transformation) { return new Transformation(a); }
     IF_MATCH(trimLeft) { return new TrimLeft(a); }
     IF_MATCH(trimRight) { return new TrimRight(a); }

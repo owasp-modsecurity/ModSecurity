@@ -30,10 +30,19 @@ namespace transformations {
 
 class SqlHexDecode : public Transformation {
  public:
-    explicit SqlHexDecode(std::string action);
-    std::string
-    evaluate(std::string exp,
+    explicit SqlHexDecode(std::string action) : Transformation(action) { }
+
+    std::string evaluate(std::string exp,
         Transaction *transaction) override;
+
+    static int inplace(unsigned char *data, int len);
+
+    static int mytolower(int ch) {
+        if (ch >= 'A' && ch <= 'Z')
+            return ('a' + ch - 'A');
+        else
+            return ch;
+    }
 };
 
 }  // namespace transformations

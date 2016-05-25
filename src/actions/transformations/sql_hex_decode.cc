@@ -24,30 +24,82 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
+#include "src/utils.h"
 
 
 namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-SqlHexDecode::SqlHexDecode(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
-}
+#ifndef VALID_HEX
+#define VALID_HEX(X) (((X >= '0') && (X <= '9')) \
+    || ((X >= 'a') && (X <= 'f')) \
+    || ((X >= 'A') && (X <= 'F')))
+#endif
+#ifndef ISODIGIT
+#define ISODIGIT(X) ((X >= '0') && (X <= '7'))
+#endif
 
 std::string SqlHexDecode::evaluate(std::string value,
     Transaction *transaction) {
-    /**
-     * @todo Implement the transformation SqlHexDecode
-     */
-    if (transaction) {
-#ifndef NO_LOGS
-        transaction->debug(4, "Transformation SqlHexDecode " \
-            "is not implemented yet.");
-#endif
+    std::string ret;
+    unsigned char *input = NULL;
+    int size = 0;
+
+    input = reinterpret_cast<unsigned char *>
+        (malloc(sizeof(char) * value.length()+1));
+
+    if (input == NULL) {
+        return "";
     }
-    return value;
+
+    memcpy(input, value.c_str(), value.length()+1);
+
+    size = inplace(input, value.length());
+
+    ret.assign(reinterpret_cast<char *>(input), size);
+    free(input);
+
+    return ret;
 }
+
+
+int SqlHexDecode::inplace(unsigned char *data, int len) {
+    unsigned char *d, *begin = data;
+
+    if ((data == NULL) || (len == 0)) {
+        return 0;
+    }
+
+    for (d = data; *data; *d++ = *data++) {
+        if (*data != '0') {
+            continue;
+        }
+        ++data;
+        if (mytolower(*data) != 'x') {
+            data--;
+            continue;
+        }
+
+        data++;
+
+        // Do we need to keep "0x" if no hexa after?
+        if (!VALID_HEX(data[0]) || !VALID_HEX(data[1])) {
+            data -= 2;
+            continue;
+        }
+
+        while (VALID_HEX(data[0]) && VALID_HEX(data[1])) {
+            *d++ = x2c(data);
+            data += 2;
+        }
+    }
+
+    *d = '\0';
+    return strlen(reinterpret_cast<char *>(begin));
+}
+
+
 
 }  // namespace transformations
 }  // namespace actions
