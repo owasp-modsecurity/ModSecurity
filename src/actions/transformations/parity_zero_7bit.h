@@ -30,9 +30,10 @@ namespace transformations {
 
 class ParityZero7bit : public Transformation {
  public:
-    explicit ParityZero7bit(std::string action);
-    std::string evaluate(std::string exp,
-        Transaction *transaction) override;
+    explicit ParityZero7bit(std::string action) : Transformation(action) { }
+
+    std::string evaluate(std::string exp, Transaction *transaction) override;
+    static bool inplace(unsigned char *input, u_int64_t input_len);
 };
 
 }  // namespace transformations

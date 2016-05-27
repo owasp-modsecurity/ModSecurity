@@ -94,9 +94,9 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(normalizePath) { return new NormalisePath(a); }
     IF_MATCH(normalisePath) { return new NormalisePath(a); }
     IF_MATCH(normalisePath) { return new NormalisePath(a); }
-    IF_MATCH(parity_even_7bit) { return new ParityEven7bit(a); }
-    IF_MATCH(parity_odd_7bit) { return new ParityOdd7bit(a); }
-    IF_MATCH(parity_zero_7bit) { return new ParityZero7bit(a); }
+    IF_MATCH(parityEven7bit) { return new ParityEven7bit(a); }
+    IF_MATCH(parityOdd7bit) { return new ParityOdd7bit(a); }
+    IF_MATCH(parityZero7bit) { return new ParityZero7bit(a); }
     IF_MATCH(removeCommentsChar) { return new RemoveCommentsChar(a); }
     IF_MATCH(removeComments) { return new RemoveComments(a); }
     IF_MATCH(removeNulls) { return new RemoveNulls(a); }

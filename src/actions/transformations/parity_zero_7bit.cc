@@ -30,24 +30,42 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-ParityZero7bit::ParityZero7bit(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 std::string ParityZero7bit::evaluate(std::string value,
     Transaction *transaction) {
-    /**
-     * @todo Implement the transformation ParityZero7bit
-     */
-    if (transaction) {
-#ifndef NO_LOGS
-        transaction->debug(4, "Transformation ParityZero7bit is not" \
-            "implemented yet.");
-#endif
+    std::string ret;
+    unsigned char *input = NULL;
+
+    input = reinterpret_cast<unsigned char *>
+        (malloc(sizeof(char) * value.length()+1));
+
+    if (input == NULL) {
+        return "";
     }
-    return value;
+
+    memcpy(input, value.c_str(), value.length()+1);
+
+    inplace(input, value.length());
+
+    ret.assign(reinterpret_cast<char *>(input), value.length());
+    free(input);
+
+    return ret;
 }
+
+
+bool ParityZero7bit::inplace(unsigned char *input, u_int64_t input_len) {
+    u_int64_t i;
+
+    i = 0;
+    while (i < input_len) {
+        input[i] &= 0x7f;
+        i++;
+    }
+
+    return true;
+}
+
 
 }  // namespace transformations
 }  // namespace actions

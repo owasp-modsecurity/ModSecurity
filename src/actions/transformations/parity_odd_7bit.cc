@@ -30,24 +30,50 @@ namespace modsecurity {
 namespace actions {
 namespace transformations {
 
-ParityOdd7bit::ParityOdd7bit(std::string action)
-    : Transformation(action) {
-    this->action_kind = 1;
-}
 
 std::string ParityOdd7bit::evaluate(std::string value,
     Transaction *transaction) {
-    /**
-     * @todo Implement the transformation ParityOdd7bit
-     */
-    if (transaction) {
-#ifndef NO_LOGS
-        transaction->debug(4, "Transformation ParityOdd7bit is not " \
-            "implemented yet.");
-#endif
+    std::string ret;
+    unsigned char *input = NULL;
+
+    input = reinterpret_cast<unsigned char *>
+        (malloc(sizeof(char) * value.length()+1));
+
+    if (input == NULL) {
+        return "";
     }
-    return value;
+
+    memcpy(input, value.c_str(), value.length()+1);
+
+    inplace(input, value.length());
+
+    ret.assign(reinterpret_cast<char *>(input), value.length());
+    free(input);
+
+    return ret;
 }
+
+bool ParityOdd7bit::inplace(unsigned char *input, u_int64_t input_len) {
+    u_int64_t i;
+
+    i = 0;
+    while (i < input_len) {
+        unsigned int x = input[i];
+
+        input[i] ^= input[i] >> 4;
+        input[i] &= 0xf;
+
+        if ((0x6996 >> input[i]) & 1) {
+            input[i] = x & 0x7f;
+        } else {
+            input[i] = x | 0x80;
+        }
+        i++;
+    }
+
+    return true;
+}
+
 
 }  // namespace transformations
 }  // namespace actions
