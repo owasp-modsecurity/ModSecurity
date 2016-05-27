@@ -94,16 +94,17 @@ bool ModSecurityTest<T>::load_test_json(std::string file) {
 
 
 template <class T>
-std::pair<std::string, std::vector<T *>>* ModSecurityTest<T>::load_tests() {
+std::pair<std::string, std::vector<T *>>*
+ModSecurityTest<T>::load_tests(std::string path) {
     DIR *dir;
     struct dirent *ent;
     struct stat buffer;
 
-    if ((dir = opendir(this->target.c_str())) == NULL) {
+    if ((dir = opendir(path.c_str())) == NULL) {
         /* if target is a file, use it as a single test. */
-        if (stat(this->target.c_str(), &buffer) == 0) {
-            if (load_test_json(this->target) == false) {
-                std::cout << "Problems loading from: " << this->target;
+        if (stat(path.c_str(), &buffer) == 0) {
+            if (load_test_json(path) == false) {
+                std::cout << "Problems loading from: " << path;
                 std::cout << std::endl;
             }
         }
@@ -117,7 +118,7 @@ std::pair<std::string, std::vector<T *>>* ModSecurityTest<T>::load_tests() {
             || !std::equal(json.rbegin(), json.rend(), filename.rbegin())) {
             continue;
         }
-        if (load_test_json(this->target + "/" + filename) == false) {
+        if (load_test_json(path + "/" + filename) == false) {
             std::cout << "Problems loading tests from: " << filename;
             std::cout << std::endl;
         }
@@ -125,6 +126,12 @@ std::pair<std::string, std::vector<T *>>* ModSecurityTest<T>::load_tests() {
     closedir(dir);
 
     return NULL;
+}
+
+
+template <class T>
+std::pair<std::string, std::vector<T *>>* ModSecurityTest<T>::load_tests() {
+    return load_tests(this->target);
 }
 
 template <class T>

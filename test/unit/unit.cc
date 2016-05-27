@@ -85,6 +85,9 @@ int main(int argc, char **argv) {
     std::cout << test.header();
 
     test.load_tests();
+    if (test.target == default_test_path) {
+        test.load_tests("test-cases/secrules-language-tests/transformations");
+    }
 
     for (std::pair<std::string, std::vector<UnitTest *> *> a : test) {
         std::vector<UnitTest *> *tests = a.second;

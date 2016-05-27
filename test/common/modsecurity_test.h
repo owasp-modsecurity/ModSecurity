@@ -34,6 +34,7 @@ template <class T> class ModSecurityTest :
     std::string header();
     void cmd_options(int, char **);
     std::pair<std::string, std::vector<T *>>* load_tests();
+    std::pair<std::string, std::vector<T *>>* load_tests(std::string path);
     bool load_test_json(std::string);
 
     std::string target;
