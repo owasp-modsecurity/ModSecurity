@@ -11,7 +11,8 @@ libmodsecurity_includesubdir = $(pkgincludedir)/collection/
 
 libmbedtls_la_SOURCES = \
 	utils/mbedtls/base64.c \
-	utils/mbedtls/md5.c
+	utils/mbedtls/md5.c \
+	utils/mbedtls/sha1.c
 
 libmbedtls_la_CFLAGS = -D MBEDTLS_CONFIG_FILE=\"mbed-tls-config.h\" -Iutils
 libmbedtls_la_CPPFLAGS =

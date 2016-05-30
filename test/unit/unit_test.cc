@@ -58,6 +58,37 @@ void replaceAll(std::string *s, const std::string &search,
 }
 
 
+void json2bin(std::string *str) {
+    std::regex re("\\\\x([a-z0-9A-Z]{2})");
+    std::regex re2("\\\\u([a-z0-9A-Z]{4})");
+    std::smatch match;
+
+    while (std::regex_search(*str, match, re) && match.size() > 1) {
+        unsigned int p;
+        std::string toBeReplaced = match.str();
+        toBeReplaced.erase(0, 2);
+        sscanf(toBeReplaced.c_str(), "%x", &p);
+        replaceAll(str, match.str(), p);
+    }
+    while (std::regex_search(*str, match, re2) && match.size() > 1) {
+        unsigned int p;
+        std::string toBeReplaced = match.str();
+        toBeReplaced.erase(0, 2);
+        sscanf(toBeReplaced.c_str(), "%4x", &p);
+        replaceAll(str, match.str(), p);
+    }
+
+    /*
+    replaceAll(str, "\\0", '\0');
+    replaceAll(str, "\\b", '\b');
+    replaceAll(str, "\\t", '\t');
+    replaceAll(str, "\\n", '\n');
+    replaceAll(str, "\\r", '\r');
+    */
+//    replaceAll(str, "\\f", '\f');
+}
+
+
 std::string UnitTest::print() {
     std::stringstream i;
 
@@ -99,27 +130,7 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
            u->param = YAJL_GET_STRING(val);
         } else if (strcmp(key, "input") == 0) {
            u->input = YAJL_GET_STRING(val);
-           /*
-            * Converting \\u0000 to \0 due to the following gcc bug:
-            * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53690
-            *
-            */
-           replaceAll(&(u->input), "\\0", '\0');
-           replaceAll(&(u->input), "\\xe4", '\xe4');
-           replaceAll(&(u->input), "\\x03", '\x03');
-           replaceAll(&(u->input), "\\xbf", '\xbf');
-           replaceAll(&(u->input), "\\xc9", '\xc9');
-           replaceAll(&(u->input), "\\x3b", '\x3b');
-           replaceAll(&(u->input), "\\xFF", '\xff');
-           replaceAll(&(u->input), "\\u0000", '\0');
-           replaceAll(&(u->input), "\\u0001", '\u0001');
-           replaceAll(&(u->input), "\\u0002", '\u0002');
-           replaceAll(&(u->input), "\\u0003", '\u0003');
-           replaceAll(&(u->input), "\\u0004", '\u0004');
-           replaceAll(&(u->input), "\\u0005", '\u0005');
-           replaceAll(&(u->input), "\\u0006", '\u0006');
-           replaceAll(&(u->input), "\\u0007", '\u0007');
-           replaceAll(&(u->input), "\\b", '\b');
+           json2bin(&u->input);
         } else if (strcmp(key, "name") == 0) {
            u->name = YAJL_GET_STRING(val);
         } else if (strcmp(key, "type") == 0) {
@@ -128,23 +139,12 @@ UnitTest *UnitTest::from_yajl_node(yajl_val &node) {
            u->ret = YAJL_GET_INTEGER(val);
         } else if (strcmp(key, "output") == 0) {
            u->output = std::string(YAJL_GET_STRING(val));
-           std::string *in = &u->output;
+           json2bin(&u->output);
            /*
             * Converting \\u0000 to \0 due to the following gcc bug:
             * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53690
             *
             */
-            std::regex re("\\\\x([a-z0-9A-Z]{2})");
-            std::smatch match;
-            while (std::regex_search(*in, match, re) && match.size() > 1) {
-                unsigned int p;
-                std::string toBeReplaced = match.str();
-                toBeReplaced.erase(0, 2);
-                sscanf(toBeReplaced.c_str(), "%x", &p);
-                replaceAll(in, match.str(), p);
-            }
-           replaceAll(&(u->output), "\\u0000", '\0');
-           replaceAll(&(u->output), "\\0", '\0');
         }
     }
 

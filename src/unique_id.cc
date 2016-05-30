@@ -58,15 +58,14 @@ namespace modsecurity {
 void UniqueId::fillUniqueId() {
     std::string macAddress;
     std::string name;
-    Utils::SHA1 sha1;
+    std::string data;
 
     macAddress = ethernetMacAddress();
     name = machineName();
 
-    sha1.update(&macAddress);
-    sha1.update(&name);
+    data = macAddress + name;
 
-    this->uniqueId_str = sha1.final();
+    this->uniqueId_str = Utils::Sha1::hexdigest(data);
 }
 
 // Based on:

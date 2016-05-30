@@ -40,11 +40,7 @@ Sha1::Sha1(std::string action)
 std::string Sha1::evaluate(std::string value,
     Transaction *transaction) {
 
-    Utils::SHA1 sha1;
-    sha1.update(&value);
-    std::string sha1_bin = sha1.final_bin();
-
-    return sha1_bin;
+    return Utils::Sha1::digest(value);
 }
 
 }  // namespace transformations

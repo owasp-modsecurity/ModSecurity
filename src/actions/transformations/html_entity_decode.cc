@@ -36,25 +36,174 @@ namespace transformations {
 
 std::string HtmlEntityDecode::evaluate(std::string value,
     Transaction *transaction) {
+    std::string ret;
+    unsigned char *input = NULL;
 
-    if (HtmlEntityDecodeInstantCache::getInstance().count(value) > 0) {
-        return HtmlEntityDecodeInstantCache::getInstance().at(value);
+    input = reinterpret_cast<unsigned char *>
+        (malloc(sizeof(char) * value.length()+1));
+
+    if (input == NULL) {
+        return "";
     }
 
-    char *tmp = strdup(value.c_str());
+    memcpy(input, value.c_str(), value.length()+1);
 
-    // FIXME: html_entities_decode_inplace is not working as expected
-    //        temporary disabled to perform the audit_log tests.
-    //  html_entities_decode_inplace((unsigned char *)tmp, value.size());
-    std::string ret("");
-    ret.assign(tmp);
-    free(tmp);
+    size_t i = inplace(input, value.length());
 
-    HtmlEntityDecodeInstantCache::getInstance().cache(value, ret);
+    ret.assign(reinterpret_cast<char *>(input), i);
+    free(input);
 
     return ret;
 }
 
+
+int HtmlEntityDecode::inplace(unsigned char *input, u_int64_t input_len) {
+    unsigned char *d = input;
+    int i, count;
+
+    if ((input == NULL) || (input_len <= 0)) {
+        return 0;
+    }
+
+    i = count = 0;
+    while ((i < input_len) && (count < input_len)) {
+        int z, copy = 1;
+
+        /* Require an ampersand and at least one character to
+         * start looking into the entity.
+         */
+        if ((input[i] == '&') && (i + 1 < input_len)) {
+            int k, j = i + 1;
+
+            if (input[j] == '#') {
+                /* Numerical entity. */
+                copy++;
+
+                if (!(j + 1 < input_len)) {
+                    goto HTML_ENT_OUT; /* Not enough bytes. */
+                }
+                j++;
+
+                if ((input[j] == 'x') || (input[j] == 'X')) {
+                    /* Hexadecimal entity. */
+                    copy++;
+
+                    if (!(j + 1 < input_len)) {
+                        goto HTML_ENT_OUT; /* Not enough bytes. */
+                    }
+                    j++; /* j is the position of the first digit now. */
+
+                    k = j;
+                    while ((j < input_len) && (isxdigit(input[j]))) {
+                        j++;
+                    }
+                    if (j > k) { /* Do we have at least one digit? */
+                        /* Decode the entity. */
+                        char *x = NULL;
+                        x = reinterpret_cast<char *>(malloc(sizeof(char) *
+                            ((j - k) + 1)));
+                        memset(x, '\0', (j - k) + 1);
+                        memcpy(x, (const char *)&input[k], j - k);
+                        *d++ = (unsigned char)strtol(x, NULL, 16);
+
+                        count++;
+
+                        /* Skip over the semicolon if it's there. */
+                        if ((j < input_len) && (input[j] == ';')) {
+                            i = j + 1;
+                        } else {
+                            i = j;
+                        }
+                        continue;
+                    } else {
+                        goto HTML_ENT_OUT;
+                    }
+                } else {
+                    /* Decimal entity. */
+                    k = j;
+                    while ((j < input_len) && (isdigit(input[j]))) {
+                        j++;
+                    }
+                    if (j > k) { /* Do we have at least one digit? */
+                        /* Decode the entity. */
+                        char *x = NULL;
+                        x = reinterpret_cast<char *>(malloc(sizeof(char) *
+                            ((j - k) + 1)));
+                        memset(x, '\0', (j - k) + 1);
+                        memcpy(x, (const char *)&input[k], j - k);
+                        *d++ = (unsigned char)strtol(x, NULL, 10);
+
+                        count++;
+
+                        /* Skip over the semicolon if it's there. */
+                        if ((j < input_len) && (input[j] == ';')) {
+                            i = j + 1;
+                        } else {
+                            i = j;
+                        }
+                        continue;
+                    } else {
+                        goto HTML_ENT_OUT;
+                    }
+                }
+            } else {
+                /* Text entity. */
+                k = j;
+                while ((j < input_len) && (isalnum(input[j]))) {
+                    j++;
+                }
+                if (j > k) { /* Do we have at least one digit? */
+                    char *x = NULL;
+                    x = reinterpret_cast<char *>(malloc(sizeof(char) *
+                        ((j - k) + 1)));
+                    memset(x, '\0', (j - k) + 1);
+                    memcpy(x, (const char *)&input[k], j - k);
+
+                    /* Decode the entity. */
+                    /* ENH What about others? */
+                    if (strcasecmp(x, "quot") == 0) {
+                        *d++ = '"';
+                    } else if (strcasecmp(x, "amp") == 0) {
+                        *d++ = '&';
+                    } else if (strcasecmp(x, "lt") == 0) {
+                        *d++ = '<';
+                    } else if (strcasecmp(x, "gt") == 0) {
+                        *d++ = '>';
+                    } else if (strcasecmp(x, "nbsp") == 0) {
+                        *d++ = NBSP;
+                    } else {
+                        /* We do no want to convert this entity,
+                         * copy the raw data over. */
+                        copy = j - k + 1;
+                        goto HTML_ENT_OUT;
+                    }
+
+                    count++;
+
+                    /* Skip over the semicolon if it's there. */
+                    if ((j < input_len) && (input[j] == ';')) {
+                        i = j + 1;
+                    } else {
+                        i = j;
+                    }
+
+                    continue;
+                }
+            }
+        }
+
+HTML_ENT_OUT:
+
+        for (z = 0; ((z < copy) && (count < input_len)); z++) {
+            *d++ = input[i++];
+            count++;
+        }
+    }
+
+    *d = '\0';
+
+    return count;
+}
 
 }  // namespace transformations
 }  // namespace actions

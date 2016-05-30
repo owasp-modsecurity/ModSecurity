@@ -30,25 +30,6 @@ namespace actions {
 namespace transformations {
 
 
-class HtmlEntityDecodeInstantCache :
-    public std::unordered_map<std::string, std::string> {
- public:
-    static HtmlEntityDecodeInstantCache& getInstance() {
-        static HtmlEntityDecodeInstantCache instance;
-        return instance;
-    }
-
-    void cache(const std::string& value, const std::string& out) {
-        emplace(value, out);
-        if (size() > 100) {
-            erase(begin());
-        }
-    }
- private:
-    HtmlEntityDecodeInstantCache() {}
-};
-
-
 class HtmlEntityDecode : public Transformation {
  public:
     explicit HtmlEntityDecode(std::string action)
@@ -56,6 +37,8 @@ class HtmlEntityDecode : public Transformation {
 
     std::string evaluate(std::string exp,
         Transaction *transaction) override;
+
+    static int inplace(unsigned char *input, u_int64_t input_len);
 };
 
 

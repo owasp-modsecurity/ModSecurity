@@ -35,6 +35,7 @@ class JsDecode : public Transformation {
 
     std::string evaluate(std::string exp,
         Transaction *transaction) override;
+    static int inplace(unsigned char *input, u_int64_t input_len);
 };
 
 }  // namespace transformations

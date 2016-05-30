@@ -13,23 +13,6 @@
  *
  */
 
-/** TODO: Reimplement this on the same terms and/or check if we use it. */
-/*
-    sha1.h - header of
-
-    ============
-    SHA-1 in C++
-    ============
-
-    100% Public Domain.
-
-    Original C Code
-        -- Steve Reid <steve@edmweb.com>
-    Small changes to fit into bglibs
-        -- Bruce Guenter <bruce@untroubled.org>
-    Translation to simpler C++ Code
-        -- Volker Grabsch <vog@notjusthosting.com>
-*/
 
 #ifndef SRC_UTILS_SHA1_H_
 #define SRC_UTILS_SHA1_H_
@@ -41,35 +24,12 @@
 namespace modsecurity {
 namespace Utils {
 
-class SHA1 {
+class Sha1 {
  public:
-    SHA1();
-    void update(std::string *s);
-    void update(std::istream *is);
-    std::string final();
-    std::string final_bin() {
-        return final_bin(true);
-    }
-    std::string final_bin(bool reset);
+    Sha1() { }
 
- private:
-    /* number of 32bit integers per SHA1 digest */
-    static const unsigned int DIGEST_INTS = 5;
-    /* number of 32bit integers per SHA1 block */
-    static const unsigned int BLOCK_INTS = 16;
-    static const unsigned int BLOCK_BYTES = BLOCK_INTS * 4;
-
-    uint32_t digest[DIGEST_INTS];
-    std::string buffer;
-    uint64_t transforms;
-
-    void reset();
-    void transform(uint32_t block[BLOCK_BYTES]);
-
-    static void buffer_to_block(const std::string &buffer,
-        uint32_t block[BLOCK_BYTES]);
-
-    void read(std::istream *is, std::string *s, int max);
+    static std::string hexdigest(std::string& input);
+    static std::string digest(std::string& input);
 };
 
 }  // namespace Utils
