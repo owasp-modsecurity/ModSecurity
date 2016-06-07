@@ -210,6 +210,11 @@ using modsecurity::Variables::XML;
 %token <std::string> CONFIG_DIR_AUDIT_STS
 %token <std::string> CONFIG_DIR_AUDIT_TPE
 
+%token <std::string> CONFIG_UPDLOAD_KEEP_FILES
+%token <std::string> CONFIG_UPLOAD_FILE_LIMIT
+%token <std::string> CONFIG_UPLOAD_FILE_MODE
+%token <std::string> CONFIG_UPLOAD_DIR
+
 %token <std::string> CONFIG_COMPONENT_SIG
 
 %token <std::string> CONFIG_DIR_DEBUG_LOG
@@ -375,6 +380,28 @@ audit_log:
     | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_HTTPS
       {
         driver.audit_log->setType(modsecurity::audit_log::AuditLog::HttpsAuditLogType);
+      }
+
+    /* Upload */
+    | CONFIG_UPDLOAD_KEEP_FILES CONFIG_VALUE_ON
+      {
+        driver.uploadKeepFiles = true;
+      }
+    | CONFIG_UPDLOAD_KEEP_FILES CONFIG_VALUE_OFF
+      {
+        driver.uploadKeepFiles = false;
+      }
+    | CONFIG_UPLOAD_FILE_LIMIT
+      {
+        driver.uploadFileLimit = strtol($1.c_str(), NULL, 10);
+      }
+    | CONFIG_UPLOAD_FILE_MODE
+      {
+        driver.uploadFileMode = strtol($1.c_str(), NULL, 8);
+      }
+    | CONFIG_UPLOAD_DIR
+      {
+        driver.uploadDirectory = $1;
       }
     ;
 

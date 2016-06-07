@@ -215,6 +215,11 @@ class RulesProperties {
     std::string m_httpbl_key;
     std::ostringstream parserError;
 
+    bool uploadKeepFiles;
+    int uploadFileLimit;
+    int uploadFileMode;
+    std::string uploadDirectory;
+
     audit_log::AuditLog *audit_log;
 
     OnFailedRemoteRulesAction remoteRulesActionOnFailed;
