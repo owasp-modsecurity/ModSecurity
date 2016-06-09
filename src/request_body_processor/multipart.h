@@ -15,7 +15,7 @@
 
 #include <string>
 #include <iostream>
-
+#include <list>
 
 #ifndef SRC_REQUEST_BODY_PROCESSOR_MULTIPART_H_
 #define SRC_REQUEST_BODY_PROCESSOR_MULTIPART_H_
@@ -25,24 +25,153 @@
 namespace modsecurity {
 namespace RequestBodyProcessor {
 
+#define MULTIPART_BUF_SIZE 4096
+#define MULTIPART_FORMDATA 1
+#define MULTIPART_FILE 2
+
+
+struct MyHash {
+    size_t operator()(const std::string& Keyval) const {
+        size_t h = 0;
+        std::for_each(Keyval.begin(), Keyval.end(), [&](char c) {
+            h += tolower(c);
+        });
+        return h;
+    }
+};
+
+
+struct MyEqual {
+    bool operator()(const std::string& Left, const std::string& Right) const {
+        return Left.size() == Right.size()
+             && std::equal(Left.begin(), Left.end(), Right.begin(),
+            [](char a, char b) {
+                return tolower(a) == tolower(b);
+            });
+    }
+};
+
+
+class MultipartPart {
+ public:
+     MultipartPart()
+     : m_type(MULTIPART_FORMDATA),
+     m_tmp_file_fd(0),
+     m_tmp_file_size(0),
+     m_offset(0),
+     m_length(0) { }
+
+    /* part type, can be MULTIPART_FORMDATA or MULTIPART_FILE */
+    int m_type;
+
+    /* the name */
+    std::string m_name;
+
+    /* variables only, variable value */
+    std::string m_value;
+    std::list<std::string> m_value_parts;
+
+    /* files only, the content type (where available) */
+    /* std::string m_content_type; */
+
+    /* files only, the name of the temporary file holding data */
+    std::string m_tmp_file_name;
+    int m_tmp_file_fd;
+    unsigned int m_tmp_file_size;
+
+    /* files only, filename as supplied by the browser */
+    std::string m_filename;
+
+    std::string m_last_header_name;
+    std::unordered_map<std::string, std::string, MyHash, MyEqual> m_headers;
+
+    unsigned int m_offset;
+    unsigned int m_length;
+};
+
+
 class Multipart {
  public:
     Multipart(std::string header, Transaction *transaction);
+    ~Multipart();
+
     bool init();
 
-    bool boundaryContainsOnlyValidCharacters();
-    bool conuntBoundaryParameters();
-    bool process(std::string data);
-    void checkForCrlfLf(const std::string &blob);
+    int boundary_characters_valid(const char *boundary);
+    int count_boundary_params(const std::string& str_header_value);
+    int is_token_char(unsigned char c);
+    int multipart_complete();
 
-    bool crlf;
-    bool containsDataAfter;
-    bool containsDataBefore;
-    bool lf;
-    bool boundaryStartsWithWhiteSpace;
-    bool boundaryIsQuoted;
-    bool missingSemicolon;
-    bool invalidQuote;
+    int parse_content_disposition(const char *c_d_value);
+    bool process(const std::string& data);
+    int process_boundary(int last_part);
+    int process_part_header();
+    int process_part_data();
+
+    int tmp_file_name(std::string *filename);
+
+    void validate_quotes(const char *data);
+
+    size_t m_reqbody_no_files_length;
+    std::list<MultipartPart *> m_parts;
+
+    /* Number of parts that are files */
+    int m_nfiles;
+
+    /* mime boundary used to detect when
+     * parts end and begin
+     */
+    std::string m_boundary;
+    int  m_boundary_count;
+
+    /* internal buffer and other variables
+     * used while parsing
+     */
+    char m_buf[MULTIPART_BUF_SIZE + 2];
+    int m_buf_contains_line;
+    char *m_bufptr;
+    int m_bufleft;
+
+    unsigned int m_buf_offset;
+
+    /* pointer that keeps track of a part while
+     * it is being built
+     */
+    MultipartPart *m_mpp;
+
+
+    /* part parsing state; 0 means we are reading
+     * headers, 1 means we are collecting data
+     */
+    int m_mpp_state;
+
+    /* because of the way this parsing algorithm
+     * works we hold back the last two bytes of
+     * each data chunk so that we can discard it
+     * later if the next data chunk proves to be
+     * a boundary; the first byte is an indicator
+     * 0 - no content, 1 - two data bytes available
+     */
+    char m_reserve[4];
+
+    int m_seen_data;
+    int m_is_complete;
+
+    int m_flag_error;
+    int m_flag_data_before;
+    int m_flag_data_after;
+    int m_flag_header_folding;
+    int m_flag_boundary_quoted;
+    int m_flag_lf_line;
+    int m_flag_crlf_line;
+    int m_flag_unmatched_boundary;
+    int m_flag_boundary_whitespace;
+    int m_flag_missing_semicolon;
+    int m_flag_invalid_quoting;
+    int m_flag_invalid_part;
+    int m_flag_invalid_header_folding;
+    int m_flag_file_limit_exceeded;
+
 #ifndef NO_LOGS
     void debug(int a, std::string str) {
         m_transaction->debug(a, str);
@@ -50,10 +179,10 @@ class Multipart {
 #endif
 
  private:
-    std::string m_boundary;
     std::string m_header;
     Transaction *m_transaction;
 };
+
 
 }  // namespace RequestBodyProcessor
 }  // namespace modsecurity

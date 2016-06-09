@@ -222,6 +222,12 @@ int Rules::merge(Driver *from) {
     this->requestBodyLimitAction = from->requestBodyLimitAction;
     this->responseBodyLimitAction = from->responseBodyLimitAction;
 
+    this->uploadKeepFiles = from->uploadKeepFiles;
+    this->uploadFileLimit = from->uploadFileLimit;
+    this->uploadFileMode = from->uploadFileMode;
+    this->uploadDirectory = from->uploadDirectory;
+    this->tmpSaveUploadedFiles = from->tmpSaveUploadedFiles;
+
     for (std::set<std::string>::iterator
         it = from->m_responseBodyTypeToBeInspected.begin();
         it != from->m_responseBodyTypeToBeInspected.end(); ++it) {
@@ -277,6 +283,12 @@ int Rules::merge(Rules *from) {
     this->responseBodyLimit = from->responseBodyLimit;
     this->requestBodyLimitAction = from->requestBodyLimitAction;
     this->responseBodyLimitAction = from->responseBodyLimitAction;
+
+    this->uploadKeepFiles = from->uploadKeepFiles;
+    this->uploadFileLimit = from->uploadFileLimit;
+    this->uploadFileMode = from->uploadFileMode;
+    this->uploadDirectory = from->uploadDirectory;
+    this->tmpSaveUploadedFiles = from->tmpSaveUploadedFiles;
 
     if (from->m_debugLog && this->m_debugLog &&
         from->m_debugLog->isLogFileSet()) {

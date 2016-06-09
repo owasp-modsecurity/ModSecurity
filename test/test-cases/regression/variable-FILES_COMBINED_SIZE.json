@@ -23,21 +23,21 @@
       "uri":"/",
       "method":"POST",
       "body":[  
-        "--------------------------756b6d74fa1a8ee2",
+        "----------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"name\"",
         "",
         "test",
-        "--------------------------756b6d74fa1a8ee2",
+        "----------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
         "Content-Type: text/plain",
         "",
         "This is a very small test file..",
-        "--------------------------756b6d74fa1a8ee2",
+        "----------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
         "Content-Type: text/plain",
         "",
         "This is another very small test file..",
-        "--------------------------756b6d74fa1a8ee2--"
+        "----------------------------756b6d74fa1a8ee2--"
       ]
     },
     "response":{  
@@ -51,13 +51,13 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"74.000000\" \\(Variable: FILES_COMBINED_SIZE\\)"
+      "debug_log":"Target value: \"70\" \\(Variable: FILES_COMBINED_SIZE\\)"
     },
     "rules":[  
       "SecRuleEngine On",
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
-      "SecRule FILES_COMBINED_SIZE \"@gt 74.000000\" \"id:1,phase:3,pass,t:trim\""
+      "SecRule FILES_COMBINED_SIZE \"@gt 70\" \"id:1,phase:3,pass,t:trim\""
     ]
   }
 ]

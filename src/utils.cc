@@ -117,7 +117,7 @@ std::string ascTime(time_t *t) {
 
 
 void chomp(std::string *str) {
-    std::string::size_type pos = str->find_last_not_of("\n\t");
+    std::string::size_type pos = str->find_last_not_of("\n\r");
     if (pos != std::string::npos) {
         str->erase(pos+1, str->length()-pos-1);
     }

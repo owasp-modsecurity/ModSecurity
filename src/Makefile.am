@@ -200,7 +200,6 @@ COLLECTION = \
 
 BODY_PROCESSORS = \
 	request_body_processor/multipart.cc \
-	request_body_processor/multipart_blob.cc \
 	request_body_processor/xml.cc
 
 

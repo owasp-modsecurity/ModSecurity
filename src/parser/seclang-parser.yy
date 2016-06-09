@@ -211,6 +211,7 @@ using modsecurity::Variables::XML;
 %token <std::string> CONFIG_DIR_AUDIT_TPE
 
 %token <std::string> CONFIG_UPDLOAD_KEEP_FILES
+%token <std::string> CONFIG_UPDLOAD_SAVE_TMP_FILES
 %token <std::string> CONFIG_UPLOAD_FILE_LIMIT
 %token <std::string> CONFIG_UPLOAD_FILE_MODE
 %token <std::string> CONFIG_UPLOAD_DIR
@@ -402,6 +403,14 @@ audit_log:
     | CONFIG_UPLOAD_DIR
       {
         driver.uploadDirectory = $1;
+      }
+    | CONFIG_UPDLOAD_SAVE_TMP_FILES CONFIG_VALUE_ON
+      {
+        driver.tmpSaveUploadedFiles = true;
+      }
+    | CONFIG_UPDLOAD_SAVE_TMP_FILES CONFIG_VALUE_OFF
+      {
+        driver.tmpSaveUploadedFiles = false;
       }
     ;
 

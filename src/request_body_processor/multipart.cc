@@ -15,147 +15,137 @@
 
 #include "request_body_processor/multipart.h"
 
+#include <time.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <list>
 #include <iostream>
 #include <string>
 
-#include "request_body_processor/multipart_blob.h"
 #include "modsecurity/collection/collections.h"
+#include "src/utils.h"
 
 namespace modsecurity {
 namespace RequestBodyProcessor {
 
+
 Multipart::Multipart(std:: string header, Transaction *transaction)
-    : crlf(false),
-    containsDataAfter(false),
-    containsDataBefore(false),
-    lf(false),
-    missingSemicolon(false),
-    invalidQuote(false),
-    boundaryStartsWithWhiteSpace(false),
-    boundaryIsQuoted(false),
+    : m_boundary_count(0),
+    m_buf_contains_line(0),
+    m_bufleft(0),
+    m_buf_offset(0),
+    m_bufptr(NULL),
+    m_flag_boundary_quoted(0),
+    m_flag_boundary_whitespace(0),
+    m_flag_crlf_line(0),
+    m_flag_data_after(0),
+    m_flag_data_before(0),
+    m_flag_error(0),
+    m_flag_file_limit_exceeded(0),
+    m_flag_header_folding(0),
+    m_flag_invalid_header_folding(0),
+    m_flag_invalid_part(0),
+    m_flag_invalid_quoting(0),
+    m_flag_lf_line(0),
+    m_flag_missing_semicolon(0),
+    m_flag_unmatched_boundary(0),
+    m_header(header),
+    m_is_complete(0),
+    m_mpp_state(0),
+    m_nfiles(0),
+    m_seen_data(0),
     m_transaction(transaction),
-    m_header(header) {
-}
+    m_reqbody_no_files_length(0)
+    { }
 
 
-bool Multipart::init() {
-    if (m_header.length() > 1024) {
-#ifndef NO_LOGS
-        debug(4, "Multipart: Invalid boundary in Content-Type (length).");
-#endif
-        return false;
-    }
+Multipart::~Multipart() {
+    debug(4, "Multipart: Cleanup started (remove files " \
+        + std::to_string(!m_transaction->m_rules->uploadKeepFiles) \
+        + ")");
 
-    std::size_t boundary_pos = m_header.find("boundary");
-    if (boundary_pos != std::string::npos &&
-        m_header.find("boundary", boundary_pos + 1) != std::string::npos) {
-#ifndef NO_LOGS
-        debug(4, "Multipart: Multiple boundary parameters in " \
-            "Content-Type.");
-#endif
-        return false;
-    }
+    if (m_transaction->m_rules->uploadKeepFiles == false) {
+        for (MultipartPart *m : m_parts) {
+            if (m->m_type == MULTIPART_FILE) {
+                if (!m->m_tmp_file_name.empty()) {
+                    /* make sure it is closed first */
+                    if (m->m_tmp_file_fd > 0) {
+                        close(m->m_tmp_file_fd);
+                        m->m_tmp_file_fd = -1;
+                    }
 
-    std::string boundary = m_header.c_str() + boundary_pos;
-    std::size_t semicolon_pos = boundary.find(";");
-    if (semicolon_pos != std::string::npos
-        && boundary.find(";", semicolon_pos + 1) != std::string::npos) {
-#ifndef NO_LOGS
-        debug(4, "Multipart: Invalid boundary in Content-Type. (malformed). " \
-            "Too many semicolons.");
-#endif
-        return false;
-    }
-
-    if (semicolon_pos == std::string::npos) {
-#ifndef NO_LOGS
-        debug(4, "Multipart: Missing semicolon.");
-#endif
-        this->missingSemicolon = true;
-    }
-
-    if (boundary.at(8) != '=') {
-#ifndef NO_LOGS
-        debug(4, "Multipart: Invalid boundary in Content-Type. (malformed). " \
-            "Missing equals.");
-#endif
-        return false;
-    }
-
-    if (boundary.at(8 + 1) == ' ') {
-        boundaryStartsWithWhiteSpace = true;
-#ifndef NO_LOGS
-        debug(4, "Multipart: Boundary starts with a white space");
-#endif
-    }
-
-    if ((boundaryStartsWithWhiteSpace && boundary.at(8 + 2) == '"') ||
-        (!boundaryStartsWithWhiteSpace && boundary.at(8 + 1) == '"')) {
-        boundaryIsQuoted = true;
-#ifndef NO_LOGS
-            debug(4, "Multipart: Boundary inside quotes");
-#endif
-    }
-
-    if (boundaryIsQuoted && boundary.at(boundary.length()-1) != '"') {
-#ifndef NO_LOGS
-        debug(4, "Multipart: Invalid boundary in Content-type (quote).");
-#endif
-        return false;
-    }
-
-#if 0
-        Not checking
-        /* Case-insensitive test for the string "boundary" in the boundary. */
-        if (count_boundary_params(msr->mp, msr->mpd->boundary) != 0) {
-            msr->mpd->flag_error = 1;
-            *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid boundary " \
-                "in C-T (content).");
-            return -1;
+                    if (unlink(m->m_tmp_file_name.c_str()) < 0) {
+                        debug(1, "Multipart: Failed to delete file (part) \"" \
+                            + m->m_tmp_file_name + "\" because " \
+                            + std::to_string(errno) +  "(" \
+                            + strerror(errno) + ")");
+                    } else {
+                        debug(4, "Multipart: Failed to delete file (part) \"" \
+                            + m->m_tmp_file_name + "\"");
+                    }
+                }
+            }
         }
-#endif  //  if 0
-
-    int real_boundary_pos = 9;
-
-    if (boundaryStartsWithWhiteSpace) {
-        real_boundary_pos++;
     }
 
-    if (boundaryIsQuoted) {
-        real_boundary_pos++;
+    while (!m_parts.empty()) {
+        m_parts.pop_front();
     }
-
-    m_boundary = boundary.c_str() + real_boundary_pos;
-
-    if (boundaryIsQuoted) {
-        m_boundary.pop_back();
-    }
-
-    if (boundaryContainsOnlyValidCharacters() == false) {
-#ifndef NO_LOGS
-        debug(4, "Multipart: Invalid boundary in Content-type " \
-            "(invalid characters).");
-#endif
-        return false;
-    }
-
-    return true;
 }
 
 
-bool Multipart::boundaryContainsOnlyValidCharacters() {
-    if (m_boundary.empty()) {
-        return false;
+int Multipart::is_token_char(unsigned char c) {
+    /* ENH Is the performance important at all? We could use a table instead. */
+
+    /* CTLs not allowed */
+    if ((c <= 32) || (c >= 127)) {
+        return 0;
     }
 
-    for (int i = 0; i < m_boundary.length(); i++) {
-        int c = m_boundary.at(i);
+    switch (c) {
+        case '(' :
+        case ')' :
+        case '<' :
+        case '>' :
+        case '@' :
+        case ',' :
+        case ';' :
+        case ':' :
+        case '\\' :
+        case '"' :
+        case '/' :
+        case '[' :
+        case ']' :
+        case '?' :
+        case '=' :
+            return 0;
+    }
 
+    return 1;
+}
+
+
+int Multipart::boundary_characters_valid(const char *boundary) {
+    const unsigned char *p = (unsigned char *)boundary;
+    unsigned char c;
+
+    if (p == NULL) {
+        return -1;
+    }
+
+    while ((c = *p) != '\0') {
         /* Control characters and space not allowed. */
+        if (c < 32) {
+            return 0;
+        }
+
         /* Non-ASCII characters not allowed. */
-        if (c < 32 || c > 126) {
-            return false;
+        if (c > 126) {
+            return 0;
         }
 
         switch (c) {
@@ -175,124 +165,1237 @@ bool Multipart::boundaryContainsOnlyValidCharacters() {
             case ']' :
             case '?' :
             case '=' :
-                return false;
+                return 0;
                 break;
+
             default :
+                /* Do nothing. */
                 break;
+        }
+
+        p++;
+    }
+
+    return 1;
+}
+
+
+void Multipart::validate_quotes(const char *data)  {
+    int i, len;
+
+    if (data == NULL)
+        return;
+
+    len = strlen(data);
+
+    for (i = 0; i < len; i++)   {
+        if (data[i] == '\'') {
+            debug(9, "Multipart: Invalid quoting detected: " \
+                + std::string(data) + " length " \
+                + std::to_string(len) + " bytes");
+            m_flag_invalid_quoting = 1;
+        }
+    }
+}
+
+
+int Multipart::parse_content_disposition(const char *c_d_value) {
+    const char *p = NULL;
+
+    /* accept only what we understand */
+    if (strncmp(c_d_value, "form-data", 9) != 0) {
+        return -1;
+    }
+
+    /* see if there are any other parts to parse */
+
+    p = c_d_value + 9;
+    while ((*p == '\t') || (*p == ' ')) p++;
+    if (*p == '\0') {
+        return 1; /* this is OK */
+    }
+
+    if (*p != ';') {
+        return -2;
+    }
+    p++;
+
+    /* parse the appended parts */
+
+    while (*p != '\0') {
+        const char *start = NULL;
+        std::string name;
+        std::string value;
+
+        /* go over the whitespace */
+        while ((*p == '\t') || (*p == ' ')) {
+            p++;
+        }
+
+        if (*p == '\0') {
+            return -3;
+        }
+
+        start = p;
+        while ((*p != '\0') && (*p != '=') && (*p != '\t') && (*p != ' ')) {
+            p++;
+        }
+
+        if (*p == '\0') {
+            return -4;
+        }
+
+        name = std::string(start, (p - start));
+
+        while ((*p == '\t') || (*p == ' ')) {
+            p++;
+        }
+
+        if (*p == '\0') {
+            return -5;
+        }
+
+        if (*p != '=') {
+            return -13;
+        }
+
+        p++;
+
+        while ((*p == '\t') || (*p == ' ')) {
+            p++;
+        }
+
+        if (*p == '\0') {
+            return -6;
+        }
+
+        /* Accept both quotes as some backends will accept them, but
+         * technically "'" is invalid and so flag_invalid_quoting is
+         * set so the user can deal with it in the rules if they so wish.
+         */
+
+        if ((*p == '"') || (*p == '\'')) {
+            /* quoted */
+            char quote = *p;
+
+            if (quote == '\'') {
+                m_flag_invalid_quoting = 1;
+            }
+
+            p++;
+            if (*p == '\0') {
+                return -7;
+            }
+
+            while (*p != '\0') {
+                if (*p == '\\') {
+                    if (*(p + 1) == '\0') {
+                        /* improper escaping */
+                        return -8;
+                    }
+                    /* only quote and \ can be escaped */
+                    if ((*(p + 1) == quote) || (*(p + 1) == '\\')) {
+                        p++;
+                    } else {
+                        /* improper escaping */
+
+                        /* We allow for now because IE sends
+                         * improperly escaped content and there's
+                         * nothing we can do about it.
+                         *
+                         * return -9;
+                         */
+                    }
+                } else if (*p == quote) {
+                    break;
+                }
+
+                value.append((p++), 1);
+            }
+
+            p++; /* go over the quote at the end */
+
+        } else {
+            /* not quoted */
+
+            start = p;
+            while ((*p != '\0') && (is_token_char(*p))) {
+                p++;
+            }
+            value.assign(start, p - start);
+        }
+
+        /* evaluate part */
+        if (name == "name") {
+            validate_quotes(value.c_str());
+
+            m_transaction->m_collections.storeOrUpdateFirst("MULTIPART_NAME",
+                value);
+
+            if (!m_mpp->m_name.empty()) {
+                debug(4, "Multipart: Warning: Duplicate Content-Disposition " \
+                    "name: " + value + ". Previously: " + m_mpp->m_name + "");
+                return -14;
+            }
+            m_mpp->m_name.assign(value);
+            debug(9, "Multipart: Content-Disposition name: " + value + ".");
+        } else if (name == "filename") {
+            validate_quotes(value.c_str());
+            collection::Collections *c = &m_transaction->m_collections;
+            c->storeOrUpdateFirst("MULTIPART_FILENAME", value);
+
+            if (!m_mpp->m_filename.empty()) {
+                debug(4, "Multipart: Warning: Duplicate Content-Disposition " \
+                    "filename: " + value + ".");
+                return -15;
+            }
+            m_mpp->m_filename.assign(value);
+
+            debug(9, "Multipart: Content-Disposition filename: " \
+                + value + ".");
+        } else {
+            return -11;
+        }
+
+        if (*p != '\0') {
+            while ((*p == '\t') || (*p == ' ')) {
+                p++;
+            }
+
+            /* the next character must be a zero or a semi-colon */
+            if (*p == '\0') {
+                return 1; /* this is OK */
+            }
+            if (*p != ';') {
+                p--;
+                if (*p == '\'' || *p == '\"') {
+                    debug(9, "Multipart: Invalid quoting detected: " \
+                        + std::string(p) + " length " \
+                        + std::to_string(strlen(p)) + " bytes");
+                    m_flag_invalid_quoting = 1;
+                }
+                p++;
+                return -12;
+            }
+            p++; /* move over the semi-colon */
+        }
+
+        /* loop will stop when (*p == '\0') */
+    }
+
+    return 1;
+}
+
+
+int Multipart::tmp_file_name(std::string *filename) {
+    std::string path;
+    struct tm timeinfo;
+    char tstr[300];
+    char *tmp;
+    int fd;
+    int mode;
+    time_t tt = time(NULL);
+
+    localtime_r(&tt, &timeinfo);
+
+    path = m_transaction->m_rules->uploadDirectory;
+    mode = m_transaction->m_rules->uploadFileMode;
+
+    memset(tstr, '\0', 300);
+    strftime(tstr, 299, "/%Y%m%d-%H%M%S", &timeinfo);
+    path = path + tstr + "-" + m_transaction->m_id;
+    path = path + "-file-XXXXXX";
+
+    tmp = strdup(path.c_str());
+
+    fd = mkstemp(tmp);
+    filename->assign(tmp);
+    free(tmp);
+    if ((fd != -1) && (mode != 0)) {
+        if (fchmod(fd, mode) == -1) {
+            return -1;
+        }
+    }
+
+    return fd;
+}
+
+
+int Multipart::process_part_data() {
+    char *p = m_buf + (MULTIPART_BUF_SIZE - m_bufleft);
+    char localreserve[2] = { '\0', '\0' }; /* initialized to quiet warning */
+    int bytes_reserved = 0;
+
+    /* Preserve some bytes for later. */
+    if (((MULTIPART_BUF_SIZE - m_bufleft) >= 1) && (*(p - 1) == '\n')) {
+        if (((MULTIPART_BUF_SIZE - m_bufleft) >= 2) && (*(p - 2) == '\r')) {
+            /* Two bytes. */
+            bytes_reserved = 2;
+            localreserve[0] = *(p - 2);
+            localreserve[1] = *(p - 1);
+            m_bufleft += 2;
+            *(p - 2) = 0;
+        } else {
+            /* Only one byte. */
+            bytes_reserved = 1;
+            localreserve[0] = *(p - 1);
+            localreserve[1] = 0;
+            m_bufleft += 1;
+            *(p - 1) = 0;
+        }
+    }
+
+    /* add data to the part we are building */
+    if (m_mpp->m_type == MULTIPART_FILE) {
+        int extract = m_transaction->m_rules->uploadKeepFiles \
+            || m_transaction->m_rules->tmpSaveUploadedFiles;
+
+        /* remember where we started */
+        if (m_mpp->m_length == 0) {
+            m_mpp->m_offset = m_buf_offset;
+        }
+
+        /* check if the file limit has been reached */
+        if (extract && m_transaction->m_rules->uploadFileLimit
+            && (m_nfiles >= m_transaction->m_rules->uploadFileLimit)) {
+            if (m_flag_file_limit_exceeded == 0) {
+               debug(1, "Multipart: Upload file limit exceeded " \
+                + std::to_string(m_transaction->m_rules->uploadFileLimit) \
+                + ". Use SecUploadFileLimit to change the limit.");
+                m_flag_file_limit_exceeded = 1;
+            }
+            extract = 0;
+        }
+        /* only store individual files on disk if we are going
+         * to keep them or if we need to have them approved later
+         */
+        if (extract) {
+            /* first create a temporary file if we don't have it already */
+            if (m_mpp->m_tmp_file_fd == 0) {
+                std::string path;
+                m_mpp->m_tmp_file_fd = tmp_file_name(&path);
+
+                /* construct temporary file name */
+                m_mpp->m_tmp_file_name = path;
+
+                /* do we have an opened file? */
+                if (m_mpp->m_tmp_file_fd < 0) {
+                    debug(1, "Multipart: Failed to create file: " \
+                        + m_mpp->m_tmp_file_name);
+                    return -1;
+                }
+                /* keep track of the files count */
+
+                m_nfiles++;
+
+                debug(4, "Multipart: Created temporary file " \
+                    + std::to_string(m_nfiles) + " (mode 04o): " \
+                    + m_mpp->m_tmp_file_name);
+            }
+
+            /* write the reserve first */
+            if (m_reserve[0] != 0) {
+                if (write(m_mpp->m_tmp_file_fd, &m_reserve[1], m_reserve[0])
+                    != m_reserve[0]) {
+                    debug(1, "Multipart: writing to \"" \
+                        + m_mpp->m_tmp_file_name + "\" failed");
+                    return -1;
+                }
+
+                m_mpp->m_tmp_file_size += m_reserve[0];
+                m_mpp->m_length += m_reserve[0];
+            }
+
+            /* write data to the file */
+
+            if (write(m_mpp->m_tmp_file_fd, m_buf,
+                MULTIPART_BUF_SIZE - m_bufleft)
+                != (MULTIPART_BUF_SIZE - m_bufleft)) {
+                debug(1, "Multipart: writing to \"" \
+                    + m_mpp->m_tmp_file_name + "\" failed");
+                return -1;
+            }
+
+            m_mpp->m_tmp_file_size += (MULTIPART_BUF_SIZE - m_bufleft);
+            m_mpp->m_length += (MULTIPART_BUF_SIZE - m_bufleft);
+        } else {
+            /* just keep track of the file size */
+            m_mpp->m_tmp_file_size += (MULTIPART_BUF_SIZE - m_bufleft) \
+                + m_reserve[0];
+            m_mpp->m_length += (MULTIPART_BUF_SIZE - m_bufleft) + m_reserve[0];
+        }
+    } else if (m_mpp->m_type == MULTIPART_FORMDATA) {
+        std::string d;
+
+        /* The buffer contains data so increase the data length counter. */
+        m_reqbody_no_files_length += (MULTIPART_BUF_SIZE - m_bufleft) \
+            + m_reserve[0];
+
+        /* add this part to the list of parts */
+
+        /* remember where we started */
+        if (m_mpp->m_length == 0) {
+            m_mpp->m_offset = m_buf_offset;
+        }
+
+        if (m_reserve[0] != 0) {
+            d.assign(&(m_reserve[1]), m_reserve[0]);
+            d.assign(m_buf, MULTIPART_BUF_SIZE - m_bufleft);
+
+            m_mpp->m_length += d.size();
+        } else {
+            d.assign(m_buf, MULTIPART_BUF_SIZE - m_bufleft);
+            m_mpp->m_length += d.size();
+        }
+
+        m_mpp->m_value_parts.push_back(d);
+
+        debug(9, "Multipart: Added data to variable: " + d);
+    } else {
+        debug(1, "Multipart: unknown part type: " \
+            + std::to_string(m_mpp->m_type));
+        return false;
+    }
+
+    /* store the reserved bytes to the multipart
+     * context so that they don't get lost
+     */
+    if (bytes_reserved) {
+        m_reserve[0] = bytes_reserved;
+        m_reserve[1] = localreserve[0];
+        m_reserve[2] = localreserve[1];
+        m_buf_offset += bytes_reserved;
+    } else {
+        m_buf_offset -= m_reserve[0];
+        m_reserve[0] = 0;
+    }
+
+    return true;
+}
+
+
+int Multipart::process_part_header() {
+    int i, len, rc;
+
+    /* Check for nul bytes. */
+    len = MULTIPART_BUF_SIZE - m_bufleft;
+    for (i = 0; i < len; i++) {
+        if (m_buf[i] == '\0') {
+            debug(1, "Multipart: Nul byte in part headers.");
+            return false;
+        }
+    }
+
+    /* The buffer is data so increase the data length counter. */
+    m_reqbody_no_files_length += (MULTIPART_BUF_SIZE - m_bufleft);
+
+    if (len > 1) {
+        if (m_buf[len - 2] == '\r') {
+            m_flag_crlf_line = 1;
+        } else {
+            m_flag_lf_line = 1;
+        }
+    } else {
+        m_flag_lf_line = 1;
+    }
+
+    /* Is this an empty line? */
+    if (((m_buf[0] == '\r') && (m_buf[1] == '\n') && (m_buf[2] == '\0'))
+        || ((m_buf[0] == '\n') && (m_buf[1] == '\0'))) { /* Empty line. */
+        std::string header_value("");
+
+        if (m_mpp->m_headers.count("Content-Disposition") == 0) {
+            debug(1, "Multipart: Part missing Content-Disposition header.");
+
+            return false;
+        }
+        header_value = m_mpp->m_headers.at("Content-Disposition");
+
+        rc = parse_content_disposition(header_value.c_str());
+        if (rc < 0) {
+            debug(1, "Multipart: Invalid Content-Disposition header ("
+                + std::to_string(rc) + "): " + header_value);
+
+            return false;
+        }
+
+        if (m_mpp->m_name.empty()) {
+            debug(1, "Multipart: Content-Disposition header missing " \
+                "name field.");
+
+            return false;
+        }
+
+        if (!m_mpp->m_filename.empty()) {
+            /* Some parsers use crude methods to extract the name and filename
+             * values from the C-D header. We need to check for the case where they
+             * didn't understand C-D but we did.
+             */
+            if (strstr(header_value.c_str(), "filename=") == NULL) {
+                debug(1, "Multipart: Invalid Content-Disposition " \
+                    "header (filename).");
+                return false;
+            }
+
+            m_mpp->m_type = MULTIPART_FILE;
+        } else {
+            m_mpp->m_type = MULTIPART_FORMDATA;
+        }
+
+        m_mpp_state = 1;
+        m_mpp->m_last_header_name.assign("");
+    } else {  /* Header line. */
+        if (isspace(m_buf[0])) {
+            std::string header_value;
+            char *data;
+            std::string new_value;
+
+            /* header folding, add data to the header we are building */
+            m_flag_header_folding = 1;
+
+            /* RFC-2557 states header folding is SP / HTAB, but PHP and
+             * perhaps others will take any whitespace.  So, we accept,
+             * but with a flag set.
+             */
+            if ((m_buf[0] != '\t') && (m_buf[0] != ' ')) {
+                m_flag_invalid_header_folding = 1;
+            }
+
+            if (m_mpp->m_last_header_name.empty()) {
+                /* we are not building a header at this moment */
+                debug(1, "Multipart: Invalid part header (folding error).");
+                return false;
+            }
+
+            /* locate the beginning of data */
+            data = m_buf;
+            while (isspace(*data)) {
+                /* Flag invalid header folding if an invalid RFC-2557
+                 * character is used anywhere in the folding prefix.
+                 */
+                if ((*data != '\t') && (*data != ' ')) {
+                    m_flag_invalid_header_folding = 1;
+                }
+                data++;
+            }
+
+            new_value = std::string(data);
+            chomp(&new_value);
+
+            /* update the header value in the table */
+            header_value = m_mpp->m_headers.at(m_mpp->m_last_header_name);
+            new_value = header_value + " " +  new_value;
+            m_mpp->m_headers.at(m_mpp->m_last_header_name) = new_value;
+
+            debug(9, "Multipart: Continued folder header \"" \
+                + m_mpp->m_last_header_name + "\" with \"" \
+                + std::string(data) + "\"");
+
+            if (new_value.size() > MULTIPART_BUF_SIZE) {
+                debug(1, "Multipart: Part header too long.");
+                return false;
+            }
+        } else {
+            char *data;
+            std::string header_value;
+            std::string header_name;
+            /* new header */
+
+            data = m_buf;
+            while ((*data != ':') && (*data != '\0')) {
+                data++;
+            }
+            if (*data == '\0') {
+                debug(1, "Multipart: Invalid part header (colon missing): " \
+                    + std::string(m_buf));
+                return false;
+            }
+
+            /* extract header name */
+            header_name = std::string(m_buf, data - m_buf);
+            if (data == m_buf) {
+                debug(1, "Multipart: Invalid part header " \
+                    "(header name missing).");
+                 return false;
+            }
+
+            /* extract the value value */
+            data++;
+            while ((*data == '\t') || (*data == ' ')) {
+                data++;
+            }
+            header_value = std::string(data);
+            chomp(&header_value);
+
+            /* error if the name already exists */
+            if (m_mpp->m_headers.count(header_name) > 0) {
+                debug(1, "Multipart: Duplicate part header: " \
+                    + header_name + ".");
+                return false;
+            }
+
+            m_mpp->m_headers.insert({header_name, header_value});
+            m_mpp->m_last_header_name.assign(header_name);
+
+            debug(9, "Multipart: Added part header \"" + header_name \
+                + "\" \"" + header_value + "\".");
         }
     }
 
     return true;
 }
 
-void Multipart::checkForCrlfLf(const std::string &data) {
-    size_t start = 0;
-    size_t pos = 0;
 
-    pos = data.find("\n", start);
-    while (pos != std::string::npos) {
-        if (pos > 1 && data.at(pos-1) == '\r') {
-            this->crlf = true;
-        } else {
-            this->lf = true;
+int Multipart::process_boundary(int last_part) {
+    /* if there was a part being built finish it */
+    if (m_mpp != NULL) {
+        /* close the temp file */
+        if ((m_mpp->m_type == MULTIPART_FILE)
+            && (!m_mpp->m_tmp_file_name.empty())
+            && (m_mpp->m_tmp_file_fd != 0)) {
+            close(m_mpp->m_tmp_file_fd);
+            m_mpp->m_tmp_file_fd = -1;
         }
-        pos = data.find("\n", pos + 1);
+
+        if (m_mpp->m_type != MULTIPART_FILE) {
+            /* now construct a single string out of the parts */
+            for (std::string &i : m_mpp->m_value_parts) {
+                m_mpp->m_value.append(i);
+            }
+        }
+
+        if (m_mpp->m_name.empty() == false) {
+            /* add the part to the list of parts */
+            m_parts.push_back(m_mpp);
+            if (m_mpp->m_type == MULTIPART_FILE) {
+                debug(9, "Multipart: Added file part to the list: name \"" \
+                    + m_mpp->m_name + "\" "
+                    "file name \"" + m_mpp->m_filename + "\" (offset " \
+                    + std::to_string(m_mpp->m_offset) +
+                    ", length " + std::to_string(m_mpp->m_length) + ")");
+            } else {
+                debug(9, "Multipart: Added part to the list: name \"" \
+                    + m_mpp->m_name + "\" "
+                    "(offset " + std::to_string(m_mpp->m_offset) \
+                    + ", length " + std::to_string(m_mpp->m_length) + ")");
+            }
+        } else {
+            m_flag_invalid_part = true;
+            debug(3, "Multipart: Skipping invalid part (part name missing): "
+                "(offset " + std::to_string(m_mpp->m_offset) + ", length "
+                + std::to_string(m_mpp->m_length) + ")");
+        }
+
+        m_mpp = NULL;
     }
+
+    if (last_part == 0) {
+        /* start building a new part */
+        m_mpp = new MultipartPart();
+
+        m_mpp_state = 0;
+
+        m_reserve[0] = 0;
+        m_reserve[1] = 0;
+        m_reserve[2] = 0;
+        m_reserve[3] = 0;
+    }
+
+    return 1;
 }
 
-bool Multipart::process(std::string data) {
-    collection::Collections *col;
-    std::list<std::string> blobs;
-    size_t start = data.find(m_boundary);
-    size_t endl = 1;
-    size_t lastValidBoundary = 0;
-    size_t firstValidBoundary = start;
-    double files_size = 0;
-    col = &m_transaction->m_collections;
 
-    if (start != 0) {
-#ifndef NO_LOGS
-        debug(4, "Multipart: Boundary was not the first thing.");
-#endif
-        this->containsDataBefore = true;
+/**
+ * Finalize multipart processing. This method is invoked at the end, when it
+ * is clear that there is no more data to be processed.
+ */
+int Multipart::multipart_complete() {
+    m_transaction->m_collections.store("MULTIPART_UNMATCHED_BOUNDARY",
+        std::to_string(m_flag_unmatched_boundary));
+
+    m_transaction->m_collections.store("MULTIPART_DATA_BEFORE",
+        std::to_string(m_flag_data_before));
+    if (m_flag_data_before) {
+        debug(4, "Multipart: Warning: seen data before first boundary.");
     }
-    while (start != std::string::npos) {
-        size_t end = data.find(m_boundary, start + m_boundary.length());
-        if (end == std::string::npos) {
-            start = end;
+
+    m_transaction->m_collections.store("MULTIPART_DATA_AFTER",
+        std::to_string(m_flag_data_after));
+    if (m_flag_data_after) {
+        debug(4, "Multipart: Warning: seen data after last boundary.");
+    }
+
+    m_transaction->m_collections.store("MULTIPART_BOUNDARY_QUOTED",
+        std::to_string(m_flag_boundary_quoted));
+    if (m_flag_boundary_quoted) {
+        debug(4, "Multipart: Warning: boundary was quoted.");
+    }
+
+    m_transaction->m_collections.store("MULTIPART_BOUNDARY_WHITESPACE",
+        std::to_string(m_flag_boundary_whitespace));
+    if (m_flag_boundary_whitespace) {
+        debug(4, "Multipart: Warning: boundary whitespace in C-T header.");
+    }
+
+    m_transaction->m_collections.store("MULTIPART_HEADER_FOLDING",
+        std::to_string(m_flag_header_folding));
+    if (m_flag_header_folding) {
+        debug(4, "Multipart: Warning: header folding used.");
+    }
+
+    m_transaction->m_collections.store("MULTIPART_CRLF_LINE",
+        std::to_string(m_flag_crlf_line));
+    m_transaction->m_collections.store("MULTIPART_LF_LINE",
+        std::to_string(m_flag_lf_line));
+    m_transaction->m_collections.store("MULTIPART_CRLF_LF_LINES",
+        std::to_string(m_flag_crlf_line && m_flag_lf_line));
+    if (m_flag_crlf_line && m_flag_lf_line) {
+        debug(4, "Multipart: Warning: mixed line endings used (CRLF/LF).");
+    } else if (m_flag_lf_line) {
+        debug(4, "Multipart: Warning: incorrect line endings used (LF).");
+    }
+
+    m_transaction->m_collections.store("MULTIPART_MISSING_SEMICOLON",
+        std::to_string(m_flag_missing_semicolon));
+    if (m_flag_missing_semicolon) {
+        debug(4, "Multipart: Warning: missing semicolon in C-T header.");
+    }
+
+    m_transaction->m_collections.store("MULTIPART_INVALID_QUOTING",
+        std::to_string(m_flag_invalid_quoting));
+    if (m_flag_invalid_quoting) {
+        debug(4, "Multipart: Warning: invalid quoting used.");
+    }
+
+    m_transaction->m_collections.store("MULTIPART_INVALID_PART",
+        std::to_string(m_flag_invalid_part));
+    if (m_flag_invalid_part) {
+        debug(4, "Multipart: Warning: invalid part parsing.");
+    }
+
+    m_transaction->m_collections.store("MULTIPART_INVALID_HEADER_FOLDING",
+        std::to_string(m_flag_invalid_header_folding));
+    if (m_flag_invalid_header_folding) {
+        debug(4, "Multipart: Warning: invalid header folding used.");
+    }
+
+    m_transaction->m_collections.store("MULTIPART_STRICT_ERROR",
+        std::to_string(m_flag_error || m_flag_boundary_quoted != 0
+        || m_flag_boundary_whitespace != 0 || m_flag_data_before != 0
+        || m_flag_data_after != 0 || m_flag_header_folding != 0
+        || m_flag_lf_line != 0 || m_flag_missing_semicolon != 0
+        || m_flag_invalid_quoting != 0 || m_flag_invalid_part != 0
+        || m_flag_invalid_header_folding != 0
+        || m_flag_file_limit_exceeded != 0));
+
+
+    if ((m_seen_data != 0) && (m_is_complete == 0)) {
+        if (m_boundary_count > 0) {
+            /* Check if we have the final boundary (that we haven't
+             * processed yet) in the buffer.
+             */
+            if (m_buf_contains_line) {
+                if (((unsigned int)(MULTIPART_BUF_SIZE - m_bufleft)
+                        == (4 + m_boundary.size()))
+                    && (*(m_buf) == '-')
+                    && (*(m_buf + 1) == '-')
+                    && (strncmp(m_buf + 2, m_boundary.c_str(),
+                        m_boundary.size()) == 0)
+                    && (*(m_buf + 2 + m_boundary.size()) == '-')
+                    && (*(m_buf + 2 + m_boundary.size() + 1) == '-')) {
+                    /* Looks like the final boundary - process it. */
+                    if (process_boundary(1 /* final */) < 0) {
+                        m_flag_error = 1;
+                        return -1;
+                    }
+
+                    /* The payload is complete after all. */
+                    m_is_complete = 1;
+                }
+            }
+
+            if (m_is_complete == 0) {
+                debug(1, "Multipart: Final boundary missing.");
+                return false;
+            }
+        } else {
+            debug(1, "Multipart: No boundaries found in payload.");
+            return false;
+        }
+    }
+
+    int file_combined_size = 0;
+    for (MultipartPart *m : m_parts) {
+        // FIXME: duplicate code, see transaction.
+        //        we need a helper function for this.
+        if (m->m_name.empty()) {
             continue;
         }
-        std::string block = std::string(data, start + m_boundary.length() +
-            + endl, end - (start + m_boundary.length() + endl) - endl);
 
-        checkForCrlfLf(block);
-
-        //  if (this->crlf) {
-        //      block.erase(0, 1);
-        //  }
-
-        blobs.push_back(block);
-        lastValidBoundary = end;
-        start = end;
-    }
-
-    size_t lastPiece = m_boundary.length() + lastValidBoundary \
-        + firstValidBoundary + 2;
-    if (this->crlf) {
-        lastPiece = lastPiece + 2;
-    } else {
-        lastPiece = lastPiece + 1;
-    }
-
-    if (data.length() > lastPiece) {
-        this->containsDataAfter = true;
-    }
-
-    std::string filename("");
-    std::string name("");
-    int i = 0;
-    for (std::string x : blobs) {
-        i++;
-#ifndef NO_LOGS
-        debug(5, "Multipart: Inspecting blob: " + std::to_string(i));
-#endif
-        MultipartBlob m(x, this);
-
-        if (m.name.empty() == false) {
-            name = m.name;
+        if (m->m_type == MULTIPART_FILE) {
+            std::string tmp_name;
+            std::string name;
+            if (!m->m_tmp_file_name.empty()) {
+                tmp_name.assign(m->m_tmp_file_name);
+            }
+            if (!m->m_filename.empty()) {
+                name.assign(m->m_filename);
+            }
+            m_transaction->m_collections.store("FILES:" + m->m_filename,
+                m->m_filename);
+            m_transaction->m_collections.store("FILES_NAMES:" + m->m_name,
+                m->m_name);
+            m_transaction->m_collections.store("FILES_SIZES:" + m->m_name,
+                std::to_string(m->m_tmp_file_size));
+            m_transaction->m_collections.store("FILES_TMP_CONTENT:" \
+                + m->m_name, m->m_value);
+            m_transaction->m_collections.store("FILES_TMPNAMES:" \
+                + m->m_filename, tmp_name);
+            file_combined_size = file_combined_size + m->m_tmp_file_size;
         } else {
-            name = "no-name-" + std::to_string(i);
+            debug(4, "Adding request argument (BODY): name \"" +
+                m->m_name + "\", value \"" + m->m_value + "\"");
+            m_transaction->m_collections.store("ARGS:" + m->m_name,
+                m->m_value);
+            m_transaction->m_collections.store("ARGS_POST:" + m->m_name,
+                m->m_value);
         }
-
-        if (m.filename.empty() == false) {
-            filename = m.filename;
+#if 0
+        if (m_transaction->m_namesArgs->empty()) {
+            m_transaction->m_namesArgs->assign(key);
         } else {
-            filename = "no-file-name-" + std::to_string(i);
+            m_transaction->m_namesArgs->assign(*m_namesArgs + " " + key);
+        }
+        if (m_transaction->m_namesArgsPost->empty()) {
+            m_transaction->m_namesArgsPost->assign(key);
+        } else {
+            m_transaction->m_namesArgsPost->assign(
+                *m_namesArgsPost + " " + key);
         }
 
-        col->storeOrUpdateFirst("FILES:" + name, filename);
-        col->storeOrUpdateFirst("FILES_NAMES:" + name, name);
-        col->storeOrUpdateFirst("FILES_SIZES:" + name,
-            std::to_string(m.content.size()));
-#ifndef NO_LOGS
-        debug(5, "Multipart: Saving FILES_TMP_CONTENT:" + name + " variable.");
+        m_transaction->m_ARGScombinedSize = \
+            m_transaction->->m_ARGScombinedSize + \
+            m->m_name.length() + m->m_value.length();
+        m_transaction->m_ARGScombinedSizeStr->assign(
+            std::to_string(m_transaction->->m_ARGScombinedSize));
 #endif
-        col->storeOrUpdateFirst("FILES_TMP_CONTENT:" + name, m.content);
-        files_size = files_size + m.content.size();
-        if (m.invalidQuote) {
-#ifndef NO_LOGS
-            debug(4, "Multipart: Found invalid quoting.");
-#endif
-            this->invalidQuote = true;
+    }
+    m_transaction->m_collections.store("FILES_COMBINED_SIZE",
+        std::to_string(file_combined_size));
+
+    return true;
+}
+
+
+int Multipart::count_boundary_params(const std::string& str_header_value) {
+    std::string lower = tolower(str_header_value);
+    const char *header_value = lower.c_str();
+    char *duplicate = NULL;
+    char *s = NULL;
+    int count = 0;
+
+    if (header_value == NULL) {
+        return -1;
+    }
+
+    duplicate = strdup(header_value);
+    if (duplicate == NULL) {
+        return -1;
+    }
+
+    s = duplicate;
+    while ((s = strstr(s, "boundary")) != NULL) {
+        s += 8;
+
+        if (strchr(s, '=') != NULL) {
+            count++;
         }
     }
-    if (filename.empty() == false) {
-        col->storeOrUpdateFirst("MULTIPART_FILENAME", filename);
+
+    free(duplicate);
+    return count;
+}
+
+
+bool Multipart::init() {
+    m_bufleft = MULTIPART_BUF_SIZE;
+    m_bufptr = m_buf;
+    m_buf_contains_line = true;
+    m_mpp = NULL;
+    const char *m_boundary_tmp = NULL;
+
+    if (m_header.empty()) {
+        m_flag_error = true;
+        debug(4, "Multipart: Content-Type header not available.");
+        return false;
     }
-    if (name.empty() == false) {
-        col->storeOrUpdateFirst("MULTIPART_NAME", name);
+
+    if (m_header.size() > 1024) {
+        m_flag_error = 1;
+        debug(4, "Multipart: Invalid boundary in C-T (length).");
+        return false;
     }
-    col->storeOrUpdateFirst("FILES_COMBINED_SIZE", std::to_string(files_size));
+
+    if (strncasecmp(m_header.c_str(), "multipart/form-data", 19) != 0) {
+        m_flag_error = 1;
+        debug(4, "Multipart: Invalid MIME type.");
+        return false;
+    }
+
+    /* Count how many times the word "boundary" appears in the C-T header. */
+    if (count_boundary_params(m_header) > 1) {
+        m_flag_error = 1;
+        debug(4, "Multipart: Multiple boundary parameters in C-T.");
+        return false;
+    }
+
+    m_boundary_tmp = strstr(m_header.c_str(), "boundary");
+    if (m_boundary_tmp) {
+        m_boundary = std::string(m_boundary_tmp);
+        const char *p = NULL;
+        const char *b = NULL;
+        int seen_semicolon = 0;
+        int len = 0;
+
+        /* Check for extra characters before the boundary. */
+        for (p = m_header.c_str() + 19;
+            p < m_boundary_tmp; p++) {
+            if (!isspace(*p)) {
+                if ((seen_semicolon == 0) && (*p == ';')) {
+                    seen_semicolon = 1; /* It is OK to have one semicolon. */
+                } else {
+                    m_flag_error = 1;
+                    debug(4, "Multipart: Invalid boundary in C-T " \
+                        "(malformed).");
+                    return false;
+                }
+            }
+        }
+
+        /* Have we seen the semicolon in the header? */
+        if (seen_semicolon == 0) {
+            m_flag_missing_semicolon = 1;
+        }
+
+        b = strchr(m_boundary_tmp + 8, '=');
+        if (b == NULL) {
+            m_flag_error = 1;
+            debug(4, "Multipart: Invalid boundary in C-T (malformed).");
+            return false;
+        }
+
+        /* Check parameter name ends well. */
+        if (b != (m_boundary.c_str() + 8)) {
+            /* Check all characters between the end of the boundary
+             * and the = character.
+             */
+            for (p = m_boundary_tmp + 8; p < b; p++) {
+                if (isspace(*p)) {
+                    /* Flag for whitespace after parameter name. */
+                    m_flag_boundary_whitespace = 1;
+                } else {
+                    m_flag_error = 1;
+                    debug(4, "Multipart: Invalid boundary in C-T " \
+                        "(parameter name).");
+                    return false;
+                }
+            }
+        }
+
+        b++; /* Go over the = character. */
+        len = strlen(b);
+
+        /* Flag for whitespace before parameter value. */
+        if (isspace(*b)) {
+            m_flag_boundary_whitespace = 1;
+        }
+
+        /* Is the boundary quoted? */
+        if ((len >= 2) && (*b == '"') && (*(b + len - 1) == '"')) {
+            /* Quoted. */
+            m_boundary.assign(std::string(b + 1, len - 2));
+            if (m_boundary.empty()) {
+                return -1;
+            }
+            m_flag_boundary_quoted = 1;
+        } else {
+            /* Not quoted. */
+
+            /* Test for partial quoting. */
+            if ((*b == '"')
+                || ((len >= 2) && (*(b + len - 1) == '"'))) {
+                m_flag_error = 1;
+                debug(4, "Multipart: Invalid boundary in C-T (quote).");
+                return false;
+            }
+
+            m_boundary.assign(b);
+            if (m_boundary.empty()) {
+                return false;
+            }
+
+            m_flag_boundary_quoted = 0;
+        }
+
+        /* Case-insensitive test for the string "boundary" in the boundary. */
+        if (count_boundary_params(m_boundary.c_str()) != 0) {
+            m_flag_error = 1;
+            debug(4, "Multipart: Invalid boundary in C-T (content).");
+            return false;
+        }
+
+        /* Validate the characters used in the boundary. */
+        if (boundary_characters_valid(m_boundary.c_str()) != 1) {
+            m_flag_error = 1;
+            debug(4, "Multipart: Invalid boundary in C-T (characters).");
+            return false;
+        }
+
+        debug(9, "Multipart: Boundary" +
+            (m_flag_boundary_quoted ?
+                std::string(" (quoted)") : std::string("")) +
+            std::string(": ") + m_boundary);
+
+        if (m_boundary.size() == 0) {
+            m_flag_error = 1;
+            debug(4, "Multipart: Invalid boundary in C-T (empty).");
+            return false;
+        }
+    } else { /* Could not find boundary in the C-T header. */
+        m_flag_error = 1;
+
+        /* Test for case-insensitive boundary. Allowed by the RFC but
+         * highly unusual. */
+        if (count_boundary_params(m_header) > 0) {
+            debug(4, "Multipart: Invalid boundary in C-T (case sensitivity).");
+            return false;
+        }
+
+        debug(4, "Multipart: Boundary not found in C-T.");
+        return false;
+    }
+
+    return 1;
+}
+
+
+/*
+ * Assuming that all data is on data. We are not processing chunks.
+ *
+ */
+bool Multipart::process(const std::string& data) {
+    const char *inptr = data.c_str();
+    unsigned int inleft = data.size();
+
+    if (data.size() == 0) return true;
+
+    m_seen_data = true;
+
+    if (m_is_complete) {
+        m_flag_data_before = true;
+
+        debug(4, "Multipart: Ignoring data after last boundary (received " \
+            + std::to_string(data.size()) + " bytes)");
+
+        return true;
+    }
+
+    if (m_bufleft == 0) {
+        m_flag_error = 1;
+        debug(4, "Multipart: Internal error in process_chunk: no space left " \
+            "in the buffer");
+        return false;
+    }
+
+    /* here we loop through the available data, one byte at a time */
+    while (inleft > 0) {
+        char c = *inptr;
+        int process_buffer = 0;
+
+        if ((c == '\r') && (m_bufleft == 1)) {
+            /* we don't want to take \r as the last byte in the buffer */
+            process_buffer = 1;
+        } else {
+            inptr++;
+            inleft = inleft - 1;
+
+            *(m_bufptr) = c;
+            m_bufptr++;
+            m_bufleft--;
+        }
+
+        /* until we either reach the end of the line
+         * or the end of our internal buffer
+         */
+        if ((c == '\n') || (m_bufleft == 0) || (process_buffer)) {
+            int processed_as_boundary = 0;
+
+            *(m_bufptr) = 0;
+
+            /* Do we have something that looks like a boundary? */
+            if (m_buf_contains_line && (strlen(m_buf) > 3) && (*(m_buf) == '-')
+                && (*(m_buf + 1) == '-')) {
+                /* Does it match our boundary? */
+                if ((strlen(m_buf) >= m_boundary.size() + 2)
+                    && (strncmp(m_buf + 2, m_boundary.c_str(),
+                        m_boundary.size()) == 0)) {
+                    char *boundary_end = m_buf + 2 + m_boundary.size();
+                    int is_final = 0;
+
+                    /* Is this the final boundary? */
+                    if ((*boundary_end == '-')
+                        && (*(boundary_end + 1)== '-')) {
+                        is_final = 1;
+                        boundary_end += 2;
+
+                        if (m_is_complete != 0) {
+                            m_flag_error = 1;
+                            debug(4, "Multipart: Invalid boundary " \
+                                "(final duplicate).");
+                            return false;
+                        }
+                    }
+
+                    /* Allow for CRLF and LF line endings. */
+                    if (((*boundary_end == '\r')
+                        && (*(boundary_end + 1) == '\n')
+                        && (*(boundary_end + 2) == '\0'))
+                        || ((*boundary_end == '\n')
+                        && (*(boundary_end + 1) == '\0'))) {
+                        if (*boundary_end == '\n') {
+                            m_flag_lf_line = 1;
+                        } else {
+                            m_flag_crlf_line = 1;
+                        }
+
+                        if (process_boundary((is_final ? 1 : 0)) < 0) {
+                            m_flag_error = true;
+                            return false;
+                        }
+
+                        if (is_final) {
+                            m_is_complete = 1;
+                        }
+
+                        processed_as_boundary = 1;
+                        m_boundary_count++;
+                    } else {
+                        /* error */
+                        m_flag_error = 1;
+                        debug(4, "Multipart: Invalid boundary: " \
+                            + std::string(m_buf));
+                        return false;
+                    }
+                } else { /* It looks like a boundary but */
+                         /* we couldn't match it. */
+                    char *p = NULL;
+
+                    /* Check if an attempt to use quotes around the
+                     * boundary was made. */
+                    if ((m_flag_boundary_quoted)
+                        && (strlen(m_buf) >= m_boundary.size() + 3)
+                        && (*(m_buf + 2) == '"')
+                        && (strncmp(m_buf + 3, m_boundary.c_str(),
+                            m_boundary.size()) == 0)) {
+                        m_flag_error = 1;
+                        debug(4, "Multipart: Invalid boundary (quotes).");
+                        return false;
+                    }
+
+                    /* Check the beginning of the boundary for whitespace. */
+                    p = m_buf + 2;
+                    while (isspace(*p)) {
+                        p++;
+                    }
+
+                    if ((p != m_buf + 2)
+                        && (strncmp(p, m_boundary.c_str(),
+                            m_boundary.size()) == 0)) {
+                        /* Found whitespace in front of a boundary. */
+                        m_flag_error = 1;
+                        debug(4, "Multipart: Invalid boundary (whitespace).");
+                        return false;
+                    }
+
+                    m_flag_unmatched_boundary = 1;
+                }
+            } else { /* We do not think the buffer contains a boundary. */
+                /* Look into the buffer to see if there's anything
+                 * there that resembles a boundary.
+                 */
+                if (m_buf_contains_line) {
+                    int i, len = (MULTIPART_BUF_SIZE - m_bufleft);
+                    char *p = m_buf;
+
+                    for (i = 0; i < len; i++) {
+                        if ((p[i] == '-') && (i + 1 < len)
+                            && (p[i + 1] == '-')) {
+                            if (strncmp(p + i + 2, m_boundary.c_str(),
+                                m_boundary.size()) == 0) {
+                                m_flag_unmatched_boundary = 1;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* Process as data if it was not a boundary. */
+            if (processed_as_boundary == 0) {
+                if (m_mpp == NULL) {
+                    m_flag_data_before = 1;
+
+                    debug(4, "Multipart: Ignoring data before first " \
+                        "boundary.");
+                } else {
+                    if (m_mpp_state == 0) {
+                        if ((m_bufleft == 0) || (process_buffer)) {
+                            /* part header lines must be shorter than
+                             * MULTIPART_BUF_SIZE bytes
+                             */
+                            m_flag_error = 1;
+                            debug(4, "Multipart: Part header line over " \
+                                + std::to_string(MULTIPART_BUF_SIZE) \
+                                + " bytes long");
+                            return false;
+                        }
+
+                        if (process_part_header() < 0) {
+                            m_flag_error = 1;
+                            return false;
+                        }
+
+                    } else {
+                        if (process_part_data() < 0) {
+                            m_flag_error = 1;
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            /* Update the offset of the data we are about
+             * to process. This is to allow us to know the
+             * offsets of individual files and variables.
+             */
+            m_buf_offset += (MULTIPART_BUF_SIZE - m_bufleft);
+
+            /* reset the pointer to the beginning of the buffer
+             * and continue to accept input data
+             */
+            m_bufptr = m_buf;
+            m_bufleft = MULTIPART_BUF_SIZE;
+            m_buf_contains_line = (c == 0x0a) ? 1 : 0;
+        }
+
+        if ((m_is_complete) && (inleft != 0)) {
+            m_flag_data_after = 1;
+            debug(4, "Multipart: Ignoring data after last boundary (" \
+                + std::to_string(inleft) + "bytes left)");
+
+            return true;
+        }
+    }
 
     return true;
 }

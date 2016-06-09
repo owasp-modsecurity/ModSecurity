@@ -606,72 +606,8 @@ int Transaction::processRequestBody() {
 
             if (m.init() == true) {
                 m.process(m_requestBody.str());
-                if (m.crlf && m.lf) {
-                    m_collections.store("MULTIPART_CRLF_LF_LINES", "1");
-                } else {
-                    m_collections.store("MULTIPART_CRLF_LF_LINES", "0");
-                }
-                if (m.boundaryStartsWithWhiteSpace) {
-#ifndef NO_LOGS
-                    debug(9, "Multipart: Boundary starts with white space, " \
-                       "setting MULTIPART_STRICT_ERROR to 1");
-#endif
-                        m_collections.storeOrUpdateFirst(
-                            "MULTIPART_STRICT_ERROR", "1");
-                }
-                if (m.boundaryIsQuoted) {
-#ifndef NO_LOGS
-
-                    debug(9, "Multipart: Boundary is quoted, " \
-                        "setting MULTIPART_STRICT_ERROR to 1");
-#endif
-                        m_collections.storeOrUpdateFirst(
-                            "MULTIPART_STRICT_ERROR", "1");
-                }
-                if (m.containsDataAfter) {
-#ifndef NO_LOGS
-                    debug(9, "Multipart: There is data after the boundary, " \
-                        "setting MULTIPART_STRICT_ERROR to 1");
-#endif
-                    m_collections.storeOrUpdateFirst(
-                        "MULTIPART_STRICT_ERROR", "1");
-                    m_collections.store("MULTIPART_UNMATCHED_BOUNDARY", "1");
-                } else {
-                    m_collections.store("MULTIPART_UNMATCHED_BOUNDARY", "0");
-                }
-                if (m.containsDataBefore) {
-#ifndef NO_LOGS
-                    debug(9, "Multipart: There is data before the boundary, " \
-                        "setting MULTIPART_STRICT_ERROR to 1");
-#endif
-                        m_collections.storeOrUpdateFirst(
-                            "MULTIPART_STRICT_ERROR", "1");
-                }
-                if (m.lf) {
-#ifndef NO_LOGS
-                    debug(9, "Multipart: Lines are LF-terminated, " \
-                        "setting MULTIPART_STRICT_ERROR to 1");
-#endif
-                        m_collections.storeOrUpdateFirst(
-                            "MULTIPART_STRICT_ERROR", "1");
-                }
-                if (m.missingSemicolon) {
-#ifndef NO_LOGS
-                    debug(9, "Multipart: Boundary missing semicolon, " \
-                        "setting MULTIPART_STRICT_ERROR to 1");
-#endif
-                        m_collections.storeOrUpdateFirst(
-                            "MULTIPART_STRICT_ERROR", "1");
-                }
-                 if (m.invalidQuote) {
-#ifndef NO_LOGS
-                    debug(9, "Multipart: Invalid quote, " \
-                        "setting MULTIPART_STRICT_ERROR to 1");
-#endif
-                        m_collections.storeOrUpdateFirst(
-                            "MULTIPART_STRICT_ERROR", "1");
-                }
             }
+            m.multipart_complete();
         }
     }
 

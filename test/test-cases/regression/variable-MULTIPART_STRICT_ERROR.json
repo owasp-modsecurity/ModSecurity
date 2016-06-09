@@ -267,21 +267,21 @@
       "uri":"/",
       "method":"POST",
       "body":[  
-        "--------------------------756b6d74fa1a8ee2",
+        "----------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"name\"",
         "",
         "test",
-        "--------------------------756b6d74fa1a8ee2",
+        "----------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
         "Content-Type: text/plain",
         "",
         "This is a very small test file..",
-        "--------------------------756b6d74fa1a8ee2",
+        "----------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
         "Content-Type: text/plain",
         "",
         "This is another very small test file..",
-        "--------------------------756b6d74fa1a8ee2--"
+        "----------------------------756b6d74fa1a8ee2--"
       ]
     },
     "response":{
@@ -295,7 +295,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Boundary missing semicolon, setting MULTIPART_STRICT_ERROR to 1"
+      "debug_log":"Warning: incorrect line endings used \(LF\)"
     },
     "rules":[
       "SecRuleEngine On",
@@ -356,7 +356,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Multipart: Invalid quote, setting MULTIPART_STRICT_ERROR to 1"
+      "debug_log":"Multipart: Warning: seen data before first boundary"
     },
     "rules":[
       "SecRuleEngine On",

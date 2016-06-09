@@ -60,7 +60,11 @@ class RulesProperties {
         requestBodyLimitAction(ProcessPartialBodyLimitAction),
         responseBodyLimit(0),
         responseBodyLimitAction(ProcessPartialBodyLimitAction),
-        secRuleEngine(DetectionOnlyRuleEngine) { }
+        secRuleEngine(DetectionOnlyRuleEngine),
+        uploadKeepFiles(0),
+        uploadFileLimit(100),
+        uploadFileMode(0),
+        tmpSaveUploadedFiles(false) { }
 
     explicit RulesProperties(DebugLog *debugLog)
         : audit_log(NULL),
@@ -76,8 +80,11 @@ class RulesProperties {
         requestBodyLimitAction(ProcessPartialBodyLimitAction),
         responseBodyLimit(0),
         responseBodyLimitAction(ProcessPartialBodyLimitAction),
-        secRuleEngine(DetectionOnlyRuleEngine) { }
-
+        secRuleEngine(DetectionOnlyRuleEngine),
+        uploadKeepFiles(0),
+        uploadFileLimit(100),
+        uploadFileMode(0),
+        tmpSaveUploadedFiles(false) { }
 
 /*
     RulesProperties(const RulesProperties &other)
@@ -219,6 +226,8 @@ class RulesProperties {
     int uploadFileLimit;
     int uploadFileMode;
     std::string uploadDirectory;
+    std::string uploadTmpDirectory;
+    bool tmpSaveUploadedFiles;
 
     audit_log::AuditLog *audit_log;
 

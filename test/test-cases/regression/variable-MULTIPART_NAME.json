@@ -23,21 +23,21 @@
       "uri":"/",
       "method":"POST",
       "body":[  
-        "--------------------------756b6d74fa1a8ee2",
+        "----------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"name\"",
         "",
         "test",
-        "--------------------------756b6d74fa1a8ee2",
+        "----------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
         "Content-Type: text/plain",
         "",
         "This is a very small test file..",
-        "--------------------------756b6d74fa1a8ee2",
+        "----------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
         "Content-Type: text/plain",
         "",
         "This is another very small test file..",
-        "--------------------------756b6d74fa1a8ee2--"
+        "----------------------------756b6d74fa1a8ee2--"
       ]
     },
     "response":{  
@@ -84,21 +84,21 @@
       "uri":"/",
       "method":"POST",
       "body":[  
-        "--------------------------756b6d74fa1a8ee2",
+        "----------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"name\"",
         "",
         "test",
-        "--------------------------756b6d74fa1a8ee2",
+        "----------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"filedata\"; filename=\"small_text_file.txt\"",
         "Content-Type: text/plain",
         "",
         "This is a very small test file..",
-        "--------------------------756b6d74fa1a8ee2",
+        "----------------------------756b6d74fa1a8ee2",
         "Content-Disposition: form-data; name=\"filedata2\"; filename=\"small_text_file2.txt\"\r",
         "Content-Type: text/plain\r",
         "\r",
         "This is another very small test file..\r",
-        "--------------------------756b6d74fa1a8ee2--\r"
+        "----------------------------756b6d74fa1a8ee2--\r"
         ]
     },
     "response":{  
