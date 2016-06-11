@@ -70,6 +70,22 @@ AC_SUBST(MSC_REGRESSION_DOCROOT_DIR)
 
 ### Configure Options
 
+# Verbose output
+AC_ARG_ENABLE(verbose-output,
+              AS_HELP_STRING([--enable-verbose-output],
+                             [Enable more verbose configure output.]),
+[
+  if test "$enableval" != "no"; then
+    verbose_output=1
+  else
+    verbose_output=0
+  fi
+],
+[
+  verbose_output=0
+])
+
+
 #OS type
 
 AC_CANONICAL_HOST
@@ -410,20 +426,6 @@ AC_ARG_ENABLE(errors,
   report_errors=1
 ])
 
-# Verbose output
-AC_ARG_ENABLE(verbose-output,
-              AS_HELP_STRING([--enable-verbose-output],
-                             [Enable more verbose configure output.]),
-[
-  if test "$enableval" != "no"; then
-    verbose_output=1
-  else
-    verbose_output=0
-  fi
-],
-[
-  verbose_output=0
-])
 
 # Strict Compile
 AC_ARG_ENABLE(strict-compile,
