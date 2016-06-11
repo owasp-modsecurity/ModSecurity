@@ -2,6 +2,7 @@ dnl Check for CURL Libraries
 dnl CHECK_CURL(ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND])
 dnl Sets:
 dnl  CURL_CFLAGS
+dnl  CURL_LDADD
 dnl  CURL_LIBS
 
 CURL_CONFIG=""
@@ -57,7 +58,8 @@ if test -n "${curl_path}"; then
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(curl VERSION: $CURL_VERSION); fi
     CURL_CFLAGS="`${CURL_CONFIG} --cflags`"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(curl CFLAGS: $CURL_CFLAGS); fi
-    CURL_LDADD="`${CURL_CONFIG} --libs`"
+    CURL_LIBS="`${CURL_CONFIG} --libs`"
+    CURL_LDADD="${CURL_LIBS}"
     if test "$verbose_output" -eq 1; then AC_MSG_NOTICE(curl LDADD: $CURL_LIBS); fi
 
     dnl # Check version is ok
