@@ -75,7 +75,8 @@ void logCb(void *data, const char *msg) {
 }
 
 
-void perform_unit_test(std::vector<RegressionTest *> *tests,
+void perform_unit_test(ModSecurityTest<RegressionTest> *test,
+    std::vector<RegressionTest *> *tests,
     ModSecurityTestResults<RegressionTestResult> *res, int *count) {
 
 
@@ -99,10 +100,13 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         } else {
             filename = t->filename;
         }
-        std::cout << std::setw(3) << std::right <<
-            std::to_string(*count) << " ";
-        std::cout << std::setw(50) << std::left << filename;
-        std::cout << std::setw(70) << std::left << t->name;
+
+        if (!test->m_automake_output) {
+            std::cout << std::setw(3) << std::right <<
+                std::to_string(*count) << " ";
+            std::cout << std::setw(50) << std::left << filename;
+            std::cout << std::setw(70) << std::left << t->name;
+        }
 
         modsec = new modsecurity::ModSecurity();
         modsec->setConnectorInformation("ModSecurity-regression v0.0.1-alpha" \
@@ -123,7 +127,12 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
             testRes->reason << KCYN << "compiled with support " << std::endl;
             testRes->reason << KCYN << "to: " << t->resource << std::endl;
             testRes->reason << RESET << std::endl;
-            std::cout << KCYN << "skipped!" << RESET << std::endl;
+            if (test->m_automake_output) {
+                std::cout << ":test-result: SKIP " << filename \
+                    << ":" << t->name << std::endl;
+            } else {
+                std::cout << KCYN << "skipped!" << RESET << std::endl;
+            }
             res->push_back(testRes);
             continue;
         }
@@ -135,7 +144,12 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
                  * Not expecting any error, thus return the error to
                  * the user.
                  */
-                std::cout << KRED << "failed!" << RESET << std::endl;
+                if (test->m_automake_output) {
+                    std::cout << ":test-result: FAIL " << filename \
+                        << ":" << t->name << std::endl;
+                } else {
+                    std::cout << KRED << "failed!" << RESET << std::endl;
+                }
                 testRes->reason << KRED << "parse failed." << RESET \
                     << std::endl;
                 testRes->reason << modsec_rules->getParserError() \
@@ -150,7 +164,12 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
             std::string s = modsec_rules->getParserError();
 
             if (regex_search(s, &match, re) && match.size() >= 1) {
-                std::cout << KGRN << "passed!" << RESET << std::endl;
+                if (test->m_automake_output) {
+                    std::cout << ":test-result: PASS " << filename \
+                        << ":" << t->name << std::endl;
+                } else {
+                    std::cout << KGRN << "passed!" << RESET << std::endl;
+                }
                 /* Parser error was expected, thus, the test passed. */
                 testRes->reason << KGRN << "passed!" << RESET << std::endl;
                 testRes->passed = true;
@@ -158,7 +177,12 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
                 continue;
             } else {
                 /* Parser error was expected, but with a different content */
-                std::cout << KRED << "failed!" << RESET << std::endl;
+                if (test->m_automake_output) {
+                    std::cout << ":test-result: FAIL " << filename \
+                        << ":" << t->name << std::endl;
+                } else {
+                    std::cout << KRED << "failed!" << RESET << std::endl;
+                }
 
                 testRes->reason << KRED << "failed!" << RESET << std::endl;
                 testRes->reason << KWHT << "Expected a parser error." \
@@ -174,11 +198,16 @@ void perform_unit_test(std::vector<RegressionTest *> *tests,
         } else {
             /* Parser error was expected but never happened */
             if (t->parser_error.empty() == false) {
-                std::cout << KRED << "failed!" << RESET << std::endl;
-                std::cout << KWHT << "Expected a parser error." \
-                    << RESET << std::endl;
-                std::cout << KWHT << "Expected: " << RESET \
-                    << t->parser_error << std::endl;
+                if (test->m_automake_output) {
+                    std::cout << ":test-result: FAIL " << filename \
+                        << ":" << t->name << std::endl;
+                } else {
+                    std::cout << KRED << "failed!" << RESET << std::endl;
+                    std::cout << KWHT << "Expected a parser error." \
+                        << RESET << std::endl;
+                    std::cout << KWHT << "Expected: " << RESET \
+                        << t->parser_error << std::endl;
+                }
                 testRes->passed = false;
                 res->push_back(testRes);
                 continue;
@@ -254,20 +283,35 @@ end:
 
         if (d != NULL) {
             if (!d->contains(t->debug_log)) {
-                std::cout << KRED << "failed!" << RESET << std::endl;
+                if (test->m_automake_output) {
+                    std::cout << ":test-result: FAIL " << filename \
+                        << ":" << t->name << std::endl;
+                } else {
+                    std::cout << KRED << "failed!" << RESET << std::endl;
+                }
                 testRes->reason << "Debug log was not matching the " \
                     << "expected results." << std::endl;
                 testRes->reason << KWHT << "Expecting: " << RESET \
                     << t->debug_log + ".";
                 testRes->passed = false;
             } else if (r.status != t->http_code) {
-                std::cout << KRED << "failed!" << RESET << std::endl;
+                if (test->m_automake_output) {
+                    std::cout << ":test-result: FAIL " << filename \
+                        << ":" << t->name << std::endl;
+                } else {
+                    std::cout << KRED << "failed!" << RESET << std::endl;
+                }
                 testRes->reason << "HTTP code mismatch. expecting: " + \
                     std::to_string(t->http_code) + \
                     " got: " + std::to_string(r.status) + "\n";
                 testRes->passed = false;
             } else {
-                std::cout << KGRN << "passed!" << RESET << std::endl;
+                if (test->m_automake_output) {
+                    std::cout << ":test-result: PASS " << filename \
+                        << ":" << t->name << std::endl;
+                } else {
+                    std::cout << KGRN << "passed!" << RESET << std::endl;
+                }
                 testRes->passed = true;
                 goto after_debug_log;
             }
@@ -297,6 +341,7 @@ after_debug_log:
 int main(int argc, char **argv) {
     ModSecurityTest<RegressionTest> test;
     ModSecurityTestResults<RegressionTest> results;
+    int test_number = 0;
 
 #ifdef WITH_GEOIP
     resources.push_back("geoip");
@@ -307,20 +352,24 @@ int main(int argc, char **argv) {
         << std::endl;
 #else
     test.cmd_options(argc, argv);
-    std::cout << test.header();
+    if (!test.m_automake_output) {
+        std::cout << test.header();
+    }
 
     test.load_tests();
 
-    std::cout << std::setw(4) << std::right << "# ";
-    std::cout << std::setw(50) << std::left << "File Name";
-    std::cout << std::setw(70) << std::left << "Test Name";
-    std::cout << std::setw(10) << std::left << "Passed?";
-    std::cout << std::endl;
-    std::cout << std::setw(4) << std::right << "--- ";
-    std::cout << std::setw(50) << std::left << "---------";
-    std::cout << std::setw(70) << std::left << "---------";
-    std::cout << std::setw(10) << std::left << "-------";
-    std::cout << std::endl;
+    if (!test.m_automake_output) {
+        std::cout << std::setw(4) << std::right << "# ";
+        std::cout << std::setw(50) << std::left << "File Name";
+        std::cout << std::setw(70) << std::left << "Test Name";
+        std::cout << std::setw(10) << std::left << "Passed?";
+        std::cout << std::endl;
+        std::cout << std::setw(4) << std::right << "--- ";
+        std::cout << std::setw(50) << std::left << "---------";
+        std::cout << std::setw(70) << std::left << "---------";
+        std::cout << std::setw(10) << std::left << "-------";
+        std::cout << std::endl;
+    }
     int counter = 0;
 
     std::list<std::string> keyList;
@@ -331,8 +380,12 @@ int main(int argc, char **argv) {
 
     ModSecurityTestResults<RegressionTestResult> res;
     for (std::string &a : keyList) {
-        std::vector<RegressionTest *> *tests = test[a];
-        perform_unit_test(tests, &res, &counter);
+        test_number++;
+        if ((test.m_test_number == 0)
+            || (test.m_test_number != 0 && test_number == test.m_test_number)) {
+            std::vector<RegressionTest *> *tests = test[a];
+            perform_unit_test(&test, tests, &res, &counter);
+        }
     }
 
     std::cout << std::endl;
@@ -347,31 +400,38 @@ int main(int argc, char **argv) {
         if (r->passed == true && r->skipped == false) {
             passed++;
         } else if (r->skipped == false) {
-            std::cout << KRED << "Test failed." << RESET << KWHT << " From: " \
-                << RESET << r->test->filename << "." << std::endl;
-            std::cout << KWHT << "Test name: " << RESET << r->test->name \
-                << "." << std::endl;
-            std::cout << KWHT << "Reason: " << RESET << std::endl;
-            std::cout << r->reason.str() << std::endl;
+            if (test.m_automake_output && 1 == 0) {
+                // m_automake_output
+            } else {
+                std::cout << KRED << "Test failed." << RESET << KWHT \
+                    << " From: " \
+                    << RESET << r->test->filename << "." << std::endl;
+                std::cout << KWHT << "Test name: " << RESET \
+                    << r->test->name \
+                    << "." << std::endl;
+                std::cout << KWHT << "Reason: " << RESET << std::endl;
+                std::cout << r->reason.str() << std::endl;
+            }
             failed++;
         }
     }
 
-    std::cout << "Ran a total of: " << std::to_string(failed + passed) \
-        << " regression tests - ";
-    if (failed == 0) {
-        std::cout << KGRN << "All tests passed." << RESET;
-    } else {
-        std::cout << KRED << failed << " failed." << RESET;
-    }
+    if (!test.m_automake_output) {
+        std::cout << "Ran a total of: " << std::to_string(failed + passed) \
+            << " regression tests - ";
+        if (failed == 0) {
+            std::cout << KGRN << "All tests passed." << RESET;
+        } else {
+            std::cout << KRED << failed << " failed." << RESET;
+        }
 
-    if (skipped > 0) {
-        std::cout << KCYN << " " << std::to_string(skipped) << " ";
-        std::cout << "skipped tests." << RESET << std::endl;
-    } else {
-        std::cout << std::endl;
+        if (skipped > 0) {
+            std::cout << KCYN << " " << std::to_string(skipped) << " ";
+            std::cout << "skipped tests." << RESET << std::endl;
+        } else {
+            std::cout << std::endl;
+        }
     }
-
     for (std::pair<std::string, std::vector<RegressionTest *> *> a : test) {
         std::vector<RegressionTest *> *vec = a.second;
         for (int i = 0; i < vec->size(); i++) {

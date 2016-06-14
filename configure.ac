@@ -116,7 +116,6 @@ CHECK_LIBXML2
 CHECK_PCRE
 
 
-
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([string])
@@ -244,6 +243,11 @@ fi
 
 
 AM_CONDITIONAL([TEST_UTILITIES], [test $buildTestUtilities = true])
+if test $buildTestUtilities = true; then
+    if test $debugLogs = true; then
+        TEST_CASES=`./test/test-list.sh`
+    fi
+fi
 
 
 # General link options

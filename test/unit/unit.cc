@@ -28,7 +28,7 @@
 #include "common/modsecurity_test_results.h"
 #include "common/colors.h"
 #include "unit/unit_test.h"
-
+#include "src/utils.h"
 
 using modsecurity_test::UnitTest;
 using modsecurity_test::ModSecurityTest;
@@ -45,34 +45,53 @@ void print_help() {
 }
 
 
-void perform_unit_test(UnitTest *t, ModSecurityTestResults<UnitTest>* res) {
+void perform_unit_test(ModSecurityTest<UnitTest> *test, UnitTest *t,
+    ModSecurityTestResults<UnitTest>* res) {
     const char *error = NULL;
+
+    if (test->m_automake_output) {
+        std::cout << ":test-result: ";
+    }
 
     if (t->type == "op") {
         Operator *op = Operator::instantiate("\"@" + t->name + \
                 " " + t->param + "\"");
         op->init(t->filename, &error);
         int ret = op->evaluate(NULL, t->input);
+        t->obtained = ret;
         if (ret != t->ret) {
-            t->obtained = ret;
             res->push_back(t);
+            if (test->m_automake_output) {
+                std::cout << "FAIL ";
+            }
+        } else if (test->m_automake_output) {
+            std::cout << "PASS ";
         }
-
         delete op;
     } else if (t->type == "tfn") {
         Transformation *tfn = Transformation::instantiate("t:" + t->name);
         std::string ret = tfn->evaluate(t->input, NULL);
         t->obtained = 1;
+        t->obtainedOutput = ret;
         if (ret != t->output) {
-            t->obtainedOutput = ret;
             res->push_back(t);
+            if (test->m_automake_output) {
+                std::cout << "FAIL ";
+            }
+        } else if (test->m_automake_output) {
+            std::cout << "PASS ";
         }
-
         delete tfn;
     } else {
         std::cerr << "Failed. Test type is unknown: << " << t->type;
         std::cerr << std::endl;
     }
+
+    if (test->m_automake_output) {
+        std::cout << t->name << " "
+            << modsecurity::toHexIfNeeded(t->input) << std::endl;
+    }
+
 }
 
 
@@ -82,7 +101,9 @@ int main(int argc, char **argv) {
     ModSecurityTestResults<UnitTest> results;
 
     test.cmd_options(argc, argv);
-    std::cout << test.header();
+    if (!test.m_automake_output) {
+        std::cout << test.header();
+    }
 
     test.load_tests();
     if (test.target == default_test_path) {
@@ -96,33 +117,42 @@ int main(int argc, char **argv) {
         for (UnitTest *t : *tests) {
             ModSecurityTestResults<UnitTest> r;
 
-            std::cout << "  " << a.first << "...\t";
-
-            perform_unit_test(t, &r);
-
-            if (r.size() == 0) {
-                std::cout << KGRN << r.size() << " tests failed.";
-            } else {
-                std::cout << KRED << r.size() << " tests failed.";
+            if (!test.m_automake_output) {
+                std::cout << "  " << a.first << "...\t";
             }
-            std::cout << RESET << std::endl;
+            perform_unit_test(&test, t, &r);
+
+            if (!test.m_automake_output) {
+                if (r.size() == 0) {
+                    std::cout << KGRN << r.size() << " tests failed.";
+                } else {
+                    std::cout << KRED << r.size() << " tests failed.";
+                }
+                std::cout << RESET << std::endl;
+            }
 
             results.insert(results.end(), r.begin(), r.end());
         }
     }
-    std::cout << "Total >> "  << total << std::endl;
+
+    if (!test.m_automake_output) {
+        std::cout << "Total >> "  << total << std::endl;
+    }
 
     for (UnitTest *t : results) {
         std::cout << t->print() << std::endl;
     }
 
-    std::cout << std::endl;
+    if (!test.m_automake_output) {
+        std::cout << std::endl;
 
-    std::cout << "Ran a total of: " << total << " unit tests - ";
-    if (results.size() == 0) {
-        std::cout << KGRN << "All tests passed" << RESET << std::endl;
-    } else {
-        std::cout << KRED << results.size() << " failed." << RESET << std::endl;
+        std::cout << "Ran a total of: " << total << " unit tests - ";
+        if (results.size() == 0) {
+            std::cout << KGRN << "All tests passed" << RESET << std::endl;
+        } else {
+            std::cout << KRED << results.size() << " failed." << RESET << std::endl;
+        }
+
     }
 
     for (std::pair<std::string, std::vector<UnitTest *> *> a : test) {

@@ -136,34 +136,28 @@ std::pair<std::string, std::vector<T *>>* ModSecurityTest<T>::load_tests() {
 
 template <class T>
 void ModSecurityTest<T>::cmd_options(int argc, char **argv) {
-#if HAS_GETOPT
-    int option_char;
-    GetOpt getopt(argc, argv, "hvct:");
-
-    while ((option_char = getopt()) != EOF) {
-        switch (option_char) {
-            case 'h':
-                print_help();
-                return;
-                break;
-            case 'v':
-                this->verbose = true;
-                break;
-            case 'c':
-                this->color = false;
-                break;
-            case 't':
-                this->target_folder = getopt.optarg;
-            break;
-          }
+    int i = 1;
+    if (argc > i && strcmp(argv[i], "automake") == 0) {
+        i++;
+        m_automake_output = true;
     }
-#else
-    if (argv[1]) {
-        this->target = argv[1];
+
+    if(const char* env_p = std::getenv("AUTOMAKE_TESTS")) {
+        m_automake_output = true;
+    }
+
+    if (argc > i && argv[i]) {
+        this->target = argv[i];
+        size_t pos = this->target.find(":");
+        if (pos != std::string::npos) {
+            std::string test_numbers = std::string(this->target, pos + 1,
+                this->target.length() - pos);
+            this->target = std::string(this->target, 0, pos);
+            m_test_number = std::atoi(test_numbers.c_str());
+        }
     } else {
         this->target = default_test_path;
     }
-#endif
 }
 
 }  // namespace modsecurity_test

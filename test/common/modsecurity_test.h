@@ -31,6 +31,10 @@ namespace modsecurity_test {
 template <class T> class ModSecurityTest :
     public std::unordered_map<std::string, std::vector<T *> *> {
  public:
+    ModSecurityTest()
+        : m_test_number(0),
+        m_automake_output(false) { }
+
     std::string header();
     void cmd_options(int, char **);
     std::pair<std::string, std::vector<T *>>* load_tests();
@@ -40,6 +44,8 @@ template <class T> class ModSecurityTest :
     std::string target;
     bool verbose = false;
     bool color = false;
+    int m_test_number;
+    bool m_automake_output;
 };
 
 }  // namespace modsecurity_test
