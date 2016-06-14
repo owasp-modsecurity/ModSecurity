@@ -95,7 +95,7 @@ if test $color_tests = yes; then
   wht='[1;40m' # White.
   std='[m'     # No color.
 else
-  red= grn= lgn= blu= mgn= std=
+  red= grn= lgn= blu= mgn= std= wht=
 fi
 
 do_exit='rm -f $log_file $trs_file; (exit $st); exit $st'

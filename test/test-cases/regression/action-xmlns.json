@@ -40,7 +40,7 @@
     "version_min":300000,
     "title":"Testing XML request body parser (validate ok)",
     "expected":{
-      "debug_log": "Target value: \"39.95\" \(Variable: XML:\/bookstore\/book\/price\[text\(\)\]\)"
+      "debug_log": "Target value: \"39.95\" \\(Variable: XML:\/bookstore\/book\/price\\[text\\(\\)\\]\\)"
     },
     "client":{
       "ip":"200.249.12.31",
