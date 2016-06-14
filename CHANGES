@@ -1,6 +1,9 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * configure: Fix detection whether libcurl is linked against gnutls and,
+   move verbose_output declaration up to the beginning.
+   [Issue #1158 - Thomas Deutschmann (@Whissi)]
  * Treat APR_INCOMPLETE as APR_EOF while receiving the request body.
    [Issue #1060, #334 - Alexey Sintsov]
 
