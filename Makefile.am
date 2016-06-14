@@ -36,9 +36,13 @@ MAINTAINERCLEANFILES = \
 	missing \
 	depcomp
 
+@VALGRIND_CHECK_RULES@
+VALGRIND_SUPPRESSIONS_FILES = test/valgrind_suppressions.txt
+
 LOG_DRIVER = env $(SHELL) $(top_srcdir)/test/custom-test-driver
 AM_TESTS_ENVIRONMENT=AUTOMAKE_TESTS=true; export AUTOMAKE_TESTS;
 LOG_COMPILER=test/test-suite.sh
+
 # for i in `find test/test-cases -iname *.json`; do echo TESTS+=$i; done
 TESTS=
 TESTS+=test/test-cases/regression/actions.json

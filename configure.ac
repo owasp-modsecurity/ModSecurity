@@ -297,6 +297,10 @@ DX_PS_FEATURE(OFF)
 
 DX_INIT_DOXYGEN([ModSecurity],[doc/doxygen.cfg])
 
+# make check-valgrind
+AX_VALGRIND_DFLT([sgcheck], [off])
+AX_VALGRIND_CHECK
+
 # Generate the files.
 AC_OUTPUT
 

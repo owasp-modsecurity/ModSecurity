@@ -1,11 +1,18 @@
 #!/bin/bash
 
-TEST=$1 1> /dev/null
 cd test 1> /dev/null
-if [[ $TEST == *"test-cases/regression/"* ]]
+
+length=$(($#-1))
+array=${@:1:$length}
+
+PARAM=$array
+FILE=${@: -1}
+
+if [[ $FILE == *"test-cases/regression/"* ]]
 then
-      ./regression_tests ../$*
+      $VALGRIND $PARAM ./regression_tests ../$FILE
+      echo $VALGRIND $PARAM ./regression_tests ../$FILE
 else
-      ./unit_tests ../$*
+      $VALGRIND $PARAM ./unit_tests ../$FILE
 fi
 cd - 1> /dev/null
