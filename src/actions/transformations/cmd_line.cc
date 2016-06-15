@@ -72,7 +72,7 @@ std::string CmdLine::evaluate(std::string value,
             /* copy normal characters */
             default :
                 char b = std::tolower(a);
-                ret.append(&b);
+                ret.append(&b, 1);
                 space = 0;
                 break;
         }
