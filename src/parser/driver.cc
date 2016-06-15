@@ -46,6 +46,7 @@ int Driver::addSecMarker(std::string marker) {
         rule->phase = i;
         rules[i].push_back(rule);
     }
+    return 0;
 }
 
 

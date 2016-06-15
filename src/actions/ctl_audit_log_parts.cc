@@ -31,6 +31,8 @@ bool CtlAuditLogParts::init(std::string *error) {
     } else {
         mPartsAction = 1;
     }
+
+    return true;
 }
 
 bool CtlAuditLogParts::evaluate(Rule *rule, Transaction *transaction) {
