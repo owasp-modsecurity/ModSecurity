@@ -8,6 +8,7 @@ multi_SOURCES = \
 multi_LDADD = \
 	-L$(top_builddir)/src/.libs/ \
 	-lmodsecurity \
+	-lpthread \
 	$(YAJL_LDFLAGS) \
 	$(GEOIP_LDFLAGS) \
 	$(GLOBAL_LDADD)
