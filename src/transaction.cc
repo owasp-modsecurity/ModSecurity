@@ -478,14 +478,18 @@ int Transaction::addRequestHeader(const std::string& key,
         std::string l = tolower(value);
         if (l.compare(0, multipart.length(), multipart) == 0) {
             this->m_requestBodyType = MultiPartRequestBody;
+            m_collections.store("REQBODY_PROCESSOR", "MULTIPART");
         }
 
         if (l == "application/x-www-form-urlencoded") {
             this->m_requestBodyType = WWWFormUrlEncoded;
+            m_collections.store("REQBODY_PROCESSOR", "URLENCODED");
         }
 
         if (l == "text/xml") {
+            // FIXME: this should be set by ctl:requestBodyProcessor.
             this->m_requestBodyType = XMLRequestBody;
+            m_collections.store("REQBODY_PROCESSOR", "XML");
         }
     }
     return 1;
