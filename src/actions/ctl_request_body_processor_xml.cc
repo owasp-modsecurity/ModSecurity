@@ -27,6 +27,8 @@ namespace actions {
 bool CtlRequestBodyProcessorXML::evaluate(Rule *rule,
     Transaction *transaction) {
     transaction->m_requestBodyProcessor = Transaction::XMLRequestBody;
+    transaction->m_collections.store("REQBODY_PROCESSOR", "XML");
+
     return true;
 }
 
