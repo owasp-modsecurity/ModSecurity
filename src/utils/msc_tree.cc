@@ -107,7 +107,7 @@ TreePrefix *CPTCreatePrefix(unsigned char *ipdata, unsigned int ip_bitmask,
         unsigned char netmask)  {
 
     TreePrefix *prefix = NULL;
-    int bytes = ip_bitmask/8;
+    int bytes = ip_bitmask;
 
     if ((ip_bitmask % 8 != 0) || (ipdata == NULL)) {
         return NULL;
@@ -759,7 +759,6 @@ TreeNode *CPTFindElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree
                 return node;
             }
         }
-
         if ((node->prefix->buffer[bytes] & mask) == (temp_data[bytes] & mask)) {
             if (TreePrefixNetmask(node->prefix, ip_bitmask, TRUE)) {
                 //if (msr && msr->txcfg->debuglog_level >= 9) {
