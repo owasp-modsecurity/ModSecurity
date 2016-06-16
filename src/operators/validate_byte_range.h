@@ -37,8 +37,8 @@ class ValidateByteRange : public Operator {
     ~ValidateByteRange() override { }
 
     bool evaluate(Transaction *transaction, const std::string &input) override;
-    bool getRange(const std::string &rangeRepresentation, const char **error);
-    bool init(const std::string& file, const char **error) override;
+    bool getRange(const std::string &rangeRepresentation, std::string *error);
+    bool init(const std::string& file, std::string *error) override;
  private:
     std::vector<std::string> ranges;
     char table[32];

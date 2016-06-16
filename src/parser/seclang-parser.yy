@@ -429,7 +429,7 @@ op:
     OPERATOR
       {
         Operator *op = Operator::instantiate($1);
-        const char *error = NULL;
+        std::string error;
         if (op->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
@@ -440,7 +440,7 @@ op:
       {
 #ifdef WITH_GEOIP
         Operator *op = Operator::instantiate($1);
-        const char *error = NULL;
+        std::string error;
         if (op->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
@@ -459,7 +459,7 @@ op:
         text.pop_back();
         text.erase(0, 1);
         Operator *op = Operator::instantiate("\"@rx " + text + "\"");
-        const char *error = NULL;
+        std::string error;
         if (op->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;

@@ -1395,6 +1395,7 @@ std::string Transaction::toJSON(int parts) {
         m_collections.m_transient->resolveMultiMatches("REQUEST_HEADERS", &l);
         for (auto h : l) {
             LOGFY_ADD(h->m_key.c_str(), h->m_value.c_str());
+            delete h;
         }
 
         /* end: request headers */
@@ -1424,6 +1425,7 @@ std::string Transaction::toJSON(int parts) {
         m_collections.m_transient->resolveMultiMatches("RESPONSE_HEADERS", &l);
         for (auto h : l) {
             LOGFY_ADD(h->m_key.c_str(), h->m_value.c_str());
+            delete h;
         }
 
         /* end: response headers */

@@ -85,13 +85,14 @@ bool Pm::evaluate(Transaction *transaction, const std::string &input) {
 }
 
 
-bool Pm::init(const std::string &file, const char **error) {
+bool Pm::init(const std::string &file, std::string *error) {
     std::vector<std::string> vec;
     std::istringstream *iss;
+    const char *err = NULL;
 
     replaceAll(param, "\\", "\\\\");
 
-    char *content = parse_pm_content(param.c_str(), param.length(), error);
+    char *content = parse_pm_content(param.c_str(), param.length(), &err);
     if (content == NULL) {
         iss = new std::istringstream(param);
     } else {

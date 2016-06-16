@@ -33,7 +33,6 @@ DebugLogWriterAgent::DebugLogWriterAgent(const std::string& fileName) :
 
 void DebugLogWriterAgent::write(const std::string& msg) {
     if (!is_open()) {
-        std::cout << "Agent: " << m_fileName << ": " << msg << std::endl;
         return;
     }
 

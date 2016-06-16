@@ -23,7 +23,7 @@ namespace modsecurity {
 namespace operators {
 
 bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
-    const char **error) {
+    std::string *error) {
     size_t pos = param.find_first_of("-");
     int start;
     int end;
@@ -32,8 +32,8 @@ bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
         try {
             start = std::stoi(rangeRepresentation);
         } catch(...) {
-            *error = ("Not able to convert '" + rangeRepresentation +
-                "' into a number").c_str();
+            error->assign("Not able to convert '" + rangeRepresentation +
+                "' into a number");
             return false;
         }
         table[start >> 3] = (table[start >> 3] | (1 << (start & 0x7)));
@@ -43,9 +43,9 @@ bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
     try {
         start = std::stoi(std::string(rangeRepresentation, 0, pos));
     } catch (...) {
-        *error = ("Not able to convert '" +
+        error->assign("Not able to convert '" +
             std::string(rangeRepresentation, 0, pos) +
-            "' into a number").c_str();
+            "' into a number");
         return false;
     }
 
@@ -53,24 +53,24 @@ bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
         end = std::stoi(std::string(rangeRepresentation, pos + 1,
             rangeRepresentation.length() - (pos + 1)));
     } catch (...) {
-        *error = ("Not able to convert '" + std::string(rangeRepresentation,
+        error->assign("Not able to convert '" + std::string(rangeRepresentation,
             pos + 1, rangeRepresentation.length() - (pos + 1)) +
-            "' into a number").c_str();
+            "' into a number");
         return false;
     }
 
     if ((start < 0) || (start > 255)) {
-        *error = ("Invalid range start value: " +
-            std::to_string(start)).c_str();
+        error->assign("Invalid range start value: " +
+            std::to_string(start));
         return false;
     }
     if ((end < 0) || (end > 255)) {
-       *error = ("Invalid range end value: " + std::to_string(end)).c_str();
+       error->assign("Invalid range end value: " + std::to_string(end));
        return false;
     }
     if (start > end) {
-       *error = ("Invalid range: " + std::to_string(start) + "-" +
-           std::to_string(end)).c_str();
+       error->assign("Invalid range: " + std::to_string(start) + "-" +
+           std::to_string(end));
        return false;
     }
 
@@ -84,7 +84,7 @@ bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
 
 
 bool ValidateByteRange::init(const std::string &file,
-    const char **error) {
+    std::string *error) {
     size_t pos = param.find_first_of(",");
 
     if (pos == std::string::npos) {

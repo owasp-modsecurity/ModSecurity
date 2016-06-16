@@ -40,7 +40,7 @@ class Operator {
     std::string param;
     bool negation;
 
-    virtual bool init(const std::string &file, const char **error) {
+    virtual bool init(const std::string &file, std::string *error) {
         return true;
     }
 

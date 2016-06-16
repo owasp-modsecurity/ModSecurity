@@ -54,12 +54,17 @@ struct MyEqual {
 
 class MultipartPart {
  public:
-     MultipartPart()
+    MultipartPart()
      : m_type(MULTIPART_FORMDATA),
      m_tmp_file_fd(0),
      m_tmp_file_size(0),
      m_offset(0),
      m_length(0) { }
+
+    ~MultipartPart () {
+        m_headers.clear();
+        m_value_parts.clear();
+    }
 
     /* part type, can be MULTIPART_FORMDATA or MULTIPART_FILE */
     int m_type;

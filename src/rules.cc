@@ -78,6 +78,8 @@ void Rules::decrementReferenceCount(void) {
 
 
 Rules::~Rules() {
+    int i = 0;
+
     /** Cleanup the rules */
     for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = this->rules[i];
@@ -87,10 +89,20 @@ Rules::~Rules() {
             rules.pop_back();
         }
     }
+    for (i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+        std::vector<actions::Action *> *tmp = &defaultActions[i];
+        while (tmp->empty() == false) {
+            actions::Action *a = tmp->back();
+            tmp->pop_back();
+            delete a;
+        }
+    }
     /** Cleanup audit log */
     if (audit_log) {
         audit_log->refCountDecreaseAndCheck();
     }
+
+    free(unicode_map_table);
 }
 
 
@@ -128,6 +140,7 @@ int Rules::load(const char *file, const std::string &ref) {
 
     if (driver->parse(file, ref) == false) {
         parserError << driver->parserError.str();
+        delete driver;
         return -1;
     }
     int rules = this->merge(driver);

@@ -51,6 +51,7 @@ Collections::~Collections() {
     for (const auto &thing : *this) {
         delete thing.second;
     }
+    delete m_transient;
     this->clear();
 }
 

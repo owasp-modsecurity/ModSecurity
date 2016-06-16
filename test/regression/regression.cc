@@ -134,6 +134,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 std::cout << KCYN << "skipped!" << RESET << std::endl;
             }
             res->push_back(testRes);
+
+            delete modsec_transaction;
+            delete modsec_rules;
+            delete modsec;
+
             continue;
         }
 
@@ -156,6 +161,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                     << std::endl;
                 testRes->passed = false;
                 res->push_back(testRes);
+
+                delete modsec_transaction;
+                delete modsec_rules;
+                delete modsec;
+
                 continue;
             }
 
@@ -174,6 +184,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 testRes->reason << KGRN << "passed!" << RESET << std::endl;
                 testRes->passed = true;
                 res->push_back(testRes);
+
+                delete modsec_transaction;
+                delete modsec_rules;
+                delete modsec;
+
                 continue;
             } else {
                 /* Parser error was expected, but with a different content */
@@ -193,6 +208,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                     << s << std::endl;
                 testRes->passed = false;
                 res->push_back(testRes);
+
+                delete modsec_transaction;
+                delete modsec_rules;
+                delete modsec;
+
                 continue;
             }
         } else {
@@ -210,6 +230,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 }
                 testRes->passed = false;
                 res->push_back(testRes);
+
+                delete modsec_transaction;
+                delete modsec_rules;
+                delete modsec;
+
                 continue;
             }
         }
@@ -340,7 +365,6 @@ after_debug_log:
 
 int main(int argc, char **argv) {
     ModSecurityTest<RegressionTest> test;
-    ModSecurityTestResults<RegressionTest> results;
     int test_number = 0;
 
 #ifdef WITH_GEOIP
@@ -414,6 +438,7 @@ int main(int argc, char **argv) {
             }
             failed++;
         }
+        delete r;
     }
 
     if (!test.m_automake_output) {
@@ -439,6 +464,7 @@ int main(int argc, char **argv) {
         }
         delete vec;
     }
+
 #endif
     return 0;
 }

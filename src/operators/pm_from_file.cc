@@ -25,14 +25,14 @@ namespace modsecurity {
 namespace operators {
 
 
-bool PmFromFile::init(const std::string &config, const char **error) {
+bool PmFromFile::init(const std::string &config, std::string *error) {
     std::istream *iss;
 
     if (param.compare(0, 8, "https://") == 0) {
         Utils::HttpsClient client;
         bool ret = client.download(param);
         if (ret == false) {
-            *error = client.error.c_str();
+            error->assign(client.error);
             return false;
         }
         iss = new std::stringstream(client.content);
@@ -41,7 +41,7 @@ bool PmFromFile::init(const std::string &config, const char **error) {
         iss = new std::ifstream(resource, std::ios::in);
 
         if (((std::ifstream *)iss)->is_open() == false) {
-            *error = std::string("Failed to open file: " + param).c_str();
+            error->assign("Failed to open file: " + param);
             delete iss;
             return false;
         }
@@ -51,7 +51,7 @@ bool PmFromFile::init(const std::string &config, const char **error) {
         acmp_add_pattern(m_p, line.c_str(), NULL, NULL, line.length());
     }
 
-    acmp_prepare(m_p);
+    //acmp_prepare(m_p);
 
     delete iss;
     return true;

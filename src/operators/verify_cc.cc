@@ -69,7 +69,7 @@ int VerifyCC::luhnVerify(const char *ccnumber, int len) {
 
 
 
-bool VerifyCC::init(const std::string &param2, const char **error) {
+bool VerifyCC::init(const std::string &param2, std::string *error) {
     const char *errptr = NULL;
     int erroffset = 0;
 
@@ -78,7 +78,7 @@ bool VerifyCC::init(const std::string &param2, const char **error) {
     m_pce = pcre_study(m_pc, PCRE_STUDY_JIT_COMPILE, &errptr);
 
     if ((m_pc == NULL) || (m_pce == NULL)) {
-        *error = errptr;
+        error->assign(errptr);
         return false;
     }
 

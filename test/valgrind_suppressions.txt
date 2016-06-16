@@ -3,6 +3,29 @@
    Memcheck:Leak
    match-leak-kinds: definite
    fun:_Znwm
+   fun:_ZN11modsecurity9operators8Operator11instantiateENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN2yy14seclang_parser5parseEv
+   fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   fun:_ZN2yy14seclang_parser5parseEv
+   fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
    fun:_ZN2yy14seclang_parser5parseEv
    fun:_ZN11ModSecurity6Parser6Driver5parseERKSsS3_
    fun:_ZN11ModSecurity5Rules4loadEPKcRKSs
@@ -71,6 +94,18 @@
    fun:_ZN11ModSecurity6Parser6Driver5parseERKSsS3_
    fun:_ZN11ModSecurity5Rules4loadEPKcRKSs
    fun:_Z17perform_unit_testPSt6vectorIPN16modsecurity_test14RegressionTestESaIS2_EEPNS0_22ModSecurityTestResultsIS1_EEPi
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   fun:_ZN11modsecurity7actions6Action11instantiateERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN2yy14seclang_parser5parseEv
+   fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
    fun:main
 }
 

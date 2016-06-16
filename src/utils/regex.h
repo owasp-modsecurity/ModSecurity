@@ -31,6 +31,7 @@ namespace Utils {
 class Regex {
  public:
     explicit Regex(const std::string& pattern_);
+    ~Regex();
     std::string pattern;
     pcre *m_pc = NULL;
     pcre_extra *m_pce = NULL;

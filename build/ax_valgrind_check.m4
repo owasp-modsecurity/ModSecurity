@@ -201,7 +201,7 @@ VALGRIND_TESTS_ENVIRONMENT = \
 	G_SLICE=always-malloc,debug-blocks \
 	G_DEBUG=fatal-warnings,fatal-criticals,gc-friendly
 
-VALGRIND_LOG_COMPILER = test/test-suite.sh 
+VALGRIND_LOG_COMPILER = test/test-suite.sh $(VALGRIND_SUPPRESSIONS) $(VALGRIND_FLAGS)
 #	$(valgrind_lt) \
 #	$(VALGRIND) $(VALGRIND_SUPPRESSIONS) --error-exitcode=1 $(VALGRIND_FLAGS)
 

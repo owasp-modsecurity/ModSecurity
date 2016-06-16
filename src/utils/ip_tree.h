@@ -30,8 +30,7 @@ namespace Utils {
 
 class IpTree {
  public:
-    IpTree()
-        : m_tree(NULL) { }
+    IpTree();
     ~IpTree();
 
     bool contains(const std::string &ip);

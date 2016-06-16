@@ -45,6 +45,19 @@ Regex::Regex(const std::string& pattern_)
     m_pce = pcre_study(m_pc, PCRE_STUDY_JIT_COMPILE, &errptr);
 }
 
+
+Regex::~Regex() {
+    if (m_pc != NULL) {
+        pcre_free(m_pc);
+        m_pc = NULL;
+    }
+    if (m_pce != NULL) {
+        pcre_free_study(m_pce);
+        m_pce = NULL;
+    }
+}
+
+
 int regex_search(const std::string& s, SMatch *match,
     const Regex& regex) {
     int ovector[OVECCOUNT];

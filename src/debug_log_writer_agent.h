@@ -36,7 +36,6 @@ class DebugLogWriterAgent : public std::ofstream {
     bool refCountDecreaseAndCheck() {
         this->m_referenceCount--;
         if (this->m_referenceCount == 0) {
-            delete this;
             return true;
         }
         return false;

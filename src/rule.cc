@@ -309,6 +309,7 @@ bool Rule::evaluate(Transaction *trasn) {
             variable->evaluateInternal(trasn, this, &z);
             for (auto &y : z) {
                 exclusions.push_back(y->m_key);
+                delete y;
             }
             exclusions.push_back(variable->m_name);
         }

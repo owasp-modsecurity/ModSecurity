@@ -33,7 +33,7 @@ class IpMatch : public Operator {
 
     bool evaluate(Transaction *transaction, const std::string &input) override;
 
-    bool init(const std::string &file, const char **error) override;
+    bool init(const std::string &file, std::string *error) override;
 
  protected:
     Utils::IpTree m_tree;

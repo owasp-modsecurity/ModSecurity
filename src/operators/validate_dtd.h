@@ -44,7 +44,7 @@ class ValidateDTD : public Operator {
     }
 
     bool evaluate(Transaction *transaction, const std::string  &str) override;
-    bool init(const std::string &file, const char **error) override;
+    bool init(const std::string &file, std::string *error) override;
 
 
     static void error_runtime(void *ctx, const char *msg, ...) {

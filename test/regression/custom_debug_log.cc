@@ -27,6 +27,7 @@ CustomDebugLog *CustomDebugLog::new_instance() {
     return new CustomDebugLog();
 }
 
+CustomDebugLog::~CustomDebugLog() { }
 
 void CustomDebugLog::write(int level, const std::string& message) {
     m_log << "[" << level << "] " << message << std::endl;
@@ -35,7 +36,6 @@ void CustomDebugLog::write(int level, const std::string& message) {
 
 bool CustomDebugLog::contains(const std::string& pattern) {
     modsecurity::Utils::Regex re(pattern);
-    modsecurity::Utils::SMatch match;
     std::string s = m_log.str();
     return modsecurity::Utils::regex_search(s, re);
 }

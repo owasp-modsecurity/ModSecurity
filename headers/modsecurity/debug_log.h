@@ -36,7 +36,7 @@ class DebugLog {
         : m_debugLevel(-1),
         m_fileName("") { }
 
-    ~DebugLog();
+    virtual ~DebugLog();
 
     virtual void write(int level, const std::string &msg);
     bool isLogFileSet();

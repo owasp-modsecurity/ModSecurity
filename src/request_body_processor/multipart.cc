@@ -92,9 +92,17 @@ Multipart::~Multipart() {
         }
     }
 
-    while (!m_parts.empty()) {
-        m_parts.pop_front();
+    while (m_parts.empty() == false) {
+        auto *a = m_parts.back();
+        m_parts.pop_back();
+        delete a;
     }
+
+    if (m_mpp != NULL) {
+        delete m_mpp;
+        m_mpp = NULL;
+    }
+
 }
 
 
@@ -734,8 +742,12 @@ int Multipart::process_part_header() {
                 return false;
             }
 
-            m_mpp->m_headers.insert({header_name, header_value});
             m_mpp->m_last_header_name.assign(header_name);
+
+
+            m_mpp->m_headers.emplace(
+                std::string(header_name), std::string(header_value));
+
 
             debug(9, "Multipart: Added part header \"" + header_name \
                 + "\" \"" + header_value + "\".");
@@ -784,6 +796,7 @@ int Multipart::process_boundary(int last_part) {
             debug(3, "Multipart: Skipping invalid part (part name missing): "
                 "(offset " + std::to_string(m_mpp->m_offset) + ", length "
                 + std::to_string(m_mpp->m_length) + ")");
+            delete m_mpp;
         }
 
         m_mpp = NULL;

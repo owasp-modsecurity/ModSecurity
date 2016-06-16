@@ -47,7 +47,7 @@ void print_help() {
 
 void perform_unit_test(ModSecurityTest<UnitTest> *test, UnitTest *t,
     ModSecurityTestResults<UnitTest>* res) {
-    const char *error = NULL;
+    std::string error;
 
     if (test->m_automake_output) {
         std::cout << ":test-result: ";

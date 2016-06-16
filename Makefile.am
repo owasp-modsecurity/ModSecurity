@@ -37,7 +37,7 @@ MAINTAINERCLEANFILES = \
 	depcomp
 
 @VALGRIND_CHECK_RULES@
-VALGRIND_SUPPRESSIONS_FILES = test/valgrind_suppressions.txt
+VALGRIND_SUPPRESSIONS_FILES = valgrind_suppressions.txt
 
 LOG_DRIVER = env $(SHELL) $(top_srcdir)/test/custom-test-driver
 AM_TESTS_ENVIRONMENT=AUTOMAKE_TESTS=true; export AUTOMAKE_TESTS;
