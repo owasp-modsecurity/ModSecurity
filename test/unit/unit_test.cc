@@ -13,29 +13,15 @@
  *
  */
 
-/*
- * Enforce using PCRE for regular expressions instead of C++ regex library.
- *
- * Since regex library proven to be unusable for gcc 4.8 and earlier versions,
- * this define is required to build workable version of executable for CentOS 7,
- * RHRL 7, Ubuntu 14.04 and SUSE Linux 12.
- */
-#define PCRE_ONLY	1
-
 #include "unit/unit_test.h"
 
 #include <string.h>
-#ifdef PCRE_ONLY
-#include <pcre.h>
-#endif
 
 #include <sstream>
 #include <string>
 #include <iostream>
 #include <iterator>
-#ifndef PCRE_ONLY
 #include <regex>
-#endif
 #include <string>
 
 #include "common/colors.h"
@@ -58,19 +44,7 @@ std::string string_to_hex(const std::string& input) {
     return output;
 }
 
-#ifdef PCRE_ONLY
-void replaceAll(std::string *s, char *search,
-    const char replace) {
-    for (size_t pos = 0; ; pos += 0) {
-        pos = s->find(search, pos);
-        if (pos == std::string::npos) {
-            break;
-        }
-        s->erase(pos, strlen(search));
-        s->insert(pos, &replace, 1);
-    }
-}
-#else
+
 void replaceAll(std::string *s, const std::string &search,
     const char replace) {
     for (size_t pos = 0; ; pos += 0) {
@@ -82,49 +56,9 @@ void replaceAll(std::string *s, const std::string &search,
         s->insert(pos, &replace, 1);
     }
 }
-#endif
 
 
 void json2bin(std::string *str) {
-#ifdef PCRE_ONLY
-    pcre *re;
-    const char *emsg;
-    int ov[5], eoffs, rc;
-    char u[7], *cptr;
-
-    re = pcre_compile("\\\\x([a-z0-9A-Z]{2})", 0, &emsg, &eoffs, NULL);
-    if (!re)
-	return;
-
-    while ((rc = pcre_exec(re, NULL, str->c_str(), str->length(), 0, 0, ov, 5)) >= 0) {
-	unsigned int p;
-
-	memset(u, 0, sizeof(u));
-	cptr = (char *) str->c_str();  cptr += ov[0];
-	for (p = 0; p < (ov[1]-ov[0]); p++) { u[p] = *(cptr+p); }
-
-	sscanf((char *)(u+2), "%x", &p);
-	replaceAll(str, (char *)u, p);
-    }
-    pcre_free(re);
-
-    re = pcre_compile("\\\\u([a-z0-9A-Z]{4})", 0, &emsg, &eoffs, NULL);
-    if (!re)
-	return;
-
-    while ((rc = pcre_exec(re, NULL, str->c_str(), str->length(), 0, 0, ov, 5)) >= 0) {
-	unsigned int p;
-
-	memset(u, 0, sizeof(u));
-	cptr = (char *) str->c_str();  cptr += ov[0];
-	for (p = 0; p < (ov[1]-ov[0]); p++) { u[p] = *(cptr+p); }
-
-	sscanf((char *)(u+2), "%4x", &p);
-	replaceAll(str, (char *)u, p);
-    }
-    pcre_free(re);
-
-#else
     std::regex re("\\\\x([a-z0-9A-Z]{2})");
     std::regex re2("\\\\u([a-z0-9A-Z]{4})");
     std::smatch match;
@@ -136,7 +70,6 @@ void json2bin(std::string *str) {
         sscanf(toBeReplaced.c_str(), "%x", &p);
         replaceAll(str, match.str(), p);
     }
-
     while (std::regex_search(*str, match, re2) && match.size() > 1) {
         unsigned int p;
         std::string toBeReplaced = match.str();
@@ -144,7 +77,6 @@ void json2bin(std::string *str) {
         sscanf(toBeReplaced.c_str(), "%4x", &p);
         replaceAll(str, match.str(), p);
     }
-#endif
 
     /*
     replaceAll(str, "\\0", '\0');
