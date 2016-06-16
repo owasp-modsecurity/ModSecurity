@@ -66,32 +66,38 @@ std::string SqlHexDecode::evaluate(std::string value,
 
 int SqlHexDecode::inplace(unsigned char *data, int len) {
     unsigned char *d, *begin = data;
+    int count = 0;
 
     if ((data == NULL) || (len == 0)) {
         return 0;
     }
 
-    for (d = data; *data; *d++ = *data++) {
+    for (d = data; (++count < len) && *data; *d++ = *data++) {
         if (*data != '0') {
             continue;
         }
         ++data;
+        ++count;
         if (mytolower(*data) != 'x') {
             data--;
+            count--;
             continue;
         }
 
         data++;
+        ++count;
 
         // Do we need to keep "0x" if no hexa after?
         if (!VALID_HEX(data[0]) || !VALID_HEX(data[1])) {
             data -= 2;
+            count -= 2;
             continue;
         }
 
         while (VALID_HEX(data[0]) && VALID_HEX(data[1])) {
             *d++ = x2c(data);
             data += 2;
+            count += 2;
         }
     }
 
