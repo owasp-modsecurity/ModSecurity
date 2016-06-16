@@ -26,6 +26,16 @@
 namespace modsecurity {
 namespace operators {
 
+VerifyCC::~VerifyCC() {
+    if (m_pc != NULL) {
+        pcre_free(m_pc);
+        m_pc = NULL;
+    }
+    if (m_pce != NULL) {
+        pcre_free_study(m_pce);
+        m_pce = NULL;
+    }
+}
 
 /**
  * Luhn Mod-10 Method (ISO 2894/ANSI 4.13)
