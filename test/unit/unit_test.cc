@@ -21,11 +21,11 @@
 #include <string>
 #include <iostream>
 #include <iterator>
-#include <regex>
 #include <string>
 
 #include "common/colors.h"
 #include "src/utils.h"
+#include "src/utils/regex.h"
 
 namespace modsecurity_test {
 
@@ -44,7 +44,6 @@ std::string string_to_hex(const std::string& input) {
     return output;
 }
 
-
 void replaceAll(std::string *s, const std::string &search,
     const char replace) {
     for (size_t pos = 0; ; pos += 0) {
@@ -59,18 +58,19 @@ void replaceAll(std::string *s, const std::string &search,
 
 
 void json2bin(std::string *str) {
-    std::regex re("\\\\x([a-z0-9A-Z]{2})");
-    std::regex re2("\\\\u([a-z0-9A-Z]{4})");
-    std::smatch match;
+    modsecurity::Utils::Regex re("\\\\x([a-z0-9A-Z]{2})");
+    modsecurity::Utils::Regex re2("\\\\u([a-z0-9A-Z]{4})");
+    modsecurity::Utils::SMatch match;
 
-    while (std::regex_search(*str, match, re) && match.size() > 1) {
+    while (modsecurity::Utils::regex_search(*str, &match, re) && match.size() > 0) {
         unsigned int p;
         std::string toBeReplaced = match.str();
         toBeReplaced.erase(0, 2);
         sscanf(toBeReplaced.c_str(), "%x", &p);
         replaceAll(str, match.str(), p);
     }
-    while (std::regex_search(*str, match, re2) && match.size() > 1) {
+
+    while (modsecurity::Utils::regex_search(*str, &match, re2) && match.size() > 0) {
         unsigned int p;
         std::string toBeReplaced = match.str();
         toBeReplaced.erase(0, 2);
