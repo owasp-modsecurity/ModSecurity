@@ -3,6 +3,54 @@
    Memcheck:Leak
    match-leak-kinds: definite
    fun:_Znwm
+   fun:_Z5yylexRN11modsecurity6Parser6DriverE
+   fun:_ZN2yy14seclang_parser5parseEv
+   fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:_Z14yy_scan_bufferPcm
+   fun:_Z13yy_scan_bytesPKcm
+   fun:_ZN11modsecurity6Parser6Driver10scan_beginEv
+   fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:_Z16yy_create_bufferP8_IO_FILEi
+   fun:_Z5yylexRN11modsecurity6Parser6DriverE
+   fun:_ZN2yy14seclang_parser5parseEv
+   fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
    fun:_ZN11modsecurity9operators8Operator11instantiateENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
    fun:_ZN2yy14seclang_parser5parseEv
    fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
