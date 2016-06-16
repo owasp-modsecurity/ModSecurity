@@ -1290,6 +1290,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         for (auto h : l) {
             audit_log << h->m_key.c_str() << ": ";
             audit_log << h->m_value.c_str() << std::endl;
+            delete h;
         }
     }
     if (parts & audit_log::AuditLog::CAuditLogPart) {
@@ -1312,6 +1313,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         for (auto h : l) {
             audit_log << h->m_key.c_str() << ": ";
             audit_log << h->m_value.c_str() << std::endl;
+            delete h;
         }
     }
     if (parts & audit_log::AuditLog::GAuditLogPart) {
