@@ -231,6 +231,44 @@ int Transaction::processConnection(const char *client, int cPort,
 }
 
 
+bool Transaction::addArgument(const std::string& orig, const std::string& key,
+    const std::string& value) {
+    debug(4, "Adding request argument (" + orig + "): name \"" + \
+                key + "\", value \"" + value + "\"");
+
+    m_collections.store("ARGS:" + key, value);
+    if (orig == "GET") {
+        m_collections.store("ARGS_GET:" + key, value);
+        if (m_namesArgsGet->empty()) {
+            m_namesArgsGet->assign(key);
+        } else {
+            m_namesArgsGet->assign(*m_namesArgsGet + " " + key);
+        }
+    }
+    if (orig == "POST") {
+        m_collections.store("ARGS_POST:" + key, value);
+        if (m_namesArgsPost->empty()) {
+            m_namesArgsPost->assign(key);
+        } else {
+            m_namesArgsPost->assign(*m_namesArgsPost + " " + key);
+        }
+    }
+
+    if (m_namesArgs->empty()) {
+        m_namesArgs->assign(key);
+    } else {
+        m_namesArgs->assign(*m_namesArgs + " " + key);
+    }
+
+    this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
+        key.length() + value.length();
+    this->m_ARGScombinedSizeStr->assign(
+        std::to_string(this->m_ARGScombinedSize));
+
+    return true;
+}
+
+
 /**
  * @name    processURI
  * @brief   Perform the analysis on the URI and all the query string variables.
@@ -361,28 +399,7 @@ int Transaction::processURI(const char *uri, const char *method,
                 i--;
             }
 
-            m_collections.store("ARGS:" + key, value);
-            m_collections.store("ARGS_GET:" + key, value);
-
-            if (m_namesArgs->empty()) {
-                m_namesArgs->assign(key);
-            } else {
-                m_namesArgs->assign(*m_namesArgs + " " + key);
-            }
-            if (m_namesArgsGet->empty()) {
-                m_namesArgsGet->assign(key);
-            } else {
-                m_namesArgsGet->assign(*m_namesArgsGet + " " + key);
-            }
-
-            this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
-                key.length() + value.length();
-            this->m_ARGScombinedSizeStr->assign(
-                std::to_string(this->m_ARGScombinedSize));
-#ifndef NO_LOGS
-            debug(4, "Adding request argument (QUERY_STRING): name \"" + \
-                key + "\", value \"" + value + "\"");
-#endif
+            addArgument("GET", key, value);
         }
     }
     return true;
@@ -676,24 +693,7 @@ int Transaction::processRequestBody() {
                 }
             }
 
-            m_collections.store("ARGS:" + key, value);
-            m_collections.store("ARGS_POST:" + key, value);
-
-            if (m_namesArgs->empty()) {
-                m_namesArgs->assign(key);
-            } else {
-                m_namesArgs->assign(*m_namesArgs + " " + key);
-            }
-            if (m_namesArgsPost->empty()) {
-                m_namesArgsPost->assign(key);
-            } else {
-                m_namesArgsPost->assign(*m_namesArgsPost + " " + key);
-            }
-
-            this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
-                key.length() + value.length();
-            this->m_ARGScombinedSizeStr->assign(
-                std::to_string(this->m_ARGScombinedSize));
+            addArgument("POST", key, value);
         }
     } else {
         std::string *a = m_collections.resolveFirst(

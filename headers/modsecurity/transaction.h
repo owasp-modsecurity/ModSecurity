@@ -144,6 +144,9 @@ class Transaction {
 
     bool intervention(ModSecurityIntervention *it);
 
+    bool addArgument(const std::string& orig, const std::string& key,
+        const std::string& value);
+
     const char *getResponseBody();
     int getResponseBodyLenth();
 
