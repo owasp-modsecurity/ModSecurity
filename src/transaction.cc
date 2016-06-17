@@ -589,27 +589,48 @@ int Transaction::processRequestBody() {
      */
 
     if (m_requestBodyProcessor == XMLRequestBody) {
+        std::string error;
         if (m_xml->init() == true) {
             m_xml->processChunk(m_requestBody.str().c_str(),
-                m_requestBody.str().size());
-            m_xml->complete();
+                m_requestBody.str().size(),
+                &error);
+            m_xml->complete(&error);
         }
-    }
-
-    if (m_requestBodyType == MultiPartRequestBody) {
+        if (error.empty() == false) {
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "1");
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "1");
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR_MSG",
+                "XML parsing error: " + error);
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR_MSG",
+                "XML parsing error: " + error);
+        } else {
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "0");
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "0");
+        }
+    } else if (m_requestBodyType == MultiPartRequestBody) {
+        std::string error;
         std::string *a = m_collections.resolveFirst(
             "REQUEST_HEADERS:Content-Type");
         if (a != NULL) {
             Multipart m(*a, this);
 
-            if (m.init() == true) {
-                m.process(m_requestBody.str());
+            if (m.init(&error) == true) {
+                m.process(m_requestBody.str(), &error);
             }
-            m.multipart_complete();
+            m.multipart_complete(&error);
         }
-    }
-
-    if (m_requestBodyType == WWWFormUrlEncoded) {
+        if (error.empty() == false) {
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "1");
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "1");
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR_MSG",
+                "Multipart parsing error: " + error);
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR_MSG",
+                "Multipart parsing error: " + error);
+        } else {
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "0");
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "0");
+        }
+    } else if (m_requestBodyType == WWWFormUrlEncoded) {
         std::string content = uri_decode(m_requestBody.str());
         if (content.empty() == false) {
             content.pop_back();
@@ -674,6 +695,19 @@ int Transaction::processRequestBody() {
             this->m_ARGScombinedSizeStr->assign(
                 std::to_string(this->m_ARGScombinedSize));
         }
+    } else {
+        std::string *a = m_collections.resolveFirst(
+            "REQUEST_HEADERS:Content-Type");
+        std::string error;
+        if (a != NULL && a->empty() == false) {
+            error.assign(*a);
+        }
+        m_collections.storeOrUpdateFirst("REQBODY_ERROR", "1");
+        m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "1");
+        m_collections.storeOrUpdateFirst("REQBODY_ERROR_MSG",
+            "Unknown request body processor: " + error);
+        m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR_MSG",
+            "Unknown request body processor: " + error);
     }
 
     /**
