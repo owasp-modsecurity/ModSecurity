@@ -140,6 +140,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     this->m_responseContentType = m_collections.resolveFirst(
         "RESPONSE_CONTENT_TYPE");
 
+    m_collections.storeOrUpdateFirst("URLENCODED_ERROR", "0");
 
 #ifndef NO_LOGS
     this->debug(4, "Initialising transaction");
@@ -239,6 +240,10 @@ bool Transaction::extractArguments(const std::string &orig,
     for (std::string t : key_value_sets) {
         char sep2 = '=';
         int i = 0;
+        size_t key_s = 0;
+        size_t value_s = 0;
+        int invalid = 0;
+        int changed = 0;
 
         std::string key;
         std::string value;
@@ -254,9 +259,29 @@ bool Transaction::extractArguments(const std::string &orig,
             i++;
         }
 
-        key = uri_decode(key);
-        value = uri_decode(value);
-        addArgument(orig, key, value);
+        key_s = (key.length() + 1);
+        value_s = (value.length() + 1);
+        unsigned char *key_c = (unsigned char *) malloc(sizeof(char) * key_s);
+        unsigned char *value_c = (unsigned char *) malloc(sizeof(char) * value_s);
+
+        memset(key_c, '\0', sizeof(char) * key_s);
+        memset(value_c, '\0', sizeof(char) * value_s);
+
+        memcpy(key_c, key.c_str(), key_s);
+        memcpy(value_c, value.c_str(), value_s);
+
+        key_s = urldecode_nonstrict_inplace(key_c, key_s, &invalid, &changed);
+        value_s = urldecode_nonstrict_inplace(value_c, value_s, &invalid, &changed);
+
+        if (invalid) {
+            m_collections.storeOrUpdateFirst("URLENCODED_ERROR", "1");
+        }
+
+        addArgument(orig, std::string((char *)key_c, key_s-1),
+            std::string((char *)value_c, value_s-1));
+
+        free(key_c);
+        free(value_c);
     }
 }
 

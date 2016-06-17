@@ -216,3 +216,4 @@ TESTS+=test/test-cases/secrules-language-tests/operators/detectXSS.json
 TESTS+=test/test-cases/secrules-language-tests/operators/eq.json
 TESTS+=test/test-cases/regression/variable-REQBODY_PROCESSOR.json
 TESTS+=test/test-cases/regression/variable-REQBODY_PROCESSOR_ERROR.json
+TESTS+=test/test-cases/regression/variable-URLENCODED_ERROR.json
