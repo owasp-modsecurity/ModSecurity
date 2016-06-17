@@ -146,6 +146,7 @@ class Transaction {
 
     bool addArgument(const std::string& orig, const std::string& key,
         const std::string& value);
+    bool extractArguments(const std::string &orig, const std::string& buf);
 
     const char *getResponseBody();
     int getResponseBodyLenth();

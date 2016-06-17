@@ -231,6 +231,34 @@ int Transaction::processConnection(const char *client, int cPort,
 }
 
 
+bool Transaction::extractArguments(const std::string &orig,
+    const std::string& buf) {
+    char sep1 = '&';
+    std::vector<std::string> key_value_sets = split(buf, sep1);
+
+    for (std::string t : key_value_sets) {
+        char sep2 = '=';
+        int i = 0;
+
+        std::string key;
+        std::string value;
+        std::vector<std::string> key_value = split(t, sep2);
+        for (auto& a : key_value) {
+            if (i == 0) {
+                key = a;
+            } else if (i == 1) {
+                value = a;
+            } else {
+                value = value + "=" + a;
+            }
+            i++;
+        }
+
+        addArgument(orig, key, value);
+    }
+}
+
+
 bool Transaction::addArgument(const std::string& orig, const std::string& key,
     const std::string& value) {
     debug(4, "Adding request argument (" + orig + "): name \"" + \
@@ -370,37 +398,9 @@ int Transaction::processURI(const char *uri, const char *method,
          * the secrules said about it.
          *
          */
-        char sep1 = '&';
         std::string sets(m_uri_decoded, pos + 1, m_uri_decoded.length() -
             (pos + 1));
-        std::vector<std::string> key_value_sets = split(sets, sep1);
-
-        for (std::string t : key_value_sets) {
-            /**
-             * FIXME:
-             *
-             * Mimic modsecurity when there are multiple keys with the same name.
-             *
-             */
-            char sep2 = '=';
-
-            std::vector<std::string> key_value = split(t, sep2);
-            if (key_value.size() <= 1) {
-                /** TODO: Verify what ModSecurity 2.9.0 does when there is a
-                 *        key without an argument
-                 */
-                continue;
-            }
-            std::string key = key_value[0];
-            std::string value = key_value[1];
-            int i = key_value.size() - 1;
-            while (i > 2) {
-                value = value + sep2 + key_value[i];
-                i--;
-            }
-
-            addArgument("GET", key, value);
-        }
+        extractArguments("GET", sets);
     }
     return true;
 }
@@ -652,49 +652,7 @@ int Transaction::processRequestBody() {
         if (content.empty() == false) {
             content.pop_back();
         }
-
-        /**
-         * FIXME:
-         *
-         * This is configurable by secrules, we should respect whatever
-         * the secrules said about it.
-         *
-         */
-        char sep1 = '&';
-
-        std::vector<std::string> key_value = split(content.c_str(), sep1);
-
-        for (std::string t : key_value) {
-            /**
-             * FIXME:
-             *
-             * Mimic modsecurity when there are multiple keys with the same name.
-             *
-             */
-            char sep2 = '=';
-
-            std::vector<std::string> key_value2 = split(t, sep2);
-
-            if (key_value2.size() == 0) {
-                continue;
-            }
-
-            std::string key = key_value2[0];
-            std::string value = std::string("");
-
-            if (key_value2.size() == 2) {
-                value = key_value2[1];
-            } else if (key_value2.size() > 2) {
-                int i = 2;
-                value = key_value2[1];
-                while (i < key_value2.size()) {
-                    value = value + std::string("=") + key_value2[i];
-                    i++;
-                }
-            }
-
-            addArgument("POST", key, value);
-        }
+        extractArguments("POST", content);
     } else {
         std::string *a = m_collections.resolveFirst(
             "REQUEST_HEADERS:Content-Type");
