@@ -254,6 +254,8 @@ bool Transaction::extractArguments(const std::string &orig,
             i++;
         }
 
+        key = uri_decode(key);
+        value = uri_decode(value);
         addArgument(orig, key, value);
     }
 }
@@ -391,16 +393,8 @@ int Transaction::processURI(const char *uri, const char *method,
     m_collections.store("REQUEST_URI_RAW", uri);
 
     if (pos != std::string::npos && (m_uri_decoded.length() - pos) > 2) {
-        /**
-         * FIXME:
-         *
-         * This is configurable by secrules, we should respect whatever
-         * the secrules said about it.
-         *
-         */
-        std::string sets(m_uri_decoded, pos + 1, m_uri_decoded.length() -
-            (pos + 1));
-        extractArguments("GET", sets);
+        extractArguments("GET", std::string(uri_s, pos_raw + 1,
+            uri_s.length() - (pos_raw + 1)));
     }
     return true;
 }
@@ -648,11 +642,7 @@ int Transaction::processRequestBody() {
             m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "0");
         }
     } else if (m_requestBodyType == WWWFormUrlEncoded) {
-        std::string content = uri_decode(m_requestBody.str());
-        if (content.empty() == false) {
-            content.pop_back();
-        }
-        extractArguments("POST", content);
+        extractArguments("POST", m_requestBody.str());
     } else {
         std::string *a = m_collections.resolveFirst(
             "REQUEST_HEADERS:Content-Type");
