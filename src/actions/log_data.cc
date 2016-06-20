@@ -29,11 +29,13 @@ namespace actions {
 
 
 bool LogData::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
-    std::string data = MacroExpansion::expand(m_parser_payload, transaction);
-
-    rm->m_data = data;
+    rm->m_data = data(transaction);
 
     return true;
+}
+
+std::string LogData::data(Transaction *transaction) {
+    return MacroExpansion::expand(m_parser_payload, transaction);
 }
 
 

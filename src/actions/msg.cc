@@ -53,9 +53,14 @@ bool Msg::evaluate(Rule *rule, Transaction *transaction) {
     transaction->debug(9, "Saving msg: " + msg);
 #endif
 
-    rule->m_log_message = msg;
+    rule->m_log_message = data(transaction);
 
     return true;
+}
+
+
+std::string Msg::data(Transaction *transaction) {
+    return MacroExpansion::expand(m_parser_payload, transaction);
 }
 
 

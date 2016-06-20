@@ -71,7 +71,8 @@ VARIABLES = \
 	variables/variable.cc \
 	variables/variations/count.cc \
 	variables/variations/exclusion.cc \
-	variables/xml.cc
+	variables/xml.cc \
+	variables/rule.cc
 
 
 ACTIONS = \

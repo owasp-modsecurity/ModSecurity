@@ -65,6 +65,7 @@ class Driver;
 #include "variables/time_year.h"
 #include "variables/tx.h"
 #include "variables/xml.h"
+#include "variables/rule.h"
 
 using modsecurity::ModSecurity;
 
@@ -247,6 +248,7 @@ using modsecurity::Variables::XML;
 %token <std::string> RUN_TIME_VAR_TIME_WDAY
 %token <std::string> RUN_TIME_VAR_TIME_YEAR
 %token <std::string> RUN_TIME_VAR_XML
+%token <std::string> RUN_TIME_VAR_RULE
 
 %token <std::string> CONFIG_SEC_REMOTE_RULES_FAIL_ACTION
 
@@ -889,6 +891,17 @@ var:
         CHECK_VARIATION(&) { var = new Count(new XML(name)); }
         CHECK_VARIATION(!) { var = new Exclusion(new XML(name)); }
         if (!var) { var = new XML(name); }
+        $$ = var;
+      }
+    | RUN_TIME_VAR_RULE
+      {
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(
+            new modsecurity::Variables::Rule(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(
+            new modsecurity::Variables::Rule(name)); }
+        if (!var) { var = new modsecurity::Variables::Rule(name); }
         $$ = var;
       }
     ;

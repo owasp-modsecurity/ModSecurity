@@ -14,36 +14,30 @@
  */
 
 #include <string>
+#include <vector>
+#include <list>
 
-#include "actions/action.h"
+#ifndef SRC_VARIABLES_RULE_H_
+#define SRC_VARIABLES_RULE_H_
 
-#ifndef SRC_ACTIONS_SEVERITY_H_
-#define SRC_ACTIONS_SEVERITY_H_
-
-#ifdef __cplusplus
+#include "variables/variable.h"
 
 namespace modsecurity {
+
 class Transaction;
+namespace Variables {
 
-namespace actions {
-
-
-class Severity : public Action {
+class Rule : public Variable {
  public:
-    explicit Severity(std::string action)
-        : Action(action),
-        m_severity(0) { }
+    explicit Rule(std::string _name)
+        : Variable(_name) { };
 
-    bool evaluate(Rule *rule, Transaction *transaction,
-        RuleMessage *rm) override;
-    bool init(std::string *error);
-
-    int m_severity;
+    void evaluateInternal(Transaction *transaction,
+        modsecurity::Rule *rule,
+        std::vector<const collection::Variable *> *l) override;
 };
 
-
-}  // namespace actions
+}  // namespace Variables
 }  // namespace modsecurity
-#endif
 
-#endif  // SRC_ACTIONS_SEVERITY_H_
+#endif  // SRC_VARIABLES_RULE_H_

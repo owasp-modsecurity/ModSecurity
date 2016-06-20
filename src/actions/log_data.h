@@ -34,6 +34,8 @@ class LogData : public Action {
 
     bool evaluate(Rule *rule, Transaction *transaction,
         RuleMessage *rm) override;
+
+    std::string data(Transaction *Transaction);
 };
 
 

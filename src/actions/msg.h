@@ -33,6 +33,8 @@ class Msg : public Action {
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
+
+    std::string data(Transaction *Transaction);
 };
 
 
