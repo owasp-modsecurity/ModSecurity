@@ -1136,6 +1136,8 @@ int Transaction::processLogging(int returned_code) {
     }
 
     this->m_httpCodeReturned = returned_code;
+    this->m_collections.store("STATUS", std::to_string(returned_code));
+
     this->m_rules->evaluate(ModSecurity::LoggingPhase, this);
 
     /* If relevant, save this transaction information at the audit_logs */

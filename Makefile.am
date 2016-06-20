@@ -218,3 +218,4 @@ TESTS+=test/test-cases/regression/variable-REQBODY_PROCESSOR.json
 TESTS+=test/test-cases/regression/variable-REQBODY_PROCESSOR_ERROR.json
 TESTS+=test/test-cases/regression/variable-URLENCODED_ERROR.json
 TESTS+=test/test-cases/regression/variable-RULE.json
+TESTS+=test/test-cases/regression/variable-STATUS.json

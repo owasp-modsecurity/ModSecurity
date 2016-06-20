@@ -229,6 +229,7 @@ using modsecurity::Variables::XML;
 %token <std::string> CONFIG_DIR_SEC_MARKER
 
 %token <std::string> VARIABLE
+%token <std::string> VARIABLE_STATUS
 %token <std::string> VARIABLE_TX
 %token <std::string> VARIABLE_COL
 %token <std::string> RUN_TIME_VAR_DUR
@@ -734,6 +735,16 @@ var:
     VARIABLE
       {
         std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new Variable(name, Variable::VariableKind::DirectVariable)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)); }
+        if (!var) { var = new Variable(name, Variable::VariableKind::DirectVariable); }
+        $$ = var;
+      }
+    | VARIABLE_STATUS
+      {
+        std::string name($1);
+        name.pop_back();
         CHECK_VARIATION_DECL
         CHECK_VARIATION(&) { var = new Count(new Variable(name, Variable::VariableKind::DirectVariable)); }
         CHECK_VARIATION(!) { var = new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)); }
