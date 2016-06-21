@@ -180,7 +180,8 @@ OPERATORS = \
 	operators/verify_cc.cc \
 	operators/verify_cpf.cc \
 	operators/verify_ssn.cc \
-	operators/within.cc
+	operators/within.cc \
+ 	operators/unconditional_match.cc
 
 
 UTILS = \

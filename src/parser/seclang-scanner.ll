@@ -120,7 +120,7 @@ DICT_ELEMENT    [^ \t|]+
 
 OPERATOR        (?i:(?:@inspectFile|@fuzzyHash|@validateByteRange|@validateDTD|@validateHash|@validateSchema|@verifyCC|@verifyCPF|@verifySSN|@gsbLookup|@rsub)|(?:\!{0,1})(?:@within|@containsWord|@contains|@endsWith|@eq|@ge|@gt|@ipMatchF|@ipMatch|@ipMatchFromFile|@le|@lt|@pmf|@pm|@pmFromFile|@rbl|@rx|@streq|@strmatch|@beginsWith))
 
-OPERATORNOARG	(?i:@detectSQLi|@detectXSS|@validateUrlEncoding|@validateUtf8Encoding)
+OPERATORNOARG	(?i:@unconditionalMatch|@detectSQLi|@detectXSS|@validateUrlEncoding|@validateUtf8Encoding)
 OPERATOR_GEOIP  (?i:@geoLookup)
 
 TRANSFORMATION  t:(?i:(parityZero7bit|parityOdd7bit|parityEven7bit|sqlHexDecode|cmdLine|sha1|md5|hexEncode|lowercase|urlDecodeUni|urlDecode|none|compressWhitespace|removeWhitespace|replaceNulls|removeNulls|htmlEntityDecode|jsDecode|cssDecode|trim|normalizePathWin|normalisePathWin|normalisePath|length|utf8toUnicode|urldecode|removeCommentsChar|removeComments|replaceComments))

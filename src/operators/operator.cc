@@ -58,6 +58,7 @@
 #include "operators/verify_cpf.h"
 #include "operators/verify_ssn.h"
 #include "operators/within.h"
+#include "operators/unconditional_match.h"
 
 #define IF_MATCH(a) \
     if (op_ == #a)
@@ -171,6 +172,10 @@ Operator *Operator::instantiate(std::string op_string) {
     IF_MATCH(verifycpf) { return new VerifyCPF(op, param, negation); }
     IF_MATCH(verifyssn) { return new VerifySSN(op, param, negation); }
     IF_MATCH(within) { return new Within(op, param, negation); }
+
+    IF_MATCH(unconditionalmatch) {
+        return new UnconditionalMatch(op, param, negation);
+    }
 
 
     return new Operator(op, param, negation);
