@@ -220,3 +220,4 @@ TESTS+=test/test-cases/regression/variable-URLENCODED_ERROR.json
 TESTS+=test/test-cases/regression/variable-RULE.json
 TESTS+=test/test-cases/regression/variable-STATUS.json
 TESTS+=test/test-cases/regression/variable-RESPONSE_PROTOCOL.json
+TESTS+=test/test-cases/regression/variable-SERVER_NAME.json

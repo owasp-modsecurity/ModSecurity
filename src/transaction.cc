@@ -522,6 +522,11 @@ int Transaction::addRequestHeader(const std::string& key,
             m_collections.store("REQBODY_PROCESSOR", "URLENCODED");
         }
     }
+
+    if (keyl == "host") {
+        std::vector<std::string> host = split(value, ':');
+        m_collections.store("SERVER_NAME", host[0]);
+    }
     return 1;
 }
 
