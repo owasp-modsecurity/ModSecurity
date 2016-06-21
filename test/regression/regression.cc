@@ -246,17 +246,21 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             t->clientPort, t->serverIp.c_str(), t->serverPort);
 
         actions(&r, modsec_transaction);
+#if 0
         if (r.status != 200) {
              goto end;
         }
+#endif
 
         modsec_transaction->processURI(t->uri.c_str(), t->method.c_str(),
             t->httpVersion.c_str());
 
         actions(&r, modsec_transaction);
+#if 0
         if (r.status != 200) {
             goto end;
         }
+#endif
 
         for (std::pair<std::string, std::string> headers :
             t->request_headers) {
@@ -267,7 +271,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         modsec_transaction->processRequestHeaders();
         actions(&r, modsec_transaction);
         if (r.status != 200) {
-            goto end;
+            //goto end;
         }
 
         modsec_transaction->appendRequestBody(
@@ -275,9 +279,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             t->request_body.size());
         modsec_transaction->processRequestBody();
         actions(&r, modsec_transaction);
+#if 0
         if (r.status != 200) {
             goto end;
         }
+#endif
 
         for (std::pair<std::string, std::string> headers :
             t->response_headers) {
@@ -285,23 +291,27 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 headers.second.c_str());
         }
 
-        modsec_transaction->processResponseHeaders();
+        modsec_transaction->processResponseHeaders(r.status, "HTTP 1.1");
         actions(&r, modsec_transaction);
+#if 0
         if (r.status != 200) {
             goto end;
         }
+#endif
 
         modsec_transaction->appendResponseBody(
             (unsigned char *)t->response_body.c_str(),
             t->response_body.size());
         modsec_transaction->processResponseBody();
         actions(&r, modsec_transaction);
+#if 0
         if (r.status != 200) {
             goto end;
         }
+#endif
 
 end:
-        modsec_transaction->processLogging(r.status);
+        modsec_transaction->processLogging();
 
         CustomDebugLog *d = reinterpret_cast<CustomDebugLog *>
             (modsec_rules->m_debugLog);

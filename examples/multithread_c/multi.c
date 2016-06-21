@@ -66,9 +66,9 @@ void process_request (void *ptr)
         msc_process_request_headers(transaction);
         msc_process_request_body(transaction);
         msc_add_response_header(transaction, "Content-type", "text/html");
-        msc_process_response_headers(transaction);
+        msc_process_response_headers(transaction, 200, "HTTP 1.0");
         msc_process_response_body(transaction);
-        msc_process_logging(transaction, 200);
+        msc_process_logging(transaction);
         msc_transaction_cleanup(transaction);
         tv.tv_sec = 0;
         tv.tv_usec = 1000;

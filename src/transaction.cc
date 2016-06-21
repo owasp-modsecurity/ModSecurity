@@ -823,15 +823,21 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
  *
  * @note Remember to check for a possible intervention.
  *
+ * @param code The returned http code.
+ * @param proto Protocol used on the response.
+ * 
  * @returns If the operation was successful or not.
  * @retval true Operation was successful.
  * @retval false Operation failed.
  *
  */
-int Transaction::processResponseHeaders() {
+int Transaction::processResponseHeaders(int code, const std::string& proto) {
 #ifndef NO_LOGS
     debug(4, "Starting phase RESPONSE_HEADERS. (SecRules 3)");
 #endif
+
+    this->m_httpCodeReturned = code;
+    this->m_collections.store("STATUS", std::to_string(code));
 
     if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
 #ifndef NO_LOGS
@@ -1123,7 +1129,7 @@ int Transaction::getResponseBodyLenth() {
  * @retval false Operation failed.
  *
  */
-int Transaction::processLogging(int returned_code) {
+int Transaction::processLogging() {
 #ifndef NO_LOGS
     debug(4, "Starting phase LOGGING. (SecRules 5)");
 #endif
@@ -1134,9 +1140,6 @@ int Transaction::processLogging(int returned_code) {
 #endif
         return true;
     }
-
-    this->m_httpCodeReturned = returned_code;
-    this->m_collections.store("STATUS", std::to_string(returned_code));
 
     this->m_rules->evaluate(ModSecurity::LoggingPhase, this);
 
@@ -1720,8 +1723,9 @@ extern "C" int msc_request_body_from_file(Transaction *transaction,
  * @retval 0 Operation failed.
  *
  */
-extern "C" int msc_process_response_headers(Transaction *transaction) {
-    return transaction->processResponseHeaders();
+extern "C" int msc_process_response_headers(Transaction *transaction,
+    int code, const char* protocol) {
+    return transaction->processResponseHeaders(code, protocol);
 }
 
 
@@ -1961,15 +1965,14 @@ extern "C" int msc_get_response_body_length(Transaction *transaction) {
  * delivered prior to the execution of this function.
  *
  * @param transaction ModSecurity transaction.
- * @param code  HTTP code returned to the user.
  *
  * @returns If the operation was successful or not.
  * @retval 1 Operation was successful.
  * @retval 0 Operation failed.
  *
  */
-extern "C" int msc_process_logging(Transaction *transaction, int code) {
-    return transaction->processLogging(code);
+extern "C" int msc_process_logging(Transaction *transaction) {
+    return transaction->processLogging();
 }
 
 }  // namespace modsecurity
