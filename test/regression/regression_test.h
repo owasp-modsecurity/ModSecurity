@@ -48,6 +48,7 @@ class RegressionTest {
     std::unordered_map<std::string, std::string> response_headers;
     std::string request_body;
     std::string response_body;
+    std::string response_protocol;
 
     std::string audit_log;
     std::string debug_log;

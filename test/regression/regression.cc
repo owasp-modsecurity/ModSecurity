@@ -291,7 +291,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 headers.second.c_str());
         }
 
-        modsec_transaction->processResponseHeaders(r.status, "HTTP 1.1");
+        modsec_transaction->processResponseHeaders(r.status, t->response_protocol);
         actions(&r, modsec_transaction);
 #if 0
         if (r.status != 200) {
