@@ -47,21 +47,6 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Include - bad operator inside include",
-    "expected":{
-      "parser_error": "Rules error. File: test-cases/data/config_example-bad-op-include.txt. Line: 2. Column: 67. .*"
-    },
-    "rules":[
-      "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
-      "Include test-cases/data/config_example-bad-op-include.txt",
-      "SecRule ARGS \"@contains test\" \"id:19,pass,t:trim\""
-    ]
-  },
-  {
-    "enabled":1,
-    "version_min":300000,
     "title":"Include - duplicate id",
     "expected":{
       "parser_error": "Rule id: 40 is duplicated"

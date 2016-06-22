@@ -190,7 +190,7 @@ VAR_FREE_TEXT_SPACE_COMMA [^, \t\"]+
 VAR_FREE_TEXT_SPACE [^ \t\"]+
 
 
-SOMETHING ["]{1}[^@|!]{1}([^"]|([^\\"]\\\"))*["]{1}
+SOMETHING ["]{1}([^"]|([^\\"]\\\"))*["]{1}
 
 CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
@@ -338,10 +338,10 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {CONFIG_DIR_SEC_MARKER}[ ]{NEW_LINE_FREE_TEXT} { return yy::seclang_parser::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 
 <EXPECTING_OPERATOR>{
-{SOMETHING}           { BEGIN(INITIAL); return yy::seclang_parser::make_FREE_TEXT(yytext, *driver.loc.back()); }
 ["]{OPERATOR}[ ]{FREE_TEXT}["]  { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
 ["]{OPERATORNOARG}[\t ]*["]     { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
 ["]{OPERATOR_GEOIP}[\t ]*["]    { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR_GEOIP(yytext, *driver.loc.back()); }
+{SOMETHING}           { BEGIN(INITIAL); return yy::seclang_parser::make_FREE_TEXT(yytext, *driver.loc.back()); }
 }
 
 {ACTION}                        { return yy::seclang_parser::make_ACTION(yytext, *driver.loc.back()); }
