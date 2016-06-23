@@ -458,7 +458,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 #[ \t]*SecAction[^\\]*\\\n[ \t]*        { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
 #[ \t]*SecAction[^\\]*\\\r\n[ \t]*      { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
 #.*                             { driver.loc.back()->step(); /* comment, just ignore. */ }
-.                               { driver.error (*driver.loc.back(), "invalid character", yytext); throw yy::seclang_parser::syntax_error(*driver.loc.back(), yytext); }
+.                               { driver.error (*driver.loc.back(), "invalid character", yytext); throw yy::seclang_parser::syntax_error(*driver.loc.back(), ""); }
 <<EOF>>                         {
                                     if (driver.ref.size() > 0) {
                                         driver.ref.pop_back();
