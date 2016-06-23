@@ -452,7 +452,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 .*[^\\]               { BEGIN(INITIAL); driver.loc.back()->lines(1); driver.loc.back()->step(); }
 }
 
-[ \t]*[\n]+                           { driver.loc.back()->lines(yyleng); driver.loc.back()->step(); }
+[ \t]*[\n]                           { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 #[ \t]*SecRule[^\\]*\\\n[ \t]*        { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT); }
 #[ \t]*SecRule[^\\]*\\\r\n[ \t]*      { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
 #[ \t]*SecAction[^\\]*\\\n[ \t]*        { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
