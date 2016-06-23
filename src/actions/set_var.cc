@@ -65,17 +65,16 @@ bool SetVar::init(std::string *error) {
         m_variableName = std::string(m_parser_payload, pos + 1,
             pos2 - (pos + 1));
         if (pos2 + 2 > m_parser_payload.length()) {
-            error->assign("Something wrong with the input format");
-            return false;
-        }
-
-        if (m_operation == setOperation) {
-            m_predicate = std::string(m_parser_payload, pos2 + 1,
-                m_parser_payload.length() - (pos2));
+            m_predicate = "";
         } else {
-            m_predicate = std::string(m_parser_payload, pos2 + 2,
-                m_parser_payload.length()
-                - (pos2 + 1));
+            if (m_operation == setOperation) {
+                m_predicate = std::string(m_parser_payload, pos2 + 1,
+                    m_parser_payload.length() - (pos2));
+            } else {
+                m_predicate = std::string(m_parser_payload, pos2 + 2,
+                    m_parser_payload.length()
+                    - (pos2 + 1));
+            }
         }
     }
 
