@@ -43,7 +43,9 @@ bool InitCol::init(std::string *error) {
     m_collection_key = std::string(m_parser_payload, 0,  posEquals);
     m_collection_value = std::string(m_parser_payload, posEquals + 1);
 
-    if (m_collection_key != "ip" && m_collection_key != "global") {
+    if (m_collection_key != "ip" &&
+        m_collection_key != "global" &&
+        m_collection_key != "resource") {
         error->assign("Something wrong with initcol: collection must be `ip' or `global'");
         return false;
     }
@@ -61,6 +63,8 @@ bool InitCol::evaluate(Rule *rule, Transaction *t) {
         t->m_collections.m_ip_collection_key = collectionName;
     } else if (m_collection_key == "global") {
         t->m_collections.m_global_collection_key = collectionName;
+    } else if (m_collection_key == "resource") {
+        t->m_collections.m_resource_collection_key = collectionName;
     } else {
         return false;
     }

@@ -116,7 +116,8 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_logCbData(logCbData),
     m_ms(ms),
     m_collections(ms->m_global_collection, ms->m_ip_collection,
-        ms->m_session_collection, ms->m_user_collection),
+        ms->m_session_collection, ms->m_user_collection,
+        ms->m_resource_collection),
     m_xml(new RequestBodyProcessor::XML(this)) {
     m_id = std::to_string(this->m_timeStamp) + \
         std::to_string(generate_transaction_unique_id());
