@@ -82,7 +82,7 @@
       ]
     },
     "expected":{
-      "parser_error": "Rules error. File: action-id.json. Line: 4. Column: 31. .*"
+      "parser_error": "File: action-id.json. Line: 4. Column: 30. invalid character i"
     },
     "rules":[
       "SecRuleEngine On",
@@ -220,7 +220,7 @@
       ]
     },
     "expected":{
-      "parser_error": "Rules error. File: action-id.json. Line: 4. Column: 31. .*"
+      "parser_error": "action-id.json. Line: 4. Column: 30. invalid character i"
     },
     "rules":[
       "SecRuleEngine On",
@@ -266,7 +266,7 @@
       ]
     },
     "expected":{
-      "parser_error": "Rules error. File: action-id.json. Line: 4. Column: 35. invalid character '"
+      "parser_error": "action-id.json. Line: 4. Column: 34. invalid character '"
     },
     "rules":[
       "SecRuleEngine On",
