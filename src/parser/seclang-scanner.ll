@@ -307,7 +307,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {CONFIG_DIR_RES_BODY_LIMIT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_RES_BODY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_RES_BODY_LIMIT_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_RES_BODY_LIMIT_ACTION(yytext, *driver.loc.back()); }
 
-{CONFIG_COMPONENT_SIG}[ ]["]{FREE_TEXT}["] { return yy::seclang_parser::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
+{CONFIG_COMPONENT_SIG}[ \t]+["]{FREE_TEXT}["] { return yy::seclang_parser::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
 
 %{ /* Other configurations */ %}
 {CONFIG_XML_EXTERNAL_ENTITY} { return yy::seclang_parser::make_CONFIG_XML_EXTERNAL_ENTITY(yytext, *driver.loc.back()); }
@@ -335,7 +335,8 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 {CONFIG_DIR_SEC_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_SEC_ACTION(yytext, *driver.loc.back()); }
 {CONFIG_DIR_SEC_DEFAULT_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_SEC_DEFAULT_ACTION(yytext, *driver.loc.back()); }
-{CONFIG_DIR_SEC_MARKER}[ ]{NEW_LINE_FREE_TEXT} { return yy::seclang_parser::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_SEC_MARKER}[ \t]+{NEW_LINE_FREE_TEXT} { return yy::seclang_parser::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_SEC_MARKER}[ \t]+["]{NEW_LINE_FREE_TEXT}["] { return yy::seclang_parser::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 
 <EXPECTING_OPERATOR>{
 ["]{OPERATOR}[ ]{FREE_TEXT}["]  { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }

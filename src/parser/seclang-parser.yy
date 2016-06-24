@@ -91,6 +91,7 @@ using modsecurity::actions::transformations::Transformation;
 using modsecurity::operators::Operator;
 using modsecurity::Rule;
 using modsecurity::Utils::GeoLookup;
+using modsecurity::removeBracketsIfNeeded;
 
 using modsecurity::Variables::Variations::Count;
 using modsecurity::Variables::Variations::Exclusion;
@@ -565,7 +566,7 @@ expression:
       }
     | CONFIG_DIR_SEC_MARKER
       {
-        driver.addSecMarker($1);
+        driver.addSecMarker(removeBracketsIfNeeded($1));
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_OFF
       {
