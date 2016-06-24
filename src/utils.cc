@@ -133,6 +133,14 @@ int urldecode_nonstrict_inplace(unsigned char *input,
 }
 
 
+std::string removeBracketsIfNeeded(std::string a) {
+    if ((a.at(0) == '"') and (a.at(a.length()-1) == '"')) {
+        a.pop_back();
+        a.erase(0, 1);
+    }
+    return a;
+}
+
 
 std::vector<std::string> split(std::string str, char delimiter) {
     std::vector<std::string> internal;

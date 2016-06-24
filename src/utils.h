@@ -60,6 +60,7 @@ namespace modsecurity {
     std::vector<std::string> expandEnv(const std::string& var, int flags);
     std::string find_resource(const std::string& file,
         const std::string& param);
+    std::string removeBracketsIfNeeded(std::string a);
 }  // namespace modsecurity
 
 
