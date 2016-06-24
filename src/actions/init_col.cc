@@ -32,9 +32,11 @@ bool InitCol::init(std::string *error) {
     int posEquals = m_parser_payload.find("=");
 
     if (m_parser_payload.size() < 8) {
+        error->assign("Something wrong with initcol format: too small");
         return false;
     }
     if (posEquals == std::string::npos) {
+        error->assign("Something wrong with initcol format: missing equals sign");
         return false;
     }
 
@@ -42,6 +44,7 @@ bool InitCol::init(std::string *error) {
     m_collection_value = std::string(m_parser_payload, posEquals + 1);
 
     if (m_collection_key != "ip" && m_collection_key != "global") {
+        error->assign("Something wrong with initcol: collection must be `ip' or `global'");
         return false;
     }
 
