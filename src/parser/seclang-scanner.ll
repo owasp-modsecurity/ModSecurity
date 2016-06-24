@@ -454,10 +454,8 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 }
 
 [ \t]*[\n]                           { driver.loc.back()->lines(1); driver.loc.back()->step(); }
-#[ \t]*SecRule[^\\]*\\\n[ \t]*        { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT); }
-#[ \t]*SecRule[^\\]*\\\r\n[ \t]*      { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
-#[ \t]*SecAction[^\\]*\\\n[ \t]*        { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
-#[ \t]*SecAction[^\\]*\\\r\n[ \t]*      { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
+#[ \t]*SecRule[^\\].*\\[ \t]*[\r\n]*        { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT); }
+#[ \t]*SecAction[^\\].*\\[ \t]*[^\\n]      { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
 #.*                             { driver.loc.back()->step(); /* comment, just ignore. */ }
 .                               { driver.error (*driver.loc.back(), "invalid character", yytext); throw yy::seclang_parser::syntax_error(*driver.loc.back(), ""); }
 <<EOF>>                         {
