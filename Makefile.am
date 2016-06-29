@@ -222,3 +222,5 @@ TESTS+=test/test-cases/regression/variable-STATUS.json
 TESTS+=test/test-cases/regression/variable-RESPONSE_PROTOCOL.json
 TESTS+=test/test-cases/regression/variable-SERVER_NAME.json
 TESTS+=test/test-cases/regression/operator-UnconditionalMatch.json
+TESTS+=test/test-cases/regression/request-body-parser-json.json
+

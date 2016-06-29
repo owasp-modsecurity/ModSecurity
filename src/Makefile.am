@@ -83,6 +83,7 @@ ACTIONS = \
 	actions/capture.cc \
 	actions/chain.cc \
 	actions/ctl_audit_log_parts.cc \
+	actions/ctl_request_body_processor_json.cc \
 	actions/ctl_request_body_processor_xml.cc \
 	actions/init_col.cc \
 	actions/deny.cc \
@@ -202,7 +203,8 @@ COLLECTION = \
 
 BODY_PROCESSORS = \
 	request_body_processor/multipart.cc \
-	request_body_processor/xml.cc
+	request_body_processor/xml.cc \
+	request_body_processor/json.cc
 
 
 libmodsecurity_la_SOURCES = \

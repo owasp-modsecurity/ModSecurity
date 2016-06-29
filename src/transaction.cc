@@ -38,6 +38,7 @@
 #include "modsecurity/modsecurity.h"
 #include "request_body_processor/multipart.h"
 #include "request_body_processor/xml.h"
+#include "request_body_processor/json.h"
 #include "audit_log/audit_log.h"
 #include "src/unique_id.h"
 #include "src/utils.h"
@@ -118,6 +119,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_collections(ms->m_global_collection, ms->m_ip_collection,
         ms->m_session_collection, ms->m_user_collection,
         ms->m_resource_collection),
+    m_json(new RequestBodyProcessor::JSON(this)),
     m_xml(new RequestBodyProcessor::XML(this)) {
     m_id = std::to_string(this->m_timeStamp) + \
         std::to_string(generate_transaction_unique_id());
@@ -163,6 +165,7 @@ Transaction::~Transaction() {
 
     m_rules->decrementReferenceCount();
 
+    delete m_json;
     delete m_xml;
 }
 
@@ -629,7 +632,6 @@ int Transaction::processRequestBody() {
      * }
      * 
      */
-
     if (m_requestBodyProcessor == XMLRequestBody) {
         std::string error;
         if (m_xml->init() == true) {
@@ -637,6 +639,25 @@ int Transaction::processRequestBody() {
                 m_requestBody.str().size(),
                 &error);
             m_xml->complete(&error);
+        }
+        if (error.empty() == false) {
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "1");
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "1");
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR_MSG",
+                "XML parsing error: " + error);
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR_MSG",
+                "XML parsing error: " + error);
+        } else {
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "0");
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "0");
+        }
+    } else if (m_requestBodyProcessor == JSONRequestBody) {
+        std::string error;
+        if (m_json->init() == true) {
+            m_json->processChunk(m_requestBody.str().c_str(),
+                m_requestBody.str().size(),
+                &error);
+            m_json->complete(&error);
         }
         if (error.empty() == false) {
             m_collections.storeOrUpdateFirst("REQBODY_ERROR", "1");

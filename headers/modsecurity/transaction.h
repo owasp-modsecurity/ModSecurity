@@ -76,6 +76,7 @@ class Action;
 }
 namespace RequestBodyProcessor {
 class XML;
+class JSON;
 }
 namespace operators {
 class Operator;
@@ -337,6 +338,7 @@ class Transaction {
     std::list<std::string> m_matched;
 
     RequestBodyProcessor::XML *m_xml;
+    RequestBodyProcessor::JSON *m_json;
 
  private:
     std::string *m_ARGScombinedSizeStr;
