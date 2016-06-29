@@ -1364,10 +1364,12 @@ void sec_audit_logger_json(modsec_rec *msr) {
         for(cfiles = 0; cfiles < msr->mpd->parts->nelts; cfiles++) {
             if (parts[cfiles]->type == MULTIPART_FILE) {
                 if(parts[cfiles]->filename != NULL) {
+                    yajl_gen_map_open(g);
                     yajl_kv_int(g, "file_size", parts[cfiles]->tmp_file_size);
                     yajl_kv_string(g, "file_name", log_escape(msr->mp, parts[cfiles]->filename));
                     yajl_kv_string(g, "content_type", parts[cfiles]->content_type ? parts[cfiles]->content_type : "<Unknown Content-Type>");
                     total_size += parts[cfiles]->tmp_file_size;
+                    yajl_gen_map_close(g);
                 }
             }
         }
