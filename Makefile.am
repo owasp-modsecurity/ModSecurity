@@ -224,4 +224,5 @@ TESTS+=test/test-cases/regression/variable-SERVER_NAME.json
 TESTS+=test/test-cases/regression/operator-UnconditionalMatch.json
 TESTS+=test/test-cases/regression/request-body-parser-json.json
 TESTS+=test/test-cases/regression/action-skip.json
+TESTS+=test/test-cases/regression/action-allow.json
 

@@ -78,6 +78,7 @@ VARIABLES = \
 ACTIONS = \
 	actions/accuracy.cc \
 	actions/action.cc \
+	actions/allow.cc \
 	actions/audit_log.cc \
 	actions/block.cc \
 	actions/capture.cc \

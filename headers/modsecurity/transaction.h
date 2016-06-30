@@ -73,6 +73,7 @@ class Rules;
 class RuleMessage;
 namespace actions {
 class Action;
+enum AllowType : short;
 }
 namespace RequestBodyProcessor {
 class XML;
@@ -309,6 +310,11 @@ class Transaction {
      * current rule should be skipped and the number needs to be decreased.
      */
     int m_skip_next;
+
+    /**
+     * If allow action was utilized, this variable holds the allow type.
+     */
+    modsecurity::actions::AllowType m_allowType;
 
     /**
      * Holds the decode URI. Notice that m_uri holds the raw version

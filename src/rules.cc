@@ -183,6 +183,22 @@ int Rules::evaluate(int phase, Transaction *transaction) {
     debug(9, "This phase consists of " + std::to_string(rules.size()) + \
         " rule(s).");
 
+    if (transaction->m_allowType == actions::FromNowOneAllowType
+        && phase != ModSecurity::Phases::LoggingPhase) {
+        debug(9, "Skipping all rules evaluation on this phase as request " \
+            "through the utilization of an `allow' action.");
+        return true;
+    }
+    if (transaction->m_allowType == actions::RequestAllowType
+        && phase <= ModSecurity::Phases::RequestBodyPhase) {
+        debug(9, "Skipping all rules evaluation on this phase as request " \
+            "through the utilization of an `allow' action.");
+        return true;
+    }
+    if (transaction->m_allowType != actions::NoneAllowType) {
+        transaction->m_allowType = actions::NoneAllowType;
+    }
+
     for (int i = 0; i < rules.size(); i++) {
         Rule *rule = rules[i];
         if (transaction->m_marker.empty() == false) {
@@ -199,8 +215,11 @@ int Rules::evaluate(int phase, Transaction *transaction) {
         } else if (transaction->m_skip_next > 0) {
             transaction->m_skip_next--;
             debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
-                + "' due to `skip' action. Still " + \
+                + "' due to a `skip' action. Still " + \
                 std::to_string(transaction->m_skip_next) + " to be skipped.");
+        } else if (transaction->m_allowType != actions::NoneAllowType) {
+            debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
+                + "' as request trough the utilization of an `allow' action.");
         } else {
             rule->evaluate(transaction);
         }

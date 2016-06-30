@@ -25,7 +25,7 @@ using modsecurity::split;
 
 ACTION          (?i:accuracy|append|block|capture|chain|deny|deprecatevar|drop|expirevar|id:[0-9]+|id:'[0-9]+'|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setrsc|setenv|status:[0-9]+)
 ACTION_XMLNS    (?i:xmlns)
-ACTION_ALLOW    (?i:allow)
+ACTION_ALLOW    ((?i:allow:(?i:REQUEST|PHASE))|(?i:phase:'(?i:REQUEST|PHASE)')|(?i:allow))
 ACTION_INITCOL  (?i:initcol)
 
 ACTION_ACCURACY (?i:accuracy)
@@ -418,9 +418,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 {LOG_DATA}:'{FREE_TEXT_QUOTE}'         { return yy::seclang_parser::make_LOG_DATA(yytext, *driver.loc.back()); }
 {ACTION_MSG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_MSG(yytext, *driver.loc.back()); }
-{ACTION_ALLOW}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_ALLOW(yytext, *driver.loc.back()); }
-{ACTION_ALLOW}:{FREE_TEXT_QUOTE_COMMA}  { return yy::seclang_parser::make_ACTION_ALLOW(yytext, *driver.loc.back()); }
-{ACTION_ALLOW}                          { return yy::seclang_parser::make_ACTION_ALLOW("", *driver.loc.back()); }
+{ACTION_ALLOW}                  { return yy::seclang_parser::make_ACTION_ALLOW(yytext, *driver.loc.back()); }
 {ACTION_REDIRECT}:{FREE_TEXT} { return yy::seclang_parser::make_ACTION_REDIRECT(yytext, *driver.loc.back()); }
 {ACTION_TAG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_TAG(yytext, *driver.loc.back()); }
 {ACTION_REV}:'{FREE_TEXT_QUOTE_COMMA}'      { return yy::seclang_parser::make_ACTION_REV(yytext, *driver.loc.back()); }

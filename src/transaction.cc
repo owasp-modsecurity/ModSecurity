@@ -43,6 +43,7 @@
 #include "src/unique_id.h"
 #include "src/utils.h"
 #include "modsecurity/rule.h"
+#include "src/actions/allow.h"
 
 using modsecurity::actions::Action;
 using modsecurity::RequestBodyProcessor::Multipart;
@@ -113,6 +114,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_responseHeadersNames(NULL),
     m_responseContentType(NULL),
     m_marker(""),
+    m_allowType(modsecurity::actions::NoneAllowType),
     m_skip_next(0),
     m_creationTimeStamp(cpu_seconds()),
     m_logCbData(logCbData),

@@ -34,6 +34,7 @@ class Driver;
 #include "actions/skip_after.h"
 #include "actions/msg.h"
 #include "actions/phase.h"
+#include "actions/allow.h"
 #include "actions/log_data.h"
 #include "actions/maturity.h"
 #include "actions/redirect.h"
@@ -87,6 +88,7 @@ using modsecurity::actions::Rev;
 using modsecurity::actions::Ver;
 using modsecurity::actions::Msg;
 using modsecurity::actions::Phase;
+using modsecurity::actions::Allow;
 using modsecurity::actions::transformations::None;
 using modsecurity::actions::LogData;
 using modsecurity::actions::Maturity;
@@ -932,6 +934,15 @@ act:
             YYERROR;
         }
       }
+    | ACTION_ALLOW
+      {
+        std::string error;
+        $$ = new Allow($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
+      }
     | ACTION_PHASE
       {
         std::string error;
@@ -983,24 +994,6 @@ act:
         }
 
         $$ = exec;
-        */
-        $$ = Action::instantiate($1);
-      }
-    | ACTION_ALLOW
-      {
-        /*
-
-        TODO: allow is not implemented yet.
-
-        std::string error;
-        Allow *allow = new Allow($1);
-
-        if (allow->init(&error) == false) {
-            driver.parserError << error;
-            YYERROR;
-        }
-
-        $$ = allow;
         */
         $$ = Action::instantiate($1);
       }
