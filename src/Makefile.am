@@ -253,7 +253,7 @@ libmodsecurity_la_LIBADD = \
 	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
 	@LEXLIB@ \
 	$(PCRE_LDADD) \
-	$(YAJL_LDADD) \
+	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
 	$(LIBXML2_LDADD) \
 	../others/libinjection.la \
 	libmbedtls.la
