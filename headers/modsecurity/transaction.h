@@ -305,8 +305,14 @@ class Transaction {
     std::string m_marker;
 
     /**
+     * Holds the amount of rules that should be skipped. If bigger than 0 the
+     * current rule should be skipped and the number needs to be decreased.
+     */
+    int m_skip_next;
+
+    /**
      * Holds the decode URI. Notice that m_uri holds the raw version
-	 * of the URI.
+     * of the URI.
      */
     std::string m_uri_decoded;
 

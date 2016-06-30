@@ -30,6 +30,7 @@ class Driver;
 #include "actions/set_uid.h"
 #include "actions/set_var.h"
 #include "actions/severity.h"
+#include "actions/skip.h"
 #include "actions/skip_after.h"
 #include "actions/msg.h"
 #include "actions/phase.h"
@@ -1087,13 +1088,7 @@ act:
     | ACTION_SKIP
       {
         std::string error;
-        /*
-
-        TODO: skip is not implemented yet.
-
-        $$ = new modsecurity::actions::SkipAfter($1);
-        */
-        $$ = Action::instantiate($1);
+        $$ = new modsecurity::actions::Skip($1);
         if ($$->init(&error) == false) {
             driver.error(@0, error);
             YYERROR;

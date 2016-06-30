@@ -101,6 +101,7 @@ ACTIONS = \
 	actions/set_uid.cc \
 	actions/set_var.cc \
 	actions/status.cc \
+	actions/skip.cc \
 	actions/skip_after.cc \
 	actions/tag.cc \
 	actions/transformations/base64_decode.cc \

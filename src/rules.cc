@@ -185,9 +185,7 @@ int Rules::evaluate(int phase, Transaction *transaction) {
 
     for (int i = 0; i < rules.size(); i++) {
         Rule *rule = rules[i];
-        if (transaction->m_marker.empty()) {
-            rule->evaluate(transaction);
-        } else {
+        if (transaction->m_marker.empty() == false) {
             debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
                 + "' due to a SecMarker: " + transaction->m_marker);
             m_secmarker_skipped++;
@@ -198,6 +196,13 @@ int Rules::evaluate(int phase, Transaction *transaction) {
                 transaction->m_marker.clear();
                 m_secmarker_skipped = 0;
             }
+        } else if (transaction->m_skip_next > 0) {
+            transaction->m_skip_next--;
+            debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
+                + "' due to `skip' action. Still " + \
+                std::to_string(transaction->m_skip_next) + " to be skipped.");
+        } else {
+            rule->evaluate(transaction);
         }
     }
     return 1;
