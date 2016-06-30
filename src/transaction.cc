@@ -113,6 +113,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_responseHeadersNames(NULL),
     m_responseContentType(NULL),
     m_marker(""),
+    m_skip_next(0),
     m_creationTimeStamp(cpu_seconds()),
     m_logCbData(logCbData),
     m_ms(ms),
