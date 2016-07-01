@@ -225,4 +225,5 @@ TESTS+=test/test-cases/regression/operator-UnconditionalMatch.json
 TESTS+=test/test-cases/regression/request-body-parser-json.json
 TESTS+=test/test-cases/regression/action-skip.json
 TESTS+=test/test-cases/regression/action-allow.json
+TESTS+=test/test-cases/regression/issue-1152.json
 
