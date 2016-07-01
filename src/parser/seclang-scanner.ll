@@ -524,6 +524,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
     std::vector<std::string> conf = split(yytext, ' ');
     key = conf[1];
     url = conf[2];
+    c.setKey(key);
 
     driver.ref.push_back(url);
     driver.loc.push_back(new yy::location());
