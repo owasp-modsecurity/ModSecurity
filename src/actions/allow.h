@@ -64,11 +64,11 @@ class Allow : public Action {
     static std::string allowTypeToName (AllowType a) {
         if (a == NoneAllowType) {
             return "None";
-        } else if (a = RequestAllowType) {
+        } else if (a == RequestAllowType) {
             return "Request";
-        } else if (a = PhaseAllowType) {
+        } else if (a == PhaseAllowType) {
             return "Phase";
-        } else if (a = FromNowOneAllowType) {
+        } else if (a == FromNowOneAllowType) {
             return "FromNowOne";
         } else {
             return "Unknown";
