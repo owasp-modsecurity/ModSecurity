@@ -290,6 +290,8 @@ bool Transaction::extractArguments(const std::string &orig,
         free(key_c);
         free(value_c);
     }
+
+    return true;
 }
 
 
@@ -1740,7 +1742,7 @@ extern "C" int msc_request_body_from_file(Transaction *transaction,
 
 /**
  * @name    msc_process_response_headers
- * @brief   Perform the analysis on the response readers.
+ * @brief   Perform the analysis on the response headers.
  *
  * This function perform the analysis on the response headers, notice however
  * that the headers should be added prior to the execution of this function.
