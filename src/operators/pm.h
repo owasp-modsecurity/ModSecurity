@@ -39,8 +39,9 @@ class Pm : public Operator {
         const std::string& to);
     bool evaluate(Transaction *transaction, const std::string &input) override;
 
-    bool init(const std::string &file, const char **error) override;
+    bool init(const std::string &file, std::string *error) override;
     void postOrderTraversal(acmp_btree_node_t *node);
+    void cleanup(acmp_node_t *n);
 
  protected:
     ACMP *m_p;

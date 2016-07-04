@@ -40,6 +40,9 @@ class Rx : public Operator {
             m_re = new Regex(param);
         }
 
+    ~Rx() {
+        delete m_re;
+    }
     bool evaluate(Transaction *transaction, const std::string &input);
 
  private:

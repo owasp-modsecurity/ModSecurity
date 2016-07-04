@@ -73,6 +73,75 @@ std::string phase_name(int x) {
 }
 
 
+int urldecode_nonstrict_inplace(unsigned char *input,
+    uint64_t input_len, int *invalid_count, int *changed) {
+    unsigned char *d = (unsigned char *)input;
+    uint64_t i, count;
+
+    *changed = 0;
+
+    if (input == NULL) {
+        return -1;
+    }
+
+    i = count = 0;
+    while (i < input_len) {
+        if (input[i] == '%') {
+            /* Character is a percent sign. */
+
+            /* Are there enough bytes available? */
+            if (i + 2 < input_len) {
+                char c1 = input[i + 1];
+                char c2 = input[i + 2];
+                if (VALID_HEX(c1) && VALID_HEX(c2)) {
+                    uint64_t uni = x2c(&input[i + 1]);
+
+                    *d++ = (wchar_t)uni;
+                    count++;
+                    i += 3;
+                    *changed = 1;
+                } else {
+                    /* Not a valid encoding, skip this % */
+                    *d++ = input[i++];
+                    count++;
+                    (*invalid_count)++;
+                }
+            } else {
+                /* Not enough bytes available, copy the raw bytes. */
+                *d++ = input[i++];
+                count++;
+                (*invalid_count)++;
+            }
+        } else {
+            /* Character is not a percent sign. */
+            if (input[i] == '+') {
+                *d++ = ' ';
+                *changed = 1;
+            } else {
+                *d++ = input[i];
+            }
+            count++;
+            i++;
+        }
+    }
+
+#if 0
+    *d = '\0';
+#endif
+
+    return count;
+}
+
+
+std::string removeBracketsIfNeeded(std::string a) {
+    if ((a.at(0) == '"') and (a.at(a.length()-1) == '"')) {
+        a.pop_back();
+        a.erase(0, 1);
+    }
+    return a;
+}
+
+
 std::vector<std::string> split(std::string str, char delimiter) {
     std::vector<std::string> internal;
     std::stringstream ss(str);  // Turn the string into a stream.

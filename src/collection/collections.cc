@@ -34,10 +34,12 @@ namespace collection {
 
 
 Collections::Collections(Collection *global,
-    Collection *ip, Collection *session, Collection *user)
-    : m_global_collection_key(""),
+    Collection *ip, Collection *session, Collection *user,
+    Collection *resource) : m_global_collection_key(""),
     m_ip_collection_key(""),
+    m_resource_collection_key(""),
     m_global_collection(global),
+    m_resource_collection(resource),
     m_ip_collection(ip),
     m_session_collection(session),
     m_user_collection(user),
@@ -51,6 +53,7 @@ Collections::~Collections() {
     for (const auto &thing : *this) {
         delete thing.second;
     }
+    delete m_transient;
     this->clear();
 }
 
@@ -70,6 +73,14 @@ void Collections::storeOrUpdateFirst(const std::string& collectionName,
             + variableName, m_global_collection_key, targetValue);
         return;
     }
+
+    if (tolower(collectionName) == "resource"
+        && !m_resource_collection_key.empty()) {
+        m_resource_collection->storeOrUpdateFirst(collectionName + ":"
+            + variableName, m_resource_collection_key, targetValue);
+        return;
+    }
+
 
     if (tolower(collectionName) == "session"
         && !m_session_collection_key.empty()) {
@@ -146,6 +157,12 @@ std::string* Collections::resolveFirst(const std::string& collectionName,
                     + ":" + var, m_global_collection_key);
         }
 
+        if (tolower(collectionName) == "resource"
+            && !m_resource_collection_key.empty()) {
+            return m_resource_collection->resolveFirst(toupper(collectionName)
+                    + ":" + var, m_resource_collection_key);
+        }
+
         if (tolower(collectionName) == "session"
             && !m_session_collection_key.empty()) {
             return m_session_collection->resolveFirst(toupper(collectionName)
@@ -190,6 +207,13 @@ void Collections::resolveSingleMatch(const std::string& var,
         return;
     }
 
+    if (tolower(collection) == "resource"
+        && !m_resource_collection_key.empty()) {
+        m_resource_collection->resolveSingleMatch(var,
+            m_resource_collection_key, l);
+        return;
+    }
+
     if (tolower(collection) == "session"
         && !m_session_collection_key.empty()) {
         m_session_collection->resolveSingleMatch(var,
@@ -225,6 +249,13 @@ void Collections::resolveMultiMatches(const std::string& var,
         return;
     }
 
+    if (tolower(collection) == "resource"
+        && !m_resource_collection_key.empty()) {
+        m_resource_collection->resolveMultiMatches(var,
+            m_resource_collection_key, l);
+        return;
+    }
+
     if (tolower(collection) == "session"
         && !m_session_collection_key.empty()) {
         m_session_collection->resolveMultiMatches(var,
@@ -257,6 +288,13 @@ void Collections::resolveRegularExpression(const std::string& var,
         && !m_global_collection_key.empty()) {
         m_global_collection->resolveRegularExpression(toupper(collection)
             + ":" + var, m_global_collection_key, l);
+        return;
+    }
+
+    if (tolower(collection) == "resource"
+        && !m_resource_collection_key.empty()) {
+        m_resource_collection->resolveRegularExpression(toupper(collection)
+            + ":" + var, m_resource_collection_key, l);
         return;
     }
 

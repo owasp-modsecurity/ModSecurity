@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
         modsecTransaction->addResponseHeader("Content-Length",
             "200");
 
-        modsecTransaction->processResponseHeaders();
+        modsecTransaction->processResponseHeaders(200, "HTTP 1.2");
 
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
         }
 
 next_request:
-        modsecTransaction->processLogging(200);
+        modsecTransaction->processLogging();
         delete modsecTransaction;
     }
 

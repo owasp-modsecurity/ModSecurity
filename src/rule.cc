@@ -201,7 +201,7 @@ bool Rule::evaluateActions(Transaction *trasn) {
         if (a->isDisruptive() == false) {
 #ifndef NO_LOGS
             trasn->debug(4, "Running (_non_ disruptive) action: " +
-                a->m_name);
+                a->m_name + ".");
 #endif
             a->evaluate(this, trasn);
         } else {
@@ -309,6 +309,7 @@ bool Rule::evaluate(Transaction *trasn) {
             variable->evaluateInternal(trasn, this, &z);
             for (auto &y : z) {
                 exclusions.push_back(y->m_key);
+                delete y;
             }
             exclusions.push_back(variable->m_name);
         }
@@ -394,6 +395,7 @@ bool Rule::evaluate(Transaction *trasn) {
             if (ret) {
                 bool containsDisruptive = false;
                 bool chainResult = false;
+                bool containsPassAction = false;
 
                 ruleMessage->m_match = "Operator `" + this->op->op +
                     "' with parameter `" + this->op->param + "' against" \
@@ -414,6 +416,10 @@ bool Rule::evaluate(Transaction *trasn) {
                     this->actions_runtime_pos) {
                     if (a->isDisruptive() == true) {
                         containsDisruptive = true;
+                        if (a->m_name == "pass") {
+                            containsPassAction = true;
+                            trasn->debug(4, "Rule contains a `pass' action");
+                        }
                     }
                 }
 
@@ -476,19 +482,30 @@ bool Rule::evaluate(Transaction *trasn) {
                         this->actions_runtime_pos) {
                         if (a->isDisruptive()
                             && trasn->m_rules->secRuleEngine
-                                == Rules::EnabledRuleEngine) {
+                                == Rules::EnabledRuleEngine
+                            && containsPassAction == false) {
 #ifndef NO_LOGS
                             trasn->debug(4, "Running (disruptive) " \
                                 "action: " + a->m_name);
 #endif
                             a->evaluate(this, trasn);
-                        } else if (a->isDisruptive()) {
+                        } else if (a->isDisruptive()
+                            && containsPassAction == false) {
 #ifndef NO_LOGS
                             trasn->debug(4,
                                 "Not running disruptive action: " + \
                                 a->m_name + ". SecRuleEngine " + \
                                 "is not On");
 #endif
+                        } else if (a->isDisruptive() &&
+                            containsPassAction == true) {
+                            if (a->m_name != "pass") {
+#ifndef NO_LOGS
+                                trasn->debug(4, "Not running disruptive " \
+                                    "action: " + a->m_name + ". It was " \
+                                    "silenced by an `pass' action.");
+#endif
+                            }
                         } else if (!a->isDisruptive()) {
 #ifndef NO_LOGS
                             trasn->debug(4, "Running (_non_ disruptive) " \

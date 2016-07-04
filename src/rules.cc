@@ -78,6 +78,8 @@ void Rules::decrementReferenceCount(void) {
 
 
 Rules::~Rules() {
+    int i = 0;
+
     /** Cleanup the rules */
     for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = this->rules[i];
@@ -87,10 +89,20 @@ Rules::~Rules() {
             rules.pop_back();
         }
     }
+    for (i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+        std::vector<actions::Action *> *tmp = &defaultActions[i];
+        while (tmp->empty() == false) {
+            actions::Action *a = tmp->back();
+            tmp->pop_back();
+            delete a;
+        }
+    }
     /** Cleanup audit log */
     if (audit_log) {
         audit_log->refCountDecreaseAndCheck();
     }
+
+    free(unicode_map_table);
 }
 
 
@@ -128,6 +140,7 @@ int Rules::load(const char *file, const std::string &ref) {
 
     if (driver->parse(file, ref) == false) {
         parserError << driver->parserError.str();
+        delete driver;
         return -1;
     }
     int rules = this->merge(driver);
@@ -170,11 +183,25 @@ int Rules::evaluate(int phase, Transaction *transaction) {
     debug(9, "This phase consists of " + std::to_string(rules.size()) + \
         " rule(s).");
 
+    if (transaction->m_allowType == actions::FromNowOneAllowType
+        && phase != ModSecurity::Phases::LoggingPhase) {
+        debug(9, "Skipping all rules evaluation on this phase as request " \
+            "through the utilization of an `allow' action.");
+        return true;
+    }
+    if (transaction->m_allowType == actions::RequestAllowType
+        && phase <= ModSecurity::Phases::RequestBodyPhase) {
+        debug(9, "Skipping all rules evaluation on this phase as request " \
+            "through the utilization of an `allow' action.");
+        return true;
+    }
+    if (transaction->m_allowType != actions::NoneAllowType) {
+        transaction->m_allowType = actions::NoneAllowType;
+    }
+
     for (int i = 0; i < rules.size(); i++) {
         Rule *rule = rules[i];
-        if (transaction->m_marker.empty()) {
-            rule->evaluate(transaction);
-        } else {
+        if (transaction->m_marker.empty() == false) {
             debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
                 + "' due to a SecMarker: " + transaction->m_marker);
             m_secmarker_skipped++;
@@ -185,6 +212,16 @@ int Rules::evaluate(int phase, Transaction *transaction) {
                 transaction->m_marker.clear();
                 m_secmarker_skipped = 0;
             }
+        } else if (transaction->m_skip_next > 0) {
+            transaction->m_skip_next--;
+            debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
+                + "' due to a `skip' action. Still " + \
+                std::to_string(transaction->m_skip_next) + " to be skipped.");
+        } else if (transaction->m_allowType != actions::NoneAllowType) {
+            debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
+                + "' as request trough the utilization of an `allow' action.");
+        } else {
+            rule->evaluate(transaction);
         }
     }
     return 1;

@@ -60,7 +60,8 @@ xmlParserInputBufferPtr XML::unloadExternalEntity(const char *URI,
 }
 
 
-bool XML::processChunk(const char *buf, unsigned int size) {
+bool XML::processChunk(const char *buf, unsigned int size,
+    std::string *error) {
     /* We want to initialise our parsing context here, to
      * enable us to pass it the first chunk of data so that
      * it can attempt to auto-detect the encoding.
@@ -88,6 +89,7 @@ bool XML::processChunk(const char *buf, unsigned int size) {
 
         if (m_data.parsing_ctx == NULL) {
             debug(4, "XML: Failed to create parsing context.");
+            error->assign("XML: Failed to create parsing context.");
             return false;
         }
         return true;
@@ -96,6 +98,7 @@ bool XML::processChunk(const char *buf, unsigned int size) {
     /* Not a first invocation. */
     xmlParseChunk(m_data.parsing_ctx, buf, size, 0);
     if (m_data.parsing_ctx->wellFormed != 1) {
+        error->assign("XML: Failed to create parsing context.");
         debug(4, "XML: Failed parsing document.");
         return false;
     }
@@ -104,7 +107,7 @@ bool XML::processChunk(const char *buf, unsigned int size) {
 }
 
 
-bool XML::complete() {
+bool XML::complete(std::string *error) {
     /* Only if we have a context, meaning we've done some work. */
     if (m_data.parsing_ctx != NULL) {
         /* This is how we signalise the end of parsing to libxml. */
@@ -121,6 +124,7 @@ bool XML::complete() {
             + std::to_string(m_data.well_formed) + ").");
 
         if (m_data.well_formed != 1) {
+            error->assign("XML: Failed parsing document.");
             debug(4, "XML: Failed parsing document.");
             return false;
         }

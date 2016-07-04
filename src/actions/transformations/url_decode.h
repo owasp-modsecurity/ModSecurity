@@ -53,9 +53,6 @@ class UrlDecode : public Transformation {
     explicit UrlDecode(std::string action);
     std::string evaluate(std::string exp,
         Transaction *transaction) override;
-
-    int urldecode_nonstrict_inplace(unsigned char *input, uint64_t input_len,
-        int *invalid_count, int *changed);
 };
 
 }  // namespace transformations

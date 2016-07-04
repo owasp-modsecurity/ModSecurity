@@ -23,15 +23,18 @@ class Driver;
 #include "actions/action.h"
 #include "actions/audit_log.h"
 #include "actions/ctl_audit_log_parts.h"
+#include "actions/ctl_request_body_processor_json.h"
 #include "actions/ctl_request_body_processor_xml.h"
 #include "actions/init_col.h"
 #include "actions/set_sid.h"
 #include "actions/set_uid.h"
 #include "actions/set_var.h"
 #include "actions/severity.h"
+#include "actions/skip.h"
 #include "actions/skip_after.h"
 #include "actions/msg.h"
 #include "actions/phase.h"
+#include "actions/allow.h"
 #include "actions/log_data.h"
 #include "actions/maturity.h"
 #include "actions/redirect.h"
@@ -65,6 +68,7 @@ class Driver;
 #include "variables/time_year.h"
 #include "variables/tx.h"
 #include "variables/xml.h"
+#include "variables/rule.h"
 
 using modsecurity::ModSecurity;
 
@@ -72,6 +76,7 @@ using modsecurity::actions::Accuracy;
 using modsecurity::actions::Action;
 using modsecurity::actions::CtlAuditLogParts;
 using modsecurity::actions::CtlRequestBodyProcessorXML;
+using modsecurity::actions::CtlRequestBodyProcessorJSON;
 using modsecurity::actions::InitCol;
 using modsecurity::actions::SetSID;
 using modsecurity::actions::SetUID;
@@ -83,6 +88,7 @@ using modsecurity::actions::Rev;
 using modsecurity::actions::Ver;
 using modsecurity::actions::Msg;
 using modsecurity::actions::Phase;
+using modsecurity::actions::Allow;
 using modsecurity::actions::transformations::None;
 using modsecurity::actions::LogData;
 using modsecurity::actions::Maturity;
@@ -90,6 +96,7 @@ using modsecurity::actions::transformations::Transformation;
 using modsecurity::operators::Operator;
 using modsecurity::Rule;
 using modsecurity::Utils::GeoLookup;
+using modsecurity::removeBracketsIfNeeded;
 
 using modsecurity::Variables::Variations::Count;
 using modsecurity::Variables::Variations::Exclusion;
@@ -228,6 +235,7 @@ using modsecurity::Variables::XML;
 %token <std::string> CONFIG_DIR_SEC_MARKER
 
 %token <std::string> VARIABLE
+%token <std::string> VARIABLE_STATUS
 %token <std::string> VARIABLE_TX
 %token <std::string> VARIABLE_COL
 %token <std::string> RUN_TIME_VAR_DUR
@@ -247,6 +255,7 @@ using modsecurity::Variables::XML;
 %token <std::string> RUN_TIME_VAR_TIME_WDAY
 %token <std::string> RUN_TIME_VAR_TIME_YEAR
 %token <std::string> RUN_TIME_VAR_XML
+%token <std::string> RUN_TIME_VAR_RULE
 
 %token <std::string> CONFIG_SEC_REMOTE_RULES_FAIL_ACTION
 
@@ -429,7 +438,7 @@ op:
     OPERATOR
       {
         Operator *op = Operator::instantiate($1);
-        const char *error = NULL;
+        std::string error;
         if (op->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
@@ -440,7 +449,7 @@ op:
       {
 #ifdef WITH_GEOIP
         Operator *op = Operator::instantiate($1);
-        const char *error = NULL;
+        std::string error;
         if (op->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
@@ -459,7 +468,7 @@ op:
         text.pop_back();
         text.erase(0, 1);
         Operator *op = Operator::instantiate("\"@rx " + text + "\"");
-        const char *error = NULL;
+        std::string error;
         if (op->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
@@ -562,7 +571,7 @@ expression:
       }
     | CONFIG_DIR_SEC_MARKER
       {
-        driver.addSecMarker($1);
+        driver.addSecMarker(removeBracketsIfNeeded($1));
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_OFF
       {
@@ -738,6 +747,16 @@ var:
         if (!var) { var = new Variable(name, Variable::VariableKind::DirectVariable); }
         $$ = var;
       }
+    | VARIABLE_STATUS
+      {
+        std::string name($1);
+        name.pop_back();
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new Variable(name, Variable::VariableKind::DirectVariable)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)); }
+        if (!var) { var = new Variable(name, Variable::VariableKind::DirectVariable); }
+        $$ = var;
+      }
     | VARIABLE_COL
       {
         std::string name($1);
@@ -891,6 +910,17 @@ var:
         if (!var) { var = new XML(name); }
         $$ = var;
       }
+    | RUN_TIME_VAR_RULE
+      {
+        std::string name($1);
+        CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(
+            new modsecurity::Variables::Rule(name)); }
+        CHECK_VARIATION(!) { var = new Exclusion(
+            new modsecurity::Variables::Rule(name)); }
+        if (!var) { var = new modsecurity::Variables::Rule(name); }
+        $$ = var;
+      }
     ;
 
 act:
@@ -901,6 +931,15 @@ act:
 
         if ($$->init(&error) == false) {
             driver.parserError << error;
+            YYERROR;
+        }
+      }
+    | ACTION_ALLOW
+      {
+        std::string error;
+        $$ = new Allow($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
             YYERROR;
         }
       }
@@ -955,24 +994,6 @@ act:
         }
 
         $$ = exec;
-        */
-        $$ = Action::instantiate($1);
-      }
-    | ACTION_ALLOW
-      {
-        /*
-
-        TODO: allow is not implemented yet.
-
-        std::string error;
-        Allow *allow = new Allow($1);
-
-        if (allow->init(&error) == false) {
-            driver.parserError << error;
-            YYERROR;
-        }
-
-        $$ = allow;
         */
         $$ = Action::instantiate($1);
       }
@@ -1060,13 +1081,7 @@ act:
     | ACTION_SKIP
       {
         std::string error;
-        /*
-
-        TODO: skip is not implemented yet.
-
-        $$ = new modsecurity::actions::SkipAfter($1);
-        */
-        $$ = Action::instantiate($1);
+        $$ = new modsecurity::actions::Skip($1);
         if ($$->init(&error) == false) {
             driver.error(@0, error);
             YYERROR;
@@ -1159,8 +1174,7 @@ act:
       }
     | ACTION_CTL_BDY_JSON
       {
-        /* not ready yet. */
-        $$ = Action::instantiate($1);
+        $$ = new modsecurity::actions::CtlRequestBodyProcessorJSON($1);
       }
     | ACTION_CTL_AUDIT_LOG_PARTS
       {

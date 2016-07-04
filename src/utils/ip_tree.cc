@@ -39,50 +39,57 @@ void IpTree::postOrderTraversal(TreeNode *node) {
     postOrderTraversal(node->right);
 
     if (node->netmasks) {
-        delete node->netmasks;
+        free(node->netmasks);
         node->netmasks = NULL;
     }
     if (node->prefix) {
         if (node->prefix->buffer) {
-            delete node->prefix->buffer;
+            free(node->prefix->buffer);
             node->prefix->buffer = NULL;
         }
         if (node->prefix->prefix_data) {
-            delete node->prefix->prefix_data;
+            free(node->prefix->prefix_data);
             node->prefix->prefix_data = NULL;
         }
-        delete node->prefix;
+        free(node->prefix);
         node->prefix = NULL;
     }
-    delete node;
+    free(node);
     node = NULL;
 }
+
+
+IpTree::IpTree() {
+    // FIXME: deal with possible error.
+    char *error;
+    create_radix_tree(&m_tree, &error);
+}
+
 
 IpTree::~IpTree() {
     if (m_tree != NULL) {
         if (m_tree->ipv4_tree != NULL) {
             // Tree_traversal: Post-order to delete all the items.
             postOrderTraversal(m_tree->ipv4_tree->head);
-            delete m_tree->ipv4_tree;
+            free(m_tree->ipv4_tree);
             m_tree->ipv4_tree = NULL;
         }
         if (m_tree->ipv6_tree != NULL) {
             // Tree_traversal: Post-order to delete all the items.
             postOrderTraversal(m_tree->ipv6_tree->head);
-            delete m_tree->ipv6_tree;
+            free(m_tree->ipv6_tree);
             m_tree->ipv6_tree = NULL;
         }
 
-        delete m_tree;
+        free(m_tree);
         m_tree = NULL;
     }
 }
 
 bool IpTree::addFromBuffer(std::istream *ss, std::string *error) {
     char *error_msg = NULL;
-
     for (std::string line; std::getline(*ss, line); ) {
-        int res = ip_tree_from_param(line.c_str(), &m_tree, &error_msg);
+        int res = add_ip_from_param(line.c_str(), &m_tree, &error_msg);
         if (res != 0) {
             if (error_msg != NULL) {
                 error->assign(error_msg);
@@ -98,7 +105,6 @@ bool IpTree::addFromBuffer(std::istream *ss, std::string *error) {
 bool IpTree::addFromBuffer(const std::string& buffer, std::string *error) {
     std::stringstream ss;
     ss << buffer;
-
     return addFromBuffer(&ss, error);
 }
 

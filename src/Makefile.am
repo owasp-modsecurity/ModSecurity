@@ -71,17 +71,20 @@ VARIABLES = \
 	variables/variable.cc \
 	variables/variations/count.cc \
 	variables/variations/exclusion.cc \
-	variables/xml.cc
+	variables/xml.cc \
+	variables/rule.cc
 
 
 ACTIONS = \
 	actions/accuracy.cc \
 	actions/action.cc \
+	actions/allow.cc \
 	actions/audit_log.cc \
 	actions/block.cc \
 	actions/capture.cc \
 	actions/chain.cc \
 	actions/ctl_audit_log_parts.cc \
+	actions/ctl_request_body_processor_json.cc \
 	actions/ctl_request_body_processor_xml.cc \
 	actions/init_col.cc \
 	actions/deny.cc \
@@ -99,6 +102,7 @@ ACTIONS = \
 	actions/set_uid.cc \
 	actions/set_var.cc \
 	actions/status.cc \
+	actions/skip.cc \
 	actions/skip_after.cc \
 	actions/tag.cc \
 	actions/transformations/base64_decode.cc \
@@ -179,7 +183,8 @@ OPERATORS = \
 	operators/verify_cc.cc \
 	operators/verify_cpf.cc \
 	operators/verify_ssn.cc \
-	operators/within.cc
+	operators/within.cc \
+ 	operators/unconditional_match.cc
 
 
 UTILS = \
@@ -200,7 +205,8 @@ COLLECTION = \
 
 BODY_PROCESSORS = \
 	request_body_processor/multipart.cc \
-	request_body_processor/xml.cc
+	request_body_processor/xml.cc \
+	request_body_processor/json.cc
 
 
 libmodsecurity_la_SOURCES = \

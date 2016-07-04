@@ -169,6 +169,9 @@ RegressionTest *RegressionTest::from_yajl_node(const yajl_val &node) {
                 if (strcmp(key2, "body") == 0) {
                     u->response_body = yajl_array_to_str(val2);
                 }
+                if (strcmp(key2, "protocol") == 0) {
+                    u->response_protocol = YAJL_GET_STRING(val2);
+                }
             }
         }
         if (strcmp(key, "expected") == 0) {

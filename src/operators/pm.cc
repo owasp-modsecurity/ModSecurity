@@ -15,6 +15,8 @@
 
 #include "operators/pm.h"
 
+#include <string.h>
+
 #include <string>
 #include <algorithm>
 #include <iterator>
@@ -29,14 +31,39 @@ namespace modsecurity {
 namespace operators {
 
 Pm::~Pm() {
-    postOrderTraversal(m_p->root_node->btree);
+    acmp_node_t *root = m_p->root_node;
+    acmp_node_t *node = root;
 
-    free(m_p->root_node);
-    m_p->root_node = NULL;
-    if (m_p) {
-        free(m_p);
-        m_p = NULL;
+    node = root;
+    cleanup(root);
+
+    free(m_p);
+    m_p = NULL;
+}
+
+
+void Pm::cleanup(acmp_node_t *n) {
+    if (n == NULL) {
+        return;
     }
+
+    cleanup(n->sibling);
+    cleanup(n->child);
+
+    postOrderTraversal(n->btree);
+
+    if (n->text && strlen(n->text) > 0) {
+        free(n->text);
+        n->text = NULL;
+    }
+
+    if (n->pattern && strlen(n->pattern) > 0) {
+        free(n->pattern);
+        n->pattern = NULL;
+    }
+
+    free(n);
+    n = NULL;
 }
 
 
@@ -45,16 +72,9 @@ void Pm::postOrderTraversal(acmp_btree_node_t *node) {
         return;
     }
 
-    postOrderTraversal(node->left);
     postOrderTraversal(node->right);
+    postOrderTraversal(node->left);
 
-    if (node->node->text) {
-        free(node->node->text);
-        node->node->text = NULL;
-    }
-
-    free(node->node);
-    node->node = NULL;
     free(node);
     node = NULL;
 }
@@ -85,13 +105,14 @@ bool Pm::evaluate(Transaction *transaction, const std::string &input) {
 }
 
 
-bool Pm::init(const std::string &file, const char **error) {
+bool Pm::init(const std::string &file, std::string *error) {
     std::vector<std::string> vec;
     std::istringstream *iss;
+    const char *err = NULL;
 
     replaceAll(param, "\\", "\\\\");
 
-    char *content = parse_pm_content(param.c_str(), param.length(), error);
+    char *content = parse_pm_content(param.c_str(), param.length(), &err);
     if (content == NULL) {
         iss = new std::istringstream(param);
     } else {

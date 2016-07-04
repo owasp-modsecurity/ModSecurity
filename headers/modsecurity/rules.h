@@ -84,9 +84,6 @@ class Rules : public RulesProperties  {
 
     void debug(int level, std::string message);
 
-    std::ostringstream parserError;
-
-
     int *unicode_map_table;
     int64_t unicode_codepage;
 

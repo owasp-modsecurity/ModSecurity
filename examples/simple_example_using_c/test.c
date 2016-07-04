@@ -63,9 +63,9 @@ int main (int argc, char **argv)
         "GET", "1.1");
     msc_process_request_headers(transaction);
     msc_process_request_body(transaction);
-    msc_process_response_headers(transaction);
+    msc_process_response_headers(transaction, 200, "HTTP 1.3");
     msc_process_response_body(transaction);
-    msc_process_logging(transaction, 200);
+    msc_process_logging(transaction);
 end:
     msc_rules_cleanup(rules);
     msc_cleanup(modsec);

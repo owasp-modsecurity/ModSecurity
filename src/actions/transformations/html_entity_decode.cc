@@ -105,7 +105,7 @@ int HtmlEntityDecode::inplace(unsigned char *input, u_int64_t input_len) {
                         memset(x, '\0', (j - k) + 1);
                         memcpy(x, (const char *)&input[k], j - k);
                         *d++ = (unsigned char)strtol(x, NULL, 16);
-
+                        free(x);
                         count++;
 
                         /* Skip over the semicolon if it's there. */
@@ -132,7 +132,7 @@ int HtmlEntityDecode::inplace(unsigned char *input, u_int64_t input_len) {
                         memset(x, '\0', (j - k) + 1);
                         memcpy(x, (const char *)&input[k], j - k);
                         *d++ = (unsigned char)strtol(x, NULL, 10);
-
+                        free(x);
                         count++;
 
                         /* Skip over the semicolon if it's there. */
@@ -175,8 +175,10 @@ int HtmlEntityDecode::inplace(unsigned char *input, u_int64_t input_len) {
                         /* We do no want to convert this entity,
                          * copy the raw data over. */
                         copy = j - k + 1;
+                        free(x);
                         goto HTML_ENT_OUT;
                     }
+                    free(x);
 
                     count++;
 

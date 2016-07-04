@@ -47,6 +47,7 @@ namespace modsecurity {
 ModSecurity::ModSecurity()
     : m_connector(""),
     m_global_collection(new collection::backend::InMemoryPerProcess()),
+    m_resource_collection(new collection::backend::InMemoryPerProcess()),
     m_ip_collection(new collection::backend::InMemoryPerProcess()),
     m_session_collection(new collection::backend::InMemoryPerProcess()),
     m_user_collection(new collection::backend::InMemoryPerProcess()),
@@ -66,6 +67,11 @@ ModSecurity::~ModSecurity() {
 #ifdef WITH_GEOIP
     Utils::GeoLookup::getInstance().cleanUp();
 #endif
+    delete m_global_collection;
+    delete m_resource_collection;
+    delete m_ip_collection;
+    delete m_session_collection;
+    delete m_user_collection;
 }
 
 

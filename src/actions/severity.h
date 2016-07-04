@@ -38,7 +38,6 @@ class Severity : public Action {
         RuleMessage *rm) override;
     bool init(std::string *error);
 
- private:
     int m_severity;
 };
 

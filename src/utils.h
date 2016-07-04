@@ -31,6 +31,8 @@
 
 namespace modsecurity {
     std::vector<std::string> split(std::string str, char delimiter);
+    int urldecode_nonstrict_inplace(unsigned char *input,
+    uint64_t input_len, int *invalid_count, int *changed);
     double random_number(const double from, const double to);
     double generate_transaction_unique_id();
     std::string ascTime(time_t *t);
@@ -58,6 +60,7 @@ namespace modsecurity {
     std::vector<std::string> expandEnv(const std::string& var, int flags);
     std::string find_resource(const std::string& file,
         const std::string& param);
+    std::string removeBracketsIfNeeded(std::string a);
 }  // namespace modsecurity
 
 

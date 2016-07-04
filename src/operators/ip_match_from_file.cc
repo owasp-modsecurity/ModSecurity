@@ -15,6 +15,8 @@
 
 #include "operators/ip_match_from_file.h"
 
+#include <string.h>
+
 #include <string>
 
 #include "operators/operator.h"
@@ -24,7 +26,7 @@ namespace operators {
 
 
 bool IpMatchFromFile::init(const std::string &file,
-    const char **error) {
+    std::string *error) {
     std::string e("");
     bool res = false;
 
@@ -35,7 +37,7 @@ bool IpMatchFromFile::init(const std::string &file,
     }
 
     if (res == false) {
-        *error = e.c_str();
+        error->assign(e);
     }
 
     return res;

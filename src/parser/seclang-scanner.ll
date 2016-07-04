@@ -25,7 +25,7 @@ using modsecurity::split;
 
 ACTION          (?i:accuracy|append|block|capture|chain|deny|deprecatevar|drop|expirevar|id:[0-9]+|id:'[0-9]+'|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setrsc|setenv|status:[0-9]+)
 ACTION_XMLNS    (?i:xmlns)
-ACTION_ALLOW    (?i:allow)
+ACTION_ALLOW    ((?i:allow:(?i:REQUEST|PHASE))|(?i:phase:'(?i:REQUEST|PHASE)')|(?i:allow))
 ACTION_INITCOL  (?i:initcol)
 
 ACTION_ACCURACY (?i:accuracy)
@@ -120,14 +120,15 @@ DICT_ELEMENT    [^ \t|]+
 
 OPERATOR        (?i:(?:@inspectFile|@fuzzyHash|@validateByteRange|@validateDTD|@validateHash|@validateSchema|@verifyCC|@verifyCPF|@verifySSN|@gsbLookup|@rsub)|(?:\!{0,1})(?:@within|@containsWord|@contains|@endsWith|@eq|@ge|@gt|@ipMatchF|@ipMatch|@ipMatchFromFile|@le|@lt|@pmf|@pm|@pmFromFile|@rbl|@rx|@streq|@strmatch|@beginsWith))
 
-OPERATORNOARG	(?i:@detectSQLi|@detectXSS|@validateUrlEncoding|@validateUtf8Encoding)
+OPERATORNOARG	(?i:@unconditionalMatch|@detectSQLi|@detectXSS|@validateUrlEncoding|@validateUtf8Encoding)
 OPERATOR_GEOIP  (?i:@geoLookup)
 
 TRANSFORMATION  t:(?i:(parityZero7bit|parityOdd7bit|parityEven7bit|sqlHexDecode|cmdLine|sha1|md5|hexEncode|lowercase|urlDecodeUni|urlDecode|none|compressWhitespace|removeWhitespace|replaceNulls|removeNulls|htmlEntityDecode|jsDecode|cssDecode|trim|normalizePathWin|normalisePathWin|normalisePath|length|utf8toUnicode|urldecode|removeCommentsChar|removeComments|replaceComments))
 
 
-VARIABLE (?i:(MULTIPART_DATA_AFTER|RESOURCE|ARGS_COMBINED_SIZE|ARGS_GET_NAMES|ARGS_POST_NAMES|FILES_TMPNAMES|FILES_COMBINED_SIZE|FULL_REQUEST_LENGTH|REQUEST_BODY_LENGTH|REQUEST_URI_RAW|UNIQUE_ID|SERVER_PORT|SERVER_ADDR|REMOTE_PORT|REMOTE_HOST|PATH_INFO|MULTIPART_CRLF_LF_LINES|MATCHED_VAR_NAME|MATCHED_VAR|INBOUND_DATA_ERROR|OUTBOUND_DATA_ERROR|FULL_REQUEST|AUTH_TYPE|ARGS_NAMES|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_PROTOCOL|RESPONSE_STATUS|REQBODY_PROCESSOR|USERID|SESSIONID))
+VARIABLE (?i:(SERVER_NAME|MULTIPART_DATA_AFTER|RESOURCE|ARGS_COMBINED_SIZE|ARGS_GET_NAMES|ARGS_POST_NAMES|FILES_TMPNAMES|FILES_COMBINED_SIZE|FULL_REQUEST_LENGTH|REQUEST_BODY_LENGTH|REQUEST_URI_RAW|UNIQUE_ID|SERVER_PORT|SERVER_ADDR|REMOTE_PORT|REMOTE_HOST|PATH_INFO|MULTIPART_CRLF_LF_LINES|MATCHED_VAR_NAME|MATCHED_VAR|INBOUND_DATA_ERROR|OUTBOUND_DATA_ERROR|FULL_REQUEST|AUTH_TYPE|ARGS_NAMES|REMOTE_ADDR|REQUEST_BASENAME|REQUEST_BODY|REQUEST_FILENAME|REQUEST_HEADERS_NAMES|REQUEST_METHOD|REQUEST_PROTOCOL|REQUEST_URI|RESPONSE_BODY|RESPONSE_CONTENT_LENGTH|RESPONSE_CONTENT_TYPE|RESPONSE_HEADERS_NAMES|RESPONSE_PROTOCOL|RESPONSE_STATUS|USERID|SESSIONID))
 VARIABLE_COL (?i:(SESSION|GLOBAL|ARGS_POST|ARGS_GET|ARGS|FILES_SIZES|FILES_NAMES|FILES_TMP_CONTENT|MULTIPART_FILENAME|MULTIPART_NAME|MATCHED_VARS_NAMES|MATCHED_VARS|FILES|QUERY_STRING|REQUEST_COOKIES|REQUEST_HEADERS|RESPONSE_HEADERS|GEO|IP|REQUEST_COOKIES_NAMES))
+VARIABLE_STATUS (?i:(STATUS[^:]))
 
 VARIABLE_TX (?i:TX)
 VARIABLE_WEBSERVER_ERROR_LOG (?:WEBSERVER_ERROR_LOG)
@@ -148,8 +149,10 @@ RUN_TIME_VAR_TIME_SEC   (?i:TIME_SEC)
 RUN_TIME_VAR_TIME_WDAY  (?i:TIME_WDAY)
 RUN_TIME_VAR_TIME_YEAR  (?i:TIME_YEAR)
 RUN_TIME_VAR_XML        (?i:XML)
+RUN_TIME_VAR_RULE       (?i:RULE)
 
-VARIABLENOCOLON  (?i:MULTIPART_FILE_LIMIT_EXCEEDED|MULTIPART_INVALID_QUOTING|REQBODY_ERROR|REQBODY_PROCESSOR_ERROR|MULTIPART_HEADER_FOLDING|MULTIPART_INVALID_HEADER_FOLDING|MULTIPART_STRICT_ERROR|MULTIPART_UNMATCHED_BOUNDARY|REMOTE_ADDR|REQUEST_LINE)
+VARIABLENOCOLON  (?i:URLENCODED_ERROR|REQBODY_PROCESSOR_ERROR_MSG|REQBODY_PROCESSOR_ERROR|REQBODY_PROCESSOR|REQBODY_ERROR_MSG|REQBODY_ERROR|MULTIPART_FILE_LIMIT_EXCEEDED|MULTIPART_INVALID_QUOTING|MULTIPART_HEADER_FOLDING|MULTIPART_INVALID_HEADER_FOLDING|MULTIPART_STRICT_ERROR|MULTIPART_UNMATCHED_BOUNDARY|REMOTE_ADDR|REQUEST_LINE)
+
 
 CONFIG_VALUE_ON (?i:On)
 CONFIG_VALUE_OFF    (?i:Off)
@@ -187,7 +190,7 @@ VAR_FREE_TEXT_SPACE_COMMA [^, \t\"]+
 VAR_FREE_TEXT_SPACE [^ \t\"]+
 
 
-SOMETHING ["]{1}[^@|!]{1}([^"]|([^\\"]\\\"))*["]{1}
+SOMETHING ["]{1}([^"]|([^\\"]\\\"))*["]{1}
 
 CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
@@ -243,10 +246,13 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 [!&]?{VARIABLE_WEBSERVER_ERROR_LOG}     { driver.error (*driver.loc.back(), "Variable VARIABLE_WEBSERVER_ERROR_LOG is not supported by libModSecurity", ""); throw yy::seclang_parser::syntax_error(*driver.loc.back(), "");}
 [!&]?{VARIABLE}(\:{DICT_ELEMENT})?        { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
 [!&]?{VARIABLE}(\:[\']{FREE_TEXT_QUOTE}[\'])?        { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE(yytext, *driver.loc.back()); }
+[!&]?{VARIABLE_STATUS}  { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_STATUS(yytext, *driver.loc.back()); }
 [!&]?{VARIABLE_COL}(\:{DICT_ELEMENT})?    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_COL(yytext, *driver.loc.back()); }
 [!&]?{VARIABLE_COL}(\:[\']{FREE_TEXT_QUOTE}[\'])?    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_COL(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_XML}(\:{DICT_ELEMENT})?    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_XML(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_XML}(\:[\']{FREE_TEXT_QUOTE}[\'])?    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_XML(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_RULE}(\:{DICT_ELEMENT})?    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_RULE(yytext, *driver.loc.back()); }
+[!&]?{RUN_TIME_VAR_RULE}(\:[\']{FREE_TEXT_QUOTE}[\'])?    { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_RULE(yytext, *driver.loc.back()); }
 [!&]?{VARIABLE_TX}(\:{DICT_ELEMENT})?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_TX(yytext, *driver.loc.back()); }
 [!&]?{VARIABLE_TX}(\:[\']{FREE_TEXT_QUOTE}[\'])?     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_TX(yytext, *driver.loc.back()); }
 [!&]?{RUN_TIME_VAR_DUR}                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
@@ -266,6 +272,8 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 ["][!&]?{VARIABLE_COL}(\:[\']{FREE_TEXT_QUOTE}[\'])?["] { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_VARIABLE_COL(yytext, *driver.loc.back()); }
 ["][!&]?{RUN_TIME_VAR_XML}(\:{DICT_ELEMENT})? { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_XML(yytext, *driver.loc.back()); }
 ["][!&]?{RUN_TIME_VAR_XML}(\:[\']{FREE_TEXT_QUOTE}[\'])?["] { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_XML(yytext, *driver.loc.back()); }
+["][!&]?{RUN_TIME_VAR_RULE}(\:{DICT_ELEMENT})? { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_RULE(yytext, *driver.loc.back()); }
+["][!&]?{RUN_TIME_VAR_RULE}(\:[\']{FREE_TEXT_QUOTE}[\'])?["] { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_RULE(yytext, *driver.loc.back()); }
 
 ["][!&]?{RUN_TIME_VAR_DUR}["]                      { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
 ["][!&]?{RUN_TIME_VAR_ENV}(\:{DICT_ELEMENT})?["]     { BEGIN(EXPECTING_OPERATOR); return yy::seclang_parser::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
@@ -299,7 +307,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {CONFIG_DIR_RES_BODY_LIMIT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_DIR_RES_BODY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_RES_BODY_LIMIT_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_RES_BODY_LIMIT_ACTION(yytext, *driver.loc.back()); }
 
-{CONFIG_COMPONENT_SIG}[ ]["]{FREE_TEXT}["] { return yy::seclang_parser::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
+{CONFIG_COMPONENT_SIG}[ \t]+["]{FREE_TEXT}["] { return yy::seclang_parser::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
 
 %{ /* Other configurations */ %}
 {CONFIG_XML_EXTERNAL_ENTITY} { return yy::seclang_parser::make_CONFIG_XML_EXTERNAL_ENTITY(yytext, *driver.loc.back()); }
@@ -327,13 +335,14 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 {CONFIG_DIR_SEC_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_SEC_ACTION(yytext, *driver.loc.back()); }
 {CONFIG_DIR_SEC_DEFAULT_ACTION} { return yy::seclang_parser::make_CONFIG_DIR_SEC_DEFAULT_ACTION(yytext, *driver.loc.back()); }
-{CONFIG_DIR_SEC_MARKER}[ ]{NEW_LINE_FREE_TEXT} { return yy::seclang_parser::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_SEC_MARKER}[ \t]+{NEW_LINE_FREE_TEXT} { return yy::seclang_parser::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_SEC_MARKER}[ \t]+["]{NEW_LINE_FREE_TEXT}["] { return yy::seclang_parser::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 
 <EXPECTING_OPERATOR>{
-{SOMETHING}           { BEGIN(INITIAL); return yy::seclang_parser::make_FREE_TEXT(yytext, *driver.loc.back()); }
 ["]{OPERATOR}[ ]{FREE_TEXT}["]  { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
 ["]{OPERATORNOARG}[\t ]*["]     { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR(yytext, *driver.loc.back()); }
 ["]{OPERATOR_GEOIP}[\t ]*["]    { BEGIN(INITIAL); return yy::seclang_parser::make_OPERATOR_GEOIP(yytext, *driver.loc.back()); }
+{SOMETHING}           { BEGIN(INITIAL); return yy::seclang_parser::make_FREE_TEXT(yytext, *driver.loc.back()); }
 }
 
 {ACTION}                        { return yy::seclang_parser::make_ACTION(yytext, *driver.loc.back()); }
@@ -409,9 +418,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 {LOG_DATA}:'{FREE_TEXT_QUOTE}'         { return yy::seclang_parser::make_LOG_DATA(yytext, *driver.loc.back()); }
 {ACTION_MSG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_MSG(yytext, *driver.loc.back()); }
-{ACTION_ALLOW}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_ALLOW(yytext, *driver.loc.back()); }
-{ACTION_ALLOW}:{FREE_TEXT_QUOTE_COMMA}  { return yy::seclang_parser::make_ACTION_ALLOW(yytext, *driver.loc.back()); }
-{ACTION_ALLOW}                          { return yy::seclang_parser::make_ACTION_ALLOW("", *driver.loc.back()); }
+{ACTION_ALLOW}                  { return yy::seclang_parser::make_ACTION_ALLOW(yytext, *driver.loc.back()); }
 {ACTION_REDIRECT}:{FREE_TEXT} { return yy::seclang_parser::make_ACTION_REDIRECT(yytext, *driver.loc.back()); }
 {ACTION_TAG}:'{FREE_TEXT_QUOTE}'      { return yy::seclang_parser::make_ACTION_TAG(yytext, *driver.loc.back()); }
 {ACTION_REV}:'{FREE_TEXT_QUOTE_COMMA}'      { return yy::seclang_parser::make_ACTION_REV(yytext, *driver.loc.back()); }
@@ -444,13 +451,12 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 .*[^\\]               { BEGIN(INITIAL); driver.loc.back()->lines(1); driver.loc.back()->step(); }
 }
 
-[ \t]*[\n]+                           { driver.loc.back()->lines(yyleng); driver.loc.back()->step(); }
-#[ \t]*SecRule[^\\]*\\\n[ \t]*        { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT); }
-#[ \t]*SecRule[^\\]*\\\r\n[ \t]*      { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
-#[ \t]*SecAction[^\\]*\\\n[ \t]*        { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
-#[ \t]*SecAction[^\\]*\\\r\n[ \t]*      { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
+[ \t]*[\n]                           { driver.loc.back()->lines(1); driver.loc.back()->step(); }
+#[ \t]*SecRule[^\\].*\\[ \t]*[\r\n]*        { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT); }
+#[ \t]*SecAction[^\\].*\\[ \t]*[^\\n]      { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
 #.*                             { driver.loc.back()->step(); /* comment, just ignore. */ }
-.                               { driver.error (*driver.loc.back(), "invalid character", yytext); throw yy::seclang_parser::syntax_error(*driver.loc.back(), yytext); }
+\r                              { driver.loc.back()->step(); /* carriage return, just ignore. */}
+.                               { driver.error (*driver.loc.back(), "invalid character", yytext); throw yy::seclang_parser::syntax_error(*driver.loc.back(), ""); }
 <<EOF>>                         {
                                     if (driver.ref.size() > 0) {
                                         driver.ref.pop_back();
@@ -519,6 +525,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
     std::vector<std::string> conf = split(yytext, ' ');
     key = conf[1];
     url = conf[2];
+    c.setKey(key);
 
     driver.ref.push_back(url);
     driver.loc.push_back(new yy::location());

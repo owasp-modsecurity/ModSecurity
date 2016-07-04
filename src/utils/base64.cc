@@ -186,8 +186,8 @@ void Base64::decode_forgiven_engine(unsigned char *plain_text,
         }
         i++;
     }
-
     k = j;
+
     if (ch == b64_pad) {
         switch(i % 4) {
             case 1:
@@ -206,7 +206,11 @@ void Base64::decode_forgiven_engine(unsigned char *plain_text,
         plain_text[j] = '\0';
     }
 
-    *aiming_size = j;
+    if (plain_text_size == 0) {
+        *aiming_size = k + 1;
+    } else {
+        *aiming_size = j;
+    }
 }
 
 

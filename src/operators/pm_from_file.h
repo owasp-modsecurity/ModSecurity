@@ -31,7 +31,7 @@ class PmFromFile : public Pm {
     PmFromFile(std::string op, std::string param, bool negation)
         : Pm(op, param, negation) { }
 
-    bool init(const std::string &file, const char **error) override;
+    bool init(const std::string &file, std::string *error) override;
 };
 
 

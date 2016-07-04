@@ -73,9 +73,11 @@ class Rules;
 class RuleMessage;
 namespace actions {
 class Action;
+enum AllowType : short;
 }
 namespace RequestBodyProcessor {
 class XML;
+class JSON;
 }
 namespace operators {
 class Operator;
@@ -131,7 +133,7 @@ class Transaction {
     int appendRequestBody(const unsigned char *body, size_t size);
     int requestBodyFromFile(const char *path);
 
-    int processResponseHeaders();
+    int processResponseHeaders(int code, const std::string& proto);
     int addResponseHeader(const std::string& key, const std::string& value);
     int addResponseHeader(const unsigned char *key, const unsigned char *value);
     int addResponseHeader(const unsigned char *key, size_t len_key,
@@ -140,9 +142,13 @@ class Transaction {
     int processResponseBody();
     int appendResponseBody(const unsigned char *body, size_t size);
 
-    int processLogging(int status_code);
+    int processLogging();
 
     bool intervention(ModSecurityIntervention *it);
+
+    bool addArgument(const std::string& orig, const std::string& key,
+        const std::string& value);
+    bool extractArguments(const std::string &orig, const std::string& buf);
 
     const char *getResponseBody();
     int getResponseBodyLenth();
@@ -300,8 +306,19 @@ class Transaction {
     std::string m_marker;
 
     /**
+     * Holds the amount of rules that should be skipped. If bigger than 0 the
+     * current rule should be skipped and the number needs to be decreased.
+     */
+    int m_skip_next;
+
+    /**
+     * If allow action was utilized, this variable holds the allow type.
+     */
+    modsecurity::actions::AllowType m_allowType;
+
+    /**
      * Holds the decode URI. Notice that m_uri holds the raw version
-	 * of the URI.
+     * of the URI.
      */
     std::string m_uri_decoded;
 
@@ -333,6 +350,7 @@ class Transaction {
     std::list<std::string> m_matched;
 
     RequestBodyProcessor::XML *m_xml;
+    RequestBodyProcessor::JSON *m_json;
 
  private:
     std::string *m_ARGScombinedSizeStr;
@@ -388,7 +406,8 @@ int msc_append_request_body(Transaction *transaction,
 int msc_request_body_from_file(Transaction *transaction, const char *path);
 
 /** @ingroup ModSecurity_C_API */
-int msc_process_response_headers(Transaction *transaction);
+int msc_process_response_headers(Transaction *transaction, int code,
+    const char* protocol);
 
 /** @ingroup ModSecurity_C_API */
 int msc_add_response_header(Transaction *transaction,
@@ -423,7 +442,7 @@ void msc_transaction_cleanup(Transaction *transaction);
 int msc_intervention(Transaction *transaction, ModSecurityIntervention *it);
 
 /** @ingroup ModSecurity_C_API */
-int msc_process_logging(Transaction *transaction, int code);
+int msc_process_logging(Transaction *transaction);
 
 #ifdef __cplusplus
 }

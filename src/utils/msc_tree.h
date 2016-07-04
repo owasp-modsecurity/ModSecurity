@@ -97,6 +97,7 @@ unsigned char is_netmask_v6(char *ip_strv6);
 int tree_contains_ip(TreeRoot *rtree,
     const char *value, char **error_msg);
 
+int add_ip_from_param(const char *param, TreeRoot **rtree, char **error_msg);
 int ip_tree_from_param(const char *param, TreeRoot **rtree, char **error_msg);
 int create_radix_tree(TreeRoot **rtree, char **error_msg);
 }

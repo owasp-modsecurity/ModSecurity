@@ -107,7 +107,7 @@ TreePrefix *CPTCreatePrefix(unsigned char *ipdata, unsigned int ip_bitmask,
         unsigned char netmask)  {
 
     TreePrefix *prefix = NULL;
-    int bytes = ip_bitmask/8;
+    int bytes = ip_bitmask;
 
     if ((ip_bitmask % 8 != 0) || (ipdata == NULL)) {
         return NULL;
@@ -759,7 +759,6 @@ TreeNode *CPTFindElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree
                 return node;
             }
         }
-
         if ((node->prefix->buffer[bytes] & mask) == (temp_data[bytes] & mask)) {
             if (TreePrefixNetmask(node->prefix, ip_bitmask, TRUE)) {
                 //if (msr && msr->txcfg->debuglog_level >= 9) {
@@ -957,6 +956,44 @@ int tree_contains_ip(TreeRoot *rtree,
     
     return 0;
 }
+
+
+
+int add_ip_from_param(
+    const char *param, TreeRoot **rtree, char **error_msg)
+{
+    char *param_copy = strdup(param);
+    char *saved = NULL;
+    char *str = NULL;
+    TreeNode *tnode = NULL;
+
+    str = strtok_r(param_copy, ",", &saved);
+    while (str != NULL)
+    {
+        if (strchr(str, ':') == NULL)
+        {
+            tnode = TreeAddIP(str, (*rtree)->ipv4_tree, IPV4_TREE);
+        }
+        else
+        {
+            tnode = TreeAddIP(str, (*rtree)->ipv6_tree, IPV6_TREE);
+        }
+
+        if (tnode == NULL)
+        {
+            //*error_msg = apr_psprintf("Could not add entry " \
+            //    "\"%s\" from: %s.", str, param);
+            free(param_copy);
+            return -1;
+        }
+
+        str = strtok_r(NULL, ",", &saved);
+    }
+    free(param_copy);
+
+    return 0;
+}
+
 
 int ip_tree_from_param(
     const char *param, TreeRoot **rtree, char **error_msg)

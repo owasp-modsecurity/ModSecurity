@@ -134,6 +134,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 std::cout << KCYN << "skipped!" << RESET << std::endl;
             }
             res->push_back(testRes);
+
+            delete modsec_transaction;
+            delete modsec_rules;
+            delete modsec;
+
             continue;
         }
 
@@ -156,6 +161,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                     << std::endl;
                 testRes->passed = false;
                 res->push_back(testRes);
+
+                delete modsec_transaction;
+                delete modsec_rules;
+                delete modsec;
+
                 continue;
             }
 
@@ -174,6 +184,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 testRes->reason << KGRN << "passed!" << RESET << std::endl;
                 testRes->passed = true;
                 res->push_back(testRes);
+
+                delete modsec_transaction;
+                delete modsec_rules;
+                delete modsec;
+
                 continue;
             } else {
                 /* Parser error was expected, but with a different content */
@@ -193,6 +208,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                     << s << std::endl;
                 testRes->passed = false;
                 res->push_back(testRes);
+
+                delete modsec_transaction;
+                delete modsec_rules;
+                delete modsec;
+
                 continue;
             }
         } else {
@@ -210,6 +230,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 }
                 testRes->passed = false;
                 res->push_back(testRes);
+
+                delete modsec_transaction;
+                delete modsec_rules;
+                delete modsec;
+
                 continue;
             }
         }
@@ -221,17 +246,21 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             t->clientPort, t->serverIp.c_str(), t->serverPort);
 
         actions(&r, modsec_transaction);
+#if 0
         if (r.status != 200) {
              goto end;
         }
+#endif
 
         modsec_transaction->processURI(t->uri.c_str(), t->method.c_str(),
             t->httpVersion.c_str());
 
         actions(&r, modsec_transaction);
+#if 0
         if (r.status != 200) {
             goto end;
         }
+#endif
 
         for (std::pair<std::string, std::string> headers :
             t->request_headers) {
@@ -242,7 +271,7 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         modsec_transaction->processRequestHeaders();
         actions(&r, modsec_transaction);
         if (r.status != 200) {
-            goto end;
+            //goto end;
         }
 
         modsec_transaction->appendRequestBody(
@@ -250,9 +279,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
             t->request_body.size());
         modsec_transaction->processRequestBody();
         actions(&r, modsec_transaction);
+#if 0
         if (r.status != 200) {
             goto end;
         }
+#endif
 
         for (std::pair<std::string, std::string> headers :
             t->response_headers) {
@@ -260,23 +291,27 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 headers.second.c_str());
         }
 
-        modsec_transaction->processResponseHeaders();
+        modsec_transaction->processResponseHeaders(r.status, t->response_protocol);
         actions(&r, modsec_transaction);
+#if 0
         if (r.status != 200) {
             goto end;
         }
+#endif
 
         modsec_transaction->appendResponseBody(
             (unsigned char *)t->response_body.c_str(),
             t->response_body.size());
         modsec_transaction->processResponseBody();
         actions(&r, modsec_transaction);
+#if 0
         if (r.status != 200) {
             goto end;
         }
+#endif
 
 end:
-        modsec_transaction->processLogging(r.status);
+        modsec_transaction->processLogging();
 
         CustomDebugLog *d = reinterpret_cast<CustomDebugLog *>
             (modsec_rules->m_debugLog);
@@ -340,7 +375,6 @@ after_debug_log:
 
 int main(int argc, char **argv) {
     ModSecurityTest<RegressionTest> test;
-    ModSecurityTestResults<RegressionTest> results;
     int test_number = 0;
 
 #ifdef WITH_GEOIP
@@ -414,6 +448,7 @@ int main(int argc, char **argv) {
             }
             failed++;
         }
+        delete r;
     }
 
     if (!test.m_automake_output) {
@@ -439,6 +474,7 @@ int main(int argc, char **argv) {
         }
         delete vec;
     }
+
 #endif
     return 0;
 }

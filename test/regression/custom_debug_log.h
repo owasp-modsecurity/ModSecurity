@@ -26,6 +26,7 @@ namespace modsecurity_test {
 class CustomDebugLog : public modsecurity::DebugLog {
  public:
     CustomDebugLog *new_instance();
+    ~CustomDebugLog();
 
     void write(int level, const std::string& message) override;
     bool contains(const std::string& pattern);

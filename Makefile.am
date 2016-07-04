@@ -37,7 +37,7 @@ MAINTAINERCLEANFILES = \
 	depcomp
 
 @VALGRIND_CHECK_RULES@
-VALGRIND_SUPPRESSIONS_FILES = test/valgrind_suppressions.txt
+VALGRIND_SUPPRESSIONS_FILES = valgrind_suppressions.txt
 
 LOG_DRIVER = env $(SHELL) $(top_srcdir)/test/custom-test-driver
 AM_TESTS_ENVIRONMENT=AUTOMAKE_TESTS=true; export AUTOMAKE_TESTS;
@@ -214,3 +214,16 @@ TESTS+=test/test-cases/secrules-language-tests/operators/ipMatch.json
 TESTS+=test/test-cases/secrules-language-tests/operators/strmatch.json
 TESTS+=test/test-cases/secrules-language-tests/operators/detectXSS.json
 TESTS+=test/test-cases/secrules-language-tests/operators/eq.json
+TESTS+=test/test-cases/regression/variable-REQBODY_PROCESSOR.json
+TESTS+=test/test-cases/regression/variable-REQBODY_PROCESSOR_ERROR.json
+TESTS+=test/test-cases/regression/variable-URLENCODED_ERROR.json
+TESTS+=test/test-cases/regression/variable-RULE.json
+TESTS+=test/test-cases/regression/variable-STATUS.json
+TESTS+=test/test-cases/regression/variable-RESPONSE_PROTOCOL.json
+TESTS+=test/test-cases/regression/variable-SERVER_NAME.json
+TESTS+=test/test-cases/regression/operator-UnconditionalMatch.json
+TESTS+=test/test-cases/regression/request-body-parser-json.json
+TESTS+=test/test-cases/regression/action-skip.json
+TESTS+=test/test-cases/regression/action-allow.json
+TESTS+=test/test-cases/regression/issue-1152.json
+

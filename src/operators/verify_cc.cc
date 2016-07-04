@@ -26,6 +26,16 @@
 namespace modsecurity {
 namespace operators {
 
+VerifyCC::~VerifyCC() {
+    if (m_pc != NULL) {
+        pcre_free(m_pc);
+        m_pc = NULL;
+    }
+    if (m_pce != NULL) {
+        pcre_free_study(m_pce);
+        m_pce = NULL;
+    }
+}
 
 /**
  * Luhn Mod-10 Method (ISO 2894/ANSI 4.13)
@@ -69,7 +79,7 @@ int VerifyCC::luhnVerify(const char *ccnumber, int len) {
 
 
 
-bool VerifyCC::init(const std::string &param2, const char **error) {
+bool VerifyCC::init(const std::string &param2, std::string *error) {
     const char *errptr = NULL;
     int erroffset = 0;
 
@@ -78,7 +88,7 @@ bool VerifyCC::init(const std::string &param2, const char **error) {
     m_pce = pcre_study(m_pc, PCRE_STUDY_JIT_COMPILE, &errptr);
 
     if ((m_pc == NULL) || (m_pce == NULL)) {
-        *error = errptr;
+        error->assign(errptr);
         return false;
     }
 

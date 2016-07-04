@@ -54,12 +54,17 @@ struct MyEqual {
 
 class MultipartPart {
  public:
-     MultipartPart()
+    MultipartPart()
      : m_type(MULTIPART_FORMDATA),
      m_tmp_file_fd(0),
      m_tmp_file_size(0),
      m_offset(0),
      m_length(0) { }
+
+    ~MultipartPart () {
+        m_headers.clear();
+        m_value_parts.clear();
+    }
 
     /* part type, can be MULTIPART_FORMDATA or MULTIPART_FILE */
     int m_type;
@@ -95,18 +100,18 @@ class Multipart {
     Multipart(std::string header, Transaction *transaction);
     ~Multipart();
 
-    bool init();
+    bool init(std::string *err);
 
     int boundary_characters_valid(const char *boundary);
     int count_boundary_params(const std::string& str_header_value);
     int is_token_char(unsigned char c);
-    int multipart_complete();
+    int multipart_complete(std::string *err);
 
     int parse_content_disposition(const char *c_d_value);
-    bool process(const std::string& data);
+    bool process(const std::string& data, std::string *err);
     int process_boundary(int last_part);
-    int process_part_header();
-    int process_part_data();
+    int process_part_header(std::string *error);
+    int process_part_data(std::string *error);
 
     int tmp_file_name(std::string *filename);
 

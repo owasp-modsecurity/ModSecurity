@@ -118,7 +118,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"24."
+      "debug_log":"Target value: \"25."
     },
     "rules":[
       "SecRuleEngine On",
@@ -144,7 +144,7 @@
         "Host":"localhost",
         "User-Agent":"curl/7.38.0",
         "Accept":"*/*",
-        "Content-Length": "27",
+        "Content-Length": "28",
         "Content-Type": "application/x-www-form-urlencoded"
       },
       "uri":"/",
@@ -164,7 +164,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"27."
+      "debug_log":"Target value: \"28."
     },
     "rules":[
       "SecRuleEngine On",
@@ -210,7 +210,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"15."
+      "debug_log":"Target value: \"16."
     },
     "rules":[
       "SecRuleEngine On",

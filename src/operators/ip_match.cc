@@ -25,12 +25,12 @@ namespace modsecurity {
 namespace operators {
 
 
-bool IpMatch::init(const std::string &file, const char **error) {
+bool IpMatch::init(const std::string &file, std::string *error) {
     std::string e("");
     bool res = m_tree.addFromBuffer(param, &e);
 
     if (res == false) {
-        *error = e.c_str();
+        error->assign(e);
     }
 
     return res;

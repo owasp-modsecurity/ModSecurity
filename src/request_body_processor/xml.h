@@ -46,8 +46,8 @@ class XML {
     explicit XML(Transaction *transaction);
     ~XML();
     bool init();
-    bool processChunk(const char *buf, unsigned int size);
-    bool complete();
+    bool processChunk(const char *buf, unsigned int size, std::string *err);
+    bool complete(std::string *err);
     static xmlParserInputBufferPtr unloadExternalEntity(const char *URI,
         xmlCharEncoding enc);
 

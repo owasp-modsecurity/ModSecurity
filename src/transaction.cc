@@ -38,10 +38,12 @@
 #include "modsecurity/modsecurity.h"
 #include "request_body_processor/multipart.h"
 #include "request_body_processor/xml.h"
+#include "request_body_processor/json.h"
 #include "audit_log/audit_log.h"
 #include "src/unique_id.h"
 #include "src/utils.h"
 #include "modsecurity/rule.h"
+#include "src/actions/allow.h"
 
 using modsecurity::actions::Action;
 using modsecurity::RequestBodyProcessor::Multipart;
@@ -112,11 +114,15 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_responseHeadersNames(NULL),
     m_responseContentType(NULL),
     m_marker(""),
+    m_allowType(modsecurity::actions::NoneAllowType),
+    m_skip_next(0),
     m_creationTimeStamp(cpu_seconds()),
     m_logCbData(logCbData),
     m_ms(ms),
     m_collections(ms->m_global_collection, ms->m_ip_collection,
-        ms->m_session_collection, ms->m_user_collection),
+        ms->m_session_collection, ms->m_user_collection,
+        ms->m_resource_collection),
+    m_json(new RequestBodyProcessor::JSON(this)),
     m_xml(new RequestBodyProcessor::XML(this)) {
     m_id = std::to_string(this->m_timeStamp) + \
         std::to_string(generate_transaction_unique_id());
@@ -140,6 +146,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     this->m_responseContentType = m_collections.resolveFirst(
         "RESPONSE_CONTENT_TYPE");
 
+    m_collections.storeOrUpdateFirst("URLENCODED_ERROR", "0");
 
 #ifndef NO_LOGS
     this->debug(4, "Initialising transaction");
@@ -161,6 +168,7 @@ Transaction::~Transaction() {
 
     m_rules->decrementReferenceCount();
 
+    delete m_json;
     delete m_xml;
 }
 
@@ -227,6 +235,98 @@ int Transaction::processConnection(const char *client, int cPort,
     this->m_collections.store("REMOTE_PORT",
         std::to_string(this->m_clientPort));
     this->m_rules->evaluate(ModSecurity::ConnectionPhase, this);
+    return true;
+}
+
+
+bool Transaction::extractArguments(const std::string &orig,
+    const std::string& buf) {
+    char sep1 = '&';
+    std::vector<std::string> key_value_sets = split(buf, sep1);
+
+    for (std::string t : key_value_sets) {
+        char sep2 = '=';
+        int i = 0;
+        size_t key_s = 0;
+        size_t value_s = 0;
+        int invalid = 0;
+        int changed = 0;
+
+        std::string key;
+        std::string value;
+        std::vector<std::string> key_value = split(t, sep2);
+        for (auto& a : key_value) {
+            if (i == 0) {
+                key = a;
+            } else if (i == 1) {
+                value = a;
+            } else {
+                value = value + "=" + a;
+            }
+            i++;
+        }
+
+        key_s = (key.length() + 1);
+        value_s = (value.length() + 1);
+        unsigned char *key_c = (unsigned char *) malloc(sizeof(char) * key_s);
+        unsigned char *value_c = (unsigned char *) malloc(sizeof(char) * value_s);
+
+        memset(key_c, '\0', sizeof(char) * key_s);
+        memset(value_c, '\0', sizeof(char) * value_s);
+
+        memcpy(key_c, key.c_str(), key_s);
+        memcpy(value_c, value.c_str(), value_s);
+
+        key_s = urldecode_nonstrict_inplace(key_c, key_s, &invalid, &changed);
+        value_s = urldecode_nonstrict_inplace(value_c, value_s, &invalid, &changed);
+
+        if (invalid) {
+            m_collections.storeOrUpdateFirst("URLENCODED_ERROR", "1");
+        }
+
+        addArgument(orig, std::string((char *)key_c, key_s-1),
+            std::string((char *)value_c, value_s-1));
+
+        free(key_c);
+        free(value_c);
+    }
+}
+
+
+bool Transaction::addArgument(const std::string& orig, const std::string& key,
+    const std::string& value) {
+    debug(4, "Adding request argument (" + orig + "): name \"" + \
+                key + "\", value \"" + value + "\"");
+
+    m_collections.store("ARGS:" + key, value);
+    if (orig == "GET") {
+        m_collections.store("ARGS_GET:" + key, value);
+        if (m_namesArgsGet->empty()) {
+            m_namesArgsGet->assign(key);
+        } else {
+            m_namesArgsGet->assign(*m_namesArgsGet + " " + key);
+        }
+    }
+    if (orig == "POST") {
+        m_collections.store("ARGS_POST:" + key, value);
+        if (m_namesArgsPost->empty()) {
+            m_namesArgsPost->assign(key);
+        } else {
+            m_namesArgsPost->assign(*m_namesArgsPost + " " + key);
+        }
+    }
+
+    if (m_namesArgs->empty()) {
+        m_namesArgs->assign(key);
+    } else {
+        m_namesArgs->assign(*m_namesArgs + " " + key);
+    }
+
+    this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
+        key.length() + value.length();
+    this->m_ARGScombinedSizeStr->assign(
+        std::to_string(this->m_ARGScombinedSize));
+
     return true;
 }
 
@@ -325,65 +425,8 @@ int Transaction::processURI(const char *uri, const char *method,
     m_collections.store("REQUEST_URI_RAW", uri);
 
     if (pos != std::string::npos && (m_uri_decoded.length() - pos) > 2) {
-        /**
-         * FIXME:
-         *
-         * This is configurable by secrules, we should respect whatever
-         * the secrules said about it.
-         *
-         */
-        char sep1 = '&';
-        std::string sets(m_uri_decoded, pos + 1, m_uri_decoded.length() -
-            (pos + 1));
-        std::vector<std::string> key_value_sets = split(sets, sep1);
-
-        for (std::string t : key_value_sets) {
-            /**
-             * FIXME:
-             *
-             * Mimic modsecurity when there are multiple keys with the same name.
-             *
-             */
-            char sep2 = '=';
-
-            std::vector<std::string> key_value = split(t, sep2);
-            if (key_value.size() <= 1) {
-                /** TODO: Verify what ModSecurity 2.9.0 does when there is a
-                 *        key without an argument
-                 */
-                continue;
-            }
-            std::string key = key_value[0];
-            std::string value = key_value[1];
-            int i = key_value.size() - 1;
-            while (i > 2) {
-                value = value + sep2 + key_value[i];
-                i--;
-            }
-
-            m_collections.store("ARGS:" + key, value);
-            m_collections.store("ARGS_GET:" + key, value);
-
-            if (m_namesArgs->empty()) {
-                m_namesArgs->assign(key);
-            } else {
-                m_namesArgs->assign(*m_namesArgs + " " + key);
-            }
-            if (m_namesArgsGet->empty()) {
-                m_namesArgsGet->assign(key);
-            } else {
-                m_namesArgsGet->assign(*m_namesArgsGet + " " + key);
-            }
-
-            this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
-                key.length() + value.length();
-            this->m_ARGScombinedSizeStr->assign(
-                std::to_string(this->m_ARGScombinedSize));
-#ifndef NO_LOGS
-            debug(4, "Adding request argument (QUERY_STRING): name \"" + \
-                key + "\", value \"" + value + "\"");
-#endif
-        }
+        extractArguments("GET", std::string(uri_s, pos_raw + 1,
+            uri_s.length() - (pos_raw + 1)));
     }
     return true;
 }
@@ -478,15 +521,18 @@ int Transaction::addRequestHeader(const std::string& key,
         std::string l = tolower(value);
         if (l.compare(0, multipart.length(), multipart) == 0) {
             this->m_requestBodyType = MultiPartRequestBody;
+            m_collections.store("REQBODY_PROCESSOR", "MULTIPART");
         }
 
         if (l == "application/x-www-form-urlencoded") {
             this->m_requestBodyType = WWWFormUrlEncoded;
+            m_collections.store("REQBODY_PROCESSOR", "URLENCODED");
         }
+    }
 
-        if (l == "text/xml") {
-            this->m_requestBodyType = XMLRequestBody;
-        }
+    if (keyl == "host") {
+        std::vector<std::string> host = split(value, ':');
+        m_collections.store("SERVER_NAME", host[0]);
     }
     return 1;
 }
@@ -589,93 +635,82 @@ int Transaction::processRequestBody() {
      * }
      * 
      */
-
     if (m_requestBodyProcessor == XMLRequestBody) {
+        std::string error;
         if (m_xml->init() == true) {
             m_xml->processChunk(m_requestBody.str().c_str(),
-                m_requestBody.str().size());
-            m_xml->complete();
+                m_requestBody.str().size(),
+                &error);
+            m_xml->complete(&error);
         }
-    }
-
-    if (m_requestBodyType == MultiPartRequestBody) {
+        if (error.empty() == false) {
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "1");
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "1");
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR_MSG",
+                "XML parsing error: " + error);
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR_MSG",
+                "XML parsing error: " + error);
+        } else {
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "0");
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "0");
+        }
+    } else if (m_requestBodyProcessor == JSONRequestBody) {
+        std::string error;
+        if (m_json->init() == true) {
+            m_json->processChunk(m_requestBody.str().c_str(),
+                m_requestBody.str().size(),
+                &error);
+            m_json->complete(&error);
+        }
+        if (error.empty() == false) {
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "1");
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "1");
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR_MSG",
+                "XML parsing error: " + error);
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR_MSG",
+                "XML parsing error: " + error);
+        } else {
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "0");
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "0");
+        }
+    } else if (m_requestBodyType == MultiPartRequestBody) {
+        std::string error;
         std::string *a = m_collections.resolveFirst(
             "REQUEST_HEADERS:Content-Type");
         if (a != NULL) {
             Multipart m(*a, this);
 
-            if (m.init() == true) {
-                m.process(m_requestBody.str());
+            if (m.init(&error) == true) {
+                m.process(m_requestBody.str(), &error);
             }
-            m.multipart_complete();
+            m.multipart_complete(&error);
         }
-    }
-
-    if (m_requestBodyType == WWWFormUrlEncoded) {
-        std::string content = uri_decode(m_requestBody.str());
-        if (content.empty() == false) {
-            content.pop_back();
+        if (error.empty() == false) {
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "1");
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "1");
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR_MSG",
+                "Multipart parsing error: " + error);
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR_MSG",
+                "Multipart parsing error: " + error);
+        } else {
+            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "0");
+            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "0");
         }
-
-        /**
-         * FIXME:
-         *
-         * This is configurable by secrules, we should respect whatever
-         * the secrules said about it.
-         *
-         */
-        char sep1 = '&';
-
-        std::vector<std::string> key_value = split(content.c_str(), sep1);
-
-        for (std::string t : key_value) {
-            /**
-             * FIXME:
-             *
-             * Mimic modsecurity when there are multiple keys with the same name.
-             *
-             */
-            char sep2 = '=';
-
-            std::vector<std::string> key_value2 = split(t, sep2);
-
-            if (key_value2.size() == 0) {
-                continue;
-            }
-
-            std::string key = key_value2[0];
-            std::string value = std::string("");
-
-            if (key_value2.size() == 2) {
-                value = key_value2[1];
-            } else if (key_value2.size() > 2) {
-                int i = 2;
-                value = key_value2[1];
-                while (i < key_value2.size()) {
-                    value = value + std::string("=") + key_value2[i];
-                    i++;
-                }
-            }
-
-            m_collections.store("ARGS:" + key, value);
-            m_collections.store("ARGS_POST:" + key, value);
-
-            if (m_namesArgs->empty()) {
-                m_namesArgs->assign(key);
-            } else {
-                m_namesArgs->assign(*m_namesArgs + " " + key);
-            }
-            if (m_namesArgsPost->empty()) {
-                m_namesArgsPost->assign(key);
-            } else {
-                m_namesArgsPost->assign(*m_namesArgsPost + " " + key);
-            }
-
-            this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
-                key.length() + value.length();
-            this->m_ARGScombinedSizeStr->assign(
-                std::to_string(this->m_ARGScombinedSize));
+    } else if (m_requestBodyType == WWWFormUrlEncoded) {
+        extractArguments("POST", m_requestBody.str());
+    } else {
+        std::string *a = m_collections.resolveFirst(
+            "REQUEST_HEADERS:Content-Type");
+        std::string error;
+        if (a != NULL && a->empty() == false) {
+            error.assign(*a);
         }
+        m_collections.storeOrUpdateFirst("REQBODY_ERROR", "1");
+        m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "1");
+        m_collections.storeOrUpdateFirst("REQBODY_ERROR_MSG",
+            "Unknown request body processor: " + error);
+        m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR_MSG",
+            "Unknown request body processor: " + error);
     }
 
     /**
@@ -818,15 +853,22 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
  *
  * @note Remember to check for a possible intervention.
  *
+ * @param code The returned http code.
+ * @param proto Protocol used on the response.
+ * 
  * @returns If the operation was successful or not.
  * @retval true Operation was successful.
  * @retval false Operation failed.
  *
  */
-int Transaction::processResponseHeaders() {
+int Transaction::processResponseHeaders(int code, const std::string& proto) {
 #ifndef NO_LOGS
     debug(4, "Starting phase RESPONSE_HEADERS. (SecRules 3)");
 #endif
+
+    this->m_httpCodeReturned = code;
+    this->m_collections.store("STATUS", std::to_string(code));
+    m_collections.store("RESPONSE_PROTOCOL", proto);
 
     if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
 #ifndef NO_LOGS
@@ -1118,7 +1160,7 @@ int Transaction::getResponseBodyLenth() {
  * @retval false Operation failed.
  *
  */
-int Transaction::processLogging(int returned_code) {
+int Transaction::processLogging() {
 #ifndef NO_LOGS
     debug(4, "Starting phase LOGGING. (SecRules 5)");
 #endif
@@ -1130,7 +1172,6 @@ int Transaction::processLogging(int returned_code) {
         return true;
     }
 
-    this->m_httpCodeReturned = returned_code;
     this->m_rules->evaluate(ModSecurity::LoggingPhase, this);
 
     /* If relevant, save this transaction information at the audit_logs */
@@ -1290,6 +1331,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         for (auto h : l) {
             audit_log << h->m_key.c_str() << ": ";
             audit_log << h->m_value.c_str() << std::endl;
+            delete h;
         }
     }
     if (parts & audit_log::AuditLog::CAuditLogPart) {
@@ -1312,6 +1354,7 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         for (auto h : l) {
             audit_log << h->m_key.c_str() << ": ";
             audit_log << h->m_value.c_str() << std::endl;
+            delete h;
         }
     }
     if (parts & audit_log::AuditLog::GAuditLogPart) {
@@ -1395,6 +1438,7 @@ std::string Transaction::toJSON(int parts) {
         m_collections.m_transient->resolveMultiMatches("REQUEST_HEADERS", &l);
         for (auto h : l) {
             LOGFY_ADD(h->m_key.c_str(), h->m_value.c_str());
+            delete h;
         }
 
         /* end: request headers */
@@ -1424,6 +1468,7 @@ std::string Transaction::toJSON(int parts) {
         m_collections.m_transient->resolveMultiMatches("RESPONSE_HEADERS", &l);
         for (auto h : l) {
             LOGFY_ADD(h->m_key.c_str(), h->m_value.c_str());
+            delete h;
         }
 
         /* end: response headers */
@@ -1709,8 +1754,9 @@ extern "C" int msc_request_body_from_file(Transaction *transaction,
  * @retval 0 Operation failed.
  *
  */
-extern "C" int msc_process_response_headers(Transaction *transaction) {
-    return transaction->processResponseHeaders();
+extern "C" int msc_process_response_headers(Transaction *transaction,
+    int code, const char* protocol) {
+    return transaction->processResponseHeaders(code, protocol);
 }
 
 
@@ -1950,15 +1996,14 @@ extern "C" int msc_get_response_body_length(Transaction *transaction) {
  * delivered prior to the execution of this function.
  *
  * @param transaction ModSecurity transaction.
- * @param code  HTTP code returned to the user.
  *
  * @returns If the operation was successful or not.
  * @retval 1 Operation was successful.
  * @retval 0 Operation failed.
  *
  */
-extern "C" int msc_process_logging(Transaction *transaction, int code) {
-    return transaction->processLogging(code);
+extern "C" int msc_process_logging(Transaction *transaction) {
+    return transaction->processLogging();
 }
 
 }  // namespace modsecurity

@@ -26,7 +26,6 @@ namespace actions {
 
 
 bool Pass::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->m_actions.clear();
     return true;
 }
 
