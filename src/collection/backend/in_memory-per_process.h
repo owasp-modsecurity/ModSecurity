@@ -90,23 +90,6 @@ class InMemoryPerProcess :
         std::vector<const Variable *> *l) override;
     void resolveRegularExpression(const std::string& var,
         std::vector<const Variable *> *l) override;
-
-    void store(std::string key, std::string compartment,
-        std::string value) override;
-    bool storeOrUpdateFirst(const std::string &key, std::string compartment,
-        const std::string &value) override;
-    bool updateFirst(const std::string &key, std::string compartment,
-        const std::string &value) override;
-    void del(const std::string& key, std::string compartment) override;
-
-    std::string* resolveFirst(const std::string& var,
-        std::string compartment) override;
-    void resolveSingleMatch(const std::string& var, std::string compartment,
-        std::vector<const Variable *> *l) override;
-    void resolveMultiMatches(const std::string& var, std::string compartment,
-        std::vector<const Variable *> *l) override;
-    void resolveRegularExpression(const std::string& var,
-        std::string compartment, std::vector<const Variable *> *l) override;
 };
 
 }  // namespace backend

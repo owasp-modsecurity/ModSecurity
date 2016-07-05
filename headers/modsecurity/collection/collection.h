@@ -61,25 +61,53 @@ class Collection {
 
 
     virtual void store(std::string key, std::string compartment,
-        std::string value) = 0;
+        std::string value) {
+        std::string nkey = key + "::" + compartment;
+        store(nkey, value);
+    }
 
     virtual bool storeOrUpdateFirst(const std::string &key,
-        std::string compartment, const std::string &value) = 0;
+        std::string compartment, const std::string &value) {
+        std::string nkey = key + "::" + compartment;
+        return storeOrUpdateFirst(nkey, value);
+    }
 
     virtual bool updateFirst(const std::string &key, std::string compartment,
-        const std::string &value) = 0;
+        const std::string &value) {
+        std::string nkey = key + "::" + compartment;
+        return updateFirst(nkey, value);
+    }
 
-    virtual void del(const std::string& key, std::string compartment) = 0;
+    virtual void del(const std::string& key, std::string compartment) {
+        std::string nkey = key + "::" + compartment;
+        del(nkey);
+    }
 
     virtual std::string* resolveFirst(const std::string& var,
-        std::string compartment) = 0;
+        std::string compartment) {
+        std::string nkey = var + "::" + compartment;
+        return resolveFirst(nkey);
+    }
+
     virtual void resolveSingleMatch(const std::string& var,
-        std::string compartment, std::vector<const Variable *> *l) = 0;
+        std::string compartment, std::vector<const Variable *> *l) {
+        std::string nkey = var + "::" + compartment;
+        resolveSingleMatch(nkey, l);
+    }
+
     virtual void resolveMultiMatches(const std::string& var,
-        std::string compartment, std::vector<const Variable *> *l) = 0;
+        std::string compartment, std::vector<const Variable *> *l) {
+        std::string nkey = var + "::" + compartment;
+        resolveMultiMatches(nkey, l);
+    }
+
     virtual void resolveRegularExpression(const std::string& var,
         std::string compartment,
-        std::vector<const Variable *> *l) = 0;
+        std::vector<const Variable *> *l) {
+        std::string nkey = var + "::" + compartment;
+        resolveRegularExpression(nkey, l);
+    }
+
 };
 
 }  // namespace collection

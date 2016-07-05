@@ -123,62 +123,6 @@ std::string* InMemoryPerProcess::resolveFirst(const std::string& var) {
 }
 
 
-void InMemoryPerProcess::store(std::string key, std::string compartment,
-    std::string value) {
-    std::string nkey = key + "::" + compartment;
-    store(nkey, value);
-}
-
-
-bool InMemoryPerProcess::storeOrUpdateFirst(const std::string &key,
-    std::string compartment, const std::string &value) {
-    std::string nkey = key + "::" + compartment;
-    return storeOrUpdateFirst(nkey, value);
-}
-
-
-bool InMemoryPerProcess::updateFirst(const std::string &key,
-    std::string compartment, const std::string &value) {
-    std::string nkey = key + "::" + compartment;
-    return updateFirst(nkey, value);
-}
-
-
-void InMemoryPerProcess::del(const std::string& key,
-    std::string compartment) {
-    std::string nkey = key + "::" + compartment;
-    del(nkey);
-}
-
-
-std::string* InMemoryPerProcess::resolveFirst(const std::string& var,
-    std::string compartment) {
-    std::string nkey = var + "::" + compartment;
-    return resolveFirst(nkey);
-}
-
-
-void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
-    std::string compartment, std::vector<const Variable *> *l) {
-    std::string nkey = var + "::" + compartment;
-    resolveSingleMatch(nkey, l);
-}
-
-
-void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
-    std::string compartment, std::vector<const Variable *> *l) {
-    std::string nkey = var + "::" + compartment;
-    resolveMultiMatches(nkey, l);
-}
-
-
-void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
-    std::string compartment, std::vector<const Variable *> *l) {
-    std::string nkey = var + "::" + compartment;
-    resolveRegularExpression(nkey, l);
-}
-
-
 }  // namespace backend
 }  // namespace collection
 }  // namespace modsecurity
