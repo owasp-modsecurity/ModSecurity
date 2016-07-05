@@ -12,6 +12,7 @@ benchmark_LDADD = \
 	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
 	$(PCRE_LDADD) \
 	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
+	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
 	$(LIBXML2_LDADD)
 
 benchmark_CPPFLAGS = \
@@ -19,8 +20,8 @@ benchmark_CPPFLAGS = \
 	-I$(top_builddir)/headers \
 	$(GLOBAL_CPPFLAGS) \
 	$(PCRE_CFLAGS) \
+	$(LMDB_CFLAGS) \
 	$(LIBXML2_CFLAGS)
-
 
 MAINTAINERCLEANFILES = \
         Makefile.in

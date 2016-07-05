@@ -200,7 +200,8 @@ UTILS = \
 
 COLLECTION = \
 	collection/collections.cc \
-	collection/backend/in_memory-per_process.cc
+	collection/backend/in_memory-per_process.cc \
+	collection/backend/lmdb.cc
 
 
 BODY_PROCESSORS = \
@@ -250,6 +251,7 @@ libmodsecurity_la_CPPFLAGS = \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(YAJL_CFLAGS) \
+	$(LMDB_CFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
@@ -260,6 +262,7 @@ libmodsecurity_la_LIBADD = \
 	@LEXLIB@ \
 	$(PCRE_LDADD) \
 	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
+	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
 	$(LIBXML2_LDADD) \
 	../others/libinjection.la \
 	libmbedtls.la

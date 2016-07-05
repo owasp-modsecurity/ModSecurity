@@ -94,6 +94,10 @@ PROG_GEOIP
 AM_CONDITIONAL([GEOIP_CFLAGS], [test "GEOIP_CFLAGS" != ""])
 
 
+# Check for LMDB
+PROG_LMDB
+AM_CONDITIONAL([LMDB_CFLAGS], [test "LMDB_CFLAGS" != ""])
+
 #
 # Check for curl
 #
@@ -370,6 +374,24 @@ if test "x$YAJL_FOUND" = "x1"; then
 fi
 if test "x$YAJL_FOUND" = "x2"; then
     echo "   + YAJL                                          ....disabled"
+fi
+
+
+## LMDB
+if test "x$LMDB_FOUND" = "x0"; then
+    echo "   + LMDB                                          ....not found"
+fi
+if test "x$LMDB_FOUND" = "x1"; then
+    echo -n "   + LMDB                                          ....found "
+    if ! test "x$LMDB_VERSION" = "x"; then
+        echo "v${LMDB_VERSION}"
+    else
+        echo ""
+    fi
+    echo "      ${LMDB_DISPLAY}"
+fi
+if test "x$LMDB_FOUND" = "x2"; then
+    echo "   + LMDB                                          ....disabled"
 fi
 
 
