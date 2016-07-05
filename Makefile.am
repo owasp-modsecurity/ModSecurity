@@ -36,6 +36,9 @@ MAINTAINERCLEANFILES = \
 	missing \
 	depcomp
 
+cppcheck:
+	cppcheck --suppressions-list=./test/cppcheck_suppressions.txt --enable=all --inconclusive --template="{file},{line},{severity},{id},{message}" -U YYSTYPE -U YY_USER_INIT --std=posix .
+
 @VALGRIND_CHECK_RULES@
 VALGRIND_SUPPRESSIONS_FILES = valgrind_suppressions.txt
 
