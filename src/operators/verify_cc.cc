@@ -85,9 +85,20 @@ bool VerifyCC::init(const std::string &param2, std::string *error) {
 
     m_pc = pcre_compile(param.c_str(), PCRE_DOTALL|PCRE_MULTILINE,
         &errptr, &erroffset, NULL);
-    m_pce = pcre_study(m_pc, PCRE_STUDY_JIT_COMPILE, &errptr);
+    if (m_pc == NULL) {
+        error->assign(errptr);
+        return false;
+    }
 
-    if ((m_pc == NULL) || (m_pce == NULL)) {
+    m_pce = pcre_study(m_pc, PCRE_STUDY_JIT_COMPILE, &errptr);
+    if (m_pce == NULL) {
+        if (errptr == NULL) {
+            /*
+             * Per pcre_study(3) m_pce == NULL && errptr == NULL means
+             * that no addional information is found, so no need to study
+             */
+            return true;
+        }
         error->assign(errptr);
         return false;
     }
