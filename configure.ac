@@ -278,13 +278,16 @@ AC_CONFIG_FILES([\
     doc/Makefile \
     src/Makefile \
     others/Makefile \
-    test/Makefile \
-    test/benchmark/Makefile \
-    test/fuzzer/Makefile \
     examples/Makefile \
     examples/simple_example_using_c/Makefile \
     examples/multiprocess_c/Makefile \
     ])
+
+AM_COND_IF([TEST_UTILITIES],
+       [AC_CONFIG_FILES([test/Makefile test/benchmark/Makefile])])
+
+AM_COND_IF([AFL_FUZZER],
+       [AC_CONFIG_FILES([test/fuzzer/Makefile])])
 
 AC_CONFIG_HEADERS([src/config.h])
 
