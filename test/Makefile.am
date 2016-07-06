@@ -25,8 +25,14 @@ noinst_PROGRAMS =
 
 noinst_PROGRAMS += unit_tests
 unit_tests_SOURCES = \
+        common/modsecurity_test.cc \
         unit/unit.cc \
         unit/unit_test.cc
+
+pkginclude_HEADERS = \
+       common/*.h \
+       unit/*.h \
+       regression/*.h
 
 unit_tests_LDADD = \
 	$(GLOBAL_LDADD) \
