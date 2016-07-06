@@ -20,6 +20,9 @@ MAINTAINERCLEANFILES = \
 bin_PROGRAMS =
 noinst_PROGRAMS =
 
+EXTRA_DIST = \
+	test-cases/*
+
 
 # unit_tests
 
