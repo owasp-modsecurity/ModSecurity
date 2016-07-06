@@ -28,7 +28,7 @@ unit_tests_SOURCES = \
         unit/unit.cc \
         unit/unit_test.cc
 
-pkginclude_HEADERS = \
+noinst_HEADERS = \
        common/modsecurity_test.cc \
        common/*.h \
        unit/*.h \

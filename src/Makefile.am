@@ -41,7 +41,16 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/modsecurity.h \
 	../headers/modsecurity/rule.h \
 	../headers/modsecurity/rules.h \
-	../headers/modsecurity/rules_properties.h \
+	../headers/modsecurity/rules_properties.h
+
+
+libmodsecurity_includesub_HEADERS = \
+	../headers/modsecurity/collection/collection.h \
+	../headers/modsecurity/collection/collections.h \
+	../headers/modsecurity/collection/variable.h
+
+
+noinst_HEADERS = \
 	actions/*.h \
 	actions/transformations/*.h \
 	audit_log/*.h \
@@ -55,14 +64,6 @@ pkginclude_HEADERS = \
 	variables/*.h \
 	variables/variations/*.h \
 	*.h
-
-
-libmodsecurity_includesub_HEADERS = \
-	../headers/modsecurity/collection/collection.h \
-	../headers/modsecurity/collection/collections.h \
-	../headers/modsecurity/collection/variable.h
-
-
 
 
 VARIABLES = \
