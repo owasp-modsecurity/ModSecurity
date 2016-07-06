@@ -41,7 +41,20 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/modsecurity.h \
 	../headers/modsecurity/rule.h \
 	../headers/modsecurity/rules.h \
-	../headers/modsecurity/rules_properties.h
+	../headers/modsecurity/rules_properties.h \
+	actions/*.h \
+	actions/transformations/*.h \
+	audit_log/*.h \
+	audit_log/writer/*.h \
+	collection/backend/*.h \
+	operators/*.h \
+	parser/*.h \
+	request_body_processor/*.h \
+	utils/*.h \
+	utils/mbedtls/*.h \
+	variables/*.h \
+	variables/variations/*.h \
+	*.h
 
 
 libmodsecurity_includesub_HEADERS = \
