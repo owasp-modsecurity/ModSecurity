@@ -62,49 +62,49 @@ class Collection {
 
     virtual void store(std::string key, std::string compartment,
         std::string value) {
-        std::string nkey = key + "::" + compartment;
+        std::string nkey = compartment + "::" + key;
         store(nkey, value);
     }
 
     virtual bool storeOrUpdateFirst(const std::string &key,
         std::string compartment, const std::string &value) {
-        std::string nkey = key + "::" + compartment;
+        std::string nkey = compartment + "::" + key;
         return storeOrUpdateFirst(nkey, value);
     }
 
     virtual bool updateFirst(const std::string &key, std::string compartment,
         const std::string &value) {
-        std::string nkey = key + "::" + compartment;
+        std::string nkey = compartment + "::" + key;
         return updateFirst(nkey, value);
     }
 
     virtual void del(const std::string& key, std::string compartment) {
-        std::string nkey = key + "::" + compartment;
+        std::string nkey = compartment + "::" + key;
         del(nkey);
     }
 
     virtual std::string* resolveFirst(const std::string& var,
         std::string compartment) {
-        std::string nkey = var + "::" + compartment;
+        std::string nkey = compartment + "::" + var;
         return resolveFirst(nkey);
     }
 
     virtual void resolveSingleMatch(const std::string& var,
         std::string compartment, std::vector<const Variable *> *l) {
-        std::string nkey = var + "::" + compartment;
+        std::string nkey = compartment + "::" + var;
         resolveSingleMatch(nkey, l);
     }
 
     virtual void resolveMultiMatches(const std::string& var,
         std::string compartment, std::vector<const Variable *> *l) {
-        std::string nkey = var + "::" + compartment;
+        std::string nkey = compartment + "::" + var;
         resolveMultiMatches(nkey, l);
     }
 
     virtual void resolveRegularExpression(const std::string& var,
         std::string compartment,
         std::vector<const Variable *> *l) {
-        std::string nkey = var + "::" + compartment;
+        std::string nkey = compartment + "::" + var;
         resolveRegularExpression(nkey, l);
     }
 

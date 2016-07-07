@@ -22,6 +22,7 @@
 
 #include "modsecurity/transaction.h"
 #include "variations/exclusion.h"
+#include "src/utils.h"
 
 using modsecurity::Variables::Variations::Exclusion;
 
@@ -37,12 +38,32 @@ Variable::Variable(std::string name)
     if (m_name.at(0) == '\\') {
         m_type = RegularExpression;
     } else if (m_name.find(":") != std::string::npos) {
+        std::string col = toupper(std::string(m_name, 0, m_name.find(":")));
+        if (col == "TX" || col == "IP" || col == "GLOBAL"
+            || col == "RESOURCE" || col == "SESSION") {
+            m_collectionName = col;
+        }
         m_type = SingleMatch;
     } else {
         m_type = MultipleMatches;
     }
 
-    if (m_name.find(".") != std::string::npos) {
+    if (tolower(m_name) == "tx") {
+        m_collectionName = "TX";
+        m_type = MultipleMatches;
+    } else if (tolower(m_name) == "ip") {
+        m_collectionName = "IP";
+        m_type = MultipleMatches;
+    } else if (tolower(m_name) == "global") {
+        m_collectionName = "GLOBAL";
+        m_type = MultipleMatches;
+    } else if (tolower(m_name) == "resource") {
+        m_collectionName = "RESOURCE";
+        m_type = MultipleMatches;
+    } else if (tolower(m_name) == "session") {
+        m_collectionName = "SESSION";
+        m_type = MultipleMatches;
+    } else if (m_name.find(".") != std::string::npos) {
         m_kind = CollectionVarible;
         m_collectionName = std::string(m_name, 0, m_name.find("."));
     } else {
@@ -60,12 +81,32 @@ Variable::Variable(std::string name, VariableKind kind)
     if (m_name.at(0) == '\\') {
         m_type = RegularExpression;
     } else if (m_name.find(":") != std::string::npos) {
+        std::string col = toupper(std::string(m_name, 0, m_name.find(":")));
+        if (col == "TX" || col == "IP" || col == "GLOBAL"
+            || col == "RESOURCE" || col == "SESSION") {
+            m_collectionName = col;
+        }
         m_type = SingleMatch;
     } else {
         m_type = MultipleMatches;
     }
 
-    if (m_name.find(".") != std::string::npos) {
+    if (tolower(m_name) == "tx") {
+        m_collectionName = "TX";
+        m_type = MultipleMatches;
+    } else if (tolower(m_name) == "ip") {
+        m_collectionName = "IP";
+        m_type = MultipleMatches;
+    } else if (tolower(m_name) == "global") {
+        m_collectionName = "GLOBAL";
+        m_type = MultipleMatches;
+    } else if (tolower(m_name) == "resource") {
+        m_collectionName = "RESOURCE";
+        m_type = MultipleMatches;
+    } else if (tolower(m_name) == "session") {
+        m_collectionName = "SESSION";
+        m_type = MultipleMatches;
+    } else if (m_name.find(".") != std::string::npos) {
         m_collectionName = std::string(m_name, 0, m_name.find("."));
     }
 }
