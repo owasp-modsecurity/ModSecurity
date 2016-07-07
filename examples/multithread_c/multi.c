@@ -17,42 +17,45 @@
 #include <modsecurity/transaction.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/wait.h>
 
-#define SHM_SIZE 1024
-#define FORKS 10
-#define TRHREADS 10
+
+#define FORKS 5
+#define REQUESTS_PER_PROCESS 100
 
 
 char main_rule_uri[] = "basic_rules.conf";
 Rules *rules = NULL;
 ModSecurity *modsec = NULL;
 
-key_t key;
 
+void process_special_request (int j) {
+    Transaction *transaction = NULL;
+    transaction = msc_new_transaction(modsec, rules, NULL);
 
-void process_request (void *ptr)
-{
-    int i;
-    for (i = 0; i < TRHREADS; i++) {
+    msc_process_connection(transaction, "127.0.0.1", 12345, "127.0.0.1", 80);
+    msc_process_uri(transaction,
+        "http://www.modsecurity.org/test?foo=herewego",
+        "GET", "1.1");
+    msc_add_request_header(transaction, "User-Agent",
+        "Basic ModSecurity example");
+    msc_process_request_headers(transaction);
+    msc_process_request_body(transaction);
+    msc_add_response_header(transaction, "Content-type", "text/html");
+    msc_process_response_headers(transaction, 200, "HTTP 1.0");
+    msc_process_response_body(transaction);
+    msc_process_logging(transaction);
+    msc_transaction_cleanup(transaction);
+}
+
+void process_request (int j) {
+    for (int i = 0; i < REQUESTS_PER_PROCESS; i++) {
+        if (i == 1 && j == 1) {
+            process_special_request(j);
+            continue;
+        }
         struct timeval tv;
-
-        int shmid = shmget(key, SHM_SIZE, 0644 | IPC_CREAT);
-        char *data;
-        int *j;
-        data = shmat(shmid, (void *)0, 0);
-        j = (int *)data;
-        (*j)++;
-
 
         Transaction *transaction = NULL;
         transaction = msc_new_transaction(modsec, rules, NULL);
@@ -70,8 +73,9 @@ void process_request (void *ptr)
         msc_process_response_body(transaction);
         msc_process_logging(transaction);
         msc_transaction_cleanup(transaction);
-        tv.tv_sec = 0;
-        tv.tv_usec = 1000;
+
+        tv.tv_sec = 1;
+        tv.tv_usec = 500;
         select(0, NULL, NULL, NULL, &tv);
     }
 }
@@ -81,21 +85,11 @@ int main (int argc, char **argv)
 {
     int ret = 1;
     const char *error = NULL;
-    pthread_t thread[TRHREADS*FORKS];
     int i = 0;
     pid_t pid;
-    int shmid;
-    int h;
-    
+    int f;
+
     modsec = msc_init();
-
-    key = ftok("shmdemo.c", 'R');
-
-    shmid = shmget(key, SHM_SIZE, 0644 | IPC_CREAT);
-    char *data = shmat(shmid, (void *)0, 0);
-    memset(data, '\0', SHM_SIZE);
-    int *z = (int *) data;
-    z = 0;
 
     msc_set_connector_info(modsec, "ModSecurity-test v0.0.1-alpha (Simple " \
         "example on how to use ModSecurity API");
@@ -111,21 +105,20 @@ int main (int argc, char **argv)
 
     msc_rules_dump(rules);
 
-    for (h = 0; h < FORKS; h++) {
+    for (f = 0; f < FORKS; f++) {
         pid = fork();
         if (pid == 0) {
-            pthread_create (&thread[h*TRHREADS], NULL, (void *) &process_request, (void *) NULL);
-            pthread_join(thread[h*TRHREADS], NULL);
+            process_request(f);
             goto child;
         }
+        struct timeval tv;
+
+        tv.tv_sec = 0;
+        tv.tv_usec = 500;
+        select(0, NULL, NULL, NULL, &tv);
     }
 
     wait(NULL);
-
-    int *j;
-    data = shmat(shmid, (void *)0, 0);
-    j = (int *) data;
-    fprintf(stderr, "The final count is: %d\n", *j);
 
 child:
 
