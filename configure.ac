@@ -283,7 +283,7 @@ AC_CONFIG_FILES([\
     test/fuzzer/Makefile \
     examples/Makefile \
     examples/simple_example_using_c/Makefile \
-    examples/multithread_c/Makefile \
+    examples/multiprocess_c/Makefile \
     ])
 
 AC_CONFIG_HEADERS([src/config.h])
