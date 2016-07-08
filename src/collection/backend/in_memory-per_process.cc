@@ -25,6 +25,7 @@
 
 #include "modsecurity/collection/variable.h"
 #include "src/utils.h"
+#include "src/utils/regex.h"
 
 namespace modsecurity {
 namespace collection {
@@ -108,7 +109,37 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
 
 void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
     std::vector<const Variable *> *l) {
-    /* Not ready */
+
+    if (var.find(":") == std::string::npos) {
+        return;
+    }
+    if (var.size() < var.find(":") + 3) {
+        return;
+    }
+    std::string col = std::string(var, 0, var.find(":"));
+    std::string name = std::string(var, var.find(":") + 2, var.size() - var.find(":") - 3);
+    size_t keySize = col.size();
+    Utils::Regex r = Utils::Regex(name);
+
+    for (const auto& x : *this) {
+        if (x.first.size() <= keySize + 1) {
+            continue;
+        }
+        if (x.first.at(keySize) != ':') {
+            continue;
+        }
+        if (std::string(x.first, 0, keySize) != col) {
+            continue;
+        }
+        std::string content = std::string(x.first, keySize + 1,
+                                          x.first.size() - keySize - 1);
+        int ret = Utils::regex_search(content, r);
+        if (ret <= 0) {
+            continue;
+        }
+
+        l->insert(l->begin(), new Variable(x.first, x.second));
+    }
 }
 
 

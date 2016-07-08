@@ -35,15 +35,18 @@ Variable::Variable(std::string name)
     m_collectionName(""),
     m_isExclusion(false),
     m_isCount(false) {
-    if (m_name.at(0) == '\\') {
-        m_type = RegularExpression;
-    } else if (m_name.find(":") != std::string::npos) {
+    if (m_name.find(":") != std::string::npos) {
         std::string col = toupper(std::string(m_name, 0, m_name.find(":")));
+        std::string name = std::string(m_name, m_name.find(":") + 1, m_name.size());
         if (col == "TX" || col == "IP" || col == "GLOBAL"
             || col == "RESOURCE" || col == "SESSION") {
             m_collectionName = col;
         }
-        m_type = SingleMatch;
+        if ((name.at(0) == '\\') || (name.at(0) == '/')) {
+            m_type = RegularExpression;
+        } else {
+            m_type = SingleMatch;
+        }
     } else {
         m_type = MultipleMatches;
     }
@@ -78,15 +81,18 @@ Variable::Variable(std::string name, VariableKind kind)
     m_kind(kind),
     m_isExclusion(false),
     m_isCount(false) {
-    if (m_name.at(0) == '\\') {
-        m_type = RegularExpression;
-    } else if (m_name.find(":") != std::string::npos) {
+    if (m_name.find(":") != std::string::npos) {
         std::string col = toupper(std::string(m_name, 0, m_name.find(":")));
+        std::string name = std::string(m_name, m_name.find(":") + 1, m_name.size());
         if (col == "TX" || col == "IP" || col == "GLOBAL"
             || col == "RESOURCE" || col == "SESSION") {
             m_collectionName = col;
         }
-        m_type = SingleMatch;
+        if ((name.at(0) == '\\') || (name.at(0) == '/')) {
+            m_type = RegularExpression;
+        } else {
+            m_type = SingleMatch;
+        }
     } else {
         m_type = MultipleMatches;
     }
@@ -127,8 +133,7 @@ void Variable::evaluateInternal(Transaction *transaction,
         if (m_kind == CollectionVarible && m_type == MultipleMatches) {
             transaction->m_collections.resolveMultiMatches(m_name,
                 m_collectionName, l);
-        } else if (m_kind == CollectionVarible
-            && m_type == RegularExpression) {
+        } else if (m_type == RegularExpression) {
             transaction->m_collections.resolveRegularExpression(m_name,
                 m_collectionName, l);
         } else {
@@ -138,8 +143,7 @@ void Variable::evaluateInternal(Transaction *transaction,
     } else {
         if (m_kind == CollectionVarible && m_type == MultipleMatches) {
             transaction->m_collections.resolveMultiMatches(m_name, l);
-        } else if (m_kind == CollectionVarible
-            && m_type == RegularExpression) {
+        } else if (m_type == RegularExpression) {
             transaction->m_collections.resolveRegularExpression(m_name, l);
         } else {
             transaction->m_collections.resolveSingleMatch(m_name, l);
