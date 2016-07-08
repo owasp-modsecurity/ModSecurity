@@ -51,6 +51,7 @@ class Collection {
     virtual void del(const std::string& key) = 0;
 
     virtual std::string* resolveFirst(const std::string& var) = 0;
+    virtual std::string resolveFirstCopy(const std::string& var) = 0;
 
     virtual void resolveSingleMatch(const std::string& var,
         std::vector<const Variable *> *l) = 0;
@@ -89,6 +90,12 @@ class Collection {
         return resolveFirst(nkey);
     }
 
+    virtual std::string resolveFirstCopy(const std::string& var,
+        std::string compartment) {
+        std::string nkey = compartment + "::" + var;
+        return resolveFirstCopy(nkey);
+    }
+
     virtual void resolveSingleMatch(const std::string& var,
         std::string compartment, std::vector<const Variable *> *l) {
         std::string nkey = compartment + "::" + var;
@@ -102,12 +109,10 @@ class Collection {
     }
 
     virtual void resolveRegularExpression(const std::string& var,
-        std::string compartment,
-        std::vector<const Variable *> *l) {
+        std::string compartment, std::vector<const Variable *> *l) {
         std::string nkey = compartment + "::" + var;
         resolveRegularExpression(nkey, l);
     }
-
 };
 
 }  // namespace collection

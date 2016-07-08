@@ -109,14 +109,14 @@ bool SetVar::evaluate(Rule *rule, Transaction *transm_parser_payload) {
         }
 
         try {
-            std::string *resolvedValue =
-                transm_parser_payload->m_collections.resolveFirst(
+            std::string resolvedValue =
+                transm_parser_payload->m_collections.resolveFirstCopy(
                     m_collectionName,
                     m_variableNameExpanded);
-            if (resolvedValue == NULL) {
+            if (resolvedValue.empty()) {
                 value = 0;
             } else {
-                value = stoi(*resolvedValue);
+                value = stoi(resolvedValue);
             }
         } catch (...) {
             value = 0;

@@ -123,6 +123,17 @@ std::string* InMemoryPerProcess::resolveFirst(const std::string& var) {
 }
 
 
+std::string InMemoryPerProcess::resolveFirstCopy(const std::string& var) {
+    auto range = equal_range(var);
+
+    for (auto it = range.first; it != range.second; ++it) {
+        return it->second;
+    }
+
+    return "";
+}
+
+
 }  // namespace backend
 }  // namespace collection
 }  // namespace modsecurity

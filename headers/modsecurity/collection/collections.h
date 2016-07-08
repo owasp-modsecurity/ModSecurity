@@ -59,6 +59,9 @@ class Collections :
     std::string* resolveFirst(const std::string& var);
     std::string* resolveFirst(const std::string& collectionName,
         const std::string& var);
+    std::string resolveFirstCopy(const std::string& var);
+    std::string resolveFirstCopy(const std::string& collectionName,
+        const std::string& var);
 
     void resolveSingleMatch(const std::string& var,
         std::vector<const Variable *> *l);
