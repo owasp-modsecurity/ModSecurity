@@ -4,7 +4,7 @@
     "version_min":300000,
     "title":"Testing setuid action",
     "expected":{
-      "debug_log": "Saving variable: USER:score with value: 5"
+      "debug_log": "Saving variable: USER:score with value: "
     },
     "client":{
       "ip":"200.249.12.31",

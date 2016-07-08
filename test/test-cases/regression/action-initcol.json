@@ -4,7 +4,7 @@
     "version_min":300000,
     "title":"Testing initcol action",
     "expected":{
-      "debug_log": "Saving variable: IP:auth_attempt with value: 3"
+      "debug_log": "Saving variable: IP:auth_attempt with value: "
     },
     "client":{
       "ip":"200.249.12.31",

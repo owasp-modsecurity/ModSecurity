@@ -24,6 +24,11 @@
 #endif
 
 #include <lmdb.h>
+#include <semaphore.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <pthread.h>
 
 #include "modsecurity/collection/variable.h"
 #include "modsecurity/collection/collection.h"
@@ -61,10 +66,10 @@ class LMDB :
         std::vector<const Variable *> *l) override;
 
  private:
-    MDB_env *m_env;
-    MDB_dbi m_dbi;
-    MDB_txn *m_txn;
+    void string2val(const std::string& str, MDB_val *val);
+    void inline lmdb_debug(int rc, std::string op, std::string scope);
 
+    MDB_env *m_env;
 };
 
 }  // namespace backend

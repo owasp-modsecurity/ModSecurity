@@ -19,6 +19,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rule.h"
 #include "src/collection/backend/in_memory-per_process.h"
+#include "src/collection/backend/lmdb.h"
 #include "src/config.h"
 #include "src/unique_id.h"
 #ifdef MSC_WITH_CURL
@@ -46,11 +47,19 @@ namespace modsecurity {
  */
 ModSecurity::ModSecurity()
     : m_connector(""),
+#ifdef WITH_LMDB
+    m_global_collection(new collection::backend::LMDB()),
+    m_resource_collection(new collection::backend::LMDB()),
+    m_ip_collection(new collection::backend::LMDB()),
+    m_session_collection(new collection::backend::LMDB()),
+    m_user_collection(new collection::backend::LMDB()),
+#else
     m_global_collection(new collection::backend::InMemoryPerProcess()),
     m_resource_collection(new collection::backend::InMemoryPerProcess()),
     m_ip_collection(new collection::backend::InMemoryPerProcess()),
     m_session_collection(new collection::backend::InMemoryPerProcess()),
     m_user_collection(new collection::backend::InMemoryPerProcess()),
+#endif
     m_logCb(NULL) {
     UniqueId::uniqueId();
     srand(time(NULL));
