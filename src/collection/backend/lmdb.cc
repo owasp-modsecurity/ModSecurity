@@ -35,7 +35,7 @@ namespace backend {
 
 LMDB::LMDB() : m_env(NULL) {
     mdb_env_create(&m_env);
-    mdb_env_open(m_env, "./testdb", MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
+    mdb_env_open(m_env, "./modsec-shared-collections", MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
 }
 
 
