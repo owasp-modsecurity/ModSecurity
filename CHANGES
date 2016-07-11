@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Fix file upload JSON audit log entry
+   [Issue #1181 and #1173 - Robert Paprocki and Christian Folini]
  * configure: Fix detection whether libcurl is linked against gnutls and,
    move verbose_output declaration up to the beginning.
    [Issue #1158 - Thomas Deutschmann (@Whissi)]
