@@ -23,6 +23,7 @@
 
 #include "modsecurity/collection/variable.h"
 #include "src/utils.h"
+#include "src/utils/regex.h"
 
 #undef LMDB_STDOUT_COUT
 
@@ -555,6 +556,92 @@ end_txn:
 
 void LMDB::resolveRegularExpression(const std::string& var,
     std::vector<const Variable *> *l) {
+    MDB_val key, data;
+    MDB_txn *txn = NULL;
+    MDB_dbi dbi;
+    int rc;
+    MDB_stat mst;
+    MDB_cursor *cursor;
+    size_t pos = std::string::npos;
+
+    pos = var.find(":");
+    if (pos == std::string::npos) {
+        return;
+    }
+    if (var.size() < pos + 3) {
+        return;
+    }
+    pos = var.find(":", pos + 2);
+    if (pos == std::string::npos) {
+        return;
+    }
+    if (var.size() < pos + 3) {
+        return;
+    }
+
+    std::string nameSpace = std::string(var, 0, pos);
+    size_t pos2 = var.find(":", pos + 1) - pos - 1;
+    std::string col = std::string(var, pos + 1, pos2);
+    pos = pos2 + pos + 3;
+    pos2 = var.size() - pos2 - pos;
+    std::string name = std::string(var, pos, pos2);
+
+    size_t keySize = nameSpace.size();
+    Utils::Regex r = Utils::Regex(name);
+
+    rc = mdb_txn_begin(m_env, NULL, 0, &txn);
+    lmdb_debug(rc, "txn", "resolveRegularExpression");
+    if (rc != 0) {
+        goto end_txn;
+    }
+
+    rc = mdb_dbi_open(txn, NULL, MDB_CREATE | MDB_DUPSORT, &dbi);
+    lmdb_debug(rc, "dbi", "resolveRegularExpression");
+    if (rc != 0) {
+        goto end_dbi;
+    }
+
+    rc = mdb_cursor_open(txn, dbi, &cursor);
+    lmdb_debug(rc, "cursor_open", "resolveRegularExpression");
+    if (rc != 0) {
+        goto end_cursor_open;
+    }
+
+    std::cout << std::endl;
+    while ((rc = mdb_cursor_get(cursor, &key, &data, MDB_NEXT)) == 0) {
+        if (key.mv_size <= keySize) {
+            continue;
+        }
+        char *a = reinterpret_cast<char *>(key.mv_data);
+        if (a[keySize] != ':') {
+            continue;
+        }
+        std::string ns = std::string(a, keySize);
+        if (ns != nameSpace) {
+            continue;
+        }
+
+        std::string content = std::string(a, keySize + 1,
+            key.mv_size - keySize - 1);
+
+        int ret = Utils::regex_search(content, r);
+        if (ret <= 0) {
+            continue;
+        }
+
+        l->insert(l->begin(), new Variable(
+            std::string(reinterpret_cast<char *>(key.mv_data), key.mv_size),
+            std::string(reinterpret_cast<char *>(data.mv_data),
+                        data.mv_size)));
+    }
+
+    mdb_cursor_close(cursor);
+end_cursor_open:
+    mdb_dbi_close(m_env, dbi);
+end_dbi:
+    mdb_txn_abort(txn);
+end_txn:
+    return;
 }
 
 
