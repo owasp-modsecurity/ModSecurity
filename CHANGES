@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Fix status failing to report in Nginx auditlogs
+   [Issue #977, #1171 - @charlymps and Chaim Sanders]
  * Fix file upload JSON audit log entry
    [Issue #1181 and #1173 - Robert Paprocki and Christian Folini]
  * configure: Fix detection whether libcurl is linked against gnutls and,
