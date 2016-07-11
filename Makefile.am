@@ -18,23 +18,26 @@ ACLOCAL_AMFLAGS = -I build
 
 # make maintainer-clean
 MAINTAINERCLEANFILES = \
-	Makefile.in \
 	aclocal.m4 \
 	ar-lib \
 	build/libtool.m4 \
+	build/lt~obsolete.m4 \
 	build/ltoptions.m4 \
 	build/ltsugar.m4 \
 	build/ltversion.m4 \
-	build/lt~obsolete.m4 \
 	compile \
 	config.guess \
 	config.sub \
 	configure \
+	depcomp \
 	install-sh \
 	ltmain.sh \
-	ylwrap \
+	Makefile.in \
 	missing \
-	depcomp
+	test/modsec-shared-collections \
+	test/modsec-shared-collections-lock \
+	ylwrap
+
 
 cppcheck:
 	cppcheck --suppressions-list=./test/cppcheck_suppressions.txt --enable=all --inconclusive --template="{file},{line},{severity},{id},{message}" -U YYSTYPE -U YY_USER_INIT --std=posix .
