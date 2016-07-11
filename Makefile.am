@@ -36,8 +36,10 @@ MAINTAINERCLEANFILES = \
 	missing \
 	test/modsec-shared-collections \
 	test/modsec-shared-collections-lock \
+	test-suite-drd.log \
+	test-suite-helgrind.log \
+	test-suite-memcheck.log \
 	ylwrap
-
 
 cppcheck:
 	cppcheck --suppressions-list=./test/cppcheck_suppressions.txt --enable=all --inconclusive --template="{file},{line},{severity},{id},{message}" -U YYSTYPE -U YY_USER_INIT --std=posix .
