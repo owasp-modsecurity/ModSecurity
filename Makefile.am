@@ -42,7 +42,15 @@ MAINTAINERCLEANFILES = \
 	ylwrap
 
 cppcheck:
-	cppcheck --suppressions-list=./test/cppcheck_suppressions.txt --enable=all --inconclusive --template="{file},{line},{severity},{id},{message}" -U YYSTYPE -U YY_USER_INIT --std=posix .
+	cppcheck \
+		--suppressions-list=./test/cppcheck_suppressions.txt \
+		--enable=all \
+		--inconclusive \
+		--template="{file},{line},{severity},{id},{message}" \
+		-U YYSTYPE \
+		-U YY_USER_INIT \
+		--std=posix . 2> cppcheck.txt
+	cat cppcheck.txt
 
 @VALGRIND_CHECK_RULES@
 VALGRIND_SUPPRESSIONS_FILES = valgrind_suppressions.txt
