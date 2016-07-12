@@ -50,7 +50,9 @@ void process_special_request (int j) {
 }
 
 void process_request (int j) {
-    for (int i = 0; i < REQUESTS_PER_PROCESS; i++) {
+    int i;
+    
+    for (i = 0; i < REQUESTS_PER_PROCESS; i++) {
         if (i == 1 && j == 1) {
             process_special_request(j);
             continue;
