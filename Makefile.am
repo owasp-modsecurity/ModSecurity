@@ -25,10 +25,12 @@ MAINTAINERCLEANFILES = \
 	build/ltoptions.m4 \
 	build/ltsugar.m4 \
 	build/ltversion.m4 \
+	coding-style.txt \
 	compile \
 	config.guess \
 	config.sub \
 	configure \
+	cppcheck.txt \
 	depcomp \
 	install-sh \
 	ltmain.sh \
@@ -51,6 +53,17 @@ cppcheck:
 		-U YY_USER_INIT \
 		--std=posix . 2> cppcheck.txt
 	cat cppcheck.txt
+
+check-style: check-coding-style
+
+check-coding-style:
+	-cpplint.py \
+		$$(find . -name "*.h" -o -name "*.cc" | xargs) 2>&1 \
+ 		| egrep -v $$(echo -n "catchall" ; \
+	  		for i in $$(cat test/coding_style_suppressions.txt); do echo -n "|"$$i; done) \
+		| sed 's/^\./warning: ./g' > coding-style.txt
+	-cat coding-style.txt
+
 
 @VALGRIND_CHECK_RULES@
 VALGRIND_SUPPRESSIONS_FILES = valgrind_suppressions.txt
