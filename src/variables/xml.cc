@@ -50,7 +50,6 @@ void XML::evaluateInternal(Transaction *t,
     xmlXPathContextPtr xpathCtx;
     xmlXPathObjectPtr xpathObj;
     xmlNodeSetPtr nodes;
-    std::string key;
     std::string param;
     const xmlChar* xpathExpr = NULL;
     int i;
@@ -58,10 +57,8 @@ void XML::evaluateInternal(Transaction *t,
 
     pos = m_name.find_first_of(":");
     if (pos == std::string::npos) {
-        key = std::string(m_name, 0);
         param = "";
     } else {
-        key = std::string(m_name, 0, pos);
         param = std::string(m_name, pos+1, m_name.length() - (pos + 1));
     }
 

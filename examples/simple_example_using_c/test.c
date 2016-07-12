@@ -24,7 +24,7 @@ char main_rule_uri[] = "basic_rules.conf";
 
 int main (int argc, char **argv)
 {
-    int ret = 1;
+    int ret;
     const char *error = NULL;
     ModSecurity *modsec = NULL;
     Transaction *transaction = NULL;

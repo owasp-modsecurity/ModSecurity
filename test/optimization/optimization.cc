@@ -55,6 +55,7 @@ int main(int argc, char **argv) {
         if (modsecRules->loadFromUri(x.c_str()) < 0) {
             std::cout << "Not able to load the rules" << std::endl;
             std::cout << modsecRules->getParserError() << std::endl;
+            delete modsecRules;
             return -1;
         }
     }
@@ -145,7 +146,7 @@ int main(int argc, char **argv) {
     std::cout << std::endl;
     std::cout << std::endl;
 
-
+    delete modsecRules;
 
     return 0;
 }

@@ -310,7 +310,9 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
         }
 #endif
 
+#if 0
 end:
+#endif
         modsec_transaction->processLogging();
 
         CustomDebugLog *d = reinterpret_cast<CustomDebugLog *>
@@ -416,7 +418,7 @@ int main(int argc, char **argv) {
     for (std::string &a : keyList) {
         test_number++;
         if ((test.m_test_number == 0)
-            || (test.m_test_number != 0 && test_number == test.m_test_number)) {
+            || (test_number == test.m_test_number)) {
             std::vector<RegressionTest *> *tests = test[a];
             perform_unit_test(&test, tests, &res, &counter);
         }

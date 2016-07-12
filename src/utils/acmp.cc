@@ -39,7 +39,7 @@ char *parse_pm_content(const char *op_parm, unsigned short int op_len, const cha
     char *parm = NULL;
     char *content = NULL;
     unsigned short int offset = 0;
-    char converted = 0;
+//    char converted = 0;
     int i, x;
     unsigned char bin = 0, esc = 0, bin_offset = 0;
     unsigned char bin_parm[3], c = 0;
@@ -84,6 +84,7 @@ char *parse_pm_content(const char *op_parm, unsigned short int op_len, const cha
 
     if (op_len == 0)   {
         *error_msg = "Content length is 0.";
+        free(parm);
         return NULL;
     }
 
@@ -116,7 +117,7 @@ char *parse_pm_content(const char *op_parm, unsigned short int op_len, const cha
                         bin_offset = 0;
                         parm[x] = c;
                         x++;
-                        converted = 1;
+                        //converted = 1;
                     }
                 } else if (parm[i] == ' ') {
                 }
@@ -133,7 +134,7 @@ char *parse_pm_content(const char *op_parm, unsigned short int op_len, const cha
                     return NULL;
                 }
                 esc = 0;
-                converted = 1;
+                //converted = 1;
             } else {
                 parm[x] = parm[i];
                 x++;
@@ -141,9 +142,11 @@ char *parse_pm_content(const char *op_parm, unsigned short int op_len, const cha
         }
     }
 
+#if 0
     if (converted) {
         op_len = x;
     }
+#endif
 
     //processed = memcpy(processed, parm, op_len);
     processed = strdup(parm);
@@ -188,11 +191,8 @@ static void acmp_strtoucs(ACMP *parser, const char *str, long *ucs_chars, int le
     int i;
     const char *c = str;
 
-
-    {
-        for (i = 0; i < len; i++) {
-            *(ucs_chars++) = *(c++);
-        }
+    for (i = 0; i < len; i++) {
+        *(ucs_chars++) = *(c++);
     }
 }
 
@@ -295,7 +295,7 @@ static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
     int left = 0, right = 0;
     if ((pos - lb) > 1) {
         left = lb + (pos - lb) / 2;
-        node->left =(acmp_btree_node_t *) calloc(1, sizeof(acmp_btree_node_t));
+        node->left = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
         /* ENH: Check alloc succeded */
         node->left->node = nodes[left];
         node->left->letter = nodes[left]->letter;
@@ -305,7 +305,7 @@ static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
     }
     if ((rb - pos) > 1) {
         right = pos + (rb - pos) / 2;
-        node->right = (acmp_btree_node_t *)calloc(1, sizeof(acmp_btree_node_t));
+        node->right = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
         /* ENH: Check alloc succeded */
         node->right->node = nodes[right];
         node->right->letter = nodes[right]->letter;
@@ -355,7 +355,7 @@ static void acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
             nodes[j] = tmp;
         }
         if (node->btree) { free (node->btree);  node->btree = NULL; }
-    node->btree = (acmp_btree_node_t *)calloc(1, sizeof(acmp_btree_node_t));
+    node->btree = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
     /* ENH: Check alloc succeded */
     pos = count / 2;
     node->btree->node = nodes[pos];
@@ -433,13 +433,12 @@ static int acmp_connect_fail_branches(ACMP *parser) {
  * flags - OR-ed values of ACMP_FLAG constants
  */
 ACMP *acmp_create(int flags) {
-    int rc;
     ACMP *parser;
 
-    parser = (ACMP *)calloc(1, sizeof(ACMP));
+    parser = reinterpret_cast<ACMP *>(calloc(1, sizeof(ACMP)));
     /* ENH: Check alloc succeded */
     parser->is_case_sensitive = (flags & ACMP_FLAG_CASE_SENSITIVE) == 0 ? 0 : 1;
-    parser->root_node = (acmp_node_t *)calloc(1, sizeof(acmp_node_t));
+    parser->root_node = reinterpret_cast<acmp_node_t *>(calloc(1, sizeof(acmp_node_t)));
     /* ENH: Check alloc succeded */
     return parser;
 }
@@ -494,7 +493,7 @@ if (parser->is_active != 0) return -1;
         }
         child = acmp_child_for_code(parent, letter);
         if (child == NULL) {
-            child = (acmp_node_t *) calloc(1, sizeof(acmp_node_t));
+            child = reinterpret_cast<acmp_node_t *>(calloc(1, sizeof(acmp_node_t)));
             /* ENH: Check alloc succeded */
             child->pattern = (char *)"";
             child->letter = letter;
@@ -537,7 +536,7 @@ int acmp_process_quick(ACMPT *acmpt, const char **match, const char *data, size_
 
     parser = acmpt->parser;
     if (acmpt->ptr == NULL) acmpt->ptr = parser->root_node;
-    node = (acmp_node_t *)acmpt->ptr;
+    node = reinterpret_cast<acmp_node_t *>(acmpt->ptr);
     end = data + len;
 
     while (data < end) {

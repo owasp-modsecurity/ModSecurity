@@ -148,7 +148,7 @@ void Base64::decode_forgiven_engine(unsigned char *plain_text,
         }
 
         ch = b64_reverse_t[ch];
-        if (ch < 0 || ch == -1) {
+        if (ch < 0) {
             continue;
         } else if (ch == -2) {
             *aiming_size = 0;

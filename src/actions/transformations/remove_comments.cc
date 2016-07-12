@@ -47,14 +47,12 @@ std::string RemoveComments::evaluate(std::string value,
 
     u_int64_t input_len = value.size();
     u_int64_t i, j, incomment;
-    int changed = 0;
 
     i = j = incomment = 0;
     while (i < input_len) {
         if (incomment == 0) {
             if ((input[i] == '/') && (i + 1 < input_len)
                 && (input[i + 1] == '*')) {
-                changed = 1;
                 incomment = 1;
                 i += 2;
             } else if ((input[i] == '<') && (i + 1 < input_len)
@@ -62,15 +60,12 @@ std::string RemoveComments::evaluate(std::string value,
                 && (input[i+2] == '-') && (i + 3 < input_len)
                 && (input[i + 3] == '-') && (incomment == 0)) {
                 incomment = 1;
-                changed = 1;
                 i += 4;
             } else if ((input[i] == '-') && (i + 1 < input_len)
                 && (input[i + 1] == '-') && (incomment == 0)) {
-                changed = 1;
                 input[i] = ' ';
                 break;
             } else if (input[i] == '#' && (incomment == 0)) {
-                changed = 1;
                 input[i] = ' ';
                 break;
             } else {

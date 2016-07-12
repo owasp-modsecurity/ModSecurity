@@ -59,10 +59,10 @@ std::string Utf8ToUnicode::evaluate(std::string value,
 
 char *Utf8ToUnicode::inplace(unsigned char *input,
     uint64_t input_len, int *changed) {
-    int unicode_len = 0, length = 0;
-    unsigned int d = 0, count = 0;
-    unsigned char c, *utf;
-    char *rval, *data;
+    int length = 0;
+    unsigned int count = 0;
+    unsigned char c;
+    char *data;
     unsigned int i, len, j;
     unsigned int bytes_left = input_len;
     unsigned char unicode[8];
@@ -75,12 +75,14 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
     }
 
     if (input == NULL) {
+        free(data);
         return NULL;
     }
 
     for (i = 0; i < bytes_left;)  {
-        unicode_len = 0; d = 0;
-        utf = (unsigned char *)&input[i];
+        int unicode_len = 0;
+        unsigned int d = 0;
+        unsigned char *utf = (unsigned char *)&input[i];
 
         c = *utf;
 
@@ -293,7 +295,7 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
 
     *data ='\0';
 
-    return NULL;
+    return data;
 }
 
 

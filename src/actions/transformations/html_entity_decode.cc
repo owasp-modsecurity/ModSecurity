@@ -100,9 +100,8 @@ int HtmlEntityDecode::inplace(unsigned char *input, u_int64_t input_len) {
                     if (j > k) { /* Do we have at least one digit? */
                         /* Decode the entity. */
                         char *x = NULL;
-                        x = reinterpret_cast<char *>(malloc(sizeof(char) *
+                        x = reinterpret_cast<char *>(calloc(sizeof(char),
                             ((j - k) + 1)));
-                        memset(x, '\0', (j - k) + 1);
                         memcpy(x, (const char *)&input[k], j - k);
                         *d++ = (unsigned char)strtol(x, NULL, 16);
                         free(x);
@@ -127,9 +126,8 @@ int HtmlEntityDecode::inplace(unsigned char *input, u_int64_t input_len) {
                     if (j > k) { /* Do we have at least one digit? */
                         /* Decode the entity. */
                         char *x = NULL;
-                        x = reinterpret_cast<char *>(malloc(sizeof(char) *
+                        x = reinterpret_cast<char *>(calloc(sizeof(char),
                             ((j - k) + 1)));
-                        memset(x, '\0', (j - k) + 1);
                         memcpy(x, (const char *)&input[k], j - k);
                         *d++ = (unsigned char)strtol(x, NULL, 10);
                         free(x);
@@ -154,9 +152,8 @@ int HtmlEntityDecode::inplace(unsigned char *input, u_int64_t input_len) {
                 }
                 if (j > k) { /* Do we have at least one digit? */
                     char *x = NULL;
-                    x = reinterpret_cast<char *>(malloc(sizeof(char) *
+                    x = reinterpret_cast<char *>(calloc(sizeof(char),
                         ((j - k) + 1)));
-                    memset(x, '\0', (j - k) + 1);
                     memcpy(x, (const char *)&input[k], j - k);
 
                     /* Decode the entity. */

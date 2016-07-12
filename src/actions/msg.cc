@@ -47,9 +47,8 @@ namespace actions {
 
 
 bool Msg::evaluate(Rule *rule, Transaction *transaction) {
-    std::string msg = MacroExpansion::expand(m_parser_payload, transaction);
-
 #ifndef NO_LOGS
+    std::string msg = MacroExpansion::expand(m_parser_payload, transaction);
     transaction->debug(9, "Saving msg: " + msg);
 #endif
 

@@ -70,7 +70,7 @@ void UniqueId::fillUniqueId() {
 
 // Based on:
 // http://stackoverflow.com/questions/16858782/how-to-obtain-almost-unique-system-identifier-in-a-cross-platform-way
-std::string UniqueId::machineName() {
+std::string const UniqueId::machineName() {
     char machine_name[MAX_MACHINE_NAME_SIZE];
     size_t len = MAX_MACHINE_NAME_SIZE;
 #ifdef WIN32
@@ -101,7 +101,7 @@ failed:
     return std::string("");
 }
 
-std::string UniqueId::ethernetMacAddress() {
+std::string const UniqueId::ethernetMacAddress() {
     char mac[MAC_ADDRESS_SIZE];
     memset(mac, '\0', sizeof(char)*(MAC_ADDRESS_SIZE));
 #ifdef DARWIN

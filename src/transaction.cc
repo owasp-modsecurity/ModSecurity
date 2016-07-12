@@ -268,11 +268,8 @@ bool Transaction::extractArguments(const std::string &orig,
 
         key_s = (key.length() + 1);
         value_s = (value.length() + 1);
-        unsigned char *key_c = (unsigned char *) malloc(sizeof(char) * key_s);
-        unsigned char *value_c = (unsigned char *) malloc(sizeof(char) * value_s);
-
-        memset(key_c, '\0', sizeof(char) * key_s);
-        memset(value_c, '\0', sizeof(char) * value_s);
+        unsigned char *key_c = (unsigned char *) calloc(sizeof(char), key_s);
+        unsigned char *value_c = (unsigned char *) calloc(sizeof(char), value_s);
 
         memcpy(key_c, key.c_str(), key_s);
         memcpy(value_c, value.c_str(), value_s);
@@ -1267,13 +1264,13 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
 
     ss << dash_if_empty(
-        *this->m_collections.resolveFirst("REQUEST_HEADERS:Host")) << " ";
+        this->m_collections.resolveFirst("REQUEST_HEADERS:Host")) << " ";
     ss << dash_if_empty(this->m_clientIpAddress) << " ";
     /** TODO: Check variable */
-    ss << dash_if_empty(*this->m_collections.resolveFirst("REMOTE_USER"));
+    ss << dash_if_empty(this->m_collections.resolveFirst("REMOTE_USER"));
     ss << " ";
     /** TODO: Check variable */
-    ss << dash_if_empty(*this->m_collections.resolveFirst("LOCAL_USER"));
+    ss << dash_if_empty(this->m_collections.resolveFirst("LOCAL_USER"));
     ss << " ";
     ss << tstr << " ";
 
@@ -1286,14 +1283,14 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << this->m_httpCodeReturned << " ";
     ss << this->m_responseBody.tellp();
     /** TODO: Check variable */
-    ss << dash_if_empty(*this->m_collections.resolveFirst("REFERER")) << " ";
+    ss << dash_if_empty(this->m_collections.resolveFirst("REFERER")) << " ";
     ss << "\"";
     ss << dash_if_empty(
-        *this->m_collections.resolveFirst("REQUEST_HEADERS:User-Agent"));
+        this->m_collections.resolveFirst("REQUEST_HEADERS:User-Agent"));
     ss << "\" ";
     ss << this->m_id << " ";
     /** TODO: Check variable */
-    ss << dash_if_empty(*this->m_collections.resolveFirst("REFERER")) << " ";
+    ss << dash_if_empty(this->m_collections.resolveFirst("REFERER")) << " ";
 
     ss << filename << " ";
     ss << "0" << " ";

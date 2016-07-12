@@ -42,8 +42,8 @@ class Regex {
 class SMatch {
  public:
     SMatch() : size_(0) { }
-    size_t size() { return size_; }
-    std::string str() { return match; }
+    size_t size() const { return size_; }
+    std::string str() const { return match; } 
     int size_;
     std::string match;
 };

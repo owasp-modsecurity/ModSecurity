@@ -164,12 +164,21 @@ double random_number(const double from, const double to) {
 }
 
 
-std::string dash_if_empty(const std::string& str) {
-    if (&str == NULL || str.empty()) {
+std::string dash_if_empty(const std::string *str) {
+    if (str == NULL || str->empty()) {
         return "-";
     }
 
-    return str;
+    return *str;
+}
+
+
+std::string dash_if_empty(const char *str) {
+    if (str == NULL || strlen(str) == 0) {
+        return "-";
+    }
+
+    return std::string(str);
 }
 
 

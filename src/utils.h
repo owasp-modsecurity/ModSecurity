@@ -37,7 +37,8 @@ namespace modsecurity {
     double generate_transaction_unique_id();
     std::string ascTime(time_t *t);
     void createDir(std::string dir, int mode);
-    std::string dash_if_empty(const std::string& str);
+    std::string dash_if_empty(const std::string *str);
+    std::string dash_if_empty(const char *str);
     void chomp(std::string *str);
     std::string uri_decode(const std::string & sSrc);
     std::string tolower(std::string str);

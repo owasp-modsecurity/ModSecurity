@@ -35,20 +35,35 @@ class Action {
  public:
     explicit Action(const std::string& _action)
         : action_kind(2),
+        m_isNone(false),
         m_name(""),
         m_parser_payload(""),
-        m_isNone(false),
         temporaryAction(false) {
             set_name_and_payload(_action);
         }
     explicit Action(const std::string& _action, int kind)
         : action_kind(kind),
+        m_isNone(false),
         m_name(""),
         m_parser_payload(""),
-        m_isNone(false),
         temporaryAction(false) {
             set_name_and_payload(_action);
         }
+
+    virtual ~Action() { }
+
+    virtual std::string evaluate(std::string exp,
+        Transaction *transaction);
+    virtual bool evaluate(Rule *rule, Transaction *transaction);
+    virtual bool evaluate(Rule *rule, Transaction *transaction,
+        RuleMessage *ruleMessage) {
+        return evaluate(rule, transaction);
+    }
+    virtual bool init(std::string *error) { return true; }
+    virtual bool isDisruptive() { return false; }
+    virtual void fillIntervention(ModSecurityIntervention *intervention);
+    static Action *instantiate(const std::string& name);
+
 
     void set_name_and_payload(const std::string& data) {
         size_t pos = data.find(":");
@@ -72,7 +87,12 @@ class Action {
         }
     }
 
-    virtual ~Action() { }
+    bool m_isNone;
+    bool temporaryAction;
+    int action_kind;
+    std::string m_name;
+    std::string m_parser_payload;
+
     /**
      *
      * Define the action kind regarding to the execution time.
@@ -106,27 +126,6 @@ class Action {
     };
 
 
-    virtual std::string evaluate(std::string exp,
-        Transaction *transaction);
-    virtual bool evaluate(Rule *rule, Transaction *transaction);
-    virtual bool evaluate(Rule *rule, Transaction *transaction,
-        RuleMessage *ruleMessage) {
-        return evaluate(rule, transaction);
-    }
-
-    virtual bool init(std::string *error) { return true; }
-
-    virtual bool isDisruptive() { return false; }
-
-    virtual void fillIntervention(ModSecurityIntervention *intervention);
-
-    static Action *instantiate(const std::string& name);
-
-    bool temporaryAction;
-    std::string m_name;
-    std::string m_parser_payload;
-    bool m_isNone;
-    int action_kind;
 };
 
 

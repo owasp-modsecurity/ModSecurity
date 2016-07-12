@@ -29,7 +29,10 @@ namespace operators {
 class Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    Operator() { }
+    Operator()
+        : op(""),
+        param(""),
+        negation(false) { }
     Operator(std::string op, std::string param, bool negation)
         : op(op),
         param(param),

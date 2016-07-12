@@ -83,7 +83,7 @@ void process_request (int j) {
 
 int main (int argc, char **argv)
 {
-    int ret = 1;
+    int ret;
     const char *error = NULL;
     int i = 0;
     pid_t pid;

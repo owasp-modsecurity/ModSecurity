@@ -562,7 +562,7 @@ void LMDB::resolveRegularExpression(const std::string& var,
     int rc;
     MDB_stat mst;
     MDB_cursor *cursor;
-    size_t pos = std::string::npos;
+    size_t pos;
 
     pos = var.find(":");
     if (pos == std::string::npos) {

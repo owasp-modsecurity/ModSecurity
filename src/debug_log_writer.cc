@@ -41,9 +41,9 @@ void DebugLogWriter::open(const std::string& fileName) {
 
 void DebugLogWriter::close(const std::string& fileName) {
     std::map<std::string, DebugLogWriterAgent *>::iterator it;
-    DebugLogWriterAgent *agent;
     it = agents.find(fileName);
     if (it != agents.end()) {
+        DebugLogWriterAgent *agent;
         agent = it->second;
         if (agent->refCountDecreaseAndCheck()) {
             delete agent;
