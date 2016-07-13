@@ -53,7 +53,6 @@ class Https : public audit_log::Writer {
 
     bool init() override;
     bool write(Transaction *transaction, int parts) override;
-
 };
 
 }  // namespace writer

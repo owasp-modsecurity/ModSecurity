@@ -36,7 +36,8 @@ bool InitCol::init(std::string *error) {
         return false;
     }
     if (posEquals == std::string::npos) {
-        error->assign("Something wrong with initcol format: missing equals sign");
+        error->assign("Something wrong with initcol format: missing " \
+                "equals sign");
         return false;
     }
 
@@ -46,7 +47,8 @@ bool InitCol::init(std::string *error) {
     if (m_collection_key != "ip" &&
         m_collection_key != "global" &&
         m_collection_key != "resource") {
-        error->assign("Something wrong with initcol: collection must be `ip' or `global'");
+        error->assign("Something wrong with initcol: collection must be " \
+            "`ip' or `global'");
         return false;
     }
 

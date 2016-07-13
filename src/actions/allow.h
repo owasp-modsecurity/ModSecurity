@@ -29,7 +29,7 @@ class Rule;
 
 namespace actions {
 
-enum AllowType : short {
+enum AllowType : int {
   /**
    *
    */
@@ -61,7 +61,7 @@ class Allow : public Action {
 
     AllowType m_allowType;
 
-    static std::string allowTypeToName (AllowType a) {
+    static std::string allowTypeToName(AllowType a) {
         if (a == NoneAllowType) {
             return "None";
         } else if (a == RequestAllowType) {

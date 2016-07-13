@@ -117,7 +117,8 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
         return;
     }
     std::string col = std::string(var, 0, var.find(":"));
-    std::string name = std::string(var, var.find(":") + 2, var.size() - var.find(":") - 3);
+    std::string name = std::string(var, var.find(":") + 2,
+        var.size() - var.find(":") - 3);
     size_t keySize = col.size();
     Utils::Regex r = Utils::Regex(name);
 

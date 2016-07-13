@@ -142,7 +142,7 @@ void ModSecurityTest<T>::cmd_options(int argc, char **argv) {
         m_automake_output = true;
     }
 
-    if(const char* env_p = std::getenv("AUTOMAKE_TESTS")) {
+    if (const char* env_p = std::getenv("AUTOMAKE_TESTS")) {
         m_automake_output = true;
     }
 

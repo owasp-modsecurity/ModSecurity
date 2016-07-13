@@ -44,3 +44,4 @@ class CmdLine : public Transformation {
 #endif
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_CMD_LINE_H_
+

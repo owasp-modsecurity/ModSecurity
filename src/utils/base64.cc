@@ -13,19 +13,21 @@
  *
  */
 
+#include "utils/base64.h"
+
+#include <string.h>
+
 #include <string>
 #include <fstream>
 #include <iostream>
 
-#include "utils/base64.h"
 #include "mbedtls/base64.h"
-#include <string.h>
 
 namespace modsecurity {
 namespace Utils {
 
 
-std::string Base64::encode(std::string& data) {
+std::string Base64::encode(const std::string& data) {
     size_t encoded_len = 0;
     unsigned char *d = NULL;
     std::string ret;
@@ -51,7 +53,7 @@ std::string Base64::encode(std::string& data) {
 }
 
 
-std::string Base64::decode(std::string& data, bool forgiven) {
+std::string Base64::decode(const std::string& data, bool forgiven) {
     if (forgiven) {
         return decode_forgiven(data);
     }
@@ -60,7 +62,7 @@ std::string Base64::decode(std::string& data, bool forgiven) {
 }
 
 
-std::string Base64::decode(std::string& data) {
+std::string Base64::decode(const std::string& data) {
     size_t decoded_len = 0;
     unsigned char *d = NULL;
     std::string ret;
@@ -86,7 +88,7 @@ std::string Base64::decode(std::string& data) {
 }
 
 
-std::string Base64::decode_forgiven(std::string& data) {
+std::string Base64::decode_forgiven(const std::string& data) {
     size_t decoded_len = 0;
     unsigned char *d = NULL;
     std::string ret;
@@ -117,7 +119,7 @@ void Base64::decode_forgiven_engine(unsigned char *plain_text,
     int i = 0, j = 0, k = 0;
     int ch = 0;
     static const char b64_pad = '=';
-    static short b64_reverse_t[256] = {
+    static int b64_reverse_t[256] = {
         -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -1, -2, -2, -1, -2, -2,
         -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
         -1, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, 62, -2, -2, -2, 63,
@@ -154,7 +156,7 @@ void Base64::decode_forgiven_engine(unsigned char *plain_text,
             *aiming_size = 0;
             return;
         }
-        switch(i % 4) {
+        switch (i % 4) {
             case 0:
                 if (plain_text_size != 0) {
                     plain_text[j] = ch << 2;
@@ -189,7 +191,7 @@ void Base64::decode_forgiven_engine(unsigned char *plain_text,
     k = j;
 
     if (ch == b64_pad) {
-        switch(i % 4) {
+        switch (i % 4) {
             case 1:
                 *aiming_size = 0;
                 return;

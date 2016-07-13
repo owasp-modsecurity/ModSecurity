@@ -91,7 +91,6 @@ void perform_unit_test(ModSecurityTest<UnitTest> *test, UnitTest *t,
         std::cout << t->name << " "
             << modsecurity::toHexIfNeeded(t->input) << std::endl;
     }
-
 }
 
 
@@ -150,9 +149,9 @@ int main(int argc, char **argv) {
         if (results.size() == 0) {
             std::cout << KGRN << "All tests passed" << RESET << std::endl;
         } else {
-            std::cout << KRED << results.size() << " failed." << RESET << std::endl;
+            std::cout << KRED << results.size() << " failed.";
+            std::cout << RESET << std::endl;
         }
-
     }
 
     for (std::pair<std::string, std::vector<UnitTest *> *> a : test) {

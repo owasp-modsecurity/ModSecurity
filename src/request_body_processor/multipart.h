@@ -61,7 +61,7 @@ class MultipartPart {
      m_offset(0),
      m_length(0) { }
 
-    ~MultipartPart () {
+    ~MultipartPart() {
         m_headers.clear();
         m_value_parts.clear();
     }

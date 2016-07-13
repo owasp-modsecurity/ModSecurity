@@ -73,7 +73,7 @@ class Rules;
 class RuleMessage;
 namespace actions {
 class Action;
-enum AllowType : short;
+enum AllowType : int;
 }
 namespace RequestBodyProcessor {
 class XML;

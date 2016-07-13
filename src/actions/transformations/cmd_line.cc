@@ -43,7 +43,6 @@ std::string CmdLine::evaluate(std::string value,
             case '\'':
             case '\\':
             case '^':
-                //ret.append("i was here");
                 break;
 
             /* replace some characters to space (only one) */
@@ -85,3 +84,4 @@ std::string CmdLine::evaluate(std::string value,
 }  // namespace transformations
 }  // namespace actions
 }  // namespace modsecurity
+

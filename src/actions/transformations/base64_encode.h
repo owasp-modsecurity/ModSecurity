@@ -30,7 +30,7 @@ namespace transformations {
 
 class Base64Encode : public Transformation {
  public:
-    explicit Base64Encode(std::string action) : Transformation(action) { };
+    explicit Base64Encode(std::string action) : Transformation(action) { }
 
     std::string evaluate(std::string exp,
         Transaction *transaction) override;

@@ -103,7 +103,7 @@ class RulesProperties {
 */
     ~RulesProperties() {
         delete m_debugLog;
-    };
+    }
 
     std::vector<Rule *> rules[7];
     std::vector<Rule *> * getRulesForPhase(int phase) {

@@ -30,7 +30,7 @@ namespace Variables {
 class Rule : public Variable {
  public:
     explicit Rule(std::string _name)
-        : Variable(_name) { };
+        : Variable(_name) { }
 
     void evaluateInternal(Transaction *transaction,
         modsecurity::Rule *rule,

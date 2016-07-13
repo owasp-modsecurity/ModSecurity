@@ -37,7 +37,8 @@ Variable::Variable(std::string name)
     m_isCount(false) {
     if (m_name.find(":") != std::string::npos) {
         std::string col = toupper(std::string(m_name, 0, m_name.find(":")));
-        std::string name = std::string(m_name, m_name.find(":") + 1, m_name.size());
+        std::string name = std::string(m_name, m_name.find(":") + 1,
+            m_name.size());
         if (col == "TX" || col == "IP" || col == "GLOBAL"
             || col == "RESOURCE" || col == "SESSION") {
             m_collectionName = col;
@@ -83,7 +84,8 @@ Variable::Variable(std::string name, VariableKind kind)
     m_isCount(false) {
     if (m_name.find(":") != std::string::npos) {
         std::string col = toupper(std::string(m_name, 0, m_name.find(":")));
-        std::string name = std::string(m_name, m_name.find(":") + 1, m_name.size());
+        std::string name = std::string(m_name, m_name.find(":") + 1,
+            m_name.size());
         if (col == "TX" || col == "IP" || col == "GLOBAL"
             || col == "RESOURCE" || col == "SESSION") {
             m_collectionName = col;

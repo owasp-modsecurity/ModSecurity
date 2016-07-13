@@ -39,7 +39,7 @@ namespace collection {
 
 class Collection {
  public:
-    virtual ~Collection() { };
+    virtual ~Collection() { }
     virtual void store(std::string key, std::string value) = 0;
 
     virtual bool storeOrUpdateFirst(const std::string &key,

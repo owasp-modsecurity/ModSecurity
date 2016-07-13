@@ -268,21 +268,24 @@ bool Transaction::extractArguments(const std::string &orig,
 
         key_s = (key.length() + 1);
         value_s = (value.length() + 1);
-        unsigned char *key_c = (unsigned char *) calloc(sizeof(char), key_s);
-        unsigned char *value_c = (unsigned char *) calloc(sizeof(char), value_s);
+        unsigned char *key_c = reinterpret_cast<unsigned char *>(
+            calloc(sizeof(char), key_s));
+        unsigned char *value_c = reinterpret_cast<unsigned char *>(
+            calloc(sizeof(char), value_s));
 
         memcpy(key_c, key.c_str(), key_s);
         memcpy(value_c, value.c_str(), value_s);
 
         key_s = urldecode_nonstrict_inplace(key_c, key_s, &invalid, &changed);
-        value_s = urldecode_nonstrict_inplace(value_c, value_s, &invalid, &changed);
+        value_s = urldecode_nonstrict_inplace(value_c, value_s,
+            &invalid, &changed);
 
         if (invalid) {
             m_collections.storeOrUpdateFirst("URLENCODED_ERROR", "1");
         }
 
-        addArgument(orig, std::string((char *)key_c, key_s-1),
-            std::string((char *)value_c, value_s-1));
+        addArgument(orig, std::string(reinterpret_cast<char *>(key_c), key_s-1),
+            std::string(reinterpret_cast<char *>(value_c), value_s-1));
 
         free(key_c);
         free(value_c);

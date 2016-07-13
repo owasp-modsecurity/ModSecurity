@@ -44,3 +44,4 @@ class RemoteUser : public Variable {
 }  // namespace modsecurity
 
 #endif  // SRC_VARIABLES_REMOTE_USER_H_
+

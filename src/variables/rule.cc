@@ -32,6 +32,7 @@
 #include <vector>
 #include <list>
 #include <utility>
+#include <map>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rules_properties.h"
@@ -54,7 +55,7 @@ void Rule::evaluateInternal(Transaction *t,
 
     // id
     envs.insert(std::pair<std::string, std::string>("RULE:id",
-        std::to_string(rule->rule_id)));    
+        std::to_string(rule->rule_id)));
 
     // rev
     envs.insert(std::pair<std::string, std::string>("RULE:rev",

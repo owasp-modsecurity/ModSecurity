@@ -270,9 +270,11 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
 
         modsec_transaction->processRequestHeaders();
         actions(&r, modsec_transaction);
+#if 0
         if (r.status != 200) {
-            //goto end;
+            goto end;
         }
+#endif
 
         modsec_transaction->appendRequestBody(
             (unsigned char *)t->request_body.c_str(),
@@ -291,7 +293,8 @@ void perform_unit_test(ModSecurityTest<RegressionTest> *test,
                 headers.second.c_str());
         }
 
-        modsec_transaction->processResponseHeaders(r.status, t->response_protocol);
+        modsec_transaction->processResponseHeaders(r.status,
+            t->response_protocol);
         actions(&r, modsec_transaction);
 #if 0
         if (r.status != 200) {

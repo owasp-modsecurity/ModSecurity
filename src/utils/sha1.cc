@@ -21,15 +21,15 @@ namespace modsecurity {
 namespace Utils {
 
 
-std::string Sha1::hexdigest(std::string& input) {
+std::string Sha1::hexdigest(const std::string& input) {
     unsigned char digest[20];
 
     mbedtls_sha1(reinterpret_cast<const unsigned char *>(input.c_str()),
         input.size(), digest);
 
     char buf[41];
-    for (int i=0; i<20; i++) {
-        sprintf(buf+i*2, "%02x", digest[i]);
+    for (int i=0; i < 20; i++) {
+        snprintf(buf+i*2, sizeof(char)*2, "%02x", digest[i]);
     }
     buf[40] = 0;
 
@@ -37,7 +37,7 @@ std::string Sha1::hexdigest(std::string& input) {
 }
 
 
-std::string Sha1::digest(std::string& input) {
+std::string Sha1::digest(const std::string& input) {
     unsigned char output[20];
     std::string ret;
 

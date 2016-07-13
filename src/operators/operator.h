@@ -49,6 +49,7 @@ class Operator {
 
     virtual bool evaluate(Transaction *transaction, const std::string &str);
     static Operator *instantiate(std::string op);
+
  protected:
     bool debug(Transaction *transaction, int x, std::string a);
 };

@@ -35,7 +35,8 @@ namespace backend {
 
 LMDB::LMDB() : m_env(NULL) {
     mdb_env_create(&m_env);
-    mdb_env_open(m_env, "./modsec-shared-collections", MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
+    mdb_env_open(m_env, "./modsec-shared-collections",
+        MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
 }
 
 
@@ -46,8 +47,9 @@ LMDB::~LMDB() {
 
 void LMDB::string2val(const std::string& str, MDB_val *val) {
     val->mv_size = sizeof(char)*(str.size());
-    val->mv_data = (char *)str.c_str();
+    val->mv_data = const_cast<char *>(str.c_str());
 }
+
 
 void LMDB::lmdb_debug(int rc, std::string op, std::string scope) {
 #ifndef LMDB_STDOUT_COUT

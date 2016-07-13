@@ -51,7 +51,7 @@ bool PmFromFile::init(const std::string &config, std::string *error) {
         acmp_add_pattern(m_p, line.c_str(), NULL, NULL, line.length());
     }
 
-    //acmp_prepare(m_p);
+    // acmp_prepare(m_p);
 
     delete iss;
     return true;
