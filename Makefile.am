@@ -44,20 +44,22 @@ MAINTAINERCLEANFILES = \
 	ylwrap
 
 cppcheck:
-	cppcheck \
+	@cppcheck \
 		--suppressions-list=./test/cppcheck_suppressions.txt \
 		--enable=all \
 		--inconclusive \
-		--template="{file},{line},{severity},{id},{message}" \
+		--template="warning: {file},{line},{severity},{id},{message}" \
 		-U YYSTYPE \
 		-U YY_USER_INIT \
 		--std=posix . 2> cppcheck.txt
 	cat cppcheck.txt
 
+check-static: cppcheck
+
 check-style: check-coding-style
 
 check-coding-style:
-	-cpplint.py \
+	@cpplint.py \
 		$$(find . -name "*.h" -o -name "*.cc" | xargs) 2>&1 \
  		| egrep -v $$(echo -n "catchall" ; \
 	  		for i in $$(cat test/coding_style_suppressions.txt); do echo -n "|"$$i; done) \
