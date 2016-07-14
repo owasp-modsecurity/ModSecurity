@@ -11,7 +11,7 @@ AC_REQUIRE([PKG_PROG_PKG_CONFIG])
 LMDB_POSSIBLE_LIB_NAMES="lmdb"
 
 # Possible extensions for the library
-LMDB_POSSIBLE_EXTENSIONS="so so0 la sl dll dylib"
+LMDB_POSSIBLE_EXTENSIONS="so so0 la sl dll dylib so.0.0.0"
 
 # Possible paths (if pkg-config was not found, proceed with the file lookup)
 LMDB_POSSIBLE_PATHS="/usr/lib /usr/local/lib /usr/local/liblmdb /usr/local/lmdb /usr/local /opt/liblmdb /opt/lmdb /opt /usr /usr/lib64"
@@ -145,11 +145,12 @@ AC_DEFUN([CHECK_FOR_LMDB_AT], [
                lmdb_lib_file="${lmdb_lib_path}/lib${z}.${y}"
                break
            fi
-           echo "*** LOOKING AT: " ${path}/lib/x86_64-linux-gnu/lib${z}.${y}
-           echo "*** LOOKING AT: " ${path}/lib/lib${z}.${y}
-           echo "*** LOOKING AT: " ${path}/lib${z}.${y}
-           echo "*** LOOKING AT: " ${path}/${z}.${y}
-
+           if test -e "${path}/lib/i386-linux-gnu/lib${z}.${y}"; then
+               lmdb_lib_path="${path}/lib/i386-linux-gnu/"
+               lmdb_lib_name="${z}"
+               lmdb_lib_file="${lmdb_lib_path}/lib${z}.${y}"
+               break
+           fi
        done
        if test -n "$lmdb_lib_path"; then
            break
