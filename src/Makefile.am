@@ -102,6 +102,7 @@ ACTIONS = \
 	actions/ctl_request_body_processor_xml.cc \
 	actions/init_col.cc \
 	actions/deny.cc \
+	actions/log.cc \
 	actions/log_data.cc \
 	actions/maturity.cc \
 	actions/msg.cc \

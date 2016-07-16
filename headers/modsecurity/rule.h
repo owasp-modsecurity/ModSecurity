@@ -104,6 +104,7 @@ class RuleMessage {
         m_ver(rule->m_ver),
         m_maturity(rule->m_maturity),
         m_rule(rule),
+        m_saveMessage(false),
         m_match(std::string(""))
     { }
 
@@ -119,8 +120,42 @@ class RuleMessage {
         m_ver(rule->m_ver),
         m_maturity(rule->m_maturity),
         m_rule(rule),
+        m_saveMessage(false),
         m_match(std::string(""))
     { }
+
+
+    std::string errorLog(Transaction *trans) {
+        std::string msg;
+
+        msg.append("[client " + std::string(trans->m_clientIpAddress) + "]");
+        msg.append(" ModSecurity: Warning.");
+        msg.append(" Matched \"" + m_match + "\"");
+        if (trans->m_collections.resolveFirst("MATCHED_VAR_NAME")) {
+            msg.append(" at "
+                + *trans->m_collections.resolveFirst("MATCHED_VAR_NAME"));
+        }
+        msg.append(" [file \"" + std::string(m_ruleFile) + "\"]");
+        msg.append(" [line \"" + std::to_string(m_ruleLine) + "\"]");
+        msg.append(" [id \"" + std::to_string(m_ruleId) + "\"]");
+        msg.append(" [rev \"" + m_rev + "\"]");
+        msg.append(" [msg \"" + m_message + "\"]");
+        msg.append(" [data \"" + m_data + "\"]");
+        msg.append(" [severity \"" +
+            std::to_string(m_severity) + "\"]");
+        msg.append(" [ver \"" + m_ver + "\"]");
+        msg.append(" [maturity \"" + std::to_string(m_maturity) + "\"]");
+        msg.append(" [accuracy \"" + std::to_string(m_accuracy) + "\"]");
+        for (auto &a : m_tags) {
+            msg.append(" [tag \"" + a + "\"]");
+        }
+        msg.append(" [hostname \"" + std::string(trans->m_serverIpAddress) \
+            + "\"]");
+        msg.append(" [uri \"" + std::string(trans->m_uri) + "\"]");
+        msg.append(" [unique_id \"" + trans->m_id + "\"]");
+
+        return msg;
+    }
 
     std::string m_match;
     std::string m_ruleFile;
@@ -137,6 +172,7 @@ class RuleMessage {
     std::list<std::string> m_tags;
 
     Rule *m_rule;
+    bool m_saveMessage;
 };
 
 

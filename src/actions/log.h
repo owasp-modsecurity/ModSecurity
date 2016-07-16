@@ -32,7 +32,8 @@ class Log : public Action {
     explicit Log(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm)
+        override;
 };
 
 }  // namespace actions

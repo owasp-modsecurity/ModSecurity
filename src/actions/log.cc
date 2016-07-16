@@ -18,16 +18,19 @@
 #include <iostream>
 #include <string>
 
+#include "actions/action.h"
 #include "modsecurity/transaction.h"
+#include "src/utils.h"
+#include "operators/operator.h"
+
 
 namespace modsecurity {
 namespace actions {
 
 
-bool Log::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->m_toBeSavedInAuditlogs = true;
-    /* FIXME: transaction->serverLog("Something...."); */
+bool Log::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
     transaction->debug(9, "Saving transaction to logs");
+    rm->m_saveMessage = true;
     return true;
 }
 

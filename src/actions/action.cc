@@ -31,6 +31,7 @@
 #include "actions/severity.h"
 #include "actions/capture.h"
 #include "actions/pass.h"
+#include "actions/log.h"
 
 
 
@@ -88,6 +89,9 @@ Action *Action::instantiate(const std::string& name) {
     }
     if (name == "deny") {
         return new Deny(name);
+    }
+    if (name == "log") {
+        return new Log(name);
     }
     return new Action(name);
 }
