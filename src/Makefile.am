@@ -244,6 +244,7 @@ libmodsecurity_la_SOURCES = \
 	macro_expansion.cc \
 	rule.cc \
 	unique_id.cc \
+	rules_exceptions.cc \
 	${BODY_PROCESSORS} \
 	${ACTIONS} \
 	${COLLECTION} \

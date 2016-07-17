@@ -217,6 +217,8 @@ using modsecurity::Variables::XML;
 %token <std::string> CONFIG_DIR_AUDIT_STS
 %token <std::string> CONFIG_DIR_AUDIT_TPE
 
+%token <std::string> CONFIG_SEC_RULE_REMOVE_BY_ID
+
 %token <std::string> CONFIG_UPDLOAD_KEEP_FILES
 %token <std::string> CONFIG_UPDLOAD_SAVE_TMP_FILES
 %token <std::string> CONFIG_UPLOAD_FILE_LIMIT
@@ -604,6 +606,19 @@ expression:
     | CONFIG_COMPONENT_SIG
       {
         driver.components.push_back($1);
+      }
+    | CONFIG_SEC_RULE_REMOVE_BY_ID
+      {
+        std::string error;
+        if (driver.m_exceptions.load($1, &error) == false) {
+            std::stringstream ss;
+            ss << "SecRuleRemoveById: failed to load:";
+            ss << $1;
+            ss << ". ";
+            ss << error;
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
       }
     /* Debug log: start */
     | CONFIG_DIR_DEBUG_LVL

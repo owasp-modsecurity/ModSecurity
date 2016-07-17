@@ -114,6 +114,7 @@ CONFIG_INCLUDE                       (?i:Include)
 CONFIG_SEC_REMOTE_RULES              (?i:SecRemoteRules)
 CONFIG_SEC_REMOTE_RULES_FAIL_ACTION  (?i:SecRemoteRulesFailAction)
 
+CONFIG_SEC_REMOVE_RULES_BY_ID        (?i:SecRuleRemoveById)
 
 DICT_ELEMENT    [^ \t|]+
 
@@ -229,6 +230,9 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {ACTION_CTL_RULE_ENGINE}=                          { return yy::seclang_parser::make_ACTION_CTL_RULE_ENGINE(yytext, *driver.loc.back()); }
 {ACTION_CTL_AUDIT_ENGINE}=                         { return yy::seclang_parser::make_ACTION_CTL_AUDIT_ENGINE(yytext, *driver.loc.back()); }
 {ACTION_CTL_FORCE_REQ_BODY_VAR}=                   { return yy::seclang_parser::make_ACTION_CTL_FORCE_REQ_BODY_VAR(yytext, *driver.loc.back()); }
+
+%{ /* Remove Rules */ %}
+{CONFIG_SEC_REMOVE_RULES_BY_ID}[ ]{FREE_TEXT_NEW_LINE}      { return yy::seclang_parser::make_CONFIG_SEC_RULE_REMOVE_BY_ID(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 
 %{ /* Upload */ %}
 {CONFIG_UPLOAD_FILE_LIMIT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_UPLOAD_FILE_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }

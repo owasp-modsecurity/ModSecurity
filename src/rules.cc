@@ -220,6 +220,9 @@ int Rules::evaluate(int phase, Transaction *transaction) {
         } else if (transaction->m_allowType != actions::NoneAllowType) {
             debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
                 + "' as request trough the utilization of an `allow' action.");
+        } else if (m_exceptions.contains(rule->rule_id)) {
+            debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
+                + "'. Removed by an SecRuleRemove directive.");
         } else {
             rule->evaluate(transaction);
         }
@@ -270,6 +273,8 @@ int Rules::merge(Driver *from) {
         it != from->m_responseBodyTypeToBeInspected.end(); ++it) {
         m_responseBodyTypeToBeInspected.insert(*it);
     }
+
+    this->m_exceptions = from->m_exceptions;
 
     /*
      *
