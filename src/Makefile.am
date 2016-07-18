@@ -41,7 +41,9 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/modsecurity.h \
 	../headers/modsecurity/rule.h \
 	../headers/modsecurity/rules.h \
-	../headers/modsecurity/rules_properties.h
+	../headers/modsecurity/rules_properties.h \
+	../headers/modsecurity/rules_exceptions.h
+
 
 
 libmodsecurity_includesub_HEADERS = \
