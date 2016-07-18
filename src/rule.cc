@@ -102,6 +102,7 @@ Rule::Rule(Operator *_op,
     m_unconditional(false),
     m_secmarker(false),
     m_marker(""),
+    m_maturity(0),
     m_referenceCount(0),
     m_fileName(fileName),
     m_lineNumber(lineNumber) {
