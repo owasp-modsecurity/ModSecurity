@@ -700,7 +700,8 @@ int Transaction::processRequestBody() {
         }
     } else if (m_requestBodyType == WWWFormUrlEncoded) {
         extractArguments("POST", m_requestBody.str());
-    } else {
+    } else if (m_collections.resolveFirst(
+            "REQUEST_HEADERS:Content-Type") != NULL) {
         std::string *a = m_collections.resolveFirst(
             "REQUEST_HEADERS:Content-Type");
         std::string error;
@@ -713,6 +714,9 @@ int Transaction::processRequestBody() {
             "Unknown request body processor: " + error);
         m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR_MSG",
             "Unknown request body processor: " + error);
+    } else {
+        m_collections.storeOrUpdateFirst("REQBODY_ERROR", "0");
+        m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "0");
     }
 
     /**
