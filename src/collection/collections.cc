@@ -81,7 +81,6 @@ void Collections::storeOrUpdateFirst(const std::string& collectionName,
         return;
     }
 
-
     if (tolower(collectionName) == "session"
         && !m_session_collection_key.empty()) {
         m_session_collection->storeOrUpdateFirst(collectionName + ":"

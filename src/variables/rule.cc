@@ -44,6 +44,7 @@
 #include "src/actions/xmlns.h"
 #include "src/actions/log_data.h"
 #include "src/actions/msg.h"
+#include "src/utils.h"
 
 namespace modsecurity {
 namespace Variables {
@@ -52,6 +53,7 @@ void Rule::evaluateInternal(Transaction *t,
     modsecurity::Rule *rule,
     std::vector<const collection::Variable *> *l) {
     std::map<std::string, std::string> envs;
+    std::string m_name_upper = toupper(m_name);
 
     // id
     envs.insert(std::pair<std::string, std::string>("RULE:id",
@@ -86,14 +88,17 @@ void Rule::evaluateInternal(Transaction *t,
     for (actions::Action *i : acts) {
         actions::Msg *a = reinterpret_cast<actions::Msg *>(i);
         if (a) {
+            std::string data = a->data(t);
             envs.insert(std::pair<std::string, std::string>("RULE:msg",
-                a->data(t)));
+                data));
         }
     }
 
     for (auto& x : envs) {
-        if ((x.first.substr(0, m_name.size() + 1).compare(m_name + ":") != 0)
-            && (x.first != m_name)) {
+        std::string xup = toupper(x.first);
+        if ((xup.substr(0, m_name_upper.size() + 1)
+            .compare(m_name_upper + ":") != 0)
+            && (xup != m_name_upper)) {
             continue;
         }
         l->push_back(new collection::Variable(x.first, x.second));

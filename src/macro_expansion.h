@@ -33,6 +33,8 @@ class MacroExpansion {
 
     static std::string expand(const std::string& input,
         Transaction *transaction);
+    static std::string expand(const std::string& input,
+        modsecurity::Rule *r, Transaction *transaction);
     static std::string expandKeepOriginal(const std::string& input,
         Transaction *transaction);
 };

@@ -90,9 +90,9 @@ bool SetVar::init(std::string *error) {
 bool SetVar::evaluate(Rule *rule, Transaction *transm_parser_payload) {
     std::string targetValue;
     std::string m_variableNameExpanded = MacroExpansion::expand(m_variableName,
-        transm_parser_payload);
+        rule, transm_parser_payload);
     std::string resolvedPre = MacroExpansion::expand(m_predicate,
-        transm_parser_payload);
+        rule, transm_parser_payload);
 
     if (m_operation == setOperation) {
         targetValue = resolvedPre;

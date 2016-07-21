@@ -15,6 +15,11 @@
 
 #include "src/macro_expansion.h"
 #include "modsecurity/transaction.h"
+#include "modsecurity/collection/variable.h"
+#include "src/variables/rule.h"
+#include "src/variables/tx.h"
+#include "src/variables/highest_severity.h"
+
 
 namespace modsecurity {
 
@@ -35,8 +40,15 @@ std::string MacroExpansion::expandKeepOriginal(const std::string& input,
 
 std::string MacroExpansion::expand(const std::string& input,
     Transaction *transaction) {
+    return expand(input, NULL, transaction);
+}
+
+
+std::string MacroExpansion::expand(const std::string& input,
+     modsecurity::Rule *rule, Transaction *transaction) {
     std::string res;
     size_t pos = input.find("%{");
+    std::string v;
 
     if (pos != std::string::npos) {
         res = input;
@@ -59,7 +71,27 @@ std::string MacroExpansion::expand(const std::string& input,
             std::string col = std::string(variable, 0, collection);
             std::string var = std::string(variable, collection + 1,
                 variable.length() - (collection + 1));
-            variableValue = transaction->m_collections.resolveFirst(col, var);
+
+            if (col == "RULE") {
+                if (rule == NULL) {
+                    transaction->debug(9, "macro expansion: cannot resolve " \
+                        "RULE variable without the Rule object");
+                    goto ops;
+                }
+                modsecurity::Variables::Rule r("RULE:" + var);
+                std::vector<const collection::Variable *> l;
+                r.evaluateInternal(transaction, rule, &l);
+                if (l.size() > 0) {
+                    v = l[0]->m_value;
+                    variableValue = &v;
+                }
+                for (auto *i : l) {
+                    delete i;
+                }
+            } else {
+                variableValue = transaction->m_collections.resolveFirst(col,
+                    var);
+            }
         }
 
         res.erase(start, end - start + 1);
@@ -70,7 +102,7 @@ std::string MacroExpansion::expand(const std::string& input,
         if (variableValue != NULL) {
             res.insert(start, *variableValue);
         }
-
+ops:
         pos = res.find("%{");
     }
 

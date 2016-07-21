@@ -2,7 +2,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Variables :: RULE (1/5)",
+    "title":"Testing Variables :: RULE (1/7)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -48,7 +48,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Variables :: RULE (2/5)",
+    "title":"Testing Variables :: RULE (2/7)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -94,7 +94,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Variables :: RULE (3/5)",
+    "title":"Testing Variables :: RULE (3/7)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -140,7 +140,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Variables :: RULE (4/5)",
+    "title":"Testing Variables :: RULE (4/7)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -186,7 +186,7 @@
   {
     "enabled":1,
     "version_min":300000,
-    "title":"Testing Variables :: RULE (5/5)",
+    "title":"Testing Variables :: RULE (5/7)",
     "client":{
       "ip":"200.249.12.31",
       "port":123
@@ -227,6 +227,98 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecRule RULE:msg \"@contains test\" \"id:1,msg:'message123',phase:3,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: RULE (6/7)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "27",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body": [
+        "param1=value1&param2=value2"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log":" Target value: \"message123\" \\(Variable: RULE:msg\\)"
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecRule rule:msg \"@contains test\" \"id:1,msg:'message123',phase:3,pass,t:trim\""
+    ]
+  },
+  {
+    "enabled":1,
+    "version_min":300000,
+    "title":"Testing Variables :: RULE (7/7)",
+    "client":{
+      "ip":"200.249.12.31",
+      "port":123
+    },
+    "server":{
+      "ip":"200.249.12.31",
+      "port":80
+    },
+    "request":{
+      "headers":{
+        "Host":"localhost",
+        "User-Agent":"curl/7.38.0",
+        "Accept":"*/*",
+        "Content-Length": "27",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri":"/",
+      "method":"POST",
+      "body": [
+        "param1=value1&param2=value2"
+      ]
+    },
+    "response":{
+      "headers":{
+        "Date":"Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified":"Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type":"text/html"
+      },
+      "body":[
+        "no need."
+      ]
+    },
+    "expected":{
+      "debug_log":"Saving variable: IP:block_reason with value: message123"
+    },
+    "rules":[
+      "SecRuleEngine On",
+      "SecDebugLog \/tmp\/modsec_debug.log",
+      "SecDebugLogLevel 9",
+      "SecRule rule:msg \"@contains message\" \"id:1,setvar:'ip.block_reason=%{RULE.msg}%',msg:'message123',phase:3,pass,t:trim\""
     ]
   }
 ]
