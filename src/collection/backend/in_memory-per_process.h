@@ -59,7 +59,7 @@ struct MyHash{
         // You might need a better hash function than this
         size_t h = 0;
         std::for_each(Keyval.begin(), Keyval.end(), [&](char c) {
-            h += c;
+            h += tolower(c);
         });
         return h;
     }

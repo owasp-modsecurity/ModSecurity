@@ -99,7 +99,9 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
         if (x.first.at(keySize) != ':') {
             continue;
         }
-        if (x.first.compare(0, keySize, var) != 0) {
+        std::string fu = toupper(x.first);
+        std::string fvar = toupper(var);
+        if (fu.compare(0, keySize, fvar) != 0) {
             continue;
         }
         l->insert(l->begin(), new Variable(x.first, x.second));
