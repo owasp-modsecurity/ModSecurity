@@ -14,7 +14,7 @@ LMDB_POSSIBLE_LIB_NAMES="lmdb"
 LMDB_POSSIBLE_EXTENSIONS="so so0 la sl dll dylib so.0.0.0"
 
 # Possible paths (if pkg-config was not found, proceed with the file lookup)
-LMDB_POSSIBLE_PATHS="/usr/lib /usr/local/lib /usr/local/liblmdb /usr/local/lmdb /usr/local /opt/liblmdb /opt/lmdb /opt /usr /usr/lib64"
+LMDB_POSSIBLE_PATHS="/usr/lib /usr/local/lib /usr/local/liblmdb /usr/local/lmdb /usr/local /opt/liblmdb /opt/lmdb /opt /usr /usr/lib64 /opt/local"
 
 # Variables to be set by this very own script.
 LMDB_VERSION=""
