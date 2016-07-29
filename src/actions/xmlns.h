@@ -35,7 +35,7 @@ class XmlNS : public Action {
         return true;
     }
 
-    bool init(std::string *error);
+    bool init(std::string *error) override;
 
     std::string m_scope;
     std::string m_href;

@@ -36,7 +36,7 @@ class Severity : public Action {
 
     bool evaluate(Rule *rule, Transaction *transaction,
         RuleMessage *rm) override;
-    bool init(std::string *error);
+    bool init(std::string *error) override;
 
     int m_severity;
 };
