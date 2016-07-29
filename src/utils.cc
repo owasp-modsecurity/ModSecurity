@@ -322,13 +322,13 @@ void createDir(std::string dir, int mode) {
 
 double cpu_seconds(void) {
         struct timespec t;
-
         if (!clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t))
                 return static_cast<double>(t.tv_sec)
                      + static_cast<double>(t.tv_nsec / 1000000000.0);
         else
                 return static_cast<double>(clock()) /
                     static_cast<double>(CLOCKS_PER_SEC);
+        return 0;
 }
 
 
@@ -642,7 +642,7 @@ length:
  * Converts a single hexadecimal digit into a decimal value.
  */
 unsigned char xsingle2c(unsigned char *what) {
-    register unsigned char digit;
+    unsigned char digit;
 
     digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
 
@@ -651,7 +651,7 @@ unsigned char xsingle2c(unsigned char *what) {
 
 
 unsigned char x2c(unsigned char *what) {
-    register unsigned char digit;
+    unsigned char digit;
 
     digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
     digit *= 16;

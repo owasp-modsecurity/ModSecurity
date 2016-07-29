@@ -122,13 +122,10 @@ bool SetVar::evaluate(Rule *rule, Transaction *transm_parser_payload) {
             value = 0;
         }
 
-        switch (m_operation) {
-            case sumAndSetOperation:
-                targetValue = std::to_string(value + pre);
-                break;
-            case substractAndSetOperation:
-                targetValue = std::to_string(value - pre);
-                break;
+        if (m_operation == sumAndSetOperation) {
+            targetValue = std::to_string(value + pre);
+        } else if (m_operation == substractAndSetOperation) {
+            targetValue = std::to_string(value - pre);
         }
     }
 

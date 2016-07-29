@@ -68,11 +68,13 @@ bool RulesExceptions::load(const std::string &a, std::string *error) {
 
 bool RulesExceptions::addNumber(int a) {
     m_numbers.push_back(a);
+    return true;
 }
 
 
 bool RulesExceptions::addRange(int a, int b) {
     m_ranges.push_back(std::make_pair(a, b));
+    return true;
 }
 
 
