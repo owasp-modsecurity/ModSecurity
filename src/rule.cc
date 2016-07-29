@@ -270,6 +270,7 @@ bool Rule::evaluateActions(Transaction *trasn) {
 
 bool Rule::evaluate(Transaction *trasn) {
     bool ret = false;
+    bool globalRet = false;
     std::vector<Variable *> *variables = this->variables;
     RuleMessage *ruleMessage = NULL;
 
@@ -398,6 +399,7 @@ bool Rule::evaluate(Transaction *trasn) {
                 bool containsDisruptive = false;
                 bool chainResult = false;
                 bool containsPassAction = false;
+		globalRet = true;
 
                 ruleMessage->m_match = "Operator `" + this->op->op +
                     "' with parameter `" + this->op->param + "' against" \
@@ -517,7 +519,7 @@ bool Rule::evaluate(Transaction *trasn) {
                         }
                     }
                 }
-            } else {
+            } else if (globalRet != true) {
 #ifndef NO_LOGS
                 trasn->debug(4, "Rule returned 0.");
                 trasn->m_collections.storeOrUpdateFirst("MATCHED_VAR", "");
@@ -547,7 +549,7 @@ bool Rule::evaluate(Transaction *trasn) {
         delete ruleMessage;
     }
 
-    return ret;
+    return globalRet;
 }
 
 

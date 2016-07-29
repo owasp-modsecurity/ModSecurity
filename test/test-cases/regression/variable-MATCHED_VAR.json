@@ -38,7 +38,7 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecRule ARGS:key \"@contains other_value\" \"chain,id:28\"",
-      "SecRule MATCHED_VAR \"@eq asdf\" \"pass\""
+      "SecRule MATCHED_VAR \"@contains asdf\" \"pass\""
     ]
   },
   {
@@ -80,7 +80,7 @@
       "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDebugLogLevel 9",
       "SecRule ARGS:key \"@contains other_value\" \"chain,id:28\"",
-      "SecRule MATCHED_VAR \"@eq Aasdf\" \"pass\"",
+      "SecRule MATCHED_VAR \"@contains Aasdf\" \"pass\"",
       "SecRule MATCHED_VAR \"@contains other_value\" \"id:29,pass\"",
       "SecRule MATCHED_VAR \"@contains other_value\" \"id:30,pass\""
     ]
