@@ -168,6 +168,15 @@ AC_DEFUN([CHECK_FOR_GEOIP_AT], [
            break
        fi
     done
+    for x in ${GEOIP_POSSIBLE_PATHS}; do
+        if test -e "${x}/include/GeoIPCity.h"; then
+            geoip_inc_path="${x}/include"
+	    break
+        elif test -e "${x}/GeoIPCity.h"; then
+            geoip_inc_path="${x}"
+            break
+        fi
+    done
     if test -e "${path}/include/GeoIPCity.h"; then
         geoip_inc_path="${path}/include"
     elif test -e "${path}/GeoIPCity.h"; then
