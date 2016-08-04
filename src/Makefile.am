@@ -18,7 +18,6 @@ libmbedtls_la_CFLAGS = -D MBEDTLS_CONFIG_FILE=\"mbed-tls-config.h\" -Iutils
 libmbedtls_la_CPPFLAGS =
 libmbedtls_la_LIBADD =
 
-
 CLEANFILES = \
 	location.hh \
 	position.hh \
