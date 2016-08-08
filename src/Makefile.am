@@ -27,6 +27,7 @@ CLEANFILES = \
 	parser/seclang-scanner.cc \
 	stack.hh
 
+EXTRA_DIST = $(CLEANFILES)
 
 MAINTAINERCLEANFILES = \
 	Makefile.in \
