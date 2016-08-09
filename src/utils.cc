@@ -321,13 +321,19 @@ void createDir(std::string dir, int mode) {
 
 
 double cpu_seconds(void) {
-        struct timespec t;
-        if (!clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t))
-                return static_cast<double>(t.tv_sec)
-                     + static_cast<double>(t.tv_nsec / 1000000000.0);
-        else
-                return static_cast<double>(clock()) /
-                    static_cast<double>(CLOCKS_PER_SEC);
+    /*
+     * FIXME: Temporary hack to fix build on MacOS X.  Very issuficient way, but
+     *      works.  Worth reimplementing using mach_absolute_time().
+     */
+#ifndef MACOSX
+    struct timespec t;
+    if (!clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t))
+        return static_cast<double>(t.tv_sec)
+            + static_cast<double>(t.tv_nsec / 1000000000.0);
+    else
+        return static_cast<double>(clock()) /
+            static_cast<double>(CLOCKS_PER_SEC);
+#endif
         return 0;
 }
 
