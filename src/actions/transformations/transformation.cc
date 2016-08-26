@@ -93,7 +93,6 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(normalisePathWin) { return new NormalisePathWin(a); }
     IF_MATCH(normalizePath) { return new NormalisePath(a); }
     IF_MATCH(normalisePath) { return new NormalisePath(a); }
-    IF_MATCH(normalisePath) { return new NormalisePath(a); }
     IF_MATCH(parityEven7bit) { return new ParityEven7bit(a); }
     IF_MATCH(parityOdd7bit) { return new ParityOdd7bit(a); }
     IF_MATCH(parityZero7bit) { return new ParityZero7bit(a); }
