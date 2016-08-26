@@ -24,7 +24,7 @@ namespace operators {
 
 bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
     std::string *error) {
-    size_t pos = param.find_first_of("-");
+    size_t pos = rangeRepresentation.find_first_of("-");
     int start;
     int end;
 
@@ -89,10 +89,13 @@ bool ValidateByteRange::init(const std::string &file,
 
     if (pos == std::string::npos) {
         getRange(param, error);
+    } else {
+        getRange(std::string(param, 0, pos), error);
     }
 
     while (pos != std::string::npos) {
         size_t next_pos = param.find_first_of(",", pos + 1);
+
         if (next_pos == std::string::npos) {
             getRange(std::string(param, pos + 1, param.length() -
                 (pos + 1)), error);
