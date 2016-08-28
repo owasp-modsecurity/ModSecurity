@@ -306,10 +306,14 @@ int json_complete(modsec_rec *msr, char **error_msg) {
 }
 
 /**
- * Frees the resources used for XML parsing.
+ * Frees the resources used for JSON parsing.
  */
 apr_status_t json_cleanup(modsec_rec *msr) {
     msr_log(msr, 4, "JSON: Cleaning up JSON results");
+    if (msr->json->handle != NULL) {
+        yajl_free(msr->json->handle);
+        msr->json->handle = NULL;
+    }
 
     return 1;
 }
