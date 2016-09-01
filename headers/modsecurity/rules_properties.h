@@ -107,7 +107,7 @@ class RulesProperties {
         delete m_debugLog;
     }
 
-    std::vector<Rule *> rules[7];
+    std::vector<Rule *> rules[8];
     std::vector<Rule *> * getRulesForPhase(int phase) {
         if (phase > 7) {
             return NULL;
@@ -116,7 +116,7 @@ class RulesProperties {
     }
 
     //  ModSecurity::Phases::NUMBER_OF_PHASES
-    std::vector<actions::Action *> defaultActions[7];
+    std::vector<actions::Action *> defaultActions[8];
     //  ModSecurity::Phases::NUMBER_OF_PHASES
 
     /**
