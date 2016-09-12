@@ -32,6 +32,7 @@
 #include "actions/capture.h"
 #include "actions/pass.h"
 #include "actions/log.h"
+#include "actions/no_log.h"
 
 
 
@@ -92,6 +93,9 @@ Action *Action::instantiate(const std::string& name) {
     }
     if (name == "log") {
         return new Log(name);
+    }
+    if (name == "nolog") {
+        return new NoLog(name);
     }
     return new Action(name);
 }
