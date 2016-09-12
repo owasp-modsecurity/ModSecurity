@@ -27,7 +27,9 @@ class DetectXSS : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     DetectXSS(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
+        : Operator(op, param, negation) {
+            m_match_message.assign("detected XSS using libinjection.");
+        }
 
     bool evaluate(Transaction *transaction, const std::string &input);
 };

@@ -28,7 +28,9 @@ class DetectSQLi : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     DetectSQLi(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation) { }
+        : Operator(op, param, negation) {
+            m_match_message.assign("detected SQLi using libinjection.");
+        }
 
     bool evaluate(Transaction *transaction, const std::string &input);
 };

@@ -129,12 +129,8 @@ class RuleMessage {
         std::string msg;
 
         msg.append("[client " + std::string(trans->m_clientIpAddress) + "]");
-        msg.append(" ModSecurity: Warning.");
-        msg.append(" Matched \"" + m_match + "\"");
-        if (trans->m_collections.resolveFirst("MATCHED_VAR_NAME")) {
-            msg.append(" at "
-                + *trans->m_collections.resolveFirst("MATCHED_VAR_NAME"));
-        }
+        msg.append(" ModSecurity: Warning. ");
+        msg.append(m_match);
         msg.append(" [file \"" + std::string(m_ruleFile) + "\"]");
         msg.append(" [line \"" + std::to_string(m_ruleLine) + "\"]");
         msg.append(" [id \"" + std::to_string(m_ruleId) + "\"]");

@@ -233,8 +233,9 @@ int Rules::evaluate(int phase, Transaction *transaction) {
 
 int Rules::merge(Driver *from) {
     int amount_of_rules = 0;
-    for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+    for (int i = 0; i <= ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = from->rules[i];
+        this->rules[i].empty();
         for (int j = 0; j < rules.size(); j++) {
             amount_of_rules++;
             Rule *rule = rules[j];
@@ -282,7 +283,7 @@ int Rules::merge(Driver *from) {
      * need to merge anything.
      *
      */
-    for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+    for (int i = 0; i <= ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Action *> actions = from->defaultActions[i];
         this->defaultActions[i].clear();
         for (int j = 0; j < actions.size(); j++) {
@@ -307,7 +308,7 @@ int Rules::merge(Driver *from) {
 
 int Rules::merge(Rules *from) {
     int amount_of_rules = 0;
-    for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+    for (int i = 0; i <= ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = from->rules[i];
         for (int j = 0; j < rules.size(); j++) {
             amount_of_rules++;
@@ -365,7 +366,7 @@ void Rules::debug(int level, std::string message) {
 
 void Rules::dump() {
     std::cout << "Rules: " << std::endl;
-    for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+    for (int i = 0; i <= ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = this->rules[i];
         std::cout << "Phase: " << std::to_string(i);
         std::cout << " (" << std::to_string(rules.size());

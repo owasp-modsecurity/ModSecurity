@@ -401,9 +401,14 @@ bool Rule::evaluate(Transaction *trasn) {
                 bool containsPassAction = false;
 		globalRet = true;
 
-                ruleMessage->m_match = "Operator `" + this->op->op +
-                    "' with parameter `" + this->op->param + "' against" \
-                    " variable `" + v->m_key + "' (Value: `" + value + "' )";
+                if (this->op->m_match_message.empty() == true) {
+                    ruleMessage->m_match = "Matched \"Operator `" + this->op->op +
+                        "' with parameter `" + this->op->param + "' against" \
+                        " variable `" + v->m_key + "' (Value: `" + value + "' ) " +
+                        "\" at " + v->m_key;
+                } else {
+                    ruleMessage->m_match = this->op->m_match_message;
+                }
 #ifndef NO_LOGS
                 trasn->debug(4, "Rule returned 1.");
                     trasn->m_collections.storeOrUpdateFirst("MATCHED_VAR",
@@ -419,11 +424,13 @@ bool Rule::evaluate(Transaction *trasn) {
                 for (Action *a :
                     this->actions_runtime_pos) {
                     if (a->isDisruptive() == true) {
-                        containsDisruptive = true;
                         if (a->m_name == "pass") {
                             containsPassAction = true;
                             trasn->debug(4, "Rule contains a `pass' action");
+                        } else {
+                            containsDisruptive = true;
                         }
+
                     }
                 }
 
@@ -461,7 +468,7 @@ bool Rule::evaluate(Transaction *trasn) {
                                             " (rule _does not_ contains a " \
                                             "disruptive action)");
 #endif
-                                        a->evaluate(this, trasn);
+                                        a->evaluate(this, trasn, ruleMessage);
                                     } else {
 #ifndef NO_LOGS
                                         trasn->debug(4, "(SecDefaultAction) " \
@@ -478,7 +485,7 @@ bool Rule::evaluate(Transaction *trasn) {
                                     "action: " + a->m_name + "!!" \
                                     + std::to_string(a->isDisruptive()));
 #endif
-                                a->evaluate(this, trasn);
+                                a->evaluate(this, trasn, ruleMessage);
                             }
                         }
                     }
@@ -519,6 +526,11 @@ bool Rule::evaluate(Transaction *trasn) {
                         }
                     }
                 }
+                if (ruleMessage->m_saveMessage == true) {
+                    ruleMessage->m_message = m_log_message;
+                    trasn->debug(4, "Saving on the server log: " + ruleMessage->errorLog(trasn));
+                    trasn->serverLog(ruleMessage->errorLog(trasn));
+                }
             } else if (globalRet != true) {
 #ifndef NO_LOGS
                 trasn->debug(4, "Rule returned 0.");
@@ -537,13 +549,10 @@ bool Rule::evaluate(Transaction *trasn) {
         }
     }
 
-    if (ruleMessage->m_saveMessage == true) {
-        trasn->serverLog(ruleMessage->errorLog(trasn));
-    }
-
     if ((!m_log_message.empty() || !m_log_data.empty())
         && !ruleMessage->m_match.empty()) {
         ruleMessage->m_data = m_log_data;
+        ruleMessage->m_message = m_log_message;
         trasn->m_rulesMessages.push_back(ruleMessage);
     } else {
         delete ruleMessage;
