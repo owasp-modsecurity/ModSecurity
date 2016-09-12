@@ -19,6 +19,7 @@
 #include "src/variables/rule.h"
 #include "src/variables/tx.h"
 #include "src/variables/highest_severity.h"
+#include "src/utils.h"
 
 
 namespace modsecurity {
@@ -72,7 +73,7 @@ std::string MacroExpansion::expand(const std::string& input,
             std::string var = std::string(variable, collection + 1,
                 variable.length() - (collection + 1));
 
-            if (col == "RULE") {
+            if (toupper(col) == "RULE") {
                 if (rule == NULL) {
                     transaction->debug(9, "macro expansion: cannot resolve " \
                         "RULE variable without the Rule object");
@@ -94,6 +95,12 @@ std::string MacroExpansion::expand(const std::string& input,
             }
         }
 
+        if (variableValue) {
+            transaction->debug(6, "Resolving: " + variable + " to: " +
+                *variableValue);
+        } else {
+            transaction->debug(6, "Resolving: " + variable + " to: NULL");
+        }
         res.erase(start, end - start + 1);
         if (res[start] == '%') {
             res.erase(start, 1);
