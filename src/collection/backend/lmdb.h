@@ -36,6 +36,8 @@
 #ifndef SRC_COLLECTION_BACKEND_LMDB_H_
 #define SRC_COLLECTION_BACKEND_LMDB_H_
 
+#ifdef WITH_LMDB
+
 #ifdef __cplusplus
 namespace modsecurity {
 namespace collection {
@@ -78,5 +80,6 @@ class LMDB :
 }  // namespace modsecurity
 #endif
 
+#endif  // WITH_LMDB
 
 #endif  // SRC_COLLECTION_BACKEND_LMDB_H_

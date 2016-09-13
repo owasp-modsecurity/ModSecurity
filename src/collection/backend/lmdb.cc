@@ -33,6 +33,9 @@ namespace collection {
 namespace backend {
 
 
+#ifdef WITH_LMDB
+
+
 LMDB::LMDB() : m_env(NULL) {
     mdb_env_create(&m_env);
     mdb_env_open(m_env, "./modsec-shared-collections",
@@ -646,6 +649,7 @@ end_txn:
     return;
 }
 
+#endif
 
 }  // namespace backend
 }  // namespace collection
