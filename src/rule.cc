@@ -402,10 +402,11 @@ bool Rule::evaluate(Transaction *trasn) {
 		globalRet = true;
 
                 if (this->op->m_match_message.empty() == true) {
-                    ruleMessage->m_match = "Matched \"Operator `" + this->op->op +
-                        "' with parameter `" + this->op->param + "' against" \
-                        " variable `" + v->m_key + "' (Value: `" + value + "' ) " +
-                        "\" at " + v->m_key;
+                    ruleMessage->m_match = "Matched \"Operator `" +
+                        this->op->op + "' with parameter `" +
+                        limitTo(200, this->op->param) +
+                        "' against variable `" + v->m_key + "' (Value: `" +
+                        value + "' ) \" at " + v->m_key;
                 } else {
                     ruleMessage->m_match = this->op->m_match_message;
                 }
@@ -430,7 +431,6 @@ bool Rule::evaluate(Transaction *trasn) {
                         } else {
                             containsDisruptive = true;
                         }
-
                     }
                 }
 
@@ -538,7 +538,6 @@ bool Rule::evaluate(Transaction *trasn) {
                 trasn->m_collections.del("MATCHED_VARS:" + v->m_key);
                 trasn->m_collections.del("MATCHED_VARS_NAMES:" + v->m_key);
                 trasn->m_collections.del("MATCHED_VARS_NAME");
-
 #endif
             }
         }
