@@ -28,39 +28,52 @@ namespace actions {
 
 bool Phase::init(std::string *error) {
     std::string a = tolower(m_parser_payload);
+    m_phase = -1;
 
     try {
         m_phase = std::stoi(m_parser_payload);
-    } catch (...) {
-        m_phase = 0;
-        if (a == "request") {
+        if (m_phase == 0) {
+            m_phase = ModSecurity::Phases::ConnectionPhase;
+            m_secRulesPhase = 0;
+        } else if (m_phase == 1) {
             m_phase = ModSecurity::Phases::RequestHeadersPhase;
+            m_secRulesPhase = 1;
+        } else if (m_phase == 2) {
+            m_phase = ModSecurity::Phases::RequestBodyPhase;
             m_secRulesPhase = 2;
-        }
-        if (a == "response") {
+        } else if (m_phase == 3) {
+            m_phase = ModSecurity::Phases::ResponseHeadersPhase;
+            m_secRulesPhase = 3;
+        } else if (m_phase == 4) {
             m_phase = ModSecurity::Phases::ResponseBodyPhase;
             m_secRulesPhase = 4;
+        } else if (m_phase == 5) {
+            m_phase = ModSecurity::Phases::LoggingPhase;
+            m_secRulesPhase = 5;
         }
-        if (a == "logging") {
+    } catch (...) {
+        if (a == "request") {
+            m_phase = ModSecurity::Phases::RequestBodyPhase;
+            m_secRulesPhase = 2;
+        } else if (a == "response") {
+            m_phase = ModSecurity::Phases::ResponseBodyPhase;
+            m_secRulesPhase = 4;
+        } else if (a == "logging") {
             m_phase = ModSecurity::Phases::LoggingPhase;
             m_secRulesPhase = 5;
         }
     }
-
-    if (m_phase == 0) {
-      /* Phase 0 is something new, we want to use as ConnectionPhase */
-      m_phase = ModSecurity::Phases::ConnectionPhase;
-      m_secRulesPhase = 1;
-    } else {
-      /* Otherwise we want to shift the rule to the correct phase */
-      m_secRulesPhase = m_phase;
-      m_phase = m_phase + 1;
+    if (m_phase == -1) {
+        error->assign("Not able to associate the given rule to any phase: " + \
+            m_parser_payload);
+        return false;
     }
 
     if (m_phase > ModSecurity::Phases::NUMBER_OF_PHASES) {
         error->assign("Unknown phase: " + std::to_string(m_phase));
         return false;
     }
+
     return true;
 }
 
