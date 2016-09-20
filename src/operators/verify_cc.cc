@@ -22,6 +22,12 @@
 
 #include "operators/operator.h"
 
+#if PCRE_HAVE_JIT
+#define pcre_study_opt PCRE_STUDY_JIT_COMPILE
+#else
+#define pcre_study_opt 0
+#endif
+
 
 namespace modsecurity {
 namespace operators {
@@ -32,7 +38,11 @@ VerifyCC::~VerifyCC() {
         m_pc = NULL;
     }
     if (m_pce != NULL) {
+#if PCRE_HAVE_JIT
         pcre_free_study(m_pce);
+#else
+        pcre_free(m_pce);
+#endif
         m_pce = NULL;
     }
 }
@@ -90,7 +100,7 @@ bool VerifyCC::init(const std::string &param2, std::string *error) {
         return false;
     }
 
-    m_pce = pcre_study(m_pc, PCRE_STUDY_JIT_COMPILE, &errptr);
+    m_pce = pcre_study(m_pc, pcre_study_opt, &errptr);
     if (m_pce == NULL) {
         if (errptr == NULL) {
             /*
