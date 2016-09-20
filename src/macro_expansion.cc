@@ -64,7 +64,7 @@ std::string MacroExpansion::expand(const std::string& input,
             return res;
         }
         std::string variable(res, start + 2, end - (start + 2));
-        std::string *variableValue;
+        std::string *variableValue = NULL;
         size_t collection = variable.find(".");
         if (collection == std::string::npos) {
             variableValue = transaction->m_collections.resolveFirst(variable);
