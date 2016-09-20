@@ -65,6 +65,31 @@ else
     AC_MSG_RESULT([no])
 fi
 
+if test -n "${PCRE_VERSION}"; then
+    AC_MSG_CHECKING(for PCRE JIT)
+    save_CFLAGS=$CFLAGS
+    save_LDFLAGS=$LDFLAGS
+    CFLAGS="${PCRE_CFLAGS} ${CFLAGS}"
+    LDFLAGS="${LDFLAGS} ${PCRE_LDADD}"
+    AC_TRY_COMPILE([ #include <stdio.h>
+                     #include <pcre.h> ],
+        [ int jit = 0;
+          pcre_free_study(NULL);
+          pcre_config(PCRE_CONFIG_JIT, &jit);
+          if (jit != 1) return 1; ],
+        [ pcre_jit_available=yes ], [:]
+    )
+
+    if test "x$pcre_jit_available" = "xyes"; then
+        AC_MSG_RESULT(yes)
+        PCRE_CFLAGS="${PCRE_CFLAGS} -DPCRE_HAVE_JIT"
+    else
+        AC_MSG_RESULT(no)
+    fi
+    CFLAGS=$save_CFLAGS
+    LDFLAGS=$save_$LDFLAGS
+fi
+
 AC_SUBST(PCRE_CONFIG)
 AC_SUBST(PCRE_VERSION)
 AC_SUBST(PCRE_CPPFLAGS)

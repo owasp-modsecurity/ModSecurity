@@ -27,6 +27,12 @@
 
 #include "utils/geo_lookup.h"
 
+#if PCRE_HAVE_JIT
+#define pcre_study_opt PCRE_STUDY_JIT_COMPILE
+#else
+#define pcre_study_opt 0
+#endif
+
 namespace modsecurity {
 namespace Utils {
 
@@ -42,7 +48,7 @@ Regex::Regex(const std::string& pattern_)
 
     m_pc = pcre_compile(pattern.c_str(), PCRE_DOTALL|PCRE_MULTILINE,
         &errptr, &erroffset, NULL);
-    m_pce = pcre_study(m_pc, PCRE_STUDY_JIT_COMPILE, &errptr);
+    m_pce = pcre_study(m_pc, pcre_study_opt, &errptr);
 }
 
 
@@ -52,7 +58,11 @@ Regex::~Regex() {
         m_pc = NULL;
     }
     if (m_pce != NULL) {
+#if PCRE_HAVE_JIT
         pcre_free_study(m_pce);
+#else
+        pcre_free(m_pce);
+#endif
         m_pce = NULL;
     }
 }
