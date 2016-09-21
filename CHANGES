@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Better handle the json parser cleanup
+   [Issue #1204 - Ephraim Vider]
  * Fix status failing to report in Nginx auditlogs
    [Issue #977, #1171 - @charlymps and Chaim Sanders]
  * Fix file upload JSON audit log entry
