@@ -406,7 +406,7 @@ bool Rule::evaluate(Transaction *trasn) {
                         this->op->op + "' with parameter `" +
                         limitTo(200, this->op->param) +
                         "' against variable `" + v->m_key + "' (Value: `" +
-                        value + "' ) \" at " + v->m_key;
+                        limitTo(100, toHexIfNeeded(value)) + "' ) \" at " + v->m_key;
                 } else {
                     ruleMessage->m_match = this->op->m_match_message;
                 }
@@ -526,11 +526,6 @@ bool Rule::evaluate(Transaction *trasn) {
                         }
                     }
                 }
-                if (ruleMessage->m_saveMessage == true) {
-                    ruleMessage->m_message = m_log_message;
-                    trasn->debug(4, "Saving on the server log: " + ruleMessage->errorLog(trasn));
-                    trasn->serverLog(ruleMessage->errorLog(trasn));
-                }
             } else if (globalRet != true) {
 #ifndef NO_LOGS
                 trasn->debug(4, "Rule returned 0.");
@@ -548,11 +543,10 @@ bool Rule::evaluate(Transaction *trasn) {
         }
     }
 
-    if ((!m_log_message.empty() || !m_log_data.empty())
-        && !ruleMessage->m_match.empty()) {
-        ruleMessage->m_data = m_log_data;
+    if (globalRet == true && rule_id != 0 && ruleMessage->m_saveMessage == true) {
         ruleMessage->m_message = m_log_message;
-        trasn->m_rulesMessages.push_back(ruleMessage);
+        trasn->debug(4, "Saving on the server log: " + ruleMessage->errorLog(trasn));
+        trasn->serverLog(ruleMessage->errorLog(trasn));
     } else {
         delete ruleMessage;
     }
