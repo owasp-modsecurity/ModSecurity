@@ -23,8 +23,10 @@
 #include <algorithm>
 #endif
 
+#ifdef WITH_LMDB
 #include <lmdb.h>
 #include <semaphore.h>
+#endif  // WITH_LMDB
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
