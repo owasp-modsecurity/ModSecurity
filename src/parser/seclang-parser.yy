@@ -313,7 +313,11 @@ using modsecurity::Variables::XML;
 
 
 input:
-    input line
+    END
+      {
+        return NULL;
+      }
+    | input line
     | line
     ;
 
