@@ -144,6 +144,11 @@ int Rules::load(const char *file, const std::string &ref) {
         return -1;
     }
     int rules = this->merge(driver);
+    if (rules == -1) {
+        parserError << driver->parserError.str();
+        delete driver;
+        return -1;
+    }
     delete driver;
 
     return rules;
@@ -235,10 +240,20 @@ int Rules::merge(Driver *from) {
     int amount_of_rules = 0;
     for (int i = 0; i <= ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = from->rules[i];
-        this->rules[i].empty();
+        std::vector<Rule *> rules_here = this->rules[i];
+
         for (int j = 0; j < rules.size(); j++) {
-            amount_of_rules++;
             Rule *rule = rules[j];
+            for (int z = 0; z < rules_here.size(); z++) {
+                Rule *rule_ckc = rules_here[z];
+                if (rule_ckc->rule_id == rule->rule_id) {
+                    parserError << "Rule id: " \
+                        << std::to_string(rule->rule_id) \
+                        << " is duplicated" << std::endl;
+                    return -1;
+                }
+            }
+            amount_of_rules++;
             this->rules[i].push_back(rule);
             rule->refCountIncrease();
         }
@@ -310,9 +325,20 @@ int Rules::merge(Rules *from) {
     int amount_of_rules = 0;
     for (int i = 0; i <= ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = from->rules[i];
+        std::vector<Rule *> rules_here = this->rules[i];
+
         for (int j = 0; j < rules.size(); j++) {
-            amount_of_rules++;
             Rule *rule = rules[j];
+            for (int z = 0; z < rules_here.size(); z++) {
+                Rule *rule_ckc = rules_here[z];
+                if (rule_ckc->rule_id == rule->rule_id) {
+                    parserError << "Rule id: " \
+                        << std::to_string(rule->rule_id) \
+                        << " is duplicated" << std::endl;
+                    return -1;
+                }
+            }
+            amount_of_rules++;
             this->rules[i].push_back(rule);
             rule->refCountIncrease();
         }
