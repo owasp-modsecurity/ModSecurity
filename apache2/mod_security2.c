@@ -1150,7 +1150,7 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
     em->line = line;
     em->level = level;
     em->status = status;
-    em->message = apr_pstrdup(msr->mp, errstr);
+    if (fmt != NULL) em->message = apr_pstrdup(msr->mp, fmt);
 #endif
     /* Remove \n from the end of the message */
     if (em->message != NULL) {
