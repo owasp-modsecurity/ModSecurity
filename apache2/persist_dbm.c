@@ -101,6 +101,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     int expired = 0;
     int i;
 
+
     if (msr->txcfg->data_dir == NULL) {
         msr_log(msr, 1, "collection_retrieve_ex: Unable to retrieve collection (name \"%s\", key \"%s\"). Use "
             "SecDataDir to define data directory first.", log_escape(msr->mp, col_name),
@@ -119,10 +120,18 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     key.dsize = col_key_len + 1;
 
     if (existing_dbm == NULL) {
+        rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
+        if (rc != APR_SUCCESS) {
+            msr_log(msr, 1, "collection_retrieve_ex: Failed to lock proc mutex: %s",
+                    get_apr_error(msr->mp, rc));
+            goto cleanup;
+        }
+
         rc = apr_sdbm_open(&dbm, dbm_filename, APR_READ | APR_SHARELOCK,
             CREATEMODE, msr->mp);
         if (rc != APR_SUCCESS) {
             dbm = NULL;
+            apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
             goto cleanup;
         }
     }
@@ -156,6 +165,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
     /* Close after "value" used from fetch or memory may be overwritten. */
     if (existing_dbm == NULL) {
         apr_sdbm_close(dbm);
+        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
         dbm = NULL;
     }
 
@@ -202,12 +212,19 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
      */
     if (apr_table_get(col, "KEY") == NULL) {
         if (existing_dbm == NULL) {
+            rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
+            if (rc != APR_SUCCESS) {
+                msr_log(msr, 1, "collection_retrieve_ex: Failed to lock proc mutex: %s",
+                        get_apr_error(msr->mp, rc));
+                goto cleanup;
+            }            
             rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
                 CREATEMODE, msr->mp);
             if (rc != APR_SUCCESS) {
                 msr_log(msr, 1, "collection_retrieve_ex: Failed to access DBM file \"%s\": %s",
                     log_escape(msr->mp, dbm_filename), get_apr_error(msr->mp, rc));
                 dbm = NULL;
+                apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
                 goto cleanup;
             }
         }
@@ -227,6 +244,7 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
 
         if (existing_dbm == NULL) {
             apr_sdbm_close(dbm);
+            apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
             dbm = NULL;
         }
 
@@ -289,14 +307,16 @@ static apr_table_t *collection_retrieve_ex(apr_sdbm_t *existing_dbm, modsec_rec 
             log_escape(msr->mp, col_name), log_escape_ex(msr->mp, col_key, col_key_len));
 
         apr_sdbm_close(dbm);
+        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);    
     }
-
+    
     return col;
 
 cleanup:
 
     if ((existing_dbm == NULL) && dbm) {
         apr_sdbm_close(dbm);
+        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);    
     }
 
     return NULL;
@@ -409,6 +429,14 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         var->value_len = strlen(var->value);
     }
 
+    /* Need to lock to pull in the stored data again and apply deltas. */
+    rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
+    if (rc != APR_SUCCESS) {
+        msr_log(msr, 1, "collection_store: Failed to lock proc mutex: %s",
+                get_apr_error(msr->mp, rc));
+        goto error;
+    }
+    
     /* ENH Make the expiration timestamp accessible in blob form so that
      * it is easier/faster to determine expiration without having to
      * convert back to table form
@@ -417,19 +445,13 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
         CREATEMODE, msr->mp);
     if (rc != APR_SUCCESS) {
+        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
         msr_log(msr, 1, "collection_store: Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
             get_apr_error(msr->mp, rc));
         dbm = NULL;
         goto error;
     }
-
-    /* Need to lock to pull in the stored data again and apply deltas. */
-    rc = apr_sdbm_lock(dbm, APR_FLOCK_EXCLUSIVE);
-    if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "collection_store: Failed to exclusivly lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
-            get_apr_error(msr->mp, rc));
-        goto error;
-    }
+    
 
     /* If there is an original value, then create a delta and
      * apply the delta to the current value */
@@ -492,8 +514,8 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
     blob = apr_pcalloc(msr->mp, blob_size);
     if (blob == NULL) {
         if (dbm != NULL) {
-            apr_sdbm_unlock(dbm);
             apr_sdbm_close(dbm);
+            apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
         }
 
         return -1;
@@ -550,16 +572,16 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         msr_log(msr, 1, "collection_store: Failed to write to DBM file \"%s\": %s", dbm_filename,
                 get_apr_error(msr->mp, rc));
         if (dbm != NULL) {
-            apr_sdbm_unlock(dbm);
             apr_sdbm_close(dbm);
+            apr_global_mutex_unlock(msr->modsecurity->dbm_lock);            
         }
 
         return -1;
     }
 
-    apr_sdbm_unlock(dbm);
     apr_sdbm_close(dbm);
-
+    apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
+    
     if (msr->txcfg->debuglog_level >= 4) {
         msr_log(msr, 4, "collection_store: Persisted collection (name \"%s\", key \"%s\").",
             log_escape_ex(msr->mp, var_name->value, var_name->value_len),
@@ -603,9 +625,17 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
                 log_escape(msr->mp, dbm_filename));
     }
 
+    rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
+    if (rc != APR_SUCCESS) {
+        msr_log(msr, 1, "collections_remove_stale: Failed to lock proc mutex: %s",
+                get_apr_error(msr->mp, rc));
+        goto error;
+    }
+    
     rc = apr_sdbm_open(&dbm, dbm_filename, APR_CREATE | APR_WRITE | APR_SHARELOCK,
             CREATEMODE, msr->mp);
     if (rc != APR_SUCCESS) {
+        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
         msr_log(msr, 1, "collections_remove_stale: Failed to access DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
                 get_apr_error(msr->mp, rc));
         dbm = NULL;
@@ -614,12 +644,6 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
 
     /* First get a list of all keys. */
     keys_arr = apr_array_make(msr->mp, 256, sizeof(char *));
-    rc = apr_sdbm_lock(dbm, APR_FLOCK_SHARED);
-    if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "collections_remove_stale: Failed to lock DBM file \"%s\": %s", log_escape(msr->mp, dbm_filename),
-            get_apr_error(msr->mp, rc));
-        goto error;
-    }
 
     /* No one can write to the file while doing this so
      * do it as fast as possible.
@@ -632,7 +656,6 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
         }
         rc = apr_sdbm_nextkey(dbm, &key);
     }
-    apr_sdbm_unlock(dbm);
 
     if (msr->txcfg->debuglog_level >= 9) {
         msr_log(msr, 9, "collections_remove_stale: Found %d record(s) in file \"%s\".", keys_arr->nelts,
@@ -698,13 +721,14 @@ int collections_remove_stale(modsec_rec *msr, const char *col_name) {
     }
 
     apr_sdbm_close(dbm);
-
+    apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
     return 1;
 
 error:
 
     if (dbm) {
         apr_sdbm_close(dbm);
+        apr_global_mutex_unlock(msr->modsecurity->dbm_lock);
     }
 
     return -1;
