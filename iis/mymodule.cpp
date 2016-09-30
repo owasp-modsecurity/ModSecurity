@@ -105,9 +105,7 @@ char *GetIpAddr(apr_pool_t *pool, PSOCKADDR pAddr)
 	// test for IPV4 with port on the end
 	if (sscanf(buf, format, ip, port) == 2) {
 		// IPV4 but with port - remove the port
-		char* input = ":";
-		char* ipv4 = strtok(buf, input);
-		return ipv4;
+		return strtok(buf, ":");
 	}
 
 	return buf;
@@ -1017,6 +1015,16 @@ CMyHttpModule::OnBeginRequest(
 		r->method = "UNLOCK";
 		r->method_number = M_UNLOCK;
 		break;
+	}
+
+	if (r->method_number == M_INVALID)
+	{
+		if ((req->pUnknownVerb != NULL) && (strcmp(req->pUnknownVerb, "PATCH") == 0))
+		{
+			// this is a PATCH command and should be supported 
+			r->method = "PATCH";
+			r->method_number = M_PATCH;
+		}
 	}
 
 	if(HTTP_EQUAL_VERSION(req->Version, 0, 9))
