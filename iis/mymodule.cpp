@@ -1016,17 +1016,7 @@ CMyHttpModule::OnBeginRequest(
 		r->method_number = M_UNLOCK;
 		break;
 	}
-
-	if (r->method_number == M_INVALID)
-	{
-		if ((req->pUnknownVerb != NULL) && (strcmp(req->pUnknownVerb, "PATCH") == 0))
-		{
-			// this is a PATCH command and should be supported 
-			r->method = "PATCH";
-			r->method_number = M_PATCH;
-		}
-	}
-
+	
 	if(HTTP_EQUAL_VERSION(req->Version, 0, 9))
 		r->protocol = "HTTP/0.9";
 	else if(HTTP_EQUAL_VERSION(req->Version, 1, 0))
