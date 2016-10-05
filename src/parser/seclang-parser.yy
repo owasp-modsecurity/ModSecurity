@@ -18,6 +18,7 @@ class Driver;
 }
 
 #include "modsecurity/modsecurity.h"
+#include "modsecurity/rules_properties.h"
 
 #include "actions/accuracy.h"
 #include "actions/action.h"
@@ -328,51 +329,51 @@ audit_log:
     /* SecAuditLogDirMode */
     CONFIG_DIR_AUDIT_DIR_MOD
       {
-        driver.audit_log->setStorageDirMode(strtol($1.c_str(), NULL, 8));
+        driver.m_auditLog->setStorageDirMode(strtol($1.c_str(), NULL, 8));
       }
 
     /* SecAuditLogStorageDir */
     | CONFIG_DIR_AUDIT_DIR
       {
-        driver.audit_log->setStorageDir($1);
+        driver.m_auditLog->setStorageDir($1);
       }
 
     /* SecAuditEngine */
     | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_RELEVANT_ONLY
       {
-        driver.audit_log->setStatus(modsecurity::audit_log::AuditLog::RelevantOnlyAuditLogStatus);
+        driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::RelevantOnlyAuditLogStatus);
       }
     | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_OFF
       {
-        driver.audit_log->setStatus(modsecurity::audit_log::AuditLog::OffAuditLogStatus);
+        driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OffAuditLogStatus);
       }
     | CONFIG_DIR_AUDIT_ENG CONFIG_VALUE_ON
       {
-        driver.audit_log->setStatus(modsecurity::audit_log::AuditLog::OnAuditLogStatus);
+        driver.m_auditLog->setStatus(modsecurity::audit_log::AuditLog::OnAuditLogStatus);
       }
 
     /* SecAuditLogFileMode */
     | CONFIG_DIR_AUDIT_FLE_MOD
       {
-        driver.audit_log->setFileMode(strtol($1.c_str(), NULL, 8));
+        driver.m_auditLog->setFileMode(strtol($1.c_str(), NULL, 8));
       }
 
     /* SecAuditLog2 */
     | CONFIG_DIR_AUDIT_LOG2
       {
-        driver.audit_log->setFilePath2($1);
+        driver.m_auditLog->setFilePath2($1);
       }
 
     /* SecAuditLogParts */
     | CONFIG_DIR_AUDIT_LOG_P
       {
-        driver.audit_log->setParts($1);
+        driver.m_auditLog->setParts($1);
       }
 
     /* SecAuditLog */
     | CONFIG_DIR_AUDIT_LOG
       {
-        driver.audit_log->setFilePath1($1);
+        driver.m_auditLog->setFilePath1($1);
       }
 
     /* SecAuditLogRelevantStatus */
@@ -381,51 +382,53 @@ audit_log:
         std::string relevant_status($1);
         relevant_status.pop_back();
         relevant_status.erase(0, 1);
-        driver.audit_log->setRelevantStatus(relevant_status);
+        driver.m_auditLog->setRelevantStatus(relevant_status);
       }
 
     /* SecAuditLogType */
     | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_SERIAL
       {
-        driver.audit_log->setType(modsecurity::audit_log::AuditLog::SerialAuditLogType);
+        driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::SerialAuditLogType);
       }
     | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_PARALLEL
       {
-        driver.audit_log->setType(modsecurity::audit_log::AuditLog::ParallelAuditLogType);
+        driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::ParallelAuditLogType);
       }
     | CONFIG_DIR_AUDIT_TPE CONFIG_VALUE_HTTPS
       {
-        driver.audit_log->setType(modsecurity::audit_log::AuditLog::HttpsAuditLogType);
+        driver.m_auditLog->setType(modsecurity::audit_log::AuditLog::HttpsAuditLogType);
       }
 
     /* Upload */
     | CONFIG_UPDLOAD_KEEP_FILES CONFIG_VALUE_ON
       {
-        driver.uploadKeepFiles = true;
+        driver.m_uploadKeepFiles = modsecurity::RulesProperties::TrueConfigBoolean;
       }
     | CONFIG_UPDLOAD_KEEP_FILES CONFIG_VALUE_OFF
       {
-        driver.uploadKeepFiles = false;
+        driver.m_uploadKeepFiles = modsecurity::RulesProperties::FalseConfigBoolean;
       }
     | CONFIG_UPLOAD_FILE_LIMIT
       {
-        driver.uploadFileLimit = strtol($1.c_str(), NULL, 10);
+        driver.m_uploadFileLimit.m_set = true;
+        driver.m_uploadFileLimit.m_value = strtol($1.c_str(), NULL, 10);
       }
     | CONFIG_UPLOAD_FILE_MODE
       {
-        driver.uploadFileMode = strtol($1.c_str(), NULL, 8);
+        driver.m_uploadFileMode.m_set = true;
+        driver.m_uploadFileMode.m_value = strtol($1.c_str(), NULL, 8);
       }
     | CONFIG_UPLOAD_DIR
       {
-        driver.uploadDirectory = $1;
+        driver.m_uploadDirectory = $1;
       }
     | CONFIG_UPDLOAD_SAVE_TMP_FILES CONFIG_VALUE_ON
       {
-        driver.tmpSaveUploadedFiles = true;
+        driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::TrueConfigBoolean;
       }
     | CONFIG_UPDLOAD_SAVE_TMP_FILES CONFIG_VALUE_OFF
       {
-        driver.tmpSaveUploadedFiles = false;
+        driver.m_tmpSaveUploadedFiles = modsecurity::RulesProperties::FalseConfigBoolean;
       }
     ;
 
@@ -581,35 +584,35 @@ expression:
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_OFF
       {
-        driver.secRuleEngine = modsecurity::Rules::DisabledRuleEngine;
+        driver.m_secRuleEngine = modsecurity::Rules::DisabledRuleEngine;
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_ON
       {
-        driver.secRuleEngine = modsecurity::Rules::EnabledRuleEngine;
+        driver.m_secRuleEngine = modsecurity::Rules::EnabledRuleEngine;
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_DETC
       {
-        driver.secRuleEngine = modsecurity::Rules::DetectionOnlyRuleEngine;
+        driver.m_secRuleEngine = modsecurity::Rules::DetectionOnlyRuleEngine;
       }
     | CONFIG_DIR_REQ_BODY CONFIG_VALUE_ON
       {
-        driver.secRequestBodyAccess = true;
+        driver.m_secRequestBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
       }
     | CONFIG_DIR_REQ_BODY CONFIG_VALUE_OFF
       {
-        driver.secRequestBodyAccess = false;
+        driver.m_secRequestBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
       }
     | CONFIG_DIR_RES_BODY CONFIG_VALUE_ON
       {
-        driver.secResponseBodyAccess = true;
+        driver.m_secResponseBodyAccess = modsecurity::RulesProperties::TrueConfigBoolean;
       }
     | CONFIG_DIR_RES_BODY CONFIG_VALUE_OFF
       {
-        driver.secResponseBodyAccess = false;
+        driver.m_secResponseBodyAccess = modsecurity::RulesProperties::FalseConfigBoolean;
       }
     | CONFIG_COMPONENT_SIG
       {
-        driver.components.push_back($1);
+        driver.m_components.push_back($1);
       }
     | CONFIG_SEC_RULE_REMOVE_BY_ID
       {
@@ -671,43 +674,47 @@ expression:
     /* Body limits */
     | CONFIG_DIR_REQ_BODY_LIMIT
       {
-        driver.requestBodyLimit = atoi($1.c_str());
+        driver.m_requestBodyLimit.m_set = true;
+        driver.m_requestBodyLimit.m_value = atoi($1.c_str());
       }
     | CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT
       {
-        driver.requestBodyNoFilesLimit = atoi($1.c_str());
+        driver.m_requestBodyNoFilesLimit.m_set = true;
+        driver.m_requestBodyNoFilesLimit.m_value = atoi($1.c_str());
       }
     | CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT
       {
-        driver.requestBodyInMemoryLimit = atoi($1.c_str());
+        driver.m_requestBodyInMemoryLimit.m_set = true;
+        driver.m_requestBodyInMemoryLimit.m_value = atoi($1.c_str());
       }
     | CONFIG_DIR_RES_BODY_LIMIT
       {
-        driver.responseBodyLimit = atoi($1.c_str());
+        driver.m_responseBodyLimit.m_set = true;
+        driver.m_responseBodyLimit.m_value = atoi($1.c_str());
       }
     | CONFIG_DIR_REQ_BODY_LIMIT_ACTION CONFIG_VALUE_PROCESS_PARTIAL
       {
-        driver.requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
+        driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
     | CONFIG_DIR_REQ_BODY_LIMIT_ACTION CONFIG_VALUE_REJECT
       {
-        driver.requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+        driver.m_requestBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
     | CONFIG_DIR_RES_BODY_LIMIT_ACTION CONFIG_VALUE_PROCESS_PARTIAL
       {
-        driver.responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
+        driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::ProcessPartialBodyLimitAction;
       }
     | CONFIG_DIR_RES_BODY_LIMIT_ACTION CONFIG_VALUE_REJECT
       {
-        driver.responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
+        driver.m_responseBodyLimitAction = modsecurity::Rules::BodyLimitAction::RejectBodyLimitAction;
       }
     | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION CONFIG_VALUE_ABORT
       {
-        driver.remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
+        driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction;
       }
     | CONFIG_SEC_REMOTE_RULES_FAIL_ACTION CONFIG_VALUE_WARN
       {
-        driver.remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
+        driver.m_remoteRulesActionOnFailed = Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction;
       }
     | CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION
     | CONFIG_DIR_PCRE_MATCH_LIMIT
@@ -724,11 +731,11 @@ expression:
       }
     | CONFIG_XML_EXTERNAL_ENTITY CONFIG_VALUE_OFF
       {
-        driver.secXMLExternalEntity = false;
+        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::FalseConfigBoolean;
       }
     | CONFIG_XML_EXTERNAL_ENTITY CONFIG_VALUE_ON
       {
-        driver.secXMLExternalEntity = true;
+        driver.m_secXMLExternalEntity = modsecurity::RulesProperties::TrueConfigBoolean;
       }
     | CONGIG_DIR_SEC_TMP_DIR
     | CONGIG_DIR_SEC_DATA_DIR
@@ -949,7 +956,7 @@ act:
         $$ = Action::instantiate($1);
 
         if ($$->init(&error) == false) {
-            driver.parserError << error;
+            driver.m_parserError << error;
             YYERROR;
         }
       }
@@ -1067,7 +1074,7 @@ act:
         SetSID *setSID = new SetSID($1);
 
         if (setSID->init(&error) == false) {
-            driver.parserError << error;
+            driver.m_parserError << error;
             YYERROR;
         }
 
@@ -1079,7 +1086,7 @@ act:
         SetUID *setUID = new SetUID($1);
 
         if (setUID->init(&error) == false) {
-            driver.parserError << error;
+            driver.m_parserError << error;
             YYERROR;
         }
 
@@ -1091,7 +1098,7 @@ act:
         SetVar *setVar = new SetVar($1);
 
         if (setVar->init(&error) == false) {
-            driver.parserError << error;
+            driver.m_parserError << error;
             YYERROR;
         }
 

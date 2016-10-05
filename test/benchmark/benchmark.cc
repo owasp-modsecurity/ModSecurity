@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
     rules = new modsecurity::Rules();
     if (rules->loadFromUri(rules_file) < 0) {
         std::cout << "Problems loading the rules..." << std::endl;
-        std::cout << rules->parserError.str() << std::endl;
+        std::cout << rules->m_parserError.str() << std::endl;
         return -1;
     }
 

@@ -52,6 +52,7 @@ void Rules::incrementReferenceCount(void) {
     this->m_referenceCount++;
 }
 
+
 /**
  * @name    decrementReferenceCount
  * @brief   Decrement the number of transactions using this class
@@ -98,8 +99,8 @@ Rules::~Rules() {
         }
     }
     /** Cleanup audit log */
-    if (audit_log) {
-        audit_log->refCountDecreaseAndCheck();
+    if (m_auditLog) {
+        m_auditLog->refCountDecreaseAndCheck();
     }
 
     free(unicode_map_table);
@@ -125,7 +126,7 @@ int Rules::loadFromUri(const char *uri) {
     Driver *driver = new Driver();
 
     if (driver->parseFile(uri) == false) {
-        parserError << driver->parserError.str();
+        m_parserError << driver->m_parserError.str();
         return -1;
     }
 
@@ -135,17 +136,18 @@ int Rules::loadFromUri(const char *uri) {
     return rules;
 }
 
+
 int Rules::load(const char *file, const std::string &ref) {
     Driver *driver = new Driver();
 
     if (driver->parse(file, ref) == false) {
-        parserError << driver->parserError.str();
+        m_parserError << driver->m_parserError.str();
         delete driver;
         return -1;
     }
     int rules = this->merge(driver);
     if (rules == -1) {
-        parserError << driver->parserError.str();
+        m_parserError << driver->m_parserError.str();
         delete driver;
         return -1;
     }
@@ -174,7 +176,7 @@ int Rules::load(const char *plainRules) {
 
 
 std::string Rules::getParserError() {
-    return this->parserError.str();
+    return this->m_parserError.str();
 }
 
 
@@ -238,83 +240,20 @@ int Rules::evaluate(int phase, Transaction *transaction) {
 
 int Rules::merge(Driver *from) {
     int amount_of_rules = 0;
-    for (int i = 0; i <= ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
-        std::vector<Rule *> rules = from->rules[i];
-        std::vector<Rule *> rules_here = this->rules[i];
+    amount_of_rules = mergeProperties(
+        reinterpret_cast<RulesProperties *>(from),
+        reinterpret_cast<RulesProperties *>(this),
+        &m_parserError);
 
-        for (int j = 0; j < rules.size(); j++) {
-            Rule *rule = rules[j];
-            for (int z = 0; z < rules_here.size(); z++) {
-                Rule *rule_ckc = rules_here[z];
-                if (rule_ckc->rule_id == rule->rule_id) {
-                    parserError << "Rule id: " \
-                        << std::to_string(rule->rule_id) \
-                        << " is duplicated" << std::endl;
-                    return -1;
-                }
-            }
-            amount_of_rules++;
-            this->rules[i].push_back(rule);
-            rule->refCountIncrease();
-        }
+    if (from->m_auditLog != NULL && this->m_auditLog != NULL) {
+        this->m_auditLog->refCountDecreaseAndCheck();
     }
 
-    this->secRuleEngine = from->secRuleEngine;
-    this->secRequestBodyAccess = from->secRequestBodyAccess;
-    this->secResponseBodyAccess = from->secResponseBodyAccess;
-    this->secXMLExternalEntity = from->secXMLExternalEntity;
-    if (from->m_debugLog && this->m_debugLog &&
-        from->m_debugLog->isLogFileSet()) {
-        this->m_debugLog->setDebugLogFile(from->m_debugLog->getDebugLogFile());
+    if (from->m_auditLog) {
+        this->m_auditLog = from->m_auditLog;
     }
-    if (from->m_debugLog && this->m_debugLog &&
-        from->m_debugLog->isLogLevelSet()) {
-        this->m_debugLog->setDebugLogLevel(
-            from->m_debugLog->getDebugLogLevel());
-    }
-    this->components = from->components;
-    this->requestBodyLimit = from->requestBodyLimit;
-    this->responseBodyLimit = from->responseBodyLimit;
-    this->requestBodyLimitAction = from->requestBodyLimitAction;
-    this->responseBodyLimitAction = from->responseBodyLimitAction;
-
-    this->uploadKeepFiles = from->uploadKeepFiles;
-    this->uploadFileLimit = from->uploadFileLimit;
-    this->uploadFileMode = from->uploadFileMode;
-    this->uploadDirectory = from->uploadDirectory;
-    this->tmpSaveUploadedFiles = from->tmpSaveUploadedFiles;
-
-    for (std::set<std::string>::iterator
-        it = from->m_responseBodyTypeToBeInspected.begin();
-        it != from->m_responseBodyTypeToBeInspected.end(); ++it) {
-        m_responseBodyTypeToBeInspected.insert(*it);
-    }
-
-    this->m_exceptions = from->m_exceptions;
-
-    /*
-     *
-     * default Actions is something per configuration context, there is
-     * need to merge anything.
-     *
-     */
-    for (int i = 0; i <= ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
-        std::vector<Action *> actions = from->defaultActions[i];
-        this->defaultActions[i].clear();
-        for (int j = 0; j < actions.size(); j++) {
-            Action *action = actions[j];
-            this->defaultActions[i].push_back(action);
-        }
-    }
-
-    if (from->audit_log != NULL && this->audit_log != NULL) {
-        this->audit_log->refCountDecreaseAndCheck();
-    }
-    if (from->audit_log) {
-        this->audit_log = from->audit_log;
-    }
-    if (this->audit_log != NULL) {
-        this->audit_log->refCountIncrease();
+    if (this->m_auditLog != NULL) {
+        this->m_auditLog->refCountIncrease();
     }
 
     return amount_of_rules;
@@ -323,64 +262,24 @@ int Rules::merge(Driver *from) {
 
 int Rules::merge(Rules *from) {
     int amount_of_rules = 0;
-    for (int i = 0; i <= ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
-        std::vector<Rule *> rules = from->rules[i];
-        std::vector<Rule *> rules_here = this->rules[i];
+    amount_of_rules = mergeProperties(
+        reinterpret_cast<RulesProperties *>(from),
+        reinterpret_cast<RulesProperties *>(this),
+        &m_parserError);
 
-        for (int j = 0; j < rules.size(); j++) {
-            Rule *rule = rules[j];
-            for (int z = 0; z < rules_here.size(); z++) {
-                Rule *rule_ckc = rules_here[z];
-                if (rule_ckc->rule_id == rule->rule_id) {
-                    parserError << "Rule id: " \
-                        << std::to_string(rule->rule_id) \
-                        << " is duplicated" << std::endl;
-                    return -1;
-                }
-            }
-            amount_of_rules++;
-            this->rules[i].push_back(rule);
-            rule->refCountIncrease();
-        }
+    if (from->m_auditLog != NULL && this->m_auditLog != NULL) {
+        this->m_auditLog->refCountDecreaseAndCheck();
     }
-
-    this->secRuleEngine = from->secRuleEngine;
-    this->secRequestBodyAccess = from->secRequestBodyAccess;
-    this->secResponseBodyAccess = from->secResponseBodyAccess;
-    this->components = from->components;
-    this->requestBodyLimit = from->requestBodyLimit;
-    this->responseBodyLimit = from->responseBodyLimit;
-    this->requestBodyLimitAction = from->requestBodyLimitAction;
-    this->responseBodyLimitAction = from->responseBodyLimitAction;
-
-    this->uploadKeepFiles = from->uploadKeepFiles;
-    this->uploadFileLimit = from->uploadFileLimit;
-    this->uploadFileMode = from->uploadFileMode;
-    this->uploadDirectory = from->uploadDirectory;
-    this->tmpSaveUploadedFiles = from->tmpSaveUploadedFiles;
-
-    if (from->m_debugLog && this->m_debugLog &&
-        from->m_debugLog->isLogFileSet()) {
-        this->m_debugLog->setDebugLogFile(from->m_debugLog->getDebugLogFile());
+    if (from->m_auditLog) {
+        this->m_auditLog = from->m_auditLog;
     }
-    if (from->m_debugLog && this->m_debugLog &&
-        from->m_debugLog->isLogLevelSet()) {
-        this->m_debugLog->setDebugLogLevel(
-            from->m_debugLog->getDebugLogLevel());
-    }
-
-    if (from->audit_log != NULL && this->audit_log != NULL) {
-        this->audit_log->refCountDecreaseAndCheck();
-    }
-    if (from->audit_log) {
-        this->audit_log = from->audit_log;
-    }
-    if (this->audit_log != NULL) {
-        this->audit_log->refCountIncrease();
+    if (this->m_auditLog != NULL) {
+        this->m_auditLog->refCountIncrease();
     }
 
     return amount_of_rules;
 }
+
 
 
 void Rules::debug(int level, std::string message) {

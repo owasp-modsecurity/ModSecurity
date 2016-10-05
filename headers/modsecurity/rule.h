@@ -23,7 +23,7 @@
 #ifndef HEADERS_MODSECURITY_RULE_H_
 #define HEADERS_MODSECURITY_RULE_H_
 
-#include "modsecurity/modsecurity.h"
+#include "modsecurity/transaction.h"
 
 
 #ifdef __cplusplus
@@ -31,6 +31,12 @@
 namespace modsecurity {
 namespace Variables {
 class Variable;
+}
+namespace actions {
+class Action;
+}
+namespace operators {
+class Operator;
 }
 
 class Rule {

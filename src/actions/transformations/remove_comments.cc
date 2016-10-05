@@ -21,6 +21,7 @@
 #include <functional>
 #include <cctype>
 #include <locale>
+#include <cstring>
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"

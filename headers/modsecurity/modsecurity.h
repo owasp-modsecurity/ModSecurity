@@ -92,7 +92,6 @@ typedef struct ModSecurity_t modsecurity;
 #include "modsecurity/intervention.h"
 #include "modsecurity/transaction.h"
 #include "modsecurity/debug_log.h"
-#include "modsecurity/rules.h"
 
 /**
  * TAG_NUM:
@@ -128,9 +127,6 @@ namespace modsecurity {
 /* few forwarded declarations */
 namespace actions {
 class Action;
-}
-namespace operators {
-class Operators;
 }
 class Rule;
 

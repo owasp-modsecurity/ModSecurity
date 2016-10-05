@@ -27,14 +27,14 @@ namespace Parser {
 Driver::Driver()
   : trace_scanning(false),
   trace_parsing(false) {
-      audit_log = new audit_log::AuditLog();
-      audit_log->refCountIncrease();
+      m_auditLog = new audit_log::AuditLog();
+      m_auditLog->refCountIncrease();
   }
 
 
 Driver::~Driver() {
-    if (audit_log != NULL) {
-        audit_log->refCountDecreaseAndCheck();
+    if (m_auditLog != NULL) {
+        m_auditLog->refCountDecreaseAndCheck();
     }
     delete loc.back();
 }
@@ -52,8 +52,8 @@ int Driver::addSecMarker(std::string marker) {
 
 int Driver::addSecAction(Rule *rule) {
     if (rule->phase > ModSecurity::Phases::NUMBER_OF_PHASES) {
-        parserError << "Unknown phase: " << std::to_string(rule->phase);
-        parserError << std::endl;
+        m_parserError << "Unknown phase: " << std::to_string(rule->phase);
+        m_parserError << std::endl;
         return false;
     }
 
@@ -64,8 +64,8 @@ int Driver::addSecAction(Rule *rule) {
 
 int Driver::addSecRule(Rule *rule) {
     if (rule->phase > ModSecurity::Phases::NUMBER_OF_PHASES) {
-        parserError << "Unknown phase: " << std::to_string(rule->phase);
-        parserError << std::endl;
+        m_parserError << "Unknown phase: " << std::to_string(rule->phase);
+        m_parserError << std::endl;
         return false;
     }
 
@@ -91,16 +91,16 @@ int Driver::addSecRule(Rule *rule) {
      * by other rule
      */
     if (rule->rule_id == 0) {
-        parserError << "Rules must have an ID. File: ";
-        parserError << rule->m_fileName << " at line: ";
-        parserError << std::to_string(rule->m_lineNumber) << std::endl;
+        m_parserError << "Rules must have an ID. File: ";
+        m_parserError << rule->m_fileName << " at line: ";
+        m_parserError << std::to_string(rule->m_lineNumber) << std::endl;
         return false;
     }
     for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = this->rules[i];
         for (int j = 0; j < rules.size(); j++) {
             if (rules[j]->rule_id == rule->rule_id) {
-                parserError << "Rule id: " << std::to_string(rule->rule_id) \
+                m_parserError << "Rule id: " << std::to_string(rule->rule_id) \
                     << " is duplicated" << std::endl;
                 return false;
             }
@@ -129,8 +129,8 @@ int Driver::parse(const std::string &f, const std::string &ref) {
     int res = parser.parse();
     scan_end();
 
-    if (audit_log->init() == false) {
-        parserError << "Problems while initializing the audit logs" \
+    if (m_auditLog->init() == false) {
+        m_parserError << "Problems while initializing the audit logs" \
             << std::endl;
         return false;
     }
@@ -144,7 +144,7 @@ int Driver::parseFile(const std::string &f) {
     std::string str;
 
     if (t.is_open() == false) {
-        parserError << "Failed to open the file: " << f << std::endl;
+        m_parserError << "Failed to open the file: " << f << std::endl;
         return false;
     }
 
@@ -166,21 +166,21 @@ void Driver::error(const yy::location& l, const std::string& m) {
 
 void Driver::error(const yy::location& l, const std::string& m,
     const std::string& c) {
-    if (parserError.tellp() == 0) {
-        parserError << "Rules error. ";
+    if (m_parserError.tellp() == 0) {
+        m_parserError << "Rules error. ";
         if (ref.empty() == false) {
-            parserError << "File: " << ref.back() << ". ";
+            m_parserError << "File: " << ref.back() << ". ";
         }
-        parserError << "Line: " << l.end.line << ". ";
-        parserError << "Column: " << l.end.column - 1 << ". ";
+        m_parserError << "Line: " << l.end.line << ". ";
+        m_parserError << "Column: " << l.end.column - 1 << ". ";
     }
 
     if (m.empty() == false) {
-        parserError << "" << m << " ";
+        m_parserError << "" << m << " ";
     }
 
     if (c.empty() == false) {
-        parserError << c;
+        m_parserError << c;
     }
 }
 

@@ -453,7 +453,7 @@ int Transaction::processRequestHeaders() {
     debug(4, "Starting phase REQUEST_HEADERS.  (SecRules 1)");
 #endif
 
-    if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+    if (m_rules->m_secRuleEngine == Rules::DisabledRuleEngine) {
 #ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
 #endif
@@ -618,7 +618,7 @@ int Transaction::processRequestBody() {
     debug(4, "Starting phase REQUEST_BODY. (SecRules 2)");
 #endif
 
-    if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+    if (m_rules->m_secRuleEngine == Rules::DisabledRuleEngine) {
 #ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
 #endif
@@ -800,7 +800,8 @@ int Transaction::requestBodyFromFile(const char *path) {
 
 #ifndef NO_LOGS
     debug(9, "Adding request body: " + std::to_string(len) + " bytes. " \
-        "Limit set to: " + std::to_string(this->m_rules->requestBodyLimit));
+        "Limit set to: "
+        + std::to_string(this->m_rules->m_requestBodyLimit.m_value));
 #endif
 
     return appendRequestBody(reinterpret_cast<const unsigned char*>(buf), len);
@@ -811,18 +812,20 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
 
 #ifndef NO_LOGS
     debug(9, "Appending request body: " + std::to_string(len) + " bytes. " \
-        "Limit set to: " + std::to_string(this->m_rules->requestBodyLimit));
+        "Limit set to: "
+        + std::to_string(this->m_rules->m_requestBodyLimit.m_value));
 #endif
 
-    if (this->m_rules->requestBodyLimit > 0
-        && this->m_rules->requestBodyLimit < len + current_size) {
+    if (this->m_rules->m_requestBodyLimit.m_value > 0
+        && this->m_rules->m_requestBodyLimit.m_value < len + current_size) {
         m_collections.store("INBOUND_DATA_ERROR", "1");
 #ifndef NO_LOGS
         debug(5, "Request body is bigger than the maximum expected.");
 #endif
-        if (this->m_rules->requestBodyLimitAction ==
+        if (this->m_rules->m_requestBodyLimitAction ==
             Rules::BodyLimitAction::ProcessPartialBodyLimitAction) {
-            size_t spaceLeft = this->m_rules->requestBodyLimit - current_size;
+            size_t spaceLeft = this->m_rules->m_requestBodyLimit.m_value
+                - current_size;
             this->m_requestBody.write(reinterpret_cast<const char*>(buf),
                 spaceLeft);
 #ifndef NO_LOGS
@@ -830,7 +833,7 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
 #endif
             return false;
         } else {
-            if (this->m_rules->requestBodyLimitAction ==
+            if (this->m_rules->m_requestBodyLimitAction ==
                 Rules::BodyLimitAction::RejectBodyLimitAction) {
 #ifndef NO_LOGS
                 debug(5, "Request body limit is marked to reject the " \
@@ -876,7 +879,7 @@ int Transaction::processResponseHeaders(int code, const std::string& proto) {
     this->m_collections.store("STATUS", std::to_string(code));
     m_collections.store("RESPONSE_PROTOCOL", proto);
 
-    if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+    if (m_rules->m_secRuleEngine == Rules::DisabledRuleEngine) {
 #ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
 #endif
@@ -997,7 +1000,7 @@ int Transaction::processResponseBody() {
     debug(4, "Starting phase RESPONSE_BODY. (SecRules 4)");
 #endif
 
-    if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+    if (m_rules->m_secRuleEngine == Rules::DisabledRuleEngine) {
 #ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
 #endif
@@ -1067,18 +1070,19 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
 #ifndef NO_LOGS
     debug(9, "Appending response body: " + std::to_string(len + current_size)
         + " bytes. Limit set to: " +
-        std::to_string(this->m_rules->responseBodyLimit));
+        std::to_string(this->m_rules->m_responseBodyLimit.m_value));
 #endif
 
-    if (this->m_rules->responseBodyLimit > 0
-        && this->m_rules->responseBodyLimit < len + current_size) {
+    if (this->m_rules->m_responseBodyLimit.m_value > 0
+        && this->m_rules->m_responseBodyLimit.m_value < len + current_size) {
         m_collections.store("OUTBOUND_DATA_ERROR", "1");
 #ifndef NO_LOGS
         debug(5, "Response body is bigger than the maximum expected.");
 #endif
-        if (this->m_rules->responseBodyLimitAction ==
+        if (this->m_rules->m_responseBodyLimitAction ==
             Rules::BodyLimitAction::ProcessPartialBodyLimitAction) {
-            size_t spaceLeft = this->m_rules->responseBodyLimit - current_size;
+            size_t spaceLeft = this->m_rules->m_responseBodyLimit.m_value \
+                - current_size;
             this->m_responseBody.write(reinterpret_cast<const char*>(buf),
                 spaceLeft);
 #ifndef NO_LOGS
@@ -1086,7 +1090,7 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
 #endif
             return false;
         } else {
-            if (this->m_rules->responseBodyLimitAction ==
+            if (this->m_rules->m_responseBodyLimitAction ==
                 Rules::BodyLimitAction::RejectBodyLimitAction) {
 #ifndef NO_LOGS
                 debug(5, "Response body limit is marked to reject the " \
@@ -1171,7 +1175,7 @@ int Transaction::processLogging() {
     debug(4, "Starting phase LOGGING. (SecRules 5)");
 #endif
 
-    if (m_rules->secRuleEngine == Rules::DisabledRuleEngine) {
+    if (m_rules->m_secRuleEngine == Rules::DisabledRuleEngine) {
 #ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
 #endif
@@ -1181,7 +1185,7 @@ int Transaction::processLogging() {
     this->m_rules->evaluate(ModSecurity::LoggingPhase, this);
 
     /* If relevant, save this transaction information at the audit_logs */
-    if (m_rules != NULL && m_rules->audit_log != NULL) {
+    if (m_rules != NULL && m_rules->m_auditLog != NULL) {
         int parts = -1;
 #ifndef NO_LOGS
         debug(8, "Checking if this request is suitable to be " \
@@ -1193,17 +1197,17 @@ int Transaction::processLogging() {
             debug(4, "There was an audit log modifier for this transaction.");
 #endif
             std::list<std::pair<int, std::string>>::iterator it;
-            parts = this->m_rules->audit_log->m_parts;
+            parts = this->m_rules->m_auditLog->m_parts;
             debug(7, "AuditLog parts before modification(s): " +
                 std::to_string(parts) + ".");
             for (it = m_auditLogModifier.begin();
                 it != m_auditLogModifier.end(); ++it) {
                 std::pair <int, std::string> p = *it;
                 if (p.first == 0) {  // Add
-                    parts = this->m_rules->audit_log->addParts(parts,
+                    parts = this->m_rules->m_auditLog->addParts(parts,
                         p.second);
                 } else {  // Remove
-                    parts = this->m_rules->audit_log->removeParts(parts,
+                    parts = this->m_rules->m_auditLog->removeParts(parts,
                         p.second);
                 }
             }
@@ -1216,7 +1220,7 @@ int Transaction::processLogging() {
 #endif
         debug(8, "Checking if this request is relevant to be " \
             "part of the audit logs.");
-        bool saved = this->m_rules->audit_log->saveIfRelevant(this, parts);
+        bool saved = this->m_rules->m_auditLog->saveIfRelevant(this, parts);
         if (saved) {
 #ifndef NO_LOGS
             debug(8, "Request was relevant to be saved. Parts: " +
@@ -1497,7 +1501,7 @@ std::string Transaction::toJSON(int parts) {
 
         /* producer > engine state */
         LOGFY_ADD("secrules_engine",
-            Rules::ruleEngineStateString(m_rules->secRuleEngine));
+            Rules::ruleEngineStateString(m_rules->m_secRuleEngine));
 
         /* producer > components */
         yajl_gen_string(g,
@@ -1505,7 +1509,7 @@ std::string Transaction::toJSON(int parts) {
             strlen("components"));
 
         yajl_gen_array_open(g);
-        for (auto a : m_rules->components) {
+        for (auto a : m_rules->m_components) {
             yajl_gen_string(g,
                 reinterpret_cast<const unsigned char*>
                     (a.c_str()), a.length());

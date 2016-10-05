@@ -540,10 +540,10 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
     if (ret == false) {
         BEGIN(INITIAL);
-        if (driver.remoteRulesActionOnFailed == Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction) {
+        if (driver.m_remoteRulesActionOnFailed == Rules::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction) {
             /** TODO: Implement the server logging mechanism. */
         }
-        if (driver.remoteRulesActionOnFailed == Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction) {
+        if (driver.m_remoteRulesActionOnFailed == Rules::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction) {
             driver.error (*driver.loc.back(), "", yytext + std::string(" - Failed to download: ") + c.error);
             throw yy::seclang_parser::syntax_error(*driver.loc.back(), "");
         }

@@ -220,7 +220,7 @@ bool Rule::evaluateActions(Transaction *trasn) {
                         " (rule contains a disruptive action)");
 #endif
                 } else {
-                    if (trasn->m_rules->secRuleEngine
+                    if (trasn->m_rules->m_secRuleEngine
                         == Rules::EnabledRuleEngine) {
 #ifndef NO_LOGS
                         trasn->debug(4, "(SecDefaultAction) " \
@@ -250,7 +250,7 @@ bool Rule::evaluateActions(Transaction *trasn) {
 
     for (Action *a : this->actions_runtime_pos) {
         if (a->isDisruptive()
-            && trasn->m_rules->secRuleEngine
+            && trasn->m_rules->m_secRuleEngine
                 == Rules::EnabledRuleEngine) {
 #ifndef NO_LOGS
             trasn->debug(4, "Running (disruptive) action: " + a->m_name);
@@ -406,7 +406,8 @@ bool Rule::evaluate(Transaction *trasn) {
                         this->op->op + "' with parameter `" +
                         limitTo(200, this->op->param) +
                         "' against variable `" + v->m_key + "' (Value: `" +
-                        limitTo(100, toHexIfNeeded(value)) + "' ) \" at " + v->m_key;
+                        limitTo(100, toHexIfNeeded(value)) + "' ) \" at " +
+                        v->m_key;
                 } else {
                     ruleMessage->m_match = this->op->m_match_message;
                 }
@@ -460,7 +461,7 @@ bool Rule::evaluate(Transaction *trasn) {
                                         " (rule contains a disruptive action)");
 #endif
                                 } else {
-                                    if (trasn->m_rules->secRuleEngine
+                                    if (trasn->m_rules->m_secRuleEngine
                                         == Rules::EnabledRuleEngine) {
 #ifndef NO_LOGS
                                         trasn->debug(4, "(SecDefaultAction) " \
@@ -492,7 +493,7 @@ bool Rule::evaluate(Transaction *trasn) {
                     for (Action *a :
                         this->actions_runtime_pos) {
                         if (a->isDisruptive()
-                            && trasn->m_rules->secRuleEngine
+                            && trasn->m_rules->m_secRuleEngine
                                 == Rules::EnabledRuleEngine
                             && containsPassAction == false) {
 #ifndef NO_LOGS
@@ -543,9 +544,11 @@ bool Rule::evaluate(Transaction *trasn) {
         }
     }
 
-    if (globalRet == true && rule_id != 0 && ruleMessage->m_saveMessage == true) {
+    if (globalRet == true && rule_id != 0
+        && ruleMessage->m_saveMessage == true) {
         ruleMessage->m_message = m_log_message;
-        trasn->debug(4, "Saving on the server log: " + ruleMessage->errorLog(trasn));
+        trasn->debug(4, "Saving on the server log: "
+            + ruleMessage->errorLog(trasn));
         trasn->serverLog(ruleMessage->errorLog(trasn));
     } else {
         delete ruleMessage;

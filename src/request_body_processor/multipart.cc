@@ -27,6 +27,7 @@
 #include <string>
 
 #include "modsecurity/collection/collections.h"
+#include "modsecurity/rules.h"
 #include "src/utils.h"
 
 namespace modsecurity {
@@ -65,10 +66,12 @@ Multipart::Multipart(std:: string header, Transaction *transaction)
 
 Multipart::~Multipart() {
     debug(4, "Multipart: Cleanup started (remove files " \
-        + std::to_string(!m_transaction->m_rules->uploadKeepFiles) \
+        + RulesProperties::configBooleanString(
+            m_transaction->m_rules->m_uploadKeepFiles) \
         + ")");
 
-    if (m_transaction->m_rules->uploadKeepFiles == false) {
+    if (m_transaction->m_rules->m_uploadKeepFiles
+        != RulesProperties::TrueConfigBoolean) {
         for (MultipartPart *m : m_parts) {
             if (m->m_type == MULTIPART_FILE) {
                 if (!m->m_tmp_file_name.empty()) {
@@ -405,8 +408,8 @@ int Multipart::tmp_file_name(std::string *filename) {
 
     localtime_r(&tt, &timeinfo);
 
-    path = m_transaction->m_rules->uploadDirectory;
-    mode = m_transaction->m_rules->uploadFileMode;
+    path = m_transaction->m_rules->m_uploadDirectory;
+    mode = m_transaction->m_rules->m_uploadFileMode.m_value;
 
     memset(tstr, '\0', 300);
     strftime(tstr, 299, "/%Y%m%d-%H%M%S", &timeinfo);
@@ -454,8 +457,10 @@ int Multipart::process_part_data(std::string *error) {
 
     /* add data to the part we are building */
     if (m_mpp->m_type == MULTIPART_FILE) {
-        int extract = m_transaction->m_rules->uploadKeepFiles \
-            || m_transaction->m_rules->tmpSaveUploadedFiles;
+        bool extract = m_transaction->m_rules->m_uploadKeepFiles \
+            == RulesProperties::TrueConfigBoolean \
+            || m_transaction->m_rules->m_tmpSaveUploadedFiles \
+            == RulesProperties::TrueConfigBoolean;
 
         /* remember where we started */
         if (m_mpp->m_length == 0) {
@@ -463,14 +468,17 @@ int Multipart::process_part_data(std::string *error) {
         }
 
         /* check if the file limit has been reached */
-        if (extract && m_transaction->m_rules->uploadFileLimit
-            && (m_nfiles >= m_transaction->m_rules->uploadFileLimit)) {
+        if (extract && m_transaction->m_rules->m_uploadFileLimit.m_value
+            && (m_nfiles >=
+                m_transaction->m_rules->m_uploadFileLimit.m_value)) {
             if (m_flag_file_limit_exceeded == 0) {
                debug(1, "Multipart: Upload file limit exceeded " \
-                + std::to_string(m_transaction->m_rules->uploadFileLimit) \
+                + std::to_string(
+                    m_transaction->m_rules->m_uploadFileLimit.m_value) \
                 + ". Use SecUploadFileLimit to change the limit.");
                error->assign("Multipart: Upload file limit exceeded " \
-                + std::to_string(m_transaction->m_rules->uploadFileLimit) \
+                + std::to_string(
+                    m_transaction->m_rules->m_uploadFileLimit.m_value) \
                 + ". Use SecUploadFileLimit to change the limit.");
                 m_flag_file_limit_exceeded = 1;
             }

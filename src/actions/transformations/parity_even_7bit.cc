@@ -21,6 +21,7 @@
 #include <functional>
 #include <cctype>
 #include <locale>
+#include <cstring>
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
@@ -43,7 +44,7 @@ std::string ParityEven7bit::evaluate(std::string value,
         return "";
     }
 
-    memcpy(input, value.c_str(), value.length()+1);
+    std::memcpy(input, value.c_str(), value.length()+1);
 
     inplace(input, value.length());
 

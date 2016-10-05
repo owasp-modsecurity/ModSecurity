@@ -18,6 +18,7 @@
 #include "stdlib.h"
 
 #include "modsecurity/modsecurity.h"
+#include "modsecurity/rules.h"
 
 
 char main_rule_uri[] = "basic_rules.conf";

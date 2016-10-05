@@ -23,11 +23,12 @@
 #include <functional>
 #include <cctype>
 #include <locale>
+#include <cstring>
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
 #include "src/utils.h"
-
+#include "modsecurity/rules.h"
 
 namespace modsecurity {
 namespace actions {

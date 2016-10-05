@@ -28,9 +28,9 @@
 #ifndef HEADERS_MODSECURITY_RULES_H_
 #define HEADERS_MODSECURITY_RULES_H_
 
+#include "modsecurity/rules_properties.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "modsecurity/rules_properties.h"
 
 #ifdef __cplusplus
 
@@ -42,7 +42,7 @@ class Driver;
 }
 
 /** @ingroup ModSecurity_CPP_API */
-class Rules : public RulesProperties  {
+class Rules : public RulesProperties {
  public:
     Rules()
         : RulesProperties(new DebugLog()),
