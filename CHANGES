@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * Fix error message inside audit logs
+   [Issue #1216 and #1073 - Armin Abfalterer]
  * Remove port from IPV4 address when running under IIS.
    [Issue #1220, #1109 and #734  - Robert Culyer]
  * Remove logdata and msg fields from JSON audit log rule.
