@@ -86,62 +86,8 @@
 
 #ifndef __cplusplus
 typedef struct ModSecurity_t modsecurity;
-#endif
-
-
-#include "modsecurity/intervention.h"
-#include "modsecurity/transaction.h"
-#include "modsecurity/debug_log.h"
-
-/**
- * TAG_NUM:
- *
- * Alpha  - 001
- * Beta   - 002
- * Dev    - 010
- * Rc1    - 051
- * Rc2    - 052
- * ...    - ...
- * Release- 100
- *
- */
-
-#define MODSECURITY_MAJOR "3"
-#define MODSECURITY_MINOR "0"
-#define MODSECURITY_PATCHLEVEL "0"
-#define MODSECURITY_TAG "-alpha"
-#define MODSECURITY_TAG_NUM "001"
-
-#define MODSECURITY_VERSION MODSECURITY_MAJOR "." \
-    MODSECURITY_MINOR "." MODSECURITY_PATCHLEVEL \
-    MODSECURITY_TAG
-
-#define MODSECURITY_VERSION_NUM MODSECURITY_MAJOR \
-    MODSECURITY_MINOR MODSECURITY_PATCHLEVEL MODSECURITY_TAG_NUM
-
-typedef void (*LogCb) (void *, const char *);
-
-#ifdef __cplusplus
+#else
 namespace modsecurity {
-
-/* few forwarded declarations */
-namespace actions {
-class Action;
-}
-class Rule;
-
-/** @ingroup ModSecurity_CPP_API */
-class ModSecurity {
- public:
-    ModSecurity();
-    ~ModSecurity();
-
-    static const std::string whoAmI();
-    void setConnectorInformation(std::string connector);
-    void setServerLogCb(LogCb cb);
-    void serverLog(void *data, const std::string& msg);
-    const std::string& getConnectorInformation();
-
     /**
      *
      * The Phases enumerator consists in mapping the different stages of a
@@ -217,6 +163,63 @@ class ModSecurity {
      */
      NUMBER_OF_PHASES,
     };
+}  // namespace modsecurity
+#endif
+
+
+
+#include "modsecurity/intervention.h"
+#include "modsecurity/transaction.h"
+#include "modsecurity/debug_log.h"
+
+/**
+ * TAG_NUM:
+ *
+ * Alpha  - 001
+ * Beta   - 002
+ * Dev    - 010
+ * Rc1    - 051
+ * Rc2    - 052
+ * ...    - ...
+ * Release- 100
+ *
+ */
+
+#define MODSECURITY_MAJOR "3"
+#define MODSECURITY_MINOR "0"
+#define MODSECURITY_PATCHLEVEL "0"
+#define MODSECURITY_TAG "-alpha"
+#define MODSECURITY_TAG_NUM "001"
+
+#define MODSECURITY_VERSION MODSECURITY_MAJOR "." \
+    MODSECURITY_MINOR "." MODSECURITY_PATCHLEVEL \
+    MODSECURITY_TAG
+
+#define MODSECURITY_VERSION_NUM MODSECURITY_MAJOR \
+    MODSECURITY_MINOR MODSECURITY_PATCHLEVEL MODSECURITY_TAG_NUM
+
+typedef void (*LogCb) (void *, const char *);
+
+#ifdef __cplusplus
+namespace modsecurity {
+
+/* few forwarded declarations */
+namespace actions {
+class Action;
+}
+class Rule;
+
+/** @ingroup ModSecurity_CPP_API */
+class ModSecurity {
+ public:
+    ModSecurity();
+    ~ModSecurity();
+
+    static const std::string whoAmI();
+    void setConnectorInformation(std::string connector);
+    void setServerLogCb(LogCb cb);
+    void serverLog(void *data, const std::string& msg);
+    const std::string& getConnectorInformation();
 
     collection::Collection *m_global_collection;
     collection::Collection *m_resource_collection;

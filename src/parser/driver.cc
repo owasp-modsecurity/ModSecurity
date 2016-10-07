@@ -17,6 +17,7 @@
 
 #include "parser/seclang-parser.hh"
 #include "audit_log/audit_log.h"
+#include "modsecurity/rules_properties.h"
 
 using modsecurity::audit_log::AuditLog;
 using modsecurity::Rule;
@@ -25,7 +26,8 @@ namespace modsecurity {
 namespace Parser {
 
 Driver::Driver()
-  : trace_scanning(false),
+  : RulesProperties(),
+  trace_scanning(false),
   trace_parsing(false) {
       m_auditLog = new audit_log::AuditLog();
       m_auditLog->refCountIncrease();
@@ -41,7 +43,7 @@ Driver::~Driver() {
 
 
 int Driver::addSecMarker(std::string marker) {
-    for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         Rule *rule = new Rule(marker);
         rule->phase = i;
         rules[i].push_back(rule);
@@ -51,7 +53,7 @@ int Driver::addSecMarker(std::string marker) {
 
 
 int Driver::addSecAction(Rule *rule) {
-    if (rule->phase > ModSecurity::Phases::NUMBER_OF_PHASES) {
+    if (rule->phase > modsecurity::Phases::NUMBER_OF_PHASES) {
         m_parserError << "Unknown phase: " << std::to_string(rule->phase);
         m_parserError << std::endl;
         return false;
@@ -63,7 +65,7 @@ int Driver::addSecAction(Rule *rule) {
 }
 
 int Driver::addSecRule(Rule *rule) {
-    if (rule->phase > ModSecurity::Phases::NUMBER_OF_PHASES) {
+    if (rule->phase > modsecurity::Phases::NUMBER_OF_PHASES) {
         m_parserError << "Unknown phase: " << std::to_string(rule->phase);
         m_parserError << std::endl;
         return false;
@@ -96,7 +98,7 @@ int Driver::addSecRule(Rule *rule) {
         m_parserError << std::to_string(rule->m_lineNumber) << std::endl;
         return false;
     }
-    for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = this->rules[i];
         for (int j = 0; j < rules.size(); j++) {
             if (rules[j]->rule_id == rule->rule_id) {

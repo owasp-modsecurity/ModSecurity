@@ -33,33 +33,33 @@ bool Phase::init(std::string *error) {
     try {
         m_phase = std::stoi(m_parser_payload);
         if (m_phase == 0) {
-            m_phase = ModSecurity::Phases::ConnectionPhase;
+            m_phase = modsecurity::Phases::ConnectionPhase;
             m_secRulesPhase = 0;
         } else if (m_phase == 1) {
-            m_phase = ModSecurity::Phases::RequestHeadersPhase;
+            m_phase = modsecurity::Phases::RequestHeadersPhase;
             m_secRulesPhase = 1;
         } else if (m_phase == 2) {
-            m_phase = ModSecurity::Phases::RequestBodyPhase;
+            m_phase = modsecurity::Phases::RequestBodyPhase;
             m_secRulesPhase = 2;
         } else if (m_phase == 3) {
-            m_phase = ModSecurity::Phases::ResponseHeadersPhase;
+            m_phase = modsecurity::Phases::ResponseHeadersPhase;
             m_secRulesPhase = 3;
         } else if (m_phase == 4) {
-            m_phase = ModSecurity::Phases::ResponseBodyPhase;
+            m_phase = modsecurity::Phases::ResponseBodyPhase;
             m_secRulesPhase = 4;
         } else if (m_phase == 5) {
-            m_phase = ModSecurity::Phases::LoggingPhase;
+            m_phase = modsecurity::Phases::LoggingPhase;
             m_secRulesPhase = 5;
         }
     } catch (...) {
         if (a == "request") {
-            m_phase = ModSecurity::Phases::RequestBodyPhase;
+            m_phase = modsecurity::Phases::RequestBodyPhase;
             m_secRulesPhase = 2;
         } else if (a == "response") {
-            m_phase = ModSecurity::Phases::ResponseBodyPhase;
+            m_phase = modsecurity::Phases::ResponseBodyPhase;
             m_secRulesPhase = 4;
         } else if (a == "logging") {
-            m_phase = ModSecurity::Phases::LoggingPhase;
+            m_phase = modsecurity::Phases::LoggingPhase;
             m_secRulesPhase = 5;
         }
     }
@@ -69,7 +69,7 @@ bool Phase::init(std::string *error) {
         return false;
     }
 
-    if (m_phase > ModSecurity::Phases::NUMBER_OF_PHASES) {
+    if (m_phase > modsecurity::Phases::NUMBER_OF_PHASES) {
         error->assign("Unknown phase: " + std::to_string(m_phase));
         return false;
     }

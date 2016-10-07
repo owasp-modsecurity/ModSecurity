@@ -408,7 +408,7 @@ int Multipart::tmp_file_name(std::string *filename) {
 
     localtime_r(&tt, &timeinfo);
 
-    path = m_transaction->m_rules->m_uploadDirectory;
+    path = m_transaction->m_rules->m_uploadDirectory.m_value;
     mode = m_transaction->m_rules->m_uploadFileMode.m_value;
 
     memset(tstr, '\0', 300);

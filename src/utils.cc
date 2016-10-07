@@ -47,25 +47,25 @@ namespace modsecurity {
 
 std::string phase_name(int x) {
     switch (x) {
-        case ModSecurity::Phases::ConnectionPhase:
+        case modsecurity::Phases::ConnectionPhase:
             return "Connection Phase";
             break;
-        case ModSecurity::Phases::UriPhase:
+        case modsecurity::Phases::UriPhase:
             return "URI Phase";
             break;
-        case ModSecurity::Phases::RequestHeadersPhase:
+        case modsecurity::Phases::RequestHeadersPhase:
             return "Request Headers";
             break;
-        case ModSecurity::Phases::RequestBodyPhase:
+        case modsecurity::Phases::RequestBodyPhase:
             return "Request Headers";
             break;
-        case ModSecurity::Phases::ResponseHeadersPhase:
+        case modsecurity::Phases::ResponseHeadersPhase:
             return "Response Headers";
             break;
-        case ModSecurity::Phases::ResponseBodyPhase:
+        case modsecurity::Phases::ResponseBodyPhase:
             return "Reponse Body";
             break;
-        case ModSecurity::Phases::LoggingPhase:
+        case modsecurity::Phases::LoggingPhase:
             return "Logging";
             break;
     }

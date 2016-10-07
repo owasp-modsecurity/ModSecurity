@@ -82,7 +82,7 @@ Rules::~Rules() {
     int i = 0;
 
     /** Cleanup the rules */
-    for (int i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = this->rules[i];
         while (rules.empty() == false) {
             Rule *rule = rules.back();
@@ -90,7 +90,7 @@ Rules::~Rules() {
             rules.pop_back();
         }
     }
-    for (i = 0; i < ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+    for (i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<actions::Action *> *tmp = &defaultActions[i];
         while (tmp->empty() == false) {
             actions::Action *a = tmp->back();
@@ -181,7 +181,7 @@ std::string Rules::getParserError() {
 
 
 int Rules::evaluate(int phase, Transaction *transaction) {
-    if (phase > ModSecurity::Phases::NUMBER_OF_PHASES) {
+    if (phase > modsecurity::Phases::NUMBER_OF_PHASES) {
        return 0;
     }
 
@@ -191,13 +191,13 @@ int Rules::evaluate(int phase, Transaction *transaction) {
         " rule(s).");
 
     if (transaction->m_allowType == actions::FromNowOneAllowType
-        && phase != ModSecurity::Phases::LoggingPhase) {
+        && phase != modsecurity::Phases::LoggingPhase) {
         debug(9, "Skipping all rules evaluation on this phase as request " \
             "through the utilization of an `allow' action.");
         return true;
     }
     if (transaction->m_allowType == actions::RequestAllowType
-        && phase <= ModSecurity::Phases::RequestBodyPhase) {
+        && phase <= modsecurity::Phases::RequestBodyPhase) {
         debug(9, "Skipping all rules evaluation on this phase as request " \
             "through the utilization of an `allow' action.");
         return true;
@@ -241,8 +241,8 @@ int Rules::evaluate(int phase, Transaction *transaction) {
 int Rules::merge(Driver *from) {
     int amount_of_rules = 0;
     amount_of_rules = mergeProperties(
-        reinterpret_cast<RulesProperties *>(from),
-        reinterpret_cast<RulesProperties *>(this),
+        dynamic_cast<RulesProperties *>(from),
+        dynamic_cast<RulesProperties *>(this),
         &m_parserError);
 
     if (from->m_auditLog != NULL && this->m_auditLog != NULL) {
@@ -263,8 +263,8 @@ int Rules::merge(Driver *from) {
 int Rules::merge(Rules *from) {
     int amount_of_rules = 0;
     amount_of_rules = mergeProperties(
-        reinterpret_cast<RulesProperties *>(from),
-        reinterpret_cast<RulesProperties *>(this),
+        dynamic_cast<RulesProperties *>(from),
+        dynamic_cast<RulesProperties *>(this),
         &m_parserError);
 
     if (from->m_auditLog != NULL && this->m_auditLog != NULL) {
@@ -291,7 +291,7 @@ void Rules::debug(int level, std::string message) {
 
 void Rules::dump() {
     std::cout << "Rules: " << std::endl;
-    for (int i = 0; i <= ModSecurity::Phases::NUMBER_OF_PHASES; i++) {
+    for (int i = 0; i <= modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = this->rules[i];
         std::cout << "Phase: " << std::to_string(i);
         std::cout << " (" << std::to_string(rules.size());

@@ -95,5 +95,23 @@ bool RulesExceptions::contains(int a) {
 }
 
 
+bool RulesExceptions::merge(const RulesExceptions& from) {
+    for (int a : from.m_numbers) {
+        bool ret = addNumber(a);
+        if (ret == false) {
+            return ret;
+        }
+    }
+    for (auto b : from.m_ranges) {
+        bool ret = addRange(b.first, b.second);
+        if (ret == false) {
+            return ret;
+        }
+    }
+
+    return true;
+}
+
+
 }  // namespace modsecurity
 

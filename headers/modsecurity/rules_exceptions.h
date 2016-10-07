@@ -42,6 +42,7 @@ class RulesExceptions {
     bool addRange(int a, int b);
     bool addNumber(int a);
     bool contains(int a);
+    bool merge(const RulesExceptions& from);
 
  private:
     std::list<std::pair<int, int> > m_ranges;

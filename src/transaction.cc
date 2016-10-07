@@ -234,7 +234,7 @@ int Transaction::processConnection(const char *client, int cPort,
         std::to_string(this->m_serverPort));
     this->m_collections.store("REMOTE_PORT",
         std::to_string(this->m_clientPort));
-    this->m_rules->evaluate(ModSecurity::ConnectionPhase, this);
+    this->m_rules->evaluate(modsecurity::ConnectionPhase, this);
     return true;
 }
 
@@ -460,7 +460,7 @@ int Transaction::processRequestHeaders() {
         return true;
     }
 
-    this->m_rules->evaluate(ModSecurity::RequestHeadersPhase, this);
+    this->m_rules->evaluate(modsecurity::RequestHeadersPhase, this);
 
     return true;
 }
@@ -749,7 +749,7 @@ int Transaction::processRequestBody() {
             std::to_string(m_requestBody.str().size()));
     }
 
-    this->m_rules->evaluate(ModSecurity::RequestBodyPhase, this);
+    this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
     return true;
 }
 
@@ -886,7 +886,7 @@ int Transaction::processResponseHeaders(int code, const std::string& proto) {
         return true;
     }
 
-    this->m_rules->evaluate(ModSecurity::ResponseHeadersPhase, this);
+    this->m_rules->evaluate(modsecurity::ResponseHeadersPhase, this);
     return true;
 }
 
@@ -1030,7 +1030,7 @@ int Transaction::processResponseBody() {
     m_collections.store("RESPONSE_CONTENT_LENGTH",
         std::to_string(m_responseBody.str().size()));
 
-    this->m_rules->evaluate(ModSecurity::ResponseBodyPhase, this);
+    this->m_rules->evaluate(modsecurity::ResponseBodyPhase, this);
     return true;
 }
 
@@ -1182,7 +1182,7 @@ int Transaction::processLogging() {
         return true;
     }
 
-    this->m_rules->evaluate(ModSecurity::LoggingPhase, this);
+    this->m_rules->evaluate(modsecurity::LoggingPhase, this);
 
     /* If relevant, save this transaction information at the audit_logs */
     if (m_rules != NULL && m_rules->m_auditLog != NULL) {

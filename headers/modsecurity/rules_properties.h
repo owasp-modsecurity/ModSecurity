@@ -77,7 +77,6 @@ class RulesProperties {
  public:
     RulesProperties() : m_auditLog(NULL),
         m_debugLog(new DebugLog()),
-        m_httpblKey(""),
         m_remoteRulesActionOnFailed(PropertyNotSetRemoteRulesAction),
         m_secRequestBodyAccess(PropertyNotSetConfigBoolean),
         m_secResponseBodyAccess(PropertyNotSetConfigBoolean),
@@ -91,7 +90,6 @@ class RulesProperties {
 
     explicit RulesProperties(DebugLog *debugLog) : m_auditLog(NULL),
         m_debugLog(debugLog),
-        m_httpblKey(""),
         m_remoteRulesActionOnFailed(PropertyNotSetRemoteRulesAction),
         m_secRequestBodyAccess(PropertyNotSetConfigBoolean),
         m_secResponseBodyAccess(PropertyNotSetConfigBoolean),
@@ -126,27 +124,27 @@ class RulesProperties {
      *
      */
     enum RuleEngine {
-        /**
-         *
-         * Rules won't be evaluated if Rule Engine is set to DisabledRuleEngine
-         *
-         */
-        DisabledRuleEngine,
-        /**
-         *
-         * Rules will be evaluated and disturb actions will take place if needed.
-         *
-         */
-        EnabledRuleEngine,
-        /**
-         * Rules will be evaluated but it won't generate any disruptive action.
-         *
-         */
-        DetectionOnlyRuleEngine,
-        /**
-         *
-         */
-        PropertyNotSetRuleEngine
+     /**
+      *
+      * Rules won't be evaluated if Rule Engine is set to DisabledRuleEngine
+      *
+      */
+     DisabledRuleEngine,
+     /**
+      *
+      * Rules will be evaluated and disturb actions will take place if needed.
+      *
+      */
+     EnabledRuleEngine,
+     /**
+      * Rules will be evaluated but it won't generate any disruptive action.
+      *
+      */
+     DetectionOnlyRuleEngine,
+     /**
+      *
+      */
+     PropertyNotSetRuleEngine
     };
 
 
@@ -232,7 +230,7 @@ class RulesProperties {
 
 
     static int mergeProperties(RulesProperties *from, RulesProperties *to,
-                               std::ostringstream *err) {
+        std::ostringstream *err) {
         int amount_of_rules = 0;
 
         amount_of_rules = appendRules(from->rules, to->rules, err);
@@ -264,8 +262,6 @@ class RulesProperties {
             to->m_tmpSaveUploadedFiles = from->m_tmpSaveUploadedFiles;
         }
 
-        to->m_components = from->m_components;
-
         if (from->m_requestBodyLimit.m_set == true) {
             to->m_requestBodyLimit.m_value = from->m_requestBodyLimit.m_value;
         }
@@ -282,7 +278,6 @@ class RulesProperties {
             to->m_responseBodyLimitAction = from->m_responseBodyLimitAction;
         }
 
-
         if (from->m_uploadFileLimit.m_set == true) {
             to->m_uploadFileLimit.m_value = from->m_uploadFileLimit.m_value;
         }
@@ -291,9 +286,31 @@ class RulesProperties {
             to->m_uploadFileMode.m_value = from->m_uploadFileMode.m_value;
         }
 
-        to->m_uploadDirectory = from->m_uploadDirectory;
+        if (from->m_uploadDirectory.m_set == true) {
+            to->m_uploadDirectory.m_value = from->m_uploadDirectory.m_value;
+        }
 
-        to->m_exceptions = from->m_exceptions;
+        if (from->m_uploadTmpDirectory.m_set == true) {
+            to->m_uploadTmpDirectory.m_value = \
+                from->m_uploadTmpDirectory.m_value;
+        }
+
+        if (from->m_httpblKey.m_set == true) {
+            to->m_httpblKey.m_value = from->m_httpblKey.m_value;
+        }
+
+        if (from->m_auditLogPath.m_set == true) {
+            to->m_auditLogPath.m_value = from->m_auditLogPath.m_value;
+        }
+
+        if (from->m_auditLogParts.m_set == true) {
+            to->m_auditLogParts.m_value = from->m_auditLogParts.m_value;
+        }
+
+        to->m_exceptions.merge(from->m_exceptions);
+
+        to->m_components.insert(to->m_components.end(),
+            from->m_components.begin(), from->m_components.end());
 
         for (std::set<std::string>::iterator
                 it = from->m_responseBodyTypeToBeInspected.begin();
@@ -301,50 +318,41 @@ class RulesProperties {
             to->m_responseBodyTypeToBeInspected.insert(*it);
         }
 
-        /*
-         *
-         * default Actions is something per configuration context, there is
-         * need to merge anything.
-         *
-         */
-        for (int i = 0; i <= 8; i++) {
-            std::vector<actions::Action *> actions = from->defaultActions[i];
-            to->defaultActions[i].clear();
-            for (int j = 0; j < actions.size(); j++) {
-                actions::Action *action = actions[j];
-                to->defaultActions[i].push_back(action);
+        for (int i = 0; i <= modsecurity::Phases::NUMBER_OF_PHASES; i++) {
+            std::vector<actions::Action *> *actions_from = \
+                from->defaultActions+i;
+            std::vector<actions::Action *> *actions_to = to->defaultActions+i;
+            for (int j = 0; j < actions_from->size(); j++) {
+                actions::Action *action = actions_from->at(j);
+                actions_to->push_back(action);
             }
         }
 
         if (from->m_debugLog && to->m_debugLog &&
-                from->m_debugLog->isLogFileSet()) {
+            from->m_debugLog->isLogFileSet()) {
             to->m_debugLog->setDebugLogFile(
                 from->m_debugLog->getDebugLogFile());
-        }
-
-        if (from->m_debugLog && to->m_debugLog &&
-                from->m_debugLog->isLogLevelSet()) {
-            to->m_debugLog->setDebugLogLevel(
-                from->m_debugLog->getDebugLogLevel());
         }
 
         return amount_of_rules;
     }
 
 
-    static int appendRules(std::vector<modsecurity::Rule *> from[8],
-        std::vector<modsecurity::Rule *> to[8],
+    static int appendRules(
+        std::vector<modsecurity::Rule *> *from,
+        std::vector<modsecurity::Rule *> *to,
         std::ostringstream *err) {
         int amount_of_rules = 0;
-        for (int i = 0; i <= 8; i++) {
-            std::vector<modsecurity::Rule *> rules_to = to[i];
-            std::vector<modsecurity::Rule *> rules_from = from[i];
-
-            for (int j = 0; j < rules_from.size(); j++) {
-                Rule *rule = rules_from[j];
-                for (int z = 0; z < rules_to.size(); z++) {
-                    Rule *rule_ckc = rules_to[z];
-                    if (rule_ckc->rule_id == rule->rule_id) {
+        for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
+            std::vector<modsecurity::Rule *> *rules_to = to+i;
+            std::vector<modsecurity::Rule *> *rules_from = from+i;
+            for (int j = 0; j < rules_from->size(); j++) {
+                Rule *rule = rules_from->at(j);
+                for (int z = 0; z < rules_to->size(); z++) {
+                    Rule *rule_ckc = rules_to->at(z);
+                    if (rule_ckc->rule_id == rule->rule_id &&
+                        rule_ckc->m_secmarker == false &&
+                        rule->m_secmarker == false) {
                         if (err != NULL) {
                             *err << "Rule id: " \
                                  << std::to_string(rule->rule_id) \
@@ -354,7 +362,7 @@ class RulesProperties {
                     }
                 }
                 amount_of_rules++;
-                rules_to.push_back(rule);
+                rules_to->push_back(rule);
                 rule->refCountIncrease();
             }
         }
@@ -363,7 +371,7 @@ class RulesProperties {
 
 
     std::vector<modsecurity::Rule *> *getRulesForPhase(int phase) {
-        if (phase > 7) {
+        if (phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
             return NULL;
         }
         return &rules[phase];
@@ -391,11 +399,11 @@ class RulesProperties {
     std::list<std::string> m_components;
     std::ostringstream m_parserError;
     std::set<std::string> m_responseBodyTypeToBeInspected;
-    std::string m_auditLogParts;
-    std::string m_auditLogPath;
-    std::string m_httpblKey;
-    std::string m_uploadDirectory;
-    std::string m_uploadTmpDirectory;
+    ConfigString m_auditLogParts;
+    ConfigString m_auditLogPath;
+    ConfigString m_httpblKey;
+    ConfigString m_uploadDirectory;
+    ConfigString m_uploadTmpDirectory;
     std::vector<actions::Action *> defaultActions[8];
     std::vector<modsecurity::Rule *> rules[8];
 };

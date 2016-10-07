@@ -128,7 +128,7 @@ Rule::Rule(Operator *_op,
      *
      */
     if (phase == -1) {
-        phase = ModSecurity::Phases::RequestHeadersPhase;
+        phase = modsecurity::Phases::RequestHeadersPhase;
     }
 
     if (op == NULL) {

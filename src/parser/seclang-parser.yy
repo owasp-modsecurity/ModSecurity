@@ -420,7 +420,8 @@ audit_log:
       }
     | CONFIG_UPLOAD_DIR
       {
-        driver.m_uploadDirectory = $1;
+        driver.m_uploadDirectory.m_set = true;
+        driver.m_uploadDirectory.m_value = $1;
       }
     | CONFIG_UPDLOAD_SAVE_TMP_FILES CONFIG_VALUE_ON
       {
@@ -560,7 +561,7 @@ expression:
             }
         }
         if (definedPhase == -1) {
-            definedPhase = modsecurity::ModSecurity::Phases::RequestHeadersPhase;
+            definedPhase = modsecurity::Phases::RequestHeadersPhase;
         }
 
         if (!driver.defaultActions[definedPhase].empty()) {

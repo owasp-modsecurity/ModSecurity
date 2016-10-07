@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
     std::cout << "Rules optimization" << std::endl;
     std::cout << std::endl;
 
-    int nphases = modsecurity::ModSecurity::Phases::NUMBER_OF_PHASES;
+    int nphases = modsecurity::Phases::NUMBER_OF_PHASES;
     for (int i = 0; i < nphases; i++) {
         std::vector<Rule *> rules = modsecRules->rules[i];
         if (rules.size() == 0) {
