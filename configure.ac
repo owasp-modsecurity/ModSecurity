@@ -396,7 +396,7 @@ AC_ARG_ENABLE(request-early,
 ])
 
 # Enable duplicate rules id
-AC_ARG_ENABLE(unique_id,
+AC_ARG_ENABLE(rule-id-validation,
               AS_HELP_STRING([--enable-rule-id-validation],
                              [Allow duplicate rule ids and no id. default is to disable that]),
 [
