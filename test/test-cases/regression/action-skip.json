@@ -27,7 +27,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
       "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:'1',phase:1,skip:1\"",
       "SecRule REQUEST_HEADERS \"should be skipped\" \"id:'2',phase:1,setvar:SESSION.score=+10\"",
       "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:'3',phase:1,t:none,nolog,pass\"",
@@ -39,7 +38,7 @@
     "version_min":300000,
     "title":"Testing skip action 2/3",
     "expected":{
-      "parser_error": "Rules error. File: action-skip.json. Line: 3. Column: 61. invalid character s"
+      "parser_error": "Rules error. File: action-skip.json. Line: 2. Column: 61. invalid character s"
     },
     "client":{
       "ip":"200.249.12.31",
@@ -62,7 +61,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
       "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:'1',phase:1,skip:abc\"",
       "SecRule REQUEST_HEADERS \"should be skipped\" \"id:'2',phase:1,setvar:SESSION.score=+10\"",
       "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:'3',phase:1,t:none,nolog,pass\"",
@@ -97,7 +95,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
       "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:'1',phase:1,skip:2\"",
       "SecRule REQUEST_HEADERS \"should be skipped\" \"id:'2',phase:1,setvar:SESSION.score=+10\"",
       "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:'3',phase:1,t:none,nolog,pass\"",

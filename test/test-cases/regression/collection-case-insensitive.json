@@ -53,8 +53,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule REQUEST_headers \"@contains PHPSESSID\" \"id:1,t:lowercase,t:none,setvar:TX.something=matched_var:%{matched_var}%\"",
       "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
     ]

@@ -46,8 +46,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test\" \"id:1,t:trim,deny,auditlog\"",
       "SecAuditEngine RelevantOnly",
       "SecAuditLogParts ABCFHZ",
@@ -105,8 +103,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test\" \"id:1,t:trim,deny,auditlog\"",
       "SecAuditEngine RelevantOnly",
       "SecAuditLogParts ABCFHZ",
@@ -165,8 +161,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test\" \"id:1,t:trim,deny,auditlog\"",
       "SecAuditEngine RelevantOnly",
       "SecAuditLogParts ABCFHZ",

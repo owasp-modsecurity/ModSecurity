@@ -35,8 +35,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule URLENCODED_ERROR \"@gt 10 \" \"id:1,pass\""
     ]
   },
@@ -76,8 +74,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule URLENCODED_ERROR \"@gt 10 \" \"id:1,pass\""
     ]
   },
@@ -122,8 +118,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule URLENCODED_ERROR \"@gt 10 \" \"id:1,phase:3,pass\""
     ]
   },
@@ -168,8 +162,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule URLENCODED_ERROR \"@gt 10 \" \"id:1,phase:3,pass,t:trim\""
     ]
   },
@@ -214,8 +206,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule URLENCODED_ERROR \"@gt 10 \" \"id:1,phase:3,pass,t:trim\""
     ]
   },
@@ -257,8 +247,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule URLENCODED_ERROR \"@gt 10 \" \"id:1,phase:3,pass,t:trim\""
     ]
   },
@@ -300,8 +288,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule URLENCODED_ERROR \"@gt 10 \" \"id:1,phase:3,pass,t:trim\""
     ]
   }

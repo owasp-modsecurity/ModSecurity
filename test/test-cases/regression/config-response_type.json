@@ -35,8 +35,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecResponseBodyMimeType text\/plain text\/html text\/xml",
       "SecRule RESPONSE_BODY \"@contains RESPONSE_CONTENT_TYPE\" \"id:9,pass,t:trim,phase:4\""
     ]
@@ -77,8 +75,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecResponseBodyMimeType application\/something",
       "SecRule RESPONSE_BODY \"@contains RESPONSE_CONTENT_TYPE\" \"id:9,pass,t:trim,phase:4\""
     ]

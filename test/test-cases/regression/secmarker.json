@@ -54,8 +54,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test\" \"phase:2,id:1,t:trim\"",
       "SecAction \"phase:2,nolog,pass\"",
       "SecMarker HERE_GOES_A_MARKER",
@@ -117,8 +115,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test\" \"phase:2,id:1,t:trim,skipAfter:HERE_GOES_A_MARKER\"",
       "SecRule ARGS \"@contains test1\" \"phase:2,id:2,t:trim\"",
       "SecRule ARGS \"@contains test2\" \"phase:2,id:3,t:trim\"",

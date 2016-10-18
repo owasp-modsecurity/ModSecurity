@@ -53,8 +53,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS:/^id_/ \"@contains nops\" \"id:1,t:lowercase,block,status:404\""
     ]
   },
@@ -112,8 +110,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS:/^id_/ \"@contains test\" \"id:1,t:lowercase,initcol:ip=%{REMOTE_ADDR},setvar:IP.id_a=test\"",
       "SecRule ARGS:/^id_/ \"@contains test\" \"id:3,t:lowercase,setvar:IP.nah=nops\"",
       "SecRule IP:/^id_/ \"@contains test\" \"id:2,t:lowercase,initcol:ip=%{REMOTE_ADDR}\"",

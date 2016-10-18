@@ -53,8 +53,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,tag:'teste',t:lowercase,t:none\"",
       "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
     ]
@@ -113,8 +111,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,tag:'teste %{REQUEST_HEADERS:Pragma}%',t:lowercase,t:none\"",
       "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
     ]

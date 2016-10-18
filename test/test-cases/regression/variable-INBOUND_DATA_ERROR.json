@@ -35,8 +35,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule INBOUND_DATA_ERROR \"@eq 1\" \"id:1,phase:3,pass,t:trim\""
     ]
   },
@@ -96,9 +94,7 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
       "SecRequestBodyLimit 2",
-      "SecDebugLogLevel 9",
       "SecRule INBOUND_DATA_ERROR \"@eq 1\" \"id:1,phase:3,pass,t:trim\""
     ]
   }

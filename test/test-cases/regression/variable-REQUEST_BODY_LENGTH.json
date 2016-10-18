@@ -55,8 +55,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule REQUEST_BODY_LENGTH \"@contains small_text_file.txt\" \"id:1,phase:3,pass,t:trim\""
     ]
   }

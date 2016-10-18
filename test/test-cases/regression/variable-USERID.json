@@ -27,7 +27,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
       "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:'900018',phase:1,t:none,t:sha1,t:hexEncode,setuid:%{REQUEST_COOKIES:USER}%,nolog,pass\"",
       "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:'900068',phase:1,t:none,t:sha1,t:hexEncode,setuid:%{REQUEST_COOKIES:USER}2,nolog,pass\"",
       "SecRule USERID \".*\" \"id:1239,phase:1,log,pass\""
@@ -61,7 +60,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
       "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:'900018',phase:1,t:none,t:sha1,t:hexEncode,setuid:%{REQUEST_COOKIES:USER}%,nolog,pass\"",
       "SecRule USERID \".*\" \"id:1239,phase:1,log,pass\""
     ]

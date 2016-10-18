@@ -35,8 +35,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule REMOTE_ADDR \"@contains 200.249\" \"id:1,pass,t:trim,severity:0\"",
       "SecRule HIGHEST_SEVERITY \"@lt 10\" \"id:2,pass,t:trim\""
     ]
@@ -77,8 +75,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule REMOTE_ADDR \"@contains 200.249\" \"id:1,pass,t:trim,severity:EMERGENCY\"",
       "SecRule HIGHEST_SEVERITY \"@lt 10\" \"id:2,pass,t:trim\""
     ]

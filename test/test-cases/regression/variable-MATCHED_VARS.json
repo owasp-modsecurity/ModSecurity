@@ -35,8 +35,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS:keyI \"@contains value\" \"chain,id:28\"",
       "SecRule ARGS:keyII \"@contains other_value\" \"chain\"",
       "SecRule MATCHED_VARS \"@contains asdf\" \"pass\""
@@ -78,8 +76,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS:keyI \"@contains value\" \"chain,id:28\"",
       "SecRule ARGS:keyII \"@contains other_value\" \"chain\"",
       "SecRule MATCHED_VARS \"@contains asdf\" \"pass\"",

@@ -54,8 +54,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule REQUEST_COOKIES \"@contains test \" \"id:1,t:lowercase,t:none\""
     ]
   },
@@ -114,8 +112,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule REQUEST_COOKIES \"@contains test \" \"id:14,t:none,t:lowercase\""
     ]
   }

@@ -53,8 +53,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule &REQUEST_HEADERS \"@contains test \" \"id:1,t:lowercase,t:none\""
     ]
   },
@@ -112,8 +110,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule &REQUEST_HEADERS:Accept \"@contains test \" \"id:1,t:lowercase,t:none\""
     ]
   },
@@ -171,8 +167,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule &REQUEST_HEADERS:missing \"@contains test \" \"id:1,t:lowercase,t:none\""
     ]
   }

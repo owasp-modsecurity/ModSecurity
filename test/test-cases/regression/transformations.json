@@ -54,8 +54,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test \" \"id:1,pass,t:trim\""
     ]
   },
@@ -114,8 +112,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test \" \"id:1,pass,t:trim,t:lowercase\""
     ]
   }

@@ -40,8 +40,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@rx (value1)\" \"id:111111111111222222222222222222222222222333333333333333333333333333444444444444444444444444444444555555555555555555555555666666666666666666666666666666666666666666,phase:2,pass,t:trim\""
     ]
   },
@@ -82,12 +80,10 @@
       ]
     },
     "expected":{
-      "parser_error": "File: action-id.json. Line: 4. Column: 30. invalid character i"
+      "parser_error": "File: action-id.json. Line: 2. Column: 30. invalid character i"
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@rx (value1)\" \"id:-1,phase:2,pass,t:trim\""
     ]
   },
@@ -132,8 +128,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@rx (value1)\" \"id:1,phase:3,pass,t:trim\""
     ]
   },
@@ -178,8 +172,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@rx (value1)\" \"id:'1',phase:3,pass,t:trim\""
     ]
   },
@@ -220,12 +212,10 @@
       ]
     },
     "expected":{
-      "parser_error": "action-id.json. Line: 4. Column: 30. invalid character i"
+      "parser_error": "action-id.json. Line: 2. Column: 30. invalid character i"
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@rx (value1)\" \"id:'1,phase:2,pass,t:trim\""
     ]
   },
@@ -266,12 +256,10 @@
       ]
     },
     "expected":{
-      "parser_error": "action-id.json. Line: 4. Column: 34. invalid character '"
+      "parser_error": "action-id.json. Line: 2. Column: 34. invalid character '"
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@rx (value1)\" \"id:1',phase:2,pass,t:trim\""
     ]
   }

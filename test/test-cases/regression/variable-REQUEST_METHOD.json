@@ -36,8 +36,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule REQUEST_METHOD \"@contains test \" \"id:1,pass,t:trim\""
     ]
   }

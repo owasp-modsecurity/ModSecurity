@@ -37,8 +37,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRequestBodyAccess On",
       "SecRule RESPONSE_BODY \"@rx ([0-9]+)\" \"id:1,phase:4,capture,id:105\"",
       "SecRule TX \"@rx ([A-z]+)\" \"phase:4,id:106\""
@@ -78,8 +76,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule REQUEST_HEADERS \"@rx ([A-z]+)\" \"id:1,log,pass,capture,id:14\"",
       "SecRule TX:0 \"@rx ([A-z]+)\" \"id:15\""
     ]

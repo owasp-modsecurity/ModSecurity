@@ -35,8 +35,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRemoteRules key https://www.modsecurity.org/modsecurity-regression-test-secremoterules.txt",
       "SecRule ARGS \"@contains somethingelse\" \"id:9,pass,t:trim\""
     ]
@@ -50,8 +48,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRemoteRulesFailAction Abort",
       "SecRemoteRules key https://www.modsecurity.org/modsecurity-regression-test-secremoterules-bonga.txt"
     ]
@@ -92,8 +88,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRemoteRulesFailAction Warn",
       "SecRemoteRules key https://www.modsecurity.org/modsecurity-regression-test-secremoterules-bonga.txt",
       "SecRule ARGS \"@contains somethingelse\" \"id:9,pass,t:trim\""

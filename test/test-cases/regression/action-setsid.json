@@ -27,7 +27,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
       "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:'900018',phase:1,t:none,t:sha1,t:hexEncode,setsid:%{REQUEST_COOKIES:PHPSESSID}%,nolog,pass\"",
       "SecRule REQUEST_HEADERS \".*\" \"id:'900021',phase:1,setvar:SESSION.score=+10\"",
       "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:'900068',phase:1,t:none,t:sha1,t:hexEncode,setsid:%{REQUEST_COOKIES:PHPSESSID}2,nolog,pass\"",

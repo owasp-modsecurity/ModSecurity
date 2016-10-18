@@ -9,7 +9,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDefaultAction \"phase:2,deny,status:404\"",
       "SecAction \"id:'900001',phase:request,nolog,status:403,t:none\""
     ]
@@ -24,7 +23,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDefaultAction \"phase:2,deny,status:404\"",
       "SecAction \"id:'1',phase:request,nolog,t:none\""
     ]
@@ -39,7 +37,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDefaultAction \"phase:2,deny,status:404\"",
       "SecAction \"id:'1',phase:request,nolog,block,t:none\""
     ]
@@ -53,7 +50,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
       "SecAction \"id:'1',phase:request,nolog,t:none\""
     ]
   },
@@ -66,7 +62,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
       "SecDefaultAction \"phase:2,deny,status:404\"",
       "SecAction \"id:'1',phase:request,nolog,pass,t:none\""
     ]

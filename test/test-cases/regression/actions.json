@@ -55,8 +55,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test\" \"id:1,t:trim,deny\""
     ]
   },
@@ -117,8 +115,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test\" \"id:1,t:trim,redirect:'http://www.google.com'\""
     ]
   },
@@ -179,8 +175,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test\" \"id:1,t:trim,status:500,redirect:'http://www.google.com'\""
     ]
   },
@@ -240,8 +234,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test\" \"id:1,t:trim,deny,status:500\""
     ]
   },
@@ -301,8 +293,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test\" \"id:1,phase:2,t:trim,status:500,deny\""
     ]
   },
@@ -362,8 +352,6 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule ARGS \"@contains test\" \"id:1,phase:4,t:trim,status:500,deny\""
     ]
   }

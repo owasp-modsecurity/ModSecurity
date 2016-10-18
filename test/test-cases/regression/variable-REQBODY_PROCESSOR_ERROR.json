@@ -73,8 +73,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500005,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
       "SecRule REQBODY_PROCESSOR_ERROR \"@contains test\" \"phase:2,id:1,pass,t:trim\"",
       "SecRule REQBODY_PROCESSOR_ERROR_MSG \"@contains test\" \"phase:2,id:2,pass,t:trim\""
@@ -134,8 +132,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500005,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
       "SecRule REQBODY_PROCESSOR_ERROR \"@contains test\" \"phase:2,id:1,pass,t:trim\"",
       "SecRule REQBODY_PROCESSOR_ERROR_MSG \"@contains test\" \"phase:2,id:2,pass,t:trim\""

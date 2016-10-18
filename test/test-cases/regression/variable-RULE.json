@@ -40,8 +40,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule RULE:id \"@contains test\" \"id:1,phase:3,rev:1.3,pass,t:trim\""
     ]
   },
@@ -86,8 +84,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule RULE:rev \"@contains test\" \"id:1,rev:200,phase:3,pass,t:trim\""
     ]
   },
@@ -132,8 +128,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule RULE:severity \"@contains test\" \"id:1,phase:3,severity:critical,pass,t:trim\""
     ]
   },
@@ -178,8 +172,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule RULE:logdata \"@contains test\" \"id:1,logdata:'data123',phase:3,pass,t:trim\""
     ]
   },
@@ -224,8 +216,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule RULE:msg \"@contains test\" \"id:1,msg:'message123',phase:3,pass,t:trim\""
     ]
   },
@@ -270,8 +260,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule rule:msg \"@contains test\" \"id:1,msg:'message123',phase:3,pass,t:trim\""
     ]
   },
@@ -316,8 +304,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule rule:msg \"@contains message\" \"id:1,setvar:'ip.block_reason=%{RULE.msg}%',msg:'message123',phase:3,pass,t:trim\""
     ]
   }

@@ -8,8 +8,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "Include test-cases/data/config_example3.txt",
       "SecRule ARGS \"@missing_operator test\" \"id:19,pass,t:trim\""
     ]
@@ -19,12 +17,10 @@
     "version_min":300000,
     "title":"Include - missing file",
     "expected":{
-      "parser_error": "Rules error. File: config-include-bad.json. Line: 4. Column: 46. test-cases/data/config_example-ops.txt: Not able to open file."
+      "parser_error": "Rules error. File: config-include-bad.json. Line: 2. Column: 46. test-cases/data/config_example-ops.txt: Not able to open file."
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "Include test-cases/data/config_example-ops.txt",
       "SecRule ARGS \"@contains test\" \"id:19,pass,t:trim\""
     ]
@@ -38,8 +34,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "Include test-cases/data/config_example-ops-include.txt",
       "SecRule ARGS \"@contains test\" \"id:19,pass,t:trim\""
     ]
@@ -53,8 +47,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "Include test-cases/data/config_example.txt",
       "Include test-cases/data/config_example.txt",
       "SecRule ARGS \"@missing_operator test\" \"id:19,pass,t:trim\""

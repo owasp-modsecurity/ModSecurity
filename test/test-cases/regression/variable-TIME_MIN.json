@@ -37,8 +37,6 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRule TIME_MIN \"@contains test \" \"id:1,phase:3,pass,t:trim\""
     ]
   }

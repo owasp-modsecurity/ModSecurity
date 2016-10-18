@@ -36,9 +36,7 @@
     "SecAuditEngine On",
     "SecAuditLogType Serial",
     "SecAuditLog logs\/modsec_audit.log",
-    "SecAuditLogParts ABCDEFHJKZ",
-    "SecDebugLog \/tmp\/modsec_debug.log",
-    "SecDebugLogLevel 9"
+    "SecAuditLogParts ABCDEFHJKZ"
   ]
 }
 ]

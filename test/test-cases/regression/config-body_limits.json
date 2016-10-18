@@ -35,8 +35,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecResponseBodyLimitAction Reject",
       "SecResponseBodyLimit 5"
     ]
@@ -77,8 +75,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecResponseBodyLimitAction ProcessPartial",
       "SecResponseBodyLimit 5"
     ]
@@ -136,8 +132,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRequestBodyLimitAction Reject",
       "SecRequestBodyLimit 5"
     ]
@@ -195,8 +189,6 @@
     },
     "rules":[  
       "SecRuleEngine On",
-      "SecDebugLog \/tmp\/modsec_debug.log",
-      "SecDebugLogLevel 9",
       "SecRequestBodyLimitAction ProcessPartial",
       "SecRequestBodyLimit 5"
     ]
