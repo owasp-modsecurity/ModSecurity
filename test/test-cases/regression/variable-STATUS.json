@@ -36,11 +36,11 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"200\" \\(Variable: STATUS\\)"
+      "debug_log":"Target value: \"200\" \\(Variable: RESPONSE_STATUS\\)"
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule STATUS \"@contains test\" \"id:1,phase:5,rev:1.3,pass,t:trim\""
+      "SecRule RESPONSE_STATUS \"@contains test\" \"id:1,phase:5,rev:1.3,pass,t:trim\""
     ]
   },
   {
@@ -80,13 +80,13 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"500\" \\(Variable: STATUS\\)",
+      "debug_log":"Target value: \"500\" \\(Variable: RESPONSE_STATUS\\)",
       "http_code": 500
     },
     "rules":[
       "SecRuleEngine On",
       "SecRule ARGS \"@pm value\" \"id:1,phase:2,t:trim,status:500,deny\"",
-      "SecRule STATUS \"@contains test\" \"id:2,phase:5,rev:1.3,pass,t:trim\""
+      "SecRule RESPONSE_STATUS \"@contains test\" \"id:2,phase:5,rev:1.3,pass,t:trim\""
     ]
   }
 ]

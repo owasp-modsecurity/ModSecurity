@@ -876,7 +876,7 @@ int Transaction::processResponseHeaders(int code, const std::string& proto) {
 #endif
 
     this->m_httpCodeReturned = code;
-    this->m_collections.store("STATUS", std::to_string(code));
+    this->m_collections.store("RESPONSE_STATUS", std::to_string(code));
     m_collections.store("RESPONSE_PROTOCOL", proto);
 
     if (m_rules->m_secRuleEngine == Rules::DisabledRuleEngine) {
