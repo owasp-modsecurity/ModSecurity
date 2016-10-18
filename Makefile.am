@@ -194,7 +194,6 @@ TESTS+=test/test-cases/secrules-language-tests/transformations/base64Decode.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/utf8toUnicode.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/cssDecode.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/trim.json
-TESTS+=test/test-cases/secrules-language-tests/transformations/ge.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/replaceComments.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/htmlEntityDecode.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/escapeSeqDecode.json
