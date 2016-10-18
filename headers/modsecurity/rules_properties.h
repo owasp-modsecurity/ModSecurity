@@ -330,9 +330,22 @@ class RulesProperties {
 
         if (from->m_debugLog && to->m_debugLog &&
             from->m_debugLog->isLogFileSet()) {
+            std::string error;
             to->m_debugLog->setDebugLogFile(
-                from->m_debugLog->getDebugLogFile());
+                from->m_debugLog->getDebugLogFile(),
+                &error);
+            if (error.size() > 0) {
+                *err << error;
+                return -1;
+            }
         }
+
+        if (from->m_debugLog && to->m_debugLog &&
+            from->m_debugLog->isLogLevelSet()) {
+            to->m_debugLog->setDebugLogLevel(
+                from->m_debugLog->getDebugLogLevel());
+        }
+
 
         return amount_of_rules;
     }

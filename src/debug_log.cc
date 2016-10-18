@@ -29,13 +29,14 @@ DebugLog::~DebugLog() {
     DebugLogWriter::getInstance().close(m_fileName);
 }
 
-void DebugLog::setDebugLogFile(const std::string& fileName) {
-    m_fileName = fileName;
+void DebugLog::setDebugLogFile(const std::string& fileName, std::string *error) {
     if (isLogFileSet()) {
         DebugLogWriter::getInstance().close(m_fileName);
     }
 
-    DebugLogWriter::getInstance().open(m_fileName);
+    m_fileName = fileName;
+
+    DebugLogWriter::getInstance().open(m_fileName, error);
 }
 
 
@@ -70,8 +71,9 @@ int DebugLog::getDebugLogLevel() {
 
 void DebugLog::write(int level, const std::string &msg) {
     if (level <= m_debugLevel) {
-        DebugLogWriter::getInstance().write(m_fileName, "[" \
-            + std::to_string(level) + "] " + msg);
+        std::string msgf = "[" + std::to_string(level) + "] " + msg;
+        DebugLogWriter &d = DebugLogWriter::getInstance();
+        d.write_log(m_fileName, msgf);
     }
 }
 

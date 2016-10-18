@@ -244,7 +244,6 @@ libmodsecurity_la_SOURCES = \
 	utils.cc \
 	debug_log.cc \
 	debug_log_writer.cc \
-	debug_log_writer_agent.cc \
 	macro_expansion.cc \
 	rule.cc \
 	unique_id.cc \

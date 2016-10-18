@@ -42,7 +42,7 @@ class DebugLog {
     bool isLogFileSet();
     bool isLogLevelSet();
     void setDebugLogLevel(int level);
-    void setDebugLogFile(const std::string &fileName);
+    void setDebugLogFile(const std::string &fileName, std::string *error);
     const std::string& getDebugLogFile();
     int getDebugLogLevel();
 

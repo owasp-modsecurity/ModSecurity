@@ -644,7 +644,14 @@ expression:
     | CONFIG_DIR_DEBUG_LOG
       {
         if (driver.m_debugLog != NULL) {
-            driver.m_debugLog->setDebugLogFile($1);
+            std::string error;
+            driver.m_debugLog->setDebugLogFile($1, &error);
+            if (error.size() > 0) {
+                std::stringstream ss;
+                ss << "Failed to start DebugLog: " << error;
+                driver.error(@0, ss.str());
+                YYERROR;
+            }
         } else {
             std::stringstream ss;
             ss << "Internal error, there is no DebugLog ";
