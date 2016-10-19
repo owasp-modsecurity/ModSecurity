@@ -1423,11 +1423,12 @@ void sec_audit_logger_json(modsec_rec *msr) {
     yajl_gen_clear(g);
     yajl_gen_free(g);
 
+    sec_auditlog_write(msr, "\n", 1);
+
     /* Return here if we were writing to a serial log
      * as it does not need an index file.
      */
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
-        sec_auditlog_write(msr, "\n", 1);
 
         /* Unlock the mutex we used to serialise access to the audit log file. */
         rc = apr_global_mutex_unlock(msr->modsecurity->auditlog_lock);
