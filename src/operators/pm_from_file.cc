@@ -28,20 +28,20 @@ namespace operators {
 bool PmFromFile::init(const std::string &config, std::string *error) {
     std::istream *iss;
 
-    if (param.compare(0, 8, "https://") == 0) {
+    if (m_param.compare(0, 8, "https://") == 0) {
         Utils::HttpsClient client;
-        bool ret = client.download(param);
+        bool ret = client.download(m_param);
         if (ret == false) {
             error->assign(client.error);
             return false;
         }
         iss = new std::stringstream(client.content);
     } else {
-        std::string resource = find_resource(param, config);
+        std::string resource = find_resource(m_param, config);
         iss = new std::ifstream(resource, std::ios::in);
 
         if (((std::ifstream *)iss)->is_open() == false) {
-            error->assign("Failed to open file: " + param);
+            error->assign("Failed to open file: " + m_param);
             delete iss;
             return false;
         }

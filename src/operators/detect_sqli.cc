@@ -49,10 +49,6 @@ bool DetectSQLi::evaluate(Transaction *transaction, const std::string &input) {
         }
     }
 
-    if (negation) {
-        return issqli == 0;
-    }
-
     return issqli != 0;
 }
 

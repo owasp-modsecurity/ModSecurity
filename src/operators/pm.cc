@@ -109,11 +109,11 @@ bool Pm::init(const std::string &file, std::string *error) {
     std::istringstream *iss;
     const char *err = NULL;
 
-    replaceAll(param, "\\", "\\\\");
+    replaceAll(m_param, "\\", "\\\\");
 
-    char *content = parse_pm_content(param.c_str(), param.length(), &err);
+    char *content = parse_pm_content(m_param.c_str(), m_param.length(), &err);
     if (content == NULL) {
-        iss = new std::istringstream(param);
+        iss = new std::istringstream(m_param);
     } else {
         iss = new std::istringstream(content);
     }

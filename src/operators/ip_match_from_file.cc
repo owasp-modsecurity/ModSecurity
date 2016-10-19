@@ -30,10 +30,10 @@ bool IpMatchFromFile::init(const std::string &file,
     std::string e("");
     bool res = false;
 
-    if (param.compare(0, 8, "https://") == 0) {
-        res = m_tree.addFromUrl(param, &e);
+    if (m_param.compare(0, 8, "https://") == 0) {
+        res = m_tree.addFromUrl(m_param, &e);
     } else {
-        res = m_tree.addFromFile(param, &e);
+        res = m_tree.addFromFile(m_param, &e);
     }
 
     if (res == false) {

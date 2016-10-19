@@ -85,22 +85,22 @@ bool ValidateByteRange::getRange(const std::string &rangeRepresentation,
 
 bool ValidateByteRange::init(const std::string &file,
     std::string *error) {
-    size_t pos = param.find_first_of(",");
+    size_t pos = m_param.find_first_of(",");
 
     if (pos == std::string::npos) {
-        getRange(param, error);
+        getRange(m_param, error);
     } else {
-        getRange(std::string(param, 0, pos), error);
+        getRange(std::string(m_param, 0, pos), error);
     }
 
     while (pos != std::string::npos) {
-        size_t next_pos = param.find_first_of(",", pos + 1);
+        size_t next_pos = m_param.find_first_of(",", pos + 1);
 
         if (next_pos == std::string::npos) {
-            getRange(std::string(param, pos + 1, param.length() -
+            getRange(std::string(m_param, pos + 1, m_param.length() -
                 (pos + 1)), error);
         } else {
-            getRange(std::string(param, pos + 1, next_pos), error);
+            getRange(std::string(m_param, pos + 1, next_pos), error);
         }
         pos = next_pos;
     }
@@ -127,10 +127,6 @@ bool ValidateByteRange::evaluate(Transaction *transaction,
 
     // debug(9, "Found %d byte(s) in %s outside range: %s.",
     //     count, var->name, rule->op_param);
-
-    if (negation) {
-        return !ret;
-    }
 
     return ret;
 }

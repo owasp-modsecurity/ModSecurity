@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
                 continue;
             }
             if (z->op != NULL) {
-                std::string op = z->op->op;
+                std::string op = z->op->m_op;
                 if (operators.count(op) > 0) {
                     operators[op] = 1 + operators[op];
                 } else {

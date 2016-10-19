@@ -27,7 +27,7 @@ namespace operators {
 
 bool IpMatch::init(const std::string &file, std::string *error) {
     std::string e("");
-    bool res = m_tree.addFromBuffer(param, &e);
+    bool res = m_tree.addFromBuffer(m_param, &e);
 
     if (res == false) {
         error->assign(e);

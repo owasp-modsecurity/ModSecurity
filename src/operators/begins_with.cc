@@ -27,16 +27,12 @@ namespace operators {
 bool BeginsWith::evaluate(Transaction *transaction, const std::string &str) {
     bool ret = false;
 
-    std::string p = MacroExpansion::expand(param, transaction);
+    std::string p = MacroExpansion::expand(m_param, transaction);
 
     if (str.size() < p.size()) {
         ret = false;
     } else if (!str.compare(0, p.size(), p)) {
          ret = true;
-    }
-
-    if (negation) {
-        return !ret;
     }
 
     return ret;

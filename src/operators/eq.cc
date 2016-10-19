@@ -28,7 +28,7 @@ bool Eq::evaluate(Transaction *transaction, const std::string &input) {
     int p = 0;
     int i = 0;
     bool eq = false;
-    std::string pt = MacroExpansion::expand(param, transaction);
+    std::string pt = MacroExpansion::expand(m_param, transaction);
 
     try {
         p = std::stoi(pt);
@@ -42,10 +42,6 @@ bool Eq::evaluate(Transaction *transaction, const std::string &input) {
     }
 
     eq = p == i;
-
-    if (negation) {
-        return !eq;
-    }
 
     return eq;
 }

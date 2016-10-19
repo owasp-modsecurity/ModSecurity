@@ -23,15 +23,11 @@ namespace modsecurity {
 namespace operators {
 
 bool Contains::evaluate(Transaction *transaction, const std::string &input) {
-    std::string p = MacroExpansion::expand(param, transaction);
+    std::string p = MacroExpansion::expand(m_param, transaction);
     bool contains = input.find(p) != std::string::npos;
 
     if (contains && transaction) {
         transaction->m_matched.push_back(p);
-    }
-
-    if (negation) {
-        return !contains;
     }
 
     return contains;

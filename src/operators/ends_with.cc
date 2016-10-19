@@ -26,15 +26,11 @@ namespace operators {
 
 bool EndsWith::evaluate(Transaction *transaction, const std::string &input) {
     bool ret = false;
-    std::string p = MacroExpansion::expand(param, transaction);
+    std::string p = MacroExpansion::expand(m_param, transaction);
 
     if (input.length() >= p.length()) {
         ret = (0 == input.compare(input.length() - p.length(),
             p.length(), p));
-    }
-
-    if (negation) {
-        return !ret;
     }
 
     return ret;

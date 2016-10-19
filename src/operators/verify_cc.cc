@@ -93,7 +93,7 @@ bool VerifyCC::init(const std::string &param2, std::string *error) {
     const char *errptr = NULL;
     int erroffset = 0;
 
-    m_pc = pcre_compile(param.c_str(), PCRE_DOTALL|PCRE_MULTILINE,
+    m_pc = pcre_compile(m_param.c_str(), PCRE_DOTALL|PCRE_MULTILINE,
         &errptr, &erroffset, NULL);
     if (m_pc == NULL) {
         error->assign(errptr);
@@ -143,7 +143,7 @@ bool VerifyCC::evaluate(Transaction *transaction, const std::string &i) {
             if (is_cc) {
                 if (transaction) {
 #ifndef NO_LOGS
-                    transaction->debug(9, "CC# match \"" + param +
+                    transaction->debug(9, "CC# match \"" + m_param +
                         "\" at " + i + ". [offset " +
                         std::to_string(offset) + "]");
 #endif
@@ -159,3 +159,4 @@ bool VerifyCC::evaluate(Transaction *transaction, const std::string &i) {
 
 }  // namespace operators
 }  // namespace modsecurity
+

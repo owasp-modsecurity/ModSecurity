@@ -25,12 +25,8 @@ namespace operators {
 
 
 bool StrMatch::evaluate(Transaction *transaction, const std::string &input) {
-    std::string p = MacroExpansion::expand(param, transaction);
+    std::string p = MacroExpansion::expand(m_param, transaction);
     bool ret = input.find(p) != std::string::npos;
-
-    if (negation) {
-        return !ret;
-    }
 
     return ret;
 }

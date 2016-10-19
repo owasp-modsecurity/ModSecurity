@@ -115,10 +115,6 @@ bool ValidateUrlEncoding::evaluate(Transaction *transaction,
             break;
     }
 
-    if (negation) {
-        return !res;
-    }
-
     return res;
 }
 

@@ -41,10 +41,6 @@ bool DetectXSS::evaluate(Transaction *transaction, const std::string &input) {
 #endif
     }
 
-    if (negation) {
-        return is_xss == 0;
-    }
-
     return is_xss != 0;
 }
 

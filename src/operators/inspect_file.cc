@@ -34,8 +34,8 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
 InspectFile::InspectFile(std::string op, std::string param,
     bool negation)
     : Operator() {
-    this->op = op;
-    this->param = param;
+    this->m_op = op;
+    this->m_param = param;
 }
 
 }  // namespace operators

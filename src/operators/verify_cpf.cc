@@ -33,8 +33,8 @@ bool VerifyCPF::evaluate(Transaction *transaction, const std::string &str) {
 
 VerifyCPF::VerifyCPF(std::string op, std::string param, bool negation)
     : Operator() {
-    this->op = op;
-    this->param = param;
+    this->m_op = op;
+    this->m_param = param;
 }
 
 }  // namespace operators

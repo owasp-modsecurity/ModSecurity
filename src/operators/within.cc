@@ -26,18 +26,13 @@ namespace operators {
 
 bool Within::evaluate(Transaction *transaction, const std::string &str) {
     bool res = false;
-    std::string paramTarget = MacroExpansion::expand(param, transaction);
+    std::string paramTarget = MacroExpansion::expand(m_param, transaction);
 
     if (str.empty()) {
         return true;
     }
 
     res = paramTarget.find(str) != std::string::npos;
-
-
-    if (negation) {
-        return !res;
-    }
 
     return res;
 }

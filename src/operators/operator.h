@@ -30,27 +30,30 @@ class Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     Operator()
-        : op(""),
-        param(""),
-        negation(false) { }
+        : m_match_message(""),
+        m_negation(false),
+        m_op(""),
+        m_param("") { }
     Operator(std::string op, std::string param, bool negation)
-        : op(op),
-        param(param),
-        negation(negation) { }
+        : m_match_message(""),
+        m_negation(negation),
+        m_op(op),
+        m_param(param) { }
 
     virtual ~Operator() { }
-    std::string op;
-    std::string param;
-    bool negation;
+    static Operator *instantiate(std::string opName);
 
-    virtual bool init(const std::string &file, std::string *error) {
+    virtual bool init(const std::string &arg, std::string *error) {
         return true;
     }
 
+    bool evaluateInternal(Transaction *t, const std::string& a);
     virtual bool evaluate(Transaction *transaction, const std::string &str);
-    static Operator *instantiate(std::string op);
 
+    bool m_negation;
     std::string m_match_message;
+    std::string m_op;
+    std::string m_param;
 
  protected:
     bool debug(Transaction *transaction, int x, std::string a);

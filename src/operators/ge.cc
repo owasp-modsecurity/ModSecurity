@@ -24,14 +24,10 @@ namespace modsecurity {
 namespace operators {
 
 bool Ge::evaluate(Transaction *transaction, const std::string &input) {
-    std::string p = MacroExpansion::expand(param, transaction);
+    std::string p = MacroExpansion::expand(m_param, transaction);
     std::string i = MacroExpansion::expand(input, transaction);
 
     bool ge = atoll(i.c_str()) >= atoll(p.c_str());
-
-    if (negation) {
-        return !ge;
-    }
 
     return ge;
 }

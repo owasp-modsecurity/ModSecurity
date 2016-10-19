@@ -26,9 +26,9 @@ namespace operators {
 
 
 bool ValidateDTD::init(const std::string &file, std::string *error) {
-    m_resource = find_resource(param, file);
+    m_resource = find_resource(m_param, file);
     if (m_resource == "") {
-        error->assign("XML: File not found: " + param + ".");
+        error->assign("XML: File not found: " + m_param + ".");
         return false;
     }
 

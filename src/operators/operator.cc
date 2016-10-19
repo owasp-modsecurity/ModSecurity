@@ -75,13 +75,25 @@ bool Operator::debug(Transaction *transaction, int x, std::string a) {
 }
 
 
+bool Operator::evaluateInternal(Transaction *transaction,
+    const std::string& a) {
+    bool res = evaluate(transaction, a);
+
+    if (m_negation) {
+        return !res;
+    }
+
+    return res;
+}
+
+
 bool Operator::evaluate(Transaction *transaction, const std::string& a) {
 #ifndef NO_LOGS
     if (transaction) {
-        transaction->debug(2, "Operator: " + this->op + \
+        transaction->debug(2, "Operator: " + this->m_op + \
             " is not implemented or malfunctioning.");
     } else {
-        std::cerr << "Operator: " + this->op + \
+        std::cerr << "Operator: " + this->m_op + \
             " is not implemented or malfunctioning.";
     }
 #endif
@@ -183,4 +195,3 @@ Operator *Operator::instantiate(std::string op_string) {
 
 }  // namespace operators
 }  // namespace modsecurity
-

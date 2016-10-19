@@ -286,16 +286,16 @@ bool Rule::evaluate(Transaction *trasn) {
     ruleMessage = new modsecurity::RuleMessage(this, m_log_message);
 
 #ifndef NO_LOGS
-    std::string eparam = MacroExpansion::expand(this->op->param, trasn);
+    std::string eparam = MacroExpansion::expand(this->op->m_param, trasn);
 
-    if (this->op->param != eparam) {
-        eparam = "\"" + eparam + "\" Was: \"" + this->op->param + "\"";
+    if (this->op->m_param != eparam) {
+        eparam = "\"" + eparam + "\" Was: \"" + this->op->m_param + "\"";
     } else {
         eparam = "\"" + eparam + "\"";
     }
 
     trasn->debug(4, "(Rule: " + std::to_string(rule_id) \
-        + ") Executing operator \"" + this->op->op \
+        + ") Executing operator \"" + this->op->m_op \
         + "\" with param " \
         + eparam \
         + " against " \
@@ -384,7 +384,7 @@ bool Rule::evaluate(Transaction *trasn) {
                 toHexIfNeeded(value)) + "\" (Variable: " + v->m_key + ")");
 #endif
 
-            ret = this->op->evaluate(trasn, value);
+            ret = this->op->evaluateInternal(trasn, value);
 
 #ifndef NO_LOGS
             clock_t end = clock();
@@ -403,8 +403,8 @@ bool Rule::evaluate(Transaction *trasn) {
 
                 if (this->op->m_match_message.empty() == true) {
                     ruleMessage->m_match = "Matched \"Operator `" +
-                        this->op->op + "' with parameter `" +
-                        limitTo(200, this->op->param) +
+                        this->op->m_op + "' with parameter `" +
+                        limitTo(200, this->op->m_param) +
                         "' against variable `" + v->m_key + "' (Value: `" +
                         limitTo(100, toHexIfNeeded(value)) + "' ) \" at " +
                         v->m_key;

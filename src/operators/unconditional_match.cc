@@ -22,10 +22,6 @@ bool UnconditionalMatch::evaluate(Transaction *transaction,
     const std::string &input) {
     bool contains = true;
 
-    if (negation) {
-        return !contains;
-    }
-
     return contains;
 }
 
