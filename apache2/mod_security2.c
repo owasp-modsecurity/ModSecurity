@@ -1144,7 +1144,7 @@ static void hook_error_log(const char *file, int line, int level, apr_status_t s
     em->line = info->line;
     em->level = info->level;
     em->status = info->status;
-    if (info->format != NULL) em->message = apr_pstrdup(msr->mp, info->format);
+    em->message = apr_pstrdup(msr->mp, errstr);
 #else
     if (file != NULL) em->file = apr_pstrdup(msr->mp, file);
     em->line = line;

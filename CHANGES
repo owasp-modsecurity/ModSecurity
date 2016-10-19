@@ -1,6 +1,12 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * JSON Log: Don't unnecessarily rename request body parts in cleanup
+   [Issue #1223 - Robert Paprocki]
+ * Fix error message inside audit logs
+   [Issue #1216 and #1073 - Armin Abfalterer]
+ * Remove port from IPV4 address when running under IIS.
+   [Issue #1220, #1109 and #734  - Robert Culyer]
  * Remove logdata and msg fields from JSON audit log rule.
    [Issue #1190 and #1174 - Robert Paprocki]
  * Better handle the json parser cleanup
