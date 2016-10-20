@@ -1,6 +1,8 @@
 DD MMM YYYY - 2.9.2 - To be released
 ------------------------------------
 
+ * JSON Log: Append a newline to concurrent JSON audit logs
+   [Issue #1233 - Robert Paprocki]
  * JSON Log: Don't unnecessarily rename request body parts in cleanup
    [Issue #1223 - Robert Paprocki]
  * Fix error message inside audit logs
