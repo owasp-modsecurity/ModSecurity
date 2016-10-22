@@ -800,7 +800,7 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
     }
 #endif
 
-    srand((unsigned int)(time(NULL) * getpid()));
+    srand((time(NULL) * getpid()) & 0xFFFF);
 
     return OK;
 }
