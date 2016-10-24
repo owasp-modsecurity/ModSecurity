@@ -13,16 +13,16 @@
  *
  */
 
-#include <iostream>
-#include <map>
-#include <string>
-
-#include <cstring>
-#include <iostream>
 #include <stdio.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/types.h>
+
+#include <iostream>
+#include <map>
+#include <string>
+#include <cstring>
+
 
 #ifndef SRC_DEBUG_LOG_WRITER_H_
 #define SRC_DEBUG_LOG_WRITER_H_

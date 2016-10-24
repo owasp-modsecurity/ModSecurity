@@ -29,7 +29,8 @@ DebugLog::~DebugLog() {
     DebugLogWriter::getInstance().close(m_fileName);
 }
 
-void DebugLog::setDebugLogFile(const std::string& fileName, std::string *error) {
+void DebugLog::setDebugLogFile(const std::string& fileName,
+    std::string *error) {
     if (isLogFileSet()) {
         DebugLogWriter::getInstance().close(m_fileName);
     }

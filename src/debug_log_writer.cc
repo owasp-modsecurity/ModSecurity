@@ -17,15 +17,15 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <fstream>
 #include <pthread.h>
-#include <stddef.h>
 #include <stdio.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <fstream>
 
 namespace modsecurity {
 
@@ -37,7 +37,7 @@ debug_log_file_handler_t *DebugLogWriter::find_handler(
         if (current->file_name == fileName) {
             return current;
         }
-        current = (debug_log_file_handler_t *) current->next;
+        current = reinterpret_cast<debug_log_file_handler_t *>(current->next);
     }
 
     return NULL;
@@ -55,7 +55,7 @@ debug_log_file_handler_t *DebugLogWriter::add_new_handler(
     FILE *fp;
 
     fp = fopen(fileName.c_str(), "a");
-    if (fp <= 0) {
+    if (fp == 0) {
         error->assign("Failed to open file: " + fileName);
         goto err_fh;
     }
@@ -64,14 +64,14 @@ debug_log_file_handler_t *DebugLogWriter::add_new_handler(
     if (mem_key_structure < 0) {
         error->assign("Failed to select key for the shared memory (1): ");
         error->append(strerror(errno));
-        goto err_mem_key1;
+        goto err_mem_key;
     }
 
     mem_key_file_name = ftok(fileName.c_str(), 2);
     if (mem_key_file_name < 0) {
         error->assign("Failed to select key for the shared memory (2): ");
         error->append(strerror(errno));
-        goto err_mem_key1;
+        goto err_mem_key;
     }
 
     shm_id = shmget(mem_key_structure, sizeof (debug_log_file_handler_t),
@@ -82,8 +82,9 @@ debug_log_file_handler_t *DebugLogWriter::add_new_handler(
         goto err_shmget1;
     }
 
-    new_debug_log = (debug_log_file_handler_t *) shmat(shm_id, NULL, 0);
-    if (((char *)new_debug_log)[0] == -1) {
+    new_debug_log = reinterpret_cast<debug_log_file_handler_t *>(
+        shmat(shm_id, NULL, 0));
+    if ((reinterpret_cast<char *>(new_debug_log)[0]) == -1) {
         error->assign("Failed to attach shared memory (1): ");
         error->append(strerror(errno));
         goto err_shmat1;
@@ -104,14 +105,14 @@ debug_log_file_handler_t *DebugLogWriter::add_new_handler(
         goto err_shmget2;
     }
     new_debug_log->shm_id_file_name = shm_id;
-    shm_ptr2 = (char *) shmat(shm_id, NULL, 0);
+    shm_ptr2 = reinterpret_cast<char *>(shmat(shm_id, NULL, 0));
     if (shm_ptr2[0] == -1) {
         error->assign("Failed to attach shared memory (2): ");
         error->append(strerror(errno));
         goto err_shmat2;
     }
-    memset(shm_ptr2, '\0', sizeof (debug_log_file_handler_t));
     memcpy(shm_ptr2, fileName.c_str(), fileName.size());
+    shm_ptr2[fileName.size()] = '\0';
 
     new_debug_log->file_name = shm_ptr2;
 
@@ -126,7 +127,8 @@ debug_log_file_handler_t *DebugLogWriter::add_new_handler(
                 new_debug_log->next = NULL;
                 current = NULL;
             } else {
-                current = (debug_log_file_handler_t *) current->next;
+                current = reinterpret_cast<debug_log_file_handler_t *>(
+                    current->next);
             }
         }
     }
@@ -139,8 +141,7 @@ err_shmat2:
 err_shmget1:
 err_shmat1:
     shmdt(new_debug_log);
-err_mem_key2:
-err_mem_key1:
+err_mem_key:
 err_fh:
     return NULL;
 }
@@ -167,7 +168,6 @@ int DebugLogWriter::open(const std::string& fileName, std::string *error) {
 
 void DebugLogWriter::close(const std::string& fileName) {
     debug_log_file_handler_t *a;
-    bool first = false;
 
     if (fileName.empty()) {
         return;
@@ -181,19 +181,20 @@ void DebugLogWriter::close(const std::string& fileName) {
     a->using_it--;
 
     if (a->using_it == 0) {
+        bool first = false;
         int shm_id1 = a->shm_id_structure;
         int shm_id2 = a->shm_id_file_name;
         debug_log_file_handler_t *p , *n;
         pthread_mutex_lock(&a->lock);
         fclose(a->fp);
 
-        p = (debug_log_file_handler_t *) a->previous;
-        n = (debug_log_file_handler_t *) a->next;
+        p = reinterpret_cast<debug_log_file_handler_t *>(a->previous);
+        n = reinterpret_cast<debug_log_file_handler_t *>(a->next);
         if (p != NULL) {
-            p->next = (debug_log_file_handler_t *) n;
+            p->next = reinterpret_cast<debug_log_file_handler_t *>(n);
         }
         if (n != NULL) {
-            n->previous = (debug_log_file_handler_t *) p;
+            n->previous = reinterpret_cast<debug_log_file_handler_t *>(p);
         }
         a->previous = NULL;
         a->next = NULL;
@@ -211,7 +212,7 @@ void DebugLogWriter::close(const std::string& fileName) {
         shmctl(shm_id2, IPC_RMID, NULL);
 
         if (first) {
-            m_first == NULL;
+            m_first = NULL;
         }
         a = NULL;
     }
@@ -230,7 +231,8 @@ void DebugLogWriter::write_log(const std::string& fileName,
     }
 
     pthread_mutex_lock(&a->lock);
-    wrote = write(a->file_handler, (void *)lmsg.c_str(), lmsg.size());
+    wrote = write(a->file_handler, reinterpret_cast<const char *>(lmsg.c_str()),
+        lmsg.size());
     if (wrote < msg.size()) {
         std::cerr << "failed to write debug log: " << msg;
     }
