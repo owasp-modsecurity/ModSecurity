@@ -50,8 +50,14 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Tag::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+std::string Tag::getName(Transaction *transaction) {
     std::string tag = MacroExpansion::expand(m_parser_payload, transaction);
+    return tag;
+}
+
+
+bool Tag::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+    std::string tag = getName(transaction);
 
 #ifndef NO_LOGS
     transaction->debug(9, "Rule tag: " + tag);

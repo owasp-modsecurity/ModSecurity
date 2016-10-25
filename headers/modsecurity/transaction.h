@@ -269,6 +269,11 @@ class Transaction {
     Rules *m_rules;
 
     /**
+     *
+     */
+    std::list< std::pair<std::string, std::string> > m_ruleRemoteTargetByTag;
+
+    /**
      * The list m_auditLogModifier contains modifications to the `auditlogs'
      * for this specific request, those modifications can happens via the
      * utilization of the action: `ctl:auditLogParts='

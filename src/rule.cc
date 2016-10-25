@@ -28,10 +28,12 @@
 #include "actions/action.h"
 #include "modsecurity/modsecurity.h"
 #include "actions/transformations/none.h"
+#include "actions/tag.h"
 #include "variables/variations/exclusion.h"
 #include "src/utils.h"
 #include "modsecurity/rules.h"
 #include "src/macro_expansion.h"
+
 
 using modsecurity::Variables::Variations::Exclusion;
 
@@ -329,6 +331,7 @@ bool Rule::evaluate(Transaction *trasn) {
         variable->evaluateInternal(trasn, this, &e);
 
         for (auto &v : e) {
+            bool ignoreVariable = false;
             if (std::find(exclusions.begin(), exclusions.end(),
                 v->m_key) != exclusions.end()) {
 #ifndef NO_LOGS
@@ -337,6 +340,24 @@ bool Rule::evaluate(Transaction *trasn) {
 #endif
                 continue;
             }
+
+            for (auto &i : trasn->m_ruleRemoteTargetByTag) {
+                std::string tag = i.first;
+                std::string args = i.second;
+                if (containsTag(tag, trasn) == false) {
+                    continue;
+                }
+                if (args == v->m_key) {
+                    trasn->debug(9, "Variable: " + v->m_key +
+                        " was excluded by ruleRemoteTargetByTag...");
+                    ignoreVariable = true;
+                    break;
+                }
+            }
+            if (ignoreVariable) {
+                continue;
+            }
+
             std::string value = v->m_value;
             int none = 0;
             for (Action *a : this->actions_runtime_pre) {
@@ -576,6 +597,18 @@ std::vector<actions::Action *> Rule::getActionsByName(const std::string& name) {
         }
     }
     return ret;
+}
+
+
+bool Rule::containsTag(const std::string& name, Transaction *t) {
+    std::vector<std::string *> ret;
+    for (auto &z : this->actions_runtime_pos) {
+        actions::Tag *tag = dynamic_cast<actions::Tag *> (z);
+        if (tag != NULL && tag->getName(t) == name) {
+            return true;
+        }
+    }
+    return false;
 }
 
 }  // namespace modsecurity

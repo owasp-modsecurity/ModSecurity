@@ -77,6 +77,8 @@ CONFIG_DIR_RES_BODY_LIMIT (?i:SecResponseBodyLimit)
 CONFIG_DIR_REQ_BODY_LIMIT_ACTION (?i:SecRequestBodyLimitAction)
 CONFIG_DIR_RES_BODY_LIMIT_ACTION (?i:SecResponseBodyLimitAction)
 
+ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG (?i:ctl:ruleRemoveTargetByTag)
+
 CONFIG_DIR_GEO_DB (?i:SecGeoLookupDb)
 
 CONFIG_DIR_RULE_ENG (?i:SecRuleEngine)
@@ -170,6 +172,7 @@ CONFIG_VALUE_ABORT   (?i:Abort)
 CONFIG_VALUE_WARN    (?i:Warn)
 
 CONFIG_VALUE_PATH    [0-9A-Za-z_\/\.\-\*\:]+
+CONFIG_VALUE_PATH2    [0-9A-Za-z_\/\.\-\*\:\;]+
 AUDIT_PARTS [ABCDEFHJKIZ]+
 CONFIG_VALUE_NUMBER [0-9]+
 
@@ -233,6 +236,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 
 %{ /* Remove Rules */ %}
 {CONFIG_SEC_REMOVE_RULES_BY_ID}[ ]{FREE_TEXT_NEW_LINE}      { return yy::seclang_parser::make_CONFIG_SEC_RULE_REMOVE_BY_ID(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG}[=]{CONFIG_VALUE_PATH2}      { return yy::seclang_parser::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG(yytext, *driver.loc.back()); }
 
 %{ /* Upload */ %}
 {CONFIG_UPLOAD_FILE_LIMIT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_UPLOAD_FILE_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }

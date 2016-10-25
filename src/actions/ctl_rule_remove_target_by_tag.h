@@ -16,30 +16,29 @@
 #include <string>
 
 #include "actions/action.h"
+#include "modsecurity/transaction.h"
+#include "utils.h"
 
-#ifndef SRC_ACTIONS_TAG_H_
-#define SRC_ACTIONS_TAG_H_
-
-class Transaction;
+#ifndef SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_TAG_H_
+#define SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_TAG_H_
 
 namespace modsecurity {
-class Transaction;
 namespace actions {
 
 
-class Tag : public Action {
+class CtlRuleRemoveTargetByTag : public Action {
  public:
-    explicit Tag(std::string action)
+    explicit CtlRuleRemoveTargetByTag(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    std::string getName(Transaction *transaction);
+    bool init(std::string *error) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
 
-    bool evaluate(Rule *rule, Transaction *transaction,
-        RuleMessage *rm) override;
+    std::string m_tag;
+    std::string m_target;
 };
-
 
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif  // SRC_ACTIONS_TAG_H_
+#endif  // SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_TAG_H_
