@@ -174,7 +174,7 @@ CONFIG_VALUE_ABORT   (?i:Abort)
 CONFIG_VALUE_WARN    (?i:Warn)
 
 CONFIG_VALUE_PATH    [0-9A-Za-z_\/\.\-\*\:]+
-CONFIG_VALUE_PATH2    [0-9A-Za-z_\/\.\-\*\:\;]+
+REMOVE_RULE_BY          [0-9A-Za-z_\/\.\-\*\:\;\]\[]+
 AUDIT_PARTS [ABCDEFHJKIZ]+
 CONFIG_VALUE_NUMBER [0-9]+
 
@@ -236,11 +236,12 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {ACTION_CTL_AUDIT_ENGINE}=                         { return yy::seclang_parser::make_ACTION_CTL_AUDIT_ENGINE(yytext, *driver.loc.back()); }
 {ACTION_CTL_FORCE_REQ_BODY_VAR}=                   { return yy::seclang_parser::make_ACTION_CTL_FORCE_REQ_BODY_VAR(yytext, *driver.loc.back()); }
 
+
 %{ /* Remove Rules */ %}
 {CONFIG_SEC_REMOVE_RULES_BY_ID}[ ]{FREE_TEXT_NEW_LINE}      { return yy::seclang_parser::make_CONFIG_SEC_RULE_REMOVE_BY_ID(strchr(yytext, ' ') + 1, *driver.loc.back()); }
-{ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG}[=]{CONFIG_VALUE_PATH2}      { return yy::seclang_parser::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG(yytext, *driver.loc.back()); }
-{ACTION_CTL_RULE_REMOVE_TARGET_BY_ID}[=]{CONFIG_VALUE_PATH2}      { return yy::seclang_parser::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID(yytext, *driver.loc.back()); }
-{ACTION_CTL_RULE_REMOVE_BY_ID}[=]{CONFIG_VALUE_PATH2}      { return yy::seclang_parser::make_ACTION_CTL_RULE_REMOVE_BY_ID(yytext, *driver.loc.back()); }
+{ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG}[=]{REMOVE_RULE_BY}      { return yy::seclang_parser::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG(yytext, *driver.loc.back()); }
+{ACTION_CTL_RULE_REMOVE_TARGET_BY_ID}[=]{REMOVE_RULE_BY}      { return yy::seclang_parser::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID(yytext, *driver.loc.back()); }
+{ACTION_CTL_RULE_REMOVE_BY_ID}[=]{REMOVE_RULE_BY}      { return yy::seclang_parser::make_ACTION_CTL_RULE_REMOVE_BY_ID(yytext, *driver.loc.back()); }
 
 %{ /* Upload */ %}
 {CONFIG_UPLOAD_FILE_LIMIT}[ ]{CONFIG_VALUE_NUMBER}  { return yy::seclang_parser::make_CONFIG_UPLOAD_FILE_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
