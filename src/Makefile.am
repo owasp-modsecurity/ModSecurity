@@ -104,6 +104,7 @@ ACTIONS = \
 	actions/ctl_request_body_processor_json.cc \
 	actions/ctl_request_body_processor_xml.cc \
 	actions/ctl_rule_remove_target_by_tag.cc \
+	actions/ctl_rule_remove_target_by_id.cc \
 	actions/init_col.cc \
 	actions/deny.cc \
 	actions/log.cc \

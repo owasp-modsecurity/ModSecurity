@@ -357,6 +357,22 @@ bool Rule::evaluate(Transaction *trasn) {
             if (ignoreVariable) {
                 continue;
             }
+            for (auto &i : trasn->m_ruleRemoteTargetById) {
+                int id = i.first;
+                std::string args = i.second;
+                if (rule_id != id) {
+                    continue;
+                }
+                if (args == v->m_key) {
+                    trasn->debug(9, "Variable: " + v->m_key +
+                        " was excluded by ruleRemoteTargetById...");
+                    ignoreVariable = true;
+                    break;
+                }
+            }
+            if (ignoreVariable) {
+                continue;
+            }
 
             std::string value = v->m_value;
             int none = 0;
