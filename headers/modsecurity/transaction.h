@@ -271,6 +271,11 @@ class Transaction {
     /**
      *
      */
+    std::list<int > m_ruleRemoveById;
+
+    /**
+     *
+     */
     std::list< std::pair<std::string, std::string> > m_ruleRemoteTargetByTag;
 
     /**

@@ -285,6 +285,15 @@ bool Rule::evaluate(Transaction *trasn) {
         return evaluateActions(trasn);
     }
 
+    for (auto &i : trasn->m_ruleRemoveById) {
+        if (rule_id != i) {
+            continue;
+        }
+        trasn->debug(9, "Rule id: " + std::to_string(rule_id) +
+            " was skipped due to an ruleRemoveById action...");
+        return true;
+    }
+
     ruleMessage = new modsecurity::RuleMessage(this, m_log_message);
 
 #ifndef NO_LOGS
