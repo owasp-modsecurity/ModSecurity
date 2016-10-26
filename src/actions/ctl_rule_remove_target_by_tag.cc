@@ -39,7 +39,7 @@ bool CtlRuleRemoveTargetByTag::init(std::string *error) {
 }
 
 bool CtlRuleRemoveTargetByTag::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->m_ruleRemoteTargetByTag.push_back(
+    transaction->m_ruleRemoveTargetByTag.push_back(
         std::make_pair(m_tag, m_target));
     return true;
 }

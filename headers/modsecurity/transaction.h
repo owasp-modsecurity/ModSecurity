@@ -276,12 +276,12 @@ class Transaction {
     /**
      *
      */
-    std::list< std::pair<std::string, std::string> > m_ruleRemoteTargetByTag;
+    std::list< std::pair<std::string, std::string> > m_ruleRemoveTargetByTag;
 
     /**
      *
      */
-    std::list< std::pair<int, std::string> > m_ruleRemoteTargetById;
+    std::list< std::pair<int, std::string> > m_ruleRemoveTargetById;
 
     /**
      * The list m_auditLogModifier contains modifications to the `auditlogs'

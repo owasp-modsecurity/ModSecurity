@@ -46,7 +46,7 @@ bool CtlRuleRemoveTargetById::init(std::string *error) {
 }
 
 bool CtlRuleRemoveTargetById::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->m_ruleRemoteTargetById.push_back(
+    transaction->m_ruleRemoveTargetById.push_back(
         std::make_pair(m_id, m_target));
     return true;
 }

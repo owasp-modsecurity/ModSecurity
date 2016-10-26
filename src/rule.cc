@@ -350,7 +350,7 @@ bool Rule::evaluate(Transaction *trasn) {
                 continue;
             }
 
-            for (auto &i : trasn->m_ruleRemoteTargetByTag) {
+            for (auto &i : trasn->m_ruleRemoveTargetByTag) {
                 std::string tag = i.first;
                 std::string args = i.second;
                 if (containsTag(tag, trasn) == false) {
@@ -366,7 +366,7 @@ bool Rule::evaluate(Transaction *trasn) {
             if (ignoreVariable) {
                 continue;
             }
-            for (auto &i : trasn->m_ruleRemoteTargetById) {
+            for (auto &i : trasn->m_ruleRemoveTargetById) {
                 int id = i.first;
                 std::string args = i.second;
                 if (rule_id != id) {
