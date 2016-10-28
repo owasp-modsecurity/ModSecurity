@@ -80,6 +80,7 @@ CONFIG_DIR_RES_BODY_LIMIT_ACTION (?i:SecResponseBodyLimitAction)
 ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG (?i:ctl:ruleRemoveTargetByTag)
 ACTION_CTL_RULE_REMOVE_TARGET_BY_ID (?i:ctl:ruleRemoveTargetById)
 ACTION_CTL_RULE_REMOVE_BY_ID (?i:ctl:ruleRemoveById)
+ACTION_CTL_REQUEST_BODY_ACCESS (?i:ctl:requestBodyAccess)
 
 CONFIG_DIR_GEO_DB (?i:SecGeoLookupDb)
 
@@ -235,6 +236,7 @@ CONFIG_DIR_UNICODE_MAP_FILE (?i:SecUnicodeMapFile)
 {ACTION_CTL_RULE_ENGINE}=                          { return yy::seclang_parser::make_ACTION_CTL_RULE_ENGINE(yytext, *driver.loc.back()); }
 {ACTION_CTL_AUDIT_ENGINE}=                         { return yy::seclang_parser::make_ACTION_CTL_AUDIT_ENGINE(yytext, *driver.loc.back()); }
 {ACTION_CTL_FORCE_REQ_BODY_VAR}=                   { return yy::seclang_parser::make_ACTION_CTL_FORCE_REQ_BODY_VAR(yytext, *driver.loc.back()); }
+{ACTION_CTL_REQUEST_BODY_ACCESS}=                  { return yy::seclang_parser::make_ACTION_CTL_REQUEST_BODY_ACCESS(yytext, *driver.loc.back()); }
 
 
 %{ /* Remove Rules */ %}

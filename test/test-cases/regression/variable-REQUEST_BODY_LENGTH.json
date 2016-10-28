@@ -55,6 +55,7 @@
     },
     "rules":[  
       "SecRuleEngine On",
+      "SecRequestBodyAccess On",
       "SecRule REQUEST_BODY_LENGTH \"@contains small_text_file.txt\" \"id:1,phase:3,pass,t:trim\""
     ]
   }

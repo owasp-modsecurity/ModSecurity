@@ -284,6 +284,11 @@ class Transaction {
     std::list< std::pair<int, std::string> > m_ruleRemoveTargetById;
 
     /**
+     *
+     */
+    int m_requestBodyAccess;
+
+    /**
      * The list m_auditLogModifier contains modifications to the `auditlogs'
      * for this specific request, those modifications can happens via the
      * utilization of the action: `ctl:auditLogParts='

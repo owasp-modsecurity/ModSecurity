@@ -29,6 +29,7 @@ class Driver;
 #include "actions/ctl_rule_remove_target_by_tag.h"
 #include "actions/ctl_rule_remove_target_by_id.h"
 #include "actions/ctl_rule_remove_by_id.h"
+#include "actions/ctl_request_body_access.h"
 #include "actions/init_col.h"
 #include "actions/set_sid.h"
 #include "actions/set_uid.h"
@@ -304,6 +305,7 @@ using modsecurity::Variables::XML;
 %token <std::string> ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG
 %token <std::string> ACTION_CTL_RULE_REMOVE_TARGET_BY_ID
 %token <std::string> ACTION_CTL_RULE_REMOVE_BY_ID
+%token <std::string> ACTION_CTL_REQUEST_BODY_ACCESS
 
 %type <std::vector<Action *> *> actions
 %type <std::vector<Variable *> *> variables
@@ -1247,6 +1249,24 @@ act:
       {
         std::string error;
         $$ = new CtlAuditLogParts($1);
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
+      }
+    | ACTION_CTL_REQUEST_BODY_ACCESS CONFIG_VALUE_ON
+      {
+        std::string error;
+        $$ = new modsecurity::actions::CtlRequestBodyAccess($1 + "true");
+        if ($$->init(&error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
+      }
+    | ACTION_CTL_REQUEST_BODY_ACCESS CONFIG_VALUE_OFF
+      {
+        std::string error;
+        $$ = new modsecurity::actions::CtlRequestBodyAccess($1 + "false");
         if ($$->init(&error) == false) {
             driver.error(@0, error);
             YYERROR;

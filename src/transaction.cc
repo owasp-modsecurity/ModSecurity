@@ -43,7 +43,9 @@
 #include "src/unique_id.h"
 #include "src/utils.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rules_properties.h"
 #include "src/actions/allow.h"
+
 
 using modsecurity::actions::Action;
 using modsecurity::RequestBodyProcessor::Multipart;
@@ -113,6 +115,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_requestHeadersNames(NULL),
     m_responseHeadersNames(NULL),
     m_responseContentType(NULL),
+    m_requestBodyAccess(Rules::PropertyNotSetConfigBoolean),
     m_marker(""),
     m_allowType(modsecurity::actions::NoneAllowType),
     m_skip_next(0),
@@ -618,7 +621,7 @@ int Transaction::processRequestBody() {
     debug(4, "Starting phase REQUEST_BODY. (SecRules 2)");
 #endif
 
-    if (m_rules->m_secRuleEngine == Rules::DisabledRuleEngine) {
+    if (m_rules->m_secRuleEngine == RulesProperties::DisabledRuleEngine) {
 #ifndef NO_LOGS
         debug(4, "Rule engine disabled, returning...");
 #endif
@@ -718,6 +721,29 @@ int Transaction::processRequestBody() {
         m_collections.storeOrUpdateFirst("REQBODY_ERROR", "0");
         m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "0");
     }
+
+#if 1
+    if (m_rules->m_secRequestBodyAccess != RulesProperties::TrueConfigBoolean) {
+        if (m_requestBodyAccess != RulesProperties::TrueConfigBoolean) {
+            debug(4, "Request body processing is disabled");
+
+            this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
+            return true;
+        } else {
+            debug(4, "Request body processing is disabled, but " \
+                "enabled to this transaction due to ctl:requestBodyAccess " \
+                "action");
+        }
+    } else {
+        if (m_requestBodyAccess == RulesProperties::FalseConfigBoolean) {
+            debug(4, "Request body processing is enabled, but " \
+                "disable to this transaction due to ctl:requestBodyAccess " \
+                "action");
+            this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
+            return true;
+        }
+    }
+#endif
 
     /**
      * FIXME: This variable should be calculated on demand, it is
