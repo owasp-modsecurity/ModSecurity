@@ -17,54 +17,55 @@ class Driver;
 }
 }
 
-#include "modsecurity/modsecurity.h"
-#include "modsecurity/rules_properties.h"
+
+
 
 #include "actions/accuracy.h"
 #include "actions/action.h"
+#include "actions/allow.h"
 #include "actions/audit_log.h"
 #include "actions/ctl_audit_log_parts.h"
+#include "actions/ctl_request_body_access.h"
 #include "actions/ctl_request_body_processor_json.h"
 #include "actions/ctl_request_body_processor_xml.h"
-#include "actions/ctl_rule_remove_target_by_tag.h"
-#include "actions/ctl_rule_remove_target_by_id.h"
 #include "actions/ctl_rule_remove_by_id.h"
-#include "actions/ctl_request_body_access.h"
+#include "actions/ctl_rule_remove_target_by_id.h"
+#include "actions/ctl_rule_remove_target_by_tag.h"
 #include "actions/init_col.h"
+#include "actions/log_data.h"
+#include "actions/maturity.h"
+#include "actions/msg.h"
+#include "actions/phase.h"
+#include "actions/redirect.h"
+#include "actions/rev.h"
 #include "actions/set_sid.h"
 #include "actions/set_uid.h"
 #include "actions/set_var.h"
 #include "actions/severity.h"
 #include "actions/skip.h"
 #include "actions/skip_after.h"
-#include "actions/msg.h"
-#include "actions/phase.h"
-#include "actions/allow.h"
-#include "actions/log_data.h"
-#include "actions/maturity.h"
-#include "actions/redirect.h"
-#include "actions/rev.h"
-#include "actions/ver.h"
 #include "actions/tag.h"
-#include "actions/transformations/transformation.h"
 #include "actions/transformations/none.h"
+#include "actions/transformations/transformation.h"
+#include "actions/ver.h"
 #include "actions/xmlns.h"
-#include "operators/operator.h"
-#include "modsecurity/rule.h"
-#include "utils/geo_lookup.h"
 #include "audit_log/audit_log.h"
+#include "modsecurity/modsecurity.h"
+#include "modsecurity/rules_properties.h"
+#include "modsecurity/rule.h"
+#include "operators/operator.h"
 #include "utils.h"
-
-#include "variables/variations/count.h"
-#include "variables/variations/exclusion.h"
+#include "utils/geo_lookup.h"
+#include "variables/xml.h"
 #include "variables/duration.h"
 #include "variables/env.h"
 #include "variables/highest_severity.h"
 #include "variables/modsec_build.h"
 #include "variables/remote_user.h"
+#include "variables/rule.h"
+#include "variables/time.h"
 #include "variables/time_day.h"
 #include "variables/time_epoch.h"
-#include "variables/time.h"
 #include "variables/time_hour.h"
 #include "variables/time_min.h"
 #include "variables/time_mon.h"
@@ -72,45 +73,18 @@ class Driver;
 #include "variables/time_wday.h"
 #include "variables/time_year.h"
 #include "variables/tx.h"
-#include "variables/xml.h"
-#include "variables/rule.h"
+#include "variables/variations/count.h"
+#include "variables/variations/exclusion.h"
+
 
 using modsecurity::ModSecurity;
-
-using modsecurity::actions::Accuracy;
-using modsecurity::actions::Action;
-using modsecurity::actions::CtlAuditLogParts;
-using modsecurity::actions::CtlRequestBodyProcessorXML;
-using modsecurity::actions::CtlRequestBodyProcessorJSON;
-using modsecurity::actions::InitCol;
-using modsecurity::actions::SetSID;
-using modsecurity::actions::SetUID;
-using modsecurity::actions::SetVar;
-using modsecurity::actions::Severity;
-using modsecurity::actions::Tag;
-using modsecurity::actions::Redirect;
-using modsecurity::actions::Rev;
-using modsecurity::actions::Ver;
-using modsecurity::actions::Msg;
-using modsecurity::actions::Phase;
-using modsecurity::actions::Allow;
-using modsecurity::actions::transformations::None;
-using modsecurity::actions::LogData;
-using modsecurity::actions::Maturity;
-using modsecurity::actions::transformations::Transformation;
-using modsecurity::operators::Operator;
 using modsecurity::Rule;
 using modsecurity::Utils::GeoLookup;
-using modsecurity::removeBracketsIfNeeded;
-
-using modsecurity::Variables::Variations::Count;
-using modsecurity::Variables::Variations::Exclusion;
 using modsecurity::Variables::Duration;
 using modsecurity::Variables::Env;
 using modsecurity::Variables::HighestSeverity;
 using modsecurity::Variables::ModsecBuild;
 using modsecurity::Variables::RemoteUser;
-using modsecurity::Variables::Time;
 using modsecurity::Variables::TimeDay;
 using modsecurity::Variables::TimeEpoch;
 using modsecurity::Variables::TimeHour;
@@ -119,9 +93,36 @@ using modsecurity::Variables::TimeMon;
 using modsecurity::Variables::TimeSec;
 using modsecurity::Variables::TimeWDay;
 using modsecurity::Variables::TimeYear;
-using modsecurity::Variables::Variable;
+using modsecurity::Variables::Time;
 using modsecurity::Variables::Tx;
+using modsecurity::Variables::Variable;
+using modsecurity::Variables::Variations::Count;
+using modsecurity::Variables::Variations::Exclusion;
 using modsecurity::Variables::XML;
+using modsecurity::actions::Accuracy;
+using modsecurity::actions::Action;
+using modsecurity::actions::Allow;
+using modsecurity::actions::CtlAuditLogParts;
+using modsecurity::actions::CtlRequestBodyProcessorJSON;
+using modsecurity::actions::CtlRequestBodyProcessorXML;
+using modsecurity::actions::InitCol;
+using modsecurity::actions::LogData;
+using modsecurity::actions::Maturity;
+using modsecurity::actions::Msg;
+using modsecurity::actions::Phase;
+using modsecurity::actions::Redirect;
+using modsecurity::actions::Rev;
+using modsecurity::actions::SetSID;
+using modsecurity::actions::SetUID;
+using modsecurity::actions::SetVar;
+using modsecurity::actions::Severity;
+using modsecurity::actions::Tag;
+using modsecurity::actions::Ver;
+using modsecurity::actions::transformations::None;
+using modsecurity::actions::transformations::Transformation;
+using modsecurity::operators::Operator;
+using modsecurity::removeBracketsIfNeeded;
+
 
 
 #define CHECK_VARIATION_DECL \
@@ -177,41 +178,39 @@ using modsecurity::Variables::XML;
   PIPE
 ;
 
-%token <std::string> QUOTATION_MARK
-%token <std::string> DIRECTIVE
-%token <std::string> DIRECTIVE_SECRULESCRIPT
-%token <std::string> CONFIG_DIR_REQ_BODY_LIMIT
-%token <std::string> CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT
-%token <std::string> CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT
-%token <std::string> CONFIG_DIR_RES_BODY_LIMIT
-%token <std::string> CONFIG_DIR_REQ_BODY_LIMIT_ACTION
-%token <std::string> CONFIG_DIR_RES_BODY_LIMIT_ACTION
-
-%token <std::string> CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION
-%token <std::string> CONFIG_DIR_PCRE_MATCH_LIMIT
-%token <std::string> CONGIG_DIR_RESPONSE_BODY_MP
-%token <std::string> CONGIG_DIR_SEC_TMP_DIR
-%token <std::string> CONGIG_DIR_SEC_DATA_DIR
-%token <std::string> CONGIG_DIR_SEC_ARG_SEP
-%token <std::string> CONGIG_DIR_SEC_COOKIE_FORMAT
-%token <std::string> CONGIG_DIR_SEC_STATUS_ENGINE
-%token <std::string> CONFIG_DIR_UNICODE_MAP_FILE
-
-%token <std::string> CONFIG_DIR_RULE_ENG
-%token <std::string> CONFIG_DIR_REQ_BODY
-%token <std::string> CONFIG_DIR_RES_BODY
-%token <std::string> CONFIG_VALUE_ON
-%token <std::string> CONFIG_VALUE_OFF
-%token <std::string> CONFIG_VALUE_DETC
-%token <std::string> CONFIG_VALUE_HTTPS
-%token <std::string> CONFIG_VALUE_SERIAL
-%token <std::string> CONFIG_VALUE_PARALLEL
-%token <std::string> CONFIG_VALUE_RELEVANT_ONLY
-%token <std::string> CONFIG_VALUE_PROCESS_PARTIAL
-%token <std::string> CONFIG_VALUE_REJECT
-%token <std::string> CONFIG_VALUE_ABORT
-%token <std::string> CONFIG_VALUE_WARN
-
+%token <std::string> ACTION
+%token <std::string> ACTION_ACCURACY
+%token <std::string> ACTION_ALLOW
+%token <std::string> ACTION_AUDIT_LOG
+%token <std::string> ACTION_CTL_AUDIT_ENGINE
+%token <std::string> ACTION_CTL_AUDIT_LOG_PARTS
+%token <std::string> ACTION_CTL_BDY_JSON
+%token <std::string> ACTION_CTL_BDY_XML
+%token <std::string> ACTION_CTL_FORCE_REQ_BODY_VAR
+%token <std::string> ACTION_CTL_REQUEST_BODY_ACCESS
+%token <std::string> ACTION_CTL_RULE_ENGINE
+%token <std::string> ACTION_CTL_RULE_REMOVE_BY_ID
+%token <std::string> ACTION_CTL_RULE_REMOVE_TARGET_BY_ID
+%token <std::string> ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG
+%token <std::string> ACTION_EXEC
+%token <std::string> ACTION_EXPIREVAR
+%token <std::string> ACTION_INITCOL
+%token <std::string> ACTION_MATURITY
+%token <std::string> ACTION_MSG
+%token <std::string> ACTION_PHASE
+%token <std::string> ACTION_REDIRECT
+%token <std::string> ACTION_REV
+%token <std::string> ACTION_SETENV
+%token <std::string> ACTION_SETSID
+%token <std::string> ACTION_SETUID
+%token <std::string> ACTION_SETVAR
+%token <std::string> ACTION_SEVERITY
+%token <std::string> ACTION_SKIP
+%token <std::string> ACTION_SKIP_AFTER
+%token <std::string> ACTION_TAG
+%token <std::string> ACTION_VER
+%token <std::string> ACTION_XMLNS
+%token <std::string> CONFIG_COMPONENT_SIG
 %token <std::string> CONFIG_DIR_AUDIT_DIR
 %token <std::string> CONFIG_DIR_AUDIT_DIR_MOD
 %token <std::string> CONFIG_DIR_AUDIT_ENG
@@ -221,37 +220,63 @@ using modsecurity::Variables::XML;
 %token <std::string> CONFIG_DIR_AUDIT_LOG_P
 %token <std::string> CONFIG_DIR_AUDIT_STS
 %token <std::string> CONFIG_DIR_AUDIT_TPE
-
-%token <std::string> CONFIG_SEC_RULE_REMOVE_BY_ID
-
-%token <std::string> CONFIG_UPDLOAD_KEEP_FILES
-%token <std::string> CONFIG_UPDLOAD_SAVE_TMP_FILES
-%token <std::string> CONFIG_UPLOAD_FILE_LIMIT
-%token <std::string> CONFIG_UPLOAD_FILE_MODE
-%token <std::string> CONFIG_UPLOAD_DIR
-
-%token <std::string> CONFIG_COMPONENT_SIG
-
 %token <std::string> CONFIG_DIR_DEBUG_LOG
 %token <std::string> CONFIG_DIR_DEBUG_LVL
-
-%token <std::string> CONFIG_XML_EXTERNAL_ENTITY
-
+%token <std::string> CONFIG_DIR_GEO_DB
+%token <std::string> CONFIG_DIR_PCRE_MATCH_LIMIT
+%token <std::string> CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION
+%token <std::string> CONFIG_DIR_REQ_BODY
+%token <std::string> CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT
+%token <std::string> CONFIG_DIR_REQ_BODY_LIMIT
+%token <std::string> CONFIG_DIR_REQ_BODY_LIMIT_ACTION
+%token <std::string> CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT
+%token <std::string> CONFIG_DIR_RES_BODY
+%token <std::string> CONFIG_DIR_RES_BODY_LIMIT
+%token <std::string> CONFIG_DIR_RES_BODY_LIMIT_ACTION
+%token <std::string> CONFIG_DIR_RULE_ENG
 %token <std::string> CONFIG_DIR_SEC_ACTION
 %token <std::string> CONFIG_DIR_SEC_DEFAULT_ACTION
 %token <std::string> CONFIG_DIR_SEC_MARKER
-
-%token <std::string> VARIABLE
-%token <std::string> VARIABLE_STATUS
-%token <std::string> VARIABLE_TX
-%token <std::string> VARIABLE_COL
+%token <std::string> CONFIG_DIR_UNICODE_MAP_FILE
+%token <std::string> CONFIG_SEC_COLLECTION_TIMEOUT
+%token <std::string> CONFIG_SEC_REMOTE_RULES_FAIL_ACTION
+%token <std::string> CONFIG_SEC_RULE_REMOVE_BY_ID
+%token <std::string> CONFIG_UPDLOAD_KEEP_FILES
+%token <std::string> CONFIG_UPDLOAD_SAVE_TMP_FILES
+%token <std::string> CONFIG_UPLOAD_DIR
+%token <std::string> CONFIG_UPLOAD_FILE_LIMIT
+%token <std::string> CONFIG_UPLOAD_FILE_MODE
+%token <std::string> CONFIG_VALUE_ABORT
+%token <std::string> CONFIG_VALUE_DETC
+%token <std::string> CONFIG_VALUE_HTTPS
+%token <std::string> CONFIG_VALUE_OFF
+%token <std::string> CONFIG_VALUE_ON
+%token <std::string> CONFIG_VALUE_PARALLEL
+%token <std::string> CONFIG_VALUE_PROCESS_PARTIAL
+%token <std::string> CONFIG_VALUE_REJECT
+%token <std::string> CONFIG_VALUE_RELEVANT_ONLY
+%token <std::string> CONFIG_VALUE_SERIAL
+%token <std::string> CONFIG_VALUE_WARN
+%token <std::string> CONFIG_XML_EXTERNAL_ENTITY
+%token <std::string> CONGIG_DIR_RESPONSE_BODY_MP
+%token <std::string> CONGIG_DIR_SEC_ARG_SEP
+%token <std::string> CONGIG_DIR_SEC_COOKIE_FORMAT
+%token <std::string> CONGIG_DIR_SEC_DATA_DIR
+%token <std::string> CONGIG_DIR_SEC_STATUS_ENGINE
+%token <std::string> CONGIG_DIR_SEC_TMP_DIR
+%token <std::string> DIRECTIVE
+%token <std::string> DIRECTIVE_SECRULESCRIPT
+%token <std::string> FREE_TEXT
+%token <std::string> LOG_DATA
+%token <std::string> OPERATOR
+%token <std::string> OPERATOR_GEOIP
+%token <std::string> QUOTATION_MARK
+%token <std::string> RUN_TIME_VAR_BLD
 %token <std::string> RUN_TIME_VAR_DUR
 %token <std::string> RUN_TIME_VAR_ENV
-%token <std::string> RUN_TIME_VAR_BLD
 %token <std::string> RUN_TIME_VAR_HSV
-
 %token <std::string> RUN_TIME_VAR_REMOTE_USER
-
+%token <std::string> RUN_TIME_VAR_RULE
 %token <std::string> RUN_TIME_VAR_TIME
 %token <std::string> RUN_TIME_VAR_TIME_DAY
 %token <std::string> RUN_TIME_VAR_TIME_EPOCH
@@ -262,57 +287,19 @@ using modsecurity::Variables::XML;
 %token <std::string> RUN_TIME_VAR_TIME_WDAY
 %token <std::string> RUN_TIME_VAR_TIME_YEAR
 %token <std::string> RUN_TIME_VAR_XML
-%token <std::string> RUN_TIME_VAR_RULE
-
-%token <std::string> CONFIG_SEC_REMOTE_RULES_FAIL_ACTION
-
-%token <std::string> CONFIG_DIR_GEO_DB
-
-%token <std::string> OPERATOR
-%token <std::string> OPERATOR_GEOIP
-%token <std::string> FREE_TEXT
-%token <std::string> ACTION
-%token <std::string> ACTION_ACCURACY
-%token <std::string> ACTION_EXEC
-%token <std::string> ACTION_ALLOW
-%token <std::string> ACTION_REDIRECT
-%token <std::string> ACTION_SKIP_AFTER
-%token <std::string> ACTION_SKIP
-%token <std::string> ACTION_AUDIT_LOG
-%token <std::string> ACTION_PHASE
-%token <std::string> ACTION_SEVERITY
-%token <std::string> ACTION_SETENV
-%token <std::string> ACTION_SETVAR
-%token <std::string> ACTION_SETSID
-%token <std::string> ACTION_SETUID
-%token <std::string> ACTION_EXPIREVAR
-%token <std::string> ACTION_INITCOL
-%token <std::string> ACTION_MSG
-%token <std::string> ACTION_TAG
-%token <std::string> ACTION_REV
-%token <std::string> ACTION_VER
-%token <std::string> ACTION_MATURITY
-%token <std::string> ACTION_XMLNS
-%token <std::string> LOG_DATA
 %token <std::string> TRANSFORMATION
-%token <std::string> ACTION_CTL_AUDIT_ENGINE
-%token <std::string> ACTION_CTL_AUDIT_LOG_PARTS
-%token <std::string> ACTION_CTL_BDY_JSON
-%token <std::string> ACTION_CTL_BDY_XML
-%token <std::string> ACTION_CTL_RULE_ENGINE
-%token <std::string> ACTION_CTL_FORCE_REQ_BODY_VAR
-%token <std::string> CONFIG_SEC_COLLECTION_TIMEOUT
-%token <std::string> ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG
-%token <std::string> ACTION_CTL_RULE_REMOVE_TARGET_BY_ID
-%token <std::string> ACTION_CTL_RULE_REMOVE_BY_ID
-%token <std::string> ACTION_CTL_REQUEST_BODY_ACCESS
+%token <std::string> VARIABLE
+%token <std::string> VARIABLE_COL
+%token <std::string> VARIABLE_STATUS
+%token <std::string> VARIABLE_TX
 
+
+%type <Action *> act
+%type <Operator *> op
+%type <Variable *> var
+%type <std::vector<Action *> *> actings
 %type <std::vector<Action *> *> actions
 %type <std::vector<Variable *> *> variables
-%type <Variable *> var
-%type <Action *> act
-%type <std::vector<Action *> *> actings
-%type <Operator *> op
 
 
 %printer { yyoutput << $$; } <*>;
@@ -493,6 +480,7 @@ op:
         }
         $$ = op;
       }
+    ;
 
 expression:
     audit_log
@@ -1322,9 +1310,7 @@ actions:
     ;
 
 %%
-void
-yy::seclang_parser::error (const location_type& l,
-                          const std::string& m)
-{
+
+void yy::seclang_parser::error (const location_type& l, const std::string& m) {
     driver.error (l, m);
 }
