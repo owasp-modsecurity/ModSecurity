@@ -100,13 +100,13 @@ ACTIONS = \
 	actions/block.cc \
 	actions/capture.cc \
 	actions/chain.cc \
-	actions/ctl_audit_log_parts.cc \
-	actions/ctl_request_body_processor_json.cc \
-	actions/ctl_request_body_processor_xml.cc \
-	actions/ctl_rule_remove_target_by_tag.cc \
-	actions/ctl_rule_remove_target_by_id.cc \
-	actions/ctl_rule_remove_by_id.cc \
-	actions/ctl_request_body_access.cc\
+	actions/ctl/audit_log_parts.cc \
+	actions/ctl/request_body_processor_json.cc \
+	actions/ctl/request_body_processor_xml.cc \
+	actions/ctl/rule_remove_target_by_tag.cc \
+	actions/ctl/rule_remove_target_by_id.cc \
+	actions/ctl/rule_remove_by_id.cc \
+	actions/ctl/request_body_access.cc\
 	actions/init_col.cc \
 	actions/deny.cc \
 	actions/log.cc \

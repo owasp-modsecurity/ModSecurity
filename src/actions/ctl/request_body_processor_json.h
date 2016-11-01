@@ -13,25 +13,30 @@
  *
  */
 
-#include "actions/ctl_request_body_processor_xml.h"
-
-#include <iostream>
 #include <string>
 
+#include "actions/action.h"
 #include "modsecurity/transaction.h"
+
+#ifndef SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_JSON_H_
+#define SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_JSON_H_
 
 namespace modsecurity {
 namespace actions {
+namespace ctl {
 
 
-bool CtlRequestBodyProcessorXML::evaluate(Rule *rule,
-    Transaction *transaction) {
-    transaction->m_requestBodyProcessor = Transaction::XMLRequestBody;
-    transaction->m_collections.store("REQBODY_PROCESSOR", "XML");
+class RequestBodyProcessorJSON : public Action {
+ public:
+    explicit RequestBodyProcessorJSON(std::string action)
+        : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    return true;
-}
+    bool evaluate(Rule *rule, Transaction *transaction) override;
+};
 
 
+}  // namespace ctl
 }  // namespace actions
 }  // namespace modsecurity
+
+#endif  // SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_JSON_H_

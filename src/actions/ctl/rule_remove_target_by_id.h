@@ -19,26 +19,29 @@
 #include "modsecurity/transaction.h"
 #include "src/utils.h"
 
-#ifndef SRC_ACTIONS_CTL_REQUEST_BODY_ACCESS_H_
-#define SRC_ACTIONS_CTL_REQUEST_BODY_ACCESS_H_
+#ifndef SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_ID_H_
+#define SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_ID_H_
 
 namespace modsecurity {
 namespace actions {
+namespace ctl {
 
 
-class CtlRequestBodyAccess : public Action {
+class RuleRemoveTargetById : public Action {
  public:
-    explicit CtlRequestBodyAccess(std::string action)
-        : Action(action, RunTimeOnlyIfMatchKind),
-        m_request_body_access(false) { }
+    explicit RuleRemoveTargetById(std::string action)
+        : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool init(std::string *error) override;
     bool evaluate(Rule *rule, Transaction *transaction) override;
 
-    bool m_request_body_access;
+    int m_id;
+    std::string m_target;
 };
 
+
+}  // namespace ctl
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif  // SRC_ACTIONS_CTL_REQUEST_BODY_ACCESS_H_
+#endif  // SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_ID_H_

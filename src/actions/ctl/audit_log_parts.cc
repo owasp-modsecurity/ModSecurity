@@ -13,27 +13,37 @@
  *
  */
 
+#include "actions/ctl/audit_log_parts.h"
+
+#include <iostream>
 #include <string>
 
-#include "actions/action.h"
 #include "modsecurity/transaction.h"
-
-#ifndef SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_XML_H_
-#define SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_XML_H_
 
 namespace modsecurity {
 namespace actions {
+namespace ctl {
 
 
-class CtlRequestBodyProcessorXML : public Action {
- public:
-    explicit CtlRequestBodyProcessorXML(std::string action)
-        : Action(action, RunTimeOnlyIfMatchKind) { }
+bool AuditLogParts::init(std::string *error) {
+    std::string what(m_parser_payload, 14, 1);
+    mParts = std::string(m_parser_payload, 15, m_parser_payload.length()-15);
+    if (what == "+") {
+        mPartsAction = 0;
+    } else {
+        mPartsAction = 1;
+    }
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
-};
+    return true;
+}
 
+bool AuditLogParts::evaluate(Rule *rule, Transaction *transaction) {
+    transaction->m_auditLogModifier.push_back(
+        std::make_pair(mPartsAction, mParts));
+    return true;
+}
+
+
+}  // namespace ctl
 }  // namespace actions
 }  // namespace modsecurity
-
-#endif  // SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_XML_H_

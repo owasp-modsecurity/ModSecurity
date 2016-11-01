@@ -13,34 +13,38 @@
  *
  */
 
+#include "actions/ctl/rule_remove_by_id.h"
+
+#include <iostream>
 #include <string>
 
-#include "actions/action.h"
 #include "modsecurity/transaction.h"
-
-#ifndef SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_
-#define SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_
 
 namespace modsecurity {
 namespace actions {
+namespace ctl {
 
 
-class CtlAuditLogParts : public Action {
- public:
-    explicit CtlAuditLogParts(std::string action)
-        : Action(action, RunTimeOnlyIfMatchKind),
-        mPartsAction(0),
-        mParts("") { }
+bool RuleRemoveById::init(std::string *error) {
+    std::string what(m_parser_payload, 15, m_parser_payload.size() - 15);
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
-    bool init(std::string *error) override;
+    try {
+        m_id = std::stoi(what);
+    } catch(...) {
+        error->assign("Not able to convert '" + what +
+            "' into a number");
+        return false;
+    }
 
- protected:
-    int mPartsAction;
-    std::string mParts;
-};
+    return true;
+}
 
+bool RuleRemoveById::evaluate(Rule *rule, Transaction *transaction) {
+    transaction->m_ruleRemoveById.push_back(m_id);
+    return true;
+}
+
+
+}  // namespace ctl
 }  // namespace actions
 }  // namespace modsecurity
-
-#endif  // SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_

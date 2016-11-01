@@ -13,33 +13,37 @@
  *
  */
 
-#include "actions/ctl_audit_log_parts.h"
-
-#include <iostream>
 #include <string>
 
+#include "actions/action.h"
 #include "modsecurity/transaction.h"
+
+#ifndef SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_
+#define SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_
 
 namespace modsecurity {
 namespace actions {
+namespace ctl {
 
-bool CtlAuditLogParts::init(std::string *error) {
-    std::string what(m_parser_payload, 14, 1);
-    mParts = std::string(m_parser_payload, 15, m_parser_payload.length()-15);
-    if (what == "+") {
-        mPartsAction = 0;
-    } else {
-        mPartsAction = 1;
-    }
 
-    return true;
-}
+class AuditLogParts : public Action {
+ public:
+    explicit AuditLogParts(std::string action)
+        : Action(action, RunTimeOnlyIfMatchKind),
+        mPartsAction(0),
+        mParts("") { }
 
-bool CtlAuditLogParts::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->m_auditLogModifier.push_back(
-        std::make_pair(mPartsAction, mParts));
-    return true;
-}
+    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool init(std::string *error) override;
 
+ protected:
+    int mPartsAction;
+    std::string mParts;
+};
+
+
+}  // namespace ctl
 }  // namespace actions
 }  // namespace modsecurity
+
+#endif  // SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_

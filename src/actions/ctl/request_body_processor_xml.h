@@ -13,34 +13,30 @@
  *
  */
 
-#include "actions/ctl_rule_remove_by_id.h"
-
-#include <iostream>
 #include <string>
 
+#include "actions/action.h"
 #include "modsecurity/transaction.h"
+
+#ifndef SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_XML_H_
+#define SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_XML_H_
 
 namespace modsecurity {
 namespace actions {
+namespace ctl {
 
-bool CtlRuleRemoveById::init(std::string *error) {
-    std::string what(m_parser_payload, 15, m_parser_payload.size() - 15);
 
-    try {
-        m_id = std::stoi(what);
-    } catch(...) {
-        error->assign("Not able to convert '" + what +
-            "' into a number");
-        return false;
-    }
+class RequestBodyProcessorXML : public Action {
+ public:
+    explicit RequestBodyProcessorXML(std::string action)
+        : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    return true;
-}
+    bool evaluate(Rule *rule, Transaction *transaction) override;
+};
 
-bool CtlRuleRemoveById::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->m_ruleRemoveById.push_back(m_id);
-    return true;
-}
 
+}  // namespace ctl
 }  // namespace actions
 }  // namespace modsecurity
+
+#endif  // SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_XML_H_

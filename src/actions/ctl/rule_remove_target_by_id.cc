@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/ctl_rule_remove_target_by_id.h"
+#include "actions/ctl/rule_remove_target_by_id.h"
 
 #include <iostream>
 #include <string>
@@ -23,8 +23,10 @@
 
 namespace modsecurity {
 namespace actions {
+namespace ctl {
 
-bool CtlRuleRemoveTargetById::init(std::string *error) {
+
+bool RuleRemoveTargetById::init(std::string *error) {
     std::string what(m_parser_payload, 21, m_parser_payload.size() - 21);
     std::vector<std::string> param = split(what, ';');
 
@@ -46,11 +48,13 @@ bool CtlRuleRemoveTargetById::init(std::string *error) {
     return true;
 }
 
-bool CtlRuleRemoveTargetById::evaluate(Rule *rule, Transaction *transaction) {
+bool RuleRemoveTargetById::evaluate(Rule *rule, Transaction *transaction) {
     transaction->m_ruleRemoveTargetById.push_back(
         std::make_pair(m_id, m_target));
     return true;
 }
 
+
+}  // namespace ctl
 }  // namespace actions
 }  // namespace modsecurity

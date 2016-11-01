@@ -13,25 +13,35 @@
  *
  */
 
-#include "actions/ctl_request_body_processor_json.h"
-
-#include <iostream>
 #include <string>
 
+#include "actions/action.h"
 #include "modsecurity/transaction.h"
+#include "src/utils.h"
+
+#ifndef SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_TAG_H_
+#define SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_TAG_H_
 
 namespace modsecurity {
 namespace actions {
+namespace ctl {
 
 
-bool CtlRequestBodyProcessorJSON::evaluate(Rule *rule,
-    Transaction *transaction) {
-    transaction->m_requestBodyProcessor = Transaction::JSONRequestBody;
-    transaction->m_collections.store("REQBODY_PROCESSOR", "JSON");
+class RuleRemoveTargetByTag : public Action {
+ public:
+    explicit RuleRemoveTargetByTag(std::string action)
+        : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    return true;
-}
+    bool init(std::string *error) override;
+    bool evaluate(Rule *rule, Transaction *transaction) override;
+
+    std::string m_tag;
+    std::string m_target;
+};
 
 
+}  // namespace ctl
 }  // namespace actions
 }  // namespace modsecurity
+
+#endif  // SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_TAG_H_

@@ -19,26 +19,28 @@
 #include "modsecurity/transaction.h"
 #include "src/utils.h"
 
-#ifndef SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_TAG_H_
-#define SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_TAG_H_
+#ifndef SRC_ACTIONS_CTL_RULE_REMOVE_BY_ID_H_
+#define SRC_ACTIONS_CTL_RULE_REMOVE_BY_ID_H_
 
 namespace modsecurity {
 namespace actions {
+namespace ctl {
 
 
-class CtlRuleRemoveTargetByTag : public Action {
+class RuleRemoveById : public Action {
  public:
-    explicit CtlRuleRemoveTargetByTag(std::string action)
+    explicit RuleRemoveById(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
     bool init(std::string *error) override;
     bool evaluate(Rule *rule, Transaction *transaction) override;
 
-    std::string m_tag;
-    std::string m_target;
+    int m_id;
 };
 
+
+}  // namespace ctl
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif  // SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_TAG_H_
+#endif  // SRC_ACTIONS_CTL_RULE_REMOVE_BY_ID_H_

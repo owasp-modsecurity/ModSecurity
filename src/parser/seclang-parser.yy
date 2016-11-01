@@ -24,13 +24,13 @@ class Driver;
 #include "actions/action.h"
 #include "actions/allow.h"
 #include "actions/audit_log.h"
-#include "actions/ctl_audit_log_parts.h"
-#include "actions/ctl_request_body_access.h"
-#include "actions/ctl_request_body_processor_json.h"
-#include "actions/ctl_request_body_processor_xml.h"
-#include "actions/ctl_rule_remove_by_id.h"
-#include "actions/ctl_rule_remove_target_by_id.h"
-#include "actions/ctl_rule_remove_target_by_tag.h"
+#include "actions/ctl/audit_log_parts.h"
+#include "actions/ctl/request_body_access.h"
+#include "actions/ctl/request_body_processor_json.h"
+#include "actions/ctl/request_body_processor_xml.h"
+#include "actions/ctl/rule_remove_by_id.h"
+#include "actions/ctl/rule_remove_target_by_id.h"
+#include "actions/ctl/rule_remove_target_by_tag.h"
 #include "actions/init_col.h"
 #include "actions/log_data.h"
 #include "actions/maturity.h"
@@ -102,9 +102,9 @@ using modsecurity::Variables::XML;
 using modsecurity::actions::Accuracy;
 using modsecurity::actions::Action;
 using modsecurity::actions::Allow;
-using modsecurity::actions::CtlAuditLogParts;
-using modsecurity::actions::CtlRequestBodyProcessorJSON;
-using modsecurity::actions::CtlRequestBodyProcessorXML;
+using modsecurity::actions::ctl::AuditLogParts;
+using modsecurity::actions::ctl::RequestBodyProcessorJSON;
+using modsecurity::actions::ctl::RequestBodyProcessorXML;
 using modsecurity::actions::InitCol;
 using modsecurity::actions::LogData;
 using modsecurity::actions::Maturity;
@@ -1200,16 +1200,16 @@ act:
       }
     | ACTION_CTL_BDY_XML
       {
-        $$ = new modsecurity::actions::CtlRequestBodyProcessorXML($1);
+        $$ = new modsecurity::actions::ctl::RequestBodyProcessorXML($1);
       }
     | ACTION_CTL_BDY_JSON
       {
-        $$ = new modsecurity::actions::CtlRequestBodyProcessorJSON($1);
+        $$ = new modsecurity::actions::ctl::RequestBodyProcessorJSON($1);
       }
     | ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG
       {
         std::string error;
-        $$ = new modsecurity::actions::CtlRuleRemoveTargetByTag($1);
+        $$ = new modsecurity::actions::ctl::RuleRemoveTargetByTag($1);
         if ($$->init(&error) == false) {
             driver.error(@0, error);
             YYERROR;
@@ -1218,7 +1218,7 @@ act:
     | ACTION_CTL_RULE_REMOVE_TARGET_BY_ID
       {
         std::string error;
-        $$ = new modsecurity::actions::CtlRuleRemoveTargetById($1);
+        $$ = new modsecurity::actions::ctl::RuleRemoveTargetById($1);
         if ($$->init(&error) == false) {
             driver.error(@0, error);
             YYERROR;
@@ -1227,7 +1227,7 @@ act:
     | ACTION_CTL_RULE_REMOVE_BY_ID
       {
         std::string error;
-        $$ = new modsecurity::actions::CtlRuleRemoveById($1);
+        $$ = new modsecurity::actions::ctl::RuleRemoveById($1);
         if ($$->init(&error) == false) {
             driver.error(@0, error);
             YYERROR;
@@ -1236,7 +1236,7 @@ act:
     | ACTION_CTL_AUDIT_LOG_PARTS
       {
         std::string error;
-        $$ = new CtlAuditLogParts($1);
+        $$ = new AuditLogParts($1);
         if ($$->init(&error) == false) {
             driver.error(@0, error);
             YYERROR;
@@ -1245,7 +1245,7 @@ act:
     | ACTION_CTL_REQUEST_BODY_ACCESS CONFIG_VALUE_ON
       {
         std::string error;
-        $$ = new modsecurity::actions::CtlRequestBodyAccess($1 + "true");
+        $$ = new modsecurity::actions::ctl::RequestBodyAccess($1 + "true");
         if ($$->init(&error) == false) {
             driver.error(@0, error);
             YYERROR;
@@ -1254,7 +1254,7 @@ act:
     | ACTION_CTL_REQUEST_BODY_ACCESS CONFIG_VALUE_OFF
       {
         std::string error;
-        $$ = new modsecurity::actions::CtlRequestBodyAccess($1 + "false");
+        $$ = new modsecurity::actions::ctl::RequestBodyAccess($1 + "false");
         if ($$->init(&error) == false) {
             driver.error(@0, error);
             YYERROR;

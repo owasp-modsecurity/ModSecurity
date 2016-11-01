@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/ctl_request_body_access.h"
+#include "actions/ctl/request_body_access.h"
 
 #include <iostream>
 #include <string>
@@ -23,8 +23,10 @@
 
 namespace modsecurity {
 namespace actions {
+namespace ctl {
 
-bool CtlRequestBodyAccess::init(std::string *error) {
+
+bool RequestBodyAccess::init(std::string *error) {
     std::string what(m_parser_payload, 18, m_parser_payload.size() - 18);
 
     if (what == "true") {
@@ -40,7 +42,7 @@ bool CtlRequestBodyAccess::init(std::string *error) {
     return true;
 }
 
-bool CtlRequestBodyAccess::evaluate(Rule *rule, Transaction *transaction) {
+bool RequestBodyAccess::evaluate(Rule *rule, Transaction *transaction) {
     if (m_request_body_access) {
         transaction->m_requestBodyAccess = RulesProperties::TrueConfigBoolean;
     } else {
@@ -50,5 +52,7 @@ bool CtlRequestBodyAccess::evaluate(Rule *rule, Transaction *transaction) {
     return true;
 }
 
+
+}  // namespace ctl
 }  // namespace actions
 }  // namespace modsecurity
