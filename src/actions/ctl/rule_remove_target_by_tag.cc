@@ -20,6 +20,9 @@
 #include <vector>
 
 #include "modsecurity/transaction.h"
+#include "utils/msc_string.h"
+
+using modsecurity::utils::String;
 
 namespace modsecurity {
 namespace actions {
@@ -28,7 +31,7 @@ namespace ctl {
 
 bool RuleRemoveTargetByTag::init(std::string *error) {
     std::string what(m_parser_payload, 22, m_parser_payload.size() - 22);
-    std::vector<std::string> param = split(what, ';');
+    std::vector<std::string> param = String::split(what, ';');
 
     if (param.size() < 2) {
         error->assign(what + " is not a valid `TAG;VARIABLE'");

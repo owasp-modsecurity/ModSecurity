@@ -22,13 +22,17 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 #include "src/utils.h"
+#include "utils/msc_string.h"
+
+using modsecurity::utils::String;
+
 
 namespace modsecurity {
 namespace actions {
 
 
 bool Severity::init(std::string *error) {
-    std::string a = tolower(m_parser_payload);
+    std::string a = String::tolower(m_parser_payload);
     if (a == "emergency") {
         m_severity = 0;
         return true;

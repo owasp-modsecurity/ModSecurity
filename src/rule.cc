@@ -31,11 +31,13 @@
 #include "actions/tag.h"
 #include "variables/variations/exclusion.h"
 #include "src/utils.h"
+#include "utils/msc_string.h"
 #include "modsecurity/rules.h"
 #include "src/macro_expansion.h"
 
 
 using modsecurity::Variables::Variations::Exclusion;
+using modsecurity::utils::String;
 
 namespace modsecurity {
 
@@ -426,8 +428,9 @@ bool Rule::evaluate(Transaction *trasn) {
             }
 
 #ifndef NO_LOGS
-            trasn->debug(9, "Target value: \"" + limitTo(80,
-                toHexIfNeeded(value)) + "\" (Variable: " + v->m_key + ")");
+            trasn->debug(9, "Target value: \"" + String::limitTo(80,
+                String::toHexIfNeeded(value)) \
+                + "\" (Variable: " + v->m_key + ")");
 #endif
 
             ret = this->op->evaluateInternal(trasn, value);
@@ -450,10 +453,10 @@ bool Rule::evaluate(Transaction *trasn) {
                 if (this->op->m_match_message.empty() == true) {
                     ruleMessage->m_match = "Matched \"Operator `" +
                         this->op->m_op + "' with parameter `" +
-                        limitTo(200, this->op->m_param) +
+                        String::limitTo(200, this->op->m_param) +
                         "' against variable `" + v->m_key + "' (Value: `" +
-                        limitTo(100, toHexIfNeeded(value)) + "' ) \" at " +
-                        v->m_key;
+                        String::limitTo(100, String::toHexIfNeeded(value)) +
+                        "' ) \" at " + v->m_key;
                 } else {
                     ruleMessage->m_match = this->op->m_match_message;
                 }

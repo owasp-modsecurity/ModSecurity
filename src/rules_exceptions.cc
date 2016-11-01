@@ -18,14 +18,17 @@
 #include <string>
 
 #include "src/utils.h"
+#include "utils/msc_string.h"
+
+using modsecurity::utils::String;
 
 namespace modsecurity {
 
 
 bool RulesExceptions::load(const std::string &a, std::string *error) {
-    std::vector<std::string> toRemove = modsecurity::split(a, ' ');
+    std::vector<std::string> toRemove = String::split(a, ' ');
     for (std::string &a : toRemove) {
-        std::string b = removeBracketsIfNeeded(a);
+        std::string b = String::removeBracketsIfNeeded(a);
 
         size_t dash = b.find('-');
         if (dash != std::string::npos) {

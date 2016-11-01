@@ -133,28 +133,6 @@ int urldecode_nonstrict_inplace(unsigned char *input,
 }
 
 
-std::string removeBracketsIfNeeded(std::string a) {
-    if ((a.at(0) == '"') && (a.at(a.length()-1) == '"')) {
-        a.pop_back();
-        a.erase(0, 1);
-    }
-    return a;
-}
-
-
-std::vector<std::string> split(std::string str, char delimiter) {
-    std::vector<std::string> internal;
-    std::stringstream ss(str);  // Turn the string into a stream.
-    std::string tok;
-
-    while (getline(ss, tok, delimiter)) {
-        internal.push_back(tok);
-    }
-
-    return internal;
-}
-
-
 double random_number(const double from, const double to) {
     std::random_device rd;
     std::mt19937 mt(rd());
@@ -164,66 +142,12 @@ double random_number(const double from, const double to) {
 }
 
 
-std::string dash_if_empty(const std::string *str) {
-    if (str == NULL || str->empty()) {
-        return "-";
-    }
-
-    return *str;
-}
-
-
-std::string dash_if_empty(const char *str) {
-    if (str == NULL || strlen(str) == 0) {
-        return "-";
-    }
-
-    return std::string(str);
-}
 
 
 double generate_transaction_unique_id() {
     return random_number(0, 100);
 }
 
-
-std::string ascTime(time_t *t) {
-    std::string ts = std::ctime(t);
-    ts.pop_back();
-    return ts;
-}
-
-
-void chomp(std::string *str) {
-    std::string::size_type pos = str->find_last_not_of("\n\r");
-    if (pos != std::string::npos) {
-        str->erase(pos+1, str->length()-pos-1);
-    }
-}
-
-
-std::string tolower(std::string str) {
-    std::string value;
-    value.resize(str.length());
-
-    std::transform(str.begin(),
-            str.end(),
-            value.begin(),
-            ::tolower);
-
-    return value;
-}
-
-std::string toupper(std::string str) {
-    std::locale loc;
-    std::string value;
-
-    for (std::string::size_type i=0; i < str.length(); ++i) {
-        value.assign(value + std::toupper(str[i], loc));
-    }
-
-    return value;
-}
 
 const char SAFE[256] = {
     /*      0 1 2 3  4 5 6 7  8 9 A B  C D E F */
@@ -678,48 +602,6 @@ unsigned char *c2x(unsigned what, unsigned char *where) {
 }
 
 
-std::string string_to_hex(const std::string& input) {
-    static const char* const lut = "0123456789ABCDEF";
-    size_t len = input.length();
-
-    std::string output;
-    output.reserve(2 * len);
-    for (size_t i = 0; i < len; ++i) {
-        const unsigned char c = input[i];
-        output.push_back(lut[c >> 4]);
-        output.push_back(lut[c & 15]);
-    }
-    return output;
-}
-
-
-std::string limitTo(int amount, const std::string &str) {
-    std::string ret;
-
-    if (str.length() > amount) {
-        ret.assign(str, 0, amount);
-        ret = ret + " (" + std::to_string(str.length() - amount) + " " \
-            "characters omitted)";
-        return ret;
-    }
-
-    return str;
-}
-
-std::string toHexIfNeeded(const std::string &str) {
-    std::stringstream res;
-
-    for (int i = 0; i < str.size(); i++) {
-        int c = str.at(i);
-        if (c < 32 || c > 126) {
-            res << "\\x" << std::setw(2) << std::setfill('0') << std::hex << c;
-        } else {
-            res << str.at(i);
-        }
-    }
-
-    return res.str();
-}
 
 
 std::vector<std::string> expandEnv(const std::string& var, int flags) {

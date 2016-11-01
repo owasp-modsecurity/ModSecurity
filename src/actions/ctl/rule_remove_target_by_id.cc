@@ -20,6 +20,10 @@
 #include <vector>
 
 #include "modsecurity/transaction.h"
+#include "utils/msc_string.h"
+
+using modsecurity::utils::String;
+
 
 namespace modsecurity {
 namespace actions {
@@ -28,7 +32,7 @@ namespace ctl {
 
 bool RuleRemoveTargetById::init(std::string *error) {
     std::string what(m_parser_payload, 21, m_parser_payload.size() - 21);
-    std::vector<std::string> param = split(what, ';');
+    std::vector<std::string> param = String::split(what, ';');
 
     if (param.size() < 2) {
         error->assign(what + " is not a valid `ID;VARIABLE'");

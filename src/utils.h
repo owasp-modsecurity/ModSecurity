@@ -30,19 +30,12 @@
 
 
 namespace modsecurity {
-    std::vector<std::string> split(std::string str, char delimiter);
     int urldecode_nonstrict_inplace(unsigned char *input,
     uint64_t input_len, int *invalid_count, int *changed);
     double random_number(const double from, const double to);
     double generate_transaction_unique_id();
-    std::string ascTime(time_t *t);
     void createDir(std::string dir, int mode);
-    std::string dash_if_empty(const std::string *str);
-    std::string dash_if_empty(const char *str);
-    void chomp(std::string *str);
     std::string uri_decode(const std::string & sSrc);
-    std::string tolower(std::string str);
-    std::string toupper(std::string str);
     double cpu_seconds(void);
     int js_decode_nonstrict_inplace(unsigned char *input, int64_t input_len);
     unsigned char x2c(unsigned char *what);
@@ -52,16 +45,12 @@ namespace modsecurity {
     int html_entities_decode_inplace(unsigned char *input, int input_len);
     int normalize_path_inplace(unsigned char *input, int input_len,
         int win, int *changed);
-    std::string string_to_hex(const std::string& input);
     int urldecode_uni_nonstrict_inplace_ex(Transaction *transaction,
         unsigned char *input, int64_t input_len, int *changed);
     std::string phase_name(int x);
-    std::string limitTo(int amount, const std::string &str);
-    std::string toHexIfNeeded(const std::string &str);
     std::vector<std::string> expandEnv(const std::string& var, int flags);
     std::string find_resource(const std::string& file,
         const std::string& param);
-    std::string removeBracketsIfNeeded(std::string a);
 }  // namespace modsecurity
 
 

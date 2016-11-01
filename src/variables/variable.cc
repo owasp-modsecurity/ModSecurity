@@ -23,7 +23,9 @@
 #include "modsecurity/transaction.h"
 #include "variations/exclusion.h"
 #include "src/utils.h"
+#include "utils/msc_string.h"
 
+using modsecurity::utils::String;
 using modsecurity::Variables::Variations::Exclusion;
 
 namespace modsecurity {
@@ -36,7 +38,8 @@ Variable::Variable(std::string name)
     m_isExclusion(false),
     m_isCount(false) {
     if (m_name.find(":") != std::string::npos) {
-        std::string col = toupper(std::string(m_name, 0, m_name.find(":")));
+        std::string col = String::toupper(
+            std::string(m_name, 0, m_name.find(":")));
         std::string name = std::string(m_name, m_name.find(":") + 1,
             m_name.size());
         if (col == "TX" || col == "IP" || col == "GLOBAL"
@@ -52,19 +55,19 @@ Variable::Variable(std::string name)
         m_type = MultipleMatches;
     }
 
-    if (tolower(m_name) == "tx") {
+    if (String::tolower(m_name) == "tx") {
         m_collectionName = "TX";
         m_type = MultipleMatches;
-    } else if (tolower(m_name) == "ip") {
+    } else if (String::tolower(m_name) == "ip") {
         m_collectionName = "IP";
         m_type = MultipleMatches;
-    } else if (tolower(m_name) == "global") {
+    } else if (String::tolower(m_name) == "global") {
         m_collectionName = "GLOBAL";
         m_type = MultipleMatches;
-    } else if (tolower(m_name) == "resource") {
+    } else if (String::tolower(m_name) == "resource") {
         m_collectionName = "RESOURCE";
         m_type = MultipleMatches;
-    } else if (tolower(m_name) == "session") {
+    } else if (String::tolower(m_name) == "session") {
         m_collectionName = "SESSION";
         m_type = MultipleMatches;
     } else if (m_name.find(".") != std::string::npos) {
@@ -83,7 +86,8 @@ Variable::Variable(std::string name, VariableKind kind)
     m_isExclusion(false),
     m_isCount(false) {
     if (m_name.find(":") != std::string::npos) {
-        std::string col = toupper(std::string(m_name, 0, m_name.find(":")));
+        std::string col = String::toupper(
+            std::string(m_name, 0, m_name.find(":")));
         std::string name = std::string(m_name, m_name.find(":") + 1,
             m_name.size());
         if (col == "TX" || col == "IP" || col == "GLOBAL"
@@ -99,19 +103,19 @@ Variable::Variable(std::string name, VariableKind kind)
         m_type = MultipleMatches;
     }
 
-    if (tolower(m_name) == "tx") {
+    if (String::tolower(m_name) == "tx") {
         m_collectionName = "TX";
         m_type = MultipleMatches;
-    } else if (tolower(m_name) == "ip") {
+    } else if (String::tolower(m_name) == "ip") {
         m_collectionName = "IP";
         m_type = MultipleMatches;
-    } else if (tolower(m_name) == "global") {
+    } else if (String::tolower(m_name) == "global") {
         m_collectionName = "GLOBAL";
         m_type = MultipleMatches;
-    } else if (tolower(m_name) == "resource") {
+    } else if (String::tolower(m_name) == "resource") {
         m_collectionName = "RESOURCE";
         m_type = MultipleMatches;
-    } else if (tolower(m_name) == "session") {
+    } else if (String::tolower(m_name) == "session") {
         m_collectionName = "SESSION";
         m_type = MultipleMatches;
     } else if (m_name.find(".") != std::string::npos) {

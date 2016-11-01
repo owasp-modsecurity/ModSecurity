@@ -8,10 +8,11 @@
 #include "seclang-parser.hh"
 #include "utils/https_client.h"
 #include "src/utils.h"
+#include "utils/msc_string.h"
 
 using modsecurity::Parser::Driver;
 using modsecurity::Utils::HttpsClient;
-using modsecurity::split;
+using modsecurity::utils::String;
 
 typedef yy::seclang_parser p;
 
@@ -436,7 +437,7 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
     std::string key;
     std::string url;
 
-    std::vector<std::string> conf = split(yytext, ' ');
+    std::vector<std::string> conf = String::split(yytext, ' ');
     key = conf[1];
     url = conf[2];
     c.setKey(key);

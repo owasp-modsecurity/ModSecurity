@@ -1,0 +1,175 @@
+/*
+ * ModSecurity, http://www.modsecurity.org/
+ * Copyright (c) 2015 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+ *
+ * You may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * If any of the files related to licensing are missing or if you have any
+ * other questions related to licensing please contact Trustwave Holdings, Inc.
+ * directly using the email address security@modsecurity.org.
+ *
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stddef.h>
+#include <string.h>
+#include <wordexp.h>
+#include <stdint.h>
+#include <inttypes.h>
+
+#include <algorithm>
+#include <random>
+#include <memory>
+#include <functional>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <cstring>
+
+#if defined _MSC_VER
+#include <direct.h>
+#elif defined __GNUC__
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
+
+#include "modsecurity/modsecurity.h"
+
+#include "utils/msc_string.h"
+
+
+namespace modsecurity {
+namespace utils {
+
+
+std::string String::ascTime(time_t *t) {
+    std::string ts = std::ctime(t);
+    ts.pop_back();
+    return ts;
+}
+
+
+std::string String::dash_if_empty(const std::string *str) {
+    if (str == NULL || str->empty()) {
+        return "-";
+    }
+
+    return *str;
+}
+
+
+std::string String::dash_if_empty(const char *str) {
+    if (str == NULL || strlen(str) == 0) {
+        return "-";
+    }
+
+    return std::string(str);
+}
+
+
+std::string String::limitTo(int amount, const std::string &str) {
+    std::string ret;
+
+    if (str.length() > amount) {
+        ret.assign(str, 0, amount);
+        ret = ret + " (" + std::to_string(str.length() - amount) + " " \
+            "characters omitted)";
+        return ret;
+    }
+
+    return str;
+}
+
+
+std::string String::removeBracketsIfNeeded(std::string a) {
+    if ((a.at(0) == '"') && (a.at(a.length()-1) == '"')) {
+        a.pop_back();
+        a.erase(0, 1);
+    }
+    return a;
+}
+
+
+std::string String::string_to_hex(const std::string& input) {
+    static const char* const lut = "0123456789ABCDEF";
+    size_t len = input.length();
+
+    std::string output;
+    output.reserve(2 * len);
+    for (size_t i = 0; i < len; ++i) {
+        const unsigned char c = input[i];
+        output.push_back(lut[c >> 4]);
+        output.push_back(lut[c & 15]);
+    }
+    return output;
+}
+
+
+std::string String::toHexIfNeeded(const std::string &str) {
+    std::stringstream res;
+
+    for (int i = 0; i < str.size(); i++) {
+        int c = str.at(i);
+        if (c < 32 || c > 126) {
+            res << "\\x" << std::setw(2) << std::setfill('0') << std::hex << c;
+        } else {
+            res << str.at(i);
+        }
+    }
+
+    return res.str();
+}
+
+
+std::string String::tolower(std::string str) {
+    std::string value;
+    value.resize(str.length());
+
+    std::transform(str.begin(),
+            str.end(),
+            value.begin(),
+            ::tolower);
+
+    return value;
+}
+
+
+std::string String::toupper(std::string str) {
+    std::locale loc;
+    std::string value;
+
+    for (std::string::size_type i=0; i < str.length(); ++i) {
+        value.assign(value + std::toupper(str[i], loc));
+    }
+
+    return value;
+}
+
+
+std::vector<std::string> String::split(std::string str, char delimiter) {
+    std::vector<std::string> internal;
+    std::stringstream ss(str);  // Turn the string into a stream.
+    std::string tok;
+
+    while (getline(ss, tok, delimiter)) {
+        internal.push_back(tok);
+    }
+
+    return internal;
+}
+
+
+void String::chomp(std::string *str) {
+    std::string::size_type pos = str->find_last_not_of("\n\r");
+    if (pos != std::string::npos) {
+        str->erase(pos+1, str->length()-pos-1);
+    }
+}
+
+
+}  // namespace utils
+}  // namespace modsecurity

@@ -22,12 +22,16 @@
 #include "modsecurity/rule.h"
 #include "src/utils.h"
 #include "modsecurity/modsecurity.h"
+#include "utils/msc_string.h"
+
+using modsecurity::utils::String;
+
 
 namespace modsecurity {
 namespace actions {
 
 bool Phase::init(std::string *error) {
-    std::string a = tolower(m_parser_payload);
+    std::string a = String::tolower(m_parser_payload);
     m_phase = -1;
 
     try {

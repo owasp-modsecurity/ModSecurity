@@ -219,7 +219,8 @@ UTILS = \
 	utils/md5.cc \
 	utils/msc_tree.cc \
 	utils/regex.cc \
-	utils/sha1.cc
+	utils/sha1.cc \
+	utils/msc_string.cc
 
 COLLECTION = \
 	collection/collections.cc \

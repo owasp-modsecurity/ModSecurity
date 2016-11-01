@@ -21,13 +21,16 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 #include "src/utils.h"
+#include "utils/msc_string.h"
 #include "modsecurity/modsecurity.h"
+
+using modsecurity::utils::String;
 
 namespace modsecurity {
 namespace actions {
 
 bool Allow::init(std::string *error) {
-    std::string a = tolower(m_parser_payload);
+    std::string a = String::tolower(m_parser_payload);
 
     if (a == "phase") {
         m_allowType = PhaseAllowType;

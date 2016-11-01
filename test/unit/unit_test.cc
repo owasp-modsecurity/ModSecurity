@@ -25,6 +25,9 @@
 #include "common/colors.h"
 #include "src/utils.h"
 #include "src/utils/regex.h"
+#include "utils/msc_string.h"
+
+using modsecurity::utils::String;
 
 namespace modsecurity_test {
 
@@ -108,9 +111,9 @@ std::string UnitTest::print() {
         i << this->obtained << "\"" << std::endl;
     }
     if (this->output != this->obtainedOutput) {
-        i << "Expecting: \"" << modsecurity::toHexIfNeeded(this->output);
+        i << "Expecting: \"" << String::toHexIfNeeded(this->output);
         i << "\" - returned: \"";
-        i << modsecurity::toHexIfNeeded(this->obtainedOutput) << "\"";
+        i << String::toHexIfNeeded(this->obtainedOutput) << "\"";
         i << std::endl;
     }
 

@@ -20,7 +20,10 @@
 #include "src/variables/tx.h"
 #include "src/variables/highest_severity.h"
 #include "src/utils.h"
+#include "utils/msc_string.h"
 
+
+using modsecurity::utils::String;
 
 namespace modsecurity {
 
@@ -73,7 +76,7 @@ std::string MacroExpansion::expand(const std::string& input,
             std::string var = std::string(variable, collection + 1,
                 variable.length() - (collection + 1));
 
-            if (toupper(col) == "RULE") {
+            if (String::toupper(col) == "RULE") {
                 if (rule == NULL) {
                     transaction->debug(9, "macro expansion: cannot resolve " \
                         "RULE variable without the Rule object");

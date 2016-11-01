@@ -45,6 +45,9 @@
 #include "src/actions/log_data.h"
 #include "src/actions/msg.h"
 #include "src/utils.h"
+#include "utils/msc_string.h"
+
+using modsecurity::utils::String;
 
 namespace modsecurity {
 namespace Variables {
@@ -53,7 +56,7 @@ void Rule::evaluateInternal(Transaction *t,
     modsecurity::Rule *rule,
     std::vector<const collection::Variable *> *l) {
     std::map<std::string, std::string> envs;
-    std::string m_name_upper = toupper(m_name);
+    std::string m_name_upper = String::toupper(m_name);
 
     // id
     envs.insert(std::pair<std::string, std::string>("RULE:id",
@@ -95,7 +98,7 @@ void Rule::evaluateInternal(Transaction *t,
     }
 
     for (auto& x : envs) {
-        std::string xup = toupper(x.first);
+        std::string xup = String::toupper(x.first);
         if ((xup.substr(0, m_name_upper.size() + 1)
             .compare(m_name_upper + ":") != 0)
             && (xup != m_name_upper)) {

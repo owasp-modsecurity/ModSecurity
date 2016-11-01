@@ -29,7 +29,9 @@
 #include "common/colors.h"
 #include "unit/unit_test.h"
 #include "src/utils.h"
+#include "utils/msc_string.h"
 
+using modsecurity::utils::String;
 using modsecurity_test::UnitTest;
 using modsecurity_test::ModSecurityTest;
 using modsecurity_test::ModSecurityTestResults;
@@ -89,7 +91,7 @@ void perform_unit_test(ModSecurityTest<UnitTest> *test, UnitTest *t,
 
     if (test->m_automake_output) {
         std::cout << t->name << " "
-            << modsecurity::toHexIfNeeded(t->input) << std::endl;
+            << String::toHexIfNeeded(t->input) << std::endl;
     }
 }
 
