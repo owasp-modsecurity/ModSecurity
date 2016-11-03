@@ -43,8 +43,6 @@ namespace modsecurity {
     int html_entities_decode_inplace(unsigned char *input, int input_len);
     int normalize_path_inplace(unsigned char *input, int input_len,
         int win, int *changed);
-    int urldecode_uni_nonstrict_inplace_ex(Transaction *transaction,
-        unsigned char *input, int64_t input_len, int *changed);
 }  // namespace modsecurity
 
 
