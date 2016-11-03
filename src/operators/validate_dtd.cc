@@ -18,7 +18,6 @@
 #include <string>
 
 #include "request_body_processor/xml.h"
-#include "src/utils.h"
 #include "src/utils/msc_system.h"
 #include "operators/operator.h"
 

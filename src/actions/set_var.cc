@@ -21,7 +21,6 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 #include "src/macro_expansion.h"
-#include "src/utils.h"
 #include "utils/msc_string.h"
 
 using modsecurity::utils::String;

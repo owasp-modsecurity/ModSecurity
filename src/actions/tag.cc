@@ -20,7 +20,6 @@
 
 #include "actions/action.h"
 #include "modsecurity/transaction.h"
-#include "src/utils.h"
 #include "src/macro_expansion.h"
 #include "modsecurity/rule.h"
 

@@ -24,7 +24,7 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
-#include "src/utils.h"
+#include "src/utils/msc_string.h"
 
 namespace modsecurity {
 namespace actions {
@@ -69,7 +69,7 @@ std::string UrlEncode::url_enc(const char *input,
             } else {
                 *d++ = '%';
                 count++;
-                c2x(c, (unsigned char *)d);
+                modsecurity::utils::c2x(c, (unsigned char *)d);
                 d += 2;
                 count++;
                 count++;

@@ -33,8 +33,7 @@
 #include <sys/stat.h>
 #endif
 
-#include "utils.h"
-#include "utils/msc_system.h"
+#include "src/utils/msc_system.h"
 
 namespace modsecurity {
 namespace utils {

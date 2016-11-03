@@ -54,7 +54,6 @@ class Driver;
 #include "modsecurity/rules_properties.h"
 #include "modsecurity/rule.h"
 #include "operators/operator.h"
-#include "utils.h"
 #include "utils/geo_lookup.h"
 #include "utils/msc_string.h"
 #include "utils/msc_system.h"

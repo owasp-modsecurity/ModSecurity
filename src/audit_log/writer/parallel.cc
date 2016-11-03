@@ -27,13 +27,14 @@
 
 #include "audit_log/audit_log.h"
 #include "modsecurity/transaction.h"
-#include "src/utils.h"
 #include "src/utils/msc_system.h"
 #include "utils/md5.h"
+
 
 namespace modsecurity {
 namespace audit_log {
 namespace writer {
+
 
 std::mutex g_writeMutex;
 

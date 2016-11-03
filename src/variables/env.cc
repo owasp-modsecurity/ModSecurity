@@ -26,7 +26,6 @@
 #include <map>
 
 #include "modsecurity/transaction.h"
-#include "src/utils.h"
 
 extern char **environ;
 

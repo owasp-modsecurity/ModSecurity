@@ -28,8 +28,8 @@
 #include "common/modsecurity_test_results.h"
 #include "common/colors.h"
 #include "unit/unit_test.h"
-#include "src/utils.h"
 #include "utils/msc_string.h"
+
 
 using modsecurity::utils::String;
 using modsecurity_test::UnitTest;

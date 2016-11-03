@@ -20,11 +20,12 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
-#include "src/utils.h"
 #include "utils/msc_string.h"
 #include "modsecurity/modsecurity.h"
 
+
 using modsecurity::utils::String;
+
 
 namespace modsecurity {
 namespace actions {

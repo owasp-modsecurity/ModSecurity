@@ -22,11 +22,12 @@
 #include <utility>
 
 #include "modsecurity/transaction.h"
-#include "src/utils.h"
+
 
 namespace modsecurity {
 namespace Variables {
 namespace Variations {
+
 
 void Count::evaluateInternal(Transaction *transaction,
     std::vector<const collection::Variable *> *l) {

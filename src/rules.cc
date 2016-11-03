@@ -23,7 +23,6 @@
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/utils.h"
 #include "parser/driver.h"
 #include "utils/https_client.h"
 

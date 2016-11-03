@@ -26,7 +26,7 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
-#include "src/utils.h"
+#include "actions/transformations/normalise_path.h"
 
 
 namespace modsecurity {
@@ -43,7 +43,8 @@ std::string NormalisePathWin::evaluate(std::string value,
     memcpy(tmp, value.c_str(), value.size() + 1);
     tmp[value.size()] = '\0';
 
-    int i = normalize_path_inplace(reinterpret_cast<unsigned char *>(tmp),
+    int i = NormalisePath::normalize_path_inplace(
+        reinterpret_cast<unsigned char *>(tmp),
         value.size(), 1, &changed);
 
     std::string ret("");

@@ -44,10 +44,11 @@
 #include "src/actions/xmlns.h"
 #include "src/actions/log_data.h"
 #include "src/actions/msg.h"
-#include "src/utils.h"
 #include "utils/msc_string.h"
 
+
 using modsecurity::utils::String;
+
 
 namespace modsecurity {
 namespace Variables {

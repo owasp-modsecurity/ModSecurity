@@ -171,5 +171,39 @@ void String::chomp(std::string *str) {
 }
 
 
+unsigned char x2c(unsigned char *what) {
+    unsigned char digit;
+
+    digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
+    digit *= 16;
+    digit += (what[1] >= 'A' ? ((what[1] & 0xdf) - 'A') + 10 : (what[1] - '0'));
+
+    return digit;
+}
+
+
+/**
+ * Converts a single hexadecimal digit into a decimal value.
+ */
+unsigned char xsingle2c(unsigned char *what) {
+    unsigned char digit;
+
+    digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
+
+    return digit;
+}
+
+
+unsigned char *c2x(unsigned what, unsigned char *where) {
+    static const char c2x_table[] = "0123456789abcdef";
+
+    what = what & 0xff;
+    *where++ = c2x_table[what >> 4];
+    *where++ = c2x_table[what & 0x0f];
+
+    return where;
+}
+
+
 }  // namespace utils
 }  // namespace modsecurity

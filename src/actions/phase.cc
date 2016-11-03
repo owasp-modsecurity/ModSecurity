@@ -20,9 +20,9 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
-#include "src/utils.h"
 #include "modsecurity/modsecurity.h"
 #include "utils/msc_string.h"
+
 
 using modsecurity::utils::String;
 

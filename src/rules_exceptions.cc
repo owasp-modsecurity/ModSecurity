@@ -17,10 +17,11 @@
 
 #include <string>
 
-#include "src/utils.h"
 #include "utils/msc_string.h"
 
+
 using modsecurity::utils::String;
+
 
 namespace modsecurity {
 

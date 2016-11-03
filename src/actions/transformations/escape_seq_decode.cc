@@ -25,7 +25,7 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
-#include "src/utils.h"
+#include "src/utils/msc_string.h"
 
 namespace modsecurity {
 namespace actions {
@@ -92,7 +92,7 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
                     if ((i + 3 < input_len) && (isxdigit(input[i + 2]))
                         && (isxdigit(input[i + 3]))) {
                         /* Two digits. */
-                        c = x2c(&input[i + 2]);
+                        c = modsecurity::utils::x2c(&input[i + 2]);
                         i += 4;
                     } else {
                         /* Invalid encoding, do nothing. */

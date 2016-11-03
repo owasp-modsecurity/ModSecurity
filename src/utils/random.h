@@ -13,25 +13,27 @@
  *
  */
 
-#include "actions/no_log.h"
-
+#include <ctime>
 #include <iostream>
 #include <string>
+#include <vector>
 
-#include "actions/action.h"
-#include "modsecurity/transaction.h"
-#include "operators/operator.h"
+#include "modsecurity/modsecurity.h"
+
+#ifndef SRC_UTILS_RANDOM_H_
+#define SRC_UTILS_RANDOM_H_
 
 
 namespace modsecurity {
-namespace actions {
+namespace utils {
 
 
-bool NoLog::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
-    rm->m_saveMessage = false;
-    return true;
-}
+    double random_number(const double from, const double to);
+    double generate_transaction_unique_id();
 
 
-}  // namespace actions
+}  // namespace utils
 }  // namespace modsecurity
+
+
+#endif  // SRC_UTILS_RANDOM_H_

@@ -27,9 +27,9 @@
 
 #include "audit_log/audit_log.h"
 #include "modsecurity/transaction.h"
-#include "src/utils.h"
 #include "utils/md5.h"
 #include "utils/https_client.h"
+
 
 namespace modsecurity {
 namespace audit_log {

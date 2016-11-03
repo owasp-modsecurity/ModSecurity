@@ -7,7 +7,6 @@
 #include "parser/driver.h"
 #include "seclang-parser.hh"
 #include "utils/https_client.h"
-#include "src/utils.h"
 #include "utils/msc_string.h"
 
 using modsecurity::Parser::Driver;

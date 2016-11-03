@@ -28,10 +28,11 @@
 
 #include "modsecurity/collection/collections.h"
 #include "modsecurity/rules.h"
-#include "src/utils.h"
 #include "utils/msc_string.h"
 
+
 using modsecurity::utils::String;
+
 
 namespace modsecurity {
 namespace RequestBodyProcessor {

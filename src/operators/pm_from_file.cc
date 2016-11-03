@@ -19,8 +19,8 @@
 
 #include "operators/operator.h"
 #include "utils/https_client.h"
-#include "src/utils.h"
 #include "src/utils/msc_system.h"
+
 
 namespace modsecurity {
 namespace operators {

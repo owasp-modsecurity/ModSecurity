@@ -13,25 +13,28 @@
  *
  */
 
-#include "actions/no_log.h"
-
+#include <ctime>
 #include <iostream>
 #include <string>
+#include <vector>
 
-#include "actions/action.h"
-#include "modsecurity/transaction.h"
-#include "operators/operator.h"
+#include "modsecurity/modsecurity.h"
+#include "src/utils/msc_string.h"
+
+#ifndef SRC_UTILS_DECODE_H_
+#define SRC_UTILS_DECODE_H_
 
 
 namespace modsecurity {
-namespace actions {
+namespace utils {
 
 
-bool NoLog::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
-    rm->m_saveMessage = false;
-    return true;
-}
+int urldecode_nonstrict_inplace(unsigned char *input,
+    uint64_t input_len, int *invalid_count, int *changed);
+std::string uri_decode(const std::string & sSrc);
 
 
-}  // namespace actions
+}  // namespace utils
 }  // namespace modsecurity
+
+#endif  // SRC_UTILS_DECODE_H_

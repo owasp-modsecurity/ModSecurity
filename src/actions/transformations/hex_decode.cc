@@ -25,7 +25,7 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
-#include "src/utils.h"
+#include "src/utils/msc_string.h"
 
 namespace modsecurity {
 namespace actions {
@@ -65,7 +65,7 @@ int HexDecode::inplace(unsigned char *data, int len) {
     }
 
     for (i = 0; i <= len - 2; i += 2) {
-        *d++ = x2c(&data[i]);
+        *d++ = modsecurity::utils::x2c(&data[i]);
         count++;
     }
     *d = '\0';

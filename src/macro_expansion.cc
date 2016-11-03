@@ -19,7 +19,6 @@
 #include "src/variables/rule.h"
 #include "src/variables/tx.h"
 #include "src/variables/highest_severity.h"
-#include "src/utils.h"
 #include "utils/msc_string.h"
 
 

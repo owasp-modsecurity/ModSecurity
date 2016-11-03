@@ -20,9 +20,9 @@
 
 #include "actions/action.h"
 #include "modsecurity/transaction.h"
-#include "src/utils.h"
 #include "modsecurity/rule.h"
 #include "src/macro_expansion.h"
+
 
 namespace modsecurity {
 namespace actions {

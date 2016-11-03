@@ -27,7 +27,7 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
-#include "src/utils.h"
+#include "src/utils/msc_string.h"
 #include "modsecurity/rules.h"
 
 namespace modsecurity {
@@ -114,7 +114,7 @@ int UrlDecodeUni::inplace(unsigned char *input, u_int64_t input_len,
                         } else {
                             /* We first make use of the lower byte here,
                              * ignoring the higher byte. */
-                            *d = x2c(&input[i + 4]);
+                            *d = modsecurity::utils::x2c(&input[i + 4]);
 
                             /* Full width ASCII (ff01 - ff5e)
                              * needs 0x20 added */
@@ -153,7 +153,7 @@ int UrlDecodeUni::inplace(unsigned char *input, u_int64_t input_len,
                     char c2 = input[i + 2];
 
                     if (VALID_HEX(c1) && VALID_HEX(c2)) {
-                        *d++ = x2c(&input[i + 1]);
+                        *d++ = modsecurity::utils::x2c(&input[i + 1]);
                         count++;
                         i += 3;
                     } else {

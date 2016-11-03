@@ -17,7 +17,7 @@
 
 #include "actions/action.h"
 #include "modsecurity/transaction.h"
-#include "src/utils.h"
+
 
 #ifndef SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_ID_H_
 #define SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_ID_H_

@@ -25,7 +25,7 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
-#include "src/utils.h"
+#include "src/utils/msc_string.h"
 
 
 namespace modsecurity {
@@ -93,7 +93,7 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
             count++;
             if (count <= len) {
                 if (c == 0)
-                    *data = x2c(&c);
+                    *data = modsecurity::utils::x2c(&c);
                 else
                     *data++ = c;
             }

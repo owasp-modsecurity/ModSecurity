@@ -33,6 +33,9 @@ class NormalisePath : public Transformation {
     explicit NormalisePath(std::string action);
     std::string evaluate(std::string exp,
         Transaction *transaction) override;
+
+    static int normalize_path_inplace(unsigned char *input, int input_len,
+        int win, int *changed);
 };
 
 }  // namespace transformations

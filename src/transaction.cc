@@ -41,9 +41,10 @@
 #include "request_body_processor/json.h"
 #include "audit_log/audit_log.h"
 #include "src/unique_id.h"
-#include "src/utils.h"
 #include "utils/msc_string.h"
 #include "utils/msc_system.h"
+#include "utils/decode.h"
+#include "utils/random.h"
 #include "modsecurity/rule.h"
 #include "modsecurity/rules_properties.h"
 #include "src/actions/allow.h"
@@ -132,7 +133,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_json(new RequestBodyProcessor::JSON(this)),
     m_xml(new RequestBodyProcessor::XML(this)) {
     m_id = std::to_string(this->m_timeStamp) + \
-        std::to_string(generate_transaction_unique_id());
+        std::to_string(modsecurity::utils::generate_transaction_unique_id());
     m_rules->incrementReferenceCount();
 
     m_collections.store("ARGS_COMBINED_SIZE", std::string("0"));
@@ -283,8 +284,9 @@ bool Transaction::extractArguments(const std::string &orig,
         memcpy(key_c, key.c_str(), key_s);
         memcpy(value_c, value.c_str(), value_s);
 
-        key_s = urldecode_nonstrict_inplace(key_c, key_s, &invalid, &changed);
-        value_s = urldecode_nonstrict_inplace(value_c, value_s,
+        key_s = utils::urldecode_nonstrict_inplace(key_c, key_s,
+            &invalid, &changed);
+        value_s = utils::urldecode_nonstrict_inplace(value_c, value_s,
             &invalid, &changed);
 
         if (invalid) {
@@ -374,7 +376,7 @@ int Transaction::processURI(const char *uri, const char *method,
     m_httpVersion = http_version;
     m_uri = uri;
     std::string uri_s(uri);
-    m_uri_decoded = uri_decode(uri);
+    m_uri_decoded = utils::uri_decode(uri);
 
     size_t pos = m_uri_decoded.find("?");
     size_t pos_raw = uri_s.find("?");

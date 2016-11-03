@@ -30,7 +30,6 @@
 #include "actions/transformations/none.h"
 #include "actions/tag.h"
 #include "variables/variations/exclusion.h"
-#include "src/utils.h"
 #include "utils/msc_string.h"
 #include "modsecurity/rules.h"
 #include "src/macro_expansion.h"

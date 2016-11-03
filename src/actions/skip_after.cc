@@ -20,7 +20,7 @@
 
 #include "actions/action.h"
 #include "modsecurity/transaction.h"
-#include "src/utils.h"
+
 
 namespace modsecurity {
 namespace actions {

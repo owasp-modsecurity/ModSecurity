@@ -25,7 +25,7 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
-#include "src/utils.h"
+#include "src/utils/msc_string.h"
 
 
 namespace modsecurity {
@@ -96,7 +96,7 @@ int SqlHexDecode::inplace(unsigned char *data, int len) {
         }
 
         while (VALID_HEX(data[0]) && VALID_HEX(data[1])) {
-            *d++ = x2c(data);
+            *d++ = modsecurity::utils::x2c(data);
             data += 2;
             count += 2;
         }

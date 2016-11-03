@@ -22,11 +22,12 @@
 
 #include "modsecurity/transaction.h"
 #include "variations/exclusion.h"
-#include "src/utils.h"
 #include "utils/msc_string.h"
+
 
 using modsecurity::utils::String;
 using modsecurity::Variables::Variations::Exclusion;
+
 
 namespace modsecurity {
 namespace Variables {

@@ -22,7 +22,6 @@
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
-#include "src/utils.h"
 #include "src/utils/msc_system.h"
 #include "parser/driver.h"
 #include "utils/https_client.h"

@@ -13,43 +13,33 @@
  *
  */
 
-#include "actions/transformations/remove_nulls.h"
 
-#include <string.h>
-
-#include <iostream>
-#include <string>
 #include <algorithm>
+#include <random>
+#include <memory>
 #include <functional>
-#include <cctype>
-#include <locale>
+#include <string>
 
-#include "modsecurity/transaction.h"
-#include "actions/transformations/transformation.h"
-
+#include "modsecurity/modsecurity.h"
 
 namespace modsecurity {
-namespace actions {
-namespace transformations {
+namespace utils {
 
 
-std::string RemoveNulls::evaluate(std::string value,
-    Transaction *transaction) {
-    int64_t i;
-
-    i = 0;
-    while (i < value.size()) {
-        if (value.at(i) == '\0') {
-            value.erase(i, 1);
-        } else {
-            i++;
-        }
-    }
-
-    return value;
+double random_number(const double from, const double to) {
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    return std::bind(
+        std::uniform_real_distribution<>{from, to},
+        std::default_random_engine{ mt() })();
 }
 
 
-}  // namespace transformations
-}  // namespace actions
+double generate_transaction_unique_id() {
+    return random_number(0, 100);
+}
+
+
+}  // namespace utils
 }  // namespace modsecurity
+

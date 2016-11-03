@@ -213,11 +213,13 @@ OPERATORS = \
 UTILS = \
 	utils/acmp.cc \
 	utils/base64.cc \
+	utils/decode.cc \
 	utils/geo_lookup.cc \
 	utils/https_client.cc \
 	utils/ip_tree.cc \
 	utils/md5.cc \
 	utils/msc_tree.cc \
+	utils/random.cc \
 	utils/regex.cc \
 	utils/sha1.cc \
 	utils/msc_string.cc \
@@ -247,7 +249,6 @@ libmodsecurity_la_SOURCES = \
 	audit_log/writer/parallel.cc \
 	modsecurity.cc \
 	rules.cc \
-	utils.cc \
 	debug_log.cc \
 	debug_log_writer.cc \
 	macro_expansion.cc \

@@ -24,9 +24,9 @@
 #endif
 
 #include "modsecurity/collection/variable.h"
-#include "src/utils.h"
 #include "src/utils/regex.h"
 #include "utils/msc_string.h"
+
 
 using modsecurity::utils::String;
 

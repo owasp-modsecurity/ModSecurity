@@ -25,7 +25,7 @@
 
 #include "modsecurity/transaction.h"
 #include "actions/transformations/transformation.h"
-#include "src/utils.h"
+#include "src/utils/decode.h"
 
 namespace modsecurity {
 namespace actions {
@@ -51,7 +51,7 @@ std::string UrlDecode::evaluate(std::string value,
     memcpy(val, value.c_str(), value.size() + 1);
     val[value.size()] = '\0';
 
-    int size = urldecode_nonstrict_inplace(val, value.size(),
+    int size = utils::urldecode_nonstrict_inplace(val, value.size(),
         &invalid_count, &changed);
     std::string out;
 

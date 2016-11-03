@@ -22,7 +22,6 @@
 #include <string>
 
 #include "modsecurity/collection/variable.h"
-#include "src/utils.h"
 #include "src/utils/regex.h"
 
 #undef LMDB_STDOUT_COUT

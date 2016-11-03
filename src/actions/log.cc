@@ -20,7 +20,6 @@
 
 #include "actions/action.h"
 #include "modsecurity/transaction.h"
-#include "src/utils.h"
 #include "operators/operator.h"
 
 
