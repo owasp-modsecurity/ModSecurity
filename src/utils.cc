@@ -45,33 +45,6 @@
 
 namespace modsecurity {
 
-std::string phase_name(int x) {
-    switch (x) {
-        case modsecurity::Phases::ConnectionPhase:
-            return "Connection Phase";
-            break;
-        case modsecurity::Phases::UriPhase:
-            return "URI Phase";
-            break;
-        case modsecurity::Phases::RequestHeadersPhase:
-            return "Request Headers";
-            break;
-        case modsecurity::Phases::RequestBodyPhase:
-            return "Request Headers";
-            break;
-        case modsecurity::Phases::ResponseHeadersPhase:
-            return "Response Headers";
-            break;
-        case modsecurity::Phases::ResponseBodyPhase:
-            return "Reponse Body";
-            break;
-        case modsecurity::Phases::LoggingPhase:
-            return "Logging";
-            break;
-    }
-    return "Phase '" + std::to_string(x) + "' is not known.";
-}
-
 
 int urldecode_nonstrict_inplace(unsigned char *input,
     uint64_t input_len, int *invalid_count, int *changed) {

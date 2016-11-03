@@ -45,7 +45,6 @@ namespace modsecurity {
         int win, int *changed);
     int urldecode_uni_nonstrict_inplace_ex(Transaction *transaction,
         unsigned char *input, int64_t input_len, int *changed);
-    std::string phase_name(int x);
 }  // namespace modsecurity
 
 
