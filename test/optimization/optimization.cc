@@ -23,6 +23,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
 #include "src/utils.h"
+#include "src/utils/msc_system.h"
 #include "parser/driver.h"
 #include "utils/https_client.h"
 #include "modsecurity/rules_properties.h"
@@ -42,7 +43,8 @@ int main(int argc, char **argv) {
 
     int i = 1;
     while (i < argc) {
-        std::vector<std::string> tfiles = modsecurity::expandEnv(argv[i] , 0);
+        std::vector<std::string> tfiles = modsecurity::utils::expandEnv(
+            argv[i], 0);
         for (const auto &file : tfiles) {
             files.insert(files.begin(), file);
         }

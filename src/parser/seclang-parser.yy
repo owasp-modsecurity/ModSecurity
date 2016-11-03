@@ -57,6 +57,7 @@ class Driver;
 #include "utils.h"
 #include "utils/geo_lookup.h"
 #include "utils/msc_string.h"
+#include "utils/msc_system.h"
 #include "variables/xml.h"
 #include "variables/duration.h"
 #include "variables/env.h"
@@ -661,7 +662,8 @@ expression:
     | CONFIG_DIR_GEO_DB
       {
 #ifdef WITH_GEOIP
-        std::string file = modsecurity::find_resource($1, driver.ref.back());
+        std::string file = modsecurity::utils::find_resource($1,
+            driver.ref.back());
         if (GeoLookup::getInstance().setDataBase(file) == false) {
             std::stringstream ss;
             ss << "Failed to load the GeoDB from: ";

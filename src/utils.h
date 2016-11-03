@@ -34,9 +34,7 @@ namespace modsecurity {
     uint64_t input_len, int *invalid_count, int *changed);
     double random_number(const double from, const double to);
     double generate_transaction_unique_id();
-    void createDir(std::string dir, int mode);
     std::string uri_decode(const std::string & sSrc);
-    double cpu_seconds(void);
     int js_decode_nonstrict_inplace(unsigned char *input, int64_t input_len);
     unsigned char x2c(unsigned char *what);
     unsigned char *c2x(unsigned what, unsigned char *where);
@@ -48,9 +46,6 @@ namespace modsecurity {
     int urldecode_uni_nonstrict_inplace_ex(Transaction *transaction,
         unsigned char *input, int64_t input_len, int *changed);
     std::string phase_name(int x);
-    std::vector<std::string> expandEnv(const std::string& var, int flags);
-    std::string find_resource(const std::string& file,
-        const std::string& param);
 }  // namespace modsecurity
 
 

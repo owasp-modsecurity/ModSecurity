@@ -28,6 +28,7 @@
 #include "audit_log/audit_log.h"
 #include "modsecurity/transaction.h"
 #include "src/utils.h"
+#include "src/utils/msc_system.h"
 #include "utils/md5.h"
 
 namespace modsecurity {
@@ -110,10 +111,10 @@ bool Parallel::write(Transaction *transaction, int parts) {
       return false;
     }
 
-    createDir((logPath +
+    utils::createDir((logPath +
         logFilePath(&transaction->m_timeStamp, YearMonthDayDirectory)).c_str(),
         m_audit->directoryPermission);
-    createDir((logPath +
+    utils::createDir((logPath +
         logFilePath(&transaction->m_timeStamp, YearMonthDayDirectory
             | YearMonthDayAndTimeDirectory)).c_str(),
         m_audit->directoryPermission);

@@ -43,9 +43,11 @@
 #include "src/unique_id.h"
 #include "src/utils.h"
 #include "utils/msc_string.h"
+#include "utils/msc_system.h"
 #include "modsecurity/rule.h"
 #include "modsecurity/rules_properties.h"
 #include "src/actions/allow.h"
+
 
 
 using modsecurity::actions::Action;
@@ -121,7 +123,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_marker(""),
     m_allowType(modsecurity::actions::NoneAllowType),
     m_skip_next(0),
-    m_creationTimeStamp(cpu_seconds()),
+    m_creationTimeStamp(utils::cpu_seconds()),
     m_logCbData(logCbData),
     m_ms(ms),
     m_collections(ms->m_global_collection, ms->m_ip_collection,

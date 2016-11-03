@@ -13,31 +13,29 @@
  *
  */
 
-#include "variables/duration.h"
-
+#include <ctime>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <list>
-#include <utility>
 
-#include "modsecurity/transaction.h"
-#include "src/utils/msc_system.h"
+#include "modsecurity/modsecurity.h"
+
+#ifndef SRC_UTILS_SYSTEM_H_
+#define SRC_UTILS_SYSTEM_H_
+
 
 namespace modsecurity {
-namespace Variables {
-
-void Duration::evaluateInternal(Transaction *transaction,
-        std::vector<const collection::Variable *> *l) {
-    std::string res;
-
-    double e = utils::cpu_seconds() - transaction->m_creationTimeStamp;
-
-    res = std::to_string(e);
-
-    l->push_back(new collection::Variable("DURATION",  std::string(res)));
-}
+namespace utils {
 
 
-}  // namespace Variables
+double cpu_seconds(void);
+std::string find_resource(const std::string& file, const std::string& param);
+std::string get_path(const std::string& file);
+std::vector<std::string> expandEnv(const std::string& var, int flags);
+void createDir(std::string dir, int mode);
+
+
+}  // namespace utils
 }  // namespace modsecurity
+
+#endif  // SRC_UTILS_SYSTEM_H_

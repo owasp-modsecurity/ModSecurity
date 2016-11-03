@@ -235,31 +235,6 @@ std::string uri_decode(const std::string & sSrc) {
 }
 
 
-void createDir(std::string dir, int mode) {
-#if defined _MSC_VER
-    _mkdir(dir.data());
-#elif defined __GNUC__
-    mkdir(dir.data(), mode);
-#endif
-}
-
-
-double cpu_seconds(void) {
-    /*
-     * FIXME: Temporary hack to fix build on MacOS X.  Very issuficient way, but
-     *      works.  Worth reimplementing using mach_absolute_time().
-     */
-#ifndef MACOSX
-    struct timespec t;
-    if (!clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t))
-        return static_cast<double>(t.tv_sec)
-            + static_cast<double>(t.tv_nsec / 1000000000.0);
-    else
-        return static_cast<double>(clock()) /
-            static_cast<double>(CLOCKS_PER_SEC);
-#endif
-        return 0;
-}
 
 
 /**
@@ -601,62 +576,6 @@ unsigned char *c2x(unsigned what, unsigned char *where) {
     return where;
 }
 
-
-
-
-std::vector<std::string> expandEnv(const std::string& var, int flags) {
-    std::vector<std::string> vars;
-
-    wordexp_t p;
-    if (wordexp(var.c_str(), &p, flags) == false) {
-        if (p.we_wordc) {
-            for (char** exp = p.we_wordv; *exp; ++exp) {
-                vars.push_back(exp[0]);
-            }
-        }
-        wordfree(&p);
-    }
-    return vars;
-}
-
-
-std::string get_path(const std::string& file) {
-    size_t found;
-
-    found = file.find_last_of("/\\");
-    if (found > 0) {
-        return file.substr(0, found);
-    }
-
-    return std::string("");
-}
-
-
-std::string find_resource(const std::string& resource,
-    const std::string& config) {
-    std::ifstream *iss = NULL;
-
-    // Trying absolute or relative to the current dir.
-    iss = new std::ifstream(resource, std::ios::in);
-    if (iss->is_open()) {
-        iss->close();
-        delete iss;
-        return resource;
-    }
-    delete iss;
-
-    // Trying the same path of the configuration file.
-    std::string f = get_path(config) + "/" + resource;
-    iss = new std::ifstream(f, std::ios::in);
-    if (iss->is_open()) {
-        iss->close();
-        delete iss;
-        return f;
-    }
-    delete iss;
-
-    return std::string("");
-}
 
 }  // namespace modsecurity
 

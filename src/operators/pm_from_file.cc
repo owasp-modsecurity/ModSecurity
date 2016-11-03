@@ -20,6 +20,7 @@
 #include "operators/operator.h"
 #include "utils/https_client.h"
 #include "src/utils.h"
+#include "src/utils/msc_system.h"
 
 namespace modsecurity {
 namespace operators {
@@ -37,7 +38,7 @@ bool PmFromFile::init(const std::string &config, std::string *error) {
         }
         iss = new std::stringstream(client.content);
     } else {
-        std::string resource = find_resource(m_param, config);
+        std::string resource = utils::find_resource(m_param, config);
         iss = new std::ifstream(resource, std::ios::in);
 
         if (((std::ifstream *)iss)->is_open() == false) {
