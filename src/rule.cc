@@ -598,9 +598,8 @@ bool Rule::evaluate(Transaction *trasn) {
         trasn->debug(4, "Saving on the server log: "
             + ruleMessage->errorLog(trasn));
         trasn->serverLog(ruleMessage->errorLog(trasn));
-    } else {
-        delete ruleMessage;
     }
+    delete ruleMessage;
 
     return globalRet;
 }
