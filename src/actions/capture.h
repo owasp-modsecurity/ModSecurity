@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "actions/action.h"
+#include "src/actions/action.h"
 
 #ifndef SRC_ACTIONS_CAPTURE_H_
 #define SRC_ACTIONS_CAPTURE_H_

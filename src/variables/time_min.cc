@@ -13,7 +13,7 @@
  *
  */
 
-#include "variables/time_min.h"
+#include "src/variables/time_min.h"
 
 #include <time.h>
 #include <stdio.h>

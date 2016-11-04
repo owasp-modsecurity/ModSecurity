@@ -13,11 +13,11 @@
  *
  */
 
-#include "operators/pm_f.h"
+#include "src/operators/pm_f.h"
 
 #include <string>
 
-#include "operators/pm_from_file.h"
+#include "src/operators/pm_from_file.h"
 
 namespace modsecurity {
 namespace operators {

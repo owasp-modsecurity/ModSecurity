@@ -13,12 +13,12 @@
  *
  */
 
-#include "operators/pm_from_file.h"
+#include "src/operators/pm_from_file.h"
 
 #include <string>
 
-#include "operators/operator.h"
-#include "utils/https_client.h"
+#include "src/operators/operator.h"
+#include "src/utils/https_client.h"
 #include "src/utils/msc_system.h"
 
 

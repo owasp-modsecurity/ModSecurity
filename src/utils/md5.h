@@ -15,8 +15,8 @@
 
 #include <string>
 
-#include "actions/action.h"
-#include "actions/transformations/transformation.h"
+#include "src/actions/action.h"
+#include "src/actions/transformations/transformation.h"
 
 #ifndef SRC_UTILS_MD5_H_
 #define SRC_UTILS_MD5_H_

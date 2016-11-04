@@ -13,7 +13,7 @@
  *
  */
 
-#include "variables/highest_severity.h"
+#include "src/variables/highest_severity.h"
 
 #include <iostream>
 #include <string>

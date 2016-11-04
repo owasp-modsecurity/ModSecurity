@@ -13,7 +13,7 @@
  *
  */
 
-#include "variables/variable.h"
+#include "src/variables/variable.h"
 
 #include <iostream>
 #include <string>
@@ -21,8 +21,8 @@
 #include <list>
 
 #include "modsecurity/transaction.h"
-#include "variations/exclusion.h"
-#include "utils/msc_string.h"
+#include "src/variables/variations/exclusion.h"
+#include "src/utils/msc_string.h"
 
 
 using modsecurity::utils::String;

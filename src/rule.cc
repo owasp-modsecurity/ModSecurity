@@ -24,13 +24,13 @@
 #include <list>
 #include <utility>
 
-#include "operators/operator.h"
-#include "actions/action.h"
+#include "src/operators/operator.h"
+#include "src/actions/action.h"
 #include "modsecurity/modsecurity.h"
-#include "actions/transformations/none.h"
-#include "actions/tag.h"
-#include "variables/variations/exclusion.h"
-#include "utils/msc_string.h"
+#include "src/actions/transformations/none.h"
+#include "src/actions/tag.h"
+#include "src/variables/variations/exclusion.h"
+#include "src/utils/msc_string.h"
 #include "modsecurity/rules.h"
 #include "modsecurity/rule_message.h"
 #include "src/macro_expansion.h"

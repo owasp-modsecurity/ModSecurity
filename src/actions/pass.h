@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "actions/action.h"
+#include "src/actions/action.h"
 #include "modsecurity/transaction.h"
 
 #ifndef SRC_ACTIONS_PASS_H_

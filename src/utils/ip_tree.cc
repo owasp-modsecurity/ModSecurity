@@ -13,7 +13,7 @@
  *
  */
 
-#include "utils/ip_tree.h"
+#include "src/utils/ip_tree.h"
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -24,8 +24,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "utils/geo_lookup.h"
-#include "utils/https_client.h"
+#include "src/utils/geo_lookup.h"
+#include "src/utils/https_client.h"
 
 namespace modsecurity {
 namespace Utils {

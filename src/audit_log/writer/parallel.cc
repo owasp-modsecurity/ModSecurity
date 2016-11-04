@@ -13,7 +13,7 @@
  *
  */
 
-#include "audit_log/writer/parallel.h"
+#include "src/audit_log/writer/parallel.h"
 
 #include <time.h>
 #include <stdio.h>
@@ -25,10 +25,10 @@
 #include <fstream>
 #include <mutex>
 
-#include "audit_log/audit_log.h"
+#include "src/audit_log/audit_log.h"
 #include "modsecurity/transaction.h"
 #include "src/utils/msc_system.h"
-#include "utils/md5.h"
+#include "src/utils/md5.h"
 
 
 namespace modsecurity {

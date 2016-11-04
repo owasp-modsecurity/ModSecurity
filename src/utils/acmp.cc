@@ -14,7 +14,7 @@
 
 /* Aho-Corasick Matching  */
 
-#include "acmp.h"
+#include "src/utils/acmp.h"
 
 #include <stdio.h>
 #include <stdlib.h>

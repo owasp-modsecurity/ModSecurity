@@ -13,11 +13,11 @@
  *
  */
 
-#include "operators/validate_hash.h"
+#include "src/operators/validate_hash.h"
 
 #include <string>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 
 namespace modsecurity {
 namespace operators {

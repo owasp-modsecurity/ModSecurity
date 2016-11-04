@@ -13,11 +13,11 @@
  *
  */
 
-#include "operators/fuzzy_hash.h"
+#include "src/operators/fuzzy_hash.h"
 
 #include <string>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 #include "src/macro_expansion.h"
 
 namespace modsecurity {

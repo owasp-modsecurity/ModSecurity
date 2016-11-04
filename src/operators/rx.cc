@@ -13,12 +13,12 @@
  *
  */
 
-#include "operators/rx.h"
+#include "src/operators/rx.h"
 
 #include <string>
 #include <list>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 #include "src/macro_expansion.h"
 
 namespace modsecurity {

@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include "operators/pm_from_file.h"
+#include "src/operators/pm_from_file.h"
 
 #ifdef __cplusplus
 namespace modsecurity {

@@ -13,13 +13,13 @@
  *
  */
 
-#include "regression/custom_debug_log.h"
+#include "test/regression/custom_debug_log.h"
 
 #include <iostream>
 #include <string>
 
 #include "modsecurity/debug_log.h"
-#include "utils/regex.h"
+#include "src/utils/regex.h"
 
 namespace modsecurity_test {
 

@@ -13,7 +13,7 @@
  *
  */
 
-#include "operators/rbl.h"
+#include "src/operators/rbl.h"
 
 #include <modsecurity/rules.h>
 #include <sys/types.h>
@@ -24,7 +24,7 @@
 
 #include <string>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 
 namespace modsecurity {
 namespace operators {

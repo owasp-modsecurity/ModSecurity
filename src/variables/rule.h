@@ -20,7 +20,7 @@
 #ifndef SRC_VARIABLES_RULE_H_
 #define SRC_VARIABLES_RULE_H_
 
-#include "variables/variable.h"
+#include "src/variables/variable.h"
 
 namespace modsecurity {
 

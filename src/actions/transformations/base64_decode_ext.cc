@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/transformations/base64_decode_ext.h"
+#include "src/actions/transformations/base64_decode_ext.h"
 
 #include <iostream>
 #include <string>
@@ -23,8 +23,8 @@
 #include <locale>
 
 #include "modsecurity/transaction.h"
-#include "actions/transformations/transformation.h"
-#include "utils/base64.h"
+#include "src/actions/transformations/transformation.h"
+#include "src/utils/base64.h"
 
 
 namespace modsecurity {

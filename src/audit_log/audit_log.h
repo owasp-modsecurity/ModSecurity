@@ -23,7 +23,7 @@
 #define SRC_AUDIT_LOG_AUDIT_LOG_H_
 
 #include "modsecurity/transaction.h"
-#include "audit_log/writer.h"
+#include "src/audit_log/writer.h"
 
 #ifdef __cplusplus
 

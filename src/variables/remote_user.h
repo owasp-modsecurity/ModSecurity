@@ -22,7 +22,7 @@
 #ifndef SRC_VARIABLES_REMOTE_USER_H_
 #define SRC_VARIABLES_REMOTE_USER_H_
 
-#include "variables/variable.h"
+#include "src/variables/variable.h"
 
 namespace modsecurity {
 

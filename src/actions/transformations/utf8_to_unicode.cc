@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/transformations/utf8_to_unicode.h"
+#include "src/actions/transformations/utf8_to_unicode.h"
 
 #include <iostream>
 #include <string>
@@ -24,7 +24,7 @@
 #include <cstring>
 
 #include "modsecurity/transaction.h"
-#include "actions/transformations/transformation.h"
+#include "src/actions/transformations/transformation.h"
 #include "src/utils/msc_string.h"
 
 

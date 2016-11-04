@@ -14,8 +14,8 @@
  */
 
 #include <modsecurity/transaction.h>
-#include "stdio.h"
-#include "stdlib.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"

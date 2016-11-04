@@ -13,7 +13,7 @@
  *
  */
 
-#include "audit_log/writer/https.h"
+#include "src/audit_log/writer/https.h"
 
 #include <time.h>
 #include <stdio.h>
@@ -25,10 +25,10 @@
 #include <fstream>
 #include <mutex>
 
-#include "audit_log/audit_log.h"
+#include "src/audit_log/audit_log.h"
 #include "modsecurity/transaction.h"
-#include "utils/md5.h"
-#include "utils/https_client.h"
+#include "src/utils/md5.h"
+#include "src/utils/https_client.h"
 
 
 namespace modsecurity {

@@ -13,11 +13,11 @@
  *
  */
 
-#include "operators/verify_ssn.h"
+#include "src/operators/verify_ssn.h"
 
 #include <string>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 
 namespace modsecurity {
 namespace operators {

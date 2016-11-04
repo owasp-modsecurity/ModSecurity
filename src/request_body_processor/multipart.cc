@@ -13,7 +13,7 @@
  *
  */
 
-#include "request_body_processor/multipart.h"
+#include "src/request_body_processor/multipart.h"
 
 #include <time.h>
 #include <stdio.h>
@@ -28,7 +28,7 @@
 
 #include "modsecurity/collection/collections.h"
 #include "modsecurity/rules.h"
-#include "utils/msc_string.h"
+#include "src/utils/msc_string.h"
 
 
 using modsecurity::utils::String;

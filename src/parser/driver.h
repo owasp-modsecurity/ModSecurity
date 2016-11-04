@@ -27,9 +27,9 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
 #include "modsecurity/rules_properties.h"
-#include "audit_log/audit_log.h"
+#include "src/audit_log/audit_log.h"
 
-#include "parser/seclang-parser.hh"
+#include "src/parser/seclang-parser.hh"
 
 using modsecurity::Rule;
 using modsecurity::Rules;

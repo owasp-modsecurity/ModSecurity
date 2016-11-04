@@ -13,11 +13,11 @@
  *
  */
 
-#include "operators/ip_match_f.h"
+#include "src/operators/ip_match_f.h"
 
 #include <string>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 
 namespace modsecurity {
 namespace operators {

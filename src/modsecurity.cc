@@ -26,7 +26,7 @@
 #include <curl/curl.h>
 #endif
 
-#include "utils/geo_lookup.h"
+#include "src/utils/geo_lookup.h"
 
 namespace modsecurity {
 

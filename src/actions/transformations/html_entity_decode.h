@@ -16,9 +16,9 @@
 #include <string>
 #include <unordered_map>
 
-#include "actions/action.h"
-#include "actions/transformations/transformation.h"
-#include "utils/msc_string.h"
+#include "src/actions/action.h"
+#include "src/actions/transformations/transformation.h"
+#include "src/utils/msc_string.h"
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_HTML_ENTITY_DECODE_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_HTML_ENTITY_DECODE_H_

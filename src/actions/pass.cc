@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/pass.h"
+#include "src/actions/pass.h"
 
 #include <iostream>
 #include <string>

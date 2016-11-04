@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/action.h"
+#include "src/actions/action.h"
 
 #include <iostream>
 #include <string>
@@ -21,18 +21,18 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 
-#include "actions/block.h"
-#include "actions/chain.h"
-#include "actions/deny.h"
-#include "actions/redirect.h"
-#include "actions/status.h"
-#include "actions/rule_id.h"
-#include "actions/phase.h"
-#include "actions/severity.h"
-#include "actions/capture.h"
-#include "actions/pass.h"
-#include "actions/log.h"
-#include "actions/no_log.h"
+#include "src/actions/block.h"
+#include "src/actions/chain.h"
+#include "src/actions/deny.h"
+#include "src/actions/redirect.h"
+#include "src/actions/status.h"
+#include "src/actions/rule_id.h"
+#include "src/actions/phase.h"
+#include "src/actions/severity.h"
+#include "src/actions/capture.h"
+#include "src/actions/pass.h"
+#include "src/actions/log.h"
+#include "src/actions/no_log.h"
 
 
 

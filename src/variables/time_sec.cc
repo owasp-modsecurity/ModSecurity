@@ -13,7 +13,7 @@
  *
  */
 
-#include "variables/time_sec.h"
+#include "src/variables/time_sec.h"
 
 #include <time.h>
 #include <stdio.h>

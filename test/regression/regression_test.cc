@@ -13,7 +13,7 @@
  *
  */
 
-#include "regression/regression_test.h"
+#include "test/regression/regression_test.h"
 
 #include <string.h>
 

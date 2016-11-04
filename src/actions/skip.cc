@@ -13,12 +13,12 @@
  *
  */
 
-#include "actions/skip.h"
+#include "src/actions/skip.h"
 
 #include <iostream>
 #include <string>
 
-#include "actions/action.h"
+#include "src/actions/action.h"
 #include "modsecurity/transaction.h"
 
 

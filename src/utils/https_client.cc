@@ -13,7 +13,7 @@
  *
  */
 
-#include "utils/https_client.h"
+#include "src/utils/https_client.h"
 #include "src/config.h"
 
 #ifdef MSC_WITH_CURL

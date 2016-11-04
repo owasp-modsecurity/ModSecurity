@@ -13,11 +13,11 @@
  *
  */
 
-#include "operators/detect_xss.h"
+#include "src/operators/detect_xss.h"
 
 #include <string>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 #include "others/libinjection/src/libinjection.h"
 #include "src/macro_expansion.h"
 

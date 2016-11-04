@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/rule_id.h"
+#include "src/actions/rule_id.h"
 
 #include <iostream>
 #include <string>

@@ -23,8 +23,8 @@
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "parser/driver.h"
-#include "utils/https_client.h"
+#include "src/parser/driver.h"
+#include "src/utils/https_client.h"
 
 using modsecurity::Parser::Driver;
 using modsecurity::Utils::HttpsClient;

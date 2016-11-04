@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/transformations/url_decode_uni.h"
+#include "src/actions/transformations/url_decode_uni.h"
 
 #include <string.h>
 
@@ -26,7 +26,7 @@
 #include <cstring>
 
 #include "modsecurity/transaction.h"
-#include "actions/transformations/transformation.h"
+#include "src/actions/transformations/transformation.h"
 #include "src/utils/msc_string.h"
 #include "modsecurity/rules.h"
 

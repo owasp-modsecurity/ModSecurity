@@ -22,7 +22,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "utils/geo_lookup.h"
+#include "src/utils/geo_lookup.h"
 
 #ifdef WITH_GEOIP
 #include <GeoIPCity.h>

@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/ctl/request_body_processor_json.h"
+#include "src/actions/ctl/request_body_processor_json.h"
 
 #include <iostream>
 #include <string>

@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "actions/action.h"
+#include "src/actions/action.h"
 #include "modsecurity/transaction.h"
 
 #ifndef SRC_ACTIONS_CTL_AUDIT_LOG_PARTS_H_

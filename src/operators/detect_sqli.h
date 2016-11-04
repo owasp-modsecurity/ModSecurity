@@ -19,7 +19,7 @@
 #include <string>
 #include <list>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 
 namespace modsecurity {
 namespace operators {

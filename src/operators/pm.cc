@@ -13,7 +13,7 @@
  *
  */
 
-#include "operators/pm.h"
+#include "src/operators/pm.h"
 
 #include <string.h>
 
@@ -24,8 +24,8 @@
 #include <vector>
 #include <list>
 
-#include "operators/operator.h"
-#include "utils/acmp.h"
+#include "src/operators/operator.h"
+#include "src/utils/acmp.h"
 
 namespace modsecurity {
 namespace operators {

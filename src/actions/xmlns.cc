@@ -13,12 +13,12 @@
  *
  */
 
-#include "actions/xmlns.h"
+#include "src/actions/xmlns.h"
 
 #include <iostream>
 #include <string>
 
-#include "actions/action.h"
+#include "src/actions/action.h"
 #include "modsecurity/transaction.h"
 
 namespace modsecurity {

@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include "utils/msc_string.h"
+#include "src/utils/msc_string.h"
 
 
 using modsecurity::utils::String;

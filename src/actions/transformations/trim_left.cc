@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/transformations/trim_left.h"
+#include "src/actions/transformations/trim_left.h"
 
 #include <iostream>
 #include <string>
@@ -23,9 +23,9 @@
 #include <locale>
 
 #include "modsecurity/transaction.h"
-#include "actions/transformations/transformation.h"
-#include "actions/transformations/trim.h"
-#include "actions/action.h"
+#include "src/actions/transformations/transformation.h"
+#include "src/actions/transformations/trim.h"
+#include "src/actions/action.h"
 
 namespace modsecurity {
 namespace actions {

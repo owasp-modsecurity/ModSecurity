@@ -18,8 +18,8 @@
 
 #include <string>
 
-#include "operators/operator.h"
-#include "utils/ip_tree.h"
+#include "src/operators/operator.h"
+#include "src/utils/ip_tree.h"
 
 #ifdef __cplusplus
 namespace modsecurity {

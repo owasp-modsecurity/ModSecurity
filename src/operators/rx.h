@@ -19,8 +19,8 @@
 #include <string>
 #include <list>
 
-#include "operators/operator.h"
-#include "utils/regex.h"
+#include "src/operators/operator.h"
+#include "src/utils/regex.h"
 
 #ifdef __cplusplus
 namespace modsecurity {

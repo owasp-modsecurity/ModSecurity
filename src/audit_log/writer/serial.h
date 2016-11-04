@@ -22,7 +22,7 @@
 #ifndef SRC_AUDIT_LOG_WRITER_SERIAL_H_
 #define SRC_AUDIT_LOG_WRITER_SERIAL_H_
 
-#include "audit_log/writer.h"
+#include "src/audit_log/writer.h"
 #include "modsecurity/transaction.h"
 
 #ifdef __cplusplus

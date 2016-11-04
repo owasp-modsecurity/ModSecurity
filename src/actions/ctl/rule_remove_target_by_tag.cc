@@ -13,14 +13,14 @@
  *
  */
 
-#include "actions/ctl/rule_remove_target_by_tag.h"
+#include "src/actions/ctl/rule_remove_target_by_tag.h"
 
 #include <iostream>
 #include <string>
 #include <vector>
 
 #include "modsecurity/transaction.h"
-#include "utils/msc_string.h"
+#include "src/utils/msc_string.h"
 
 using modsecurity::utils::String;
 

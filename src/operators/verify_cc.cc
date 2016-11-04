@@ -13,14 +13,14 @@
  *
  */
 
-#include "operators/verify_cc.h"
+#include "src/operators/verify_cc.h"
 
 #include <pcre.h>
 #include <iostream>
 #include <cstring>
 #include <vector>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 
 #if PCRE_HAVE_JIT
 #define pcre_study_opt PCRE_STUDY_JIT_COMPILE

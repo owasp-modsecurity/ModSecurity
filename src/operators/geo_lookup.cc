@@ -13,7 +13,7 @@
  *
  */
 
-#include "operators/geo_lookup.h"
+#include "src/operators/geo_lookup.h"
 
 #ifdef WITH_GEOIP
 #include <GeoIPCity.h>
@@ -22,8 +22,8 @@
 #include <string>
 #include <functional>
 
-#include "operators/operator.h"
-#include "utils/geo_lookup.h"
+#include "src/operators/operator.h"
+#include "src/utils/geo_lookup.h"
 
 
 namespace modsecurity {

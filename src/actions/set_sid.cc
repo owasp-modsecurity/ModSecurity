@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/set_sid.h"
+#include "src/actions/set_sid.h"
 
 #include <iostream>
 #include <string>

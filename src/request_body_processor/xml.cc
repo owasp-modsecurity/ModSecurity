@@ -13,7 +13,7 @@
  *
  */
 
-#include "request_body_processor/xml.h"
+#include "src/request_body_processor/xml.h"
 
 #include <list>
 #include <iostream>

@@ -20,7 +20,7 @@
 #include <list>
 
 #include "modsecurity/transaction.h"
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 
 #ifdef __cplusplus
 namespace modsecurity {

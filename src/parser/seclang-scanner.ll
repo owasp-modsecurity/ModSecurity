@@ -4,10 +4,10 @@
 #include <cstdlib>
 #include <string>
 
-#include "parser/driver.h"
-#include "seclang-parser.hh"
-#include "utils/https_client.h"
-#include "utils/msc_string.h"
+#include "src/parser/driver.h"
+#include "src/parser/seclang-parser.hh"
+#include "src/utils/https_client.h"
+#include "src/utils/msc_string.h"
 
 using modsecurity::Parser::Driver;
 using modsecurity::Utils::HttpsClient;

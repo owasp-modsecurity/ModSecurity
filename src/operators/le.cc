@@ -13,11 +13,11 @@
  *
  */
 
-#include "operators/le.h"
+#include "src/operators/le.h"
 
 #include <string>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 #include "src/macro_expansion.h"
 
 namespace modsecurity {

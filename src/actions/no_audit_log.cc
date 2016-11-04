@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/no_audit_log.h"
+#include "src/actions/no_audit_log.h"
 
 #include <iostream>
 #include <string>

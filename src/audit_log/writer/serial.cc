@@ -13,11 +13,11 @@
  *
  */
 
-#include "audit_log/writer/serial.h"
+#include "src/audit_log/writer/serial.h"
 
 // #include <mutex>
 
-#include "audit_log/audit_log.h"
+#include "src/audit_log/audit_log.h"
 
 namespace modsecurity {
 namespace audit_log {

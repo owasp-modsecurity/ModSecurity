@@ -19,8 +19,8 @@
 #include <string>
 #include <list>
 
-#include "operators/operator.h"
-#include "utils/acmp.h"
+#include "src/operators/operator.h"
+#include "src/utils/acmp.h"
 
 #ifdef __cplusplus
 namespace modsecurity {

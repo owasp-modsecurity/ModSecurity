@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/transformations/url_encode.h"
+#include "src/actions/transformations/url_encode.h"
 
 #include <iostream>
 #include <string>
@@ -23,7 +23,7 @@
 #include <locale>
 
 #include "modsecurity/transaction.h"
-#include "actions/transformations/transformation.h"
+#include "src/actions/transformations/transformation.h"
 #include "src/utils/msc_string.h"
 
 namespace modsecurity {

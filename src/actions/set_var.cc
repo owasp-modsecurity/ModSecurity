@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/set_var.h"
+#include "src/actions/set_var.h"
 
 #include <iostream>
 #include <string>
@@ -21,7 +21,7 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 #include "src/macro_expansion.h"
-#include "utils/msc_string.h"
+#include "src/utils/msc_string.h"
 
 using modsecurity::utils::String;
 

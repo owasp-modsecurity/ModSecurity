@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/transformations/remove_nulls.h"
+#include "src/actions/transformations/remove_nulls.h"
 
 #include <string.h>
 
@@ -25,7 +25,7 @@
 #include <locale>
 
 #include "modsecurity/transaction.h"
-#include "actions/transformations/transformation.h"
+#include "src/actions/transformations/transformation.h"
 
 
 namespace modsecurity {

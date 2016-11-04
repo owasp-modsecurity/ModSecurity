@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/ctl/rule_remove_by_id.h"
+#include "src/actions/ctl/rule_remove_by_id.h"
 
 #include <iostream>
 #include <string>

@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/transformations/replace_comments.h"
+#include "src/actions/transformations/replace_comments.h"
 
 #include <iostream>
 #include <string>
@@ -24,7 +24,7 @@
 #include <cstring>
 
 #include "modsecurity/transaction.h"
-#include "actions/transformations/transformation.h"
+#include "src/actions/transformations/transformation.h"
 
 
 namespace modsecurity {

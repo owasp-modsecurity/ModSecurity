@@ -39,7 +39,7 @@
 
 #include "modsecurity/modsecurity.h"
 
-#include "utils/msc_string.h"
+#include "src/utils/msc_string.h"
 
 
 namespace modsecurity {

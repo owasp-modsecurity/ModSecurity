@@ -13,12 +13,12 @@
  *
  */
 
-#include "actions/log_data.h"
+#include "src/actions/log_data.h"
 
 #include <iostream>
 #include <string>
 
-#include "actions/action.h"
+#include "src/actions/action.h"
 #include "modsecurity/transaction.h"
 #include "src/macro_expansion.h"
 #include "modsecurity/rule.h"

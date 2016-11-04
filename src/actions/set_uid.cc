@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/set_uid.h"
+#include "src/actions/set_uid.h"
 
 #include <iostream>
 #include <string>

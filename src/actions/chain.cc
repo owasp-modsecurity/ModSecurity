@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/chain.h"
+#include "src/actions/chain.h"
 
 #include <iostream>
 #include <string>

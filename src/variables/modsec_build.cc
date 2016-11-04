@@ -13,7 +13,7 @@
  *
  */
 
-#include "variables/modsec_build.h"
+#include "src/variables/modsec_build.h"
 
 #include <iostream>
 #include <string>

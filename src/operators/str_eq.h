@@ -16,7 +16,7 @@
 #include <string>
 
 #include "modsecurity/transaction.h"
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 
 
 #ifndef SRC_OPERATORS_STR_EQ_H_

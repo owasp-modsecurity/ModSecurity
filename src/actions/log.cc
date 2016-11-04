@@ -13,14 +13,14 @@
  *
  */
 
-#include "actions/log.h"
+#include "src/actions/log.h"
 
 #include <iostream>
 #include <string>
 
-#include "actions/action.h"
+#include "src/actions/action.h"
 #include "modsecurity/transaction.h"
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 #include "modsecurity/rule_message.h"
 
 namespace modsecurity {

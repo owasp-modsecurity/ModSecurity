@@ -13,7 +13,7 @@
  *
  */
 
-#include "variables/rule.h"
+#include "src/variables/rule.h"
 
 #include <time.h>
 #include <stdio.h>
@@ -44,7 +44,7 @@
 #include "src/actions/xmlns.h"
 #include "src/actions/log_data.h"
 #include "src/actions/msg.h"
-#include "utils/msc_string.h"
+#include "src/utils/msc_string.h"
 
 
 using modsecurity::utils::String;

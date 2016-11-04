@@ -22,7 +22,7 @@
 #define SRC_UTILS_IP_TREE_H_
 
 #include "modsecurity/transaction.h"
-#include "utils/msc_tree.h"
+#include "src/utils/msc_tree.h"
 
 namespace modsecurity {
 namespace Utils {

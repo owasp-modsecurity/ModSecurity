@@ -22,7 +22,7 @@
 #ifndef SRC_VARIABLES_XML_H_
 #define SRC_VARIABLES_XML_H_
 
-#include "variables/variable.h"
+#include "src/variables/variable.h"
 #include "src/variables/xml.h"
 
 namespace modsecurity {

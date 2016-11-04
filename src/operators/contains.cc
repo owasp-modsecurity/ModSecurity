@@ -13,7 +13,7 @@
  * 
  */
 
-#include "operators/contains.h"
+#include "src/operators/contains.h"
 
 #include <string>
 

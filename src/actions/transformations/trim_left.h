@@ -15,9 +15,9 @@
 
 #include <string>
 
-#include "actions/action.h"
-#include "actions/transformations/transformation.h"
-#include "actions/transformations/trim.h"
+#include "src/actions/action.h"
+#include "src/actions/transformations/transformation.h"
+#include "src/actions/transformations/trim.h"
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_TRIM_LEFT_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_TRIM_LEFT_H_

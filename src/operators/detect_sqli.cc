@@ -13,12 +13,12 @@
  *
  */
 
-#include "operators/detect_sqli.h"
+#include "src/operators/detect_sqli.h"
 
 #include <string>
 #include <list>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 #include "others/libinjection/src/libinjection.h"
 
 namespace modsecurity {

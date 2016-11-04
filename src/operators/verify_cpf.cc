@@ -13,11 +13,11 @@
  *
  */
 
-#include "operators/verify_cpf.h"
+#include "src/operators/verify_cpf.h"
 
 #include <string>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 
 namespace modsecurity {
 namespace operators {

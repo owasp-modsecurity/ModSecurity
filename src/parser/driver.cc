@@ -13,10 +13,10 @@
  *
  */
 
-#include "parser/driver.h"
+#include "src/parser/driver.h"
 
-#include "parser/seclang-parser.hh"
-#include "audit_log/audit_log.h"
+#include "src/parser/seclang-parser.hh"
+#include "src/audit_log/audit_log.h"
 #include "modsecurity/rules_properties.h"
 
 using modsecurity::audit_log::AuditLog;

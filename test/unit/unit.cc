@@ -21,14 +21,14 @@
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
-#include "operators/operator.h"
-#include "actions/transformations/transformation.h"
+#include "src/operators/operator.h"
+#include "src/actions/transformations/transformation.h"
 
-#include "common/modsecurity_test.h"
-#include "common/modsecurity_test_results.h"
-#include "common/colors.h"
-#include "unit/unit_test.h"
-#include "utils/msc_string.h"
+#include "test/common/modsecurity_test.h"
+#include "test/common/modsecurity_test_results.h"
+#include "test/common/colors.h"
+#include "test/unit/unit_test.h"
+#include "src/utils/msc_string.h"
 
 
 using modsecurity::utils::String;

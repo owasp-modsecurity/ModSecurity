@@ -13,13 +13,13 @@
  *
  */
 
-#include "operators/validate_dtd.h"
+#include "src/operators/validate_dtd.h"
 
 #include <string>
 
-#include "request_body_processor/xml.h"
+#include "src/request_body_processor/xml.h"
 #include "src/utils/msc_system.h"
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 
 namespace modsecurity {
 namespace operators {

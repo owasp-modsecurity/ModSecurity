@@ -13,11 +13,11 @@
  *
  */
 
-#include "operators/inspect_file.h"
+#include "src/operators/inspect_file.h"
 
 #include <string>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 
 namespace modsecurity {
 namespace operators {

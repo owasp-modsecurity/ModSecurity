@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "actions/action.h"
+#include "src/actions/action.h"
 
 #ifndef SRC_ACTIONS_SET_UID_H_
 #define SRC_ACTIONS_SET_UID_H_

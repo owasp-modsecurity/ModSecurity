@@ -21,7 +21,7 @@
 #ifndef SRC_VARIABLES_MODSEC_BUILD_H_
 #define SRC_VARIABLES_MODSEC_BUILD_H_
 
-#include "variables/variable.h"
+#include "src/variables/variable.h"
 
 namespace modsecurity {
 

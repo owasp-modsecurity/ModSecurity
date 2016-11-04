@@ -13,7 +13,7 @@
  *
  */
 
-#include "variables/time_hour.h"
+#include "src/variables/time_hour.h"
 
 #include <time.h>
 #include <stdio.h>

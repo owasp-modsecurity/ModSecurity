@@ -15,8 +15,8 @@
 
 #include <string>
 
-#include "actions/action.h"
-#include "actions/transformations/transformation.h"
+#include "src/actions/action.h"
+#include "src/actions/transformations/transformation.h"
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_ESCAPE_SEQ_DECODE_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_ESCAPE_SEQ_DECODE_H_

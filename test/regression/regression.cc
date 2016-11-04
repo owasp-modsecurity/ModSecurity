@@ -24,12 +24,12 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
 
-#include "common/modsecurity_test.h"
-#include "common/colors.h"
-#include "regression/regression_test.h"
-#include "common/modsecurity_test_results.h"
-#include "regression/custom_debug_log.h"
-#include "utils/regex.h"
+#include "test/common/modsecurity_test.h"
+#include "test/common/colors.h"
+#include "test/regression/regression_test.h"
+#include "test/common/modsecurity_test_results.h"
+#include "test/regression/custom_debug_log.h"
+#include "src/utils/regex.h"
 
 using modsecurity_test::CustomDebugLog;
 using modsecurity_test::ModSecurityTest;

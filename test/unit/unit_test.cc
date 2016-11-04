@@ -13,7 +13,7 @@
  *
  */
 
-#include "unit/unit_test.h"
+#include "test/unit/unit_test.h"
 
 #include <string.h>
 
@@ -22,9 +22,9 @@
 #include <iostream>
 #include <iterator>
 
-#include "common/colors.h"
+#include "test/common/colors.h"
 #include "src/utils/regex.h"
-#include "utils/msc_string.h"
+#include "src/utils/msc_string.h"
 
 
 using modsecurity::utils::String;

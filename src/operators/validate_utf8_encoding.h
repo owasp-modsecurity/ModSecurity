@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 
 
 #define UNICODE_ERROR_CHARACTERS_MISSING    -1

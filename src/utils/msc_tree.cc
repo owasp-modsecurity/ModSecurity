@@ -19,7 +19,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "msc_tree.h"
+#include "src/utils/msc_tree.h"
 
 extern "C" {
 

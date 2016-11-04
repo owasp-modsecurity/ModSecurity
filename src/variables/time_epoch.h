@@ -21,7 +21,7 @@
 #ifndef SRC_VARIABLES_TIME_EPOCH_H_
 #define SRC_VARIABLES_TIME_EPOCH_H_
 
-#include "variables/variable.h"
+#include "src/variables/variable.h"
 
 namespace modsecurity {
 

@@ -13,7 +13,7 @@
  *
  */
 
-#include "utils/regex.h"
+#include "src/utils/regex.h"
 
 #include <pcre.h>
 #include <sys/socket.h>
@@ -25,7 +25,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "utils/geo_lookup.h"
+#include "src/utils/geo_lookup.h"
 
 #if PCRE_HAVE_JIT
 #define pcre_study_opt PCRE_STUDY_JIT_COMPILE

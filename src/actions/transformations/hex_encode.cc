@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/transformations/hex_encode.h"
+#include "src/actions/transformations/hex_encode.h"
 
 #include <iostream>
 #include <string>
@@ -24,7 +24,7 @@
 #include <iterator>
 
 #include "modsecurity/transaction.h"
-#include "actions/transformations/transformation.h"
+#include "src/actions/transformations/transformation.h"
 
 
 namespace modsecurity {

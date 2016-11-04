@@ -13,11 +13,11 @@
  *
  */
 
-#include "operators/rsub.h"
+#include "src/operators/rsub.h"
 
 #include <string>
 
-#include "operators/operator.h"
+#include "src/operators/operator.h"
 
 namespace modsecurity {
 namespace operators {

@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/transformations/sha1.h"
+#include "src/actions/transformations/sha1.h"
 
 #include <iostream>
 #include <string>
@@ -23,8 +23,8 @@
 #include <locale>
 
 #include "modsecurity/transaction.h"
-#include "actions/transformations/transformation.h"
-#include "utils/sha1.h"
+#include "src/actions/transformations/transformation.h"
+#include "src/utils/sha1.h"
 
 
 namespace modsecurity {

@@ -13,7 +13,7 @@
  *
  */
 
-#include "variables/duration.h"
+#include "src/variables/duration.h"
 
 #include <iostream>
 #include <string>

@@ -13,7 +13,7 @@
  *
  */
 
-#include "audit_log/audit_log.h"
+#include "src/audit_log/audit_log.h"
 
 #include <stddef.h>
 #include <stdio.h>
@@ -21,10 +21,10 @@
 
 #include <fstream>
 
-#include "audit_log/writer/https.h"
-#include "audit_log/writer/parallel.h"
-#include "audit_log/writer/serial.h"
-#include "utils/regex.h"
+#include "src/audit_log/writer/https.h"
+#include "src/audit_log/writer/parallel.h"
+#include "src/audit_log/writer/serial.h"
+#include "src/utils/regex.h"
 
 #define PARTS_CONSTAINS(a, c) \
     if (new_parts.find(toupper(a)) != std::string::npos \

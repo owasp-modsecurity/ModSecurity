@@ -13,7 +13,7 @@
  *
  */
 
-#include "variables/remote_user.h"
+#include "src/variables/remote_user.h"
 
 #include <time.h>
 #include <stdio.h>
@@ -29,7 +29,7 @@
 #include <utility>
 
 #include "modsecurity/transaction.h"
-#include "utils/base64.h"
+#include "src/utils/base64.h"
 
 namespace modsecurity {
 namespace Variables {

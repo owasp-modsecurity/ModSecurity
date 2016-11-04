@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include "operators/ip_match_from_file.h"
+#include "src/operators/ip_match_from_file.h"
 
 #ifdef __cplusplus
 namespace modsecurity {

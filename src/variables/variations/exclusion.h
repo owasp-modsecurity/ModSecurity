@@ -22,7 +22,7 @@
 #ifndef SRC_VARIABLES_VARIATIONS_EXCLUSION_H_
 #define SRC_VARIABLES_VARIATIONS_EXCLUSION_H_
 
-#include "variables/variable.h"
+#include "src/variables/variable.h"
 
 namespace modsecurity {
 

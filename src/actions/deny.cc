@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/deny.h"
+#include "src/actions/deny.h"
 
 #include <iostream>
 #include <string>

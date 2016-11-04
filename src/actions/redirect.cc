@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/redirect.h"
+#include "src/actions/redirect.h"
 
 #include <iostream>
 #include <string>

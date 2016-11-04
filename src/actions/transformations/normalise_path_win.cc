@@ -13,7 +13,7 @@
  *
  */
 
-#include "actions/transformations/normalise_path_win.h"
+#include "src/actions/transformations/normalise_path_win.h"
 
 #include <string.h>
 
@@ -25,8 +25,8 @@
 #include <locale>
 
 #include "modsecurity/transaction.h"
-#include "actions/transformations/transformation.h"
-#include "actions/transformations/normalise_path.h"
+#include "src/actions/transformations/transformation.h"
+#include "src/actions/transformations/normalise_path.h"
 
 
 namespace modsecurity {

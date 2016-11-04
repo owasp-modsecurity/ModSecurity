@@ -13,7 +13,7 @@
  *
  */
 
-#include "operators/str_eq.h"
+#include "src/operators/str_eq.h"
 
 #include <string>
 #include "src/macro_expansion.h"

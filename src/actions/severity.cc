@@ -13,15 +13,15 @@
  *
  */
 
-#include "actions/severity.h"
+#include "src/actions/severity.h"
 
 #include <iostream>
 #include <string>
 
-#include "actions/action.h"
+#include "src/actions/action.h"
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
-#include "utils/msc_string.h"
+#include "src/utils/msc_string.h"
 #include "modsecurity/rule_message.h"
 
 
