@@ -19,7 +19,7 @@
 #include "src/variables/rule.h"
 #include "src/variables/tx.h"
 #include "src/variables/highest_severity.h"
-#include "src/utils/msc_string.h"
+#include "src/utils/string.h"
 
 
 using modsecurity::utils::String;

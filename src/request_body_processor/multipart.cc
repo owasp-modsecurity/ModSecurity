@@ -28,7 +28,7 @@
 
 #include "modsecurity/collection/collections.h"
 #include "modsecurity/rules.h"
-#include "src/utils/msc_string.h"
+#include "src/utils/string.h"
 
 
 using modsecurity::utils::String;

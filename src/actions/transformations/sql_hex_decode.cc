@@ -25,7 +25,7 @@
 
 #include "modsecurity/transaction.h"
 #include "src/actions/transformations/transformation.h"
-#include "src/utils/msc_string.h"
+#include "src/utils/string.h"
 
 
 namespace modsecurity {

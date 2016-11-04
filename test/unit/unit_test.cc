@@ -24,7 +24,7 @@
 
 #include "test/common/colors.h"
 #include "src/utils/regex.h"
-#include "src/utils/msc_string.h"
+#include "src/utils/string.h"
 
 
 using modsecurity::utils::String;

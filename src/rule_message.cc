@@ -19,7 +19,7 @@
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/transaction.h"
-#include "src/utils/msc_string.h"
+#include "src/utils/string.h"
 
 namespace modsecurity {
 

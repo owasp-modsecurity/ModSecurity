@@ -28,7 +28,7 @@
 #include "test/common/modsecurity_test_results.h"
 #include "test/common/colors.h"
 #include "test/unit/unit_test.h"
-#include "src/utils/msc_string.h"
+#include "src/utils/string.h"
 
 
 using modsecurity::utils::String;

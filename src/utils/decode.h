@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "modsecurity/modsecurity.h"
-#include "src/utils/msc_string.h"
+#include "src/utils/string.h"
 
 #ifndef SRC_UTILS_DECODE_H_
 #define SRC_UTILS_DECODE_H_

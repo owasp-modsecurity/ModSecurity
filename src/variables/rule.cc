@@ -44,7 +44,7 @@
 #include "src/actions/xmlns.h"
 #include "src/actions/log_data.h"
 #include "src/actions/msg.h"
-#include "src/utils/msc_string.h"
+#include "src/utils/string.h"
 
 
 using modsecurity::utils::String;

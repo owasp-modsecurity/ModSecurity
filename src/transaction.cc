@@ -41,7 +41,7 @@
 #include "src/request_body_processor/json.h"
 #include "src/audit_log/audit_log.h"
 #include "src/unique_id.h"
-#include "src/utils/msc_string.h"
+#include "src/utils/string.h"
 #include "src/utils/system.h"
 #include "src/utils/decode.h"
 #include "src/utils/random.h"

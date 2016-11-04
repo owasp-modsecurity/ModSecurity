@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "modsecurity/transaction.h"
-#include "src/utils/msc_string.h"
+#include "src/utils/string.h"
 
 using modsecurity::utils::String;
 
