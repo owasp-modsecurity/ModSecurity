@@ -48,7 +48,7 @@ std::string RuleMessage::errorLog(Transaction *trans) {
     msg.append(" [uri \"" + std::string(trans->m_uri) + "\"]");
     msg.append(" [unique_id \"" + trans->m_id + "\"]");
 
-    return modsecurity::utils::String::toHexIfNeeded(msg);
+    return modsecurity::utils::string::toHexIfNeeded(msg);
 }
 
 }  // namespace modsecurity

@@ -96,7 +96,7 @@ int SqlHexDecode::inplace(unsigned char *data, int len) {
         }
 
         while (VALID_HEX(data[0]) && VALID_HEX(data[1])) {
-            *d++ = modsecurity::utils::x2c(data);
+            *d++ = utils::string::x2c(data);
             data += 2;
             count += 2;
         }

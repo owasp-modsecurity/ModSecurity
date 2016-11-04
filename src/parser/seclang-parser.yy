@@ -122,7 +122,6 @@ using modsecurity::actions::Ver;
 using modsecurity::actions::transformations::None;
 using modsecurity::actions::transformations::Transformation;
 using modsecurity::operators::Operator;
-using modsecurity::utils::String;
 
 
 
@@ -578,7 +577,7 @@ expression:
       }
     | CONFIG_DIR_SEC_MARKER
       {
-        driver.addSecMarker(String::removeBracketsIfNeeded($1));
+        driver.addSecMarker(modsecurity::utils::string::removeBracketsIfNeeded($1));
       }
     | CONFIG_DIR_RULE_ENG CONFIG_VALUE_OFF
       {

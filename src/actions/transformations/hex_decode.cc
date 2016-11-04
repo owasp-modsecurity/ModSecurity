@@ -65,7 +65,7 @@ int HexDecode::inplace(unsigned char *data, int len) {
     }
 
     for (i = 0; i <= len - 2; i += 2) {
-        *d++ = modsecurity::utils::x2c(&data[i]);
+        *d++ = utils::string::x2c(&data[i]);
         count++;
     }
     *d = '\0';

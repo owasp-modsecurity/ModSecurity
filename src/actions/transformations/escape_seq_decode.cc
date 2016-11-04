@@ -92,7 +92,7 @@ int EscapeSeqDecode::ansi_c_sequences_decode_inplace(unsigned char *input,
                     if ((i + 3 < input_len) && (isxdigit(input[i + 2]))
                         && (isxdigit(input[i + 3]))) {
                         /* Two digits. */
-                        c = modsecurity::utils::x2c(&input[i + 2]);
+                        c = utils::string::x2c(&input[i + 2]);
                         i += 4;
                     } else {
                         /* Invalid encoding, do nothing. */

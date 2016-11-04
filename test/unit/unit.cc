@@ -31,7 +31,6 @@
 #include "src/utils/string.h"
 
 
-using modsecurity::utils::String;
 using modsecurity_test::UnitTest;
 using modsecurity_test::ModSecurityTest;
 using modsecurity_test::ModSecurityTestResults;
@@ -91,7 +90,8 @@ void perform_unit_test(ModSecurityTest<UnitTest> *test, UnitTest *t,
 
     if (test->m_automake_output) {
         std::cout << t->name << " "
-            << String::toHexIfNeeded(t->input) << std::endl;
+            << modsecurity::utils::string::toHexIfNeeded(t->input)
+            << std::endl;
     }
 }
 

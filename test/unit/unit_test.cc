@@ -27,9 +27,6 @@
 #include "src/utils/string.h"
 
 
-using modsecurity::utils::String;
-
-
 namespace modsecurity_test {
 
 
@@ -112,9 +109,11 @@ std::string UnitTest::print() {
         i << this->obtained << "\"" << std::endl;
     }
     if (this->output != this->obtainedOutput) {
-        i << "Expecting: \"" << String::toHexIfNeeded(this->output);
+        i << "Expecting: \"";
+        i << modsecurity::utils::string::toHexIfNeeded(this->output);
         i << "\" - returned: \"";
-        i << String::toHexIfNeeded(this->obtainedOutput) << "\"";
+        i << modsecurity::utils::string::toHexIfNeeded(this->obtainedOutput);
+        i << "\"";
         i << std::endl;
     }
 

@@ -30,9 +30,6 @@
 #include "src/utils/string.h"
 
 
-using modsecurity::utils::String;
-
-
 namespace modsecurity {
 namespace collection {
 
@@ -64,28 +61,28 @@ Collections::~Collections() {
 void Collections::storeOrUpdateFirst(const std::string& collectionName,
     const std::string& variableName,
     const std::string& targetValue) {
-    if (String::tolower(collectionName) == "ip"
+    if (utils::string::tolower(collectionName) == "ip"
         && !m_ip_collection_key.empty()) {
         m_ip_collection->storeOrUpdateFirst(collectionName + ":"
             + variableName, m_ip_collection_key, targetValue);
         return;
     }
 
-    if (String::tolower(collectionName) == "global"
+    if (utils::string::tolower(collectionName) == "global"
         && !m_global_collection_key.empty()) {
         m_global_collection->storeOrUpdateFirst(collectionName + ":"
             + variableName, m_global_collection_key, targetValue);
         return;
     }
 
-    if (String::tolower(collectionName) == "resource"
+    if (utils::string::tolower(collectionName) == "resource"
         && !m_resource_collection_key.empty()) {
         m_resource_collection->storeOrUpdateFirst(collectionName + ":"
             + variableName, m_resource_collection_key, targetValue);
         return;
     }
 
-    if (String::tolower(collectionName) == "session"
+    if (utils::string::tolower(collectionName) == "session"
         && !m_session_collection_key.empty()) {
         m_session_collection->storeOrUpdateFirst(collectionName + ":"
             + variableName, m_session_collection_key, targetValue);
@@ -137,7 +134,7 @@ std::string* Collections::resolveFirst(const std::string& var) {
 
     for (auto &a : *this) {
         std::string *res = a.second->resolveFirst(
-            String::toupper(a.first) + ":" + var);
+            utils::string::toupper(a.first) + ":" + var);
         if (res != NULL) {
             return res;
         }
@@ -149,38 +146,39 @@ std::string* Collections::resolveFirst(const std::string& var) {
 
 std::string* Collections::resolveFirst(const std::string& collectionName,
         const std::string& var) {
-        if (String::tolower(collectionName) == "ip"
+        if (utils::string::tolower(collectionName) == "ip"
             && !m_ip_collection_key.empty()) {
             return m_ip_collection->resolveFirst(
-                String::toupper(collectionName)
+                utils::string::toupper(collectionName)
                 + ":" + var, m_ip_collection_key);
         }
 
-        if (String::tolower(collectionName) == "global"
+        if (utils::string::tolower(collectionName) == "global"
             && !m_global_collection_key.empty()) {
             return m_global_collection->resolveFirst(
-                String::toupper(collectionName)
+                utils::string::toupper(collectionName)
                 + ":" + var, m_global_collection_key);
         }
 
-        if (String::tolower(collectionName) == "resource"
+        if (utils::string::tolower(collectionName) == "resource"
             && !m_resource_collection_key.empty()) {
             return m_resource_collection->resolveFirst(
-                String::toupper(collectionName)
+                utils::string::toupper(collectionName)
                 + ":" + var, m_resource_collection_key);
         }
 
-        if (String::tolower(collectionName) == "session"
+        if (utils::string::tolower(collectionName) == "session"
             && !m_session_collection_key.empty()) {
             return m_session_collection->resolveFirst(
-                String::toupper(collectionName)
+                utils::string::toupper(collectionName)
                 + ":" + var, m_session_collection_key);
         }
 
         for (auto &a : *this) {
-            if (String::tolower(a.first) == String::tolower(collectionName)) {
+            if (utils::string::tolower(a.first)
+                == utils::string::tolower(collectionName)) {
                 std::string *res = a.second->resolveFirst(
-                    String::toupper(a.first)
+                    utils::string::toupper(a.first)
                     + ":" + var);
                 if (res != NULL) {
                     return res;
@@ -200,7 +198,8 @@ std::string Collections::resolveFirstCopy(const std::string& var) {
     }
 
     for (auto &a : *this) {
-        std::string res = a.second->resolveFirstCopy(String::toupper(a.first) +
+        std::string res = a.second->resolveFirstCopy(
+            utils::string::toupper(a.first) +
             ":" + var);
         if (res.empty() == false) {
             return res;
@@ -213,38 +212,39 @@ std::string Collections::resolveFirstCopy(const std::string& var) {
 
 std::string Collections::resolveFirstCopy(const std::string& collectionName,
         const std::string& var) {
-        if (String::tolower(collectionName) == "ip"
+        if (utils::string::tolower(collectionName) == "ip"
             && !m_ip_collection_key.empty()) {
             return m_ip_collection->resolveFirstCopy(
-                String::toupper(collectionName)
+                utils::string::toupper(collectionName)
                 + ":" + var, m_ip_collection_key);
         }
 
-        if (String::tolower(collectionName) == "global"
+        if (utils::string::tolower(collectionName) == "global"
             && !m_global_collection_key.empty()) {
             return m_global_collection->resolveFirstCopy(
-                String::toupper(collectionName) + ":" + var,
+                utils::string::toupper(collectionName) + ":" + var,
                 m_global_collection_key);
         }
 
-        if (String::tolower(collectionName) == "resource"
+        if (utils::string::tolower(collectionName) == "resource"
             && !m_resource_collection_key.empty()) {
             return m_resource_collection->resolveFirstCopy(
-                String::toupper(collectionName) + ":" + var,
+                utils::string::toupper(collectionName) + ":" + var,
                 m_resource_collection_key);
         }
 
-        if (String::tolower(collectionName) == "session"
+        if (utils::string::tolower(collectionName) == "session"
             && !m_session_collection_key.empty()) {
             return m_session_collection->resolveFirstCopy(
-                String::toupper(collectionName) + ":" + var,
+                utils::string::toupper(collectionName) + ":" + var,
                 m_session_collection_key);
         }
 
         for (auto &a : *this) {
-            if (String::tolower(a.first) == String::tolower(collectionName)) {
+            if (utils::string::tolower(a.first)
+                == utils::string::tolower(collectionName)) {
                 std::string res = a.second->resolveFirstCopy(
-                    String::toupper(a.first) + ":" + var);
+                    utils::string::toupper(a.first) + ":" + var);
                 if (res.empty() == false) {
                     return res;
                 }
@@ -266,27 +266,27 @@ void Collections::resolveSingleMatch(const std::string& var,
     const std::string& collection,
     std::vector<const Variable *> *l) {
 
-    if (String::tolower(collection) == "ip"
+    if (utils::string::tolower(collection) == "ip"
         && !m_ip_collection_key.empty()) {
         m_ip_collection->resolveSingleMatch(var, m_ip_collection_key, l);
         return;
     }
 
-    if (String::tolower(collection) == "global"
+    if (utils::string::tolower(collection) == "global"
         && !m_global_collection_key.empty()) {
         m_global_collection->resolveSingleMatch(var,
             m_global_collection_key, l);
         return;
     }
 
-    if (String::tolower(collection) == "resource"
+    if (utils::string::tolower(collection) == "resource"
         && !m_resource_collection_key.empty()) {
         m_resource_collection->resolveSingleMatch(var,
             m_resource_collection_key, l);
         return;
     }
 
-    if (String::tolower(collection) == "session"
+    if (utils::string::tolower(collection) == "session"
         && !m_session_collection_key.empty()) {
         m_session_collection->resolveSingleMatch(var,
             m_session_collection_key, l);
@@ -308,27 +308,27 @@ void Collections::resolveMultiMatches(const std::string& var,
 void Collections::resolveMultiMatches(const std::string& var,
     const std::string& collection,
     std::vector<const Variable *> *l) {
-    if (String::tolower(collection) == "ip"
+    if (utils::string::tolower(collection) == "ip"
         && !m_ip_collection_key.empty()) {
         m_ip_collection->resolveMultiMatches(var, m_ip_collection_key, l);
         return;
     }
 
-    if (String::tolower(collection) == "global"
+    if (utils::string::tolower(collection) == "global"
         && !m_global_collection_key.empty()) {
         m_global_collection->resolveMultiMatches(var,
             m_global_collection_key, l);
         return;
     }
 
-    if (String::tolower(collection) == "resource"
+    if (utils::string::tolower(collection) == "resource"
         && !m_resource_collection_key.empty()) {
         m_resource_collection->resolveMultiMatches(var,
             m_resource_collection_key, l);
         return;
     }
 
-    if (String::tolower(collection) == "session"
+    if (utils::string::tolower(collection) == "session"
         && !m_session_collection_key.empty()) {
         m_session_collection->resolveMultiMatches(var,
             m_session_collection_key, l);
@@ -349,34 +349,34 @@ void Collections::resolveRegularExpression(const std::string& var,
 void Collections::resolveRegularExpression(const std::string& var,
     const std::string& collection,
     std::vector<const Variable *> *l) {
-    if (String::tolower(collection) == "ip"
+    if (utils::string::tolower(collection) == "ip"
         && !m_ip_collection_key.empty()) {
         m_ip_collection->resolveRegularExpression(
-            String::toupper(collection)
+            utils::string::toupper(collection)
             + ":" + var, m_ip_collection_key, l);
         return;
     }
 
-    if (String::tolower(collection) == "global"
+    if (utils::string::tolower(collection) == "global"
         && !m_global_collection_key.empty()) {
         m_global_collection->resolveRegularExpression(
-            String::toupper(collection)
+            utils::string::toupper(collection)
             + ":" + var, m_global_collection_key, l);
         return;
     }
 
-    if (String::tolower(collection) == "resource"
+    if (utils::string::tolower(collection) == "resource"
         && !m_resource_collection_key.empty()) {
         m_resource_collection->resolveRegularExpression(
-            String::toupper(collection)
+            utils::string::toupper(collection)
             + ":" + var, m_resource_collection_key, l);
         return;
     }
 
-    if (String::tolower(collection) == "session"
+    if (utils::string::tolower(collection) == "session"
         && !m_session_collection_key.empty()) {
         m_session_collection->resolveRegularExpression(
-            String::toupper(collection)
+            utils::string::toupper(collection)
             + ":" + var, m_session_collection_key, l);
         return;
     }

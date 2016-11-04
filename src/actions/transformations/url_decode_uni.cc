@@ -114,7 +114,7 @@ int UrlDecodeUni::inplace(unsigned char *input, u_int64_t input_len,
                         } else {
                             /* We first make use of the lower byte here,
                              * ignoring the higher byte. */
-                            *d = modsecurity::utils::x2c(&input[i + 4]);
+                            *d = utils::string::x2c(&input[i + 4]);
 
                             /* Full width ASCII (ff01 - ff5e)
                              * needs 0x20 added */
@@ -153,7 +153,7 @@ int UrlDecodeUni::inplace(unsigned char *input, u_int64_t input_len,
                     char c2 = input[i + 2];
 
                     if (VALID_HEX(c1) && VALID_HEX(c2)) {
-                        *d++ = modsecurity::utils::x2c(&input[i + 1]);
+                        *d++ = utils::string::x2c(&input[i + 1]);
                         count++;
                         i += 3;
                     } else {

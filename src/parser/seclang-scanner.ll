@@ -11,7 +11,6 @@
 
 using modsecurity::Parser::Driver;
 using modsecurity::Utils::HttpsClient;
-using modsecurity::utils::String;
 
 typedef yy::seclang_parser p;
 
@@ -436,7 +435,7 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
     std::string key;
     std::string url;
 
-    std::vector<std::string> conf = String::split(yytext, ' ');
+    std::vector<std::string> conf = modsecurity::utils::string::split(yytext, ' ');
     key = conf[1];
     url = conf[2];
     c.setKey(key);

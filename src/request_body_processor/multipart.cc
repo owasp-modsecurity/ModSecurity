@@ -31,9 +31,6 @@
 #include "src/utils/string.h"
 
 
-using modsecurity::utils::String;
-
-
 namespace modsecurity {
 namespace RequestBodyProcessor {
 
@@ -720,7 +717,7 @@ int Multipart::process_part_header(std::string *error) {
             }
 
             new_value = std::string(data);
-            String::chomp(&new_value);
+            utils::string::chomp(&new_value);
 
             /* update the header value in the table */
             header_value = m_mpp->m_headers.at(m_mpp->m_last_header_name);
@@ -770,7 +767,7 @@ int Multipart::process_part_header(std::string *error) {
                 data++;
             }
             header_value = std::string(data);
-            String::chomp(&header_value);
+            utils::string::chomp(&header_value);
 
             /* error if the name already exists */
             if (m_mpp->m_headers.count(header_name) > 0) {
@@ -1040,7 +1037,7 @@ int Multipart::multipart_complete(std::string *error) {
 
 
 int Multipart::count_boundary_params(const std::string& str_header_value) {
-    std::string lower = String::tolower(str_header_value);
+    std::string lower = utils::string::tolower(str_header_value);
     const char *header_value = lower.c_str();
     char *duplicate = NULL;
     char *s = NULL;

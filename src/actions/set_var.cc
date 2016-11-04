@@ -23,8 +23,6 @@
 #include "src/macro_expansion.h"
 #include "src/utils/string.h"
 
-using modsecurity::utils::String;
-
 
 namespace modsecurity {
 namespace actions {
@@ -52,7 +50,7 @@ bool SetVar::init(std::string *error) {
     pos = m_parser_payload.find(".");
     if (pos != std::string::npos) {
         m_collectionName = std::string(m_parser_payload, 0, pos);
-        m_collectionName = String::toupper(m_collectionName);
+        m_collectionName = utils::string::toupper(m_collectionName);
     } else {
         error->assign("Missing the collection and/or variable name");
         return false;

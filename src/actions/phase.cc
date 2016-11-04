@@ -24,14 +24,11 @@
 #include "src/utils/string.h"
 
 
-using modsecurity::utils::String;
-
-
 namespace modsecurity {
 namespace actions {
 
 bool Phase::init(std::string *error) {
-    std::string a = String::tolower(m_parser_payload);
+    std::string a = utils::string::tolower(m_parser_payload);
     m_phase = -1;
 
     try {

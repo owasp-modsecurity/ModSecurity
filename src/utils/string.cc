@@ -44,16 +44,17 @@
 
 namespace modsecurity {
 namespace utils {
+namespace string {
 
 
-std::string String::ascTime(time_t *t) {
+std::string ascTime(time_t *t) {
     std::string ts = std::ctime(t);
     ts.pop_back();
     return ts;
 }
 
 
-std::string String::dash_if_empty(const std::string *str) {
+std::string dash_if_empty(const std::string *str) {
     if (str == NULL || str->empty()) {
         return "-";
     }
@@ -62,7 +63,7 @@ std::string String::dash_if_empty(const std::string *str) {
 }
 
 
-std::string String::dash_if_empty(const char *str) {
+std::string dash_if_empty(const char *str) {
     if (str == NULL || strlen(str) == 0) {
         return "-";
     }
@@ -71,7 +72,7 @@ std::string String::dash_if_empty(const char *str) {
 }
 
 
-std::string String::limitTo(int amount, const std::string &str) {
+std::string limitTo(int amount, const std::string &str) {
     std::string ret;
 
     if (str.length() > amount) {
@@ -85,7 +86,7 @@ std::string String::limitTo(int amount, const std::string &str) {
 }
 
 
-std::string String::removeBracketsIfNeeded(std::string a) {
+std::string removeBracketsIfNeeded(std::string a) {
     if ((a.at(0) == '"') && (a.at(a.length()-1) == '"')) {
         a.pop_back();
         a.erase(0, 1);
@@ -94,7 +95,7 @@ std::string String::removeBracketsIfNeeded(std::string a) {
 }
 
 
-std::string String::string_to_hex(const std::string& input) {
+std::string string_to_hex(const std::string& input) {
     static const char* const lut = "0123456789ABCDEF";
     size_t len = input.length();
 
@@ -109,7 +110,7 @@ std::string String::string_to_hex(const std::string& input) {
 }
 
 
-std::string String::toHexIfNeeded(const std::string &str) {
+std::string toHexIfNeeded(const std::string &str) {
     std::stringstream res;
 
     for (int i = 0; i < str.size(); i++) {
@@ -125,7 +126,7 @@ std::string String::toHexIfNeeded(const std::string &str) {
 }
 
 
-std::string String::tolower(std::string str) {
+std::string tolower(std::string str) {
     std::string value;
     value.resize(str.length());
 
@@ -138,7 +139,7 @@ std::string String::tolower(std::string str) {
 }
 
 
-std::string String::toupper(std::string str) {
+std::string toupper(std::string str) {
     std::locale loc;
     std::string value;
 
@@ -150,7 +151,7 @@ std::string String::toupper(std::string str) {
 }
 
 
-std::vector<std::string> String::split(std::string str, char delimiter) {
+std::vector<std::string> split(std::string str, char delimiter) {
     std::vector<std::string> internal;
     std::stringstream ss(str);  // Turn the string into a stream.
     std::string tok;
@@ -163,7 +164,7 @@ std::vector<std::string> String::split(std::string str, char delimiter) {
 }
 
 
-void String::chomp(std::string *str) {
+void chomp(std::string *str) {
     std::string::size_type pos = str->find_last_not_of("\n\r");
     if (pos != std::string::npos) {
         str->erase(pos+1, str->length()-pos-1);
@@ -205,5 +206,6 @@ unsigned char *c2x(unsigned what, unsigned char *where) {
 }
 
 
+}  // namespace string
 }  // namespace utils
 }  // namespace modsecurity

@@ -90,20 +90,20 @@ int CssDecode::css_decode_inplace(unsigned char *input, int64_t input_len) {
                     switch (j) {
                         /* Number of hex characters */
                         case 1:
-                            *d++ = modsecurity::utils::xsingle2c(&input[i]);
+                            *d++ = utils::string::xsingle2c(&input[i]);
                             break;
 
                         case 2:
                         case 3:
                             /* Use the last two from the end. */
-                            *d++ = modsecurity::utils::x2c(&input[i + j - 2]);
+                            *d++ = utils::string::x2c(&input[i + j - 2]);
                             break;
 
                         case 4:
                             /* Use the last two from the end, but request
                              * a full width check.
                              */
-                            *d = modsecurity::utils::x2c(&input[i + j - 2]);
+                            *d = utils::string::x2c(&input[i + j - 2]);
                             fullcheck = 1;
                             break;
 
@@ -112,7 +112,7 @@ int CssDecode::css_decode_inplace(unsigned char *input, int64_t input_len) {
                              * a full width check if the number is greater
                              * or equal to 0xFFFF.
                              */
-                            *d = modsecurity::utils::x2c(&input[i + j - 2]);
+                            *d = utils::string::x2c(&input[i + j - 2]);
                             /* Do full check if first byte is 0 */
                             if (input[i] == '0') {
                                 fullcheck = 1;
@@ -126,7 +126,7 @@ int CssDecode::css_decode_inplace(unsigned char *input, int64_t input_len) {
                              * a full width check if the number is greater
                              * or equal to 0xFFFF.
                              */
-                            *d = modsecurity::utils::x2c(&input[i + j - 2]);
+                            *d = utils::string::x2c(&input[i + j - 2]);
 
                             /* Do full check if first/second bytes are 0 */
                             if ((input[i] == '0')

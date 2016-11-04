@@ -55,7 +55,6 @@
 using modsecurity::actions::Action;
 using modsecurity::RequestBodyProcessor::Multipart;
 using modsecurity::RequestBodyProcessor::XML;
-using modsecurity::utils::String;
 
 namespace modsecurity {
 
@@ -251,7 +250,7 @@ int Transaction::processConnection(const char *client, int cPort,
 bool Transaction::extractArguments(const std::string &orig,
     const std::string& buf) {
     char sep1 = '&';
-    std::vector<std::string> key_value_sets = String::split(buf, sep1);
+    std::vector<std::string> key_value_sets = utils::string::split(buf, sep1);
 
     for (std::string t : key_value_sets) {
         char sep2 = '=';
@@ -263,7 +262,7 @@ bool Transaction::extractArguments(const std::string &orig,
 
         std::string key;
         std::string value;
-        std::vector<std::string> key_value = String::split(t, sep2);
+        std::vector<std::string> key_value = utils::string::split(t, sep2);
         for (auto& a : key_value) {
             if (i == 0) {
                 key = a;
@@ -499,16 +498,17 @@ int Transaction::addRequestHeader(const std::string& key,
 
     this->m_collections.store("REQUEST_HEADERS:" + key, value);
 
-    std::string keyl = String::tolower(key);
+    std::string keyl = utils::string::tolower(key);
     if (keyl == "authorization") {
-        std::vector<std::string> type = String::split(value, ' ');
+        std::vector<std::string> type = utils::string::split(value, ' ');
         this->m_collections.store("AUTH_TYPE", type[0]);
     }
 
     if (keyl == "cookie") {
-        std::vector<std::string> cookies = String::split(value, ';');
+        std::vector<std::string> cookies = utils::string::split(value, ';');
         while (cookies.empty() == false) {
-            std::vector<std::string> s = String::split(cookies.back(), '=');
+            std::vector<std::string> s = utils::string::split(cookies.back(),
+               '=');
             if (s.size() > 1) {
                 if (s[0].at(0) == ' ') {
                     s[0].erase(0, 1);
@@ -530,7 +530,7 @@ int Transaction::addRequestHeader(const std::string& key,
 
     if (keyl == "content-type") {
         std::string multipart("multipart/form-data");
-        std::string l = String::tolower(value);
+        std::string l = utils::string::tolower(value);
         if (l.compare(0, multipart.length(), multipart) == 0) {
             this->m_requestBodyType = MultiPartRequestBody;
             m_collections.store("REQBODY_PROCESSOR", "MULTIPART");
@@ -543,7 +543,7 @@ int Transaction::addRequestHeader(const std::string& key,
     }
 
     if (keyl == "host") {
-        std::vector<std::string> host = String::split(value, ':');
+        std::vector<std::string> host = utils::string::split(value, ':');
         m_collections.store("SERVER_NAME", host[0]);
     }
     return 1;
@@ -948,7 +948,7 @@ int Transaction::addResponseHeader(const std::string& key,
 
     this->m_collections.store("RESPONSE_HEADERS:" + key, value);
 
-    if (String::tolower(key) == "content-type") {
+    if (utils::string::tolower(key) == "content-type") {
         this->m_responseContentType->assign(value);
     }
     return 1;
@@ -1307,15 +1307,15 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
 
     strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
 
-    ss << String::dash_if_empty(
+    ss << utils::string::dash_if_empty(
         this->m_collections.resolveFirst("REQUEST_HEADERS:Host")) << " ";
-    ss << String::dash_if_empty(this->m_clientIpAddress) << " ";
+    ss << utils::string::dash_if_empty(this->m_clientIpAddress) << " ";
     /** TODO: Check variable */
-    ss << String::dash_if_empty(
+    ss << utils::string::dash_if_empty(
         this->m_collections.resolveFirst("REMOTE_USER"));
     ss << " ";
     /** TODO: Check variable */
-    ss << String::dash_if_empty(
+    ss << utils::string::dash_if_empty(
         this->m_collections.resolveFirst("LOCAL_USER"));
     ss << " ";
     ss << tstr << " ";
@@ -1329,15 +1329,15 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << this->m_httpCodeReturned << " ";
     ss << this->m_responseBody.tellp();
     /** TODO: Check variable */
-    ss << String::dash_if_empty(
+    ss << utils::string::dash_if_empty(
         this->m_collections.resolveFirst("REFERER")) << " ";
     ss << "\"";
-    ss << String::dash_if_empty(
+    ss << utils::string::dash_if_empty(
         this->m_collections.resolveFirst("REQUEST_HEADERS:User-Agent"));
     ss << "\" ";
     ss << this->m_id << " ";
     /** TODO: Check variable */
-    ss << String::dash_if_empty(
+    ss << utils::string::dash_if_empty(
         this->m_collections.resolveFirst("REFERER")) << " ";
 
     ss << filename << " ";
@@ -1435,7 +1435,7 @@ std::string Transaction::toJSON(int parts) {
     const unsigned char *buf;
     size_t len;
     yajl_gen g = NULL;
-    std::string ts = String::ascTime(&m_timeStamp).c_str();
+    std::string ts = utils::string::ascTime(&m_timeStamp).c_str();
     std::string uniqueId = UniqueId::uniqueId();
 
     g = yajl_gen_alloc(NULL);

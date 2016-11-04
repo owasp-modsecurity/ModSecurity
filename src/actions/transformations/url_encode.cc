@@ -69,7 +69,7 @@ std::string UrlEncode::url_enc(const char *input,
             } else {
                 *d++ = '%';
                 count++;
-                modsecurity::utils::c2x(c, (unsigned char *)d);
+                utils::string::c2x(c, (unsigned char *)d);
                 d += 2;
                 count++;
                 count++;

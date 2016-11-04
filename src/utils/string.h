@@ -18,8 +18,8 @@
 #include <string>
 #include <vector>
 
-#ifndef SRC_UTILS_MSC_STRING_H_
-#define SRC_UTILS_MSC_STRING_H_
+#ifndef SRC_UTILS_STRING_H_
+#define SRC_UTILS_STRING_H_
 
 #define VALID_HEX(X) (((X >= '0') && (X <= '9')) || \
     ((X >= 'a') && (X <= 'f')) || ((X >= 'A') && (X <= 'F')))
@@ -29,6 +29,7 @@
 
 namespace modsecurity {
 namespace utils {
+namespace string {
 
 const char HEX2DEC[256] = {
     /*       0  1  2  3   4  5  6  7   8  9  A  B   C  D  E  F */
@@ -54,26 +55,24 @@ const char HEX2DEC[256] = {
 };
 
 
-class String {
- public:
-    static std::string ascTime(time_t *t);
-    static std::string dash_if_empty(const char *str);
-    static std::string dash_if_empty(const std::string *str);
-    static std::string limitTo(int amount, const std::string &str);
-    static std::string removeBracketsIfNeeded(std::string a);
-    static std::string string_to_hex(const std::string& input);
-    static std::string toHexIfNeeded(const std::string &str);
-    static std::string tolower(std::string str);
-    static std::string toupper(std::string str);
-    static std::vector<std::string> split(std::string str, char delimiter);
-    static void chomp(std::string *str);
-};
+std::string ascTime(time_t *t);
+std::string dash_if_empty(const char *str);
+std::string dash_if_empty(const std::string *str);
+std::string limitTo(int amount, const std::string &str);
+std::string removeBracketsIfNeeded(std::string a);
+std::string string_to_hex(const std::string& input);
+std::string toHexIfNeeded(const std::string &str);
+std::string tolower(std::string str);
+std::string toupper(std::string str);
+std::vector<std::string> split(std::string str, char delimiter);
+void chomp(std::string *str);
 
 unsigned char x2c(unsigned char *what);
 unsigned char xsingle2c(unsigned char *what);
 unsigned char *c2x(unsigned what, unsigned char *where);
 
+}  // namespace string
 }  // namespace utils
 }  // namespace modsecurity
 
-#endif  // SRC_UTILS_MSC_STRING_H_
+#endif  // SRC_UTILS_STRING_H_

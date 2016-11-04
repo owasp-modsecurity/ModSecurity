@@ -25,15 +25,12 @@
 #include "modsecurity/rule_message.h"
 
 
-using modsecurity::utils::String;
-
-
 namespace modsecurity {
 namespace actions {
 
 
 bool Severity::init(std::string *error) {
-    std::string a = String::tolower(m_parser_payload);
+    std::string a = utils::string::tolower(m_parser_payload);
     if (a == "emergency") {
         m_severity = 0;
         return true;

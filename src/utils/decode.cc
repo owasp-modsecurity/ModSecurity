@@ -43,7 +43,7 @@ int urldecode_nonstrict_inplace(unsigned char *input,
                 char c1 = input[i + 1];
                 char c2 = input[i + 2];
                 if (VALID_HEX(c1) && VALID_HEX(c2)) {
-                    uint64_t uni = x2c(&input[i + 1]);
+                    uint64_t uni = string::x2c(&input[i + 1]);
 
                     *d++ = (wchar_t)uni;
                     count++;
@@ -99,8 +99,8 @@ std::string uri_decode(const std::string & sSrc) {
     while (pSrc < SRC_LAST_DEC) {
         if (*pSrc == '%') {
             char dec1, dec2;
-            if (-1 != (dec1 = HEX2DEC[*(pSrc + 1)])
-                && -1 != (dec2 = HEX2DEC[*(pSrc + 2)])) {
+            if (-1 != (dec1 = string::HEX2DEC[*(pSrc + 1)])
+                && -1 != (dec2 = string::HEX2DEC[*(pSrc + 2)])) {
                 *pEnd++ = (dec1 << 4) + dec2;
                 pSrc += 3;
                 continue;

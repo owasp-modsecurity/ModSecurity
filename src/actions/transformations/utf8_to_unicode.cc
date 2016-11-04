@@ -93,7 +93,7 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
             count++;
             if (count <= len) {
                 if (c == 0)
-                    *data = modsecurity::utils::x2c(&c);
+                    *data = utils::string::x2c(&c);
                 else
                     *data++ = c;
             }

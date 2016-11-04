@@ -28,9 +28,6 @@
 #include "src/utils/string.h"
 
 
-using modsecurity::utils::String;
-
-
 namespace modsecurity {
 namespace collection {
 namespace backend {
@@ -103,8 +100,8 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
         if (x.first.at(keySize) != ':') {
             continue;
         }
-        std::string fu = String::toupper(x.first);
-        std::string fvar = String::toupper(var);
+        std::string fu = utils::string::toupper(x.first);
+        std::string fvar = utils::string::toupper(var);
         if (fu.compare(0, keySize, fvar) != 0) {
             continue;
         }

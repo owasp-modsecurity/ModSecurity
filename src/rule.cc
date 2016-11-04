@@ -37,7 +37,6 @@
 
 
 using modsecurity::Variables::Variations::Exclusion;
-using modsecurity::utils::String;
 
 namespace modsecurity {
 
@@ -428,8 +427,8 @@ bool Rule::evaluate(Transaction *trasn) {
             }
 
 #ifndef NO_LOGS
-            trasn->debug(9, "Target value: \"" + String::limitTo(80,
-                String::toHexIfNeeded(value)) \
+            trasn->debug(9, "Target value: \"" + utils::string::limitTo(80,
+                utils::string::toHexIfNeeded(value)) \
                 + "\" (Variable: " + v->m_key + ")");
 #endif
 
@@ -453,9 +452,10 @@ bool Rule::evaluate(Transaction *trasn) {
                 if (this->op->m_match_message.empty() == true) {
                     ruleMessage->m_match = "Matched \"Operator `" +
                         this->op->m_op + "' with parameter `" +
-                        String::limitTo(200, this->op->m_param) +
+                        utils::string::limitTo(200, this->op->m_param) +
                         "' against variable `" + v->m_key + "' (Value: `" +
-                        String::limitTo(100, String::toHexIfNeeded(value)) +
+                        utils::string::limitTo(100,
+                            utils::string::toHexIfNeeded(value)) +
                         "' ) \" at " + v->m_key;
                 } else {
                     ruleMessage->m_match = this->op->m_match_message;

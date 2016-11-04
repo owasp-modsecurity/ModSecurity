@@ -72,7 +72,7 @@ int JsDecode::inplace(unsigned char *input, u_int64_t input_len) {
                 /* \uHHHH */
 
                 /* Use only the lower byte. */
-                *d = modsecurity::utils::x2c(&input[i + 4]);
+                *d = utils::string::x2c(&input[i + 4]);
 
                 /* Full width ASCII (ff01 - ff5e) needs 0x20 added */
                 if ((*d > 0x00) && (*d < 0x5f)
@@ -87,7 +87,7 @@ int JsDecode::inplace(unsigned char *input, u_int64_t input_len) {
             } else if ((i + 3 < input_len) && (input[i + 1] == 'x')
                     && VALID_HEX(input[i + 2]) && VALID_HEX(input[i + 3])) {
                 /* \xHH */
-                *d++ = modsecurity::utils::x2c(&input[i + 2]);
+                *d++ = utils::string::x2c(&input[i + 2]);
                 count++;
                 i += 4;
             } else if ((i + 1 < input_len) && ISODIGIT(input[i + 1])) {

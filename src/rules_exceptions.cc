@@ -20,16 +20,13 @@
 #include "src/utils/string.h"
 
 
-using modsecurity::utils::String;
-
-
 namespace modsecurity {
 
 
 bool RulesExceptions::load(const std::string &a, std::string *error) {
-    std::vector<std::string> toRemove = String::split(a, ' ');
+    std::vector<std::string> toRemove = utils::string::split(a, ' ');
     for (std::string &a : toRemove) {
-        std::string b = String::removeBracketsIfNeeded(a);
+        std::string b = utils::string::removeBracketsIfNeeded(a);
 
         size_t dash = b.find('-');
         if (dash != std::string::npos) {

@@ -25,7 +25,6 @@
 #include "src/utils/string.h"
 
 
-using modsecurity::utils::String;
 using modsecurity::Variables::Variations::Exclusion;
 
 
@@ -39,7 +38,7 @@ Variable::Variable(std::string name)
     m_isExclusion(false),
     m_isCount(false) {
     if (m_name.find(":") != std::string::npos) {
-        std::string col = String::toupper(
+        std::string col = utils::string::toupper(
             std::string(m_name, 0, m_name.find(":")));
         std::string name = std::string(m_name, m_name.find(":") + 1,
             m_name.size());
@@ -56,19 +55,19 @@ Variable::Variable(std::string name)
         m_type = MultipleMatches;
     }
 
-    if (String::tolower(m_name) == "tx") {
+    if (utils::string::tolower(m_name) == "tx") {
         m_collectionName = "TX";
         m_type = MultipleMatches;
-    } else if (String::tolower(m_name) == "ip") {
+    } else if (utils::string::tolower(m_name) == "ip") {
         m_collectionName = "IP";
         m_type = MultipleMatches;
-    } else if (String::tolower(m_name) == "global") {
+    } else if (utils::string::tolower(m_name) == "global") {
         m_collectionName = "GLOBAL";
         m_type = MultipleMatches;
-    } else if (String::tolower(m_name) == "resource") {
+    } else if (utils::string::tolower(m_name) == "resource") {
         m_collectionName = "RESOURCE";
         m_type = MultipleMatches;
-    } else if (String::tolower(m_name) == "session") {
+    } else if (utils::string::tolower(m_name) == "session") {
         m_collectionName = "SESSION";
         m_type = MultipleMatches;
     } else if (m_name.find(".") != std::string::npos) {
@@ -87,7 +86,7 @@ Variable::Variable(std::string name, VariableKind kind)
     m_isExclusion(false),
     m_isCount(false) {
     if (m_name.find(":") != std::string::npos) {
-        std::string col = String::toupper(
+        std::string col = utils::string::toupper(
             std::string(m_name, 0, m_name.find(":")));
         std::string name = std::string(m_name, m_name.find(":") + 1,
             m_name.size());
@@ -104,19 +103,19 @@ Variable::Variable(std::string name, VariableKind kind)
         m_type = MultipleMatches;
     }
 
-    if (String::tolower(m_name) == "tx") {
+    if (utils::string::tolower(m_name) == "tx") {
         m_collectionName = "TX";
         m_type = MultipleMatches;
-    } else if (String::tolower(m_name) == "ip") {
+    } else if (utils::string::tolower(m_name) == "ip") {
         m_collectionName = "IP";
         m_type = MultipleMatches;
-    } else if (String::tolower(m_name) == "global") {
+    } else if (utils::string::tolower(m_name) == "global") {
         m_collectionName = "GLOBAL";
         m_type = MultipleMatches;
-    } else if (String::tolower(m_name) == "resource") {
+    } else if (utils::string::tolower(m_name) == "resource") {
         m_collectionName = "RESOURCE";
         m_type = MultipleMatches;
-    } else if (String::tolower(m_name) == "session") {
+    } else if (utils::string::tolower(m_name) == "session") {
         m_collectionName = "SESSION";
         m_type = MultipleMatches;
     } else if (m_name.find(".") != std::string::npos) {
