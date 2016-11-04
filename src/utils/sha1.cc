@@ -16,6 +16,9 @@
 
 #include "src/utils/sha1.h"
 #include "src/utils/mbedtls/sha1.h"
+#include <fstream>
+#include <iostream>
+#include <cstring>
 
 namespace modsecurity {
 namespace Utils {
@@ -23,17 +26,19 @@ namespace Utils {
 
 std::string Sha1::hexdigest(const std::string& input) {
     unsigned char digest[20];
+    static const char* const lut = "0123456789abcdef";
 
     mbedtls_sha1(reinterpret_cast<const unsigned char *>(input.c_str()),
         input.size(), digest);
+    std::string a;
 
-    char buf[41];
-    for (int i=0; i < 20; i++) {
-        snprintf(buf+i*2, sizeof(char)*2, "%02x", digest[i]);
+    for (int i = 0; i < 20; i++) {
+        const unsigned char c = digest[i];
+        a.push_back(lut[c >> 4]);
+        a.push_back(lut[c & 15]);
     }
-    buf[40] = 0;
 
-    return std::string(buf, 40);
+    return a;
 }
 
 
