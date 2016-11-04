@@ -3,21 +3,8 @@ BUILT_SOURCES= \
 	parser/seclang-parser.cc
 
 lib_LTLIBRARIES = libmodsecurity.la
-noinst_LTLIBRARIES = libmbedtls.la
 libmodsecurity_ladir = $(prefix)/include
 libmodsecurity_includesubdir = $(pkgincludedir)/collection/
-
-
-
-libmbedtls_la_SOURCES = \
-	utils/mbedtls/base64.c \
-	utils/mbedtls/md5.c \
-	utils/mbedtls/sha1.c
-
-libmbedtls_la_CFLAGS = -D MBEDTLS_CONFIG_FILE=\"mbed-tls-config.h\" -Iutils
-libmbedtls_la_CPPFLAGS =
-libmbedtls_la_LIBADD =
-
 
 CLEANFILES = \
 	location.hh \
@@ -63,7 +50,6 @@ noinst_HEADERS = \
 	parser/*.h \
 	request_body_processor/*.h \
 	utils/*.h \
-	utils/mbedtls/*.h \
 	variables/*.h \
 	variables/variations/*.h \
 	*.h
@@ -273,9 +259,10 @@ libmodsecurity_la_CPPFLAGS = \
 	-std=c++11 \
 	-I.. \
 	-g \
+	-I../others \
 	-fPIC \
 	-O3 \
-	-I ../headers \
+	-I../headers \
 	$(GEOIP_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \
@@ -294,7 +281,7 @@ libmodsecurity_la_LIBADD = \
 	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
 	$(LIBXML2_LDADD) \
 	../others/libinjection.la \
-	libmbedtls.la
+	../others/libmbedtls.la
 
 
 libmodsecurity_la_LDFLAGS = \
