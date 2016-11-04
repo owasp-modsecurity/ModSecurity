@@ -32,6 +32,7 @@
 #include "variables/variations/exclusion.h"
 #include "utils/msc_string.h"
 #include "modsecurity/rules.h"
+#include "modsecurity/rule_message.h"
 #include "src/macro_expansion.h"
 
 

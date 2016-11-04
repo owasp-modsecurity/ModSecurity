@@ -46,6 +46,7 @@
 #include "utils/decode.h"
 #include "utils/random.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rule_message.h"
 #include "modsecurity/rules_properties.h"
 #include "src/actions/allow.h"
 

@@ -22,6 +22,8 @@
 #include "modsecurity/transaction.h"
 #include "src/macro_expansion.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rule_message.h"
+
 
 namespace modsecurity {
 namespace actions {

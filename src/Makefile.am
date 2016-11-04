@@ -253,6 +253,7 @@ libmodsecurity_la_SOURCES = \
 	debug_log_writer.cc \
 	macro_expansion.cc \
 	rule.cc \
+	rule_message.cc \
 	unique_id.cc \
 	rules_exceptions.cc \
 	${BODY_PROCESSORS} \

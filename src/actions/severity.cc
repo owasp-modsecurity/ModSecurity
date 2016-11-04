@@ -22,6 +22,7 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 #include "utils/msc_string.h"
+#include "modsecurity/rule_message.h"
 
 
 using modsecurity::utils::String;

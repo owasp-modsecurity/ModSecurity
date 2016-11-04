@@ -21,6 +21,7 @@
 #include "actions/action.h"
 #include "modsecurity/transaction.h"
 #include "operators/operator.h"
+#include "modsecurity/rule_message.h"
 
 
 namespace modsecurity {
