@@ -22,7 +22,7 @@
 #include <utility>
 
 #include "modsecurity/transaction.h"
-#include "src/utils/msc_system.h"
+#include "src/utils/system.h"
 
 namespace modsecurity {
 namespace Variables {

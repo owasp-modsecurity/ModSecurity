@@ -27,7 +27,7 @@
 
 #include "src/audit_log/audit_log.h"
 #include "modsecurity/transaction.h"
-#include "src/utils/msc_system.h"
+#include "src/utils/system.h"
 #include "src/utils/md5.h"
 
 

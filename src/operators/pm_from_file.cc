@@ -19,7 +19,7 @@
 
 #include "src/operators/operator.h"
 #include "src/utils/https_client.h"
-#include "src/utils/msc_system.h"
+#include "src/utils/system.h"
 
 
 namespace modsecurity {

@@ -207,23 +207,24 @@ OPERATORS = \
 	operators/verify_cpf.cc \
 	operators/verify_ssn.cc \
 	operators/within.cc \
- 	operators/unconditional_match.cc
+	operators/unconditional_match.cc
 
 
 UTILS = \
-	utils/acmp.cc \
-	utils/base64.cc \
-	utils/decode.cc \
-	utils/geo_lookup.cc \
-	utils/https_client.cc \
-	utils/ip_tree.cc \
-	utils/md5.cc \
-	utils/msc_tree.cc \
-	utils/random.cc \
-	utils/regex.cc \
-	utils/sha1.cc \
-	utils/msc_string.cc \
-	utils/msc_system.cc
+        utils/acmp.cc \
+        utils/base64.cc \
+        utils/decode.cc \
+        utils/geo_lookup.cc \
+        utils/https_client.cc \
+        utils/ip_tree.cc \
+        utils/md5.cc \
+        utils/msc_string.cc \
+        utils/msc_tree.cc \
+        utils/random.cc \
+        utils/regex.cc \
+        utils/sha1.cc \
+        utils/system.cc
+
 
 COLLECTION = \
 	collection/collections.cc \

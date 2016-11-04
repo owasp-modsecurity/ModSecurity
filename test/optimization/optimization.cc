@@ -22,7 +22,7 @@
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules.h"
-#include "src/utils/msc_system.h"
+#include "src/utils/system.h"
 #include "src/parser/driver.h"
 #include "src/utils/https_client.h"
 #include "modsecurity/rules_properties.h"

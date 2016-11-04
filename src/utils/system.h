@@ -20,8 +20,8 @@
 
 #include "modsecurity/modsecurity.h"
 
-#ifndef SRC_UTILS_MSC_SYSTEM_H_
-#define SRC_UTILS_MSC_SYSTEM_H_
+#ifndef SRC_UTILS_SYSTEM_H_
+#define SRC_UTILS_SYSTEM_H_
 
 
 namespace modsecurity {
@@ -38,4 +38,4 @@ void createDir(std::string dir, int mode);
 }  // namespace utils
 }  // namespace modsecurity
 
-#endif  // SRC_UTILS_MSC_SYSTEM_H_
+#endif  // SRC_UTILS_SYSTEM_H_
