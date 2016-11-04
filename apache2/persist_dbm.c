@@ -384,6 +384,14 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
                 log_escape(msr->mp, dbm_filename));
     }
 
+    /* Need to lock to pull in the stored data again and apply deltas. */
+    rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
+    if (rc != APR_SUCCESS) {
+        msr_log(msr, 1, "collection_store: Failed to lock proc mutex: %s",
+                get_apr_error(msr->mp, rc));
+        goto error;
+    }
+
     /* Delete IS_NEW on store. */
     apr_table_unset(col, "IS_NEW");
 
@@ -430,14 +438,6 @@ int collection_store(modsec_rec *msr, apr_table_t *col) {
         }
         var->value = apr_psprintf(msr->mp, "%d", counter + 1);
         var->value_len = strlen(var->value);
-    }
-
-    /* Need to lock to pull in the stored data again and apply deltas. */
-    rc = apr_global_mutex_lock(msr->modsecurity->dbm_lock);
-    if (rc != APR_SUCCESS) {
-        msr_log(msr, 1, "collection_store: Failed to lock proc mutex: %s",
-                get_apr_error(msr->mp, rc));
-        goto error;
     }
     
     /* ENH Make the expiration timestamp accessible in blob form so that
