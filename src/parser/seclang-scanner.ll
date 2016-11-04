@@ -123,7 +123,7 @@ CONGIG_DIR_SEC_TMP_DIR                  (?i:SecTmpDir)
 DICT_ELEMENT                            [^ \t|]+
 DIRECTIVE                               (?i:SecRule)
 DIRECTIVE_SECRULESCRIPT                 (?i:SecRuleScript)
-FREE_TEXT                               ([^\"]|(\\\"))+
+FREE_TEXT                               ([^\"]|([^\\]\\\"))+
 FREE_TEXT_NEW_LINE                      [^\"|\n]+
 FREE_TEXT_QUOTE                         ([^\']|([^\\]\\\'))+
 FREE_TEXT_QUOTE_COMMA                   [^,\']+
