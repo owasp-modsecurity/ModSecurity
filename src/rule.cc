@@ -73,6 +73,10 @@ Rule::~Rule() {
     if (variables != NULL) {
         delete variables;
     }
+
+    if (chainedRule != NULL) {
+        delete chainedRule;
+    }
 }
 
 Rule::Rule(std::string marker)
