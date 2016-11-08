@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "src/actions/action.h"
+#include "modsecurity/actions/action.h"
 #include "src/actions/transformations/transformation.h"
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_UTF8_TO_UNICODE_H_

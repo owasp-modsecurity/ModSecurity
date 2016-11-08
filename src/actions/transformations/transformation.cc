@@ -21,7 +21,7 @@
 #include <string>
 
 #include "modsecurity/transaction.h"
-#include "src/actions/action.h"
+#include "modsecurity/actions/action.h"
 #include "src/actions/transformations/base64_decode_ext.h"
 #include "src/actions/transformations/base64_decode.h"
 #include "src/actions/transformations/base64_encode.h"

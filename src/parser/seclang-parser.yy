@@ -21,7 +21,7 @@ class Driver;
 
 
 #include "src/actions/accuracy.h"
-#include "src/actions/action.h"
+#include "modsecurity/actions/action.h"
 #include "src/actions/allow.h"
 #include "src/actions/audit_log.h"
 #include "src/actions/ctl/audit_log_parts.h"

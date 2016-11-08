@@ -13,14 +13,18 @@
  *
  */
 
+#ifdef __cplusplus
+
 #include <string>
 #include <iostream>
+
+#endif
 
 #include "modsecurity/intervention.h"
 #include "modsecurity/rule.h"
 
-#ifndef SRC_ACTIONS_ACTION_H_
-#define SRC_ACTIONS_ACTION_H_
+#ifndef HEADERS_MODSECURITY_ACTIONS_ACTION_H_
+#define HEADERS_MODSECURITY_ACTIONS_ACTION_H_
 
 #ifdef __cplusplus
 
@@ -37,6 +41,7 @@ class Action {
         : action_kind(2),
         m_isNone(false),
         m_name(""),
+        m_referenceCount(0),
         m_parser_payload(""),
         temporaryAction(false) {
             set_name_and_payload(_action);
@@ -45,6 +50,7 @@ class Action {
         : action_kind(kind),
         m_isNone(false),
         m_name(""),
+        m_referenceCount(0),
         m_parser_payload(""),
         temporaryAction(false) {
             set_name_and_payload(_action);
@@ -87,6 +93,17 @@ class Action {
         }
     }
 
+    void refCountDecreaseAndCheck() {
+        this->m_referenceCount--;
+        if (this->m_referenceCount == 0) {
+            delete this;
+        }
+    }
+
+    void refCountIncrease() {
+        this->m_referenceCount++;
+    }
+
     bool m_isNone;
     bool temporaryAction;
     int action_kind;
@@ -124,6 +141,9 @@ class Action {
      */
      RunTimeOnlyIfMatchKind,
     };
+
+ private:
+    int m_referenceCount;
 };
 
 
@@ -132,4 +152,4 @@ class Action {
 
 #endif
 
-#endif  // SRC_ACTIONS_ACTION_H_
+#endif  // HEADERS_MODSECURITY_ACTIONS_ACTION_H_

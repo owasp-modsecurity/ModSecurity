@@ -16,7 +16,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "src/actions/action.h"
+#include "modsecurity/actions/action.h"
 #include "src/actions/transformations/transformation.h"
 #include "src/utils/string.h"
 

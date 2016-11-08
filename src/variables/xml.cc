@@ -38,7 +38,7 @@
 #include "modsecurity/rules.h"
 
 #include "src/request_body_processor/xml.h"
-#include "src/actions/action.h"
+#include "modsecurity/actions/action.h"
 #include "src/actions/xmlns.h"
 
 namespace modsecurity {

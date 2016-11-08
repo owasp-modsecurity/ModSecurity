@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "src/actions/action.h"
+#include "modsecurity/actions/action.h"
 #include "src/actions/transformations/transformation.h"
 
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_BASE64_DECODE_H_

@@ -31,6 +31,7 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rule.h"
 #include "modsecurity/rules_exceptions.h"
+#include "modsecurity/actions/action.h"
 
 
 #ifdef __cplusplus
@@ -39,9 +40,6 @@ namespace modsecurity {
 class RulesExceptions;
 namespace audit_log {
 class AuditLog;
-}
-namespace actions {
-class Action;
 }
 namespace Parser {
 class Driver;
@@ -324,6 +322,7 @@ class RulesProperties {
             std::vector<actions::Action *> *actions_to = to->defaultActions+i;
             for (int j = 0; j < actions_from->size(); j++) {
                 actions::Action *action = actions_from->at(j);
+                action->refCountIncrease();
                 actions_to->push_back(action);
             }
         }

@@ -32,7 +32,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "src/actions/action.h"
+#include "modsecurity/actions/action.h"
 #include "src/actions/deny.h"
 #include "modsecurity/intervention.h"
 #include "modsecurity/modsecurity.h"

@@ -24,7 +24,7 @@
 
 #include "modsecurity/transaction.h"
 #include "src/actions/transformations/transformation.h"
-#include "src/actions/action.h"
+#include "modsecurity/actions/action.h"
 
 namespace modsecurity {
 namespace actions {

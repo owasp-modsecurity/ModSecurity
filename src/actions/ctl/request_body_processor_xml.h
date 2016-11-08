@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "src/actions/action.h"
+#include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
 
 #ifndef SRC_ACTIONS_CTL_REQUEST_BODY_PROCESSOR_XML_H_

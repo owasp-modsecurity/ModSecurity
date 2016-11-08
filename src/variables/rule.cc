@@ -39,7 +39,7 @@
 #include "modsecurity/rules.h"
 
 #include "src/request_body_processor/xml.h"
-#include "src/actions/action.h"
+#include "modsecurity/actions/action.h"
 #include "src/actions/severity.h"
 #include "src/actions/xmlns.h"
 #include "src/actions/log_data.h"

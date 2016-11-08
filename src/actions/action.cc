@@ -13,7 +13,7 @@
  *
  */
 
-#include "src/actions/action.h"
+#include "modsecurity/actions/action.h"
 
 #include <iostream>
 #include <string>

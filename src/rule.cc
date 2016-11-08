@@ -25,7 +25,7 @@
 #include <utility>
 
 #include "src/operators/operator.h"
-#include "src/actions/action.h"
+#include "modsecurity/actions/action.h"
 #include "modsecurity/modsecurity.h"
 #include "src/actions/transformations/none.h"
 #include "src/actions/tag.h"

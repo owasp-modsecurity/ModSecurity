@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "src/actions/action.h"
+#include "modsecurity/actions/action.h"
 
 #ifndef SRC_ACTIONS_BLOCK_H_
 #define SRC_ACTIONS_BLOCK_H_

@@ -93,8 +93,8 @@ Rules::~Rules() {
         std::vector<actions::Action *> *tmp = &defaultActions[i];
         while (tmp->empty() == false) {
             actions::Action *a = tmp->back();
+            a->refCountDecreaseAndCheck();
             tmp->pop_back();
-            delete a;
         }
     }
     /** Cleanup audit log */
