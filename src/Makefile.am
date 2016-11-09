@@ -4,7 +4,8 @@ BUILT_SOURCES= \
 
 lib_LTLIBRARIES = libmodsecurity.la
 libmodsecurity_ladir = $(prefix)/include
-libmodsecurity_includesubdir = $(pkgincludedir)/collection/
+libmodsecurity_includesub_collectiondir = $(pkgincludedir)/collection/
+libmodsecurity_includesub_actionsdir = $(pkgincludedir)/actions/
 
 CLEANFILES = \
 	location.hh \
@@ -34,10 +35,14 @@ pkginclude_HEADERS = \
 
 
 
-libmodsecurity_includesub_HEADERS = \
+libmodsecurity_includesub_collection_HEADERS = \
 	../headers/modsecurity/collection/collection.h \
 	../headers/modsecurity/collection/collections.h \
 	../headers/modsecurity/collection/variable.h
+
+
+libmodsecurity_includesub_actions_HEADERS = \
+	../headers/modsecurity/actions/action.h
 
 
 noinst_HEADERS = \
