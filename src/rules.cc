@@ -317,9 +317,7 @@ extern "C" void msc_rules_dump(Rules *rules) {
 
 extern "C" int msc_rules_merge(Rules *rules_dst,
     Rules *rules_from) {
-    rules_dst->merge(rules_from);
-
-    return 0;
+    return rules_dst->merge(rules_from);
 }
 
 
