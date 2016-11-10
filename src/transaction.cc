@@ -358,7 +358,7 @@ bool Transaction::addArgument(const std::string& orig, const std::string& key,
  * @param transaction ModSecurity transaction.
  * @param uri   Uri.
  * @param method   Method (GET, POST, PUT).
- * @param http_version   Http version (1.0, 1.2, 2.0).
+ * @param http_version   Http version (1.0, 1.1, 2.0).
  *
  * @returns If the operation was successful or not.
  * @retval true Operation was successful.
@@ -1725,7 +1725,7 @@ extern "C" int msc_process_request_headers(Transaction *transaction) {
 
 /**
  * @name    msc_process_request_body
- * @brief   Perform the request body (if any)
+ * @brief   Perform the analysis on the request body (if any)
  *
  * This function perform the analysis on the request body. It is optional to
  * call that function. If this API consumer already know that there isn't a
@@ -1809,13 +1809,13 @@ extern "C" int msc_process_response_headers(Transaction *transaction,
 
 /**
  * @name    msc_process_response_body
- * @brief   Perform the request body (if any)
+ * @brief   Perform the analysis on the response body (if any)
  *
- * This function perform the analysis on the request body. It is optional to
+ * This function perform the analysis on the response body. It is optional to
  * call that function. If this API consumer already know that there isn't a
  * body for inspect it is recommended to skip this step.
  *
- * @note It is necessary to "append" the request body prior to the execution
+ * @note It is necessary to "append" the response body prior to the execution
  *       of this function.
  * @note Remember to check for a possible intervention.
  *
