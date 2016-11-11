@@ -82,7 +82,7 @@ static const char *const geo_country_name[GEO_COUNTRY_LAST + 1] = {
     "Bangladesh","Belgium","Burkina Faso","Bulgaria","Bahrain","Burundi","Benin","Bermuda","Brunei Darussalam","Bolivia",
     "Brazil","Bahamas","Bhutan","Bouvet Island","Botswana","Belarus","Belize","Canada","Cocos (Keeling) Islands","Congo, The Democratic Republic of the",
     "Central African Republic","Congo","Switzerland","Cote D'Ivoire","Cook Islands","Chile","Cameroon","China","Colombia","Costa Rica",
-    "Cuba","Cape Verde","Christmas Island","Cyprus","Czech Republic","Germany","Djibouti","Denmark","Dominica","Dominican Republic",
+    "Cuba","Cape Verde","Christmas Island","Cyprus","Czechia","Germany","Djibouti","Denmark","Dominica","Dominican Republic",
     "Algeria","Ecuador","Estonia","Egypt","Western Sahara","Eritrea","Spain","Ethiopia","Finland","Fiji",
     "Falkland Islands (Malvinas)","Micronesia, Federated States of","Faroe Islands","France","France, Metropolitan","Gabon","United Kingdom","Grenada","Georgia","French Guiana",
     "Ghana","Gibraltar","Greenland","Gambia","Guinea","Guadeloupe","Equatorial Guinea","Greece","South Georgia and the South Sandwich Islands","Guatemala",
@@ -134,17 +134,17 @@ static const char geo_country_continent[GEO_COUNTRY_LAST + 1][4] = {
 };
 
 typedef enum {
-GEOIP_COUNTRY_EDITION     = 1,
-GEOIP_REGION_EDITION_REV0 = 7,
-GEOIP_CITY_EDITION_REV0   = 6,
-GEOIP_ORG_EDITION         = 5,
-GEOIP_ISP_EDITION         = 4,
-GEOIP_CITY_EDITION_REV1   = 2,
-GEOIP_REGION_EDITION_REV1 = 3,
-GEOIP_PROXY_EDITION       = 8,
-GEOIP_ASNUM_EDITION       = 9,
-GEOIP_NETSPEED_EDITION    = 10,
-GEOIP_DOMAIN_EDITION      = 11
+    GEOIP_COUNTRY_EDITION     = 1,
+    GEOIP_REGION_EDITION_REV0 = 7,
+    GEOIP_CITY_EDITION_REV0   = 6,
+    GEOIP_ORG_EDITION         = 5,
+    GEOIP_ISP_EDITION         = 4,
+    GEOIP_CITY_EDITION_REV1   = 2,
+    GEOIP_REGION_EDITION_REV1 = 3,
+    GEOIP_PROXY_EDITION       = 8,
+    GEOIP_ASNUM_EDITION       = 9,
+    GEOIP_NETSPEED_EDITION    = 10,
+    GEOIP_DOMAIN_EDITION      = 11
 } GeoIPDBTypes;
 
 static void create_segments(geo_db *geo) {
@@ -502,5 +502,3 @@ int geo_lookup(modsec_rec *msr, geo_rec *georec, const char *target, char **erro
 
     return 1;
 }
-
-
