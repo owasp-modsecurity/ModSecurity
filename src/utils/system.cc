@@ -70,6 +70,11 @@ std::string find_resource(const std::string& resource,
     }
     delete iss;
 
+    // What about `*' ?
+    if (utils::expandEnv(resource, 0).size() > 1) {
+        return resource;
+    }
+
     // Trying the same path of the configuration file.
     std::string f = get_path(config) + "/" + resource;
     iss = new std::ifstream(f, std::ios::in);
@@ -79,6 +84,11 @@ std::string find_resource(const std::string& resource,
         return f;
     }
     delete iss;
+
+    // What about `*' ?
+    if (utils::expandEnv(f, 0).size() > 1) {
+        return f;
+    }
 
     return std::string("");
 }

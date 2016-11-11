@@ -396,7 +396,8 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
 
 {CONFIG_INCLUDE}[ ]{CONFIG_VALUE_PATH} {
     const char *file = strchr(yytext, ' ') + 1;
-    for (auto& s: modsecurity::utils::expandEnv(file, 0)) {
+    std::string fi = modsecurity::utils::find_resource(file, driver.ref.back());
+    for (auto& s: modsecurity::utils::expandEnv(fi, 0)) {
         std::string f = modsecurity::utils::find_resource(s, driver.ref.back());
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
@@ -414,7 +415,8 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
     const char *file = strchr(yytext, ' ') + 1;
     char *f = strdup(file + 1);
     f[strlen(f)-1] = '\0';
-    for (auto& s: modsecurity::utils::expandEnv(f, 0)) {
+    std::string fi = modsecurity::utils::find_resource(f, driver.ref.back());
+    for (auto& s: modsecurity::utils::expandEnv(fi, 0)) {
         std::string f = modsecurity::utils::find_resource(s, driver.ref.back());
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
