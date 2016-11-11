@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
             "net.tutsplus.com");
         modsecTransaction->addRequestHeader("User-Agent",
             "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) " \
-            "Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\n\r");
+            "Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)");
         modsecTransaction->addRequestHeader("Accept",
             "text/html,application/xhtml+xml,application/xml;" \
             "q=0.9,*/*;q=0.8");
