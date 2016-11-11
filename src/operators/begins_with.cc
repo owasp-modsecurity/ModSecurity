@@ -32,7 +32,7 @@ bool BeginsWith::evaluate(Transaction *transaction, const std::string &str) {
     if (str.size() < p.size()) {
         ret = false;
     } else if (!str.compare(0, p.size(), p)) {
-         ret = true;
+        ret = true;
     }
 
     return ret;

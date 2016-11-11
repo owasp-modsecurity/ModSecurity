@@ -276,7 +276,7 @@ if test "$PLATFORM" != "MacOSX"; then
 fi
 
 if test "$aflFuzzer" == "true"; then
-    FUZZ_CPPCFLAGS="-fsanitize=address -fsanitize-coverage=edge,indirect-calls,8bit-counters "
+    FUZZ_CPPCFLAGS="-fsanitize=address -fsanitize-coverage=4 "
     GLOBAL_LDADD="$GLOBAL_LDADD -fsanitize=address "
     GLOBAL_CPPFLAGS="$GLOBAL_CPPFLAGS $FUZZ_CPPCFLAGS"
     $buildExamples = false
