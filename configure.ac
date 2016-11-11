@@ -234,6 +234,20 @@ AC_ARG_ENABLE(afl-fuzz,
     [aflFuzzer=false]
     )
 
+# Examples
+AC_ARG_ENABLE(examples,
+    [AC_HELP_STRING([--enable-examples],[Turn on the examples compilation (default option)])],
+
+    [case "${enableval}" in
+        yes) buildExamples=true ;;
+        no)  buildExamples=false ;;
+        *) AC_MSG_ERROR(bad value ${enableval} for --enable-examples) ;;
+    esac],
+
+    [buildExamples=true]
+    )
+
+
 
 # Decide if we want to build the tests or not.
 buildTestUtilities=false
@@ -253,6 +267,8 @@ if test $buildTestUtilities = true; then
     fi
 fi
 
+AM_CONDITIONAL([EXAMPLES], [test $buildExamples = true])
+
 
 # General link options
 if test "$PLATFORM" != "MacOSX"; then
@@ -263,6 +279,7 @@ if test "$aflFuzzer" == "true"; then
     FUZZ_CPPCFLAGS="-fsanitize=address -fsanitize-coverage=edge,indirect-calls,8bit-counters "
     GLOBAL_LDADD="$GLOBAL_LDADD -fsanitize=address "
     GLOBAL_CPPFLAGS="$GLOBAL_CPPFLAGS $FUZZ_CPPCFLAGS"
+    $buildExamples = false
 fi
 AC_SUBST(GLOBAL_LDADD)
 AC_SUBST(GLOBAL_CPPFLAGS)
@@ -277,14 +294,16 @@ AC_CONFIG_FILES([\
     Makefile \
     doc/Makefile \
     src/Makefile \
-    others/Makefile \
-    examples/Makefile \
-    examples/simple_example_using_c/Makefile \
-    examples/multiprocess_c/Makefile \
+    others/Makefile
     ])
 
 AM_COND_IF([TEST_UTILITIES],
        [AC_CONFIG_FILES([test/Makefile test/benchmark/Makefile])])
+
+AM_COND_IF([EXAMPLES],
+       [AC_CONFIG_FILES([examples/Makefile \
+            examples/simple_example_using_c/Makefile \
+            examples/multiprocess_c/Makefile])])
 
 AM_COND_IF([AFL_FUZZER],
        [AC_CONFIG_FILES([test/fuzzer/Makefile])])
@@ -439,6 +458,13 @@ if test "$aflFuzzer" = "true"; then
 else
     echo "   + afl fuzzer                                    ....disabled"
 fi
+
+if test "$buildExamples" = "true"; then
+    echo "   + library examples                              ....enabled"
+else
+    echo "   + library examples                              ....disabled"
+fi
+
 
 echo " "
 

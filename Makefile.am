@@ -3,11 +3,16 @@ if TEST_UTILITIES
 export MAYBE_TEST = test
 endif
 
+if EXAMPLES
+export MAYBE_EXAMPLES = examples
+endif
+
+
 SUBDIRS = \
 	others \
 	src \
 	doc \
-	examples \
+	$(MAYBE_EXAMPLES) \
 	$(MAYBE_TEST)
 
 
