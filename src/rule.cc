@@ -408,7 +408,8 @@ bool Rule::evaluate(Transaction *trasn) {
 #ifndef NO_LOGS
                         trasn->debug(9, "(SecDefaultAction) T (" + \
                             std::to_string(transformations) + ") " + \
-                            a->m_name + ": \"" + value +"\"");
+                            a->m_name + ": \"" + \
+                            utils::string::limitTo(80, value) +"\"");
 #endif
                         transformations++;
                     }
@@ -421,7 +422,8 @@ bool Rule::evaluate(Transaction *trasn) {
 #ifndef NO_LOGS
                     trasn->debug(9, " T (" + \
                             std::to_string(transformations) + ") " + \
-                            a->m_name + ": \"" + value +"\"");
+                            a->m_name + ": \"" + \
+                            utils::string::limitTo(80, value) + "\"");
 #endif
                     transformations++;
                 }

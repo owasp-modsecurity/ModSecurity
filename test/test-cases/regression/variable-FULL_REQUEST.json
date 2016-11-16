@@ -51,7 +51,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"Content-Type: multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2"
+      "debug_log":"Expect: 100-continue\\x0aContent-Type: multipart/form-data; boundary=------------"
     },
     "rules":[  
       "SecRuleEngine On",
