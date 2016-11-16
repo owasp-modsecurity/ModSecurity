@@ -16,7 +16,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
-#include <vector>
+#include <list>
 
 #include "modsecurity/modsecurity.h"
 
@@ -31,7 +31,7 @@ namespace utils {
 double cpu_seconds(void);
 std::string find_resource(const std::string& file, const std::string& param);
 std::string get_path(const std::string& file);
-std::vector<std::string> expandEnv(const std::string& var, int flags);
+std::list<std::string> expandEnv(const std::string& var, int flags);
 void createDir(std::string dir, int mode);
 
 

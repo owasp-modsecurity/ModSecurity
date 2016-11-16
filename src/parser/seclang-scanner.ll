@@ -402,7 +402,9 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
         driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file."));
         throw p::syntax_error(*driver.loc.back(), "");
     }
-    for (auto& s: modsecurity::utils::expandEnv(fi, 0)) {
+    std::list<std::string> files = modsecurity::utils::expandEnv(fi, 0);
+    files.reverse();
+    for (auto& s: files) {
         std::string f = modsecurity::utils::find_resource(s, driver.ref.back());
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
@@ -426,7 +428,9 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
         driver.error (*driver.loc.back(), "", file + std::string(": Not able to open file."));
         throw p::syntax_error(*driver.loc.back(), "");
     }
-    for (auto& s: modsecurity::utils::expandEnv(fi, 0)) {
+    std::list<std::string> files = modsecurity::utils::expandEnv(fi, 0);
+    files.reverse();
+    for (auto& s: files) {
         std::string f = modsecurity::utils::find_resource(s, driver.ref.back());
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
@@ -437,7 +441,6 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
         driver.ref.push_back(f.c_str());
         driver.loc.push_back(new yy::location());
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
-
     }
     free(f);
 }

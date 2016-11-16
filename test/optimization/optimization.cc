@@ -37,12 +37,12 @@ void print_help() {
 
 int main(int argc, char **argv) {
     modsecurity::Rules *modsecRules = new modsecurity::Rules();
-    std::vector<std::string> files;
+    std::list<std::string> files;
     int total = 0;
 
     int i = 1;
     while (i < argc) {
-        std::vector<std::string> tfiles = modsecurity::utils::expandEnv(
+        std::list<std::string> tfiles = modsecurity::utils::expandEnv(
             argv[i], 0);
         for (const auto &file : tfiles) {
             files.insert(files.begin(), file);

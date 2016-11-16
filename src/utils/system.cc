@@ -106,8 +106,8 @@ std::string get_path(const std::string& file) {
 }
 
 
-std::vector<std::string> expandEnv(const std::string& var, int flags) {
-    std::vector<std::string> vars;
+std::list<std::string> expandEnv(const std::string& var, int flags) {
+    std::list<std::string> vars;
 
     wordexp_t p;
     if (wordexp(var.c_str(), &p, flags) == false) {
