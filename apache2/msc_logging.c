@@ -559,35 +559,8 @@ static void write_rule_json(modsec_rec *msr, const msre_rule *rule, yajl_gen g) 
     if (rule->actionset->rev) {
         yajl_kv_string(g, "rev", log_escape(msr->mp, rule->actionset->rev));
     }
-    if (rule->actionset->msg) {
-        msc_string *var = (msc_string *)apr_palloc(msr->mp, sizeof(msc_string));
-        var->value = (char *)rule->actionset->msg;
-        var->value_len = strlen(rule->actionset->msg);
-        expand_macros(msr, var, NULL, msr->mp);
-
-        yajl_kv_string(g, "msg", log_escape_ex(msr->mp, var->value, var->value_len));
-    }
     if (rule->actionset->version) {
         yajl_kv_string(g, "version", log_escape(msr->mp, rule->actionset->version));
-    }
-    if (rule->actionset->logdata) {
-        char *logdata = NULL;
-        msc_string *var = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-        var->value = (char *)rule->actionset->logdata;
-        var->value_len = strlen(rule->actionset->logdata);
-        expand_macros(msr, var, NULL, msr->mp);
-
-        logdata = apr_pstrdup(msr->mp, log_escape_hex(msr->mp, (unsigned char *)var->value, var->value_len));
-
-        // if it is > 512 bytes, then truncate at 512 with ellipsis.
-        if (strlen(logdata) > 515) {
-            logdata[512] = '.';
-            logdata[513] = '.';
-            logdata[514] = '.';
-            logdata[515] = '\0';
-        }
-
-        yajl_kv_string(g, "logdata", logdata);
     }
     if (rule->actionset->severity != NOT_SET) {
         yajl_kv_int(g, "severity", rule->actionset->severity);
@@ -1450,11 +1423,12 @@ void sec_audit_logger_json(modsec_rec *msr) {
     yajl_gen_clear(g);
     yajl_gen_free(g);
 
+    sec_auditlog_write(msr, "\n", 1);
+
     /* Return here if we were writing to a serial log
      * as it does not need an index file.
      */
     if (msr->txcfg->auditlog_type != AUDITLOG_CONCURRENT) {
-        sec_auditlog_write(msr, "\n", 1);
 
         /* Unlock the mutex we used to serialise access to the audit log file. */
         rc = apr_global_mutex_unlock(msr->modsecurity->auditlog_lock);

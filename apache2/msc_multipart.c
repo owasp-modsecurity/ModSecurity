@@ -1327,6 +1327,11 @@ apr_status_t multipart_cleanup(modsec_rec *msr) {
             } else {
                 /* Move file to the upload dir. */
                 if (parts[i]->tmp_file_name != NULL) {
+                    if (strcmp(msr->txcfg->upload_dir, msr->txcfg->tmp_dir) == 0) {
+                        msr_log(msr, 4, "Not moving part to identical location");
+                        continue;
+                    }
+
                     const char *new_filename = NULL;
                     const char *new_basename = NULL;
 
