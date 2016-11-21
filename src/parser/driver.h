@@ -68,6 +68,9 @@ class Driver : public RulesProperties {
     int parseFile(const std::string& f);
     int parse(const std::string& f, const std::string &ref);
 
+    void save_orig(std::string orig);
+    std::string get_orig();
+
     std::string file;
 
     bool trace_parsing;
@@ -81,6 +84,8 @@ class Driver : public RulesProperties {
     std::list<std::string> ref;
     std::string buffer;
     Rule *lastRule;
+
+    std::string m_orig;
 };
 
 

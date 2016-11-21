@@ -34,6 +34,7 @@
 #include "modsecurity/rules.h"
 #include "modsecurity/rule_message.h"
 #include "src/macro_expansion.h"
+#include "audit_log/audit_log.h"
 
 
 using modsecurity::Variables::Variations::Exclusion;
@@ -92,12 +93,14 @@ Rule::Rule(std::string marker)
     m_marker(marker),
     m_maturity(0),
     m_referenceCount(0),
+    m_plainText(""),
     m_fileName(""),
     m_lineNumber(0) { }
 
 Rule::Rule(Operator *_op,
         std::vector<Variable *> *_variables,
         std::vector<Action *> *actions,
+        std::string plainText,
         std::string fileName,
         int lineNumber): chained(false),
     chainedRule(NULL),
@@ -109,6 +112,7 @@ Rule::Rule(Operator *_op,
     m_unconditional(false),
     m_secmarker(false),
     m_marker(""),
+    m_plainText(plainText),
     m_maturity(0),
     m_referenceCount(0),
     m_fileName(fileName),
@@ -455,6 +459,24 @@ bool Rule::evaluate(Transaction *trasn) {
                 bool containsPassAction = false;
 		globalRet = true;
 
+#ifdef AUDITLOG_ENABLED
+                /* AUDITLOG:  save fired rule for auditlog */
+                if (trasn->m_rules->m_auditLog) {
+                    int al = 0;
+                    for (Action *a : 
+                    this->actions_runtime_pos) {
+                        if (a->m_name == "auditlog") { 
+                            al = 1;
+                            break;
+                        }
+                    }
+                    if (al == 1) {
+                        /* save records which has 'auditlog' action set */
+                        trasn->m_rules->m_auditLog->m_fired_rules.push_back(this);
+                    }
+                }
+#endif /* AUDITLOG_ENABLED */
+
                 if (this->op->m_match_message.empty() == true) {
                     ruleMessage->m_match = "Matched \"Operator `" +
                         this->op->m_op + "' with parameter `" +
@@ -489,6 +511,10 @@ bool Rule::evaluate(Transaction *trasn) {
                         }
                     }
                 }
+
+/* FIXME:  save SecDefaultAction to auditlog as well */
+/* FIXME:  save chained rules for auditlog in special way */
+
 
                 if (this->chained && this->chainedRule == NULL) {
 #ifndef NO_LOGS
@@ -605,6 +631,10 @@ bool Rule::evaluate(Transaction *trasn) {
         trasn->debug(4, "Saving on the server log: "
             + ruleMessage->errorLog(trasn));
         trasn->serverLog(ruleMessage->errorLog(trasn));
+#ifdef AUDITLOG_ENABLED
+        /* AUDITLOG:  save fired message for auditlog */
+        trasn->m_rules->m_auditLog->m_fired_messages.push_back(ruleMessage->errorLog(trasn));
+#endif
     }
     delete ruleMessage;
 

@@ -41,6 +41,36 @@ Driver::~Driver() {
     delete loc.back();
 }
 
+void Driver::save_orig(std::string orig) {
+#ifdef AUDITLOG_ENABLED
+    if (m_orig.length() > 0) {
+        m_orig += orig;
+    }
+
+    if (orig == "SecRule" || orig == "SecAction") {
+        m_orig = orig + " ";
+    }
+#endif
+}
+
+std::string Driver::get_orig() {
+#ifdef AUDITLOG_ENABLED
+    std::string orig = m_orig;
+
+    // balance quotes
+    // FIXME:  research if single quotes need to be balanced as well
+    int i, dq;
+    for (i = 0; i < orig.size(); i++) {
+        if (orig[i] == '"') { dq++; }
+    }
+    if (dq % 2 == 1) { orig += "\""; }
+
+    //std::cout << "REQUESTED: " << orig << "\n";
+#endif
+    m_orig = "";
+    return orig;
+}
+
 
 int Driver::addSecMarker(std::string marker) {
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {

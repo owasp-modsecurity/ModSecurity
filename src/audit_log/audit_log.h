@@ -23,6 +23,7 @@
 #define SRC_AUDIT_LOG_AUDIT_LOG_H_
 
 #include "modsecurity/transaction.h"
+#include "modsecurity/rule.h"
 #include "src/audit_log/writer.h"
 
 #ifdef __cplusplus
@@ -170,6 +171,9 @@ class AuditLog {
     int directoryPermission;
 
     int m_parts;
+
+    std::vector<Rule *> m_fired_rules;
+    std::vector<std::string> m_fired_messages;
 
  private:
     AuditLogStatus m_status;

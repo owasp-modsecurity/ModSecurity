@@ -178,6 +178,7 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
 %{
   // Code run each time yylex is called.
   driver.loc.back()->step();
+  driver.save_orig(yytext);
 %}
 {ACTION_ACCURACY}:'{FREE_TEXT_QUOTE}'                                   { return p::make_ACTION_ACCURACY(yytext, *driver.loc.back()); }
 {ACTION_ACCURACY}:{FREE_TEXT_QUOTE}                                     { return p::make_ACTION_ACCURACY(yytext, *driver.loc.back()); }
