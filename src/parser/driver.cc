@@ -66,9 +66,11 @@ std::string Driver::get_orig() {
     if (dq % 2 == 1) { orig += "\""; }
 
     //std::cout << "REQUESTED: " << orig << "\n";
-#endif
     m_orig = "";
     return orig;
+#else
+    return "";
+#endif
 }
 
 
