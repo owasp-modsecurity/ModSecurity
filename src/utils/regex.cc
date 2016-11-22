@@ -21,6 +21,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string>
+#include <list>
 
 #include <fstream>
 #include <iostream>
@@ -48,6 +49,7 @@ Regex::Regex(const std::string& pattern_)
 
     m_pc = pcre_compile(pattern.c_str(), PCRE_DOTALL|PCRE_MULTILINE,
         &errptr, &erroffset, NULL);
+
     m_pce = pcre_study(m_pc, pcre_study_opt, &errptr);
 }
 
@@ -67,6 +69,30 @@ Regex::~Regex() {
     }
 }
 
+
+std::list<SMatch> Regex::searchAll(const std::string& s) {
+    int ovector[OVECCOUNT];
+    std::list<SMatch> retList;
+    int i;
+    const char *subject = s.c_str();
+    int rc;
+
+    rc = pcre_exec(m_pc, m_pce, subject,
+        s.size(), 0, 0, ovector, OVECCOUNT);
+
+    for (i = 0; i < rc; i++) {
+        SMatch match;
+        const char *substring_start = subject + ovector[2*i];
+        int substring_length = ovector[2*i+1] - ovector[2*i];
+
+        match.match = std::string(subject, ovector[2*i],
+            ovector[2*i+1] - ovector[2*i]);
+
+        retList.push_front(match);
+    }
+
+    return retList;
+}
 
 int regex_search(const std::string& s, SMatch *match,
     const Regex& regex) {

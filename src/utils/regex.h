@@ -18,6 +18,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <list>
 
 #ifndef SRC_UTILS_REGEX_H_
 #define SRC_UTILS_REGEX_H_
@@ -28,6 +29,16 @@ namespace Utils {
 
 #define OVECCOUNT 30
 
+class SMatch {
+ public:
+    SMatch() : size_(0) { }
+    size_t size() const { return size_; }
+    std::string str() const { return match; }
+    int size_;
+    std::string match;
+};
+
+
 class Regex {
  public:
     explicit Regex(const std::string& pattern_);
@@ -36,16 +47,8 @@ class Regex {
     pcre *m_pc = NULL;
     pcre_extra *m_pce = NULL;
     int m_ovector[OVECCOUNT];
-};
 
-
-class SMatch {
- public:
-    SMatch() : size_(0) { }
-    size_t size() const { return size_; }
-    std::string str() const { return match; }
-    int size_;
-    std::string match;
+    std::list<SMatch> searchAll(const std::string& s);
 };
 
 
