@@ -406,9 +406,9 @@ int Transaction::processURI(const char *uri, const char *method,
     m_collections.store("REQUEST_FILENAME", path_info);
 
     size_t offset = path_info.find_last_of("/\\");
-    if (offset != std::string::npos) {
-        std::string basename = std::string(path_info, offset,
-            path_info.length() - offset);
+    if (offset != std::string::npos && path_info.length() > offset + 1) {
+        std::string basename = std::string(path_info, offset + 1,
+            path_info.length() - (offset + 1));
         m_collections.store("REQUEST_BASENAME", basename);
     }
     m_collections.store("REQUEST_METHOD", method);

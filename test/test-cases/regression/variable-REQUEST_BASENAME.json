@@ -33,7 +33,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"/login.php\" \\(Variable: REQUEST_BASENAME\\)"
+      "debug_log":"Target value: \"login.php\" \\(Variable: REQUEST_BASENAME\\)"
     },
     "rules":[
       "SecRuleEngine On",
