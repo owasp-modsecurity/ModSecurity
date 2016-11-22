@@ -102,6 +102,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_clientPort(0),
     m_serverPort(0),
     m_uri(""),
+    m_uri_no_query_string_decoded(""),
     m_method(""),
     m_httpVersion(""),
     m_rules(rules),
@@ -383,6 +384,12 @@ int Transaction::processURI(const char *uri, const char *method,
 
     m_collections.store("REQUEST_LINE", std::string(method) + " " +
         std::string(uri) + " HTTP/" + std::string(http_version));
+
+    if (pos != std::string::npos) {
+        m_uri_no_query_string_decoded = std::string(m_uri_decoded, 0, pos);
+    } else {
+        m_uri_no_query_string_decoded = std::string(m_uri_decoded);
+    }
 
     if (pos_raw != std::string::npos) {
         m_collections.store("QUERY_STRING", std::string(uri_s, pos_raw + 1,

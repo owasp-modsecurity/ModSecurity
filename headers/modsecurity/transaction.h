@@ -215,13 +215,18 @@ class Transaction {
     const char *m_serverIpAddress;
 
     /**
-     * Holds the raw URI that was requestd.
+     * Holds the raw URI that was requested.
      */
     const char *m_uri;
 
     /**
+     * Holds the URI that was requests (without the query string).
+     */
+    std::string m_uri_no_query_string_decoded;
+
+    /**
      * Holds the combined size of all arguments, later used to fill the
-	 * variable  ARGS_COMBINED_SIZE.
+     * variable  ARGS_COMBINED_SIZE.
      */
     double m_ARGScombinedSize;
 

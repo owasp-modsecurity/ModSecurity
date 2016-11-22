@@ -45,7 +45,7 @@ std::string RuleMessage::errorLog(Transaction *trans) {
     }
     msg.append(" [hostname \"" + std::string(trans->m_serverIpAddress) \
         + "\"]");
-    msg.append(" [uri \"" + std::string(trans->m_uri) + "\"]");
+    msg.append(" [uri \"" + trans->m_uri_no_query_string_decoded + "\"]");
     msg.append(" [unique_id \"" + trans->m_id + "\"]");
 
     return modsecurity::utils::string::toHexIfNeeded(msg);
