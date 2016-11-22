@@ -89,45 +89,18 @@ int ModSecurity::refreshCollections(CollectionBackendType typ,
         collection::backend::LMDB *dbi;
         int rc;
 
-        dbi = new collection::backend::LMDB();
-        rc = dbi->env_open(m_collectionBackendPath);
-        if (rc != 0) {
-            return rc;
-        }
-        delete m_global_collection;
-        m_global_collection = dbi;
+#define LMDB_COLL_REFRESH(COLL)                      \
+        dbi = new collection::backend::LMDB();       \
+        rc = dbi->env_open(m_collectionBackendPath); \
+        if (rc != 0) { return rc; }                  \
+        delete COLL;                                 \
+        COLL = dbi;
 
-        dbi = new collection::backend::LMDB();
-        rc = dbi->env_open(m_collectionBackendPath);
-        if (rc != 0) {
-            return rc;
-        }
-        delete m_resource_collection;
-        m_resource_collection = dbi;
-
-        dbi = new collection::backend::LMDB();
-        rc = dbi->env_open(m_collectionBackendPath);
-        if (rc != 0) {
-            return rc;
-        }
-        delete m_ip_collection;
-        m_ip_collection = dbi;
-
-        dbi = new collection::backend::LMDB();
-        rc = dbi->env_open(m_collectionBackendPath);
-        if (rc != 0) {
-            return rc;
-        }
-        delete m_session_collection;
-        m_session_collection = dbi;
-
-        dbi = new collection::backend::LMDB();
-        rc = dbi->env_open(m_collectionBackendPath);
-        if (rc != 0) {
-            return rc;
-        }
-        delete m_user_collection;
-        m_user_collection = dbi;
+        LMDB_COLL_REFRESH(m_global_collection);
+        LMDB_COLL_REFRESH(m_resource_collection);
+        LMDB_COLL_REFRESH(m_ip_collection);
+        LMDB_COLL_REFRESH(m_session_collection);
+        LMDB_COLL_REFRESH(m_user_collection);
 
         /* store actual values */
         m_collectionBackendType = typ;
