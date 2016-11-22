@@ -136,6 +136,21 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
         std::to_string(modsecurity::utils::generate_transaction_unique_id());
     m_rules->incrementReferenceCount();
 
+    this->init_collections();
+
+#ifndef NO_LOGS
+    this->debug(4, "Initializing transaction");
+#endif
+}
+
+void Transaction::init_collections() {
+
+    // FIXME: free resources used by m_collections ???
+
+    m_collections = collection::Collections(m_ms->m_global_collection,
+        m_ms->m_ip_collection, m_ms->m_session_collection,
+        m_ms->m_user_collection, m_ms->m_resource_collection);
+
     m_collections.store("ARGS_COMBINED_SIZE", std::string("0"));
     m_ARGScombinedSizeStr = m_collections.resolveFirst("ARGS_COMBINED_SIZE");
     m_collections.store("ARGS_NAMES", std::string(""));
@@ -155,10 +170,6 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
         "RESPONSE_CONTENT_TYPE");
 
     m_collections.storeOrUpdateFirst("URLENCODED_ERROR", "0");
-
-#ifndef NO_LOGS
-    this->debug(4, "Initialising transaction");
-#endif
 }
 
 
@@ -229,6 +240,20 @@ int Transaction::processConnection(const char *client, int cPort,
     this->m_serverIpAddress = server;
     this->m_clientPort = cPort;
     this->m_serverPort = sPort;
+
+    // Check and apply CollectionBackend engine
+    if (m_rules->m_collectionBackendType != CollectionBackendNotSet) {
+        int rc;
+        rc = m_ms->refreshCollections(m_rules->m_collectionBackendType, m_rules->m_collectionBackendPath.m_value);
+        if (rc == 0) {
+            this->init_collections();
+        } else if (rc == -255) {
+            /* ignore error */
+        } else {
+            /* FIXME:  display LMDB db opening error (LMDB::env_open() failed) */
+        }
+    }
+    
 #ifndef NO_LOGS
     debug(4, "Transaction context created.");
     debug(4, "Starting phase CONNECTION. (SecRules 0)");

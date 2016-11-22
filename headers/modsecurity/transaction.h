@@ -386,6 +386,8 @@ class Transaction {
      * the web server (connector) log.
      */
     void *m_logCbData;
+
+    void init_collections();
 };
 
 

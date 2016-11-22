@@ -218,6 +218,41 @@ void Driver::error(const yy::location& l, const std::string& m,
     }
 }
 
+/**
+ * SecCollectionBackend lmdb://var/nginx/modsec-db
+ */
+void Driver::configureCollectionBackend(std::string engine,
+        std::string *error) {
+
+    std::cout << "Driver::configureCollectionBackend called(" << engine << ");" << std::endl;
+
+    utils::string::chomp(&engine);
+    std::vector<std::string> parts = utils::string::split(engine, ':');
+    if (parts.size() != 2) {
+        *error = "SecCollectionBackend:  wrong value";
+        return;
+    }
+
+    std::string e = utils::string::tolower(parts[0]);
+    std::string p = parts[1];
+    p.erase(0, 1);	/* strip extra '/' */
+
+    if (e.compare("lmdb") == 0) {
+#ifdef WITH_LMDB
+        m_collectionBackendType = CollectionBackendLMDB;
+        m_collectionBackendPath.m_set = true;
+        m_collectionBackendPath.m_value = p;
+#else
+        *error = "SecCollectionBackend:  LMDB support is not compiled in";
+#endif
+    } else if (e.compare("redis") == 0) {
+        *error = "SecCollectionBackend:  Redis support is not compiled in";
+    } else if (e.compare("memcache") == 0) {
+        *error = "SecCollectionBackend:  Memcache support is not compiled in";
+    } else {
+        *error = "SecCollectionBackend: unknown engine" ;
+    }
+}
 
 }  // namespace Parser
 }  // namespace modsecurity

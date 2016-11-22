@@ -166,6 +166,18 @@ namespace modsecurity {
 }  // namespace modsecurity
 #endif
 
+   /**
+    *      
+    * Define persistent Collections storage way
+    *
+    */
+    enum CollectionBackendType {
+        CollectionBackendLMDB,
+        CollectionBackendReDIS,
+        CollectionBackendMemcache,
+        CollectionBackendNotSet
+    };
+
 
 
 #include "modsecurity/intervention.h"
@@ -226,6 +238,10 @@ class ModSecurity {
     collection::Collection *m_ip_collection;
     collection::Collection *m_session_collection;
     collection::Collection *m_user_collection;
+
+    int refreshCollections(CollectionBackendType typ, std::string path);
+    CollectionBackendType m_collectionBackendType;
+    std::string m_collectionBackendPath;
 
  private:
     std::string m_connector;

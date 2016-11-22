@@ -47,19 +47,13 @@ namespace modsecurity {
  */
 ModSecurity::ModSecurity()
     : m_connector(""),
-#ifdef WITH_LMDB
-    m_global_collection(new collection::backend::LMDB()),
-    m_resource_collection(new collection::backend::LMDB()),
-    m_ip_collection(new collection::backend::LMDB()),
-    m_session_collection(new collection::backend::LMDB()),
-    m_user_collection(new collection::backend::LMDB()),
-#else
     m_global_collection(new collection::backend::InMemoryPerProcess()),
     m_resource_collection(new collection::backend::InMemoryPerProcess()),
     m_ip_collection(new collection::backend::InMemoryPerProcess()),
     m_session_collection(new collection::backend::InMemoryPerProcess()),
     m_user_collection(new collection::backend::InMemoryPerProcess()),
-#endif
+    m_collectionBackendType(CollectionBackendNotSet),
+    m_collectionBackendPath(NULL),
     m_logCb(NULL) {
     UniqueId::uniqueId();
     srand(time(NULL));
@@ -67,7 +61,6 @@ ModSecurity::ModSecurity()
     curl_global_init(CURL_GLOBAL_ALL);
 #endif
 }
-
 
 ModSecurity::~ModSecurity() {
 #ifdef MSC_WITH_CURL
@@ -81,6 +74,70 @@ ModSecurity::~ModSecurity() {
     delete m_ip_collection;
     delete m_session_collection;
     delete m_user_collection;
+}
+
+int ModSecurity::refreshCollections(CollectionBackendType typ,
+               std::string path) {
+
+    if (m_collectionBackendType == typ &&
+        m_collectionBackendPath == path) {
+        return -255;
+    }
+
+#ifdef WITH_LMDB
+    if (m_collectionBackendType == CollectionBackendLMDB) {
+        collection::backend::LMDB *dbi;
+        int rc;
+
+        dbi = new collection::backend::LMDB();
+        rc = dbi->env_open(m_collectionBackendPath);
+        if (rc != 0) {
+            return rc;
+        }
+        delete m_global_collection;
+        m_global_collection = dbi;
+
+        dbi = new collection::backend::LMDB();
+        rc = dbi->env_open(m_collectionBackendPath);
+        if (rc != 0) {
+            return rc;
+        }
+        delete m_resource_collection;
+        m_resource_collection = dbi;
+
+        dbi = new collection::backend::LMDB();
+        rc = dbi->env_open(m_collectionBackendPath);
+        if (rc != 0) {
+            return rc;
+        }
+        delete m_ip_collection;
+        m_ip_collection = dbi;
+
+        dbi = new collection::backend::LMDB();
+        rc = dbi->env_open(m_collectionBackendPath);
+        if (rc != 0) {
+            return rc;
+        }
+        delete m_session_collection;
+        m_session_collection = dbi;
+
+        dbi = new collection::backend::LMDB();
+        rc = dbi->env_open(m_collectionBackendPath);
+        if (rc != 0) {
+            return rc;
+        }
+        delete m_user_collection;
+        m_user_collection = dbi;
+
+        /* store actual values */
+        m_collectionBackendType = typ;
+        m_collectionBackendPath = path;
+
+        return 0;
+    }
+#endif
+
+    return -255;
 }
 
 

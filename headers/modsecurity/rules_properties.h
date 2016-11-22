@@ -83,7 +83,8 @@ class RulesProperties {
         m_responseBodyLimitAction(PropertyNotSetBodyLimitAction),
         m_secRuleEngine(PropertyNotSetRuleEngine),
         m_uploadKeepFiles(PropertyNotSetConfigBoolean),
-        m_tmpSaveUploadedFiles(PropertyNotSetConfigBoolean) { }
+        m_tmpSaveUploadedFiles(PropertyNotSetConfigBoolean),
+        m_collectionBackendType(CollectionBackendNotSet) {}
 
 
     explicit RulesProperties(DebugLog *debugLog) : m_auditLog(NULL),
@@ -96,7 +97,8 @@ class RulesProperties {
         m_responseBodyLimitAction(PropertyNotSetBodyLimitAction),
         m_secRuleEngine(PropertyNotSetRuleEngine),
         m_uploadKeepFiles(PropertyNotSetConfigBoolean),
-        m_tmpSaveUploadedFiles(PropertyNotSetConfigBoolean) { }
+        m_tmpSaveUploadedFiles(PropertyNotSetConfigBoolean),
+        m_collectionBackendType(CollectionBackendNotSet) {}
 
 
     ~RulesProperties() {
@@ -345,6 +347,19 @@ class RulesProperties {
                 from->m_debugLog->getDebugLogLevel());
         }
 
+        if (to->m_collectionBackendType != CollectionBackendNotSet) {
+            if (from->m_collectionBackendType != CollectionBackendNotSet) {
+                *err << "SecCollectionBackend is duplicated";
+                return -1;
+            }
+            if (from->m_collectionBackendPath.m_set == false) {
+                *err << "SecCollectionBackend db path is not set";
+                return -1;
+            }
+            to->m_collectionBackendType = from->m_collectionBackendType;
+            to->m_collectionBackendPath.m_value = from->m_collectionBackendPath.m_value;
+        }
+
 
         return amount_of_rules;
     }
@@ -418,6 +433,9 @@ class RulesProperties {
     ConfigString m_uploadTmpDirectory;
     std::vector<actions::Action *> defaultActions[8];
     std::vector<modsecurity::Rule *> rules[8];
+
+    CollectionBackendType m_collectionBackendType;
+    ConfigString m_collectionBackendPath;
 };
 
 #endif
