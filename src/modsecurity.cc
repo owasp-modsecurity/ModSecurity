@@ -255,10 +255,8 @@ extern "C" void msc_cleanup(ModSecurity *msc) {
  *
  * @endcode
  */
-extern "C" ModSecurity *msc_init() {
-    ModSecurity *modsec = new ModSecurity();
-
-    return modsec;
+extern "C" ModSecurity *msc_init(void) {
+    return new ModSecurity();
 }
 
 

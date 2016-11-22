@@ -309,10 +309,8 @@ void Rules::dump() {
 }
 
 
-extern "C" Rules *msc_create_rules_set() {
-    Rules *rules = new Rules();
-
-    return rules;
+extern "C" Rules *msc_create_rules_set(void) {
+    return new Rules();
 }
 
 
