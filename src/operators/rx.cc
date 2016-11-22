@@ -28,15 +28,21 @@ namespace operators {
 
 bool Rx::evaluate(Transaction *transaction, const std::string& input) {
     SMatch match;
+    std::list<SMatch> matches;
 
     if (m_param.empty()) {
         return true;
     }
 
-    if (regex_search(input, &match, *m_re) && match.size() >= 1) {
+    matches = m_re->searchAll(input);
+    for (const SMatch& a : matches) {
         if (transaction) {
-            transaction->m_matched.push_back(match.match);
+            transaction->m_matched.push_back(a.match);
+            transaction->debug(7, "Added regex subexpression: " + a.match);
         }
+    }
+
+    if (matches.size() > 0) {
         return true;
     }
 
