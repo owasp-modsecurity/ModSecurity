@@ -88,7 +88,8 @@ void Pm::replaceAll(std::string str, const std::string& from,
     }
 }
 
-bool Pm::evaluate(Transaction *transaction, const std::string &input) {
+bool Pm::evaluate(Transaction *transaction, Rule *rule,
+    const std::string &input) {
     int rc = 0;
     ACMPT pt;
     pt.parser = m_p;
@@ -96,8 +97,17 @@ bool Pm::evaluate(Transaction *transaction, const std::string &input) {
     const char *match = NULL;
 
     rc = acmp_process_quick(&pt, &match, input.c_str(), input.length());
+    bool capture = rule && rule->getActionsByName("capture").size() > 0;
+
     if (rc == 1 && transaction) {
         transaction->m_matched.push_back(std::string(match));
+    }
+
+    if (capture && transaction && rc) {
+        transaction->m_collections.storeOrUpdateFirst("TX", "0",
+            std::string(match));
+        transaction->debug(7, "Added pm match TX.0: " + \
+            std::string(match));
     }
 
     return rc == 1;
