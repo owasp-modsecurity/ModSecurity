@@ -58,6 +58,17 @@ Collections::~Collections() {
     this->clear();
 }
 
+void Collections::refreshCollections(Collection *global,
+        Collection *ip, Collection *session, Collection *user,
+        Collection *resource) {
+/* FIXME:  is there any need to free() resources ? */
+    m_global_collection = global;
+    m_resource_collection = resource;
+    m_ip_collection = ip;
+    m_session_collection = session;
+    m_user_collection = user;
+}
+
 void Collections::storeOrUpdateFirst(const std::string& collectionName,
     const std::string& variableName,
     const std::string& targetValue) {

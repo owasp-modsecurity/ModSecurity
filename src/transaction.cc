@@ -147,7 +147,7 @@ void Transaction::init_collections() {
 
     // FIXME: free resources used by m_collections ???
 
-    m_collections = collection::Collections(m_ms->m_global_collection,
+    m_collections.refreshCollections( m_ms->m_global_collection,
         m_ms->m_ip_collection, m_ms->m_session_collection,
         m_ms->m_user_collection, m_ms->m_resource_collection);
 
