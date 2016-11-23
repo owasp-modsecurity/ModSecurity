@@ -238,7 +238,7 @@ optimization making your “back traces” populated with readable data. Use the
 CFLAGS to disable the compilation optimization parameters:
 
 ```shell
-$ export CFLAGS=”-g -02”
+$ export CFLAGS="-g -O0"
 $ ./build.sh
 $ ./configure
 $ make
