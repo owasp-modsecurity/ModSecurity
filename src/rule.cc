@@ -208,7 +208,7 @@ bool Rule::evaluateActions(Transaction *trasn) {
     for (Action *a : this->actions_runtime_pos) {
         if (a->isDisruptive() == false) {
 #ifndef NO_LOGS
-            trasn->debug(4, "Running (_non_ disruptive) action: " +
+            trasn->debug(4, "Running [III] (_non_ disruptive) action: " +
                 a->m_name + ".");
 #endif
             a->evaluate(this, trasn);
@@ -438,7 +438,7 @@ bool Rule::evaluate(Transaction *trasn) {
                 + "\" (Variable: " + v->m_key + ")");
 #endif
 
-            ret = this->op->evaluateInternal(trasn, value);
+            ret = this->op->evaluateInternal(trasn, this, value);
 
 #ifndef NO_LOGS
             clock_t end = clock();
@@ -486,6 +486,12 @@ bool Rule::evaluate(Transaction *trasn) {
                             trasn->debug(4, "Rule contains a `pass' action");
                         } else {
                             containsDisruptive = true;
+                        }
+                    } else {
+                        if (a->m_name == "setvar") {
+                            trasn->debug(4, "Running [I] (_non_ disruptive) " \
+                                "action: " + a->m_name);
+                            a->evaluate(this, trasn, ruleMessage);
                         }
                     }
                 }
@@ -574,11 +580,14 @@ bool Rule::evaluate(Transaction *trasn) {
 #endif
                             }
                         } else if (!a->isDisruptive()) {
+                            // here
+                            if (a->m_name != "capture" && a->m_name != "setvar") {
 #ifndef NO_LOGS
-                            trasn->debug(4, "Running (_non_ disruptive) " \
-                                "action: " + a->m_name);
+                                trasn->debug(4, "Running [II] (_non_ disruptive) " \
+                                    "action: " + a->m_name);
 #endif
-                            a->evaluate(this, trasn, ruleMessage);
+                                a->evaluate(this, trasn, ruleMessage);
+                            }
                         }
                     }
                 }

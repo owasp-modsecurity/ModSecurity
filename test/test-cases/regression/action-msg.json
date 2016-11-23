@@ -111,8 +111,8 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,capture,t:lowercase,t:none,msg:'This is a test: %{TX.0}% ops'\"",
-      "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,capture,t:none\""
+      "SecRule REQUEST_HEADERS \"@rx PHPSESSID\" \"id:1,capture,t:lowercase,t:none,msg:'This is a test: %{TX.0}% ops'\"",
+      "SecRule TX \"@rx to_test\" \"id:2,t:lowercase,capture,t:none\""
     ]
   }
 ]

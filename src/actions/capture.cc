@@ -33,17 +33,6 @@ namespace actions {
 
 
 bool Capture::evaluate(Rule *rule, Transaction *transaction) {
-    if (transaction->m_matched.empty()) {
-        return false;
-    }
-
-    int i = 0;
-    while (transaction->m_matched.empty() == false) {
-        transaction->m_collections.storeOrUpdateFirst("TX",
-            std::to_string(i), transaction->m_matched.back());
-        transaction->m_matched.pop_back();
-        i++;
-    }
     return true;
 }
 

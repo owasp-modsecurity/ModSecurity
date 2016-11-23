@@ -43,7 +43,12 @@ class Rx : public Operator {
     ~Rx() {
         delete m_re;
     }
-    bool evaluate(Transaction *transaction, const std::string &input);
+    bool evaluate(Transaction *transaction, Rule *rule,
+        const std::string &input) override;
+    bool evaluate(Transaction *transaction,
+        const std::string &input) override {
+        return evaluate(transaction, NULL, input);
+    }
 
  private:
     std::string m_param;

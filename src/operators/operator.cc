@@ -76,6 +76,17 @@ bool Operator::debug(Transaction *transaction, int x, std::string a) {
 
 
 bool Operator::evaluateInternal(Transaction *transaction,
+    Rule *rule, const std::string& a) {
+    bool res = evaluate(transaction, rule, a);
+
+    if (m_negation) {
+        return !res;
+    }
+
+    return res;
+}
+
+bool Operator::evaluateInternal(Transaction *transaction,
     const std::string& a) {
     bool res = evaluate(transaction, a);
 
