@@ -53,7 +53,7 @@ ModSecurity::ModSecurity()
     m_session_collection(new collection::backend::InMemoryPerProcess()),
     m_user_collection(new collection::backend::InMemoryPerProcess()),
     m_collectionBackendType(CollectionBackendNotSet),
-    m_collectionBackendPath(NULL),
+    m_collectionBackendPath(""),
     m_logCb(NULL) {
     UniqueId::uniqueId();
     srand(time(NULL));
