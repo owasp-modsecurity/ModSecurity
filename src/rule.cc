@@ -580,10 +580,11 @@ bool Rule::evaluate(Transaction *trasn) {
 #endif
                             }
                         } else if (!a->isDisruptive()) {
-                            // here
-                            if (a->m_name != "capture" && a->m_name != "setvar") {
+                            if (a->m_name != "capture" \
+                                && a->m_name != "setvar") {
 #ifndef NO_LOGS
-                                trasn->debug(4, "Running [II] (_non_ disruptive) " \
+                                trasn->debug(4, "Running [II] " \
+                                    "(_non_ disruptive) " \
                                     "action: " + a->m_name);
 #endif
                                 a->evaluate(this, trasn, ruleMessage);

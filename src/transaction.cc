@@ -415,7 +415,7 @@ int Transaction::processURI(const char *uri, const char *method,
     m_collections.store("REQUEST_PROTOCOL",
         "HTTP/" + std::string(http_version));
 
-    std::string parsedURI = uri;
+    std::string parsedURI = m_uri_decoded;
     // The more popular case is without domain
     if (!m_uri_decoded.empty() && m_uri_decoded.at(0) != '/') {
         bool fullDomain = true;
