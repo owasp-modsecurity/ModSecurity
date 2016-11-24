@@ -41,6 +41,38 @@ Driver::~Driver() {
     delete loc.back();
 }
 
+void Driver::save_orig(std::string orig) {
+#ifdef AUDITLOG_ENABLED
+    if (m_orig.length() > 0) {
+        m_orig += orig;
+    }
+
+    if (orig == "SecRule" || orig == "SecAction") {
+        m_orig = orig + " ";
+    }
+#endif
+}
+
+std::string Driver::get_orig() {
+#ifdef AUDITLOG_ENABLED
+    std::string orig = m_orig;
+
+    // balance quotes
+    // FIXME:  research if single quotes need to be balanced as well
+    int i, dq;
+    for (i = 0; i < orig.size(); i++) {
+        if (orig[i] == '"') { dq++; }
+    }
+    if (dq % 2 == 1) { orig += "\""; }
+
+    //std::cout << "REQUESTED: " << orig << "\n";
+    m_orig = "";
+    return orig;
+#else
+    return "";
+#endif
+}
+
 
 int Driver::addSecMarker(std::string marker) {
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
@@ -186,6 +218,41 @@ void Driver::error(const yy::location& l, const std::string& m,
     }
 }
 
+/**
+ * SecCollectionBackend lmdb://var/nginx/modsec-db
+ */
+void Driver::configureCollectionBackend(std::string engine,
+        std::string *error) {
+
+    std::cout << "Driver::configureCollectionBackend called(" << engine << ");" << std::endl;
+
+    utils::string::chomp(&engine);
+    std::vector<std::string> parts = utils::string::split(engine, ':');
+    if (parts.size() != 2) {
+        *error = "SecCollectionBackend:  wrong value";
+        return;
+    }
+
+    std::string e = utils::string::tolower(parts[0]);
+    std::string p = parts[1];
+    p.erase(0, 1);	/* strip extra '/' */
+
+    if (e.compare("lmdb") == 0) {
+#ifdef WITH_LMDB
+        m_collectionBackendType = CollectionBackendLMDB;
+        m_collectionBackendPath.m_set = true;
+        m_collectionBackendPath.m_value = p;
+#else
+        *error = "SecCollectionBackend:  LMDB support is not compiled in";
+#endif
+    } else if (e.compare("redis") == 0) {
+        *error = "SecCollectionBackend:  Redis support is not compiled in";
+    } else if (e.compare("memcache") == 0) {
+        *error = "SecCollectionBackend:  Memcache support is not compiled in";
+    } else {
+        *error = "SecCollectionBackend: unknown engine" ;
+    }
+}
 
 }  // namespace Parser
 }  // namespace modsecurity

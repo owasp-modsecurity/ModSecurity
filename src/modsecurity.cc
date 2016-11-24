@@ -47,27 +47,21 @@ namespace modsecurity {
  */
 ModSecurity::ModSecurity()
     : m_connector(""),
-#ifdef WITH_LMDB
-    m_global_collection(new collection::backend::LMDB()),
-    m_resource_collection(new collection::backend::LMDB()),
-    m_ip_collection(new collection::backend::LMDB()),
-    m_session_collection(new collection::backend::LMDB()),
-    m_user_collection(new collection::backend::LMDB()),
-#else
     m_global_collection(new collection::backend::InMemoryPerProcess()),
     m_resource_collection(new collection::backend::InMemoryPerProcess()),
     m_ip_collection(new collection::backend::InMemoryPerProcess()),
     m_session_collection(new collection::backend::InMemoryPerProcess()),
     m_user_collection(new collection::backend::InMemoryPerProcess()),
-#endif
-    m_logCb(NULL) {
+    m_collectionBackendType(CollectionBackendNotSet),
+    m_collectionBackendPath(""),
+    m_logCb(NULL),
+    m_logLevel(0) {
     UniqueId::uniqueId();
     srand(time(NULL));
 #ifdef MSC_WITH_CURL
     curl_global_init(CURL_GLOBAL_ALL);
 #endif
 }
-
 
 ModSecurity::~ModSecurity() {
 #ifdef MSC_WITH_CURL
@@ -81,6 +75,43 @@ ModSecurity::~ModSecurity() {
     delete m_ip_collection;
     delete m_session_collection;
     delete m_user_collection;
+}
+
+int ModSecurity::refreshCollections(CollectionBackendType typ,
+               std::string path) {
+
+    if (m_collectionBackendType == typ &&
+        m_collectionBackendPath == path) {
+        return -255;
+    }
+
+#ifdef WITH_LMDB
+    if (m_collectionBackendType == CollectionBackendLMDB) {
+        collection::backend::LMDB *dbi;
+        int rc;
+
+#define LMDB_COLL_REFRESH(COLL)                      \
+        dbi = new collection::backend::LMDB();       \
+        rc = dbi->env_open(m_collectionBackendPath); \
+        if (rc != 0) { return rc; }                  \
+        delete COLL;                                 \
+        COLL = dbi;
+
+        LMDB_COLL_REFRESH(m_global_collection);
+        LMDB_COLL_REFRESH(m_resource_collection);
+        LMDB_COLL_REFRESH(m_ip_collection);
+        LMDB_COLL_REFRESH(m_session_collection);
+        LMDB_COLL_REFRESH(m_user_collection);
+
+        /* store actual values */
+        m_collectionBackendType = typ;
+        m_collectionBackendPath = path;
+
+        return 0;
+    }
+#endif
+
+    return -255;
 }
 
 
@@ -162,16 +193,19 @@ const std::string& ModSecurity::getConnectorInformation() {
 
 
 void ModSecurity::serverLog(void *data, const std::string& msg) {
+//std::cout << "ModSecurity[" << (void*) this << "]::serverLog(" << (void *) m_logCb  << "," << m_logLevel << ") is called\n";
     if (m_logCb == NULL) {
         std::cout << "Server log callback is not set -- " << msg << std::endl;
     } else {
-        m_logCb(data, msg.c_str());
+        m_logCb(m_logLevel, data, msg.c_str());
     }
 }
 
 
-void ModSecurity::setServerLogCb(LogCb cb) {
+void ModSecurity::setServerLogCb(LogCb cb, int log_level) {
+//std::cout << "ModSecurity[" << (void*) this << "]::setServerLogCb(" << (void *) cb << "," << log_level << ") is called\n";
     m_logCb = (LogCb) cb;
+    m_logLevel = log_level;
 }
 
 /**
@@ -186,8 +220,8 @@ void ModSecurity::setServerLogCb(LogCb cb) {
  * will be passed.
  *
  */
-extern "C" void msc_set_log_cb(ModSecurity *msc, LogCb cb) {
-    msc->setServerLogCb(cb);
+extern "C" void msc_set_log_cb(ModSecurity *msc, LogCb cb, int log_level) {
+    msc->setServerLogCb(cb, log_level);
 }
 
 /**

@@ -51,6 +51,8 @@ class LMDB :
  public:
     LMDB();
     ~LMDB();
+    int env_open(std::string db_path);
+
     void store(std::string key, std::string value) override;
 
     bool storeOrUpdateFirst(const std::string &key,

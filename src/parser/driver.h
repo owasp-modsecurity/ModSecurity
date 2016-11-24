@@ -58,6 +58,7 @@ class Driver : public RulesProperties {
     int addSecRule(Rule *rule);
     int addSecAction(Rule *rule);
     int addSecMarker(std::string marker);
+    void configureCollectionBackend(std::string engine, std::string *error);
 
     int result;
 
@@ -67,6 +68,9 @@ class Driver : public RulesProperties {
 
     int parseFile(const std::string& f);
     int parse(const std::string& f, const std::string &ref);
+
+    void save_orig(std::string orig);
+    std::string get_orig();
 
     std::string file;
 
@@ -81,6 +85,8 @@ class Driver : public RulesProperties {
     std::list<std::string> ref;
     std::string buffer;
     Rule *lastRule;
+
+    std::string m_orig;
 };
 
 

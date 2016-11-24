@@ -61,6 +61,7 @@ ACTION_XMLNS                            (?i:xmlns)
 AUDIT_PARTS                             [ABCDEFHJKIZ]+
 COL_FREE_TEXT_SPACE_COMMA               ([^,"])+
 COL_NAME                                [A-Za-z]+
+CONFIG_DIR_COLL_BACKEND                 (?i:SecCollectionsBackend)
 CONFIG_COMPONENT_SIG                    (?i:SecComponentSignature)
 CONFIG_DIR_AUDIT_DIR                    (?i:SecAuditLogStorageDir)
 CONFIG_DIR_AUDIT_DIR_MOD                (?i:SecAuditLogDirMode)
@@ -178,6 +179,7 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
 %{
   // Code run each time yylex is called.
   driver.loc.back()->step();
+  driver.save_orig(yytext);
 %}
 {ACTION_ACCURACY}:'{FREE_TEXT_QUOTE}'                                   { return p::make_ACTION_ACCURACY(yytext, *driver.loc.back()); }
 {ACTION_ACCURACY}:{FREE_TEXT_QUOTE}                                     { return p::make_ACTION_ACCURACY(yytext, *driver.loc.back()); }
@@ -286,6 +288,7 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
 {TRANSFORMATION}                                                        { return p::make_TRANSFORMATION(yytext, *driver.loc.back()); }
 {CONFIG_SEC_REMOTE_RULES_FAIL_ACTION}                                   { return p::make_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION(yytext, *driver.loc.back()); }
 {CONFIG_SEC_COLLECTION_TIMEOUT}[ ]{CONFIG_VALUE_NUMBER}                 { return p::make_CONFIG_SEC_COLLECTION_TIMEOUT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+{CONFIG_DIR_COLL_BACKEND}[ ]{CONFIG_VALUE_PATH}                         { return p::make_CONFIG_DIR_COLL_BACKEND(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 [ \t]*[\n]                                                              { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 #[ \t]*SecRule[^\\].*\\[ \t]*[\r\n]*                                    { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT); }
 #[ \t]*SecAction[^\\].*\\[ \t]*[^\\n]                                   { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }

@@ -37,15 +37,21 @@ namespace backend {
 
 LMDB::LMDB() : m_env(NULL) {
     mdb_env_create(&m_env);
-    mdb_env_open(m_env, "./modsec-shared-collections",
-        MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
 }
-
 
 LMDB::~LMDB() {
     mdb_env_close(m_env);
 }
 
+/* FIXME: document possible return values 
+ * ENOMEM -- memory allocation failure
+ * EINVAL -- unable to find/open db file
+ */
+int LMDB::env_open(std::string db_path)
+{
+    return mdb_env_open(m_env, db_path.c_str(),
+        MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
+}
 
 void LMDB::string2val(const std::string& str, MDB_val *val) {
     val->mv_size = sizeof(char)*(str.size());

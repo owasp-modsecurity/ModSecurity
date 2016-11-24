@@ -125,6 +125,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_allowType(modsecurity::actions::NoneAllowType),
     m_skip_next(0),
     m_creationTimeStamp(utils::cpu_seconds()),
+    m_interceptMessage(""),
     m_logCbData(logCbData),
     m_ms(ms),
     m_collections(ms->m_global_collection, ms->m_ip_collection,
@@ -135,6 +136,21 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_id = std::to_string(this->m_timeStamp) + \
         std::to_string(modsecurity::utils::generate_transaction_unique_id());
     m_rules->incrementReferenceCount();
+
+    this->init_collections();
+
+#ifndef NO_LOGS
+    this->debug(4, "Initializing transaction");
+#endif
+}
+
+void Transaction::init_collections() {
+
+    // FIXME: free resources used by m_collections ???
+
+    m_collections.refreshCollections( m_ms->m_global_collection,
+        m_ms->m_ip_collection, m_ms->m_session_collection,
+        m_ms->m_user_collection, m_ms->m_resource_collection);
 
     m_collections.store("ARGS_COMBINED_SIZE", std::string("0"));
     m_ARGScombinedSizeStr = m_collections.resolveFirst("ARGS_COMBINED_SIZE");
@@ -155,10 +171,6 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
         "RESPONSE_CONTENT_TYPE");
 
     m_collections.storeOrUpdateFirst("URLENCODED_ERROR", "0");
-
-#ifndef NO_LOGS
-    this->debug(4, "Initialising transaction");
-#endif
 }
 
 
@@ -229,6 +241,20 @@ int Transaction::processConnection(const char *client, int cPort,
     this->m_serverIpAddress = server;
     this->m_clientPort = cPort;
     this->m_serverPort = sPort;
+
+    // Check and apply CollectionBackend engine
+    if (m_rules->m_collectionBackendType != CollectionBackendNotSet) {
+        int rc;
+        rc = m_ms->refreshCollections(m_rules->m_collectionBackendType, m_rules->m_collectionBackendPath.m_value);
+        if (rc == 0) {
+            this->init_collections();
+        } else if (rc == -255) {
+            /* ignore error */
+        } else {
+            /* FIXME:  display LMDB db opening error (LMDB::env_open() failed) */
+        }
+    }
+    
 #ifndef NO_LOGS
     debug(4, "Transaction context created.");
     debug(4, "Starting phase CONNECTION. (SecRules 0)");
@@ -1281,10 +1307,15 @@ bool Transaction::intervention(ModSecurityIntervention *it) {
     it->status = 200;
     it->url = NULL;
     it->disruptive = false;
+    it->log = NULL;
+    it->intercept_msg = NULL;
     if (m_actions.size() > 0) {
         for (Action *a : m_actions) {
             if (a->action_kind == Action::Kind::RunTimeOnlyIfMatchKind) {
                 a->fillIntervention(it);
+                if (this->m_interceptMessage != "") {
+                    it->intercept_msg = this->m_interceptMessage.c_str();
+                }
             }
             if (a->temporaryAction) {
                 delete a;
@@ -1390,8 +1421,16 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         /** TODO: write audit_log D part. */
     }
     if (parts & audit_log::AuditLog::EAuditLogPart) {
+        /* FIXME:  check if it's working as expected, and nginx passes
+         * special response (403, etc)
+         */
         audit_log << "--" << trailer << "-" << "E--" << std::endl;
-        /** TODO: write audit_log E part. */
+#ifdef AUDITLOG_ENABLED
+        std::string body = this->m_responseBody.str();
+        if (body.size() > 0) {
+            audit_log << body << std::endl;
+        }
+#endif
     }
     if (parts & audit_log::AuditLog::FAuditLogPart) {
         std::vector<const collection::Variable *> l;
@@ -1410,7 +1449,12 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     }
     if (parts & audit_log::AuditLog::HAuditLogPart) {
         audit_log << "--" << trailer << "-" << "H--" << std::endl;
-        /** TODO: write audit_log H part. */
+#ifdef AUDITLOG_ENABLED
+        for (int i = 0; i < this->m_rules->m_auditLog->m_fired_messages.size(); i++) {
+            std::string m = this->m_rules->m_auditLog->m_fired_messages[i];
+            audit_log << m << std::endl;
+        }
+#endif
     }
     if (parts & audit_log::AuditLog::IAuditLogPart) {
         audit_log << "--" << trailer << "-" << "I--" << std::endl;
@@ -1422,7 +1466,14 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     }
     if (parts & audit_log::AuditLog::KAuditLogPart) {
         audit_log << "--" << trailer << "-" << "K--" << std::endl;
-        /** TODO: write audit_log K part. */
+#ifdef AUDITLOG_ENABLED
+        for (int i = 0; i < this->m_rules->m_auditLog->m_fired_rules.size(); i++) {
+            Rule *r = this->m_rules->m_auditLog->m_fired_rules[i];
+            if (r->m_plainText.size() > 0) {
+                audit_log << r->m_plainText << std::endl << std::endl;
+            }
+        }
+#endif
     }
     audit_log << "--" << trailer << "-" << "Z--" << std::endl << std::endl;
 
