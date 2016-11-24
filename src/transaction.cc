@@ -125,6 +125,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_allowType(modsecurity::actions::NoneAllowType),
     m_skip_next(0),
     m_creationTimeStamp(utils::cpu_seconds()),
+    m_interceptMessage(""),
     m_logCbData(logCbData),
     m_ms(ms),
     m_collections(ms->m_global_collection, ms->m_ip_collection,
@@ -1306,10 +1307,15 @@ bool Transaction::intervention(ModSecurityIntervention *it) {
     it->status = 200;
     it->url = NULL;
     it->disruptive = false;
+    it->log = NULL;
+    it->intercept_msg = NULL;
     if (m_actions.size() > 0) {
         for (Action *a : m_actions) {
             if (a->action_kind == Action::Kind::RunTimeOnlyIfMatchKind) {
                 a->fillIntervention(it);
+                if (this->m_interceptMessage != "") {
+                    it->intercept_msg = this->m_interceptMessage.c_str();
+                }
             }
             if (a->temporaryAction) {
                 delete a;

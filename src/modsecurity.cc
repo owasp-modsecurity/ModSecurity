@@ -54,7 +54,8 @@ ModSecurity::ModSecurity()
     m_user_collection(new collection::backend::InMemoryPerProcess()),
     m_collectionBackendType(CollectionBackendNotSet),
     m_collectionBackendPath(""),
-    m_logCb(NULL) {
+    m_logCb(NULL),
+    m_logLevel(0) {
     UniqueId::uniqueId();
     srand(time(NULL));
 #ifdef MSC_WITH_CURL
@@ -192,16 +193,19 @@ const std::string& ModSecurity::getConnectorInformation() {
 
 
 void ModSecurity::serverLog(void *data, const std::string& msg) {
+//std::cout << "ModSecurity[" << (void*) this << "]::serverLog(" << (void *) m_logCb  << "," << m_logLevel << ") is called\n";
     if (m_logCb == NULL) {
         std::cout << "Server log callback is not set -- " << msg << std::endl;
     } else {
-        m_logCb(data, msg.c_str());
+        m_logCb(m_logLevel, data, msg.c_str());
     }
 }
 
 
-void ModSecurity::setServerLogCb(LogCb cb) {
+void ModSecurity::setServerLogCb(LogCb cb, int log_level) {
+//std::cout << "ModSecurity[" << (void*) this << "]::setServerLogCb(" << (void *) cb << "," << log_level << ") is called\n";
     m_logCb = (LogCb) cb;
+    m_logLevel = log_level;
 }
 
 /**
@@ -216,8 +220,8 @@ void ModSecurity::setServerLogCb(LogCb cb) {
  * will be passed.
  *
  */
-extern "C" void msc_set_log_cb(ModSecurity *msc, LogCb cb) {
-    msc->setServerLogCb(cb);
+extern "C" void msc_set_log_cb(ModSecurity *msc, LogCb cb, int log_level) {
+    msc->setServerLogCb(cb, log_level);
 }
 
 /**

@@ -372,6 +372,12 @@ class Transaction {
     RequestBodyProcessor::XML *m_xml;
     RequestBodyProcessor::JSON *m_json;
 
+    /**
+     * FIXME: document
+     *
+     */
+    std::string m_interceptMessage;
+
  private:
     std::string *m_ARGScombinedSizeStr;
     std::string *m_namesArgs;

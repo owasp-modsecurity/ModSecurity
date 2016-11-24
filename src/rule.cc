@@ -286,6 +286,7 @@ bool Rule::evaluate(Transaction *trasn) {
     RuleMessage *ruleMessage = NULL;
 
     trasn->m_matched.clear();
+    trasn->m_interceptMessage = "";
 
     if (m_secmarker == true) {
         return true;
@@ -635,6 +636,8 @@ bool Rule::evaluate(Transaction *trasn) {
         /* AUDITLOG:  save fired message for auditlog */
         trasn->m_rules->m_auditLog->m_fired_messages.push_back(ruleMessage->errorLog(trasn));
 #endif
+        /* save intercept message for later error's error_log post */
+        trasn->m_interceptMessage = ruleMessage->m_match;
     }
     delete ruleMessage;
 
