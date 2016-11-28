@@ -20,6 +20,7 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
+#include "src/utils/string.h"
 
 #include "src/actions/block.h"
 #include "src/actions/chain.h"
@@ -33,7 +34,7 @@
 #include "src/actions/pass.h"
 #include "src/actions/log.h"
 #include "src/actions/no_log.h"
-
+#include "src/actions/multi_match.h"
 
 
 #define IF_MATCH(a) \
@@ -96,6 +97,9 @@ Action *Action::instantiate(const std::string& name) {
     }
     if (name == "nolog") {
         return new NoLog(name);
+    }
+    if (utils::string::tolower(name) == "multimatch") {
+        return new MultiMatch(utils::string::tolower(name));
     }
     return new Action(name);
 }

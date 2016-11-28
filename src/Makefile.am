@@ -104,6 +104,7 @@ ACTIONS = \
 	actions/log_data.cc \
 	actions/maturity.cc \
 	actions/msg.cc \
+	actions/multi_match.cc \
 	actions/no_audit_log.cc \
 	actions/no_log.cc \
 	actions/pass.cc \
