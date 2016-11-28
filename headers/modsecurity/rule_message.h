@@ -49,22 +49,6 @@ class RuleMessage {
         m_match(std::string(""))
     { }
 
-    RuleMessage(Rule *rule, std::string message) :
-        m_ruleFile(rule->m_fileName),
-        m_ruleLine(rule->m_lineNumber),
-        m_ruleId(rule->rule_id),
-        m_rev(rule->m_rev),
-        m_accuracy(rule->m_accuracy),
-        m_message(message),
-        m_data(std::string("")),
-        m_severity(0),
-        m_ver(rule->m_ver),
-        m_maturity(rule->m_maturity),
-        m_rule(rule),
-        m_saveMessage(false),
-        m_match(std::string(""))
-    { }
-
     std::string errorLog(Transaction *trans);
 
 
@@ -81,6 +65,8 @@ class RuleMessage {
     int m_accuracy;
 
     std::list<std::string> m_tags;
+    std::vector<actions::Action *> m_tmp_actions;
+    std::list<std::string> m_server_logs;
 
     Rule *m_rule;
     bool m_saveMessage;

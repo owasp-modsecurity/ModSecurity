@@ -32,6 +32,7 @@ namespace actions {
 bool LogData::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
     rm->m_data = data(transaction);
 
+    transaction->m_collections.storeOrUpdateFirst("RULE:logdata", rm->m_data);
     return true;
 }
 

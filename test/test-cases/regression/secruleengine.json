@@ -5,7 +5,7 @@
     "title":"Testing Disruptive actions (1/n)",
     "expected":{
       "debug_log": " Running action: deny",
-      "http_code":404
+      "http_code":403
     },
     "rules":[
       "SecRuleEngine On",
@@ -34,7 +34,7 @@
     "version_min":300000,
     "title":"Testing Disruptive actions (3/n)",
     "expected":{
-      "debug_log": "Not running disruptive action: block. SecRuleEngine is not On",
+      "debug_log": "_Not_ running action: deny. Rule _does not_contains a disruptive action, but SecRuleEngine is not On.",
       "http_code":200
     },
     "rules":[

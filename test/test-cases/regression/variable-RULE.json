@@ -256,7 +256,7 @@
       ]
     },
     "expected":{
-      "debug_log":" Target value: \"message123\" \\(Variable: RULE:msg\\)"
+      "debug_log":" Target value: \"message123\" \\(Variable: rule:msg\\)"
     },
     "rules":[
       "SecRuleEngine On",
@@ -304,7 +304,7 @@
     },
     "rules":[
       "SecRuleEngine On",
-      "SecRule rule:msg \"@contains message\" \"id:1,setvar:'ip.block_reason=%{RULE.msg}%',msg:'message123',phase:3,pass,t:trim\""
+      "SecRule rule:msg \"@contains message\" \"id:1,msg:'message123',setvar:'ip.block_reason=%{RULE.msg}%',phase:3,pass,t:trim\""
     ]
   }
 ]

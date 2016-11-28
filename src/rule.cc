@@ -586,8 +586,9 @@ bool Rule::evaluate(Transaction *trasn) {
                     &containsDisruptive, &ruleMessage);
                 std::string msg2save = ruleMessage.errorLog(trasn);
                 if (ruleMessage.m_message.empty() == false) {
-                    trasn->debug(4, "Scheduled to be saved on the server " +
-                        "log: " + msg2save + "");
+                    trasn->debug(4,
+                        "Scheduled to be saved on the server log: " \
+                        + msg2save + "");
                     ruleMessage.m_server_logs.push_back(msg2save);
                 }
                 globalRet = true;

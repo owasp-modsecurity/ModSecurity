@@ -49,7 +49,7 @@
     },
     "expected": {
       "audit_log": "",
-      "debug_log": "Running unconditional rule.",
+      "debug_log": "Executing unconditional rule",
       "error_log": ""
     },
     "rules": [
