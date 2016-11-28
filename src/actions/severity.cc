@@ -82,6 +82,9 @@ bool Severity::evaluate(Rule *rule, Transaction *transaction,
     if (transaction->m_highestSeverityAction > this->m_severity) {
         transaction->m_highestSeverityAction = this->m_severity;
     }
+
+    transaction->m_collections.storeOrUpdateFirst("RULE:severity",
+        std::to_string(m_severity));
     return true;
 }
 

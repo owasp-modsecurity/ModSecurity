@@ -73,7 +73,7 @@ std::string MacroExpansion::expand(const std::string& input,
             std::string var = std::string(variable, collection + 1,
                 variable.length() - (collection + 1));
 
-            if (utils::string::toupper(col) == "RULE") {
+            /*if (utils::string::toupper(col) == "RULE") {
                 if (rule == NULL) {
                     transaction->debug(9, "macro expansion: cannot resolve " \
                         "RULE variable without the Rule object");
@@ -89,6 +89,10 @@ std::string MacroExpansion::expand(const std::string& input,
                 for (auto *i : l) {
                     delete i;
                 }
+            }*/
+            if (utils::string::toupper(col) == "RULE") {
+                variableValue = transaction->m_collections.resolveFirst(
+                    "RULE:" + var);
             } else {
                 variableValue = transaction->m_collections.resolveFirst(col,
                     var);

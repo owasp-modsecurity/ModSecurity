@@ -945,12 +945,20 @@ var:
       {
         std::string name($1);
         CHECK_VARIATION_DECL
+        CHECK_VARIATION(&) { var = new Count(new Variable(name, Variable::VariableKind::DirectVariable)); }
+        CHECK_VARIATION(!) { var = new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)); }
+        if (!var) { var = new Variable(name, Variable::VariableKind::DirectVariable); }
+        $$ = var;
+    /*
+        std::string name($1);
+        CHECK_VARIATION_DECL
         CHECK_VARIATION(&) { var = new Count(
             new modsecurity::Variables::Rule(name)); }
         CHECK_VARIATION(!) { var = new Exclusion(
             new modsecurity::Variables::Rule(name)); }
         if (!var) { var = new modsecurity::Variables::Rule(name); }
         $$ = var;
+      */
       }
     ;
 

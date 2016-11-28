@@ -53,57 +53,7 @@ namespace Variables {
 void Rule::evaluateInternal(Transaction *t,
     modsecurity::Rule *rule,
     std::vector<const collection::Variable *> *l) {
-    std::map<std::string, std::string> envs;
-    std::string m_name_upper = utils::string::toupper(m_name);
-
-    // id
-    envs.insert(std::pair<std::string, std::string>("RULE:id",
-        std::to_string(rule->rule_id)));
-
-    // rev
-    envs.insert(std::pair<std::string, std::string>("RULE:rev",
-        rule->m_rev));
-
-    // severity
-    std::vector<actions::Action *> acts = rule->getActionsByName("severity");
-    for (actions::Action *i : acts) {
-        actions::Severity *a = reinterpret_cast<actions::Severity *>(i);
-        if (a) {
-            envs.insert(std::pair<std::string, std::string>("RULE:severity",
-                std::to_string(a->m_severity)));
-        }
-    }
-
-    // logdata
-    acts = rule->getActionsByName("logdata");
-    for (actions::Action *i : acts) {
-        actions::LogData *a = reinterpret_cast<actions::LogData *>(i);
-        if (a) {
-            envs.insert(std::pair<std::string, std::string>("RULE:logdata",
-                a->data(t)));
-        }
-    }
-
-    // msg
-    acts = rule->getActionsByName("msg");
-    for (actions::Action *i : acts) {
-        actions::Msg *a = reinterpret_cast<actions::Msg *>(i);
-        if (a) {
-            std::string data = a->data(t);
-            envs.insert(std::pair<std::string, std::string>("RULE:msg",
-                data));
-        }
-    }
-
-    for (auto& x : envs) {
-        std::string xup = utils::string::toupper(x.first);
-        if ((xup.substr(0, m_name_upper.size() + 1)
-            .compare(m_name_upper + ":") != 0)
-            && (xup != m_name_upper)) {
-            continue;
-        }
-        l->push_back(new collection::Variable(x.first, x.second));
-    }
+    // Variable rule is now being saved as part of the transient collection.
 }
 
 }  // namespace Variables

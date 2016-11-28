@@ -24,6 +24,7 @@
 #define HEADERS_MODSECURITY_RULE_H_
 
 #include "modsecurity/transaction.h"
+#include "modsecurity/collection/variable.h"
 
 
 #ifdef __cplusplus
@@ -51,11 +52,26 @@ class Rule {
     ~Rule();
     bool evaluate(Transaction *transaction);
     bool evaluateActions(Transaction *transaction);
+    std::vector<const collection::Variable *> getFinalVars(Transaction *trasn);
+    void executeActionsAfterFullMatch(Transaction *trasn,
+        bool containsDisruptive, RuleMessage *ruleMessage);
+    std::vector<std::string> executeSecDefaultActionTransofrmations(
+        Transaction *trasn, std::string &value, bool multiMatch);
+    bool executeOperatorAt(Transaction *trasn, std::string key,
+        std::string value);
+    void executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
+        bool *b, RuleMessage *ruleMessage);
+    std::string resolveMatchMessage(std::string key, std::string value);
+    void updateMatchedVars(Transaction *trasn, std::string key,
+        std::string value);
+    void cleanMatchedVars(Transaction *trasn);
+    void updateRulesVariable(Transaction *trasn);
+
 
     operators::Operator *op;
-    std::vector<actions::Action *> actions_conf;
-    std::vector<actions::Action *> actions_runtime_pre;
-    std::vector<actions::Action *> actions_runtime_pos;
+    std::vector<actions::Action *> m_actionsConf;
+    std::vector<actions::Action *> m_actionsRuntimePre;
+    std::vector<actions::Action *> m_actionsRuntimePos;
 
     std::vector<std::string> getActionNames();
     std::vector<actions::Action *> getActionsByName(const std::string& name);
@@ -87,7 +103,6 @@ class Rule {
     std::string m_fileName;
     int m_lineNumber;
 
-    std::string m_log_message;
     std::string m_log_data;
     int m_accuracy;
     int m_maturity;
