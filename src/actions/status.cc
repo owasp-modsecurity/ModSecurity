@@ -20,6 +20,7 @@
 
 #include "modsecurity/transaction.h"
 
+
 namespace modsecurity {
 namespace actions {
 
@@ -36,8 +37,8 @@ bool Status::init(std::string *error) {
 }
 
 
-bool Status::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->m_actions.push_back(this);
+bool Status::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+    rm->m_tmp_actions.push_back(this);
     return true;
 }
 

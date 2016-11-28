@@ -16,6 +16,7 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "modsecurity/rule_message.h"
 
 #ifndef SRC_ACTIONS_STATUS_H_
 #define SRC_ACTIONS_STATUS_H_
@@ -32,7 +33,8 @@ class Status : public Action {
     explicit Status(std::string action) : Action(action, 2) { }
 
     bool init(std::string *error) override;
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm)
+        override;
     void fillIntervention(ModSecurityIntervention *i) override;
 
  protected:

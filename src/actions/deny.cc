@@ -24,11 +24,11 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Deny::evaluate(Rule *rule, Transaction *transaction) {
+bool Deny::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
 #ifndef NO_LOGS
     transaction->debug(8, "Running action deny");
 #endif
-    transaction->m_actions.push_back(this);
+    rm->m_tmp_actions.push_back(this);
     return true;
 }
 

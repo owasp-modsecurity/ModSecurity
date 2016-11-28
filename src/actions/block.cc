@@ -26,13 +26,13 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Block::evaluate(Rule *rule, Transaction *transaction) {
+bool Block::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
 #ifndef NO_LOGS
     transaction->debug(8, "Running action block");
 #endif
-    for (Action *a : rule->actions_runtime_pos) {
+    for (Action *a : rule->m_actionsRuntimePos) {
         if (a->isDisruptive() == true) {
-            transaction->m_actions.push_back(a);
+            rm->m_tmp_actions.push_back(a);
         }
     }
     return true;

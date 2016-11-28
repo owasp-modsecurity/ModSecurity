@@ -16,6 +16,7 @@
 #include <string>
 
 #include "modsecurity/actions/action.h"
+#include "modsecurity/rule_message.h"
 
 #ifndef SRC_ACTIONS_BLOCK_H_
 #define SRC_ACTIONS_BLOCK_H_
@@ -33,7 +34,8 @@ class Block : public Action {
  public:
     explicit Block(std::string action) : Action(action) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(Rule *rule, Transaction *transaction,
+        RuleMessage *rm) override;
     void fillIntervention(ModSecurityIntervention *i) override;
     bool isDisruptive() override { return true; }
 };

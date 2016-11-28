@@ -22,6 +22,7 @@
 #include "modsecurity/transaction.h"
 #include "src/macro_expansion.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rule_message.h"
 
 /*
  * Description: Assigns a custom message to the rule or chain in which it
@@ -45,14 +46,12 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Msg::evaluate(Rule *rule, Transaction *transaction) {
-#ifndef NO_LOGS
-    std::string msg = MacroExpansion::expand(m_parser_payload, transaction);
+bool Msg::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+    std::string msg = data(transaction);
     transaction->debug(9, "Saving msg: " + msg);
-#endif
+    rm->m_message = msg;
 
-    rule->m_log_message = data(transaction);
-
+    transaction->m_collections.storeOrUpdateFirst("RULE:msg", msg);
     return true;
 }
 

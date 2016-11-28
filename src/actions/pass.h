@@ -29,7 +29,8 @@ class Pass : public Action {
  public:
     explicit Pass(std::string action) : Action(action) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm)
+        override;
     bool isDisruptive() override { return true; }
 };
 

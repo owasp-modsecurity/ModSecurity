@@ -20,12 +20,14 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rule_message.h"
 
 namespace modsecurity {
 namespace actions {
 
 
-bool Pass::evaluate(Rule *rule, Transaction *transaction) {
+bool Pass::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+    rm->m_tmp_actions.clear();
     return true;
 }
 
