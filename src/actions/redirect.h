@@ -31,7 +31,10 @@ namespace actions {
 class Redirect : public Action {
  public:
     explicit Redirect(const std::string &action)
-        : Action(action, RunTimeOnlyIfMatchKind) { }
+        : Action(action, RunTimeOnlyIfMatchKind),
+        m_status(0),
+        m_urlExpanded(""),
+        m_url("") { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
     bool init(std::string *error) override;

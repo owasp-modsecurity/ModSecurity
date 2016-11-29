@@ -42,17 +42,17 @@ namespace modsecurity {
 namespace audit_log {
 
 AuditLog::AuditLog()
-    : m_status(OffAuditLogStatus),
-    m_path1(""),
+    : m_path1(""),
     m_path2(""),
     m_storage_dir(""),
+    m_filePermission(0600),
+    m_directoryPermission(0766),
     m_parts(AAuditLogPart | BAuditLogPart | CAuditLogPart | FAuditLogPart
             | HAuditLogPart | ZAuditLogPart),
+    m_status(OffAuditLogStatus),
     m_type(ParallelAuditLogType),
-    m_writer(NULL),
     m_relevant(""),
-    filePermission(0600),
-    directoryPermission(0766),
+    m_writer(NULL),
     m_refereceCount(0) { }
 
 AuditLog::~AuditLog() {
@@ -74,13 +74,13 @@ void AuditLog::refCountDecreaseAndCheck() {
 }
 
 bool AuditLog::setStorageDirMode(int permission) {
-    this->directoryPermission = permission;
+    this->m_directoryPermission = permission;
     return true;
 }
 
 
 bool AuditLog::setFileMode(int permission) {
-    this->filePermission = permission;
+    this->m_filePermission = permission;
     return true;
 }
 

@@ -114,13 +114,13 @@ bool Parallel::write(Transaction *transaction, int parts) {
 
     utils::createDir((logPath +
         logFilePath(&transaction->m_timeStamp, YearMonthDayDirectory)).c_str(),
-        m_audit->directoryPermission);
+        m_audit->m_directoryPermission);
     utils::createDir((logPath +
         logFilePath(&transaction->m_timeStamp, YearMonthDayDirectory
             | YearMonthDayAndTimeDirectory)).c_str(),
-        m_audit->directoryPermission);
+        m_audit->m_directoryPermission);
 
-    fd = open(fileName.c_str(), O_CREAT | O_WRONLY, m_audit->filePermission);
+    fd = open(fileName.c_str(), O_CREAT | O_WRONLY, m_audit->m_filePermission);
     if (fd < 0) {
         return false;
     }

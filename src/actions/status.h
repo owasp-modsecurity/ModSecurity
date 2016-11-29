@@ -30,7 +30,8 @@ namespace actions {
 
 class Status : public Action {
  public:
-    explicit Status(std::string action) : Action(action, 2) { }
+    explicit Status(std::string action) : Action(action, 2),
+    m_status(0) { }
 
     bool init(std::string *error) override;
     bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm)

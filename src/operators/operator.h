@@ -58,8 +58,8 @@ class Operator {
         return evaluate(transaction, str);
     }
 
-    bool m_negation;
     std::string m_match_message;
+    bool m_negation;
     std::string m_op;
     std::string m_param;
 

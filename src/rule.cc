@@ -519,7 +519,6 @@ void Rule::executeActionsAfterFullMatch(Transaction *trasn,
 
 
 bool Rule::evaluate(Transaction *trasn) {
-    bool isThisAChainedRule = rule_id == 0;
     bool globalRet = false;
     std::vector<Variable *> *variables = this->variables;
     bool recursiveGlobalRet;
@@ -571,13 +570,13 @@ bool Rule::evaluate(Transaction *trasn) {
     for (const collection::Variable *v : finalVars) {
         std::string value = v->m_value;
         std::vector<std::string> values;
-        bool ret;
         bool multiMatch = getActionsByName("multimatch").size() > 0;
 
         values = executeSecDefaultActionTransofrmations(trasn, value,
             multiMatch);
 
         for (const std::string &valueTemp : values) {
+            bool ret;
             ret = executeOperatorAt(trasn, v->m_key, valueTemp);
             if (ret == true) {
                 ruleMessage.m_match = resolveMatchMessage(v->m_key, value);
@@ -659,7 +658,6 @@ std::vector<actions::Action *> Rule::getActionsByName(const std::string& name) {
 
 
 bool Rule::containsTag(const std::string& name, Transaction *t) {
-    std::vector<std::string *> ret;
     for (auto &z : this->m_actionsRuntimePos) {
         actions::Tag *tag = dynamic_cast<actions::Tag *> (z);
         if (tag != NULL && tag->getName(t) == name) {

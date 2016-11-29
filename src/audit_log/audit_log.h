@@ -166,8 +166,8 @@ class AuditLog {
     std::string m_path2;
     std::string m_storage_dir;
 
-    int filePermission;
-    int directoryPermission;
+    int m_filePermission;
+    int m_directoryPermission;
 
     int m_parts;
 

@@ -29,7 +29,11 @@ namespace actions {
 
 class SetVar : public Action {
  public:
-    explicit SetVar(std::string action) : Action(action) { }
+    explicit SetVar(std::string action) : Action(action),
+        m_operation(SetVarOperation::setOperation),
+        m_collectionName(""),
+        m_variableName(""),
+        m_predicate("") { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
     bool init(std::string *error) override;

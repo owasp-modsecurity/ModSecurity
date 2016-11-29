@@ -35,9 +35,8 @@ class Rx : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     Rx(std::string op, std::string param, bool negation)
-        : Operator(op, param, negation),
-        m_param(param) {
-            m_re = new Regex(param);
+        : Operator(op, param, negation) {
+        m_re = new Regex(param);
         }
 
     ~Rx() {
@@ -51,7 +50,6 @@ class Rx : public Operator {
     }
 
  private:
-    std::string m_param;
     Regex *m_re;
 };
 

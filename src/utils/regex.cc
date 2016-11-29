@@ -39,7 +39,8 @@ namespace Utils {
 
 
 Regex::Regex(const std::string& pattern_)
-    : pattern(pattern_) {
+    : pattern(pattern_),
+    m_ovector {0} {
     const char *errptr = NULL;
     int erroffset;
 
@@ -86,7 +87,7 @@ std::list<SMatch> Regex::searchAll(const std::string& s) {
         int substring_length = ovector[2*i+1] - ovector[2*i];
 
         match.match = std::string(subject, ovector[2*i],
-            ovector[2*i+1] - ovector[2*i]);
+            substring_length);
 
         retList.push_front(match);
     }
