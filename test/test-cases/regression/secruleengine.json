@@ -34,14 +34,14 @@
     "version_min":300000,
     "title":"Testing Disruptive actions (3/n)",
     "expected":{
-      "debug_log": "_Not_ running action: deny. Rule _does not_contains a disruptive action, but SecRuleEngine is not On.",
+      "debug_log": "_Not_ running .disruptive. action: block. SecRuleEngine is not On",
       "http_code":200
     },
     "rules":[
       "SecRuleEngine On",
       "SecRuleEngine DetectionOnly",
       "SecDefaultAction \"phase:2,deny,status:404\"",
-      "SecAction \"id:'1',phase:request,nolog,block,t:none\""
+      "SecAction \"id:'1',phase:request,nolog,nolog,block,t:none\""
     ]
   },
   {

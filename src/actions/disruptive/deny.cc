@@ -13,34 +13,41 @@
  *
  */
 
-#include "src/actions/deny.h"
+#include "src/actions/disruptive/deny.h"
 
 #include <iostream>
 #include <string>
+#include <cstring>
+#include <string.h>
 
 #include "modsecurity/transaction.h"
 
 namespace modsecurity {
 namespace actions {
+namespace disruptive {
 
 
 bool Deny::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
 #ifndef NO_LOGS
     transaction->debug(8, "Running action deny");
 #endif
-    rm->m_tmp_actions.push_back(this);
+    std::string log;
+
+    if (transaction->m_it.status == 200) {
+        transaction->m_it.status = 403;
+    }
+
+    log.append("Access denied with code %d");
+    log.append(" (phase ");
+    log.append(std::to_string(rm->m_rule->phase - 1) + "). ");
+
+    transaction->m_it.disruptive = true;
+    transaction->m_it.log = strdup(rm->disruptiveErrorLog(transaction, log).c_str());
+
     return true;
 }
 
 
-void Deny::fillIntervention(ModSecurityIntervention *i) {
-    if (i->status == 200) {
-        i->status = 403;
-    }
-    i->log = "Deny action";
-    i->disruptive = true;
-}
-
-
+}  // namespace disruptive
 }  // namespace actions
 }  // namespace modsecurity

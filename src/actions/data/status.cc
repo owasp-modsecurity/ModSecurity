@@ -13,42 +13,36 @@
  *
  */
 
-#include "src/actions/redirect.h"
+#include "src/actions/data/status.h"
 
 #include <iostream>
 #include <string>
 
 #include "modsecurity/transaction.h"
-#include "src/macro_expansion.h"
+
 
 namespace modsecurity {
 namespace actions {
+namespace data {
 
-
-bool Redirect::init(std::string *error) {
-    m_url = m_parser_payload;
-    m_status = 302;
-    return true;
-}
-
-
-bool Redirect::evaluate(Rule *rule, Transaction *transaction) {
-    m_urlExpanded = MacroExpansion::expand(m_url, transaction);
-    transaction->m_actions.push_back(this);
-    return true;
-}
-
-
-void Redirect::fillIntervention(ModSecurityIntervention *i) {
-    /* if it was changed before, lets keep it. */
-    if (i->status == 200) {
-        i->status = m_status;
+bool Status::init(std::string *error) {
+    try {
+        m_status = std::stoi(m_parser_payload);
+    } catch (...) {
+        error->assign("Not a valid number: " + m_parser_payload);
+        return false;
     }
-    i->url = m_urlExpanded.c_str();
-    i->log = "Redirecting";
-    i->disruptive = true;
+
+    return true;
 }
 
 
+bool Status::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+    transaction->m_it.status = m_status;
+    return true;
+}
+
+
+}  // namespace data
 }  // namespace actions
 }  // namespace modsecurity

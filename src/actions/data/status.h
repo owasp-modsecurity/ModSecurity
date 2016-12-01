@@ -13,41 +13,39 @@
  *
  */
 
-#include "src/actions/status.h"
-
-#include <iostream>
 #include <string>
 
-#include "modsecurity/transaction.h"
+#include "modsecurity/actions/action.h"
+#include "modsecurity/rule_message.h"
 
+#ifndef SRC_ACTIONS_STATUS_H_
+#define SRC_ACTIONS_STATUS_H_
+
+#ifdef __cplusplus
+class Transaction;
 
 namespace modsecurity {
+class Transaction;
 namespace actions {
+namespace data {
 
 
-bool Status::init(std::string *error) {
-    try {
-        m_status = std::stoi(m_parser_payload);
-    } catch (...) {
-        error->assign("Not a valid number: " + m_parser_payload);
-        return false;
-    }
+class Status : public Action {
+ public:
+    explicit Status(std::string action) : Action(action, 2),
+    m_status(0) { }
 
-    return true;
-}
+    bool init(std::string *error) override;
+    bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm)
+        override;
 
-
-bool Status::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
-    rm->m_tmp_actions.push_back(this);
-    return true;
-}
+    int m_status;
+};
 
 
-void Status::fillIntervention(ModSecurityIntervention *i) {
-    i->status = m_status;
-    i->log = "Status";
-}
-
-
+}  // namespace data
 }  // namespace actions
 }  // namespace modsecurity
+#endif
+
+#endif  // SRC_ACTIONS_STATUS_H_

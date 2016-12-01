@@ -73,7 +73,9 @@ class Rules;
 class RuleMessage;
 namespace actions {
 class Action;
+namespace disruptive {
 enum AllowType : int;
+}
 }
 namespace RequestBodyProcessor {
 class XML;
@@ -339,7 +341,7 @@ class Transaction {
     /**
      * If allow action was utilized, this variable holds the allow type.
      */
-    modsecurity::actions::AllowType m_allowType;
+    modsecurity::actions::disruptive::AllowType m_allowType;
 
     /**
      * Holds the decode URI. Notice that m_uri holds the raw version
@@ -351,7 +353,8 @@ class Transaction {
      * Actions (disruptive?) that should be taken by the connector related to
      * that transaction.
      */
-    std::vector<actions::Action *> m_actions;
+    std::vector<ModSecurityIntervention> m_actions;
+    ModSecurityIntervention m_it;
 
     /**
      * Holds the creation time stamp, using std::time.

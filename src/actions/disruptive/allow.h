@@ -28,6 +28,8 @@ class Transaction;
 class Rule;
 
 namespace actions {
+namespace disruptive {
+
 
 enum AllowType : int {
   /**
@@ -76,6 +78,8 @@ class Allow : public Action {
     }
 };
 
+
+}  // namespace disruptive
 }  // namespace actions
 }  // namespace modsecurity
 #endif

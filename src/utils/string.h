@@ -66,6 +66,8 @@ std::string tolower(std::string str);
 std::string toupper(std::string str);
 std::vector<std::string> split(std::string str, char delimiter);
 void chomp(std::string *str);
+void replaceAll(std::string *str, const std::string& from,
+    const std::string& to);
 
 unsigned char x2c(unsigned char *what);
 unsigned char xsingle2c(unsigned char *what);

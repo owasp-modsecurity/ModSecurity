@@ -251,9 +251,6 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
             }
         }
     }
-    for (auto &z : ruleMessage->m_tmp_actions) {
-        trasn->m_actions.push_back(z);
-    }
 }
 
 
@@ -505,15 +502,13 @@ void Rule::executeActionsAfterFullMatch(Transaction *trasn,
             a->evaluate(this, trasn, ruleMessage);
             continue;
         } else {
+            trasn->debug(4, "_Not_ running (disruptive) action: "
+                + a->m_name + ". SecRuleEngine is not On.");
             continue;
         }
 
         trasn->debug(4, "Not running disruptive action: " + \
                 a->m_name + ". SecRuleEngine is not On");
-    }
-
-    for (auto &z : ruleMessage->m_tmp_actions) {
-        trasn->m_actions.push_back(z);
     }
 }
 
@@ -524,6 +519,8 @@ bool Rule::evaluate(Transaction *trasn) {
     bool recursiveGlobalRet;
     bool containsDisruptive = false;
     RuleMessage ruleMessage(this);
+    std::vector<const collection::Variable *> finalVars;
+    std::string eparam;
 
     trasn->m_matched.clear();
 
@@ -535,8 +532,7 @@ bool Rule::evaluate(Transaction *trasn) {
             + ") Executing unconditional rule...");
         executeActionsIndependentOfChainedRuleResult(trasn,
             &containsDisruptive, &ruleMessage);
-        executeActionsAfterFullMatch(trasn, false, &ruleMessage);
-        return true;
+        goto end_exec;
     }
 
     for (auto &i : trasn->m_ruleRemoveById) {
@@ -548,7 +544,7 @@ bool Rule::evaluate(Transaction *trasn) {
         return true;
     }
 
-    std::string eparam = MacroExpansion::expand(this->op->m_param, trasn);
+    eparam = MacroExpansion::expand(this->op->m_param, trasn);
 
     if (this->op->m_param != eparam) {
         eparam = "\"" + eparam + "\" Was: \"" + this->op->m_param + "\"";
@@ -565,7 +561,7 @@ bool Rule::evaluate(Transaction *trasn) {
 
     updateRulesVariable(trasn);
 
-    std::vector<const collection::Variable *> finalVars = getFinalVars(trasn);
+    finalVars = getFinalVars(trasn);
 
     for (const collection::Variable *v : finalVars) {
         std::string value = v->m_value;
@@ -583,13 +579,6 @@ bool Rule::evaluate(Transaction *trasn) {
                 updateMatchedVars(trasn, v->m_key, value);
                 executeActionsIndependentOfChainedRuleResult(trasn,
                     &containsDisruptive, &ruleMessage);
-                std::string msg2save = ruleMessage.errorLog(trasn);
-                if (ruleMessage.m_message.empty() == false) {
-                    trasn->debug(4,
-                        "Scheduled to be saved on the server log: " \
-                        + msg2save + "");
-                    ruleMessage.m_server_logs.push_back(msg2save);
-                }
                 globalRet = true;
             }
         }
@@ -604,14 +593,7 @@ bool Rule::evaluate(Transaction *trasn) {
     trasn->debug(4, "Rule returned 1.");
 
     if (this->chained == false) {
-        executeActionsAfterFullMatch(trasn, containsDisruptive, &ruleMessage);
-        trasn->debug(4, "Merging temporary actions to the main transaction.");
-
-        for (const auto &u : ruleMessage.m_server_logs) {
-            trasn->debug(8, "To save: " + u);
-            trasn->serverLog(u);
-        }
-        return true;
+        goto end_exec;
     }
 
     if (this->chainedRule == NULL) {
@@ -624,15 +606,18 @@ bool Rule::evaluate(Transaction *trasn) {
     recursiveGlobalRet = this->chainedRule->evaluate(trasn);
 
     if (recursiveGlobalRet == true) {
-        executeActionsAfterFullMatch(trasn, containsDisruptive, &ruleMessage);
-        trasn->debug(4, "Merging temporary actions to the main transaction.");
-        for (const auto &u : ruleMessage.m_server_logs) {
-            trasn->serverLog(u);
-        }
-        return true;
+        goto end_exec;
     }
 
     return false;
+
+end_exec:
+    executeActionsAfterFullMatch(trasn, containsDisruptive, &ruleMessage);
+    for (const auto &u : ruleMessage.m_server_logs) {
+        trasn->serverLog(u);
+    }
+
+    return true;
 }
 
 

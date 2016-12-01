@@ -13,7 +13,7 @@
  *
  */
 
-#include "src/actions/allow.h"
+#include "src/actions/disruptive/allow.h"
 
 #include <iostream>
 #include <string>
@@ -26,6 +26,8 @@
 
 namespace modsecurity {
 namespace actions {
+namespace disruptive {
+
 
 bool Allow::init(std::string *error) {
     std::string a = utils::string::tolower(m_parser_payload);
@@ -56,5 +58,7 @@ bool Allow::evaluate(Rule *rule, Transaction *transaction) {
     return true;
 }
 
+
+}  // namespace disruptive
 }  // namespace actions
 }  // namespace modsecurity

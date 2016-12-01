@@ -189,20 +189,20 @@ int Rules::evaluate(int phase, Transaction *transaction) {
     debug(9, "This phase consists of " + std::to_string(rules.size()) + \
         " rule(s).");
 
-    if (transaction->m_allowType == actions::FromNowOneAllowType
+    if (transaction->m_allowType == actions::disruptive::FromNowOneAllowType
         && phase != modsecurity::Phases::LoggingPhase) {
         debug(9, "Skipping all rules evaluation on this phase as request " \
             "through the utilization of an `allow' action.");
         return true;
     }
-    if (transaction->m_allowType == actions::RequestAllowType
+    if (transaction->m_allowType == actions::disruptive::RequestAllowType
         && phase <= modsecurity::Phases::RequestBodyPhase) {
         debug(9, "Skipping all rules evaluation on this phase as request " \
             "through the utilization of an `allow' action.");
         return true;
     }
-    if (transaction->m_allowType != actions::NoneAllowType) {
-        transaction->m_allowType = actions::NoneAllowType;
+    if (transaction->m_allowType != actions::disruptive::NoneAllowType) {
+        transaction->m_allowType = actions::disruptive::NoneAllowType;
     }
 
     for (int i = 0; i < rules.size(); i++) {
@@ -223,7 +223,8 @@ int Rules::evaluate(int phase, Transaction *transaction) {
             debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
                 + "' due to a `skip' action. Still " + \
                 std::to_string(transaction->m_skip_next) + " to be skipped.");
-        } else if (transaction->m_allowType != actions::NoneAllowType) {
+        } else if (transaction->m_allowType
+            != actions::disruptive::NoneAllowType) {
             debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
                 + "' as request trough the utilization of an `allow' action.");
         } else if (m_exceptions.contains(rule->rule_id)) {
@@ -231,6 +232,11 @@ int Rules::evaluate(int phase, Transaction *transaction) {
                 + "'. Removed by an SecRuleRemove directive.");
         } else {
             rule->evaluate(transaction);
+            if (transaction->m_it.disruptive == true) {
+                debug(8, "Skipping this phase as this " \
+                    "request was already intercepted.");
+                break;
+            }
         }
     }
     return 1;

@@ -32,7 +32,7 @@
     "version_min":300000,
     "title":"Testing Disruptive actions (3/n)",
     "expected":{
-      "debug_log": "Running action block",
+      "debug_log": "Running .disruptive. action: block",
       "http_code":404
     },
     "rules":[

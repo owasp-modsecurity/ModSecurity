@@ -22,16 +22,16 @@
 #include "modsecurity/rule.h"
 #include "src/utils/string.h"
 
-#include "src/actions/block.h"
+#include "src/actions/disruptive/block.h"
 #include "src/actions/chain.h"
-#include "src/actions/deny.h"
-#include "src/actions/redirect.h"
-#include "src/actions/status.h"
+#include "src/actions/disruptive/deny.h"
+#include "src/actions/disruptive/redirect.h"
+#include "src/actions/data/status.h"
 #include "src/actions/rule_id.h"
 #include "src/actions/phase.h"
 #include "src/actions/severity.h"
 #include "src/actions/capture.h"
-#include "src/actions/pass.h"
+#include "src/actions/disruptive/pass.h"
 #include "src/actions/log.h"
 #include "src/actions/no_log.h"
 #include "src/actions/multi_match.h"
@@ -55,9 +55,6 @@ bool Action::evaluate(Rule *rule, Transaction *transaction) {
 }
 
 
-void Action::fillIntervention(ModSecurityIntervention *i) {
-}
-
 Action *Action::instantiate(const std::string& name) {
     std::string status("status:");
     std::string redirect("redirect:");
@@ -66,13 +63,13 @@ Action *Action::instantiate(const std::string& name) {
     std::string rule_id("id:");
 
     if (name.compare(0, status.length(), status) == 0) {
-        return new Status(name);
+        return new data::Status(name);
     }
     if (name.compare(0, redirect.length(), redirect) == 0) {
-        return new Redirect(name);
+        return new disruptive::Redirect(name);
     }
     if (name.compare(0, block.length(), block) == 0) {
-        return new Block(name);
+        return new disruptive::Block(name);
     }
     if (name.compare(0, phase.length(), phase) == 0) {
         return new Phase(name);
@@ -87,10 +84,10 @@ Action *Action::instantiate(const std::string& name) {
         return new Capture(name);
     }
     if (name == "pass") {
-        return new Pass(name);
+        return new disruptive::Pass(name);
     }
     if (name == "deny") {
-        return new Deny(name);
+        return new disruptive::Deny(name);
     }
     if (name == "log") {
         return new Log(name);

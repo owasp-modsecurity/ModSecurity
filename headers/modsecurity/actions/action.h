@@ -67,7 +67,6 @@ class Action {
     }
     virtual bool init(std::string *error) { return true; }
     virtual bool isDisruptive() { return false; }
-    virtual void fillIntervention(ModSecurityIntervention *intervention);
     static Action *instantiate(const std::string& name);
 
 

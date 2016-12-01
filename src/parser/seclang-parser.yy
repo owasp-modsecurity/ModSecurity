@@ -22,7 +22,7 @@ class Driver;
 
 #include "src/actions/accuracy.h"
 #include "modsecurity/actions/action.h"
-#include "src/actions/allow.h"
+#include "src/actions/disruptive/allow.h"
 #include "src/actions/audit_log.h"
 #include "src/actions/ctl/audit_log_parts.h"
 #include "src/actions/ctl/request_body_access.h"
@@ -36,7 +36,7 @@ class Driver;
 #include "src/actions/maturity.h"
 #include "src/actions/msg.h"
 #include "src/actions/phase.h"
-#include "src/actions/redirect.h"
+#include "src/actions/disruptive/redirect.h"
 #include "src/actions/rev.h"
 #include "src/actions/set_sid.h"
 #include "src/actions/set_uid.h"
@@ -102,7 +102,7 @@ using modsecurity::Variables::Variations::Exclusion;
 using modsecurity::Variables::XML;
 using modsecurity::actions::Accuracy;
 using modsecurity::actions::Action;
-using modsecurity::actions::Allow;
+using modsecurity::actions::disruptive::Allow;
 using modsecurity::actions::ctl::AuditLogParts;
 using modsecurity::actions::ctl::RequestBodyProcessorJSON;
 using modsecurity::actions::ctl::RequestBodyProcessorXML;
@@ -111,7 +111,7 @@ using modsecurity::actions::LogData;
 using modsecurity::actions::Maturity;
 using modsecurity::actions::Msg;
 using modsecurity::actions::Phase;
-using modsecurity::actions::Redirect;
+using modsecurity::actions::disruptive::Redirect;
 using modsecurity::actions::Rev;
 using modsecurity::actions::SetSID;
 using modsecurity::actions::SetUID;

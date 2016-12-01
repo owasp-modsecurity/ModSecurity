@@ -48,10 +48,12 @@ namespace actions {
 
 bool Msg::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
     std::string msg = data(transaction);
-    transaction->debug(9, "Saving msg: " + msg);
     rm->m_message = msg;
+    transaction->debug(9, "Saving msg: " + msg);
 
     transaction->m_collections.storeOrUpdateFirst("RULE:msg", msg);
+
+    rm->m_server_logs.push_back(rm->errorLog(transaction));
     return true;
 }
 

@@ -86,9 +86,7 @@ VARIABLES = \
 ACTIONS = \
 	actions/accuracy.cc \
 	actions/action.cc \
-	actions/allow.cc \
 	actions/audit_log.cc \
-	actions/block.cc \
 	actions/capture.cc \
 	actions/chain.cc \
 	actions/ctl/audit_log_parts.cc \
@@ -98,8 +96,12 @@ ACTIONS = \
 	actions/ctl/rule_remove_target_by_id.cc \
 	actions/ctl/rule_remove_by_id.cc \
 	actions/ctl/request_body_access.cc\
+	actions/disruptive/allow.cc \
+	actions/disruptive/block.cc \
+	actions/disruptive/deny.cc \
+	actions/disruptive/redirect.cc \
+	actions/disruptive/pass.cc \
 	actions/init_col.cc \
-	actions/deny.cc \
 	actions/log.cc \
 	actions/log_data.cc \
 	actions/maturity.cc \
@@ -107,16 +109,14 @@ ACTIONS = \
 	actions/multi_match.cc \
 	actions/no_audit_log.cc \
 	actions/no_log.cc \
-	actions/pass.cc \
 	actions/phase.cc \
-	actions/redirect.cc \
 	actions/rev.cc \
 	actions/rule_id.cc \
 	actions/severity.cc \
 	actions/set_sid.cc \
 	actions/set_uid.cc \
 	actions/set_var.cc \
-	actions/status.cc \
+	actions/data/status.cc \
 	actions/skip.cc \
 	actions/skip_after.cc \
 	actions/tag.cc \

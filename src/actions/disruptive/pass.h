@@ -18,11 +18,12 @@
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
 
-#ifndef SRC_ACTIONS_PASS_H_
-#define SRC_ACTIONS_PASS_H_
+#ifndef SRC_ACTIONS_DISRUPTIVE_PASS_H_
+#define SRC_ACTIONS_DISRUPTIVE_PASS_H_
 
 namespace modsecurity {
 namespace actions {
+namespace disruptive {
 
 
 class Pass : public Action {
@@ -34,8 +35,10 @@ class Pass : public Action {
     bool isDisruptive() override { return true; }
 };
 
+
+}  // namespace disruptive
 }  // namespace actions
 }  // namespace modsecurity
 
 
-#endif  // SRC_ACTIONS_PASS_H_
+#endif  // SRC_ACTIONS_DISRUPTIVE_PASS_H_

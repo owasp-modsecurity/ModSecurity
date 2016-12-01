@@ -18,6 +18,7 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <cstring>
 #endif
 
 #ifndef HEADERS_MODSECURITY_RULE_MESSAGE_H_
@@ -50,6 +51,7 @@ class RuleMessage {
     { }
 
     std::string errorLog(Transaction *trans);
+    std::string disruptiveErrorLog(Transaction *trans, std::string log2);
 
 
     std::string m_match;
@@ -65,7 +67,6 @@ class RuleMessage {
     int m_accuracy;
 
     std::list<std::string> m_tags;
-    std::vector<actions::Action *> m_tmp_actions;
     std::list<std::string> m_server_logs;
 
     Rule *m_rule;

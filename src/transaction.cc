@@ -33,7 +33,7 @@
 #include <vector>
 
 #include "modsecurity/actions/action.h"
-#include "src/actions/deny.h"
+#include "src/actions/disruptive/deny.h"
 #include "modsecurity/intervention.h"
 #include "modsecurity/modsecurity.h"
 #include "src/request_body_processor/multipart.h"
@@ -48,7 +48,7 @@
 #include "modsecurity/rule.h"
 #include "modsecurity/rule_message.h"
 #include "modsecurity/rules_properties.h"
-#include "src/actions/allow.h"
+#include "src/actions/disruptive/allow.h"
 
 
 
@@ -123,7 +123,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_responseContentType(NULL),
     m_requestBodyAccess(Rules::PropertyNotSetConfigBoolean),
     m_marker(""),
-    m_allowType(modsecurity::actions::NoneAllowType),
+    m_allowType(modsecurity::actions::disruptive::NoneAllowType),
     m_skip_next(0),
     m_creationTimeStamp(utils::cpu_seconds()),
     m_logCbData(logCbData),
@@ -158,8 +158,14 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_collections.storeOrUpdateFirst("URLENCODED_ERROR", "0");
 
 #ifndef NO_LOGS
-    this->debug(4, "Initialising transaction");
+    this->debug(4, "Initializing transaction");
 #endif
+
+    m_it.status = 200;
+    m_it.disruptive = false;
+    m_it.url = NULL;
+    m_it.log = NULL;
+    m_it.pause = 0;
 }
 
 
@@ -879,9 +885,9 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
                 debug(5, "Request body limit is marked to reject the " \
                     "request");
 #endif
-                Action *a = new actions::Deny("deny");
-                a->temporaryAction = true;
-                m_actions.push_back(a);
+                m_it.log = "Request body limit is marked to reject the request";
+                m_it.status = 403;
+                m_it.disruptive = true;
             }
             return true;
         }
@@ -1136,9 +1142,10 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
                 debug(5, "Response body limit is marked to reject the " \
                     "request");
 #endif
-                Action *a = new actions::Deny("deny");
-                a->temporaryAction = true;
-                m_actions.push_back(a);
+
+                m_it.log = "Response body limit is marked to reject the request";
+                m_it.status = 403;
+                m_it.disruptive = true;
             }
             return true;
         }
@@ -1285,20 +1292,26 @@ int Transaction::processLogging() {
  *
  */
 bool Transaction::intervention(ModSecurityIntervention *it) {
-    it->status = 200;
-    it->url = NULL;
-    it->disruptive = false;
-    if (m_actions.size() > 0) {
-        for (Action *a : m_actions) {
-            if (a->action_kind == Action::Kind::RunTimeOnlyIfMatchKind) {
-                a->fillIntervention(it);
-            }
-            if (a->temporaryAction) {
-                delete a;
-            }
+    if (m_it.disruptive) {
+        it->url = m_it.url;
+        it->disruptive = m_it.disruptive;
+        it->status = m_it.status;
+
+        if (m_it.log != NULL) {
+            std::string log("");
+            const char *log_str;
+            log.append(m_it.log);
+            utils::string::replaceAll(&log, std::string("%d"), std::to_string(it->status));
+            log_str = strdup(log.c_str());
+            it->log = log_str;
         }
-        m_actions.clear();
+        m_it.status = 200;
+        m_it.disruptive = false;
+        m_it.url = NULL;
+        m_it.log = NULL;
+        m_it.pause = 0;
     }
+
     return it->disruptive;
 }
 

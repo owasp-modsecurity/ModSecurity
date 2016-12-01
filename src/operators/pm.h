@@ -35,8 +35,6 @@ class Pm : public Operator {
         m_p = acmp_create(0);
     }
     ~Pm();
-    void replaceAll(std::string str, const std::string& from,
-        const std::string& to);
     bool evaluate(Transaction *transaction, Rule *rule,
         const std::string &input) override;
     bool evaluate(Transaction *transaction,

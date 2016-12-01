@@ -13,36 +13,33 @@
  *
  */
 
-#include "src/actions/block.h"
+#include "src/actions/disruptive/pass.h"
 
 #include <iostream>
 #include <string>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
-#include "modsecurity/intervention.h"
+#include "modsecurity/rule_message.h"
 
 namespace modsecurity {
 namespace actions {
+namespace disruptive {
 
 
-bool Block::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
-#ifndef NO_LOGS
-    transaction->debug(8, "Running action block");
-#endif
-    for (Action *a : rule->m_actionsRuntimePos) {
-        if (a->isDisruptive() == true) {
-            rm->m_tmp_actions.push_back(a);
-        }
-    }
+bool Pass::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+    transaction->m_it.status = 200;
+    transaction->m_it.disruptive = false;
+    transaction->m_it.url = NULL;
+    transaction->m_it.log = NULL;
+    transaction->m_it.pause = 0;
+
+    transaction->debug(8, "Running action pass");
+
     return true;
 }
 
 
-void Block::fillIntervention(ModSecurityIntervention *i) {
-    i->disruptive = true;
-}
-
-
+}  // namespace disruptive
 }  // namespace actions
 }  // namespace modsecurity
