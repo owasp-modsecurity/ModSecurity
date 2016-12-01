@@ -28,11 +28,8 @@ namespace disruptive {
 
 
 bool Pass::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
-    transaction->m_it.status = 200;
-    transaction->m_it.disruptive = false;
-    transaction->m_it.url = NULL;
-    transaction->m_it.log = NULL;
-    transaction->m_it.pause = 0;
+    intervention::free(&transaction->m_it);
+    intervention::reset(&transaction->m_it);
 
     transaction->debug(8, "Running action pass");
 

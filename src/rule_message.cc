@@ -23,7 +23,8 @@
 
 namespace modsecurity {
 
-std::string RuleMessage::disruptiveErrorLog(Transaction *trans, std::string msg2) {
+std::string RuleMessage::disruptiveErrorLog(Transaction *trans,
+    std::string msg2) {
     std::string msg;
 
     msg.append("[client " + std::string(trans->m_clientIpAddress) + "]");
@@ -50,7 +51,6 @@ std::string RuleMessage::disruptiveErrorLog(Transaction *trans, std::string msg2
     msg.append(" [unique_id \"" + trans->m_id + "\"]");
 
     return modsecurity::utils::string::toHexIfNeeded(msg);
-
 }
 
 std::string RuleMessage::errorLog(Transaction *trans) {

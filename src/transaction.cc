@@ -161,11 +161,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     this->debug(4, "Initializing transaction");
 #endif
 
-    m_it.status = 200;
-    m_it.disruptive = false;
-    m_it.url = NULL;
-    m_it.log = NULL;
-    m_it.pause = 0;
+    intervention::clean(&m_it);
 }
 
 
@@ -182,6 +178,9 @@ Transaction::~Transaction() {
     m_rulesMessages.clear();
 
     m_rules->decrementReferenceCount();
+
+    intervention::free(&m_it);
+    intervention::clean(&m_it);
 
     delete m_json;
     delete m_xml;
@@ -885,7 +884,8 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
                 debug(5, "Request body limit is marked to reject the " \
                     "request");
 #endif
-                m_it.log = "Request body limit is marked to reject the request";
+                intervention::free(&m_it);
+                m_it.log = strdup("Request body limit is marked to reject the request");
                 m_it.status = 403;
                 m_it.disruptive = true;
             }
@@ -1142,8 +1142,9 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
                 debug(5, "Response body limit is marked to reject the " \
                     "request");
 #endif
-
-                m_it.log = "Response body limit is marked to reject the request";
+                intervention::free(&m_it);
+                m_it.log = strdup("Response body limit is marked to reject " \
+                    "the request");
                 m_it.status = 403;
                 m_it.disruptive = true;
             }
@@ -1299,17 +1300,12 @@ bool Transaction::intervention(ModSecurityIntervention *it) {
 
         if (m_it.log != NULL) {
             std::string log("");
-            const char *log_str;
             log.append(m_it.log);
-            utils::string::replaceAll(&log, std::string("%d"), std::to_string(it->status));
-            log_str = strdup(log.c_str());
-            it->log = log_str;
+            utils::string::replaceAll(&log, std::string("%d"),
+                std::to_string(it->status));
+            it->log = strdup(log.c_str());
         }
-        m_it.status = 200;
-        m_it.disruptive = false;
-        m_it.url = NULL;
-        m_it.log = NULL;
-        m_it.pause = 0;
+        intervention::reset(&m_it);
     }
 
     return it->disruptive;

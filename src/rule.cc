@@ -587,7 +587,7 @@ bool Rule::evaluate(Transaction *trasn) {
     if (globalRet == false) {
         trasn->debug(4, "Rule returned 0.");
         cleanMatchedVars(trasn);
-        return false;
+        goto end_clean;
     }
 
     trasn->debug(4, "Rule returned 1.");
@@ -599,7 +599,7 @@ bool Rule::evaluate(Transaction *trasn) {
     if (this->chainedRule == NULL) {
         trasn->debug(4, "Rule is marked as chained but there " \
             "isn't a subsequent rule.");
-        return false;
+        goto end_clean;
     }
 
     trasn->debug(4, "Executing chained rule.");
@@ -609,12 +609,25 @@ bool Rule::evaluate(Transaction *trasn) {
         goto end_exec;
     }
 
+end_clean:
+    while (finalVars.empty() == false) {
+        auto *a = finalVars.back();
+        finalVars.pop_back();
+        delete a;
+    }
+
     return false;
 
 end_exec:
     executeActionsAfterFullMatch(trasn, containsDisruptive, &ruleMessage);
     for (const auto &u : ruleMessage.m_server_logs) {
         trasn->serverLog(u);
+    }
+
+    while (finalVars.empty() == false) {
+        auto *a = finalVars.back();
+        finalVars.pop_back();
+        delete a;
     }
 
     return true;

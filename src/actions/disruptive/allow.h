@@ -17,8 +17,8 @@
 
 #include "modsecurity/actions/action.h"
 
-#ifndef SRC_ACTIONS_ALLOW_H_
-#define SRC_ACTIONS_ALLOW_H_
+#ifndef SRC_ACTIONS_DISRUPTIVE_ALLOW_H_
+#define SRC_ACTIONS_DISRUPTIVE_ALLOW_H_
 
 #ifdef __cplusplus
 class Transaction;
@@ -84,4 +84,4 @@ class Allow : public Action {
 }  // namespace modsecurity
 #endif
 
-#endif  // SRC_ACTIONS_ALLOW_H_
+#endif  // SRC_ACTIONS_DISRUPTIVE_ALLOW_H_

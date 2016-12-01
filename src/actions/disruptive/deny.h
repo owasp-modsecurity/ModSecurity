@@ -19,8 +19,8 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule_message.h"
 
-#ifndef SRC_ACTIONS_DENY_H_
-#define SRC_ACTIONS_DENY_H_
+#ifndef SRC_ACTIONS_DISRUPTIVE_DENY_H_
+#define SRC_ACTIONS_DISRUPTIVE_DENY_H_
 
 namespace modsecurity {
 namespace actions {
@@ -41,4 +41,4 @@ class Deny : public Action {
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif  // SRC_ACTIONS_DENY_H_
+#endif  // SRC_ACTIONS_DISRUPTIVE_DENY_H_

@@ -15,10 +15,10 @@
 
 #include "src/actions/disruptive/deny.h"
 
+#include <string.h>
 #include <iostream>
 #include <string>
 #include <cstring>
-#include <string.h>
 
 #include "modsecurity/transaction.h"
 
@@ -42,7 +42,9 @@ bool Deny::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
     log.append(std::to_string(rm->m_rule->phase - 1) + "). ");
 
     transaction->m_it.disruptive = true;
-    transaction->m_it.log = strdup(rm->disruptiveErrorLog(transaction, log).c_str());
+    intervention::freeLog(&transaction->m_it);
+    transaction->m_it.log = strdup(
+        rm->disruptiveErrorLog(transaction, log).c_str());
 
     return true;
 }

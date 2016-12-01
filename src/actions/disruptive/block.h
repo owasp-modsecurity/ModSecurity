@@ -18,8 +18,8 @@
 #include "modsecurity/actions/action.h"
 #include "modsecurity/rule_message.h"
 
-#ifndef SRC_ACTIONS_BLOCK_H_
-#define SRC_ACTIONS_BLOCK_H_
+#ifndef SRC_ACTIONS_DISRUPTIVE_BLOCK_H_
+#define SRC_ACTIONS_DISRUPTIVE_BLOCK_H_
 
 #ifdef __cplusplus
 class Transaction;
@@ -46,4 +46,4 @@ class Block : public Action {
 }  // namespace modsecurity
 #endif
 
-#endif  // SRC_ACTIONS_BLOCK_H_
+#endif  // SRC_ACTIONS_DISRUPTIVE_BLOCK_H_

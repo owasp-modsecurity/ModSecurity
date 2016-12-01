@@ -18,8 +18,8 @@
 #include "modsecurity/actions/action.h"
 #include "modsecurity/rule_message.h"
 
-#ifndef SRC_ACTIONS_REDIRECT_H_
-#define SRC_ACTIONS_REDIRECT_H_
+#ifndef SRC_ACTIONS_DISRUPTIVE_REDIRECT_H_
+#define SRC_ACTIONS_DISRUPTIVE_REDIRECT_H_
 
 #ifdef __cplusplus
 class Transaction;
@@ -39,7 +39,8 @@ class Redirect : public Action {
         m_urlExpanded(""),
         m_url("") { }
 
-    bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) override;
+    bool evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm)
+        override;
     bool init(std::string *error) override;
     bool isDisruptive() override { return true; }
 
@@ -55,4 +56,4 @@ class Redirect : public Action {
 }  // namespace modsecurity
 #endif
 
-#endif  // SRC_ACTIONS_REDIRECT_H_
+#endif  // SRC_ACTIONS_DISRUPTIVE_REDIRECT_H_

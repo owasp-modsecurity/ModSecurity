@@ -18,8 +18,8 @@
 #include "modsecurity/actions/action.h"
 #include "modsecurity/rule_message.h"
 
-#ifndef SRC_ACTIONS_STATUS_H_
-#define SRC_ACTIONS_STATUS_H_
+#ifndef SRC_ACTIONS_DATA_STATUS_H_
+#define SRC_ACTIONS_DATA_STATUS_H_
 
 #ifdef __cplusplus
 class Transaction;
@@ -48,4 +48,4 @@ class Status : public Action {
 }  // namespace modsecurity
 #endif
 
-#endif  // SRC_ACTIONS_STATUS_H_
+#endif  // SRC_ACTIONS_DATA_STATUS_H_

@@ -15,9 +15,9 @@
 
 #include "src/actions/disruptive/redirect.h"
 
+#include <string.h>
 #include <iostream>
 #include <string>
-#include <string.h>
 
 
 #include "modsecurity/transaction.h"
@@ -35,7 +35,8 @@ bool Redirect::init(std::string *error) {
 }
 
 
-bool Redirect::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
+bool Redirect::evaluate(Rule *rule, Transaction *transaction,
+    RuleMessage *rm) {
     m_urlExpanded = MacroExpansion::expand(m_url, transaction);
     std::string log;
 
@@ -47,9 +48,12 @@ bool Redirect::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
     log.append(" (phase ");
     log.append(std::to_string(rm->m_rule->phase - 1) + "). ");
 
+    intervention::freeUrl(&transaction->m_it);
     transaction->m_it.url = strdup(m_urlExpanded.c_str());
     transaction->m_it.disruptive = true;
-    transaction->m_it.log = strdup(rm->disruptiveErrorLog(transaction, log).c_str());
+    intervention::freeLog(&transaction->m_it);
+    transaction->m_it.log = strdup(
+        rm->disruptiveErrorLog(transaction, log).c_str());
 
     return true;
 }

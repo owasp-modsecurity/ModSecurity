@@ -30,8 +30,6 @@ namespace disruptive {
 
 
 bool Block::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
-    std::string log;
-
     transaction->debug(8, "Marking request as disruptive.");
 
     for (Action *a : transaction->m_rules->defaultActions[rule->phase]) {
