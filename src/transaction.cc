@@ -962,7 +962,12 @@ int Transaction::addResponseHeader(const std::string& key,
     this->m_collections.store("RESPONSE_HEADERS:" + key, value);
 
     if (utils::string::tolower(key) == "content-type") {
-        this->m_responseContentType->assign(value);
+        // Removes the charset=...
+        // Content-Type: text/html; charset=UTF-8
+        std::vector<std::string> val = utils::string::split(value, ';');
+        if (val.size() > 0) {
+            this->m_responseContentType->assign(val[0]);
+        }
     }
     return 1;
 }
