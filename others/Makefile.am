@@ -10,9 +10,13 @@ noinst_HEADERS = \
 	libinjection/src/libinjection_html5.h \
 	libinjection/src/libinjection_sqli.h \
 	libinjection/src/libinjection_sqli_data.h \
-	libinjection/src/libinjection_xss.h
-
-
+	libinjection/src/libinjection_xss.h \
+	mbedtls/base64.h \
+	mbedtls/check_config.h \
+	mbedtls/mbed-tls-config.h \
+	mbedtls/md5.h \
+	mbedtls/platform.h \
+	mbedtls/sha1.h
 
 libmbedtls_la_SOURCES = \
 	mbedtls/base64.c \
