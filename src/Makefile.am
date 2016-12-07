@@ -29,6 +29,7 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/intervention.h \
 	../headers/modsecurity/modsecurity.h \
 	../headers/modsecurity/rule.h \
+	../headers/modsecurity/rule_message.h \
 	../headers/modsecurity/rules.h \
 	../headers/modsecurity/rules_properties.h \
 	../headers/modsecurity/rules_exceptions.h
@@ -47,6 +48,9 @@ libmodsecurity_includesub_actions_HEADERS = \
 
 noinst_HEADERS = \
 	actions/*.h \
+	actions/ctl/*.h \
+	actions/data/*.h \
+	actions/disruptive/*.h \
 	actions/transformations/*.h \
 	audit_log/*.h \
 	audit_log/writer/*.h \
