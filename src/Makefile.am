@@ -52,6 +52,7 @@ noinst_HEADERS = \
 	actions/data/*.h \
 	actions/disruptive/*.h \
 	actions/transformations/*.h \
+	debug_log/*.h \
 	audit_log/*.h \
 	audit_log/writer/*.h \
 	collection/backend/*.h \
