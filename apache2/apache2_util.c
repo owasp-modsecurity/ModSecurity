@@ -339,6 +339,7 @@ char *format_error_log_message(apr_pool_t *mp, error_message_t *em) {
 
     if (em == NULL) return NULL;
 
+#ifndef LOG_NO_FILENAME
     if (em->file != NULL) {
         s_file = apr_psprintf(mp, "[file \"%s\"] ",
             log_escape(mp, (char *)em->file));
@@ -349,6 +350,7 @@ char *format_error_log_message(apr_pool_t *mp, error_message_t *em) {
         s_line = apr_psprintf(mp, "[line %d] ", em->line);
         if (s_line == NULL) return NULL;
     }
+#endif
 
     s_level = apr_psprintf(mp, "[level %d] ", em->level);
     if (s_level == NULL) return NULL;
