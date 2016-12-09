@@ -2194,10 +2194,12 @@ char *msre_format_metadata(modsec_rec *msr, msre_actionset *actionset) {
 
     if (actionset == NULL) return "";
 
+#ifndef LOG_NO_FILENAME
     if ((actionset->rule != NULL) && (actionset->rule->filename != NULL)) {
         fn = apr_psprintf(msr->mp, " [file \"%s\"] [line \"%d\"]",
                 actionset->rule->filename, actionset->rule->line_num);
     }
+#endif
     if (actionset->id != NULL) {
         id = apr_psprintf(msr->mp, " [id \"%s\"]",
                 log_escape(msr->mp, actionset->id));
