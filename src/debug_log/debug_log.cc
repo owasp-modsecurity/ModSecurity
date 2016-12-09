@@ -19,11 +19,13 @@
 
 #include <fstream>
 
-#include "src/debug_log_writer.h"
+#include "src/debug_log/debug_log_writer.h"
 #include "src/debug_log_writer_agent.h"
 
 
 namespace modsecurity {
+namespace debug_log {
+
 
 DebugLog::~DebugLog() {
     DebugLogWriter::getInstance().close(m_fileName);
@@ -79,4 +81,5 @@ void DebugLog::write(int level, const std::string &msg) {
 }
 
 
+}  // namespace debug_log
 }  // namespace modsecurity

@@ -24,11 +24,12 @@
 #include <cstring>
 
 
-#ifndef SRC_DEBUG_LOG_WRITER_H_
-#define SRC_DEBUG_LOG_WRITER_H_
+#ifndef SRC_DEBUG_LOG_DEBUG_LOG_WRITER_H_
+#define SRC_DEBUG_LOG_DEBUG_LOG_WRITER_H_
 
 
 namespace modsecurity {
+namespace debug_log {
 
 
 typedef struct debug_log_file_handler {
@@ -77,6 +78,7 @@ class DebugLogWriter {
 };
 
 
+}  // namespace debug_log
 }  // namespace modsecurity
 
-#endif  // SRC_DEBUG_LOG_WRITER_H_
+#endif  // SRC_DEBUG_LOG_DEBUG_LOG_WRITER_H_

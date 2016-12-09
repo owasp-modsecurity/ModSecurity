@@ -247,8 +247,8 @@ libmodsecurity_la_SOURCES = \
 	audit_log/writer/parallel.cc \
 	modsecurity.cc \
 	rules.cc \
-	debug_log.cc \
-	debug_log_writer.cc \
+	debug_log/debug_log.cc \
+	debug_log/debug_log_writer.cc \
 	macro_expansion.cc \
 	rule.cc \
 	rule_message.cc \

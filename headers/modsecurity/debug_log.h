@@ -28,6 +28,8 @@ typedef struct DebugLog_t DebugLog;
 #ifdef __cplusplus
 
 namespace modsecurity {
+namespace debug_log {
+
 
 /** @ingroup ModSecurity_CPP_API */
 class DebugLog {
@@ -51,6 +53,8 @@ class DebugLog {
     std::string m_fileName;
 };
 
+
+}  // namespace debug_log
 }  // namespace modsecurity
 #endif
 

@@ -13,7 +13,7 @@
  *
  */
 
-#include "src/debug_log_writer.h"
+#include "src/debug_log/debug_log_writer.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -28,7 +28,7 @@
 #include <fstream>
 
 namespace modsecurity {
-
+namespace debug_log {
 
 debug_log_file_handler_t *DebugLogWriter::find_handler(
     const std::string &fileName) {
@@ -240,4 +240,5 @@ void DebugLogWriter::write_log(const std::string& fileName,
 }
 
 
+}  // namespace debug_log
 }  // namespace modsecurity

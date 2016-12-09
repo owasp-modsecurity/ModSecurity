@@ -45,6 +45,7 @@ namespace Parser {
 class Driver;
 }
 
+using modsecurity::debug_log::DebugLog;
 
 /** @ingroup ModSecurity_CPP_API */
 class ConfigInt {
