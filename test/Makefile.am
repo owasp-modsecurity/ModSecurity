@@ -38,14 +38,14 @@ noinst_HEADERS = \
        regression/*.h
 
 unit_tests_LDADD = \
-	$(GLOBAL_LDADD) \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
 	$(PCRE_LDADD) \
 	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
 	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
-	$(LIBXML2_LDADD)
+	$(LIBXML2_LDADD) \
+	$(GLOBAL_LDADD)
 
 
 unit_tests_CPPFLAGS = \
@@ -74,14 +74,14 @@ regression_tests_SOURCES = \
         regression/custom_debug_log.cc
 
 regression_tests_LDADD = \
-	$(GLOBAL_LDADD) \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
 	$(PCRE_LDADD) \
 	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
 	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
-	$(LIBXML2_LDADD)
+	$(LIBXML2_LDADD) \
+	$(GLOBAL_LDADD)
 
 
 regression_tests_CPPFLAGS = \
@@ -109,14 +109,14 @@ rules_optimization_SOURCES = \
         optimization/optimization.cc
 
 rules_optimization_LDADD = \
-	$(GLOBAL_LDADD) \
 	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
 	$(PCRE_LDADD) \
 	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
 	$(LMDB_LDFLAGS) $(LMDB_LDADD) \
-	$(LIBXML2_LDADD)
+	$(LIBXML2_LDADD) \
+	$(GLOBAL_LDADD)
 
 
 rules_optimization_CPPFLAGS = \
