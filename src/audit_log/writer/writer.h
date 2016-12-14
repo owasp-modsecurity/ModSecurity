@@ -13,47 +13,67 @@
  *
  */
 
-#ifndef SRC_AUDIT_LOG_WRITER_H_
-#define SRC_AUDIT_LOG_WRITER_H_
+#ifndef SRC_AUDIT_LOG_WRITER_WRITER_H_
+#define SRC_AUDIT_LOG_WRITER_WRITER_H_
 
-#ifdef __cplusplus
+
+#include <stdio.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/types.h>
+
+#include <iostream>
 #include <string>
-#endif
+#include <map>
+#include <cstring>
+
 
 #include "modsecurity/transaction.h"
+#include "modsecurity/audit_log.h"
 
-
-#ifdef __cplusplus
 
 namespace modsecurity {
 namespace audit_log {
+namespace writer {
 
-class AuditLog;
+
 
 /** @ingroup ModSecurity_CPP_API */
 class Writer {
  public:
     explicit Writer(AuditLog *audit)
         : m_audit(audit),
-        m_refereceCount(0) { }
+        m_refereceCount(1) { }
 
     virtual ~Writer() { }
 
-    virtual void refCountIncrease() = 0;
-    virtual void refCountDecreaseAndCheck() = 0;
+    virtual bool init(std::string *error) = 0;
+    virtual bool write(Transaction *transaction, int parts,
+        std::string *error) = 0;
 
-    virtual bool init() { return true; }
-    virtual bool write(Transaction *transaction, int parts);
 
-    std::string file_name(const std::string& unique_id);
+    void refCountIncrease() {
+        m_refereceCount++;
+    }
+
+
+    bool refCountDecreaseAndCheck() {
+        m_refereceCount--;
+        if (m_refereceCount == 0) {
+            delete this;
+            return true;
+        }
+        return false;
+    }
 
  protected:
     AuditLog *m_audit;
     int m_refereceCount;
 };
 
+
+}  // namespace writer
 }  // namespace audit_log
 }  // namespace modsecurity
-#endif
 
-#endif  // SRC_AUDIT_LOG_WRITER_H_
+#endif  // SRC_AUDIT_LOG_WRITER_WRITER_H_

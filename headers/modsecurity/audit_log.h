@@ -19,16 +19,19 @@
 #include <string>
 #endif
 
-#ifndef SRC_AUDIT_LOG_AUDIT_LOG_H_
-#define SRC_AUDIT_LOG_AUDIT_LOG_H_
+#ifndef HEADERS_MODSECURITY_AUDIT_LOG_H_
+#define HEADERS_MODSECURITY_AUDIT_LOG_H_
 
 #include "modsecurity/transaction.h"
-#include "src/audit_log/writer.h"
+
 
 #ifdef __cplusplus
 
 namespace modsecurity {
 namespace audit_log {
+namespace writer {
+class Writer;
+}
 
 /** @ingroup ModSecurity_CPP_API */
 class AuditLog {
@@ -36,16 +39,15 @@ class AuditLog {
     AuditLog();
     ~AuditLog();
 
-    void refCountIncrease();
-    void refCountDecreaseAndCheck();
-
     enum AuditLogType {
+     NotSetAuditLogType,
      SerialAuditLogType,
      ParallelAuditLogType,
      HttpsAuditLogType
     };
 
     enum AuditLogStatus {
+     NotSetLogStatus,
      OnAuditLogStatus,
      OffAuditLogStatus,
      RelevantOnlyAuditLogStatus
@@ -149,10 +151,14 @@ class AuditLog {
     bool setFilePath2(const std::basic_string<char>& path);
     bool setStorageDir(const std::basic_string<char>& path);
 
+    int getDirectoryPermission();
+    int getFilePermission();
+    int getParts();
+
     bool setParts(const std::basic_string<char>& new_parts);
     bool setType(AuditLogType audit_type);
 
-    bool init();
+    bool init(std::string *error);
     bool close();
 
     bool saveIfRelevant(Transaction *transaction);
@@ -162,28 +168,49 @@ class AuditLog {
     int addParts(int parts, const std::string& new_parts);
     int removeParts(int parts, const std::string& new_parts);
 
+    bool merge(AuditLog *from, std::string *error);
+
     std::string m_path1;
     std::string m_path2;
     std::string m_storage_dir;
 
-    int m_filePermission;
-    int m_directoryPermission;
+    void refCountIncrease() {
+        m_refereceCount++;
+    }
 
+    bool refCountDecreaseAndCheck() {
+        m_refereceCount--;
+        if (m_refereceCount == 0) {
+            delete this;
+            return true;
+        }
+        return false;
+    }
+
+ protected:
     int m_parts;
+    int m_defaultParts = AAuditLogPart | BAuditLogPart | CAuditLogPart
+        | FAuditLogPart | HAuditLogPart | ZAuditLogPart;
+
+    int m_filePermission;
+    int m_defaultFilePermission = 0600;
+
+    int m_directoryPermission;
+    int m_defaultDirectoryPermission = 0766;
 
  private:
     AuditLogStatus m_status;
 
-
     AuditLogType m_type;
     std::string m_relevant;
 
-    audit_log::Writer *m_writer;
+    audit_log::writer::Writer *m_writer;
     int m_refereceCount;
 };
+
 
 }  // namespace audit_log
 }  // namespace modsecurity
 #endif
 
-#endif  // SRC_AUDIT_LOG_AUDIT_LOG_H_
+#endif  // HEADERS_MODSECURITY_AUDIT_LOG_H_

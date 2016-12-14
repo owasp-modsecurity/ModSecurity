@@ -26,6 +26,7 @@ MAINTAINERCLEANFILES = \
 pkginclude_HEADERS = \
 	../headers/modsecurity/transaction.h \
 	../headers/modsecurity/debug_log.h \
+	../headers/modsecurity/audit_log.h \
 	../headers/modsecurity/intervention.h \
 	../headers/modsecurity/modsecurity.h \
 	../headers/modsecurity/rule.h \
@@ -53,7 +54,6 @@ noinst_HEADERS = \
 	actions/disruptive/*.h \
 	actions/transformations/*.h \
 	debug_log/*.h \
-	audit_log/*.h \
 	audit_log/writer/*.h \
 	collection/backend/*.h \
 	operators/*.h \
@@ -220,7 +220,8 @@ UTILS = \
 	utils/regex.cc \
 	utils/sha1.cc \
 	utils/string.cc \
-	utils/system.cc
+	utils/system.cc \
+	utils/shared_files.cc
 
 
 
@@ -242,7 +243,7 @@ libmodsecurity_la_SOURCES = \
 	parser/driver.cc \
 	transaction.cc \
 	audit_log/audit_log.cc \
-	audit_log/writer.cc \
+	audit_log/writer/writer.cc \
 	audit_log/writer/https.cc \
 	audit_log/writer/serial.cc \
 	audit_log/writer/parallel.cc \

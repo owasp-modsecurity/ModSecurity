@@ -97,10 +97,7 @@ Rules::~Rules() {
             tmp->pop_back();
         }
     }
-    /** Cleanup audit log */
-    if (m_auditLog) {
-        m_auditLog->refCountDecreaseAndCheck();
-    }
+
 
     free(unicode_map_table);
 }
@@ -250,17 +247,6 @@ int Rules::merge(Driver *from) {
         dynamic_cast<RulesProperties *>(this),
         &m_parserError);
 
-    if (from->m_auditLog != NULL && this->m_auditLog != NULL) {
-        this->m_auditLog->refCountDecreaseAndCheck();
-    }
-
-    if (from->m_auditLog) {
-        this->m_auditLog = from->m_auditLog;
-    }
-    if (this->m_auditLog != NULL) {
-        this->m_auditLog->refCountIncrease();
-    }
-
     return amount_of_rules;
 }
 
@@ -271,16 +257,6 @@ int Rules::merge(Rules *from) {
         dynamic_cast<RulesProperties *>(from),
         dynamic_cast<RulesProperties *>(this),
         &m_parserError);
-
-    if (from->m_auditLog != NULL && this->m_auditLog != NULL) {
-        this->m_auditLog->refCountDecreaseAndCheck();
-    }
-    if (from->m_auditLog) {
-        this->m_auditLog = from->m_auditLog;
-    }
-    if (this->m_auditLog != NULL) {
-        this->m_auditLog->refCountIncrease();
-    }
 
     return amount_of_rules;
 }

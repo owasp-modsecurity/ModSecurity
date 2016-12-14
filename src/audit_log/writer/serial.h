@@ -22,8 +22,10 @@
 #ifndef SRC_AUDIT_LOG_WRITER_SERIAL_H_
 #define SRC_AUDIT_LOG_WRITER_SERIAL_H_
 
-#include "src/audit_log/writer.h"
+#include "src/audit_log/writer/writer.h"
+#include "src/utils/shared_files.h"
 #include "modsecurity/transaction.h"
+#include "modsecurity/audit_log.h"
 
 #ifdef __cplusplus
 
@@ -33,37 +35,21 @@ namespace writer {
 
 #define SERIAL_AUDIT_LOG_BOUNDARY_LENGTH 8
 
+
 /** @ingroup ModSecurity_CPP_API */
-class Serial : public audit_log::Writer {
+class Serial : public Writer {
  public:
     explicit Serial(audit_log::AuditLog *audit)
-        : audit_log::Writer(audit) { }
+        : audit_log::writer::Writer(audit) { }
 
     ~Serial() override;
 
-    void refCountIncrease() override {
-        m_refereceCount++;
-    }
 
-
-    void refCountDecreaseAndCheck() override {
-        /*
-        m_refereceCount--;
-
-
-        if (m_refereceCount == 0) {
-        */
-        delete this;
-        /*
-        /}
-        */
-    }
-
-    bool init() override;;
-    bool write(Transaction *transaction, int parts) override;
+    bool init(std::string *error) override;
+    bool write(Transaction *transaction, int parts,
+        std::string *error) override;
 
  private:
-    std::ofstream m_log;
     void generateBoundary(std::string *boundary);
 };
 

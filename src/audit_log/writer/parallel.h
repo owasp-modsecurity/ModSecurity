@@ -18,8 +18,10 @@
 #ifndef SRC_AUDIT_LOG_WRITER_PARALLEL_H_
 #define SRC_AUDIT_LOG_WRITER_PARALLEL_H_
 
-#include "src/audit_log/writer.h"
+#include "src/audit_log/writer/writer.h"
 #include "modsecurity/transaction.h"
+#include "modsecurity/audit_log.h"
+#include "src/utils/shared_files.h"
 
 #ifdef __cplusplus
 
@@ -28,26 +30,16 @@ namespace audit_log {
 namespace writer {
 
 /** @ingroup ModSecurity_CPP_API */
-class Parallel : public audit_log::Writer {
+class Parallel : public Writer {
  public:
     explicit Parallel(AuditLog *audit)
-        : audit_log::Writer(audit) { }
+        : audit_log::writer::Writer(audit) { }
 
     ~Parallel() override;
-    bool init() override;
-    bool write(Transaction *transaction, int parts) override;
+    bool init(std::string *error) override;
+    bool write(Transaction *transaction, int parts,
+        std::string *error) override;
 
-    void refCountIncrease() override {
-        m_refereceCount++;
-    }
-
-
-    void refCountDecreaseAndCheck() override {
-        m_refereceCount--;
-        if (m_refereceCount == 0) {
-            delete this;
-        }
-    }
 
     /**
      *
@@ -72,8 +64,6 @@ class Parallel : public audit_log::Writer {
      YearMonthDayAndTimeFileName = 8,
     };
 
-    std::ofstream log1;
-    std::ofstream log2;
     inline std::string logFilePath(time_t *t, int part);
 };
 

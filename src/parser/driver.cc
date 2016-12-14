@@ -16,7 +16,7 @@
 #include "src/parser/driver.h"
 
 #include "src/parser/seclang-parser.hh"
-#include "src/audit_log/audit_log.h"
+#include "modsecurity/audit_log.h"
 #include "modsecurity/rules_properties.h"
 
 using modsecurity::audit_log::AuditLog;
@@ -116,6 +116,7 @@ int Driver::addSecRule(Rule *rule) {
 
 
 int Driver::parse(const std::string &f, const std::string &ref) {
+    std::string error;
     lastRule = NULL;
     loc.push_back(new yy::location());
     if (ref.empty()) {
@@ -131,11 +132,13 @@ int Driver::parse(const std::string &f, const std::string &ref) {
     int res = parser.parse();
     scan_end();
 
-    if (m_auditLog->init() == false) {
-        m_parserError << "Problems while initializing the audit logs" \
-            << std::endl;
+    /*
+    if (m_auditLog->init(&error) == false) {
+        m_parserError << "Problems while initializing the audit logs: " \
+            << error << std::endl;
         return false;
     }
+    */
 
     return res == 0;
 }

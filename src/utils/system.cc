@@ -122,12 +122,15 @@ std::list<std::string> expandEnv(const std::string& var, int flags) {
 }
 
 
-void createDir(std::string dir, int mode) {
-#if defined _MSC_VER
-    _mkdir(dir.data());
-#elif defined __GNUC__
-    mkdir(dir.data(), mode);
-#endif
+bool createDir(std::string dir, int mode, std::string *error) {
+    int ret = mkdir(dir.data(), mode);
+    if (ret != 0 && errno != EEXIST) {
+        error->assign("Not able to create directory: " + dir + ": " \
+            + strerror(errno) + ".");
+        return false;
+    }
+
+    return true;
 }
 
 

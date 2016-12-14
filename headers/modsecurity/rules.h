@@ -36,7 +36,6 @@
 
 namespace modsecurity {
 class Rule;
-class AuditLog;
 namespace Parser {
 class Driver;
 }

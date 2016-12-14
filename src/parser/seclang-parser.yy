@@ -49,7 +49,7 @@ class Driver;
 #include "src/actions/transformations/transformation.h"
 #include "src/actions/ver.h"
 #include "src/actions/xmlns.h"
-#include "src/audit_log/audit_log.h"
+#include "modsecurity/audit_log.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules_properties.h"
 #include "modsecurity/rule.h"

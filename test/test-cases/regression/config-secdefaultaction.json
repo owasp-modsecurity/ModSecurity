@@ -272,7 +272,7 @@
     },
     "expected":{
       "audit_log":"",
-      "debug_log":"Request was relevant to be saved.",
+      "debug_log":"Saving this request as part of the audit log.",
       "http_code": 302
     },
     "rules":[

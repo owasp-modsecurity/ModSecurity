@@ -39,7 +39,7 @@
 #include "src/request_body_processor/multipart.h"
 #include "src/request_body_processor/xml.h"
 #include "src/request_body_processor/json.h"
-#include "src/audit_log/audit_log.h"
+#include "modsecurity/audit_log.h"
 #include "src/unique_id.h"
 #include "src/utils/string.h"
 #include "src/utils/system.h"
@@ -1239,7 +1239,7 @@ int Transaction::processLogging() {
 
     /* If relevant, save this transaction information at the audit_logs */
     if (m_rules != NULL && m_rules->m_auditLog != NULL) {
-        int parts = -1;
+        int parts = this->m_rules->m_auditLog->getParts();
 #ifndef NO_LOGS
         debug(8, "Checking if this request is suitable to be " \
             "saved as an audit log.");
@@ -1250,7 +1250,6 @@ int Transaction::processLogging() {
             debug(4, "There was an audit log modifier for this transaction.");
 #endif
             std::list<std::pair<int, std::string>>::iterator it;
-            parts = this->m_rules->m_auditLog->m_parts;
             debug(7, "AuditLog parts before modification(s): " +
                 std::to_string(parts) + ".");
             for (it = m_auditLogModifier.begin();

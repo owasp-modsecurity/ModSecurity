@@ -32,7 +32,7 @@ double cpu_seconds(void);
 std::string find_resource(const std::string& file, const std::string& param);
 std::string get_path(const std::string& file);
 std::list<std::string> expandEnv(const std::string& var, int flags);
-void createDir(std::string dir, int mode);
+bool createDir(std::string dir, int mode, std::string *error);
 
 
 }  // namespace utils

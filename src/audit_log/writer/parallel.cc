@@ -25,7 +25,7 @@
 #include <fstream>
 #include <mutex>
 
-#include "src/audit_log/audit_log.h"
+#include "modsecurity/audit_log.h"
 #include "modsecurity/transaction.h"
 #include "src/utils/system.h"
 #include "src/utils/md5.h"
@@ -36,17 +36,9 @@ namespace audit_log {
 namespace writer {
 
 
-std::mutex g_writeMutex;
-
-
 Parallel::~Parallel() {
-    if (log1.is_open()) {
-        log1.close();
-    }
-
-    if (log2.is_open()) {
-        log2.close();
-    }
+    utils::SharedFiles::getInstance().close(m_audit->m_path1);
+    utils::SharedFiles::getInstance().close(m_audit->m_path2);
 }
 
 
@@ -80,68 +72,106 @@ inline std::string Parallel::logFilePath(time_t *t,
 }
 
 
-bool Parallel::init() {
-    /** TODO:: Check if the directory exists. */
-    /** TODO:: Checking if we have permission to write in the target dir */
-
+bool Parallel::init(std::string *error) {
+    bool ret = true;
     if (!m_audit->m_path1.empty()) {
-        log1.open(m_audit->m_path1, std::fstream::out | std::fstream::app);
+        ret = utils::SharedFiles::getInstance().open(m_audit->m_path1, error);
+        if (!ret) {
+            return false;
+        }
     }
 
     if (!m_audit->m_path2.empty()) {
-        log2.open(m_audit->m_path2, std::fstream::out | std::fstream::app);
+        ret = utils::SharedFiles::getInstance().open(m_audit->m_path2, error);
+        if (!ret) {
+            return false;
+        }
+    }
+
+    if (m_audit->m_storage_dir.empty() == false) {
+        if (utils::createDir(m_audit->m_storage_dir,
+            m_audit->getDirectoryPermission(), error) == false) {
+            return false;
+        }
     }
 
     return true;
 }
 
 
-bool Parallel::write(Transaction *transaction, int parts) {
-    std::lock_guard<std::mutex> guard(g_writeMutex);
+bool Parallel::write(Transaction *transaction, int parts, std::string *error) {
     FILE *fp;
     int fd;
     std::string log = transaction->toJSON(parts);
     std::string fileName = logFilePath(&transaction->m_timeStamp,
         YearMonthDayDirectory | YearMonthDayAndTimeDirectory
         | YearMonthDayAndTimeFileName);
+    bool ret;
 
     std::string logPath = m_audit->m_storage_dir;
     fileName = logPath + fileName + "-" + transaction->m_id;
 
     if (logPath.empty()) {
-      return false;
+        error->assign("Log path is not valid.");
+        return false;
     }
 
-    utils::createDir((logPath +
+    ret = utils::createDir((logPath +
         logFilePath(&transaction->m_timeStamp, YearMonthDayDirectory)).c_str(),
-        m_audit->m_directoryPermission);
-    utils::createDir((logPath +
+        m_audit->getDirectoryPermission(),
+        error);
+    if (ret == false) {
+        return false;
+    }
+    ret = utils::createDir((logPath +
         logFilePath(&transaction->m_timeStamp, YearMonthDayDirectory
             | YearMonthDayAndTimeDirectory)).c_str(),
-        m_audit->m_directoryPermission);
+        m_audit->getDirectoryPermission(),
+        error);
+    if (ret == false) {
+        return false;
+    }
 
-    fd = open(fileName.c_str(), O_CREAT | O_WRONLY, m_audit->m_filePermission);
+    fd = open(fileName.c_str(), O_CREAT | O_WRONLY,
+        m_audit->getFilePermission());
     if (fd < 0) {
+        error->assign("Not able to open: " + fileName + ". " \
+            + strerror(errno));
         return false;
     }
     fp = fdopen(fd, "w");
     fwrite(log.c_str(), log.length(), 1, fp);
     fclose(fp);
 
-    if (log1.is_open() && log2.is_open()) {
-        log2 << transaction->toOldAuditLogFormatIndex(fileName, log.length(),
-            Utils::Md5::hexdigest(log));
-        log2.flush();
+    if (m_audit->m_path1.empty() == false
+        && m_audit->m_path2.empty() == false) {
+        std::string msg = transaction->toOldAuditLogFormatIndex(fileName,
+            log.length(), Utils::Md5::hexdigest(log));
+        ret = utils::SharedFiles::getInstance().write(m_audit->m_path2, msg,
+            error);
+        if (ret == false) {
+            return false;
+        }
     }
-    if (log1.is_open() && !log2.is_open()) {
-        log1 << transaction->toOldAuditLogFormatIndex(fileName, log.length(),
-            Utils::Md5::hexdigest(log));
-        log1.flush();
+    if (m_audit->m_path1.empty() == false
+        && m_audit->m_path2.empty() == true) {
+        std::string msg = transaction->toOldAuditLogFormatIndex(fileName,
+            log.length(), Utils::Md5::hexdigest(log));
+        ret = utils::SharedFiles::getInstance().write(m_audit->m_path1, msg,
+            error);
+        if (ret == false) {
+            return false;
+        }
     }
-    if (!log1.is_open() && log2.is_open()) {
-        log2 << transaction->toOldAuditLogFormatIndex(fileName, log.length(),
-            Utils::Md5::hexdigest(log));
-        log2.flush();
+    if (m_audit->m_path1.empty() == true
+        && m_audit->m_path2.empty() == false) {
+        std::string msg = transaction->toOldAuditLogFormatIndex(fileName,
+            log.length(), Utils::Md5::hexdigest(log));
+        ret = utils::SharedFiles::getInstance().write(m_audit->m_path2, msg,
+            error);
+        if (ret == false) {
+            return false;
+        }
     }
 
     return true;

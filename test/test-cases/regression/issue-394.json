@@ -32,11 +32,7 @@
   "rules": [
     "SecRuleEngine On",
     "SecRequestBodyAccess On",
-    "SecResponseBodyAccess On",
-    "SecAuditEngine On",
-    "SecAuditLogType Serial",
-    "SecAuditLog logs\/modsec_audit.log",
-    "SecAuditLogParts ABCDEFHJKZ"
+    "SecResponseBodyAccess On"
   ]
 }
 ]

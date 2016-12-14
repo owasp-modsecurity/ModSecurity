@@ -15,9 +15,7 @@
 
 #include "src/audit_log/writer/serial.h"
 
-// #include <mutex>
-
-#include "src/audit_log/audit_log.h"
+#include "modsecurity/audit_log.h"
 
 namespace modsecurity {
 namespace audit_log {
@@ -26,7 +24,7 @@ namespace writer {
 
 
 Serial::~Serial() {
-    m_log.close();
+    utils::SharedFiles::getInstance().close(m_audit->m_path1);
 }
 
 
@@ -42,25 +40,20 @@ void Serial::generateBoundary(std::string *boundary) {
 }
 
 
-bool Serial::init() {
-    m_log.open(m_audit->m_path1, std::fstream::out | std::fstream::app);
-    return true;
+bool Serial::init(std::string *error) {
+    return utils::SharedFiles::getInstance().open(m_audit->m_path1, error);
 }
 
 
-bool Serial::write(Transaction *transaction, int parts) {
+bool Serial::write(Transaction *transaction, int parts, std::string *error) {
     std::string boundary;
+    std::string msg;
 
     generateBoundary(&boundary);
+    msg = transaction->toOldAuditLogFormat(parts, "-" + boundary + "--");
 
-    // serialLoggingMutex.lock();
-
-    m_log << transaction->toOldAuditLogFormat(parts, "-" + boundary + "--");
-    m_log.flush();
-
-    // serialLoggingMutex.unlock();
-
-    return true;
+    return utils::SharedFiles::getInstance().write(m_audit->m_path1, msg,
+        error);
 }
 
 }  // namespace writer

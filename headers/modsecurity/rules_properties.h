@@ -32,20 +32,19 @@
 #include "modsecurity/rule.h"
 #include "modsecurity/rules_exceptions.h"
 #include "modsecurity/actions/action.h"
+#include "modsecurity/audit_log.h"
 
 
 #ifdef __cplusplus
 
 namespace modsecurity {
 class RulesExceptions;
-namespace audit_log {
-class AuditLog;
-}
 namespace Parser {
 class Driver;
 }
 
 using modsecurity::debug_log::DebugLog;
+using modsecurity::audit_log::AuditLog;
 
 /** @ingroup ModSecurity_CPP_API */
 class ConfigInt {
@@ -74,8 +73,9 @@ class ConfigString {
 
 class RulesProperties {
  public:
-    RulesProperties() : m_auditLog(NULL),
+    RulesProperties() :
         m_debugLog(new DebugLog()),
+        m_auditLog(new AuditLog()),
         m_remoteRulesActionOnFailed(PropertyNotSetRemoteRulesAction),
         m_secRequestBodyAccess(PropertyNotSetConfigBoolean),
         m_secResponseBodyAccess(PropertyNotSetConfigBoolean),
@@ -87,8 +87,9 @@ class RulesProperties {
         m_tmpSaveUploadedFiles(PropertyNotSetConfigBoolean) { }
 
 
-    explicit RulesProperties(DebugLog *debugLog) : m_auditLog(NULL),
+    explicit RulesProperties(DebugLog *debugLog) :
         m_debugLog(debugLog),
+        m_auditLog(new AuditLog()),
         m_remoteRulesActionOnFailed(PropertyNotSetRemoteRulesAction),
         m_secRequestBodyAccess(PropertyNotSetConfigBoolean),
         m_secResponseBodyAccess(PropertyNotSetConfigBoolean),
@@ -102,6 +103,7 @@ class RulesProperties {
 
     ~RulesProperties() {
         delete m_debugLog;
+        delete m_auditLog;
     }
 
 
@@ -298,14 +300,6 @@ class RulesProperties {
             to->m_httpblKey.m_value = from->m_httpblKey.m_value;
         }
 
-        if (from->m_auditLogPath.m_set == true) {
-            to->m_auditLogPath.m_value = from->m_auditLogPath.m_value;
-        }
-
-        if (from->m_auditLogParts.m_set == true) {
-            to->m_auditLogParts.m_value = from->m_auditLogParts.m_value;
-        }
-
         to->m_exceptions.merge(from->m_exceptions);
 
         to->m_components.insert(to->m_components.end(),
@@ -325,6 +319,16 @@ class RulesProperties {
                 actions::Action *action = actions_from->at(j);
                 action->refCountIncrease();
                 actions_to->push_back(action);
+            }
+        }
+
+
+        if (to->m_auditLog) {
+            std::string error;
+            to->m_auditLog->merge(from->m_auditLog, &error);
+            if (error.size() > 0) {
+                *err << error;
+                return -1;
             }
         }
 
@@ -412,8 +416,6 @@ class RulesProperties {
     std::list<std::string> m_components;
     std::ostringstream m_parserError;
     std::set<std::string> m_responseBodyTypeToBeInspected;
-    ConfigString m_auditLogParts;
-    ConfigString m_auditLogPath;
     ConfigString m_httpblKey;
     ConfigString m_uploadDirectory;
     ConfigString m_uploadTmpDirectory;

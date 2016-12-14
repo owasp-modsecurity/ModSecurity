@@ -22,7 +22,7 @@
 #ifndef SRC_AUDIT_LOG_WRITER_HTTPS_H_
 #define SRC_AUDIT_LOG_WRITER_HTTPS_H_
 
-#include "src/audit_log/writer.h"
+#include "src/audit_log/writer/writer.h"
 #include "modsecurity/transaction.h"
 
 #ifdef __cplusplus
@@ -32,27 +32,16 @@ namespace audit_log {
 namespace writer {
 
 /** @ingroup ModSecurity_CPP_API */
-class Https : public audit_log::Writer {
+class Https : public Writer {
  public:
     explicit Https(audit_log::AuditLog *audit)
-        : audit_log::Writer(audit) { }
+        : audit_log::writer::Writer(audit) { }
 
     ~Https() override;
 
-    void refCountIncrease() override {
-        m_refereceCount++;
-    }
-
-
-    void refCountDecreaseAndCheck() override {
-        m_refereceCount--;
-        if (m_refereceCount == 0) {
-            delete this;
-        }
-    }
-
-    bool init() override;
-    bool write(Transaction *transaction, int parts) override;
+    bool init(std::string *error) override;
+    bool write(Transaction *transaction, int parts,
+        std::string *error) override;
 };
 
 }  // namespace writer

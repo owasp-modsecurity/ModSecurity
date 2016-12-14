@@ -25,7 +25,7 @@
 #include <fstream>
 #include <mutex>
 
-#include "src/audit_log/audit_log.h"
+#include "modsecurity/audit_log.h"
 #include "modsecurity/transaction.h"
 #include "src/utils/md5.h"
 #include "src/utils/https_client.h"
@@ -40,12 +40,12 @@ Https::~Https() {
 }
 
 
-bool Https::init() {
+bool Https::init(std::string *error) {
     return true;
 }
 
 
-bool Https::write(Transaction *transaction, int parts) {
+bool Https::write(Transaction *transaction, int parts, std::string *error) {
     Utils::HttpsClient m_http_client;
     transaction->debug(7, "Sending logs to: " + m_audit->m_path1);
 
