@@ -216,6 +216,9 @@ bool AuditLog::init(std::string *error) {
         m_writer = new audit_log::writer::Parallel(this);
     }
 
+    if (m_status == OffAuditLogStatus || m_status == NotSetLogStatus) {
+        return true;
+    }
 
     if (m_writer == NULL || m_writer->init(error) == false) {
         return false;
@@ -256,6 +259,10 @@ bool AuditLog::saveIfRelevant(Transaction *transaction) {
 
 
 bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
+    if (m_status == OffAuditLogStatus || m_status == NotSetLogStatus) {
+        return true;
+    }
+
     if (this->isRelevant(transaction->m_httpCodeReturned) == false &&
         transaction->m_toBeSavedInAuditlogs == false) {
         transaction->debug(5, "Return code `" +
