@@ -1410,10 +1410,14 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         audit_log << std::endl;
         /** TODO: write audit_log D part. */
     }
-    if (parts & audit_log::AuditLog::EAuditLogPart) {
+    if (parts & audit_log::AuditLog::EAuditLogPart
+        && m_responseBody.tellp() > 0) {
+        std::string body = m_responseBody.str();
         audit_log << "--" << trailer << "-" << "E--" << std::endl;
+        if (body.size() > 0) {
+            audit_log << body << std::endl;
+        }
         audit_log << std::endl;
-        /** TODO: write audit_log E part. */
     }
     if (parts & audit_log::AuditLog::FAuditLogPart) {
         std::vector<const collection::Variable *> l;
@@ -1504,6 +1508,7 @@ std::string Transaction::toJSON(int parts) {
     LOGFY_ADD("uri", this->m_uri);
 
     if (parts & audit_log::AuditLog::CAuditLogPart) {
+        // FIXME: check for the binary content size.
         LOGFY_ADD("body", this->m_requestBody.str().c_str());
     }
 
