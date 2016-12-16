@@ -1393,21 +1393,26 @@ std::string Transaction::toOldAuditLogFormat(int parts,
 
         m_collections.m_transient->resolveMultiMatches("REQUEST_HEADERS", &l);
         for (auto h : l) {
-            audit_log << h->m_key.c_str() << ": ";
+            size_t pos = strlen("REQUEST_HEADERS:");
+            audit_log << h->m_key.c_str() + pos << ": ";
             audit_log << h->m_value.c_str() << std::endl;
             delete h;
         }
+        audit_log << std::endl;
     }
     if (parts & audit_log::AuditLog::CAuditLogPart) {
         audit_log << "--" << trailer << "-" << "C--" << std::endl;
+        audit_log << std::endl;
         /** TODO: write audit_log C part. */
     }
     if (parts & audit_log::AuditLog::DAuditLogPart) {
         audit_log << "--" << trailer << "-" << "D--" << std::endl;
+        audit_log << std::endl;
         /** TODO: write audit_log D part. */
     }
     if (parts & audit_log::AuditLog::EAuditLogPart) {
         audit_log << "--" << trailer << "-" << "E--" << std::endl;
+        audit_log << std::endl;
         /** TODO: write audit_log E part. */
     }
     if (parts & audit_log::AuditLog::FAuditLogPart) {
@@ -1416,29 +1421,37 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         audit_log << "--" << trailer << "-" << "F--" << std::endl;
         m_collections.m_transient->resolveMultiMatches("RESPONSE_HEADERS", &l);
         for (auto h : l) {
-            audit_log << h->m_key.c_str() << ": ";
+            size_t pos = strlen("RESPONSE_HEADERS:");
+            audit_log << h->m_key.c_str() + pos << ": ";
             audit_log << h->m_value.c_str() << std::endl;
             delete h;
         }
     }
+    audit_log << std::endl;
+
     if (parts & audit_log::AuditLog::GAuditLogPart) {
         audit_log << "--" << trailer << "-" << "G--" << std::endl;
+        audit_log << std::endl;
         /** TODO: write audit_log G part. */
     }
     if (parts & audit_log::AuditLog::HAuditLogPart) {
         audit_log << "--" << trailer << "-" << "H--" << std::endl;
+        audit_log << std::endl;
         /** TODO: write audit_log H part. */
     }
     if (parts & audit_log::AuditLog::IAuditLogPart) {
         audit_log << "--" << trailer << "-" << "I--" << std::endl;
+        audit_log << std::endl;
         /** TODO: write audit_log I part. */
     }
     if (parts & audit_log::AuditLog::JAuditLogPart) {
         audit_log << "--" << trailer << "-" << "J--" << std::endl;
+        audit_log << std::endl;
         /** TODO: write audit_log J part. */
     }
     if (parts & audit_log::AuditLog::KAuditLogPart) {
         audit_log << "--" << trailer << "-" << "K--" << std::endl;
+        audit_log << std::endl;
         /** TODO: write audit_log K part. */
     }
     audit_log << "--" << trailer << "-" << "Z--" << std::endl << std::endl;
@@ -1583,7 +1596,6 @@ std::string Transaction::toJSON(int parts) {
         for (auto a : m_rulesMessages) {
             yajl_gen_map_open(g);
             LOGFY_ADD("message", a.m_message.c_str());
-#if 1
             yajl_gen_string(g,
                 reinterpret_cast<const unsigned char*>("details"),
                 strlen("details"));
@@ -1611,7 +1623,6 @@ std::string Transaction::toJSON(int parts) {
             LOGFY_ADD("maturity", std::to_string(a.m_maturity).c_str());
             LOGFY_ADD("accuracy", std::to_string(a.m_accuracy).c_str());
             yajl_gen_map_close(g);
-#endif
             yajl_gen_map_close(g);
         }
         yajl_gen_array_close(g);
