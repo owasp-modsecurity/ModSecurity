@@ -623,6 +623,9 @@ end_exec:
     for (const auto &u : ruleMessage.m_server_logs) {
         trasn->serverLog(u);
     }
+    if (ruleMessage.m_server_logs.size() > 0) {
+        trasn->m_rulesMessages.push_back(ruleMessage);
+    }
 
     while (finalVars.empty() == false) {
         auto *a = finalVars.back();

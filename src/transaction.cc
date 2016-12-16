@@ -172,9 +172,6 @@ Transaction::~Transaction() {
     m_requestBody.str(std::string());
     m_requestBody.clear();
 
-    for (auto *a : m_rulesMessages) {
-        delete a;
-    }
     m_rulesMessages.clear();
 
     m_rules->decrementReferenceCount();
@@ -1504,7 +1501,8 @@ std::string Transaction::toJSON(int parts) {
 
         m_collections.m_transient->resolveMultiMatches("REQUEST_HEADERS", &l);
         for (auto h : l) {
-            LOGFY_ADD(h->m_key.c_str(), h->m_value.c_str());
+            size_t pos = strlen("REQUEST_HEADERS:");
+            LOGFY_ADD(h->m_key.c_str() + pos, h->m_value.c_str());
             delete h;
         }
 
@@ -1534,7 +1532,8 @@ std::string Transaction::toJSON(int parts) {
 
         m_collections.m_transient->resolveMultiMatches("RESPONSE_HEADERS", &l);
         for (auto h : l) {
-            LOGFY_ADD(h->m_key.c_str(), h->m_value.c_str());
+            size_t pos = strlen("RESPONSE_HEADERS:");
+            LOGFY_ADD(h->m_key.c_str() + pos, h->m_value.c_str());
             delete h;
         }
 
@@ -1583,34 +1582,36 @@ std::string Transaction::toJSON(int parts) {
         yajl_gen_array_open(g);
         for (auto a : m_rulesMessages) {
             yajl_gen_map_open(g);
-            LOGFY_ADD("message", a->m_message.c_str());
+            LOGFY_ADD("message", a.m_message.c_str());
+#if 1
             yajl_gen_string(g,
-                reinterpret_cast<const unsigned char*>("producer"),
-                strlen("producer"));
+                reinterpret_cast<const unsigned char*>("details"),
+                strlen("details"));
             yajl_gen_map_open(g);
-            LOGFY_ADD("match", a->m_match.c_str());
-            LOGFY_ADD("ruleId", std::to_string(a->m_ruleId).c_str());
-            LOGFY_ADD("file", a->m_ruleFile.c_str());
-            LOGFY_ADD("lineNumber", std::to_string(a->m_ruleLine).c_str());
-            LOGFY_ADD("data", a->m_data.c_str());
-            LOGFY_ADD("severity", std::to_string(a->m_severity).c_str());
-            LOGFY_ADD("ver", a->m_ver.c_str());
-            LOGFY_ADD("rev", a->m_rev.c_str());
+            LOGFY_ADD("match", a.m_match.c_str());
+            LOGFY_ADD("ruleId", std::to_string(a.m_ruleId).c_str());
+            LOGFY_ADD("file", a.m_ruleFile.c_str());
+            LOGFY_ADD("lineNumber", std::to_string(a.m_ruleLine).c_str());
+            LOGFY_ADD("data", a.m_data.c_str());
+            LOGFY_ADD("severity", std::to_string(a.m_severity).c_str());
+            LOGFY_ADD("ver", a.m_ver.c_str());
+            LOGFY_ADD("rev", a.m_rev.c_str());
 
             yajl_gen_string(g,
                 reinterpret_cast<const unsigned char*>("tags"),
                 strlen("tags"));
             yajl_gen_array_open(g);
-            for (auto b : a->m_tags) {
+            for (auto b : a.m_tags) {
                 yajl_gen_string(g,
                     reinterpret_cast<const unsigned char*>(b.c_str()),
                     strlen(b.c_str()));
             }
             yajl_gen_array_close(g);
 
-            LOGFY_ADD("maturity", std::to_string(a->m_maturity).c_str());
-            LOGFY_ADD("accuracy", std::to_string(a->m_accuracy).c_str());
+            LOGFY_ADD("maturity", std::to_string(a.m_maturity).c_str());
+            LOGFY_ADD("accuracy", std::to_string(a.m_accuracy).c_str());
             yajl_gen_map_close(g);
+#endif
             yajl_gen_map_close(g);
         }
         yajl_gen_array_close(g);

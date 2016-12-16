@@ -308,7 +308,7 @@ class Transaction {
      * of the actions: `log_data' and `msg'. These should be included on the
      * auditlogs.
      */
-    std::list<modsecurity::RuleMessage *> m_rulesMessages;
+    std::list<modsecurity::RuleMessage> m_rulesMessages;
 
     /**
      * Holds the request body, in case of any.
