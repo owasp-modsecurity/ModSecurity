@@ -53,11 +53,11 @@ std::string RuleMessage::disruptiveErrorLog(Transaction *trans,
     return modsecurity::utils::string::toHexIfNeeded(msg);
 }
 
-std::string RuleMessage::errorLog(Transaction *trans) {
+
+std::string RuleMessage::noClientErrorLog(Transaction *trans) {
     std::string msg;
 
-    msg.append("[client " + std::string(trans->m_clientIpAddress) + "]");
-    msg.append(" ModSecurity: Warning. ");
+    msg.append("ModSecurity: Warning. ");
     msg.append(m_match);
     msg.append(" [file \"" + std::string(m_ruleFile) + "\"]");
     msg.append(" [line \"" + std::to_string(m_ruleLine) + "\"]");
@@ -73,12 +73,29 @@ std::string RuleMessage::errorLog(Transaction *trans) {
     for (auto &a : m_tags) {
         msg.append(" [tag \"" + a + "\"]");
     }
-    msg.append(" [hostname \"" + std::string(trans->m_serverIpAddress) \
+
+    return modsecurity::utils::string::toHexIfNeeded(msg);
+}
+
+std::string RuleMessage::errorLogTail(Transaction *trans) {
+    std::string msg;
+
+    msg.append("[hostname \"" + std::string(trans->m_serverIpAddress) \
         + "\"]");
     msg.append(" [uri \"" + trans->m_uri_no_query_string_decoded + "\"]");
     msg.append(" [unique_id \"" + trans->m_id + "\"]");
 
     return modsecurity::utils::string::toHexIfNeeded(msg);
+}
+
+std::string RuleMessage::errorLog(Transaction *trans) {
+    std::string msg;
+
+    msg.append("[client " + std::string(trans->m_clientIpAddress) + "] ");
+    msg.append(noClientErrorLog(trans));
+    msg.append(" " + errorLogTail(trans));
+
+    return msg;
 }
 
 }  // namespace modsecurity

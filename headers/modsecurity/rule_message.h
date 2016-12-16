@@ -52,7 +52,8 @@ class RuleMessage {
 
     std::string errorLog(Transaction *trans);
     std::string disruptiveErrorLog(Transaction *trans, std::string log2);
-
+    std::string noClientErrorLog(Transaction *trans);
+    std::string errorLogTail(Transaction *trans);
 
     std::string m_match;
     std::string m_ruleFile;
