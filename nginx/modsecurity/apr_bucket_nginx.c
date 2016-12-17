@@ -62,7 +62,9 @@ static apr_status_t nginx_bucket_read(apr_bucket *b, const char **str,
             return APR_EGENERAL;
         }
 
-        size = ngx_read_file(buf->file, data, ngx_buf_size(buf), buf->file_pos);
+        size = ngx_read_file(buf->file, data, ngx_buf_size(buf),
+                buf->file_pos);
+
         if (size != ngx_buf_size(buf)) {
             apr_bucket_free(data);
             return APR_EGENERAL;
@@ -153,10 +155,44 @@ ngx_buf_t * apr_bucket_to_ngx_buf(apr_bucket *e, ngx_pool_t *pool) {
     return buf;
 }
 
-ngx_int_t
-move_chain_to_brigade(ngx_chain_t *chain, apr_bucket_brigade *bb, ngx_pool_t *pool, ngx_int_t last_buf) {
+ngx_int_t copy_chain_to_brigade(ngx_chain_t *chain_orig,
+        apr_bucket_brigade *bb, ngx_pool_t *pool, ngx_int_t last_buf)
+{
+    apr_bucket *e;
+
+    ngx_chain_t *chain = chain_orig;
+    while (chain) {
+        e = ngx_buf_to_apr_bucket(chain->buf, bb->p, bb->bucket_alloc);
+        if (e == NULL) {
+            return NGX_ERROR;
+        }
+
+        APR_BRIGADE_INSERT_TAIL(bb, e);
+        if (chain->buf->last_buf) {
+            e = apr_bucket_eos_create(bb->bucket_alloc);
+            APR_BRIGADE_INSERT_TAIL(bb, e);
+            return NGX_OK;
+        }
+        chain = chain->next;
+    }
+
+    if (last_buf) {
+        e = apr_bucket_eos_create(bb->bucket_alloc);
+        APR_BRIGADE_INSERT_TAIL(bb, e);
+        return NGX_OK;
+    }
+
+    return NGX_AGAIN;
+}
+
+
+ngx_int_t move_chain_to_brigade(ngx_chain_t *chain_orig,
+        apr_bucket_brigade *bb, ngx_pool_t *pool, ngx_int_t last_buf)
+{
     apr_bucket         *e;
-    ngx_chain_t        *cl;
+    ngx_chain_t *cl;
+
+    ngx_chain_t *chain = chain_orig;
 
     while (chain) {
         e = ngx_buf_to_apr_bucket(chain->buf, bb->p, bb->bucket_alloc);
@@ -168,7 +204,6 @@ move_chain_to_brigade(ngx_chain_t *chain, apr_bucket_brigade *bb, ngx_pool_t *po
         if (chain->buf->last_buf) {
             e = apr_bucket_eos_create(bb->bucket_alloc);
             APR_BRIGADE_INSERT_TAIL(bb, e);
-            chain->buf->last_buf = 0;
             return NGX_OK;
         }
         cl = chain;
@@ -181,12 +216,12 @@ move_chain_to_brigade(ngx_chain_t *chain, apr_bucket_brigade *bb, ngx_pool_t *po
         APR_BRIGADE_INSERT_TAIL(bb, e);
         return NGX_OK;
     }
-
     return NGX_AGAIN;
 }
 
-ngx_int_t
-move_brigade_to_chain(apr_bucket_brigade *bb, ngx_chain_t **ll, ngx_pool_t *pool) {
+ngx_int_t move_brigade_to_chain(apr_bucket_brigade *bb,
+        ngx_chain_t **ll, ngx_pool_t *pool)
+{
     apr_bucket  *e;
     ngx_buf_t   *buf;
     ngx_chain_t *cl;
@@ -215,8 +250,10 @@ move_brigade_to_chain(apr_bucket_brigade *bb, ngx_chain_t **ll, ngx_pool_t *pool
                 }
 
                 cl->buf->last_buf = 1;
+                cl->next = NULL;
                 *ll = cl;
             } else {
+                cl->next = NULL;
                 cl->buf->last_buf = 1;
             }
             apr_brigade_cleanup(bb);
@@ -242,6 +279,7 @@ move_brigade_to_chain(apr_bucket_brigade *bb, ngx_chain_t **ll, ngx_pool_t *pool
         *ll = cl;
         ll = &cl->next;
     }
+
 
     apr_brigade_cleanup(bb);
     /* no eos or error */
