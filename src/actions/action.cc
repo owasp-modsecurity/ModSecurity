@@ -34,6 +34,7 @@
 #include "src/actions/disruptive/pass.h"
 #include "src/actions/log.h"
 #include "src/actions/no_log.h"
+#include "src/actions/no_audit_log.h"
 #include "src/actions/multi_match.h"
 
 
@@ -54,52 +55,6 @@ bool Action::evaluate(Rule *rule, Transaction *transaction) {
     return true;
 }
 
-
-Action *Action::instantiate(const std::string& name) {
-    std::string status("status:");
-    std::string redirect("redirect:");
-    std::string block("block");
-    std::string phase("phase:");
-    std::string rule_id("id:");
-
-    if (name.compare(0, status.length(), status) == 0) {
-        return new data::Status(name);
-    }
-    if (name.compare(0, redirect.length(), redirect) == 0) {
-        return new disruptive::Redirect(name);
-    }
-    if (name.compare(0, block.length(), block) == 0) {
-        return new disruptive::Block(name);
-    }
-    if (name.compare(0, phase.length(), phase) == 0) {
-        return new Phase(name);
-    }
-    if (name.compare(0, rule_id.length(), rule_id) == 0) {
-        return new RuleId(name);
-    }
-    if (name == "chain") {
-        return new Chain(name);
-    }
-    if (name == "capture") {
-        return new Capture(name);
-    }
-    if (name == "pass") {
-        return new disruptive::Pass(name);
-    }
-    if (name == "deny") {
-        return new disruptive::Deny(name);
-    }
-    if (name == "log") {
-        return new Log(name);
-    }
-    if (name == "nolog") {
-        return new NoLog(name);
-    }
-    if (utils::string::tolower(name) == "multimatch") {
-        return new MultiMatch(utils::string::tolower(name));
-    }
-    return new Action(name);
-}
 
 }  // namespace actions
 }  // namespace modsecurity

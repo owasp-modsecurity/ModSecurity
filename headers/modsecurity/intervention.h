@@ -61,7 +61,7 @@ namespace intervention {
         freeLog(i);
     }
 
-}  // namespace modsecurity
+}  // namespace intervention
 #endif
 
 #ifdef __cplusplus

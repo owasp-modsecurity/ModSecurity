@@ -67,7 +67,6 @@ class Action {
     }
     virtual bool init(std::string *error) { return true; }
     virtual bool isDisruptive() { return false; }
-    static Action *instantiate(const std::string& name);
 
 
     void set_name_and_payload(const std::string& data) {

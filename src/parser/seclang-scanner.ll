@@ -25,10 +25,13 @@ typedef yy::seclang_parser p;
 %}
 %option noyywrap nounput batch debug noinput
 
-ACTION                                  (?i:accuracy|append|block|capture|chain|deny|deprecatevar|drop|expirevar|id:[0-9]+|id:'[0-9]+'|log|multiMatch|noauditlog|nolog|pass|pause|prepend|proxy|sanitiseArg|sanitiseMatched|sanitiseMatchedBytes|sanitiseRequestHeader|sanitiseResponseHeader|setrsc|setenv|status:[0-9]+)
 ACTION_ACCURACY                         (?i:accuracy)
 ACTION_ALLOW                            ((?i:allow:(?i:REQUEST|PHASE))|(?i:phase:'(?i:REQUEST|PHASE)')|(?i:allow))
+ACTION_APPEND                           (?i:append)
 ACTION_AUDIT_LOG                        (?i:auditlog)
+ACTION_BLOCK                            (?i:block)
+ACTION_CAPTURE                          (?i:capture)
+ACTION_CHAIN                            (?i:chain)
 ACTION_CTL_AUDIT_ENGINE                 (?i:ctl:auditEngine)
 ACTION_CTL_AUDIT_LOG_PARTS              (?i:ctl:auditLogParts)
 ACTION_CTL_BDY_JSON                     (?i:ctl:requestBodyProcessor=JSON)
@@ -39,25 +42,47 @@ ACTION_CTL_RULE_ENGINE                  (?i:ctl:ruleEngine)
 ACTION_CTL_RULE_REMOVE_BY_ID            (?i:ctl:ruleRemoveById)
 ACTION_CTL_RULE_REMOVE_TARGET_BY_ID     (?i:ctl:ruleRemoveTargetById)
 ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG    (?i:ctl:ruleRemoveTargetByTag)
+ACTION_DENY                             (?i:deny)
+ACTION_DEPRECATE_VAR                    (?i:deprecatevar)
+ACTION_DROP                             (?i:drop)
 ACTION_EXEC                             (?i:exec)
-ACTION_EXPIREVAR                        (?i:expirevar)
+ACTION_EXPIRE_VAR                       (?i:expirevar)
+ACTION_ID                               (?i:id:[0-9]+|id:'[0-9]+')
 ACTION_INITCOL                          (?i:initcol)
+ACTION_LOG_DATA                         (?i:logdata)
+ACTION_LOG                              (?i:log)
 ACTION_MATURITY                         (?i:maturity)
 ACTION_MSG                              (?i:msg)
+ACTION_MULTI_MATCH                      (?i:multiMatch)
+ACTION_NO_AUDIT_LOG                     (?i:noauditlog)
+ACTION_NO_LOG                           (?i:nolog)
+ACTION_PASS                             (?i:pass)
+ACTION_PAUSE                            (?i:pause)
 ACTION_PHASE                            ((?i:phase:(?i:REQUEST|RESPONSE|LOGGING|[0-9]+))|(?i:phase:'(?i:REQUEST|RESPONSE|LOGGING|[0-9]+)'))
+ACTION_PREPEND                          (?i:prepend)
+ACTION_PROXY                            (?i:proxy)
 ACTION_REDIRECT                         (?i:redirect)
 ACTION_REV                              (?i:rev)
+ACTION_SANATISE_ARG                     (?i:sanitiseArg)
+ACTION_SANATISE_MATCHED_BYTES           (?i:sanitiseMatchedBytes)
+ACTION_SANATISE_MATCHED                  (?i:sanitiseMatched)
+ACTION_SANATISE_REQUEST_HEADER          (?i:sanitiseRequestHeader)
+ACTION_SANATISE_RESPONSE_HEADER         (?i:sanitiseResponseHeader)
 ACTION_SETENV                           (?i:setenv)
+ACTION_SETRSC                           (?i:setrsc)
 ACTION_SETSID                           (?i:setsid)
 ACTION_SETUID                           (?i:setuid)
 ACTION_SETVAR                           (?i:setvar)
 ACTION_SEVERITY                         (?i:severity)
 ACTION_SEVERITY_VALUE                   (?i:(EMERGENCY|ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)|[0-9]+)
-ACTION_SKIP                             (?i:skip)
 ACTION_SKIP_AFTER                       (?i:skipAfter)
+ACTION_SKIP                             (?i:skip)
+ACTION_STATUS                           (?i:status:[0-9]+)
 ACTION_TAG                              (?i:tag)
 ACTION_VER                              (?i:ver)
 ACTION_XMLNS                            (?i:xmlns)
+
+
 AUDIT_PARTS                             [ABCDEFHJKIZ]+
 COL_FREE_TEXT_SPACE_COMMA               ([^,"])+
 COL_NAME                                [A-Za-z]+
@@ -129,7 +154,6 @@ FREE_TEXT_QUOTE_COMMA                   [^,\']+
 FREE_TEXT_SPACE                         [^ \t]+
 FREE_TEXT_SPACE_COMMA                   [^, \t]+
 FREE_TEXT_SPACE_COMMA_QUOTE             [^, \t\"\n\r]+
-LOG_DATA                                (?i:logdata)
 NEW_LINE_FREE_TEXT                      [^, \t\"\n\r]+
 OPERATORNOARG                           (?i:@unconditionalMatch|@detectSQLi|@detectXSS|@validateUrlEncoding|@validateUtf8Encoding)
 OPERATOR                                (?i:(?:@inspectFile|@fuzzyHash|@validateByteRange|@validateDTD|@validateHash|@validateSchema|@verifyCC|@verifyCPF|@verifySSN|@gsbLookup|@rsub)|(?:\!{0,1})(?:@within|@containsWord|@contains|@endsWith|@eq|@ge|@gt|@ipMatchF|@ipMatch|@ipMatchFromFile|@le|@lt|@pmf|@pm|@pmFromFile|@rbl|@rx|@streq|@strmatch|@beginsWith))
@@ -179,6 +203,30 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
   // Code run each time yylex is called.
   driver.loc.back()->step();
 %}
+
+{ACTION_APPEND}                                                         { return p::make_ACTION_APPEND(yytext, *driver.loc.back()); }
+{ACTION_BLOCK}                                                          { return p::make_ACTION_BLOCK(yytext, *driver.loc.back()); }
+{ACTION_CAPTURE}                                                        { return p::make_ACTION_CAPTURE(yytext, *driver.loc.back()); }
+{ACTION_CHAIN}                                                          { return p::make_ACTION_CHAIN(yytext, *driver.loc.back()); }
+{ACTION_DENY}                                                           { return p::make_ACTION_DENY(yytext, *driver.loc.back()); }
+{ACTION_DEPRECATE_VAR}                                                  { return p::make_ACTION_DEPRECATE_VAR(yytext, *driver.loc.back()); }
+{ACTION_DROP}                                                           { return p::make_ACTION_DROP(yytext, *driver.loc.back()); }
+{ACTION_ID}                                                             { return p::make_ACTION_ID(yytext, *driver.loc.back()); }
+{ACTION_LOG}                                                            { return p::make_ACTION_LOG(yytext, *driver.loc.back()); }
+{ACTION_MULTI_MATCH}                                                    { return p::make_ACTION_MULTI_MATCH(yytext, *driver.loc.back()); }
+{ACTION_NO_AUDIT_LOG}                                                   { return p::make_ACTION_NO_AUDIT_LOG(yytext, *driver.loc.back()); }
+{ACTION_NO_LOG}                                                         { return p::make_ACTION_NO_LOG(yytext, *driver.loc.back()); }
+{ACTION_PASS}                                                           { return p::make_ACTION_PASS(yytext, *driver.loc.back()); }
+{ACTION_PAUSE}                                                          { return p::make_ACTION_PAUSE(yytext, *driver.loc.back()); }
+{ACTION_PREPEND}                                                        { return p::make_ACTION_PREPEND(yytext, *driver.loc.back()); }
+{ACTION_PROXY}                                                          { return p::make_ACTION_PROXY(yytext, *driver.loc.back()); }
+{ACTION_SANATISE_ARG}                                                   { return p::make_ACTION_SANATISE_ARG(yytext, *driver.loc.back()); }
+{ACTION_SANATISE_MATCHED}                                               { return p::make_ACTION_SANATISE_MATCHED(yytext, *driver.loc.back()); }
+{ACTION_SANATISE_MATCHED_BYTES}                                         { return p::make_ACTION_SANATISE_MATCHED_BYTES(yytext, *driver.loc.back()); }
+{ACTION_SANATISE_REQUEST_HEADER}                                        { return p::make_ACTION_SANATISE_REQUEST_HEADER(yytext, *driver.loc.back()); }
+{ACTION_SANATISE_RESPONSE_HEADER}                                       { return p::make_ACTION_SANATISE_RESPONSE_HEADER(yytext, *driver.loc.back()); }
+{ACTION_SETRSC}                                                         { return p::make_ACTION_SETRSC(yytext, *driver.loc.back()); }
+{ACTION_STATUS}                                                         { return p::make_ACTION_STATUS(yytext, *driver.loc.back()); }
 {ACTION_ACCURACY}:'{FREE_TEXT_QUOTE}'                                   { return p::make_ACTION_ACCURACY(yytext, *driver.loc.back()); }
 {ACTION_ACCURACY}:{FREE_TEXT_QUOTE}                                     { return p::make_ACTION_ACCURACY(yytext, *driver.loc.back()); }
 {ACTION_ALLOW}                                                          { return p::make_ACTION_ALLOW(yytext, *driver.loc.back()); }
@@ -195,10 +243,10 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
 {ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG}[=]{REMOVE_RULE_BY}               { return p::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG(yytext, *driver.loc.back()); }
 {ACTION_EXEC}:'{VAR_FREE_TEXT_QUOTE}'                                   { return p::make_ACTION_EXEC(yytext, *driver.loc.back()); }
 {ACTION_EXEC}:{VAR_FREE_TEXT_SPACE_COMMA}                               { return p::make_ACTION_EXEC(yytext, *driver.loc.back()); }
-{ACTION_EXPIREVAR}:'{VAR_FREE_TEXT_QUOTE}={VAR_FREE_TEXT_QUOTE}'        { return p::make_ACTION_EXPIREVAR(yytext, *driver.loc.back()); }
-{ACTION_EXPIREVAR}:'{VAR_FREE_TEXT_QUOTE}'                              { return p::make_ACTION_EXPIREVAR(yytext, *driver.loc.back()); }
-{ACTION_EXPIREVAR}:{VAR_FREE_TEXT_SPACE_COMMA}                          { return p::make_ACTION_EXPIREVAR(yytext, *driver.loc.back()); }
-{ACTION_EXPIREVAR}:{VAR_FREE_TEXT_SPACE}={VAR_FREE_TEXT_SPACE_COMMA}    { return p::make_ACTION_EXPIREVAR(yytext, *driver.loc.back()); }
+{ACTION_EXPIRE_VAR}:'{VAR_FREE_TEXT_QUOTE}={VAR_FREE_TEXT_QUOTE}'        { return p::make_ACTION_EXPIRE_VAR(yytext, *driver.loc.back()); }
+{ACTION_EXPIRE_VAR}:'{VAR_FREE_TEXT_QUOTE}'                              { return p::make_ACTION_EXPIRE_VAR(yytext, *driver.loc.back()); }
+{ACTION_EXPIRE_VAR}:{VAR_FREE_TEXT_SPACE_COMMA}                          { return p::make_ACTION_EXPIRE_VAR(yytext, *driver.loc.back()); }
+{ACTION_EXPIRE_VAR}:{VAR_FREE_TEXT_SPACE}={VAR_FREE_TEXT_SPACE_COMMA}    { return p::make_ACTION_EXPIRE_VAR(yytext, *driver.loc.back()); }
 {ACTION_INITCOL}:{COL_NAME}={COL_FREE_TEXT_SPACE_COMMA}                 { return p::make_ACTION_INITCOL(yytext, *driver.loc.back()); }
 {ACTION_MATURITY}:'{FREE_TEXT_QUOTE}'                                   { return p::make_ACTION_MATURITY(yytext, *driver.loc.back()); }
 {ACTION_MATURITY}:{FREE_TEXT_QUOTE}                                     { return p::make_ACTION_MATURITY(yytext, *driver.loc.back()); }
@@ -226,7 +274,7 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
 {ACTION_TAG}:'{FREE_TEXT_QUOTE}'                                        { return p::make_ACTION_TAG(yytext, *driver.loc.back()); }
 {ACTION_VER}:'{FREE_TEXT_QUOTE}'                                        { return p::make_ACTION_VER(yytext, *driver.loc.back()); }
 {ACTION_XMLNS}:{FREE_TEXT_SPACE_COMMA_QUOTE}                            { return p::make_ACTION_XMLNS(yytext, *driver.loc.back()); }
-{ACTION}                                                                { return p::make_ACTION(yytext, *driver.loc.back()); }
+{ACTION_LOG_DATA}:'{FREE_TEXT_QUOTE}'                                   { return p::make_ACTION_LOG_DATA(yytext, *driver.loc.back()); }
 {CONFIG_COMPONENT_SIG}[ \t]+["]{FREE_TEXT}["]                           { return p::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_DIR_MOD}[ ]{CONFIG_VALUE_NUMBER}                      { return p::make_CONFIG_DIR_AUDIT_DIR_MOD(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {CONFIG_DIR_AUDIT_DIR}[ ]{CONFIG_VALUE_PATH}                            { return p::make_CONFIG_DIR_AUDIT_DIR(strchr(yytext, ' ') + 1, *driver.loc.back()); }
@@ -282,7 +330,6 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
 {CONGIG_DIR_SEC_TMP_DIR}[ ]{CONFIG_VALUE_PATH}                          { return p::make_CONGIG_DIR_SEC_TMP_DIR(strchr(yytext, ' ') + 1, *driver.loc.back()); }
 {DIRECTIVE_SECRULESCRIPT}[ ]{CONFIG_VALUE_PATH}                         { return p::make_DIRECTIVE_SECRULESCRIPT(yytext, *driver.loc.back()); }
 {DIRECTIVE}                                                             { return p::make_DIRECTIVE(yytext, *driver.loc.back()); }
-{LOG_DATA}:'{FREE_TEXT_QUOTE}'                                          { return p::make_LOG_DATA(yytext, *driver.loc.back()); }
 {TRANSFORMATION}                                                        { return p::make_TRANSFORMATION(yytext, *driver.loc.back()); }
 {CONFIG_SEC_REMOTE_RULES_FAIL_ACTION}                                   { return p::make_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION(yytext, *driver.loc.back()); }
 {CONFIG_SEC_COLLECTION_TIMEOUT}[ ]{CONFIG_VALUE_NUMBER}                 { return p::make_CONFIG_SEC_COLLECTION_TIMEOUT(strchr(yytext, ' ') + 1, *driver.loc.back()); }

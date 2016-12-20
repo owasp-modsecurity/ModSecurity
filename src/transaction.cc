@@ -882,7 +882,8 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
                     "request");
 #endif
                 intervention::free(&m_it);
-                m_it.log = strdup("Request body limit is marked to reject the request");
+                m_it.log = strdup("Request body limit is marked to " \
+                        "reject the request");
                 m_it.status = 403;
                 m_it.disruptive = true;
             }

@@ -18,12 +18,10 @@ class Driver;
 }
 
 
-
-
 #include "src/actions/accuracy.h"
-#include "modsecurity/actions/action.h"
-#include "src/actions/disruptive/allow.h"
 #include "src/actions/audit_log.h"
+#include "src/actions/capture.h"
+#include "src/actions/chain.h"
 #include "src/actions/ctl/audit_log_parts.h"
 #include "src/actions/ctl/request_body_access.h"
 #include "src/actions/ctl/request_body_processor_json.h"
@@ -31,24 +29,37 @@ class Driver;
 #include "src/actions/ctl/rule_remove_by_id.h"
 #include "src/actions/ctl/rule_remove_target_by_id.h"
 #include "src/actions/ctl/rule_remove_target_by_tag.h"
+#include "src/actions/data/status.h"
+#include "src/actions/disruptive/allow.h"
+#include "src/actions/disruptive/block.h"
+#include "src/actions/disruptive/deny.h"
+#include "src/actions/disruptive/pass.h"
+#include "src/actions/disruptive/redirect.h"
 #include "src/actions/init_col.h"
 #include "src/actions/log_data.h"
+#include "src/actions/log.h"
 #include "src/actions/maturity.h"
 #include "src/actions/msg.h"
+#include "src/actions/multi_match.h"
+#include "src/actions/no_audit_log.h"
+#include "src/actions/no_log.h"
 #include "src/actions/phase.h"
-#include "src/actions/disruptive/redirect.h"
 #include "src/actions/rev.h"
+#include "src/actions/rule_id.h"
 #include "src/actions/set_sid.h"
 #include "src/actions/set_uid.h"
 #include "src/actions/set_var.h"
 #include "src/actions/severity.h"
-#include "src/actions/skip.h"
 #include "src/actions/skip_after.h"
+#include "src/actions/skip.h"
 #include "src/actions/tag.h"
 #include "src/actions/transformations/none.h"
 #include "src/actions/transformations/transformation.h"
 #include "src/actions/ver.h"
 #include "src/actions/xmlns.h"
+
+
+
 #include "modsecurity/audit_log.h"
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules_properties.h"
@@ -100,27 +111,9 @@ using modsecurity::Variables::Variable;
 using modsecurity::Variables::Variations::Count;
 using modsecurity::Variables::Variations::Exclusion;
 using modsecurity::Variables::XML;
-using modsecurity::actions::Accuracy;
-using modsecurity::actions::Action;
-using modsecurity::actions::disruptive::Allow;
-using modsecurity::actions::ctl::AuditLogParts;
-using modsecurity::actions::ctl::RequestBodyProcessorJSON;
-using modsecurity::actions::ctl::RequestBodyProcessorXML;
-using modsecurity::actions::InitCol;
-using modsecurity::actions::LogData;
-using modsecurity::actions::Maturity;
-using modsecurity::actions::Msg;
-using modsecurity::actions::Phase;
-using modsecurity::actions::disruptive::Redirect;
-using modsecurity::actions::Rev;
-using modsecurity::actions::SetSID;
-using modsecurity::actions::SetUID;
-using modsecurity::actions::SetVar;
-using modsecurity::actions::Severity;
-using modsecurity::actions::Tag;
-using modsecurity::actions::Ver;
-using modsecurity::actions::transformations::None;
-using modsecurity::actions::transformations::Transformation;
+
+using namespace modsecurity;
+
 using modsecurity::operators::Operator;
 
 
@@ -140,6 +133,17 @@ using modsecurity::operators::Operator;
     } \
     if (t)
 
+
+#define ACTION_NOT_SUPPORTED(a, b) \
+    driver.error(b, "Action: " + std::string(a) + " is not yet supported."); \
+    YYERROR;
+
+#define ACTION_INIT(a, b) \
+    std::string error; \
+    if (a->init(&error) == false) { \
+        driver.error(b, error); \
+        YYERROR; \
+    }
 
 /**
  * %destructor { code } THING
@@ -178,10 +182,13 @@ using modsecurity::operators::Operator;
   PIPE
 ;
 
-%token <std::string> ACTION
 %token <std::string> ACTION_ACCURACY
 %token <std::string> ACTION_ALLOW
+%token <std::string> ACTION_APPEND
 %token <std::string> ACTION_AUDIT_LOG
+%token <std::string> ACTION_BLOCK
+%token <std::string> ACTION_CAPTURE
+%token <std::string> ACTION_CHAIN
 %token <std::string> ACTION_CTL_AUDIT_ENGINE
 %token <std::string> ACTION_CTL_AUDIT_LOG_PARTS
 %token <std::string> ACTION_CTL_BDY_JSON
@@ -192,24 +199,45 @@ using modsecurity::operators::Operator;
 %token <std::string> ACTION_CTL_RULE_REMOVE_BY_ID
 %token <std::string> ACTION_CTL_RULE_REMOVE_TARGET_BY_ID
 %token <std::string> ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG
+%token <std::string> ACTION_DENY
+%token <std::string> ACTION_DEPRECATE_VAR
+%token <std::string> ACTION_DROP
 %token <std::string> ACTION_EXEC
-%token <std::string> ACTION_EXPIREVAR
+%token <std::string> ACTION_EXPIRE_VAR
+%token <std::string> ACTION_ID
 %token <std::string> ACTION_INITCOL
+%token <std::string> ACTION_LOG_DATA
+%token <std::string> ACTION_LOG
 %token <std::string> ACTION_MATURITY
 %token <std::string> ACTION_MSG
+%token <std::string> ACTION_MULTI_MATCH
+%token <std::string> ACTION_NO_AUDIT_LOG
+%token <std::string> ACTION_NO_LOG
+%token <std::string> ACTION_PASS
+%token <std::string> ACTION_PAUSE
 %token <std::string> ACTION_PHASE
+%token <std::string> ACTION_PREPEND
+%token <std::string> ACTION_PROXY
 %token <std::string> ACTION_REDIRECT
 %token <std::string> ACTION_REV
+%token <std::string> ACTION_SANATISE_ARG
+%token <std::string> ACTION_SANATISE_MATCHED
+%token <std::string> ACTION_SANATISE_MATCHED_BYTES
+%token <std::string> ACTION_SANATISE_REQUEST_HEADER
+%token <std::string> ACTION_SANATISE_RESPONSE_HEADER
 %token <std::string> ACTION_SETENV
+%token <std::string> ACTION_SETRSC
 %token <std::string> ACTION_SETSID
 %token <std::string> ACTION_SETUID
 %token <std::string> ACTION_SETVAR
 %token <std::string> ACTION_SEVERITY
 %token <std::string> ACTION_SKIP
 %token <std::string> ACTION_SKIP_AFTER
+%token <std::string> ACTION_STATUS
 %token <std::string> ACTION_TAG
 %token <std::string> ACTION_VER
 %token <std::string> ACTION_XMLNS
+
 %token <std::string> CONFIG_COMPONENT_SIG
 %token <std::string> CONFIG_DIR_AUDIT_DIR
 %token <std::string> CONFIG_DIR_AUDIT_DIR_MOD
@@ -267,7 +295,7 @@ using modsecurity::operators::Operator;
 %token <std::string> DIRECTIVE
 %token <std::string> DIRECTIVE_SECRULESCRIPT
 %token <std::string> FREE_TEXT
-%token <std::string> LOG_DATA
+
 %token <std::string> OPERATOR
 %token <std::string> OPERATOR_GEOIP
 %token <std::string> QUOTATION_MARK
@@ -294,11 +322,11 @@ using modsecurity::operators::Operator;
 %token <std::string> VARIABLE_TX
 
 
-%type <Action *> act
+%type <actions::Action *> act
 %type <Operator *> op
 %type <Variable *> var
-%type <std::vector<Action *> *> actings
-%type <std::vector<Action *> *> actions
+%type <std::vector<actions::Action *> *> actings
+%type <std::vector<actions::Action *> *> actions
 %type <std::vector<Variable *> *> variables
 
 
@@ -533,19 +561,19 @@ expression:
       }
     | CONFIG_DIR_SEC_DEFAULT_ACTION actings
       {
-        std::vector<Action *> *actions = $2;
-        std::vector<Action *> checkedActions;
+        std::vector<actions::Action *> *actions = $2;
+        std::vector<actions::Action *> checkedActions;
         int definedPhase = -1;
         int secRuleDefinedPhase = -1;
-        for (Action *a : *actions) {
-            Phase *phase = dynamic_cast<Phase *>(a);
+        for (actions::Action *a : *actions) {
+            actions::Phase *phase = dynamic_cast<actions::Phase *>(a);
             if (phase != NULL) {
                 definedPhase = phase->m_phase;
                 secRuleDefinedPhase = phase->m_secRulesPhase;
                 delete phase;
-            } else if (a->action_kind == Action::RunTimeOnlyIfMatchKind ||
-                a->action_kind == Action::RunTimeBeforeMatchAttemptKind) {
-                None *none = dynamic_cast<None *>(a);
+            } else if (a->action_kind == actions::Action::RunTimeOnlyIfMatchKind ||
+                a->action_kind == actions::Action::RunTimeBeforeMatchAttemptKind) {
+                actions::transformations::None *none = dynamic_cast<actions::transformations::None *>(a);
                 if (none != NULL) {
                     driver.error(@0, "The transformation none is not suitable to be part of the SecDefaultActions");
                     YYERROR;
@@ -569,7 +597,7 @@ expression:
             YYERROR;
         }
 
-        for (Action *a : checkedActions) {
+        for (actions::Action *a : checkedActions) {
             driver.defaultActions[definedPhase].push_back(a);
         }
 
@@ -963,356 +991,279 @@ var:
     ;
 
 act:
-    ACTION
+    ACTION_ACCURACY
       {
-        std::string error;
-        $$ = Action::instantiate($1);
-
-        if ($$->init(&error) == false) {
-            driver.m_parserError << error;
-            YYERROR;
-        }
+        $$ = new actions::Accuracy($1);
       }
     | ACTION_ALLOW
       {
-        std::string error;
-        $$ = new Allow($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
+        $$ = new actions::disruptive::Allow($1);
       }
-    | ACTION_PHASE
+    | ACTION_APPEND
       {
-        std::string error;
-        $$ = new Phase($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | ACTION_INITCOL
-      {
-        std::string error;
-        $$ = new InitCol($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | TRANSFORMATION
-      {
-        std::string error;
-        $$ = Transformation::instantiate($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | ACTION_ACCURACY
-      {
-        std::string error;
-        $$ = new Accuracy($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | ACTION_EXEC
-      {
-        /*
-
-        TODO: exec is not implemented yet.
-
-        std::string error;
-        Allow *exec = new Exec($1);
-
-        if (exec->init(&error) == false) {
-            driver.parserError << error;
-            YYERROR;
-        }
-
-        $$ = exec;
-        */
-        $$ = Action::instantiate($1);
-      }
-    | ACTION_REDIRECT
-      {
-        std::string error;
-        $$ =  new Redirect($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | ACTION_SEVERITY
-      {
-        std::string error;
-        $$ =  new Severity($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | ACTION_EXPIREVAR
-      {
-        std::string error;
-        $$ = Action::instantiate($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | ACTION_SETENV
-      {
-        /*
-
-        TODO: setEnv is not implemented yet.
-
-        std::string error;
-        SetEnv *setEnv = new s($1);
-
-        if (setEnv->init(&error) == false) {
-            driver.parserError << error;
-            YYERROR;
-        }
-
-        $$ = setEnv;
-        */
-        $$ = Action::instantiate($1);
-      }
-    | ACTION_SETSID
-      {
-        std::string error;
-        SetSID *setSID = new SetSID($1);
-
-        if (setSID->init(&error) == false) {
-            driver.m_parserError << error;
-            YYERROR;
-        }
-
-        $$ = setSID;
-      }
-    | ACTION_SETUID
-      {
-        std::string error;
-        SetUID *setUID = new SetUID($1);
-
-        if (setUID->init(&error) == false) {
-            driver.m_parserError << error;
-            YYERROR;
-        }
-
-        $$ = setUID;
-      }
-    | ACTION_SETVAR
-      {
-        std::string error;
-        SetVar *setVar = new SetVar($1);
-
-        if (setVar->init(&error) == false) {
-            driver.m_parserError << error;
-            YYERROR;
-        }
-
-        $$ = setVar;
-      }
-    | ACTION_SKIP
-      {
-        std::string error;
-        $$ = new modsecurity::actions::Skip($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | ACTION_SKIP_AFTER
-      {
-        std::string error;
-        $$ = new modsecurity::actions::SkipAfter($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
+        ACTION_NOT_SUPPORTED("Append", @0);
       }
     | ACTION_AUDIT_LOG
       {
-        std::string error;
         $$ = new modsecurity::actions::AuditLog($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
       }
-    | LOG_DATA
+    | ACTION_BLOCK
       {
-        std::string error;
-        $$ = new LogData($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
+        $$ = new actions::disruptive::Block($1);
       }
-    | ACTION_MSG
+    | ACTION_CAPTURE
       {
-        std::string error;
-        $$ = new Msg($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
+        $$ = new actions::Capture($1);
       }
-    | ACTION_TAG
+    | ACTION_CHAIN
       {
-        std::string error;
-        $$ = new Tag($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
+        $$ = new actions::Chain($1);
       }
-    | ACTION_REV
+    | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_ON
       {
-        std::string error;
-        $$ = new Rev($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
+        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
+        $$ = new actions::Action($1);
       }
-    | ACTION_VER
+    | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_OFF
       {
-        std::string error;
-        $$ = new Ver($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
+        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
+        $$ = new actions::Action($1);
       }
-    | ACTION_MATURITY
+    | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_RELEVANT_ONLY
       {
-        std::string error;
-        $$ = new Maturity($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
+        //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
+        $$ = new actions::Action($1);
       }
-    | ACTION_XMLNS
+    | ACTION_CTL_AUDIT_LOG_PARTS
       {
-        std::string error;
-        $$ = new modsecurity::actions::XmlNS($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | ACTION_CTL_BDY_XML
-      {
-        $$ = new modsecurity::actions::ctl::RequestBodyProcessorXML($1);
+        $$ = new actions::ctl::AuditLogParts($1);
       }
     | ACTION_CTL_BDY_JSON
       {
         $$ = new modsecurity::actions::ctl::RequestBodyProcessorJSON($1);
       }
-    | ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG
+    | ACTION_CTL_BDY_XML
       {
-        std::string error;
-        $$ = new modsecurity::actions::ctl::RuleRemoveTargetByTag($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | ACTION_CTL_RULE_REMOVE_TARGET_BY_ID
-      {
-        std::string error;
-        $$ = new modsecurity::actions::ctl::RuleRemoveTargetById($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | ACTION_CTL_RULE_REMOVE_BY_ID
-      {
-        std::string error;
-        $$ = new modsecurity::actions::ctl::RuleRemoveById($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | ACTION_CTL_AUDIT_LOG_PARTS
-      {
-        std::string error;
-        $$ = new AuditLogParts($1);
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | ACTION_CTL_REQUEST_BODY_ACCESS CONFIG_VALUE_ON
-      {
-        std::string error;
-        $$ = new modsecurity::actions::ctl::RequestBodyAccess($1 + "true");
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-      }
-    | ACTION_CTL_REQUEST_BODY_ACCESS CONFIG_VALUE_OFF
-      {
-        std::string error;
-        $$ = new modsecurity::actions::ctl::RequestBodyAccess($1 + "false");
-        if ($$->init(&error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
+        $$ = new modsecurity::actions::ctl::RequestBodyProcessorXML($1);
       }
     | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_ON
       {
-        $$ = Action::instantiate($1);
+        //ACTION_NOT_SUPPORTED("CtlForceReequestBody", @0);
+        $$ = new actions::Action($1);
       }
     | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_OFF
       {
-        $$ = Action::instantiate($1);
+        //ACTION_NOT_SUPPORTED("CtlForceReequestBody", @0);
+        $$ = new actions::Action($1);
+      }
+    | ACTION_CTL_REQUEST_BODY_ACCESS CONFIG_VALUE_ON
+      {
+        $$ = new modsecurity::actions::ctl::RequestBodyAccess($1 + "true");
+      }
+    | ACTION_CTL_REQUEST_BODY_ACCESS CONFIG_VALUE_OFF
+      {
+        $$ = new modsecurity::actions::ctl::RequestBodyAccess($1 + "false");
       }
     | ACTION_CTL_RULE_ENGINE CONFIG_VALUE_ON
       {
-        $$ = Action::instantiate($1);
+        //ACTION_NOT_SUPPORTED("CtlRuleEngine", @0);
+        $$ = new actions::Action($1);
       }
     | ACTION_CTL_RULE_ENGINE CONFIG_VALUE_OFF
       {
-        $$ = Action::instantiate($1);
+        //ACTION_NOT_SUPPORTED("CtlRuleEngine", @0);
+        $$ = new actions::Action($1);
       }
     | ACTION_CTL_RULE_ENGINE CONFIG_VALUE_DETC
       {
-        $$ = Action::instantiate($1);
+        //ACTION_NOT_SUPPORTED("CtlRuleEngine", @0);
+        $$ = new actions::Action($1);
       }
-    | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_ON
+    | ACTION_CTL_RULE_REMOVE_BY_ID
       {
-        $$ = Action::instantiate($1);
+        $$ = new modsecurity::actions::ctl::RuleRemoveById($1);
       }
-    | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_OFF
+    | ACTION_CTL_RULE_REMOVE_TARGET_BY_ID
       {
-        $$ = Action::instantiate($1);
+        $$ = new modsecurity::actions::ctl::RuleRemoveTargetById($1);
       }
-    | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_RELEVANT_ONLY
+    | ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG
       {
-        $$ = Action::instantiate($1);
+        $$ = new modsecurity::actions::ctl::RuleRemoveTargetByTag($1);
+      }
+    | ACTION_DENY
+      {
+        $$ = new modsecurity::actions::disruptive::Deny($1);
+      }
+    | ACTION_DEPRECATE_VAR
+      {
+        ACTION_NOT_SUPPORTED("DeprecateVar", @0);
+      }
+    | ACTION_DROP
+      {
+        //ACTION_NOT_SUPPORTED("Drop", @0);
+        $$ = new actions::Action($1);
+      }
+    | ACTION_EXEC
+      {
+        ACTION_NOT_SUPPORTED("Exec", @0);
+      }
+    | ACTION_EXPIRE_VAR
+      {
+        //ACTION_NOT_SUPPORTED("ExpireVar", @0);
+        $$ = new actions::Action($1);
+      }
+    | ACTION_ID
+      {
+        $$ = new actions::RuleId($1);
+      }
+    | ACTION_INITCOL
+      {
+        $$ = new actions::InitCol($1);
+      }
+    | ACTION_LOG_DATA
+      {
+        $$ = new actions::LogData($1);
+      }
+    | ACTION_LOG
+      {
+        $$ = new actions::Log($1);
+      }
+    | ACTION_MATURITY
+      {
+        $$ = new actions::Maturity($1);
+      }
+    | ACTION_MSG
+      {
+        $$ = new actions::Msg($1);
+      }
+    | ACTION_MULTI_MATCH
+      {
+        $$ = new actions::MultiMatch($1);
+      }
+    | ACTION_NO_AUDIT_LOG
+      {
+        $$ = new actions::NoAuditLog($1);
+      }
+    | ACTION_NO_LOG
+      {
+        $$ = new actions::NoLog($1);
+      }
+    | ACTION_PASS
+      {
+        $$ = new actions::disruptive::Pass($1);
+      }
+    | ACTION_PAUSE
+      {
+        ACTION_NOT_SUPPORTED("Pause", @0);
+      }
+    | ACTION_PHASE
+      {
+        $$ = new actions::Phase($1);
+      }
+    | ACTION_PREPEND
+      {
+        ACTION_NOT_SUPPORTED("Prepend", @0);
+      }
+    | ACTION_PROXY
+      {
+        ACTION_NOT_SUPPORTED("Proxy", @0);
+      }
+    | ACTION_REDIRECT
+      {
+        $$ = new actions::disruptive::Redirect($1);
+      }
+    | ACTION_REV
+      {
+        $$ = new actions::Rev($1);
+      }
+    | ACTION_SANATISE_ARG
+      {
+        ACTION_NOT_SUPPORTED("SanatiseArg", @0);
+      }
+    | ACTION_SANATISE_MATCHED
+      {
+        ACTION_NOT_SUPPORTED("SanatiseMatched", @0);
+      }
+    | ACTION_SANATISE_MATCHED_BYTES
+      {
+        ACTION_NOT_SUPPORTED("SanatiseMatchedBytes", @0);
+      }
+    | ACTION_SANATISE_REQUEST_HEADER
+      {
+        ACTION_NOT_SUPPORTED("SanatiseRequestHeader", @0);
+      }
+    | ACTION_SANATISE_RESPONSE_HEADER
+      {
+        ACTION_NOT_SUPPORTED("SanatiseResponseHeader", @0);
+      }
+    | ACTION_SETENV
+      {
+        ACTION_NOT_SUPPORTED("SetEnv", @0);
+      }
+    | ACTION_SETRSC
+      {
+        ACTION_NOT_SUPPORTED("SetRSC", @0);
+      }
+    | ACTION_SETSID
+      {
+        $$ = new actions::SetSID($1);
+      }
+    | ACTION_SETUID
+      {
+        $$ = new actions::SetUID($1);
+      }
+    | ACTION_SETVAR
+      {
+        $$ = new actions::SetVar($1);
+      }
+    | ACTION_SEVERITY
+      {
+        $$ =  new actions::Severity($1);
+      }
+    | ACTION_SKIP
+      {
+        $$ = new modsecurity::actions::Skip($1);
+      }
+    | ACTION_SKIP_AFTER
+      {
+        $$ = new modsecurity::actions::SkipAfter($1);
+      }
+    | ACTION_STATUS
+      {
+        $$ = new actions::data::Status($1);
+      }
+    | ACTION_TAG
+      {
+        $$ = new actions::Tag($1);
+      }
+    | ACTION_VER
+      {
+        $$ = new actions::Ver($1);
+      }
+    | ACTION_XMLNS
+      {
+        $$ = new modsecurity::actions::XmlNS($1);
+      }
+
+    | TRANSFORMATION
+      {
+        $$ = actions::transformations::Transformation::instantiate($1);
       }
     ;
 
 actions:
     actions COMMA act
       {
-        std::vector<Action *> *a = $1;
+        std::vector<actions::Action *> *a = $1;
+        ACTION_INIT($3, @0)
         a->push_back($3);
         $$ = $1;
       }
     | act
       {
-        std::vector<Action *> *a = new std::vector<Action *>;
+        std::vector<actions::Action *> *a = new std::vector<actions::Action *>;
+        ACTION_INIT($1, @0)
         a->push_back($1);
         $$ = a;
       }
