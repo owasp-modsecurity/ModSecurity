@@ -237,7 +237,7 @@ static void modsecurity_persist_data(modsec_rec *msr) {
     }
 
     /* Remove stale collections. */
-    if (rand() < RAND_MAX/100) {
+    if (ap_random_pick(0, RAND_MAX) < RAND_MAX/100) {
         arr = apr_table_elts(msr->collections);
         te = (apr_table_entry_t *)arr->elts;
         for (i = 0; i < arr->nelts; i++) {
