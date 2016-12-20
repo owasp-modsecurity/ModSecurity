@@ -20,8 +20,6 @@
 #ifndef SRC_ACTIONS_TRANSFORMATIONS_TRANSFORMATION_H_
 #define SRC_ACTIONS_TRANSFORMATIONS_TRANSFORMATION_H_
 
-#ifdef __cplusplus
-
 namespace modsecurity {
 class Transaction;
 
@@ -36,8 +34,6 @@ class Transformation : public Action {
     explicit Transformation(const std::string& _action, int kind)
         : Action(_action, kind) { }
 
-    static Transformation* instantiate(std::string);
-
     std::string evaluate(std::string exp,
         Transaction *transaction) override;
 };
@@ -46,6 +42,5 @@ class Transformation : public Action {
 }  // namespace actions
 }  // namespace modsecurity
 
-#endif
 
 #endif  // SRC_ACTIONS_TRANSFORMATIONS_TRANSFORMATION_H_

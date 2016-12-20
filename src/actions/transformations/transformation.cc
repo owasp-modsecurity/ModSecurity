@@ -58,10 +58,6 @@
 #include "src/actions/transformations/url_encode.h"
 #include "src/actions/transformations/utf8_to_unicode.h"
 
-#define IF_MATCH(b) \
-    if (a.compare(2, std::strlen(#b), #b) == 0)
-
-
 namespace modsecurity {
 namespace actions {
 namespace transformations {
@@ -72,50 +68,6 @@ std::string Transformation::evaluate(std::string value,
     return value;
 }
 
-
-Transformation* Transformation::instantiate(std::string a) {
-    IF_MATCH(base64DecodeExt) { return new Base64DecodeExt(a); }
-    IF_MATCH(base64Decode) { return new Base64Decode(a); }
-    IF_MATCH(base64Encode) { return new Base64Encode(a); }
-    IF_MATCH(cmd_line) { return new CmdLine(a); }
-    IF_MATCH(compress_whitespace) { return new CompressWhitespace(a); }
-    IF_MATCH(cssDecode) { return new CssDecode(a); }
-    IF_MATCH(escapeSeqDecode) { return new EscapeSeqDecode(a); }
-    IF_MATCH(hexDecode) { return new HexDecode(a); }
-    IF_MATCH(hexEncode) { return new HexEncode(a); }
-    IF_MATCH(htmlEntityDecode) { return new HtmlEntityDecode(a); }
-    IF_MATCH(jsDecode) { return new JsDecode(a); }
-    IF_MATCH(length) { return new Length(a); }
-    IF_MATCH(lowercase) { return new LowerCase(a); }
-    IF_MATCH(md5) { return new Md5(a); }
-    IF_MATCH(none) { return new None(a); }
-    IF_MATCH(normalizePathWin) { return new NormalisePathWin(a); }
-    IF_MATCH(normalisePathWin) { return new NormalisePathWin(a); }
-    IF_MATCH(normalizePath) { return new NormalisePath(a); }
-    IF_MATCH(normalisePath) { return new NormalisePath(a); }
-    IF_MATCH(parityEven7bit) { return new ParityEven7bit(a); }
-    IF_MATCH(parityOdd7bit) { return new ParityOdd7bit(a); }
-    IF_MATCH(parityZero7bit) { return new ParityZero7bit(a); }
-    IF_MATCH(removeCommentsChar) { return new RemoveCommentsChar(a); }
-    IF_MATCH(removeComments) { return new RemoveComments(a); }
-    IF_MATCH(removeNulls) { return new RemoveNulls(a); }
-    IF_MATCH(removeWhitespace) { return new RemoveWhitespace(a); }
-    IF_MATCH(compressWhitespace) { return new CompressWhitespace(a); }
-    IF_MATCH(replaceComments) { return new ReplaceComments(a); }
-    IF_MATCH(replaceNulls) { return new ReplaceNulls(a); }
-    IF_MATCH(sha1) { return new Sha1(a); }
-    IF_MATCH(sqlHexDecode) { return new SqlHexDecode(a); }
-    IF_MATCH(transformation) { return new Transformation(a); }
-    IF_MATCH(trimLeft) { return new TrimLeft(a); }
-    IF_MATCH(trimRight) { return new TrimRight(a); }
-    IF_MATCH(trim) { return new Trim(a); }
-    IF_MATCH(urlDecodeUni) { return new UrlDecodeUni(a); }
-    IF_MATCH(urlDecode) { return new UrlDecode(a); }
-    IF_MATCH(urlEncode) { return new UrlEncode(a); }
-    IF_MATCH(utf8ToUnicode) { return new Utf8ToUnicode(a); }
-
-    return new Transformation(a);
-}
 
 }  // namespace transformations
 }  // namespace actions

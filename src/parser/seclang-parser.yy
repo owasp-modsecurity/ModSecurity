@@ -58,6 +58,43 @@ class Driver;
 #include "src/actions/ver.h"
 #include "src/actions/xmlns.h"
 
+#include "src/actions/transformations/hex_encode.h"
+#include "src/actions/transformations/parity_even_7bit.h"
+#include "src/actions/transformations/utf8_to_unicode.h"
+#include "src/actions/transformations/parity_zero_7bit.h"
+#include "src/actions/transformations/sql_hex_decode.h"
+#include "src/actions/transformations/replace_comments.h"
+#include "src/actions/transformations/none.h"
+#include "src/actions/transformations/url_decode.h"
+#include "src/actions/transformations/lower_case.h"
+#include "src/actions/transformations/hex_decode.h"
+#include "src/actions/transformations/url_encode.h"
+#include "src/actions/transformations/js_decode.h"
+#include "src/actions/transformations/url_decode_uni.h"
+#include "src/actions/transformations/parity_odd_7bit.h"
+#include "src/actions/transformations/transformation.h"
+#include "src/actions/transformations/trim_right.h"
+#include "src/actions/transformations/escape_seq_decode.h"
+#include "src/actions/transformations/base64_decode_ext.h"
+#include "src/actions/transformations/base64_decode.h"
+#include "src/actions/transformations/trim.h"
+#include "src/actions/transformations/cmd_line.h"
+#include "src/actions/transformations/replace_nulls.h"
+#include "src/actions/transformations/md5.h"
+#include "src/actions/transformations/length.h"
+#include "src/actions/transformations/sha1.h"
+#include "src/actions/transformations/compress_whitespace.h"
+#include "src/actions/transformations/normalise_path_win.h"
+#include "src/actions/transformations/remove_nulls.h"
+#include "src/actions/transformations/remove_comments.h"
+#include "src/actions/transformations/normalise_path.h"
+#include "src/actions/transformations/html_entity_decode.h"
+#include "src/actions/transformations/trim_left.h"
+#include "src/actions/transformations/remove_comments_char.h"
+#include "src/actions/transformations/base64_encode.h"
+#include "src/actions/transformations/remove_whitespace.h"
+#include "src/actions/transformations/css_decode.h"
+
 
 
 #include "modsecurity/audit_log.h"
@@ -238,6 +275,36 @@ using modsecurity::operators::Operator;
 %token <std::string> ACTION_VER
 %token <std::string> ACTION_XMLNS
 
+%token <std::string> ACTION_TRANSFORMATION_CMD_LINE
+%token <std::string> ACTION_TRANSFORMATION_COMPRESS_WHITESPACE
+%token <std::string> ACTION_TRANSFORMATION_CSS_DECODE
+%token <std::string> ACTION_TRANSFORMATION_HEX_ENCODE
+%token <std::string> ACTION_TRANSFORMATION_HTML_ENTITY_DECODE
+%token <std::string> ACTION_TRANSFORMATION_JS_DECODE
+%token <std::string> ACTION_TRANSFORMATION_LENGTH
+%token <std::string> ACTION_TRANSFORMATION_LOWERCASE
+%token <std::string> ACTION_TRANSFORMATION_MD5
+%token <std::string> ACTION_TRANSFORMATION_NONE
+%token <std::string> ACTION_TRANSFORMATION_NORMALISE_PATH
+%token <std::string> ACTION_TRANSFORMATION_NORMALISE_PATH_WIN
+%token <std::string> ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT
+%token <std::string> ACTION_TRANSFORMATION_PARITY_ODD_7_BIT
+%token <std::string> ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT
+%token <std::string> ACTION_TRANSFORMATION_REMOVE_COMMENTS
+%token <std::string> ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR
+%token <std::string> ACTION_TRANSFORMATION_REMOVE_NULLS
+%token <std::string> ACTION_TRANSFORMATION_REMOVE_WHITESPACE
+%token <std::string> ACTION_TRANSFORMATION_REPLACE_COMMENTS
+%token <std::string> ACTION_TRANSFORMATION_REPLACE_NULLS
+%token <std::string> ACTION_TRANSFORMATION_SHA1
+%token <std::string> ACTION_TRANSFORMATION_SQL_HEX_DECODE
+%token <std::string> ACTION_TRANSFORMATION_TRIM
+%token <std::string> ACTION_TRANSFORMATION_URL_DECODE
+%token <std::string> ACTION_TRANSFORMATION_URL_DECODE_UNI
+%token <std::string> ACTION_TRANSFORMATION_UTF8_TO_UNICODE
+
+
+
 %token <std::string> CONFIG_COMPONENT_SIG
 %token <std::string> CONFIG_DIR_AUDIT_DIR
 %token <std::string> CONFIG_DIR_AUDIT_DIR_MOD
@@ -315,19 +382,18 @@ using modsecurity::operators::Operator;
 %token <std::string> RUN_TIME_VAR_TIME_WDAY
 %token <std::string> RUN_TIME_VAR_TIME_YEAR
 %token <std::string> RUN_TIME_VAR_XML
-%token <std::string> TRANSFORMATION
 %token <std::string> VARIABLE
 %token <std::string> VARIABLE_COL
 %token <std::string> VARIABLE_STATUS
 %token <std::string> VARIABLE_TX
 
-
 %type <actions::Action *> act
-%type <Operator *> op
-%type <Variable *> var
 %type <std::vector<actions::Action *> *> actings
 %type <std::vector<actions::Action *> *> actions
+
 %type <std::vector<Variable *> *> variables
+%type <Operator *> op
+%type <Variable *> var
 
 
 %printer { yyoutput << $$; } <*>;
@@ -466,6 +532,24 @@ actings:
         $$ = $1;
       }
     ;
+
+actions:
+    actions COMMA act
+      {
+        std::vector<actions::Action *> *a = $1;
+        ACTION_INIT($3, @0)
+        a->push_back($3);
+        $$ = $1;
+      }
+    | act
+      {
+        std::vector<actions::Action *> *a = new std::vector<actions::Action *>;
+        ACTION_INIT($1, @0)
+        a->push_back($1);
+        $$ = a;
+      }
+    ;
+
 
 op:
     OPERATOR
@@ -1207,19 +1291,19 @@ act:
       }
     | ACTION_SETSID
       {
-        $$ = new actions::SetSID($1);
+        $$ = new modsecurity::actions::SetSID($1);
       }
     | ACTION_SETUID
       {
-        $$ = new actions::SetUID($1);
+        $$ = new modsecurity::actions::SetUID($1);
       }
     | ACTION_SETVAR
       {
-        $$ = new actions::SetVar($1);
+        $$ = new modsecurity::actions::SetVar($1);
       }
     | ACTION_SEVERITY
       {
-        $$ =  new actions::Severity($1);
+        $$ =  new modsecurity::actions::Severity($1);
       }
     | ACTION_SKIP
       {
@@ -1231,41 +1315,127 @@ act:
       }
     | ACTION_STATUS
       {
-        $$ = new actions::data::Status($1);
+        $$ = new modsecurity::actions::data::Status($1);
       }
     | ACTION_TAG
       {
-        $$ = new actions::Tag($1);
+        $$ = new modsecurity::actions::Tag($1);
       }
     | ACTION_VER
       {
-        $$ = new actions::Ver($1);
+        $$ = new modsecurity::actions::Ver($1);
       }
     | ACTION_XMLNS
       {
         $$ = new modsecurity::actions::XmlNS($1);
       }
-
-    | TRANSFORMATION
+    | ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT
       {
-        $$ = actions::transformations::Transformation::instantiate($1);
+        $$ = new modsecurity::actions::transformations::ParityZero7bit($1);
       }
-    ;
-
-actions:
-    actions COMMA act
+    | ACTION_TRANSFORMATION_PARITY_ODD_7_BIT
       {
-        std::vector<actions::Action *> *a = $1;
-        ACTION_INIT($3, @0)
-        a->push_back($3);
-        $$ = $1;
+        $$ = new modsecurity::actions::transformations::ParityOdd7bit($1);
       }
-    | act
+    | ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT
       {
-        std::vector<actions::Action *> *a = new std::vector<actions::Action *>;
-        ACTION_INIT($1, @0)
-        a->push_back($1);
-        $$ = a;
+        $$ = new modsecurity::actions::transformations::ParityEven7bit($1);
+      }
+    | ACTION_TRANSFORMATION_SQL_HEX_DECODE
+      {
+        $$ = new modsecurity::actions::transformations::SqlHexDecode($1);
+      }
+    | ACTION_TRANSFORMATION_CMD_LINE
+      {
+        $$ = new modsecurity::actions::transformations::CmdLine($1);
+      }
+    | ACTION_TRANSFORMATION_SHA1
+      {
+        $$ = new modsecurity::actions::transformations::Sha1($1);
+      }
+    | ACTION_TRANSFORMATION_MD5
+      {
+        $$ = new modsecurity::actions::transformations::Md5($1);
+      }
+    | ACTION_TRANSFORMATION_HEX_ENCODE
+      {
+        $$ = new modsecurity::actions::transformations::HexEncode($1);
+      }
+    | ACTION_TRANSFORMATION_LOWERCASE
+      {
+        $$ = new modsecurity::actions::transformations::LowerCase($1);
+      }
+    | ACTION_TRANSFORMATION_URL_DECODE_UNI
+      {
+        $$ = new modsecurity::actions::transformations::UrlDecodeUni($1);
+      }
+    | ACTION_TRANSFORMATION_URL_DECODE
+      {
+        $$ = new modsecurity::actions::transformations::UrlDecode($1);
+      }
+    | ACTION_TRANSFORMATION_NONE
+      {
+        $$ = new modsecurity::actions::transformations::None($1);
+      }
+    | ACTION_TRANSFORMATION_COMPRESS_WHITESPACE
+      {
+        $$ = new modsecurity::actions::transformations::CompressWhitespace($1);
+      }
+    | ACTION_TRANSFORMATION_REMOVE_WHITESPACE
+      {
+        $$ = new modsecurity::actions::transformations::RemoveWhitespace($1);
+      }
+    | ACTION_TRANSFORMATION_REPLACE_NULLS
+      {
+        $$ = new modsecurity::actions::transformations::ReplaceNulls($1);
+      }
+    | ACTION_TRANSFORMATION_REMOVE_NULLS
+      {
+        $$ = new modsecurity::actions::transformations::RemoveNulls($1);
+      }
+    | ACTION_TRANSFORMATION_HTML_ENTITY_DECODE
+      {
+        $$ = new modsecurity::actions::transformations::HtmlEntityDecode($1);
+      }
+    | ACTION_TRANSFORMATION_JS_DECODE
+      {
+        $$ = new modsecurity::actions::transformations::JsDecode($1);
+      }
+    | ACTION_TRANSFORMATION_CSS_DECODE
+      {
+        $$ = new modsecurity::actions::transformations::CssDecode($1);
+      }
+    | ACTION_TRANSFORMATION_TRIM
+      {
+        $$ = new modsecurity::actions::transformations::Trim($1);
+      }
+    | ACTION_TRANSFORMATION_NORMALISE_PATH_WIN
+      {
+        $$ = new modsecurity::actions::transformations::NormalisePathWin($1);
+      }
+    | ACTION_TRANSFORMATION_NORMALISE_PATH
+      {
+        $$ = new modsecurity::actions::transformations::NormalisePath($1);
+      }
+    | ACTION_TRANSFORMATION_LENGTH
+      {
+        $$ = new modsecurity::actions::transformations::Length($1);
+      }
+    | ACTION_TRANSFORMATION_UTF8_TO_UNICODE
+      {
+        $$ = new modsecurity::actions::transformations::Utf8ToUnicode($1);
+      }
+    | ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR
+      {
+        $$ = new modsecurity::actions::transformations::RemoveCommentsChar($1);
+      }
+    | ACTION_TRANSFORMATION_REMOVE_COMMENTS
+      {
+        $$ = new modsecurity::actions::transformations::RemoveComments($1);
+      }
+    | ACTION_TRANSFORMATION_REPLACE_COMMENTS
+      {
+        $$ = new modsecurity::actions::transformations::ReplaceComments($1);
       }
     ;
 
