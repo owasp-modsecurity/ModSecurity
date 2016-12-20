@@ -34,7 +34,8 @@ class NoAuditLog : public Action {
     explicit NoAuditLog(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(Rule *rule, Transaction *transaction,
+        RuleMessage *rm) override;
 };
 
 }  // namespace actions

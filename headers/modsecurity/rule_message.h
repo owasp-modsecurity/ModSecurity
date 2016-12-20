@@ -47,6 +47,7 @@ class RuleMessage {
         m_maturity(rule->m_maturity),
         m_rule(rule),
         m_saveMessage(false),
+        m_noAuditLog(false),
         m_match(std::string(""))
     { }
 
@@ -70,6 +71,7 @@ class RuleMessage {
     std::list<std::string> m_tags;
     std::list<std::string> m_server_logs;
 
+    bool m_noAuditLog;
     Rule *m_rule;
     bool m_saveMessage;
 };

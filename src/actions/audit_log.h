@@ -34,7 +34,8 @@ class AuditLog : public Action {
     explicit AuditLog(std::string action)
         : Action(action, RunTimeOnlyIfMatchKind) { }
 
-    bool evaluate(Rule *rule, Transaction *transaction) override;
+    bool evaluate(Rule *rule, Transaction *transaction,
+        RuleMessage *rm) override;
 };
 
 

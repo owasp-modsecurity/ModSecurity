@@ -19,13 +19,15 @@
 #include <string>
 
 #include "modsecurity/transaction.h"
+#include "modsecurity/rule_message.h"
 
 namespace modsecurity {
 namespace actions {
 
 
-bool AuditLog::evaluate(Rule *rule, Transaction *transaction) {
-    transaction->m_toBeSavedInAuditlogs = true;
+bool AuditLog::evaluate(Rule *rule, Transaction *transaction,
+    RuleMessage *rm) {
+    rm->m_noAuditLog = false;
     return true;
 }
 

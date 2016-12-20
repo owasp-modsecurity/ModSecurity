@@ -21,6 +21,7 @@
 
 #include <fstream>
 
+#include "modsecurity/rule_message.h"
 #include "src/audit_log/writer/https.h"
 #include "src/audit_log/writer/parallel.h"
 #include "src/audit_log/writer/serial.h"
@@ -244,6 +245,7 @@ bool AuditLog::isRelevant(int status) {
         return false;
     }
 
+
     if (sstatus.empty()) {
         return true;
     }
@@ -259,29 +261,26 @@ bool AuditLog::saveIfRelevant(Transaction *transaction) {
 
 
 bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
+    bool saveAnyway = false;
     if (m_status == OffAuditLogStatus || m_status == NotSetLogStatus) {
         return true;
     }
 
+    for (RuleMessage &i : transaction->m_rulesMessages) {
+        if (i.m_noAuditLog == false) {
+            saveAnyway = true;
+            break;
+        }
+    }
+
     if ((m_status == RelevantOnlyAuditLogStatus
-        && this->isRelevant(transaction->m_httpCodeReturned) == false
-        && transaction->m_toBeSavedInAuditlogs == false)) {
+        && this->isRelevant(transaction->m_httpCodeReturned) == false)
+        && saveAnyway == false) {
         transaction->debug(5, "Return code `" +
             std::to_string(transaction->m_httpCodeReturned) + "'" \
             " is not interesting to audit logs, relevant code(s): `" +
             m_relevant + "'.");
 
-        return false;
-    }
-
-    /**
-     * Even if it is relevant, if it is marked not to be save,
-     * we won't save it.
-     *
-     */
-    if (transaction->m_toNotBeSavedInAuditLogs == true) {
-        transaction->debug(5, "This request was marked to not " \
-            "be saved in the audit logs.");
         return false;
     }
 

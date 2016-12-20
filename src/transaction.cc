@@ -106,8 +106,6 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_method(""),
     m_httpVersion(""),
     m_rules(rules),
-    m_toBeSavedInAuditlogs(false),
-    m_toNotBeSavedInAuditLogs(false),
     m_timeStamp(std::time(NULL)),
     m_httpCodeReturned(200),
     m_highestSeverityAction(255),
@@ -1262,12 +1260,6 @@ int Transaction::processLogging() {
                 }
             }
         }
-#ifndef NO_LOGS
-        if (m_toBeSavedInAuditlogs) {
-            debug(8, "This request was marked to be " \
-                "saved via auditlog action.");
-        }
-#endif
         debug(8, "Checking if this request is relevant to be " \
             "part of the audit logs.");
         bool saved = this->m_rules->m_auditLog->saveIfRelevant(this, parts);

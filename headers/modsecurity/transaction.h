@@ -165,25 +165,6 @@ class Transaction {
     std::string toOldAuditLogFormatIndex(const std::string &filename,
         double size, const std::string &md5);
 
-
-    /**
-     * This variable is basically set by the `autidlog' action. It means
-     * that this particular transaction was marked to be saved as part of
-     * the auditlogs, even if it is not originally classified to be saved
-     * by `SecAuditLogRelevantStatus'.
-     */
-    bool m_toBeSavedInAuditlogs;
-
-    /**
-     * Set by `noauditlog' action, it means that this particular should
-     * not be saved. Regardless of `SecAuditLogRelevantStatus'.
-     *
-     * @note It is possible to have `auditlog' and `noauditlog' actions
-     * 		 in a same rule, in that case prevails the last input.
-     */
-    bool m_toNotBeSavedInAuditLogs;
-
-
     /**
      * Filled during the class instantiation, this variable can be later
      * used to fill the SecRule variable `duration'. The variable `duration'
