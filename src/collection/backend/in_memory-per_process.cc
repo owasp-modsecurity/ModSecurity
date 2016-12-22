@@ -94,17 +94,25 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
     }
 
     for (const auto& x : *this) {
+        bool diff = false;
+
         if (x.first.size() <= keySize + 1) {
             continue;
         }
         if (x.first.at(keySize) != ':') {
             continue;
         }
-        std::string fu = utils::string::toupper(x.first);
-        std::string fvar = utils::string::toupper(var);
-        if (fu.compare(0, keySize, fvar) != 0) {
+
+        for (int i = 0; i < keySize && diff == false; i++) {
+            if (std::tolower(x.first.at(i)) != std::tolower(var.at(i))) {
+                diff = true;
+            }
+        }
+
+        if (diff == true) {
             continue;
         }
+
         l->insert(l->begin(), new Variable(x.first, x.second));
     }
 }
