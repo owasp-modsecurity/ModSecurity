@@ -161,46 +161,6 @@ void LMDB::lmdb_debug(int rc, std::string op, std::string scope) {
 }
 
 
-std::string LMDB::resolveFirstCopy(const std::string& var) {
-    int rc;
-    MDB_val mdb_key;
-    MDB_val mdb_value;
-    MDB_val mdb_value_ret;
-    std::string ret;
-    MDB_txn *txn = NULL;
-    MDB_dbi dbi;
-
-    string2val(var, &mdb_key);
-
-    rc = mdb_txn_begin(m_env, NULL, 0, &txn);
-    lmdb_debug(rc, "txn", "resolveFirst");
-    if (rc != 0) {
-        goto end_txn;
-    }
-    rc = mdb_dbi_open(txn, NULL, MDB_CREATE | MDB_DUPSORT, &dbi);
-    lmdb_debug(rc, "dbi", "resolveFirst");
-    if (rc != 0) {
-        goto end_dbi;
-    }
-    rc = mdb_get(txn, dbi, &mdb_key, &mdb_value_ret);
-    lmdb_debug(rc, "get", "resolveFirst");
-    if (rc != 0) {
-        goto end_get;
-    }
-
-    ret.assign(
-        reinterpret_cast<char *>(mdb_value_ret.mv_data),
-        mdb_value_ret.mv_size);
-
-end_get:
-    mdb_dbi_close(m_env, dbi);
-end_dbi:
-    mdb_txn_abort(txn);
-end_txn:
-    return ret;
-}
-
-
 std::string* LMDB::resolveFirst(const std::string& var) {
     int rc;
     MDB_val mdb_key;
