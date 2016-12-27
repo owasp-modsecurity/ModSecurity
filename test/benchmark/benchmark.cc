@@ -169,5 +169,6 @@ next_request:
         delete modsecTransaction;
     }
 
+    delete rules;
     delete modsec;
 }
