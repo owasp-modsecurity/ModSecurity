@@ -256,9 +256,11 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
 
 bool Rule::executeOperatorAt(Transaction *trasn, std::string key,
     std::string value) {
+#if MSC_EXEC_CLOCK_ENABLED
     clock_t begin = clock();
     clock_t end;
     double elapsed_s = 0;
+#endif
     bool ret;
 
     trasn->debug(9, "Target value: \"" + utils::string::limitTo(80,
@@ -270,12 +272,13 @@ bool Rule::executeOperatorAt(Transaction *trasn, std::string key,
         return false;
     }
 
+#if MSC_EXEC_CLOCK_ENABLED
     end = clock();
     elapsed_s = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 
     trasn->debug(4, "Operator completed in " + \
         std::to_string(elapsed_s) + " seconds");
-
+#endif
     return ret;
 }
 
