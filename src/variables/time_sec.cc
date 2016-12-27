@@ -45,7 +45,10 @@ void TimeSec::evaluateInternal(Transaction *transaction,
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%S", &timeinfo);
 
-    l->push_back(new collection::Variable("TIME_SEC",  std::string(tstr)));
+    transaction->m_variableTimeSec.assign(tstr);
+
+    l->push_back(new collection::Variable(&m_retName,
+        &transaction->m_variableTimeSec));
 }
 
 

@@ -47,7 +47,10 @@ void TimeWDay::evaluateInternal(Transaction *transaction,
     int a = atoi(tstr);
     a--;
 
-    l->push_back(new collection::Variable("TIME_WDAY",  std::to_string(a)));
+    transaction->m_variableTimeWDay.assign(tstr);
+
+    l->push_back(new collection::Variable(&m_retName,
+        &transaction->m_variableTimeWDay));
 }
 
 

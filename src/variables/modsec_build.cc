@@ -15,27 +15,19 @@
 
 #include "src/variables/modsec_build.h"
 
-#include <iostream>
-#include <string>
 #include <vector>
 #include <list>
 #include <utility>
 
 #include "modsecurity/transaction.h"
-#include "modsecurity/modsecurity.h"
 
 namespace modsecurity {
 namespace Variables {
 
 void ModsecBuild::evaluateInternal(Transaction *transaction,
     std::vector<const collection::Variable *> *l) {
-    std::ostringstream ss;
-    ss << std::setw(2) << std::setfill('0') << MODSECURITY_MAJOR;
-    ss << std::setw(2) << std::setfill('0') << MODSECURITY_MINOR;
-    ss << std::setw(2) << std::setfill('0') << MODSECURITY_PATCHLEVEL;
-    ss << std::setw(2) << std::setfill('0') << MODSECURITY_TAG_NUM;
 
-    l->push_back(new collection::Variable("MODSEC_BUILD", ss.str()));
+    l->push_back(new collection::Variable(&m_retName, &m_build));
 }
 
 

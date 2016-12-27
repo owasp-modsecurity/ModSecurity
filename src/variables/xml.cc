@@ -73,8 +73,7 @@ void XML::evaluateInternal(Transaction *t,
         /* Invocation without an XPath expression makes sense
          * with functions that manipulate the document tree.
          */
-        l->push_back(new collection::Variable("XML",
-            std::string("[XML document tree]" + param)));
+        l->push_back(new collection::Variable(&m_name, &m_plain));
         return;
     }
 
@@ -124,8 +123,9 @@ void XML::evaluateInternal(Transaction *t,
         content = reinterpret_cast<char *>(
             xmlNodeGetContent(nodes->nodeTab[i]));
         if (content != NULL) {
-            l->push_back(new collection::Variable(m_name,
-                std::string(content)));
+            // FIXME: Memory leak
+            l->push_back(new collection::Variable(&m_name,
+                new std::string(content)));
             xmlFree(content);
          }
     }

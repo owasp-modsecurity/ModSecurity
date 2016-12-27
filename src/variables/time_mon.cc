@@ -47,7 +47,10 @@ void TimeMon::evaluateInternal(Transaction *transaction,
     int a = atoi(tstr);
     a--;
 
-    l->push_back(new collection::Variable("TIME_MON",  std::to_string(a)));
+    transaction->m_variableTimeMin.assign(std::to_string(a));
+
+    l->push_back(new collection::Variable(&m_retName,
+        &transaction->m_variableTimeMin));
 }
 
 

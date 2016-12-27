@@ -29,13 +29,12 @@ namespace Variables {
 
 void Duration::evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
-    std::string res;
-
     double e = utils::cpu_seconds() - transaction->m_creationTimeStamp;
 
-    res = std::to_string(e);
+    transaction->m_variableDuration.assign(std::to_string(e));
 
-    l->push_back(new collection::Variable("DURATION",  std::string(res)));
+    l->push_back(new collection::Variable(&m_retName,
+        &transaction->m_variableDuration));
 }
 
 

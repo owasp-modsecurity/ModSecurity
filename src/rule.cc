@@ -282,10 +282,11 @@ bool Rule::executeOperatorAt(Transaction *trasn, std::string key,
 // FIXME: this should be a list instead of a vector, keeping the but
 // of v2 alive.
 std::vector<std::string> Rule::executeSecDefaultActionTransofrmations(
-    Transaction *trasn, std::string &value, bool multiMatch) {
+    Transaction *trasn, const std::string &value2, bool multiMatch) {
     int none = 0;
     int transformations = 0;
     std::vector<std::string> ret;
+    std::string value = std::string(value2);
 
     if (multiMatch == true) {
         ret.push_back(value);
@@ -305,7 +306,7 @@ std::vector<std::string> Rule::executeSecDefaultActionTransofrmations(
         for (Action *a : trasn->m_rules->defaultActions[this->phase]) {
             if (a->action_kind \
                 == actions::Action::RunTimeBeforeMatchAttemptKind) {
-                std::string oldValue = value;
+                std::string oldValue = std::string(value);
                 if (multiMatch) {
                     oldValue = ret.back();
                 }
@@ -330,7 +331,7 @@ std::vector<std::string> Rule::executeSecDefaultActionTransofrmations(
 
     for (Action *a : this->m_actionsRuntimePre) {
         if (none == 0) {
-            std::string oldValue = value;
+            std::string oldValue = std::string(value);
             if (multiMatch) {
                 oldValue = ret.back();
             }
@@ -373,7 +374,7 @@ std::vector<std::string> Rule::executeSecDefaultActionTransofrmations(
 
 std::vector<const collection::Variable *> Rule::getFinalVars(
     Transaction *trasn) {
-    std::list<std::string> exclusions;
+    std::list<const std::string*> exclusions;
     std::vector<Variable *> *variables = this->variables;
     std::vector<const collection::Variable *> finalVars;
 
@@ -386,7 +387,7 @@ std::vector<const collection::Variable *> Rule::getFinalVars(
                 exclusions.push_back(y->m_key);
                 delete y;
             }
-            exclusions.push_back(variable->m_name);
+            exclusions.push_back(&variable->m_name);
         }
     }
 
@@ -401,10 +402,13 @@ std::vector<const collection::Variable *> Rule::getFinalVars(
 
         variable->evaluateInternal(trasn, this, &e);
         for (const collection::Variable *v : e) {
-            if (std::find(exclusions.begin(), exclusions.end(),
-                v->m_key) != exclusions.end()) {
+            const std::string *key = v->m_key;
+
+            if (std::find_if(exclusions.begin(), exclusions.end(),
+                [key](const std::string *m) -> bool { return *key == *m; })
+                != exclusions.end()) {
 #ifndef NO_LOGS
-                trasn->debug(9, "Variable: " + v->m_key +
+                trasn->debug(9, "Variable: " + *key +
                     " is part of the exclusion list, skipping...");
 #endif
                 continue;
@@ -416,8 +420,8 @@ std::vector<const collection::Variable *> Rule::getFinalVars(
                 if (containsTag(tag, trasn) == false) {
                     continue;
                 }
-                if (args == v->m_key) {
-                    trasn->debug(9, "Variable: " + v->m_key +
+                if (args == *key) {
+                    trasn->debug(9, "Variable: " + *key +
                         " was excluded by ruleRemoteTargetByTag...");
                     ignoreVariable = true;
                     break;
@@ -433,8 +437,8 @@ std::vector<const collection::Variable *> Rule::getFinalVars(
                 if (rule_id != id) {
                     continue;
                 }
-                if (args == v->m_key) {
-                    trasn->debug(9, "Variable: " + v->m_key +
+                if (args == *key) {
+                    trasn->debug(9, "Variable: " + *key +
                         " was excluded by ruleRemoteTargetById...");
                     ignoreVariable = true;
                     break;
@@ -564,7 +568,9 @@ bool Rule::evaluate(Transaction *trasn) {
     finalVars = getFinalVars(trasn);
 
     for (const collection::Variable *v : finalVars) {
-        std::string value = v->m_value;
+        const std::string value = *(v->m_value);
+        const std::string key = *(v->m_key);
+
         std::vector<std::string> values;
         bool multiMatch = getActionsByName("multimatch").size() > 0;
 
@@ -573,10 +579,11 @@ bool Rule::evaluate(Transaction *trasn) {
 
         for (const std::string &valueTemp : values) {
             bool ret;
-            ret = executeOperatorAt(trasn, v->m_key, valueTemp);
+
+            ret = executeOperatorAt(trasn, key, valueTemp);
             if (ret == true) {
-                ruleMessage.m_match = resolveMatchMessage(v->m_key, value);
-                updateMatchedVars(trasn, v->m_key, value);
+                ruleMessage.m_match = resolveMatchMessage(key, value);
+                updateMatchedVars(trasn, key, value);
                 executeActionsIndependentOfChainedRuleResult(trasn,
                     &containsDisruptive, &ruleMessage);
                 globalRet = true;

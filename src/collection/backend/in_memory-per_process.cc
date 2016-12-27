@@ -77,7 +77,7 @@ void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
     auto range = this->equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
-        l->push_back(new Variable(var, it->second));
+        l->push_back(new Variable(&it->first, &it->second));
     }
 }
 
@@ -90,7 +90,7 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
     auto range = this->equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
-        l->insert(l->begin(), new Variable(var, it->second));
+        l->insert(l->begin(), new Variable(&var, &it->second));
     }
 
     for (const auto& x : *this) {
@@ -113,7 +113,7 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
             continue;
         }
 
-        l->insert(l->begin(), new Variable(x.first, x.second));
+        l->insert(l->begin(), new Variable(&x.first, &x.second));
     }
 }
 
@@ -150,7 +150,7 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
             continue;
         }
 
-        l->insert(l->begin(), new Variable(x.first, x.second));
+        l->insert(l->begin(), new Variable(&x.first, &x.second));
     }
 }
 

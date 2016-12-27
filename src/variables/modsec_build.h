@@ -17,11 +17,13 @@
 #include <string>
 #include <list>
 #include <utility>
+#include <iostream>
 
 #ifndef SRC_VARIABLES_MODSEC_BUILD_H_
 #define SRC_VARIABLES_MODSEC_BUILD_H_
 
 #include "src/variables/variable.h"
+#include "modsecurity/modsecurity.h"
 
 namespace modsecurity {
 
@@ -31,10 +33,21 @@ namespace Variables {
 class ModsecBuild : public Variable {
  public:
     explicit ModsecBuild(std::string _name)
-        : Variable(_name) { }
+        : Variable(_name),
+        m_retName("MODSEC_BUILD") {
+        std::ostringstream ss;
+        ss << std::setw(2) << std::setfill('0') << MODSECURITY_MAJOR;
+        ss << std::setw(2) << std::setfill('0') << MODSECURITY_MINOR;
+        ss << std::setw(2) << std::setfill('0') << MODSECURITY_PATCHLEVEL;
+        ss << std::setw(2) << std::setfill('0') << MODSECURITY_TAG_NUM;
+        m_build = ss.str();
+    }
 
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) override;
+
+    std::string m_build;
+    std::string m_retName;
 };
 
 

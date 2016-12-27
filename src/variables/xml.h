@@ -33,11 +33,13 @@ namespace Variables {
 class XML : public Variable {
  public:
     explicit XML(std::string _name)
-        : Variable(_name) { }
+        : Variable(_name),
+        m_plain("[XML document tree]") { }
 
     void evaluateInternal(Transaction *transaction,
         Rule *rule,
         std::vector<const collection::Variable *> *l) override;
+    std::string m_plain;
 };
 
 }  // namespace Variables

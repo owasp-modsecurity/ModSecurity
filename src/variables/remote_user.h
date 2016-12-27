@@ -33,10 +33,12 @@ namespace Variables {
 class RemoteUser : public Variable {
  public:
     explicit RemoteUser(std::string _name)
-        : Variable(_name) { }
+        : Variable(_name),
+        m_retName("REMOTE_USER") { }
 
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) override;
+    std::string m_retName;
 };
 
 

@@ -31,10 +31,12 @@ namespace Variables {
 class Duration : public Variable {
  public:
     explicit Duration(std::string _name)
-        : Variable(_name) { }
+        : Variable(_name),
+        m_retName("DURATION") { }
 
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) override;
+    std::string m_retName;
 };
 
 

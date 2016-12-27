@@ -31,10 +31,12 @@ namespace Variables {
 class TimeEpoch : public Variable {
  public:
     explicit TimeEpoch(std::string _name)
-        : Variable(_name) { }
+        : Variable(_name),
+        m_retName("TIME_EPOCH") { }
 
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) override;
+    std::string m_retName;
 };
 
 }  // namespace Variables

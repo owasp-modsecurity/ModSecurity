@@ -768,8 +768,8 @@ int Transaction::processRequestBody() {
     m_collections.resolveMultiMatches("REQUEST_HEADERS", &l);
     for (auto &a : l) {
         fullRequest = fullRequest + \
-            std::string(a->m_key, 16, a->m_key.length() - 16) + ": " \
-            + a->m_value + "\n";
+            std::string(*a->m_key, 16, a->m_key->length() - 16) + ": " \
+            + *a->m_value + "\n";
     }
 
     while (l.empty() == false) {
@@ -1387,8 +1387,8 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         m_collections.m_transient->resolveMultiMatches("REQUEST_HEADERS", &l);
         for (auto h : l) {
             size_t pos = strlen("REQUEST_HEADERS:");
-            audit_log << h->m_key.c_str() + pos << ": ";
-            audit_log << h->m_value.c_str() << std::endl;
+            audit_log << h->m_key->c_str() + pos << ": ";
+            audit_log << h->m_value->c_str() << std::endl;
             delete h;
         }
         audit_log << std::endl;
@@ -1419,8 +1419,8 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         m_collections.m_transient->resolveMultiMatches("RESPONSE_HEADERS", &l);
         for (auto h : l) {
             size_t pos = strlen("RESPONSE_HEADERS:");
-            audit_log << h->m_key.c_str() + pos << ": ";
-            audit_log << h->m_value.c_str() << std::endl;
+            audit_log << h->m_key->c_str() + pos << ": ";
+            audit_log << h->m_value->c_str() << std::endl;
             delete h;
         }
     }
@@ -1516,7 +1516,7 @@ std::string Transaction::toJSON(int parts) {
         m_collections.m_transient->resolveMultiMatches("REQUEST_HEADERS", &l);
         for (auto h : l) {
             size_t pos = strlen("REQUEST_HEADERS:");
-            LOGFY_ADD(h->m_key.c_str() + pos, h->m_value.c_str());
+            LOGFY_ADD(h->m_key->c_str() + pos, h->m_value->c_str());
             delete h;
         }
 
@@ -1547,7 +1547,7 @@ std::string Transaction::toJSON(int parts) {
         m_collections.m_transient->resolveMultiMatches("RESPONSE_HEADERS", &l);
         for (auto h : l) {
             size_t pos = strlen("RESPONSE_HEADERS:");
-            LOGFY_ADD(h->m_key.c_str() + pos, h->m_value.c_str());
+            LOGFY_ADD(h->m_key->c_str() + pos, h->m_value->c_str());
             delete h;
         }
 

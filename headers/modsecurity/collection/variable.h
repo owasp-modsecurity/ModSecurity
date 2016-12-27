@@ -33,11 +33,20 @@ namespace collection {
 
 class Variable {
  public:
-     Variable(const std::string& key, const std::string& value) :
+    Variable(const std::string *key, const std::string *value) :
         m_key(key),
-        m_value(value) { }
-     std::string m_key;
-     std::string m_value;
+        m_value(value),
+        m_dynamic_value(false) { }
+
+    ~Variable() {
+        if (m_dynamic_value) {
+            delete m_value;
+        }
+    }
+
+    const std::string *m_key;
+    const std::string *m_value;
+    bool m_dynamic_value;
 };
 
 }  // namespace collection

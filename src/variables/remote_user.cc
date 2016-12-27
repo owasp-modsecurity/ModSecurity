@@ -57,9 +57,10 @@ void RemoteUser::evaluateInternal(Transaction *transaction,
     if (pos == std::string::npos) {
         return;
     }
-    base64 = std::string(base64, 0, pos);
+    transaction->m_variableRemoteUser.assign(std::string(base64, 0, pos));
 
-    l->push_back(new collection::Variable("REMOTE_USER", base64));
+    l->push_back(new collection::Variable(&m_retName,
+        &transaction->m_variableRemoteUser));
 }
 
 

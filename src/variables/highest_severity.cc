@@ -28,8 +28,10 @@ namespace Variables {
 
 void HighestSeverity::evaluateInternal(Transaction *transaction,
     std::vector<const collection::Variable *> *l) {
-    l->push_back(new collection::Variable("HIGHEST_SEVERITY",
-        std::to_string(transaction->m_highestSeverityAction)));
+    transaction->m_variableHighestSeverityAction.assign(
+        std::to_string(transaction->m_highestSeverityAction));
+    l->push_back(new collection::Variable(&m_retName,
+       &transaction->m_variableHighestSeverityAction));
 }
 
 

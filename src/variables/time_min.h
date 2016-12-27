@@ -31,10 +31,12 @@ namespace Variables {
 class TimeMin : public Variable {
  public:
     explicit TimeMin(std::string _name)
-        : Variable(_name) { }
+        : Variable(_name),
+        m_retName("TIME_MIN") { }
 
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) override;
+    std::string m_retName;
 };
 
 }  // namespace Variables

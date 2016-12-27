@@ -56,7 +56,7 @@ class Rule {
     void executeActionsAfterFullMatch(Transaction *trasn,
         bool containsDisruptive, RuleMessage *ruleMessage);
     std::vector<std::string> executeSecDefaultActionTransofrmations(
-        Transaction *trasn, std::string &value, bool multiMatch);
+        Transaction *trasn, const std::string &value, bool multiMatch);
     bool executeOperatorAt(Transaction *trasn, std::string key,
         std::string value);
     void executeActionsIndependentOfChainedRuleResult(Transaction *trasn,

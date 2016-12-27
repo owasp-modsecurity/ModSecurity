@@ -45,7 +45,10 @@ void TimeYear::evaluateInternal(Transaction *transaction,
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%Y", &timeinfo);
 
-    l->push_back(new collection::Variable("TIME_YEAR",  std::string(tstr)));
+    transaction->m_variableTimeYear.assign(tstr);
+
+    l->push_back(new collection::Variable(&m_retName,
+        &transaction->m_variableTimeYear));
 }
 
 

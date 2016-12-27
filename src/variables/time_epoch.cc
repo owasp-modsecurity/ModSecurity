@@ -35,8 +35,10 @@ namespace Variables {
 
 void TimeEpoch::evaluateInternal(Transaction *transaction,
     std::vector<const collection::Variable *> *l) {
-    l->push_back(new collection::Variable("TIME_EPOCH",
-        std::to_string(std::time(nullptr))));
+    transaction->m_variableTimeEpoch.assign(
+        std::to_string(std::time(nullptr)));
+    l->push_back(new collection::Variable(&m_retName,
+        &transaction->m_variableTimeEpoch));
 }
 
 

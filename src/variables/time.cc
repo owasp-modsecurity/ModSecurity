@@ -46,7 +46,9 @@ void Time::evaluateInternal(Transaction *transaction,
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%H:%M:%S", &timeinfo);
 
-    l->push_back(new collection::Variable("TIME", std::string(tstr)));
+    transaction->m_variableTime.assign(tstr);
+    l->push_back(new collection::Variable(&m_retName,
+        &transaction->m_variableTime));
 }
 
 

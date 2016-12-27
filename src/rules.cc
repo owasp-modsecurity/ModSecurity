@@ -80,6 +80,9 @@ void Rules::decrementReferenceCount(void) {
 Rules::~Rules() {
     int i = 0;
 
+    free(unicode_map_table);
+    unicode_map_table = NULL;
+
     /** Cleanup the rules */
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = this->rules[i];
@@ -97,9 +100,6 @@ Rules::~Rules() {
             tmp->pop_back();
         }
     }
-
-
-    free(unicode_map_table);
 }
 
 

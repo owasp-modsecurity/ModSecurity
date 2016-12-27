@@ -45,7 +45,10 @@ void TimeMin::evaluateInternal(Transaction *transaction,
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%M", &timeinfo);
 
-    l->push_back(new collection::Variable("TIME_MIN",  std::string(tstr)));
+    transaction->m_variableTimeMin.assign(tstr);
+
+    l->push_back(new collection::Variable(&m_retName,
+        &transaction->m_variableTimeMin));
 }
 
 

@@ -31,10 +31,12 @@ namespace Variables {
 class TimeSec : public Variable {
  public:
     explicit TimeSec(std::string _name)
-        : Variable(_name) { }
+        : Variable(_name),
+        m_retName("TIME_SEC") { }
 
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) override;
+    std::string m_retName;
 };
 
 }  // namespace Variables

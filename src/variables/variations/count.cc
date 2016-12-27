@@ -46,10 +46,13 @@ void Count::evaluateInternal(Transaction *transaction,
     }
     delete reslIn;
 
-    std::string res = std::to_string(count);
+    std::string *res = new std::string(std::to_string(count));
 
-    l->push_back(new collection::Variable(std::string(var->m_name),
-        std::string(res)));
+    collection::Variable *val = new collection::Variable(&var->m_name,
+        res);
+    val->m_dynamic_value = true;
+
+    l->push_back(val);
 }
 
 

@@ -45,7 +45,10 @@ void TimeDay::evaluateInternal(Transaction *transaction,
     localtime_r(&timer, &timeinfo);
     strftime(tstr, 200, "%d", &timeinfo);
 
-    l->push_back(new collection::Variable("TIME_DAY",  std::string(tstr)));
+    transaction->m_variableTimeDay.assign(tstr);
+
+    l->push_back(new collection::Variable(&m_retName,
+        &transaction->m_variableTimeDay));
 }
 
 

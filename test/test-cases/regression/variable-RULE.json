@@ -256,7 +256,7 @@
       ]
     },
     "expected":{
-      "debug_log":" Target value: \"message123\" \\(Variable: rule:msg\\)"
+      "debug_log":" Target value: \"message123\" \\(Variable: RULE:msg\\)"
     },
     "rules":[
       "SecRuleEngine On",
