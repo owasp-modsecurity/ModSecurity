@@ -1,6 +1,74 @@
 {
    <insert_a_suppression_name_here>
    Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+   fun:call_init.part.0
+   fun:call_init
+   fun:_dl_init
+   obj:/lib/x86_64-linux-gnu/ld-2.23.so
+   obj:*
+   obj:*
+   obj:*
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   fun:_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE12_M_constructIPcEEvT_S7_St20forward_iterator_tag.isra.73
+   fun:_M_construct_aux<char const*>
+   fun:_M_construct<char const*>
+   fun:basic_string
+   fun:_ZN11modsecurity9Variables15HighestSeverityC1ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN2yy14seclang_parser5parseEv
+   fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   fun:_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE12_M_constructIPcEEvT_S7_St20forward_iterator_tag.isra.73
+   fun:_M_construct_aux<char const*>
+   fun:_M_construct<char const*>
+   fun:basic_string
+   fun:_ZN11modsecurity9Variables3XMLC1ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN2yy14seclang_parser5parseEv
+   fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   fun:_ZN2yy14seclang_parser5parseEv
+   fun:_ZN11modsecurity6Parser6Driver5parseERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES9_
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   fun:RulesProperties
+   fun:_ZN11modsecurity6Parser6DriverC1Ev
+   fun:_ZN11modsecurity5Rules4loadEPKcRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_Z17perform_unit_testPN16modsecurity_test15ModSecurityTestINS_14RegressionTestEEEPSt6vectorIPS1_SaIS5_EEPNS_22ModSecurityTestResultsINS_20RegressionTestResultEEEPi
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
    match-leak-kinds: definite
    fun:_Znwm
    fun:_Z5yylexRN11modsecurity6Parser6DriverE
