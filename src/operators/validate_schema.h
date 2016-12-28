@@ -35,9 +35,9 @@ class ValidateSchema : public Operator {
     /** @ingroup ModSecurity_Operator */
     ValidateSchema(std::string o, std::string p, bool i)
         : Operator(o, p, i),
-        m_schema(NULL),
+        m_parserCtx(NULL),
         m_validCtx(NULL),
-        m_parserCtx(NULL) { }
+        m_schema(NULL) { }
     ~ValidateSchema() {
         /*
         if (m_schema != NULL) {

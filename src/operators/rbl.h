@@ -62,8 +62,8 @@ class Rbl : public Operator {
     /** @ingroup ModSecurity_Operator */
     Rbl(std::string op, std::string param, bool negation)
         : Operator(op, param, negation),
-        m_demandsPassword(false),
-        m_service(param) {
+        m_service(param),
+        m_demandsPassword(false) {
             m_provider = RblProvider::UnknownProvider;
             if (m_service == "httpbl.org") {
                 m_demandsPassword = true;

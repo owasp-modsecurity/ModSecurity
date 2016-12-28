@@ -28,7 +28,8 @@ namespace Parser {
 Driver::Driver()
   : RulesProperties(),
   trace_scanning(false),
-  trace_parsing(false) {
+  trace_parsing(false),
+  lastRule(NULL) {
       m_auditLog = new audit_log::AuditLog();
       m_auditLog->refCountIncrease();
   }
@@ -116,7 +117,6 @@ int Driver::addSecRule(Rule *rule) {
 
 
 int Driver::parse(const std::string &f, const std::string &ref) {
-    std::string error;
     lastRule = NULL;
     loc.push_back(new yy::location());
     if (ref.empty()) {

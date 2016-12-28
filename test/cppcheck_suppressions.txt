@@ -1,3 +1,5 @@
+unusedFunction:test/regression/regression_test.cc
+unusedFunction:src/utils/string.cc
 unusedFunction:src/transaction.cc
 unusedFunction:src/utils/mbedtls/sha1.c
 unusedFunction:src/utils/mbedtls/md5.c

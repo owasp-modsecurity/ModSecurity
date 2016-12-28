@@ -49,7 +49,6 @@ class Serial : public Writer {
     bool write(Transaction *transaction, int parts,
         std::string *error) override;
 
- private:
     void generateBoundary(std::string *boundary);
 };
 

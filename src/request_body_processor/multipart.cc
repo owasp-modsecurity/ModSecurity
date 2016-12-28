@@ -36,33 +36,35 @@ namespace RequestBodyProcessor {
 
 
 Multipart::Multipart(std:: string header, Transaction *transaction)
-    : m_boundary_count(0),
+    : m_reqbody_no_files_length(0),
+    m_nfiles(0),
+    m_boundary_count(0),
+    m_buf{0},
     m_buf_contains_line(0),
+    m_bufptr(NULL),
     m_bufleft(0),
     m_buf_offset(0),
-    m_bufptr(NULL),
-    m_flag_boundary_quoted(0),
-    m_flag_boundary_whitespace(0),
-    m_flag_crlf_line(0),
-    m_flag_data_after(0),
-    m_flag_data_before(0),
-    m_flag_error(0),
-    m_flag_file_limit_exceeded(0),
-    m_flag_header_folding(0),
-    m_flag_invalid_header_folding(0),
-    m_flag_invalid_part(0),
-    m_flag_invalid_quoting(0),
-    m_flag_lf_line(0),
-    m_flag_missing_semicolon(0),
-    m_flag_unmatched_boundary(0),
-    m_header(header),
-    m_is_complete(0),
+    m_mpp(NULL),
     m_mpp_state(0),
-    m_nfiles(0),
+    m_reserve{0},
     m_seen_data(0),
-    m_transaction(transaction),
-    m_reqbody_no_files_length(0)
-    { }
+    m_is_complete(0),
+    m_flag_error(0),
+    m_flag_data_before(0),
+    m_flag_data_after(0),
+    m_flag_header_folding(0),
+    m_flag_boundary_quoted(0),
+    m_flag_lf_line(0),
+    m_flag_crlf_line(0),
+    m_flag_unmatched_boundary(0),
+    m_flag_boundary_whitespace(0),
+    m_flag_missing_semicolon(0),
+    m_flag_invalid_quoting(0),
+    m_flag_invalid_part(0),
+    m_flag_invalid_header_folding(0),
+    m_flag_file_limit_exceeded(0),
+    m_header(header),
+    m_transaction(transaction) { }
 
 
 Multipart::~Multipart() {
@@ -398,7 +400,7 @@ int Multipart::parse_content_disposition(const char *c_d_value) {
 }
 
 
-int Multipart::tmp_file_name(std::string *filename) {
+int Multipart::tmp_file_name(std::string *filename) const {
     std::string path;
     struct tm timeinfo;
     char tstr[300];
@@ -1197,7 +1199,7 @@ bool Multipart::init(std::string *error) {
         }
 
         /* Case-insensitive test for the string "boundary" in the boundary. */
-        if (count_boundary_params(m_boundary.c_str()) != 0) {
+        if (count_boundary_params(m_boundary) != 0) {
             m_flag_error = 1;
             debug(4, "Multipart: Invalid boundary in C-T (content).");
             error->assign("Multipart: Invalid boundary in C-T (content).");

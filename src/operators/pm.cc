@@ -63,7 +63,6 @@ void Pm::cleanup(acmp_node_t *n) {
     }
 
     free(n);
-    n = NULL;
 }
 
 
@@ -76,7 +75,6 @@ void Pm::postOrderTraversal(acmp_btree_node_t *node) {
     postOrderTraversal(node->left);
 
     free(node);
-    node = NULL;
 }
 
 

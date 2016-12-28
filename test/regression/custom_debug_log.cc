@@ -23,10 +23,6 @@
 
 namespace modsecurity_test {
 
-CustomDebugLog *CustomDebugLog::new_instance() {
-    return new CustomDebugLog();
-}
-
 CustomDebugLog::~CustomDebugLog() { }
 
 void CustomDebugLog::write(int level, const std::string& message) {

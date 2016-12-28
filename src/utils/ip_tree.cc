@@ -55,7 +55,6 @@ void IpTree::postOrderTraversal(TreeNode *node) {
         node->prefix = NULL;
     }
     free(node);
-    node = NULL;
 }
 
 

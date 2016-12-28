@@ -59,8 +59,6 @@ class Driver : public RulesProperties {
     int addSecAction(Rule *rule);
     int addSecMarker(std::string marker);
 
-    int result;
-
     bool scan_begin();
     void scan_end();
     bool trace_scanning;

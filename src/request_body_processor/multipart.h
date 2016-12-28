@@ -113,7 +113,7 @@ class Multipart {
     int process_part_header(std::string *error);
     int process_part_data(std::string *error);
 
-    int tmp_file_name(std::string *filename);
+    int tmp_file_name(std::string *filename) const;
 
     void validate_quotes(const char *data);
 

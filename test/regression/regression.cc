@@ -380,7 +380,9 @@ after_debug_log:
 
 int main(int argc, char **argv) {
     ModSecurityTest<RegressionTest> test;
+#ifndef NO_LOGS
     int test_number = 0;
+#endif
 
 #ifdef WITH_GEOIP
     resources.push_back("geoip");
