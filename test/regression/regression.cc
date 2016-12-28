@@ -66,6 +66,10 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
         if (it.url != NULL) {
             r->location = it.url;
         }
+        if (it.log != NULL) {
+            free(it.log);
+            it.log = NULL;
+        }
     }
 }
 
