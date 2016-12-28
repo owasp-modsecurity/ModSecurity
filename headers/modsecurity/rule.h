@@ -55,7 +55,7 @@ class Rule {
     std::vector<const collection::Variable *> getFinalVars(Transaction *trasn);
     void executeActionsAfterFullMatch(Transaction *trasn,
         bool containsDisruptive, RuleMessage *ruleMessage);
-    std::vector<std::string> executeSecDefaultActionTransofrmations(
+    std::vector<std::string *> executeSecDefaultActionTransofrmations(
         Transaction *trasn, const std::string &value, bool multiMatch);
     bool executeOperatorAt(Transaction *trasn, std::string key,
         std::string value);

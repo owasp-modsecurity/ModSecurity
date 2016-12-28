@@ -123,9 +123,10 @@ void XML::evaluateInternal(Transaction *t,
         content = reinterpret_cast<char *>(
             xmlNodeGetContent(nodes->nodeTab[i]));
         if (content != NULL) {
-            // FIXME: Memory leak
-            l->push_back(new collection::Variable(&m_name,
-                new std::string(content)));
+            collection::Variable *var = new collection::Variable(&m_name,
+                new std::string(content));
+            var->m_dynamic_value = true;
+            l->push_back(var);
             xmlFree(content);
          }
     }
