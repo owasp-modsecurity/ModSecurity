@@ -95,6 +95,45 @@ class Driver;
 #include "src/actions/transformations/remove_whitespace.h"
 #include "src/actions/transformations/css_decode.h"
 
+#include "src/operators/begins_with.h"
+#include "src/operators/contains.h"
+#include "src/operators/contains_word.h"
+#include "src/operators/detect_sqli.h"
+#include "src/operators/detect_xss.h"
+#include "src/operators/ends_with.h"
+#include "src/operators/eq.h"
+#include "src/operators/fuzzy_hash.h"
+#include "src/operators/ge.h"
+#include "src/operators/geo_lookup.h"
+#include "src/operators/gsblookup.h"
+#include "src/operators/gt.h"
+#include "src/operators/inspect_file.h"
+#include "src/operators/ip_match_f.h"
+#include "src/operators/ip_match_from_file.h"
+#include "src/operators/ip_match.h"
+#include "src/operators/le.h"
+#include "src/operators/lt.h"
+#include "src/operators/no_match.h"
+#include "src/operators/operator.h"
+#include "src/operators/pm_f.h"
+#include "src/operators/pm_from_file.h"
+#include "src/operators/pm.h"
+#include "src/operators/rbl.h"
+#include "src/operators/rsub.h"
+#include "src/operators/rx.h"
+#include "src/operators/str_eq.h"
+#include "src/operators/str_match.h"
+#include "src/operators/unconditional_match.h"
+#include "src/operators/validate_byte_range.h"
+#include "src/operators/validate_dtd.h"
+#include "src/operators/validate_hash.h"
+#include "src/operators/validate_schema.h"
+#include "src/operators/validate_url_encoding.h"
+#include "src/operators/validate_utf8_encoding.h"
+#include "src/operators/verify_cc.h"
+#include "src/operators/verify_cpf.h"
+#include "src/operators/verify_ssn.h"
+#include "src/operators/within.h"
 
 
 #include "modsecurity/audit_log.h"
@@ -364,6 +403,11 @@ using modsecurity::operators::Operator;
 %token <std::string> FREE_TEXT
 
 %token <std::string> OPERATOR
+%token <std::string> OPERATOR_UNCONDITIONAL_MATCH
+%token <std::string> OPERATOR_DETECT_SQLI
+%token <std::string> OPERATOR_DETECT_XSS
+%token <std::string> OPERATOR_VALIDATE_URL_ENCODING
+%token <std::string> OPERATOR_VALIDATE_UTF8_ENCODING
 %token <std::string> OPERATOR_GEOIP
 %token <std::string> QUOTATION_MARK
 %token <std::string> RUN_TIME_VAR_BLD
@@ -392,6 +436,7 @@ using modsecurity::operators::Operator;
 %type <std::vector<actions::Action *> *> actions
 
 %type <std::vector<Variable *> *> variables
+%type <Operator *> op_before_init
 %type <Operator *> op
 %type <Variable *> var
 
@@ -550,28 +595,47 @@ actions:
       }
     ;
 
-
 op:
-    OPERATOR
+    op_before_init
       {
-        Operator *op = Operator::instantiate($1);
+        $$ = $1;
         std::string error;
-        if (op->init(driver.ref.back(), &error) == false) {
+        if ($$->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
             YYERROR;
         }
-        $$ = op;
+      }
+    ;
+
+op_before_init:
+    OPERATOR
+      {
+        $$ = Operator::instantiate($1);
+      }
+    | OPERATOR_UNCONDITIONAL_MATCH
+      {
+        $$ = new operators::UnconditionalMatch();
+      }
+    | OPERATOR_DETECT_SQLI
+      {
+        $$ = new operators::DetectSQLi();
+      }
+    | OPERATOR_DETECT_XSS
+      {
+        $$ = new operators::DetectXSS();
+      }
+    | OPERATOR_VALIDATE_URL_ENCODING
+      {
+        $$ = new operators::ValidateUrlEncoding();
+      }
+    | OPERATOR_VALIDATE_UTF8_ENCODING
+      {
+        $$ = new operators::ValidateUtf8Encoding();
       }
     | OPERATOR_GEOIP
       {
 #ifdef WITH_GEOIP
-        Operator *op = Operator::instantiate($1);
-        std::string error;
-        if (op->init(driver.ref.back(), &error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-        $$ = op;
+        $$ = $$ = new operators::GeoLookup($1);
 #else
         std::stringstream ss;
             ss << "This version of ModSecurity was not compiled with GeoIP support.";
@@ -584,13 +648,7 @@ op:
         std::string text = std::string($1);
         text.pop_back();
         text.erase(0, 1);
-        Operator *op = Operator::instantiate("\"@rx " + text + "\"");
-        std::string error;
-        if (op->init(driver.ref.back(), &error) == false) {
-            driver.error(@0, error);
-            YYERROR;
-        }
-        $$ = op;
+        $$ = new operators::Rx("rx", text);
       }
     ;
 

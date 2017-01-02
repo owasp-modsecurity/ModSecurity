@@ -36,6 +36,8 @@ class ValidateUtf8Encoding : public Operator {
     /** @ingroup ModSecurity_Operator */
     ValidateUtf8Encoding(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
+    ValidateUtf8Encoding()
+        : Operator("ValidateUtf8Encoding") { }
 
     bool evaluate(Transaction *transaction, const std::string &input) override;
 

@@ -38,6 +38,10 @@ class Rx : public Operator {
         : Operator(op, param, negation) {
         m_re = new Regex(param);
         }
+    Rx(std::string name, std::string param)
+        : Operator(name, param) {
+        m_re = new Regex(param);
+    }
 
     ~Rx() {
         delete m_re;

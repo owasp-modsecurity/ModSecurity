@@ -35,11 +35,24 @@ class Operator {
         m_negation(false),
         m_op(""),
         m_param("") { }
-    Operator(std::string op, std::string param, bool negation)
+
+    Operator(std::string opName, std::string param, bool negation)
         : m_match_message(""),
         m_negation(negation),
-        m_op(op),
+        m_op(opName),
         m_param(param) { }
+
+    Operator(std::string opName, std::string param)
+        : m_match_message(""),
+        m_negation(false),
+        m_op(opName),
+        m_param(param) { }
+
+    Operator(std::string opName)
+        : m_match_message(""),
+        m_negation(false),
+        m_op(opName),
+        m_param() { }
 
     virtual ~Operator() { }
     static Operator *instantiate(std::string opName);

@@ -20,9 +20,7 @@ namespace operators {
 
 bool UnconditionalMatch::evaluate(Transaction *transaction,
     const std::string &input) {
-    bool contains = true;
-
-    return contains;
+    return true;
 }
 
 }  // namespace operators

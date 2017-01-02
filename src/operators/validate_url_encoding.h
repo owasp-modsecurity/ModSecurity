@@ -29,6 +29,8 @@ class ValidateUrlEncoding : public Operator {
     /** @ingroup ModSecurity_Operator */
     ValidateUrlEncoding(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
+    ValidateUrlEncoding()
+        : Operator("ValidateUrlEncoding") { }
 
     bool evaluate(Transaction *transaction, const std::string &input) override;
     int validate_url_encoding(const char *input, uint64_t input_length);

@@ -93,12 +93,6 @@ bool GeoLookup::evaluate(Transaction *trans, const std::string &exp) {
     return ret;
 }
 
-GeoLookup::GeoLookup(std::string op, std::string param,
-bool negation)
-    : Operator() {
-    this->m_op = op;
-    this->m_param = param;
-}
 
 }  // namespace operators
 }  // namespace modsecurity

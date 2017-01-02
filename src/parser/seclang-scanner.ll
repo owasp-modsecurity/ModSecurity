@@ -183,7 +183,12 @@ FREE_TEXT_SPACE                         [^ \t]+
 FREE_TEXT_SPACE_COMMA                   [^, \t]+
 FREE_TEXT_SPACE_COMMA_QUOTE             [^, \t\"\n\r]+
 NEW_LINE_FREE_TEXT                      [^, \t\"\n\r]+
-OPERATORNOARG                           (?i:@unconditionalMatch|@detectSQLi|@detectXSS|@validateUrlEncoding|@validateUtf8Encoding)
+OPERATOR_UNCONDITIONAL_MATCH            (?i:@unconditionalMatch)
+OPERATOR_DETECT_SQLI                    (?i:@detectSQLi)
+OPERATOR_DETECT_XSS                     (?i:@detectXSS)
+OPERATOR_VALIDATE_URL_ENCODING          (?i:@validateUrlEncoding)
+OPERATOR_VALIDATE_UTF8_ENCODING         (?i:@validateUtf8Encoding)
+
 OPERATOR                                (?i:(?:@inspectFile|@fuzzyHash|@validateByteRange|@validateDTD|@validateHash|@validateSchema|@verifyCC|@verifyCPF|@verifySSN|@gsbLookup|@rsub)|(?:\!{0,1})(?:@within|@containsWord|@contains|@endsWith|@eq|@ge|@gt|@ipMatchF|@ipMatch|@ipMatchFromFile|@le|@lt|@pmf|@pm|@pmFromFile|@rbl|@rx|@streq|@strmatch|@beginsWith))
 OPERATOR_GEOIP                          (?i:@geoLookup)
 REMOVE_RULE_BY                          [0-9A-Za-z_\/\.\-\*\:\;\]\[]+
@@ -450,7 +455,11 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
 
 <EXPECTING_OPERATOR>{
 ["]{OPERATOR}[ ]{FREE_TEXT}["]                                          { BEGIN(INITIAL); return p::make_OPERATOR(yytext, *driver.loc.back()); }
-["]{OPERATORNOARG}[\t ]*["]                                             { BEGIN(INITIAL); return p::make_OPERATOR(yytext, *driver.loc.back()); }
+["]{OPERATOR_UNCONDITIONAL_MATCH}[\t ]*["]                              { BEGIN(INITIAL); return p::make_OPERATOR_UNCONDITIONAL_MATCH(yytext, *driver.loc.back()); }
+["]{OPERATOR_DETECT_SQLI}[\t ]*["]                                      { BEGIN(INITIAL); return p::make_OPERATOR_DETECT_SQLI(yytext, *driver.loc.back()); }
+["]{OPERATOR_DETECT_XSS}[\t ]*["]                                       { BEGIN(INITIAL); return p::make_OPERATOR_DETECT_XSS(yytext, *driver.loc.back()); }
+["]{OPERATOR_VALIDATE_URL_ENCODING}[\t ]*["]                            { BEGIN(INITIAL); return p::make_OPERATOR_VALIDATE_URL_ENCODING(yytext, *driver.loc.back()); }
+["]{OPERATOR_VALIDATE_UTF8_ENCODING}[\t ]*["]                           { BEGIN(INITIAL); return p::make_OPERATOR_VALIDATE_UTF8_ENCODING(yytext, *driver.loc.back()); }
 ["]{OPERATOR_GEOIP}[\t ]*["]                                            { BEGIN(INITIAL); return p::make_OPERATOR_GEOIP(yytext, *driver.loc.back()); }
 {SOMETHING}                                                             { BEGIN(INITIAL); return p::make_FREE_TEXT(yytext, *driver.loc.back()); }
 }

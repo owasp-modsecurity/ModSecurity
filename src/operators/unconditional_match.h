@@ -22,7 +22,6 @@
 #include "modsecurity/transaction.h"
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
 namespace modsecurity {
 namespace operators {
 
@@ -31,13 +30,14 @@ class UnconditionalMatch : public Operator {
     /** @ingroup ModSecurity_Operator */
     UnconditionalMatch(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
+    UnconditionalMatch()
+        : Operator("UnconditionalMatch") { }
 
     bool evaluate(Transaction *transaction, const std::string &exp) override;
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_UNCONDITIONAL_MATCH_H_

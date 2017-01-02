@@ -30,6 +30,10 @@ class DetectXSS : public Operator {
         : Operator(op, param, negation) {
             m_match_message.assign("detected XSS using libinjection.");
         }
+    DetectXSS()
+        : Operator("DetectXSS") {
+            m_match_message.assign("detected XSS using libinjection.");
+        }
 
     bool evaluate(Transaction *transaction, const std::string &input);
 };
