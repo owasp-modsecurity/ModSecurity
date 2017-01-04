@@ -31,7 +31,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Executing operator \"@contains\" with param \"config_example2\" against ARGS."
+      "debug_log":"Executing operator \"Contains\" with param \"config_example2\" against ARGS."
     },
     "rules":[
       "SecRuleEngine On",
@@ -71,7 +71,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Executing operator \"@contains\" with param \"config_example\" against ARGS."
+      "debug_log":"Executing operator \"Contains\" with param \"config_example\" against ARGS."
     },
     "rules":[
       "SecRuleEngine On",
@@ -111,7 +111,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Executing operator \"@contains\" with param \"config_example2\" against ARGS."
+      "debug_log":"Executing operator \"Contains\" with param \"config_example2\" against ARGS."
     },
     "rules":[
       "SecRuleEngine On",
@@ -151,7 +151,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Executing operator \"@contains\" with param \"test\" against ARGS."
+      "debug_log":"Executing operator \"Contains\" with param \"test\" against ARGS."
     },
     "rules":[
       "SecRuleEngine On",
@@ -191,7 +191,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Executing operator \"@contains\" with param \"config_example2\" against ARGS."
+      "debug_log":"Executing operator \"Contains\" with param \"config_example2\" against ARGS."
     },
     "rules":[
       "SecRuleEngine On",
@@ -232,7 +232,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Executing operator \"@contains\" with param \"test\" against ARGS."
+      "debug_log":"Executing operator \"Contains\" with param \"test\" against ARGS."
     },
     "rules":[
       "SecRuleEngine On",

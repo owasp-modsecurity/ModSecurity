@@ -20,21 +20,24 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
 namespace modsecurity {
 namespace operators {
+
 
 class VerifyCPF : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    VerifyCPF(std::string o, std::string p, bool i);
+    VerifyCPF(std::string o, std::string p, bool n)
+        : Operator(o, p, n) { }
+    explicit VerifyCPF(std::string param)
+        : Operator("VerifyCPF", param) { }
     bool evaluate(Transaction *transaction, const std::string  &str) override;
 };
+
 
 }  // namespace operators
 }  // namespace modsecurity
 
-#endif
 
 
 #endif  // SRC_OPERATORS_VERIFY_CPF_H_

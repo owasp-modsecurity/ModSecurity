@@ -26,7 +26,7 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -35,6 +35,11 @@ class ValidateSchema : public Operator {
     /** @ingroup ModSecurity_Operator */
     ValidateSchema(std::string o, std::string p, bool i)
         : Operator(o, p, i),
+        m_parserCtx(NULL),
+        m_validCtx(NULL),
+        m_schema(NULL) { }
+    explicit ValidateSchema(std::string param)
+        : Operator("ValidateSchema", param),
         m_parserCtx(NULL),
         m_validCtx(NULL),
         m_schema(NULL) { }
@@ -131,7 +136,6 @@ class ValidateSchema : public Operator {
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_VALIDATE_SCHEMA_H_

@@ -20,7 +20,7 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -29,14 +29,15 @@ class GeoLookup : public Operator {
     /** @ingroup ModSecurity_Operator */
     GeoLookup(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
-    GeoLookup(std::string param)
+    explicit GeoLookup(std::string param)
         : Operator("GeoLookup", param) { }
+    GeoLookup()
+        : Operator("GeoLookup") { }
     bool evaluate(Transaction *transaction, const std::string &exp) override;
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_GEO_LOOKUP_H_

@@ -20,20 +20,22 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
 class ValidateHash : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    ValidateHash(std::string o, std::string p, bool i);
+    ValidateHash(std::string o, std::string p, bool n)
+        : Operator(o, p, n) { }
+    explicit ValidateHash(std::string param)
+        : Operator("ValidateHash", param) { }
     bool evaluate(Transaction *transaction, const std::string  &str) override;
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_VALIDATE_HASH_H_

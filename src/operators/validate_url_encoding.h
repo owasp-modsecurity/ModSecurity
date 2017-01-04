@@ -20,7 +20,7 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -38,7 +38,6 @@ class ValidateUrlEncoding : public Operator {
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_VALIDATE_URL_ENCODING_H_

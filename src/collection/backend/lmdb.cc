@@ -188,7 +188,7 @@ std::string* LMDB::resolveFirst(const std::string& var) {
         goto end_get;
     }
 
-    //FIXME: Memory leak here.
+    // FIXME: Memory leak here.
     ret = new std::string(
         reinterpret_cast<char *>(mdb_value_ret.mv_data),
         mdb_value_ret.mv_size);

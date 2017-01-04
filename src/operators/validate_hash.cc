@@ -31,11 +31,5 @@ bool ValidateHash::evaluate(Transaction *transaction, const std::string &str) {
 }
 
 
-ValidateHash::ValidateHash(std::string op, std::string param, bool negation)
-    : Operator() {
-    this->m_op = op;
-    this->m_param = param;
-}
-
 }  // namespace operators
 }  // namespace modsecurity

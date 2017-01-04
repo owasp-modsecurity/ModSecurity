@@ -20,7 +20,6 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
 
 namespace modsecurity {
 namespace operators {
@@ -28,13 +27,15 @@ namespace operators {
 class VerifySSN : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    VerifySSN(std::string o, std::string p, bool i);
+    VerifySSN(std::string o, std::string p, bool n)
+        : Operator(o, p, n) { }
+    explicit VerifySSN(std::string param)
+        : Operator("VerifySSN", param) { }
     bool evaluate(Transaction *transaction, const std::string  &str) override;
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_VERIFY_SSN_H_

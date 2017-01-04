@@ -214,6 +214,12 @@ using modsecurity::operators::Operator;
     driver.error(b, "Action: " + std::string(a) + " is not yet supported."); \
     YYERROR;
 
+
+#define OPERATOR_NOT_SUPPORTED(a, b) \
+    driver.error(b, "Operator: " + std::string(a) + " is not yet supported."); \
+    YYERROR;
+
+
 #define ACTION_INIT(a, b) \
     std::string error; \
     if (a->init(&error) == false) { \
@@ -256,6 +262,7 @@ using modsecurity::operators::Operator;
   END  0  "end of file"
   COMMA    ","
   PIPE
+  NEW_LINE
 ;
 
 %token <std::string> ACTION_ACCURACY
@@ -408,7 +415,41 @@ using modsecurity::operators::Operator;
 %token <std::string> OPERATOR_DETECT_XSS
 %token <std::string> OPERATOR_VALIDATE_URL_ENCODING
 %token <std::string> OPERATOR_VALIDATE_UTF8_ENCODING
-%token <std::string> OPERATOR_GEOIP
+%token <std::string> OPERATOR_GEOLOOKUP
+%token <std::string> OPERATOR_INSPECT_FILE
+%token <std::string> OPERATOR_FUZZY_HASH
+%token <std::string> OPERATOR_VALIDATE_BYTE_RANGE
+%token <std::string> OPERATOR_VALIDATE_DTD
+%token <std::string> OPERATOR_VALIDATE_HASH
+%token <std::string> OPERATOR_VALIDATE_SCHEMA
+%token <std::string> OPERATOR_VERIFY_CC
+%token <std::string> OPERATOR_VERIFY_CPF
+%token <std::string> OPERATOR_VERIFY_SSN
+%token <std::string> OPERATOR_GSB_LOOKUP
+%token <std::string> OPERATOR_RSUB
+%token <std::string> OPERATOR_RX_CONTENT_ONLY
+%token <std::string> NOT
+
+
+%token <std::string> OPERATOR_WITHIN
+%token <std::string> OPERATOR_CONTAINS_WORD
+%token <std::string> OPERATOR_CONTAINS
+%token <std::string> OPERATOR_ENDS_WITH
+%token <std::string> OPERATOR_EQ
+%token <std::string> OPERATOR_GE
+%token <std::string> OPERATOR_GT
+%token <std::string> OPERATOR_IP_MATCH_FROM_FILE
+%token <std::string> OPERATOR_IP_MATCH
+%token <std::string> OPERATOR_LE
+%token <std::string> OPERATOR_LT
+%token <std::string> OPERATOR_PM_FROM_FILE
+%token <std::string> OPERATOR_PM
+%token <std::string> OPERATOR_RBL
+%token <std::string> OPERATOR_RX
+%token <std::string> OPERATOR_STR_EQ
+%token <std::string> OPERATOR_STR_MATCH
+%token <std::string> OPERATOR_BEGINS_WITH
+
 %token <std::string> QUOTATION_MARK
 %token <std::string> RUN_TIME_VAR_BLD
 %token <std::string> RUN_TIME_VAR_DUR
@@ -430,6 +471,8 @@ using modsecurity::operators::Operator;
 %token <std::string> VARIABLE_COL
 %token <std::string> VARIABLE_STATUS
 %token <std::string> VARIABLE_TX
+
+%token <std::string> OP_QUOTE
 
 %type <actions::Action *> act
 %type <std::vector<actions::Action *> *> actings
@@ -605,14 +648,40 @@ op:
             YYERROR;
         }
       }
+    | NOT op_before_init
+      {
+        $$ = $2;
+        $$->m_negation = true;
+        std::string error;
+        if ($$->init(driver.ref.back(), &error) == false) {
+            driver.error(@0, error);
+            YYERROR;
+        }
+      }
+    | OPERATOR_RX_CONTENT_ONLY
+      {
+        $$ = new operators::Rx(utils::string::removeBracketsIfNeeded($1));
+        std::string error;
+        if ($$->init(driver.ref.back(), &error) == false) {
+            $$->m_negation = true;
+            driver.error(@0, error);
+            YYERROR;
+        }
+      }
+    | NOT OPERATOR_RX_CONTENT_ONLY
+      {
+        $$ = new operators::Rx("!" + utils::string::removeBracketsIfNeeded($2));
+        std::string error;
+        if ($$->init(driver.ref.back(), &error) == false) {
+            $$->m_negation = true;
+            driver.error(@0, error);
+            YYERROR;
+        }
+      }
     ;
 
 op_before_init:
-    OPERATOR
-      {
-        $$ = Operator::instantiate($1);
-      }
-    | OPERATOR_UNCONDITIONAL_MATCH
+    OPERATOR_UNCONDITIONAL_MATCH
       {
         $$ = new operators::UnconditionalMatch();
       }
@@ -632,23 +701,139 @@ op_before_init:
       {
         $$ = new operators::ValidateUtf8Encoding();
       }
-    | OPERATOR_GEOIP
+    | OPERATOR_INSPECT_FILE FREE_TEXT
+      {
+        /* $$ = new operators::InspectFile($1); */
+        OPERATOR_NOT_SUPPORTED("InspectFile", @0);
+      }
+    | OPERATOR_FUZZY_HASH FREE_TEXT
+      {
+        /* $$ = new operators::FuzzyHash(); */
+        OPERATOR_NOT_SUPPORTED("FuzzyHash", @0);
+      }
+    | OPERATOR_VALIDATE_BYTE_RANGE FREE_TEXT
+      {
+        $$ = new operators::ValidateByteRange($2);
+      }
+    | OPERATOR_VALIDATE_DTD FREE_TEXT
+      {
+        $$ = new operators::ValidateDTD($2);
+      }
+    | OPERATOR_VALIDATE_HASH FREE_TEXT
+      {
+        /* $$ = new operators::ValidateHash($1); */
+        OPERATOR_NOT_SUPPORTED("ValidateHash", @0);
+      }
+    | OPERATOR_VALIDATE_SCHEMA FREE_TEXT
+      {
+        $$ = new operators::ValidateSchema($2);
+      }
+    | OPERATOR_VERIFY_CC FREE_TEXT
+      {
+        $$ = new operators::VerifyCC($2);
+      }
+    | OPERATOR_VERIFY_CPF FREE_TEXT
+      {
+        /* $$ = new operators::VerifyCPF($1); */
+        OPERATOR_NOT_SUPPORTED("VerifyCPF", @0);
+      }
+    | OPERATOR_VERIFY_SSN FREE_TEXT
+      {
+        /* $$ = new operators::VerifySSN($1); */
+        OPERATOR_NOT_SUPPORTED("VerifySSN", @0);
+      }
+    | OPERATOR_GSB_LOOKUP FREE_TEXT
+      {
+        /* $$ = new operators::GsbLookup($1); */
+        OPERATOR_NOT_SUPPORTED("GsbLookup", @0);
+      }
+    | OPERATOR_RSUB FREE_TEXT
+      {
+        /* $$ = new operators::Rsub($1); */
+        OPERATOR_NOT_SUPPORTED("Rsub", @0);
+      }
+    | OPERATOR_WITHIN FREE_TEXT
+      {
+        $$ = new operators::Within($2);
+      }
+    | OPERATOR_CONTAINS_WORD FREE_TEXT
+      {
+        $$ = new operators::ContainsWord($2);
+      }
+    | OPERATOR_CONTAINS FREE_TEXT
+      {
+        $$ = new operators::Contains($2);
+      }
+    | OPERATOR_ENDS_WITH FREE_TEXT
+      {
+        $$ = new operators::EndsWith($2);
+      }
+    | OPERATOR_EQ FREE_TEXT
+      {
+        $$ = new operators::Eq($2);
+      }
+    | OPERATOR_GE FREE_TEXT
+      {
+        $$ = new operators::Ge($2);
+      }
+    | OPERATOR_GT FREE_TEXT
+      {
+        $$ = new operators::Gt($2);
+      }
+    | OPERATOR_IP_MATCH_FROM_FILE FREE_TEXT
+      {
+        $$ = new operators::IpMatchF($2);
+      }
+    | OPERATOR_IP_MATCH FREE_TEXT
+      {
+        $$ = new operators::IpMatch($2);
+      }
+    | OPERATOR_LE FREE_TEXT
+      {
+        $$ = new operators::Le($2);
+      }
+    | OPERATOR_LT FREE_TEXT
+      {
+        $$ = new operators::Lt($2);
+      }
+    | OPERATOR_PM_FROM_FILE FREE_TEXT
+      {
+        $$ = new operators::PmFromFile($2);
+      }
+    | OPERATOR_PM FREE_TEXT
+      {
+        $$ = new operators::Pm($2);
+      }
+    | OPERATOR_RBL FREE_TEXT
+      {
+        $$ = new operators::Rbl($2);
+      }
+    | OPERATOR_RX FREE_TEXT
+      {
+        $$ = new operators::Rx($2);
+      }
+    | OPERATOR_STR_EQ FREE_TEXT
+      {
+        $$ = new operators::StrEq($2);
+      }
+    | OPERATOR_STR_MATCH FREE_TEXT
+      {
+        $$ = new operators::StrMatch($2);
+      }
+    | OPERATOR_BEGINS_WITH FREE_TEXT
+      {
+        $$ = new operators::BeginsWith($2);
+      }
+    | OPERATOR_GEOLOOKUP
       {
 #ifdef WITH_GEOIP
-        $$ = $$ = new operators::GeoLookup($1);
+        $$ = new operators::GeoLookup();
 #else
         std::stringstream ss;
             ss << "This version of ModSecurity was not compiled with GeoIP support.";
             driver.error(@0, ss.str());
             YYERROR;
 #endif  // WITH_GEOIP
-      }
-    | FREE_TEXT
-      {
-        std::string text = std::string($1);
-        text.pop_back();
-        text.erase(0, 1);
-        $$ = new operators::Rx("rx", text);
       }
     ;
 

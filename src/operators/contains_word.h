@@ -20,7 +20,7 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -29,7 +29,8 @@ class ContainsWord : public Operator {
     /** @ingroup ModSecurity_Operator */
     ContainsWord(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
-
+    explicit ContainsWord(std::string param)
+        : Operator("ContainsWord", param) { }
     bool evaluate(Transaction *transaction, const std::string &str);
 
     bool acceptableChar(const std::string& a, size_t pos);
@@ -37,8 +38,6 @@ class ContainsWord : public Operator {
 
 }  // namespace operators
 }  // namespace modsecurity
-
-#endif
 
 
 #endif  // SRC_OPERATORS_CONTAINS_WORD_H_

@@ -13,9 +13,7 @@
  *
  */
 
-#ifdef __cplusplus
 #include <string>
-#endif
 
 #ifndef SRC_OPERATORS_OPERATOR_H__
 #define SRC_OPERATORS_OPERATOR_H__
@@ -23,7 +21,7 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -48,7 +46,7 @@ class Operator {
         m_op(opName),
         m_param(param) { }
 
-    Operator(std::string opName)
+    explicit Operator(std::string opName)
         : m_match_message(""),
         m_negation(false),
         m_op(opName),
@@ -82,7 +80,6 @@ class Operator {
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
+
 
 #endif  // SRC_OPERATORS_OPERATOR_H__
-

@@ -22,6 +22,7 @@
 namespace modsecurity {
 namespace operators {
 
+
 bool VerifySSN::evaluate(Transaction *transaction, const std::string &str) {
     /**
      * @todo Implement the operator VerifySSN.
@@ -30,11 +31,6 @@ bool VerifySSN::evaluate(Transaction *transaction, const std::string &str) {
     return true;
 }
 
-VerifySSN::VerifySSN(std::string op, std::string param, bool negation)
-    : Operator() {
-    this->m_op = op;
-    this->m_param = param;
-}
 
 }  // namespace operators
 }  // namespace modsecurity

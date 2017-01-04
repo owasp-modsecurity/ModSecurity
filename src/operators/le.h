@@ -20,7 +20,7 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -29,6 +29,8 @@ class Le : public Operator {
     /** @ingroup ModSecurity_Operator */
     Le(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
+    explicit Le(std::string param)
+        : Operator("Le", param) { }
 
     bool evaluate(Transaction *transaction, const std::string &input) override;
 };
@@ -36,8 +38,6 @@ class Le : public Operator {
 
 }  // namespace operators
 }  // namespace modsecurity
-
-#endif
 
 
 #endif  // SRC_OPERATORS_LE_H_

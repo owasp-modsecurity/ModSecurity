@@ -20,7 +20,7 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -29,13 +29,13 @@ class Ge : public Operator {
     /** @ingroup ModSecurity_Operator */
     Ge(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
-
+    explicit Ge(std::string param)
+        : Operator("Ge", param) { }
     bool evaluate(Transaction *transaction, const std::string &input) override;
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_GE_H_

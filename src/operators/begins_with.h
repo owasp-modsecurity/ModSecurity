@@ -20,7 +20,7 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -29,13 +29,14 @@ class BeginsWith : public Operator {
     /** @ingroup ModSecurity_Operator */
     BeginsWith(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
+    explicit BeginsWith(std::string param)
+        : Operator("BeginsWith", param) { }
 
     bool evaluate(Transaction *transaction, const std::string &str) override;
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_BEGINS_WITH_H_

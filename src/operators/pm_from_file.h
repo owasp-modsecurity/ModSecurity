@@ -20,7 +20,7 @@
 
 #include "src/operators/pm.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -30,15 +30,14 @@ class PmFromFile : public Pm {
     /** @ingroup ModSecurity_Operator */
     PmFromFile(std::string op, std::string param, bool negation)
         : Pm(op, param, negation) { }
-
+    explicit PmFromFile(std::string param)
+        : Pm("PmFromFile", param) { }
     bool init(const std::string &file, std::string *error) override;
 };
 
 
 }  // namespace operators
 }  // namespace modsecurity
-
-#endif
 
 
 #endif  // SRC_OPERATORS_PM_FROM_FILE_H_

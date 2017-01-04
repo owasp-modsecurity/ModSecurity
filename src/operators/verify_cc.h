@@ -31,6 +31,10 @@ class VerifyCC : public Operator {
         : Operator(op, param, negation),
         m_pc(NULL),
         m_pce(NULL) { }
+    explicit VerifyCC(std::string param)
+        : Operator("VerifyCC", param),
+        m_pc(NULL),
+        m_pce(NULL) { }
     ~VerifyCC();
 
     int luhnVerify(const char *ccnumber, int len);

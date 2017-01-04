@@ -20,21 +20,22 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
 class FuzzyHash : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    FuzzyHash(std::string o, std::string p, bool i);
+    FuzzyHash(std::string o, std::string p, bool n)
+        : Operator(o, p, n) { }
+    explicit FuzzyHash(std::string param)
+        : Operator("FuzzyHash", param) { }
     bool evaluate(Transaction *transaction, const std::string &std) override;
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-
-#endif
 
 
 #endif  // SRC_OPERATORS_FUZZY_HASH_H_

@@ -22,7 +22,7 @@
 #include "src/operators/operator.h"
 #include "src/utils/regex.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 using Utils::SMatch;
 using Utils::regex_search;
@@ -40,6 +40,10 @@ class Rx : public Operator {
         }
     Rx(std::string name, std::string param)
         : Operator(name, param) {
+        m_re = new Regex(param);
+    }
+    explicit Rx(std::string param)
+        : Operator("Rx", param) {
         m_re = new Regex(param);
     }
 
@@ -60,8 +64,6 @@ class Rx : public Operator {
 
 }  // namespace operators
 }  // namespace modsecurity
-
-#endif
 
 
 #endif  // SRC_OPERATORS_RX_H_

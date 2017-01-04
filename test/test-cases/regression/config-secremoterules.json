@@ -31,7 +31,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Executing operator \"@pmfromfile\" with param \"https://www.modsecurity.org/modsecurity-regression-test.txt\" against REQUEST_FILENAME"
+      "debug_log":"Executing operator \"PmFromFile\" with param \"https://www.modsecurity.org/modsecurity-regression-test.txt\" against REQUEST_FILENAME"
     },
     "rules":[
       "SecRuleEngine On",
@@ -84,7 +84,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Executing operator \"@contains\" with param \"somethingelse\" against ARGS."
+      "debug_log":"Executing operator \"Contains\" with param \"somethingelse\" against ARGS."
     },
     "rules":[
       "SecRuleEngine On",

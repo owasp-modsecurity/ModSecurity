@@ -20,7 +20,7 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -29,14 +29,14 @@ class EndsWith : public Operator {
     /** @ingroup ModSecurity_Operator */
     EndsWith(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
-
+    explicit EndsWith(std::string param)
+        : Operator("EndsWith", param) { }
     bool evaluate(Transaction *transaction, const std::string &str) override;
 };
 
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_ENDS_WITH_H_

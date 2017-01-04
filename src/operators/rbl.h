@@ -26,7 +26,6 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
 
 namespace modsecurity {
 namespace operators {
@@ -74,7 +73,20 @@ class Rbl : public Operator {
                 m_provider = RblProvider::httpbl;
             }
         }
-
+    explicit Rbl(std::string param)
+        : Operator("Rbl", param),
+        m_service(param),
+        m_demandsPassword(false) {
+            m_provider = RblProvider::UnknownProvider;
+            if (m_service == "httpbl.org") {
+                m_demandsPassword = true;
+                m_provider = RblProvider::httpbl;
+            } else if (m_service == "uribl.com") {
+                m_provider = RblProvider::httpbl;
+            } else if (m_service == "spamhaus.org") {
+                m_provider = RblProvider::httpbl;
+            }
+        }
     bool evaluate(Transaction *transaction, const std::string  &str) override;
 
     std::string mapIpToAddress(std::string ipStr, Transaction *trans);
@@ -95,7 +107,6 @@ class Rbl : public Operator {
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_RBL_H_

@@ -19,7 +19,6 @@
 
 #include "src/operators/ip_match.h"
 
-#ifdef __cplusplus
 namespace modsecurity {
 namespace operators {
 
@@ -28,13 +27,14 @@ class IpMatchFromFile : public IpMatch {
     /** @ingroup ModSecurity_Operator */
     IpMatchFromFile(std::string op, std::string param, bool negation)
         : IpMatch(op, param, negation) { }
+    IpMatchFromFile(std::string op, std::string param)
+        : IpMatch(op, param) { }
 
     bool init(const std::string& file, std::string *error) override;
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_IP_MATCH_FROM_FILE_H_

@@ -22,7 +22,7 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -33,7 +33,10 @@ class ValidateByteRange : public Operator {
         : Operator(op, param, negation) {
             std::memset(table, '\0', sizeof(char) * 32);
         }
-
+    explicit ValidateByteRange(std::string param)
+        : Operator("ValidadeByteRange", param) {
+            std::memset(table, '\0', sizeof(char) * 32);
+        }
     ~ValidateByteRange() override { }
 
     bool evaluate(Transaction *transaction, const std::string &input) override;
@@ -46,8 +49,6 @@ class ValidateByteRange : public Operator {
 
 }  // namespace operators
 }  // namespace modsecurity
-
-#endif
 
 
 #endif  // SRC_OPERATORS_VALIDATE_BYTE_RANGE_H_

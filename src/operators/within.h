@@ -20,7 +20,7 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -29,13 +29,13 @@ class Within : public Operator {
     /** @ingroup ModSecurity_Operator */
     Within(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
-
+    explicit Within(std::string param)
+        : Operator("Within", param) { }
     bool evaluate(Transaction *transaction, const std::string &str);
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_WITHIN_H_

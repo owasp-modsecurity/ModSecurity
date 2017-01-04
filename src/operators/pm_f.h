@@ -20,7 +20,7 @@
 
 #include "src/operators/pm_from_file.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -35,7 +35,6 @@ class PmF : public PmFromFile {
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_PM_F_H_

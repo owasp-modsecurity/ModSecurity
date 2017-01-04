@@ -20,7 +20,7 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -29,13 +29,14 @@ class StrMatch : public Operator {
     /** @ingroup ModSecurity_Operator */
     StrMatch(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
+    explicit StrMatch(std::string param)
+        : Operator("StrMatch", param) { }
 
     bool evaluate(Transaction *transaction, const std::string &input) override;
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_STR_MATCH_H_

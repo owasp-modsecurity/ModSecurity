@@ -21,7 +21,6 @@
 #include "src/operators/operator.h"
 #include "src/utils/ip_tree.h"
 
-#ifdef __cplusplus
 namespace modsecurity {
 namespace operators {
 
@@ -30,7 +29,10 @@ class IpMatch : public Operator {
     /** @ingroup ModSecurity_Operator */
     IpMatch(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
-
+    IpMatch(std::string op, std::string param)
+        : Operator(op, param) { }
+    explicit IpMatch(std::string param)
+        : Operator("IpMatch", param) { }
     bool evaluate(Transaction *transaction, const std::string &input) override;
 
     bool init(const std::string &file, std::string *error) override;
@@ -41,7 +43,6 @@ class IpMatch : public Operator {
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_IP_MATCH_H_

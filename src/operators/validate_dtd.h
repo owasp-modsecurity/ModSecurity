@@ -26,7 +26,7 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -36,6 +36,8 @@ class ValidateDTD : public Operator {
     ValidateDTD(std::string o, std::string p, bool i)
         : Operator(o, p, i),
         m_dtd(NULL) { }
+    explicit ValidateDTD(std::string param)
+        : Operator("ValidateDTD", param) { }
     ~ValidateDTD() {
         if (m_dtd != NULL) {
             xmlFreeDtd(m_dtd);
@@ -91,7 +93,6 @@ class ValidateDTD : public Operator {
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_VALIDATE_DTD_H_

@@ -22,7 +22,7 @@
 #include "src/operators/operator.h"
 #include "src/utils/acmp.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -32,6 +32,14 @@ class Pm : public Operator {
     /** @ingroup ModSecurity_Operator */
     Pm(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) {
+        m_p = acmp_create(0);
+    }
+    Pm(std::string op, std::string param)
+        : Operator(op, param) {
+        m_p = acmp_create(0);
+    }
+    explicit Pm(std::string param)
+        : Operator("Pm", param) {
         m_p = acmp_create(0);
     }
     ~Pm();
@@ -53,7 +61,6 @@ class Pm : public Operator {
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_PM_H_

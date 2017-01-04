@@ -20,7 +20,7 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -29,12 +29,13 @@ class Gt : public Operator {
     /** @ingroup ModSecurity_Operator */
     Gt(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
-
-     bool evaluate(Transaction *transaction, const std::string &input) override;
+    explicit Gt(std::string param)
+        : Operator("Gt", param) { }
+    bool evaluate(Transaction *transaction, const std::string &input) override;
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
+
 
 #endif  // SRC_OPERATORS_GT_H_

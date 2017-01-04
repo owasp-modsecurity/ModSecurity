@@ -22,7 +22,7 @@
 #include "modsecurity/transaction.h"
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
@@ -31,13 +31,13 @@ class Contains : public Operator {
     /** @ingroup ModSecurity_Operator */
     Contains(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
-
+    explicit Contains(std::string param)
+        : Operator("Contains", param) { }
     bool evaluate(Transaction *transaction, const std::string &exp) override;
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_CONTAINS_H_

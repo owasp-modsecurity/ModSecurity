@@ -20,20 +20,23 @@
 
 #include "src/operators/operator.h"
 
-#ifdef __cplusplus
+
 namespace modsecurity {
 namespace operators {
 
 class InspectFile : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
-    InspectFile(std::string o, std::string p, bool i);
+    InspectFile(std::string o, std::string p, bool n)
+        : Operator(o, p, n) { }
+    explicit InspectFile(std::string param)
+        : Operator("InspectFile", param) { }
+
     bool evaluate(Transaction *transaction, const std::string &str) override;
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-#endif
 
 
 #endif  // SRC_OPERATORS_INSPECT_FILE_H_

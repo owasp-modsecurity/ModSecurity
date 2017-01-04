@@ -23,7 +23,6 @@
 #define SRC_OPERATORS_STR_EQ_H_
 
 
-#ifdef __cplusplus
 namespace modsecurity {
 namespace operators {
 
@@ -32,14 +31,14 @@ class StrEq : public Operator {
     /** @ingroup ModSecurity_Operator */
     StrEq(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
+    explicit StrEq(std::string param)
+        : Operator("StrEq", param) { }
 
     bool evaluate(Transaction *transaction, const std::string &str) override;
 };
 
 }  // namespace operators
 }  // namespace modsecurity
-
-#endif
 
 
 #endif  // SRC_OPERATORS_STR_EQ_H_
