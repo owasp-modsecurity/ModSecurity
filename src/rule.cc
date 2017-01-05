@@ -309,7 +309,7 @@ std::vector<std::string *> Rule::executeSecDefaultActionTransofrmations(
     // Notice that first we make sure that won't be a t:none
     // on the target rule.
     if (none == 0) {
-        for (Action *a : trasn->m_rules->defaultActions[this->phase]) {
+        for (Action *a : trasn->m_rules->m_defaultActions[this->phase]) {
             if (a->action_kind \
                 == actions::Action::RunTimeBeforeMatchAttemptKind) {
                 newValue = new std::string(a->evaluate(*value, trasn));
@@ -472,7 +472,7 @@ std::vector<const collection::Variable *> Rule::getFinalVars(
 void Rule::executeActionsAfterFullMatch(Transaction *trasn,
     bool containsDisruptive, RuleMessage *ruleMessage) {
 
-    for (Action *a : trasn->m_rules->defaultActions[this->phase]) {
+    for (Action *a : trasn->m_rules->m_defaultActions[this->phase]) {
         if (a->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }

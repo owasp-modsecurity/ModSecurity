@@ -93,7 +93,7 @@ Rules::~Rules() {
         }
     }
     for (i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        std::vector<actions::Action *> *tmp = &defaultActions[i];
+        std::vector<actions::Action *> *tmp = &m_defaultActions[i];
         while (tmp->empty() == false) {
             actions::Action *a = tmp->back();
             a->refCountDecreaseAndCheck();

@@ -915,7 +915,7 @@ expression:
             definedPhase = modsecurity::Phases::RequestHeadersPhase;
         }
 
-        if (!driver.defaultActions[definedPhase].empty()) {
+        if (!driver.m_defaultActions[definedPhase].empty()) {
             std::stringstream ss;
             ss << "SecDefaultActions can only be placed once per phase and configuration context. Phase ";
             ss << secRuleDefinedPhase;
@@ -925,7 +925,7 @@ expression:
         }
 
         for (actions::Action *a : checkedActions) {
-            driver.defaultActions[definedPhase].push_back(a);
+            driver.m_defaultActions[definedPhase].push_back(a);
         }
 
         delete actions;

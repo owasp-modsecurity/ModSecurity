@@ -313,8 +313,8 @@ class RulesProperties {
 
         for (int i = 0; i <= modsecurity::Phases::NUMBER_OF_PHASES; i++) {
             std::vector<actions::Action *> *actions_from = \
-                from->defaultActions+i;
-            std::vector<actions::Action *> *actions_to = to->defaultActions+i;
+                from->m_defaultActions+i;
+            std::vector<actions::Action *> *actions_to = to->m_defaultActions+i;
             for (int j = 0; j < actions_from->size(); j++) {
                 actions::Action *action = actions_from->at(j);
                 action->refCountIncrease();
@@ -419,7 +419,7 @@ class RulesProperties {
     ConfigString m_httpblKey;
     ConfigString m_uploadDirectory;
     ConfigString m_uploadTmpDirectory;
-    std::vector<actions::Action *> defaultActions[8];
+    std::vector<actions::Action *> m_defaultActions[8];
     std::vector<modsecurity::Rule *> m_rules[8];
 };
 
