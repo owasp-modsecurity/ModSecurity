@@ -47,7 +47,7 @@ int Driver::addSecMarker(std::string marker) {
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         Rule *rule = new Rule(marker);
         rule->phase = i;
-        rules[i].push_back(rule);
+        m_rules[i].push_back(rule);
     }
     return 0;
 }
@@ -60,7 +60,7 @@ int Driver::addSecAction(Rule *rule) {
         return false;
     }
 
-    rules[rule->phase].push_back(rule);
+    m_rules[rule->phase].push_back(rule);
 
     return true;
 }
@@ -100,7 +100,7 @@ int Driver::addSecRule(Rule *rule) {
         return false;
     }
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        std::vector<Rule *> rules = this->rules[i];
+        std::vector<Rule *> rules = m_rules[i];
         for (int j = 0; j < rules.size(); j++) {
             if (rules[j]->rule_id == rule->rule_id) {
                 m_parserError << "Rule id: " << std::to_string(rule->rule_id) \
@@ -111,7 +111,7 @@ int Driver::addSecRule(Rule *rule) {
     }
 
     lastRule = rule;
-    rules[rule->phase].push_back(rule);
+    m_rules[rule->phase].push_back(rule);
     return true;
 }
 

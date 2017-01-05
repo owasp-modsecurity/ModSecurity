@@ -234,7 +234,7 @@ class RulesProperties {
         std::ostringstream *err) {
         int amount_of_rules = 0;
 
-        amount_of_rules = appendRules(from->rules, to->rules, err);
+        amount_of_rules = appendRules(from->m_rules, to->m_rules, err);
         if (amount_of_rules < 0) {
             return amount_of_rules;
         }
@@ -391,7 +391,7 @@ class RulesProperties {
         if (phase >= modsecurity::Phases::NUMBER_OF_PHASES) {
             return NULL;
         }
-        return &rules[phase];
+        return &m_rules[phase];
     }
 
 
@@ -420,7 +420,7 @@ class RulesProperties {
     ConfigString m_uploadDirectory;
     ConfigString m_uploadTmpDirectory;
     std::vector<actions::Action *> defaultActions[8];
-    std::vector<modsecurity::Rule *> rules[8];
+    std::vector<modsecurity::Rule *> m_rules[8];
 };
 
 #endif

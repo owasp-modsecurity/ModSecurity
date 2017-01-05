@@ -85,7 +85,7 @@ Rules::~Rules() {
 
     /** Cleanup the rules */
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        std::vector<Rule *> rules = this->rules[i];
+        std::vector<Rule *> rules = m_rules[i];
         while (rules.empty() == false) {
             Rule *rule = rules.back();
             rule->refCountDecreaseAndCheck();
@@ -181,7 +181,7 @@ int Rules::evaluate(int phase, Transaction *transaction) {
        return 0;
     }
 
-    std::vector<Rule *> rules = this->rules[phase];
+    std::vector<Rule *> rules = m_rules[phase];
 
     debug(9, "This phase consists of " + std::to_string(rules.size()) + \
         " rule(s).");
@@ -273,7 +273,7 @@ void Rules::debug(int level, std::string message) {
 void Rules::dump() {
     std::cout << "Rules: " << std::endl;
     for (int i = 0; i <= modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        std::vector<Rule *> rules = this->rules[i];
+        std::vector<Rule *> rules = m_rules[i];
         std::cout << "Phase: " << std::to_string(i);
         std::cout << " (" << std::to_string(rules.size());
         std::cout << " rules)" << std::endl;
