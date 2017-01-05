@@ -521,7 +521,9 @@ NEW_LINE                                [\n\r]+
 }
 
 <EXPECTING_VARIABLE,TRANSACTION_FROM_VARIABLE_TO_OPERATOR>{
-[ \t]+["]*                                                              { BEGIN(EXPECTING_OPERATOR); }
+[ \t]*\"                { BEGIN(EXPECTING_OPERATOR); }
+[ \t]*\\\n[ \t]*\"      { BEGIN(EXPECTING_OPERATOR); }
+[ \t]*\\\r\n[ \t]*\"    { BEGIN(EXPECTING_OPERATOR); }
 }
 
 <EXPECTING_OPERATOR>{
