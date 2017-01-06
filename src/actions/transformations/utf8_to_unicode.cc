@@ -92,9 +92,12 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
             /* single byte unicode (7 bit ASCII equivilent) has no validation */
             count++;
             if (count <= len) {
-                if (c == 0)
-                    *data = utils::string::x2c(&c);
-                else
+                if (c == 0 && input_len > i + 1) {
+                    unsigned char z[2];
+                    z[0] = *utf;
+                    z[1] = *(utf + 1);
+                    *data = utils::string::x2c((unsigned char*) &z);
+                } else
                     *data++ = c;
             }
         } else if ((c & 0xE0) == 0xC0) {
