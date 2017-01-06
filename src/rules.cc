@@ -103,6 +103,7 @@ int Rules::loadFromUri(const char *uri) {
 
     if (driver->parseFile(uri) == false) {
         m_parserError << driver->m_parserError.str();
+        delete driver;
         return -1;
     }
 
