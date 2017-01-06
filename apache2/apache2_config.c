@@ -140,6 +140,7 @@ void *create_directory_config(apr_pool_t *mp, char *path)
 
     /* Collection timeout */
     dcfg->col_timeout = NOT_SET;
+    dcfg->col_gc_freq = NOT_SET;
 
     dcfg->crypto_key = NOT_SET_P;
     dcfg->crypto_key_len = NOT_SET;
@@ -588,6 +589,9 @@ void *merge_directory_configs(apr_pool_t *mp, void *_parent, void *_child)
     merged->col_timeout = (child->col_timeout == NOT_SET
         ? parent->col_timeout : child->col_timeout);
 
+    merged->col_gc_freq = (child->col_gc_freq == NOT_SET)
+        ? parent->col_gc_freq : child->col_gc_freq;
+
     /* Hash */
     merged->crypto_key = (child->crypto_key == NOT_SET_P
         ? parent->crypto_key : child->crypto_key);
@@ -730,6 +734,7 @@ void init_directory_config(directory_config *dcfg)
     if (dcfg->disable_backend_compression == NOT_SET) dcfg->disable_backend_compression = 0;
 
     if (dcfg->col_timeout == NOT_SET) dcfg->col_timeout = 3600;
+    if (dcfg->col_gc_freq == NOT_SET) dcfg->col_gc_freq = .01;
 
     /* Hash */
     if (dcfg->crypto_key == NOT_SET_P) dcfg->crypto_key = getkey(dcfg->mp);
@@ -1204,7 +1209,7 @@ static const char *cmd_audit_log(cmd_parms *cmd, void *_dcfg, const char *p1)
     else {
         const char *file_name = ap_server_root_relative(cmd->pool, dcfg->auditlog_name);
         apr_status_t rc;
-        
+
         if (dcfg->auditlog_fileperms == NOT_SET) {
             dcfg->auditlog_fileperms = CREATEMODE;
         }
@@ -1490,6 +1495,32 @@ static const char *cmd_collection_timeout(cmd_parms *cmd, void *_dcfg,
     if ((dcfg->col_timeout >= 0)&&(dcfg->col_timeout <= 2592000)) return NULL;
 
     return apr_psprintf(cmd->pool, "ModSecurity: Invalid value for SecCollectionTimeout: %s", p1);
+}
+
+static const char *cmd_collection_gc_freq(cmd_parms *cmd, void *_dcfg,
+                                        const char *p1, const char *p2)
+{
+    directory_config *dcfg = (directory_config *)_dcfg;
+    float freq;
+    
+    if (sscanf(p1, "%f", &freq) != 1) {
+      return "ModSecurity: Invalid value for SecCollectionGCFrequency. Value must be a float.";
+    }
+    
+    if (freq <= 0) {
+        // <= 0 would mean GC would never run. 
+        return "ModSecurity: Invalid value for SecCollectionGCFrequency. Value must be greater than 0.";
+    }
+    
+    if (freq > 100) {
+        // >100 would make no sense.
+        return "ModSecurity: Invalid value for SecCollectionGCFrequency. Value must be less than 100.";
+    }
+    
+    // Convert to percentage
+    dcfg->col_gc_freq = freq / 100;
+
+    return NULL;
 }
 
 static const char *cmd_debug_log_level(cmd_parms *cmd, void *_dcfg,
@@ -3382,6 +3413,14 @@ const command_rec module_directives[] = {
         NULL,
         CMD_SCOPE_ANY,
         "set default collections timeout. default it 3600"
+    ),
+
+    AP_INIT_TAKE12 (
+        "SecCollectionGCFrequency",
+        cmd_collection_gc_freq,
+        NULL,
+        CMD_SCOPE_ANY,
+        "set garbage collection frequency. default is to run during roughly 1% of requests."
     ),
 
     AP_INIT_TAKE1 (
