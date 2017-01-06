@@ -34,6 +34,7 @@ class Count : public Variable {
     explicit Count(Variable *v)
         : Variable("count(" + v->m_name + ")"),
         var(v) { }
+    virtual ~Count() { delete var; }
 
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) override;

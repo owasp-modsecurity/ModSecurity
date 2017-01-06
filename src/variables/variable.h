@@ -64,6 +64,7 @@ class Variable {
 
     explicit Variable(std::string _name);
     Variable(std::string name, VariableKind kind);
+    virtual ~Variable() { }
 
     static std::string to_s(std::vector<Variable *> *variables);
 
