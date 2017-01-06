@@ -131,6 +131,7 @@ char *parse_pm_content(const char *op_parm, unsigned short int op_len, const cha
                     x++;
                 } else {
                     *error_msg = std::string("Unsupported escape sequence.").c_str();
+                    free(parm);
                     return NULL;
                 }
                 esc = 0;
