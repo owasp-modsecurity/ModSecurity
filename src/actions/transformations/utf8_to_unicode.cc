@@ -38,6 +38,7 @@ std::string Utf8ToUnicode::evaluate(std::string value,
     std::string ret;
     unsigned char *input = NULL;
     int changed = 0;
+    char *out;
 
     input = reinterpret_cast<unsigned char *>
         (malloc(sizeof(char) * value.length()+1));
@@ -48,11 +49,13 @@ std::string Utf8ToUnicode::evaluate(std::string value,
 
     memcpy(input, value.c_str(), value.length()+1);
 
-    inplace(input, value.size() + 1, &changed);
-
-    ret.assign(reinterpret_cast<char *>(input),
-        strlen(reinterpret_cast<char *>(input)));
+    out = inplace(input, value.size() + 1, &changed);
     free(input);
+    if (out != NULL) {
+        ret.assign(reinterpret_cast<char *>(out),
+            strlen(reinterpret_cast<char *>(out)));
+        free(out);
+    }
 
     return ret;
 }
@@ -64,6 +67,7 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
     unsigned int count = 0;
     unsigned char c;
     char *data;
+    char *data_orig;
     unsigned int i, len, j;
     unsigned int bytes_left = input_len;
     unsigned char unicode[8];
@@ -74,6 +78,7 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
     if (data == NULL) {
         return NULL;
     }
+    data_orig = data;
 
     if (input == NULL) {
         free(data);
@@ -299,7 +304,7 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
 
     *data ='\0';
 
-    return data;
+    return data_orig;
 }
 
 
