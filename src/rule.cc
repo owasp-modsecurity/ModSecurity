@@ -94,7 +94,7 @@ Rule::Rule(std::string marker)
     m_secmarker(true),
     m_marker(marker),
     m_maturity(0),
-    m_referenceCount(0),
+    m_referenceCount(1),
     m_fileName(""),
     m_lineNumber(0) { }
 
@@ -113,7 +113,7 @@ Rule::Rule(Operator *_op,
     m_secmarker(false),
     m_marker(""),
     m_maturity(0),
-    m_referenceCount(0),
+    m_referenceCount(1),
     m_fileName(fileName),
     m_lineNumber(lineNumber) {
     if (actions != NULL) {

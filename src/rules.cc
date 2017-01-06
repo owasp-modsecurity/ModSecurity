@@ -78,28 +78,8 @@ void Rules::decrementReferenceCount(void) {
 
 
 Rules::~Rules() {
-    int i = 0;
-
     free(unicode_map_table);
     unicode_map_table = NULL;
-
-    /** Cleanup the rules */
-    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        std::vector<Rule *> rules = m_rules[i];
-        while (rules.empty() == false) {
-            Rule *rule = rules.back();
-            rule->refCountDecreaseAndCheck();
-            rules.pop_back();
-        }
-    }
-    for (i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
-        std::vector<actions::Action *> *tmp = &m_defaultActions[i];
-        while (tmp->empty() == false) {
-            actions::Action *a = tmp->back();
-            a->refCountDecreaseAndCheck();
-            tmp->pop_back();
-        }
-    }
 }
 
 

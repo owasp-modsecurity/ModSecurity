@@ -41,7 +41,7 @@ class Action {
         : action_kind(2),
         m_isNone(false),
         m_name(""),
-        m_referenceCount(0),
+        m_referenceCount(1),
         m_parser_payload(""),
         temporaryAction(false) {
             set_name_and_payload(_action);
@@ -50,7 +50,7 @@ class Action {
         : action_kind(kind),
         m_isNone(false),
         m_name(""),
-        m_referenceCount(0),
+        m_referenceCount(1),
         m_parser_payload(""),
         temporaryAction(false) {
             set_name_and_payload(_action);
@@ -91,11 +91,13 @@ class Action {
         }
     }
 
-    void refCountDecreaseAndCheck() {
+    int refCountDecreaseAndCheck() {
         this->m_referenceCount--;
         if (this->m_referenceCount == 0) {
             delete this;
+            return 1;
         }
+        return 0;
     }
 
     void refCountIncrease() {

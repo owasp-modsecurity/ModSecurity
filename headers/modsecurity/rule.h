@@ -84,15 +84,17 @@ class Rule {
     Rule *chainedRule;
     bool chained;
 
-    void refCountDecreaseAndCheck() {
-        this->m_referenceCount--;
-        if (this->m_referenceCount == 0) {
+    int refCountDecreaseAndCheck() {
+        m_referenceCount--;
+        if (m_referenceCount == 0) {
             delete this;
+            return 1;
         }
+        return 0;
     }
 
     void refCountIncrease() {
-        this->m_referenceCount++;
+        m_referenceCount++;
     }
 
     std::string m_rev;

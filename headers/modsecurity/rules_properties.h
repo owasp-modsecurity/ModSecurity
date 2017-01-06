@@ -102,6 +102,29 @@ class RulesProperties {
 
 
     ~RulesProperties() {
+        int i = 0;
+        /** Cleanup the rules */
+        for (i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
+            std::vector<Rule *> rules = m_rules[i];
+            while (rules.empty() == false) {
+                Rule *rule = rules.back();
+                rules.pop_back();
+                if (rule->refCountDecreaseAndCheck()) {
+                    rule = NULL;
+                }
+            }
+        }
+        for (i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
+            std::vector<actions::Action *> *tmp = &m_defaultActions[i];
+            while (tmp->empty() == false) {
+                actions::Action *a = tmp->back();
+                tmp->pop_back();
+                if (a->refCountDecreaseAndCheck()) {
+                    a = NULL;
+                }
+            }
+        }
+
         delete m_debugLog;
         delete m_auditLog;
     }
