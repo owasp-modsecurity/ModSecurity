@@ -29,16 +29,10 @@ Driver::Driver()
   : RulesProperties(),
   trace_scanning(false),
   trace_parsing(false),
-  lastRule(NULL) {
-      m_auditLog = new audit_log::AuditLog();
-      m_auditLog->refCountIncrease();
-  }
+  lastRule(NULL) { }
 
 
 Driver::~Driver() {
-    if (m_auditLog != NULL) {
-        m_auditLog->refCountDecreaseAndCheck();
-    }
     delete loc.back();
 }
 
