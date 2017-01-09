@@ -171,6 +171,7 @@ Transaction::~Transaction() {
     m_requestBody.clear();
 
     m_rulesMessages.clear();
+    m_auditLogFiredRules.clear();
 
     m_rules->decrementReferenceCount();
 
@@ -1452,7 +1453,16 @@ std::string Transaction::toOldAuditLogFormat(int parts,
     if (parts & audit_log::AuditLog::KAuditLogPart) {
         audit_log << "--" << trailer << "-" << "K--" << std::endl;
         audit_log << std::endl;
-        /** TODO: write audit_log K part. */
+#ifdef FULL_AUDIT_LOGS
+        for (auto r : m_auditLogFiredRules) {
+            if (r->m_plainText.size() > 0) {
+                audit_log << r->m_plainText << std::endl;
+                if (!r->chained) {
+                    audit_log << std::endl;
+                }
+            }
+        }
+#endif
     }
     audit_log << "--" << trailer << "-" << "Z--" << std::endl << std::endl;
 

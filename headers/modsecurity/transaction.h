@@ -37,6 +37,7 @@
 typedef struct ModSecurity_t ModSecurity;
 typedef struct Transaction_t Transaction;
 typedef struct Rules_t Rules;
+typedef struct Rule_t Rule;
 #endif
 
 #include "modsecurity/intervention.h"
@@ -70,6 +71,7 @@ namespace modsecurity {
 class ModSecurity;
 class Transaction;
 class Rules;
+class Rule;
 class RuleMessage;
 namespace actions {
 class Action;
@@ -290,6 +292,12 @@ class Transaction {
      * auditlogs.
      */
     std::list<modsecurity::RuleMessage> m_rulesMessages;
+
+    /**
+     * This variable holds all rules matched throughout of rules evaluation
+     * process.
+     */
+    std::list<Rule*> m_auditLogFiredRules;
 
     /**
      * Holds the request body, in case of any.

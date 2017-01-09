@@ -42,7 +42,37 @@ Driver::~Driver() {
     delete loc.back();
 }
 
+void Driver::save_orig(std::string orig) {
+#ifdef FULL_AUDIT_LOGS
+    if (m_orig.length() > 0) {
+        m_orig += orig;
+    }
 
+    if (orig == "SecRule" || orig == "SecAction") {
+        m_orig = orig + " ";
+    }
+#else
+    m_orig = "";
+#endif
+}
+
+std::string Driver::get_orig() {
+    std::string orig = m_orig;
+
+#ifdef FULL_AUDIT_LOGS
+    // balance quotes
+    // FIXME:  research if single quotes need to be balanced as well
+    int i, dq;
+    for (i = 0; i < orig.size(); i++) {
+        if (orig[i] == '"') { dq++; }
+    }
+    if (dq % 2 == 1) { orig += "\""; }
+#endif
+
+    m_orig = "";
+    return orig;
+}
+ 
 int Driver::addSecMarker(std::string marker) {
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         Rule *rule = new Rule(marker);

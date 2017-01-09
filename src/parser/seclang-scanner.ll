@@ -229,6 +229,7 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
 %{
   // Code run each time yylex is called.
   driver.loc.back()->step();
+  driver.save_orig(yytext);
 %}
 
 {ACTION_APPEND}                                                         { return p::make_ACTION_APPEND(yytext, *driver.loc.back()); }
