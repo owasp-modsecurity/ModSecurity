@@ -255,7 +255,19 @@ VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
 
 NEW_LINE                                [\n\r]+
 
-%x TRANSACTION_TO_VARIABLE EXPECTING_VARIABLE TRANSACTION_FROM_VARIABLE_TO_OPERATOR EXPECTING_OPERATOR COMMENT  EXPECTING_PARAMETER EXPECTING_ACTIONS TRANSACTION_FROM_OPERATOR_TO_ACTIONS TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS NO_OP_INFORMED FINISH_ACTIONS
+%x TRANSACTION_TO_VARIABLE
+%x EXPECTING_VARIABLE
+%x TRANSACTION_FROM_VARIABLE_TO_OPERATOR
+%x EXPECTING_OPERATOR
+%x COMMENT
+%x EXPECTING_PARAMETER
+%x EXPECTING_ACTIONS
+%x TRANSACTION_FROM_OPERATOR_TO_ACTIONS
+%x TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS
+%x NO_OP_INFORMED
+%x FINISH_ACTIONS
+%x LEXING_ERROR
+%x LEXING_ERROR_ACTION
 
 %{
   // Code run each time a pattern is matched.
@@ -386,8 +398,9 @@ NEW_LINE                                [\n\r]+
 \"[ \t]*\n                                                              { BEGIN(INITIAL); yyless(1); }
 \"[ \t]*\r\n                                                            { BEGIN(INITIAL); driver.loc.back()->lines(1); driver.loc.back()->step(); }
 
-.                                                                       { driver.error (*driver.loc.back(), "invalid character", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
+.                                                                       { BEGIN(LEXING_ERROR_ACTION); yyless(0); }
 }
+
 
 <FINISH_ACTIONS>{
 <<EOF>> { BEGIN(INITIAL); yyless(0); p::make_NEW_LINE(*driver.loc.back()); }
@@ -603,8 +616,10 @@ NEW_LINE                                [\n\r]+
 
 
 
-.                                                                       { driver.error (*driver.loc.back(), "invalid character", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
+.                                                                       { BEGIN(LEXING_ERROR); yyless(0); }
 
+<LEXING_ERROR>.+  { driver.error (*driver.loc.back(), "Invalid input: ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
+<LEXING_ERROR_ACTION>.+  { driver.error (*driver.loc.back(), "Invalid action: ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
 
 
 <<EOF>> {
