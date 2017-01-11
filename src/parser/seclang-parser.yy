@@ -849,6 +849,7 @@ expression:
             /* line number */ @0.end.line
             );
         if (driver.addSecRule(rule) == false) {
+            delete rule;
             YYERROR;
         }
       }
@@ -867,6 +868,7 @@ expression:
             /* line number */ @0.end.line
             );
         if (driver.addSecRule(rule) == false) {
+            delete rule;
             YYERROR;
         }
       }
