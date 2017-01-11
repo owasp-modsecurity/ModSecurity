@@ -1,19 +1,19 @@
 
-BUILT_SOURCES= \
-	parser/seclang-parser.cc
+if BUILD_PARSER
+export MAYBE_PARSER = parser
+endif
+
+
+SUBDIRS = \
+	$(MAYBE_PARSER)
+
+
 
 lib_LTLIBRARIES = libmodsecurity.la
 libmodsecurity_ladir = $(prefix)/include
 libmodsecurity_includesub_collectiondir = $(pkgincludedir)/collection/
 libmodsecurity_includesub_actionsdir = $(pkgincludedir)/actions/
 
-CLEANFILES = \
-	location.hh \
-	position.hh \
-	parser/seclang-parser.cc \
-	parser/seclang-parser.hh \
-	parser/seclang-scanner.cc \
-	stack.hh
 
 EXTRA_DIST = $(CLEANFILES)
 
@@ -238,8 +238,8 @@ BODY_PROCESSORS = \
 
 
 libmodsecurity_la_SOURCES = \
-	parser/seclang-parser.yy \
-	parser/seclang-scanner.ll \
+	parser/seclang-parser.cc \
+	parser/seclang-scanner.cc \
 	parser/driver.cc \
 	transaction.cc \
 	audit_log/audit_log.cc \

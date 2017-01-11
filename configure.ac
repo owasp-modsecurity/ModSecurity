@@ -247,6 +247,20 @@ AC_ARG_ENABLE(examples,
     [buildExamples=true]
     )
 
+# Parser
+AC_ARG_ENABLE(parser-generation,
+    [AC_HELP_STRING([--enable-parser-generation],[Enables parser generation during the build])],
+
+    [case "${enableval}" in
+        yes) buildParser=true ;;
+        no)  buildParser=false ;;
+        *) AC_MSG_ERROR(bad value ${enableval} for --enable-parser-generation) ;;
+    esac],
+
+    [buildParser=false]
+    )
+
+
 
 
 # Decide if we want to build the tests or not.
@@ -268,6 +282,7 @@ if test $buildTestUtilities = true; then
 fi
 
 AM_CONDITIONAL([EXAMPLES], [test $buildExamples = true])
+AM_CONDITIONAL([BUILD_PARSER], [test $buildParser = true])
 
 
 # General link options
@@ -307,6 +322,10 @@ AM_COND_IF([EXAMPLES],
 
 AM_COND_IF([AFL_FUZZER],
        [AC_CONFIG_FILES([test/fuzzer/Makefile])])
+
+AM_COND_IF([BUILD_PARSER],
+       [AC_CONFIG_FILES([src/parser/Makefile])])
+
 
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -464,7 +483,11 @@ if test "$buildExamples" = "true"; then
 else
     echo "   + library examples                              ....disabled"
 fi
-
+if test "$buildParser" = "true"; then
+    echo "   + Building parser                               ....enabled"
+else
+    echo "   + Building parser                               ....disabled"
+fi
 
 echo " "
 
