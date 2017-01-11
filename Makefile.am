@@ -48,6 +48,11 @@ MAINTAINERCLEANFILES = \
 	test-suite-memcheck.log \
 	ylwrap
 
+parser:
+	cat src/parser/seclang-parser.hh | sed "s/return \*new (yyas_<T> ()) T (t)/return *new (yyas_<T> ()) T (std::move((T\&)t))/g"  > src/parser/seclang-parser.hh.fix && mv src/parser/seclang-parser.hh.fix src/parser/seclang-parser.hh
+
+
+
 cppcheck:
 	@cppcheck \
 		--suppressions-list=./test/cppcheck_suppressions.txt \
