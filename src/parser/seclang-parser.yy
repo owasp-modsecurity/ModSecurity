@@ -227,20 +227,14 @@ using modsecurity::operators::Operator;
         YYERROR; \
     }
 
-/**
- * %destructor { code } THING
- *
- * %destructor is not working as expected. Apparently it was fixed on a most recent,
- * version of Bison. We are not interested to limit the usage to this newest version,
- * thus, we have to deal with memory leak when rules failed to load. Not that big
- * problem, as we don't really continue when it fails (only for SecRemoteRules).
- *
- * Information about destructor:
- * http://www.gnu.org/software/bison/manual/html_node/Destructor-Decl.html
- *
- * Patch:
- * https://www.mail-archive.com/search?l=bug-bison@gnu.org&q=subject:%22Destructor+miscompilation+with+C%2B%2B+variants%3F%22&o=newest&f=1
- */
+#define OPERATOR_CONTAINER(a, b) \
+    std::unique_ptr<Operator> c(b); \
+    a = std::move(c);
+
+#define ACTION_CONTAINER(a, b) \
+    std::unique_ptr<actions::Action> c(b); \
+    a = std::move(c);
+
 
 }
 // The parsing context.
@@ -467,17 +461,23 @@ using modsecurity::operators::Operator;
   VARIABLE_TX                                  "VARIABLE_TX"
 ;
 
-%type <actions::Action *> act
-%type <std::vector<actions::Action *> *> actings
-%type <std::vector<actions::Action *> *> actions
+%type <std::unique_ptr<actions::Action>> act
 
-%type <std::vector<Variable *> *> variables
-%type <Operator *> op_before_init
-%type <Operator *> op
-%type <Variable *> var
+%type <std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > > >
+  actions_may_quoted
+  actions
+;
+
+%type <std::unique_ptr<Operator>>
+  op_before_init
+  op
+;
+
+%type <std::unique_ptr<std::vector<std::unique_ptr<Variable> > > > variables
+%type <std::unique_ptr<Variable>> var
 
 
-%printer { yyoutput << $$; } <*>;
+//%printer { yyoutput << $$; } <*>;
 
 %%
 %start input;
@@ -603,38 +603,37 @@ audit_log:
       }
     ;
 
-actings:
-    QUOTATION_MARK actions QUOTATION_MARK
+actions:
+    QUOTATION_MARK actions_may_quoted QUOTATION_MARK
       {
-        $$ = $2;
+        $$ = std::move($2);
       }
-    | actions
+    | actions_may_quoted
       {
-        $$ = $1;
+        $$ = std::move($1);
       }
     ;
 
-actions:
-    actions COMMA act
+actions_may_quoted:
+    actions_may_quoted COMMA act
       {
-        std::vector<actions::Action *> *a = $1;
         ACTION_INIT($3, @0)
-        a->push_back($3);
-        $$ = $1;
+        $1->push_back(std::move($3));
+        $$ = std::move($1);
       }
     | act
       {
-        std::vector<actions::Action *> *a = new std::vector<actions::Action *>;
+        std::unique_ptr<std::vector<std::unique_ptr<actions::Action>>> b(new std::vector<std::unique_ptr<actions::Action>>());
         ACTION_INIT($1, @0)
-        a->push_back($1);
-        $$ = a;
+        b->push_back(std::move($1));
+        $$ = std::move(b);
       }
     ;
 
 op:
     op_before_init
       {
-        $$ = $1;
+        $$ = std::move($1);
         std::string error;
         if ($$->init(driver.ref.back(), &error) == false) {
             driver.error(@0, error);
@@ -643,7 +642,7 @@ op:
       }
     | NOT op_before_init
       {
-        $$ = $2;
+        $$ = std::move($2);
         $$->m_negation = true;
         std::string error;
         if ($$->init(driver.ref.back(), &error) == false) {
@@ -653,20 +652,18 @@ op:
       }
     | OPERATOR_RX_CONTENT_ONLY
       {
-        $$ = new operators::Rx(utils::string::removeBracketsIfNeeded($1));
+        OPERATOR_CONTAINER($$, new operators::Rx(utils::string::removeBracketsIfNeeded($1)));
         std::string error;
         if ($$->init(driver.ref.back(), &error) == false) {
-            $$->m_negation = true;
             driver.error(@0, error);
             YYERROR;
         }
       }
     | NOT OPERATOR_RX_CONTENT_ONLY
       {
-        $$ = new operators::Rx("!" + utils::string::removeBracketsIfNeeded($2));
+        OPERATOR_CONTAINER($$, new operators::Rx("!" + utils::string::removeBracketsIfNeeded($2)));
         std::string error;
         if ($$->init(driver.ref.back(), &error) == false) {
-            $$->m_negation = true;
             driver.error(@0, error);
             YYERROR;
         }
@@ -676,23 +673,23 @@ op:
 op_before_init:
     OPERATOR_UNCONDITIONAL_MATCH
       {
-        $$ = new operators::UnconditionalMatch();
+        OPERATOR_CONTAINER($$, new operators::UnconditionalMatch());
       }
     | OPERATOR_DETECT_SQLI
       {
-        $$ = new operators::DetectSQLi();
+        OPERATOR_CONTAINER($$, new operators::DetectSQLi());
       }
     | OPERATOR_DETECT_XSS
       {
-        $$ = new operators::DetectXSS();
+        OPERATOR_CONTAINER($$, new operators::DetectXSS());
       }
     | OPERATOR_VALIDATE_URL_ENCODING
       {
-        $$ = new operators::ValidateUrlEncoding();
+        OPERATOR_CONTAINER($$, new operators::ValidateUrlEncoding());
       }
     | OPERATOR_VALIDATE_UTF8_ENCODING
       {
-        $$ = new operators::ValidateUtf8Encoding();
+        OPERATOR_CONTAINER($$, new operators::ValidateUtf8Encoding());
       }
     | OPERATOR_INSPECT_FILE FREE_TEXT
       {
@@ -706,11 +703,11 @@ op_before_init:
       }
     | OPERATOR_VALIDATE_BYTE_RANGE FREE_TEXT
       {
-        $$ = new operators::ValidateByteRange($2);
+        OPERATOR_CONTAINER($$, new operators::ValidateByteRange($2));
       }
     | OPERATOR_VALIDATE_DTD FREE_TEXT
       {
-        $$ = new operators::ValidateDTD($2);
+        OPERATOR_CONTAINER($$, new operators::ValidateDTD($2));
       }
     | OPERATOR_VALIDATE_HASH FREE_TEXT
       {
@@ -719,11 +716,11 @@ op_before_init:
       }
     | OPERATOR_VALIDATE_SCHEMA FREE_TEXT
       {
-        $$ = new operators::ValidateSchema($2);
+        OPERATOR_CONTAINER($$, new operators::ValidateSchema($2));
       }
     | OPERATOR_VERIFY_CC FREE_TEXT
       {
-        $$ = new operators::VerifyCC($2);
+        OPERATOR_CONTAINER($$, new operators::VerifyCC($2));
       }
     | OPERATOR_VERIFY_CPF FREE_TEXT
       {
@@ -747,80 +744,80 @@ op_before_init:
       }
     | OPERATOR_WITHIN FREE_TEXT
       {
-        $$ = new operators::Within($2);
+        OPERATOR_CONTAINER($$, new operators::Within($2));
       }
     | OPERATOR_CONTAINS_WORD FREE_TEXT
       {
-        $$ = new operators::ContainsWord($2);
+        OPERATOR_CONTAINER($$, new operators::ContainsWord($2));
       }
     | OPERATOR_CONTAINS FREE_TEXT
       {
-        $$ = new operators::Contains($2);
+        OPERATOR_CONTAINER($$, new operators::Contains($2));
       }
     | OPERATOR_ENDS_WITH FREE_TEXT
       {
-        $$ = new operators::EndsWith($2);
+        OPERATOR_CONTAINER($$, new operators::EndsWith($2));
       }
     | OPERATOR_EQ FREE_TEXT
       {
-        $$ = new operators::Eq($2);
+        OPERATOR_CONTAINER($$, new operators::Eq($2));
       }
     | OPERATOR_GE FREE_TEXT
       {
-        $$ = new operators::Ge($2);
+        OPERATOR_CONTAINER($$, new operators::Ge($2));
       }
     | OPERATOR_GT FREE_TEXT
       {
-        $$ = new operators::Gt($2);
+        OPERATOR_CONTAINER($$, new operators::Gt($2));
       }
     | OPERATOR_IP_MATCH_FROM_FILE FREE_TEXT
       {
-        $$ = new operators::IpMatchF($2);
+        OPERATOR_CONTAINER($$, new operators::IpMatchF($2));
       }
     | OPERATOR_IP_MATCH FREE_TEXT
       {
-        $$ = new operators::IpMatch($2);
+        OPERATOR_CONTAINER($$, new operators::IpMatch($2));
       }
     | OPERATOR_LE FREE_TEXT
       {
-        $$ = new operators::Le($2);
+        OPERATOR_CONTAINER($$, new operators::Le($2));
       }
     | OPERATOR_LT FREE_TEXT
       {
-        $$ = new operators::Lt($2);
+        OPERATOR_CONTAINER($$, new operators::Lt($2));
       }
     | OPERATOR_PM_FROM_FILE FREE_TEXT
       {
-        $$ = new operators::PmFromFile($2);
+        OPERATOR_CONTAINER($$, new operators::PmFromFile($2));
       }
     | OPERATOR_PM FREE_TEXT
       {
-        $$ = new operators::Pm($2);
+        OPERATOR_CONTAINER($$, new operators::Pm($2));
       }
     | OPERATOR_RBL FREE_TEXT
       {
-        $$ = new operators::Rbl($2);
+        OPERATOR_CONTAINER($$, new operators::Rbl($2));
       }
     | OPERATOR_RX FREE_TEXT
       {
-        $$ = new operators::Rx($2);
+        OPERATOR_CONTAINER($$, new operators::Rx($2));
       }
     | OPERATOR_STR_EQ FREE_TEXT
       {
-        $$ = new operators::StrEq($2);
+        OPERATOR_CONTAINER($$, new operators::StrEq($2));
       }
     | OPERATOR_STR_MATCH FREE_TEXT
       {
-        $$ = new operators::StrMatch($2);
+        OPERATOR_CONTAINER($$, new operators::StrMatch($2));
       }
     | OPERATOR_BEGINS_WITH FREE_TEXT
       {
-        $$ = new operators::BeginsWith($2);
+        OPERATOR_CONTAINER($$, new operators::BeginsWith($2));
       }
     | OPERATOR_GEOLOOKUP
       {
 #ifdef WITH_GEOIP
-        $$ = new operators::GeoLookup();
+        OPERATOR_CONTAINER($$, new operators::GeoLookup());
 #else
         std::stringstream ss;
             ss << "This version of ModSecurity was not compiled with GeoIP support.";
@@ -832,46 +829,63 @@ op_before_init:
 
 expression:
     audit_log
-    | DIRECTIVE variables op actings
+    | DIRECTIVE variables op actions
       {
+        std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        for (auto &i : *$4.get()) {
+            a->push_back(i.release());
+        }
+        std::vector<Variable *> *v = new std::vector<Variable *>();
+        for (auto &i : *$2.get()) {
+            v->push_back(i.release());
+        }
+
+        Operator *op = $3.release();
         Rule *rule = new Rule(
-            /* op */ $3,
-            /* variables */ $2,
-            /* actions */ $4,
+            /* op */ op,
+            /* variables */ v,
+            /* actions */ a,
             /* file name */ driver.ref.back(),
             /* line number */ @0.end.line
             );
-
         if (driver.addSecRule(rule) == false) {
             YYERROR;
         }
       }
     | DIRECTIVE variables op
       {
+        std::vector<Variable *> *v = new std::vector<Variable *>();
+        for (auto &i : *$2.get()) {
+            v->push_back(i.release());
+        }
+
         Rule *rule = new Rule(
-            /* op */ $3,
-            /* variables */ $2,
+            /* op */ $3.release(),
+            /* variables */ v,
             /* actions */ NULL,
             /* file name */ driver.ref.back(),
             /* line number */ @0.end.line
             );
-
         if (driver.addSecRule(rule) == false) {
             YYERROR;
         }
       }
-    | CONFIG_DIR_SEC_ACTION actings
+    | CONFIG_DIR_SEC_ACTION actions
       {
+        std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        for (auto &i : *$2.get()) {
+            a->push_back(i.release());
+        }
         Rule *rule = new Rule(
             /* op */ NULL,
             /* variables */ NULL,
-            /* actions */ $2,
+            /* actions */ a,
             /* file name */ driver.ref.back(),
             /* line number */ @0.end.line
             );
         driver.addSecAction(rule);
       }
-    | DIRECTIVE_SECRULESCRIPT actings
+    | DIRECTIVE_SECRULESCRIPT actions
       {
         /*
 
@@ -879,9 +893,12 @@ expression:
 
         */
       }
-    | CONFIG_DIR_SEC_DEFAULT_ACTION actings
+    | CONFIG_DIR_SEC_DEFAULT_ACTION actions
       {
-        std::vector<actions::Action *> *actions = $2;
+        std::vector<actions::Action *> *actions = new std::vector<actions::Action *>();
+        for (auto &i : *$2.get()) {
+            actions->push_back(i.release());
+        }
         std::vector<actions::Action *> checkedActions;
         int definedPhase = -1;
         int secRuleDefinedPhase = -1;
@@ -1104,15 +1121,14 @@ expression:
 variables:
     variables PIPE var
       {
-        std::vector<Variable *> *v = $1;
-        v->push_back($3);
-        $$ = $1;
+        $1->push_back(std::move($3));
+        $$ = std::move($1);
       }
     | var
       {
-        std::vector<Variable *> *variables = new std::vector<Variable *>;
-        variables->push_back($1);
-        $$ = variables;
+        std::unique_ptr<std::vector<std::unique_ptr<Variable>>> b(new std::vector<std::unique_ptr<Variable>>());
+        b->push_back(std::move($1));
+        $$ = std::move(b);
       }
     ;
 
@@ -1120,204 +1136,353 @@ var:
     VARIABLE
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new Variable(name, Variable::VariableKind::DirectVariable)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)); }
-        if (!var) { var = new Variable(name, Variable::VariableKind::DirectVariable); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new Variable(name, Variable::VariableKind::DirectVariable)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new Variable(name, Variable::VariableKind::DirectVariable));
+            $$ = std::move(c);
+        }
       }
     | VARIABLE_STATUS
       {
         std::string name($1);
-        name.pop_back();
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new Variable(name, Variable::VariableKind::DirectVariable)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)); }
-        if (!var) { var = new Variable(name, Variable::VariableKind::DirectVariable); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new Variable(name, Variable::VariableKind::DirectVariable)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new Variable(name, Variable::VariableKind::DirectVariable));
+            $$ = std::move(c);
+        }
       }
     | VARIABLE_COL
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new Variable(name, Variable::VariableKind::CollectionVarible)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new Variable(name, Variable::VariableKind::CollectionVarible)); }
-        if (!var) { var = new Variable(name, Variable::VariableKind::CollectionVarible); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new Variable(name, Variable::VariableKind::CollectionVarible)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new Variable(name, Variable::VariableKind::CollectionVarible)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new Variable(name, Variable::VariableKind::CollectionVarible));
+            $$ = std::move(c);
+        }
       }
     | VARIABLE_TX
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new Tx(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new Tx(name)); }
-        if (!var) { var = new Tx(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new Tx(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new Tx(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new Tx(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_DUR
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new Duration(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new Duration(name)); }
-        if (!var) { var = new Duration(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new Duration(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new Duration(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new Duration(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_ENV
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new Env(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new Env(name)); }
-        if (!var) { var = new Env(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new Env(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new Env(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new Env(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_BLD
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new ModsecBuild(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new ModsecBuild(name)); }
-        if (!var) { var = new ModsecBuild(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new ModsecBuild(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new ModsecBuild(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new ModsecBuild(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_HSV
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new HighestSeverity(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new HighestSeverity(name)); }
-        if (!var) { var = new HighestSeverity(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new HighestSeverity(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new HighestSeverity(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new HighestSeverity(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_REMOTE_USER
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new RemoteUser(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new RemoteUser(name)); }
-        if (!var) { var = new RemoteUser(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new RemoteUser(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new RemoteUser(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new RemoteUser(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_TIME
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new Time(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new Time(name)); }
-        if (!var) { var = new Time(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new Time(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new Time(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new Time(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_TIME_DAY
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new TimeDay(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new TimeDay(name)); }
-        if (!var) { var = new TimeDay(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new TimeDay(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new TimeDay(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new TimeDay(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_TIME_EPOCH
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new TimeEpoch(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new TimeEpoch(name)); }
-        if (!var) { var = new TimeEpoch(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new TimeEpoch(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new TimeEpoch(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new TimeEpoch(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_TIME_HOUR
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new TimeHour(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new TimeHour(name)); }
-        if (!var) { var = new TimeHour(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new TimeHour(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new TimeHour(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new TimeHour(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_TIME_MIN
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new TimeMin(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new TimeMin(name)); }
-        if (!var) { var = new TimeMin(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new TimeMin(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new TimeMin(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new TimeMin(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_TIME_MON
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new TimeMon(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new TimeMon(name)); }
-        if (!var) { var = new TimeMon(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new TimeMon(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new TimeMon(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new TimeMon(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_TIME_SEC
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new TimeSec(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new TimeSec(name)); }
-        if (!var) { var = new TimeSec(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new TimeSec(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new TimeSec(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new TimeSec(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_TIME_WDAY
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new TimeWDay(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new TimeWDay(name)); }
-        if (!var) { var = new TimeWDay(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new TimeWDay(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new TimeWDay(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new TimeWDay(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_TIME_YEAR
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new TimeYear(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new TimeYear(name)); }
-        if (!var) { var = new TimeYear(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new TimeYear(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new TimeYear(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new TimeYear(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_XML
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new XML(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new XML(name)); }
-        if (!var) { var = new XML(name); }
-        $$ = var;
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new XML(name)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new XML(name)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new XML(name));
+            $$ = std::move(c);
+        }
       }
     | RUN_TIME_VAR_RULE
       {
         std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(new Variable(name, Variable::VariableKind::DirectVariable)); }
-        CHECK_VARIATION(!) { var = new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)); }
-        if (!var) { var = new Variable(name, Variable::VariableKind::DirectVariable); }
-        $$ = var;
-    /*
-        std::string name($1);
-        CHECK_VARIATION_DECL
-        CHECK_VARIATION(&) { var = new Count(
-            new modsecurity::Variables::Rule(name)); }
-        CHECK_VARIATION(!) { var = new Exclusion(
-            new modsecurity::Variables::Rule(name)); }
-        if (!var) { var = new modsecurity::Variables::Rule(name); }
-        $$ = var;
-      */
+        char z = name.at(0);
+        if (z == '&') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Count(new Variable(name, Variable::VariableKind::DirectVariable)));
+            $$ = std::move(c);
+        } else if (z == '!') {
+            name.erase(0, 1);
+            std::unique_ptr<Variable> c(new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)));
+            $$ = std::move(c);
+        } else {
+            std::unique_ptr<Variable> c(new Variable(name, Variable::VariableKind::DirectVariable));
+            $$ = std::move(c);
+        }
       }
     ;
 
 act:
     ACTION_ACCURACY
       {
-        $$ = new actions::Accuracy($1);
+        ACTION_CONTAINER($$, new actions::Accuracy($1));
       }
     | ACTION_ALLOW
       {
-        $$ = new actions::disruptive::Allow($1);
+        ACTION_CONTAINER($$, new actions::disruptive::Allow($1));
       }
     | ACTION_APPEND
       {
@@ -1325,95 +1490,95 @@ act:
       }
     | ACTION_AUDIT_LOG
       {
-        $$ = new modsecurity::actions::AuditLog($1);
+        ACTION_CONTAINER($$, new actions::AuditLog($1));
       }
     | ACTION_BLOCK
       {
-        $$ = new actions::disruptive::Block($1);
+        ACTION_CONTAINER($$, new actions::disruptive::Block($1));
       }
     | ACTION_CAPTURE
       {
-        $$ = new actions::Capture($1);
+        ACTION_CONTAINER($$, new actions::Capture($1));
       }
     | ACTION_CHAIN
       {
-        $$ = new actions::Chain($1);
+        ACTION_CONTAINER($$, new actions::Chain($1));
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_ON
       {
         //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        $$ = new actions::Action($1);
+        ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_OFF
       {
         //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        $$ = new actions::Action($1);
+        ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_CTL_AUDIT_ENGINE CONFIG_VALUE_RELEVANT_ONLY
       {
         //ACTION_NOT_SUPPORTED("CtlAuditEngine", @0);
-        $$ = new actions::Action($1);
+        ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_CTL_AUDIT_LOG_PARTS
       {
-        $$ = new actions::ctl::AuditLogParts($1);
+        ACTION_CONTAINER($$, new actions::ctl::AuditLogParts($1));
       }
     | ACTION_CTL_BDY_JSON
       {
-        $$ = new modsecurity::actions::ctl::RequestBodyProcessorJSON($1);
+        ACTION_CONTAINER($$, new actions::ctl::RequestBodyProcessorJSON($1));
       }
     | ACTION_CTL_BDY_XML
       {
-        $$ = new modsecurity::actions::ctl::RequestBodyProcessorXML($1);
+        ACTION_CONTAINER($$, new actions::ctl::RequestBodyProcessorXML($1));
       }
     | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_ON
       {
         //ACTION_NOT_SUPPORTED("CtlForceReequestBody", @0);
-        $$ = new actions::Action($1);
+        ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_CTL_FORCE_REQ_BODY_VAR CONFIG_VALUE_OFF
       {
         //ACTION_NOT_SUPPORTED("CtlForceReequestBody", @0);
-        $$ = new actions::Action($1);
+        ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_CTL_REQUEST_BODY_ACCESS CONFIG_VALUE_ON
       {
-        $$ = new modsecurity::actions::ctl::RequestBodyAccess($1 + "true");
+        ACTION_CONTAINER($$, new actions::ctl::RequestBodyAccess($1 + "true"));
       }
     | ACTION_CTL_REQUEST_BODY_ACCESS CONFIG_VALUE_OFF
       {
-        $$ = new modsecurity::actions::ctl::RequestBodyAccess($1 + "false");
+        ACTION_CONTAINER($$, new actions::ctl::RequestBodyAccess($1 + "false"));
       }
     | ACTION_CTL_RULE_ENGINE CONFIG_VALUE_ON
       {
         //ACTION_NOT_SUPPORTED("CtlRuleEngine", @0);
-        $$ = new actions::Action($1);
+        ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_CTL_RULE_ENGINE CONFIG_VALUE_OFF
       {
         //ACTION_NOT_SUPPORTED("CtlRuleEngine", @0);
-        $$ = new actions::Action($1);
+        ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_CTL_RULE_ENGINE CONFIG_VALUE_DETC
       {
         //ACTION_NOT_SUPPORTED("CtlRuleEngine", @0);
-        $$ = new actions::Action($1);
+        ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_CTL_RULE_REMOVE_BY_ID
       {
-        $$ = new modsecurity::actions::ctl::RuleRemoveById($1);
+        ACTION_CONTAINER($$, new actions::ctl::RuleRemoveById($1));
       }
     | ACTION_CTL_RULE_REMOVE_TARGET_BY_ID
       {
-        $$ = new modsecurity::actions::ctl::RuleRemoveTargetById($1);
+        ACTION_CONTAINER($$, new actions::ctl::RuleRemoveTargetById($1));
       }
     | ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG
       {
-        $$ = new modsecurity::actions::ctl::RuleRemoveTargetByTag($1);
+        ACTION_CONTAINER($$, new actions::ctl::RuleRemoveTargetByTag($1));
       }
     | ACTION_DENY
       {
-        $$ = new modsecurity::actions::disruptive::Deny($1);
+        ACTION_CONTAINER($$, new actions::disruptive::Deny($1));
       }
     | ACTION_DEPRECATE_VAR
       {
@@ -1422,7 +1587,7 @@ act:
     | ACTION_DROP
       {
         //ACTION_NOT_SUPPORTED("Drop", @0);
-        $$ = new actions::Action($1);
+        ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_EXEC
       {
@@ -1431,47 +1596,47 @@ act:
     | ACTION_EXPIRE_VAR
       {
         //ACTION_NOT_SUPPORTED("ExpireVar", @0);
-        $$ = new actions::Action($1);
+        ACTION_CONTAINER($$, new actions::Action($1));
       }
     | ACTION_ID
       {
-        $$ = new actions::RuleId($1);
+        ACTION_CONTAINER($$, new actions::RuleId($1));
       }
     | ACTION_INITCOL
       {
-        $$ = new actions::InitCol($1);
+        ACTION_CONTAINER($$, new actions::InitCol($1));
       }
     | ACTION_LOG_DATA
       {
-        $$ = new actions::LogData($1);
+        ACTION_CONTAINER($$, new actions::LogData($1));
       }
     | ACTION_LOG
       {
-        $$ = new actions::Log($1);
+        ACTION_CONTAINER($$, new actions::Log($1));
       }
     | ACTION_MATURITY
       {
-        $$ = new actions::Maturity($1);
+        ACTION_CONTAINER($$, new actions::Maturity($1));
       }
     | ACTION_MSG
       {
-        $$ = new actions::Msg($1);
+        ACTION_CONTAINER($$, new actions::Msg($1));
       }
     | ACTION_MULTI_MATCH
       {
-        $$ = new actions::MultiMatch($1);
+        ACTION_CONTAINER($$, new actions::MultiMatch($1));
       }
     | ACTION_NO_AUDIT_LOG
       {
-        $$ = new actions::NoAuditLog($1);
+        ACTION_CONTAINER($$, new actions::NoAuditLog($1));
       }
     | ACTION_NO_LOG
       {
-        $$ = new actions::NoLog($1);
+        ACTION_CONTAINER($$, new actions::NoLog($1));
       }
     | ACTION_PASS
       {
-        $$ = new actions::disruptive::Pass($1);
+        ACTION_CONTAINER($$, new actions::disruptive::Pass($1));
       }
     | ACTION_PAUSE
       {
@@ -1479,7 +1644,7 @@ act:
       }
     | ACTION_PHASE
       {
-        $$ = new actions::Phase($1);
+        ACTION_CONTAINER($$, new actions::Phase($1));
       }
     | ACTION_PREPEND
       {
@@ -1491,11 +1656,11 @@ act:
       }
     | ACTION_REDIRECT
       {
-        $$ = new actions::disruptive::Redirect($1);
+        ACTION_CONTAINER($$, new actions::disruptive::Redirect($1));
       }
     | ACTION_REV
       {
-        $$ = new actions::Rev($1);
+        ACTION_CONTAINER($$, new actions::Rev($1));
       }
     | ACTION_SANATISE_ARG
       {
@@ -1527,151 +1692,151 @@ act:
       }
     | ACTION_SETSID
       {
-        $$ = new modsecurity::actions::SetSID($1);
+        ACTION_CONTAINER($$, new actions::SetSID($1));
       }
     | ACTION_SETUID
       {
-        $$ = new modsecurity::actions::SetUID($1);
+        ACTION_CONTAINER($$, new actions::SetUID($1));
       }
     | ACTION_SETVAR
       {
-        $$ = new modsecurity::actions::SetVar($1);
+        ACTION_CONTAINER($$, new actions::SetVar($1));
       }
     | ACTION_SEVERITY
       {
-        $$ =  new modsecurity::actions::Severity($1);
+        ACTION_CONTAINER($$, new actions::Severity($1));
       }
     | ACTION_SKIP
       {
-        $$ = new modsecurity::actions::Skip($1);
+        ACTION_CONTAINER($$, new actions::Skip($1));
       }
     | ACTION_SKIP_AFTER
       {
-        $$ = new modsecurity::actions::SkipAfter($1);
+        ACTION_CONTAINER($$, new actions::SkipAfter($1));
       }
     | ACTION_STATUS
       {
-        $$ = new modsecurity::actions::data::Status($1);
+        ACTION_CONTAINER($$, new actions::data::Status($1));
       }
     | ACTION_TAG
       {
-        $$ = new modsecurity::actions::Tag($1);
+        ACTION_CONTAINER($$, new actions::Tag($1));
       }
     | ACTION_VER
       {
-        $$ = new modsecurity::actions::Ver($1);
+        ACTION_CONTAINER($$, new actions::Ver($1));
       }
     | ACTION_XMLNS
       {
-        $$ = new modsecurity::actions::XmlNS($1);
+        ACTION_CONTAINER($$, new actions::XmlNS($1));
       }
     | ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT
       {
-        $$ = new modsecurity::actions::transformations::ParityZero7bit($1);
+        ACTION_CONTAINER($$, new actions::transformations::ParityZero7bit($1));
       }
     | ACTION_TRANSFORMATION_PARITY_ODD_7_BIT
       {
-        $$ = new modsecurity::actions::transformations::ParityOdd7bit($1);
+        ACTION_CONTAINER($$, new actions::transformations::ParityOdd7bit($1));
       }
     | ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT
       {
-        $$ = new modsecurity::actions::transformations::ParityEven7bit($1);
+        ACTION_CONTAINER($$, new actions::transformations::ParityEven7bit($1));
       }
     | ACTION_TRANSFORMATION_SQL_HEX_DECODE
       {
-        $$ = new modsecurity::actions::transformations::SqlHexDecode($1);
+        ACTION_CONTAINER($$, new actions::transformations::SqlHexDecode($1));
       }
     | ACTION_TRANSFORMATION_CMD_LINE
       {
-        $$ = new modsecurity::actions::transformations::CmdLine($1);
+        ACTION_CONTAINER($$, new actions::transformations::CmdLine($1));
       }
     | ACTION_TRANSFORMATION_SHA1
       {
-        $$ = new modsecurity::actions::transformations::Sha1($1);
+        ACTION_CONTAINER($$, new actions::transformations::Sha1($1));
       }
     | ACTION_TRANSFORMATION_MD5
       {
-        $$ = new modsecurity::actions::transformations::Md5($1);
+        ACTION_CONTAINER($$, new actions::transformations::Md5($1));
       }
     | ACTION_TRANSFORMATION_HEX_ENCODE
       {
-        $$ = new modsecurity::actions::transformations::HexEncode($1);
+        ACTION_CONTAINER($$, new actions::transformations::HexEncode($1));
       }
     | ACTION_TRANSFORMATION_LOWERCASE
       {
-        $$ = new modsecurity::actions::transformations::LowerCase($1);
+        ACTION_CONTAINER($$, new actions::transformations::LowerCase($1));
       }
     | ACTION_TRANSFORMATION_URL_DECODE_UNI
       {
-        $$ = new modsecurity::actions::transformations::UrlDecodeUni($1);
+        ACTION_CONTAINER($$, new actions::transformations::UrlDecodeUni($1));
       }
     | ACTION_TRANSFORMATION_URL_DECODE
       {
-        $$ = new modsecurity::actions::transformations::UrlDecode($1);
+        ACTION_CONTAINER($$, new actions::transformations::UrlDecode($1));
       }
     | ACTION_TRANSFORMATION_NONE
       {
-        $$ = new modsecurity::actions::transformations::None($1);
+        ACTION_CONTAINER($$, new actions::transformations::None($1));
       }
     | ACTION_TRANSFORMATION_COMPRESS_WHITESPACE
       {
-        $$ = new modsecurity::actions::transformations::CompressWhitespace($1);
+        ACTION_CONTAINER($$, new actions::transformations::CompressWhitespace($1));
       }
     | ACTION_TRANSFORMATION_REMOVE_WHITESPACE
       {
-        $$ = new modsecurity::actions::transformations::RemoveWhitespace($1);
+        ACTION_CONTAINER($$, new actions::transformations::RemoveWhitespace($1));
       }
     | ACTION_TRANSFORMATION_REPLACE_NULLS
       {
-        $$ = new modsecurity::actions::transformations::ReplaceNulls($1);
+        ACTION_CONTAINER($$, new actions::transformations::ReplaceNulls($1));
       }
     | ACTION_TRANSFORMATION_REMOVE_NULLS
       {
-        $$ = new modsecurity::actions::transformations::RemoveNulls($1);
+        ACTION_CONTAINER($$, new actions::transformations::RemoveNulls($1));
       }
     | ACTION_TRANSFORMATION_HTML_ENTITY_DECODE
       {
-        $$ = new modsecurity::actions::transformations::HtmlEntityDecode($1);
+        ACTION_CONTAINER($$, new actions::transformations::HtmlEntityDecode($1));
       }
     | ACTION_TRANSFORMATION_JS_DECODE
       {
-        $$ = new modsecurity::actions::transformations::JsDecode($1);
+        ACTION_CONTAINER($$, new actions::transformations::JsDecode($1));
       }
     | ACTION_TRANSFORMATION_CSS_DECODE
       {
-        $$ = new modsecurity::actions::transformations::CssDecode($1);
+        ACTION_CONTAINER($$, new actions::transformations::CssDecode($1));
       }
     | ACTION_TRANSFORMATION_TRIM
       {
-        $$ = new modsecurity::actions::transformations::Trim($1);
+        ACTION_CONTAINER($$, new actions::transformations::Trim($1));
       }
     | ACTION_TRANSFORMATION_NORMALISE_PATH_WIN
       {
-        $$ = new modsecurity::actions::transformations::NormalisePathWin($1);
+        ACTION_CONTAINER($$, new actions::transformations::NormalisePathWin($1));
       }
     | ACTION_TRANSFORMATION_NORMALISE_PATH
       {
-        $$ = new modsecurity::actions::transformations::NormalisePath($1);
+        ACTION_CONTAINER($$, new actions::transformations::NormalisePath($1));
       }
     | ACTION_TRANSFORMATION_LENGTH
       {
-        $$ = new modsecurity::actions::transformations::Length($1);
+        ACTION_CONTAINER($$, new actions::transformations::Length($1));
       }
     | ACTION_TRANSFORMATION_UTF8_TO_UNICODE
       {
-        $$ = new modsecurity::actions::transformations::Utf8ToUnicode($1);
+        ACTION_CONTAINER($$, new actions::transformations::Utf8ToUnicode($1));
       }
     | ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR
       {
-        $$ = new modsecurity::actions::transformations::RemoveCommentsChar($1);
+        ACTION_CONTAINER($$, new actions::transformations::RemoveCommentsChar($1));
       }
     | ACTION_TRANSFORMATION_REMOVE_COMMENTS
       {
-        $$ = new modsecurity::actions::transformations::RemoveComments($1);
+        ACTION_CONTAINER($$, new actions::transformations::RemoveComments($1));
       }
     | ACTION_TRANSFORMATION_REPLACE_COMMENTS
       {
-        $$ = new modsecurity::actions::transformations::ReplaceComments($1);
+        ACTION_CONTAINER($$, new actions::transformations::ReplaceComments($1));
       }
     ;
 
