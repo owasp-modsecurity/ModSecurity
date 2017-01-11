@@ -33,7 +33,11 @@ Driver::Driver()
 
 
 Driver::~Driver() {
-    delete loc.back();
+    while (loc.empty() == false) {
+        yy::location *a = loc.back();
+        loc.pop_back();
+        delete a;
+    }
 }
 
 
