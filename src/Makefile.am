@@ -287,7 +287,6 @@ libmodsecurity_la_LIBADD = \
 	$(GLOBAL_LDADD) \
 	$(CURL_LDADD) \
 	$(GEOIP_LDFLAGS) $(GEOIP_LDADD) \
-	@LEXLIB@ \
 	$(PCRE_LDADD) \
 	$(YAJL_LDFLAGS) $(YAJL_LDADD) \
 	$(LMDB_LDFLAGS) $(LMDB_LDADD) \

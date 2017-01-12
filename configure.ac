@@ -38,23 +38,7 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 # Check for dependencies (C++, AR, Lex, Yacc and Make)
 AC_PROG_CXX
 AM_PROG_AR
-AC_PROG_YACC
-AC_PROG_LEX
 AC_PROG_MAKE_SET
-
-
-AC_PATH_PROG([FLEX], [flex])
-test "x$FLEX" = "x" && AC_MSG_ERROR([flex is needed to build ModSecurity])
-
-AC_PATH_PROG([BISON], [bison])
-test "x$BISON" = "x" && AC_MSG_ERROR([bison is needed to build ModSecurity])
-
-AC_PATH_PROG([YACC_INST], $YACC)
-if test ! -f "$srcdir/gram.c"; then
-    if test -z "$YACC_INST"; then
-        AC_MSG_ERROR([yacc not found - unable to compile ModSecurity])
-    fi
-fi
 
 
 # Check if the compiler is c++11 compatible.
@@ -261,6 +245,22 @@ AC_ARG_ENABLE(parser-generation,
     )
 
 
+if test $buildParser = true; then
+    AC_PROG_YACC
+    AC_PROG_LEX
+    AC_PATH_PROG([FLEX], [flex])
+    test "x$FLEX" = "x" && AC_MSG_ERROR([flex is needed to build ModSecurity])
+
+    AC_PATH_PROG([BISON], [bison])
+    test "x$BISON" = "x" && AC_MSG_ERROR([bison is needed to build ModSecurity])
+
+    AC_PATH_PROG([YACC_INST], $YACC)
+    if test ! -f "$srcdir/gram.c"; then
+        if test -z "$YACC_INST"; then
+            AC_MSG_ERROR([yacc not found - unable to compile ModSecurity])
+        fi
+    fi
+fi
 
 
 # Decide if we want to build the tests or not.
