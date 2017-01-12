@@ -144,6 +144,7 @@ class Driver;
 #include "src/utils/geo_lookup.h"
 #include "src/utils/string.h"
 #include "src/utils/system.h"
+#include "src/variables/args_names.h"
 #include "src/variables/xml.h"
 #include "src/variables/duration.h"
 #include "src/variables/env.h"
@@ -257,6 +258,7 @@ using modsecurity::operators::Operator;
   COMMA    ","
   PIPE
   NEW_LINE
+  VARIABLE_ARGS_NAMES   "Variable ARGS_NAMES"
 ;
 
 %token <std::string>
@@ -1135,7 +1137,12 @@ variables:
     ;
 
 var:
-    VARIABLE
+    VARIABLE_ARGS_NAMES
+      {
+        std::unique_ptr<Variable> c(new Variables::ArgsNames());
+        $$ = std::move(c);
+      }
+    | VARIABLE
       {
         std::string name($1);
         char z = name.at(0);

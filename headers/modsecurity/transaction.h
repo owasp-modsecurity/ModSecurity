@@ -86,8 +86,51 @@ class Operator;
 }
 
 
+class AnchoredVariable {
+ public:
+    AnchoredVariable(Transaction *t, std::string name)
+        : m_offset(0),
+        m_name(name),
+        m_transaction(t),
+        m_value("") { }
+    size_t m_offset;
+    std::string m_value;
+    Transaction *m_transaction;
+    std::string m_name;
+
+    void set(const std::string &a, size_t offset) {
+        m_value = a;
+        m_offset = offset;
+    }
+
+    void append(const std::string &a, size_t offset,
+        bool spaceSeparator = false) {
+        if (spaceSeparator && !m_value.empty()) {
+            m_value.append(" " + a);
+        } else {
+            m_value.append(a);
+        }
+        m_offset = offset;
+    }
+
+    void evaluate(std::vector<const collection::Variable *> *l) {
+        l->push_back(new collection::Variable(&m_name,
+            &m_value));
+    }
+};
+
+
+class TransactionAnchoredVariables {
+ public:
+    TransactionAnchoredVariables(Transaction *t)
+        : m_variableArgsNames(t, "ARG_NAMES") { }
+
+    AnchoredVariable m_variableArgsNames;
+};
+
+
 /** @ingroup ModSecurity_CPP_API */
-class Transaction {
+class Transaction : public TransactionAnchoredVariables {
  public:
     Transaction(ModSecurity *transaction, Rules *rules, void *logCbData);
     ~Transaction();
@@ -376,7 +419,6 @@ class Transaction {
 
  private:
     std::string *m_ARGScombinedSizeStr;
-    std::string *m_namesArgs;
     std::string *m_namesArgsGet;
     std::string *m_namesArgsPost;
     std::string *m_requestHeadersNames;

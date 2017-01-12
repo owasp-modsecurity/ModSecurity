@@ -111,7 +111,6 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_highestSeverityAction(255),
     m_ARGScombinedSize(0),
     m_ARGScombinedSizeStr(NULL),
-    m_namesArgs(NULL),
     m_namesArgsPost(NULL),
     m_namesArgsGet(NULL),
     m_requestBodyType(UnknownFormat),
@@ -130,15 +129,14 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
         ms->m_session_collection, ms->m_user_collection,
         ms->m_resource_collection),
     m_json(new RequestBodyProcessor::JSON(this)),
-    m_xml(new RequestBodyProcessor::XML(this)) {
+    m_xml(new RequestBodyProcessor::XML(this)),
+    TransactionAnchoredVariables(this) {
     m_id = std::to_string(this->m_timeStamp) + \
         std::to_string(modsecurity::utils::generate_transaction_unique_id());
     m_rules->incrementReferenceCount();
 
     m_collections.store("ARGS_COMBINED_SIZE", std::string("0"));
     m_ARGScombinedSizeStr = m_collections.resolveFirst("ARGS_COMBINED_SIZE");
-    m_collections.store("ARGS_NAMES", std::string(""));
-    this->m_namesArgs = m_collections.resolveFirst("ARGS_NAMES");
     m_collections.store("ARGS_POST_NAMES", std::string(""));
     this->m_namesArgsPost = m_collections.resolveFirst("ARGS_POST_NAMES");
     m_collections.store("ARGS_GET_NAMES", std::string(""));
@@ -328,11 +326,8 @@ bool Transaction::addArgument(const std::string& orig, const std::string& key,
         }
     }
 
-    if (m_namesArgs->empty()) {
-        m_namesArgs->assign(key);
-    } else {
-        m_namesArgs->assign(*m_namesArgs + " " + key);
-    }
+    m_variableArgsNames.append(key, 0, true);
+
 
     this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
         key.length() + value.length();
