@@ -77,18 +77,20 @@ std::list<SMatch> Regex::searchAll(const std::string& s) {
     int i;
     const char *subject = s.c_str();
     int rc;
+    const std::string tmpString = std::string(s.c_str(), s.size());
 
     rc = pcre_exec(m_pc, m_pce, subject,
         s.size(), 0, 0, ovector, OVECCOUNT);
 
     for (i = 0; i < rc; i++) {
         SMatch match;
-        const char *substring_start = subject + ovector[2*i];
-        int substring_length = ovector[2*i+1] - ovector[2*i];
-
-        match.match = std::string(subject, ovector[2*i],
-            substring_length);
-
+        size_t start = ovector[2*i];
+        size_t end = ovector[2*i+1];
+        size_t len = end - start;
+        if (end >= s.size()) {
+            continue;
+        }
+        match.match = std::string(tmpString, start, len);
         retList.push_front(match);
     }
 
