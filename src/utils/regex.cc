@@ -87,7 +87,7 @@ std::list<SMatch> Regex::searchAll(const std::string& s) {
         size_t start = ovector[2*i];
         size_t end = ovector[2*i+1];
         size_t len = end - start;
-        if (end >= s.size()) {
+        if (end > s.size()) {
             continue;
         }
         match.match = std::string(tmpString, start, len);
