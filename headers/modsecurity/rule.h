@@ -45,6 +45,7 @@ class Rule {
     Rule(operators::Operator *_op,
             std::vector<Variables::Variable *> *_variables,
             std::vector<actions::Action *> *_actions,
+            std::string plainText,
             std::string fileName,
             int lineNumber);
     explicit Rule(std::string marker);
@@ -98,6 +99,7 @@ class Rule {
     std::string m_rev;
     std::string m_ver;
 
+    std::string m_plainText;
     std::string m_marker;
     bool m_secmarker;
     std::string m_fileName;

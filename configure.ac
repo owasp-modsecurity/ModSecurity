@@ -220,6 +220,22 @@ if test "$debugLogs" != "true"; then
     AC_SUBST(MODSEC_NO_LOGS)
 fi
 
+AC_ARG_ENABLE(full-audit-logs,
+    [AC_HELP_STRING([--enable-full-audit-logs],[Turn on saving full audit logs])],
+
+    [case "${enableval}" in
+        yes) fullAuditLogs=true ;;
+        no)  fullAuditLogs=false ;;
+        *) AC_MSG_ERROR(bad value ${enableval} for --enable-full-audit-logs) ;;
+    esac],
+
+    [fullAuditLogs=false]
+    )
+if test "$fullAuditLogs" != "false"; then
+    MODSEC_AUDIT_LOGS="-DFULL_AUDIT_LOGS=1"
+    AC_SUBST(MODSEC_AUDIT_LOGS)
+fi
+
 
 # Fuzzer
 AC_ARG_ENABLE(afl-fuzz,

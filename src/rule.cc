@@ -95,12 +95,14 @@ Rule::Rule(std::string marker)
     m_marker(marker),
     m_maturity(0),
     m_referenceCount(0),
+    m_plainText(""),
     m_fileName(""),
     m_lineNumber(0) { }
 
 Rule::Rule(Operator *_op,
         std::vector<Variable *> *_variables,
         std::vector<Action *> *actions,
+        std::string plainText,
         std::string fileName,
         int lineNumber): chained(false),
     chainedRule(NULL),
@@ -114,6 +116,7 @@ Rule::Rule(Operator *_op,
     m_marker(""),
     m_maturity(0),
     m_referenceCount(0),
+    m_plainText(plainText),
     m_fileName(fileName),
     m_lineNumber(lineNumber) {
     if (actions != NULL) {
@@ -613,6 +616,15 @@ bool Rule::evaluate(Transaction *trasn) {
     }
 
     trasn->debug(4, "Rule returned 1.");
+
+#ifdef FULL_AUDIT_LOGS
+    {
+        bool have_auditLog = getActionsByName("auditlog").size() > 0;
+        if (have_auditLog) {
+            trasn->m_auditLogFiredRules.push_back(this);
+        }
+    }
+#endif
 
     if (this->chained == false) {
         goto end_exec;
