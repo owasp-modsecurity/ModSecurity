@@ -257,6 +257,7 @@ VARIABLE_FILES_COMBINED_SIZE              (?i:FILES_COMBINED_SIZE)
 VARIABLE_FILES_TMP_NAMES                  (?i:FILES_TMPNAMES)
 VARIABLE_FULL_REQUEST                     (?i:FULL_REQUEST)
 VARIABLE_FULL_REQUEST_LENGTH              (?i:FULL_REQUEST_LENGTH)
+VARIABLE_GLOBAL                           (?i:GLOBAL)
 VARIABLE_INBOUND_DATA_ERROR               (?i:INBOUND_DATA_ERROR)
 VARIABLE_MATCHED_VAR                      (?i:MATCHED_VAR)
 VARIABLE_MATCHED_VAR_NAME                 (?i:MATCHED_VAR_NAME)
@@ -303,12 +304,10 @@ VARIABLE_SESSION_ID                       (?i:SESSIONID)
 VARIABLE_UNIQUE_ID                        (?i:UNIQUE_ID)
 VARIABLE_URL_ENCODED_ERROR                (?i:URLENCODED_ERROR)
 VARIABLE_USER_ID                          (?i:USERID)
-VARIABLE_WEBSERVER_ERROR_LOG              (?:WEBSERVER_ERROR_LOG)
+VARIABLE_WEBSERVER_ERROR_LOG              (?i:WEBSERVER_ERROR_LOG)
 
 
-
-
-VARIABLE_COL                            (?i:(GLOBAL|ARGS_POST|ARGS_GET|ARGS|FILES_SIZES|FILES_NAMES|FILES_TMP_CONTENT|MULTIPART_FILENAME|MULTIPART_NAME|MATCHED_VARS_NAMES|MATCHED_VARS|FILES|REQUEST_COOKIES|REQUEST_HEADERS|RESPONSE_HEADERS|GEO|REQUEST_COOKIES_NAMES))
+VARIABLE_COL                            (?i:(ARGS_POST|ARGS_GET|ARGS|FILES_SIZES|FILES_NAMES|FILES_TMP_CONTENT|MULTIPART_FILENAME|MULTIPART_NAME|MATCHED_VARS_NAMES|MATCHED_VARS|FILES|REQUEST_COOKIES|REQUEST_HEADERS|RESPONSE_HEADERS|GEO|REQUEST_COOKIES_NAMES))
 VARIABLE_SESSION                        (?i:(SESSION))
 VARIABLE_IP                             (?i:(IP))
 VARIABLE_USER                           (?i:(USER))
@@ -479,6 +478,7 @@ EQUALS_MINUS                            (?i:=\-)
 <SETVAR_ACTION_WAITING_VARIABLE>{
 \'*                                                                {  }
 \"*                                                                {  }
+{NOT}                                                              { return p::make_NOT(*driver.loc.back()); }
 {VARIABLE_TX}(\:[\']{DICT_ELEMENT_TWO}[\'])?                       { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
 {VARIABLE_TX}(\:{DICT_ELEMENT_TWO})?                               { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
 {VARIABLE_TX}(\.[\']{DICT_ELEMENT_TWO}[\'])?                       { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
@@ -495,6 +495,10 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_USER}(\:{DICT_ELEMENT_TWO})?                             { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
 {VARIABLE_USER}(\.[\']{DICT_ELEMENT_TWO}[\'])?                     { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
 {VARIABLE_USER}(\.{DICT_ELEMENT_TWO})?                             { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
+{VARIABLE_GLOBAL}(\:[\']{DICT_ELEMENT_TWO}[\'])?                   { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
+{VARIABLE_GLOBAL}(\:{DICT_ELEMENT_TWO})?                           { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
+{VARIABLE_GLOBAL}(\.[\']{DICT_ELEMENT_TWO}[\'])?                   { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
+{VARIABLE_GLOBAL}(\.{DICT_ELEMENT_TWO})?                           { BEGIN(SETVAR_ACTION_WAITING_OPERATION); return p::make_VARIABLE(yytext, *driver.loc.back()); }
 .                                                                  { BEGIN(LEXING_ERROR_ACTION); yyless(0); }
 [ \t]*\\\n[ \t]*                                                   { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 [ \t]*\\\r\n[ \t]*                                                 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
@@ -628,6 +632,8 @@ EQUALS_MINUS                            (?i:=\-)
 [!&]?{RUN_TIME_VAR_XML}(\:{DICT_ELEMENT})?                              { return p::make_RUN_TIME_VAR_XML(yytext, *driver.loc.back()); }
 [!&]?{VARIABLE_COL}(\:[\']{FREE_TEXT_QUOTE}[\'])?                       { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
 [!&]?{VARIABLE_COL}(\:{DICT_ELEMENT})?                                  { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
+[!&]?{VARIABLE_GLOBAL}(\:[\']{FREE_TEXT_QUOTE}[\'])?                       { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
+[!&]?{VARIABLE_GLOBAL}(\:{DICT_ELEMENT})?                                  { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
 [!&]?{VARIABLE_SESSION}(\:[\']{FREE_TEXT_QUOTE}[\'])?                       { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
 [!&]?{VARIABLE_SESSION}(\:{DICT_ELEMENT})?                                  { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
 [!&]?{VARIABLE_IP}(\:[\']{FREE_TEXT_QUOTE}[\'])?                       { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
@@ -649,6 +655,8 @@ EQUALS_MINUS                            (?i:=\-)
 ["][!&]?{RUN_TIME_VAR_XML}(\:{DICT_ELEMENT})?                           { return p::make_RUN_TIME_VAR_XML(yytext, *driver.loc.back()); }
 ["][!&]?{VARIABLE_COL}(\:[\']{FREE_TEXT_QUOTE}[\'])?["]                 { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
 ["][!&]?{VARIABLE_COL}(\:{DICT_ELEMENT})?                               { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
+["][!&]?{VARIABLE_GLOBAL}(\:[\']{FREE_TEXT_QUOTE}[\'])?["]                 { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
+["][!&]?{VARIABLE_GLOBAL}(\:{DICT_ELEMENT})?                               { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
 ["][!&]?{VARIABLE_SESSION}(\:[\']{FREE_TEXT_QUOTE}[\'])?["]                 { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
 ["][!&]?{VARIABLE_SESSION}(\:{DICT_ELEMENT})?                               { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
 ["][!&]?{VARIABLE_IP}(\:[\']{FREE_TEXT_QUOTE}[\'])?["]                 { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
@@ -715,7 +723,6 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_URL_ENCODED_ERROR}                { return p::make_VARIABLE_URL_ENCODED_ERROR(*driver.loc.back()); }
 {VARIABLE_USER_ID}                          { return p::make_VARIABLE_USER_ID(*driver.loc.back()); }
 
-
 }
 
 <EXPECTING_VARIABLE,TRANSACTION_FROM_VARIABLE_TO_OPERATOR>{
@@ -761,7 +768,7 @@ EQUALS_MINUS                            (?i:=\-)
 {OPERATOR_VALIDATE_URL_ENCODING}        { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_URL_ENCODING(yytext, *driver.loc.back()); }
 {OPERATOR_VALIDATE_UTF8_ENCODING}       { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_UTF8_ENCODING(yytext, *driver.loc.back()); }
 
-{NOT}                                   { BEGIN(EXPECTING_OPERATOR); return p::make_NOT(yytext, *driver.loc.back()); }
+{NOT}                                   { BEGIN(EXPECTING_OPERATOR); return p::make_NOT(*driver.loc.back()); }
 .                                       { BEGIN(NO_OP_INFORMED); yyless(0); }
 
 }
