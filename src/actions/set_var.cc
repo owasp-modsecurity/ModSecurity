@@ -46,7 +46,7 @@ bool SetVar::init(std::string *error) {
     }
 
     // Resolv operation
-    m_operation = setToOne;
+    m_operation = setToOneOperation;
     pos = m_parser_payload.find("=");
     if (pos != std::string::npos) {
         m_operation = setOperation;
@@ -71,7 +71,7 @@ bool SetVar::init(std::string *error) {
     }
 
     // Variable name
-    if (m_operation == setToOne) {
+    if (m_operation == setToOneOperation) {
         m_variableName = std::string(m_parser_payload, pos + 1,
             m_parser_payload.length()
             - (pos + 1));
@@ -111,8 +111,12 @@ bool SetVar::evaluate(Rule *rule, Transaction *transm_parser_payload) {
 
     if (m_operation == setOperation) {
         targetValue = resolvedPre;
-    } else if (m_operation == setToOne) {
+    } else if (m_operation == setToOneOperation) {
         targetValue = std::string("1");
+    } else if (m_operation == unsetOperation) {
+        transm_parser_payload->m_collections.del(m_collectionName + ":" +
+            m_variableNameExpanded);
+        goto end;
     } else {
         int pre = 0;
         int value = 0;
@@ -151,6 +155,7 @@ bool SetVar::evaluate(Rule *rule, Transaction *transm_parser_payload) {
     transm_parser_payload->m_collections.storeOrUpdateFirst(m_collectionName,
         m_variableNameExpanded, targetValue);
 
+end:
     return true;
 }
 

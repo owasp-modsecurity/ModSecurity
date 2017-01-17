@@ -374,6 +374,7 @@ using modsecurity::operators::Operator;
   SETVAR_OPERATION_EQUALS
   SETVAR_OPERATION_EQUALS_PLUS
   SETVAR_OPERATION_EQUALS_MINUS
+  NOT                                          "NOT"
   ;
 
 %token <std::string>
@@ -515,7 +516,6 @@ using modsecurity::operators::Operator;
   DIRECTIVE                                    "DIRECTIVE"
   DIRECTIVE_SECRULESCRIPT                      "DIRECTIVE_SECRULESCRIPT"
   FREE_TEXT                                    "FREE_TEXT"
-  NOT                                          "NOT"
   OPERATOR                                     "OPERATOR"
   OPERATOR_BEGINS_WITH                         "OPERATOR_BEGINS_WITH"
   OPERATOR_CONTAINS                            "OPERATOR_CONTAINS"
@@ -2063,9 +2063,13 @@ act:
       {
         ACTION_CONTAINER($$, new actions::SetUID($1));
       }
+    | ACTION_SETVAR NOT VARIABLE
+      {
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::unsetOperation, $3));
+      }
     | ACTION_SETVAR VARIABLE
       {
-        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::setToOne, $2));
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::setToOneOperation, $2));
       }
     | ACTION_SETVAR VARIABLE SETVAR_OPERATION_EQUALS FREE_TEXT
       {

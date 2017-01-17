@@ -34,7 +34,9 @@ enum SetVarOperation {
     /* read variable, substract predicate and set */
     substractAndSetOperation,
     /* set variable to 1 */
-    setToOne
+    setToOneOperation,
+    /* unset operation */
+    unsetOperation,
 };
 
 class SetVar : public Action {
