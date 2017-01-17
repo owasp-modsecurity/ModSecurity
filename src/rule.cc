@@ -173,8 +173,8 @@ bool Rule::evaluateActions(Transaction *trasn) {
 void Rule::updateMatchedVars(Transaction *trasn, std::string key,
     std::string value) {
     trasn->debug(4, "Matched vars updated.");
-    trasn->m_collections.storeOrUpdateFirst("MATCHED_VAR", value);
-    trasn->m_collections.storeOrUpdateFirst("MATCHED_VAR_NAME", key);
+    trasn->m_variableMatchedVar.set(value, trasn->m_variableOffset);
+    trasn->m_variableMatchedVarName.set(key, trasn->m_variableOffset);
     trasn->m_collections.store("MATCHED_VARS:" + key, value);
     trasn->m_collections.store("MATCHED_VARS_NAMES:" + key, key);
 }
@@ -183,6 +183,7 @@ void Rule::updateMatchedVars(Transaction *trasn, std::string key,
 void Rule::cleanMatchedVars(Transaction *trasn) {
     trasn->debug(4, "Matched vars cleaned.");
     trasn->m_collections.storeOrUpdateFirst("MATCHED_VAR", "");
+    trasn->m_variableMatchedVar.set("", trasn->m_variableOffset);
     trasn->m_collections.del("MATCHED_VARS_NAME");
     trasn->m_collections.del("MATCHED_VARS");
     trasn->m_collections.del("MATCHED_VARS_NAMES");

@@ -28,7 +28,8 @@ namespace ctl {
 bool RequestBodyProcessorJSON::evaluate(Rule *rule,
     Transaction *transaction) {
     transaction->m_requestBodyProcessor = Transaction::JSONRequestBody;
-    transaction->m_collections.store("REQBODY_PROCESSOR", "JSON");
+    transaction->m_variableReqbodyProcessor.set("JSON",
+        transaction->m_variableOffset);
 
     return true;
 }

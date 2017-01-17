@@ -26,6 +26,16 @@ class Rule;
 
 namespace actions {
 
+enum SetVarOperation {
+    /* Set variable to something */
+    setOperation,
+    /* read variable, sum predicate and set */
+    sumAndSetOperation,
+    /* read variable, substract predicate and set */
+    substractAndSetOperation,
+    /* set variable to 1 */
+    setToOne
+};
 
 class SetVar : public Action {
  public:
@@ -35,19 +45,23 @@ class SetVar : public Action {
         m_variableName(""),
         m_predicate("") { }
 
+    SetVar(SetVarOperation operation,
+        std::string variableName,
+        std::string predicate) : Action("setvar"),
+        m_operation(operation),
+        m_predicate(predicate),
+        m_collectionName(""),
+        m_variableName(variableName) { }
+
+    SetVar(SetVarOperation operation,
+        std::string variableName) : Action("setvar"),
+        m_operation(operation),
+        m_predicate(""),
+        m_collectionName(""),
+        m_variableName(variableName) { }
+
     bool evaluate(Rule *rule, Transaction *transaction) override;
     bool init(std::string *error) override;
-
-    enum SetVarOperation {
-        /* Set variable to something */
-        setOperation,
-        /* read variable, sum predicate and set */
-        sumAndSetOperation,
-        /* read variable, substract predicate and set */
-        substractAndSetOperation,
-        /* set variable to 1 */
-        setToOne
-    };
 
  private:
     SetVarOperation m_operation;

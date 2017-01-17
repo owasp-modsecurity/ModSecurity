@@ -146,15 +146,67 @@ class Driver;
 #include "src/utils/system.h"
 #include "src/variables/args_names.h"
 #include "src/variables/xml.h"
+#include "src/variables/args_combined_size.h"
+#include "src/variables/args_get_names.h"
+#include "src/variables/args_names.h"
+#include "src/variables/args_post_names.h"
+#include "src/variables/auth_type.h"
 #include "src/variables/duration.h"
 #include "src/variables/env.h"
+#include "src/variables/files_combined_size.h"
+#include "src/variables/files_tmp_names.h"
+#include "src/variables/full_request.h"
+#include "src/variables/full_request_length.h"
 #include "src/variables/highest_severity.h"
+#include "src/variables/inbound_data_error.h"
+#include "src/variables/matched_var.h"
+#include "src/variables/matched_var_name.h"
 #include "src/variables/modsec_build.h"
+#include "src/variables/multipart_crlf_lf_line.h"
+#include "src/variables/multipart_data_after.h"
+#include "src/variables/multipart_file_limit_exceeded.h"
+#include "src/variables/multipart_header_folding.h"
+#include "src/variables/multipart_invalid_header_folding.h"
+#include "src/variables/multipart_invalid_quoting.h"
+#include "src/variables/multipart_strict_error.h"
+#include "src/variables/multipart_unmatched_boundary.h"
+#include "src/variables/outbound_data_error.h"
+#include "src/variables/path_info.h"
+#include "src/variables/query_string.h"
+#include "src/variables/remote_addr.h"
+#include "src/variables/remote_host.h"
+#include "src/variables/remote_port.h"
 #include "src/variables/remote_user.h"
+#include "src/variables/reqbody_error.h"
+#include "src/variables/reqbody_error_msg.h"
+#include "src/variables/reqbody_processor_error.h"
+#include "src/variables/reqbody_processor_error_msg.h"
+#include "src/variables/reqbody_processor.h"
+#include "src/variables/request_base_name.h"
+#include "src/variables/request_body.h"
+#include "src/variables/request_body_length.h"
+#include "src/variables/request_file_name.h"
+#include "src/variables/request_headers_names.h"
+#include "src/variables/request_line.h"
+#include "src/variables/request_method.h"
+#include "src/variables/request_protocol.h"
+#include "src/variables/request_uri.h"
+#include "src/variables/request_uri_raw.h"
+#include "src/variables/resources.h"
+#include "src/variables/response_body.h"
+#include "src/variables/response_content_length.h"
+#include "src/variables/response_content_type.h"
+#include "src/variables/response_headers_names.h"
+#include "src/variables/response_protocol.h"
+#include "src/variables/response_status.h"
 #include "src/variables/rule.h"
-#include "src/variables/time.h"
+#include "src/variables/server_addr.h"
+#include "src/variables/server_name.h"
+#include "src/variables/server_port.h"
+#include "src/variables/session_id.h"
 #include "src/variables/time_day.h"
 #include "src/variables/time_epoch.h"
+#include "src/variables/time.h"
 #include "src/variables/time_hour.h"
 #include "src/variables/time_min.h"
 #include "src/variables/time_mon.h"
@@ -162,6 +214,11 @@ class Driver;
 #include "src/variables/time_wday.h"
 #include "src/variables/time_year.h"
 #include "src/variables/tx.h"
+#include "src/variables/unique_id.h"
+#include "src/variables/url_encoded_error.h"
+#include "src/variables/user_id.h"
+#include "src/variables/variable.h"
+#include "src/variables/xml.h"
 #include "src/variables/variations/count.h"
 #include "src/variables/variations/exclusion.h"
 
@@ -258,8 +315,66 @@ using modsecurity::operators::Operator;
   COMMA    ","
   PIPE
   NEW_LINE
-  VARIABLE_ARGS_NAMES   "Variable ARGS_NAMES"
-;
+  VARIABLE_ARGS_COMBINED_SIZE
+  VARIABLE_ARGS_GET_NAMES
+  VARIABLE_ARGS_NAMES           "Variable ARGS_NAMES"
+  VARIABLE_ARGS_POST_NAMES
+  VARIABLE_AUTH_TYPE            "AUTH_TYPE"
+  VARIABLE_FILES_COMBINED_SIZE  "FILES_COMBINED_SIZE"
+  VARIABLE_FILES_TMP_NAMES       "FILES_TMPNAMES"
+  VARIABLE_FULL_REQUEST         "FULL_REQUEST"
+  VARIABLE_FULL_REQUEST_LENGTH  "FULL_REQUEST_LENGTH"
+  VARIABLE_INBOUND_DATA_ERROR   "INBOUND_DATA_ERROR"
+  VARIABLE_MATCHED_VAR          "MATCHED_VAR"
+  VARIABLE_MATCHED_VAR_NAME     "MATCHED_VAR_NAME"
+  VARIABLE_MULTIPART_CRLF_LF_LINES    "MULTIPART_CRLF_LF_LINES"
+  VARIABLE_MULTIPART_DATA_AFTER "MULTIPART_DATA_AFTER"
+  VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED       "MULTIPART_FILE_LIMIT_EXCEEDED"
+  VARIABLE_MULTIPART_HEADER_FOLDING            "MULTIPART_HEADER_FOLDING"
+  VARIABLE_MULTIPART_INVALID_HEADER_FOLDING    "MULTIPART_INVALID_HEADER_FOLDING"
+  VARIABLE_MULTIPART_INVALID_QUOTING           "MULTIPART_INVALID_QUOTING"
+  VARIABLE_MULTIPART_STRICT_ERROR              "MULTIPART_STRICT_ERROR"
+  VARIABLE_MULTIPART_UNMATCHED_BOUNDARY        "MULTIPART_UNMATCHED_BOUNDARY"
+  VARIABLE_OUTBOUND_DATA_ERROR  "OUTBOUND_DATA_ERROR"
+  VARIABLE_PATH_INFO            "PATH_INFO"
+  VARIABLE_QUERY_STRING         "QUERY_STRING"
+  VARIABLE_REMOTE_ADDR          "REMOTE_ADDR"
+  VARIABLE_REMOTE_HOST          "REMOTE_HOST"
+  VARIABLE_REMOTE_PORT          "REMOTE_PORT"
+  VARIABLE_REQBODY_ERROR_MSG    "REQBODY_ERROR_MSG"
+  VARIABLE_REQBODY_ERROR        "REQBODY_ERROR"
+  VARIABLE_REQBODY_PROCESSOR_ERROR_MSG    "REQBODY_PROCESSOR_ERROR_MSG"
+  VARIABLE_REQBODY_PROCESSOR_ERROR        "REQBODY_PROCESSOR_ERROR"
+  VARIABLE_REQBODY_PROCESSOR    "REQBODY_PROCESSOR"
+  VARIABLE_REQUEST_BASENAME     "REQUEST_BASENAME"
+  VARIABLE_REQUEST_BODY_LENGTH  "REQUEST_BODY_LENGTH"
+  VARIABLE_REQUEST_BODY         "REQUEST_BODY"
+  VARIABLE_REQUEST_FILE_NAME     "REQUEST_FILENAME"
+  VARIABLE_REQUEST_HEADERS_NAMES
+  VARIABLE_REQUEST_LINE         "REQUEST_LINE"
+  VARIABLE_REQUEST_METHOD       "REQUEST_METHOD"
+  VARIABLE_REQUEST_PROTOCOL     "REQUEST_PROTOCOL"
+  VARIABLE_REQUEST_URI_RAW      "REQUEST_URI_RAW"
+  VARIABLE_REQUEST_URI          "REQUEST_URI"
+  VARIABLE_RESOURCE             "RESOURCE"
+  VARIABLE_RESPONSE_BODY        "RESPONSE_BODY"
+  VARIABLE_RESPONSE_CONTENT_LENGTH    "RESPONSE_CONTENT_LENGTH"
+  VARIABLE_RESPONSE_CONTENT_TYPE
+  VARIABLE_RESPONSE_HEADERS_NAMES
+  VARIABLE_RESPONSE_PROTOCOL    "RESPONSE_PROTOCOL"
+  VARIABLE_RESPONSE_STATUS      "RESPONSE_STATUS"
+  VARIABLE_SERVER_ADDR          "SERVER_ADDR"
+  VARIABLE_SERVER_NAME          "SERVER_NAME"
+  VARIABLE_SERVER_PORT          "SERVER_PORT"
+  VARIABLE_SESSION_ID           "SESSIONID"
+  VARIABLE_UNIQUE_ID            "UNIQUE_ID"
+  VARIABLE_URL_ENCODED_ERROR    "URLENCODED_ERROR"
+  VARIABLE_USER_ID               "USERID"
+  ACTION_SETVAR                                "SetVar"
+  SETVAR_OPERATION_EQUALS
+  SETVAR_OPERATION_EQUALS_PLUS
+  SETVAR_OPERATION_EQUALS_MINUS
+  ;
 
 %token <std::string>
   ACTION_ACCURACY                              "Accuracy"
@@ -309,7 +424,6 @@ using modsecurity::operators::Operator;
   ACTION_SETRSC                                "SetSrc"
   ACTION_SETSID                                "SetSid"
   ACTION_SETUID                                "SetUID"
-  ACTION_SETVAR                                "SetVar"
   ACTION_SEVERITY                              "Severity"
   ACTION_SKIP                                  "Skip"
   ACTION_SKIP_AFTER                            "SkipAfter"
@@ -1142,22 +1256,275 @@ var:
         std::unique_ptr<Variable> c(new Variables::ArgsNames());
         $$ = std::move(c);
       }
-    | VARIABLE
+    | VARIABLE_ARGS_GET_NAMES
       {
-        std::string name($1);
-        char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new Variable(name, Variable::VariableKind::DirectVariable)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new Variable(name, Variable::VariableKind::DirectVariable));
-            $$ = std::move(c);
-        }
+        std::unique_ptr<Variable> c(new Variables::ArgsGetNames());
+        $$ = std::move(c);
+      }
+    | VARIABLE_ARGS_POST_NAMES
+      {
+        std::unique_ptr<Variable> c(new Variables::ArgsPostNames());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQUEST_HEADERS_NAMES
+      {
+        std::unique_ptr<Variable> c(new Variables::RequestHeadersNames());
+        $$ = std::move(c);
+      }
+    | VARIABLE_RESPONSE_CONTENT_TYPE
+      {
+        std::unique_ptr<Variable> c(new Variables::ResponseContentType());
+        $$ = std::move(c);
+      }
+    | VARIABLE_RESPONSE_HEADERS_NAMES
+      {
+        std::unique_ptr<Variable> c(new Variables::ResponseHeadersNames());
+        $$ = std::move(c);
+      }
+    | VARIABLE_ARGS_COMBINED_SIZE
+      {
+        std::unique_ptr<Variable> c(new Variables::ArgsCombinedSize());
+        $$ = std::move(c);
+      }
+   | VARIABLE_AUTH_TYPE
+      {
+        std::unique_ptr<Variable> c(new Variables::AuthType());
+        $$ = std::move(c);
+      }
+    | VARIABLE_FILES_COMBINED_SIZE
+      {
+        std::unique_ptr<Variable> c(new Variables::FilesCombinedSize());
+        $$ = std::move(c);
+      }
+    | VARIABLE_FILES_TMP_NAMES
+      {
+        std::unique_ptr<Variable> c(new Variables::FilesTmpNames());
+        $$ = std::move(c);
+      }
+    | VARIABLE_FULL_REQUEST
+      {
+        std::unique_ptr<Variable> c(new Variables::FullRequest());
+        $$ = std::move(c);
+      }
+    | VARIABLE_FULL_REQUEST_LENGTH
+      {
+        std::unique_ptr<Variable> c(new Variables::FullRequestLength());
+        $$ = std::move(c);
+      }
+    | VARIABLE_INBOUND_DATA_ERROR
+      {
+        std::unique_ptr<Variable> c(new Variables::InboundDataError());
+        $$ = std::move(c);
+      }
+    | VARIABLE_MATCHED_VAR
+      {
+        std::unique_ptr<Variable> c(new Variables::MatchedVar());
+        $$ = std::move(c);
+      }
+    | VARIABLE_MATCHED_VAR_NAME
+      {
+        std::unique_ptr<Variable> c(new Variables::MatchedVarName());
+        $$ = std::move(c);
+      }
+    | VARIABLE_MULTIPART_CRLF_LF_LINES
+      {
+        std::unique_ptr<Variable> c(new Variables::MultipartCrlfLFLines());
+        $$ = std::move(c);
+      }
+    | VARIABLE_MULTIPART_DATA_AFTER
+      {
+        std::unique_ptr<Variable> c(new Variables::MultipartDateAfter());
+        $$ = std::move(c);
+      }
+    | VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED
+      {
+        std::unique_ptr<Variable> c(new Variables::MultipartFileLimitExceeded());
+        $$ = std::move(c);
+      }
+    | VARIABLE_MULTIPART_HEADER_FOLDING
+      {
+        std::unique_ptr<Variable> c(new Variables::MultipartHeaderFolding());
+        $$ = std::move(c);
+      }
+    | VARIABLE_MULTIPART_INVALID_HEADER_FOLDING
+      {
+        std::unique_ptr<Variable> c(new Variables::MultipartInvalidHeaderFolding());
+        $$ = std::move(c);
+      }
+    | VARIABLE_MULTIPART_INVALID_QUOTING
+      {
+        std::unique_ptr<Variable> c(new Variables::MultipartInvalidQuoting());
+        $$ = std::move(c);
+      }
+    | VARIABLE_MULTIPART_STRICT_ERROR
+      {
+        std::unique_ptr<Variable> c(new Variables::MultipartStrictError());
+        $$ = std::move(c);
+      }
+    | VARIABLE_MULTIPART_UNMATCHED_BOUNDARY
+      {
+        std::unique_ptr<Variable> c(new Variables::MultipartUnmatchedBoundary());
+        $$ = std::move(c);
+      }
+    | VARIABLE_OUTBOUND_DATA_ERROR
+      {
+        std::unique_ptr<Variable> c(new Variables::OutboundDataError());
+        $$ = std::move(c);
+      }
+    | VARIABLE_PATH_INFO
+      {
+        std::unique_ptr<Variable> c(new Variables::PathInfo());
+        $$ = std::move(c);
+      }
+    | VARIABLE_QUERY_STRING
+      {
+        std::unique_ptr<Variable> c(new Variables::QueryString());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REMOTE_ADDR
+      {
+        std::unique_ptr<Variable> c(new Variables::RemoteAddr());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REMOTE_HOST
+      {
+        std::unique_ptr<Variable> c(new Variables::RemoteHost());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REMOTE_PORT
+      {
+        std::unique_ptr<Variable> c(new Variables::RemotePort());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQBODY_ERROR
+      {
+        std::unique_ptr<Variable> c(new Variables::ReqbodyError());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQBODY_ERROR_MSG
+      {
+        std::unique_ptr<Variable> c(new Variables::ReqbodyErrorMsg());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQBODY_PROCESSOR
+      {
+        std::unique_ptr<Variable> c(new Variables::ReqbodyProcessor());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQBODY_PROCESSOR_ERROR
+      {
+        std::unique_ptr<Variable> c(new Variables::ReqbodyProcessorError());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQBODY_PROCESSOR_ERROR_MSG
+      {
+        std::unique_ptr<Variable> c(new Variables::ReqbodyProcessorErrorMsg());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQUEST_BASENAME
+      {
+        std::unique_ptr<Variable> c(new Variables::RequestBasename());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQUEST_BODY
+      {
+        std::unique_ptr<Variable> c(new Variables::RequestBody());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQUEST_BODY_LENGTH
+      {
+        std::unique_ptr<Variable> c(new Variables::RequestBodyLength());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQUEST_FILE_NAME
+      {
+        std::unique_ptr<Variable> c(new Variables::RequestFilename());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQUEST_LINE
+      {
+        std::unique_ptr<Variable> c(new Variables::RequestLine());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQUEST_METHOD
+      {
+        std::unique_ptr<Variable> c(new Variables::RequestMethod());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQUEST_PROTOCOL
+      {
+        std::unique_ptr<Variable> c(new Variables::RequestProtocol());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQUEST_URI
+      {
+        std::unique_ptr<Variable> c(new Variables::RequestURI());
+        $$ = std::move(c);
+      }
+    | VARIABLE_REQUEST_URI_RAW
+      {
+        std::unique_ptr<Variable> c(new Variables::RequestURIRaw());
+        $$ = std::move(c);
+      }
+    | VARIABLE_RESOURCE
+      {
+        std::unique_ptr<Variable> c(new Variables::Resource());
+        $$ = std::move(c);
+      }
+    | VARIABLE_RESPONSE_BODY
+      {
+        std::unique_ptr<Variable> c(new Variables::ResponseBody());
+        $$ = std::move(c);
+      }
+    | VARIABLE_RESPONSE_CONTENT_LENGTH
+      {
+        std::unique_ptr<Variable> c(new Variables::ResponseContentLength());
+        $$ = std::move(c);
+      }
+    | VARIABLE_RESPONSE_PROTOCOL
+      {
+        std::unique_ptr<Variable> c(new Variables::ResponseProtocol());
+        $$ = std::move(c);
+      }
+    | VARIABLE_RESPONSE_STATUS
+      {
+        std::unique_ptr<Variable> c(new Variables::ResponseStatus());
+        $$ = std::move(c);
+      }
+    | VARIABLE_SERVER_ADDR
+      {
+        std::unique_ptr<Variable> c(new Variables::ServerAddr());
+        $$ = std::move(c);
+      }
+    | VARIABLE_SERVER_NAME
+      {
+        std::unique_ptr<Variable> c(new Variables::ServerName());
+        $$ = std::move(c);
+      }
+    | VARIABLE_SERVER_PORT
+      {
+        std::unique_ptr<Variable> c(new Variables::ServerPort());
+        $$ = std::move(c);
+      }
+    | VARIABLE_SESSION_ID
+      {
+        std::unique_ptr<Variable> c(new Variables::SessionID());
+        $$ = std::move(c);
+      }
+    | VARIABLE_UNIQUE_ID
+      {
+        std::unique_ptr<Variable> c(new Variables::UniqueID());
+        $$ = std::move(c);
+      }
+    | VARIABLE_URL_ENCODED_ERROR
+      {
+        std::unique_ptr<Variable> c(new Variables::UrlEncodedError());
+        $$ = std::move(c);
+      }
+    | VARIABLE_USER_ID
+      {
+        std::unique_ptr<Variable> c(new Variables::UserID());
+        $$ = std::move(c);
       }
     | VARIABLE_STATUS
       {
@@ -1450,20 +1817,9 @@ var:
       }
     | RUN_TIME_VAR_XML
       {
-        std::string name($1);
-        char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new XML(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new XML(name)));
-            $$ = std::move(c);
-        } else {
+            std::string name($1);
             std::unique_ptr<Variable> c(new XML(name));
             $$ = std::move(c);
-        }
       }
     | RUN_TIME_VAR_RULE
       {
@@ -1707,9 +2063,21 @@ act:
       {
         ACTION_CONTAINER($$, new actions::SetUID($1));
       }
-    | ACTION_SETVAR
+    | ACTION_SETVAR VARIABLE
       {
-        ACTION_CONTAINER($$, new actions::SetVar($1));
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::setToOne, $2));
+      }
+    | ACTION_SETVAR VARIABLE SETVAR_OPERATION_EQUALS FREE_TEXT
+      {
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::setOperation, $2, $4));
+      }
+    | ACTION_SETVAR VARIABLE SETVAR_OPERATION_EQUALS_PLUS FREE_TEXT
+      {
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::sumAndSetOperation, $2, $4));
+      }
+    | ACTION_SETVAR VARIABLE SETVAR_OPERATION_EQUALS_MINUS FREE_TEXT
+      {
+        ACTION_CONTAINER($$, new actions::SetVar(actions::SetVarOperation::substractAndSetOperation, $2, $4));
       }
     | ACTION_SEVERITY
       {

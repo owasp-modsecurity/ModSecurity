@@ -109,15 +109,9 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
     m_timeStamp(std::time(NULL)),
     m_httpCodeReturned(200),
     m_highestSeverityAction(255),
-    m_ARGScombinedSize(0),
-    m_ARGScombinedSizeStr(NULL),
-    m_namesArgsPost(NULL),
-    m_namesArgsGet(NULL),
+    m_ARGScombinedSizeDouble(0),
     m_requestBodyType(UnknownFormat),
     m_requestBodyProcessor(UnknownFormat),
-    m_requestHeadersNames(NULL),
-    m_responseHeadersNames(NULL),
-    m_responseContentType(NULL),
     m_requestBodyAccess(Rules::PropertyNotSetConfigBoolean),
     m_marker(""),
     m_allowType(modsecurity::actions::disruptive::NoneAllowType),
@@ -135,23 +129,7 @@ Transaction::Transaction(ModSecurity *ms, Rules *rules, void *logCbData)
         std::to_string(modsecurity::utils::generate_transaction_unique_id());
     m_rules->incrementReferenceCount();
 
-    m_collections.store("ARGS_COMBINED_SIZE", std::string("0"));
-    m_ARGScombinedSizeStr = m_collections.resolveFirst("ARGS_COMBINED_SIZE");
-    m_collections.store("ARGS_POST_NAMES", std::string(""));
-    this->m_namesArgsPost = m_collections.resolveFirst("ARGS_POST_NAMES");
-    m_collections.store("ARGS_GET_NAMES", std::string(""));
-    this->m_namesArgsGet = m_collections.resolveFirst("ARGS_GET_NAMES");
-    m_collections.store("REQUEST_HEADERS_NAMES", std::string(""));
-    this->m_requestHeadersNames = m_collections.resolveFirst(
-        "REQUEST_HEADERS_NAMES");
-    m_collections.store("RESPONSE_HEADERS_NAMES", std::string(""));
-    this->m_responseHeadersNames = m_collections.resolveFirst(
-        "RESPONSE_HEADERS_NAMES");
-    m_collections.store("RESPONSE_CONTENT_TYPE", std::string(""));
-    this->m_responseContentType = m_collections.resolveFirst(
-        "RESPONSE_CONTENT_TYPE");
-
-    m_collections.storeOrUpdateFirst("URLENCODED_ERROR", "0");
+    m_variableUrlEncodedError.set("0", 0);
 
 #ifndef NO_LOGS
     this->debug(4, "Initializing transaction");
@@ -233,14 +211,13 @@ int Transaction::processConnection(const char *client, int cPort,
     debug(4, "Starting phase CONNECTION. (SecRules 0)");
 #endif
 
-    this->m_collections.store("REMOTE_HOST", m_clientIpAddress);
-    this->m_collections.store("UNIQUE_ID", m_id);
-    this->m_collections.store("REMOTE_ADDR", m_clientIpAddress);
-    this->m_collections.store("SERVER_ADDR", m_serverIpAddress);
-    this->m_collections.store("SERVER_PORT",
-        std::to_string(this->m_serverPort));
-    this->m_collections.store("REMOTE_PORT",
-        std::to_string(this->m_clientPort));
+    m_variableRemoteHost.set(m_clientIpAddress, m_variableOffset);
+    m_variableUniqueID.set(m_id, m_variableOffset);
+    m_variableRemoteAddr.set(m_clientIpAddress, m_variableOffset);
+    m_variableServerAddr.set(m_serverIpAddress, m_variableOffset);
+    m_variableServerPort.set(std::to_string(this->m_serverPort), m_variableOffset);
+    m_variableRemotePort.set(std::to_string(this->m_clientPort), m_variableOffset);
+
     this->m_rules->evaluate(modsecurity::ConnectionPhase, this);
     return true;
 }
@@ -289,7 +266,7 @@ bool Transaction::extractArguments(const std::string &orig,
             &invalid, &changed);
 
         if (invalid) {
-            m_collections.storeOrUpdateFirst("URLENCODED_ERROR", "1");
+            m_variableUrlEncodedError.set("1", m_variableOffset);
         }
 
         addArgument(orig, std::string(reinterpret_cast<char *>(key_c), key_s-1),
@@ -309,30 +286,20 @@ bool Transaction::addArgument(const std::string& orig, const std::string& key,
                 key + "\", value \"" + value + "\"");
 
     m_collections.store("ARGS:" + key, value);
+
     if (orig == "GET") {
         m_collections.store("ARGS_GET:" + key, value);
-        if (m_namesArgsGet->empty()) {
-            m_namesArgsGet->assign(key);
-        } else {
-            m_namesArgsGet->assign(*m_namesArgsGet + " " + key);
-        }
-    }
-    if (orig == "POST") {
+        m_variableArgGetNames.append(key, 0, true);
+    } else if (orig == "POST") {
         m_collections.store("ARGS_POST:" + key, value);
-        if (m_namesArgsPost->empty()) {
-            m_namesArgsPost->assign(key);
-        } else {
-            m_namesArgsPost->assign(*m_namesArgsPost + " " + key);
-        }
+        m_variableArgPostNames.append(key, 0, true);
     }
-
     m_variableArgsNames.append(key, 0, true);
 
-
-    this->m_ARGScombinedSize = this->m_ARGScombinedSize + \
+    m_ARGScombinedSizeDouble = m_ARGScombinedSizeDouble + \
         key.length() + value.length();
-    this->m_ARGScombinedSizeStr->assign(
-        std::to_string(this->m_ARGScombinedSize));
+
+    m_variableARGScombinedSize.set(std::to_string(m_ARGScombinedSizeDouble), 0);
 
     return true;
 }
@@ -377,8 +344,8 @@ int Transaction::processURI(const char *uri, const char *method,
     size_t pos = m_uri_decoded.find("?");
     size_t pos_raw = uri_s.find("?");
 
-    m_collections.store("REQUEST_LINE", std::string(method) + " " +
-        std::string(uri) + " HTTP/" + std::string(http_version));
+    m_variableRequestLine.set(std::string(method) + " " + std::string(uri)
+        + " HTTP/" + std::string(http_version), m_variableOffset);
 
     if (pos != std::string::npos) {
         m_uri_no_query_string_decoded = std::string(m_uri_decoded, 0, pos);
@@ -387,8 +354,9 @@ int Transaction::processURI(const char *uri, const char *method,
     }
 
     if (pos_raw != std::string::npos) {
-        m_collections.store("QUERY_STRING", std::string(uri_s, pos_raw + 1,
-            uri_s.length() - (pos_raw + 1)));
+        std::string qry = std::string(uri_s, pos_raw + 1,
+            uri_s.length() - (pos_raw + 1));
+        m_variableQueryString.set(qry, m_variableOffset);
     }
 
     std::string path_info;
@@ -397,18 +365,18 @@ int Transaction::processURI(const char *uri, const char *method,
     } else {
         path_info = std::string(m_uri_decoded, 0, pos);
     }
-    m_collections.store("PATH_INFO", path_info);
-    m_collections.store("REQUEST_FILENAME", path_info);
+    m_variablePathInfo.set(path_info, m_variableOffset);
+    m_variableRequestFilename.set(path_info, m_variableOffset);
 
     size_t offset = path_info.find_last_of("/\\");
     if (offset != std::string::npos && path_info.length() > offset + 1) {
         std::string basename = std::string(path_info, offset + 1,
             path_info.length() - (offset + 1));
-        m_collections.store("REQUEST_BASENAME", basename);
+        m_variableRequestBasename.set(basename, m_variableOffset);
     }
-    m_collections.store("REQUEST_METHOD", method);
-    m_collections.store("REQUEST_PROTOCOL",
-        "HTTP/" + std::string(http_version));
+    m_variableRequestMethod.set(method, m_variableOffset);
+    m_variableRequestProtocol.set("HTTP/" + std::string(http_version),
+        m_variableOffset);
 
     std::string parsedURI = m_uri_decoded;
     // The more popular case is without domain
@@ -434,8 +402,8 @@ int Transaction::processURI(const char *uri, const char *method,
         }
     }
 
-    m_collections.store("REQUEST_URI", parsedURI);
-    m_collections.store("REQUEST_URI_RAW", uri);
+    m_variableRequestURI.set(parsedURI, m_variableOffset);
+    m_variableRequestURIRaw.set(uri, m_variableOffset);
 
     if (pos != std::string::npos && (m_uri_decoded.length() - pos) > 2) {
         extractArguments("GET", std::string(uri_s, pos_raw + 1,
@@ -496,14 +464,14 @@ int Transaction::processRequestHeaders() {
  */
 int Transaction::addRequestHeader(const std::string& key,
     const std::string& value) {
-    m_requestHeadersNames->assign(*m_requestHeadersNames + " " + key);
+    m_variableRequestHeadersNames.append(key, 0, true);
 
     this->m_collections.store("REQUEST_HEADERS:" + key, value);
 
     std::string keyl = utils::string::tolower(key);
     if (keyl == "authorization") {
         std::vector<std::string> type = utils::string::split(value, ' ');
-        this->m_collections.store("AUTH_TYPE", type[0]);
+        m_variableAuthType.set(type[0], m_variableOffset);
     }
 
     if (keyl == "cookie") {
@@ -535,18 +503,18 @@ int Transaction::addRequestHeader(const std::string& key,
         std::string l = utils::string::tolower(value);
         if (l.compare(0, multipart.length(), multipart) == 0) {
             this->m_requestBodyType = MultiPartRequestBody;
-            m_collections.store("REQBODY_PROCESSOR", "MULTIPART");
+            m_variableReqbodyProcessor.set("MULTIPART", m_variableOffset);
         }
 
         if (l == "application/x-www-form-urlencoded") {
             this->m_requestBodyType = WWWFormUrlEncoded;
-            m_collections.store("REQBODY_PROCESSOR", "URLENCODED");
+            m_variableReqbodyProcessor.set("URLENCODED", m_variableOffset);
         }
     }
 
     if (keyl == "host") {
         std::vector<std::string> host = utils::string::split(value, ':');
-        m_collections.store("SERVER_NAME", host[0]);
+        m_variableServerName.set(host[0], m_variableOffset);
     }
     return 1;
 }
@@ -637,8 +605,8 @@ int Transaction::processRequestBody() {
         return true;
     }
 
-    if (m_collections.resolveFirst("INBOUND_DATA_ERROR") == NULL) {
-        m_collections.store("INBOUND_DATA_ERROR", "0");
+    if (m_variableInboundDataError.m_value.empty() == true) {
+        m_variableInboundDataError.set("0", m_variableOffset);
     }
 
     /*
@@ -658,15 +626,15 @@ int Transaction::processRequestBody() {
             m_xml->complete(&error);
         }
         if (error.empty() == false) {
-            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "1");
-            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "1");
-            m_collections.storeOrUpdateFirst("REQBODY_ERROR_MSG",
-                "XML parsing error: " + error);
-            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR_MSG",
-                "XML parsing error: " + error);
+            m_variableReqbodyError.set("1", m_variableOffset);
+            m_variableReqbodyErrorMsg.set("XML parsing error: " + error,
+                m_variableOffset);
+            m_variableReqbodyProcessorErrorMsg.set("XML parsing error: " \
+                + error, m_variableOffset);
+            m_variableReqbodyProcessorError.set("1", m_variableOffset);
         } else {
-            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "0");
-            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "0");
+            m_variableReqbodyError.set("1", m_variableOffset);
+            m_variableReqbodyProcessorError.set("0", m_variableOffset);
         }
     } else if (m_requestBodyProcessor == JSONRequestBody) {
         std::string error;
@@ -677,15 +645,15 @@ int Transaction::processRequestBody() {
             m_json->complete(&error);
         }
         if (error.empty() == false) {
-            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "1");
-            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "1");
-            m_collections.storeOrUpdateFirst("REQBODY_ERROR_MSG",
-                "XML parsing error: " + error);
-            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR_MSG",
-                "XML parsing error: " + error);
+            m_variableReqbodyError.set("1", m_variableOffset);
+            m_variableReqbodyProcessorError.set("1", m_variableOffset);
+            m_variableReqbodyErrorMsg.set("XML parsing error: " + error,
+                m_variableOffset);
+            m_variableReqbodyProcessorErrorMsg.set("XML parsing error: " \
+                + error, m_variableOffset);
         } else {
-            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "0");
-            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "0");
+            m_variableReqbodyError.set("0", m_variableOffset);
+            m_variableReqbodyProcessorError.set("0", m_variableOffset);
         }
     } else if (m_requestBodyType == MultiPartRequestBody) {
         std::string error;
@@ -700,15 +668,15 @@ int Transaction::processRequestBody() {
             m.multipart_complete(&error);
         }
         if (error.empty() == false) {
-            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "1");
-            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "1");
-            m_collections.storeOrUpdateFirst("REQBODY_ERROR_MSG",
-                "Multipart parsing error: " + error);
-            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR_MSG",
-                "Multipart parsing error: " + error);
+            m_variableReqbodyError.set("1", m_variableOffset);
+            m_variableReqbodyProcessorError.set("1", m_variableOffset);
+            m_variableReqbodyErrorMsg.set("Multipart parsing error: " + error,
+                m_variableOffset);
+            m_variableReqbodyProcessorErrorMsg.set("Multipart parsing " \
+                "error: " + error, m_variableOffset);
         } else {
-            m_collections.storeOrUpdateFirst("REQBODY_ERROR", "0");
-            m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "0");
+            m_variableReqbodyError.set("0", m_variableOffset);
+            m_variableReqbodyProcessorError.set("0", m_variableOffset);
         }
     } else if (m_requestBodyType == WWWFormUrlEncoded) {
         extractArguments("POST", m_requestBody.str());
@@ -720,15 +688,15 @@ int Transaction::processRequestBody() {
         if (a != NULL && a->empty() == false) {
             error.assign(*a);
         }
-        m_collections.storeOrUpdateFirst("REQBODY_ERROR", "1");
-        m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "1");
-        m_collections.storeOrUpdateFirst("REQBODY_ERROR_MSG",
-            "Unknown request body processor: " + error);
-        m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR_MSG",
-            "Unknown request body processor: " + error);
+        m_variableReqbodyError.set("1", m_variableOffset);
+        m_variableReqbodyProcessorError.set("1", m_variableOffset);
+        m_variableReqbodyErrorMsg.set("Unknown request body processor: " \
+            + error, m_variableOffset);
+        m_variableReqbodyProcessorErrorMsg.set("Unknown request body " \
+            "processor: " + error, m_variableOffset);
     } else {
-        m_collections.storeOrUpdateFirst("REQBODY_ERROR", "0");
-        m_collections.storeOrUpdateFirst("REQBODY_PROCESSOR_ERROR", "0");
+        m_variableReqbodyError.set("0", m_variableOffset);
+        m_variableReqbodyProcessorError.set("0", m_variableOffset);
     }
 
 #if 1
@@ -774,14 +742,15 @@ int Transaction::processRequestBody() {
 
     fullRequest = fullRequest + "\n\n";
     fullRequest = fullRequest + m_requestBody.str();
-    m_collections.store("FULL_REQUEST", fullRequest);
-    m_collections.store("FULL_REQUEST_LENGTH",
-        std::to_string(fullRequest.size()));
+    m_variableFullRequest.set(fullRequest, m_variableOffset);
+    m_variableFullRequestLength.set(std::to_string(fullRequest.size()),
+        m_variableOffset);
 
     if (m_requestBody.tellp() > 0) {
-        m_collections.store("REQUEST_BODY", m_requestBody.str());
-        m_collections.store("REQUEST_BODY_LENGTH",
-            std::to_string(m_requestBody.str().size()));
+        m_variableRequestBody.set(m_requestBody.str(), m_variableOffset);
+        m_variableRequestBodyLength.set(std::to_string(
+            m_requestBody.str().size()),
+            m_variableOffset);
     }
 
     this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
@@ -853,7 +822,7 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
 
     if (this->m_rules->m_requestBodyLimit.m_value > 0
         && this->m_rules->m_requestBodyLimit.m_value < len + current_size) {
-        m_collections.store("INBOUND_DATA_ERROR", "1");
+        m_variableInboundDataError.set("1", m_variableOffset);
 #ifndef NO_LOGS
         debug(5, "Request body is bigger than the maximum expected.");
 #endif
@@ -913,8 +882,8 @@ int Transaction::processResponseHeaders(int code, const std::string& proto) {
 #endif
 
     this->m_httpCodeReturned = code;
-    this->m_collections.store("RESPONSE_STATUS", std::to_string(code));
-    m_collections.store("RESPONSE_PROTOCOL", proto);
+    m_variableResponseStatus.set(std::to_string(code), m_variableOffset);
+    m_variableResponseProtocol.set(proto, m_variableOffset);
 
     if (m_rules->m_secRuleEngine == Rules::DisabledRuleEngine) {
 #ifndef NO_LOGS
@@ -948,7 +917,7 @@ int Transaction::processResponseHeaders(int code, const std::string& proto) {
  */
 int Transaction::addResponseHeader(const std::string& key,
     const std::string& value) {
-    m_responseHeadersNames->assign(*m_responseHeadersNames + " " + key);
+    m_variableResponseHeadersNames.append(key, 0, true);
 
     this->m_collections.store("RESPONSE_HEADERS:" + key, value);
 
@@ -957,7 +926,7 @@ int Transaction::addResponseHeader(const std::string& key,
         // Content-Type: text/html; charset=UTF-8
         std::vector<std::string> val = utils::string::split(value, ';');
         if (val.size() > 0) {
-            this->m_responseContentType->assign(val[0]);
+            m_variableResponseContentType.set(val[0], 0);
         }
     }
     return 1;
@@ -1050,10 +1019,10 @@ int Transaction::processResponseBody() {
     }
 
     std::set<std::string> &bi = this->m_rules->m_responseBodyTypeToBeInspected;
-    auto t = bi.find(*m_responseContentType);
+    auto t = bi.find(m_variableResponseContentType.m_value);
     if (t == bi.end() && bi.empty() == false) {
 #ifndef NO_LOGS
-        debug(5, "Response Content-Type is " + *m_responseContentType + \
+        debug(5, "Response Content-Type is " + m_variableResponseContentType.m_value + \
             ". It is not marked to be inspected.");
         std::string validContetTypes("");
         for (std::set<std::string>::iterator i = bi.begin();
@@ -1064,13 +1033,12 @@ int Transaction::processResponseBody() {
 #endif
         return true;
     }
-    if (m_collections.resolveFirst("OUTBOUND_DATA_ERROR") == NULL) {
-        m_collections.store("OUTBOUND_DATA_ERROR", "0");
+    if (m_variableOutboundDataError.m_value.empty() == true) {
+        m_variableOutboundDataError.set("0", m_variableOffset);
     }
 
-    m_collections.store("RESPONSE_BODY", m_responseBody.str());
-    m_collections.store("RESPONSE_CONTENT_LENGTH",
-        std::to_string(m_responseBody.str().size()));
+    m_variableResponseBody.set(m_responseBody.str(), m_variableOffset);
+    m_variableResponseContentLength.set(std::to_string(m_responseBody.str().size()), m_variableOffset);
 
     this->m_rules->evaluate(modsecurity::ResponseBodyPhase, this);
     return true;
@@ -1099,11 +1067,11 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
     int current_size = this->m_responseBody.tellp();
 
     std::set<std::string> &bi = this->m_rules->m_responseBodyTypeToBeInspected;
-    auto t = bi.find(*m_responseContentType);
+    auto t = bi.find(m_variableResponseContentType.m_value);
     if (t == bi.end() && bi.empty() == false) {
 #ifndef NO_LOGS
         debug(4, "Not appending response body. " \
-            "Response Content-Type is " + *m_responseContentType + \
+            "Response Content-Type is " + m_variableResponseContentType.m_value + \
             ". It is not marked to be inspected.");
 #endif
         return true;
@@ -1117,7 +1085,7 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
 
     if (this->m_rules->m_responseBodyLimit.m_value > 0
         && this->m_rules->m_responseBodyLimit.m_value < len + current_size) {
-        m_collections.store("OUTBOUND_DATA_ERROR", "1");
+        m_variableOutboundDataError.set("1", m_variableOffset);
 #ifndef NO_LOGS
         debug(5, "Response body is bigger than the maximum expected.");
 #endif

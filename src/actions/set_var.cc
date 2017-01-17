@@ -31,6 +31,20 @@ namespace actions {
 bool SetVar::init(std::string *error) {
     size_t pos;
 
+    if (m_variableName.empty() == false) {
+        pos = m_variableName.find(".");
+        if (pos != std::string::npos) {
+            m_collectionName = std::string(m_variableName, 0, pos);
+            m_collectionName = utils::string::toupper(m_collectionName);
+            m_variableName = std::string(m_variableName, pos + 1,
+                m_variableName.size() - (pos + 1));
+        } else {
+            error->assign("Missing the collection and/or variable name");
+            return false;
+        }
+        return true;
+    }
+
     // Resolv operation
     m_operation = setToOne;
     pos = m_parser_payload.find("=");

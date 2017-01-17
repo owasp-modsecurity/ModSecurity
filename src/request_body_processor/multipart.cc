@@ -859,8 +859,9 @@ int Multipart::process_boundary(int last_part) {
  * is clear that there is no more data to be processed.
  */
 int Multipart::multipart_complete(std::string *error) {
-    m_transaction->m_collections.store("MULTIPART_UNMATCHED_BOUNDARY",
-        std::to_string(m_flag_unmatched_boundary));
+    m_transaction->m_variableMultipartUnmatchedBoundary.set(
+        std::to_string(m_flag_unmatched_boundary),
+        m_transaction->m_variableOffset);
 
     m_transaction->m_collections.store("MULTIPART_DATA_BEFORE",
         std::to_string(m_flag_data_before));
@@ -868,8 +869,9 @@ int Multipart::multipart_complete(std::string *error) {
         debug(4, "Multipart: Warning: seen data before first boundary.");
     }
 
-    m_transaction->m_collections.store("MULTIPART_DATA_AFTER",
-        std::to_string(m_flag_data_after));
+    m_transaction->m_variableMultipartDataAfter.set(
+        std::to_string(m_flag_data_after),
+        m_transaction->m_variableOffset);
     if (m_flag_data_after) {
         debug(4, "Multipart: Warning: seen data after last boundary.");
     }
@@ -886,8 +888,9 @@ int Multipart::multipart_complete(std::string *error) {
         debug(4, "Multipart: Warning: boundary whitespace in C-T header.");
     }
 
-    m_transaction->m_collections.store("MULTIPART_HEADER_FOLDING",
-        std::to_string(m_flag_header_folding));
+    m_transaction->m_variableMultipartHeaderFolding.set(
+        std::to_string(m_flag_header_folding),
+        m_transaction->m_variableOffset);
     if (m_flag_header_folding) {
         debug(4, "Multipart: Warning: header folding used.");
     }
@@ -896,8 +899,9 @@ int Multipart::multipart_complete(std::string *error) {
         std::to_string(m_flag_crlf_line));
     m_transaction->m_collections.store("MULTIPART_LF_LINE",
         std::to_string(m_flag_lf_line));
-    m_transaction->m_collections.store("MULTIPART_CRLF_LF_LINES",
-        std::to_string(m_flag_crlf_line && m_flag_lf_line));
+    m_transaction->m_variableMultipartCrlfLFLines.set(
+        std::to_string(m_flag_crlf_line && m_flag_lf_line),
+        m_transaction->m_variableOffset);
     if (m_flag_crlf_line && m_flag_lf_line) {
         debug(4, "Multipart: Warning: mixed line endings used (CRLF/LF).");
     } else if (m_flag_lf_line) {
@@ -910,8 +914,9 @@ int Multipart::multipart_complete(std::string *error) {
         debug(4, "Multipart: Warning: missing semicolon in C-T header.");
     }
 
-    m_transaction->m_collections.store("MULTIPART_INVALID_QUOTING",
-        std::to_string(m_flag_invalid_quoting));
+    m_transaction->m_variableMultipartInvalidQuoting.set(
+        std::to_string(m_flag_invalid_quoting),
+        m_transaction->m_variableOffset);
     if (m_flag_invalid_quoting) {
         debug(4, "Multipart: Warning: invalid quoting used.");
     }
@@ -922,20 +927,21 @@ int Multipart::multipart_complete(std::string *error) {
         debug(4, "Multipart: Warning: invalid part parsing.");
     }
 
-    m_transaction->m_collections.store("MULTIPART_INVALID_HEADER_FOLDING",
-        std::to_string(m_flag_invalid_header_folding));
+    m_transaction->m_variableMultipartInvalidHeaderFolding.set(
+        std::to_string(m_flag_invalid_header_folding),
+        m_transaction->m_variableOffset);
     if (m_flag_invalid_header_folding) {
         debug(4, "Multipart: Warning: invalid header folding used.");
     }
 
-    m_transaction->m_collections.store("MULTIPART_STRICT_ERROR",
+    m_transaction->m_variableMultipartStrictError.set(
         std::to_string(m_flag_error || m_flag_boundary_quoted != 0
         || m_flag_boundary_whitespace != 0 || m_flag_data_before != 0
         || m_flag_data_after != 0 || m_flag_header_folding != 0
         || m_flag_lf_line != 0 || m_flag_missing_semicolon != 0
         || m_flag_invalid_quoting != 0 || m_flag_invalid_part != 0
         || m_flag_invalid_header_folding != 0
-        || m_flag_file_limit_exceeded != 0));
+        || m_flag_file_limit_exceeded != 0), m_transaction->m_variableOffset);
 
 
     if ((m_seen_data != 0) && (m_is_complete == 0)) {
@@ -1031,8 +1037,9 @@ int Multipart::multipart_complete(std::string *error) {
             std::to_string(m_transaction->->m_ARGScombinedSize));
 #endif
     }
-    m_transaction->m_collections.store("FILES_COMBINED_SIZE",
-        std::to_string(file_combined_size));
+    m_transaction->m_variableFilesCombinedSize.set(
+        std::to_string(file_combined_size),
+        m_transaction->m_variableOffset);
 
     return true;
 }

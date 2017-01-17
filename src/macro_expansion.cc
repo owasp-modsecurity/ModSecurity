@@ -66,7 +66,11 @@ std::string MacroExpansion::expand(const std::string& input,
         std::string *variableValue = NULL;
         size_t collection = variable.find(".");
         if (collection == std::string::npos) {
-            variableValue = transaction->m_collections.resolveFirst(variable);
+            if (utils::string::toupper(variable) == "MATCHED_VAR") {
+                variableValue = transaction->m_variableMatchedVar.evaluate();
+            } else {
+                variableValue = transaction->m_collections.resolveFirst(variable);
+            }
         } else {
             std::string col = std::string(variable, 0, collection);
             std::string var = std::string(variable, collection + 1,

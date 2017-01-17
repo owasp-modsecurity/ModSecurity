@@ -38,7 +38,7 @@ class XML : public Variable {
 
     void evaluateInternal(Transaction *transaction,
         Rule *rule,
-        std::vector<const collection::Variable *> *l) override;
+        std::vector<const collection::Variable *> *l);
     std::string m_plain;
 };
 

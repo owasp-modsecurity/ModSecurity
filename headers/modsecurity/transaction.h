@@ -117,15 +117,133 @@ class AnchoredVariable {
         l->push_back(new collection::Variable(&m_name,
             &m_value));
     }
+
+    std::string *evaluate() {
+        if (m_value.empty() == true) {
+            return NULL;
+        }
+        return &m_value;
+    }
 };
 
 
 class TransactionAnchoredVariables {
  public:
     TransactionAnchoredVariables(Transaction *t)
-        : m_variableArgsNames(t, "ARG_NAMES") { }
+        : m_variableArgsNames(t, "ARGS_NAMES"),
+        m_variableArgGetNames(t, "ARGS_GET_NAMES"),
+        m_variableArgPostNames(t, "ARGS_POST_NAMES"),
+        m_variableRequestHeadersNames(t, "REQUEST_HEADERS_NAMES"),
+        m_variableResponseContentType(t, "RESPONSE_CONTENT_TYPE"),
+        m_variableResponseHeadersNames(t, "RESPONSE_HEADERS_NAMES"),
+        m_variableARGScombinedSize(t, "ARGS_COMBINED_SIZE"),
+        m_variableAuthType(t, "AUTH_TYPE"),
+        m_variableFilesCombinedSize(t, "FILES_COMBINED_SIZE"),
+        m_variableFilesTmpNames(t, "FILES_TMPNAMES"),
+        m_variableFullRequest(t, "FULL_REQUEST"),
+        m_variableFullRequestLength(t, "FULL_REQUEST_LENGTH"),
+        m_variableInboundDataError(t, "INBOUND_DATA_ERROR"),
+        m_variableMatchedVar(t, "MATCHED_VAR"),
+        m_variableMatchedVarName(t, "MATCHED_VAR_NAME"),
+        m_variableMultipartCrlfLFLines(t, "MULTIPART_CRLF_LF_LINES"),
+        m_variableMultipartDataAfter(t, "MULTIPART_DATA_AFTER"),
+        m_variableMultipartFileLimitExceeded(t, "MULTIPART_FILE_LIMIT_EXCEEDED"),
+        m_variableMultipartStrictError(t, "MULTIPART_STRICT_ERROR"),
+        m_variableMultipartHeaderFolding(t, "MULTIPART_HEADER_FOLDING"),
+        m_variableMultipartInvalidQuoting(t, "MULTIPART_INVALID_QUOTING"),
+        m_variableMultipartInvalidHeaderFolding(t, "MULTIPART_INVALID_HEADER_FOLDING"),
+        m_variableMultipartUnmatchedBoundary(t, "MULTIPART_UNMATCHED_BOUNDARY"),
+        m_variableOutboundDataError(t, "OUTBOUND_DATA_ERROR"),
+        m_variablePathInfo(t, "PATH_INFO"),
+        m_variableQueryString(t, "QUERY_STRING"),
+        m_variableRemoteAddr(t, "REMOTE_ADDR"),
+        m_variableRemoteHost(t, "REMOTE_HOST"),
+        m_variableRemotePort(t, "REMOTE_PORT"),
+        m_variableReqbodyError(t, "REQBODY_ERROR"),
+        m_variableReqbodyErrorMsg(t, "REQBODY_ERROR_MSG"),
+        m_variableReqbodyProcessorErrorMsg(t, "REQBODY_PROCESSOR_ERROR_MSG"),
+        m_variableReqbodyProcessorError(t, "REQBODY_PROCESSOR_ERROR"),
+        m_variableReqbodyProcessor(t, "REQBODY_PROCESSOR"),
+        m_variableRequestBasename(t, "REQUEST_BASENAME"),
+        m_variableRequestBody(t, "REQUEST_BODY"),
+        m_variableRequestBodyLength(t, "REQUEST_BODY_LENGTH"),
+        m_variableRequestFilename(t, "REQUEST_FILENAME"),
+        m_variableRequestLine(t, "REQUEST_LINE"),
+        m_variableRequestMethod(t, "REQUEST_METHOD"),
+        m_variableRequestProtocol(t, "REQUEST_PROTOCOL"),
+        m_variableRequestURI(t, "REQUEST_URI"),
+        m_variableRequestURIRaw(t, "REQUEST_URI_RAW"),
+        m_variableResource(t, "RESOURCE"),
+        m_variableResponseBody(t, "RESPONSE_BODY"),
+        m_variableResponseContentLength(t, "RESPONSE_CONTENT_LENGTH"),
+        m_variableResponseProtocol(t, "RESPONSE_PROTOCOL"),
+        m_variableResponseStatus(t, "RESPONSE_STATUS"),
+        m_variableServerAddr(t, "SERVER_ADDR"),
+        m_variableServerName(t, "SERVER_NAME"),
+        m_variableServerPort(t, "SERVER_PORT"),
+        m_variableSessionID(t, "SESSIONID"),
+        m_variableUniqueID(t, "UNIQUE_ID"),
+        m_variableUrlEncodedError(t, "URLENCODED_ERROR"),
+        m_variableUserID(t, "USERID")
+        { }
 
     AnchoredVariable m_variableArgsNames;
+    AnchoredVariable m_variableArgGetNames;
+    AnchoredVariable m_variableArgPostNames;
+    AnchoredVariable m_variableRequestHeadersNames;
+    AnchoredVariable m_variableResponseContentType;
+    AnchoredVariable m_variableResponseHeadersNames;
+    AnchoredVariable m_variableARGScombinedSize;
+    AnchoredVariable m_variableAuthType;
+    AnchoredVariable m_variableFilesCombinedSize;
+    AnchoredVariable m_variableFilesTmpNames;
+    AnchoredVariable m_variableFullRequest;
+    AnchoredVariable m_variableFullRequestLength;
+    AnchoredVariable m_variableInboundDataError;
+    AnchoredVariable m_variableMatchedVar;
+    AnchoredVariable m_variableMatchedVarName;
+    AnchoredVariable m_variableMultipartCrlfLFLines;
+    AnchoredVariable m_variableMultipartDataAfter;
+    AnchoredVariable m_variableMultipartFileLimitExceeded;
+    AnchoredVariable m_variableMultipartStrictError;
+    AnchoredVariable m_variableMultipartHeaderFolding;
+    AnchoredVariable m_variableMultipartInvalidQuoting;
+    AnchoredVariable m_variableMultipartInvalidHeaderFolding;
+    AnchoredVariable m_variableMultipartUnmatchedBoundary;
+    AnchoredVariable m_variableOutboundDataError;
+    AnchoredVariable m_variablePathInfo;
+    AnchoredVariable m_variableQueryString;
+    AnchoredVariable m_variableRemoteAddr;
+    AnchoredVariable m_variableRemoteHost;
+    AnchoredVariable m_variableRemotePort;
+    AnchoredVariable m_variableReqbodyError;
+    AnchoredVariable m_variableReqbodyErrorMsg;
+    AnchoredVariable m_variableReqbodyProcessorError;
+    AnchoredVariable m_variableReqbodyProcessorErrorMsg;
+    AnchoredVariable m_variableReqbodyProcessor;
+    AnchoredVariable m_variableRequestBasename;
+    AnchoredVariable m_variableRequestBody;
+    AnchoredVariable m_variableRequestBodyLength;
+    AnchoredVariable m_variableRequestFilename;
+    AnchoredVariable m_variableRequestLine;
+    AnchoredVariable m_variableRequestMethod;
+    AnchoredVariable m_variableRequestProtocol;
+    AnchoredVariable m_variableRequestURI;
+    AnchoredVariable m_variableRequestURIRaw;
+    AnchoredVariable m_variableResource;
+    AnchoredVariable m_variableResponseBody;
+    AnchoredVariable m_variableResponseContentLength;
+    AnchoredVariable m_variableResponseProtocol;
+    AnchoredVariable m_variableResponseStatus;
+    AnchoredVariable m_variableServerAddr;
+    AnchoredVariable m_variableServerName;
+    AnchoredVariable m_variableServerPort;
+    AnchoredVariable m_variableSessionID;
+    AnchoredVariable m_variableUniqueID;
+    AnchoredVariable m_variableUrlEncodedError;
+    AnchoredVariable m_variableUserID;
+
+    int m_variableOffset;
 };
 
 
@@ -254,7 +372,7 @@ class Transaction : public TransactionAnchoredVariables {
      * Holds the combined size of all arguments, later used to fill the
      * variable  ARGS_COMBINED_SIZE.
      */
-    double m_ARGScombinedSize;
+    double m_ARGScombinedSizeDouble;
 
     /**
      * Client tcp port.
@@ -418,13 +536,6 @@ class Transaction : public TransactionAnchoredVariables {
     std::string m_variableTimeYear;
 
  private:
-    std::string *m_ARGScombinedSizeStr;
-    std::string *m_namesArgsGet;
-    std::string *m_namesArgsPost;
-    std::string *m_requestHeadersNames;
-    std::string *m_responseContentType;
-    std::string *m_responseHeadersNames;
-
     /**
      * Pointer to the callback function that will be called to fill
      * the web server (connector) log.

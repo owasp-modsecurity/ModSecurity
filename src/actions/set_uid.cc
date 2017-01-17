@@ -49,7 +49,7 @@ bool SetUID::evaluate(Rule *rule, Transaction *t) {
 #endif
 
     t->m_collections.m_user_collection_key = colNameExpanded;
-    t->m_collections.storeOrUpdateFirst("USERID", colNameExpanded);
+    t->m_variableUserID.set(colNameExpanded, t->m_variableOffset);
 
     return true;
 }
