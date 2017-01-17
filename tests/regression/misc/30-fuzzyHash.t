@@ -108,7 +108,7 @@ SecRule REQBODY_ERROR \"!\@eq 0\" \
 		status => qr/^200$/,
 	},
 	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/index.html",
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 		[
 			"Content-Type" => "application/x-www-form-urlencoded",
 		],
