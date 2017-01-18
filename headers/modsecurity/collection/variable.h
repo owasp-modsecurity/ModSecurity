@@ -33,10 +33,16 @@ namespace collection {
 
 class Variable {
  public:
+    Variable(const std::string *key) :
+        m_key(key),
+        m_value(),
+        m_dynamic_value(false),
+        m_dynamic(false) { }
     Variable(const std::string *key, const std::string *value) :
         m_key(key),
         m_value(value),
-        m_dynamic_value(false) { }
+        m_dynamic_value(false),
+        m_dynamic(false) { }
 
     ~Variable() {
         if (m_dynamic_value) {
@@ -47,6 +53,7 @@ class Variable {
     const std::string *m_key;
     const std::string *m_value;
     bool m_dynamic_value;
+    bool m_dynamic;
 };
 
 }  // namespace collection

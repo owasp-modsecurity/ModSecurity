@@ -420,8 +420,10 @@ std::vector<const collection::Variable *> Rule::getFinalVars(
                 trasn->debug(9, "Variable: " + *key +
                     " is part of the exclusion list, skipping...");
 #endif
-                delete v;
-                v = NULL;
+                if (v->m_dynamic) {
+                    delete v;
+                    v = NULL;
+                }
                 continue;
             }
 
@@ -439,8 +441,10 @@ std::vector<const collection::Variable *> Rule::getFinalVars(
                 }
             }
             if (ignoreVariable) {
-                delete v;
-                v = NULL;
+                if (v->m_dynamic) {
+                    delete v;
+                    v = NULL;
+                }
                 continue;
             }
 
@@ -458,8 +462,10 @@ std::vector<const collection::Variable *> Rule::getFinalVars(
                 }
             }
             if (ignoreVariable) {
-                delete v;
-                v = NULL;
+                if (v->m_dynamic) {
+                    delete v;
+                    v = NULL;
+                }
                 continue;
             }
 
@@ -636,7 +642,9 @@ end_clean:
     while (finalVars.empty() == false) {
         auto *a = finalVars.back();
         finalVars.pop_back();
-        delete a;
+        if (a->m_dynamic) {
+            delete a;
+        }
     }
 
     return false;
@@ -654,7 +662,9 @@ end_exec:
     while (finalVars.empty() == false) {
         auto *a = finalVars.back();
         finalVars.pop_back();
-        delete a;
+        if (a->m_dynamic) {
+            delete a;
+        }
     }
 
     return true;
