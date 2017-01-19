@@ -34,6 +34,7 @@
 namespace modsecurity {
 namespace utils {
 
+#define MODSEC_SM_SHF_SIGNATURE        "m0d$shf"
 
 msc_file_handler_t *SharedFiles::find_handler(
     const std::string &fileName) {
@@ -50,14 +51,20 @@ msc_file_handler_t *SharedFiles::find_handler(
 
 
 msc_file_handler_t *SharedFiles::add_new_handler(
-    const std::string &fileName, std::string *error) {
+    const std::string &fileName, std::string *error, int pinc) {
     msc_file_handler_t *current = m_first;
     int shm_id;
     key_t mem_key_structure;
     key_t mem_key_file_name;
     msc_file_handler_t *new_debug_log;
     char *shm_ptr2;
+    char memsign[] = MODSEC_SM_SHF_SIGNATURE;
     FILE *fp;
+
+    if (pinc > 10) {
+        /* recursion protection */
+        return NULL;
+    }
 
     fp = fopen(fileName.c_str(), "a");
     if (fp == NULL) {
@@ -65,14 +72,14 @@ msc_file_handler_t *SharedFiles::add_new_handler(
         goto err_fh;
     }
 
-    mem_key_structure = ftok(fileName.c_str(), 1);
+    mem_key_structure = ftok(fileName.c_str(), pinc);
     if (mem_key_structure < 0) {
         error->assign("Failed to select key for the shared memory (1): ");
         error->append(strerror(errno));
         goto err_mem_key;
     }
 
-    mem_key_file_name = ftok(fileName.c_str(), 2);
+    mem_key_file_name = ftok(fileName.c_str(), pinc+1);
     if (mem_key_file_name < 0) {
         error->assign("Failed to select key for the shared memory (2): ");
         error->append(strerror(errno));
@@ -94,6 +101,15 @@ msc_file_handler_t *SharedFiles::add_new_handler(
         error->append(strerror(errno));
         goto err_shmat1;
     }
+
+    /* there's a crash scenario when add_new_handler(), described in src/debug_log/debug_log_writer.cc */
+    if (memcmp(new_debug_log->signature, memsign, strlen(memsign)) == 0) {
+        /* if shared memory block is in use, try allocating with another project_id in ftok() */
+        fclose(fp);
+        shmdt(new_debug_log);
+        return add_new_handler(fileName, error, pinc+2);
+    }
+
     memset(new_debug_log, '\0', sizeof(msc_file_handler_t));
 
     pthread_mutex_init(&new_debug_log->lock, NULL);
@@ -120,6 +136,9 @@ msc_file_handler_t *SharedFiles::add_new_handler(
     shm_ptr2[fileName.size()] = '\0';
 
     new_debug_log->file_name = shm_ptr2;
+
+    /* populate 'shared block in-use' signature */
+    memcpy(new_debug_log->signature, memsign, sizeof(new_debug_log->signature));
 
     if (m_first == NULL) {
         m_first = new_debug_log;
@@ -156,7 +175,7 @@ err_fh:
 bool SharedFiles::open(const std::string& fileName, std::string *error) {
     msc_file_handler_t *a = find_handler(fileName);
     if (a == NULL) {
-        a = add_new_handler(fileName, error);
+        a = add_new_handler(fileName, error, 1);
         if (error->size() > 0) {
             return false;
         }
