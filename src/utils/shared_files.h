@@ -33,6 +33,7 @@ namespace utils {
 
 
 typedef struct msc_file_handler {
+    char signature[8];
     char *file_name;
     FILE *fp;
     int file_handler;
@@ -59,7 +60,7 @@ class SharedFiles {
  protected:
     msc_file_handler_t *find_handler(const std::string &fileName);
     msc_file_handler_t *add_new_handler(const std::string &fileName,
-        std::string *error);
+        std::string *error, int pinc);
 
  private:
     SharedFiles() : m_first(NULL) { }

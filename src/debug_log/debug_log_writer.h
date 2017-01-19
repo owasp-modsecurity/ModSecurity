@@ -33,6 +33,7 @@ namespace debug_log {
 
 
 typedef struct debug_log_file_handler {
+    char signature[8];
     char *file_name;
     FILE *fp;
     int file_handler;
@@ -60,7 +61,7 @@ class DebugLogWriter {
  protected:
     debug_log_file_handler_t *find_handler(const std::string &fileName);
     debug_log_file_handler_t *add_new_handler(const std::string &fileName,
-        std::string *error);
+        std::string *error, int pinc);
 
  private:
     DebugLogWriter() : m_first(NULL) { }
