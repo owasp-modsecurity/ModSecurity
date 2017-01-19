@@ -60,7 +60,7 @@ msc_file_handler_t *SharedFiles::add_new_handler(
     FILE *fp;
 
     fp = fopen(fileName.c_str(), "a");
-    if (fp == 0) {
+    if (fp == NULL) {
         error->assign("Failed to open file: " + fileName);
         goto err_fh;
     }
@@ -139,14 +139,15 @@ msc_file_handler_t *SharedFiles::add_new_handler(
     }
 
     return new_debug_log;
+
 err_shmget2:
 err_shmat2:
     shmdt(shm_ptr2);
-    fclose(new_debug_log->fp);
 err_shmget1:
 err_shmat1:
     shmdt(new_debug_log);
 err_mem_key:
+    fclose(fp);
 err_fh:
     return NULL;
 }
