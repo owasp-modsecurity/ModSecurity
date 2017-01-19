@@ -16,12 +16,14 @@
 
 #ifdef __cplusplus
 #include <string>
+#include <iostream>
+#include <memory>
 #endif
 
+#include "modsecurity/variable_origin.h"
 
 #ifndef HEADERS_MODSECURITY_COLLECTION_VARIABLE_H_
 #define HEADERS_MODSECURITY_COLLECTION_VARIABLE_H_
-
 
 #ifndef __cplusplus
 typedef struct Variable_t Variable;
@@ -54,6 +56,7 @@ class Variable {
     const std::string *m_value;
     bool m_dynamic_value;
     bool m_dynamic;
+    std::list<std::unique_ptr<VariableOrigin>> m_orign;
 };
 
 }  // namespace collection

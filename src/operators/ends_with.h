@@ -31,7 +31,8 @@ class EndsWith : public Operator {
         : Operator(op, param, negation) { }
     explicit EndsWith(std::string param)
         : Operator("EndsWith", param) { }
-    bool evaluate(Transaction *transaction, const std::string &str) override;
+    bool evaluate(Transaction *transaction, Rule *rule,
+        const std::string &str, RuleMessage *ruleMessage) override;
 };
 
 

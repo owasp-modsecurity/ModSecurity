@@ -31,11 +31,16 @@ namespace Utils {
 
 class SMatch {
  public:
-    SMatch() : size_(0) { }
+    SMatch() : size_(0),
+        m_offset(0),
+        m_length(0),
+        match("") { }
     size_t size() const { return size_; }
     std::string str() const { return match; }
-    int size_;
     std::string match;
+    int size_;
+    int m_offset;
+    int m_length;
 };
 
 

@@ -79,7 +79,7 @@ void Pm::postOrderTraversal(acmp_btree_node_t *node) {
 
 
 bool Pm::evaluate(Transaction *transaction, Rule *rule,
-    const std::string &input) {
+    const std::string &input, RuleMessage *ruleMessage) {
     int rc = 0;
     ACMPT pt;
     pt.parser = m_p;
@@ -89,7 +89,8 @@ bool Pm::evaluate(Transaction *transaction, Rule *rule,
     rc = acmp_process_quick(&pt, &match, input.c_str(), input.length());
     bool capture = rule && rule->getActionsByName("capture").size() > 0;
 
-    if (rc == 1 && transaction) {
+    if (rc > 0 && transaction) {
+        logOffset(ruleMessage, rc, input.size());
         transaction->m_matched.push_back(std::string(match));
     }
 
@@ -100,7 +101,7 @@ bool Pm::evaluate(Transaction *transaction, Rule *rule,
             std::string(match));
     }
 
-    return rc == 1;
+    return rc > 0;
 }
 
 

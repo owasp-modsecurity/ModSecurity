@@ -43,6 +43,7 @@ typedef struct Rules_t Rules;
 #include "modsecurity/collection/collections.h"
 #include "modsecurity/collection/variable.h"
 #include "modsecurity/collection/collection.h"
+#include "modsecurity/variable_origin.h"
 
 #define LOGFY_ADD(a, b) \
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
@@ -86,36 +87,69 @@ class Operator;
 }
 
 
+
+class VariableOriginRequest : public VariableOrigin {
+ public:
+    VariableOriginRequest()
+        : m_length(0),
+        m_offset(0) { }
+
+    std::string toText() {
+#if 0
+        return "Variable origin was extracted straight from " \
+            "request/response, offset: " + std::to_string(m_offset) + \
+            ", length: " + std::to_string(m_length) + ".";
+#else
+        return "rr:" + std::to_string(m_offset) + "," \
+            + std::to_string(m_length);
+#endif
+    }
+
+    int m_length;
+    int m_offset;
+};
+
 class AnchoredVariable {
  public:
     AnchoredVariable(Transaction *t, std::string name)
-        : m_offset(0),
-        m_name(name),
+        : m_name(""),
         m_transaction(t),
-        m_value("") { }
-    size_t m_offset;
-    std::string m_value;
-    Transaction *m_transaction;
-    std::string m_name;
+        m_value("") {
+            m_name.append(name);
+            m_var = new collection::Variable(&m_name);
+            m_var->m_dynamic = false;
+            m_var->m_value = &m_value;
+        }
 
     void set(const std::string &a, size_t offset) {
-        m_value = a;
+        std::unique_ptr<VariableOriginRequest> origin (new VariableOriginRequest());
         m_offset = offset;
+        m_value.assign(a.c_str(), a.size());
+        origin->m_offset = offset;
+        origin->m_length = m_value.size();
+        m_var->m_orign.push_back(std::move(origin));
     }
 
     void append(const std::string &a, size_t offset,
         bool spaceSeparator = false) {
+        std::unique_ptr<VariableOriginRequest> origin (new VariableOriginRequest());
         if (spaceSeparator && !m_value.empty()) {
             m_value.append(" " + a);
         } else {
             m_value.append(a);
         }
         m_offset = offset;
+        origin->m_offset = offset;
+        origin->m_length = a.size();
+        m_var->m_orign.push_back(std::move(origin));
     }
 
     void evaluate(std::vector<const collection::Variable *> *l) {
-        l->push_back(new collection::Variable(&m_name,
-            &m_value));
+        if (m_name.empty() || m_var->m_key == NULL
+            || m_var->m_value == NULL || m_var->m_key->empty()) {
+            return;
+        }
+        l->push_back(m_var);
     }
 
     std::string *evaluate() {
@@ -124,6 +158,12 @@ class AnchoredVariable {
         }
         return &m_value;
     }
+
+    int m_offset;
+    std::string m_value;
+    Transaction *m_transaction;
+    std::string m_name;
+    collection::Variable *m_var;
 };
 
 
@@ -310,8 +350,9 @@ class Transaction : public TransactionAnchoredVariables {
     bool intervention(ModSecurityIntervention *it);
 
     bool addArgument(const std::string& orig, const std::string& key,
-        const std::string& value);
-    bool extractArguments(const std::string &orig, const std::string& buf);
+        const std::string& value, size_t offset);
+    bool extractArguments(const std::string &orig, const std::string& buf,
+        size_t offset);
 
     const char *getResponseBody();
     int getResponseBodyLenth();

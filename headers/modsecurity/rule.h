@@ -55,10 +55,15 @@ class Rule {
     std::vector<const collection::Variable *> getFinalVars(Transaction *trasn);
     void executeActionsAfterFullMatch(Transaction *trasn,
         bool containsDisruptive, RuleMessage *ruleMessage);
-    std::vector<std::string *> executeSecDefaultActionTransofrmations(
+    std::list<
+        std::pair<
+            std::unique_ptr<std::string>,
+            std::unique_ptr<std::string>
+        >
+    > executeSecDefaultActionTransofrmations(
         Transaction *trasn, const std::string &value, bool multiMatch);
     bool executeOperatorAt(Transaction *trasn, std::string key,
-        std::string value);
+        std::string value, RuleMessage *rm);
     void executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
         bool *b, RuleMessage *ruleMessage);
     std::string resolveMatchMessage(std::string key, std::string value);

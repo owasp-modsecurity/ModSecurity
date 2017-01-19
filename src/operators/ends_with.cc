@@ -24,13 +24,18 @@ namespace modsecurity {
 namespace operators {
 
 
-bool EndsWith::evaluate(Transaction *transaction, const std::string &input) {
+bool EndsWith::evaluate(Transaction *transaction, Rule *rule,
+    const std::string &input, RuleMessage *ruleMessage) {
     bool ret = false;
     std::string p = MacroExpansion::expand(m_param, transaction);
 
     if (input.length() >= p.length()) {
         ret = (0 == input.compare(input.length() - p.length(),
             p.length(), p));
+        if (ret) {
+            logOffset(ruleMessage, input.length() - p.length(),
+                      p.size());
+        }
     }
 
     return ret;

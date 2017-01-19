@@ -31,7 +31,8 @@ class Within : public Operator {
         : Operator(op, param, negation) { }
     explicit Within(std::string param)
         : Operator("Within", param) { }
-    bool evaluate(Transaction *transaction, const std::string &str);
+    bool evaluate(Transaction *transaction, Rule *rule,
+        const std::string &str, RuleMessage *ruleMessage);
 };
 
 }  // namespace operators

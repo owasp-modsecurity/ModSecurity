@@ -178,10 +178,10 @@ int JSON::addArgument(const std::string& value) {
     }
 
     if (m_data.prefix.empty()) {
-        m_transaction->addArgument("JSON", m_data.current_key, value);
+        m_transaction->addArgument("JSON", m_data.current_key, value, 0);
     } else {
         m_transaction->addArgument("JSON", m_data.prefix + "." + \
-            m_data.current_key, value);
+            m_data.current_key, value, 0);
     }
 
     return 1;

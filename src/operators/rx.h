@@ -51,11 +51,15 @@ class Rx : public Operator {
         delete m_re;
     }
     bool evaluate(Transaction *transaction, Rule *rule,
-        const std::string &input) override;
+        const std::string &input) override {
+        return evaluate(transaction, NULL, input, NULL);
+    }
     bool evaluate(Transaction *transaction,
         const std::string &input) override {
         return evaluate(transaction, NULL, input);
     }
+    bool evaluate(Transaction *transaction, Rule *rule,
+        const std::string& input, RuleMessage *ruleMessage) override;
 
  private:
     Regex *m_re;

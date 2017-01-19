@@ -109,8 +109,8 @@ bool ValidateByteRange::init(const std::string &file,
 }
 
 
-bool ValidateByteRange::evaluate(Transaction *transaction,
-    const std::string &input) {
+bool ValidateByteRange::evaluate(Transaction *transaction, Rule *rule,
+    const std::string &input, RuleMessage *ruleMessage) {
     bool ret = true;
 
     size_t count = 0;
@@ -119,6 +119,7 @@ bool ValidateByteRange::evaluate(Transaction *transaction,
         if (!(table[x >> 3] & (1 << (x & 0x7)))) {
             // debug(9, "Value " + std::to_string(x) + " in " +
             //     input + " ouside range: " + param);
+            logOffset(ruleMessage, i, 1);
             count++;
         }
     }

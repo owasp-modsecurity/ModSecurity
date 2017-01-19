@@ -20,7 +20,7 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
-
+#include "modsecurity/rule_message.h"
 
 namespace modsecurity {
 namespace operators {
@@ -62,11 +62,29 @@ class Operator {
     bool evaluateInternal(Transaction *t, const std::string& a);
     bool evaluateInternal(Transaction *t, Rule *rule,
         const std::string& a);
+    bool evaluateInternal(Transaction *t, Rule *rule,
+        const std::string& a, RuleMessage *ruleMessage);
+
 
     virtual bool evaluate(Transaction *transaction, const std::string &str);
     virtual bool evaluate(Transaction *transaction, Rule *rule,
         const std::string &str) {
         return evaluate(transaction, str);
+    }
+    virtual bool evaluate(Transaction *transaction, Rule *rule,
+        const std::string &str, RuleMessage *ruleMessage) {
+        return evaluate(transaction, str);
+    }
+
+    static void logOffset(RuleMessage *ruleMessage, int offset, int len) {
+        if (ruleMessage) {
+            if (ruleMessage->m_reference.empty() == false) {
+                ruleMessage->m_reference.append(";");
+            }
+            ruleMessage->m_reference.append("op:"
+                + std::to_string(offset) + ","
+                + std::to_string(len));
+        }
     }
 
     std::string m_match_message;

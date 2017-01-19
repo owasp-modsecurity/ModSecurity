@@ -91,6 +91,8 @@ std::list<SMatch> Regex::searchAll(const std::string& s) {
             continue;
         }
         match.match = std::string(tmpString, start, len);
+        match.m_offset = start;
+        match.m_length = len;
         retList.push_front(match);
     }
 

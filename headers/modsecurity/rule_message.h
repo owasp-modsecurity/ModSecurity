@@ -67,6 +67,8 @@ class RuleMessage {
     std::string m_rev;
     int m_maturity;
     int m_accuracy;
+    std::string m_reference;
+    std::string m_referenceOp;
 
     std::list<std::string> m_tags;
     std::list<std::string> m_server_logs;

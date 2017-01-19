@@ -224,7 +224,7 @@ int Transaction::processConnection(const char *client, int cPort,
 
 
 bool Transaction::extractArguments(const std::string &orig,
-    const std::string& buf) {
+    const std::string& buf, size_t offset) {
     char sep1 = '&';
     std::vector<std::string> key_value_sets = utils::string::split(buf, sep1);
 
@@ -270,7 +270,8 @@ bool Transaction::extractArguments(const std::string &orig,
         }
 
         addArgument(orig, std::string(reinterpret_cast<char *>(key_c), key_s-1),
-            std::string(reinterpret_cast<char *>(value_c), value_s-1));
+            std::string(reinterpret_cast<char *>(value_c), value_s-1), offset);
+        offset = offset + t.size() + 1;
 
         free(key_c);
         free(value_c);
@@ -281,7 +282,7 @@ bool Transaction::extractArguments(const std::string &orig,
 
 
 bool Transaction::addArgument(const std::string& orig, const std::string& key,
-    const std::string& value) {
+    const std::string& value, size_t offset) {
     debug(4, "Adding request argument (" + orig + "): name \"" + \
                 key + "\", value \"" + value + "\"");
 
@@ -289,12 +290,12 @@ bool Transaction::addArgument(const std::string& orig, const std::string& key,
 
     if (orig == "GET") {
         m_collections.store("ARGS_GET:" + key, value);
-        m_variableArgGetNames.append(key, 0, true);
+        m_variableArgGetNames.append(key, offset, true);
     } else if (orig == "POST") {
         m_collections.store("ARGS_POST:" + key, value);
-        m_variableArgPostNames.append(key, 0, true);
+        m_variableArgPostNames.append(key, offset, true);
     }
-    m_variableArgsNames.append(key, 0, true);
+    m_variableArgsNames.append(key, offset, true);
 
     m_ARGScombinedSizeDouble = m_ARGScombinedSizeDouble + \
         key.length() + value.length();
@@ -346,6 +347,7 @@ int Transaction::processURI(const char *uri, const char *method,
 
     m_variableRequestLine.set(std::string(method) + " " + std::string(uri)
         + " HTTP/" + std::string(http_version), m_variableOffset);
+    m_variableOffset = m_variableRequestLine.m_value.size();
 
     if (pos != std::string::npos) {
         m_uri_no_query_string_decoded = std::string(m_uri_decoded, 0, pos);
@@ -356,7 +358,8 @@ int Transaction::processURI(const char *uri, const char *method,
     if (pos_raw != std::string::npos) {
         std::string qry = std::string(uri_s, pos_raw + 1,
             uri_s.length() - (pos_raw + 1));
-        m_variableQueryString.set(qry, m_variableOffset);
+        m_variableQueryString.set(qry, pos_raw + 1
+            + std::string(method).size() + 1);
     }
 
     std::string path_info;
@@ -405,9 +408,9 @@ int Transaction::processURI(const char *uri, const char *method,
     m_variableRequestURI.set(parsedURI, m_variableOffset);
     m_variableRequestURIRaw.set(uri, m_variableOffset);
 
-    if (pos != std::string::npos && (m_uri_decoded.length() - pos) > 2) {
-        extractArguments("GET", std::string(uri_s, pos_raw + 1,
-            uri_s.length() - (pos_raw + 1)));
+    if (m_variableQueryString.m_value.empty() == false) {
+        extractArguments("GET", m_variableQueryString.m_value,
+            m_variableQueryString.m_offset);
     }
     return true;
 }
@@ -679,7 +682,7 @@ int Transaction::processRequestBody() {
             m_variableReqbodyProcessorError.set("0", m_variableOffset);
         }
     } else if (m_requestBodyType == WWWFormUrlEncoded) {
-        extractArguments("POST", m_requestBody.str());
+        extractArguments("POST", m_requestBody.str(), 0);
     } else if (m_collections.resolveFirst(
             "REQUEST_HEADERS:Content-Type") != NULL) {
         std::string *a = m_collections.resolveFirst(

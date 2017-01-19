@@ -182,8 +182,8 @@ void Rule::updateMatchedVars(Transaction *trasn, std::string key,
 
 void Rule::cleanMatchedVars(Transaction *trasn) {
     trasn->debug(4, "Matched vars cleaned.");
-    trasn->m_collections.storeOrUpdateFirst("MATCHED_VAR", "");
     trasn->m_variableMatchedVar.set("", trasn->m_variableOffset);
+    trasn->m_variableMatchedVarName.set("", trasn->m_variableOffset);
     trasn->m_collections.del("MATCHED_VARS_NAME");
     trasn->m_collections.del("MATCHED_VARS");
     trasn->m_collections.del("MATCHED_VARS_NAMES");
@@ -256,7 +256,7 @@ void Rule::executeActionsIndependentOfChainedRuleResult(Transaction *trasn,
 
 
 bool Rule::executeOperatorAt(Transaction *trasn, std::string key,
-    std::string value) {
+    std::string value, RuleMessage *ruleMessage) {
 #if MSC_EXEC_CLOCK_ENABLED
     clock_t begin = clock();
     clock_t end;
@@ -268,7 +268,7 @@ bool Rule::executeOperatorAt(Transaction *trasn, std::string key,
             utils::string::toHexIfNeeded(value)) \
             + "\" (Variable: " + key + ")");
 
-    ret = this->op->evaluateInternal(trasn, this, value);
+    ret = this->op->evaluateInternal(trasn, this, value, ruleMessage);
     if (ret == false) {
         return false;
     }
@@ -285,19 +285,32 @@ bool Rule::executeOperatorAt(Transaction *trasn, std::string key,
 
 // FIXME: this should be a list instead of a vector, keeping the but
 // of v2 alive.
-std::vector<std::string *> Rule::executeSecDefaultActionTransofrmations(
+std::list<std::pair<std::unique_ptr<std::string>,
+    std::unique_ptr<std::string>>>
+    Rule::executeSecDefaultActionTransofrmations(
+
     Transaction *trasn, const std::string &in, bool multiMatch) {
     int none = 0;
     int transformations = 0;
-    std::vector<std::string *> ret;
 
-    std::string *value = new std::string(in);
-    std::string *newValue = NULL;
+    std::list<std::pair<std::unique_ptr<std::string>,
+        std::unique_ptr<std::string>>> ret;
 
+
+    std::unique_ptr<std::string> value =
+        std::unique_ptr<std::string>(new std::string(in));
+    std::unique_ptr<std::string> newValue;
+
+    std::unique_ptr<std::string> trans =
+        std::unique_ptr<std::string>(new std::string());
 
     if (multiMatch == true) {
-        ret.push_back(value);
-        ret.push_back(value);
+        ret.push_back(std::make_pair(
+            std::move(value),
+            std::move(trans)));
+        ret.push_back(std::make_pair(
+            std::move(value),
+            std::move(trans)));
     }
 
     for (Action *a : this->m_actionsRuntimePre) {
@@ -313,18 +326,21 @@ std::vector<std::string *> Rule::executeSecDefaultActionTransofrmations(
         for (Action *a : trasn->m_rules->m_defaultActions[this->phase]) {
             if (a->action_kind \
                 == actions::Action::RunTimeBeforeMatchAttemptKind) {
-                newValue = new std::string(a->evaluate(*value, trasn));
+                newValue = std::unique_ptr<std::string>(new std::string(a->evaluate(*value, trasn)));
 
                 if (multiMatch == true) {
                     if (*newValue != *value) {
-                        ret.push_back(newValue);
-                    } else {
-                        delete value;
+                        ret.push_back(std::make_pair(
+                            std::move(newValue),
+                            std::move(trans)));
                     }
-                } else {
-                    delete value;
                 }
-                value = newValue;
+                value = std::move(newValue);
+                if (trans->empty()) {
+                    trans->append(a->m_name);
+                } else {
+                    trans->append("," + a->m_name);
+                }
                 trasn->debug(9, "(SecDefaultAction) T (" + \
                     std::to_string(transformations) + ") " + \
                     a->m_name + ": \"" + \
@@ -336,28 +352,29 @@ std::vector<std::string *> Rule::executeSecDefaultActionTransofrmations(
     }
 
 
-
     for (Action *a : this->m_actionsRuntimePre) {
         if (none == 0) {
-            newValue = new std::string(a->evaluate(*value, trasn));
+            newValue = std::unique_ptr<std::string>(new std::string(a->evaluate(*value, trasn)));
 
             if (multiMatch == true) {
                 if (*value != *newValue) {
-                    ret.push_back(newValue);
-                    value = newValue;
-                } else {
-                    delete value;
+                    ret.push_back(std::make_pair(
+                        std::move(newValue),
+                        std::move(trans)));
+                    value = std::move(newValue);
                 }
-            } else {
-                delete value;
             }
 
-            value = newValue;
+            value = std::move(newValue);
             trasn->debug(9, " T (" + \
                 std::to_string(transformations) + ") " + \
                 a->m_name + ": \"" + \
                 utils::string::limitTo(80, *value) + "\"");
-
+            if (trans->empty()) {
+                trans->append(a->m_name);
+            } else {
+                trans->append("," + a->m_name);
+            }
             transformations++;
         }
         if (a->m_isNone) {
@@ -366,15 +383,18 @@ std::vector<std::string *> Rule::executeSecDefaultActionTransofrmations(
     }
     if (multiMatch == true) {
         // v2 checks the last entry twice. Don't know why.
-        ret.push_back(ret.back());
+        ret.push_back(std::move(ret.back()));
+
         trasn->debug(9, "multiMatch is enabled. " \
             + std::to_string(ret.size()) + \
             " values to be tested.");
-        for (const std::string *a : ret) {
-            trasn->debug(9, " - " + *a);
-        }
+        //for (const std::string *a : ret) {
+        //    trasn->debug(9, " - " + *a);
+        //}
     } else {
-        ret.push_back(value);
+        ret.push_back(std::make_pair(
+            std::move(value),
+            std::move(trans)));
     }
 
     return ret;
@@ -592,24 +612,34 @@ bool Rule::evaluate(Transaction *trasn) {
         const std::string value = *(v->m_value);
         const std::string key = *(v->m_key);
 
-        std::vector<std::string *> values;
+        std::list<std::pair<std::unique_ptr<std::string>,
+            std::unique_ptr<std::string>>> values;
+
         bool multiMatch = getActionsByName("multimatch").size() > 0;
 
         values = executeSecDefaultActionTransofrmations(trasn, value,
             multiMatch);
-
-        for (const std::string *valueTemp : values) {
+        for (const auto &valueTemp : values) {
             bool ret;
+            std::string valueAfterTrans = std::move(*valueTemp.first);
 
-            ret = executeOperatorAt(trasn, key, *valueTemp);
+            ret = executeOperatorAt(trasn, key, valueAfterTrans, &ruleMessage);
+
             if (ret == true) {
                 ruleMessage.m_match = resolveMatchMessage(key, value);
+                for (auto &i : v->m_orign) {
+                    if (ruleMessage.m_reference.empty()) {
+                        ruleMessage.m_reference.append(i->toText());
+                    } else {
+                        ruleMessage.m_reference.append(";" + i->toText());
+                    }
+                }
+                ruleMessage.m_reference.append("-" + *valueTemp.second);
                 updateMatchedVars(trasn, key, value);
                 executeActionsIndependentOfChainedRuleResult(trasn,
                     &containsDisruptive, &ruleMessage);
                 globalRet = true;
             }
-            delete valueTemp;
         }
     }
 

@@ -21,6 +21,7 @@
 #include "src/operators/operator.h"
 #include "src/macro_expansion.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rule_message.h"
 
 namespace modsecurity {
 namespace operators {
@@ -28,7 +29,7 @@ namespace operators {
 
 
 bool Rx::evaluate(Transaction *transaction, Rule *rule,
-    const std::string& input) {
+    const std::string& input, RuleMessage *ruleMessage) {
     SMatch match;
     std::list<SMatch> matches;
 
@@ -48,6 +49,10 @@ bool Rx::evaluate(Transaction *transaction, Rule *rule,
             transaction->m_matched.push_back(a.match);
             i++;
         }
+    }
+
+    for (const auto & i : matches) {
+        logOffset(ruleMessage, i.m_offset, i.m_length);
     }
 
     if (matches.size() > 0) {

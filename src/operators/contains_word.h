@@ -19,7 +19,7 @@
 #include <string>
 
 #include "src/operators/operator.h"
-
+#include "modsecurity/rule_message.h"
 
 namespace modsecurity {
 namespace operators {
@@ -31,7 +31,8 @@ class ContainsWord : public Operator {
         : Operator(op, param, negation) { }
     explicit ContainsWord(std::string param)
         : Operator("ContainsWord", param) { }
-    bool evaluate(Transaction *transaction, const std::string &str);
+    bool evaluate(Transaction *transaction, Rule *rule,
+        const std::string &str, RuleMessage *ruleMessage) override;
 
     bool acceptableChar(const std::string& a, size_t pos);
 };

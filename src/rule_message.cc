@@ -49,6 +49,7 @@ std::string RuleMessage::disruptiveErrorLog(Transaction *trans,
         + "\"]");
     msg.append(" [uri \"" + trans->m_uri_no_query_string_decoded + "\"]");
     msg.append(" [unique_id \"" + trans->m_id + "\"]");
+    msg.append(" [ref \"" + m_reference + "\"]");
 
     return modsecurity::utils::string::toHexIfNeeded(msg);
 }
@@ -73,6 +74,7 @@ std::string RuleMessage::noClientErrorLog(Transaction *trans) {
     for (auto &a : m_tags) {
         msg.append(" [tag \"" + a + "\"]");
     }
+    msg.append(" [ref \"" + m_reference + "\"]");
 
     return modsecurity::utils::string::toHexIfNeeded(msg);
 }

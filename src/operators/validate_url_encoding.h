@@ -32,8 +32,10 @@ class ValidateUrlEncoding : public Operator {
     ValidateUrlEncoding()
         : Operator("ValidateUrlEncoding") { }
 
-    bool evaluate(Transaction *transaction, const std::string &input) override;
-    int validate_url_encoding(const char *input, uint64_t input_length);
+    bool evaluate(Transaction *transaction, Rule *rule,
+        const std::string &input, RuleMessage *ruleMessage) override;
+    int validate_url_encoding(const char *input, uint64_t input_length,
+        size_t *offset);
 };
 
 }  // namespace operators

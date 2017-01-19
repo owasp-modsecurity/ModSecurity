@@ -530,6 +530,7 @@ int acmp_process_quick(ACMPT *acmpt, const char **match, const char *data, size_
     ACMP *parser;
     acmp_node_t *node, *go_to;
     const char *end;
+    int offset = 0;
 
     if (acmpt->parser->is_failtree_done == 0) {
         acmp_prepare(acmpt->parser);
@@ -551,7 +552,7 @@ int acmp_process_quick(ACMPT *acmpt, const char **match, const char *data, size_
             if (go_to != NULL) {
                 if (go_to->is_last) {
                     *match = go_to->text;
-                    return 1;
+                    return offset;
                 }
             }
             if (node == parser->root_node) break;
@@ -562,8 +563,9 @@ int acmp_process_quick(ACMPT *acmpt, const char **match, const char *data, size_
         /* If node has o_match, then we found a pattern */
         if (node->o_match != NULL) {
             *match = node->text;
-            return 1;
+            return offset;
         }
+        offset++;
     }
     acmpt->ptr = node;
     return 0;

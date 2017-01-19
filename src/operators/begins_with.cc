@@ -24,7 +24,8 @@ namespace modsecurity {
 namespace operators {
 
 
-bool BeginsWith::evaluate(Transaction *transaction, const std::string &str) {
+bool BeginsWith::evaluate(Transaction *transaction, Rule *rule,
+    const std::string &str, RuleMessage *ruleMessage) {
     bool ret = false;
 
     std::string p = MacroExpansion::expand(m_param, transaction);
@@ -32,6 +33,7 @@ bool BeginsWith::evaluate(Transaction *transaction, const std::string &str) {
     if (str.size() < p.size()) {
         ret = false;
     } else if (!str.compare(0, p.size(), p)) {
+        logOffset(ruleMessage, 0, p.size());
         ret = true;
     }
 

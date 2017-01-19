@@ -24,8 +24,9 @@ namespace operators {
 
 
 int ValidateUrlEncoding::validate_url_encoding(const char *input,
-    uint64_t input_length) {
+    uint64_t input_length, size_t *offset) {
     int i;
+    *offset = 0;
 
     if ((input == NULL) || (input_length <= 0)) {
         return -1;
@@ -35,6 +36,7 @@ int ValidateUrlEncoding::validate_url_encoding(const char *input,
     while (i < input_length) {
         if (input[i] == '%') {
             if (i + 2 >= input_length) {
+                *offset = i;
                 /* Not enough bytes. */
                 return -3;
             } else {
@@ -53,6 +55,7 @@ int ValidateUrlEncoding::validate_url_encoding(const char *input,
                     i += 3;
                 } else {
                     /* Non-hexadecimal characters used in encoding. */
+                    *offset = i;
                     return -2;
                 }
             }
@@ -65,15 +68,16 @@ int ValidateUrlEncoding::validate_url_encoding(const char *input,
 }
 
 
-bool ValidateUrlEncoding::evaluate(Transaction *transaction,
-    const std::string &input) {
+bool ValidateUrlEncoding::evaluate(Transaction *transaction, Rule *rule,
+    const std::string &input, RuleMessage *ruleMessage) {
+    size_t offset = 0;
     bool res = false;
 
     if (input.empty() == true) {
         return res;
     }
 
-    int rc = validate_url_encoding(input.c_str(), input.size());
+    int rc = validate_url_encoding(input.c_str(), input.size(), &offset);
     switch (rc) {
         case 1 :
             /* Encoding is valid */
@@ -90,6 +94,7 @@ bool ValidateUrlEncoding::evaluate(Transaction *transaction,
                 transaction->debug(7, "Invalid URL Encoding: Non-hexadecimal "
                     "digits used at '" + input + "'");
 #endif
+                logOffset(ruleMessage, offset, input.size());
             }
             res = true; /* Invalid match. */
             break;
@@ -99,6 +104,7 @@ bool ValidateUrlEncoding::evaluate(Transaction *transaction,
                 transaction->debug(7, "Invalid URL Encoding: Not enough " \
                 "characters at the end of input at '" + input + "'");
 #endif
+                logOffset(ruleMessage, offset, input.size());
             }
             res = true; /* Invalid match. */
             break;
@@ -110,6 +116,7 @@ bool ValidateUrlEncoding::evaluate(Transaction *transaction,
                     "Error (rc = " + std::to_string(rc) + ") at '" +
                     input + "'");
 #endif
+                logOffset(ruleMessage, offset, input.size());
             }
             res = true;
             break;

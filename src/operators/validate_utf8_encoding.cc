@@ -113,8 +113,8 @@ int ValidateUtf8Encoding::detect_utf8_character(
     return unicode_len;
 }
 
-bool ValidateUtf8Encoding::evaluate(Transaction *transaction,
-    const std::string &str) {
+bool ValidateUtf8Encoding::evaluate(Transaction *transaction, Rule *rule,
+    const std::string &str, RuleMessage *ruleMessage) {
     unsigned int i, bytes_left;
 
     const char *str_c = str.c_str();
@@ -143,6 +143,7 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction,
                         "at " + str + ". [offset \"" +
                         std::to_string(i) + "\"]");
 #endif
+                    logOffset(ruleMessage, i, str.size());
                 }
                 return true;
                 break;
@@ -154,6 +155,7 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction,
                         "at " + str + ". [offset \"" +
                         std::to_string(i) + "\"]");
 #endif
+                    logOffset(ruleMessage, i, str.size());
                 }
                 return true;
                 break;
@@ -165,6 +167,7 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction,
                         "at " + str + ". [offset \"" +
                         std::to_string(i) + "\"]");
 #endif
+                    logOffset(ruleMessage, i, str.size());
                 }
                 return true;
                 break;
@@ -175,6 +178,7 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction,
                         "at " + str + ". [offset \"" +
                         std::to_string(i) + "\"]");
 #endif
+                    logOffset(ruleMessage, i, str.size());
                 }
                 return true;
                 break;
@@ -187,6 +191,7 @@ bool ValidateUtf8Encoding::evaluate(Transaction *transaction,
                     "at " + str + ". [offset \"" +
                     std::to_string(i) + "\"]");
 #endif
+                logOffset(ruleMessage, i, str.size());
             }
             return true;
         }

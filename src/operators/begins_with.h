@@ -32,7 +32,8 @@ class BeginsWith : public Operator {
     explicit BeginsWith(std::string param)
         : Operator("BeginsWith", param) { }
 
-    bool evaluate(Transaction *transaction, const std::string &str) override;
+    bool evaluate(Transaction *transaction, Rule *rule, const std::string &str,
+        RuleMessage *ruleMessage) override;
 };
 
 }  // namespace operators
