@@ -30,6 +30,8 @@ class PmFromFile : public Pm {
     /** @ingroup ModSecurity_Operator */
     PmFromFile(std::string op, std::string param, bool negation)
         : Pm(op, param, negation) { }
+    PmFromFile(std::string op, std::string param)
+        : Pm(op, param) { }
     explicit PmFromFile(std::string param)
         : Pm("PmFromFile", param) { }
     bool init(const std::string &file, std::string *error) override;

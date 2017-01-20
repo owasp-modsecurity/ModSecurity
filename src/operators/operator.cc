@@ -21,6 +21,7 @@
 
 #include "modsecurity/transaction.h"
 
+#include "src/utils/string.h"
 #include "src/operators/begins_with.h"
 #include "src/operators/contains.h"
 #include "src/operators/contains_word.h"
@@ -113,105 +114,67 @@ bool Operator::evaluate(Transaction *transaction, const std::string& a) {
     if (transaction) {
         transaction->debug(2, "Operator: " + this->m_op + \
             " is not implemented or malfunctioning.");
-    } else {
-        std::cerr << "Operator: " + this->m_op + \
-            " is not implemented or malfunctioning.";
     }
 #endif
 
     return true;
 }
 
-Operator *Operator::instantiate(std::string op_string) {
-    // Sanity check.
-    if (op_string.size() <= 2) {
-        return NULL;
-    }
+Operator *Operator::instantiate(std::string op, std::string param) {
+    std::string op_ = utils::string::tolower(op);
 
-    std::string op = op_string;
-    op = op.substr(1, op_string.size() - 2);
-
-    // We assume no negation by default
-    bool negation = false;
-    // If there is a '!' in front substring and assign negation
-    if (op.at(0) == '!') {
-       op = op.substr(1, op.size() - 1);
-       negation = true;
-    }
-
-    // Check to see if there is a parameter, if not param is an empty string
-    std::string param = "";
-    if (op.find(" ") != std::string::npos) {
-        param = op;
-        param.erase(0, param.find(" ") + 1);
-        op.erase(op.find(" "),
-            op.length() - op.find(" "));
-    }
-
-    for (std::basic_string<char>::iterator p = op.begin();
-        p != op.end(); ++p) {
-       *p = tolower(*p);
-    }
-    std::string op_ = op;
-    if (op_.length() > 2) {
-        op_.erase(0, 1);
-        if (op_.back() == ' ') {
-            op_.pop_back();
-        }
-    }
-
-    IF_MATCH(beginswith) { return new BeginsWith(op, param, negation); }
-    IF_MATCH(contains) { return new Contains(op, param, negation); }
-    IF_MATCH(containsword) { return new ContainsWord(op, param, negation); }
-    IF_MATCH(detectsqli) { return new DetectSQLi(op, param, negation); }
-    IF_MATCH(detectxss) { return new DetectXSS(op, param, negation); }
-    IF_MATCH(endswith) { return new EndsWith(op, param, negation); }
-    IF_MATCH(eq) { return new Eq(op, param, negation); }
-    IF_MATCH(fuzzyhash) { return new FuzzyHash(op, param, negation); }
-    IF_MATCH(geolookup) { return new GeoLookup(op, param, negation); }
-    IF_MATCH(ge) { return new Ge(op, param, negation); }
-    IF_MATCH(gsblookup) { return new GsbLookup(op, param, negation); }
-    IF_MATCH(gt) { return new Gt(op, param, negation); }
-    IF_MATCH(inspectfile) { return new InspectFile(op, param, negation); }
-    IF_MATCH(ipmatchf) { return new IpMatchF(op, param, negation); }
+    IF_MATCH(beginswith) { return new BeginsWith(param); }
+    IF_MATCH(contains) { return new Contains(param); }
+    IF_MATCH(containsword) { return new ContainsWord(param); }
+    IF_MATCH(detectsqli) { return new DetectSQLi(); }
+    IF_MATCH(detectxss) { return new DetectXSS(); }
+    IF_MATCH(endswith) { return new EndsWith(param); }
+    IF_MATCH(eq) { return new Eq(param); }
+    IF_MATCH(fuzzyhash) { return new FuzzyHash(param); }
+    IF_MATCH(geolookup) { return new GeoLookup(param); }
+    IF_MATCH(ge) { return new Ge(param); }
+    IF_MATCH(gsblookup) { return new GsbLookup(param); }
+    IF_MATCH(gt) { return new Gt(param); }
+    IF_MATCH(inspectfile) { return new InspectFile(param); }
+    IF_MATCH(ipmatchf) { return new IpMatchF(param); }
     IF_MATCH(ipmatchfromfile) {
-        return new IpMatchFromFile(op, param, negation);
+        return new IpMatchFromFile(param);
     }
-    IF_MATCH(ipmatch) { return new IpMatch(op, param, negation); }
-    IF_MATCH(le) { return new Le(op, param, negation); }
-    IF_MATCH(lt) { return new Lt(op, param, negation); }
-    IF_MATCH(nomatch) { return new NoMatch(op, param, negation); }
-    IF_MATCH(pmf) { return new PmF(op, param, negation); }
-    IF_MATCH(pmfromfile) { return new PmFromFile(op, param, negation); }
-    IF_MATCH(pm) { return new Pm(op, param, negation); }
-    IF_MATCH(rbl) { return new Rbl(op, param, negation); }
-    IF_MATCH(rsub) { return new Rsub(op, param, negation); }
-    IF_MATCH(rx) { return new Rx(op, param, negation); }
-    IF_MATCH(streq) { return new StrEq(op, param, negation); }
-    IF_MATCH(strmatch) { return new StrMatch(op, param, negation); }
+    IF_MATCH(ipmatch) { return new IpMatch(param); }
+    IF_MATCH(le) { return new Le(param); }
+    IF_MATCH(lt) { return new Lt(param); }
+    IF_MATCH(nomatch) { return new NoMatch(); }
+    IF_MATCH(pmfromfile) { return new PmFromFile(param); }
+    IF_MATCH(pmf) { return new PmF(param); }
+    IF_MATCH(pm) { return new Pm(param); }
+    IF_MATCH(rbl) { return new Rbl(param); }
+    IF_MATCH(rsub) { return new Rsub(param); }
+    IF_MATCH(rx) { return new Rx(param); }
+    IF_MATCH(streq) { return new StrEq(param); }
+    IF_MATCH(strmatch) { return new StrMatch(param); }
     IF_MATCH(validatebyterange) {
-        return new ValidateByteRange(op, param, negation);
+        return new ValidateByteRange(param);
     }
-    IF_MATCH(validatedtd) { return new ValidateDTD(op, param, negation); }
-    IF_MATCH(validatehash) { return new ValidateHash(op, param, negation); }
-    IF_MATCH(validateschema) { return new ValidateSchema(op, param, negation); }
+    IF_MATCH(validatedtd) { return new ValidateDTD(param); }
+    IF_MATCH(validatehash) { return new ValidateHash(param); }
+    IF_MATCH(validateschema) { return new ValidateSchema(param); }
     IF_MATCH(validateurlencoding) {
-        return new ValidateUrlEncoding(op, param, negation);
+        return new ValidateUrlEncoding();
     }
     IF_MATCH(validateutf8encoding) {
-        return new ValidateUtf8Encoding(op, param, negation);
+        return new ValidateUtf8Encoding();
     }
-    IF_MATCH(verifycc) { return new VerifyCC(op, param, negation); }
-    IF_MATCH(verifycpf) { return new VerifyCPF(op, param, negation); }
-    IF_MATCH(verifyssn) { return new VerifySSN(op, param, negation); }
-    IF_MATCH(within) { return new Within(op, param, negation); }
+    IF_MATCH(verifycc) { return new VerifyCC(param); }
+    IF_MATCH(verifycpf) { return new VerifyCPF(param); }
+    IF_MATCH(verifyssn) { return new VerifySSN(param); }
+    IF_MATCH(within) { return new Within(param); }
 
     IF_MATCH(unconditionalmatch) {
-        return new UnconditionalMatch(op, param, negation);
+        return new UnconditionalMatch();
     }
 
 
-    return new Operator(op, param, negation);
+    return new Operator(param);
 }
 
 }  // namespace operators

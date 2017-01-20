@@ -31,6 +31,8 @@ class NoMatch : public Operator {
     /** @ingroup ModSecurity_Operator */
     NoMatch(std::string op, std::string param, bool negation)
         : Operator(op, param, negation) { }
+    NoMatch()
+        : Operator("NoMatch") { }
 
     bool evaluate(Transaction *transaction, const std::string &str) override;
 };

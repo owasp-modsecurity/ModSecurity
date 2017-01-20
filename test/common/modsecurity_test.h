@@ -33,7 +33,8 @@ template <class T> class ModSecurityTest :
  public:
     ModSecurityTest()
         : m_test_number(0),
-        m_automake_output(false) { }
+        m_automake_output(false),
+        m_count_all(false) { }
 
     std::string header();
     void cmd_options(int, char **);
@@ -45,6 +46,7 @@ template <class T> class ModSecurityTest :
     bool verbose = false;
     bool color = false;
     int m_test_number;
+    bool m_count_all;
     bool m_automake_output;
 };
 

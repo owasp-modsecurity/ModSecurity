@@ -29,6 +29,8 @@ class IpMatchFromFile : public IpMatch {
         : IpMatch(op, param, negation) { }
     IpMatchFromFile(std::string op, std::string param)
         : IpMatch(op, param) { }
+    IpMatchFromFile(std::string param)
+        : IpMatch("IpMatchFromFile", param) { }
 
     bool init(const std::string& file, std::string *error) override;
 };

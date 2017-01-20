@@ -30,6 +30,8 @@ class PmF : public PmFromFile {
     /** @ingroup ModSecurity_Operator */
     PmF(std::string op, std::string param, bool negation)
         : PmFromFile(op, param, negation) { }
+    explicit PmF(std::string param)
+        : PmFromFile("PmFromF", param) { }
 };
 
 

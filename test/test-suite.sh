@@ -10,8 +10,14 @@ FILE=${@: -1}
 
 if [[ $FILE == *"test-cases/regression/"* ]]
 then
-      $VALGRIND $PARAM ./regression_tests ../$FILE
-      echo $VALGRIND $PARAM ./regression_tests ../$FILE
+    AMOUNT=$(./regression_tests countall ../$FILE)
+    for i in `seq 1 $AMOUNT`; do
+        $VALGRIND $PARAM ./regression_tests ../$FILE:$i
+        if [ $? -eq 139 ]; then
+            echo ":test-result: FAIL segfault: ../$FILE:$i"
+        fi
+        echo $VALGRIND $PARAM ./regression_tests ../$FILE:$i
+    done;
 else
       $VALGRIND $PARAM ./unit_tests ../$FILE
 fi

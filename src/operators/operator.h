@@ -53,7 +53,7 @@ class Operator {
         m_param() { }
 
     virtual ~Operator() { }
-    static Operator *instantiate(std::string opName);
+    static Operator *instantiate(std::string opName, std::string param);
 
     virtual bool init(const std::string &arg, std::string *error) {
         return true;

@@ -29,7 +29,7 @@ class IpMatchF : public IpMatchFromFile {
     IpMatchF(std::string op, std::string param, bool negation)
         : IpMatchFromFile(op, param, negation) { }
     explicit IpMatchF(std::string param)
-        : IpMatchFromFile("IpMatchFromFile", param) { }
+        : IpMatchFromFile("IpMatchFromF", param) { }
 };
 
 }  // namespace operators

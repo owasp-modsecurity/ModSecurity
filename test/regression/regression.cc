@@ -397,13 +397,13 @@ int main(int argc, char **argv) {
         << std::endl;
 #else
     test.cmd_options(argc, argv);
-    if (!test.m_automake_output) {
+    if (!test.m_automake_output && !test.m_count_all) {
         std::cout << test.header();
     }
 
     test.load_tests();
 
-    if (!test.m_automake_output) {
+    if (!test.m_automake_output && !test.m_count_all) {
         std::cout << std::setw(4) << std::right << "# ";
         std::cout << std::setw(50) << std::left << "File Name";
         std::cout << std::setw(70) << std::left << "Test Name";
@@ -422,6 +422,11 @@ int main(int argc, char **argv) {
         keyList.push_back(a.first);
     }
     keyList.sort();
+
+    if (test.m_count_all) {
+        std::cout << std::to_string(keyList.size()) << std::endl;
+        exit(0);
+    }
 
     ModSecurityTestResults<RegressionTestResult> res;
     for (std::string &a : keyList) {
