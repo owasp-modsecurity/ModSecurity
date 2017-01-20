@@ -33,12 +33,10 @@ class ReqbodyErrorMsg : public Variable {
  public:
     ReqbodyErrorMsg()
         : Variable("REQBODY_ERROR_MSG") { }
-
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableReqbodyErrorMsg.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

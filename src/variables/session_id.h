@@ -38,7 +38,6 @@ class SessionID : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableSessionID.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

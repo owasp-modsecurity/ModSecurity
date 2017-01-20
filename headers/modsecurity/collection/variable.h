@@ -18,6 +18,7 @@
 #include <string>
 #include <iostream>
 #include <memory>
+#include <list>
 #endif
 
 #include "modsecurity/variable_origin.h"
@@ -35,7 +36,7 @@ namespace collection {
 
 class Variable {
  public:
-    Variable(const std::string *key) :
+    explicit Variable(const std::string *key) :
         m_key(key),
         m_value(),
         m_dynamic_value(false),

@@ -215,8 +215,10 @@ int Transaction::processConnection(const char *client, int cPort,
     m_variableUniqueID.set(m_id, m_variableOffset);
     m_variableRemoteAddr.set(m_clientIpAddress, m_variableOffset);
     m_variableServerAddr.set(m_serverIpAddress, m_variableOffset);
-    m_variableServerPort.set(std::to_string(this->m_serverPort), m_variableOffset);
-    m_variableRemotePort.set(std::to_string(this->m_clientPort), m_variableOffset);
+    m_variableServerPort.set(std::to_string(this->m_serverPort),
+        m_variableOffset);
+    m_variableRemotePort.set(std::to_string(this->m_clientPort),
+        m_variableOffset);
 
     this->m_rules->evaluate(modsecurity::ConnectionPhase, this);
     return true;
@@ -1025,14 +1027,16 @@ int Transaction::processResponseBody() {
     auto t = bi.find(m_variableResponseContentType.m_value);
     if (t == bi.end() && bi.empty() == false) {
 #ifndef NO_LOGS
-        debug(5, "Response Content-Type is " + m_variableResponseContentType.m_value + \
-            ". It is not marked to be inspected.");
+        debug(5, "Response Content-Type is " \
+            + m_variableResponseContentType.m_value \
+            + ". It is not marked to be inspected.");
         std::string validContetTypes("");
         for (std::set<std::string>::iterator i = bi.begin();
              i != bi.end(); i++) {
             validContetTypes.append(*i + " ");
         }
-        debug(8, "Content-Type(s) marked to be inspected: " + validContetTypes);
+        debug(8, "Content-Type(s) marked to be inspected: " \
+            + validContetTypes);
 #endif
         return true;
     }
@@ -1041,7 +1045,8 @@ int Transaction::processResponseBody() {
     }
 
     m_variableResponseBody.set(m_responseBody.str(), m_variableOffset);
-    m_variableResponseContentLength.set(std::to_string(m_responseBody.str().size()), m_variableOffset);
+    m_variableResponseContentLength.set(std::to_string(
+        m_responseBody.str().size()), m_variableOffset);
 
     this->m_rules->evaluate(modsecurity::ResponseBodyPhase, this);
     return true;
@@ -1074,8 +1079,9 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
     if (t == bi.end() && bi.empty() == false) {
 #ifndef NO_LOGS
         debug(4, "Not appending response body. " \
-            "Response Content-Type is " + m_variableResponseContentType.m_value + \
-            ". It is not marked to be inspected.");
+            "Response Content-Type is " \
+            + m_variableResponseContentType.m_value \
+            + ". It is not marked to be inspected.");
 #endif
         return true;
     }

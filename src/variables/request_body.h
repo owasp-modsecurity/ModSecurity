@@ -33,12 +33,10 @@ class RequestBody : public Variable {
  public:
     RequestBody()
         : Variable("REQUEST_BODY") { }
-
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRequestBody.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

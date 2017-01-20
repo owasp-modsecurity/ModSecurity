@@ -33,12 +33,10 @@ class ResponseContentLength : public Variable {
  public:
     ResponseContentLength()
         : Variable("RESPONSE_CONTENT_LENGTH") { }
-
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableResponseContentLength.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

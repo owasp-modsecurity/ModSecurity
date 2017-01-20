@@ -38,7 +38,6 @@ class RemotePort : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRemotePort.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

@@ -19,8 +19,8 @@
 #include <list>
 #include <utility>
 
-#ifndef SRC_VARIABLES_REQUEST_BASENAME_H_
-#define SRC_VARIABLES_REQUEST_BASENAME_H_
+#ifndef SRC_VARIABLES_REQUEST_BASE_NAME_H_
+#define SRC_VARIABLES_REQUEST_BASE_NAME_H_
 
 #include "src/variables/variable.h"
 
@@ -38,10 +38,9 @@ class RequestBasename : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRequestBasename.evaluate(l);
     }
-
 };
 
 }  // namespace Variables
 }  // namespace modsecurity
 
-#endif  // SRC_VARIABLES_REQUEST_BASENAME_H_
+#endif  // SRC_VARIABLES_REQUEST_BASE_NAME_H_

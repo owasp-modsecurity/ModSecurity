@@ -46,8 +46,8 @@ template <class T> class ModSecurityTest :
     bool verbose = false;
     bool color = false;
     int m_test_number;
-    bool m_count_all;
     bool m_automake_output;
+    bool m_count_all;
 };
 
 }  // namespace modsecurity_test

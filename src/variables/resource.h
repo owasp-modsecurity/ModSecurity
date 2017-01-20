@@ -38,7 +38,6 @@ class Resource : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableResource.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

@@ -19,8 +19,8 @@
 #include <list>
 #include <utility>
 
-#ifndef SRC_VARIABLES_REQUEST_FILENAME_H_
-#define SRC_VARIABLES_REQUEST_FILENAME_H_
+#ifndef SRC_VARIABLES_REQUEST_FILE_NAME_H_
+#define SRC_VARIABLES_REQUEST_FILE_NAME_H_
 
 #include "src/variables/variable.h"
 
@@ -33,15 +33,13 @@ class RequestFilename : public Variable {
  public:
     RequestFilename()
         : Variable("REQUEST_FILENAME") { }
-
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRequestFilename.evaluate(l);
     }
-
 };
 
 }  // namespace Variables
 }  // namespace modsecurity
 
-#endif  // SRC_VARIABLES_REQUEST_FILENAME_H_
+#endif  // SRC_VARIABLES_REQUEST_FILE_NAME_H_

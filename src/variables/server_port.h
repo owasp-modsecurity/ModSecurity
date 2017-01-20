@@ -38,7 +38,6 @@ class ServerPort : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableServerPort.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

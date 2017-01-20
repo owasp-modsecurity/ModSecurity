@@ -38,7 +38,6 @@ class InboundDataError : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableInboundDataError.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

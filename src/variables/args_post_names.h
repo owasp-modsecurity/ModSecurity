@@ -19,8 +19,8 @@
 #include <list>
 #include <utility>
 
-#ifndef SRC_VARIABLES_ARGS_NAMES_POST_H_
-#define SRC_VARIABLES_ARGS_NAMES_POST_H_
+#ifndef SRC_VARIABLES_ARGS_POST_NAMES_H_
+#define SRC_VARIABLES_ARGS_POST_NAMES_H_
 
 #include "src/variables/variable.h"
 
@@ -38,10 +38,9 @@ class ArgsPostNames : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableArgPostNames.evaluate(l);
     }
-
 };
 
 }  // namespace Variables
 }  // namespace modsecurity
 
-#endif  // SRC_VARIABLES_ARGS_NAMES_POST_H_
+#endif  // SRC_VARIABLES_ARGS_POST_NAMES_H_

@@ -38,7 +38,6 @@ class UserID : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableUserID.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

@@ -326,7 +326,8 @@ std::list<std::pair<std::unique_ptr<std::string>,
         for (Action *a : trasn->m_rules->m_defaultActions[this->phase]) {
             if (a->action_kind \
                 == actions::Action::RunTimeBeforeMatchAttemptKind) {
-                newValue = std::unique_ptr<std::string>(new std::string(a->evaluate(*value, trasn)));
+                newValue = std::unique_ptr<std::string>(
+                    new std::string(a->evaluate(*value, trasn)));
 
                 if (multiMatch == true) {
                     if (*newValue != *value) {
@@ -354,7 +355,8 @@ std::list<std::pair<std::unique_ptr<std::string>,
 
     for (Action *a : this->m_actionsRuntimePre) {
         if (none == 0) {
-            newValue = std::unique_ptr<std::string>(new std::string(a->evaluate(*value, trasn)));
+            newValue = std::unique_ptr<std::string>(
+                new std::string(a->evaluate(*value, trasn)));
 
             if (multiMatch == true) {
                 if (*value != *newValue) {
@@ -388,9 +390,6 @@ std::list<std::pair<std::unique_ptr<std::string>,
         trasn->debug(9, "multiMatch is enabled. " \
             + std::to_string(ret.size()) + \
             " values to be tested.");
-        //for (const std::string *a : ret) {
-        //    trasn->debug(9, " - " + *a);
-        //}
     } else {
         ret.push_back(std::make_pair(
             std::move(value),

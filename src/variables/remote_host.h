@@ -38,7 +38,6 @@ class RemoteHost : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRemoteHost.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

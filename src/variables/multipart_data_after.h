@@ -38,7 +38,6 @@ class MultipartDateAfter : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableMultipartDataAfter.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

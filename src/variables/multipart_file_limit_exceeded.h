@@ -38,7 +38,6 @@ class MultipartFileLimitExceeded : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableMultipartFileLimitExceeded.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

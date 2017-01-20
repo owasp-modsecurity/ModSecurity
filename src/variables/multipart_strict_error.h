@@ -38,7 +38,6 @@ class MultipartStrictError : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableMultipartStrictError.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

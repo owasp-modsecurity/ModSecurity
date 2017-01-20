@@ -38,7 +38,6 @@ class MultipartHeaderFolding : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableMultipartHeaderFolding.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

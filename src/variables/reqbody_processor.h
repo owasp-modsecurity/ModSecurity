@@ -33,12 +33,10 @@ class ReqbodyProcessor : public Variable {
  public:
     ReqbodyProcessor()
         : Variable("REQBODY_PROCESSOR") { }
-
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableReqbodyProcessor.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

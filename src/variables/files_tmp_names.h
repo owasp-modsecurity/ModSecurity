@@ -38,7 +38,6 @@ class FilesTmpNames : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableFilesTmpNames.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

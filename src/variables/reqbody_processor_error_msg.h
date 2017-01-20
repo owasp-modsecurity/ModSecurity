@@ -19,8 +19,8 @@
 #include <list>
 #include <utility>
 
-#ifndef SRC_VARIABLES_PROCESSOR_ERROR_MSG_H_
-#define SRC_VARIABLES_PROCESSOR_ERROR_MSG_H_
+#ifndef SRC_VARIABLES_REQBODY_PROCESSOR_ERROR_MSG_H_
+#define SRC_VARIABLES_REQBODY_PROCESSOR_ERROR_MSG_H_
 
 #include "src/variables/variable.h"
 
@@ -38,10 +38,9 @@ class ReqbodyProcessorErrorMsg : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableReqbodyProcessorErrorMsg.evaluate(l);
     }
-
 };
 
 }  // namespace Variables
 }  // namespace modsecurity
 
-#endif  // SRC_VARIABLES_PROCESSOR_ERROR_MSG_H_
+#endif  // SRC_VARIABLES_REQBODY_PROCESSOR_ERROR_MSG_H_

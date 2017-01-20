@@ -38,7 +38,6 @@ class ReqbodyError : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableReqbodyError.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

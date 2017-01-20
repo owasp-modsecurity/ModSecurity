@@ -69,7 +69,8 @@ std::string MacroExpansion::expand(const std::string& input,
             if (utils::string::toupper(variable) == "MATCHED_VAR") {
                 variableValue = transaction->m_variableMatchedVar.evaluate();
             } else {
-                variableValue = transaction->m_collections.resolveFirst(variable);
+                variableValue = transaction->m_collections.resolveFirst(
+                    variable);
             }
         } else {
             std::string col = std::string(variable, 0, collection);

@@ -38,7 +38,6 @@ class FullRequest : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableFullRequest.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

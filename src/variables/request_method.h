@@ -33,12 +33,10 @@ class RequestMethod : public Variable {
  public:
     RequestMethod()
         : Variable("REQUEST_METHOD") { }
-
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRequestMethod.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

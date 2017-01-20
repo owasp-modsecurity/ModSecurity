@@ -38,7 +38,6 @@ class ServerAddr : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableServerAddr.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

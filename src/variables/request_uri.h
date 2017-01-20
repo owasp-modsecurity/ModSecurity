@@ -33,12 +33,10 @@ class RequestURI : public Variable {
  public:
     RequestURI()
         : Variable("REQUEST_URI") { }
-
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRequestURI.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

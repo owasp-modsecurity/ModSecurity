@@ -38,7 +38,6 @@ class MatchedVar : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableMatchedVar.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

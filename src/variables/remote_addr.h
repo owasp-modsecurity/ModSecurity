@@ -38,7 +38,6 @@ class RemoteAddr : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRemoteAddr.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

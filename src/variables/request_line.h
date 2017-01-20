@@ -33,12 +33,10 @@ class RequestLine : public Variable {
  public:
     RequestLine()
         : Variable("REQUEST_LINE") { }
-
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRequestLine.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

@@ -19,8 +19,8 @@
 #include <list>
 #include <utility>
 
-#ifndef SRC_VARIABLES_ARG_NAMES_H_
-#define SRC_VARIABLES_ARG_NAMES_H_
+#ifndef SRC_VARIABLES_RESPONSE_HEADERS_NAMES_H_
+#define SRC_VARIABLES_RESPONSE_HEADERS_NAMES_H_
 
 #include "src/variables/variable.h"
 
@@ -43,4 +43,4 @@ class ResponseHeadersNames : public Variable {
 }  // namespace Variables
 }  // namespace modsecurity
 
-#endif  // SRC_VARIABLES_TIMEARG_NAMES_H_
+#endif  // SRC_VARIABLES_RESPONSE_HEADERS_NAMES_H_

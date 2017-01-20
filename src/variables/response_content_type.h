@@ -33,7 +33,6 @@ class ResponseContentType : public Variable {
  public:
     ResponseContentType()
         : Variable("RESPONSE_CONTENT_TYPE") { }
-
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableResponseContentType.evaluate(l);

@@ -38,7 +38,6 @@ class FilesCombinedSize : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableFilesCombinedSize.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

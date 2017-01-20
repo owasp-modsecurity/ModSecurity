@@ -33,12 +33,11 @@ class ArgsNames : public Variable {
  public:
     ArgsNames()
         : Variable("ARGS_NAMES") { }
- 
+
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableArgsNames.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

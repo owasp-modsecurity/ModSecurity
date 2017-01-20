@@ -38,7 +38,6 @@ class AuthType : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableAuthType.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

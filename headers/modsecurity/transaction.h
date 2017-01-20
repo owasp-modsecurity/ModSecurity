@@ -122,7 +122,8 @@ class AnchoredVariable {
         }
 
     void set(const std::string &a, size_t offset) {
-        std::unique_ptr<VariableOriginRequest> origin (new VariableOriginRequest());
+        std::unique_ptr<VariableOriginRequest> origin(
+            new VariableOriginRequest());
         m_offset = offset;
         m_value.assign(a.c_str(), a.size());
         origin->m_offset = offset;
@@ -132,7 +133,8 @@ class AnchoredVariable {
 
     void append(const std::string &a, size_t offset,
         bool spaceSeparator = false) {
-        std::unique_ptr<VariableOriginRequest> origin (new VariableOriginRequest());
+        std::unique_ptr<VariableOriginRequest> origin(
+            new VariableOriginRequest());
         if (spaceSeparator && !m_value.empty()) {
             m_value.append(" " + a);
         } else {
@@ -169,7 +171,7 @@ class AnchoredVariable {
 
 class TransactionAnchoredVariables {
  public:
-    TransactionAnchoredVariables(Transaction *t)
+    explicit TransactionAnchoredVariables(Transaction *t)
         : m_variableArgsNames(t, "ARGS_NAMES"),
         m_variableArgGetNames(t, "ARGS_GET_NAMES"),
         m_variableArgPostNames(t, "ARGS_POST_NAMES"),
@@ -187,12 +189,15 @@ class TransactionAnchoredVariables {
         m_variableMatchedVarName(t, "MATCHED_VAR_NAME"),
         m_variableMultipartCrlfLFLines(t, "MULTIPART_CRLF_LF_LINES"),
         m_variableMultipartDataAfter(t, "MULTIPART_DATA_AFTER"),
-        m_variableMultipartFileLimitExceeded(t, "MULTIPART_FILE_LIMIT_EXCEEDED"),
+        m_variableMultipartFileLimitExceeded(t,
+            "MULTIPART_FILE_LIMIT_EXCEEDED"),
         m_variableMultipartStrictError(t, "MULTIPART_STRICT_ERROR"),
         m_variableMultipartHeaderFolding(t, "MULTIPART_HEADER_FOLDING"),
         m_variableMultipartInvalidQuoting(t, "MULTIPART_INVALID_QUOTING"),
-        m_variableMultipartInvalidHeaderFolding(t, "MULTIPART_INVALID_HEADER_FOLDING"),
-        m_variableMultipartUnmatchedBoundary(t, "MULTIPART_UNMATCHED_BOUNDARY"),
+        m_variableMultipartInvalidHeaderFolding(t,
+            "MULTIPART_INVALID_HEADER_FOLDING"),
+        m_variableMultipartUnmatchedBoundary(t,
+            "MULTIPART_UNMATCHED_BOUNDARY"),
         m_variableOutboundDataError(t, "OUTBOUND_DATA_ERROR"),
         m_variablePathInfo(t, "PATH_INFO"),
         m_variableQueryString(t, "QUERY_STRING"),

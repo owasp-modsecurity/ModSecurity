@@ -38,7 +38,6 @@ class MultipartCrlfLFLines : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableMultipartCrlfLFLines.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

@@ -37,10 +37,11 @@ class SMatch {
         match("") { }
     size_t size() const { return size_; }
     std::string str() const { return match; }
-    std::string match;
+
     int size_;
     int m_offset;
     int m_length;
+    std::string match;
 };
 
 

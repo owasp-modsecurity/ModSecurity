@@ -65,7 +65,6 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
     uint64_t input_len, int *changed) {
     int length = 0;
     unsigned int count = 0;
-    unsigned char c;
     char *data;
     char *data_orig;
     unsigned int i, len, j;
@@ -88,6 +87,7 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
     for (i = 0; i < bytes_left;)  {
         int unicode_len = 0;
         unsigned int d = 0;
+        unsigned char c;
         unsigned char *utf = (unsigned char *)&input[i];
 
         c = *utf;
@@ -102,8 +102,9 @@ char *Utf8ToUnicode::inplace(unsigned char *input,
                     z[0] = *utf;
                     z[1] = *(utf + 1);
                     *data = utils::string::x2c((unsigned char*) &z);
-                } else
+                } else {
                     *data++ = c;
+                }
             }
         } else if ((c & 0xE0) == 0xC0) {
             /* If first byte begins with binary 110 it is two byte encoding*/

@@ -38,10 +38,9 @@ class MultipartUnmatchedBoundary : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableMultipartUnmatchedBoundary.evaluate(l);
     }
-
 };
 
 }  // namespace Variables
 }  // namespace modsecurity
 
-#endif  // SRC_VARIABLES_ARGS_NAMES_H_
+#endif  // SRC_VARIABLES_MULTIPART_UNMATCHED_BOUNDARY_H_

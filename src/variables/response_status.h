@@ -33,12 +33,10 @@ class ResponseStatus : public Variable {
  public:
     ResponseStatus()
         : Variable("RESPONSE_STATUS") { }
-
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableResponseStatus.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

@@ -51,16 +51,16 @@ class SetVar : public Action {
         std::string variableName,
         std::string predicate) : Action("setvar"),
         m_operation(operation),
-        m_predicate(predicate),
         m_collectionName(""),
-        m_variableName(variableName) { }
+        m_variableName(variableName),
+        m_predicate(predicate) { }
 
     SetVar(SetVarOperation operation,
         std::string variableName) : Action("setvar"),
         m_operation(operation),
-        m_predicate(""),
         m_collectionName(""),
-        m_variableName(variableName) { }
+        m_variableName(variableName),
+        m_predicate("") { }
 
     bool evaluate(Rule *rule, Transaction *transaction) override;
     bool init(std::string *error) override;

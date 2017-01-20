@@ -38,7 +38,6 @@ class UniqueID : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableUniqueID.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

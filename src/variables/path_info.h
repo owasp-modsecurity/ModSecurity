@@ -38,7 +38,6 @@ class PathInfo : public Variable {
         std::vector<const collection::Variable *> *l) {
         transaction->m_variablePathInfo.evaluate(l);
     }
-
 };
 
 }  // namespace Variables

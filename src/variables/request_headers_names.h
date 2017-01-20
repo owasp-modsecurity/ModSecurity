@@ -33,15 +33,13 @@ class RequestHeadersNames : public Variable {
  public:
     RequestHeadersNames()
         : Variable("REQUEST_HEADERS_NAMES") { }
-
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRequestHeadersNames.evaluate(l);
     }
-
 };
 
 }  // namespace Variables
 }  // namespace modsecurity
 
-#endif  // SRC_VARIABLES_TIMEARG_NAMES_H_
+#endif  // SRC_VARIABLES_REQUEST_HEADERS_NAMES_H_

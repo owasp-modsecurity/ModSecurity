@@ -33,12 +33,10 @@ class ResponseProtocol : public Variable {
  public:
     ResponseProtocol()
         : Variable("RESPONSE_PROTOCOL") { }
-
     void evaluateInternal(Transaction *transaction,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableResponseProtocol.evaluate(l);
     }
-
 };
 
 }  // namespace Variables
