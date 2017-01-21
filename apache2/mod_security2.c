@@ -266,8 +266,18 @@ int perform_interception(modsec_rec *msr) {
             #if !defined(WIN32) && !defined(VERSION_NGINX)
             {
                 extern module core_module;
-                apr_socket_t *csd = ap_get_module_config(msr->r->connection->conn_config,
-                    &core_module);
+                apr_socket_t *csd;
+
+                /* For mod_http2 used by HTTP/2 there is a virtual connection so must go through
+                 * master to get the main connection or the drop request doesn't seem to do anything.
+                 * For HTTP/1.1 master will not be defined so just go through normal connection.
+                 * More details here: https://github.com/icing/mod_h2/issues/127
+                 */
+                if (msr->r->connection->master) {
+                    csd = ap_get_module_config(msr->r->connection->master->conn_config, &core_module);
+                } else {
+                    csd = ap_get_module_config(msr->r->connection->conn_config, &core_module);
+                }
 
                 if (csd) {
                     if (apr_socket_close(csd) == APR_SUCCESS) {
