@@ -87,28 +87,6 @@ class Operator;
 }
 
 
-
-class VariableOriginRequest : public VariableOrigin {
- public:
-    VariableOriginRequest()
-        : m_length(0),
-        m_offset(0) { }
-
-    std::string toText() {
-#if 0
-        return "Variable origin was extracted straight from " \
-            "request/response, offset: " + std::to_string(m_offset) + \
-            ", length: " + std::to_string(m_length) + ".";
-#else
-        return "rr:" + std::to_string(m_offset) + "," \
-            + std::to_string(m_length);
-#endif
-    }
-
-    int m_length;
-    int m_offset;
-};
-
 class AnchoredVariable {
  public:
     AnchoredVariable(Transaction *t, std::string name)
@@ -121,9 +99,14 @@ class AnchoredVariable {
             m_var->m_value = &m_value;
         }
 
+    ~AnchoredVariable() {
+        delete (m_var);
+        m_var = NULL;
+    }
+
     void set(const std::string &a, size_t offset) {
-        std::unique_ptr<VariableOriginRequest> origin(
-            new VariableOriginRequest());
+        std::unique_ptr<VariableOrigin> origin(
+            new VariableOrigin());
         m_offset = offset;
         m_value.assign(a.c_str(), a.size());
         origin->m_offset = offset;
@@ -133,8 +116,8 @@ class AnchoredVariable {
 
     void append(const std::string &a, size_t offset,
         bool spaceSeparator = false) {
-        std::unique_ptr<VariableOriginRequest> origin(
-            new VariableOriginRequest());
+        std::unique_ptr<VariableOrigin> origin(
+            new VariableOrigin());
         if (spaceSeparator && !m_value.empty()) {
             m_value.append(" " + a);
         } else {
@@ -229,7 +212,8 @@ class TransactionAnchoredVariables {
         m_variableSessionID(t, "SESSIONID"),
         m_variableUniqueID(t, "UNIQUE_ID"),
         m_variableUrlEncodedError(t, "URLENCODED_ERROR"),
-        m_variableUserID(t, "USERID")
+        m_variableUserID(t, "USERID"),
+        m_variableOffset(0)
         { }
 
     AnchoredVariable m_variableArgsNames;

@@ -40,12 +40,12 @@ class Variable {
         m_key(key),
         m_value(),
         m_dynamic_value(false),
-        m_dynamic(false) { }
+        m_dynamic(true) { }
     Variable(const std::string *key, const std::string *value) :
         m_key(key),
         m_value(value),
         m_dynamic_value(false),
-        m_dynamic(false) { }
+        m_dynamic(true) { }
 
     ~Variable() {
         if (m_dynamic_value) {

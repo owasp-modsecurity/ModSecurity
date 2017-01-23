@@ -33,8 +33,18 @@ namespace modsecurity {
 /** @ingroup ModSecurity_CPP_API */
 class VariableOrigin {
  public:
-    VariableOrigin() { }
-    virtual std::string toText() = 0;
+    VariableOrigin()
+        : m_length(0),
+        m_offset(0) { }
+
+    std::string toText() {
+        std::string offset = std::to_string(m_offset);
+        std::string len = std::to_string(m_length);
+        return "rr:" + offset + "," + len;
+    }
+
+    int m_length;
+    size_t m_offset;
 };
 
 
