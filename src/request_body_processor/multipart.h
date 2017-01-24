@@ -16,6 +16,7 @@
 #include <string>
 #include <iostream>
 #include <list>
+#include <unordered_map>
 
 #ifndef SRC_REQUEST_BODY_PROCESSOR_MULTIPART_H_
 #define SRC_REQUEST_BODY_PROCESSOR_MULTIPART_H_

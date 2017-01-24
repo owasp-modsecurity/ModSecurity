@@ -242,6 +242,7 @@ libmodsecurity_la_SOURCES = \
 	parser/seclang-scanner.cc \
 	parser/driver.cc \
 	transaction.cc \
+	anchored_set_variable.cc \
 	audit_log/audit_log.cc \
 	audit_log/writer/writer.cc \
 	audit_log/writer/https.cc \

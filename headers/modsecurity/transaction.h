@@ -25,6 +25,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <memory>
 #endif
 
 #include <stdlib.h>
@@ -85,6 +86,77 @@ class JSON;
 namespace operators {
 class Operator;
 }
+
+
+struct MyEqual {
+    bool operator()(const std::string& Left, const std::string& Right) const {
+        return Left.size() == Right.size()
+             && std::equal(Left.begin(), Left.end(), Right.begin(),
+            [](char a, char b) {
+            return tolower(a) == tolower(b);
+        });
+    }
+};
+
+struct MyHash{
+    size_t operator()(const std::string& Keyval) const {
+        // You might need a better hash function than this
+        size_t h = 0;
+        std::for_each(Keyval.begin(), Keyval.end(), [&](char c) {
+            h += tolower(c);
+        });
+        return h;
+    }
+};
+
+class AnchoredSetVariable : public std::unordered_multimap<std::string,
+	collection::Variable *, MyHash, MyEqual> {
+ public:
+    AnchoredSetVariable(Transaction *t, std::string name)
+        : m_name(""),
+        m_transaction(t) {
+            m_name.append(name);
+        }
+
+    ~AnchoredSetVariable() {
+        for (const auto& x : *this) {
+            collection::Variable *var = x.second;
+            delete var->m_key;
+            delete var;
+        }
+    }
+
+    void set(const std::string &key, const std::string &value,
+        size_t offset) {
+        std::string *v = new std::string(value);
+        std::string *k = new std::string(m_name + ":" + key);
+
+        collection::Variable *var = new collection::Variable(k, v);
+        var->m_dynamic_value = true;
+        var->m_dynamic = false;
+        emplace(key, var);
+    }
+
+    void resolve(std::vector<const collection::Variable *> *l) {
+        for (const auto& x : *this) {
+            l->insert(l->begin(), x.second);
+        }
+    }
+
+    void resolve(const std::string &key,
+        std::vector<const collection::Variable *> *l) {
+        auto range = this->equal_range(key);
+        for (auto it = range.first; it != range.second; ++it) {
+            l->push_back(it->second);
+        }
+    }
+
+    void resolveRegularExpression(const std::string &var,
+        std::vector<const collection::Variable *> *l);
+
+    Transaction *m_transaction;
+    std::string m_name;
+};
 
 
 class AnchoredVariable {
@@ -213,7 +285,8 @@ class TransactionAnchoredVariables {
         m_variableUniqueID(t, "UNIQUE_ID"),
         m_variableUrlEncodedError(t, "URLENCODED_ERROR"),
         m_variableUserID(t, "USERID"),
-        m_variableOffset(0)
+        m_variableOffset(0),
+        m_variableArgs(t, "ARGS")
         { }
 
     AnchoredVariable m_variableArgsNames;
@@ -271,6 +344,8 @@ class TransactionAnchoredVariables {
     AnchoredVariable m_variableUniqueID;
     AnchoredVariable m_variableUrlEncodedError;
     AnchoredVariable m_variableUserID;
+
+    AnchoredSetVariable m_variableArgs;
 
     int m_variableOffset;
 };

@@ -18,6 +18,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "modsecurity/transaction.h"
 #include "src/utils/string.h"

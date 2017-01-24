@@ -307,7 +307,8 @@ VARIABLE_USER_ID                          (?i:USERID)
 VARIABLE_WEBSERVER_ERROR_LOG              (?i:WEBSERVER_ERROR_LOG)
 
 
-VARIABLE_COL                            (?i:(ARGS_POST|ARGS_GET|ARGS|FILES_SIZES|FILES_NAMES|FILES_TMP_CONTENT|MULTIPART_FILENAME|MULTIPART_NAME|MATCHED_VARS_NAMES|MATCHED_VARS|FILES|REQUEST_COOKIES|REQUEST_HEADERS|RESPONSE_HEADERS|GEO|REQUEST_COOKIES_NAMES))
+VARIABLE_ARGS                           (?i:ARGS)
+VARIABLE_COL                            (?i:(ARGS_POST|ARGS_GET|FILES_SIZES|FILES_NAMES|FILES_TMP_CONTENT|MULTIPART_FILENAME|MULTIPART_NAME|MATCHED_VARS_NAMES|MATCHED_VARS|FILES|REQUEST_COOKIES|REQUEST_HEADERS|RESPONSE_HEADERS|GEO|REQUEST_COOKIES_NAMES))
 VARIABLE_SESSION                        (?i:(SESSION))
 VARIABLE_IP                             (?i:(IP))
 VARIABLE_USER                           (?i:(USER))
@@ -331,6 +332,7 @@ EQUALS_MINUS                            (?i:=\-)
 %x TRANSACTION_FROM_VARIABLE_TO_OPERATOR
 %x EXPECTING_OPERATOR
 %x COMMENT
+%x EXPECTING_VAR_PARAMETER
 %x EXPECTING_PARAMETER
 %x EXPECTING_ACTIONS
 %x TRANSACTION_FROM_OPERATOR_TO_ACTIONS
@@ -723,6 +725,15 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_URL_ENCODED_ERROR}                { return p::make_VARIABLE_URL_ENCODED_ERROR(*driver.loc.back()); }
 {VARIABLE_USER_ID}                          { return p::make_VARIABLE_USER_ID(*driver.loc.back()); }
 
+{VARIABLE_ARGS}                             { return p::make_VARIABLE_ARGS(*driver.loc.back()); }
+{VARIABLE_ARGS}[:]                          { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS(*driver.loc.back()); }
+}
+
+
+<EXPECTING_VAR_PARAMETER>{
+[\/]{DICT_ELEMENT}[\/]                        { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT_REGEXP(yytext, *driver.loc.back()); }
+{DICT_ELEMENT}                                { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT(yytext, *driver.loc.back()); }
+.                                             { BEGIN(LEXING_ERROR_ACTION); yyless(0); }
 }
 
 <EXPECTING_VARIABLE,TRANSACTION_FROM_VARIABLE_TO_OPERATOR>{

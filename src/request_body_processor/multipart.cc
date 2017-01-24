@@ -1012,8 +1012,8 @@ int Multipart::multipart_complete(std::string *error) {
         } else {
             debug(4, "Adding request argument (BODY): name \"" +
                 m->m_name + "\", value \"" + m->m_value + "\"");
-            m_transaction->m_collections.store("ARGS:" + m->m_name,
-                m->m_value);
+            m_transaction->m_variableArgs.set(m->m_name, m->m_value,
+                m_transaction->m_variableOffset);
             m_transaction->m_collections.store("ARGS_POST:" + m->m_name,
                 m->m_value);
         }

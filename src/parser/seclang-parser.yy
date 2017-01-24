@@ -144,6 +144,7 @@ class Driver;
 #include "src/utils/geo_lookup.h"
 #include "src/utils/string.h"
 #include "src/utils/system.h"
+#include "src/variables/args.h"
 #include "src/variables/args_names.h"
 #include "src/variables/xml.h"
 #include "src/variables/args_combined_size.h"
@@ -315,6 +316,7 @@ using modsecurity::operators::Operator;
   COMMA    ","
   PIPE
   NEW_LINE
+  VARIABLE_ARGS
   VARIABLE_ARGS_COMBINED_SIZE
   VARIABLE_ARGS_GET_NAMES
   VARIABLE_ARGS_NAMES           "Variable ARGS_NAMES"
@@ -575,6 +577,8 @@ using modsecurity::operators::Operator;
   VARIABLE_COL                                 "VARIABLE_COL"
   VARIABLE_STATUS                              "VARIABLE_STATUS"
   VARIABLE_TX                                  "VARIABLE_TX"
+  DICT_ELEMENT                                 "Dictionary element"
+  DICT_ELEMENT_REGEXP                          "Dictionary element, selected by regexp"
 ;
 
 %type <std::unique_ptr<actions::Action>> act
@@ -1254,6 +1258,21 @@ var:
     VARIABLE_ARGS_NAMES
       {
         std::unique_ptr<Variable> c(new Variables::ArgsNames());
+        $$ = std::move(c);
+      }
+    | VARIABLE_ARGS DICT_ELEMENT
+      {
+        std::unique_ptr<Variable> c(new Variables::Args_DictElement($2));
+        $$ = std::move(c);
+      }
+    | VARIABLE_ARGS DICT_ELEMENT_REGEXP
+      {
+        std::unique_ptr<Variable> c(new Variables::Args_DictElementRegexp($2));
+        $$ = std::move(c);
+      }
+    | VARIABLE_ARGS
+      {
+        std::unique_ptr<Variable> c(new Variables::Args_NoDictElement());
         $$ = std::move(c);
       }
     | VARIABLE_ARGS_GET_NAMES

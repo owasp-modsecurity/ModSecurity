@@ -288,7 +288,7 @@ bool Transaction::addArgument(const std::string& orig, const std::string& key,
     debug(4, "Adding request argument (" + orig + "): name \"" + \
                 key + "\", value \"" + value + "\"");
 
-    m_collections.store("ARGS:" + key, value);
+    m_variableArgs.set(key, value, m_variableOffset);
 
     if (orig == "GET") {
         m_collections.store("ARGS_GET:" + key, value);

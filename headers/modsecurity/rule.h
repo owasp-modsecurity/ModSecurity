@@ -18,6 +18,7 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <memory>
 #endif
 
 #ifndef HEADERS_MODSECURITY_RULE_H_
