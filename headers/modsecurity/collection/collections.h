@@ -56,8 +56,8 @@ class Collections :
     bool storeOrUpdateFirst(const std::string &key, const std::string &value);
     bool updateFirst(const std::string &key, const std::string &value);
     void del(const std::string& key);
-    std::string* resolveFirst(const std::string& var);
-    std::string* resolveFirst(const std::string& collectionName,
+    std::unique_ptr<std::string> resolveFirst(const std::string& var);
+    std::unique_ptr<std::string> resolveFirst(const std::string& collectionName,
         const std::string& var);
 
     void resolveSingleMatch(const std::string& var,

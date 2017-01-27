@@ -34,7 +34,8 @@ class RemotePort : public Variable {
     RemotePort()
         : Variable("REMOTE_PORT") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRemotePort.evaluate(l);
     }

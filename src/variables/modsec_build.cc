@@ -24,7 +24,8 @@
 namespace modsecurity {
 namespace Variables {
 
-void ModsecBuild::evaluateInternal(Transaction *transaction,
+void ModsecBuild::evaluate(Transaction *transaction,
+    Rule *rule,
     std::vector<const collection::Variable *> *l) {
 
     l->push_back(new collection::Variable(&m_retName, &m_build));

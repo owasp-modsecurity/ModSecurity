@@ -33,7 +33,8 @@ class RequestBodyLength : public Variable {
  public:
     RequestBodyLength()
         : Variable("REQUEST_BODY_LENGTH") { }
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRequestBodyLength.evaluate(l);
     }

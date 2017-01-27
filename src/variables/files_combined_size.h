@@ -34,7 +34,8 @@ class FilesCombinedSize : public Variable {
     FilesCombinedSize()
         : Variable("FILES_COMBINED_SIZE") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableFilesCombinedSize.evaluate(l);
     }

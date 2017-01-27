@@ -24,16 +24,19 @@ MAINTAINERCLEANFILES = \
 
 
 pkginclude_HEADERS = \
-	../headers/modsecurity/transaction.h \
-	../headers/modsecurity/debug_log.h \
+	../headers/modsecurity/anchored_set_variable.h \
+	../headers/modsecurity/anchored_variable.h \
 	../headers/modsecurity/audit_log.h \
+	../headers/modsecurity/debug_log.h \
 	../headers/modsecurity/intervention.h \
 	../headers/modsecurity/modsecurity.h \
 	../headers/modsecurity/rule.h \
 	../headers/modsecurity/rule_message.h \
 	../headers/modsecurity/rules.h \
+	../headers/modsecurity/rules_exceptions.h \
 	../headers/modsecurity/rules_properties.h \
-	../headers/modsecurity/rules_exceptions.h
+	../headers/modsecurity/transaction.h \
+	../headers/modsecurity/variable_origin.h
 
 
 
@@ -61,7 +64,6 @@ noinst_HEADERS = \
 	request_body_processor/*.h \
 	utils/*.h \
 	variables/*.h \
-	variables/variations/*.h \
 	*.h
 
 
@@ -82,10 +84,7 @@ VARIABLES = \
 	variables/time_year.cc \
 	variables/tx.cc \
 	variables/variable.cc \
-	variables/variations/count.cc \
-	variables/variations/exclusion.cc \
-	variables/xml.cc \
-	variables/rule.cc
+	variables/xml.cc
 
 
 ACTIONS = \
@@ -243,6 +242,7 @@ libmodsecurity_la_SOURCES = \
 	parser/driver.cc \
 	transaction.cc \
 	anchored_set_variable.cc \
+	anchored_variable.cc \
 	audit_log/audit_log.cc \
 	audit_log/writer/writer.cc \
 	audit_log/writer/https.cc \

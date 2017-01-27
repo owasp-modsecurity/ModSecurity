@@ -33,7 +33,8 @@
 namespace modsecurity {
 namespace Variables {
 
-void TimeMin::evaluateInternal(Transaction *transaction,
+void TimeMin::evaluate(Transaction *transaction,
+    Rule *rule,
     std::vector<const collection::Variable *> *l) {
     char tstr[200];
     struct tm timeinfo;

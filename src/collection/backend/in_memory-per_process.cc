@@ -155,11 +155,11 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
 }
 
 
-std::string* InMemoryPerProcess::resolveFirst(const std::string& var) {
+std::unique_ptr<std::string> InMemoryPerProcess::resolveFirst(const std::string& var) {
     auto range = equal_range(var);
 
     for (auto it = range.first; it != range.second; ++it) {
-        return &it->second;
+        return std::unique_ptr<std::string>(new std::string(it->second));
     }
 
     return NULL;

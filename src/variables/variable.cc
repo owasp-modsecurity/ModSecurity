@@ -21,11 +21,7 @@
 #include <list>
 
 #include "modsecurity/transaction.h"
-#include "src/variables/variations/exclusion.h"
 #include "src/utils/string.h"
-
-
-using modsecurity::Variables::Variations::Exclusion;
 
 
 namespace modsecurity {
@@ -128,12 +124,14 @@ std::vector<const collection::Variable *> *
     Variable::evaluate(Transaction *transaction) {
     std::vector<const collection::Variable *> *l = NULL;
     l = new std::vector<const collection::Variable *>();
-    evaluate(transaction, l);
+    evaluate(transaction, NULL, l);
 
     return l;
 }
 
-void Variable::evaluateInternal(Transaction *transaction,
+
+void Variable::evaluate(Transaction *transaction,
+    Rule *rule,
     std::vector<const collection::Variable *> *l) {
     if (m_collectionName.empty() == false) {
         if (m_kind == CollectionVarible && m_type == MultipleMatches) {
@@ -158,9 +156,11 @@ void Variable::evaluateInternal(Transaction *transaction,
 }
 
 
-void Variable::evaluate(Transaction *transaction,
+void Variable::evaluateInternal(Transaction *transaction,
+    Rule *rule,
     std::vector<const collection::Variable *> *l) {
-    evaluateInternal(transaction, l);
+
+    evaluate(transaction, rule, l);
 }
 
 
@@ -170,7 +170,7 @@ std::string Variable::to_s(
     std::string except("");
     for (int i = 0; i < variables->size() ; i++) {
         std::string name = variables->at(i)->m_name;
-        Exclusion *e =  dynamic_cast<Exclusion *>(variables->at(i));
+        VariableModificatorExclusion *e =  dynamic_cast<VariableModificatorExclusion *>(variables->at(i));
         if (e != NULL) {
             if (except.empty()) {
                 except = except + name;

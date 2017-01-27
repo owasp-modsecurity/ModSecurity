@@ -390,12 +390,12 @@ class RulesProperties {
                 Rule *rule = rules_from->at(j);
                 for (int z = 0; z < rules_to->size(); z++) {
                     Rule *rule_ckc = rules_to->at(z);
-                    if (rule_ckc->rule_id == rule->rule_id &&
-                        rule_ckc->m_secmarker == false &&
-                        rule->m_secmarker == false) {
+                    if (rule_ckc->m_ruleId == rule->m_ruleId &&
+                        rule_ckc->m_secMarker == false &&
+                        rule->m_secMarker == false) {
                         if (err != NULL) {
                             *err << "Rule id: " \
-                                 << std::to_string(rule->rule_id) \
+                                 << std::to_string(rule->m_ruleId) \
                                  << " is duplicated" << std::endl;
                         }
                         return -1;

@@ -33,7 +33,8 @@ class MultipartInvalidQuoting : public Variable {
  public:
     MultipartInvalidQuoting()
         : Variable("MULTIPART_INVALID_QUOTING") { }
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableMultipartInvalidQuoting.evaluate(l);
     }

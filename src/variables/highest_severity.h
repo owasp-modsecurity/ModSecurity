@@ -34,7 +34,8 @@ class HighestSeverity : public Variable {
         : Variable(_name),
         m_retName("HIGHEST_SEVERITY") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) override;
     std::string m_retName;
 };

@@ -32,7 +32,8 @@ extern char **environ;
 namespace modsecurity {
 namespace Variables {
 
-void Env::evaluateInternal(Transaction *transaction,
+void Env::evaluate(Transaction *transaction,
+    Rule *rule,
     std::vector<const collection::Variable *> *l) {
     for (char **current = environ; *current; current++) {
         std::string env = std::string(*current);

@@ -46,7 +46,7 @@ bool Redirect::evaluate(Rule *rule, Transaction *transaction,
     }
     log.append("Access denied with code %d");
     log.append(" (phase ");
-    log.append(std::to_string(rm->m_rule->phase - 1) + "). ");
+    log.append(std::to_string(rm->m_rule->m_phase - 1) + "). ");
 
     intervention::freeUrl(&transaction->m_it);
     transaction->m_it.url = strdup(m_urlExpanded.c_str());

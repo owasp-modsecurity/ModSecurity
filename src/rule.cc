@@ -29,7 +29,6 @@
 #include "modsecurity/modsecurity.h"
 #include "src/actions/transformations/none.h"
 #include "src/actions/tag.h"
-#include "src/variables/variations/exclusion.h"
 #include "src/utils/string.h"
 #include "modsecurity/rules.h"
 #include "modsecurity/rule_message.h"
@@ -37,9 +36,8 @@
 #include "src/actions/msg.h"
 #include "src/actions/log_data.h"
 #include "src/actions/severity.h"
+#include "src/variables/variable.h"
 
-
-using modsecurity::Variables::Variations::Exclusion;
 
 namespace modsecurity {
 
@@ -48,74 +46,55 @@ using actions::Action;
 using Variables::Variable;
 using actions::transformations::None;
 
-Rule::~Rule() {
-    if (op != NULL) {
-        delete op;
-    }
-    while (m_actionsConf.empty() == false) {
-        auto *a = m_actionsConf.back();
-        m_actionsConf.pop_back();
-        delete a;
-    }
-    while (m_actionsRuntimePre.empty() == false) {
-        auto *a = m_actionsRuntimePre.back();
-        m_actionsRuntimePre.pop_back();
-        delete a;
-    }
-    while (m_actionsRuntimePos.empty() == false) {
-        auto *a = m_actionsRuntimePos.back();
-        m_actionsRuntimePos.pop_back();
-        delete a;
-    }
-    while (variables != NULL && variables->empty() == false) {
-        auto *a = variables->back();
-        variables->pop_back();
-        delete a;
-    }
-
-    if (variables != NULL) {
-        delete variables;
-    }
-
-    if (chainedRule != NULL) {
-        delete chainedRule;
-    }
-}
 
 Rule::Rule(std::string marker)
-    : chained(false),
-    chainedRule(NULL),
-    variables(NULL),
-    op(NULL),
-    rule_id(0),
-    phase(-1),
-    m_accuracy(0),
-    m_unconditional(false),
-    m_secmarker(true),
+    : m_accuracy(0),
+    m_actionsConf(),
+    m_actionsRuntimePos(),
+    m_actionsRuntimePre(),
+    m_chained(false),
+    m_chainedRule(NULL),
+    m_fileName(""),
+    m_lineNumber(0),
+    m_logData(""),
     m_marker(marker),
     m_maturity(0),
-    m_referenceCount(1),
-    m_fileName(""),
-    m_lineNumber(0) { }
+    m_op(NULL),
+    m_phase(-1),
+    m_rev(""),
+    m_ruleId(0),
+    m_secMarker(true),
+    m_variables(NULL),
+    m_ver(""),
+    m_unconditional(false),
+    m_referenceCount(1) { }
+
 
 Rule::Rule(Operator *_op,
         std::vector<Variable *> *_variables,
         std::vector<Action *> *actions,
         std::string fileName,
-        int lineNumber): chained(false),
-    chainedRule(NULL),
-    variables(_variables),
-    op(_op),
-    rule_id(0),
-    phase(-1),
-    m_accuracy(0),
-    m_unconditional(false),
-    m_secmarker(false),
+        int lineNumber)
+    : m_accuracy(0),
+    m_actionsConf(),
+    m_actionsRuntimePos(),
+    m_actionsRuntimePre(),
+    m_chained(false),
+    m_chainedRule(NULL),
+    m_fileName(fileName),
+    m_lineNumber(lineNumber),
+    m_logData(""),
     m_marker(""),
     m_maturity(0),
-    m_referenceCount(1),
-    m_fileName(fileName),
-    m_lineNumber(lineNumber) {
+    m_op(_op),
+    m_phase(-1),
+    m_rev(""),
+    m_ruleId(0),
+    m_secMarker(false),
+    m_variables(_variables),
+    m_ver(""),
+    m_unconditional(false),
+    m_referenceCount(1) {
     if (actions != NULL) {
         for (Action *a : *actions) {
             if (a->action_kind == Action::ConfigurationKind) {
@@ -137,15 +116,50 @@ Rule::Rule(Operator *_op,
      * If phase is not entered, we assume phase 2. For historical reasons.
      *
      */
-    if (phase == -1) {
-        phase = modsecurity::Phases::RequestHeadersPhase;
+    if (m_phase == -1) {
+        m_phase = modsecurity::Phases::RequestHeadersPhase;
     }
 
-    if (op == NULL) {
+    if (m_op == NULL) {
         m_unconditional = true;
     }
 
     delete actions;
+}
+
+
+Rule::~Rule() {
+    if (m_op != NULL) {
+        delete m_op;
+    }
+    while (m_actionsConf.empty() == false) {
+        auto *a = m_actionsConf.back();
+        m_actionsConf.pop_back();
+        delete a;
+    }
+    while (m_actionsRuntimePre.empty() == false) {
+        auto *a = m_actionsRuntimePre.back();
+        m_actionsRuntimePre.pop_back();
+        delete a;
+    }
+    while (m_actionsRuntimePos.empty() == false) {
+        auto *a = m_actionsRuntimePos.back();
+        m_actionsRuntimePos.pop_back();
+        delete a;
+    }
+    while (m_variables != NULL && m_variables->empty() == false) {
+        auto *a = m_variables->back();
+        m_variables->pop_back();
+        delete a;
+    }
+
+    if (m_variables != NULL) {
+        delete m_variables;
+    }
+
+    if (m_chainedRule != NULL) {
+        delete m_chainedRule;
+    }
 }
 
 
@@ -175,55 +189,53 @@ void Rule::updateMatchedVars(Transaction *trasn, std::string key,
     trasn->debug(4, "Matched vars updated.");
     trasn->m_variableMatchedVar.set(value, trasn->m_variableOffset);
     trasn->m_variableMatchedVarName.set(key, trasn->m_variableOffset);
-    trasn->m_collections.store("MATCHED_VARS:" + key, value);
-    trasn->m_collections.store("MATCHED_VARS_NAMES:" + key, key);
+
+    trasn->m_variableMatchedVars.set(key, value, trasn->m_variableOffset);
+    trasn->m_variableMatchedVarsNames.set(key, key, trasn->m_variableOffset);
 }
 
 
 void Rule::cleanMatchedVars(Transaction *trasn) {
     trasn->debug(4, "Matched vars cleaned.");
-    trasn->m_variableMatchedVar.set("", trasn->m_variableOffset);
-    trasn->m_variableMatchedVarName.set("", trasn->m_variableOffset);
-    trasn->m_collections.del("MATCHED_VARS_NAME");
-    trasn->m_collections.del("MATCHED_VARS");
-    trasn->m_collections.del("MATCHED_VARS_NAMES");
+    trasn->m_variableMatchedVar.unset();
+    trasn->m_variableMatchedVars.unset();
+    trasn->m_variableMatchedVarName.unset();
+    trasn->m_variableMatchedVarsNames.unset();
 }
 
 
 void Rule::updateRulesVariable(Transaction *trasn) {
-    if (rule_id != 0) {
-        trasn->m_collections.storeOrUpdateFirst("RULE:id",
-            std::to_string(rule_id));
+    if (m_ruleId != 0) {
+        trasn->m_variableRule.set("id", std::to_string(m_ruleId), 0);
     }
     if (m_rev.empty() == false) {
-        trasn->m_collections.storeOrUpdateFirst("RULE:rev", m_rev);
+        trasn->m_variableRule.set("rev", m_rev, 0);
     }
     if (getActionsByName("msg").size() > 0) {
         actions::Msg *msg = dynamic_cast<actions::Msg*>(
             getActionsByName("msg")[0]);
-        trasn->m_collections.storeOrUpdateFirst("RULE:msg", msg->data(trasn));
+        trasn->m_variableRule.set("msg", msg->data(trasn), 0);
     }
     if (getActionsByName("logdata").size() > 0) {
         actions::LogData *data = dynamic_cast<actions::LogData*>(
             getActionsByName("logdata")[0]);
-        trasn->m_collections.storeOrUpdateFirst("RULE:logdata",
-            data->data(trasn));
+        trasn->m_variableRule.set("logdata", data->data(trasn), 0);
     }
     if (getActionsByName("severity").size() > 0) {
         actions::Severity *data = dynamic_cast<actions::Severity*>(
             getActionsByName("severity")[0]);
-        trasn->m_collections.storeOrUpdateFirst("RULE:severity",
-            std::to_string(data->m_severity));
+        trasn->m_variableRule.set("severity",
+            std::to_string(data->m_severity), 0);
     }
 }
 
 
 std::string Rule::resolveMatchMessage(std::string key, std::string value) {
-    std::string ret = this->op->m_match_message;
+    std::string ret = this->m_op->m_match_message;
 
     if (ret.empty() == true) {
-        ret = "Matched \"Operator `" + this->op->m_op + "' with parameter `" +
-            utils::string::limitTo(200, this->op->m_param) +
+        ret = "Matched \"Operator `" + this->m_op->m_op + "' with parameter `" +
+            utils::string::limitTo(200, this->m_op->m_param) +
             "' against variable `" + key + "' (Value: `" +
             utils::string::limitTo(100, utils::string::toHexIfNeeded(value)) +
             "' ) \" at " + key;
@@ -268,7 +280,7 @@ bool Rule::executeOperatorAt(Transaction *trasn, std::string key,
             utils::string::toHexIfNeeded(value)) \
             + "\" (Variable: " + key + ")");
 
-    ret = this->op->evaluateInternal(trasn, this, value, ruleMessage);
+    ret = this->m_op->evaluateInternal(trasn, this, value, ruleMessage);
     if (ret == false) {
         return false;
     }
@@ -323,7 +335,7 @@ std::list<std::pair<std::unique_ptr<std::string>,
     // Notice that first we make sure that won't be a t:none
     // on the target rule.
     if (none == 0) {
-        for (Action *a : trasn->m_rules->m_defaultActions[this->phase]) {
+        for (Action *a : trasn->m_rules->m_defaultActions[this->m_phase]) {
             if (a->action_kind \
                 == actions::Action::RunTimeBeforeMatchAttemptKind) {
                 newValue = std::unique_ptr<std::string>(
@@ -400,11 +412,11 @@ std::list<std::pair<std::unique_ptr<std::string>,
 }
 
 
-std::vector<const collection::Variable *> Rule::getFinalVars(
+std::vector<std::unique_ptr<collection::Variable>> Rule::getFinalVars(
     Transaction *trasn) {
     std::list<const std::string*> exclusions;
-    std::vector<Variable *> *variables = this->variables;
-    std::vector<const collection::Variable *> finalVars;
+    std::vector<Variable *> *variables = m_variables;
+    std::vector<std::unique_ptr<collection::Variable>> finalVars;
 
     for (int i = 0; i < variables->size(); i++) {
         Variable *variable = variables->at(i);
@@ -413,7 +425,7 @@ std::vector<const collection::Variable *> Rule::getFinalVars(
             variable->evaluateInternal(trasn, this, &z);
             for (auto &y : z) {
                 exclusions.push_back(y->m_key);
-                delete y;
+                //delete y;
             }
             exclusions.push_back(&variable->m_name);
         }
@@ -431,7 +443,6 @@ std::vector<const collection::Variable *> Rule::getFinalVars(
         variable->evaluateInternal(trasn, this, &e);
         for (const collection::Variable *v : e) {
             const std::string *key = v->m_key;
-
             if (std::find_if(exclusions.begin(), exclusions.end(),
                 [key](const std::string *m) -> bool { return *key == *m; })
                 != exclusions.end()) {
@@ -470,7 +481,7 @@ std::vector<const collection::Variable *> Rule::getFinalVars(
             for (auto &i : trasn->m_ruleRemoveTargetById) {
                 int id = i.first;
                 std::string args = i.second;
-                if (rule_id != id) {
+                if (m_ruleId != id) {
                     continue;
                 }
                 if (args == *key) {
@@ -488,7 +499,17 @@ std::vector<const collection::Variable *> Rule::getFinalVars(
                 continue;
             }
 
-            finalVars.push_back(v);
+            std::unique_ptr<collection::Variable> var(new collection::Variable(
+                new std::string(*v->m_key),
+                new std::string(*v->m_value)));
+            var->m_dynamic_value = true;
+            var->m_dynamic_key = true;
+
+            if (v->m_dynamic) {
+                delete v;
+                v = NULL;
+            }
+            finalVars.push_back(std::move(var));
         }
     }
     return finalVars;
@@ -498,7 +519,7 @@ std::vector<const collection::Variable *> Rule::getFinalVars(
 void Rule::executeActionsAfterFullMatch(Transaction *trasn,
     bool containsDisruptive, RuleMessage *ruleMessage) {
 
-    for (Action *a : trasn->m_rules->m_defaultActions[this->phase]) {
+    for (Action *a : trasn->m_rules->m_defaultActions[this->m_phase]) {
         if (a->action_kind != actions::Action::RunTimeOnlyIfMatchKind) {
             continue;
         }
@@ -545,10 +566,6 @@ void Rule::executeActionsAfterFullMatch(Transaction *trasn,
             trasn->debug(4, "Running (disruptive) action: " + a->m_name);
             a->evaluate(this, trasn, ruleMessage);
             continue;
-        } else {
-            trasn->debug(4, "_Not_ running (disruptive) action: "
-                + a->m_name + ". SecRuleEngine is not On.");
-            continue;
         }
 
         trasn->debug(4, "Not running disruptive action: " + \
@@ -559,20 +576,20 @@ void Rule::executeActionsAfterFullMatch(Transaction *trasn,
 
 bool Rule::evaluate(Transaction *trasn) {
     bool globalRet = false;
-    std::vector<Variable *> *variables = this->variables;
+    std::vector<Variable *> *variables = this->m_variables;
     bool recursiveGlobalRet;
     bool containsDisruptive = false;
     RuleMessage ruleMessage(this);
-    std::vector<const collection::Variable *> finalVars;
+    std::vector<std::unique_ptr<collection::Variable>> finalVars;
     std::string eparam;
 
     trasn->m_matched.clear();
 
-    if (m_secmarker == true) {
+    if (m_secMarker == true) {
         return true;
     }
     if (m_unconditional == true) {
-        trasn->debug(4, "(Rule: " + std::to_string(rule_id) \
+        trasn->debug(4, "(Rule: " + std::to_string(m_ruleId) \
             + ") Executing unconditional rule...");
         executeActionsIndependentOfChainedRuleResult(trasn,
             &containsDisruptive, &ruleMessage);
@@ -580,24 +597,24 @@ bool Rule::evaluate(Transaction *trasn) {
     }
 
     for (auto &i : trasn->m_ruleRemoveById) {
-        if (rule_id != i) {
+        if (m_ruleId != i) {
             continue;
         }
-        trasn->debug(9, "Rule id: " + std::to_string(rule_id) +
+        trasn->debug(9, "Rule id: " + std::to_string(m_ruleId) +
             " was skipped due to an ruleRemoveById action...");
         return true;
     }
 
-    eparam = MacroExpansion::expand(this->op->m_param, trasn);
+    eparam = MacroExpansion::expand(this->m_op->m_param, trasn);
 
-    if (this->op->m_param != eparam) {
-        eparam = "\"" + eparam + "\" Was: \"" + this->op->m_param + "\"";
+    if (this->m_op->m_param != eparam) {
+        eparam = "\"" + eparam + "\" Was: \"" + this->m_op->m_param + "\"";
     } else {
         eparam = "\"" + eparam + "\"";
     }
 
-    trasn->debug(4, "(Rule: " + std::to_string(rule_id) \
-        + ") Executing operator \"" + this->op->m_op \
+    trasn->debug(4, "(Rule: " + std::to_string(m_ruleId) \
+        + ") Executing operator \"" + this->m_op->m_op \
         + "\" with param " \
         + eparam \
         + " against " \
@@ -607,7 +624,7 @@ bool Rule::evaluate(Transaction *trasn) {
 
     finalVars = getFinalVars(trasn);
 
-    for (const collection::Variable *v : finalVars) {
+    for (auto &v : finalVars) {
         const std::string value = *(v->m_value);
         const std::string key = *(v->m_key);
 
@@ -650,32 +667,24 @@ bool Rule::evaluate(Transaction *trasn) {
 
     trasn->debug(4, "Rule returned 1.");
 
-    if (this->chained == false) {
+    if (this->m_chained == false) {
         goto end_exec;
     }
 
-    if (this->chainedRule == NULL) {
+    if (this->m_chainedRule == NULL) {
         trasn->debug(4, "Rule is marked as chained but there " \
             "isn't a subsequent rule.");
         goto end_clean;
     }
 
     trasn->debug(4, "Executing chained rule.");
-    recursiveGlobalRet = this->chainedRule->evaluate(trasn);
+    recursiveGlobalRet = this->m_chainedRule->evaluate(trasn);
 
     if (recursiveGlobalRet == true) {
         goto end_exec;
     }
 
 end_clean:
-    while (finalVars.empty() == false) {
-        auto *a = finalVars.back();
-        finalVars.pop_back();
-        if (a->m_dynamic) {
-            delete a;
-        }
-    }
-
     return false;
 
 end_exec:
@@ -686,14 +695,6 @@ end_exec:
 
     if (ruleMessage.m_server_logs.size() > 0) {
         trasn->m_rulesMessages.push_back(ruleMessage);
-    }
-
-    while (finalVars.empty() == false) {
-        auto *a = finalVars.back();
-        finalVars.pop_back();
-        if (a->m_dynamic) {
-            delete a;
-        }
     }
 
     return true;

@@ -40,22 +40,28 @@ class Variable {
         m_key(key),
         m_value(),
         m_dynamic_value(false),
+        m_dynamic_key(false),
         m_dynamic(true) { }
     Variable(const std::string *key, const std::string *value) :
         m_key(key),
         m_value(value),
         m_dynamic_value(false),
+        m_dynamic_key(false),
         m_dynamic(true) { }
 
     ~Variable() {
         if (m_dynamic_value) {
             delete m_value;
         }
+        if (m_dynamic_key) {
+            delete m_key;
+        }
     }
 
     const std::string *m_key;
     const std::string *m_value;
     bool m_dynamic_value;
+    bool m_dynamic_key;
     bool m_dynamic;
     std::list<std::unique_ptr<VariableOrigin>> m_orign;
 };

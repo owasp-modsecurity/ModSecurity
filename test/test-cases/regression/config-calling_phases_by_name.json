@@ -71,7 +71,7 @@
       ]
     },
     "expected":{
-      "debug_log":"Target value: \"\" \\(Variable: MATCHED_VAR\\)"
+      "debug_log":"Target value: \"other_value\" \\(Variable: MATCHED_VAR\\)"
     },
     "rules":[
       "SecRuleEngine On",

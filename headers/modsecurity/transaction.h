@@ -40,11 +40,14 @@ typedef struct Transaction_t Transaction;
 typedef struct Rules_t Rules;
 #endif
 
+#include "modsecurity/anchored_set_variable.h"
+#include "modsecurity/anchored_variable.h"
 #include "modsecurity/intervention.h"
 #include "modsecurity/collection/collections.h"
 #include "modsecurity/collection/variable.h"
 #include "modsecurity/collection/collection.h"
 #include "modsecurity/variable_origin.h"
+
 
 #define LOGFY_ADD(a, b) \
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
@@ -88,142 +91,6 @@ class Operator;
 }
 
 
-struct MyEqual {
-    bool operator()(const std::string& Left, const std::string& Right) const {
-        return Left.size() == Right.size()
-             && std::equal(Left.begin(), Left.end(), Right.begin(),
-            [](char a, char b) {
-            return tolower(a) == tolower(b);
-        });
-    }
-};
-
-struct MyHash{
-    size_t operator()(const std::string& Keyval) const {
-        // You might need a better hash function than this
-        size_t h = 0;
-        std::for_each(Keyval.begin(), Keyval.end(), [&](char c) {
-            h += tolower(c);
-        });
-        return h;
-    }
-};
-
-class AnchoredSetVariable : public std::unordered_multimap<std::string,
-	collection::Variable *, MyHash, MyEqual> {
- public:
-    AnchoredSetVariable(Transaction *t, std::string name)
-        : m_name(""),
-        m_transaction(t) {
-            m_name.append(name);
-        }
-
-    ~AnchoredSetVariable() {
-        for (const auto& x : *this) {
-            collection::Variable *var = x.second;
-            delete var->m_key;
-            delete var;
-        }
-    }
-
-    void set(const std::string &key, const std::string &value,
-        size_t offset) {
-        std::string *v = new std::string(value);
-        std::string *k = new std::string(m_name + ":" + key);
-
-        collection::Variable *var = new collection::Variable(k, v);
-        var->m_dynamic_value = true;
-        var->m_dynamic = false;
-        emplace(key, var);
-    }
-
-    void resolve(std::vector<const collection::Variable *> *l) {
-        for (const auto& x : *this) {
-            l->insert(l->begin(), x.second);
-        }
-    }
-
-    void resolve(const std::string &key,
-        std::vector<const collection::Variable *> *l) {
-        auto range = this->equal_range(key);
-        for (auto it = range.first; it != range.second; ++it) {
-            l->push_back(it->second);
-        }
-    }
-
-    void resolveRegularExpression(const std::string &var,
-        std::vector<const collection::Variable *> *l);
-
-    Transaction *m_transaction;
-    std::string m_name;
-};
-
-
-class AnchoredVariable {
- public:
-    AnchoredVariable(Transaction *t, std::string name)
-        : m_name(""),
-        m_transaction(t),
-        m_value("") {
-            m_name.append(name);
-            m_var = new collection::Variable(&m_name);
-            m_var->m_dynamic = false;
-            m_var->m_value = &m_value;
-        }
-
-    ~AnchoredVariable() {
-        delete (m_var);
-        m_var = NULL;
-    }
-
-    void set(const std::string &a, size_t offset) {
-        std::unique_ptr<VariableOrigin> origin(
-            new VariableOrigin());
-        m_offset = offset;
-        m_value.assign(a.c_str(), a.size());
-        origin->m_offset = offset;
-        origin->m_length = m_value.size();
-        m_var->m_orign.push_back(std::move(origin));
-    }
-
-    void append(const std::string &a, size_t offset,
-        bool spaceSeparator = false) {
-        std::unique_ptr<VariableOrigin> origin(
-            new VariableOrigin());
-        if (spaceSeparator && !m_value.empty()) {
-            m_value.append(" " + a);
-        } else {
-            m_value.append(a);
-        }
-        m_offset = offset;
-        origin->m_offset = offset;
-        origin->m_length = a.size();
-        m_var->m_orign.push_back(std::move(origin));
-    }
-
-    void evaluate(std::vector<const collection::Variable *> *l) {
-        if (m_name.empty() || m_var->m_key == NULL
-            || m_var->m_value == NULL || m_var->m_key->empty()) {
-            return;
-        }
-        l->push_back(m_var);
-    }
-
-    std::string *evaluate() {
-        if (m_value.empty() == true) {
-            return NULL;
-        }
-        return &m_value;
-    }
-
-    int m_offset;
-    std::string m_value;
-    Transaction *m_transaction;
-    std::string m_name;
-    collection::Variable *m_var;
-};
-
-
 class TransactionAnchoredVariables {
  public:
     explicit TransactionAnchoredVariables(Transaction *t)
@@ -236,7 +103,6 @@ class TransactionAnchoredVariables {
         m_variableARGScombinedSize(t, "ARGS_COMBINED_SIZE"),
         m_variableAuthType(t, "AUTH_TYPE"),
         m_variableFilesCombinedSize(t, "FILES_COMBINED_SIZE"),
-        m_variableFilesTmpNames(t, "FILES_TMPNAMES"),
         m_variableFullRequest(t, "FULL_REQUEST"),
         m_variableFullRequestLength(t, "FULL_REQUEST_LENGTH"),
         m_variableInboundDataError(t, "INBOUND_DATA_ERROR"),
@@ -285,8 +151,25 @@ class TransactionAnchoredVariables {
         m_variableUniqueID(t, "UNIQUE_ID"),
         m_variableUrlEncodedError(t, "URLENCODED_ERROR"),
         m_variableUserID(t, "USERID"),
-        m_variableOffset(0),
-        m_variableArgs(t, "ARGS")
+        m_variableArgs(t, "ARGS"),
+        m_variableArgsGet(t, "ARGS_GET"),
+        m_variableArgsPost(t, "ARGS_POST"),
+        m_variableFilesSizes(t, "FILES_SIZES"),
+        m_variableFilesNames(t, "FILES_NAMES"),
+        m_variableFilesTmpContent(t, "FILES_TMP_CONTENT"),
+        m_variableMultiPartFileName(t, "MULTIPART_FILENAME"),
+        m_variableMultiPartName(t, "MULTIPART_NAME"),
+        m_variableMatchedVarsNames(t, "MATCHED_VARS_NAMES"),
+        m_variableMatchedVars(t, "MATCHED_VARS"),
+        m_variableFiles(t, "FILES"),
+        m_variableRequestCookies(t, "REQUEST_COOKIES"),
+        m_variableRequestHeaders(t, "REQUEST_HEADERS"),
+        m_variableResponseHeaders(t, "RESPONSE_HEADERS"),
+        m_variableGeo(t, "GEO"),
+        m_variableRequestCookiesNames(t, "REQUEST_COOKIES_NAMES"),
+        m_variableRule(t, "RULE"),
+        m_variableFilesTmpNames(t, "FILES_TMPNAMES"),
+        m_variableOffset(0)
         { }
 
     AnchoredVariable m_variableArgsNames;
@@ -298,7 +181,6 @@ class TransactionAnchoredVariables {
     AnchoredVariable m_variableARGScombinedSize;
     AnchoredVariable m_variableAuthType;
     AnchoredVariable m_variableFilesCombinedSize;
-    AnchoredVariable m_variableFilesTmpNames;
     AnchoredVariable m_variableFullRequest;
     AnchoredVariable m_variableFullRequestLength;
     AnchoredVariable m_variableInboundDataError;
@@ -346,6 +228,23 @@ class TransactionAnchoredVariables {
     AnchoredVariable m_variableUserID;
 
     AnchoredSetVariable m_variableArgs;
+    AnchoredSetVariable m_variableArgsGet;
+    AnchoredSetVariable m_variableArgsPost;
+    AnchoredSetVariable m_variableFilesSizes;
+    AnchoredSetVariable m_variableFilesNames;
+    AnchoredSetVariable m_variableFilesTmpContent;
+    AnchoredSetVariable m_variableMultiPartFileName;
+    AnchoredSetVariable m_variableMultiPartName;
+    AnchoredSetVariable m_variableMatchedVarsNames;
+    AnchoredSetVariable m_variableMatchedVars;
+    AnchoredSetVariable m_variableFiles;
+    AnchoredSetVariable m_variableRequestCookies;
+    AnchoredSetVariable m_variableRequestHeaders;
+    AnchoredSetVariable m_variableResponseHeaders;
+    AnchoredSetVariable m_variableGeo;
+    AnchoredSetVariable m_variableRequestCookiesNames;
+    AnchoredSetVariable m_variableRule;
+    AnchoredSetVariable m_variableFilesTmpNames;
 
     int m_variableOffset;
 };

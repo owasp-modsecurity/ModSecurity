@@ -34,7 +34,8 @@ class ServerName : public Variable {
     ServerName()
         : Variable("SERVER_NAME") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableServerName.evaluate(l);
     }

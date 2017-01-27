@@ -47,43 +47,48 @@ bool GeoLookup::evaluate(Transaction *trans, const std::string &exp) {
     }
     if (ret && gir) {
         if (gir->country_code) {
-            trans->m_collections.store("GEO:COUNTRY_CODE", gir->country_code);
+            trans->m_variableGeo.set("COUNTRY_CODE",
+                std::string(gir->country_code), 0);
         }
         if (gir->country_code3) {
-            trans->m_collections.store("GEO:COUNTRY_CODE3", gir->country_code3);
+            trans->m_variableGeo.set("COUNTRY_CODE3",
+                std::string(gir->country_code3), 0);
         }
         if (gir->country_name) {
-            trans->m_collections.store("GEO:COUNTRY_NAME", gir->country_name);
+            trans->m_variableGeo.set("COUNTRY_NAME",
+                std::string(gir->country_name), 0);
         }
         if (gir->continent_code) {
-            trans->m_collections.store("GEO:COUNTRY_CONTINENT",
-                gir->continent_code);
+            trans->m_variableGeo.set("COUNTRY_CONTINENT",
+                std::string(gir->continent_code), 0);
         }
         if (gir->country_code && gir->region) {
-            trans->m_collections.store("GEO:REGION",
-                GeoIP_region_name_by_code(gir->country_code, gir->region));
+            trans->m_variableGeo.set("REGION",
+                std::string(GeoIP_region_name_by_code(gir->country_code,
+                    gir->region)), 0);
         }
         if (gir->city) {
-            trans->m_collections.store("GEO:CITY", gir->city);
+            trans->m_variableGeo.set("CITY", std::string(gir->city), 0);
         }
         if (gir->postal_code) {
-            trans->m_collections.store("GEO:POSTAL_CODE", gir->postal_code);
+            trans->m_variableGeo.set("POSTAL_CODE",
+                std::string(gir->postal_code), 0);
         }
         if (gir->latitude) {
-            trans->m_collections.store("GEO:LATITUDE",
-                std::to_string(gir->latitude));
+            trans->m_variableGeo.set("LATITUDE",
+                std::to_string(gir->latitude), 0);
         }
         if (gir->longitude) {
-            trans->m_collections.store("GEO:LONGITUDE",
-                std::to_string(gir->longitude));
+            trans->m_variableGeo.set("LONGITUDE",
+                std::to_string(gir->longitude), 0);
         }
         if (gir->metro_code) {
-            trans->m_collections.store("GEO:DMA_CODE",
-                std::to_string(gir->metro_code));
+            trans->m_variableGeo.set("DMA_CODE",
+                std::to_string(gir->metro_code), 0);
         }
         if (gir->area_code) {
-            trans->m_collections.store("GEO:AREA_CODE",
-                std::to_string(gir->area_code));
+            trans->m_variableGeo.set("AREA_CODE",
+                std::to_string(gir->area_code), 0);
         }
 
         GeoIPRecord_delete(gir);

@@ -128,7 +128,7 @@ bool SetVar::evaluate(Rule *rule, Transaction *transm_parser_payload) {
         }
 
         try {
-            std::string *resolvedValue =
+            std::unique_ptr<std::string> resolvedValue =
                 transm_parser_payload->m_collections.resolveFirst(
                     m_collectionName,
                     m_variableNameExpanded);

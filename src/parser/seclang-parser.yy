@@ -144,31 +144,40 @@ class Driver;
 #include "src/utils/geo_lookup.h"
 #include "src/utils/string.h"
 #include "src/utils/system.h"
+#include "src/variables/args_combined_size.h"
+#include "src/variables/args_get.h"
+#include "src/variables/args_get_names.h"
 #include "src/variables/args.h"
 #include "src/variables/args_names.h"
-#include "src/variables/xml.h"
-#include "src/variables/args_combined_size.h"
-#include "src/variables/args_get_names.h"
-#include "src/variables/args_names.h"
+#include "src/variables/args_post.h"
 #include "src/variables/args_post_names.h"
 #include "src/variables/auth_type.h"
 #include "src/variables/duration.h"
 #include "src/variables/env.h"
 #include "src/variables/files_combined_size.h"
+#include "src/variables/files.h"
+#include "src/variables/files_names.h"
+#include "src/variables/files_sizes.h"
+#include "src/variables/files_tmp_content.h"
 #include "src/variables/files_tmp_names.h"
 #include "src/variables/full_request.h"
 #include "src/variables/full_request_length.h"
+#include "src/variables/geo.h"
 #include "src/variables/highest_severity.h"
 #include "src/variables/inbound_data_error.h"
 #include "src/variables/matched_var.h"
 #include "src/variables/matched_var_name.h"
+#include "src/variables/matched_vars.h"
+#include "src/variables/matched_vars_names.h"
 #include "src/variables/modsec_build.h"
 #include "src/variables/multipart_crlf_lf_lines.h"
 #include "src/variables/multipart_data_after.h"
 #include "src/variables/multipart_file_limit_exceeded.h"
+#include "src/variables/multipart_file_name.h"
 #include "src/variables/multipart_header_folding.h"
 #include "src/variables/multipart_invalid_header_folding.h"
 #include "src/variables/multipart_invalid_quoting.h"
+#include "src/variables/multipart_name.h"
 #include "src/variables/multipart_strict_error.h"
 #include "src/variables/multipart_unmatched_boundary.h"
 #include "src/variables/outbound_data_error.h"
@@ -186,7 +195,10 @@ class Driver;
 #include "src/variables/request_base_name.h"
 #include "src/variables/request_body.h"
 #include "src/variables/request_body_length.h"
+#include "src/variables/request_cookies.h"
+#include "src/variables/request_cookies_names.h"
 #include "src/variables/request_file_name.h"
+#include "src/variables/request_headers.h"
 #include "src/variables/request_headers_names.h"
 #include "src/variables/request_line.h"
 #include "src/variables/request_method.h"
@@ -197,6 +209,7 @@ class Driver;
 #include "src/variables/response_body.h"
 #include "src/variables/response_content_length.h"
 #include "src/variables/response_content_type.h"
+#include "src/variables/response_headers.h"
 #include "src/variables/response_headers_names.h"
 #include "src/variables/response_protocol.h"
 #include "src/variables/response_status.h"
@@ -220,9 +233,10 @@ class Driver;
 #include "src/variables/user_id.h"
 #include "src/variables/variable.h"
 #include "src/variables/xml.h"
-#include "src/variables/variations/count.h"
-#include "src/variables/variations/exclusion.h"
-
+#include "src/variables/ip.h"
+#include "src/variables/global.h"
+#include "src/variables/session.h"
+#include "src/variables/status.h"
 
 using modsecurity::ModSecurity;
 using modsecurity::Rule;
@@ -241,10 +255,27 @@ using modsecurity::Variables::TimeSec;
 using modsecurity::Variables::TimeWDay;
 using modsecurity::Variables::TimeYear;
 using modsecurity::Variables::Time;
-using modsecurity::Variables::Tx;
+using modsecurity::Variables::Tx_DictElement;
+using modsecurity::Variables::Tx_NoDictElement;
+using modsecurity::Variables::Tx_DictElementRegexp;
+
+using modsecurity::Variables::Ip_DictElement;
+using modsecurity::Variables::Ip_NoDictElement;
+using modsecurity::Variables::Ip_DictElementRegexp;
+
+using modsecurity::Variables::Global_DictElement;
+using modsecurity::Variables::Global_NoDictElement;
+using modsecurity::Variables::Global_DictElementRegexp;
+
+using modsecurity::Variables::Session_DictElement;
+using modsecurity::Variables::Session_NoDictElement;
+using modsecurity::Variables::Session_DictElementRegexp;
+
+
+
 using modsecurity::Variables::Variable;
-using modsecurity::Variables::Variations::Count;
-using modsecurity::Variables::Variations::Exclusion;
+using modsecurity::Variables::VariableModificatorExclusion;
+using modsecurity::Variables::VariableModificatorCount;
 using modsecurity::Variables::XML;
 
 using namespace modsecurity;
@@ -294,6 +325,10 @@ using modsecurity::operators::Operator;
     std::unique_ptr<actions::Action> c(b); \
     a = std::move(c);
 
+#define VARIABLE_CONTAINER(a, b) \
+    std::unique_ptr<Variable> c(b); \
+    a = std::move(c);
+
 
 }
 // The parsing context.
@@ -316,9 +351,27 @@ using modsecurity::operators::Operator;
   COMMA    ","
   PIPE
   NEW_LINE
+  VAR_COUNT
+  VAR_EXCLUSION
   VARIABLE_ARGS
+  VARIABLE_ARGS_POST
+  VARIABLE_ARGS_GET
+  VARIABLE_FILES_SIZES
+  VARIABLE_FILES_NAMES
+  VARIABLE_FILES_TMP_CONTENT
+  VARIABLE_MULTIPART_FILENAME
+  VARIABLE_MULTIPART_NAME
+  VARIABLE_MATCHED_VARS_NAMES
+  VARIABLE_MATCHED_VARS
+  VARIABLE_FILES
+  VARIABLE_REQUEST_COOKIES
+  VARIABLE_REQUEST_HEADERS
+  VARIABLE_RESPONSE_HEADERS
+  VARIABLE_GEO
+  VARIABLE_REQUEST_COOKIES_NAMES
   VARIABLE_ARGS_COMBINED_SIZE
   VARIABLE_ARGS_GET_NAMES
+  VARIABLE_RULE
   VARIABLE_ARGS_NAMES           "Variable ARGS_NAMES"
   VARIABLE_ARGS_POST_NAMES
   VARIABLE_AUTH_TYPE            "AUTH_TYPE"
@@ -372,6 +425,15 @@ using modsecurity::operators::Operator;
   VARIABLE_UNIQUE_ID            "UNIQUE_ID"
   VARIABLE_URL_ENCODED_ERROR    "URLENCODED_ERROR"
   VARIABLE_USER_ID               "USERID"
+  VARIABLE_STATUS                              "VARIABLE_STATUS"
+  VARIABLE_IP                                  "VARIABLE_IP"
+  VARIABLE_GLOBAL                              "VARIABLE_GLOBAL"
+  VARIABLE_TX                                  "VARIABLE_TX"
+  VARIABLE_SESSION                             "VARIABLE_SESSION"
+  VARIABLE_USER                                 "VARIABLE_USER"
+  RUN_TIME_VAR_ENV                             "RUN_TIME_VAR_ENV"
+  RUN_TIME_VAR_XML                             "RUN_TIME_VAR_XML"
+
   ACTION_SETVAR                                "SetVar"
   SETVAR_OPERATION_EQUALS
   SETVAR_OPERATION_EQUALS_PLUS
@@ -559,10 +621,8 @@ using modsecurity::operators::Operator;
   QUOTATION_MARK                               "QUOTATION_MARK"
   RUN_TIME_VAR_BLD                             "RUN_TIME_VAR_BLD"
   RUN_TIME_VAR_DUR                             "RUN_TIME_VAR_DUR"
-  RUN_TIME_VAR_ENV                             "RUN_TIME_VAR_ENV"
   RUN_TIME_VAR_HSV                             "RUN_TIME_VAR_HSV"
   RUN_TIME_VAR_REMOTE_USER                     "RUN_TIME_VAR_REMOTE_USER"
-  RUN_TIME_VAR_RULE                            "RUN_TIME_VAR_RULE"
   RUN_TIME_VAR_TIME                            "RUN_TIME_VAR_TIME"
   RUN_TIME_VAR_TIME_DAY                        "RUN_TIME_VAR_TIME_DAY"
   RUN_TIME_VAR_TIME_EPOCH                      "RUN_TIME_VAR_TIME_EPOCH"
@@ -572,11 +632,7 @@ using modsecurity::operators::Operator;
   RUN_TIME_VAR_TIME_SEC                        "RUN_TIME_VAR_TIME_SEC"
   RUN_TIME_VAR_TIME_WDAY                       "RUN_TIME_VAR_TIME_WDAY"
   RUN_TIME_VAR_TIME_YEAR                       "RUN_TIME_VAR_TIME_YEAR"
-  RUN_TIME_VAR_XML                             "RUN_TIME_VAR_XML"
   VARIABLE                                     "VARIABLE"
-  VARIABLE_COL                                 "VARIABLE_COL"
-  VARIABLE_STATUS                              "VARIABLE_STATUS"
-  VARIABLE_TX                                  "VARIABLE_TX"
   DICT_ELEMENT                                 "Dictionary element"
   DICT_ELEMENT_REGEXP                          "Dictionary element, selected by regexp"
 ;
@@ -1246,616 +1302,647 @@ variables:
         $1->push_back(std::move($3));
         $$ = std::move($1);
       }
+    | variables PIPE VAR_EXCLUSION var
+      {
+        std::unique_ptr<Variable> c(new VariableModificatorExclusion(std::move($4)));
+        $1->push_back(std::move(c));
+        $$ = std::move($1);
+      }
+    | variables PIPE VAR_COUNT var
+      {
+        std::unique_ptr<Variable> c(new VariableModificatorCount(std::move($4)));
+        $1->push_back(std::move(c));
+        $$ = std::move($1);
+      }
     | var
       {
         std::unique_ptr<std::vector<std::unique_ptr<Variable>>> b(new std::vector<std::unique_ptr<Variable>>());
         b->push_back(std::move($1));
         $$ = std::move(b);
       }
+    | VAR_EXCLUSION var
+      {
+        std::unique_ptr<std::vector<std::unique_ptr<Variable>>> b(new std::vector<std::unique_ptr<Variable>>());
+        std::unique_ptr<Variable> c(new VariableModificatorExclusion(std::move($2)));
+        b->push_back(std::move(c));
+        $$ = std::move(b);
+      }
+    | VAR_COUNT var
+      {
+        std::unique_ptr<std::vector<std::unique_ptr<Variable>>> b(new std::vector<std::unique_ptr<Variable>>());
+        std::unique_ptr<Variable> c(new VariableModificatorCount(std::move($2)));
+        b->push_back(std::move(c));
+        $$ = std::move(b);
+      }
     ;
 
 var:
-    VARIABLE_ARGS_NAMES
+    VARIABLE_ARGS DICT_ELEMENT
       {
-        std::unique_ptr<Variable> c(new Variables::ArgsNames());
-        $$ = std::move(c);
-      }
-    | VARIABLE_ARGS DICT_ELEMENT
-      {
-        std::unique_ptr<Variable> c(new Variables::Args_DictElement($2));
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::Args_DictElement($2));
       }
     | VARIABLE_ARGS DICT_ELEMENT_REGEXP
       {
-        std::unique_ptr<Variable> c(new Variables::Args_DictElementRegexp($2));
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::Args_DictElementRegexp($2));
       }
     | VARIABLE_ARGS
       {
-        std::unique_ptr<Variable> c(new Variables::Args_NoDictElement());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::Args_NoDictElement());
       }
-    | VARIABLE_ARGS_GET_NAMES
+    | VARIABLE_ARGS_POST DICT_ELEMENT
       {
-        std::unique_ptr<Variable> c(new Variables::ArgsGetNames());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::ArgsPost_DictElement($2));
       }
-    | VARIABLE_ARGS_POST_NAMES
+    | VARIABLE_ARGS_POST DICT_ELEMENT_REGEXP
       {
-        std::unique_ptr<Variable> c(new Variables::ArgsPostNames());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::ArgsPost_DictElementRegexp($2));
       }
-    | VARIABLE_REQUEST_HEADERS_NAMES
+    | VARIABLE_ARGS_POST
       {
-        std::unique_ptr<Variable> c(new Variables::RequestHeadersNames());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::ArgsPost_NoDictElement());
       }
-    | VARIABLE_RESPONSE_CONTENT_TYPE
+    | VARIABLE_ARGS_GET DICT_ELEMENT
       {
-        std::unique_ptr<Variable> c(new Variables::ResponseContentType());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::ArgsGet_DictElement($2));
       }
-    | VARIABLE_RESPONSE_HEADERS_NAMES
+    | VARIABLE_ARGS_GET DICT_ELEMENT_REGEXP
       {
-        std::unique_ptr<Variable> c(new Variables::ResponseHeadersNames());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::ArgsGet_DictElementRegexp($2));
       }
-    | VARIABLE_ARGS_COMBINED_SIZE
+    | VARIABLE_ARGS_GET
       {
-        std::unique_ptr<Variable> c(new Variables::ArgsCombinedSize());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::ArgsGet_NoDictElement());
       }
-   | VARIABLE_AUTH_TYPE
+    | VARIABLE_FILES_SIZES DICT_ELEMENT
       {
-        std::unique_ptr<Variable> c(new Variables::AuthType());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::FilesSizes_DictElement($2));
       }
-    | VARIABLE_FILES_COMBINED_SIZE
+    | VARIABLE_FILES_SIZES DICT_ELEMENT_REGEXP
       {
-        std::unique_ptr<Variable> c(new Variables::FilesCombinedSize());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::FilesSizes_DictElementRegexp($2));
+      }
+    | VARIABLE_FILES_SIZES
+      {
+        VARIABLE_CONTAINER($$, new Variables::FilesSizes_NoDictElement());
+      }
+    | VARIABLE_FILES_NAMES DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::FilesNames_DictElement($2));
+      }
+    | VARIABLE_FILES_NAMES DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::FilesNames_DictElementRegexp($2));
+      }
+    | VARIABLE_FILES_NAMES
+      {
+        VARIABLE_CONTAINER($$, new Variables::FilesNames_NoDictElement());
+      }
+    | VARIABLE_FILES_TMP_CONTENT DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::FilesTmpContent_DictElement($2));
+      }
+    | VARIABLE_FILES_TMP_CONTENT DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::FilesTmpContent_DictElementRegexp($2));
+      }
+    | VARIABLE_FILES_TMP_CONTENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::FilesTmpContent_NoDictElement());
+      }
+    | VARIABLE_MULTIPART_FILENAME DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultiPartFileName_DictElement($2));
+      }
+    | VARIABLE_MULTIPART_FILENAME DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultiPartFileName_DictElementRegexp($2));
+      }
+    | VARIABLE_MULTIPART_FILENAME
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultiPartFileName_NoDictElement());
+      }
+    | VARIABLE_MULTIPART_NAME DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultiPartName_DictElement($2));
+      }
+    | VARIABLE_MULTIPART_NAME DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultiPartName_DictElementRegexp($2));
+      }
+    | VARIABLE_MULTIPART_NAME
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultiPartName_NoDictElement());
+      }
+    | VARIABLE_MATCHED_VARS_NAMES DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::MatchedVarsNames_DictElement($2));
+      }
+    | VARIABLE_MATCHED_VARS_NAMES DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::MatchedVarsNames_DictElementRegexp($2));
+      }
+    | VARIABLE_MATCHED_VARS_NAMES
+      {
+        VARIABLE_CONTAINER($$, new Variables::MatchedVarsNames_NoDictElement());
+      }
+    | VARIABLE_MATCHED_VARS DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::MatchedVars_DictElement($2));
+      }
+    | VARIABLE_MATCHED_VARS DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::MatchedVars_DictElementRegexp($2));
+      }
+    | VARIABLE_MATCHED_VARS
+      {
+        VARIABLE_CONTAINER($$, new Variables::MatchedVars_NoDictElement());
+      }
+    | VARIABLE_FILES DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::Files_DictElement($2));
+      }
+    | VARIABLE_FILES DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::Files_DictElementRegexp($2));
+      }
+    | VARIABLE_FILES
+      {
+        VARIABLE_CONTAINER($$, new Variables::Files_NoDictElement());
+      }
+    | VARIABLE_REQUEST_COOKIES DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestCookies_DictElement($2));
+      }
+    | VARIABLE_REQUEST_COOKIES DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestCookies_DictElementRegexp($2));
+      }
+    | VARIABLE_REQUEST_COOKIES
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestCookies_NoDictElement());
+      }
+    | VARIABLE_REQUEST_HEADERS DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestHeaders_DictElement($2));
+      }
+    | VARIABLE_REQUEST_HEADERS DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestHeaders_DictElementRegexp($2));
+      }
+    | VARIABLE_REQUEST_HEADERS
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestHeaders_NoDictElement());
+      }
+    | VARIABLE_RESPONSE_HEADERS DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::ResponseHeaders_DictElement($2));
+      }
+    | VARIABLE_RESPONSE_HEADERS DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::ResponseHeaders_DictElementRegexp($2));
+      }
+    | VARIABLE_RESPONSE_HEADERS
+      {
+        VARIABLE_CONTAINER($$, new Variables::ResponseHeaders_NoDictElement());
+      }
+    | VARIABLE_GEO DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::Geo_DictElement($2));
+      }
+    | VARIABLE_GEO DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::Geo_DictElementRegexp($2));
+      }
+    | VARIABLE_GEO
+      {
+        VARIABLE_CONTAINER($$, new Variables::Geo_NoDictElement());
+      }
+    | VARIABLE_REQUEST_COOKIES_NAMES DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestCookiesNames_DictElement($2));
+      }
+    | VARIABLE_REQUEST_COOKIES_NAMES DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestCookiesNames_DictElementRegexp($2));
+      }
+    | VARIABLE_REQUEST_COOKIES_NAMES
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestCookiesNames_NoDictElement());
+      }
+    | VARIABLE_RULE DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::Rule_DictElement($2));
+      }
+    | VARIABLE_RULE DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::Rule_DictElementRegexp($2));
+      }
+    | VARIABLE_RULE
+      {
+        VARIABLE_CONTAINER($$, new Variables::Rule_NoDictElement());
+      }
+    | RUN_TIME_VAR_ENV DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::Env("ENV:" + $2));
+      }
+    | RUN_TIME_VAR_ENV DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::Env("ENV:" + $2));
+      }
+    | RUN_TIME_VAR_ENV
+      {
+        VARIABLE_CONTAINER($$, new Variables::Env("ENV"));
+      }
+    | RUN_TIME_VAR_XML DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::XML("XML:" + $2));
+      }
+    | RUN_TIME_VAR_XML DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::XML("XML:" + $2));
+      }
+    | RUN_TIME_VAR_XML
+      {
+        VARIABLE_CONTAINER($$, new Variables::XML_NoDictElement());
+      }
+    | VARIABLE_FILES_TMP_NAMES DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::FilesTmpNames_DictElement($2));
+      }
+    | VARIABLE_FILES_TMP_NAMES DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::FilesTmpNames_DictElementRegexp($2));
       }
     | VARIABLE_FILES_TMP_NAMES
       {
-        std::unique_ptr<Variable> c(new Variables::FilesTmpNames());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::FilesTmpNames_NoDictElement());
       }
-    | VARIABLE_FULL_REQUEST
+
+    | VARIABLE_IP DICT_ELEMENT
       {
-        std::unique_ptr<Variable> c(new Variables::FullRequest());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::Ip_DictElement($2));
       }
-    | VARIABLE_FULL_REQUEST_LENGTH
+    | VARIABLE_IP DICT_ELEMENT_REGEXP
       {
-        std::unique_ptr<Variable> c(new Variables::FullRequestLength());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::Ip_DictElementRegexp($2));
       }
-    | VARIABLE_INBOUND_DATA_ERROR
+    | VARIABLE_IP
       {
-        std::unique_ptr<Variable> c(new Variables::InboundDataError());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::Ip_NoDictElement());
       }
-    | VARIABLE_MATCHED_VAR
+
+    | VARIABLE_GLOBAL DICT_ELEMENT
       {
-        std::unique_ptr<Variable> c(new Variables::MatchedVar());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::Global_DictElement($2));
       }
-    | VARIABLE_MATCHED_VAR_NAME
+    | VARIABLE_GLOBAL DICT_ELEMENT_REGEXP
       {
-        std::unique_ptr<Variable> c(new Variables::MatchedVarName());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::Global_DictElementRegexp($2));
       }
-    | VARIABLE_MULTIPART_CRLF_LF_LINES
+    | VARIABLE_GLOBAL
       {
-        std::unique_ptr<Variable> c(new Variables::MultipartCrlfLFLines());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::Global_NoDictElement());
       }
-    | VARIABLE_MULTIPART_DATA_AFTER
+
+    | VARIABLE_TX DICT_ELEMENT
       {
-        std::unique_ptr<Variable> c(new Variables::MultipartDateAfter());
-        $$ = std::move(c);
+        VARIABLE_CONTAINER($$, new Variables::Tx_DictElement($2));
       }
-    | VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED
+    | VARIABLE_TX DICT_ELEMENT_REGEXP
       {
-        std::unique_ptr<Variable> c(new Variables::MultipartFileLimitExceeded());
-        $$ = std::move(c);
-      }
-    | VARIABLE_MULTIPART_HEADER_FOLDING
-      {
-        std::unique_ptr<Variable> c(new Variables::MultipartHeaderFolding());
-        $$ = std::move(c);
-      }
-    | VARIABLE_MULTIPART_INVALID_HEADER_FOLDING
-      {
-        std::unique_ptr<Variable> c(new Variables::MultipartInvalidHeaderFolding());
-        $$ = std::move(c);
-      }
-    | VARIABLE_MULTIPART_INVALID_QUOTING
-      {
-        std::unique_ptr<Variable> c(new Variables::MultipartInvalidQuoting());
-        $$ = std::move(c);
-      }
-    | VARIABLE_MULTIPART_STRICT_ERROR
-      {
-        std::unique_ptr<Variable> c(new Variables::MultipartStrictError());
-        $$ = std::move(c);
-      }
-    | VARIABLE_MULTIPART_UNMATCHED_BOUNDARY
-      {
-        std::unique_ptr<Variable> c(new Variables::MultipartUnmatchedBoundary());
-        $$ = std::move(c);
-      }
-    | VARIABLE_OUTBOUND_DATA_ERROR
-      {
-        std::unique_ptr<Variable> c(new Variables::OutboundDataError());
-        $$ = std::move(c);
-      }
-    | VARIABLE_PATH_INFO
-      {
-        std::unique_ptr<Variable> c(new Variables::PathInfo());
-        $$ = std::move(c);
-      }
-    | VARIABLE_QUERY_STRING
-      {
-        std::unique_ptr<Variable> c(new Variables::QueryString());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REMOTE_ADDR
-      {
-        std::unique_ptr<Variable> c(new Variables::RemoteAddr());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REMOTE_HOST
-      {
-        std::unique_ptr<Variable> c(new Variables::RemoteHost());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REMOTE_PORT
-      {
-        std::unique_ptr<Variable> c(new Variables::RemotePort());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQBODY_ERROR
-      {
-        std::unique_ptr<Variable> c(new Variables::ReqbodyError());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQBODY_ERROR_MSG
-      {
-        std::unique_ptr<Variable> c(new Variables::ReqbodyErrorMsg());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQBODY_PROCESSOR
-      {
-        std::unique_ptr<Variable> c(new Variables::ReqbodyProcessor());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQBODY_PROCESSOR_ERROR
-      {
-        std::unique_ptr<Variable> c(new Variables::ReqbodyProcessorError());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQBODY_PROCESSOR_ERROR_MSG
-      {
-        std::unique_ptr<Variable> c(new Variables::ReqbodyProcessorErrorMsg());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQUEST_BASENAME
-      {
-        std::unique_ptr<Variable> c(new Variables::RequestBasename());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQUEST_BODY
-      {
-        std::unique_ptr<Variable> c(new Variables::RequestBody());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQUEST_BODY_LENGTH
-      {
-        std::unique_ptr<Variable> c(new Variables::RequestBodyLength());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQUEST_FILE_NAME
-      {
-        std::unique_ptr<Variable> c(new Variables::RequestFilename());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQUEST_LINE
-      {
-        std::unique_ptr<Variable> c(new Variables::RequestLine());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQUEST_METHOD
-      {
-        std::unique_ptr<Variable> c(new Variables::RequestMethod());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQUEST_PROTOCOL
-      {
-        std::unique_ptr<Variable> c(new Variables::RequestProtocol());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQUEST_URI
-      {
-        std::unique_ptr<Variable> c(new Variables::RequestURI());
-        $$ = std::move(c);
-      }
-    | VARIABLE_REQUEST_URI_RAW
-      {
-        std::unique_ptr<Variable> c(new Variables::RequestURIRaw());
-        $$ = std::move(c);
-      }
-    | VARIABLE_RESOURCE
-      {
-        std::unique_ptr<Variable> c(new Variables::Resource());
-        $$ = std::move(c);
-      }
-    | VARIABLE_RESPONSE_BODY
-      {
-        std::unique_ptr<Variable> c(new Variables::ResponseBody());
-        $$ = std::move(c);
-      }
-    | VARIABLE_RESPONSE_CONTENT_LENGTH
-      {
-        std::unique_ptr<Variable> c(new Variables::ResponseContentLength());
-        $$ = std::move(c);
-      }
-    | VARIABLE_RESPONSE_PROTOCOL
-      {
-        std::unique_ptr<Variable> c(new Variables::ResponseProtocol());
-        $$ = std::move(c);
-      }
-    | VARIABLE_RESPONSE_STATUS
-      {
-        std::unique_ptr<Variable> c(new Variables::ResponseStatus());
-        $$ = std::move(c);
-      }
-    | VARIABLE_SERVER_ADDR
-      {
-        std::unique_ptr<Variable> c(new Variables::ServerAddr());
-        $$ = std::move(c);
-      }
-    | VARIABLE_SERVER_NAME
-      {
-        std::unique_ptr<Variable> c(new Variables::ServerName());
-        $$ = std::move(c);
-      }
-    | VARIABLE_SERVER_PORT
-      {
-        std::unique_ptr<Variable> c(new Variables::ServerPort());
-        $$ = std::move(c);
-      }
-    | VARIABLE_SESSION_ID
-      {
-        std::unique_ptr<Variable> c(new Variables::SessionID());
-        $$ = std::move(c);
-      }
-    | VARIABLE_UNIQUE_ID
-      {
-        std::unique_ptr<Variable> c(new Variables::UniqueID());
-        $$ = std::move(c);
-      }
-    | VARIABLE_URL_ENCODED_ERROR
-      {
-        std::unique_ptr<Variable> c(new Variables::UrlEncodedError());
-        $$ = std::move(c);
-      }
-    | VARIABLE_USER_ID
-      {
-        std::unique_ptr<Variable> c(new Variables::UserID());
-        $$ = std::move(c);
-      }
-    | VARIABLE_STATUS
-      {
-        std::string name($1);
-        char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new Variable(name, Variable::VariableKind::DirectVariable)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new Variable(name, Variable::VariableKind::DirectVariable));
-            $$ = std::move(c);
-        }
-      }
-    | VARIABLE_COL
-      {
-        std::string name($1);
-        char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new Variable(name, Variable::VariableKind::CollectionVarible)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new Variable(name, Variable::VariableKind::CollectionVarible)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new Variable(name, Variable::VariableKind::CollectionVarible));
-            $$ = std::move(c);
-        }
+        VARIABLE_CONTAINER($$, new Variables::Tx_DictElementRegexp($2));
       }
     | VARIABLE_TX
       {
-        std::string name($1);
-        char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new Tx(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new Tx(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new Tx(name));
-            $$ = std::move(c);
-        }
+        VARIABLE_CONTAINER($$, new Variables::Tx_NoDictElement());
+      }
+
+    | VARIABLE_SESSION DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new Variables::Session_DictElement($2));
+      }
+    | VARIABLE_SESSION DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new Variables::Session_DictElementRegexp($2));
+      }
+    | VARIABLE_SESSION
+      {
+        VARIABLE_CONTAINER($$, new Variables::Session_NoDictElement());
+      }
+
+
+
+    | VARIABLE_ARGS_NAMES
+      {
+        VARIABLE_CONTAINER($$, new Variables::ArgsNames());
+      }
+    | VARIABLE_ARGS_GET_NAMES
+      {
+        VARIABLE_CONTAINER($$, new Variables::ArgsGetNames());
+      }
+    | VARIABLE_ARGS_POST_NAMES
+      {
+        VARIABLE_CONTAINER($$, new Variables::ArgsPostNames());
+      }
+    | VARIABLE_REQUEST_HEADERS_NAMES
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestHeadersNames());
+      }
+    | VARIABLE_RESPONSE_CONTENT_TYPE
+      {
+        VARIABLE_CONTAINER($$, new Variables::ResponseContentType());
+      }
+    | VARIABLE_RESPONSE_HEADERS_NAMES
+      {
+        VARIABLE_CONTAINER($$, new Variables::ResponseHeadersNames());
+      }
+    | VARIABLE_ARGS_COMBINED_SIZE
+      {
+        VARIABLE_CONTAINER($$, new Variables::ArgsCombinedSize());
+      }
+   | VARIABLE_AUTH_TYPE
+      {
+        VARIABLE_CONTAINER($$, new Variables::AuthType());
+      }
+    | VARIABLE_FILES_COMBINED_SIZE
+      {
+        VARIABLE_CONTAINER($$, new Variables::FilesCombinedSize());
+      }
+    | VARIABLE_FULL_REQUEST
+      {
+        VARIABLE_CONTAINER($$, new Variables::FullRequest());
+      }
+    | VARIABLE_FULL_REQUEST_LENGTH
+      {
+        VARIABLE_CONTAINER($$, new Variables::FullRequestLength());
+      }
+    | VARIABLE_INBOUND_DATA_ERROR
+      {
+        VARIABLE_CONTAINER($$, new Variables::InboundDataError());
+      }
+    | VARIABLE_MATCHED_VAR
+      {
+        VARIABLE_CONTAINER($$, new Variables::MatchedVar());
+      }
+    | VARIABLE_MATCHED_VAR_NAME
+      {
+        VARIABLE_CONTAINER($$, new Variables::MatchedVarName());
+      }
+    | VARIABLE_MULTIPART_CRLF_LF_LINES
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartCrlfLFLines());
+      }
+    | VARIABLE_MULTIPART_DATA_AFTER
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartDateAfter());
+      }
+    | VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartFileLimitExceeded());
+      }
+    | VARIABLE_MULTIPART_HEADER_FOLDING
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartHeaderFolding());
+      }
+    | VARIABLE_MULTIPART_INVALID_HEADER_FOLDING
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartInvalidHeaderFolding());
+      }
+    | VARIABLE_MULTIPART_INVALID_QUOTING
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartInvalidQuoting());
+      }
+    | VARIABLE_MULTIPART_STRICT_ERROR
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartStrictError());
+      }
+    | VARIABLE_MULTIPART_UNMATCHED_BOUNDARY
+      {
+        VARIABLE_CONTAINER($$, new Variables::MultipartUnmatchedBoundary());
+      }
+    | VARIABLE_OUTBOUND_DATA_ERROR
+      {
+        VARIABLE_CONTAINER($$, new Variables::OutboundDataError());
+      }
+    | VARIABLE_PATH_INFO
+      {
+        VARIABLE_CONTAINER($$, new Variables::PathInfo());
+      }
+    | VARIABLE_QUERY_STRING
+      {
+        VARIABLE_CONTAINER($$, new Variables::QueryString());
+      }
+    | VARIABLE_REMOTE_ADDR
+      {
+        VARIABLE_CONTAINER($$, new Variables::RemoteAddr());
+      }
+    | VARIABLE_REMOTE_HOST
+      {
+        VARIABLE_CONTAINER($$, new Variables::RemoteHost());
+      }
+    | VARIABLE_REMOTE_PORT
+      {
+        VARIABLE_CONTAINER($$, new Variables::RemotePort());
+      }
+    | VARIABLE_REQBODY_ERROR
+      {
+        VARIABLE_CONTAINER($$, new Variables::ReqbodyError());
+      }
+    | VARIABLE_REQBODY_ERROR_MSG
+      {
+        VARIABLE_CONTAINER($$, new Variables::ReqbodyErrorMsg());
+      }
+    | VARIABLE_REQBODY_PROCESSOR
+      {
+        VARIABLE_CONTAINER($$, new Variables::ReqbodyProcessor());
+      }
+    | VARIABLE_REQBODY_PROCESSOR_ERROR
+      {
+        VARIABLE_CONTAINER($$, new Variables::ReqbodyProcessorError());
+      }
+    | VARIABLE_REQBODY_PROCESSOR_ERROR_MSG
+      {
+        VARIABLE_CONTAINER($$, new Variables::ReqbodyProcessorErrorMsg());
+      }
+    | VARIABLE_REQUEST_BASENAME
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestBasename());
+      }
+    | VARIABLE_REQUEST_BODY
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestBody());
+      }
+    | VARIABLE_REQUEST_BODY_LENGTH
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestBodyLength());
+      }
+    | VARIABLE_REQUEST_FILE_NAME
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestFilename());
+      }
+    | VARIABLE_REQUEST_LINE
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestLine());
+      }
+    | VARIABLE_REQUEST_METHOD
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestMethod());
+      }
+    | VARIABLE_REQUEST_PROTOCOL
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestProtocol());
+      }
+    | VARIABLE_REQUEST_URI
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestURI());
+      }
+    | VARIABLE_REQUEST_URI_RAW
+      {
+        VARIABLE_CONTAINER($$, new Variables::RequestURIRaw());
+      }
+    | VARIABLE_RESOURCE
+      {
+        VARIABLE_CONTAINER($$, new Variables::Resource());
+      }
+    | VARIABLE_RESPONSE_BODY
+      {
+        VARIABLE_CONTAINER($$, new Variables::ResponseBody());
+      }
+    | VARIABLE_RESPONSE_CONTENT_LENGTH
+      {
+        VARIABLE_CONTAINER($$, new Variables::ResponseContentLength());
+      }
+    | VARIABLE_RESPONSE_PROTOCOL
+      {
+        VARIABLE_CONTAINER($$, new Variables::ResponseProtocol());
+      }
+    | VARIABLE_RESPONSE_STATUS
+      {
+        VARIABLE_CONTAINER($$, new Variables::ResponseStatus());
+      }
+    | VARIABLE_SERVER_ADDR
+      {
+        VARIABLE_CONTAINER($$, new Variables::ServerAddr());
+      }
+    | VARIABLE_SERVER_NAME
+      {
+        VARIABLE_CONTAINER($$, new Variables::ServerName());
+      }
+    | VARIABLE_SERVER_PORT
+      {
+        VARIABLE_CONTAINER($$, new Variables::ServerPort());
+      }
+    | VARIABLE_SESSION_ID
+      {
+        VARIABLE_CONTAINER($$, new Variables::SessionID());
+      }
+    | VARIABLE_UNIQUE_ID
+      {
+        VARIABLE_CONTAINER($$, new Variables::UniqueID());
+      }
+    | VARIABLE_URL_ENCODED_ERROR
+      {
+        VARIABLE_CONTAINER($$, new Variables::UrlEncodedError());
+      }
+    | VARIABLE_USER_ID
+      {
+        VARIABLE_CONTAINER($$, new Variables::UserID());
+      }
+    | VARIABLE_STATUS
+      {
+        VARIABLE_CONTAINER($$, new Variables::Status());
       }
     | RUN_TIME_VAR_DUR
       {
         std::string name($1);
         char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new Duration(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new Duration(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new Duration(name));
-            $$ = std::move(c);
-        }
+        std::unique_ptr<Variable> c(new Duration(name));
+        $$ = std::move(c);
       }
-    | RUN_TIME_VAR_ENV
-      {
-        std::string name($1);
-        char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new Env(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new Env(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new Env(name));
-            $$ = std::move(c);
-        }
-      }
+
     | RUN_TIME_VAR_BLD
       {
         std::string name($1);
         char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new ModsecBuild(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new ModsecBuild(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new ModsecBuild(name));
-            $$ = std::move(c);
-        }
+        std::unique_ptr<Variable> c(new ModsecBuild(name));
+        $$ = std::move(c);
       }
     | RUN_TIME_VAR_HSV
       {
         std::string name($1);
         char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new HighestSeverity(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new HighestSeverity(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new HighestSeverity(name));
-            $$ = std::move(c);
-        }
+        std::unique_ptr<Variable> c(new HighestSeverity(name));
+        $$ = std::move(c);
       }
     | RUN_TIME_VAR_REMOTE_USER
       {
         std::string name($1);
         char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new RemoteUser(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new RemoteUser(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new RemoteUser(name));
-            $$ = std::move(c);
-        }
+        std::unique_ptr<Variable> c(new RemoteUser(name));
+        $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME
       {
         std::string name($1);
         char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new Time(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new Time(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new Time(name));
-            $$ = std::move(c);
-        }
+        std::unique_ptr<Variable> c(new Time(name));
+        $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_DAY
       {
         std::string name($1);
         char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new TimeDay(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new TimeDay(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new TimeDay(name));
-            $$ = std::move(c);
-        }
+        std::unique_ptr<Variable> c(new TimeDay(name));
+        $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_EPOCH
       {
         std::string name($1);
         char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new TimeEpoch(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new TimeEpoch(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new TimeEpoch(name));
-            $$ = std::move(c);
-        }
+        std::unique_ptr<Variable> c(new TimeEpoch(name));
+        $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_HOUR
       {
         std::string name($1);
         char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new TimeHour(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new TimeHour(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new TimeHour(name));
-            $$ = std::move(c);
-        }
+        std::unique_ptr<Variable> c(new TimeHour(name));
+        $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_MIN
       {
         std::string name($1);
         char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new TimeMin(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new TimeMin(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new TimeMin(name));
-            $$ = std::move(c);
-        }
+        std::unique_ptr<Variable> c(new TimeMin(name));
+        $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_MON
       {
         std::string name($1);
         char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new TimeMon(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new TimeMon(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new TimeMon(name));
-            $$ = std::move(c);
-        }
+        std::unique_ptr<Variable> c(new TimeMon(name));
+        $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_SEC
       {
         std::string name($1);
         char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new TimeSec(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new TimeSec(name)));
-            $$ = std::move(c);
-        } else {
             std::unique_ptr<Variable> c(new TimeSec(name));
             $$ = std::move(c);
-        }
       }
     | RUN_TIME_VAR_TIME_WDAY
       {
         std::string name($1);
         char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new TimeWDay(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new TimeWDay(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new TimeWDay(name));
-            $$ = std::move(c);
-        }
+        std::unique_ptr<Variable> c(new TimeWDay(name));
+        $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_YEAR
       {
         std::string name($1);
         char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new TimeYear(name)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new TimeYear(name)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new TimeYear(name));
-            $$ = std::move(c);
-        }
-      }
-    | RUN_TIME_VAR_XML
-      {
-            std::string name($1);
-            std::unique_ptr<Variable> c(new XML(name));
-            $$ = std::move(c);
-      }
-    | RUN_TIME_VAR_RULE
-      {
-        std::string name($1);
-        char z = name.at(0);
-        if (z == '&') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Count(new Variable(name, Variable::VariableKind::DirectVariable)));
-            $$ = std::move(c);
-        } else if (z == '!') {
-            name.erase(0, 1);
-            std::unique_ptr<Variable> c(new Exclusion(new Variable(name, Variable::VariableKind::DirectVariable)));
-            $$ = std::move(c);
-        } else {
-            std::unique_ptr<Variable> c(new Variable(name, Variable::VariableKind::DirectVariable));
-            $$ = std::move(c);
-        }
+        std::unique_ptr<Variable> c(new TimeYear(name));
+        $$ = std::move(c);
       }
     ;
 

@@ -125,26 +125,27 @@ void Collections::del(const std::string& key) {
 }
 
 
-std::string* Collections::resolveFirst(const std::string& var) {
-    std::string *transientVar = m_transient->resolveFirst(var);
+std::unique_ptr<std::string> Collections::resolveFirst(const std::string& var) {
+    std::unique_ptr<std::string> transientVar = m_transient->resolveFirst(var);
 
     if (transientVar != NULL) {
         return transientVar;
     }
 
     for (auto &a : *this) {
-        std::string *res = a.second->resolveFirst(
+        std::unique_ptr<std::string> res = a.second->resolveFirst(
             utils::string::toupper(a.first) + ":" + var);
+
         if (res != NULL) {
             return res;
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 
-std::string* Collections::resolveFirst(const std::string& collectionName,
+std::unique_ptr<std::string> Collections::resolveFirst(const std::string& collectionName,
         const std::string& var) {
         if (utils::string::tolower(collectionName) == "ip"
             && !m_ip_collection_key.empty()) {
@@ -177,7 +178,7 @@ std::string* Collections::resolveFirst(const std::string& collectionName,
         for (auto &a : *this) {
             if (utils::string::tolower(a.first)
                 == utils::string::tolower(collectionName)) {
-                std::string *res = a.second->resolveFirst(
+                std::unique_ptr<std::string> res = a.second->resolveFirst(
                     utils::string::toupper(a.first)
                     + ":" + var);
                 if (res != NULL) {

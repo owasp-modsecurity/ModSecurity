@@ -13,7 +13,7 @@
  *
  */
 
-#include "modsecurity/transaction.h"
+#include "modsecurity/anchored_set_variable.h"
 
 #include <ctime>
 #include <iostream>
@@ -28,9 +28,70 @@
 namespace modsecurity {
 
 
-void AnchoredSetVariable::resolveRegularExpression(const std::string &var,
+AnchoredSetVariable::AnchoredSetVariable(Transaction *t, std::string name)
+    : m_transaction(t),
+    m_name(name) { }
+
+
+AnchoredSetVariable::~AnchoredSetVariable() {
+    unset();
+}
+
+
+void AnchoredSetVariable::unset() {
+    for (const auto& x : *this) {
+        collection::Variable *var = x.second;
+        delete var->m_key;
+        var->m_key = NULL;
+        delete var;
+    }
+    clear();
+}
+
+
+void AnchoredSetVariable::set(const std::string &key,
+    const std::string &value, size_t offset) {
+    std::string *v = new std::string(value);
+    std::string *k = new std::string(m_name + ":" + key);
+
+    collection::Variable *var = new collection::Variable(k, v);
+    var->m_dynamic_value = true;
+    var->m_dynamic = false;
+    emplace(key, var);
+}
+
+
+void AnchoredSetVariable::resolve(
     std::vector<const collection::Variable *> *l) {
-    Utils::Regex *r = new Utils::Regex(var);
+    for (const auto& x : *this) {
+        l->insert(l->begin(), x.second);
+    }
+}
+
+
+void AnchoredSetVariable::resolve(const std::string &key,
+    std::vector<const collection::Variable *> *l) {
+    auto range = this->equal_range(key);
+    for (auto it = range.first; it != range.second; ++it) {
+        l->push_back(it->second);
+    }
+}
+
+
+std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
+    const std::string &key) {
+    auto range = equal_range(key);
+    for (auto it = range.first; it != range.second; ++it) {
+        std::unique_ptr<std::string> b(new std::string());
+        b->assign(*it->second->m_value);
+        return b;
+    }
+    return nullptr;
+}
+
+
+void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
+    std::vector<const collection::Variable *> *l) {
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);
         if (ret <= 0) {
@@ -38,7 +99,6 @@ void AnchoredSetVariable::resolveRegularExpression(const std::string &var,
         }
         l->insert(l->begin(), x.second);
     }
-    delete r;
 }
 
 

@@ -342,8 +342,9 @@ int Multipart::parse_content_disposition(const char *c_d_value) {
         if (name == "name") {
             validate_quotes(value.c_str());
 
-            m_transaction->m_collections.storeOrUpdateFirst("MULTIPART_NAME",
-                value);
+            m_transaction->m_variableMultiPartName.set(value, value, 0);
+            //m_transaction->m_collections.storeOrUpdateFirst("MULTIPART_NAME",
+            //    value);
 
             if (!m_mpp->m_name.empty()) {
                 debug(4, "Multipart: Warning: Duplicate Content-Disposition " \
@@ -354,8 +355,7 @@ int Multipart::parse_content_disposition(const char *c_d_value) {
             debug(9, "Multipart: Content-Disposition name: " + value + ".");
         } else if (name == "filename") {
             validate_quotes(value.c_str());
-            collection::Collections *c = &m_transaction->m_collections;
-            c->storeOrUpdateFirst("MULTIPART_FILENAME", value);
+            m_transaction->m_variableMultiPartFileName.set(value, value, 0);
 
             if (!m_mpp->m_filename.empty()) {
                 debug(4, "Multipart: Warning: Duplicate Content-Disposition " \
@@ -998,24 +998,25 @@ int Multipart::multipart_complete(std::string *error) {
             if (!m->m_filename.empty()) {
                 name.assign(m->m_filename);
             }
-            m_transaction->m_collections.store("FILES:" + m->m_filename,
-                m->m_filename);
-            m_transaction->m_collections.store("FILES_NAMES:" + m->m_name,
-                m->m_name);
-            m_transaction->m_collections.store("FILES_SIZES:" + m->m_name,
-                std::to_string(m->m_tmp_file_size));
-            m_transaction->m_collections.store("FILES_TMP_CONTENT:" \
-                + m->m_name, m->m_value);
-            m_transaction->m_collections.store("FILES_TMPNAMES:" \
-                + m->m_filename, tmp_name);
+            m_transaction->m_variableFiles.set(m->m_filename,
+                m->m_filename, 0);
+            m_transaction->m_variableFilesNames.set(m->m_name,
+                m->m_name, 0);
+            m_transaction->m_variableFilesSizes.set(m->m_name,
+                std::to_string(m->m_tmp_file_size), 0);
+            m_transaction->m_variableFilesTmpContent.set(m->m_name,
+               m->m_value, 0);
+            m_transaction->m_variableFilesTmpContent.set(m->m_name,
+               m->m_value, 0);
+            m_transaction->m_variableFilesTmpNames.set(m->m_name,
+               m->m_value, 0);
             file_combined_size = file_combined_size + m->m_tmp_file_size;
         } else {
             debug(4, "Adding request argument (BODY): name \"" +
                 m->m_name + "\", value \"" + m->m_value + "\"");
             m_transaction->m_variableArgs.set(m->m_name, m->m_value,
                 m_transaction->m_variableOffset);
-            m_transaction->m_collections.store("ARGS_POST:" + m->m_name,
-                m->m_value);
+            m_transaction->m_variableArgsPost.set(m->m_name, m->m_value, 0);
         }
 #if 0
         if (m_transaction->m_namesArgs->empty()) {
@@ -1031,7 +1032,7 @@ int Multipart::multipart_complete(std::string *error) {
         }
 
         m_transaction->m_ARGScombinedSize = \
-            m_transaction->->m_ARGScombinedSize + \
+            m_transaction->m_ARGScombinedSize + \
             m->m_name.length() + m->m_value.length();
         m_transaction->m_ARGScombinedSizeStr->assign(
             std::to_string(m_transaction->->m_ARGScombinedSize));

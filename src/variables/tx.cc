@@ -34,17 +34,6 @@ namespace modsecurity {
 namespace Variables {
 
 
-void Tx::evaluateInternal(Transaction *transaction,
-    std::vector<const collection::Variable *> *l) {
-    if (m_type == SingleMatch) {
-        transaction->m_collections.resolveSingleMatch(m_name, "TX", l);
-    } else if (m_type == MultipleMatches) {
-        transaction->m_collections.resolveMultiMatches(m_name, "TX", l);
-    } else if (m_type == RegularExpression) {
-        transaction->m_collections.resolveRegularExpression(m_name, "TX", l);
-    }
-}
-
 
 }  // namespace Variables
 }  // namespace modsecurity

@@ -82,7 +82,7 @@ class InMemoryPerProcess :
 
     void del(const std::string& key) override;
 
-    std::string* resolveFirst(const std::string& var) override;
+    std::unique_ptr<std::string> resolveFirst(const std::string& var) override;
 
     void resolveSingleMatch(const std::string& var,
         std::vector<const Variable *> *l) override;

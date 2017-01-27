@@ -34,7 +34,8 @@ class MultipartCrlfLFLines : public Variable {
     MultipartCrlfLFLines()
         : Variable("MULTIPART_CRLF_LF_LINES") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableMultipartCrlfLFLines.evaluate(l);
     }

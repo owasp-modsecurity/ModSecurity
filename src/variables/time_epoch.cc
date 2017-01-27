@@ -33,7 +33,8 @@
 namespace modsecurity {
 namespace Variables {
 
-void TimeEpoch::evaluateInternal(Transaction *transaction,
+void TimeEpoch::evaluate(Transaction *transaction,
+    Rule *rule,
     std::vector<const collection::Variable *> *l) {
     transaction->m_variableTimeEpoch.assign(
         std::to_string(std::time(nullptr)));

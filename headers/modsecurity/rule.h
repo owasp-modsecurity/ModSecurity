@@ -48,12 +48,12 @@ class Rule {
             std::vector<actions::Action *> *_actions,
             std::string fileName,
             int lineNumber);
-    explicit Rule(std::string marker);
-
+    Rule(std::__cxx11::string marker);
     ~Rule();
+
     bool evaluate(Transaction *transaction);
     bool evaluateActions(Transaction *transaction);
-    std::vector<const collection::Variable *> getFinalVars(Transaction *trasn);
+    std::vector<std::unique_ptr<collection::Variable>> getFinalVars(Transaction *trasn);
     void executeActionsAfterFullMatch(Transaction *trasn,
         bool containsDisruptive, RuleMessage *ruleMessage);
     std::list<
@@ -73,22 +73,10 @@ class Rule {
     void cleanMatchedVars(Transaction *trasn);
     void updateRulesVariable(Transaction *trasn);
 
-
-    operators::Operator *op;
-    std::vector<actions::Action *> m_actionsConf;
-    std::vector<actions::Action *> m_actionsRuntimePre;
-    std::vector<actions::Action *> m_actionsRuntimePos;
-
     std::vector<std::string> getActionNames();
     std::vector<actions::Action *> getActionsByName(const std::string& name);
     bool containsTag(const std::string& name, Transaction *t);
 
-    std::vector<Variables::Variable *> *variables;
-    int phase;
-    long rule_id;
-
-    Rule *chainedRule;
-    bool chained;
 
     int refCountDecreaseAndCheck() {
         m_referenceCount--;
@@ -99,22 +87,30 @@ class Rule {
         return 0;
     }
 
+
     void refCountIncrease() {
         m_referenceCount++;
     }
 
-    std::string m_rev;
-    std::string m_ver;
 
-    std::string m_marker;
-    bool m_secmarker;
+    int m_accuracy;
+    std::vector<actions::Action *> m_actionsConf;
+    std::vector<actions::Action *> m_actionsRuntimePos;
+    std::vector<actions::Action *> m_actionsRuntimePre;
+    bool m_chained;
+    Rule *m_chainedRule;
     std::string m_fileName;
     int m_lineNumber;
-
-    std::string m_log_data;
-    int m_accuracy;
+    std::string m_logData;
+    std::string m_marker;
     int m_maturity;
-
+    operators::Operator *m_op;
+    int m_phase;
+    std::string m_rev;
+    long m_ruleId;
+    bool m_secMarker;
+    std::vector<Variables::Variable *> *m_variables;
+    std::string m_ver;
  private:
     bool m_unconditional;
     int m_referenceCount;
@@ -126,5 +122,3 @@ class Rule {
 
 
 #endif  // HEADERS_MODSECURITY_RULE_H_
-
-

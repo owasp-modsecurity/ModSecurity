@@ -27,11 +27,14 @@ namespace utils {
 
 
 double random_number(const double from, const double to) {
+#if 0
     std::random_device rd;
     std::mt19937 mt(rd());
     return std::bind(
         std::uniform_real_distribution<>{from, to},
         std::default_random_engine{ mt() })();
+#endif
+    return from+1;
 }
 
 

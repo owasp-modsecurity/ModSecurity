@@ -34,7 +34,8 @@ class AuthType : public Variable {
     AuthType()
         : Variable("AUTH_TYPE") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableAuthType.evaluate(l);
     }

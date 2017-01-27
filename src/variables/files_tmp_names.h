@@ -28,17 +28,52 @@ namespace modsecurity {
 
 class Transaction;
 namespace Variables {
-
-class FilesTmpNames : public Variable {
+class FilesTmpNames_DictElement : public Variable {
  public:
-    FilesTmpNames()
+    FilesTmpNames_DictElement(std::string dictElement)
+        : Variable("FILES_TMPNAMES" + std::string(":") +
+            std::string(dictElement)),
+        m_dictElement(dictElement) { }
+
+    void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) {
+        transaction->m_variableFilesTmpNames.resolve(m_dictElement, l);
+    }
+
+    std::string m_dictElement;
+};
+
+
+class FilesTmpNames_NoDictElement : public Variable {
+ public:
+    FilesTmpNames_NoDictElement()
         : Variable("FILES_TMPNAMES") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
-        transaction->m_variableFilesTmpNames.evaluate(l);
+        transaction->m_variableFilesTmpNames.resolve(l);
     }
 };
+
+
+class FilesTmpNames_DictElementRegexp : public Variable {
+ public:
+    FilesTmpNames_DictElementRegexp(std::string dictElement)
+        : Variable("FILES_TMPNAMES"),
+        m_r(dictElement) { }
+
+    void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) override {
+        transaction->m_variableFilesTmpNames.resolveRegularExpression(
+            &m_r, l);
+    }
+
+    Utils::Regex m_r;
+};
+
 
 }  // namespace Variables
 }  // namespace modsecurity

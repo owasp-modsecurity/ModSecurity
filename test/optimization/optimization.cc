@@ -84,8 +84,8 @@ int main(int argc, char **argv) {
             if (z == NULL) {
                 continue;
             }
-            if (z->op != NULL) {
-                std::string op = z->op->m_op;
+            if (z->m_op != NULL) {
+                std::string op = z->m_op->m_op;
                 if (operators.count(op) > 0) {
                     operators[op] = 1 + operators[op];
                 } else {
@@ -93,8 +93,8 @@ int main(int argc, char **argv) {
                 }
                 key = op;
             }
-            if (z->variables != NULL) {
-                std::string var = Variable::to_s(z->variables);
+            if (z->m_variables != NULL) {
+                std::string var = Variable::to_s(z->m_variables);
                 if (variables.count(var) > 0) {
                     variables[var] = 1 + variables[var];
                 } else {
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
                 }
                 key = key + var;
             }
-            if (z->variables != NULL && z->op != NULL) {
+            if (z->m_variables != NULL && z->m_op != NULL) {
                 if (op2var.count(key) > 0) {
                     op2var[key] = 1 + op2var[key];
                 } else {

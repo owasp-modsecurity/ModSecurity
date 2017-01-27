@@ -27,14 +27,50 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
-class Rule : public Variable {
+class Rule_DictElement : public Variable {
  public:
-    explicit Rule(std::string _name)
-        : Variable(_name) { }
+    Rule_DictElement(std::string dictElement)
+        : Variable("RULE" + std::string(":") +
+            std::string(dictElement)),
+        m_dictElement(dictElement) { }
 
-    void evaluateInternal(Transaction *transaction,
-        modsecurity::Rule *rule,
-        std::vector<const collection::Variable *> *l) override;
+    void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) {
+        transaction->m_variableRule.resolve(m_dictElement, l);
+    }
+
+    std::string m_dictElement;
+};
+
+
+class Rule_NoDictElement : public Variable {
+ public:
+    Rule_NoDictElement()
+        : Variable("RULE") { }
+
+    void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) {
+        transaction->m_variableRule.resolve(l);
+    }
+};
+
+
+class Rule_DictElementRegexp : public Variable {
+ public:
+    Rule_DictElementRegexp(std::string dictElement)
+        : Variable("RULE"),
+        m_r(dictElement) { }
+
+    void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) override {
+        transaction->m_variableRule.resolveRegularExpression(
+            &m_r, l);
+    }
+
+    Utils::Regex m_r;
 };
 
 }  // namespace Variables

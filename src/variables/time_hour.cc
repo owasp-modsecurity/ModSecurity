@@ -33,7 +33,8 @@
 namespace modsecurity {
 namespace Variables {
 
-void TimeHour::evaluateInternal(Transaction *transaction,
+void TimeHour::evaluate(Transaction *transaction,
+    Rule *rule,
     std::vector<const collection::Variable *> *l) {
     char tstr[200];
     struct tm timeinfo;

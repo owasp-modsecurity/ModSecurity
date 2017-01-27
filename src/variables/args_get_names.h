@@ -34,7 +34,8 @@ class ArgsGetNames : public Variable {
     ArgsGetNames()
         : Variable("ARGS_GET_NAMES") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableArgGetNames.evaluate(l);
     }

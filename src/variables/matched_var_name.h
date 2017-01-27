@@ -34,7 +34,8 @@ class MatchedVarName : public Variable {
     MatchedVarName()
         : Variable("MATCHED_VAR_NAME") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableMatchedVarName.evaluate(l);
     }

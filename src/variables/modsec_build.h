@@ -43,7 +43,8 @@ class ModsecBuild : public Variable {
         m_build = ss.str();
     }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) override;
 
     std::string m_build;

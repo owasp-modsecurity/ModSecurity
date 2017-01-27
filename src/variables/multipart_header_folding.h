@@ -34,7 +34,8 @@ class MultipartHeaderFolding : public Variable {
     MultipartHeaderFolding()
         : Variable("MULTIPART_HEADER_FOLDING") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableMultipartHeaderFolding.evaluate(l);
     }

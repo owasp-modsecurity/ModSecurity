@@ -51,7 +51,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"small_text_file.txt\" \\(Variable: MULTIPART_FILENAME\\)"
+      "debug_log":"Target value: \"small_text_file.txt\" \\(Variable: MULTIPART_FILENAME"
     },
     "rules":[  
       "SecRuleEngine On",
@@ -110,7 +110,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"small_text_file2.txt\" \\(Variable: MULTIPART_FILENAME\\)"
+      "debug_log":"Target value: \"small_text_file2.txt\" \\(Variable: MULTIPART_FILENAME"
     },
     "rules":[  
       "SecRuleEngine On",

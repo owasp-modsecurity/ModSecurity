@@ -13,28 +13,35 @@
  *
  */
 
-#include "src/variables/variations/exclusion.h"
-
 #include <iostream>
 #include <string>
 #include <vector>
 #include <list>
 #include <utility>
 
-#include "modsecurity/transaction.h"
+#ifndef SRC_VARIABLES_STATUS_H_
+#define SRC_VARIABLES_STATUS_H_
 
+#include "src/variables/variable.h"
 
 namespace modsecurity {
+
+class Transaction;
 namespace Variables {
-namespace Variations {
 
+class Status : public Variable {
+ public:
+    Status()
+        : Variable("STATUS") { }
 
-void Exclusion::evaluateInternal(Transaction *transaction,
-    std::vector<const collection::Variable *> *l) {
-    transaction->m_collections.resolveMultiMatches(m_name, l);
-}
+    void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) {
+        transaction->m_variableResponseStatus.evaluate(l);
+    }
+};
 
-
-}  // namespace Variations
 }  // namespace Variables
 }  // namespace modsecurity
+
+#endif  // SRC_VARIABLES_STATUS_H_

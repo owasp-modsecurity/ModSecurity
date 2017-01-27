@@ -34,7 +34,8 @@ class ArgsPostNames : public Variable {
     ArgsPostNames()
         : Variable("ARGS_POST_NAMES") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableArgPostNames.evaluate(l);
     }

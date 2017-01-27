@@ -44,7 +44,7 @@
 namespace modsecurity {
 namespace Variables {
 
-void XML::evaluateInternal(Transaction *t,
+void XML::evaluate(Transaction *t,
     Rule *rule,
     std::vector<const collection::Variable *> *l) {
     xmlXPathContextPtr xpathCtx;
@@ -55,6 +55,7 @@ void XML::evaluateInternal(Transaction *t,
     int i;
     size_t pos;
 
+    param = m_name;
     pos = m_name.find_first_of(":");
     if (pos == std::string::npos) {
         param = "";
@@ -69,19 +70,11 @@ void XML::evaluateInternal(Transaction *t,
         return;
     }
 
-    if (param.empty() == true) {
-        /* Invocation without an XPath expression makes sense
-         * with functions that manipulate the document tree.
-         */
-        l->push_back(new collection::Variable(&m_name, &m_plain));
-        return;
-    }
-
     /* Process the XPath expression. */
     xpathExpr = (const xmlChar*)param.c_str();
     xpathCtx = xmlXPathNewContext(t->m_xml->m_data.doc);
     if (xpathCtx == NULL) {
-        t->debug(1, "XML: Unable to create new XPath context.");
+        t->debug(1, "XML: Unable to create new XPath context. : ");
         return;
     }
 

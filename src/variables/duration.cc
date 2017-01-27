@@ -27,8 +27,9 @@
 namespace modsecurity {
 namespace Variables {
 
-void Duration::evaluateInternal(Transaction *transaction,
-        std::vector<const collection::Variable *> *l) {
+void Duration::evaluate(Transaction *transaction,
+    Rule *rule,
+    std::vector<const collection::Variable *> *l) {
     double e = utils::cpu_seconds() - transaction->m_creationTimeStamp;
 
     transaction->m_variableDuration.assign(std::to_string(e));

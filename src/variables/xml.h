@@ -30,17 +30,41 @@ namespace modsecurity {
 class Transaction;
 namespace Variables {
 
+
+/* Invocation without an XPath expression makes sense
+ * with functions that manipulate the document tree.
+ */
+class XML_NoDictElement : public Variable {
+ public:
+    explicit XML_NoDictElement()
+        : Variable("XML"),
+        m_plain("[XML document tree]"),
+        m_var(&m_name, &m_plain) {
+            m_var.m_dynamic = false;
+            m_var.m_dynamic_value = false;
+        }
+
+    void evaluate(Transaction *transaction,
+        Rule *rule,
+        std::vector<const collection::Variable *> *l) {
+        l->push_back(&m_var);
+    }
+
+    std::string m_plain;
+    collection::Variable m_var;
+};
+
+
 class XML : public Variable {
  public:
     explicit XML(std::string _name)
-        : Variable(_name),
-        m_plain("[XML document tree]") { }
+        : Variable(_name) { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
         Rule *rule,
         std::vector<const collection::Variable *> *l);
-    std::string m_plain;
 };
+
 
 }  // namespace Variables
 }  // namespace modsecurity

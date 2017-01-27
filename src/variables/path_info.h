@@ -34,7 +34,8 @@ class PathInfo : public Variable {
     PathInfo()
         : Variable("PATH_INFO") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variablePathInfo.evaluate(l);
     }

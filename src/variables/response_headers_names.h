@@ -34,7 +34,8 @@ class ResponseHeadersNames : public Variable {
     ResponseHeadersNames()
         : Variable("RESPONSE_HEADERS_NAMES") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableResponseHeadersNames.evaluate(l);
     }

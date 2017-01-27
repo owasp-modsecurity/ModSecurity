@@ -33,7 +33,8 @@ class RequestHeadersNames : public Variable {
  public:
     RequestHeadersNames()
         : Variable("REQUEST_HEADERS_NAMES") { }
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRequestHeadersNames.evaluate(l);
     }

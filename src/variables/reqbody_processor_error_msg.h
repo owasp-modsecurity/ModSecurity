@@ -34,7 +34,8 @@ class ReqbodyProcessorErrorMsg : public Variable {
     ReqbodyProcessorErrorMsg()
         : Variable("PROCESSOR_ERROR_MSG") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableReqbodyProcessorErrorMsg.evaluate(l);
     }

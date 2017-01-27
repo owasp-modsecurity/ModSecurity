@@ -34,7 +34,8 @@ class ReqbodyError : public Variable {
     ReqbodyError()
         : Variable("REQBODY_ERROR") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableReqbodyError.evaluate(l);
     }

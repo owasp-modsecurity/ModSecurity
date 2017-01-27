@@ -34,7 +34,7 @@
     "version_min":300000,
     "title":"Testing Disruptive actions (3/n)",
     "expected":{
-      "debug_log": "_Not_ running .disruptive. action: block. SecRuleEngine is not On",
+      "debug_log": "Not running disruptive action: block. SecRuleEngine is not On",
       "http_code":200
     },
     "rules":[

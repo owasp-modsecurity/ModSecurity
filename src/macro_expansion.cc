@@ -63,11 +63,174 @@ std::string MacroExpansion::expand(const std::string& input,
             return res;
         }
         std::string variable(res, start + 2, end - (start + 2));
-        std::string *variableValue = NULL;
+        std::unique_ptr<std::string> variableValue = nullptr;
         size_t collection = variable.find(".");
         if (collection == std::string::npos) {
-            if (utils::string::toupper(variable) == "MATCHED_VAR") {
-                variableValue = transaction->m_variableMatchedVar.evaluate();
+            collection = variable.find(":");
+        }
+        variable = utils::string::toupper(variable);
+        if (collection == std::string::npos) {
+            if (variable == "ARGS_NAMES") {
+                variableValue = transaction->m_variableArgsNames.resolveFirst();
+            }
+            else if (variable == "ARGS_GET_NAMES") {
+                variableValue = transaction->m_variableArgGetNames.resolveFirst();
+            }
+            else if (variable == "ARGS_POST_NAMES") {
+                variableValue = transaction->m_variableArgPostNames.resolveFirst();
+            }
+            else if (variable == "REQUEST_HEADERS_NAMES") {
+                variableValue = transaction->m_variableRequestHeadersNames.resolveFirst();
+            }
+            else if (variable == "RESPONSE_CONTENT_TYPE") {
+                variableValue = transaction->m_variableResponseContentType.resolveFirst();
+            }
+            else if (variable == "RESPONSE_HEADERS_NAMES") {
+                variableValue = transaction->m_variableResponseHeadersNames.resolveFirst();
+            }
+            else if (variable == "ARGS_COMBINED_SIZE") {
+                variableValue = transaction->m_variableARGScombinedSize.resolveFirst();
+            }
+            else if (variable == "AUTH_TYPE") {
+                variableValue = transaction->m_variableAuthType.resolveFirst();
+            }
+            else if (variable == "FILES_COMBINED_SIZE") {
+                variableValue = transaction->m_variableFilesCombinedSize.resolveFirst();
+            }
+            else if (variable == "FULL_REQUEST") {
+                variableValue = transaction->m_variableFullRequest.resolveFirst();
+            }
+            else if (variable == "FULL_REQUEST_LENGTH") {
+                variableValue = transaction->m_variableFullRequestLength.resolveFirst();
+            }
+            else if (variable == "INBOUND_DATA_ERROR") {
+                variableValue = transaction->m_variableInboundDataError.resolveFirst();
+            }
+            else if (variable == "MATCHED_VAR") {
+                variableValue = transaction->m_variableMatchedVar.resolveFirst();
+            }
+            else if (variable == "MATCHED_VAR_NAME") {
+                variableValue = transaction->m_variableMatchedVarName.resolveFirst();
+            }
+            else if (variable == "MULTIPART_CRLF_LF_LINES") {
+                variableValue = transaction->m_variableMultipartCrlfLFLines.resolveFirst();
+            }
+            else if (variable == "MULTIPART_DATA_AFTER") {
+                variableValue = transaction->m_variableMultipartDataAfter.resolveFirst();
+            }
+            else if (variable == "MULTIPART_FILE_LIMIT_EXCEEDED") {
+                variableValue = transaction->m_variableMultipartFileLimitExceeded.resolveFirst();
+            }
+            else if (variable == "MULTIPART_STRICT_ERROR") {
+                variableValue = transaction->m_variableMultipartStrictError.resolveFirst();
+            }
+            else if (variable == "MULTIPART_HEADER_FOLDING") {
+                variableValue = transaction->m_variableMultipartHeaderFolding.resolveFirst();
+            }
+            else if (variable == "MULTIPART_INVALID_QUOTING") {
+                variableValue = transaction->m_variableMultipartInvalidQuoting.resolveFirst();
+            }
+            else if (variable == "MULTIPART_INVALID_HEADER_FOLDING") {
+                variableValue = transaction->m_variableMultipartInvalidHeaderFolding.resolveFirst();
+            }
+            else if (variable == "MULTIPART_UNMATCHED_BOUNDARY") {
+                variableValue = transaction->m_variableMultipartUnmatchedBoundary.resolveFirst();
+            }
+            else if (variable == "OUTBOUND_DATA_ERROR") {
+                variableValue = transaction->m_variableOutboundDataError.resolveFirst();
+            }
+            else if (variable == "PATH_INFO") {
+                variableValue = transaction->m_variablePathInfo.resolveFirst();
+            }
+            else if (variable == "QUERY_STRING") {
+                variableValue = transaction->m_variableQueryString.resolveFirst();
+            }
+            else if (variable == "REMOTE_ADDR") {
+                variableValue = transaction->m_variableRemoteAddr.resolveFirst();
+            }
+            else if (variable == "REMOTE_HOST") {
+                variableValue = transaction->m_variableRemoteHost.resolveFirst();
+            }
+            else if (variable == "REMOTE_PORT") {
+                variableValue = transaction->m_variableRemotePort.resolveFirst();
+            }
+            else if (variable == "REQBODY_ERROR") {
+                variableValue = transaction->m_variableReqbodyError.resolveFirst();
+            }
+            else if (variable == "REQBODY_ERROR_MSG") {
+                variableValue = transaction->m_variableReqbodyErrorMsg.resolveFirst();
+            }
+            else if (variable == "REQBODY_PROCESSOR_ERROR_MSG") {
+                variableValue = transaction->m_variableReqbodyProcessorErrorMsg.resolveFirst();
+            }
+            else if (variable == "REQBODY_PROCESSOR_ERROR") {
+                variableValue = transaction->m_variableReqbodyProcessorError.resolveFirst();
+            }
+            else if (variable == "REQBODY_PROCESSOR") {
+                variableValue = transaction->m_variableReqbodyProcessor.resolveFirst();
+            }
+            else if (variable == "REQUEST_BASENAME") {
+                variableValue = transaction->m_variableRequestBasename.resolveFirst();
+            }
+            else if (variable == "REQUEST_BODY") {
+                variableValue = transaction->m_variableRequestBody.resolveFirst();
+            }
+            else if (variable == "REQUEST_BODY_LENGTH") {
+                variableValue = transaction->m_variableRequestBodyLength.resolveFirst();
+            }
+            else if (variable == "REQUEST_FILENAME") {
+                variableValue = transaction->m_variableRequestFilename.resolveFirst();
+            }
+            else if (variable == "REQUEST_LINE") {
+                variableValue = transaction->m_variableRequestLine.resolveFirst();
+            }
+            else if (variable == "REQUEST_METHOD") {
+                variableValue = transaction->m_variableRequestMethod.resolveFirst();
+            }
+            else if (variable == "REQUEST_PROTOCOL") {
+                variableValue = transaction->m_variableRequestProtocol.resolveFirst();
+            }
+            else if (variable == "REQUEST_URI") {
+                variableValue = transaction->m_variableRequestURI.resolveFirst();
+            }
+            else if (variable == "REQUEST_URI_RAW") {
+                variableValue = transaction->m_variableRequestURIRaw.resolveFirst();
+            }
+            else if (variable == "RESOURCE") {
+                variableValue = transaction->m_variableResource.resolveFirst();
+            }
+            else if (variable == "RESPONSE_BODY") {
+                variableValue = transaction->m_variableResponseBody.resolveFirst();
+            }
+            else if (variable == "RESPONSE_CONTENT_LENGTH") {
+                variableValue = transaction->m_variableResponseContentLength.resolveFirst();
+            }
+            else if (variable == "RESPONSE_PROTOCOL") {
+                variableValue = transaction->m_variableResponseProtocol.resolveFirst();
+            }
+            else if (variable == "RESPONSE_STATUS") {
+                variableValue = transaction->m_variableResponseStatus.resolveFirst();
+            }
+            else if (variable == "SERVER_ADDR") {
+                variableValue = transaction->m_variableServerAddr.resolveFirst();
+            }
+            else if (variable == "SERVER_NAME") {
+                variableValue = transaction->m_variableServerName.resolveFirst();
+            }
+            else if (variable == "SERVER_PORT") {
+                variableValue = transaction->m_variableServerPort.resolveFirst();
+            }
+            else if (variable == "SESSIONID") {
+                variableValue = transaction->m_variableSessionID.resolveFirst();
+            }
+            else if (variable == "UNIQUE_ID") {
+                variableValue = transaction->m_variableUniqueID.resolveFirst();
+            }
+            else if (variable == "URLENCODED_ERROR") {
+                variableValue = transaction->m_variableUrlEncodedError.resolveFirst();
+            }
+            else if (variable == "USERID") {
+                variableValue = transaction->m_variableUserID.resolveFirst();
             } else {
                 variableValue = transaction->m_collections.resolveFirst(
                     variable);
@@ -76,10 +239,61 @@ std::string MacroExpansion::expand(const std::string& input,
             std::string col = std::string(variable, 0, collection);
             std::string var = std::string(variable, collection + 1,
                 variable.length() - (collection + 1));
+            col = utils::string::toupper(col);
 
-            if (utils::string::toupper(col) == "RULE") {
-                variableValue = transaction->m_collections.resolveFirst(
-                    "RULE:" + var);
+            if (col == "ARGS") {
+                variableValue = transaction->m_variableArgs.resolveFirst(var);
+            }
+            else if (col == "RULE") {
+                variableValue = transaction->m_variableRule.resolveFirst(var);
+            }
+            else if (col == "ARGS_GET") {
+                variableValue = transaction->m_variableArgsGet.resolveFirst(var);
+            }
+            else if (col == "ARGS_POST") {
+                variableValue = transaction->m_variableArgsPost.resolveFirst(var);
+            }
+            else if (col == "FILES_SIZES") {
+                variableValue = transaction->m_variableFilesSizes.resolveFirst(var);
+            }
+            else if (col == "FILES_NAMES") {
+                variableValue = transaction->m_variableFilesNames.resolveFirst(var);
+            }
+            else if (col == "FILES_TMP_CONTENT") {
+                variableValue = transaction->m_variableFilesTmpContent.resolveFirst(var);
+            }
+            else if (col == "MULTIPART_FILENAME") {
+                variableValue = transaction->m_variableMultiPartFileName.resolveFirst(var);
+            }
+            else if (col == "MULTIPART_NAME") {
+                variableValue = transaction->m_variableMultiPartName.resolveFirst(var);
+            }
+            else if (col == "MATCHED_VARS_NAMES") {
+                variableValue = transaction->m_variableMatchedVarsNames.resolveFirst(var);
+            }
+            else if (col == "MATCHED_VARS") {
+                variableValue = transaction->m_variableMatchedVars.resolveFirst(var);
+            }
+            else if (col == "FILES") {
+                variableValue = transaction->m_variableFiles.resolveFirst(var);
+            }
+            else if (col == "REQUEST_COOKIES") {
+                variableValue = transaction->m_variableRequestCookies.resolveFirst(var);
+            }
+            else if (col == "REQUEST_HEADERS") {
+                variableValue = transaction->m_variableRequestHeaders.resolveFirst(var);
+            }
+            else if (col == "RESPONSE_HEADERS") {
+                variableValue = transaction->m_variableResponseHeaders.resolveFirst(var);
+            }
+            else if (col == "GEO") {
+                variableValue = transaction->m_variableGeo.resolveFirst(var);
+            }
+            else if (col == "REQUEST_COOKIES_NAMES") {
+                variableValue = transaction->m_variableRequestCookiesNames.resolveFirst(var);
+            }
+            else if (col == "FILES_TMPNAMES") {
+                variableValue = transaction->m_variableFilesTmpNames.resolveFirst(var);
             } else {
                 variableValue = transaction->m_collections.resolveFirst(col,
                     var);

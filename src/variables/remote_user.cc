@@ -35,13 +35,14 @@ namespace modsecurity {
 namespace Variables {
 
 
-void RemoteUser::evaluateInternal(Transaction *transaction,
+void RemoteUser::evaluate(Transaction *transaction,
+    Rule *rule,
     std::vector<const collection::Variable *> *l) {
     size_t pos;
     std::string base64;
 
-    std::string *header = transaction->m_collections.resolveFirst(
-        "REQUEST_HEADERS:Authorization");
+    std::unique_ptr<std::string> header = std::move(transaction->m_variableRequestHeaders.resolveFirst(
+        "Authorization"));
 
     if (header == NULL) {
         return;
@@ -61,6 +62,7 @@ void RemoteUser::evaluateInternal(Transaction *transaction,
 
     l->push_back(new collection::Variable(&m_retName,
         &transaction->m_variableRemoteUser));
+
 }
 
 

@@ -34,7 +34,8 @@ class ServerAddr : public Variable {
     ServerAddr()
         : Variable("SERVER_ADDR") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableServerAddr.evaluate(l);
     }

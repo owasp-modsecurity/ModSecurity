@@ -39,7 +39,7 @@ bool Deny::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
 
     log.append("Access denied with code %d");
     log.append(" (phase ");
-    log.append(std::to_string(rm->m_rule->phase - 1) + "). ");
+    log.append(std::to_string(rm->m_rule->m_phase - 1) + "). ");
 
     transaction->m_it.disruptive = true;
     intervention::freeLog(&transaction->m_it);

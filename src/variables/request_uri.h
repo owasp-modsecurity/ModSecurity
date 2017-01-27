@@ -33,7 +33,8 @@ class RequestURI : public Variable {
  public:
     RequestURI()
         : Variable("REQUEST_URI") { }
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRequestURI.evaluate(l);
     }

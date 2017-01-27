@@ -32,7 +32,7 @@ namespace disruptive {
 bool Block::evaluate(Rule *rule, Transaction *transaction, RuleMessage *rm) {
     transaction->debug(8, "Marking request as disruptive.");
 
-    for (Action *a : transaction->m_rules->m_defaultActions[rule->phase]) {
+    for (Action *a : transaction->m_rules->m_defaultActions[rule->m_phase]) {
         if (a->isDisruptive() == false) {
             continue;
         }

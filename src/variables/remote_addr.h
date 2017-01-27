@@ -34,7 +34,8 @@ class RemoteAddr : public Variable {
     RemoteAddr()
         : Variable("REMOTE_ADDR") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRemoteAddr.evaluate(l);
     }

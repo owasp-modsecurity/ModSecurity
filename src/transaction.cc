@@ -291,10 +291,10 @@ bool Transaction::addArgument(const std::string& orig, const std::string& key,
     m_variableArgs.set(key, value, m_variableOffset);
 
     if (orig == "GET") {
-        m_collections.store("ARGS_GET:" + key, value);
+        m_variableArgsGet.set(key, value, m_variableOffset);
         m_variableArgGetNames.append(key, offset, true);
     } else if (orig == "POST") {
-        m_collections.store("ARGS_POST:" + key, value);
+        m_variableArgsPost.set(key, value, m_variableOffset);
         m_variableArgPostNames.append(key, offset, true);
     }
     m_variableArgsNames.append(key, offset, true);
@@ -471,7 +471,8 @@ int Transaction::addRequestHeader(const std::string& key,
     const std::string& value) {
     m_variableRequestHeadersNames.append(key, 0, true);
 
-    this->m_collections.store("REQUEST_HEADERS:" + key, value);
+    m_variableRequestHeaders.set(key, value, m_variableOffset);
+
 
     std::string keyl = utils::string::tolower(key);
     if (keyl == "authorization") {
@@ -488,10 +489,9 @@ int Transaction::addRequestHeader(const std::string& key,
                 if (s[0].at(0) == ' ') {
                     s[0].erase(0, 1);
                 }
-                this->m_collections.store("REQUEST_COOKIES:"
-                    + s[0], s[1]);
-                this->m_collections.store("REQUEST_COOKIES_NAMES:"
-                    + s[0], s[0]);
+                m_variableRequestCookies.set(s[0], s[1], m_variableOffset);
+                m_variableRequestCookiesNames.set(s[0],
+                    s[0], m_variableOffset);
             }
             cookies.pop_back();
         }
@@ -622,6 +622,8 @@ int Transaction::processRequestBody() {
      * }
      * 
      */
+    std::unique_ptr<std::string> a = m_variableRequestHeaders.resolveFirst(
+        "Content-Type");
     if (m_requestBodyProcessor == XMLRequestBody) {
         std::string error;
         if (m_xml->init() == true) {
@@ -662,11 +664,8 @@ int Transaction::processRequestBody() {
         }
     } else if (m_requestBodyType == MultiPartRequestBody) {
         std::string error;
-        std::string *a = m_collections.resolveFirst(
-            "REQUEST_HEADERS:Content-Type");
         if (a != NULL) {
             Multipart m(*a, this);
-
             if (m.init(&error) == true) {
                 m.process(m_requestBody.str(), &error);
             }
@@ -685,14 +684,12 @@ int Transaction::processRequestBody() {
         }
     } else if (m_requestBodyType == WWWFormUrlEncoded) {
         extractArguments("POST", m_requestBody.str(), 0);
-    } else if (m_collections.resolveFirst(
-            "REQUEST_HEADERS:Content-Type") != NULL) {
-        std::string *a = m_collections.resolveFirst(
-            "REQUEST_HEADERS:Content-Type");
+    } else if (a != NULL) {
         std::string error;
         if (a != NULL && a->empty() == false) {
             error.assign(*a);
         }
+
         m_variableReqbodyError.set("1", m_variableOffset);
         m_variableReqbodyProcessorError.set("1", m_variableOffset);
         m_variableReqbodyErrorMsg.set("Unknown request body processor: " \
@@ -733,16 +730,11 @@ int Transaction::processRequestBody() {
      */
     std::string fullRequest;
     std::vector<const collection::Variable *> l;
-    m_collections.resolveMultiMatches("REQUEST_HEADERS", &l);
+    m_variableRequestHeaders.resolve(&l);
     for (auto &a : l) {
-        fullRequest = fullRequest + \
-            std::string(*a->m_key, 16, a->m_key->length() - 16) + ": " \
-            + *a->m_value + "\n";
-    }
-
-    while (l.empty() == false) {
-        delete l.back();
-        l.pop_back();
+        std::string z(*a->m_key, 16, a->m_key->length() - 16);
+        z = z + ": " + *a->m_value;
+        fullRequest = fullRequest + z + "\n";
     }
 
     fullRequest = fullRequest + "\n\n";
@@ -923,8 +915,7 @@ int Transaction::processResponseHeaders(int code, const std::string& proto) {
 int Transaction::addResponseHeader(const std::string& key,
     const std::string& value) {
     m_variableResponseHeadersNames.append(key, 0, true);
-
-    this->m_collections.store("RESPONSE_HEADERS:" + key, value);
+    m_variableResponseHeaders.set(key, value, m_variableOffset);
 
     if (utils::string::tolower(key) == "content-type") {
         // Removes the charset=...
@@ -1290,15 +1281,16 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     strftime(tstr, 299, "[%d/%b/%Y:%H:%M:%S %z]", &timeinfo);
 
     ss << utils::string::dash_if_empty(
-        this->m_collections.resolveFirst("REQUEST_HEADERS:Host")) << " ";
+       m_variableRequestHeaders.resolveFirst("Host").get())
+        << " ";
     ss << utils::string::dash_if_empty(this->m_clientIpAddress) << " ";
     /** TODO: Check variable */
     ss << utils::string::dash_if_empty(
-        this->m_collections.resolveFirst("REMOTE_USER"));
+        m_collections.resolveFirst("REMOTE_USER").get());
     ss << " ";
     /** TODO: Check variable */
     ss << utils::string::dash_if_empty(
-        this->m_collections.resolveFirst("LOCAL_USER"));
+        this->m_collections.resolveFirst("LOCAL_USER").get());
     ss << " ";
     ss << tstr << " ";
 
@@ -1312,15 +1304,15 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << this->m_responseBody.tellp();
     /** TODO: Check variable */
     ss << utils::string::dash_if_empty(
-        this->m_collections.resolveFirst("REFERER")) << " ";
+        this->m_collections.resolveFirst("REFERER").get()) << " ";
     ss << "\"";
     ss << utils::string::dash_if_empty(
-        this->m_collections.resolveFirst("REQUEST_HEADERS:User-Agent"));
+        m_variableRequestHeaders.resolveFirst("User-Agent").get());
     ss << "\" ";
     ss << this->m_id << " ";
     /** TODO: Check variable */
     ss << utils::string::dash_if_empty(
-        this->m_collections.resolveFirst("REFERER")) << " ";
+        this->m_collections.resolveFirst("REFERER").get()) << " ";
 
     ss << filename << " ";
     ss << "0" << " ";
@@ -1356,12 +1348,11 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         audit_log << this->m_method << " " << this->m_uri << " " << "HTTP/";
         audit_log << this->m_httpVersion << std::endl;
 
-        m_collections.m_transient->resolveMultiMatches("REQUEST_HEADERS", &l);
+        m_variableRequestHeaders.resolve(&l);
         for (auto h : l) {
             size_t pos = strlen("REQUEST_HEADERS:");
             audit_log << h->m_key->c_str() + pos << ": ";
             audit_log << h->m_value->c_str() << std::endl;
-            delete h;
         }
         audit_log << std::endl;
     }
@@ -1388,12 +1379,11 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         std::vector<const collection::Variable *> l;
 
         audit_log << "--" << trailer << "-" << "F--" << std::endl;
-        m_collections.m_transient->resolveMultiMatches("RESPONSE_HEADERS", &l);
+        m_variableResponseHeaders.resolve(&l);
         for (auto h : l) {
             size_t pos = strlen("RESPONSE_HEADERS:");
             audit_log << h->m_key->c_str() + pos << ": ";
             audit_log << h->m_value->c_str() << std::endl;
-            delete h;
         }
     }
     audit_log << std::endl;
@@ -1436,7 +1426,7 @@ std::string Transaction::toJSON(int parts) {
 #ifdef WITH_YAJL
     const unsigned char *buf;
     size_t len;
-    yajl_gen g = NULL;
+    yajl_gen g;
     std::string ts = utils::string::ascTime(&m_timeStamp).c_str();
     std::string uniqueId = UniqueId::uniqueId();
 
@@ -1484,12 +1474,10 @@ std::string Transaction::toJSON(int parts) {
             strlen("headers"));
         yajl_gen_map_open(g);
 
-
-        m_collections.m_transient->resolveMultiMatches("REQUEST_HEADERS", &l);
+        m_variableRequestHeaders.resolve(&l);
         for (auto h : l) {
             size_t pos = strlen("REQUEST_HEADERS:");
             LOGFY_ADD(h->m_key->c_str() + pos, h->m_value->c_str());
-            delete h;
         }
 
         /* end: request headers */
@@ -1516,11 +1504,10 @@ std::string Transaction::toJSON(int parts) {
             strlen("headers"));
         yajl_gen_map_open(g);
 
-        m_collections.m_transient->resolveMultiMatches("RESPONSE_HEADERS", &l);
+        m_variableResponseHeaders.resolve(&l);
         for (auto h : l) {
             size_t pos = strlen("RESPONSE_HEADERS:");
             LOGFY_ADD(h->m_key->c_str() + pos, h->m_value->c_str());
-            delete h;
         }
 
         /* end: response headers */

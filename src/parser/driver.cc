@@ -44,7 +44,7 @@ Driver::~Driver() {
 int Driver::addSecMarker(std::string marker) {
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         Rule *rule = new Rule(marker);
-        rule->phase = i;
+        rule->m_phase = i;
         m_rules[i].push_back(rule);
     }
     return 0;
@@ -52,37 +52,37 @@ int Driver::addSecMarker(std::string marker) {
 
 
 int Driver::addSecAction(Rule *rule) {
-    if (rule->phase > modsecurity::Phases::NUMBER_OF_PHASES) {
-        m_parserError << "Unknown phase: " << std::to_string(rule->phase);
+    if (rule->m_phase > modsecurity::Phases::NUMBER_OF_PHASES) {
+        m_parserError << "Unknown phase: " << std::to_string(rule->m_phase);
         m_parserError << std::endl;
         return false;
     }
 
-    m_rules[rule->phase].push_back(rule);
+    m_rules[rule->m_phase].push_back(rule);
 
     return true;
 }
 
 int Driver::addSecRule(Rule *rule) {
-    if (rule->phase > modsecurity::Phases::NUMBER_OF_PHASES) {
-        m_parserError << "Unknown phase: " << std::to_string(rule->phase);
+    if (rule->m_phase > modsecurity::Phases::NUMBER_OF_PHASES) {
+        m_parserError << "Unknown phase: " << std::to_string(rule->m_phase);
         m_parserError << std::endl;
         return false;
     }
 
-    if (lastRule && lastRule->chained && lastRule->chainedRule == NULL) {
-        rule->phase = lastRule->phase;
-        lastRule->chainedRule = rule;
+    if (lastRule && lastRule->m_chained && lastRule->m_chainedRule == NULL) {
+        rule->m_phase = lastRule->m_phase;
+        lastRule->m_chainedRule = rule;
         return true;
     }
 
-    if (lastRule && lastRule->chained && lastRule->chainedRule != NULL) {
-        Rule *a = lastRule->chainedRule;
-        while (a->chained && a->chainedRule != NULL) {
-            a = a->chainedRule;
+    if (lastRule && lastRule->m_chained && lastRule->m_chainedRule != NULL) {
+        Rule *a = lastRule->m_chainedRule;
+        while (a->m_chained && a->m_chainedRule != NULL) {
+            a = a->m_chainedRule;
         }
-        if (a->chained && a->chainedRule == NULL) {
-            a->chainedRule = rule;
+        if (a->m_chained && a->m_chainedRule == NULL) {
+            a->m_chainedRule = rule;
             return true;
         }
     }
@@ -91,7 +91,7 @@ int Driver::addSecRule(Rule *rule) {
      * Checking if the rule has an ID and also checking if this ID is not used
      * by other rule
      */
-    if (rule->rule_id == 0) {
+    if (rule->m_ruleId == 0) {
         m_parserError << "Rules must have an ID. File: ";
         m_parserError << rule->m_fileName << " at line: ";
         m_parserError << std::to_string(rule->m_lineNumber) << std::endl;
@@ -100,8 +100,8 @@ int Driver::addSecRule(Rule *rule) {
     for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
         std::vector<Rule *> rules = m_rules[i];
         for (int j = 0; j < rules.size(); j++) {
-            if (rules[j]->rule_id == rule->rule_id) {
-                m_parserError << "Rule id: " << std::to_string(rule->rule_id) \
+            if (rules[j]->m_ruleId == rule->m_ruleId) {
+                m_parserError << "Rule id: " << std::to_string(rule->m_ruleId) \
                     << " is duplicated" << std::endl;
                 return false;
             }
@@ -109,7 +109,7 @@ int Driver::addSecRule(Rule *rule) {
     }
 
     lastRule = rule;
-    m_rules[rule->phase].push_back(rule);
+    m_rules[rule->m_phase].push_back(rule);
     return true;
 }
 

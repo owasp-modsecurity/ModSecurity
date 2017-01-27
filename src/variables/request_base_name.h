@@ -34,7 +34,8 @@ class RequestBasename : public Variable {
     RequestBasename()
         : Variable("REQUEST_BASENAME") { }
 
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRequestBasename.evaluate(l);
     }

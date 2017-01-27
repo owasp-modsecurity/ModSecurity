@@ -33,7 +33,8 @@ class RequestFilename : public Variable {
  public:
     RequestFilename()
         : Variable("REQUEST_FILENAME") { }
-    void evaluateInternal(Transaction *transaction,
+    void evaluate(Transaction *transaction,
+        Rule *rule,
         std::vector<const collection::Variable *> *l) {
         transaction->m_variableRequestFilename.evaluate(l);
     }

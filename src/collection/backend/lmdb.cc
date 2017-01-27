@@ -161,7 +161,7 @@ void LMDB::lmdb_debug(int rc, std::string op, std::string scope) {
 }
 
 
-std::string* LMDB::resolveFirst(const std::string& var) {
+std::unique_ptr<std::string> LMDB::resolveFirst(const std::string& var) {
     int rc;
     MDB_val mdb_key;
     MDB_val mdb_value;
@@ -188,10 +188,9 @@ std::string* LMDB::resolveFirst(const std::string& var) {
         goto end_get;
     }
 
-    // FIXME: Memory leak here.
-    ret = new std::string(
+    ret = std::unique_ptr<std::string>(new std::string(
         reinterpret_cast<char *>(mdb_value_ret.mv_data),
-        mdb_value_ret.mv_size);
+        mdb_value_ret.mv_size));
 
 end_get:
     mdb_dbi_close(m_env, dbi);

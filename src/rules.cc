@@ -186,11 +186,11 @@ int Rules::evaluate(int phase, Transaction *transaction) {
     for (int i = 0; i < rules.size(); i++) {
         Rule *rule = rules[i];
         if (transaction->m_marker.empty() == false) {
-            debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
+            debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
                 + "' due to a SecMarker: " + transaction->m_marker);
             m_secmarker_skipped++;
             debug(9, "Rule: " + rule->m_marker);
-            if (rule->m_secmarker && rule->m_marker == transaction->m_marker) {
+            if (rule->m_secMarker && rule->m_marker == transaction->m_marker) {
                 debug(4, "Out of a SecMarker after skip " \
                     + std::to_string(m_secmarker_skipped) + " rules.");
                 transaction->m_marker.clear();
@@ -198,15 +198,15 @@ int Rules::evaluate(int phase, Transaction *transaction) {
             }
         } else if (transaction->m_skip_next > 0) {
             transaction->m_skip_next--;
-            debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
+            debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
                 + "' due to a `skip' action. Still " + \
                 std::to_string(transaction->m_skip_next) + " to be skipped.");
         } else if (transaction->m_allowType
             != actions::disruptive::NoneAllowType) {
-            debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
+            debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
                 + "' as request trough the utilization of an `allow' action.");
-        } else if (m_exceptions.contains(rule->rule_id)) {
-            debug(9, "Skipped rule id '" + std::to_string(rule->rule_id) \
+        } else if (m_exceptions.contains(rule->m_ruleId)) {
+            debug(9, "Skipped rule id '" + std::to_string(rule->m_ruleId) \
                 + "'. Removed by an SecRuleRemove directive.");
         } else {
             rule->evaluate(transaction);
@@ -259,7 +259,7 @@ void Rules::dump() {
         std::cout << " (" << std::to_string(rules.size());
         std::cout << " rules)" << std::endl;
         for (int j = 0; j < rules.size(); j++) {
-            std::cout << "    Rule ID: " << std::to_string(rules[j]->rule_id);
+            std::cout << "    Rule ID: " << std::to_string(rules[j]->m_ruleId);
             std::cout << "--" << rules[j] << std::endl;
         }
     }

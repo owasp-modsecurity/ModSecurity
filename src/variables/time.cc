@@ -33,7 +33,8 @@
 namespace modsecurity {
 namespace Variables {
 
-void Time::evaluateInternal(Transaction *transaction,
+void Time::evaluate(Transaction *transaction,
+    Rule *rule,
     std::vector<const collection::Variable *> *l) {
 
     char tstr[200];

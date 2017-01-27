@@ -37,7 +37,7 @@ class RuleMessage {
     explicit RuleMessage(Rule *rule) :
         m_ruleFile(rule->m_fileName),
         m_ruleLine(rule->m_lineNumber),
-        m_ruleId(rule->rule_id),
+        m_ruleId(rule->m_ruleId),
         m_rev(rule->m_rev),
         m_accuracy(rule->m_accuracy),
         m_message(std::string("")),

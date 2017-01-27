@@ -51,7 +51,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"filedata\" \\(Variable: MULTIPART_NAME\\)"
+      "debug_log":"Target value: \"filedata\" \\(Variable: MULTIPART_NAME"
     },
     "rules":[  
       "SecRuleEngine On",
@@ -110,7 +110,7 @@
       ]
     },
     "expected":{  
-      "debug_log":"Target value: \"filedata2\" \\(Variable: MULTIPART_NAME\\)"
+      "debug_log":"Target value: \"filedata2\" \\(Variable: MULTIPART_NAME"
     },
     "rules":[  
       "SecRuleEngine On",

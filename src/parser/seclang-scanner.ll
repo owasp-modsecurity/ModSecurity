@@ -110,6 +110,142 @@ ACTION_TRANSFORMATION_URL_DECODE_UNI            (?i:t:urlDecodeUni)
 ACTION_TRANSFORMATION_UTF8_TO_UNICODE           (?i:t:utf8toUnicode)
 
 
+VARIABLE_ARGS_COMBINED_SIZE               (?i:ARGS_COMBINED_SIZE)
+VARIABLE_ARGS_GET_NAMES                   (?i:ARGS_GET_NAMES)
+VARIABLE_ARGS_NAMES                       (?i:ARGS_NAMES)
+VARIABLE_ARGS_POST_NAMES                  (?i:ARGS_POST_NAMES)
+VARIABLE_AUTH_TYPE                        (?i:AUTH_TYPE)
+VARIABLE_FILES_COMBINED_SIZE              (?i:FILES_COMBINED_SIZE)
+VARIABLE_FILES_TMP_NAMES                  (?i:FILES_TMPNAMES)
+VARIABLE_FULL_REQUEST                     (?i:FULL_REQUEST)
+VARIABLE_FULL_REQUEST_LENGTH              (?i:FULL_REQUEST_LENGTH)
+VARIABLE_GLOBAL                           (?i:GLOBAL)
+VARIABLE_INBOUND_DATA_ERROR               (?i:INBOUND_DATA_ERROR)
+VARIABLE_MATCHED_VAR                      (?i:MATCHED_VAR)
+VARIABLE_MATCHED_VAR_NAME                 (?i:MATCHED_VAR_NAME)
+VARIABLE_MULTIPART_CRLF_LF_LINES          (?i:MULTIPART_CRLF_LF_LINES)
+VARIABLE_MULTIPART_DATA_AFTER             (?i:MULTIPART_DATA_AFTER)
+VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED    (?i:MULTIPART_FILE_LIMIT_EXCEEDED)
+VARIABLE_MULTIPART_HEADER_FOLDING         (?i:MULTIPART_HEADER_FOLDING)
+VARIABLE_MULTIPART_INVALID_HEADER_FOLDING (?i:MULTIPART_INVALID_HEADER_FOLDING)
+VARIABLE_MULTIPART_INVALID_QUOTING        (?i:MULTIPART_INVALID_QUOTING)
+VARIABLE_MULTIPART_STRICT_ERROR           (?i:MULTIPART_STRICT_ERROR)
+VARIABLE_MULTIPART_UNMATCHED_BOUNDARY     (?i:MULTIPART_UNMATCHED_BOUNDARY)
+VARIABLE_OUTBOUND_DATA_ERROR              (?i:OUTBOUND_DATA_ERROR)
+VARIABLE_PATH_INFO                        (?i:PATH_INFO)
+VARIABLE_QUERY_STRING                     (?i:QUERY_STRING)
+VARIABLE_REMOTE_ADDR                      (?i:REMOTE_ADDR)
+VARIABLE_REMOTE_HOST                      (?i:REMOTE_HOST)
+VARIABLE_REMOTE_PORT                      (?i:REMOTE_PORT)
+VARIABLE_REQBODY_ERROR                    (?i:REQBODY_ERROR)
+VARIABLE_REQBODY_ERROR_MSG                (?i:REQBODY_ERROR_MSG)
+VARIABLE_REQBODY_PROCESSOR_ERROR          (?i:REQBODY_PROCESSOR_ERROR)
+VARIABLE_REQBODY_PROCESSOR_ERROR_MSG      (?i:REQBODY_PROCESSOR_ERROR_MSG)
+VARIABLE_REQBODY_PROCESSOR                (?i:REQBODY_PROCESSOR)
+VARIABLE_REQUEST_BASENAME                 (?i:REQUEST_BASENAME)
+VARIABLE_REQUEST_BODY                     (?i:REQUEST_BODY)
+VARIABLE_REQUEST_BODY_LENGTH              (?i:REQUEST_BODY_LENGTH)
+VARIABLE_REQUEST_FILE_NAME                (?i:REQUEST_FILENAME)
+VARIABLE_REQUEST_HEADERS_NAMES            (?i:REQUEST_HEADERS_NAMES)
+VARIABLE_REQUEST_LINE                     (?i:REQUEST_LINE)
+VARIABLE_REQUEST_METHOD                   (?i:REQUEST_METHOD)
+VARIABLE_REQUEST_PROTOCOL                 (?i:REQUEST_PROTOCOL)
+VARIABLE_REQUEST_URI                      (?i:REQUEST_URI)
+VARIABLE_REQUEST_URI_RAW                  (?i:REQUEST_URI_RAW)
+VARIABLE_RESOURCE                         (?i:RESOURCE)
+VARIABLE_RESPONSE_BODY                    (?i:RESPONSE_BODY)
+VARIABLE_RESPONSE_CONTENT_LENGTH          (?i:RESPONSE_CONTENT_LENGTH)
+VARIABLE_RESPONSE_CONTENT_TYPE            (?i:RESPONSE_CONTENT_TYPE)
+VARIABLE_RESPONSE_HEADERS_NAMES           (?i:RESPONSE_HEADERS_NAMES)
+VARIABLE_RESPONSE_PROTOCOL                (?i:RESPONSE_PROTOCOL)
+VARIABLE_RESPONSE_STATUS                  (?i:RESPONSE_STATUS)
+VARIABLE_SERVER_ADDR                      (?i:SERVER_ADDR)
+VARIABLE_SERVER_NAME                      (?i:SERVER_NAME)
+VARIABLE_SERVER_PORT                      (?i:SERVER_PORT)
+VARIABLE_SESSION_ID                       (?i:SESSIONID)
+VARIABLE_UNIQUE_ID                        (?i:UNIQUE_ID)
+VARIABLE_URL_ENCODED_ERROR                (?i:URLENCODED_ERROR)
+VARIABLE_USER_ID                          (?i:USERID)
+VARIABLE_WEBSERVER_ERROR_LOG              (?i:WEBSERVER_ERROR_LOG)
+VARIABLE_ARGS                             (?i:ARGS)
+VARIABLE_ARGS_POST                        (?i:ARGS_POST)
+VARIABLE_ARGS_GET                         (?i:ARGS_GET)
+VARIABLE_FILES_SIZES                      (?i:FILES_SIZES)
+VARIABLE_FILES_NAMES                      (?i:FILES_NAMES)
+VARIABLE_FILES_TMP_CONTENT                (?i:FILES_TMP_CONTENT)
+VARIABLE_MULTIPART_FILENAME               (?i:MULTIPART_FILENAME)
+VARIABLE_MULTIPART_NAME                   (?i:MULTIPART_NAME)
+VARIABLE_MATCHED_VARS_NAMES               (?i:MATCHED_VARS_NAMES)
+VARIABLE_MATCHED_VARS                     (?i:MATCHED_VARS)
+VARIABLE_FILES                            (?i:FILES)
+VARIABLE_REQUEST_COOKIES                  (?i:REQUEST_COOKIES)
+VARIABLE_REQUEST_HEADERS                  (?i:REQUEST_HEADERS)
+VARIABLE_RESPONSE_HEADERS                 (?i:RESPONSE_HEADERS)
+VARIABLE_GEO                              (?i:GEO)
+VARIABLE_REQUEST_COOKIES_NAMES            (?i:REQUEST_COOKIES_NAMES)
+VARIABLE_RULE                             (?i:RULE)
+VARIABLE_SESSION                          (?i:(SESSION))
+VARIABLE_IP                               (?i:(IP))
+VARIABLE_USER                             (?i:(USER))
+VARIABLE_STATUS                           (?i:(STATUS[^:]))
+VARIABLE_TX                               (?i:TX)
+RUN_TIME_VAR_BLD                          (?i:MODSEC_BUILD)
+RUN_TIME_VAR_DUR                          (?i:DURATION)
+RUN_TIME_VAR_ENV                          (?i:ENV)
+RUN_TIME_VAR_HSV                          (?i:HIGHEST_SEVERITY)
+RUN_TIME_VAR_REMOTE_USER                  (?i:REMOTE_USER)
+RUN_TIME_VAR_TIME                         (?i:TIME)
+RUN_TIME_VAR_TIME_DAY                     (?i:TIME_DAY)
+RUN_TIME_VAR_TIME_EPOCH                   (?i:TIME_EPOCH)
+RUN_TIME_VAR_TIME_HOUR                    (?i:TIME_HOUR)
+RUN_TIME_VAR_TIME_MIN                     (?i:TIME_MIN)
+RUN_TIME_VAR_TIME_MON                     (?i:TIME_MON)
+RUN_TIME_VAR_TIME_SEC                     (?i:TIME_SEC)
+RUN_TIME_VAR_TIME_WDAY                    (?i:TIME_WDAY)
+RUN_TIME_VAR_TIME_YEAR                    (?i:TIME_YEAR)
+RUN_TIME_VAR_XML                          (?i:XML)
+VAR_EXCLUSION                             (!)
+VAR_COUNT                                 (&)
+
+
+OPERATOR_UNCONDITIONAL_MATCH            (?i:@unconditionalMatch)
+OPERATOR_DETECT_SQLI                    (?i:@detectSQLi)
+OPERATOR_DETECT_XSS                     (?i:@detectXSS)
+OPERATOR_VALIDATE_URL_ENCODING          (?i:@validateUrlEncoding)
+OPERATOR_VALIDATE_UTF8_ENCODING         (?i:@validateUtf8Encoding)
+OPERATOR_INSPECT_FILE                   (?i:@inspectFile)
+OPERATOR_FUZZY_HASH                     (?i:@fuzzyHash)
+OPERATOR_VALIDATE_BYTE_RANGE            (?i:@validateByteRange)
+OPERATOR_VALIDATE_DTD                   (?i:@validateDTD)
+OPERATOR_VALIDATE_HASH                  (?i:@validateHash)
+OPERATOR_VALIDATE_SCHEMA                (?i:@validateSchema)
+OPERATOR_VERIFY_CC                      (?i:@verifyCC)
+OPERATOR_VERIFY_CPF                     (?i:@verifyCPF)
+OPERATOR_VERIFY_SSN                     (?i:@verifySSN)
+OPERATOR_GSB_LOOKUP                     (?i:@gsbLookup)
+OPERATOR_RSUB                           (?i:@rsub)
+OPERATOR_WITHIN                         (?i:@within)
+OPERATOR_CONTAINS_WORD                  (?i:@containsWord)
+OPERATOR_CONTAINS                       (?i:@contains)
+OPERATOR_ENDS_WITH                      (?i:@endsWith)
+OPERATOR_EQ                             (?i:@eq)
+OPERATOR_GE                             (?i:@ge)
+OPERATOR_GT                             (?i:@gt)
+OPERATOR_IP_MATCH_FROM_FILE             (?i:(@ipMatchF|@ipMatchFromFile))
+OPERATOR_IP_MATCH                       (?i:@ipMatch)
+OPERATOR_LE                             (?i:@le)
+OPERATOR_LT                             (?i:@lt)
+OPERATOR_PM_FROM_FILE                   (?i:(@pmf|@pmFromFile))
+OPERATOR_PM                             (?i:@pm)
+OPERATOR_RBL                            (?i:@rbl)
+OPERATOR_RX                             (?i:@rx)
+OPERATOR_STR_EQ                         (?i:@streq)
+OPERATOR_STR_MATCH                      (?i:@strmatch)
+OPERATOR_BEGINS_WITH                    (?i:@beginsWith)
+OPERATOR_GEOLOOKUP                      (?i:@geoLookup)
+OPERATOR_RX_CONTENT_ONLY                ([^\"]|([^\\]\\\"))+
+
+
 AUDIT_PARTS                             [ABCDEFHJKIZ]+
 COL_FREE_TEXT_SPACE_COMMA               ([^,"])+
 COL_NAME                                [A-Za-z]+
@@ -172,6 +308,7 @@ CONGIG_DIR_SEC_DATA_DIR                 (?i:SecDataDir)
 CONGIG_DIR_SEC_STATUS_ENGINE            (?i:SecStatusEngine)
 CONGIG_DIR_SEC_TMP_DIR                  (?i:SecTmpDir)
 DICT_ELEMENT                            [^ \t|]+
+DICT_ELEMENT_WITH_PIPE                  [^ \t]+
 DICT_ELEMENT_TWO                        [^\"\=]+
 DICT_ELEMENT_TWO2                        [A-Za-z_ -\%\{\.\}\-\/]+
 DIRECTIVE                               (?i:SecRule)
@@ -184,137 +321,11 @@ FREE_TEXT_SPACE_COMMA                   [^, \t]+
 FREE_TEXT_SPACE_COMMA_QUOTE             [^, \t\"\n\r]+
 FREE_TEXT_COMMA_QUOTE                   [^,\"\\n\\r]+
 NEW_LINE_FREE_TEXT                      [^, \t\"\n\r]+
-
-OPERATOR_UNCONDITIONAL_MATCH            (?i:@unconditionalMatch)
-OPERATOR_DETECT_SQLI                    (?i:@detectSQLi)
-OPERATOR_DETECT_XSS                     (?i:@detectXSS)
-OPERATOR_VALIDATE_URL_ENCODING          (?i:@validateUrlEncoding)
-OPERATOR_VALIDATE_UTF8_ENCODING         (?i:@validateUtf8Encoding)
-OPERATOR_INSPECT_FILE                   (?i:@inspectFile)
-OPERATOR_FUZZY_HASH                     (?i:@fuzzyHash)
-OPERATOR_VALIDATE_BYTE_RANGE            (?i:@validateByteRange)
-OPERATOR_VALIDATE_DTD                   (?i:@validateDTD)
-OPERATOR_VALIDATE_HASH                  (?i:@validateHash)
-OPERATOR_VALIDATE_SCHEMA                (?i:@validateSchema)
-OPERATOR_VERIFY_CC                      (?i:@verifyCC)
-OPERATOR_VERIFY_CPF                     (?i:@verifyCPF)
-OPERATOR_VERIFY_SSN                     (?i:@verifySSN)
-OPERATOR_GSB_LOOKUP                     (?i:@gsbLookup)
-OPERATOR_RSUB                           (?i:@rsub)
-OPERATOR_WITHIN                         (?i:@within)
-OPERATOR_CONTAINS_WORD                  (?i:@containsWord)
-OPERATOR_CONTAINS                       (?i:@contains)
-OPERATOR_ENDS_WITH                      (?i:@endsWith)
-OPERATOR_EQ                             (?i:@eq)
-OPERATOR_GE                             (?i:@ge)
-OPERATOR_GT                             (?i:@gt)
-OPERATOR_IP_MATCH_FROM_FILE             (?i:(@ipMatchF|@ipMatchFromFile))
-OPERATOR_IP_MATCH                       (?i:@ipMatch)
-OPERATOR_LE                             (?i:@le)
-OPERATOR_LT                             (?i:@lt)
-OPERATOR_PM_FROM_FILE                   (?i:(@pmf|@pmFromFile))
-OPERATOR_PM                             (?i:@pm)
-OPERATOR_RBL                            (?i:@rbl)
-OPERATOR_RX                             (?i:@rx)
-OPERATOR_STR_EQ                         (?i:@streq)
-OPERATOR_STR_MATCH                      (?i:@strmatch)
-OPERATOR_BEGINS_WITH                    (?i:@beginsWith)
-OPERATOR_GEOLOOKUP                      (?i:@geoLookup)
-OPERATOR_RX_CONTENT_ONLY                ([^\"]|([^\\]\\\"))+
-
-
 NOT !
 OP_QUOTE \"
-
-
 FREE_TEXT                               ([^\"]|([^\\]\\\"))+
-
 REMOVE_RULE_BY                          [0-9A-Za-z_\/\.\-\*\:\;\]\[]+
-RUN_TIME_VAR_BLD                        (?i:MODSEC_BUILD)
-RUN_TIME_VAR_DUR                        (?i:DURATION)
-RUN_TIME_VAR_ENV                        (?i:ENV)
-RUN_TIME_VAR_HSV                        (?i:HIGHEST_SEVERITY)
-RUN_TIME_VAR_REMOTE_USER                (?i:REMOTE_USER)
-RUN_TIME_VAR_RULE                       (?i:RULE)
-RUN_TIME_VAR_TIME                       (?i:TIME)
-RUN_TIME_VAR_TIME_DAY                   (?i:TIME_DAY)
-RUN_TIME_VAR_TIME_EPOCH                 (?i:TIME_EPOCH)
-RUN_TIME_VAR_TIME_HOUR                  (?i:TIME_HOUR)
-RUN_TIME_VAR_TIME_MIN                   (?i:TIME_MIN)
-RUN_TIME_VAR_TIME_MON                   (?i:TIME_MON)
-RUN_TIME_VAR_TIME_SEC                   (?i:TIME_SEC)
-RUN_TIME_VAR_TIME_WDAY                  (?i:TIME_WDAY)
-RUN_TIME_VAR_TIME_YEAR                  (?i:TIME_YEAR)
-RUN_TIME_VAR_XML                        (?i:XML)
 
-
-VARIABLE_ARGS_COMBINED_SIZE               (?i:ARGS_COMBINED_SIZE)
-VARIABLE_ARGS_GET_NAMES                   (?i:ARGS_GET_NAMES)
-VARIABLE_ARGS_NAMES                       (?i:ARGS_NAMES)
-VARIABLE_ARGS_POST_NAMES                  (?i:ARGS_POST_NAMES)
-VARIABLE_AUTH_TYPE                        (?i:AUTH_TYPE)
-VARIABLE_FILES_COMBINED_SIZE              (?i:FILES_COMBINED_SIZE)
-VARIABLE_FILES_TMP_NAMES                  (?i:FILES_TMPNAMES)
-VARIABLE_FULL_REQUEST                     (?i:FULL_REQUEST)
-VARIABLE_FULL_REQUEST_LENGTH              (?i:FULL_REQUEST_LENGTH)
-VARIABLE_GLOBAL                           (?i:GLOBAL)
-VARIABLE_INBOUND_DATA_ERROR               (?i:INBOUND_DATA_ERROR)
-VARIABLE_MATCHED_VAR                      (?i:MATCHED_VAR)
-VARIABLE_MATCHED_VAR_NAME                 (?i:MATCHED_VAR_NAME)
-VARIABLE_MULTIPART_CRLF_LF_LINES          (?i:MULTIPART_CRLF_LF_LINES)
-VARIABLE_MULTIPART_DATA_AFTER             (?i:MULTIPART_DATA_AFTER)
-VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED    (?i:MULTIPART_FILE_LIMIT_EXCEEDED)
-VARIABLE_MULTIPART_HEADER_FOLDING         (?i:MULTIPART_HEADER_FOLDING)
-VARIABLE_MULTIPART_INVALID_HEADER_FOLDING (?i:MULTIPART_INVALID_HEADER_FOLDING)
-VARIABLE_MULTIPART_INVALID_QUOTING        (?i:MULTIPART_INVALID_QUOTING)
-VARIABLE_MULTIPART_STRICT_ERROR           (?i:MULTIPART_STRICT_ERROR)
-VARIABLE_MULTIPART_UNMATCHED_BOUNDARY     (?i:MULTIPART_UNMATCHED_BOUNDARY)
-VARIABLE_OUTBOUND_DATA_ERROR              (?i:OUTBOUND_DATA_ERROR)
-VARIABLE_PATH_INFO                        (?i:PATH_INFO)
-VARIABLE_QUERY_STRING                     (?i:QUERY_STRING)
-VARIABLE_REMOTE_ADDR                      (?i:REMOTE_ADDR)
-VARIABLE_REMOTE_HOST                      (?i:REMOTE_HOST)
-VARIABLE_REMOTE_PORT                      (?i:REMOTE_PORT)
-VARIABLE_REQBODY_ERROR                    (?i:REQBODY_ERROR)
-VARIABLE_REQBODY_ERROR_MSG                (?i:REQBODY_ERROR_MSG)
-VARIABLE_REQBODY_PROCESSOR_ERROR          (?i:REQBODY_PROCESSOR_ERROR)
-VARIABLE_REQBODY_PROCESSOR_ERROR_MSG      (?i:REQBODY_PROCESSOR_ERROR_MSG)
-VARIABLE_REQBODY_PROCESSOR                (?i:REQBODY_PROCESSOR)
-VARIABLE_REQUEST_BASENAME                 (?i:REQUEST_BASENAME)
-VARIABLE_REQUEST_BODY                     (?i:REQUEST_BODY)
-VARIABLE_REQUEST_BODY_LENGTH              (?i:REQUEST_BODY_LENGTH)
-VARIABLE_REQUEST_FILE_NAME                (?i:REQUEST_FILENAME)
-VARIABLE_REQUEST_HEADERS_NAMES            (?i:REQUEST_HEADERS_NAMES)
-VARIABLE_REQUEST_LINE                     (?i:REQUEST_LINE)
-VARIABLE_REQUEST_METHOD                   (?i:REQUEST_METHOD)
-VARIABLE_REQUEST_PROTOCOL                 (?i:REQUEST_PROTOCOL)
-VARIABLE_REQUEST_URI                      (?i:REQUEST_URI)
-VARIABLE_REQUEST_URI_RAW                  (?i:REQUEST_URI_RAW)
-VARIABLE_RESOURCE                         (?i:RESOURCE)
-VARIABLE_RESPONSE_BODY                    (?i:RESPONSE_BODY)
-VARIABLE_RESPONSE_CONTENT_LENGTH          (?i:RESPONSE_CONTENT_LENGTH)
-VARIABLE_RESPONSE_CONTENT_TYPE            (?i:RESPONSE_CONTENT_TYPE)
-VARIABLE_RESPONSE_HEADERS_NAMES           (?i:RESPONSE_HEADERS_NAMES)
-VARIABLE_RESPONSE_PROTOCOL                (?i:RESPONSE_PROTOCOL)
-VARIABLE_RESPONSE_STATUS                  (?i:RESPONSE_STATUS)
-VARIABLE_SERVER_ADDR                      (?i:SERVER_ADDR)
-VARIABLE_SERVER_NAME                      (?i:SERVER_NAME)
-VARIABLE_SERVER_PORT                      (?i:SERVER_PORT)
-VARIABLE_SESSION_ID                       (?i:SESSIONID)
-VARIABLE_UNIQUE_ID                        (?i:UNIQUE_ID)
-VARIABLE_URL_ENCODED_ERROR                (?i:URLENCODED_ERROR)
-VARIABLE_USER_ID                          (?i:USERID)
-VARIABLE_WEBSERVER_ERROR_LOG              (?i:WEBSERVER_ERROR_LOG)
-
-
-VARIABLE_ARGS                           (?i:ARGS)
-VARIABLE_COL                            (?i:(ARGS_POST|ARGS_GET|FILES_SIZES|FILES_NAMES|FILES_TMP_CONTENT|MULTIPART_FILENAME|MULTIPART_NAME|MATCHED_VARS_NAMES|MATCHED_VARS|FILES|REQUEST_COOKIES|REQUEST_HEADERS|RESPONSE_HEADERS|GEO|REQUEST_COOKIES_NAMES))
-VARIABLE_SESSION                        (?i:(SESSION))
-VARIABLE_IP                             (?i:(IP))
-VARIABLE_USER                           (?i:(USER))
-
-VARIABLE_STATUS                         (?i:(STATUS[^:]))
-VARIABLE_TX                             (?i:TX)
 VAR_FREE_TEXT_QUOTE                     ([^\']|([^\\]\\\'))+
 VAR_FREE_TEXT_SPACE                     [^ \t\"]+
 VAR_FREE_TEXT_SPACE_COMMA               [^, \t\"]+
@@ -613,69 +624,12 @@ EQUALS_MINUS                            (?i:=\-)
 
 
 <EXPECTING_VARIABLE>{
-
-[!&]?{RUN_TIME_VAR_BLD}                                                 { return p::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_DUR}                                                 { return p::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_ENV}(\:[\']{FREE_TEXT_QUOTE}[\'])?                   { return p::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_ENV}(\:{DICT_ELEMENT})?                              { return p::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_HSV}                                                 { return p::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_REMOTE_USER}                                         { return p::make_RUN_TIME_VAR_REMOTE_USER(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_RULE}(\:[\']{FREE_TEXT_QUOTE}[\'])?                  { return p::make_RUN_TIME_VAR_RULE(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_RULE}(\:{DICT_ELEMENT})?                             { return p::make_RUN_TIME_VAR_RULE(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_TIME_DAY}                                            { return p::make_RUN_TIME_VAR_TIME_DAY(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_TIME_EPOCH}                                          { return p::make_RUN_TIME_VAR_TIME_EPOCH(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_TIME_HOUR}                                           { return p::make_RUN_TIME_VAR_TIME_HOUR(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_TIME_MIN}                                            { return p::make_RUN_TIME_VAR_TIME_MIN(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_TIME_MON}                                            { return p::make_RUN_TIME_VAR_TIME_MON(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_TIME_SEC}                                            { return p::make_RUN_TIME_VAR_TIME_SEC(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_TIME_YEAR}                                           { return p::make_RUN_TIME_VAR_TIME_YEAR(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_TIME}                                                { return p::make_RUN_TIME_VAR_TIME(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_XML}(\:[\']{FREE_TEXT_QUOTE}[\'])?                   { return p::make_RUN_TIME_VAR_XML(yytext, *driver.loc.back()); }
-[!&]?{RUN_TIME_VAR_XML}(\:{DICT_ELEMENT})?                              { return p::make_RUN_TIME_VAR_XML(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_COL}(\:[\']{FREE_TEXT_QUOTE}[\'])?                       { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_COL}(\:{DICT_ELEMENT})?                                  { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_GLOBAL}(\:[\']{FREE_TEXT_QUOTE}[\'])?                       { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_GLOBAL}(\:{DICT_ELEMENT})?                                  { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_SESSION}(\:[\']{FREE_TEXT_QUOTE}[\'])?                       { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_SESSION}(\:{DICT_ELEMENT})?                                  { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_IP}(\:[\']{FREE_TEXT_QUOTE}[\'])?                       { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_IP}(\:{DICT_ELEMENT})?                                  { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_USER}(\:[\']{FREE_TEXT_QUOTE}[\'])?                       { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_USER}(\:{DICT_ELEMENT})?                                  { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_STATUS}                                                  { return p::make_VARIABLE_STATUS(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_TX}(\:[\']{FREE_TEXT_QUOTE}[\'])?                        { return p::make_VARIABLE_TX(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_TX}(\:{DICT_ELEMENT})?                                   { return p::make_VARIABLE_TX(yytext, *driver.loc.back()); }
-[!&]?{VARIABLE_WEBSERVER_ERROR_LOG}                                     { driver.error (*driver.loc.back(), "Variable VARIABLE_WEBSERVER_ERROR_LOG is not supported by libModSecurity", ""); throw p::syntax_error(*driver.loc.back(), "");}
-["][!&]?{RUN_TIME_VAR_BLD}["]                                           { return p::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
-["][!&]?{RUN_TIME_VAR_DUR}["]                                           { return p::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
-["][!&]?{RUN_TIME_VAR_ENV}(\:\'{FREE_TEXT_QUOTE}[\'])?["]               { return p::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
-["][!&]?{RUN_TIME_VAR_ENV}(\:{DICT_ELEMENT})?["]                        { return p::make_RUN_TIME_VAR_ENV(yytext, *driver.loc.back()); }
-["][!&]?{RUN_TIME_VAR_HSV}["]                                           { return p::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
-["][!&]?{RUN_TIME_VAR_RULE}(\:[\']{FREE_TEXT_QUOTE}[\'])?["]            { return p::make_RUN_TIME_VAR_RULE(yytext, *driver.loc.back()); }
-["][!&]?{RUN_TIME_VAR_RULE}(\:{DICT_ELEMENT})?                          { return p::make_RUN_TIME_VAR_RULE(yytext, *driver.loc.back()); }
-["][!&]?{RUN_TIME_VAR_XML}(\:[\']{FREE_TEXT_QUOTE}[\'])?["]             { return p::make_RUN_TIME_VAR_XML(yytext, *driver.loc.back()); }
-["][!&]?{RUN_TIME_VAR_XML}(\:{DICT_ELEMENT})?                           { return p::make_RUN_TIME_VAR_XML(yytext, *driver.loc.back()); }
-["][!&]?{VARIABLE_COL}(\:[\']{FREE_TEXT_QUOTE}[\'])?["]                 { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-["][!&]?{VARIABLE_COL}(\:{DICT_ELEMENT})?                               { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-["][!&]?{VARIABLE_GLOBAL}(\:[\']{FREE_TEXT_QUOTE}[\'])?["]                 { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-["][!&]?{VARIABLE_GLOBAL}(\:{DICT_ELEMENT})?                               { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-["][!&]?{VARIABLE_SESSION}(\:[\']{FREE_TEXT_QUOTE}[\'])?["]                 { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-["][!&]?{VARIABLE_SESSION}(\:{DICT_ELEMENT})?                               { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-["][!&]?{VARIABLE_IP}(\:[\']{FREE_TEXT_QUOTE}[\'])?["]                 { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-["][!&]?{VARIABLE_IP}(\:{DICT_ELEMENT})?                               { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-["][!&]?{VARIABLE_USER}(\:[\']{FREE_TEXT_QUOTE}[\'])?["]                 { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-["][!&]?{VARIABLE_USER}(\:{DICT_ELEMENT})?                               { return p::make_VARIABLE_COL(yytext, *driver.loc.back()); }
-["][!&]?{VARIABLE_TX}(\:[\']{FREE_TEXT_QUOTE}[\'])?["]                  { return p::make_VARIABLE_TX(yytext, *driver.loc.back()); }
-["][!&]?{VARIABLE_TX}(\:{DICT_ELEMENT})?["]                             { return p::make_VARIABLE_TX(yytext, *driver.loc.back()); }
-[&]?{RUN_TIME_VAR_TIME_WDAY}                                            { return p::make_RUN_TIME_VAR_TIME_WDAY(yytext, *driver.loc.back()); }
-
 {VARIABLE_ARGS_COMBINED_SIZE}               { return p::make_VARIABLE_ARGS_COMBINED_SIZE(*driver.loc.back()); }
 {VARIABLE_ARGS_GET_NAMES}                   { return p::make_VARIABLE_ARGS_GET_NAMES(*driver.loc.back()); }
 {VARIABLE_ARGS_NAMES}                       { return p::make_VARIABLE_ARGS_NAMES(*driver.loc.back()); }
 {VARIABLE_ARGS_POST_NAMES}                  { return p::make_VARIABLE_ARGS_POST_NAMES(*driver.loc.back()); }
 {VARIABLE_AUTH_TYPE}                        { return p::make_VARIABLE_AUTH_TYPE(*driver.loc.back()); }
 {VARIABLE_FILES_COMBINED_SIZE}              { return p::make_VARIABLE_FILES_COMBINED_SIZE(*driver.loc.back()); }
-{VARIABLE_FILES_TMP_NAMES}                  { return p::make_VARIABLE_FILES_TMP_NAMES(*driver.loc.back()); }
 {VARIABLE_FULL_REQUEST_LENGTH}              { return p::make_VARIABLE_FULL_REQUEST_LENGTH(*driver.loc.back()); }
 {VARIABLE_FULL_REQUEST}                     { return p::make_VARIABLE_FULL_REQUEST(*driver.loc.back()); }
 {VARIABLE_INBOUND_DATA_ERROR}               { return p::make_VARIABLE_INBOUND_DATA_ERROR(*driver.loc.back()); }
@@ -724,15 +678,88 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_UNIQUE_ID}                        { return p::make_VARIABLE_UNIQUE_ID(*driver.loc.back()); }
 {VARIABLE_URL_ENCODED_ERROR}                { return p::make_VARIABLE_URL_ENCODED_ERROR(*driver.loc.back()); }
 {VARIABLE_USER_ID}                          { return p::make_VARIABLE_USER_ID(*driver.loc.back()); }
-
 {VARIABLE_ARGS}                             { return p::make_VARIABLE_ARGS(*driver.loc.back()); }
 {VARIABLE_ARGS}[:]                          { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS(*driver.loc.back()); }
+{VARIABLE_ARGS_GET}                         { return p::make_VARIABLE_ARGS_GET(*driver.loc.back()); }
+{VARIABLE_ARGS_GET}[:]                      { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_GET(*driver.loc.back()); }
+{VARIABLE_ARGS_POST}                        { return p::make_VARIABLE_ARGS_POST(*driver.loc.back()); }
+{VARIABLE_ARGS_POST}[:]                     { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_POST(*driver.loc.back()); }
+{VARIABLE_FILES_SIZES}                      { return p::make_VARIABLE_FILES_SIZES(*driver.loc.back()); }
+{VARIABLE_FILES_SIZES}[:]                   { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_FILES_SIZES(*driver.loc.back()); }
+{VARIABLE_FILES_NAMES}                      { return p::make_VARIABLE_FILES_NAMES(*driver.loc.back()); }
+{VARIABLE_FILES_NAMES}[:]                   { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_FILES_NAMES(*driver.loc.back()); }
+{VARIABLE_FILES_TMP_CONTENT}                { return p::make_VARIABLE_FILES_TMP_CONTENT(*driver.loc.back()); }
+{VARIABLE_FILES_TMP_CONTENT}[:]             { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_FILES_TMP_CONTENT(*driver.loc.back()); }
+{VARIABLE_MULTIPART_FILENAME}               { return p::make_VARIABLE_MULTIPART_FILENAME(*driver.loc.back()); }
+{VARIABLE_MULTIPART_FILENAME}[:]            { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MULTIPART_FILENAME(*driver.loc.back()); }
+{VARIABLE_MULTIPART_NAME}                   { return p::make_VARIABLE_MULTIPART_NAME(*driver.loc.back()); }
+{VARIABLE_MULTIPART_NAME}[:]                { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MULTIPART_NAME(*driver.loc.back()); }
+{VARIABLE_MATCHED_VARS_NAMES}               { return p::make_VARIABLE_MATCHED_VARS_NAMES(*driver.loc.back()); }
+{VARIABLE_MATCHED_VARS_NAMES}[:]            { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MATCHED_VARS_NAMES(*driver.loc.back()); }
+{VARIABLE_MATCHED_VARS}                     { return p::make_VARIABLE_MATCHED_VARS(*driver.loc.back()); }
+{VARIABLE_MATCHED_VARS}[:]                  { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MATCHED_VARS(*driver.loc.back()); }
+{VARIABLE_FILES}                            { return p::make_VARIABLE_FILES(*driver.loc.back()); }
+{VARIABLE_FILES}[:]                         { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_FILES(*driver.loc.back()); }
+{VARIABLE_REQUEST_COOKIES}                  { return p::make_VARIABLE_REQUEST_COOKIES(*driver.loc.back()); }
+{VARIABLE_REQUEST_COOKIES}[:]               { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_REQUEST_COOKIES(*driver.loc.back()); }
+{VARIABLE_REQUEST_HEADERS}                  { return p::make_VARIABLE_REQUEST_HEADERS(*driver.loc.back()); }
+{VARIABLE_REQUEST_HEADERS}[:]               { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_REQUEST_HEADERS(*driver.loc.back()); }
+{VARIABLE_RESPONSE_HEADERS}                 { return p::make_VARIABLE_RESPONSE_HEADERS(*driver.loc.back()); }
+{VARIABLE_RESPONSE_HEADERS}[:]              { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_RESPONSE_HEADERS(*driver.loc.back()); }
+{VARIABLE_GEO}                              { return p::make_VARIABLE_GEO(*driver.loc.back()); }
+{VARIABLE_GEO}[:]                           { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_GEO(*driver.loc.back()); }
+{VARIABLE_REQUEST_COOKIES_NAMES}            { return p::make_VARIABLE_REQUEST_COOKIES_NAMES(*driver.loc.back()); }
+{VARIABLE_REQUEST_COOKIES_NAMES}[:]         { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_REQUEST_COOKIES_NAMES(*driver.loc.back()); }
+{VARIABLE_RULE}                             { return p::make_VARIABLE_RULE(*driver.loc.back()); }
+{VARIABLE_RULE}[:]                          { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_RULE(*driver.loc.back()); }
+{VARIABLE_FILES_TMP_NAMES}                  { return p::make_VARIABLE_FILES_TMP_NAMES(*driver.loc.back()); }
+{VARIABLE_FILES_TMP_NAMES}[:]               { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_FILES_TMP_NAMES(*driver.loc.back()); }
+{RUN_TIME_VAR_XML}                          { return p::make_RUN_TIME_VAR_XML(*driver.loc.back()); }
+{RUN_TIME_VAR_XML}[:]                       { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_RUN_TIME_VAR_XML(*driver.loc.back()); }
+{RUN_TIME_VAR_ENV}                          { return p::make_RUN_TIME_VAR_ENV(*driver.loc.back()); }
+{RUN_TIME_VAR_ENV}[:]                       { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_RUN_TIME_VAR_ENV(*driver.loc.back()); }
+
+
+{VARIABLE_IP}                               { return p::make_VARIABLE_IP(*driver.loc.back()); }
+{VARIABLE_IP}[:]                            { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_IP(*driver.loc.back()); }
+{VARIABLE_GLOBAL}                           { return p::make_VARIABLE_GLOBAL(*driver.loc.back()); }
+{VARIABLE_GLOBAL}[:]                        { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_GLOBAL(*driver.loc.back()); }
+{VARIABLE_SESSION}                          { return p::make_VARIABLE_SESSION(*driver.loc.back()); }
+{VARIABLE_SESSION}[:]                       { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_SESSION(*driver.loc.back()); }
+{VARIABLE_USER}                             { return p::make_VARIABLE_USER(*driver.loc.back()); }
+{VARIABLE_USER}[:]                          { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_USER(*driver.loc.back()); }
+{VARIABLE_TX}                               { return p::make_VARIABLE_TX(*driver.loc.back()); }
+{VARIABLE_TX}[:]                            { BEGIN(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_TX(*driver.loc.back()); }
+
+
+{RUN_TIME_VAR_BLD}                          { return p::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
+{RUN_TIME_VAR_DUR}                          { return p::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
+{RUN_TIME_VAR_HSV}                          { return p::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
+{RUN_TIME_VAR_REMOTE_USER}                  { return p::make_RUN_TIME_VAR_REMOTE_USER(yytext, *driver.loc.back()); }
+{RUN_TIME_VAR_TIME_DAY}                     { return p::make_RUN_TIME_VAR_TIME_DAY(yytext, *driver.loc.back()); }
+{RUN_TIME_VAR_TIME_EPOCH}                   { return p::make_RUN_TIME_VAR_TIME_EPOCH(yytext, *driver.loc.back()); }
+{RUN_TIME_VAR_TIME_HOUR}                    { return p::make_RUN_TIME_VAR_TIME_HOUR(yytext, *driver.loc.back()); }
+{RUN_TIME_VAR_TIME_MIN}                     { return p::make_RUN_TIME_VAR_TIME_MIN(yytext, *driver.loc.back()); }
+{RUN_TIME_VAR_TIME_MON}                     { return p::make_RUN_TIME_VAR_TIME_MON(yytext, *driver.loc.back()); }
+{RUN_TIME_VAR_TIME_SEC}                     { return p::make_RUN_TIME_VAR_TIME_SEC(yytext, *driver.loc.back()); }
+{RUN_TIME_VAR_TIME_YEAR}                    { return p::make_RUN_TIME_VAR_TIME_YEAR(yytext, *driver.loc.back()); }
+{RUN_TIME_VAR_TIME}                         { return p::make_RUN_TIME_VAR_TIME(yytext, *driver.loc.back()); }
+{RUN_TIME_VAR_TIME_WDAY}                    { return p::make_RUN_TIME_VAR_TIME_WDAY(yytext, *driver.loc.back()); }
+
+
+{VARIABLE_WEBSERVER_ERROR_LOG}              { driver.error (*driver.loc.back(), "Variable VARIABLE_WEBSERVER_ERROR_LOG is not supported by libModSecurity", ""); throw p::syntax_error(*driver.loc.back(), "");}
+{VARIABLE_STATUS}                           { return p::make_VARIABLE_STATUS(*driver.loc.back()); }
+
+
+{VAR_EXCLUSION}                             { return p::make_VAR_EXCLUSION(*driver.loc.back()); }
+{VAR_COUNT}                                 { return p::make_VAR_COUNT(*driver.loc.back()); }
 }
 
 
 <EXPECTING_VAR_PARAMETER>{
-[\/]{DICT_ELEMENT}[\/]                        { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT_REGEXP(yytext, *driver.loc.back()); }
+[\/]{DICT_ELEMENT_WITH_PIPE}[\/]              { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
 {DICT_ELEMENT}                                { BEGIN(EXPECTING_VARIABLE); return p::make_DICT_ELEMENT(yytext, *driver.loc.back()); }
+[|]                                           { }
 .                                             { BEGIN(LEXING_ERROR_ACTION); yyless(0); }
 }
 
