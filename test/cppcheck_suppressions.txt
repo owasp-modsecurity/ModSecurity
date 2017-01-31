@@ -42,5 +42,7 @@ nullPointerRedundantCheck:src/utils/msc_tree.cc:654
 *:seclang-parser.tab.hh
 *:seclang-scanner.ll
 *:seclang-scanner.cc
-
-functionStatic:*
+*:src/seclang-scanner.cc
+passedByValue:src/variables/time.h:34
+knownConditionTrueFalse:test/regression/regression.cc:453
+unusedFunction:test/unit/unit_test.cc:33
